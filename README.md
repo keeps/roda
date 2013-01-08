@@ -7,7 +7,7 @@ Repository of Authentic Digital Objects
 
 RODA source code is migrating to GitHub, but before we are Mavenizing and making it a lot slimmer.
 
-RODA will be at GitHub until the end of July 2012, but, if you can't wait, checkout our current development site at:
+This process is taking more time than antecipated, but we expect that RODA will be at GitHub in March 2013. If you can't wait, checkout our current development site at:
 
 http://redmine.keep.pt/projects/roda-public/wiki
 
