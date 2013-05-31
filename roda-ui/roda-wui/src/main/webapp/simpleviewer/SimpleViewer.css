@@ -1,0 +1,20 @@
+@CHARSET "UTF-8";
+
+/* hide from ie on mac \*/
+html {
+	height: 100%;
+	overflow: hidden;
+}
+
+#flashcontent {
+	height: 100%;
+}
+
+/* end hide */
+body {
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	background-color: #181818;
+	color: #ffffff;
+}

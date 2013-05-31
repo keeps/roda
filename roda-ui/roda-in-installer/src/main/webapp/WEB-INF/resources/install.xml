@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<installation version="1.0">
+	<info>
+		<appname>RODA-in</appname>
+		<appversion>${roda-in.version}</appversion>
+		<authors>
+			<author name="Direcção Geral de Arquivos" email="http://dgarq.gov.pt"/>
+			<author name="Universidade do Minho" email="http://uminho.pt"/>
+		</authors>
+		<url>${roda_community_url}</url>
+		<javaversion>${java_version}</javaversion>
+	</info>
+	<guiprefs width="600" height="480" resizable="no">
+		<modifier key="useFlags" value="no"/>
+		<modifier key="langDisplayType" value="native"/>
+		<modifier key="layoutAnchor" value="NORTH"/>
+		<modifier key="useHeadingPanel" value="yes"/>
+		<modifier key="headingImageOnLeft" value="yes"/>
+		<modifier key="headingLineCount" value="1"/>
+		<modifier key="headingFontSize" value="1.5"/>
+		<modifier key="headingBackgroundColor" value="0x00ffffff"/>
+		<modifier key="headingPanelCounter" value="text"/>
+		<modifier key="headingPanelCounterPos" value="inHeading"/>
+	</guiprefs>
+	<locale>
+		<langpack iso3="por"/>
+		<langpack iso3="eng"/>
+	</locale>
+	<variables>
+		<variable name="roda.in.version" value="${roda-in.version}"/>
+		<variable name="roda.in.build.code" value="final"/>
+		<variable name="roda.in.build.date" value="${build.date}"/>
+	</variables>
+	<resources>
+		<res id="HTMLInfoPanel.info_por" src="Readme.por.html" encoding="UTF-8"/>
+		<res id="HTMLLicencePanel.licence_por" src="License.por.html" encoding="UTF-8"/>
+		<res id="HTMLInfoPanel.info_eng" src="Readme.eng.html" encoding="UTF-8"/>
+		<res id="HTMLLicencePanel.licence_eng" src="License.eng.html" encoding="UTF-8"/>
+		<res id="installer.langsel.img" src="install-images/LangSelectImg.png"/>
+		<res id="Heading.image" src="install-images/roda-logo-75x75.png"/>
+		<res id="shortcutSpec.xml" src="shortcutSpec.xml"/>
+		<res id="Unix_shortcutSpec.xml" src="Unix_shortcutSpec.xml"/>
+		<res id="packsLang.xml_por" src="packsLang.xml_por"/>
+		<res id="packsLang.xml_eng" src="packsLang.xml_eng"/>
+	</resources>
+	<!--
+		The panels section. We indicate here which panels we want to use. The
+		order will be respected.
+	-->
+	<panels>
+		<panel classname="HelloPanel"/>
+		<panel classname="HTMLInfoPanel"/>
+		<panel classname="HTMLLicencePanel"/>
+		<panel classname="TargetPanel"/>
+		<panel classname="PacksPanel"/>
+		<panel classname="InstallPanel"/>
+		<panel classname="ShortcutPanel"/>
+		<panel classname="SimpleFinishPanel"/>
+	</panels>
+	<!--
+		The packs section. We specify here our packs.
+	-->
+	<packs>
+		<pack name="Base" required="yes" id="base.package">
+			<description/>
+			<updatecheck>
+				<include name="lib/**"/>
+				<include name="roda-in.jar"/>
+				<exclude name="config/"/>
+			</updatecheck>
+			<fileset dir="." targetdir="$INSTALL_PATH" defaultexcludes="yes">
+				<include name="Readme.*.html"/>
+				<include name="License.*.html"/>
+				<include name="lib/*"/>
+				<include name="config/*"/>
+				<exclude name="config/roda-in.properties"/>
+				<include name="roda-in.jar"/>
+				<include name="icons/*"/>
+			</fileset>
+			<file src="roda-in.sh" targetdir="$INSTALL_PATH"/>
+			<file src="roda-in.cmd" targetdir="$INSTALL_PATH" os="windows"/>
+			<parsable targetfile="$INSTALL_PATH/roda-in.sh" encoding="UTF-8"/>
+			<parsable targetfile="$INSTALL_PATH/roda-in.cmd" encoding="UTF-8" os="windows"/>
+			<executable targetfile="$INSTALL_PATH/roda-in.sh" stage="never"/>
+		</pack>
+		<pack name="Docs" required="no" id="docs.package">
+			<description/>
+			<file src="doc" targetdir="$INSTALL_PATH"/>
+			<!-- Reccursive adding -->
+		</pack>
+	</packs>
+	<!-- The listeners section for CustomActions -->
+	<listeners>
+		<listener installer="RegistryInstallerListener" uninstaller="RegistryUninstallerListener">
+			<os family="windows"/>
+		</listener>
+	</listeners>
+	<native type="izpack" name="ShellLink.dll"/>
+	<native type="3rdparty" name="COIOSHelper.dll" stage="both">
+		<os family="windows"/>
+	</native>
+</installation>

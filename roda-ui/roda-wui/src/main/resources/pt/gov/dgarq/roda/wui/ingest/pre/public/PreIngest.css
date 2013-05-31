@@ -1,0 +1,24 @@
+@CHARSET "UTF-8";
+
+.wui-ingest-pre {
+}
+
+.wui-ingest-pre .classificationPlan-label {
+	font-size: 14px;
+	font-weight: bold;
+	margin: 10px 5px 5px 200px;
+}
+
+.wui-ingest-pre .classificationPlan {
+	width: 625px;
+	margin-left: 200px;
+	margin-bottom: 5px;
+}
+
+.wui-ingest-pre .classificationPlan .element-header-title {
+	width: 280px;
+}
+
+.wui-ingest-pre .classificationPlan .TreeItemPanel .treeitem-info-title {
+	width: 280px;
+}

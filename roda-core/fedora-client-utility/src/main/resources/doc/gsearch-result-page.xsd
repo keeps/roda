@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+  <xs:element name="resultPage">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="gfindObjects" type="gfindObjects"/>
+      </xs:sequence>
+      <xs:attribute name="dateTime" use="required" type="xs:string"/>
+      <xs:attribute name="indexName" use="required" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="gfindObjects">
+    <xs:sequence>
+      <xs:element name="objects" type="objects"/>
+    </xs:sequence>
+    <xs:attribute name="hitPageSize" use="required" type="xs:int"/>
+    <xs:attribute name="hitPageStart" use="required" type="xs:int"/>
+    <xs:attribute name="hitTotal" use="required" type="xs:int"/>
+    <xs:attribute name="query" use="required" type="xs:string"/>
+    <xs:attribute name="resultPageXslt" use="required" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="objects">
+    <xs:sequence>
+      <xs:element name="object" type="object" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="object">
+    <xs:sequence>
+      <xs:element name="field" type="field" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="no" use="required" type="xs:int"/>
+    <xs:attribute name="score" use="required" type="xs:float"/>
+  </xs:complexType>
+
+  <xs:complexType name="field" mixed="true">
+    <xs:sequence>
+      <xs:element name="span" type="span" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="name" use="required" type="xs:string"/>
+    <xs:attribute name="snippet" type="xs:NMTOKEN"/>
+  </xs:complexType>
+
+  <xs:complexType name="span">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="class" type="xs:string"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+</xs:schema>

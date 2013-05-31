@@ -1,0 +1,12 @@
+Na sequência do registo sobre o nome de utilizador $username, enviamos o pedido de verificação do endereço electrónico.
+
+Para proceder à verificação, siga o endereço $verificationCompleteURL
+Alternativamente, insira a senha de autenticação em $verificationURL
+
+Nome de utilizador:   $username
+Senha de verificação: $token
+
+Caso não tenha feito o registo, por favor ignore este email.
+
+=====================================================
+RODA - Repositório de Objectos Digitais e Autênticos

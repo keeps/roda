@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app id="roda-migrator-win" version="2.4"
+	xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+	<display-name>RODA Windows Migration Service</display-name>
+	<description>This application provides windows migration services for RODA
+		services</description>
+	<servlet>
+		<display-name> Apache-Axis Servlet</display-name>
+		<servlet-name>AxisServlet</servlet-name>
+		<servlet-class> org.apache.axis.transport.http.AxisServlet</servlet-class>
+	</servlet>
+	<servlet>
+		<display-name> Axis Admin Servlet</display-name>
+		<servlet-name>AdminServlet</servlet-name>
+		<servlet-class> org.apache.axis.transport.http.AdminServlet</servlet-class>
+		<load-on-startup>100</load-on-startup>
+	</servlet>
+	<!-- Cache Servlet -->
+	<servlet>
+		<display-name>RODA Migrator Cache Servlet</display-name>
+		<servlet-name>CacheServlet</servlet-name>
+		<servlet-class>pt.gov.dgarq.roda.migrator.services.CacheServlet
+		</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>AxisServlet</servlet-name>
+		<url-pattern>/servlet/AxisServlet</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>AxisServlet</servlet-name>
+		<url-pattern>*.jws</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>AxisServlet</servlet-name>
+		<url-pattern>/services/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>AdminServlet</servlet-name>
+		<url-pattern>/servlet/AdminServlet</url-pattern>
+	</servlet-mapping>
+	<!-- Cache Servlet -->
+	<servlet-mapping>
+		<servlet-name>CacheServlet</servlet-name>
+		<url-pattern>/cache/*</url-pattern>
+	</servlet-mapping>
+	
+		<!-- Listeners -->
+	<listener>
+		<description>
+			RODA Migrator Listener listens for startup and shutdown
+			notifications of the RODA Migrator web application.
+		</description>
+		<display-name>RODA Win Migrator Listener</display-name>
+		<listener-class>
+			pt.gov.dgarq.roda.migrator.RodaMigratorWinApplication
+		</listener-class>
+	</listener>
+	
+	<!-- LDAP Authentication Filter -->
+	<filter>
+		<filter-name>LdapAuthenticationFilter</filter-name>
+		<filter-class> pt.gov.dgarq.roda.servlet.LdapAuthenticationFilter 
+		</filter-class>
+		<init-param>
+			<description> LDAP server hostname (default: localhost) 
+			</description>
+			<param-name>host</param-name>
+			<param-value>localhost</param-value>
+		</init-param>
+		<init-param>
+			<description>LDAP server port (default: 389)</description>
+			<param-name>port</param-name>
+			<param-value>389</param-value>
+		</init-param>
+		<init-param>
+			<description>LDAP people DN</description>
+			<param-name>peopleDN</param-name>
+			<param-value>ou=people,dc=roda,dc=dgarq,dc=gov,dc=pt </param-value>
+		</init-param>
+		<init-param>
+			<description>LDAP groups DN</description>
+			<param-name>groupsDN</param-name>
+			<param-value>ou=groups,dc=roda,dc=dgarq,dc=gov,dc=pt </param-value>
+		</init-param>
+		<init-param>
+			<description>LDAP roles DN</description>
+			<param-name>rolesDN</param-name>
+			<param-value>ou=roles,dc=roda,dc=dgarq,dc=gov,dc=pt </param-value>
+		</init-param>
+		<init-param>
+			<description>LDAP protected users</description>
+			<param-name>protectedUsers</param-name>
+			<param-value>admin,guest,roda-ingest-task,roda-wui,roda-disseminator</param-value>
+		</init-param>
+		<init-param>
+			<description>LDAP protected groups</description>
+			<param-name>protectedGroups</param-name>
+			<param-value>administrators,guests</param-value>
+		</init-param>
+		<init-param>
+			<description> Authentication Realm (default: null) </description>
+			<param-name>realm</param-name>
+			<param-value>RODA Services</param-value>
+		</init-param>
+	</filter>
+
+	<!-- Role Filters -->
+	<!--
+		<filter> <filter-name>UserManagementRoleFilter</filter-name>
+		<filter-class> pt.gov.dgarq.roda.servlet.RoleFilter </filter-class>
+		<init-param> <description> The role to access UserManagement service
+		</description> <param-name>role</param-name>
+		<param-value>administration.user</param-value> </init-param> </filter>
+	-->
+	
+	<!-- Converters authentication filter -->
+	<filter-mapping>
+		<filter-name>LdapAuthenticationFilter</filter-name>
+		<url-pattern>/services/*</url-pattern>
+	</filter-mapping>
+
+	<!-- Cache authentication filter -->
+	<!-- 
+	<filter-mapping>
+		<filter-name>LdapAuthenticationFilter</filter-name>
+		<url-pattern>/cache/*</url-pattern>
+	</filter-mapping>
+	-->
+
+	<!-- Converters role filter -->
+	<!--
+		<filter-mapping> <filter-name>ConvertersRoleFilter</filter-name>
+		<url-pattern>/services/*</url-pattern> </filter-mapping>
+	-->
+</web-app>

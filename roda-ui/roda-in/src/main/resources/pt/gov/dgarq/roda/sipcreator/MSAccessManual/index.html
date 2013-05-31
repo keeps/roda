@@ -1,0 +1,48 @@
+<html>
+<body>
+<h1>Importar de Microsoft Access</h1>
+<p>Para importar bases de dados em Microsoft Access s&#227;o necess&#225;rios alguns passos manuais. A aplica&#231;&#227;o destes passos &#233; r&#225;pida e simples, e pressup&#245;e a exist&#234;ncia de um Microsoft Access instalado na m&#225;quina onde ser&#225; feita a importa&#231;&#227;o pelo RODA-in.</p>
+
+<br>
+<h2>Activar op&#231;&#227;o para ver objectos de sistema</h2>
+<p>&#201; necess&#225;rio activar a op&#231;&#227;o de visualiza&#231;&#227;o de objectos de sistema para conseguir efectuar os passos seguintes. Este passo s&#243; precisa de ser efectuado uma vez numa mesma instala&#231;&#227;o do Microsoft Access:</p>
+<ol>
+<li>Aceda &#224;s op&#231;&#245;es do Microsoft Access;
+<br/>
+<img src="images/ms_access_step_01.png" alt="Tools &#187; Options" />
+<br/>
+<br/>
+</li>
+<li>No separador <i>View</i>, em <i>Show</i>, escolha <i>System Objects</i>;
+<br/>
+<img src="images/ms_access_step_02.png" alt="View &#187; Show &#187; System Objects" />
+<br/>
+<br/>
+</li>
+<li>Carregue em <i>OK</i>.</li>
+
+</li>
+</ol>
+
+<br/>
+<h2>Adicione permiss&#245;es de leitura ao Cat&#225;logo Microsoft</h2>
+<p>Para cada base de dados a importar, &#233; necess&#225;rio adicionar permiss&#245;es de leitura ao C&#225;talogo Microsoft, para que as informa&#231;&#245;es de estruturas possam ser extra&#237;das:</p>
+<ol>
+<li>Aceda &#224;s permiss&#245;es de Utilizadores e Grupos;
+<br/>
+<img src="images/ms_access_step_03.png" alt="Tools &#187; Security &#187; User and Group Permissions..." />
+<br/>
+<br/>
+</li>
+<li>No separador <i>Permissions</i>, na lista <i>Object Name</i>, escolha a tabela <emph>MSysRelationships</emph>;
+<br/>
+<img src="images/ms_access_step_04.png" alt="Permissions &#187; Object Name &#187; MSysRelationships" />
+<br/>
+<br/>
+<li>Active as permiss&#245;es <i>Read Design</i> e <i>Read Data</i>;</li>
+<li>Carregue em <i>OK</i>.</li>
+</li>
+</ol>
+
+</body>
+</html>

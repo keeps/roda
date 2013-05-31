@@ -1,0 +1,795 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="http://services.core.roda.dgarq.gov.pt" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="http://services.core.roda.dgarq.gov.pt" xmlns:intf="http://services.core.roda.dgarq.gov.pt" xmlns:tns1="http://data.core.roda.dgarq.gov.pt" xmlns:tns2="http://common.core.roda.dgarq.gov.pt" xmlns:tns3="http://filter.adapter.data.core.roda.dgarq.gov.pt" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<!--WSDL created by Apache Axis version: 1.4
+Built on Apr 22, 2006 (06:55:48 PDT)-->
+ <wsdl:types>
+  <schema elementFormDefault="qualified" targetNamespace="http://services.core.roda.dgarq.gov.pt" xmlns="http://www.w3.org/2001/XMLSchema">
+   <import namespace="http://data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://common.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+   <element name="addGroup">
+    <complexType>
+     <sequence>
+      <element name="group" type="tns1:Group"/>
+     </sequence>
+    </complexType>
+   </element>
+   <complexType name="ArrayOf_xsd_string">
+    <sequence>
+     <element maxOccurs="unbounded" minOccurs="0" name="item" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <element name="addGroupResponse">
+    <complexType>
+     <sequence>
+      <element name="addGroupReturn" type="tns1:Group"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="fault" type="tns2:UserManagementException"/>
+   <element name="fault1" type="tns2:GroupAlreadyExistsException"/>
+   <element name="removeGroup">
+    <complexType>
+     <sequence>
+      <element name="groupname" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="removeGroupResponse">
+    <complexType/>
+   </element>
+   <element name="fault2" type="tns2:IllegalOperationException"/>
+   <element name="modifyGroup">
+    <complexType>
+     <sequence>
+      <element name="modifiedGroup" type="tns1:Group"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="modifyGroupResponse">
+    <complexType>
+     <sequence>
+      <element name="modifyGroupReturn" type="tns1:Group"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="fault3" type="tns2:NoSuchGroupException"/>
+   <element name="addUser">
+    <complexType>
+     <sequence>
+      <element name="user" type="tns1:User"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="addUserResponse">
+    <complexType>
+     <sequence>
+      <element name="addUserReturn" type="tns1:User"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="fault4" type="tns2:UserAlreadyExistsException"/>
+   <element name="fault5" type="tns2:EmailAlreadyExistsException"/>
+   <element name="modifyUser">
+    <complexType>
+     <sequence>
+      <element name="modifiedUser" type="tns1:User"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="modifyUserResponse">
+    <complexType>
+     <sequence>
+      <element name="modifyUserReturn" type="tns1:User"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="fault6" type="tns2:NoSuchUserException"/>
+   <element name="removeUser">
+    <complexType>
+     <sequence>
+      <element name="username" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="removeUserResponse">
+    <complexType>
+     <sequence>
+      <element name="removeUserReturn" type="xsd:boolean"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="setUserPassword">
+    <complexType>
+     <sequence>
+      <element name="username" type="xsd:string"/>
+      <element name="password" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="setUserPasswordResponse">
+    <complexType/>
+   </element>
+  </schema>
+  <schema elementFormDefault="qualified" targetNamespace="http://data.core.roda.dgarq.gov.pt" xmlns="http://www.w3.org/2001/XMLSchema">
+   <import namespace="http://common.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://services.core.roda.dgarq.gov.pt"/>
+   <complexType name="RODAMember">
+    <sequence>
+     <element name="active" type="xsd:boolean"/>
+     <element name="allGroups" nillable="true" type="impl:ArrayOf_xsd_string"/>
+     <element name="directRoles" nillable="true" type="impl:ArrayOf_xsd_string"/>
+     <element name="fullName" nillable="true" type="xsd:string"/>
+     <element name="groups" nillable="true" type="impl:ArrayOf_xsd_string"/>
+     <element name="name" nillable="true" type="xsd:string"/>
+     <element name="roles" nillable="true" type="impl:ArrayOf_xsd_string"/>
+    </sequence>
+   </complexType>
+   <complexType name="Group">
+    <complexContent>
+     <extension base="tns1:RODAMember">
+      <sequence>
+       <element name="memberGroupNames" nillable="true" type="impl:ArrayOf_xsd_string"/>
+       <element name="memberUserNames" nillable="true" type="impl:ArrayOf_xsd_string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="User">
+    <complexContent>
+     <extension base="tns1:RODAMember">
+      <sequence>
+       <element name="birthCountry" nillable="true" type="xsd:string"/>
+       <element name="businessCategory" nillable="true" type="xsd:string"/>
+       <element name="countryName" nillable="true" type="xsd:string"/>
+       <element name="email" nillable="true" type="xsd:string"/>
+       <element name="emailConfirmationToken" nillable="true" type="xsd:string"/>
+       <element name="emailConfirmationTokenExpirationDate" nillable="true" type="xsd:string"/>
+       <element name="fax" nillable="true" type="xsd:string"/>
+       <element name="financeIdentificationNumber" nillable="true" type="xsd:string"/>
+       <element name="idDocument" nillable="true" type="xsd:string"/>
+       <element name="idDocumentDate" nillable="true" type="xsd:dateTime"/>
+       <element name="idDocumentLocation" nillable="true" type="xsd:string"/>
+       <element name="idDocumentType" nillable="true" type="xsd:string"/>
+       <element name="localityName" nillable="true" type="xsd:string"/>
+       <element name="postalAddress" nillable="true" type="xsd:string"/>
+       <element name="postalCode" nillable="true" type="xsd:string"/>
+       <element name="resetPasswordToken" nillable="true" type="xsd:string"/>
+       <element name="resetPasswordTokenExpirationDate" nillable="true" type="xsd:string"/>
+       <element name="telephoneNumber" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+  </schema>
+  <schema elementFormDefault="qualified" targetNamespace="http://common.core.roda.dgarq.gov.pt" xmlns="http://www.w3.org/2001/XMLSchema">
+   <import namespace="http://data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://services.core.roda.dgarq.gov.pt"/>
+   <complexType abstract="true" name="RODAException">
+    <sequence>
+     <element name="message" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="RODAServiceException">
+    <complexContent>
+     <extension base="tns2:RODAException">
+      <sequence/>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="UserManagementException">
+    <complexContent>
+     <extension base="tns2:RODAServiceException">
+      <sequence/>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="GroupAlreadyExistsException">
+    <complexContent>
+     <extension base="tns2:RODAServiceException">
+      <sequence/>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="IllegalOperationException">
+    <complexContent>
+     <extension base="tns2:RODAServiceException">
+      <sequence/>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="NoSuchGroupException">
+    <complexContent>
+     <extension base="tns2:RODAServiceException">
+      <sequence/>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="UserAlreadyExistsException">
+    <complexContent>
+     <extension base="tns2:UserManagementException">
+      <sequence/>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="UserRegistrationException">
+    <complexContent>
+     <extension base="tns2:RODAServiceException">
+      <sequence/>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="EmailAlreadyExistsException">
+    <complexContent>
+     <extension base="tns2:UserRegistrationException">
+      <sequence/>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="NoSuchUserException">
+    <complexContent>
+     <extension base="tns2:RODAServiceException">
+      <sequence/>
+     </extension>
+    </complexContent>
+   </complexType>
+  </schema>
+  <schema elementFormDefault="qualified" targetNamespace="http://filter.adapter.data.core.roda.dgarq.gov.pt" xmlns="http://www.w3.org/2001/XMLSchema">
+   <import namespace="http://data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://common.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://services.core.roda.dgarq.gov.pt"/>
+   <complexType abstract="true" name="FilterParameter">
+    <sequence>
+     <element name="name" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="SimpleFilterParameter">
+    <complexContent>
+     <extension base="tns3:FilterParameter">
+      <sequence>
+       <element name="value" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="OneOfManyFilterParameter">
+    <complexContent>
+     <extension base="tns3:FilterParameter">
+      <sequence>
+       <element name="values" nillable="true" type="impl:ArrayOf_xsd_string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="RangeFilterParameter">
+    <complexContent>
+     <extension base="tns3:FilterParameter">
+      <sequence>
+       <element name="fromValue" nillable="true" type="xsd:string"/>
+       <element name="toValue" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="RegexFilterParameter">
+    <complexContent>
+     <extension base="tns3:FilterParameter">
+      <sequence>
+       <element name="regex" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="ProducerFilterParameter">
+    <complexContent>
+     <extension base="tns3:FilterParameter">
+      <sequence>
+       <element name="groups" nillable="true" type="impl:ArrayOf_xsd_string"/>
+       <element name="username" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="LikeFilterParameter">
+    <complexContent>
+     <extension base="tns3:FilterParameter">
+      <sequence>
+       <element name="expression" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+  </schema>
+ </wsdl:types>
+
+   <wsdl:message name="removeUserResponse">
+
+      <wsdl:part element="impl:removeUserResponse" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="modifyUserResponse">
+
+      <wsdl:part element="impl:modifyUserResponse" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="addUserResponse">
+
+      <wsdl:part element="impl:addUserResponse" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="setUserPasswordRequest">
+
+      <wsdl:part element="impl:setUserPassword" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="IllegalOperationException">
+
+      <wsdl:part element="impl:fault2" name="fault"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="modifyUserRequest">
+
+      <wsdl:part element="impl:modifyUser" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="addGroupRequest">
+
+      <wsdl:part element="impl:addGroup" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="modifyGroupRequest">
+
+      <wsdl:part element="impl:modifyGroup" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="modifyGroupResponse">
+
+      <wsdl:part element="impl:modifyGroupResponse" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="GroupAlreadyExistsException">
+
+      <wsdl:part element="impl:fault1" name="fault"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="EmailAlreadyExistsException">
+
+      <wsdl:part element="impl:fault5" name="fault"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="removeGroupResponse">
+
+      <wsdl:part element="impl:removeGroupResponse" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="UserAlreadyExistsException">
+
+      <wsdl:part element="impl:fault4" name="fault"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="removeUserRequest">
+
+      <wsdl:part element="impl:removeUser" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="addGroupResponse">
+
+      <wsdl:part element="impl:addGroupResponse" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="addUserRequest">
+
+      <wsdl:part element="impl:addUser" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="NoSuchUserException">
+
+      <wsdl:part element="impl:fault6" name="fault"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="NoSuchGroupException">
+
+      <wsdl:part element="impl:fault3" name="fault"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="removeGroupRequest">
+
+      <wsdl:part element="impl:removeGroup" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="setUserPasswordResponse">
+
+      <wsdl:part element="impl:setUserPasswordResponse" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="UserManagementException">
+
+      <wsdl:part element="impl:fault" name="fault"/>
+
+   </wsdl:message>
+
+   <wsdl:portType name="UserManagement">
+
+      <wsdl:operation name="addGroup">
+
+         <wsdl:input message="impl:addGroupRequest" name="addGroupRequest"/>
+
+         <wsdl:output message="impl:addGroupResponse" name="addGroupResponse"/>
+
+         <wsdl:fault message="impl:GroupAlreadyExistsException" name="GroupAlreadyExistsException"/>
+
+         <wsdl:fault message="impl:UserManagementException" name="UserManagementException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="removeGroup">
+
+         <wsdl:input message="impl:removeGroupRequest" name="removeGroupRequest"/>
+
+         <wsdl:output message="impl:removeGroupResponse" name="removeGroupResponse"/>
+
+         <wsdl:fault message="impl:IllegalOperationException" name="IllegalOperationException"/>
+
+         <wsdl:fault message="impl:UserManagementException" name="UserManagementException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="modifyGroup">
+
+         <wsdl:input message="impl:modifyGroupRequest" name="modifyGroupRequest"/>
+
+         <wsdl:output message="impl:modifyGroupResponse" name="modifyGroupResponse"/>
+
+         <wsdl:fault message="impl:NoSuchGroupException" name="NoSuchGroupException"/>
+
+         <wsdl:fault message="impl:IllegalOperationException" name="IllegalOperationException"/>
+
+         <wsdl:fault message="impl:UserManagementException" name="UserManagementException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="addUser">
+
+         <wsdl:input message="impl:addUserRequest" name="addUserRequest"/>
+
+         <wsdl:output message="impl:addUserResponse" name="addUserResponse"/>
+
+         <wsdl:fault message="impl:UserAlreadyExistsException" name="UserAlreadyExistsException"/>
+
+         <wsdl:fault message="impl:EmailAlreadyExistsException" name="EmailAlreadyExistsException"/>
+
+         <wsdl:fault message="impl:UserManagementException" name="UserManagementException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="modifyUser">
+
+         <wsdl:input message="impl:modifyUserRequest" name="modifyUserRequest"/>
+
+         <wsdl:output message="impl:modifyUserResponse" name="modifyUserResponse"/>
+
+         <wsdl:fault message="impl:NoSuchUserException" name="NoSuchUserException"/>
+
+         <wsdl:fault message="impl:IllegalOperationException" name="IllegalOperationException"/>
+
+         <wsdl:fault message="impl:EmailAlreadyExistsException" name="EmailAlreadyExistsException"/>
+
+         <wsdl:fault message="impl:UserManagementException" name="UserManagementException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="removeUser">
+
+         <wsdl:input message="impl:removeUserRequest" name="removeUserRequest"/>
+
+         <wsdl:output message="impl:removeUserResponse" name="removeUserResponse"/>
+
+         <wsdl:fault message="impl:NoSuchUserException" name="NoSuchUserException"/>
+
+         <wsdl:fault message="impl:IllegalOperationException" name="IllegalOperationException"/>
+
+         <wsdl:fault message="impl:UserManagementException" name="UserManagementException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="setUserPassword">
+
+         <wsdl:input message="impl:setUserPasswordRequest" name="setUserPasswordRequest"/>
+
+         <wsdl:output message="impl:setUserPasswordResponse" name="setUserPasswordResponse"/>
+
+         <wsdl:fault message="impl:NoSuchUserException" name="NoSuchUserException"/>
+
+         <wsdl:fault message="impl:IllegalOperationException" name="IllegalOperationException"/>
+
+         <wsdl:fault message="impl:UserManagementException" name="UserManagementException"/>
+
+      </wsdl:operation>
+
+   </wsdl:portType>
+
+   <wsdl:binding name="UserManagementSoapBinding" type="impl:UserManagement">
+
+      <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+      <wsdl:operation name="addGroup">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="addGroupRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="addGroupResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="GroupAlreadyExistsException">
+
+            <wsdlsoap:fault name="GroupAlreadyExistsException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="UserManagementException">
+
+            <wsdlsoap:fault name="UserManagementException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="removeGroup">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="removeGroupRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="removeGroupResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="IllegalOperationException">
+
+            <wsdlsoap:fault name="IllegalOperationException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="UserManagementException">
+
+            <wsdlsoap:fault name="UserManagementException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="modifyGroup">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="modifyGroupRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="modifyGroupResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="NoSuchGroupException">
+
+            <wsdlsoap:fault name="NoSuchGroupException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="IllegalOperationException">
+
+            <wsdlsoap:fault name="IllegalOperationException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="UserManagementException">
+
+            <wsdlsoap:fault name="UserManagementException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="addUser">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="addUserRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="addUserResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="UserAlreadyExistsException">
+
+            <wsdlsoap:fault name="UserAlreadyExistsException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="EmailAlreadyExistsException">
+
+            <wsdlsoap:fault name="EmailAlreadyExistsException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="UserManagementException">
+
+            <wsdlsoap:fault name="UserManagementException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="modifyUser">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="modifyUserRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="modifyUserResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="NoSuchUserException">
+
+            <wsdlsoap:fault name="NoSuchUserException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="IllegalOperationException">
+
+            <wsdlsoap:fault name="IllegalOperationException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="EmailAlreadyExistsException">
+
+            <wsdlsoap:fault name="EmailAlreadyExistsException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="UserManagementException">
+
+            <wsdlsoap:fault name="UserManagementException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="removeUser">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="removeUserRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="removeUserResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="NoSuchUserException">
+
+            <wsdlsoap:fault name="NoSuchUserException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="IllegalOperationException">
+
+            <wsdlsoap:fault name="IllegalOperationException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="UserManagementException">
+
+            <wsdlsoap:fault name="UserManagementException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="setUserPassword">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="setUserPasswordRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="setUserPasswordResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="NoSuchUserException">
+
+            <wsdlsoap:fault name="NoSuchUserException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="IllegalOperationException">
+
+            <wsdlsoap:fault name="IllegalOperationException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="UserManagementException">
+
+            <wsdlsoap:fault name="UserManagementException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+   </wsdl:binding>
+
+   <wsdl:service name="UserManagementService">
+
+      <wsdl:port binding="impl:UserManagementSoapBinding" name="UserManagement">
+
+         <wsdlsoap:address location="http://localhost:8080/roda-core/services/UserManagement"/>
+
+      </wsdl:port>
+
+   </wsdl:service>
+
+</wsdl:definitions>

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app id="WebApp_ID" version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+	<display-name>
+	roda-in-installer</display-name>
+	<servlet>
+		<description>
+		Get RODA-in installer</description>
+		<display-name>GetRodaIn</display-name>
+		<servlet-name>GetRodaIn</servlet-name>
+		<servlet-class>
+		pt.gov.dgarq.roda.sipcreator.installer.GetRodaIn</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>GetRodaIn</servlet-name>
+		<url-pattern>/GetRodaIn</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>GetRodaIn</servlet-name>
+		<url-pattern>/GetRodaIn/*</url-pattern>
+	</servlet-mapping>
+	
+	<!-- LDAP Authentication Filters -->
+	<filter>
+		<filter-name>LdapAuthenticationFilter</filter-name>
+		<filter-class>
+			pt.gov.dgarq.roda.servlet.LdapAuthenticationFilter
+		</filter-class>
+		<init-param>
+			<description>
+				Authentication Realm (default: null)
+			</description>
+			<param-name>realm</param-name>
+			<param-value>RODA-in Installer</param-value>
+		</init-param>
+<!--	
+		<init-param>
+			<description>
+				LDAP server hostname (default: localhost)
+			</description>
+			<param-name>host</param-name>
+			<param-value>localhost</param-value>
+		</init-param>
+		<init-param>
+			<description>LDAP server port (default: 389)</description>
+			<param-name>port</param-name>
+			<param-value>389</param-value>
+		</init-param>
+		<init-param>
+			<description>LDAP people DN</description>
+			<param-name>peopleDN</param-name>
+			<param-value>
+				ou=people,dc=roda,dc=dgarq,dc=gov,dc=pt
+			</param-value>
+		</init-param>
+		<init-param>
+			<description>LDAP groups DN</description>
+			<param-name>groupsDN</param-name>
+			<param-value>
+				ou=groups,dc=roda,dc=dgarq,dc=gov,dc=pt
+			</param-value>
+		</init-param>
+		<init-param>
+			<description>LDAP roles DN</description>
+			<param-name>rolesDN</param-name>
+			<param-value>
+				ou=roles,dc=roda,dc=dgarq,dc=gov,dc=pt
+			</param-value>
+		</init-param>
+		<init-param>
+			<description>LDAP protected users</description>
+			<param-name>protectedUsers</param-name>
+			<param-value>
+				admin,guest,roda-ingest-task,roda-wui
+			</param-value>
+		</init-param>
+		<init-param>
+			<description>LDAP protected groups</description>
+			<param-name>protectedGroups</param-name>
+			<param-value>administrators,guests</param-value>
+		</init-param>
+		<init-param>
+			<description>
+				Authentication Realm (default: null)
+			</description>
+			<param-name>realm</param-name>
+			<param-value>RODA-in Installer</param-value>
+		</init-param>
+-->
+	</filter>
+
+	<!-- Role Filters -->
+	<filter>
+		<filter-name>GetRodaInRoleFilter</filter-name>
+		<filter-class>
+			pt.gov.dgarq.roda.servlet.RoleFilter
+		</filter-class>
+		<init-param>
+			<description>
+				The role to access get RODA-in service
+			</description>
+			<param-name>role</param-name>
+			<param-value>misc.browse_users</param-value>
+		</init-param>
+	</filter>
+	
+	<!-- Get RODA-in LDAP filter -->
+	<filter-mapping>
+		<filter-name>LdapAuthenticationFilter</filter-name>
+		<url-pattern>/GetRodaIn/*</url-pattern>
+	</filter-mapping>
+	<!-- Get RODA-in role service -->
+	<filter-mapping>
+		<filter-name>GetRodaInRoleFilter</filter-name>
+		<url-pattern>/GetRodaIn/*</url-pattern>
+	</filter-mapping>
+</web-app>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="setup-migrator-core" basedir=".">
+
+	<property environment="env" />
+
+	<!-- ../config/ldap-filter.properties -->
+	<target name="ldap-filter.properties">
+		<replace file="../config/ldap-filter.properties" token="LDAPHOST" value="${env.LDAPHOST}" />
+		<replace file="../config/ldap-filter.properties" token="LDAPPORT" value="${env.LDAPPORT}" />
+		<replace file="../config/ldap-filter.properties" token="LDAP_USERS_DN" value="${env.LDAP_USERS_DN}" />
+		<replace file="../config/ldap-filter.properties" token="LDAP_GROUPS_DN" value="${env.LDAP_GROUPS_DN}" />
+		<replace file="../config/ldap-filter.properties" token="LDAP_ROLES_DN" value="${env.LDAP_ROLES_DN}" />
+	</target>
+
+	<!-- ../config/roda-migrator.properties -->
+	<target name="roda-migrator.properties">
+		<replace file="../config/roda-migrator.properties" token="RODA_HOME" value="${env.RODA_HOME}" />
+		<replace file="../config/roda-migrator.properties" token="RODACORE_HOST" value="${env.RODACORE_HOST}" />
+		<replace file="../config/roda-migrator.properties" token="RODACORE_PORT" value="${env.RODACORE_PORT}" />
+		<replace file="../config/roda-migrator.properties" token="RODAWUI_MYSQL_HOST" value="${env.RODAWUI_MYSQL_HOST}" />
+		<replace file="../config/roda-migrator.properties" token="RODAWUI_MYSQL_PORT" value="${env.RODAWUI_MYSQL_PORT}" />
+		<replace file="../config/roda-migrator.properties" token="RODAWUI_MYSQL_USER_PASSWD" value="${env.RODAWUI_MYSQL_USER_PASSWD}" />
+		<replace file="../config/roda-migrator.properties" token="RODAWUI_MYSQL_USER" value="${env.RODAWUI_MYSQL_USER}" />
+	</target>
+
+</project>
+

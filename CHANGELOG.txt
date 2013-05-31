@@ -1,0 +1,18 @@
+roda (1.1.0) stable; urgency=low
+
+  * RODA was released to GitHub
+    (https://github.com/keeps/roda/issues/2)
+  * RODA was completly mavenized (installer creation included,
+    using the maven profile "create-installer")
+    (https://github.com/keeps/roda/issues/1)
+  * Scheduler was storing dates incorrectly
+    (https://github.com/keeps/roda/issues/3)
+  * String formater was used in some parts of the code to build
+    SQL statements and proved to be a problem with different
+    locales (when different characters are used as separator
+    for floating point values)
+    (https://github.com/keeps/roda/issues/4)
+  * Revised footer logos (roda-wui)
+
+ -- KEEP SOLUTIONS <hsilva@keep.pt>  Fri, 31 May 2013 13:00:00 +0000
+

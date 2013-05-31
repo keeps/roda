@@ -1,0 +1,59 @@
+{
+"hdl_http_config" = {
+"bind_address" = "0.0.0.0"
+"num_threads" = "15"
+"bind_port" = "8000"
+"backlog" = "5"
+"log_accesses" = "yes"
+}
+
+"server_type" = "server"
+"hdl_udp_config" = {
+"bind_address" = "0.0.0.0"
+"num_threads" = "15"
+"bind_port" = "2641"
+"log_accesses" = "yes"
+}
+
+"hdl_tcp_config" = {
+"bind_address" = "0.0.0.0"
+"num_threads" = "15"
+"bind_port" = "2641"
+"backlog" = "5"
+"log_accesses" = "yes"
+}
+
+"log_save_config" = {
+"log_save_interval" = "Daily"
+}
+
+"no_udp_resolution" = "n"
+"interfaces" = (
+"hdl_udp"
+"hdl_tcp"
+"hdl_http"
+)
+
+"server_config" = {
+"server_admins" = (
+"300:0.NA/10384"
+)
+
+"replication_admins" = (
+"300:0.NA/10384"
+)
+
+"max_session_time" = "86400000"
+"this_server_id" = "1"
+"max_auth_time" = "60000"
+"backup_admins" = (
+"300:0.NA/10384"
+)
+
+"case_sensitive" = "no"
+
+"storage_type" = "custom"
+"storage_class" = "pt.gov.dgarq.roda.handle.RODAHandleStorage"
+}
+
+}

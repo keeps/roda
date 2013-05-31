@@ -1,0 +1,214 @@
+#!/bin/bash
+### BEGIN INIT INFO
+# Provides:          jboss
+# Required-Start:    $local_fs $remote_fs $network $syslog
+# Required-Stop:     $local_fs $remote_fs $network $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start/Stop JBoss AS
+### END INIT INFO
+
+# change to the directory where the script is so we can read the configurations
+cd $(dirname $(readlink -m $0))
+
+# try to source the config file and set some variables
+if [ -f jboss.config ]; then
+	. ./jboss.config
+	. $SET_RODA_ENV_SCRIPT
+	JBOSS_HOME="${RODA_HOME%/}/$JBOSS_RELATIVE_PATH_TO_RODA_HOME"
+	JBOSS_PIDFILE="${JBOSS_HOME%/}/pid/jboss.pid"
+fi
+
+#define where jboss is - this is the directory containing directories log, bin, conf etc
+JBOSS_HOME=${JBOSS_HOME:-"/usr/local/jboss"}
+
+#define the user under which jboss will run, or use 'RUNASIS' to run as the current user
+JBOSS_USER=${JBOSS_USER:-"RUNASIS"}
+
+#make sure java is in your path
+#this must be set even if java is in a well-known place like /usr/bin
+JAVAPTH=${JAVAPTH:-"/usr/bin"}
+
+#configuration to use, usually one of 'minimal', 'default', 'all'
+JBOSS_CONF=${JBOSS_CONF:-"default"}
+
+#if JBOSS_HOST specified, use -b to bind jboss services to that address
+JBOSS_BIND_ADDR=${JBOSS_HOST:-"-b 0.0.0.0"}
+
+if [ "$JBOSS_USER" = "RUNASIS" -o "$USER" = "$JBOSS_USER" ]; then
+	SUBIT=""
+else
+	SUBIT="su - $JBOSS_USER -c "
+fi
+
+#define what will be done with the console log
+JBOSS_CONSOLE=${JBOSS_CONSOLE:-"/dev/null"}
+
+if [ -z "$(echo $PATH | grep $JAVAPTH)" ]; then
+	export PATH=$PATH:$JAVAPTH
+fi
+
+if [ ! -d "$JBOSS_HOME" ]; then
+	echo JBOSS_HOME does not exist as a valid directory : $JBOSS_HOME
+	exit 1
+fi
+
+if [ ! -z $JAVA_HOME ]; then
+  JAVA=$JAVA_HOME/bin/java
+else
+  JAVA=java
+fi
+
+# Define classpaths for startup and shutdown
+JBOSS_CLASSPATH=${JBOSS_CLASSPATH:-"$JBOSS_HOME/bin/run.jar:$JAVA_HOME/lib/tools.jar"}
+JBOSS_SHUTDOWN_CLASSPATH=${JBOSS_SHUTDOWN_CLASSPATH:-"$JBOSS_HOME/bin/shutdown.jar:$JBOSS_HOME/client/jnet.jar"}
+
+JAVA_OPTS=${JAVA_OPTS:-"-Xms256m -Xmx768m -XX:MaxPermSize=256m -Dorg.jboss.resolver.warning=true -Dsun.rmi.dgc.client.gcInterval=3600000 \
+ -Dsun.rmi.dgc.server.gcInterval=3600000 -Dsun.lang.ClassLoader.allowArraySyntax=true -Djava.net.preferIPv4Stack=true -server"}
+
+JBOSS_ENDORSED_DIRS=${JBOSS_ENDORSED_DIRS:-"$JBOSS_HOME/lib/endorsed"}
+
+JBOSS_PIDFILE=${JBOSS_PIDFILE:-"/var/run/jboss/jboss.pid"}
+# create pid directory if inexistent
+JBOSS_PID_DIR=$(dirname $(readlink -m $JBOSS_PIDFILE))
+if [ ! -d $JBOSS_PID_DIR ]; then
+	mkdir -p $JBOSS_PID_DIR
+fi
+
+function status {
+	RUNNING_PID=0
+	if [ -f $JBOSS_PIDFILE ]; then
+		TMP_PID=$(cat $JBOSS_PIDFILE)
+		TMP_PID_CHECK=$(ps -p $TMP_PID -o pid=)
+		if [ "$TMP_PID_CHECK" != "" ]; then
+			RUNNING_PID=$TMP_PID
+			return 0  # running
+		else
+			return 1  # stopped, but pid file exists 
+		fi
+	fi
+	return 3 # stopped
+}
+
+function stop {
+	echo "Stopping JBoss..."
+
+	status
+	if [ $? -ne 0 ]; then
+		echo "Nothing to stop, JBoss is not running.  aborting."
+		exit 100
+	fi
+
+	STOP_CMD="$JAVA -classpath $JBOSS_SHUTDOWN_CLASSPATH org.jboss.Shutdown --shutdown $JBOSS_JNDI_ADDR $ADMIN_USER_OPT $ADMIN_PASS_OPT"
+
+	if [ ! -z "$SUBIT" ]; then
+		$SUBIT "$STOP_CMD"
+	else
+		$STOP_CMD
+	fi
+	RES=$?
+
+	if [ $RES -ne 0 ]; then
+		echo
+		echo "If shutdown failed, please make sure that \$JBOSS_ADMIN_PASS and \$JBOSS_ADMIN_USER reflects your JMX Console admin credentials."
+		echo "Use \"$0 force-stop\" to force a shutdown."
+		exit $RES
+	fi
+
+	RUNNING_PID=1
+	while [ $RUNNING_PID -ne 0 ]; 
+	do
+		sleep 1
+		status
+		echo -n .
+	done  
+	echo
+	rm -f $JBOSS_PIDFILE
+}
+
+function force_stop {
+	echo -n "Forcibly stopping JBoss... "
+
+	status
+	if [ $? -ne 0 ]; then 
+		echo "JBoss is not running.  aborting."
+	else
+		CHILD_PID=$(ps --ppid $RUNNING_PID -o pid=)
+		GRANDCHILD_PID=$(ps --ppid $CHILD_PID -o pid=)
+		ALL_PIDS="$RUNNING_PID $CHILD_PID $GRANDCHILD_PID"
+		echo "(pids $ALL_PIDS)"
+		kill $ALL_PIDS && rm -f $JBOSS_PIDFILE 2>/dev/null
+		sleep 3
+		kill -9 $ALL_PIDS 2>/dev/null && rm -f $JBOSS_PIDFILE
+	fi
+}
+
+function start {
+	echo "Starting JBoss..."
+	
+	status
+	if [ $? -eq 0 ]; then
+		echo "JBoss (pid $RUNNING_PID) is already running. aborting."
+		exit 100
+	fi
+	
+	START_CMD="$JAVA $JAVA_OPTS -Djava.endorsed.dirs=$JBOSS_ENDORSED_DIRS -classpath $JBOSS_CLASSPATH \
+	org.jboss.Main -c $JBOSS_CONF $JBOSS_BIND_ADDR -Droda.home=$RODA_HOME -Dfedora.home=$FEDORA_HOME" 
+	
+	if [ ! -z "$SUBIT" ]; then
+		$SUBIT "( $START_CMD > $JBOSS_CONSOLE 2>&1 )" &
+		$SUBIT "( echo $! > $JBOSS_PIDFILE )" 
+	else
+		$START_CMD > $JBOSS_CONSOLE 2>&1 &
+		echo $! > $JBOSS_PIDFILE
+	fi
+	sleep 1
+	status
+	if [ $? -ne 0 ]; then
+		echo "JBoss failed to start. please check the logs."
+		exit 1
+	fi
+}
+
+
+case "$1" in
+	start)
+		start
+	;;
+
+	stop)
+		stop
+	;;
+
+	force-stop)
+		force_stop
+	;;
+
+	restart)
+		stop
+		sleep 1
+		start
+	;;
+
+	force-restart)
+		force-stop
+		sleep 1
+		start
+	;;
+
+	status)
+		status
+		RET=$?
+		if [ $RET -eq 0 ]; then
+			echo "JBoss (pid $RUNNING_PID) is running..."
+		elif [ $RET -eq 1 ]; then
+			echo "JBoss is dead but pidfile ($JBOSS_PIDFILE) exists..."
+		else
+			echo "JBoss is stopped."
+		fi
+		exit $RET
+	;;
+
+	*)
+		echo "usage: $0 (start|stop|force-stop|restart|force-restart|status|help)"
+esac

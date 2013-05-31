@@ -1,0 +1,30 @@
+@CHARSET "UTF-8";
+
+/** File Upload Panel */
+.wui-fileUpload {
+
+}
+.wui-fileUpload .fileUpload-form {
+
+}
+.wui-fileUpload .fileUpload-form-browse {
+
+}
+.wui-fileUpload .fileUpload-form-add {
+	color: black;
+}
+		
+		
+		
+/** File Panel **/
+.wui-fileUpload-file {
+	margin: 2px;
+}
+.wui-fileUpload-file .file-path {
+	color: #58595b;
+}
+.wui-fileUpload-file .file-status-remove {
+	margin-left: 3px;
+	cursor: pointer;
+	cursor: hand;
+}

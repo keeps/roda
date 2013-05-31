@@ -1,0 +1,149 @@
+@CHARSET "UTF-8";
+
+/** Ingest Submit **/
+
+.wui-ingest-submit {
+	width: 98%;	
+}
+
+.wui-ingest-submit .gwt-TabBar{
+	background-color: #e6e7e8;
+}
+
+/** Upload SIP **/ 
+
+.wui-ingest-submit-upload {
+	padding: 5px;
+}
+.wui-ingest-submit-upload .upload-title {
+	margin-bottom: 5px;
+	margin-left: 5px;
+	font-size: 14px;
+	font-weight: bold;
+	color: #58595b;
+}
+.wui-ingest-submit-upload .upload-file {
+	margin: 5px 5px 5px 10px;
+}
+.wui-ingest-submit-upload .upload-action {
+	width: 100%;
+}
+.wui-ingest-submit-upload .upload-action-button {
+	margin: 5px;
+	width: 100px;
+}
+.wui-ingest-submit-upload .upload-action-loading-image {
+
+}
+.wui-ingest-submit-upload .upload-action-loading-message {
+	color: #58595b;
+	white-space: nowrap;
+}
+
+.wui-ingest-submit-upload .upload-action-get-roda-in {
+	width: 200px;
+	margin: 5px;
+}
+
+/** Create SIP **/
+.wui-ingest-submit-create {
+	padding: 5px;
+}
+.wui-ingest-submit-create .create-title {
+	margin-bottom: 5px;
+	margin-left: 5px;
+	font-size: 14px;
+	font-weight: bold;
+	color: #58595b;
+}
+
+.wui-ingest-submit-create .create-metadata {
+	margin: 5px 5px 10px 10px;
+}
+
+.wui-ingest-submit-create .create-metadata-header {
+	width: 100%;
+}
+
+.wui-ingest-submit-create .create-metadata-toggle {
+	float: right;
+	margin: 5px;
+	color: #58595b;
+	font-size: 9pt;
+	white-space: nowrap;
+	text-decoration: underline;
+	cursor: pointer;
+	cursor: hand;
+}
+.wui-ingest-submit-create .create-representation {
+}
+
+.wui-ingest-submit-create .create-representation-file {
+	margin: 5px 5px 5px 10px;
+}
+
+.wui-ingest-submit-create  .create-destination-chooser {
+	margin: 5px 5px 5px 10px;
+}
+
+.wui-ingest-submit-create  .create-destination-chooser .scrollAutoLoader {
+	height: 350px;
+}
+
+.wui-ingest-submit-create .create-submit {
+
+}
+
+.wui-ingest-submit-create .create-submit-button {
+	margin: 5px;
+	width: 100px;
+}
+.wui-ingest-submit-create .create-submit-loading {
+	
+}
+.wui-ingest-submit-create .create-submit-message {
+	color: #58595b;
+	font-size: 9pt;
+	white-space: nowrap;
+}
+
+.wui-ingest-submit-create .create-submit-message-error {
+	color: red;
+	white-space: nowrap;
+}
+
+.wui-ingest-submit-create .create-submit-get-roda-in {
+	width: 200px;
+	margin: 5px;
+}
+
+/** # Content Model Selector **/
+.wui-cModelSelector {
+	width: 350px;
+	margin: 0 20px 10px 10px;
+}
+
+.wui-cModelSelector .contentModel {
+	margin: 5px 2px 5px 0;
+	cursor: pointer;
+	cursor: hand;
+}
+.wui-cModelSelector .contentModel-layout {
+	vertical-align: top;
+}
+.wui-cModelSelector .contentModel-radio {
+	margin: 2px;
+}
+.wui-cModelSelector .contentModel-title {
+	font-size: 12px;
+}
+.wui-cModelSelector .contentModel-description {
+	font-size: 11px;
+	margin-left: 2px;
+}
+.wui-cModelSelector .contentModel-icons {
+	
+}
+.wui-cModelSelector .contentModel-icons .icon {
+	
+}

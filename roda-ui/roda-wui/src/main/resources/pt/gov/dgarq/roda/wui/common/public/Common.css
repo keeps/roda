@@ -1,0 +1,1293 @@
+@CHARSET "UTF-8";
+
+/** IE PNG fix **/
+.iepngfix img, .iepngfix div { behavior: url(iepngfix/iepngfix.htc) }
+
+
+/** GWT Look & Feel **/
+.gwt-TabPanel {
+	margin-left: 10px;
+	margin-right: 10px;
+}
+
+.gwt-TabPanelBottom {
+	border: 1px solid #58595b;
+	background-color: #e6e7e8;
+	padding: 5px;
+}
+
+.gwt-TabBar {
+	background-color: #999;
+	border: 0;
+}
+
+.gwt-TabBar .gwt-TabBarFirst {
+	
+}
+
+.gwt-TabBar .gwt-TabBarRest {
+	
+}
+
+.gwt-TabBar .gwt-TabBarItem {
+	border: 1px solid #58595b;
+	margin: 1px;
+	font-family: Verdana, Lucida, Arial, Helvetica, sans-serif;
+	font-size: 11pt;
+	font-weight: normal;
+	color: #58595b;
+	background-color: #999;
+	padding: 1px 2px;
+	cursor: pointer;
+	cursor: hand;
+}
+
+.gwt-TabBar .gwt-TabBarItem-selected {
+	background-color: #e6e7e8;
+	font-weight: normal;
+}
+
+.gwt-SuggestBox { 
+}
+.gwt-SuggestBoxPopup {
+	background-color: #e6e7e8;
+	border: 1px solid #58595b;
+}
+.gwt-SuggestBoxPopup .item {
+	color: #58595b;
+	text-align: left;
+}
+.gwt-SuggestBoxPopup .item-selected {
+	background-color: #999;
+}
+
+
+/** Office Button **/
+.wui-button {
+	cursor: pointer;
+	cursor: hand;
+}
+
+.wui-button-layout {
+	border-spacing: 0;
+}
+
+.wui-button-layout:ACTIVE {
+	outline: none;
+}
+
+.wui-button-enabled {
+	
+}
+
+.wui-button-disabled {
+	
+}
+
+.wui-button .office-button-layout {
+	height: 19px;
+	border-spacing: 0;
+}
+
+.wui-button .wui-button-layout .wui-button-text-container {
+	width: 100%;
+	height: 19px;
+	background-repeat: repeat-x;
+	vertical-align: middle;
+}
+
+.wui-button-enabled .wui-button-layout .wui-button-text-container {
+	background-image: url("images/button/normal/center.png");
+}
+
+.wui-button-hover .wui-button-layout .wui-button-text-container {
+	background-image: url("images/button/hover/center.png");
+}
+
+.wui-button-pressed .wui-button-layout .wui-button-text-container {
+	background-image: url("images/button/pressed/center.png");
+}
+
+.wui-button-disabled .wui-button-layout .wui-button-text-container {
+	background-image: url("images/button/disabled/center.png");
+}
+
+.wui-button .button-left {
+	position: relative;
+	float: left;
+	width: 10px;
+	height: 19px;
+	padding: 0;;
+	float: left;
+}
+
+.wui-button .button-left .gwt-HTML {
+	width: 10px;
+}
+
+.wui-button-enabled .button-left-square {
+	background-image: url("images/button/normal/left_square.png");
+}
+
+.wui-button-hover .button-left-square {
+	background-image: url("images/button/hover/left_square.png");
+}
+
+.wui-button-pressed .button-left-square {
+	background-image: url("images/button/pressed/left_square.png");
+}
+
+.wui-button-disabled .button-left-square {
+	background-image: url("images/button/disabled/left_square.png");
+}
+
+.wui-button-enabled .button-left-round {
+	background-image: url("images/button/normal/left_round.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src = 'images/button/normal/left_round.png', sizingMethod = 'scale');
+}
+
+.wui-button-hover .button-left-round {
+	background-image: url("images/button/hover/left_round.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src = 'images/button/hover/left_round.png', sizingMethod = 'scale');
+}
+
+.wui-button-pressed .button-left-round {
+	background-image: url("images/button/pressed/left_round.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src = 'images/button/pressed/left_round.png', sizingMethod = 'scale');
+}
+
+.wui-button-disabled .button-left-round {
+	background-image: url("images/button/disabled/left_round.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src = 'images/button/disabled/left_round.png', sizingMethod = 'scale');
+}
+
+.wui-button .wui-button-text {
+	width: 100%;
+	font-family: Verdana, Lucida, Arial, Helvetica, sans-serif;
+	font-size: 9pt;
+	color: #58595b;
+}
+
+.wui-button .button-right {
+	position: relative;
+	float: right;
+	width: 21px;
+	height: 19px;
+	padding: 0;
+}
+
+.wui-button .button-right .gwt-HTML {
+	width: 21px;
+}
+
+.wui-button-enabled .button-right-action_report {
+	background-image: url("images/button/normal/right_action_report.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src = 'images/button/normal/right_action_report.png', sizingMethod = 'scale' );
+}
+
+.wui-button-enabled .button-right-arrow-backward {
+	background-image: url("images/button/normal/right_arrow_backward.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src = 'images/button/normal/right_arrow_backward.png', sizingMethod = 'scale' );
+}
+
+.wui-button-enabled .button-right-arrow-down {
+	background-image: url("images/button/normal/right_arrow_down.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src = 'images/button/normal/right_arrow_down.png', sizingMethod = 'scale' );
+}
+
+.wui-button-enabled .button-right-arrow-forward {
+	background-image: url("images/button/normal/right_arrow_forward.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src = 'images/button/normal/right_arrow_forward.png', sizingMethod = 'scale' );
+}
+
+.wui-button-enabled .button-right-arrow-up {
+	background-image: url("images/button/normal/right_arrow_up.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src = 'images/button/normal/right_arrow_up.png', sizingMethod = 'scale' );
+}
+
+.wui-button-enabled .button-right-check {
+	background-image: url("images/button/normal/right_check.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src = 'images/button/normal/right_check.png', sizingMethod = 'scale' );
+}
+
+.wui-button-enabled .button-right-cross {
+	background-image: url("images/button/normal/right_cross.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src = 'images/button/normal/right_cross.png', sizingMethod = 'scale' );
+}
+
+.wui-button-enabled .button-right-info {
+	background-image: url("images/button/normal/right_info.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src = 'images/button/normal/right_info.png', sizingMethod = 'scale');
+}
+
+.wui-button-enabled .button-right-minus {
+	background-image: url("images/button/normal/right_minus.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/button/normal/right_minus.png', sizingMethod =      
+		'scale' );
+}
+
+.wui-button-enabled .button-right-plus {
+	background-image: url("images/button/normal/right_plus.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/button/normal/right_plus.png', sizingMethod =       'scale'
+		);
+}
+
+.wui-button-enabled .button-right-ri {
+	background-image: url("images/button/normal/right_ri.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/button/normal/right_ri.png', sizingMethod =       'scale' )
+		;
+}
+
+.wui-button-enabled .button-right-rec {
+	background-image: url("images/button/normal/right_rec.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/button/normal/right_rec.png', sizingMethod =       'scale'
+		);
+}
+
+.wui-button-hover .button-right-action_report {
+	background-image: url("images/button/hover/right_action_report.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/button/hover/right_action_report.png', sizingMethod =    
+		  'scale' );
+}
+
+.wui-button-hover .button-right-arrow-backward {
+	background-image: url("images/button/hover/right_arrow_backward.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/button/hover/right_arrow_backward.png', sizingMethod =    
+		  'scale' );
+}
+
+.wui-button-hover .button-right-arrow-down {
+	background-image: url("images/button/hover/right_arrow_down.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/button/hover/right_arrow_down.png', sizingMethod =     
+		 'scale' );
+}
+
+.wui-button-hover .button-right-arrow-forward {
+	background-image: url("images/button/hover/right_arrow_forward.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/button/hover/right_arrow_forward.png', sizingMethod =    
+		  'scale' );
+}
+
+.wui-button-hover .button-right-arrow-up {
+	background-image: url("images/button/hover/right_arrow_up.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/button/hover/right_arrow_up.png', sizingMethod =      
+		'scale' );
+}
+
+.wui-button-hover .button-right-check {
+	background-image: url("images/button/hover/right_check.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/button/hover/right_check.png', sizingMethod =       'scale'
+		);
+}
+
+.wui-button-hover .button-right-cross {
+	background-image: url("images/button/hover/right_cross.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/button/hover/right_cross.png', sizingMethod =       'scale'
+		);
+}
+
+.wui-button-hover .button-right-info {
+	background-image: url("images/button/hover/right_info.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/button/hover/right_info.png', sizingMethod =       'scale'
+		);
+}
+
+.wui-button-hover .button-right-minus {
+	background-image: url("images/button/hover/right_minus.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/button/hover/right_minus.png', sizingMethod =       'scale'
+		);
+}
+
+.wui-button-hover .button-right-plus {
+	background-image: url("images/button/hover/right_plus.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/button/hover/right_plus.png', sizingMethod =       'scale'
+		);
+}
+
+.wui-button-hover .button-right-ri {
+	background-image: url("images/button/hover/right_ri.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/button/hover/right_ri.png', sizingMethod =       'scale' );
+}
+
+.wui-button-hover .button-right-rec {
+	background-image: url("images/button/hover/right_rec.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/button/hover/right_rec.png', sizingMethod =       'scale' )
+		;
+}
+
+.wui-button-pressed .button-right-action_report {
+	background-image: url("images/button/pressed/right_action_report.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/button/pressed/right_action_report.png', sizingMethod =   
+		   'scale' );
+}
+
+.wui-button-pressed .button-right-arrow-backward {
+	background-image: url("images/button/pressed/right_arrow_backward.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/button/pressed/right_arrow_backward.png', sizingMethod =   
+		   'scale' );
+}
+
+.wui-button-pressed .button-right-arrow-down {
+	background-image: url("images/button/pressed/right_arrow_down.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/button/pressed/right_arrow_down.png', sizingMethod =    
+		  'scale' );
+}
+
+.wui-button-pressed .button-right-arrow-forward {
+	background-image: url("images/button/pressed/right_arrow_forward.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/button/pressed/right_arrow_forward.png', sizingMethod =   
+		   'scale' );
+}
+
+.wui-button-pressed .button-right-arrow-up {
+	background-image: url("images/button/pressed/right_arrow_up.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/button/pressed/right_arrow_up.png', sizingMethod =     
+		 'scale' );
+}
+
+.wui-button-pressed .button-right-check {
+	background-image: url("images/button/pressed/right_check.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/button/pressed/right_check.png', sizingMethod =      
+		'scale' );
+}
+
+.wui-button-pressed .button-right-cross {
+	background-image: url("images/button/pressed/right_cross.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/button/pressed/right_cross.png', sizingMethod =      
+		'scale' );
+}
+
+.wui-button-pressed .button-right-info {
+	background-image: url("images/button/pressed/right_info.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/button/pressed/right_info.png', sizingMethod =      
+		'scale' );
+}
+
+.wui-button-pressed .button-right-minus {
+	background-image: url("images/button/pressed/right_minus.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/button/pressed/right_minus.png', sizingMethod =      
+		'scale' );
+}
+
+.wui-button-pressed .button-right-plus {
+	background-image: url("images/button/pressed/right_plus.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/button/pressed/right_plus.png', sizingMethod =      
+		'scale' );
+}
+
+.wui-button-pressed .button-right-ri {
+	background-image: url("images/button/pressed/right_ri.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/button/pressed/right_ri.png', sizingMethod =       'scale'
+		);
+}
+
+.wui-button-pressed .button-right-rec {
+	background-image: url("images/button/pressed/right_rec.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/button/pressed/right_rec.png', sizingMethod =       'scale'
+		);
+}
+
+.wui-button-disabled .button-right-action_report {
+	background-image: url("images/button/disabled/right_action_report.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/button/disabled/right_action_report.png', sizingMethod =   
+		   'scale' );
+}
+
+.wui-button-disabled .button-right-arrow-backward {
+	background-image: url("images/button/disabled/right_arrow_backward.png")
+		;
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/button/disabled/right_arrow_backward.png', sizingMethod =
+		  
+		   'scale' );
+}
+
+.wui-button-disabled .button-right-arrow-down {
+	background-image: url("images/button/disabled/right_arrow_down.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/button/disabled/right_arrow_down.png', sizingMethod =    
+		  'scale' );
+}
+
+.wui-button-disabled .button-right-arrow-forward {
+	background-image: url("images/button/disabled/right_arrow_forward.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/button/disabled/right_arrow_forward.png', sizingMethod =   
+		   'scale' );
+}
+
+.wui-button-disabled .button-right-arrow-up {
+	background-image: url("images/button/disabled/right_arrow_up.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/button/disabled/right_arrow_up.png', sizingMethod =     
+		 'scale' );
+}
+
+.wui-button-disabled .button-right-check {
+	background-image: url("images/button/disabled/right_check.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/button/disabled/right_check.png', sizingMethod =      
+		'scale' );
+}
+
+.wui-button-disabled .button-right-cross {
+	background-image: url("images/button/disabled/right_cross.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/button/disabled/right_cross.png', sizingMethod =      
+		'scale' );
+}
+
+.wui-button-disabled .button-right-info {
+	background-image: url("images/button/disabled/right_info.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/button/disabled/right_info.png', sizingMethod =      
+		'scale' );
+}
+
+.wui-button-disabled .button-right-minus {
+	background-image: url("images/button/disabled/right_minus.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/button/disabled/right_minus.png', sizingMethod =      
+		'scale' );
+}
+
+.wui-button-disabled .button-right-plus {
+	background-image: url("images/button/disabled/right_plus.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/button/disabled/right_plus.png', sizingMethod =      
+		'scale' );
+}
+
+.wui-button-disabled .button-right-ri {
+	background-image: url("images/button/disabled/right_ri.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/button/disabled/right_ri.png', sizingMethod =       'scale'
+		);
+}
+
+.wui-button-disabled .button-right-rec {
+	background-image: url("images/button/disabled/right_rec.png");
+	_background-image: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/button/disabled/right_rec.png', sizingMethod =      
+		'scale' );
+}
+
+/** Office Window **/
+.office-window-dock {
+	background-color: #999;
+}
+
+.office-window-title {
+	font-size: 15pt;
+	font-weight: bold;
+	color: #fff;
+	margin: 10px 10px 10px 10px;
+	overflow: hidden;
+}
+
+.office-window-bottom {
+	padding: 10px 10px 10px 10px;
+}
+
+.office-window-bottom .wui-button {
+	margin-left: 10px;
+}
+
+.office-window-shadow .shadow-up-left {
+	width: 30px;
+	height: 30px;
+	background: url("images/shadow/shadow-up-left.png") no-repeat;
+	_background: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/shadow/shadow-up-left.png', sizingMethod =       'scale' );
+}
+
+.office-window-shadow .shadow-up {
+	height: 30px;
+	background: url("images/shadow/shadow-up.png") repeat-x;
+	_background: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/shadow/shadow-up.png', sizingMethod =       'scale' );
+}
+
+.office-window-shadow .shadow-up-right {
+	width: 30px;
+	height: 30px;
+	background: url("images/shadow/shadow-up-right.png") no-repeat;
+	_background: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/shadow/shadow-up-right.png', sizingMethod =       'scale' )
+		;
+}
+
+.office-window-shadow .shadow-left {
+	width: 30px;
+	height: 100%;
+	background: url("images/shadow/shadow-left.png") repeat-y;
+	_background: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/shadow/shadow-left.png', sizingMethod =       'scale' );
+}
+
+.office-window-shadow .shadow-right {
+	width: 30px;
+	height: 100%;
+	background: url("images/shadow/shadow-right.png") repeat-y;
+	_background: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/shadow/shadow-right.png', sizingMethod =       'scale' );
+}
+
+.office-window-shadow .shadow-bottom-left {
+	width: 30px;
+	height: 30px;
+	background: url("images/shadow/shadow-bottom-left.png") no-repeat;
+	_background: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/shadow/shadow-bottom-left.png', sizingMethod =      
+		'scale' );
+}
+
+.office-window-shadow .shadow-bottom {
+	height: 30px;
+	background: url("images/shadow/shadow-bottom.png") repeat-x;
+	_background: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/shadow/shadow-bottom.png', sizingMethod =       'scale' );
+}
+
+.office-window-shadow .shadow-bottom-right {
+	width: 30px;
+	height: 30px;
+	background: url("images/shadow/shadow-bottom-right.png") no-repeat;
+	_background: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
+		    src =   
+		   'images/shadow/shadow-bottom-right.png', sizingMethod =      
+		'scale' );
+}
+
+/** Alphabet Sorted List **/
+.AlphabetSortedList {
+	width: 100%;
+	border: 1px solid #999;
+}
+
+.AlphabetSortedList * {
+	padding: 0;
+	margin: 0;
+}
+
+.AlphabetSortedList .alphabet-header {
+	width: 100%;
+	background-color: #999;
+	border: 1px solid #fff;
+}
+
+.AlphabetSortedList .alphabet-header .alphabet-header-indent {
+	border-right: 1px solid #fff;
+	height: 100%;
+	width: 20px;
+}
+
+.AlphabetSortedList .Header .AlphabetPanel {
+	
+}
+
+.AlphabetSortedList .AlphabetPanel .letter-off {
+	margin: 0px 2px;
+	font-weight: bold;
+	font-size: 13px;
+	color: #aaa;
+	cursor: default;
+}
+
+.AlphabetSortedList .AlphabetPanel .letter {
+	margin: 0px 2px;
+	font-size: 13px;
+	font-weight: bold;
+	color: #ccc;
+	cursor: pointer;
+	cursor: hand;
+}
+
+.AlphabetSortedList .AlphabetPanel .letter-on {
+	color: #fff;
+}
+
+.AlphabetSortedList .ScrollPanel {
+	width: 100%;
+	height: 100%;
+	border: 1px solid #fff;
+}
+
+.AlphabetSortedList .sizeLabel {
+	text-align: right;
+	font-size: 11px;
+	color: #fff;
+	margin-right: 5px;
+}
+
+.AlphabetSortedList .WidgetSortedListPanel {
+	width: 99%;
+	*width: 97%;
+}
+
+.AlphabetSortedList .AlphabetSortedListWidget {
+	
+}
+
+.AlphabetSortedList .CheckBoxColumn {
+	width: 20px;
+}
+
+.AlphabetSortedList .CheckBoxPlaceholder {
+	vertical-align: top;
+	padding-left: 4px;
+	padding-right: 4px;
+	padding-top: 4px;
+	background-color: #e6e7e8;
+	border-top: 1px solid #fff;
+	border-bottom: 1px solid #fff;
+}
+
+.AlphabetSortedList .checkbox-disclosed {
+	background-color: #b8a414;
+}
+
+.AlphabetSortedList .AlphabetCheckBox {
+	
+}
+
+.AlphabetSortedList .ScrollPanel {
+	height: 400px;
+}
+
+/** Loading popup **/
+.loading {
+	background-color: white;
+	color: black;
+	font-family: Verdana, Lucida, Arial, Helvetica, sans-serif;
+	font-size: 20pt;
+	font-weight: bold;
+	padding: 5px;
+	border: 1px solid black;
+}
+
+/** Date picker **/
+.yearPicker {
+	width: 3em;
+	margin-right: 5px;
+}
+
+.monthPicker {
+	margin-right: 5px;
+}
+
+.dayPicker {
+	margin-right: 5px;
+}
+
+/** Date time picker **/
+.wui-date-time-picker {
+	
+}
+
+.wui-date-time-picker .picker-time-hour {
+	margin-left: 5px;
+	width: 15px;
+}
+
+.wui-date-time-picker .picker-time-minute {
+	width: 15px;
+}
+
+.wui-date-time-picker .picker-time-separator {
+	margin: 0 1px;
+}
+
+/**  Control Panel  **/
+.wui-controlPanel {
+	margin: 5px;
+}
+
+.controlPanel-whitebox {
+	min-width: 130px;
+	border: 1px solid #999;
+	background-color: #e6e7e8;
+}
+
+.wui-controlPanel .controlPanel-title {
+	font-weight: bold;
+	font-size: 12px;
+	white-space: nowrap;
+	color: #333333;
+	padding: 3px;
+	border-top: 1px solid white;
+	border-left: 1px solid white;
+	border-right: 1px solid white;
+}
+
+.wui-controlPanel .controlPanel-options {
+	width: 100%;
+	padding: 2px 2px 2px 15px;
+	border-left: 1px solid white;
+	border-right: 1px solid white;
+}
+
+.wui-controlPanel .option {
+	font-size: 12px;
+	color: #333;
+	margin-bottom: 2px;
+	white-space: nowrap;
+	cursor: pointer;
+	cursor: hand;
+}
+
+.wui-controlPanel .option-selected {
+	color: #b8a414;
+}
+
+.wui-controlPanel .controlPanel-actions {
+	margin-top: 5px;
+}
+
+.wui-controlPanel .controlPanel-action {
+	margin-top: 5px;
+	width: 130px;
+}
+
+.wui-controlPanel .controlPanel-search-title {
+	font-weight: bold;
+	font-size: 12px;
+	white-space: nowrap;
+	color: #333333;
+	padding: 3px;
+	border-top: 1px solid white;
+	border-left: 1px solid white;
+	border-right: 1px solid white;
+}
+
+.wui-controlPanel .controlPanel-search {
+	width: 100%;
+	background-color: #e6e7e8;
+	padding: 5px;
+	width: 125px;
+	border-left: 1px solid white;
+	border-right: 1px solid white;
+	border-bottom: 1px solid white;
+}
+
+.wui-search-compact {
+	position: relative;
+	width: 120px;
+}
+
+.wui-search-compact .search-layout {
+	
+}
+
+.wui-search-compact .search-box {
+	width: 120px;
+	color: #999;
+	font-size: 10pt;
+}
+
+.wui-search-compact .search-button {
+	position: absolute;
+	right: 10px;
+	top: 10px;
+	cursor: pointer;
+	cursor: hand;
+}
+
+/** User Info Panel **/
+.wui-user-info {
+	background-color: #e6e7e8;
+	max-width: 300px;
+}
+
+.wui-user-info .info-username {
+	padding: 2px 3px;
+	width: 100%;
+	background-color: #58595b;
+	color: #e6e7e8;
+	font-weight: bold;
+}
+
+.wui-user-info .info-layout {
+	margin: 5px;
+}
+
+.wui-user-info .info-essentialInfo {
+	margin-left: 5px;
+}
+
+.wui-user-info .info-details {
+	width: 100%;
+}
+
+.wui-user-info .info-details .header * {
+	text-decoration: underline;
+}
+
+.wui-user-info .info-details-layout {
+	margin-left: 5px;
+}
+
+.wui-user-info .info-label {
+	padding: 1px;
+	font-weight: bold;
+	font-size: 9pt;
+}
+
+.wui-user-info .info-value {
+	padding: 1px;
+	font-size: 9pt;
+}
+
+/** Error Popup **/
+.wui-error-popup {
+	width: 350px;
+	padding: 5px;
+	background-color: #58595b;
+	border: 1px solid #999;
+}
+
+.wui-error-popup .error-popup-icon {
+	margin: 3px;
+}
+
+.wui-error-popup .error-popup-message {
+	
+}
+
+.wui-error-popup .error-popup-message-title {
+	font-size: 10pt;
+	color: white;
+	font-weight: bold;
+}
+
+.wui-error-popup .error-popup-message-details {
+	font-size: 9pt;
+	color: #999;
+}
+
+/** Lazy Vertical List **/
+.wui-lazy-list-vertical {
+	width: 100%;
+}
+
+.wui-lazy-list-vertical .lazy-list-vertical-north {
+	width: 100%;
+}
+
+.wui-lazy-list-vertical .lazy-list-status-layout {
+	width: 100%;
+	height: 20px;
+	vertical-align: bottom;
+}
+
+.wui-lazy-list-vertical .lazy-list-loading-image {
+	
+}
+
+.wui-lazy-list-vertical .lazy-list-loading-message {
+	white-space: nowrap;
+}
+
+.wui-lazy-list-vertical .lazy-list-vertical-total {
+	text-align: right;
+}
+
+.wui-lazy-list-vertical .lazy-list-vertical-print {
+	margin-left: 2px;
+	cursor: pointer;
+	cursor: hand;
+}
+	
+	
+
+.wui-lazy-list-vertical .lazy-list-vertical-headers {
+	width: 100%;
+}
+
+.wui-lazy-list-vertical .lazy-list-vertical-scroll {
+	width: 100%;
+	height: 100%;
+	background-color: white;
+	border: 1px solid #58595b;
+}
+
+.wui-lazy-list-vertical .lazy-list-vertical-scroll-layout {
+	width: 99%;
+}
+
+.wui-lazy-list-vertical .lazy-list-vertical-scroll-layout * {
+	font-size: 11px;
+}
+
+/** list-header **/
+
+.lazy-list-header {
+	height: 18px;
+	background-color: #58595b;
+	white-space: nowrap;
+	padding: 2px 3px;
+	margin: 1px;
+	color: white;
+	cursor: pointer;
+	cursor: hand;
+}
+
+.lazy-list-header .lazy-list-header-layout {
+	width: 100%;
+	height: 100%;
+}
+
+.lazy-list-header .lazy-list-header-label {
+	font-size: 11px;
+	color: white;
+	white-space: nowrap;
+}
+
+.lazy-list-header .lazy-list-header-direction {
+	
+}
+
+.lazy-list-header .lazy-list-header-direction-unsorted {
+	-moz-opacity: .20;
+	opacity: .20;
+}
+
+.lazy-list-header:hover .lazy-list-header-direction-unsorted {
+	-moz-opacity: 1;
+	opacity: 1;
+}
+
+/** Report Panel **/
+.wui-report {
+	background-color: #e6e7e8;
+	width: 100%;
+}
+
+.wui-report .report-layout {
+	width: 100%;
+}
+
+.wui-report .report-attributes {
+	width: 100%;
+}
+
+.wui-report .report-items {
+	width: 100%;
+}
+
+.wui-report .attribute-name {
+	font-weight: bold;
+	margin-right: 5px;
+}
+
+.wui-report .attribute-value {
+	
+}
+
+.wui-report .report-item {
+	width: 100%;
+	margin-bottom: 2px;
+}
+
+.wui-report .report-item .header {
+	background-color: #58595b;
+}
+
+.wui-report .report-item .header * {
+	color: #ffffff;
+}
+
+.wui-report .report-item-attributes {
+	margin-left: 10px;
+}
+
+.wui-report .report-item .attribute-name {
+	
+}
+
+.wui-report .report-item .attribute-value {
+	
+}
+
+/** Report Window **/
+.wui-report-window {
+	background-color: #e6e7e8;
+}
+
+/** Static pages style **/
+
+.welcome {
+	font-size: 12px;
+	color: black;
+	font-weight: normal;
+	margin-left: 200px;
+	margin-right: 40px;
+	
+}
+
+.paragraph {
+	margin-left: 200px;
+	margin-right: 40px;
+	font-size: 12px;
+	line-height: 18px;
+}
+
+.link {
+	font-size: 12px;
+	text-decoration: none;
+	border-bottom-style: dotted;
+	border-width: 1px;
+}
+
+.list {
+	margin-left: 200px;
+	margin-right: 40px;
+	margin-bottom: 25px;
+	padding-left: 15px;
+}
+
+.list-item {
+	font-size: 12px;
+	line-height: 18px;
+	margin-bottom: 5px;
+}
+
+.sub-list {
+	margin-top: 5px;
+	padding-left: 15px;
+	list-style-type: circle;
+}
+
+.list-enum {
+	margin-left: 200px;
+	margin-right: 40px;
+	margin-bottom: 25px;
+	padding-left: 0;
+}
+
+.list-item-enum {
+	font-size: 12px;
+	line-height: 18px;
+	margin-bottom: 5px;
+	margin-left: 20px;
+}
+
+.sub-list-enum {
+	padding-left: 10px;
+}
+
+.strong {
+	font-size: 12px;
+	line-height: 18px;
+	color: black;
+	font-weight: normal;
+}
+
+.note {
+	background-color: yellow;
+	opacity: 0.2;
+}
+
+.bibref * {
+	font-size: 11px;
+}
+
+.bibref {
+	margin-left: 200px;
+	margin-right: 40px;
+	line-height: 18px;
+}
+
+.bibref-title {
+	font-style: italic;
+}
+
+.static-table {
+	
+}
+
+.table-header {
+	background-color: #58595b;
+	color: #e6e7e8;
+	border-left: 1px solid #e6e7e8;
+	border-right: 1px solid #e6e7e8;
+	padding: 2px 5px;
+}
+
+.table-cell {
+	border-bottom: 1px solid #58595b;
+	padding: 5px;
+	font-size: 11px;
+	vertical-align: top;
+	text-align: left;
+}
+
+.table-cell * {
+	font-size: 11px;
+}
+
+.static-image {
+	padding-left: 20px;
+}
+
+/* File Upload */
+.waitWindow-layout {
+
+}
+
+.waitWindow-image {
+	margin: 5px 0px 5px 15px;
+}
+.waitWindow-label {
+	color: #e6e7e8;
+	margin: 14px 0px;
+	font-size: 14px;	
+}

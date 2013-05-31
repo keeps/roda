@@ -1,0 +1,739 @@
+@CHARSET "UTF-8";
+
+/** User Management **/
+.UserManagement {
+	height: 450px;
+}
+
+.UserManagement .AlphabetSortedList .ScrollPanel {
+	height: 428px;
+}
+
+/** Control panel **/
+.wui-management-user-actions-title {
+	margin-top: 5px;
+	color: #333333;
+	font-weight: bold;
+}
+
+/** User Disclosure Panel **/
+.wui-UserDisclosurePanel {
+	border-top: 1px solid #fff;
+	border-bottom: 1px solid #fff;
+	width: 100%;
+	background-color: #e6e7e8;
+}
+
+.wui-UserDisclosurePanel .gwt-DisclosurePanel {
+	width: 100%;
+	border-spacing: 0;
+	/*	border-right: 1px solid #fff;*/
+}
+
+.wui-UserDisclosurePanel .gwt-DisclosurePanel .header {
+	width: 100%;
+	color: #58595b;
+	text-decoration: none;
+}
+
+.wui-UserDisclosurePanel .user-header {
+	height: 16px;
+	vertical-align: middle;
+}
+
+.wui-UserDisclosurePanel .user-header .user-icon {
+	margin: 0 5px;
+	vertical-align: middle;
+}
+.wui-UserDisclosurePanel .user-header .user-name {
+	width: 150px;
+	overflow: hidden;
+	font-size: 11px;
+	margin-top: 2px;
+}
+.wui-UserDisclosurePanel .user-header .user-fullname {
+	width: 100%;
+	overflow: hidden;
+	font-size: 11px;
+	margin-top: 2px;
+}
+.wui-UserDisclosurePanel .user-header .user-report {
+	margin: 0 10px;
+	cursor: pointer;
+	cursor: hand;
+	vertical-align: middle;
+	border: 0;
+}
+
+.wui-UserDisclosurePanel .gwt-DisclosurePanel .content {
+	border-spacing: 0;
+	background-color: #f1edd0;
+}
+
+.wui-UserDisclosurePanel .gwt-DisclosurePanel-open .header {
+	background-color: #b8a414;
+}
+
+.wui-UserDisclosurePanel .gwt-DisclosurePanel-closed .header {
+	background-color: #e6e7e8;
+}
+
+.wui-UserDisclosurePanel .wui-GroupList {
+	width: 100%;
+}
+
+.wui-UserDisclosurePanel .wui-GroupList .wui-group-mini {
+	cursor: pointer;
+	cursor: hand;
+}
+
+.wui-UserDisclosurePanel .wui-GroupList .wui-group-mini-selected {
+	background-color: #ded48a;
+}
+
+.wui-UserDisclosurePanel .wui-GroupList .wui-group-mini .group-layout {
+	padding-left: 20px;
+}
+
+.wui-UserDisclosurePanel .wui-GroupList .wui-group-mini .group-icon {
+	margin: 0 10px;
+	vertical-align: middle;
+}
+
+.wui-UserDisclosurePanel .wui-GroupList .wui-group-mini .group-label {
+	width: 100%;
+	font-size: 11px;
+	margin-top: 2px;
+}
+
+/** Group Disclosure Panel **/
+.wui-GroupDisclosurePanel {
+	border: 1px solid #fff;
+	width: 100%;
+	background-color: #e6e7e8;
+}
+
+.wui-GroupDisclosurePanel .gwt-DisclosurePanel {
+	width: 100%;
+	border-spacing: 0;
+	/*	border-right: 1px solid #fff;*/
+}
+
+.wui-GroupDisclosurePanel .gwt-DisclosurePanel .header {
+	width: 100%;
+	color: #58595b;
+	text-decoration: none;
+}
+
+.wui-GroupDisclosurePanel .group-header {
+}
+.wui-GroupDisclosurePanel .group-header .group-icon {
+	margin: 0 5px;
+	vertical-align: middle;
+}
+
+.wui-GroupDisclosurePanel .group-header .group-name {
+	width: 150px;
+	overflow: hidden;
+	font-size: 11px;
+	margin-top: 2px;
+}
+
+.wui-GroupDisclosurePanel .group-header .group-fullname {
+	width: 100%;
+	overflow: hidden;
+	font-size: 11px;
+	margin-top: 2px;
+}
+
+.wui-GroupDisclosurePanel .gwt-DisclosurePanel .content {
+	border-spacing: 0;
+	background-color: #f1edd0;
+}
+
+.wui-GroupDisclosurePanel .gwt-DisclosurePanel-open .header {
+	background-color: #b8a414;
+}
+
+.wui-GroupDisclosurePanel .gwt-DisclosurePanel-closed .header {
+	background-color: #e6e7e8;
+}
+
+.wui-GroupDisclosurePanel .wui-UserList {
+	width: 100%;
+}
+
+.wui-GroupDisclosurePanel .wui-user-mini {
+	cursor: pointer;
+	cursor: hand;
+	background-color: #f1edd0;
+	padding-left: 20px;
+}
+
+.wui-GroupDisclosurePanel .wui-user-mini-selected {
+	background-color: #ded48a;
+}
+
+.wui-GroupDisclosurePanel .wui-user-mini .user-layout {
+}
+
+
+.wui-GroupDisclosurePanel .wui-user-mini .user-icon {
+	margin: 0 10px;
+	vertical-align: middle;
+}
+
+.wui-GroupDisclosurePanel .wui-user-mini .user-label {
+	width: 100%;
+	font-size: 11px;
+	margin-top: 2px;
+}
+
+.wui-GroupDisclosurePanel .wui-group-mini {
+	cursor: pointer;
+	cursor: hand;
+	padding-left: 20px;
+	background-color: #f1edd0;
+}
+
+.wui-GroupDisclosurePanel .wui-group-mini-selected {
+	background-color: #ded48a;
+}
+
+.wui-GroupDisclosurePanel .wui-group-mini .group-layout {
+	
+}
+
+.wui-GroupDisclosurePanel .wui-group-mini .group-icon {
+	margin: 0 10px;
+	vertical-align: middle;
+}
+
+.wui-GroupDisclosurePanel .wui-group-mini .group-label {
+	width: 100%;
+	font-size: 11px;
+	margin-top: 2px;
+}
+
+/** Group Select Panel **/
+.groupselect {
+	margin-top: 5px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.groupselect .group-label {
+	font-weight: bold;
+	color: #fff;
+	background-color: #58595b;
+	padding: 2px 4px;
+	width: 300px;
+}
+
+.groupselect .group-box {
+	width: 100%;
+	height: 100px;
+}
+
+.groupselect .group-button-panel {
+	width: 40px;
+}
+
+.groupselect .group-button-add {
+	margin: 10px 13px;
+	cursor: pointer;
+	cursor: hand;
+}
+
+.groupselect .group-button-remove {
+	margin: 10px 13px;
+	cursor: pointer;
+	cursor: hand;
+}
+
+/** Permissions Panel **/
+.permissions {
+	width: 100%;
+}
+
+.permissions .permission {
+	margin: 5px;
+}
+
+.permissions .permission .permission-checkbox {
+	
+}
+
+.permissions .permission .permission-description-on {
+	width: 100%;
+	vertical-align: center;
+	cursor: pointer;
+	cursor: hand;
+	margin-left: 3px;
+	color: #000;
+}
+
+.permissions .permission .permission-description-off {
+	width: 100%;
+	vertical-align: center;
+	cursor: default;
+	margin-left: 3px;
+	color: #999;
+}
+
+/** Create/Edit User **/
+.office-create-user-tabpanel {
+	
+}
+
+.office-create-user-tabpanel .gwt-TabPanelBottom {
+/*	width: 699px;
+	height: 525px;*/
+}
+
+.office-create-user-tabpanel .office-create-user-data {
+	
+}
+
+.office-edit-user-tabpanel {
+	
+}
+
+.office-edit-user-tabpanel .gwt-TabPanelBottom {
+/*	width: 699px;
+	height: 525px;*/
+}
+
+.office-edit-user-tabpanel .office-create-user-data {
+	
+}
+
+.wui-user-data .office-input-panel {
+	margin-top: 10px;
+	margin-right: 20px;
+}
+
+.wui-user-data .office-input-title {
+	margin-bottom: 3px;
+	font-weight: bold;
+	color: #58595b;
+	font-size: 11px;
+}
+
+.wui-user-data .office-input-widget {
+	width: 300px;
+	overflow: auto;
+}
+.wui-user-data .id-locality {
+	width: 95px;
+}
+	
+
+.wui-user-data .postalCode {
+	width: 95px;
+	margin-right: 5px;
+}
+
+.wui-user-data .locality {
+	width: 200px;
+}
+
+.wui-user-data .postalAddress {
+	height: 73px;
+}
+
+.wui-user-data .isWrong {
+	background-color: #d97570;
+}
+
+.wui-user-data .password {
+}
+
+.wui-user-data .password-input {
+	width: 140px;
+	margin-right: 5px;
+}
+
+.wui-user-data .password-input-repeat {
+	width: 140px;
+}
+
+.wui-user-data .password-button {
+	width: 80px;
+	margin-left: 15px;
+}
+
+.wui-user-data .password-note {
+	font-size: 8pt;
+	color: #999;
+	margin-top: 2px;
+}
+
+
+
+.wui-user-data .wui-user-data-loginAttributes {
+	padding: 0px 5px 5px 5px;
+	width: 100%;
+	height: 75px;
+}
+
+.wui-user-data .wui-user-data-personalPanel {
+	background-color: #ccc;
+	padding-left: 5px;
+	padding-right: 5px;
+	padding-bottom: 18px;
+	width: 100%;
+	/*	margin-top: 18px;*/ /*	margin-bottom: 18px;*/
+}
+
+.wui-user-data .wui-user-data-note {
+	font-size: 8pt;
+	color: #999;
+	margin-top: 2px;
+}
+
+.wui-user-data .groupselect {
+	
+}
+
+/** Create Group **/
+.office-create-group-tabpanel .gwt-TabPanelBottom {
+/*	width: 690px;
+	height: 356px;*/
+}
+
+.office-create-group-tabpanel .basicInfoPanel {
+	
+}
+
+.office-create-group-tabpanel .office-input-panel {
+	margin-top: 15px;
+	margin-right: 10px;
+}
+
+.office-create-group-tabpanel .office-input-title {
+	margin-bottom: 3px;
+	font-weight: bold;
+	color: #58595b;
+}
+
+.office-create-group-tabpanel .office-input-widget {
+	width: 300px;
+	overflow: auto;
+}
+
+.office-create-group-tabpanel .groupselect {
+	margin-top: 30px;
+}
+
+.office-create-group-tabpanel .namePanel { /*	margin-right: 70px;*/
+	
+}
+
+/** Edit Group **/
+.office-edit-group-tabpanel .gwt-TabPanelBottom {
+/*	width: 690px;
+	height: 346px;*/
+}
+
+.office-edit-group-tabpanel .basicInfoPanel {
+	
+}
+
+.office-edit-group-tabpanel .office-input-panel {
+	margin-top: 10px;
+	margin-right: 10px;
+}
+
+.office-edit-group-tabpanel .office-input-title {
+	margin-bottom: 3px;
+	font-weight: bold;
+	color: #58595b;
+}
+
+.office-edit-group-tabpanel .office-input-widget {
+	width: 300px;
+	overflow: auto;
+}
+
+.office-edit-group-tabpanel .groupselect {
+	margin-top: 20px;
+}
+
+.office-edit-group-tabpanel .namePanel {
+	margin-right: 70px;
+}
+
+/** User Log **/
+.wui-userlog {
+	width: 100%;
+}
+
+.wui-userlog .userlog-layout {
+	width: 830px;
+	margin: 3px 10px;
+}
+
+
+.wui-userlog .log-total {
+	margin-right: 5px;
+}
+
+.wui-userlog .log-header-layout {
+	background-color: #58595b;
+	font-weight: bold;
+	border-bottom: 2px solid white;
+}
+.wui-userlog .log-header-layout * {
+	color: #e6e7e8;
+}
+
+.wui-userlog .log-header-dateTime {
+	width: 170px;
+}
+.wui-userlog .log-header-action {
+	width: 271px;
+}
+.wui-userlog .log-header-parameters {
+	width: 273px;
+}
+
+.wui-userlog-user .log-header-parameters {
+	width: 373px;
+}
+
+.wui-userlog .log-header-user {
+	width: 100px;
+	overflow: hidden;
+}
+
+.wui-userlog .log-entries {
+	height: 350px;
+}
+
+.wui-userlog .log-entries .log-entry {
+	width: 100%;
+}
+
+.wui-userlog .log-entries .log-entries-row {
+	width: 100%;
+	background-color: white;
+	border-spacing: 0;
+	border-bottom: 2px solid white;
+}
+
+.wui-userlog .log-entries .log-entries-row .dateTime {
+	width: 170px;
+	height: 100%;
+	padding: 1px 2px;
+	background-color: #e6e7e8;
+	vertical-align: top;
+	border-right: 2px solid white;
+}
+
+.wui-userlog .log-entries .log-entries-row .action {
+	width: 271px;
+	height: 100%;
+	padding: 1px 2px;
+	background-color: #e6e7e8;
+	vertical-align: top;
+	border-right: 2px solid white;
+}
+
+.wui-userlog .log-entries .log-entries-row .parameters {
+	width: 279px;
+	padding: 1px 2px;
+	background-color: #e6e7e8;
+	vertical-align: top;
+	border-right: 2px solid white;
+	overflow-x: auto;
+}
+
+.wui-userlog .log-entries .log-entries-row .user {
+	width: 88px;
+	height: 100%;
+	padding: 1px 2px;
+	background-color: #e6e7e8;
+	vertical-align: top;
+	overflow: hidden;
+}
+
+.wui-userlog .log-filters-layout {
+	margin: 3px 10px;
+}
+	
+.wui-userlog .actions-layout {
+	margin-right: 15px;
+}
+
+.wui-userlog .actions-label {
+	color: #58595b;
+	margin-bottom: 5px;
+}
+
+.wui-userlog .actions-picker {
+
+}
+.wui-userlog .date-initial-layout {
+	margin-right: 10px;
+}
+.wui-userlog .date-initial-label {
+	color: #58595b;
+	margin-bottom: 5px;
+}
+.wui-userlog .date-initial-picker {
+}
+.wui-userlog .date-final-layout {
+}
+.wui-userlog .date-final-label {
+	color: #58595b;
+	margin-bottom: 5px;
+}
+
+.wui-userlog .date-final-picker {
+}
+
+.wui-userlog .filter-set {
+	width: 100px;
+	margin: 5px 5px 0 5px;
+}
+
+/** Register **/
+
+.wui-register {
+	
+}
+.wui-register .register-title {
+	margin-top: 10px;
+	margin-bottom: 5px;
+	margin-left: 15px;
+	font-size: 14px;
+	font-weight: bold;
+	color: #58595b;
+}
+.wui-register .register-userdata {
+	padding: 0 15px 15px 15px;
+	width: 100%;
+}
+
+
+.wui-register .register-disclaimer {
+	margin: 0 15px 15px 15px;
+	font-size: 11px;
+	color: #999;	
+}
+	
+.wui-register .register-captcha {
+	padding: 5px 15px 15px 30px;
+	margin-bottom: 10px;
+}
+.wui-register .register-submit {
+	width: 100px;
+	margin: 0 0 15px 10px;
+}
+
+/** Verify email **/
+
+.wui-verifyemail {
+	margin: 10px;
+	width: 100%;
+}
+.wui-verifyemail .verifyemail-input {
+	margin: 0 10px 15px 5px;
+}
+.wui-verifyemail .verifyemail-input-user-label {
+	color: #58595b;
+}
+.wui-verifyemail .verifyemail-input-user-box {
+}
+.wui-verifyemail .verifyemail-input-token-label {
+	color: #58595b;
+}
+.wui-verifyemail .verifyemail-input-token-box {
+}
+.wui-verifyemail .verifyemail-buttons {
+	width: 100%;
+}
+.wui-verifyemail .verifyemail-button-verify {
+	width: 150px;
+	margin: 5px;
+}
+.wui-verifyemail .verifyemail-button-resend {
+	width: 180px;
+	margin: 5px;
+}
+.wui-verifyemail .verifyemail-button-change {
+	width: 180px;
+	margin: 5px;
+}
+
+/** Preferences **/
+
+.wui-preferences {
+	
+}
+.wui-preferences .preferences-title {
+	margin-bottom: 5px;
+	margin-left: 5px;
+	font-size: 14px;
+	font-weight: bold;
+	color: #58595b;
+}
+.wui-preferences .preferences-userdata {
+	padding: 0 15px 15px 15px;
+	margin-bottom: 10px;
+	width: 100%;
+}
+
+.wui-preferences .preferences-submit {
+	width: 80px;
+	margin: 0 0 15px 10px;
+}
+
+/** Recover Login **/
+.wui-recoverLogin {
+	
+}
+.wui-recoverLogin .usernameOrEmail-layout {
+	margin: 15px;
+}
+.wui-recoverLogin .usernameOrEmail-label {
+	
+}
+.wui-recoverLogin .usernameOrEmail-box {
+	width: 300px;
+	margin-left: 5px;
+}
+.wui-recoverLogin .captcha-title {
+	margin-top: 10px;
+	margin-bottom: 5px;
+	margin-left: 15px;
+	font-size: 14px;
+	font-weight: bold;
+	color: #58595b;
+}
+
+.wui-recoverLogin .wui-captcha-image-default {
+	margin: 15px;
+}
+
+.wui-recoverLogin .submit {
+	width: 200px;
+	margin: 15px;
+}
+
+/** Reset Password **/ 
+.wui-resetPassword {
+}
+.wui-resetPassword .resetPassword-label {
+}
+.wui-resetPassword .resetPassword-box {
+	width: 250px;
+}
+}
+.wui-resetPassword .resetPassword-submit {
+}
+
+.wui-resetPassword .invalid {
+	background-color: #d97570;
+}

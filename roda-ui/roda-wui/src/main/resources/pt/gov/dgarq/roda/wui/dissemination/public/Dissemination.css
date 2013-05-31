@@ -1,0 +1,156 @@
+@CHARSET "UTF-8";
+
+.wui-dissemination {
+	color: #58595b;
+}
+
+/* @group Description Metadata Panel */
+
+.descriptionMetadata {
+	width: 100%;
+}
+
+/* @group Description Group Panel */
+
+.descriptionElement {
+	width: 100%;
+}
+
+.descriptionElement .edit-widget {
+	width: 100%;
+	height: auto;
+}
+
+.descriptionElement .readonly-widget.gwt-Label {
+	white-space: -moz-pre-wrap; /* Mozilla, supported since 1999 */
+	white-space: -pre-wrap; /* Opera 4 - 6 */
+	white-space: -o-pre-wrap; /* Opera 7 */
+	white-space: pre-wrap; /* CSS3 */
+	word-wrap: break-word; /* IE 5.5+ */ 
+}
+
+.descriptionElement .edit-widget-tabs {
+	margin: 0;
+}
+
+.descriptionElement .edit-widget-tabs .gwt-TabPanelBottom {
+	border: 0;
+	padding: 0;
+	height: auto;
+}
+
+.descriptionElement .edit-widget-tabs .gwt-TabBar {
+	background-color: inherit;
+	border: 0;
+}
+
+.descriptionElement .edit-widget-tabs .gwt-TabBar .gwt-TabBarItem {
+	filter: alpha(opacity = 75);
+	-moz-opacity: .75;
+	opacity: .75;
+	
+	border: 0;
+	margin: 1px 2px;
+	background-color: inherit;
+	padding: 0;
+	cursor: pointer;
+	cursor: hand;
+}
+
+.descriptionElement .edit-widget-tabs .gwt-TabBar .gwt-TabBarItem-selected {
+	background-color: inherit;
+	filter: alpha(opacity = 100);
+	-moz-opacity: 1;
+	opacity: 1;
+}
+
+.descriptionElement .edit-widget-mode {
+	width: 99%;
+}
+
+.descriptionElement .wui-editor-date {
+	width: auto;
+}
+
+.descriptionElement .wui-editor-physdesc{
+	width: auto;
+}
+
+.descriptionElement .wui-editor-languages {
+	width: auto;
+}
+
+
+.descriptionGroup {
+	font-family: Verdana, Lucida, Arial, Helvetica, sans-serif;
+	font-size: 10pt;
+}
+
+.descriptionGroup {
+	width: 100%;
+}
+
+.descriptionGroup .descriptionGroupDisclosure {
+	width: 100%;
+}
+
+.descriptionGroup .descriptionGroupDisclosure .header {
+	background-color: #58595b;
+	font-weight: bold;
+	text-decoration: none;
+	cursor: pointer;
+	cursor: hand;
+}
+
+.descriptionGroup .descriptionGroupDisclosure .header * {
+	color: #ffffff;
+	font-size: 11px;
+}
+
+
+
+.descriptionGroup .descriptionGroupTable {
+	color: #58595b;
+	background-color: white;
+}
+
+.descriptionGroup .descriptionGroupTable .label-container {
+	vertical-align: top;
+	padding: 2px;
+	background-color: #dedfe0;
+}
+
+.descriptionGroup .descriptionGroupTable .value-container {
+	width: 100%;
+	vertical-align: top;
+	padding: 2px;
+	background-color: #f0f1f2;
+}
+
+.descriptionGroup .descriptionGroup-row:hover .label-container {
+	background-color: #e6e7e8;
+}
+
+.descriptionGroup .descriptionGroup-row:hover .value-container {
+	background-color: white;
+}
+
+.descriptionGroup .descriptionGroupTable .label-container-last {
+}
+
+.descriptionGroup .descriptionGroupTable .value-container-last {
+}
+
+.descriptionGroup .descriptionGroup-label {
+	width: 150px;
+	font-size: 11px;
+}
+
+.descriptionGroup .descriptionGroup-value {
+}
+
+.descriptionGroup .descriptionGroup-value * {
+	font-size: 11px;
+}
+
+/* @end */

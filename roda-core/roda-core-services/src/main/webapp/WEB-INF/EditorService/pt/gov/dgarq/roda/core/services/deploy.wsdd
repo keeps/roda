@@ -1,0 +1,247 @@
+<!-- Use this file to deploy some handlers/chains and services      -->
+<!-- Two ways to do this:                                           -->
+<!--   java org.apache.axis.client.AdminClient deploy.wsdd          -->
+<!--      after the axis server is running                          -->
+<!-- or                                                             -->
+<!--   java org.apache.axis.utils.Admin client|server deploy.wsdd   -->
+<!--      from the same directory that the Axis engine runs         -->
+
+<deployment
+    xmlns="http://xml.apache.org/axis/wsdd/"
+    xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
+
+  <!-- Services from EditorService WSDL service -->
+
+  <service name="Editor" provider="java:RPC" style="wrapped" use="literal">
+      <parameter name="wsdlTargetNamespace" value="http://services.core.roda.dgarq.gov.pt"/>
+      <parameter name="wsdlServiceElement" value="EditorService"/>
+      <parameter name="schemaQualified" value="http://services.core.roda.dgarq.gov.pt,http://filter.adapter.data.core.roda.dgarq.gov.pt,http://common.core.roda.dgarq.gov.pt,http://eadc.data.core.roda.dgarq.gov.pt,http://data.core.roda.dgarq.gov.pt"/>
+      <parameter name="wsdlServicePort" value="Editor"/>
+      <parameter name="className" value="pt.gov.dgarq.roda.core.services.Editor"/>
+      <parameter name="wsdlPortType" value="Editor"/>
+      <parameter name="typeMappingVersion" value="1.2"/>
+      <operation name="createDescriptionObject" qname="operNS:createDescriptionObject" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:createDescriptionObjectReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:string" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
+        <parameter qname="pns:dObject" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:DescriptionObject" xmlns:tns="http://data.core.roda.dgarq.gov.pt"/>
+        <fault name="NoSuchRODAObjectException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="InvalidDescriptionObjectException" qname="fns:fault2" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.InvalidDescriptionObjectException" type="tns:InvalidDescriptionObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="EditorException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.EditorException" type="tns:EditorException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="modifyDescriptionObject" qname="operNS:modifyDescriptionObject" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:modifyDescriptionObjectReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:DescriptionObject" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
+        <parameter qname="pns:dObject" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:DescriptionObject" xmlns:tns="http://data.core.roda.dgarq.gov.pt"/>
+        <fault name="NoSuchRODAObjectException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="EditorException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.EditorException" type="tns:EditorException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="removeDescriptionObject" qname="operNS:removeDescriptionObject" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" soapAction="" >
+        <parameter qname="pns:pid" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <fault name="NoSuchRODAObjectException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="EditorException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.EditorException" type="tns:EditorException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="getDOPossibleLevels" qname="operNS:getDOPossibleLevels" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getDOPossibleLevelsReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:DescriptionLevel" xmlns:rtns="http://eadc.data.core.roda.dgarq.gov.pt" soapAction="" >
+        <parameter qname="pns:doPID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <fault name="EditorException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.EditorException" type="tns:EditorException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="setRODAObjectPermissions" qname="operNS:setRODAObjectPermissions" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:setRODAObjectPermissionsReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:RODAObjectPermissions" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
+        <parameter qname="pns:permissions" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:RODAObjectPermissions" xmlns:tns="http://data.core.roda.dgarq.gov.pt"/>
+        <parameter qname="pns:applyToDescendants" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:boolean" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <fault name="NoSuchRODAObjectException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="EditorException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.EditorException" type="tns:EditorException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="setProducers" qname="operNS:setProducers" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" soapAction="" >
+        <parameter qname="pns:doPID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <parameter qname="pns:producers" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:Producers" xmlns:tns="http://data.core.roda.dgarq.gov.pt"/>
+        <fault name="NoSuchRODAObjectException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="EditorException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.EditorException" type="tns:EditorException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <parameter name="allowedMethods" value="removeDescriptionObject createDescriptionObject setRODAObjectPermissions getDOPossibleLevels modifyDescriptionObject setProducers"/>
+      <parameter name="scope" value="Application"/>
+
+      <typeMapping
+        xmlns:ns="http://eadc.data.core.roda.dgarq.gov.pt"
+        qname="ns:LangmaterialLanguages"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.LangmaterialLanguages"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <arrayMapping
+        xmlns:ns="http://services.core.roda.dgarq.gov.pt"
+        qname="ns:ArrayOf_tns2_ArrangementTableGroup"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.ArrangementTableGroup[]"
+        innerType="cmp-ns:ArrangementTableGroup" xmlns:cmp-ns="http://eadc.data.core.roda.dgarq.gov.pt"
+        encodingStyle=""
+      />
+      <arrayMapping
+        xmlns:ns="http://services.core.roda.dgarq.gov.pt"
+        qname="ns:ArrayOf_xsd_string"
+        type="java:java.lang.String[]"
+        innerType="cmp-ns:string" xmlns:cmp-ns="http://www.w3.org/2001/XMLSchema"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://common.core.roda.dgarq.gov.pt"
+        qname="ns:InvalidDescriptionObjectException"
+        type="java:pt.gov.dgarq.roda.core.common.InvalidDescriptionObjectException"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://common.core.roda.dgarq.gov.pt"
+        qname="ns:RODAServiceException"
+        type="java:pt.gov.dgarq.roda.core.common.RODAServiceException"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://data.core.roda.dgarq.gov.pt"
+        qname="ns:Producers"
+        type="java:pt.gov.dgarq.roda.core.data.Producers"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://eadc.data.core.roda.dgarq.gov.pt"
+        qname="ns:BioghistChronitem"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.BioghistChronitem"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://common.core.roda.dgarq.gov.pt"
+        qname="ns:EditorException"
+        type="java:pt.gov.dgarq.roda.core.common.EditorException"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://eadc.data.core.roda.dgarq.gov.pt"
+        qname="ns:ArrangementTableGroup"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.ArrangementTableGroup"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://data.core.roda.dgarq.gov.pt"
+        qname="ns:DescriptionObject"
+        type="java:pt.gov.dgarq.roda.core.data.DescriptionObject"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://eadc.data.core.roda.dgarq.gov.pt"
+        qname="ns:DescriptionLevel"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.DescriptionLevel"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://eadc.data.core.roda.dgarq.gov.pt"
+        qname="ns:BioghistChronlist"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.BioghistChronlist"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <arrayMapping
+        xmlns:ns="http://services.core.roda.dgarq.gov.pt"
+        qname="ns:ArrayOf_tns2_ArrangementTableRow"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.ArrangementTableRow[]"
+        innerType="cmp-ns:ArrangementTableRow" xmlns:cmp-ns="http://eadc.data.core.roda.dgarq.gov.pt"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://data.core.roda.dgarq.gov.pt"
+        qname="ns:RODAObjectPermissions"
+        type="java:pt.gov.dgarq.roda.core.data.RODAObjectPermissions"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://eadc.data.core.roda.dgarq.gov.pt"
+        qname="ns:ArrangementTableRow"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.ArrangementTableRow"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://eadc.data.core.roda.dgarq.gov.pt"
+        qname="ns:ArrangementTableBody"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.ArrangementTableBody"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <arrayMapping
+        xmlns:ns="http://services.core.roda.dgarq.gov.pt"
+        qname="ns:ArrayOf_tns2_BioghistChronitem"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.BioghistChronitem[]"
+        innerType="cmp-ns:BioghistChronitem" xmlns:cmp-ns="http://eadc.data.core.roda.dgarq.gov.pt"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://common.core.roda.dgarq.gov.pt"
+        qname="ns:NoSuchRODAObjectException"
+        type="java:pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://eadc.data.core.roda.dgarq.gov.pt"
+        qname="ns:ArrangementTableHead"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.ArrangementTableHead"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://eadc.data.core.roda.dgarq.gov.pt"
+        qname="ns:ArrangementTable"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.ArrangementTable"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://eadc.data.core.roda.dgarq.gov.pt"
+        qname="ns:PhysdescElement"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.PhysdescElement"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://data.core.roda.dgarq.gov.pt"
+        qname="ns:RODAObject"
+        type="java:pt.gov.dgarq.roda.core.data.RODAObject"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://common.core.roda.dgarq.gov.pt"
+        qname="ns:RODAException"
+        type="java:pt.gov.dgarq.roda.core.common.RODAException"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://data.core.roda.dgarq.gov.pt"
+        qname="ns:SimpleDescriptionObject"
+        type="java:pt.gov.dgarq.roda.core.data.SimpleDescriptionObject"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+  </service>
+</deployment>

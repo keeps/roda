@@ -1,0 +1,180 @@
+<!-- Use this file to deploy some handlers/chains and services      -->
+<!-- Two ways to do this:                                           -->
+<!--   java org.apache.axis.client.AdminClient deploy.wsdd          -->
+<!--      after the axis server is running                          -->
+<!-- or                                                             -->
+<!--   java org.apache.axis.utils.Admin client|server deploy.wsdd   -->
+<!--      from the same directory that the Axis engine runs         -->
+
+<deployment
+    xmlns="http://xml.apache.org/axis/wsdd/"
+    xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
+
+  <!-- Services from UserManagementService WSDL service -->
+
+  <service name="UserManagement" provider="java:RPC" style="wrapped" use="literal">
+      <parameter name="wsdlTargetNamespace" value="http://services.core.roda.dgarq.gov.pt"/>
+      <parameter name="wsdlServiceElement" value="UserManagementService"/>
+      <parameter name="schemaQualified" value="http://services.core.roda.dgarq.gov.pt,http://filter.adapter.data.core.roda.dgarq.gov.pt,http://common.core.roda.dgarq.gov.pt,http://data.core.roda.dgarq.gov.pt"/>
+      <parameter name="wsdlServicePort" value="UserManagement"/>
+      <parameter name="className" value="pt.gov.dgarq.roda.core.services.UserManagement"/>
+      <parameter name="wsdlPortType" value="UserManagement"/>
+      <parameter name="typeMappingVersion" value="1.2"/>
+      <operation name="addGroup" qname="operNS:addGroup" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:addGroupReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:Group" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
+        <parameter qname="pns:group" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:Group" xmlns:tns="http://data.core.roda.dgarq.gov.pt"/>
+        <fault name="GroupAlreadyExistsException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.GroupAlreadyExistsException" type="tns:GroupAlreadyExistsException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="UserManagementException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.UserManagementException" type="tns:UserManagementException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="removeGroup" qname="operNS:removeGroup" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" soapAction="" >
+        <parameter qname="pns:groupname" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <fault name="IllegalOperationException" qname="fns:fault2" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.IllegalOperationException" type="tns:IllegalOperationException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="UserManagementException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.UserManagementException" type="tns:UserManagementException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="modifyGroup" qname="operNS:modifyGroup" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:modifyGroupReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:Group" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
+        <parameter qname="pns:modifiedGroup" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:Group" xmlns:tns="http://data.core.roda.dgarq.gov.pt"/>
+        <fault name="NoSuchGroupException" qname="fns:fault3" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchGroupException" type="tns:NoSuchGroupException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="IllegalOperationException" qname="fns:fault2" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.IllegalOperationException" type="tns:IllegalOperationException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="UserManagementException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.UserManagementException" type="tns:UserManagementException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="addUser" qname="operNS:addUser" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:addUserReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:User" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
+        <parameter qname="pns:user" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:User" xmlns:tns="http://data.core.roda.dgarq.gov.pt"/>
+        <fault name="UserAlreadyExistsException" qname="fns:fault4" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.UserAlreadyExistsException" type="tns:UserAlreadyExistsException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="UserManagementException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.UserManagementException" type="tns:UserManagementException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="EmailAlreadyExistsException" qname="fns:fault5" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.EmailAlreadyExistsException" type="tns:EmailAlreadyExistsException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="modifyUser" qname="operNS:modifyUser" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:modifyUserReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:User" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
+        <parameter qname="pns:modifiedUser" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:User" xmlns:tns="http://data.core.roda.dgarq.gov.pt"/>
+        <fault name="NoSuchUserException" qname="fns:fault6" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchUserException" type="tns:NoSuchUserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="IllegalOperationException" qname="fns:fault2" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.IllegalOperationException" type="tns:IllegalOperationException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="UserManagementException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.UserManagementException" type="tns:UserManagementException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="EmailAlreadyExistsException" qname="fns:fault5" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.EmailAlreadyExistsException" type="tns:EmailAlreadyExistsException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="removeUser" qname="operNS:removeUser" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:removeUserReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:boolean" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
+        <parameter qname="pns:username" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <fault name="NoSuchUserException" qname="fns:fault6" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchUserException" type="tns:NoSuchUserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="IllegalOperationException" qname="fns:fault2" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.IllegalOperationException" type="tns:IllegalOperationException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="UserManagementException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.UserManagementException" type="tns:UserManagementException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="setUserPassword" qname="operNS:setUserPassword" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" soapAction="" >
+        <parameter qname="pns:username" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <parameter qname="pns:password" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <fault name="NoSuchUserException" qname="fns:fault6" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchUserException" type="tns:NoSuchUserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="IllegalOperationException" qname="fns:fault2" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.IllegalOperationException" type="tns:IllegalOperationException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="UserManagementException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.UserManagementException" type="tns:UserManagementException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <parameter name="allowedMethods" value="modifyGroup setUserPassword addGroup modifyUser removeUser removeGroup addUser"/>
+      <parameter name="scope" value="Application"/>
+
+      <arrayMapping
+        xmlns:ns="http://services.core.roda.dgarq.gov.pt"
+        qname="ns:ArrayOf_xsd_string"
+        type="java:java.lang.String[]"
+        innerType="cmp-ns:string" xmlns:cmp-ns="http://www.w3.org/2001/XMLSchema"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://common.core.roda.dgarq.gov.pt"
+        qname="ns:NoSuchGroupException"
+        type="java:pt.gov.dgarq.roda.core.common.NoSuchGroupException"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://common.core.roda.dgarq.gov.pt"
+        qname="ns:NoSuchUserException"
+        type="java:pt.gov.dgarq.roda.core.common.NoSuchUserException"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://common.core.roda.dgarq.gov.pt"
+        qname="ns:IllegalOperationException"
+        type="java:pt.gov.dgarq.roda.core.common.IllegalOperationException"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://common.core.roda.dgarq.gov.pt"
+        qname="ns:RODAServiceException"
+        type="java:pt.gov.dgarq.roda.core.common.RODAServiceException"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://common.core.roda.dgarq.gov.pt"
+        qname="ns:EmailAlreadyExistsException"
+        type="java:pt.gov.dgarq.roda.core.common.EmailAlreadyExistsException"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://common.core.roda.dgarq.gov.pt"
+        qname="ns:GroupAlreadyExistsException"
+        type="java:pt.gov.dgarq.roda.core.common.GroupAlreadyExistsException"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://data.core.roda.dgarq.gov.pt"
+        qname="ns:RODAMember"
+        type="java:pt.gov.dgarq.roda.core.data.RODAMember"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://data.core.roda.dgarq.gov.pt"
+        qname="ns:Group"
+        type="java:pt.gov.dgarq.roda.core.data.Group"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://common.core.roda.dgarq.gov.pt"
+        qname="ns:UserManagementException"
+        type="java:pt.gov.dgarq.roda.core.common.UserManagementException"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://common.core.roda.dgarq.gov.pt"
+        qname="ns:UserRegistrationException"
+        type="java:pt.gov.dgarq.roda.core.common.UserRegistrationException"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://common.core.roda.dgarq.gov.pt"
+        qname="ns:RODAException"
+        type="java:pt.gov.dgarq.roda.core.common.RODAException"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://common.core.roda.dgarq.gov.pt"
+        qname="ns:UserAlreadyExistsException"
+        type="java:pt.gov.dgarq.roda.core.common.UserAlreadyExistsException"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://data.core.roda.dgarq.gov.pt"
+        qname="ns:User"
+        type="java:pt.gov.dgarq.roda.core.data.User"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+  </service>
+</deployment>

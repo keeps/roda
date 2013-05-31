@@ -1,0 +1,82 @@
+<!-- Use this file to deploy some handlers/chains and services      -->
+<!-- Two ways to do this:                                           -->
+<!--   java org.apache.axis.client.AdminClient deploy.wsdd          -->
+<!--      after the axis server is running                          -->
+<!-- or                                                             -->
+<!--   java org.apache.axis.utils.Admin client|server deploy.wsdd   -->
+<!--      from the same directory that the Axis engine runs         -->
+
+<deployment
+    xmlns="http://xml.apache.org/axis/wsdd/"
+    xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
+
+  <!-- Services from AcceptSIPService WSDL service -->
+
+  <service name="AcceptSIP" provider="java:RPC" style="wrapped" use="literal">
+      <parameter name="wsdlTargetNamespace" value="http://services.core.roda.dgarq.gov.pt"/>
+      <parameter name="wsdlServiceElement" value="AcceptSIPService"/>
+      <parameter name="schemaQualified" value="http://services.core.roda.dgarq.gov.pt,http://common.core.roda.dgarq.gov.pt"/>
+      <parameter name="wsdlServicePort" value="AcceptSIP"/>
+      <parameter name="className" value="pt.gov.dgarq.roda.core.services.AcceptSIPSoapBindingImpl"/>
+      <parameter name="wsdlPortType" value="AcceptSIP"/>
+      <parameter name="typeMappingVersion" value="1.2"/>
+      <operation name="acceptSIP" qname="operNS:acceptSIP" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" soapAction="" >
+        <parameter qname="pns:sipID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <parameter qname="pns:accept" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:boolean" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <parameter qname="pns:reason" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <fault name="NoSuchSIPException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchSIPException" type="tns:NoSuchSIPException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="AcceptSIPException" qname="fns:fault2" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.AcceptSIPException" type="tns:AcceptSIPException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="IllegalOperationException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.IllegalOperationException" type="tns:IllegalOperationException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <parameter name="allowedMethods" value="acceptSIP"/>
+
+      <typeMapping
+        xmlns:ns="http://common.core.roda.dgarq.gov.pt"
+        qname="ns:IllegalOperationException"
+        type="java:pt.gov.dgarq.roda.core.common.IllegalOperationException"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://common.core.roda.dgarq.gov.pt"
+        qname="ns:RODAServiceException"
+        type="java:pt.gov.dgarq.roda.core.common.RODAServiceException"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://common.core.roda.dgarq.gov.pt"
+        qname="ns:RODAException"
+        type="java:pt.gov.dgarq.roda.core.common.RODAException"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://common.core.roda.dgarq.gov.pt"
+        qname="ns:IngestException"
+        type="java:pt.gov.dgarq.roda.core.common.IngestException"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://common.core.roda.dgarq.gov.pt"
+        qname="ns:NoSuchSIPException"
+        type="java:pt.gov.dgarq.roda.core.common.NoSuchSIPException"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://common.core.roda.dgarq.gov.pt"
+        qname="ns:AcceptSIPException"
+        type="java:pt.gov.dgarq.roda.core.common.AcceptSIPException"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+  </service>
+</deployment>

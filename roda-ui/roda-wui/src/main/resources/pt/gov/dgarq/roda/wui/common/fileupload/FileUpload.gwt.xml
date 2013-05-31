@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><module>
+
+	<!-- Inherit the core Web Toolkit stuff.                  -->
+	<inherits name="com.google.gwt.user.User"/>
+
+	<!-- Specify the cascade stylesheet to use -->
+	<stylesheet src="FileUpload.css"/>
+
+	<servlet class="pt.gov.dgarq.roda.wui.common.fileupload.server.FileUpload" path="/fileUpload"/>
+<servlet class="pt.gov.dgarq.roda.wui.common.fileupload.server.FileUploadProgressImpl" path="/fileuploadprogress"/></module>

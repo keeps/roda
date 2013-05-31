@@ -1,0 +1,12 @@
+#!/bin/sh
+
+#scriptdir=`dirname "$0"`
+
+# Set enviroment variables for RODA
+#. $scriptdir/set-roda-env.sh
+
+# import common configuration functions
+#. $scriptdir/roda-config.sh
+
+ldapmodify -h LDAPHOST -p LDAPPORT -x -D "LDAP_ADMIN_DN" -w LDAP_ADMIN_PASSWD $*
+

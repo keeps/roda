@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="http://services.core.roda.dgarq.gov.pt" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="http://services.core.roda.dgarq.gov.pt" xmlns:intf="http://services.core.roda.dgarq.gov.pt" xmlns:tns1="http://data.core.roda.dgarq.gov.pt" xmlns:tns2="http://eadc.data.core.roda.dgarq.gov.pt" xmlns:tns3="http://common.core.roda.dgarq.gov.pt" xmlns:tns4="http://filter.adapter.data.core.roda.dgarq.gov.pt" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<!--WSDL created by Apache Axis version: 1.4
+Built on Apr 22, 2006 (06:55:48 PDT)-->
+ <wsdl:types>
+  <schema elementFormDefault="qualified" targetNamespace="http://services.core.roda.dgarq.gov.pt" xmlns="http://www.w3.org/2001/XMLSchema">
+   <import namespace="http://data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://eadc.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://common.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+   <element name="basicSearch">
+    <complexType>
+     <sequence>
+      <element name="query" type="xsd:string"/>
+      <element name="firstResultIndex" type="xsd:int"/>
+      <element name="maxResults" type="xsd:int"/>
+      <element name="snippetsMax" type="xsd:int"/>
+      <element name="fieldMaxLength" type="xsd:int"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="basicSearchResponse">
+    <complexType>
+     <sequence>
+      <element name="basicSearchReturn" type="tns1:SearchResult"/>
+     </sequence>
+    </complexType>
+   </element>
+   <complexType name="ArrayOf_xsd_string">
+    <sequence>
+     <element maxOccurs="unbounded" minOccurs="0" name="item" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="ArrayOf_tns2_ArrangementTableRow">
+    <sequence>
+     <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns2:ArrangementTableRow"/>
+    </sequence>
+   </complexType>
+   <complexType name="ArrayOf_tns2_ArrangementTableGroup">
+    <sequence>
+     <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns2:ArrangementTableGroup"/>
+    </sequence>
+   </complexType>
+   <complexType name="ArrayOf_tns2_BioghistChronitem">
+    <sequence>
+     <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns2:BioghistChronitem"/>
+    </sequence>
+   </complexType>
+   <complexType name="ArrayOf_tns1_SearchResultObject">
+    <sequence>
+     <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns1:SearchResultObject"/>
+    </sequence>
+   </complexType>
+   <element name="fault" type="tns3:SearchException"/>
+   <element name="advancedSearch">
+    <complexType>
+     <sequence>
+      <element maxOccurs="unbounded" name="searchParameters" type="tns1:SearchParameter"/>
+      <element name="firstResultIndex" type="xsd:int"/>
+      <element name="maxResults" type="xsd:int"/>
+      <element name="snippetsMax" type="xsd:int"/>
+      <element name="fieldMaxLength" type="xsd:int"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="advancedSearchResponse">
+    <complexType>
+     <sequence>
+      <element name="advancedSearchReturn" type="tns1:SearchResult"/>
+     </sequence>
+    </complexType>
+   </element>
+  </schema>
+  <schema elementFormDefault="qualified" targetNamespace="http://data.core.roda.dgarq.gov.pt" xmlns="http://www.w3.org/2001/XMLSchema">
+   <import namespace="http://eadc.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://common.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://services.core.roda.dgarq.gov.pt"/>
+   <complexType name="RODAObject">
+    <sequence>
+     <element name="contentModel" nillable="true" type="xsd:string"/>
+     <element name="createdDate" nillable="true" type="xsd:dateTime"/>
+     <element name="label" nillable="true" type="xsd:string"/>
+     <element name="lastModifiedDate" nillable="true" type="xsd:dateTime"/>
+     <element name="pid" nillable="true" type="xsd:string"/>
+     <element name="state" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="SimpleDescriptionObject">
+    <complexContent>
+     <extension base="tns1:RODAObject">
+      <sequence>
+       <element name="countryCode" nillable="true" type="xsd:string"/>
+       <element name="dateFinal" nillable="true" type="xsd:string"/>
+       <element name="dateInitial" nillable="true" type="xsd:string"/>
+       <element name="description" nillable="true" type="xsd:string"/>
+       <element name="id" nillable="true" type="xsd:string"/>
+       <element name="level" nillable="true" type="tns2:DescriptionLevel"/>
+       <element name="parentPID" nillable="true" type="xsd:string"/>
+       <element name="repositoryCode" nillable="true" type="xsd:string"/>
+       <element name="subElementsCount" type="xsd:int"/>
+       <element name="title" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="DescriptionObject">
+    <complexContent>
+     <extension base="tns1:SimpleDescriptionObject">
+      <sequence>
+       <element name="accessrestrict" nillable="true" type="xsd:string"/>
+       <element name="accruals" nillable="true" type="xsd:string"/>
+       <element name="acqinfo" nillable="true" type="xsd:string"/>
+       <element name="acqinfoDate" nillable="true" type="xsd:string"/>
+       <element name="acqinfoNum" nillable="true" type="xsd:string"/>
+       <element name="appraisal" nillable="true" type="xsd:string"/>
+       <element name="arrangement" nillable="true" type="xsd:string"/>
+       <element name="arrangementTable" nillable="true" type="tns2:ArrangementTable"/>
+       <element name="bibliography" nillable="true" type="xsd:string"/>
+       <element name="bioghist" nillable="true" type="xsd:string"/>
+       <element name="bioghistChronlist" nillable="true" type="tns2:BioghistChronlist"/>
+       <element name="completeReference" nillable="true" type="xsd:string"/>
+       <element name="custodhist" nillable="true" type="xsd:string"/>
+       <element name="handleURL" nillable="true" type="xsd:string"/>
+       <element name="langmaterialLanguages" nillable="true" type="tns2:LangmaterialLanguages"/>
+       <element name="materialspec" nillable="true" type="xsd:string"/>
+       <element name="note" nillable="true" type="xsd:string"/>
+       <element name="origination" nillable="true" type="xsd:string"/>
+       <element name="otherfindaid" nillable="true" type="xsd:string"/>
+       <element name="physdesc" nillable="true" type="xsd:string"/>
+       <element name="physdescDateFinal" nillable="true" type="xsd:string"/>
+       <element name="physdescDateInitial" nillable="true" type="xsd:string"/>
+       <element name="physdescDimensions" nillable="true" type="tns2:PhysdescElement"/>
+       <element name="physdescExtent" nillable="true" type="tns2:PhysdescElement"/>
+       <element name="physdescPhysfacet" nillable="true" type="tns2:PhysdescElement"/>
+       <element name="phystech" nillable="true" type="xsd:string"/>
+       <element name="prefercite" nillable="true" type="xsd:string"/>
+       <element name="relatedmaterial" nillable="true" type="xsd:string"/>
+       <element name="scopecontent" nillable="true" type="xsd:string"/>
+       <element name="userestrict" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="SearchResultObject">
+    <sequence>
+     <element name="descriptionObject" nillable="true" type="tns1:DescriptionObject"/>
+     <element name="number" type="xsd:int"/>
+     <element name="score" type="xsd:float"/>
+    </sequence>
+   </complexType>
+   <complexType name="SearchResult">
+    <sequence>
+     <element name="datetime" nillable="true" type="xsd:string"/>
+     <element name="hitPageSize" type="xsd:int"/>
+     <element name="hitPageStart" type="xsd:int"/>
+     <element name="hitTotal" type="xsd:int"/>
+     <element name="indexName" nillable="true" type="xsd:string"/>
+     <element name="resultCount" type="xsd:int"/>
+     <element name="resultPageXslt" nillable="true" type="xsd:string"/>
+     <element name="searchResultObjects" nillable="true" type="impl:ArrayOf_tns1_SearchResultObject"/>
+    </sequence>
+   </complexType>
+   <complexType name="SearchParameter">
+    <sequence>
+     <element name="subQuery" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+  </schema>
+  <schema elementFormDefault="qualified" targetNamespace="http://eadc.data.core.roda.dgarq.gov.pt" xmlns="http://www.w3.org/2001/XMLSchema">
+   <import namespace="http://data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://common.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://services.core.roda.dgarq.gov.pt"/>
+   <complexType name="DescriptionLevel">
+    <sequence>
+     <element name="level" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="ArrangementTableRow">
+    <sequence>
+     <element name="entries" nillable="true" type="impl:ArrayOf_xsd_string"/>
+    </sequence>
+   </complexType>
+   <complexType name="ArrangementTableBody">
+    <sequence>
+     <element name="rows" nillable="true" type="impl:ArrayOf_tns2_ArrangementTableRow"/>
+    </sequence>
+   </complexType>
+   <complexType name="ArrangementTableHead">
+    <complexContent>
+     <extension base="tns2:ArrangementTableBody">
+      <sequence/>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="ArrangementTableGroup">
+    <sequence>
+     <element name="body" nillable="true" type="tns2:ArrangementTableBody"/>
+     <element name="columns" type="xsd:int"/>
+     <element name="head" nillable="true" type="tns2:ArrangementTableHead"/>
+    </sequence>
+   </complexType>
+   <complexType name="ArrangementTable">
+    <sequence>
+     <element name="arrangementTableGroups" nillable="true" type="impl:ArrayOf_tns2_ArrangementTableGroup"/>
+    </sequence>
+   </complexType>
+   <complexType name="BioghistChronitem">
+    <sequence>
+     <element name="dateFinal" nillable="true" type="xsd:string"/>
+     <element name="dateInitial" nillable="true" type="xsd:string"/>
+     <element name="event" nillable="true" type="xsd:string"/>
+     <element name="text" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="BioghistChronlist">
+    <sequence>
+     <element name="bioghistChronitems" nillable="true" type="impl:ArrayOf_tns2_BioghistChronitem"/>
+    </sequence>
+   </complexType>
+   <complexType name="LangmaterialLanguages">
+    <sequence>
+     <element name="langmaterialLanguages" nillable="true" type="impl:ArrayOf_xsd_string"/>
+    </sequence>
+   </complexType>
+   <complexType name="PhysdescElement">
+    <sequence>
+     <element name="unit" nillable="true" type="xsd:string"/>
+     <element name="value" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+  </schema>
+  <schema elementFormDefault="qualified" targetNamespace="http://common.core.roda.dgarq.gov.pt" xmlns="http://www.w3.org/2001/XMLSchema">
+   <import namespace="http://data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://eadc.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://services.core.roda.dgarq.gov.pt"/>
+   <complexType abstract="true" name="RODAException">
+    <sequence>
+     <element name="message" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="RODAServiceException">
+    <complexContent>
+     <extension base="tns3:RODAException">
+      <sequence/>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="SearchException">
+    <complexContent>
+     <extension base="tns3:RODAServiceException">
+      <sequence/>
+     </extension>
+    </complexContent>
+   </complexType>
+  </schema>
+  <schema elementFormDefault="qualified" targetNamespace="http://filter.adapter.data.core.roda.dgarq.gov.pt" xmlns="http://www.w3.org/2001/XMLSchema">
+   <import namespace="http://data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://eadc.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://common.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://services.core.roda.dgarq.gov.pt"/>
+   <complexType abstract="true" name="FilterParameter">
+    <sequence>
+     <element name="name" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="SimpleFilterParameter">
+    <complexContent>
+     <extension base="tns4:FilterParameter">
+      <sequence>
+       <element name="value" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="OneOfManyFilterParameter">
+    <complexContent>
+     <extension base="tns4:FilterParameter">
+      <sequence>
+       <element name="values" nillable="true" type="impl:ArrayOf_xsd_string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="RangeFilterParameter">
+    <complexContent>
+     <extension base="tns4:FilterParameter">
+      <sequence>
+       <element name="fromValue" nillable="true" type="xsd:string"/>
+       <element name="toValue" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="RegexFilterParameter">
+    <complexContent>
+     <extension base="tns4:FilterParameter">
+      <sequence>
+       <element name="regex" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="ProducerFilterParameter">
+    <complexContent>
+     <extension base="tns4:FilterParameter">
+      <sequence>
+       <element name="groups" nillable="true" type="impl:ArrayOf_xsd_string"/>
+       <element name="username" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="LikeFilterParameter">
+    <complexContent>
+     <extension base="tns4:FilterParameter">
+      <sequence>
+       <element name="expression" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+  </schema>
+ </wsdl:types>
+
+   <wsdl:message name="advancedSearchRequest">
+
+      <wsdl:part element="impl:advancedSearch" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="basicSearchResponse">
+
+      <wsdl:part element="impl:basicSearchResponse" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="SearchException">
+
+      <wsdl:part element="impl:fault" name="fault"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="basicSearchRequest">
+
+      <wsdl:part element="impl:basicSearch" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="advancedSearchResponse">
+
+      <wsdl:part element="impl:advancedSearchResponse" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:portType name="Search">
+
+      <wsdl:operation name="basicSearch">
+
+         <wsdl:input message="impl:basicSearchRequest" name="basicSearchRequest"/>
+
+         <wsdl:output message="impl:basicSearchResponse" name="basicSearchResponse"/>
+
+         <wsdl:fault message="impl:SearchException" name="SearchException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="advancedSearch">
+
+         <wsdl:input message="impl:advancedSearchRequest" name="advancedSearchRequest"/>
+
+         <wsdl:output message="impl:advancedSearchResponse" name="advancedSearchResponse"/>
+
+         <wsdl:fault message="impl:SearchException" name="SearchException"/>
+
+      </wsdl:operation>
+
+   </wsdl:portType>
+
+   <wsdl:binding name="SearchSoapBinding" type="impl:Search">
+
+      <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+      <wsdl:operation name="basicSearch">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="basicSearchRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="basicSearchResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="SearchException">
+
+            <wsdlsoap:fault name="SearchException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="advancedSearch">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="advancedSearchRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="advancedSearchResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="SearchException">
+
+            <wsdlsoap:fault name="SearchException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+   </wsdl:binding>
+
+   <wsdl:service name="SearchService">
+
+      <wsdl:port binding="impl:SearchSoapBinding" name="Search">
+
+         <wsdlsoap:address location="http://localhost:8080/roda-core/services/Search"/>
+
+      </wsdl:port>
+
+   </wsdl:service>
+
+</wsdl:definitions>

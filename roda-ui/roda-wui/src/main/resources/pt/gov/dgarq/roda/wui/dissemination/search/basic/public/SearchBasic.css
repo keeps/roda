@@ -1,0 +1,33 @@
+@CHARSET "UTF-8";
+
+.wui-search-basic {
+	
+}
+
+.wui-search-basic .layout {
+	margin: 40px 40px 40px 40px;
+	vertical-align: middle;
+}
+
+.wui-search-basic .label {
+	margin-top: 10px;
+	margin-bottom: 5px;
+	margin-left: 2px;
+	font-size: 14px;
+	font-weight: bold;
+	color: #58595b;
+}
+
+.wui-search-basic .box {
+	font-family: Verdana, Lucida, Arial, Helvetica, sans-serif;
+	font-size: 12pt;
+	width: 680px;
+	font-size: 12pt;
+	color: #58595b;
+	margin-right: 5px;
+}
+
+.wui-search-basic .button {
+	width: 100px;	
+}
+

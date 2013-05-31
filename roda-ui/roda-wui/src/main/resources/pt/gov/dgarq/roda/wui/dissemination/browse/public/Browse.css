@@ -1,0 +1,550 @@
+@CHARSET "UTF-8";
+/** Browser**/
+.wui-browse {
+	width: 865px;
+}
+
+.wui-browse .browse-header {
+	width: 100%;
+}
+
+.wui-browse .browse-total {
+	font-size: 11px;
+	color: #58595b;
+	white-space: nowrap;
+}
+
+.wui-browse .browse-createFonds {
+	margin-left: 5px;
+	cursor: pointer;
+	cursor: hand;
+}
+
+.wui-browse .browse-refresh {
+	margin-left: 5px;
+	cursor: pointer;
+	cursor: hand;
+}
+
+.wui-browse .view-toggle {
+	width: 16px;
+	cursor: pointer;
+	cursor: hand;
+}
+
+.wui-browse-split {
+	width: 865px;
+	height: 440px;
+}
+
+.wui-browse-split .hsplitter {
+	display: table;
+	width: 10px;
+}
+
+.wui-browse-split-hidden {
+	
+}
+
+.wui-browse-split-hidden .hsplitter {
+	display: none;
+	width: 0px;
+}
+
+.viewPanel-container {
+	width: 99%;
+}
+
+.wui-view-panel {
+	width: 100%;
+}
+
+.viewPanel-tabs {
+	width: 100%;
+	margin: 0;
+}
+
+.viewPanel-bottom {
+	width: 100%;
+}
+
+.viewPanel-tabs .gwt-TabBar {
+	background-color: #e6e7e8;
+	border: 0;
+}
+
+.viewPanel-tabs .gwt-TabPanelBottom {
+	height: 400px;
+	padding: 0;
+}
+
+.viewPanel-description-layout {
+	width: 100%;
+}
+
+.viewPanel-description-scroll {
+	width: 100%;
+	height: 390px;
+}
+
+.viewPanel-action {
+	margin: 5px;
+}
+
+.viewPanel-edit {
+	width: 80px;
+	margin: 5px;
+}
+
+.viewPanel-save {
+	width: 80px;
+	margin: 5px;
+}
+
+.viewPanel-createChild {
+	width: 90px;
+	margin: 5px;
+}
+
+.viewPanel-clone {
+	width: 90px;
+	margin: 5px;
+}
+
+.viewPanel-move {
+	width: 80px;
+	margin: 5px;
+}
+
+.viewPanel-remove {
+	width: 80px;
+	margin: 5px;
+}
+
+.viewPanel-close {
+	width: 80px;
+	margin: 5px;
+}
+
+.viewPanel-optionalFieldsToggle {
+	position: absolute;
+	top: 5px;
+	right: 5px;
+	color: white;
+	text-decoration: underline;
+	cursor: pointer;
+	cursor: hand;
+}
+
+.wui-view-window  .viewPanel-tabs .gwt-TabBar {
+	background-color: #999;
+}
+
+.wui-view-window .viewPanel-tabs .gwt-TabPanelBottom {
+	/*height: 574px;*/
+}
+
+/** Item Popup **/
+.itemPopup-focus {
+}
+
+.itemPopup-layout {
+	width: 350px;
+	border: 1px solid #414042;
+	background-color: #f1f699;
+}
+
+.itemPopup .header {
+	width: 100%;
+	padding: 1px 2px;
+	background-color: #414042;
+	color: #e6e7e8;
+}
+
+.itemPopup-scroll {
+	max-height: 200px;
+	height: expression(document.body.clientHeight > 200 ? "200px" : "auto");
+}
+
+.itemPopup .description {
+	max-width: 350px;
+	padding: 1px 2px;
+	width: expression(document.body.clientWidth > 350 ? "350px" : "auto");
+	color: #414042;
+	font-size: 11px;
+}
+
+/* @group Collection Tree */
+.collection-tree {
+	width: 100%;
+}
+
+
+.collection-tree  TABLE {
+	width: 100%;
+	border-spacing: 0px;	
+}
+
+
+.collection-tree .gwt-TreeItem .treeitem-layout {
+	border: 0;
+	padding: 0;
+	margin: 0;
+}
+
+.collection-tree .gwt-TreeItem-selected .treeitem-layout {
+	border: 1px solid #6a9bae;
+}
+
+.TreeItemPanel { 
+	border: 0;
+	cursor: pointer;
+	cursor: hand;
+	vertical-align: middle;
+	white-space: nowrap;
+	display: inline;
+	width: 100%;
+}
+
+.TreeItemPanel .treeitem-layout { 
+	height: 20px;
+}
+
+.TreeItem-dummy {
+	width: auto;
+	font-size: 11px;
+	color: #58595b;
+}
+
+.TreeItem-dummy table {
+	width: auto;
+}
+
+.TreeItem-dummy .gwt-TreeItem {
+	width: auto;
+}
+
+.TreeItemPanel .treeitem-icon {
+	margin: auto;
+}
+
+.TreeItemPanel .treeitem-label {
+	font-size: 11px;
+	color: #58595b;
+	margin-left: 3px;
+	width: 100%;
+	height: 20px;
+	vertical-align: middle;
+	overflow: hidden;
+}
+
+.TreeItemPanel .treeitem-info-title {
+	font-size: 11px;
+	color: #58595b;
+	width: 480px;
+	background-color: #d7d8d9;
+	overflow: hidden;
+	padding-left: 2px; 
+	padding-right: 2px;
+	height: 20px;
+	vertical-align: middle;
+}
+
+.TreeItemPanel .treeitem-info-data {
+	text-align: center;
+	font-size: 11px;
+	color: #58595b;
+	margin-left: 2px;
+	width: 90px;
+	background-color: #d7d8d9;
+	height: 20px;
+	vertical-align: middle;
+	white-space: nowrap;
+}
+
+.TreeItemPanel:hover {
+	color: #000;
+	cursor: pointer;
+	cursor: hand;
+}
+
+.TreeItemPanel .itemWaitingImage {
+	position: absolute;
+	left: 0px;
+}
+
+.jumpitem {
+	width: auto;
+}
+
+.jumpitem table {
+	width: auto;
+}
+
+.jumpitem .gwt-TreeItem {
+	width: auto;
+}
+
+.jumpitem-next {
+	
+}
+
+.jumpitem-previous {
+	
+}
+
+.jumpitem-layout {
+	width: auto;
+}
+
+.jumpitem-text {
+	font-size: 11px;
+	color: #58595b;
+	cursor: pointer;
+	cursor: hand;
+}
+
+.jumpitem-icon {
+	cursor: pointer;
+	cursor: hand;
+}
+
+.BrowseTree .sliderPanel {
+	width: 20px;
+	height: 200px;
+}
+
+.BrowseTree .slider {
+	width: 20px;
+	height: 200px;
+}
+
+.BrowseTree .slider .handle {
+	width: 18px;
+	height: 18px;
+	/*	background-image: url("images/slider_handle.png");*/
+}
+
+.BrowseTree .slider .background {
+	width: 20px;
+	height: 200px;
+	border: 1px solid black;
+	/*	background-image: url("images/slider_background.png");*/
+}
+
+/* @end */ 
+
+/* @group Elements Vertical Scroll Panel */
+.elementVerticalScrollPanel {
+	width: 100%;
+}
+
+.elementVerticalScrollPanel .scrollAutoLoader {
+	width: 100%;
+	height: 440px;
+	overflow-y: scroll !important;
+}
+
+.elementVerticalScrollPanel .layout {
+	width: 99%;
+}
+
+.elementVerticalScrollPanel .wui-list-header {
+	width: 100%;
+}
+
+.elementVerticalScrollPanel .wui-list-header * {
+	color: white;
+}
+
+.elementVerticalScrollPanel .element-header-id {
+	/*width: 100%;*/
+	white-space: nowrap;
+	padding: 0px 3px;
+	margin: 1px;
+	background-color: #58595b;
+	color: white;
+}
+.elementVerticalScrollPanel .element-header-title {
+	width: 480px;
+	white-space: nowrap;
+	padding: 0px 3px;
+	margin: 1px;
+	background-color: #58595b;
+	color: white;
+}
+.elementVerticalScrollPanel .element-header-date-initial {
+	width: 84px;
+	white-space: nowrap;
+	padding: 0px 3px;
+	margin: 1px;
+	background-color: #58595b;
+	color: white;
+}
+.elementVerticalScrollPanel .element-header-date-final {
+	width: 92px;
+	white-space: nowrap;
+	padding: 0px 3px;
+	margin: 1px 17px 1px 1px;
+	background-color: #58595b;
+	color: white;
+}
+
+.elementVerticalScrollPanel-noInfo .element-header-title {
+	display: none;
+}
+.elementVerticalScrollPanel-noInfo .element-header-date-initial {
+	display: none;
+}
+.elementVerticalScrollPanel-noInfo .element-header-date-final {
+	display: none;
+}
+
+
+/* @end */ /* @end */ /** Element Path Panel **/
+.wui-elementPath {
+	vertical-align: middle;
+}
+
+.wui-elementPath .elementPathItem-layout {
+	margin-left: 10px;
+	cursor: pointer;
+	cursor: hand;
+}
+
+.wui-elementPath .elementPathItem-layout .elementPathItem-icon {
+	
+}
+
+.wui-elementPath .elementPathItem-layout .elementPathItem-id {
+	font-family: Verdana, Lucida, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	color: #58595b;
+	margin-left: 3px;
+	vertical-align: middle;
+}
+
+.wui-elementPath .elementPathItem-final-layout .elementPathItem-id {
+	font-weight: bold;
+}
+
+.wui-elementPath .separator {
+	margin-left: 10px;
+}
+
+/** Arrangement table **/
+.wui-browse-arrangementTable { /*	background-color: white;*/
+	
+}
+
+.wui-browse-arrangementTable .header-cell {
+	background-color: #58595b;
+	text-align: center;
+}
+
+.wui-browse-arrangementTable .body-cell {
+	vertical-align: top;
+}
+
+.wui-browse-arrangementTable .body-row {
+	background-color: #e6e7e8;
+}
+
+.wui-browse-arrangementTable .body-row:hover {
+	background-color: white;
+}
+
+.wui-browse-arrangementTable .header-widget {
+	color: #e6e7e8;
+	white-space: nowrap;
+	margin: 1px 2px;
+}
+
+.wui-browse-arrangementTable .body-widget {
+	
+}
+
+/** Disseminations Panel **/
+.wui-browse-representations {
+	width: 97%;
+	height: auto;
+}
+
+.wui-browse-representations-title {
+	margin: 5px;
+}
+
+.wui-browse-representations-disseminations {
+	width: 100%;
+	height: auto;
+}
+
+.wui-browse-representations .representation {
+	width: 100%;
+	padding: 10px;
+}
+
+.wui-browse-representations .representation-disseminations {
+	width: 100%;
+}
+
+.wui-browse-representations .dissemination {
+	float: left;
+	width: 180px;
+	margin: 5px;
+	cursor: pointer;
+	cursor: hand;
+}
+
+.wui-browse-representations .dissemination:hover {
+	background-color: white;
+}
+.wui-browse-representations .dissemination-layout {
+	width: 100%;
+}
+.wui-browse-representations .dissemination-description {
+	font-size: 11px;
+}
+.wui-browse-representations .dissemination-icon {
+	
+}
+.wui-browse-representations .dissemination-original-label {
+	color: red;
+}
+
+/** Preservation Metadata Panel **/
+.wui-metadata-preservation {
+	width: 100%;
+}
+.wui-metadata-preservation .wui-metadata-preservation-header {
+	width: 100%;
+}
+.wui-metadata-preservation-header-reps {
+}
+
+.wui-metadata-preservation .preservation-rep-layout {
+	vertical-align: middle;
+	margin: 1px;
+}
+.wui-metadata-preservation .preservation-rep-icon {
+}
+.wui-metadata-preservation .preservation-rep-label {
+	font-size: 10px;
+}
+	
+.wui-metadata-preservation-header-timeUnit {
+	
+}
+.wui-metadata-preservation .wui-metadata-preservation-timeline {
+	width: 100%;
+	margin: 5px 2px;
+}
+
+.wui-metadata-preservation .wui-metadata-preservation-timeline * {
+	font-size: 11px;
+}
+
+.wui-metadata-preservation .wui-metadata-preservation-timeline .timeline-copyright {
+	display: none;
+}
+

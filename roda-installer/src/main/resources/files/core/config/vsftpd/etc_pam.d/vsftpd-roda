@@ -1,0 +1,23 @@
+# Standard behaviour for ftpd(8).
+#auth	required	pam_listfile.so item=user sense=deny file=/etc/ftpusers onerr=succeed
+
+# Note: vsftpd handles anonymous logins on its own.  Do not enable
+# pam_ftp.so.
+
+# Standard blurb.
+#@include common-account
+#@include common-session
+
+#@include common-auth
+#auth	required	pam_shells.so
+
+session required 	pam_mkhomedir.so #dir=/usr/local/roda/core/data/ingest/FTP_DROP_DIR
+auth	requisite	pam_ldap.so debug config=/etc/ldap/ldap.conf
+account required	pam_permit.so
+
+#pam_groupdn		cn=ingest.load_sips,ou=roles,dc=roda,dc=dgarq,dc=gov,dc=pt
+#pam_member_attribute	roleOccupant
+
+#pam_groupdn		cn=administrators,ou=groups,dc=roda,dc=dgarq,dc=gov,dc=pt
+#pam_member_attribute	uniqueMember
+

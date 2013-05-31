@@ -1,0 +1,850 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app id="roda-core" version="2.4"
+	xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+
+	<display-name>RODA Core Services</display-name>
+
+	<context-param>
+		<description>
+       The location of the oaicat.properties file containing
+       datapairs used to initialize the OAI repository software.
+		</description>
+		<param-name>properties</param-name>
+		<param-value>${roda.home}/config/roda-core.properties</param-value>
+	</context-param>
+	<servlet>
+		<description>
+	     This servlet processes OAI verbs. 
+	
+	     The initialization parameter names for this servlet are the
+	     &quot;servlet path&quot; that will be received by this servlet (after the
+	     filename extension is removed).  The corresponding value is the
+	     name of the action class that will be used to process this request.
+		</description>
+		<servlet-name>OAIHandler</servlet-name>
+		<servlet-class>ORG.oclc.oai.server.OAIHandler</servlet-class>
+		<load-on-startup>100</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>OAIHandler</servlet-name>
+		<url-pattern>/report</url-pattern>
+	</servlet-mapping>
+
+	<!-- <servlet> <display-name>Quartz Initializer Servlet</display-name> <servlet-name>QuartzInitializer</servlet-name> 
+		<servlet-class> org.quartz.ee.servlet.QuartzInitializerServlet </servlet-class> 
+		<init-param> <param-name>start-scheduler-on-load</param-name> <param-value>true</param-value> 
+		</init-param> <init-param> <param-name>shutdown-on-unload</param-name> <param-value>true</param-value> 
+		</init-param> <load-on-startup>1</load-on-startup> </servlet> -->
+	<servlet>
+		<display-name>Apache-Axis Servlet</display-name>
+		<servlet-name>AxisServlet</servlet-name>
+		<servlet-class>org.apache.axis.transport.http.AxisServlet</servlet-class>
+	</servlet>
+	<servlet>
+		<display-name>Axis Admin Servlet</display-name>
+		<servlet-name>AdminServlet</servlet-name>
+		<servlet-class>org.apache.axis.transport.http.AdminServlet</servlet-class>
+		<load-on-startup>100</load-on-startup>
+	</servlet>
+	<servlet>
+		<display-name>RODA SIP Upload Servlet</display-name>
+		<servlet-name>SIPUploadServlet</servlet-name>
+		<servlet-class>pt.gov.dgarq.roda.core.services.SIPUploadServlet</servlet-class>
+	</servlet>
+	<servlet>
+		<display-name>RODA File Access Servlet</display-name>
+		<servlet-name>FileAccessServlet</servlet-name>
+		<servlet-class>pt.gov.dgarq.roda.core.services.FileAccessServlet</servlet-class>
+	</servlet>
+	<servlet>
+		<description>
+			Servlet to upload representation files
+		</description>
+		<display-name>File Upload Servlet</display-name>
+		<servlet-name>FileUploadServlet</servlet-name>
+		<servlet-class>pt.gov.dgarq.roda.core.services.FileUploadServlet</servlet-class>
+	</servlet>
+	<servlet>
+		<description>
+			Servlet get the complete reference of a DescriptionObject
+		</description>
+		<display-name>DO Complete Reference Servlet</display-name>
+		<servlet-name>DOCompleteReferenceServlet</servlet-name>
+		<servlet-class>
+			pt.gov.dgarq.roda.core.services.DOCompleteReferenceServlet
+		</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>jersey</servlet-name>
+		<servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+		<init-param>
+			<param-name>com.sun.jersey.spi.container.ContainerRequestFilters</param-name>
+			<param-value>com.sun.jersey.api.container.filter.PostReplaceFilter</param-value>
+		</init-param>
+		<init-param>
+			<param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>jersey</servlet-name>
+		<url-pattern>/rest/*</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>AxisServlet</servlet-name>
+		<url-pattern>/servlet/AxisServlet</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>AxisServlet</servlet-name>
+		<url-pattern>*.jws</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>AxisServlet</servlet-name>
+		<url-pattern>/services/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>AdminServlet</servlet-name>
+		<url-pattern>/servlet/AdminServlet</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>SIPUploadServlet</servlet-name>
+		<url-pattern>/SIPUpload</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>FileAccessServlet</servlet-name>
+		<url-pattern>/get/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>FileUploadServlet</servlet-name>
+		<url-pattern>/FileUpload</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>DOCompleteReferenceServlet</servlet-name>
+		<url-pattern>/getCompleteReference/*</url-pattern>
+	</servlet-mapping>
+
+	<!-- Listeners -->
+	<listener>
+		<description>
+			RODA Core Listener listens for startup and shutdown
+			notifications of the RODA Core web application.
+		</description>
+		<display-name>RODA Core Listener</display-name>
+		<listener-class>pt.gov.dgarq.roda.core.RodaWebApplication</listener-class>
+	</listener>
+
+
+	<!-- LDAP Authentication Filters -->
+
+	<filter>
+		<filter-name>LdapAuthenticationFilter</filter-name>
+		<filter-class>pt.gov.dgarq.roda.servlet.LdapAuthenticationFilter</filter-class>
+		<init-param>
+			<description>
+				LDAP server hostname (default: localhost)
+			</description>
+			<param-name>host</param-name>
+			<param-value>localhost</param-value>
+		</init-param>
+		<init-param>
+			<description>LDAP server port (default: 389)</description>
+			<param-name>port</param-name>
+			<param-value>389</param-value>
+		</init-param>
+		<init-param>
+			<description>LDAP people DN</description>
+			<param-name>peopleDN</param-name>
+			<param-value>
+				ou=people,dc=roda,dc=dgarq,dc=gov,dc=pt
+			</param-value>
+		</init-param>
+		<init-param>
+			<description>LDAP groups DN</description>
+			<param-name>groupsDN</param-name>
+			<param-value>
+				ou=groups,dc=roda,dc=dgarq,dc=gov,dc=pt
+			</param-value>
+		</init-param>
+		<init-param>
+			<description>LDAP roles DN</description>
+			<param-name>rolesDN</param-name>
+			<param-value>
+				ou=roles,dc=roda,dc=dgarq,dc=gov,dc=pt
+			</param-value>
+		</init-param>
+		<init-param>
+			<description>LDAP protected users</description>
+			<param-name>protectedUsers</param-name>
+			<param-value>
+				admin,guest,roda-ingest-task,roda-wui,roda-disseminator
+			</param-value>
+		</init-param>
+		<init-param>
+			<description>LDAP protected groups</description>
+			<param-name>protectedGroups</param-name>
+			<param-value>administrators,guests</param-value>
+		</init-param>
+		<init-param>
+			<description>
+				Authentication Realm (default: null)
+			</description>
+			<param-name>realm</param-name>
+			<param-value>RODA Core Services</param-value>
+		</init-param>
+	</filter>
+
+	<!-- Role Filters -->
+
+	<filter>
+		<filter-name>UserManagementRoleFilter</filter-name>
+		<filter-class>pt.gov.dgarq.roda.servlet.RoleFilter</filter-class>
+		<init-param>
+			<description>
+				The role to access UserManagement service
+			</description>
+			<param-name>role</param-name>
+			<param-value>administration.user</param-value>
+		</init-param>
+		<init-param>
+			<description>
+				Authentication Realm (default: null)
+			</description>
+			<param-name>realm</param-name>
+			<param-value>RODA Core Services</param-value>
+		</init-param>
+	</filter>
+	<filter>
+		<filter-name>UserRegistrationRoleFilter</filter-name>
+		<filter-class>pt.gov.dgarq.roda.servlet.RoleFilter</filter-class>
+		<init-param>
+			<description>
+				The role to access UserRegistration service
+			</description>
+			<param-name>role</param-name>
+			<param-value>misc.register_user</param-value>
+		</init-param>
+		<init-param>
+			<description>Ask for authentication filter fails (default: false)</description>
+			<param-name>authenticate_on_fail</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<description>
+				Authentication Realm (default: null)
+			</description>
+			<param-name>realm</param-name>
+			<param-value>RODA Core Services</param-value>
+		</init-param>
+	</filter>
+	<filter>
+		<filter-name>UserBrowserRoleFilter</filter-name>
+		<filter-class>pt.gov.dgarq.roda.servlet.RoleFilter</filter-class>
+		<init-param>
+			<description>
+				The role to access UserBrowser service
+			</description>
+			<param-name>role</param-name>
+			<param-value>misc.browse_users</param-value>
+		</init-param>
+		<init-param>
+			<description>
+				Authentication Realm (default: null)
+			</description>
+			<param-name>realm</param-name>
+			<param-value>RODA Core Services</param-value>
+		</init-param>
+	</filter>
+	<filter>
+		<filter-name>LoggerRoleFilter</filter-name>
+		<filter-class>pt.gov.dgarq.roda.servlet.RoleFilter</filter-class>
+		<init-param>
+			<description>The role to access Logger service</description>
+			<param-name>role</param-name>
+			<param-value>misc.logger</param-value>
+		</init-param>
+		<init-param>
+			<description>
+				Authentication Realm (default: null)
+			</description>
+			<param-name>realm</param-name>
+			<param-value>RODA Core Services</param-value>
+		</init-param>
+	</filter>
+	<filter>
+		<filter-name>LogMonitorRoleFilter</filter-name>
+		<filter-class>pt.gov.dgarq.roda.servlet.RoleFilter</filter-class>
+		<init-param>
+			<description>The role to access LogMonitor service</description>
+			<param-name>role</param-name>
+			<param-value>logger.monitor</param-value>
+		</init-param>
+		<init-param>
+			<description>
+				Authentication Realm (default: null)
+			</description>
+			<param-name>realm</param-name>
+			<param-value>RODA Core Services</param-value>
+		</init-param>
+	</filter>
+	<filter>
+		<filter-name>BrowserRoleFilter</filter-name>
+		<filter-class>pt.gov.dgarq.roda.servlet.RoleFilter</filter-class>
+		<init-param>
+			<description>
+				The role to access Browser service
+			</description>
+			<param-name>role</param-name>
+			<param-value>dissemination.browse</param-value>
+		</init-param>
+		<init-param>
+			<description>
+				Authentication Realm (default: null)
+			</description>
+			<param-name>realm</param-name>
+			<param-value>RODA Core Services</param-value>
+		</init-param>
+	</filter>
+	<filter>
+		<filter-name>SearchBasicRoleFilter</filter-name>
+		<filter-class>pt.gov.dgarq.roda.servlet.RoleFilter</filter-class>
+		<init-param>
+			<description>
+				The role to access basic Search service
+			</description>
+			<param-name>role</param-name>
+			<param-value>dissemination.search.basic</param-value>
+		</init-param>
+		<init-param>
+			<description>
+				Authentication Realm (default: null)
+			</description>
+			<param-name>realm</param-name>
+			<param-value>RODA Core Services</param-value>
+		</init-param>
+	</filter>
+	<filter>
+		<filter-name>SearchAdvancedRoleFilter</filter-name>
+		<filter-class>pt.gov.dgarq.roda.servlet.RoleFilter</filter-class>
+		<init-param>
+			<description>
+				The role to access advanced Search service
+			</description>
+			<param-name>role</param-name>
+			<param-value>dissemination.search.advanced</param-value>
+		</init-param>
+		<init-param>
+			<description>
+				Authentication Realm (default: null)
+			</description>
+			<param-name>realm</param-name>
+			<param-value>RODA Core Services</param-value>
+		</init-param>
+	</filter>
+	<filter>
+		<filter-name>EditorRoleFilter</filter-name>
+		<filter-class>pt.gov.dgarq.roda.servlet.RoleFilter</filter-class>
+		<init-param>
+			<description>The role to access Editor service</description>
+			<param-name>role</param-name>
+			<param-value>administration.metadata_editor</param-value>
+		</init-param>
+		<init-param>
+			<description>
+				Authentication Realm (default: null)
+			</description>
+			<param-name>realm</param-name>
+			<param-value>RODA Core Services</param-value>
+		</init-param>
+	</filter>
+	<filter>
+		<filter-name>IngestMonitorRoleFilter</filter-name>
+		<filter-class>pt.gov.dgarq.roda.servlet.RoleFilter</filter-class>
+		<init-param>
+			<description>
+				The role to access IngestMonitor service
+			</description>
+			<param-name>role</param-name>
+			<param-value>
+				ingest.list_batch,ingest.list_all_sips,ingest.list_my_sips
+			</param-value>
+		</init-param>
+		<init-param>
+			<description>
+				Authentication Realm (default: null)
+			</description>
+			<param-name>realm</param-name>
+			<param-value>RODA Core Services</param-value>
+		</init-param>
+	</filter>
+	<filter>
+		<filter-name>SIPUploadRoleFilter</filter-name>
+		<filter-class>pt.gov.dgarq.roda.servlet.RoleFilter</filter-class>
+		<init-param>
+			<description>
+				The role to access SIPUpload service
+			</description>
+			<param-name>role</param-name>
+			<param-value>ingest.load_sips</param-value>
+		</init-param>
+		<init-param>
+			<description>
+				Authentication Realm (default: null)
+			</description>
+			<param-name>realm</param-name>
+			<param-value>RODA Core Services</param-value>
+		</init-param>
+	</filter>
+	<filter>
+		<filter-name>AcceptSIPRoleFilter</filter-name>
+		<filter-class>pt.gov.dgarq.roda.servlet.RoleFilter</filter-class>
+		<init-param>
+			<description>
+				The role to access AcceptSIP service
+			</description>
+			<param-name>role</param-name>
+			<param-value>ingest.accept_reject_sip</param-value>
+		</init-param>
+		<init-param>
+			<description>
+				Authentication Realm (default: null)
+			</description>
+			<param-name>realm</param-name>
+			<param-value>RODA Core Services</param-value>
+		</init-param>
+	</filter>
+	<filter>
+		<filter-name>FileAccessRoleFilter</filter-name>
+		<filter-class>pt.gov.dgarq.roda.servlet.RoleFilter</filter-class>
+		<init-param>
+			<description>The role to access FileAccess service</description>
+			<param-name>role</param-name>
+			<param-value>dissemination.browse</param-value>
+		</init-param>
+		<init-param>
+			<description>
+				Authentication Realm (default: null)
+			</description>
+			<param-name>realm</param-name>
+			<param-value>RODA Core Services</param-value>
+		</init-param>
+	</filter>
+	<filter>
+		<filter-name>IngestRoleFilter</filter-name>
+		<filter-class>pt.gov.dgarq.roda.servlet.RoleFilter</filter-class>
+		<init-param>
+			<description>The role to access Ingest service</description>
+			<param-name>role</param-name>
+			<param-value>ingest.insert_files</param-value>
+		</init-param>
+		<init-param>
+			<description>
+				Authentication Realm (default: null)
+			</description>
+			<param-name>realm</param-name>
+			<param-value>RODA Core Services</param-value>
+		</init-param>
+	</filter>
+	<filter>
+		<filter-name>SchedulerRoleFilter</filter-name>
+		<filter-class>pt.gov.dgarq.roda.servlet.RoleFilter</filter-class>
+		<init-param>
+			<description>
+				The role to access Scheduler service
+			</description>
+			<param-name>role</param-name>
+			<param-value>administration.event</param-value>
+		</init-param>
+		<init-param>
+			<description>
+				Authentication Realm (default: null)
+			</description>
+			<param-name>realm</param-name>
+			<param-value>RODA Core Services</param-value>
+		</init-param>
+	</filter>
+	<filter>
+		<filter-name>PluginsRoleFilter</filter-name>
+		<filter-class>pt.gov.dgarq.roda.servlet.RoleFilter</filter-class>
+		<init-param>
+			<description>
+				The role to access Plugins service
+			</description>
+			<param-name>role</param-name>
+			<param-value>administration.event</param-value>
+		</init-param>
+		<init-param>
+			<description>
+				Authentication Realm (default: null)
+			</description>
+			<param-name>realm</param-name>
+			<param-value>RODA Core Services</param-value>
+		</init-param>
+	</filter>
+	<filter>
+		<filter-name>StatisticsRoleFilter</filter-name>
+		<filter-class>pt.gov.dgarq.roda.servlet.RoleFilter</filter-class>
+		<init-param>
+			<description>
+				The role to access Statistics service
+			</description>
+			<param-name>role</param-name>
+			<param-value>administration.statistics</param-value>
+		</init-param>
+		<init-param>
+			<description>
+				Authentication Realm (default: null)
+			</description>
+			<param-name>realm</param-name>
+			<param-value>RODA Core Services</param-value>
+		</init-param>
+	</filter>
+	<filter>
+		<filter-name>StatisticsMonitorRoleFilter</filter-name>
+		<filter-class>pt.gov.dgarq.roda.servlet.RoleFilter</filter-class>
+		<init-param>
+			<description>
+				The role to access StatisticsMonitor service
+			</description>
+			<param-name>role</param-name>
+			<param-value>administration.statistics.monitor</param-value>
+		</init-param>
+		<init-param>
+			<description>
+				Authentication Realm (default: null)
+			</description>
+			<param-name>realm</param-name>
+			<param-value>RODA Core Services</param-value>
+		</init-param>
+	</filter>
+
+	<!-- GSearch hostname filter -->
+
+	<filter>
+		<filter-name>LocalhostFilter</filter-name>
+		<filter-class>pt.gov.dgarq.roda.servlet.RemoteHostFilter</filter-class>
+		<init-param>
+			<description>
+				The hostname to allow. It can be a list.
+			</description>
+			<param-name>hostname</param-name>
+			<param-value>127.0.0.1,192.168.111.150,192.168.92.7</param-value>
+		</init-param>
+	</filter>
+
+	<!-- WSDL files authentication filter -->
+	<filter-mapping>
+		<filter-name>LdapAuthenticationFilter</filter-name>
+		<url-pattern>/wsdl/*</url-pattern>
+	</filter-mapping>
+	<!-- UserManagement authentication filter -->
+	<filter-mapping>
+		<filter-name>LdapAuthenticationFilter</filter-name>
+		<url-pattern>/services/UserManagement</url-pattern>
+	</filter-mapping>
+	<!-- UserRegistration authentication filter -->
+	<filter-mapping>
+		<filter-name>LdapAuthenticationFilter</filter-name>
+		<url-pattern>/services/UserRegistration</url-pattern>
+	</filter-mapping>
+	<!-- UserBrowser authentication filter -->
+	<filter-mapping>
+		<filter-name>LdapAuthenticationFilter</filter-name>
+		<url-pattern>/services/UserBrowser</url-pattern>
+	</filter-mapping>
+	<!-- Logger authentication filter -->
+	<filter-mapping>
+		<filter-name>LdapAuthenticationFilter</filter-name>
+		<url-pattern>/services/Logger</url-pattern>
+	</filter-mapping>
+	<!-- LogMonitor authentication filter -->
+	<filter-mapping>
+		<filter-name>LdapAuthenticationFilter</filter-name>
+		<url-pattern>/services/LogMonitor</url-pattern>
+	</filter-mapping>
+	<!-- Browser authentication filter -->
+	<filter-mapping>
+		<filter-name>LdapAuthenticationFilter</filter-name>
+		<url-pattern>/services/Browser</url-pattern>
+	</filter-mapping>
+	<!-- Search authentication filter -->
+	<filter-mapping>
+		<filter-name>LdapAuthenticationFilter</filter-name>
+		<url-pattern>/services/Search</url-pattern>
+	</filter-mapping>
+	<!-- Editor authentication filter -->
+	<filter-mapping>
+		<filter-name>LdapAuthenticationFilter</filter-name>
+		<url-pattern>/services/Editor</url-pattern>
+	</filter-mapping>
+	<!-- IngestMonitor authentication filter -->
+	<filter-mapping>
+		<filter-name>LdapAuthenticationFilter</filter-name>
+		<url-pattern>/services/IngestMonitor</url-pattern>
+	</filter-mapping>
+	<!-- SIPUpload authentication filter -->
+	<filter-mapping>
+		<filter-name>LdapAuthenticationFilter</filter-name>
+		<url-pattern>/SIPUpload</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>LdapAuthenticationFilter</filter-name>
+		<url-pattern>/SIPUpload/*</url-pattern>
+	</filter-mapping>
+	<!-- AcceptSIP authentication filter -->
+	<filter-mapping>
+		<filter-name>LdapAuthenticationFilter</filter-name>
+		<url-pattern>/services/AcceptSIP</url-pattern>
+	</filter-mapping>
+	<!-- File Access authentication filter -->
+	<filter-mapping>
+		<filter-name>LdapAuthenticationFilter</filter-name>
+		<url-pattern>/get/*</url-pattern>
+	</filter-mapping>
+	<!-- Ingest authentication filter -->
+	<filter-mapping>
+		<filter-name>LdapAuthenticationFilter</filter-name>
+		<url-pattern>/services/Ingest</url-pattern>
+	</filter-mapping>
+	<!-- FileUpload authentication filter -->
+	<filter-mapping>
+		<filter-name>LdapAuthenticationFilter</filter-name>
+		<url-pattern>/FileUpload</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>LdapAuthenticationFilter</filter-name>
+		<url-pattern>/FileUpload/*</url-pattern>
+	</filter-mapping>
+	<!-- Scheduler authentication filter -->
+	<filter-mapping>
+		<filter-name>LdapAuthenticationFilter</filter-name>
+		<url-pattern>/services/Scheduler</url-pattern>
+	</filter-mapping>
+	<!-- Plugins authentication filter -->
+	<filter-mapping>
+		<filter-name>LdapAuthenticationFilter</filter-name>
+		<url-pattern>/services/Plugins</url-pattern>
+	</filter-mapping>
+	<!-- Statistics authentication filter -->
+	<filter-mapping>
+		<filter-name>LdapAuthenticationFilter</filter-name>
+		<url-pattern>/services/Statistics</url-pattern>
+	</filter-mapping>
+	<!-- StatisticsMonitor authentication filter -->
+	<filter-mapping>
+		<filter-name>LdapAuthenticationFilter</filter-name>
+		<url-pattern>/services/StatisticsMonitor</url-pattern>
+	</filter-mapping>
+	<!-- PlanResource authentication filter -->
+	<filter-mapping>
+		<filter-name>LdapAuthenticationFilter</filter-name>
+		<url-pattern>/rest/plan</url-pattern>
+	</filter-mapping>
+
+
+	<!-- UserManagement role filter -->
+	<filter-mapping>
+		<filter-name>UserManagementRoleFilter</filter-name>
+		<url-pattern>/services/UserManagement</url-pattern>
+	</filter-mapping>
+	<!-- UserRegistration role filter -->
+	<filter-mapping>
+		<filter-name>UserRegistrationRoleFilter</filter-name>
+		<url-pattern>/services/UserRegistration</url-pattern>
+	</filter-mapping>
+	<!-- UserBrowser role filter -->
+	<filter-mapping>
+		<filter-name>UserBrowserRoleFilter</filter-name>
+		<url-pattern>/services/UserBrowser</url-pattern>
+	</filter-mapping>
+	<!-- Logger role filter -->
+	<filter-mapping>
+		<filter-name>LoggerRoleFilter</filter-name>
+		<url-pattern>/services/Logger</url-pattern>
+	</filter-mapping>
+	<!-- LogMonitor role filter -->
+	<filter-mapping>
+		<filter-name>LogMonitorRoleFilter</filter-name>
+		<url-pattern>/services/LogMonitor</url-pattern>
+	</filter-mapping>
+	<!-- Browser role filter -->
+	<filter-mapping>
+		<filter-name>BrowserRoleFilter</filter-name>
+		<url-pattern>/services/Browser</url-pattern>
+	</filter-mapping>
+	<!-- SearchBasic role filter -->
+	<filter-mapping>
+		<filter-name>SearchBasicRoleFilter</filter-name>
+		<url-pattern>/services/Search</url-pattern>
+	</filter-mapping>
+	<!-- SearchAdvanced role filter -->
+	<filter-mapping>
+		<filter-name>SearchAdvancedRoleFilter</filter-name>
+		<url-pattern>/services/Search</url-pattern>
+	</filter-mapping>
+	<!-- Editor role filter -->
+	<filter-mapping>
+		<filter-name>EditorRoleFilter</filter-name>
+		<url-pattern>/services/Editor</url-pattern>
+	</filter-mapping>
+	<!-- IngestMonitor role filter -->
+	<filter-mapping>
+		<filter-name>IngestMonitorRoleFilter</filter-name>
+		<url-pattern>/services/IngestMonitor</url-pattern>
+	</filter-mapping>
+	<!-- SIP upload role filter -->
+	<filter-mapping>
+		<filter-name>SIPUploadRoleFilter</filter-name>
+		<url-pattern>/SIPUpload</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>SIPUploadRoleFilter</filter-name>
+		<url-pattern>/SIPUpload/*</url-pattern>
+	</filter-mapping>
+	<!-- AcceptSIP role service -->
+	<filter-mapping>
+		<filter-name>AcceptSIPRoleFilter</filter-name>
+		<url-pattern>/services/AcceptSIP</url-pattern>
+	</filter-mapping>
+	<!-- FileAccess role filter -->
+	<filter-mapping>
+		<filter-name>FileAccessRoleFilter</filter-name>
+		<url-pattern>/get/*</url-pattern>
+	</filter-mapping>
+	<!-- Ingest role filter -->
+	<filter-mapping>
+		<filter-name>IngestRoleFilter</filter-name>
+		<url-pattern>/services/Ingest</url-pattern>
+	</filter-mapping>
+	<!-- FileUpload (Ingest) role filter -->
+	<filter-mapping>
+		<filter-name>IngestRoleFilter</filter-name>
+		<url-pattern>/FileUpload</url-pattern>
+	</filter-mapping>
+	<!-- PlanResource role filter -->
+	<!-- <filter-mapping> <filter-name>IngestRoleFilter</filter-name> <url-pattern>/rest/plan</url-pattern> 
+		</filter-mapping> -->
+	<!-- Scheduler role filter -->
+	<filter-mapping>
+		<filter-name>SchedulerRoleFilter</filter-name>
+		<url-pattern>/services/Scheduler</url-pattern>
+	</filter-mapping>
+	<!-- Plugins role filter -->
+	<filter-mapping>
+		<filter-name>PluginsRoleFilter</filter-name>
+		<url-pattern>/services/Plugins</url-pattern>
+	</filter-mapping>
+	<!-- Statistics role filter -->
+	<filter-mapping>
+		<filter-name>StatisticsRoleFilter</filter-name>
+		<url-pattern>/services/Statistics</url-pattern>
+	</filter-mapping>
+	<!-- StatisticsMonitor role filter -->
+	<filter-mapping>
+		<filter-name>StatisticsMonitorRoleFilter</filter-name>
+		<url-pattern>/services/StatisticsMonitor</url-pattern>
+	</filter-mapping>
+
+	<!-- UserManagement WSDL role filter -->
+	<filter-mapping>
+		<filter-name>UserManagementRoleFilter</filter-name>
+		<url-pattern>/wsdl/UserManagement.wsdl</url-pattern>
+	</filter-mapping>
+	<!-- UserRegistration WSDL role filter -->
+	<filter-mapping>
+		<filter-name>UserRegistrationRoleFilter</filter-name>
+		<url-pattern>/wsdl/UserRegistration.wsdl</url-pattern>
+	</filter-mapping>
+	<!-- UserBrowser WSDL role filter -->
+	<filter-mapping>
+		<filter-name>UserBrowserRoleFilter</filter-name>
+		<url-pattern>/wsdl/UserBrowser.wsdl</url-pattern>
+	</filter-mapping>
+	<!-- Logger WSDL role filter -->
+	<filter-mapping>
+		<filter-name>LoggerRoleFilter</filter-name>
+		<url-pattern>/wsdl/Logger.wsdl</url-pattern>
+	</filter-mapping>
+	<!-- LogMonitor WSDL role filter -->
+	<filter-mapping>
+		<filter-name>LogMonitorRoleFilter</filter-name>
+		<url-pattern>/wsdl/LogMonitor.wsdl</url-pattern>
+	</filter-mapping>
+	<!-- Browser WSDL role filter -->
+	<filter-mapping>
+		<filter-name>BrowserRoleFilter</filter-name>
+		<url-pattern>/wsdl/Browser.wsdl</url-pattern>
+	</filter-mapping>
+	<!-- Basic Search WSDL role filter -->
+	<filter-mapping>
+		<filter-name>SearchBasicRoleFilter</filter-name>
+		<url-pattern>/wsdl/Search.wsdl</url-pattern>
+	</filter-mapping>
+	<!-- Advanced Search WSDL role filter -->
+	<filter-mapping>
+		<filter-name>SearchAdvancedRoleFilter</filter-name>
+		<url-pattern>/wsdl/Search.wsdl</url-pattern>
+	</filter-mapping>
+	<!-- Editor WSDL role filter -->
+	<filter-mapping>
+		<filter-name>EditorRoleFilter</filter-name>
+		<url-pattern>/wsdl/Editor.wsdl</url-pattern>
+	</filter-mapping>
+	<!-- IngestMonitor WSDL role filter -->
+	<filter-mapping>
+		<filter-name>IngestMonitorRoleFilter</filter-name>
+		<url-pattern>/wsdl/IngestMonitor.wsdl</url-pattern>
+	</filter-mapping>
+	<!-- AcceptSIP WSDL role filter -->
+	<filter-mapping>
+		<filter-name>AcceptSIPRoleFilter</filter-name>
+		<url-pattern>/wsdl/AcceptSIP.wsdl</url-pattern>
+	</filter-mapping>
+	<!-- Ingest WSDL role filter -->
+	<filter-mapping>
+		<filter-name>IngestRoleFilter</filter-name>
+		<url-pattern>/wsdl/Ingest.wsdl</url-pattern>
+	</filter-mapping>
+	<!-- Scheduler WSDL role filter -->
+	<filter-mapping>
+		<filter-name>SchedulerRoleFilter</filter-name>
+		<url-pattern>/wsdl/Scheduler.wsdl</url-pattern>
+	</filter-mapping>
+	<!-- Plugins WSDL role filter -->
+	<filter-mapping>
+		<filter-name>PluginsRoleFilter</filter-name>
+		<url-pattern>/wsdl/Plugins.wsdl</url-pattern>
+	</filter-mapping>
+	<!-- Statistics WSDL role filter -->
+	<filter-mapping>
+		<filter-name>StatisticsRoleFilter</filter-name>
+		<url-pattern>/wsdl/Statistics.wsdl</url-pattern>
+	</filter-mapping>
+	<!-- StatisticsMonitor WSDL role filter -->
+	<filter-mapping>
+		<filter-name>StatisticsMonitorRoleFilter</filter-name>
+		<url-pattern>/wsdl/StatisticsMonitor.wsdl</url-pattern>
+	</filter-mapping>
+
+	<!-- GSearch localhost filter -->
+	<filter-mapping>
+		<filter-name>LocalhostFilter</filter-name>
+		<url-pattern>/getCompleteReference</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>LocalhostFilter</filter-name>
+		<url-pattern>/getCompleteReference/*</url-pattern>
+	</filter-mapping>
+
+	<!-- <filter-mapping> <filter-name>secFilter</filter-name> <servlet-name>AxisServlet</servlet-name> 
+		</filter-mapping> <filter-mapping> <filter-name>secFilter</filter-name> <url-pattern>/services/UserManagement</url-pattern> 
+		</filter-mapping> -->
+
+
+	<!-- Define the login configuration for this application -->
+	<!-- <login-config> <auth-method>BASIC</auth-method> <realm-name>RODA Services</realm-name> 
+		</login-config> -->
+
+</web-app>

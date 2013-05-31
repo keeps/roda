@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- $Id: log4j.xml 6643 2008-02-22 16:09:25Z gertsp $ -->
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+        
+  <appender name="STDOUT" class="org.apache.log4j.ConsoleAppender">
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%p %d (%c{1}) %m%n"/>
+    </layout>
+  </appender>
+  
+  <appender name="FILEOUT" class="org.apache.log4j.FileAppender">
+    <param name="File" value="LOGPATH/fedoragsearch.log"/>
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%p %d (%c{1}) %m%n"/>
+    </layout>
+  </appender>
+  
+  <logger name="dk.defxws.fedoragsearch" additivity="false">
+    <level value="DEBUGLEVELG" />
+    <appender-ref ref="FILEOUT"/>
+  </logger>
+  
+  <logger name="dk.defxws.fgszebra" additivity="false">
+    <level value="DEBUGLEVELZ" />
+    <appender-ref ref="FILEOUT"/>
+  </logger>
+  
+  <logger name="dk.defxws.fgslucene" additivity="false">
+    <level value="DEBUGLEVELL" />
+    <appender-ref ref="FILEOUT"/>
+  </logger>
+  
+  <logger name="dk.defxws.fgssolr" additivity="false">
+    <level value="DEBUGLEVELS" />
+    <appender-ref ref="FILEOUT"/>
+  </logger>
+
+  <root>
+    <level value="WARN" />
+    <appender-ref ref="STDOUT"/>
+  </root>
+  
+</log4j:configuration>

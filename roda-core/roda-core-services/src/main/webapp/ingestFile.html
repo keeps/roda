@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>RODA Representation File Upload Utility</title>
+</head>
+<body>
+
+<form action="FileUpload" method="post" enctype="multipart/form-data">
+	<fieldset>
+		<legend>Representation</legend>
+		<label for="inputPID">PID</label>
+		<input id="inputPID" type="text" name="pid" />
+		<fieldset>
+			<legend>Select file to upload</legend>
+			<label for="inputFileID">File ID</label>
+			<input id="inputFileID" type="text" name="id" />
+			<label for="inputFile">File</label>
+			<input id="inputFile" type="file" name="file" />
+		</fieldset>
+		<input type="submit" value="Upload file" />
+	</fieldset>
+</form>
+
+</body>
+</html>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+	
+	<appender name="STDOUT" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%p %d (%c{1}) %m%n" />
+		</layout>
+	</appender>
+	
+	<appender name="FILEOUT" class="org.apache.log4j.RollingFileAppender">
+		<param name="File" value="${catalina.home}/logs/roda-migrator-win.log" />
+		<param name="MaxFileSize" value="26MB" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%p %d (%c{1}) %m%n" />
+		</layout>
+	</appender>
+	
+	<logger name="pt.gov.dgarq.roda" additivity="false">
+		<level value="DEBUG" />
+		<appender-ref ref="FILEOUT" />
+	</logger>
+
+	<logger name="pt.gov.dgarq.roda.migrator" additivity="false">
+		<level value="DEBUG" />
+		<appender-ref ref="FILEOUT" />
+	</logger>
+	
+	<root>
+		<level value="WARN" />
+		<appender-ref ref="FILEOUT" />
+	</root>
+
+</log4j:configuration>

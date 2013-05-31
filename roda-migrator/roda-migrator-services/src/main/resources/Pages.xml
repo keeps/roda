@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<content width="@WIDTH" height="@HEIGHT" bgcolor="cccccc" loadercolor="ffffff"
+	panelcolor="5d5d61" buttoncolor="5d5d61" textcolor="ffffff">
+@PAGES
+</content>

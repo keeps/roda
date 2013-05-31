@@ -1,0 +1,309 @@
+@CHARSET "UTF-8";
+
+/** Event Management **/
+
+.wui-management-event-tabs {
+	width: 100%;
+	margin: 0;
+}
+
+.wui-management-event-tabs .gwt-TabBar {
+	background-color: #e6e7e8;
+}
+
+.wui-management-event-tabs .gwt-TabPanelBottom {
+	border: 0;
+}
+
+.wui-management-event {
+	width: 100%;
+}
+
+/** Task List **/
+
+.wui-management-event .event-task-list {
+	width: 100%;
+}
+
+.wui-management-event .event-task-list .task-list-header-scheduled {
+	width: 12px;
+}
+.wui-management-event .event-task-list .task-list-header-name {
+	width: 140px;
+}
+
+.wui-management-event .event-task-list .task-list-header-startDate {
+	width: 145px;
+}
+.wui-management-event .event-task-list .task-list-header-repeat {
+	width: 239px;
+}
+.wui-management-event .event-task-list .task-list-header-user {
+	width: 100px;
+}
+
+
+
+
+/** Task Panel **/
+
+.wui-task {
+	width: 100%;
+	background-color: #e6e7e9;
+	margin: 1px;
+	cursor: pointer;
+	cursor: hand;
+}
+
+.wui-task-selected {
+	background-color: #b8a414;
+}
+
+.wui-task .task-state-scheduled {
+	margin: 1px;
+}
+
+.wui-task .task-name {
+	width: 140px;
+	margin: 2px 5px 2px 2px;
+	overflow: hidden;
+	white-space: nowrap;
+}
+.wui-task .task-startDate {
+	width: 150px;
+	margin: 2px;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+.wui-task .task-repeat {
+	width: 100%;
+	margin: 2px;
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+.wui-task .task-user {
+	width: 100px;
+	margin: 2px;
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+.wui-task .task-state-running {
+	margin: 2px 4px;
+}
+
+
+/** Task data panel **/
+.wui-task-data {
+	width: 99%;
+}
+.wui-task-data .task-data-labels {
+	margin-right: 10px;	
+}
+.wui-task-data .task-name-label {
+	white-space: nowrap;
+}
+.wui-task-data .task-description-label {
+	white-space: nowrap;
+}
+.wui-task-data .task-startDate-label {
+	white-space: nowrap;
+	margin-top: 10px;
+}
+.wui-task-data .task-repeat-label {
+	white-space: nowrap;
+	margin-top: 10px;
+}
+.wui-task-data .task-plugin-label {
+	white-space: nowrap;
+	margin-top: 10px;
+}
+.wui-task-data .task-name-box {
+	width: 100%;
+}
+.wui-task-data .task-description-box {
+	width: 100%;
+}
+
+.wui-task-startDate {
+	margin-top: 10px;
+}
+.wui-task-startDate .task-startDate-current {
+	cursor: pointer;
+	cursor: hand;
+}
+.wui-task-startDate .task-startDate-schedule-layout {
+}
+.wui-task-startDate .task-startDate-schedule {
+	margin-right: 5px;
+	cursor: pointer;
+	cursor: hand;
+}
+.wui-task-startDate .task-startDate-schedule-picker {
+}
+
+
+.wui-task-data .wui-task-repeat {
+	margin-top: 10px;
+}
+
+.wui-task-data .wui-task-plugin {
+	margin-top: 10px;
+}
+
+.wui-task-repeat {
+}
+.wui-task-repeat .task-repeat-not {
+	cursor: pointer;
+	cursor: hand;
+}
+.wui-task-repeat .task-repeat-yes {
+	cursor: pointer;
+	cursor: hand;
+}
+.wui-task-repeat .task-repeat-layout {
+}
+
+.wui-task-repeat .task-repeat-layout-center {
+	margin: 3px;
+}
+.wui-task-repeat .task-repeat-interval-layout {
+}
+.wui-task-repeat .task-repeat-interval-label {
+}
+.wui-task-repeat .task-repeat-interval-box {
+	width: 45px;
+	margin: 0 5px;
+}
+.wui-task-repeat .task-repeat-interval-magnitude {
+}
+.wui-task-repeat .task-repeat-until-layout {
+}
+.wui-task-repeat .task-repeat-until-label {
+	margin: 0 5px;
+}
+.wui-task-repeat .task-repeat-until-box {
+	width: 25px;
+	margin-right: 5px;
+}
+.wui-task-repeat .task-repeat-until-type {
+}
+
+/** Plugin Panel **/
+.wui-task-plugin {
+	width: 100%;
+}
+.wui-task-plugin .task-plugin-list {
+}
+.wui-task-plugin .task-plugin-description {
+	margin: 2px 10px;
+	font-style: italic;
+}
+
+.wui-task-plugin .task-plugin-parameters-title {
+	margin: 10px 0 2px 0;
+}
+
+.wui-task-plugin .task-plugin-parameters {
+	margin-left: 10px;
+	width: 99%;
+}
+
+.wui-task-plugin .task-plugin-parameters .plugin-parameter-name {
+	white-space: nowrap;
+}
+.wui-task-plugin .task-plugin-parameters .plugin-parameter-value {
+	width: 100%;
+}
+
+/** Create Task Window **/
+.wui-task-create-scroll {
+	background-color: #e6e7e8;
+	padding: 5px;
+}
+
+/** Edit Task Window **/
+.wui-task-edit-scroll {
+	background-color: #e6e7e8;
+	padding: 5px;
+}
+
+/** Task Instance List **/
+.wui-management-event .event-instance-list {
+	width: 100%;
+}
+
+.wui-management-event .event-instance-list .instance-header-running {
+	width: 20px;
+}
+
+.wui-management-event .event-instance-list .instance-header-name {
+	width: 217px;
+}
+
+.wui-management-event .event-instance-list .instance-header-startDate {
+	width: 142px;
+}
+
+.wui-management-event .event-instance-list .instance-header-completeness {
+	width: 142px;
+}
+
+.wui-management-event .event-instance-list .instance-header-user {
+	width: 106px;
+}
+
+.wui-management-event .event-instance-list .instance-header-report {
+	width: 30px;
+}
+
+
+/** Task Instance Panel **/
+.wui-task-instance {
+	width: 100%;
+	background-color: #e6e7e9;
+	margin: 1px;
+	cursor: pointer;
+	cursor: hand;
+}
+
+.wui-task-instance-selected {
+	background-color: #b8a414;
+}
+
+.wui-task-instance .task-state-running {
+	margin: 0 5px;
+	vertical-align: middle;
+}
+
+.wui-task-instance .instance-name {
+	width: 230px;
+	overflow: hidden;
+	white-space: nowrap;
+	margin-top: 2px;
+}
+.wui-task-instance .instance-startDate {
+	width: 150px;
+	white-space: nowrap;
+	overflow: hidden;
+	margin-top: 2px;
+}
+.wui-task-instance .instance-percentage {
+	width: 150px;
+	white-space: nowrap;
+	overflow: hidden;
+	margin-top: 2px;
+}
+.wui-task-instance .instance-user {
+	width: 100px;
+	white-space: nowrap;
+	overflow: hidden;
+	margin-top: 2px;
+}
+.wui-task-instance .instance-report {
+	margin: 0 5px;
+	vertical-align: middle;
+}
+

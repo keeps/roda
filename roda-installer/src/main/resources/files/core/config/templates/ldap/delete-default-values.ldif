@@ -1,0 +1,108 @@
+#######################
+# Roles
+#######################
+
+dn: cn=administrator,LDAP_ROLES_DN
+changetype: delete
+
+dn: cn=misc.logger,LDAP_ROLES_DN
+changetype: delete
+
+dn: cn=logger.monitor,LDAP_ROLES_DN
+changetype: delete
+
+dn: cn=misc.register_user,LDAP_ROLES_DN
+changetype: delete
+
+dn: cn=misc.browse_users,LDAP_ROLES_DN
+changetype: delete
+
+dn: cn=dissemination.search.basic,LDAP_ROLES_DN
+changetype: delete
+
+dn: cn=dissemination.search.advanced,LDAP_ROLES_DN
+changetype: delete
+
+dn: cn=dissemination.browse,LDAP_ROLES_DN
+changetype: delete
+
+dn: cn=administration.user,LDAP_ROLES_DN
+changetype: delete
+
+dn: cn=administration.event,LDAP_ROLES_DN
+changetype: delete
+
+dn: cn=administration.metadata_editor,LDAP_ROLES_DN
+changetype: delete
+
+dn: cn=administration.statistics,LDAP_ROLES_DN
+changetype: delete
+
+dn: cn=administration.statistics.monitor,LDAP_ROLES_DN
+changetype: delete
+
+dn: cn=ingest.pre_ingest,LDAP_ROLES_DN
+changetype: delete
+
+dn: cn=ingest.load_sips,LDAP_ROLES_DN
+changetype: delete
+
+dn: cn=ingest.list_batch,LDAP_ROLES_DN
+changetype: delete
+
+dn: cn=ingest.list_all_sips,LDAP_ROLES_DN
+changetype: delete
+
+dn: cn=ingest.list_my_sips,LDAP_ROLES_DN
+changetype: delete
+
+dn: cn=ingest.batch_validation,LDAP_ROLES_DN
+changetype: delete
+
+dn: cn=ingest.accept_reject_sip,LDAP_ROLES_DN
+changetype: delete
+
+dn: cn=ingest.insert_files,LDAP_ROLES_DN
+changetype: delete
+
+#######################
+# Groups
+#######################
+
+dn: cn=administrators,LDAP_GROUPS_DN
+changetype: delete
+
+dn: cn=producers,LDAP_GROUPS_DN
+changetype: delete
+
+dn: cn=archivists,LDAP_GROUPS_DN
+changetype: delete
+
+dn: cn=users,LDAP_GROUPS_DN
+changetype: delete
+
+dn: cn=guests,LDAP_GROUPS_DN
+changetype: delete
+
+#######################
+# Users
+#######################
+
+dn: uid=admin,LDAP_USERS_DN
+changetype: delete
+
+dn: uid=roda-wui,LDAP_USERS_DN
+changetype: delete
+
+dn: uid=roda-ingest-task,LDAP_USERS_DN
+changetype: delete
+
+dn: uid=roda-preservation-task,LDAP_USERS_DN
+changetype: delete
+
+dn: uid=roda-handle,LDAP_USERS_DN
+changetype: delete
+
+dn: uid=guest,LDAP_USERS_DN
+changetype: delete
+

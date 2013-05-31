@@ -1,0 +1,203 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<name>roda-wui</name>
+	<artifactId>roda-wui</artifactId>
+	<parent>
+		<groupId>pt.gov.dgarq.roda</groupId>
+		<artifactId>roda-ui</artifactId>
+		<version>1.1.0</version>
+		<relativePath>..</relativePath>
+	</parent>
+	<packaging>war</packaging>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>gwt-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<!-- <configuration> <extraJvmArgs>-Xmx512M -Xss1024k</extraJvmArgs> 
+							</configuration> -->
+						<id>compile-gwt</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>compile</goal>
+							<!-- <goal>generateAsync</goal> <goal>test</goal> -->
+						</goals>
+					</execution>
+				</executions>
+				<!-- <configuration> <runTarget>pt.gov.dgarq.roda.wui.main.Main/Main.html</runTarget> 
+					<draftCompile>true</draftCompile> <optimizationLevel>1</optimizationLevel> 
+					</configuration> -->
+			</plugin>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>prepare-package</phase>
+						<configuration>
+							<target>
+								<move todir="${project.build.directory}/${project.build.finalName}">
+									<fileset dir="${project.build.directory}/${project.build.finalName}/pt.gov.dgarq.roda.wui.main.Main/"/>
+								</move>
+								<move todir="${project.build.directory}/${project.build.finalName}">
+									<fileset dir="${project.build.directory}/${project.build.finalName}/pt.gov.dgarq.roda.disseminators.common.loading.Loading/"/>
+								</move>
+							</target>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+	<dependencies>
+		<dependency>
+			<groupId>pt.gov.dgarq.roda</groupId>
+			<artifactId>roda-client</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>pt.gov.dgarq.roda</groupId>
+			<artifactId>roda-common-certification</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>pt.gov.dgarq.roda</groupId>
+			<artifactId>roda-migrator-client</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>pt.gov.dgarq.roda</groupId>
+			<artifactId>roda-common-convert-db</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>pt.gov.dgarq.roda</groupId>
+			<artifactId>roda-common-data</artifactId>
+			<classifier>sources</classifier>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>pt.gov.dgarq.roda</groupId>
+			<artifactId>roda-common-data</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>pt.gov.dgarq.roda</groupId>
+			<artifactId>roda-common-sip-utility</artifactId>
+		</dependency>
+		<!--
+		<dependency>
+			<groupId>pt.gov.dgarq.roda</groupId>
+			<artifactId>roda-common-servlet-security</artifactId>
+		</dependency>
+	
+		<dependency>
+			<groupId>pt.gov.dgarq.roda</groupId>
+			<artifactId>roda-common-utils</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>pt.gov.dgarq.roda</groupId>
+			<artifactId>roda-common-metadata</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>pt.gov.dgarq.roda</groupId>
+			<artifactId>ead-c.2008</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>pt.gov.dgarq.roda</groupId>
+			<artifactId>roda-common-format-utility</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>pt.gov.dgarq.roda</groupId>
+			<artifactId>roda-common-content-adapter</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>pt.gov.dgarq.roda</groupId>
+			<artifactId>roda-core-plugins</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>pt.gov.dgarq.roda</groupId>
+			<artifactId>roda-common-db</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>pt.gov.dgarq.roda</groupId>
+			<artifactId>roda-common-ingest</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>pt.gov.dgarq.roda</groupId>
+			<artifactId>fedora-client-utility</artifactId>
+		</dependency>
+-->
+		<dependency>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>fop</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.octo.captcha</groupId>
+			<artifactId>jcaptcha-all</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.rednels</groupId>
+			<artifactId>ofcgwt</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.netthreads</groupId>
+			<artifactId>gwt-simile-timeline-dev</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.adamtacy</groupId>
+			<artifactId>gwt-fx</artifactId>
+			<classifier>RC2</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.google.gwt</groupId>
+			<artifactId>gwt-servlet</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.google.gwt</groupId>
+			<artifactId>gwt-user</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.gwt-widget</groupId>
+			<artifactId>gwt-widgets</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-configuration</groupId>
+			<artifactId>commons-configuration</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-fileupload</groupId>
+			<artifactId>commons-fileupload</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.velocity</groupId>
+			<artifactId>velocity</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss</groupId>
+			<artifactId>jbossweb-extras</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+		</dependency>
+	</dependencies>
+</project>

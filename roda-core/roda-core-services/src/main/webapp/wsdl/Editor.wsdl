@@ -1,0 +1,739 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="http://services.core.roda.dgarq.gov.pt" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="http://services.core.roda.dgarq.gov.pt" xmlns:intf="http://services.core.roda.dgarq.gov.pt" xmlns:tns1="http://data.core.roda.dgarq.gov.pt" xmlns:tns2="http://eadc.data.core.roda.dgarq.gov.pt" xmlns:tns3="http://common.core.roda.dgarq.gov.pt" xmlns:tns4="http://filter.adapter.data.core.roda.dgarq.gov.pt" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<!--WSDL created by Apache Axis version: 1.4
+Built on Apr 22, 2006 (06:55:48 PDT)-->
+ <wsdl:types>
+  <schema elementFormDefault="qualified" targetNamespace="http://services.core.roda.dgarq.gov.pt" xmlns="http://www.w3.org/2001/XMLSchema">
+   <import namespace="http://data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://eadc.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://common.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+   <element name="createDescriptionObject">
+    <complexType>
+     <sequence>
+      <element name="dObject" type="tns1:DescriptionObject"/>
+     </sequence>
+    </complexType>
+   </element>
+   <complexType name="ArrayOf_xsd_string">
+    <sequence>
+     <element maxOccurs="unbounded" minOccurs="0" name="item" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="ArrayOf_tns2_ArrangementTableRow">
+    <sequence>
+     <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns2:ArrangementTableRow"/>
+    </sequence>
+   </complexType>
+   <complexType name="ArrayOf_tns2_ArrangementTableGroup">
+    <sequence>
+     <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns2:ArrangementTableGroup"/>
+    </sequence>
+   </complexType>
+   <complexType name="ArrayOf_tns2_BioghistChronitem">
+    <sequence>
+     <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns2:BioghistChronitem"/>
+    </sequence>
+   </complexType>
+   <element name="createDescriptionObjectResponse">
+    <complexType>
+     <sequence>
+      <element name="createDescriptionObjectReturn" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="fault" type="tns3:EditorException"/>
+   <element name="fault1" type="tns3:NoSuchRODAObjectException"/>
+   <element name="fault2" type="tns3:InvalidDescriptionObjectException"/>
+   <element name="modifyDescriptionObject">
+    <complexType>
+     <sequence>
+      <element name="dObject" type="tns1:DescriptionObject"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="modifyDescriptionObjectResponse">
+    <complexType>
+     <sequence>
+      <element name="modifyDescriptionObjectReturn" type="tns1:DescriptionObject"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="removeDescriptionObject">
+    <complexType>
+     <sequence>
+      <element name="pid" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="removeDescriptionObjectResponse">
+    <complexType/>
+   </element>
+   <element name="getDOPossibleLevels">
+    <complexType>
+     <sequence>
+      <element name="doPID" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="getDOPossibleLevelsResponse">
+    <complexType>
+     <sequence>
+      <element maxOccurs="unbounded" name="getDOPossibleLevelsReturn" type="tns2:DescriptionLevel"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="setRODAObjectPermissions">
+    <complexType>
+     <sequence>
+      <element name="permissions" type="tns1:RODAObjectPermissions"/>
+      <element name="applyToDescendants" type="xsd:boolean"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="setRODAObjectPermissionsResponse">
+    <complexType>
+     <sequence>
+      <element name="setRODAObjectPermissionsReturn" type="tns1:RODAObjectPermissions"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="setProducers">
+    <complexType>
+     <sequence>
+      <element name="doPID" type="xsd:string"/>
+      <element name="producers" type="tns1:Producers"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="setProducersResponse">
+    <complexType/>
+   </element>
+  </schema>
+  <schema elementFormDefault="qualified" targetNamespace="http://data.core.roda.dgarq.gov.pt" xmlns="http://www.w3.org/2001/XMLSchema">
+   <import namespace="http://eadc.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://common.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://services.core.roda.dgarq.gov.pt"/>
+   <complexType name="RODAObject">
+    <sequence>
+     <element name="contentModel" nillable="true" type="xsd:string"/>
+     <element name="createdDate" nillable="true" type="xsd:dateTime"/>
+     <element name="label" nillable="true" type="xsd:string"/>
+     <element name="lastModifiedDate" nillable="true" type="xsd:dateTime"/>
+     <element name="pid" nillable="true" type="xsd:string"/>
+     <element name="state" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="SimpleDescriptionObject">
+    <complexContent>
+     <extension base="tns1:RODAObject">
+      <sequence>
+       <element name="countryCode" nillable="true" type="xsd:string"/>
+       <element name="dateFinal" nillable="true" type="xsd:string"/>
+       <element name="dateInitial" nillable="true" type="xsd:string"/>
+       <element name="description" nillable="true" type="xsd:string"/>
+       <element name="id" nillable="true" type="xsd:string"/>
+       <element name="level" nillable="true" type="tns2:DescriptionLevel"/>
+       <element name="parentPID" nillable="true" type="xsd:string"/>
+       <element name="repositoryCode" nillable="true" type="xsd:string"/>
+       <element name="subElementsCount" type="xsd:int"/>
+       <element name="title" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="DescriptionObject">
+    <complexContent>
+     <extension base="tns1:SimpleDescriptionObject">
+      <sequence>
+       <element name="accessrestrict" nillable="true" type="xsd:string"/>
+       <element name="accruals" nillable="true" type="xsd:string"/>
+       <element name="acqinfo" nillable="true" type="xsd:string"/>
+       <element name="acqinfoDate" nillable="true" type="xsd:string"/>
+       <element name="acqinfoNum" nillable="true" type="xsd:string"/>
+       <element name="appraisal" nillable="true" type="xsd:string"/>
+       <element name="arrangement" nillable="true" type="xsd:string"/>
+       <element name="arrangementTable" nillable="true" type="tns2:ArrangementTable"/>
+       <element name="bibliography" nillable="true" type="xsd:string"/>
+       <element name="bioghist" nillable="true" type="xsd:string"/>
+       <element name="bioghistChronlist" nillable="true" type="tns2:BioghistChronlist"/>
+       <element name="completeReference" nillable="true" type="xsd:string"/>
+       <element name="custodhist" nillable="true" type="xsd:string"/>
+       <element name="handleURL" nillable="true" type="xsd:string"/>
+       <element name="langmaterialLanguages" nillable="true" type="tns2:LangmaterialLanguages"/>
+       <element name="materialspec" nillable="true" type="xsd:string"/>
+       <element name="note" nillable="true" type="xsd:string"/>
+       <element name="origination" nillable="true" type="xsd:string"/>
+       <element name="otherfindaid" nillable="true" type="xsd:string"/>
+       <element name="physdesc" nillable="true" type="xsd:string"/>
+       <element name="physdescDateFinal" nillable="true" type="xsd:string"/>
+       <element name="physdescDateInitial" nillable="true" type="xsd:string"/>
+       <element name="physdescDimensions" nillable="true" type="tns2:PhysdescElement"/>
+       <element name="physdescExtent" nillable="true" type="tns2:PhysdescElement"/>
+       <element name="physdescPhysfacet" nillable="true" type="tns2:PhysdescElement"/>
+       <element name="phystech" nillable="true" type="xsd:string"/>
+       <element name="prefercite" nillable="true" type="xsd:string"/>
+       <element name="relatedmaterial" nillable="true" type="xsd:string"/>
+       <element name="scopecontent" nillable="true" type="xsd:string"/>
+       <element name="userestrict" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="RODAObjectPermissions">
+    <sequence>
+     <element name="grantGroups" nillable="true" type="impl:ArrayOf_xsd_string"/>
+     <element name="grantUsers" nillable="true" type="impl:ArrayOf_xsd_string"/>
+     <element name="modifyGroups" nillable="true" type="impl:ArrayOf_xsd_string"/>
+     <element name="modifyUsers" nillable="true" type="impl:ArrayOf_xsd_string"/>
+     <element name="objectPID" nillable="true" type="xsd:string"/>
+     <element name="readGroups" nillable="true" type="impl:ArrayOf_xsd_string"/>
+     <element name="readUsers" nillable="true" type="impl:ArrayOf_xsd_string"/>
+     <element name="removeGroups" nillable="true" type="impl:ArrayOf_xsd_string"/>
+     <element name="removeUsers" nillable="true" type="impl:ArrayOf_xsd_string"/>
+    </sequence>
+   </complexType>
+   <complexType name="Producers">
+    <sequence>
+     <element name="descriptionObjectPID" nillable="true" type="xsd:string"/>
+     <element name="groups" nillable="true" type="impl:ArrayOf_xsd_string"/>
+     <element name="users" nillable="true" type="impl:ArrayOf_xsd_string"/>
+    </sequence>
+   </complexType>
+  </schema>
+  <schema elementFormDefault="qualified" targetNamespace="http://eadc.data.core.roda.dgarq.gov.pt" xmlns="http://www.w3.org/2001/XMLSchema">
+   <import namespace="http://data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://common.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://services.core.roda.dgarq.gov.pt"/>
+   <complexType name="DescriptionLevel">
+    <sequence>
+     <element name="level" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="ArrangementTableRow">
+    <sequence>
+     <element name="entries" nillable="true" type="impl:ArrayOf_xsd_string"/>
+    </sequence>
+   </complexType>
+   <complexType name="ArrangementTableBody">
+    <sequence>
+     <element name="rows" nillable="true" type="impl:ArrayOf_tns2_ArrangementTableRow"/>
+    </sequence>
+   </complexType>
+   <complexType name="ArrangementTableHead">
+    <complexContent>
+     <extension base="tns2:ArrangementTableBody">
+      <sequence/>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="ArrangementTableGroup">
+    <sequence>
+     <element name="body" nillable="true" type="tns2:ArrangementTableBody"/>
+     <element name="columns" type="xsd:int"/>
+     <element name="head" nillable="true" type="tns2:ArrangementTableHead"/>
+    </sequence>
+   </complexType>
+   <complexType name="ArrangementTable">
+    <sequence>
+     <element name="arrangementTableGroups" nillable="true" type="impl:ArrayOf_tns2_ArrangementTableGroup"/>
+    </sequence>
+   </complexType>
+   <complexType name="BioghistChronitem">
+    <sequence>
+     <element name="dateFinal" nillable="true" type="xsd:string"/>
+     <element name="dateInitial" nillable="true" type="xsd:string"/>
+     <element name="event" nillable="true" type="xsd:string"/>
+     <element name="text" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="BioghistChronlist">
+    <sequence>
+     <element name="bioghistChronitems" nillable="true" type="impl:ArrayOf_tns2_BioghistChronitem"/>
+    </sequence>
+   </complexType>
+   <complexType name="LangmaterialLanguages">
+    <sequence>
+     <element name="langmaterialLanguages" nillable="true" type="impl:ArrayOf_xsd_string"/>
+    </sequence>
+   </complexType>
+   <complexType name="PhysdescElement">
+    <sequence>
+     <element name="unit" nillable="true" type="xsd:string"/>
+     <element name="value" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+  </schema>
+  <schema elementFormDefault="qualified" targetNamespace="http://common.core.roda.dgarq.gov.pt" xmlns="http://www.w3.org/2001/XMLSchema">
+   <import namespace="http://data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://eadc.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://services.core.roda.dgarq.gov.pt"/>
+   <complexType abstract="true" name="RODAException">
+    <sequence>
+     <element name="message" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="RODAServiceException">
+    <complexContent>
+     <extension base="tns3:RODAException">
+      <sequence/>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="EditorException">
+    <complexContent>
+     <extension base="tns3:RODAServiceException">
+      <sequence/>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="NoSuchRODAObjectException">
+    <complexContent>
+     <extension base="tns3:RODAException">
+      <sequence/>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="InvalidDescriptionObjectException">
+    <complexContent>
+     <extension base="tns3:RODAException">
+      <sequence/>
+     </extension>
+    </complexContent>
+   </complexType>
+  </schema>
+  <schema elementFormDefault="qualified" targetNamespace="http://filter.adapter.data.core.roda.dgarq.gov.pt" xmlns="http://www.w3.org/2001/XMLSchema">
+   <import namespace="http://data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://eadc.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://common.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://services.core.roda.dgarq.gov.pt"/>
+   <complexType abstract="true" name="FilterParameter">
+    <sequence>
+     <element name="name" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="SimpleFilterParameter">
+    <complexContent>
+     <extension base="tns4:FilterParameter">
+      <sequence>
+       <element name="value" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="OneOfManyFilterParameter">
+    <complexContent>
+     <extension base="tns4:FilterParameter">
+      <sequence>
+       <element name="values" nillable="true" type="impl:ArrayOf_xsd_string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="RangeFilterParameter">
+    <complexContent>
+     <extension base="tns4:FilterParameter">
+      <sequence>
+       <element name="fromValue" nillable="true" type="xsd:string"/>
+       <element name="toValue" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="RegexFilterParameter">
+    <complexContent>
+     <extension base="tns4:FilterParameter">
+      <sequence>
+       <element name="regex" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="ProducerFilterParameter">
+    <complexContent>
+     <extension base="tns4:FilterParameter">
+      <sequence>
+       <element name="groups" nillable="true" type="impl:ArrayOf_xsd_string"/>
+       <element name="username" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="LikeFilterParameter">
+    <complexContent>
+     <extension base="tns4:FilterParameter">
+      <sequence>
+       <element name="expression" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+  </schema>
+ </wsdl:types>
+
+   <wsdl:message name="setProducersResponse">
+
+      <wsdl:part element="impl:setProducersResponse" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="modifyDescriptionObjectRequest">
+
+      <wsdl:part element="impl:modifyDescriptionObject" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="modifyDescriptionObjectResponse">
+
+      <wsdl:part element="impl:modifyDescriptionObjectResponse" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getDOPossibleLevelsRequest">
+
+      <wsdl:part element="impl:getDOPossibleLevels" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="createDescriptionObjectRequest">
+
+      <wsdl:part element="impl:createDescriptionObject" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="NoSuchRODAObjectException">
+
+      <wsdl:part element="impl:fault1" name="fault"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="InvalidDescriptionObjectException">
+
+      <wsdl:part element="impl:fault2" name="fault"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="EditorException">
+
+      <wsdl:part element="impl:fault" name="fault"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="setRODAObjectPermissionsResponse">
+
+      <wsdl:part element="impl:setRODAObjectPermissionsResponse" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="setProducersRequest">
+
+      <wsdl:part element="impl:setProducers" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="removeDescriptionObjectRequest">
+
+      <wsdl:part element="impl:removeDescriptionObject" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="createDescriptionObjectResponse">
+
+      <wsdl:part element="impl:createDescriptionObjectResponse" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getDOPossibleLevelsResponse">
+
+      <wsdl:part element="impl:getDOPossibleLevelsResponse" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="setRODAObjectPermissionsRequest">
+
+      <wsdl:part element="impl:setRODAObjectPermissions" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="removeDescriptionObjectResponse">
+
+      <wsdl:part element="impl:removeDescriptionObjectResponse" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:portType name="Editor">
+
+      <wsdl:operation name="createDescriptionObject">
+
+         <wsdl:input message="impl:createDescriptionObjectRequest" name="createDescriptionObjectRequest"/>
+
+         <wsdl:output message="impl:createDescriptionObjectResponse" name="createDescriptionObjectResponse"/>
+
+         <wsdl:fault message="impl:InvalidDescriptionObjectException" name="InvalidDescriptionObjectException"/>
+
+         <wsdl:fault message="impl:NoSuchRODAObjectException" name="NoSuchRODAObjectException"/>
+
+         <wsdl:fault message="impl:EditorException" name="EditorException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="modifyDescriptionObject">
+
+         <wsdl:input message="impl:modifyDescriptionObjectRequest" name="modifyDescriptionObjectRequest"/>
+
+         <wsdl:output message="impl:modifyDescriptionObjectResponse" name="modifyDescriptionObjectResponse"/>
+
+         <wsdl:fault message="impl:NoSuchRODAObjectException" name="NoSuchRODAObjectException"/>
+
+         <wsdl:fault message="impl:EditorException" name="EditorException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="removeDescriptionObject">
+
+         <wsdl:input message="impl:removeDescriptionObjectRequest" name="removeDescriptionObjectRequest"/>
+
+         <wsdl:output message="impl:removeDescriptionObjectResponse" name="removeDescriptionObjectResponse"/>
+
+         <wsdl:fault message="impl:NoSuchRODAObjectException" name="NoSuchRODAObjectException"/>
+
+         <wsdl:fault message="impl:EditorException" name="EditorException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getDOPossibleLevels">
+
+         <wsdl:input message="impl:getDOPossibleLevelsRequest" name="getDOPossibleLevelsRequest"/>
+
+         <wsdl:output message="impl:getDOPossibleLevelsResponse" name="getDOPossibleLevelsResponse"/>
+
+         <wsdl:fault message="impl:EditorException" name="EditorException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="setRODAObjectPermissions">
+
+         <wsdl:input message="impl:setRODAObjectPermissionsRequest" name="setRODAObjectPermissionsRequest"/>
+
+         <wsdl:output message="impl:setRODAObjectPermissionsResponse" name="setRODAObjectPermissionsResponse"/>
+
+         <wsdl:fault message="impl:NoSuchRODAObjectException" name="NoSuchRODAObjectException"/>
+
+         <wsdl:fault message="impl:EditorException" name="EditorException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="setProducers">
+
+         <wsdl:input message="impl:setProducersRequest" name="setProducersRequest"/>
+
+         <wsdl:output message="impl:setProducersResponse" name="setProducersResponse"/>
+
+         <wsdl:fault message="impl:NoSuchRODAObjectException" name="NoSuchRODAObjectException"/>
+
+         <wsdl:fault message="impl:EditorException" name="EditorException"/>
+
+      </wsdl:operation>
+
+   </wsdl:portType>
+
+   <wsdl:binding name="EditorSoapBinding" type="impl:Editor">
+
+      <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+      <wsdl:operation name="createDescriptionObject">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="createDescriptionObjectRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="createDescriptionObjectResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="InvalidDescriptionObjectException">
+
+            <wsdlsoap:fault name="InvalidDescriptionObjectException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="NoSuchRODAObjectException">
+
+            <wsdlsoap:fault name="NoSuchRODAObjectException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="EditorException">
+
+            <wsdlsoap:fault name="EditorException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="modifyDescriptionObject">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="modifyDescriptionObjectRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="modifyDescriptionObjectResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="NoSuchRODAObjectException">
+
+            <wsdlsoap:fault name="NoSuchRODAObjectException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="EditorException">
+
+            <wsdlsoap:fault name="EditorException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="removeDescriptionObject">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="removeDescriptionObjectRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="removeDescriptionObjectResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="NoSuchRODAObjectException">
+
+            <wsdlsoap:fault name="NoSuchRODAObjectException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="EditorException">
+
+            <wsdlsoap:fault name="EditorException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getDOPossibleLevels">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getDOPossibleLevelsRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getDOPossibleLevelsResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="EditorException">
+
+            <wsdlsoap:fault name="EditorException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="setRODAObjectPermissions">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="setRODAObjectPermissionsRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="setRODAObjectPermissionsResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="NoSuchRODAObjectException">
+
+            <wsdlsoap:fault name="NoSuchRODAObjectException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="EditorException">
+
+            <wsdlsoap:fault name="EditorException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="setProducers">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="setProducersRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="setProducersResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="NoSuchRODAObjectException">
+
+            <wsdlsoap:fault name="NoSuchRODAObjectException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="EditorException">
+
+            <wsdlsoap:fault name="EditorException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+   </wsdl:binding>
+
+   <wsdl:service name="EditorService">
+
+      <wsdl:port binding="impl:EditorSoapBinding" name="Editor">
+
+         <wsdlsoap:address location="http://localhost:8080/roda-core/services/Editor"/>
+
+      </wsdl:port>
+
+   </wsdl:service>
+
+</wsdl:definitions>

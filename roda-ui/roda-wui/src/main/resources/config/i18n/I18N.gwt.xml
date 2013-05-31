@@ -1,0 +1,8 @@
+<module>
+	<!-- Inherit the core Web Toolkit stuff.                  -->
+	<inherits name='com.google.gwt.user.User'/>
+	
+   <!-- I18N -->
+   <extend-property name="locale" values="en"/>
+   <extend-property name="locale" values="pt_PT"/>
+</module>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "http://logging.apache.org/log4j/docs/api/org/apache/log4j/xml/log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+
+	<appender name="STDOUT" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%p %d (%c{1}) %m%n" />
+		</layout>
+	</appender>
+
+	<appender name="FILEOUT" class="org.apache.log4j.RollingFileAppender">
+		<param name="File" value="${roda.home}/log/roda-in-installer.log" />
+		<param name="MaxFileSize" value="26MB" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%p %d (%c{1}) %m%n" />
+		</layout>
+	</appender>
+
+	<logger name="pt.gov.dgarq.roda.sipcreator.installer"
+		additivity="false">
+		<level value="WARN" />
+		<appender-ref ref="FILEOUT" />
+		<!--
+			Comment next line when exporting to tomcat to avoid overflooding
+			catalina.out
+		-->
+<!--		<appender-ref ref="STDOUT" />-->
+	</logger>
+
+</log4j:configuration>

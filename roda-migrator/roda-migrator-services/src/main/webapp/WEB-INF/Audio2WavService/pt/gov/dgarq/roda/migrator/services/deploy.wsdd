@@ -1,0 +1,180 @@
+<!-- Use this file to deploy some handlers/chains and services      -->
+<!-- Two ways to do this:                                           -->
+<!--   java org.apache.axis.client.AdminClient deploy.wsdd          -->
+<!--      after the axis server is running                          -->
+<!-- or                                                             -->
+<!--   java org.apache.axis.utils.Admin client|server deploy.wsdd   -->
+<!--      from the same directory that the Axis engine runs         -->
+
+<deployment
+    xmlns="http://xml.apache.org/axis/wsdd/"
+    xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
+
+  <!-- Services from Audio2WavService WSDL service -->
+
+  <service name="Audio2Wav" provider="java:RPC" style="wrapped" use="literal">
+      <parameter name="wsdlTargetNamespace" value="http://services.migrator.roda.dgarq.gov.pt"/>
+      <parameter name="wsdlServiceElement" value="Audio2WavService"/>
+      <parameter name="schemaQualified" value="http://common.migrator.roda.dgarq.gov.pt,http://data.common.migrator.roda.dgarq.gov.pt,http://filter.adapter.data.core.roda.dgarq.gov.pt,http://common.core.roda.dgarq.gov.pt,http://services.migrator.roda.dgarq.gov.pt,http://data.core.roda.dgarq.gov.pt"/>
+      <parameter name="wsdlServicePort" value="Audio2Wav"/>
+      <parameter name="className" value="pt.gov.dgarq.roda.migrator.services.Audio2Wav"/>
+      <parameter name="wsdlPortType" value="SynchronousConverter"/>
+      <parameter name="typeMappingVersion" value="1.2"/>
+      <operation name="convert" qname="operNS:convert" xmlns:operNS="http://services.migrator.roda.dgarq.gov.pt" returnQName="retNS:convertReturn" xmlns:retNS="http://services.migrator.roda.dgarq.gov.pt" returnType="rtns:ConversionResult" xmlns:rtns="http://data.common.migrator.roda.dgarq.gov.pt" soapAction="" >
+        <parameter qname="pns:in0" xmlns:pns="http://services.migrator.roda.dgarq.gov.pt" type="tns:RepresentationObject" xmlns:tns="http://data.core.roda.dgarq.gov.pt"/>
+        <fault name="RepresentationAlreadyConvertedException" qname="fns:fault" xmlns:fns="http://services.migrator.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.migrator.common.RepresentationAlreadyConvertedException" type="tns:RepresentationAlreadyConvertedException" xmlns:tns="http://common.migrator.roda.dgarq.gov.pt"/>
+        <fault name="ConverterException" qname="fns:fault4" xmlns:fns="http://services.migrator.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.migrator.common.ConverterException" type="tns:ConverterException" xmlns:tns="http://common.migrator.roda.dgarq.gov.pt"/>
+        <fault name="WrongRepresentationSubtypeException" qname="fns:fault3" xmlns:fns="http://services.migrator.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.migrator.common.WrongRepresentationSubtypeException" type="tns:WrongRepresentationSubtypeException" xmlns:tns="http://common.migrator.roda.dgarq.gov.pt"/>
+        <fault name="InvalidRepresentationException" qname="fns:fault1" xmlns:fns="http://services.migrator.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.migrator.common.InvalidRepresentationException" type="tns:InvalidRepresentationException" xmlns:tns="http://common.migrator.roda.dgarq.gov.pt"/>
+        <fault name="WrongRepresentationTypeException" qname="fns:fault2" xmlns:fns="http://services.migrator.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.migrator.common.WrongRepresentationTypeException" type="tns:WrongRepresentationTypeException" xmlns:tns="http://common.migrator.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="getAgent" qname="operNS:getAgent" xmlns:operNS="http://services.migrator.roda.dgarq.gov.pt" returnQName="retNS:getAgentReturn" xmlns:retNS="http://services.migrator.roda.dgarq.gov.pt" returnType="rtns:AgentPreservationObject" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
+        <fault name="ConverterException" qname="fns:fault4" xmlns:fns="http://services.migrator.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.migrator.common.ConverterException" type="tns:ConverterException" xmlns:tns="http://common.migrator.roda.dgarq.gov.pt"/>
+      </operation>
+      <parameter name="allowedMethods" value="convert getAgent"/>
+      <parameter name="scope" value="Application"/>
+
+      <typeMapping
+        xmlns:ns="http://common.migrator.roda.dgarq.gov.pt"
+        qname="ns:RepresentationAlreadyConvertedException"
+        type="java:pt.gov.dgarq.roda.migrator.common.RepresentationAlreadyConvertedException"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://data.core.roda.dgarq.gov.pt"
+        qname="ns:SimpleRepresentationObject"
+        type="java:pt.gov.dgarq.roda.core.data.SimpleRepresentationObject"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://data.core.roda.dgarq.gov.pt"
+        qname="ns:AgentPreservationObject"
+        type="java:pt.gov.dgarq.roda.core.data.AgentPreservationObject"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <arrayMapping
+        xmlns:ns="http://services.migrator.roda.dgarq.gov.pt"
+        qname="ns:ArrayOf_xsd_string"
+        type="java:java.lang.String[]"
+        innerType="cmp-ns:string" xmlns:cmp-ns="http://www.w3.org/2001/XMLSchema"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://data.core.roda.dgarq.gov.pt"
+        qname="ns:SimpleEventPreservationObject"
+        type="java:pt.gov.dgarq.roda.core.data.SimpleEventPreservationObject"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://data.core.roda.dgarq.gov.pt"
+        qname="ns:RepresentationFile"
+        type="java:pt.gov.dgarq.roda.core.data.RepresentationFile"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://common.core.roda.dgarq.gov.pt"
+        qname="ns:RODAServiceException"
+        type="java:pt.gov.dgarq.roda.core.common.RODAServiceException"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://common.migrator.roda.dgarq.gov.pt"
+        qname="ns:ConverterException"
+        type="java:pt.gov.dgarq.roda.migrator.common.ConverterException"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://data.common.migrator.roda.dgarq.gov.pt"
+        qname="ns:ConversionResult"
+        type="java:pt.gov.dgarq.roda.migrator.common.data.ConversionResult"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://common.migrator.roda.dgarq.gov.pt"
+        qname="ns:WrongRepresentationTypeException"
+        type="java:pt.gov.dgarq.roda.migrator.common.WrongRepresentationTypeException"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://common.migrator.roda.dgarq.gov.pt"
+        qname="ns:InvalidRepresentationException"
+        type="java:pt.gov.dgarq.roda.migrator.common.InvalidRepresentationException"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://common.migrator.roda.dgarq.gov.pt"
+        qname="ns:WrongRepresentationSubtypeException"
+        type="java:pt.gov.dgarq.roda.migrator.common.WrongRepresentationSubtypeException"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://data.core.roda.dgarq.gov.pt"
+        qname="ns:RepresentationObject"
+        type="java:pt.gov.dgarq.roda.core.data.RepresentationObject"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <arrayMapping
+        xmlns:ns="http://services.migrator.roda.dgarq.gov.pt"
+        qname="ns:ArrayOf_tns1_RepresentationFile"
+        type="java:pt.gov.dgarq.roda.core.data.RepresentationFile[]"
+        innerType="cmp-ns:RepresentationFile" xmlns:cmp-ns="http://data.core.roda.dgarq.gov.pt"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://data.core.roda.dgarq.gov.pt"
+        qname="ns:RODAObject"
+        type="java:pt.gov.dgarq.roda.core.data.RODAObject"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://data.core.roda.dgarq.gov.pt"
+        qname="ns:EventPreservationObject"
+        type="java:pt.gov.dgarq.roda.core.data.EventPreservationObject"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://common.core.roda.dgarq.gov.pt"
+        qname="ns:RODAException"
+        type="java:pt.gov.dgarq.roda.core.common.RODAException"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://data.core.roda.dgarq.gov.pt"
+        qname="ns:PreservationObject"
+        type="java:pt.gov.dgarq.roda.core.data.PreservationObject"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+  </service>
+</deployment>

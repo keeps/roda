@@ -1,0 +1,15 @@
+<html>
+<body>
+<p>Na sequ&ecirc;ncia do registo sobre o nome de utilizador <em>$username</em>, enviamos o pedido de verifica&ccedil;&atilde;o do endere&#231;o electr&#243;nico.</p>
+<p>Para proceder &#224; verifica&#231;&#227;o, siga o endere&#231;o <a href="$verificationCompleteURL">$verificationCompleteURL</a>, ou, alternativamente, insira a senha de autentica&#231;&#227;o em <a href="$verificationURL">$verificationURL</a>:
+<ul>
+<li><strong>Nome de utilizador:</strong> $username</li>
+<li><strong>Senha de verifica&#231;&#227;o:</strong> $token</li>
+</ul>
+</p>
+<p>Caso n&#227;o tenha feito o registo, por favor ignore este email.</p>
+
+<p>RODA - Reposit&#243;rio de Objectos Digitais e Aut&#234;nticos</p>
+
+</body>
+<html>

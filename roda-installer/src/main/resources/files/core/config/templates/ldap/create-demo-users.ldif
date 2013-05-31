@@ -1,0 +1,47 @@
+#######################
+# demo-admin
+dn: uid=demo-admin,LDAP_USERS_DN
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+objectClass: top
+objectClass: extensibleObject
+uid: demo-admin
+userPassword: demo-admin
+givenName: Administrator
+sn: Demo
+cn: Administrator Demo
+email: demo-admin@roda.pt
+shadowInactive: 0
+
+#######################
+# demo-prod
+dn: uid=demo-prod,LDAP_USERS_DN
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+objectClass: top
+objectClass: extensibleObject
+uid: demo-prod
+userPassword: demo-prod
+givenName: Producer
+sn: Demo
+cn: Producer Demo
+email: demo-prod@roda.pt
+shadowInactive: 0
+
+#######################
+# demo-arq
+dn: uid=demo-arq,LDAP_USERS_DN
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+objectClass: top
+objectClass: extensibleObject
+uid: demo-arq
+userPassword: demo-arq
+givenName: Archivist
+sn: Demo
+cn: Archivist Demo
+email: demo-arq@roda.pt
+shadowInactive: 0

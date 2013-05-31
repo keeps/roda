@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<module>
+
+	<!-- Inherit the core Web Toolkit stuff.                  -->
+	<inherits name="com.google.gwt.user.User" />
+
+	<!-- Specify the cascade stylesheet to use -->
+	<stylesheet src="IngestList.css" />
+
+	<servlet
+		class="pt.gov.dgarq.roda.wui.ingest.list.server.IngestListServiceImpl"
+		path="/ingestlist" />
+</module>

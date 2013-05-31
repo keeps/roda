@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="http://migrator.roda.dgarq.gov.pt" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="http://migrator.roda.dgarq.gov.pt" xmlns:intf="http://migrator.roda.dgarq.gov.pt" xmlns:tns1="http://data.core.roda.dgarq.gov.pt" xmlns:tns2="http://data.migrator.roda.dgarq.gov.pt" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<!--WSDL created by Apache Axis version: 1.4
+Built on Apr 22, 2006 (06:55:48 PDT)-->
+ <wsdl:types>
+  <schema elementFormDefault="qualified" targetNamespace="http://migrator.roda.dgarq.gov.pt" xmlns="http://www.w3.org/2001/XMLSchema">
+   <import namespace="http://data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://data.migrator.roda.dgarq.gov.pt"/>
+   <element name="getAgent">
+    <complexType/>
+   </element>
+   <element name="getAgentResponse">
+    <complexType>
+     <sequence>
+      <element name="getAgentReturn" type="tns1:AgentPreservationObject"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="requestConversion">
+    <complexType>
+     <sequence>
+      <element name="request" type="tns2:ConverstionRequest"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="requestConversionResponse">
+    <complexType>
+     <sequence>
+      <element name="requestConversionReturn" type="tns2:ConversionTicket"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="checkConversionStatus">
+    <complexType>
+     <sequence>
+      <element name="ticket" type="tns2:ConversionTicket"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="checkConversionStatusResponse">
+    <complexType>
+     <sequence>
+      <element name="checkConversionStatusReturn" type="tns2:ConversionStatus"/>
+     </sequence>
+    </complexType>
+   </element>
+  </schema>
+  <schema elementFormDefault="qualified" targetNamespace="http://data.core.roda.dgarq.gov.pt" xmlns="http://www.w3.org/2001/XMLSchema">
+   <import namespace="http://data.migrator.roda.dgarq.gov.pt"/>
+   <complexType name="RODAObject">
+    <sequence>
+     <element name="contentModel" nillable="true" type="xsd:string"/>
+     <element name="label" nillable="true" type="xsd:string"/>
+     <element name="lastModifiedDate" nillable="true" type="xsd:string"/>
+     <element name="pid" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType abstract="true" name="PreservationObject">
+    <complexContent>
+     <extension base="tns1:RODAObject">
+      <sequence>
+       <element name="ID" nillable="true" type="xsd:string"/>
+       <element name="type" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="AgentPreservationObject">
+    <complexContent>
+     <extension base="tns1:PreservationObject">
+      <sequence>
+       <element name="agentName" nillable="true" type="xsd:string"/>
+       <element name="agentType" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+  </schema>
+  <schema elementFormDefault="qualified" targetNamespace="http://data.migrator.roda.dgarq.gov.pt" xmlns="http://www.w3.org/2001/XMLSchema">
+   <import namespace="http://data.core.roda.dgarq.gov.pt"/>
+   <complexType name="ConverstionRequest">
+    <sequence/>
+   </complexType>
+   <complexType name="ConversionTicket">
+    <sequence/>
+   </complexType>
+   <complexType name="ConversionStatus">
+    <sequence/>
+   </complexType>
+  </schema>
+ </wsdl:types>
+
+   <wsdl:message name="checkConversionStatusRequest">
+
+      <wsdl:part element="impl:checkConversionStatus" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getAgentResponse">
+
+      <wsdl:part element="impl:getAgentResponse" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getAgentRequest">
+
+      <wsdl:part element="impl:getAgent" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="checkConversionStatusResponse">
+
+      <wsdl:part element="impl:checkConversionStatusResponse" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="requestConversionResponse">
+
+      <wsdl:part element="impl:requestConversionResponse" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="requestConversionRequest">
+
+      <wsdl:part element="impl:requestConversion" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:portType name="AsynchronousConverter">
+
+      <wsdl:operation name="getAgent">
+
+         <wsdl:input message="impl:getAgentRequest" name="getAgentRequest"/>
+
+         <wsdl:output message="impl:getAgentResponse" name="getAgentResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="requestConversion">
+
+         <wsdl:input message="impl:requestConversionRequest" name="requestConversionRequest"/>
+
+         <wsdl:output message="impl:requestConversionResponse" name="requestConversionResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="checkConversionStatus">
+
+         <wsdl:input message="impl:checkConversionStatusRequest" name="checkConversionStatusRequest"/>
+
+         <wsdl:output message="impl:checkConversionStatusResponse" name="checkConversionStatusResponse"/>
+
+      </wsdl:operation>
+
+   </wsdl:portType>
+
+   <wsdl:binding name="AsynchronousConverterSoapBinding" type="impl:AsynchronousConverter">
+
+      <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+      <wsdl:operation name="getAgent">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getAgentRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getAgentResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="requestConversion">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="requestConversionRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="requestConversionResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="checkConversionStatus">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="checkConversionStatusRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="checkConversionStatusResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+   </wsdl:binding>
+
+   <wsdl:service name="AsynchronousConverterService">
+
+      <wsdl:port binding="impl:AsynchronousConverterSoapBinding" name="AsynchronousConverter">
+
+         <wsdlsoap:address location="http://localhost:9090/roda-migrator/services/AsynchronousConverter"/>
+
+      </wsdl:port>
+
+   </wsdl:service>
+
+</wsdl:definitions>

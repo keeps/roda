@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="FgsConfig" basedir="." default="configFgs">
+	<description>
+		Fedora Generic Search Service configuration.
+		>ant -f configure-gsearch.xml
+	</description>
+
+	<property environment="env" />
+	
+	<property name="roda.home" value="${env.RODA_HOME}" />
+	<property name="fedora.home" value="${env.FEDORA_HOME}" />
+	<property name="rodacore.hostport" value="${env.RODACORE_HOSTPORT}" />
+
+	<property name="logs.path" value="${fedora.home}/server/logs" />
+	<property name="installer.config.path" value="${roda.home}/fedora/genericsearch-2.1.1/fedoragsearchwar/WEB-INF/classes" />
+
+	<!-- The three soap properties are used for the deployment of the deploy.wsdd file for soap access -->
+	<property name="soap.deploy.hostport" value="${rodacore.hostport}" />
+	<property name="soap.deploy.user" value="fedoraAdmin" />
+	<property name="soap.deploy.pass" value="${env.FEDORA_ADMIN_PASSWD}" />
+
+	<property name="roda.config.name" value="configRODAOnLucene" />
+
+	<target name="configFgs">
+		<antcall target="configFgs_inner">
+			<param name="deployed.config.path" value="${deployed.config.path}"/>
+		</antcall>
+	</target>
+
+	<target name="configFgs_inner" depends="configRODAOnLucene" description="set values for the configs on installer directory">
+		
+		<echo message="roda.home=${roda.home}" />
+		<echo message="fedora.home=${fedora.home}" />
+		<echo message="logs.path=${logs.path}" />
+		<echo message="installer.config.path=${installer.config.path}" />
+		<echo message="rodacore.hostport=${rodacore.hostport}" />
+
+		<echo message="deployed.config.path=${deployed.config.path}" />
+		
+		<property name="debug.level" value="INFO" />
+		<replace file="${installer.config.path}/log4j.xml" token="LOGPATH" value="${logs.path}" />
+		<replace file="${installer.config.path}/log4j.xml" token="DEBUGLEVELG" value="${debug.level}" />
+		<replace file="${installer.config.path}/log4j.xml" token="DEBUGLEVELL" value="${debug.level}" />
+		<replace file="${installer.config.path}/log4j.xml" token="DEBUGLEVELS" value="${debug.level}" />
+		<replace file="${installer.config.path}/log4j.xml" token="DEBUGLEVELZ" value="${debug.level}" />
+	</target>
+
+	<target name="configRODAOnLucene" description="set values for configRODAOnLucene - copied from configTestOnLucene">
+
+		<property name="default.config.path" value="${installer.config.path}/config" />
+		<property name="roda.installer.config.path" value="${installer.config.path}/${roda.config.name}" />
+		<property name="roda.config.path" value="${deployed.config.path}/${roda.config.name}" />
+		<property name="roda.config.prefix" value="roda" />
+		<property name="roda.mimetypes" value="text/plain text/xml text/html application/pdf" />
+		<property name="roda.index.1" value="RODAOnLucene" />
+		<property name="roda.index.1.indexdir" value="${fedora.home}/../../data/fedora/gsearch/${roda.index.1}" />
+		<property name="roda.index.names" value="${roda.index.1}" />
+		<property name="roda.repos.1" value="RODA" />
+		<property name="roda.repos.1.fedorasoap" value="http://${soap.deploy.hostport}" />
+		<property name="roda.repos.1.fedorauser" value="${soap.deploy.user}" />
+		<property name="roda.repos.1.fedorapass" value="${soap.deploy.pass}" />
+		<property name="roda.repos.1.fedoraobjectdir" value="${fedora.home}/../../data/fedora/objects" />
+		<property name="roda.repos.1.fedoraversion" value="2.2.1" />
+		<property name="roda.repos.names" value="${roda.repos.1}" />
+
+		<echo message="deployed.config.path=${deployed.config.path}" />
+
+		<delete dir="${default.config.path}" />
+		<mkdir dir="${default.config.path}" />
+		<copy todir="${default.config.path}">
+			<fileset dir="${roda.installer.config.path}" />
+		</copy>
+
+		<replace file="${installer.config.path}/config/fedoragsearch.properties" token="SOAPHOSTPORT" value="${soap.deploy.hostport}" />
+		<replace file="${installer.config.path}/config/fedoragsearch.properties" token="SOAPUSER" value="${soap.deploy.user}" />
+		<replace file="${installer.config.path}/config/fedoragsearch.properties" token="SOAPPASS" value="${soap.deploy.pass}" />
+		<replace file="${installer.config.path}/config/fedoragsearch.properties" token="CONFIGPATH" value="${default.config.path}" />
+		<replace file="${installer.config.path}/config/fedoragsearch.properties" token="REPOSNAMES" value="${roda.repos.names}" />
+		<replace file="${installer.config.path}/config/fedoragsearch.properties" token="INDEXNAMES" value="${roda.index.names}" />
+		<replace file="${installer.config.path}/config/fedoragsearch.properties" token="DEFAULTUPDATEINDEXRESTXSLT" value="${roda.config.prefix}UpdateIndexToHtml" />
+		<replace file="${installer.config.path}/config/fedoragsearch.properties" token="DEFAULTGFINDOBJECTSRESTXSLT" value="${roda.config.prefix}GfindObjectsToHtml" />
+		<replace file="${installer.config.path}/config/fedoragsearch.properties" token="DEFAULTBROWSEINDEXRESTXSLT" value="${roda.config.prefix}BrowseIndexToHtml" />
+		<replace file="${installer.config.path}/config/fedoragsearch.properties" token="DEFAULTGETREPOSITORYINFORESTXSLT" value="${roda.config.prefix}GetRepositoryInfoToHtml" />
+		<replace file="${installer.config.path}/config/fedoragsearch.properties" token="DEFAULTGETINDEXINFORESTXSLT" value="${roda.config.prefix}GetIndexInfoToHtml" />
+		<replace file="${installer.config.path}/config/fedoragsearch.properties" token="MIMETYPES" value="${roda.mimetypes}" />
+
+		<replace file="${installer.config.path}/config/rest/${roda.config.prefix}UpdateIndexToHtml.xslt" token="CONFIGPATH" value="${default.config.path}" />
+		<replace file="${installer.config.path}/config/rest/${roda.config.prefix}GfindObjectsToHtml.xslt" token="CONFIGPATH" value="${default.config.path}" />
+		<replace file="${installer.config.path}/config/rest/${roda.config.prefix}BrowseIndexToHtml.xslt" token="CONFIGPATH" value="${default.config.path}" />
+		<replace file="${installer.config.path}/config/rest/${roda.config.prefix}GetIndexInfoToHtml.xslt" token="CONFIGPATH" value="${default.config.path}" />
+		<replace file="${installer.config.path}/config/rest/${roda.config.prefix}GetRepositoryInfoToHtml.xslt" token="CONFIGPATH" value="${default.config.path}" />
+		<replace file="${installer.config.path}/config/rest/${roda.config.prefix}GfindObjectsToHtml.xslt" token="REPOS1FEDORABASE" value="${roda.repos.1.fedorasoap}" />
+
+		<replace file="${installer.config.path}/config/repository/${roda.repos.1}/repository.properties" token="FEDORASOAP" value="${roda.repos.1.fedorasoap}" />
+		<replace file="${installer.config.path}/config/repository/${roda.repos.1}/repository.properties" token="FEDORAUSER" value="${roda.repos.1.fedorauser}" />
+		<replace file="${installer.config.path}/config/repository/${roda.repos.1}/repository.properties" token="FEDORAPASS" value="${roda.repos.1.fedorapass}" />
+		<replace file="${installer.config.path}/config/repository/${roda.repos.1}/repository.properties" token="FEDORAOBJECTDIR" value="${roda.repos.1.fedoraobjectdir}" />
+		<replace file="${installer.config.path}/config/repository/${roda.repos.1}/repository.properties" token="FEDORAVERSION" value="${roda.repos.1.fedoraversion}" />
+
+		<replace file="${installer.config.path}/config/index/${roda.index.1}/index.properties" token="INDEXDIR" value="${roda.index.1.indexdir}" />
+		<replace file="${installer.config.path}/config/index/${roda.index.1}/index.properties" token="DEFAULTUPDATEINDEXDOCXSLT" value="${roda.config.prefix}FoxmlToLucene" />
+		<replace file="${installer.config.path}/config/index/${roda.index.1}/${roda.config.prefix}FoxmlToLucene.xslt" token="CONFIGPATH" value="${default.config.path}" />
+		<replace file="${installer.config.path}/config/index/${roda.index.1}/${roda.config.prefix}DOToLucene.xslt" token="RODACOREHOSTPORT" value="${rodacore.hostport}" />
+
+	</target>
+
+</project>

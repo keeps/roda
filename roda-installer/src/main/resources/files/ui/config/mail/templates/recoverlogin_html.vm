@@ -1,0 +1,17 @@
+<html>
+<body>
+<p>Foi pedida a recupera&#231;&#227;o do registo associado a este email.</p>
+
+<p>Para proceder &#224; recupera&#231;&#227;o, siga o endere&#231;o <a href="$recoverLoginCompleteURL">$recoverLoginCompleteURL</a>.</p>
+<p>Alternativamente, preencha os campos necess&#225;rios em <a href="$recoverLoginURL">$recoverLoginURL</a>.</p>
+<ul>
+<li><strong>Nome de utilizador:</strong> $username</li>
+<li><strong>Senha de recupera&#231;&#227;o:</strong> $token</li>
+</ul>
+<p>E modifique a sua palavra-passe.</p>
+<p>Se n&#227;o pediu a recupera&#231;&#227;o do registo, por favor ignore este email.</p>
+
+<p>RODA - Reposit&#243;rio de Objectos Digitais e Aut&#234;nticos</p>
+
+</body>
+<html>

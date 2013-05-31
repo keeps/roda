@@ -1,0 +1,11 @@
+<module>
+
+	<!-- Inherit the core Web Toolkit stuff.                  -->
+	<inherits name='com.google.gwt.user.User' />
+
+	<!-- Inherit all sub modules -->
+	<inherits name='pt.gov.dgarq.roda.wui.ingest.pre.PreIngest' />
+	<inherits name='pt.gov.dgarq.roda.wui.ingest.submit.IngestSubmit' />
+	<inherits name='pt.gov.dgarq.roda.wui.ingest.list.IngestList' />
+
+</module>

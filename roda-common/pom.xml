@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<name>roda-common</name>
+	<artifactId>roda-common</artifactId>
+	<version>1.1.0</version>
+	<parent>
+		<groupId>pt.gov.dgarq.roda</groupId>
+		<artifactId>roda</artifactId>
+		<version>1.1.0</version>
+	</parent>
+	<packaging>pom</packaging>
+	<modules>
+		<module>roda-common-utils</module>
+		<module>roda-common-certification</module>
+		<module>roda-common-format-utility</module>
+		<module>roda-common-content-adapter</module>
+		<module>roda-common-convert-db</module>
+		<module>roda-common-data</module>
+		<module>roda-common-db</module>
+		<module>roda-common-ingest</module>
+		<module>roda-common-metadata</module>
+		<module>roda-common-migrator</module>
+		<module>roda-common-plugins</module>
+		<module>roda-common-servlet-security</module>
+		<module>roda-common-sip-utility</module>
+	</modules>
+</project>

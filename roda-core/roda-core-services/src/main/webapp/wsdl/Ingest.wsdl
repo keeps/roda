@@ -1,0 +1,1241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="http://services.core.roda.dgarq.gov.pt" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="http://services.core.roda.dgarq.gov.pt" xmlns:intf="http://services.core.roda.dgarq.gov.pt" xmlns:tns1="http://data.core.roda.dgarq.gov.pt" xmlns:tns2="http://eadc.data.core.roda.dgarq.gov.pt" xmlns:tns3="http://common.core.roda.dgarq.gov.pt" xmlns:tns4="http://preservation.data.core.roda.dgarq.gov.pt" xmlns:tns5="http://filter.adapter.data.core.roda.dgarq.gov.pt" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<!--WSDL created by Apache Axis version: 1.4
+Built on Apr 22, 2006 (06:55:48 PDT)-->
+ <wsdl:types>
+  <schema elementFormDefault="qualified" targetNamespace="http://services.core.roda.dgarq.gov.pt" xmlns="http://www.w3.org/2001/XMLSchema">
+   <import namespace="http://data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://eadc.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://common.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://preservation.data.core.roda.dgarq.gov.pt"/>
+   <element name="createDescriptionObject">
+    <complexType>
+     <sequence>
+      <element name="dObject" type="tns1:DescriptionObject"/>
+     </sequence>
+    </complexType>
+   </element>
+   <complexType name="ArrayOf_xsd_string">
+    <sequence>
+     <element maxOccurs="unbounded" minOccurs="0" name="item" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="ArrayOf_tns2_ArrangementTableRow">
+    <sequence>
+     <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns2:ArrangementTableRow"/>
+    </sequence>
+   </complexType>
+   <complexType name="ArrayOf_tns2_ArrangementTableGroup">
+    <sequence>
+     <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns2:ArrangementTableGroup"/>
+    </sequence>
+   </complexType>
+   <complexType name="ArrayOf_tns2_BioghistChronitem">
+    <sequence>
+     <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns2:BioghistChronitem"/>
+    </sequence>
+   </complexType>
+   <element name="createDescriptionObjectResponse">
+    <complexType>
+     <sequence>
+      <element name="createDescriptionObjectReturn" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="fault" type="tns3:NoSuchRODAObjectException"/>
+   <element name="fault1" type="tns3:InvalidDescriptionObjectException"/>
+   <element name="fault2" type="tns3:IngestException"/>
+   <element name="removeDescriptionObject">
+    <complexType>
+     <sequence>
+      <element name="doPID" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="removeDescriptionObjectResponse">
+    <complexType/>
+   </element>
+   <element name="removeObjects">
+    <complexType>
+     <sequence>
+      <element maxOccurs="unbounded" name="pids" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="removeObjectsResponse">
+    <complexType>
+     <sequence>
+      <element maxOccurs="unbounded" name="removeObjectsReturn" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="createDetachedDescriptionObject">
+    <complexType>
+     <sequence>
+      <element name="dObject" type="tns1:DescriptionObject"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="createDetachedDescriptionObjectResponse">
+    <complexType>
+     <sequence>
+      <element name="createDetachedDescriptionObjectReturn" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="createRepresentationObject">
+    <complexType>
+     <sequence>
+      <element name="rObject" type="tns1:RepresentationObject"/>
+     </sequence>
+    </complexType>
+   </element>
+   <complexType name="ArrayOf_tns1_RepresentationFile">
+    <sequence>
+     <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns1:RepresentationFile"/>
+    </sequence>
+   </complexType>
+   <element name="createRepresentationObjectResponse">
+    <complexType>
+     <sequence>
+      <element name="createRepresentationObjectReturn" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="createRepresentationPreservationObject">
+    <complexType>
+     <sequence>
+      <element name="rpo" type="tns1:RepresentationPreservationObject"/>
+      <element name="doPID" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <complexType name="ArrayOf_tns4_Fixity">
+    <sequence>
+     <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns4:Fixity"/>
+    </sequence>
+   </complexType>
+   <complexType name="ArrayOf_tns4_RepresentationFilePreservationObject">
+    <sequence>
+     <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns4:RepresentationFilePreservationObject"/>
+    </sequence>
+   </complexType>
+   <element name="createRepresentationPreservationObjectResponse">
+    <complexType>
+     <sequence>
+      <element name="createRepresentationPreservationObjectReturn" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="fault3" type="tns3:RepresentationAlreadyPreservedException"/>
+   <element name="setDONormalizedRepresentation">
+    <complexType>
+     <sequence>
+      <element name="doPID" type="xsd:string"/>
+      <element name="roPID" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="setDONormalizedRepresentationResponse">
+    <complexType>
+     <sequence>
+      <element name="setDONormalizedRepresentationReturn" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="createDerivationRelationship">
+    <complexType>
+     <sequence>
+      <element name="rpoPID" type="xsd:string"/>
+      <element name="derivationEventPID" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="createDerivationRelationshipResponse">
+    <complexType/>
+   </element>
+   <element name="registerIngestEvent">
+    <complexType>
+     <sequence>
+      <element maxOccurs="unbounded" name="doPIDs" type="xsd:string"/>
+      <element maxOccurs="unbounded" name="roPIDs" type="xsd:string"/>
+      <element maxOccurs="unbounded" name="poPIDs" type="xsd:string"/>
+      <element name="agentName" type="xsd:string"/>
+      <element name="details" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="registerIngestEventResponse">
+    <complexType>
+     <sequence>
+      <element name="registerIngestEventReturn" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="registerEvent">
+    <complexType>
+     <sequence>
+      <element name="rpoPID" type="xsd:string"/>
+      <element name="eventPO" type="tns1:EventPreservationObject"/>
+      <element name="agent" type="tns1:AgentPreservationObject"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="registerEventResponse">
+    <complexType>
+     <sequence>
+      <element name="registerEventReturn" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="registerDerivationEvent">
+    <complexType>
+     <sequence>
+      <element name="originalRepresentationPID" type="xsd:string"/>
+      <element name="derivedRepresentationPID" type="xsd:string"/>
+      <element name="eventPO" type="tns1:EventPreservationObject"/>
+      <element name="agentPO" type="tns1:AgentPreservationObject"/>
+      <element name="markObjectsActive" type="xsd:boolean"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="registerDerivationEventResponse">
+    <complexType>
+     <sequence>
+      <element name="registerDerivationEventReturn" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+  </schema>
+  <schema elementFormDefault="qualified" targetNamespace="http://data.core.roda.dgarq.gov.pt" xmlns="http://www.w3.org/2001/XMLSchema">
+   <import namespace="http://eadc.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://common.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://preservation.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://services.core.roda.dgarq.gov.pt"/>
+   <complexType name="RODAObject">
+    <sequence>
+     <element name="contentModel" nillable="true" type="xsd:string"/>
+     <element name="createdDate" nillable="true" type="xsd:dateTime"/>
+     <element name="label" nillable="true" type="xsd:string"/>
+     <element name="lastModifiedDate" nillable="true" type="xsd:dateTime"/>
+     <element name="pid" nillable="true" type="xsd:string"/>
+     <element name="state" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="SimpleDescriptionObject">
+    <complexContent>
+     <extension base="tns1:RODAObject">
+      <sequence>
+       <element name="countryCode" nillable="true" type="xsd:string"/>
+       <element name="dateFinal" nillable="true" type="xsd:string"/>
+       <element name="dateInitial" nillable="true" type="xsd:string"/>
+       <element name="description" nillable="true" type="xsd:string"/>
+       <element name="id" nillable="true" type="xsd:string"/>
+       <element name="level" nillable="true" type="tns2:DescriptionLevel"/>
+       <element name="parentPID" nillable="true" type="xsd:string"/>
+       <element name="repositoryCode" nillable="true" type="xsd:string"/>
+       <element name="subElementsCount" type="xsd:int"/>
+       <element name="title" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="DescriptionObject">
+    <complexContent>
+     <extension base="tns1:SimpleDescriptionObject">
+      <sequence>
+       <element name="accessrestrict" nillable="true" type="xsd:string"/>
+       <element name="accruals" nillable="true" type="xsd:string"/>
+       <element name="acqinfo" nillable="true" type="xsd:string"/>
+       <element name="acqinfoDate" nillable="true" type="xsd:string"/>
+       <element name="acqinfoNum" nillable="true" type="xsd:string"/>
+       <element name="appraisal" nillable="true" type="xsd:string"/>
+       <element name="arrangement" nillable="true" type="xsd:string"/>
+       <element name="arrangementTable" nillable="true" type="tns2:ArrangementTable"/>
+       <element name="bibliography" nillable="true" type="xsd:string"/>
+       <element name="bioghist" nillable="true" type="xsd:string"/>
+       <element name="bioghistChronlist" nillable="true" type="tns2:BioghistChronlist"/>
+       <element name="completeReference" nillable="true" type="xsd:string"/>
+       <element name="custodhist" nillable="true" type="xsd:string"/>
+       <element name="handleURL" nillable="true" type="xsd:string"/>
+       <element name="langmaterialLanguages" nillable="true" type="tns2:LangmaterialLanguages"/>
+       <element name="materialspec" nillable="true" type="xsd:string"/>
+       <element name="note" nillable="true" type="xsd:string"/>
+       <element name="origination" nillable="true" type="xsd:string"/>
+       <element name="otherfindaid" nillable="true" type="xsd:string"/>
+       <element name="physdesc" nillable="true" type="xsd:string"/>
+       <element name="physdescDateFinal" nillable="true" type="xsd:string"/>
+       <element name="physdescDateInitial" nillable="true" type="xsd:string"/>
+       <element name="physdescDimensions" nillable="true" type="tns2:PhysdescElement"/>
+       <element name="physdescExtent" nillable="true" type="tns2:PhysdescElement"/>
+       <element name="physdescPhysfacet" nillable="true" type="tns2:PhysdescElement"/>
+       <element name="phystech" nillable="true" type="xsd:string"/>
+       <element name="prefercite" nillable="true" type="xsd:string"/>
+       <element name="relatedmaterial" nillable="true" type="xsd:string"/>
+       <element name="scopecontent" nillable="true" type="xsd:string"/>
+       <element name="userestrict" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="SimpleRepresentationObject">
+    <complexContent>
+     <extension base="tns1:RODAObject">
+      <sequence>
+       <element name="descriptionObjectPID" nillable="true" type="xsd:string"/>
+       <element name="id" nillable="true" type="xsd:string"/>
+       <element name="statuses" nillable="true" type="impl:ArrayOf_xsd_string"/>
+       <element name="subType" nillable="true" type="xsd:string"/>
+       <element name="type" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="RepresentationFile">
+    <sequence>
+     <element name="accessURL" nillable="true" type="xsd:string"/>
+     <element name="id" nillable="true" type="xsd:string"/>
+     <element name="mimetype" nillable="true" type="xsd:string"/>
+     <element name="originalName" nillable="true" type="xsd:string"/>
+     <element name="size" type="xsd:long"/>
+    </sequence>
+   </complexType>
+   <complexType name="RepresentationObject">
+    <complexContent>
+     <extension base="tns1:SimpleRepresentationObject">
+      <sequence>
+       <element name="partFiles" nillable="true" type="impl:ArrayOf_tns1_RepresentationFile"/>
+       <element name="rootFile" nillable="true" type="tns1:RepresentationFile"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType abstract="true" name="PreservationObject">
+    <complexContent>
+     <extension base="tns1:RODAObject">
+      <sequence>
+       <element name="ID" nillable="true" type="xsd:string"/>
+       <element name="type" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="SimpleRepresentationPreservationObject">
+    <complexContent>
+     <extension base="tns1:PreservationObject">
+      <sequence>
+       <element name="representationObjectPID" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="RepresentationPreservationObject">
+    <complexContent>
+     <extension base="tns1:SimpleRepresentationPreservationObject">
+      <sequence>
+       <element name="derivationEventID" nillable="true" type="xsd:string"/>
+       <element name="derivedFromRepresentationObjectID" nillable="true" type="xsd:string"/>
+       <element name="partFiles" nillable="true" type="impl:ArrayOf_tns4_RepresentationFilePreservationObject"/>
+       <element name="preservationEventIDs" nillable="true" type="impl:ArrayOf_xsd_string"/>
+       <element name="preservationLevel" nillable="true" type="xsd:string"/>
+       <element name="representationContentModel" nillable="true" type="xsd:string"/>
+       <element name="rootFile" nillable="true" type="tns4:RepresentationFilePreservationObject"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="SimpleEventPreservationObject">
+    <complexContent>
+     <extension base="tns1:PreservationObject">
+      <sequence>
+       <element name="agentPID" nillable="true" type="xsd:string"/>
+       <element name="targetPID" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="EventPreservationObject">
+    <complexContent>
+     <extension base="tns1:SimpleEventPreservationObject">
+      <sequence>
+       <element name="agentID" nillable="true" type="xsd:string"/>
+       <element name="agentRole" nillable="true" type="xsd:string"/>
+       <element name="datetime" nillable="true" type="xsd:dateTime"/>
+       <element name="eventDetail" nillable="true" type="xsd:string"/>
+       <element name="eventType" nillable="true" type="xsd:string"/>
+       <element name="objectIDs" nillable="true" type="impl:ArrayOf_xsd_string"/>
+       <element name="outcome" nillable="true" type="xsd:string"/>
+       <element name="outcomeDetailExtension" nillable="true" type="xsd:string"/>
+       <element name="outcomeDetailNote" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="AgentPreservationObject">
+    <complexContent>
+     <extension base="tns1:PreservationObject">
+      <sequence>
+       <element name="agentName" nillable="true" type="xsd:string"/>
+       <element name="agentType" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+  </schema>
+  <schema elementFormDefault="qualified" targetNamespace="http://eadc.data.core.roda.dgarq.gov.pt" xmlns="http://www.w3.org/2001/XMLSchema">
+   <import namespace="http://data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://common.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://preservation.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://services.core.roda.dgarq.gov.pt"/>
+   <complexType name="DescriptionLevel">
+    <sequence>
+     <element name="level" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="ArrangementTableRow">
+    <sequence>
+     <element name="entries" nillable="true" type="impl:ArrayOf_xsd_string"/>
+    </sequence>
+   </complexType>
+   <complexType name="ArrangementTableBody">
+    <sequence>
+     <element name="rows" nillable="true" type="impl:ArrayOf_tns2_ArrangementTableRow"/>
+    </sequence>
+   </complexType>
+   <complexType name="ArrangementTableHead">
+    <complexContent>
+     <extension base="tns2:ArrangementTableBody">
+      <sequence/>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="ArrangementTableGroup">
+    <sequence>
+     <element name="body" nillable="true" type="tns2:ArrangementTableBody"/>
+     <element name="columns" type="xsd:int"/>
+     <element name="head" nillable="true" type="tns2:ArrangementTableHead"/>
+    </sequence>
+   </complexType>
+   <complexType name="ArrangementTable">
+    <sequence>
+     <element name="arrangementTableGroups" nillable="true" type="impl:ArrayOf_tns2_ArrangementTableGroup"/>
+    </sequence>
+   </complexType>
+   <complexType name="BioghistChronitem">
+    <sequence>
+     <element name="dateFinal" nillable="true" type="xsd:string"/>
+     <element name="dateInitial" nillable="true" type="xsd:string"/>
+     <element name="event" nillable="true" type="xsd:string"/>
+     <element name="text" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="BioghistChronlist">
+    <sequence>
+     <element name="bioghistChronitems" nillable="true" type="impl:ArrayOf_tns2_BioghistChronitem"/>
+    </sequence>
+   </complexType>
+   <complexType name="LangmaterialLanguages">
+    <sequence>
+     <element name="langmaterialLanguages" nillable="true" type="impl:ArrayOf_xsd_string"/>
+    </sequence>
+   </complexType>
+   <complexType name="PhysdescElement">
+    <sequence>
+     <element name="unit" nillable="true" type="xsd:string"/>
+     <element name="value" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+  </schema>
+  <schema elementFormDefault="qualified" targetNamespace="http://common.core.roda.dgarq.gov.pt" xmlns="http://www.w3.org/2001/XMLSchema">
+   <import namespace="http://data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://eadc.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://preservation.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://services.core.roda.dgarq.gov.pt"/>
+   <complexType abstract="true" name="RODAException">
+    <sequence>
+     <element name="message" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="NoSuchRODAObjectException">
+    <complexContent>
+     <extension base="tns3:RODAException">
+      <sequence/>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="InvalidDescriptionObjectException">
+    <complexContent>
+     <extension base="tns3:RODAException">
+      <sequence/>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="RODAServiceException">
+    <complexContent>
+     <extension base="tns3:RODAException">
+      <sequence/>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="EditorException">
+    <complexContent>
+     <extension base="tns3:RODAServiceException">
+      <sequence/>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="IngestException">
+    <complexContent>
+     <extension base="tns3:EditorException">
+      <sequence/>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="RepresentationAlreadyPreservedException">
+    <complexContent>
+     <extension base="tns3:RODAServiceException">
+      <sequence/>
+     </extension>
+    </complexContent>
+   </complexType>
+  </schema>
+  <schema elementFormDefault="qualified" targetNamespace="http://preservation.data.core.roda.dgarq.gov.pt" xmlns="http://www.w3.org/2001/XMLSchema">
+   <import namespace="http://data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://eadc.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://common.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://services.core.roda.dgarq.gov.pt"/>
+   <complexType name="Fixity">
+    <sequence>
+     <element name="messageDigest" nillable="true" type="xsd:string"/>
+     <element name="messageDigestAlgorithm" nillable="true" type="xsd:string"/>
+     <element name="messageDigestOriginator" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="RepresentationFilePreservationObject">
+    <sequence>
+     <element name="ID" nillable="true" type="xsd:string"/>
+     <element name="compositionLevel" type="xsd:int"/>
+     <element name="contentLocationType" nillable="true" type="xsd:string"/>
+     <element name="contentLocationValue" nillable="true" type="xsd:string"/>
+     <element name="creatingApplicationName" nillable="true" type="xsd:string"/>
+     <element name="creatingApplicationVersion" nillable="true" type="xsd:string"/>
+     <element name="dateCreatedByApplication" nillable="true" type="xsd:string"/>
+     <element name="fixities" nillable="true" type="impl:ArrayOf_tns4_Fixity"/>
+     <element name="formatDesignationName" nillable="true" type="xsd:string"/>
+     <element name="formatDesignationVersion" nillable="true" type="xsd:string"/>
+     <element name="formatRegistryKey" nillable="true" type="xsd:string"/>
+     <element name="formatRegistryName" nillable="true" type="xsd:string"/>
+     <element name="formatRegistryRole" nillable="true" type="xsd:string"/>
+     <element name="objectCharacteristicsExtension" nillable="true" type="xsd:string"/>
+     <element name="originalName" nillable="true" type="xsd:string"/>
+     <element name="preservationLevel" nillable="true" type="xsd:string"/>
+     <element name="size" type="xsd:long"/>
+    </sequence>
+   </complexType>
+  </schema>
+  <schema elementFormDefault="qualified" targetNamespace="http://filter.adapter.data.core.roda.dgarq.gov.pt" xmlns="http://www.w3.org/2001/XMLSchema">
+   <import namespace="http://data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://eadc.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://common.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://preservation.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://services.core.roda.dgarq.gov.pt"/>
+   <complexType abstract="true" name="FilterParameter">
+    <sequence>
+     <element name="name" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="SimpleFilterParameter">
+    <complexContent>
+     <extension base="tns5:FilterParameter">
+      <sequence>
+       <element name="value" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="OneOfManyFilterParameter">
+    <complexContent>
+     <extension base="tns5:FilterParameter">
+      <sequence>
+       <element name="values" nillable="true" type="impl:ArrayOf_xsd_string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="RangeFilterParameter">
+    <complexContent>
+     <extension base="tns5:FilterParameter">
+      <sequence>
+       <element name="fromValue" nillable="true" type="xsd:string"/>
+       <element name="toValue" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="RegexFilterParameter">
+    <complexContent>
+     <extension base="tns5:FilterParameter">
+      <sequence>
+       <element name="regex" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="ProducerFilterParameter">
+    <complexContent>
+     <extension base="tns5:FilterParameter">
+      <sequence>
+       <element name="groups" nillable="true" type="impl:ArrayOf_xsd_string"/>
+       <element name="username" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="LikeFilterParameter">
+    <complexContent>
+     <extension base="tns5:FilterParameter">
+      <sequence>
+       <element name="expression" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+  </schema>
+ </wsdl:types>
+
+   <wsdl:message name="setDONormalizedRepresentationRequest">
+
+      <wsdl:part element="impl:setDONormalizedRepresentation" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="RepresentationAlreadyPreservedException">
+
+      <wsdl:part element="impl:fault3" name="fault"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="createDerivationRelationshipResponse">
+
+      <wsdl:part element="impl:createDerivationRelationshipResponse" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="registerDerivationEventResponse">
+
+      <wsdl:part element="impl:registerDerivationEventResponse" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="InvalidDescriptionObjectException">
+
+      <wsdl:part element="impl:fault1" name="fault"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="NoSuchRODAObjectException">
+
+      <wsdl:part element="impl:fault" name="fault"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="createDescriptionObjectRequest">
+
+      <wsdl:part element="impl:createDescriptionObject" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="registerIngestEventResponse">
+
+      <wsdl:part element="impl:registerIngestEventResponse" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="removeDescriptionObjectRequest">
+
+      <wsdl:part element="impl:removeDescriptionObject" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="createDescriptionObjectResponse">
+
+      <wsdl:part element="impl:createDescriptionObjectResponse" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="createRepresentationObjectRequest">
+
+      <wsdl:part element="impl:createRepresentationObject" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="removeObjectsResponse">
+
+      <wsdl:part element="impl:removeObjectsResponse" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="registerEventResponse">
+
+      <wsdl:part element="impl:registerEventResponse" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="removeDescriptionObjectResponse">
+
+      <wsdl:part element="impl:removeDescriptionObjectResponse" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="createDetachedDescriptionObjectResponse">
+
+      <wsdl:part element="impl:createDetachedDescriptionObjectResponse" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="createRepresentationPreservationObjectRequest">
+
+      <wsdl:part element="impl:createRepresentationPreservationObject" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="IngestException">
+
+      <wsdl:part element="impl:fault2" name="fault"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="createRepresentationPreservationObjectResponse">
+
+      <wsdl:part element="impl:createRepresentationPreservationObjectResponse" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="setDONormalizedRepresentationResponse">
+
+      <wsdl:part element="impl:setDONormalizedRepresentationResponse" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="removeObjectsRequest">
+
+      <wsdl:part element="impl:removeObjects" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="registerIngestEventRequest">
+
+      <wsdl:part element="impl:registerIngestEvent" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="registerEventRequest">
+
+      <wsdl:part element="impl:registerEvent" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="createRepresentationObjectResponse">
+
+      <wsdl:part element="impl:createRepresentationObjectResponse" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="createDetachedDescriptionObjectRequest">
+
+      <wsdl:part element="impl:createDetachedDescriptionObject" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="registerDerivationEventRequest">
+
+      <wsdl:part element="impl:registerDerivationEvent" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="createDerivationRelationshipRequest">
+
+      <wsdl:part element="impl:createDerivationRelationship" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:portType name="Ingest">
+
+      <wsdl:operation name="createDescriptionObject">
+
+         <wsdl:input message="impl:createDescriptionObjectRequest" name="createDescriptionObjectRequest"/>
+
+         <wsdl:output message="impl:createDescriptionObjectResponse" name="createDescriptionObjectResponse"/>
+
+         <wsdl:fault message="impl:InvalidDescriptionObjectException" name="InvalidDescriptionObjectException"/>
+
+         <wsdl:fault message="impl:NoSuchRODAObjectException" name="NoSuchRODAObjectException"/>
+
+         <wsdl:fault message="impl:IngestException" name="IngestException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="removeDescriptionObject">
+
+         <wsdl:input message="impl:removeDescriptionObjectRequest" name="removeDescriptionObjectRequest"/>
+
+         <wsdl:output message="impl:removeDescriptionObjectResponse" name="removeDescriptionObjectResponse"/>
+
+         <wsdl:fault message="impl:NoSuchRODAObjectException" name="NoSuchRODAObjectException"/>
+
+         <wsdl:fault message="impl:IngestException" name="IngestException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="removeObjects">
+
+         <wsdl:input message="impl:removeObjectsRequest" name="removeObjectsRequest"/>
+
+         <wsdl:output message="impl:removeObjectsResponse" name="removeObjectsResponse"/>
+
+         <wsdl:fault message="impl:IngestException" name="IngestException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="createDetachedDescriptionObject">
+
+         <wsdl:input message="impl:createDetachedDescriptionObjectRequest" name="createDetachedDescriptionObjectRequest"/>
+
+         <wsdl:output message="impl:createDetachedDescriptionObjectResponse" name="createDetachedDescriptionObjectResponse"/>
+
+         <wsdl:fault message="impl:InvalidDescriptionObjectException" name="InvalidDescriptionObjectException"/>
+
+         <wsdl:fault message="impl:NoSuchRODAObjectException" name="NoSuchRODAObjectException"/>
+
+         <wsdl:fault message="impl:IngestException" name="IngestException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="createRepresentationObject">
+
+         <wsdl:input message="impl:createRepresentationObjectRequest" name="createRepresentationObjectRequest"/>
+
+         <wsdl:output message="impl:createRepresentationObjectResponse" name="createRepresentationObjectResponse"/>
+
+         <wsdl:fault message="impl:NoSuchRODAObjectException" name="NoSuchRODAObjectException"/>
+
+         <wsdl:fault message="impl:IngestException" name="IngestException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="createRepresentationPreservationObject">
+
+         <wsdl:input message="impl:createRepresentationPreservationObjectRequest" name="createRepresentationPreservationObjectRequest"/>
+
+         <wsdl:output message="impl:createRepresentationPreservationObjectResponse" name="createRepresentationPreservationObjectResponse"/>
+
+         <wsdl:fault message="impl:NoSuchRODAObjectException" name="NoSuchRODAObjectException"/>
+
+         <wsdl:fault message="impl:IngestException" name="IngestException"/>
+
+         <wsdl:fault message="impl:RepresentationAlreadyPreservedException" name="RepresentationAlreadyPreservedException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="setDONormalizedRepresentation">
+
+         <wsdl:input message="impl:setDONormalizedRepresentationRequest" name="setDONormalizedRepresentationRequest"/>
+
+         <wsdl:output message="impl:setDONormalizedRepresentationResponse" name="setDONormalizedRepresentationResponse"/>
+
+         <wsdl:fault message="impl:NoSuchRODAObjectException" name="NoSuchRODAObjectException"/>
+
+         <wsdl:fault message="impl:IngestException" name="IngestException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="createDerivationRelationship">
+
+         <wsdl:input message="impl:createDerivationRelationshipRequest" name="createDerivationRelationshipRequest"/>
+
+         <wsdl:output message="impl:createDerivationRelationshipResponse" name="createDerivationRelationshipResponse"/>
+
+         <wsdl:fault message="impl:IngestException" name="IngestException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="registerIngestEvent">
+
+         <wsdl:input message="impl:registerIngestEventRequest" name="registerIngestEventRequest"/>
+
+         <wsdl:output message="impl:registerIngestEventResponse" name="registerIngestEventResponse"/>
+
+         <wsdl:fault message="impl:IngestException" name="IngestException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="registerEvent">
+
+         <wsdl:input message="impl:registerEventRequest" name="registerEventRequest"/>
+
+         <wsdl:output message="impl:registerEventResponse" name="registerEventResponse"/>
+
+         <wsdl:fault message="impl:IngestException" name="IngestException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="registerDerivationEvent">
+
+         <wsdl:input message="impl:registerDerivationEventRequest" name="registerDerivationEventRequest"/>
+
+         <wsdl:output message="impl:registerDerivationEventResponse" name="registerDerivationEventResponse"/>
+
+         <wsdl:fault message="impl:NoSuchRODAObjectException" name="NoSuchRODAObjectException"/>
+
+         <wsdl:fault message="impl:IngestException" name="IngestException"/>
+
+      </wsdl:operation>
+
+   </wsdl:portType>
+
+   <wsdl:binding name="IngestSoapBinding" type="impl:Ingest">
+
+      <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+      <wsdl:operation name="createDescriptionObject">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="createDescriptionObjectRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="createDescriptionObjectResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="InvalidDescriptionObjectException">
+
+            <wsdlsoap:fault name="InvalidDescriptionObjectException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="NoSuchRODAObjectException">
+
+            <wsdlsoap:fault name="NoSuchRODAObjectException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="IngestException">
+
+            <wsdlsoap:fault name="IngestException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="removeDescriptionObject">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="removeDescriptionObjectRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="removeDescriptionObjectResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="NoSuchRODAObjectException">
+
+            <wsdlsoap:fault name="NoSuchRODAObjectException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="IngestException">
+
+            <wsdlsoap:fault name="IngestException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="removeObjects">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="removeObjectsRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="removeObjectsResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="IngestException">
+
+            <wsdlsoap:fault name="IngestException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="createDetachedDescriptionObject">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="createDetachedDescriptionObjectRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="createDetachedDescriptionObjectResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="InvalidDescriptionObjectException">
+
+            <wsdlsoap:fault name="InvalidDescriptionObjectException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="NoSuchRODAObjectException">
+
+            <wsdlsoap:fault name="NoSuchRODAObjectException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="IngestException">
+
+            <wsdlsoap:fault name="IngestException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="createRepresentationObject">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="createRepresentationObjectRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="createRepresentationObjectResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="NoSuchRODAObjectException">
+
+            <wsdlsoap:fault name="NoSuchRODAObjectException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="IngestException">
+
+            <wsdlsoap:fault name="IngestException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="createRepresentationPreservationObject">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="createRepresentationPreservationObjectRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="createRepresentationPreservationObjectResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="NoSuchRODAObjectException">
+
+            <wsdlsoap:fault name="NoSuchRODAObjectException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="IngestException">
+
+            <wsdlsoap:fault name="IngestException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="RepresentationAlreadyPreservedException">
+
+            <wsdlsoap:fault name="RepresentationAlreadyPreservedException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="setDONormalizedRepresentation">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="setDONormalizedRepresentationRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="setDONormalizedRepresentationResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="NoSuchRODAObjectException">
+
+            <wsdlsoap:fault name="NoSuchRODAObjectException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="IngestException">
+
+            <wsdlsoap:fault name="IngestException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="createDerivationRelationship">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="createDerivationRelationshipRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="createDerivationRelationshipResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="IngestException">
+
+            <wsdlsoap:fault name="IngestException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="registerIngestEvent">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="registerIngestEventRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="registerIngestEventResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="IngestException">
+
+            <wsdlsoap:fault name="IngestException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="registerEvent">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="registerEventRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="registerEventResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="IngestException">
+
+            <wsdlsoap:fault name="IngestException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="registerDerivationEvent">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="registerDerivationEventRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="registerDerivationEventResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="NoSuchRODAObjectException">
+
+            <wsdlsoap:fault name="NoSuchRODAObjectException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="IngestException">
+
+            <wsdlsoap:fault name="IngestException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+   </wsdl:binding>
+
+   <wsdl:service name="IngestService">
+
+      <wsdl:port binding="impl:IngestSoapBinding" name="Ingest">
+
+         <wsdlsoap:address location="http://localhost:8080/roda-core/services/Ingest"/>
+
+      </wsdl:port>
+
+   </wsdl:service>
+
+</wsdl:definitions>

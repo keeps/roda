@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="setup-roda" basedir=".">
+
+	<property environment="env" />
+
+	<!-- ./set-roda-env.sh -->
+	<target name="set-roda-env.sh">
+		<echo message="env.RODA_HOME=${env.RODA_HOME}"/>
+		<replace file="set-roda-env.sh" token="RODAHOME" value="${env.RODA_HOME}" />
+	</target>
+
+</project>

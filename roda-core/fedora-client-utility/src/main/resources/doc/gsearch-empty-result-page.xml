@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resultPage xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="gsearch-result-page.xsd"
+    xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:foxml="info:fedora/fedora-system:def/foxml#"
+    xmlns:zs="http://www.loc.gov/zing/srw/" indexName="RODAOnLucene"
+    dateTime="Thu Nov 29 12:31:16 WET 2007">
+    <gfindObjects hitTotal="0" resultPageXslt="gfindObjectsToResultPage" hitPageSize="10"
+        hitPageStart="1" query="xxx">
+        <objects/>
+    </gfindObjects>
+</resultPage>

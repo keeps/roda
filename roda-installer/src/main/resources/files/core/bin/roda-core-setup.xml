@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="setup-roda-core" basedir=".">
+
+	<property environment="env" />
+
+	<target name="roda-ldapadd">
+		<replace file="../bin/roda-ldapadd" token="LDAPHOST" value="${env.LDAPHOST}" />
+		<replace file="../bin/roda-ldapadd" token="LDAPPORT" value="${env.LDAPPORT}" />
+		<replace file="../bin/roda-ldapadd" token="LDAP_ADMIN_DN" value="${env.LDAP_ADMIN_DN}" />
+		<replace file="../bin/roda-ldapadd" token="LDAP_ADMIN_PASSWD" value="${env.LDAP_ADMIN_PASSWD}" />
+	</target>
+
+	<target name="roda-ldapmodify">
+		<replace file="../bin/roda-ldapmodify" token="LDAPHOST" value="${env.LDAPHOST}" />
+		<replace file="../bin/roda-ldapmodify" token="LDAPPORT" value="${env.LDAPPORT}" />
+		<replace file="../bin/roda-ldapmodify" token="LDAP_ADMIN_DN" value="${env.LDAP_ADMIN_DN}" />
+		<replace file="../bin/roda-ldapmodify" token="LDAP_ADMIN_PASSWD" value="${env.LDAP_ADMIN_PASSWD}" />
+	</target>
+
+	<target name="roda-core-create-fedora-mysql-db.sh">
+		<replace file="../bin/roda-core-create-fedora-mysql-db.sh" token="RODADATA_MYSQL_HOST" value="${env.RODADATA_MYSQL_HOST}" />
+		<replace file="../bin/roda-core-create-fedora-mysql-db.sh" token="RODADATA_MYSQL_PORT" value="${env.RODADATA_MYSQL_PORT}" />
+	</target>
+	
+	<target name="roda-core-create-roda-mysql-db.sh">
+		<replace file="../bin/roda-core-create-roda-mysql-db.sh" token="RODADATA_MYSQL_HOST" value="${env.RODADATA_MYSQL_HOST}" />
+		<replace file="../bin/roda-core-create-roda-mysql-db.sh" token="RODADATA_MYSQL_PORT" value="${env.RODADATA_MYSQL_PORT}" />
+	</target>
+
+	<target name="roda-data-create-gsearch-index.sh">
+		<replace file="../bin/roda-data-create-gsearch-index.sh" token="RODADATA_HOST" value="${env.RODADATA_HOST}" />
+		<replace file="../bin/roda-data-create-gsearch-index.sh" token="RODADATA_PORT" value="${env.RODADATA_PORT}" />
+	</target>
+	
+	<target name="roda-data-update-gsearch-index.sh">
+		<replace file="../bin/roda-data-update-gsearch-index.sh" token="RODADATA_HOST" value="${env.RODADATA_HOST}" />
+		<replace file="../bin/roda-data-update-gsearch-index.sh" token="RODADATA_PORT" value="${env.RODADATA_PORT}" />
+	</target>
+
+	<target name="ldap-filter.properties">
+		<replace file="../config/ldap-filter.properties" token="LDAPHOST" value="${env.LDAPHOST}" />
+		<replace file="../config/ldap-filter.properties" token="LDAPPORT" value="${env.LDAPPORT}" />
+		<replace file="../config/ldap-filter.properties" token="LDAP_USERS_DN" value="${env.LDAP_USERS_DN}" />
+		<replace file="../config/ldap-filter.properties" token="LDAP_GROUPS_DN" value="${env.LDAP_GROUPS_DN}" />
+		<replace file="../config/ldap-filter.properties" token="LDAP_ROLES_DN" value="${env.LDAP_ROLES_DN}" />
+	</target>
+
+	<target name="create-parent-users-groups-roles.ldif">
+		<replace file="../config/ldap/create-parent-users-groups-roles.ldif" token="LDAP_USERS_DN" value="${env.LDAP_USERS_DN}" />
+		<replace file="../config/ldap/create-parent-users-groups-roles.ldif" token="LDAP_GROUPS_DN" value="${env.LDAP_GROUPS_DN}" />
+		<replace file="../config/ldap/create-parent-users-groups-roles.ldif" token="LDAP_ROLES_DN" value="${env.LDAP_ROLES_DN}" />
+	</target>
+
+	<target name="create-default-values.ldif">
+		<replace file="../config/ldap/create-default-values.ldif" token="LDAP_USERS_DN" value="${env.LDAP_USERS_DN}" />
+		<replace file="../config/ldap/create-default-values.ldif" token="LDAP_GROUPS_DN" value="${env.LDAP_GROUPS_DN}" />
+		<replace file="../config/ldap/create-default-values.ldif" token="LDAP_ROLES_DN" value="${env.LDAP_ROLES_DN}" />
+		<replace file="../config/ldap/create-default-values.ldif" token="RODA_ADMIN_PASSWD" value="${env.RODA_ADMIN_PASSWD}" />
+		<replace file="../config/ldap/create-default-values.ldif" token="RODA_WUI_PASSWD" value="${env.RODA_WUI_PASSWD}" />
+		<replace file="../config/ldap/create-default-values.ldif" token="RODA_INGEST_TASK_PASSWD" value="${env.RODA_INGEST_TASK_PASSWD}" />
+		<replace file="../config/ldap/create-default-values.ldif" token="RODA_PRESERVATION_TASK_PASSWD" value="${env.RODA_PRESERVATION_TASK_PASSWD}" />
+		<replace file="../config/ldap/create-default-values.ldif" token="RODA_HANDLE_PASSWD" value="${env.RODA_HANDLE_PASSWD}" />
+		<replace file="../config/ldap/create-default-values.ldif" token="RODA_GUEST_PASSWD" value="${env.RODA_GUEST_PASSWD}" />
+	</target>
+
+	<target name="delete-default-values.ldif">
+		<replace file="../config/ldap/delete-default-values.ldif" token="LDAP_USERS_DN" value="${env.LDAP_USERS_DN}" />
+		<replace file="../config/ldap/delete-default-values.ldif" token="LDAP_GROUPS_DN" value="${env.LDAP_GROUPS_DN}" />
+		<replace file="../config/ldap/delete-default-values.ldif" token="LDAP_ROLES_DN" value="${env.LDAP_ROLES_DN}" />
+		<replace file="../config/ldap/delete-default-values.ldif" token="RODA_ADMIN_PASSWD" value="${env.RODA_ADMIN_PASSWD}" />
+		<replace file="../config/ldap/delete-default-values.ldif" token="RODA_WUI_PASSWD" value="${env.RODA_WUI_PASSWD}" />
+		<replace file="../config/ldap/delete-default-values.ldif" token="RODA_INGEST_TASK_PASSWD" value="${env.RODA_INGEST_TASK_PASSWD}" />
+		<replace file="../config/ldap/delete-default-values.ldif" token="RODA_PRESERVATION_TASK_PASSWD" value="${env.RODA_PRESERVATION_TASK_PASSWD}" />
+		<replace file="../config/ldap/delete-default-values.ldif" token="RODA_HANDLE_PASSWD" value="${env.RODA_HANDLE_PASSWD}" />
+		<replace file="../config/ldap/delete-default-values.ldif" token="RODA_GUEST_PASSWD" value="${env.RODA_GUEST_PASSWD}" />
+	</target>
+	
+	<target name="create-demo-users.ldif">
+		<replace file="../config/ldap/create-demo-users.ldif" token="LDAP_USERS_DN" value="${env.LDAP_USERS_DN}" />
+		<replace file="../config/ldap/create-demo-users.ldif" token="LDAP_GROUPS_DN" value="${env.LDAP_GROUPS_DN}" />
+		<replace file="../config/ldap/create-demo-users.ldif" token="LDAP_ROLES_DN" value="${env.LDAP_ROLES_DN}" />
+	</target>
+
+	<target name="delete-demo-users.ldif">
+		<replace file="../config/ldap/delete-demo-users.ldif" token="LDAP_USERS_DN" value="${env.LDAP_USERS_DN}" />
+		<replace file="../config/ldap/delete-demo-users.ldif" token="LDAP_GROUPS_DN" value="${env.LDAP_GROUPS_DN}" />
+		<replace file="../config/ldap/delete-demo-users.ldif" token="LDAP_ROLES_DN" value="${env.LDAP_ROLES_DN}" />
+	</target>
+
+	<target name="create-fedora-db.sql">
+		<replace file="../config/sql/create-fedora-db.sql" token="FEDORA_DB" value="${env.FEDORA_DB}" />
+		<replace file="../config/sql/create-fedora-db.sql" token="FEDORA_ADMIN_PASSWD" value="${env.FEDORA_ADMIN_PASSWD}" />
+	</target>
+
+	<target name="create-roda-db.sql">
+		<replace file="../config/sql/create-roda-db.sql" token="RODADATA_MYSQL_RODACORE_PASSWD" value="${env.RODADATA_MYSQL_RODACORE_PASSWD}" />
+	</target>
+
+	<target name="fedora.fcfg">
+		<replace file="../config/fedora/fedora.fcfg" token="FEDORA_ADMIN_PASSWD" value="${env.FEDORA_ADMIN_PASSWD}" />
+		<replace file="../config/fedora/fedora.fcfg" token="RODADATA_MYSQL_HOST" value="${env.RODADATA_MYSQL_HOST}" />
+		<replace file="../config/fedora/fedora.fcfg" token="RODADATA_MYSQL_PORT" value="${env.RODADATA_MYSQL_PORT}" />
+		<replace file="../config/fedora/fedora.fcfg" token="FEDORA_DB" value="${env.FEDORA_DB}" />
+	</target>
+
+	<target name="fedora-2.2.4-install.properties">
+      <replace file="../fedora/fedora-2.2.4-install.properties" token="RODA_HOME" value="${env.RODA_HOME}" />
+   </target>
+
+	<target name="fedora-users.xml">
+		<replace file="../config/fedora/fedora-users.xml" token="FEDORA_ADMIN_PASSWD" value="${env.FEDORA_ADMIN_PASSWD}" />
+	</target>
+
+	<target name="fedora-web.xml">
+		<replace file="../fedora/fedora-2.2.4/install/fedorawar/WEB-INF/web.xml" token="RODA_HOME" value="${env.RODA_HOME}" />
+		<replace file="../fedora/fedora-2.2.4/install/fedorawar/WEB-INF/web.xml" token="LDAPHOST" value="${env.LDAPHOST}" />
+		<replace file="../fedora/fedora-2.2.4/install/fedorawar/WEB-INF/web.xml" token="LDAPPORT" value="${env.LDAPPORT}" />
+		<replace file="../fedora/fedora-2.2.4/install/fedorawar/WEB-INF/web.xml" token="LDAP_USERS_DN" value="${env.LDAP_USERS_DN}" />
+		<replace file="../fedora/fedora-2.2.4/install/fedorawar/WEB-INF/web.xml" token="LDAP_GROUPS_DN" value="${env.LDAP_GROUPS_DN}" />
+		<replace file="../fedora/fedora-2.2.4/install/fedorawar/WEB-INF/web.xml" token="LDAP_ROLES_DN" value="${env.LDAP_ROLES_DN}" />
+	</target>
+
+	<target name="roda-core.properties">
+		<replace file="../config/roda-core.properties" token="RODADATA_HOST" value="${env.RODADATA_HOST}" />
+		<replace file="../config/roda-core.properties" token="RODADATA_PORT" value="${env.RODADATA_PORT}" />
+		<replace file="../config/roda-core.properties" token="RODA_GUEST_PASSWD" value="${env.RODA_GUEST_PASSWD}" />
+		<replace file="../config/roda-core.properties" token="RODA_ADMIN_PASSWD" value="${env.RODA_ADMIN_PASSWD}" />
+		<replace file="../config/roda-core.properties" token="FEDORA_ADMIN_PASSWD" value="${env.FEDORA_ADMIN_PASSWD}" />
+		<replace file="../config/roda-core.properties" token="LDAPHOST" value="${env.LDAPHOST}" />
+		<replace file="../config/roda-core.properties" token="LDAPPORT" value="${env.LDAPPORT}" />
+		<replace file="../config/roda-core.properties" token="LDAP_ADMIN_DN" value="${env.LDAP_ADMIN_DN}" />
+		<replace file="../config/roda-core.properties" token="LDAP_ADMIN_PASSWD" value="${env.LDAP_ADMIN_PASSWD}" />
+		<replace file="../config/roda-core.properties" token="LDAP_USERS_DN" value="${env.LDAP_USERS_DN}" />
+		<replace file="../config/roda-core.properties" token="LDAP_GROUPS_DN" value="${env.LDAP_GROUPS_DN}" />
+		<replace file="../config/roda-core.properties" token="LDAP_ROLES_DN" value="${env.LDAP_ROLES_DN}" />
+	</target>
+
+	<target name="core-plugins">
+		<replace dir="../config/plugins" token="RODAMIGRATORLINUX_HOST" value="${env.RODAMIGRATORLINUX_HOST}">
+			<include name="**/*.properties"/>
+		</replace>
+		<replace dir="../config/plugins" token="RODAMIGRATORLINUX_PORT" value="${env.RODAMIGRATORLINUX_PORT}">
+			<include name="**/*.properties"/>
+		</replace>
+	</target>
+
+	<target name="plugins.properties">
+		<replace file="../config/plugins.properties" token="RODA_HOME" value="${env.RODA_HOME}" />
+	</target>
+
+	<target name="logger.properties">
+		<replace file="../config/logger.properties" token="RODADATA_MYSQL_HOST" value="${env.RODADATA_MYSQL_HOST}" />
+		<replace file="../config/logger.properties" token="RODADATA_MYSQL_PORT" value="${env.RODADATA_MYSQL_PORT}" />
+		<replace file="../config/logger.properties" token="RODADATA_MYSQL_RODACORE_PASSWD" value="${env.RODADATA_MYSQL_RODACORE_PASSWD}" />
+	</target>
+
+	<target name="ingest.properties">
+		<replace file="../config/ingest.properties" token="RODA_HOME" value="${env.RODA_HOME}" />
+		<replace file="../config/ingest.properties" token="RODADATA_MYSQL_HOST" value="${env.RODADATA_MYSQL_HOST}" />
+		<replace file="../config/ingest.properties" token="RODADATA_MYSQL_PORT" value="${env.RODADATA_MYSQL_PORT}" />
+		<replace file="../config/ingest.properties" token="RODADATA_MYSQL_RODACORE_PASSWD" value="${env.RODADATA_MYSQL_RODACORE_PASSWD}" />
+	</target>
+
+	<target name="reports.properties">
+		<replace file="../config/reports.properties" token="RODADATA_MYSQL_HOST" value="${env.RODADATA_MYSQL_HOST}" />
+		<replace file="../config/reports.properties" token="RODADATA_MYSQL_PORT" value="${env.RODADATA_MYSQL_PORT}" />
+		<replace file="../config/reports.properties" token="RODADATA_MYSQL_RODACORE_PASSWD" value="${env.RODADATA_MYSQL_RODACORE_PASSWD}" />
+	</target>
+
+	<target name="statistics.properties">
+		<replace file="../config/statistics.properties" token="RODADATA_MYSQL_HOST" value="${env.RODADATA_MYSQL_HOST}" />
+		<replace file="../config/statistics.properties" token="RODADATA_MYSQL_PORT" value="${env.RODADATA_MYSQL_PORT}" />
+		<replace file="../config/statistics.properties" token="RODADATA_MYSQL_RODACORE_PASSWD" value="${env.RODADATA_MYSQL_RODACORE_PASSWD}" />
+	</target>
+
+	<target name="scheduler.properties">
+		<replace file="../config/scheduler.properties" token="RODADATA_MYSQL_HOST" value="${env.RODADATA_MYSQL_HOST}" />
+		<replace file="../config/scheduler.properties" token="RODADATA_MYSQL_PORT" value="${env.RODADATA_MYSQL_PORT}" />
+		<replace file="../config/scheduler.properties" token="RODADATA_MYSQL_RODACORE_PASSWD" value="${env.RODADATA_MYSQL_RODACORE_PASSWD}" />
+	</target>
+
+	<target name="quartz.properties">
+		<replace file="../config/quartz.properties" token="RODADATA_MYSQL_HOST" value="${env.RODADATA_MYSQL_HOST}" />
+		<replace file="../config/quartz.properties" token="RODADATA_MYSQL_PORT" value="${env.RODADATA_MYSQL_PORT}" />
+		<replace file="../config/quartz.properties" token="RODADATA_MYSQL_RODACORE_PASSWD" value="${env.RODADATA_MYSQL_RODACORE_PASSWD}" />
+	</target>
+
+	<target name="roda-vsftpd.conf">
+		<replace file="../config/roda-vsftpd.conf" token="RODA_HOME" value="${env.RODA_HOME}" />
+	</target>
+
+</project>
