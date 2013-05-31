@@ -14,5 +14,5 @@ roda (1.1.0) stable; urgency=low
     (https://github.com/keeps/roda/issues/4)
   * Revised footer logos (roda-wui)
 
- -- KEEP SOLUTIONS <hsilva@keep.pt>  Fri, 31 May 2013 13:00:00 +0000
+ -- KEEP SOLUTIONS <hsilva@keep.pt>  Fri, 31 May 2013 16:30:00 +1000
 
