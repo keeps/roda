@@ -130,6 +130,7 @@ ant -q -f $RODA_HOME/bin/roda-core-setup.xml fedora-users.xml > /dev/null
 
 echo
 echo "Copying config/ldap files from templates"
+mkdir -p $RODA_HOME/config/ldap/
 cp -f $RODA_HOME/config/templates/ldap/* $RODA_HOME/config/ldap/
 echo
 echo "Configuring config/ldap files"

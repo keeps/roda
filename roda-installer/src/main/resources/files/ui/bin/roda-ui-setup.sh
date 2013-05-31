@@ -110,7 +110,7 @@ ant -q -f $RODA_HOME/bin/roda-ui-setup.xml velocity.mail.properties > /dev/null
 echo
 echo "Linking WARs into JBoss deploy directory"
 mv $RODA_HOME/webapps/roda-wui.war $RODA_HOME/webapps/roda-wui.zip
-unzip $RODA_HOME/webapps/roda-wui.zip -d $RODA_HOME/webapps/roda-wui.war
+unzip -q $RODA_HOME/webapps/roda-wui.zip -d $RODA_HOME/webapps/roda-wui.war
 ln -s $RODA_HOME/webapps/roda-wui.war $RODA_HOME/jboss/jboss-4.2.3.GA/server/default/deploy/ROOT.war
 ln -s $RODA_HOME/webapps/roda-in-installer.war $RODA_HOME/jboss/jboss-4.2.3.GA/server/default/deploy/roda-in-installer.war
 

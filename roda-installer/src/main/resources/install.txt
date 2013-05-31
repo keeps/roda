@@ -45,21 +45,42 @@ The following software is needed:
 	3. Install dependencies
 ################################################################################
 
-For Debian or Debian based systems, here is how to install all 
-software other than RODA in a glimpse (replace w64codecs by w32codecs for the
-32bit machines):
+For Debian or Debian based systems, here is how to install all software other
+than RODA in a glimpse:
 
-   $> sudo -E wget --output-document=/etc/apt/sources.list.d/medibuntu.list 
-   http://www.medibuntu.org/sources.list.d/$(lsb_release -cs).list && 
-   sudo apt-get --quiet update && sudo apt-get --yes --quiet 
-   --allow-unauthenticated install medibuntu-keyring && sudo apt-get 
+   $> sudo -E wget --output-document=/etc/apt/sources.list.d/medibuntu.list \ 
+   http://www.medibuntu.org/sources.list.d/$(lsb_release -cs).list && \
+   sudo apt-get --quiet update && sudo apt-get --yes --quiet \
+   --allow-unauthenticated install medibuntu-keyring && sudo apt-get \
    --quiet update
 
-   $> sudo apt-get install mysql-server slapd ldap-utils debconf-utils clamav 
-   ant openjdk-6-jdk imagemagick ghostscript mencoder jodconverter 
-   soundconverter ffmpeg gstreamer0.10-plugins-bad gstreamer0.10-ffmpeg 
-   fonts-ipafont-mincho fonts-ipafont-gothic ttf-arphic-ukai ttf-arphic-uming
+	For 32bit machines:
+   $> sudo apt-get install mysql-server slapd ldap-utils debconf-utils clamav \
+   ant openjdk-6-jdk imagemagick ghostscript mencoder jodconverter \
+   soundconverter ffmpeg gstreamer0.10-plugins-bad gstreamer0.10-ffmpeg \
+   fonts-ipafont-mincho fonts-ipafont-gothic ttf-arphic-ukai ttf-arphic-uming \
+   w32codecs munin munin-node postfix
+
+	For 64bit machines:
+   $> sudo apt-get install mysql-server slapd ldap-utils debconf-utils clamav \
+   ant openjdk-6-jdk imagemagick ghostscript mencoder jodconverter \
+   soundconverter ffmpeg gstreamer0.10-plugins-bad gstreamer0.10-ffmpeg \
+   fonts-ipafont-mincho fonts-ipafont-gothic ttf-arphic-ukai ttf-arphic-uming \
    w64codecs munin munin-node postfix
+
+   For demo environments, make the following configurations when
+   promped (as it will make the installation process quicker):
+      1. MySql server root password as 'roda' (without the quotes)
+      2. OpenLDAP root password as 'roda' (without the quotes)
+		3. Postfix with the default values
+
+   Also for demo environments, reconfigure the OpenLDAP so it has the 
+   configuration expected by default by the RODA installer. Do:
+   	$> sudo dpkg-reconfigure slapd
+	and set the domain to 'keep.pt' (without the quotes), the domain name 
+   to 'KEEPS' (without the quotes), root password to 'roda' (without the quotes) 
+   and the rest of the configurations with the default values.
+
 
 For other Linux distribuitions, follow the appropriate documentation to install
 each of the dependencies.
@@ -75,17 +96,12 @@ executions (strings prefixed by '$>').
 
 If you want to test RODA and install it as quickly as possible, you just need
 to proceed as follows. In this installation process, RODA will be installed in 
-the user home directory, all services running locally and all default/demo 
-users will have the same password, i.e., 'roda' (without the quotes).
+the user home directory (in a folder called 'roda'), all services running 
+locally and all default/demo users will have the same password, i.e.,
+'roda' (without the quotes).
 
 1. Ensure that you have installed all the dependencies on the same machine
-(see section 3), taking in consideration the following assumptions:
-
-   1.1. The MySQL server root password must be set to 'roda' (without the
-        quotes).
-
-   1.2. The OpenLDAP domain must be set to 'keep.pt' and root password to 'roda'
-        (without the quotes).
+(see section 3).
 
 2. Run the RODA installer. Do:
    	$> [RODA_INSTALLER]/install.sh
@@ -104,23 +120,7 @@ executions (strings prefixed by '$>').
 
 1. Ensure that you have installed all the dependencies (see section 3).
 
-2. Configure OpenLDAP
-
-   If an instance of OpenLDAP is already available/configured on your system 
-   or institution, you may skip this step. Otherwise, proceed as follows:
-
-	2.1 Create a new LDAP directory, setting up the Root DN for your domain
-       (e.g., domain 'keep.pt' will create a directory with the Root DN
-       'dc=keep,dc=pt'). Please take note of this values, because you'll need
-       them in the next step of the installation.
-
-       Note: for Debian or Debian based systems, here is how to invoke the 
-	    configuration process of a new LDAP directory:
-       	$> sudo dpkg-reconfigure slapd
-
-   2.2 Assign an administrator password.
-
-3. Define installation properties 
+2. Define installation properties 
    
    Properties are defined in a file called "install.config", located in the 
    installation directory. Here, one can define properties like where to 
@@ -128,7 +128,7 @@ executions (strings prefixed by '$>').
    configurations, and other RODA related properties. To configure them, do:
    	$> vi [RODA_INSTALLER]/install.config
 
-4. Run the RODA installer. Do:
+3. Run the RODA installer. Do:
    	$> [RODA_INSTALLER]/install.sh
 
 
