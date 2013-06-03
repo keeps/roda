@@ -22,8 +22,8 @@ if [ "$DB_NUMBER" -eq "2" ]; then
    read anwser
    case $anwser in
       [yY])
-         echo "drop database roda; | mysql -u $RODADATA_MYSQL_RODACORE_USER -p$RODADATA_MYSQL_RODACORE_PASSWD"
-         echo "drop database $FEDORA_DB; | mysql -u $RODADATA_MYSQL_RODACORE_USER -p$RODADATA_MYSQL_RODACORE_PASSWD"
+         echo "drop database roda;" | mysql -u $RODADATA_MYSQL_RODACORE_USER -p$RODADATA_MYSQL_RODACORE_PASSWD
+         echo "drop database $FEDORA_DB;" | mysql -u $RODADATA_MYSQL_RODACORE_USER -p$RODADATA_MYSQL_RODACORE_PASSWD
       ;;
       *)
       ;;
