@@ -32,8 +32,9 @@ fi
 
 info "Installing RODA Common"
 # Copy common files to the installation dir
-#cp -r files/todelete $RODA_HOME #for debug purpose (to avoid deleting the files)
 cp -r files/common/* $RODA_HOME
+# Also copy install.config to be able to correctly uninstall RODA
+cp install.config $RODA_HOME/uninstall/
 . $RODA_HOME/bin/roda-setup.sh
 
 if [ "$LDAP_RECONFIGURE_SLAPD" = "yes" ]; then
@@ -98,6 +99,25 @@ if [ "$INSTALL_HANDLE" = "yes" ]; then
 	echo
 fi
 
-info "Done installing RODA!"
+END_MSG="***************************************************************************\n"
+END_MSG="$END_MSG*\n"
+END_MSG="$END_MSG* Now, you just need to start JBoss\n"
+END_MSG="$END_MSG*\n"
+END_MSG="$END_MSG*\t${RODA_HOME%/}/bin/jboss start\n"
+END_MSG="$END_MSG*\n"
+END_MSG="$END_MSG* and create Fedora Generic Search index by pointing out your browser to\n"
+END_MSG="$END_MSG*\n"
+END_MSG="$END_MSG*\thttp://$RODACORE_HOST:$RODACORE_PORT/fedoragsearch/rest?operation=updateIndex\n"
+END_MSG="$END_MSG*\n"
+END_MSG="$END_MSG* and clicking the button \"updateIndex createEmpty\"\n"
+END_MSG="$END_MSG*\n"
+END_MSG="$END_MSG*\n"
+END_MSG="$END_MSG* Finally, point your browser to RODA Web Interface (RODA-WUI)\n"
+END_MSG="$END_MSG*\n"
+END_MSG="$END_MSG*\thttp://$RODAWUI_PUBLIC_HOSTNAME:$RODAWUI_PUBLIC_PORT/\n"
+END_MSG="$END_MSG*\n"
+END_MSG="$END_MSG*\n***************************************************************************\n"
+
+info "Done installing RODA!\n\n$END_MSG"
 
 exit 0

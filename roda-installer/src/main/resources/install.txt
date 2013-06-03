@@ -76,10 +76,13 @@ than RODA in a glimpse:
 
    Also for demo environments, reconfigure the OpenLDAP so it has the 
    configuration expected by default by the RODA installer. Do:
+
    	$> sudo dpkg-reconfigure slapd
-	and set the domain to 'keep.pt' (without the quotes), the domain name 
-   to 'KEEPS' (without the quotes), root password to 'roda' (without the quotes) 
-   and the rest of the configurations with the default values.
+
+	and do not omit slapd configuration, set the domain to 'keep.pt' (without 
+   the quotes), the organization name to 'KEEPS' (without the quotes),
+   root password to 'roda' (without the quotes) and the rest of the 
+   configurations with the default values.
 
 
 For other Linux distribuitions, follow the appropriate documentation to install
