@@ -1,19 +1,41 @@
 #!/bin/bash
 
 function error(){
-   echo -e "[$(date --rfc-3339=seconds)][ERROR] $1"
+   echo -e "[$(date --rfc-3339=seconds)][ERROR] $1" | tee -a $INSTALL_LOG
 }
 
 function warn(){
-   echo -e "[$(date --rfc-3339=seconds)][WARN ] $1"
+   echo -e "[$(date --rfc-3339=seconds)][WARN ] $1" | tee -a $INSTALL_LOG
 }
 
 function info(){
-   echo -e "[$(date --rfc-3339=seconds)][INFO ] $1"
+   echo -e "[$(date --rfc-3339=seconds)][INFO ] $1" | tee -a $INSTALL_LOG
 }
 
 function usage(){
    info "$1"
+}
+
+function myEcho(){
+	echo "$@" | tee -a $INSTALL_LOG
+}
+
+function testExecutionAndExitOnFailure(){
+	exitCode=$1
+	codeToExitWith=$2
+	if [ "$exitCode" -ne "0" ]; then
+		exit $codeToExitWith
+	fi
+}
+
+function testExecutionAndExitWithMsgOnFailure(){
+	exitCode=$1
+	codeToExitWith=$2
+	msg=$3
+	if [ "$exitCode" -ne "0" ]; then
+		error "$msg"
+		exit $codeToExitWith
+	fi
 }
 
 function ask_roda_home() {

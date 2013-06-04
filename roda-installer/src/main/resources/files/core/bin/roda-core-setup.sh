@@ -1,11 +1,5 @@
 #!/bin/bash
 
-#scriptdir=`dirname "$0"`
-
-#export RODA_HOME=$(readlink -f $scriptdir/..)
-
-#echo "RODA_HOME=$RODA_HOME"
-
 . $RODA_HOME/bin/roda-common-setup.sh
 
 ask_roda_home
@@ -38,169 +32,249 @@ ask_rodadata_port
 ask_rodamigratorlinux_host
 ask_rodamigratorlinux_port
 
-echo
-echo "Downloading fedora"
-wget -q --output-document=$RODA_HOME/fedora/fedora-2.2.4-installer.jar "http://sourceforge.net/projects/fedora-commons/files/fedora/2.2.4/fedora-2.2.4-installer.jar/download"
-#cp $RODA_HOME/todelete/fedora-2.2.4-installer.jar $RODA_HOME/fedora/fedora-2.2.4-installer.jar
-echo
-echo "Configuring fedora installation properties"
-ant -q -f $RODA_HOME/bin/roda-core-setup.xml fedora-2.2.4-install.properties > /dev/null
-echo
-echo "Installing fedora"
-java -jar $RODA_HOME/fedora/fedora-2.2.4-installer.jar $RODA_HOME/fedora/fedora-2.2.4-install.properties > /dev/null
-## hacks (to allow a successful deployment in jboss and others)
-mv $RODA_HOME/fedora/fedora-2.2.4/install/fedorawar/WEB-INF/lib/jsf-api.jar $RODA_HOME/fedora/fedora-2.2.4/install/fedorawar/WEB-INF/lib/jsf-api.jar.bak
-mv $RODA_HOME/fedora/fedora-2.2.4/install/fedorawar/WEB-INF/lib/jsf-impl.jar $RODA_HOME/fedora/fedora-2.2.4/install/fedorawar/WEB-INF/lib/jsf-impl.jar.bak
-rm $RODA_HOME/fedora/fedora-2.2.4/install/fedora.war
-ln -s $RODA_HOME/fedora/fedora-2.2.4/install/fedorawar $RODA_HOME/fedora/fedora-2.2.4/install/fedora
-cp $RODA_HOME/fedora/extra-files/beSecurity.xml $RODA_HOME/fedora/fedora-2.2.4/server/config/beSecurity.xml
-mkdir -p $RODA_HOME/fedora/fedora-2.2.4/server/fedora-internal-use/fedora-internal-use-backend-service-policies
-cp $RODA_HOME/fedora/extra-files/callback*.xml $RODA_HOME/fedora/fedora-2.2.4/server/fedora-internal-use/fedora-internal-use-backend-service-policies/
-
-echo
-echo "Downloading genericsearch"
-wget -q --output-document=/tmp/genericsearch-2.1.1.zip "http://sourceforge.net/projects/fedora-commons/files/services/3.0/genericsearch-2.1.1.zip/download"
-#cp $RODA_HOME/todelete/genericsearch-2.1.1.zip /tmp/genericsearch-2.1.1.zip
-echo
-echo "Unpacking genericsearch"
-unzip -o -q /tmp/genericsearch-2.1.1.zip -d /tmp
-unzip -o -q /tmp/genericsearch-2.1.1/fedoragsearch.war -d /tmp/genericsearch-2.1.1/fedoragsearchwar
-cp -r /tmp/genericsearch-2.1.1/fedoragsearchwar/* $RODA_HOME/fedora/genericsearch-2.1.1/fedoragsearchwar/
-rm -rf /tmp/genericsearch-2.1.1/
-rm /tmp/genericsearch-2.1.1.zip
-
-echo
-echo "Copying bin scripts from templates"
-cp -f $RODA_HOME/bin/templates/roda-ldapadd $RODA_HOME/bin/
-cp -f $RODA_HOME/bin/templates/roda-ldapmodify $RODA_HOME/bin/
-cp -f $RODA_HOME/bin/templates/roda-core-create-fedora-mysql-db.sh $RODA_HOME/bin/
-cp -f $RODA_HOME/bin/templates/roda-core-create-roda-mysql-db.sh $RODA_HOME/bin/
-cp -f $RODA_HOME/bin/templates/roda-data-create-gsearch-index.sh $RODA_HOME/bin/
-cp -f $RODA_HOME/bin/templates/roda-data-update-gsearch-index.sh $RODA_HOME/bin/
-
-echo
-echo "Configuring bin scripts"
-ant -q -f $RODA_HOME/bin/roda-core-setup.xml roda-ldapadd > /dev/null
-ant -q -f $RODA_HOME/bin/roda-core-setup.xml roda-ldapmodify > /dev/null
-ant -q -f $RODA_HOME/bin/roda-core-setup.xml roda-core-create-fedora-mysql-db.sh > /dev/null
-ant -q -f $RODA_HOME/bin/roda-core-setup.xml roda-core-create-roda-mysql-db.sh > /dev/null
-ant -q -f $RODA_HOME/bin/roda-core-setup.xml roda-data-create-gsearch-index.sh > /dev/null
-ant -q -f $RODA_HOME/bin/roda-core-setup.xml roda-data-update-gsearch-index.sh > /dev/null
-
-echo
-echo "Making bin scripts executable"
-chmod +x $RODA_HOME/bin/*.sh
-chmod +x $RODA_HOME/bin/roda-ldapadd
-chmod +x $RODA_HOME/bin/roda-ldapmodify
-
-echo
-echo "Copying config files from templates"
-cp -f $RODA_HOME/config/templates/ldap-filter.properties $RODA_HOME/config/
-cp -f $RODA_HOME/config/templates/roda-core.properties $RODA_HOME/config/
-cp -f $RODA_HOME/config/templates/logger.properties $RODA_HOME/config/
-cp -f $RODA_HOME/config/templates/ingest.properties $RODA_HOME/config/
-cp -f $RODA_HOME/config/templates/reports.properties $RODA_HOME/config/
-cp -f $RODA_HOME/config/templates/statistics.properties $RODA_HOME/config/
-cp -f $RODA_HOME/config/templates/scheduler.properties $RODA_HOME/config/
-cp -f $RODA_HOME/config/templates/quartz.properties $RODA_HOME/config/
-cp -f $RODA_HOME/config/templates/plugins.properties $RODA_HOME/config/
-cp -f $RODA_HOME/config/templates/roda-vsftpd.conf $RODA_HOME/config/
-
-echo
-echo "Configuring config files"
-ant -q -f $RODA_HOME/bin/roda-core-setup.xml ldap-filter.properties > /dev/null
-ant -q -f $RODA_HOME/bin/roda-core-setup.xml roda-core.properties > /dev/null
-ant -q -f $RODA_HOME/bin/roda-core-setup.xml logger.properties > /dev/null
-ant -q -f $RODA_HOME/bin/roda-core-setup.xml ingest.properties > /dev/null
-ant -q -f $RODA_HOME/bin/roda-core-setup.xml reports.properties > /dev/null
-ant -q -f $RODA_HOME/bin/roda-core-setup.xml statistics.properties > /dev/null
-ant -q -f $RODA_HOME/bin/roda-core-setup.xml scheduler.properties > /dev/null
-ant -q -f $RODA_HOME/bin/roda-core-setup.xml quartz.properties > /dev/null
-ant -q -f $RODA_HOME/bin/roda-core-setup.xml plugins.properties > /dev/null
-ant -q -f $RODA_HOME/bin/roda-core-setup.xml roda-vsftpd.conf > /dev/null
-
-echo
-echo "Copying config/fedora files from templates"
-ln -s $RODA_HOME/fedora/fedora-2.2.4/server/config/ $RODA_HOME/config/fedora
-cp -f $RODA_HOME/config/templates/fedora/* $RODA_HOME/config/fedora/
-echo
-echo "Configuring config/fedora files"
-ant -q -f $RODA_HOME/bin/roda-core-setup.xml fedora.fcfg > /dev/null
-ant -q -f $RODA_HOME/bin/roda-core-setup.xml fedora-users.xml > /dev/null
-
-echo
-echo "Copying config/ldap files from templates"
-mkdir -p $RODA_HOME/config/ldap/
-cp -f $RODA_HOME/config/templates/ldap/* $RODA_HOME/config/ldap/
-echo
-echo "Configuring config/ldap files"
-ant -q -f $RODA_HOME/bin/roda-core-setup.xml create-parent-users-groups-roles.ldif > /dev/null
-ant -q -f $RODA_HOME/bin/roda-core-setup.xml create-default-values.ldif > /dev/null
-ant -q -f $RODA_HOME/bin/roda-core-setup.xml delete-default-values.ldif > /dev/null
-ant -q -f $RODA_HOME/bin/roda-core-setup.xml create-demo-users.ldif > /dev/null
-ant -q -f $RODA_HOME/bin/roda-core-setup.xml delete-demo-users.ldif > /dev/null
-
-echo
-echo "Copying config/sql files from templates"
-cp -f $RODA_HOME/config/templates/sql/create-fedora-db.sql $RODA_HOME/config/sql/
-cp -f $RODA_HOME/config/templates/sql/create-roda-db.sql $RODA_HOME/config/sql/
-echo
-echo "Configuring config/sql files"
-ant -q -f $RODA_HOME/bin/roda-core-setup.xml create-fedora-db.sql > /dev/null
-ant -q -f $RODA_HOME/bin/roda-core-setup.xml create-roda-db.sql > /dev/null
-
-echo
-echo "Copying config/plugins files from templates"
-cp -f $RODA_HOME/config/templates/plugins/* $RODA_HOME/config/plugins/
-echo
-echo "Configuring config/plugins files"
-ant -q -f $RODA_HOME/bin/roda-core-setup.xml core-plugins > /dev/null
-
-echo
-echo "Copying roda-filter to fedora application"
-cp -rf $RODA_HOME/fedora/roda-filter/* $RODA_HOME/fedora/fedora-2.2.4/install/fedorawar/WEB-INF/lib
-echo
-echo "Copying fedora web.xml from templates"
-cp -f $RODA_HOME/config/templates/fedora/web.xml $RODA_HOME/fedora/fedora-2.2.4/install/fedorawar/WEB-INF/
-echo
-echo "Configuring fedora web.xml"
-ant -q -f $RODA_HOME/bin/roda-core-setup.xml fedora-web.xml > /dev/null
-
-echo
-echo "Copying fedoragsearch log4.xml from templates"
-cp -f $RODA_HOME/config/templates/fedoragsearch/log4j.xml $RODA_HOME/fedora/genericsearch-2.1.1/fedoragsearchwar/WEB-INF/classes
-FEDORA_HOME=$RODA_HOME/fedora/fedora-2.2.4 RODACORE_HOSTPORT="$RODADATA_HOST:$RODADATA_PORT" ant -q -f $RODA_HOME/bin/configure-gsearch.xml -Ddeployed.config.path=$RODA_HOME/fedora/genericsearch-2.1.1/fedoragsearchwar/WEB-INF/classes > /dev/null
-
-echo
-echo "Creating Fedora database ($FEDORA_DB) ..."
-$RODA_HOME/bin/roda-core-create-fedora-mysql-db.sh > /dev/null
-echo
-echo "Creating RODA database (roda) ..."
-$RODA_HOME/bin/roda-core-create-roda-mysql-db.sh > /dev/null
-echo
-echo -n "Creating LDAP parent entries users/groups/roles ..."
-$RODA_HOME/bin/roda-ldapadd -c -f $RODA_HOME/config/ldap/create-parent-users-groups-roles.ldif > /dev/null && echo "OK" || echo "FAILED!!!"
-echo
-echo -n "Creating LDAP entries default users/groups/roles ..."
-$RODA_HOME/bin/roda-ldapadd -c -f $RODA_HOME/config/ldap/create-default-values.ldif > /dev/null && echo "OK" || echo "FAILED!!!"
-
-echo
-echo "Linking WARs into JBoss deploy directory"
-ln -s $RODA_HOME/fedora/genericsearch-2.1.1/fedoragsearchwar/ $RODA_HOME/jboss/jboss-4.2.3.GA/server/default/deploy/fedoragsearch.war
-ln -s $RODA_HOME/fedora/fedora-2.2.4/install/fedorawar/ $RODA_HOME/jboss/jboss-4.2.3.GA/server/default/deploy/fedora.war
-ln -s $RODA_HOME/webapps/roda-core.war $RODA_HOME/jboss/jboss-4.2.3.GA/server/default/deploy/
-
-if [ $? -eq 0 ]; then
-	echo
-	#echo "********************************************************************************"
-	echo "* RODA Core setup finished"
-	#echo "********************************************************************************"
-	echo
+FEDORA_JAR="fedora-2.2.4-installer.jar"
+FEDORA_JAR_MD5="a7b85a546be4224a93252c7bc13dd048"
+FEDORA_JAR_URL="http://sourceforge.net/projects/fedora-commons/files/fedora/2.2.4/fedora-2.2.4-installer.jar/download"
+myEcho
+myEcho "Downloading fedora"
+if [ -f "/tmp/$FEDORA_JAR" ] && [ "$FEDORA_JAR_MD5" = "$(md5sum /tmp/$FEDORA_JAR | sed 's# .*$##')" ]; then
+	myEcho
+	myEcho "Fedora already exists in /tmp and is valid (md5=\"$FEDORA_JAR_MD5\")"
 else
-	echo
-	#echo "********************************************************************************"
-	echo "* ERROR setting up RODA Core"
-	#echo "********************************************************************************"
-	echo
+	wget --output-document=/tmp/$FEDORA_JAR "$FEDORA_JAR_URL" &>> $INSTALL_LOG
+	testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_1)"
 fi
+cp /tmp/$FEDORA_JAR $RODA_HOME/fedora/$FEDORA_JAR &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_2)"
+myEcho
+myEcho "Configuring fedora installation properties"
+ant -f $RODA_HOME/bin/roda-core-setup.xml fedora-2.2.4-install.properties &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_3)"
+myEcho
+myEcho "Installing fedora"
+java -jar $RODA_HOME/fedora/$FEDORA_JAR $RODA_HOME/fedora/fedora-2.2.4-install.properties &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_4)"
+## hacks (to allow a successful deployment in jboss and others)
+mv $RODA_HOME/fedora/fedora-2.2.4/install/fedorawar/WEB-INF/lib/jsf-api.jar $RODA_HOME/fedora/fedora-2.2.4/install/fedorawar/WEB-INF/lib/jsf-api.jar.bak &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_5)"
+mv $RODA_HOME/fedora/fedora-2.2.4/install/fedorawar/WEB-INF/lib/jsf-impl.jar $RODA_HOME/fedora/fedora-2.2.4/install/fedorawar/WEB-INF/lib/jsf-impl.jar.bak &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_6)"
+rm $RODA_HOME/fedora/fedora-2.2.4/install/fedora.war &>> $INSTALL_LOG
+ln -s $RODA_HOME/fedora/fedora-2.2.4/install/fedorawar $RODA_HOME/fedora/fedora-2.2.4/install/fedora &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_7)"
+cp -v $RODA_HOME/fedora/extra-files/beSecurity.xml $RODA_HOME/fedora/fedora-2.2.4/server/config/beSecurity.xml &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_8)"
+mkdir -p $RODA_HOME/fedora/fedora-2.2.4/server/fedora-internal-use/fedora-internal-use-backend-service-policies &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_9)"
+cp -v $RODA_HOME/fedora/extra-files/callback*.xml $RODA_HOME/fedora/fedora-2.2.4/server/fedora-internal-use/fedora-internal-use-backend-service-policies/ &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_10)"
 
+GSEARCH_ZIP="genericsearch-2.1.1.zip"
+GSEARCH_ZIP_MD5="904fee63c01f52a745cd75c39ce94a62"
+GSEARCH_ZIP_URL="http://sourceforge.net/projects/fedora-commons/files/services/3.0/genericsearch-2.1.1.zip/download"
+myEcho
+myEcho "Downloading genericsearch"
+if [ -f "/tmp/$GSEARCH_ZIP" ] && [ "$GSEARCH_ZIP_MD5" = "$(md5sum /tmp/$GSEARCH_ZIP | sed 's# .*$##')" ]; then
+	myEcho
+	myEcho "Fedora GSearch already exists in /tmp and is valid (md5=\"$GSEARCH_ZIP_MD5\")"
+else
+	wget --output-document=/tmp/$GSEARCH_ZIP "$GSEARCH_ZIP_URL" &>> $INSTALL_LOG
+	testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_11)"
+fi
+myEcho
+myEcho "Unpacking genericsearch"
+unzip -o -q /tmp/$GSEARCH_ZIP -d /tmp &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_12)"
+unzip -o -q /tmp/genericsearch-2.1.1/fedoragsearch.war -d /tmp/genericsearch-2.1.1/fedoragsearchwar &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_13)"
+cp -v -r /tmp/genericsearch-2.1.1/fedoragsearchwar/* $RODA_HOME/fedora/genericsearch-2.1.1/fedoragsearchwar/ &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_14)"
+rm -rf /tmp/genericsearch-2.1.1/ &>> $INSTALL_LOG
+
+myEcho
+myEcho "Copying bin scripts from templates"
+cp -v -f $RODA_HOME/bin/templates/roda-ldapadd $RODA_HOME/bin/ &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_15)"
+cp -v -f $RODA_HOME/bin/templates/roda-ldapmodify $RODA_HOME/bin/ &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_16)"
+cp -v -f $RODA_HOME/bin/templates/roda-core-create-fedora-mysql-db.sh $RODA_HOME/bin/ &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_17)"
+cp -v -f $RODA_HOME/bin/templates/roda-core-create-roda-mysql-db.sh $RODA_HOME/bin/ &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_18)"
+cp -v -f $RODA_HOME/bin/templates/roda-data-create-gsearch-index.sh $RODA_HOME/bin/ &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_19)"
+cp -v -f $RODA_HOME/bin/templates/roda-data-update-gsearch-index.sh $RODA_HOME/bin/ &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_20)"
+
+myEcho
+myEcho "Configuring bin scripts"
+ant -f $RODA_HOME/bin/roda-core-setup.xml roda-ldapadd &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_21)"
+ant -f $RODA_HOME/bin/roda-core-setup.xml roda-ldapmodify &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_22)"
+ant -f $RODA_HOME/bin/roda-core-setup.xml roda-core-create-fedora-mysql-db.sh &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_23)"
+ant -f $RODA_HOME/bin/roda-core-setup.xml roda-core-create-roda-mysql-db.sh &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_24)"
+ant -f $RODA_HOME/bin/roda-core-setup.xml roda-data-create-gsearch-index.sh &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_25)"
+ant -f $RODA_HOME/bin/roda-core-setup.xml roda-data-update-gsearch-index.sh &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_26)"
+
+myEcho
+myEcho "Making bin scripts executable"
+chmod +x $RODA_HOME/bin/*.sh &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_27)"
+chmod +x $RODA_HOME/bin/roda-ldapadd &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_28)"
+chmod +x $RODA_HOME/bin/roda-ldapmodify &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_29)"
+
+myEcho
+myEcho "Copying config files from templates"
+cp -v -f $RODA_HOME/config/templates/ldap-filter.properties $RODA_HOME/config/ &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_30)"
+cp -v -f $RODA_HOME/config/templates/roda-core.properties $RODA_HOME/config/ &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_31)"
+cp -v -f $RODA_HOME/config/templates/logger.properties $RODA_HOME/config/ &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_32)"
+cp -v -f $RODA_HOME/config/templates/ingest.properties $RODA_HOME/config/ &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_33)"
+cp -v -f $RODA_HOME/config/templates/reports.properties $RODA_HOME/config/ &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_34)"
+cp -v -f $RODA_HOME/config/templates/statistics.properties $RODA_HOME/config/ &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_35)"
+cp -v -f $RODA_HOME/config/templates/scheduler.properties $RODA_HOME/config/ &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_36)"
+cp -v -f $RODA_HOME/config/templates/quartz.properties $RODA_HOME/config/ &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_37)"
+cp -v -f $RODA_HOME/config/templates/plugins.properties $RODA_HOME/config/ &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_38)"
+cp -v -f $RODA_HOME/config/templates/roda-vsftpd.conf $RODA_HOME/config/ &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_39)"
+
+myEcho
+myEcho "Configuring config files"
+ant -f $RODA_HOME/bin/roda-core-setup.xml ldap-filter.properties &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_40)"
+ant -f $RODA_HOME/bin/roda-core-setup.xml roda-core.properties &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_41)"
+ant -f $RODA_HOME/bin/roda-core-setup.xml logger.properties &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_42)"
+ant -f $RODA_HOME/bin/roda-core-setup.xml ingest.properties &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_43)"
+ant -f $RODA_HOME/bin/roda-core-setup.xml reports.properties &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_44)"
+ant -f $RODA_HOME/bin/roda-core-setup.xml statistics.properties &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_45)"
+ant -f $RODA_HOME/bin/roda-core-setup.xml scheduler.properties &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_46)"
+ant -f $RODA_HOME/bin/roda-core-setup.xml quartz.properties &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_47)"
+ant -f $RODA_HOME/bin/roda-core-setup.xml plugins.properties &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_48)"
+ant -f $RODA_HOME/bin/roda-core-setup.xml roda-vsftpd.conf &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_49)"
+
+myEcho
+myEcho "Copying config/fedora files from templates"
+ln -s $RODA_HOME/fedora/fedora-2.2.4/server/config/ $RODA_HOME/config/fedora &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_50)"
+cp -v -f $RODA_HOME/config/templates/fedora/* $RODA_HOME/config/fedora/ &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_51)"
+myEcho
+myEcho "Configuring config/fedora files"
+ant -f $RODA_HOME/bin/roda-core-setup.xml fedora.fcfg &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_52)"
+ant -f $RODA_HOME/bin/roda-core-setup.xml fedora-users.xml &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_53)"
+
+myEcho
+myEcho "Copying config/ldap files from templates"
+mkdir -p $RODA_HOME/config/ldap/ &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_54)"
+cp -v -f $RODA_HOME/config/templates/ldap/* $RODA_HOME/config/ldap/ &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_55)"
+myEcho
+myEcho "Configuring config/ldap files"
+ant -f $RODA_HOME/bin/roda-core-setup.xml create-parent-users-groups-roles.ldif &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_56)"
+ant -f $RODA_HOME/bin/roda-core-setup.xml create-default-values.ldif &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_57)"
+ant -f $RODA_HOME/bin/roda-core-setup.xml delete-default-values.ldif &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_58)"
+ant -f $RODA_HOME/bin/roda-core-setup.xml create-demo-users.ldif &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_59)"
+ant -f $RODA_HOME/bin/roda-core-setup.xml delete-demo-users.ldif &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_60)"
+
+myEcho
+myEcho "Copying config/sql files from templates"
+cp -v -f $RODA_HOME/config/templates/sql/create-fedora-db.sql $RODA_HOME/config/sql/ &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_61)"
+cp -v -f $RODA_HOME/config/templates/sql/create-roda-db.sql $RODA_HOME/config/sql/ &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_62)"
+myEcho
+myEcho "Configuring config/sql files"
+ant -f $RODA_HOME/bin/roda-core-setup.xml create-fedora-db.sql &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_63)"
+ant -f $RODA_HOME/bin/roda-core-setup.xml create-roda-db.sql &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_64)"
+
+myEcho
+myEcho "Copying config/plugins files from templates"
+cp -v -f $RODA_HOME/config/templates/plugins/* $RODA_HOME/config/plugins/ &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_65)"
+myEcho
+myEcho "Configuring config/plugins files"
+ant -f $RODA_HOME/bin/roda-core-setup.xml core-plugins &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_66)"
+
+myEcho
+myEcho "Copying roda-filter to fedora application"
+cp -v -rf $RODA_HOME/fedora/roda-filter/* $RODA_HOME/fedora/fedora-2.2.4/install/fedorawar/WEB-INF/lib &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_67)"
+myEcho
+myEcho "Copying fedora web.xml from templates"
+cp -v -f $RODA_HOME/config/templates/fedora/web.xml $RODA_HOME/fedora/fedora-2.2.4/install/fedorawar/WEB-INF/ &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_68)"
+myEcho
+myEcho "Configuring fedora web.xml"
+ant -f $RODA_HOME/bin/roda-core-setup.xml fedora-web.xml &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_69)"
+
+myEcho
+myEcho "Copying fedoragsearch log4.xml from templates"
+cp -v -f $RODA_HOME/config/templates/fedoragsearch/log4j.xml $RODA_HOME/fedora/genericsearch-2.1.1/fedoragsearchwar/WEB-INF/classes &>> $INSTALL_LOG
+FEDORA_HOME=$RODA_HOME/fedora/fedora-2.2.4 RODACORE_HOSTPORT="$RODADATA_HOST:$RODADATA_PORT" ant -q -f $RODA_HOME/bin/configure-gsearch.xml -Ddeployed.config.path=$RODA_HOME/fedora/genericsearch-2.1.1/fedoragsearchwar/WEB-INF/classes &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_70)"
+
+myEcho
+myEcho "Creating Fedora database ($FEDORA_DB)..."
+$RODA_HOME/bin/roda-core-create-fedora-mysql-db.sh &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_71)"
+myEcho
+myEcho "Creating RODA database (roda)..."
+$RODA_HOME/bin/roda-core-create-roda-mysql-db.sh &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_72)"
+myEcho
+myEcho "Creating LDAP parent entries users/groups/roles..."
+$RODA_HOME/bin/roda-ldapadd -c -f $RODA_HOME/config/ldap/create-parent-users-groups-roles.ldif &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_73)"
+myEcho
+myEcho "Creating LDAP entries default users/groups/roles..."
+$RODA_HOME/bin/roda-ldapadd -c -f $RODA_HOME/config/ldap/create-default-values.ldif &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_74)"
+
+myEcho
+myEcho "Linking WARs into JBoss deploy directory"
+ln -s $RODA_HOME/fedora/genericsearch-2.1.1/fedoragsearchwar/ $RODA_HOME/jboss/jboss-4.2.3.GA/server/default/deploy/fedoragsearch.war &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_75)"
+ln -s $RODA_HOME/fedora/fedora-2.2.4/install/fedorawar/ $RODA_HOME/jboss/jboss-4.2.3.GA/server/default/deploy/fedora.war &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_76)"
+ln -s $RODA_HOME/webapps/roda-core.war $RODA_HOME/jboss/jboss-4.2.3.GA/server/default/deploy/ &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_77)"
+
+myEcho
+myEcho "* RODA Core setup finished"
+myEcho

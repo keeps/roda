@@ -1,21 +1,45 @@
 #!/bin/bash
 
-####################################################################
+################################################################################
+# RODA installation script (http://www.roda-community.org)
 #
-# Exit codes:
-# 0 - Script run without problems
+# Last update : 2013-06-04
+# Updated by  : hsilva@keep.pt
 #
-####################################################################
+# Exit codes  :
+EX_OK=0                         # RODA installer script run smoothly
+EX_RODA_HOME_ALREADY_EXISTS=1   # RODA_HOME already exits
+EX_FAILED_TO_INSTALL_COMMON=2   # Failed to install RODA Common files
+EX_FAILED_TO_INSTALL_JBOSS=3    # Failed to install JBoss
+EX_FAILED_TO_INSTALL_CORE=4     # Failed to install RODA CORE
+EX_FAILED_TO_INSTALL_MIGRATOR=5 # Failed to install RODA CORE
+EX_FAILED_TO_INSTALL_UI=6       # Failed to install RODA CORE
+EX_FAILED_TO_INSTALL_HANDLE=7   # Failed to install RODA CORE
+#
+################################################################################
 
 # Change dir to the script dir
 SCRIPT_DIR=$(dirname $(readlink -m $0))
 cd $SCRIPT_DIR
+INSTALL_LOG="$SCRIPT_DIR/install.log"
+if [ -f $INSTALL_LOG ]; then
+	rm $INSTALL_LOG
+fi
 
+
+################################################################################
+# Source needed files
+################################################################################
 # Source common script functions
 . files/common/bin/roda-common-setup.sh
 # Source the installation config file
 . install.config
 
+
+################################################################################
+# Test whether RODA_HOME already exists so we don't override
+# already existing files/dirs by accident
+################################################################################
 if [ -d $RODA_HOME ]; then
 	warn "The installation dir already exists ($RODA_HOME)!\nDo you want to procede? [yN]"
 	read anwser
@@ -23,22 +47,29 @@ if [ -d $RODA_HOME ]; then
    	[yY])
 	      ;;
    	*)
-	      exit 1
+	      exit $EX_RODA_HOME_ALREADY_EXISTS
    	   ;;
 	esac
 else
 	mkdir $RODA_HOME
 fi
 
+
+################################################################################
+# Install RODA Common files
+################################################################################
 info "Installing RODA Common"
 # Copy common files to the installation dir
-cp -r files/common/* $RODA_HOME
+cp -v -r files/common/* $RODA_HOME &>> $INSTALL_LOG
 # Also copy install.config to be able to correctly uninstall RODA
-cp install.config $RODA_HOME/uninstall/
+cp -v install.config $RODA_HOME/uninstall/ &>> $INSTALL_LOG
 . $RODA_HOME/bin/roda-setup.sh
 
+
+################################################################################
+# Optional: reconfigure, non interactively, slapd in Debian machines
+################################################################################
 if [ "$LDAP_RECONFIGURE_SLAPD" = "yes" ]; then
-	# Reconfigure, non interactively, slapd in Debian machines
 	touch /tmp/slapd_conf
 	chmod 600 /tmp/slapd_conf
 	cat > /tmp/slapd_conf <<-EOF
@@ -57,46 +88,66 @@ if [ "$LDAP_RECONFIGURE_SLAPD" = "yes" ]; then
 	rm /tmp/slapd_conf
 fi
 
-# Disables outputing the values of the environment variables on the roda-common-setup.sh script
+
+# Disable environment variables output 
+# from roda-common-setup.sh script
 QUIET=yes
 
+
+################################################################################
+# Install JBoss 
+################################################################################
 cd $SCRIPT_DIR
 info "Installing JBoss"
-cp -r files/jboss $RODA_HOME
+cp -v -r files/jboss $RODA_HOME &>> $INSTALL_LOG
 . $RODA_HOME/jboss/bin/jboss-setup.sh
 
-# Test if it's to install RODA CORE
+
+################################################################################
+# Install RODA CORE?
+################################################################################
 cd $SCRIPT_DIR
 if [ "$INSTALL_CORE" = "yes" ] && [ -f files/core/bin/roda-core-setup.sh ]; then
 	info "Installing RODA Core"
-	cp -r files/core/* $RODA_HOME
+	cp -v -r files/core/* $RODA_HOME &>> $INSTALL_LOG
 	. $RODA_HOME/bin/roda-core-setup.sh
 fi
 
-# Test if it's to install RODA MIGRATOR
+
+################################################################################
+# Install RODA MIGRATOR?
+################################################################################
 cd $SCRIPT_DIR
 if [ "$INSTALL_MIGRATOR" = "yes" ] && [ -f files/migrator/bin/roda-migrator-setup.sh ]; then
 	info "Installing RODA Migrator"
-	cp -r files/migrator/* $RODA_HOME
+	cp -v -r files/migrator/* $RODA_HOME &>> $INSTALL_LOG
 	. $RODA_HOME/bin/roda-migrator-setup.sh
 fi
 
-# Test if it's to install RODA UI
+
+################################################################################
+# Install RODA UI?
+################################################################################
 cd $SCRIPT_DIR
 if [ "$INSTALL_UI" = "yes" ] && [ -f files/ui/bin/roda-ui-setup.sh ]; then
 	info "Installing RODA WUI"
-	cp -r files/ui/* $RODA_HOME
+	cp -v -r files/ui/* $RODA_HOME &>> $INSTALL_LOG
 	. $RODA_HOME/bin/roda-ui-setup.sh
 fi
 
-# Test if it's to install RODA HANDLE
+
+################################################################################
+# Install RODA HANDLE?
+################################################################################
 cd $SCRIPT_DIR
 if [ "$INSTALL_HANDLE" = "yes" ]; then
 	info "Installing RODA Handle"
-	cp -r files/handle/* $RODA_HOME
-	echo
-	echo "* RODA Handle setup finished"
-	echo
+	cp -v -r files/handle/* $RODA_HOME &>> $INSTALL_LOG
+	testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_HANDLE" \
+		"Error installting RODA HANDLE (errorCode=${EX_FAILED_TO_INSTALL_HANDLE}_1)"
+	myEcho
+	myEcho "* RODA Handle setup finished"
+	myEcho
 fi
 
 END_MSG="***************************************************************************\n"
@@ -120,4 +171,4 @@ END_MSG="$END_MSG*\n************************************************************
 
 info "Done installing RODA!\n\n$END_MSG"
 
-exit 0
+exit $EX_OK
