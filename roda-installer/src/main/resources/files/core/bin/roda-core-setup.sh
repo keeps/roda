@@ -276,5 +276,10 @@ ln -s $RODA_HOME/webapps/roda-core.war $RODA_HOME/jboss/jboss-4.2.3.GA/server/de
 testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_77)"
 
 myEcho
+myEcho "Creating needed folders"
+mkdir -p $RODA_HOME/data/ingest/FTP_DROP_DIR/ &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_78)"
+
+myEcho
 myEcho "* RODA Core setup finished"
 myEcho
