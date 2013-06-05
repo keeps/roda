@@ -21,7 +21,8 @@ The following software is needed:
 - OpenLDAP version 2.4.6 or higher
 - Fedora Commons 2.2.4 (installed automatically with RODA)
 - Fedora Generic Search 2.1.1 (installed automatically with RODA)
-- JBoss 4.2.3 (installed automatically with RODA)
+- Apache Tomcat 6.x.x (default, installed automatically with RODA)
+- JBoss 4.2.3 (optional, installed automatically with RODA)
 - ClamAV
 - Apache Ant version 1.8.x or higher
 - Munin
@@ -143,7 +144,12 @@ Please note that [RODA_HOME] denotes the path to the folder where RODA was
 installed, that must be replaced accordingly in all commandline
 executions (strings prefixed by '$>').
 
-1. Start Jboss
+1. Start Tomcat/Jboss (by default Tomcat)
+
+   Run Tomcat start/stop script:
+   	$> [RODA_HOME]/bin/tomcat start
+
+or
 
    Run JBoss start/stop script:
    	$> [RODA_HOME]/bin/jboss start

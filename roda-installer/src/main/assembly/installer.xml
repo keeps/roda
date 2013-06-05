@@ -20,6 +20,7 @@
 		<componentDescriptor>src/main/assembly/core.xml</componentDescriptor>
 		<componentDescriptor>src/main/assembly/handle.xml</componentDescriptor>
 		<componentDescriptor>src/main/assembly/jboss.xml</componentDescriptor>
+		<componentDescriptor>src/main/assembly/tomcat.xml</componentDescriptor>
 		<componentDescriptor>src/main/assembly/migrator.xml</componentDescriptor>
 		<componentDescriptor>src/main/assembly/ui.xml</componentDescriptor>
 	</componentDescriptors>
