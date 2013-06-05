@@ -32,9 +32,11 @@ ask_rodadata_port
 ask_rodamigratorlinux_host
 ask_rodamigratorlinux_port
 
-FEDORA_JAR="fedora-2.2.4-installer.jar"
+FEDORA_VERSION="2.2.4"
+FEDORA_DIRNAME="fedora-$FEDORA_VERSION"
+FEDORA_JAR="$FEDORA_DIRNAME-installer.jar"
 FEDORA_JAR_MD5="a7b85a546be4224a93252c7bc13dd048"
-FEDORA_JAR_URL="http://sourceforge.net/projects/fedora-commons/files/fedora/2.2.4/fedora-2.2.4-installer.jar/download"
+FEDORA_JAR_URL="http://sourceforge.net/projects/fedora-commons/files/fedora/$FEDORA_VERSION/$FEDORA_JAR/download"
 myEcho
 myEcho "Downloading fedora"
 if [ -f "/tmp/$FEDORA_JAR" ] && [ "$FEDORA_JAR_MD5" = "$(md5sum /tmp/$FEDORA_JAR | sed 's# .*$##')" ]; then
@@ -48,30 +50,40 @@ cp /tmp/$FEDORA_JAR $RODA_HOME/fedora/$FEDORA_JAR &>> $INSTALL_LOG
 testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_2)"
 myEcho
 myEcho "Configuring fedora installation properties"
-ant -f $RODA_HOME/bin/roda-core-setup.xml fedora-2.2.4-install.properties &>> $INSTALL_LOG
+ant -f $RODA_HOME/bin/roda-core-setup.xml fedora-$FEDORA_VERSION-install.properties &>> $INSTALL_LOG
 testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_3)"
 myEcho
 myEcho "Installing fedora"
-java -jar $RODA_HOME/fedora/$FEDORA_JAR $RODA_HOME/fedora/fedora-2.2.4-install.properties &>> $INSTALL_LOG
+java -jar $RODA_HOME/fedora/$FEDORA_JAR $RODA_HOME/fedora/fedora-$FEDORA_VERSION-install.properties &>> $INSTALL_LOG
 testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_4)"
 ## hacks (to allow a successful deployment in jboss and others)
-mv $RODA_HOME/fedora/fedora-2.2.4/install/fedorawar/WEB-INF/lib/jsf-api.jar $RODA_HOME/fedora/fedora-2.2.4/install/fedorawar/WEB-INF/lib/jsf-api.jar.bak &>> $INSTALL_LOG
+mv $RODA_HOME/fedora/$FEDORA_DIRNAME/install/fedorawar/WEB-INF/lib/jsf-api.jar $RODA_HOME/fedora/$FEDORA_DIRNAME/install/fedorawar/WEB-INF/lib/jsf-api.jar.bak &>> $INSTALL_LOG
 testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_5)"
-mv $RODA_HOME/fedora/fedora-2.2.4/install/fedorawar/WEB-INF/lib/jsf-impl.jar $RODA_HOME/fedora/fedora-2.2.4/install/fedorawar/WEB-INF/lib/jsf-impl.jar.bak &>> $INSTALL_LOG
+mv $RODA_HOME/fedora/$FEDORA_DIRNAME/install/fedorawar/WEB-INF/lib/jsf-impl.jar $RODA_HOME/fedora/$FEDORA_DIRNAME/install/fedorawar/WEB-INF/lib/jsf-impl.jar.bak &>> $INSTALL_LOG
 testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_6)"
-rm $RODA_HOME/fedora/fedora-2.2.4/install/fedora.war &>> $INSTALL_LOG
-ln -s $RODA_HOME/fedora/fedora-2.2.4/install/fedorawar $RODA_HOME/fedora/fedora-2.2.4/install/fedora &>> $INSTALL_LOG
+rm $RODA_HOME/fedora/$FEDORA_DIRNAME/install/fedora.war &>> $INSTALL_LOG
+ln -s $RODA_HOME/fedora/$FEDORA_DIRNAME/install/fedorawar $RODA_HOME/fedora/$FEDORA_DIRNAME/install/fedora &>> $INSTALL_LOG
 testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_7)"
-cp -v $RODA_HOME/fedora/extra-files/beSecurity.xml $RODA_HOME/fedora/fedora-2.2.4/server/config/beSecurity.xml &>> $INSTALL_LOG
+cp -v $RODA_HOME/fedora/extra-files/beSecurity.xml $RODA_HOME/fedora/$FEDORA_DIRNAME/server/config/beSecurity.xml &>> $INSTALL_LOG
 testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_8)"
-mkdir -p $RODA_HOME/fedora/fedora-2.2.4/server/fedora-internal-use/fedora-internal-use-backend-service-policies &>> $INSTALL_LOG
+mkdir -p $RODA_HOME/fedora/$FEDORA_DIRNAME/server/fedora-internal-use/fedora-internal-use-backend-service-policies &>> $INSTALL_LOG
 testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_9)"
-cp -v $RODA_HOME/fedora/extra-files/callback*.xml $RODA_HOME/fedora/fedora-2.2.4/server/fedora-internal-use/fedora-internal-use-backend-service-policies/ &>> $INSTALL_LOG
+cp -v $RODA_HOME/fedora/extra-files/callback*.xml $RODA_HOME/fedora/$FEDORA_DIRNAME/server/fedora-internal-use/fedora-internal-use-backend-service-policies/ &>> $INSTALL_LOG
 testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_10)"
 
-GSEARCH_ZIP="genericsearch-2.1.1.zip"
+if [ "$SERVLET_CONTAINER" = "tomcat6" ]; then
+	for i in $(ls $RODA_HOME/fedora/$FEDORA_DIRNAME/client/lib/*.jar | egrep -v "(xml|xerces)");
+	do 
+		cp $i "$SERVLET_CONTAINER_LIB_DIR/fedora_$(basename $i)"
+	done
+	testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_1x)"
+fi
+
+GSEARCH_VERSION="2.1.1"
+GSEARCH_DIRNAME="genericsearch-$GSEARCH_VERSION"
+GSEARCH_ZIP="$GSEARCH_DIRNAME.zip"
 GSEARCH_ZIP_MD5="904fee63c01f52a745cd75c39ce94a62"
-GSEARCH_ZIP_URL="http://sourceforge.net/projects/fedora-commons/files/services/3.0/genericsearch-2.1.1.zip/download"
+GSEARCH_ZIP_URL="http://sourceforge.net/projects/fedora-commons/files/services/3.0/$GSEARCH_ZIP/download"
 myEcho
 myEcho "Downloading genericsearch"
 if [ -f "/tmp/$GSEARCH_ZIP" ] && [ "$GSEARCH_ZIP_MD5" = "$(md5sum /tmp/$GSEARCH_ZIP | sed 's# .*$##')" ]; then
@@ -85,11 +97,11 @@ myEcho
 myEcho "Unpacking genericsearch"
 unzip -o -q /tmp/$GSEARCH_ZIP -d /tmp &>> $INSTALL_LOG
 testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_12)"
-unzip -o -q /tmp/genericsearch-2.1.1/fedoragsearch.war -d /tmp/genericsearch-2.1.1/fedoragsearchwar &>> $INSTALL_LOG
+unzip -o -q /tmp/$GSEARCH_DIRNAME/fedoragsearch.war -d /tmp/$GSEARCH_DIRNAME/fedoragsearchwar &>> $INSTALL_LOG
 testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_13)"
-cp -v -r /tmp/genericsearch-2.1.1/fedoragsearchwar/* $RODA_HOME/fedora/genericsearch-2.1.1/fedoragsearchwar/ &>> $INSTALL_LOG
+cp -v -r /tmp/$GSEARCH_DIRNAME/fedoragsearchwar/* $RODA_HOME/fedora/$GSEARCH_DIRNAME/fedoragsearchwar/ &>> $INSTALL_LOG
 testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_14)"
-rm -rf /tmp/genericsearch-2.1.1/ &>> $INSTALL_LOG
+rm -rf /tmp/$GSEARCH_DIRNAME/ &>> $INSTALL_LOG
 
 myEcho
 myEcho "Copying bin scripts from templates"
@@ -178,7 +190,7 @@ testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error in
 
 myEcho
 myEcho "Copying config/fedora files from templates"
-ln -s $RODA_HOME/fedora/fedora-2.2.4/server/config/ $RODA_HOME/config/fedora &>> $INSTALL_LOG
+ln -s $RODA_HOME/fedora/$FEDORA_DIRNAME/server/config/ $RODA_HOME/config/fedora &>> $INSTALL_LOG
 testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_50)"
 cp -v -f $RODA_HOME/config/templates/fedora/* $RODA_HOME/config/fedora/ &>> $INSTALL_LOG
 testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_51)"
@@ -232,11 +244,11 @@ testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error in
 
 myEcho
 myEcho "Copying roda-filter to fedora application"
-cp -v -rf $RODA_HOME/fedora/roda-filter/* $RODA_HOME/fedora/fedora-2.2.4/install/fedorawar/WEB-INF/lib &>> $INSTALL_LOG
+cp -v -rf $RODA_HOME/fedora/roda-filter/* $RODA_HOME/fedora/$FEDORA_DIRNAME/install/fedorawar/WEB-INF/lib &>> $INSTALL_LOG
 testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_67)"
 myEcho
 myEcho "Copying fedora web.xml from templates"
-cp -v -f $RODA_HOME/config/templates/fedora/web.xml $RODA_HOME/fedora/fedora-2.2.4/install/fedorawar/WEB-INF/ &>> $INSTALL_LOG
+cp -v -f $RODA_HOME/config/templates/fedora/web.xml $RODA_HOME/fedora/$FEDORA_DIRNAME/install/fedorawar/WEB-INF/ &>> $INSTALL_LOG
 testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_68)"
 myEcho
 myEcho "Configuring fedora web.xml"
@@ -245,8 +257,8 @@ testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error in
 
 myEcho
 myEcho "Copying fedoragsearch log4.xml from templates"
-cp -v -f $RODA_HOME/config/templates/fedoragsearch/log4j.xml $RODA_HOME/fedora/genericsearch-2.1.1/fedoragsearchwar/WEB-INF/classes &>> $INSTALL_LOG
-FEDORA_HOME=$RODA_HOME/fedora/fedora-2.2.4 RODACORE_HOSTPORT="$RODADATA_HOST:$RODADATA_PORT" ant -q -f $RODA_HOME/bin/configure-gsearch.xml -Ddeployed.config.path=$RODA_HOME/fedora/genericsearch-2.1.1/fedoragsearchwar/WEB-INF/classes &>> $INSTALL_LOG
+cp -v -f $RODA_HOME/config/templates/fedoragsearch/log4j.xml $RODA_HOME/fedora/$GSEARCH_DIRNAME/fedoragsearchwar/WEB-INF/classes &>> $INSTALL_LOG
+FEDORA_HOME=$RODA_HOME/fedora/$FEDORA_DIRNAME RODACORE_HOSTPORT="$RODADATA_HOST:$RODADATA_PORT" ant -q -f $RODA_HOME/bin/configure-gsearch.xml -Ddeployed.config.path=$RODA_HOME/fedora/$GSEARCH_DIRNAME/fedoragsearchwar/WEB-INF/classes &>> $INSTALL_LOG
 testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_70)"
 
 myEcho
@@ -267,12 +279,20 @@ $RODA_HOME/bin/roda-ldapadd -c -f $RODA_HOME/config/ldap/create-default-values.l
 testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_74)"
 
 myEcho
-myEcho "Linking WARs into JBoss deploy directory"
-ln -s $RODA_HOME/fedora/genericsearch-2.1.1/fedoragsearchwar/ $RODA_HOME/jboss/jboss-4.2.3.GA/server/default/deploy/fedoragsearch.war &>> $INSTALL_LOG
+myEcho "Linking WARs into Servlet container deploy directory"
+if [ "$SERVLET_CONTAINER" = "tomcat6" ]; then
+	ln -s $RODA_HOME/fedora/$GSEARCH_DIRNAME/fedoragsearchwar/ $SERVLET_CONTAINER_DEPLOY_DIR/fedoragsearch &>> $INSTALL_LOG
+elif [ "$SERVLET_CONTAINER" = "jboss4" ]; then
+	ln -s $RODA_HOME/fedora/$GSEARCH_DIRNAME/fedoragsearchwar/ $SERVLET_CONTAINER_DEPLOY_DIR/fedoragsearch.war &>> $INSTALL_LOG
+fi
 testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_75)"
-ln -s $RODA_HOME/fedora/fedora-2.2.4/install/fedorawar/ $RODA_HOME/jboss/jboss-4.2.3.GA/server/default/deploy/fedora.war &>> $INSTALL_LOG
+if [ "$SERVLET_CONTAINER" = "tomcat6" ]; then
+	ln -s $RODA_HOME/fedora/$FEDORA_DIRNAME/install/fedorawar/ $SERVLET_CONTAINER_DEPLOY_DIR/fedora &>> $INSTALL_LOG
+elif [ "$SERVLET_CONTAINER" = "jboss4" ]; then
+	ln -s $RODA_HOME/fedora/$FEDORA_DIRNAME/install/fedorawar/ $SERVLET_CONTAINER_DEPLOY_DIR/fedora.war &>> $INSTALL_LOG
+fi
 testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_76)"
-ln -s $RODA_HOME/webapps/roda-core.war $RODA_HOME/jboss/jboss-4.2.3.GA/server/default/deploy/ &>> $INSTALL_LOG
+ln -s $RODA_HOME/webapps/roda-core.war $SERVLET_CONTAINER_DEPLOY_DIR &>> $INSTALL_LOG
 testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_CORE" "Error installting RODA CORE (errorCode=${EX_FAILED_TO_INSTALL_CORE}_77)"
 
 myEcho

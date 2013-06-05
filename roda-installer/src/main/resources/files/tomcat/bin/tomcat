@@ -1,0 +1,93 @@
+#!/bin/bash
+
+### BEGIN INIT INFO
+# Provides:          tomcat6
+# Required-Start:    $local_fs $remote_fs $network
+# Required-Stop:     $local_fs $remote_fs $network
+# Should-Start:      $named
+# Should-Stop:       $named
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start Tomcat.
+# Description:       Start the Tomcat servlet engine.
+### END INIT INFO
+
+# change to the directory where the script is so we can read the configurations
+cd $(dirname $(readlink -m $0))
+
+if [ -f tomcat.config ]; then
+   . ./tomcat.config
+   . $SET_RODA_ENV_SCRIPT
+   TOMCAT_HOME="${RODA_HOME%/}/$TOMCAT_RELATIVE_PATH_TO_RODA_HOME"
+fi
+
+JAVA_HOME=/usr/lib/jvm/default-java
+export JAVA_HOME
+START_TOMCAT=$TOMCAT_HOME/bin/startup.sh
+STOP_TOMCAT=$TOMCAT_HOME/bin/shutdown.sh
+#TOMCAT_USER="dspace"
+JAVA_OPTS="$JAVA_OPTS  -Droda.home=$RODA_HOME -Dfedora.home=$FEDORA_HOME"
+
+[ -f $START_TOMCAT ] || exit 1
+[ -f $STOP_TOMCAT ] || exit 2
+
+RETVAL=0
+
+umask 077
+
+info(){
+   echo "[INFO] $1"
+}
+
+debug(){
+   echo "[DEBUG] $1"
+}
+
+start() {
+   info "Starting Tomcat Java server: "
+   #su -c $START_TOMCAT $TOMCAT_USER
+   $START_TOMCAT
+   echo
+   return $RETVAL
+}
+stop() {
+   info "Shutting down Tomcat Java server: "
+   #su -c $STOP_TOMCAT $TOMCAT_USER
+   $STOP_TOMCAT
+   echo
+   return $RETVAL
+}
+restart() {
+   #PID=$(pgrep -u $TOMCAT_USER -f tomcat)   
+   PID=$(pgrep -f tomcat)   
+   stop
+   if [ `ps -p $PID -o comm= | wc -l` -gt 0 ]; then
+      info "sleeping 2 seconds..."
+      sleep 2
+      if [ `ps -p $PID -o comm= | wc -l` -gt 0 ]; then
+         info "sleeping 3 seconds..."
+         sleep 3
+         if [ `ps -p $PID -o comm= | wc -l` -gt 0 ]; then
+            info "killing process with pid $PID"
+            kill -9 $PID
+         fi
+      fi
+   fi
+   start
+}
+case "$1" in
+   start)
+      start
+      ;;
+   stop)
+      stop
+      ;;
+   restart|reload)
+      restart
+      ;;
+   *)
+      echo "Usage: $0 {start|stop|restart}"
+      exit 1
+esac
+
+exit $?

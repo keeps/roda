@@ -3,18 +3,19 @@
 ################################################################################
 # RODA installation script (http://www.roda-community.org)
 #
-# Last update : 2013-06-04
+# Last update : 2013-06-05
 # Updated by  : hsilva@keep.pt
 #
 # Exit codes  :
 EX_OK=0                         # RODA installer script run smoothly
-EX_RODA_HOME_ALREADY_EXISTS=1   # RODA_HOME already exits
+EX_RODA_HOME_ALREADY_EXISTS=1   # RODA_HOME already exists
 EX_FAILED_TO_INSTALL_COMMON=2   # Failed to install RODA Common files
 EX_FAILED_TO_INSTALL_JBOSS=3    # Failed to install JBoss
-EX_FAILED_TO_INSTALL_CORE=4     # Failed to install RODA CORE
-EX_FAILED_TO_INSTALL_MIGRATOR=5 # Failed to install RODA CORE
-EX_FAILED_TO_INSTALL_UI=6       # Failed to install RODA CORE
-EX_FAILED_TO_INSTALL_HANDLE=7   # Failed to install RODA CORE
+EX_FAILED_TO_INSTALL_TOMCAT=4   # Failed to install Tomcat 
+EX_FAILED_TO_INSTALL_CORE=5     # Failed to install RODA CORE
+EX_FAILED_TO_INSTALL_MIGRATOR=6 # Failed to install RODA MIGRATOR
+EX_FAILED_TO_INSTALL_UI=7       # Failed to install RODA UI
+EX_FAILED_TO_INSTALL_HANDLE=8   # Failed to install RODA HANDLE
 #
 ################################################################################
 
@@ -95,12 +96,31 @@ QUIET=yes
 
 
 ################################################################################
-# Install JBoss 
+# Install Servlet Container (Tomcat or JBoss)
 ################################################################################
 cd $SCRIPT_DIR
-info "Installing JBoss"
-cp -v -r files/jboss $RODA_HOME &>> $INSTALL_LOG
-. $RODA_HOME/jboss/bin/jboss-setup.sh
+if [ "$SERVLET_CONTAINER" = "tomcat6" ]; then
+	TOMCAT_VERSION="6.0.37"
+	TOMCAT_DIRNAME="apache-tomcat-$TOMCAT_VERSION"
+	TOMCAT_ZIP="$TOMCAT_DIRNAME.zip"
+	TOMCAT_ZIP_MD5="2cdccdb521196932fcf2bc26b60c388b"
+	TOMCAT_ZIP_URL="http://www.eu.apache.org/dist/tomcat/tomcat-${TOMCAT_VERSION%%.*}/v$TOMCAT_VERSION/bin/$TOMCAT_ZIP"
+	info "Installing Tomcat"
+	cp -v -r files/tomcat $RODA_HOME &>> $INSTALL_LOG
+	. $RODA_HOME/tomcat/bin/tomcat-setup.sh
+	SERVLET_CONTAINER_DEPLOY_DIR=$RODA_HOME/tomcat/$TOMCAT_DIRNAME/webapps
+	SERVLET_CONTAINER_LIB_DIR=$RODA_HOME/tomcat/$TOMCAT_DIRNAME/lib
+elif [ "$SERVLET_CONTAINER" = "jboss4" ]; then
+	JBOSS_VERSION="4.2.3"
+	JBOSS_DIRNAME="jboss-$JBOSS_VERSION.GA-jdk6"
+	JBOSS_ZIP="$JBOSS_DIRNAME.zip"
+	JBOSS_ZIP_MD5="e548d9e369589f8b9be0abc642c19842"
+	JBOSS_ZIP_URL="http://sourceforge.net/projects/jboss/files/JBoss/JBoss-${JBOSS_VERSION}.GA/${JBOSS_ZIP}/download"
+	info "Installing JBoss"
+	cp -v -r files/jboss $RODA_HOME &>> $INSTALL_LOG
+	. $RODA_HOME/jboss/bin/jboss-setup.sh
+	SERVLET_CONTAINER_DEPLOY_DIR=$RODA_HOME/jboss/$JBOSS_DIRNAME/server/default/deploy
+fi
 
 
 ################################################################################
@@ -152,9 +172,15 @@ fi
 
 END_MSG="***************************************************************************\n"
 END_MSG="$END_MSG*\n"
-END_MSG="$END_MSG* Now, you just need to start JBoss\n"
-END_MSG="$END_MSG*\n"
-END_MSG="$END_MSG*\t${RODA_HOME%/}/bin/jboss start\n"
+if [ "$SERVLET_CONTAINER" = "tomcat6" ]; then
+	END_MSG="$END_MSG* Now, you just need to start Tomcat\n"
+	END_MSG="$END_MSG*\n"
+	END_MSG="$END_MSG*\t${RODA_HOME%/}/bin/tomcat start\n"
+elif [ "$SERVLET_CONTAINER" = "jboss4" ]; then
+	END_MSG="$END_MSG* Now, you just need to start JBoss\n"
+	END_MSG="$END_MSG*\n"
+	END_MSG="$END_MSG*\t${RODA_HOME%/}/bin/jboss start\n"
+fi
 END_MSG="$END_MSG*\n"
 END_MSG="$END_MSG* and create Fedora Generic Search index by pointing out your browser to\n"
 END_MSG="$END_MSG*\n"

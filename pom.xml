@@ -137,6 +137,8 @@ all the functionality prescribed by the OAIS reference model.</description>
 		<profile>
 			<id>core</id>
 			<modules>
+				<module>roda-common</module>
+				<module>roda-client</module>
 				<module>roda-core</module>
 			</modules>
 		</profile>

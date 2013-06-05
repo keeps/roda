@@ -113,14 +113,18 @@ testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_UI" "Error inst
 #fi
 
 myEcho
-myEcho "Linking WARs into JBoss deploy directory"
+myEcho "Linking WARs into Servlet container deploy directory"
 mv $RODA_HOME/webapps/roda-wui.war $RODA_HOME/webapps/roda-wui.zip &>> $INSTALL_LOG
 testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_UI" "Error installting RODA UI (errorCode=${EX_FAILED_TO_INSTALL_UI}_12)"
 unzip -q $RODA_HOME/webapps/roda-wui.zip -d $RODA_HOME/webapps/roda-wui.war &>> $INSTALL_LOG
 testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_UI" "Error installting RODA UI (errorCode=${EX_FAILED_TO_INSTALL_UI}_13)"
-ln -s $RODA_HOME/webapps/roda-wui.war $RODA_HOME/jboss/jboss-4.2.3.GA/server/default/deploy/ROOT.war &>> $INSTALL_LOG
+if [ "$SERVLET_CONTAINER" = "tomcat6" ]; then
+	ln -s $RODA_HOME/webapps/roda-wui.war $SERVLET_CONTAINER_DEPLOY_DIR/ROOT &>> $INSTALL_LOG
+elif [ "$SERVLET_CONTAINER" = "jboss4" ]; then
+	ln -s $RODA_HOME/webapps/roda-wui.war $SERVLET_CONTAINER_DEPLOY_DIR/ROOT.war &>> $INSTALL_LOG
+fi
 testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_UI" "Error installting RODA UI (errorCode=${EX_FAILED_TO_INSTALL_UI}_14)"
-ln -s $RODA_HOME/webapps/roda-in-installer.war $RODA_HOME/jboss/jboss-4.2.3.GA/server/default/deploy/roda-in-installer.war &>> $INSTALL_LOG
+ln -s $RODA_HOME/webapps/roda-in-installer.war $SERVLET_CONTAINER_DEPLOY_DIR &>> $INSTALL_LOG
 testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_UI" "Error installting RODA UI (errorCode=${EX_FAILED_TO_INSTALL_UI}_15)"
 
 myEcho

@@ -40,8 +40,8 @@ ant -f $RODA_HOME/bin/roda-migrator-setup.xml roda-migrator.properties &>> $INST
 testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_MIGRATOR" "Error installting RODA MIGRATOR (errorCode=${EX_FAILED_TO_INSTALL_MIGRATOR}_5)"
 
 myEcho
-myEcho "Linking WARs into JBoss deploy directory"
-ln -s $RODA_HOME/webapps/roda-migrator.war $RODA_HOME/jboss/jboss-4.2.3.GA/server/default/deploy/ &>> $INSTALL_LOG
+myEcho "Linking WARs into Servlet container deploy directory"
+ln -s $RODA_HOME/webapps/roda-migrator.war $SERVLET_CONTAINER_DEPLOY_DIR &>> $INSTALL_LOG
 testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_MIGRATOR" "Error installting RODA MIGRATOR (errorCode=${EX_FAILED_TO_INSTALL_MIGRATOR}_6)"
 
 myEcho
