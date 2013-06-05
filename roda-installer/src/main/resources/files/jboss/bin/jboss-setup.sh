@@ -15,13 +15,14 @@ JBOSS_ZIP_URL="http://sourceforge.net/projects/jboss/files/JBoss/JBoss-4.2.3.GA/
 myEcho
 myEcho "Downloading JBoss"
 if [ -f /tmp/$JBOSS_ZIP ] && [ "$JBOSS_ZIP_MD5" = "$(md5sum /tmp/$JBOSS_ZIP | sed 's# .*$##')" ]; then
+	myEcho
 	myEcho "JBoss already exists in /tmp and is valid (md5=\"$JBOSS_ZIP_MD5\")"
 else
 	wget --output-document=/tmp/$JBOSS_ZIP "$JBOSS_ZIP_URL" &>> $INSTALL_LOG
 	testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_JBOSS" "Error installting JBoss (errorCode=${EX_FAILED_TO_INSTALL_JBOSS}_3)"
 fi
-myEcho
 
+myEcho
 myEcho "Unpacking JBoss"
 unzip -o -q /tmp/$JBOSS_ZIP -d /tmp &>> $INSTALL_LOG
 testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_JBOSS" "Error installting JBoss (errorCode=${EX_FAILED_TO_INSTALL_JBOSS}_4)"
