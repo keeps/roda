@@ -188,7 +188,7 @@ or
 ################################################################################
 
 Inspect the logs:
-- RODA logs: [RODA_HOME]/roda/log/
-- Tomcat logs: [RODA_HOME]/roda/tomcat/apache-tomcat-6.0.37/logs/
-- JBoss logs: [RODA_HOME]/jboss-4.2.3.GA/server/default/log/
-- Fedora logs: [RODA_HOME]/roda/fedora/fedora-2.2.4/server/logs/
+- RODA logs: [RODA_HOME]/log/
+- Tomcat logs: [RODA_HOME]/tomcat/apache-tomcat-6.0.37/logs/
+- JBoss logs: [RODA_HOME]/jboss/jboss-4.2.3.GA/server/default/log/
+- Fedora logs: [RODA_HOME]/fedora/fedora-2.2.4/server/logs/
