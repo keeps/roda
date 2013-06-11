@@ -15,25 +15,33 @@
 # change to the directory where the script is so we can read the configurations
 cd $(dirname $(readlink -m $0))
 
+# source tomcat config file
 if [ -f tomcat.config ]; then
    . ./tomcat.config
    . $SET_RODA_ENV_SCRIPT
    TOMCAT_HOME="${RODA_HOME%/}/$TOMCAT_RELATIVE_PATH_TO_RODA_HOME"
+   TOMCAT_PIDFILE="${TOMCAT_HOME%/}/pid/tomcat.pid"
 fi
 
+# define variables
+umask 077
 JAVA_HOME=/usr/lib/jvm/default-java
 export JAVA_HOME
 START_TOMCAT=$TOMCAT_HOME/bin/startup.sh
 STOP_TOMCAT=$TOMCAT_HOME/bin/shutdown.sh
-#TOMCAT_USER="dspace"
+TOMCAT_USER="$(whoami)"
 JAVA_OPTS="$JAVA_OPTS  -Droda.home=$RODA_HOME -Dfedora.home=$FEDORA_HOME"
 
+# check if start/stop script exist
 [ -f $START_TOMCAT ] || exit 1
 [ -f $STOP_TOMCAT ] || exit 2
 
-RETVAL=0
+# check if the directory where the pid file is going to be saved exist
+TOMCAT_PID_DIR=$(dirname $(readlink -m $TOMCAT_PIDFILE))
+if [ ! -d $TOMCAT_PID_DIR ]; then
+   mkdir -p $TOMCAT_PID_DIR
+fi
 
-umask 077
 
 info(){
    echo "[INFO] $1"
@@ -42,37 +50,74 @@ info(){
 debug(){
    echo "[DEBUG] $1"
 }
-
+status() {
+   RUNNING_PID=0
+   if [ -f $TOMCAT_PIDFILE ]; then
+      TMP_PID=$(cat $TOMCAT_PIDFILE)
+      TMP_PID_CHECK=$(ps -p $TMP_PID -o pid=)
+      if [ "$TMP_PID_CHECK" != "" ]; then
+         RUNNING_PID=$TMP_PID
+         return 0  # running
+      else
+         return 1  # stopped, but pid file exists 
+      fi
+   fi
+   return 3 # stopped
+}
 start() {
+	status
+   if [ $? -eq 0 ]; then
+      echo "Tomcat (pid $RUNNING_PID) is already running. Aborting."
+      exit 100
+   fi
    info "Starting Tomcat Java server: "
    #su -c $START_TOMCAT $TOMCAT_USER
    $START_TOMCAT
-   echo
-   return $RETVAL
+	pgrep -f org.apache.catalina.startup.Bootstrap > $TOMCAT_PIDFILE
 }
 stop() {
    info "Shutting down Tomcat Java server: "
    #su -c $STOP_TOMCAT $TOMCAT_USER
+	status
+   if [ $? -ne 0 ]; then
+      echo "Nothing to stop, Tomcat is not running. Aborting."
+      exit 100
+   fi
    $STOP_TOMCAT
-   echo
-   return $RETVAL
+	RUNNING_PID=1
+	COUNT=0
+	MAX=10
+   while [ "$RUNNING_PID" -ne "0" ]; 
+   do
+		((COUNT++))
+      sleep 1
+      status
+      echo -n .
+		if [ "$COUNT" -ge "$MAX" ]; then
+			break
+		fi
+   done
+	echo
+	status
+   if [ "$?" -eq "0" ]; then
+   	if [ "$(ps -p $RUNNING_PID -o comm= 2>/dev/null | wc -l)" -gt "0" ]; then
+      	info "Sleeping 2 seconds..."
+	      sleep 2
+   		if [ "$(ps -p $RUNNING_PID -o comm= 2>/dev/null| wc -l)" -gt "0" ]; then
+         	info "Sleeping 3 seconds..."
+	         sleep 3
+   	      if [ "$(ps -p $RUNNING_PID -o comm= 2>/dev/null| wc -l)" -gt "0" ]; then
+      	      info "Killing process with pid $RUNNING_PID"
+         	   kill -9 $RUNNING_PID
+	         fi
+   	   fi
+		fi
+   fi
+   rm -f $TOMCAT_PIDFILE
 }
 restart() {
-   #PID=$(pgrep -u $TOMCAT_USER -f tomcat)   
-   PID=$(pgrep -f tomcat)   
+	status
    stop
-   if [ `ps -p $PID -o comm= | wc -l` -gt 0 ]; then
-      info "sleeping 2 seconds..."
-      sleep 2
-      if [ `ps -p $PID -o comm= | wc -l` -gt 0 ]; then
-         info "sleeping 3 seconds..."
-         sleep 3
-         if [ `ps -p $PID -o comm= | wc -l` -gt 0 ]; then
-            info "killing process with pid $PID"
-            kill -9 $PID
-         fi
-      fi
-   fi
    start
 }
 case "$1" in
@@ -85,9 +130,20 @@ case "$1" in
    restart|reload)
       restart
       ;;
+	status)
+      status
+      RET=$?
+      if [ $RET -eq 0 ]; then
+         echo "Tomcat (pid $RUNNING_PID) is running..."
+      elif [ $RET -eq 1 ]; then
+         echo "Tomcat is dead but pidfile ($TOMCAT_PIDFILE) exists..."
+      else
+         echo "Tomcat is stopped."
+      fi
+		;;
    *)
-      echo "Usage: $0 {start|stop|restart}"
-      exit 1
+      echo "Usage: $0 {start|stop|restart|status}"
+      exit 4
 esac
 
 exit $?
