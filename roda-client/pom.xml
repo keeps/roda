@@ -44,6 +44,14 @@
 			<artifactId>axis</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>axis</groupId>
+			<artifactId>axis-ant</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>axis</groupId>
+			<artifactId>axis-jaxrpc</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.sun.jersey</groupId>
 			<artifactId>jersey-client</artifactId>
 		</dependency>
@@ -68,10 +76,6 @@
 		<dependency>
 			<groupId>stax</groupId>
 			<artifactId>stax-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>axis</groupId>
-			<artifactId>axis-jaxrpc</artifactId>
 		</dependency>
 	</dependencies>
 	<build>

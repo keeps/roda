@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="roda-migrator-client" default="create-stubs" basedir=".">
+
+	<property name="roda-migrator-client.location" value="${basedir}" />
+	<!-- necessary to get the WSDL files -->
+	<property name="roda-migrator.location" value="${roda-migrator-client.location}/../roda-migrator-services" />
+	<property name="roda-migrator-client.stubs.location" value="${roda-migrator-client.location}/target/stubs" />
+
+	<path id="axis.classpath">
+		<path refid="roda-migrator-client.classpath" />
+	</path>
+	
+	<path id="roda-migrator-client.classpath">
+		<pathelement location="${roda-migrator-client.location}/target/classes" />
+		<fileset dir="${roda-migrator-client.location}/target/dependency">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<taskdef resource="axis-tasks.properties" classpathref="axis.classpath" />
+
+	<target name="create-stub">
+
+		<echo message="Generating client stubs for service ${service}" />
+	
+		<mkdir dir="${roda-migrator-client.stubs.location}"/>
+
+		<axis-wsdl2java output="${roda-migrator-client.stubs.location}" 
+			deployscope="Application" 
+			serverside="false" 
+			url="${roda-migrator.location}/src/main/webapp/wsdl/${service}.wsdl" 
+			timeout="-1" 
+			all="true" >
+			<mapping
+			      namespace="http://services.migrator.roda.dgarq.gov.pt"
+			      package="pt.gov.dgarq.roda.migrator.stubs" />
+		</axis-wsdl2java>
+
+	</target>
+
+	<target name="create-stubs">
+		<antcall target="create-stub">
+			<param name="service" value="SynchronousConverter" />
+		</antcall>
+		<!--
+		<antcall target="create-stub">
+			<param name="service" value="DW2Tiff" />
+		</antcall>
+		
+		<antcall target="create-stub">
+			<param name="service" value="ST2Pdf" />
+		</antcall>
+		
+		<antcall target="create-stub">
+			<param name="service" value="Audio2Mp3" />
+		</antcall>
+
+		<antcall target="create-stub">
+			<param name="service" value="Audio2Wav" />
+		</antcall>
+
+		<antcall target="create-stub">
+			<param name="service" value="Video2DVD" />
+		</antcall>
+
+		<antcall target="create-stub">
+			<param name="service" value="Video2Flv" />
+		</antcall>
+		-->
+
+		<!-- Delete files already in roda-common-data.jar -->
+		<delete includeemptydirs="true" quiet="true">
+			<fileset dir="${roda-migrator-client.stubs.location}/pt/gov/dgarq/roda/core" includes="**" />
+		</delete>
+
+		<!-- Delete existing stubs -->
+		<delete includeemptydirs="true" >
+			<fileset dir="${roda-migrator-client.location}/src/main/java/pt/gov/dgarq/roda/migrator/stubs" includes="**" />
+		</delete>
+
+		<!-- Copy new stub files to src directory -->
+		<copy todir="${roda-migrator-client.location}/src/main/java">
+			<fileset dir="${roda-migrator-client.stubs.location}" includes="**/*" />
+		</copy>
+
+	</target>
+
+</project>

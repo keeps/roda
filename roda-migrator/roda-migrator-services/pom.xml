@@ -77,9 +77,15 @@
 			<groupId>pt.gov.dgarq.roda</groupId>
 			<artifactId>roda-common-format-utility</artifactId>
 		</dependency>
+<!--
 		<dependency>
 			<groupId>axis</groupId>
 			<artifactId>axis-jaxrpc</artifactId>
+		</dependency>
+-->
+		<dependency>
+			<groupId>axis</groupId>
+			<artifactId>axis-ant</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.thoughtworks.xstream</groupId>

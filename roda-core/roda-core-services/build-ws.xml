@@ -16,7 +16,7 @@
 
 	<path id="roda-core.classpath">
 		<pathelement location="${roda-core.location}/target/classes" />
-		<fileset dir="${roda-core.location}/target/roda-core-1.0.0/WEB-INF/lib">
+		<fileset dir="${roda-core.location}/target/roda-core-services-1.1.0/WEB-INF/lib">
 			<include name="**/*.jar" />
 		</fileset>
 	</path>

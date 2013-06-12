@@ -3,7 +3,7 @@
 
 	<property name="roda-client.location" value="${basedir}" />
 	<!-- necessary to get the WSDL files -->
-	<property name="roda-core.location" value="${roda-client.location}/../core/roda-core" />
+	<property name="roda-core.location" value="${roda-client.location}/../roda-core/roda-core-services" />
 	<property name="roda-client.stubs.location" value="${roda-client.location}/target/stubs" />
 
 	<path id="axis.classpath">

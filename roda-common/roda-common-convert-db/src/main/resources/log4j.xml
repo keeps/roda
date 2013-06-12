@@ -16,7 +16,8 @@
 	</logger>
 
 	<root>
-		<level value="DEBUG" />
+		<level value="WARN" />
+		<!--<level value="DEBUG" />-->
 		<!-- <level value="TRACE" /> -->
 		<appender-ref ref="STDOUT" />
 	</root>

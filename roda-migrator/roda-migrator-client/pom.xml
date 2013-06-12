@@ -21,11 +21,15 @@
 		</dependency>
 		<dependency>
 			<groupId>axis</groupId>
-			<artifactId>axis-jaxrpc</artifactId>
+			<artifactId>axis</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>axis</groupId>
-			<artifactId>axis</artifactId>
+			<artifactId>axis-ant</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>axis</groupId>
+			<artifactId>axis-jaxrpc</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>pt.gov.dgarq.roda</groupId>
@@ -40,4 +44,20 @@
 			<artifactId>roda-common-utils</artifactId>
 		</dependency>
 	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-dependencies-to-target-dir</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>
