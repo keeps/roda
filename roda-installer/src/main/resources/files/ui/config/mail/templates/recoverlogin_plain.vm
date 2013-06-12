@@ -1,14 +1,14 @@
-Foi pedida a recuperação do registo associado a este email. 
+A login recovery associated to this e-mail was requested.
 
-Para proceder à recuperação, siga o endereço $recoverLoginCompleteURL
-Alternativamente, preencha os campos necessários em $recoverLoginURL
+To continue the recovery process, access the following address: $recoverLoginCompleteURL
+Alternatively, insert the necessary data in the following address: $recoverLoginURL
 
-Nome de utilizador:   $username
-Senha de recuperação: $token
+Username: $username
+Password for verification: $token
 
-E modifique a sua palavra-passe.
+And modify your password.
 
-Se não pediu a recuperação do registo, por favor ignore este email.
+If you didn't ask the login recovery before mentioned, please ignore this e-mail.
 
 =====================================================
-RODA - Repositório de Objectos Digitais e Autênticos
+RODA - Repository of Authentic Digital Objects

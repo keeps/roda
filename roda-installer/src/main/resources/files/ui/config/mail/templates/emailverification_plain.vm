@@ -1,12 +1,12 @@
-Na sequência do registo sobre o nome de utilizador $username, enviamos o pedido de verificação do endereço electrónico.
+In the sequence of the registration process of the username $username, an e-mail address verification is needed.
 
-Para proceder à verificação, siga o endereço $verificationCompleteURL
-Alternativamente, insira a senha de autenticação em $verificationURL
+To continue the verification process, access the following address : $verificationCompleteURL
+Alternatively, insert the password for verification in the following address: $verificationURL
 
-Nome de utilizador:   $username
-Senha de verificação: $token
+Username: $username
+Password for verification: $token
 
-Caso não tenha feito o registo, por favor ignore este email.
+If you didn't made the registration before mentioned, please ignore this e-mail.
 
 =====================================================
-RODA - Repositório de Objectos Digitais e Autênticos
+RODA - Repository of Authentic Digital Objects

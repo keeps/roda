@@ -1,13 +1,12 @@
 <html>
 <body>
-<p>Caro(a) Sr(a). $producerFullName,</p>
-<p>O pacote de ingest&#227;o depositado com o nome $sipOriginalFilename, na data $sipDateTime, foi rejeitado 
-manualmente pela seguinte raz&#227;o:</p>
+<p>Dear Mr./Mrs. $producerFullName,</p>
+<p>The package with the name $sipOriginalFilename, on $sipDateTime, was rejected manually for the following reason:</p>
 <p style="margin-left: 5px; margin-right: 5px; font-style: italic">$message</p>
 
-<p>Por favor reveja os erros indicados e tome as ac&#231;&#245;es apropriadas.</p>
+<p>Please revise the errors mentioned and act accordingly.</p>
 
-<p>RODA - Reposit&#243;rio de Objectos Digitais e Aut&#234;nticos</p>
+<p>RODA - Repository of Authentic Digital Objects</p>
 
 </body>
 <html>

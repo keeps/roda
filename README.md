@@ -33,7 +33,7 @@ The prerequisites to build RODA are:
  * Apache Ant
  * OpenJDK 6 JDK
 
-To install all dependencies in Debian or Debian based systems execute:
+To install all dependencies in Debian based systems execute:
 ```bash
 $ sudo apt-get install git maven ant openjdk-6-jdk
 ```
@@ -43,7 +43,7 @@ To compile, go to the RODA sources and execute the command:
 $ mvn clean install -Pcreate-installer
 ```
 
-After a successful compile, the installer will be available at `roda-installer/roda-installer.zip`. To install, uncompress the archive and follow the instructions on the file install.txt that is inside.
+After a successful compile, the installer will be available at `roda-installer/roda-installer.zip`. To install, uncompress the archive and follow the instructions on the file INSTALL.txt that is inside.
 
 ## Developers
 

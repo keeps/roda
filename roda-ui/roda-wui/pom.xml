@@ -10,50 +10,97 @@
 		<relativePath>..</relativePath>
 	</parent>
 	<packaging>war</packaging>
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>gwt-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<!-- <configuration> <extraJvmArgs>-Xmx512M -Xss1024k</extraJvmArgs> 
-							</configuration> -->
-						<id>compile-gwt</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>compile</goal>
-							<!-- <goal>generateAsync</goal> <goal>test</goal> -->
-						</goals>
-					</execution>
-				</executions>
-				<!-- <configuration> <runTarget>pt.gov.dgarq.roda.wui.main.Main/Main.html</runTarget> 
-					<draftCompile>true</draftCompile> <optimizationLevel>1</optimizationLevel> 
-					</configuration> -->
-			</plugin>
-			<plugin>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<executions>
-					<execution>
-						<phase>prepare-package</phase>
+	<profiles>
+		<profile>
+			<id>default</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>gwt-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>compile-gwt</id>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>compile</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<executions>
+							<execution>
+								<phase>prepare-package</phase>
+								<configuration>
+									<target>
+										<move todir="${project.build.directory}/${project.build.finalName}">
+											<fileset dir="${project.build.directory}/${project.build.finalName}/pt.gov.dgarq.roda.wui.main.Main/"/>
+										</move>
+										<move todir="${project.build.directory}/${project.build.finalName}">
+											<fileset dir="${project.build.directory}/${project.build.finalName}/pt.gov.dgarq.roda.disseminators.common.loading.Loading/"/>
+										</move>
+									</target>
+								</configuration>
+								<goals>
+									<goal>run</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>dev</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>gwt-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>compile-gwt</id>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>compile</goal>
+								</goals>
+							</execution>
+						</executions>
 						<configuration>
-							<target>
-								<move todir="${project.build.directory}/${project.build.finalName}">
-									<fileset dir="${project.build.directory}/${project.build.finalName}/pt.gov.dgarq.roda.wui.main.Main/"/>
-								</move>
-								<move todir="${project.build.directory}/${project.build.finalName}">
-									<fileset dir="${project.build.directory}/${project.build.finalName}/pt.gov.dgarq.roda.disseminators.common.loading.Loading/"/>
-								</move>
-							</target>
+							<draftCompile>true</draftCompile>
+							<optimizationLevel>0</optimizationLevel>
 						</configuration>
-						<goals>
-							<goal>run</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
+					</plugin>
+					<plugin>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<executions>
+							<execution>
+								<phase>prepare-package</phase>
+								<configuration>
+									<target>
+										<move todir="${project.build.directory}/${project.build.finalName}">
+											<fileset dir="${project.build.directory}/${project.build.finalName}/pt.gov.dgarq.roda.wui.main.Main/"/>
+										</move>
+										<move todir="${project.build.directory}/${project.build.finalName}">
+											<fileset dir="${project.build.directory}/${project.build.finalName}/pt.gov.dgarq.roda.disseminators.common.loading.Loading/"/>
+										</move>
+									</target>
+								</configuration>
+								<goals>
+									<goal>run</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 	<dependencies>
 		<dependency>
 			<groupId>pt.gov.dgarq.roda</groupId>

@@ -1,15 +1,15 @@
 <html>
 <body>
-<p>Na sequ&ecirc;ncia do registo sobre o nome de utilizador <em>$username</em>, enviamos o pedido de verifica&ccedil;&atilde;o do endere&#231;o electr&#243;nico.</p>
-<p>Para proceder &#224; verifica&#231;&#227;o, siga o endere&#231;o <a href="$verificationCompleteURL">$verificationCompleteURL</a>, ou, alternativamente, insira a senha de autentica&#231;&#227;o em <a href="$verificationURL">$verificationURL</a>:
+<p>In the sequence of the registration process of the username <em>$username</em>, an e-mail address verification is needed.</p>
+<p>To continue the verification process, access the following address <a href="$verificationCompleteURL">$verificationCompleteURL</a>, or, alternatively, insert the password for verification in the following address <a href="$verificationURL">$verificationURL</a>:
 <ul>
-<li><strong>Nome de utilizador:</strong> $username</li>
-<li><strong>Senha de verifica&#231;&#227;o:</strong> $token</li>
+<li><strong>Username:</strong> $username</li>
+<li><strong>Password for verification:</strong> $token</li>
 </ul>
 </p>
-<p>Caso n&#227;o tenha feito o registo, por favor ignore este email.</p>
+<p>If you didn't made the registration before mentioned, please ignore this e-mail.</p>
 
-<p>RODA - Reposit&#243;rio de Objectos Digitais e Aut&#234;nticos</p>
+<p>RODA - Repository of Authentic Digital Objects</p>
 
 </body>
 <html>

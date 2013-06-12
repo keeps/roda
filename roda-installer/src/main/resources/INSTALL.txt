@@ -46,7 +46,7 @@ The following software is needed:
 	3. Install dependencies
 ################################################################################
 
-For Debian or Debian based systems, here is how to install all software other
+For Debian based systems, here is how to install all software other
 than RODA in a glimpse:
 
    $> sudo -E wget --output-document=/etc/apt/sources.list.d/medibuntu.list \ 
@@ -82,7 +82,7 @@ than RODA in a glimpse:
 
 	and do not omit slapd configuration, set the domain to 'keep.pt' (without 
    the quotes), the organization name to 'KEEPS' (without the quotes),
-   root password to 'roda' (without the quotes) and the rest of the 
+   administrator password to 'roda' (without the quotes) and the rest of the 
    configurations with the default values.
 
 
@@ -109,6 +109,8 @@ locally and all default/demo users will have the same password, i.e.,
 
 2. Run the RODA installer. Do:
    	$> [RODA_INSTALLER]/install.sh
+
+If the installation was successful, go straight to section 6.
 
 WARNING: This installation process it's not meant to be used in production 
 environments.
@@ -154,11 +156,15 @@ or
    Run JBoss start/stop script:
    	$> [RODA_HOME]/bin/jboss start
 
+   As Tomcat/JBoss may take 1 or 2 minutes to deploy the web applications, please
+   consult the logs in order to assess if the deployment already finished before
+   continuing the process.
+
 2. Create Fedora Generic Search index
 
    Point out your browser to the address
-   	http://localhost:8080/fedoragsearch/rest?operation=updateIndex
-   and click the button "updateIndex createEmpty".
+		http://localhost:8080/fedoragsearch/rest?operation=updateIndex&action=createEmpty
+   and you're done.
 
 3. Verify if all RODA services are running
    
@@ -192,3 +198,12 @@ Inspect the logs:
 - Tomcat logs: [RODA_HOME]/tomcat/apache-tomcat-6.0.37/logs/
 - JBoss logs: [RODA_HOME]/jboss/jboss-4.2.3.GA/server/default/log/
 - Fedora logs: [RODA_HOME]/fedora/fedora-2.2.4/server/logs/
+
+
+################################################################################
+	7. Uninstalling RODA
+################################################################################
+
+   In order to properly uninstall RODA, a script to do the job is provived. 
+   To uninstall RODA, do:
+   	$> [RODA_HOME]/uninstall/uninstall.sh
