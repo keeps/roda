@@ -159,7 +159,7 @@ function ask_fedora_admin_passwd() {
 
 function ask_rodadata_mysql_host() {
 	if [ "$RODADATA_MYSQL_HOST" == "" ]; then
-		read -p "RODA Data MySQL database port [localhost]: " RODADATA_MYSQL_HOST
+		read -p "RODA Data MySQL database host [localhost]: " RODADATA_MYSQL_HOST
 		if [ "$RODADATA_MYSQL_HOST" == "" ]; then
 			RODADATA_MYSQL_HOST="localhost"
 		fi

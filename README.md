@@ -29,9 +29,9 @@ Also, you can checkout the [features](http://www.roda-community.org/what-is-roda
 
 To start developing for RODA check the [Developer guide](https://github.com/keeps/roda/wiki/Developer-guide) which has information on:
 
-1. [How to get the source code](https://github.com/keeps/roda/wiki/Developer-guide#wiki-get-source-code)
-2. [How the code is laid out](https://github.com/keeps/roda/wiki/Developer-guide#code-structure)
-3. [How to build and run](https://github.com/keeps/roda/wiki/Developer-guide#build)
-4. [How to set up the development environment](https://github.com/keeps/roda/wiki/Developer-guide#dev-env)
-5. [How to contribute](https://github.com/keeps/roda/wiki/Developer-guide#contribute)
+1. [How to get the source code](https://github.com/keeps/roda/wiki/Developer-guide#-how-to-get-the-source-code)
+2. [How the code is laid out](https://github.com/keeps/roda/wiki/Developer-guide#-how-the-code-is-laid-out)
+3. [How to build and run](https://github.com/keeps/roda/wiki/Developer-guide#-how-to-build-and-run)
+4. [How to set up the development environment](https://github.com/keeps/roda/wiki/Developer-guide#-how-to-set-up-the-development-environment)
+5. [How to contribute](https://github.com/keeps/roda/wiki/Developer-guide#-how-to-contribute)
 
