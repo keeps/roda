@@ -25,13 +25,32 @@ To install RODA checkout the binary installation packages at: http://www.roda-co
 
 Also, you can checkout the [features](http://www.roda-community.org/what-is-roda/) and [screenshots](http://www.roda-community.org/screenshots/) at the [RODA Community website](http://www.roda-community.org).
 
+## How to build and run
+
+The prerequisites to build RODA are:
+ * Git client
+ * Apache Maven
+ * Apache Ant
+ * OpenJDK 6 JDK
+
+To install all dependencies in Debian or Debian based systems execute:
+```bash
+$ sudo apt-get install git maven ant openjdk-6-jdk
+```
+
+To compile, go to the RODA sources and execute the command:
+```bash
+$ mvn clean install -Pcreate-installer
+```
+
+After a successful compile, the installer will be available at `roda-installer/roda-installer.zip`. To install, uncompress the archive and follow the instructions on the file install.txt that is inside.
+
 ## Developers
 
 To start developing for RODA check the [Developer guide](https://github.com/keeps/roda/wiki/Developer-guide) which has information on:
 
 1. [How to get the source code](https://github.com/keeps/roda/wiki/Developer-guide#-how-to-get-the-source-code)
 2. [How the code is laid out](https://github.com/keeps/roda/wiki/Developer-guide#-how-the-code-is-laid-out)
-3. [How to build and run](https://github.com/keeps/roda/wiki/Developer-guide#-how-to-build-and-run)
-4. [How to set up the development environment](https://github.com/keeps/roda/wiki/Developer-guide#-how-to-set-up-the-development-environment)
-5. [How to contribute](https://github.com/keeps/roda/wiki/Developer-guide#-how-to-contribute)
+3. [How to set up the development environment](https://github.com/keeps/roda/wiki/Developer-guide#-how-to-set-up-the-development-environment)
+4. [How to contribute](https://github.com/keeps/roda/wiki/Developer-guide#-how-to-contribute)
 
