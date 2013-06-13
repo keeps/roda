@@ -98,6 +98,7 @@ all the functionality prescribed by the OAIS reference model.</description>
 		<java_version>1.6</java_version>
 		<gwt_version>2.4.0</gwt_version>
 		<jhove_version>1.5</jhove_version>
+		<fedora_version>3.6.2</fedora_version>
 		<roda_community_url>http://roda-community.org</roda_community_url>
 	</properties>
 	<profiles>
@@ -316,6 +317,16 @@ all the functionality prescribed by the OAIS reference model.</description>
 				<groupId>com.artofsolving</groupId>
 				<artifactId>jodconverter</artifactId>
 				<version>2.2.1</version>
+			</dependency>
+			<dependency>
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-core</artifactId>
+				<version>2.2.2</version>
+			</dependency>
+			<dependency>
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-databind</artifactId>
+				<version>2.2.2</version>
 			</dependency>
 			<dependency>
 				<groupId>com.google.gwt</groupId>
@@ -655,21 +666,40 @@ all the functionality prescribed by the OAIS reference model.</description>
 				<version>1.0.0</version>
 			</dependency>
 			<dependency>
+				<!-- TO BE REMOVED -->
 				<groupId>pt.gov.dgarq.roda</groupId>
 				<artifactId>fedora-2.2.4-client</artifactId>
 				<version>1.0.0</version>
 			</dependency>
 			<dependency>
+				<groupId>org.fcrepo</groupId>
+				<artifactId>fcrepo-client-admin</artifactId>
+				<version>${fedora_version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.fcrepo</groupId>
+				<artifactId>fcrepo-client-messaging</artifactId>
+				<version>${fedora_version}</version>
+			</dependency>
+			<dependency>
+				<!-- TO BE REMOVED -->
 				<groupId>pt.gov.dgarq.roda</groupId>
 				<artifactId>fedora-2.2.4-getNextPIDInfo</artifactId>
 				<version>1.0.0</version>
 			</dependency>
 			<dependency>
+				<!-- TO BE REMOVED -->
 				<groupId>pt.gov.dgarq.roda</groupId>
 				<artifactId>fedora-2.2.4-server</artifactId>
 				<version>1.0.0</version>
 			</dependency>
 			<dependency>
+				<groupId>org.fcrepo</groupId>
+				<artifactId>fcrepo-server</artifactId>
+				<version>${fedora_version}</version>
+			</dependency>
+			<dependency>
+				<!-- TO BE REMOVED -->
 				<groupId>pt.gov.dgarq.roda</groupId>
 				<artifactId>fedora-2.2.4-xacml</artifactId>
 				<version>1.0.0</version>

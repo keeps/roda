@@ -12,37 +12,63 @@
 # Description:       Start the Tomcat servlet engine.
 ### END INIT INFO
 
-# change to the directory where the script is so we can read the configurations
+################################################################################
+# Change to the directory where the script is so we can read the configurations
+################################################################################
 cd $(dirname $(readlink -m $0))
 
-# source tomcat config file
+
+################################################################################
+# Source tomcat config file (or exit if not able to do so)
+################################################################################
 if [ -f tomcat.config ]; then
    . ./tomcat.config
    . $SET_RODA_ENV_SCRIPT
    TOMCAT_HOME="${RODA_HOME%/}/$TOMCAT_RELATIVE_PATH_TO_RODA_HOME"
    TOMCAT_PIDFILE="${TOMCAT_HOME%/}/pid/tomcat.pid"
+else
+	echo "Cannot source Tomcat config file ($PWD/tomcat.config)."
+	exit 1
 fi
 
-# define variables
+
+################################################################################
+# Define variables
+################################################################################
 umask 077
-JAVA_HOME=/usr/lib/jvm/default-java
-export JAVA_HOME
 START_TOMCAT=$TOMCAT_HOME/bin/startup.sh
 STOP_TOMCAT=$TOMCAT_HOME/bin/shutdown.sh
-TOMCAT_USER="$(whoami)"
-JAVA_OPTS="$JAVA_OPTS  -Droda.home=$RODA_HOME -Dfedora.home=$FEDORA_HOME"
-
-# check if start/stop script exist
-[ -f $START_TOMCAT ] || exit 1
-[ -f $STOP_TOMCAT ] || exit 2
-
-# check if the directory where the pid file is going to be saved exist
-TOMCAT_PID_DIR=$(dirname $(readlink -m $TOMCAT_PIDFILE))
-if [ ! -d $TOMCAT_PID_DIR ]; then
-   mkdir -p $TOMCAT_PID_DIR
+JAVA_OPTS="$JAVA_OPTS -Droda.home=$RODA_HOME -Dfedora.home=$FEDORA_HOME"
+if [ "$USER" = "$RUN_SERVLET_CONTAINER_AS" ]; then
+   SUBIT=""
+else
+   SUBIT="su - $RUN_SERVLET_CONTAINER_AS -c "
 fi
 
 
+################################################################################
+# Check if start/stop scripts exist
+################################################################################
+[ -f $START_TOMCAT ] || exit 2
+[ -f $STOP_TOMCAT ] || exit 3
+
+
+################################################################################
+# Check if the directory where the pid file is going to be saved exist
+################################################################################
+TOMCAT_PID_DIR=$(dirname $(readlink -m $TOMCAT_PIDFILE))
+if [ ! -d $TOMCAT_PID_DIR ]; then
+	if [ ! -z "$SUBIT" ]; then
+      $SUBIT "mkdir -p $TOMCAT_PID_DIR"
+   else
+      mkdir -p $TOMCAT_PID_DIR
+   fi
+fi
+
+
+################################################################################
+# Functions
+################################################################################
 info(){
    echo "[INFO] $1"
 }
@@ -50,9 +76,10 @@ info(){
 debug(){
    echo "[DEBUG] $1"
 }
+
 status() {
    RUNNING_PID=0
-   if [ -f $TOMCAT_PIDFILE ]; then
+   if [ -f $TOMCAT_PIDFILE -a -s $TOMCAT_PIDFILE ]; then
       TMP_PID=$(cat $TOMCAT_PIDFILE)
       TMP_PID_CHECK=$(ps -p $TMP_PID -o pid=)
       if [ "$TMP_PID_CHECK" != "" ]; then
@@ -64,26 +91,37 @@ status() {
    fi
    return 3 # stopped
 }
+
 start() {
 	status
    if [ $? -eq 0 ]; then
       echo "Tomcat (pid $RUNNING_PID) is already running. Aborting."
-      exit 100
+      exit 4 
    fi
    info "Starting Tomcat Java server: "
-   #su -c $START_TOMCAT $TOMCAT_USER
-   $START_TOMCAT
-	pgrep -f org.apache.catalina.startup.Bootstrap > $TOMCAT_PIDFILE
+	if [ ! -z "$SUBIT" ]; then
+      $SUBIT "export JAVA_OPTS=\"$JAVA_OPTS\"; $START_TOMCAT"
+   else
+      $START_TOMCAT
+   fi
+   pgrep -f org.apache.catalina.startup.Bootstrap > $TOMCAT_PIDFILE
+	if [ ! -z "$SUBIT" ]; then
+      chown $RUN_SERVLET_CONTAINER_AS $TOMCAT_PIDFILE
+   fi
 }
+
 stop() {
    info "Shutting down Tomcat Java server: "
-   #su -c $STOP_TOMCAT $TOMCAT_USER
 	status
    if [ $? -ne 0 ]; then
       echo "Nothing to stop, Tomcat is not running. Aborting."
-      exit 100
+      exit 5 
    fi
-   $STOP_TOMCAT
+	if [ ! -z "$SUBIT" ]; then
+      $SUBIT "$STOP_TOMCAT"
+   else
+      $STOP_TOMCAT
+   fi
 	RUNNING_PID=1
 	COUNT=0
 	MAX=10
@@ -115,11 +153,17 @@ stop() {
    fi
    rm -f $TOMCAT_PIDFILE
 }
+
 restart() {
 	status
    stop
    start
 }
+
+
+################################################################################
+# Real deal: let's decide what to do
+################################################################################
 case "$1" in
    start)
       start
@@ -143,7 +187,7 @@ case "$1" in
 		;;
    *)
       echo "Usage: $0 {start|stop|restart|status}"
-      exit 4
+      exit 6
 esac
 
 exit $?

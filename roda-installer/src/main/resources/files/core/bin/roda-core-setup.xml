@@ -125,6 +125,7 @@
 		<replace file="../config/roda-core.properties" token="RODADATA_PORT" value="${env.RODADATA_PORT}" />
 		<replace file="../config/roda-core.properties" token="RODA_GUEST_PASSWD" value="${env.RODA_GUEST_PASSWD}" />
 		<replace file="../config/roda-core.properties" token="RODA_ADMIN_PASSWD" value="${env.RODA_ADMIN_PASSWD}" />
+		<replace file="../config/roda-core.properties" token="RODA_INGEST_TASK_PASSWD" value="${env.RODA_INGEST_TASK_PASSWD}" />
 		<replace file="../config/roda-core.properties" token="FEDORA_ADMIN_PASSWD" value="${env.FEDORA_ADMIN_PASSWD}" />
 		<replace file="../config/roda-core.properties" token="LDAPHOST" value="${env.LDAPHOST}" />
 		<replace file="../config/roda-core.properties" token="LDAPPORT" value="${env.LDAPPORT}" />
