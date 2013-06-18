@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="roda-migrator-win" default="create-services" basedir=".">
+
+	<property name="roda-migrator-win.location" value="${basedir}" />
+	
+	<!-- AXIS properties -->
+	<!-- necessary to create services -->
+	<property name="target.server" value="localhost" />
+	<property name="target.port" value="8080" />
+	<property name="target.appname" value="roda-migrator" />
+	<property name="endpoint-stub.wsdd" value="${roda-migrator-win.location}/src/main/webapp/WEB-INF/server-config.wsdd" />
+
+	<path id="axis.classpath">
+		<path refid="roda-migrator-win.classpath" />
+	</path>
+
+	<path id="roda-migrator-win.classpath">
+		<pathelement location="${roda-migrator-win.location}/target/classes" />
+		<fileset dir="${roda-migrator-win.location}/target/roda-migrator-win-1.1.0/WEB-INF/lib">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<taskdef resource="axis-tasks.properties" classpathref="axis.classpath" />
+
+	<target name="create-converter-service">
+
+		<echo message="Generating WSDL for service interface ${interface}" />
+
+		<axis-java2wsdl 
+			output="${roda-migrator-win.location}/src/main/webapp/wsdl/${interface}.wsdl" 
+			classname="pt.gov.dgarq.roda.migrator.services.${interface}" 
+			style="WRAPPED" 
+			namespace="http://services.migrator.roda.dgarq.gov.pt" 
+			location="http://${target.server}:${target.port}/${target.appname}/services/${interface}" 
+			extraClasses="pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter pt.gov.dgarq.roda.core.data.adapter.filter.OneOfManyFilterParameter pt.gov.dgarq.roda.core.data.adapter.filter.RangeFilterParameter pt.gov.dgarq.roda.core.data.adapter.filter.RegexFilterParameter"/>
+
+		<!-- Copy the interface WSDL to service WSDL -->
+		<copy file="${roda-migrator-win.location}/src/main/webapp/wsdl/${interface}.wsdl" tofile="${roda-migrator-win.location}/src/main/webapp/wsdl/${service}.wsdl" />
+
+		<!-- Fix WSDL. Replace 'interface name' by 'service name' -->
+		<replace file="${roda-migrator-win.location}/src/main/webapp/wsdl/${service}.wsdl" token="${interface}Service" value="${service}Service" />
+
+		<replace file="${roda-migrator-win.location}/src/main/webapp/wsdl/${service}.wsdl" token="wsdl:port binding=&quot;impl:${interface}SoapBinding&quot; name=&quot;${interface}&quot;" value="wsdl:port binding=&quot;impl:${interface}SoapBinding&quot; name=&quot;${service}&quot;" />
+
+		<echo message="Generating WSDD for service ${service}" />
+
+		<property name="roda-migrator-win.skells.location" value="${roda-migrator-win.location}/target/skells" />
+		
+		<mkdir dir="${roda-migrator-win.skells.location}"/>
+
+		<!-- Generate server skeleton files and the WSDD files -->
+		<axis-wsdl2java output="${roda-migrator-win.skells.location}" deployscope="Application" 
+			serverside="true" url="${roda-migrator-win.location}/src/main/webapp/wsdl/${service}.wsdl" />
+
+		<!-- Copy the WSDD files -->
+		<copy todir="${roda-migrator-win.location}/src/main/webapp/WEB-INF/${service}Service">
+			<fileset dir="${roda-migrator-win.skells.location}" includes="**/*.wsdd" />
+		</copy>
+
+		<!-- Fix WSDD. Replace 'skeleton' classname by 'real' classname -->
+		<replace file="${roda-migrator-win.location}/src/main/webapp/WEB-INF/${service}Service/pt/gov/dgarq/roda/migrator/services/deploy.wsdd" 
+			token="pt.gov.dgarq.roda.migrator.services.${interface}SoapBindingImpl" 
+			value="pt.gov.dgarq.roda.migrator.services.${service}" />
+
+		<!-- Delete the skeleton files -->
+		<delete includeemptydirs="true">
+			<fileset dir="${roda-migrator-win.skells.location}" includes="**" />
+		</delete>
+
+		<!-- Update main WSDD file (server-config.wsdd) -->
+		<echo message="Updating server-config.wsdd" />
+		<java classname="org.apache.axis.utils.Admin" dir="${roda-migrator-win.location}/src/main/webapp/WEB-INF" fork="true">
+			<classpath refid="axis.classpath" />
+			<arg value="server" />
+			<arg value="${roda-migrator-win.location}/src/main/webapp/WEB-INF/${service}Service/pt/gov/dgarq/roda/migrator/services/deploy.wsdd" />
+		</java>
+	</target>
+
+	<target name="create-services">
+
+		<!--<echo message="To remove old services call 'ant remove-services' first" />-->
+
+		<antcall target="create-converter-service">
+			<param name="interface" value="SynchronousConverter" />
+			<param name="service" value="Doc2Pdf" />
+		</antcall>
+
+		<!-- ADD NEW SERVICES HERE -->
+		<!-- 1 - Copy an antcall 'create-converter-service -->
+		<!-- 2 - Change the service to the implemented class name -->
+		<!-- 3 - In the command line, call $ ant create-services -->
+		<!-- 4 - Create a new roda-migrator-win.war, call $ ant -->
+		<!-- 5 - Deploy the roda-migrator-win.war to your server -->
+
+	</target>
+
+	<target name="remove-services">
+
+		<!-- Remove all services -->
+		<!-- Copy the empty-server-config.wsdd WSDD server-config.wsdd -->
+		<copy file="${roda-migrator-win.location}/src/main/webapp/WEB-INF/empty-server-config.wsdd" 
+			tofile="${roda-migrator-win.location}/src/main/webapp/WEB-INF/server-config.wsdd" 
+			overwrite="true" />
+
+	</target>
+
+</project>
