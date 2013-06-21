@@ -168,6 +168,12 @@ or
 
 3. Verify if all RODA services are running
    
+	Please note that "admin" and other default/demo user passwords
+   (i.e., "guest", "roda-ingest-task", "roda-preservation-task", "roda-wui", 
+   "roda-handle", "roda-disseminator", "demo-admin", "demo-prod" and "demo-arq") 
+   are defined in install.config and should be used both to login into RODA-WUI
+   and to authenticate in all RODA Web Services.
+
 	Open your browser and access the following addresses:
 
    3.1. RODA-WUI   http://localhost:8080
