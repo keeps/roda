@@ -45,6 +45,8 @@ $ mvn clean install -Pcreate-installer
 
 After a successful compile, the installer will be available at `roda-installer/roda-installer.zip`. To install, uncompress the archive and follow the instructions on the file INSTALL.txt that is inside.
 
+For known issues running RODA and possible solutions please refer to the [Troubleshooting](https://github.com/keeps/roda/wiki/Troubleshooting) wiki page.
+
 ## Developers
 
 To start developing for RODA check the [Developer guide](https://github.com/keeps/roda/wiki/Developer-guide) which has information on:
