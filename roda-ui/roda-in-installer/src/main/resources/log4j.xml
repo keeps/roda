@@ -20,11 +20,13 @@
 		additivity="false">
 		<level value="WARN" />
 		<appender-ref ref="FILEOUT" />
-		<!--
-			Comment next line when exporting to tomcat to avoid overflooding
-			catalina.out
-		-->
-<!--		<appender-ref ref="STDOUT" />-->
+		<!-- Comment next line when exporting to tomcat to avoid overflooding catalina.out -->
+		<!-- <appender-ref ref="STDOUT" /> -->
 	</logger>
+
+	<root>
+		<level value="WARN" />
+		<appender-ref ref="FILEOUT" />
+	</root>
 
 </log4j:configuration>

@@ -45,5 +45,10 @@
 		<level value="INFO" />
 		<appender-ref ref="FILEOUT" />
 	</logger>
+	
+	<root>
+		<level value="WARN" />
+		<appender-ref ref="FILEOUT" />
+	</root>
 
 </log4j:configuration>

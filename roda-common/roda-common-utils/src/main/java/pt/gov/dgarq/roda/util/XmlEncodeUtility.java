@@ -40,4 +40,35 @@ public class XmlEncodeUtility {
 		return ret.toString();
 	}
 
+	/**
+	 * Escape invalid control characters from a text to be included in XML.
+	 * String types may contain C0 control characters that are not legal in XML.
+	 * This method convert these to the Unicode replacement character 0xFFFD.
+	 * 
+	 * @param text
+	 *            the text to be escaped.
+	 * @return the escaped text.
+	 */
+	public static String escapeInvalidXmlChars(String text) {
+		StringBuffer ret = new StringBuffer();
+
+		for (int i = 0; i < text.length(); i++) {
+			ret.append(escapeChar(text.charAt(i)));
+		}
+
+		return ret.toString();
+	}
+
+	private static char escapeChar(char c) {
+		if (c >= 0x20)
+			return c;
+		else if (c == '\n')
+			return c;
+		else if (c == '\r')
+			return c;
+		else if (c == '\t')
+			return c;
+		return '\uFFFD';
+	}
+
 }

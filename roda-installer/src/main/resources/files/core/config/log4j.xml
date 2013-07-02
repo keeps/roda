@@ -107,4 +107,9 @@
 		<appender-ref ref="RODA-CORE-LOG" />
 	</logger>
 
+	<root>
+		<level value="WARN" />
+		<appender-ref ref="RODA-CORE-LOG" />
+	</root>
+
 </log4j:configuration>

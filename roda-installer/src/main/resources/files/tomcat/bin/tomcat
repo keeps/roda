@@ -17,7 +17,6 @@
 ################################################################################
 cd $(dirname $(readlink -m $0))
 
-
 ################################################################################
 # Source tomcat config file (or exit if not able to do so)
 ################################################################################
@@ -104,6 +103,8 @@ start() {
    else
       $START_TOMCAT
    fi
+   info "Sleeping 3 seconds..."
+   sleep 3
    pgrep -f org.apache.catalina.startup.Bootstrap > $TOMCAT_PIDFILE
 	if [ ! -z "$SUBIT" ]; then
       chown $RUN_SERVLET_CONTAINER_AS $TOMCAT_PIDFILE
@@ -139,11 +140,11 @@ stop() {
 	status
    if [ "$?" -eq "0" ]; then
    	if [ "$(ps -p $RUNNING_PID -o comm= 2>/dev/null | wc -l)" -gt "0" ]; then
-      	info "Sleeping 2 seconds..."
-	      sleep 2
+      	info "Sleeping 5 seconds..."
+	      sleep 5
    		if [ "$(ps -p $RUNNING_PID -o comm= 2>/dev/null| wc -l)" -gt "0" ]; then
-         	info "Sleeping 3 seconds..."
-	         sleep 3
+         	info "Sleeping 10 seconds..."
+	         sleep 10
    	      if [ "$(ps -p $RUNNING_PID -o comm= 2>/dev/null| wc -l)" -gt "0" ]; then
       	      info "Killing process with pid $RUNNING_PID"
          	   kill -9 $RUNNING_PID

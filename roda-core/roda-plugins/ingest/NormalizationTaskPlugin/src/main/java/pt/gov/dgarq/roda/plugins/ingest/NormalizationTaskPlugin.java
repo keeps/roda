@@ -1,5 +1,6 @@
 package pt.gov.dgarq.roda.plugins.ingest;
 
+import java.io.File;
 import java.net.URL;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -63,8 +64,7 @@ public class NormalizationTaskPlugin extends IngestTaskPlugin {
 	private final String description = "Convert representations to normalized formats."; //$NON-NLS-1$
 
 	private final static String PROPERTIES_FILE_KEY = NormalizationTaskPlugin.class
-			.getName()
-			+ ".propertiesFile"; //$NON-NLS-1$
+			.getName() + ".propertiesFile"; //$NON-NLS-1$
 
 	private PluginManager pluginManager;
 	private PropertiesConfiguration normalizationProperties;
@@ -102,12 +102,13 @@ public class NormalizationTaskPlugin extends IngestTaskPlugin {
 
 		// Get the name of the properties file from the ingest task
 		// configuration
-		Configuration configuration = getIngestManagerConfiguration();
+		Configuration ingestManagerConfiguration = getIngestManagerConfiguration();
 
 		// Read the normalization properties file
 		String propertiesFile;
-		if (configuration.containsKey(PROPERTIES_FILE_KEY)) {
-			propertiesFile = configuration.getString(PROPERTIES_FILE_KEY);
+		if (ingestManagerConfiguration.containsKey(PROPERTIES_FILE_KEY)) {
+			propertiesFile = ingestManagerConfiguration
+					.getString(PROPERTIES_FILE_KEY);
 			logger.info("Properties file is " + propertiesFile); //$NON-NLS-1$
 		} else {
 			propertiesFile = "normalization.properties"; //$NON-NLS-1$
@@ -117,10 +118,40 @@ public class NormalizationTaskPlugin extends IngestTaskPlugin {
 		}
 
 		this.normalizationProperties = new PropertiesConfiguration();
+
 		try {
 
-			this.normalizationProperties.load(getClass().getResourceAsStream(
-					propertiesFile));
+			String RODA_HOME = null;
+
+			if (System.getProperty("roda.home") != null) {
+				RODA_HOME = System.getProperty("roda.home");//$NON-NLS-1$
+			} else if (System.getenv("RODA_HOME") != null) {
+				RODA_HOME = System.getenv("RODA_HOME"); //$NON-NLS-1$
+			} else {
+				RODA_HOME = null;
+			}
+
+			if (StringUtils.isBlank(RODA_HOME)) {
+				throw new PluginException(
+						"RODA_HOME enviroment variable and ${roda.home} system property are not set.");
+			}
+
+			File RODA_PLUGINS_CONFIG_DIRECTORY = new File(new File(RODA_HOME,
+					"config"), "plugins");
+
+			File configFile = new File(RODA_PLUGINS_CONFIG_DIRECTORY,
+					propertiesFile);
+
+			logger.debug("Trying to load configuration file from " + configFile);
+
+			if (configFile.isFile()) {
+				this.normalizationProperties.load(configFile);
+				logger.info("Loading configuration file from " + configFile);
+			} else {
+				this.normalizationProperties.load(getClass().getResourceAsStream(
+						propertiesFile));
+				logger.info("Loading default configuration file from resources");
+			}
 
 			if (logger.isDebugEnabled()) {
 				Iterator<String> keyIterator = this.normalizationProperties
@@ -133,9 +164,9 @@ public class NormalizationTaskPlugin extends IngestTaskPlugin {
 			}
 
 		} catch (ConfigurationException e) {
-			logger.debug("Error reading plugin configuration - " //$NON-NLS-1$
-					+ e.getMessage(), e);
-			throw new PluginException("Error reading plugin configuration - " //$NON-NLS-1$
+			logger.debug(
+					"Error reading plugin configuration - " + e.getMessage(), e);
+			throw new PluginException("Error reading plugin configuration - "
 					+ e.getMessage(), e);
 		}
 
@@ -175,8 +206,8 @@ public class NormalizationTaskPlugin extends IngestTaskPlugin {
 	 */
 	public List<PluginParameter> getParameters() {
 		return Arrays.asList(AbstractPlugin.PARAMETER_RODA_CORE_URL(),
-				AbstractPlugin.PARAMETER_RODA_CORE_USERNAME(), AbstractPlugin
-						.PARAMETER_RODA_CORE_PASSWORD());
+				AbstractPlugin.PARAMETER_RODA_CORE_USERNAME(),
+				AbstractPlugin.PARAMETER_RODA_CORE_PASSWORD());
 	}
 
 	/**
@@ -203,12 +234,9 @@ public class NormalizationTaskPlugin extends IngestTaskPlugin {
 			logger.error("Error getting representations of DO " + doPID + " - " //$NON-NLS-1$ //$NON-NLS-2$
 					+ e.getMessage(), e);
 
-			report
-					.append(String
-							.format(
-									Messages
-											.getString("NormalizationTaskPlugin.ERROR_GETTING_REPRESENTATIONS_OF_DO_X"), //$NON-NLS-1$
-									doPID, e.getMessage()));
+			report.append(String.format(
+					Messages.getString("NormalizationTaskPlugin.ERROR_GETTING_REPRESENTATIONS_OF_DO_X"), //$NON-NLS-1$
+					doPID, e.getMessage()));
 
 			// return new IngestTaskResult(false, report.toString());
 			this.ingestedDOPID = null;
@@ -217,21 +245,17 @@ public class NormalizationTaskPlugin extends IngestTaskPlugin {
 							+ e.getMessage(), e);
 		}
 
-		report
-				.append(String
-						.format(
-								Messages
-										.getString("NormalizationTaskPlugin.SIP_HAS_X_REPRESENTATIONS"),//$NON-NLS-1$
-								representations.size()));
+		report.append(String.format(
+				Messages.getString("NormalizationTaskPlugin.SIP_HAS_X_REPRESENTATIONS"),//$NON-NLS-1$
+				representations.size()));
 
 		logger.debug(String.format("SIP has %d representations %s\n", //$NON-NLS-1$
 				representations.size(), representations));
 
 		if (representations.size() == 0) {
 
-			report
-					.append(Messages
-							.getString("NormalizationTaskPlugin.SIP_DOESNT_HAVE_REPRESENATATIONS")); //$NON-NLS-1$
+			report.append(Messages
+					.getString("NormalizationTaskPlugin.SIP_DOESNT_HAVE_REPRESENATATIONS")); //$NON-NLS-1$
 
 			logger.debug("SIP doesn't have representations."); //$NON-NLS-1$
 
@@ -244,52 +268,36 @@ public class NormalizationTaskPlugin extends IngestTaskPlugin {
 
 				try {
 
-					report
-							.append(String
-									.format(
-											Messages
-													.getString("NormalizationTaskPlugin.PROCESSING_REPRESENTATION"), simpleRO //$NON-NLS-1$
-													.getPid()));
+					report.append(String.format(
+							Messages.getString("NormalizationTaskPlugin.PROCESSING_REPRESENTATION"), simpleRO //$NON-NLS-1$
+									.getPid()));
 
 					String reportLines = processRepresentation(simpleRO);
 
 					report.append(reportLines);
-					report
-							.append(String
-									.format(
-											Messages
-													.getString("NormalizationTaskPlugin.REPRESENTATION_X_PROCESSED_SUCCESSFULLY"), simpleRO //$NON-NLS-1$
-													.getPid()));
+					report.append(String.format(
+							Messages.getString("NormalizationTaskPlugin.REPRESENTATION_X_PROCESSED_SUCCESSFULLY"), simpleRO //$NON-NLS-1$
+									.getPid()));
 
 				} catch (PluginException e) {
 
 					logger.error(e.getMessage(), e);
 
-					report
-							.append(String
-									.format(
-											Messages
-													.getString("NormalizationTaskPlugin.ERROR_PROCESSING_REPRESENTATION_X"), //$NON-NLS-1$
-											simpleRO.getPid() + " - " //$NON-NLS-1$
-													+ e.getMessage()));
+					report.append(String.format(
+							Messages.getString("NormalizationTaskPlugin.ERROR_PROCESSING_REPRESENTATION_X"), //$NON-NLS-1$
+							simpleRO.getPid() + " - " //$NON-NLS-1$
+									+ e.getMessage()));
 
 					if (e.getReport() != null) {
-						report
-								.append(String
-										.format(
-												Messages
-														.getString("NormalizationTaskPlugin.NOMALIZATION_PLUGIN_IS_X"), //$NON-NLS-1$
-												getReportAsString(e.getReport())));
+						report.append(String.format(
+								Messages.getString("NormalizationTaskPlugin.NOMALIZATION_PLUGIN_IS_X"), //$NON-NLS-1$
+								getReportAsString(e.getReport())));
 					}
 
 					if (e.getReportItem() != null) {
-						report
-								.append(String
-										.format(
-												Messages
-														.getString("NormalizationTaskPlugin.NORMALIZATION_PLUGIN_REPORT_IS_X"), //$NON-NLS-1$
-												getReportItemAsString(e
-														.getReportItem())));
+						report.append(String.format(
+								Messages.getString("NormalizationTaskPlugin.NORMALIZATION_PLUGIN_REPORT_IS_X"), //$NON-NLS-1$
+								getReportItemAsString(e.getReportItem())));
 					}
 
 					sip.setIngestedPID(null);
@@ -307,8 +315,7 @@ public class NormalizationTaskPlugin extends IngestTaskPlugin {
 
 		if (taskResult.isPassed()) {
 			// Normalization went ok. Do clean
-			logger
-					.info("doCleanup for SIP " + sip.getId() + ". Nothing to cleanup"); //$NON-NLS-1$ //$NON-NLS-2$
+			logger.info("doCleanup for SIP " + sip.getId() + ". Nothing to cleanup"); //$NON-NLS-1$ //$NON-NLS-2$
 		} else {
 
 			// Normalization failed. Remove all objects
@@ -320,8 +327,9 @@ public class NormalizationTaskPlugin extends IngestTaskPlugin {
 				this.ingestService.removeDescriptionObject(this.ingestedDOPID);
 
 			} catch (Exception e) {
-				logger.warn("Error removing ingested objects - "
-						+ e.getMessage(), e);
+				logger.warn(
+						"Error removing ingested objects - " + e.getMessage(),
+						e);
 			}
 
 		}
@@ -351,9 +359,8 @@ public class NormalizationTaskPlugin extends IngestTaskPlugin {
 
 				// It means the representation is already normalised
 				String reportLine = String
-						.format(
-								Messages
-										.getString("NormalizationTaskPlugin.REPRESENTATION_X_IS_ALREADY_NORMALIZED"), //$NON-NLS-1$
+						.format(Messages
+								.getString("NormalizationTaskPlugin.REPRESENTATION_X_IS_ALREADY_NORMALIZED"), //$NON-NLS-1$
 								simpleRO.getPid(), simpleRO.getContentModel());
 				report.append(reportLine);
 				logger.debug(reportLine);
@@ -361,9 +368,9 @@ public class NormalizationTaskPlugin extends IngestTaskPlugin {
 				try {
 
 					String normalizedROPID = this.ingestService
-							.setDONormalizedRepresentation(simpleRO
-									.getDescriptionObjectPID(), simpleRO
-									.getPid());
+							.setDONormalizedRepresentation(
+									simpleRO.getDescriptionObjectPID(),
+									simpleRO.getPid());
 
 					logger.info("Marked representation " + normalizedROPID //$NON-NLS-1$
 							+ " as normalized"); //$NON-NLS-1$
@@ -382,9 +389,8 @@ public class NormalizationTaskPlugin extends IngestTaskPlugin {
 				// We have a normalization plugin. Let's call it.
 
 				String reportLine = String
-						.format(
-								Messages
-										.getString("NormalizationTaskPlugin.REPRESENTATION_X_PROCESSED_BY_PLUGIN_X"),//$NON-NLS-1$
+						.format(Messages
+								.getString("NormalizationTaskPlugin.REPRESENTATION_X_PROCESSED_BY_PLUGIN_X"),//$NON-NLS-1$
 								simpleRO.getPid(), normalizationPlugin);
 				report.append(reportLine);
 
@@ -396,12 +402,9 @@ public class NormalizationTaskPlugin extends IngestTaskPlugin {
 				Report pluginReport = executeNormalizationPlugin(
 						normalizationPlugin, simpleRO);
 
-				report
-						.append(String
-								.format(
-										Messages
-												.getString("NormalizationTaskPlugin.DETAILS_OF_PLUGIN_X"), //$NON-NLS-1$
-										normalizationPlugin));
+				report.append(String.format(
+						Messages.getString("NormalizationTaskPlugin.DETAILS_OF_PLUGIN_X"), //$NON-NLS-1$
+						normalizationPlugin));
 				report.append(getReportAsString(pluginReport));
 			}
 
@@ -409,9 +412,8 @@ public class NormalizationTaskPlugin extends IngestTaskPlugin {
 			// We don't know this content model
 
 			String reportLine = String
-					.format(
-							Messages
-									.getString("NormalizationTaskPlugin.REPRESENTATION_X_HAS_UNKOWN_CMODEL_X_NO_ACTION"),//$NON-NLS-1$
+					.format(Messages
+							.getString("NormalizationTaskPlugin.REPRESENTATION_X_HAS_UNKOWN_CMODEL_X_NO_ACTION"),//$NON-NLS-1$
 							simpleRO.getPid(), simpleRO.getContentModel());
 
 			report.append(reportLine);

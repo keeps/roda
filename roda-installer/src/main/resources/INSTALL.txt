@@ -22,6 +22,7 @@ The following software is needed:
 - Fedora Commons 2.2.4 (installed automatically with RODA)
 - Fedora Generic Search 2.1.1 (installed automatically with RODA)
 - Apache Tomcat 6.x.x (default, installed automatically with RODA)
+   - libtcnative-1 (optional library to speedup tomcat)
 - JBoss 4.2.3 (optional, installed automatically with RODA)
 - ClamAV
 - Apache Ant version 1.8.x or higher
@@ -58,16 +59,16 @@ than RODA in a glimpse:
 	For 32bit machines:
    $> sudo apt-get install mysql-server slapd ldap-utils debconf-utils clamav \
    ant openjdk-6-jdk imagemagick ghostscript mencoder jodconverter \
-   soundconverter ffmpeg gstreamer0.10-plugins-bad gstreamer0.10-ffmpeg \
-   fonts-ipafont-mincho fonts-ipafont-gothic ttf-arphic-ukai ttf-arphic-uming \
-   w32codecs munin munin-node postfix unzip
+   soundconverter ffmpeg gstreamer0.10-plugins-bad gstreamer0.10-plugins-ugly \
+   gstreamer0.10-ffmpeg fonts-ipafont-mincho fonts-ipafont-gothic \
+   ttf-arphic-ukai ttf-arphic-uming w32codecs munin munin-node postfix unzip
 
 	For 64bit machines:
    $> sudo apt-get install mysql-server slapd ldap-utils debconf-utils clamav \
    ant openjdk-6-jdk imagemagick ghostscript mencoder jodconverter \
-   soundconverter ffmpeg gstreamer0.10-plugins-bad gstreamer0.10-ffmpeg \
-   fonts-ipafont-mincho fonts-ipafont-gothic ttf-arphic-ukai ttf-arphic-uming \
-   w64codecs munin munin-node postfix unzip
+   soundconverter ffmpeg gstreamer0.10-plugins-bad gstreamer0.10-plugins-ugly \
+   gstreamer0.10-ffmpeg fonts-ipafont-mincho fonts-ipafont-gothic \
+   ttf-arphic-ukai ttf-arphic-uming w64codecs munin munin-node postfix unzip
 
    For demo environments, make the following configurations when
    promped (as it will make the installation process quicker):

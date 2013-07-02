@@ -131,6 +131,8 @@ all the functionality prescribed by the OAIS reference model.</description>
 			<modules>
 				<module>roda-common</module>
 				<module>roda-core/roda-plugins</module>
+				<module>roda-core/roda-core-plugins</module>
+				<module>roda-core/fedora-client-utility</module>
 				<module>roda-client</module>
 				<module>roda-migrator</module>
 			</modules>

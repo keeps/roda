@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Workarround for soundconverter bug that causes soundconverter to fail when running without X
+export $(dbus-launch)
+
+soundconverter $*
