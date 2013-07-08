@@ -52,12 +52,12 @@ public class GetRodaIn extends HttpServlet implements Servlet {
 
 	private static final long serialVersionUID = -2969960103558601287L;
 
+	private static Logger logger = Logger.getLogger(GetRodaIn.class);
+
 	private static final String RODA_IN_INSTALLER_FILE = "roda-in-installer.jar";
 	private static final String RODA_IN_WIN_INSTALLER_FILE = "roda-in-installer.exe";
 
 	private static final String OPERATIVE_SYSTEM_PARAMETER = "os";
-
-	private Logger logger = Logger.getLogger(GetRodaIn.class);
 
 	private final File tmpDir;
 	private final Properties properties;
@@ -341,8 +341,7 @@ public class GetRodaIn extends HttpServlet implements Servlet {
 				"WEB-INF/launch4j.xml")));
 		launch4jTask.setOutfile(output);
 		launch4jTask.setJar(genericInstaller);
-		launch4jTask.setBindir(new File(getRodaHome(),
-				"in/launch4j"));
+		launch4jTask.setBindir(new File(getRodaHome(), "in/launch4j"));
 		Project project = new Project();
 		project.setBasedir(getServletContext().getRealPath("WEB-INF/"));
 		launch4jTask.setProject(project);

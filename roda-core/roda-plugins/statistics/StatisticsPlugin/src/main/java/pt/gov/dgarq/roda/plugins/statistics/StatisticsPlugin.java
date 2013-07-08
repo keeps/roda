@@ -11,9 +11,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.w3c.util.DateParser;
 import org.w3c.util.InvalidDateException;
 
@@ -66,6 +67,7 @@ import pt.gov.dgarq.roda.core.stubs.UserBrowser;
  * 
  */
 public class StatisticsPlugin extends AbstractPlugin {
+	private static Logger logger = Logger.getLogger(StatisticsPlugin.class);
 
 	private static final int MAX_BLOCK_SIZE = 500;
 
@@ -220,7 +222,7 @@ public class StatisticsPlugin extends AbstractPlugin {
 
 	private void insert(Date timestamp, String type, String value) {
 		StatisticData entry = new StatisticData(timestamp, type, value);
-		System.out.println("ADD " + entry);
+		logger.info("ADD " + entry);
 		entries.add(entry);
 	}
 
@@ -522,8 +524,9 @@ public class StatisticsPlugin extends AbstractPlugin {
 			// insert
 			insert(currentDate, "logs.action." + action, actionCount + "");
 			for (Entry<String, Integer> entry : userCache.entrySet()) {
-				insert(currentDate, "logs.user." + action + "."
-						+ entry.getKey(), entry.getValue().toString());
+				insert(currentDate,
+						"logs.user." + action + "." + entry.getKey(), entry
+								.getValue().toString());
 			}
 		}
 
@@ -644,8 +647,8 @@ public class StatisticsPlugin extends AbstractPlugin {
 		int n = sipsCount - stateCount;
 		int manualTotal = Integer.parseInt(lastDurationManualTotal.getValue());
 
-		Set<String> producers = new HashSet<String>(translateList(lastProducers
-				.getValue(), ' '));
+		Set<String> producers = new HashSet<String>(translateList(
+				lastProducers.getValue(), ' '));
 
 		while (stateParsedCount < stateCount) {
 			adapter.setSublist(new Sublist(stateParsedCount, MAX_BLOCK_SIZE));
@@ -715,12 +718,11 @@ public class StatisticsPlugin extends AbstractPlugin {
 
 					producers.add(sip.getUsername());
 					n++;
-				}
-				else {
+				} else {
 					// TODO warning?
 				}
 			}
-			
+
 		}
 
 		insert(currentDate, "sips.duration.total", "" + durationTotalAvg);
@@ -760,8 +762,8 @@ public class StatisticsPlugin extends AbstractPlugin {
 
 			if (prodStates != null && prodStates.length > 0) {
 				insert(currentDate,
-						"producer." + producer + ".submission.last", DateParser
-								.getIsoDate(prodStates[0].getDatetime()));
+						"producer." + producer + ".submission.last",
+						DateParser.getIsoDate(prodStates[0].getDatetime()));
 			}
 
 			// Total of submissions

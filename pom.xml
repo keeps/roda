@@ -126,6 +126,18 @@ all the functionality prescribed by the OAIS reference model.</description>
 				<module>roda-migrator</module>
 			</modules>
 		</profile>
+                <profile>
+                        <id>all-but-wui</id>
+                        <modules>
+                                <module>roda-common</module>
+                                <module>roda-core</module>
+                                <module>roda-client</module>
+                                <module>roda-handle</module>
+                                <module>roda-migrator</module>
+				<module>roda-ui/roda-in</module>
+				<module>roda-ui/roda-in-installer</module>
+                        </modules>
+                </profile>
 		<profile>
 			<id>plugins</id>
 			<modules>
@@ -149,6 +161,8 @@ all the functionality prescribed by the OAIS reference model.</description>
 			<id>handle</id>
 			<modules>
 				<module>roda-handle</module>
+				<module>roda-common</module>
+				<module>roda-client</module>
 			</modules>
 		</profile>
 		<profile>
