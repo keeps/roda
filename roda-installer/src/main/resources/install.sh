@@ -102,6 +102,7 @@ cd $SCRIPT_DIR
 if [ "$SERVLET_CONTAINER" = "tomcat6" ]; then
 	TOMCAT_VERSION="6.0.37"
 	TOMCAT_DIRNAME="apache-tomcat-$TOMCAT_VERSION"
+	export TOMCAT_DIRNAME
 	TOMCAT_ZIP="$TOMCAT_DIRNAME.zip"
 	TOMCAT_ZIP_MD5="2cdccdb521196932fcf2bc26b60c388b"
 	TOMCAT_ZIP_URL="http://www.eu.apache.org/dist/tomcat/tomcat-${TOMCAT_VERSION%%.*}/v$TOMCAT_VERSION/bin/$TOMCAT_ZIP"

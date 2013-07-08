@@ -8,6 +8,7 @@
 		<echo message="env.RODA_HOME=${env.RODA_HOME}"/>
 		<replace file="tomcat.config" token="RODAHOME" value="${env.RODA_HOME}" />
 		<replace file="tomcat.config" token="USER" value="${env.USER}" />
+		<replace file="tomcat.config" token="TOMCATDIRNAME" value="${env.TOMCAT_DIRNAME}" />
 	</target>
 
 </project>
