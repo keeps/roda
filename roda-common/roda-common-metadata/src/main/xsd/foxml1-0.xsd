@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema targetNamespace="info:fedora/fedora-system:def/foxml#" xmlns="info:fedora/fedora-system:def/foxml#" xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<!-- the root element for FOXML: digitalObject -->
+	<xsd:element name="digitalObject">
+		<xsd:annotation>
+			<xsd:documentation/>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="digitalObjectType"/>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<!-- complex type declarations -->
+	<xsd:complexType name="digitalObjectType">
+		<xsd:sequence>
+			<xsd:element name="objectProperties" type="objectPropertiesType"/>
+			<xsd:element name="datastream" type="datastreamType" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="disseminator" type="disseminatorType" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="PID" type="pidType" use="optional"/>
+		<xsd:attribute name="FEDORA_URI" type="xsd:anyURI" use="optional"/>
+		<xsd:anyAttribute namespace="##other" processContents="lax"/>
+	</xsd:complexType>
+	<xsd:complexType name="objectPropertiesType">
+		<xsd:sequence>
+			<xsd:element name="property" type="propertyType" maxOccurs="unbounded"/>
+			<xsd:element name="extproperty" type="extpropertyType" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="datastreamType">
+		<xsd:sequence>
+			<xsd:element name="datastreamVersion" type="datastreamVersionType" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="ID" type="idType" use="required"/>
+		<xsd:attribute name="CONTROL_GROUP" use="required">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="E"/>
+					<xsd:enumeration value="M"/>
+					<xsd:enumeration value="R"/>
+					<xsd:enumeration value="X"/>
+					<xsd:enumeration value="B"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="FEDORA_URI" type="xsd:anyURI" use="optional"/>
+		<xsd:attribute name="STATE" type="stateType" use="optional"/>
+		<xsd:attribute name="VERSIONABLE" type="xsd:boolean" use="optional" default="true"/>
+
+	</xsd:complexType>
+	<xsd:complexType name="datastreamVersionType">
+		<xsd:sequence>
+			<xsd:element name="contentDigest" type="contentDigestType" minOccurs="0"/>
+			<xsd:choice>
+				<xsd:element name="xmlContent" type="xmlContentType"/>
+				<xsd:element name="contentLocation" type="contentLocationType"/>
+				<xsd:element name="binaryContent" type="xsd:base64Binary"/>
+			</xsd:choice>
+		</xsd:sequence>
+		<xsd:attribute name="ID" type="idType" use="required"/>
+		<xsd:attribute name="LABEL" type="xsd:string" use="optional"/>
+		<xsd:attribute name="CREATED" type="xsd:dateTime" use="optional"/>
+		<xsd:attribute name="MIMETYPE" type="xsd:string" use="required"/>
+		<xsd:attribute name="ALT_IDS" type="uriListType" use="optional"/>
+		<xsd:attribute name="FORMAT_URI" type="xsd:anyURI" use="optional"/>
+		<xsd:attribute name="SIZE" type="xsd:long" use="optional" default="0"/>
+	</xsd:complexType>
+	<xsd:complexType name="contentDigestType">
+		<xsd:attribute name="TYPE" use="optional">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="MD5"/>
+					<xsd:enumeration value="SHA-1"/>
+					<xsd:enumeration value="SHA-256"/>
+					<xsd:enumeration value="SHA-384"/>
+					<xsd:enumeration value="SHA-512"/>
+					<xsd:enumeration value="HAVAL"/>
+					<xsd:enumeration value="TIGER"/>
+					<xsd:enumeration value="WHIRLPOOL"/>
+					<xsd:enumeration value="DISABLED"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="DIGEST" type="xsd:string" use="optional"/>
+	</xsd:complexType>
+	<xsd:complexType name="xmlContentType">
+		<xsd:sequence>
+			<xsd:any namespace="##any" processContents="skip" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="contentLocationType">
+		<xsd:attribute name="TYPE" use="required">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="INTERNAL_ID"/>
+					<xsd:enumeration value="URL"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="REF" use="required">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:anyURI">
+					<xsd:minLength value="1"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<!--<xsd:simpleType>-->
+			<!-- <xsd:restriction base="xsd:token">-->
+			<!--<xsd:minLength value="1"/>-->
+			<!--</xsd:restriction>-->
+			<!--</xsd:simpleType>-->
+		</xsd:attribute>
+	</xsd:complexType>
+	<xsd:complexType name="disseminatorType">
+		<xsd:sequence>
+			<xsd:element name="disseminatorVersion" type="disseminatorVersionType" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="ID" type="idType" use="required"/>
+		<xsd:attribute name="BDEF_CONTRACT_PID" use="required">
+			<xsd:simpleType>
+				<xsd:restriction base="nonEmptyStringType">
+					<xsd:maxLength value="64"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="STATE" type="stateType" use="optional"/>
+		<xsd:attribute name="VERSIONABLE" type="xsd:boolean" use="optional" default="true"/>
+	</xsd:complexType>
+	<xsd:complexType name="disseminatorVersionType">
+		<xsd:sequence>
+			<xsd:element name="serviceInputMap" type="serviceInputMapType" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attribute name="ID" type="idType" use="required"/>
+		<xsd:attribute name="BMECH_SERVICE_PID" use="required">
+			<xsd:simpleType>
+				<xsd:restriction base="nonEmptyStringType">
+					<xsd:maxLength value="64"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="CREATED" type="xsd:dateTime" use="optional"/>
+		<xsd:attribute name="LABEL" type="xsd:string" use="optional"/>
+	</xsd:complexType>
+	<xsd:complexType name="serviceInputMapType">
+		<xsd:sequence>
+			<xsd:element name="datastreamBinding" type="datastreamBindingType" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="datastreamBindingType">
+		<xsd:attribute name="KEY" use="required">
+			<xsd:simpleType>
+				<xsd:restriction base="nonEmptyStringType">
+					<xsd:maxLength value="64"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="DATASTREAM_ID" type="xsd:IDREF" use="required"/>
+		<xsd:attribute name="LABEL" type="xsd:string" use="optional"/>
+		<xsd:attribute name="ORDER" type="xsd:string" use="optional"/>
+	</xsd:complexType>
+	<xsd:complexType name="propertyType">
+		<xsd:attribute name="NAME" use="required">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+					<xsd:enumeration value="info:fedora/fedora-system:def/model#state"/>
+					<xsd:enumeration value="info:fedora/fedora-system:def/model#label"/>
+					<xsd:enumeration value="info:fedora/fedora-system:def/model#createdDate"/>
+					<xsd:enumeration value="info:fedora/fedora-system:def/view#lastModifiedDate"/>
+					<xsd:enumeration value="info:fedora/fedora-system:def/model#contentModel"/>
+					<xsd:enumeration value="info:fedora/fedora-system:def/model#ownerId"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="VALUE" type="xsd:string" use="required"/>
+	</xsd:complexType>
+	<xsd:complexType name="extpropertyType">
+		<xsd:attribute name="NAME" type="xsd:string" use="required"/>
+		<xsd:attribute name="VALUE" type="xsd:string" use="required"/>
+	</xsd:complexType>
+	<xsd:simpleType name="stateType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="A"/>
+			<xsd:enumeration value="D"/>
+			<xsd:enumeration value="I"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- See http://www.fedora.info/definitions/identifiers/ -->
+	<xsd:simpleType name="pidType">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="64"/>
+			<xsd:pattern value="([A-Za-z0-9]|-|\.)+:(([A-Za-z0-9])|-|\.|~|_|(%[0-9A-F]{2}))+"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="nonEmptyStringType">
+		<xsd:restriction base="xsd:string">
+			<xsd:minLength value="1"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="idType">
+		<xsd:restriction base="xsd:ID">
+			<xsd:maxLength value="64"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="uriListType">
+		<xsd:list itemType="xsd:anyURI"/>
+	</xsd:simpleType>
+</xsd:schema>

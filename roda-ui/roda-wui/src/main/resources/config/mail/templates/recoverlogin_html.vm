@@ -1,22 +1,17 @@
 <html>
 <body>
-<p>Foi pedida a recupera&#231;&#227;o do registo associado a este email.</p>
+<p>A login recovery associated to this e-mail was requested.</p>
 
-<p>Para proceder &#224; recupera&#231;&#227;o, siga o endere&#231;o <a href="$recoverLoginCompleteURL">$recoverLoginCompleteURL</a>.</p>
-<p>Alternativamente, preencha os campos necess&#225;rios em <a href="$recoverLoginURL">$recoverLoginURL</a>.</p>
+<p>To continue the recovery process, access the following address <a href="$recoverLoginCompleteURL">$recoverLoginCompleteURL</a>.</p>
+<p>Alternatively, insert the necessary data in the following address <a href="$recoverLoginURL">$recoverLoginURL</a>.</p>
 <ul>
-<li><strong>Nome de utilizador:</strong> $username</li>
-<li><strong>Senha de recupera&#231;&#227;o:</strong> $token</li>
+<li><strong>Username:</strong> $username</li>
+<li><strong>Password for verification:</strong> $token</li>
 </ul>
-<p>E modifique a sua palavra-passe.</p>
-<p>Se n&#227;o pediu a recupera&#231;&#227;o do registo, por favor ignore este email.</p>
+<p>And modify your password.</p>
+<p>If you didn't ask the login recovery before mentioned, please ignore this e-mail.</p>
 
-<div id="footer" style="border-top: 1px solid #58595b; width: 90%; padding: 5px 10px; color: #58595b">
-RODA - Reposit&#243;rio de Objectos Digitais e Aut&#234;nticos<br/>
-<a href="https://roda.dgarq.gov.pt">https://roda.dgarq.gov.pt</a><br/>
-Direc&ccedil;&atilde;o Geral de Arquivos<br/>
-Governo de Portugal
-</div>
+<p>RODA - Repository of Authentic Digital Objects</p>
 
 </body>
 <html>

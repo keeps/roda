@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+	<xs:element name="COLUMN">
+		<xs:complexType mixed="true">
+			<xs:attribute name="ID" use="required"/>
+			<xs:attribute name="NAME" use="required"/>
+			<xs:attribute name="TYPE"/>
+			<xs:attribute name="SIZE"/>
+			<xs:attribute name="NULL"/>
+			<xs:attribute name="ISBIN"/>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="COLUMNS">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="COLUMN" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="DATA">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="TABLE" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="DB">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="STRUCTURE"/>
+				<xs:element ref="DATA"/>
+			</xs:sequence>
+			<xs:attribute name="NAME" use="required"/>
+			<xs:attribute name="CREATIONDATE" use="optional"/>
+			<xs:attribute name="EXPORTDATE" use="optional"/>
+			<xs:attribute name="PRODUCTNAME" use="optional"/>
+			<xs:attribute name="PRODUCTVERSION" use="optional"/>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="FIELD">
+		<xs:complexType>
+			<xs:attribute name="NAME" use="required"/>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="FKEY">
+		<xs:complexType>
+			<xs:attribute name="ID" use="required"/>
+			<xs:attribute name="NAME" use="required"/>
+			<xs:attribute name="IN" use="required"/>
+			<xs:attribute name="REF" use="required"/>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="KEYS">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="PKEY"/>
+				<xs:element ref="FKEY" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="PKEY">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="FIELD" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="TYPE" use="required">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="COMPOSITE"/>
+						<xs:enumeration value="SIMPLE"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="REGISTER">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="COLUMN" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="ID" use="required"/>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="STRUCTURE">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="TABLE" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="TABLE">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="COLUMNS" minOccurs="0"/>
+				<xs:element ref="KEYS" minOccurs="0"/>
+				<xs:element ref="REGISTER" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="ID" use="required"/>
+			<xs:attribute name="NAME" use="required"/>
+		</xs:complexType>
+	</xs:element>
+
+</xs:schema>

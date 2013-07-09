@@ -155,6 +155,7 @@ all the functionality prescribed by the OAIS reference model.</description>
 				<module>roda-common</module>
 				<module>roda-client</module>
 				<module>roda-core</module>
+				<module>roda-migrator/roda-migrator-client</module>
 			</modules>
 		</profile>
 		<profile>

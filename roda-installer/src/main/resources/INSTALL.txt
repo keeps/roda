@@ -60,15 +60,17 @@ than RODA in a glimpse:
    $> sudo apt-get install mysql-server slapd ldap-utils debconf-utils clamav \
    ant openjdk-6-jdk imagemagick ghostscript mencoder jodconverter \
    soundconverter ffmpeg gstreamer0.10-plugins-bad gstreamer0.10-plugins-ugly \
-   gstreamer0.10-ffmpeg fonts-ipafont-mincho fonts-ipafont-gothic \
-   ttf-arphic-ukai ttf-arphic-uming w32codecs munin munin-node postfix unzip
+   gstreamer0.10-plugins-bad-multiverse gstreamer0.10-ffmpeg \
+   fonts-ipafont-mincho fonts-ipafont-gothic ttf-arphic-ukai ttf-arphic-uming \
+   w32codecs munin munin-node postfix unzip
 
 	For 64bit machines:
    $> sudo apt-get install mysql-server slapd ldap-utils debconf-utils clamav \
    ant openjdk-6-jdk imagemagick ghostscript mencoder jodconverter \
    soundconverter ffmpeg gstreamer0.10-plugins-bad gstreamer0.10-plugins-ugly \
-   gstreamer0.10-ffmpeg fonts-ipafont-mincho fonts-ipafont-gothic \
-   ttf-arphic-ukai ttf-arphic-uming w64codecs munin munin-node postfix unzip
+   gstreamer0.10-plugins-bad-multiverse gstreamer0.10-ffmpeg \
+   fonts-ipafont-mincho fonts-ipafont-gothic ttf-arphic-ukai ttf-arphic-uming \
+   w64codecs munin munin-node postfix unzip
 
    For demo environments, make the following configurations when
    promped (as it will make the installation process quicker):

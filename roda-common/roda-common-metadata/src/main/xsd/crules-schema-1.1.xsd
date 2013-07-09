@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+           elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:documentation>
+      This W3C XML Schema was automatically derived from the RELAX NG schema 
+      included in the appinfo element below.
+    </xs:documentation>
+    <xs:appinfo>
+      <grammar xmlns="http://relaxng.org/ns/structure/1.0">
+        <description xmlns="http://purl.org/dc/elements/1.1/">
+          A conversion rules document starts with a root "conversionRules"
+          element.  This element contains an optional "description"
+          element, followed by zero or more "namespace" elements,
+          followed by zero or more "datastreamTemplate" elements,
+          followed by zero or more "objectTemplate" elements.
+          
+          A "namespace" element must have an "alias" and a "uri" attribute.
+
+          A "datastreamTemplate" element must have a "nodeType" attribute.
+          The element also contains an optional "description" element,
+          followed by zero or more "attribute" elements.
+
+          An "attribute" element must have "name" and "value" attributes.
+
+          An "objectTemplate" element must have a "nodeType" attribute.
+          The element also contains an optional "description" element,
+          followed by zero or more "attribute" elements, followed by
+          zero or more "relationship" elements.
+
+          A "relationship" element must have a "name" attribute.  The element
+          also contains one ore more "target" elements.
+
+          A "target" element must have a "primitiveRel" element whose value is
+          "tree:parent", "tree:child", "tree:ancestor", or "tree:descendant".  
+          The element also must have a "nodeType" attribute.
+        </description>
+        <start>
+          <element name="conversionRules">
+            <ref name="optionalDescriptionElement"/>
+            <zeroOrMore>
+              <element name="namespace">
+                <attribute name="alias">
+                  <text/>
+                </attribute>
+                <attribute name="uri">
+                  <text/>
+                </attribute>
+              </element>
+            </zeroOrMore>
+            <zeroOrMore>
+              <element name="datastreamTemplate">
+                <ref name="nodeTypeAttribute"/>
+                <ref name="optionalDescriptionElement"/>
+                <ref name="zeroOrMoreAttributeElements"/>
+              </element>
+            </zeroOrMore>
+            <zeroOrMore>
+              <element name="objectTemplate">
+                <ref name="nodeTypeAttribute"/>
+                <ref name="optionalDescriptionElement"/>
+                <ref name="zeroOrMoreAttributeElements"/>
+                <zeroOrMore>
+                  <element name="relationship">
+                    <attribute name="name">
+                      <text/>
+                    </attribute>
+                    <oneOrMore>
+                      <element name="target">
+                        <attribute name="primitiveRel">
+                          <choice>
+                            <value>tree:parent</value>
+                            <value>tree:child</value>
+                            <value>tree:ancestor</value>
+                            <value>tree:descendant</value>
+                          </choice>
+                        </attribute>
+                        <ref name="nodeTypeAttribute"/>
+                      </element>
+                    </oneOrMore>
+                  </element>
+                </zeroOrMore>
+              </element>
+            </zeroOrMore>
+          </element>
+        </start>
+        <define name="optionalDescriptionElement">
+          <optional>
+            <element name="description">
+              <text/>
+            </element>
+          </optional>
+        </define>
+        <define name="nodeTypeAttribute">
+          <attribute name="nodeType">
+            <text/>
+          </attribute>
+        </define>
+        <define name="zeroOrMoreAttributeElements">
+          <zeroOrMore>
+            <element name="attribute">
+              <attribute name="name">
+                <text/>
+              </attribute>
+              <attribute name="value">
+                <text/>
+              </attribute>
+            </element>
+          </zeroOrMore>
+        </define>
+      </grammar>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="conversionRules">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:group ref="optionalDescriptionElement"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="namespace"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="datastreamTemplate"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="objectTemplate"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="namespace">
+    <xs:complexType>
+      <xs:attribute name="alias" use="required"/>
+      <xs:attribute name="uri" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="datastreamTemplate">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:group ref="optionalDescriptionElement"/>
+        <xs:group ref="zeroOrMoreAttributeElements"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="nodeTypeAttribute"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="objectTemplate">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:group ref="optionalDescriptionElement"/>
+        <xs:group ref="zeroOrMoreAttributeElements"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="relationship"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="nodeTypeAttribute"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="relationship">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="target"/>
+      </xs:sequence>
+      <xs:attribute name="name" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="target">
+    <xs:complexType>
+      <xs:attribute name="primitiveRel" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="tree:parent"/>
+            <xs:enumeration value="tree:child"/>
+            <xs:enumeration value="tree:ancestor"/>
+            <xs:enumeration value="tree:descendant"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attributeGroup ref="nodeTypeAttribute"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:group name="optionalDescriptionElement">
+    <xs:sequence>
+      <xs:element minOccurs="0" ref="description"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:element name="description" type="xs:string"/>
+  <xs:attributeGroup name="nodeTypeAttribute">
+    <xs:attribute name="nodeType" use="required"/>
+  </xs:attributeGroup>
+  <xs:group name="zeroOrMoreAttributeElements">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="attribute"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:element name="attribute">
+    <xs:complexType>
+      <xs:attribute name="name" use="required"/>
+      <xs:attribute name="value" use="required"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>  

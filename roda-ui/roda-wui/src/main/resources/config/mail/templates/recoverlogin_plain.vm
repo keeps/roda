@@ -1,0 +1,14 @@
+A login recovery associated to this e-mail was requested.
+
+To continue the recovery process, access the following address: $recoverLoginCompleteURL
+Alternatively, insert the necessary data in the following address: $recoverLoginURL
+
+Username: $username
+Password for verification: $token
+
+And modify your password.
+
+If you didn't ask the login recovery before mentioned, please ignore this e-mail.
+
+=====================================================
+RODA - Repository of Authentic Digital Objects

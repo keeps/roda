@@ -212,6 +212,7 @@ objectClass: top
 cn: misc.browse_users
 roleOccupant: cn=administrators,LDAP_GROUPS_DN
 roleOccupant: cn=archivists,LDAP_GROUPS_DN
+roleOccupant: cn=producers,LDAP_GROUPS_DN
 
 #######################
 # dissemination.search.basic

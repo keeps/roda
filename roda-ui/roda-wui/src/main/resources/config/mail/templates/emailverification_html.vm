@@ -1,22 +1,15 @@
 <html>
 <body>
-<p>Na sequ&ecirc;ncia do registo do utilizador com o nome <em>$username</em>, enviamos o pedido de verifica&ccedil;&atilde;o do endere&#231;o electr&#243;nico.</p>
-<p>Para proceder &#224; verifica&#231;&#227;o, siga o endere&#231;o <a href="$verificationCompleteURL">$verificationCompleteURL</a>.</p>
-
-<p>Alternativamente, prencha o formul&#225;rio <a href="$verificationURL">$verificationURL</a>:
+<p>In the sequence of the registration process of the username <em>$username</em>, an e-mail address verification is needed.</p>
+<p>To continue the verification process, access the following address <a href="$verificationCompleteURL">$verificationCompleteURL</a>, or, alternatively, insert the password for verification in the following address <a href="$verificationURL">$verificationURL</a>:
 <ul>
-<li><strong>Nome de utilizador:</strong> $username</li>
-<li><strong>Senha de verifica&#231;&#227;o:</strong> $token</li>
+<li><strong>Username:</strong> $username</li>
+<li><strong>Password for verification:</strong> $token</li>
 </ul>
 </p>
-<p>Caso n&#227;o tenha feito o registo, por favor ignore este email.</p>
+<p>If you didn't made the registration before mentioned, please ignore this e-mail.</p>
 
-<div id="footer" style="border-top: 1px solid #58595b; width: 90%; padding: 5px 10px; color: #58595b">
-RODA - Reposit&#243;rio de Objectos Digitais e Aut&#234;nticos<br/>
-<a href="https://roda.dgarq.gov.pt">https://roda.dgarq.gov.pt</a><br/>
-Direc&ccedil;&atilde;o Geral de Arquivos<br/>
-Governo de Portugal
-</div>
+<p>RODA - Repository of Authentic Digital Objects</p>
 
 </body>
 <html>

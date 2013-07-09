@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+	
+	<xs:element name="type">
+		<xs:annotation>
+			<xs:documentation>The type of the column. A type can be simple or composed, composed
+				types can be structure or array. Types are defined based on SQL:1999
+			standard.</xs:documentation></xs:annotation>
+		<xs:complexType>
+			<xs:choice>
+				<xs:element ref="simpleTypeString"/>
+				<xs:element ref="simpleTypeNumericExact"/>
+				<xs:element ref="simpleTypeNumericApproximate"/>
+				<xs:element ref="simpleTypeBoolean"/>
+				<xs:element ref="simpleTypeEnumeration"/>
+				<xs:element ref="simpleTypeDateTime"/>
+				<xs:element ref="simpleTypeInterval"/>
+				<xs:element ref="simpleTypeBinary"/>
+				<xs:element ref="composedTypeStructure"/>
+				<xs:element ref="composedTypeArray"/>
+			</xs:choice>
+			<xs:attribute name="originalTypeName" use="optional"/>
+			<xs:attribute name="description" use="optional"/>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="composedTypeArray">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="type" minOccurs="1" maxOccurs="1"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="composedTypeStructure">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="type" minOccurs="1" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="simpleTypeString">
+		<xs:annotation>
+			<xs:documentation>Sequence of charecters drawn from sobre character repertoire (charset)
+				This sequence is is either of fixed length, or of variable length up to some
+				implementation-defined maximum</xs:documentation></xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="length" type="xs:nonNegativeInteger" use="required"/>
+			<xs:attribute name="variableLegth" type="xs:boolean" use="required"/>
+			<xs:attribute name="charSet" type="xs:string" use="optional"/>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="simpleTypeNumericExact">
+		<xs:annotation>
+			<xs:documentation>An exact numeric includes integer types and types with specified
+				precision (number of digits) and scale (digits after the radix
+			point)</xs:documentation></xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="precision" type="xs:nonNegativeInteger" use="optional"/>
+			<xs:attribute name="scale" type="xs:nonNegativeInteger" use="optional"/>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="simpleTypeNumericApproximate">
+		<xs:annotation>
+			<xs:documentation>An approximate numeric is essentially a floating point and for each a
+				precision may be optionally specified</xs:documentation></xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="precision" type="xs:nonNegativeInteger" use="optional"/>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="simpleTypeBoolean">
+		<xs:annotation>
+			<xs:documentation>A value of the Boolean data type is either true or false. The truth
+				value of unknown is sometimes represented by the null value.</xs:documentation></xs:annotation>
+	</xs:element>
+	
+	<xs:element name="simpleTypeEnumeration">
+		<xs:annotation>
+			<xs:documentation>A list of possible values for this field. Each value is represented by
+				a string</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="simpleTypeEnumerationOption" minOccurs="2" maxOccurs="unbounded"
+				/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="simpleTypeEnumerationOption">
+		<xs:complexType>
+			<xs:attribute name="name" type="xs:string" use="required"/>
+			<xs:attribute name="description" use="optional"/>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="simpleTypeDateTime">
+		<xs:annotation><xs:documentation>Date and time according to ISO 8601.</xs:documentation></xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="timeDefined" type="xs:boolean" use="required"/>
+			<xs:attribute name="timeZoneDefined" type="xs:boolean" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="simpleTypeInterval">
+		<xs:annotation><xs:documentation>Time intervals according to ISO 8601.</xs:documentation></xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="type" use="required">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="START_END"/>
+						<xs:enumeration value="START_DURATION"/>
+						<xs:enumeration value="DURATION_END"/>
+						<xs:enumeration value="DURATION"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="simpleTypeBinary">
+		<xs:annotation>
+			<xs:documentation>A value of binary string type (known as a binary large object, or
+				BLOB) is a variable length sequence of octets, up to an implementation-defined
+				maximum.</xs:documentation></xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="formatRegistryName" type="xs:string" use="optional"/>
+			<xs:attribute name="formatRegistryKey" type="xs:string" use="optional"/>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="column">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="type" minOccurs="1" maxOccurs="1"/>
+			</xs:sequence>
+			<xs:attribute name="id" use="required"/>
+			<xs:attribute name="name" use="required"/>
+			<xs:attribute name="nillable" type="xs:boolean" use="optional"/>
+			<xs:attribute name="description" use="optional"/>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="columns">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="column" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="field">
+		<xs:complexType>
+			<xs:attribute name="name" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="fkey">
+		<xs:complexType>
+			<xs:attribute name="id" use="required"/>
+			<xs:attribute name="name" use="required"/>
+			<xs:attribute name="in" use="required"/>
+			<xs:attribute name="ref" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="pkey">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="field" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="type" use="required">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="COMPOSITE"/>
+						<xs:enumeration value="SIMPLE"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="keys">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="pkey" minOccurs="0" maxOccurs="1"/>
+				<xs:element ref="fkey" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="table">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="columns" minOccurs="0"/>
+				<xs:element ref="keys" minOccurs="0"/>
+			</xs:sequence>
+			<xs:attribute name="id" use="required"/>
+			<xs:attribute name="name" use="required"/>
+			<xs:attribute name="description" use="optional"/>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="structure">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="table" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="db">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="structure"/>
+				<xs:element ref="data"/>
+			</xs:sequence>
+			<xs:attribute name="name" use="required"/>
+			<xs:attribute name="creationDate"  type="xs:dateTime" use="optional"/>
+			<xs:attribute name="exportDate" type="xs:dateTime" use="optional"/>
+			<xs:attribute name="productName" type="xs:string" use="optional"/>
+			<xs:attribute name="productVersion" type="xs:string" use="optional"/>
+			<xs:attribute name="defaultTransactionIsolationLevel" type="xs:int" use="optional"/>
+			<xs:attribute name="extraNameCharacters" type="xs:string" use="optional"/>
+			<xs:attribute name="stringFunctions" type="xs:string" use="optional"/>
+			<xs:attribute name="systemFunctions" type="xs:string" use="optional"/>
+			<xs:attribute name="timeDateFunctions" type="xs:string" use="optional"/>
+			<xs:attribute name="url" type="xs:string" use="optional"/>
+			<xs:attribute name="supportsANSI92EntryLevelSQL" type="xs:boolean" use="optional"/>
+			<xs:attribute name="supportsANSI92IntermediateSQL" type="xs:boolean" use="optional"/>
+			<xs:attribute name="supportsANSI92FullSQL" type="xs:boolean" use="optional"/>
+			<xs:attribute name="supportsCoreSQLGrammar" type="xs:boolean" use="optional"/>
+			<xs:attribute name="schemaVersion" type="xs:string" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="data">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="tableData" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="tableData">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="row" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="id" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="row">
+		<xs:annotation>
+			<xs:documentation>Container for the row data. A row has a list of
+			cells.</xs:documentation></xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="cell" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="id" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="cell">
+		<xs:annotation>
+			<xs:documentation>Container for the cell data. The data correspondes to a simple or
+				composite type. All types are nillable.</xs:documentation></xs:annotation>
+		<xs:complexType>
+			<xs:choice minOccurs="1" maxOccurs="1">
+				<xs:element ref="s"/>
+				<xs:element ref="c"/>
+				<xs:element ref="b"/>
+			</xs:choice>
+			<xs:attribute name="id" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="s" type="xs:string" nillable="true">
+		<xs:annotation>
+			<xs:documentation>Container for simple or predefined data like string, integers,
+				booleans, dates, etc.</xs:documentation></xs:annotation>
+	</xs:element>
+	
+	<xs:element name="b" nillable="true">
+		<xs:annotation>
+			<xs:documentation>Container for simple or predefined data like string, integers,
+			booleans, dates, etc.</xs:documentation></xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="file" type="xs:string" use="required"/>
+			<xs:attribute name="formatRegistryName" type="xs:string" use="optional"/>
+			<xs:attribute name="formatRegistryKey" type="xs:string" use="optional"/>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="c" nillable="true">
+		<xs:annotation>
+			<xs:documentation>Container for composite data like arrays or
+				structures</xs:documentation></xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:choice minOccurs="1" maxOccurs="unbounded">
+					<xs:element ref="s"/>
+					<xs:element ref="c"/>
+					<xs:element ref="b"/>
+				</xs:choice>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

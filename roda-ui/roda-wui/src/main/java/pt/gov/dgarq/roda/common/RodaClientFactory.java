@@ -120,8 +120,15 @@ public class RodaClientFactory {
 		int serverPort = req.getServerPort();
 		String contextPath = req.getContextPath();
 
-		String url = scheme + "://" + serverName + ":" + serverPort
-				+ contextPath;
+		String url;
+		if ("http".equalsIgnoreCase(scheme) && serverPort == 80) {
+			url = scheme + "://" + serverName + contextPath;
+		} else if ("https".equalsIgnoreCase(scheme) && serverPort == 443) {
+			url = scheme + "://" + serverName + contextPath;
+		} else {
+			url = scheme + "://" + serverName + ":" + serverPort + contextPath;
+		}
+
 		return url;
 	}
 
