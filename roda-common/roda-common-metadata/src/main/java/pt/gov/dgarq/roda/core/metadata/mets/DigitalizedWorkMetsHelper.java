@@ -72,8 +72,12 @@ public class DigitalizedWorkMetsHelper extends MetsHelper {
 
 		try {
 
-			return new DigitalizedWorkMetsHelper(MetsDocument.Factory
-					.parse(metsInputStream));
+			MetsDocument document = MetsDocument.Factory.parse(metsInputStream);
+			if (document.validate()) {
+				return new DigitalizedWorkMetsHelper(document);
+			} else {
+				throw new MetsMetadataException("Error validating XML document");
+			}
 
 		} catch (XmlException e) {
 			logger.debug("Error parsing METS - " + e.getMessage(), e);
@@ -315,7 +319,7 @@ public class DigitalizedWorkMetsHelper extends MetsHelper {
 		}
 
 		// FileType file = null;
-		//		
+		//
 		// for (FileType fileType : getFiles()) {
 		// if (fileType.getFLocatList().get(0).getHref().equals(href)) {
 		// file = fileType;

@@ -11,6 +11,7 @@ import java.util.List;
 
 import lc.xmlns.premisV2.ContentLocationComplexType;
 import lc.xmlns.premisV2.CreatingApplicationComplexType;
+import lc.xmlns.premisV2.EventDocument;
 import lc.xmlns.premisV2.ExtensionComplexType;
 import lc.xmlns.premisV2.File;
 import lc.xmlns.premisV2.FixityComplexType;
@@ -86,8 +87,14 @@ public class PremisFileObjectHelper extends PremisObjectHelper {
 
 		try {
 
-			return new PremisFileObjectHelper(ObjectDocument.Factory
-					.parse(premisInputStream));
+			ObjectDocument document = ObjectDocument.Factory
+					.parse(premisInputStream);
+			if (document.validate()) {
+				return new PremisFileObjectHelper(document);
+			} else {
+				throw new PremisMetadataException(
+						"Error validating XML document");
+			}
 
 		} catch (XmlException e) {
 			logger.debug("Error parsing PREMIS - " + e.getMessage(), e);

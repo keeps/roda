@@ -20,13 +20,13 @@ import x0Policy.oasisNamesTcXacml1.ActionMatchType;
 import x0Policy.oasisNamesTcXacml1.ApplyType;
 import x0Policy.oasisNamesTcXacml1.AttributeDesignatorType;
 import x0Policy.oasisNamesTcXacml1.AttributeValueType;
+import x0Policy.oasisNamesTcXacml1.EffectType.Enum;
 import x0Policy.oasisNamesTcXacml1.PolicyDocument;
 import x0Policy.oasisNamesTcXacml1.PolicyType;
 import x0Policy.oasisNamesTcXacml1.ResourceMatchType;
 import x0Policy.oasisNamesTcXacml1.RuleType;
 import x0Policy.oasisNamesTcXacml1.SubjectAttributeDesignatorType;
 import x0Policy.oasisNamesTcXacml1.TargetType;
-import x0Policy.oasisNamesTcXacml1.EffectType.Enum;
 
 /**
  * This is an helper class for manipulating a XACML Policy XML document. It
@@ -107,8 +107,14 @@ public class PolicyHelper {
 
 		try {
 
-			return new PolicyHelper(PolicyDocument.Factory
-					.parse(policyInputStream));
+			PolicyDocument document = PolicyDocument.Factory
+					.parse(policyInputStream);
+			if (document.validate()) {
+				return new PolicyHelper(document);
+			} else {
+				throw new PolicyMetadataException(
+						"Error validating XML document");
+			}
 
 		} catch (XmlException e) {
 			logger.debug("Error parsing XACML Policy - " + e.getMessage(), e);
@@ -252,13 +258,13 @@ public class PolicyHelper {
 		// /Policy/Rule/@RuleId='grantUsers'
 		addRule(getPolicy(), "grantUsers", "Permit",
 				FEDORA_RESOURCE_DATASTREAM_ID, "POLICY", FEDORA_ACTION_API,
-				FEDORA_ACTION_APIM, SUBJECT_ATTRIBUTE_ID_USERS, permissions
-						.getGrantUsers());
+				FEDORA_ACTION_APIM, SUBJECT_ATTRIBUTE_ID_USERS,
+				permissions.getGrantUsers());
 		// /Policy/Rule/@RuleId='grantGroups'
 		addRule(getPolicy(), "grantGroups", "Permit",
 				FEDORA_RESOURCE_DATASTREAM_ID, "POLICY", FEDORA_ACTION_API,
-				FEDORA_ACTION_APIM, SUBJECT_ATTRIBUTE_ID_GROUPS, permissions
-						.getGrantGroups());
+				FEDORA_ACTION_APIM, SUBJECT_ATTRIBUTE_ID_GROUPS,
+				permissions.getGrantGroups());
 
 		// /Policy/Rule/@RuleId='modifyUsers'
 		addRule(getPolicy(), "modifyUsers", "Permit", null, null,

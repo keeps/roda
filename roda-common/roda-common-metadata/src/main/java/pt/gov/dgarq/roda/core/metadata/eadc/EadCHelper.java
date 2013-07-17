@@ -31,6 +31,7 @@ import pt.gov.dgarq.roda.core.metadata.MetadataException;
 import pt.gov.dgarq.roda.core.metadata.MetadataHelperUtility;
 import pt.gov.dgarq.roda.x2008.eadcSchema.Acqinfo;
 import pt.gov.dgarq.roda.x2008.eadcSchema.Arrangement;
+import pt.gov.dgarq.roda.x2008.eadcSchema.AvLevel.Enum;
 import pt.gov.dgarq.roda.x2008.eadcSchema.Bioghist;
 import pt.gov.dgarq.roda.x2008.eadcSchema.C;
 import pt.gov.dgarq.roda.x2008.eadcSchema.Chronitem;
@@ -51,7 +52,6 @@ import pt.gov.dgarq.roda.x2008.eadcSchema.Tgroup;
 import pt.gov.dgarq.roda.x2008.eadcSchema.Thead;
 import pt.gov.dgarq.roda.x2008.eadcSchema.Unitdate;
 import pt.gov.dgarq.roda.x2008.eadcSchema.Unitid;
-import pt.gov.dgarq.roda.x2008.eadcSchema.AvLevel.Enum;
 
 /**
  * This is an helper class for manipulating a EAD-C XML document. It provides
@@ -109,7 +109,12 @@ public class EadCHelper {
 
 		try {
 
-			return new EadCHelper(EadCDocument.Factory.parse(eadcInputStream));
+			EadCDocument document = EadCDocument.Factory.parse(eadcInputStream);
+			if (document.validate()) {
+				return new EadCHelper(document);
+			} else {
+				throw new EadCMetadataException("Error validating XML document");
+			}
 
 		} catch (XmlException e) {
 			logger.debug("Error parsing EAD-C - " + e.getMessage(), e);

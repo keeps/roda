@@ -86,8 +86,14 @@ public class PremisEventHelper {
 
 		try {
 
-			return new PremisEventHelper(EventDocument.Factory
-					.parse(premisInputStream));
+			EventDocument document = EventDocument.Factory
+					.parse(premisInputStream);
+			if (document.validate()) {
+				return new PremisEventHelper(document);
+			} else {
+				throw new PremisMetadataException(
+						"Error validating XML document");
+			}
 
 		} catch (XmlException e) {
 			logger.debug("Error parsing PREMIS - " + e.getMessage(), e);
@@ -293,8 +299,7 @@ public class PremisEventHelper {
 
 			}
 
-			pObject.setObjectIDs(objectIDs
-					.toArray(new String[objectIDs.size()]));
+			pObject.setObjectIDs(objectIDs.toArray(new String[objectIDs.size()]));
 
 		}
 

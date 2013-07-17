@@ -103,8 +103,12 @@ public class SIPMetsHelper extends MetsHelper {
 
 		try {
 
-			return new SIPMetsHelper(MetsDocument.Factory
-					.parse(metsInputStream));
+			MetsDocument document = MetsDocument.Factory.parse(metsInputStream);
+			if (document.validate()) {
+				return new SIPMetsHelper(document);
+			} else {
+				throw new MetsMetadataException("Error validating XML document");
+			}
 
 		} catch (XmlException e) {
 			logger.debug("Error parsing METS - " + e.getMessage(), e);
@@ -237,8 +241,7 @@ public class SIPMetsHelper extends MetsHelper {
 			dmdSec = (MdSecType) xmlObjects[0];
 
 			if (xmlObjects.length > 1) {
-				logger
-						.warn("Parent mets:dmdSec (without @GROUPID) is not unique!");
+				logger.warn("Parent mets:dmdSec (without @GROUPID) is not unique!");
 			}
 		}
 
@@ -445,12 +448,11 @@ public class SIPMetsHelper extends MetsHelper {
 						dmdid = repDiv.getDMDID().get(0).toString();
 
 						if (repDiv.getDMDID().size() > 1) {
-							logger
-									.warn("Representation <div ID=" //$NON-NLS-1$
-											+ repDiv.getID()
-											+ "> @DMDID attribute has " //$NON-NLS-1$
-											+ repDiv.getDMDID().size()
-											+ " values, but only 1 is being considered."); //$NON-NLS-1$
+							logger.warn("Representation <div ID=" //$NON-NLS-1$
+									+ repDiv.getID()
+									+ "> @DMDID attribute has " //$NON-NLS-1$
+									+ repDiv.getDMDID().size()
+									+ " values, but only 1 is being considered."); //$NON-NLS-1$
 						}
 
 					} else {
@@ -597,12 +599,11 @@ public class SIPMetsHelper extends MetsHelper {
 				mdSecID = digiprovMdSec.getID();
 
 				if (admIDList.size() > 1) {
-					logger
-							.warn("Representation " //$NON-NLS-1$
-									+ representationID
-									+ " has " //$NON-NLS-1$
-									+ admIDList.size()
-									+ " ADMID values. Only the first one will be used."); //$NON-NLS-1$
+					logger.warn("Representation " //$NON-NLS-1$
+							+ representationID
+							+ " has " //$NON-NLS-1$
+							+ admIDList.size()
+							+ " ADMID values. Only the first one will be used."); //$NON-NLS-1$
 				}
 			}
 
@@ -619,7 +620,8 @@ public class SIPMetsHelper extends MetsHelper {
 	 *            the {@link MdSecType} ID.
 	 * 
 	 * @return a {@link of the representation.} of a PREMIS file with the
-	 *         representation preservation object or <code>null<code> if the representation doesn't exist or if it doesn't have preservation metadata.
+	 *         representation preservation object or
+	 *         <code>null<code> if the representation doesn't exist or if it doesn't have preservation metadata.
 	 */
 	public MdSecType getRepresentationPreservationObjectMdSec(String rpoMdSecID) {
 		return getDigiprovMD(rpoMdSecID);
@@ -1085,9 +1087,7 @@ public class SIPMetsHelper extends MetsHelper {
 		try {
 
 			newFile.setCHECKSUMTYPE(CHECKSUMTYPE.MD_5);
-			newFile
-					.setCHECKSUM(FileUtility
-							.calculateChecksumInHex(file, "MD5")); //$NON-NLS-1$
+			newFile.setCHECKSUM(FileUtility.calculateChecksumInHex(file, "MD5")); //$NON-NLS-1$
 
 		} catch (Exception e) {
 			newFile.unsetCHECKSUMTYPE();
@@ -1148,8 +1148,8 @@ public class SIPMetsHelper extends MetsHelper {
 		List<RepresentationFile> repFiles = new ArrayList<RepresentationFile>();
 		for (DivType.Fptr repDivFptr : repDiv.getFptrList()) {
 
-			repFiles.add(getRepresentationFile(rObject.getId(), metsFileMap
-					.get(repDivFptr.getFILEID())));
+			repFiles.add(getRepresentationFile(rObject.getId(),
+					metsFileMap.get(repDivFptr.getFILEID())));
 
 			logger.trace("Added RepresentationFile " + repDivFptr.getFILEID()); //$NON-NLS-1$
 		}

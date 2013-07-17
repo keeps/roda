@@ -80,7 +80,12 @@ public class MetsHelper {
 
 		try {
 
-			return new MetsHelper(MetsDocument.Factory.parse(metsInputStream));
+			MetsDocument document = MetsDocument.Factory.parse(metsInputStream);
+			if (document.validate()) {
+				return new MetsHelper(document);
+			} else {
+				throw new MetsMetadataException("Error validating XML document");
+			}
 
 		} catch (XmlException e) {
 			logger.debug("Error parsing METS - " + e.getMessage(), e);

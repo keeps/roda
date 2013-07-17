@@ -74,8 +74,14 @@ public class PremisAgentHelper {
 
 		try {
 
-			return new PremisAgentHelper(AgentDocument.Factory
-					.parse(premisInputStream));
+			AgentDocument document = AgentDocument.Factory
+					.parse(premisInputStream);
+			if (document.validate()) {
+				return new PremisAgentHelper(document);
+			} else {
+				throw new PremisMetadataException(
+						"Error validating XML document");
+			}
 
 		} catch (XmlException e) {
 			logger.debug("Error parsing PREMIS - " + e.getMessage(), e);

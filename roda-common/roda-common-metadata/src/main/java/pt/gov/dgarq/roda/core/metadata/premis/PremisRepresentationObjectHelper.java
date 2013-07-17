@@ -84,8 +84,14 @@ public class PremisRepresentationObjectHelper extends PremisObjectHelper {
 
 		try {
 
-			return new PremisRepresentationObjectHelper(ObjectDocument.Factory
-					.parse(premisInputStream));
+			ObjectDocument document = ObjectDocument.Factory
+					.parse(premisInputStream);
+			if (document.validate()) {
+				return new PremisRepresentationObjectHelper(document);
+			} else {
+				throw new PremisMetadataException(
+						"Error validating XML document");
+			}
 
 		} catch (XmlException e) {
 			logger.debug("Error parsing PREMIS - " + e.getMessage(), e);
@@ -318,9 +324,8 @@ public class PremisRepresentationObjectHelper extends PremisObjectHelper {
 
 							RelatedObjectIdentificationComplexType relatedObjectIdentification = relationship
 									.getRelatedObjectIdentificationArray(0);
-							pObject
-									.setDerivedFromRepresentationObjectID(relatedObjectIdentification
-											.getRelatedObjectIdentifierValue());
+							pObject.setDerivedFromRepresentationObjectID(relatedObjectIdentification
+									.getRelatedObjectIdentifierValue());
 						}
 
 						if (relationship.getRelatedEventIdentificationList() != null
@@ -330,9 +335,8 @@ public class PremisRepresentationObjectHelper extends PremisObjectHelper {
 
 							RelatedEventIdentificationComplexType relatedEventIdentification = relationship
 									.getRelatedEventIdentificationArray(0);
-							pObject
-									.setDerivationEventID(relatedEventIdentification
-											.getRelatedEventIdentifierValue());
+							pObject.setDerivationEventID(relatedEventIdentification
+									.getRelatedEventIdentifierValue());
 						}
 
 					} else {
@@ -450,8 +454,8 @@ public class PremisRepresentationObjectHelper extends PremisObjectHelper {
 					premisRelationshipSubTypeDerivedFrom);
 
 			addNewRelatedObject(relationshipDerivedFrom,
-					PremisHelper.premisIdentifierTypePID, rpo
-							.getDerivedFromRepresentationObjectID());
+					PremisHelper.premisIdentifierTypePID,
+					rpo.getDerivedFromRepresentationObjectID());
 
 			// <relatedEventIdentification>
 			if (!StringUtils.isBlank(rpo.getDerivationEventID())) {
