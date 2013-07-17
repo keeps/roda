@@ -24,5 +24,7 @@
 
 	<!-- Specify the cascade stylesheet to use -->
 	<stylesheet src="Main.css" />
+	
+	<servlet path="/gaservice" class="pt.gov.dgarq.roda.wui.main.server.GAnalyticsServiceImpl" />
 
 </module>

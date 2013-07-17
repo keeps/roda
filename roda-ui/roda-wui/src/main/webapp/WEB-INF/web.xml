@@ -28,6 +28,11 @@
 			pt.gov.dgarq.roda.wui.common.captcha.server.CaptchaServiceImpl</servlet-class>
 	</servlet>
 	<servlet>
+		<servlet-name>GAnalyticsService</servlet-name>
+		<servlet-class>
+			pt.gov.dgarq.roda.wui.main.server.GAnalyticsServiceImpl</servlet-class>
+	</servlet>
+	<servlet>
 		<servlet-name>UserManagementService</servlet-name>
 		<servlet-class>
 			pt.gov.dgarq.roda.wui.management.user.server.UserManagementServiceImpl</servlet-class>
@@ -107,6 +112,10 @@
 	<servlet-mapping>
 		<servlet-name>CaptchaService</servlet-name>
 		<url-pattern>/captchaservice</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>GAnalyticsService</servlet-name>
+		<url-pattern>/gaservice</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>FileDownload</servlet-name>

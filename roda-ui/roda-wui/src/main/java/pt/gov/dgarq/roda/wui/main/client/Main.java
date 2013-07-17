@@ -247,6 +247,8 @@ public class Main extends SimplePanel implements EntryPoint, HistoryListener {
 			final String decodedHistoryToken = URL.decode(historyToken);
 			String[] historyPath = Tools.splitHistory(decodedHistoryToken);
 			breadcrumbPanel.updatePath(historyPath);
+			
+			
 			DeferredCommand.addCommand(new Command() {
 
 				public void execute() {
@@ -266,7 +268,7 @@ public class Main extends SimplePanel implements EntryPoint, HistoryListener {
 				}
 
 			});
-
+			GAnalyticsTracker.track(historyToken);
 		}
 	}
 
