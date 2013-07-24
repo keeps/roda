@@ -17,6 +17,7 @@ import java.util.UUID;
 import java.util.Vector;
 import java.util.regex.Matcher;
 
+import org.apache.axis.utils.XMLUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.lf5.util.StreamUtils;
 
@@ -110,7 +111,7 @@ public class DW2SimpleViewer extends ImageMagickConverter {
 		}
 
 		galleryTemplate = galleryTemplate.replaceAll("\\@TITLE", Matcher
-				.quoteReplacement(title));
+				.quoteReplacement(XMLUtils.xmlEncodeString(title)));
 		galleryTemplate = galleryTemplate.replaceAll("\\@IMAGES", Matcher
 				.quoteReplacement(imagesXML));
 
