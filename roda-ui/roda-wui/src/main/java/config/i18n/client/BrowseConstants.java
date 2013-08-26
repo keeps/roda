@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package config.i18n.client;
 
@@ -8,261 +8,357 @@ import com.google.gwt.i18n.client.ConstantsWithLookup;
 
 /**
  * @author Luis Faria
- * 
+ *
  */
 public interface BrowseConstants extends Constants, ConstantsWithLookup {
 
-	// Tree
+    // Tree
+    @DefaultStringValue("_")
+    public String noDate();
 
-	@DefaultStringValue("_")
-	public String noDate();
+    @DefaultStringValue("<no title>")
+    public String noTitle();
 
-	@DefaultStringValue("<no title>")
-	public String noTitle();
+    @DefaultStringValue("loading...")
+    public String treeLoading();
 
-	@DefaultStringValue("loading...")
-	public String treeLoading();
+    // Element Scroll Panel
+    @DefaultStringValue("Reference")
+    public String elementHeaderId();
 
-	// Element Scroll Panel
-	@DefaultStringValue("Reference")
-	public String elementHeaderId();
+    @DefaultStringValue("Title")
+    public String elementHeaderTitle();
 
-	@DefaultStringValue("Title")
-	public String elementHeaderTitle();
+    @DefaultStringValue("Initial date")
+    public String elementHeaderDateInitial();
 
-	@DefaultStringValue("Initial date")
-	public String elementHeaderDateInitial();
+    @DefaultStringValue("Final date")
+    public String elementHeaderDateFinal();
 
-	@DefaultStringValue("Final date")
-	public String elementHeaderDateFinal();
+    // Item popup
+    @DefaultStringValue("No description")
+    public String noDescription();
 
-	// Item popup
+    // View Panel / Window
+    @DefaultStringValue("CLOSE")
+    public String close();
 
-	@DefaultStringValue("No description")
-	public String noDescription();
+    @DefaultStringValue("EAD")
+    public String downloadEadC();
 
-	// View Panel / Window
-	@DefaultStringValue("CLOSE")
-	public String close();
+    @DefaultStringValue("PREMIS")
+    public String downloadPremis();
 
-	@DefaultStringValue("EAD")
-	public String downloadEadC();
+    @DefaultStringValue("Description")
+    public String descriptiveMetadata();
 
-	@DefaultStringValue("PREMIS")
-	public String downloadPremis();
+    @DefaultStringValue("View")
+    public String representations();
 
-	@DefaultStringValue("Description")
-	public String descriptiveMetadata();
+    @DefaultStringValue("Preservation")
+    public String preservationMetadata();
 
-	@DefaultStringValue("View")
-	public String representations();
+    @DefaultStringValue("Producers")
+    public String producers();
 
-	@DefaultStringValue("Preservation")
-	public String preservationMetadata();
+    @DefaultStringValue("Permissions")
+    public String objPermissions();
 
-	@DefaultStringValue("Producers")
-	public String producers();
+    @DefaultStringValue("loading...")
+    public String viewWindowLoading();
 
-	@DefaultStringValue("Permissions")
-	public String objPermissions();
+    @DefaultStringValue("Hide optional fields")
+    public String hideOptionalFields();
 
-	@DefaultStringValue("loading...")
-	public String viewWindowLoading();
+    @DefaultStringValue("Show optional fields")
+    public String showOptionalFields();
 
-	@DefaultStringValue("Hide optional fields")
-	public String hideOptionalFields();
+    @DefaultStringValue("The object no longer exists in the repository. It may have been deleted or the user does not have permissions to access.")
+    public String viewWindowObjectNoLongerExists();
 
-	@DefaultStringValue("Show optional fields")
-	public String showOptionalFields();
+    // Disseminations Panel
+    @DefaultStringValue("download")
+    public String disseminationDownloadLabel();
 
-	@DefaultStringValue("The object no longer exists in the repository. It may have been deleted or the user does not have permissions to access.")
-	public String viewWindowObjectNoLongerExists();
+    // Browser
+    @DefaultStringValue("Open description of each element in a side panel")
+    public String viewPanelToggleTitle();
 
-	// Disseminations Panel
-	@DefaultStringValue("download")
-	public String disseminationDownloadLabel();
+    @DefaultStringValue("Open description of each element in a new window")
+    public String viewWindowToggleTitle();
 
-	// Browser
-	@DefaultStringValue("Open description of each element in a side panel")
-	public String viewPanelToggleTitle();
+    @DefaultStringValue("The repository is empty")
+    public String repositoryEmpty();
 
-	@DefaultStringValue("Open description of each element in a new window")
-	public String viewWindowToggleTitle();
+    // Edit mode
+    @DefaultStringValue("EDIT")
+    public String editDescriptiveMetadata();
 
-	@DefaultStringValue("The repository is empty")
-	public String repositoryEmpty();
+    @DefaultStringValue("SAVE")
+    public String saveDescriptiveMetadata();
 
-	// Edit mode
-	@DefaultStringValue("EDIT")
-	public String editDescriptiveMetadata();
+    @DefaultStringValue("CANCEL")
+    public String cancelEditDescriptiveMetadata();
 
-	@DefaultStringValue("SAVE")
-	public String saveDescriptiveMetadata();
+    @DefaultStringValue("Do you want to save changes before exiting?")
+    public String saveBeforeClosing();
 
-	@DefaultStringValue("CANCEL")
-	public String cancelEditDescriptiveMetadata();
+    @DefaultStringValue("SUBLEVEL")
+    public String createElementChild();
 
-	@DefaultStringValue("Do you want to save changes before exiting?")
-	public String saveBeforeClosing();
+    @DefaultStringValue("<no reference>")
+    public String newFonds();
 
-	@DefaultStringValue("SUBLEVEL")
-	public String createElementChild();
+    @DefaultStringValue("<no reference>")
+    public String newElement();
 
-	@DefaultStringValue("<no reference>")
-	public String newFonds();
+    @DefaultStringValue("MOVE")
+    public String moveElement();
 
-	@DefaultStringValue("<no reference>")
-	public String newElement();
+    @DefaultStringValue("REMOVE")
+    public String removeElement();
 
-	@DefaultStringValue("MOVE")
-	public String moveElement();
+    @DefaultStringValue("Are you sure you want to remove this element?")
+    public String confirmElementRemove();
 
-	@DefaultStringValue("REMOVE")
-	public String removeElement();
+    @DefaultStringValue("This element contains sub-elements will be removed recursively. Are you sure you want to continue?")
+    public String confirmRecursiveRemove();
 
-	@DefaultStringValue("Are you sure you want to remove this element?")
-	public String confirmElementRemove();
+    @DefaultStringValue("CLONE")
+    public String cloneElement();
 
-	@DefaultStringValue("This element contains sub-elements will be removed recursively. Are you sure you want to continue?")
-	public String confirmRecursiveRemove();
+    // Dissemination Panel
+    @DefaultStringValue("(original)")
+    public String disseminationOfOriginal();
 
-	@DefaultStringValue("CLONE")
-	public String cloneElement();
+    @DefaultStringValue("(original and normalized)")
+    public String disseminationOfOriginalAndNormalized();
 
-	// Dissemination Panel
-	@DefaultStringValue("(original)")
-	public String disseminationOfOriginal();
+    @DefaultStringValue("(normalized)")
+    public String disseminationOfNormalized();
 
-	@DefaultStringValue("(original and normalized)")
-	public String disseminationOfOriginalAndNormalized();
+    // * Disseminations
+    @DefaultStringValue("Download representation")
+    public String dissemination_AIPDownload();
 
-	@DefaultStringValue("(normalized)")
-	public String disseminationOfNormalized();
+    @DefaultStringValue("Download signed representation")
+    public String dissemination_Signature();
 
-	// * Disseminations
-	@DefaultStringValue("Download representation")
-	public String dissemination_AIPDownload();
+    @DefaultStringValue("Photo preview")
+    public String dissemination_SimpleViewer();
 
-	@DefaultStringValue("Download signed representation")
-	public String dissemination_Signature();
+    @DefaultStringValue("Book preview")
+    public String dissemination_FlashPageFlipFree();
 
-	@DefaultStringValue("Photo preview")
-	public String dissemination_SimpleViewer();
+    @DefaultStringValue("Book preview")
+    public String dissemination_FlashPageFlipPaid();
 
-	@DefaultStringValue("Book preview")
-	public String dissemination_FlashPageFlipFree();
+    @DefaultStringValue("Database preview")
+    public String dissemination_PhpMyAdmin();
 
-	@DefaultStringValue("Book preview")
-	public String dissemination_FlashPageFlipPaid();
+    @DefaultStringValue("Media preview")
+    public String dissemination_MediaPlayer();
 
-	@DefaultStringValue("Database preview")
-	public String dissemination_PhpMyAdmin();
+    @DefaultStringValue("Audio preview")
+    public String dissemination_MediaPlayerAudio();
 
-	@DefaultStringValue("Media preview")
-	public String dissemination_MediaPlayer();
+    @DefaultStringValue("Video preview")
+    public String dissemination_MediaPlayerVideo();
 
-	@DefaultStringValue("Audio preview")
-	public String dissemination_MediaPlayerAudio();
+    // Preservation Metadata Panel
+    @DefaultStringValue("Day")
+    public String timeUnitDay();
 
-	@DefaultStringValue("Video preview")
-	public String dissemination_MediaPlayerVideo();
+    @DefaultStringValue("Month")
+    public String timeUnitMonth();
 
-	// Preservation Metadata Panel
-	@DefaultStringValue("Day")
-	public String timeUnitDay();
+    @DefaultStringValue("Year")
+    public String timeUnitYear();
 
-	@DefaultStringValue("Month")
-	public String timeUnitMonth();
+    // Representation formats
+    @DefaultStringValue("unknown format")
+    public String representation_format_unknown();
 
-	@DefaultStringValue("Year")
-	public String timeUnitYear();
+    @DefaultStringValue("AutoCAD Drawing Database File (dwg)")
+    public String representation_format_application_acad();
 
-	// Representation formats
-	@DefaultStringValue("PDF")
-	public String representation_format_application_pdf();
+    @DefaultStringValue("Microsoft Excel Spreadsheet (xlsx)")
+    public String representation_format_application_vnd_openxmlformats_officedocument_spreadsheetml_sheet();
 
-	@DefaultStringValue("Word 97_2004")
-	public String representation_format_application_msword();
+    @DefaultStringValue("CorelDRAW Image File (cdr)")
+    public String representation_format_application_cdr();
 
-	@DefaultStringValue("Word 2007")
-	public String representation_format_application_vnd_openxmlformats_officedocument_wordprocessingml_document();
+    @DefaultStringValue("Adobe Illustrator File (ai)")
+    public String representation_format_application_illustrator();
 
-	@DefaultStringValue("OpenOffice")
-	public String representation_format_application_vnd_oasis_opendocument_text();
+    @DefaultStringValue("Outlook Mail Message (msg)")
+    public String representation_format_application_msoutlook();
 
-	@DefaultStringValue("RTF")
-	public String representation_format_application_rtf();
+    @DefaultStringValue("Microsoft Word (doc)")
+    public String representation_format_application_msword();
 
-	@DefaultStringValue("Plain Text")
-	public String representation_format_text_plain();
+    @DefaultStringValue("Portable Document Format (pdf)")
+    public String representation_format_application_pdf();
 
-	@DefaultStringValue("TIFF")
-	public String representation_format_image_mets_tiff();
+    @DefaultStringValue("Adobe Illustrator File (ai)")
+    public String representation_format_application_postscript();
 
-	@DefaultStringValue("JPEG")
-	public String representation_format_image_mets_jpeg();
+    @DefaultStringValue("Rich Text Format (rtf)")
+    public String representation_format_application_rtf();
+    
+    @DefaultStringValue("Rich Text Format (rtf)")
+    public String representation_format_application_rtf__text_rtf();    
 
-	@DefaultStringValue("PNG")
-	public String representation_format_image_mets_png();
+    @DefaultStringValue("Microsoft Excel Spreadsheet (xls)")
+    public String representation_format_application_vnd_ms_excel();
 
-	@DefaultStringValue("Windows Bitmap")
-	public String representation_format_image_mets_bmp();
+    @DefaultStringValue("Microsoft PowerPoint Presentation (ppt)")
+    public String representation_format_application_vnd_ms_powerpoint();
 
-	@DefaultStringValue("GIF")
-	public String representation_format_image_mets_gif();
+    @DefaultStringValue("OpenDocument Presentation (odp)")
+    public String representation_format_application_vnd_oasis_opendocument_presentation();
 
-	@DefaultStringValue("Windows Icon")
-	public String representation_format_image_mets_ico();
+    @DefaultStringValue("OpenDocument Spreadsheet (ods)")
+    public String representation_format_application_vnd_oasis_opendocument_spreadsheet();
 
-	@DefaultStringValue("XMP")
-	public String representation_format_image_mets_xpm();
+    @DefaultStringValue("OpenDocument Text (odt)")
+    public String representation_format_application_vnd_oasis_opendocument_text();
 
-	@DefaultStringValue("TGA")
-	public String representation_format_image_mets_tga();
+    @DefaultStringValue("Microsoft PowerPoint Presentation (pptx)")
+    public String representation_format_application_vnd_openxmlformats_officedocument_presentationml_presentation();
 
-	@DefaultStringValue("Scanned document")
-	public String representation_format_image_mets_misc();
+    @DefaultStringValue("Microsoft Word (docx)")
+    public String representation_format_application_vnd_openxmlformats_officedocument_wordprocessingml_document();
 
-	@DefaultStringValue("Database(DBML)")
-	public String representation_format_application_dbml();
+    @DefaultStringValue("Shapes File (shp)")
+    public String representation_format_application_x_qgis();
 
-	@DefaultStringValue("Database(DBML)")
-	public String representation_format_application_dbml_octet_stream();
+    @DefaultStringValue("LaTeX Source Document (tex)")
+    public String representation_format_application_x_tex();
 
-	@DefaultStringValue("Audio WAV")
-	public String representation_format_audio_wav();
+    @DefaultStringValue("TEX file format (texi)")
+    public String representation_format_application_x_texinfo();
 
-	@DefaultStringValue("Audio MP3")
-	public String representation_format_audio_mpeg();
+    @DefaultStringValue("TomeRaider 2 eBook File (tr)")
+    public String representation_format_application_x_troff();
 
-	@DefaultStringValue("Audio FLAC")
-	public String representation_format_audio_flac();
+    @DefaultStringValue("Audio Interchange File (aiff)")
+    public String representation_format_audio_aiff();
 
-	@DefaultStringValue("Audio AIFF")
-	public String representation_format_audio_aiff();
+    @DefaultStringValue("uLaw/AU Audio File(au)")
+    public String representation_format_audio_basic();
 
-	@DefaultStringValue("Audio OGG")
-	public String representation_format_audio_ogg();
+    @DefaultStringValue("Free Lossless Audio Codec (flac)")
+    public String representation_format_audio_flac();
 
-	@DefaultStringValue("MPEG 1")
-	public String representation_format_video_mpeg();
+    @DefaultStringValue("Musical Instrument Digital Interface (midi)")
+    public String representation_format_audio_midi();
 
-	@DefaultStringValue("MPEG 2")
-	public String representation_format_video_mpeg2();
+    @DefaultStringValue("MPEG Audio File")
+    public String representation_format_audio_mpeg();
 
-	@DefaultStringValue("MPEG 4")
-	public String representation_format_video_mp4();
+    @DefaultStringValue("Codec Compressed Multimedia File (ogg)")
+    public String representation_format_audio_ogg();
 
-	@DefaultStringValue("Video AVI")
-	public String representation_format_video_avi();
+    @DefaultStringValue("WAVE Audio File (wav)")
+    public String representation_format_audio_wav();
 
-	@DefaultStringValue("Windows Media Video")
-	public String representation_format_video_x_ms_wmv();
+    @DefaultStringValue("Compressed Audio Interchange File (aifc)")
+    public String representation_format_audio_x_aifc();
 
-	@DefaultStringValue("Quicktime")
-	public String representation_format_video_quicktime();
+    @DefaultStringValue("Audio Interchange File (aif)")
+    public String representation_format_audio_x_aiff();
 
-	@DefaultStringValue("unknown format")
-	public String representation_format_unknown();
+    @DefaultStringValue("MPEG Audio (mpeg)")
+    public String representation_format_audio_x_mpeg();
 
+    @DefaultStringValue("Windows Media Audio (wma)")
+    public String representation_format_audio_x_ms_wma();
+
+    @DefaultStringValue("Bitmap Image File (bmp)")
+    public String representation_format_image_bmp();
+
+    @DefaultStringValue("Graphical Interchange Format File (gif)")
+    public String representation_format_image_gif();
+
+    @DefaultStringValue("Windows Icon (ico)")
+    public String representation_format_image_ico();
+
+    @DefaultStringValue("Image File (ief)")
+    public String representation_format_image_ief();
+
+    @DefaultStringValue("JPEG 2000 Core Image File (jp2)")
+    public String representation_format_image_jp2();
+
+    @DefaultStringValue("JPEG Image (jpg)")
+    public String representation_format_image_jpeg();
+
+    @DefaultStringValue("Package - JPEG 2000 images (zip)")
+    public String representation_format_image_mets_jp2();
+
+    @DefaultStringValue("Package - JPEG images (zip)")
+    public String representation_format_image_mets_jpeg();
+
+    @DefaultStringValue("Package - TIFF images (zip)")
+    public String representation_format_image_mets_tiff();
+
+    @DefaultStringValue("Package - BMP images (zip)")
+    public String representation_format_image_mets_bmp();
+
+    @DefaultStringValue("Package - GIF images (zip)")
+    public String representation_format_image_mets_gif();
+
+    @DefaultStringValue("Portable Network Graphic (png)")
+    public String representation_format_image_png();
+
+    @DefaultStringValue(" Scalable Vector Graphics File (svg)")
+    public String representation_format_image_svg_xml();
+
+    @DefaultStringValue("Targa Graphic (tga)")
+    public String representation_format_image_tga();
+
+    @DefaultStringValue("Tagged Image File Format (tiff)")
+    public String representation_format_image_tiff();
+
+    @DefaultStringValue("X Windows Dump Image (xwd)")
+    public String representation_format_image_x_xwindowdump();
+
+    @DefaultStringValue("X11 Pixmap Graphic (xpm)")
+    public String representation_format_image_xpm();
+
+    @DefaultStringValue("E-Mail Message(eml)")
+    public String representation_format_message_rfc822();
+
+    @DefaultStringValue("Database (dbml)")
+    public String representation_format_text_dbml();
+
+    @DefaultStringValue("Hypertext Markup Language File (html)")
+    public String representation_format_text_html();
+
+    @DefaultStringValue("Plain Text File (txt)")
+    public String representation_format_text_plain();
+
+    @DefaultStringValue("XML file (xml)")
+    public String representation_format_text_xml();
+
+    @DefaultStringValue("Audio Video Interleave File (avi)")
+    public String representation_format_video_avi();
+
+    @DefaultStringValue("MPEG-4 Video File (mp4)")
+    public String representation_format_video_mp4();
+
+    @DefaultStringValue("MPEG Movie (mpeg)")
+    public String representation_format_video_mpeg();
+
+    @DefaultStringValue("MPEG-2 Video File (mpg2)")
+    public String representation_format_video_mpeg2();
+
+    @DefaultStringValue("Apple QuickTime Movie (mov)")
+    public String representation_format_video_quicktime();
+
+    @DefaultStringValue("Windows Media Video (wmv)")
+    public String representation_format_video_x_ms_wmv();
+
+    @DefaultStringValue("Audio Video Interleave File (avi)")
+    public String representation_format_video_x_msvideo();
 }

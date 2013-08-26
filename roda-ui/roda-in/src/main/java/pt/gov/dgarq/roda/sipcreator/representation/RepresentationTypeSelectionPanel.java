@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package pt.gov.dgarq.roda.sipcreator.representation;
 
@@ -27,310 +27,305 @@ import pt.gov.dgarq.roda.sipcreator.Tools;
 
 /**
  * @author Luis Faria
- * 
+ * @author Vladislav Korecký <vladislav_korecky@gordic.cz>
  */
 public class RepresentationTypeSelectionPanel extends JPanel {
-	private static final long serialVersionUID = 1815965515328293090L;
 
-	/**
-	 * Representation type selection listener
-	 * 
-	 * @author Luis Faria
-	 * 
-	 */
-	public interface RepresentationTypeSelectionListener {
-		/**
-		 * On representation type selected
-		 * 
-		 * @param type
-		 *            the base representation type
-		 * @param subtype
-		 *            the sub type, or MIME type
-		 */
-		public void onRepresentationTypeSelected(String type, String subtype);
-	}
+    private static final long serialVersionUID = 1815965515328293090L;
 
-	private JScrollPane representationTypesScroll = null;
-	private JList representationTypes = null;
-	private List<RepresentationTypeSelectionListener> listeners;
+    /**
+     * Representation type selection listener
+     *
+     * @author Luis Faria
+     *
+     */
+    public interface RepresentationTypeSelectionListener {
 
-	/**
-	 * Create a new representation type selection panel
-	 */
-	public RepresentationTypeSelectionPanel() {
-		setLayout(new BorderLayout());
-		add(getRepresentationTypesScroll(), BorderLayout.CENTER);
-		listeners = new ArrayList<RepresentationTypeSelectionListener>();
-		setPreferredSize(new Dimension(500, 680));
-	}
+        /**
+         * On representation type selected
+         *
+         * @param type the base representation type
+         * @param subtype the sub type, or MIME type
+         */
+        public void onRepresentationTypeSelected(String type, String subtype);
+    }
+    private JScrollPane representationTypesScroll = null;
+    private JList representationTypes = null;
+    private List<RepresentationTypeSelectionListener> listeners;
 
-	private JScrollPane getRepresentationTypesScroll() {
-		if (representationTypesScroll == null) {
-			representationTypesScroll = new JScrollPane(
-					getRepresentationTypes());
-		}
-		return representationTypesScroll;
-	}
+    /**
+     * Create a new representation type selection panel
+     */
+    public RepresentationTypeSelectionPanel() {
+        setLayout(new BorderLayout());
+        add(getRepresentationTypesScroll(), BorderLayout.CENTER);
+        listeners = new ArrayList<RepresentationTypeSelectionListener>();
+        setPreferredSize(new Dimension(500, 680));
+    }
 
-	private RepresentationTypeInfo getInfo(String repType) {
-		return new RepresentationTypeInfo(
-				repType,
-				null,
-				repType + ".png",
-				Messages.getString("Representation." + repType + ".TITLE"),
-				Messages
-						.getString("Representation." + repType + ".DESCRIPTION"));
-	}
+    private JScrollPane getRepresentationTypesScroll() {
+        if (representationTypesScroll == null) {
+            representationTypesScroll = new JScrollPane(
+                    getRepresentationTypes());
+        }
+        return representationTypesScroll;
+    }
 
-	private JList getRepresentationTypes() {
-		if (representationTypes == null) {
-			Vector<RepresentationTypeInfo> types = new Vector<RepresentationTypeInfo>();
-			types.add(getInfo(RepresentationObject.STRUCTURED_TEXT));
-			types.add(getInfo(RepresentationObject.DIGITALIZED_WORK));
-			types.add(getInfo(RepresentationObject.AUDIO));
-			types.add(getInfo(RepresentationObject.VIDEO));
-			types.add(getInfo(RepresentationObject.RELATIONAL_DATABASE));
-			types.add(getInfo(RepresentationObject.UNKNOWN));
+    private RepresentationTypeInfo getInfo(String repType) {
+        return new RepresentationTypeInfo(
+                repType,
+                null,
+                repType + ".png",
+                Messages.getString("Representation." + repType + ".TITLE"),
+                Messages
+                .getString("Representation." + repType + ".DESCRIPTION"));
+    }
 
-			representationTypes = new JList(types);
-			representationTypes.setCellRenderer(new ListCellRenderer() {
+    private JList getRepresentationTypes() {
+        if (representationTypes == null) {
+            Vector<RepresentationTypeInfo> types = new Vector<RepresentationTypeInfo>();
+            types.add(getInfo(RepresentationObject.EMAIL));
+            types.add(getInfo(RepresentationObject.STRUCTURED_TEXT));
+            types.add(getInfo(RepresentationObject.PRESENTATION));
+            types.add(getInfo(RepresentationObject.SPREADSHEET));
+            types.add(getInfo(RepresentationObject.VECTOR_GRAPHIC));
+            types.add(getInfo(RepresentationObject.DIGITALIZED_WORK));
+            types.add(getInfo(RepresentationObject.AUDIO));
+            types.add(getInfo(RepresentationObject.VIDEO));
+            types.add(getInfo(RepresentationObject.RELATIONAL_DATABASE));
+            types.add(getInfo(RepresentationObject.UNKNOWN));
 
-				public Component getListCellRendererComponent(JList list,
-						Object value, int index, boolean isSelected,
-						boolean cellHasFocus) {
-					Component ret = null;
-					if (value instanceof RepresentationTypeInfo) {
-						ret = getRepresentationTypePanel((RepresentationTypeInfo) value);
+            representationTypes = new JList(types);
+            representationTypes.setCellRenderer(new ListCellRenderer() {
+                public Component getListCellRendererComponent(JList list,
+                        Object value, int index, boolean isSelected,
+                        boolean cellHasFocus) {
+                    Component ret = null;
+                    if (value instanceof RepresentationTypeInfo) {
+                        ret = getRepresentationTypePanel((RepresentationTypeInfo) value);
 
-					}
+                    }
 
-					return ret;
-				}
+                    return ret;
+                }
+            });
 
-			});
+            representationTypes.addMouseListener(new MouseListener() {
+                public void mouseClicked(MouseEvent e) {
+                    RepresentationTypeInfo selected = (RepresentationTypeInfo) representationTypes
+                            .getSelectedValue();
+                    onRepresentationTypeSelected(selected.getType(), selected
+                            .getSubtype());
 
-			representationTypes.addMouseListener(new MouseListener() {
+                }
 
-				public void mouseClicked(MouseEvent e) {
-					RepresentationTypeInfo selected = (RepresentationTypeInfo) representationTypes
-							.getSelectedValue();
-					onRepresentationTypeSelected(selected.getType(), selected
-							.getSubtype());
+                public void mouseEntered(MouseEvent e) {
+                    representationTypes.setSelectedIndex(representationTypes
+                            .locationToIndex(e.getPoint()));
+                }
 
-				}
+                public void mouseExited(MouseEvent e) {
+                    representationTypes.clearSelection();
+                }
 
-				public void mouseEntered(MouseEvent e) {
-					representationTypes.setSelectedIndex(representationTypes
-							.locationToIndex(e.getPoint()));
-				}
+                public void mousePressed(MouseEvent e) {
+                    // nothing to do
+                }
 
-				public void mouseExited(MouseEvent e) {
-					representationTypes.clearSelection();
-				}
+                public void mouseReleased(MouseEvent e) {
+                    // nothing to do
+                }
+            });
 
-				public void mousePressed(MouseEvent e) {
-					// nothing to do
-				}
+            representationTypes
+                    .addMouseMotionListener(new MouseMotionListener() {
+                public void mouseDragged(MouseEvent e) {
+                    representationTypes
+                            .setSelectedIndex(representationTypes
+                            .locationToIndex(e.getPoint()));
 
-				public void mouseReleased(MouseEvent e) {
-					// nothing to do
+                }
 
-				}
+                public void mouseMoved(MouseEvent e) {
+                    representationTypes
+                            .setSelectedIndex(representationTypes
+                            .locationToIndex(e.getPoint()));
 
-			});
+                }
+            });
+        }
+        return representationTypes;
+    }
 
-			representationTypes
-					.addMouseMotionListener(new MouseMotionListener() {
+    /**
+     * Representation type information container class
+     *
+     * @author Luis Faria
+     *
+     */
+    public class RepresentationTypeInfo {
 
-						public void mouseDragged(MouseEvent e) {
-							representationTypes
-									.setSelectedIndex(representationTypes
-											.locationToIndex(e.getPoint()));
+        private String type;
+        private String subtype;
+        private String iconPath;
+        private String title;
+        private String description;
 
-						}
+        /**
+         * Create a new representation type information class
+         *
+         * @param type
+         *
+         * @param subtype
+         * @param iconPath
+         * @param title
+         * @param description
+         */
+        public RepresentationTypeInfo(String type, String subtype,
+                String iconPath, String title, String description) {
+            this.type = type;
+            this.subtype = subtype;
+            this.iconPath = iconPath;
+            this.title = title;
+            this.description = description;
+        }
 
-						public void mouseMoved(MouseEvent e) {
-							representationTypes
-									.setSelectedIndex(representationTypes
-											.locationToIndex(e.getPoint()));
+        /**
+         * Get type
+         *
+         * @return the base type
+         */
+        public String getType() {
+            return type;
+        }
 
-						}
+        /**
+         * Set type
+         *
+         * @param type
+         */
+        public void setType(String type) {
+            this.type = type;
+        }
 
-					});
-		}
-		return representationTypes;
-	}
+        /**
+         * Get sub type, or MIME type
+         *
+         * @return the sub type
+         */
+        public String getSubtype() {
+            return subtype;
+        }
 
-	/**
-	 * Representation type information container class
-	 * 
-	 * @author Luis Faria
-	 * 
-	 */
-	public class RepresentationTypeInfo {
-		private String type;
-		private String subtype;
-		private String iconPath;
-		private String title;
-		private String description;
+        /**
+         * Set sub type, or MIME type
+         *
+         * @param subtype
+         */
+        public void setSubtype(String subtype) {
+            this.subtype = subtype;
+        }
 
-		/**
-		 * Create a new representation type information class
-		 * 
-		 * @param type
-		 * 
-		 * @param subtype
-		 * @param iconPath
-		 * @param title
-		 * @param description
-		 */
-		public RepresentationTypeInfo(String type, String subtype,
-				String iconPath, String title, String description) {
-			this.type = type;
-			this.subtype = subtype;
-			this.iconPath = iconPath;
-			this.title = title;
-			this.description = description;
-		}
+        /**
+         * Get icon path
+         *
+         * @return the icon path
+         */
+        public String getIconPath() {
+            return iconPath;
+        }
 
-		/**
-		 * Get type
-		 * 
-		 * @return the base type
-		 */
-		public String getType() {
-			return type;
-		}
+        /**
+         * Set icon path
+         *
+         * @param iconPath
+         */
+        public void setIconPath(String iconPath) {
+            this.iconPath = iconPath;
+        }
 
-		/**
-		 * Set type
-		 * 
-		 * @param type
-		 */
-		public void setType(String type) {
-			this.type = type;
-		}
+        /**
+         * Get title
+         *
+         * @return the title
+         */
+        public String getTitle() {
+            return title;
+        }
 
-		/**
-		 * Get sub type, or MIME type
-		 * 
-		 * @return the sub type
-		 */
-		public String getSubtype() {
-			return subtype;
-		}
+        /**
+         * Set title
+         *
+         * @param title
+         */
+        public void setTitle(String title) {
+            this.title = title;
+        }
 
-		/**
-		 * Set sub type, or MIME type
-		 * 
-		 * @param subtype
-		 */
-		public void setSubtype(String subtype) {
-			this.subtype = subtype;
-		}
+        /**
+         * Get description
+         *
+         * @return the description
+         */
+        public String getDescription() {
+            return description;
+        }
 
-		/**
-		 * Get icon path
-		 * 
-		 * @return the icon path
-		 */
-		public String getIconPath() {
-			return iconPath;
-		}
+        /**
+         * Set description
+         *
+         * @param description
+         */
+        public void setDescription(String description) {
+            this.description = description;
+        }
+    }
 
-		/**
-		 * Set icon path
-		 * 
-		 * @param iconPath
-		 */
-		public void setIconPath(String iconPath) {
-			this.iconPath = iconPath;
-		}
+    protected JPanel getRepresentationTypePanel(RepresentationTypeInfo info) {
+        JPanel panel = new JPanel(new BorderLayout());
+        JLabel icon = new JLabel();
+        icon
+                .setIcon(Tools
+                .createImageIcon("/pt/gov/dgarq/roda/sipcreator/representationType/"
+                + info.getIconPath()));
+        JLabel title = new JLabel(String.format("<html><h3>%1$s</h3></html>",
+                info.getTitle()));
+        JTextArea description = new JTextArea(info.getDescription());
+        Tools.makeTextAreaLookLikeLable(description);
 
-		/**
-		 * Get title
-		 * 
-		 * @return the title
-		 */
-		public String getTitle() {
-			return title;
-		}
+        panel.add(title, BorderLayout.NORTH);
+        panel.add(icon, BorderLayout.WEST);
+        panel.add(description, BorderLayout.CENTER);
 
-		/**
-		 * Set title
-		 * 
-		 * @param title
-		 */
-		public void setTitle(String title) {
-			this.title = title;
-		}
+        panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        description.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-		/**
-		 * Get description
-		 * 
-		 * @return the description
-		 */
-		public String getDescription() {
-			return description;
-		}
+        return panel;
+    }
 
-		/**
-		 * Set description
-		 * 
-		 * @param description
-		 */
-		public void setDescription(String description) {
-			this.description = description;
-		}
+    /**
+     * Add representation type selection listener
+     *
+     * @param listener
+     */
+    public void addRepresentationTypeSelectionListener(
+            RepresentationTypeSelectionListener listener) {
+        listeners.add(listener);
+    }
 
-	}
+    /**
+     * Remove representation type selection listener
+     *
+     * @param listener
+     */
+    public void removeRepresentationTypeSelectionListener(
+            RepresentationTypeSelectionListener listener) {
+        listeners.remove(listener);
+    }
 
-	protected JPanel getRepresentationTypePanel(RepresentationTypeInfo info) {
-		JPanel panel = new JPanel(new BorderLayout());
-		JLabel icon = new JLabel();
-		icon
-				.setIcon(Tools
-						.createImageIcon("/pt/gov/dgarq/roda/sipcreator/representationType/"
-								+ info.getIconPath()));
-		JLabel title = new JLabel(String.format("<html><h3>%1$s</h3></html>",
-				info.getTitle()));
-		JTextArea description = new JTextArea(info.getDescription());
-		Tools.makeTextAreaLookLikeLable(description);
-
-		panel.add(title, BorderLayout.NORTH);
-		panel.add(icon, BorderLayout.WEST);
-		panel.add(description, BorderLayout.CENTER);
-
-		panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-		description.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-
-		return panel;
-	}
-
-	/**
-	 * Add representation type selection listener
-	 * 
-	 * @param listener
-	 */
-	public void addRepresentationTypeSelectionListener(
-			RepresentationTypeSelectionListener listener) {
-		listeners.add(listener);
-	}
-
-	/**
-	 * Remove representation type selection listener
-	 * 
-	 * @param listener
-	 */
-	public void removeRepresentationTypeSelectionListener(
-			RepresentationTypeSelectionListener listener) {
-		listeners.remove(listener);
-	}
-
-	protected void onRepresentationTypeSelected(String type, String subtype) {
-		for (RepresentationTypeSelectionListener listener : listeners) {
-			listener.onRepresentationTypeSelected(type, subtype);
-		}
-	}
-
+    protected void onRepresentationTypeSelected(String type, String subtype) {
+        for (RepresentationTypeSelectionListener listener : listeners) {
+            listener.onRepresentationTypeSelected(type, subtype);
+        }
+    }
 }

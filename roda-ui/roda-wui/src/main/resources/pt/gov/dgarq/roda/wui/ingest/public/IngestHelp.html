@@ -1,3 +1,372 @@
-<p class="paragraph">This is a static page in RODA, in particular, <b>IngestHelp.html</b>.</p>
-<p class="paragraph">In order to modify the contents of this file, one just need to edit file <b>[RODA_HOME]/webapps/roda-wui.war/IngestHelp.html</b></p>
-<p class="paragraph">Also, if one wants to have this page in multiple languages, one just needs to create one file per language. For example, to have english support create a file called <b>IngestHelp_en.html</b>, for portuguese (from Portugal) create a file called <b>IngestHelp_pt_PT.html</b></p>
+<p class="paragraph"><span class="strong">Q: Como posso criar
+e submeter objectos digitais ao RODA</span></p>
+<p class="paragraph">Tem à sua disposição 3 vias para criar e
+submeter objectos digitais ao RODA:</p>
+<ul class="list">
+	<li class="list-item">SIP com criação e submissão online: utilizar
+	as facilidades disponíveis na página <a class="link"
+		href="http://roda.di.uminho.pt:8080/roda-wui/#ingest.submit">Submeter
+	SIP</a> – solução recomendada apenas para uso esporádico (poucos SIP e de
+	pequena dimensão)</li>
+	<li class="list-item">SIP com criação off-line e submissão online:
+	descarregar a ferramenta RODA-in que auxilia o processo de criação de
+	SIP e permite a sua submissão electrónica – solução recomendada para a
+	generalidade dos casos, a evitar apenas no componente de submissão,
+	quando perante um SIP de dimensão superior a 2GB.</li>
+	<li class="list-item">SIP com criação e submissão off-line:
+	descarregar a ferramenta RODA-in para auxílio ao processo de criação do
+	SIP, depois gravado em suporte externo (CD-R, DVD) e entregue
+	presencialmente ou por via postal na DGARQ – solução recomendada para
+	SIP com dimensão superior a 2GB.</li>
+</ul>
+
+<p class="paragraph"><span class="strong">Q: Que necessito
+para utilizar a aplicação RODA IN?</span></p>
+<p class="paragraph">É necessário ter a aplicação Java (versão 1.5
+ou posterior) instalada, para poder correr a aplicação RODA IN. A
+aplicação Java pode ser descarregada em <a class="link"
+	href="http://www.java.com/en/download/manual.jsp"><span>http://www.java.com/en/download/manual.jsp</span></a></p>
+
+<p class="paragraph"><span class="strong">Q: Como utilizo o
+RODA IN para submeter SIP</span></p>
+<ol class="list-enum">
+	<li class="list-item-enum">Ao seleccionar Actualizar Plano é
+	pedida a validação do login e palavra-Chave.</li>
+	<li class="list-item-enum">Seleccionar o nome de um elemento da
+	hierarquia do plano permite visualizar a metainformação descritiva
+	relativa ao referido elemento.</li>
+	<li class="list-item-enum">Produzir SIP
+	<ol class="sub-list-enum">
+		<li class="list-item-enum">Seleccionar Criar</li>
+		<li class="list-item-enum">Introduzir metainformação e selecionar
+		entre Documento composto e Documento Simples</li>
+		<li class="list-item-enum">(Criar Documento Simples/Remover
+		Documento Simples)</li>
+		<li class="list-item-enum">Seleccionar Criar Representação</li>
+		<li class="list-item-enum">Seleccionar a classe da representação
+		pretendida:
+		<ol class="sub-list-enum">
+			<li class="list-item-enum">Texto com Estrutura (PDF, Microsoft
+			Word, Rich Text Format)</li>
+			<li class="list-item-enum">Imagens com Estrutura (TIFF, JPEG,
+			GIF, PNG, BMP)</li>
+			<li class="list-item-enum">Bases de Dados Relacionais (MySQL,
+			PostgreSQL, Microsoft SQL Server, Microsoft Access, DBML)</li>
+			<li class="list-item-enum">Áudio (MP3, WAV, WMA)</li>
+			<li class="list-item-enum">Vídeo (MPEG, AVI, WMV)</li>
+			<li class="list-item-enum">Desconhecido – tipo genérico. Sem
+			garantia de preservação</li>
+		</ol>
+		</li>
+	</ol>
+	</li>
+
+	<li class="list-item-enum">O ecrã das Representações permite
+	seleccionar e organizar as representações
+	<ol style="">
+		<li class="list-item-enum">Pode criar novas secções</li>
+		<li class="list-item-enum">Pode remover secções</li>
+		<li class="list-item-enum">Pode adicionar representação</li>
+		<li class="list-item-enum">Pode remover representação</li>
+		<li class="list-item-enum">Pode mover a representação para cima
+		ou para baixo de outras.</li>
+		<li class="list-item-enum">Seleccionar numa representação permite
+		a sua visualização na área de Pré-Visualização</li>
+	</ol>
+	</li>
+
+	<li class="list-item-enum">Seleccionar Guardar</li>
+	<li class="list-item-enum">Seleccionar Validar para verificar se o
+	pacote é válido</li>
+	<li class="list-item-enum">Seleccionar Enviar</li>
+	<li class="list-item-enum">Em Carregar Pacotes, pode:
+	<ol style="">
+		<li class="list-item-enum">Escolher os pacotes a ingerir</li>
+		<li class="list-item-enum">Escolher o modo de envio
+		<ol style="">
+			<li class="list-item-enum">Online</li>
+			<li class="list-item-enum">Offline, por correio</li>
+		</ol>
+		</li>
+	</ol>
+	</li>
+</ol>
+
+
+<p class="paragraph"><span class="strong">Q: Como utilizo o
+WebRODA para submeter SIP</span></p>
+<p class="paragraph">Existem duas opções de submissão de objectos
+Digitais</p>
+
+<ul class="list">
+	<li class="list-item">Solução para Enviar Pacote (recomendada
+	apenas para uso esporádico, i.e., poucos SIP e de pequena dimensão)
+	<ol class="sub-list-enum">
+		<li class="list-item-enum">Em Ingestão seleccione em Enviar</li>
+		<li class="list-item-enum">No painel Enviar Pacote, seleccione
+		essa opção</li>
+		<li class="list-item-enum">Clique no botão Browse para
+		seleccionar a representação que deseja adicionar</li>
+		<li class="list-item-enum">Seleccione adicionar</li>
+		<li class="list-item-enum">Caso queira retirar uma das
+		representações, clique no sinal “-“ que surge à direita do nome da
+		representação</li>
+		<li class="list-item-enum">Seleccione Submeter. Quando a
+		Submissão estiver concluída o ecrã vai directamente para o Painel
+		Estado</li>
+	</ol>
+	</li>
+	<li class="list-item">Solução para Criar Pacote
+	<ol class="sub-list-enum">
+		<li class="list-item-enum">Em Ingestão seleccione em Enviar</li>
+		<li class="list-item-enum">No painel Criar Pacote, seleccione
+		essa opção</li>
+		<li class="list-item-enum">Preencha o formulário da
+		Metainformação</li>
+		<li class="list-item-enum">Seleccione o tipo de representações
+		que pretende adicionar</li>
+		<li class="list-item-enum">Clique no botão Browse para
+		seleccionar a representação que deseja adicionar</li>
+		<li class="list-item-enum">Seleccione adicionar</li>
+		<li class="list-item-enum">Caso queira retirar uma das
+		representações, clique no sinal “-“ que surge à direita do nome da
+		representação</li>
+		<li class="list-item-enum">Seleccione a referência onde pretende
+		integrar o SIP, na tabela Escolha o destino.</li>
+		<li class="list-item-enum">Seleccione Submeter. Quando a
+		Submissão estiver concluída o ecrã vai directamente para o Painel
+		Estado</li>
+	</ol>
+	</li>
+</ul>
+
+
+<p class="paragraph"><span class="strong">Q: Posso submeter
+qualquer representação para o RODA?</span></p>
+<p class="paragraph">Antes de criar e submeter pacotes de informação
+ao RODA, tenha presente que, nos termos da política de preservação
+digital do RODA, é rejeitada a submissão de pacotes que:</p>
+<ul class="list">
+	<li class="list-item">Não estejam previstos no Plano de aquisição
+	negociado;</li>
+	<li class="list-item">Se apresentem em formatos não declarados
+	aceitáveis pelo RODA ou não especificamente autorizados no Acordo de
+	aquisição;</li>
+	<li class="list-item">Tenham, em algum dos seus ficheiros
+	constitutivos, vírus detectado pelo RODA;</li>
+	<li class="list-item">Se apresentem com falhas ou erros na
+	metainformação associada.</li>
+</ul>
+
+<p class="paragraph"><span class="strong">Q: Onde posso
+verificar o Estado das submissões de SIPs?</span></p>
+<p class="paragraph">O Painel Estado permite verificar o nome, a
+data, o estado do pacote submetido, o progresso do estado (medido em
+percentagem) e o nome do produtor.</p>
+
+
+<p class="paragraph"><span class="strong">Q: Como posso
+visualizar apenas SIPs pertencentes a uma certa categoria?</span></p>
+<p class="paragraph">É possível Filtrar os processos, de forma a
+visualizar apenas os que se encontram numa destas categorias:</p>
+<ul class="list">
+	<li class="list-item">Concluídos</li>
+	<li class="list-item">A processar</li>
+	<li class="list-item">Aceites</li>
+	<li class="list-item">Rejeitados</li>
+	<li class="list-item">Todos</li>
+	<li class="list-item">Produzidos por um produtor, devendo-se
+	escrever o nome do produtor pretendido.</li>
+</ul>
+
+<p class="paragraph"><span class="strong">Q: Como posso obter
+uma lista de pacotes em fase de submissão?</span></p>
+<p class="paragraph">É possível Exportar a lista actual para PDF ou
+para CSV (formato de tabela)</p>
+
+<p class="paragraph"><span class="strong">Q: Como posso obter
+informação sobre as diversas fases da ingestão?</span></p>
+<p class="paragraph">O Relatório de Ingestão apresenta o nome do
+pacote submetido e o estado por que já passou.</p>
+<p class="paragraph">Estas fases são:</p>
+<ol class="list-enum">
+	<li class="list-item-enum">Pacote recebido - Carregar pacote para
+	servidor</li>
+	<li class="list-item-enum">Pacote Descomprimido – Descompactar o
+	pacote</li>
+	<li class="list-item-enum">Livre de Vírus – verificação com
+	antivírus</li>
+	<li class="list-item-enum">Envelope válido – verificação de
+	coerência (checksums, organização)</li>
+	<li class="list-item-enum">Autorizado – Verificação de autorização
+	de ingestão pró parte do produtor</li>
+	<li class="list-item-enum">Ingerido – Representações e
+	metainformação integrados no RODA</li>
+	<li class="list-item-enum">Concluído – Ingestão concluída.</li>
+	<li class="list-item-enum">Aceite – o SIP foi aceite por quem tem
+	permissões para o aceitar, ou</li>
+	<li class="list-item-enum">Rejeitado – O SIP foi rejeitado por
+	quem tem permissões para tal. A Razão de tal rejeição surge no elemento
+	Detalhes.</li>
+</ol>
+<p class="paragraph">A metainformação sobre cada uma destas fases
+inclui:</p>
+
+<ul class="list">
+	<li class="list-item">Data e Hora: em que ocorreu a fase</li>
+	<li class="list-item">Tarefa: Indicação da operação</li>
+	<li class="list-item">Resultado: pode ser Sucesso ou Falha. O
+	último caso o processo de ingestão pára.</li>
+	<li class="list-item">Detalhes: operações que ocorrem dentro de
+	cada fase</li>
+</ul>
+
+<p class="paragraph"><span class="strong">Q: Como posso
+aceder à representação e a sua metainformação em processo de ingestão</span></p>
+<p class="paragraph">A Visualização permite aceder à Metainformação
+descritiva e de Preservação, visualizar as representações e as
+permissões de clientes, após o processamento ter terminado.</p>
+<p class="paragraph">No menu de Descrição é possível:</p>
+<ul class="list">
+	<li class="list-item">Editar a Metainformação</li>
+	<li class="list-item">Verificar subníveis (caso existam)</li>
+	<li class="list-item">Mover as representações do pacote para as
+	integrar noutro destino.</li>
+	<li class="list-item">Descarregar a descrição em EAD no formato
+	XML</li>
+</ul>
+<p class="paragraph">No menu Visualização pode-se:</p>
+<ul class="list">
+	<li class="list-item">Descarregar a representação original</li>
+	<li class="list-item">Descarregar a representação normalizada</li>
+	<li class="list-item">Pré-visualizar a representação no
+	visualizador de fotos (quando possível)</li>
+	<li class="list-item">Pré-visualizar a representação no
+	visualizador de livros (quando possível)</li>
+</ul>
+<p class="paragraph">No menu Preservação é possível:</p>
+<ul class="list">
+	<li class="list-item">Visualizar a calendarização dos eventos de
+	preservação e respectiva metainformação de preservação da
+	representação.</li>
+	<li class="list-item">Seleccionar a opção de visualização de
+	metainformação de preservação por Dia e por Mês</li>
+	<li class="list-item">Descarregar a descrição em PREMIS no formato
+	XML</li>
+</ul>
+<p class="paragraph">No menu Permissões pode-se:</p>
+<ul class="list">
+	<li class="list-item">Visualizar utilizadores e grupos de
+	utilizadores</li>
+	<li class="list-item">Visualizar e editar as permissões de acesso
+	dos utilizadores e grupos de utilizadores relativamente às
+	representações do pacote submetido. <br />
+	As permissões possíveis são:
+	<ul class="sub-list">
+		<li class="list-item">Sem Acesso</li>
+		<li class="list-item">Acesso a metainformação e disseminações</li>
+		<li class="list-item">Acesso e edição de metainformação</li>
+		<li class="list-item">Controlo completo</li>
+	</ul>
+	</li>
+	<li class="list-item">Aplicar a permissão escolhida, de forma
+	recursiva, a todos os sub-níveis</li>
+	<li class="list-item">Adicionar Utilizador</li>
+	<li class="list-item">Adicionar Grupo de utilizadores</li>
+	<li class="list-item">Guardar Alterações</li>
+</ul>
+
+
+<p class="paragraph"><span class="strong">Q: Como posso
+validar a representação e respectiva metainformação</span></p>
+<p class="paragraph">O Botão de Aceitar permite confirmar que tanto
+a representação, como a metainformação estão correctas e que estão em
+condições de serem acedidos no catálogo pelos utilizadores com permissão
+para tal.</p>
+
+
+<p class="paragraph"><span class="strong">Q: Como posso
+rejeitar a representação e respectiva metainformação</span></p>
+<p class="paragraph">O Botão de rejeitar tem como objectivo a
+rejeição de um pacote, permitindo:</p>
+<ul class="list">
+	<li class="list-item-enum">Escrever uma mensagem explicativa das
+	razões pelas quais o SIP foi rejeitado</li>
+	<li class="list-item-enum">Escolher mensagens padrão</li>
+	<li class="list-item-enum">Notificar o produtor</li>
+	<li class="list-item-enum">Rejeitar – confirmar a decisão de
+	rejeição</li>
+	<li class="list-item-enum">Cancelar – Não rejeitar.</li>
+</ul>
+
+<p class="paragraph"><span class="strong">Q: Que formatos são
+aceites para submissão?</span></p>
+<p class="paragraph">Os formatos aceites integram-se actualmente nas
+categorias de Texto, Imagem fixa, Audio, Vídeo.</p>
+<p class="paragraph">Texto:</p>
+<ul class="list">
+	<li class="list-item">Portable Document File (.pdf)</li>
+	<li class="list-item">Microsoft Word.Document (doc, .docx)</li>
+	<li class="list-item">Rich Text File (.rtf)</li>
+	<li class="list-item">Open Document Text (.odt)</li>
+</ul>
+
+<p class="paragraph">Imagem:</p>
+<ul class="list">
+	<li class="list-item">eXtensible Markup Language (.xml)</li>
+	<li class="list-item">Joint Photographic Experts Group File (.jpg,
+	jpeg)</li>
+	<li class="list-item">Graphics Interchange Format (.gif)</li>
+	<li class="list-item">Tagged Image File Format (.tiff ,.tif)</li>
+	<li class="list-item">Portable Network Graphics (.png)</li>
+</ul>
+
+<p class="paragraph">Aúdio:</p>
+<ul class="list">
+	<li class="list-item">MPEG-1 Audio Layer I (.mp1)</li>
+	<li class="list-item">MPEG-1 Audio Layer II (.mp2)</li>
+	<li class="list-item">MPEG-1 Audio Layer III (.mp3)</li>
+	<li class="list-item">Waveform audio format (.wav)</li>
+	<li class="list-item">Audio Interchange File Format (.aif .aiff)</li>
+	<li class="list-item">Ogg Vorbis audio file format (.ogg)</li>
+</ul>
+
+<p class="paragraph">Vídeo:</p>
+<ul class="list">
+	<li class="list-item">Moving Picture Experts Group format file
+	(.mpg, .mpeg)</li>
+	<li class="list-item">Audio Video Interleave (.avi)</li>
+	<li class="list-item">Windows Media Video (.wmv)</li>
+	<li class="list-item">QuickTime file format (.mov)</li>
+</ul>
+
+<p class="paragraph"><span class="strong">Q: Posso submeter
+outros formatos que não integrem a lista anterior</span></p>
+<p class="paragraph">A submissão de outros formatos pode ser aceite
+desde que estejam expressos no Acordo de custódia. No entanto, o RODA
+poderá não garantir a preservação da acessibilidade dos mesmos.</p>
+
+
+<p class="paragraph"><span class="strong">Q: Quais os
+sistemas de gestão de bases de dados que actualmente o RODA pode ingerir
+informação neles constantes</span></p>
+<p class="paragraph">MySQL, PostgreSQL, Microsoft SQL Server,
+Microsoft Access, e quaisquer outros cuja informação seja passível de
+ser convertida para o formato DBML</p>
+
+
+<p class="paragraph"><span class="strong">Q: Como posso
+esclarecer dúvidas sobre o Acordo de custódia, e/ou actualizar o Plano
+de aquisição</span></p>
+<p class="paragraph">Em caso de dúvida sobre os termos do Acordo de
+aquisição celebrado e, mais precisamente, sobre o Plano de transferência
+negociado, utilize os <a class="link" href="#about.contacts">contactos</a>
+oficiais para solicitar quaisquer esclarecimentos à DGARQ. Utilize a
+mesma via para manifestar eventuais necessidades de actualizar o Plano
+de aquisição previamente negociado.</p>
+
+<p class="paragraph"><span class="strong">Q: Como posso
+requer formação sobre a ingestão no RODA</span></p>
+<p class="paragraph">Caso necessite de obter formação específica
+sobre os procedimentos de ingestão, <a class="link" href="#about.contacts">contacte-nos</a> com o seu pedido de formação.</p>
+

@@ -222,7 +222,7 @@ public class RepresentationsPanel extends Composite {
 		try {
 			if (format != null) {
 				ret = constants.getString("representation_format_"
-						+ format.replaceAll("[/+-\\.]", "_"));
+						+ format.replaceAll("[/+-\\., ]", "_"));
 			} else {
 				ret = constants.representation_format_unknown();
 			}

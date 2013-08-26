@@ -77,6 +77,13 @@
 			<groupId>stax</groupId>
 			<artifactId>stax-api</artifactId>
 		</dependency>
+                <dependency>
+                        <groupId>pt.gov.dgarq.roda</groupId>
+                        <artifactId>roda-common-format-utility</artifactId>
+                        <version>1.0.0</version>
+                        <scope>test</scope>
+                        <type>jar</type>
+                </dependency>
 	</dependencies>
 	<build>
 		<plugins>

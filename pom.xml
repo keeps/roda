@@ -40,12 +40,7 @@ all the functionality prescribed by the OAIS reference model.</description>
 			<name>DuraSpace Repository (releases)</name>
 			<url>https://m2.duraspace.org/content/repositories/releases</url>
 		</repository>
-		<repository>
-			<id>jhove</id>
-			<name>jhove</name>
-			<url>http://repository.bibforge.org/archiva/repository/snapshots</url>
-		</repository>
-		<repository>
+		<repository>			
 			<id>com.springsource.repository.bundles.external</id>
 			<name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
 			<url>http://repository.springsource.com/maven/bundles/external</url>
@@ -90,6 +85,14 @@ all the functionality prescribed by the OAIS reference model.</description>
 			<organizationUrl>http://www.keep.pt</organizationUrl>
 			<timezone>0</timezone>
 		</developer>
+ <developer>
+			<id>vkorecky</id>
+			<name>Vladislav Korecký</name>
+			<email>vladislav_korecky@gordic.cz</email>
+			<organization>GORDIC spol. s r.o.</organization>
+			<organizationUrl>http://www.gordic.cz</organizationUrl>
+			<timezone>+1</timezone>
+		</developer>
 	</developers>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -97,7 +100,8 @@ all the functionality prescribed by the OAIS reference model.</description>
 		<maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
 		<java_version>1.6</java_version>
 		<gwt_version>2.4.0</gwt_version>
-		<jhove_version>1.5</jhove_version>
+    <jhove_old_version>1.6</jhove_old_version>
+		<jhove_version>1.9</jhove_version>    
 		<!-- THE PROPERTY THAT FOLLOWS IS NOT YET IN USE -->
 		<fedora_version>3.6.2</fedora_version>
 		<roda_community_url>http://roda-community.org</roda_community_url>
@@ -109,6 +113,8 @@ all the functionality prescribed by the OAIS reference model.</description>
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<modules>
+        <module>jodconverter-core</module>
+        <module>jhove</module>
 				<module>roda-common</module>
 				<module>roda-core</module>
 				<module>roda-client</module>
@@ -120,6 +126,8 @@ all the functionality prescribed by the OAIS reference model.</description>
 		<profile>
 			<id>all-but-ui</id>
 			<modules>
+        <module>jodconverter-core</module>
+        <module>jhove</module>
 				<module>roda-common</module>
 				<module>roda-core</module>
 				<module>roda-client</module>
@@ -130,6 +138,8 @@ all the functionality prescribed by the OAIS reference model.</description>
 		<profile>
 			<id>all-but-wui</id>
 			<modules>
+        <module>jodconverter-core</module>
+        <module>jhove</module>
 				<module>roda-common</module>
 				<module>roda-core</module>
 				<module>roda-client</module>
@@ -142,6 +152,8 @@ all the functionality prescribed by the OAIS reference model.</description>
 		<profile>
 			<id>plugins</id>
 			<modules>
+        <module>jodconverter-core</module>
+        <module>jhove</module>
 				<module>roda-common</module>
 				<module>roda-core/roda-plugins</module>
 				<module>roda-core/roda-core-plugins</module>
@@ -153,6 +165,8 @@ all the functionality prescribed by the OAIS reference model.</description>
 		<profile>
 			<id>core</id>
 			<modules>
+        <module>jodconverter-core</module>
+        <module>jhove</module>
 				<module>roda-common</module>
 				<module>roda-client</module>
 				<module>roda-core</module>
@@ -162,6 +176,8 @@ all the functionality prescribed by the OAIS reference model.</description>
 		<profile>
 			<id>handle</id>
 			<modules>
+        <module>jodconverter-core</module>
+        <module>jhove</module>
 				<module>roda-handle</module>
 				<module>roda-common</module>
 				<module>roda-client</module>
@@ -170,6 +186,8 @@ all the functionality prescribed by the OAIS reference model.</description>
 		<profile>
 			<id>wui</id>
 			<modules>
+        <module>jodconverter-core</module>
+        <module>jhove</module>
 				<module>roda-common</module>
 				<module>roda-client</module>
 				<module>roda-migrator</module>
@@ -180,6 +198,8 @@ all the functionality prescribed by the OAIS reference model.</description>
 		<profile>
 			<id>create-installer</id>
 			<modules>
+        <module>jodconverter-core</module>
+        <module>jhove</module>
 				<module>roda-common</module>
 				<module>roda-core</module>
 				<module>roda-client</module>
@@ -341,11 +361,11 @@ all the functionality prescribed by the OAIS reference model.</description>
 				<artifactId>acrobat</artifactId>
 				<version>1.1</version>
 			</dependency>
-			<dependency>
-				<groupId>com.artofsolving</groupId>
-				<artifactId>jodconverter</artifactId>
-				<version>2.2.1</version>
-			</dependency>
+                        <dependency>
+                                <groupId>org.artofsolving.jodconverter</groupId>
+				<artifactId>jodconverter-core</artifactId>
+				<version>3.0-beta-4</version>
+			</dependency>			
 			<dependency>
 				<groupId>com.fasterxml.jackson.core</groupId>
 				<artifactId>jackson-core</artifactId>
@@ -491,12 +511,12 @@ all the functionality prescribed by the OAIS reference model.</description>
 			<dependency>
 				<groupId>edu.harvard.hul.ois.jhove</groupId>
 				<artifactId>jhove-handler</artifactId>
-				<version>${jhove_version}</version>
+				<version>${jhove_old_version}</version>
 			</dependency>
 			<dependency>
 				<groupId>edu.harvard.hul.ois.jhove</groupId>
 				<artifactId>jhove-module</artifactId>
-				<version>${jhove_version}</version>
+				<version>${jhove_old_version}</version>
 			</dependency>
 			<dependency>
 				<groupId>javax.activation</groupId>

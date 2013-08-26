@@ -7,6 +7,7 @@ import com.google.gwt.i18n.client.ConstantsWithLookup;
 
 /**
  * @author Luis Faria
+ * @author Vladislav Korecký <vladislav_korecky@gordic.cz>
  * 
  */
 public interface StatisticsConstants extends ConstantsWithLookup {
@@ -329,14 +330,22 @@ public interface StatisticsConstants extends ConstantsWithLookup {
 	String sips_state_QUARANTINE();
 
 	String object_representation_type_digitalized_work();
+        
+        String object_representation_type_email();
 
 	String object_representation_type_structured_text();
+        
+        String object_representation_type_presentation();
+        
+        String object_representation_type_spreadsheet();
+        
+        String object_representation_type_vector_graphic();
 
 	String object_representation_type_relational_database();
 
 	String object_representation_type_video();
 
-	String object_representation_type_audio();
+	String object_representation_type_audio();              
 
 	String object_representation_type_unknown();
 

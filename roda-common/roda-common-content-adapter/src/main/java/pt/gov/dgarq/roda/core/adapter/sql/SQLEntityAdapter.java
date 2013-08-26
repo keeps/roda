@@ -5,7 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
@@ -268,10 +267,10 @@ public abstract class SQLEntityAdapter<E> implements SortParameterComparator<E> 
 	 */
 	protected String getSQLDatetime(String value) {
 		try {
+			String toIsoDate = DateParser.getIsoDate(DateParser.parse(value))
+					.replace("T", " ").replace("Z", "");
 
-			Timestamp timestamp = new Timestamp(DateParser.parse(value).getTime());
-
-			return "TIMESTAMP '" + timestamp + "'";
+			return "TIMESTAMP '" + toIsoDate + "'";
 
 		} catch (InvalidDateException e) {
 			throw new IllegalArgumentException(
@@ -296,9 +295,10 @@ public abstract class SQLEntityAdapter<E> implements SortParameterComparator<E> 
 				dateValue = DateParser.parse(value.toString());
 			}
 
-			Timestamp timestamp = new Timestamp(dateValue.getTime());
+			String toIsoDate = DateParser.getIsoDate(dateValue).replace("T",
+					" ").replace("Z", "");
 
-			return "TIMESTAMP '" + timestamp + "'";
+			return "TIMESTAMP '" + toIsoDate + "'";
 
 		} catch (InvalidDateException e) {
 			throw new IllegalArgumentException(

@@ -13,6 +13,23 @@
 		<param-name>properties</param-name>
 		<param-value>${roda.home}/config/roda-core.properties</param-value>
 	</context-param>
+	<!-- <servlet>
+		<description>
+	     This servlet processes OAI verbs. 
+	
+	     The initialization parameter names for this servlet are the
+	     &quot;servlet path&quot; that will be received by this servlet (after the
+	     filename extension is removed).  The corresponding value is the
+	     name of the action class that will be used to process this request.
+		</description>
+		<servlet-name>OAIHandler</servlet-name>
+		<servlet-class>ORG.oclc.oai.server.OAIHandler</servlet-class>
+		<load-on-startup>100</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>OAIHandler</servlet-name>
+		<url-pattern>/report</url-pattern>
+	</servlet-mapping> -->
 
 	<!-- <servlet> <display-name>Quartz Initializer Servlet</display-name> <servlet-name>QuartzInitializer</servlet-name> 
 		<servlet-class> org.quartz.ee.servlet.QuartzInitializerServlet </servlet-class> 

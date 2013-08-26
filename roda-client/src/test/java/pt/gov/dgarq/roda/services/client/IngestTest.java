@@ -6,13 +6,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-
 import org.w3c.util.DateParser;
-
+import pt.gov.dgarq.roda.common.FormatUtility;
 import pt.gov.dgarq.roda.core.RODAClient;
 import pt.gov.dgarq.roda.core.Uploader;
 import pt.gov.dgarq.roda.core.data.DescriptionObject;
 import pt.gov.dgarq.roda.core.data.EventPreservationObject;
+import pt.gov.dgarq.roda.core.data.FileFormat;
 import pt.gov.dgarq.roda.core.data.RepresentationFile;
 import pt.gov.dgarq.roda.core.data.RepresentationObject;
 import pt.gov.dgarq.roda.core.data.RepresentationPreservationObject;
@@ -23,182 +23,179 @@ import pt.gov.dgarq.roda.core.stubs.Ingest;
 
 /**
  * Test class for Ingest service.
- * 
+ *
  * @author Rui Castro
+ * @author Vladislav Korecký <vladislav_korecky@gordic.cz>
  */
 public class IngestTest {
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
+    /**
+     * @param args
+     */
+    public static void main(String[] args) {
 
-		List<String> createdObjectPIDs = new ArrayList<String>();
+        List<String> createdObjectPIDs = new ArrayList<String>();
 
-		try {
+        try {
 
-			RODAClient rodaClient = null;
-			Uploader rodaUploader = null;
+            RODAClient rodaClient = null;
+            Uploader rodaUploader = null;
 
-			String doParentPID = null;
-			File representationRootFile = null;
+            String doParentPID = null;
+            File representationRootFile = null;
 
-			if (args.length == 5) {
+            if (args.length == 5) {
 
-				// http://localhost:8180/ user pass
-				String hostUrl = args[0];
-				String username = args[1];
-				String password = args[2];
-				doParentPID = args[3];
-				representationRootFile = new File(args[4]);
+                // http://localhost:8180/ user pass
+                String hostUrl = args[0];
+                String username = args[1];
+                String password = args[2];
+                doParentPID = args[3];
+                representationRootFile = new File(args[4]);
 
-				if (!representationRootFile.exists()) {
-					System.err.println("File " + representationRootFile
-							+ " doesn't exist");
-					System.exit(1);
-				}
+                if (!representationRootFile.exists()) {
+                    System.err.println("File " + representationRootFile
+                            + " doesn't exist");
+                    System.exit(1);
+                }
 
-				rodaClient = new RODAClient(new URL(hostUrl), username,
-						password);
-				rodaUploader = new Uploader(new URL(hostUrl), username,
-						password);
+                rodaClient = new RODAClient(new URL(hostUrl), username,
+                        password);
+                rodaUploader = new Uploader(new URL(hostUrl), username,
+                        password);
 
-			} else {
-				System.err
-						.println(IngestTest.class.getSimpleName()
-								+ " protocol://hostname:port/ username password DO_Parent_PID representationRootFile");
-				System.exit(1);
-			}
+            } else {
+                System.err
+                        .println(IngestTest.class.getSimpleName()
+                        + " protocol://hostname:port/ username password DO_Parent_PID representationRootFile");
+                System.exit(1);
+            }
 
-			Ingest ingestService = rodaClient.getIngestService();
-			Browser browserService = rodaClient.getBrowserService();
-			Editor editorService = rodaClient.getEditorService();
+            Ingest ingestService = rodaClient.getIngestService();
+            Browser browserService = rodaClient.getBrowserService();
+            Editor editorService = rodaClient.getEditorService();
 
-			try {
+            try {
 
-				DescriptionObject dObject = new DescriptionObject();
-				dObject.setLevel(DescriptionLevel.ITEM);
-				dObject.setId("testIngest");
-				dObject.setCountryCode("PT");
-				dObject.setRepositoryCode("DGARQ");
-				dObject.setTitle("Test Item for Ingest Service");
-				dObject.setOrigination("Rui Castro");
-				dObject
-						.setScopecontent("This object is just for testing purposes");
-				dObject.setParentPID(doParentPID);
+                DescriptionObject dObject = new DescriptionObject();
+                dObject.setLevel(DescriptionLevel.ITEM);
+                dObject.setId("testIngest");
+                dObject.setCountryCode("PT");
+                dObject.setRepositoryCode("DGARQ");
+                dObject.setTitle("Test Item for Ingest Service");
+                dObject.setOrigination("Rui Castro");
+                dObject
+                        .setScopecontent("This object is just for testing purposes");
+                dObject.setParentPID(doParentPID);
 
-				System.out.println("\n**************************************");
-				System.out.println("Create DescriptionObject");
-				System.out.println("**************************************");
+                System.out.println("\n**************************************");
+                System.out.println("Create DescriptionObject");
+                System.out.println("**************************************");
 
-				System.out.println("Creating " + dObject);
+                System.out.println("Creating " + dObject);
 
-				String dObjectPID = ingestService
-						.createDescriptionObject(dObject);
+                String dObjectPID = ingestService
+                        .createDescriptionObject(dObject);
 
-				System.out.println("Created with pid " + dObjectPID);
+                System.out.println("Created with pid " + dObjectPID);
 
-				createdObjectPIDs.add(dObjectPID);
+                createdObjectPIDs.add(dObjectPID);
 
-				System.out.println("\n**************************************");
-				System.out.println("Possible levels for DO " + dObjectPID);
-				System.out.println("**************************************");
+                System.out.println("\n**************************************");
+                System.out.println("Possible levels for DO " + dObjectPID);
+                System.out.println("**************************************");
 
-				System.out.println(Arrays.asList(editorService
-						.getDOPossibleLevels(dObjectPID)));
+                System.out.println(Arrays.asList(editorService
+                        .getDOPossibleLevels(dObjectPID)));
 
-				System.out.println("\n**************************************");
-				System.out.println("Create RepresentationObject");
-				System.out.println("**************************************");
+                System.out.println("\n**************************************");
+                System.out.println("Create RepresentationObject");
+                System.out.println("**************************************");
 
-				RepresentationFile rFile = new RepresentationFile("F0",
-						representationRootFile.getName(),
-						"application/octet-stream", representationRootFile
-								.length(), representationRootFile.toURI()
-								.toURL().toExternalForm());
+                RepresentationFile rFile = new RepresentationFile("F0",
+                        representationRootFile.getName(), representationRootFile.length(), representationRootFile.toURI().toURL().toExternalForm(),
+                        FormatUtility.getFileFormat(representationRootFile, representationRootFile.getName()));
+                RepresentationObject rObject = new RepresentationObject();
+                rObject.setLabel(DateParser.getIsoDate(new Date()));
+                rObject.setType(RepresentationObject.UNKNOWN);
+                rObject.setStatuses(new String[]{RepresentationObject.STATUS_ORIGINAL});
+                rObject.setDescriptionObjectPID(dObjectPID);
+                rObject.setRootFile(rFile);
+                rObject.setDescriptionObjectPID(dObjectPID);
 
-				RepresentationObject rObject = new RepresentationObject();
-				rObject.setLabel(DateParser.getIsoDate(new Date()));
-				rObject.setType(RepresentationObject.UNKNOWN);
-				rObject
-						.setStatuses(new String[] { RepresentationObject.STATUS_ORIGINAL });
-				rObject.setDescriptionObjectPID(dObjectPID);
-				rObject.setRootFile(rFile);
-				rObject.setDescriptionObjectPID(dObjectPID);
+                System.out.println("Creating " + rObject);
 
-				System.out.println("Creating " + rObject);
+                String rObjectPID = ingestService
+                        .createRepresentationObject(rObject);
 
-				String rObjectPID = ingestService
-						.createRepresentationObject(rObject);
+                System.out.println("Created with pid " + rObjectPID);
+                createdObjectPIDs.add(rObjectPID);
 
-				System.out.println("Created with pid " + rObjectPID);
-				createdObjectPIDs.add(rObjectPID);
+                System.out.println("Uploading representation file " + rFile);
+                rodaUploader.uploadRepresentationFile(rObjectPID, rObject
+                        .getRootFile());
 
-				System.out.println("Uploading representation file " + rFile);
-				rodaUploader.uploadRepresentationFile(rObjectPID, rObject
-						.getRootFile());
+                System.out.println("\n**************************************");
+                System.out.println("Registering ingestion");
+                System.out.println("**************************************");
 
-				System.out.println("\n**************************************");
-				System.out.println("Registering ingestion");
-				System.out.println("**************************************");
+                String ingestEventPObjectPID = ingestService
+                        .registerIngestEvent(new String[]{dObjectPID},
+                        new String[]{rObjectPID}, new String[0],
+                        IngestTest.class.getName(), "Test ingestion");
 
-				String ingestEventPObjectPID = ingestService
-						.registerIngestEvent(new String[] { dObjectPID },
-								new String[] { rObjectPID }, new String[0],
-								IngestTest.class.getName(), "Test ingestion");
+                System.out.println("Ingest Event created with pid "
+                        + ingestEventPObjectPID);
+                createdObjectPIDs.add(ingestEventPObjectPID);
 
-				System.out.println("Ingest Event created with pid "
-						+ ingestEventPObjectPID);
-				createdObjectPIDs.add(ingestEventPObjectPID);
+                EventPreservationObject ingestEventPObject = browserService
+                        .getEventPreservationObject(ingestEventPObjectPID);
+                System.out
+                        .println("Event preservation object for ingestion is "
+                        + ingestEventPObject);
 
-				EventPreservationObject ingestEventPObject = browserService
-						.getEventPreservationObject(ingestEventPObjectPID);
-				System.out
-						.println("Event preservation object for ingestion is "
-								+ ingestEventPObject);
+                RepresentationPreservationObject rPObject = browserService
+                        .getROPreservationObject(rObjectPID);
 
-				RepresentationPreservationObject rPObject = browserService
-						.getROPreservationObject(rObjectPID);
+                System.out.println("Preservation object for representation "
+                        + rObjectPID + " is " + rPObject);
 
-				System.out.println("Preservation object for representation "
-						+ rObjectPID + " is " + rPObject);
+                rPObject = browserService
+                        .getRepresentationPreservationObject(rPObject.getPid());
 
-				rPObject = browserService
-						.getRepresentationPreservationObject(rPObject.getPid());
+                System.out.println("Representation preservation object is "
+                        + rPObject);
 
-				System.out.println("Representation preservation object is "
-						+ rPObject);
+                System.out.println("\n**************************************");
+                System.out.println("Set normalized representation");
+                System.out.println("**************************************");
 
-				System.out.println("\n**************************************");
-				System.out.println("Set normalized representation");
-				System.out.println("**************************************");
+                String normROPID = ingestService.setDONormalizedRepresentation(
+                        dObjectPID, rObjectPID);
+                System.out.println("Normalized representation PID is "
+                        + normROPID);
 
-				String normROPID = ingestService.setDONormalizedRepresentation(
-						dObjectPID, rObjectPID);
-				System.out.println("Normalized representation PID is "
-						+ normROPID);
+                RepresentationObject normalizedRO = browserService
+                        .getRepresentationObject(normROPID);
 
-				RepresentationObject normalizedRO = browserService
-						.getRepresentationObject(normROPID);
+                System.out.println("Normalized RO " + normalizedRO);
 
-				System.out.println("Normalized RO " + normalizedRO);
+            } catch (Exception e) {
 
-			} catch (Exception e) {
+                e.printStackTrace();
 
-				e.printStackTrace();
+            } finally {
 
-			} finally {
+                System.out.println("Removing created objects "
+                        + createdObjectPIDs);
 
-				System.out.println("Removing created objects "
-						+ createdObjectPIDs);
+                // Remove the ingest objects
+                ingestService.removeObjects((String[]) createdObjectPIDs
+                        .toArray(new String[createdObjectPIDs.size()]));
+            }
 
-				// Remove the ingest objects
-				ingestService.removeObjects((String[]) createdObjectPIDs
-						.toArray(new String[createdObjectPIDs.size()]));
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
