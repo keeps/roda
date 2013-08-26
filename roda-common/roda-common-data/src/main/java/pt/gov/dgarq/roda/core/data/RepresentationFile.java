@@ -4,158 +4,140 @@ import java.io.Serializable;
 
 /**
  * This is a file inside a {@link RepresentationObject}.
- * 
+ *
  * @author Rui Castro
+ * @author Vladislav Korecký <vladislav_korecky@gordic.cz>
  */
-public class RepresentationFile implements Serializable {
-	private static final long serialVersionUID = 542428357688741774L;
+public class RepresentationFile extends FileFormat implements Serializable {
 
-	private String id = null;
-	private String originalName = null;
-	private String mimetype = null;
-	private long size = 0;
-	private String accessURL = null;
+    private static final long serialVersionUID = 542428357688741774L;
+    private String id = null;
+    private String originalName = null;
+    private long size = 0;
+    private String accessURL = null;
 
-	/**
-	 * Constructs an empty {@link RepresentationFile}.
-	 */
-	public RepresentationFile() {
-	}
+    /**
+     * Constructs an empty {@link RepresentationFile}.
+     */
+    public RepresentationFile() {
+        super();
+    }
 
-	/**
-	 * Constructs a {@link RepresentationFile} with the given parameters.
-	 * 
-	 * @param id
-	 *            the file unique identification inside the
-	 *            {@link RepresentationObject}.
-	 * @param originalName
-	 *            the file's original name.
-	 * @param mimetype
-	 *            the file's mimetype.
-	 * @param size
-	 *            the file's size in bytes.
-	 * @param accessURL
-	 *            the relative URL to access this file.
-	 */
-	public RepresentationFile(String id, String originalName, String mimetype,
-			long size, String accessURL) {
-		setId(id);
-		setOriginalName(originalName);
-		setMimetype(mimetype);
-		setSize(size);
-		setAccessURL(accessURL);
-	}
+    public RepresentationFile(String id, String originalName, long size, String accessURL, FileFormat fileFormat) {
+        super(fileFormat);
+        setId(id);
+        setOriginalName(originalName);
+        setSize(size);
+        setAccessURL(accessURL);
+    }
 
-	/**
-	 * Construct a {@link RepresentationFile} cloning an existing
-	 * {@link RepresentationFile}.
-	 * 
-	 * @param representationFile
-	 *            the {@link RepresentationFile} to clone.
-	 */
-	public RepresentationFile(RepresentationFile representationFile) {
-		this(representationFile.getId(), representationFile.getOriginalName(),
-				representationFile.getMimetype(), representationFile.getSize(),
-				representationFile.getAccessURL());
-	}
+    /**
+     * Construct a {@link RepresentationFile} cloning an existing
+     * {@link RepresentationFile}.
+     *
+     * @param representationFile the {@link RepresentationFile} to clone.
+     */
+    public RepresentationFile(RepresentationFile representationFile) {
+        this(representationFile.getId(), representationFile.getOriginalName(), representationFile.getSize(), representationFile.getAccessURL(), representationFile.exportFileFormat());
+    }
 
-	/**
-	 * @see Object#toString()
-	 */
-	public String toString() {
-		return "RepresentationFile(id=" + getId() + ", originalName="
-				+ getOriginalName() + ", mimetype=" + getMimetype() + ", size="
-				+ getSize() + ", accessURL=" + getAccessURL() + ")";
-	}
+    /**
+     * @see Object#toString()
+     */
+    @Override
+    public String toString() {
+        StringBuilder strBuilder = new StringBuilder();
+        strBuilder.append("RepresentationFile(id=");
+        strBuilder.append(getId());
+        strBuilder.append(", originalName=");
+        strBuilder.append(getOriginalName());
+        strBuilder.append(", size=");
+        strBuilder.append(getSize());
+        strBuilder.append(", accessURL=");
+        strBuilder.append(getAccessURL());
+        strBuilder.append(", fileformat:mimetype=");
+        strBuilder.append(getMimetype());
+        strBuilder.append(", fileformat:name=");
+        strBuilder.append(getName());
+        strBuilder.append(", fileformat:version=");
+        strBuilder.append(getVersion());
+        strBuilder.append(", fileformat:fomratRegistryName=");
+        strBuilder.append(getFormatRegistryName());
+        strBuilder.append(", fileformat:puid=");
+        strBuilder.append(getPuid());
+        strBuilder.append(")");
+        return strBuilder.toString();
+    }
 
-	/**
-	 * @see Object#equals(Object)
-	 */
-	public boolean equals(Object obj) {
-		if (obj instanceof RepresentationFile) {
-			RepresentationFile other = (RepresentationFile) obj;
-			return getId() == other.getId() || getId().equals(other.getId());
-		} else {
-			return false;
-		}
-	}
+    /**
+     * @see Object#equals(Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof RepresentationFile) {
+            RepresentationFile other = (RepresentationFile) obj;
+            return getId() == other.getId() || getId().equals(other.getId());
+        } else {
+            return false;
+        }
+    }
 
-	/**
-	 * @return the id
-	 */
-	public String getId() {
-		return id;
-	}
+    /**
+     * @return the id
+     */
+    public String getId() {
+        return id;
+    }
 
-	/**
-	 * @param id
-	 *            the id to set
-	 */
-	public void setId(String id) {
-		if (id == null) {
-			throw new NullPointerException("id cannot be null");
-		}
-		this.id = id;
-	}
+    /**
+     * @param id the id to set
+     */
+    public void setId(String id) {
+        if (id == null) {
+            throw new NullPointerException("id cannot be null");
+        }
+        this.id = id;
+    }
 
-	/**
-	 * @return the originalName
-	 */
-	public String getOriginalName() {
-		return originalName;
-	}
+    /**
+     * @return the originalName
+     */
+    public String getOriginalName() {
+        return originalName;
+    }
 
-	/**
-	 * @param originalName
-	 *            the originalName to set
-	 */
-	public void setOriginalName(String originalName) {
-		this.originalName = originalName;
-	}
+    /**
+     * @param originalName the originalName to set
+     */
+    public void setOriginalName(String originalName) {
+        this.originalName = originalName;
+    }
 
-	/**
-	 * @return the mimetype
-	 */
-	public String getMimetype() {
-		return mimetype;
-	}
+    /**
+     * @return the size
+     */
+    public long getSize() {
+        return size;
+    }
 
-	/**
-	 * @param mimetype
-	 *            the mimetype to set
-	 */
-	public void setMimetype(String mimetype) {
-		this.mimetype = mimetype;
-	}
+    /**
+     * @param size the size to set
+     */
+    public void setSize(long size) {
+        this.size = size;
+    }
 
-	/**
-	 * @return the size
-	 */
-	public long getSize() {
-		return size;
-	}
+    /**
+     * @return the accessURL
+     */
+    public String getAccessURL() {
+        return accessURL;
+    }
 
-	/**
-	 * @param size
-	 *            the size to set
-	 */
-	public void setSize(long size) {
-		this.size = size;
-	}
-
-	/**
-	 * @return the accessURL
-	 */
-	public String getAccessURL() {
-		return accessURL;
-	}
-
-	/**
-	 * @param accessURL
-	 *            the accessURL to set
-	 */
-	public void setAccessURL(String accessURL) {
-		this.accessURL = accessURL;
-	}
-
+    /**
+     * @param accessURL the accessURL to set
+     */
+    public void setAccessURL(String accessURL) {
+        this.accessURL = accessURL;
+    }
 }

@@ -1,3 +1,539 @@
-<p class="paragraph">This is a static page in RODA, in particular, <b>ManagementHelp.html</b>.</p>
-<p class="paragraph">In order to modify the contents of this file, one just need to edit file <b>[RODA_HOME]/webapps/roda-wui.war/ManagementHelp.html</b></p>
-<p class="paragraph">Also, if one wants to have this page in multiple languages, one just needs to create one file per language. For example, to have english support create a file called <b>ManagementHelp_en.html</b>, for portuguese (from Portugal) create a file called <b>ManagementHelp_pt_PT.html</b></p>
+<p class="paragraph"><span class="strong">Q: Como Visualizar
+a lista de Utilizadores</span></p>
+<ol class="list-enum">
+	<li class="list-item-enum">Seleccione Administração</li>
+	<li class="list-item-enum">Seleccione Utilizadores. Surgirá, por
+	defeito, o painel “Lista de Utilizadores”. Aí poderá visualizar todos
+	os utilizadores registados.</li>
+	<li class="list-item-enum">Seleccione uma letra no topo do painel
+	para refinar a lista de utilizadores. Apenas surgirão os utilizadores
+	cujo primeiro nome de registo começa pela letra escolhida.</li>
+	<li class="list-item-enum">Ao seleccionar um utilizador,
+	aparecerão os grupos aos quais ele pertence.</li>
+</ol>
+
+<p class="paragraph"><span class="strong">Q: Como Visualizar
+a lista de Grupos</span></p>
+<ol class="list-enum">
+	<li class="list-item-enum">Seleccione Administração</li>
+	<li class="list-item-enum">Seleccione Utilizadores.</li>
+	<li class="list-item-enum">No painel “Listar”, seleccione Grupos</li>
+	<li class="list-item-enum">Seleccione uma letra no topo do painel
+	para refinar a lista de grupos. Apenas surgirão os grupos cujo primeiro
+	nome de registo começa pela letra escolhida.</li>
+	<li class="list-item-enum">Ao seleccionar um grupo, aparecerão os
+	utilizadores que a ele pertencem</li>
+</ol>
+
+<p class="paragraph"><span class="strong">Q: Como pesquisar
+Utilizadores ou grupos</span></p>
+<ol class="list-enum">
+	<li class="list-item-enum">Seleccione Administração</li>
+	<li class="list-item-enum">Seleccione Utilizadores.</li>
+	<li class="list-item-enum">No painel “Listar”, seleccione a
+	categoria em que pretende fazer a pesquisa</li>
+	<li class="list-item-enum">Em Pesquisar escreva o nome do
+	utilizador ou grupo que pretende</li>
+</ol>
+
+<p class="paragraph"><span class="strong">Gestão de Utilizadores</span></p>
+<ol class="list-enum">
+	<li class="list-item-enum">Seleccione Administração</li>
+	<li class="list-item-enum">Seleccione Utilizadores</li>
+</ol>
+<p class="paragraph"><span class="strong">Q: Como criar novos
+utilizadores</span></p>
+<ol class="list-enum">
+	<li class="list-item-enum">No painel “Utilizadores”, seleccione
+	“Novo”</li>
+	<li class="list-item-enum">Preencha o formulário com os seus
+	dados, tendo o cuidado de verificar os dados dos campos obrigatórios:</li>
+
+	<table cellspacing="0" class="static-table">
+		<tbody>
+			<tr>
+				<td class="table-header">Nome do Campo</td>
+				<td class="table-header">Definição</td>
+				<td class="table-header">Observações</td>
+			</tr>
+			<tr>
+				<td class="table-cell">Nome de utilizador</td>
+				<td class="table-cell">O identificador de validação do
+				utilizador, devendo se um nome curto sem espaços</td>
+				<td class="table-cell">(campo obrigatório)</td>
+			</tr>
+			<tr>
+				<td class="table-cell">Palavra-passe</td>
+				<td class="table-cell">Elemento de verificação pessoal e
+				intransmissível para confirmação de identificação</td>
+				<td class="table-cell">(campo obrigatório)</td>
+			</tr>
+			<tr>
+				<td class="table-cell">Nome completo</td>
+				<td class="table-cell">Nome completo do utilizador, de acordo
+				com documento de identificação</td>
+				<td class="table-cell">(campo obrigatório)</td>
+			</tr>
+			<tr>
+				<td class="table-cell">Nº de documento de identificação</td>
+				<td class="table-cell">Número do documento de identificação
+				utilizado, com indicação se é BI, passaporte ou cartão único</td>
+				<td class="table-cell">(campo obrigatório)</td>
+			</tr>
+			<tr>
+				<td class="table-cell">Data de emissão</td>
+				<td class="table-cell">Data de emissão do documento de
+				identificação utilizado</td>
+				<td class="table-cell">(campo obrigatório)</td>
+			</tr>
+			<tr>
+				<td class="table-cell">Local de emissão</td>
+				<td class="table-cell">Local de emissão documento de
+				identificação utilizado</td>
+				<td class="table-cell">(campo obrigatório)</td>
+			</tr>
+			<tr>
+				<td class="table-cell">Nacionalidade</td>
+				<td class="table-cell">País de origem do utilizador, de acordo
+				com documento de identificação</td>
+				<td class="table-cell">(campo obrigatório, vocabulário
+				controlado)</td>
+			</tr>
+			<tr>
+				<td class="table-cell">Nº de identificação fiscal</td>
+				<td class="table-cell">Número de identificação para efeitos
+				fiscais</td>
+				<td class="table-cell">(campo obrigatório quando não disponha
+				de cartão único)</td>
+			</tr>
+			<tr>
+				<td class="table-cell">Organização</td>
+				<td class="table-cell">Instituição a que pertence o utilizador
+				</td>
+				<td class="table-cell">&nbsp;</td>
+			</tr>
+			<tr>
+				<td class="table-cell">Função na organização</td>
+				<td class="table-cell">Cargo, hierarquia ou função do
+				utilizador dentro da organização</td>
+				<td class="table-cell">&nbsp;</td>
+			</tr>
+			<tr>
+				<td class="table-cell">Área de actividade</td>
+				<td class="table-cell">Área de actividade do
+				utilizador/instituição</td>
+				<td class="table-cell">(campo obrigatório, vocabulário
+				controlado)</td>
+			</tr>
+			<tr>
+				<td class="table-cell">Habilitações académicas</td>
+				<td class="table-cell">Grau académico, habilitações académicas
+				do utilizador</td>
+				<td class="table-cell">(vocabulário controlado)</td>
+			</tr>
+			<tr>
+				<td class="table-cell">Endereço electrónico</td>
+				<td class="table-cell">E-mail utilizador para comunicar com o
+				utilizar</td>
+				<td class="table-cell">(campo obrigatório)</td>
+			</tr>
+			<tr>
+				<td class="table-cell">Endereço postal</td>
+				<td class="table-cell">Endereço oficial do utilizador</td>
+				<td class="table-cell">&nbsp;</td>
+			</tr>
+			<tr>
+				<td class="table-cell">Código postal e Localidade</td>
+				<td class="table-cell">Código postal e Localidade do endereço
+				oficial do utilizador</td>
+				<td class="table-cell">&nbsp;</td>
+			</tr>
+			<tr>
+				<td class="table-cell">País de residência</td>
+				<td class="table-cell">País onde o utilizador reside</td>
+				<td class="table-cell">(vocabulário controlado)</td>
+			</tr>
+			<tr>
+				<td class="table-cell">Contacto telefónico</td>
+				<td class="table-cell">Número telefónico para contacto com o
+				utilizador</td>
+				<td class="table-cell">&nbsp;</td>
+			</tr>
+			<tr>
+				<td class="table-cell">Fax</td>
+				<td class="table-cell">Número de Fax para comunicação com o
+				utilizador</td>
+				<td class="table-cell">&nbsp;</td>
+			</tr>
+		</tbody>
+	</table>
+	<br />
+	<li class="list-item-enum">Seleccione o(s) grupo(s) disponível(is)
+	de que pretende herdar permissões, clicando no (+). Se pretender
+	remover algum dos grupos do qual herda permissões, clique em (-).</li>
+	<li class="list-item-enum">Alternativamente, poderá seleccionar a
+	opção “Permissões” e escolher manualmente as permissões desejadas:</li>
+
+	<ul class="sub-list">
+		<li class="list-item">Pode utilizar a procura básica</li>
+
+		<li class="list-item">Pode utilizar a procura avançada</li>
+
+		<li class="list-item">Pode navegar no repositório</li>
+
+		<li class="list-item">Pode gerir utilizadores</li>
+
+		<li class="list-item">Pode gerir eventos</li>
+
+		<li class="list-item">Pode editar metainformação</li>
+
+		<li class="list-item">Pode aceder à pré-ingestão</li>
+
+		<li class="list-item">Pode carregar SIPs</li>
+
+		<li class="list-item">Pode aceder à lista dos seus SIPs</li>
+
+		<li class="list-item">Pode aceder à lista de todos os SIPs</li>
+
+		<li class="list-item">Pode aceitar ou rejeitar SIPs</li>
+
+		<li class="list-item">Pode escrever entradas no registo do
+		sistema</li>
+
+		<li class="list-item">Pode registar utilizadores</li>
+
+		<li class="list-item">Pode listar utilizadores ou grupos</li>
+
+		<li class="list-item">administration.statistics (needs
+		translation)</li>
+
+		<li class="list-item">logger.monitor (needs translation)</li>
+
+		<li class="list-item">administration.statistics.monitor (needs
+		translation)</li>
+	</ul>
+	<li class="list-item-enum">Seleccione Gravar.</li>
+</ol>
+
+<p class="paragraph"><span class="strong">Q: Como editar
+dados dos Utilizadores</span></p>
+<ol class="list-enum">
+	<li class="list-item-enum">Seleccione o utilizador que pretende
+	“Editar”</li>
+	<li class="list-item-enum">No painel “Utilizadores”, seleccione
+	“Editar”</li>
+	<li class="list-item-enum">Efectue as alterações pretendidas</li>
+	<li class="list-item-enum">Seleccione “Gravar”</li>
+</ol>
+<p class="paragraph"><span class="strong">Q: Como
+activar/desactivar Utilizadores</span></p>
+<ol class="list-enum">
+	<li class="list-item-enum">Seleccione o utilizador que pretende
+	Activar/Desactivar</li>
+	<li class="list-item-enum">No painel “Utilizadores”, seleccione
+	“Activar” ou “Desactivar”, conforme a situação</li>
+	<li class="list-item-enum">Os utilizadores activados estão
+	representados por uma figura azul, enquanto que os utilizadores
+	desactivados estão representados por uma figura vermelha.</li>
+	<li class="list-item-enum">Caso os utilizadores estejam
+	desactivados, não poderão efectuar o login no RODA</li>
+</ol>
+<p class="paragraph"><span class="strong">Q: Como visualizar
+Relatório de Acções do Utilizador</span></p>
+<ol class="list-enum">
+	<li class="list-item-enum">Seleccione o utilizador do qual
+	pretende ver o relatório</li>
+	<li class="list-item-enum">No painel “Utilizadores”, seleccione
+	“Relatório”</li>
+	<li class="list-item-enum">Poderá refinar a lista de acções,
+	escolhendo um tipo de acção na caixa de lista pendente e seleccionando
+	datas extremas.</li>
+	<li class="list-item-enum">Clique em “Aplicar”</li>
+	<li class="list-item-enum">Poderá exportar a lista actual para PDF
+	ou CSV</li>
+</ol>
+
+<p class="paragraph"><span class="strong">Q: Como remover um
+Utilizador</span></p>
+<ol class="list-enum">
+	<li class="list-item-enum">Seleccione o utilizador que pretende
+	eliminar</li>
+	<li class="list-item-enum">No painel “Utilizadores”, seleccione
+	“Remover”</li>
+	<li class="list-item-enum">Caso o utilizador seleccionado tenha
+	acções associadas, ele não será eliminado, mas sim desactivado</li>
+</ol>
+<p class="paragraph"><span class="strong">Gestão de Grupos</span></p>
+<ol class="list-enum">
+	<li class="list-item-enum">Seleccione Administração</li>
+	<li class="list-item-enum">Seleccione Utilizadores</li>
+</ol>
+
+<p class="paragraph"><span class="strong">Q: Como criar um
+Grupo</span></p>
+<ol class="list-enum">
+	<li class="list-item-enum">No painel “Grupo”, seleccione “Novo”</li>
+	<li class="list-item-enum">No painel Criar Grupo, preencha os
+	dados</li>
+	<li class="list-item-enum">Seleccione o(s) grupo(s) disponível(is)
+	de que pretende herdar permissões, clicando no (+). Se pretender
+	remover algum dos grupos do qual herda permissões, clique em (-).</li>
+	<li class="list-item-enum">Alternativamente, poderá seleccionar a
+	opção “Permissões” e escolher manualmente as permissões desejadas:</li>
+	<ul class="sub-list">
+		<li class="list-item">Pode utilizar a procura básica</li>
+		<li class="list-item">Pode utilizar a procura avançada</li>
+		<li class="list-item">Pode navegar no repositório</li>
+		<li class="list-item">Pode gerir utilizadores</li>
+		<li class="list-item">Pode gerir eventos</li>
+		<li class="list-item">Pode editar metainformação</li>
+		<li class="list-item">Pode aceder à pré-ingestão</li>
+		<li class="list-item">Pode carregar SIPs</li>
+		<li class="list-item">Pode aceder à lista dos seus SIPs</li>
+		<li class="list-item">Pode aceder à lista de todos os SIPs</li>
+		<li class="list-item">Pode aceitar ou rejeitar SIPs</li>
+		<li class="list-item">Pode escrever entradas no registo do
+		sistema</li>
+		<li class="list-item">Pode registar utilizadores</li>
+		<li class="list-item">Pode listar utilizadores ou grupos</li>
+		<li class="list-item">administration.statistics (needs
+		translation)</li>
+		<li class="list-item">logger.monitor (needs translation)</li>
+		<li class="list-item">administration.statistics.monitor (needs
+		translation)</li>
+	</ul>
+	<li class="list-item-enum">Seleccione Gravar.</li>
+</ol>
+
+<p class="paragraph"><span class="strong">Q: Como editar um
+Grupo</span></p>
+<ol class="list-enum">
+	<li class="list-item-enum">No painel “Listar” seleccione “Grupos</li>
+	<li class="list-item-enum">Seleccione o grupo que pretende
+	“Editar”</li>
+	<li class="list-item-enum">No painel “Grupos”, seleccione “Editar”
+	</li>
+	<li class="list-item-enum">Efectue as alterações pretendidas</li>
+	<li class="list-item-enum">Seleccione “Gravar”</li>
+</ol>
+<p class="paragraph"><span class="strong">Q: Como remover um
+Grupo</span></p>
+<ol class="list-enum">
+	<li class="list-item-enum">No painel “Listar” seleccione “Grupos</li>
+	<li class="list-item-enum">Seleccione o grupo que pretende
+	“Remover”</li>
+	<li class="list-item-enum">No painel “Grupos”, clique em “Remover”
+	</li>
+</ol>
+<p class="paragraph"><span class="strong">Q: Como aceder à
+Gestão de Tarefas</span></p>
+<ol class="list-enum">
+	<li class="list-item-enum">Seleccione Administração</li>
+	<li class="list-item-enum">Seleccione Tarefas</li>
+</ol>
+<p class="paragraph"><span class="strong">Q: Como pesquisar
+e/ou refinar Visualização em Agenda de Tarefas</span></p>
+<ol class="list-enum">
+	<li class="list-item-enum">No painel “Listar” seleccione a
+	categoria de tarefas que pretende visualizar</li>
+	<li class="list-item-enum">Em Pesquisar escreva o nome do evento
+	que pretende visualizar</li>
+	<li class="list-item-enum">Poderá exportar a lista actual para PDF
+	ou CSV</li>
+</ol>
+<p class="paragraph"><span class="strong">Q: Como visualizar
+lista de tarefas</span></p>
+<ol class="list-enum">
+	<li class="list-item-enum">Seleccione “Lista”</li>
+	<li class="list-item-enum">No painel “Listar” poderá refinar a
+	lista de tarefas, seleccionando o estádio que pretende verificar</li>
+	<li class="list-item-enum">Alternativamente poderá pesquisar pelo
+	nome da tarefa, no painel “Nome”</li>
+	<li class="list-item-enum">Poderá exportar a lista actual para PDF
+	ou CSV</li>
+</ol>
+<p class="paragraph"><span class="strong">Q: Como criar uma
+Tarefa</span></p>
+<ol class="list-enum">
+	<li class="list-item-enum">Seleccione “Nova"</li>
+	<li class="list-item-enum">Preencha os dados, indicando o nome e
+	descrição</li>
+	<li class="list-item-enum">Defina a data de início</li>
+	<li class="list-item-enum">Define possibilidade de repetição</li>
+	<li class="list-item-enum">Seleccione o Agente</li>
+	<li class="list-item-enum">Preencha os parâmetros obrigatórios</li>
+	<li class="list-item-enum">Clique em Gravar</li>
+</ol>
+
+<p class="paragraph"><span class="strong">Q: Como editar uma
+Tarefa</span></p>
+<ol class="list-enum">
+	<li class="list-item-enum">Seleccione a tarefa que pretende
+	alterar</li>
+	<li class="list-item-enum">Seleccione “Editar”</li>
+	<li class="list-item-enum">Efectue as alterações pretendidas</li>
+	<li class="list-item-enum">Seleccione “Gravar”</li>
+</ol>
+
+<p class="paragraph"><span class="strong">Q: Como
+pausar/recomeçar uma Tarefa</span></p>
+<ol class="list-enum">
+	<li class="list-item-enum">Seleccione a tarefa que pretende pausar
+	ou recomeçar</li>
+	<li class="list-item-enum">Seleccione “Pausar” ou “Resumir”,
+	conforme esteja ou não activo</li>
+	<li class="list-item-enum">O símbolo que representa o estado da
+	tarefa mudará em conformidade.</li>
+	<li class="list-item-enum">Caso a tarefa esteja pausada, ela não
+	será activada.</li>
+</ol>
+
+<p class="paragraph"><span class="strong">Q: Como remover uma
+Tarefa</span></p>
+<ol class="list-enum">
+	<li class="list-item-enum">Seleccione a tarefa que pretende
+	“Remover”</li>
+	<li class="list-item-enum">Clique em “Remover”</li>
+</ol>
+
+<p class="paragraph"><span class="strong">Q: Como aceder às
+Estatísticas</span></p>
+<ol class="list-enum">
+	<li class="list-item-enum">Seleccione Administração</li>
+	<li class="list-item-enum">Seleccione Estatísticas</li>
+</ol>
+
+<p class="paragraph"><span class="strong">Q: Como Visualizar
+as Estatísticas</span></p>
+<ol class="list-enum">
+	<li class="list-item-enum">Seleccione que painel de estatísticas
+	pretende visualizar:
+	<ol class="sub-list-enum">
+		<li class="list-item-enum">Repositório</li>
+		<li class="list-item-enum">Ingestão</li>
+		<li class="list-item-enum">Produtores</li>
+		<li class="list-item-enum">Utilizadores</li>
+		<li class="list-item-enum">Acesso</li>
+		<li class="list-item-enum">Acções</li>
+		<li class="list-item-enum">Sistema</li>
+	</ol>
+	</li>
+	<li class="list-item-enum">Visualização de Estatísticas do
+	Repositório
+	<ol class="sub-list-enum">
+		<li class="list-item-enum">Cada elemento indicará informação
+		numérica em sob a forma de gráficos</li>
+		<li class="list-item-enum">Poderá clicar no sinal de informação
+		gráfica para aceder ao painel de informação mais aprofundada.</li>
+		<li class="list-item-enum">No painel “Gráfico” poderá definir a
+		unidade de tempo e as datas extremas da informação gráfica a
+		visualizar</li>
+		<li class="list-item-enum">No painel “Tabela” poderá visualizar a
+		lista de ocorrências, e exportar a lista actual para PDF ou CSV</li>
+	</ol>
+	</li>
+	<li class="list-item-enum">Visualização de Estatísticas de
+	Ingestão
+	<ol class="sub-list-enum">
+		<li class="list-item-enum">Cada elemento indicará informação em
+		horas, minutos, segundos em sob a forma de gráficos</li>
+		<li class="list-item-enum">Poderá clicar no sinal de informação
+		gráfica para aceder ao painel de informação mais aprofundada em cada
+		elemento informativo.
+		<ol class="sub-list-enum">
+			<li class="list-item-enum">No painel “Gráfico” poderá definir a
+			unidade de tempo e as datas extremas da informação gráfica a
+			visualizar</li>
+			<li class="list-item-enum">No painel “Tabela” poderá visualizar
+			a lista de ocorrências, e exportar a lista actual para PDF ou CSV</li>
+		</ol>
+		</li>
+		<li class="list-item-enum">Adicionalmente, alguns elementos
+		informativos permitem visualizar a metainformação e/ou a representação
+		do pacote ingerido, clicando no símbolo “!”</li>
+	</ol>
+	</li>
+	<li class="list-item-enum">Visualização de Estatísticas de
+	Produtores
+	<ol class="sub-list-enum">
+		<li class="list-item-enum">Seleccione o produtor pretendido</li>
+		<li class="list-item-enum">Será apresentada informação sobre a
+		data da última submissão e a distribuição do estado dos depósitos sob
+		a forma de gráficos</li>
+		<li class="list-item-enum">Poderá clicar no sinal de informação
+		gráfica para aceder ao painel de informação mais aprofundada.</li>
+		<li class="list-item-enum">No painel “Gráfico” poderá definir a
+		unidade de tempo e as datas extremas da informação gráfica a
+		visualizar</li>
+		<li class="list-item-enum">No painel “Tabela” poderá visualizar a
+		lista de ocorrências, e exportar a lista actual para PDF ou CSV</li>
+	</ol>
+	</li>
+	<li class="list-item-enum">Visualização de Estatísticas de
+	Utilizadores
+	<ol class="sub-list-enum">
+		<li class="list-item-enum">Cada elemento indicará informação
+		numérica em sob a forma de gráficos</li>
+		<li class="list-item-enum">Poderá clicar no sinal de informação
+		gráfica para aceder ao painel de informação mais aprofundada.</li>
+		<li class="list-item-enum">No painel “Gráfico” poderá definir a
+		unidade de tempo e as datas extremas da informação gráfica a
+		visualizar</li>
+		<li class="list-item-enum">No painel “Tabela” poderá visualizar a
+		lista de ocorrências, e exportar a lista actual para PDF ou CSV</li>
+	</ol>
+	</li>
+	<li class="list-item-enum">Visualização de Estatísticas de Acesso
+	<ol class="sub-list-enum">
+		<li class="list-item-enum">Cada elemento indicará informação
+		numérica em sob a forma de gráficos</li>
+		<li class="list-item-enum">Poderá clicar no sinal de informação
+		gráfica para aceder ao painel de informação mais aprofundada.</li>
+		<li class="list-item-enum">No painel “Gráfico” poderá definir a
+		unidade de tempo e as datas extremas da informação gráfica a
+		visualizar</li>
+		<li class="list-item-enum">No painel “Tabela” poderá visualizar a
+		lista de ocorrências, e exportar a lista actual para PDF ou CSV</li>
+	</ol>
+	</li>
+	<li class="list-item-enum">Visualização de Estatísticas de Acções
+	<ol class="sub-list-enum">
+		<li class="list-item-enum">Cada elemento indicará informação
+		numérica em sob a forma de gráficos</li>
+		<li class="list-item-enum">Poderá clicar no sinal de informação
+		gráfica para aceder ao painel de informação mais aprofundada.</li>
+		<li class="list-item-enum">No painel “Gráfico” poderá definir a
+		unidade de tempo e as datas extremas da informação gráfica a
+		visualizar</li>
+		<li class="list-item-enum">No painel “Tabela” poderá visualizar a
+		lista de ocorrências, e exportar a lista actual para PDF ou CSV</li>
+	</ol>
+	</li>
+	<li class="list-item-enum">Visualização de Estatísticas de Sistema
+	<ol class="sub-list-enum">
+		<li class="list-item-enum">As estatísticas do sistema utilizam a
+		aplicação Munin, que permite monitorizar informação gráfica sobre o
+		hardware e software utilizados.</li>
+		<li class="list-item-enum">A opção “Abrir monitor de sistema
+		noutra janela, permite visualizar a informação sem a restrição das
+		medida dos painéis do RODA</li>
+	</ol>
+	</li>
+</ol>
+<p class="paragraph"><span class="strong">Q: Como aceder ao
+Relatório de Acções</span></p>
+<ol class="list-enum">
+	<li class="list-item-enum">Seleccione Administração</li>
+	<li class="list-item-enum">Seleccione Relatório de Acções</li>
+</ol>
+
+<p class="paragraph"><span class="strong">Q: Como refinar a
+lista do Relatório de Acções</span></p>
+<ol class="list-enum">
+	<li class="list-item-enum">Poderá refinar a lista de acções,
+	escolhendo um tipo de acção na caixa de lista pendente e seleccionando
+	datas extremas.</li>
+	<li class="list-item-enum">Clique em “Aplicar”</li>
+	<li class="list-item-enum">Poderá exportar a lista actual para PDF
+	ou CSV</li>
+</ol>

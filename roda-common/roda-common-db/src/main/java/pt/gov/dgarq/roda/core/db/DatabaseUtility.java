@@ -234,23 +234,6 @@ public class DatabaseUtility<EA extends SQLEntityAdapter<E>, E> {
 	}
 
 	/**
-	 * @param value
-	 * @return
-	 */
-	public static String truncateValueOrNull(String value) {
-		// FIXME replace locale specific string
-		if (value != null) {
-			if (value.length() > MAX_TEXT_LENGTH) {
-				value = value.substring(0, MAX_TEXT_LENGTH)
-						+ "\n(Texto truncado).";
-			}
-			return value;
-		} else {
-			return "NULL";
-		}
-	}
-
-	/**
 	 * @param date
 	 * @return
 	 */

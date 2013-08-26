@@ -36,6 +36,12 @@
 		<module>converters/st/Pdf2PdfConverterPlugin</module>
 		<module>converters/st/Rtf2PdfConverterPlugin</module>
 		<module>converters/st/ST2PdfConverterPlugin</module>
+<module>converters/presentation/Ppt2PdfConverterPlugin</module>
+    <module>converters/presentation/Pptx2PdfConverterPlugin</module>
+    <module>converters/presentation/Odp2PdfConverterPlugin</module>
+    <module>converters/spreadsheet/Xls2PdfConverterPlugin</module>
+    <module>converters/spreadsheet/Xlsx2PdfConverterPlugin</module>
+    <module>converters/spreadsheet/Ods2PdfConverterPlugin</module>
 		<module>converters/video/Avi2Mpeg2ConverterPlugin</module>
 		<module>converters/video/Mov2Mpeg2ConverterPlugin</module>
 		<module>converters/video/Mpeg22Mpeg2ConverterPlugin</module>
@@ -43,6 +49,7 @@
 		<module>converters/video/Mpeg42Mpeg2ConverterPlugin</module>
 		<module>converters/video/Video2Mpeg2ConverterPlugin</module>
 		<module>converters/video/Wmv2Mpeg2ConverterPlugin</module>
+<module>converters/email/Eml2PdfConverterPlugin</module>
 		<module>description/AccessRestrictNotifierPlugin</module>
 		<module>description/common</module>
 		<module>description/UnitdatesInferencePlugin</module>

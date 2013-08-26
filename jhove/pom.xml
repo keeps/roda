@@ -1,0 +1,156 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>edu.harvard.hul.ois.jhove</groupId>
+  <artifactId>jhove</artifactId>
+  <name>JHOVE - JSTOR/Harvard Object Validation Environment</name>
+  <description>JHOVE provides functions to perform format-specific identification, validation, and characterization of digital objects.</description>
+  <licenses>
+    <license>
+      <name>GNU Library or Lesser General Public License (LGPL)</name>
+      <url>http://www.gnu.org/licenses/lgpl.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <url>http://hul.harvard.edu/jhove/</url>
+  <scm>
+    <url>http://sourceforge.net/projects/jhove/</url>
+    <connection>scm:cvs:pserver:anonymous:@jhove.cvs.sourceforge.net:/cvsroot/jhove:jhove</connection>
+  </scm>
+  <version>1.9</version>
+  <properties>
+    <download.url>http://downloads.sourceforge.net/project/jhove/jhove/JHOVE%201.9/jhove-1_9.zip?use_mirror=switch</download.url>
+    <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
+  </properties>
+  <build>
+    <!-- <sourceDirectory>target/generated-sources/main/java</sourceDirectory> -->
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.0.2</version>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <configuration>
+              <tasks>
+                <!-- get source jar -->
+                <mkdir dir="target" />
+                <get src="${download.url}" dest="target/jhove-${project.version}-dist.zip" usetimestamp="true" ignoreerrors="true" />
+                <!-- unpack classes -->
+                <unzip src="target/jhove-${project.version}-dist.zip" dest="target/generated-sources/main/java">
+                  <patternset>
+                    <include name="jhove/classes/**/*.java" />
+                  </patternset>
+                  <mapper type="glob" from="jhove/classes/*" to="*" />
+                </unzip>
+                <!-- unpack tests -->
+                <unzip src="target/jhove-${project.version}-dist.zip" dest="target/generated-sources/test/java">
+                  <patternset>
+                    <include name="jhove/tests/**/*.java" />
+                  </patternset>
+                  <mapper type="glob" from="jhove/tests/*" to="*" />
+                </unzip>
+                <!-- unpack all -->
+                <unzip src="target/jhove-${project.version}-dist.zip" dest="target/jhove2-unpacked">
+                  <patternset>
+                    <include name="**/*.*" />
+                  </patternset>
+                </unzip>
+              </tasks>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>2.4.1</version>
+        <executions>
+          <execution>
+            <id>copy-resources</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${basedir}/target/generated-sources/main/java</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${basedir}/target/checkout/classes</directory>
+                  <filtering>false</filtering>
+                  <!-- Exclude the files we wish to patch -->
+                  <excludes>
+                    <exclude>**/JhoveBase.java</exclude>
+                  </excludes>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>1.1</version>
+        <executions>
+          <execution>
+            <id>add-source</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>${basedir}/src/main/java</source>
+                <source>${basedir}/target/generated-sources/main/java</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>Jhove</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <use>false</use>
+        </configuration>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.7</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>

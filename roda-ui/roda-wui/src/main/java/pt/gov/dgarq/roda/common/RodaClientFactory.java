@@ -120,15 +120,8 @@ public class RodaClientFactory {
 		int serverPort = req.getServerPort();
 		String contextPath = req.getContextPath();
 
-		String url;
-		if ("http".equalsIgnoreCase(scheme) && serverPort == 80) {
-			url = scheme + "://" + serverName + contextPath;
-		} else if ("https".equalsIgnoreCase(scheme) && serverPort == 443) {
-			url = scheme + "://" + serverName + contextPath;
-		} else {
-			url = scheme + "://" + serverName + ":" + serverPort + contextPath;
-		}
-
+		String url = scheme + "://" + serverName + ":" + serverPort
+				+ contextPath;
 		return url;
 	}
 
@@ -190,9 +183,9 @@ public class RodaClientFactory {
 			RODAClientException {
 		if (rodaWuiClient == null) {
 			try {
-				rodaWuiClient = new RODAClient(rodaCoreURL,
-						rodaProperties.getProperty("roda.wui.user.name"),
-						rodaProperties.getProperty("roda.wui.user.password"));
+				rodaWuiClient = new RODAClient(rodaCoreURL, rodaProperties
+						.getProperty("roda.wui.user.name"), rodaProperties
+						.getProperty("roda.wui.user.password"));
 			} catch (LoginException e) {
 				throw new LoginException(e.getMessage());
 			}
@@ -220,7 +213,8 @@ public class RodaClientFactory {
 			parameters.add(new LogEntryParameter("address", request
 					.getRemoteAddr()));
 			parameters.add(new LogEntryParameter("port", request
-					.getRemotePort() + ""));
+					.getRemotePort()
+					+ ""));
 			parameters.add(new LogEntryParameter("pid", pid));
 			LogEntry logEntry = new LogEntry();
 			logEntry.setAction("disseminator." + (hit ? "hit" : "miss") + "."
@@ -258,17 +252,15 @@ public class RodaClientFactory {
 		} else {
 			roda_home = null;
 		}
-
-		File staticConfig = new File(roda_home, "config" + File.separator
-				+ relativePath);
+		
+		File staticConfig = new File(roda_home, "config"
+				+ File.separator + relativePath);
 
 		if (staticConfig.exists()) {
 			try {
 				ret = new FileInputStream(staticConfig);
 				logger.info("Using static configuration");
 			} catch (FileNotFoundException e) {
-				logger.warn("Couldn't find static configuration file - "
-						+ staticConfig);
 				logger.info("Using internal configuration");
 				ret = RodaClientFactory.class.getResourceAsStream("/config/"
 						+ relativePath);

@@ -10,301 +10,292 @@ import pt.gov.dgarq.roda.core.common.WrongCModelException;
 /**
  * This is a {@link SimpleRepresentationObject}. It contains basic information
  * about a representation.
- * 
+ *
  * @author Rui Castro
+ * @author Vladislav Korecký <vladislav_korecky@gordic.cz>
  */
 public class SimpleRepresentationObject extends RODAObject {
-	private static final long serialVersionUID = 5693442011598801608L;
 
-	/*
-	 * Types
-	 */
-	public static final String UNKNOWN = "unknown";
-	public static final String DIGITALIZED_WORK = "digitalized_work";
-	public static final String STRUCTURED_TEXT = "structured_text";
-	public static final String RELATIONAL_DATABASE = "relational_database";
-	public static final String VIDEO = "video";
-	public static final String AUDIO = "audio";
+    private static final long serialVersionUID = 5693442011598801608L;
 
-	public static final String[] TYPES = new String[] { DIGITALIZED_WORK,
-			STRUCTURED_TEXT, RELATIONAL_DATABASE, VIDEO, AUDIO, UNKNOWN };
+    /*
+     * Types
+     */
+    public static final String UNKNOWN = "unknown";
+    public static final String DIGITALIZED_WORK = "digitalized_work";
+    public static final String STRUCTURED_TEXT = "structured_text";
+    public static final String RELATIONAL_DATABASE = "relational_database";
+    public static final String VIDEO = "video";
+    public static final String AUDIO = "audio";
+    public static final String EMAIL = "email";
+    public static final String PRESENTATION = "presentation";
+    public static final String SPREADSHEET = "spreadsheet";
+    public static final String VECTOR_GRAPHIC = "vector_graphic";
+    public static final String[] TYPES = new String[]{EMAIL, STRUCTURED_TEXT, PRESENTATION, SPREADSHEET, VECTOR_GRAPHIC, DIGITALIZED_WORK, AUDIO, VIDEO, RELATIONAL_DATABASE, UNKNOWN};
 
-	/*
-	 * Status
-	 */
-	public static final String STATUS_ORIGINAL = "original";
-	public static final String STATUS_NORMALIZED = "normalized";
-	public static final String STATUS_ALTERNATIVE = "alternative";
+    /*
+     * Status
+     */
+    public static final String STATUS_ORIGINAL = "original";
+    public static final String STATUS_NORMALIZED = "normalized";
+    public static final String STATUS_ALTERNATIVE = "alternative";
+    public static final String[] STATUSES = new String[]{STATUS_ORIGINAL,
+        STATUS_NORMALIZED, STATUS_ALTERNATIVE};
+    public static final List<String> STATUSES_LIST = Arrays.asList(STATUSES);
+    private String descriptionObjectPID = null;
+    // private String[] statuses = null;
+    private List<String> statuses = new ArrayList<String>();
 
-	public static final String[] STATUSES = new String[] { STATUS_ORIGINAL,
-			STATUS_NORMALIZED, STATUS_ALTERNATIVE };
-	public static final List<String> STATUSES_LIST = Arrays.asList(STATUSES);
+    /**
+     * Constructs an empty {@link SimpleRepresentationObject}.
+     */
+    public SimpleRepresentationObject() {
+        setType(UNKNOWN);
+    }
 
-	private String descriptionObjectPID = null;
+    /**
+     * Constructs a new {@link SimpleRepresentationObject} cloning an existing
+     * {@link SimpleRepresentationObject}.
+     *
+     * @param rObject a Representation Object.
+     */
+    public SimpleRepresentationObject(SimpleRepresentationObject rObject) {
+        this(rObject, rObject.getStatuses(), rObject.getDescriptionObjectPID());
+    }
 
-	// private String[] statuses = null;
-	private List<String> statuses = new ArrayList<String>();
+    /**
+     * Constructs a {@link SimpleRepresentationObject} with the given arguments.
+     *
+     * @param rObject
+     * @param statuses
+     * @param descriptionObjectPID
+     */
+    public SimpleRepresentationObject(RODAObject rObject, String[] statuses,
+            String descriptionObjectPID) {
+        this(rObject.getPid(), rObject.getLabel(), rObject.getContentModel(),
+                rObject.getLastModifiedDate(), rObject.getCreatedDate(),
+                rObject.getState(), statuses, descriptionObjectPID);
+    }
 
-	/**
-	 * Constructs an empty {@link SimpleRepresentationObject}.
-	 */
-	public SimpleRepresentationObject() {
-		setType(UNKNOWN);
-	}
+    /**
+     * Constructs a {@link SimpleRepresentationObject} with the given arguments.
+     *
+     * @param pid
+     * @param id
+     * @param type
+     * @param subType
+     * @param lastModifiedDate
+     * @param createdDate
+     * @param state
+     * @param statuses
+     * @param descriptionObjectPID
+     */
+    public SimpleRepresentationObject(String pid, String id, String type,
+            String subType, Date lastModifiedDate, Date createdDate,
+            String state, String[] statuses, String descriptionObjectPID) {
+        super(pid, id, "roda:r", lastModifiedDate, createdDate, state);
+        setType(type);
+        setSubType(subType);
+        setStatuses(statuses);
+        setDescriptionObjectPID(descriptionObjectPID);
+    }
 
-	/**
-	 * Constructs a new {@link SimpleRepresentationObject} cloning an existing
-	 * {@link SimpleRepresentationObject}.
-	 * 
-	 * @param rObject
-	 *            a Representation Object.
-	 */
-	public SimpleRepresentationObject(SimpleRepresentationObject rObject) {
-		this(rObject, rObject.getStatuses(), rObject.getDescriptionObjectPID());
-	}
+    /**
+     * Constructs a {@link SimpleRepresentationObject} with the given arguments.
+     *
+     * @param pid
+     * @param id
+     * @param contentModel
+     * @param lastModifiedDate
+     * @param createdDate
+     * @param state
+     * @param statuses
+     * @param descriptionObjectPID
+     */
+    public SimpleRepresentationObject(String pid, String id,
+            String contentModel, Date lastModifiedDate, Date createdDate,
+            String state, String[] statuses, String descriptionObjectPID) {
+        super(pid, id, contentModel, lastModifiedDate, createdDate, state);
+        setStatuses(statuses);
+        setDescriptionObjectPID(descriptionObjectPID);
+    }
 
-	/**
-	 * Constructs a {@link SimpleRepresentationObject} with the given arguments.
-	 * 
-	 * @param rObject
-	 * @param statuses
-	 * @param descriptionObjectPID
-	 */
-	public SimpleRepresentationObject(RODAObject rObject, String[] statuses,
-			String descriptionObjectPID) {
-		this(rObject.getPid(), rObject.getLabel(), rObject.getContentModel(),
-				rObject.getLastModifiedDate(), rObject.getCreatedDate(),
-				rObject.getState(), statuses, descriptionObjectPID);
-	}
+    /**
+     * @see RODAObject#toString()
+     */
+    public String toString() {
 
-	/**
-	 * Constructs a {@link SimpleRepresentationObject} with the given arguments.
-	 * 
-	 * @param pid
-	 * @param id
-	 * @param type
-	 * @param subType
-	 * @param lastModifiedDate
-	 * @param createdDate
-	 * @param state
-	 * @param statuses
-	 * @param descriptionObjectPID
-	 */
-	public SimpleRepresentationObject(String pid, String id, String type,
-			String subType, Date lastModifiedDate, Date createdDate,
-			String state, String[] statuses, String descriptionObjectPID) {
-		super(pid, id, "roda:r", lastModifiedDate, createdDate, state);
-		setType(type);
-		setSubType(subType);
-		setStatuses(statuses);
-		setDescriptionObjectPID(descriptionObjectPID);
-	}
+        return "SimpleRepresentationObject( " + super.toString()
+                + ", statuses=" + Arrays.toString(getStatuses())
+                + ", descriptionObjectPID=" + getDescriptionObjectPID() + " )";
+    }
 
-	/**
-	 * Constructs a {@link SimpleRepresentationObject} with the given arguments.
-	 * 
-	 * @param pid
-	 * @param id
-	 * @param contentModel
-	 * @param lastModifiedDate
-	 * @param createdDate
-	 * @param state
-	 * @param statuses
-	 * @param descriptionObjectPID
-	 */
-	public SimpleRepresentationObject(String pid, String id,
-			String contentModel, Date lastModifiedDate, Date createdDate,
-			String state, String[] statuses, String descriptionObjectPID) {
-		super(pid, id, contentModel, lastModifiedDate, createdDate, state);
-		setStatuses(statuses);
-		setDescriptionObjectPID(descriptionObjectPID);
-	}
+    /**
+     * @see RODAObject#setContentModel(String)
+     */
+    public void setContentModel(String contentModel) {
+        super.setContentModel(contentModel);
 
-	/**
-	 * @see RODAObject#toString()
-	 */
-	public String toString() {
+        String[] names = getContentModel().split(":");
+        if (names.length < 3) {
+            throw new IllegalArgumentException(contentModel
+                    + " is not a valid contentModel for a representation");
+        } else {
+            if (!names[1].equalsIgnoreCase("r")) {
+                throw new WrongCModelException(
+                        "contentModel should start with 'roda:r' ("
+                        + contentModel + ")");
+            } else {
+                // it's already set, by super.setCModel(contentModel)
+                // check that the type is supported
+            }
+        }
+    }
 
-		return "SimpleRepresentationObject( " + super.toString()
-				+ ", statuses=" + Arrays.toString(getStatuses())
-				+ ", descriptionObjectPID=" + getDescriptionObjectPID() + " )";
-	}
+    /**
+     * @return the id
+     */
+    public String getId() {
+        return getLabel();
+    }
 
-	/**
-	 * @see RODAObject#setContentModel(String)
-	 */
-	public void setContentModel(String contentModel) {
-		super.setContentModel(contentModel);
+    /**
+     * @param id the id to set
+     */
+    public void setId(String id) {
+        setLabel(id);
+    }
 
-		String[] names = getContentModel().split(":");
-		if (names.length < 3) {
-			throw new IllegalArgumentException(contentModel
-					+ " is not a valid contentModel for a representation");
-		} else {
-			if (!names[1].equalsIgnoreCase("r")) {
-				throw new WrongCModelException(
-						"contentModel should start with 'roda:r' ("
-								+ contentModel + ")");
-			} else {
-				// it's already set, by super.setCModel(contentModel)
-				// check that the type is supported
+    /**
+     * @return the type
+     */
+    public String getType() {
+        String type = null;
+        if (getContentModel() != null) {
+            type = getContentModel().split(":")[2].toLowerCase();
+        }
+        return type;
+    }
 
-			}
-		}
-	}
+    /**
+     * @param type the type to set
+     */
+    public void setType(String type) {
 
-	/**
-	 * @return the id
-	 */
-	public String getId() {
-		return getLabel();
-	}
+        type = type != null ? type.toLowerCase() : "";
 
-	/**
-	 * @param id
-	 *            the id to set
-	 */
-	public void setId(String id) {
-		setLabel(id);
-	}
+        if (getSubType() != null) {
+            setContentModel("roda:r:" + type + ":" + getSubType());
+        } else {
+            setContentModel("roda:r:" + type);
+        }
+    }
 
-	/**
-	 * @return the type
-	 */
-	public String getType() {
-		String type = null;
-		if (getContentModel() != null) {
-			type = getContentModel().split(":")[2].toLowerCase();
-		}
-		return type;
-	}
+    /**
+     * @return the type
+     */
+    public String getSubType() {
 
-	/**
-	 * @param type
-	 *            the type to set
-	 */
-	public void setType(String type) {
+        String subType = null;
 
-		type = type != null ? type.toLowerCase() : "";
+        if (getContentModel() != null) {
 
-		if (getSubType() != null) {
-			setContentModel("roda:r:" + type + ":" + getSubType());
-		} else {
-			setContentModel("roda:r:" + type);
-		}
-	}
+            String[] split = getContentModel().split(":");
 
-	/**
-	 * @return the type
-	 */
-	public String getSubType() {
+            if (split.length > 3) {
+                subType = split[3].length() > 0 ? split[3].toLowerCase() : null;
 
-		String subType = null;
+            }
+        }
 
-		if (getContentModel() != null) {
+        return subType;
+    }
 
-			String[] split = getContentModel().split(":");
+    /**
+     * @param subType the type to set
+     */
+    public void setSubType(String subType) {
 
-			if (split.length > 3) {
-				subType = split[3].length() > 0 ? split[3].toLowerCase() : null;
+        String type = getType() != null ? getType() : "";
 
-			}
-		}
+        if (subType != null) {
+            setContentModel("roda:r:" + type + ":" + subType.toLowerCase());
+        } else {
+            setContentModel("roda:r:" + type);
+        }
+    }
 
-		return subType;
-	}
+    /**
+     * @return the statuses
+     */
+    public String[] getStatuses() {
+        return statuses.toArray(new String[statuses.size()]);
+    }
 
-	/**
-	 * @param subType
-	 *            the type to set
-	 */
-	public void setSubType(String subType) {
+    /**
+     * @param statuses the statuses to set
+     *
+     * @exception NullPointerException
+     * @exception IllegalArgumentException
+     */
+    public void setStatuses(String[] statuses) throws NullPointerException,
+            IllegalArgumentException {
 
-		String type = getType() != null ? getType() : "";
+        if (statuses == null) {
+            throw new NullPointerException("statuses cannot be null");
+        } else if (statuses.length == 0) {
+            throw new IllegalArgumentException("statuses cannot be empty");
+        } else {
 
-		if (subType != null) {
-			setContentModel("roda:r:" + type + ":" + subType.toLowerCase());
-		} else {
-			setContentModel("roda:r:" + type);
-		}
-	}
+            this.statuses.clear();
 
-	/**
-	 * @return the statuses
-	 */
-	public String[] getStatuses() {
-		return statuses.toArray(new String[statuses.size()]);
-	}
+            for (int i = 0; i < statuses.length; i++) {
+                addStatus(statuses[i]);
+            }
 
-	/**
-	 * @param statuses
-	 *            the statuses to set
-	 * 
-	 * @exception NullPointerException
-	 * @exception IllegalArgumentException
-	 */
-	public void setStatuses(String[] statuses) throws NullPointerException,
-			IllegalArgumentException {
+        }
+    }
 
-		if (statuses == null) {
-			throw new NullPointerException("statuses cannot be null");
-		} else if (statuses.length == 0) {
-			throw new IllegalArgumentException("statuses cannot be empty");
-		} else {
+    /**
+     * Add a new status to the representation.
+     *
+     * @param status the status to add.
+     */
+    public void addStatus(String status) {
+        if (status == null) {
+            throw new NullPointerException("statuses cannot be null");
+        } else {
 
-			this.statuses.clear();
+            if (STATUSES_LIST.contains(status)) {
+                this.statuses.add(status);
+            } else {
+                throw new IllegalArgumentException("'" + status
+                        + "' is not a valid status value.");
+            }
 
-			for (int i = 0; i < statuses.length; i++) {
-				addStatus(statuses[i]);
-			}
+        }
+    }
 
-		}
-	}
+    /**
+     * Remove a status from the representation.
+     *
+     * @param status the status to remove.
+     */
+    public void removeStatus(String status) {
+        this.statuses.remove(status);
+    }
 
-	/**
-	 * Add a new status to the representation.
-	 * 
-	 * @param status
-	 *            the status to add.
-	 */
-	public void addStatus(String status) {
-		if (status == null) {
-			throw new NullPointerException("statuses cannot be null");
-		} else {
+    /**
+     * @return the descriptionObjectPID
+     */
+    public String getDescriptionObjectPID() {
+        return descriptionObjectPID;
+    }
 
-			if (STATUSES_LIST.contains(status)) {
-				this.statuses.add(status);
-			} else {
-				throw new IllegalArgumentException("'" + status
-						+ "' is not a valid status value.");
-			}
-
-		}
-	}
-
-	/**
-	 * Remove a status from the representation.
-	 * 
-	 * @param status
-	 *            the status to remove.
-	 */
-	public void removeStatus(String status) {
-		this.statuses.remove(status);
-	}
-
-	/**
-	 * @return the descriptionObjectPID
-	 */
-	public String getDescriptionObjectPID() {
-		return descriptionObjectPID;
-	}
-
-	/**
-	 * @param descriptionObjectPID
-	 *            the descriptionObjectPID to set
-	 */
-	public void setDescriptionObjectPID(String descriptionObjectPID) {
-		this.descriptionObjectPID = descriptionObjectPID;
-	}
-
+    /**
+     * @param descriptionObjectPID the descriptionObjectPID to set
+     */
+    public void setDescriptionObjectPID(String descriptionObjectPID) {
+        this.descriptionObjectPID = descriptionObjectPID;
+    }
 }

@@ -1,15 +1,11 @@
 package pt.gov.dgarq.roda.migrator.services;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.URI;
 import java.util.UUID;
-
 import org.apache.log4j.Logger;
-
 import pt.gov.dgarq.roda.common.FormatUtility;
 import pt.gov.dgarq.roda.core.DownloaderException;
 import pt.gov.dgarq.roda.core.common.RODAServiceException;
@@ -31,164 +27,155 @@ import pt.gov.dgarq.roda.util.TempDir;
 /**
  * @author Luis Faria
  * @author Rui Castro
+ * @author Vladislav Korecký <vladislav_korecky@gordic.cz>
  */
 public abstract class OpenOfficeConverter extends AbstractSynchronousConverter {
 
-	private static final Logger logger = Logger
-			.getLogger(OpenOfficeConverter.class);
+    private static final Logger logger = Logger
+            .getLogger(OpenOfficeConverter.class);
+    private static final String VERSION = "1.0";
+    protected String format;
+    protected String formatExtension;
+    protected JodConverter converter;
 
-	private static final String VERSION = "1.0";
+    /**
+     * @throws RODAServiceException
+     */
+    public OpenOfficeConverter() throws RODAServiceException {
+        super();
 
-	protected String format;
-	protected String formatExtension;
+        try {
 
-	protected JodConverter converter;
+            converter = new JodConverter();
 
-	/**
-	 * @throws RODAServiceException
-	 */
-	public OpenOfficeConverter() throws RODAServiceException {
-		super();
+        } catch (ConnectException e) {
+            logger.error("Error creating JodConverter - " + e.getMessage(), e);
+            throw new RODAServiceException("Error creating JodConverter - "
+                    + e.getMessage(), e);
+        }
+    }
 
-		try {
+    /**
+     *
+     *
+     * @throws ConverterException
+     *
+     * @see SynchronousConverter#convert(RepresentationObject)
+     */
+    public ConversionResult convert(RepresentationObject representation)
+            throws RepresentationAlreadyConvertedException,
+            InvalidRepresentationException, WrongRepresentationTypeException,
+            WrongRepresentationSubtypeException, ConverterException {
 
-			converter = new JodConverter();
+        UUID uuid = UUID.randomUUID();
+        File finalDirectory = new File(getCacheDirectory(), uuid.toString());
 
-		} catch (ConnectException e) {
-			logger.error("Error creating JodConverter - " + e.getMessage(), e);
-			throw new RODAServiceException("Error creating JodConverter - "
-					+ e.getMessage(), e);
-		}
-	}
+        StringBuffer report = new StringBuffer();
 
-	/**
-	 * 
-	 * 
-	 * @throws ConverterException
-	 * 
-	 * @see SynchronousConverter#convert(RepresentationObject)
-	 */
-	public ConversionResult convert(RepresentationObject representation)
-			throws RepresentationAlreadyConvertedException,
-			InvalidRepresentationException, WrongRepresentationTypeException,
-			WrongRepresentationSubtypeException, ConverterException {
+        try {
 
-		UUID uuid = UUID.randomUUID();
-		File finalDirectory = new File(getCacheDirectory(), uuid.toString());
+            LocalRepresentationObject localRepresentation = downloadRepresentationToLocalDisk(representation);
 
-		StringBuffer report = new StringBuffer();
+            logger.trace("Representation downloaded " + localRepresentation);
 
-		try {
+            File tempDirectory = TempDir.createUniqueDirectory("convertedRep");
 
-			LocalRepresentationObject localRepresentation = downloadRepresentationToLocalDisk(representation);
+            logger.debug("Saving converted representation files to "
+                    + tempDirectory);
 
-			logger.trace("Representation downloaded " + localRepresentation);
+            // Create a new RepresentationObject that is a copy of source
+            // RepresentationObject
+            LocalRepresentationObject convertedRepresentation = new LocalRepresentationObject(
+                    tempDirectory, localRepresentation);
 
-			File tempDirectory = TempDir.createUniqueDirectory("convertedRep");
+            // Convert Root File
+            RepresentationFile convertedRootFile = convertRootFile(
+                    localRepresentation.getRootFile(), tempDirectory, report);
 
-			logger.debug("Saving converted representation files to "
-					+ tempDirectory);
+            convertedRepresentation.setRootFile(convertedRootFile);
 
-			// Create a new RepresentationObject that is a copy of source
-			// RepresentationObject
-			LocalRepresentationObject convertedRepresentation = new LocalRepresentationObject(
-					tempDirectory, localRepresentation);
+            String subtype = RepresentationBuilder
+                    .getRepresentationSubtype(convertedRepresentation);
+            convertedRepresentation.setSubType(subtype);
 
-			// Convert Root File
-			RepresentationFile convertedRootFile = convertRootFile(
-					localRepresentation.getRootFile(), tempDirectory, report);
+            moveToFinalDirectory(convertedRepresentation, finalDirectory);
 
-			convertedRepresentation.setRootFile(convertedRootFile);
+            EventPreservationObject eventPO = new EventPreservationObject();
+            eventPO.setOutcome("success");
+            eventPO.setOutcomeDetailNote("Converter details"); //$NON-NLS-1$
+            eventPO.setOutcomeDetailExtension(report.toString());
 
-			String subtype = RepresentationBuilder
-					.getRepresentationSubtype(convertedRepresentation);
-			convertedRepresentation.setSubType(subtype);
+            logger.info("Event is " + eventPO);
 
-			moveToFinalDirectory(convertedRepresentation, finalDirectory);
+            return new ConversionResult(convertedRepresentation, eventPO,
+                    getAgent());
 
-			EventPreservationObject eventPO = new EventPreservationObject();
-			eventPO.setOutcome("success");
-			eventPO.setOutcomeDetailNote("Converter details"); //$NON-NLS-1$
-			eventPO.setOutcomeDetailExtension(report.toString());
+        } catch (DownloaderException e) {
+            logger.debug("Exception downloading representation files - "
+                    + e.getMessage(), e);
+            throw new ConverterException(
+                    "Exception downloading representation files - "
+                    + e.getMessage(), e);
+        } catch (IOException e) {
+            logger.debug("Exception downloading representation files - "
+                    + e.getMessage(), e);
+            throw new ConverterException(
+                    "Exception downloading representation files - "
+                    + e.getMessage(), e);
+        }
 
-			logger.info("Event is " + eventPO);
+    }
 
-			return new ConversionResult(convertedRepresentation, eventPO,
-					getAgent());
+    protected String getVersion() throws ConverterException {
+        try {
+            String version = getClass().getName() + "/" + VERSION + " - ";
+            String sofficeHelp = CommandUtility.execute("soffice", "-h");
+            String sofficeVersion = "";
+            if (sofficeHelp.indexOf('\n') > 0) {
+                sofficeVersion = sofficeHelp.substring(0, sofficeHelp
+                        .indexOf('\n'));
+            } else {
+                sofficeVersion = sofficeHelp;
+            }
+            return version + sofficeVersion;
 
-		} catch (DownloaderException e) {
-			logger.debug("Exception downloading representation files - "
-					+ e.getMessage(), e);
-			throw new ConverterException(
-					"Exception downloading representation files - "
-							+ e.getMessage(), e);
-		} catch (IOException e) {
-			logger.debug("Exception downloading representation files - "
-					+ e.getMessage(), e);
-			throw new ConverterException(
-					"Exception downloading representation files - "
-							+ e.getMessage(), e);
-		}
+        } catch (CommandException e) {
+            logger.warn("Exception getting OpenOffice version - "
+                    + e.getMessage(), e);
+            throw new ConverterException(
+                    "Exception getting OpenOffice version - " + e.getMessage(),
+                    e);
+        }
 
-	}
+    }
 
-	protected String getVersion() throws ConverterException {
-		try {
-			String version = getClass().getName() + "/" + VERSION + " - ";
-			String sofficeHelp = CommandUtility.execute("soffice", "-h");
-			String sofficeVersion = "";
-			if (sofficeHelp.indexOf('\n') > 0) {
-				sofficeVersion = sofficeHelp.substring(0, sofficeHelp
-						.indexOf('\n'));
-			} else {
-				sofficeVersion = sofficeHelp;
-			}
-			return version + sofficeVersion;
+    protected RepresentationFile convertRootFile(
+            RepresentationFile originalRootFile, File tempDirectory,
+            StringBuffer report) throws IOException {
 
-		} catch (CommandException e) {
-			logger.warn("Exception getting OpenOffice version - "
-					+ e.getMessage(), e);
-			throw new ConverterException(
-					"Exception getting OpenOffice version - " + e.getMessage(),
-					e);
-		}
+        File originalFile = new File(URI
+                .create(originalRootFile.getAccessURL()));
+        File convertedFile = new File(tempDirectory, originalFile.getName());
 
-	}
+        converter.convert(originalFile, convertedFile, format);
 
-	protected RepresentationFile convertRootFile(
-			RepresentationFile originalRootFile, File tempDirectory,
-			StringBuffer report) throws IOException {
+        RepresentationFile convertedRootFile = new RepresentationFile(
+                originalRootFile);
 
-		File originalFile = new File(URI
-				.create(originalRootFile.getAccessURL()));
-		File convertedFile = new File(tempDirectory, originalFile.getName());
+        // convertedRootFile.setMimetype(format);
+        convertedRootFile.importFileFormat(FormatUtility.getFileFormat(convertedFile, convertedFile.getName()));
+        convertedRootFile.setSize(convertedFile.length());
+        convertedRootFile.setAccessURL(convertedFile.getAbsolutePath());
+        convertedRootFile.setOriginalName(convertedRootFile.getOriginalName()
+                + this.formatExtension);
 
-		FileInputStream originalFileInputStream = new FileInputStream(
-				originalFile);
-		converter.convert(originalFileInputStream, originalRootFile
-				.getMimetype(), new FileOutputStream(convertedFile), format);
-		originalFileInputStream.close();
+        String message = String.format("%s: %s => %s%n%n", originalRootFile
+                .getId(), originalRootFile.getOriginalName(), convertedRootFile
+                .getOriginalName());
 
-		RepresentationFile convertedRootFile = new RepresentationFile(
-				originalRootFile);
+        logger.trace(message);
+        report.append(message);
 
-		// convertedRootFile.setMimetype(format);
-		convertedRootFile.setMimetype(FormatUtility.getMimetype(convertedFile
-				.getName()
-				+ this.formatExtension));
-		convertedRootFile.setSize(convertedFile.length());
-		convertedRootFile.setAccessURL(convertedFile.getAbsolutePath());
-		convertedRootFile.setOriginalName(convertedRootFile.getOriginalName()
-				+ this.formatExtension);
-
-		String message = String.format("%s: %s => %s%n%n", originalRootFile
-				.getId(), originalRootFile.getOriginalName(), convertedRootFile
-				.getOriginalName());
-
-		logger.trace(message);
-		report.append(message);
-
-		return convertedRootFile;
-	}
-
+        return convertedRootFile;
+    }
 }

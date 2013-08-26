@@ -20,23 +20,12 @@
       <parameter name="className" value="pt.gov.dgarq.roda.core.services.UserBrowser"/>
       <parameter name="wsdlPortType" value="UserBrowser"/>
       <parameter name="typeMappingVersion" value="1.2"/>
-      <operation name="getGroups" qname="operNS:getGroups" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getGroupsReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:Group" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
+      <operation name="getUsers" qname="operNS:getUsers" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getUsersReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:User" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
         <parameter qname="pns:contentAdapter" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:ContentAdapter" xmlns:tns="http://adapter.data.core.roda.dgarq.gov.pt"/>
         <fault name="UserManagementException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.UserManagementException" type="tns:UserManagementException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
       </operation>
-      <operation name="getRoles" qname="operNS:getRoles" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getRolesReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:string" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
-        <fault name="UserManagementException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.UserManagementException" type="tns:UserManagementException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-      </operation>
-      <operation name="getGroupCount" qname="operNS:getGroupCount" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getGroupCountReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:int" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
-        <parameter qname="pns:filter" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:Filter" xmlns:tns="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
-        <fault name="UserManagementException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.UserManagementException" type="tns:UserManagementException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-      </operation>
-      <operation name="getGroup" qname="operNS:getGroup" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getGroupReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:Group" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
-        <parameter qname="pns:groupName" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
-        <fault name="UserManagementException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.UserManagementException" type="tns:UserManagementException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-      </operation>
-      <operation name="getUsersInGroup" qname="operNS:getUsersInGroup" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getUsersInGroupReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:User" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
-        <parameter qname="pns:groupName" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+      <operation name="getUserNames" qname="operNS:getUserNames" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getUserNamesReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:string" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
+        <parameter qname="pns:contentAdapter" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:ContentAdapter" xmlns:tns="http://adapter.data.core.roda.dgarq.gov.pt"/>
         <fault name="UserManagementException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.UserManagementException" type="tns:UserManagementException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
       </operation>
       <operation name="getUserCount" qname="operNS:getUserCount" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getUserCountReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:int" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
@@ -47,15 +36,7 @@
         <parameter qname="pns:name" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
         <fault name="UserManagementException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.UserManagementException" type="tns:UserManagementException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
       </operation>
-      <operation name="getUsers" qname="operNS:getUsers" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getUsersReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:User" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
-        <parameter qname="pns:contentAdapter" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:ContentAdapter" xmlns:tns="http://adapter.data.core.roda.dgarq.gov.pt"/>
-        <fault name="UserManagementException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.UserManagementException" type="tns:UserManagementException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-      </operation>
-      <operation name="getUserNames" qname="operNS:getUserNames" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getUserNamesReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:string" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
-        <parameter qname="pns:contentAdapter" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:ContentAdapter" xmlns:tns="http://adapter.data.core.roda.dgarq.gov.pt"/>
-        <fault name="UserManagementException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.UserManagementException" type="tns:UserManagementException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-      </operation>
-      <operation name="getGroupDirectRoles" qname="operNS:getGroupDirectRoles" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getGroupDirectRolesReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:string" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
+      <operation name="getGroup" qname="operNS:getGroup" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getGroupReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:Group" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
         <parameter qname="pns:groupName" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
         <fault name="UserManagementException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.UserManagementException" type="tns:UserManagementException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
       </operation>
@@ -63,7 +44,26 @@
         <parameter qname="pns:userName" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
         <fault name="UserManagementException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.UserManagementException" type="tns:UserManagementException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
       </operation>
-      <parameter name="allowedMethods" value="getGroupCount getUser getGroupDirectRoles getGroups getUserDirectRoles getUserNames getUsersInGroup getUserCount getGroup getUsers getRoles"/>
+      <operation name="getGroupCount" qname="operNS:getGroupCount" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getGroupCountReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:int" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
+        <parameter qname="pns:filter" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:Filter" xmlns:tns="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+        <fault name="UserManagementException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.UserManagementException" type="tns:UserManagementException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="getUsersInGroup" qname="operNS:getUsersInGroup" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getUsersInGroupReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:User" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
+        <parameter qname="pns:groupName" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <fault name="UserManagementException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.UserManagementException" type="tns:UserManagementException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="getGroupDirectRoles" qname="operNS:getGroupDirectRoles" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getGroupDirectRolesReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:string" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
+        <parameter qname="pns:groupName" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <fault name="UserManagementException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.UserManagementException" type="tns:UserManagementException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="getRoles" qname="operNS:getRoles" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getRolesReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:string" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
+        <fault name="UserManagementException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.UserManagementException" type="tns:UserManagementException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="getGroups" qname="operNS:getGroups" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getGroupsReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:Group" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
+        <parameter qname="pns:contentAdapter" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:ContentAdapter" xmlns:tns="http://adapter.data.core.roda.dgarq.gov.pt"/>
+        <fault name="UserManagementException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.UserManagementException" type="tns:UserManagementException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <parameter name="allowedMethods" value="getGroupCount getUser getGroups getGroupDirectRoles getUserDirectRoles getUsersInGroup getUserNames getUserCount getGroup getRoles getUsers"/>
       <parameter name="scope" value="Application"/>
 
       <typeMapping
@@ -169,17 +169,17 @@
         encodingStyle=""
       />
       <typeMapping
-        xmlns:ns="http://filter.adapter.data.core.roda.dgarq.gov.pt"
-        qname="ns:SimpleFilterParameter"
-        type="java:pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter"
+        xmlns:ns="http://sublist.adapter.data.core.roda.dgarq.gov.pt"
+        qname="ns:Sublist"
+        type="java:pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""
       />
       <typeMapping
-        xmlns:ns="http://sublist.adapter.data.core.roda.dgarq.gov.pt"
-        qname="ns:Sublist"
-        type="java:pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist"
+        xmlns:ns="http://filter.adapter.data.core.roda.dgarq.gov.pt"
+        qname="ns:SimpleFilterParameter"
+        type="java:pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""

@@ -11,8 +11,6 @@ import pt.gov.dgarq.roda.wui.main.client.logos.LogosBundle;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DOM;
@@ -53,8 +51,8 @@ public class Main extends SimplePanel implements EntryPoint, HistoryListener {
 		ClientLogger.setUncaughtExceptionHandler();
 
 		// Remove loading image
-		DOM.removeChild(RootPanel.getBodyElement(),
-				DOM.getElementById("loading"));
+		DOM.removeChild(RootPanel.getBodyElement(), DOM
+				.getElementById("loading"));
 
 		// Add main widget to root panel
 		RootPanel.get().add(this);
@@ -167,45 +165,69 @@ public class Main extends SimplePanel implements EntryPoint, HistoryListener {
 	private HorizontalPanel createLogos() {
 		HorizontalPanel ret = new HorizontalPanel();
 
-		Image dgarq = new Image(logosBundle.dgarq());
-		Image scape = new Image(logosBundle.scape());
+		Image poap = new Image();
+		Image uniao_europeia = new Image();
+		Image rep_portuguesa = new Image();
+		Image min_cultura = new Image();
 
-		Image keeps = new Image(logosBundle.keeps());
-		
+		Image dgarq = new Image();
+		Image uminho = new Image();
+
+		applyImages(poap, logosBundle.poap_bw(), logosBundle.poap());
+		applyImages(uniao_europeia, logosBundle.uniao_europeia_bw(),
+				logosBundle.uniao_europeia());
+		applyImages(rep_portuguesa, logosBundle.rep_portuguesa_bw(),
+				logosBundle.rep_portuguesa());
+		applyImages(min_cultura, logosBundle.min_cultura_bw(), logosBundle
+				.min_cultura());
+
+		applyImages(dgarq, logosBundle.dgarq_bw(), logosBundle.dgarq());
+		applyImages(uminho, logosBundle.uminho_bw(), logosBundle.uminho());
+
+		addLink(poap, "http://www.poap.pt", "_blank");
+		addLink(uniao_europeia, "http://europa.eu", "_blank");
+		addLink(rep_portuguesa, "http://www.portugal.gov.pt", "_blank");
+		addLink(min_cultura, "http://www.min-cultura.pt", "_blank");
 
 		addLink(dgarq, "http://www.dgarq.gov.pt", "_blank");
-		addLink(scape, "http://www.scape-project.eu", "_blank");
+		addLink(uminho, "http://www.uminho.pt", "_blank");
 
-		addLink(keeps, "http://www.keep.pt", "_blank");
-		
+		ret.add(poap);
+		ret.add(uniao_europeia);
+		ret.add(rep_portuguesa);
+		ret.add(min_cultura);
 
 		ret.add(dgarq);
-		ret.add(scape);
+		ret.add(uminho);
 
-		ret.add(keeps);
-		
+		ret.setCellWidth(poap, "70px");
+		ret.setCellWidth(uniao_europeia, "70px");
+		ret.setCellWidth(rep_portuguesa, "70px");
+		ret.setCellWidth(min_cultura, "100%");
 
 		ret.setCellWidth(dgarq, "70px");
-		ret.setCellWidth(scape, "100%");
-
-		ret.setCellWidth(keeps, "70px");
-		
+		ret.setCellWidth(uminho, "70px");
 
 		ret.setHorizontalAlignment(HasAlignment.ALIGN_RIGHT);
 
+		poap.addStyleName("main-logos-logo");
+		uniao_europeia.addStyleName("main-logos-logo");
+		rep_portuguesa.addStyleName("main-logos-logo");
+		min_cultura.addStyleName("main-logos-logo");
 		dgarq.addStyleName("main-logos-logo");
-		scape.addStyleName("main-logos-logo");
-		keeps.addStyleName("main-logos-logo");
+		uminho.addStyleName("main-logos-logo");
 
 		return ret;
 	}
 
 	private void addLink(Image image, final String url, final String target) {
-		image.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
+		image.addClickListener(new ClickListener() {
+
+			public void onClick(Widget sender) {
 				Window.open(url, target, "");
+
 			}
+
 		});
 	}
 
@@ -247,8 +269,6 @@ public class Main extends SimplePanel implements EntryPoint, HistoryListener {
 			final String decodedHistoryToken = URL.decode(historyToken);
 			String[] historyPath = Tools.splitHistory(decodedHistoryToken);
 			breadcrumbPanel.updatePath(historyPath);
-			
-			
 			DeferredCommand.addCommand(new Command() {
 
 				public void execute() {
@@ -268,7 +288,7 @@ public class Main extends SimplePanel implements EntryPoint, HistoryListener {
 				}
 
 			});
-			GAnalyticsTracker.track(historyToken);
+
 		}
 	}
 

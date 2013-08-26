@@ -113,7 +113,6 @@ public class PreservationMetadataPanel extends Composite {
 			timeUnit.addItem(constants.timeUnitDay(), TIME_UNIT_DAY);
 			timeUnit.addItem(constants.timeUnitMonth(), TIME_UNIT_MONTH);
 			timeUnit.addItem(constants.timeUnitYear(), TIME_UNIT_YEAR);
-			timeUnit.setSelectedIndex(timeUnit.getItemCount()-1);
 
 			timeUnit.addChangeListener(new ChangeListener() {
 
@@ -237,7 +236,7 @@ public class PreservationMetadataPanel extends Composite {
 					public void onSuccess(TimelineInfo timelineInfo) {
 						PreservationMetadataPanel.this.timelineInfo = timelineInfo;
 						timelineRender = new PreservationTimeLineRender(
-								timelineInfo, DateTime.YEAR(), DateTime.YEAR());
+								timelineInfo, DateTime.DAY(), DateTime.MONTH());
 						update();
 						loading.hide();
 					}

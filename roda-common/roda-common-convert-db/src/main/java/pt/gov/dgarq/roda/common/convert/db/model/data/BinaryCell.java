@@ -7,7 +7,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import pt.gov.dgarq.roda.common.FileFormat;
+import pt.gov.dgarq.roda.core.data.FileFormat;
 import pt.gov.dgarq.roda.common.convert.db.model.exception.ModuleException;
 
 /**

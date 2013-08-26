@@ -1,0 +1,6 @@
+            <!-- Finishing flow -->
+            <fo:block id="last-page"/>
+        </fo:flow>
+    </fo:page-sequence>
+    
+</fo:root>

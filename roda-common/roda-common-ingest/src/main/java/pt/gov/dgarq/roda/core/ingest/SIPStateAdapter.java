@@ -10,6 +10,7 @@ import java.util.List;
 
 import pt.gov.dgarq.roda.core.adapter.SortParameterComparator;
 import pt.gov.dgarq.roda.core.adapter.sql.SQLEntityAdapter;
+import pt.gov.dgarq.roda.core.data.Report;
 import pt.gov.dgarq.roda.core.data.SIPState;
 import pt.gov.dgarq.roda.core.data.SIPStateTransition;
 

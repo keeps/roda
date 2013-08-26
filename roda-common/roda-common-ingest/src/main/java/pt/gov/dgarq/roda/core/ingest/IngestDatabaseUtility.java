@@ -1,7 +1,6 @@
 package pt.gov.dgarq.roda.core.ingest;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -168,42 +167,37 @@ public class IngestDatabaseUtility extends
 
 		Connection connection = null;
 		Statement statement = null;
-		PreparedStatement prepStatement = null;
 
 		try {
 
 			connection = getConnection();
 			connection.setAutoCommit(false);
 
-			String updateQuery = "UPDATE SIPs SET state=?,complete=?,percentage=?,pid=?,parent_pid=?"
-							+ " WHERE id=?";
-			prepStatement = connection.prepareStatement(updateQuery);
-			prepStatement.setString(1, newState);
-			prepStatement.setBoolean(2, complete);
-			prepStatement.setFloat(3, percentage);
-			prepStatement.setString(4, ingestedPID==null?"NULL":ingestedPID);
-			prepStatement.setString(5, parentPID==null?"NULL":parentPID);
-			prepStatement.setString(6, sipID);
+			statement = connection.createStatement();
 
-			logger.trace("executing update query " + prepStatement.toString());
+			// SIP sip = getSIP(sipID);
 
-			prepStatement.execute();
+			String updateQuery = String.format(
+					"UPDATE SIPs SET state='%s',complete=%b,percentage=%f,pid=%s,parent_pid=%s"
+							+ " WHERE id='%s'", escapeValue(newState),
+					complete, percentage, quoteValueOrNull(ingestedPID),
+					quoteValueOrNull(parentPID), escapeValue(sipID));
 
+			logger.trace("executing update query " + updateQuery);
 
-			String insertQuery = "INSERT INTO SIPStateTransitions (SIPs_id, from_state, to_state, datetime, task_id, success, description) "
-					+ "VALUES (?, ?, ?, CURRENT_TIMESTAMP, ?, ?, ?)";
-			prepStatement = connection.prepareStatement(insertQuery);
-			prepStatement.setString(1, sipID);
-			prepStatement.setString(2, oldState==null?"NULL":oldState);
-			prepStatement.setString(3, newState);
-			prepStatement.setString(4, taskID==null?"NULL":taskID);
-			prepStatement.setBoolean(5, success); //this was previously a string
-			prepStatement.setString(6, truncateValueOrNull(description));
-			
+			statement.executeUpdate(updateQuery);
 
-			logger.trace("executing update query " + prepStatement.toString());
+			String insertQuery = String
+					.format(
+							"INSERT INTO SIPStateTransitions (SIPs_id, from_state, to_state, datetime, task_id, success, description) "
+									+ "VALUES ('%1$s', %2$s, '%3$s', CURRENT_TIMESTAMP, %4$s, %5$s, %6$s)",
+							escapeValue(sipID), quoteValueOrNull(oldState),
+							escapeValue(newState), quoteValueOrNull(taskID),
+							success, quoteAndTruncateValueOrNull(description));
 
-			prepStatement.execute();
+			logger.trace("executing update query " + insertQuery);
+
+			statement.executeUpdate(insertQuery);
 
 			connection.commit();
 
@@ -377,6 +371,8 @@ public class IngestDatabaseUtility extends
 			boolean oldProcessingFlag = rowsUpdated == 1;
 
 			return oldProcessingFlag;
+
+			// connection.commit();
 
 		} catch (SQLException e) {
 
