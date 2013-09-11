@@ -11,7 +11,7 @@ import java.util.Vector;
 
 import org.apache.commons.transaction.util.FileHelper;
 
-import pt.gov.dgarq.roda.common.FileFormat;
+import pt.gov.dgarq.roda.core.data.FileFormat;
 import pt.gov.dgarq.roda.common.convert.db.model.data.BinaryCell;
 import pt.gov.dgarq.roda.common.convert.db.model.data.Cell;
 import pt.gov.dgarq.roda.common.convert.db.model.data.FileItem;
@@ -29,6 +29,7 @@ import com.microsoft.sqlserver.jdbc.SQLServerResultSet;
  * Microsoft SQL Server JDBC import module.
  * 
  * @author Luis Faria
+ * @author Vladislav Korecký <vladislav_korecky@gordic.cz>
  */
 public class SQLServerJDBCImportModule extends JDBCImportModule {
 

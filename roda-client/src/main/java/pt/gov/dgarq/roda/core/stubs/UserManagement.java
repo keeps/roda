@@ -8,11 +8,11 @@
 package pt.gov.dgarq.roda.core.stubs;
 
 public interface UserManagement extends java.rmi.Remote {
-    public pt.gov.dgarq.roda.core.data.Group addGroup(pt.gov.dgarq.roda.core.data.Group group) throws java.rmi.RemoteException, pt.gov.dgarq.roda.core.common.GroupAlreadyExistsException, pt.gov.dgarq.roda.core.common.UserManagementException;
-    public void removeGroup(java.lang.String groupname) throws java.rmi.RemoteException, pt.gov.dgarq.roda.core.common.IllegalOperationException, pt.gov.dgarq.roda.core.common.UserManagementException;
     public pt.gov.dgarq.roda.core.data.Group modifyGroup(pt.gov.dgarq.roda.core.data.Group modifiedGroup) throws java.rmi.RemoteException, pt.gov.dgarq.roda.core.common.NoSuchGroupException, pt.gov.dgarq.roda.core.common.IllegalOperationException, pt.gov.dgarq.roda.core.common.UserManagementException;
     public pt.gov.dgarq.roda.core.data.User addUser(pt.gov.dgarq.roda.core.data.User user) throws java.rmi.RemoteException, pt.gov.dgarq.roda.core.common.UserAlreadyExistsException, pt.gov.dgarq.roda.core.common.UserManagementException, pt.gov.dgarq.roda.core.common.EmailAlreadyExistsException;
     public pt.gov.dgarq.roda.core.data.User modifyUser(pt.gov.dgarq.roda.core.data.User modifiedUser) throws java.rmi.RemoteException, pt.gov.dgarq.roda.core.common.NoSuchUserException, pt.gov.dgarq.roda.core.common.IllegalOperationException, pt.gov.dgarq.roda.core.common.UserManagementException, pt.gov.dgarq.roda.core.common.EmailAlreadyExistsException;
     public boolean removeUser(java.lang.String username) throws java.rmi.RemoteException, pt.gov.dgarq.roda.core.common.NoSuchUserException, pt.gov.dgarq.roda.core.common.IllegalOperationException, pt.gov.dgarq.roda.core.common.UserManagementException;
     public void setUserPassword(java.lang.String username, java.lang.String password) throws java.rmi.RemoteException, pt.gov.dgarq.roda.core.common.NoSuchUserException, pt.gov.dgarq.roda.core.common.IllegalOperationException, pt.gov.dgarq.roda.core.common.UserManagementException;
+    public void removeGroup(java.lang.String groupname) throws java.rmi.RemoteException, pt.gov.dgarq.roda.core.common.IllegalOperationException, pt.gov.dgarq.roda.core.common.UserManagementException;
+    public pt.gov.dgarq.roda.core.data.Group addGroup(pt.gov.dgarq.roda.core.data.Group group) throws java.rmi.RemoteException, pt.gov.dgarq.roda.core.common.GroupAlreadyExistsException, pt.gov.dgarq.roda.core.common.UserManagementException;
 }

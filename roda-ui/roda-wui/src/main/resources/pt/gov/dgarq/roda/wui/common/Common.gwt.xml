@@ -1,29 +1,26 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><module>
-	<!-- Inherit the core Web Toolkit stuff. -->
-	<inherits name="com.google.gwt.user.User"/>
-	<inherits name="com.google.gwt.i18n.I18N"/>
-
-	<!-- Inherit data model                  -->
-	<inherits name="pt.gov.dgarq.roda.core.Core"/>
-	
-	<!-- Inherit translation                  -->
-	<inherits name="config.i18n.I18N"/>
-
-	<!-- Inherit sub modules                  -->
-	<inherits name="pt.gov.dgarq.roda.wui.common.captcha.Captcha"/>
-	<inherits name="pt.gov.dgarq.roda.wui.common.fileupload.FileUpload"/>
-
-	<!-- Inherit the necessary libraries     -->
-	<inherits name="org.gwtwidgets.WidgetLibrary"/>
-
-	<!-- Servlets                            -->
-
-	<servlet class="pt.gov.dgarq.roda.wui.common.server.FileDownload" path="/wuidownload"/>
-	<servlet class="pt.gov.dgarq.roda.wui.common.server.ClientLoggerImpl" path="/wuilogger"/>
-	<servlet class="pt.gov.dgarq.roda.wui.common.server.UserLoginServiceImpl" path="/userlogin"/>
-	<servlet class="pt.gov.dgarq.roda.wui.common.server.ReportDownload" path="/ReportDownload"/>
-	<servlet class="pt.gov.dgarq.roda.wui.common.server.MetadataDownload" path="/MetadataDownload"/>
-
-	<!-- Specify the cascade stylesheet      -->
-	<stylesheet src="Common.css"/>
-<servlet class="pt.gov.dgarq.roda.wui.common.server.ReportServiceImpl" path="/reportservice"/></module>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<module>
+  <!-- Inherit the core Web Toolkit stuff. -->
+  <inherits name="com.google.gwt.user.User"/>
+  <inherits name="com.google.gwt.i18n.I18N"/>
+  <!-- Inherit data model -->
+  <inherits name="pt.gov.dgarq.roda.core.Core"/>
+  <!-- Inherit translation -->
+  <inherits name="config.i18n.I18N"/>
+  <!-- Inherit sub modules -->
+  <inherits name="pt.gov.dgarq.roda.wui.common.captcha.Captcha"/>
+  <inherits name="pt.gov.dgarq.roda.wui.common.fileupload.FileUpload"/>
+  <!-- Inherit the necessary libraries -->
+  <inherits name="org.gwtwidgets.WidgetLibrary"/>
+  <!-- Servlets -->
+  <servlet class="pt.gov.dgarq.roda.wui.common.server.FileDownload" path="/wuidownload"/>
+  <servlet class="pt.gov.dgarq.roda.wui.common.server.ClientLoggerImpl" path="/wuilogger"/>
+  <servlet class="pt.gov.dgarq.roda.wui.common.server.UserLoginServiceImpl" path="/userlogin"/>
+  <servlet class="pt.gov.dgarq.roda.wui.common.server.ReportDownload" path="/ReportDownload"/>
+  <servlet class="pt.gov.dgarq.roda.wui.common.server.MetadataDownload" path="/MetadataDownload"/>
+  <servlet class="pt.gov.dgarq.roda.wui.common.server.AIPDownloadDEMO" path="/AIPDownloadDEMO"/>
+  <servlet class="pt.gov.dgarq.roda.wui.common.server.DIPDownloadDEMO" path="/DIPDownloadDEMO"/>
+  <!-- Specify the cascade stylesheet -->
+  <stylesheet src="Common.css"/>
+  <servlet class="pt.gov.dgarq.roda.wui.common.server.ReportServiceImpl" path="/reportservice"/>
+</module>

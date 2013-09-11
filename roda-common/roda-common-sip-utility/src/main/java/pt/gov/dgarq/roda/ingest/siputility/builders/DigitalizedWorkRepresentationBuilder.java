@@ -1,7 +1,6 @@
 package pt.gov.dgarq.roda.ingest.siputility.builders;
 
 import gov.loc.mets.FileType;
-
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -9,9 +8,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import org.apache.log4j.Logger;
-
 import pt.gov.dgarq.roda.common.FormatUtility;
 import pt.gov.dgarq.roda.core.data.RepresentationFile;
 import pt.gov.dgarq.roda.core.data.RepresentationObject;
@@ -25,177 +22,180 @@ import pt.gov.dgarq.roda.ingest.siputility.data.StreamRepresentationObject;
 
 /**
  * Representation builder for digitalized works.
- * 
+ *
  * @author Rui Castro
+ * @author Vladislav Korecký <vladislav_korecky@gordic.cz>
  */
 public class DigitalizedWorkRepresentationBuilder extends RepresentationBuilder {
-	private static final Logger logger = Logger
-			.getLogger(DigitalizedWorkRepresentationBuilder.class);
 
-	/**
-	 * Returns the subtype of the given {@link RepresentationObject}.
-	 * 
-	 * @param rObject
-	 *            the {@link RepresentationObject}.
-	 * 
-	 * @return a {@link String} with the subtype of the given
-	 *         {@link RepresentationObject} or <code>null</code> if the subtype
-	 *         couldn't be determined.
-	 */
-	public static String getRepresentationSubtype(RepresentationObject rObject) {
-		return getRepresentationSubtype(Arrays.asList(rObject.getPartFiles()));
-	}
+    private static final Logger logger = Logger
+            .getLogger(DigitalizedWorkRepresentationBuilder.class);
 
-	/**
-	 * Returns the subtype of the given {@link RepresentationObject}.
-	 * 
-	 * @param partFiles
-	 * 
-	 * @return a {@link String} with the subtype of the given
-	 *         {@link RepresentationObject} or <code>null</code> if the subtype
-	 *         couldn't be determined.
-	 */
-	public static String getRepresentationSubtype(
-			List<RepresentationFile> partFiles) {
+    /**
+     * Returns the subtype of the given {@link RepresentationObject}.
+     *
+     * @param rObject the {@link RepresentationObject}.
+     *
+     * @return a {@link String} with the subtype of the given
+     * {@link RepresentationObject} or <code>null</code> if the subtype couldn't
+     * be determined.
+     */
+    public static String getRepresentationSubtype(RepresentationObject rObject) {
+        return getRepresentationSubtype(Arrays.asList(rObject.getPartFiles()));
+    }
 
-		String subType = null;
+    /**
+     * Returns the subtype of the given {@link RepresentationObject}.
+     *
+     * @param partFiles
+     *
+     * @return a {@link String} with the subtype of the given
+     * {@link RepresentationObject} or <code>null</code> if the subtype couldn't
+     * be determined.
+     */
+    public static String getRepresentationSubtype(
+            List<RepresentationFile> partFiles) {
 
-		Set<String> mimetypes = new HashSet<String>();
-		if (partFiles != null) {
-			for (RepresentationFile partFile : partFiles) {
-				mimetypes.add(partFile.getMimetype());
-			}
-		}
+        String subType = null;
 
-		logger.debug("mimetypes of images are " + mimetypes);
+        Set<String> mimetypes = new HashSet<String>();
+        if (partFiles != null) {
+            for (RepresentationFile partFile : partFiles) {
+                String mimeType = partFile.getMimetype();
+                mimetypes.add(mimeType);
+            }
+        }
 
-		if (mimetypes.size() > 1) {
-			// If we have more than 1 mimetype
-			subType = "image/mets+misc";
-		} else if (mimetypes.size() == 1) {
-			// If we have only 1 mimetype
+        logger.debug("mimetypes of images are " + mimetypes);
 
-			// Get the mimetype (image/jpeg)
-			String mimetype = new ArrayList<String>(mimetypes).get(0);
-			// Get only the second part of the mimetype (jpeg)
-			subType = "image/mets+" + mimetype.split("/")[1];
-		}
+        if (mimetypes.size() > 1) {
+            // If we have more than 1 mimetype
+            subType = "image/mets+misc";
+        } else if (mimetypes.size() == 1) {
+            // If we have only 1 mimetype
 
-		return subType;
-	}
+            // Get the mimetype (image/jpeg)
+            String mimetype = new ArrayList<String>(mimetypes).get(0);
+            // Get only the second part of the mimetype (jpeg)
+            subType = "image/mets+" + mimetype.split("/")[1];
+        }
 
-	/**
-	 * @see RepresentationBuilder#createRepresentation(List, List)
-	 */
-	@Override
-	public StreamRepresentationObject createRepresentation(
-			List<String> imageFilenames, List<InputStream> imageStreams)
-			throws SIPException {
+        return subType;
+    }
 
-		if (imageFilenames == null || imageStreams == null
-				|| imageFilenames.size() != imageStreams.size()
-				|| imageFilenames.isEmpty()) {
-			throw new IllegalArgumentException(
-					"filenames and streams cannot be null, empty or in diferent number");
-		}
+    /**
+     * @see RepresentationBuilder#createRepresentation(List, List)
+     */
+    @Override
+    public StreamRepresentationObject createRepresentation(
+            List<String> imageFilenames, List<InputStream> imageStreams)
+            throws SIPException {
 
-		try {
+        if (imageFilenames == null || imageStreams == null
+                || imageFilenames.size() != imageStreams.size()
+                || imageFilenames.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "filenames and streams cannot be null, empty or in diferent number");
+        }
 
-			// the representation ID
-			String newRepID = createNewRepresentationID();
+        try {
 
-			// Find out the subtype from the mimetypes of the images
-			Set<String> mimetypes = new HashSet<String>();
-			for (String imageFilename : imageFilenames) {
-				mimetypes.add(FormatUtility.getMimetype(imageFilename));
-			}
-			logger.debug("mimetypes of images are " + mimetypes);
+            // the representation ID
+            String newRepID = createNewRepresentationID();
 
-			String subType = null;
+            // Find out the subtype from the mimetypes of the images
+            Set<String> mimetypes = new HashSet<String>();
+            for (int i = 0; i < imageFilenames.size(); i++) {
+                InputStream imageStream = imageStreams.get(i);
+                String imageFilename = imageFilenames.get(i);
+                mimetypes.add(FormatUtility.getMimetype(imageStream, imageFilename));
+            }
+            logger.debug("mimetypes of images are " + mimetypes);
 
-			if (mimetypes.size() > 1) {
-				// If we have more than 1 mimetype
-				subType = "image/mets+misc";
-			} else {
-				// If we have only 1 mimetype
+            String subType = null;
 
-				// Get the mimetype (image/jpeg)
-				String mimetype = new ArrayList<String>(mimetypes).get(0);
-				// Get only the second part of the mimetype (jpeg)
-				subType = "image/mets+" + mimetype.split("/")[1];
-			}
+            if (mimetypes.size() > 1) {
+                // If we have more than 1 mimetype
+                subType = "image/mets+misc";
+            } else {
+                // If we have only 1 mimetype
 
-			// The name of the representation root file (METS file)
-			String metsFilename = "METS.xml";
+                // Get the mimetype (image/jpeg)
+                String mimetype = new ArrayList<String>(mimetypes).get(0);
+                // Get only the second part of the mimetype (jpeg)
+                subType = "image/mets+" + mimetype.split("/")[1];
+            }
 
-			// Create a METS only with the representation ID
-			DigitalizedWorkMetsHelper dwMetsHelper = new DigitalizedWorkMetsHelper();
-			dwMetsHelper.createRepresentation(newRepID);
-			InputStream emptyMetsStream = new ByteArrayInputStream(dwMetsHelper
-					.saveToByteArray());
+            // The name of the representation root file (METS file)
+            String metsFilename = "METS.xml";
 
-			// Create the representation
-			StreamRepresentationObject representation = createRepresentation(
-					SIPRepresentationObject.DIGITALIZED_WORK, subType,
-					newRepID, metsFilename, emptyMetsStream, imageFilenames,
-					imageStreams);
+            // Create a METS only with the representation ID
+            DigitalizedWorkMetsHelper dwMetsHelper = new DigitalizedWorkMetsHelper();
+            dwMetsHelper.createRepresentation(newRepID);
+            InputStream emptyMetsStream = new ByteArrayInputStream(dwMetsHelper
+                    .saveToByteArray());
 
-			logger.debug("Represenation created " + representation);
+            // Create the representation
+            StreamRepresentationObject representation = createRepresentation(
+                    SIPRepresentationObject.DIGITALIZED_WORK, subType,
+                    newRepID, metsFilename, emptyMetsStream, imageFilenames,
+                    imageStreams);
 
-			// Add information about the part files to METS (the representation
-			// root file)
-			// By default the image files are structured in a flat structure.
-			addRepresentationFilesWithFlatStructure(dwMetsHelper,
-					representation.getPartStreams());
+            logger.debug("Represenation created " + representation);
 
-			// Change the stream and size of the root file (the METS file)
-			StreamRepresentationFile metsRootStream = representation
-					.getRootStream();
-			byte[] metsByteArray = dwMetsHelper.saveToByteArray();
-			metsRootStream.setSize(metsByteArray.length);
-			metsRootStream.setInputStream(new ByteArrayInputStream(
-					metsByteArray));
+            // Add information about the part files to METS (the representation
+            // root file)
+            // By default the image files are structured in a flat structure.
+            addRepresentationFilesWithFlatStructure(dwMetsHelper,
+                    representation.getPartStreams());
 
-			// This is not needed. It's the same reference
-			// representation.setRootStream(metsRootStream);
+            // Change the stream and size of the root file (the METS file)
+            StreamRepresentationFile metsRootStream = representation
+                    .getRootStream();
+            byte[] metsByteArray = dwMetsHelper.saveToByteArray();
+            metsRootStream.setSize(metsByteArray.length);
+            metsRootStream.setInputStream(new ByteArrayInputStream(
+                    metsByteArray));
 
-			return representation;
+            // This is not needed. It's the same reference
+            // representation.setRootStream(metsRootStream);
 
-		} catch (MetsMetadataException e) {
-			logger.warn("Error creating METS with the file structure - "
-					+ e.getMessage(), e);
-			throw new SIPException(
-					"Error creating METS with the file structure - "
-							+ e.getMessage(), e);
-		} catch (MetsFileAlreadyExistsException e) {
-			logger.warn("Error creating METS with the file structure - "
-					+ e.getMessage(), e);
-			throw new SIPException(
-					"Error creating METS with the file structure - "
-							+ e.getMessage(), e);
-		}
+            return representation;
 
-	}
+        } catch (MetsMetadataException e) {
+            logger.warn("Error creating METS with the file structure - "
+                    + e.getMessage(), e);
+            throw new SIPException(
+                    "Error creating METS with the file structure - "
+                    + e.getMessage(), e);
+        } catch (MetsFileAlreadyExistsException e) {
+            logger.warn("Error creating METS with the file structure - "
+                    + e.getMessage(), e);
+            throw new SIPException(
+                    "Error creating METS with the file structure - "
+                    + e.getMessage(), e);
+        }
 
-	private void addRepresentationFilesWithFlatStructure(
-			DigitalizedWorkMetsHelper dwMetsHelper,
-			StreamRepresentationFile[] partStreams)
-			throws MetsFileAlreadyExistsException {
+    }
 
-		if (partStreams != null) {
-			for (StreamRepresentationFile partFile : partStreams) {
+    private void addRepresentationFilesWithFlatStructure(
+            DigitalizedWorkMetsHelper dwMetsHelper,
+            StreamRepresentationFile[] partStreams)
+            throws MetsFileAlreadyExistsException {
 
-				// Create the file in the fileSec
-				FileType fileType = dwMetsHelper.createFile(partFile.getId(),
-						partFile.getId());
+        if (partStreams != null) {
+            for (StreamRepresentationFile partFile : partStreams) {
 
-				// Add a reference in the structure div
-				dwMetsHelper.createFptr(dwMetsHelper
-						.getRepresentationFileStructureDiv(), fileType);
-			}
+                // Create the file in the fileSec
+                FileType fileType = dwMetsHelper.createFile(partFile.getId(),
+                        partFile.getId());
 
-		}
+                // Add a reference in the structure div
+                dwMetsHelper.createFptr(dwMetsHelper
+                        .getRepresentationFileStructureDiv(), fileType);
+            }
 
-	}
+        }
 
+    }
 }

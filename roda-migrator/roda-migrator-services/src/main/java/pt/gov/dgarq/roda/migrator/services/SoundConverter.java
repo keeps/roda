@@ -6,11 +6,9 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-
 import pt.gov.dgarq.roda.common.FormatUtility;
 import pt.gov.dgarq.roda.core.DownloaderException;
 import pt.gov.dgarq.roda.core.common.RODAServiceException;
@@ -28,209 +26,176 @@ import pt.gov.dgarq.roda.util.CommandException;
 import pt.gov.dgarq.roda.util.CommandUtility;
 import pt.gov.dgarq.roda.util.StringUtility;
 import pt.gov.dgarq.roda.util.TempDir;
-import pt.gov.dgarq.roda.util.XmlEncodeUtility;
 
 /**
- * Sound convert abstract class Uses package soundconvert.<br>
- * <br>
- * <strong>Syntax:</strong> soundconverter -b -m audio/x-wav -s .wav F0<br>
- * <br>
- * Possible formats:
- * <ul>
- * <li>audio/ogg</li>
- * <li>audio/flac</li>
- * <li>audio/wav</li>
- * <li>audio/mpeg</li>
- * </ul>
- * 
+ * Sound convert abstract class Uses package soundconvert.<br> <br>
+ * <strong>Syntax:</strong> soundconverter -b -m audio/x-wav -s .wav F0<br> <br>
+ * Possible formats: <ul> <li>audio/ogg</li> <li>audio/flac</li>
+ * <li>audio/wav</li> <li>audio/mpeg</li> </ul>
+ *
  * @author Luis Faria
  * @author Rui Castro
+ * @author Vladislav Korecký <vladislav_korecky@gordic.cz>
  */
 public abstract class SoundConverter extends AbstractSynchronousConverter {
 
-	private static final Logger logger = Logger.getLogger(SoundConverter.class);
+    private static final Logger logger = Logger.getLogger(SoundConverter.class);
+    private static final String VERSION = "1.0";
+    protected String formatExtension;
+    protected String soundconverterFormat;
 
-	private static final String VERSION = "1.0";
+    /**
+     * @throws RODAServiceException
+     */
+    public SoundConverter() throws RODAServiceException {
+        super();
+    }
 
-	protected String formatExtension;
-	protected String soundconverterFormat;
+    /**
+     *
+     * @throws ConverterException
+     *
+     * @see SynchronousConverter#convert(RepresentationObject)
+     */
+    public ConversionResult convert(RepresentationObject representation)
+            throws RepresentationAlreadyConvertedException,
+            InvalidRepresentationException, WrongRepresentationTypeException,
+            WrongRepresentationSubtypeException, ConverterException {
 
-	/**
-	 * @throws RODAServiceException
-	 */
-	public SoundConverter() throws RODAServiceException {
-		super();
-	}
+        UUID uuid = UUID.randomUUID();
+        File finalDirectory = new File(getCacheDirectory(), uuid.toString());
 
-	/**
-	 * 
-	 * @throws ConverterException
-	 * 
-	 * @see SynchronousConverter#convert(RepresentationObject)
-	 */
-	public ConversionResult convert(RepresentationObject representation)
-			throws RepresentationAlreadyConvertedException,
-			InvalidRepresentationException, WrongRepresentationTypeException,
-			WrongRepresentationSubtypeException, ConverterException {
+        StringBuffer report = new StringBuffer();
 
-		UUID uuid = UUID.randomUUID();
-		File finalDirectory = new File(getCacheDirectory(), uuid.toString());
+        try {
 
-		StringBuffer report = new StringBuffer();
+            LocalRepresentationObject localRepresentation = downloadRepresentationToLocalDisk(representation);
 
-		try {
+            logger.trace("Representation downloaded " + localRepresentation);
 
-			LocalRepresentationObject localRepresentation = downloadRepresentationToLocalDisk(representation);
+            File tempDirectory = TempDir.createUniqueDirectory("convertedRep");
 
-			logger.trace("Representation downloaded " + localRepresentation);
+            // Create a new RepresentationObject that is a copy of source
+            // RepresentationObject
+            LocalRepresentationObject convertedRepresentation = new LocalRepresentationObject(
+                    tempDirectory, localRepresentation);
 
-			File tempDirectory = TempDir.createUniqueDirectory("convertedRep");
+            logger.debug("Saving converted representation files to "
+                    + tempDirectory);
 
-			// Create a new RepresentationObject that is a copy of source
-			// RepresentationObject
-			LocalRepresentationObject convertedRepresentation = new LocalRepresentationObject(
-					tempDirectory, localRepresentation);
+            // Root File
+            File originalFile = new File(URI.create(localRepresentation
+                    .getRootFile().getAccessURL()));
 
-			logger.debug("Saving converted representation files to "
-					+ tempDirectory);
+            File convertedFile = new File(tempDirectory, originalFile.getName());
 
-			// Root File
-			File originalFile = new File(URI.create(localRepresentation
-					.getRootFile().getAccessURL()));
+            try {
 
-			File convertedFile = new File(tempDirectory, originalFile.getName());
+                File convertedFileWithExtension = new File(originalFile
+                        .getPath()
+                        + this.formatExtension);
 
-			try {
+                List<String> commandArgs = new ArrayList<String>();
+                commandArgs.add("soundconverter");
+                commandArgs.add("-b");
+                commandArgs.add("-q");
+                commandArgs.add("-m");
+                commandArgs.add(soundconverterFormat);
+                commandArgs.add("-s");
+                commandArgs.add(formatExtension);
+                commandArgs.add(originalFile.getAbsolutePath());
 
-				File convertedFileWithExtension = new File(
-						originalFile.getPath() + this.formatExtension);
+                String convertOutput = CommandUtility.execute(commandArgs);
 
-				logger.warn("Using soundconverter-fix script as a workarround for a soundconverter bug that causes soundconverter to fail when running without X");
-				String RODA_HOME = null;
-				if (System.getProperty("roda.home") != null) {
-					RODA_HOME = System.getProperty("roda.home");//$NON-NLS-1$
-				} else if (System.getenv("RODA_HOME") != null) {
-					RODA_HOME = System.getenv("RODA_HOME"); //$NON-NLS-1$
-				} else {
-					RODA_HOME = null;
-				}
+                String commandline = StringUtility.join(commandArgs, " "); //$NON-NLS-1$
 
-				if (StringUtils.isBlank(RODA_HOME)) {
-					throw new ConverterException(
-							"RODA_HOME enviroment variable and ${roda.home} system property are not set.");
-				}
+                String message;
+                if (StringUtils.isBlank(convertOutput)) {
+                    message = String.format(
+                            "%s: %s => %s%n%s%n%n", localRepresentation //$NON-NLS-1$
+                            .getRootFile().getId(), localRepresentation
+                            .getRootFile().getOriginalName(),
+                            convertedFileWithExtension.getName(), commandline);
+                } else {
+                    message = String
+                            .format(
+                            "%s: %s => %s (%s)%n(Command: %s)%n%n", //$NON-NLS-1$
+                            localRepresentation.getRootFile().getId(),
+                            localRepresentation.getRootFile()
+                            .getOriginalName(),
+                            convertedFileWithExtension.getName(),
+                            convertOutput, commandline);
+                }
 
-				File soundconverter = new File(new File(RODA_HOME, "bin"),
-						"soundconverter-fix");
+                logger.trace(message);
+                report.append(message);
 
-				List<String> commandArgs = new ArrayList<String>();
-				commandArgs.add(soundconverter.getAbsolutePath());
-				commandArgs.add("-b");
-				commandArgs.add("-q");
-				commandArgs.add("-m");
-				commandArgs.add(soundconverterFormat);
-				commandArgs.add("-s");
-				commandArgs.add(formatExtension);
-				commandArgs.add(originalFile.getAbsolutePath());
+                RepresentationFile convertedRootFile = convertedRepresentation
+                        .getRootFile();
+                convertedRootFile.importFileFormat(FormatUtility
+                        .getFileFormat(convertedFileWithExtension, convertedFileWithExtension.getName()));
+                convertedRootFile.setOriginalName(convertedRootFile
+                        .getOriginalName()
+                        + this.formatExtension);
+                convertedRootFile.setSize(convertedFileWithExtension.length());
 
-				String convertOutput = CommandUtility.execute(commandArgs);
+                convertedRepresentation.setSubType(convertedRootFile.getMimetype());
 
-				String commandline = StringUtility.join(commandArgs, " "); //$NON-NLS-1$
+                FileUtils.moveFile(convertedFileWithExtension, convertedFile);
 
-				String message;
-				if (StringUtils.isBlank(convertOutput)) {
-					message = String.format(
-							"%s: %s => %s%n%s%n%n", localRepresentation //$NON-NLS-1$
-									.getRootFile().getId(), localRepresentation
-									.getRootFile().getOriginalName(),
-							convertedFileWithExtension.getName(), commandline);
-				} else {
-					message = String
-							.format("%s: %s => %s (%s)%n(Command: %s)%n%n", //$NON-NLS-1$
-									localRepresentation.getRootFile().getId(),
-									localRepresentation.getRootFile()
-											.getOriginalName(),
-									convertedFileWithExtension.getName(),
-									convertOutput, commandline);
-				}
+                moveToFinalDirectory(convertedRepresentation, finalDirectory);
 
-				logger.trace(message);
-				report.append(message);
+                EventPreservationObject eventPO = new EventPreservationObject();
+                eventPO.setOutcome("success");
+                eventPO.setOutcomeDetailNote("Converter details"); //$NON-NLS-1$
+                eventPO.setOutcomeDetailExtension(report.toString());
 
-				RepresentationFile convertedRootFile = convertedRepresentation
-						.getRootFile();
-				convertedRootFile.setMimetype(FormatUtility
-						.getMimetype(convertedFileWithExtension.getName()));
-				convertedRootFile.setOriginalName(convertedRootFile
-						.getOriginalName() + this.formatExtension);
-				convertedRootFile.setSize(convertedFileWithExtension.length());
+                logger.info("Event is " + eventPO);
 
-				convertedRepresentation.setSubType(convertedRootFile
-						.getMimetype());
+                return new ConversionResult(convertedRepresentation, eventPO,
+                        getAgent());
 
-				FileUtils.moveFile(convertedFileWithExtension, convertedFile);
+            } catch (CommandException e) {
+                logger.debug("Exception executing convert command - "
+                        + e.getMessage(), e);
+                throw new ConverterException(
+                        "Exception executing convert command - "
+                        + e.getMessage(), e);
+            }
 
-				moveToFinalDirectory(convertedRepresentation, finalDirectory);
+        } catch (DownloaderException e) {
+            logger.debug("Exception downloading representation files - "
+                    + e.getMessage(), e);
+            throw new ConverterException(
+                    "Exception downloading representation files - "
+                    + e.getMessage(), e);
+        } catch (IOException e) {
+            logger.debug("Exception downloading representation files - "
+                    + e.getMessage(), e);
+            throw new ConverterException(
+                    "Exception downloading representation files - "
+                    + e.getMessage(), e);
+        }
 
-				EventPreservationObject eventPO = new EventPreservationObject();
-				eventPO.setOutcome("success");
-				eventPO.setOutcomeDetailNote("Converter details"); //$NON-NLS-1$
-				String escapedText = XmlEncodeUtility
-						.escapeInvalidXmlChars(report.toString());
-				logger.debug("Escaped text:" + escapedText);
-				eventPO.setOutcomeDetailExtension(escapedText);
+    }
 
-				logger.info("Event is " + eventPO);
+    protected String getVersion() throws ConverterException {
+        try {
+            String version = getClass().getName() + "/" + VERSION + " - ";
+            String soundconverterHelp = CommandUtility.execute(
+                    "soundconverter", "-h");
+            String soundconverterVersion = soundconverterHelp.substring(0,
+                    soundconverterHelp.indexOf('\n'));
 
-				return new ConversionResult(convertedRepresentation, eventPO,
-						getAgent());
+            return version + soundconverterVersion;
 
-			} catch (CommandException e) {
-				logger.debug(
-						"Exception executing convert command - "
-								+ e.getMessage(), e);
-				throw new ConverterException(
-						"Exception executing convert command - "
-								+ e.getMessage(), e);
-			}
+        } catch (CommandException e) {
+            logger.warn("Exception getting OpenOffice version - "
+                    + e.getMessage(), e);
+            throw new ConverterException(
+                    "Exception getting OpenOffice version - " + e.getMessage(),
+                    e);
+        }
 
-		} catch (DownloaderException e) {
-			logger.debug(
-					"Exception downloading representation files - "
-							+ e.getMessage(), e);
-			throw new ConverterException(
-					"Exception downloading representation files - "
-							+ e.getMessage(), e);
-		} catch (IOException e) {
-			logger.debug(
-					"Exception downloading representation files - "
-							+ e.getMessage(), e);
-			throw new ConverterException(
-					"Exception downloading representation files - "
-							+ e.getMessage(), e);
-		}
-
-	}
-
-	protected String getVersion() throws ConverterException {
-		try {
-			String version = getClass().getName() + "/" + VERSION + " - ";
-			String soundconverterHelp = CommandUtility.execute(
-					"soundconverter", "-h");
-			String soundconverterVersion = soundconverterHelp.substring(0,
-					soundconverterHelp.indexOf('\n'));
-
-			return version + soundconverterVersion;
-
-		} catch (CommandException e) {
-			logger.warn(
-					"Exception getting OpenOffice version - " + e.getMessage(),
-					e);
-			throw new ConverterException(
-					"Exception getting OpenOffice version - " + e.getMessage(),
-					e);
-		}
-
-	}
-
+    }
 }

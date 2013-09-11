@@ -1,85 +1,203 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="roda-migrator-services" default="create-services" basedir=".">
+<project basedir="." default="build" name="roda-migrator-compile">
+	<property environment="env" />
 
-	<property name="roda-migrator.location" value="${basedir}" />
-	
+	<property name="roda-migrator.location" value="${env.RODA_DEV}/roda-migrator" />
+
 	<!-- AXIS properties -->
 	<!-- necessary to create services -->
 	<property name="target.server" value="localhost" />
 	<property name="target.port" value="8080" />
 	<property name="target.appname" value="roda-migrator" />
-	<property name="endpoint-stub.wsdd" value="${roda-migrator.location}/src/main/webapp/WEB-INF/server-config.wsdd" />
+	<property name="endpoint-stub.wsdd" value="${roda-migrator.location}/WebContent/WEB-INF/server-config.wsdd" />
+
+  	<!-- Classpaths -->
+
+	<path id="j2ee-container.classpath">
+		<fileset dir="${env.RODA_DEV}/shared-libs/servlet-api-2.4">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<path id="java-utils.classpath">
+		<pathelement location="${java-utils.location}/build/classes" />
+		<fileset dir="${java-utils.location}/lib">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<path id="roda-common-data.classpath">
+		<pathelement location="${roda-common-data.location}/build/classes" />
+	</path>
+
+	<path id="roda-common-metadata.classpath">
+		<pathelement location="${roda-common-metadata.location}/build/classes" />
+		<fileset dir="${roda-common-metadata.location}/lib">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<path id="roda-common-content-adapter.classpath">
+		<pathelement location="${roda-common-content-adapter.location}/build/classes" />
+		<fileset dir="${roda-common-content-adapter.location}/lib">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<path id="roda-common-servlet-security.classpath">
+		<pathelement location="${roda-common-servlet-security.location}/build/classes" />
+		<fileset dir="${roda-common-servlet-security.location}/lib">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<path id="roda-common-format-utility.classpath">
+		<pathelement location="${roda-common-format-utility.location}/build/classes" />
+		<fileset dir="${roda-common-format-utility.location}/lib">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<path id="roda-common-sip-utility.classpath">
+		<pathelement location="${roda-common-sip-utility.location}/build/classes" />
+		<fileset dir="${roda-common-sip-utility.location}/lib">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+	
+	<path id="roda-common-convert-db.classpath">
+		<pathelement location="${roda-common-convert-db.location}/build/classes" />
+		<fileset dir="${roda-common-convert-db.location}/lib">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<path id="roda-common-migrator.classpath">
+		<pathelement location="${roda-common-migrator.location}/build/classes" />
+		<fileset dir="${roda-common-migrator.location}/lib">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+	
+	<path id="roda-client.classpath">
+		<pathelement location="${roda-client.location}/build/classes" />
+		<fileset dir="${roda-client.location}/lib">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<path id="roda-migrator.classpath">
+		<pathelement location="${roda-migrator.location}/build/classes" />
+		<fileset dir="${roda-migrator.location}/WebContent/WEB-INF/lib">
+			<include name="**/*.jar" />
+		</fileset>
+		
+		<path refid="java-utils.classpath" />
+		<path refid="roda-common-data.classpath" />
+		<path refid="roda-common-metadata.classpath" />
+		<path refid="roda-common-content-adapter.classpath" />
+		<path refid="roda-common-servlet-security.classpath" />
+		<path refid="roda-common-format-utility.classpath" />
+		<path refid="roda-common-sip-utility.classpath" />
+		<path refid="roda-common-convert-db.classpath" />
+		<path refid="roda-common-migrator.classpath" />
+		<path refid="roda-client.classpath" />
+
+		<path refid="j2ee-container.classpath" />
+	</path>
 
 	<path id="axis.classpath">
 		<path refid="roda-migrator.classpath" />
 	</path>
 
-	<path id="roda-migrator.classpath">
-		<pathelement location="${roda-migrator.location}/target/classes" />
-		<fileset dir="${roda-migrator.location}/target/roda-migrator-services-1.1.0/WEB-INF/lib">
-			<include name="**/*.jar" />
-		</fileset>
-	</path>
-
 	<taskdef resource="axis-tasks.properties" classpathref="axis.classpath" />
+
+	<target name="create-service">
+
+		<echo message="Generating WSDL for service ${service}" />
+
+		<axis-java2wsdl output="${roda-migrator.location}/WebContent/wsdl/${service}.wsdl" classname="pt.gov.dgarq.roda.migrator.services.${service}" style="WRAPPED" namespace="http://services.migrator.roda.dgarq.gov.pt" location="http://${target.server}:${target.port}/${target.appname}/services/${service}" extraClasses="pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter pt.gov.dgarq.roda.core.data.adapter.filter.OneOfManyFilterParameter pt.gov.dgarq.roda.core.data.adapter.filter.RangeFilterParameter pt.gov.dgarq.roda.core.data.adapter.filter.RegexFilterParameter" />
+
+		<echo message="Generating WSDD for service ${service}" />
+
+		<!-- Generate server skeleton files and the WSDD files -->
+		<axis-wsdl2java output="${roda-migrator.location}/skells" deployscope="Application" serverside="true" url="${roda-migrator.location}/WebContent/wsdl/${service}.wsdl" />
+
+		<!-- Copy the WSDD files -->
+		<copy todir="${roda-migrator.location}/WebContent/WEB-INF/${service}Service">
+			<fileset dir="${roda-migrator.location}/skells" includes="**/*.wsdd" />
+		</copy>
+
+		<!-- Fix WSDD. Replace 'skeleton' classname by 'real' classname -->
+		<replace file="${roda-migrator.location}/WebContent/WEB-INF/${service}Service/pt/gov/dgarq/roda/migrator/services/deploy.wsdd" token="pt.gov.dgarq.roda.migrator.services.${service}SoapBindingImpl" value="pt.gov.dgarq.roda.migrator.services.${service}" />
+
+		<!-- Delete the skeleton files -->
+		<delete includeemptydirs="true">
+			<fileset dir="${roda-migrator.location}/skells" includes="**" />
+		</delete>
+
+		<!-- Update main WSDD file (server-config.wsdd) -->
+		<echo message="Updating server-config.wsdd" />
+		<java classname="org.apache.axis.utils.Admin" dir="${roda-migrator.location}/WebContent/WEB-INF" fork="true">
+			<classpath refid="axis.classpath" />
+			<arg value="server" />
+			<arg value="${roda-migrator.location}/WebContent/WEB-INF/${service}Service/pt/gov/dgarq/roda/migrator/services/deploy.wsdd" />
+		</java>
+
+	</target>
 
 	<target name="create-converter-service">
 
 		<echo message="Generating WSDL for service interface ${interface}" />
 
 		<axis-java2wsdl 
-			output="${roda-migrator.location}/src/main/webapp/wsdl/${interface}.wsdl" 
+			output="${roda-migrator.location}/WebContent/wsdl/${interface}.wsdl" 
 			classname="pt.gov.dgarq.roda.migrator.services.${interface}" 
 			style="WRAPPED" 
 			namespace="http://services.migrator.roda.dgarq.gov.pt" 
 			location="http://${target.server}:${target.port}/${target.appname}/services/${interface}" 
-			extraClasses="pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter pt.gov.dgarq.roda.core.data.adapter.filter.OneOfManyFilterParameter pt.gov.dgarq.roda.core.data.adapter.filter.RangeFilterParameter pt.gov.dgarq.roda.core.data.adapter.filter.RegexFilterParameter"/>
+			extraClasses="pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter pt.gov.dgarq.roda.core.data.adapter.filter.OneOfManyFilterParameter pt.gov.dgarq.roda.core.data.adapter.filter.RangeFilterParameter pt.gov.dgarq.roda.core.data.adapter.filter.RegexFilterParameter" 
+		/>
 
 		<!-- Copy the interface WSDL to service WSDL -->
-		<copy file="${roda-migrator.location}/src/main/webapp/wsdl/${interface}.wsdl" tofile="${roda-migrator.location}/src/main/webapp/wsdl/${service}.wsdl" />
+		<copy file="${roda-migrator.location}/WebContent/wsdl/${interface}.wsdl" tofile="${roda-migrator.location}/WebContent/wsdl/${service}.wsdl" />
 
 		<!-- Fix WSDL. Replace 'interface name' by 'service name' -->
-		<replace file="${roda-migrator.location}/src/main/webapp/wsdl/${service}.wsdl" token="${interface}Service" value="${service}Service" />
+		<replace file="${roda-migrator.location}/WebContent/wsdl/${service}.wsdl" token="${interface}Service" value="${service}Service" />
 
-		<replace file="${roda-migrator.location}/src/main/webapp/wsdl/${service}.wsdl" token="wsdl:port binding=&quot;impl:${interface}SoapBinding&quot; name=&quot;${interface}&quot;" value="wsdl:port binding=&quot;impl:${interface}SoapBinding&quot; name=&quot;${service}&quot;" />
+		<replace file="${roda-migrator.location}/WebContent/wsdl/${service}.wsdl" token="wsdl:port binding=&quot;impl:${interface}SoapBinding&quot; name=&quot;${interface}&quot;" value="wsdl:port binding=&quot;impl:${interface}SoapBinding&quot; name=&quot;${service}&quot;" />
 
 		<echo message="Generating WSDD for service ${service}" />
 
-		<property name="roda-migrator.skells.location" value="${roda-migrator.location}/target/skells" />
-		
-		<mkdir dir="${roda-migrator.skells.location}"/>
-
 		<!-- Generate server skeleton files and the WSDD files -->
-		<axis-wsdl2java output="${roda-migrator.skells.location}" deployscope="Application" 
-			serverside="true" url="${roda-migrator.location}/src/main/webapp/wsdl/${service}.wsdl" />
+		<axis-wsdl2java output="${roda-migrator.location}/skells" deployscope="Application" serverside="true" url="${roda-migrator.location}/WebContent/wsdl/${service}.wsdl" />
 
 		<!-- Copy the WSDD files -->
-		<copy todir="${roda-migrator.location}/src/main/webapp/WEB-INF/${service}Service">
-			<fileset dir="${roda-migrator.skells.location}" includes="**/*.wsdd" />
+		<copy todir="${roda-migrator.location}/WebContent/WEB-INF/${service}Service">
+			<fileset dir="${roda-migrator.location}/skells" includes="**/*.wsdd" />
 		</copy>
 
 		<!-- Fix WSDD. Replace 'skeleton' classname by 'real' classname -->
-		<replace file="${roda-migrator.location}/src/main/webapp/WEB-INF/${service}Service/pt/gov/dgarq/roda/migrator/services/deploy.wsdd" 
-			token="pt.gov.dgarq.roda.migrator.services.${interface}SoapBindingImpl" 
-			value="pt.gov.dgarq.roda.migrator.services.${service}" />
+		<replace file="${roda-migrator.location}/WebContent/WEB-INF/${service}Service/pt/gov/dgarq/roda/migrator/services/deploy.wsdd" token="pt.gov.dgarq.roda.migrator.services.${interface}SoapBindingImpl" value="pt.gov.dgarq.roda.migrator.services.${service}" />
 
 		<!-- Delete the skeleton files -->
 		<delete includeemptydirs="true">
-			<fileset dir="${roda-migrator.skells.location}" includes="**" />
+			<fileset dir="${roda-migrator.location}/skells" includes="**" />
 		</delete>
 
 		<!-- Update main WSDD file (server-config.wsdd) -->
 		<echo message="Updating server-config.wsdd" />
-		<java classname="org.apache.axis.utils.Admin" dir="${roda-migrator.location}/src/main/webapp/WEB-INF" fork="true">
+		<java classname="org.apache.axis.utils.Admin" dir="${roda-migrator.location}/WebContent/WEB-INF" fork="true">
 			<classpath refid="axis.classpath" />
 			<arg value="server" />
-			<arg value="${roda-migrator.location}/src/main/webapp/WEB-INF/${service}Service/pt/gov/dgarq/roda/migrator/services/deploy.wsdd" />
+			<arg value="${roda-migrator.location}/WebContent/WEB-INF/${service}Service/pt/gov/dgarq/roda/migrator/services/deploy.wsdd" />
 		</java>
+
 	</target>
 
-	<target name="create-services">
+	<target name="create-services" depends="build">
 
-		<!--<echo message="To remove old services call 'ant remove-services' first" />-->
+		<echo message="To remove old services call 'ant remove-services' first" />
 
 		<antcall target="create-converter-service">
 			<param name="interface" value="SynchronousConverter" />
@@ -149,9 +267,7 @@
 
 		<!-- Remove all services -->
 		<!-- Copy the empty-server-config.wsdd WSDD server-config.wsdd -->
-		<copy file="${roda-migrator.location}/src/main/webapp/WEB-INF/empty-server-config.wsdd" 
-			tofile="${roda-migrator.location}/src/main/webapp/WEB-INF/server-config.wsdd" 
-			overwrite="true" />
+		<copy file="${roda-migrator.location}/WebContent/WEB-INF/empty-server-config.wsdd" tofile="${roda-migrator.location}/WebContent/WEB-INF/server-config.wsdd" overwrite="true" />
 
 	</target>
 

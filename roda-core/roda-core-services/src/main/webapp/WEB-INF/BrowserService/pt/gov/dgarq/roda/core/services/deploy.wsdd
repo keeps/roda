@@ -20,177 +20,177 @@
       <parameter name="className" value="pt.gov.dgarq.roda.core.services.Browser"/>
       <parameter name="wsdlPortType" value="Browser"/>
       <parameter name="typeMappingVersion" value="1.2"/>
-      <operation name="getRODAObject" qname="operNS:getRODAObject" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getRODAObjectReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:RODAObject" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
-        <parameter qname="pns:pid" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
-        <fault name="NoSuchRODAObjectException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-        <fault name="BrowserException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      <operation name="getProducers" qname="operNS:getProducers" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getProducersReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:Producers" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
+        <parameter qname="pns:doPID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <fault name="NoSuchRODAObjectException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="BrowserException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
       </operation>
-      <operation name="getRODAObjectCount" qname="operNS:getRODAObjectCount" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getRODAObjectCountReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:int" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
+      <operation name="getDOPIDs" qname="operNS:getDOPIDs" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getDOPIDsReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:string" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
+        <fault name="BrowserException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="getSimpleRepresentationPreservationObjectCount" qname="operNS:getSimpleRepresentationPreservationObjectCount" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getSimpleRepresentationPreservationObjectCountReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:int" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
         <parameter qname="pns:filter" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:Filter" xmlns:tns="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
-        <fault name="BrowserException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="BrowserException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
       </operation>
-      <operation name="getRODAObjects" qname="operNS:getRODAObjects" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getRODAObjectsReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:RODAObject" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
+      <operation name="getSimpleRepresentationObject" qname="operNS:getSimpleRepresentationObject" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getSimpleRepresentationObjectReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:SimpleRepresentationObject" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
+        <parameter qname="pns:roPID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <fault name="NoSuchRODAObjectException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="BrowserException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="getSimpleRepresentationObjectCount" qname="operNS:getSimpleRepresentationObjectCount" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getSimpleRepresentationObjectCountReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:int" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
+        <parameter qname="pns:filter" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:Filter" xmlns:tns="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+        <fault name="BrowserException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="getSimpleRepresentationObjects" qname="operNS:getSimpleRepresentationObjects" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getSimpleRepresentationObjectsReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:SimpleRepresentationObject" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
         <parameter qname="pns:contentAdapter" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:ContentAdapter" xmlns:tns="http://adapter.data.core.roda.dgarq.gov.pt"/>
-        <fault name="BrowserException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="BrowserException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
       </operation>
-      <operation name="getSimpleDescriptionObject" qname="operNS:getSimpleDescriptionObject" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getSimpleDescriptionObjectReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:SimpleDescriptionObject" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
-        <parameter qname="pns:pid" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
-        <fault name="NoSuchRODAObjectException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-        <fault name="BrowserException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      <operation name="getSimpleRepresentationPreservationObject" qname="operNS:getSimpleRepresentationPreservationObject" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getSimpleRepresentationPreservationObjectReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:SimpleRepresentationPreservationObject" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
+        <parameter qname="pns:roPID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <fault name="NoSuchRODAObjectException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="BrowserException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
       </operation>
       <operation name="getSimpleDescriptionObjectCount" qname="operNS:getSimpleDescriptionObjectCount" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getSimpleDescriptionObjectCountReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:int" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
         <parameter qname="pns:filter" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:Filter" xmlns:tns="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
-        <fault name="BrowserException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-      </operation>
-      <operation name="getSimpleDescriptionObjects" qname="operNS:getSimpleDescriptionObjects" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getSimpleDescriptionObjectsReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:SimpleDescriptionObject" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
-        <parameter qname="pns:contentAdapter" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:ContentAdapter" xmlns:tns="http://adapter.data.core.roda.dgarq.gov.pt"/>
-        <fault name="BrowserException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="BrowserException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
       </operation>
       <operation name="getSimpleDescriptionObjectIndex" qname="operNS:getSimpleDescriptionObjectIndex" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getSimpleDescriptionObjectIndexReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:int" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
         <parameter qname="pns:pid" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
         <parameter qname="pns:contentAdapter" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:ContentAdapter" xmlns:tns="http://adapter.data.core.roda.dgarq.gov.pt"/>
-        <fault name="BrowserException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="BrowserException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
       </operation>
-      <operation name="getDescriptionObject" qname="operNS:getDescriptionObject" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getDescriptionObjectReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:DescriptionObject" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
-        <parameter qname="pns:pid" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
-        <fault name="NoSuchRODAObjectException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-        <fault name="BrowserException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-      </operation>
-      <operation name="getDOPIDs" qname="operNS:getDOPIDs" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getDOPIDsReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:string" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
-        <fault name="BrowserException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-      </operation>
-      <operation name="getDOAncestorPIDs" qname="operNS:getDOAncestorPIDs" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getDOAncestorPIDsReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:string" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
-        <parameter qname="pns:pid" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
-        <fault name="NoSuchRODAObjectException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-        <fault name="BrowserException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-      </operation>
-      <operation name="getDORepresentations" qname="operNS:getDORepresentations" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getDORepresentationsReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:RepresentationObject" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
-        <parameter qname="pns:doPID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
-        <fault name="NoSuchRODAObjectException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-        <fault name="BrowserException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-      </operation>
-      <operation name="getDOOriginalRepresentation" qname="operNS:getDOOriginalRepresentation" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getDOOriginalRepresentationReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:RepresentationObject" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
-        <parameter qname="pns:doPID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
-        <fault name="NoSuchRODAObjectException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-        <fault name="BrowserException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      <operation name="getSimpleRepresentationPreservationObjects" qname="operNS:getSimpleRepresentationPreservationObjects" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getSimpleRepresentationPreservationObjectsReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:SimpleRepresentationPreservationObject" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
+        <parameter qname="pns:contentAdapter" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:ContentAdapter" xmlns:tns="http://adapter.data.core.roda.dgarq.gov.pt"/>
+        <fault name="BrowserException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
       </operation>
       <operation name="getDONormalizedRepresentation" qname="operNS:getDONormalizedRepresentation" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getDONormalizedRepresentationReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:RepresentationObject" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
         <parameter qname="pns:doPID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
-        <fault name="NoSuchRODAObjectException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-        <fault name="BrowserException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="NoSuchRODAObjectException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="BrowserException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
       </operation>
-      <operation name="getDOPreservationObjects" qname="operNS:getDOPreservationObjects" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getDOPreservationObjectsReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:RepresentationPreservationObject" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
-        <parameter qname="pns:doPID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
-        <fault name="NoSuchRODAObjectException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-        <fault name="BrowserException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      <operation name="getRepresentationPreservationObject" qname="operNS:getRepresentationPreservationObject" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getRepresentationPreservationObjectReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:RepresentationPreservationObject" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
+        <parameter qname="pns:poPID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <fault name="NoSuchRODAObjectException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="BrowserException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
       </operation>
-      <operation name="getSimpleRepresentationObject" qname="operNS:getSimpleRepresentationObject" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getSimpleRepresentationObjectReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:SimpleRepresentationObject" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
+      <operation name="getSimpleEventPreservationObject" qname="operNS:getSimpleEventPreservationObject" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getSimpleEventPreservationObjectReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:SimpleEventPreservationObject" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
         <parameter qname="pns:roPID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
-        <fault name="NoSuchRODAObjectException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-        <fault name="BrowserException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="NoSuchRODAObjectException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="BrowserException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
       </operation>
-      <operation name="getSimpleRepresentationObjectCount" qname="operNS:getSimpleRepresentationObjectCount" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getSimpleRepresentationObjectCountReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:int" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
+      <operation name="getSimpleEventPreservationObjectCount" qname="operNS:getSimpleEventPreservationObjectCount" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getSimpleEventPreservationObjectCountReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:int" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
         <parameter qname="pns:filter" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:Filter" xmlns:tns="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
-        <fault name="BrowserException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="BrowserException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
       </operation>
-      <operation name="getSimpleRepresentationObjects" qname="operNS:getSimpleRepresentationObjects" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getSimpleRepresentationObjectsReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:SimpleRepresentationObject" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
+      <operation name="getSimpleEventPreservationObjects" qname="operNS:getSimpleEventPreservationObjects" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getSimpleEventPreservationObjectsReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:SimpleEventPreservationObject" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
         <parameter qname="pns:contentAdapter" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:ContentAdapter" xmlns:tns="http://adapter.data.core.roda.dgarq.gov.pt"/>
-        <fault name="BrowserException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="BrowserException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="getAgentPreservationObject" qname="operNS:getAgentPreservationObject" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getAgentPreservationObjectReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:AgentPreservationObject" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
+        <parameter qname="pns:poPID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <fault name="NoSuchRODAObjectException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="BrowserException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
       </operation>
       <operation name="getRepresentationObject" qname="operNS:getRepresentationObject" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getRepresentationObjectReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:RepresentationObject" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
         <parameter qname="pns:roPID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
-        <fault name="NoSuchRODAObjectException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-        <fault name="BrowserException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="NoSuchRODAObjectException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="BrowserException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
       </operation>
       <operation name="getRepresentationFile" qname="operNS:getRepresentationFile" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getRepresentationFileReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:RepresentationFile" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
         <parameter qname="pns:roPID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
         <parameter qname="pns:fileID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
-        <fault name="NoSuchRODAObjectException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-        <fault name="BrowserException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="NoSuchRODAObjectException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="BrowserException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
         <fault name="NoSuchRepresentationFileException" qname="fns:fault2" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRepresentationFileException" type="tns:NoSuchRepresentationFileException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-      </operation>
-      <operation name="getROPreservationObject" qname="operNS:getROPreservationObject" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getROPreservationObjectReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:RepresentationPreservationObject" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
-        <parameter qname="pns:roPID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
-        <fault name="NoSuchRODAObjectException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-        <fault name="BrowserException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-      </operation>
-      <operation name="getSimpleRepresentationPreservationObject" qname="operNS:getSimpleRepresentationPreservationObject" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getSimpleRepresentationPreservationObjectReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:SimpleRepresentationPreservationObject" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
-        <parameter qname="pns:roPID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
-        <fault name="NoSuchRODAObjectException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-        <fault name="BrowserException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-      </operation>
-      <operation name="getSimpleRepresentationPreservationObjectCount" qname="operNS:getSimpleRepresentationPreservationObjectCount" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getSimpleRepresentationPreservationObjectCountReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:int" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
-        <parameter qname="pns:filter" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:Filter" xmlns:tns="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
-        <fault name="BrowserException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-      </operation>
-      <operation name="getSimpleRepresentationPreservationObjects" qname="operNS:getSimpleRepresentationPreservationObjects" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getSimpleRepresentationPreservationObjectsReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:SimpleRepresentationPreservationObject" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
-        <parameter qname="pns:contentAdapter" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:ContentAdapter" xmlns:tns="http://adapter.data.core.roda.dgarq.gov.pt"/>
-        <fault name="BrowserException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-      </operation>
-      <operation name="getRepresentationPreservationObject" qname="operNS:getRepresentationPreservationObject" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getRepresentationPreservationObjectReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:RepresentationPreservationObject" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
-        <parameter qname="pns:poPID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
-        <fault name="NoSuchRODAObjectException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-        <fault name="BrowserException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-      </operation>
-      <operation name="getSimpleEventPreservationObject" qname="operNS:getSimpleEventPreservationObject" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getSimpleEventPreservationObjectReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:SimpleEventPreservationObject" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
-        <parameter qname="pns:roPID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
-        <fault name="NoSuchRODAObjectException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-        <fault name="BrowserException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-      </operation>
-      <operation name="getSimpleEventPreservationObjectCount" qname="operNS:getSimpleEventPreservationObjectCount" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getSimpleEventPreservationObjectCountReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:int" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
-        <parameter qname="pns:filter" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:Filter" xmlns:tns="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
-        <fault name="BrowserException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-      </operation>
-      <operation name="getSimpleEventPreservationObjects" qname="operNS:getSimpleEventPreservationObjects" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getSimpleEventPreservationObjectsReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:SimpleEventPreservationObject" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
-        <parameter qname="pns:contentAdapter" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:ContentAdapter" xmlns:tns="http://adapter.data.core.roda.dgarq.gov.pt"/>
-        <fault name="BrowserException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-      </operation>
-      <operation name="getEventPreservationObject" qname="operNS:getEventPreservationObject" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getEventPreservationObjectReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:EventPreservationObject" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
-        <parameter qname="pns:poPID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
-        <fault name="NoSuchRODAObjectException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-        <fault name="BrowserException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-      </operation>
-      <operation name="getPreservationEvents" qname="operNS:getPreservationEvents" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getPreservationEventsReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:EventPreservationObject" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
-        <parameter qname="pns:poPID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
-        <fault name="NoSuchRODAObjectException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-        <fault name="BrowserException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-      </operation>
-      <operation name="getAgentPreservationObject" qname="operNS:getAgentPreservationObject" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getAgentPreservationObjectReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:AgentPreservationObject" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
-        <parameter qname="pns:poPID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
-        <fault name="NoSuchRODAObjectException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-        <fault name="BrowserException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-      </operation>
-      <operation name="getRODAObjectPermissions" qname="operNS:getRODAObjectPermissions" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getRODAObjectPermissionsReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:RODAObjectPermissions" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
-        <parameter qname="pns:pid" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
-        <fault name="NoSuchRODAObjectException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-        <fault name="BrowserException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-      </operation>
-      <operation name="getRODAObjectUserPermissions" qname="operNS:getRODAObjectUserPermissions" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getRODAObjectUserPermissionsReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:RODAObjectUserPermissions" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
-        <parameter qname="pns:pid" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
-        <fault name="NoSuchRODAObjectException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-        <fault name="BrowserException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-      </operation>
-      <operation name="hasModifyPermission" qname="operNS:hasModifyPermission" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:hasModifyPermissionReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:boolean" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
-        <parameter qname="pns:pid" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
-        <fault name="NoSuchRODAObjectException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-        <fault name="BrowserException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
       </operation>
       <operation name="hasRemovePermission" qname="operNS:hasRemovePermission" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:hasRemovePermissionReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:boolean" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
         <parameter qname="pns:pid" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
-        <fault name="NoSuchRODAObjectException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-        <fault name="BrowserException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="NoSuchRODAObjectException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="BrowserException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="getRODAObject" qname="operNS:getRODAObject" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getRODAObjectReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:RODAObject" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
+        <parameter qname="pns:pid" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <fault name="NoSuchRODAObjectException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="BrowserException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="getSimpleDescriptionObjects" qname="operNS:getSimpleDescriptionObjects" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getSimpleDescriptionObjectsReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:SimpleDescriptionObject" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
+        <parameter qname="pns:contentAdapter" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:ContentAdapter" xmlns:tns="http://adapter.data.core.roda.dgarq.gov.pt"/>
+        <fault name="BrowserException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="getROPreservationObject" qname="operNS:getROPreservationObject" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getROPreservationObjectReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:RepresentationPreservationObject" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
+        <parameter qname="pns:roPID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <fault name="NoSuchRODAObjectException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="BrowserException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="getRODAObjectCount" qname="operNS:getRODAObjectCount" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getRODAObjectCountReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:int" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
+        <parameter qname="pns:filter" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:Filter" xmlns:tns="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+        <fault name="BrowserException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="getDOAncestorPIDs" qname="operNS:getDOAncestorPIDs" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getDOAncestorPIDsReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:string" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
+        <parameter qname="pns:pid" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <fault name="NoSuchRODAObjectException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="BrowserException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="getEventPreservationObject" qname="operNS:getEventPreservationObject" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getEventPreservationObjectReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:EventPreservationObject" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
+        <parameter qname="pns:poPID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <fault name="NoSuchRODAObjectException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="BrowserException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="getPreservationEvents" qname="operNS:getPreservationEvents" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getPreservationEventsReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:EventPreservationObject" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
+        <parameter qname="pns:poPID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <fault name="NoSuchRODAObjectException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="BrowserException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="getRODAObjectPermissions" qname="operNS:getRODAObjectPermissions" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getRODAObjectPermissionsReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:RODAObjectPermissions" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
+        <parameter qname="pns:pid" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <fault name="NoSuchRODAObjectException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="BrowserException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="getSimpleDescriptionObject" qname="operNS:getSimpleDescriptionObject" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getSimpleDescriptionObjectReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:SimpleDescriptionObject" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
+        <parameter qname="pns:pid" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <fault name="NoSuchRODAObjectException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="BrowserException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
       </operation>
       <operation name="hasGrantPermission" qname="operNS:hasGrantPermission" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:hasGrantPermissionReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:boolean" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
         <parameter qname="pns:pid" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
-        <fault name="NoSuchRODAObjectException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-        <fault name="BrowserException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="NoSuchRODAObjectException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="BrowserException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
       </operation>
-      <operation name="getProducers" qname="operNS:getProducers" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getProducersReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:Producers" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
+      <operation name="hasModifyPermission" qname="operNS:hasModifyPermission" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:hasModifyPermissionReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:boolean" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
+        <parameter qname="pns:pid" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <fault name="NoSuchRODAObjectException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="BrowserException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="getRODAObjects" qname="operNS:getRODAObjects" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getRODAObjectsReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:RODAObject" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
+        <parameter qname="pns:contentAdapter" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:ContentAdapter" xmlns:tns="http://adapter.data.core.roda.dgarq.gov.pt"/>
+        <fault name="BrowserException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="getDescriptionObject" qname="operNS:getDescriptionObject" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getDescriptionObjectReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:DescriptionObject" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
+        <parameter qname="pns:pid" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <fault name="NoSuchRODAObjectException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="BrowserException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="getDOPreservationObjects" qname="operNS:getDOPreservationObjects" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getDOPreservationObjectsReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:RepresentationPreservationObject" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
         <parameter qname="pns:doPID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
-        <fault name="NoSuchRODAObjectException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-        <fault name="BrowserException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="NoSuchRODAObjectException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="BrowserException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
       </operation>
-      <parameter name="allowedMethods" value="getRODAObjectPermissions getSimpleDescriptionObjectCount getProducers getRODAObjectUserPermissions getDOOriginalRepresentation getSimpleEventPreservationObjects getDORepresentations getAgentPreservationObject getSimpleRepresentationObjects getSimpleRepresentationObject getDONormalizedRepresentation getSimpleRepresentationPreservationObjects getRODAObjects getSimpleRepresentationPreservationObject getDOPIDs getSimpleDescriptionObjectIndex getSimpleDescriptionObject getDescriptionObject hasGrantPermission getRODAObjectCount getDOAncestorPIDs getSimpleDescriptionObjects getRepresentationObject getSimpleEventPreservationObjectCount getSimpleRepresentationPreservationObjectCount getRODAObject getRepresentationPreservationObject getPreservationEvents getSimpleRepresentationObjectCount getDOPreservationObjects hasRemovePermission getEventPreservationObject getSimpleEventPreservationObject getRepresentationFile hasModifyPermission getROPreservationObject"/>
+      <operation name="getRODAObjectUserPermissions" qname="operNS:getRODAObjectUserPermissions" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getRODAObjectUserPermissionsReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:RODAObjectUserPermissions" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
+        <parameter qname="pns:pid" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <fault name="NoSuchRODAObjectException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="BrowserException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="getDOOriginalRepresentation" qname="operNS:getDOOriginalRepresentation" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getDOOriginalRepresentationReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:RepresentationObject" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
+        <parameter qname="pns:doPID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <fault name="NoSuchRODAObjectException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="BrowserException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="getDORepresentations" qname="operNS:getDORepresentations" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getDORepresentationsReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:RepresentationObject" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
+        <parameter qname="pns:doPID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <fault name="NoSuchRODAObjectException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="BrowserException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.BrowserException" type="tns:BrowserException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <parameter name="allowedMethods" value="getRODAObjectPermissions getSimpleDescriptionObjectCount getProducers getRODAObjectUserPermissions getDOOriginalRepresentation getSimpleEventPreservationObjects getDORepresentations getAgentPreservationObject getSimpleRepresentationObjects getSimpleRepresentationObject getDONormalizedRepresentation getSimpleRepresentationPreservationObjects getRODAObjects getSimpleRepresentationPreservationObject getDOPIDs getSimpleDescriptionObjectIndex getSimpleDescriptionObject getDescriptionObject hasGrantPermission getRODAObjectCount getSimpleDescriptionObjects getDOAncestorPIDs getRepresentationObject getSimpleEventPreservationObjectCount getSimpleRepresentationPreservationObjectCount getRODAObject getRepresentationPreservationObject getPreservationEvents getSimpleRepresentationObjectCount getDOPreservationObjects getEventPreservationObject getSimpleEventPreservationObject hasRemovePermission getRepresentationFile hasModifyPermission getROPreservationObject"/>
       <parameter name="scope" value="Application"/>
 
       <typeMapping
@@ -199,13 +199,6 @@
         type="java:pt.gov.dgarq.roda.core.data.adapter.sort.Sorter"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle=""
-      />
-      <arrayMapping
-        xmlns:ns="http://services.core.roda.dgarq.gov.pt"
-        qname="ns:ArrayOf_tns7_BioghistChronitem"
-        type="java:pt.gov.dgarq.roda.core.data.eadc.BioghistChronitem[]"
-        innerType="cmp-ns:BioghistChronitem" xmlns:cmp-ns="http://eadc.data.core.roda.dgarq.gov.pt"
         encodingStyle=""
       />
       <typeMapping
@@ -272,6 +265,20 @@
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""
       />
+      <arrayMapping
+        xmlns:ns="http://services.core.roda.dgarq.gov.pt"
+        qname="ns:ArrayOf_tns7_Fixity"
+        type="java:pt.gov.dgarq.roda.core.data.preservation.Fixity[]"
+        innerType="cmp-ns:Fixity" xmlns:cmp-ns="http://preservation.data.core.roda.dgarq.gov.pt"
+        encodingStyle=""
+      />
+      <arrayMapping
+        xmlns:ns="http://services.core.roda.dgarq.gov.pt"
+        qname="ns:ArrayOf_tns8_ArrangementTableRow"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.ArrangementTableRow[]"
+        innerType="cmp-ns:ArrangementTableRow" xmlns:cmp-ns="http://eadc.data.core.roda.dgarq.gov.pt"
+        encodingStyle=""
+      />
       <typeMapping
         xmlns:ns="http://eadc.data.core.roda.dgarq.gov.pt"
         qname="ns:BioghistChronitem"
@@ -304,11 +311,12 @@
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""
       />
-      <arrayMapping
-        xmlns:ns="http://services.core.roda.dgarq.gov.pt"
-        qname="ns:ArrayOf_tns7_ArrangementTableGroup"
-        type="java:pt.gov.dgarq.roda.core.data.eadc.ArrangementTableGroup[]"
-        innerType="cmp-ns:ArrangementTableGroup" xmlns:cmp-ns="http://eadc.data.core.roda.dgarq.gov.pt"
+      <typeMapping
+        xmlns:ns="http://data.core.roda.dgarq.gov.pt"
+        qname="ns:FileFormat"
+        type="java:pt.gov.dgarq.roda.core.data.FileFormat"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""
       />
       <typeMapping
@@ -380,6 +388,13 @@
         type="java:pt.gov.dgarq.roda.core.data.RepresentationObject"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <arrayMapping
+        xmlns:ns="http://services.core.roda.dgarq.gov.pt"
+        qname="ns:ArrayOf_tns8_BioghistChronitem"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.BioghistChronitem[]"
+        innerType="cmp-ns:BioghistChronitem" xmlns:cmp-ns="http://eadc.data.core.roda.dgarq.gov.pt"
         encodingStyle=""
       />
       <typeMapping
@@ -468,13 +483,6 @@
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""
       />
-      <arrayMapping
-        xmlns:ns="http://services.core.roda.dgarq.gov.pt"
-        qname="ns:ArrayOf_tns8_Fixity"
-        type="java:pt.gov.dgarq.roda.core.data.preservation.Fixity[]"
-        innerType="cmp-ns:Fixity" xmlns:cmp-ns="http://preservation.data.core.roda.dgarq.gov.pt"
-        encodingStyle=""
-      />
       <typeMapping
         xmlns:ns="http://data.core.roda.dgarq.gov.pt"
         qname="ns:SimpleEventPreservationObject"
@@ -499,13 +507,6 @@
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""
       />
-      <arrayMapping
-        xmlns:ns="http://services.core.roda.dgarq.gov.pt"
-        qname="ns:ArrayOf_tns7_ArrangementTableRow"
-        type="java:pt.gov.dgarq.roda.core.data.eadc.ArrangementTableRow[]"
-        innerType="cmp-ns:ArrangementTableRow" xmlns:cmp-ns="http://eadc.data.core.roda.dgarq.gov.pt"
-        encodingStyle=""
-      />
       <typeMapping
         xmlns:ns="http://eadc.data.core.roda.dgarq.gov.pt"
         qname="ns:ArrangementTableGroup"
@@ -527,6 +528,20 @@
         qname="ns:ArrayOf_tns3_FilterParameter"
         type="java:pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter[]"
         innerType="cmp-ns:FilterParameter" xmlns:cmp-ns="http://filter.adapter.data.core.roda.dgarq.gov.pt"
+        encodingStyle=""
+      />
+      <arrayMapping
+        xmlns:ns="http://services.core.roda.dgarq.gov.pt"
+        qname="ns:ArrayOf_tns7_RepresentationFilePreservationObject"
+        type="java:pt.gov.dgarq.roda.core.data.preservation.RepresentationFilePreservationObject[]"
+        innerType="cmp-ns:RepresentationFilePreservationObject" xmlns:cmp-ns="http://preservation.data.core.roda.dgarq.gov.pt"
+        encodingStyle=""
+      />
+      <arrayMapping
+        xmlns:ns="http://services.core.roda.dgarq.gov.pt"
+        qname="ns:ArrayOf_tns8_ArrangementTableGroup"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.ArrangementTableGroup[]"
+        innerType="cmp-ns:ArrangementTableGroup" xmlns:cmp-ns="http://eadc.data.core.roda.dgarq.gov.pt"
         encodingStyle=""
       />
       <typeMapping
@@ -591,13 +606,6 @@
         type="java:pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle=""
-      />
-      <arrayMapping
-        xmlns:ns="http://services.core.roda.dgarq.gov.pt"
-        qname="ns:ArrayOf_tns8_RepresentationFilePreservationObject"
-        type="java:pt.gov.dgarq.roda.core.data.preservation.RepresentationFilePreservationObject[]"
-        innerType="cmp-ns:RepresentationFilePreservationObject" xmlns:cmp-ns="http://preservation.data.core.roda.dgarq.gov.pt"
         encodingStyle=""
       />
       <typeMapping
