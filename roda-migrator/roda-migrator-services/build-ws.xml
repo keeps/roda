@@ -2,16 +2,25 @@
 <project basedir="." default="build" name="roda-migrator-compile">
 	<property environment="env" />
 
-	<property name="roda-migrator.location" value="${env.RODA_DEV}/roda-migrator" />
+	<property name="roda-migrator.location" value="${env.RODA_DEV}/roda-migrator/roda-migrator-services" />
 
 	<!-- AXIS properties -->
 	<!-- necessary to create services -->
 	<property name="target.server" value="localhost" />
 	<property name="target.port" value="8080" />
 	<property name="target.appname" value="roda-migrator" />
-	<property name="endpoint-stub.wsdd" value="${roda-migrator.location}/WebContent/WEB-INF/server-config.wsdd" />
+	<property name="endpoint-stub.wsdd" value="${roda-migrator.location}/src/main/webapp/WEB-INF/server-config.wsdd" />
 
   	<!-- Classpaths -->
+
+	<!-- 
+		WARNING! WARNING! WARNING! WARNING! WARNING! WARNING!  
+		
+		This ant script needs to be reviews due to changes in structure when the project was mavenized.
+
+		The ant script will be replaced by a Maven task when Axis is updated to a Maven compatible version.
+
+	-->
 
 	<path id="j2ee-container.classpath">
 		<fileset dir="${env.RODA_DEV}/shared-libs/servlet-api-2.4">
