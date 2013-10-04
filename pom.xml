@@ -104,7 +104,7 @@
         <maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
         <java_version>1.6</java_version>
         <gwt_version>2.4.0</gwt_version>
-        <jhove_version>1.10</jhove_version>
+        <jhove_version>1.11</jhove_version>
         <!-- THE PROPERTY THAT FOLLOWS IS NOT YET IN USE -->
         <fedora_version>3.6.2</fedora_version>
         <roda_community_url>http://roda-community.org</roda_community_url>
