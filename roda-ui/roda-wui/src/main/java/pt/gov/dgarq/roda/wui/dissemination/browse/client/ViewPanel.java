@@ -877,9 +877,13 @@ public class ViewPanel extends Composite {
                 createChild.setVisible(true);
                 // clone.setVisible(true);
                 move.setVisible(true);
-                remove.setVisible(removeObjectPermission
-                        && sdo.getSubElementsCount() == 0
-                        && sdo.getLevel().compareTo(DescriptionLevel.FILE) < 0);
+                // TODO make the option of hide remove button of File
+		// configurable
+		// remove.setVisible(removeObjectPermission
+		// && sdo.getSubElementsCount() == 0
+		// && sdo.getLevel().compareTo(DescriptionLevel.FILE) < 0);
+		remove.setVisible(removeObjectPermission
+				&& sdo.getSubElementsCount() == 0);
                 optionalFieldsToggle.setVisible(true);
             } else if (modifyGlobalPermission && modifyObjectPermission) {
                 if (!descriptiveMetadata.isReadonly()) {
