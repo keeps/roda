@@ -75,13 +75,12 @@ public class AIPDownloadDEMO extends HttpServlet {
 		File tempDir = TempDir.createUniqueTemporaryDirectory(name);
 		try {
 			RODAClient rodaClient = RodaClientFactory.getRodaClient(request.getSession());
-			getPremisAndRepresentations(pid, rodaClient, aipDir);
-			getEad(pid, request, response, rodaClient, aipDir);
+			getPremisAndRepresentations(pid, rodaClient, tempDir);
 			// Create ZIP output stream
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			ZipOutputStream zip = new ZipOutputStream(baos);
 			// Add all files to zip recursivelly
-			ZipUtility.addDirToArchive(zip, aipDir);
+			ZipUtility.addDirToArchive(zip, tempDir);
 			// Send zip stream to client
 			response.setContentType("application/zip");
 			response.setContentLength((int) baos.size());
@@ -104,8 +103,8 @@ public class AIPDownloadDEMO extends HttpServlet {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 		} finally {
 			// Remove temp dir
-			if ((aipDir != null) && (aipDir.exists())) {
-				FileUtils.deleteDirectory(aipDir);
+			if ((tempDir != null) && (tempDir.exists())) {
+				FileUtils.deleteDirectory(tempDir);
 			}
 		}
 
