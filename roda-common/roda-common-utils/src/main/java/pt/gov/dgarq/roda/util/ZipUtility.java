@@ -13,206 +13,221 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
 /**
  * @author Rui Castro
- * 
+ * @author Vladislav Korecký <vladislav_korecky@gordic.cz>
  */
 public class ZipUtility {
 
-	final private static Logger logger = Logger.getLogger(ZipUtility.class);
+    final private static Logger logger = Logger.getLogger(ZipUtility.class);
+    final private static int BUFFER_SIZE = 1024;
 
-	final private static int BUFFER_SIZE = 1024;
+    /**
+     * Extract files in zipFilename to outputDir.
+     *
+     * @param zipFilename the zip file to extract files from.
+     * @param outputDir the output directory to extract files to.
+     * @throws IOException if a input/output operation fails, like opening a
+     * file or reading/writing from/to a stream.
+     */
+    public static void extractZIPFiles(File zipFilename, File outputDir) throws IOException {
+        extractFilesFromZIP(zipFilename, outputDir);
+    }
 
-	/**
-	 * Extract files in zipFilename to outputDir.
-	 * 
-	 * @param zipFilename
-	 *            the zip file to extract files from.
-	 * @param outputDir
-	 *            the output directory to extract files to.
-	 * @throws IOException
-	 *             if a input/output operation fails, like opening a file or
-	 *             reading/writing from/to a stream.
-	 */
-	public static void extractZIPFiles(File zipFilename, File outputDir)
-			throws IOException {
-		extractFilesFromZIP(zipFilename, outputDir);
-	}
+    /**
+     * Extract files in zipFilename to outputDir.
+     *
+     * @param zipFilename the zip file to extract files from.
+     * @param outputDir the output directory to extract files to.
+     *
+     * @return a {@link List} of with all the extracted {@link File}s.
+     *
+     * @throws IOException if a input/output operation fails, like opening a
+     * file or reading/writing from/to a stream.
+     */
+    public static List<File> extractFilesFromZIP(File zipFilename, File outputDir) throws IOException {
+        ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(zipFilename));
+        // JarInputStream jarInputStream = new JarInputStream(new
+        // FileInputStream(
+        // zipFilename));
 
-	/**
-	 * Extract files in zipFilename to outputDir.
-	 * 
-	 * @param zipFilename
-	 *            the zip file to extract files from.
-	 * @param outputDir
-	 *            the output directory to extract files to.
-	 * 
-	 * @return a {@link List} of with all the extracted {@link File}s.
-	 * 
-	 * @throws IOException
-	 *             if a input/output operation fails, like opening a file or
-	 *             reading/writing from/to a stream.
-	 */
-	public static List<File> extractFilesFromZIP(File zipFilename,
-			File outputDir) throws IOException {
+        ZipEntry zipEntry = zipInputStream.getNextEntry();
+        // JarEntry jarEntry = jarInputStream.getNextJarEntry();
 
-		ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(
-				zipFilename));
-		// JarInputStream jarInputStream = new JarInputStream(new
-		// FileInputStream(
-		// zipFilename));
+        if (zipEntry == null) {
+            // if (jarEntry == null) {
+            // No entries in ZIP
 
-		ZipEntry zipEntry = zipInputStream.getNextEntry();
-		// JarEntry jarEntry = jarInputStream.getNextJarEntry();
+            zipInputStream.close();
+            // jarInputStream.close();
 
-		if (zipEntry == null) {
-			// if (jarEntry == null) {
-			// No entries in ZIP
+            throw new IOException("No files inside ZIP");
 
-			zipInputStream.close();
-			// jarInputStream.close();
+        } else {
 
-			throw new IOException("No files inside ZIP");
+            List<File> extractedFiles = new ArrayList<File>();
 
-		} else {
+            while (zipEntry != null) {
+                // while (jarEntry != null) {
 
-			List<File> extractedFiles = new ArrayList<File>();
+                // for each entry to be extracted
+                String entryName = zipEntry.getName();
+                // String entryName = jarEntry.getName();
 
-			while (zipEntry != null) {
-				// while (jarEntry != null) {
+                logger.debug("Extracting " + entryName);
 
-				// for each entry to be extracted
-				String entryName = zipEntry.getName();
-				// String entryName = jarEntry.getName();
+                File newFile = new File(outputDir, entryName);
 
-				logger.debug("Extracting " + entryName);
+                extractedFiles.add(new File(entryName));
 
-				File newFile = new File(outputDir, entryName);
+                if (zipEntry.isDirectory()) {
+                    // if (jarEntry.isDirectory()) {
 
-				extractedFiles.add(new File(entryName));
+                    newFile.mkdirs();
 
-				if (zipEntry.isDirectory()) {
-					// if (jarEntry.isDirectory()) {
+                } else {
 
-					newFile.mkdirs();
+                    if (newFile.getParentFile() != null
+                            && (!newFile.getParentFile().exists())) {
+                        newFile.getParentFile().mkdirs();
+                    }
 
-				} else {
+                    FileOutputStream newFileOutputStream = new FileOutputStream(
+                            newFile);
 
-					if (newFile.getParentFile() != null
-							&& (!newFile.getParentFile().exists())) {
-						newFile.getParentFile().mkdirs();
-					}
+                    // IOUtils.copy(zipInputStream, newFileOutputStream);
+                    // copyLarge returns a long instead of int
+                    IOUtils.copyLarge(zipInputStream, newFileOutputStream);
+                    // IOUtils.copyLarge(jarInputStream, newFileOutputStream);
 
-					FileOutputStream newFileOutputStream = new FileOutputStream(
-							newFile);
+                    // int n;
+                    // while ((n = zipInputStream.read(buf, 0, BUFFER_SIZE)) >
+                    // -1) {
+                    // newFileOutputStream.write(buf, 0, n);
+                    // }
 
-					// IOUtils.copy(zipInputStream, newFileOutputStream);
-					// copyLarge returns a long instead of int
-					IOUtils.copyLarge(zipInputStream, newFileOutputStream);
-					// IOUtils.copyLarge(jarInputStream, newFileOutputStream);
+                    newFileOutputStream.close();
+                    zipInputStream.closeEntry();
+                    // jarInputStream.closeEntry();
 
-					// int n;
-					// while ((n = zipInputStream.read(buf, 0, BUFFER_SIZE)) >
-					// -1) {
-					// newFileOutputStream.write(buf, 0, n);
-					// }
+                }
 
-					newFileOutputStream.close();
-					zipInputStream.closeEntry();
-					// jarInputStream.closeEntry();
+                zipEntry = zipInputStream.getNextEntry();
+                // jarEntry = jarInputStream.getNextJarEntry();
 
-				}
+            } // end while
 
-				zipEntry = zipInputStream.getNextEntry();
-				// jarEntry = jarInputStream.getNextJarEntry();
+            zipInputStream.close();
+            // jarInputStream.close();
 
-			} // end while
+            return extractedFiles;
+        }
 
-			zipInputStream.close();
-			// jarInputStream.close();
+    }
 
-			return extractedFiles;
-		}
+    /**
+     * Creates ZIP file with the files inside directory
+     * <code>contentsDir</code> .
+     *
+     * @param newZipFile the ZIP file to create
+     * @param contentsDir the directory containing the files to compress.
+     * @return the created ZIP file.
+     * @throws IOException if something goes wrong with creation of the ZIP file
+     * or the reading of the files to compress.
+     */
+    public static File createZIPFile(File newZipFile, File contentsDir)
+            throws IOException {
 
-	}
+        List<File> contentAbsoluteFiles = FileUtility
+                .listFilesRecursively(contentsDir);
 
-	/**
-	 * Creates ZIP file with the files inside directory <code>contentsDir</code>
-	 * .
-	 * 
-	 * @param newZipFile
-	 *            the ZIP file to create
-	 * @param contentsDir
-	 *            the directory containing the files to compress.
-	 * @return the created ZIP file.
-	 * @throws IOException
-	 *             if something goes wrong with creation of the ZIP file or the
-	 *             reading of the files to compress.
-	 */
-	public static File createZIPFile(File newZipFile, File contentsDir)
-			throws IOException {
+        JarOutputStream jarOutputStream = new JarOutputStream(
+                new BufferedOutputStream(new FileOutputStream(newZipFile)));
+        // ZipOutputStream zipOutputStream = new ZipOutputStream(
+        // new BufferedOutputStream(new FileOutputStream(newZipFile)));
 
-		List<File> contentAbsoluteFiles = FileUtility
-				.listFilesRecursively(contentsDir);
+        // Create a buffer for reading the files
+        byte[] buffer = new byte[BUFFER_SIZE];
 
-		JarOutputStream jarOutputStream = new JarOutputStream(
-				new BufferedOutputStream(new FileOutputStream(newZipFile)));
-		// ZipOutputStream zipOutputStream = new ZipOutputStream(
-		// new BufferedOutputStream(new FileOutputStream(newZipFile)));
+        Iterator<File> iterator = contentAbsoluteFiles.iterator();
+        while (iterator.hasNext()) {
+            File absoluteFile = iterator.next();
+            String relativeFile = getFilePathRelativeTo(absoluteFile,
+                    contentsDir);
 
-		// Create a buffer for reading the files
-		byte[] buffer = new byte[BUFFER_SIZE];
+            BufferedInputStream in = new BufferedInputStream(
+                    new FileInputStream(absoluteFile));
 
-		Iterator<File> iterator = contentAbsoluteFiles.iterator();
-		while (iterator.hasNext()) {
-			File absoluteFile = iterator.next();
-			String relativeFile = getFilePathRelativeTo(absoluteFile,
-					contentsDir);
+            // Add ZIP entry to output stream.
+            // zipOutputStream.putNextEntry(new
+            // ZipEntry(relativeFile.toString()));
+            jarOutputStream.putNextEntry(new JarEntry(relativeFile));
 
-			BufferedInputStream in = new BufferedInputStream(
-					new FileInputStream(absoluteFile));
+            logger.trace("Adding " + relativeFile);
 
-			// Add ZIP entry to output stream.
-			// zipOutputStream.putNextEntry(new
-			// ZipEntry(relativeFile.toString()));
-			jarOutputStream.putNextEntry(new JarEntry(relativeFile));
+            int length;
+            while ((length = in.read(buffer)) > 0) {
+                // zipOutputStream.write(buffer, 0, length);
+                jarOutputStream.write(buffer, 0, length);
+            }
 
-			logger.trace("Adding " + relativeFile);
+            // Complete the entry
+            // zipOutputStream.closeEntry();
+            jarOutputStream.closeEntry();
+            in.close();
+        }
 
-			int length;
-			while ((length = in.read(buffer)) > 0) {
-				// zipOutputStream.write(buffer, 0, length);
-				jarOutputStream.write(buffer, 0, length);
-			}
+        // Complete the ZIP file
+        // zipOutputStream.close();
+        jarOutputStream.close();
 
-			// Complete the entry
-			// zipOutputStream.closeEntry();
-			jarOutputStream.closeEntry();
-			in.close();
-		}
+        return newZipFile;
+    }
 
-		// Complete the ZIP file
-		// zipOutputStream.close();
-		jarOutputStream.close();
+    /**
+     * @param file the {@link File} to make relative
+     * @param relativeTo the {@link File} (or directory) that file should be
+     * made relative to.
+     * @return a {@link String} with the relative file path.
+     */
+    public static String getFilePathRelativeTo(File file, File relativeTo) {
+        return relativeTo.getAbsoluteFile().toURI().relativize(
+                file.getAbsoluteFile().toURI()).toString();
+    }
 
-		return newZipFile;
-	}
-
-	/**
-	 * @param file
-	 *            the {@link File} to make relative
-	 * @param relativeTo
-	 *            the {@link File} (or directory) that file should be made
-	 *            relative to.
-	 * @return a {@link String} with the relative file path.
-	 */
-	public static String getFilePathRelativeTo(File file, File relativeTo) {
-		return relativeTo.getAbsoluteFile().toURI().relativize(
-				file.getAbsoluteFile().toURI()).toString();
-	}
-
+    /**
+     * Adds file / folder to zip output stream. Method works recursively.
+     * @param zos
+     * @param srcFile 
+     */
+    public static void addDirToArchive(ZipOutputStream zos, File srcFile) {
+        File[] files = srcFile.listFiles();
+        for (int i = 0; i < files.length; i++) {
+            // if the file is directory, use recursion
+            if (files[i].isDirectory()) {
+                addDirToArchive(zos, files[i]);
+                continue;
+            }
+            try {
+                // create byte buffer
+                byte[] buffer = new byte[1024];
+                FileInputStream fis = new FileInputStream(files[i]);
+                zos.putNextEntry(new ZipEntry(files[i].getName()));
+                int length;
+                while ((length = fis.read(buffer)) > 0) {
+                    zos.write(buffer, 0, length);
+                }
+                zos.closeEntry();
+                // close the InputStream
+                fis.close();
+            } catch (IOException ioe) {
+                System.out.println("IOException :" + ioe);
+            }
+        }
+    }
 }

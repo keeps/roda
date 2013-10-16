@@ -12,8 +12,10 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import pt.gov.dgarq.roda.common.FormatUtility;
+import pt.gov.dgarq.roda.core.data.FileFormat;
 import pt.gov.dgarq.roda.core.data.RepresentationFile;
 import pt.gov.dgarq.roda.core.data.RepresentationObject;
 import pt.gov.dgarq.roda.migrator.stubs.SynchronousConverter;
@@ -225,14 +227,26 @@ public class MigratorClient {
                         + getMethod.getStatusLine());
 
             } else {
-
                 File outputFile = new File(directory, rFile.getId());
-                IOUtils.copyLarge(getMethod.getResponseBodyAsStream(),
-                        new FileOutputStream(outputFile));
+                IOUtils.copyLarge(getMethod.getResponseBodyAsStream(), new FileOutputStream(outputFile));
+
+                FileFormat fileFormat = new FileFormat();
+                if (StringUtils.isNotBlank(rFile.getPuid())) {
+                    // fileFormat is stored in rFile
+                    fileFormat.setExtensions(rFile.getExtensions());
+                    fileFormat.setFormatRegistryName(rFile.getFormatRegistryName());
+                    fileFormat.setName(rFile.getName());
+                    fileFormat.setMimetype(rFile.getMimetype());
+                    fileFormat.setPuid(rFile.getPuid());
+                    fileFormat.setVersion(rFile.getVersion());
+                } else {
+                    // Unknown file format lets detect it
+                    fileFormat = FormatUtility.getFileFormat(outputFile, outputFile.getName());
+                }
 
                 return new RepresentationFile(rFile.getId(), rFile
                         .getOriginalName(), outputFile
-                        .length(), outputFile.toURI().toURL().toExternalForm(), FormatUtility.getFileFormat(outputFile, outputFile.getName()));
+                        .length(), outputFile.toURI().toURL().toExternalForm(), fileFormat);
             }
 
         } catch (HttpException e) {
