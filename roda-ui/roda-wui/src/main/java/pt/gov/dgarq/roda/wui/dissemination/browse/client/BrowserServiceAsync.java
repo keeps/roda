@@ -187,7 +187,5 @@ public interface BrowserServiceAsync {
      * @throws RODAException
      */
     public void getPreservationTimeline(List<String> repPIDs,
-            List<String> icons, List<String> colors, String locale, AsyncCallback<TimelineInfo> callback);
-
-    public void getDOPIDs(AsyncCallback<String[]> callback);
+            List<String> icons, List<String> colors, String locale, AsyncCallback<TimelineInfo> callback);    
 }

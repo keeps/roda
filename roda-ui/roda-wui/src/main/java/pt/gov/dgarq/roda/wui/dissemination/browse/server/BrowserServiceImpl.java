@@ -590,15 +590,4 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements
     protected String escapeXML(String xml) {
         return StringEscapeUtils.escapeXml(xml);
     }
-
-    @Override
-    public String[] getDOPIDs() throws RODAException, BrowserException {
-        String[] pids = null;
-        try {
-            pids = RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession()).getBrowserService().getDOPIDs();
-        } catch (RemoteException ex) {
-            java.util.logging.Logger.getLogger(BrowserServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return pids;
-    }
 }

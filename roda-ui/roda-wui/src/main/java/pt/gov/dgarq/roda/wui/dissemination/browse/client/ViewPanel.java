@@ -46,14 +46,6 @@ import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.BrowseConstants;
 import config.i18n.client.BrowseMessages;
-import java.rmi.RemoteException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import pt.gov.dgarq.roda.core.common.BrowserException;
-import pt.gov.dgarq.roda.core.common.LoginException;
-import pt.gov.dgarq.roda.core.common.RODAClientException;
-import pt.gov.dgarq.roda.wui.main.client.DipDialog;
-import pt.gov.dgarq.roda.wui.main.client.LoginDialog;
 
 /**
  * @author Luis Faria
@@ -102,8 +94,6 @@ public class ViewPanel extends Composite {
     // private final WUIButton clone;
     private final WUIButton remove;
     private final WUIButton downloadEADC;
-    private final WUIButton downloadAIP;
-    private final WUIButton downloadDIP;
     private final WUIButton downloadPremis;
     private final WUIButton close;
     private final TabPanel tabs;
@@ -421,38 +411,6 @@ public class ViewPanel extends Composite {
             }
         });
 
-        downloadAIP = new WUIButton("AIP",
-                WUIButton.Left.ROUND, WUIButton.Right.ARROW_DOWN);
-
-        downloadAIP.addClickListener(new ClickListener() {
-            public void onClick(Widget sender) {
-                Window.open(GWT.getModuleBaseURL()
-                        + "AIPDownloadDEMO?pid=" + sdo.getPid(),
-                        "_blank", "");
-
-            }
-        });
-
-        downloadDIP = new WUIButton("DIP",
-                WUIButton.Left.ROUND, WUIButton.Right.ARROW_DOWN);
-
-        downloadDIP.addClickListener(new ClickListener() {
-            public void onClick(Widget sender) {
-                if ((sdo != null) && (sdo.getLevel().equals(DescriptionLevel.ITEM))) {
-                    Window.open(GWT.getModuleBaseURL()
-                            + "DIPDownloadDEMO?pids=" + sdo.getPid(),
-                            "_blank", "");
-                } else {
-                    try {
-                        DipDialog dipDialog = new DipDialog();
-                        dipDialog.show();
-                    } catch (Exception ex) {
-                        logger.error(null, ex);
-                    }
-                }
-            }
-        });
-
         downloadPremis = new WUIButton(constants.downloadPremis(),
                 WUIButton.Left.ROUND, WUIButton.Right.ARROW_DOWN);
 
@@ -482,8 +440,6 @@ public class ViewPanel extends Composite {
         bottomToolbar.add(move);
         bottomToolbar.add(remove);
         bottomToolbar.add(downloadEADC);
-        bottomToolbar.add(downloadAIP);
-        bottomToolbar.add(downloadDIP);
         bottomToolbar.add(downloadPremis);
         bottomToolbar.add(close);
 
@@ -507,8 +463,6 @@ public class ViewPanel extends Composite {
         move.addStyleName("viewPanel-action");
         remove.addStyleName("viewPanel-action");
         downloadEADC.addStyleName("viewPanel-action");
-        downloadAIP.addStyleName("viewPanel-action");
-        downloadDIP.addStyleName("viewPanel-action");
         downloadPremis.addStyleName("viewPanel-action");
         close.addStyleName("viewPanel-close");
         optionalFieldsToggle.addStyleName("viewPanel-optionalFieldsToggle");
@@ -817,8 +771,6 @@ public class ViewPanel extends Composite {
         move.setVisible(false);
         remove.setVisible(false);
         downloadEADC.setVisible(false);
-        downloadAIP.setVisible(false);
-        downloadDIP.setVisible(false);
         downloadPremis.setVisible(false);
         optionalFieldsToggle.setVisible(false);
 
@@ -837,10 +789,6 @@ public class ViewPanel extends Composite {
         // Description metadata tab selected
         if (selectedTab == descriptiveMetadataTabIndex) {
             downloadEADC.setVisible(true);
-            if ((sdo != null) && (sdo.getLevel().equals(DescriptionLevel.ITEM))) {
-                downloadAIP.setVisible(true);
-            }
-            downloadDIP.setVisible(true);
             if (modifyGlobalPermission && modifyObjectPermission && editmode) {
                 descriptiveMetadata.setReadonly(false);
                 edit.setVisible(false);
@@ -878,12 +826,12 @@ public class ViewPanel extends Composite {
                 // clone.setVisible(true);
                 move.setVisible(true);
                 // TODO make the option of hide remove button of File
-		// configurable
-		// remove.setVisible(removeObjectPermission
-		// && sdo.getSubElementsCount() == 0
-		// && sdo.getLevel().compareTo(DescriptionLevel.FILE) < 0);
-		remove.setVisible(removeObjectPermission
-				&& sdo.getSubElementsCount() == 0);
+                // configurable
+                // remove.setVisible(removeObjectPermission
+                // && sdo.getSubElementsCount() == 0
+                // && sdo.getLevel().compareTo(DescriptionLevel.FILE) < 0);
+                remove.setVisible(removeObjectPermission
+                        && sdo.getSubElementsCount() == 0);
                 optionalFieldsToggle.setVisible(true);
             } else if (modifyGlobalPermission && modifyObjectPermission) {
                 if (!descriptiveMetadata.isReadonly()) {

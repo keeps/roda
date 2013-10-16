@@ -225,13 +225,5 @@ public interface BrowserService extends RemoteService {
      */
     public TimelineInfo getPreservationTimeline(List<String> repPIDs,
             List<String> icons, List<String> colors, String locale)
-            throws RODAException;
-
-    /**
-     * Returns a list of all Description Object PIDs.
-     * @return
-     * @throws RODAException
-     * @throws BrowserException 
-     */
-    public String[] getDOPIDs() throws RODAException, BrowserException;
+            throws RODAException;    
 }

@@ -6,9 +6,11 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+
 import pt.gov.dgarq.roda.common.FormatUtility;
 import pt.gov.dgarq.roda.core.DownloaderException;
 import pt.gov.dgarq.roda.core.common.RODAServiceException;
@@ -26,12 +28,20 @@ import pt.gov.dgarq.roda.util.CommandException;
 import pt.gov.dgarq.roda.util.CommandUtility;
 import pt.gov.dgarq.roda.util.StringUtility;
 import pt.gov.dgarq.roda.util.TempDir;
+import pt.gov.dgarq.roda.util.XmlEncodeUtility;
 
 /**
- * Sound convert abstract class Uses package soundconvert.<br> <br>
- * <strong>Syntax:</strong> soundconverter -b -m audio/x-wav -s .wav F0<br> <br>
- * Possible formats: <ul> <li>audio/ogg</li> <li>audio/flac</li>
- * <li>audio/wav</li> <li>audio/mpeg</li> </ul>
+ * Sound convert abstract class Uses package soundconvert.<br>
+ * <br>
+ * <strong>Syntax:</strong> soundconverter -b -m audio/x-wav -s .wav F0<br>
+ * <br>
+ * Possible formats:
+ * <ul>
+ * <li>audio/ogg</li>
+ * <li>audio/flac</li>
+ * <li>audio/wav</li>
+ * <li>audio/mpeg</li>
+ * </ul>
  *
  * @author Luis Faria
  * @author Rui Castro
@@ -91,12 +101,29 @@ public abstract class SoundConverter extends AbstractSynchronousConverter {
 
             try {
 
-                File convertedFileWithExtension = new File(originalFile
-                        .getPath()
-                        + this.formatExtension);
+                File convertedFileWithExtension = new File(
+                        originalFile.getPath() + this.formatExtension);
+
+                logger.warn("Using soundconverter-fix script as a workarround for a soundconverter bug that causes soundconverter to fail when running without X");
+                String RODA_HOME = null;
+                if (System.getProperty("roda.home") != null) {
+                    RODA_HOME = System.getProperty("roda.home");//$NON-NLS-1$
+                } else if (System.getenv("RODA_HOME") != null) {
+                    RODA_HOME = System.getenv("RODA_HOME"); //$NON-NLS-1$
+                } else {
+                    RODA_HOME = null;
+                }
+
+                if (StringUtils.isBlank(RODA_HOME)) {
+                    throw new ConverterException(
+                            "RODA_HOME enviroment variable and ${roda.home} system property are not set.");
+                }
+
+                File soundconverter = new File(new File(RODA_HOME, "bin"),
+                        "soundconverter-fix");
 
                 List<String> commandArgs = new ArrayList<String>();
-                commandArgs.add("soundconverter");
+                commandArgs.add(soundconverter.getAbsolutePath());
                 commandArgs.add("-b");
                 commandArgs.add("-q");
                 commandArgs.add("-m");
@@ -118,8 +145,7 @@ public abstract class SoundConverter extends AbstractSynchronousConverter {
                             convertedFileWithExtension.getName(), commandline);
                 } else {
                     message = String
-                            .format(
-                            "%s: %s => %s (%s)%n(Command: %s)%n%n", //$NON-NLS-1$
+                            .format("%s: %s => %s (%s)%n(Command: %s)%n%n", //$NON-NLS-1$
                             localRepresentation.getRootFile().getId(),
                             localRepresentation.getRootFile()
                             .getOriginalName(),
@@ -130,15 +156,10 @@ public abstract class SoundConverter extends AbstractSynchronousConverter {
                 logger.trace(message);
                 report.append(message);
 
-                RepresentationFile convertedRootFile = convertedRepresentation
-                        .getRootFile();
-                convertedRootFile.importFileFormat(FormatUtility
-                        .getFileFormat(convertedFileWithExtension, convertedFileWithExtension.getName()));
-                convertedRootFile.setOriginalName(convertedRootFile
-                        .getOriginalName()
-                        + this.formatExtension);
+                RepresentationFile convertedRootFile = convertedRepresentation.getRootFile();
+                convertedRootFile.importFileFormat(FormatUtility.getFileFormat(convertedFileWithExtension, convertedFileWithExtension.getName()));
+                convertedRootFile.setOriginalName(convertedRootFile.getOriginalName() + this.formatExtension);
                 convertedRootFile.setSize(convertedFileWithExtension.length());
-
                 convertedRepresentation.setSubType(convertedRootFile.getMimetype());
 
                 FileUtils.moveFile(convertedFileWithExtension, convertedFile);
@@ -148,7 +169,10 @@ public abstract class SoundConverter extends AbstractSynchronousConverter {
                 EventPreservationObject eventPO = new EventPreservationObject();
                 eventPO.setOutcome("success");
                 eventPO.setOutcomeDetailNote("Converter details"); //$NON-NLS-1$
-                eventPO.setOutcomeDetailExtension(report.toString());
+                String escapedText = XmlEncodeUtility
+                        .escapeInvalidXmlChars(report.toString());
+                logger.debug("Escaped text:" + escapedText);
+                eventPO.setOutcomeDetailExtension(escapedText);
 
                 logger.info("Event is " + eventPO);
 
@@ -156,7 +180,8 @@ public abstract class SoundConverter extends AbstractSynchronousConverter {
                         getAgent());
 
             } catch (CommandException e) {
-                logger.debug("Exception executing convert command - "
+                logger.debug(
+                        "Exception executing convert command - "
                         + e.getMessage(), e);
                 throw new ConverterException(
                         "Exception executing convert command - "
@@ -164,13 +189,15 @@ public abstract class SoundConverter extends AbstractSynchronousConverter {
             }
 
         } catch (DownloaderException e) {
-            logger.debug("Exception downloading representation files - "
+            logger.debug(
+                    "Exception downloading representation files - "
                     + e.getMessage(), e);
             throw new ConverterException(
                     "Exception downloading representation files - "
                     + e.getMessage(), e);
         } catch (IOException e) {
-            logger.debug("Exception downloading representation files - "
+            logger.debug(
+                    "Exception downloading representation files - "
                     + e.getMessage(), e);
             throw new ConverterException(
                     "Exception downloading representation files - "
@@ -190,8 +217,9 @@ public abstract class SoundConverter extends AbstractSynchronousConverter {
             return version + soundconverterVersion;
 
         } catch (CommandException e) {
-            logger.warn("Exception getting OpenOffice version - "
-                    + e.getMessage(), e);
+            logger.warn(
+                    "Exception getting OpenOffice version - " + e.getMessage(),
+                    e);
             throw new ConverterException(
                     "Exception getting OpenOffice version - " + e.getMessage(),
                     e);
