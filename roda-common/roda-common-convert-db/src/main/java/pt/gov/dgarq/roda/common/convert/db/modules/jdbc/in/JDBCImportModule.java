@@ -20,7 +20,7 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.w3c.util.DateParser;
 
-import pt.gov.dgarq.roda.common.FileFormat;
+import pt.gov.dgarq.roda.core.data.FileFormat;
 import pt.gov.dgarq.roda.common.FormatUtility;
 import pt.gov.dgarq.roda.common.convert.db.model.data.BinaryCell;
 import pt.gov.dgarq.roda.common.convert.db.model.data.Cell;
@@ -50,7 +50,7 @@ import pt.gov.dgarq.roda.common.convert.db.modules.SQLHelper;
 
 /**
  * @author Luis Faria
- * 
+ * @author Vladislav Korecký <vladislav_korecky@gordic.cz> 
  */
 public class JDBCImportModule implements DatabaseImportModule {
 
@@ -479,7 +479,7 @@ public class JDBCImportModule implements DatabaseImportModule {
 			InputStream binaryStream = rawData.getBinaryStream(columnName);
 			FileItem fileItem = new FileItem(binaryStream);
 			FileFormat fileFormat = FormatUtility.getFileFormat(fileItem
-					.getFile());
+					.getFile(), fileItem.getFile().getName());
 			List<FileFormat> formats = new ArrayList<FileFormat>();
 			formats.add(fileFormat);
 			cell = new BinaryCell(id, fileItem, formats);

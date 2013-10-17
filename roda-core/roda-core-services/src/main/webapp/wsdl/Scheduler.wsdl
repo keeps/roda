@@ -74,6 +74,63 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
      </sequence>
     </complexType>
    </element>
+   <element name="getTaskInstance">
+    <complexType>
+     <sequence>
+      <element name="taskInstanceID" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="getTaskInstanceResponse">
+    <complexType>
+     <sequence>
+      <element name="getTaskInstanceReturn" type="tns1:TaskInstance"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="fault2" type="tns2:NoSuchTaskInstanceException"/>
+   <element name="getTaskInstanceCount">
+    <complexType>
+     <sequence>
+      <element name="filter" type="tns4:Filter"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="getTaskInstanceCountResponse">
+    <complexType>
+     <sequence>
+      <element name="getTaskInstanceCountReturn" type="xsd:int"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="getTaskInstances">
+    <complexType>
+     <sequence>
+      <element name="contentAdapter" type="tns3:ContentAdapter"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="getTaskInstancesResponse">
+    <complexType>
+     <sequence>
+      <element maxOccurs="unbounded" name="getTaskInstancesReturn" type="tns1:TaskInstance"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="resumeTask">
+    <complexType>
+     <sequence>
+      <element name="taskName" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="resumeTaskResponse">
+    <complexType>
+     <sequence>
+      <element name="resumeTaskReturn" type="tns1:Task"/>
+     </sequence>
+    </complexType>
+   </element>
    <element name="getTaskCount">
     <complexType>
      <sequence>
@@ -123,63 +180,6 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
     <complexType>
      <sequence>
       <element name="pauseTaskReturn" type="tns1:Task"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="resumeTask">
-    <complexType>
-     <sequence>
-      <element name="taskName" type="xsd:string"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="resumeTaskResponse">
-    <complexType>
-     <sequence>
-      <element name="resumeTaskReturn" type="tns1:Task"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="getTaskInstance">
-    <complexType>
-     <sequence>
-      <element name="taskInstanceID" type="xsd:string"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="getTaskInstanceResponse">
-    <complexType>
-     <sequence>
-      <element name="getTaskInstanceReturn" type="tns1:TaskInstance"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="fault2" type="tns2:NoSuchTaskInstanceException"/>
-   <element name="getTaskInstances">
-    <complexType>
-     <sequence>
-      <element name="contentAdapter" type="tns3:ContentAdapter"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="getTaskInstancesResponse">
-    <complexType>
-     <sequence>
-      <element maxOccurs="unbounded" name="getTaskInstancesReturn" type="tns1:TaskInstance"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="getTaskInstanceCount">
-    <complexType>
-     <sequence>
-      <element name="filter" type="tns4:Filter"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="getTaskInstanceCountResponse">
-    <complexType>
-     <sequence>
-      <element name="getTaskInstanceCountReturn" type="xsd:int"/>
      </sequence>
     </complexType>
    </element>
@@ -405,9 +405,21 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
   </schema>
  </wsdl:types>
 
+   <wsdl:message name="getTaskInstanceResponse">
+
+      <wsdl:part element="impl:getTaskInstanceResponse" name="parameters"/>
+
+   </wsdl:message>
+
    <wsdl:message name="removeTaskResponse">
 
       <wsdl:part element="impl:removeTaskResponse" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getTaskInstanceCountResponse">
+
+      <wsdl:part element="impl:getTaskInstanceCountResponse" name="parameters"/>
 
    </wsdl:message>
 
@@ -441,6 +453,24 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
    </wsdl:message>
 
+   <wsdl:message name="getTasksRequest">
+
+      <wsdl:part element="impl:getTasks" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getTasksResponse">
+
+      <wsdl:part element="impl:getTasksResponse" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="removeTaskRequest">
+
+      <wsdl:part element="impl:removeTask" name="parameters"/>
+
+   </wsdl:message>
+
    <wsdl:message name="NoSuchTaskInstanceException">
 
       <wsdl:part element="impl:fault2" name="fault"/>
@@ -471,60 +501,6 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
    </wsdl:message>
 
-   <wsdl:message name="getTaskInstanceRequest">
-
-      <wsdl:part element="impl:getTaskInstance" name="parameters"/>
-
-   </wsdl:message>
-
-   <wsdl:message name="addTaskRequest">
-
-      <wsdl:part element="impl:addTask" name="parameters"/>
-
-   </wsdl:message>
-
-   <wsdl:message name="modifyTaskRequest">
-
-      <wsdl:part element="impl:modifyTask" name="parameters"/>
-
-   </wsdl:message>
-
-   <wsdl:message name="getTaskResponse">
-
-      <wsdl:part element="impl:getTaskResponse" name="parameters"/>
-
-   </wsdl:message>
-
-   <wsdl:message name="getTaskInstanceResponse">
-
-      <wsdl:part element="impl:getTaskInstanceResponse" name="parameters"/>
-
-   </wsdl:message>
-
-   <wsdl:message name="getTaskInstanceCountResponse">
-
-      <wsdl:part element="impl:getTaskInstanceCountResponse" name="parameters"/>
-
-   </wsdl:message>
-
-   <wsdl:message name="getTasksRequest">
-
-      <wsdl:part element="impl:getTasks" name="parameters"/>
-
-   </wsdl:message>
-
-   <wsdl:message name="getTasksResponse">
-
-      <wsdl:part element="impl:getTasksResponse" name="parameters"/>
-
-   </wsdl:message>
-
-   <wsdl:message name="removeTaskRequest">
-
-      <wsdl:part element="impl:removeTask" name="parameters"/>
-
-   </wsdl:message>
-
    <wsdl:message name="NoSuchTaskException">
 
       <wsdl:part element="impl:fault" name="fault"/>
@@ -543,15 +519,39 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
    </wsdl:message>
 
+   <wsdl:message name="getTaskInstanceRequest">
+
+      <wsdl:part element="impl:getTaskInstance" name="parameters"/>
+
+   </wsdl:message>
+
    <wsdl:message name="getTaskInstancesRequest">
 
       <wsdl:part element="impl:getTaskInstances" name="parameters"/>
 
    </wsdl:message>
 
+   <wsdl:message name="addTaskRequest">
+
+      <wsdl:part element="impl:addTask" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="modifyTaskRequest">
+
+      <wsdl:part element="impl:modifyTask" name="parameters"/>
+
+   </wsdl:message>
+
    <wsdl:message name="getTaskCountRequest">
 
       <wsdl:part element="impl:getTaskCount" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getTaskResponse">
+
+      <wsdl:part element="impl:getTaskResponse" name="parameters"/>
 
    </wsdl:message>
 
@@ -586,6 +586,50 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
          <wsdl:output message="impl:getTasksResponse" name="getTasksResponse"/>
 
          <wsdl:fault message="impl:SchedulerException" name="SchedulerException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getTaskInstance">
+
+         <wsdl:input message="impl:getTaskInstanceRequest" name="getTaskInstanceRequest"/>
+
+         <wsdl:output message="impl:getTaskInstanceResponse" name="getTaskInstanceResponse"/>
+
+         <wsdl:fault message="impl:SchedulerException" name="SchedulerException"/>
+
+         <wsdl:fault message="impl:NoSuchTaskInstanceException" name="NoSuchTaskInstanceException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getTaskInstanceCount">
+
+         <wsdl:input message="impl:getTaskInstanceCountRequest" name="getTaskInstanceCountRequest"/>
+
+         <wsdl:output message="impl:getTaskInstanceCountResponse" name="getTaskInstanceCountResponse"/>
+
+         <wsdl:fault message="impl:SchedulerException" name="SchedulerException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getTaskInstances">
+
+         <wsdl:input message="impl:getTaskInstancesRequest" name="getTaskInstancesRequest"/>
+
+         <wsdl:output message="impl:getTaskInstancesResponse" name="getTaskInstancesResponse"/>
+
+         <wsdl:fault message="impl:SchedulerException" name="SchedulerException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="resumeTask">
+
+         <wsdl:input message="impl:resumeTaskRequest" name="resumeTaskRequest"/>
+
+         <wsdl:output message="impl:resumeTaskResponse" name="resumeTaskResponse"/>
+
+         <wsdl:fault message="impl:SchedulerException" name="SchedulerException"/>
+
+         <wsdl:fault message="impl:NoSuchTaskException" name="NoSuchTaskException"/>
 
       </wsdl:operation>
 
@@ -632,50 +676,6 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
          <wsdl:fault message="impl:SchedulerException" name="SchedulerException"/>
 
          <wsdl:fault message="impl:NoSuchTaskException" name="NoSuchTaskException"/>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="resumeTask">
-
-         <wsdl:input message="impl:resumeTaskRequest" name="resumeTaskRequest"/>
-
-         <wsdl:output message="impl:resumeTaskResponse" name="resumeTaskResponse"/>
-
-         <wsdl:fault message="impl:SchedulerException" name="SchedulerException"/>
-
-         <wsdl:fault message="impl:NoSuchTaskException" name="NoSuchTaskException"/>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="getTaskInstance">
-
-         <wsdl:input message="impl:getTaskInstanceRequest" name="getTaskInstanceRequest"/>
-
-         <wsdl:output message="impl:getTaskInstanceResponse" name="getTaskInstanceResponse"/>
-
-         <wsdl:fault message="impl:SchedulerException" name="SchedulerException"/>
-
-         <wsdl:fault message="impl:NoSuchTaskInstanceException" name="NoSuchTaskInstanceException"/>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="getTaskInstances">
-
-         <wsdl:input message="impl:getTaskInstancesRequest" name="getTaskInstancesRequest"/>
-
-         <wsdl:output message="impl:getTaskInstancesResponse" name="getTaskInstancesResponse"/>
-
-         <wsdl:fault message="impl:SchedulerException" name="SchedulerException"/>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="getTaskInstanceCount">
-
-         <wsdl:input message="impl:getTaskInstanceCountRequest" name="getTaskInstanceCountRequest"/>
-
-         <wsdl:output message="impl:getTaskInstanceCountResponse" name="getTaskInstanceCountResponse"/>
-
-         <wsdl:fault message="impl:SchedulerException" name="SchedulerException"/>
 
       </wsdl:operation>
 
@@ -758,6 +758,114 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
          <wsdl:fault name="SchedulerException">
 
             <wsdlsoap:fault name="SchedulerException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getTaskInstance">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getTaskInstanceRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getTaskInstanceResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="SchedulerException">
+
+            <wsdlsoap:fault name="SchedulerException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="NoSuchTaskInstanceException">
+
+            <wsdlsoap:fault name="NoSuchTaskInstanceException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getTaskInstanceCount">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getTaskInstanceCountRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getTaskInstanceCountResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="SchedulerException">
+
+            <wsdlsoap:fault name="SchedulerException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getTaskInstances">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getTaskInstancesRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getTaskInstancesResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="SchedulerException">
+
+            <wsdlsoap:fault name="SchedulerException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="resumeTask">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="resumeTaskRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="resumeTaskResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="SchedulerException">
+
+            <wsdlsoap:fault name="SchedulerException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="NoSuchTaskException">
+
+            <wsdlsoap:fault name="NoSuchTaskException" use="literal"/>
 
          </wsdl:fault>
 
@@ -872,114 +980,6 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
          <wsdl:fault name="NoSuchTaskException">
 
             <wsdlsoap:fault name="NoSuchTaskException" use="literal"/>
-
-         </wsdl:fault>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="resumeTask">
-
-         <wsdlsoap:operation soapAction=""/>
-
-         <wsdl:input name="resumeTaskRequest">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:input>
-
-         <wsdl:output name="resumeTaskResponse">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:output>
-
-         <wsdl:fault name="SchedulerException">
-
-            <wsdlsoap:fault name="SchedulerException" use="literal"/>
-
-         </wsdl:fault>
-
-         <wsdl:fault name="NoSuchTaskException">
-
-            <wsdlsoap:fault name="NoSuchTaskException" use="literal"/>
-
-         </wsdl:fault>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="getTaskInstance">
-
-         <wsdlsoap:operation soapAction=""/>
-
-         <wsdl:input name="getTaskInstanceRequest">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:input>
-
-         <wsdl:output name="getTaskInstanceResponse">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:output>
-
-         <wsdl:fault name="SchedulerException">
-
-            <wsdlsoap:fault name="SchedulerException" use="literal"/>
-
-         </wsdl:fault>
-
-         <wsdl:fault name="NoSuchTaskInstanceException">
-
-            <wsdlsoap:fault name="NoSuchTaskInstanceException" use="literal"/>
-
-         </wsdl:fault>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="getTaskInstances">
-
-         <wsdlsoap:operation soapAction=""/>
-
-         <wsdl:input name="getTaskInstancesRequest">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:input>
-
-         <wsdl:output name="getTaskInstancesResponse">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:output>
-
-         <wsdl:fault name="SchedulerException">
-
-            <wsdlsoap:fault name="SchedulerException" use="literal"/>
-
-         </wsdl:fault>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="getTaskInstanceCount">
-
-         <wsdlsoap:operation soapAction=""/>
-
-         <wsdl:input name="getTaskInstanceCountRequest">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:input>
-
-         <wsdl:output name="getTaskInstanceCountResponse">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:output>
-
-         <wsdl:fault name="SchedulerException">
-
-            <wsdlsoap:fault name="SchedulerException" use="literal"/>
 
          </wsdl:fault>
 

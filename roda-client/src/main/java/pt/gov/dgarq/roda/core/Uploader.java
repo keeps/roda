@@ -8,7 +8,6 @@ import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpStatus;
@@ -21,209 +20,196 @@ import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-
 import pt.gov.dgarq.roda.core.data.RepresentationFile;
 import pt.gov.dgarq.roda.core.data.RepresentationObject;
 
 /**
  * @author Rui Castro
+ * @author Vladislav Korecký <vladislav_korecky@gordic.cz>
  */
 public class Uploader {
 
-	static final private Logger logger = Logger.getLogger(Uploader.class);
+    static final private Logger logger = Logger.getLogger(Uploader.class);
+    private static final String fileUploadLocation = "/roda-core/FileUpload";
+    private URL serviceHost = null;
+    private String username = null;
+    private String password = null;
+    private URL fileUploadURL = null;
 
-	private static final String fileUploadLocation = "/roda-core/FileUpload";
+    /**
+     * Constructs a new authenticated {@link Uploader} for RODA file upload
+     * service.
+     *
+     * @param servicesHost the {@link URL} to the host that hosts the RODA
+     * services.
+     * @param username the username to use in the connection to the service
+     * @param password the password to use in the connection to the service
+     *
+     * @throws MalformedURLException
+     */
+    public Uploader(URL servicesHost, String username, String password)
+            throws MalformedURLException {
 
-	private URL serviceHost = null;
+        this.serviceHost = servicesHost;
+        this.username = username;
+        this.password = password;
 
-	private String username = null;
-	private String password = null;
+        this.fileUploadURL = new URL(this.serviceHost, fileUploadLocation);
+    }
 
-	private URL fileUploadURL = null;
+    /**
+     * Upload a {@link RepresentationObject}'s {@link File}.
+     *
+     * @param roPID the PID of the {@link RepresentationObject} to which this
+     * file belongs.
+     * @param fileID the file ID.
+     * @param file the {@link File} to upload.
+     *
+     * @throws FileNotFoundException if the specified {@link File} cannot be
+     * found.
+     * @throws UploadException if something goes wrong with the upload.
+     */
+    public void uploadRepresentationFile(String roPID, String fileID, File file)
+            throws UploadException, FileNotFoundException {
 
-	/**
-	 * Constructs a new authenticated {@link Uploader} for RODA file upload
-	 * service.
-	 * 
-	 * @param servicesHost
-	 *            the {@link URL} to the host that hosts the RODA services.
-	 * @param username
-	 *            the username to use in the connection to the service
-	 * @param password
-	 *            the password to use in the connection to the service
-	 * 
-	 * @throws MalformedURLException
-	 */
-	public Uploader(URL servicesHost, String username, String password)
-			throws MalformedURLException {
+        logger.debug("uploadURL: " + this.fileUploadURL.toString());
 
-		this.serviceHost = servicesHost;
-		this.username = username;
-		this.password = password;
+        PostMethod postMethod = new PostMethod(this.fileUploadURL.toString());
+        // postMethod.setFollowRedirects(true);
 
-		this.fileUploadURL = new URL(this.serviceHost, fileUploadLocation);
-	}
+        Part[] parts = {new StringPart("pid", roPID),
+            new StringPart("id", fileID), new FilePart("file", file)};
 
-	/**
-	 * Upload a {@link RepresentationObject}'s {@link File}.
-	 * 
-	 * @param roPID
-	 *            the PID of the {@link RepresentationObject} to which this file
-	 *            belongs.
-	 * @param fileID
-	 *            the file ID.
-	 * @param file
-	 *            the {@link File} to upload.
-	 * 
-	 * @throws FileNotFoundException
-	 *             if the specified {@link File} cannot be found.
-	 * @throws UploadException
-	 *             if something goes wrong with the upload.
-	 */
-	public void uploadRepresentationFile(String roPID, String fileID, File file)
-			throws UploadException, FileNotFoundException {
+        postMethod.setRequestEntity(new MultipartRequestEntity(parts,
+                postMethod.getParams()));
 
-		logger.debug("uploadURL: " + this.fileUploadURL.toString());
+        HttpClient client = new HttpClient();
 
-		PostMethod postMethod = new PostMethod(this.fileUploadURL.toString());
-		// postMethod.setFollowRedirects(true);
+        client.getState().setCredentials(
+                new AuthScope(this.fileUploadURL.getHost(), this.fileUploadURL
+                .getPort()),
+                new UsernamePasswordCredentials(this.username, this.password));
 
-		Part[] parts = { new StringPart("pid", roPID),
-				new StringPart("id", fileID), new FilePart("file", file) };
+        try {
 
-		postMethod.setRequestEntity(new MultipartRequestEntity(parts,
-				postMethod.getParams()));
+            int status = client.executeMethod(postMethod);
 
-		HttpClient client = new HttpClient();
+            logger.debug("Response Status: " + status + " - "
+                    + HttpStatus.getStatusText(status));
 
-		client.getState().setCredentials(
-				new AuthScope(this.fileUploadURL.getHost(), this.fileUploadURL
-						.getPort()),
-				new UsernamePasswordCredentials(this.username, this.password));
+            if (status == HttpStatus.SC_OK || status == HttpStatus.SC_CREATED) {
+                logger.info("Upload Successful. OK");
+            } else {
+                logger.error("Upload error: "
+                        + HttpStatus.getStatusText(status) + " FAILED");
+                throw new UploadException("Error uploading file: "
+                        + HttpStatus.getStatusText(status));
+            }
+            String uploadResponse = postMethod.getResponseBodyAsString().trim();
 
-		try {
+            logger.debug("Upload response: " + uploadResponse);
 
-			int status = client.executeMethod(postMethod);
+            // return uploadedFileURL;
 
-			logger.debug("Response Status: " + status + " - "
-					+ HttpStatus.getStatusText(status));
+        } catch (HttpException e) {
+            throw new UploadException(e.getMessage(), e);
+        } catch (IOException e) {
+            throw new UploadException(e.getMessage(), e);
+        }
 
-			if (status == HttpStatus.SC_OK || status == HttpStatus.SC_CREATED) {
-				logger.info("Upload Successful. OK");
-			} else {
-				logger.error("Upload error: "
-						+ HttpStatus.getStatusText(status) + " FAILED");
-				throw new UploadException("Error uploading file: "
-						+ HttpStatus.getStatusText(status));
-			}
-			String uploadResponse = postMethod.getResponseBodyAsString().trim();
+    }
 
-			logger.debug("Upload response: " + uploadResponse);
+    /**
+     * Upload a {@link RepresentationObject}'s {@link RepresentationFile}.
+     *
+     * @param roPID the PID of the {@link RepresentationObject} to which this
+     * file belongs.
+     * @param rFile the {@link RepresentationFile} to upload.
+     *
+     * @throws FileNotFoundException if the specified {@link File} cannot be
+     * found.
+     * @throws UploadException if something goes wrong with the upload.
+     */
+    public void uploadRepresentationFile(String roPID, RepresentationFile rFile)
+            throws UploadException, FileNotFoundException {
 
-			// return uploadedFileURL;
+        logger.debug("uploadURL: " + this.fileUploadURL.toString());
 
-		} catch (HttpException e) {
-			throw new UploadException(e.getMessage(), e);
-		} catch (IOException e) {
-			throw new UploadException(e.getMessage(), e);
-		}
+        PostMethod postMethod = new PostMethod(this.fileUploadURL.toString());
+        // postMethod.setFollowRedirects(true);
 
-	}
+        logger
+                .trace("Representation file accessURL is "
+                + rFile.getAccessURL());
+        File fileToUpload = new File(URI.create(rFile.getAccessURL()));
+        logger.trace("Representation file is " + fileToUpload);
 
-	/**
-	 * Upload a {@link RepresentationObject}'s {@link RepresentationFile}.
-	 * 
-	 * @param roPID
-	 *            the PID of the {@link RepresentationObject} to which this file
-	 *            belongs.
-	 * @param rFile
-	 *            the {@link RepresentationFile} to upload.
-	 * 
-	 * @throws FileNotFoundException
-	 *             if the specified {@link File} cannot be found.
-	 * @throws UploadException
-	 *             if something goes wrong with the upload.
-	 */
-	public void uploadRepresentationFile(String roPID, RepresentationFile rFile)
-			throws UploadException, FileNotFoundException {
+        long fileSize = fileToUpload.length();
 
-		logger.debug("uploadURL: " + this.fileUploadURL.toString());
+        if (rFile.getSize() != fileSize) {
+            logger
+                    .warn("File size information in RepresentationFile differs from the real file size.");
+            logger.warn("Using the real file size; " + fileSize + " bytes");
+        }
 
-		PostMethod postMethod = new PostMethod(this.fileUploadURL.toString());
-		// postMethod.setFollowRedirects(true);
+        String mimeType = rFile.getMimetype();
+        Part[] parts = {new StringPart("pid", roPID),
+            new StringPart("id", rFile.getId()),
+            new StringPart("name", rFile.getOriginalName(), "UTF-8"),
+            new StringPart("mimetype", mimeType),
+            new StringPart("size", Long.toString(fileToUpload.length())),
+            new FilePart("file", fileToUpload)};
 
-		logger
-				.trace("Representation file accessURL is "
-						+ rFile.getAccessURL());
-		File fileToUpload = new File(URI.create(rFile.getAccessURL()));
-		logger.trace("Representation file is " + fileToUpload);
+        logger.debug("Upload pid: " + roPID);
+        logger.debug("Upload id: " + rFile.getId());
+        logger.debug("Upload name: " + rFile.getOriginalName());
+        logger.debug("Upload mimetype: " + mimeType);
+        logger.debug("Upload size: " + Long.toString(fileToUpload.length()));
+        logger.debug("Upload file: " + fileToUpload);
 
-		long fileSize = fileToUpload.length();
+        postMethod.setRequestEntity(new MultipartRequestEntity(parts,
+                postMethod.getParams()));
 
-		if (rFile.getSize() != fileSize) {
-			logger
-					.warn("File size information in RepresentationFile differs from the real file size.");
-			logger.warn("Using the real file size; " + fileSize + " bytes");
-		}
+        HttpClient client = new HttpClient();
 
-		Part[] parts = { new StringPart("pid", roPID),
-				new StringPart("id", rFile.getId()),
-				new StringPart("name", rFile.getOriginalName(), "UTF-8"),
-				new StringPart("mimetype", rFile.getMimetype()),
-				new StringPart("size", Long.toString(fileToUpload.length())),
-				new FilePart("file", fileToUpload) };
+        client.getState().setCredentials(
+                new AuthScope(this.fileUploadURL.getHost(), this.fileUploadURL
+                .getPort()),
+                new UsernamePasswordCredentials(this.username, this.password));
 
-		logger.debug("Upload pid: " + roPID);
-		logger.debug("Upload id: " + rFile.getId());
-		logger.debug("Upload name: " + rFile.getOriginalName());
-		logger.debug("Upload mimetype: " + rFile.getMimetype());
-		logger.debug("Upload size: " + Long.toString(fileToUpload.length()));
-		logger.debug("Upload file: " + fileToUpload);
+        try {
 
-		postMethod.setRequestEntity(new MultipartRequestEntity(parts,
-				postMethod.getParams()));
+            int status = client.executeMethod(postMethod);
 
-		HttpClient client = new HttpClient();
+            logger.debug("Response Status: " + status + " - "
+                    + HttpStatus.getStatusText(status));
 
-		client.getState().setCredentials(
-				new AuthScope(this.fileUploadURL.getHost(), this.fileUploadURL
-						.getPort()),
-				new UsernamePasswordCredentials(this.username, this.password));
+            if (status == HttpStatus.SC_OK || status == HttpStatus.SC_CREATED) {
+                logger.info("Upload Successful. OK");
+            } else {
+                logger.error("Upload error: "
+                        + HttpStatus.getStatusText(status) + " FAILED");
+                throw new UploadException("Error uploading file: "
+                        + HttpStatus.getStatusText(status));
+            }
 
-		try {
+            InputStream responseInputStream = postMethod
+                    .getResponseBodyAsStream();
 
-			int status = client.executeMethod(postMethod);
+            StringWriter stringWriter = new StringWriter();
+            IOUtils.copy(responseInputStream, stringWriter);
 
-			logger.debug("Response Status: " + status + " - "
-					+ HttpStatus.getStatusText(status));
+            String uploadResponse = stringWriter.toString();
 
-			if (status == HttpStatus.SC_OK || status == HttpStatus.SC_CREATED) {
-				logger.info("Upload Successful. OK");
-			} else {
-				logger.error("Upload error: "
-						+ HttpStatus.getStatusText(status) + " FAILED");
-				throw new UploadException("Error uploading file: "
-						+ HttpStatus.getStatusText(status));
-			}
+            stringWriter.close();
 
-			InputStream responseInputStream = postMethod
-					.getResponseBodyAsStream();
+            logger.debug("Upload response: " + uploadResponse);
 
-			StringWriter stringWriter = new StringWriter();
-			IOUtils.copy(responseInputStream, stringWriter);
+        } catch (HttpException e) {
+            throw new UploadException(e.getMessage(), e);
+        } catch (IOException e) {
+            throw new UploadException(e.getMessage(), e);
+        }
 
-			String uploadResponse = stringWriter.toString();
-
-			stringWriter.close();
-
-			logger.debug("Upload response: " + uploadResponse);
-
-		} catch (HttpException e) {
-			throw new UploadException(e.getMessage(), e);
-		} catch (IOException e) {
-			throw new UploadException(e.getMessage(), e);
-		}
-
-	}
-
+    }
 }

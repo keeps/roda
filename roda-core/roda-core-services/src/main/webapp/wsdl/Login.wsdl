@@ -28,16 +28,6 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
     </sequence>
    </complexType>
    <element name="fault" type="tns2:LoginException"/>
-   <element name="getGuestUser">
-    <complexType/>
-   </element>
-   <element name="getGuestUserResponse">
-    <complexType>
-     <sequence>
-      <element name="getGuestUserReturn" type="tns1:User"/>
-     </sequence>
-    </complexType>
-   </element>
    <element name="getGuestCredentials">
     <complexType/>
    </element>
@@ -45,6 +35,16 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
     <complexType>
      <sequence>
       <element maxOccurs="unbounded" name="getGuestCredentialsReturn" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="getGuestUser">
+    <complexType/>
+   </element>
+   <element name="getGuestUserResponse">
+    <complexType>
+     <sequence>
+      <element name="getGuestUserReturn" type="tns1:User"/>
      </sequence>
     </complexType>
    </element>
@@ -237,6 +237,14 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
       </wsdl:operation>
 
+      <wsdl:operation name="getGuestCredentials">
+
+         <wsdl:input message="impl:getGuestCredentialsRequest" name="getGuestCredentialsRequest"/>
+
+         <wsdl:output message="impl:getGuestCredentialsResponse" name="getGuestCredentialsResponse"/>
+
+      </wsdl:operation>
+
       <wsdl:operation name="getGuestUser">
 
          <wsdl:input message="impl:getGuestUserRequest" name="getGuestUserRequest"/>
@@ -244,14 +252,6 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
          <wsdl:output message="impl:getGuestUserResponse" name="getGuestUserResponse"/>
 
          <wsdl:fault message="impl:LoginException" name="LoginException"/>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="getGuestCredentials">
-
-         <wsdl:input message="impl:getGuestCredentialsRequest" name="getGuestCredentialsRequest"/>
-
-         <wsdl:output message="impl:getGuestCredentialsResponse" name="getGuestCredentialsResponse"/>
 
       </wsdl:operation>
 
@@ -285,6 +285,24 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
       </wsdl:operation>
 
+      <wsdl:operation name="getGuestCredentials">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getGuestCredentialsRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getGuestCredentialsResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
       <wsdl:operation name="getGuestUser">
 
          <wsdlsoap:operation soapAction=""/>
@@ -306,24 +324,6 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
             <wsdlsoap:fault name="LoginException" use="literal"/>
 
          </wsdl:fault>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="getGuestCredentials">
-
-         <wsdlsoap:operation soapAction=""/>
-
-         <wsdl:input name="getGuestCredentialsRequest">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:input>
-
-         <wsdl:output name="getGuestCredentialsResponse">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:output>
 
       </wsdl:operation>
 

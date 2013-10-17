@@ -42,8 +42,8 @@
 			<artifactId>roda-client</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.artofsolving</groupId>
-			<artifactId>jodconverter</artifactId>
+			<groupId>org.artofsolving.jodconverter</groupId>
+			<artifactId>jodconverter-core</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>pt.gov.dgarq.roda</groupId>
