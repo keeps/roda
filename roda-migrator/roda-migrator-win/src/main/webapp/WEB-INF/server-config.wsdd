@@ -5,9 +5,9 @@
   <parameter name="enableNamespacePrefixOptimization" value="false"/>
   <parameter name="dotNetSoapEncFix" value="true"/>
   <parameter name="disablePrettyXML" value="true"/>
-  <parameter name="sendXsiTypes" value="true"/>
-  <parameter name="attachments.implementation" value="org.apache.axis.attachments.AttachmentsImpl"/>
   <parameter name="sendMultiRefs" value="true"/>
+  <parameter name="attachments.implementation" value="org.apache.axis.attachments.AttachmentsImpl"/>
+  <parameter name="sendXsiTypes" value="true"/>
   <parameter name="sendXMLDeclaration" value="true"/>
   <requestFlow>
    <handler type="java:org.apache.axis.handlers.JWSHandler">
@@ -62,6 +62,13 @@
   <arrayMapping innerType="xsd:string" languageSpecificType="java:java.lang.String[]" qname="ns28:ArrayOf_xsd_string" xmlns:ns28="http://services.migrator.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
   <arrayMapping innerType="ns30:RepresentationFile" languageSpecificType="java:pt.gov.dgarq.roda.core.data.RepresentationFile[]" qname="ns29:ArrayOf_tns1_RepresentationFile" xmlns:ns29="http://services.migrator.roda.dgarq.gov.pt" xmlns:ns30="http://data.core.roda.dgarq.gov.pt"/>
  </service>
+ <service name="AdminService" provider="java:MSG">
+  <parameter name="allowedMethods" value="AdminService"/>
+  <parameter name="enableRemoteAdmin" value="false"/>
+  <parameter name="className" value="org.apache.axis.utils.Admin"/>
+  <namespace>http://xml.apache.org/axis/wsdd/
+        </namespace>
+ </service>
  <service name="Doc2Pdf" provider="java:RPC" style="wrapped" use="literal">
   <operation name="convert" qname="ns31:convert" returnQName="ns31:convertReturn" returnType="ns32:ConversionResult" soapAction="" xmlns:ns31="http://services.migrator.roda.dgarq.gov.pt" xmlns:ns32="http://data.common.migrator.roda.dgarq.gov.pt">
    <parameter qname="ns31:in0" type="ns33:RepresentationObject" xmlns:ns33="http://data.core.roda.dgarq.gov.pt"/>
@@ -92,8 +99,8 @@
   <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns48:RODAServiceException" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.common.RODAServiceException" xmlns:ns48="http://common.core.roda.dgarq.gov.pt"/>
   <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns49:ConverterException" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.migrator.common.ConverterException" xmlns:ns49="http://common.migrator.roda.dgarq.gov.pt"/>
   <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns50:ConversionResult" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.migrator.common.data.ConversionResult" xmlns:ns50="http://data.common.migrator.roda.dgarq.gov.pt"/>
-  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns51:InvalidRepresentationException" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.migrator.common.InvalidRepresentationException" xmlns:ns51="http://common.migrator.roda.dgarq.gov.pt"/>
-  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns52:WrongRepresentationTypeException" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.migrator.common.WrongRepresentationTypeException" xmlns:ns52="http://common.migrator.roda.dgarq.gov.pt"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns51:WrongRepresentationTypeException" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.migrator.common.WrongRepresentationTypeException" xmlns:ns51="http://common.migrator.roda.dgarq.gov.pt"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns52:InvalidRepresentationException" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.migrator.common.InvalidRepresentationException" xmlns:ns52="http://common.migrator.roda.dgarq.gov.pt"/>
   <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns53:WrongRepresentationSubtypeException" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.migrator.common.WrongRepresentationSubtypeException" xmlns:ns53="http://common.migrator.roda.dgarq.gov.pt"/>
   <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns54:RepresentationObject" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.RepresentationObject" xmlns:ns54="http://data.core.roda.dgarq.gov.pt"/>
   <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns55:EventPreservationObject" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.EventPreservationObject" xmlns:ns55="http://data.core.roda.dgarq.gov.pt"/>
@@ -102,13 +109,6 @@
   <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns58:PreservationObject" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.PreservationObject" xmlns:ns58="http://data.core.roda.dgarq.gov.pt"/>
   <arrayMapping innerType="xsd:string" languageSpecificType="java:java.lang.String[]" qname="ns59:ArrayOf_xsd_string" xmlns:ns59="http://services.migrator.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
   <arrayMapping innerType="ns61:RepresentationFile" languageSpecificType="java:pt.gov.dgarq.roda.core.data.RepresentationFile[]" qname="ns60:ArrayOf_tns1_RepresentationFile" xmlns:ns60="http://services.migrator.roda.dgarq.gov.pt" xmlns:ns61="http://data.core.roda.dgarq.gov.pt"/>
- </service>
- <service name="AdminService" provider="java:MSG">
-  <parameter name="allowedMethods" value="AdminService"/>
-  <parameter name="enableRemoteAdmin" value="false"/>
-  <parameter name="className" value="org.apache.axis.utils.Admin"/>
-  <namespace>http://xml.apache.org/axis/wsdd/
-        </namespace>
  </service>
  <service name="Eml2Pdf" provider="java:RPC" style="wrapped" use="literal">
   <operation name="getAgent" qname="ns62:getAgent" returnQName="ns62:getAgentReturn" returnType="ns63:AgentPreservationObject" soapAction="" xmlns:ns62="http://services.migrator.roda.dgarq.gov.pt" xmlns:ns63="http://data.core.roda.dgarq.gov.pt">

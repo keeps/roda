@@ -25,10 +25,10 @@
         <parameter qname="pns:password" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
         <fault name="LoginException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.LoginException" type="tns:LoginException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
       </operation>
-      <operation name="getGuestCredentials" qname="operNS:getGuestCredentials" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getGuestCredentialsReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:string" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
-      </operation>
       <operation name="getGuestUser" qname="operNS:getGuestUser" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getGuestUserReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:User" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
         <fault name="LoginException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.LoginException" type="tns:LoginException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="getGuestCredentials" qname="operNS:getGuestCredentials" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getGuestCredentialsReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:string" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
       </operation>
       <parameter name="allowedMethods" value="getAuthenticatedUser getGuestUser getGuestCredentials"/>
       <parameter name="scope" value="Application"/>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<wsdl:definitions targetNamespace="http://services.core.roda.dgarq.gov.pt" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="http://services.core.roda.dgarq.gov.pt" xmlns:intf="http://services.core.roda.dgarq.gov.pt" xmlns:tns1="http://data.core.roda.dgarq.gov.pt" xmlns:tns2="http://common.core.roda.dgarq.gov.pt" xmlns:tns3="http://filter.adapter.data.core.roda.dgarq.gov.pt" xmlns:tns4="http://adapter.data.core.roda.dgarq.gov.pt" xmlns:tns5="http://sort.adapter.data.core.roda.dgarq.gov.pt" xmlns:tns6="http://sublist.adapter.data.core.roda.dgarq.gov.pt" xmlns:tns7="http://preservation.data.core.roda.dgarq.gov.pt" xmlns:tns8="http://eadc.data.core.roda.dgarq.gov.pt" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<wsdl:definitions targetNamespace="http://services.core.roda.dgarq.gov.pt" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="http://services.core.roda.dgarq.gov.pt" xmlns:intf="http://services.core.roda.dgarq.gov.pt" xmlns:tns1="http://data.core.roda.dgarq.gov.pt" xmlns:tns2="http://common.core.roda.dgarq.gov.pt" xmlns:tns3="http://filter.adapter.data.core.roda.dgarq.gov.pt" xmlns:tns4="http://adapter.data.core.roda.dgarq.gov.pt" xmlns:tns5="http://sort.adapter.data.core.roda.dgarq.gov.pt" xmlns:tns6="http://sublist.adapter.data.core.roda.dgarq.gov.pt" xmlns:tns7="http://eadc.data.core.roda.dgarq.gov.pt" xmlns:tns8="http://preservation.data.core.roda.dgarq.gov.pt" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 <!--WSDL created by Apache Axis version: 1.4
 Built on Apr 22, 2006 (06:55:48 PDT)-->
  <wsdl:types>
@@ -12,38 +12,23 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
    <import namespace="http://adapter.data.core.roda.dgarq.gov.pt"/>
    <import namespace="http://sort.adapter.data.core.roda.dgarq.gov.pt"/>
    <import namespace="http://sublist.adapter.data.core.roda.dgarq.gov.pt"/>
-   <element name="getProducers">
+   <element name="getRODAObject">
     <complexType>
      <sequence>
-      <element name="doPID" type="xsd:string"/>
+      <element name="pid" type="xsd:string"/>
      </sequence>
     </complexType>
    </element>
-   <element name="getProducersResponse">
+   <element name="getRODAObjectResponse">
     <complexType>
      <sequence>
-      <element name="getProducersReturn" type="tns1:Producers"/>
+      <element name="getRODAObjectReturn" type="tns1:RODAObject"/>
      </sequence>
     </complexType>
    </element>
-   <complexType name="ArrayOf_xsd_string">
-    <sequence>
-     <element maxOccurs="unbounded" minOccurs="0" name="item" type="xsd:string"/>
-    </sequence>
-   </complexType>
-   <element name="fault" type="tns2:NoSuchRODAObjectException"/>
-   <element name="fault1" type="tns2:BrowserException"/>
-   <element name="getDOPIDs">
-    <complexType/>
-   </element>
-   <element name="getDOPIDsResponse">
-    <complexType>
-     <sequence>
-      <element maxOccurs="unbounded" name="getDOPIDsReturn" type="xsd:string"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="getSimpleRepresentationPreservationObjectCount">
+   <element name="fault" type="tns2:BrowserException"/>
+   <element name="fault1" type="tns2:NoSuchRODAObjectException"/>
+   <element name="getRODAObjectCount">
     <complexType>
      <sequence>
       <element name="filter" type="tns3:Filter"/>
@@ -55,13 +40,218 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
      <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns3:FilterParameter"/>
     </sequence>
    </complexType>
-   <element name="getSimpleRepresentationPreservationObjectCountResponse">
+   <element name="getRODAObjectCountResponse">
     <complexType>
      <sequence>
-      <element name="getSimpleRepresentationPreservationObjectCountReturn" type="xsd:int"/>
+      <element name="getRODAObjectCountReturn" type="xsd:int"/>
      </sequence>
     </complexType>
    </element>
+   <element name="getRODAObjects">
+    <complexType>
+     <sequence>
+      <element name="contentAdapter" type="tns4:ContentAdapter"/>
+     </sequence>
+    </complexType>
+   </element>
+   <complexType name="ArrayOf_tns5_SortParameter">
+    <sequence>
+     <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns5:SortParameter"/>
+    </sequence>
+   </complexType>
+   <element name="getRODAObjectsResponse">
+    <complexType>
+     <sequence>
+      <element maxOccurs="unbounded" name="getRODAObjectsReturn" type="tns1:RODAObject"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="getSimpleDescriptionObject">
+    <complexType>
+     <sequence>
+      <element name="pid" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="getSimpleDescriptionObjectResponse">
+    <complexType>
+     <sequence>
+      <element name="getSimpleDescriptionObjectReturn" type="tns1:SimpleDescriptionObject"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="getSimpleDescriptionObjectCount">
+    <complexType>
+     <sequence>
+      <element name="filter" type="tns3:Filter"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="getSimpleDescriptionObjectCountResponse">
+    <complexType>
+     <sequence>
+      <element name="getSimpleDescriptionObjectCountReturn" type="xsd:int"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="getSimpleDescriptionObjects">
+    <complexType>
+     <sequence>
+      <element name="contentAdapter" type="tns4:ContentAdapter"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="getSimpleDescriptionObjectsResponse">
+    <complexType>
+     <sequence>
+      <element maxOccurs="unbounded" name="getSimpleDescriptionObjectsReturn" type="tns1:SimpleDescriptionObject"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="getSimpleDescriptionObjectIndex">
+    <complexType>
+     <sequence>
+      <element name="pid" type="xsd:string"/>
+      <element name="contentAdapter" type="tns4:ContentAdapter"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="getSimpleDescriptionObjectIndexResponse">
+    <complexType>
+     <sequence>
+      <element name="getSimpleDescriptionObjectIndexReturn" type="xsd:int"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="getDescriptionObject">
+    <complexType>
+     <sequence>
+      <element name="pid" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="getDescriptionObjectResponse">
+    <complexType>
+     <sequence>
+      <element name="getDescriptionObjectReturn" type="tns1:DescriptionObject"/>
+     </sequence>
+    </complexType>
+   </element>
+   <complexType name="ArrayOf_xsd_string">
+    <sequence>
+     <element maxOccurs="unbounded" minOccurs="0" name="item" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="ArrayOf_tns7_ArrangementTableRow">
+    <sequence>
+     <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns7:ArrangementTableRow"/>
+    </sequence>
+   </complexType>
+   <complexType name="ArrayOf_tns7_ArrangementTableGroup">
+    <sequence>
+     <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns7:ArrangementTableGroup"/>
+    </sequence>
+   </complexType>
+   <complexType name="ArrayOf_tns7_BioghistChronitem">
+    <sequence>
+     <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns7:BioghistChronitem"/>
+    </sequence>
+   </complexType>
+   <element name="getDOPIDs">
+    <complexType/>
+   </element>
+   <element name="getDOPIDsResponse">
+    <complexType>
+     <sequence>
+      <element maxOccurs="unbounded" name="getDOPIDsReturn" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="getDOAncestorPIDs">
+    <complexType>
+     <sequence>
+      <element name="pid" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="getDOAncestorPIDsResponse">
+    <complexType>
+     <sequence>
+      <element maxOccurs="unbounded" name="getDOAncestorPIDsReturn" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="getDORepresentations">
+    <complexType>
+     <sequence>
+      <element name="doPID" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="getDORepresentationsResponse">
+    <complexType>
+     <sequence>
+      <element maxOccurs="unbounded" name="getDORepresentationsReturn" type="tns1:RepresentationObject"/>
+     </sequence>
+    </complexType>
+   </element>
+   <complexType name="ArrayOf_tns1_RepresentationFile">
+    <sequence>
+     <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns1:RepresentationFile"/>
+    </sequence>
+   </complexType>
+   <element name="getDOOriginalRepresentation">
+    <complexType>
+     <sequence>
+      <element name="doPID" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="getDOOriginalRepresentationResponse">
+    <complexType>
+     <sequence>
+      <element name="getDOOriginalRepresentationReturn" type="tns1:RepresentationObject"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="getDONormalizedRepresentation">
+    <complexType>
+     <sequence>
+      <element name="doPID" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="getDONormalizedRepresentationResponse">
+    <complexType>
+     <sequence>
+      <element name="getDONormalizedRepresentationReturn" type="tns1:RepresentationObject"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="getDOPreservationObjects">
+    <complexType>
+     <sequence>
+      <element name="doPID" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="getDOPreservationObjectsResponse">
+    <complexType>
+     <sequence>
+      <element maxOccurs="unbounded" name="getDOPreservationObjectsReturn" type="tns1:RepresentationPreservationObject"/>
+     </sequence>
+    </complexType>
+   </element>
+   <complexType name="ArrayOf_tns8_Fixity">
+    <sequence>
+     <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns8:Fixity"/>
+    </sequence>
+   </complexType>
+   <complexType name="ArrayOf_tns8_RepresentationFilePreservationObject">
+    <sequence>
+     <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns8:RepresentationFilePreservationObject"/>
+    </sequence>
+   </complexType>
    <element name="getSimpleRepresentationObject">
     <complexType>
      <sequence>
@@ -97,15 +287,54 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
      </sequence>
     </complexType>
    </element>
-   <complexType name="ArrayOf_tns5_SortParameter">
-    <sequence>
-     <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns5:SortParameter"/>
-    </sequence>
-   </complexType>
    <element name="getSimpleRepresentationObjectsResponse">
     <complexType>
      <sequence>
       <element maxOccurs="unbounded" name="getSimpleRepresentationObjectsReturn" type="tns1:SimpleRepresentationObject"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="getRepresentationObject">
+    <complexType>
+     <sequence>
+      <element name="roPID" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="getRepresentationObjectResponse">
+    <complexType>
+     <sequence>
+      <element name="getRepresentationObjectReturn" type="tns1:RepresentationObject"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="getRepresentationFile">
+    <complexType>
+     <sequence>
+      <element name="roPID" type="xsd:string"/>
+      <element name="fileID" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="getRepresentationFileResponse">
+    <complexType>
+     <sequence>
+      <element name="getRepresentationFileReturn" type="tns1:RepresentationFile"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="fault2" type="tns2:NoSuchRepresentationFileException"/>
+   <element name="getROPreservationObject">
+    <complexType>
+     <sequence>
+      <element name="roPID" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="getROPreservationObjectResponse">
+    <complexType>
+     <sequence>
+      <element name="getROPreservationObjectReturn" type="tns1:RepresentationPreservationObject"/>
      </sequence>
     </complexType>
    </element>
@@ -123,32 +352,17 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
      </sequence>
     </complexType>
    </element>
-   <element name="getSimpleDescriptionObjectCount">
+   <element name="getSimpleRepresentationPreservationObjectCount">
     <complexType>
      <sequence>
       <element name="filter" type="tns3:Filter"/>
      </sequence>
     </complexType>
    </element>
-   <element name="getSimpleDescriptionObjectCountResponse">
+   <element name="getSimpleRepresentationPreservationObjectCountResponse">
     <complexType>
      <sequence>
-      <element name="getSimpleDescriptionObjectCountReturn" type="xsd:int"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="getSimpleDescriptionObjectIndex">
-    <complexType>
-     <sequence>
-      <element name="pid" type="xsd:string"/>
-      <element name="contentAdapter" type="tns4:ContentAdapter"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="getSimpleDescriptionObjectIndexResponse">
-    <complexType>
-     <sequence>
-      <element name="getSimpleDescriptionObjectIndexReturn" type="xsd:int"/>
+      <element name="getSimpleRepresentationPreservationObjectCountReturn" type="xsd:int"/>
      </sequence>
     </complexType>
    </element>
@@ -166,25 +380,6 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
      </sequence>
     </complexType>
    </element>
-   <element name="getDONormalizedRepresentation">
-    <complexType>
-     <sequence>
-      <element name="doPID" type="xsd:string"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="getDONormalizedRepresentationResponse">
-    <complexType>
-     <sequence>
-      <element name="getDONormalizedRepresentationReturn" type="tns1:RepresentationObject"/>
-     </sequence>
-    </complexType>
-   </element>
-   <complexType name="ArrayOf_tns1_RepresentationFile">
-    <sequence>
-     <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns1:RepresentationFile"/>
-    </sequence>
-   </complexType>
    <element name="getRepresentationPreservationObject">
     <complexType>
      <sequence>
@@ -199,16 +394,6 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
      </sequence>
     </complexType>
    </element>
-   <complexType name="ArrayOf_tns7_Fixity">
-    <sequence>
-     <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns7:Fixity"/>
-    </sequence>
-   </complexType>
-   <complexType name="ArrayOf_tns7_RepresentationFilePreservationObject">
-    <sequence>
-     <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns7:RepresentationFilePreservationObject"/>
-    </sequence>
-   </complexType>
    <element name="getSimpleEventPreservationObject">
     <complexType>
      <sequence>
@@ -251,134 +436,6 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
      </sequence>
     </complexType>
    </element>
-   <element name="getAgentPreservationObject">
-    <complexType>
-     <sequence>
-      <element name="poPID" type="xsd:string"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="getAgentPreservationObjectResponse">
-    <complexType>
-     <sequence>
-      <element name="getAgentPreservationObjectReturn" type="tns1:AgentPreservationObject"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="getRepresentationObject">
-    <complexType>
-     <sequence>
-      <element name="roPID" type="xsd:string"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="getRepresentationObjectResponse">
-    <complexType>
-     <sequence>
-      <element name="getRepresentationObjectReturn" type="tns1:RepresentationObject"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="getRepresentationFile">
-    <complexType>
-     <sequence>
-      <element name="roPID" type="xsd:string"/>
-      <element name="fileID" type="xsd:string"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="getRepresentationFileResponse">
-    <complexType>
-     <sequence>
-      <element name="getRepresentationFileReturn" type="tns1:RepresentationFile"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="fault2" type="tns2:NoSuchRepresentationFileException"/>
-   <element name="hasRemovePermission">
-    <complexType>
-     <sequence>
-      <element name="pid" type="xsd:string"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="hasRemovePermissionResponse">
-    <complexType>
-     <sequence>
-      <element name="hasRemovePermissionReturn" type="xsd:boolean"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="getRODAObject">
-    <complexType>
-     <sequence>
-      <element name="pid" type="xsd:string"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="getRODAObjectResponse">
-    <complexType>
-     <sequence>
-      <element name="getRODAObjectReturn" type="tns1:RODAObject"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="getSimpleDescriptionObjects">
-    <complexType>
-     <sequence>
-      <element name="contentAdapter" type="tns4:ContentAdapter"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="getSimpleDescriptionObjectsResponse">
-    <complexType>
-     <sequence>
-      <element maxOccurs="unbounded" name="getSimpleDescriptionObjectsReturn" type="tns1:SimpleDescriptionObject"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="getROPreservationObject">
-    <complexType>
-     <sequence>
-      <element name="roPID" type="xsd:string"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="getROPreservationObjectResponse">
-    <complexType>
-     <sequence>
-      <element name="getROPreservationObjectReturn" type="tns1:RepresentationPreservationObject"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="getRODAObjectCount">
-    <complexType>
-     <sequence>
-      <element name="filter" type="tns3:Filter"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="getRODAObjectCountResponse">
-    <complexType>
-     <sequence>
-      <element name="getRODAObjectCountReturn" type="xsd:int"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="getDOAncestorPIDs">
-    <complexType>
-     <sequence>
-      <element name="pid" type="xsd:string"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="getDOAncestorPIDsResponse">
-    <complexType>
-     <sequence>
-      <element maxOccurs="unbounded" name="getDOAncestorPIDsReturn" type="xsd:string"/>
-     </sequence>
-    </complexType>
-   </element>
    <element name="getEventPreservationObject">
     <complexType>
      <sequence>
@@ -407,6 +464,20 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
      </sequence>
     </complexType>
    </element>
+   <element name="getAgentPreservationObject">
+    <complexType>
+     <sequence>
+      <element name="poPID" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="getAgentPreservationObjectResponse">
+    <complexType>
+     <sequence>
+      <element name="getAgentPreservationObjectReturn" type="tns1:AgentPreservationObject"/>
+     </sequence>
+    </complexType>
+   </element>
    <element name="getRODAObjectPermissions">
     <complexType>
      <sequence>
@@ -418,105 +489,6 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
     <complexType>
      <sequence>
       <element name="getRODAObjectPermissionsReturn" type="tns1:RODAObjectPermissions"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="getSimpleDescriptionObject">
-    <complexType>
-     <sequence>
-      <element name="pid" type="xsd:string"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="getSimpleDescriptionObjectResponse">
-    <complexType>
-     <sequence>
-      <element name="getSimpleDescriptionObjectReturn" type="tns1:SimpleDescriptionObject"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="hasGrantPermission">
-    <complexType>
-     <sequence>
-      <element name="pid" type="xsd:string"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="hasGrantPermissionResponse">
-    <complexType>
-     <sequence>
-      <element name="hasGrantPermissionReturn" type="xsd:boolean"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="hasModifyPermission">
-    <complexType>
-     <sequence>
-      <element name="pid" type="xsd:string"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="hasModifyPermissionResponse">
-    <complexType>
-     <sequence>
-      <element name="hasModifyPermissionReturn" type="xsd:boolean"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="getRODAObjects">
-    <complexType>
-     <sequence>
-      <element name="contentAdapter" type="tns4:ContentAdapter"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="getRODAObjectsResponse">
-    <complexType>
-     <sequence>
-      <element maxOccurs="unbounded" name="getRODAObjectsReturn" type="tns1:RODAObject"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="getDescriptionObject">
-    <complexType>
-     <sequence>
-      <element name="pid" type="xsd:string"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="getDescriptionObjectResponse">
-    <complexType>
-     <sequence>
-      <element name="getDescriptionObjectReturn" type="tns1:DescriptionObject"/>
-     </sequence>
-    </complexType>
-   </element>
-   <complexType name="ArrayOf_tns8_ArrangementTableRow">
-    <sequence>
-     <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns8:ArrangementTableRow"/>
-    </sequence>
-   </complexType>
-   <complexType name="ArrayOf_tns8_ArrangementTableGroup">
-    <sequence>
-     <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns8:ArrangementTableGroup"/>
-    </sequence>
-   </complexType>
-   <complexType name="ArrayOf_tns8_BioghistChronitem">
-    <sequence>
-     <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns8:BioghistChronitem"/>
-    </sequence>
-   </complexType>
-   <element name="getDOPreservationObjects">
-    <complexType>
-     <sequence>
-      <element name="doPID" type="xsd:string"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="getDOPreservationObjectsResponse">
-    <complexType>
-     <sequence>
-      <element maxOccurs="unbounded" name="getDOPreservationObjectsReturn" type="tns1:RepresentationPreservationObject"/>
      </sequence>
     </complexType>
    </element>
@@ -534,31 +506,59 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
      </sequence>
     </complexType>
    </element>
-   <element name="getDOOriginalRepresentation">
+   <element name="hasModifyPermission">
+    <complexType>
+     <sequence>
+      <element name="pid" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="hasModifyPermissionResponse">
+    <complexType>
+     <sequence>
+      <element name="hasModifyPermissionReturn" type="xsd:boolean"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="hasRemovePermission">
+    <complexType>
+     <sequence>
+      <element name="pid" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="hasRemovePermissionResponse">
+    <complexType>
+     <sequence>
+      <element name="hasRemovePermissionReturn" type="xsd:boolean"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="hasGrantPermission">
+    <complexType>
+     <sequence>
+      <element name="pid" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="hasGrantPermissionResponse">
+    <complexType>
+     <sequence>
+      <element name="hasGrantPermissionReturn" type="xsd:boolean"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="getProducers">
     <complexType>
      <sequence>
       <element name="doPID" type="xsd:string"/>
      </sequence>
     </complexType>
    </element>
-   <element name="getDOOriginalRepresentationResponse">
+   <element name="getProducersResponse">
     <complexType>
      <sequence>
-      <element name="getDOOriginalRepresentationReturn" type="tns1:RepresentationObject"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="getDORepresentations">
-    <complexType>
-     <sequence>
-      <element name="doPID" type="xsd:string"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="getDORepresentationsResponse">
-    <complexType>
-     <sequence>
-      <element maxOccurs="unbounded" name="getDORepresentationsReturn" type="tns1:RepresentationObject"/>
+      <element name="getProducersReturn" type="tns1:Producers"/>
      </sequence>
     </complexType>
    </element>
@@ -572,13 +572,6 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
    <import namespace="http://sort.adapter.data.core.roda.dgarq.gov.pt"/>
    <import namespace="http://sublist.adapter.data.core.roda.dgarq.gov.pt"/>
    <import namespace="http://services.core.roda.dgarq.gov.pt"/>
-   <complexType name="Producers">
-    <sequence>
-     <element name="descriptionObjectPID" nillable="true" type="xsd:string"/>
-     <element name="groups" nillable="true" type="impl:ArrayOf_xsd_string"/>
-     <element name="users" nillable="true" type="impl:ArrayOf_xsd_string"/>
-    </sequence>
-   </complexType>
    <complexType name="RODAObject">
     <sequence>
      <element name="contentModel" nillable="true" type="xsd:string"/>
@@ -589,6 +582,62 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
      <element name="state" nillable="true" type="xsd:string"/>
     </sequence>
    </complexType>
+   <complexType name="SimpleDescriptionObject">
+    <complexContent>
+     <extension base="tns1:RODAObject">
+      <sequence>
+       <element name="countryCode" nillable="true" type="xsd:string"/>
+       <element name="dateFinal" nillable="true" type="xsd:string"/>
+       <element name="dateInitial" nillable="true" type="xsd:string"/>
+       <element name="description" nillable="true" type="xsd:string"/>
+       <element name="id" nillable="true" type="xsd:string"/>
+       <element name="level" nillable="true" type="tns7:DescriptionLevel"/>
+       <element name="parentPID" nillable="true" type="xsd:string"/>
+       <element name="repositoryCode" nillable="true" type="xsd:string"/>
+       <element name="subElementsCount" type="xsd:int"/>
+       <element name="title" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="DescriptionObject">
+    <complexContent>
+     <extension base="tns1:SimpleDescriptionObject">
+      <sequence>
+       <element name="accessrestrict" nillable="true" type="xsd:string"/>
+       <element name="accruals" nillable="true" type="xsd:string"/>
+       <element name="acqinfo" nillable="true" type="xsd:string"/>
+       <element name="acqinfoDate" nillable="true" type="xsd:string"/>
+       <element name="acqinfoNum" nillable="true" type="xsd:string"/>
+       <element name="appraisal" nillable="true" type="xsd:string"/>
+       <element name="arrangement" nillable="true" type="xsd:string"/>
+       <element name="arrangementTable" nillable="true" type="tns7:ArrangementTable"/>
+       <element name="bibliography" nillable="true" type="xsd:string"/>
+       <element name="bioghist" nillable="true" type="xsd:string"/>
+       <element name="bioghistChronlist" nillable="true" type="tns7:BioghistChronlist"/>
+       <element name="completeReference" nillable="true" type="xsd:string"/>
+       <element name="custodhist" nillable="true" type="xsd:string"/>
+       <element name="handleURL" nillable="true" type="xsd:string"/>
+       <element name="langmaterialLanguages" nillable="true" type="tns7:LangmaterialLanguages"/>
+       <element name="materialspec" nillable="true" type="xsd:string"/>
+       <element name="note" nillable="true" type="xsd:string"/>
+       <element name="origination" nillable="true" type="xsd:string"/>
+       <element name="otherfindaid" nillable="true" type="xsd:string"/>
+       <element name="physdesc" nillable="true" type="xsd:string"/>
+       <element name="physdescDateFinal" nillable="true" type="xsd:string"/>
+       <element name="physdescDateInitial" nillable="true" type="xsd:string"/>
+       <element name="physdescDimensions" nillable="true" type="tns7:PhysdescElement"/>
+       <element name="physdescExtent" nillable="true" type="tns7:PhysdescElement"/>
+       <element name="physdescPhysfacet" nillable="true" type="tns7:PhysdescElement"/>
+       <element name="phystech" nillable="true" type="xsd:string"/>
+       <element name="prefercite" nillable="true" type="xsd:string"/>
+       <element name="relatedmaterial" nillable="true" type="xsd:string"/>
+       <element name="scopecontent" nillable="true" type="xsd:string"/>
+       <element name="userestrict" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
    <complexType name="SimpleRepresentationObject">
     <complexContent>
      <extension base="tns1:RODAObject">
@@ -598,25 +647,6 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
        <element name="statuses" nillable="true" type="impl:ArrayOf_xsd_string"/>
        <element name="subType" nillable="true" type="xsd:string"/>
        <element name="type" nillable="true" type="xsd:string"/>
-      </sequence>
-     </extension>
-    </complexContent>
-   </complexType>
-   <complexType abstract="true" name="PreservationObject">
-    <complexContent>
-     <extension base="tns1:RODAObject">
-      <sequence>
-       <element name="ID" nillable="true" type="xsd:string"/>
-       <element name="type" nillable="true" type="xsd:string"/>
-      </sequence>
-     </extension>
-    </complexContent>
-   </complexType>
-   <complexType name="SimpleRepresentationPreservationObject">
-    <complexContent>
-     <extension base="tns1:PreservationObject">
-      <sequence>
-       <element name="representationObjectPID" nillable="true" type="xsd:string"/>
       </sequence>
      </extension>
     </complexContent>
@@ -653,17 +683,36 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
      </extension>
     </complexContent>
    </complexType>
+   <complexType abstract="true" name="PreservationObject">
+    <complexContent>
+     <extension base="tns1:RODAObject">
+      <sequence>
+       <element name="ID" nillable="true" type="xsd:string"/>
+       <element name="type" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="SimpleRepresentationPreservationObject">
+    <complexContent>
+     <extension base="tns1:PreservationObject">
+      <sequence>
+       <element name="representationObjectPID" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
    <complexType name="RepresentationPreservationObject">
     <complexContent>
      <extension base="tns1:SimpleRepresentationPreservationObject">
       <sequence>
        <element name="derivationEventID" nillable="true" type="xsd:string"/>
        <element name="derivedFromRepresentationObjectID" nillable="true" type="xsd:string"/>
-       <element name="partFiles" nillable="true" type="impl:ArrayOf_tns7_RepresentationFilePreservationObject"/>
+       <element name="partFiles" nillable="true" type="impl:ArrayOf_tns8_RepresentationFilePreservationObject"/>
        <element name="preservationEventIDs" nillable="true" type="impl:ArrayOf_xsd_string"/>
        <element name="preservationLevel" nillable="true" type="xsd:string"/>
        <element name="representationContentModel" nillable="true" type="xsd:string"/>
-       <element name="rootFile" nillable="true" type="tns7:RepresentationFilePreservationObject"/>
+       <element name="rootFile" nillable="true" type="tns8:RepresentationFilePreservationObject"/>
       </sequence>
      </extension>
     </complexContent>
@@ -674,34 +723,6 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
       <sequence>
        <element name="agentPID" nillable="true" type="xsd:string"/>
        <element name="targetPID" nillable="true" type="xsd:string"/>
-      </sequence>
-     </extension>
-    </complexContent>
-   </complexType>
-   <complexType name="AgentPreservationObject">
-    <complexContent>
-     <extension base="tns1:PreservationObject">
-      <sequence>
-       <element name="agentName" nillable="true" type="xsd:string"/>
-       <element name="agentType" nillable="true" type="xsd:string"/>
-      </sequence>
-     </extension>
-    </complexContent>
-   </complexType>
-   <complexType name="SimpleDescriptionObject">
-    <complexContent>
-     <extension base="tns1:RODAObject">
-      <sequence>
-       <element name="countryCode" nillable="true" type="xsd:string"/>
-       <element name="dateFinal" nillable="true" type="xsd:string"/>
-       <element name="dateInitial" nillable="true" type="xsd:string"/>
-       <element name="description" nillable="true" type="xsd:string"/>
-       <element name="id" nillable="true" type="xsd:string"/>
-       <element name="level" nillable="true" type="tns8:DescriptionLevel"/>
-       <element name="parentPID" nillable="true" type="xsd:string"/>
-       <element name="repositoryCode" nillable="true" type="xsd:string"/>
-       <element name="subElementsCount" type="xsd:int"/>
-       <element name="title" nillable="true" type="xsd:string"/>
       </sequence>
      </extension>
     </complexContent>
@@ -723,6 +744,16 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
      </extension>
     </complexContent>
    </complexType>
+   <complexType name="AgentPreservationObject">
+    <complexContent>
+     <extension base="tns1:PreservationObject">
+      <sequence>
+       <element name="agentName" nillable="true" type="xsd:string"/>
+       <element name="agentType" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
    <complexType name="RODAObjectPermissions">
     <sequence>
      <element name="grantGroups" nillable="true" type="impl:ArrayOf_xsd_string"/>
@@ -736,44 +767,6 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
      <element name="removeUsers" nillable="true" type="impl:ArrayOf_xsd_string"/>
     </sequence>
    </complexType>
-   <complexType name="DescriptionObject">
-    <complexContent>
-     <extension base="tns1:SimpleDescriptionObject">
-      <sequence>
-       <element name="accessrestrict" nillable="true" type="xsd:string"/>
-       <element name="accruals" nillable="true" type="xsd:string"/>
-       <element name="acqinfo" nillable="true" type="xsd:string"/>
-       <element name="acqinfoDate" nillable="true" type="xsd:string"/>
-       <element name="acqinfoNum" nillable="true" type="xsd:string"/>
-       <element name="appraisal" nillable="true" type="xsd:string"/>
-       <element name="arrangement" nillable="true" type="xsd:string"/>
-       <element name="arrangementTable" nillable="true" type="tns8:ArrangementTable"/>
-       <element name="bibliography" nillable="true" type="xsd:string"/>
-       <element name="bioghist" nillable="true" type="xsd:string"/>
-       <element name="bioghistChronlist" nillable="true" type="tns8:BioghistChronlist"/>
-       <element name="completeReference" nillable="true" type="xsd:string"/>
-       <element name="custodhist" nillable="true" type="xsd:string"/>
-       <element name="handleURL" nillable="true" type="xsd:string"/>
-       <element name="langmaterialLanguages" nillable="true" type="tns8:LangmaterialLanguages"/>
-       <element name="materialspec" nillable="true" type="xsd:string"/>
-       <element name="note" nillable="true" type="xsd:string"/>
-       <element name="origination" nillable="true" type="xsd:string"/>
-       <element name="otherfindaid" nillable="true" type="xsd:string"/>
-       <element name="physdesc" nillable="true" type="xsd:string"/>
-       <element name="physdescDateFinal" nillable="true" type="xsd:string"/>
-       <element name="physdescDateInitial" nillable="true" type="xsd:string"/>
-       <element name="physdescDimensions" nillable="true" type="tns8:PhysdescElement"/>
-       <element name="physdescExtent" nillable="true" type="tns8:PhysdescElement"/>
-       <element name="physdescPhysfacet" nillable="true" type="tns8:PhysdescElement"/>
-       <element name="phystech" nillable="true" type="xsd:string"/>
-       <element name="prefercite" nillable="true" type="xsd:string"/>
-       <element name="relatedmaterial" nillable="true" type="xsd:string"/>
-       <element name="scopecontent" nillable="true" type="xsd:string"/>
-       <element name="userestrict" nillable="true" type="xsd:string"/>
-      </sequence>
-     </extension>
-    </complexContent>
-   </complexType>
    <complexType name="RODAObjectUserPermissions">
     <sequence>
      <element name="grant" type="xsd:boolean"/>
@@ -781,6 +774,13 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
      <element name="objectPID" nillable="true" type="xsd:string"/>
      <element name="remove" type="xsd:boolean"/>
      <element name="username" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="Producers">
+    <sequence>
+     <element name="descriptionObjectPID" nillable="true" type="xsd:string"/>
+     <element name="groups" nillable="true" type="impl:ArrayOf_xsd_string"/>
+     <element name="users" nillable="true" type="impl:ArrayOf_xsd_string"/>
     </sequence>
    </complexType>
   </schema>
@@ -798,13 +798,6 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
      <element name="message" nillable="true" type="xsd:string"/>
     </sequence>
    </complexType>
-   <complexType name="NoSuchRODAObjectException">
-    <complexContent>
-     <extension base="tns2:RODAException">
-      <sequence/>
-     </extension>
-    </complexContent>
-   </complexType>
    <complexType name="RODAServiceException">
     <complexContent>
      <extension base="tns2:RODAException">
@@ -815,6 +808,13 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
    <complexType name="BrowserException">
     <complexContent>
      <extension base="tns2:RODAServiceException">
+      <sequence/>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="NoSuchRODAObjectException">
+    <complexContent>
+     <extension base="tns2:RODAException">
       <sequence/>
      </extension>
     </complexContent>
@@ -957,6 +957,74 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
     </sequence>
    </complexType>
   </schema>
+  <schema elementFormDefault="qualified" targetNamespace="http://eadc.data.core.roda.dgarq.gov.pt" xmlns="http://www.w3.org/2001/XMLSchema">
+   <import namespace="http://data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://common.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://preservation.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://adapter.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://sort.adapter.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://sublist.adapter.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://services.core.roda.dgarq.gov.pt"/>
+   <complexType name="DescriptionLevel">
+    <sequence>
+     <element name="level" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="ArrangementTableRow">
+    <sequence>
+     <element name="entries" nillable="true" type="impl:ArrayOf_xsd_string"/>
+    </sequence>
+   </complexType>
+   <complexType name="ArrangementTableBody">
+    <sequence>
+     <element name="rows" nillable="true" type="impl:ArrayOf_tns7_ArrangementTableRow"/>
+    </sequence>
+   </complexType>
+   <complexType name="ArrangementTableHead">
+    <complexContent>
+     <extension base="tns7:ArrangementTableBody">
+      <sequence/>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="ArrangementTableGroup">
+    <sequence>
+     <element name="body" nillable="true" type="tns7:ArrangementTableBody"/>
+     <element name="columns" type="xsd:int"/>
+     <element name="head" nillable="true" type="tns7:ArrangementTableHead"/>
+    </sequence>
+   </complexType>
+   <complexType name="ArrangementTable">
+    <sequence>
+     <element name="arrangementTableGroups" nillable="true" type="impl:ArrayOf_tns7_ArrangementTableGroup"/>
+    </sequence>
+   </complexType>
+   <complexType name="BioghistChronitem">
+    <sequence>
+     <element name="dateFinal" nillable="true" type="xsd:string"/>
+     <element name="dateInitial" nillable="true" type="xsd:string"/>
+     <element name="event" nillable="true" type="xsd:string"/>
+     <element name="text" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="BioghistChronlist">
+    <sequence>
+     <element name="bioghistChronitems" nillable="true" type="impl:ArrayOf_tns7_BioghistChronitem"/>
+    </sequence>
+   </complexType>
+   <complexType name="LangmaterialLanguages">
+    <sequence>
+     <element name="langmaterialLanguages" nillable="true" type="impl:ArrayOf_xsd_string"/>
+    </sequence>
+   </complexType>
+   <complexType name="PhysdescElement">
+    <sequence>
+     <element name="unit" nillable="true" type="xsd:string"/>
+     <element name="value" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+  </schema>
   <schema elementFormDefault="qualified" targetNamespace="http://preservation.data.core.roda.dgarq.gov.pt" xmlns="http://www.w3.org/2001/XMLSchema">
    <import namespace="http://data.core.roda.dgarq.gov.pt"/>
    <import namespace="http://eadc.data.core.roda.dgarq.gov.pt"/>
@@ -982,7 +1050,7 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
      <element name="creatingApplicationName" nillable="true" type="xsd:string"/>
      <element name="creatingApplicationVersion" nillable="true" type="xsd:string"/>
      <element name="dateCreatedByApplication" nillable="true" type="xsd:string"/>
-     <element name="fixities" nillable="true" type="impl:ArrayOf_tns7_Fixity"/>
+     <element name="fixities" nillable="true" type="impl:ArrayOf_tns8_Fixity"/>
      <element name="formatDesignationName" nillable="true" type="xsd:string"/>
      <element name="formatDesignationVersion" nillable="true" type="xsd:string"/>
      <element name="formatRegistryKey" nillable="true" type="xsd:string"/>
@@ -995,85 +1063,17 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
     </sequence>
    </complexType>
   </schema>
-  <schema elementFormDefault="qualified" targetNamespace="http://eadc.data.core.roda.dgarq.gov.pt" xmlns="http://www.w3.org/2001/XMLSchema">
-   <import namespace="http://data.core.roda.dgarq.gov.pt"/>
-   <import namespace="http://common.core.roda.dgarq.gov.pt"/>
-   <import namespace="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
-   <import namespace="http://preservation.data.core.roda.dgarq.gov.pt"/>
-   <import namespace="http://adapter.data.core.roda.dgarq.gov.pt"/>
-   <import namespace="http://sort.adapter.data.core.roda.dgarq.gov.pt"/>
-   <import namespace="http://sublist.adapter.data.core.roda.dgarq.gov.pt"/>
-   <import namespace="http://services.core.roda.dgarq.gov.pt"/>
-   <complexType name="DescriptionLevel">
-    <sequence>
-     <element name="level" nillable="true" type="xsd:string"/>
-    </sequence>
-   </complexType>
-   <complexType name="ArrangementTableRow">
-    <sequence>
-     <element name="entries" nillable="true" type="impl:ArrayOf_xsd_string"/>
-    </sequence>
-   </complexType>
-   <complexType name="ArrangementTableBody">
-    <sequence>
-     <element name="rows" nillable="true" type="impl:ArrayOf_tns8_ArrangementTableRow"/>
-    </sequence>
-   </complexType>
-   <complexType name="ArrangementTableHead">
-    <complexContent>
-     <extension base="tns8:ArrangementTableBody">
-      <sequence/>
-     </extension>
-    </complexContent>
-   </complexType>
-   <complexType name="ArrangementTableGroup">
-    <sequence>
-     <element name="body" nillable="true" type="tns8:ArrangementTableBody"/>
-     <element name="columns" type="xsd:int"/>
-     <element name="head" nillable="true" type="tns8:ArrangementTableHead"/>
-    </sequence>
-   </complexType>
-   <complexType name="ArrangementTable">
-    <sequence>
-     <element name="arrangementTableGroups" nillable="true" type="impl:ArrayOf_tns8_ArrangementTableGroup"/>
-    </sequence>
-   </complexType>
-   <complexType name="BioghistChronitem">
-    <sequence>
-     <element name="dateFinal" nillable="true" type="xsd:string"/>
-     <element name="dateInitial" nillable="true" type="xsd:string"/>
-     <element name="event" nillable="true" type="xsd:string"/>
-     <element name="text" nillable="true" type="xsd:string"/>
-    </sequence>
-   </complexType>
-   <complexType name="BioghistChronlist">
-    <sequence>
-     <element name="bioghistChronitems" nillable="true" type="impl:ArrayOf_tns8_BioghistChronitem"/>
-    </sequence>
-   </complexType>
-   <complexType name="LangmaterialLanguages">
-    <sequence>
-     <element name="langmaterialLanguages" nillable="true" type="impl:ArrayOf_xsd_string"/>
-    </sequence>
-   </complexType>
-   <complexType name="PhysdescElement">
-    <sequence>
-     <element name="unit" nillable="true" type="xsd:string"/>
-     <element name="value" nillable="true" type="xsd:string"/>
-    </sequence>
-   </complexType>
-  </schema>
  </wsdl:types>
-
-   <wsdl:message name="getDOPreservationObjectsResponse">
-
-      <wsdl:part element="impl:getDOPreservationObjectsResponse" name="parameters"/>
-
-   </wsdl:message>
 
    <wsdl:message name="getDOPIDsRequest">
 
       <wsdl:part element="impl:getDOPIDs" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getDOPreservationObjectsResponse">
+
+      <wsdl:part element="impl:getDOPreservationObjectsResponse" name="parameters"/>
 
    </wsdl:message>
 
@@ -1125,15 +1125,15 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
    </wsdl:message>
 
-   <wsdl:message name="getSimpleDescriptionObjectCountResponse">
+   <wsdl:message name="NoSuchRODAObjectException">
 
-      <wsdl:part element="impl:getSimpleDescriptionObjectCountResponse" name="parameters"/>
+      <wsdl:part element="impl:fault1" name="fault"/>
 
    </wsdl:message>
 
-   <wsdl:message name="NoSuchRODAObjectException">
+   <wsdl:message name="getSimpleDescriptionObjectCountResponse">
 
-      <wsdl:part element="impl:fault" name="fault"/>
+      <wsdl:part element="impl:getSimpleDescriptionObjectCountResponse" name="parameters"/>
 
    </wsdl:message>
 
@@ -1157,7 +1157,7 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
    <wsdl:message name="BrowserException">
 
-      <wsdl:part element="impl:fault1" name="fault"/>
+      <wsdl:part element="impl:fault" name="fault"/>
 
    </wsdl:message>
 
@@ -1317,15 +1317,15 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
    </wsdl:message>
 
-   <wsdl:message name="getSimpleRepresentationPreservationObjectsResponse">
-
-      <wsdl:part element="impl:getSimpleRepresentationPreservationObjectsResponse" name="parameters"/>
-
-   </wsdl:message>
-
    <wsdl:message name="getSimpleEventPreservationObjectsResponse">
 
       <wsdl:part element="impl:getSimpleEventPreservationObjectsResponse" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getSimpleRepresentationPreservationObjectsResponse">
+
+      <wsdl:part element="impl:getSimpleRepresentationPreservationObjectsResponse" name="parameters"/>
 
    </wsdl:message>
 
@@ -1395,15 +1395,15 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
    </wsdl:message>
 
-   <wsdl:message name="getDORepresentationsRequest">
-
-      <wsdl:part element="impl:getDORepresentations" name="parameters"/>
-
-   </wsdl:message>
-
    <wsdl:message name="hasModifyPermissionRequest">
 
       <wsdl:part element="impl:hasModifyPermission" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getDORepresentationsRequest">
+
+      <wsdl:part element="impl:getDORepresentations" name="parameters"/>
 
    </wsdl:message>
 
@@ -1517,11 +1517,85 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
    <wsdl:portType name="Browser">
 
-      <wsdl:operation name="getProducers">
+      <wsdl:operation name="getRODAObject">
 
-         <wsdl:input message="impl:getProducersRequest" name="getProducersRequest"/>
+         <wsdl:input message="impl:getRODAObjectRequest" name="getRODAObjectRequest"/>
 
-         <wsdl:output message="impl:getProducersResponse" name="getProducersResponse"/>
+         <wsdl:output message="impl:getRODAObjectResponse" name="getRODAObjectResponse"/>
+
+         <wsdl:fault message="impl:NoSuchRODAObjectException" name="NoSuchRODAObjectException"/>
+
+         <wsdl:fault message="impl:BrowserException" name="BrowserException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getRODAObjectCount">
+
+         <wsdl:input message="impl:getRODAObjectCountRequest" name="getRODAObjectCountRequest"/>
+
+         <wsdl:output message="impl:getRODAObjectCountResponse" name="getRODAObjectCountResponse"/>
+
+         <wsdl:fault message="impl:BrowserException" name="BrowserException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getRODAObjects">
+
+         <wsdl:input message="impl:getRODAObjectsRequest" name="getRODAObjectsRequest"/>
+
+         <wsdl:output message="impl:getRODAObjectsResponse" name="getRODAObjectsResponse"/>
+
+         <wsdl:fault message="impl:BrowserException" name="BrowserException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getSimpleDescriptionObject">
+
+         <wsdl:input message="impl:getSimpleDescriptionObjectRequest" name="getSimpleDescriptionObjectRequest"/>
+
+         <wsdl:output message="impl:getSimpleDescriptionObjectResponse" name="getSimpleDescriptionObjectResponse"/>
+
+         <wsdl:fault message="impl:NoSuchRODAObjectException" name="NoSuchRODAObjectException"/>
+
+         <wsdl:fault message="impl:BrowserException" name="BrowserException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getSimpleDescriptionObjectCount">
+
+         <wsdl:input message="impl:getSimpleDescriptionObjectCountRequest" name="getSimpleDescriptionObjectCountRequest"/>
+
+         <wsdl:output message="impl:getSimpleDescriptionObjectCountResponse" name="getSimpleDescriptionObjectCountResponse"/>
+
+         <wsdl:fault message="impl:BrowserException" name="BrowserException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getSimpleDescriptionObjects">
+
+         <wsdl:input message="impl:getSimpleDescriptionObjectsRequest" name="getSimpleDescriptionObjectsRequest"/>
+
+         <wsdl:output message="impl:getSimpleDescriptionObjectsResponse" name="getSimpleDescriptionObjectsResponse"/>
+
+         <wsdl:fault message="impl:BrowserException" name="BrowserException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getSimpleDescriptionObjectIndex">
+
+         <wsdl:input message="impl:getSimpleDescriptionObjectIndexRequest" name="getSimpleDescriptionObjectIndexRequest"/>
+
+         <wsdl:output message="impl:getSimpleDescriptionObjectIndexResponse" name="getSimpleDescriptionObjectIndexResponse"/>
+
+         <wsdl:fault message="impl:BrowserException" name="BrowserException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getDescriptionObject">
+
+         <wsdl:input message="impl:getDescriptionObjectRequest" name="getDescriptionObjectRequest"/>
+
+         <wsdl:output message="impl:getDescriptionObjectResponse" name="getDescriptionObjectResponse"/>
 
          <wsdl:fault message="impl:NoSuchRODAObjectException" name="NoSuchRODAObjectException"/>
 
@@ -1539,11 +1613,61 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
       </wsdl:operation>
 
-      <wsdl:operation name="getSimpleRepresentationPreservationObjectCount">
+      <wsdl:operation name="getDOAncestorPIDs">
 
-         <wsdl:input message="impl:getSimpleRepresentationPreservationObjectCountRequest" name="getSimpleRepresentationPreservationObjectCountRequest"/>
+         <wsdl:input message="impl:getDOAncestorPIDsRequest" name="getDOAncestorPIDsRequest"/>
 
-         <wsdl:output message="impl:getSimpleRepresentationPreservationObjectCountResponse" name="getSimpleRepresentationPreservationObjectCountResponse"/>
+         <wsdl:output message="impl:getDOAncestorPIDsResponse" name="getDOAncestorPIDsResponse"/>
+
+         <wsdl:fault message="impl:NoSuchRODAObjectException" name="NoSuchRODAObjectException"/>
+
+         <wsdl:fault message="impl:BrowserException" name="BrowserException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getDORepresentations">
+
+         <wsdl:input message="impl:getDORepresentationsRequest" name="getDORepresentationsRequest"/>
+
+         <wsdl:output message="impl:getDORepresentationsResponse" name="getDORepresentationsResponse"/>
+
+         <wsdl:fault message="impl:NoSuchRODAObjectException" name="NoSuchRODAObjectException"/>
+
+         <wsdl:fault message="impl:BrowserException" name="BrowserException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getDOOriginalRepresentation">
+
+         <wsdl:input message="impl:getDOOriginalRepresentationRequest" name="getDOOriginalRepresentationRequest"/>
+
+         <wsdl:output message="impl:getDOOriginalRepresentationResponse" name="getDOOriginalRepresentationResponse"/>
+
+         <wsdl:fault message="impl:NoSuchRODAObjectException" name="NoSuchRODAObjectException"/>
+
+         <wsdl:fault message="impl:BrowserException" name="BrowserException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getDONormalizedRepresentation">
+
+         <wsdl:input message="impl:getDONormalizedRepresentationRequest" name="getDONormalizedRepresentationRequest"/>
+
+         <wsdl:output message="impl:getDONormalizedRepresentationResponse" name="getDONormalizedRepresentationResponse"/>
+
+         <wsdl:fault message="impl:NoSuchRODAObjectException" name="NoSuchRODAObjectException"/>
+
+         <wsdl:fault message="impl:BrowserException" name="BrowserException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getDOPreservationObjects">
+
+         <wsdl:input message="impl:getDOPreservationObjectsRequest" name="getDOPreservationObjectsRequest"/>
+
+         <wsdl:output message="impl:getDOPreservationObjectsResponse" name="getDOPreservationObjectsResponse"/>
+
+         <wsdl:fault message="impl:NoSuchRODAObjectException" name="NoSuchRODAObjectException"/>
 
          <wsdl:fault message="impl:BrowserException" name="BrowserException"/>
 
@@ -1581,6 +1705,44 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
       </wsdl:operation>
 
+      <wsdl:operation name="getRepresentationObject">
+
+         <wsdl:input message="impl:getRepresentationObjectRequest" name="getRepresentationObjectRequest"/>
+
+         <wsdl:output message="impl:getRepresentationObjectResponse" name="getRepresentationObjectResponse"/>
+
+         <wsdl:fault message="impl:NoSuchRODAObjectException" name="NoSuchRODAObjectException"/>
+
+         <wsdl:fault message="impl:BrowserException" name="BrowserException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getRepresentationFile">
+
+         <wsdl:input message="impl:getRepresentationFileRequest" name="getRepresentationFileRequest"/>
+
+         <wsdl:output message="impl:getRepresentationFileResponse" name="getRepresentationFileResponse"/>
+
+         <wsdl:fault message="impl:NoSuchRODAObjectException" name="NoSuchRODAObjectException"/>
+
+         <wsdl:fault message="impl:BrowserException" name="BrowserException"/>
+
+         <wsdl:fault message="impl:NoSuchRepresentationFileException" name="NoSuchRepresentationFileException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getROPreservationObject">
+
+         <wsdl:input message="impl:getROPreservationObjectRequest" name="getROPreservationObjectRequest"/>
+
+         <wsdl:output message="impl:getROPreservationObjectResponse" name="getROPreservationObjectResponse"/>
+
+         <wsdl:fault message="impl:NoSuchRODAObjectException" name="NoSuchRODAObjectException"/>
+
+         <wsdl:fault message="impl:BrowserException" name="BrowserException"/>
+
+      </wsdl:operation>
+
       <wsdl:operation name="getSimpleRepresentationPreservationObject">
 
          <wsdl:input message="impl:getSimpleRepresentationPreservationObjectRequest" name="getSimpleRepresentationPreservationObjectRequest"/>
@@ -1593,21 +1755,11 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
       </wsdl:operation>
 
-      <wsdl:operation name="getSimpleDescriptionObjectCount">
+      <wsdl:operation name="getSimpleRepresentationPreservationObjectCount">
 
-         <wsdl:input message="impl:getSimpleDescriptionObjectCountRequest" name="getSimpleDescriptionObjectCountRequest"/>
+         <wsdl:input message="impl:getSimpleRepresentationPreservationObjectCountRequest" name="getSimpleRepresentationPreservationObjectCountRequest"/>
 
-         <wsdl:output message="impl:getSimpleDescriptionObjectCountResponse" name="getSimpleDescriptionObjectCountResponse"/>
-
-         <wsdl:fault message="impl:BrowserException" name="BrowserException"/>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="getSimpleDescriptionObjectIndex">
-
-         <wsdl:input message="impl:getSimpleDescriptionObjectIndexRequest" name="getSimpleDescriptionObjectIndexRequest"/>
-
-         <wsdl:output message="impl:getSimpleDescriptionObjectIndexResponse" name="getSimpleDescriptionObjectIndexResponse"/>
+         <wsdl:output message="impl:getSimpleRepresentationPreservationObjectCountResponse" name="getSimpleRepresentationPreservationObjectCountResponse"/>
 
          <wsdl:fault message="impl:BrowserException" name="BrowserException"/>
 
@@ -1618,18 +1770,6 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
          <wsdl:input message="impl:getSimpleRepresentationPreservationObjectsRequest" name="getSimpleRepresentationPreservationObjectsRequest"/>
 
          <wsdl:output message="impl:getSimpleRepresentationPreservationObjectsResponse" name="getSimpleRepresentationPreservationObjectsResponse"/>
-
-         <wsdl:fault message="impl:BrowserException" name="BrowserException"/>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="getDONormalizedRepresentation">
-
-         <wsdl:input message="impl:getDONormalizedRepresentationRequest" name="getDONormalizedRepresentationRequest"/>
-
-         <wsdl:output message="impl:getDONormalizedRepresentationResponse" name="getDONormalizedRepresentationResponse"/>
-
-         <wsdl:fault message="impl:NoSuchRODAObjectException" name="NoSuchRODAObjectException"/>
 
          <wsdl:fault message="impl:BrowserException" name="BrowserException"/>
 
@@ -1679,112 +1819,6 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
       </wsdl:operation>
 
-      <wsdl:operation name="getAgentPreservationObject">
-
-         <wsdl:input message="impl:getAgentPreservationObjectRequest" name="getAgentPreservationObjectRequest"/>
-
-         <wsdl:output message="impl:getAgentPreservationObjectResponse" name="getAgentPreservationObjectResponse"/>
-
-         <wsdl:fault message="impl:NoSuchRODAObjectException" name="NoSuchRODAObjectException"/>
-
-         <wsdl:fault message="impl:BrowserException" name="BrowserException"/>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="getRepresentationObject">
-
-         <wsdl:input message="impl:getRepresentationObjectRequest" name="getRepresentationObjectRequest"/>
-
-         <wsdl:output message="impl:getRepresentationObjectResponse" name="getRepresentationObjectResponse"/>
-
-         <wsdl:fault message="impl:NoSuchRODAObjectException" name="NoSuchRODAObjectException"/>
-
-         <wsdl:fault message="impl:BrowserException" name="BrowserException"/>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="getRepresentationFile">
-
-         <wsdl:input message="impl:getRepresentationFileRequest" name="getRepresentationFileRequest"/>
-
-         <wsdl:output message="impl:getRepresentationFileResponse" name="getRepresentationFileResponse"/>
-
-         <wsdl:fault message="impl:NoSuchRODAObjectException" name="NoSuchRODAObjectException"/>
-
-         <wsdl:fault message="impl:BrowserException" name="BrowserException"/>
-
-         <wsdl:fault message="impl:NoSuchRepresentationFileException" name="NoSuchRepresentationFileException"/>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="hasRemovePermission">
-
-         <wsdl:input message="impl:hasRemovePermissionRequest" name="hasRemovePermissionRequest"/>
-
-         <wsdl:output message="impl:hasRemovePermissionResponse" name="hasRemovePermissionResponse"/>
-
-         <wsdl:fault message="impl:NoSuchRODAObjectException" name="NoSuchRODAObjectException"/>
-
-         <wsdl:fault message="impl:BrowserException" name="BrowserException"/>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="getRODAObject">
-
-         <wsdl:input message="impl:getRODAObjectRequest" name="getRODAObjectRequest"/>
-
-         <wsdl:output message="impl:getRODAObjectResponse" name="getRODAObjectResponse"/>
-
-         <wsdl:fault message="impl:NoSuchRODAObjectException" name="NoSuchRODAObjectException"/>
-
-         <wsdl:fault message="impl:BrowserException" name="BrowserException"/>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="getSimpleDescriptionObjects">
-
-         <wsdl:input message="impl:getSimpleDescriptionObjectsRequest" name="getSimpleDescriptionObjectsRequest"/>
-
-         <wsdl:output message="impl:getSimpleDescriptionObjectsResponse" name="getSimpleDescriptionObjectsResponse"/>
-
-         <wsdl:fault message="impl:BrowserException" name="BrowserException"/>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="getROPreservationObject">
-
-         <wsdl:input message="impl:getROPreservationObjectRequest" name="getROPreservationObjectRequest"/>
-
-         <wsdl:output message="impl:getROPreservationObjectResponse" name="getROPreservationObjectResponse"/>
-
-         <wsdl:fault message="impl:NoSuchRODAObjectException" name="NoSuchRODAObjectException"/>
-
-         <wsdl:fault message="impl:BrowserException" name="BrowserException"/>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="getRODAObjectCount">
-
-         <wsdl:input message="impl:getRODAObjectCountRequest" name="getRODAObjectCountRequest"/>
-
-         <wsdl:output message="impl:getRODAObjectCountResponse" name="getRODAObjectCountResponse"/>
-
-         <wsdl:fault message="impl:BrowserException" name="BrowserException"/>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="getDOAncestorPIDs">
-
-         <wsdl:input message="impl:getDOAncestorPIDsRequest" name="getDOAncestorPIDsRequest"/>
-
-         <wsdl:output message="impl:getDOAncestorPIDsResponse" name="getDOAncestorPIDsResponse"/>
-
-         <wsdl:fault message="impl:NoSuchRODAObjectException" name="NoSuchRODAObjectException"/>
-
-         <wsdl:fault message="impl:BrowserException" name="BrowserException"/>
-
-      </wsdl:operation>
-
       <wsdl:operation name="getEventPreservationObject">
 
          <wsdl:input message="impl:getEventPreservationObjectRequest" name="getEventPreservationObjectRequest"/>
@@ -1809,81 +1843,23 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
       </wsdl:operation>
 
+      <wsdl:operation name="getAgentPreservationObject">
+
+         <wsdl:input message="impl:getAgentPreservationObjectRequest" name="getAgentPreservationObjectRequest"/>
+
+         <wsdl:output message="impl:getAgentPreservationObjectResponse" name="getAgentPreservationObjectResponse"/>
+
+         <wsdl:fault message="impl:NoSuchRODAObjectException" name="NoSuchRODAObjectException"/>
+
+         <wsdl:fault message="impl:BrowserException" name="BrowserException"/>
+
+      </wsdl:operation>
+
       <wsdl:operation name="getRODAObjectPermissions">
 
          <wsdl:input message="impl:getRODAObjectPermissionsRequest" name="getRODAObjectPermissionsRequest"/>
 
          <wsdl:output message="impl:getRODAObjectPermissionsResponse" name="getRODAObjectPermissionsResponse"/>
-
-         <wsdl:fault message="impl:NoSuchRODAObjectException" name="NoSuchRODAObjectException"/>
-
-         <wsdl:fault message="impl:BrowserException" name="BrowserException"/>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="getSimpleDescriptionObject">
-
-         <wsdl:input message="impl:getSimpleDescriptionObjectRequest" name="getSimpleDescriptionObjectRequest"/>
-
-         <wsdl:output message="impl:getSimpleDescriptionObjectResponse" name="getSimpleDescriptionObjectResponse"/>
-
-         <wsdl:fault message="impl:NoSuchRODAObjectException" name="NoSuchRODAObjectException"/>
-
-         <wsdl:fault message="impl:BrowserException" name="BrowserException"/>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="hasGrantPermission">
-
-         <wsdl:input message="impl:hasGrantPermissionRequest" name="hasGrantPermissionRequest"/>
-
-         <wsdl:output message="impl:hasGrantPermissionResponse" name="hasGrantPermissionResponse"/>
-
-         <wsdl:fault message="impl:NoSuchRODAObjectException" name="NoSuchRODAObjectException"/>
-
-         <wsdl:fault message="impl:BrowserException" name="BrowserException"/>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="hasModifyPermission">
-
-         <wsdl:input message="impl:hasModifyPermissionRequest" name="hasModifyPermissionRequest"/>
-
-         <wsdl:output message="impl:hasModifyPermissionResponse" name="hasModifyPermissionResponse"/>
-
-         <wsdl:fault message="impl:NoSuchRODAObjectException" name="NoSuchRODAObjectException"/>
-
-         <wsdl:fault message="impl:BrowserException" name="BrowserException"/>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="getRODAObjects">
-
-         <wsdl:input message="impl:getRODAObjectsRequest" name="getRODAObjectsRequest"/>
-
-         <wsdl:output message="impl:getRODAObjectsResponse" name="getRODAObjectsResponse"/>
-
-         <wsdl:fault message="impl:BrowserException" name="BrowserException"/>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="getDescriptionObject">
-
-         <wsdl:input message="impl:getDescriptionObjectRequest" name="getDescriptionObjectRequest"/>
-
-         <wsdl:output message="impl:getDescriptionObjectResponse" name="getDescriptionObjectResponse"/>
-
-         <wsdl:fault message="impl:NoSuchRODAObjectException" name="NoSuchRODAObjectException"/>
-
-         <wsdl:fault message="impl:BrowserException" name="BrowserException"/>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="getDOPreservationObjects">
-
-         <wsdl:input message="impl:getDOPreservationObjectsRequest" name="getDOPreservationObjectsRequest"/>
-
-         <wsdl:output message="impl:getDOPreservationObjectsResponse" name="getDOPreservationObjectsResponse"/>
 
          <wsdl:fault message="impl:NoSuchRODAObjectException" name="NoSuchRODAObjectException"/>
 
@@ -1903,11 +1879,11 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
       </wsdl:operation>
 
-      <wsdl:operation name="getDOOriginalRepresentation">
+      <wsdl:operation name="hasModifyPermission">
 
-         <wsdl:input message="impl:getDOOriginalRepresentationRequest" name="getDOOriginalRepresentationRequest"/>
+         <wsdl:input message="impl:hasModifyPermissionRequest" name="hasModifyPermissionRequest"/>
 
-         <wsdl:output message="impl:getDOOriginalRepresentationResponse" name="getDOOriginalRepresentationResponse"/>
+         <wsdl:output message="impl:hasModifyPermissionResponse" name="hasModifyPermissionResponse"/>
 
          <wsdl:fault message="impl:NoSuchRODAObjectException" name="NoSuchRODAObjectException"/>
 
@@ -1915,11 +1891,35 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
       </wsdl:operation>
 
-      <wsdl:operation name="getDORepresentations">
+      <wsdl:operation name="hasRemovePermission">
 
-         <wsdl:input message="impl:getDORepresentationsRequest" name="getDORepresentationsRequest"/>
+         <wsdl:input message="impl:hasRemovePermissionRequest" name="hasRemovePermissionRequest"/>
 
-         <wsdl:output message="impl:getDORepresentationsResponse" name="getDORepresentationsResponse"/>
+         <wsdl:output message="impl:hasRemovePermissionResponse" name="hasRemovePermissionResponse"/>
+
+         <wsdl:fault message="impl:NoSuchRODAObjectException" name="NoSuchRODAObjectException"/>
+
+         <wsdl:fault message="impl:BrowserException" name="BrowserException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="hasGrantPermission">
+
+         <wsdl:input message="impl:hasGrantPermissionRequest" name="hasGrantPermissionRequest"/>
+
+         <wsdl:output message="impl:hasGrantPermissionResponse" name="hasGrantPermissionResponse"/>
+
+         <wsdl:fault message="impl:NoSuchRODAObjectException" name="NoSuchRODAObjectException"/>
+
+         <wsdl:fault message="impl:BrowserException" name="BrowserException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getProducers">
+
+         <wsdl:input message="impl:getProducersRequest" name="getProducersRequest"/>
+
+         <wsdl:output message="impl:getProducersResponse" name="getProducersResponse"/>
 
          <wsdl:fault message="impl:NoSuchRODAObjectException" name="NoSuchRODAObjectException"/>
 
@@ -1933,17 +1933,197 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
       <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
 
-      <wsdl:operation name="getProducers">
+      <wsdl:operation name="getRODAObject">
 
          <wsdlsoap:operation soapAction=""/>
 
-         <wsdl:input name="getProducersRequest">
+         <wsdl:input name="getRODAObjectRequest">
 
             <wsdlsoap:body use="literal"/>
 
          </wsdl:input>
 
-         <wsdl:output name="getProducersResponse">
+         <wsdl:output name="getRODAObjectResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="NoSuchRODAObjectException">
+
+            <wsdlsoap:fault name="NoSuchRODAObjectException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="BrowserException">
+
+            <wsdlsoap:fault name="BrowserException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getRODAObjectCount">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getRODAObjectCountRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getRODAObjectCountResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="BrowserException">
+
+            <wsdlsoap:fault name="BrowserException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getRODAObjects">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getRODAObjectsRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getRODAObjectsResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="BrowserException">
+
+            <wsdlsoap:fault name="BrowserException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getSimpleDescriptionObject">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getSimpleDescriptionObjectRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getSimpleDescriptionObjectResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="NoSuchRODAObjectException">
+
+            <wsdlsoap:fault name="NoSuchRODAObjectException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="BrowserException">
+
+            <wsdlsoap:fault name="BrowserException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getSimpleDescriptionObjectCount">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getSimpleDescriptionObjectCountRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getSimpleDescriptionObjectCountResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="BrowserException">
+
+            <wsdlsoap:fault name="BrowserException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getSimpleDescriptionObjects">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getSimpleDescriptionObjectsRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getSimpleDescriptionObjectsResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="BrowserException">
+
+            <wsdlsoap:fault name="BrowserException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getSimpleDescriptionObjectIndex">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getSimpleDescriptionObjectIndexRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getSimpleDescriptionObjectIndexResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="BrowserException">
+
+            <wsdlsoap:fault name="BrowserException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getDescriptionObject">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getDescriptionObjectRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getDescriptionObjectResponse">
 
             <wsdlsoap:body use="literal"/>
 
@@ -1987,21 +2167,147 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
       </wsdl:operation>
 
-      <wsdl:operation name="getSimpleRepresentationPreservationObjectCount">
+      <wsdl:operation name="getDOAncestorPIDs">
 
          <wsdlsoap:operation soapAction=""/>
 
-         <wsdl:input name="getSimpleRepresentationPreservationObjectCountRequest">
+         <wsdl:input name="getDOAncestorPIDsRequest">
 
             <wsdlsoap:body use="literal"/>
 
          </wsdl:input>
 
-         <wsdl:output name="getSimpleRepresentationPreservationObjectCountResponse">
+         <wsdl:output name="getDOAncestorPIDsResponse">
 
             <wsdlsoap:body use="literal"/>
 
          </wsdl:output>
+
+         <wsdl:fault name="NoSuchRODAObjectException">
+
+            <wsdlsoap:fault name="NoSuchRODAObjectException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="BrowserException">
+
+            <wsdlsoap:fault name="BrowserException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getDORepresentations">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getDORepresentationsRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getDORepresentationsResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="NoSuchRODAObjectException">
+
+            <wsdlsoap:fault name="NoSuchRODAObjectException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="BrowserException">
+
+            <wsdlsoap:fault name="BrowserException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getDOOriginalRepresentation">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getDOOriginalRepresentationRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getDOOriginalRepresentationResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="NoSuchRODAObjectException">
+
+            <wsdlsoap:fault name="NoSuchRODAObjectException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="BrowserException">
+
+            <wsdlsoap:fault name="BrowserException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getDONormalizedRepresentation">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getDONormalizedRepresentationRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getDONormalizedRepresentationResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="NoSuchRODAObjectException">
+
+            <wsdlsoap:fault name="NoSuchRODAObjectException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="BrowserException">
+
+            <wsdlsoap:fault name="BrowserException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getDOPreservationObjects">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getDOPreservationObjectsRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getDOPreservationObjectsResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="NoSuchRODAObjectException">
+
+            <wsdlsoap:fault name="NoSuchRODAObjectException" use="literal"/>
+
+         </wsdl:fault>
 
          <wsdl:fault name="BrowserException">
 
@@ -2089,6 +2395,102 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
       </wsdl:operation>
 
+      <wsdl:operation name="getRepresentationObject">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getRepresentationObjectRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getRepresentationObjectResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="NoSuchRODAObjectException">
+
+            <wsdlsoap:fault name="NoSuchRODAObjectException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="BrowserException">
+
+            <wsdlsoap:fault name="BrowserException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getRepresentationFile">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getRepresentationFileRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getRepresentationFileResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="NoSuchRODAObjectException">
+
+            <wsdlsoap:fault name="NoSuchRODAObjectException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="BrowserException">
+
+            <wsdlsoap:fault name="BrowserException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="NoSuchRepresentationFileException">
+
+            <wsdlsoap:fault name="NoSuchRepresentationFileException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getROPreservationObject">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getROPreservationObjectRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getROPreservationObjectResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="NoSuchRODAObjectException">
+
+            <wsdlsoap:fault name="NoSuchRODAObjectException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="BrowserException">
+
+            <wsdlsoap:fault name="BrowserException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
       <wsdl:operation name="getSimpleRepresentationPreservationObject">
 
          <wsdlsoap:operation soapAction=""/>
@@ -2119,41 +2521,17 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
       </wsdl:operation>
 
-      <wsdl:operation name="getSimpleDescriptionObjectCount">
+      <wsdl:operation name="getSimpleRepresentationPreservationObjectCount">
 
          <wsdlsoap:operation soapAction=""/>
 
-         <wsdl:input name="getSimpleDescriptionObjectCountRequest">
+         <wsdl:input name="getSimpleRepresentationPreservationObjectCountRequest">
 
             <wsdlsoap:body use="literal"/>
 
          </wsdl:input>
 
-         <wsdl:output name="getSimpleDescriptionObjectCountResponse">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:output>
-
-         <wsdl:fault name="BrowserException">
-
-            <wsdlsoap:fault name="BrowserException" use="literal"/>
-
-         </wsdl:fault>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="getSimpleDescriptionObjectIndex">
-
-         <wsdlsoap:operation soapAction=""/>
-
-         <wsdl:input name="getSimpleDescriptionObjectIndexRequest">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:input>
-
-         <wsdl:output name="getSimpleDescriptionObjectIndexResponse">
+         <wsdl:output name="getSimpleRepresentationPreservationObjectCountResponse">
 
             <wsdlsoap:body use="literal"/>
 
@@ -2182,36 +2560,6 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
             <wsdlsoap:body use="literal"/>
 
          </wsdl:output>
-
-         <wsdl:fault name="BrowserException">
-
-            <wsdlsoap:fault name="BrowserException" use="literal"/>
-
-         </wsdl:fault>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="getDONormalizedRepresentation">
-
-         <wsdlsoap:operation soapAction=""/>
-
-         <wsdl:input name="getDONormalizedRepresentationRequest">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:input>
-
-         <wsdl:output name="getDONormalizedRepresentationResponse">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:output>
-
-         <wsdl:fault name="NoSuchRODAObjectException">
-
-            <wsdlsoap:fault name="NoSuchRODAObjectException" use="literal"/>
-
-         </wsdl:fault>
 
          <wsdl:fault name="BrowserException">
 
@@ -2329,270 +2677,6 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
       </wsdl:operation>
 
-      <wsdl:operation name="getAgentPreservationObject">
-
-         <wsdlsoap:operation soapAction=""/>
-
-         <wsdl:input name="getAgentPreservationObjectRequest">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:input>
-
-         <wsdl:output name="getAgentPreservationObjectResponse">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:output>
-
-         <wsdl:fault name="NoSuchRODAObjectException">
-
-            <wsdlsoap:fault name="NoSuchRODAObjectException" use="literal"/>
-
-         </wsdl:fault>
-
-         <wsdl:fault name="BrowserException">
-
-            <wsdlsoap:fault name="BrowserException" use="literal"/>
-
-         </wsdl:fault>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="getRepresentationObject">
-
-         <wsdlsoap:operation soapAction=""/>
-
-         <wsdl:input name="getRepresentationObjectRequest">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:input>
-
-         <wsdl:output name="getRepresentationObjectResponse">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:output>
-
-         <wsdl:fault name="NoSuchRODAObjectException">
-
-            <wsdlsoap:fault name="NoSuchRODAObjectException" use="literal"/>
-
-         </wsdl:fault>
-
-         <wsdl:fault name="BrowserException">
-
-            <wsdlsoap:fault name="BrowserException" use="literal"/>
-
-         </wsdl:fault>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="getRepresentationFile">
-
-         <wsdlsoap:operation soapAction=""/>
-
-         <wsdl:input name="getRepresentationFileRequest">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:input>
-
-         <wsdl:output name="getRepresentationFileResponse">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:output>
-
-         <wsdl:fault name="NoSuchRODAObjectException">
-
-            <wsdlsoap:fault name="NoSuchRODAObjectException" use="literal"/>
-
-         </wsdl:fault>
-
-         <wsdl:fault name="BrowserException">
-
-            <wsdlsoap:fault name="BrowserException" use="literal"/>
-
-         </wsdl:fault>
-
-         <wsdl:fault name="NoSuchRepresentationFileException">
-
-            <wsdlsoap:fault name="NoSuchRepresentationFileException" use="literal"/>
-
-         </wsdl:fault>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="hasRemovePermission">
-
-         <wsdlsoap:operation soapAction=""/>
-
-         <wsdl:input name="hasRemovePermissionRequest">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:input>
-
-         <wsdl:output name="hasRemovePermissionResponse">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:output>
-
-         <wsdl:fault name="NoSuchRODAObjectException">
-
-            <wsdlsoap:fault name="NoSuchRODAObjectException" use="literal"/>
-
-         </wsdl:fault>
-
-         <wsdl:fault name="BrowserException">
-
-            <wsdlsoap:fault name="BrowserException" use="literal"/>
-
-         </wsdl:fault>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="getRODAObject">
-
-         <wsdlsoap:operation soapAction=""/>
-
-         <wsdl:input name="getRODAObjectRequest">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:input>
-
-         <wsdl:output name="getRODAObjectResponse">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:output>
-
-         <wsdl:fault name="NoSuchRODAObjectException">
-
-            <wsdlsoap:fault name="NoSuchRODAObjectException" use="literal"/>
-
-         </wsdl:fault>
-
-         <wsdl:fault name="BrowserException">
-
-            <wsdlsoap:fault name="BrowserException" use="literal"/>
-
-         </wsdl:fault>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="getSimpleDescriptionObjects">
-
-         <wsdlsoap:operation soapAction=""/>
-
-         <wsdl:input name="getSimpleDescriptionObjectsRequest">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:input>
-
-         <wsdl:output name="getSimpleDescriptionObjectsResponse">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:output>
-
-         <wsdl:fault name="BrowserException">
-
-            <wsdlsoap:fault name="BrowserException" use="literal"/>
-
-         </wsdl:fault>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="getROPreservationObject">
-
-         <wsdlsoap:operation soapAction=""/>
-
-         <wsdl:input name="getROPreservationObjectRequest">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:input>
-
-         <wsdl:output name="getROPreservationObjectResponse">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:output>
-
-         <wsdl:fault name="NoSuchRODAObjectException">
-
-            <wsdlsoap:fault name="NoSuchRODAObjectException" use="literal"/>
-
-         </wsdl:fault>
-
-         <wsdl:fault name="BrowserException">
-
-            <wsdlsoap:fault name="BrowserException" use="literal"/>
-
-         </wsdl:fault>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="getRODAObjectCount">
-
-         <wsdlsoap:operation soapAction=""/>
-
-         <wsdl:input name="getRODAObjectCountRequest">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:input>
-
-         <wsdl:output name="getRODAObjectCountResponse">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:output>
-
-         <wsdl:fault name="BrowserException">
-
-            <wsdlsoap:fault name="BrowserException" use="literal"/>
-
-         </wsdl:fault>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="getDOAncestorPIDs">
-
-         <wsdlsoap:operation soapAction=""/>
-
-         <wsdl:input name="getDOAncestorPIDsRequest">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:input>
-
-         <wsdl:output name="getDOAncestorPIDsResponse">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:output>
-
-         <wsdl:fault name="NoSuchRODAObjectException">
-
-            <wsdlsoap:fault name="NoSuchRODAObjectException" use="literal"/>
-
-         </wsdl:fault>
-
-         <wsdl:fault name="BrowserException">
-
-            <wsdlsoap:fault name="BrowserException" use="literal"/>
-
-         </wsdl:fault>
-
-      </wsdl:operation>
-
       <wsdl:operation name="getEventPreservationObject">
 
          <wsdlsoap:operation soapAction=""/>
@@ -2653,6 +2737,36 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
       </wsdl:operation>
 
+      <wsdl:operation name="getAgentPreservationObject">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getAgentPreservationObjectRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getAgentPreservationObjectResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="NoSuchRODAObjectException">
+
+            <wsdlsoap:fault name="NoSuchRODAObjectException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="BrowserException">
+
+            <wsdlsoap:fault name="BrowserException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
       <wsdl:operation name="getRODAObjectPermissions">
 
          <wsdlsoap:operation soapAction=""/>
@@ -2664,180 +2778,6 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
          </wsdl:input>
 
          <wsdl:output name="getRODAObjectPermissionsResponse">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:output>
-
-         <wsdl:fault name="NoSuchRODAObjectException">
-
-            <wsdlsoap:fault name="NoSuchRODAObjectException" use="literal"/>
-
-         </wsdl:fault>
-
-         <wsdl:fault name="BrowserException">
-
-            <wsdlsoap:fault name="BrowserException" use="literal"/>
-
-         </wsdl:fault>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="getSimpleDescriptionObject">
-
-         <wsdlsoap:operation soapAction=""/>
-
-         <wsdl:input name="getSimpleDescriptionObjectRequest">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:input>
-
-         <wsdl:output name="getSimpleDescriptionObjectResponse">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:output>
-
-         <wsdl:fault name="NoSuchRODAObjectException">
-
-            <wsdlsoap:fault name="NoSuchRODAObjectException" use="literal"/>
-
-         </wsdl:fault>
-
-         <wsdl:fault name="BrowserException">
-
-            <wsdlsoap:fault name="BrowserException" use="literal"/>
-
-         </wsdl:fault>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="hasGrantPermission">
-
-         <wsdlsoap:operation soapAction=""/>
-
-         <wsdl:input name="hasGrantPermissionRequest">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:input>
-
-         <wsdl:output name="hasGrantPermissionResponse">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:output>
-
-         <wsdl:fault name="NoSuchRODAObjectException">
-
-            <wsdlsoap:fault name="NoSuchRODAObjectException" use="literal"/>
-
-         </wsdl:fault>
-
-         <wsdl:fault name="BrowserException">
-
-            <wsdlsoap:fault name="BrowserException" use="literal"/>
-
-         </wsdl:fault>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="hasModifyPermission">
-
-         <wsdlsoap:operation soapAction=""/>
-
-         <wsdl:input name="hasModifyPermissionRequest">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:input>
-
-         <wsdl:output name="hasModifyPermissionResponse">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:output>
-
-         <wsdl:fault name="NoSuchRODAObjectException">
-
-            <wsdlsoap:fault name="NoSuchRODAObjectException" use="literal"/>
-
-         </wsdl:fault>
-
-         <wsdl:fault name="BrowserException">
-
-            <wsdlsoap:fault name="BrowserException" use="literal"/>
-
-         </wsdl:fault>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="getRODAObjects">
-
-         <wsdlsoap:operation soapAction=""/>
-
-         <wsdl:input name="getRODAObjectsRequest">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:input>
-
-         <wsdl:output name="getRODAObjectsResponse">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:output>
-
-         <wsdl:fault name="BrowserException">
-
-            <wsdlsoap:fault name="BrowserException" use="literal"/>
-
-         </wsdl:fault>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="getDescriptionObject">
-
-         <wsdlsoap:operation soapAction=""/>
-
-         <wsdl:input name="getDescriptionObjectRequest">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:input>
-
-         <wsdl:output name="getDescriptionObjectResponse">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:output>
-
-         <wsdl:fault name="NoSuchRODAObjectException">
-
-            <wsdlsoap:fault name="NoSuchRODAObjectException" use="literal"/>
-
-         </wsdl:fault>
-
-         <wsdl:fault name="BrowserException">
-
-            <wsdlsoap:fault name="BrowserException" use="literal"/>
-
-         </wsdl:fault>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="getDOPreservationObjects">
-
-         <wsdlsoap:operation soapAction=""/>
-
-         <wsdl:input name="getDOPreservationObjectsRequest">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:input>
-
-         <wsdl:output name="getDOPreservationObjectsResponse">
 
             <wsdlsoap:body use="literal"/>
 
@@ -2887,17 +2827,17 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
       </wsdl:operation>
 
-      <wsdl:operation name="getDOOriginalRepresentation">
+      <wsdl:operation name="hasModifyPermission">
 
          <wsdlsoap:operation soapAction=""/>
 
-         <wsdl:input name="getDOOriginalRepresentationRequest">
+         <wsdl:input name="hasModifyPermissionRequest">
 
             <wsdlsoap:body use="literal"/>
 
          </wsdl:input>
 
-         <wsdl:output name="getDOOriginalRepresentationResponse">
+         <wsdl:output name="hasModifyPermissionResponse">
 
             <wsdlsoap:body use="literal"/>
 
@@ -2917,17 +2857,77 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
       </wsdl:operation>
 
-      <wsdl:operation name="getDORepresentations">
+      <wsdl:operation name="hasRemovePermission">
 
          <wsdlsoap:operation soapAction=""/>
 
-         <wsdl:input name="getDORepresentationsRequest">
+         <wsdl:input name="hasRemovePermissionRequest">
 
             <wsdlsoap:body use="literal"/>
 
          </wsdl:input>
 
-         <wsdl:output name="getDORepresentationsResponse">
+         <wsdl:output name="hasRemovePermissionResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="NoSuchRODAObjectException">
+
+            <wsdlsoap:fault name="NoSuchRODAObjectException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="BrowserException">
+
+            <wsdlsoap:fault name="BrowserException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="hasGrantPermission">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="hasGrantPermissionRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="hasGrantPermissionResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="NoSuchRODAObjectException">
+
+            <wsdlsoap:fault name="NoSuchRODAObjectException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="BrowserException">
+
+            <wsdlsoap:fault name="BrowserException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getProducers">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getProducersRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getProducersResponse">
 
             <wsdlsoap:body use="literal"/>
 

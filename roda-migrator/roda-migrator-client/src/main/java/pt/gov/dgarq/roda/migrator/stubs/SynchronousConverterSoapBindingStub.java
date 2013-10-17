@@ -180,6 +180,13 @@ public class SynchronousConverterSoapBindingStub extends org.apache.axis.client.
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
 
+            qName = new javax.xml.namespace.QName("http://data.core.roda.dgarq.gov.pt", "FileFormat");
+            cachedSerQNames.add(qName);
+            cls = pt.gov.dgarq.roda.core.data.FileFormat.class;
+            cachedSerClasses.add(cls);
+            cachedSerFactories.add(beansf);
+            cachedDeserFactories.add(beandf);
+
             qName = new javax.xml.namespace.QName("http://data.core.roda.dgarq.gov.pt", "PreservationObject");
             cachedSerQNames.add(qName);
             cls = pt.gov.dgarq.roda.core.data.PreservationObject.class;

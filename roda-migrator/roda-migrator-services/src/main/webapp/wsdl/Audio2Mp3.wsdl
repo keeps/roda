@@ -78,14 +78,27 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
      </extension>
     </complexContent>
    </complexType>
-   <complexType name="RepresentationFile">
+   <complexType name="FileFormat">
     <sequence>
-     <element name="accessURL" nillable="true" type="xsd:string"/>
-     <element name="id" nillable="true" type="xsd:string"/>
+     <element name="extensions" nillable="true" type="impl:ArrayOf_xsd_string"/>
+     <element name="formatRegistryName" nillable="true" type="xsd:string"/>
      <element name="mimetype" nillable="true" type="xsd:string"/>
-     <element name="originalName" nillable="true" type="xsd:string"/>
-     <element name="size" type="xsd:long"/>
+     <element name="name" nillable="true" type="xsd:string"/>
+     <element name="puid" nillable="true" type="xsd:string"/>
+     <element name="version" nillable="true" type="xsd:string"/>
     </sequence>
+   </complexType>
+   <complexType name="RepresentationFile">
+    <complexContent>
+     <extension base="tns1:FileFormat">
+      <sequence>
+       <element name="accessURL" nillable="true" type="xsd:string"/>
+       <element name="id" nillable="true" type="xsd:string"/>
+       <element name="originalName" nillable="true" type="xsd:string"/>
+       <element name="size" type="xsd:long"/>
+      </sequence>
+     </extension>
+    </complexContent>
    </complexType>
    <complexType name="RepresentationObject">
     <complexContent>

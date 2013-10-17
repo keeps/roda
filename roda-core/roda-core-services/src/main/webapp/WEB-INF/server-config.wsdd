@@ -28,10 +28,10 @@
    <parameter qname="ns1:password" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
    <fault class="pt.gov.dgarq.roda.core.common.LoginException" qname="ns1:fault" type="ns3:LoginException" xmlns:ns3="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getGuestCredentials" qname="ns4:getGuestCredentials" returnQName="ns4:getGuestCredentialsReturn" returnType="xsd:string" soapAction="" xmlns:ns4="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-  <operation name="getGuestUser" qname="ns5:getGuestUser" returnQName="ns5:getGuestUserReturn" returnType="ns6:User" soapAction="" xmlns:ns5="http://services.core.roda.dgarq.gov.pt" xmlns:ns6="http://data.core.roda.dgarq.gov.pt">
-   <fault class="pt.gov.dgarq.roda.core.common.LoginException" qname="ns5:fault" type="ns7:LoginException" xmlns:ns7="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getGuestUser" qname="ns4:getGuestUser" returnQName="ns4:getGuestUserReturn" returnType="ns5:User" soapAction="" xmlns:ns4="http://services.core.roda.dgarq.gov.pt" xmlns:ns5="http://data.core.roda.dgarq.gov.pt">
+   <fault class="pt.gov.dgarq.roda.core.common.LoginException" qname="ns4:fault" type="ns6:LoginException" xmlns:ns6="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
+  <operation name="getGuestCredentials" qname="ns7:getGuestCredentials" returnQName="ns7:getGuestCredentialsReturn" returnType="xsd:string" soapAction="" xmlns:ns7="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
   <parameter name="wsdlServicePort" value="Login"/>
   <parameter name="schemaQualified" value="http://services.core.roda.dgarq.gov.pt,http://filter.adapter.data.core.roda.dgarq.gov.pt,http://common.core.roda.dgarq.gov.pt,http://data.core.roda.dgarq.gov.pt"/>
   <parameter name="className" value="pt.gov.dgarq.roda.core.services.Login"/>
@@ -49,37 +49,37 @@
   <arrayMapping innerType="xsd:string" languageSpecificType="java:java.lang.String[]" qname="ns13:ArrayOf_xsd_string" xmlns:ns13="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
  </service>
  <service name="Editor" provider="java:RPC" style="wrapped" use="literal">
-  <operation name="setRODAObjectPermissions" qname="ns14:setRODAObjectPermissions" returnQName="ns14:setRODAObjectPermissionsReturn" returnType="ns15:RODAObjectPermissions" soapAction="" xmlns:ns14="http://services.core.roda.dgarq.gov.pt" xmlns:ns15="http://data.core.roda.dgarq.gov.pt">
-   <parameter qname="ns14:permissions" type="ns15:RODAObjectPermissions"/>
-   <parameter qname="ns14:applyToDescendants" type="xsd:boolean" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns14:fault" type="ns16:NoSuchRODAObjectException" xmlns:ns16="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.EditorException" qname="ns14:fault1" type="ns17:EditorException" xmlns:ns17="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="createDescriptionObject" qname="ns14:createDescriptionObject" returnQName="ns14:createDescriptionObjectReturn" returnType="xsd:string" soapAction="" xmlns:ns14="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <parameter qname="ns14:dObject" type="ns15:DescriptionObject" xmlns:ns15="http://data.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns14:fault1" type="ns16:NoSuchRODAObjectException" xmlns:ns16="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.InvalidDescriptionObjectException" qname="ns14:fault2" type="ns17:InvalidDescriptionObjectException" xmlns:ns17="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.EditorException" qname="ns14:fault" type="ns18:EditorException" xmlns:ns18="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="createDescriptionObject" qname="ns18:createDescriptionObject" returnQName="ns18:createDescriptionObjectReturn" returnType="xsd:string" soapAction="" xmlns:ns18="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-   <parameter qname="ns18:dObject" type="ns19:DescriptionObject" xmlns:ns19="http://data.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns18:fault" type="ns20:NoSuchRODAObjectException" xmlns:ns20="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.InvalidDescriptionObjectException" qname="ns18:fault2" type="ns21:InvalidDescriptionObjectException" xmlns:ns21="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.EditorException" qname="ns18:fault1" type="ns22:EditorException" xmlns:ns22="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="modifyDescriptionObject" qname="ns19:modifyDescriptionObject" returnQName="ns19:modifyDescriptionObjectReturn" returnType="ns20:DescriptionObject" soapAction="" xmlns:ns19="http://services.core.roda.dgarq.gov.pt" xmlns:ns20="http://data.core.roda.dgarq.gov.pt">
+   <parameter qname="ns19:dObject" type="ns20:DescriptionObject"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns19:fault1" type="ns21:NoSuchRODAObjectException" xmlns:ns21="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.EditorException" qname="ns19:fault" type="ns22:EditorException" xmlns:ns22="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="modifyDescriptionObject" qname="ns23:modifyDescriptionObject" returnQName="ns23:modifyDescriptionObjectReturn" returnType="ns24:DescriptionObject" soapAction="" xmlns:ns23="http://services.core.roda.dgarq.gov.pt" xmlns:ns24="http://data.core.roda.dgarq.gov.pt">
-   <parameter qname="ns23:dObject" type="ns24:DescriptionObject"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns23:fault" type="ns25:NoSuchRODAObjectException" xmlns:ns25="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.EditorException" qname="ns23:fault1" type="ns26:EditorException" xmlns:ns26="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="removeDescriptionObject" qname="ns23:removeDescriptionObject" soapAction="" xmlns:ns23="http://services.core.roda.dgarq.gov.pt">
+   <parameter qname="ns23:pid" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns23:fault1" type="ns24:NoSuchRODAObjectException" xmlns:ns24="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.EditorException" qname="ns23:fault" type="ns25:EditorException" xmlns:ns25="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="removeDescriptionObject" qname="ns27:removeDescriptionObject" soapAction="" xmlns:ns27="http://services.core.roda.dgarq.gov.pt">
-   <parameter qname="ns27:pid" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns27:fault" type="ns28:NoSuchRODAObjectException" xmlns:ns28="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.EditorException" qname="ns27:fault1" type="ns29:EditorException" xmlns:ns29="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getDOPossibleLevels" qname="ns26:getDOPossibleLevels" returnQName="ns26:getDOPossibleLevelsReturn" returnType="ns27:DescriptionLevel" soapAction="" xmlns:ns26="http://services.core.roda.dgarq.gov.pt" xmlns:ns27="http://eadc.data.core.roda.dgarq.gov.pt">
+   <parameter qname="ns26:doPID" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <fault class="pt.gov.dgarq.roda.core.common.EditorException" qname="ns26:fault" type="ns28:EditorException" xmlns:ns28="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getDOPossibleLevels" qname="ns30:getDOPossibleLevels" returnQName="ns30:getDOPossibleLevelsReturn" returnType="ns31:DescriptionLevel" soapAction="" xmlns:ns30="http://services.core.roda.dgarq.gov.pt" xmlns:ns31="http://eadc.data.core.roda.dgarq.gov.pt">
-   <parameter qname="ns30:doPID" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <fault class="pt.gov.dgarq.roda.core.common.EditorException" qname="ns30:fault1" type="ns32:EditorException" xmlns:ns32="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="setRODAObjectPermissions" qname="ns29:setRODAObjectPermissions" returnQName="ns29:setRODAObjectPermissionsReturn" returnType="ns30:RODAObjectPermissions" soapAction="" xmlns:ns29="http://services.core.roda.dgarq.gov.pt" xmlns:ns30="http://data.core.roda.dgarq.gov.pt">
+   <parameter qname="ns29:permissions" type="ns30:RODAObjectPermissions"/>
+   <parameter qname="ns29:applyToDescendants" type="xsd:boolean" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns29:fault1" type="ns31:NoSuchRODAObjectException" xmlns:ns31="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.EditorException" qname="ns29:fault" type="ns32:EditorException" xmlns:ns32="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
   <operation name="setProducers" qname="ns33:setProducers" soapAction="" xmlns:ns33="http://services.core.roda.dgarq.gov.pt">
    <parameter qname="ns33:doPID" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
    <parameter qname="ns33:producers" type="ns34:Producers" xmlns:ns34="http://data.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns33:fault" type="ns35:NoSuchRODAObjectException" xmlns:ns35="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.EditorException" qname="ns33:fault1" type="ns36:EditorException" xmlns:ns36="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns33:fault1" type="ns35:NoSuchRODAObjectException" xmlns:ns35="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.EditorException" qname="ns33:fault" type="ns36:EditorException" xmlns:ns36="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
   <parameter name="wsdlServicePort" value="Editor"/>
   <parameter name="schemaQualified" value="http://services.core.roda.dgarq.gov.pt,http://filter.adapter.data.core.roda.dgarq.gov.pt,http://common.core.roda.dgarq.gov.pt,http://eadc.data.core.roda.dgarq.gov.pt,http://data.core.roda.dgarq.gov.pt"/>
@@ -90,30 +90,30 @@
   <parameter name="wsdlTargetNamespace" value="http://services.core.roda.dgarq.gov.pt"/>
   <parameter name="wsdlPortType" value="Editor"/>
   <parameter name="scope" value="Application"/>
-  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns37:DescriptionLevel" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.eadc.DescriptionLevel" xmlns:ns37="http://eadc.data.core.roda.dgarq.gov.pt"/>
-  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns38:LangmaterialLanguages" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.eadc.LangmaterialLanguages" xmlns:ns38="http://eadc.data.core.roda.dgarq.gov.pt"/>
-  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns39:BioghistChronlist" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.eadc.BioghistChronlist" xmlns:ns39="http://eadc.data.core.roda.dgarq.gov.pt"/>
-  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns40:RODAObjectPermissions" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.RODAObjectPermissions" xmlns:ns40="http://data.core.roda.dgarq.gov.pt"/>
-  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns41:ArrangementTableRow" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.eadc.ArrangementTableRow" xmlns:ns41="http://eadc.data.core.roda.dgarq.gov.pt"/>
-  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns42:ArrangementTableBody" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.eadc.ArrangementTableBody" xmlns:ns42="http://eadc.data.core.roda.dgarq.gov.pt"/>
-  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns43:NoSuchRODAObjectException" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" xmlns:ns43="http://common.core.roda.dgarq.gov.pt"/>
-  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns44:InvalidDescriptionObjectException" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.common.InvalidDescriptionObjectException" xmlns:ns44="http://common.core.roda.dgarq.gov.pt"/>
-  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns45:ArrangementTableHead" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.eadc.ArrangementTableHead" xmlns:ns45="http://eadc.data.core.roda.dgarq.gov.pt"/>
-  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns46:ArrangementTable" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.eadc.ArrangementTable" xmlns:ns46="http://eadc.data.core.roda.dgarq.gov.pt"/>
-  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns47:RODAServiceException" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.common.RODAServiceException" xmlns:ns47="http://common.core.roda.dgarq.gov.pt"/>
-  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns48:Producers" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.Producers" xmlns:ns48="http://data.core.roda.dgarq.gov.pt"/>
-  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns49:PhysdescElement" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.eadc.PhysdescElement" xmlns:ns49="http://eadc.data.core.roda.dgarq.gov.pt"/>
-  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns50:BioghistChronitem" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.eadc.BioghistChronitem" xmlns:ns50="http://eadc.data.core.roda.dgarq.gov.pt"/>
-  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns51:RODAObject" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.RODAObject" xmlns:ns51="http://data.core.roda.dgarq.gov.pt"/>
-  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns52:RODAException" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.common.RODAException" xmlns:ns52="http://common.core.roda.dgarq.gov.pt"/>
-  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns53:EditorException" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.common.EditorException" xmlns:ns53="http://common.core.roda.dgarq.gov.pt"/>
-  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns54:ArrangementTableGroup" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.eadc.ArrangementTableGroup" xmlns:ns54="http://eadc.data.core.roda.dgarq.gov.pt"/>
-  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns55:DescriptionObject" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.DescriptionObject" xmlns:ns55="http://data.core.roda.dgarq.gov.pt"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns37:LangmaterialLanguages" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.eadc.LangmaterialLanguages" xmlns:ns37="http://eadc.data.core.roda.dgarq.gov.pt"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns38:InvalidDescriptionObjectException" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.common.InvalidDescriptionObjectException" xmlns:ns38="http://common.core.roda.dgarq.gov.pt"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns39:RODAServiceException" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.common.RODAServiceException" xmlns:ns39="http://common.core.roda.dgarq.gov.pt"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns40:Producers" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.Producers" xmlns:ns40="http://data.core.roda.dgarq.gov.pt"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns41:BioghistChronitem" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.eadc.BioghistChronitem" xmlns:ns41="http://eadc.data.core.roda.dgarq.gov.pt"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns42:EditorException" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.common.EditorException" xmlns:ns42="http://common.core.roda.dgarq.gov.pt"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns43:ArrangementTableGroup" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.eadc.ArrangementTableGroup" xmlns:ns43="http://eadc.data.core.roda.dgarq.gov.pt"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns44:DescriptionObject" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.DescriptionObject" xmlns:ns44="http://data.core.roda.dgarq.gov.pt"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns45:DescriptionLevel" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.eadc.DescriptionLevel" xmlns:ns45="http://eadc.data.core.roda.dgarq.gov.pt"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns46:BioghistChronlist" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.eadc.BioghistChronlist" xmlns:ns46="http://eadc.data.core.roda.dgarq.gov.pt"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns47:RODAObjectPermissions" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.RODAObjectPermissions" xmlns:ns47="http://data.core.roda.dgarq.gov.pt"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns48:ArrangementTableRow" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.eadc.ArrangementTableRow" xmlns:ns48="http://eadc.data.core.roda.dgarq.gov.pt"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns49:ArrangementTableBody" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.eadc.ArrangementTableBody" xmlns:ns49="http://eadc.data.core.roda.dgarq.gov.pt"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns50:NoSuchRODAObjectException" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" xmlns:ns50="http://common.core.roda.dgarq.gov.pt"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns51:ArrangementTableHead" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.eadc.ArrangementTableHead" xmlns:ns51="http://eadc.data.core.roda.dgarq.gov.pt"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns52:ArrangementTable" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.eadc.ArrangementTable" xmlns:ns52="http://eadc.data.core.roda.dgarq.gov.pt"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns53:PhysdescElement" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.eadc.PhysdescElement" xmlns:ns53="http://eadc.data.core.roda.dgarq.gov.pt"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns54:RODAObject" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.RODAObject" xmlns:ns54="http://data.core.roda.dgarq.gov.pt"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns55:RODAException" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.common.RODAException" xmlns:ns55="http://common.core.roda.dgarq.gov.pt"/>
   <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns56:SimpleDescriptionObject" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.SimpleDescriptionObject" xmlns:ns56="http://data.core.roda.dgarq.gov.pt"/>
-  <arrayMapping innerType="xsd:string" languageSpecificType="java:java.lang.String[]" qname="ns57:ArrayOf_xsd_string" xmlns:ns57="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-  <arrayMapping innerType="ns59:BioghistChronitem" languageSpecificType="java:pt.gov.dgarq.roda.core.data.eadc.BioghistChronitem[]" qname="ns58:ArrayOf_tns3_BioghistChronitem" xmlns:ns58="http://services.core.roda.dgarq.gov.pt" xmlns:ns59="http://eadc.data.core.roda.dgarq.gov.pt"/>
-  <arrayMapping innerType="ns61:ArrangementTableGroup" languageSpecificType="java:pt.gov.dgarq.roda.core.data.eadc.ArrangementTableGroup[]" qname="ns60:ArrayOf_tns3_ArrangementTableGroup" xmlns:ns60="http://services.core.roda.dgarq.gov.pt" xmlns:ns61="http://eadc.data.core.roda.dgarq.gov.pt"/>
-  <arrayMapping innerType="ns63:ArrangementTableRow" languageSpecificType="java:pt.gov.dgarq.roda.core.data.eadc.ArrangementTableRow[]" qname="ns62:ArrayOf_tns3_ArrangementTableRow" xmlns:ns62="http://services.core.roda.dgarq.gov.pt" xmlns:ns63="http://eadc.data.core.roda.dgarq.gov.pt"/>
+  <arrayMapping innerType="ns58:ArrangementTableGroup" languageSpecificType="java:pt.gov.dgarq.roda.core.data.eadc.ArrangementTableGroup[]" qname="ns57:ArrayOf_tns2_ArrangementTableGroup" xmlns:ns57="http://services.core.roda.dgarq.gov.pt" xmlns:ns58="http://eadc.data.core.roda.dgarq.gov.pt"/>
+  <arrayMapping innerType="xsd:string" languageSpecificType="java:java.lang.String[]" qname="ns59:ArrayOf_xsd_string" xmlns:ns59="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+  <arrayMapping innerType="ns61:ArrangementTableRow" languageSpecificType="java:pt.gov.dgarq.roda.core.data.eadc.ArrangementTableRow[]" qname="ns60:ArrayOf_tns2_ArrangementTableRow" xmlns:ns60="http://services.core.roda.dgarq.gov.pt" xmlns:ns61="http://eadc.data.core.roda.dgarq.gov.pt"/>
+  <arrayMapping innerType="ns63:BioghistChronitem" languageSpecificType="java:pt.gov.dgarq.roda.core.data.eadc.BioghistChronitem[]" qname="ns62:ArrayOf_tns2_BioghistChronitem" xmlns:ns62="http://services.core.roda.dgarq.gov.pt" xmlns:ns63="http://eadc.data.core.roda.dgarq.gov.pt"/>
  </service>
  <service name="Search" provider="java:RPC" style="wrapped" use="literal">
   <operation name="basicSearch" qname="ns64:basicSearch" returnQName="ns64:basicSearchReturn" returnType="ns65:SearchResult" soapAction="" xmlns:ns64="http://services.core.roda.dgarq.gov.pt" xmlns:ns65="http://data.core.roda.dgarq.gov.pt">
@@ -189,54 +189,54 @@
   <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns106:RODAException" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.common.RODAException" xmlns:ns106="http://common.core.roda.dgarq.gov.pt"/>
  </service>
  <service name="UserBrowser" provider="java:RPC" style="wrapped" use="literal">
-  <operation name="getUsers" qname="ns107:getUsers" returnQName="ns107:getUsersReturn" returnType="ns108:User" soapAction="" xmlns:ns107="http://services.core.roda.dgarq.gov.pt" xmlns:ns108="http://data.core.roda.dgarq.gov.pt">
+  <operation name="getGroups" qname="ns107:getGroups" returnQName="ns107:getGroupsReturn" returnType="ns108:Group" soapAction="" xmlns:ns107="http://services.core.roda.dgarq.gov.pt" xmlns:ns108="http://data.core.roda.dgarq.gov.pt">
    <parameter qname="ns107:contentAdapter" type="ns109:ContentAdapter" xmlns:ns109="http://adapter.data.core.roda.dgarq.gov.pt"/>
    <fault class="pt.gov.dgarq.roda.core.common.UserManagementException" qname="ns107:fault" type="ns110:UserManagementException" xmlns:ns110="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getUserNames" qname="ns111:getUserNames" returnQName="ns111:getUserNamesReturn" returnType="xsd:string" soapAction="" xmlns:ns111="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-   <parameter qname="ns111:contentAdapter" type="ns112:ContentAdapter" xmlns:ns112="http://adapter.data.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.UserManagementException" qname="ns111:fault" type="ns113:UserManagementException" xmlns:ns113="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getRoles" qname="ns111:getRoles" returnQName="ns111:getRolesReturn" returnType="xsd:string" soapAction="" xmlns:ns111="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <fault class="pt.gov.dgarq.roda.core.common.UserManagementException" qname="ns111:fault" type="ns112:UserManagementException" xmlns:ns112="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getUserCount" qname="ns114:getUserCount" returnQName="ns114:getUserCountReturn" returnType="xsd:int" soapAction="" xmlns:ns114="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-   <parameter qname="ns114:filter" type="ns115:Filter" xmlns:ns115="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.UserManagementException" qname="ns114:fault" type="ns116:UserManagementException" xmlns:ns116="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getGroupCount" qname="ns113:getGroupCount" returnQName="ns113:getGroupCountReturn" returnType="xsd:int" soapAction="" xmlns:ns113="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <parameter qname="ns113:filter" type="ns114:Filter" xmlns:ns114="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.UserManagementException" qname="ns113:fault" type="ns115:UserManagementException" xmlns:ns115="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getUser" qname="ns117:getUser" returnQName="ns117:getUserReturn" returnType="ns118:User" soapAction="" xmlns:ns117="http://services.core.roda.dgarq.gov.pt" xmlns:ns118="http://data.core.roda.dgarq.gov.pt">
-   <parameter qname="ns117:name" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <fault class="pt.gov.dgarq.roda.core.common.UserManagementException" qname="ns117:fault" type="ns119:UserManagementException" xmlns:ns119="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getGroup" qname="ns116:getGroup" returnQName="ns116:getGroupReturn" returnType="ns117:Group" soapAction="" xmlns:ns116="http://services.core.roda.dgarq.gov.pt" xmlns:ns117="http://data.core.roda.dgarq.gov.pt">
+   <parameter qname="ns116:groupName" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <fault class="pt.gov.dgarq.roda.core.common.UserManagementException" qname="ns116:fault" type="ns118:UserManagementException" xmlns:ns118="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getGroup" qname="ns120:getGroup" returnQName="ns120:getGroupReturn" returnType="ns121:Group" soapAction="" xmlns:ns120="http://services.core.roda.dgarq.gov.pt" xmlns:ns121="http://data.core.roda.dgarq.gov.pt">
-   <parameter qname="ns120:groupName" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <fault class="pt.gov.dgarq.roda.core.common.UserManagementException" qname="ns120:fault" type="ns122:UserManagementException" xmlns:ns122="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getUsersInGroup" qname="ns119:getUsersInGroup" returnQName="ns119:getUsersInGroupReturn" returnType="ns120:User" soapAction="" xmlns:ns119="http://services.core.roda.dgarq.gov.pt" xmlns:ns120="http://data.core.roda.dgarq.gov.pt">
+   <parameter qname="ns119:groupName" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <fault class="pt.gov.dgarq.roda.core.common.UserManagementException" qname="ns119:fault" type="ns121:UserManagementException" xmlns:ns121="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getUserDirectRoles" qname="ns123:getUserDirectRoles" returnQName="ns123:getUserDirectRolesReturn" returnType="xsd:string" soapAction="" xmlns:ns123="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-   <parameter qname="ns123:userName" type="xsd:string"/>
-   <fault class="pt.gov.dgarq.roda.core.common.UserManagementException" qname="ns123:fault" type="ns124:UserManagementException" xmlns:ns124="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getUserCount" qname="ns122:getUserCount" returnQName="ns122:getUserCountReturn" returnType="xsd:int" soapAction="" xmlns:ns122="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <parameter qname="ns122:filter" type="ns123:Filter" xmlns:ns123="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.UserManagementException" qname="ns122:fault" type="ns124:UserManagementException" xmlns:ns124="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getGroupCount" qname="ns125:getGroupCount" returnQName="ns125:getGroupCountReturn" returnType="xsd:int" soapAction="" xmlns:ns125="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-   <parameter qname="ns125:filter" type="ns126:Filter" xmlns:ns126="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+  <operation name="getUser" qname="ns125:getUser" returnQName="ns125:getUserReturn" returnType="ns126:User" soapAction="" xmlns:ns125="http://services.core.roda.dgarq.gov.pt" xmlns:ns126="http://data.core.roda.dgarq.gov.pt">
+   <parameter qname="ns125:name" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
    <fault class="pt.gov.dgarq.roda.core.common.UserManagementException" qname="ns125:fault" type="ns127:UserManagementException" xmlns:ns127="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getUsersInGroup" qname="ns128:getUsersInGroup" returnQName="ns128:getUsersInGroupReturn" returnType="ns129:User" soapAction="" xmlns:ns128="http://services.core.roda.dgarq.gov.pt" xmlns:ns129="http://data.core.roda.dgarq.gov.pt">
-   <parameter qname="ns128:groupName" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <fault class="pt.gov.dgarq.roda.core.common.UserManagementException" qname="ns128:fault" type="ns130:UserManagementException" xmlns:ns130="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getUsers" qname="ns128:getUsers" returnQName="ns128:getUsersReturn" returnType="ns129:User" soapAction="" xmlns:ns128="http://services.core.roda.dgarq.gov.pt" xmlns:ns129="http://data.core.roda.dgarq.gov.pt">
+   <parameter qname="ns128:contentAdapter" type="ns130:ContentAdapter" xmlns:ns130="http://adapter.data.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.UserManagementException" qname="ns128:fault" type="ns131:UserManagementException" xmlns:ns131="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getGroupDirectRoles" qname="ns131:getGroupDirectRoles" returnQName="ns131:getGroupDirectRolesReturn" returnType="xsd:string" soapAction="" xmlns:ns131="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-   <parameter qname="ns131:groupName" type="xsd:string"/>
-   <fault class="pt.gov.dgarq.roda.core.common.UserManagementException" qname="ns131:fault" type="ns132:UserManagementException" xmlns:ns132="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getUserNames" qname="ns132:getUserNames" returnQName="ns132:getUserNamesReturn" returnType="xsd:string" soapAction="" xmlns:ns132="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <parameter qname="ns132:contentAdapter" type="ns133:ContentAdapter" xmlns:ns133="http://adapter.data.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.UserManagementException" qname="ns132:fault" type="ns134:UserManagementException" xmlns:ns134="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getRoles" qname="ns133:getRoles" returnQName="ns133:getRolesReturn" returnType="xsd:string" soapAction="" xmlns:ns133="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-   <fault class="pt.gov.dgarq.roda.core.common.UserManagementException" qname="ns133:fault" type="ns134:UserManagementException" xmlns:ns134="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getGroupDirectRoles" qname="ns135:getGroupDirectRoles" returnQName="ns135:getGroupDirectRolesReturn" returnType="xsd:string" soapAction="" xmlns:ns135="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <parameter qname="ns135:groupName" type="xsd:string"/>
+   <fault class="pt.gov.dgarq.roda.core.common.UserManagementException" qname="ns135:fault" type="ns136:UserManagementException" xmlns:ns136="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getGroups" qname="ns135:getGroups" returnQName="ns135:getGroupsReturn" returnType="ns136:Group" soapAction="" xmlns:ns135="http://services.core.roda.dgarq.gov.pt" xmlns:ns136="http://data.core.roda.dgarq.gov.pt">
-   <parameter qname="ns135:contentAdapter" type="ns137:ContentAdapter" xmlns:ns137="http://adapter.data.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.UserManagementException" qname="ns135:fault" type="ns138:UserManagementException" xmlns:ns138="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getUserDirectRoles" qname="ns137:getUserDirectRoles" returnQName="ns137:getUserDirectRolesReturn" returnType="xsd:string" soapAction="" xmlns:ns137="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <parameter qname="ns137:userName" type="xsd:string"/>
+   <fault class="pt.gov.dgarq.roda.core.common.UserManagementException" qname="ns137:fault" type="ns138:UserManagementException" xmlns:ns138="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
   <parameter name="wsdlServicePort" value="UserBrowser"/>
   <parameter name="schemaQualified" value="http://services.core.roda.dgarq.gov.pt,http://sublist.adapter.data.core.roda.dgarq.gov.pt,http://adapter.data.core.roda.dgarq.gov.pt,http://sort.adapter.data.core.roda.dgarq.gov.pt,http://common.core.roda.dgarq.gov.pt,http://filter.adapter.data.core.roda.dgarq.gov.pt,http://data.core.roda.dgarq.gov.pt"/>
   <parameter name="className" value="pt.gov.dgarq.roda.core.services.UserBrowser"/>
   <parameter name="typeMappingVersion" value="1.2"/>
-  <parameter name="allowedMethods" value="getGroupCount getUser getGroups getGroupDirectRoles getUserDirectRoles getUsersInGroup getUserNames getUserCount getGroup getRoles getUsers"/>
+  <parameter name="allowedMethods" value="getGroupCount getUser getGroupDirectRoles getGroups getUserDirectRoles getUserNames getUsersInGroup getUserCount getGroup getUsers getRoles"/>
   <parameter name="wsdlServiceElement" value="UserBrowserService"/>
   <parameter name="wsdlTargetNamespace" value="http://services.core.roda.dgarq.gov.pt"/>
   <parameter name="wsdlPortType" value="UserBrowser"/>
@@ -252,8 +252,8 @@
   <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns147:FilterParameter" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter" xmlns:ns147="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
   <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns148:RangeFilterParameter" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.adapter.filter.RangeFilterParameter" xmlns:ns148="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
   <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns149:Filter" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.adapter.filter.Filter" xmlns:ns149="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
-  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns150:Sublist" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist" xmlns:ns150="http://sublist.adapter.data.core.roda.dgarq.gov.pt"/>
-  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns151:SimpleFilterParameter" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter" xmlns:ns151="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns150:SimpleFilterParameter" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter" xmlns:ns150="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns151:Sublist" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist" xmlns:ns151="http://sublist.adapter.data.core.roda.dgarq.gov.pt"/>
   <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns152:Group" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.Group" xmlns:ns152="http://data.core.roda.dgarq.gov.pt"/>
   <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns153:ContentAdapter" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.adapter.ContentAdapter" xmlns:ns153="http://adapter.data.core.roda.dgarq.gov.pt"/>
   <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns154:RegexFilterParameter" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.adapter.filter.RegexFilterParameter" xmlns:ns154="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
@@ -284,13 +284,13 @@
   <arrayMapping innerType="ns170:LogEntryParameter" languageSpecificType="java:pt.gov.dgarq.roda.core.data.LogEntryParameter[]" qname="ns169:ArrayOf_tns1_LogEntryParameter" xmlns:ns169="http://services.core.roda.dgarq.gov.pt" xmlns:ns170="http://data.core.roda.dgarq.gov.pt"/>
  </service>
  <service name="LogMonitor" provider="java:RPC" style="wrapped" use="literal">
-  <operation name="getLogEntriesCount" qname="ns171:getLogEntriesCount" returnQName="ns171:getLogEntriesCountReturn" returnType="xsd:int" soapAction="" xmlns:ns171="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-   <parameter qname="ns171:filter" type="ns172:Filter" xmlns:ns172="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.LoggerException" qname="ns171:fault" type="ns173:LoggerException" xmlns:ns173="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getLogEntries" qname="ns171:getLogEntries" returnQName="ns171:getLogEntriesReturn" returnType="ns172:LogEntry" soapAction="" xmlns:ns171="http://services.core.roda.dgarq.gov.pt" xmlns:ns172="http://data.core.roda.dgarq.gov.pt">
+   <parameter qname="ns171:contentAdapter" type="ns173:ContentAdapter" xmlns:ns173="http://adapter.data.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.LoggerException" qname="ns171:fault" type="ns174:LoggerException" xmlns:ns174="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getLogEntries" qname="ns174:getLogEntries" returnQName="ns174:getLogEntriesReturn" returnType="ns175:LogEntry" soapAction="" xmlns:ns174="http://services.core.roda.dgarq.gov.pt" xmlns:ns175="http://data.core.roda.dgarq.gov.pt">
-   <parameter qname="ns174:contentAdapter" type="ns176:ContentAdapter" xmlns:ns176="http://adapter.data.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.LoggerException" qname="ns174:fault" type="ns177:LoggerException" xmlns:ns177="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getLogEntriesCount" qname="ns175:getLogEntriesCount" returnQName="ns175:getLogEntriesCountReturn" returnType="xsd:int" soapAction="" xmlns:ns175="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <parameter qname="ns175:filter" type="ns176:Filter" xmlns:ns176="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.LoggerException" qname="ns175:fault" type="ns177:LoggerException" xmlns:ns177="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
   <parameter name="wsdlServicePort" value="LogMonitor"/>
   <parameter name="schemaQualified" value="http://services.core.roda.dgarq.gov.pt,http://sublist.adapter.data.core.roda.dgarq.gov.pt,http://adapter.data.core.roda.dgarq.gov.pt,http://sort.adapter.data.core.roda.dgarq.gov.pt,http://common.core.roda.dgarq.gov.pt,http://filter.adapter.data.core.roda.dgarq.gov.pt,http://data.core.roda.dgarq.gov.pt"/>
@@ -317,84 +317,84 @@
   <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns191:ContentAdapter" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.adapter.ContentAdapter" xmlns:ns191="http://adapter.data.core.roda.dgarq.gov.pt"/>
   <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns192:RegexFilterParameter" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.adapter.filter.RegexFilterParameter" xmlns:ns192="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
   <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns193:RODAException" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.common.RODAException" xmlns:ns193="http://common.core.roda.dgarq.gov.pt"/>
-  <arrayMapping innerType="ns195:FilterParameter" languageSpecificType="java:pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter[]" qname="ns194:ArrayOf_tns1_FilterParameter" xmlns:ns194="http://services.core.roda.dgarq.gov.pt" xmlns:ns195="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
-  <arrayMapping innerType="xsd:string" languageSpecificType="java:java.lang.String[]" qname="ns196:ArrayOf_xsd_string" xmlns:ns196="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-  <arrayMapping innerType="ns198:SortParameter" languageSpecificType="java:pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter[]" qname="ns197:ArrayOf_tns4_SortParameter" xmlns:ns197="http://services.core.roda.dgarq.gov.pt" xmlns:ns198="http://sort.adapter.data.core.roda.dgarq.gov.pt"/>
-  <arrayMapping innerType="ns200:LogEntryParameter" languageSpecificType="java:pt.gov.dgarq.roda.core.data.LogEntryParameter[]" qname="ns199:ArrayOf_tns6_LogEntryParameter" xmlns:ns199="http://services.core.roda.dgarq.gov.pt" xmlns:ns200="http://data.core.roda.dgarq.gov.pt"/>
+  <arrayMapping innerType="xsd:string" languageSpecificType="java:java.lang.String[]" qname="ns194:ArrayOf_xsd_string" xmlns:ns194="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+  <arrayMapping innerType="ns196:FilterParameter" languageSpecificType="java:pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter[]" qname="ns195:ArrayOf_tns2_FilterParameter" xmlns:ns195="http://services.core.roda.dgarq.gov.pt" xmlns:ns196="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+  <arrayMapping innerType="ns198:LogEntryParameter" languageSpecificType="java:pt.gov.dgarq.roda.core.data.LogEntryParameter[]" qname="ns197:ArrayOf_tns5_LogEntryParameter" xmlns:ns197="http://services.core.roda.dgarq.gov.pt" xmlns:ns198="http://data.core.roda.dgarq.gov.pt"/>
+  <arrayMapping innerType="ns200:SortParameter" languageSpecificType="java:pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter[]" qname="ns199:ArrayOf_tns3_SortParameter" xmlns:ns199="http://services.core.roda.dgarq.gov.pt" xmlns:ns200="http://sort.adapter.data.core.roda.dgarq.gov.pt"/>
  </service>
  <service name="Ingest" provider="java:RPC" style="wrapped" use="literal">
-  <operation name="createDetachedDescriptionObject" qname="ns201:createDetachedDescriptionObject" returnQName="ns201:createDetachedDescriptionObjectReturn" returnType="xsd:string" soapAction="" xmlns:ns201="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <operation name="createDescriptionObject" qname="ns201:createDescriptionObject" returnQName="ns201:createDescriptionObjectReturn" returnType="xsd:string" soapAction="" xmlns:ns201="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
    <parameter qname="ns201:dObject" type="ns202:DescriptionObject" xmlns:ns202="http://data.core.roda.dgarq.gov.pt"/>
    <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns201:fault" type="ns203:NoSuchRODAObjectException" xmlns:ns203="http://common.core.roda.dgarq.gov.pt"/>
    <fault class="pt.gov.dgarq.roda.core.common.InvalidDescriptionObjectException" qname="ns201:fault1" type="ns204:InvalidDescriptionObjectException" xmlns:ns204="http://common.core.roda.dgarq.gov.pt"/>
    <fault class="pt.gov.dgarq.roda.core.common.IngestException" qname="ns201:fault2" type="ns205:IngestException" xmlns:ns205="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="createRepresentationPreservationObject" qname="ns206:createRepresentationPreservationObject" returnQName="ns206:createRepresentationPreservationObjectReturn" returnType="xsd:string" soapAction="" xmlns:ns206="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-   <parameter qname="ns206:rpo" type="ns207:RepresentationPreservationObject" xmlns:ns207="http://data.core.roda.dgarq.gov.pt"/>
-   <parameter qname="ns206:doPID" type="xsd:string"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns206:fault" type="ns208:NoSuchRODAObjectException" xmlns:ns208="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.IngestException" qname="ns206:fault2" type="ns209:IngestException" xmlns:ns209="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.RepresentationAlreadyPreservedException" qname="ns206:fault3" type="ns210:RepresentationAlreadyPreservedException" xmlns:ns210="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="removeDescriptionObject" qname="ns206:removeDescriptionObject" soapAction="" xmlns:ns206="http://services.core.roda.dgarq.gov.pt">
+   <parameter qname="ns206:doPID" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns206:fault" type="ns207:NoSuchRODAObjectException" xmlns:ns207="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.IngestException" qname="ns206:fault2" type="ns208:IngestException" xmlns:ns208="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="setDONormalizedRepresentation" qname="ns211:setDONormalizedRepresentation" returnQName="ns211:setDONormalizedRepresentationReturn" returnType="xsd:string" soapAction="" xmlns:ns211="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-   <parameter qname="ns211:doPID" type="xsd:string"/>
-   <parameter qname="ns211:roPID" type="xsd:string"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns211:fault" type="ns212:NoSuchRODAObjectException" xmlns:ns212="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.IngestException" qname="ns211:fault2" type="ns213:IngestException" xmlns:ns213="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="removeObjects" qname="ns209:removeObjects" returnQName="ns209:removeObjectsReturn" returnType="xsd:string" soapAction="" xmlns:ns209="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <parameter qname="ns209:pids" type="xsd:string"/>
+   <fault class="pt.gov.dgarq.roda.core.common.IngestException" qname="ns209:fault2" type="ns210:IngestException" xmlns:ns210="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="registerEvent" qname="ns214:registerEvent" returnQName="ns214:registerEventReturn" returnType="xsd:string" soapAction="" xmlns:ns214="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-   <parameter qname="ns214:rpoPID" type="xsd:string"/>
-   <parameter qname="ns214:eventPO" type="ns215:EventPreservationObject" xmlns:ns215="http://data.core.roda.dgarq.gov.pt"/>
-   <parameter qname="ns214:agent" type="ns216:AgentPreservationObject" xmlns:ns216="http://data.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.IngestException" qname="ns214:fault2" type="ns217:IngestException" xmlns:ns217="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="createDetachedDescriptionObject" qname="ns211:createDetachedDescriptionObject" returnQName="ns211:createDetachedDescriptionObjectReturn" returnType="xsd:string" soapAction="" xmlns:ns211="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <parameter qname="ns211:dObject" type="ns212:DescriptionObject" xmlns:ns212="http://data.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns211:fault" type="ns213:NoSuchRODAObjectException" xmlns:ns213="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.InvalidDescriptionObjectException" qname="ns211:fault1" type="ns214:InvalidDescriptionObjectException" xmlns:ns214="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.IngestException" qname="ns211:fault2" type="ns215:IngestException" xmlns:ns215="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="registerDerivationEvent" qname="ns218:registerDerivationEvent" returnQName="ns218:registerDerivationEventReturn" returnType="xsd:string" soapAction="" xmlns:ns218="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-   <parameter qname="ns218:originalRepresentationPID" type="xsd:string"/>
-   <parameter qname="ns218:derivedRepresentationPID" type="xsd:string"/>
-   <parameter qname="ns218:eventPO" type="ns219:EventPreservationObject" xmlns:ns219="http://data.core.roda.dgarq.gov.pt"/>
-   <parameter qname="ns218:agentPO" type="ns220:AgentPreservationObject" xmlns:ns220="http://data.core.roda.dgarq.gov.pt"/>
-   <parameter qname="ns218:markObjectsActive" type="xsd:boolean"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns218:fault" type="ns221:NoSuchRODAObjectException" xmlns:ns221="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.IngestException" qname="ns218:fault2" type="ns222:IngestException" xmlns:ns222="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="createRepresentationObject" qname="ns216:createRepresentationObject" returnQName="ns216:createRepresentationObjectReturn" returnType="xsd:string" soapAction="" xmlns:ns216="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <parameter qname="ns216:rObject" type="ns217:RepresentationObject" xmlns:ns217="http://data.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns216:fault" type="ns218:NoSuchRODAObjectException" xmlns:ns218="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.IngestException" qname="ns216:fault2" type="ns219:IngestException" xmlns:ns219="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="createRepresentationObject" qname="ns223:createRepresentationObject" returnQName="ns223:createRepresentationObjectReturn" returnType="xsd:string" soapAction="" xmlns:ns223="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-   <parameter qname="ns223:rObject" type="ns224:RepresentationObject" xmlns:ns224="http://data.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns223:fault" type="ns225:NoSuchRODAObjectException" xmlns:ns225="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.IngestException" qname="ns223:fault2" type="ns226:IngestException" xmlns:ns226="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="createRepresentationPreservationObject" qname="ns220:createRepresentationPreservationObject" returnQName="ns220:createRepresentationPreservationObjectReturn" returnType="xsd:string" soapAction="" xmlns:ns220="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <parameter qname="ns220:rpo" type="ns221:RepresentationPreservationObject" xmlns:ns221="http://data.core.roda.dgarq.gov.pt"/>
+   <parameter qname="ns220:doPID" type="xsd:string"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns220:fault" type="ns222:NoSuchRODAObjectException" xmlns:ns222="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.IngestException" qname="ns220:fault2" type="ns223:IngestException" xmlns:ns223="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.RepresentationAlreadyPreservedException" qname="ns220:fault3" type="ns224:RepresentationAlreadyPreservedException" xmlns:ns224="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="createDerivationRelationship" qname="ns227:createDerivationRelationship" soapAction="" xmlns:ns227="http://services.core.roda.dgarq.gov.pt">
-   <parameter qname="ns227:rpoPID" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <parameter qname="ns227:derivationEventPID" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <fault class="pt.gov.dgarq.roda.core.common.IngestException" qname="ns227:fault2" type="ns228:IngestException" xmlns:ns228="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="setDONormalizedRepresentation" qname="ns225:setDONormalizedRepresentation" returnQName="ns225:setDONormalizedRepresentationReturn" returnType="xsd:string" soapAction="" xmlns:ns225="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <parameter qname="ns225:doPID" type="xsd:string"/>
+   <parameter qname="ns225:roPID" type="xsd:string"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns225:fault" type="ns226:NoSuchRODAObjectException" xmlns:ns226="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.IngestException" qname="ns225:fault2" type="ns227:IngestException" xmlns:ns227="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="registerIngestEvent" qname="ns229:registerIngestEvent" returnQName="ns229:registerIngestEventReturn" returnType="xsd:string" soapAction="" xmlns:ns229="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-   <parameter qname="ns229:doPIDs" type="xsd:string"/>
-   <parameter qname="ns229:roPIDs" type="xsd:string"/>
-   <parameter qname="ns229:poPIDs" type="xsd:string"/>
-   <parameter qname="ns229:agentName" type="xsd:string"/>
-   <parameter qname="ns229:details" type="xsd:string"/>
-   <fault class="pt.gov.dgarq.roda.core.common.IngestException" qname="ns229:fault2" type="ns230:IngestException" xmlns:ns230="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="createDerivationRelationship" qname="ns228:createDerivationRelationship" soapAction="" xmlns:ns228="http://services.core.roda.dgarq.gov.pt">
+   <parameter qname="ns228:rpoPID" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <parameter qname="ns228:derivationEventPID" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <fault class="pt.gov.dgarq.roda.core.common.IngestException" qname="ns228:fault2" type="ns229:IngestException" xmlns:ns229="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="createDescriptionObject" qname="ns231:createDescriptionObject" returnQName="ns231:createDescriptionObjectReturn" returnType="xsd:string" soapAction="" xmlns:ns231="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-   <parameter qname="ns231:dObject" type="ns232:DescriptionObject" xmlns:ns232="http://data.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns231:fault" type="ns233:NoSuchRODAObjectException" xmlns:ns233="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.InvalidDescriptionObjectException" qname="ns231:fault1" type="ns234:InvalidDescriptionObjectException" xmlns:ns234="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.IngestException" qname="ns231:fault2" type="ns235:IngestException" xmlns:ns235="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="registerIngestEvent" qname="ns230:registerIngestEvent" returnQName="ns230:registerIngestEventReturn" returnType="xsd:string" soapAction="" xmlns:ns230="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <parameter qname="ns230:doPIDs" type="xsd:string"/>
+   <parameter qname="ns230:roPIDs" type="xsd:string"/>
+   <parameter qname="ns230:poPIDs" type="xsd:string"/>
+   <parameter qname="ns230:agentName" type="xsd:string"/>
+   <parameter qname="ns230:details" type="xsd:string"/>
+   <fault class="pt.gov.dgarq.roda.core.common.IngestException" qname="ns230:fault2" type="ns231:IngestException" xmlns:ns231="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="removeObjects" qname="ns236:removeObjects" returnQName="ns236:removeObjectsReturn" returnType="xsd:string" soapAction="" xmlns:ns236="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-   <parameter qname="ns236:pids" type="xsd:string"/>
-   <fault class="pt.gov.dgarq.roda.core.common.IngestException" qname="ns236:fault2" type="ns237:IngestException" xmlns:ns237="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="registerEvent" qname="ns232:registerEvent" returnQName="ns232:registerEventReturn" returnType="xsd:string" soapAction="" xmlns:ns232="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <parameter qname="ns232:rpoPID" type="xsd:string"/>
+   <parameter qname="ns232:eventPO" type="ns233:EventPreservationObject" xmlns:ns233="http://data.core.roda.dgarq.gov.pt"/>
+   <parameter qname="ns232:agent" type="ns234:AgentPreservationObject" xmlns:ns234="http://data.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.IngestException" qname="ns232:fault2" type="ns235:IngestException" xmlns:ns235="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="removeDescriptionObject" qname="ns238:removeDescriptionObject" soapAction="" xmlns:ns238="http://services.core.roda.dgarq.gov.pt">
-   <parameter qname="ns238:doPID" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns238:fault" type="ns239:NoSuchRODAObjectException" xmlns:ns239="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.IngestException" qname="ns238:fault2" type="ns240:IngestException" xmlns:ns240="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="registerDerivationEvent" qname="ns236:registerDerivationEvent" returnQName="ns236:registerDerivationEventReturn" returnType="xsd:string" soapAction="" xmlns:ns236="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <parameter qname="ns236:originalRepresentationPID" type="xsd:string"/>
+   <parameter qname="ns236:derivedRepresentationPID" type="xsd:string"/>
+   <parameter qname="ns236:eventPO" type="ns237:EventPreservationObject" xmlns:ns237="http://data.core.roda.dgarq.gov.pt"/>
+   <parameter qname="ns236:agentPO" type="ns238:AgentPreservationObject" xmlns:ns238="http://data.core.roda.dgarq.gov.pt"/>
+   <parameter qname="ns236:markObjectsActive" type="xsd:boolean"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns236:fault" type="ns239:NoSuchRODAObjectException" xmlns:ns239="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.IngestException" qname="ns236:fault2" type="ns240:IngestException" xmlns:ns240="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
   <parameter name="wsdlServicePort" value="Ingest"/>
   <parameter name="schemaQualified" value="http://services.core.roda.dgarq.gov.pt,http://preservation.data.core.roda.dgarq.gov.pt,http://filter.adapter.data.core.roda.dgarq.gov.pt,http://common.core.roda.dgarq.gov.pt,http://eadc.data.core.roda.dgarq.gov.pt,http://data.core.roda.dgarq.gov.pt"/>
   <parameter name="className" value="pt.gov.dgarq.roda.core.services.Ingest"/>
   <parameter name="typeMappingVersion" value="1.2"/>
-  <parameter name="allowedMethods" value="removeDescriptionObject createDescriptionObject createDerivationRelationship createRepresentationObject setDONormalizedRepresentation createRepresentationPreservationObject registerDerivationEvent registerEvent removeObjects registerIngestEvent createDetachedDescriptionObject"/>
+  <parameter name="allowedMethods" value="createDerivationRelationship setDONormalizedRepresentation createRepresentationObject removeDescriptionObject createDescriptionObject createRepresentationPreservationObject registerDerivationEvent registerEvent removeObjects registerIngestEvent createDetachedDescriptionObject"/>
   <parameter name="wsdlServiceElement" value="IngestService"/>
   <parameter name="wsdlTargetNamespace" value="http://services.core.roda.dgarq.gov.pt"/>
   <parameter name="wsdlPortType" value="Ingest"/>
@@ -473,15 +473,15 @@
   <parameter name="wsdlTargetNamespace" value="http://services.core.roda.dgarq.gov.pt"/>
   <parameter name="wsdlPortType" value="AcceptSIP"/>
   <parameter name="scope" value="Application"/>
-  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns298:IllegalOperationException" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.common.IllegalOperationException" xmlns:ns298="http://common.core.roda.dgarq.gov.pt"/>
-  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns299:RODAServiceException" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.common.RODAServiceException" xmlns:ns299="http://common.core.roda.dgarq.gov.pt"/>
-  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns300:IngestException" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.common.IngestException" xmlns:ns300="http://common.core.roda.dgarq.gov.pt"/>
-  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns301:SIPStateTransition" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.SIPStateTransition" xmlns:ns301="http://data.core.roda.dgarq.gov.pt"/>
-  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns302:RODAException" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.common.RODAException" xmlns:ns302="http://common.core.roda.dgarq.gov.pt"/>
-  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns303:NoSuchSIPException" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.common.NoSuchSIPException" xmlns:ns303="http://common.core.roda.dgarq.gov.pt"/>
-  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns304:EditorException" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.common.EditorException" xmlns:ns304="http://common.core.roda.dgarq.gov.pt"/>
-  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns305:AcceptSIPException" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.common.AcceptSIPException" xmlns:ns305="http://common.core.roda.dgarq.gov.pt"/>
-  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns306:SIPState" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.SIPState" xmlns:ns306="http://data.core.roda.dgarq.gov.pt"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns298:NoSuchSIPException" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.common.NoSuchSIPException" xmlns:ns298="http://common.core.roda.dgarq.gov.pt"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns299:SIPState" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.SIPState" xmlns:ns299="http://data.core.roda.dgarq.gov.pt"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns300:IllegalOperationException" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.common.IllegalOperationException" xmlns:ns300="http://common.core.roda.dgarq.gov.pt"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns301:RODAServiceException" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.common.RODAServiceException" xmlns:ns301="http://common.core.roda.dgarq.gov.pt"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns302:IngestException" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.common.IngestException" xmlns:ns302="http://common.core.roda.dgarq.gov.pt"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns303:SIPStateTransition" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.SIPStateTransition" xmlns:ns303="http://data.core.roda.dgarq.gov.pt"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns304:RODAException" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.common.RODAException" xmlns:ns304="http://common.core.roda.dgarq.gov.pt"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns305:EditorException" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.common.EditorException" xmlns:ns305="http://common.core.roda.dgarq.gov.pt"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns306:AcceptSIPException" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.common.AcceptSIPException" xmlns:ns306="http://common.core.roda.dgarq.gov.pt"/>
   <arrayMapping innerType="ns308:SIPStateTransition" languageSpecificType="java:pt.gov.dgarq.roda.core.data.SIPStateTransition[]" qname="ns307:ArrayOf_tns1_SIPStateTransition" xmlns:ns307="http://services.core.roda.dgarq.gov.pt" xmlns:ns308="http://data.core.roda.dgarq.gov.pt"/>
  </service>
  <service name="UserRegistration" provider="java:RPC" style="wrapped" use="literal">
@@ -492,42 +492,42 @@
    <fault class="pt.gov.dgarq.roda.core.common.UserRegistrationException" qname="ns309:fault2" type="ns312:UserRegistrationException" xmlns:ns312="http://common.core.roda.dgarq.gov.pt"/>
    <fault class="pt.gov.dgarq.roda.core.common.EmailAlreadyExistsException" qname="ns309:fault1" type="ns313:EmailAlreadyExistsException" xmlns:ns313="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="modifyUnconfirmedEmail" qname="ns314:modifyUnconfirmedEmail" returnQName="ns314:modifyUnconfirmedEmailReturn" returnType="ns315:User" soapAction="" xmlns:ns314="http://services.core.roda.dgarq.gov.pt" xmlns:ns315="http://data.core.roda.dgarq.gov.pt">
+  <operation name="getUnconfirmedUser" qname="ns314:getUnconfirmedUser" returnQName="ns314:getUnconfirmedUserReturn" returnType="ns315:User" soapAction="" xmlns:ns314="http://services.core.roda.dgarq.gov.pt" xmlns:ns315="http://data.core.roda.dgarq.gov.pt">
    <parameter qname="ns314:username" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <parameter qname="ns314:email" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
    <fault class="pt.gov.dgarq.roda.core.common.UserRegistrationException" qname="ns314:fault2" type="ns316:UserRegistrationException" xmlns:ns316="http://common.core.roda.dgarq.gov.pt"/>
    <fault class="pt.gov.dgarq.roda.core.common.NoSuchUserException" qname="ns314:fault4" type="ns317:NoSuchUserException" xmlns:ns317="http://common.core.roda.dgarq.gov.pt"/>
    <fault class="pt.gov.dgarq.roda.core.common.IllegalOperationException" qname="ns314:fault3" type="ns318:IllegalOperationException" xmlns:ns318="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="confirmUserEmail" qname="ns319:confirmUserEmail" returnQName="ns319:confirmUserEmailReturn" returnType="ns320:User" soapAction="" xmlns:ns319="http://services.core.roda.dgarq.gov.pt" xmlns:ns320="http://data.core.roda.dgarq.gov.pt">
+  <operation name="modifyUnconfirmedEmail" qname="ns319:modifyUnconfirmedEmail" returnQName="ns319:modifyUnconfirmedEmailReturn" returnType="ns320:User" soapAction="" xmlns:ns319="http://services.core.roda.dgarq.gov.pt" xmlns:ns320="http://data.core.roda.dgarq.gov.pt">
    <parameter qname="ns319:username" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
    <parameter qname="ns319:email" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <parameter qname="ns319:emailConfirmationToken" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <fault class="pt.gov.dgarq.roda.core.common.InvalidTokenException" qname="ns319:fault5" type="ns321:InvalidTokenException" xmlns:ns321="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.UserRegistrationException" qname="ns319:fault2" type="ns322:UserRegistrationException" xmlns:ns322="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchUserException" qname="ns319:fault4" type="ns323:NoSuchUserException" xmlns:ns323="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.UserRegistrationException" qname="ns319:fault2" type="ns321:UserRegistrationException" xmlns:ns321="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchUserException" qname="ns319:fault4" type="ns322:NoSuchUserException" xmlns:ns322="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.IllegalOperationException" qname="ns319:fault3" type="ns323:IllegalOperationException" xmlns:ns323="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="resetUserPassword" qname="ns324:resetUserPassword" returnQName="ns324:resetUserPasswordReturn" returnType="ns325:User" soapAction="" xmlns:ns324="http://services.core.roda.dgarq.gov.pt" xmlns:ns325="http://data.core.roda.dgarq.gov.pt">
+  <operation name="confirmUserEmail" qname="ns324:confirmUserEmail" returnQName="ns324:confirmUserEmailReturn" returnType="ns325:User" soapAction="" xmlns:ns324="http://services.core.roda.dgarq.gov.pt" xmlns:ns325="http://data.core.roda.dgarq.gov.pt">
    <parameter qname="ns324:username" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <parameter qname="ns324:password" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <parameter qname="ns324:resetPasswordToken" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <parameter qname="ns324:email" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <parameter qname="ns324:emailConfirmationToken" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
    <fault class="pt.gov.dgarq.roda.core.common.InvalidTokenException" qname="ns324:fault5" type="ns326:InvalidTokenException" xmlns:ns326="http://common.core.roda.dgarq.gov.pt"/>
    <fault class="pt.gov.dgarq.roda.core.common.UserRegistrationException" qname="ns324:fault2" type="ns327:UserRegistrationException" xmlns:ns327="http://common.core.roda.dgarq.gov.pt"/>
    <fault class="pt.gov.dgarq.roda.core.common.NoSuchUserException" qname="ns324:fault4" type="ns328:NoSuchUserException" xmlns:ns328="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.IllegalOperationException" qname="ns324:fault3" type="ns329:IllegalOperationException" xmlns:ns329="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getUnconfirmedUser" qname="ns330:getUnconfirmedUser" returnQName="ns330:getUnconfirmedUserReturn" returnType="ns331:User" soapAction="" xmlns:ns330="http://services.core.roda.dgarq.gov.pt" xmlns:ns331="http://data.core.roda.dgarq.gov.pt">
-   <parameter qname="ns330:username" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <fault class="pt.gov.dgarq.roda.core.common.UserRegistrationException" qname="ns330:fault2" type="ns332:UserRegistrationException" xmlns:ns332="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchUserException" qname="ns330:fault4" type="ns333:NoSuchUserException" xmlns:ns333="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.IllegalOperationException" qname="ns330:fault3" type="ns334:IllegalOperationException" xmlns:ns334="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="requestPasswordReset" qname="ns329:requestPasswordReset" returnQName="ns329:requestPasswordResetReturn" returnType="ns330:User" soapAction="" xmlns:ns329="http://services.core.roda.dgarq.gov.pt" xmlns:ns330="http://data.core.roda.dgarq.gov.pt">
+   <parameter qname="ns329:username" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <parameter qname="ns329:email" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <fault class="pt.gov.dgarq.roda.core.common.UserRegistrationException" qname="ns329:fault2" type="ns331:UserRegistrationException" xmlns:ns331="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchUserException" qname="ns329:fault4" type="ns332:NoSuchUserException" xmlns:ns332="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.IllegalOperationException" qname="ns329:fault3" type="ns333:IllegalOperationException" xmlns:ns333="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="requestPasswordReset" qname="ns335:requestPasswordReset" returnQName="ns335:requestPasswordResetReturn" returnType="ns336:User" soapAction="" xmlns:ns335="http://services.core.roda.dgarq.gov.pt" xmlns:ns336="http://data.core.roda.dgarq.gov.pt">
-   <parameter qname="ns335:username" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <parameter qname="ns335:email" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <fault class="pt.gov.dgarq.roda.core.common.UserRegistrationException" qname="ns335:fault2" type="ns337:UserRegistrationException" xmlns:ns337="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchUserException" qname="ns335:fault4" type="ns338:NoSuchUserException" xmlns:ns338="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.IllegalOperationException" qname="ns335:fault3" type="ns339:IllegalOperationException" xmlns:ns339="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="resetUserPassword" qname="ns334:resetUserPassword" returnQName="ns334:resetUserPasswordReturn" returnType="ns335:User" soapAction="" xmlns:ns334="http://services.core.roda.dgarq.gov.pt" xmlns:ns335="http://data.core.roda.dgarq.gov.pt">
+   <parameter qname="ns334:username" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <parameter qname="ns334:password" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <parameter qname="ns334:resetPasswordToken" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <fault class="pt.gov.dgarq.roda.core.common.InvalidTokenException" qname="ns334:fault5" type="ns336:InvalidTokenException" xmlns:ns336="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.UserRegistrationException" qname="ns334:fault2" type="ns337:UserRegistrationException" xmlns:ns337="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchUserException" qname="ns334:fault4" type="ns338:NoSuchUserException" xmlns:ns338="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.IllegalOperationException" qname="ns334:fault3" type="ns339:IllegalOperationException" xmlns:ns339="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
   <parameter name="wsdlServicePort" value="UserRegistration"/>
   <parameter name="schemaQualified" value="http://services.core.roda.dgarq.gov.pt,http://filter.adapter.data.core.roda.dgarq.gov.pt,http://common.core.roda.dgarq.gov.pt,http://data.core.roda.dgarq.gov.pt"/>
@@ -552,53 +552,53 @@
   <arrayMapping innerType="xsd:string" languageSpecificType="java:java.lang.String[]" qname="ns351:ArrayOf_xsd_string" xmlns:ns351="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
  </service>
  <service name="UserManagement" provider="java:RPC" style="wrapped" use="literal">
-  <operation name="modifyGroup" qname="ns352:modifyGroup" returnQName="ns352:modifyGroupReturn" returnType="ns353:Group" soapAction="" xmlns:ns352="http://services.core.roda.dgarq.gov.pt" xmlns:ns353="http://data.core.roda.dgarq.gov.pt">
-   <parameter qname="ns352:modifiedGroup" type="ns353:Group"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchGroupException" qname="ns352:fault1" type="ns354:NoSuchGroupException" xmlns:ns354="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.IllegalOperationException" qname="ns352:fault2" type="ns355:IllegalOperationException" xmlns:ns355="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.UserManagementException" qname="ns352:fault" type="ns356:UserManagementException" xmlns:ns356="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="addGroup" qname="ns352:addGroup" returnQName="ns352:addGroupReturn" returnType="ns353:Group" soapAction="" xmlns:ns352="http://services.core.roda.dgarq.gov.pt" xmlns:ns353="http://data.core.roda.dgarq.gov.pt">
+   <parameter qname="ns352:group" type="ns353:Group"/>
+   <fault class="pt.gov.dgarq.roda.core.common.GroupAlreadyExistsException" qname="ns352:fault1" type="ns354:GroupAlreadyExistsException" xmlns:ns354="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.UserManagementException" qname="ns352:fault" type="ns355:UserManagementException" xmlns:ns355="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="addUser" qname="ns357:addUser" returnQName="ns357:addUserReturn" returnType="ns358:User" soapAction="" xmlns:ns357="http://services.core.roda.dgarq.gov.pt" xmlns:ns358="http://data.core.roda.dgarq.gov.pt">
-   <parameter qname="ns357:user" type="ns358:User"/>
-   <fault class="pt.gov.dgarq.roda.core.common.UserAlreadyExistsException" qname="ns357:fault3" type="ns359:UserAlreadyExistsException" xmlns:ns359="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.UserManagementException" qname="ns357:fault" type="ns360:UserManagementException" xmlns:ns360="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.EmailAlreadyExistsException" qname="ns357:fault4" type="ns361:EmailAlreadyExistsException" xmlns:ns361="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="removeGroup" qname="ns356:removeGroup" soapAction="" xmlns:ns356="http://services.core.roda.dgarq.gov.pt">
+   <parameter qname="ns356:groupname" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <fault class="pt.gov.dgarq.roda.core.common.IllegalOperationException" qname="ns356:fault2" type="ns357:IllegalOperationException" xmlns:ns357="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.UserManagementException" qname="ns356:fault" type="ns358:UserManagementException" xmlns:ns358="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="modifyUser" qname="ns362:modifyUser" returnQName="ns362:modifyUserReturn" returnType="ns363:User" soapAction="" xmlns:ns362="http://services.core.roda.dgarq.gov.pt" xmlns:ns363="http://data.core.roda.dgarq.gov.pt">
-   <parameter qname="ns362:modifiedUser" type="ns363:User"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchUserException" qname="ns362:fault5" type="ns364:NoSuchUserException" xmlns:ns364="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.IllegalOperationException" qname="ns362:fault2" type="ns365:IllegalOperationException" xmlns:ns365="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.UserManagementException" qname="ns362:fault" type="ns366:UserManagementException" xmlns:ns366="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.EmailAlreadyExistsException" qname="ns362:fault4" type="ns367:EmailAlreadyExistsException" xmlns:ns367="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="modifyGroup" qname="ns359:modifyGroup" returnQName="ns359:modifyGroupReturn" returnType="ns360:Group" soapAction="" xmlns:ns359="http://services.core.roda.dgarq.gov.pt" xmlns:ns360="http://data.core.roda.dgarq.gov.pt">
+   <parameter qname="ns359:modifiedGroup" type="ns360:Group"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchGroupException" qname="ns359:fault3" type="ns361:NoSuchGroupException" xmlns:ns361="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.IllegalOperationException" qname="ns359:fault2" type="ns362:IllegalOperationException" xmlns:ns362="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.UserManagementException" qname="ns359:fault" type="ns363:UserManagementException" xmlns:ns363="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="removeUser" qname="ns368:removeUser" returnQName="ns368:removeUserReturn" returnType="xsd:boolean" soapAction="" xmlns:ns368="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-   <parameter qname="ns368:username" type="xsd:string"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchUserException" qname="ns368:fault5" type="ns369:NoSuchUserException" xmlns:ns369="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.IllegalOperationException" qname="ns368:fault2" type="ns370:IllegalOperationException" xmlns:ns370="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.UserManagementException" qname="ns368:fault" type="ns371:UserManagementException" xmlns:ns371="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="addUser" qname="ns364:addUser" returnQName="ns364:addUserReturn" returnType="ns365:User" soapAction="" xmlns:ns364="http://services.core.roda.dgarq.gov.pt" xmlns:ns365="http://data.core.roda.dgarq.gov.pt">
+   <parameter qname="ns364:user" type="ns365:User"/>
+   <fault class="pt.gov.dgarq.roda.core.common.UserAlreadyExistsException" qname="ns364:fault4" type="ns366:UserAlreadyExistsException" xmlns:ns366="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.UserManagementException" qname="ns364:fault" type="ns367:UserManagementException" xmlns:ns367="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.EmailAlreadyExistsException" qname="ns364:fault5" type="ns368:EmailAlreadyExistsException" xmlns:ns368="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="setUserPassword" qname="ns372:setUserPassword" soapAction="" xmlns:ns372="http://services.core.roda.dgarq.gov.pt">
-   <parameter qname="ns372:username" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <parameter qname="ns372:password" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchUserException" qname="ns372:fault5" type="ns373:NoSuchUserException" xmlns:ns373="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.IllegalOperationException" qname="ns372:fault2" type="ns374:IllegalOperationException" xmlns:ns374="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.UserManagementException" qname="ns372:fault" type="ns375:UserManagementException" xmlns:ns375="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="modifyUser" qname="ns369:modifyUser" returnQName="ns369:modifyUserReturn" returnType="ns370:User" soapAction="" xmlns:ns369="http://services.core.roda.dgarq.gov.pt" xmlns:ns370="http://data.core.roda.dgarq.gov.pt">
+   <parameter qname="ns369:modifiedUser" type="ns370:User"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchUserException" qname="ns369:fault6" type="ns371:NoSuchUserException" xmlns:ns371="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.IllegalOperationException" qname="ns369:fault2" type="ns372:IllegalOperationException" xmlns:ns372="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.UserManagementException" qname="ns369:fault" type="ns373:UserManagementException" xmlns:ns373="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.EmailAlreadyExistsException" qname="ns369:fault5" type="ns374:EmailAlreadyExistsException" xmlns:ns374="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="removeGroup" qname="ns376:removeGroup" soapAction="" xmlns:ns376="http://services.core.roda.dgarq.gov.pt">
-   <parameter qname="ns376:groupname" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <fault class="pt.gov.dgarq.roda.core.common.IllegalOperationException" qname="ns376:fault2" type="ns377:IllegalOperationException" xmlns:ns377="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.UserManagementException" qname="ns376:fault" type="ns378:UserManagementException" xmlns:ns378="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="removeUser" qname="ns375:removeUser" returnQName="ns375:removeUserReturn" returnType="xsd:boolean" soapAction="" xmlns:ns375="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <parameter qname="ns375:username" type="xsd:string"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchUserException" qname="ns375:fault6" type="ns376:NoSuchUserException" xmlns:ns376="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.IllegalOperationException" qname="ns375:fault2" type="ns377:IllegalOperationException" xmlns:ns377="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.UserManagementException" qname="ns375:fault" type="ns378:UserManagementException" xmlns:ns378="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="addGroup" qname="ns379:addGroup" returnQName="ns379:addGroupReturn" returnType="ns380:Group" soapAction="" xmlns:ns379="http://services.core.roda.dgarq.gov.pt" xmlns:ns380="http://data.core.roda.dgarq.gov.pt">
-   <parameter qname="ns379:group" type="ns380:Group"/>
-   <fault class="pt.gov.dgarq.roda.core.common.GroupAlreadyExistsException" qname="ns379:fault6" type="ns381:GroupAlreadyExistsException" xmlns:ns381="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="setUserPassword" qname="ns379:setUserPassword" soapAction="" xmlns:ns379="http://services.core.roda.dgarq.gov.pt">
+   <parameter qname="ns379:username" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <parameter qname="ns379:password" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchUserException" qname="ns379:fault6" type="ns380:NoSuchUserException" xmlns:ns380="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.IllegalOperationException" qname="ns379:fault2" type="ns381:IllegalOperationException" xmlns:ns381="http://common.core.roda.dgarq.gov.pt"/>
    <fault class="pt.gov.dgarq.roda.core.common.UserManagementException" qname="ns379:fault" type="ns382:UserManagementException" xmlns:ns382="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
   <parameter name="wsdlServicePort" value="UserManagement"/>
   <parameter name="schemaQualified" value="http://services.core.roda.dgarq.gov.pt,http://filter.adapter.data.core.roda.dgarq.gov.pt,http://common.core.roda.dgarq.gov.pt,http://data.core.roda.dgarq.gov.pt"/>
   <parameter name="className" value="pt.gov.dgarq.roda.core.services.UserManagement"/>
   <parameter name="typeMappingVersion" value="1.2"/>
-  <parameter name="allowedMethods" value="modifyGroup addGroup setUserPassword modifyUser removeGroup removeUser addUser"/>
+  <parameter name="allowedMethods" value="modifyGroup setUserPassword addGroup modifyUser removeUser removeGroup addUser"/>
   <parameter name="wsdlServiceElement" value="UserManagementService"/>
   <parameter name="wsdlTargetNamespace" value="http://services.core.roda.dgarq.gov.pt"/>
   <parameter name="wsdlPortType" value="UserManagement"/>
@@ -619,181 +619,181 @@
   <arrayMapping innerType="xsd:string" languageSpecificType="java:java.lang.String[]" qname="ns396:ArrayOf_xsd_string" xmlns:ns396="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
  </service>
  <service name="Browser" provider="java:RPC" style="wrapped" use="literal">
-  <operation name="getProducers" qname="ns397:getProducers" returnQName="ns397:getProducersReturn" returnType="ns398:Producers" soapAction="" xmlns:ns397="http://services.core.roda.dgarq.gov.pt" xmlns:ns398="http://data.core.roda.dgarq.gov.pt">
-   <parameter qname="ns397:doPID" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns397:fault" type="ns399:NoSuchRODAObjectException" xmlns:ns399="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns397:fault1" type="ns400:BrowserException" xmlns:ns400="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getRODAObject" qname="ns397:getRODAObject" returnQName="ns397:getRODAObjectReturn" returnType="ns398:RODAObject" soapAction="" xmlns:ns397="http://services.core.roda.dgarq.gov.pt" xmlns:ns398="http://data.core.roda.dgarq.gov.pt">
+   <parameter qname="ns397:pid" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns397:fault1" type="ns399:NoSuchRODAObjectException" xmlns:ns399="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns397:fault" type="ns400:BrowserException" xmlns:ns400="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getDOPIDs" qname="ns401:getDOPIDs" returnQName="ns401:getDOPIDsReturn" returnType="xsd:string" soapAction="" xmlns:ns401="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns401:fault1" type="ns402:BrowserException" xmlns:ns402="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getRODAObjectCount" qname="ns401:getRODAObjectCount" returnQName="ns401:getRODAObjectCountReturn" returnType="xsd:int" soapAction="" xmlns:ns401="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <parameter qname="ns401:filter" type="ns402:Filter" xmlns:ns402="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns401:fault" type="ns403:BrowserException" xmlns:ns403="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getSimpleRepresentationPreservationObjectCount" qname="ns403:getSimpleRepresentationPreservationObjectCount" returnQName="ns403:getSimpleRepresentationPreservationObjectCountReturn" returnType="xsd:int" soapAction="" xmlns:ns403="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-   <parameter qname="ns403:filter" type="ns404:Filter" xmlns:ns404="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns403:fault1" type="ns405:BrowserException" xmlns:ns405="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getRODAObjects" qname="ns404:getRODAObjects" returnQName="ns404:getRODAObjectsReturn" returnType="ns405:RODAObject" soapAction="" xmlns:ns404="http://services.core.roda.dgarq.gov.pt" xmlns:ns405="http://data.core.roda.dgarq.gov.pt">
+   <parameter qname="ns404:contentAdapter" type="ns406:ContentAdapter" xmlns:ns406="http://adapter.data.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns404:fault" type="ns407:BrowserException" xmlns:ns407="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getSimpleRepresentationObject" qname="ns406:getSimpleRepresentationObject" returnQName="ns406:getSimpleRepresentationObjectReturn" returnType="ns407:SimpleRepresentationObject" soapAction="" xmlns:ns406="http://services.core.roda.dgarq.gov.pt" xmlns:ns407="http://data.core.roda.dgarq.gov.pt">
-   <parameter qname="ns406:roPID" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns406:fault" type="ns408:NoSuchRODAObjectException" xmlns:ns408="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns406:fault1" type="ns409:BrowserException" xmlns:ns409="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getSimpleDescriptionObject" qname="ns408:getSimpleDescriptionObject" returnQName="ns408:getSimpleDescriptionObjectReturn" returnType="ns409:SimpleDescriptionObject" soapAction="" xmlns:ns408="http://services.core.roda.dgarq.gov.pt" xmlns:ns409="http://data.core.roda.dgarq.gov.pt">
+   <parameter qname="ns408:pid" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns408:fault1" type="ns410:NoSuchRODAObjectException" xmlns:ns410="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns408:fault" type="ns411:BrowserException" xmlns:ns411="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getSimpleRepresentationObjectCount" qname="ns410:getSimpleRepresentationObjectCount" returnQName="ns410:getSimpleRepresentationObjectCountReturn" returnType="xsd:int" soapAction="" xmlns:ns410="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-   <parameter qname="ns410:filter" type="ns411:Filter" xmlns:ns411="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns410:fault1" type="ns412:BrowserException" xmlns:ns412="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getSimpleDescriptionObjectCount" qname="ns412:getSimpleDescriptionObjectCount" returnQName="ns412:getSimpleDescriptionObjectCountReturn" returnType="xsd:int" soapAction="" xmlns:ns412="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <parameter qname="ns412:filter" type="ns413:Filter" xmlns:ns413="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns412:fault" type="ns414:BrowserException" xmlns:ns414="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getSimpleRepresentationObjects" qname="ns413:getSimpleRepresentationObjects" returnQName="ns413:getSimpleRepresentationObjectsReturn" returnType="ns414:SimpleRepresentationObject" soapAction="" xmlns:ns413="http://services.core.roda.dgarq.gov.pt" xmlns:ns414="http://data.core.roda.dgarq.gov.pt">
-   <parameter qname="ns413:contentAdapter" type="ns415:ContentAdapter" xmlns:ns415="http://adapter.data.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns413:fault1" type="ns416:BrowserException" xmlns:ns416="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getSimpleDescriptionObjects" qname="ns415:getSimpleDescriptionObjects" returnQName="ns415:getSimpleDescriptionObjectsReturn" returnType="ns416:SimpleDescriptionObject" soapAction="" xmlns:ns415="http://services.core.roda.dgarq.gov.pt" xmlns:ns416="http://data.core.roda.dgarq.gov.pt">
+   <parameter qname="ns415:contentAdapter" type="ns417:ContentAdapter" xmlns:ns417="http://adapter.data.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns415:fault" type="ns418:BrowserException" xmlns:ns418="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getSimpleRepresentationPreservationObject" qname="ns417:getSimpleRepresentationPreservationObject" returnQName="ns417:getSimpleRepresentationPreservationObjectReturn" returnType="ns418:SimpleRepresentationPreservationObject" soapAction="" xmlns:ns417="http://services.core.roda.dgarq.gov.pt" xmlns:ns418="http://data.core.roda.dgarq.gov.pt">
-   <parameter qname="ns417:roPID" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns417:fault" type="ns419:NoSuchRODAObjectException" xmlns:ns419="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns417:fault1" type="ns420:BrowserException" xmlns:ns420="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getSimpleDescriptionObjectIndex" qname="ns419:getSimpleDescriptionObjectIndex" returnQName="ns419:getSimpleDescriptionObjectIndexReturn" returnType="xsd:int" soapAction="" xmlns:ns419="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <parameter qname="ns419:pid" type="xsd:string"/>
+   <parameter qname="ns419:contentAdapter" type="ns420:ContentAdapter" xmlns:ns420="http://adapter.data.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns419:fault" type="ns421:BrowserException" xmlns:ns421="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getSimpleDescriptionObjectCount" qname="ns421:getSimpleDescriptionObjectCount" returnQName="ns421:getSimpleDescriptionObjectCountReturn" returnType="xsd:int" soapAction="" xmlns:ns421="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-   <parameter qname="ns421:filter" type="ns422:Filter" xmlns:ns422="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns421:fault1" type="ns423:BrowserException" xmlns:ns423="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getDescriptionObject" qname="ns422:getDescriptionObject" returnQName="ns422:getDescriptionObjectReturn" returnType="ns423:DescriptionObject" soapAction="" xmlns:ns422="http://services.core.roda.dgarq.gov.pt" xmlns:ns423="http://data.core.roda.dgarq.gov.pt">
+   <parameter qname="ns422:pid" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns422:fault1" type="ns424:NoSuchRODAObjectException" xmlns:ns424="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns422:fault" type="ns425:BrowserException" xmlns:ns425="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getSimpleDescriptionObjectIndex" qname="ns424:getSimpleDescriptionObjectIndex" returnQName="ns424:getSimpleDescriptionObjectIndexReturn" returnType="xsd:int" soapAction="" xmlns:ns424="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-   <parameter qname="ns424:pid" type="xsd:string"/>
-   <parameter qname="ns424:contentAdapter" type="ns425:ContentAdapter" xmlns:ns425="http://adapter.data.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns424:fault1" type="ns426:BrowserException" xmlns:ns426="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getDOPIDs" qname="ns426:getDOPIDs" returnQName="ns426:getDOPIDsReturn" returnType="xsd:string" soapAction="" xmlns:ns426="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns426:fault" type="ns427:BrowserException" xmlns:ns427="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getSimpleRepresentationPreservationObjects" qname="ns427:getSimpleRepresentationPreservationObjects" returnQName="ns427:getSimpleRepresentationPreservationObjectsReturn" returnType="ns428:SimpleRepresentationPreservationObject" soapAction="" xmlns:ns427="http://services.core.roda.dgarq.gov.pt" xmlns:ns428="http://data.core.roda.dgarq.gov.pt">
-   <parameter qname="ns427:contentAdapter" type="ns429:ContentAdapter" xmlns:ns429="http://adapter.data.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns427:fault1" type="ns430:BrowserException" xmlns:ns430="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getDOAncestorPIDs" qname="ns428:getDOAncestorPIDs" returnQName="ns428:getDOAncestorPIDsReturn" returnType="xsd:string" soapAction="" xmlns:ns428="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <parameter qname="ns428:pid" type="xsd:string"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns428:fault1" type="ns429:NoSuchRODAObjectException" xmlns:ns429="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns428:fault" type="ns430:BrowserException" xmlns:ns430="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getDONormalizedRepresentation" qname="ns431:getDONormalizedRepresentation" returnQName="ns431:getDONormalizedRepresentationReturn" returnType="ns432:RepresentationObject" soapAction="" xmlns:ns431="http://services.core.roda.dgarq.gov.pt" xmlns:ns432="http://data.core.roda.dgarq.gov.pt">
+  <operation name="getDORepresentations" qname="ns431:getDORepresentations" returnQName="ns431:getDORepresentationsReturn" returnType="ns432:RepresentationObject" soapAction="" xmlns:ns431="http://services.core.roda.dgarq.gov.pt" xmlns:ns432="http://data.core.roda.dgarq.gov.pt">
    <parameter qname="ns431:doPID" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns431:fault" type="ns433:NoSuchRODAObjectException" xmlns:ns433="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns431:fault1" type="ns434:BrowserException" xmlns:ns434="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns431:fault1" type="ns433:NoSuchRODAObjectException" xmlns:ns433="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns431:fault" type="ns434:BrowserException" xmlns:ns434="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getRepresentationPreservationObject" qname="ns435:getRepresentationPreservationObject" returnQName="ns435:getRepresentationPreservationObjectReturn" returnType="ns436:RepresentationPreservationObject" soapAction="" xmlns:ns435="http://services.core.roda.dgarq.gov.pt" xmlns:ns436="http://data.core.roda.dgarq.gov.pt">
-   <parameter qname="ns435:poPID" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns435:fault" type="ns437:NoSuchRODAObjectException" xmlns:ns437="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns435:fault1" type="ns438:BrowserException" xmlns:ns438="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getDOOriginalRepresentation" qname="ns435:getDOOriginalRepresentation" returnQName="ns435:getDOOriginalRepresentationReturn" returnType="ns436:RepresentationObject" soapAction="" xmlns:ns435="http://services.core.roda.dgarq.gov.pt" xmlns:ns436="http://data.core.roda.dgarq.gov.pt">
+   <parameter qname="ns435:doPID" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns435:fault1" type="ns437:NoSuchRODAObjectException" xmlns:ns437="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns435:fault" type="ns438:BrowserException" xmlns:ns438="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getSimpleEventPreservationObject" qname="ns439:getSimpleEventPreservationObject" returnQName="ns439:getSimpleEventPreservationObjectReturn" returnType="ns440:SimpleEventPreservationObject" soapAction="" xmlns:ns439="http://services.core.roda.dgarq.gov.pt" xmlns:ns440="http://data.core.roda.dgarq.gov.pt">
-   <parameter qname="ns439:roPID" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns439:fault" type="ns441:NoSuchRODAObjectException" xmlns:ns441="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns439:fault1" type="ns442:BrowserException" xmlns:ns442="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getDONormalizedRepresentation" qname="ns439:getDONormalizedRepresentation" returnQName="ns439:getDONormalizedRepresentationReturn" returnType="ns440:RepresentationObject" soapAction="" xmlns:ns439="http://services.core.roda.dgarq.gov.pt" xmlns:ns440="http://data.core.roda.dgarq.gov.pt">
+   <parameter qname="ns439:doPID" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns439:fault1" type="ns441:NoSuchRODAObjectException" xmlns:ns441="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns439:fault" type="ns442:BrowserException" xmlns:ns442="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getSimpleEventPreservationObjectCount" qname="ns443:getSimpleEventPreservationObjectCount" returnQName="ns443:getSimpleEventPreservationObjectCountReturn" returnType="xsd:int" soapAction="" xmlns:ns443="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-   <parameter qname="ns443:filter" type="ns444:Filter" xmlns:ns444="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns443:fault1" type="ns445:BrowserException" xmlns:ns445="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getDOPreservationObjects" qname="ns443:getDOPreservationObjects" returnQName="ns443:getDOPreservationObjectsReturn" returnType="ns444:RepresentationPreservationObject" soapAction="" xmlns:ns443="http://services.core.roda.dgarq.gov.pt" xmlns:ns444="http://data.core.roda.dgarq.gov.pt">
+   <parameter qname="ns443:doPID" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns443:fault1" type="ns445:NoSuchRODAObjectException" xmlns:ns445="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns443:fault" type="ns446:BrowserException" xmlns:ns446="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getSimpleEventPreservationObjects" qname="ns446:getSimpleEventPreservationObjects" returnQName="ns446:getSimpleEventPreservationObjectsReturn" returnType="ns447:SimpleEventPreservationObject" soapAction="" xmlns:ns446="http://services.core.roda.dgarq.gov.pt" xmlns:ns447="http://data.core.roda.dgarq.gov.pt">
-   <parameter qname="ns446:contentAdapter" type="ns448:ContentAdapter" xmlns:ns448="http://adapter.data.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns446:fault1" type="ns449:BrowserException" xmlns:ns449="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getSimpleRepresentationObject" qname="ns447:getSimpleRepresentationObject" returnQName="ns447:getSimpleRepresentationObjectReturn" returnType="ns448:SimpleRepresentationObject" soapAction="" xmlns:ns447="http://services.core.roda.dgarq.gov.pt" xmlns:ns448="http://data.core.roda.dgarq.gov.pt">
+   <parameter qname="ns447:roPID" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns447:fault1" type="ns449:NoSuchRODAObjectException" xmlns:ns449="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns447:fault" type="ns450:BrowserException" xmlns:ns450="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getAgentPreservationObject" qname="ns450:getAgentPreservationObject" returnQName="ns450:getAgentPreservationObjectReturn" returnType="ns451:AgentPreservationObject" soapAction="" xmlns:ns450="http://services.core.roda.dgarq.gov.pt" xmlns:ns451="http://data.core.roda.dgarq.gov.pt">
-   <parameter qname="ns450:poPID" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns450:fault" type="ns452:NoSuchRODAObjectException" xmlns:ns452="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns450:fault1" type="ns453:BrowserException" xmlns:ns453="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getSimpleRepresentationObjectCount" qname="ns451:getSimpleRepresentationObjectCount" returnQName="ns451:getSimpleRepresentationObjectCountReturn" returnType="xsd:int" soapAction="" xmlns:ns451="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <parameter qname="ns451:filter" type="ns452:Filter" xmlns:ns452="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns451:fault" type="ns453:BrowserException" xmlns:ns453="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getRepresentationObject" qname="ns454:getRepresentationObject" returnQName="ns454:getRepresentationObjectReturn" returnType="ns455:RepresentationObject" soapAction="" xmlns:ns454="http://services.core.roda.dgarq.gov.pt" xmlns:ns455="http://data.core.roda.dgarq.gov.pt">
-   <parameter qname="ns454:roPID" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns454:fault" type="ns456:NoSuchRODAObjectException" xmlns:ns456="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns454:fault1" type="ns457:BrowserException" xmlns:ns457="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getSimpleRepresentationObjects" qname="ns454:getSimpleRepresentationObjects" returnQName="ns454:getSimpleRepresentationObjectsReturn" returnType="ns455:SimpleRepresentationObject" soapAction="" xmlns:ns454="http://services.core.roda.dgarq.gov.pt" xmlns:ns455="http://data.core.roda.dgarq.gov.pt">
+   <parameter qname="ns454:contentAdapter" type="ns456:ContentAdapter" xmlns:ns456="http://adapter.data.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns454:fault" type="ns457:BrowserException" xmlns:ns457="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getRepresentationFile" qname="ns458:getRepresentationFile" returnQName="ns458:getRepresentationFileReturn" returnType="ns459:RepresentationFile" soapAction="" xmlns:ns458="http://services.core.roda.dgarq.gov.pt" xmlns:ns459="http://data.core.roda.dgarq.gov.pt">
+  <operation name="getRepresentationObject" qname="ns458:getRepresentationObject" returnQName="ns458:getRepresentationObjectReturn" returnType="ns459:RepresentationObject" soapAction="" xmlns:ns458="http://services.core.roda.dgarq.gov.pt" xmlns:ns459="http://data.core.roda.dgarq.gov.pt">
    <parameter qname="ns458:roPID" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <parameter qname="ns458:fileID" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns458:fault" type="ns460:NoSuchRODAObjectException" xmlns:ns460="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns458:fault1" type="ns461:BrowserException" xmlns:ns461="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRepresentationFileException" qname="ns458:fault2" type="ns462:NoSuchRepresentationFileException" xmlns:ns462="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns458:fault1" type="ns460:NoSuchRODAObjectException" xmlns:ns460="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns458:fault" type="ns461:BrowserException" xmlns:ns461="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="hasRemovePermission" qname="ns463:hasRemovePermission" returnQName="ns463:hasRemovePermissionReturn" returnType="xsd:boolean" soapAction="" xmlns:ns463="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-   <parameter qname="ns463:pid" type="xsd:string"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns463:fault" type="ns464:NoSuchRODAObjectException" xmlns:ns464="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns463:fault1" type="ns465:BrowserException" xmlns:ns465="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getRepresentationFile" qname="ns462:getRepresentationFile" returnQName="ns462:getRepresentationFileReturn" returnType="ns463:RepresentationFile" soapAction="" xmlns:ns462="http://services.core.roda.dgarq.gov.pt" xmlns:ns463="http://data.core.roda.dgarq.gov.pt">
+   <parameter qname="ns462:roPID" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <parameter qname="ns462:fileID" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns462:fault1" type="ns464:NoSuchRODAObjectException" xmlns:ns464="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns462:fault" type="ns465:BrowserException" xmlns:ns465="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRepresentationFileException" qname="ns462:fault2" type="ns466:NoSuchRepresentationFileException" xmlns:ns466="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getRODAObject" qname="ns466:getRODAObject" returnQName="ns466:getRODAObjectReturn" returnType="ns467:RODAObject" soapAction="" xmlns:ns466="http://services.core.roda.dgarq.gov.pt" xmlns:ns467="http://data.core.roda.dgarq.gov.pt">
-   <parameter qname="ns466:pid" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns466:fault" type="ns468:NoSuchRODAObjectException" xmlns:ns468="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns466:fault1" type="ns469:BrowserException" xmlns:ns469="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getROPreservationObject" qname="ns467:getROPreservationObject" returnQName="ns467:getROPreservationObjectReturn" returnType="ns468:RepresentationPreservationObject" soapAction="" xmlns:ns467="http://services.core.roda.dgarq.gov.pt" xmlns:ns468="http://data.core.roda.dgarq.gov.pt">
+   <parameter qname="ns467:roPID" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns467:fault1" type="ns469:NoSuchRODAObjectException" xmlns:ns469="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns467:fault" type="ns470:BrowserException" xmlns:ns470="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getSimpleDescriptionObjects" qname="ns470:getSimpleDescriptionObjects" returnQName="ns470:getSimpleDescriptionObjectsReturn" returnType="ns471:SimpleDescriptionObject" soapAction="" xmlns:ns470="http://services.core.roda.dgarq.gov.pt" xmlns:ns471="http://data.core.roda.dgarq.gov.pt">
-   <parameter qname="ns470:contentAdapter" type="ns472:ContentAdapter" xmlns:ns472="http://adapter.data.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns470:fault1" type="ns473:BrowserException" xmlns:ns473="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getSimpleRepresentationPreservationObject" qname="ns471:getSimpleRepresentationPreservationObject" returnQName="ns471:getSimpleRepresentationPreservationObjectReturn" returnType="ns472:SimpleRepresentationPreservationObject" soapAction="" xmlns:ns471="http://services.core.roda.dgarq.gov.pt" xmlns:ns472="http://data.core.roda.dgarq.gov.pt">
+   <parameter qname="ns471:roPID" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns471:fault1" type="ns473:NoSuchRODAObjectException" xmlns:ns473="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns471:fault" type="ns474:BrowserException" xmlns:ns474="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getROPreservationObject" qname="ns474:getROPreservationObject" returnQName="ns474:getROPreservationObjectReturn" returnType="ns475:RepresentationPreservationObject" soapAction="" xmlns:ns474="http://services.core.roda.dgarq.gov.pt" xmlns:ns475="http://data.core.roda.dgarq.gov.pt">
-   <parameter qname="ns474:roPID" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns474:fault" type="ns476:NoSuchRODAObjectException" xmlns:ns476="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns474:fault1" type="ns477:BrowserException" xmlns:ns477="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getSimpleRepresentationPreservationObjectCount" qname="ns475:getSimpleRepresentationPreservationObjectCount" returnQName="ns475:getSimpleRepresentationPreservationObjectCountReturn" returnType="xsd:int" soapAction="" xmlns:ns475="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <parameter qname="ns475:filter" type="ns476:Filter" xmlns:ns476="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns475:fault" type="ns477:BrowserException" xmlns:ns477="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getRODAObjectCount" qname="ns478:getRODAObjectCount" returnQName="ns478:getRODAObjectCountReturn" returnType="xsd:int" soapAction="" xmlns:ns478="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-   <parameter qname="ns478:filter" type="ns479:Filter" xmlns:ns479="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns478:fault1" type="ns480:BrowserException" xmlns:ns480="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getSimpleRepresentationPreservationObjects" qname="ns478:getSimpleRepresentationPreservationObjects" returnQName="ns478:getSimpleRepresentationPreservationObjectsReturn" returnType="ns479:SimpleRepresentationPreservationObject" soapAction="" xmlns:ns478="http://services.core.roda.dgarq.gov.pt" xmlns:ns479="http://data.core.roda.dgarq.gov.pt">
+   <parameter qname="ns478:contentAdapter" type="ns480:ContentAdapter" xmlns:ns480="http://adapter.data.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns478:fault" type="ns481:BrowserException" xmlns:ns481="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getDOAncestorPIDs" qname="ns481:getDOAncestorPIDs" returnQName="ns481:getDOAncestorPIDsReturn" returnType="xsd:string" soapAction="" xmlns:ns481="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-   <parameter qname="ns481:pid" type="xsd:string"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns481:fault" type="ns482:NoSuchRODAObjectException" xmlns:ns482="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns481:fault1" type="ns483:BrowserException" xmlns:ns483="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getRepresentationPreservationObject" qname="ns482:getRepresentationPreservationObject" returnQName="ns482:getRepresentationPreservationObjectReturn" returnType="ns483:RepresentationPreservationObject" soapAction="" xmlns:ns482="http://services.core.roda.dgarq.gov.pt" xmlns:ns483="http://data.core.roda.dgarq.gov.pt">
+   <parameter qname="ns482:poPID" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns482:fault1" type="ns484:NoSuchRODAObjectException" xmlns:ns484="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns482:fault" type="ns485:BrowserException" xmlns:ns485="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getEventPreservationObject" qname="ns484:getEventPreservationObject" returnQName="ns484:getEventPreservationObjectReturn" returnType="ns485:EventPreservationObject" soapAction="" xmlns:ns484="http://services.core.roda.dgarq.gov.pt" xmlns:ns485="http://data.core.roda.dgarq.gov.pt">
-   <parameter qname="ns484:poPID" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns484:fault" type="ns486:NoSuchRODAObjectException" xmlns:ns486="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns484:fault1" type="ns487:BrowserException" xmlns:ns487="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getSimpleEventPreservationObject" qname="ns486:getSimpleEventPreservationObject" returnQName="ns486:getSimpleEventPreservationObjectReturn" returnType="ns487:SimpleEventPreservationObject" soapAction="" xmlns:ns486="http://services.core.roda.dgarq.gov.pt" xmlns:ns487="http://data.core.roda.dgarq.gov.pt">
+   <parameter qname="ns486:roPID" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns486:fault1" type="ns488:NoSuchRODAObjectException" xmlns:ns488="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns486:fault" type="ns489:BrowserException" xmlns:ns489="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getPreservationEvents" qname="ns488:getPreservationEvents" returnQName="ns488:getPreservationEventsReturn" returnType="ns489:EventPreservationObject" soapAction="" xmlns:ns488="http://services.core.roda.dgarq.gov.pt" xmlns:ns489="http://data.core.roda.dgarq.gov.pt">
-   <parameter qname="ns488:poPID" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns488:fault" type="ns490:NoSuchRODAObjectException" xmlns:ns490="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns488:fault1" type="ns491:BrowserException" xmlns:ns491="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getSimpleEventPreservationObjectCount" qname="ns490:getSimpleEventPreservationObjectCount" returnQName="ns490:getSimpleEventPreservationObjectCountReturn" returnType="xsd:int" soapAction="" xmlns:ns490="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <parameter qname="ns490:filter" type="ns491:Filter" xmlns:ns491="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns490:fault" type="ns492:BrowserException" xmlns:ns492="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getRODAObjectPermissions" qname="ns492:getRODAObjectPermissions" returnQName="ns492:getRODAObjectPermissionsReturn" returnType="ns493:RODAObjectPermissions" soapAction="" xmlns:ns492="http://services.core.roda.dgarq.gov.pt" xmlns:ns493="http://data.core.roda.dgarq.gov.pt">
-   <parameter qname="ns492:pid" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns492:fault" type="ns494:NoSuchRODAObjectException" xmlns:ns494="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns492:fault1" type="ns495:BrowserException" xmlns:ns495="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getSimpleEventPreservationObjects" qname="ns493:getSimpleEventPreservationObjects" returnQName="ns493:getSimpleEventPreservationObjectsReturn" returnType="ns494:SimpleEventPreservationObject" soapAction="" xmlns:ns493="http://services.core.roda.dgarq.gov.pt" xmlns:ns494="http://data.core.roda.dgarq.gov.pt">
+   <parameter qname="ns493:contentAdapter" type="ns495:ContentAdapter" xmlns:ns495="http://adapter.data.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns493:fault" type="ns496:BrowserException" xmlns:ns496="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getSimpleDescriptionObject" qname="ns496:getSimpleDescriptionObject" returnQName="ns496:getSimpleDescriptionObjectReturn" returnType="ns497:SimpleDescriptionObject" soapAction="" xmlns:ns496="http://services.core.roda.dgarq.gov.pt" xmlns:ns497="http://data.core.roda.dgarq.gov.pt">
-   <parameter qname="ns496:pid" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns496:fault" type="ns498:NoSuchRODAObjectException" xmlns:ns498="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns496:fault1" type="ns499:BrowserException" xmlns:ns499="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getEventPreservationObject" qname="ns497:getEventPreservationObject" returnQName="ns497:getEventPreservationObjectReturn" returnType="ns498:EventPreservationObject" soapAction="" xmlns:ns497="http://services.core.roda.dgarq.gov.pt" xmlns:ns498="http://data.core.roda.dgarq.gov.pt">
+   <parameter qname="ns497:poPID" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns497:fault1" type="ns499:NoSuchRODAObjectException" xmlns:ns499="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns497:fault" type="ns500:BrowserException" xmlns:ns500="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="hasGrantPermission" qname="ns500:hasGrantPermission" returnQName="ns500:hasGrantPermissionReturn" returnType="xsd:boolean" soapAction="" xmlns:ns500="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-   <parameter qname="ns500:pid" type="xsd:string"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns500:fault" type="ns501:NoSuchRODAObjectException" xmlns:ns501="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns500:fault1" type="ns502:BrowserException" xmlns:ns502="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getPreservationEvents" qname="ns501:getPreservationEvents" returnQName="ns501:getPreservationEventsReturn" returnType="ns502:EventPreservationObject" soapAction="" xmlns:ns501="http://services.core.roda.dgarq.gov.pt" xmlns:ns502="http://data.core.roda.dgarq.gov.pt">
+   <parameter qname="ns501:poPID" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns501:fault1" type="ns503:NoSuchRODAObjectException" xmlns:ns503="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns501:fault" type="ns504:BrowserException" xmlns:ns504="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="hasModifyPermission" qname="ns503:hasModifyPermission" returnQName="ns503:hasModifyPermissionReturn" returnType="xsd:boolean" soapAction="" xmlns:ns503="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-   <parameter qname="ns503:pid" type="xsd:string"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns503:fault" type="ns504:NoSuchRODAObjectException" xmlns:ns504="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns503:fault1" type="ns505:BrowserException" xmlns:ns505="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getAgentPreservationObject" qname="ns505:getAgentPreservationObject" returnQName="ns505:getAgentPreservationObjectReturn" returnType="ns506:AgentPreservationObject" soapAction="" xmlns:ns505="http://services.core.roda.dgarq.gov.pt" xmlns:ns506="http://data.core.roda.dgarq.gov.pt">
+   <parameter qname="ns505:poPID" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns505:fault1" type="ns507:NoSuchRODAObjectException" xmlns:ns507="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns505:fault" type="ns508:BrowserException" xmlns:ns508="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getRODAObjects" qname="ns506:getRODAObjects" returnQName="ns506:getRODAObjectsReturn" returnType="ns507:RODAObject" soapAction="" xmlns:ns506="http://services.core.roda.dgarq.gov.pt" xmlns:ns507="http://data.core.roda.dgarq.gov.pt">
-   <parameter qname="ns506:contentAdapter" type="ns508:ContentAdapter" xmlns:ns508="http://adapter.data.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns506:fault1" type="ns509:BrowserException" xmlns:ns509="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getRODAObjectPermissions" qname="ns509:getRODAObjectPermissions" returnQName="ns509:getRODAObjectPermissionsReturn" returnType="ns510:RODAObjectPermissions" soapAction="" xmlns:ns509="http://services.core.roda.dgarq.gov.pt" xmlns:ns510="http://data.core.roda.dgarq.gov.pt">
+   <parameter qname="ns509:pid" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns509:fault1" type="ns511:NoSuchRODAObjectException" xmlns:ns511="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns509:fault" type="ns512:BrowserException" xmlns:ns512="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getDescriptionObject" qname="ns510:getDescriptionObject" returnQName="ns510:getDescriptionObjectReturn" returnType="ns511:DescriptionObject" soapAction="" xmlns:ns510="http://services.core.roda.dgarq.gov.pt" xmlns:ns511="http://data.core.roda.dgarq.gov.pt">
-   <parameter qname="ns510:pid" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns510:fault" type="ns512:NoSuchRODAObjectException" xmlns:ns512="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns510:fault1" type="ns513:BrowserException" xmlns:ns513="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getRODAObjectUserPermissions" qname="ns513:getRODAObjectUserPermissions" returnQName="ns513:getRODAObjectUserPermissionsReturn" returnType="ns514:RODAObjectUserPermissions" soapAction="" xmlns:ns513="http://services.core.roda.dgarq.gov.pt" xmlns:ns514="http://data.core.roda.dgarq.gov.pt">
+   <parameter qname="ns513:pid" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns513:fault1" type="ns515:NoSuchRODAObjectException" xmlns:ns515="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns513:fault" type="ns516:BrowserException" xmlns:ns516="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getDOPreservationObjects" qname="ns514:getDOPreservationObjects" returnQName="ns514:getDOPreservationObjectsReturn" returnType="ns515:RepresentationPreservationObject" soapAction="" xmlns:ns514="http://services.core.roda.dgarq.gov.pt" xmlns:ns515="http://data.core.roda.dgarq.gov.pt">
-   <parameter qname="ns514:doPID" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns514:fault" type="ns516:NoSuchRODAObjectException" xmlns:ns516="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns514:fault1" type="ns517:BrowserException" xmlns:ns517="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="hasModifyPermission" qname="ns517:hasModifyPermission" returnQName="ns517:hasModifyPermissionReturn" returnType="xsd:boolean" soapAction="" xmlns:ns517="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <parameter qname="ns517:pid" type="xsd:string"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns517:fault1" type="ns518:NoSuchRODAObjectException" xmlns:ns518="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns517:fault" type="ns519:BrowserException" xmlns:ns519="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getRODAObjectUserPermissions" qname="ns518:getRODAObjectUserPermissions" returnQName="ns518:getRODAObjectUserPermissionsReturn" returnType="ns519:RODAObjectUserPermissions" soapAction="" xmlns:ns518="http://services.core.roda.dgarq.gov.pt" xmlns:ns519="http://data.core.roda.dgarq.gov.pt">
-   <parameter qname="ns518:pid" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns518:fault" type="ns520:NoSuchRODAObjectException" xmlns:ns520="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns518:fault1" type="ns521:BrowserException" xmlns:ns521="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="hasRemovePermission" qname="ns520:hasRemovePermission" returnQName="ns520:hasRemovePermissionReturn" returnType="xsd:boolean" soapAction="" xmlns:ns520="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <parameter qname="ns520:pid" type="xsd:string"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns520:fault1" type="ns521:NoSuchRODAObjectException" xmlns:ns521="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns520:fault" type="ns522:BrowserException" xmlns:ns522="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getDOOriginalRepresentation" qname="ns522:getDOOriginalRepresentation" returnQName="ns522:getDOOriginalRepresentationReturn" returnType="ns523:RepresentationObject" soapAction="" xmlns:ns522="http://services.core.roda.dgarq.gov.pt" xmlns:ns523="http://data.core.roda.dgarq.gov.pt">
-   <parameter qname="ns522:doPID" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns522:fault" type="ns524:NoSuchRODAObjectException" xmlns:ns524="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns522:fault1" type="ns525:BrowserException" xmlns:ns525="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="hasGrantPermission" qname="ns523:hasGrantPermission" returnQName="ns523:hasGrantPermissionReturn" returnType="xsd:boolean" soapAction="" xmlns:ns523="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <parameter qname="ns523:pid" type="xsd:string"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns523:fault1" type="ns524:NoSuchRODAObjectException" xmlns:ns524="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns523:fault" type="ns525:BrowserException" xmlns:ns525="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getDORepresentations" qname="ns526:getDORepresentations" returnQName="ns526:getDORepresentationsReturn" returnType="ns527:RepresentationObject" soapAction="" xmlns:ns526="http://services.core.roda.dgarq.gov.pt" xmlns:ns527="http://data.core.roda.dgarq.gov.pt">
+  <operation name="getProducers" qname="ns526:getProducers" returnQName="ns526:getProducersReturn" returnType="ns527:Producers" soapAction="" xmlns:ns526="http://services.core.roda.dgarq.gov.pt" xmlns:ns527="http://data.core.roda.dgarq.gov.pt">
    <parameter qname="ns526:doPID" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns526:fault" type="ns528:NoSuchRODAObjectException" xmlns:ns528="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns526:fault1" type="ns529:BrowserException" xmlns:ns529="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" qname="ns526:fault1" type="ns528:NoSuchRODAObjectException" xmlns:ns528="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.BrowserException" qname="ns526:fault" type="ns529:BrowserException" xmlns:ns529="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
   <parameter name="wsdlServicePort" value="Browser"/>
   <parameter name="schemaQualified" value="http://services.core.roda.dgarq.gov.pt,http://sublist.adapter.data.core.roda.dgarq.gov.pt,http://adapter.data.core.roda.dgarq.gov.pt,http://sort.adapter.data.core.roda.dgarq.gov.pt,http://preservation.data.core.roda.dgarq.gov.pt,http://filter.adapter.data.core.roda.dgarq.gov.pt,http://common.core.roda.dgarq.gov.pt,http://eadc.data.core.roda.dgarq.gov.pt,http://data.core.roda.dgarq.gov.pt"/>
   <parameter name="className" value="pt.gov.dgarq.roda.core.services.Browser"/>
   <parameter name="typeMappingVersion" value="1.2"/>
-  <parameter name="allowedMethods" value="getRODAObjectPermissions getSimpleDescriptionObjectCount getProducers getRODAObjectUserPermissions getDOOriginalRepresentation getSimpleEventPreservationObjects getDORepresentations getAgentPreservationObject getSimpleRepresentationObjects getSimpleRepresentationObject getDONormalizedRepresentation getSimpleRepresentationPreservationObjects getRODAObjects getSimpleRepresentationPreservationObject getDOPIDs getSimpleDescriptionObjectIndex getSimpleDescriptionObject getDescriptionObject hasGrantPermission getRODAObjectCount getSimpleDescriptionObjects getDOAncestorPIDs getRepresentationObject getSimpleEventPreservationObjectCount getSimpleRepresentationPreservationObjectCount getRODAObject getRepresentationPreservationObject getPreservationEvents getSimpleRepresentationObjectCount getDOPreservationObjects getEventPreservationObject getSimpleEventPreservationObject hasRemovePermission getRepresentationFile hasModifyPermission getROPreservationObject"/>
+  <parameter name="allowedMethods" value="getRODAObjectPermissions getSimpleDescriptionObjectCount getProducers getRODAObjectUserPermissions getDOOriginalRepresentation getSimpleEventPreservationObjects getDORepresentations getAgentPreservationObject getSimpleRepresentationObjects getSimpleRepresentationObject getDONormalizedRepresentation getSimpleRepresentationPreservationObjects getRODAObjects getSimpleRepresentationPreservationObject getDOPIDs getSimpleDescriptionObjectIndex getSimpleDescriptionObject getDescriptionObject hasGrantPermission getRODAObjectCount getDOAncestorPIDs getSimpleDescriptionObjects getRepresentationObject getSimpleEventPreservationObjectCount getSimpleRepresentationPreservationObjectCount getRODAObject getRepresentationPreservationObject getPreservationEvents getSimpleRepresentationObjectCount getDOPreservationObjects hasRemovePermission getEventPreservationObject getSimpleEventPreservationObject getRepresentationFile hasModifyPermission getROPreservationObject"/>
   <parameter name="wsdlServiceElement" value="BrowserService"/>
   <parameter name="wsdlTargetNamespace" value="http://services.core.roda.dgarq.gov.pt"/>
   <parameter name="wsdlPortType" value="Browser"/>
@@ -843,32 +843,32 @@
   <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns572:BrowserException" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.common.BrowserException" xmlns:ns572="http://common.core.roda.dgarq.gov.pt"/>
   <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns573:Sublist" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist" xmlns:ns573="http://sublist.adapter.data.core.roda.dgarq.gov.pt"/>
   <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns574:ContentAdapter" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.adapter.ContentAdapter" xmlns:ns574="http://adapter.data.core.roda.dgarq.gov.pt"/>
-  <arrayMapping innerType="ns576:Fixity" languageSpecificType="java:pt.gov.dgarq.roda.core.data.preservation.Fixity[]" qname="ns575:ArrayOf_tns7_Fixity" xmlns:ns575="http://services.core.roda.dgarq.gov.pt" xmlns:ns576="http://preservation.data.core.roda.dgarq.gov.pt"/>
-  <arrayMapping innerType="ns578:ArrangementTableRow" languageSpecificType="java:pt.gov.dgarq.roda.core.data.eadc.ArrangementTableRow[]" qname="ns577:ArrayOf_tns8_ArrangementTableRow" xmlns:ns577="http://services.core.roda.dgarq.gov.pt" xmlns:ns578="http://eadc.data.core.roda.dgarq.gov.pt"/>
+  <arrayMapping innerType="ns576:BioghistChronitem" languageSpecificType="java:pt.gov.dgarq.roda.core.data.eadc.BioghistChronitem[]" qname="ns575:ArrayOf_tns7_BioghistChronitem" xmlns:ns575="http://services.core.roda.dgarq.gov.pt" xmlns:ns576="http://eadc.data.core.roda.dgarq.gov.pt"/>
+  <arrayMapping innerType="ns578:ArrangementTableGroup" languageSpecificType="java:pt.gov.dgarq.roda.core.data.eadc.ArrangementTableGroup[]" qname="ns577:ArrayOf_tns7_ArrangementTableGroup" xmlns:ns577="http://services.core.roda.dgarq.gov.pt" xmlns:ns578="http://eadc.data.core.roda.dgarq.gov.pt"/>
   <arrayMapping innerType="ns580:RepresentationFile" languageSpecificType="java:pt.gov.dgarq.roda.core.data.RepresentationFile[]" qname="ns579:ArrayOf_tns1_RepresentationFile" xmlns:ns579="http://services.core.roda.dgarq.gov.pt" xmlns:ns580="http://data.core.roda.dgarq.gov.pt"/>
-  <arrayMapping innerType="ns582:BioghistChronitem" languageSpecificType="java:pt.gov.dgarq.roda.core.data.eadc.BioghistChronitem[]" qname="ns581:ArrayOf_tns8_BioghistChronitem" xmlns:ns581="http://services.core.roda.dgarq.gov.pt" xmlns:ns582="http://eadc.data.core.roda.dgarq.gov.pt"/>
-  <arrayMapping innerType="ns584:SortParameter" languageSpecificType="java:pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter[]" qname="ns583:ArrayOf_tns5_SortParameter" xmlns:ns583="http://services.core.roda.dgarq.gov.pt" xmlns:ns584="http://sort.adapter.data.core.roda.dgarq.gov.pt"/>
-  <arrayMapping innerType="xsd:string" languageSpecificType="java:java.lang.String[]" qname="ns585:ArrayOf_xsd_string" xmlns:ns585="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-  <arrayMapping innerType="ns587:FilterParameter" languageSpecificType="java:pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter[]" qname="ns586:ArrayOf_tns3_FilterParameter" xmlns:ns586="http://services.core.roda.dgarq.gov.pt" xmlns:ns587="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
-  <arrayMapping innerType="ns589:RepresentationFilePreservationObject" languageSpecificType="java:pt.gov.dgarq.roda.core.data.preservation.RepresentationFilePreservationObject[]" qname="ns588:ArrayOf_tns7_RepresentationFilePreservationObject" xmlns:ns588="http://services.core.roda.dgarq.gov.pt" xmlns:ns589="http://preservation.data.core.roda.dgarq.gov.pt"/>
-  <arrayMapping innerType="ns591:ArrangementTableGroup" languageSpecificType="java:pt.gov.dgarq.roda.core.data.eadc.ArrangementTableGroup[]" qname="ns590:ArrayOf_tns8_ArrangementTableGroup" xmlns:ns590="http://services.core.roda.dgarq.gov.pt" xmlns:ns591="http://eadc.data.core.roda.dgarq.gov.pt"/>
+  <arrayMapping innerType="ns582:SortParameter" languageSpecificType="java:pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter[]" qname="ns581:ArrayOf_tns5_SortParameter" xmlns:ns581="http://services.core.roda.dgarq.gov.pt" xmlns:ns582="http://sort.adapter.data.core.roda.dgarq.gov.pt"/>
+  <arrayMapping innerType="xsd:string" languageSpecificType="java:java.lang.String[]" qname="ns583:ArrayOf_xsd_string" xmlns:ns583="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+  <arrayMapping innerType="ns585:Fixity" languageSpecificType="java:pt.gov.dgarq.roda.core.data.preservation.Fixity[]" qname="ns584:ArrayOf_tns8_Fixity" xmlns:ns584="http://services.core.roda.dgarq.gov.pt" xmlns:ns585="http://preservation.data.core.roda.dgarq.gov.pt"/>
+  <arrayMapping innerType="ns587:ArrangementTableRow" languageSpecificType="java:pt.gov.dgarq.roda.core.data.eadc.ArrangementTableRow[]" qname="ns586:ArrayOf_tns7_ArrangementTableRow" xmlns:ns586="http://services.core.roda.dgarq.gov.pt" xmlns:ns587="http://eadc.data.core.roda.dgarq.gov.pt"/>
+  <arrayMapping innerType="ns589:FilterParameter" languageSpecificType="java:pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter[]" qname="ns588:ArrayOf_tns3_FilterParameter" xmlns:ns588="http://services.core.roda.dgarq.gov.pt" xmlns:ns589="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+  <arrayMapping innerType="ns591:RepresentationFilePreservationObject" languageSpecificType="java:pt.gov.dgarq.roda.core.data.preservation.RepresentationFilePreservationObject[]" qname="ns590:ArrayOf_tns8_RepresentationFilePreservationObject" xmlns:ns590="http://services.core.roda.dgarq.gov.pt" xmlns:ns591="http://preservation.data.core.roda.dgarq.gov.pt"/>
  </service>
  <service name="Reports" provider="java:RPC" style="wrapped" use="literal">
-  <operation name="getReports" qname="ns592:getReports" returnQName="ns592:getReportsReturn" returnType="ns593:Report" soapAction="" xmlns:ns592="http://services.core.roda.dgarq.gov.pt" xmlns:ns593="http://data.core.roda.dgarq.gov.pt">
-   <parameter qname="ns592:contentAdapter" type="ns594:ContentAdapter" xmlns:ns594="http://adapter.data.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.ReportException" qname="ns592:fault" type="ns595:ReportException" xmlns:ns595="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getReport" qname="ns592:getReport" returnQName="ns592:getReportReturn" returnType="ns593:Report" soapAction="" xmlns:ns592="http://services.core.roda.dgarq.gov.pt" xmlns:ns593="http://data.core.roda.dgarq.gov.pt">
+   <parameter qname="ns592:reportID" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchReportException" qname="ns592:fault" type="ns594:NoSuchReportException" xmlns:ns594="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.ReportException" qname="ns592:fault1" type="ns595:ReportException" xmlns:ns595="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getReport" qname="ns596:getReport" returnQName="ns596:getReportReturn" returnType="ns597:Report" soapAction="" xmlns:ns596="http://services.core.roda.dgarq.gov.pt" xmlns:ns597="http://data.core.roda.dgarq.gov.pt">
-   <parameter qname="ns596:reportID" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchReportException" qname="ns596:fault1" type="ns598:NoSuchReportException" xmlns:ns598="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.ReportException" qname="ns596:fault" type="ns599:ReportException" xmlns:ns599="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getReportsCount" qname="ns596:getReportsCount" returnQName="ns596:getReportsCountReturn" returnType="xsd:int" soapAction="" xmlns:ns596="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <parameter qname="ns596:filter" type="ns597:Filter" xmlns:ns597="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.ReportException" qname="ns596:fault1" type="ns598:ReportException" xmlns:ns598="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getReportsCount" qname="ns600:getReportsCount" returnQName="ns600:getReportsCountReturn" returnType="xsd:int" soapAction="" xmlns:ns600="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-   <parameter qname="ns600:filter" type="ns601:Filter" xmlns:ns601="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.ReportException" qname="ns600:fault" type="ns602:ReportException" xmlns:ns602="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getReports" qname="ns599:getReports" returnQName="ns599:getReportsReturn" returnType="ns600:Report" soapAction="" xmlns:ns599="http://services.core.roda.dgarq.gov.pt" xmlns:ns600="http://data.core.roda.dgarq.gov.pt">
+   <parameter qname="ns599:contentAdapter" type="ns601:ContentAdapter" xmlns:ns601="http://adapter.data.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.ReportException" qname="ns599:fault1" type="ns602:ReportException" xmlns:ns602="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
   <parameter name="wsdlServicePort" value="Reports"/>
-  <parameter name="schemaQualified" value="http://services.core.roda.dgarq.gov.pt,http://sublist.adapter.data.core.roda.dgarq.gov.pt,http://adapter.data.core.roda.dgarq.gov.pt,http://sort.adapter.data.core.roda.dgarq.gov.pt,http://common.core.roda.dgarq.gov.pt,http://filter.adapter.data.core.roda.dgarq.gov.pt,http://data.core.roda.dgarq.gov.pt"/>
+  <parameter name="schemaQualified" value="http://services.core.roda.dgarq.gov.pt,http://sublist.adapter.data.core.roda.dgarq.gov.pt,http://adapter.data.core.roda.dgarq.gov.pt,http://sort.adapter.data.core.roda.dgarq.gov.pt,http://filter.adapter.data.core.roda.dgarq.gov.pt,http://common.core.roda.dgarq.gov.pt,http://data.core.roda.dgarq.gov.pt"/>
   <parameter name="className" value="pt.gov.dgarq.roda.core.services.Reports"/>
   <parameter name="typeMappingVersion" value="1.2"/>
   <parameter name="allowedMethods" value="getReportsCount getReports getReport"/>
@@ -882,8 +882,8 @@
   <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns606:ProducerFilterParameter" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.adapter.filter.ProducerFilterParameter" xmlns:ns606="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
   <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns607:OneOfManyFilterParameter" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.adapter.filter.OneOfManyFilterParameter" xmlns:ns607="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
   <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns608:ReportException" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.common.ReportException" xmlns:ns608="http://common.core.roda.dgarq.gov.pt"/>
-  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns609:SortParameter" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter" xmlns:ns609="http://sort.adapter.data.core.roda.dgarq.gov.pt"/>
-  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns610:FilterParameter" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter" xmlns:ns610="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns609:FilterParameter" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter" xmlns:ns609="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns610:SortParameter" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter" xmlns:ns610="http://sort.adapter.data.core.roda.dgarq.gov.pt"/>
   <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns611:ReportItem" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.ReportItem" xmlns:ns611="http://data.core.roda.dgarq.gov.pt"/>
   <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns612:RangeFilterParameter" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.adapter.filter.RangeFilterParameter" xmlns:ns612="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
   <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns613:RODAServiceException" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.common.RODAServiceException" xmlns:ns613="http://common.core.roda.dgarq.gov.pt"/>
@@ -895,11 +895,11 @@
   <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns619:Report" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.Report" xmlns:ns619="http://data.core.roda.dgarq.gov.pt"/>
   <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns620:RegexFilterParameter" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.adapter.filter.RegexFilterParameter" xmlns:ns620="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
   <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns621:RODAException" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.common.RODAException" xmlns:ns621="http://common.core.roda.dgarq.gov.pt"/>
-  <arrayMapping innerType="ns623:Attribute" languageSpecificType="java:pt.gov.dgarq.roda.core.data.Attribute[]" qname="ns622:ArrayOf_tns5_Attribute" xmlns:ns622="http://services.core.roda.dgarq.gov.pt" xmlns:ns623="http://data.core.roda.dgarq.gov.pt"/>
+  <arrayMapping innerType="ns623:SortParameter" languageSpecificType="java:pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter[]" qname="ns622:ArrayOf_tns5_SortParameter" xmlns:ns622="http://services.core.roda.dgarq.gov.pt" xmlns:ns623="http://sort.adapter.data.core.roda.dgarq.gov.pt"/>
   <arrayMapping innerType="xsd:string" languageSpecificType="java:java.lang.String[]" qname="ns624:ArrayOf_xsd_string" xmlns:ns624="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-  <arrayMapping innerType="ns626:ReportItem" languageSpecificType="java:pt.gov.dgarq.roda.core.data.ReportItem[]" qname="ns625:ArrayOf_tns5_ReportItem" xmlns:ns625="http://services.core.roda.dgarq.gov.pt" xmlns:ns626="http://data.core.roda.dgarq.gov.pt"/>
-  <arrayMapping innerType="ns628:FilterParameter" languageSpecificType="java:pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter[]" qname="ns627:ArrayOf_tns2_FilterParameter" xmlns:ns627="http://services.core.roda.dgarq.gov.pt" xmlns:ns628="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
-  <arrayMapping innerType="ns630:SortParameter" languageSpecificType="java:pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter[]" qname="ns629:ArrayOf_tns3_SortParameter" xmlns:ns629="http://services.core.roda.dgarq.gov.pt" xmlns:ns630="http://sort.adapter.data.core.roda.dgarq.gov.pt"/>
+  <arrayMapping innerType="ns626:Attribute" languageSpecificType="java:pt.gov.dgarq.roda.core.data.Attribute[]" qname="ns625:ArrayOf_tns1_Attribute" xmlns:ns625="http://services.core.roda.dgarq.gov.pt" xmlns:ns626="http://data.core.roda.dgarq.gov.pt"/>
+  <arrayMapping innerType="ns628:ReportItem" languageSpecificType="java:pt.gov.dgarq.roda.core.data.ReportItem[]" qname="ns627:ArrayOf_tns1_ReportItem" xmlns:ns627="http://services.core.roda.dgarq.gov.pt" xmlns:ns628="http://data.core.roda.dgarq.gov.pt"/>
+  <arrayMapping innerType="ns630:FilterParameter" languageSpecificType="java:pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter[]" qname="ns629:ArrayOf_tns3_FilterParameter" xmlns:ns629="http://services.core.roda.dgarq.gov.pt" xmlns:ns630="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
  </service>
  <service name="Scheduler" provider="java:RPC" style="wrapped" use="literal">
   <operation name="getTask" qname="ns631:getTask" returnQName="ns631:getTaskReturn" returnType="ns632:Task" soapAction="" xmlns:ns631="http://services.core.roda.dgarq.gov.pt" xmlns:ns632="http://data.core.roda.dgarq.gov.pt">
@@ -915,48 +915,48 @@
    <parameter qname="ns638:contentAdapter" type="ns640:ContentAdapter" xmlns:ns640="http://adapter.data.core.roda.dgarq.gov.pt"/>
    <fault class="pt.gov.dgarq.roda.core.common.SchedulerException" qname="ns638:fault1" type="ns641:SchedulerException" xmlns:ns641="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getTaskInstance" qname="ns642:getTaskInstance" returnQName="ns642:getTaskInstanceReturn" returnType="ns643:TaskInstance" soapAction="" xmlns:ns642="http://services.core.roda.dgarq.gov.pt" xmlns:ns643="http://data.core.roda.dgarq.gov.pt">
-   <parameter qname="ns642:taskInstanceID" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+  <operation name="getTaskCount" qname="ns642:getTaskCount" returnQName="ns642:getTaskCountReturn" returnType="xsd:int" soapAction="" xmlns:ns642="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <parameter qname="ns642:filter" type="ns643:Filter" xmlns:ns643="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
    <fault class="pt.gov.dgarq.roda.core.common.SchedulerException" qname="ns642:fault1" type="ns644:SchedulerException" xmlns:ns644="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchTaskInstanceException" qname="ns642:fault2" type="ns645:NoSuchTaskInstanceException" xmlns:ns645="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getTaskInstanceCount" qname="ns646:getTaskInstanceCount" returnQName="ns646:getTaskInstanceCountReturn" returnType="xsd:int" soapAction="" xmlns:ns646="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-   <parameter qname="ns646:filter" type="ns647:Filter" xmlns:ns647="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.SchedulerException" qname="ns646:fault1" type="ns648:SchedulerException" xmlns:ns648="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="modifyTask" qname="ns645:modifyTask" returnQName="ns645:modifyTaskReturn" returnType="ns646:Task" soapAction="" xmlns:ns645="http://services.core.roda.dgarq.gov.pt" xmlns:ns646="http://data.core.roda.dgarq.gov.pt">
+   <parameter qname="ns645:task" type="ns646:Task"/>
+   <fault class="pt.gov.dgarq.roda.core.common.SchedulerException" qname="ns645:fault1" type="ns647:SchedulerException" xmlns:ns647="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchTaskException" qname="ns645:fault" type="ns648:NoSuchTaskException" xmlns:ns648="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getTaskInstances" qname="ns649:getTaskInstances" returnQName="ns649:getTaskInstancesReturn" returnType="ns650:TaskInstance" soapAction="" xmlns:ns649="http://services.core.roda.dgarq.gov.pt" xmlns:ns650="http://data.core.roda.dgarq.gov.pt">
-   <parameter qname="ns649:contentAdapter" type="ns651:ContentAdapter" xmlns:ns651="http://adapter.data.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.SchedulerException" qname="ns649:fault1" type="ns652:SchedulerException" xmlns:ns652="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="removeTask" qname="ns649:removeTask" soapAction="" xmlns:ns649="http://services.core.roda.dgarq.gov.pt">
+   <parameter qname="ns649:taskName" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <fault class="pt.gov.dgarq.roda.core.common.SchedulerException" qname="ns649:fault1" type="ns650:SchedulerException" xmlns:ns650="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchTaskException" qname="ns649:fault" type="ns651:NoSuchTaskException" xmlns:ns651="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="resumeTask" qname="ns653:resumeTask" returnQName="ns653:resumeTaskReturn" returnType="ns654:Task" soapAction="" xmlns:ns653="http://services.core.roda.dgarq.gov.pt" xmlns:ns654="http://data.core.roda.dgarq.gov.pt">
-   <parameter qname="ns653:taskName" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <fault class="pt.gov.dgarq.roda.core.common.SchedulerException" qname="ns653:fault1" type="ns655:SchedulerException" xmlns:ns655="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchTaskException" qname="ns653:fault" type="ns656:NoSuchTaskException" xmlns:ns656="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="pauseTask" qname="ns652:pauseTask" returnQName="ns652:pauseTaskReturn" returnType="ns653:Task" soapAction="" xmlns:ns652="http://services.core.roda.dgarq.gov.pt" xmlns:ns653="http://data.core.roda.dgarq.gov.pt">
+   <parameter qname="ns652:taskName" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <fault class="pt.gov.dgarq.roda.core.common.SchedulerException" qname="ns652:fault1" type="ns654:SchedulerException" xmlns:ns654="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchTaskException" qname="ns652:fault" type="ns655:NoSuchTaskException" xmlns:ns655="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getTaskCount" qname="ns657:getTaskCount" returnQName="ns657:getTaskCountReturn" returnType="xsd:int" soapAction="" xmlns:ns657="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-   <parameter qname="ns657:filter" type="ns658:Filter" xmlns:ns658="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.SchedulerException" qname="ns657:fault1" type="ns659:SchedulerException" xmlns:ns659="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="resumeTask" qname="ns656:resumeTask" returnQName="ns656:resumeTaskReturn" returnType="ns657:Task" soapAction="" xmlns:ns656="http://services.core.roda.dgarq.gov.pt" xmlns:ns657="http://data.core.roda.dgarq.gov.pt">
+   <parameter qname="ns656:taskName" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <fault class="pt.gov.dgarq.roda.core.common.SchedulerException" qname="ns656:fault1" type="ns658:SchedulerException" xmlns:ns658="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchTaskException" qname="ns656:fault" type="ns659:NoSuchTaskException" xmlns:ns659="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="modifyTask" qname="ns660:modifyTask" returnQName="ns660:modifyTaskReturn" returnType="ns661:Task" soapAction="" xmlns:ns660="http://services.core.roda.dgarq.gov.pt" xmlns:ns661="http://data.core.roda.dgarq.gov.pt">
-   <parameter qname="ns660:task" type="ns661:Task"/>
+  <operation name="getTaskInstance" qname="ns660:getTaskInstance" returnQName="ns660:getTaskInstanceReturn" returnType="ns661:TaskInstance" soapAction="" xmlns:ns660="http://services.core.roda.dgarq.gov.pt" xmlns:ns661="http://data.core.roda.dgarq.gov.pt">
+   <parameter qname="ns660:taskInstanceID" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
    <fault class="pt.gov.dgarq.roda.core.common.SchedulerException" qname="ns660:fault1" type="ns662:SchedulerException" xmlns:ns662="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchTaskException" qname="ns660:fault" type="ns663:NoSuchTaskException" xmlns:ns663="http://common.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.NoSuchTaskInstanceException" qname="ns660:fault2" type="ns663:NoSuchTaskInstanceException" xmlns:ns663="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="removeTask" qname="ns664:removeTask" soapAction="" xmlns:ns664="http://services.core.roda.dgarq.gov.pt">
-   <parameter qname="ns664:taskName" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <fault class="pt.gov.dgarq.roda.core.common.SchedulerException" qname="ns664:fault1" type="ns665:SchedulerException" xmlns:ns665="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchTaskException" qname="ns664:fault" type="ns666:NoSuchTaskException" xmlns:ns666="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getTaskInstances" qname="ns664:getTaskInstances" returnQName="ns664:getTaskInstancesReturn" returnType="ns665:TaskInstance" soapAction="" xmlns:ns664="http://services.core.roda.dgarq.gov.pt" xmlns:ns665="http://data.core.roda.dgarq.gov.pt">
+   <parameter qname="ns664:contentAdapter" type="ns666:ContentAdapter" xmlns:ns666="http://adapter.data.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.SchedulerException" qname="ns664:fault1" type="ns667:SchedulerException" xmlns:ns667="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="pauseTask" qname="ns667:pauseTask" returnQName="ns667:pauseTaskReturn" returnType="ns668:Task" soapAction="" xmlns:ns667="http://services.core.roda.dgarq.gov.pt" xmlns:ns668="http://data.core.roda.dgarq.gov.pt">
-   <parameter qname="ns667:taskName" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <fault class="pt.gov.dgarq.roda.core.common.SchedulerException" qname="ns667:fault1" type="ns669:SchedulerException" xmlns:ns669="http://common.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.NoSuchTaskException" qname="ns667:fault" type="ns670:NoSuchTaskException" xmlns:ns670="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getTaskInstanceCount" qname="ns668:getTaskInstanceCount" returnQName="ns668:getTaskInstanceCountReturn" returnType="xsd:int" soapAction="" xmlns:ns668="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <parameter qname="ns668:filter" type="ns669:Filter" xmlns:ns669="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.SchedulerException" qname="ns668:fault1" type="ns670:SchedulerException" xmlns:ns670="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
   <parameter name="wsdlServicePort" value="Scheduler"/>
   <parameter name="schemaQualified" value="http://services.core.roda.dgarq.gov.pt,http://sublist.adapter.data.core.roda.dgarq.gov.pt,http://adapter.data.core.roda.dgarq.gov.pt,http://sort.adapter.data.core.roda.dgarq.gov.pt,http://filter.adapter.data.core.roda.dgarq.gov.pt,http://common.core.roda.dgarq.gov.pt,http://data.core.roda.dgarq.gov.pt"/>
   <parameter name="className" value="pt.gov.dgarq.roda.core.services.Scheduler"/>
   <parameter name="typeMappingVersion" value="1.2"/>
-  <parameter name="allowedMethods" value="getTaskInstance modifyTask resumeTask pauseTask getTasks getTaskInstances getTaskInstanceCount addTask removeTask getTaskCount getTask"/>
+  <parameter name="allowedMethods" value="getTaskInstance resumeTask modifyTask pauseTask getTasks getTaskInstances getTaskInstanceCount addTask removeTask getTaskCount getTask"/>
   <parameter name="wsdlServiceElement" value="SchedulerService"/>
   <parameter name="wsdlTargetNamespace" value="http://services.core.roda.dgarq.gov.pt"/>
   <parameter name="wsdlPortType" value="Scheduler"/>
@@ -1027,20 +1027,20 @@
   <parameter name="className" value="org.apache.axis.Version"/>
  </service>
  <service name="IngestMonitor" provider="java:RPC" style="wrapped" use="literal">
-  <operation name="getPossibleStates" qname="ns715:getPossibleStates" returnQName="ns715:getPossibleStatesReturn" returnType="xsd:string" soapAction="" xmlns:ns715="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-  <operation name="getSIPsCount" qname="ns716:getSIPsCount" returnQName="ns716:getSIPsCountReturn" returnType="xsd:int" soapAction="" xmlns:ns716="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-   <parameter qname="ns716:filter" type="ns717:Filter" xmlns:ns717="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.IngestMonitorException" qname="ns716:fault" type="ns718:IngestMonitorException" xmlns:ns718="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getSIPsCount" qname="ns715:getSIPsCount" returnQName="ns715:getSIPsCountReturn" returnType="xsd:int" soapAction="" xmlns:ns715="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <parameter qname="ns715:filter" type="ns716:Filter" xmlns:ns716="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.IngestMonitorException" qname="ns715:fault" type="ns717:IngestMonitorException" xmlns:ns717="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
-  <operation name="getSIPs" qname="ns719:getSIPs" returnQName="ns719:getSIPsReturn" returnType="ns720:SIPState" soapAction="" xmlns:ns719="http://services.core.roda.dgarq.gov.pt" xmlns:ns720="http://data.core.roda.dgarq.gov.pt">
-   <parameter qname="ns719:contentAdapter" type="ns721:ContentAdapter" xmlns:ns721="http://adapter.data.core.roda.dgarq.gov.pt"/>
-   <fault class="pt.gov.dgarq.roda.core.common.IngestMonitorException" qname="ns719:fault" type="ns722:IngestMonitorException" xmlns:ns722="http://common.core.roda.dgarq.gov.pt"/>
+  <operation name="getSIPs" qname="ns718:getSIPs" returnQName="ns718:getSIPsReturn" returnType="ns719:SIPState" soapAction="" xmlns:ns718="http://services.core.roda.dgarq.gov.pt" xmlns:ns719="http://data.core.roda.dgarq.gov.pt">
+   <parameter qname="ns718:contentAdapter" type="ns720:ContentAdapter" xmlns:ns720="http://adapter.data.core.roda.dgarq.gov.pt"/>
+   <fault class="pt.gov.dgarq.roda.core.common.IngestMonitorException" qname="ns718:fault" type="ns721:IngestMonitorException" xmlns:ns721="http://common.core.roda.dgarq.gov.pt"/>
   </operation>
+  <operation name="getPossibleStates" qname="ns722:getPossibleStates" returnQName="ns722:getPossibleStatesReturn" returnType="xsd:string" soapAction="" xmlns:ns722="http://services.core.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
   <parameter name="wsdlServicePort" value="IngestMonitor"/>
   <parameter name="schemaQualified" value="http://services.core.roda.dgarq.gov.pt,http://sublist.adapter.data.core.roda.dgarq.gov.pt,http://adapter.data.core.roda.dgarq.gov.pt,http://sort.adapter.data.core.roda.dgarq.gov.pt,http://common.core.roda.dgarq.gov.pt,http://filter.adapter.data.core.roda.dgarq.gov.pt,http://data.core.roda.dgarq.gov.pt"/>
   <parameter name="className" value="pt.gov.dgarq.roda.core.services.IngestMonitor"/>
   <parameter name="typeMappingVersion" value="1.2"/>
-  <parameter name="allowedMethods" value="getSIPs getPossibleStates getSIPsCount"/>
+  <parameter name="allowedMethods" value="getPossibleStates getSIPs getSIPsCount"/>
   <parameter name="wsdlServiceElement" value="IngestMonitorService"/>
   <parameter name="wsdlTargetNamespace" value="http://services.core.roda.dgarq.gov.pt"/>
   <parameter name="wsdlPortType" value="IngestMonitor"/>
@@ -1050,8 +1050,8 @@
   <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns725:LikeFilterParameter" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.adapter.filter.LikeFilterParameter" xmlns:ns725="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
   <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns726:ProducerFilterParameter" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.adapter.filter.ProducerFilterParameter" xmlns:ns726="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
   <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns727:OneOfManyFilterParameter" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.adapter.filter.OneOfManyFilterParameter" xmlns:ns727="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
-  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns728:FilterParameter" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter" xmlns:ns728="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
-  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns729:SortParameter" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter" xmlns:ns729="http://sort.adapter.data.core.roda.dgarq.gov.pt"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns728:SortParameter" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter" xmlns:ns728="http://sort.adapter.data.core.roda.dgarq.gov.pt"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns729:FilterParameter" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter" xmlns:ns729="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
   <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns730:RangeFilterParameter" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.adapter.filter.RangeFilterParameter" xmlns:ns730="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
   <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns731:SIPState" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.data.SIPState" xmlns:ns731="http://data.core.roda.dgarq.gov.pt"/>
   <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns732:RODAServiceException" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:pt.gov.dgarq.roda.core.common.RODAServiceException" xmlns:ns732="http://common.core.roda.dgarq.gov.pt"/>

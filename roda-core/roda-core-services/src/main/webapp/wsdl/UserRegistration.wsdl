@@ -30,6 +30,22 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
    <element name="fault" type="tns2:UserAlreadyExistsException"/>
    <element name="fault1" type="tns2:EmailAlreadyExistsException"/>
    <element name="fault2" type="tns2:UserRegistrationException"/>
+   <element name="getUnconfirmedUser">
+    <complexType>
+     <sequence>
+      <element name="username" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="getUnconfirmedUserResponse">
+    <complexType>
+     <sequence>
+      <element name="getUnconfirmedUserReturn" type="tns1:User"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="fault3" type="tns2:IllegalOperationException"/>
+   <element name="fault4" type="tns2:NoSuchUserException"/>
    <element name="modifyUnconfirmedEmail">
     <complexType>
      <sequence>
@@ -45,8 +61,6 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
      </sequence>
     </complexType>
    </element>
-   <element name="fault3" type="tns2:IllegalOperationException"/>
-   <element name="fault4" type="tns2:NoSuchUserException"/>
    <element name="confirmUserEmail">
     <complexType>
      <sequence>
@@ -64,6 +78,21 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
     </complexType>
    </element>
    <element name="fault5" type="tns2:InvalidTokenException"/>
+   <element name="requestPasswordReset">
+    <complexType>
+     <sequence>
+      <element name="username" type="xsd:string"/>
+      <element name="email" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="requestPasswordResetResponse">
+    <complexType>
+     <sequence>
+      <element name="requestPasswordResetReturn" type="tns1:User"/>
+     </sequence>
+    </complexType>
+   </element>
    <element name="resetUserPassword">
     <complexType>
      <sequence>
@@ -77,35 +106,6 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
     <complexType>
      <sequence>
       <element name="resetUserPasswordReturn" type="tns1:User"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="getUnconfirmedUser">
-    <complexType>
-     <sequence>
-      <element name="username" type="xsd:string"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="getUnconfirmedUserResponse">
-    <complexType>
-     <sequence>
-      <element name="getUnconfirmedUserReturn" type="tns1:User"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="requestPasswordReset">
-    <complexType>
-     <sequence>
-      <element name="username" type="xsd:string"/>
-      <element name="email" type="xsd:string"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="requestPasswordResetResponse">
-    <complexType>
-     <sequence>
-      <element name="requestPasswordResetReturn" type="tns1:User"/>
      </sequence>
     </complexType>
    </element>
@@ -322,6 +322,12 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
    </wsdl:message>
 
+   <wsdl:message name="InvalidTokenException">
+
+      <wsdl:part element="impl:fault5" name="fault"/>
+
+   </wsdl:message>
+
    <wsdl:message name="registerUserRequest">
 
       <wsdl:part element="impl:registerUser" name="parameters"/>
@@ -337,12 +343,6 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
    <wsdl:message name="UserRegistrationException">
 
       <wsdl:part element="impl:fault2" name="fault"/>
-
-   </wsdl:message>
-
-   <wsdl:message name="InvalidTokenException">
-
-      <wsdl:part element="impl:fault5" name="fault"/>
 
    </wsdl:message>
 
@@ -410,6 +410,20 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
       </wsdl:operation>
 
+      <wsdl:operation name="getUnconfirmedUser">
+
+         <wsdl:input message="impl:getUnconfirmedUserRequest" name="getUnconfirmedUserRequest"/>
+
+         <wsdl:output message="impl:getUnconfirmedUserResponse" name="getUnconfirmedUserResponse"/>
+
+         <wsdl:fault message="impl:UserRegistrationException" name="UserRegistrationException"/>
+
+         <wsdl:fault message="impl:NoSuchUserException" name="NoSuchUserException"/>
+
+         <wsdl:fault message="impl:IllegalOperationException" name="IllegalOperationException"/>
+
+      </wsdl:operation>
+
       <wsdl:operation name="modifyUnconfirmedEmail">
 
          <wsdl:input message="impl:modifyUnconfirmedEmailRequest" name="modifyUnconfirmedEmailRequest"/>
@@ -438,6 +452,20 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
       </wsdl:operation>
 
+      <wsdl:operation name="requestPasswordReset">
+
+         <wsdl:input message="impl:requestPasswordResetRequest" name="requestPasswordResetRequest"/>
+
+         <wsdl:output message="impl:requestPasswordResetResponse" name="requestPasswordResetResponse"/>
+
+         <wsdl:fault message="impl:UserRegistrationException" name="UserRegistrationException"/>
+
+         <wsdl:fault message="impl:NoSuchUserException" name="NoSuchUserException"/>
+
+         <wsdl:fault message="impl:IllegalOperationException" name="IllegalOperationException"/>
+
+      </wsdl:operation>
+
       <wsdl:operation name="resetUserPassword">
 
          <wsdl:input message="impl:resetUserPasswordRequest" name="resetUserPasswordRequest"/>
@@ -447,34 +475,6 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
          <wsdl:fault message="impl:UserRegistrationException" name="UserRegistrationException"/>
 
          <wsdl:fault message="impl:InvalidTokenException" name="InvalidTokenException"/>
-
-         <wsdl:fault message="impl:NoSuchUserException" name="NoSuchUserException"/>
-
-         <wsdl:fault message="impl:IllegalOperationException" name="IllegalOperationException"/>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="getUnconfirmedUser">
-
-         <wsdl:input message="impl:getUnconfirmedUserRequest" name="getUnconfirmedUserRequest"/>
-
-         <wsdl:output message="impl:getUnconfirmedUserResponse" name="getUnconfirmedUserResponse"/>
-
-         <wsdl:fault message="impl:UserRegistrationException" name="UserRegistrationException"/>
-
-         <wsdl:fault message="impl:NoSuchUserException" name="NoSuchUserException"/>
-
-         <wsdl:fault message="impl:IllegalOperationException" name="IllegalOperationException"/>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="requestPasswordReset">
-
-         <wsdl:input message="impl:requestPasswordResetRequest" name="requestPasswordResetRequest"/>
-
-         <wsdl:output message="impl:requestPasswordResetResponse" name="requestPasswordResetResponse"/>
-
-         <wsdl:fault message="impl:UserRegistrationException" name="UserRegistrationException"/>
 
          <wsdl:fault message="impl:NoSuchUserException" name="NoSuchUserException"/>
 
@@ -519,6 +519,42 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
          <wsdl:fault name="EmailAlreadyExistsException">
 
             <wsdlsoap:fault name="EmailAlreadyExistsException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getUnconfirmedUser">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getUnconfirmedUserRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getUnconfirmedUserResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="UserRegistrationException">
+
+            <wsdlsoap:fault name="UserRegistrationException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="NoSuchUserException">
+
+            <wsdlsoap:fault name="NoSuchUserException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="IllegalOperationException">
+
+            <wsdlsoap:fault name="IllegalOperationException" use="literal"/>
 
          </wsdl:fault>
 
@@ -596,6 +632,42 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
       </wsdl:operation>
 
+      <wsdl:operation name="requestPasswordReset">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="requestPasswordResetRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="requestPasswordResetResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="UserRegistrationException">
+
+            <wsdlsoap:fault name="UserRegistrationException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="NoSuchUserException">
+
+            <wsdlsoap:fault name="NoSuchUserException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="IllegalOperationException">
+
+            <wsdlsoap:fault name="IllegalOperationException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
       <wsdl:operation name="resetUserPassword">
 
          <wsdlsoap:operation soapAction=""/>
@@ -621,78 +693,6 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
          <wsdl:fault name="InvalidTokenException">
 
             <wsdlsoap:fault name="InvalidTokenException" use="literal"/>
-
-         </wsdl:fault>
-
-         <wsdl:fault name="NoSuchUserException">
-
-            <wsdlsoap:fault name="NoSuchUserException" use="literal"/>
-
-         </wsdl:fault>
-
-         <wsdl:fault name="IllegalOperationException">
-
-            <wsdlsoap:fault name="IllegalOperationException" use="literal"/>
-
-         </wsdl:fault>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="getUnconfirmedUser">
-
-         <wsdlsoap:operation soapAction=""/>
-
-         <wsdl:input name="getUnconfirmedUserRequest">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:input>
-
-         <wsdl:output name="getUnconfirmedUserResponse">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:output>
-
-         <wsdl:fault name="UserRegistrationException">
-
-            <wsdlsoap:fault name="UserRegistrationException" use="literal"/>
-
-         </wsdl:fault>
-
-         <wsdl:fault name="NoSuchUserException">
-
-            <wsdlsoap:fault name="NoSuchUserException" use="literal"/>
-
-         </wsdl:fault>
-
-         <wsdl:fault name="IllegalOperationException">
-
-            <wsdlsoap:fault name="IllegalOperationException" use="literal"/>
-
-         </wsdl:fault>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="requestPasswordReset">
-
-         <wsdlsoap:operation soapAction=""/>
-
-         <wsdl:input name="requestPasswordResetRequest">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:input>
-
-         <wsdl:output name="requestPasswordResetResponse">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:output>
-
-         <wsdl:fault name="UserRegistrationException">
-
-            <wsdlsoap:fault name="UserRegistrationException" use="literal"/>
 
          </wsdl:fault>
 

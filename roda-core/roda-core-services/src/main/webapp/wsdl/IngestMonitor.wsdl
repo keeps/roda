@@ -10,16 +10,6 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
    <import namespace="http://adapter.data.core.roda.dgarq.gov.pt"/>
    <import namespace="http://sort.adapter.data.core.roda.dgarq.gov.pt"/>
    <import namespace="http://sublist.adapter.data.core.roda.dgarq.gov.pt"/>
-   <element name="getPossibleStates">
-    <complexType/>
-   </element>
-   <element name="getPossibleStatesResponse">
-    <complexType>
-     <sequence>
-      <element maxOccurs="unbounded" name="getPossibleStatesReturn" type="xsd:string"/>
-     </sequence>
-    </complexType>
-   </element>
    <element name="getSIPsCount">
     <complexType>
      <sequence>
@@ -64,6 +54,16 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
      <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns6:SIPStateTransition"/>
     </sequence>
    </complexType>
+   <element name="getPossibleStates">
+    <complexType/>
+   </element>
+   <element name="getPossibleStatesResponse">
+    <complexType>
+     <sequence>
+      <element maxOccurs="unbounded" name="getPossibleStatesReturn" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
    <complexType name="ArrayOf_xsd_string">
     <sequence>
      <element maxOccurs="unbounded" minOccurs="0" name="item" type="xsd:string"/>
@@ -299,14 +299,6 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
    <wsdl:portType name="IngestMonitor">
 
-      <wsdl:operation name="getPossibleStates">
-
-         <wsdl:input message="impl:getPossibleStatesRequest" name="getPossibleStatesRequest"/>
-
-         <wsdl:output message="impl:getPossibleStatesResponse" name="getPossibleStatesResponse"/>
-
-      </wsdl:operation>
-
       <wsdl:operation name="getSIPsCount">
 
          <wsdl:input message="impl:getSIPsCountRequest" name="getSIPsCountRequest"/>
@@ -327,29 +319,19 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
       </wsdl:operation>
 
+      <wsdl:operation name="getPossibleStates">
+
+         <wsdl:input message="impl:getPossibleStatesRequest" name="getPossibleStatesRequest"/>
+
+         <wsdl:output message="impl:getPossibleStatesResponse" name="getPossibleStatesResponse"/>
+
+      </wsdl:operation>
+
    </wsdl:portType>
 
    <wsdl:binding name="IngestMonitorSoapBinding" type="impl:IngestMonitor">
 
       <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
-
-      <wsdl:operation name="getPossibleStates">
-
-         <wsdlsoap:operation soapAction=""/>
-
-         <wsdl:input name="getPossibleStatesRequest">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:input>
-
-         <wsdl:output name="getPossibleStatesResponse">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:output>
-
-      </wsdl:operation>
 
       <wsdl:operation name="getSIPsCount">
 
@@ -396,6 +378,24 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
             <wsdlsoap:fault name="IngestMonitorException" use="literal"/>
 
          </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getPossibleStates">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getPossibleStatesRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getPossibleStatesResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
 
       </wsdl:operation>
 

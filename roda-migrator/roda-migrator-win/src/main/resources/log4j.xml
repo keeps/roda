@@ -9,7 +9,7 @@
 	</appender>
 	
 	<appender name="FILEOUT" class="org.apache.log4j.RollingFileAppender">
-		<param name="File" value="${catalina.home}/logs/roda-migrator-win.log" />
+		<param name="File" value="${roda.home}/log/roda-migrator-win.log" />
 		<param name="MaxFileSize" value="26MB" />
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%p %d (%c{1}) %m%n" />
