@@ -33,6 +33,22 @@
 
       <typeMapping
         xmlns:ns="http://common.core.roda.dgarq.gov.pt"
+        qname="ns:NoSuchSIPException"
+        type="java:pt.gov.dgarq.roda.core.common.NoSuchSIPException"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://data.core.roda.dgarq.gov.pt"
+        qname="ns:SIPState"
+        type="java:pt.gov.dgarq.roda.core.data.SIPState"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://common.core.roda.dgarq.gov.pt"
         qname="ns:IllegalOperationException"
         type="java:pt.gov.dgarq.roda.core.common.IllegalOperationException"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
@@ -80,14 +96,6 @@
       />
       <typeMapping
         xmlns:ns="http://common.core.roda.dgarq.gov.pt"
-        qname="ns:NoSuchSIPException"
-        type="java:pt.gov.dgarq.roda.core.common.NoSuchSIPException"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle=""
-      />
-      <typeMapping
-        xmlns:ns="http://common.core.roda.dgarq.gov.pt"
         qname="ns:EditorException"
         type="java:pt.gov.dgarq.roda.core.common.EditorException"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
@@ -98,14 +106,6 @@
         xmlns:ns="http://common.core.roda.dgarq.gov.pt"
         qname="ns:AcceptSIPException"
         type="java:pt.gov.dgarq.roda.core.common.AcceptSIPException"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle=""
-      />
-      <typeMapping
-        xmlns:ns="http://data.core.roda.dgarq.gov.pt"
-        qname="ns:SIPState"
-        type="java:pt.gov.dgarq.roda.core.data.SIPState"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""

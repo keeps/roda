@@ -24,31 +24,6 @@ public class EditorSoapBindingStub extends org.apache.axis.client.Stub implement
         org.apache.axis.description.OperationDesc oper;
         org.apache.axis.description.ParameterDesc param;
         oper = new org.apache.axis.description.OperationDesc();
-        oper.setName("setRODAObjectPermissions");
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "permissions"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://data.core.roda.dgarq.gov.pt", "RODAObjectPermissions"), pt.gov.dgarq.roda.core.data.RODAObjectPermissions.class, false, false);
-        oper.addParameter(param);
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "applyToDescendants"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"), boolean.class, false, false);
-        oper.addParameter(param);
-        oper.setReturnType(new javax.xml.namespace.QName("http://data.core.roda.dgarq.gov.pt", "RODAObjectPermissions"));
-        oper.setReturnClass(pt.gov.dgarq.roda.core.data.RODAObjectPermissions.class);
-        oper.setReturnQName(new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "setRODAObjectPermissionsReturn"));
-        oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
-        oper.setUse(org.apache.axis.constants.Use.LITERAL);
-        oper.addFault(new org.apache.axis.description.FaultDesc(
-                      new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "fault"),
-                      "pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException",
-                      new javax.xml.namespace.QName("http://common.core.roda.dgarq.gov.pt", "NoSuchRODAObjectException"), 
-                      true
-                     ));
-        oper.addFault(new org.apache.axis.description.FaultDesc(
-                      new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "fault1"),
-                      "pt.gov.dgarq.roda.core.common.EditorException",
-                      new javax.xml.namespace.QName("http://common.core.roda.dgarq.gov.pt", "EditorException"), 
-                      true
-                     ));
-        _operations[0] = oper;
-
-        oper = new org.apache.axis.description.OperationDesc();
         oper.setName("createDescriptionObject");
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "dObject"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://data.core.roda.dgarq.gov.pt", "DescriptionObject"), pt.gov.dgarq.roda.core.data.DescriptionObject.class, false, false);
         oper.addParameter(param);
@@ -58,7 +33,7 @@ public class EditorSoapBindingStub extends org.apache.axis.client.Stub implement
         oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
         oper.addFault(new org.apache.axis.description.FaultDesc(
-                      new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "fault"),
+                      new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "fault1"),
                       "pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException",
                       new javax.xml.namespace.QName("http://common.core.roda.dgarq.gov.pt", "NoSuchRODAObjectException"), 
                       true
@@ -70,12 +45,12 @@ public class EditorSoapBindingStub extends org.apache.axis.client.Stub implement
                       true
                      ));
         oper.addFault(new org.apache.axis.description.FaultDesc(
-                      new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "fault1"),
+                      new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "fault"),
                       "pt.gov.dgarq.roda.core.common.EditorException",
                       new javax.xml.namespace.QName("http://common.core.roda.dgarq.gov.pt", "EditorException"), 
                       true
                      ));
-        _operations[1] = oper;
+        _operations[0] = oper;
 
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("modifyDescriptionObject");
@@ -87,18 +62,18 @@ public class EditorSoapBindingStub extends org.apache.axis.client.Stub implement
         oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
         oper.addFault(new org.apache.axis.description.FaultDesc(
-                      new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "fault"),
+                      new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "fault1"),
                       "pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException",
                       new javax.xml.namespace.QName("http://common.core.roda.dgarq.gov.pt", "NoSuchRODAObjectException"), 
                       true
                      ));
         oper.addFault(new org.apache.axis.description.FaultDesc(
-                      new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "fault1"),
+                      new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "fault"),
                       "pt.gov.dgarq.roda.core.common.EditorException",
                       new javax.xml.namespace.QName("http://common.core.roda.dgarq.gov.pt", "EditorException"), 
                       true
                      ));
-        _operations[2] = oper;
+        _operations[1] = oper;
 
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("removeDescriptionObject");
@@ -108,18 +83,18 @@ public class EditorSoapBindingStub extends org.apache.axis.client.Stub implement
         oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
         oper.addFault(new org.apache.axis.description.FaultDesc(
-                      new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "fault"),
+                      new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "fault1"),
                       "pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException",
                       new javax.xml.namespace.QName("http://common.core.roda.dgarq.gov.pt", "NoSuchRODAObjectException"), 
                       true
                      ));
         oper.addFault(new org.apache.axis.description.FaultDesc(
-                      new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "fault1"),
+                      new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "fault"),
                       "pt.gov.dgarq.roda.core.common.EditorException",
                       new javax.xml.namespace.QName("http://common.core.roda.dgarq.gov.pt", "EditorException"), 
                       true
                      ));
-        _operations[3] = oper;
+        _operations[2] = oper;
 
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("getDOPossibleLevels");
@@ -131,7 +106,32 @@ public class EditorSoapBindingStub extends org.apache.axis.client.Stub implement
         oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
         oper.addFault(new org.apache.axis.description.FaultDesc(
+                      new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "fault"),
+                      "pt.gov.dgarq.roda.core.common.EditorException",
+                      new javax.xml.namespace.QName("http://common.core.roda.dgarq.gov.pt", "EditorException"), 
+                      true
+                     ));
+        _operations[3] = oper;
+
+        oper = new org.apache.axis.description.OperationDesc();
+        oper.setName("setRODAObjectPermissions");
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "permissions"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://data.core.roda.dgarq.gov.pt", "RODAObjectPermissions"), pt.gov.dgarq.roda.core.data.RODAObjectPermissions.class, false, false);
+        oper.addParameter(param);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "applyToDescendants"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"), boolean.class, false, false);
+        oper.addParameter(param);
+        oper.setReturnType(new javax.xml.namespace.QName("http://data.core.roda.dgarq.gov.pt", "RODAObjectPermissions"));
+        oper.setReturnClass(pt.gov.dgarq.roda.core.data.RODAObjectPermissions.class);
+        oper.setReturnQName(new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "setRODAObjectPermissionsReturn"));
+        oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
+        oper.setUse(org.apache.axis.constants.Use.LITERAL);
+        oper.addFault(new org.apache.axis.description.FaultDesc(
                       new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "fault1"),
+                      "pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException",
+                      new javax.xml.namespace.QName("http://common.core.roda.dgarq.gov.pt", "NoSuchRODAObjectException"), 
+                      true
+                     ));
+        oper.addFault(new org.apache.axis.description.FaultDesc(
+                      new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "fault"),
                       "pt.gov.dgarq.roda.core.common.EditorException",
                       new javax.xml.namespace.QName("http://common.core.roda.dgarq.gov.pt", "EditorException"), 
                       true
@@ -148,13 +148,13 @@ public class EditorSoapBindingStub extends org.apache.axis.client.Stub implement
         oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
         oper.addFault(new org.apache.axis.description.FaultDesc(
-                      new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "fault"),
+                      new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "fault1"),
                       "pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException",
                       new javax.xml.namespace.QName("http://common.core.roda.dgarq.gov.pt", "NoSuchRODAObjectException"), 
                       true
                      ));
         oper.addFault(new org.apache.axis.description.FaultDesc(
-                      new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "fault1"),
+                      new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "fault"),
                       "pt.gov.dgarq.roda.core.common.EditorException",
                       new javax.xml.namespace.QName("http://common.core.roda.dgarq.gov.pt", "EditorException"), 
                       true
@@ -381,7 +381,7 @@ public class EditorSoapBindingStub extends org.apache.axis.client.Stub implement
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
 
-            qName = new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "ArrayOf_tns3_ArrangementTableGroup");
+            qName = new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "ArrayOf_tns2_ArrangementTableGroup");
             cachedSerQNames.add(qName);
             cls = pt.gov.dgarq.roda.core.data.eadc.ArrangementTableGroup[].class;
             cachedSerClasses.add(cls);
@@ -390,7 +390,7 @@ public class EditorSoapBindingStub extends org.apache.axis.client.Stub implement
             cachedSerFactories.add(new org.apache.axis.encoding.ser.ArraySerializerFactory(qName, qName2));
             cachedDeserFactories.add(new org.apache.axis.encoding.ser.ArrayDeserializerFactory());
 
-            qName = new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "ArrayOf_tns3_ArrangementTableRow");
+            qName = new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "ArrayOf_tns2_ArrangementTableRow");
             cachedSerQNames.add(qName);
             cls = pt.gov.dgarq.roda.core.data.eadc.ArrangementTableRow[].class;
             cachedSerClasses.add(cls);
@@ -399,7 +399,7 @@ public class EditorSoapBindingStub extends org.apache.axis.client.Stub implement
             cachedSerFactories.add(new org.apache.axis.encoding.ser.ArraySerializerFactory(qName, qName2));
             cachedDeserFactories.add(new org.apache.axis.encoding.ser.ArrayDeserializerFactory());
 
-            qName = new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "ArrayOf_tns3_BioghistChronitem");
+            qName = new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "ArrayOf_tns2_BioghistChronitem");
             cachedSerQNames.add(qName);
             cls = pt.gov.dgarq.roda.core.data.eadc.BioghistChronitem[].class;
             cachedSerClasses.add(cls);
@@ -483,57 +483,12 @@ public class EditorSoapBindingStub extends org.apache.axis.client.Stub implement
         }
     }
 
-    public pt.gov.dgarq.roda.core.data.RODAObjectPermissions setRODAObjectPermissions(pt.gov.dgarq.roda.core.data.RODAObjectPermissions permissions, boolean applyToDescendants) throws java.rmi.RemoteException, pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException, pt.gov.dgarq.roda.core.common.EditorException {
-        if (super.cachedEndpoint == null) {
-            throw new org.apache.axis.NoEndPointException();
-        }
-        org.apache.axis.client.Call _call = createCall();
-        _call.setOperation(_operations[0]);
-        _call.setUseSOAPAction(true);
-        _call.setSOAPActionURI("");
-        _call.setEncodingStyle(null);
-        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
-        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
-        _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
-        _call.setOperationName(new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "setRODAObjectPermissions"));
-
-        setRequestHeaders(_call);
-        setAttachments(_call);
- try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {permissions, new java.lang.Boolean(applyToDescendants)});
-
-        if (_resp instanceof java.rmi.RemoteException) {
-            throw (java.rmi.RemoteException)_resp;
-        }
-        else {
-            extractAttachments(_call);
-            try {
-                return (pt.gov.dgarq.roda.core.data.RODAObjectPermissions) _resp;
-            } catch (java.lang.Exception _exception) {
-                return (pt.gov.dgarq.roda.core.data.RODAObjectPermissions) org.apache.axis.utils.JavaUtils.convert(_resp, pt.gov.dgarq.roda.core.data.RODAObjectPermissions.class);
-            }
-        }
-  } catch (org.apache.axis.AxisFault axisFaultException) {
-    if (axisFaultException.detail != null) {
-        if (axisFaultException.detail instanceof java.rmi.RemoteException) {
-              throw (java.rmi.RemoteException) axisFaultException.detail;
-         }
-        if (axisFaultException.detail instanceof pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException) {
-              throw (pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException) axisFaultException.detail;
-         }
-        if (axisFaultException.detail instanceof pt.gov.dgarq.roda.core.common.EditorException) {
-              throw (pt.gov.dgarq.roda.core.common.EditorException) axisFaultException.detail;
-         }
-   }
-  throw axisFaultException;
-}
-    }
-
     public java.lang.String createDescriptionObject(pt.gov.dgarq.roda.core.data.DescriptionObject dObject) throws java.rmi.RemoteException, pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException, pt.gov.dgarq.roda.core.common.InvalidDescriptionObjectException, pt.gov.dgarq.roda.core.common.EditorException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
         org.apache.axis.client.Call _call = createCall();
-        _call.setOperation(_operations[1]);
+        _call.setOperation(_operations[0]);
         _call.setUseSOAPAction(true);
         _call.setSOAPActionURI("");
         _call.setEncodingStyle(null);
@@ -581,7 +536,7 @@ public class EditorSoapBindingStub extends org.apache.axis.client.Stub implement
             throw new org.apache.axis.NoEndPointException();
         }
         org.apache.axis.client.Call _call = createCall();
-        _call.setOperation(_operations[2]);
+        _call.setOperation(_operations[1]);
         _call.setUseSOAPAction(true);
         _call.setSOAPActionURI("");
         _call.setEncodingStyle(null);
@@ -626,7 +581,7 @@ public class EditorSoapBindingStub extends org.apache.axis.client.Stub implement
             throw new org.apache.axis.NoEndPointException();
         }
         org.apache.axis.client.Call _call = createCall();
-        _call.setOperation(_operations[3]);
+        _call.setOperation(_operations[2]);
         _call.setUseSOAPAction(true);
         _call.setSOAPActionURI("");
         _call.setEncodingStyle(null);
@@ -664,7 +619,7 @@ public class EditorSoapBindingStub extends org.apache.axis.client.Stub implement
             throw new org.apache.axis.NoEndPointException();
         }
         org.apache.axis.client.Call _call = createCall();
-        _call.setOperation(_operations[4]);
+        _call.setOperation(_operations[3]);
         _call.setUseSOAPAction(true);
         _call.setSOAPActionURI("");
         _call.setEncodingStyle(null);
@@ -692,6 +647,51 @@ public class EditorSoapBindingStub extends org.apache.axis.client.Stub implement
     if (axisFaultException.detail != null) {
         if (axisFaultException.detail instanceof java.rmi.RemoteException) {
               throw (java.rmi.RemoteException) axisFaultException.detail;
+         }
+        if (axisFaultException.detail instanceof pt.gov.dgarq.roda.core.common.EditorException) {
+              throw (pt.gov.dgarq.roda.core.common.EditorException) axisFaultException.detail;
+         }
+   }
+  throw axisFaultException;
+}
+    }
+
+    public pt.gov.dgarq.roda.core.data.RODAObjectPermissions setRODAObjectPermissions(pt.gov.dgarq.roda.core.data.RODAObjectPermissions permissions, boolean applyToDescendants) throws java.rmi.RemoteException, pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException, pt.gov.dgarq.roda.core.common.EditorException {
+        if (super.cachedEndpoint == null) {
+            throw new org.apache.axis.NoEndPointException();
+        }
+        org.apache.axis.client.Call _call = createCall();
+        _call.setOperation(_operations[4]);
+        _call.setUseSOAPAction(true);
+        _call.setSOAPActionURI("");
+        _call.setEncodingStyle(null);
+        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
+        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
+        _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
+        _call.setOperationName(new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "setRODAObjectPermissions"));
+
+        setRequestHeaders(_call);
+        setAttachments(_call);
+ try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {permissions, new java.lang.Boolean(applyToDescendants)});
+
+        if (_resp instanceof java.rmi.RemoteException) {
+            throw (java.rmi.RemoteException)_resp;
+        }
+        else {
+            extractAttachments(_call);
+            try {
+                return (pt.gov.dgarq.roda.core.data.RODAObjectPermissions) _resp;
+            } catch (java.lang.Exception _exception) {
+                return (pt.gov.dgarq.roda.core.data.RODAObjectPermissions) org.apache.axis.utils.JavaUtils.convert(_resp, pt.gov.dgarq.roda.core.data.RODAObjectPermissions.class);
+            }
+        }
+  } catch (org.apache.axis.AxisFault axisFaultException) {
+    if (axisFaultException.detail != null) {
+        if (axisFaultException.detail instanceof java.rmi.RemoteException) {
+              throw (java.rmi.RemoteException) axisFaultException.detail;
+         }
+        if (axisFaultException.detail instanceof pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException) {
+              throw (pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException) axisFaultException.detail;
          }
         if (axisFaultException.detail instanceof pt.gov.dgarq.roda.core.common.EditorException) {
               throw (pt.gov.dgarq.roda.core.common.EditorException) axisFaultException.detail;

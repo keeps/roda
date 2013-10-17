@@ -115,16 +115,16 @@
       />
       <typeMapping
         xmlns:ns="http://common.migrator.roda.dgarq.gov.pt"
-        qname="ns:InvalidRepresentationException"
-        type="java:pt.gov.dgarq.roda.migrator.common.InvalidRepresentationException"
+        qname="ns:WrongRepresentationTypeException"
+        type="java:pt.gov.dgarq.roda.migrator.common.WrongRepresentationTypeException"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""
       />
       <typeMapping
         xmlns:ns="http://common.migrator.roda.dgarq.gov.pt"
-        qname="ns:WrongRepresentationTypeException"
-        type="java:pt.gov.dgarq.roda.migrator.common.WrongRepresentationTypeException"
+        qname="ns:InvalidRepresentationException"
+        type="java:pt.gov.dgarq.roda.migrator.common.InvalidRepresentationException"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""

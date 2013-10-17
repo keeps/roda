@@ -15,23 +15,23 @@
   <service name="Reports" provider="java:RPC" style="wrapped" use="literal">
       <parameter name="wsdlTargetNamespace" value="http://services.core.roda.dgarq.gov.pt"/>
       <parameter name="wsdlServiceElement" value="ReportsService"/>
-      <parameter name="schemaQualified" value="http://services.core.roda.dgarq.gov.pt,http://sublist.adapter.data.core.roda.dgarq.gov.pt,http://adapter.data.core.roda.dgarq.gov.pt,http://sort.adapter.data.core.roda.dgarq.gov.pt,http://common.core.roda.dgarq.gov.pt,http://filter.adapter.data.core.roda.dgarq.gov.pt,http://data.core.roda.dgarq.gov.pt"/>
+      <parameter name="schemaQualified" value="http://services.core.roda.dgarq.gov.pt,http://sublist.adapter.data.core.roda.dgarq.gov.pt,http://adapter.data.core.roda.dgarq.gov.pt,http://sort.adapter.data.core.roda.dgarq.gov.pt,http://filter.adapter.data.core.roda.dgarq.gov.pt,http://common.core.roda.dgarq.gov.pt,http://data.core.roda.dgarq.gov.pt"/>
       <parameter name="wsdlServicePort" value="Reports"/>
       <parameter name="className" value="pt.gov.dgarq.roda.core.services.Reports"/>
       <parameter name="wsdlPortType" value="Reports"/>
       <parameter name="typeMappingVersion" value="1.2"/>
-      <operation name="getReports" qname="operNS:getReports" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getReportsReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:Report" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
-        <parameter qname="pns:contentAdapter" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:ContentAdapter" xmlns:tns="http://adapter.data.core.roda.dgarq.gov.pt"/>
-        <fault name="ReportException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.ReportException" type="tns:ReportException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-      </operation>
       <operation name="getReport" qname="operNS:getReport" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getReportReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:Report" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
         <parameter qname="pns:reportID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
-        <fault name="NoSuchReportException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchReportException" type="tns:NoSuchReportException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-        <fault name="ReportException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.ReportException" type="tns:ReportException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="NoSuchReportException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchReportException" type="tns:NoSuchReportException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="ReportException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.ReportException" type="tns:ReportException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
       </operation>
       <operation name="getReportsCount" qname="operNS:getReportsCount" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getReportsCountReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:int" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
         <parameter qname="pns:filter" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:Filter" xmlns:tns="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
-        <fault name="ReportException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.ReportException" type="tns:ReportException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="ReportException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.ReportException" type="tns:ReportException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="getReports" qname="operNS:getReports" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getReportsReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:Report" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
+        <parameter qname="pns:contentAdapter" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:ContentAdapter" xmlns:tns="http://adapter.data.core.roda.dgarq.gov.pt"/>
+        <fault name="ReportException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.ReportException" type="tns:ReportException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
       </operation>
       <parameter name="allowedMethods" value="getReportsCount getReports getReport"/>
       <parameter name="scope" value="Application"/>
@@ -46,9 +46,9 @@
       />
       <arrayMapping
         xmlns:ns="http://services.core.roda.dgarq.gov.pt"
-        qname="ns:ArrayOf_tns5_Attribute"
-        type="java:pt.gov.dgarq.roda.core.data.Attribute[]"
-        innerType="cmp-ns:Attribute" xmlns:cmp-ns="http://data.core.roda.dgarq.gov.pt"
+        qname="ns:ArrayOf_tns5_SortParameter"
+        type="java:pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter[]"
+        innerType="cmp-ns:SortParameter" xmlns:cmp-ns="http://sort.adapter.data.core.roda.dgarq.gov.pt"
         encodingStyle=""
       />
       <typeMapping
@@ -99,17 +99,17 @@
         encodingStyle=""
       />
       <typeMapping
-        xmlns:ns="http://sort.adapter.data.core.roda.dgarq.gov.pt"
-        qname="ns:SortParameter"
-        type="java:pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter"
+        xmlns:ns="http://filter.adapter.data.core.roda.dgarq.gov.pt"
+        qname="ns:FilterParameter"
+        type="java:pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""
       />
       <typeMapping
-        xmlns:ns="http://filter.adapter.data.core.roda.dgarq.gov.pt"
-        qname="ns:FilterParameter"
-        type="java:pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter"
+        xmlns:ns="http://sort.adapter.data.core.roda.dgarq.gov.pt"
+        qname="ns:SortParameter"
+        type="java:pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""
@@ -146,19 +146,19 @@
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""
       />
-      <arrayMapping
-        xmlns:ns="http://services.core.roda.dgarq.gov.pt"
-        qname="ns:ArrayOf_tns5_ReportItem"
-        type="java:pt.gov.dgarq.roda.core.data.ReportItem[]"
-        innerType="cmp-ns:ReportItem" xmlns:cmp-ns="http://data.core.roda.dgarq.gov.pt"
-        encodingStyle=""
-      />
       <typeMapping
         xmlns:ns="http://filter.adapter.data.core.roda.dgarq.gov.pt"
         qname="ns:Filter"
         type="java:pt.gov.dgarq.roda.core.data.adapter.filter.Filter"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <arrayMapping
+        xmlns:ns="http://services.core.roda.dgarq.gov.pt"
+        qname="ns:ArrayOf_tns1_Attribute"
+        type="java:pt.gov.dgarq.roda.core.data.Attribute[]"
+        innerType="cmp-ns:Attribute" xmlns:cmp-ns="http://data.core.roda.dgarq.gov.pt"
         encodingStyle=""
       />
       <typeMapping
@@ -179,9 +179,9 @@
       />
       <arrayMapping
         xmlns:ns="http://services.core.roda.dgarq.gov.pt"
-        qname="ns:ArrayOf_tns2_FilterParameter"
-        type="java:pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter[]"
-        innerType="cmp-ns:FilterParameter" xmlns:cmp-ns="http://filter.adapter.data.core.roda.dgarq.gov.pt"
+        qname="ns:ArrayOf_tns1_ReportItem"
+        type="java:pt.gov.dgarq.roda.core.data.ReportItem[]"
+        innerType="cmp-ns:ReportItem" xmlns:cmp-ns="http://data.core.roda.dgarq.gov.pt"
         encodingStyle=""
       />
       <typeMapping
@@ -218,9 +218,9 @@
       />
       <arrayMapping
         xmlns:ns="http://services.core.roda.dgarq.gov.pt"
-        qname="ns:ArrayOf_tns3_SortParameter"
-        type="java:pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter[]"
-        innerType="cmp-ns:SortParameter" xmlns:cmp-ns="http://sort.adapter.data.core.roda.dgarq.gov.pt"
+        qname="ns:ArrayOf_tns3_FilterParameter"
+        type="java:pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter[]"
+        innerType="cmp-ns:FilterParameter" xmlns:cmp-ns="http://filter.adapter.data.core.roda.dgarq.gov.pt"
         encodingStyle=""
       />
   </service>

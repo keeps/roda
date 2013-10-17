@@ -33,24 +33,6 @@
         <parameter qname="pns:contentAdapter" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:ContentAdapter" xmlns:tns="http://adapter.data.core.roda.dgarq.gov.pt"/>
         <fault name="SchedulerException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.SchedulerException" type="tns:SchedulerException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
       </operation>
-      <operation name="getTaskInstance" qname="operNS:getTaskInstance" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getTaskInstanceReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:TaskInstance" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
-        <parameter qname="pns:taskInstanceID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
-        <fault name="SchedulerException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.SchedulerException" type="tns:SchedulerException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-        <fault name="NoSuchTaskInstanceException" qname="fns:fault2" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchTaskInstanceException" type="tns:NoSuchTaskInstanceException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-      </operation>
-      <operation name="getTaskInstanceCount" qname="operNS:getTaskInstanceCount" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getTaskInstanceCountReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:int" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
-        <parameter qname="pns:filter" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:Filter" xmlns:tns="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
-        <fault name="SchedulerException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.SchedulerException" type="tns:SchedulerException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-      </operation>
-      <operation name="getTaskInstances" qname="operNS:getTaskInstances" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getTaskInstancesReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:TaskInstance" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
-        <parameter qname="pns:contentAdapter" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:ContentAdapter" xmlns:tns="http://adapter.data.core.roda.dgarq.gov.pt"/>
-        <fault name="SchedulerException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.SchedulerException" type="tns:SchedulerException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-      </operation>
-      <operation name="resumeTask" qname="operNS:resumeTask" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:resumeTaskReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:Task" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
-        <parameter qname="pns:taskName" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
-        <fault name="SchedulerException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.SchedulerException" type="tns:SchedulerException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-        <fault name="NoSuchTaskException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchTaskException" type="tns:NoSuchTaskException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-      </operation>
       <operation name="getTaskCount" qname="operNS:getTaskCount" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getTaskCountReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:int" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
         <parameter qname="pns:filter" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:Filter" xmlns:tns="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
         <fault name="SchedulerException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.SchedulerException" type="tns:SchedulerException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
@@ -70,7 +52,25 @@
         <fault name="SchedulerException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.SchedulerException" type="tns:SchedulerException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
         <fault name="NoSuchTaskException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchTaskException" type="tns:NoSuchTaskException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
       </operation>
-      <parameter name="allowedMethods" value="getTaskInstance modifyTask resumeTask pauseTask getTasks getTaskInstances getTaskInstanceCount addTask removeTask getTaskCount getTask"/>
+      <operation name="resumeTask" qname="operNS:resumeTask" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:resumeTaskReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:Task" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
+        <parameter qname="pns:taskName" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <fault name="SchedulerException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.SchedulerException" type="tns:SchedulerException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="NoSuchTaskException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchTaskException" type="tns:NoSuchTaskException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="getTaskInstance" qname="operNS:getTaskInstance" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getTaskInstanceReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:TaskInstance" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
+        <parameter qname="pns:taskInstanceID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <fault name="SchedulerException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.SchedulerException" type="tns:SchedulerException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="NoSuchTaskInstanceException" qname="fns:fault2" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchTaskInstanceException" type="tns:NoSuchTaskInstanceException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="getTaskInstances" qname="operNS:getTaskInstances" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getTaskInstancesReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:TaskInstance" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
+        <parameter qname="pns:contentAdapter" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:ContentAdapter" xmlns:tns="http://adapter.data.core.roda.dgarq.gov.pt"/>
+        <fault name="SchedulerException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.SchedulerException" type="tns:SchedulerException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="getTaskInstanceCount" qname="operNS:getTaskInstanceCount" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getTaskInstanceCountReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:int" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
+        <parameter qname="pns:filter" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:Filter" xmlns:tns="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+        <fault name="SchedulerException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.SchedulerException" type="tns:SchedulerException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <parameter name="allowedMethods" value="getTaskInstance resumeTask modifyTask pauseTask getTasks getTaskInstances getTaskInstanceCount addTask removeTask getTaskCount getTask"/>
       <parameter name="scope" value="Application"/>
 
       <typeMapping

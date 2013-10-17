@@ -7,10 +7,10 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
    <import namespace="http://data.core.roda.dgarq.gov.pt"/>
    <import namespace="http://common.core.roda.dgarq.gov.pt"/>
    <import namespace="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
-   <element name="modifyGroup">
+   <element name="addGroup">
     <complexType>
      <sequence>
-      <element name="modifiedGroup" type="tns1:Group"/>
+      <element name="group" type="tns1:Group"/>
      </sequence>
     </complexType>
    </element>
@@ -19,6 +19,33 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
      <element maxOccurs="unbounded" minOccurs="0" name="item" type="xsd:string"/>
     </sequence>
    </complexType>
+   <element name="addGroupResponse">
+    <complexType>
+     <sequence>
+      <element name="addGroupReturn" type="tns1:Group"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="fault" type="tns2:UserManagementException"/>
+   <element name="fault1" type="tns2:GroupAlreadyExistsException"/>
+   <element name="removeGroup">
+    <complexType>
+     <sequence>
+      <element name="groupname" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="removeGroupResponse">
+    <complexType/>
+   </element>
+   <element name="fault2" type="tns2:IllegalOperationException"/>
+   <element name="modifyGroup">
+    <complexType>
+     <sequence>
+      <element name="modifiedGroup" type="tns1:Group"/>
+     </sequence>
+    </complexType>
+   </element>
    <element name="modifyGroupResponse">
     <complexType>
      <sequence>
@@ -26,9 +53,7 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
      </sequence>
     </complexType>
    </element>
-   <element name="fault" type="tns2:UserManagementException"/>
-   <element name="fault1" type="tns2:NoSuchGroupException"/>
-   <element name="fault2" type="tns2:IllegalOperationException"/>
+   <element name="fault3" type="tns2:NoSuchGroupException"/>
    <element name="addUser">
     <complexType>
      <sequence>
@@ -43,8 +68,8 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
      </sequence>
     </complexType>
    </element>
-   <element name="fault3" type="tns2:UserAlreadyExistsException"/>
-   <element name="fault4" type="tns2:EmailAlreadyExistsException"/>
+   <element name="fault4" type="tns2:UserAlreadyExistsException"/>
+   <element name="fault5" type="tns2:EmailAlreadyExistsException"/>
    <element name="modifyUser">
     <complexType>
      <sequence>
@@ -59,7 +84,7 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
      </sequence>
     </complexType>
    </element>
-   <element name="fault5" type="tns2:NoSuchUserException"/>
+   <element name="fault6" type="tns2:NoSuchUserException"/>
    <element name="removeUser">
     <complexType>
      <sequence>
@@ -85,31 +110,6 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
    <element name="setUserPasswordResponse">
     <complexType/>
    </element>
-   <element name="removeGroup">
-    <complexType>
-     <sequence>
-      <element name="groupname" type="xsd:string"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="removeGroupResponse">
-    <complexType/>
-   </element>
-   <element name="addGroup">
-    <complexType>
-     <sequence>
-      <element name="group" type="tns1:Group"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="addGroupResponse">
-    <complexType>
-     <sequence>
-      <element name="addGroupReturn" type="tns1:Group"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="fault6" type="tns2:GroupAlreadyExistsException"/>
   </schema>
   <schema elementFormDefault="qualified" targetNamespace="http://data.core.roda.dgarq.gov.pt" xmlns="http://www.w3.org/2001/XMLSchema">
    <import namespace="http://common.core.roda.dgarq.gov.pt"/>
@@ -186,7 +186,7 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
      </extension>
     </complexContent>
    </complexType>
-   <complexType name="NoSuchGroupException">
+   <complexType name="GroupAlreadyExistsException">
     <complexContent>
      <extension base="tns2:RODAServiceException">
       <sequence/>
@@ -194,6 +194,13 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
     </complexContent>
    </complexType>
    <complexType name="IllegalOperationException">
+    <complexContent>
+     <extension base="tns2:RODAServiceException">
+      <sequence/>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="NoSuchGroupException">
     <complexContent>
      <extension base="tns2:RODAServiceException">
       <sequence/>
@@ -222,13 +229,6 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
     </complexContent>
    </complexType>
    <complexType name="NoSuchUserException">
-    <complexContent>
-     <extension base="tns2:RODAServiceException">
-      <sequence/>
-     </extension>
-    </complexContent>
-   </complexType>
-   <complexType name="GroupAlreadyExistsException">
     <complexContent>
      <extension base="tns2:RODAServiceException">
       <sequence/>
@@ -310,15 +310,15 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
    </wsdl:message>
 
-   <wsdl:message name="addUserResponse">
-
-      <wsdl:part element="impl:addUserResponse" name="parameters"/>
-
-   </wsdl:message>
-
    <wsdl:message name="modifyUserResponse">
 
       <wsdl:part element="impl:modifyUserResponse" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="addUserResponse">
+
+      <wsdl:part element="impl:addUserResponse" name="parameters"/>
 
    </wsdl:message>
 
@@ -360,13 +360,13 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
    <wsdl:message name="GroupAlreadyExistsException">
 
-      <wsdl:part element="impl:fault6" name="fault"/>
+      <wsdl:part element="impl:fault1" name="fault"/>
 
    </wsdl:message>
 
    <wsdl:message name="EmailAlreadyExistsException">
 
-      <wsdl:part element="impl:fault4" name="fault"/>
+      <wsdl:part element="impl:fault5" name="fault"/>
 
    </wsdl:message>
 
@@ -378,19 +378,19 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
    <wsdl:message name="UserAlreadyExistsException">
 
-      <wsdl:part element="impl:fault3" name="fault"/>
-
-   </wsdl:message>
-
-   <wsdl:message name="addGroupResponse">
-
-      <wsdl:part element="impl:addGroupResponse" name="parameters"/>
+      <wsdl:part element="impl:fault4" name="fault"/>
 
    </wsdl:message>
 
    <wsdl:message name="removeUserRequest">
 
       <wsdl:part element="impl:removeUser" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="addGroupResponse">
+
+      <wsdl:part element="impl:addGroupResponse" name="parameters"/>
 
    </wsdl:message>
 
@@ -402,13 +402,13 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
    <wsdl:message name="NoSuchUserException">
 
-      <wsdl:part element="impl:fault5" name="fault"/>
+      <wsdl:part element="impl:fault6" name="fault"/>
 
    </wsdl:message>
 
    <wsdl:message name="NoSuchGroupException">
 
-      <wsdl:part element="impl:fault1" name="fault"/>
+      <wsdl:part element="impl:fault3" name="fault"/>
 
    </wsdl:message>
 
@@ -431,6 +431,30 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
    </wsdl:message>
 
    <wsdl:portType name="UserManagement">
+
+      <wsdl:operation name="addGroup">
+
+         <wsdl:input message="impl:addGroupRequest" name="addGroupRequest"/>
+
+         <wsdl:output message="impl:addGroupResponse" name="addGroupResponse"/>
+
+         <wsdl:fault message="impl:GroupAlreadyExistsException" name="GroupAlreadyExistsException"/>
+
+         <wsdl:fault message="impl:UserManagementException" name="UserManagementException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="removeGroup">
+
+         <wsdl:input message="impl:removeGroupRequest" name="removeGroupRequest"/>
+
+         <wsdl:output message="impl:removeGroupResponse" name="removeGroupResponse"/>
+
+         <wsdl:fault message="impl:IllegalOperationException" name="IllegalOperationException"/>
+
+         <wsdl:fault message="impl:UserManagementException" name="UserManagementException"/>
+
+      </wsdl:operation>
 
       <wsdl:operation name="modifyGroup">
 
@@ -504,35 +528,71 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
       </wsdl:operation>
 
-      <wsdl:operation name="removeGroup">
-
-         <wsdl:input message="impl:removeGroupRequest" name="removeGroupRequest"/>
-
-         <wsdl:output message="impl:removeGroupResponse" name="removeGroupResponse"/>
-
-         <wsdl:fault message="impl:IllegalOperationException" name="IllegalOperationException"/>
-
-         <wsdl:fault message="impl:UserManagementException" name="UserManagementException"/>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="addGroup">
-
-         <wsdl:input message="impl:addGroupRequest" name="addGroupRequest"/>
-
-         <wsdl:output message="impl:addGroupResponse" name="addGroupResponse"/>
-
-         <wsdl:fault message="impl:GroupAlreadyExistsException" name="GroupAlreadyExistsException"/>
-
-         <wsdl:fault message="impl:UserManagementException" name="UserManagementException"/>
-
-      </wsdl:operation>
-
    </wsdl:portType>
 
    <wsdl:binding name="UserManagementSoapBinding" type="impl:UserManagement">
 
       <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+      <wsdl:operation name="addGroup">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="addGroupRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="addGroupResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="GroupAlreadyExistsException">
+
+            <wsdlsoap:fault name="GroupAlreadyExistsException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="UserManagementException">
+
+            <wsdlsoap:fault name="UserManagementException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="removeGroup">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="removeGroupRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="removeGroupResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="IllegalOperationException">
+
+            <wsdlsoap:fault name="IllegalOperationException" use="literal"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="UserManagementException">
+
+            <wsdlsoap:fault name="UserManagementException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
 
       <wsdl:operation name="modifyGroup">
 
@@ -709,66 +769,6 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
          <wsdl:fault name="IllegalOperationException">
 
             <wsdlsoap:fault name="IllegalOperationException" use="literal"/>
-
-         </wsdl:fault>
-
-         <wsdl:fault name="UserManagementException">
-
-            <wsdlsoap:fault name="UserManagementException" use="literal"/>
-
-         </wsdl:fault>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="removeGroup">
-
-         <wsdlsoap:operation soapAction=""/>
-
-         <wsdl:input name="removeGroupRequest">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:input>
-
-         <wsdl:output name="removeGroupResponse">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:output>
-
-         <wsdl:fault name="IllegalOperationException">
-
-            <wsdlsoap:fault name="IllegalOperationException" use="literal"/>
-
-         </wsdl:fault>
-
-         <wsdl:fault name="UserManagementException">
-
-            <wsdlsoap:fault name="UserManagementException" use="literal"/>
-
-         </wsdl:fault>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="addGroup">
-
-         <wsdlsoap:operation soapAction=""/>
-
-         <wsdl:input name="addGroupRequest">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:input>
-
-         <wsdl:output name="addGroupResponse">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:output>
-
-         <wsdl:fault name="GroupAlreadyExistsException">
-
-            <wsdlsoap:fault name="GroupAlreadyExistsException" use="literal"/>
 
          </wsdl:fault>
 

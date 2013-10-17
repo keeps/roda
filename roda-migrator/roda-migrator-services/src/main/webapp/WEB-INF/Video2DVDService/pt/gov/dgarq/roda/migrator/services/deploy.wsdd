@@ -67,6 +67,14 @@
       />
       <typeMapping
         xmlns:ns="http://data.core.roda.dgarq.gov.pt"
+        qname="ns:FileFormat"
+        type="java:pt.gov.dgarq.roda.core.data.FileFormat"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://data.core.roda.dgarq.gov.pt"
         qname="ns:SimpleEventPreservationObject"
         type="java:pt.gov.dgarq.roda.core.data.SimpleEventPreservationObject"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
@@ -137,6 +145,14 @@
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""
       />
+      <typeMapping
+        xmlns:ns="http://data.core.roda.dgarq.gov.pt"
+        qname="ns:EventPreservationObject"
+        type="java:pt.gov.dgarq.roda.core.data.EventPreservationObject"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
       <arrayMapping
         xmlns:ns="http://services.migrator.roda.dgarq.gov.pt"
         qname="ns:ArrayOf_tns1_RepresentationFile"
@@ -148,14 +164,6 @@
         xmlns:ns="http://data.core.roda.dgarq.gov.pt"
         qname="ns:RODAObject"
         type="java:pt.gov.dgarq.roda.core.data.RODAObject"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle=""
-      />
-      <typeMapping
-        xmlns:ns="http://data.core.roda.dgarq.gov.pt"
-        qname="ns:EventPreservationObject"
-        type="java:pt.gov.dgarq.roda.core.data.EventPreservationObject"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""
