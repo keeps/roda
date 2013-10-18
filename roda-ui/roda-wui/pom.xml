@@ -24,7 +24,7 @@
 						<artifactId>gwt-maven-plugin</artifactId>
 						<configuration>
 							<module>pt.gov.dgarq.roda.wui.main.Main</module>
-							<runTarget>Main.html</runTarget>
+							<runTarget>pt.gov.dgarq.roda.wui.main.Main/Main.html</runTarget>
 							<buildOutputDirectory>target/classes</buildOutputDirectory>
 						</configuration>
 						<executions>
