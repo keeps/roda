@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<name>roda-wui</name>
 	<artifactId>roda-wui</artifactId>
@@ -21,6 +22,11 @@
 					<plugin>
 						<groupId>org.codehaus.mojo</groupId>
 						<artifactId>gwt-maven-plugin</artifactId>
+						<configuration>
+							<module>pt.gov.dgarq.roda.wui.main.Main</module>
+							<runTarget>Main.html</runTarget>
+							<buildOutputDirectory>target/classes</buildOutputDirectory>
+						</configuration>
 						<executions>
 							<execution>
 								<id>compile-gwt</id>
@@ -39,10 +45,12 @@
 								<configuration>
 									<target>
 										<move todir="${project.build.directory}/${project.build.finalName}">
-											<fileset dir="${project.build.directory}/${project.build.finalName}/pt.gov.dgarq.roda.wui.main.Main/"/>
+											<fileset
+												dir="${project.build.directory}/${project.build.finalName}/pt.gov.dgarq.roda.wui.main.Main/" />
 										</move>
 										<move todir="${project.build.directory}/${project.build.finalName}">
-											<fileset dir="${project.build.directory}/${project.build.finalName}/pt.gov.dgarq.roda.disseminators.common.loading.Loading/"/>
+											<fileset
+												dir="${project.build.directory}/${project.build.finalName}/pt.gov.dgarq.roda.disseminators.common.loading.Loading/" />
 										</move>
 									</target>
 								</configuration>
@@ -84,10 +92,12 @@
 								<configuration>
 									<target>
 										<move todir="${project.build.directory}/${project.build.finalName}">
-											<fileset dir="${project.build.directory}/${project.build.finalName}/pt.gov.dgarq.roda.wui.main.Main/"/>
+											<fileset
+												dir="${project.build.directory}/${project.build.finalName}/pt.gov.dgarq.roda.wui.main.Main/" />
 										</move>
 										<move todir="${project.build.directory}/${project.build.finalName}">
-											<fileset dir="${project.build.directory}/${project.build.finalName}/pt.gov.dgarq.roda.disseminators.common.loading.Loading/"/>
+											<fileset
+												dir="${project.build.directory}/${project.build.finalName}/pt.gov.dgarq.roda.disseminators.common.loading.Loading/" />
 										</move>
 									</target>
 								</configuration>
@@ -132,57 +142,17 @@
 			<groupId>pt.gov.dgarq.roda</groupId>
 			<artifactId>roda-common-sip-utility</artifactId>
 		</dependency>
-		<!--
-		<dependency>
-			<groupId>pt.gov.dgarq.roda</groupId>
-			<artifactId>roda-common-servlet-security</artifactId>
-		</dependency>
-	
-		<dependency>
-			<groupId>pt.gov.dgarq.roda</groupId>
-			<artifactId>roda-common-utils</artifactId>
-		</dependency>
-		
-		<dependency>
-			<groupId>pt.gov.dgarq.roda</groupId>
-			<artifactId>roda-common-metadata</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>pt.gov.dgarq.roda</groupId>
-			<artifactId>ead-c.2008</artifactId>
-		</dependency>
-		
-		<dependency>
-			<groupId>pt.gov.dgarq.roda</groupId>
-			<artifactId>roda-common-format-utility</artifactId>
-		</dependency>
-		
-		<dependency>
-			<groupId>pt.gov.dgarq.roda</groupId>
-			<artifactId>roda-common-content-adapter</artifactId>
-		</dependency>
-		
-		<dependency>
-			<groupId>pt.gov.dgarq.roda</groupId>
-			<artifactId>roda-core-plugins</artifactId>
-		</dependency>
-		
-		<dependency>
-			<groupId>pt.gov.dgarq.roda</groupId>
-			<artifactId>roda-common-db</artifactId>
-		</dependency>
-		
-		<dependency>
-			<groupId>pt.gov.dgarq.roda</groupId>
-			<artifactId>roda-common-ingest</artifactId>
-		</dependency>
-		
-		<dependency>
-			<groupId>pt.gov.dgarq.roda</groupId>
-			<artifactId>fedora-client-utility</artifactId>
-		</dependency>
--->
+		<!-- <dependency> <groupId>pt.gov.dgarq.roda</groupId> <artifactId>roda-common-servlet-security</artifactId> 
+			</dependency> <dependency> <groupId>pt.gov.dgarq.roda</groupId> <artifactId>roda-common-utils</artifactId> 
+			</dependency> <dependency> <groupId>pt.gov.dgarq.roda</groupId> <artifactId>roda-common-metadata</artifactId> 
+			</dependency> <dependency> <groupId>pt.gov.dgarq.roda</groupId> <artifactId>ead-c.2008</artifactId> 
+			</dependency> <dependency> <groupId>pt.gov.dgarq.roda</groupId> <artifactId>roda-common-format-utility</artifactId> 
+			</dependency> <dependency> <groupId>pt.gov.dgarq.roda</groupId> <artifactId>roda-common-content-adapter</artifactId> 
+			</dependency> <dependency> <groupId>pt.gov.dgarq.roda</groupId> <artifactId>roda-core-plugins</artifactId> 
+			</dependency> <dependency> <groupId>pt.gov.dgarq.roda</groupId> <artifactId>roda-common-db</artifactId> 
+			</dependency> <dependency> <groupId>pt.gov.dgarq.roda</groupId> <artifactId>roda-common-ingest</artifactId> 
+			</dependency> <dependency> <groupId>pt.gov.dgarq.roda</groupId> <artifactId>fedora-client-utility</artifactId> 
+			</dependency> -->
 		<dependency>
 			<groupId>org.apache.xmlgraphics</groupId>
 			<artifactId>fop</artifactId>
