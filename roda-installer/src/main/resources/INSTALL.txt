@@ -50,27 +50,12 @@ The following software is needed:
 For Debian based systems, here is how to install all software other
 than RODA in a glimpse:
 
-   $> sudo -E wget --output-document=/etc/apt/sources.list.d/medibuntu.list \ 
-   http://www.medibuntu.org/sources.list.d/$(lsb_release -cs).list && \
-   sudo apt-get --quiet update && sudo apt-get --yes --quiet \
-   --allow-unauthenticated install medibuntu-keyring && sudo apt-get \
-   --quiet update
-
-	For 32bit machines:
    $> sudo apt-get install mysql-server slapd ldap-utils debconf-utils clamav \
    ant openjdk-6-jdk imagemagick ghostscript mencoder jodconverter \
    soundconverter ffmpeg gstreamer0.10-plugins-bad gstreamer0.10-plugins-ugly \
    gstreamer0.10-plugins-bad-multiverse gstreamer0.10-ffmpeg \
    fonts-ipafont-mincho fonts-ipafont-gothic ttf-arphic-ukai ttf-arphic-uming \
-   w32codecs munin munin-node postfix unzip
-
-	For 64bit machines:
-   $> sudo apt-get install mysql-server slapd ldap-utils debconf-utils clamav \
-   ant openjdk-6-jdk imagemagick ghostscript mencoder jodconverter \
-   soundconverter ffmpeg gstreamer0.10-plugins-bad gstreamer0.10-plugins-ugly \
-   gstreamer0.10-plugins-bad-multiverse gstreamer0.10-ffmpeg \
-   fonts-ipafont-mincho fonts-ipafont-gothic ttf-arphic-ukai ttf-arphic-uming \
-   w64codecs munin munin-node postfix unzip
+   munin munin-node postfix unzip
 
    For demo environments, make the following configurations when
    promped (as it will make the installation process quicker):

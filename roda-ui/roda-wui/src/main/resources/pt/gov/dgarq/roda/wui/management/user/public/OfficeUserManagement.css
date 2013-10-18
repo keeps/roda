@@ -266,7 +266,7 @@
 
 .permissions .permission .permission-description-on {
 	width: 100%;
-	vertical-align: center;
+	vertical-align: middle;
 	cursor: pointer;
 	cursor: hand;
 	margin-left: 3px;
@@ -275,7 +275,7 @@
 
 .permissions .permission .permission-description-off {
 	width: 100%;
-	vertical-align: center;
+	vertical-align: middle;
 	cursor: default;
 	margin-left: 3px;
 	color: #999;
@@ -730,7 +730,7 @@
 .wui-resetPassword .resetPassword-box {
 	width: 250px;
 }
-}
+
 .wui-resetPassword .resetPassword-submit {
 }
 
