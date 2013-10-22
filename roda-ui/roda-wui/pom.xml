@@ -23,7 +23,6 @@
 						<groupId>org.codehaus.mojo</groupId>
 						<artifactId>gwt-maven-plugin</artifactId>
 						<configuration>
-							<module>pt.gov.dgarq.roda.wui.main.Main</module>
 							<runTarget>pt.gov.dgarq.roda.wui.main.Main/Main.html</runTarget>
 							<buildOutputDirectory>target/classes</buildOutputDirectory>
 						</configuration>

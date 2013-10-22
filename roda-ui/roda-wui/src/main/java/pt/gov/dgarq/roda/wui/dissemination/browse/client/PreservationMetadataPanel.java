@@ -9,11 +9,13 @@ import java.util.List;
 import pt.gov.dgarq.roda.core.data.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.widgets.LoadingPopup;
+import pt.gov.dgarq.roda.wui.common.client.widgets.MessagePopup;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.TimelineInfo.HotZone;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.TimelineInfo.Phase;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.Composite;
@@ -113,22 +115,21 @@ public class PreservationMetadataPanel extends Composite {
 			timeUnit.addItem(constants.timeUnitDay(), TIME_UNIT_DAY);
 			timeUnit.addItem(constants.timeUnitMonth(), TIME_UNIT_MONTH);
 			timeUnit.addItem(constants.timeUnitYear(), TIME_UNIT_YEAR);
-			timeUnit.setSelectedIndex(timeUnit.getItemCount()-1);
+			timeUnit.setSelectedIndex(timeUnit.getItemCount() - 1);
 
 			timeUnit.addChangeListener(new ChangeListener() {
 
 				public void onChange(Widget sender) {
-					String unit = timeUnit
-							.getValue(timeUnit.getSelectedIndex());
+					String unit = timeUnit.getValue(timeUnit.getSelectedIndex());
 					if (unit.equals(TIME_UNIT_DAY)) {
-						timelineRender.setTimeUnit(DateTime.DAY(), DateTime
-								.MONTH());
+						timelineRender.setTimeUnit(DateTime.DAY(),
+								DateTime.MONTH());
 					} else if (unit.equals(TIME_UNIT_MONTH)) {
-						timelineRender.setTimeUnit(DateTime.MONTH(), DateTime
-								.YEAR());
+						timelineRender.setTimeUnit(DateTime.MONTH(),
+								DateTime.YEAR());
 					} else /* unit == TIME_UNIT_YEAR */{
-						timelineRender.setTimeUnit(DateTime.YEAR(), DateTime
-								.DECADE());
+						timelineRender.setTimeUnit(DateTime.YEAR(),
+								DateTime.DECADE());
 					}
 					update();
 				}
@@ -175,10 +176,9 @@ public class PreservationMetadataPanel extends Composite {
 								}
 
 								repLabel.setTitle(messages
-										.preservationRepTooltip(info
-												.getNumberOfFiles(), info
-												.getSizeOfFiles()));
-								
+										.preservationRepTooltip(
+												info.getNumberOfFiles(),
+												info.getSizeOfFiles()));
 
 								repLayout.add(repIcon);
 								repLayout.add(repLabel);
@@ -236,10 +236,19 @@ public class PreservationMetadataPanel extends Composite {
 
 					public void onSuccess(TimelineInfo timelineInfo) {
 						PreservationMetadataPanel.this.timelineInfo = timelineInfo;
-						timelineRender = new PreservationTimeLineRender(
-								timelineInfo, DateTime.YEAR(), DateTime.YEAR());
-						update();
-						loading.hide();
+						try {
+							timelineRender = new PreservationTimeLineRender(
+									timelineInfo, DateTime.YEAR(), DateTime
+											.YEAR());
+							update();
+						} catch (Throwable e) {
+							MessagePopup.showError(e.getClass().getName()
+									+ ": " + e.getMessage());
+							logger.error("Error getting preservation timeline",
+									e);
+						} finally {
+							loading.hide();
+						}
 					}
 
 				});
