@@ -2,8 +2,6 @@ package pt.gov.dgarq.roda.wui.dissemination.browse.server;
 
 import java.rmi.NoSuchObjectException;
 import java.rmi.RemoteException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -51,7 +49,6 @@ import pt.gov.dgarq.roda.wui.dissemination.browse.client.TimelineInfo.Phase;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import config.i18n.server.BrowserServiceMessages;
-import java.util.logging.Level;
 
 /**
  * Browser Service Implementation
@@ -476,10 +473,6 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements
 
         return ret;
     }
-    // private static final DateFormat dateFormat = new SimpleDateFormat(
-    // "yyyy-MM-dd hh:ss");
-    private static final DateFormat timelineDateFormat = new SimpleDateFormat(
-            "MMM dd yyyy HH:mm:ss 'GMT'");
 
     public TimelineInfo getPreservationTimeline(List<String> rpoPIDs,
             List<String> icons, List<String> colors, String localeString)
@@ -520,7 +513,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements
         eventXML += "</data>";
 
         timelineInfo.setEventsXML(eventXML);
-        timelineInfo.setDate(timelineDateFormat.format(new Date()));
+        timelineInfo.setDate(DateParser.getIsoDate(new Date()));
 
         logger.debug("Timeline events XML: " + eventXML);
         logger.debug("Timeline date: " + timelineInfo.getDate());

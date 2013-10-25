@@ -126,7 +126,7 @@ public class LogEntry implements Serializable {
 			"RODAWUI.pageHit", "RODAWUI.error", "RODAWUI.login" };
 
 	public static final String[] DISSEMINATOR_ACTIONS = new String[] {
-			"disseminator.hit.AIPDownload", "disseminator.miss.AIPDownload",
+			"disseminator.hit.RepresentationDownload", "disseminator.miss.RepresentationDownload",
 			"disseminator.hit.SimpleViewer", "disseminator.miss.SimpleViewer",
 			"disseminator.hit.FlashPageFlip",
 			"disseminator.miss.FlashPageFlip", "disseminator.hit.PhpMyAdmin",

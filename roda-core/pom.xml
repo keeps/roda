@@ -4,11 +4,11 @@
 	<name>roda-core</name>
 	<artifactId>roda-core</artifactId>
 	<packaging>pom</packaging>
-	<version>1.1.0</version>
+	<version>1.2.0</version>
 	<parent>
 		<groupId>pt.gov.dgarq.roda</groupId>
 		<artifactId>roda</artifactId>
-		<version>1.1.0</version>
+		<version>1.2.0</version>
 		<relativePath>..</relativePath>
 	</parent>
 	<modules>

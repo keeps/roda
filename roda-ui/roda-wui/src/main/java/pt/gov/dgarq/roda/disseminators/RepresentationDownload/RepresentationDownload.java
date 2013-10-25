@@ -1,4 +1,4 @@
-package pt.gov.dgarq.roda.disseminators.AIPDownload;
+package pt.gov.dgarq.roda.disseminators.RepresentationDownload;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,15 +32,15 @@ import pt.gov.dgarq.roda.disseminators.common.tools.ZipTools;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.DisseminationInfo;
 
 /**
- * Servlet implementation class for Servlet: AIPDownload
+ * Servlet implementation class for Servlet: RepresentationDownload
  * 
- * @web.servlet name="AIPDownload" display-name="AIPDownload"
- *              description="Download the AIP"
+ * @web.servlet name="RepresentationDownload" display-name="RepresentationDownload"
+ *              description="Download the Representation"
  * 
- * @web.servlet-mapping url-pattern="/AIPDownload"
+ * @web.servlet-mapping url-pattern="/RepresentationDownload"
  * 
  */
-public class AIPDownload extends javax.servlet.http.HttpServlet implements
+public class RepresentationDownload extends javax.servlet.http.HttpServlet implements
 		javax.servlet.Servlet {
 
 	/**
@@ -50,15 +50,15 @@ public class AIPDownload extends javax.servlet.http.HttpServlet implements
 
 	private static final Set<String> ALWAYS_ZIP = new HashSet<String>(Arrays
 			.asList(RodaClientFactory.getRodaProperties().getProperty(
-					"roda.disseminators.aipdownload.alwayszip").split(" ")));
+					"roda.disseminators.representationdownload.alwayszip").split(" ")));
 
-	private Logger logger = Logger.getLogger(AIPDownload.class);
+	private Logger logger = Logger.getLogger(RepresentationDownload.class);
 	private RepresentationHelper representationHelper = null;
 
 	/**
-	 * Create a new AIP download servlet
+	 * Create a new Representation download servlet
 	 */
-	public AIPDownload() {
+	public RepresentationDownload() {
 		logger.debug("Always zip: " + ALWAYS_ZIP);
 	}
 
@@ -145,8 +145,8 @@ public class AIPDownload extends javax.servlet.http.HttpServlet implements
 
 	private void sendIcon(HttpSession session, RepresentationObject rep,
 			HttpServletResponse response) throws IOException {
-		String basePath = "/pt/gov/dgarq/roda/disseminators/AIPDownload/icons/";
-		InputStream defaultIcon = AIPDownload.class.getClassLoader()
+		String basePath = "/pt/gov/dgarq/roda/disseminators/RepresentationDownload/icons/";
+		InputStream defaultIcon = RepresentationDownload.class.getClassLoader()
 				.getResourceAsStream(basePath + "default.png");
 
 		// Set headers
@@ -163,13 +163,13 @@ public class AIPDownload extends javax.servlet.http.HttpServlet implements
 			FileHelper.copy(defaultIcon, response.getOutputStream());
 		} else if (rep.getPartFiles().length > 0
 				|| ALWAYS_ZIP.contains(rep.getType())) {
-			InputStream zipIcon = AIPDownload.class.getClassLoader()
+			InputStream zipIcon = RepresentationDownload.class.getClassLoader()
 					.getResourceAsStream(basePath + "application_zip.png");
 			FileHelper.copy(zipIcon, response.getOutputStream());
 		} else {
 			String mimetype = rep.getRootFile().getMimetype();
 			mimetype = mimetype.replace('/', '_');
-			InputStream icon = AIPDownload.class.getClassLoader()
+			InputStream icon = RepresentationDownload.class.getClassLoader()
 					.getResourceAsStream(basePath + mimetype + ".png");
 			if (icon == null) {
 				logger.debug("No icon found for mimetype " + mimetype);

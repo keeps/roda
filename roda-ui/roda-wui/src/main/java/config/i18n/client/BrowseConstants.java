@@ -139,7 +139,7 @@ public interface BrowseConstants extends Constants, ConstantsWithLookup {
 
     // * Disseminations
     @DefaultStringValue("Download representation")
-    public String dissemination_AIPDownload();
+    public String dissemination_RepresentationDownload();
 
     @DefaultStringValue("Download signed representation")
     public String dissemination_Signature();

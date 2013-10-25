@@ -16,7 +16,7 @@
 
 	<path id="roda-migrator-win.classpath">
 		<pathelement location="${roda-migrator-win.location}/target/classes" />
-		<fileset dir="${roda-migrator-win.location}/target/roda-migrator-win-1.1.0/WEB-INF/lib">
+		<fileset dir="${roda-migrator-win.location}/target/roda-migrator-win-1.2.0/WEB-INF/lib">
 			<include name="**/*.jar" />
 		</fileset>
 	</path>

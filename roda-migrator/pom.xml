@@ -3,12 +3,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<name>roda-migrator</name>
 	<artifactId>roda-migrator</artifactId>
-	<version>1.1.0</version>
+	<version>1.2.0</version>
 	<packaging>pom</packaging>
 	<parent>
 		<groupId>pt.gov.dgarq.roda</groupId>
 		<artifactId>roda</artifactId>
-		<version>1.1.0</version>
+		<version>1.2.0</version>
 		<relativePath>..</relativePath>
 	</parent>
 	<modules>

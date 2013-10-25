@@ -11,8 +11,10 @@ import java.io.Serializable;
  */
 public class DisseminationInfo implements Serializable {
 
+	private static final long serialVersionUID = -6014468773068700324L;
+
 	// TODO set this in properties
-	public final static String DOWNLOAD_DISSEMINATOR_ID = "AIPDownload";
+	public final static String DOWNLOAD_DISSEMINATOR_ID = "RepresentationDownload";
 
 	private String id;
 

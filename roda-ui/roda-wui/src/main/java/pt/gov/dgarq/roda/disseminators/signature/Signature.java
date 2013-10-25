@@ -37,7 +37,7 @@ import pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException;
 import pt.gov.dgarq.roda.core.common.RODAClientException;
 import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.data.RepresentationObject;
-import pt.gov.dgarq.roda.disseminators.AIPDownload.AIPDownload;
+import pt.gov.dgarq.roda.disseminators.RepresentationDownload.RepresentationDownload;
 import pt.gov.dgarq.roda.disseminators.common.RepresentationHelper;
 import pt.gov.dgarq.roda.disseminators.common.tools.ZipEntryInfo;
 import pt.gov.dgarq.roda.disseminators.common.tools.ZipTools;
@@ -48,7 +48,7 @@ import pt.gov.dgarq.roda.disseminators.common.tools.ZipTools;
 public class Signature extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	private Logger logger = Logger.getLogger(AIPDownload.class);
+	private Logger logger = Logger.getLogger(RepresentationDownload.class);
 	private SignatureUtility signatureUtility = null;
 	private RepresentationHelper representationHelper = null;
 

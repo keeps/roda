@@ -3,18 +3,19 @@
  */
 package config.i18n.client.flags;
 
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
-import com.google.gwt.user.client.ui.ImageBundle;
+import com.google.gwt.resources.client.ClientBundle;
+import com.google.gwt.resources.client.ImageResource;
 
 /**
  * @author Luis Faria
  * @author Vladislav Korecký <vladislav_korecky@gordic.cz> 
  */
-public interface FlagsBundle extends ImageBundle {
+public interface FlagsBundle extends ClientBundle {
 
-	public AbstractImagePrototype pt_PT();
+	public ImageResource pt_PT();
 
-	public AbstractImagePrototype en();
-        
-        public AbstractImagePrototype cs_CZ();
+	public ImageResource en();
+	
+	public ImageResource cs_CZ();
+
 }

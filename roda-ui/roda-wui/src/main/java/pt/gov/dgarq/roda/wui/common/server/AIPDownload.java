@@ -36,11 +36,11 @@ import pt.gov.dgarq.roda.util.TempDir;
 import pt.gov.dgarq.roda.util.ZipUtility;
 
 /**
- * Servlet implementation class AIPDownloadDEMO
+ * Servlet implementation class AIPDownload
  *
  * @author Vladislav Korecký <vladislav_korecky@gordic.cz>
  */
-public class AIPDownloadDEMO extends HttpServlet {
+public class AIPDownload extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
     /**
@@ -55,12 +55,12 @@ public class AIPDownloadDEMO extends HttpServlet {
      * Servlet EAD type parameter value
      */
     public static String TYPE_EAD = "EAD";
-    private static final Logger logger = Logger.getLogger(AIPDownloadDEMO.class);
+    private static final Logger logger = Logger.getLogger(AIPDownload.class);
 
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public AIPDownloadDEMO() {
+    public AIPDownload() {
         super();
     }
 
@@ -75,13 +75,13 @@ public class AIPDownloadDEMO extends HttpServlet {
         try {
             RODAClient rodaClient = RodaClientFactory.getRodaClient(request.getSession());
             getPremisAndRepresentations(pid, rodaClient, tempDir);
+            response.setContentType("application/zip");            
+            response.setHeader("Content-disposition", "attachment; filename=" + pid.replace(':', '_') + ".aip.zip");
             // Create ZIP output stream            
             ZipOutputStream zip = new ZipOutputStream(response.getOutputStream());
             // Add all files to zip recursivelly
             ZipUtility.addDirToArchive(zip, tempDir);
             // Send zip stream to client
-            response.setContentType("application/zip");            
-            response.setHeader("Content-disposition", "attachment; filename=" + pid.replace(':', '_') + ".aip.zip");            
             response.flushBuffer();
         } catch (LoginException e) {
             logger.error("Error getting RODA Client", e);

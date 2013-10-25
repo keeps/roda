@@ -1,10 +1,30 @@
-roda (1.1.0) stable; urgency=low
+1.2.0 (2013-10-25)
+New features:
+  * Using Droid for file format identification
+  * Added support for presentations: Microsoft Powerpoint (ppt, pptx), OpenOffice Presentation / LibreOffice Impress (odp)
+  * Added suport for spreadsheets: Microsoft Excel (xls, xlsx), OpenOffice Spreadsheet / LibreOffice Calc (ods)
+  * Added support for email (.eml) but conversion is not yet supported
+  * Added web service to download AIP
+  * Added web service to download DIP
 
+Bug fixes:
+  * Validation of SIP XML was not being properly done
+  * Fixed visualization of preservation metadata in roda-wui when system locale was not in English
+  * Fixed roda-in representation type selector in some Java versions
+
+
+1.1.0 (2013-05-31)
+New features:
   * RODA was released to GitHub
     (https://github.com/keeps/roda/issues/2)
   * RODA was completly mavenized (installer creation included,
     using the maven profile "create-installer")
     (https://github.com/keeps/roda/issues/1)
+  * RODA now running on Apache Tomcat
+  * Added new instalation process
+  * Added support for Ubuntu Linux 12.04 LTS (supported until April 2017)
+
+Bug fixes
   * Scheduler was storing dates incorrectly
     (https://github.com/keeps/roda/issues/3)
   * String formater was used in some parts of the code to build
@@ -14,5 +34,6 @@ roda (1.1.0) stable; urgency=low
     (https://github.com/keeps/roda/issues/4)
   * Revised footer logos (roda-wui)
 
- -- KEEP SOLUTIONS <hsilva@keep.pt>  Fri, 31 May 2013 16:30:00 +1000
 
+1.0.1 (2009-05-18)
+  * First release of RODA
