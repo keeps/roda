@@ -27,7 +27,7 @@
 							<goal>single</goal>
 						</goals>
 						<configuration>
-							<finalName>${installer.dirname}</finalName>
+							<finalName>${installer.dirname}_v${project.version}</finalName>
 							<appendAssemblyId>false</appendAssemblyId>
 							<outputDirectory>${project.basedir}</outputDirectory>
 							<descriptors>
