@@ -23,6 +23,7 @@ New features:
   * RODA now running on Apache Tomcat
   * Added new instalation process
   * Added support for Ubuntu Linux 12.04 LTS (supported until April 2017)
+  * Updated Google Web Toolkit to v2.4.0, adding support for Internet Explorer 8, 9 and 10.
 
 Bug fixes
   * Scheduler was storing dates incorrectly
