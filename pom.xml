@@ -41,11 +41,6 @@
 			<url>https://m2.duraspace.org/content/repositories/releases</url>
 		</repository>
 		<repository>
-			<id>jhove</id>
-			<name>jhove</name>
-			<url>http://repository.bibforge.org/archiva/repository/snapshots</url>
-		</repository>
-		<repository>
 			<id>com.springsource.repository.bundles.external</id>
 			<name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
 			<url>http://repository.springsource.com/maven/bundles/external</url>
