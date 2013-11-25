@@ -90,7 +90,8 @@ public class DIPDownload extends HttpServlet {
 			// Add all files to zip recursivelly
 			ZipUtility.addDirToArchive(zip, tempDir);
 			// Send zip stream to client
-			response.flushBuffer();
+			zip.close();
+			//response.flushBuffer();
 		} catch (LoginException e) {
 			logger.error("Error getting RODA Client", e);
 			response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
