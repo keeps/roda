@@ -1,5 +1,6 @@
 package pt.gov.dgarq.roda.sipcreator;
 
+import java.lang.UnsatisfiedLinkError;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -40,13 +41,18 @@ public class SIPCreator {
 	public void init() {
 		if (!initialized) {
 			initialized = true;
+			/* MacOS X is having a problem with the UI
 			try {
 				UIManager
 						.setLookAndFeel(new com.nilo.plaf.nimrod.NimRODLookAndFeel());
 			} catch (UnsupportedLookAndFeelException e) {
 				logger.warn("Could not enable NimROD Look & Feel - " //$NON-NLS-1$
 						+ e.getMessage(), e);
+			} catch (UnsatisfiedLinkError e) {
+				logger.warn("Could not enable NimROD Look & Feel - " //$NON-NLS-1$
+						+ e.getMessage(), e);
 			}
+			*/
 			getMainFrame().setVisible(true);
 		}
 	}
