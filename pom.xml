@@ -28,7 +28,7 @@
 		<repository>
 			<id>duraspace-third-party</id>
 			<name>DuraSpace Repository (third party)</name>
-			<url>https://m2.duraspace.org/content/repositories/thirdparty</url>
+			<url>http://m2.duraspace.org/content/repositories/thirdparty</url>
 		</repository>
 		<repository>
 			<id>duraspace-central</id>
@@ -38,7 +38,7 @@
 		<repository>
 			<id>duraspace-releases</id>
 			<name>DuraSpace Repository (releases)</name>
-			<url>https://m2.duraspace.org/content/repositories/releases</url>
+			<url>http://m2.duraspace.org/content/repositories/releases</url>
 		</repository>
 		<repository>
 			<id>com.springsource.repository.bundles.external</id>
