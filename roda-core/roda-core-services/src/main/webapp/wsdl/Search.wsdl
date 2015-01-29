@@ -31,6 +31,26 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
      <element maxOccurs="unbounded" minOccurs="0" name="item" type="xsd:string"/>
     </sequence>
    </complexType>
+   <complexType name="ArrayOf_tns2_Unitid">
+    <sequence>
+     <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns2:Unitid"/>
+    </sequence>
+   </complexType>
+   <complexType name="ArrayOf_tns2_Archref">
+    <sequence>
+     <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns2:Archref"/>
+    </sequence>
+   </complexType>
+   <complexType name="ArrayOf_tns2_Note">
+    <sequence>
+     <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns2:Note"/>
+    </sequence>
+   </complexType>
+   <complexType name="ArrayOf_tns2_Acqinfo">
+    <sequence>
+     <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns2:Acqinfo"/>
+    </sequence>
+   </complexType>
    <complexType name="ArrayOf_tns2_ArrangementTableRow">
     <sequence>
      <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns2:ArrangementTableRow"/>
@@ -44,6 +64,31 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
    <complexType name="ArrayOf_tns2_BioghistChronitem">
     <sequence>
      <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns2:BioghistChronitem"/>
+    </sequence>
+   </complexType>
+   <complexType name="ArrayOf_tns2_ControlAccess">
+    <sequence>
+     <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns2:ControlAccess"/>
+    </sequence>
+   </complexType>
+   <complexType name="ArrayOf_tns2_Indexentry">
+    <sequence>
+     <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns2:Indexentry"/>
+    </sequence>
+   </complexType>
+   <complexType name="ArrayOf_tns2_Materialspec">
+    <sequence>
+     <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns2:Materialspec"/>
+    </sequence>
+   </complexType>
+   <complexType name="ArrayOf_tns2_P">
+    <sequence>
+     <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns2:P"/>
+    </sequence>
+   </complexType>
+   <complexType name="ArrayOf_tns2_Relatedmaterial">
+    <sequence>
+     <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns2:Relatedmaterial"/>
     </sequence>
    </complexType>
    <complexType name="ArrayOf_tns1_SearchResultObject">
@@ -108,11 +153,13 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
     <complexContent>
      <extension base="tns1:SimpleDescriptionObject">
       <sequence>
+       <element name="abstract" nillable="true" type="xsd:string"/>
        <element name="accessrestrict" nillable="true" type="xsd:string"/>
        <element name="accruals" nillable="true" type="xsd:string"/>
        <element name="acqinfo" nillable="true" type="xsd:string"/>
        <element name="acqinfoDate" nillable="true" type="xsd:string"/>
        <element name="acqinfoNum" nillable="true" type="xsd:string"/>
+       <element name="acqinfos" nillable="true" type="tns2:Acqinfos"/>
        <element name="appraisal" nillable="true" type="xsd:string"/>
        <element name="arrangement" nillable="true" type="xsd:string"/>
        <element name="arrangementTable" nillable="true" type="tns2:ArrangementTable"/>
@@ -120,11 +167,17 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
        <element name="bioghist" nillable="true" type="xsd:string"/>
        <element name="bioghistChronlist" nillable="true" type="tns2:BioghistChronlist"/>
        <element name="completeReference" nillable="true" type="xsd:string"/>
+       <element name="controlaccesses" nillable="true" type="tns2:ControlAccesses"/>
        <element name="custodhist" nillable="true" type="xsd:string"/>
        <element name="handleURL" nillable="true" type="xsd:string"/>
+       <element name="index" nillable="true" type="tns2:Index"/>
        <element name="langmaterialLanguages" nillable="true" type="tns2:LangmaterialLanguages"/>
        <element name="materialspec" nillable="true" type="xsd:string"/>
+       <element name="materialspecs" nillable="true" type="tns2:Materialspecs"/>
+       <element name="metsID" nillable="true" type="xsd:string"/>
        <element name="note" nillable="true" type="xsd:string"/>
+       <element name="notes" nillable="true" type="tns2:Notes"/>
+       <element name="odd" nillable="true" type="xsd:string"/>
        <element name="origination" nillable="true" type="xsd:string"/>
        <element name="otherfindaid" nillable="true" type="xsd:string"/>
        <element name="physdesc" nillable="true" type="xsd:string"/>
@@ -132,10 +185,13 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
        <element name="physdescDateInitial" nillable="true" type="xsd:string"/>
        <element name="physdescDimensions" nillable="true" type="tns2:PhysdescElement"/>
        <element name="physdescExtent" nillable="true" type="tns2:PhysdescElement"/>
+       <element name="physdescGenreform" nillable="true" type="tns2:PhysdescGenreform"/>
        <element name="physdescPhysfacet" nillable="true" type="tns2:PhysdescElement"/>
        <element name="phystech" nillable="true" type="xsd:string"/>
        <element name="prefercite" nillable="true" type="xsd:string"/>
+       <element name="processinfo" nillable="true" type="tns2:ProcessInfo"/>
        <element name="relatedmaterial" nillable="true" type="xsd:string"/>
+       <element name="relatedmaterials" nillable="true" type="tns2:Relatedmaterials"/>
        <element name="scopecontent" nillable="true" type="xsd:string"/>
        <element name="userestrict" nillable="true" type="xsd:string"/>
       </sequence>
@@ -175,6 +231,66 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
    <complexType name="DescriptionLevel">
     <sequence>
      <element name="level" nillable="true" type="xsd:string"/>
+     <element name="levelSanitized" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="ItemList">
+    <sequence>
+     <element name="items" nillable="true" type="impl:ArrayOf_xsd_string"/>
+    </sequence>
+   </complexType>
+   <complexType name="Note">
+    <sequence>
+     <element name="attributeAltrender" nillable="true" type="xsd:string"/>
+     <element name="attributeLabel" nillable="true" type="xsd:string"/>
+     <element name="list" nillable="true" type="tns2:ItemList"/>
+     <element name="p" nillable="true" type="tns2:P"/>
+    </sequence>
+   </complexType>
+   <complexType name="Unitid">
+    <sequence>
+     <element name="attributeAltrender" nillable="true" type="xsd:string"/>
+     <element name="attributeRepositorycode" nillable="true" type="xsd:string"/>
+     <element name="text" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="Archref">
+    <sequence>
+     <element name="note" nillable="true" type="tns2:Note"/>
+     <element name="unitids" nillable="true" type="impl:ArrayOf_tns2_Unitid"/>
+     <element name="unittitle" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="Archrefs">
+    <sequence>
+     <element name="archrefs" nillable="true" type="impl:ArrayOf_tns2_Archref"/>
+    </sequence>
+   </complexType>
+   <complexType name="Notes">
+    <sequence>
+     <element name="notes" nillable="true" type="impl:ArrayOf_tns2_Note"/>
+    </sequence>
+   </complexType>
+   <complexType name="P">
+    <sequence>
+     <element name="archrefs" nillable="true" type="tns2:Archrefs"/>
+     <element name="attributeAltrender" nillable="true" type="xsd:string"/>
+     <element name="corpname" nillable="true" type="xsd:string"/>
+     <element name="date" nillable="true" type="xsd:string"/>
+     <element name="notes" nillable="true" type="tns2:Notes"/>
+     <element name="num" nillable="true" type="xsd:string"/>
+     <element name="text" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="Acqinfo">
+    <sequence>
+     <element name="attributeAltrender" nillable="true" type="xsd:string"/>
+     <element name="p" nillable="true" type="tns2:P"/>
+    </sequence>
+   </complexType>
+   <complexType name="Acqinfos">
+    <sequence>
+     <element name="acqinfos" nillable="true" type="impl:ArrayOf_tns2_Acqinfo"/>
     </sequence>
    </complexType>
    <complexType name="ArrangementTableRow">
@@ -219,15 +335,77 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
      <element name="bioghistChronitems" nillable="true" type="impl:ArrayOf_tns2_BioghistChronitem"/>
     </sequence>
    </complexType>
+   <complexType name="ControlAccess">
+    <sequence>
+     <element name="attributeEncodinganalog" nillable="true" type="xsd:string"/>
+     <element name="attributeSource" nillable="true" type="xsd:string"/>
+     <element name="function" nillable="true" type="xsd:string"/>
+     <element name="head" nillable="true" type="xsd:string"/>
+     <element name="p" nillable="true" type="xsd:string"/>
+     <element name="subject" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="ControlAccesses">
+    <sequence>
+     <element name="controlaccesses" nillable="true" type="impl:ArrayOf_tns2_ControlAccess"/>
+    </sequence>
+   </complexType>
+   <complexType name="Indexentry">
+    <sequence>
+     <element name="subject" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="Index">
+    <sequence>
+     <element name="indexes" nillable="true" type="impl:ArrayOf_tns2_Indexentry"/>
+    </sequence>
+   </complexType>
    <complexType name="LangmaterialLanguages">
     <sequence>
      <element name="langmaterialLanguages" nillable="true" type="impl:ArrayOf_xsd_string"/>
+    </sequence>
+   </complexType>
+   <complexType name="Materialspec">
+    <sequence>
+     <element name="attributeLabel" nillable="true" type="xsd:string"/>
+     <element name="text" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="Materialspecs">
+    <sequence>
+     <element name="materialspecs" nillable="true" type="impl:ArrayOf_tns2_Materialspec"/>
     </sequence>
    </complexType>
    <complexType name="PhysdescElement">
     <sequence>
      <element name="unit" nillable="true" type="xsd:string"/>
      <element name="value" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="PhysdescGenreform">
+    <sequence>
+     <element name="attributeAuthfilenumber" nillable="true" type="xsd:string"/>
+     <element name="attributeNormal" nillable="true" type="xsd:string"/>
+     <element name="attributeSource" nillable="true" type="xsd:string"/>
+     <element name="text" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="ProcessInfo">
+    <sequence>
+     <element name="attributeAltrender" nillable="true" type="xsd:string"/>
+     <element name="note" nillable="true" type="tns2:Note"/>
+     <element name="pList" nillable="true" type="impl:ArrayOf_tns2_P"/>
+    </sequence>
+   </complexType>
+   <complexType name="Relatedmaterial">
+    <sequence>
+     <element name="archref" nillable="true" type="tns2:Archref"/>
+     <element name="p" nillable="true" type="tns2:P"/>
+    </sequence>
+   </complexType>
+   <complexType name="Relatedmaterials">
+    <sequence>
+     <element name="relatedmaterials" nillable="true" type="impl:ArrayOf_tns2_Relatedmaterial"/>
     </sequence>
    </complexType>
   </schema>
@@ -318,6 +496,16 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
      <extension base="tns4:FilterParameter">
       <sequence>
        <element name="expression" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="ClassificationSchemeFilterParameter">
+    <complexContent>
+     <extension base="tns4:FilterParameter">
+      <sequence>
+       <element name="classificationSchemeId" nillable="true" type="xsd:string"/>
+       <element name="possibleClassesPids" nillable="true" type="impl:ArrayOf_xsd_string"/>
       </sequence>
      </extension>
     </complexContent>

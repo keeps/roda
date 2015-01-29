@@ -31,7 +31,8 @@ public class SimpleRepresentationObject extends RODAObject {
     public static final String PRESENTATION = "presentation";
     public static final String SPREADSHEET = "spreadsheet";
     public static final String VECTOR_GRAPHIC = "vector_graphic";
-    public static final String[] TYPES = new String[]{EMAIL, STRUCTURED_TEXT, PRESENTATION, SPREADSHEET, VECTOR_GRAPHIC, DIGITALIZED_WORK, AUDIO, VIDEO, RELATIONAL_DATABASE, UNKNOWN};
+    public static final String APPLICATION_DATA = "application_data";
+    public static final String[] TYPES = new String[]{EMAIL, STRUCTURED_TEXT, PRESENTATION, SPREADSHEET, VECTOR_GRAPHIC, DIGITALIZED_WORK, AUDIO, VIDEO, RELATIONAL_DATABASE, APPLICATION_DATA, UNKNOWN};
 
     /*
      * Status

@@ -1,15 +1,64 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<wsdl:definitions targetNamespace="http://services.core.roda.dgarq.gov.pt" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="http://services.core.roda.dgarq.gov.pt" xmlns:intf="http://services.core.roda.dgarq.gov.pt" xmlns:tns1="http://data.core.roda.dgarq.gov.pt" xmlns:tns2="http://common.core.roda.dgarq.gov.pt" xmlns:tns3="http://filter.adapter.data.core.roda.dgarq.gov.pt" xmlns:tns4="http://adapter.data.core.roda.dgarq.gov.pt" xmlns:tns5="http://sort.adapter.data.core.roda.dgarq.gov.pt" xmlns:tns6="http://sublist.adapter.data.core.roda.dgarq.gov.pt" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<wsdl:definitions targetNamespace="http://services.core.roda.dgarq.gov.pt" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="http://services.core.roda.dgarq.gov.pt" xmlns:intf="http://services.core.roda.dgarq.gov.pt" xmlns:tns1="http://filter.adapter.data.core.roda.dgarq.gov.pt" xmlns:tns2="http://common.core.roda.dgarq.gov.pt" xmlns:tns3="http://adapter.data.core.roda.dgarq.gov.pt" xmlns:tns4="http://sort.adapter.data.core.roda.dgarq.gov.pt" xmlns:tns5="http://sublist.adapter.data.core.roda.dgarq.gov.pt" xmlns:tns6="http://data.core.roda.dgarq.gov.pt" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 <!--WSDL created by Apache Axis version: 1.4
 Built on Apr 22, 2006 (06:55:48 PDT)-->
  <wsdl:types>
   <schema elementFormDefault="qualified" targetNamespace="http://services.core.roda.dgarq.gov.pt" xmlns="http://www.w3.org/2001/XMLSchema">
    <import namespace="http://data.core.roda.dgarq.gov.pt"/>
-   <import namespace="http://common.core.roda.dgarq.gov.pt"/>
    <import namespace="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://common.core.roda.dgarq.gov.pt"/>
    <import namespace="http://adapter.data.core.roda.dgarq.gov.pt"/>
    <import namespace="http://sort.adapter.data.core.roda.dgarq.gov.pt"/>
    <import namespace="http://sublist.adapter.data.core.roda.dgarq.gov.pt"/>
+   <element name="getReportsCount">
+    <complexType>
+     <sequence>
+      <element name="filter" type="tns1:Filter"/>
+     </sequence>
+    </complexType>
+   </element>
+   <complexType name="ArrayOf_tns1_FilterParameter">
+    <sequence>
+     <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns1:FilterParameter"/>
+    </sequence>
+   </complexType>
+   <element name="getReportsCountResponse">
+    <complexType>
+     <sequence>
+      <element name="getReportsCountReturn" type="xsd:int"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="fault" type="tns2:ReportException"/>
+   <element name="getReports">
+    <complexType>
+     <sequence>
+      <element name="contentAdapter" type="tns3:ContentAdapter"/>
+     </sequence>
+    </complexType>
+   </element>
+   <complexType name="ArrayOf_tns4_SortParameter">
+    <sequence>
+     <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns4:SortParameter"/>
+    </sequence>
+   </complexType>
+   <element name="getReportsResponse">
+    <complexType>
+     <sequence>
+      <element maxOccurs="unbounded" name="getReportsReturn" type="tns6:Report"/>
+     </sequence>
+    </complexType>
+   </element>
+   <complexType name="ArrayOf_tns6_Attribute">
+    <sequence>
+     <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns6:Attribute"/>
+    </sequence>
+   </complexType>
+   <complexType name="ArrayOf_tns6_ReportItem">
+    <sequence>
+     <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns6:ReportItem"/>
+    </sequence>
+   </complexType>
    <element name="getReport">
     <complexType>
      <sequence>
@@ -20,127 +69,15 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
    <element name="getReportResponse">
     <complexType>
      <sequence>
-      <element name="getReportReturn" type="tns1:Report"/>
+      <element name="getReportReturn" type="tns6:Report"/>
      </sequence>
     </complexType>
    </element>
-   <complexType name="ArrayOf_tns1_Attribute">
-    <sequence>
-     <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns1:Attribute"/>
-    </sequence>
-   </complexType>
-   <complexType name="ArrayOf_tns1_ReportItem">
-    <sequence>
-     <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns1:ReportItem"/>
-    </sequence>
-   </complexType>
-   <element name="fault" type="tns2:NoSuchReportException"/>
-   <element name="fault1" type="tns2:ReportException"/>
-   <element name="getReportsCount">
-    <complexType>
-     <sequence>
-      <element name="filter" type="tns3:Filter"/>
-     </sequence>
-    </complexType>
-   </element>
-   <complexType name="ArrayOf_tns3_FilterParameter">
-    <sequence>
-     <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns3:FilterParameter"/>
-    </sequence>
-   </complexType>
-   <element name="getReportsCountResponse">
-    <complexType>
-     <sequence>
-      <element name="getReportsCountReturn" type="xsd:int"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="getReports">
-    <complexType>
-     <sequence>
-      <element name="contentAdapter" type="tns4:ContentAdapter"/>
-     </sequence>
-    </complexType>
-   </element>
-   <complexType name="ArrayOf_tns5_SortParameter">
-    <sequence>
-     <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns5:SortParameter"/>
-    </sequence>
-   </complexType>
-   <element name="getReportsResponse">
-    <complexType>
-     <sequence>
-      <element maxOccurs="unbounded" name="getReportsReturn" type="tns1:Report"/>
-     </sequence>
-    </complexType>
-   </element>
+   <element name="fault1" type="tns2:NoSuchReportException"/>
    <complexType name="ArrayOf_xsd_string">
     <sequence>
      <element maxOccurs="unbounded" minOccurs="0" name="item" type="xsd:string"/>
     </sequence>
-   </complexType>
-  </schema>
-  <schema elementFormDefault="qualified" targetNamespace="http://data.core.roda.dgarq.gov.pt" xmlns="http://www.w3.org/2001/XMLSchema">
-   <import namespace="http://common.core.roda.dgarq.gov.pt"/>
-   <import namespace="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
-   <import namespace="http://adapter.data.core.roda.dgarq.gov.pt"/>
-   <import namespace="http://sort.adapter.data.core.roda.dgarq.gov.pt"/>
-   <import namespace="http://sublist.adapter.data.core.roda.dgarq.gov.pt"/>
-   <import namespace="http://services.core.roda.dgarq.gov.pt"/>
-   <complexType name="Attribute">
-    <sequence>
-     <element name="name" nillable="true" type="xsd:string"/>
-     <element name="value" nillable="true" type="xsd:string"/>
-    </sequence>
-   </complexType>
-   <complexType name="ReportItem">
-    <sequence>
-     <element name="attributes" nillable="true" type="impl:ArrayOf_tns1_Attribute"/>
-     <element name="title" nillable="true" type="xsd:string"/>
-    </sequence>
-   </complexType>
-   <complexType name="Report">
-    <sequence>
-     <element name="attributes" nillable="true" type="impl:ArrayOf_tns1_Attribute"/>
-     <element name="id" nillable="true" type="xsd:string"/>
-     <element name="items" nillable="true" type="impl:ArrayOf_tns1_ReportItem"/>
-     <element name="title" nillable="true" type="xsd:string"/>
-     <element name="type" nillable="true" type="xsd:string"/>
-    </sequence>
-   </complexType>
-  </schema>
-  <schema elementFormDefault="qualified" targetNamespace="http://common.core.roda.dgarq.gov.pt" xmlns="http://www.w3.org/2001/XMLSchema">
-   <import namespace="http://data.core.roda.dgarq.gov.pt"/>
-   <import namespace="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
-   <import namespace="http://adapter.data.core.roda.dgarq.gov.pt"/>
-   <import namespace="http://sort.adapter.data.core.roda.dgarq.gov.pt"/>
-   <import namespace="http://sublist.adapter.data.core.roda.dgarq.gov.pt"/>
-   <import namespace="http://services.core.roda.dgarq.gov.pt"/>
-   <complexType abstract="true" name="RODAException">
-    <sequence>
-     <element name="message" nillable="true" type="xsd:string"/>
-    </sequence>
-   </complexType>
-   <complexType name="NoSuchReportException">
-    <complexContent>
-     <extension base="tns2:RODAException">
-      <sequence/>
-     </extension>
-    </complexContent>
-   </complexType>
-   <complexType name="RODAServiceException">
-    <complexContent>
-     <extension base="tns2:RODAException">
-      <sequence/>
-     </extension>
-    </complexContent>
-   </complexType>
-   <complexType name="ReportException">
-    <complexContent>
-     <extension base="tns2:RODAServiceException">
-      <sequence/>
-     </extension>
-    </complexContent>
    </complexType>
   </schema>
   <schema elementFormDefault="qualified" targetNamespace="http://filter.adapter.data.core.roda.dgarq.gov.pt" xmlns="http://www.w3.org/2001/XMLSchema">
@@ -157,12 +94,12 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
    </complexType>
    <complexType name="Filter">
     <sequence>
-     <element name="parameters" nillable="true" type="impl:ArrayOf_tns3_FilterParameter"/>
+     <element name="parameters" nillable="true" type="impl:ArrayOf_tns1_FilterParameter"/>
     </sequence>
    </complexType>
    <complexType name="SimpleFilterParameter">
     <complexContent>
-     <extension base="tns3:FilterParameter">
+     <extension base="tns1:FilterParameter">
       <sequence>
        <element name="value" nillable="true" type="xsd:string"/>
       </sequence>
@@ -171,7 +108,7 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
    </complexType>
    <complexType name="OneOfManyFilterParameter">
     <complexContent>
-     <extension base="tns3:FilterParameter">
+     <extension base="tns1:FilterParameter">
       <sequence>
        <element name="values" nillable="true" type="impl:ArrayOf_xsd_string"/>
       </sequence>
@@ -180,7 +117,7 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
    </complexType>
    <complexType name="RangeFilterParameter">
     <complexContent>
-     <extension base="tns3:FilterParameter">
+     <extension base="tns1:FilterParameter">
       <sequence>
        <element name="fromValue" nillable="true" type="xsd:string"/>
        <element name="toValue" nillable="true" type="xsd:string"/>
@@ -190,7 +127,7 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
    </complexType>
    <complexType name="RegexFilterParameter">
     <complexContent>
-     <extension base="tns3:FilterParameter">
+     <extension base="tns1:FilterParameter">
       <sequence>
        <element name="regex" nillable="true" type="xsd:string"/>
       </sequence>
@@ -199,7 +136,7 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
    </complexType>
    <complexType name="ProducerFilterParameter">
     <complexContent>
-     <extension base="tns3:FilterParameter">
+     <extension base="tns1:FilterParameter">
       <sequence>
        <element name="groups" nillable="true" type="impl:ArrayOf_xsd_string"/>
        <element name="username" nillable="true" type="xsd:string"/>
@@ -209,18 +146,62 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
    </complexType>
    <complexType name="LikeFilterParameter">
     <complexContent>
-     <extension base="tns3:FilterParameter">
+     <extension base="tns1:FilterParameter">
       <sequence>
        <element name="expression" nillable="true" type="xsd:string"/>
       </sequence>
      </extension>
     </complexContent>
    </complexType>
+   <complexType name="ClassificationSchemeFilterParameter">
+    <complexContent>
+     <extension base="tns1:FilterParameter">
+      <sequence>
+       <element name="classificationSchemeId" nillable="true" type="xsd:string"/>
+       <element name="possibleClassesPids" nillable="true" type="impl:ArrayOf_xsd_string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+  </schema>
+  <schema elementFormDefault="qualified" targetNamespace="http://common.core.roda.dgarq.gov.pt" xmlns="http://www.w3.org/2001/XMLSchema">
+   <import namespace="http://data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://adapter.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://sort.adapter.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://sublist.adapter.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://services.core.roda.dgarq.gov.pt"/>
+   <complexType abstract="true" name="RODAException">
+    <sequence>
+     <element name="message" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="RODAServiceException">
+    <complexContent>
+     <extension base="tns2:RODAException">
+      <sequence/>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="ReportException">
+    <complexContent>
+     <extension base="tns2:RODAServiceException">
+      <sequence/>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="NoSuchReportException">
+    <complexContent>
+     <extension base="tns2:RODAException">
+      <sequence/>
+     </extension>
+    </complexContent>
+   </complexType>
   </schema>
   <schema elementFormDefault="qualified" targetNamespace="http://sort.adapter.data.core.roda.dgarq.gov.pt" xmlns="http://www.w3.org/2001/XMLSchema">
    <import namespace="http://data.core.roda.dgarq.gov.pt"/>
-   <import namespace="http://common.core.roda.dgarq.gov.pt"/>
    <import namespace="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://common.core.roda.dgarq.gov.pt"/>
    <import namespace="http://adapter.data.core.roda.dgarq.gov.pt"/>
    <import namespace="http://sublist.adapter.data.core.roda.dgarq.gov.pt"/>
    <import namespace="http://services.core.roda.dgarq.gov.pt"/>
@@ -232,14 +213,14 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
    </complexType>
    <complexType name="Sorter">
     <sequence>
-     <element name="parameters" nillable="true" type="impl:ArrayOf_tns5_SortParameter"/>
+     <element name="parameters" nillable="true" type="impl:ArrayOf_tns4_SortParameter"/>
     </sequence>
    </complexType>
   </schema>
   <schema elementFormDefault="qualified" targetNamespace="http://sublist.adapter.data.core.roda.dgarq.gov.pt" xmlns="http://www.w3.org/2001/XMLSchema">
    <import namespace="http://data.core.roda.dgarq.gov.pt"/>
-   <import namespace="http://common.core.roda.dgarq.gov.pt"/>
    <import namespace="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://common.core.roda.dgarq.gov.pt"/>
    <import namespace="http://adapter.data.core.roda.dgarq.gov.pt"/>
    <import namespace="http://sort.adapter.data.core.roda.dgarq.gov.pt"/>
    <import namespace="http://services.core.roda.dgarq.gov.pt"/>
@@ -252,16 +233,45 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
   </schema>
   <schema elementFormDefault="qualified" targetNamespace="http://adapter.data.core.roda.dgarq.gov.pt" xmlns="http://www.w3.org/2001/XMLSchema">
    <import namespace="http://data.core.roda.dgarq.gov.pt"/>
-   <import namespace="http://common.core.roda.dgarq.gov.pt"/>
    <import namespace="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://common.core.roda.dgarq.gov.pt"/>
    <import namespace="http://sort.adapter.data.core.roda.dgarq.gov.pt"/>
    <import namespace="http://sublist.adapter.data.core.roda.dgarq.gov.pt"/>
    <import namespace="http://services.core.roda.dgarq.gov.pt"/>
    <complexType name="ContentAdapter">
     <sequence>
-     <element name="filter" nillable="true" type="tns3:Filter"/>
-     <element name="sorter" nillable="true" type="tns5:Sorter"/>
-     <element name="sublist" nillable="true" type="tns6:Sublist"/>
+     <element name="filter" nillable="true" type="tns1:Filter"/>
+     <element name="sorter" nillable="true" type="tns4:Sorter"/>
+     <element name="sublist" nillable="true" type="tns5:Sublist"/>
+    </sequence>
+   </complexType>
+  </schema>
+  <schema elementFormDefault="qualified" targetNamespace="http://data.core.roda.dgarq.gov.pt" xmlns="http://www.w3.org/2001/XMLSchema">
+   <import namespace="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://common.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://adapter.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://sort.adapter.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://sublist.adapter.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://services.core.roda.dgarq.gov.pt"/>
+   <complexType name="Attribute">
+    <sequence>
+     <element name="name" nillable="true" type="xsd:string"/>
+     <element name="value" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="ReportItem">
+    <sequence>
+     <element name="attributes" nillable="true" type="impl:ArrayOf_tns6_Attribute"/>
+     <element name="title" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="Report">
+    <sequence>
+     <element name="attributes" nillable="true" type="impl:ArrayOf_tns6_Attribute"/>
+     <element name="id" nillable="true" type="xsd:string"/>
+     <element name="items" nillable="true" type="impl:ArrayOf_tns6_ReportItem"/>
+     <element name="title" nillable="true" type="xsd:string"/>
+     <element name="type" nillable="true" type="xsd:string"/>
     </sequence>
    </complexType>
   </schema>
@@ -281,7 +291,7 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
    <wsdl:message name="NoSuchReportException">
 
-      <wsdl:part element="impl:fault" name="fault"/>
+      <wsdl:part element="impl:fault1" name="fault"/>
 
    </wsdl:message>
 
@@ -293,7 +303,7 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
    <wsdl:message name="ReportException">
 
-      <wsdl:part element="impl:fault1" name="fault"/>
+      <wsdl:part element="impl:fault" name="fault"/>
 
    </wsdl:message>
 
@@ -317,18 +327,6 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
    <wsdl:portType name="Reports">
 
-      <wsdl:operation name="getReport">
-
-         <wsdl:input message="impl:getReportRequest" name="getReportRequest"/>
-
-         <wsdl:output message="impl:getReportResponse" name="getReportResponse"/>
-
-         <wsdl:fault message="impl:NoSuchReportException" name="NoSuchReportException"/>
-
-         <wsdl:fault message="impl:ReportException" name="ReportException"/>
-
-      </wsdl:operation>
-
       <wsdl:operation name="getReportsCount">
 
          <wsdl:input message="impl:getReportsCountRequest" name="getReportsCountRequest"/>
@@ -349,41 +347,23 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
       </wsdl:operation>
 
+      <wsdl:operation name="getReport">
+
+         <wsdl:input message="impl:getReportRequest" name="getReportRequest"/>
+
+         <wsdl:output message="impl:getReportResponse" name="getReportResponse"/>
+
+         <wsdl:fault message="impl:NoSuchReportException" name="NoSuchReportException"/>
+
+         <wsdl:fault message="impl:ReportException" name="ReportException"/>
+
+      </wsdl:operation>
+
    </wsdl:portType>
 
    <wsdl:binding name="ReportsSoapBinding" type="impl:Reports">
 
       <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
-
-      <wsdl:operation name="getReport">
-
-         <wsdlsoap:operation soapAction=""/>
-
-         <wsdl:input name="getReportRequest">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:input>
-
-         <wsdl:output name="getReportResponse">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:output>
-
-         <wsdl:fault name="NoSuchReportException">
-
-            <wsdlsoap:fault name="NoSuchReportException" use="literal"/>
-
-         </wsdl:fault>
-
-         <wsdl:fault name="ReportException">
-
-            <wsdlsoap:fault name="ReportException" use="literal"/>
-
-         </wsdl:fault>
-
-      </wsdl:operation>
 
       <wsdl:operation name="getReportsCount">
 
@@ -424,6 +404,36 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
             <wsdlsoap:body use="literal"/>
 
          </wsdl:output>
+
+         <wsdl:fault name="ReportException">
+
+            <wsdlsoap:fault name="ReportException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getReport">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getReportRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getReportResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="NoSuchReportException">
+
+            <wsdlsoap:fault name="NoSuchReportException" use="literal"/>
+
+         </wsdl:fault>
 
          <wsdl:fault name="ReportException">
 

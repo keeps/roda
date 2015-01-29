@@ -18,9 +18,9 @@ import org.apache.log4j.Logger;
 
 import pt.gov.dgarq.roda.core.common.RODAServiceException;
 import pt.gov.dgarq.roda.core.data.User;
-import pt.gov.dgarq.roda.servlet.ExtendedUserPrincipal;
-import pt.gov.dgarq.roda.servlet.LdapAuthenticationFilter;
+import pt.gov.dgarq.roda.servlet.cas.CASAuthenticationFilter;
 import pt.gov.dgarq.roda.servlet.RodaServletRequestWrapper;
+import pt.gov.dgarq.roda.servlet.cas.CASUserPrincipal;
 
 /**
  * This is a servlet to access files in RODA Migrator Cache.
@@ -219,7 +219,7 @@ public class CacheServlet extends HttpServlet {
 
 		if (getCurrentRequest() instanceof RodaServletRequestWrapper) {
 			RodaServletRequestWrapper rodaRequestWrapper = (RodaServletRequestWrapper) getCurrentRequest();
-			user = rodaRequestWrapper.getLdapUserPrincipal();
+			user = rodaRequestWrapper.getCASUserPrincipal();
 		} else {
 			// user = null
 			user = new User(getCurrentRequest().getUserPrincipal().getName());
@@ -253,13 +253,13 @@ public class CacheServlet extends HttpServlet {
 		if (getCurrentRequest() instanceof RodaServletRequestWrapper) {
 
 			RodaServletRequestWrapper rodaRequestWrapper = (RodaServletRequestWrapper) getCurrentRequest();
-			ExtendedUserPrincipal userPrincipal = (ExtendedUserPrincipal) rodaRequestWrapper
-					.getLdapUserPrincipal();
-			password = userPrincipal.getPassword();
+			CASUserPrincipal userPrincipal = (CASUserPrincipal) rodaRequestWrapper
+					.getCASUserPrincipal();
+			password = userPrincipal.getProxyGrantingTicket();
 
 		} else {
 
-			String[] usernamePassword = LdapAuthenticationFilter
+			String[] usernamePassword = CASAuthenticationFilter
 					.parseUsernamePassword(getCurrentRequest());
 			password = usernamePassword[1];
 

@@ -264,4 +264,7 @@ public class LanguageEditor implements MetadataElementEditor {
 		return languages.size() == 0;
 	}
 
+	public boolean isValid() {
+		return true;
+	}
 }

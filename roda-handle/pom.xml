@@ -100,7 +100,7 @@
 		</dependency>
 		<dependency>
 			<groupId>pt.gov.dgarq.roda</groupId>
-			<artifactId>mets-1.7</artifactId>
+			<artifactId>mets-1.9.1</artifactId>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>

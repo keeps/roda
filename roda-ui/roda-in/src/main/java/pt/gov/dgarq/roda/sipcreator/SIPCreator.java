@@ -45,6 +45,25 @@ public class SIPCreator {
 			try {
 				UIManager
 						.setLookAndFeel(new com.nilo.plaf.nimrod.NimRODLookAndFeel());
+			} catch (UnsatisfiedLinkError e) {
+				logger.warn("Could not enable NimROD Look & Feel - " //$NON-NLS-1$
+						+ e.getMessage(), e);
+				try {
+					UIManager.setLookAndFeel(UIManager
+							.getSystemLookAndFeelClassName());
+				} catch (ClassNotFoundException e1) {
+					logger.error("Could not set system Look & Feel - "
+							+ e.getMessage(), e1);
+				} catch (InstantiationException e1) {
+					logger.error("Could not set system Look & Feel - "
+							+ e.getMessage(), e1);
+				} catch (IllegalAccessException e1) {
+					logger.error("Could not set system Look & Feel - "
+							+ e.getMessage(), e1);
+				} catch (UnsupportedLookAndFeelException e1) {
+					logger.error("Could not set system Look & Feel - "
+							+ e.getMessage(), e1);
+				}
 			} catch (UnsupportedLookAndFeelException e) {
 				logger.warn("Could not enable NimROD Look & Feel - " //$NON-NLS-1$
 						+ e.getMessage(), e);

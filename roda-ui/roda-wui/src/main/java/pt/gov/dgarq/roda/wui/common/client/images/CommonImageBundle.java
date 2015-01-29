@@ -10,6 +10,7 @@ import com.google.gwt.user.client.ui.ImageBundle;
  * @author Luis Faria
  * 
  */
+@SuppressWarnings("deprecation")
 public interface CommonImageBundle extends ImageBundle {
 
 	public AbstractImagePrototype forwardLight();
@@ -45,4 +46,7 @@ public interface CommonImageBundle extends ImageBundle {
 
 	public AbstractImagePrototype date_edit();
 
+	public AbstractImagePrototype login();
+	
+	public AbstractImagePrototype user();
 }

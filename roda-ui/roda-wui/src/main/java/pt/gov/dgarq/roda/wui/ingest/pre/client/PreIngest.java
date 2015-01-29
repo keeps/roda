@@ -3,11 +3,11 @@
  */
 package pt.gov.dgarq.roda.wui.ingest.pre.client;
 
+import pt.gov.dgarq.roda.core.data.DescriptionObject;
 import pt.gov.dgarq.roda.core.data.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.OneOfManyFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.ProducerFilterParameter;
-import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevel;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
@@ -15,6 +15,7 @@ import pt.gov.dgarq.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.CollectionsTreeVerticalScrollPanel;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.ViewWindow;
 import pt.gov.dgarq.roda.wui.ingest.client.Ingest;
+import pt.gov.dgarq.roda.wui.main.client.Main;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.History;
@@ -61,6 +62,8 @@ public class PreIngest implements HistoryResolver {
 
 	private CollectionsTreeVerticalScrollPanel classificationPlan;
 
+	private ViewWindow viewWindow;
+
 	private PreIngest() {
 		initialized = false;
 	}
@@ -73,17 +76,25 @@ public class PreIngest implements HistoryResolver {
 
 			Filter classPlanFilter = new Filter();
 			classPlanFilter.add(new ProducerFilterParameter());
+			// classPlanFilter.add(new OneOfManyFilterParameter(
+			// SimpleDescriptionObject.LEVEL, new String[] {
+			// DescriptionLevel.FONDS.getLevel(),
+			// DescriptionLevel.SUBFONDS.getLevel(),
+			// DescriptionLevel.CLASS.getLevel(),
+			// DescriptionLevel.SUBCLASS.getLevel(),
+			// DescriptionLevel.SERIES.getLevel(),
+			// DescriptionLevel.SUBSERIES.getLevel() }));
+			int size = Main.ALL_BUT_REPRESENTATIONS_DESCRIPTION_LEVELS.size();
+			String[] classPlanLevels = new String[size];
+			for (int i = 0; i < size; i++) {
+				classPlanLevels[i] = Main.ALL_BUT_REPRESENTATIONS_DESCRIPTION_LEVELS
+						.get(i).getLevel();
+			}
 			classPlanFilter.add(new OneOfManyFilterParameter(
-					SimpleDescriptionObject.LEVEL, new String[] {
-							DescriptionLevel.FONDS.getLevel(),
-							DescriptionLevel.SUBFONDS.getLevel(),
-							DescriptionLevel.CLASS.getLevel(),
-							DescriptionLevel.SUBCLASS.getLevel(),
-							DescriptionLevel.SERIES.getLevel(),
-							DescriptionLevel.SUBSERIES.getLevel() }));
+					SimpleDescriptionObject.LEVEL, classPlanLevels));
 
-			classificationPlanLabel = new Label(constants
-					.classificationPlanLabel());
+			classificationPlanLabel = new Label(
+					constants.classificationPlanLabel());
 
 			classificationPlan = new CollectionsTreeVerticalScrollPanel(
 					classPlanFilter,
@@ -93,8 +104,23 @@ public class PreIngest implements HistoryResolver {
 
 				public void onClick(Widget sender) {
 					String pid = classificationPlan.getSelected().getPid();
-					ViewWindow viewWindow = new ViewWindow(pid);
-					viewWindow.show();
+					/*
+					 * ViewWindow viewWindow = new ViewWindow(pid);
+					 * viewWindow.show();
+					 */
+					viewWindow = new ViewWindow(pid,
+							new AsyncCallback<DescriptionObject>() {
+
+								public void onFailure(Throwable caught) {
+									logger.error("Error creating view window",
+											caught);
+								}
+
+								public void onSuccess(DescriptionObject obj) {
+									viewWindow.show();
+								}
+
+							});
 
 				}
 

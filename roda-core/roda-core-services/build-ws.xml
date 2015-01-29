@@ -32,7 +32,7 @@
 			style="WRAPPED" 
 			namespace="http://services.core.roda.dgarq.gov.pt" 
 			location="http://${target.server}:${target.port}/${target.appname}/services/${service}" 
-			extraClasses="pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter pt.gov.dgarq.roda.core.data.adapter.filter.OneOfManyFilterParameter pt.gov.dgarq.roda.core.data.adapter.filter.RangeFilterParameter pt.gov.dgarq.roda.core.data.adapter.filter.RegexFilterParameter pt.gov.dgarq.roda.core.data.adapter.filter.ProducerFilterParameter pt.gov.dgarq.roda.core.data.adapter.filter.LikeFilterParameter" />
+			extraClasses="pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter pt.gov.dgarq.roda.core.data.adapter.filter.OneOfManyFilterParameter pt.gov.dgarq.roda.core.data.adapter.filter.RangeFilterParameter pt.gov.dgarq.roda.core.data.adapter.filter.RegexFilterParameter pt.gov.dgarq.roda.core.data.adapter.filter.ProducerFilterParameter pt.gov.dgarq.roda.core.data.adapter.filter.LikeFilterParameter pt.gov.dgarq.roda.core.data.adapter.filter.ClassificationSchemeFilterParameter" />
 
 		<echo message="Generating WSDD for service ${service}" />
 		
@@ -72,6 +72,9 @@
 
 	<!--<target name="create-services" depends="build">-->
 	<target name="create-services">
+		<antcall target="create-service">
+			<param name="service" value="ConfigurationManager" />
+		</antcall>
 		<antcall target="create-service">
 			<param name="service" value="Login" />
 		</antcall>

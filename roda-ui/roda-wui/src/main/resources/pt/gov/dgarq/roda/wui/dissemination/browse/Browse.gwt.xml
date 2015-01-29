@@ -1,17 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module>
 
-	<!-- Inherit the core Web Toolkit stuff.                  -->
+	<!-- Inherit the core Web Toolkit stuff. -->
 	<inherits name="com.google.gwt.user.User" />
 	<inherits name="com.google.gwt.xml.XML" />
 
-	<!-- Inherit the other RODA projects                  -->
+	<!-- Inherit the other RODA projects -->
 	<inherits name="pt.gov.dgarq.roda.wui.common.Common" />	
 
 	<!-- Specify the cascade stylesheet to use -->
 	<stylesheet src="Browse.css" />
 
-	<servlet
-		class="pt.gov.dgarq.roda.wui.dissemination.browse.server.BrowserServiceImpl"
-		path="/browserservice" />
 </module>

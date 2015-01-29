@@ -4,9 +4,8 @@
 package pt.gov.dgarq.roda.wui.management.statistics.client;
 
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
-import pt.gov.dgarq.roda.wui.common.client.UserLogin;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.DockPanel;
 import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.HTML;
@@ -37,10 +36,10 @@ public class SystemStatistics extends StatisticTab {
 	protected boolean init() {
 		boolean ret = false;
 		if (super.init()) {
-			link = new HTML("<a href='Munin/index.html' target='_blank'>"
+			link = new HTML("<a href='"+GWT.getModuleBaseURL() +"Munin/index.html' target='_blank'>"
 					+ constants.systemStatisticsLink() + "</a>");
 
-			iframe = new Frame("Munin/index.html");
+			iframe = new Frame(GWT.getModuleBaseURL() +"Munin/index.html");
 			
 			layout.add(link, DockPanel.NORTH);
 			layout.add(iframe, DockPanel.CENTER);

@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 
 import pt.gov.dgarq.roda.common.RodaClientFactory;
 import pt.gov.dgarq.roda.core.RODAClient;
+import pt.gov.dgarq.roda.core.SipSendUtility;
 import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
 import pt.gov.dgarq.roda.core.common.LoginException;
 import pt.gov.dgarq.roda.core.common.RODAClientException;
@@ -69,8 +70,8 @@ public class IngestSubmitServiceImpl extends RemoteServiceServlet implements
 		return ret;
 	}
 
-	public boolean submitSIPs(String[] fileCodes) throws LoginException,
-			RODAClientException, GenericException, AuthorizationDeniedException {
+	public boolean submitSIPs(String[] fileCodes) throws LoginException, 
+			RODAClientException, GenericException, AuthorizationDeniedException, IOException {
 		boolean allsubmitted;
 		HttpSession session = getThreadLocalRequest().getSession();
 		FileItem[] items = FileUpload.lookupFileItems(session, fileCodes);
@@ -95,7 +96,8 @@ public class IngestSubmitServiceImpl extends RemoteServiceServlet implements
 
 				};
 			}
-			allsubmitted = sendSIPs(sipPartSources);
+			RODAClient rodaClient = RodaClientFactory.getRodaClient(getThreadLocalRequest().getSession());
+			allsubmitted = SipSendUtility.sendSIPs(sipPartSources,rodaClient);
 		} else {
 			allsubmitted = false;
 		}
@@ -146,8 +148,9 @@ public class IngestSubmitServiceImpl extends RemoteServiceServlet implements
 				logger.debug("Sending SIP");
 
 				String sipName = createSipName(parentPID, metadata);
-				success = sendSIPs(new PartSource[] { createPartSource(
-						sipStream, sipName, sipStream.getChannel().size()) });
+				RODAClient rodaClient = RodaClientFactory.getRodaClient(getThreadLocalRequest().getSession());
+				success = SipSendUtility.sendSIPs(new PartSource[] { SipSendUtility.createPartSource(
+						sipStream, sipName, sipStream.getChannel().size()) },rodaClient);
 
 				logger.debug("Done creating and sending SIP");
 			} else {
@@ -160,6 +163,8 @@ public class IngestSubmitServiceImpl extends RemoteServiceServlet implements
 			logger.error("Error creating representation stream", e);
 			throw new GenericException(e.getMessage());
 		} finally {
+			logger.debug("### SIP: "+sipTempFile.getPath());
+			/*
 			if (sip != null && sip.getDirectory() != null) {
 				FileUtils.deleteQuietly(sip.getDirectory());
 			}
@@ -167,6 +172,7 @@ public class IngestSubmitServiceImpl extends RemoteServiceServlet implements
 			if (sipTempFile != null) {
 				sipTempFile.delete();
 			}
+			*/
 		}
 
 		return success;
@@ -203,83 +209,6 @@ public class IngestSubmitServiceImpl extends RemoteServiceServlet implements
 		return name;
 	}
 
-	protected PartSource createPartSource(final InputStream stream,
-			final String fileName, final long length) {
-		return new PartSource() {
-
-			public InputStream createInputStream() throws IOException {
-				return stream;
-			}
-
-			public String getFileName() {
-				return fileName;
-			}
-
-			public long getLength() {
-				return length;
-			}
-
-		};
-	}
-
-	private boolean sendSIPs(PartSource[] sipSources) throws LoginException,
-			GenericException, RODAClientException, AuthorizationDeniedException {
-
-		boolean success = false;
-
-		try {
-			URL sipUploadURL = RodaClientFactory.getIngestSubmitUrl();
-
-			PostMethod filePost = new PostMethod(sipUploadURL.toString());
-
-			Part[] parts = new Part[sipSources.length];
-			for (int i = 0; i < sipSources.length; i++) {
-				parts[i] = new FilePart(sipSources[i].getFileName(),
-						sipSources[i]);
-			}
-
-			filePost.setRequestEntity(new MultipartRequestEntity(parts,
-					filePost.getParams()));
-
-			HttpClient client = new HttpClient();
-			client.getParams().setAuthenticationPreemptive(true);
-			RODAClient rodaClient = RodaClientFactory
-					.getRodaClient(getThreadLocalRequest().getSession());
-
-			Credentials credentials = new UsernamePasswordCredentials(
-					rodaClient.getUsername(), rodaClient.getPassword());
-			client.getState().setCredentials(
-					new AuthScope(sipUploadURL.getHost(), sipUploadURL
-							.getPort(), AuthScope.ANY_REALM), credentials);
-
-			int status = client.executeMethod(filePost);
-
-			logger.trace("Responde Status: " + status + " - "
-					+ HttpStatus.getStatusText(status));
-
-			if (status == HttpStatus.SC_OK || status == HttpStatus.SC_CREATED) {
-				success = true;
-				logger.debug("SIP Upload Successful.");
-
-			} else if (status == HttpStatus.SC_UNAUTHORIZED) {
-				success = false;
-				throw new AuthorizationDeniedException(
-						"Not authorized to upload SIPs");
-			} else {
-				success = false;
-				logger.error("Upload error - HTTP Status: " + status + " - "
-						+ HttpStatus.getStatusText(status));
-			}
-
-		} catch (HttpException e) {
-			logger.error("Error executing POST method", e);
-			throw new GenericException(e.getMessage());
-		} catch (IOException e) {
-			logger.error("Error getting POST response", e);
-			throw new GenericException(e.getMessage());
-		}
-
-		return success;
-	}
+	
 
 }

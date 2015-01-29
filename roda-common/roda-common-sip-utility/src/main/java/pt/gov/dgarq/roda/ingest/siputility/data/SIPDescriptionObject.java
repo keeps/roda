@@ -104,18 +104,21 @@ public class SIPDescriptionObject extends DescriptionObject implements
 		fireDataChangedEvent();
 	}
 
+	@Deprecated
 	@Override
 	public void setAcqinfo(String acqinfo) {
 		super.setAcqinfo(acqinfo);
 		fireDataChangedEvent();
 	}
 
+	@Deprecated
 	@Override
 	public void setAcqinfoDate(String acqinfoDate) {
 		super.setAcqinfoDate(acqinfoDate);
 		fireDataChangedEvent();
 	}
 
+	@Deprecated
 	@Override
 	public void setAcqinfoNum(String acqinfoNum) {
 		super.setAcqinfoNum(acqinfoNum);
@@ -244,12 +247,14 @@ public class SIPDescriptionObject extends DescriptionObject implements
 		fireDataChangedEvent();
 	}
 
+	@Deprecated
 	@Override
 	public void setMaterialspec(String materialspec) {
 		super.setMaterialspec(materialspec);
 		fireDataChangedEvent();
 	}
 
+	@Deprecated
 	@Override
 	public void setNote(String note) {
 		super.setNote(note);
@@ -322,6 +327,7 @@ public class SIPDescriptionObject extends DescriptionObject implements
 		fireDataChangedEvent();
 	}
 
+	@Deprecated
 	@Override
 	public void setRelatedmaterial(String relatedmaterial) {
 		super.setRelatedmaterial(relatedmaterial);
@@ -507,8 +513,7 @@ public class SIPDescriptionObject extends DescriptionObject implements
 			if (this.children.contains(evtDataChanged.getSource())) {
 				fireDataChangedEvent(evtDataChanged);
 			} else {
-				logger
-						.debug("SIPDescriptionObject has changed, but is not one of mine. Why am I listening to this???"); //$NON-NLS-1$
+				logger.debug("SIPDescriptionObject has changed, but is not one of mine. Why am I listening to this???"); //$NON-NLS-1$
 			}
 
 		} else if (evtDataChanged.getSource() instanceof SIPRepresentationObject) {
@@ -516,8 +521,7 @@ public class SIPDescriptionObject extends DescriptionObject implements
 			if (this.representations.contains(evtDataChanged.getSource())) {
 				fireDataChangedEvent(evtDataChanged);
 			} else {
-				logger
-						.debug("SIPRepresentationObject has changed, but is not one of mine. Why am I listening to this???"); //$NON-NLS-1$
+				logger.debug("SIPRepresentationObject has changed, but is not one of mine. Why am I listening to this???"); //$NON-NLS-1$
 			}
 
 		} else {

@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.naming.AuthenticationException;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -78,6 +79,8 @@ import pt.gov.dgarq.roda.core.plugins.Plugin;
 import pt.gov.dgarq.roda.core.plugins.PluginException;
 import pt.gov.dgarq.roda.ingest.siputility.builders.RepresentationBuilder;
 import pt.gov.dgarq.roda.plugins.converters.common.LocalRepresentationObject;
+import pt.gov.dgarq.roda.servlet.cas.CASUserPrincipal;
+import pt.gov.dgarq.roda.servlet.cas.CASUtility;
 import pt.gov.dgarq.roda.util.CommandException;
 import pt.gov.dgarq.roda.util.CommandUtility;
 import pt.gov.dgarq.roda.util.TempDir;
@@ -196,11 +199,13 @@ public class ExecutePlanPlugin extends AbstractPlugin {
         final String rodaClientServiceUrl = getParameterValues().get(AbstractPlugin.PARAMETER_RODA_CORE_URL().getName());
         final String rodaClientUsername = getParameterValues().get(AbstractPlugin.PARAMETER_RODA_CORE_USERNAME().getName());
         final String rodaClientPassword = getParameterValues().get(AbstractPlugin.PARAMETER_RODA_CORE_PASSWORD().getName());
-
+        final String casURL = getParameterValues().get(AbstractPlugin.PARAMETER_RODA_CAS_URL().getName());
+        final String coreURL = getParameterValues().get(AbstractPlugin.PARAMETER_RODA_CORE_URL().getName());
         try {
-
-            rodaClient = new RODAClient(new URL(rodaClientServiceUrl), rodaClientUsername, rodaClientPassword);
-            rodaUploader = new Uploader(new URL(rodaClientServiceUrl), rodaClientUsername, rodaClientPassword);
+			CASUtility casUtility = new CASUtility(new URL(casURL), new URL(coreURL));
+			CASUserPrincipal cup = casUtility.getCASUserPrincipal(rodaClientUsername, rodaClientPassword);
+            rodaClient = new RODAClient(new URL(rodaClientServiceUrl), cup,casUtility);
+            rodaUploader = new Uploader(new URL(rodaClientServiceUrl), cup,casUtility);
             rodaDownloader = rodaClient.getDownloader();
 
         } catch (RODAClientException e) {
@@ -215,7 +220,10 @@ public class ExecutePlanPlugin extends AbstractPlugin {
         } catch (DownloaderException e) {
             logger.debug("Exception creating RODA downloader - " + e.getMessage(), e);
             throw new PluginException("Exception creating service URL - " + e.getMessage(), e);
-        }
+        } catch (AuthenticationException e) {
+        	logger.debug("Exception creating RODA downloader - " + e.getMessage(), e);
+            throw new PluginException("Exception creating service URL - " + e.getMessage(), e);
+		}
     }
 
     /**
@@ -636,10 +644,10 @@ public class ExecutePlanPlugin extends AbstractPlugin {
             reportItem.addAttribute(new Attribute("Derivation event PID", epoPID));
 
         } catch (ExecutePlanException e) {
-            logger.debug("Error registering convertion event - " + e.getMessage(), e);
+            logger.debug("Error registering conversion event - " + e.getMessage(), e);
 
             try {
-                logger.warn("Error registering convertion event. Removing created object " + derivedROPID);
+                logger.warn("Error registering conversion event. Removing created object " + derivedROPID);
 
                 this.rodaClient.getIngestService().removeObjects(new String[]{derivedROPID});
 
@@ -651,7 +659,7 @@ public class ExecutePlanPlugin extends AbstractPlugin {
                 logger.warn("Error removing representation " + roPID + " - " + e1.getMessage() + ". IGNORING", e1);
             }
 
-            throw new ExecutePlanException("Error registering convertion event - " + e.getMessage(), e, reportItem);
+            throw new ExecutePlanException("Error registering conversion event - " + e.getMessage(), e, reportItem);
         }
 
         return derivedROPID;
@@ -742,24 +750,24 @@ public class ExecutePlanPlugin extends AbstractPlugin {
             final String epoPID = this.rodaClient.getIngestService().registerDerivationEvent(originalROPID, roPID, eventPO,
                     agentPO, true);
 
-            logger.info("Event registration finnished. Derivation event is " + epoPID);
+            logger.info("Event registration finished. Derivation event is " + epoPID);
 
             reportItem.addAttribute(new Attribute("Register event - event PID", epoPID));
 
             return epoPID;
 
         } catch (NoSuchRODAObjectException e) {
-            logger.debug("Error registering convertion event - " + e.getMessage(), e);
-            throw new ExecutePlanException("Error registering convertion event - " + e.getMessage(), e, reportItem);
+            logger.debug("Error registering conversion event - " + e.getMessage(), e);
+            throw new ExecutePlanException("Error registering conversion event - " + e.getMessage(), e, reportItem);
         } catch (IngestException e) {
-            logger.debug("Error registering convertion event - " + e.getMessage(), e);
-            throw new ExecutePlanException("Error registering convertion event - " + e.getMessage(), e, reportItem);
+            logger.debug("Error registering conversion event - " + e.getMessage(), e);
+            throw new ExecutePlanException("Error registering conversion event - " + e.getMessage(), e, reportItem);
         } catch (RemoteException e) {
-            logger.debug("Error registering convertion event - " + e.getMessage(), e);
-            throw new ExecutePlanException("Error registering convertion event - " + e.getMessage(), e, reportItem);
+            logger.debug("Error registering conversion event - " + e.getMessage(), e);
+            throw new ExecutePlanException("Error registering conversion event - " + e.getMessage(), e, reportItem);
         } catch (RODAClientException e) {
-            logger.debug("Error registering convertion event - " + e.getMessage(), e);
-            throw new ExecutePlanException("Error registering convertion event - " + e.getMessage(), e, reportItem);
+            logger.debug("Error registering conversion event - " + e.getMessage(), e);
+            throw new ExecutePlanException("Error registering conversion event - " + e.getMessage(), e, reportItem);
         }
 
     }

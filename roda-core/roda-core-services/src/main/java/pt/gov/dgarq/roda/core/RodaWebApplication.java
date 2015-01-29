@@ -1,10 +1,12 @@
 package pt.gov.dgarq.roda.core;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Properties;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -21,6 +23,7 @@ import pt.gov.dgarq.roda.core.data.PluginInfo;
 import pt.gov.dgarq.roda.core.data.PluginParameter;
 import pt.gov.dgarq.roda.core.data.Task;
 import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevelManager;
 import pt.gov.dgarq.roda.core.ingest.IngestManager;
 import pt.gov.dgarq.roda.core.ingest.IngestRegistryException;
 import pt.gov.dgarq.roda.core.plugins.PluginManager;
@@ -45,304 +48,292 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class RodaWebApplication implements ServletContextListener {
 
-	public static File RODA_HOME = null;
-	public static File RODA_CORE_CONFIG_DIRECTORY = null;
-	public static final String RODA_CORE_POSTINSTALL_FILENAME = "roda-core.postinstall";
-	public static final String RODA_CORE_PROPERTIES_FILENAME = "roda-core.properties";
+  public static File RODA_HOME = null;
+  public static File RODA_CORE_CONFIG_DIRECTORY = null;
+  public static final String RODA_CORE_POSTINSTALL_FILENAME = "roda-core.postinstall";
+  public static final String RODA_CORE_PROPERTIES_FILENAME = "roda-core.properties";
 
-	private static final Logger logger;
-	static {
-		try {
+  private static final Logger logger;
+  static {
+    try {
 
-			if (System.getProperty("roda.home") != null) {
-				RODA_HOME = new File(System.getProperty("roda.home"));
-			} else if (System.getenv("RODA_HOME") != null) {
-				RODA_HOME = new File(System.getenv("RODA_HOME")); //$NON-NLS-1$
-			} else {
-				RODA_HOME = new File(".");
-			}
+      if (System.getProperty("roda.home") != null) {
+        RODA_HOME = new File(System.getProperty("roda.home"));
+      } else if (System.getenv("RODA_HOME") != null) {
+        RODA_HOME = new File(System.getenv("RODA_HOME")); //$NON-NLS-1$
+      } else {
+        RODA_HOME = new File(".");
+      }
 
-			RODA_CORE_CONFIG_DIRECTORY = new File(RODA_HOME, "config"); //$NON-NLS-1$
+      RODA_CORE_CONFIG_DIRECTORY = new File(RODA_HOME, "config"); //$NON-NLS-1$
 
-			File log4jXml = new File(RODA_CORE_CONFIG_DIRECTORY, "log4j.xml");
-			DOMConfigurator.configure(log4jXml.getPath());
+      File log4jXml = new File(RODA_CORE_CONFIG_DIRECTORY, "log4j.xml");
+      DOMConfigurator.configure(log4jXml.getPath());
 
-		} catch (FactoryConfigurationError e) {
-			e.printStackTrace();
-		}
+    } catch (FactoryConfigurationError e) {
+      e.printStackTrace();
+    }
 
-		logger = Logger.getLogger(RodaWebApplication.class);
-	}
+    logger = Logger.getLogger(RodaWebApplication.class);
+  }
 
-	private SchedulerManager scheduler = null;
+  private SchedulerManager scheduler = null;
 
-	private PluginManager pluginManager = null;
+  private PluginManager pluginManager = null;
 
-	private IngestManager ingestManager = null;
+  private IngestManager ingestManager = null;
 
-	/**
-	 * 
-	 * @see ServletContextListener#contextInitialized(ServletContextEvent)
-	 */
-	public void contextInitialized(ServletContextEvent ctx) {
+  /**
+   * 
+   * @see ServletContextListener#contextInitialized(ServletContextEvent)
+   */
+  public void contextInitialized(ServletContextEvent ctx) {
 
-		logger.info("RODA Core starting");
+    logger.info("RODA Core starting");
 
-		try {
+    try {
 
-			logger.debug(getClass().getName() + " ClassLoader is "
-					+ getClass().getClassLoader());
+      logger.debug(getClass().getName() + " ClassLoader is " + getClass().getClassLoader());
 
-			try {
+      // FIXME see if this is the best place to initialize the description
+      // levels
+      try {
+        Properties descriptionLevels = new Properties();
+        descriptionLevels.load(new FileInputStream(new File(RODA_CORE_CONFIG_DIRECTORY,
+          "roda-description-levels-hierarchy.properties")));
+        new DescriptionLevelManager(descriptionLevels);
+      } catch (IOException e) {
+        logger.error(e);
+      }
 
-				this.ingestManager = IngestManager.getDefaultIngestManager();
+      try {
 
-			} catch (IngestRegistryException e) {
-				logger.error(
-						"Error creating Ingest Manager - " + e.getMessage(), e);
-			}
+        this.ingestManager = IngestManager.getDefaultIngestManager();
 
-			try {
+      } catch (IngestRegistryException e) {
+        logger.error("Error creating Ingest Manager - " + e.getMessage(), e);
+      }
 
-				UserBrowser userBrowser = new UserBrowser();
-				User[] users = userBrowser.getUsers(null);
+      try {
 
-				this.ingestManager.createFTPDropDirectories(users);
+        UserBrowser userBrowser = new UserBrowser();
+        User[] users = userBrowser.getUsers(null);
 
-			} catch (RODAServiceException e) {
-				logger.error(
-						"Error getting list of users - "
-								+ e.getMessage()
-								+ ". FTP drop directories will not be verified/created.",
-						e);
-			}
+        this.ingestManager.createFTPDropDirectories(users);
 
-			// IMPORTANT: It's very important that
-			// 'ingestManager.clearProcessingFlags()' is called BEFORE the
-			// Scheduler
-			// is started, because no ingest tasks should be running at this
-			// stage.
-			try {
+      } catch (RODAServiceException e) {
+        logger.error("Error getting list of users - " + e.getMessage()
+          + ". FTP drop directories will not be verified/created.", e);
+      }
 
-				this.ingestManager.clearProcessingFlags();
+      // IMPORTANT: It's very important that
+      // 'ingestManager.clearProcessingFlags()' is called BEFORE the
+      // Scheduler
+      // is started, because no ingest tasks should be running at this
+      // stage.
+      try {
 
-			} catch (IngestRegistryException e) {
-				logger.error(
-						"Error clearing processing flags - "
-								+ e.getMessage()
-								+ ". It's possible that some SIPs stay blocked.",
-						e);
-			}
+        this.ingestManager.clearProcessingFlags();
 
-			try {
+      } catch (IngestRegistryException e) {
+        logger.error("Error clearing processing flags - " + e.getMessage()
+          + ". It's possible that some SIPs stay blocked.", e);
+      }
 
-				// Create the PluginManager
-				this.pluginManager = PluginManager.getDefaultPluginManager();
+      try {
 
-			} catch (PluginManagerException e) {
-				logger.error(
-						"Error creating Plugin Manager - " + e.getMessage(), e);
-			}
+        // Create the PluginManager
+        this.pluginManager = PluginManager.getDefaultPluginManager();
 
-			try {
+      } catch (PluginManagerException e) {
+        logger.error("Error creating Plugin Manager - " + e.getMessage(), e);
+      }
 
-				scheduler = SchedulerManager.getDefaultSchedulerManager();
+      try {
 
-			} catch (RODASchedulerException e) {
-				logger.error(
-						"Error getting default RODA Scheduler - "
-								+ e.getMessage(), e);
-			}
+        scheduler = SchedulerManager.getDefaultSchedulerManager();
 
-			// create default tasks the first time RODA-CORE is
-			// initialized
-			Task task = null;
-			if (scheduler != null && createDefaultTasks()) {
-				Configuration rodaCoreConfiguration = getConfiguration(
-						this.getClass(), RODA_CORE_PROPERTIES_FILENAME);
-				if (rodaCoreConfiguration != null) {
-					List<String> defaultTasks = rodaCoreConfiguration
-							.getList("defaultTasks");
-					for (String taskConfiguration : defaultTasks) {
-						task = createTask(taskConfiguration);
-						if (task != null) {
-							scheduler.addTask(task);
-						}
-					}
-					if (!createRODACorePostInstallFile()) {
-						logger.error("Error creating file \""
-								+ RODA_CORE_POSTINSTALL_FILENAME + "\"...");
-					}
-				}
-			}
-			logger.info("RODA Core started");
+      } catch (RODASchedulerException e) {
+        logger.error("Error getting default RODA Scheduler - " + e.getMessage(), e);
+      }
 
-		} catch (Throwable t) {
-			logger.error("Error starting RODA Core - " + t.getMessage(), t);
-		}
+      // create default tasks the first time RODA-CORE is
+      // initialized
+      Task task = null;
+      if (scheduler != null && createDefaultTasks()) {
+        Configuration rodaCoreConfiguration = getConfiguration(this.getClass(), RODA_CORE_PROPERTIES_FILENAME);
+        if (rodaCoreConfiguration != null) {
+          List<String> defaultTasks = rodaCoreConfiguration.getList("defaultTasks");
+          for (String taskConfiguration : defaultTasks) {
+            task = createTask(taskConfiguration);
+            if (task != null) {
+              scheduler.addTask(task);
+            }
+          }
+          if (!createRODACorePostInstallFile()) {
+            logger.error("Error creating file \"" + RODA_CORE_POSTINSTALL_FILENAME + "\"...");
+          }
+        }
+      }
+      logger.info("RODA Core started");
 
-	}
+    } catch (Throwable t) {
+      logger.error("Error starting RODA Core - " + t.getMessage(), t);
+    }
 
-	/**
-	 * Method that determines if default tasks should be created. It checks if a
-	 * file called {@value #RODA_CORE_POSTINSTALL_FILENAME} exists under RODA
-	 * config directory. If it doesn't exists, create default tasks. Otherwise,
-	 * don't.
-	 * 
-	 * @return true if default tasks should be create and false otherwise.
-	 * */
-	private boolean createDefaultTasks() {
-		File rodaCorePostInstall = new File(RODA_CORE_CONFIG_DIRECTORY,
-				RODA_CORE_POSTINSTALL_FILENAME);
-		return !rodaCorePostInstall.exists();
-	}
+  }
 
-	/**
-	 * Method that creates a file called
-	 * {@value #RODA_CORE_POSTINSTALL_FILENAME} under RODA config directory to
-	 * mark the execution of post install tasks (things that should only be done
-	 * the first time RODA is initialized)
-	 * 
-	 * @return true if the file was successfully create and false otherwise
-	 * 
-	 * */
-	private boolean createRODACorePostInstallFile() {
-		boolean res = true;
-		File rodaCorePostInstall = new File(RODA_CORE_CONFIG_DIRECTORY,
-				RODA_CORE_POSTINSTALL_FILENAME);
-		try {
-			res = rodaCorePostInstall.createNewFile();
-		} catch (IOException e) {
-			res = false;
-		}
-		return res;
-	}
+  /**
+   * Method that determines if default tasks should be created. It checks if a
+   * file called {@value #RODA_CORE_POSTINSTALL_FILENAME} exists under RODA
+   * config directory. If it doesn't exists, create default tasks. Otherwise,
+   * don't.
+   * 
+   * @return true if default tasks should be create and false otherwise.
+   * */
+  private boolean createDefaultTasks() {
+    File rodaCorePostInstall = new File(RODA_CORE_CONFIG_DIRECTORY, RODA_CORE_POSTINSTALL_FILENAME);
+    return !rodaCorePostInstall.exists();
+  }
 
-	/**
-	 * Method that creates a task for a given JSON configuration, obtained from
-	 * roda-core.properties
-	 * 
-	 * @return a {@link Task} if everything goes alright or null otherwise
-	 * 
-	 * */
-	private Task createTask(String pluginConfiguration) {
-		Task task = new Task();
-		JsonFactory factory = new JsonFactory();
-		ObjectMapper mapper = new ObjectMapper(factory);
-		TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {
-		};
-		HashMap<String, Object> jsonObject;
-		String value;
-		try {
-			jsonObject = mapper.readValue(pluginConfiguration, typeRef);
-			value = (String) jsonObject.get("name");
-			task.setName(value);
-			task.setRepeatCount(-1);
-			value = (String) jsonObject.get("interval");
-			task.setRepeatInterval(Long.valueOf(value));
-			task.setUsername("admin");
-			task.setStartDate(new Date());
-			String pluginName = (String) jsonObject.get("plugin");
-			PluginInfo pluginInfo = null;
-			int retries = 3, sleep = 1, i = 0;
-			while (i < retries) {
-				pluginInfo = pluginManager.getPluginInfo(pluginName);
-				if (pluginInfo == null) {
-					i++;
-					try {
-						Thread.sleep(1000 * i * sleep);
-					} catch (InterruptedException e) {
-					}
-				} else {
-					PluginParameter[] parameters = pluginInfo.getParameters();
-					for (PluginParameter param : parameters) {
-						value = (String) jsonObject.get(param.getName());
-						param.setValue(value);
-					}
-					task.setPluginInfo(pluginInfo);
-					break;
-				}
-			}
-			if (pluginInfo == null) {
-				task = null;
-			}
-		} catch (JsonParseException e) {
-			logger.error(e);
-			task = null;
-		} catch (JsonMappingException e) {
-			logger.error(e);
-			task = null;
-		} catch (IOException e) {
-			logger.error(e);
-			task = null;
-		}
-		return task;
-	}
+  /**
+   * Method that creates a file called {@value #RODA_CORE_POSTINSTALL_FILENAME}
+   * under RODA config directory to mark the execution of post install tasks
+   * (things that should only be done the first time RODA is initialized)
+   * 
+   * @return true if the file was successfully create and false otherwise
+   * 
+   * */
+  private boolean createRODACorePostInstallFile() {
+    boolean res = true;
+    File rodaCorePostInstall = new File(RODA_CORE_CONFIG_DIRECTORY, RODA_CORE_POSTINSTALL_FILENAME);
+    try {
+      res = rodaCorePostInstall.createNewFile();
+    } catch (IOException e) {
+      res = false;
+    }
+    return res;
+  }
 
-	/**
-	 * 
-	 * @see ServletContextListener#contextDestroyed(ServletContextEvent)
-	 */
-	public void contextDestroyed(ServletContextEvent ctx) {
+  /**
+   * Method that creates a task for a given JSON configuration, obtained from
+   * roda-core.properties
+   * 
+   * @return a {@link Task} if everything goes alright or null otherwise
+   * 
+   * */
+  private Task createTask(String pluginConfiguration) {
+    Task task = new Task();
+    JsonFactory factory = new JsonFactory();
+    ObjectMapper mapper = new ObjectMapper(factory);
+    TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {
+    };
+    HashMap<String, Object> jsonObject;
+    String value;
+    try {
+      jsonObject = mapper.readValue(pluginConfiguration, typeRef);
+      value = (String) jsonObject.get("name");
+      task.setName(value);
+      task.setRepeatCount(-1);
+      value = (String) jsonObject.get("interval");
+      task.setRepeatInterval(Long.valueOf(value));
+      task.setUsername("admin");
+      task.setStartDate(new Date());
+      String pluginName = (String) jsonObject.get("plugin");
+      PluginInfo pluginInfo = null;
+      int retries = 3, sleep = 1, i = 0;
+      while (i < retries) {
+        pluginInfo = pluginManager.getPluginInfo(pluginName);
+        if (pluginInfo == null) {
+          i++;
+          try {
+            Thread.sleep(1000 * i * sleep);
+          } catch (InterruptedException e) {
+          }
+        } else {
+          PluginParameter[] parameters = pluginInfo.getParameters();
+          for (PluginParameter param : parameters) {
+            value = (String) jsonObject.get(param.getName());
+            param.setValue(value);
+          }
+          task.setPluginInfo(pluginInfo);
+          break;
+        }
+      }
+      if (pluginInfo == null) {
+        task = null;
+      }
+    } catch (JsonParseException e) {
+      logger.error(e);
+      task = null;
+    } catch (JsonMappingException e) {
+      logger.error(e);
+      task = null;
+    } catch (IOException e) {
+      logger.error(e);
+      task = null;
+    }
+    return task;
+  }
 
-		logger.info("RODA Core stopping");
+  /**
+   * 
+   * @see ServletContextListener#contextDestroyed(ServletContextEvent)
+   */
+  public void contextDestroyed(ServletContextEvent ctx) {
 
-		// Shutdown PluginManager
-		if (this.pluginManager != null) {
-			this.pluginManager.shutdown();
-			this.pluginManager = null;
-		}
+    logger.info("RODA Core stopping");
 
-		if (this.scheduler != null) {
+    // Shutdown PluginManager
+    if (this.pluginManager != null) {
+      this.pluginManager.shutdown();
+      this.pluginManager = null;
+    }
 
-			try {
+    if (this.scheduler != null) {
 
-				this.scheduler.stop();
-				this.scheduler = null;
+      try {
 
-			} catch (RODASchedulerException e) {
-				logger.error(
-						"Error stopping RODA Scheduler - " + e.getMessage(), e);
-			}
+        this.scheduler.stop();
+        this.scheduler = null;
 
-		}
+      } catch (RODASchedulerException e) {
+        logger.error("Error stopping RODA Scheduler - " + e.getMessage(), e);
+      }
 
-		logger.info("RODA Core stopped");
-	}
+    }
 
-	/**
-	 * Return the configuration properties with the specified name.
-	 * 
-	 * @param c
-	 *            the {@link Class} for which the properties will be loaded.
-	 * @param configurationFile
-	 *            the name of the configuration file.
-	 * 
-	 * @return a {@link Configuration} with the properties of the specified
-	 *         name.
-	 * 
-	 * @throws ConfigurationException
-	 */
-	public static Configuration getConfiguration(Class<?> c,
-			String configurationFile) throws ConfigurationException {
+    logger.info("RODA Core stopped");
+  }
 
-		PropertiesConfiguration propertiesConfiguration = new PropertiesConfiguration();
-		propertiesConfiguration.setDelimiterParsingDisabled(true);
+  /**
+   * Return the configuration properties with the specified name.
+   * 
+   * @param c
+   *          the {@link Class} for which the properties will be loaded.
+   * @param configurationFile
+   *          the name of the configuration file.
+   * 
+   * @return a {@link Configuration} with the properties of the specified name.
+   * 
+   * @throws ConfigurationException
+   */
+  public static Configuration getConfiguration(Class<?> c, String configurationFile) throws ConfigurationException {
 
-		File externalConfigurationFile = new File(
-				RodaWebApplication.RODA_CORE_CONFIG_DIRECTORY,
-				configurationFile);
+    PropertiesConfiguration propertiesConfiguration = new PropertiesConfiguration();
+    propertiesConfiguration.setDelimiterParsingDisabled(true);
 
-		if (externalConfigurationFile.isFile()) {
-			propertiesConfiguration.load(externalConfigurationFile);
-			logger.debug("Loading configuration " + externalConfigurationFile);
-		} else {
-			propertiesConfiguration
-					.load(c.getResource("/" + configurationFile));
-			logger.debug("Loading default configuration " + configurationFile);
-		}
+    File externalConfigurationFile = new File(RodaWebApplication.RODA_CORE_CONFIG_DIRECTORY, configurationFile);
 
-		return propertiesConfiguration;
-	}
+    if (externalConfigurationFile.isFile()) {
+      propertiesConfiguration.load(externalConfigurationFile);
+      logger.debug("Loading configuration " + externalConfigurationFile);
+    } else {
+      propertiesConfiguration.load(c.getResource("/" + configurationFile));
+      logger.debug("Loading default configuration " + configurationFile);
+    }
+
+    return propertiesConfiguration;
+  }
 
 }

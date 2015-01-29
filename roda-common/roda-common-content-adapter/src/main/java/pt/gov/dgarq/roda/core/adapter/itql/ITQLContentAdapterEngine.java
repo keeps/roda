@@ -15,6 +15,7 @@ import pt.gov.dgarq.roda.core.adapter.ContentAdapterEngine;
 import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.OneOfManyFilterParameter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.ClassificationSchemeFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.ProducerFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.RangeFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.RegexFilterParameter;
@@ -80,6 +81,10 @@ public class ITQLContentAdapterEngine<EA extends ITQLEntityAdapter<E>, E>
 			itqlParameterAdapter = new ITQLProducerFilterParameter<EA, E>(
 					getEntityAdapter(),
 					(ProducerFilterParameter) filterParameter);
+		} else if (filterParameter instanceof ClassificationSchemeFilterParameter) {
+			itqlParameterAdapter = new ITQLClassificationSchemeFilterParameter<EA, E>(
+					getEntityAdapter(),
+					(ClassificationSchemeFilterParameter) filterParameter);
 		} else {
 		}
 

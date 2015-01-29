@@ -5,6 +5,7 @@ import java.net.URL;
 import pt.gov.dgarq.roda.core.RODAClient;
 import pt.gov.dgarq.roda.core.data.User;
 import pt.gov.dgarq.roda.core.stubs.UserEditor;
+import pt.gov.dgarq.roda.servlet.cas.CASUtility;
 
 /**
  * @author Rui Castro
@@ -21,11 +22,14 @@ public class UserEditorTest {
 		String hostUrl = args[0];
 		String username = args[1];
 		String password = args[2];
-
+		String casURL = args[3];
+		String coreURL = args[4];
+		String serviceURL = args[5];
 		try {
+			CASUtility casUtility = new CASUtility(new URL(casURL), new URL(coreURL), new URL(serviceURL));
 
 			RODAClient rodaClient = new RODAClient(new URL(hostUrl), username,
-					password);
+					password,casUtility);
 
 			UserEditor userEditor = rodaClient.getUserEditorService();
 

@@ -9,6 +9,7 @@ import pt.gov.dgarq.roda.core.data.SimpleRepresentationObject;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
 import pt.gov.dgarq.roda.core.stubs.Browser;
+import pt.gov.dgarq.roda.servlet.cas.CASUtility;
 
 /**
  * Test class for Browser service.
@@ -26,20 +27,24 @@ public class BrowserSimpleROTest {
 
 			RODAClient rodaClient = null;
 
-			if (args.length == 3) {
+			if (args.length == 6) {
 
 				// http://localhost:8180/
 				String hostUrl = args[0];
 				String username = args[1];
 				String password = args[2];
+				String casURL = args[3];
+				String coreURL = args[4];
+				String serviceURL = args[5];
+				CASUtility casUtility = new CASUtility(new URL(casURL), new URL(coreURL), new URL(serviceURL));
 				rodaClient = new RODAClient(new URL(hostUrl), username,
-						password);
+						password,casUtility);
 
 			} else {
 				System.err
 						.println(BrowserSimpleRepresentationPOTest.class
 								.getSimpleName()
-								+ " protocol://hostname:port/core-service [username password]");
+								+ " protocol://hostname:port/core-service [username password] casURL coreURL serviceURL");
 				System.exit(1);
 			}
 

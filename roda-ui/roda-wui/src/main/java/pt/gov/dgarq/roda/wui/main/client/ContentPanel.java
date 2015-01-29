@@ -23,6 +23,7 @@ import pt.gov.dgarq.roda.wui.management.user.client.ResetPassword;
 import pt.gov.dgarq.roda.wui.management.user.client.VerifyEmail;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -44,6 +45,7 @@ public class ContentPanel extends VerticalPanel {
 
 	private static ClientLogger logger = new ClientLogger(ContentPanel.class.getName());
 
+		
 	/**
 	 * Get the singleton instance
 	 * 
@@ -123,7 +125,9 @@ public class ContentPanel extends VerticalPanel {
 
 					public void onSuccess(Boolean permitted) {
 						if (!permitted.booleanValue()) {
-							LoginDialog.getInstance().show();
+							String windowLocation = Window.Location.getHref();
+							CasForwardDialog cfd = new CasForwardDialog(windowLocation);
+							cfd.show(); 
 						} else {
 							resolver.resolve(Tools.tail(historyTokens),
 									new AsyncCallback<Widget>() {

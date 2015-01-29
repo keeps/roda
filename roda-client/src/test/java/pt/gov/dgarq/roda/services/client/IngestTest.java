@@ -20,21 +20,22 @@ import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevel;
 import pt.gov.dgarq.roda.core.stubs.Browser;
 import pt.gov.dgarq.roda.core.stubs.Editor;
 import pt.gov.dgarq.roda.core.stubs.Ingest;
+import pt.gov.dgarq.roda.servlet.cas.CASUtility;
 
 /**
  * Test class for Ingest service.
- *
+ * 
  * @author Rui Castro
  * @author Vladislav Korecký <vladislav_korecky@gordic.cz>
  */
 public class IngestTest {
 
-    /**
-     * @param args
-     */
-    public static void main(String[] args) {
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
 
-        List<String> createdObjectPIDs = new ArrayList<String>();
+		List<String> createdObjectPIDs = new ArrayList<String>();
 
         try {
 
@@ -44,14 +45,18 @@ public class IngestTest {
             String doParentPID = null;
             File representationRootFile = null;
 
-            if (args.length == 5) {
+            if (args.length == 8) {
 
                 // http://localhost:8180/ user pass
                 String hostUrl = args[0];
                 String username = args[1];
                 String password = args[2];
-                doParentPID = args[3];
-                representationRootFile = new File(args[4]);
+                String casURL = args[3];
+				String coreURL = args[4];
+				String serviceURL = args[5];
+				CASUtility casUtility = new CASUtility(new URL(casURL), new URL(coreURL), new URL(serviceURL));
+                doParentPID = args[6];
+                representationRootFile = new File(args[7]);
 
                 if (!representationRootFile.exists()) {
                     System.err.println("File " + representationRootFile
@@ -60,14 +65,14 @@ public class IngestTest {
                 }
 
                 rodaClient = new RODAClient(new URL(hostUrl), username,
-                        password);
+                        password,casUtility);
                 rodaUploader = new Uploader(new URL(hostUrl), username,
-                        password);
+                        password,casUtility);
 
             } else {
                 System.err
                         .println(IngestTest.class.getSimpleName()
-                        + " protocol://hostname:port/ username password DO_Parent_PID representationRootFile");
+                        + " protocol://hostname:port/ username password casURL coreURL serviceURL DO_Parent_PID representationRootFile");
                 System.exit(1);
             }
 
@@ -76,7 +81,7 @@ public class IngestTest {
             Editor editorService = rodaClient.getEditorService();
 
             try {
-
+/*
                 DescriptionObject dObject = new DescriptionObject();
                 dObject.setLevel(DescriptionLevel.ITEM);
                 dObject.setId("testIngest");
@@ -179,7 +184,7 @@ public class IngestTest {
                         .getRepresentationObject(normROPID);
 
                 System.out.println("Normalized RO " + normalizedRO);
-
+*/
             } catch (Exception e) {
 
                 e.printStackTrace();

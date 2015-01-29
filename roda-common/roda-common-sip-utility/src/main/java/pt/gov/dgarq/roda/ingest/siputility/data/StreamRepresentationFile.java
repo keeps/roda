@@ -21,6 +21,7 @@ public class StreamRepresentationFile extends RepresentationFile {
      * Constructs an empty {@link StreamRepresentationFile}.
      */
     public StreamRepresentationFile() {
+    	super();
     }
 
     /**

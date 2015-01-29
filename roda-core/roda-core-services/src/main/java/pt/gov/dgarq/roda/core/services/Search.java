@@ -4,8 +4,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -24,9 +22,6 @@ import pt.gov.dgarq.roda.core.fedora.gsearch.FedoraGSearchException;
  */
 public class Search extends RODAWebService {
 	static final private Logger logger = Logger.getLogger(Search.class);
-
-	private Map<String, FedoraGSearch> fedoraGSearchCache = new HashMap<String, FedoraGSearch>();
-
 	/**
 	 * Constructs a new instance of Search service.
 	 * 
@@ -141,42 +136,30 @@ public class Search extends RODAWebService {
 	private FedoraGSearch getFedoraGSearch() throws SearchException {
 
 		User clientUser = getClientUser();
-
+		FedoraGSearch fedoraGSearch = null;
 		if (clientUser != null) {
 
-			String usernamePasswordKey = clientUser.getName()
-					+ getClientUserPassword();
+			try {
 
-			if (!this.fedoraGSearchCache.containsKey(usernamePasswordKey)) {
+				String fedoraGSearchURL = getConfiguration().getString(
+						"fedoraGSearchURL");
+				fedoraGSearch = new FedoraGSearch(new URL(fedoraGSearchURL),clientUser);
+			} catch (MalformedURLException e) {
 
-				try {
+				logger
+						.error(
+								"MalformedURLException in FedoraGSearch service URL",
+								e);
 
-					String fedoraGSearchURL = getConfiguration().getString(
-							"fedoraGSearchURL");
-
-					this.fedoraGSearchCache.put(usernamePasswordKey,
-							new FedoraGSearch(new URL(fedoraGSearchURL),
-									clientUser));
-
-				} catch (MalformedURLException e) {
-
-					logger
-							.error(
-									"MalformedURLException in FedoraGSearch service URL",
-									e);
-
-					throw new SearchException(
-							"Malformed URL Exception in FedoraGSearch service URL - "
-									+ e.getMessage(), e);
-				} catch (FedoraGSearchException e) {
-					throw new SearchException(
-							"Error creating FedoraGSearch service client - "
-									+ e.getMessage(), e);
-				}
-
+				throw new SearchException(
+						"Malformed URL Exception in FedoraGSearch service URL - "
+								+ e.getMessage(), e);
+			} catch (FedoraGSearchException e) {
+				throw new SearchException(
+						"Error creating FedoraGSearch service client - "
+								+ e.getMessage(), e);
 			}
-
-			return this.fedoraGSearchCache.get(usernamePasswordKey);
+			return fedoraGSearch;
 
 		} else {
 

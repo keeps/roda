@@ -11,6 +11,7 @@ import com.google.gwt.user.client.ui.ImageBundle;
  * 
  * Image icons for each level of the Description Object
  */
+@Deprecated
 public interface ElementIconBundle extends ImageBundle {
 
 	@Resource("fonds.png")

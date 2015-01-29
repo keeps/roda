@@ -1,5 +1,6 @@
 package pt.gov.dgarq.roda.util;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,6 +9,24 @@ import java.io.InputStream;
  * @author Rui Castro
  */
 public class StreamUtility {
+
+	/**
+	 * Class that ensure that the underlying input stream is always available
+	 * (it will not be closed after the first use)
+	 */
+	public static class UnclosableBufferedInputStream extends
+			BufferedInputStream {
+
+		public UnclosableBufferedInputStream(InputStream in) {
+			super(in);
+			super.mark(Integer.MAX_VALUE);
+		}
+
+		@Override
+		public void close() throws IOException {
+			super.reset();
+		}
+	}
 
 	/**
 	 * Reads bytes from a {@link InputStream}.

@@ -20,7 +20,7 @@ import javax.swing.event.ChangeListener;
 import org.apache.log4j.Logger;
 
 import pt.gov.dgarq.roda.core.data.RepresentationObject;
-import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevel;
+import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevelManager;
 import pt.gov.dgarq.roda.ingest.siputility.builders.RepresentationBuilder;
 import pt.gov.dgarq.roda.ingest.siputility.data.DataChangeListener;
 import pt.gov.dgarq.roda.ingest.siputility.data.DataChangedEvent;
@@ -382,8 +382,11 @@ public class SIPDOPanel extends JPanel implements
 		getSaveSIPAction().setEnabled(true);
 
 		// Documents
-		actionCreateDO.setEnabled(sipdo.getLevel()
-				.equals(DescriptionLevel.FILE)
+		actionCreateDO.setEnabled(DescriptionLevelManager
+				.getRepresentationsDescriptionLevels().contains(
+						sipdo.getLevel())
+				&& !DescriptionLevelManager.getLeafDescriptionLevels().contains(
+						sipdo.getLevel())
 				&& sipdo.getRepresentations().size() == 0);
 
 		actionRemoveDO.setEnabled(!sip.getDescriptionObject().equals(sipdo));

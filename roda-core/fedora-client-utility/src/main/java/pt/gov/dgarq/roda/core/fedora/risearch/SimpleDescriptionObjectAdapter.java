@@ -15,6 +15,7 @@ import pt.gov.dgarq.roda.core.adapter.itql.ITQLEntityAdapter;
 import pt.gov.dgarq.roda.core.data.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.core.data.User;
 import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevel;
+import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevelManager;
 
 /**
  * @author Rui Castro
@@ -28,11 +29,11 @@ public class SimpleDescriptionObjectAdapter extends
 	private static final String[] attributeNames = new String[] { "id",
 			"level", "countrycode", "repositorycode", "title", "dateinitial",
 			"datefinal", "parentpid", "subelementscount", "produceruser",
-			"producergroup" };
+			"producergroup", "classificationscheme" };
 
 	private static final String[] itqlSubjects = new String[] { "$id",
 			"$level", "$countryCode", "$repositoryCode", "$title",
-			"$dateInitial", "$dateFinal", "$parentPID", "$k0", null, null };
+			"$dateInitial", "$dateFinal", "$parentPID", "$k0", null, null, null };
 
 	private static final String[] itqlPredicates = new String[] {
 			FedoraRISearch.ITQL_PREDICATE_RODA_DESCRIPTION_ID,
@@ -44,7 +45,7 @@ public class SimpleDescriptionObjectAdapter extends
 			FedoraRISearch.ITQL_PREDICATE_RODA_DESCRIPTION_DATEFINAL,
 			FedoraRISearch.ITQL_PREDICATE_RODA_CHILD_OF, null,
 			FedoraRISearch.ITQL_PREDICATE_RODA_PRODUCER_USER,
-			FedoraRISearch.ITQL_PREDICATE_RODA_PRODUCER_GROUP, };
+			FedoraRISearch.ITQL_PREDICATE_RODA_PRODUCER_GROUP, null };
 
 	private RODAObjectAdapter rodaObjectAdapter = null;
 
@@ -87,8 +88,8 @@ public class SimpleDescriptionObjectAdapter extends
 	 */
 	@Override
 	public List<String> getAttributeNames() {
-		List<String> list = new ArrayList<String>(rodaObjectAdapter
-				.getAttributeNames());
+		List<String> list = new ArrayList<String>(
+				rodaObjectAdapter.getAttributeNames());
 		list.addAll(Arrays.asList(attributeNames));
 		return list;
 	}
@@ -100,8 +101,8 @@ public class SimpleDescriptionObjectAdapter extends
 	 */
 	@Override
 	public List<String> getITQLSubjects() {
-		List<String> list = new ArrayList<String>(rodaObjectAdapter
-				.getITQLSubjects());
+		List<String> list = new ArrayList<String>(
+				rodaObjectAdapter.getITQLSubjects());
 		list.addAll(Arrays.asList(itqlSubjects));
 		return list;
 	}
@@ -113,8 +114,8 @@ public class SimpleDescriptionObjectAdapter extends
 	 */
 	@Override
 	public List<String> getITQLPredicates() {
-		List<String> list = new ArrayList<String>(rodaObjectAdapter
-				.getITQLPredicates());
+		List<String> list = new ArrayList<String>(
+				rodaObjectAdapter.getITQLPredicates());
 		list.addAll(Arrays.asList(itqlPredicates));
 		return list;
 	}
@@ -211,25 +212,30 @@ public class SimpleDescriptionObjectAdapter extends
 	public String getITQLProducerCondition(String itqlQuerySubject,
 			String username, List<String> groups) {
 
+		// FIXME this should be coherent with the newly programmable description
+		// levels
 		String itqlObjectFonds = getITQLObjectForAttribute("level",
-				DescriptionLevel.FONDS.getLevel());
+				DescriptionLevelManager.getFirstRootLevel());
 
 		String conditions1 = String.format("%1$s %2$s %3$s and %4$s",
 				itqlQuerySubject,
 				FedoraRISearch.ITQL_PREDICATE_RODA_DESCRIPTION_LEVEL,
-				itqlObjectFonds, getProducerConditions(itqlQuerySubject,
-						username, groups));
+				itqlObjectFonds,
+				getProducerConditions(itqlQuerySubject, username, groups));
 
 		String conditions2 = String
-				.format(
-						"$ascendent %2$s %3$s and (%1$s %4$s $ascendent or trans(%1$s %4$s $ascendent)) and %5$s",
+				.format("$ascendent %2$s %3$s and (%1$s %4$s $ascendent or trans(%1$s %4$s $ascendent)) and %5$s",
 						itqlQuerySubject,
 						FedoraRISearch.ITQL_PREDICATE_RODA_DESCRIPTION_LEVEL,
 						itqlObjectFonds,
 						FedoraRISearch.ITQL_PREDICATE_RODA_CHILD_OF,
 						getProducerConditions("$ascendent", username, groups));
 
-		return String.format("((%s) or (%s))", conditions1, conditions2);
+		String res = String.format("((%s) or (%s))", conditions1, conditions2);
+
+		logger.debug("getITQLProducerCondition " + res);
+
+		return res;
 	}
 
 	/**
@@ -243,11 +249,10 @@ public class SimpleDescriptionObjectAdapter extends
 
 			// the subject is a count subquery
 			return String
-					.format(
-							"count(select $child from <#ri> where $child %1$s %2$s and %3$s)",
+					.format("count(select $child from <#ri> where $child %1$s %2$s and %3$s)",
 							FedoraRISearch.ITQL_PREDICATE_RODA_CHILD_OF,
-							itqlQuerySubject, rodaObjectAdapter
-									.getPermissionConditions("$child"));
+							itqlQuerySubject,
+							rodaObjectAdapter.getPermissionConditions("$child"));
 
 		} else {
 			return super.getITQLSubjectForAttribute(itqlQuerySubject,
@@ -273,9 +278,7 @@ public class SimpleDescriptionObjectAdapter extends
 				rodaObjectAdapter.getEntity(tuple));
 
 		if (tuple.containsKey("level")) {
-			sdo
-					.setLevel(new DescriptionLevel(tuple.get("level")
-							.stringValue()));
+			sdo.setLevel(new DescriptionLevel(tuple.get("level").stringValue()));
 		}
 
 		if (tuple.containsKey("countryCode")) {
@@ -337,6 +340,36 @@ public class SimpleDescriptionObjectAdapter extends
 		}
 
 		return " (" + producerConditions + ") ";
+	}
+
+	@Override
+	public String getITQLClassificationSchemeCondition(
+			String itqlQuerySubject, String classificationSchemeId,
+			String[] possibleParentsPids) {
+		StringBuilder sb = new StringBuilder();
+
+		if (possibleParentsPids.length > 0) {
+			sb.append("(");
+			for (int i = 0; i < possibleParentsPids.length; i++) {
+				if (i != 0) {
+					sb.append(" or ");
+				}
+				sb.append("%1$s <dc:identifier> '")
+						.append(possibleParentsPids[i]).append("'");
+			}
+			sb.append(")");
+			sb.append(" and %1$s %2$s 'class'");
+			sb.append(" and $csascendent %2$s 'classification_scheme'");
+			sb.append(" and $csascendent %3$s '%4$s' ");
+			sb.append(" and (%1$s %5$s $csascendent or trans(%1$s %5$s $csascendent))");
+		}
+		String res = String.format(sb.toString(), itqlQuerySubject,
+				FedoraRISearch.ITQL_PREDICATE_RODA_DESCRIPTION_LEVEL,
+				FedoraRISearch.ITQL_PREDICATE_RODA_DESCRIPTION_ID,
+				classificationSchemeId,
+				FedoraRISearch.ITQL_PREDICATE_RODA_CHILD_OF);
+		logger.debug("getITQLClassificationSchemeCondition " + res);
+		return res;
 	}
 
 }

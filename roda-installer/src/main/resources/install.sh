@@ -16,6 +16,8 @@ EX_FAILED_TO_INSTALL_CORE=5     # Failed to install RODA CORE
 EX_FAILED_TO_INSTALL_MIGRATOR=6 # Failed to install RODA MIGRATOR
 EX_FAILED_TO_INSTALL_UI=7       # Failed to install RODA UI
 EX_FAILED_TO_INSTALL_HANDLE=8   # Failed to install RODA HANDLE
+EX_FAILED_TO_INSTALL_CAS=9      # Failed to install RODA CAS
+EX_FAILED_TO_INSTALL_FITS=10    # Failed to install RODA FITS
 #
 ################################################################################
 
@@ -100,11 +102,11 @@ QUIET=yes
 ################################################################################
 cd $SCRIPT_DIR
 if [ "$SERVLET_CONTAINER" = "tomcat6" ]; then
-	TOMCAT_VERSION="6.0.37"
+	TOMCAT_VERSION="$(wget -q -O - http://www.eu.apache.org/dist/tomcat/tomcat-6/ | egrep "<a href=\"v6" | tail -n1 | sed 's#^.*<a href="v##;s#/.*##')"
 	TOMCAT_DIRNAME="apache-tomcat-$TOMCAT_VERSION"
 	export TOMCAT_DIRNAME
 	TOMCAT_ZIP="$TOMCAT_DIRNAME.zip"
-	TOMCAT_ZIP_MD5="2cdccdb521196932fcf2bc26b60c388b"
+	TOMCAT_ZIP_MD5="25c9223978a12a2b604f24eaccee858c"
 	TOMCAT_ZIP_URL="http://www.eu.apache.org/dist/tomcat/tomcat-${TOMCAT_VERSION%%.*}/v$TOMCAT_VERSION/bin/$TOMCAT_ZIP"
 	info "Installing Tomcat"
 	cp -v -r files/tomcat $RODA_HOME &>> $INSTALL_LOG
@@ -165,10 +167,36 @@ if [ "$INSTALL_HANDLE" = "yes" ]; then
 	info "Installing RODA Handle"
 	cp -v -r files/handle/* $RODA_HOME &>> $INSTALL_LOG
 	testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_HANDLE" \
-		"Error installting RODA HANDLE (errorCode=${EX_FAILED_TO_INSTALL_HANDLE}_1)"
+		"Error installing RODA HANDLE (errorCode=${EX_FAILED_TO_INSTALL_HANDLE}_1)"
 	myEcho
 	myEcho "* RODA Handle setup finished"
 	myEcho
+fi
+
+
+################################################################################
+# Install CAS?
+################################################################################
+cd $SCRIPT_DIR
+if [ "$INSTALL_CAS" = "yes" ] && [ -f files/cas/bin/roda-cas-setup.sh ]; then
+	info "Installing RODA CAS"
+	cp -v -r files/cas/* $RODA_HOME &>> $INSTALL_LOG
+	. $RODA_HOME/bin/roda-cas-setup.sh
+fi
+
+
+
+################################################################################
+# Install FITS?
+################################################################################
+cd $SCRIPT_DIR
+if [ "$INSTALL_FITS" = "yes" ] && [ -f files/fits/bin/fits-setup.sh ]; then
+	FITS_ZIP="fits_v0.8.zip"
+	FITS_ZIP_MD5="ef626c2269b0e229b60b5969d5455529"
+	FITS_ZIP_URL="https://github.com/keeps/fits/releases/download/v0.8/fits_v0.8.zip"
+	info "Installing FITS"
+	cp -v -r files/fits/* $RODA_HOME &>> $INSTALL_LOG
+	. $RODA_HOME/bin/fits-setup.sh
 fi
 
 END_MSG="***************************************************************************\n"

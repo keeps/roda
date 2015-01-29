@@ -16,7 +16,7 @@ import com.google.gwt.user.client.ui.Widget;
 public abstract class AbstractImageCaptcha {
 
 	private static String getImageUrl() {
-		return GWT.getModuleBaseURL() + "/jcaptcha" + "?rand="
+		return GWT.getModuleBaseURL() + "jcaptcha" + "?rand="
 				+ System.currentTimeMillis();
 	}
 

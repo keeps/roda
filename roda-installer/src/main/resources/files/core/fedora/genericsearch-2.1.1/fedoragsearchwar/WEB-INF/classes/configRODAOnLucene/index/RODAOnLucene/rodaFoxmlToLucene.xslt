@@ -7,7 +7,7 @@
 	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
 	xmlns:sparql="http://www.w3.org/2001/sw/DataAccess/rf1/result"
 	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-	xmlns:eadc="http://roda.dgarq.gov.pt/2008/EADCSchema"
+	xmlns:eadc="http://roda.dgarq.gov.pt/2014/EADCSchema"
 	xmlns:roda="http://roda.dgarq.gov.pt/#"
 	xmlns:roda-log="http://roda.dgarq.gov.pt/log#">
 

@@ -19,6 +19,12 @@ ask_rodawui_mysql_port
 ask_rodawui_mysql_user
 ask_rodawui_mysql_user_passwd
 
+
+ask_roda_core_url
+ask_roda_cas_url
+ask_roda_cas_external_url
+
+
 ask_rodacore_host
 ask_rodacore_port
 
@@ -31,6 +37,7 @@ ask_rodamigratorlinux_port
 ask_rodawui_host
 ask_rodawui_public_hostname
 ask_rodawui_public_port
+ask_external_domain
 
 ### FIXME what to do with phpMyAdmin???
 #myEcho
@@ -45,38 +52,38 @@ ask_rodawui_public_port
 myEcho
 myEcho "Making bin scripts executable"
 chmod +x $RODA_HOME/bin/*.sh &>> $INSTALL_LOG
-testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_UI" "Error installting RODA UI (errorCode=${EX_FAILED_TO_INSTALL_UI}_1)"
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_UI" "Error installing RODA UI (errorCode=${EX_FAILED_TO_INSTALL_UI}_1)"
 
 myEcho
 myEcho "Copying config files from templates"
 cp -v -f $RODA_HOME/config/templates/roda-wui.properties $RODA_HOME/config/ &>> $INSTALL_LOG
-testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_UI" "Error installting RODA UI (errorCode=${EX_FAILED_TO_INSTALL_UI}_2)"
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_UI" "Error installing RODA UI (errorCode=${EX_FAILED_TO_INSTALL_UI}_2)"
 cp -v -f $RODA_HOME/config/templates/roda-in-installer.properties $RODA_HOME/config/ &>> $INSTALL_LOG
-testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_UI" "Error installting RODA UI (errorCode=${EX_FAILED_TO_INSTALL_UI}_3)"
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_UI" "Error installing RODA UI (errorCode=${EX_FAILED_TO_INSTALL_UI}_3)"
 cp -v -f $RODA_HOME/config/templates/roda-in.properties $RODA_HOME/config/ &>> $INSTALL_LOG
-testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_UI" "Error installting RODA UI (errorCode=${EX_FAILED_TO_INSTALL_UI}_4)"
-cp -v -f $RODA_HOME/config/templates/ldap-filter.properties $RODA_HOME/config/ &>> $INSTALL_LOG
-testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_UI" "Error installting RODA UI (errorCode=${EX_FAILED_TO_INSTALL_UI}_5)"
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_UI" "Error installing RODA UI (errorCode=${EX_FAILED_TO_INSTALL_UI}_4)"
+cp -v -f $RODA_HOME/config/templates/cas-filter.properties $RODA_HOME/config/ &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_UI" "Error installing RODA UI (errorCode=${EX_FAILED_TO_INSTALL_UI}_5)"
 
 myEcho
 myEcho "Configuring config files"
-ant -f $RODA_HOME/bin/roda-ui-setup.xml ldap-filter.properties &>> $INSTALL_LOG
-testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_UI" "Error installting RODA UI (errorCode=${EX_FAILED_TO_INSTALL_UI}_6)"
+ant -f $RODA_HOME/bin/roda-ui-setup.xml cas-filter.properties &>> $INSTALL_LOG
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_UI" "Error installing RODA UI (errorCode=${EX_FAILED_TO_INSTALL_UI}_6)"
 ant -f $RODA_HOME/bin/roda-ui-setup.xml roda-wui.properties &>> $INSTALL_LOG
-testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_UI" "Error installting RODA UI (errorCode=${EX_FAILED_TO_INSTALL_UI}_7)"
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_UI" "Error installing RODA UI (errorCode=${EX_FAILED_TO_INSTALL_UI}_7)"
 ant -f $RODA_HOME/bin/roda-ui-setup.xml roda-in-installer.properties &>> $INSTALL_LOG
-testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_UI" "Error installting RODA UI (errorCode=${EX_FAILED_TO_INSTALL_UI}_8)"
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_UI" "Error installing RODA UI (errorCode=${EX_FAILED_TO_INSTALL_UI}_8)"
 ant -f $RODA_HOME/bin/roda-ui-setup.xml roda-in.properties &>> $INSTALL_LOG
-testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_UI" "Error installting RODA UI (errorCode=${EX_FAILED_TO_INSTALL_UI}_9)"
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_UI" "Error installing RODA UI (errorCode=${EX_FAILED_TO_INSTALL_UI}_9)"
 
 myEcho
 myEcho "Copying config/mail files from templates"
 cp -v -f $RODA_HOME/config/templates/mail/* $RODA_HOME/config/mail/ &>> $INSTALL_LOG
-testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_UI" "Error installting RODA UI (errorCode=${EX_FAILED_TO_INSTALL_UI}_10)"
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_UI" "Error installing RODA UI (errorCode=${EX_FAILED_TO_INSTALL_UI}_10)"
 myEcho
 myEcho "Configuring config/mail files"
 ant -f $RODA_HOME/bin/roda-ui-setup.xml velocity.mail.properties &>> $INSTALL_LOG
-testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_UI" "Error installting RODA UI (errorCode=${EX_FAILED_TO_INSTALL_UI}_11)"
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_UI" "Error installing RODA UI (errorCode=${EX_FAILED_TO_INSTALL_UI}_11)"
 
 ### FIXME what to do with phpMyAdmin???
 #myEcho
@@ -115,22 +122,22 @@ testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_UI" "Error inst
 myEcho
 myEcho "Creating necessary directories for RODA execution"
 mkdir -p $RODA_HOME/disseminators/cache &>> $INSTALL_LOG
-testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_UI" "Error installting RODA UI (errorCode=${EX_FAILED_TO_INSTALL_UI}_12)"
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_UI" "Error installing RODA UI (errorCode=${EX_FAILED_TO_INSTALL_UI}_12)"
 
 myEcho
 myEcho "Linking WARs into Servlet container deploy directory"
 mv $RODA_HOME/webapps/roda-wui.war $RODA_HOME/webapps/roda-wui.zip &>> $INSTALL_LOG
-testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_UI" "Error installting RODA UI (errorCode=${EX_FAILED_TO_INSTALL_UI}_13)"
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_UI" "Error installing RODA UI (errorCode=${EX_FAILED_TO_INSTALL_UI}_13)"
 unzip -q $RODA_HOME/webapps/roda-wui.zip -d $RODA_HOME/webapps/roda-wui.war &>> $INSTALL_LOG
-testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_UI" "Error installting RODA UI (errorCode=${EX_FAILED_TO_INSTALL_UI}_14)"
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_UI" "Error installing RODA UI (errorCode=${EX_FAILED_TO_INSTALL_UI}_14)"
 if [ "$SERVLET_CONTAINER" = "tomcat6" ]; then
 	ln -s $RODA_HOME/webapps/roda-wui.war $SERVLET_CONTAINER_DEPLOY_DIR/ROOT &>> $INSTALL_LOG
 elif [ "$SERVLET_CONTAINER" = "jboss4" ]; then
 	ln -s $RODA_HOME/webapps/roda-wui.war $SERVLET_CONTAINER_DEPLOY_DIR/ROOT.war &>> $INSTALL_LOG
 fi
-testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_UI" "Error installting RODA UI (errorCode=${EX_FAILED_TO_INSTALL_UI}_15)"
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_UI" "Error installing RODA UI (errorCode=${EX_FAILED_TO_INSTALL_UI}_15)"
 ln -s $RODA_HOME/webapps/roda-in-installer.war $SERVLET_CONTAINER_DEPLOY_DIR &>> $INSTALL_LOG
-testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_UI" "Error installting RODA UI (errorCode=${EX_FAILED_TO_INSTALL_UI}_16)"
+testExecutionAndExitWithMsgOnFailure "$?" "$EX_FAILED_TO_INSTALL_UI" "Error installing RODA UI (errorCode=${EX_FAILED_TO_INSTALL_UI}_16)"
 
 myEcho
 myEcho "* RODA WUI setup finished"

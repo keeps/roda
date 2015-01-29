@@ -10,9 +10,8 @@ import org.w3c.util.DateParser;
 
 import pt.gov.dgarq.roda.core.data.DescriptionObject;
 import pt.gov.dgarq.roda.core.data.SimpleDescriptionObject;
-import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevel;
+import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevelManager;
 import pt.gov.dgarq.roda.core.stubs.Browser;
-import pt.gov.dgarq.roda.plugins.description.DescriptionTraverserAgent;
 
 /**
  * @author Miguel Ferreira
@@ -55,8 +54,7 @@ public class AccessRestrictNotifierAgent implements
 		}
 
 		if (sdo.getSubElementsCount() == 0
-				&& (sdo.getLevel().equals(DescriptionLevel.FILE) || sdo
-						.getLevel().equals(DescriptionLevel.ITEM))) {
+				&& (DescriptionLevelManager.getRepresentationsDescriptionLevels().contains(sdo.getLevel()))) {
 
 			DescriptionObject descriptionObject = browserService
 					.getDescriptionObject(sdo.getPid());

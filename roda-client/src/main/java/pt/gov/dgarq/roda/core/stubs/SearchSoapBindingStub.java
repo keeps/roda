@@ -167,6 +167,34 @@ public class SearchSoapBindingStub extends org.apache.axis.client.Stub implement
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
 
+            qName = new javax.xml.namespace.QName("http://eadc.data.core.roda.dgarq.gov.pt", "Acqinfo");
+            cachedSerQNames.add(qName);
+            cls = pt.gov.dgarq.roda.core.data.eadc.Acqinfo.class;
+            cachedSerClasses.add(cls);
+            cachedSerFactories.add(beansf);
+            cachedDeserFactories.add(beandf);
+
+            qName = new javax.xml.namespace.QName("http://eadc.data.core.roda.dgarq.gov.pt", "Acqinfos");
+            cachedSerQNames.add(qName);
+            cls = pt.gov.dgarq.roda.core.data.eadc.Acqinfos.class;
+            cachedSerClasses.add(cls);
+            cachedSerFactories.add(beansf);
+            cachedDeserFactories.add(beandf);
+
+            qName = new javax.xml.namespace.QName("http://eadc.data.core.roda.dgarq.gov.pt", "Archref");
+            cachedSerQNames.add(qName);
+            cls = pt.gov.dgarq.roda.core.data.eadc.Archref.class;
+            cachedSerClasses.add(cls);
+            cachedSerFactories.add(beansf);
+            cachedDeserFactories.add(beandf);
+
+            qName = new javax.xml.namespace.QName("http://eadc.data.core.roda.dgarq.gov.pt", "Archrefs");
+            cachedSerQNames.add(qName);
+            cls = pt.gov.dgarq.roda.core.data.eadc.Archrefs.class;
+            cachedSerClasses.add(cls);
+            cachedSerFactories.add(beansf);
+            cachedDeserFactories.add(beandf);
+
             qName = new javax.xml.namespace.QName("http://eadc.data.core.roda.dgarq.gov.pt", "ArrangementTable");
             cachedSerQNames.add(qName);
             cls = pt.gov.dgarq.roda.core.data.eadc.ArrangementTable.class;
@@ -216,9 +244,44 @@ public class SearchSoapBindingStub extends org.apache.axis.client.Stub implement
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
 
+            qName = new javax.xml.namespace.QName("http://eadc.data.core.roda.dgarq.gov.pt", "ControlAccess");
+            cachedSerQNames.add(qName);
+            cls = pt.gov.dgarq.roda.core.data.eadc.ControlAccess.class;
+            cachedSerClasses.add(cls);
+            cachedSerFactories.add(beansf);
+            cachedDeserFactories.add(beandf);
+
+            qName = new javax.xml.namespace.QName("http://eadc.data.core.roda.dgarq.gov.pt", "ControlAccesses");
+            cachedSerQNames.add(qName);
+            cls = pt.gov.dgarq.roda.core.data.eadc.ControlAccesses.class;
+            cachedSerClasses.add(cls);
+            cachedSerFactories.add(beansf);
+            cachedDeserFactories.add(beandf);
+
             qName = new javax.xml.namespace.QName("http://eadc.data.core.roda.dgarq.gov.pt", "DescriptionLevel");
             cachedSerQNames.add(qName);
             cls = pt.gov.dgarq.roda.core.data.eadc.DescriptionLevel.class;
+            cachedSerClasses.add(cls);
+            cachedSerFactories.add(beansf);
+            cachedDeserFactories.add(beandf);
+
+            qName = new javax.xml.namespace.QName("http://eadc.data.core.roda.dgarq.gov.pt", "Index");
+            cachedSerQNames.add(qName);
+            cls = pt.gov.dgarq.roda.core.data.eadc.Index.class;
+            cachedSerClasses.add(cls);
+            cachedSerFactories.add(beansf);
+            cachedDeserFactories.add(beandf);
+
+            qName = new javax.xml.namespace.QName("http://eadc.data.core.roda.dgarq.gov.pt", "Indexentry");
+            cachedSerQNames.add(qName);
+            cls = pt.gov.dgarq.roda.core.data.eadc.Indexentry.class;
+            cachedSerClasses.add(cls);
+            cachedSerFactories.add(beansf);
+            cachedDeserFactories.add(beandf);
+
+            qName = new javax.xml.namespace.QName("http://eadc.data.core.roda.dgarq.gov.pt", "ItemList");
+            cachedSerQNames.add(qName);
+            cls = pt.gov.dgarq.roda.core.data.eadc.ItemList.class;
             cachedSerClasses.add(cls);
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
@@ -230,9 +293,86 @@ public class SearchSoapBindingStub extends org.apache.axis.client.Stub implement
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
 
+            qName = new javax.xml.namespace.QName("http://eadc.data.core.roda.dgarq.gov.pt", "Materialspec");
+            cachedSerQNames.add(qName);
+            cls = pt.gov.dgarq.roda.core.data.eadc.Materialspec.class;
+            cachedSerClasses.add(cls);
+            cachedSerFactories.add(beansf);
+            cachedDeserFactories.add(beandf);
+
+            qName = new javax.xml.namespace.QName("http://eadc.data.core.roda.dgarq.gov.pt", "Materialspecs");
+            cachedSerQNames.add(qName);
+            cls = pt.gov.dgarq.roda.core.data.eadc.Materialspecs.class;
+            cachedSerClasses.add(cls);
+            cachedSerFactories.add(beansf);
+            cachedDeserFactories.add(beandf);
+
+            qName = new javax.xml.namespace.QName("http://eadc.data.core.roda.dgarq.gov.pt", "Note");
+            cachedSerQNames.add(qName);
+            cls = pt.gov.dgarq.roda.core.data.eadc.Note.class;
+            cachedSerClasses.add(cls);
+            cachedSerFactories.add(beansf);
+            cachedDeserFactories.add(beandf);
+
+            qName = new javax.xml.namespace.QName("http://eadc.data.core.roda.dgarq.gov.pt", "Notes");
+            cachedSerQNames.add(qName);
+            cls = pt.gov.dgarq.roda.core.data.eadc.Notes.class;
+            cachedSerClasses.add(cls);
+            cachedSerFactories.add(beansf);
+            cachedDeserFactories.add(beandf);
+
+            qName = new javax.xml.namespace.QName("http://eadc.data.core.roda.dgarq.gov.pt", "P");
+            cachedSerQNames.add(qName);
+            cls = pt.gov.dgarq.roda.core.data.eadc.P.class;
+            cachedSerClasses.add(cls);
+            cachedSerFactories.add(beansf);
+            cachedDeserFactories.add(beandf);
+
             qName = new javax.xml.namespace.QName("http://eadc.data.core.roda.dgarq.gov.pt", "PhysdescElement");
             cachedSerQNames.add(qName);
             cls = pt.gov.dgarq.roda.core.data.eadc.PhysdescElement.class;
+            cachedSerClasses.add(cls);
+            cachedSerFactories.add(beansf);
+            cachedDeserFactories.add(beandf);
+
+            qName = new javax.xml.namespace.QName("http://eadc.data.core.roda.dgarq.gov.pt", "PhysdescGenreform");
+            cachedSerQNames.add(qName);
+            cls = pt.gov.dgarq.roda.core.data.eadc.PhysdescGenreform.class;
+            cachedSerClasses.add(cls);
+            cachedSerFactories.add(beansf);
+            cachedDeserFactories.add(beandf);
+
+            qName = new javax.xml.namespace.QName("http://eadc.data.core.roda.dgarq.gov.pt", "ProcessInfo");
+            cachedSerQNames.add(qName);
+            cls = pt.gov.dgarq.roda.core.data.eadc.ProcessInfo.class;
+            cachedSerClasses.add(cls);
+            cachedSerFactories.add(beansf);
+            cachedDeserFactories.add(beandf);
+
+            qName = new javax.xml.namespace.QName("http://eadc.data.core.roda.dgarq.gov.pt", "Relatedmaterial");
+            cachedSerQNames.add(qName);
+            cls = pt.gov.dgarq.roda.core.data.eadc.Relatedmaterial.class;
+            cachedSerClasses.add(cls);
+            cachedSerFactories.add(beansf);
+            cachedDeserFactories.add(beandf);
+
+            qName = new javax.xml.namespace.QName("http://eadc.data.core.roda.dgarq.gov.pt", "Relatedmaterials");
+            cachedSerQNames.add(qName);
+            cls = pt.gov.dgarq.roda.core.data.eadc.Relatedmaterials.class;
+            cachedSerClasses.add(cls);
+            cachedSerFactories.add(beansf);
+            cachedDeserFactories.add(beandf);
+
+            qName = new javax.xml.namespace.QName("http://eadc.data.core.roda.dgarq.gov.pt", "Unitid");
+            cachedSerQNames.add(qName);
+            cls = pt.gov.dgarq.roda.core.data.eadc.Unitid.class;
+            cachedSerClasses.add(cls);
+            cachedSerFactories.add(beansf);
+            cachedDeserFactories.add(beandf);
+
+            qName = new javax.xml.namespace.QName("http://filter.adapter.data.core.roda.dgarq.gov.pt", "ClassificationSchemeFilterParameter");
+            cachedSerQNames.add(qName);
+            cls = pt.gov.dgarq.roda.core.data.adapter.filter.ClassificationSchemeFilterParameter.class;
             cachedSerClasses.add(cls);
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
@@ -295,6 +435,24 @@ public class SearchSoapBindingStub extends org.apache.axis.client.Stub implement
             cachedSerFactories.add(new org.apache.axis.encoding.ser.ArraySerializerFactory(qName, qName2));
             cachedDeserFactories.add(new org.apache.axis.encoding.ser.ArrayDeserializerFactory());
 
+            qName = new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "ArrayOf_tns2_Acqinfo");
+            cachedSerQNames.add(qName);
+            cls = pt.gov.dgarq.roda.core.data.eadc.Acqinfo[].class;
+            cachedSerClasses.add(cls);
+            qName = new javax.xml.namespace.QName("http://eadc.data.core.roda.dgarq.gov.pt", "Acqinfo");
+            qName2 = new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "item");
+            cachedSerFactories.add(new org.apache.axis.encoding.ser.ArraySerializerFactory(qName, qName2));
+            cachedDeserFactories.add(new org.apache.axis.encoding.ser.ArrayDeserializerFactory());
+
+            qName = new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "ArrayOf_tns2_Archref");
+            cachedSerQNames.add(qName);
+            cls = pt.gov.dgarq.roda.core.data.eadc.Archref[].class;
+            cachedSerClasses.add(cls);
+            qName = new javax.xml.namespace.QName("http://eadc.data.core.roda.dgarq.gov.pt", "Archref");
+            qName2 = new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "item");
+            cachedSerFactories.add(new org.apache.axis.encoding.ser.ArraySerializerFactory(qName, qName2));
+            cachedDeserFactories.add(new org.apache.axis.encoding.ser.ArrayDeserializerFactory());
+
             qName = new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "ArrayOf_tns2_ArrangementTableGroup");
             cachedSerQNames.add(qName);
             cls = pt.gov.dgarq.roda.core.data.eadc.ArrangementTableGroup[].class;
@@ -318,6 +476,69 @@ public class SearchSoapBindingStub extends org.apache.axis.client.Stub implement
             cls = pt.gov.dgarq.roda.core.data.eadc.BioghistChronitem[].class;
             cachedSerClasses.add(cls);
             qName = new javax.xml.namespace.QName("http://eadc.data.core.roda.dgarq.gov.pt", "BioghistChronitem");
+            qName2 = new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "item");
+            cachedSerFactories.add(new org.apache.axis.encoding.ser.ArraySerializerFactory(qName, qName2));
+            cachedDeserFactories.add(new org.apache.axis.encoding.ser.ArrayDeserializerFactory());
+
+            qName = new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "ArrayOf_tns2_ControlAccess");
+            cachedSerQNames.add(qName);
+            cls = pt.gov.dgarq.roda.core.data.eadc.ControlAccess[].class;
+            cachedSerClasses.add(cls);
+            qName = new javax.xml.namespace.QName("http://eadc.data.core.roda.dgarq.gov.pt", "ControlAccess");
+            qName2 = new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "item");
+            cachedSerFactories.add(new org.apache.axis.encoding.ser.ArraySerializerFactory(qName, qName2));
+            cachedDeserFactories.add(new org.apache.axis.encoding.ser.ArrayDeserializerFactory());
+
+            qName = new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "ArrayOf_tns2_Indexentry");
+            cachedSerQNames.add(qName);
+            cls = pt.gov.dgarq.roda.core.data.eadc.Indexentry[].class;
+            cachedSerClasses.add(cls);
+            qName = new javax.xml.namespace.QName("http://eadc.data.core.roda.dgarq.gov.pt", "Indexentry");
+            qName2 = new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "item");
+            cachedSerFactories.add(new org.apache.axis.encoding.ser.ArraySerializerFactory(qName, qName2));
+            cachedDeserFactories.add(new org.apache.axis.encoding.ser.ArrayDeserializerFactory());
+
+            qName = new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "ArrayOf_tns2_Materialspec");
+            cachedSerQNames.add(qName);
+            cls = pt.gov.dgarq.roda.core.data.eadc.Materialspec[].class;
+            cachedSerClasses.add(cls);
+            qName = new javax.xml.namespace.QName("http://eadc.data.core.roda.dgarq.gov.pt", "Materialspec");
+            qName2 = new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "item");
+            cachedSerFactories.add(new org.apache.axis.encoding.ser.ArraySerializerFactory(qName, qName2));
+            cachedDeserFactories.add(new org.apache.axis.encoding.ser.ArrayDeserializerFactory());
+
+            qName = new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "ArrayOf_tns2_Note");
+            cachedSerQNames.add(qName);
+            cls = pt.gov.dgarq.roda.core.data.eadc.Note[].class;
+            cachedSerClasses.add(cls);
+            qName = new javax.xml.namespace.QName("http://eadc.data.core.roda.dgarq.gov.pt", "Note");
+            qName2 = new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "item");
+            cachedSerFactories.add(new org.apache.axis.encoding.ser.ArraySerializerFactory(qName, qName2));
+            cachedDeserFactories.add(new org.apache.axis.encoding.ser.ArrayDeserializerFactory());
+
+            qName = new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "ArrayOf_tns2_P");
+            cachedSerQNames.add(qName);
+            cls = pt.gov.dgarq.roda.core.data.eadc.P[].class;
+            cachedSerClasses.add(cls);
+            qName = new javax.xml.namespace.QName("http://eadc.data.core.roda.dgarq.gov.pt", "P");
+            qName2 = new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "item");
+            cachedSerFactories.add(new org.apache.axis.encoding.ser.ArraySerializerFactory(qName, qName2));
+            cachedDeserFactories.add(new org.apache.axis.encoding.ser.ArrayDeserializerFactory());
+
+            qName = new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "ArrayOf_tns2_Relatedmaterial");
+            cachedSerQNames.add(qName);
+            cls = pt.gov.dgarq.roda.core.data.eadc.Relatedmaterial[].class;
+            cachedSerClasses.add(cls);
+            qName = new javax.xml.namespace.QName("http://eadc.data.core.roda.dgarq.gov.pt", "Relatedmaterial");
+            qName2 = new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "item");
+            cachedSerFactories.add(new org.apache.axis.encoding.ser.ArraySerializerFactory(qName, qName2));
+            cachedDeserFactories.add(new org.apache.axis.encoding.ser.ArrayDeserializerFactory());
+
+            qName = new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "ArrayOf_tns2_Unitid");
+            cachedSerQNames.add(qName);
+            cls = pt.gov.dgarq.roda.core.data.eadc.Unitid[].class;
+            cachedSerClasses.add(cls);
+            qName = new javax.xml.namespace.QName("http://eadc.data.core.roda.dgarq.gov.pt", "Unitid");
             qName2 = new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "item");
             cachedSerFactories.add(new org.apache.axis.encoding.ser.ArraySerializerFactory(qName, qName2));
             cachedDeserFactories.add(new org.apache.axis.encoding.ser.ArrayDeserializerFactory());

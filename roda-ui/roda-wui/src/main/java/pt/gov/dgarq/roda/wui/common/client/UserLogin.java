@@ -15,11 +15,19 @@ import pt.gov.dgarq.roda.core.data.RODAMember;
 import pt.gov.dgarq.roda.core.data.User;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.RequestException;
+import com.google.gwt.http.client.RequestTimeoutException;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
+import config.i18n.client.CommonConstants;
 import config.i18n.client.CommonMessages;
 
 /**
@@ -30,8 +38,11 @@ import config.i18n.client.CommonMessages;
  */
 public class UserLogin {
 
-	private static final ClientLogger logger = new ClientLogger(UserLogin.class
-			.getName());
+	private static final ClientLogger logger = new ClientLogger(
+			UserLogin.class.getName());
+
+	private static final CommonConstants constants = (CommonConstants) GWT
+			.create(CommonConstants.class);
 
 	private static final CommonMessages messages = (CommonMessages) GWT
 			.create(CommonMessages.class);
@@ -98,6 +109,10 @@ public class UserLogin {
 
 	private AuthenticatedUser user = null;
 
+	public void setUser(AuthenticatedUser user) {
+		this.user = user;
+	}
+
 	private UserLogin() {
 		listeners = new Vector<LoginStatusListener>();
 	}
@@ -132,16 +147,9 @@ public class UserLogin {
 		}
 	}
 
-	/**
-	 * Login into RODA Core
-	 * 
-	 * @param username
-	 * @param password
-	 * @param callback
-	 */
-	public void login(String username, String password,
+	public void loginCAS(String location, String serviceTicket,
 			final AsyncCallback<AuthenticatedUser> callback) {
-		userLoginService.login(username, password,
+		userLoginService.loginCAS(location, serviceTicket,
 				new AsyncCallback<AuthenticatedUser>() {
 
 					public void onFailure(Throwable caught) {
@@ -165,6 +173,35 @@ public class UserLogin {
 					}
 
 				});
+
+	}
+
+	/**
+	 * Login into RODA Core
+	 * 
+	 * @param username
+	 * @param password
+	 * @param callback
+	 */
+	public void login() {
+		userLoginService.getRodaCasURL(new AsyncCallback<String>() {
+
+			@Override
+			public void onSuccess(String result) {
+
+				final String casURL = result;
+				StringBuilder forwardURL = new StringBuilder();
+				forwardURL.append(casURL).append("/login?locale=")
+						.append(constants.locale()).append("&service=")
+						.append(Window.Location.getHref());
+				Window.open(forwardURL.toString(), "_self", "");
+			}
+
+			@Override
+			public void onFailure(Throwable caught) {
+				logger.fatal("Error with CAS URL", caught);
+			}
+		});
 	}
 
 	/**
@@ -178,6 +215,7 @@ public class UserLogin {
 				userLoginService.logout(new AsyncCallback<AuthenticatedUser>() {
 
 					public void onFailure(Throwable caught) {
+					    logger.error(caught.getMessage(),caught);
 						if (caught instanceof LoginException) {
 							Window.alert(messages.loginFailed(caught
 									.getMessage()));
@@ -192,10 +230,57 @@ public class UserLogin {
 						callback.onFailure(caught);
 					}
 
-					public void onSuccess(AuthenticatedUser user) {
-						callback.onSuccess(user);
-						UserLogin.this.user = user;
-						onLoginStatusChanged(user);
+					public void onSuccess(final AuthenticatedUser user) {
+						userLoginService
+								.getRodaCasURL(new AsyncCallback<String>() {
+
+									@Override
+									public void onSuccess(String result) {
+										String logoutURL = result + "/logout";
+										GWT.log("CAS logout: "+logoutURL);
+										RequestBuilder builder = new RequestBuilder(
+												RequestBuilder.GET, logoutURL);
+
+										try {
+											builder.sendRequest(null,
+													new RequestCallback() {
+														public void onError(
+																Request request,
+																Throwable exception) {
+															if (exception instanceof RequestTimeoutException) {
+																Window.alert("The request has timed out");
+															} else {
+																Window.alert(exception
+																		.getMessage());
+															}
+														}
+
+														public void onResponseReceived(
+																Request request,
+																Response response) {
+														  logger.error("REMOVING COOKIES...");
+															Cookies.removeCookie("CASTGC", "/cas/");
+															
+															UserLogin.this.user = user;
+															callback.onSuccess(user);
+															onLoginStatusChanged(user);
+														}
+
+													});
+										} catch (RequestException e) {
+											Window.alert(e.getMessage());
+											logger.error(e.getMessage(),e);
+										}
+									}
+
+									@Override
+									public void onFailure(Throwable caught) {
+										Window.alert(caught.getMessage());
+										logger.error(caught.getMessage(),caught);
+										logger.fatal("Error with CAS URL",
+												caught);
+									}
+								});
 					}
 
 				});
@@ -222,7 +307,7 @@ public class UserLogin {
 		listeners.remove(listener);
 	}
 
-	private void onLoginStatusChanged(AuthenticatedUser newUser) {
+	public void onLoginStatusChanged(AuthenticatedUser newUser) {
 		for (LoginStatusListener listener : listeners) {
 			listener.onLoginStatusChanged(newUser);
 		}
@@ -267,9 +352,7 @@ public class UserLogin {
 		getAuthenticatedUser(new AsyncCallback<AuthenticatedUser>() {
 
 			public void onFailure(Throwable caught) {
-				logger
-						.error("Error getting current authenticated user",
-								caught);
+				logger.error("Error getting current authenticated user", caught);
 			}
 
 			public void onSuccess(AuthenticatedUser user) {

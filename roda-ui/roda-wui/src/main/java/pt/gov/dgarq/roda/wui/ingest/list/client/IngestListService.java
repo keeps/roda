@@ -24,7 +24,7 @@ public interface IngestListService extends RemoteService {
 	/**
 	 * Ingest list service URI
 	 */
-	public static final String SERVICE_URI = "/ingestlist";
+	public static final String SERVICE_URI = "ingestlist";
 
 	/**
 	 * Utilities

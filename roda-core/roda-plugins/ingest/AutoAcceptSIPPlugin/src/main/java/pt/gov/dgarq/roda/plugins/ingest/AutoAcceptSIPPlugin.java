@@ -36,6 +36,7 @@ import pt.gov.dgarq.roda.core.plugins.Plugin;
 import pt.gov.dgarq.roda.core.plugins.PluginException;
 import pt.gov.dgarq.roda.core.stubs.AcceptSIP;
 import pt.gov.dgarq.roda.core.stubs.IngestMonitor;
+import pt.gov.dgarq.roda.servlet.cas.CASUtility;
 
 /**
  * @author Rui Castro
@@ -116,7 +117,7 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin {
 		return Arrays.asList(AbstractPlugin.PARAMETER_RODA_CORE_URL(),
 				AbstractPlugin.PARAMETER_RODA_CORE_USERNAME(), AbstractPlugin
 						.PARAMETER_RODA_CORE_PASSWORD(),
-				PARAMETER_PRODUCER_USERNAME());
+				PARAMETER_PRODUCER_USERNAME(),AbstractPlugin.PARAMETER_RODA_CAS_URL());
 	}
 
 	/**
@@ -174,7 +175,7 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin {
 				report.addItem(reportItem);
 			}
 
-			report.addAttribute(new Attribute("finnish time", DateParser
+			report.addAttribute(new Attribute("finish time", DateParser
 					.getIsoDate(Calendar.getInstance().getTime())));
 
 			return report;
@@ -237,11 +238,14 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin {
 				AbstractPlugin.PARAMETER_RODA_CORE_USERNAME().getName());
 		String rodaClientPassword = getParameterValues().get(
 				AbstractPlugin.PARAMETER_RODA_CORE_PASSWORD().getName());
-
+		
+		
+		String casURL = getParameterValues().get(AbstractPlugin.PARAMETER_RODA_CAS_URL().getName());
+		String coreURL = getParameterValues().get(AbstractPlugin.PARAMETER_RODA_CORE_URL().getName());
 		try {
-
+			CASUtility casUtility = new CASUtility(new URL(casURL), new URL(coreURL));
 			this.rodaClient = new RODAClient(new URL(rodaClientServiceUrl),
-					rodaClientUsername, rodaClientPassword);
+					rodaClientUsername, rodaClientPassword,casUtility);
 			this.ingestMonitorService = this.rodaClient
 					.getIngestMonitorService();
 			this.acceptSIPService = this.rodaClient.getAcceptSIPService();

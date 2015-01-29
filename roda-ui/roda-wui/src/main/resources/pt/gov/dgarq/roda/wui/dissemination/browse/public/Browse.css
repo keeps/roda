@@ -6,18 +6,21 @@
 
 .wui-browse .browse-header {
 	width: 100%;
+	margin-bottom: 2px;
 }
 
 .wui-browse .browse-total {
 	font-size: 11px;
 	color: #58595b;
 	white-space: nowrap;
+	margin-top: 2px;
 }
 
 .wui-browse .browse-createFonds {
 	margin-left: 5px;
 	cursor: pointer;
 	cursor: hand;
+	width: 80px;
 }
 
 .wui-browse .browse-refresh {

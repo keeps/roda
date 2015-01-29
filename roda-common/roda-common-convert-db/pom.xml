@@ -9,32 +9,6 @@
         <artifactId>roda-common</artifactId>
         <version>1.2.0</version>
     </parent>
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>pt.gov.dgarq.roda.common.convert.db.Main</mainClass>
-                        </manifest>
-                    </archive>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
     <dependencies>
         <dependency>
             <groupId>commons-transaction</groupId>
@@ -76,7 +50,7 @@
         </dependency>
         <dependency>
             <groupId>pt.gov.dgarq.roda</groupId>
-            <artifactId>mets-1.7</artifactId>
+            <artifactId>mets-1.9.1</artifactId>
             <scope>runtime</scope>
         </dependency>
     </dependencies>

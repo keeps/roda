@@ -1,10 +1,11 @@
 package pt.gov.dgarq.roda.core.services;
 
 import java.net.MalformedURLException;
+import java.rmi.RemoteException;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import javax.resource.NotSupportedException;
 
 import org.apache.log4j.Logger;
 
@@ -18,10 +19,11 @@ import pt.gov.dgarq.roda.core.data.DescriptionObject;
 import pt.gov.dgarq.roda.core.data.Producers;
 import pt.gov.dgarq.roda.core.data.RODAObject;
 import pt.gov.dgarq.roda.core.data.RODAObjectPermissions;
-import pt.gov.dgarq.roda.core.data.User;
 import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevel;
 import pt.gov.dgarq.roda.core.fedora.FedoraClientException;
 import pt.gov.dgarq.roda.core.fedora.FedoraClientUtility;
+import pt.gov.dgarq.roda.core.metadata.eadc.EadCMetadataException;
+import pt.gov.dgarq.roda.servlet.cas.CASUserPrincipal;
 
 /**
  * This class implements the Editor service.
@@ -31,8 +33,6 @@ import pt.gov.dgarq.roda.core.fedora.FedoraClientUtility;
 public class Editor extends RODAWebService {
 
 	static final private Logger logger = Logger.getLogger(Editor.class);
-
-	private Map<String, EditorHelper> editorHelperCache = new HashMap<String, EditorHelper>();
 
 	/**
 	 * Constructs a new instance of the {@link Editor} service.
@@ -274,16 +274,22 @@ public class Editor extends RODAWebService {
 		}
 	}
 
+	
+	public void modifyOtherMetadata(String doPID, String fileID, String otherMetadata) throws NoSuchRODAObjectException, NotSupportedException, EditorException, BrowserException, InvalidDescriptionObjectException, RemoteException, EadCMetadataException {
+		logger.info("modifyOtherMetadata("+doPID+","+fileID+",...)");
+		DescriptionObject originalDO = getEditorHelper().getBrowserHelper().getDescriptionObject(doPID);	//get the original DO
+		
+		// INFO implement here modification logic, if any
+		logger.error("No modify other metadata logic is defined!");
+	}
+	
+
 	private EditorHelper getEditorHelper() throws EditorException {
 
-		User clientUser = getClientUser();
-
+		CASUserPrincipal clientUser = getClientUser();
+		FedoraClientUtility fedoraClientUtility = null;
+		EditorHelper editorHelper = null;
 		if (clientUser != null) {
-
-			String usernamePasswordKey = clientUser.getName()
-					+ getClientUserPassword();
-
-			if (!this.editorHelperCache.containsKey(usernamePasswordKey)) {
 
 				try {
 
@@ -292,14 +298,8 @@ public class Editor extends RODAWebService {
 					String fedoraGSearchURL = getConfiguration().getString(
 							"fedoraGSearchURL");
 
-					FedoraClientUtility fedoraClientUtility = new FedoraClientUtility(
-							fedoraURL, fedoraGSearchURL, clientUser,
-							getClientUserPassword());
-
-					this.editorHelperCache.put(usernamePasswordKey,
-							new EditorHelper(fedoraClientUtility,
-									getConfiguration()));
-
+				fedoraClientUtility = new FedoraClientUtility(fedoraURL,fedoraGSearchURL, clientUser, getCasUtility());
+				editorHelper = new EditorHelper(fedoraClientUtility,getConfiguration());
 				} catch (FedoraClientException e) {
 					logger.debug("Error creating Fedora client - "
 							+ e.getMessage(), e);
@@ -312,9 +312,7 @@ public class Editor extends RODAWebService {
 							+ e.getMessage(), e);
 				}
 
-			}
-
-			return this.editorHelperCache.get(usernamePasswordKey);
+			return editorHelper;
 
 		} else {
 

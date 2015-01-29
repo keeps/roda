@@ -11,6 +11,7 @@ import pt.gov.dgarq.roda.core.data.SearchResultObject;
 import pt.gov.dgarq.roda.core.data.search.DateRangeSearchParameter;
 import pt.gov.dgarq.roda.core.data.search.DefaultSearchParameter;
 import pt.gov.dgarq.roda.core.stubs.Search;
+import pt.gov.dgarq.roda.servlet.cas.CASUtility;
 
 /**
  * @author Rui Castro
@@ -26,31 +27,37 @@ public class SearchTest {
 
 			String query = "banco";
 
-			if (args.length == 1) {
+			if (args.length == 4) {
 
 				// http://localhost:8180/
 				String hostUrl = args[0];
+				String casURL = args[1];
+				String coreURL = args[2];
+				String serviceURL = args[3];
+				CASUtility casUtility = new CASUtility(new URL(casURL), new URL(coreURL), new URL(serviceURL));
+				rodaClient = new RODAClient(new URL(hostUrl),casUtility);
 
-				rodaClient = new RODAClient(new URL(hostUrl));
-
-			} else if (args.length >= 3) {
+			} else if (args.length >= 6) {
 
 				// http://localhost:8180/ user pass
 				String hostUrl = args[0];
 				String username = args[1];
 				String password = args[2];
-
+				String casURL = args[3];
+				String coreURL = args[4];
+				String serviceURL = args[5];
+				CASUtility casUtility = new CASUtility(new URL(casURL), new URL(coreURL), new URL(serviceURL));
 				rodaClient = new RODAClient(new URL(hostUrl), username,
-						password);
+						password,casUtility);
 			} else {
 				System.err
 						.println(SearchTest.class.getSimpleName()
-								+ " protocol://hostname:port/service [username password] [query]");
+								+ " protocol://hostname:port/service [username password] casURL coreURL query]");
 				System.exit(1);
 			}
 
-			if (args.length > 3) {
-				query = args[3];
+			if (args.length > 6) {
+				query = args[6];
 			} else {
 				// no query specified
 			}

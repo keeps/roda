@@ -7,6 +7,7 @@
 	<xsl:param name="contentModel"/>
 	<xsl:param name="label"/>
 	<xsl:param name="state"/>
+	<xsl:param name="insertOtherMetadata"/>
 	
 	<xsl:template match="/">
 		<foxml:digitalObject
@@ -48,6 +49,16 @@
 					<foxml:xmlContent>EADC_XML_PLACEHOLDER</foxml:xmlContent>
 				</foxml:datastreamVersion>
 			</foxml:datastream>
+			
+			<xsl:if test="not(string-length($insertOtherMetadata) = 0)"> 
+				<foxml:datastream CONTROL_GROUP="X" ID="OTHER" STATE="A" VERSIONABLE="true">
+					<foxml:datastreamVersion ID="OTHER.0" LABEL="Other metadata"
+						MIMETYPE="text/xml">
+						<foxml:contentDigest DIGEST="none" TYPE="DISABLED"/>
+						<foxml:xmlContent>OTHER_METADATA_XML_PLACEHOLDER</foxml:xmlContent>
+					</foxml:datastreamVersion>
+				</foxml:datastream>
+			</xsl:if>
 
 		</foxml:digitalObject>
 	</xsl:template>

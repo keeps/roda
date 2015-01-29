@@ -252,7 +252,7 @@ public class TaskInstance implements Serializable {
 	}
 
 	/**
-	 * @return the finnishDate
+	 * @return the finishDate
 	 */
 	public Date getFinishDate() {
 		return finishDate;
@@ -260,7 +260,7 @@ public class TaskInstance implements Serializable {
 
 	/**
 	 * @param finishDate
-	 *            the finnishDate to set
+	 *            the finishDate to set
 	 */
 	public void setFinishDate(Date finishDate) {
 		this.finishDate = finishDate;

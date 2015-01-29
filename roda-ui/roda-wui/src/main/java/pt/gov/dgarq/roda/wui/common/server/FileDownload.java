@@ -65,8 +65,11 @@ public class FileDownload extends RemoteServiceServlet {
 				client.getParams().setAuthenticationPreemptive(true);
 				RODAClient rodaClient = RodaClientFactory.getRodaClient(request
 						.getSession());
+				String username = rodaClient.getUsername();
+				String password = rodaClient.getCasUtility().generateProxyTicket(rodaClient.getProxyGrantingTicket());
+
 				Credentials credentials = new UsernamePasswordCredentials(
-						rodaClient.getUsername(), rodaClient.getPassword());
+						username, password);
 				client.getState().setCredentials(
 						new AuthScope(rodaServices.getHost(), rodaServices
 								.getPort(), AuthScope.ANY_REALM), credentials);

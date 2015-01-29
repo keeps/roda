@@ -124,4 +124,12 @@ public class TextEditor implements MetadataElementEditor {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see pt.gov.dgarq.roda.office.management.editor.client.MetadataElementEditor#isValid()
+	 */
+	public boolean isValid() {
+		return true;
+	}
 }

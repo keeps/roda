@@ -33,8 +33,8 @@ public class HTMLWidgetWrapper extends HTML {
 			url = url.substring(0, url.length() - 5);
 		}
 
-		localizedURL = url + "_" + constants.locale() + ".html";
-		genericURL = url + ".html";
+		localizedURL = GWT.getModuleBaseURL() + url + "_" + constants.locale() + ".html";
+		genericURL = GWT.getModuleBaseURL() + url + ".html";
 
 		RequestBuilder request = new RequestBuilder(RequestBuilder.GET,
 				localizedURL);

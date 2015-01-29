@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.xml.transform.TransformerException;
@@ -20,6 +21,7 @@ import javax.xml.transform.TransformerException;
 import noNamespace.PidListDocument;
 
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpStatus;
@@ -33,6 +35,7 @@ import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.PartSource;
 import org.apache.log4j.Logger;
 
+import pt.gov.dgarq.roda.core.common.Pair;
 import pt.gov.dgarq.roda.core.data.DescriptionObject;
 import pt.gov.dgarq.roda.core.data.Producers;
 import pt.gov.dgarq.roda.core.data.RODAObject;
@@ -43,6 +46,8 @@ import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevel;
 import pt.gov.dgarq.roda.core.fedora.gsearch.FedoraGSearch;
 import pt.gov.dgarq.roda.core.fedora.risearch.FedoraRISearch;
 import pt.gov.dgarq.roda.core.fedora.risearch.FedoraRISearchException;
+import pt.gov.dgarq.roda.servlet.cas.CASUserPrincipal;
+import pt.gov.dgarq.roda.servlet.cas.CASUtility;
 import pt.gov.dgarq.roda.util.StreamUtility;
 import pt.gov.dgarq.roda.util.XsltUtility;
 import fedora.client.Downloader;
@@ -79,8 +84,8 @@ public class FedoraClientUtility extends FedoraClient {
 	private URL fedoraURL = null;
 	private URL fedoraUploadURL = null;
 
-	private User user = null;
-	private String password = null;
+	private CASUserPrincipal cup = null;
+	private CASUtility casUtility = null;
 
 	private FedoraAPIA fedoraAPIA = null;
 	private FedoraAPIM fedoraAPIM = null;
@@ -103,35 +108,33 @@ public class FedoraClientUtility extends FedoraClient {
 	 * @throws MalformedURLException
 	 */
 	public FedoraClientUtility(String fedoraURL, String fedoraGSearchURL,
-			User user, String password) throws FedoraClientException,
-			MalformedURLException {
+			CASUserPrincipal cup, CASUtility casUtility)
+			throws FedoraClientException, MalformedURLException {
 
-		super(fedoraURL, user.getName(), password);
-
+		super(fedoraURL, cup.getName(), cup.getProxyGrantingTicket());
 		try {
-
 			this.fedoraURL = new URL(fedoraURL);
-			this.user = user;
-			this.password = password;
-
+			this.cup = cup;
+			this.casUtility = casUtility;
 			this.fedoraAPIA = super.getAPIA();
 			this.fedoraAPIM = super.getAPIM();
 
 			this.fedoraUploadURL = new URL(getUploadURL());
 
-			this.fedoraRISearch = new FedoraRISearch(this, user, password);
+			this.fedoraRISearch = new FedoraRISearch(this, cup);
 			this.fedoraGSearch = new FedoraGSearch(new URL(fedoraGSearchURL),
-					user);
+					cup);
 
 			this.uploader = new Uploader(this.fedoraURL.getProtocol(),
-					this.fedoraURL.getHost(), this.fedoraURL.getPort(), user
-							.getName(), password);
+					this.fedoraURL.getHost(), this.fedoraURL.getPort(),
+					cup.getName(), cup.getProxyGrantingTicket());
 
 			this.downloader = new Downloader(this.fedoraURL.getHost(),
-					this.fedoraURL.getPort(), user.getName(), password);
+					this.fedoraURL.getPort(), cup.getName(),
+					cup.getProxyGrantingTicket());
 
 			logger.trace(String.format("%4$s (%1$s ; %2$s ; %3$s) init OK",
-					fedoraURL, user.getName(), "*******", getClass()
+					fedoraURL, cup.getName(), "*******", getClass()
 							.getSimpleName()));
 
 			if (relsExtDatastreamID == null) {
@@ -163,28 +166,7 @@ public class FedoraClientUtility extends FedoraClient {
 	 */
 	public FedoraRISearch getFedoraRISearchNewInstance()
 			throws FedoraRISearchException {
-		return new FedoraRISearch(this, getUser(), getPassword());
-	}
-
-	/**
-	 * @return the username used in this client.
-	 */
-	public String getUsername() {
-		return getUser().getName();
-	}
-
-	/**
-	 * @return the user used in this client.
-	 */
-	public User getUser() {
-		return this.user;
-	}
-
-	/**
-	 * @return the password used in this client.
-	 */
-	private String getPassword() {
-		return this.password;
+		return new FedoraRISearch(this, cup);
 	}
 
 	/**
@@ -380,6 +362,23 @@ public class FedoraClientUtility extends FedoraClient {
 	public String createDescriptionObject(RODAObject rObject, String rdf,
 			String policy, String eadc) throws FedoraClientException {
 
+		return createDescriptionObject(rObject, rdf, policy, eadc, null);
+
+	}
+
+	/**
+	 * Creates the given {@link RODAObject} inside Fedora.
+	 * 
+	 * @param rObject
+	 * 
+	 * @return the PID of the newly created object.
+	 * 
+	 * @throws FedoraClientException
+	 */
+	// FIXME revise javadocs
+	public String createDescriptionObject(RODAObject rObject, String rdf,
+			String policy, String eadc, String otherMetadata) throws FedoraClientException {
+
 		InputStream xsltStream = getClass().getResourceAsStream(
 				resourceXsltCreateRodaDescriptionObject);
 
@@ -394,6 +393,8 @@ public class FedoraClientUtility extends FedoraClient {
 					"PID", rObject.getPid());
 			parameters.put("contentModel", rObject.getContentModel());
 			parameters.put("label", rObject.getLabel());
+			parameters.put("insertOtherMetadata", (otherMetadata != null
+					&& otherMetadata.length() > 0 ? "true" : ""));
 
 			if (RODAObject.STATE_ACTIVE.equalsIgnoreCase(rObject.getState())) {
 
@@ -424,6 +425,10 @@ public class FedoraClientUtility extends FedoraClient {
 					"POLICY_XML_PLACEHOLDER", policy);
 			foxmlAsString = foxmlAsString.replaceFirst("EADC_XML_PLACEHOLDER",
 					eadc);
+			if (otherMetadata != null && otherMetadata.length() > 0) {
+				foxmlAsString = foxmlAsString.replaceFirst(
+						"OTHER_METADATA_XML_PLACEHOLDER", otherMetadata);
+			}
 
 			logger.debug("FOXML is\n" + foxmlAsString);
 
@@ -863,10 +868,14 @@ public class FedoraClientUtility extends FedoraClient {
 
 		HttpClient client = new HttpClient();
 
+		String username = this.cup.getName();
+		String password = this.cup.getProxyGrantingTicket();
+		Credentials credentials = new UsernamePasswordCredentials(username,
+				password);
+
 		client.getState().setCredentials(
 				new AuthScope(getFedoraUploadURL().getHost(),
-						getFedoraUploadURL().getPort()),
-				new UsernamePasswordCredentials(getUsername(), getPassword()));
+						getFedoraUploadURL().getPort()), credentials);
 
 		try {
 
@@ -886,7 +895,6 @@ public class FedoraClientUtility extends FedoraClient {
 				return uploadedFileURL;
 
 			} else {
-
 				postMethod.releaseConnection();
 
 				logger.info("Upload failed: " + status + " - "
@@ -897,13 +905,13 @@ public class FedoraClientUtility extends FedoraClient {
 			}
 
 		} catch (HttpException e) {
-			logger.debug("Exception uploading file to Fedora - "
-					+ e.getMessage(), e);
+			logger.debug(
+					"Exception uploading file to Fedora - " + e.getMessage(), e);
 			throw new FedoraClientException(
 					"Exception uploading file to Fedora - " + e.getMessage(), e);
 		} catch (IOException e) {
-			logger.debug("Exception uploading file to Fedora - "
-					+ e.getMessage(), e);
+			logger.debug(
+					"Exception uploading file to Fedora - " + e.getMessage(), e);
 			throw new FedoraClientException(
 					"Exception uploading file to Fedora - " + e.getMessage(), e);
 		}
@@ -1026,18 +1034,19 @@ public class FedoraClientUtility extends FedoraClient {
 
 		Map<String, String[]> properties = new HashMap<String, String[]>();
 		// predicate -> object
-		properties.put(FedoraRISearch.RDF_TAG_PRODUCER_USER, producers
-				.getUsers());
-		properties.put(FedoraRISearch.RDF_TAG_PRODUCER_GROUP, producers
-				.getGroups());
+		properties.put(FedoraRISearch.RDF_TAG_PRODUCER_USER,
+				producers.getUsers());
+		properties.put(FedoraRISearch.RDF_TAG_PRODUCER_GROUP,
+				producers.getGroups());
 
 		try {
 
 			replaceRDFValueProperties(doPID, properties);
 
 		} catch (Exception e) {
-			logger.debug("Exception setting producer properties - "
-					+ e.getMessage(), e);
+			logger.debug(
+					"Exception setting producer properties - " + e.getMessage(),
+					e);
 			throw new FedoraClientException(
 					"Exception setting producer properties - " + e.getMessage(),
 					e);
@@ -1072,7 +1081,7 @@ public class FedoraClientUtility extends FedoraClient {
 						null);
 
 				getAPIM().modifyObject(pid, getStateCode(state),
-						objectProfile.getObjLabel(), getUsername(),
+						objectProfile.getObjLabel(), this.cup.getName(),
 						"Marked " + state + " by RODA FedoraClientUtility.");
 				count++;
 
@@ -1111,9 +1120,7 @@ public class FedoraClientUtility extends FedoraClient {
 		} else if (RODAObject.STATE_DELETED.equalsIgnoreCase(state)) {
 			stateCode = "D";
 		} else {
-			logger
-					.warn("getStateCode(" + state
-							+ ") => null. State is unkown.");
+			logger.warn("getStateCode(" + state + ") => null. State is unkown.");
 			stateCode = null;
 		}
 		return stateCode;
@@ -1131,7 +1138,7 @@ public class FedoraClientUtility extends FedoraClient {
 		return getStateCode(rObject.getState());
 	}
 
-	private String getStateCode(DatastreamState state) {
+	public String getStateCode(DatastreamState state) {
 
 		if (state == DatastreamState.Active) {
 			return "A";
@@ -1143,7 +1150,7 @@ public class FedoraClientUtility extends FedoraClient {
 		}
 	}
 
-	private void addRDFProperties(String pid, Map<String, String> properties,
+	private void addRDFProperties(String pid, List<Pair<String, String>> properties,
 			InputStream xsltAddProperty) throws Exception {
 
 		Map<String, Object> parameters = new HashMap<String, Object>();
@@ -1162,8 +1169,8 @@ public class FedoraClientUtility extends FedoraClient {
 			logger.trace("RELS-EXT exists? " + datastreamExists);
 
 			// If datastream already exists, get a inputStream for it
-			rdfInputStream = new ByteArrayInputStream(dsDissemination
-					.getStream());
+			rdfInputStream = new ByteArrayInputStream(
+					dsDissemination.getStream());
 
 		} catch (Exception e) {
 
@@ -1186,28 +1193,28 @@ public class FedoraClientUtility extends FedoraClient {
 			XsltUtility.applyTransformation(xsltCreateRDF, parameters,
 					rdfInputStream, rdfOutputStream);
 
-			rdfInputStream = new ByteArrayInputStream(rdfOutputStream
-					.toByteArray());
+			rdfInputStream = new ByteArrayInputStream(
+					rdfOutputStream.toByteArray());
 		}
 
 		String xsltAddPropertyString = StreamUtility
 				.inputStreamToString(xsltAddProperty);
 
 		// Add all the properties in the properties Map
-		for (Map.Entry<String, String> entry : properties.entrySet()) {
+		for (Pair<String, String> entry : properties) {
 			rdfOutputStream = new ByteArrayOutputStream();
 
 			parameters.clear();
-			parameters.put("predicate", entry.getKey());
-			parameters.put("object", entry.getValue());
+			parameters.put("predicate", entry.getFirst());
+			parameters.put("object", entry.getSecond());
 
 			// Add the property
 			XsltUtility.applyTransformation(xsltAddPropertyString, parameters,
 					rdfInputStream, rdfOutputStream);
 			// }
 
-			rdfInputStream = new ByteArrayInputStream(rdfOutputStream
-					.toByteArray());
+			rdfInputStream = new ByteArrayInputStream(
+					rdfOutputStream.toByteArray());
 		}
 
 		logger.trace("New RELS-EXT:\n"
@@ -1249,12 +1256,11 @@ public class FedoraClientUtility extends FedoraClient {
 	private void addRDFResourceProperty(String pid, String propertyName,
 			String resource) throws Exception {
 
-		Map<String, String> properties = new HashMap<String, String>();
-		// predicate -> object
-		properties.put(propertyName, resource);
-
-		addRDFProperties(pid, properties, getClass().getResourceAsStream(
-				"/addRDFResourceProperty.xslt"));
+		List<Pair<String,String>> properties = new ArrayList<Pair<String,String>>();
+		properties.add(new Pair<String, String>(propertyName, resource));
+		
+		addRDFProperties(pid, properties,
+				getClass().getResourceAsStream("/addRDFResourceProperty.xslt"));
 	}
 
 	/**
@@ -1265,17 +1271,17 @@ public class FedoraClientUtility extends FedoraClient {
 	 * 
 	 * @throws Exception
 	 */
+	// FIXME
 	private void addRDFResourceProperties(String pid, String propertyName,
 			String[] resources) throws Exception {
 
-		Map<String, String> properties = new HashMap<String, String>();
+		List<Pair<String,String>> properties = new ArrayList<Pair<String,String>>();
 		for (String resource : resources) {
-			// predicate -> object
-			properties.put(propertyName, resource);
+			properties.add(new Pair<String, String>(propertyName, resource));
 		}
 
-		addRDFProperties(pid, properties, getClass().getResourceAsStream(
-				"/addRDFResourceProperty.xslt"));
+		addRDFProperties(pid, properties,
+				getClass().getResourceAsStream("/addRDFResourceProperty.xslt"));
 	}
 
 	/**
@@ -1289,12 +1295,12 @@ public class FedoraClientUtility extends FedoraClient {
 	private void addRDFValueProperty(String pid, String propertyName,
 			String value) throws Exception {
 
-		Map<String, String> properties = new HashMap<String, String>();
-		// predicate -> object
-		properties.put(propertyName, value);
+		List<Pair<String,String>> properties = new ArrayList<Pair<String,String>>();
+		properties.add(new Pair<String, String>(propertyName, value));
+	
 
-		addRDFProperties(pid, properties, getClass().getResourceAsStream(
-				"/addRDFValueProperty.xslt"));
+		addRDFProperties(pid, properties,
+				getClass().getResourceAsStream("/addRDFValueProperty.xslt"));
 	}
 
 	/**
@@ -1325,8 +1331,8 @@ public class FedoraClientUtility extends FedoraClient {
 
 		if (dissemination != null) {
 
-			InputStream inputStream = new ByteArrayInputStream(dissemination
-					.getStream());
+			InputStream inputStream = new ByteArrayInputStream(
+					dissemination.getStream());
 			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
 			XsltUtility.applyTransformation(xsltRemoveProperty, xsltParameters,
@@ -1401,13 +1407,15 @@ public class FedoraClientUtility extends FedoraClient {
 	 */
 	private void modifyRDFResourceSingleProperty(String pid,
 			String propertyName, String resource) throws Exception {
+		
+		List<Pair<String,String>> properties = new ArrayList<Pair<String,String>>();
+		properties.add(new Pair<String, String>(propertyName, resource));		
 
-		Map<String, String> properties = new HashMap<String, String>();
-		// predicate -> object
-		properties.put(propertyName, resource);
-
-		addRDFProperties(pid, properties, getClass().getResourceAsStream(
-				"/modifyRDFResourceSingleProperty.xslt"));
+		addRDFProperties(
+				pid,
+				properties,
+				getClass().getResourceAsStream(
+						"/modifyRDFResourceSingleProperty.xslt"));
 
 	}
 
@@ -1422,9 +1430,9 @@ public class FedoraClientUtility extends FedoraClient {
 	private void modifyRDFValueSingleProperty(String pid, String propertyName,
 			String value) throws Exception {
 
-		Map<String, String> properties = new HashMap<String, String>();
 		// predicate -> object
-		properties.put(propertyName, value);
+		List<Pair<String,String>> properties = new ArrayList<Pair<String,String>>();
+		properties.add(new Pair<String, String>(propertyName, value));
 
 		modifyRDFValueSingleProperties(pid, properties);
 	}
@@ -1437,10 +1445,13 @@ public class FedoraClientUtility extends FedoraClient {
 	 * @throws Exception
 	 */
 	private void modifyRDFValueSingleProperties(String pid,
-			Map<String, String> properties) throws Exception {
+			List<Pair<String,String>> properties) throws Exception {
 
-		addRDFProperties(pid, properties, getClass().getResourceAsStream(
-				"/modifyRDFValueSingleProperty.xslt"));
+		addRDFProperties(
+				pid,
+				properties,
+				getClass().getResourceAsStream(
+						"/modifyRDFValueSingleProperty.xslt"));
 	}
 
 	/**
@@ -1473,8 +1484,8 @@ public class FedoraClientUtility extends FedoraClient {
 			logger.trace("RELS-EXT exists? " + datastreamExists);
 
 			// If datastream already exists, get a inputStream for it
-			rdfInputStream = new ByteArrayInputStream(dsDissemination
-					.getStream());
+			rdfInputStream = new ByteArrayInputStream(
+					dsDissemination.getStream());
 
 		} catch (Exception e) {
 
@@ -1497,8 +1508,8 @@ public class FedoraClientUtility extends FedoraClient {
 			XsltUtility.applyTransformation(xsltCreateRDF, parameters,
 					rdfInputStream, rdfOutputStream);
 
-			rdfInputStream = new ByteArrayInputStream(rdfOutputStream
-					.toByteArray());
+			rdfInputStream = new ByteArrayInputStream(
+					rdfOutputStream.toByteArray());
 		}
 
 		String removeRDFValueSinglePropertyString = StreamUtility
@@ -1516,8 +1527,8 @@ public class FedoraClientUtility extends FedoraClient {
 			XsltUtility.applyTransformation(removeRDFValueSinglePropertyString,
 					parameters, rdfInputStream, rdfOutputStream);
 
-			rdfInputStream = new ByteArrayInputStream(rdfOutputStream
-					.toByteArray());
+			rdfInputStream = new ByteArrayInputStream(
+					rdfOutputStream.toByteArray());
 		}
 
 		String addRDFValuePropertyString = StreamUtility
@@ -1541,8 +1552,8 @@ public class FedoraClientUtility extends FedoraClient {
 				XsltUtility.applyTransformation(addRDFValuePropertyString,
 						parameters, rdfInputStream, rdfOutputStream);
 
-				rdfInputStream = new ByteArrayInputStream(rdfOutputStream
-						.toByteArray());
+				rdfInputStream = new ByteArrayInputStream(
+						rdfOutputStream.toByteArray());
 
 				// logger.trace("New RELS-EXT:\n"
 				// + StreamUtility
@@ -1607,12 +1618,12 @@ public class FedoraClientUtility extends FedoraClient {
 
 			ByteArrayOutputStream rdfOutputStream = new ByteArrayOutputStream();
 
-			XsltUtility.applyTransformation(xsltCreateRDF, XsltUtility
-					.createParameters("subjectPID", pid), rdfInputStream,
-					rdfOutputStream);
+			XsltUtility.applyTransformation(xsltCreateRDF,
+					XsltUtility.createParameters("subjectPID", pid),
+					rdfInputStream, rdfOutputStream);
 
-			rdfInputStream = new ByteArrayInputStream(rdfOutputStream
-					.toByteArray());
+			rdfInputStream = new ByteArrayInputStream(
+					rdfOutputStream.toByteArray());
 
 			return rdfInputStream;
 
@@ -1646,8 +1657,8 @@ public class FedoraClientUtility extends FedoraClient {
 				XsltUtility.applyTransformation(xsltAddPropertyString,
 						parameters, rdfInputStream, rdfOutputStream);
 
-				rdfInputStream = new ByteArrayInputStream(rdfOutputStream
-						.toByteArray());
+				rdfInputStream = new ByteArrayInputStream(
+						rdfOutputStream.toByteArray());
 			}
 
 			return rdfInputStream;
@@ -1683,8 +1694,8 @@ public class FedoraClientUtility extends FedoraClient {
 						removeRDFValueSinglePropertyString, parameters,
 						rdfInputStream, rdfOutputStream);
 
-				rdfInputStream = new ByteArrayInputStream(rdfOutputStream
-						.toByteArray());
+				rdfInputStream = new ByteArrayInputStream(
+						rdfOutputStream.toByteArray());
 			}
 
 			return rdfInputStream;
@@ -1724,8 +1735,8 @@ public class FedoraClientUtility extends FedoraClient {
 					XsltUtility.applyTransformation(addRDFValuePropertyString,
 							parameters, rdfInputStream, rdfOutputStream);
 
-					rdfInputStream = new ByteArrayInputStream(rdfOutputStream
-							.toByteArray());
+					rdfInputStream = new ByteArrayInputStream(
+							rdfOutputStream.toByteArray());
 
 				}
 
@@ -1765,8 +1776,8 @@ public class FedoraClientUtility extends FedoraClient {
 				XsltUtility.applyTransformation(xsltAddPropertyString,
 						parameters, rdfInputStream, rdfOutputStream);
 
-				rdfInputStream = new ByteArrayInputStream(rdfOutputStream
-						.toByteArray());
+				rdfInputStream = new ByteArrayInputStream(
+						rdfOutputStream.toByteArray());
 			}
 
 			return rdfInputStream;
@@ -1796,6 +1807,10 @@ public class FedoraClientUtility extends FedoraClient {
 			logger.debug(e.getMessage(), e);
 			throw new FedoraClientException(e.getMessage(), e);
 		}
+	}
+
+	public CASUserPrincipal getCASUserPrincipal() {
+		return cup;
 	}
 
 }

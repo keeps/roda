@@ -112,7 +112,7 @@ public class ListHeader extends Composite implements SourcesClickEvents {
 
 		if (sortParameters.length == 0) {
 			// no image
-			sortDirection.setUrl("clear.cache.gif");
+			sortDirection.setUrl(GWT.getModuleBaseURL() + "clear.cache.gif");
 		} else if (ascending == null) {
 			commonImageBundle.listSortDirection().applyTo(sortDirection);
 			sortDirection.addStyleDependentName("unsorted");

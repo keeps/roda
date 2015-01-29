@@ -253,7 +253,7 @@ public class LazyVerticalList<T> {
 		totalLabel = new Label();
 		printPDF = commonImageBundle.printPDF().createImage();
 		printCSV = commonImageBundle.printCSV().createImage();
-		loadingImage = new Image("images/loadingSmall.gif");
+		loadingImage = new Image(GWT.getModuleBaseURL() + "images/loadingSmall.gif");
 		loadingMessage = new Label();
 		header = new ListHeaderPanel(new ListHeaderListener() {
 

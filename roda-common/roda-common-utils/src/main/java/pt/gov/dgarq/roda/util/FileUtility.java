@@ -116,9 +116,7 @@ public class FileUtility {
 		int bufSize = 1048576; // 1 MByte
 		byte[] buffer = new byte[bufSize];
 		int n = is.read(buffer, 0, bufSize);
-		int count = 0;
 		while (n != -1) {
-			count += n;
 			digestor.update(buffer, 0, n);
 			n = is.read(buffer, 0, bufSize);
 		}
@@ -212,6 +210,33 @@ public class FileUtility {
 		byte[] bytes = StreamUtility.byteArrayFromInputStream(inputStream);
 		inputStream.close();
 		return bytes;
+	}
+
+	/**
+	 * Gets file extension from filename
+	 * 
+	 * @param file
+	 * @return file extension if filename has at least one dot ; otherwise an
+	 *         empty string
+	 * */
+	public static String getFileExtension(File file) {
+		return getFileExtension(file.getName());
+	}
+
+	/**
+	 * Gets file extension from filename
+	 * 
+	 * @param file
+	 * @return file extension if filename has at least one dot ; otherwise an
+	 *         empty string
+	 * */
+	public static String getFileExtension(String file) {
+		String res = "";
+		int lastIndexOf = file.lastIndexOf('.');
+		if (lastIndexOf != -1) {
+			res = file.substring(lastIndexOf + 1);
+		}
+		return res;
 	}
 
 }

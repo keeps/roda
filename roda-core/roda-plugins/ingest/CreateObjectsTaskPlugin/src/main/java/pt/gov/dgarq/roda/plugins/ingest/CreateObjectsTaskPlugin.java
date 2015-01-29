@@ -36,6 +36,7 @@ import pt.gov.dgarq.roda.ingest.siputility.data.SIPEventPreservationObject;
 import pt.gov.dgarq.roda.ingest.siputility.data.SIPRepresentationObject;
 import pt.gov.dgarq.roda.ingest.siputility.data.SIPRepresentationPreservationObject;
 import pt.gov.dgarq.roda.plugins.common.IngestTaskPlugin;
+import pt.gov.dgarq.roda.servlet.cas.CASUtility;
 
 /**
  * @author Rui Castro
@@ -104,7 +105,7 @@ public class CreateObjectsTaskPlugin extends IngestTaskPlugin {
 	public List<PluginParameter> getParameters() {
 		return Arrays.asList(AbstractPlugin.PARAMETER_RODA_CORE_URL(),
 				AbstractPlugin.PARAMETER_RODA_CORE_USERNAME(), AbstractPlugin
-						.PARAMETER_RODA_CORE_PASSWORD());
+						.PARAMETER_RODA_CORE_PASSWORD(),AbstractPlugin.PARAMETER_RODA_CAS_URL());
 	}
 
 	@Override
@@ -849,13 +850,18 @@ public class CreateObjectsTaskPlugin extends IngestTaskPlugin {
 				AbstractPlugin.PARAMETER_RODA_CORE_USERNAME().getName());
 		String rodaClientPassword = getParameterValues().get(
 				AbstractPlugin.PARAMETER_RODA_CORE_PASSWORD().getName());
-
+		String casURL = getParameterValues().get(
+				AbstractPlugin.PARAMETER_RODA_CAS_URL().getName());
+		String coreURL = getParameterValues().get(
+				AbstractPlugin.PARAMETER_RODA_CORE_URL().getName());
+		
 		try {
+			CASUtility casUtility = new CASUtility(new URL(casURL), new URL(coreURL));
 
 			this.rodaClient = new RODAClient(new URL(rodaClientServiceUrl),
-					rodaClientUsername, rodaClientPassword);
+					rodaClientUsername, rodaClientPassword,casUtility);
 			this.rodaUploader = new Uploader(new URL(rodaClientServiceUrl),
-					rodaClientUsername, rodaClientPassword);
+					rodaClientUsername, rodaClientPassword,casUtility);
 
 			this.ingestService = this.rodaClient.getIngestService();
 			this.browserService = this.rodaClient.getBrowserService();

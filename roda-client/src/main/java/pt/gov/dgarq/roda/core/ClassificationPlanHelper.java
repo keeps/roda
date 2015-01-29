@@ -21,7 +21,7 @@ import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.OneOfManyFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.ProducerFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
-import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevel;
+import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevelManager;
 import pt.gov.dgarq.roda.core.metadata.MetadataException;
 import pt.gov.dgarq.roda.core.metadata.eadc.EadCHelper;
 import pt.gov.dgarq.roda.core.metadata.eadc.EadCMetadataException;
@@ -140,20 +140,24 @@ public class ClassificationPlanHelper {
 			new EadCHelper(dObj).saveToFile(eadcFile);
 
 			// if SDO can have children greater than document level
-			if (sdo.getLevel().compareTo(DescriptionLevel.SUBSERIES) < 0) {
+			if (DescriptionLevelManager
+					.getAllButRepresentationsDescriptionLevels().contains(
+							sdo.getLevel())) {
 
 				ContentAdapter adapter = new ContentAdapter();
 				Filter filter = new Filter();
 				filter.add(new ProducerFilterParameter());
-				filter.add(new OneOfManyFilterParameter("level", new String[] {
-						DescriptionLevel.SUBFONDS.getLevel(),
-						DescriptionLevel.CLASS.getLevel(),
-						DescriptionLevel.SUBCLASS.getLevel(),
-						DescriptionLevel.SERIES.getLevel(),
-						DescriptionLevel.SUBSERIES.getLevel(), }));
-				filter
-						.add(new SimpleFilterParameter("parentPID", sdo
-								.getPid()));
+				int size = DescriptionLevelManager
+						.getAllButRepresentationsDescriptionLevels().size();
+				String[] levels = new String[size];
+				for (int i = 0; i < size; i++) {
+					levels[i] = DescriptionLevelManager
+							.getAllButRepresentationsDescriptionLevels().get(i)
+							.getLevel();
+				}
+				filter.add(new OneOfManyFilterParameter(
+						SimpleDescriptionObject.LEVEL, levels));
+				filter.add(new SimpleFilterParameter("parentPID", sdo.getPid()));
 				adapter.setFilter(filter);
 
 				// Get children
@@ -163,8 +167,9 @@ public class ClassificationPlanHelper {
 				// Recursively export children if greater than document level
 				if (subElements != null) {
 					for (SimpleDescriptionObject child : subElements) {
-						if (child.getLevel().compareTo(
-								DescriptionLevel.SUBSERIES) <= 0) {
+						if (DescriptionLevelManager
+								.getAllButRepresentationsDescriptionLevels()
+								.contains(child.getLevel())) {
 							exportDescriptionObject(child, sdoDir, browser);
 						}
 					}

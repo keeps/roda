@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
 
+import javax.naming.AuthenticationException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -25,6 +26,9 @@ import pt.gov.dgarq.roda.core.common.LoginException;
 import pt.gov.dgarq.roda.core.common.RODAClientException;
 import pt.gov.dgarq.roda.core.data.LogEntry;
 import pt.gov.dgarq.roda.core.data.LogEntryParameter;
+import pt.gov.dgarq.roda.servlet.cas.CASUserPrincipal;
+import pt.gov.dgarq.roda.servlet.cas.CASUtility;
+import pt.gov.dgarq.roda.wui.common.client.AuthenticatedUser;
 
 /**
  * @author Luis Faria
@@ -81,6 +85,22 @@ public class RodaClientFactory {
 		return rodaServices;
 	}
 
+	public static URL getCasUrl() throws IOException {
+		URL casURL;
+		casURL = new URL(getRodaProperties().getProperty("roda.cas.url"));
+		return casURL;
+	}
+
+	public static String getCasUrlAsString() {
+		return getRodaProperties().getProperty("roda.cas.external.url");
+	}
+
+	public static URL getCoreURL() throws IOException {
+		URL coreURL;
+		coreURL = new URL(getRodaProperties().getProperty("roda.core.url"));
+		return coreURL;
+	}
+
 	/**
 	 * Get the RODA client kept in session
 	 * 
@@ -97,8 +117,12 @@ public class RodaClientFactory {
 		if (rodaClient == null) {
 			try {
 				logger.info("No RODA Client in session, creating a guest one");
-				rodaClient = new RODAClient(rodaCoreURL);
+				CASUtility casUtility = new CASUtility(getCasUrl(),
+						getCoreURL());
+				rodaClient = new RODAClient(rodaCoreURL, casUtility);
 			} catch (LoginException e) {
+				throw new LoginException(e.getMessage());
+			} catch (IOException e) {
 				throw new LoginException(e.getMessage());
 			}
 			session.setAttribute(RODA_CLIENT_SESSION_ATTRIBUTE, rodaClient);
@@ -149,12 +173,51 @@ public class RodaClientFactory {
 			String password) throws LoginException, RODAClientException {
 		RODAClient rodaClient;
 		try {
-			rodaClient = new RODAClient(rodaCoreURL, username, password);
+			CASUtility casUtility = new CASUtility(getCasUrl(), getCoreURL());
+			rodaClient = new RODAClient(rodaCoreURL, username, password,
+					casUtility);
 			logger.info("Login as " + username + " successful");
 			session.setAttribute(RODA_CLIENT_SESSION_ATTRIBUTE, rodaClient);
 		} catch (LoginException e) {
 			logger.error("Login as " + username + " failed", e);
 			throw new LoginException(e.getMessage());
+		} catch (IOException e) {
+			logger.error("Login as " + username + " failed", e);
+			throw new LoginException(e.getMessage());
+		}
+
+	}
+
+	public static AuthenticatedUser login(HttpSession session, String serviceTicket,
+			URL location) throws LoginException, RODAClientException {
+		RODAClient rodaClient;
+		try {
+			CASUtility casUtility = new CASUtility(getCasUrl(), getCoreURL(),
+					location);
+			CASUserPrincipal cup = casUtility.getCASUserPrincipal(null,
+					serviceTicket);
+			CASUtility casUtilityClient = new CASUtility(getCasUrl(),
+					getCoreURL());
+			rodaClient = new RODAClient(rodaCoreURL, cup, casUtilityClient);
+			logger.debug("Login using cas successful");
+			session.setAttribute(RODA_CLIENT_SESSION_ATTRIBUTE, rodaClient);
+			return new AuthenticatedUser(cup, rodaClient.isGuestLogin());
+		} catch (LoginException e) {
+			logger.error("Login using cas ticket " + serviceTicket + " failed",
+					e);
+			throw new LoginException(e.getMessage());
+		} catch (IOException e) {
+			logger.error("Login using cas ticket " + serviceTicket + " failed",
+					e);
+			throw new LoginException(e.getMessage());
+		} catch (AuthenticationException e) {
+			logger.error("Login using cas ticket " + serviceTicket + " failed",
+					e);
+			throw new LoginException(e.getMessage());
+		} catch (Exception e) {
+		  logger.error("Error while login:" + e.getMessage());
+		    throw new LoginException(e.getMessage());
+			
 		}
 
 	}
@@ -171,9 +234,14 @@ public class RodaClientFactory {
 			RODAClientException {
 		RODAClient rodaClient;
 		try {
-			rodaClient = new RODAClient(rodaCoreURL);
+			CASUtility casUtility = new CASUtility(getCasUrl(), getCoreURL());
+			rodaClient = new RODAClient(rodaCoreURL, casUtility);
 			session.setAttribute(RODA_CLIENT_SESSION_ATTRIBUTE, rodaClient);
+			session.removeAttribute("edu.yale.its.tp.cas.client.filter.user");
+			session.removeAttribute("_const_cas_assertion_");
 		} catch (LoginException e) {
+			throw new LoginException(e.getMessage());
+		} catch (IOException e) {
 			throw new LoginException(e.getMessage());
 		}
 
@@ -190,10 +258,18 @@ public class RodaClientFactory {
 			RODAClientException {
 		if (rodaWuiClient == null) {
 			try {
+				CASUtility casUtility = new CASUtility(getCasUrl(),
+						getCoreURL());
+
 				rodaWuiClient = new RODAClient(rodaCoreURL,
 						rodaProperties.getProperty("roda.wui.user.name"),
-						rodaProperties.getProperty("roda.wui.user.password"));
+						rodaProperties.getProperty("roda.wui.user.password"),
+						casUtility);
 			} catch (LoginException e) {
+				logger.error(e.getMessage(), e);
+				throw new LoginException(e.getMessage());
+			} catch (IOException e) {
+				logger.error(e.getMessage(), e);
 				throw new LoginException(e.getMessage());
 			}
 		}
@@ -279,16 +355,6 @@ public class RodaClientFactory {
 					+ relativePath);
 		}
 		return ret;
-	}
-
-	/**
-	 * Get the Ingest Submit service URL. This URL can be used to submit SIPs.
-	 * 
-	 * @return the Ingest Submit service URL
-	 * @throws IOException
-	 */
-	public static URL getIngestSubmitUrl() throws IOException {
-		return new URL(getRodaCoreUrl() + "/SIPUpload");
 	}
 
 }

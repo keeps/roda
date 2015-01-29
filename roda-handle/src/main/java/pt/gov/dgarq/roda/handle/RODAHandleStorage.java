@@ -25,6 +25,7 @@ import pt.gov.dgarq.roda.core.RODAClient;
 import pt.gov.dgarq.roda.core.common.BrowserException;
 import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.stubs.Browser;
+import pt.gov.dgarq.roda.servlet.cas.CASUtility;
 
 /**
  * This class is a {@link HandleStorage} for RODA. It does not store handles,
@@ -42,6 +43,8 @@ public class RODAHandleStorage implements HandleStorage {
 	private URL rodacoreURL;
 	private String rodaUsername;
 	private String rodaPassword;
+	private String casURL;
+	private String coreURL;
 
 	private String rodaUrlPrefix = null;
 
@@ -73,6 +76,8 @@ public class RODAHandleStorage implements HandleStorage {
 			rodacoreURL = new URL(configuration.getString("rodacoreURL"));
 			rodaUsername = configuration.getString("rodaUsername");
 			rodaPassword = configuration.getString("rodaPassword");
+			casURL = configuration.getString("roda.cas.url");
+			coreURL = configuration.getString("roda.core.url");
 
 			handleRootNA = configuration.getString("handleRootNA");
 			rodaHandlePrefix = configuration.getString("rodaHandlePrefix");
@@ -88,8 +93,9 @@ public class RODAHandleStorage implements HandleStorage {
 		}
 
 		rodaNAHandle = handleRootNA + "/" + rodaHandlePrefix;
+		CASUtility casUtility = new CASUtility(new URL(casURL), new URL(coreURL));
 		RODAClient rodaClient = new RODAClient(rodacoreURL, rodaUsername,
-				rodaPassword);
+				rodaPassword,casUtility);
 
 		browserService = rodaClient.getBrowserService();
 

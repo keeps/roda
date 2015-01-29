@@ -103,7 +103,7 @@ public abstract class ImageMagickConverter extends AbstractSynchronousConverter
 
         try {
 
-            if (!representationNeedsConvertion(localRepresentation)) {
+            if (!representationNeedsConversion(localRepresentation)) {
                 throw new RepresentationAlreadyConvertedException(
                         "Representation is already in the destination format"); //$NON-NLS-1$
             }
@@ -180,7 +180,7 @@ public abstract class ImageMagickConverter extends AbstractSynchronousConverter
 
     }
 
-    abstract protected boolean representationNeedsConvertion(
+    abstract protected boolean representationNeedsConversion(
             LocalRepresentationObject localRepresentation)
             throws CommandException, WrongRepresentationTypeException,
             WrongRepresentationSubtypeException;

@@ -48,6 +48,7 @@ import pt.gov.dgarq.roda.core.stubs.Ingest;
 import pt.gov.dgarq.roda.migrator.common.RepresentationAlreadyConvertedException;
 import pt.gov.dgarq.roda.plugins.common.IngestTaskPlugin;
 import pt.gov.dgarq.roda.plugins.converters.common.AbstractRodaMigratorPlugin;
+import pt.gov.dgarq.roda.servlet.cas.CASUtility;
 
 /**
  * This task uses migration plugins to perform normalization on representations
@@ -207,7 +208,7 @@ public class NormalizationTaskPlugin extends IngestTaskPlugin {
 	public List<PluginParameter> getParameters() {
 		return Arrays.asList(AbstractPlugin.PARAMETER_RODA_CORE_URL(),
 				AbstractPlugin.PARAMETER_RODA_CORE_USERNAME(),
-				AbstractPlugin.PARAMETER_RODA_CORE_PASSWORD());
+				AbstractPlugin.PARAMETER_RODA_CORE_PASSWORD(),AbstractPlugin.PARAMETER_RODA_CAS_URL());
 	}
 
 	/**
@@ -259,8 +260,7 @@ public class NormalizationTaskPlugin extends IngestTaskPlugin {
 
 			logger.debug("SIP doesn't have representations."); //$NON-NLS-1$
 
-			sip.setIngestedPID(null);
-			return new IngestTaskResult(false, report.toString());
+			return new IngestTaskResult(true, report.toString());
 
 		} else {
 
@@ -459,9 +459,9 @@ public class NormalizationTaskPlugin extends IngestTaskPlugin {
 		Report report = null;
 
 		// Get the plugin with the given name
-		Plugin convertionPlugin = pluginManager.getPlugin(pluginClassname);
+		Plugin conversionPlugin = pluginManager.getPlugin(pluginClassname);
 
-		if (convertionPlugin == null) {
+		if (conversionPlugin == null) {
 			throw new PluginException(pluginClassname
 					+ " is not a valid plugin class name"); //$NON-NLS-1$
 		}
@@ -469,11 +469,11 @@ public class NormalizationTaskPlugin extends IngestTaskPlugin {
 		// Set the plugin parameters
 		try {
 
-			logger.debug("Setting plugin " + convertionPlugin.getName() //$NON-NLS-1$
+			logger.debug("Setting plugin " + conversionPlugin.getName() //$NON-NLS-1$
 					+ " parameters " + getParameterValues()); //$NON-NLS-1$
 
-			convertionPlugin.setParameterValues(getPluginParameters(
-					convertionPlugin, simpleRO.getPid()));
+			conversionPlugin.setParameterValues(getPluginParameters(
+					conversionPlugin, simpleRO.getPid()));
 
 		} catch (InvalidParameterException e) {
 			logger.debug("Error setting plugin parameters - " + e.getMessage(), //$NON-NLS-1$
@@ -486,11 +486,11 @@ public class NormalizationTaskPlugin extends IngestTaskPlugin {
 		try {
 
 			logger.debug("Starting execution of plugin " //$NON-NLS-1$
-					+ convertionPlugin.getName() + " with parameters " //$NON-NLS-1$
+					+ conversionPlugin.getName() + " with parameters " //$NON-NLS-1$
 					+ getParameterValues());
 
 			// Execute the plugin and collect the report.
-			report = convertionPlugin.execute();
+			report = conversionPlugin.execute();
 
 			logger.info("Plugin terminated without error."); //$NON-NLS-1$
 			logger.info("Execution report is " + report); //$NON-NLS-1$
@@ -571,11 +571,16 @@ public class NormalizationTaskPlugin extends IngestTaskPlugin {
 				AbstractPlugin.PARAMETER_RODA_CORE_USERNAME().getName());
 		String rodaClientPassword = getParameterValues().get(
 				AbstractPlugin.PARAMETER_RODA_CORE_PASSWORD().getName());
-
+		String casURL = getParameterValues().get(
+				AbstractPlugin.PARAMETER_RODA_CAS_URL().getName());
+		String coreURL = getParameterValues().get(
+				AbstractPlugin.PARAMETER_RODA_CORE_URL().getName());
+		
 		try {
+			CASUtility casUtility = new CASUtility(new URL(casURL), new URL(coreURL));
 
 			this.rodaClient = new RODAClient(new URL(rodaClientServiceUrl),
-					rodaClientUsername, rodaClientPassword);
+					rodaClientUsername, rodaClientPassword,casUtility);
 
 			this.browserService = this.rodaClient.getBrowserService();
 			this.ingestService = this.rodaClient.getIngestService();

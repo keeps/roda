@@ -3,24 +3,12 @@
  */
 package pt.gov.dgarq.roda.wui.management.user.client;
 
-import pt.gov.dgarq.roda.core.common.EmailAlreadyExistsException;
-import pt.gov.dgarq.roda.core.common.IllegalOperationException;
-import pt.gov.dgarq.roda.core.common.InvalidTokenException;
-import pt.gov.dgarq.roda.core.common.LoggerException;
-import pt.gov.dgarq.roda.core.common.LoginException;
-import pt.gov.dgarq.roda.core.common.NoSuchUserException;
-import pt.gov.dgarq.roda.core.common.RODAClientException;
 import pt.gov.dgarq.roda.core.common.RODAException;
-import pt.gov.dgarq.roda.core.common.ReportException;
-import pt.gov.dgarq.roda.core.common.UserAlreadyExistsException;
-import pt.gov.dgarq.roda.core.common.UserManagementException;
-import pt.gov.dgarq.roda.core.common.UserRegistrationException;
 import pt.gov.dgarq.roda.core.data.Group;
 import pt.gov.dgarq.roda.core.data.LogEntry;
 import pt.gov.dgarq.roda.core.data.User;
 import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import pt.gov.dgarq.roda.wui.common.client.GenericException;
 import pt.gov.dgarq.roda.wui.common.client.PrintReportException;
 
 import com.google.gwt.core.client.GWT;
@@ -36,7 +24,7 @@ public interface UserManagementService extends RemoteService {
 	/**
 	 * Service URI path
 	 */
-	public static final String SERVICE_URI = "/UserManagementService";
+	public static final String SERVICE_URI = "UserManagementService";
 
 	/**
 	 * Factory utility

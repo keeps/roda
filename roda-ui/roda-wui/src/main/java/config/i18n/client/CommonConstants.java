@@ -86,4 +86,17 @@ public interface CommonConstants extends Constants {
 	@DefaultStringValue("CSV")
 	public String reportWindowPrintCSV();
 
+	// ID Type
+	@DefaultStringValue("Simple identifier")
+	public String simpleID();
+
+	@DefaultStringValue("Full identifier")
+	public String fullID();
+	
+	// Redaction Type
+	@DefaultStringValue("Input")
+	public String input();
+
+	@DefaultStringValue("Output")
+	public String output();
 }

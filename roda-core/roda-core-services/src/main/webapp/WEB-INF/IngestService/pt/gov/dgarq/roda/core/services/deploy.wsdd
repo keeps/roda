@@ -20,49 +20,16 @@
       <parameter name="className" value="pt.gov.dgarq.roda.core.services.Ingest"/>
       <parameter name="wsdlPortType" value="Ingest"/>
       <parameter name="typeMappingVersion" value="1.2"/>
-      <operation name="createDescriptionObject" qname="operNS:createDescriptionObject" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:createDescriptionObjectReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:string" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
-        <parameter qname="pns:dObject" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:DescriptionObject" xmlns:tns="http://data.core.roda.dgarq.gov.pt"/>
-        <fault name="NoSuchRODAObjectException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-        <fault name="InvalidDescriptionObjectException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.InvalidDescriptionObjectException" type="tns:InvalidDescriptionObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-        <fault name="IngestException" qname="fns:fault2" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.IngestException" type="tns:IngestException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-      </operation>
       <operation name="removeDescriptionObject" qname="operNS:removeDescriptionObject" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" soapAction="" >
         <parameter qname="pns:doPID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
         <fault name="NoSuchRODAObjectException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-        <fault name="IngestException" qname="fns:fault2" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.IngestException" type="tns:IngestException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="IngestException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.IngestException" type="tns:IngestException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
       </operation>
-      <operation name="removeObjects" qname="operNS:removeObjects" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:removeObjectsReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:string" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
-        <parameter qname="pns:pids" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
-        <fault name="IngestException" qname="fns:fault2" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.IngestException" type="tns:IngestException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-      </operation>
-      <operation name="createDetachedDescriptionObject" qname="operNS:createDetachedDescriptionObject" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:createDetachedDescriptionObjectReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:string" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
-        <parameter qname="pns:dObject" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:DescriptionObject" xmlns:tns="http://data.core.roda.dgarq.gov.pt"/>
-        <fault name="NoSuchRODAObjectException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-        <fault name="InvalidDescriptionObjectException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.InvalidDescriptionObjectException" type="tns:InvalidDescriptionObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-        <fault name="IngestException" qname="fns:fault2" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.IngestException" type="tns:IngestException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-      </operation>
-      <operation name="createRepresentationObject" qname="operNS:createRepresentationObject" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:createRepresentationObjectReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:string" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
-        <parameter qname="pns:rObject" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:RepresentationObject" xmlns:tns="http://data.core.roda.dgarq.gov.pt"/>
-        <fault name="NoSuchRODAObjectException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-        <fault name="IngestException" qname="fns:fault2" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.IngestException" type="tns:IngestException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-      </operation>
-      <operation name="createRepresentationPreservationObject" qname="operNS:createRepresentationPreservationObject" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:createRepresentationPreservationObjectReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:string" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
-        <parameter qname="pns:rpo" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:RepresentationPreservationObject" xmlns:tns="http://data.core.roda.dgarq.gov.pt"/>
-        <parameter qname="pns:doPID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
-        <fault name="NoSuchRODAObjectException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-        <fault name="IngestException" qname="fns:fault2" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.IngestException" type="tns:IngestException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-        <fault name="RepresentationAlreadyPreservedException" qname="fns:fault3" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.RepresentationAlreadyPreservedException" type="tns:RepresentationAlreadyPreservedException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-      </operation>
-      <operation name="setDONormalizedRepresentation" qname="operNS:setDONormalizedRepresentation" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:setDONormalizedRepresentationReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:string" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
-        <parameter qname="pns:doPID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
-        <parameter qname="pns:roPID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
-        <fault name="NoSuchRODAObjectException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-        <fault name="IngestException" qname="fns:fault2" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.IngestException" type="tns:IngestException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-      </operation>
-      <operation name="createDerivationRelationship" qname="operNS:createDerivationRelationship" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" soapAction="" >
-        <parameter qname="pns:rpoPID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
-        <parameter qname="pns:derivationEventPID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
-        <fault name="IngestException" qname="fns:fault2" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.IngestException" type="tns:IngestException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      <operation name="getPossibleParents" qname="operNS:getPossibleParents" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getPossibleParentsReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:string" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
+        <parameter qname="pns:producerUsername" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <parameter qname="pns:classificationSchemeId" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <parameter qname="pns:classFullId" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <fault name="IngestException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.IngestException" type="tns:IngestException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
       </operation>
       <operation name="registerIngestEvent" qname="operNS:registerIngestEvent" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:registerIngestEventReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:string" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
         <parameter qname="pns:doPIDs" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
@@ -70,13 +37,72 @@
         <parameter qname="pns:poPIDs" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
         <parameter qname="pns:agentName" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
         <parameter qname="pns:details" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
-        <fault name="IngestException" qname="fns:fault2" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.IngestException" type="tns:IngestException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="IngestException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.IngestException" type="tns:IngestException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="createDescriptionObject" qname="operNS:createDescriptionObject" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:createDescriptionObjectReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:string" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
+        <parameter qname="pns:dObject" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:DescriptionObject" xmlns:tns="http://data.core.roda.dgarq.gov.pt"/>
+        <fault name="NoSuchRODAObjectException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="InvalidDescriptionObjectException" qname="fns:fault2" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.InvalidDescriptionObjectException" type="tns:InvalidDescriptionObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="IngestException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.IngestException" type="tns:IngestException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="createDescriptionObjectWithOtherMetadata" qname="operNS:createDescriptionObjectWithOtherMetadata" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:createDescriptionObjectWithOtherMetadataReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:string" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
+        <parameter qname="pns:dObject" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:DescriptionObject" xmlns:tns="http://data.core.roda.dgarq.gov.pt"/>
+        <parameter qname="pns:otherMetadataFilePath" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <fault name="NoSuchRODAObjectException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="InvalidDescriptionObjectException" qname="fns:fault2" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.InvalidDescriptionObjectException" type="tns:InvalidDescriptionObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="IngestException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.IngestException" type="tns:IngestException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="createRepresentationPreservationObject" qname="operNS:createRepresentationPreservationObject" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:createRepresentationPreservationObjectReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:string" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
+        <parameter qname="pns:rpo" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:RepresentationPreservationObject" xmlns:tns="http://data.core.roda.dgarq.gov.pt"/>
+        <parameter qname="pns:doPID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <fault name="NoSuchRODAObjectException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="IngestException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.IngestException" type="tns:IngestException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="RepresentationAlreadyPreservedException" qname="fns:fault3" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.RepresentationAlreadyPreservedException" type="tns:RepresentationAlreadyPreservedException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="removeObjects" qname="operNS:removeObjects" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:removeObjectsReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:string" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
+        <parameter qname="pns:pids" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <fault name="IngestException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.IngestException" type="tns:IngestException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="findVolumeParent" qname="operNS:findVolumeParent" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:findVolumeParentReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:DescriptionObject" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
+        <parameter qname="pns:classPID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <parameter qname="pns:caseFileFullId" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <parameter qname="pns:subfileFullId" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <fault name="IngestException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.IngestException" type="tns:IngestException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="createDetachedDescriptionObject" qname="operNS:createDetachedDescriptionObject" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:createDetachedDescriptionObjectReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:string" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
+        <parameter qname="pns:dObject" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:DescriptionObject" xmlns:tns="http://data.core.roda.dgarq.gov.pt"/>
+        <fault name="NoSuchRODAObjectException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="InvalidDescriptionObjectException" qname="fns:fault2" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.InvalidDescriptionObjectException" type="tns:InvalidDescriptionObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="IngestException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.IngestException" type="tns:IngestException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="createDerivationRelationship" qname="operNS:createDerivationRelationship" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" soapAction="" >
+        <parameter qname="pns:rpoPID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <parameter qname="pns:derivationEventPID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <fault name="IngestException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.IngestException" type="tns:IngestException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="setDONormalizedRepresentation" qname="operNS:setDONormalizedRepresentation" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:setDONormalizedRepresentationReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:string" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
+        <parameter qname="pns:doPID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <parameter qname="pns:roPID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <fault name="NoSuchRODAObjectException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="IngestException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.IngestException" type="tns:IngestException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="createDetachedDescriptionObjectWithOtherMetadata" qname="operNS:createDetachedDescriptionObjectWithOtherMetadata" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:createDetachedDescriptionObjectWithOtherMetadataReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:string" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
+        <parameter qname="pns:dObject" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:DescriptionObject" xmlns:tns="http://data.core.roda.dgarq.gov.pt"/>
+        <parameter qname="pns:otherMetadataFilePath" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <fault name="NoSuchRODAObjectException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="InvalidDescriptionObjectException" qname="fns:fault2" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.InvalidDescriptionObjectException" type="tns:InvalidDescriptionObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="IngestException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.IngestException" type="tns:IngestException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
       </operation>
       <operation name="registerEvent" qname="operNS:registerEvent" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:registerEventReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:string" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
         <parameter qname="pns:rpoPID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
         <parameter qname="pns:eventPO" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:EventPreservationObject" xmlns:tns="http://data.core.roda.dgarq.gov.pt"/>
         <parameter qname="pns:agent" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:AgentPreservationObject" xmlns:tns="http://data.core.roda.dgarq.gov.pt"/>
-        <fault name="IngestException" qname="fns:fault2" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.IngestException" type="tns:IngestException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="IngestException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.IngestException" type="tns:IngestException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      </operation>
+      <operation name="createRepresentationObject" qname="operNS:createRepresentationObject" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:createRepresentationObjectReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:string" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
+        <parameter qname="pns:rObject" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:RepresentationObject" xmlns:tns="http://data.core.roda.dgarq.gov.pt"/>
+        <fault name="NoSuchRODAObjectException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="IngestException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.IngestException" type="tns:IngestException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
       </operation>
       <operation name="registerDerivationEvent" qname="operNS:registerDerivationEvent" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:registerDerivationEventReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:string" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
         <parameter qname="pns:originalRepresentationPID" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
@@ -85,26 +111,11 @@
         <parameter qname="pns:agentPO" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:AgentPreservationObject" xmlns:tns="http://data.core.roda.dgarq.gov.pt"/>
         <parameter qname="pns:markObjectsActive" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:boolean" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
         <fault name="NoSuchRODAObjectException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException" type="tns:NoSuchRODAObjectException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
-        <fault name="IngestException" qname="fns:fault2" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.IngestException" type="tns:IngestException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+        <fault name="IngestException" qname="fns:fault1" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.IngestException" type="tns:IngestException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
       </operation>
-      <parameter name="allowedMethods" value="createDerivationRelationship setDONormalizedRepresentation createRepresentationObject removeDescriptionObject createDescriptionObject createRepresentationPreservationObject registerDerivationEvent registerEvent removeObjects registerIngestEvent createDetachedDescriptionObject"/>
+      <parameter name="allowedMethods" value="findVolumeParent createDescriptionObject createDescriptionObjectWithOtherMetadata setDONormalizedRepresentation registerEvent registerIngestEvent createDetachedDescriptionObjectWithOtherMetadata createRepresentationObject removeDescriptionObject createDerivationRelationship createRepresentationPreservationObject registerDerivationEvent removeObjects getPossibleParents createDetachedDescriptionObject"/>
       <parameter name="scope" value="Application"/>
 
-      <typeMapping
-        xmlns:ns="http://eadc.data.core.roda.dgarq.gov.pt"
-        qname="ns:LangmaterialLanguages"
-        type="java:pt.gov.dgarq.roda.core.data.eadc.LangmaterialLanguages"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle=""
-      />
-      <arrayMapping
-        xmlns:ns="http://services.core.roda.dgarq.gov.pt"
-        qname="ns:ArrayOf_tns2_ArrangementTableGroup"
-        type="java:pt.gov.dgarq.roda.core.data.eadc.ArrangementTableGroup[]"
-        innerType="cmp-ns:ArrangementTableGroup" xmlns:cmp-ns="http://eadc.data.core.roda.dgarq.gov.pt"
-        encodingStyle=""
-      />
       <typeMapping
         xmlns:ns="http://data.core.roda.dgarq.gov.pt"
         qname="ns:SimpleRepresentationObject"
@@ -113,19 +124,11 @@
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""
       />
-      <typeMapping
-        xmlns:ns="http://common.core.roda.dgarq.gov.pt"
-        qname="ns:RepresentationAlreadyPreservedException"
-        type="java:pt.gov.dgarq.roda.core.common.RepresentationAlreadyPreservedException"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle=""
-      />
       <arrayMapping
         xmlns:ns="http://services.core.roda.dgarq.gov.pt"
-        qname="ns:ArrayOf_xsd_string"
-        type="java:java.lang.String[]"
-        innerType="cmp-ns:string" xmlns:cmp-ns="http://www.w3.org/2001/XMLSchema"
+        qname="ns:ArrayOf_tns3_Relatedmaterial"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.Relatedmaterial[]"
+        innerType="cmp-ns:Relatedmaterial" xmlns:cmp-ns="http://eadc.data.core.roda.dgarq.gov.pt"
         encodingStyle=""
       />
       <typeMapping
@@ -154,14 +157,6 @@
       />
       <typeMapping
         xmlns:ns="http://data.core.roda.dgarq.gov.pt"
-        qname="ns:SimpleEventPreservationObject"
-        type="java:pt.gov.dgarq.roda.core.data.SimpleEventPreservationObject"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle=""
-      />
-      <typeMapping
-        xmlns:ns="http://data.core.roda.dgarq.gov.pt"
         qname="ns:RepresentationFile"
         type="java:pt.gov.dgarq.roda.core.data.RepresentationFile"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
@@ -177,14 +172,6 @@
         encodingStyle=""
       />
       <typeMapping
-        xmlns:ns="http://preservation.data.core.roda.dgarq.gov.pt"
-        qname="ns:Fixity"
-        type="java:pt.gov.dgarq.roda.core.data.preservation.Fixity"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle=""
-      />
-      <typeMapping
         xmlns:ns="http://common.core.roda.dgarq.gov.pt"
         qname="ns:IngestException"
         type="java:pt.gov.dgarq.roda.core.common.IngestException"
@@ -194,8 +181,31 @@
       />
       <typeMapping
         xmlns:ns="http://eadc.data.core.roda.dgarq.gov.pt"
+        qname="ns:PhysdescGenreform"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.PhysdescGenreform"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <arrayMapping
+        xmlns:ns="http://services.core.roda.dgarq.gov.pt"
+        qname="ns:ArrayOf_tns3_Indexentry"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.Indexentry[]"
+        innerType="cmp-ns:Indexentry" xmlns:cmp-ns="http://eadc.data.core.roda.dgarq.gov.pt"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://eadc.data.core.roda.dgarq.gov.pt"
         qname="ns:BioghistChronitem"
         type="java:pt.gov.dgarq.roda.core.data.eadc.BioghistChronitem"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://eadc.data.core.roda.dgarq.gov.pt"
+        qname="ns:Archref"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.Archref"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""
@@ -210,31 +220,15 @@
       />
       <arrayMapping
         xmlns:ns="http://services.core.roda.dgarq.gov.pt"
-        qname="ns:ArrayOf_tns4_RepresentationFilePreservationObject"
-        type="java:pt.gov.dgarq.roda.core.data.preservation.RepresentationFilePreservationObject[]"
-        innerType="cmp-ns:RepresentationFilePreservationObject" xmlns:cmp-ns="http://preservation.data.core.roda.dgarq.gov.pt"
+        qname="ns:ArrayOf_tns3_Archref"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.Archref[]"
+        innerType="cmp-ns:Archref" xmlns:cmp-ns="http://eadc.data.core.roda.dgarq.gov.pt"
         encodingStyle=""
       />
       <typeMapping
         xmlns:ns="http://common.core.roda.dgarq.gov.pt"
         qname="ns:EditorException"
         type="java:pt.gov.dgarq.roda.core.common.EditorException"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle=""
-      />
-      <typeMapping
-        xmlns:ns="http://eadc.data.core.roda.dgarq.gov.pt"
-        qname="ns:ArrangementTableGroup"
-        type="java:pt.gov.dgarq.roda.core.data.eadc.ArrangementTableGroup"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle=""
-      />
-      <typeMapping
-        xmlns:ns="http://data.core.roda.dgarq.gov.pt"
-        qname="ns:DescriptionObject"
-        type="java:pt.gov.dgarq.roda.core.data.DescriptionObject"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""
@@ -255,27 +249,19 @@
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""
       />
-      <arrayMapping
-        xmlns:ns="http://services.core.roda.dgarq.gov.pt"
-        qname="ns:ArrayOf_tns2_ArrangementTableRow"
-        type="java:pt.gov.dgarq.roda.core.data.eadc.ArrangementTableRow[]"
-        innerType="cmp-ns:ArrangementTableRow" xmlns:cmp-ns="http://eadc.data.core.roda.dgarq.gov.pt"
-        encodingStyle=""
-      />
-      <typeMapping
-        xmlns:ns="http://data.core.roda.dgarq.gov.pt"
-        qname="ns:AgentPreservationObject"
-        type="java:pt.gov.dgarq.roda.core.data.AgentPreservationObject"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle=""
-      />
       <typeMapping
         xmlns:ns="http://data.core.roda.dgarq.gov.pt"
         qname="ns:FileFormat"
         type="java:pt.gov.dgarq.roda.core.data.FileFormat"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <arrayMapping
+        xmlns:ns="http://services.core.roda.dgarq.gov.pt"
+        qname="ns:ArrayOf_tns3_P"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.P[]"
+        innerType="cmp-ns:P" xmlns:cmp-ns="http://eadc.data.core.roda.dgarq.gov.pt"
         encodingStyle=""
       />
       <typeMapping
@@ -294,17 +280,26 @@
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""
       />
-      <arrayMapping
-        xmlns:ns="http://services.core.roda.dgarq.gov.pt"
-        qname="ns:ArrayOf_tns2_BioghistChronitem"
-        type="java:pt.gov.dgarq.roda.core.data.eadc.BioghistChronitem[]"
-        innerType="cmp-ns:BioghistChronitem" xmlns:cmp-ns="http://eadc.data.core.roda.dgarq.gov.pt"
+      <typeMapping
+        xmlns:ns="http://eadc.data.core.roda.dgarq.gov.pt"
+        qname="ns:Indexentry"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.Indexentry"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""
       />
       <typeMapping
-        xmlns:ns="http://common.core.roda.dgarq.gov.pt"
-        qname="ns:NoSuchRODAObjectException"
-        type="java:pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException"
+        xmlns:ns="http://eadc.data.core.roda.dgarq.gov.pt"
+        qname="ns:Acqinfo"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.Acqinfo"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://eadc.data.core.roda.dgarq.gov.pt"
+        qname="ns:Notes"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.Notes"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""
@@ -319,24 +314,10 @@
       />
       <typeMapping
         xmlns:ns="http://eadc.data.core.roda.dgarq.gov.pt"
-        qname="ns:ArrangementTable"
-        type="java:pt.gov.dgarq.roda.core.data.eadc.ArrangementTable"
+        qname="ns:ProcessInfo"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.ProcessInfo"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle=""
-      />
-      <arrayMapping
-        xmlns:ns="http://services.core.roda.dgarq.gov.pt"
-        qname="ns:ArrayOf_tns1_RepresentationFile"
-        type="java:pt.gov.dgarq.roda.core.data.RepresentationFile[]"
-        innerType="cmp-ns:RepresentationFile" xmlns:cmp-ns="http://data.core.roda.dgarq.gov.pt"
-        encodingStyle=""
-      />
-      <arrayMapping
-        xmlns:ns="http://services.core.roda.dgarq.gov.pt"
-        qname="ns:ArrayOf_tns4_Fixity"
-        type="java:pt.gov.dgarq.roda.core.data.preservation.Fixity[]"
-        innerType="cmp-ns:Fixity" xmlns:cmp-ns="http://preservation.data.core.roda.dgarq.gov.pt"
         encodingStyle=""
       />
       <typeMapping
@@ -379,6 +360,13 @@
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""
       />
+      <arrayMapping
+        xmlns:ns="http://services.core.roda.dgarq.gov.pt"
+        qname="ns:ArrayOf_tns3_Acqinfo"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.Acqinfo[]"
+        innerType="cmp-ns:Acqinfo" xmlns:cmp-ns="http://eadc.data.core.roda.dgarq.gov.pt"
+        encodingStyle=""
+      />
       <typeMapping
         xmlns:ns="http://data.core.roda.dgarq.gov.pt"
         qname="ns:SimpleRepresentationPreservationObject"
@@ -387,10 +375,263 @@
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""
       />
+      <arrayMapping
+        xmlns:ns="http://services.core.roda.dgarq.gov.pt"
+        qname="ns:ArrayOf_tns2_RepresentationFile"
+        type="java:pt.gov.dgarq.roda.core.data.RepresentationFile[]"
+        innerType="cmp-ns:RepresentationFile" xmlns:cmp-ns="http://data.core.roda.dgarq.gov.pt"
+        encodingStyle=""
+      />
       <typeMapping
         xmlns:ns="http://data.core.roda.dgarq.gov.pt"
         qname="ns:SimpleDescriptionObject"
         type="java:pt.gov.dgarq.roda.core.data.SimpleDescriptionObject"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://eadc.data.core.roda.dgarq.gov.pt"
+        qname="ns:Note"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.Note"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://eadc.data.core.roda.dgarq.gov.pt"
+        qname="ns:LangmaterialLanguages"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.LangmaterialLanguages"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://eadc.data.core.roda.dgarq.gov.pt"
+        qname="ns:Relatedmaterial"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.Relatedmaterial"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://common.core.roda.dgarq.gov.pt"
+        qname="ns:RepresentationAlreadyPreservedException"
+        type="java:pt.gov.dgarq.roda.core.common.RepresentationAlreadyPreservedException"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <arrayMapping
+        xmlns:ns="http://services.core.roda.dgarq.gov.pt"
+        qname="ns:ArrayOf_xsd_string"
+        type="java:java.lang.String[]"
+        innerType="cmp-ns:string" xmlns:cmp-ns="http://www.w3.org/2001/XMLSchema"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://eadc.data.core.roda.dgarq.gov.pt"
+        qname="ns:ControlAccess"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.ControlAccess"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <arrayMapping
+        xmlns:ns="http://services.core.roda.dgarq.gov.pt"
+        qname="ns:ArrayOf_tns3_ControlAccess"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.ControlAccess[]"
+        innerType="cmp-ns:ControlAccess" xmlns:cmp-ns="http://eadc.data.core.roda.dgarq.gov.pt"
+        encodingStyle=""
+      />
+      <arrayMapping
+        xmlns:ns="http://services.core.roda.dgarq.gov.pt"
+        qname="ns:ArrayOf_tns3_Unitid"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.Unitid[]"
+        innerType="cmp-ns:Unitid" xmlns:cmp-ns="http://eadc.data.core.roda.dgarq.gov.pt"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://data.core.roda.dgarq.gov.pt"
+        qname="ns:SimpleEventPreservationObject"
+        type="java:pt.gov.dgarq.roda.core.data.SimpleEventPreservationObject"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <arrayMapping
+        xmlns:ns="http://services.core.roda.dgarq.gov.pt"
+        qname="ns:ArrayOf_tns3_BioghistChronitem"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.BioghistChronitem[]"
+        innerType="cmp-ns:BioghistChronitem" xmlns:cmp-ns="http://eadc.data.core.roda.dgarq.gov.pt"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://eadc.data.core.roda.dgarq.gov.pt"
+        qname="ns:Unitid"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.Unitid"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://preservation.data.core.roda.dgarq.gov.pt"
+        qname="ns:Fixity"
+        type="java:pt.gov.dgarq.roda.core.data.preservation.Fixity"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://eadc.data.core.roda.dgarq.gov.pt"
+        qname="ns:Materialspec"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.Materialspec"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <arrayMapping
+        xmlns:ns="http://services.core.roda.dgarq.gov.pt"
+        qname="ns:ArrayOf_tns3_Materialspec"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.Materialspec[]"
+        innerType="cmp-ns:Materialspec" xmlns:cmp-ns="http://eadc.data.core.roda.dgarq.gov.pt"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://eadc.data.core.roda.dgarq.gov.pt"
+        qname="ns:ControlAccesses"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.ControlAccesses"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <arrayMapping
+        xmlns:ns="http://services.core.roda.dgarq.gov.pt"
+        qname="ns:ArrayOf_tns4_RepresentationFilePreservationObject"
+        type="java:pt.gov.dgarq.roda.core.data.preservation.RepresentationFilePreservationObject[]"
+        innerType="cmp-ns:RepresentationFilePreservationObject" xmlns:cmp-ns="http://preservation.data.core.roda.dgarq.gov.pt"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://eadc.data.core.roda.dgarq.gov.pt"
+        qname="ns:ArrangementTableGroup"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.ArrangementTableGroup"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://data.core.roda.dgarq.gov.pt"
+        qname="ns:DescriptionObject"
+        type="java:pt.gov.dgarq.roda.core.data.DescriptionObject"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://eadc.data.core.roda.dgarq.gov.pt"
+        qname="ns:Materialspecs"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.Materialspecs"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <arrayMapping
+        xmlns:ns="http://services.core.roda.dgarq.gov.pt"
+        qname="ns:ArrayOf_tns3_ArrangementTableGroup"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.ArrangementTableGroup[]"
+        innerType="cmp-ns:ArrangementTableGroup" xmlns:cmp-ns="http://eadc.data.core.roda.dgarq.gov.pt"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://eadc.data.core.roda.dgarq.gov.pt"
+        qname="ns:P"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.P"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <arrayMapping
+        xmlns:ns="http://services.core.roda.dgarq.gov.pt"
+        qname="ns:ArrayOf_tns3_ArrangementTableRow"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.ArrangementTableRow[]"
+        innerType="cmp-ns:ArrangementTableRow" xmlns:cmp-ns="http://eadc.data.core.roda.dgarq.gov.pt"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://eadc.data.core.roda.dgarq.gov.pt"
+        qname="ns:Relatedmaterials"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.Relatedmaterials"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://data.core.roda.dgarq.gov.pt"
+        qname="ns:AgentPreservationObject"
+        type="java:pt.gov.dgarq.roda.core.data.AgentPreservationObject"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://eadc.data.core.roda.dgarq.gov.pt"
+        qname="ns:Acqinfos"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.Acqinfos"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <arrayMapping
+        xmlns:ns="http://services.core.roda.dgarq.gov.pt"
+        qname="ns:ArrayOf_tns3_Note"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.Note[]"
+        innerType="cmp-ns:Note" xmlns:cmp-ns="http://eadc.data.core.roda.dgarq.gov.pt"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://eadc.data.core.roda.dgarq.gov.pt"
+        qname="ns:Index"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.Index"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://common.core.roda.dgarq.gov.pt"
+        qname="ns:NoSuchRODAObjectException"
+        type="java:pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://eadc.data.core.roda.dgarq.gov.pt"
+        qname="ns:ArrangementTable"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.ArrangementTable"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://eadc.data.core.roda.dgarq.gov.pt"
+        qname="ns:Archrefs"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.Archrefs"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <arrayMapping
+        xmlns:ns="http://services.core.roda.dgarq.gov.pt"
+        qname="ns:ArrayOf_tns4_Fixity"
+        type="java:pt.gov.dgarq.roda.core.data.preservation.Fixity[]"
+        innerType="cmp-ns:Fixity" xmlns:cmp-ns="http://preservation.data.core.roda.dgarq.gov.pt"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://eadc.data.core.roda.dgarq.gov.pt"
+        qname="ns:ItemList"
+        type="java:pt.gov.dgarq.roda.core.data.eadc.ItemList"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""

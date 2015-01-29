@@ -3,7 +3,6 @@
  */
 package pt.gov.dgarq.roda.wui.common.client.widgets;
 
-import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.widgets.MonthPicker.MonthType;
 import pt.gov.dgarq.roda.wui.common.client.widgets.YearPicker.YearType;
 
@@ -39,8 +38,6 @@ public class DayPicker extends ListBox {
 		MONTH_28_DAYS
 	}
 
-	private ClientLogger logger = new ClientLogger(getClass().getName());
-
 	private DayPickerType type;
 
 	private boolean initial;
@@ -54,7 +51,6 @@ public class DayPicker extends ListBox {
 	public DayPicker(boolean initial) {
 		this.initial = initial;
 		this.setVisibleItemCount(1);
-		this.setEnabled(false);
 		this.addStyleName("dayPicker");
 	}
 

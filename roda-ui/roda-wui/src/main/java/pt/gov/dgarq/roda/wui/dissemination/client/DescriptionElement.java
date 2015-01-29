@@ -3,31 +3,48 @@
  */
 package pt.gov.dgarq.roda.wui.dissemination.client;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.MissingResourceException;
 import java.util.Vector;
 
 import pt.gov.dgarq.roda.core.data.DescriptionObject;
+import pt.gov.dgarq.roda.core.data.eadc.Acqinfos;
 import pt.gov.dgarq.roda.core.data.eadc.ArrangementTable;
 import pt.gov.dgarq.roda.core.data.eadc.BioghistChronitem;
 import pt.gov.dgarq.roda.core.data.eadc.BioghistChronlist;
+import pt.gov.dgarq.roda.core.data.eadc.ControlAccesses;
 import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevel;
 import pt.gov.dgarq.roda.core.data.eadc.EadCValue;
+import pt.gov.dgarq.roda.core.data.eadc.Index;
 import pt.gov.dgarq.roda.core.data.eadc.LangmaterialLanguages;
+import pt.gov.dgarq.roda.core.data.eadc.Materialspecs;
+import pt.gov.dgarq.roda.core.data.eadc.Notes;
 import pt.gov.dgarq.roda.core.data.eadc.PhysdescElement;
+import pt.gov.dgarq.roda.core.data.eadc.PhysdescGenreform;
+import pt.gov.dgarq.roda.core.data.eadc.ProcessInfo;
+import pt.gov.dgarq.roda.core.data.eadc.Relatedmaterials;
 import pt.gov.dgarq.roda.core.data.eadc.Text;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.ArrangementTableGroupPanel;
 import pt.gov.dgarq.roda.wui.dissemination.client.images.EditorsIconBundle;
+import pt.gov.dgarq.roda.wui.management.editor.client.AcqInfosEditor;
 import pt.gov.dgarq.roda.wui.management.editor.client.ArrangementTableEditor;
 import pt.gov.dgarq.roda.wui.management.editor.client.ChronListEditor;
+import pt.gov.dgarq.roda.wui.management.editor.client.ControlAccessesEditor;
 import pt.gov.dgarq.roda.wui.management.editor.client.CountryEditor;
 import pt.gov.dgarq.roda.wui.management.editor.client.DateEditor;
 import pt.gov.dgarq.roda.wui.management.editor.client.ElementLevelEditor;
+import pt.gov.dgarq.roda.wui.management.editor.client.KeywordsEditor;
 import pt.gov.dgarq.roda.wui.management.editor.client.LanguageEditor;
+import pt.gov.dgarq.roda.wui.management.editor.client.MaterialSpecsEditor;
 import pt.gov.dgarq.roda.wui.management.editor.client.MetadataElementEditor;
+import pt.gov.dgarq.roda.wui.management.editor.client.NotesEditor;
 import pt.gov.dgarq.roda.wui.management.editor.client.PhysDescElementEditor;
+import pt.gov.dgarq.roda.wui.management.editor.client.PhysDescGenreformEditor;
+import pt.gov.dgarq.roda.wui.management.editor.client.ProcessInfoEditor;
+import pt.gov.dgarq.roda.wui.management.editor.client.RelatedMaterialsEditor;
 import pt.gov.dgarq.roda.wui.management.editor.client.TextEditor;
 
 import com.google.gwt.core.client.GWT;
@@ -51,7 +68,7 @@ import config.i18n.client.DisseminationConstants;
 public class DescriptionElement implements SourcesChangeEvents {
 
 	public static enum EditMode {
-		TEXT_LINE, TEXT_AREA, TEXT_BIGAREA, DATE, COUNTRYCODE, ARRANGEMENT_TABLE, CHRON_LIST, LANGUAGES_LIST, PHYSDESC_DIMENSIONS, PHYSDESC_PHYSFACET, PHYSDESC_EXTENT, LEVEL
+		TEXT_LINE, TEXT_AREA, TEXT_BIGAREA, DATE, COUNTRYCODE, ARRANGEMENT_TABLE, CHRON_LIST, LANGUAGES_LIST, PHYSDESC_DIMENSIONS, PHYSDESC_GENREFORM, PHYSDESC_PHYSFACET, PHYSDESC_EXTENT, LEVEL, NOTES, PROCESS_INFO, CONTROL_ACCESSES, MATERIAL_SPECS, RELATED_MATERIALS, ACQUISITIONS_INFOS, KEYWORDS
 	}
 
 	private static DisseminationConstants constants = (DisseminationConstants) GWT
@@ -86,6 +103,8 @@ public class DescriptionElement implements SourcesChangeEvents {
 
 	private boolean required;
 
+	private List<MetadataElementEditor> editors;
+
 	public DescriptionElement(DescriptionObject object, String element,
 			String description, boolean required, boolean valueAsHTML) {
 		this(object, element, description, new EditMode[] {}, required,
@@ -109,11 +128,12 @@ public class DescriptionElement implements SourcesChangeEvents {
 		listeners = new Vector<ChangeListener>();
 		body.setWidget(readonlyWidget);
 		body.addStyleName("descriptionElement");
+		editors = new ArrayList<MetadataElementEditor>();
 	}
 
 	public void addEditMode(EditMode mode) {
-		Vector<EditMode> editModes = new Vector<EditMode>(Arrays
-				.asList(this.editModes));
+		Vector<EditMode> editModes = new Vector<EditMode>(
+				Arrays.asList(this.editModes));
 		editModes.add(mode);
 		this.editModes = (EditMode[]) editModes.toArray(new EditMode[] {});
 
@@ -168,18 +188,18 @@ public class DescriptionElement implements SourcesChangeEvents {
 			editor.addChangeListener(editorListener);
 			ret = editor.getWidget();
 			ret.addStyleName("edit-widget-mode");
+			editors.add(editor);
 		} else if (editModes.length > 1) {
 			TabPanel tabs = new TabPanel();
 			for (int i = 0; i < editModes.length; i++) {
 				MetadataElementEditor editor = createEditWidgetMode(editModes[i]);
-				tabs
-						.add(editor.getWidget(),
-								createEditorModeIcon(editModes[i]));
+				tabs.add(editor.getWidget(), createEditorModeIcon(editModes[i]));
 				if (!editor.isEmpty()) {
 					tabs.selectTab(i);
 				}
 				editor.addChangeListener(editorListener);
 				editor.getWidget().addStyleName("edit-widget-mode");
+				editors.add(editor);
 			}
 			ret = tabs;
 			ret.addStyleName("edit-widget-tabs");
@@ -218,6 +238,22 @@ public class DescriptionElement implements SourcesChangeEvents {
 			ret = new ArrangementTableEditor();
 		} else if (mode.equals(EditMode.LEVEL)) {
 			ret = new ElementLevelEditor(object.getPid());
+		} else if (mode.equals(EditMode.NOTES)) {
+			ret = new NotesEditor();
+		} else if (mode.equals(EditMode.PHYSDESC_GENREFORM)) {
+			ret = new PhysDescGenreformEditor();
+		} else if (mode.equals(EditMode.PROCESS_INFO)) {
+			ret = new ProcessInfoEditor();
+		} else if (mode.equals(EditMode.CONTROL_ACCESSES)) {
+			ret = new ControlAccessesEditor();
+		} else if (mode.equals(EditMode.MATERIAL_SPECS)) {
+			ret = new MaterialSpecsEditor();
+		} else if (mode.equals(EditMode.RELATED_MATERIALS)) {
+			ret = new RelatedMaterialsEditor();
+		} else if (mode.equals(EditMode.ACQUISITIONS_INFOS)) {
+			ret = new AcqInfosEditor();
+		} else if (mode.equals(EditMode.KEYWORDS)) {
+			ret = new KeywordsEditor();
 		}
 
 		if (ret != null) {
@@ -270,8 +306,8 @@ public class DescriptionElement implements SourcesChangeEvents {
 						.getBioghistChronitems();
 				FlexTable bioghistChronLayout = new FlexTable();
 				for (int i = 0; i < chronitems.length; i++) {
-					Label dateInitial = new Label(chronitems[i]
-							.getDateInitial());
+					Label dateInitial = new Label(
+							chronitems[i].getDateInitial());
 					Label dateFinal = new Label(chronitems[i].getDateFinal());
 					Label text = new Label(chronitems[i].getEvent());
 
@@ -297,12 +333,28 @@ public class DescriptionElement implements SourcesChangeEvents {
 				ret = languagesLayout;
 			} else if (value instanceof PhysdescElement) {
 				PhysdescElement physdescElement = (PhysdescElement) value;
-				Label physdescElementWidget = new Label(physdescElement
-						.getValue()
-						+ " "
-						+ (physdescElement.getUnit() != null ? physdescElement
-								.getUnit() : ""));
+				Label physdescElementWidget = new Label(
+						physdescElement.getValue()
+								+ " "
+								+ (physdescElement.getUnit() != null ? physdescElement
+										.getUnit() : ""));
 				ret = physdescElementWidget;
+			} else if (value instanceof PhysdescGenreform) {
+				ret = PhysDescGenreformEditor.getReadonlyWidget(value);
+			} else if (value instanceof Materialspecs) {
+				ret = MaterialSpecsEditor.getReadonlyWidget(value);
+			} else if (value instanceof Notes) {
+				ret = NotesEditor.getReadonlyWidget(value);
+			} else if (value instanceof Index) {
+				ret = KeywordsEditor.getReadonlyWidget(value);
+			} else if (value instanceof ControlAccesses) {
+				ret = ControlAccessesEditor.getReadonlyWidget(value);
+			} else if (value instanceof Acqinfos) {
+				ret = AcqInfosEditor.getReadonlyWidget(value);
+			} else if (value instanceof Relatedmaterials) {
+				ret = RelatedMaterialsEditor.getReadonlyWidget(value);
+			} else if (value instanceof ProcessInfo) {
+				ret = ProcessInfoEditor.getReadonlyWidget(value);
 			} else {
 				logger.error("Unsupported value type "
 						+ value.getClass().getName());
@@ -399,6 +451,11 @@ public class DescriptionElement implements SourcesChangeEvents {
 	 */
 	public boolean isValid() {
 		boolean valid = (value != null) || !required;
+		if (value != null) {
+			for (MetadataElementEditor editor : editors) {
+				valid = valid && editor.isValid();
+			}
+		}
 		if (!valid) {
 			if (editWidget != null) {
 				editWidget.addStyleName("unvalid");

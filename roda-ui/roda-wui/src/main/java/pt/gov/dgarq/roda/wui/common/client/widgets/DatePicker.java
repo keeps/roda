@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Vector;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -19,6 +20,7 @@ import com.google.gwt.user.client.ui.Widget;
  * @author Luis Faria
  * 
  */
+@SuppressWarnings("deprecation")
 public class DatePicker extends HorizontalPanel implements SourcesChangeEvents {
 
 	private YearPicker year;
@@ -58,7 +60,7 @@ public class DatePicker extends HorizontalPanel implements SourcesChangeEvents {
 		add(year);
 		add(month);
 		add(day);
-
+		
 		year.addKeyboardListener(new KeyboardListener() {
 
 			public void onKeyDown(Widget sender, char keyCode, int modifiers) {
@@ -69,20 +71,15 @@ public class DatePicker extends HorizontalPanel implements SourcesChangeEvents {
 
 			public void onKeyUp(Widget sender, char keyCode, int modifiers) {
 				if (year.isValid()) {
-					month.setEnabled(true);
 					day
 							.update(year.getYearType(), month
 									.getSelectedMonthType());
-					day.setEnabled(true);
 					if (firstEdit) {
 						firstEdit = false;
 						if (!DatePicker.this.initial) {
 							month.setSelectedIndex(month.getItemCount() - 1);
 						}
 					}
-				} else {
-					month.setEnabled(false);
-					day.setEnabled(false);
 				}
 				DatePicker.this.onChange(year);
 			}
@@ -100,7 +97,7 @@ public class DatePicker extends HorizontalPanel implements SourcesChangeEvents {
 		ChangeListener changeListener = new ChangeListener() {
 
 			public void onChange(Widget sender) {
-				DatePicker.this.onChange(year);
+				DatePicker.this.onChange(sender);
 			}
 
 		};
@@ -188,7 +185,6 @@ public class DatePicker extends HorizontalPanel implements SourcesChangeEvents {
 	 * 
 	 * @return
 	 */
-	@SuppressWarnings("deprecation")
 	public Date getDate() {
 		return new Date(year.getInt() - 1900, month.getSelectedInt() - 1, day
 				.getSelectedInt());
@@ -199,7 +195,7 @@ public class DatePicker extends HorizontalPanel implements SourcesChangeEvents {
 	 * 
 	 * @param date
 	 */
-	@SuppressWarnings("deprecation")
+	
 	public void setDate(Date date) {
 		if (date != null) {
 			int year = date.getYear() + 1900;

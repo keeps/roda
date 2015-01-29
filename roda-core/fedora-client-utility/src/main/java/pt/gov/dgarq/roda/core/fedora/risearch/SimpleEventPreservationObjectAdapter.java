@@ -60,8 +60,8 @@ public class SimpleEventPreservationObjectAdapter extends
 	 * 
 	 * @see SortParameterComparator#compare(Object, Object, String)
 	 */
-	public int compare(SimpleEventPreservationObject e1, SimpleEventPreservationObject e2,
-			String attributeName) {
+	public int compare(SimpleEventPreservationObject e1,
+			SimpleEventPreservationObject e2, String attributeName) {
 		return 0;
 	}
 
@@ -73,8 +73,8 @@ public class SimpleEventPreservationObjectAdapter extends
 	 */
 	@Override
 	public List<String> getAttributeNames() {
-		List<String> list = new ArrayList<String>(rodaObjectAdapter
-				.getAttributeNames());
+		List<String> list = new ArrayList<String>(
+				rodaObjectAdapter.getAttributeNames());
 		list.addAll(Arrays.asList(attributeNames));
 		return list;
 	}
@@ -86,8 +86,8 @@ public class SimpleEventPreservationObjectAdapter extends
 	 */
 	@Override
 	public List<String> getITQLSubjects() {
-		List<String> list = new ArrayList<String>(rodaObjectAdapter
-				.getITQLSubjects());
+		List<String> list = new ArrayList<String>(
+				rodaObjectAdapter.getITQLSubjects());
 		list.addAll(Arrays.asList(itqlSubjects));
 		return list;
 	}
@@ -99,8 +99,8 @@ public class SimpleEventPreservationObjectAdapter extends
 	 */
 	@Override
 	public List<String> getITQLPredicates() {
-		List<String> list = new ArrayList<String>(rodaObjectAdapter
-				.getITQLPredicates());
+		List<String> list = new ArrayList<String>(
+				rodaObjectAdapter.getITQLPredicates());
 		list.addAll(Arrays.asList(itqlPredicates));
 		return list;
 	}
@@ -198,11 +198,15 @@ public class SimpleEventPreservationObjectAdapter extends
 
 		sro.setTargetPID(getPIDFromFedoraURI(tuple.get("targetPID")
 				.stringValue()));
-		sro
-				.setAgentPID(getPIDFromFedoraURI(tuple.get("agentPID")
-						.stringValue()));
+		sro.setAgentPID(getPIDFromFedoraURI(tuple.get("agentPID").stringValue()));
 
 		return sro;
 
+	}
+
+	@Override
+	public String getITQLClassificationSchemeCondition(String itqlQuerySubject,
+			String classificationSchemeId, String[] possibleParentsPids) {
+		return null;
 	}
 }

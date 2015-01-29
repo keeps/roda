@@ -15,7 +15,15 @@
 			<includes>
 				<include>commons-configuration:commons-configuration</include>
 				<include>commons-lang:commons-lang</include>
-				<include>org.w3c:w3c-utils</include>     
+				<include>org.w3c:w3c-utils</include>   
+				<include>org.jasig.cas.client:cas-client-core</include> 
+				<include>org.opensaml:opensaml1</include> 
+				<include>commons-codec:commons-codec</include> 
+				<include>xml-security:xmlsec</include> 
+				<include>org.objectweb.carol:carol</include> 
+				<include>commons-io:commons-io</include>
+				<include>myfaces:myfaces-api</include>
+				<include>myfaces:myfaces-impl</include>
 			</includes>
 		</dependencySet>
 	</dependencySets>

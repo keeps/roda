@@ -5,7 +5,7 @@
 		xmlns:zs="http://www.loc.gov/zing/srw/"
 		xmlns:foxml="info:fedora/fedora-system:def/foxml#"
 		xmlns:dc="http://purl.org/dc/elements/1.1/"
-		xmlns:eadc="http://roda.dgarq.gov.pt/2008/EADCSchema">
+		xmlns:eadc="http://roda.dgarq.gov.pt/2014/EADCSchema">
 	<xsl:output method="xml" indent="yes" encoding="UTF-8"/>
 
 	<xsl:template match="/">

@@ -36,6 +36,7 @@ public class EadcSearchFields {
 	public static final String ACQINFO = "ead.acqinfo";
 	public static final String ACQINFO_DATE = "ead.acqinfo.date";
 	public static final String ACQINFO_NUM = "ead.acqinfo.num";
+	public static final String ACQINFO_NUM_FULL_ID = "ead.acqinfo.num.fullid";
 	public static final String SCOPECONTENT = "ead.scopecontent";
 	public static final String APPRAISAL = "ead.appraisal";
 	public static final String ACCRUALS = "ead.accruals";
@@ -47,14 +48,30 @@ public class EadcSearchFields {
 	public static final String MATERIALSPEC = "ead.materialspec";
 	public static final String PHYSDESC_PHYSFACET = "ead.physdesc.physfacet";
 	public static final String PHYSDESC_PHYSFACET_UNIT = "ead.physdesc.physfacet.unit";
+	public static final String PHYSDESC_GENREFORM = "ead.physdesc.genreform";
 	public static final String OTHERFINDAID = "ead.otherfindaid";
 	public static final String RELATEDMATERIAL = "ead.relatedmaterial";
 	public static final String BIBLIOGRAPHY = "ead.bibliography";
 	public static final String NOTE = "ead.note";
 	public static final String PREFERCITE = "ead.prefercite";
-
+	public static final String CONTROL_ACCESS = "ead.controlaccess";
+	public static final String ABSTRACT = "ead.abstract";
+	public static final String INDEX = "ead.index";
+	public static final String ODD = "ead.odd";
+	
+	
 	/**
 	 * @deprecated this field will be deleted in the future.
 	 */
-	public static final String PROCESSINFO = "ead.processinfo";
+	public static final String PROCESSINFO = "ead.processinfo.note";
+
+  
+
+  
+
+  
+
+  
+
+  
 }

@@ -210,6 +210,10 @@ public abstract class ITQLEntityAdapter<E> implements
 	public abstract String getITQLProducerCondition(String itqlQuerySubject,
 			String username, List<String> groups);
 
+	public abstract String getITQLClassificationSchemeCondition(
+			String itqlQuerySubject, String classificationSchemeId,
+			String[] possibleParentsPids);
+
 	public abstract String getEntityCountITQLQuerySubject();
 
 	/**

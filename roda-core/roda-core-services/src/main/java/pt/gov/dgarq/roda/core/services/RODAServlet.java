@@ -1,6 +1,8 @@
 package pt.gov.dgarq.roda.core.services;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -20,9 +22,10 @@ import pt.gov.dgarq.roda.core.data.LogEntry;
 import pt.gov.dgarq.roda.core.data.LogEntryParameter;
 import pt.gov.dgarq.roda.core.data.User;
 import pt.gov.dgarq.roda.core.logger.LoggerManager;
-import pt.gov.dgarq.roda.servlet.ExtendedUserPrincipal;
-import pt.gov.dgarq.roda.servlet.LdapAuthenticationFilter;
 import pt.gov.dgarq.roda.servlet.RodaServletRequestWrapper;
+import pt.gov.dgarq.roda.servlet.cas.CASAuthenticationFilter;
+import pt.gov.dgarq.roda.servlet.cas.CASUserPrincipal;
+import pt.gov.dgarq.roda.servlet.cas.CASUtility;
 
 /**
  * This {@link Servlet} should be the base class for all RODA servlets.
@@ -40,6 +43,9 @@ public abstract class RODAServlet extends HttpServlet implements Servlet {
 
 	private Queue<LogEntry> logEntryQueue = null;
 	private RegisterLogEntriesThread registerLogEntriesThread = null;
+	
+	private CASUtility casUtility;
+	
 
 	/**
 	 * Initialise a {@link RODAServlet}.
@@ -58,6 +64,14 @@ public abstract class RODAServlet extends HttpServlet implements Servlet {
 			if (loggerManager == null) {
 				loggerManager = LoggerManager.getDefaultLoggerManager();
 			}
+			
+			
+			if(casUtility==null){
+				String casURL = configuration.getString("roda.cas.url");
+				String coreURL = configuration.getString("roda.core.url");
+				
+				casUtility = new CASUtility(new URL(casURL), new URL(coreURL));
+			}
 
 		} catch (ConfigurationException e) {
 
@@ -73,6 +87,11 @@ public abstract class RODAServlet extends HttpServlet implements Servlet {
 			throw new RODAServiceException("Error creating logger utility  - "
 					+ e.getMessage(), e);
 
+		} catch (MalformedURLException e) {
+			logger.error("Error creating CAS utility  - " + e.getMessage(),
+					e);
+			throw new RODAServiceException("Error creating CAS utility  - "
+					+ e.getMessage(), e);
 		}
 
 		this.logEntryQueue = new ConcurrentLinkedQueue<LogEntry>();
@@ -105,6 +124,11 @@ public abstract class RODAServlet extends HttpServlet implements Servlet {
 		return configuration;
 	}
 
+	
+	
+	protected CASUtility getCasUtility(){
+		return casUtility;
+	}
 	/**
 	 * Return the configuration properties with the specified name.
 	 * 
@@ -246,16 +270,24 @@ public abstract class RODAServlet extends HttpServlet implements Servlet {
 	 * @return the {@link User} that requested this service or <code>null</code>
 	 *         if it doesn't exist.
 	 */
-	protected User getClientUser() {
+	protected CASUserPrincipal getClientUser() {
 
-		User user = null;
-
-		if (getCurrentRequest() instanceof RodaServletRequestWrapper) {
-			RodaServletRequestWrapper rodaRequestWrapper = (RodaServletRequestWrapper) getCurrentRequest();
-			user = rodaRequestWrapper.getLdapUserPrincipal();
-		} else {
-			// user = null
-			user = new User(getCurrentRequest().getUserPrincipal().getName());
+		CASUserPrincipal user = null;
+		try{
+			if (getCurrentRequest() instanceof RodaServletRequestWrapper) {
+				RodaServletRequestWrapper rodaRequestWrapper = (RodaServletRequestWrapper) getCurrentRequest();
+				user = rodaRequestWrapper.getCASUserPrincipal();
+			} else {
+				
+				String username = getClientUserName();
+				String password = getClientUserPassword();
+				if(username!=null){
+					logger.debug("GETTING CAS USER FROM U/P "+username+"/"+password);
+					user = casUtility.getCASUserPrincipal(username, password);
+				}
+			}
+		}catch(Exception e){
+			logger.error("ERROR GETTING CLIENT: "+e.getMessage());
 		}
 
 		return user;
@@ -286,19 +318,43 @@ public abstract class RODAServlet extends HttpServlet implements Servlet {
 		if (getCurrentRequest() instanceof RodaServletRequestWrapper) {
 
 			RodaServletRequestWrapper rodaRequestWrapper = (RodaServletRequestWrapper) getCurrentRequest();
-			ExtendedUserPrincipal userPrincipal = (ExtendedUserPrincipal) rodaRequestWrapper
-					.getLdapUserPrincipal();
-			password = userPrincipal.getPassword();
+			
+			CASUserPrincipal userPrincipal = (CASUserPrincipal) rodaRequestWrapper
+					.getCASUserPrincipal();
+			password = userPrincipal.getProxyGrantingTicket();
 
 		} else {
 
-			String[] usernamePassword = LdapAuthenticationFilter
+			String[] usernamePassword = CASAuthenticationFilter
 					.parseUsernamePassword(getCurrentRequest());
 			password = usernamePassword[1];
 
 		}
 
 		return password;
+	}
+	
+	protected String getClientUserName() {
+
+		String username = null;
+
+		if (getCurrentRequest() instanceof RodaServletRequestWrapper) {
+
+			RodaServletRequestWrapper rodaRequestWrapper = (RodaServletRequestWrapper) getCurrentRequest();
+			
+			CASUserPrincipal userPrincipal = (CASUserPrincipal) rodaRequestWrapper
+					.getCASUserPrincipal();
+			username = userPrincipal.getName();
+
+		} else {
+
+			String[] usernamePassword = CASAuthenticationFilter
+					.parseUsernamePassword(getCurrentRequest());
+			username = usernamePassword[0];
+
+		}
+
+		return username;
 	}
 
 }

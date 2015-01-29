@@ -1,6 +1,7 @@
 package pt.gov.dgarq.roda.servlet;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterConfig;
@@ -18,6 +19,7 @@ public abstract class RODAFilter implements Filter {
 	static final private Logger logger = Logger.getLogger(RODAFilter.class);
 
 	private final static String PARAMETER_REALM = "realm"; //$NON-NLS-1$
+	private final static String PARAMETER_CAS_URL = "casURL"; //$NON-NLS-1$
 
 	/**
 	 * Authentication Realm
@@ -25,12 +27,23 @@ public abstract class RODAFilter implements Filter {
 	protected String realm = null;
 
 	/**
+	 * CAS URL
+	 */
+	protected String casURL = null;
+	
+	/**
 	 * @see Filter#init(FilterConfig)
 	 */
 	public void init(FilterConfig filterConfig) throws ServletException {
 
 		if (filterConfig.getInitParameter(PARAMETER_REALM) != null) {
 			realm = filterConfig.getInitParameter(PARAMETER_REALM);
+		} else {
+			// Default value (null)
+		}
+		
+		if (filterConfig.getInitParameter(PARAMETER_CAS_URL) != null) {
+			casURL = filterConfig.getInitParameter(PARAMETER_CAS_URL);
 		} else {
 			// Default value (null)
 		}

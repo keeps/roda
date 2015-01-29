@@ -140,7 +140,7 @@ public class PhpMyAdmin extends javax.servlet.http.HttpServlet implements
 						.getRepresentationObject(pid);
 				final SynchronousConverter service = migratorClient
 						.getSynchronousConverterService(migratorUrl, rodaClient
-								.getUsername(), rodaClient.getPassword());
+								.getCup(),rodaClient.getCasUtility());
 				new Thread() {
 					public void run() {
 						try {

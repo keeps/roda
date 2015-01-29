@@ -43,6 +43,8 @@ import pt.gov.dgarq.roda.core.plugins.PluginException;
 import pt.gov.dgarq.roda.core.stubs.Browser;
 import pt.gov.dgarq.roda.core.stubs.Ingest;
 import pt.gov.dgarq.roda.core.stubs.UserBrowser;
+import pt.gov.dgarq.roda.servlet.cas.CASUserPrincipal;
+import pt.gov.dgarq.roda.servlet.cas.CASUtility;
 import pt.gov.dgarq.roda.util.EmailUtility;
 import pt.gov.dgarq.roda.util.FileUtility;
 import pt.gov.dgarq.roda.util.TempDir;
@@ -133,7 +135,8 @@ public class FixityCheckPlugin extends AbstractPlugin {
 		return Arrays.asList(PARAMETER_RODA_CORE_URL(),
 				PARAMETER_RODA_CORE_USERNAME(), PARAMETER_RODA_CORE_PASSWORD(),
 				PARAMETER_NOTIFIER_EMAIL_ADDRESS(),
-				PARAMETER_RESPONSIBLE_USERNAME());
+				PARAMETER_RESPONSIBLE_USERNAME(),
+				PARAMETER_RODA_CAS_URL());
 	}
 
 	/**
@@ -673,14 +676,35 @@ public class FixityCheckPlugin extends AbstractPlugin {
 				PARAMETER_RODA_CORE_PASSWORD().getName());
 	}
 
+	private URL getCasURL() throws MalformedURLException {
+		return new URL(getParameterValues().get(
+				PARAMETER_RODA_CAS_URL().getName()));
+	}
+	private URL getCoreURL() throws MalformedURLException {
+		return new URL(getParameterValues().get(
+				PARAMETER_RODA_CORE_URL().getName()));
+	}
 	private void initRODAServices() throws PluginException {
 
 		try {
-
-			this.rodaClient = new RODAClient(getRodaServicesURL(),
-					getUsername(), getPassword());
-			this.rodaDownloader = new Downloader(getRodaServicesURL(),
-					getUsername(), getPassword());
+			String rodaClientServiceUrl = getParameterValues().get(
+					AbstractPlugin.PARAMETER_RODA_CORE_URL().getName());
+			String rodaClientUsername = getParameterValues().get(
+					AbstractPlugin.PARAMETER_RODA_CORE_USERNAME().getName());
+			String rodaClientPassword = getParameterValues().get(
+					AbstractPlugin.PARAMETER_RODA_CORE_PASSWORD().getName());
+			String casURL = getParameterValues().get(
+					AbstractPlugin.PARAMETER_RODA_CAS_URL().getName());
+			String coreURL = getParameterValues().get(
+					AbstractPlugin.PARAMETER_RODA_CORE_URL().getName());
+			
+			CASUtility casUtility = new CASUtility(new URL(casURL), new URL(
+					coreURL));
+			
+			this.rodaClient = new RODAClient(new URL(rodaClientServiceUrl),
+					rodaClientUsername, rodaClientPassword, casUtility);
+			this.rodaDownloader = new Downloader(new URL(rodaClientServiceUrl),
+					rodaClientUsername, rodaClientPassword, casUtility);
 
 			this.browserService = this.rodaClient.getBrowserService();
 			this.ingestService = this.rodaClient.getIngestService();

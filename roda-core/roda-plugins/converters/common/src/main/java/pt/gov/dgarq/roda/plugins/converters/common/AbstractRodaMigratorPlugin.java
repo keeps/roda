@@ -11,6 +11,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import javax.naming.AuthenticationException;
+
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.StringUtils;
@@ -54,6 +56,8 @@ import pt.gov.dgarq.roda.migrator.common.RepresentationAlreadyConvertedException
 import pt.gov.dgarq.roda.migrator.common.data.ConversionResult;
 import pt.gov.dgarq.roda.migrator.stubs.SynchronousConverter;
 import pt.gov.dgarq.roda.plugins.converters.common.LocalRepresentationObject;
+import pt.gov.dgarq.roda.servlet.cas.CASUserPrincipal;
+import pt.gov.dgarq.roda.servlet.cas.CASUtility;
 import pt.gov.dgarq.roda.util.StringUtility;
 import pt.gov.dgarq.roda.util.TempDir;
 
@@ -92,7 +96,7 @@ public abstract class AbstractRodaMigratorPlugin extends
 	public static PluginParameter PARAMETER_FAIL_AT_FIRST_ERROR() {
 		return new PluginParameter("failAtFirstError",
 				PluginParameter.TYPE_BOOLEAN, "false", true, true,
-				"Plugin fails at first convertion error");
+				"Plugin fails at first conversion error");
 	}
 
 	private RODAClient rodaClient = null;
@@ -107,6 +111,8 @@ public abstract class AbstractRodaMigratorPlugin extends
 	private String converterServiceURL = null;
 
 	private String[] representationSubTypes = null;
+	
+	private boolean initialized = false;
 
 	/**
 	 * Create a new {@link AbstractRodaMigratorPlugin}.
@@ -363,9 +369,12 @@ public abstract class AbstractRodaMigratorPlugin extends
 	protected abstract boolean isNormalization();
 
 	private SynchronousConverter getConverter() throws MigratorClientException {
+		try{
+			initClientServices();
+		}catch (PluginException e) {
+		}
 		return new MigratorClient().getSynchronousConverterService(
-				converterServiceURL, getParameterRodaServicesUsername(),
-				getParameterRodaServicesPassword());
+				converterServiceURL,rodaClient.getCup(),rodaClient.getCasUtility());
 	}
 
 	private List<String> getRepresentationSubtypes() {
@@ -374,8 +383,11 @@ public abstract class AbstractRodaMigratorPlugin extends
 
 	private ReportItem executeOn(String representationPID)
 			throws PluginException {
-
-		ReportItem reportItem = new ReportItem("Convertion of representation "
+		try{
+			initClientServices();
+		}catch (PluginException e) {
+		}
+		ReportItem reportItem = new ReportItem("Conversion of representation "
 				+ representationPID);
 		reportItem.addAttribute(new Attribute("start datetime", DateParser
 				.getIsoDate(new Date())));
@@ -394,7 +406,7 @@ public abstract class AbstractRodaMigratorPlugin extends
 			logger.info("Original representation is " + originalRObject);
 
 			reportItem.addAttribute(new Attribute(
-					"Download original representation - finnish datetime",
+					"Download original representation - finish datetime",
 					DateParser.getIsoDate(new Date())));
 
 		} catch (BrowserException e) {
@@ -457,7 +469,7 @@ public abstract class AbstractRodaMigratorPlugin extends
 								+ exception.getMessage(), exception, reportItem);
 			}
 
-			reportItem.addAttributes(new Attribute("finnish datetime",
+			reportItem.addAttributes(new Attribute("finish datetime",
 					DateParser.getIsoDate(new Date())));
 
 			return reportItem;
@@ -486,7 +498,7 @@ public abstract class AbstractRodaMigratorPlugin extends
 			logger.info("Convert " + originalRObject.getPid() + " finished");
 
 			reportItem.addAttribute(new Attribute(
-					"Conversion - finnish datetime", DateParser
+					"Conversion - finish datetime", DateParser
 							.getIsoDate(new Date())));
 			reportItem.addAttribute(new Attribute(
 					"Conversion - converted representation", convertResult
@@ -541,7 +553,7 @@ public abstract class AbstractRodaMigratorPlugin extends
 			logger.info("Representation written");
 
 			reportItem.addAttribute(new Attribute(
-					"Download converted representation - finnish datetime",
+					"Download converted representation - finish datetime",
 					DateParser.getIsoDate(new Date())));
 
 			reportItem.addAttribute(new Attribute("Ingest - start datetime",
@@ -566,7 +578,7 @@ public abstract class AbstractRodaMigratorPlugin extends
 
 			logger.info("Representation ingested with PID " + roPID);
 
-			reportItem.addAttribute(new Attribute("Ingest - finnish datetime",
+			reportItem.addAttribute(new Attribute("Ingest - finish datetime",
 					DateParser.getIsoDate(new Date())));
 			reportItem.addAttribute(new Attribute(
 					"Ingest - ingested representation PID", roPID));
@@ -678,32 +690,32 @@ public abstract class AbstractRodaMigratorPlugin extends
 					originalRObject.getPid(), roPID, eventPO, agentPO,
 					getParameterMakeObjectsActive());
 
-			logger.info("Event registration finnished. Derivation event is "
+			logger.info("Event registration finished. Derivation event is "
 					+ epoPID);
 
 			reportItem.addAttributes(new Attribute(
 					"Register event - event PID", epoPID), new Attribute(
-					"finnish datetime", DateParser.getIsoDate(new Date())));
+					"finish datetime", DateParser.getIsoDate(new Date())));
 
 			return reportItem;
 
 		} catch (NoSuchRODAObjectException e) {
 			// registerDerivationEvent(...)
 			logger.debug(
-					"Error registering convertion event - " + e.getMessage(), e);
-			throw new PluginException("Error registering convertion event - "
+					"Error registering conversion event - " + e.getMessage(), e);
+			throw new PluginException("Error registering conversion event - "
 					+ e.getMessage(), e, reportItem);
 		} catch (IngestException e) {
 			// registerDerivationEvent(...)
 			logger.debug(
-					"Error registering convertion event - " + e.getMessage(), e);
-			throw new PluginException("Error registering convertion event - "
+					"Error registering conversion event - " + e.getMessage(), e);
+			throw new PluginException("Error registering conversion event - "
 					+ e.getMessage(), e, reportItem);
 		} catch (RemoteException e) {
 			// registerDerivationEvent(...)
 			logger.debug(
-					"Error registering convertion event - " + e.getMessage(), e);
-			throw new PluginException("Error registering convertion event - "
+					"Error registering conversion event - " + e.getMessage(), e);
+			throw new PluginException("Error registering conversion event - "
 					+ e.getMessage(), e, reportItem);
 		}
 
@@ -894,60 +906,74 @@ public abstract class AbstractRodaMigratorPlugin extends
 	}
 
 	private void initClientServices() throws PluginException {
-		try {
-
-			this.rodaClient = new RODAClient(getParameterRodaServicesURL(),
-					getParameterRodaServicesUsername(),
-					getParameterRodaServicesPassword());
-			this.rodaUploader = new Uploader(getParameterRodaServicesURL(),
-					getParameterRodaServicesUsername(),
-					getParameterRodaServicesPassword());
-			this.rodaDownloader = new Downloader(getParameterRodaServicesURL(),
-					getParameterRodaServicesUsername(),
-					getParameterRodaServicesPassword());
-
-		} catch (RODAClientException e) {
-			logger.debug("Error creating RODA client - " + e.getMessage(), e);
-			throw new PluginException("Error creating RODA client - "
-					+ e.getMessage(), e);
-		} catch (LoginException e) {
-			logger.debug("Error creating RODA client - " + e.getMessage(), e);
-			throw new PluginException("Error creating RODA client - "
-					+ e.getMessage(), e);
-		} catch (MalformedURLException e) {
-			logger.debug("Error creating RODA client - " + e.getMessage(), e);
-			throw new PluginException("Error creating RODA client - "
-					+ e.getMessage(), e);
-		} catch (DownloaderException e) {
-			logger.debug("Error creating RODA downloader - " + e.getMessage(),
-					e);
-			throw new PluginException("Error creating RODA downloader - "
-					+ e.getMessage(), e);
+		if(!initialized){
+			CASUtility casUtility=null;
+			CASUserPrincipal cup = null;
+			try {
+				casUtility = new CASUtility(new URL(getParameterCASUrl()), new URL(getParameterCoreUrl()));
+			} catch (MalformedURLException e) {
+				throw new PluginException("Error creating CAS Utility - "+ e.getMessage(), e);
+			}
+			
+			try {
+				cup = casUtility.getCASUserPrincipal(getParameterRodaServicesUsername(), getParameterRodaServicesPassword());
+			} catch (Throwable e) {
+				throw new PluginException("Unable to create CasUserPrincipal - "+ e.getMessage(), e);
+			}
+			try {
+				this.rodaClient = new RODAClient(getParameterRodaServicesURL(),cup,casUtility);
+				this.rodaUploader = new Uploader(getParameterRodaServicesURL(),cup,casUtility);
+				this.rodaDownloader = new Downloader(getParameterRodaServicesURL(),cup,casUtility);
+			} catch (RODAClientException e) {
+				logger.debug("Error creating RODA client - " + e.getMessage(), e);
+				throw new PluginException("Error creating RODA client - "
+						+ e.getMessage(), e);
+			} catch (LoginException e) {
+				logger.debug("Error creating RODA client - " + e.getMessage(), e);
+				throw new PluginException("Error creating RODA client - "
+						+ e.getMessage(), e);
+			} catch (MalformedURLException e) {
+				logger.debug("Error creating RODA client - " + e.getMessage(), e);
+				throw new PluginException("Error creating RODA client - "
+						+ e.getMessage(), e);
+			} catch (DownloaderException e) {
+				logger.debug("Error creating RODA downloader - " + e.getMessage(),
+						e);
+				throw new PluginException("Error creating RODA downloader - "
+						+ e.getMessage(), e);
+			} catch(Throwable e){
+				logger.debug("Error while initializing client service - " + e.getMessage(),
+						e);
+				throw new PluginException("Error while initializing client service - "
+						+ e.getMessage(), e);
+			}
+	
+			try {
+	
+				this.browserService = this.rodaClient.getBrowserService();
+	
+			} catch (RODAClientException e) {
+				logger.error("Error accessing Browser service - " + e.getMessage(),
+						e);
+				throw new PluginException("Error accessing Browser service - "
+						+ e.getMessage(), e);
+			}
+	
+			try {
+	
+				this.ingestService = this.rodaClient.getIngestService();
+	
+			} catch (RODAClientException e) {
+				logger.error("Error accessing Ingest service - " + e.getMessage(),
+						e);
+				throw new PluginException("Error accessing Ingest service - "
+						+ e.getMessage(), e);
+			}
+	
+			this.migratorClient = new MigratorClient();
+			initialized = true;
+			logger.debug("##### INITIALIZED OK");
 		}
-
-		try {
-
-			this.browserService = this.rodaClient.getBrowserService();
-
-		} catch (RODAClientException e) {
-			logger.debug("Error accessing Browser service - " + e.getMessage(),
-					e);
-			throw new PluginException("Error accessing Browser service - "
-					+ e.getMessage(), e);
-		}
-
-		try {
-
-			this.ingestService = this.rodaClient.getIngestService();
-
-		} catch (RODAClientException e) {
-			logger.debug("Error accessing Ingest service - " + e.getMessage(),
-					e);
-			throw new PluginException("Error accessing Ingest service - "
-					+ e.getMessage(), e);
-		}
-
-		this.migratorClient = new MigratorClient();
 	}
 
 	private URL getParameterRodaServicesURL() throws MalformedURLException {
@@ -964,6 +990,17 @@ public abstract class AbstractRodaMigratorPlugin extends
 		return getParameterValues().get(
 				PARAMETER_RODA_CORE_PASSWORD().getName());
 	}
+	
+	private String getParameterCASUrl() {
+		return getParameterValues().get(
+				PARAMETER_RODA_CAS_URL().getName());
+	}
+	
+	private String getParameterCoreUrl() {
+		return getParameterValues().get(
+				PARAMETER_RODA_CORE_URL().getName());
+	}
+	
 
 	private boolean getParameterMakeObjectsActive() {
 		return Boolean.parseBoolean(getParameterValues().get(

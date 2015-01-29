@@ -1,8 +1,12 @@
 package pt.gov.dgarq.roda.wui.common.server;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 
@@ -29,6 +33,11 @@ public class UserLoginServiceImpl extends RemoteServiceServlet implements
 	/**
 	 * 
 	 */
+
+	public static UserLoginServiceImpl getInstance() {
+		return new UserLoginServiceImpl();
+	}
+
 	private static final long serialVersionUID = -6898933466651262033L;
 
 	private static final String LOG_ACTION_WUI_LOGIN = "RODAWUI.login";
@@ -62,6 +71,22 @@ public class UserLoginServiceImpl extends RemoteServiceServlet implements
 		authenticatedUser = getAuthenticatedUser();
 
 		return authenticatedUser;
+	}
+
+	public AuthenticatedUser loginCAS(String location, String serviceTicket)
+			throws RODAException {
+		try {
+			AuthenticatedUser authenticatedUser;
+			RodaClientFactory.login(this.getThreadLocalRequest().getSession(),
+					serviceTicket, new URL(location));
+			authenticatedUser = getAuthenticatedUser();
+			return authenticatedUser;
+		} catch (MalformedURLException mfue) {
+			logger.error("Error while loginCAS 1:" + mfue.getMessage(),mfue);
+		} catch (Exception e) {
+			logger.error("Error while loginCAS 2:" + e.getMessage(),e);
+		}
+		return null;
 	}
 
 	protected void logLogin(String username) {
@@ -118,4 +143,21 @@ public class UserLoginServiceImpl extends RemoteServiceServlet implements
 
 	}
 
+	public AuthenticatedUser loginCAS(HttpSession session, String location,
+			String serviceTicket) throws RODAException {
+		try {
+			AuthenticatedUser authenticatedUser = RodaClientFactory.login(session, serviceTicket, new URL(location));
+			return authenticatedUser;
+		} catch (MalformedURLException mfue) {
+			logger.error("Error while loginCAS 3:" + mfue.getMessage(),mfue);
+		} catch (Exception e) {
+			logger.error("Error while loginCAS 4:" + e.getMessage(),e);
+		}
+		return null;
+	}
+
+	@Override
+	public String getRodaCasURL() {
+		return RodaClientFactory.getCasUrlAsString();
+	}
 }

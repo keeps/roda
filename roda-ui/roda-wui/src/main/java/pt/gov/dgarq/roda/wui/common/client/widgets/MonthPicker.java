@@ -44,7 +44,6 @@ public class MonthPicker extends ListBox {
 	 */
 	public MonthPicker() {
 		this.setVisibleItemCount(1);
-		this.setEnabled(false);
 		init();
 		this.addStyleName("monthPicker");
 	}

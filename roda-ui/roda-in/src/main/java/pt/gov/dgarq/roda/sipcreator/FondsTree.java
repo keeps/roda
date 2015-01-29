@@ -25,6 +25,8 @@ import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
 import java.awt.event.InputEvent;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.Icon;
 import javax.swing.JScrollBar;
@@ -41,6 +43,8 @@ import org.apache.log4j.Logger;
 
 import pt.gov.dgarq.roda.core.data.DescriptionObject;
 import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevel;
+import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevelInfo;
+import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevelManager;
 import pt.gov.dgarq.roda.ingest.siputility.SIPException;
 import pt.gov.dgarq.roda.ingest.siputility.data.SIPDescriptionObject;
 
@@ -62,6 +66,8 @@ public class FondsTree extends JTree implements TreeSelectionListener,
 	private DragSource dragSource = null;
 
 	private final FondsTreeModel model;
+
+	private static final String IMAGE_BASE = "/pt/gov/dgarq/roda/sipcreator/descriptionLevel/";
 
 	/**
 	 * Create a new digitalized work Mets tree
@@ -448,30 +454,22 @@ public class FondsTree extends JTree implements TreeSelectionListener,
 	class FondsTreeCellRenderer extends DefaultTreeCellRenderer {
 		private static final long serialVersionUID = -3384681573197356288L;
 
-		private final Icon fondsIcon;
-		private final Icon subFondsIcon;
-		private final Icon classIcon;
-		private final Icon subClassIcon;
-		private final Icon seriesIcon;
-		private final Icon subSeriesIcon;
-		private final Icon fileIcon;
-		private final Icon itemIcon;
+		private final Map<String,Icon> levelIcons;
 
 		public FondsTreeCellRenderer() {
-			fondsIcon = Tools.createImageIcon("descriptionLevel/fonds.png");
-			subFondsIcon = Tools
-					.createImageIcon("descriptionLevel/subfonds.png");
-			classIcon = Tools.createImageIcon("descriptionLevel/class.png");
-			subClassIcon = Tools
-					.createImageIcon("descriptionLevel/subclass.png");
-			seriesIcon = Tools.createImageIcon("descriptionLevel/series.png");
-			subSeriesIcon = Tools
-					.createImageIcon("descriptionLevel/subseries.png");
-			fileIcon = Tools.createImageIcon("descriptionLevel/file.png");
-			itemIcon = Tools.createImageIcon("descriptionLevel/item.png");
-			
-			
-
+			levelIcons = new HashMap<String, Icon>();
+			logger.debug("Going to load description level icons");
+			String category="";
+			for(DescriptionLevel level : DescriptionLevelManager.getDescriptionLevels()){
+				for (DescriptionLevelInfo descriptionLevel : DescriptionLevelManager.getDescriptionLevelsInfo()) {
+					if (descriptionLevel.getLevel().equals(level.getLevel())) {
+						category = descriptionLevel.getCategory().getCategory();
+						break;
+					}
+				}
+				logger.debug("level=" + level.getLevel() + " category=" + category);
+				levelIcons.put(level.getLevel(), Tools.createImageIcon(IMAGE_BASE+(category)+".png"));
+			}
 		}
 
 		public Component getTreeCellRendererComponent(JTree tree, Object value,
@@ -492,23 +490,8 @@ public class FondsTree extends JTree implements TreeSelectionListener,
 			if (node.getUserObject() instanceof DescriptionObject) {
 				DescriptionObject obj = (DescriptionObject) node
 						.getUserObject();
-				if (DescriptionLevel.FONDS.equals(obj.getLevel())) {
-					ret = fondsIcon;
-				} else if (DescriptionLevel.SUBFONDS.equals(obj.getLevel())) {
-					ret = subFondsIcon;
-				} else if (DescriptionLevel.CLASS.equals(obj.getLevel())) {
-					ret = classIcon;
-				} else if (DescriptionLevel.SUBCLASS.equals(obj.getLevel())) {
-					ret = subClassIcon;
-				} else if (DescriptionLevel.SERIES.equals(obj.getLevel())) {
-					ret = seriesIcon;
-				} else if (DescriptionLevel.SUBSERIES.equals(obj.getLevel())) {
-					ret = subSeriesIcon;
-				} else if (DescriptionLevel.FILE.equals(obj.getLevel())) {
-					ret = fileIcon;
-				} else if (DescriptionLevel.ITEM.equals(obj.getLevel())) {
-					ret = itemIcon;
-				}
+				logger.debug("getIcon for "+obj.getLevel());
+				ret = levelIcons.get(obj.getLevel().getLevel());
 			} else if (node.getUserObject() instanceof SIP) {
 				SIP sip = (SIP) node.getUserObject();
 				ret = sip.getIcon();

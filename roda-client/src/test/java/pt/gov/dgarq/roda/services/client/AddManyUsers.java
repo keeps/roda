@@ -15,6 +15,7 @@ import pt.gov.dgarq.roda.core.common.UserAlreadyExistsException;
 import pt.gov.dgarq.roda.core.common.UserManagementException;
 import pt.gov.dgarq.roda.core.data.User;
 import pt.gov.dgarq.roda.core.stubs.UserManagement;
+import pt.gov.dgarq.roda.servlet.cas.CASUtility;
 
 /**
  * @author Rui Castro
@@ -28,21 +29,26 @@ public class AddManyUsers {
 	 */
 	public static void main(String[] args) {
 
-		if (args.length < 4) {
+		if (args.length < 7) {
 			System.err.println("Wrong number of arguments.");
 			System.err.println("Use " + AddManyUsers.class.getSimpleName()
-					+ "protocol://host:port/ (number of users)");
+					+ "protocol://host:port/ casURL coreURL serviceURL (number of users)");
 		} else {
 			// http://localhost:8180/
 			String hostUrl = args[0];
 			String serviceusername = args[1];
 			String servicepassword = args[2];
-			int numberOfUsers = Integer.parseInt(args[3]);
+			String casURL = args[3];
+			String coreURL = args[4];
+			String serviceURL = args[5];
+			int numberOfUsers = Integer.parseInt(args[6]);
 
 			RODAClient rodaClient = null;
 			try {
+				CASUtility casUtility = new CASUtility(new URL(casURL), new URL(coreURL), new URL(serviceURL));
+
 				rodaClient = new RODAClient(new URL(hostUrl), serviceusername,
-						servicepassword);
+						servicepassword,casUtility);
 			} catch (RODAClientException e) {
 				logger.error("Error creating RODA client - " + e.getMessage(),
 						e);
@@ -96,10 +102,10 @@ public class AddManyUsers {
 				}
 			}
 
-			long timeInMillisAfterFinnish = Calendar.getInstance()
+			long timeInMillisAfterFinish = Calendar.getInstance()
 					.getTimeInMillis();
 
-			long durationInMillis = timeInMillisAfterFinnish
+			long durationInMillis = timeInMillisAfterFinish
 					- timeInMillisBeforeStart;
 
 			long durationInSeconds = durationInMillis / 1000l;

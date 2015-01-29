@@ -19,6 +19,8 @@ import pt.gov.dgarq.roda.core.data.RepresentationFile;
 import pt.gov.dgarq.roda.core.data.RepresentationObject;
 import pt.gov.dgarq.roda.migrator.common.ConverterException;
 import pt.gov.dgarq.roda.migrator.common.data.LocalRepresentationObject;
+import pt.gov.dgarq.roda.servlet.cas.CASUserPrincipal;
+import pt.gov.dgarq.roda.servlet.cas.CASUtility;
 import pt.gov.dgarq.roda.util.TempDir;
 
 /**
@@ -39,51 +41,48 @@ public abstract class AbstractSynchronousConverter extends ConverterWebService
 	 * @throws RODAServiceException
 	 */
 	public AbstractSynchronousConverter() throws RODAServiceException {
-
 		super();
-		
-		try {
-
 			String rodaServicesURL = getConfiguration().getString(
 					"rodaServicesURL");
 			String username = getClientUser().getName();
 			String password = getClientUserPassword();
 
+			String casURL = getConfiguration().getString("roda.cas.url");
+			String coreURL = getConfiguration().getString("roda.core.url");
+					
+			CASUserPrincipal cup = null;
+			CASUtility casUtility = null;
+			
+			
 			try {
-
-				this.rodaDownloader = new Downloader(new URL(rodaServicesURL),
-						username, password);
-				rodaClient = new RODAClient(new URL(rodaServicesURL), username,
-						password);
-
-			} catch (DownloaderException e) {
-				logger.debug("Error creating RODA client downloader - "
-						+ e.getMessage(), e);
-				throw new ConverterException(
-						"Error creating RODA client downloader - "
-								+ e.getMessage(), e);
-			} catch (LoginException e) {
-				logger.debug("Error creating RODA client - " + e.getMessage(),
-						e);
-				throw new ConverterException("Error creating RODA client - "
-						+ e.getMessage(), e);
-			} catch (MalformedURLException e) {
-				logger.debug("Error creating RODA client - " + e.getMessage(),
-						e);
-				throw new ConverterException("Error creating RODA client - "
-						+ e.getMessage(), e);
-			} catch (RODAClientException e) {
-				logger.debug("Error creating RODA client - " + e.getMessage(),
-						e);
-				throw new ConverterException("Error creating RODA client - "
-						+ e.getMessage(), e);
+			casUtility = new CASUtility(new URL(casURL), new URL(coreURL));
+			}catch(Throwable e){
+				throw new RODAServiceException("Unable to create CASUtility - "+ e.getMessage(), e);
+			}
+				
+			try{
+				cup = casUtility.getCASUserPrincipal(username,password);
+			}catch(Exception e){
+				throw new RODAServiceException("Unable to get CASUserPrincipal - "+ e.getMessage(), e);
 			}
 			
-		} catch (Throwable e) {
-			logger.debug("Error creating RODA client - " + e.getMessage(), e);
-			throw new ConverterException("Error creating RODA client - "
-					+ e.getMessage(), e);
-		}
+			
+			try {
+				this.rodaDownloader = new Downloader(new URL(rodaServicesURL),
+							cup,casUtility);
+				
+			} catch (DownloaderException e) {
+				throw new RODAServiceException("Unable to create Downloader - "+ e.getMessage(), e);
+			} catch (MalformedURLException e) {
+				throw new RODAServiceException("Unable to create Downloader - "+ e.getMessage(), e);
+			}
+			try {
+				rodaClient = new RODAClient(new URL(rodaServicesURL), cup,casUtility);
+			} catch (RODAClientException e) {
+				throw new RODAServiceException("Unable to create RodaClient - "+ e.getMessage(), e);
+			} catch (MalformedURLException e) {
+				throw new RODAServiceException("Unable to create RodaClient - "+ e.getMessage(), e);
+			}
 
 	}
 

@@ -1,6 +1,5 @@
-<?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<name>roda-wui</name>
 	<artifactId>roda-wui</artifactId>
@@ -36,7 +35,7 @@
 							</execution>
 						</executions>
 					</plugin>
-					<plugin>
+					<!--					<plugin>
 						<artifactId>maven-antrun-plugin</artifactId>
 						<executions>
 							<execution>
@@ -55,6 +54,33 @@
 								</configuration>
 								<goals>
 									<goal>run</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>-->
+					<plugin>
+						<artifactId>maven-clean-plugin</artifactId>
+						<configuration>
+							<filesets>
+								<fileset>
+									<directory>src/main</directory>
+									<includes>
+										<include>gwt-unitCache/**</include>
+										<include>webapp/pt.gov.dgarq.roda.disseminators.common.loading.Loading/**</include>
+										<include>webapp/pt.gov.dgarq.roda.wui.main.Main/**</include>
+										<include>webapp/WEB-INF/deploy/**</include>
+										<include>webapp/WEB-INF/classes/**</include>
+									</includes>
+									<followSymlinks>false</followSymlinks>
+								</fileset>
+							</filesets>
+						</configuration>
+						<executions>
+							<execution>
+								<id>gwt-clean</id>
+								<phase>initialize</phase>
+								<goals>
+									<goal>clean</goal>
 								</goals>
 							</execution>
 						</executions>
@@ -83,7 +109,7 @@
 							<optimizationLevel>0</optimizationLevel>
 						</configuration>
 					</plugin>
-					<plugin>
+					<!--					<plugin>
 						<artifactId>maven-antrun-plugin</artifactId>
 						<executions>
 							<execution>
@@ -105,7 +131,7 @@
 								</goals>
 							</execution>
 						</executions>
-					</plugin>
+					</plugin>-->
 				</plugins>
 			</build>
 		</profile>
@@ -140,6 +166,10 @@
 		<dependency>
 			<groupId>pt.gov.dgarq.roda</groupId>
 			<artifactId>roda-common-sip-utility</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>pt.gov.dgarq.roda</groupId>
+			<artifactId>roda-common-servlet-security</artifactId>
 		</dependency>
 		<!-- <dependency> <groupId>pt.gov.dgarq.roda</groupId> <artifactId>roda-common-servlet-security</artifactId> 
 			</dependency> <dependency> <groupId>pt.gov.dgarq.roda</groupId> <artifactId>roda-common-utils</artifactId> 
@@ -215,5 +245,62 @@
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.opensaml</groupId>
+			<artifactId>opensaml1</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jasig.cas.client</groupId>
+			<artifactId>cas-client-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>xml-security</groupId>
+			<artifactId>xmlsec</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.objectweb.carol</groupId>
+			<artifactId>carol</artifactId>
+		</dependency>
 	</dependencies>
+	<build>
+		<pluginManagement>
+			<plugins>
+				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.apache.maven.plugins
+										</groupId>
+										<artifactId>
+											maven-clean-plugin
+										</artifactId>
+										<versionRange>
+											[2.5,)
+										</versionRange>
+										<goals>
+											<goal>clean</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
 </project>

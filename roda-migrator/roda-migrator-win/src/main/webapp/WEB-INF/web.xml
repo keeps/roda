@@ -60,8 +60,8 @@
 	
 	<!-- LDAP Authentication Filter -->
 	<filter>
-		<filter-name>LdapAuthenticationFilter</filter-name>
-		<filter-class> pt.gov.dgarq.roda.servlet.LdapAuthenticationFilter 
+		<filter-name>CASAuthenticationFilter</filter-name>
+		<filter-class> pt.gov.dgarq.roda.servlet.cas.CASAuthenticationFilter 
 		</filter-class>
 		<init-param>
 			<description> LDAP server hostname (default: localhost) 
@@ -117,7 +117,7 @@
 	
 	<!-- Converters authentication filter -->
 	<filter-mapping>
-		<filter-name>LdapAuthenticationFilter</filter-name>
+		<filter-name>CASAuthenticationFilter</filter-name>
 		<url-pattern>/services/*</url-pattern>
 	</filter-mapping>
 

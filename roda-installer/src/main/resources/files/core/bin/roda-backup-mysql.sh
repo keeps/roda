@@ -3,18 +3,13 @@
 scriptdir=`dirname "$0"`
 
 # Set enviroment variables for RODA MySQL
-. $scriptdir/set-roda-data-mysql-env.sh
+. $scriptdir/set-roda-env.sh
+. $RODA_HOME/uninstall/install.config
 
-DATE_YYMMDD=`date +"%F"`
+DATE_YYMMDD=$(date +"%F")
 
-#echo "MySQL root password"
-#read -s PASSWORD
-PASSWORD=froda
-
-MYSQL_BACKUP_DIR=$RODA_BACKUP_DIR/$DATE_YYMMDD
+MYSQL_BACKUP_DIR=$RODA_BACKUP_DIR/$DATE_YYMMDD/mysql
 mkdir -p $MYSQL_BACKUP_DIR
-MYSQL_BACKUP_FILE=$MYSQL_BACKUP_DIR/`hostname`-mysqldump.sql
+MYSQL_BACKUP_FILE=$MYSQL_BACKUP_DIR/mysqldump.sql
 
-#$MYSQL_BIN_DIR/mysqladmin --defaults-file=$MYSQL_DEFAULTS_FILE $*
-$MYSQL_BIN_DIR/mysqldump --defaults-file=$MYSQL_DEFAULTS_FILE -u root -p$PASSWORD --all-databases > $MYSQL_BACKUP_FILE
-
+mysqldump --defaults-file=$MYSQL_DEFAULTS_FILE -u $RODADATA_MYSQL_RODACORE_USER -p$RODADATA_MYSQL_RODACORE_PASSWD --databases $RODADATA_MYSQL_DB $FEDORA_DB > $MYSQL_BACKUP_FILE

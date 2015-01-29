@@ -3,9 +3,14 @@ package pt.gov.dgarq.roda.migrator;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.xml.rpc.ServiceException;
+
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpStatus;
@@ -14,6 +19,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+
 import pt.gov.dgarq.roda.common.FormatUtility;
 import pt.gov.dgarq.roda.core.data.FileFormat;
 import pt.gov.dgarq.roda.core.data.RepresentationFile;
@@ -21,6 +27,8 @@ import pt.gov.dgarq.roda.core.data.RepresentationObject;
 import pt.gov.dgarq.roda.migrator.stubs.SynchronousConverter;
 import pt.gov.dgarq.roda.migrator.stubs.SynchronousConverterServiceLocator;
 import pt.gov.dgarq.roda.migrator.stubs.SynchronousConverterSoapBindingStub;
+import pt.gov.dgarq.roda.servlet.cas.CASUserPrincipal;
+import pt.gov.dgarq.roda.servlet.cas.CASUtility;
 
 /**
  * @author Rui Castro
@@ -180,7 +188,7 @@ public class MigratorClient {
      * @throws MigratorClientException
      */
     public SynchronousConverter getSynchronousConverterService(
-            String serviceURL, String username, String password)
+            String serviceURL,CASUserPrincipal cup, CASUtility casUtility)
             throws MigratorClientException {
 
         SynchronousConverter converter;
@@ -197,12 +205,13 @@ public class MigratorClient {
                     + e.getMessage(), e);
         }
 
-        ((SynchronousConverterSoapBindingStub) converter).setUsername(username);
-        ((SynchronousConverterSoapBindingStub) converter).setPassword(password);
+        ((SynchronousConverterSoapBindingStub) converter).setUsername(cup.getName());
+        ((SynchronousConverterSoapBindingStub) converter).setPassword(cup.getProxyGrantingTicket());
         // Disable timeout. Conversions may take long time.
         ((SynchronousConverterSoapBindingStub) converter).setTimeout(0);
 
         return converter;
+       
     }
 
     private RepresentationFile writeRepresentationFile(HttpClient httpClient,

@@ -399,4 +399,7 @@ public class ArrangementTableEditor implements MetadataElementEditor {
 		return rows.size() == 0;
 	}
 
+	public boolean isValid() {
+		return true;
+	}
 }

@@ -5,6 +5,8 @@ import java.security.Principal;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
+import pt.gov.dgarq.roda.servlet.cas.CASAuthenticationFilter;
+
 /**
  * This is a RODA request wrapper for a HttpServletRequest.
  * 
@@ -12,10 +14,20 @@ import javax.servlet.http.HttpServletRequestWrapper;
  */
 public class RodaServletRequestWrapper extends HttpServletRequestWrapper {
 
-	// static final private Logger logger =
-	// Logger.getLogger(RodaServletRequestWrapper.class);
+	private pt.gov.dgarq.roda.servlet.cas.CASUserPrincipal  CASUserPrincipal = null;
+	
+	
+	
 
-	private UserPrincipal ldapUserPrincipal = null;
+	public pt.gov.dgarq.roda.servlet.cas.CASUserPrincipal getCASUserPrincipal() {
+		return CASUserPrincipal;
+	}
+
+	public void setCASUserPrincipal(
+			pt.gov.dgarq.roda.servlet.cas.CASUserPrincipal CASUserPrincipal) {
+		this.CASUserPrincipal = CASUserPrincipal;
+		setAttribute(CASAuthenticationFilter.USERNAME, CASUserPrincipal.getName());
+	}
 
 	/**
 	 * @param request
@@ -25,28 +37,11 @@ public class RodaServletRequestWrapper extends HttpServletRequestWrapper {
 	}
 
 	/**
-	 * @return the ldapUser
-	 */
-	public UserPrincipal getLdapUserPrincipal() {
-		return ldapUserPrincipal;
-	}
-
-	/**
-	 * @param ldapUser
-	 *            the ldapUser to set
-	 */
-	public void setLdapUserPrincipal(UserPrincipal ldapUser) {
-		this.ldapUserPrincipal = ldapUser;
-		setAttribute(LdapAuthenticationFilter.USERNAME, ldapUser.getName());
-		// setAttribute(LdapAuthenticationFilter.FEDORA_AUX_SUBJECT_ATTRIBUTES,ldapUserPrincipal.getFedoraAttributeMap());
-	}
-
-	/**
 	 * @see HttpServletRequestWrapper#getUserPrincipal()
 	 */
 	@Override
 	public Principal getUserPrincipal() {
-		return getLdapUserPrincipal();
+		return getCASUserPrincipal();
 	}
 
 	/**
@@ -57,12 +52,11 @@ public class RodaServletRequestWrapper extends HttpServletRequestWrapper {
 
 		boolean isInRole;
 
-		if (getLdapUserPrincipal() == null) {
+		if (getCASUserPrincipal() == null) {
 			isInRole = false;
 		} else {
-			isInRole = getLdapUserPrincipal().hasRole(role);
+			isInRole = getCASUserPrincipal().hasRole(role);
 		}
-
 		return isInRole;
 	}
 }

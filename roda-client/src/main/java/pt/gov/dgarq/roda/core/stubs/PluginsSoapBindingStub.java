@@ -77,6 +77,13 @@ public class PluginsSoapBindingStub extends org.apache.axis.client.Stub implemen
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
 
+            qName = new javax.xml.namespace.QName("http://filter.adapter.data.core.roda.dgarq.gov.pt", "ClassificationSchemeFilterParameter");
+            cachedSerQNames.add(qName);
+            cls = pt.gov.dgarq.roda.core.data.adapter.filter.ClassificationSchemeFilterParameter.class;
+            cachedSerClasses.add(cls);
+            cachedSerFactories.add(beansf);
+            cachedDeserFactories.add(beandf);
+
             qName = new javax.xml.namespace.QName("http://filter.adapter.data.core.roda.dgarq.gov.pt", "FilterParameter");
             cachedSerQNames.add(qName);
             cls = pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter.class;

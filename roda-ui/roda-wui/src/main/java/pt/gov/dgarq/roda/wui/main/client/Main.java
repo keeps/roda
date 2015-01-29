@@ -3,35 +3,37 @@
  */
 package pt.gov.dgarq.roda.wui.main.client;
 
+import java.util.List;
+
+import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevel;
+import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevelInfo;
+import pt.gov.dgarq.roda.wui.common.client.AuthenticatedUser;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.ClientLoggerService;
+import pt.gov.dgarq.roda.wui.common.client.UserLogin;
 import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
 import pt.gov.dgarq.roda.wui.home.client.Home;
 import pt.gov.dgarq.roda.wui.main.client.logos.LogosBundle;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.HistoryListener;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
-import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HasAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.MouseListener;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.LanguageSwitcherPanel;
 import config.i18n.client.MainConstants;
@@ -40,12 +42,31 @@ import config.i18n.client.MainConstants;
  * @author Luis Faria
  * 
  */
+@SuppressWarnings("deprecation")
 public class Main extends SimplePanel implements EntryPoint, HistoryListener {
 
 	private ClientLogger logger = new ClientLogger(getClass().getName());
 
 	private static MainConstants constants = (MainConstants) GWT
 			.create(MainConstants.class);
+
+	public static List<DescriptionLevelInfo> DESCRIPTION_LEVELS_INFO;
+	public static List<DescriptionLevel> DESCRIPTION_LEVELS;
+	public static List<DescriptionLevel> ROOT_DESCRIPTION_LEVELS;
+	public static List<DescriptionLevel> LEAF_DESCRIPTION_LEVELS;
+	public static List<DescriptionLevel> REPRESENTATION_DESCRIPTION_LEVELS;
+	public static List<DescriptionLevel> ALL_BUT_REPRESENTATIONS_DESCRIPTION_LEVELS;
+
+	public static DescriptionLevelInfo getDescriptionLevel(String level) {
+		DescriptionLevelInfo ret = null;
+		for (DescriptionLevelInfo descriptionLevel : DESCRIPTION_LEVELS_INFO) {
+			if (descriptionLevel.getLevel().equals(level)) {
+				ret = descriptionLevel;
+				break;
+			}
+		}
+		return ret;
+	}
 
 	public void onModuleLoad() {
 
@@ -60,13 +81,39 @@ public class Main extends SimplePanel implements EntryPoint, HistoryListener {
 		RootPanel.get().add(this);
 
 		// deferred call to init
-		DeferredCommand.addCommand(new Command() {
+		Scheduler.get().scheduleDeferred(new Command() {
 
 			public void execute() {
-				init();
+				DescriptionLevelServiceAsync.INSTANCE
+						.getAllDescriptionLevels(new AsyncCallback<DescriptionLevelInfoPack>() {
+
+							@Override
+							public void onFailure(Throwable caught) {
+								logger.error(
+										"Error getting all the description levels!",
+										caught);
+							}
+
+							@Override
+							public void onSuccess(
+									DescriptionLevelInfoPack result) {
+								DESCRIPTION_LEVELS_INFO = result
+										.getDescriptionLevelsInfo();
+								DESCRIPTION_LEVELS = result
+										.getDescriptionLevels();
+								ROOT_DESCRIPTION_LEVELS = result
+										.getRootDescriptionLevels();
+								LEAF_DESCRIPTION_LEVELS = result
+										.getLeafDescriptionLevels();
+								REPRESENTATION_DESCRIPTION_LEVELS = result
+										.getRepresentationDescriptionLevels();
+								ALL_BUT_REPRESENTATIONS_DESCRIPTION_LEVELS = result
+										.getAllButRepresentationDescriptionLevels();
+								init();
+							}
+						});
 			}
 		});
-
 	}
 
 	private VerticalPanel layout;
@@ -74,6 +121,8 @@ public class Main extends SimplePanel implements EntryPoint, HistoryListener {
 	private HorizontalPanel banner;
 
 	private FocusPanel homeLinkArea;
+
+	private VerticalPanel bannerRight;
 
 	private LanguageSwitcherPanel languageSwitcherPanel;
 
@@ -112,18 +161,32 @@ public class Main extends SimplePanel implements EntryPoint, HistoryListener {
 
 		banner = new HorizontalPanel();
 		homeLinkArea = new FocusPanel();
+		bannerRight = new VerticalPanel();
 		languageSwitcherPanel = new LanguageSwitcherPanel();
 		loginPanel = new LoginPanel();
 
+		bannerRight.add(languageSwitcherPanel);
+		bannerRight.add(loginPanel);
+
 		banner.add(homeLinkArea);
-		banner.add(languageSwitcherPanel);
-		banner.add(loginPanel);
+		/*
+		 * banner.add(languageSwitcherPanel); banner.add(loginPanel);
+		 */
+		banner.add(bannerRight);
 
 		banner.addStyleName("banner");
 		homeLinkArea.addStyleName("homeLink");
-		banner.setCellHorizontalAlignment(languageSwitcherPanel,
+		/*
+		 * banner.setCellHorizontalAlignment(languageSwitcherPanel,
+		 * HorizontalPanel.ALIGN_RIGHT);
+		 * banner.setCellHorizontalAlignment(loginPanel,
+		 * HorizontalPanel.ALIGN_RIGHT);
+		 */
+		banner.setCellHorizontalAlignment(bannerRight,
 				HorizontalPanel.ALIGN_RIGHT);
-		banner.setCellHorizontalAlignment(loginPanel,
+		bannerRight.setCellHorizontalAlignment(languageSwitcherPanel,
+				HorizontalPanel.ALIGN_RIGHT);
+		bannerRight.setCellHorizontalAlignment(loginPanel,
 				HorizontalPanel.ALIGN_RIGHT);
 
 		menu = new Menu();
@@ -138,12 +201,11 @@ public class Main extends SimplePanel implements EntryPoint, HistoryListener {
 		layout.add(contentPanel);
 		layout.add(logos);
 
-		homeLinkArea.addClickListener(new ClickListener() {
+		homeLinkArea.addClickHandler(new ClickHandler() {
 
-			public void onClick(Widget sender) {
+			public void onClick(ClickEvent event) {
 				History.newItem(Home.getInstance().getHistoryPath());
 			}
-
 		});
 
 		homeLinkArea.setTitle(constants.homeTitle());
@@ -162,6 +224,7 @@ public class Main extends SimplePanel implements EntryPoint, HistoryListener {
 		layout.setCellHeight(contentPanel, "100%");
 
 		layout.addStyleName("main-layout");
+
 	}
 
 	private HorizontalPanel createLogos() {
@@ -171,25 +234,21 @@ public class Main extends SimplePanel implements EntryPoint, HistoryListener {
 		Image scape = new Image(logosBundle.scape());
 
 		Image keeps = new Image(logosBundle.keeps());
-		
 
 		addLink(dgarq, "http://www.dgarq.gov.pt", "_blank");
 		addLink(scape, "http://www.scape-project.eu", "_blank");
 
 		addLink(keeps, "http://www.keep.pt", "_blank");
-		
 
 		ret.add(dgarq);
 		ret.add(scape);
 
 		ret.add(keeps);
-		
 
 		ret.setCellWidth(dgarq, "70px");
 		ret.setCellWidth(scape, "100%");
 
 		ret.setCellWidth(keeps, "70px");
-		
 
 		ret.setHorizontalAlignment(HasAlignment.ALIGN_RIGHT);
 
@@ -209,34 +268,34 @@ public class Main extends SimplePanel implements EntryPoint, HistoryListener {
 		});
 	}
 
-	private void applyImages(final Image image,
-			final AbstractImagePrototype normal,
-			final AbstractImagePrototype hover) {
-		normal.applyTo(image);
-		image.addMouseListener(new MouseListener() {
-
-			public void onMouseDown(Widget sender, int x, int y) {
-				// nothing to do
-			}
-
-			public void onMouseEnter(Widget sender) {
-				hover.applyTo(image);
-			}
-
-			public void onMouseLeave(Widget sender) {
-				normal.applyTo(image);
-			}
-
-			public void onMouseMove(Widget sender, int x, int y) {
-				// nothing to do
-			}
-
-			public void onMouseUp(Widget sender, int x, int y) {
-				// nothing to do
-			}
-
-		});
-	}
+	// private void applyImages(final Image image,
+	// final AbstractImagePrototype normal,
+	// final AbstractImagePrototype hover) {
+	// normal.applyTo(image);
+	// image.addMouseListener(new MouseListener() {
+	//
+	// public void onMouseDown(Widget sender, int x, int y) {
+	// // nothing to do
+	// }
+	//
+	// public void onMouseEnter(Widget sender) {
+	// hover.applyTo(image);
+	// }
+	//
+	// public void onMouseLeave(Widget sender) {
+	// normal.applyTo(image);
+	// }
+	//
+	// public void onMouseMove(Widget sender, int x, int y) {
+	// // nothing to do
+	// }
+	//
+	// public void onMouseUp(Widget sender, int x, int y) {
+	// // nothing to do
+	// }
+	//
+	// });
+	// }
 
 	public void onHistoryChanged(String historyToken) {
 		if (historyToken.length() == 0) {
@@ -247,9 +306,8 @@ public class Main extends SimplePanel implements EntryPoint, HistoryListener {
 			final String decodedHistoryToken = URL.decode(historyToken);
 			String[] historyPath = Tools.splitHistory(decodedHistoryToken);
 			breadcrumbPanel.updatePath(historyPath);
-			
-			
-			DeferredCommand.addCommand(new Command() {
+
+			Scheduler.get().scheduleDeferred(new Command() {
 
 				public void execute() {
 					ClientLoggerService.Util.getInstance().pagehit(
@@ -261,7 +319,6 @@ public class Main extends SimplePanel implements EntryPoint, HistoryListener {
 
 								public void onSuccess(Void result) {
 									// do nothing
-
 								}
 
 							});
@@ -271,5 +328,4 @@ public class Main extends SimplePanel implements EntryPoint, HistoryListener {
 			GAnalyticsTracker.track(historyToken);
 		}
 	}
-
 }

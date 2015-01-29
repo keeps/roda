@@ -10,5 +10,9 @@
 		<replace file="tomcat.config" token="USER" value="${env.USER}" />
 		<replace file="tomcat.config" token="TOMCATDIRNAME" value="${env.TOMCAT_DIRNAME}" />
 	</target>
+	<target name="ssl-setup">
+		<replace file="tomcat.config" token="KEYSTOREPATH" value="${env.KEYSTOREPATH}" />
+		<replace file="tomcat.config" token="TRUSTSTOREPATH" value="${env.TRUSTSTOREPATH}" />
+	</target>
 
 </project>

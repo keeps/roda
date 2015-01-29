@@ -158,7 +158,7 @@ public class PreservationMetadataPanel extends Composite {
 										% TIMELINE_COLORS.length];
 
 								HorizontalPanel repLayout = new HorizontalPanel();
-								Image repIcon = new Image(icon);
+								Image repIcon = new Image(GWT.getModuleBaseURL() + icon);
 								Label repLabel = new Label();
 
 								if (info.isOriginal()) {

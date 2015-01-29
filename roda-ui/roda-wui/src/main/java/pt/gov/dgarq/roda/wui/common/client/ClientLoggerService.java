@@ -19,7 +19,7 @@ public interface ClientLoggerService extends RemoteService {
 	/**
 	 * logger service URI
 	 */
-	public static final String SERVICE_URI = "/wuilogger";
+	public static final String SERVICE_URI = "wuilogger";
 
 	/**
 	 * Utilities

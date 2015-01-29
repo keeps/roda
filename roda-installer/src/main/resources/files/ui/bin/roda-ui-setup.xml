@@ -15,13 +15,11 @@
 		<replace file="../bin/roda-wui-create-phpMyAdmin-mysql-db.sh" token="RODAWUI_MYSQL_PORT" value="${env.RODAWUI_MYSQL_PORT}" />
 	</target>
 
-	<!-- ../config/ldap-filter.properties -->
-	<target name="ldap-filter.properties">
-		<replace file="../config/ldap-filter.properties" token="LDAPHOST" value="${env.LDAPHOST}" />
-		<replace file="../config/ldap-filter.properties" token="LDAPPORT" value="${env.LDAPPORT}" />
-		<replace file="../config/ldap-filter.properties" token="LDAP_USERS_DN" value="${env.LDAP_USERS_DN}" />
-		<replace file="../config/ldap-filter.properties" token="LDAP_GROUPS_DN" value="${env.LDAP_GROUPS_DN}" />
-		<replace file="../config/ldap-filter.properties" token="LDAP_ROLES_DN" value="${env.LDAP_ROLES_DN}" />
+	<!-- ../config/cas-filter.properties -->
+	<target name="cas-filter.properties">
+		<replace file="../config/cas-filter.properties" token="RODA_CAS_URL" value="${env.RODA_CAS_URL}" />
+		<replace file="../config/cas-filter.properties" token="RODA_CAS_EXTERNAL_URL" value="${env.RODA_CAS_EXTERNAL_URL}" />
+		<replace file="../config/cas-filter.properties" token="RODA_CORE_URL" value="${env.RODA_CORE_URL}" />
 	</target>
 
 	<!-- ../config/roda-wui.properties -->
@@ -38,12 +36,19 @@
 		<replace file="../config/roda-wui.properties" token="RODAWUI_MYSQL_PORT" value="${env.RODAWUI_MYSQL_PORT}" />
 		<replace file="../config/roda-wui.properties" token="RODAWUI_MYSQL_USER_PASSWD" value="${env.RODAWUI_MYSQL_USER_PASSWD}" />
 		<replace file="../config/roda-wui.properties" token="RODAWUI_MYSQL_USER" value="${env.RODAWUI_MYSQL_USER}" />
+		<replace file="../config/roda-wui.properties" token="RODA_CAS_URL" value="${env.RODA_CAS_URL}" />
+		<replace file="../config/roda-wui.properties" token="RODA_CAS_EXTERNAL_URL" value="${env.RODA_CAS_EXTERNAL_URL}" />
+		<replace file="../config/roda-wui.properties" token="RODA_CORE_URL" value="${env.RODA_CORE_URL}" />
+		<replace file="../config/roda-wui.properties" token="RODA_EXTERNAL_DOMAIN" value="${env.RODA_EXTERNAL_DOMAIN}" />
 	</target>
 
 	<!-- ../config/roda-in-installer.properties -->
 	<target name="roda-in-installer.properties">
 		<replace file="../config/roda-in-installer.properties" token="RODACORE_HOST" value="${env.RODACORE_HOST}" />
 		<replace file="../config/roda-in-installer.properties" token="RODACORE_PORT" value="${env.RODACORE_PORT}" />
+		<replace file="../config/roda-in-installer.properties" token="RODA_CAS_URL" value="${env.RODA_CAS_URL}" />
+		<replace file="../config/roda-in-installer.properties" token="RODA_CAS_EXTERNAL_URL" value="${env.RODA_CAS_EXTERNAL_URL}" />
+		<replace file="../config/roda-in-installer.properties" token="RODA_CORE_URL" value="${env.RODA_CORE_URL}" />
 	</target>
 
 	<!-- ../config/roda-in.properties -->
@@ -52,6 +57,9 @@
 		<replace file="../config/roda-in.properties" token="RODACORE_PUBLIC_PORT" value="${env.RODACORE_PUBLIC_PORT}" />
 		<replace file="../config/roda-in.properties" token="RODAWUI_PUBLIC_HOSTNAME" value="${env.RODAWUI_PUBLIC_HOSTNAME}" />
 		<replace file="../config/roda-in.properties" token="RODAWUI_PUBLIC_PORT" value="${env.RODAWUI_PUBLIC_PORT}" />
+		<replace file="../config/roda-in.properties" token="RODA_CAS_URL" value="${env.RODA_CAS_EXTERNAL_URL}" />
+		<replace file="../config/roda-in.properties" token="RODA_CAS_EXTERNAL_URL" value="${env.RODA_CAS_EXTERNAL_URL}" />
+		<replace file="../config/roda-in.properties" token="RODA_CORE_URL" value="${env.RODA_CORE_URL}" />
 	</target>
 
 	<!-- ../config/mail/velocity.mail.properties -->

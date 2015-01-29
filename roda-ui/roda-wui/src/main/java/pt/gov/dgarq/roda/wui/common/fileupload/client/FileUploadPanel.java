@@ -59,7 +59,7 @@ public class FileUploadPanel implements SourcesChangeEvents {
 	public static final String UPLOAD_FAILURE = "ERROR";
 
 	private static final String FILE_UPLOAD_SERVER = GWT.getModuleBaseURL()
-			+ "/fileUpload";
+			+ "fileUpload";
 
 	private ClientLogger logger = new ClientLogger(getClass().getName());
 
@@ -314,7 +314,7 @@ public class FileUploadPanel implements SourcesChangeEvents {
 				300, 50);
 
 		HorizontalPanel waitWindowLayout = new HorizontalPanel();
-		Image loadingImage = new Image("images/loading_999.gif");
+		Image loadingImage = new Image(GWT.getModuleBaseURL() + "images/loading_999.gif");
 		final Label loadingLabel = new Label(constants.waitWindowLabel());
 		waitWindowLayout.add(loadingImage);
 		waitWindowLayout.add(loadingLabel);

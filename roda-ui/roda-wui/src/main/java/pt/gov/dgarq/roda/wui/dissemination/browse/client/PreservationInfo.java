@@ -86,16 +86,20 @@ public class PreservationInfo implements Serializable {
 			this.label = rpo.getID();
 		}
 
-		this.numberOfFiles = rpo.getPartFiles().length + 1;
 		if (rpo.getRootFile() != null) {
 			this.sizeOfFiles = rpo.getRootFile().getSize();
 		} else {
 			this.sizeOfFiles = 0;
 		}
-		for (RepresentationFilePreservationObject file : rpo.getPartFiles()) {
-			this.sizeOfFiles += file.getSize();
+		
+		this.numberOfFiles = 1;
+		if(rpo.getPartFiles()!=null){
+			this.numberOfFiles += rpo.getPartFiles().length;
+			
+			for (RepresentationFilePreservationObject file : rpo.getPartFiles()) {
+				this.sizeOfFiles += file.getSize();
+			}
 		}
-
 	}
 
 	/**

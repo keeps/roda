@@ -1,5 +1,6 @@
 package pt.gov.dgarq.roda.core.services;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
@@ -15,6 +16,7 @@ import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
 import pt.gov.dgarq.roda.core.common.IngestException;
@@ -56,16 +58,15 @@ public class SIPUploadServlet extends RODAServlet {
 
 		// Check that we have a file upload request
 		boolean isMultipart = ServletFileUpload.isMultipartContent(request);
-
 		if (isMultipart) {
 
 			// Create a factory for disk-based file items
-			FileItemFactory factory = new DiskFileItemFactory(0, new File(
-					System.getProperty("java.io.tmpdir")));
+			DiskFileItemFactory factory = new DiskFileItemFactory();
+			factory.setSizeThreshold(2 * 1024 * 1024 * 1024);
+			
 
 			// Create a new file upload handler
 			ServletFileUpload upload = new ServletFileUpload(factory);
-
 			try {
 
 				response.setContentType("text/plain");
@@ -75,9 +76,7 @@ public class SIPUploadServlet extends RODAServlet {
 
 				// Parse the request
 				List<FileItem> items = upload.parseRequest(request);
-
 				for (FileItem fileItem : items) {
-
 					if (fileItem.isFormField()) {
 						// Bad!!! only files should be uploaded
 						logger.warn(fileItem.getFieldName()
@@ -86,7 +85,6 @@ public class SIPUploadServlet extends RODAServlet {
 					} else {
 
 						try {
-
 							SIPUploadTask sipUploadTask = new SIPUploadTask(
 									fileItem);
 							SIPState insertedSIP = sipUploadTask.insertSIP(user
@@ -117,6 +115,12 @@ public class SIPUploadServlet extends RODAServlet {
 
 			} catch (FileUploadException e) {
 				// Bad!!! Upload failed.
+				logger.error("Error parsing SIP upload request - "
+						+ e.getMessage(), e);
+				response.sendError(
+						HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+						"Error parsing SIP upload request - " + e.getMessage());
+			} catch(Throwable e) {
 				logger.error("Error parsing SIP upload request - "
 						+ e.getMessage(), e);
 				response.sendError(

@@ -2,11 +2,11 @@ package pt.gov.dgarq.roda.core.services;
 
 import org.apache.xmlbeans.XmlOptions;
 
-import pt.gov.dgarq.roda.x2008.eadcSchema.C;
-import pt.gov.dgarq.roda.x2008.eadcSchema.Did;
-import pt.gov.dgarq.roda.x2008.eadcSchema.Dimensions;
-import pt.gov.dgarq.roda.x2008.eadcSchema.EadCDocument;
-import pt.gov.dgarq.roda.x2008.eadcSchema.Physdesc;
+import pt.gov.dgarq.roda.x2014.eadcSchema.C;
+import pt.gov.dgarq.roda.x2014.eadcSchema.Did;
+import pt.gov.dgarq.roda.x2014.eadcSchema.Dimensions;
+import pt.gov.dgarq.roda.x2014.eadcSchema.EadCDocument;
+import pt.gov.dgarq.roda.x2014.eadcSchema.Physdesc;
 
 /**
  * @author Rui Castro

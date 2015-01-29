@@ -51,7 +51,7 @@ public class TreeItemPanel extends FocusPanel implements SourcesSliderEvents {
 
 	// private final int childrenCount;
 
-	final private Image waitImage = new Image("images/loadingSmall.gif");
+	final private Image waitImage = new Image(GWT.getModuleBaseURL() + "images/loadingSmall.gif");
 
 	private boolean showInfo;
 

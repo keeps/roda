@@ -42,6 +42,7 @@ import pt.gov.dgarq.roda.core.plugins.Plugin;
 import pt.gov.dgarq.roda.core.plugins.PluginException;
 import pt.gov.dgarq.roda.core.stubs.IngestMonitor;
 import pt.gov.dgarq.roda.core.stubs.UserBrowser;
+import pt.gov.dgarq.roda.servlet.cas.CASUtility;
 import pt.gov.dgarq.roda.util.EmailUtility;
 
 /**
@@ -195,7 +196,7 @@ public class IngestNotificationPlugin extends AbstractPlugin {
 	public List<PluginParameter> getParameters() {
 		return Arrays.asList(PARAMETER_RODA_CORE_URL(),
 				PARAMETER_RODA_CORE_USERNAME(), PARAMETER_RODA_CORE_PASSWORD(),
-				PARAMETER_NOTIFIER_EMAIL_ADDRESS());
+				PARAMETER_NOTIFIER_EMAIL_ADDRESS(),AbstractPlugin.PARAMETER_RODA_CAS_URL());
 	}
 
 	/**
@@ -307,7 +308,7 @@ public class IngestNotificationPlugin extends AbstractPlugin {
 		this.lastNotificationDate = null;
 		this.currentNotificationDate = null;
 
-		report.addAttribute(new Attribute("Finnish datetime", DateParser //$NON-NLS-1$
+		report.addAttribute(new Attribute("Finish datetime", DateParser //$NON-NLS-1$
 				.getIsoDate(new Date())));
 		return report;
 	}
@@ -617,11 +618,15 @@ public class IngestNotificationPlugin extends AbstractPlugin {
 				AbstractPlugin.PARAMETER_RODA_CORE_USERNAME().getName());
 		String rodaClientPassword = getParameterValues().get(
 				AbstractPlugin.PARAMETER_RODA_CORE_PASSWORD().getName());
-
+		String casURL = getParameterValues().get(
+				AbstractPlugin.PARAMETER_RODA_CAS_URL().getName());
+		String coreURL = getParameterValues().get(
+				AbstractPlugin.PARAMETER_RODA_CORE_URL().getName());
 		try {
+			CASUtility casUtility = new CASUtility(new URL(casURL), new URL(coreURL));
 
 			this.rodaClient = new RODAClient(new URL(rodaClientServiceUrl),
-					rodaClientUsername, rodaClientPassword);
+					rodaClientUsername, rodaClientPassword,casUtility);
 			this.ingestMonitorService = this.rodaClient
 					.getIngestMonitorService();
 			this.userBrowserService = this.rodaClient.getUserBrowserService();

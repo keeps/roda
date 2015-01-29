@@ -10,14 +10,14 @@ import pt.gov.dgarq.roda.wui.common.client.images.CommonImageBundle;
 import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.DockPanel;
 import com.google.gwt.user.client.ui.HasAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Widget;
 
 /**
  * Small sized panel for a simple statistics
@@ -77,9 +77,8 @@ public class SimpleStatisticMiniPanel extends StatisticMiniPanel {
 		this.layout.add(header, DockPanel.NORTH);
 		this.layout.add(centerLayout, DockPanel.CENTER);
 
-		report.addClickListener(new ClickListener() {
-
-			public void onClick(Widget sender) {
+		report.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
 				showReport();
 			}
 

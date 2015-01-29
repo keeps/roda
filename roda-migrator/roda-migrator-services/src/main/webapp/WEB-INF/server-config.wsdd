@@ -402,7 +402,7 @@
   <parameter name="allowedMethods" value="getVersion"/>
   <parameter name="className" value="org.apache.axis.Version"/>
  </service>
- <service name="Pdf2FlashPageFlip" provider="java:RPC" style="wrapped" use="literal">
+ <service name="Dbml2Dbml" provider="java:RPC" style="wrapped" use="literal">
   <operation name="convert" qname="ns280:convert" returnQName="ns280:convertReturn" returnType="ns281:ConversionResult" soapAction="" xmlns:ns280="http://services.migrator.roda.dgarq.gov.pt" xmlns:ns281="http://data.common.migrator.roda.dgarq.gov.pt">
    <parameter qname="ns280:in0" type="ns282:RepresentationObject" xmlns:ns282="http://data.core.roda.dgarq.gov.pt"/>
    <fault class="pt.gov.dgarq.roda.migrator.common.RepresentationAlreadyConvertedException" qname="ns280:fault" type="ns283:RepresentationAlreadyConvertedException" xmlns:ns283="http://common.migrator.roda.dgarq.gov.pt"/>
@@ -414,12 +414,12 @@
   <operation name="getAgent" qname="ns288:getAgent" returnQName="ns288:getAgentReturn" returnType="ns289:AgentPreservationObject" soapAction="" xmlns:ns288="http://services.migrator.roda.dgarq.gov.pt" xmlns:ns289="http://data.core.roda.dgarq.gov.pt">
    <fault class="pt.gov.dgarq.roda.migrator.common.ConverterException" qname="ns288:fault4" type="ns290:ConverterException" xmlns:ns290="http://common.migrator.roda.dgarq.gov.pt"/>
   </operation>
-  <parameter name="wsdlServicePort" value="Pdf2FlashPageFlip"/>
+  <parameter name="wsdlServicePort" value="Dbml2Dbml"/>
   <parameter name="schemaQualified" value="http://common.migrator.roda.dgarq.gov.pt,http://data.common.migrator.roda.dgarq.gov.pt,http://filter.adapter.data.core.roda.dgarq.gov.pt,http://common.core.roda.dgarq.gov.pt,http://services.migrator.roda.dgarq.gov.pt,http://data.core.roda.dgarq.gov.pt"/>
-  <parameter name="className" value="pt.gov.dgarq.roda.migrator.services.Pdf2FlashPageFlip"/>
+  <parameter name="className" value="pt.gov.dgarq.roda.migrator.services.Dbml2Dbml"/>
   <parameter name="typeMappingVersion" value="1.2"/>
   <parameter name="allowedMethods" value="convert getAgent"/>
-  <parameter name="wsdlServiceElement" value="Pdf2FlashPageFlipService"/>
+  <parameter name="wsdlServiceElement" value="Dbml2DbmlService"/>
   <parameter name="wsdlTargetNamespace" value="http://services.migrator.roda.dgarq.gov.pt"/>
   <parameter name="wsdlPortType" value="SynchronousConverter"/>
   <parameter name="scope" value="Application"/>
@@ -443,7 +443,7 @@
   <arrayMapping innerType="xsd:string" languageSpecificType="java:java.lang.String[]" qname="ns308:ArrayOf_xsd_string" xmlns:ns308="http://services.migrator.roda.dgarq.gov.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
   <arrayMapping innerType="ns310:RepresentationFile" languageSpecificType="java:pt.gov.dgarq.roda.core.data.RepresentationFile[]" qname="ns309:ArrayOf_tns1_RepresentationFile" xmlns:ns309="http://services.migrator.roda.dgarq.gov.pt" xmlns:ns310="http://data.core.roda.dgarq.gov.pt"/>
  </service>
- <service name="Dbml2Dbml" provider="java:RPC" style="wrapped" use="literal">
+ <service name="Pdf2FlashPageFlip" provider="java:RPC" style="wrapped" use="literal">
   <operation name="convert" qname="ns311:convert" returnQName="ns311:convertReturn" returnType="ns312:ConversionResult" soapAction="" xmlns:ns311="http://services.migrator.roda.dgarq.gov.pt" xmlns:ns312="http://data.common.migrator.roda.dgarq.gov.pt">
    <parameter qname="ns311:in0" type="ns313:RepresentationObject" xmlns:ns313="http://data.core.roda.dgarq.gov.pt"/>
    <fault class="pt.gov.dgarq.roda.migrator.common.RepresentationAlreadyConvertedException" qname="ns311:fault" type="ns314:RepresentationAlreadyConvertedException" xmlns:ns314="http://common.migrator.roda.dgarq.gov.pt"/>
@@ -455,12 +455,12 @@
   <operation name="getAgent" qname="ns319:getAgent" returnQName="ns319:getAgentReturn" returnType="ns320:AgentPreservationObject" soapAction="" xmlns:ns319="http://services.migrator.roda.dgarq.gov.pt" xmlns:ns320="http://data.core.roda.dgarq.gov.pt">
    <fault class="pt.gov.dgarq.roda.migrator.common.ConverterException" qname="ns319:fault4" type="ns321:ConverterException" xmlns:ns321="http://common.migrator.roda.dgarq.gov.pt"/>
   </operation>
-  <parameter name="wsdlServicePort" value="Dbml2Dbml"/>
+  <parameter name="wsdlServicePort" value="Pdf2FlashPageFlip"/>
   <parameter name="schemaQualified" value="http://common.migrator.roda.dgarq.gov.pt,http://data.common.migrator.roda.dgarq.gov.pt,http://filter.adapter.data.core.roda.dgarq.gov.pt,http://common.core.roda.dgarq.gov.pt,http://services.migrator.roda.dgarq.gov.pt,http://data.core.roda.dgarq.gov.pt"/>
-  <parameter name="className" value="pt.gov.dgarq.roda.migrator.services.Dbml2Dbml"/>
+  <parameter name="className" value="pt.gov.dgarq.roda.migrator.services.Pdf2FlashPageFlip"/>
   <parameter name="typeMappingVersion" value="1.2"/>
   <parameter name="allowedMethods" value="convert getAgent"/>
-  <parameter name="wsdlServiceElement" value="Dbml2DbmlService"/>
+  <parameter name="wsdlServiceElement" value="Pdf2FlashPageFlipService"/>
   <parameter name="wsdlTargetNamespace" value="http://services.migrator.roda.dgarq.gov.pt"/>
   <parameter name="wsdlPortType" value="SynchronousConverter"/>
   <parameter name="scope" value="Application"/>

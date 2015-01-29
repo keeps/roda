@@ -114,6 +114,7 @@ a {
 /* @group Language Switcher Panel */
 .wui-languageSwitcher {
 	width: 270px;
+	margin-right: 20px;
 }
 
 .wui-languageSwitcher .languageSwitcher-flag {
@@ -450,7 +451,57 @@ a {
 
 
 
+/* @group Image Link */
 
+.image-link {
+	cursor: hand;
+	cursor: pointer;
+}
+
+.image-link-panel {
+	width: 200px;
+}
+
+.image-link-image {
+	
+}
+
+.image-link-label {
+	margin-top: 3px;
+	color: white;
+	text-transform: uppercase;
+	font-weight: bold;
+	font-size: 14px;
+	margin-left: 10px;
+}
+
+/* @end */
+
+/* @group CAS Login Panel */
+
+.wui-login .wui-loginLinks {
+	position: relative;
+	top: 0;
+	left: 0;
+	margin-top: 20px;
+}
+
+.wui-login .wui-login-login,
+.wui-login .wui-login-user {
+	margin-top: 12px;
+}
+
+.wui-login .loginLink {
+	color: white;
+}
+
+.wui-login .loginLink:hover {
+	text-decoration: underline;
+	cursor: hand;
+	cursor: pointer;
+}
+
+/* @end */
 
 
 

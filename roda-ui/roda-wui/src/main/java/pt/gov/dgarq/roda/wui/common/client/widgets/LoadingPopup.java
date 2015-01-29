@@ -3,6 +3,7 @@
  */
 package pt.gov.dgarq.roda.wui.common.client.widgets;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.PopupPanel;
@@ -37,7 +38,7 @@ public class LoadingPopup extends PopupPanel {
 	 *            widget in which the popup will center
 	 */
 	public LoadingPopup(Widget widgetCenter) {
-		loadingImage = new Image("images/loading.gif");
+		loadingImage = new Image(GWT.getModuleBaseURL() + "images/loading.gif");
 		this.setWidget(loadingImage);
 		this.widgetCenter = widgetCenter;
 		this.show = false;

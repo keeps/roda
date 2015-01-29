@@ -79,7 +79,7 @@ debug(){
 status() {
    RUNNING_PID=0
    if [ -f $TOMCAT_PIDFILE -a -s $TOMCAT_PIDFILE ]; then
-      TMP_PID=$(cat $TOMCAT_PIDFILE)
+      TMP_PID=$(head -n1 $TOMCAT_PIDFILE)
       TMP_PID_CHECK=$(ps -p $TMP_PID -o pid=)
       if [ "$TMP_PID_CHECK" != "" ]; then
          RUNNING_PID=$TMP_PID
@@ -105,7 +105,7 @@ start() {
    fi
    info "Sleeping 3 seconds..."
    sleep 3
-   pgrep -f org.apache.catalina.startup.Bootstrap > $TOMCAT_PIDFILE
+   pgrep -f "\-Droda.home.*org.apache.catalina.startup.Bootstrap" > $TOMCAT_PIDFILE
 	if [ ! -z "$SUBIT" ]; then
       chown $RUN_SERVLET_CONTAINER_AS $TOMCAT_PIDFILE
    fi

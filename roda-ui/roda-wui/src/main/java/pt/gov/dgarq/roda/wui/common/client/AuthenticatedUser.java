@@ -12,6 +12,17 @@ import pt.gov.dgarq.roda.core.data.User;
 public class AuthenticatedUser extends User {
 
 	private boolean guest;
+	private String pgt;
+	
+	
+
+	public String getPgt() {
+		return pgt;
+	}
+
+	public void setPgt(String pgt) {
+		this.pgt = pgt;
+	}
 
 	/**
 	 * @deprecated Only for GWT serialization purposes

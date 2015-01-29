@@ -23,6 +23,7 @@ import pt.gov.dgarq.roda.core.plugins.PluginException;
 import pt.gov.dgarq.roda.core.stubs.Browser;
 import pt.gov.dgarq.roda.core.stubs.Editor;
 import pt.gov.dgarq.roda.plugins.description.DescriptionTraverserPlugin;
+import pt.gov.dgarq.roda.servlet.cas.CASUtility;
 
 /**
  * @author Rui Castro
@@ -204,13 +205,23 @@ public class UnitdatesInferencePlugin
 	private String getFondsPID() {
 		return getParameterValues().get(PARAMETER_FONDS_PID().getName());
 	}
+	
+	private URL getCasURL() throws MalformedURLException {
+		return new URL(getParameterValues().get(
+				PARAMETER_RODA_CAS_URL().getName()));
+	}
+	private URL getCoreURL() throws MalformedURLException {
+		return new URL(getParameterValues().get(
+				PARAMETER_RODA_CORE_URL().getName()));
+	}
 
 	private void initRODAServices() throws PluginException {
 
 		try {
 
+			CASUtility casUtility = new CASUtility(getCasURL(), getCoreURL());
 			this.rodaClient = new RODAClient(getRodaServicesURL(),
-					getUsername(), getPassword());
+					getUsername(), getPassword(),casUtility);
 
 			this.editorService = this.rodaClient.getEditorService();
 			this.browserService = this.rodaClient.getBrowserService();

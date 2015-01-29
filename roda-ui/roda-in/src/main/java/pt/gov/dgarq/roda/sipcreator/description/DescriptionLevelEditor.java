@@ -8,6 +8,7 @@ import java.awt.event.FocusListener;
 import javax.swing.JComboBox;
 
 import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevel;
+import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevelManager;
 import pt.gov.dgarq.roda.core.data.eadc.EadCValue;
 
 /**
@@ -19,24 +20,42 @@ public class DescriptionLevelEditor extends AbstractDescriptionEditor {
 
 	private final JComboBox jComboBox;
 
-	private static final LocalizedDescriptionLevel[] classificationPlanLevels = new LocalizedDescriptionLevel[] {
-			new LocalizedDescriptionLevel(DescriptionLevel.FONDS),
-			new LocalizedDescriptionLevel(DescriptionLevel.SUBFONDS),
-			new LocalizedDescriptionLevel(DescriptionLevel.CLASS),
-			new LocalizedDescriptionLevel(DescriptionLevel.SUBCLASS),
-			new LocalizedDescriptionLevel(DescriptionLevel.SERIES),
-			new LocalizedDescriptionLevel(DescriptionLevel.SUBSERIES)
+	private static final LocalizedDescriptionLevel[] classificationPlanLevels;
+	static {
+		int size = DescriptionLevelManager
+				.getAllButRepresentationsDescriptionLevels().size();
+		classificationPlanLevels = new LocalizedDescriptionLevel[size];
+		for (int i = 0; i < size; i++) {
+			classificationPlanLevels[i] = new LocalizedDescriptionLevel(
+					DescriptionLevelManager
+							.getAllButRepresentationsDescriptionLevels().get(i));
+		}
+	}
 
-	};
+	private static final LocalizedDescriptionLevel[] sipLevels;
+	static {
+		int size = DescriptionLevelManager
+				.getRepresentationsDescriptionLevels().size();
+		sipLevels = new LocalizedDescriptionLevel[size];
+		for (int i = 0; i < size; i++) {
+			sipLevels[i] = new LocalizedDescriptionLevel(
+					DescriptionLevelManager
+							.getRepresentationsDescriptionLevels().get(i));
+		}
+	}
 
-	private static final LocalizedDescriptionLevel[] sipLevels = new LocalizedDescriptionLevel[] {
-			new LocalizedDescriptionLevel(DescriptionLevel.ITEM),
-			new LocalizedDescriptionLevel(DescriptionLevel.FILE) };
+	private static final LocalizedDescriptionLevel[] fileChildLevels;
+	static {
+		int size = DescriptionLevelManager.getRepresentationsDescriptionLevels().size();
+		fileChildLevels = new LocalizedDescriptionLevel[size];
+		for (int i = 0; i < size; i++) {
+			fileChildLevels[i] = new LocalizedDescriptionLevel(
+					DescriptionLevelManager.getRepresentationsDescriptionLevels().get(i));
+		}
+	}
 
-	private static final LocalizedDescriptionLevel[] fileChildLevels = new LocalizedDescriptionLevel[] { new LocalizedDescriptionLevel(
-			DescriptionLevel.ITEM) };
-
-	private DescriptionLevel selected = DescriptionLevel.ITEM;
+	private DescriptionLevel selected = DescriptionLevelManager
+			.getRepresentationsDescriptionLevels().get(0);
 	private EadCValue lastValue;
 	private boolean fileChild;
 
@@ -149,7 +168,7 @@ public class DescriptionLevelEditor extends AbstractDescriptionEditor {
 
 	/**
 	 * If the description object associated with this editor is child of a
-	 * description object with level {@link DescriptionLevel#FILE}. 
+	 * description object with level {@link DescriptionLevel#FILE}.
 	 * 
 	 * @return true if the above condition applies, false otherwise
 	 */
@@ -158,11 +177,13 @@ public class DescriptionLevelEditor extends AbstractDescriptionEditor {
 	}
 
 	/**
-	 * Set the file child flag, only allowing for {@link DescriptionLevel#ITEM} level to be set.
+	 * Set the file child flag, only allowing for {@link DescriptionLevel#ITEM}
+	 * level to be set.
 	 * 
 	 * @param fileChild
-	 * Whereas the description object associated with this editor is child of a
-	 * description object with level {@link DescriptionLevel#FILE}.
+	 *            Whereas the description object associated with this editor is
+	 *            child of a description object with level
+	 *            {@link DescriptionLevel#FILE}.
 	 */
 	public void setFileChild(boolean fileChild) {
 		this.fileChild = fileChild;

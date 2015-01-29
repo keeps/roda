@@ -10,6 +10,7 @@ import java.util.Set;
 import org.w3c.util.DateParser;
 
 import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.servlet.cas.CASAuthenticationFilter;
 
 /**
  * This is a User that is registered in an LDAP server. This class defines the
@@ -117,7 +118,7 @@ public class UserPrincipal extends User implements Principal {
 				new HashSet<String>(Arrays.asList(getRoles())));
 
 		// The roles are also fedoraRole's
-		attributeMap.put(LdapAuthenticationFilter.FEDORA_ROLE,
+		attributeMap.put(CASAuthenticationFilter.FEDORA_ROLE,
 				getAttributeMapSet(attributeMap, "roles"));
 
 		return attributeMap;

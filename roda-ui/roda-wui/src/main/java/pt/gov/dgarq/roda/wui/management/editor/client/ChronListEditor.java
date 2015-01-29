@@ -335,4 +335,7 @@ public class ChronListEditor implements MetadataElementEditor {
 		return items.size() == 0;
 	}
 
+	public boolean isValid() {
+		return true;
+	}
 }

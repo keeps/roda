@@ -173,14 +173,12 @@ public class MediaPlayer extends javax.servlet.http.HttpServlet implements
 
 			if (rep.getType().equals(RepresentationObject.VIDEO)) {
 				service = migratorClient.getSynchronousConverterService(
-						videoMigratorUrl, rodaClient.getUsername(), rodaClient
-								.getPassword());
+						videoMigratorUrl, rodaClient.getCup(),rodaClient.getCasUtility());
 				extension = ".flv";
 
 			} else if (rep.getType().equals(RepresentationObject.AUDIO)) {
 				service = migratorClient.getSynchronousConverterService(
-						audioMigratorUrl, rodaClient.getUsername(), rodaClient
-								.getPassword());
+						audioMigratorUrl, rodaClient.getCup(),rodaClient.getCasUtility());
 				extension = ".mp3";
 
 			} else {

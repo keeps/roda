@@ -18,6 +18,7 @@ import pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.stubs.Browser;
+import pt.gov.dgarq.roda.servlet.cas.CASUtility;
 
 /**
  * Test class for Browser service.
@@ -37,30 +38,38 @@ public class BrowserTest {
 			String doPIDWithReps = null;
 			String roPID = null;
 
-			if (args.length == 3) {
+			if (args.length == 6) {
 
 				// http://localhost:8180/
 				String hostUrl = args[0];
-				doPIDWithReps = args[1];
-				roPID = args[2];
+				String casURL = args[1];
+				String coreURL = args[2];
+				String serviceURL = args[3];
+				CASUtility casUtility = new CASUtility(new URL(casURL), new URL(coreURL), new URL(serviceURL));
+				doPIDWithReps = args[4];
+				roPID = args[5];
 
-				rodaClient = new RODAClient(new URL(hostUrl));
+				rodaClient = new RODAClient(new URL(hostUrl),casUtility);
 
-			} else if (args.length == 5) {
+			} else if (args.length == 8) {
 
 				// http://localhost:8180/ user pass
 				String hostUrl = args[0];
 				String username = args[1];
 				String password = args[2];
-				doPIDWithReps = args[3];
-				roPID = args[4];
+				String casURL = args[3];
+				String coreURL = args[4];
+				String serviceURL = args[5];
+				CASUtility casUtility = new CASUtility(new URL(casURL), new URL(coreURL), new URL(serviceURL));
+				doPIDWithReps = args[6];
+				roPID = args[7];
 
 				rodaClient = new RODAClient(new URL(hostUrl), username,
-						password);
+						password,casUtility);
 			} else {
 				System.err
 						.println(BrowserTest.class.getSimpleName()
-								+ " protocol://hostname:port/ [username password] doPID roPID");
+								+ " protocol://hostname:port/ [username password] casURL coreURL serviceURL doPID roPID");
 				System.exit(1);
 			}
 

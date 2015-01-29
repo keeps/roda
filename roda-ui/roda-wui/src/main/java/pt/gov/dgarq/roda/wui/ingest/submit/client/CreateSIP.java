@@ -15,8 +15,11 @@ import pt.gov.dgarq.roda.wui.dissemination.browse.client.CollectionsTreeVertical
 import pt.gov.dgarq.roda.wui.dissemination.client.DescriptiveMetadataPanel;
 import pt.gov.dgarq.roda.wui.ingest.client.Ingest;
 import pt.gov.dgarq.roda.wui.ingest.list.client.IngestList;
+import pt.gov.dgarq.roda.wui.main.client.Main;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.ChangeListener;
@@ -94,8 +97,8 @@ public class CreateSIP {
 		if (!initialized) {
 			initialized = true;
 			descriptiveMetadataHeaderLayout = new HorizontalPanel();
-			descriptiveMetadataHeader = new Label(constants
-					.createMetadataHeader());
+			descriptiveMetadataHeader = new Label(
+					constants.createMetadataHeader());
 			descriptiveMetadataOptionalToggle = new Label();
 			descriptiveMetadata = new DescriptiveMetadataPanel();
 			descriptiveMetadata.setReadonly(false);
@@ -103,9 +106,8 @@ public class CreateSIP {
 
 			updateOptionalMetadataToggle();
 			descriptiveMetadataOptionalToggle
-					.addClickListener(new ClickListener() {
-
-						public void onClick(Widget sender) {
+					.addClickHandler(new ClickHandler() {
+						public void onClick(ClickEvent event) {
 							descriptiveMetadata
 									.setOptionalVisible(!descriptiveMetadata
 											.isOptionalVisible());
@@ -114,8 +116,8 @@ public class CreateSIP {
 
 					});
 
-			representationHeader = new Label(constants
-					.createRepresentationHeader());
+			representationHeader = new Label(
+					constants.createRepresentationHeader());
 			representationLayout = new HorizontalPanel();
 			representationType = new ContentModelSelector();
 			fileUpload = new FileUploadPanel(representationType.getSelected()
@@ -134,14 +136,14 @@ public class CreateSIP {
 			destinationHeader = new Label(constants.createDestinationHeader());
 			Filter classPlanFilter = new Filter();
 			classPlanFilter.add(new ProducerFilterParameter());
+			int size = Main.ALL_BUT_REPRESENTATIONS_DESCRIPTION_LEVELS.size();
+			String[] classPlanLevels = new String[size];
+			for (int i = 0; i < size; i++) {
+				classPlanLevels[i] = Main.ALL_BUT_REPRESENTATIONS_DESCRIPTION_LEVELS
+						.get(i).getLevel();
+			}
 			classPlanFilter.add(new OneOfManyFilterParameter(
-					SimpleDescriptionObject.LEVEL, new String[] {
-							DescriptionLevel.FONDS.getLevel(),
-							DescriptionLevel.SUBFONDS.getLevel(),
-							DescriptionLevel.CLASS.getLevel(),
-							DescriptionLevel.SUBCLASS.getLevel(),
-							DescriptionLevel.SERIES.getLevel(),
-							DescriptionLevel.SUBSERIES.getLevel() }));
+					SimpleDescriptionObject.LEVEL, classPlanLevels));
 			destinationChooser = new CollectionsTreeVerticalScrollPanel(
 					classPlanFilter,
 					CollectionsTreeVerticalScrollPanel.DEFAULT_SORTER, true);
@@ -150,23 +152,22 @@ public class CreateSIP {
 			submitButton = new WUIButton(constants.createSubmitButton(),
 					WUIButton.Left.ROUND, WUIButton.Right.ARROW_FORWARD);
 
-			submitButton.addClickListener(new ClickListener() {
-
-				public void onClick(Widget sender) {
+			submitButton.addClickHandler(new ClickHandler() {
+				public void onClick(ClickEvent event) {
 					submit();
 				}
 
 			});
 
-			loadingImage = new Image("images/loadingSmall.gif");
+			loadingImage = new Image(GWT.getModuleBaseURL()
+					+ "images/loadingSmall.gif");
 			submitMessage = new Label();
 
 			getRodaIn = new WUIButton(constants.createSipGetRodaIn(),
 					WUIButton.Left.ROUND, WUIButton.Right.ARROW_DOWN);
 
-			getRodaIn.addClickListener(new ClickListener() {
-
-				public void onClick(Widget sender) {
+			getRodaIn.addClickHandler(new ClickHandler() {
+				public void onClick(ClickEvent event) {
 					Ingest.downloadRodaIn(null, null);
 				}
 
@@ -293,16 +294,16 @@ public class CreateSIP {
 					submitMessage.addStyleDependentName("error");
 				} else if (!fileUpload.isValid()) {
 					submitButton.setEnabled(false);
-					submitMessage
-							.setText(constants.createInvalidFilesWarning());
+					submitMessage.setText(constants.createInvalidFilesWarning());
 					submitMessage.addStyleDependentName("error");
 				} else if (destinationChooser.getSelected() == null) {
 					submitButton.setEnabled(false);
 					submitMessage.setText(constants
 							.createNoDestinationWarning());
 					submitMessage.addStyleDependentName("error");
-				} else if (destinationChooser.getSelected().getSDO().getLevel()
-						.compareTo(DescriptionLevel.FILE) > 0) {
+				} else if (!Main.ALL_BUT_REPRESENTATIONS_DESCRIPTION_LEVELS
+						.contains(destinationChooser.getSelected().getSDO()
+								.getLevel())) {
 					submitButton.setEnabled(false);
 					submitMessage.setText(constants
 							.createInvalidDestinationWarning());
@@ -353,7 +354,7 @@ public class CreateSIP {
 							public void onFailure(Throwable caught) {
 								logger.error("Error while submiting", caught);
 								submitting = false;
-								
+
 								loadingImage.setVisible(false);
 								submitMessage.setText("");
 								submitButton.setEnabled(true);

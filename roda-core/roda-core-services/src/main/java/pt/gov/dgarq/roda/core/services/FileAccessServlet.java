@@ -14,9 +14,9 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import pt.gov.dgarq.roda.core.common.RODAServiceException;
-import pt.gov.dgarq.roda.core.data.User;
 import pt.gov.dgarq.roda.core.fedora.FedoraClientException;
 import pt.gov.dgarq.roda.core.fedora.FedoraClientUtility;
+import pt.gov.dgarq.roda.servlet.cas.CASUserPrincipal;
 import fedora.client.HttpInputStream;
 import fedora.server.types.gen.DatastreamDef;
 
@@ -43,7 +43,6 @@ public class FileAccessServlet extends RODAServlet {
 
 		fedoraURL = getConfiguration().getString("fedoraURL"); //$NON-NLS-1$
 		fedoraGSearchURL = getConfiguration().getString("fedoraGSearchURL"); //$NON-NLS-1$
-
 		logger.debug(getClass().getSimpleName() + " initialised ok"); //$NON-NLS-1$
 	}
 
@@ -81,7 +80,7 @@ public class FileAccessServlet extends RODAServlet {
 
 				logger.debug("HTTP GET " + pathInfo); //$NON-NLS-1$
 
-				User clientUser = getClientUser();
+				CASUserPrincipal clientUser = getClientUser();
 
 				if (clientUser == null) {
 					throw new ServletException(
@@ -90,10 +89,7 @@ public class FileAccessServlet extends RODAServlet {
 
 					FedoraClientUtility fedoraClient;
 					try {
-
-						fedoraClient = new FedoraClientUtility(fedoraURL,
-								fedoraGSearchURL, clientUser,
-								getClientUserPassword());
+						fedoraClient = new FedoraClientUtility(fedoraURL,fedoraGSearchURL, clientUser, getCasUtility());
 
 					} catch (FedoraClientException e) {
 						throw new ServletException(

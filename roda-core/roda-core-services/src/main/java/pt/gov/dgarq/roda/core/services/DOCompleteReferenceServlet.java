@@ -2,6 +2,7 @@ package pt.gov.dgarq.roda.core.services;
 
 import java.io.IOException;
 
+import javax.naming.AuthenticationException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -18,6 +19,7 @@ import pt.gov.dgarq.roda.core.common.RODAServiceException;
 import pt.gov.dgarq.roda.core.data.User;
 import pt.gov.dgarq.roda.core.fedora.FedoraClientException;
 import pt.gov.dgarq.roda.core.fedora.FedoraClientUtility;
+import pt.gov.dgarq.roda.servlet.cas.CASUserPrincipal;
 
 /**
  * This servlet serves complete references for Description Objects.
@@ -84,12 +86,9 @@ public class DOCompleteReferenceServlet extends RODAServlet {
 				try {
 
 					if (this.browserHelper == null) {
-						User adminUser = new Login().getAuthenticatedUser(
-								adminUsername, adminPassword);
-
+						CASUserPrincipal adminUser = getCasUtility().getCASUserPrincipal(adminUsername, adminPassword);
 						FedoraClientUtility fedoraClient = new FedoraClientUtility(
-								fedoraURL, fedoraGSearchURL, adminUser,
-								adminPassword);
+								fedoraURL, fedoraGSearchURL, adminUser,getCasUtility());
 						this.browserHelper = new BrowserHelper(fedoraClient,
 								getConfiguration());
 					}
@@ -120,11 +119,11 @@ public class DOCompleteReferenceServlet extends RODAServlet {
 					throw new ServletException(
 							"Exception getting complete reference - "
 									+ e.getMessage(), e);
-				} catch (LoginException e) {
+				} catch (RODAServiceException e) {
 					throw new ServletException(
 							"Exception getting complete reference - "
 									+ e.getMessage(), e);
-				} catch (RODAServiceException e) {
+				} catch (AuthenticationException e) {
 					throw new ServletException(
 							"Exception getting complete reference - "
 									+ e.getMessage(), e);

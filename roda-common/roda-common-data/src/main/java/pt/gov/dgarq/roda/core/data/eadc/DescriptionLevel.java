@@ -1,8 +1,6 @@
 package pt.gov.dgarq.roda.core.data.eadc;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.List;
 
 import pt.gov.dgarq.roda.core.common.InvalidDescriptionLevel;
 import pt.gov.dgarq.roda.core.data.SimpleDescriptionObject;
@@ -10,82 +8,23 @@ import pt.gov.dgarq.roda.core.data.SimpleDescriptionObject;
 /**
  * This is the description level of a {@link SimpleDescriptionObject}.
  * 
- * Valid values for level are:
- * <ul>
- * <li>{@link DescriptionLevel#FONDS},</li>
- * <li>{@link DescriptionLevel#SUBFONDS},</li>
- * <li>{@link DescriptionLevel#CLASS},</li>
- * <li>{@link DescriptionLevel#SUBCLASS},</li>
- * <li>{@link DescriptionLevel#SERIES},</li>
- * <li>{@link DescriptionLevel#SUBSERIES},</li>
- * <li>{@link DescriptionLevel#FILE},</li>
- * <li>{@link DescriptionLevel#ITEM}.</li>
- * </ul>
- * 
  * @author Rui Castro
+ * @author Hélder Silva
+ * @author Luis Faria <lfaria@keep.pt>
  */
 public class DescriptionLevel implements EadCValue,
 		Comparable<DescriptionLevel>, Serializable {
 	private static final long serialVersionUID = 9038357012292858570L;
 
-	/**
-	 * All the possible values of {@link DescriptionLevel}'s level, in order,
-	 * from fonds to item.
-	 */
-	public static final String[] LEVELS = new String[] { "fonds", "subfonds",
-			"class", "subclass", "series", "subseries", "file", "item" };
+	// description level
+	private String level = null;
 
 	/**
 	 * Description Object Level Fonds (fonds)
 	 */
+	// FIXME this should be removed in order to have a fully programmable
+	// description levels system
 	public final static DescriptionLevel FONDS = new DescriptionLevel("fonds");
-
-	/**
-	 * Description Object Level Subfonds (subfonds)
-	 */
-	public final static DescriptionLevel SUBFONDS = new DescriptionLevel(
-			"subfonds");
-
-	/**
-	 * Description Object Level Class (class)
-	 */
-	public final static DescriptionLevel CLASS = new DescriptionLevel("class");
-
-	/**
-	 * Description Object Level Subclass (subclass)
-	 */
-	public final static DescriptionLevel SUBCLASS = new DescriptionLevel(
-			"subclass");
-
-	/**
-	 * Description Object Level Series (series)
-	 */
-	public final static DescriptionLevel SERIES = new DescriptionLevel("series");
-
-	/**
-	 * Description Object Level Subseries (subseries)
-	 */
-	public final static DescriptionLevel SUBSERIES = new DescriptionLevel(
-			"subseries");
-
-	/**
-	 * Description Object Level File (file)
-	 */
-	public final static DescriptionLevel FILE = new DescriptionLevel("file");
-
-	/**
-	 * Description Object Level Item (item)
-	 */
-	public final static DescriptionLevel ITEM = new DescriptionLevel("item");
-
-	/**
-	 * All the possible values of {@link DescriptionLevel}, in order, from fonds
-	 * to item.
-	 */
-	public static final DescriptionLevel[] DESCRIPTION_LEVELS = new DescriptionLevel[] {
-			FONDS, SUBFONDS, CLASS, SUBCLASS, SERIES, SUBSERIES, FILE, ITEM };
-
-	private String level = null;
 
 	/**
 	 * Constructs an empty (<strong>invalid</strong>) {@link DescriptionLevel}.
@@ -116,18 +55,7 @@ public class DescriptionLevel implements EadCValue,
 	 * Constructs a new {@link DescriptionLevel} of the specified level.
 	 * 
 	 * @param level
-	 *            the level of this {@link DescriptionLevel}. Valid values for
-	 *            description level are:
-	 *            <ul>
-	 *            <li>fonds,</li>
-	 *            <li>subfonds,</li>
-	 *            <li>class,</li>
-	 *            <li>subclass,</li>
-	 *            <li>series,</li>
-	 *            <li>subseries,</li>
-	 *            <li>file,</li>
-	 *            <li>item.</li>
-	 *            </ul>
+	 *            the level of this {@link DescriptionLevel}.
 	 * 
 	 * @throws InvalidDescriptionLevel
 	 *             if the specified level is not one of the allowed levels.
@@ -154,19 +82,22 @@ public class DescriptionLevel implements EadCValue,
 	}
 
 	/**
-	 * Compare to other description level following the order in
-	 * {@link DescriptionLevel#DESCRIPTION_LEVELS}
+	 * Compare to other description level
 	 * 
 	 * @param other
-	 * @return greater than 0 if other level is lesser than this. returns 0 if equal.
+	 * @return (&lt;0), 0 or (&gt;0) if other description level is a descendant
+	 *         of this object, equal to this object or a ascendant level of this
+	 *         object.
 	 */
+	@Deprecated
 	public int compareTo(DescriptionLevel other) {
 
-		DescriptionLevel otherDescriptionLevel = (DescriptionLevel) other;
-
-		List<DescriptionLevel> levels = Arrays.asList(DESCRIPTION_LEVELS);
-
-		return levels.indexOf(this) - levels.indexOf(otherDescriptionLevel);
+		// DescriptionLevel otherDescriptionLevel = (DescriptionLevel) other;
+		//
+		// List<DescriptionLevel> levels = DESCRIPTION_LEVELS;
+		//
+		// return levels.indexOf(this) - levels.indexOf(otherDescriptionLevel);
+		return 0;
 	}
 
 	/**
@@ -184,24 +115,29 @@ public class DescriptionLevel implements EadCValue,
 	}
 
 	/**
+	 * If the level {@link String} for some reason a special word in some
+	 * context (e.g. the word "class" it's exclusive for the Java language and
+	 * therefore one can't use it as an assessor keyword)
+	 * */
+	public String getLevelSanitized() {
+		if (level.equals("class")) {
+			return "class_";
+		} else {
+			return level;
+		}
+	}
+
+	/**
+	 * Sets the level (it gets trimmed in the process)
+	 * 
 	 * @param level
-	 *            the level to set. Valid values for description level are:
-	 *            <ul>
-	 *            <li>fonds,</li>
-	 *            <li>subfonds,</li>
-	 *            <li>class,</li>
-	 *            <li>subclass,</li>
-	 *            <li>series,</li>
-	 *            <li>subseries,</li>
-	 *            <li>file,</li>
-	 *            <li>item.</li>
-	 *            </ul>
+	 *            the level to set.
 	 * @throws InvalidDescriptionLevel
-	 *             if the specified level is not one of the allowed levels.
+	 *             if the specified level is null or empty {@link String}.
 	 */
 	public void setLevel(String level) throws InvalidDescriptionLevel {
-		if (Arrays.asList(LEVELS).contains(level.toLowerCase())) {
-			this.level = level.toLowerCase();
+		if (level != null && !"".equals(level.trim().toLowerCase())) {
+			this.level = level.trim().toLowerCase();
 		} else {
 			throw new InvalidDescriptionLevel("Invalid level: " + level);
 		}

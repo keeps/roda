@@ -80,10 +80,18 @@
 			</fileset>
 			<file src="roda-in.sh" targetdir="$INSTALL_PATH"/>
 			<file src="roda-in.cmd" targetdir="$INSTALL_PATH" os="windows"/>
-			<file src="%5$s/config/roda-in.properties" targetdir="$INSTALL_PATH/config"/>
+			<fileset dir="%5$s" targetdir="$INSTALL_PATH" defaultexcludes="yes">
+				<include name="config/roda-in.properties"/>
+				<include name="config/roda-description-levels-hierarchy.properties"/>
+				<include name="config/rodaTruststore.ts"/>
+				<include name="fits/**"/>
+				<exclude name="fits/.git"/>
+			</fileset>
 			<parsable targetfile="$INSTALL_PATH/roda-in.sh" encoding="UTF-8"/>
 			<parsable targetfile="$INSTALL_PATH/roda-in.cmd" encoding="UTF-8" os="windows"/>
 			<executable targetfile="$INSTALL_PATH/roda-in.sh" stage="never"/>
+			<executable targetfile="$INSTALL_PATH/fits/fits.sh" stage="never"/>
+			<executable targetfile="$INSTALL_PATH/fits/fits-env.sh" stage="never"/>
 		</pack>
 		<!-- Classification Plan package -->
 		<pack name="ClassificationPlan" required="no" id="classification_plan.package">

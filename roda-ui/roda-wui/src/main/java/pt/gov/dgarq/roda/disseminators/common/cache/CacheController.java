@@ -99,7 +99,7 @@ public abstract class CacheController {
 		String servletUrl = RodaClientFactory.getServletUrl(request);
 		final String cacheURL = Cache.getCacheUrl(request);
 		if (waitingForResources.contains(pid)) {
-			response.sendRedirect(servletUrl + "/Loading.html#" + servletUrl
+			response.sendRedirect(servletUrl + "/pt.gov.dgarq.roda.disseminators.common.loading.Loading/Loading.html#" + servletUrl
 					+ "/" + disseminatorURL + "/" + pid + "/");
 		} else {
 			final RepresentationObject rep = RodaClientFactory.getRodaClient(
@@ -123,7 +123,7 @@ public abstract class CacheController {
 					}
 				};
 				createResourcesThread.start();
-				response.sendRedirect(servletUrl + "/Loading.html#"
+				response.sendRedirect(servletUrl + "/pt.gov.dgarq.roda.disseminators.common.loading.Loading/Loading.html#"
 						+ servletUrl + "/" + disseminatorURL + "/" + pid + "/");
 				RodaClientFactory.log(disseminatorName, false, pid, request);
 

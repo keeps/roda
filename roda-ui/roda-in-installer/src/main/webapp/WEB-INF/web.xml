@@ -19,12 +19,9 @@
 		<url-pattern>/GetRodaIn/*</url-pattern>
 	</servlet-mapping>
 	
-	<!-- LDAP Authentication Filters -->
 	<filter>
-		<filter-name>LdapAuthenticationFilter</filter-name>
-		<filter-class>
-			pt.gov.dgarq.roda.servlet.LdapAuthenticationFilter
-		</filter-class>
+		<filter-name>CASAuthenticationFilter</filter-name>
+		<filter-class>pt.gov.dgarq.roda.servlet.cas.CASAuthenticationFilter</filter-class>
 		<init-param>
 			<description>
 				Authentication Realm (default: null)
@@ -32,60 +29,6 @@
 			<param-name>realm</param-name>
 			<param-value>RODA-in Installer</param-value>
 		</init-param>
-<!--	
-		<init-param>
-			<description>
-				LDAP server hostname (default: localhost)
-			</description>
-			<param-name>host</param-name>
-			<param-value>localhost</param-value>
-		</init-param>
-		<init-param>
-			<description>LDAP server port (default: 389)</description>
-			<param-name>port</param-name>
-			<param-value>389</param-value>
-		</init-param>
-		<init-param>
-			<description>LDAP people DN</description>
-			<param-name>peopleDN</param-name>
-			<param-value>
-				ou=people,dc=roda,dc=dgarq,dc=gov,dc=pt
-			</param-value>
-		</init-param>
-		<init-param>
-			<description>LDAP groups DN</description>
-			<param-name>groupsDN</param-name>
-			<param-value>
-				ou=groups,dc=roda,dc=dgarq,dc=gov,dc=pt
-			</param-value>
-		</init-param>
-		<init-param>
-			<description>LDAP roles DN</description>
-			<param-name>rolesDN</param-name>
-			<param-value>
-				ou=roles,dc=roda,dc=dgarq,dc=gov,dc=pt
-			</param-value>
-		</init-param>
-		<init-param>
-			<description>LDAP protected users</description>
-			<param-name>protectedUsers</param-name>
-			<param-value>
-				admin,guest,roda-ingest-task,roda-wui
-			</param-value>
-		</init-param>
-		<init-param>
-			<description>LDAP protected groups</description>
-			<param-name>protectedGroups</param-name>
-			<param-value>administrators,guests</param-value>
-		</init-param>
-		<init-param>
-			<description>
-				Authentication Realm (default: null)
-			</description>
-			<param-name>realm</param-name>
-			<param-value>RODA-in Installer</param-value>
-		</init-param>
--->
 	</filter>
 
 	<!-- Role Filters -->
@@ -103,11 +46,11 @@
 		</init-param>
 	</filter>
 	
-	<!-- Get RODA-in LDAP filter -->
 	<filter-mapping>
-		<filter-name>LdapAuthenticationFilter</filter-name>
+		<filter-name>CASAuthenticationFilter</filter-name>
 		<url-pattern>/GetRodaIn/*</url-pattern>
 	</filter-mapping>
+	
 	<!-- Get RODA-in role service -->
 	<filter-mapping>
 		<filter-name>GetRodaInRoleFilter</filter-name>

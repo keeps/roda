@@ -15,9 +15,10 @@ import pt.gov.dgarq.roda.wui.common.client.UserLogin;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.images.BrowseImageBundle;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
@@ -105,8 +106,8 @@ public class RepresentationsPanel extends Composite {
 						public void onSuccess(
 								final List<RepresentationInfo> reps) {
 							if (reps.size() > 0) {
-								title.setText(messages.representationsTitle(obj
-										.getId(), obj.getTitle()));
+								title.setText(messages.representationsTitle(
+										obj.getId(), obj.getTitle()));
 							} else {
 								title.setText(messages
 										.noRepresentationsTitle(obj.getId()));
@@ -172,14 +173,14 @@ public class RepresentationsPanel extends Composite {
 		layout.add(description);
 
 		if (dissemination.isDownloadDisseminator()) {
-			focus.setTitle(messages.representationDownloadTooltip(repInfo
-					.getFormat(), repInfo.getNumberOfFiles(), repInfo
-					.getSizeOfFiles()));
+			focus.setTitle(messages.representationDownloadTooltip(
+					repInfo.getFormat(), repInfo.getNumberOfFiles(),
+					repInfo.getSizeOfFiles()));
 			description.setText(translateFormat(repInfo.getFormat()));
 
 			if (repInfo.isOriginal() || repInfo.isNormalized()) {
-				Label originalDisseminatorLabel = new Label(constants
-						.disseminationOfOriginal());
+				Label originalDisseminatorLabel = new Label(
+						constants.disseminationOfOriginal());
 				if (repInfo.isOriginal() && repInfo.isNormalized()) {
 					originalDisseminatorLabel.setText(constants
 							.disseminationOfOriginalAndNormalized());
@@ -202,8 +203,8 @@ public class RepresentationsPanel extends Composite {
 			description.setText(getDisseminationDescription(dissemination));
 		}
 
-		focus.addClickListener(getDisseminationClickListener(repInfo.getRepresentationObjectPID(),
-				dissemination));
+		focus.addClickHandler(getDisseminationClickListener(
+				repInfo.getRepresentationObjectPID(), dissemination));
 
 		layout.setCellHorizontalAlignment(icon, HasAlignment.ALIGN_CENTER);
 		layout.setCellHorizontalAlignment(description,
@@ -242,11 +243,12 @@ public class RepresentationsPanel extends Composite {
 		return ret;
 	}
 
-	protected ClickListener getDisseminationClickListener(final String repPid,
+	protected ClickHandler getDisseminationClickListener(final String repPid,
 			final DisseminationInfo dissemination) {
-		return new ClickListener() {
+		return new ClickHandler() {
 
-			public void onClick(Widget sender) {
+			@Override
+			public void onClick(ClickEvent event) {
 				UserLogin.getInstance().getAuthenticatedUser(
 						new AsyncCallback<AuthenticatedUser>() {
 
@@ -256,17 +258,16 @@ public class RepresentationsPanel extends Composite {
 							}
 
 							public void onSuccess(AuthenticatedUser user) {
-								String url = dissemination.getUrl().replaceAll(
-										"\\$PID", repPid);
+								String url = "../"
+										+ dissemination.getUrl().replaceAll(
+												"\\$PID", repPid);
 								Window.open(url, dissemination.getWindowName(),
 										dissemination.getWindowFeatures());
 
 							}
 
 						});
-
 			}
-
 		};
 	}
 }

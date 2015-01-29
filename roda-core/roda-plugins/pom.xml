@@ -78,5 +78,6 @@
     <module>statistics/StatisticsPlugin</module>
     <module>misc/ExecutePlanPlugin</module>
     <module>misc/FixityCheckPlugin</module>
+    <module>misc/FITSPlugin</module>
   </modules>
 </project>

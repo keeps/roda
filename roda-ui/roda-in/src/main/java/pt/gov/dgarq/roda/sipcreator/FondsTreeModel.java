@@ -20,6 +20,7 @@ import org.apache.log4j.Logger;
 
 import pt.gov.dgarq.roda.core.data.DescriptionObject;
 import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevel;
+import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevelManager;
 import pt.gov.dgarq.roda.ingest.siputility.SIPException;
 import pt.gov.dgarq.roda.ingest.siputility.SIPUtility;
 import pt.gov.dgarq.roda.ingest.siputility.data.DataChangeListener;
@@ -88,13 +89,11 @@ public class FondsTreeModel extends DefaultTreeModel implements
 			SwingUtilities.invokeLater(new Runnable() {
 
 				public void run() {
-					JOptionPane
-							.showMessageDialog(
-									SIPCreator.getInstance().getMainFrame(),
-									Messages
-											.getString("FondsTreeModel.warning.EMPTY_CLASSIFICATION_PLAN"),
-									Messages.getString("common.WARNING"),
-									JOptionPane.WARNING_MESSAGE);
+					JOptionPane.showMessageDialog(
+							SIPCreator.getInstance().getMainFrame(),
+							Messages.getString("FondsTreeModel.warning.EMPTY_CLASSIFICATION_PLAN"),
+							Messages.getString("common.WARNING"),
+							JOptionPane.WARNING_MESSAGE);
 				}
 
 			});
@@ -165,8 +164,9 @@ public class FondsTreeModel extends DefaultTreeModel implements
 					SIP sip = new SIP(SIPUtility.readSIP(sipDir), false);
 					ret.add(sip);
 				} catch (SIPException e) {
-					logger.error("Error reading sip from "
-							+ sipDir.getAbsolutePath(), e);
+					logger.error(
+							"Error reading sip from "
+									+ sipDir.getAbsolutePath(), e);
 				}
 			} else {
 				logger.info("Ignoring file " + sipDir.getName());
@@ -181,8 +181,9 @@ public class FondsTreeModel extends DefaultTreeModel implements
 					SIP sip = new SIP(SIPUtility.readSIP(sipDir), true);
 					ret.add(sip);
 				} catch (SIPException e) {
-					logger.error("Error reading sip from "
-							+ sipDir.getAbsolutePath(), e);
+					logger.error(
+							"Error reading sip from "
+									+ sipDir.getAbsolutePath(), e);
 				}
 			} else {
 				logger.info("Ignoring file " + sipDir.getName());
@@ -209,9 +210,9 @@ public class FondsTreeModel extends DefaultTreeModel implements
 		sip.setSent(false);
 		// TODO get SIP initial description object from properties
 		SIPDescriptionObject dObj = new SIPDescriptionObject();
-		dObj.setLevel(DescriptionLevel.ITEM);
+		dObj.setLevel(DescriptionLevelManager.getFirstLeafDescriptionLevel());
 		dObj.setCountryCode("PT");
-		dObj.setRepositoryCode("DGARQ");
+		dObj.setRepositoryCode("KEEPS");
 		sip.setDescriptionObject(dObj);
 		sip.setParentPID(parentPid);
 
@@ -272,13 +273,17 @@ public class FondsTreeModel extends DefaultTreeModel implements
 	 */
 	public FondsTreeNode createNewSipDO(SIPDescriptionObject parent) {
 		FondsTreeNode newSipDoNode = null;
-		if (parent.getLevel().equals(DescriptionLevel.FILE)) {
+		if (DescriptionLevelManager.getRepresentationsDescriptionLevels()
+				.contains(parent.getLevel())
+				&& !DescriptionLevelManager.getLeafDescriptionLevels()
+						.contains(parent.getLevel())) {
 			// create new SIP DO
 			// TODO get SIP DO initial description object from properties
 			SIPDescriptionObject dObj = new SIPDescriptionObject();
-			dObj.setLevel(DescriptionLevel.ITEM);
+			dObj.setLevel(DescriptionLevelManager
+					.getFirstLeafDescriptionLevel());
 			dObj.setCountryCode("PT");
-			dObj.setRepositoryCode("DGARQ");
+			dObj.setRepositoryCode("KEEPS");
 
 			// Update data
 			parent.addChild(dObj);
@@ -313,8 +318,8 @@ public class FondsTreeModel extends DefaultTreeModel implements
 		FondsTreeNode parentNode = null;
 		if (!sip.getDescriptionObject().equals(sipdo)) {
 			// get parent
-			SIPDescriptionObject parent = getSipDOParent(sipdo, sip
-					.getDescriptionObject());
+			SIPDescriptionObject parent = getSipDOParent(sipdo,
+					sip.getDescriptionObject());
 
 			// remove from parent
 			parent.removeChild(sipdo);
@@ -375,7 +380,7 @@ public class FondsTreeModel extends DefaultTreeModel implements
 			SIPException {
 
 		sip.removeChangeListener(this);
-		
+
 		// Change SIP state
 		sip.setParentPID(parentPID);
 		sip.setSent(false);
@@ -437,8 +442,8 @@ public class FondsTreeModel extends DefaultTreeModel implements
 						for (SIP sip : sipNodes.keySet()) {
 							if (sip.isSaveValid() && sip.isChanged()) {
 								Loading.setMessage(Messages.getString(
-										"FondsTreeModel.SAVING_SIP", sip
-												.getCompleteReference()));
+										"FondsTreeModel.SAVING_SIP",
+										sip.getCompleteReference()));
 								try {
 									success[0] = sip.save() && success[0];
 								} catch (SIPException e) {

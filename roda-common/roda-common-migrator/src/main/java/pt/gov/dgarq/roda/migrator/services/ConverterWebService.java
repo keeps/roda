@@ -138,7 +138,7 @@ public abstract class ConverterWebService {
 
 			if (httpRequest instanceof RodaServletRequestWrapper) {
 				RodaServletRequestWrapper rodaRequestWrapper = (RodaServletRequestWrapper) httpRequest;
-				return rodaRequestWrapper.getLdapUserPrincipal();
+				return rodaRequestWrapper.getCASUserPrincipal();
 			} else {
 				// user = null
 				return new User(context.getUsername());

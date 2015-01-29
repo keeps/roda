@@ -3,4 +3,5 @@ target/
 .classpath
 .project
 roda-installer/*.zip
+roda-installer/roda-installer_v*
 *~

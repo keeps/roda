@@ -1,0 +1,7 @@
+gwt-unitCache
+src/main/webapp/WEB-INF/deploy/
+src/main/webapp/WEB-INF/lib/
+src/main/webapp/pt.gov.dgarq.roda.disseminators.common.loading.Loading/
+src/main/webapp/pt.gov.dgarq.roda.wui.main.Main/
+/target
+/target/

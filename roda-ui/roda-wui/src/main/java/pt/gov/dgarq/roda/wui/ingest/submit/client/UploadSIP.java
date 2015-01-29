@@ -77,7 +77,7 @@ public class UploadSIP {
 			title = new Label(constants.uploadHeader());
 			FileNameConstraints fileNameConstraints = new FileNameConstraints();
 			fileNameConstraints
-					.addConstraint(new String[] { "zip", "sip" }, -1);
+					.addConstraint(new String[] { "zip", "sip", "xml" }, -1);
 			fileUpload = new FileUploadPanel(fileNameConstraints);
 			actionLayout = new HorizontalPanel();
 
@@ -115,7 +115,7 @@ public class UploadSIP {
 
 			});
 
-			loading = new Image("images/loadingSmall.gif");
+			loading = new Image(GWT.getModuleBaseURL() + "images/loadingSmall.gif");
 			loadingMessage = new Label();
 
 			updateVisibles();

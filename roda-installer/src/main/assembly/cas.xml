@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<component xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/component/1.1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/component/1.1.2 http://maven.apache.org/xsd/component-1.1.2.xsd">
+	<moduleSets>
+		<moduleSet>
+			<useAllReactorProjects>true</useAllReactorProjects>
+			<includes>
+				<include>pt.gov.dgarq.roda:roda-cas</include>
+			</includes>
+			<binaries>
+				<outputFileNameMapping>roda-cas.${module.extension}</outputFileNameMapping>
+				<outputDirectory>files/cas/webapps</outputDirectory>
+				<unpack>false</unpack>
+				<includeDependencies>false</includeDependencies>
+			</binaries>
+		</moduleSet>
+	</moduleSets>
+	<fileSets>
+		<fileSet>
+			<directory>src/main/resources/files/cas</directory>
+			<outputDirectory>files/cas</outputDirectory>
+		</fileSet>
+	</fileSets>
+</component>

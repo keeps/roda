@@ -28,7 +28,7 @@ public interface BrowserService extends RemoteService {
     /**
      * Service location
      */
-    public static final String SERVICE_URI = "/browserservice";
+    public static final String SERVICE_URI = "browserservice";
 
     /**
      * Utilities

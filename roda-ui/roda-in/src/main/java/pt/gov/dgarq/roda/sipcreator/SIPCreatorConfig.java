@@ -45,21 +45,35 @@ public class SIPCreatorConfig {
 	private File tmpDir;
 	private File eadDir;
 	private URL rodaCoreServices;
-	private URL ingestService;
 	private URL updateCheckURL;
 	private URL updateDownloadURL;
 	private String version;
 	private String buildCode;
 	private String buildDate;
 	private Locale locale;
+	
+	private String casURL;
 
 	private SIPCreatorConfig() {
 		CompositeConfiguration config = new CompositeConfiguration();
 		try {
-			config.addConfiguration(new PropertiesConfiguration(
-					"roda-in.properties"));
-			config.addConfiguration(new PropertiesConfiguration(
-					"roda-in-version.properties"));
+			if (System.getenv("RODA_IN_HOME") != null) {
+				config.addConfiguration(new PropertiesConfiguration(System
+						.getenv("RODA_IN_HOME")
+						+ File.separator
+						+ "config"
+						+ File.separator + "roda-in.properties"));
+				config.addConfiguration(new PropertiesConfiguration(System
+						.getenv("RODA_IN_HOME")
+						+ File.separator
+						+ "config"
+						+ File.separator + "roda-in-version.properties"));
+			}else{
+				config.addConfiguration(new PropertiesConfiguration(
+						"roda-in.properties"));
+				config.addConfiguration(new PropertiesConfiguration(
+						"roda-in-version.properties"));
+			}
 			configuration = config;
 			sipSentDir = createWriteDir(configuration.getString("sip.sent"));
 			sipDraftDir = createWriteDir(configuration.getString("sip.draft"));
@@ -68,9 +82,6 @@ public class SIPCreatorConfig {
 			eadDir = createWriteDir(configuration.getString("ead"));
 			rodaCoreServices = new URL(configuration
 					.getString("roda.services.url"));
-			ingestService = new URL(configuration
-					.getString("roda.services.url")
-					+ "/SIPUpload");
 			updateCheckURL = new URL(configuration
 					.getString("roda.in.update.check.url"));
 			updateDownloadURL = new URL(configuration
@@ -79,7 +90,7 @@ public class SIPCreatorConfig {
 			buildCode = configuration.getString("roda.in.build.code");
 			buildDate = configuration.getString("roda.in.build.date");
 			locale = new Locale(configuration.getString("locale"));
-
+			casURL = configuration.getString("roda.cas.url");
 		} catch (ConfigurationException e) {
 			logger.error("Error getting configuration", e);
 			configuration = null;
@@ -87,6 +98,11 @@ public class SIPCreatorConfig {
 			logger.error("Error getting configuration", e);
 			configuration = null;
 		}
+	}
+
+
+	public URL getCasURL() throws MalformedURLException {
+		return new URL(casURL);
 	}
 
 	private File createWriteDir(String path) {
@@ -179,14 +195,6 @@ public class SIPCreatorConfig {
 		return rodaCoreServices;
 	}
 
-	/**
-	 * Get the Ingest Submit service URL. This URL can be used to submit SIPs.
-	 * 
-	 * @return the Ingest Submit service URL
-	 */
-	public URL getIngestSubmitUrl() {
-		return ingestService;
-	}
 
 	/**
 	 * Get the update check URL

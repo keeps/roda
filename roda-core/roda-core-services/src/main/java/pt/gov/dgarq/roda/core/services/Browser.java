@@ -2,9 +2,7 @@ package pt.gov.dgarq.roda.core.services;
 
 import java.net.MalformedURLException;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -27,11 +25,11 @@ import pt.gov.dgarq.roda.core.data.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.core.data.SimpleEventPreservationObject;
 import pt.gov.dgarq.roda.core.data.SimpleRepresentationObject;
 import pt.gov.dgarq.roda.core.data.SimpleRepresentationPreservationObject;
-import pt.gov.dgarq.roda.core.data.User;
 import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.fedora.FedoraClientException;
 import pt.gov.dgarq.roda.core.fedora.FedoraClientUtility;
+import pt.gov.dgarq.roda.servlet.cas.CASUserPrincipal;
 
 /**
  * This class implements the Browser service.
@@ -41,8 +39,6 @@ import pt.gov.dgarq.roda.core.fedora.FedoraClientUtility;
 public class Browser extends RODAWebService {
 
 	static final private Logger logger = Logger.getLogger(Browser.class);
-
-	private Map<String, BrowserHelper> browserHelperCache = new HashMap<String, BrowserHelper>();
 
 	/**
 	 * Constructs a new instance of Browser service.
@@ -1105,49 +1101,35 @@ public class Browser extends RODAWebService {
 
 	private BrowserHelper getBrowserHelper() throws BrowserException {
 
-		User clientUser = getClientUser();
-
+		CASUserPrincipal clientUser = getClientUser();
+		BrowserHelper helper = null;
 		if (clientUser != null) {
 
-			String usernamePasswordKey = clientUser.getName()
-					+ getClientUserPassword();
+			try {
 
-			if (!this.browserHelperCache.containsKey(usernamePasswordKey)) {
+				FedoraClientUtility fedoraClient = null;
 
-				try {
+				String fedoraURL = getConfiguration()
+						.getString("fedoraURL");
+				String fedoraGSearchURL = getConfiguration().getString(
+						"fedoraGSearchURL");
+				fedoraClient = new FedoraClientUtility(fedoraURL,fedoraGSearchURL, clientUser, getCasUtility());
+				helper = new BrowserHelper(fedoraClient, getConfiguration());
 
-					FedoraClientUtility fedoraClient = null;
-
-					String fedoraURL = getConfiguration()
-							.getString("fedoraURL");
-					String fedoraGSearchURL = getConfiguration().getString(
-							"fedoraGSearchURL");
-
-					fedoraClient = new FedoraClientUtility(fedoraURL,
-							fedoraGSearchURL, clientUser,
-							getClientUserPassword());
-
-					this.browserHelperCache
-							.put(usernamePasswordKey, new BrowserHelper(
-									fedoraClient, getConfiguration()));
-
-				} catch (MalformedURLException e) {
-					logger.error("Error creating BrowserHelper - "
-							+ e.getMessage(), e);
-					throw new BrowserException(
-							"Error creating BrowserHelper - " + e.getMessage(),
-							e);
-				} catch (FedoraClientException e) {
-					logger.error("Error creating Fedora client - "
-							+ e.getMessage(), e);
-					throw new BrowserException(
-							"Error creating Fedora client - " + e.getMessage(),
-							e);
-				}
-
+			} catch (MalformedURLException e) {
+				logger.error("Error creating BrowserHelper - "
+						+ e.getMessage(), e);
+				throw new BrowserException(
+						"Error creating BrowserHelper - " + e.getMessage(),
+						e);
+			} catch (FedoraClientException e) {
+				logger.error("Error creating Fedora client - "
+						+ e.getMessage(), e);
+				throw new BrowserException(
+						"Error creating Fedora client - " + e.getMessage(),
+						e);
 			}
-
-			return this.browserHelperCache.get(usernamePasswordKey);
+			return helper;
 
 		} else {
 

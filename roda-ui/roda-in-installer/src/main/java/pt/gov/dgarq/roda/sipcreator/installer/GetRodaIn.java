@@ -36,9 +36,10 @@ import pt.gov.dgarq.roda.core.common.RODAClientException;
 import pt.gov.dgarq.roda.core.data.User;
 import pt.gov.dgarq.roda.core.metadata.MetadataException;
 import pt.gov.dgarq.roda.core.metadata.eadc.EadCMetadataException;
-import pt.gov.dgarq.roda.servlet.ExtendedUserPrincipal;
-import pt.gov.dgarq.roda.servlet.LdapAuthenticationFilter;
 import pt.gov.dgarq.roda.servlet.RodaServletRequestWrapper;
+import pt.gov.dgarq.roda.servlet.cas.CASAuthenticationFilter;
+import pt.gov.dgarq.roda.servlet.cas.CASUserPrincipal;
+import pt.gov.dgarq.roda.servlet.cas.CASUtility;
 import pt.gov.dgarq.roda.util.TempDir;
 
 import com.izforge.izpack.compiler.CompilerConfig;
@@ -250,7 +251,7 @@ public class GetRodaIn extends HttpServlet implements Servlet {
 
 		if (request instanceof RodaServletRequestWrapper) {
 			RodaServletRequestWrapper rodaRequestWrapper = (RodaServletRequestWrapper) request;
-			user = rodaRequestWrapper.getLdapUserPrincipal();
+			user = rodaRequestWrapper.getCASUserPrincipal();
 		} else {
 			user = new User(request.getUserPrincipal().getName());
 		}
@@ -273,13 +274,12 @@ public class GetRodaIn extends HttpServlet implements Servlet {
 		if (request instanceof RodaServletRequestWrapper) {
 
 			RodaServletRequestWrapper rodaRequestWrapper = (RodaServletRequestWrapper) request;
-			ExtendedUserPrincipal userPrincipal = (ExtendedUserPrincipal) rodaRequestWrapper
-					.getLdapUserPrincipal();
-			password = userPrincipal.getPassword();
+			CASUserPrincipal userPrincipal = (CASUserPrincipal) rodaRequestWrapper.getCASUserPrincipal();
+			password = userPrincipal.getProxyGrantingTicket();
 
 		} else {
 
-			String[] usernamePassword = LdapAuthenticationFilter
+			String[] usernamePassword = CASAuthenticationFilter
 					.parseUsernamePassword(request);
 			password = usernamePassword[1];
 
@@ -298,8 +298,15 @@ public class GetRodaIn extends HttpServlet implements Servlet {
 
 		User user = getClientUser(request);
 		String password = getClientUserPassword(request);
-		helper.update(new RODAClient(getRodaServicesUrl(), user.getName(),
-				password));
+		
+		CASUtility casUtility = new CASUtility(new URL(properties.getProperty("roda.cas.url")), new URL(properties.getProperty("roda.services.url")));
+		if(user instanceof CASUserPrincipal){
+			helper.update(new RODAClient(getRodaServicesUrl(),(CASUserPrincipal)user,casUtility)) ;
+		}else{
+			helper.update(new RODAClient(getRodaServicesUrl(),username,password,casUtility)) ;
+		}
+
+		
 	}
 
 	private void createGenericInstaller(File output, HttpServletRequest request)

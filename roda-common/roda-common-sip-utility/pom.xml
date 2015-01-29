@@ -12,7 +12,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>pt.gov.dgarq.roda</groupId>
-			<artifactId>mets-1.7</artifactId>
+			<artifactId>mets-1.9.1</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>pt.gov.dgarq.roda</groupId>
@@ -48,7 +48,7 @@
 		</dependency>
 		<dependency>
 			<groupId>pt.gov.dgarq.roda</groupId>
-			<artifactId>ead-c.2008</artifactId>
+			<artifactId>ead-c.2014</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.xmlbeans</groupId>

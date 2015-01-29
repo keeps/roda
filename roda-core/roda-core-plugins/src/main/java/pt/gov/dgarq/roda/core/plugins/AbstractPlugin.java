@@ -38,6 +38,16 @@ public abstract class AbstractPlugin implements Plugin {
 				null, true, false, "Password"); //$NON-NLS-1$
 	}
 
+	/**
+	 * Common CAS URL plugin parameter
+	 */
+	public static PluginParameter PARAMETER_RODA_CAS_URL() {
+		return new PluginParameter("roda.cas.url", PluginParameter.TYPE_STRING, //$NON-NLS-1$
+				null, true, false, "CAS URL"); //$NON-NLS-1$
+	}
+	
+	
+
 	private Map<String, String> parameterValues;
 
 	/**

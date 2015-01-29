@@ -135,6 +135,16 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
      </extension>
     </complexContent>
    </complexType>
+   <complexType name="ClassificationSchemeFilterParameter">
+    <complexContent>
+     <extension base="tns3:FilterParameter">
+      <sequence>
+       <element name="classificationSchemeId" nillable="true" type="xsd:string"/>
+       <element name="possibleClassesPids" nillable="true" type="impl:ArrayOf_xsd_string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
   </schema>
  </wsdl:types>
 

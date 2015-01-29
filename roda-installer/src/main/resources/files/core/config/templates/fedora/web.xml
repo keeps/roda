@@ -352,22 +352,12 @@
     <filter-name>SetupFilter</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
+  <!-- 
   <filter-mapping>
     <filter-name>XmlUserfileFilter</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
-
-  <!-- filter-mapping - LDAP for user attributes -->
-  <filter-mapping>
-    <filter-name>LdapFilterForAttributes</filter-name>
-    <url-pattern>/*</url-pattern>
-  </filter-mapping>
-  <!-- filter-mapping - LDAP for user group memberships -->
-  <filter-mapping>
-    <filter-name>LdapFilterForGroups</filter-name>
-    <url-pattern>/*</url-pattern>
-  </filter-mapping>
-
+	-->
   <!-- filter-mapping - RODA roles to fedoraRole's -->
   <filter-mapping>
     <filter-name>RODAFedoraFilter</filter-name>

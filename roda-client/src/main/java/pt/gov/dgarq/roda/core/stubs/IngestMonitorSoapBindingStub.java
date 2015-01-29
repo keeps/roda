@@ -24,20 +24,12 @@ public class IngestMonitorSoapBindingStub extends org.apache.axis.client.Stub im
         org.apache.axis.description.OperationDesc oper;
         org.apache.axis.description.ParameterDesc param;
         oper = new org.apache.axis.description.OperationDesc();
-        oper.setName("getSIPsCount");
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "filter"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://filter.adapter.data.core.roda.dgarq.gov.pt", "Filter"), pt.gov.dgarq.roda.core.data.adapter.filter.Filter.class, false, false);
-        oper.addParameter(param);
-        oper.setReturnType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "int"));
-        oper.setReturnClass(int.class);
-        oper.setReturnQName(new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "getSIPsCountReturn"));
+        oper.setName("getPossibleStates");
+        oper.setReturnType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
+        oper.setReturnClass(java.lang.String[].class);
+        oper.setReturnQName(new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "getPossibleStatesReturn"));
         oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
-        oper.addFault(new org.apache.axis.description.FaultDesc(
-                      new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "fault"),
-                      "pt.gov.dgarq.roda.core.common.IngestMonitorException",
-                      new javax.xml.namespace.QName("http://common.core.roda.dgarq.gov.pt", "IngestMonitorException"), 
-                      true
-                     ));
         _operations[0] = oper;
 
         oper = new org.apache.axis.description.OperationDesc();
@@ -58,12 +50,20 @@ public class IngestMonitorSoapBindingStub extends org.apache.axis.client.Stub im
         _operations[1] = oper;
 
         oper = new org.apache.axis.description.OperationDesc();
-        oper.setName("getPossibleStates");
-        oper.setReturnType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        oper.setReturnClass(java.lang.String[].class);
-        oper.setReturnQName(new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "getPossibleStatesReturn"));
+        oper.setName("getSIPsCount");
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "filter"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://filter.adapter.data.core.roda.dgarq.gov.pt", "Filter"), pt.gov.dgarq.roda.core.data.adapter.filter.Filter.class, false, false);
+        oper.addParameter(param);
+        oper.setReturnType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "int"));
+        oper.setReturnClass(int.class);
+        oper.setReturnQName(new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "getSIPsCountReturn"));
         oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
+        oper.addFault(new org.apache.axis.description.FaultDesc(
+                      new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "fault"),
+                      "pt.gov.dgarq.roda.core.common.IngestMonitorException",
+                      new javax.xml.namespace.QName("http://common.core.roda.dgarq.gov.pt", "IngestMonitorException"), 
+                      true
+                     ));
         _operations[2] = oper;
 
     }
@@ -139,6 +139,13 @@ public class IngestMonitorSoapBindingStub extends org.apache.axis.client.Stub im
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
 
+            qName = new javax.xml.namespace.QName("http://filter.adapter.data.core.roda.dgarq.gov.pt", "ClassificationSchemeFilterParameter");
+            cachedSerQNames.add(qName);
+            cls = pt.gov.dgarq.roda.core.data.adapter.filter.ClassificationSchemeFilterParameter.class;
+            cachedSerClasses.add(cls);
+            cachedSerFactories.add(beansf);
+            cachedDeserFactories.add(beandf);
+
             qName = new javax.xml.namespace.QName("http://filter.adapter.data.core.roda.dgarq.gov.pt", "Filter");
             cachedSerQNames.add(qName);
             cls = pt.gov.dgarq.roda.core.data.adapter.filter.Filter.class;
@@ -195,7 +202,7 @@ public class IngestMonitorSoapBindingStub extends org.apache.axis.client.Stub im
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
 
-            qName = new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "ArrayOf_tns1_FilterParameter");
+            qName = new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "ArrayOf_tns2_FilterParameter");
             cachedSerQNames.add(qName);
             cls = pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter[].class;
             cachedSerClasses.add(cls);
@@ -204,7 +211,7 @@ public class IngestMonitorSoapBindingStub extends org.apache.axis.client.Stub im
             cachedSerFactories.add(new org.apache.axis.encoding.ser.ArraySerializerFactory(qName, qName2));
             cachedDeserFactories.add(new org.apache.axis.encoding.ser.ArrayDeserializerFactory());
 
-            qName = new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "ArrayOf_tns4_SortParameter");
+            qName = new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "ArrayOf_tns3_SortParameter");
             cachedSerQNames.add(qName);
             cls = pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter[].class;
             cachedSerClasses.add(cls);
@@ -213,7 +220,7 @@ public class IngestMonitorSoapBindingStub extends org.apache.axis.client.Stub im
             cachedSerFactories.add(new org.apache.axis.encoding.ser.ArraySerializerFactory(qName, qName2));
             cachedDeserFactories.add(new org.apache.axis.encoding.ser.ArrayDeserializerFactory());
 
-            qName = new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "ArrayOf_tns6_SIPStateTransition");
+            qName = new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "ArrayOf_tns5_SIPStateTransition");
             cachedSerQNames.add(qName);
             cls = pt.gov.dgarq.roda.core.data.SIPStateTransition[].class;
             cachedSerClasses.add(cls);
@@ -318,7 +325,7 @@ public class IngestMonitorSoapBindingStub extends org.apache.axis.client.Stub im
         }
     }
 
-    public int getSIPsCount(pt.gov.dgarq.roda.core.data.adapter.filter.Filter filter) throws java.rmi.RemoteException, pt.gov.dgarq.roda.core.common.IngestMonitorException {
+    public java.lang.String[] getPossibleStates() throws java.rmi.RemoteException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -330,11 +337,11 @@ public class IngestMonitorSoapBindingStub extends org.apache.axis.client.Stub im
         _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
         _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
         _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
-        _call.setOperationName(new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "getSIPsCount"));
+        _call.setOperationName(new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "getPossibleStates"));
 
         setRequestHeaders(_call);
         setAttachments(_call);
- try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {filter});
+ try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {});
 
         if (_resp instanceof java.rmi.RemoteException) {
             throw (java.rmi.RemoteException)_resp;
@@ -342,20 +349,12 @@ public class IngestMonitorSoapBindingStub extends org.apache.axis.client.Stub im
         else {
             extractAttachments(_call);
             try {
-                return ((java.lang.Integer) _resp).intValue();
+                return (java.lang.String[]) _resp;
             } catch (java.lang.Exception _exception) {
-                return ((java.lang.Integer) org.apache.axis.utils.JavaUtils.convert(_resp, int.class)).intValue();
+                return (java.lang.String[]) org.apache.axis.utils.JavaUtils.convert(_resp, java.lang.String[].class);
             }
         }
   } catch (org.apache.axis.AxisFault axisFaultException) {
-    if (axisFaultException.detail != null) {
-        if (axisFaultException.detail instanceof java.rmi.RemoteException) {
-              throw (java.rmi.RemoteException) axisFaultException.detail;
-         }
-        if (axisFaultException.detail instanceof pt.gov.dgarq.roda.core.common.IngestMonitorException) {
-              throw (pt.gov.dgarq.roda.core.common.IngestMonitorException) axisFaultException.detail;
-         }
-   }
   throw axisFaultException;
 }
     }
@@ -402,7 +401,7 @@ public class IngestMonitorSoapBindingStub extends org.apache.axis.client.Stub im
 }
     }
 
-    public java.lang.String[] getPossibleStates() throws java.rmi.RemoteException {
+    public int getSIPsCount(pt.gov.dgarq.roda.core.data.adapter.filter.Filter filter) throws java.rmi.RemoteException, pt.gov.dgarq.roda.core.common.IngestMonitorException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -414,11 +413,11 @@ public class IngestMonitorSoapBindingStub extends org.apache.axis.client.Stub im
         _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
         _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
         _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
-        _call.setOperationName(new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "getPossibleStates"));
+        _call.setOperationName(new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "getSIPsCount"));
 
         setRequestHeaders(_call);
         setAttachments(_call);
- try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {});
+ try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {filter});
 
         if (_resp instanceof java.rmi.RemoteException) {
             throw (java.rmi.RemoteException)_resp;
@@ -426,12 +425,20 @@ public class IngestMonitorSoapBindingStub extends org.apache.axis.client.Stub im
         else {
             extractAttachments(_call);
             try {
-                return (java.lang.String[]) _resp;
+                return ((java.lang.Integer) _resp).intValue();
             } catch (java.lang.Exception _exception) {
-                return (java.lang.String[]) org.apache.axis.utils.JavaUtils.convert(_resp, java.lang.String[].class);
+                return ((java.lang.Integer) org.apache.axis.utils.JavaUtils.convert(_resp, int.class)).intValue();
             }
         }
   } catch (org.apache.axis.AxisFault axisFaultException) {
+    if (axisFaultException.detail != null) {
+        if (axisFaultException.detail instanceof java.rmi.RemoteException) {
+              throw (java.rmi.RemoteException) axisFaultException.detail;
+         }
+        if (axisFaultException.detail instanceof pt.gov.dgarq.roda.core.common.IngestMonitorException) {
+              throw (pt.gov.dgarq.roda.core.common.IngestMonitorException) axisFaultException.detail;
+         }
+   }
   throw axisFaultException;
 }
     }

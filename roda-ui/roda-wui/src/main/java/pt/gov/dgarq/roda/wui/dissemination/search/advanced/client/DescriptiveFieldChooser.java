@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import pt.gov.dgarq.roda.core.data.search.EadcSearchFields;
+import pt.gov.dgarq.roda.core.data.search.OtherSearchFields;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.CheckBox;
@@ -118,6 +119,8 @@ public class DescriptiveFieldChooser extends FlexTable {
 	private final FieldOption physDescPhysFacet;
 
 	private final FieldOption physDescExtent;
+	
+	private final FieldOption physDescGenreform;
 
 	private final FieldOption preferCite;
 
@@ -140,12 +143,29 @@ public class DescriptiveFieldChooser extends FlexTable {
 	private final FieldOption accessRestrict;
 
 	private final FieldOption useRestrict;
+	
+	private final FieldOption langMaterial;
 
-	private final FieldOption relatedMaterials;
+	private final FieldOption relatedMaterial;
 
 	private final FieldOption otherFindAid;
 
 	private final FieldOption bibliography;
+	
+	private final FieldOption eadAbstract;
+	
+	private final FieldOption index;
+	
+	private final FieldOption processInfo;
+	
+	private final FieldOption controlAccess;
+	
+	private final FieldOption odd;
+	
+	private final FieldOption notes;
+	
+	private final FieldOption otherMetadata;
+	
 
 	/**
 	 * Create a new description fields chooser panel
@@ -173,6 +193,7 @@ public class DescriptiveFieldChooser extends FlexTable {
 						.physDescPhysFacet());
 		physDescExtent = new FieldOption(EadcSearchFields.PHYSDESC_EXTENT,
 				constants.physDescExtent());
+		physDescGenreform = new FieldOption(EadcSearchFields.PHYSDESC_GENREFORM, constants.physDescGenreform());
 		preferCite = new FieldOption(EadcSearchFields.PREFERCITE, constants
 				.preferCite());
 
@@ -198,7 +219,7 @@ public class DescriptiveFieldChooser extends FlexTable {
 		useRestrict = new FieldOption(EadcSearchFields.USERESTRICT, constants
 				.useRestrict());
 
-		relatedMaterials = new FieldOption(EadcSearchFields.RELATEDMATERIAL,
+		relatedMaterial = new FieldOption(EadcSearchFields.RELATEDMATERIAL,
 				constants.relatedMaterialsGroupLabel());
 
 		otherFindAid = new FieldOption(EadcSearchFields.OTHERFINDAID, constants
@@ -206,35 +227,72 @@ public class DescriptiveFieldChooser extends FlexTable {
 
 		bibliography = new FieldOption(EadcSearchFields.BIBLIOGRAPHY, constants
 				.bibliography());
+		
+		eadAbstract = new FieldOption(EadcSearchFields.ABSTRACT, constants.abstractNote());
+		
+		langMaterial = new FieldOption(EadcSearchFields.LANGMATERIAL_LANGUAGE, constants.langMaterialLanguages());
+		
+		index = new FieldOption(EadcSearchFields.INDEX, constants.index());
+		
+		processInfo = new FieldOption(EadcSearchFields.PROCESSINFO, constants.processInfoGroupLabel());
+		
+		controlAccess = new FieldOption(EadcSearchFields.CONTROL_ACCESS, constants.controlAccesses());
+		
+		odd = new FieldOption(EadcSearchFields.ODD, constants.odd());
+		
+		notes = new FieldOption(EadcSearchFields.NOTE, constants.notes());
+		
+		otherMetadata = new FieldOption(OtherSearchFields.OTHER, constants.otherMetadata());
 
 		this.setWidget(0, 0, completeReference);
 		this.setWidget(1, 0, title);
-		this.setWidget(2, 0, origination);
-		this.setWidget(3, 0, acqInfoNum);
+		this.setWidget(2, 0, eadAbstract);
+		this.setWidget(3, 0, origination);
 		this.setWidget(4, 0, materialspec);
-		this.setWidget(5, 0, physDesc);
-		this.setWidget(6, 0, physDescDimensions);
-		this.setWidget(7, 0, physDescPhysFacet);
-		this.setWidget(8, 0, physDescExtent);
+		this.setWidget(5, 0, physDescGenreform);
+		this.setWidget(6, 0, physDesc);
+		this.setWidget(7, 0, physDescDimensions);
+		this.setWidget(8, 0, physDescPhysFacet);
+                this.setWidget(9, 0, physDescExtent);
+                this.setWidget(10, 0, langMaterial);
+                this.setWidget(11, 0, preferCite);
+                
+                
+                this.setWidget(0, 1, bioghist);
+                this.setWidget(1, 1, custodhist);
+                this.setWidget(2, 1, acqinfo);
+		this.setWidget(3, 1, acqInfoNum);
 		
-		this.setWidget(0, 1, preferCite);
-		this.setWidget(1, 1, bioghist);
-		this.setWidget(2, 1, custodhist);
-		this.setWidget(3, 1, acqinfo);
-
+		
 		this.setWidget(5, 1, scopeContent);
-		this.setWidget(6, 1, arrangement);
-		this.setWidget(7, 1, appraisal);
-		this.setWidget(8, 1, accruals);
+                this.setWidget(6, 1, arrangement);
+                this.setWidget(7, 1, appraisal);
+                this.setWidget(8,1, accruals);
+		
+                this.setWidget(10, 1, physTech);
+                this.setWidget(11, 1, accessRestrict);
+                this.setWidget(0, 2, useRestrict);
+                this.setWidget(1, 2, controlAccess);
+		
+		
+                this.setWidget(3, 2, relatedMaterial);
+                this.setWidget(4, 2, otherFindAid);
+		
+		
+                this.setWidget(6, 2, notes);
+		this.setWidget(7, 2, index);
+		this.setWidget(8, 2, bibliography);
+		this.setWidget(9, 2, odd);
+		
 
-		this.setWidget(0, 2, physTech);
-		this.setWidget(1, 2, accessRestrict);
-		this.setWidget(2, 2, useRestrict);
-
-		this.setWidget(4, 2, otherFindAid);
-		this.setWidget(5, 2, relatedMaterials);
-
-		this.setWidget(7, 2, bibliography);
+		
+		
+		this.setWidget(11, 2, processInfo);
+		
+		
+		this.setWidget(13, 2, otherMetadata);
+		
+		
 
 		this.addStyleName("wui-descriptiveFieldChooser");
 
@@ -332,12 +390,45 @@ public class DescriptiveFieldChooser extends FlexTable {
 			selectedFieldSet.add(otherFindAid);
 		}
 
-		if (relatedMaterials.isChecked()) {
-			selectedFieldSet.add(relatedMaterials);
+		if (relatedMaterial.isChecked()) {
+			selectedFieldSet.add(relatedMaterial);
 		}
 
 		if (bibliography.isChecked()) {
 			selectedFieldSet.add(bibliography);
+		}
+		if(physDescGenreform.isChecked()){
+		  selectedFieldSet.add(physDescGenreform);
+		}
+		
+		if(langMaterial.isChecked()){
+		  selectedFieldSet.add(langMaterial);
+		}
+		
+		if(eadAbstract.isChecked()){
+		  selectedFieldSet.add(eadAbstract);
+		}
+		
+		if(index.isChecked()){
+		  selectedFieldSet.add(index);
+		}
+		if(processInfo.isChecked()){
+		  selectedFieldSet.add(processInfo);
+		}
+		if(controlAccess.isChecked()){
+		  selectedFieldSet.add(controlAccess);
+		}
+		
+		if(odd.isChecked()){
+		  selectedFieldSet.add(odd);
+		}
+		
+		if(notes.isChecked()){
+		  selectedFieldSet.add(notes);
+		}
+		
+		if(otherMetadata.isChecked()){
+		  selectedFieldSet.add(otherMetadata);
 		}
 		return selectedFieldSet;
 	}
@@ -364,10 +455,10 @@ public class DescriptiveFieldChooser extends FlexTable {
 	public List<FieldOption> getAllFields() {
 		return Arrays.asList(new FieldOption[] { completeReference, title,
 				origination, acqInfoNum, materialspec, physDesc, physDescDimensions,
-				physDescPhysFacet, physDescExtent, preferCite, bioghist,
+				physDescPhysFacet, physDescExtent,physDescGenreform, preferCite, bioghist,
 				custodhist, acqinfo, scopeContent, arrangement, appraisal,
 				accruals, physTech, accessRestrict, useRestrict, otherFindAid,
-				relatedMaterials, bibliography });
+				relatedMaterial, bibliography, index,processInfo,controlAccess,odd,notes,otherMetadata});
 	}
 
 	/**

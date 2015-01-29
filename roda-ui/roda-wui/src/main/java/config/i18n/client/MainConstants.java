@@ -174,6 +174,15 @@ public interface MainConstants extends Constants, ConstantsWithLookup {
 
 	@DefaultStringValue("Password")
 	public String loginPassword();
+	
+	@DefaultStringValue("Login")
+	public String loginLogin();
+	
+	@DefaultStringValue("Register")
+	public String loginRegister();
+	
+	@DefaultStringValue("Recover")
+	public String loginRecover();
 
 	@DefaultStringValue("Preferences")
 	public String loginPreferences();
@@ -204,6 +213,10 @@ public interface MainConstants extends Constants, ConstantsWithLookup {
 	// Content Panel
 	@DefaultStringValue("Authorization Denied")
 	public String authorizationDeniedAlert();
+	
+	
+	@DefaultStringValue("You need to be authenticated to access this page. Do you want to authenticate?")
+	public String casForwardWarning();
 
 
 }

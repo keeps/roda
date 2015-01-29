@@ -27,7 +27,7 @@ public class DW2Tiff extends ImageMagickConverter {
 	}
 
 	@Override
-	protected boolean representationNeedsConvertion(
+	protected boolean representationNeedsConversion(
 			LocalRepresentationObject localRepresentation)
 			throws CommandException, WrongRepresentationSubtypeException,
 			WrongRepresentationTypeException {

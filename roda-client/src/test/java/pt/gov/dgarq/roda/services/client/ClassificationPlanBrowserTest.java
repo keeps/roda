@@ -13,6 +13,7 @@ import pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.stubs.Browser;
+import pt.gov.dgarq.roda.servlet.cas.CASUtility;
 
 /**
  * Test class for Browser service.
@@ -31,24 +32,28 @@ public class ClassificationPlanBrowserTest {
 			RODAClient rodaClient = null;
 			String producerUsername = null;
 
-			if (args.length >= 3) {
+			if (args.length >= 6) {
 
 				// http://localhost:8180/ user pass
 				String hostUrl = args[0];
 				String username = args[1];
 				String password = args[2];
-				if (args.length > 3) {
-					producerUsername = args[3];
+				String casURL = args[3];
+				String coreURL = args[4];
+				String serviceURL = args[5];
+				CASUtility casUtility = new CASUtility(new URL(casURL), new URL(coreURL), new URL(serviceURL));
+				if (args.length > 6) {
+					producerUsername = args[6];
 				}
 
 				rodaClient = new RODAClient(new URL(hostUrl), username,
-						password);
+						password,casUtility);
 			} else {
 				System.err
 						.println(ClassificationPlanBrowserTest.class
 								.getSimpleName()
-								+ " roda-core-url username password [producerUserName]\n"
-								+ "Ex: http://localhost:8080/roda-core demo-admin demo-admin rcastro");
+								+ " roda-core-url username password casURL coreURL serviceURL [producerUserName]\n"
+								+ "Ex: http://localhost:8080/roda-core demo-admin demo-admin https://localhost:8443/cas https://localhost:8443/roda-core/ https://localhost:8443/ rcastro");
 				System.exit(1);
 			}
 

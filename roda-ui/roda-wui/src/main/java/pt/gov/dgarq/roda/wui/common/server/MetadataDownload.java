@@ -59,6 +59,8 @@ public class MetadataDownload extends HttpServlet {
 	private static final Logger logger = Logger
 			.getLogger(MetadataDownload.class);
 
+	public static String TYPE_OTHER_DESCRIPTIVE_METADATA = "OTHER";
+
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
@@ -84,7 +86,7 @@ public class MetadataDownload extends HttpServlet {
 
 			} else if (type.equals(TYPE_EAD)) {
 				getEad(pid, request, response, rodaClient);
-			} else {
+			}else{
 				response.sendError(HttpServletResponse.SC_BAD_REQUEST,
 						"Wrong type '" + type + "'. Use '" + TYPE_EAD
 								+ "' or '" + TYPE_PREMIS + "'");
@@ -136,6 +138,11 @@ public class MetadataDownload extends HttpServlet {
 		RepresentationPreservationObject[] preservationObjects = rodaClient
 				.getBrowserService().getDOPreservationObjects(pid);
 
+		if (preservationObjects == null) {
+			throw new DownloaderException("The object with PID \"" + pid
+					+ "\" doesn't have preservation information...");
+		}
+		
 		File premisDir = TempDir.createUniqueTemporaryDirectory("premis");
 
 		Set<String> agentPids = new HashSet<String>();

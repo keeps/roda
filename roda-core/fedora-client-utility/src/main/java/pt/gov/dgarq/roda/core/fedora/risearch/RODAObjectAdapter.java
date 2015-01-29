@@ -72,8 +72,7 @@ public class RODAObjectAdapter extends ITQLEntityAdapter<RODAObject> {
 	 * 
 	 * @see SortParameterComparator#compare(Object, Object, String)
 	 */
-	public int compare(RODAObject e1, RODAObject e2,
-			String attributeName) {
+	public int compare(RODAObject e1, RODAObject e2, String attributeName) {
 		return 0;
 	}
 
@@ -264,5 +263,11 @@ public class RODAObjectAdapter extends ITQLEntityAdapter<RODAObject> {
 		}
 
 		return stateURI;
+	}
+
+	@Override
+	public String getITQLClassificationSchemeCondition(String itqlQuerySubject,
+			String classificationSchemeId, String[] possibleParentsPids) {
+		return null;
 	}
 }

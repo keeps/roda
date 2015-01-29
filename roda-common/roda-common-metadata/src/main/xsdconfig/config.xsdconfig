@@ -1,0 +1,5 @@
+<xb:config xmlns:pol="http://openuri.org/easypoLocal" xmlns:xb="http://www.bea.com/2002/09/xbean/config">
+	<xb:namespace uri="http://www.loc.gov/METS/">
+		<xb:package>gov.loc.mets</xb:package>
+	</xb:namespace>
+</xb:config>

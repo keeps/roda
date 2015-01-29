@@ -255,13 +255,10 @@ public class FlashPageFlipPaid extends javax.servlet.http.HttpServlet implements
 			SynchronousConverter service;
 			if (rep.getType().equals(RepresentationObject.DIGITALIZED_WORK)) {
 				service = migratorClient.getSynchronousConverterService(
-						dwMigratorUrl, rodaClient.getUsername(), rodaClient
-								.getPassword());
-			} else if (rep.getType().equals(
-					RepresentationObject.STRUCTURED_TEXT)) {
+						dwMigratorUrl, rodaClient.getCup() ,rodaClient.getCasUtility());
+			} else if (rep.getType().equals(RepresentationObject.STRUCTURED_TEXT) || rep.getType().equals(RepresentationObject.PRESENTATION)) {
 				service = migratorClient.getSynchronousConverterService(
-						pdfMigratorUrl, rodaClient.getUsername(), rodaClient
-								.getPassword());
+						pdfMigratorUrl, rodaClient.getCup(),rodaClient.getCasUtility());
 			} else {
 				logger.error("Unsuported representation type: "
 						+ rep.getContentModel());

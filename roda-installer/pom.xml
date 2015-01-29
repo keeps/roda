@@ -41,11 +41,11 @@
 	</build>
 	<dependencies>
 		<dependency>
-   		<groupId>org.objectweb.carol</groupId>
+			<groupId>org.objectweb.carol</groupId>
 			<artifactId>carol</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>commons-configuration</groupId> 
+			<groupId>commons-configuration</groupId>
 			<artifactId>commons-configuration</artifactId>
 		</dependency>
 		<dependency>
@@ -55,6 +55,26 @@
 		<dependency>
 			<groupId>org.w3c</groupId>
 			<artifactId>w3c-utils</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.opensaml</groupId>
+			<artifactId>opensaml1</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jasig.cas.client</groupId>
+			<artifactId>cas-client-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>xml-security</groupId>
+			<artifactId>xmlsec</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.objectweb.carol</groupId>
+			<artifactId>carol</artifactId>
 		</dependency>
 	</dependencies>
 </project>

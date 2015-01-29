@@ -51,6 +51,22 @@ email: roda-ingest-task@roda.pt
 shadowInactive: 0
 
 #######################
+# fedoraAdmin
+dn: uid=fedoraAdmin,LDAP_USERS_DN
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+objectClass: top
+objectClass: extensibleObject
+uid: fedoraAdmin
+userPassword: roda
+givenName: Fedora Admin
+cn: RODA
+sn: Fedora Admin
+email: fedoraAdmin@roda.pt
+shadowInactive: 0
+
+#######################
 # roda-preservation-task
 dn: uid=roda-preservation-task,LDAP_USERS_DN
 objectClass: inetOrgPerson

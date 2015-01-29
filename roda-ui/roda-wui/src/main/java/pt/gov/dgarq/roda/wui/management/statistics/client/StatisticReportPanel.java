@@ -14,15 +14,16 @@ import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
 import pt.gov.dgarq.roda.wui.common.client.widgets.DatePicker;
 import pt.gov.dgarq.roda.wui.common.client.widgets.ElementPanel;
 import pt.gov.dgarq.roda.wui.common.client.widgets.LazyVerticalList;
+import pt.gov.dgarq.roda.wui.common.client.widgets.LazyVerticalList.ContentSource;
 import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
 import pt.gov.dgarq.roda.wui.common.client.widgets.WUIWindow;
-import pt.gov.dgarq.roda.wui.common.client.widgets.LazyVerticalList.ContentSource;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.ChangeListener;
-import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.DockPanel;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HasAlignment;
@@ -94,9 +95,8 @@ public abstract class StatisticReportPanel extends StatisticsPanel {
 
 		window.addToBottom(close);
 
-		close.addClickListener(new ClickListener() {
-
-			public void onClick(Widget sender) {
+		close.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
 				hide();
 			}
 
@@ -123,6 +123,7 @@ public abstract class StatisticReportPanel extends StatisticsPanel {
 
 		chartWidget = new ChartWidget();
 		chartWidget.setSize("890px", "350px");
+		chartWidget.setFlashUrl(GWT.getModuleBaseURL() + "open-flash-chart.swf");
 
 		chartLayout.add(chartHeader, DockPanel.NORTH);
 		chartLayout.add(chartWidget, DockPanel.CENTER);
@@ -136,9 +137,8 @@ public abstract class StatisticReportPanel extends StatisticsPanel {
 
 		});
 
-		changeDateInterval.addClickListener(new ClickListener() {
-
-			public void onClick(Widget sender) {
+		changeDateInterval.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
 				getDateIntervalPickerWindow().show();
 			}
 
@@ -286,9 +286,8 @@ public abstract class StatisticReportPanel extends StatisticsPanel {
 			dateIntervalPickerInitial.setDate(getInitialDate());
 			dateIntervalPickerFinal.setDate(getFinalDate());
 
-			dateIntervalPickerApply.addClickListener(new ClickListener() {
-
-				public void onClick(Widget sender) {
+			dateIntervalPickerApply.addClickHandler(new ClickHandler() {
+				public void onClick(ClickEvent event) {
 					// date final must be set first because initial is relative
 					setFinalDate(dateIntervalPickerFinal.getDate());
 					setInitialDate(dateIntervalPickerInitial.getDate());

@@ -59,6 +59,7 @@ import pt.gov.dgarq.roda.core.stubs.Scheduler;
 import pt.gov.dgarq.roda.core.stubs.Statistics;
 import pt.gov.dgarq.roda.core.stubs.StatisticsMonitor;
 import pt.gov.dgarq.roda.core.stubs.UserBrowser;
+import pt.gov.dgarq.roda.servlet.cas.CASUtility;
 
 /**
  * Plugin to update the statistics
@@ -115,7 +116,7 @@ public class StatisticsPlugin extends AbstractPlugin {
 	 */
 	public List<PluginParameter> getParameters() {
 		return Arrays.asList(PARAMETER_RODA_CORE_URL(),
-				PARAMETER_RODA_CORE_USERNAME(), PARAMETER_RODA_CORE_PASSWORD());
+				PARAMETER_RODA_CORE_USERNAME(), PARAMETER_RODA_CORE_PASSWORD(),AbstractPlugin.PARAMETER_RODA_CAS_URL());
 	}
 
 	/**
@@ -137,8 +138,12 @@ public class StatisticsPlugin extends AbstractPlugin {
 					PARAMETER_RODA_CORE_USERNAME().getName());
 			String password = getParameterValues().get(
 					PARAMETER_RODA_CORE_PASSWORD().getName());
-
-			rodaClient = new RODAClient(rodaCore, username, password);
+			String casURL = getParameterValues().get(
+					AbstractPlugin.PARAMETER_RODA_CAS_URL().getName());
+			String coreURL = getParameterValues().get(
+					AbstractPlugin.PARAMETER_RODA_CORE_URL().getName());
+			CASUtility casUtility = new CASUtility(new URL(casURL), new URL(coreURL));
+			rodaClient = new RODAClient(rodaCore, username, password,casUtility);
 			currentDate = new Date();
 			entries = new ArrayList<StatisticData>();
 

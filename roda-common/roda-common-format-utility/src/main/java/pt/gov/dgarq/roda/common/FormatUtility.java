@@ -1,8 +1,6 @@
 package pt.gov.dgarq.roda.common;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -14,12 +12,17 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.Iterator;
 import java.util.UUID;
+
 import javax.activation.MimetypesFileTypeMap;
+
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.NullArgumentException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+
+import edu.harvard.hul.ois.fits.exceptions.FitsConfigurationException;
+import edu.harvard.hul.ois.fits.exceptions.FitsException;
 import pt.gov.dgarq.roda.core.data.FileFormat;
 
 /**
@@ -61,18 +64,19 @@ public class FormatUtility {
 
         if ((file != null) && (file.exists()) && (file.length() > 0)) {
             try {
-                DroidFactory droidFactory = new DroidFactory(file);
-                detectedFileFormat = droidFactory.execute();
-            } catch (FormatDetectionException ex) {
-                logger.error("Error, when RODA tried detect file format by DROID", ex);
-            }
+                detectedFileFormat = FITSUtility.execute(file);
+            } catch (FitsConfigurationException e) {
+            	logger.error("Error while creating FITS Utility", e);
+			} catch (FitsException e) {
+				logger.error("Error while trying to detect file format using FITS", e);
+			}
         } else {
             if (file == null) {
-                logger.error("Error, when RODA tried detect file format by DROID", new NullArgumentException("attribute file is NULL"));
+                logger.error("Error while trying to detect file format using FITS", new NullArgumentException("attribute file is NULL"));
             } else if (!file.exists()) {
-                logger.error("Error, when RODA tried detect file format by DROID", new IOException("File \"" + file.getAbsolutePath() + "\" doesn't exist"));
+                logger.error("Error while trying to detect file format using FITS", new IOException("File \"" + file.getAbsolutePath() + "\" doesn't exist"));
             } else if (file.length() > 1) {
-                logger.error("Error, when RODA tried detect file format by DROID", new IOException("File \"" + file.getAbsolutePath() + "\" has 0 size."));
+                logger.error("Error while trying to detect file format using FITS", new IOException("File \"" + file.getAbsolutePath() + "\" has 0 size."));
             }
         }
         // Sometimes are not information from PRONOM completed or PRONOM couldn't detect file format. 
@@ -119,12 +123,13 @@ public class FormatUtility {
         FileFormat detectedFileFormat = null;
         File tempFile = null;
         try {
-            tempFile = saveStreamAsTempFile(inputStream);
+			tempFile = saveStreamAsTempFile(inputStream, originalFileName);
+			
             // Run file format detection
             detectedFileFormat = getFileFormat(tempFile, originalFileName);
         } catch (IOException e) {
             logger.error(
-                    "Cannot create temp file for getMimetype FileInputStream. DROID can't detect mime-type.",
+                    "Cannot create temp file for getMimetype FileInputStream. FITS can't detect mime-type.",
                     e);
         } finally {
             if ((tempFile != null) && (tempFile.exists())) {
@@ -150,12 +155,12 @@ public class FormatUtility {
         String mimeType = "application/octet-stream";
         File tempFile = null;
         try {
-            tempFile = saveStreamAsTempFile(inputStream);
+            tempFile = saveStreamAsTempFile(inputStream, originalFileName);
             // Run file format detection
             mimeType = getMimetype(tempFile, originalFileName);
         } catch (IOException e) {
             logger.error(
-                    "Cannot create temp file for getMimetype FileInputStream. DROID can't detect mime-type.",
+                    "Cannot create temp file for getMimetype FileInputStream. FITS can't detect mime-type.",
                     e);
         } finally {
             if ((tempFile != null) && (tempFile.exists())) {
@@ -237,9 +242,11 @@ public class FormatUtility {
         return mimetypesFileTypeMap;
     }
 
-    public static File saveStreamAsTempFile(InputStream inputStream) throws IOException {
-        // Create temp file                
-        File tempFile = File.createTempFile(String.valueOf(UUID.randomUUID()), ".droid_tmp");
+    public static File saveStreamAsTempFile(InputStream inputStream, String originalFileName) throws IOException {
+    	String suffix = (originalFileName != null)?originalFileName:".fits_tmp";
+    	
+    	// Create temp file                
+        File tempFile = File.createTempFile(String.valueOf(UUID.randomUUID()), suffix);
         if (inputStream == null) {
             return null;
         }
@@ -308,4 +315,9 @@ public class FormatUtility {
         }
         return tempFile;
     }
+    
+	public static File saveStreamAsTempFile(InputStream inputStream)
+			throws IOException {
+		return saveStreamAsTempFile(inputStream, null);
+	}
 }

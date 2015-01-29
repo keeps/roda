@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="setup-cas" basedir=".">
+
+	<property environment="env" />
+
+	<target name="set-roda-env.sh">
+		<echo message="env.RODA_HOME=${env.RODA_HOME}"/>
+		<replace file="../bin/set-roda-env.sh" token="RODAHOME" value="${env.RODA_HOME}" />
+	</target>
+
+	<target name="deployerConfigContext.xml">
+		<replace file="../webapps/cas.war/WEB-INF/deployerConfigContext.xml" token="LDAPHOST" value="${env.LDAPHOST}" />
+		<replace file="../webapps/cas.war/WEB-INF/deployerConfigContext.xml" token="LDAP_USERS_DN" value="${env.LDAP_USERS_DN}" />
+		<replace file="../webapps/cas.war/WEB-INF/deployerConfigContext.xml" token="LDAP_GROUPS_DN" value="${env.LDAP_GROUPS_DN}" />
+		<replace file="../webapps/cas.war/WEB-INF/deployerConfigContext.xml" token="LDAP_ROLES_DN" value="${env.LDAP_ROLES_DN}" />
+	</target>
+
+	<target name="cas.properties">
+		<replace file="../webapps/cas.war/WEB-INF/cas.properties" token="CAS_SERVER_NAME" value="${env.CAS_SERVER_NAME}" />
+		<replace file="../webapps/cas.war/WEB-INF/cas.properties" token="CAS_SERVER_PREFIX" value="${env.CAS_SERVER_PREFIX}" />
+	</target>
+
+</project>

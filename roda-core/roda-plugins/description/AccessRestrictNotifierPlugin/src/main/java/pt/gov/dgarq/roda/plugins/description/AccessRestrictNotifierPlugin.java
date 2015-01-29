@@ -28,6 +28,7 @@ import pt.gov.dgarq.roda.core.plugins.PluginException;
 import pt.gov.dgarq.roda.core.stubs.Browser;
 import pt.gov.dgarq.roda.core.stubs.UserBrowser;
 import pt.gov.dgarq.roda.plugins.description.DescriptionTraverserPlugin;
+import pt.gov.dgarq.roda.servlet.cas.CASUtility;
 import pt.gov.dgarq.roda.util.EmailUtility;
 
 /**
@@ -112,7 +113,7 @@ public class AccessRestrictNotifierPlugin
 		return Arrays.asList(AbstractPlugin.PARAMETER_RODA_CORE_URL(), AbstractPlugin
 				.PARAMETER_RODA_CORE_USERNAME(), AbstractPlugin
 				.PARAMETER_RODA_CORE_PASSWORD(), PARAMETER_FONDS_PID(),
-				PARAMETER_NOTIFIER_EMAIL_ADDRESS());
+				PARAMETER_NOTIFIER_EMAIL_ADDRESS(),AbstractPlugin.PARAMETER_RODA_CAS_URL());
 	}
 
 	/**
@@ -293,6 +294,14 @@ public class AccessRestrictNotifierPlugin
 				AbstractPlugin.PARAMETER_RODA_CORE_PASSWORD().getName());
 	}
 
+	private URL getCasURL() throws MalformedURLException {
+		return new URL(getParameterValues().get(
+				AbstractPlugin.PARAMETER_RODA_CAS_URL().getName()));
+	}
+	private URL getCoreURL() throws MalformedURLException {
+		return new URL(getParameterValues().get(
+				AbstractPlugin.PARAMETER_RODA_CORE_URL().getName()));
+	}
 	private String getFondsPID() {
 		return getParameterValues().get(PARAMETER_FONDS_PID().getName());
 	}
@@ -301,8 +310,9 @@ public class AccessRestrictNotifierPlugin
 
 		try {
 
+			CASUtility casUtility = new CASUtility(getCasURL(),  getCoreURL());
 			this.rodaClient = new RODAClient(getRodaServicesURL(),
-					getUsername(), getPassword());
+					getUsername(), getPassword(),casUtility);
 
 			this.browserService = this.rodaClient.getBrowserService();
 			this.userBrowserService = this.rodaClient.getUserBrowserService();

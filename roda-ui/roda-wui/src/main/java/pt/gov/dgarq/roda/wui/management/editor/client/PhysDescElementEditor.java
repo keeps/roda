@@ -107,4 +107,7 @@ public class PhysDescElementEditor implements MetadataElementEditor {
 		return value.getText().length() == 0;
 	}
 
+	public boolean isValid() {
+		return true;
+	}
 }

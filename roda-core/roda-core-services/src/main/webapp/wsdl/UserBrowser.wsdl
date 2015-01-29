@@ -10,7 +10,7 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
    <import namespace="http://adapter.data.core.roda.dgarq.gov.pt"/>
    <import namespace="http://sort.adapter.data.core.roda.dgarq.gov.pt"/>
    <import namespace="http://sublist.adapter.data.core.roda.dgarq.gov.pt"/>
-   <element name="getGroups">
+   <element name="getUsers">
     <complexType>
      <sequence>
       <element name="contentAdapter" type="tns1:ContentAdapter"/>
@@ -27,10 +27,10 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
      <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns3:SortParameter"/>
     </sequence>
    </complexType>
-   <element name="getGroupsResponse">
+   <element name="getUsersResponse">
     <complexType>
      <sequence>
-      <element maxOccurs="unbounded" name="getGroupsReturn" type="tns5:Group"/>
+      <element maxOccurs="unbounded" name="getUsersReturn" type="tns5:User"/>
      </sequence>
     </complexType>
    </element>
@@ -40,6 +40,20 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
     </sequence>
    </complexType>
    <element name="fault" type="tns6:UserManagementException"/>
+   <element name="getGroups">
+    <complexType>
+     <sequence>
+      <element name="contentAdapter" type="tns1:ContentAdapter"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="getGroupsResponse">
+    <complexType>
+     <sequence>
+      <element maxOccurs="unbounded" name="getGroupsReturn" type="tns5:Group"/>
+     </sequence>
+    </complexType>
+   </element>
    <element name="getRoles">
     <complexType/>
    </element>
@@ -47,6 +61,34 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
     <complexType>
      <sequence>
       <element maxOccurs="unbounded" name="getRolesReturn" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="getUserDirectRoles">
+    <complexType>
+     <sequence>
+      <element name="userName" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="getUserDirectRolesResponse">
+    <complexType>
+     <sequence>
+      <element maxOccurs="unbounded" name="getUserDirectRolesReturn" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="getUserCount">
+    <complexType>
+     <sequence>
+      <element name="filter" type="tns2:Filter"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="getUserCountResponse">
+    <complexType>
+     <sequence>
+      <element name="getUserCountReturn" type="xsd:int"/>
      </sequence>
     </complexType>
    </element>
@@ -78,31 +120,17 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
      </sequence>
     </complexType>
    </element>
-   <element name="getUsersInGroup">
+   <element name="getUserNames">
     <complexType>
      <sequence>
-      <element name="groupName" type="xsd:string"/>
+      <element name="contentAdapter" type="tns1:ContentAdapter"/>
      </sequence>
     </complexType>
    </element>
-   <element name="getUsersInGroupResponse">
+   <element name="getUserNamesResponse">
     <complexType>
      <sequence>
-      <element maxOccurs="unbounded" name="getUsersInGroupReturn" type="tns5:User"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="getUserCount">
-    <complexType>
-     <sequence>
-      <element name="filter" type="tns2:Filter"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="getUserCountResponse">
-    <complexType>
-     <sequence>
-      <element name="getUserCountReturn" type="xsd:int"/>
+      <element maxOccurs="unbounded" name="getUserNamesReturn" type="xsd:string"/>
      </sequence>
     </complexType>
    </element>
@@ -120,31 +148,17 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
      </sequence>
     </complexType>
    </element>
-   <element name="getUsers">
+   <element name="getUsersInGroup">
     <complexType>
      <sequence>
-      <element name="contentAdapter" type="tns1:ContentAdapter"/>
+      <element name="groupName" type="xsd:string"/>
      </sequence>
     </complexType>
    </element>
-   <element name="getUsersResponse">
+   <element name="getUsersInGroupResponse">
     <complexType>
      <sequence>
-      <element maxOccurs="unbounded" name="getUsersReturn" type="tns5:User"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="getUserNames">
-    <complexType>
-     <sequence>
-      <element name="contentAdapter" type="tns1:ContentAdapter"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="getUserNamesResponse">
-    <complexType>
-     <sequence>
-      <element maxOccurs="unbounded" name="getUserNamesReturn" type="xsd:string"/>
+      <element maxOccurs="unbounded" name="getUsersInGroupReturn" type="tns5:User"/>
      </sequence>
     </complexType>
    </element>
@@ -159,20 +173,6 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
     <complexType>
      <sequence>
       <element maxOccurs="unbounded" name="getGroupDirectRolesReturn" type="xsd:string"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="getUserDirectRoles">
-    <complexType>
-     <sequence>
-      <element name="userName" type="xsd:string"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="getUserDirectRolesResponse">
-    <complexType>
-     <sequence>
-      <element maxOccurs="unbounded" name="getUserDirectRolesReturn" type="xsd:string"/>
      </sequence>
     </complexType>
    </element>
@@ -250,6 +250,16 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
      </extension>
     </complexContent>
    </complexType>
+   <complexType name="ClassificationSchemeFilterParameter">
+    <complexContent>
+     <extension base="tns2:FilterParameter">
+      <sequence>
+       <element name="classificationSchemeId" nillable="true" type="xsd:string"/>
+       <element name="possibleClassesPids" nillable="true" type="impl:ArrayOf_xsd_string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
   </schema>
   <schema elementFormDefault="qualified" targetNamespace="http://sort.adapter.data.core.roda.dgarq.gov.pt" xmlns="http://www.w3.org/2001/XMLSchema">
    <import namespace="http://data.core.roda.dgarq.gov.pt"/>
@@ -317,16 +327,6 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
      <element name="roles" nillable="true" type="impl:ArrayOf_xsd_string"/>
     </sequence>
    </complexType>
-   <complexType name="Group">
-    <complexContent>
-     <extension base="tns5:RODAMember">
-      <sequence>
-       <element name="memberGroupNames" nillable="true" type="impl:ArrayOf_xsd_string"/>
-       <element name="memberUserNames" nillable="true" type="impl:ArrayOf_xsd_string"/>
-      </sequence>
-     </extension>
-    </complexContent>
-   </complexType>
    <complexType name="User">
     <complexContent>
      <extension base="tns5:RODAMember">
@@ -349,6 +349,16 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
        <element name="resetPasswordToken" nillable="true" type="xsd:string"/>
        <element name="resetPasswordTokenExpirationDate" nillable="true" type="xsd:string"/>
        <element name="telephoneNumber" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="Group">
+    <complexContent>
+     <extension base="tns5:RODAMember">
+      <sequence>
+       <element name="memberGroupNames" nillable="true" type="impl:ArrayOf_xsd_string"/>
+       <element name="memberUserNames" nillable="true" type="impl:ArrayOf_xsd_string"/>
       </sequence>
      </extension>
     </complexContent>
@@ -395,12 +405,6 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
    </wsdl:message>
 
-   <wsdl:message name="getUserDirectRolesResponse">
-
-      <wsdl:part element="impl:getUserDirectRolesResponse" name="parameters"/>
-
-   </wsdl:message>
-
    <wsdl:message name="getUserNamesResponse">
 
       <wsdl:part element="impl:getUserNamesResponse" name="parameters"/>
@@ -410,6 +414,12 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
    <wsdl:message name="getUsersRequest">
 
       <wsdl:part element="impl:getUsers" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getUserDirectRolesResponse">
+
+      <wsdl:part element="impl:getUserDirectRolesResponse" name="parameters"/>
 
    </wsdl:message>
 
@@ -461,15 +471,15 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
    </wsdl:message>
 
-   <wsdl:message name="getGroupCountResponse">
-
-      <wsdl:part element="impl:getGroupCountResponse" name="parameters"/>
-
-   </wsdl:message>
-
    <wsdl:message name="getUsersInGroupResponse">
 
       <wsdl:part element="impl:getUsersInGroupResponse" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getGroupCountResponse">
+
+      <wsdl:part element="impl:getGroupCountResponse" name="parameters"/>
 
    </wsdl:message>
 
@@ -509,19 +519,29 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
    </wsdl:message>
 
-   <wsdl:message name="getUserDirectRolesRequest">
-
-      <wsdl:part element="impl:getUserDirectRoles" name="parameters"/>
-
-   </wsdl:message>
-
    <wsdl:message name="UserManagementException">
 
       <wsdl:part element="impl:fault" name="fault"/>
 
    </wsdl:message>
 
+   <wsdl:message name="getUserDirectRolesRequest">
+
+      <wsdl:part element="impl:getUserDirectRoles" name="parameters"/>
+
+   </wsdl:message>
+
    <wsdl:portType name="UserBrowser">
+
+      <wsdl:operation name="getUsers">
+
+         <wsdl:input message="impl:getUsersRequest" name="getUsersRequest"/>
+
+         <wsdl:output message="impl:getUsersResponse" name="getUsersResponse"/>
+
+         <wsdl:fault message="impl:UserManagementException" name="UserManagementException"/>
+
+      </wsdl:operation>
 
       <wsdl:operation name="getGroups">
 
@@ -538,6 +558,26 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
          <wsdl:input message="impl:getRolesRequest" name="getRolesRequest"/>
 
          <wsdl:output message="impl:getRolesResponse" name="getRolesResponse"/>
+
+         <wsdl:fault message="impl:UserManagementException" name="UserManagementException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getUserDirectRoles">
+
+         <wsdl:input message="impl:getUserDirectRolesRequest" name="getUserDirectRolesRequest"/>
+
+         <wsdl:output message="impl:getUserDirectRolesResponse" name="getUserDirectRolesResponse"/>
+
+         <wsdl:fault message="impl:UserManagementException" name="UserManagementException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getUserCount">
+
+         <wsdl:input message="impl:getUserCountRequest" name="getUserCountRequest"/>
+
+         <wsdl:output message="impl:getUserCountResponse" name="getUserCountResponse"/>
 
          <wsdl:fault message="impl:UserManagementException" name="UserManagementException"/>
 
@@ -563,21 +603,11 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
       </wsdl:operation>
 
-      <wsdl:operation name="getUsersInGroup">
+      <wsdl:operation name="getUserNames">
 
-         <wsdl:input message="impl:getUsersInGroupRequest" name="getUsersInGroupRequest"/>
+         <wsdl:input message="impl:getUserNamesRequest" name="getUserNamesRequest"/>
 
-         <wsdl:output message="impl:getUsersInGroupResponse" name="getUsersInGroupResponse"/>
-
-         <wsdl:fault message="impl:UserManagementException" name="UserManagementException"/>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="getUserCount">
-
-         <wsdl:input message="impl:getUserCountRequest" name="getUserCountRequest"/>
-
-         <wsdl:output message="impl:getUserCountResponse" name="getUserCountResponse"/>
+         <wsdl:output message="impl:getUserNamesResponse" name="getUserNamesResponse"/>
 
          <wsdl:fault message="impl:UserManagementException" name="UserManagementException"/>
 
@@ -593,21 +623,11 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
       </wsdl:operation>
 
-      <wsdl:operation name="getUsers">
+      <wsdl:operation name="getUsersInGroup">
 
-         <wsdl:input message="impl:getUsersRequest" name="getUsersRequest"/>
+         <wsdl:input message="impl:getUsersInGroupRequest" name="getUsersInGroupRequest"/>
 
-         <wsdl:output message="impl:getUsersResponse" name="getUsersResponse"/>
-
-         <wsdl:fault message="impl:UserManagementException" name="UserManagementException"/>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="getUserNames">
-
-         <wsdl:input message="impl:getUserNamesRequest" name="getUserNamesRequest"/>
-
-         <wsdl:output message="impl:getUserNamesResponse" name="getUserNamesResponse"/>
+         <wsdl:output message="impl:getUsersInGroupResponse" name="getUsersInGroupResponse"/>
 
          <wsdl:fault message="impl:UserManagementException" name="UserManagementException"/>
 
@@ -623,21 +643,35 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
       </wsdl:operation>
 
-      <wsdl:operation name="getUserDirectRoles">
-
-         <wsdl:input message="impl:getUserDirectRolesRequest" name="getUserDirectRolesRequest"/>
-
-         <wsdl:output message="impl:getUserDirectRolesResponse" name="getUserDirectRolesResponse"/>
-
-         <wsdl:fault message="impl:UserManagementException" name="UserManagementException"/>
-
-      </wsdl:operation>
-
    </wsdl:portType>
 
    <wsdl:binding name="UserBrowserSoapBinding" type="impl:UserBrowser">
 
       <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+      <wsdl:operation name="getUsers">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getUsersRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getUsersResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="UserManagementException">
+
+            <wsdlsoap:fault name="UserManagementException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
 
       <wsdl:operation name="getGroups">
 
@@ -674,6 +708,54 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
          </wsdl:input>
 
          <wsdl:output name="getRolesResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="UserManagementException">
+
+            <wsdlsoap:fault name="UserManagementException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getUserDirectRoles">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getUserDirectRolesRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getUserDirectRolesResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="UserManagementException">
+
+            <wsdlsoap:fault name="UserManagementException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getUserCount">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getUserCountRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getUserCountResponse">
 
             <wsdlsoap:body use="literal"/>
 
@@ -735,41 +817,17 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
       </wsdl:operation>
 
-      <wsdl:operation name="getUsersInGroup">
+      <wsdl:operation name="getUserNames">
 
          <wsdlsoap:operation soapAction=""/>
 
-         <wsdl:input name="getUsersInGroupRequest">
+         <wsdl:input name="getUserNamesRequest">
 
             <wsdlsoap:body use="literal"/>
 
          </wsdl:input>
 
-         <wsdl:output name="getUsersInGroupResponse">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:output>
-
-         <wsdl:fault name="UserManagementException">
-
-            <wsdlsoap:fault name="UserManagementException" use="literal"/>
-
-         </wsdl:fault>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="getUserCount">
-
-         <wsdlsoap:operation soapAction=""/>
-
-         <wsdl:input name="getUserCountRequest">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:input>
-
-         <wsdl:output name="getUserCountResponse">
+         <wsdl:output name="getUserNamesResponse">
 
             <wsdlsoap:body use="literal"/>
 
@@ -807,41 +865,17 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
       </wsdl:operation>
 
-      <wsdl:operation name="getUsers">
+      <wsdl:operation name="getUsersInGroup">
 
          <wsdlsoap:operation soapAction=""/>
 
-         <wsdl:input name="getUsersRequest">
+         <wsdl:input name="getUsersInGroupRequest">
 
             <wsdlsoap:body use="literal"/>
 
          </wsdl:input>
 
-         <wsdl:output name="getUsersResponse">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:output>
-
-         <wsdl:fault name="UserManagementException">
-
-            <wsdlsoap:fault name="UserManagementException" use="literal"/>
-
-         </wsdl:fault>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="getUserNames">
-
-         <wsdlsoap:operation soapAction=""/>
-
-         <wsdl:input name="getUserNamesRequest">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:input>
-
-         <wsdl:output name="getUserNamesResponse">
+         <wsdl:output name="getUsersInGroupResponse">
 
             <wsdlsoap:body use="literal"/>
 
@@ -866,30 +900,6 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
          </wsdl:input>
 
          <wsdl:output name="getGroupDirectRolesResponse">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:output>
-
-         <wsdl:fault name="UserManagementException">
-
-            <wsdlsoap:fault name="UserManagementException" use="literal"/>
-
-         </wsdl:fault>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="getUserDirectRoles">
-
-         <wsdlsoap:operation soapAction=""/>
-
-         <wsdl:input name="getUserDirectRolesRequest">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:input>
-
-         <wsdl:output name="getUserDirectRolesResponse">
 
             <wsdlsoap:body use="literal"/>
 

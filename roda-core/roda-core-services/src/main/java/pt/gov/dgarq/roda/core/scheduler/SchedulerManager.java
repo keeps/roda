@@ -99,16 +99,14 @@ public class SchedulerManager {
 			// Start quartz with custom configuration file
 			String quartzPropertiesFile = configuration.getString(
 					"quartzPropertiesFile", "quartz.properties");
-
-			System.setProperty("org.quartz.properties", new File(
-					RodaWebApplication.RODA_CORE_CONFIG_DIRECTORY,
-					quartzPropertiesFile).getAbsolutePath());
+                        String quartzPropertiesFilePath = new File(RodaWebApplication.RODA_CORE_CONFIG_DIRECTORY, quartzPropertiesFile)
+                          .getAbsolutePath();
 
 			logger.info("Using quartz properties "
-					+ System.getProperty("org.quartz.properties"));
+					+ quartzPropertiesFilePath);
 
 			// Grab the Scheduler instance from the Factory
-			this.scheduler = StdSchedulerFactory.getDefaultScheduler();
+                        this.scheduler = new StdSchedulerFactory(quartzPropertiesFilePath).getScheduler();
 
 			this.quartzSchedulerListener = new QuartzSchedulerListener();
 			this.scheduler.addSchedulerListener(quartzSchedulerListener);
@@ -197,7 +195,7 @@ public class SchedulerManager {
 					// .getName(), context.getJobDetail().getGroup());
 					// }
 
-					logger.info("Shutting down Quartz scheduler (waiting for jobs to finnish...)");
+					logger.info("Shutting down Quartz scheduler (waiting for jobs to finish...)");
 					this.scheduler.shutdown(true);
 					logger.info("Quartz scheduler terminated.");
 				}

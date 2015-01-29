@@ -4,20 +4,22 @@
 package pt.gov.dgarq.roda.wui.dissemination.client;
 
 import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevel;
+import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevelInfo;
 import pt.gov.dgarq.roda.wui.common.client.BadHistoryTokenException;
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
 import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
 import pt.gov.dgarq.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.Browse;
-import pt.gov.dgarq.roda.wui.dissemination.client.images.ElementIconBundle;
 import pt.gov.dgarq.roda.wui.dissemination.search.client.Search;
+import pt.gov.dgarq.roda.wui.main.client.Main;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 
+import config.i18n.client.CommonConstants;
 import config.i18n.client.DisseminationConstants;
 
 /**
@@ -26,9 +28,8 @@ import config.i18n.client.DisseminationConstants;
  */
 public class Dissemination implements HistoryResolver {
 
-	private static ElementIconBundle icons = (ElementIconBundle) GWT
-			.create(ElementIconBundle.class);
-
+	private static CommonConstants commonConstants = (CommonConstants) GWT
+			.create(CommonConstants.class);
 	private static DisseminationConstants constants = (DisseminationConstants) GWT
 			.create(DisseminationConstants.class);
 
@@ -120,25 +121,20 @@ public class Dissemination implements HistoryResolver {
 	 */
 	public Image getElementLevelIcon(DescriptionLevel level) {
 		Image ret;
-		if (level.equals(new DescriptionLevel(DescriptionLevel.FONDS))) {
-			ret = icons.fonds().createImage();
-		} else if (level
-				.equals(new DescriptionLevel(DescriptionLevel.SUBFONDS))) {
-			ret = icons.subfonds().createImage();
-		} else if (level.equals(new DescriptionLevel(DescriptionLevel.CLASS))) {
-			ret = icons.class_().createImage();
-		} else if (level
-				.equals(new DescriptionLevel(DescriptionLevel.SUBCLASS))) {
-			ret = icons.subclass().createImage();
-		} else if (level.equals(new DescriptionLevel(DescriptionLevel.SERIES))) {
-			ret = icons.series().createImage();
-		} else if (level
-				.equals(new DescriptionLevel(DescriptionLevel.SUBSERIES))) {
-			ret = icons.subseries().createImage();
-		} else if (level.equals(new DescriptionLevel(DescriptionLevel.FILE))) {
-			ret = icons.file().createImage();
-		} else if (level.equals(new DescriptionLevel(DescriptionLevel.ITEM))) {
-			ret = icons.item().createImage();
+		final DescriptionLevelInfo levelInfo = Main.getDescriptionLevel(level
+				.getLevel());
+		if (levelInfo != null) {
+			ret = new Image(GWT.getModuleBaseURL() + "description_levels/"
+					+ levelInfo.getCategory().getCategory() + ".png");
+			ret.setAltText(levelInfo.getLabel(commonConstants.locale()));
+		} else {
+			ret = new Image(GWT.getModuleBaseURL()
+					+ "description_levels/default.png");
+			ret.setAltText("default");
+		}
+
+		if (Main.DESCRIPTION_LEVELS.contains(level)) {
+
 		} else {
 			ret = null;
 		}
@@ -153,29 +149,11 @@ public class Dissemination implements HistoryResolver {
 	 */
 	public String getElementLevelTranslation(DescriptionLevel level) {
 		String ret;
-		if (level.equals(new DescriptionLevel(DescriptionLevel.FONDS))) {
-			ret = constants.fonds();
-		} else if (level
-				.equals(new DescriptionLevel(DescriptionLevel.SUBFONDS))) {
-			ret = constants.subfonds();
-		} else if (level.equals(new DescriptionLevel(DescriptionLevel.CLASS))) {
-			ret = constants.class_();
-		} else if (level
-				.equals(new DescriptionLevel(DescriptionLevel.SUBCLASS))) {
-			ret = constants.subclass();
-		} else if (level.equals(new DescriptionLevel(DescriptionLevel.SERIES))) {
-			ret = constants.series();
-		} else if (level
-				.equals(new DescriptionLevel(DescriptionLevel.SUBSERIES))) {
-			ret = constants.subseries();
-		} else if (level.equals(new DescriptionLevel(DescriptionLevel.FILE))) {
-			ret = constants.file();
-		} else if (level.equals(new DescriptionLevel(DescriptionLevel.ITEM))) {
-			ret = constants.item();
+		if (Main.DESCRIPTION_LEVELS.contains(level)) {
+			ret = constants.getString(level.getLevelSanitized());
 		} else {
 			ret = null;
 		}
-
 		return ret;
 	}
 }

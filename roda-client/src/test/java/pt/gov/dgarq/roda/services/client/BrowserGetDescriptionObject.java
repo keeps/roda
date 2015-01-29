@@ -11,6 +11,7 @@ import pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException;
 import pt.gov.dgarq.roda.core.common.RODAClientException;
 import pt.gov.dgarq.roda.core.data.DescriptionObject;
 import pt.gov.dgarq.roda.core.stubs.Browser;
+import pt.gov.dgarq.roda.servlet.cas.CASUtility;
 
 /**
  * @author Rui Castro
@@ -28,28 +29,35 @@ public class BrowserGetDescriptionObject {
 			RODAClient rodaClient = null;
 			String pid = null;
 
-			if (args.length == 2) {
+			if (args.length == 5) {
 
 				// http://localhost:8180/
 				String hostUrl = args[0];
-				pid = args[1];
+				String casURL = args[1];
+				String coreURL = args[2];
+				String serviceURL = args[3];
+				CASUtility casUtility = new CASUtility(new URL(casURL), new URL(coreURL), new URL(serviceURL));
+				pid = args[4];
+				
+				rodaClient = new RODAClient(new URL(hostUrl),casUtility);
 
-				rodaClient = new RODAClient(new URL(hostUrl));
-
-			} else if (args.length >= 4) {
+			} else if (args.length == 7) {
 
 				// http://localhost:8180/ user pass
 				String hostUrl = args[0];
 				pid = args[1];
 				String username = args[2];
 				String password = args[3];
-
+				String casURL = args[4];
+				String coreURL = args[5];
+				String serviceURL = args[6];
+				CASUtility casUtility = new CASUtility(new URL(casURL), new URL(coreURL), new URL(serviceURL));
 				rodaClient = new RODAClient(new URL(hostUrl), username,
-						password);
+						password,casUtility);
 			} else {
 				System.err.println(BrowserGetDescriptionObject.class
 						.getSimpleName()
-						+ " protocol://hostname:port/ pid [username password]");
+						+ " protocol://hostname:port/ pid [username password] casURL coreURL serviceURL");
 				System.exit(1);
 			}
 

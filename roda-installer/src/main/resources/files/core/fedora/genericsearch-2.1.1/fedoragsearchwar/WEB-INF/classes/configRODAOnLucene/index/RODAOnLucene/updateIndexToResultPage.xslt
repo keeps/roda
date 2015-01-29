@@ -4,7 +4,7 @@
 		xmlns:zs="http://www.loc.gov/zing/srw/"
 		xmlns:foxml="info:fedora/fedora-system:def/foxml#"
 		xmlns:dc="http://purl.org/dc/elements/1.1/"
-		xmlns:eadc="http://roda.dgarq.gov.pt/2008/EADCSchema">
+		xmlns:eadc="http://roda.dgarq.gov.pt/2014/EADCSchema">
 		
 <!-- This xslt stylesheet generates the resultPage
      from a Lucene updateIndex.

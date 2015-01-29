@@ -2,10 +2,11 @@ package pt.gov.dgarq.roda.wui.common.client;
 
 import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
 import pt.gov.dgarq.roda.wui.common.client.widgets.MessagePopup;
-import pt.gov.dgarq.roda.wui.main.client.LoginDialog;
+import pt.gov.dgarq.roda.wui.main.client.CasForwardDialog;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.GWT.UncaughtExceptionHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
@@ -50,6 +51,7 @@ public class ClientLogger implements IsSerializable {
 	private static boolean SHOW_ERROR_MESSAGES = false;
 
 	private String classname;
+	
 
 	/**
 	 * Create a new client logger
@@ -295,7 +297,9 @@ public class ClientLogger implements IsSerializable {
 	 */
 	public void error(final String message, final Throwable error) {
 		if (error instanceof AuthorizationDeniedException) {
-			LoginDialog.getInstance().show();
+			String windowLocation = Window.Location.getHref();
+			CasForwardDialog cfd = new CasForwardDialog(windowLocation);
+			cfd.show(); 
 		} else if (CURRENT_LOG_LEVEL <= ERROR) {
 			AsyncCallback<Void> errorcallback = new AsyncCallback<Void>() {
 				public void onFailure(Throwable caught) {

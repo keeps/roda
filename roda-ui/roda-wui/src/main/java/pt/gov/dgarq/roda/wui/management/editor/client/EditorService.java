@@ -33,7 +33,7 @@ public interface EditorService extends RemoteService {
 	/**
 	 * Editor service URI
 	 */
-	public static final String SERVICE_URI = "/editorservice";
+	public static final String SERVICE_URI = "editorservice";
 
 	/**
 	 * Utilities

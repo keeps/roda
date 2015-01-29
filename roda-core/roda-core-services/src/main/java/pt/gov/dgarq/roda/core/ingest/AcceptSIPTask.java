@@ -15,6 +15,8 @@ import pt.gov.dgarq.roda.core.common.NoSuchSIPException;
 import pt.gov.dgarq.roda.core.data.DescriptionObject;
 import pt.gov.dgarq.roda.core.data.RODAObjectPermissions;
 import pt.gov.dgarq.roda.core.data.SIPState;
+import pt.gov.dgarq.roda.core.data.eadc.Acqinfo;
+import pt.gov.dgarq.roda.core.data.eadc.P;
 import pt.gov.dgarq.roda.core.fedora.FedoraClientUtility;
 import pt.gov.dgarq.roda.core.fedora.risearch.FedoraRISearchException;
 import pt.gov.dgarq.roda.core.services.Browser;
@@ -126,19 +128,11 @@ public class AcceptSIPTask extends IngestTask {
 				Date acceptDate = new Date();
 				String acqinfoDate = DateParser.getIsoDate(acceptDate).split(
 						"T")[0]; //$NON-NLS-1$
-				ingestedDO.setAcqinfoDate(acqinfoDate);
-
-				if (StringUtils.isBlank(ingestedDO.getNote())) {
-					// If previous note is blank
-					ingestedDO
-							.setNote("Pacote de submissão validado semanticamente por "
-									+ username);
-				} else {
-					// If previous note already contains something
-					ingestedDO
-							.setNote("Pacote de submissão validado semanticamente por "
-									+ username + "\n" + ingestedDO.getNote());
-				}
+				P p = new P();
+				p.setDate(acqinfoDate);
+				ingestedDO.addAcqinfo(new Acqinfo(p, DescriptionObject.ATTRIBUTE_ALTRENDER.ACCEPTANCE_DATE.name()));
+				
+				ingestedDO.addNote("Pacote de submissão validado semanticamente por " + username);
 
 				Editor editorService = new Editor();
 				Browser browserService = new Browser();

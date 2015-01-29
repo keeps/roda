@@ -1,6 +1,5 @@
-<?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<name>RODA - Repositório de Objetos Digitais Autênticos</name>
 	<url>http://roda.keep.pt/</url>
@@ -55,6 +54,10 @@
 			<name>Apache SVN</name>
 			<url>http://svn.apache.org/repos/asf/servicemix/m2-repo</url>
 		</repository>
+		<repository>
+			<id>ja-sig</id>
+			<url>http://oss.sonatype.org/content/repositories/releases/</url>
+		</repository>
 	</repositories>
 	<ciManagement>
 		<system>Jenkins</system>
@@ -101,9 +104,9 @@
 		<maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
 		<java_version>1.6</java_version>
 		<gwt_version>2.4.0</gwt_version>
-		<jhove_version>1.11</jhove_version>
 		<!-- THE PROPERTY THAT FOLLOWS IS NOT YET IN USE -->
 		<fedora_version>3.6.2</fedora_version>
+		<cas.version>3.5.2</cas.version>
 		<roda_community_url>http://roda-community.org</roda_community_url>
 	</properties>
 	<profiles>
@@ -119,6 +122,7 @@
 				<module>roda-handle</module>
 				<module>roda-migrator</module>
 				<module>roda-ui</module>
+				<module>roda-cas</module>
 			</modules>
 		</profile>
 		<profile>
@@ -129,6 +133,7 @@
 				<module>roda-client</module>
 				<module>roda-handle</module>
 				<module>roda-migrator</module>
+				<module>roda-cas</module>
 			</modules>
 		</profile>
 		<profile>
@@ -141,6 +146,7 @@
 				<module>roda-migrator</module>
 				<module>roda-ui/roda-in</module>
 				<module>roda-ui/roda-in-installer</module>
+				<module>roda-cas</module>
 			</modules>
 		</profile>
 		<profile>
@@ -161,6 +167,7 @@
 				<module>roda-client</module>
 				<module>roda-core</module>
 				<module>roda-migrator/roda-migrator-client</module>
+				<module>roda-cas</module>
 			</modules>
 		</profile>
 		<profile>
@@ -190,11 +197,34 @@
 				<module>roda-handle</module>
 				<module>roda-migrator</module>
 				<module>roda-ui</module>
+				<module>roda-cas</module>
 				<module>roda-installer</module>
 			</modules>
 		</profile>
 	</profiles>
 	<build>
+		<!--<plugins>
+			<plugin>
+				<groupId>com.googlecode.maven-java-formatter-plugin</groupId>
+				<artifactId>maven-java-formatter-plugin</artifactId>
+				<version>0.4</version>
+				<configuration>
+					<configFile>${session.executionRootDirectory}/code-style/eclipse_formatter.xml</configFile>
+					<excludes>
+						<exclude>pt/gov/dgarq/roda/core/stubs/</exclude>
+						<exclude>pt/gov/dgarq/roda/migrator/stubs/</exclude>
+					</excludes>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>format</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>-->
 		<pluginManagement>
 			<plugins>
 				<plugin>
@@ -272,6 +302,11 @@
 					<version>2.2.1</version>
 				</plugin>
 				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>xmlbeans-maven-plugin</artifactId>
+					<version>2.3.3</version>
+				</plugin>
+				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>
 					<version>1.0.0</version>
@@ -288,7 +323,7 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore />
+										<ignore/>
 									</action>
 								</pluginExecution>
 							</pluginExecutions>
@@ -325,11 +360,6 @@
 				<artifactId>axis-wsdl4j</artifactId>
 				<version>1.5.1</version>
 			</dependency>
-			<!--<dependency> <groupId>org.apache.axis</groupId> <artifactId>axis</artifactId> 
-				<version>1.4</version> </dependency> <dependency> <groupId>org.apache.axis</groupId> 
-				<artifactId>axis-ant</artifactId> <version>1.4</version> </dependency> <dependency> 
-				<groupId>org.apache.axis</groupId> <artifactId>axis-jaxrpc</artifactId> <version>1.4</version> 
-				</dependency> -->
 			<dependency>
 				<groupId>com.adobe.acrobat</groupId>
 				<artifactId>acrobat</artifactId>
@@ -372,9 +402,14 @@
 				<version>1.0.0</version>
 			</dependency>
 			<dependency>
+				<groupId>commons-cli</groupId>
+				<artifactId>commons-cli</artifactId>
+				<version>1.2</version>
+			</dependency>
+			<dependency>
 				<groupId>commons-codec</groupId>
 				<artifactId>commons-codec</artifactId>
-				<version>1.3</version>
+				<version>1.6</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-collections</groupId>
@@ -399,7 +434,7 @@
 			<dependency>
 				<groupId>commons-fileupload</groupId>
 				<artifactId>commons-fileupload</artifactId>
-				<version>1.2</version>
+				<version>1.3.1</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-httpclient</groupId>
@@ -476,21 +511,6 @@
 				<groupId>com.toedter</groupId>
 				<artifactId>jcalendar</artifactId>
 				<version>1.3.2</version>
-			</dependency>
-			<dependency>
-				<groupId>edu.harvard.hul.ois.jhove</groupId>
-				<artifactId>jhove</artifactId>
-				<version>${jhove_version}</version>
-			</dependency>
-			<dependency>
-				<groupId>edu.harvard.hul.ois.jhove</groupId>
-				<artifactId>jhove-handler</artifactId>
-				<version>${jhove_version}</version>
-			</dependency>
-			<dependency>
-				<groupId>edu.harvard.hul.ois.jhove</groupId>
-				<artifactId>jhove-module</artifactId>
-				<version>${jhove_version}</version>
 			</dependency>
 			<dependency>
 				<groupId>javax.activation</groupId>
@@ -584,12 +604,12 @@
 			<dependency>
 				<groupId>org.apache.xmlbeans</groupId>
 				<artifactId>xmlbeans</artifactId>
-				<version>2.4.0</version>
+				<version>2.6.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.xmlbeans</groupId>
 				<artifactId>xmlbeans-xpath</artifactId>
-				<version>2.4.0</version>
+				<version>2.6.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.xmlgraphics</groupId>
@@ -684,7 +704,7 @@
 			</dependency>
 			<dependency>
 				<groupId>pt.gov.dgarq.roda</groupId>
-				<artifactId>ead-c.2008</artifactId>
+				<artifactId>ead-c.2014</artifactId>
 				<version>1.0.0</version>
 			</dependency>
 			<dependency>
@@ -745,9 +765,14 @@
 				<artifactId>gsearch-2.2.1-result-page</artifactId>
 				<version>1.0.0</version>
 			</dependency>
-			<dependency>
+			<!--<dependency>
 				<groupId>pt.gov.dgarq.roda</groupId>
 				<artifactId>mets-1.7</artifactId>
+				<version>1.0.0</version>
+			</dependency>-->
+			<dependency>
+				<groupId>pt.gov.dgarq.roda</groupId>
+				<artifactId>mets-1.9.1</artifactId>
 				<version>1.0.0</version>
 			</dependency>
 			<dependency>
@@ -901,6 +926,107 @@
 				<groupId>mrj</groupId>
 				<artifactId>MRJToolkitStubs</artifactId>
 				<version>1.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jasig.cas.client</groupId>
+				<artifactId>cas-client-core</artifactId>
+				<version>3.2.1</version>
+				<exclusions>
+					<exclusion>
+						<groupId>javax.servlet</groupId>
+						<artifactId>servlet-api</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.opensaml</groupId>
+				<artifactId>opensaml1</artifactId>
+				<version>1.1</version>
+			</dependency>
+			<dependency>
+				<groupId>xml-security</groupId>
+				<artifactId>xmlsec</artifactId>
+				<version>1.3.0</version>
+			</dependency>
+			<dependency>
+				<groupId>edu.harvard.hul.ois</groupId>
+				<artifactId>fits</artifactId>
+				<version>0.8.1</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jdom</groupId>
+				<artifactId>jdom</artifactId>
+				<version>1.1</version>
+			</dependency>
+			<dependency>
+				<groupId>edu.harvard.hul.ois</groupId>
+				<artifactId>ots-schemas</artifactId>
+				<version>0.11</version>
+			</dependency>
+			<dependency>
+				<groupId>jaxen</groupId>
+				<artifactId>jaxen</artifactId>
+				<version>1.1.4</version>
+			</dependency>
+			<dependency>
+				<groupId>myfaces</groupId>
+				<artifactId>myfaces-api</artifactId>
+				<version>1.1.1</version>
+			</dependency>
+			<dependency>
+				<groupId>myfaces</groupId>
+				<artifactId>myfaces-impl</artifactId>
+				<version>1.1.1</version>
+			</dependency>
+			<dependency>
+				<groupId>xerces</groupId>
+				<artifactId>xercesImpl</artifactId>
+				<version>2.11.0</version>
+			</dependency>
+			<dependency>
+				<groupId>xml-apis</groupId>
+				<artifactId>xml-apis</artifactId>
+				<version>1.4.01</version>
+			</dependency>
+			<!-- CAS related dependencies -->
+			<dependency>
+				<groupId>org.jasig.cas</groupId>
+				<artifactId>cas-server-webapp</artifactId>
+				<version>${cas.version}</version>
+				<type>war</type>
+				<scope>runtime</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.jasig.cas</groupId>
+				<artifactId>cas-server-support-ldap</artifactId>
+				<version>${cas.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jasig.cas</groupId>
+				<artifactId>cas-server-support-generic</artifactId>
+				<version>${cas.version}</version>
+				<type>jar</type>
+				<scope>runtime</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.jasig.cas</groupId>
+				<artifactId>cas-server-integration-restlet</artifactId>
+				<version>${cas.version}</version>
+				<type>jar</type>
+				<exclusions>
+					<exclusion>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring-web</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>javax.servlet</groupId>
+						<artifactId>servlet-api</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring-beans</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

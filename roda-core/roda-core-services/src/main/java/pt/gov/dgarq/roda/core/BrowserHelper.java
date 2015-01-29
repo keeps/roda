@@ -1,8 +1,10 @@
 package pt.gov.dgarq.roda.core;
 
 import fedora.client.Downloader;
+import fedora.server.management.FedoraAPIM;
 import fedora.server.types.gen.Datastream;
 import fedora.server.types.gen.DatastreamDef;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -16,9 +18,11 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+
 import pt.gov.dgarq.roda.common.FormatUtility;
 import static pt.gov.dgarq.roda.common.FormatUtility.getMimetype;
 import static pt.gov.dgarq.roda.common.FormatUtility.saveStreamAsTempFile;
@@ -53,6 +57,7 @@ import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevel;
 import pt.gov.dgarq.roda.core.data.preservation.RepresentationFilePreservationObject;
 import pt.gov.dgarq.roda.core.fedora.FedoraClientException;
 import pt.gov.dgarq.roda.core.fedora.FedoraClientUtility;
+import pt.gov.dgarq.roda.core.fedora.FedoraClientUtility.DatastreamState;
 import pt.gov.dgarq.roda.core.fedora.risearch.FedoraRISearch;
 import pt.gov.dgarq.roda.core.fedora.risearch.FedoraRISearchException;
 import pt.gov.dgarq.roda.core.metadata.eadc.EadCHelper;
@@ -65,6 +70,7 @@ import pt.gov.dgarq.roda.core.metadata.premis.PremisRepresentationObjectHelper;
 import pt.gov.dgarq.roda.core.metadata.xacml.PolicyHelper;
 import pt.gov.dgarq.roda.core.metadata.xacml.PolicyMetadataException;
 import pt.gov.dgarq.roda.core.services.UserBrowser;
+import pt.gov.dgarq.roda.servlet.cas.CASUserPrincipal;
 
 /**
  * @author Rui Castro
@@ -82,7 +88,7 @@ public class BrowserHelper {
     // private Configuration configuration = null;
     private FedoraClientUtility fedoraClientUtility = null;
     private FedoraRISearch fedoraRISearch = null;
-    private User user = null;
+    private CASUserPrincipal user = null;
 
     /**
      * Constructs a new {@link BrowserHelper}.
@@ -97,7 +103,7 @@ public class BrowserHelper {
         this.fedoraClientUtility = fedoraClientUtility;
         this.fedoraRISearch = fedoraClientUtility.getFedoraRISearch();
 
-        this.user = this.fedoraClientUtility.getUser();
+        this.user = this.fedoraClientUtility.getCASUserPrincipal();
 
         this.descriptionObjectDatastreamID = configuration
                 .getString("descriptionObjectDatastreamID");
@@ -801,31 +807,31 @@ public class BrowserHelper {
             getRODAObject(roPID);
 
             // Look for the requested datastream
-            DatastreamDef[] datastreamDefs = this.fedoraClientUtility.getAPIA()
-                    .listDatastreams(roPID, null);
+              Datastream[] datastreams = this.fedoraClientUtility.getAPIM().getDatastreams(roPID, null,
+                fedoraClientUtility.getStateCode(DatastreamState.Active));
+           
+            Datastream datastream = null;
+            if (datastreams != null) {
 
-            DatastreamDef datastreamDef = null;
-            if (datastreamDefs != null) {
+                for (Datastream ds : datastreams) {
 
-                for (DatastreamDef dsDef : datastreamDefs) {
+                    if (ds.getID().equals(fileID)) {
 
-                    if (dsDef.getID().equals(fileID)) {
-
-                        datastreamDef = dsDef;
+                        datastream = ds;
                         break;
                     }
                 }
-
+                
             }
 
-            if (datastreamDef == null) {
+            if (datastream == null) {
                 throw new NoSuchRepresentationFileException(
                         "RepresentationFile " + fileID
                         + " from representation " + roPID
                         + " was not found.");
             } else {
-                return getRepresentationFileFromDatastreamDef(roPID,
-                        datastreamDef);
+                return getRepresentationFileFromDatastream(roPID,
+                		datastream);
             }
 
         } catch (RemoteException e) {
@@ -1130,7 +1136,14 @@ public class BrowserHelper {
                 filter, null, null));
 
         for (SimpleEventPreservationObject simpleEPO : eventsPerformedOn) {
+          
+          // XXX this "if clause" was added because the ITQL query doesn't ensure that
+          // only events associated to the provided targetPID are added to the result set
+          // A re-implementation of how ITQL filters already existing parameters needs to be done
+          // to solve this issue permanently.
+          if(simpleEPO.getTargetPID().equals(PID)){
             events.add(getEventPreservationObject(simpleEPO));
+          }
         }
 
         return events;
@@ -1555,13 +1568,13 @@ public class BrowserHelper {
 
             List<RepresentationFile> repFiles = new ArrayList<RepresentationFile>();
 
-            DatastreamDef[] datastreamDefs = this.fedoraClientUtility.getAPIA()
-                    .listDatastreams(simpleRO.getPid(), null);
+            Datastream[] datastreams = this.fedoraClientUtility.getAPIM()
+                    .getDatastreams(simpleRO.getPid(), null, fedoraClientUtility.getStateCode(DatastreamState.Active));
 
-            for (DatastreamDef datastream : datastreamDefs) {
+            for (Datastream datastream : datastreams) {
 
                 if (!isDefaultDatastream(datastream.getID())) {
-                    RepresentationFile rFile = getRepresentationFileFromDatastreamDef(
+                    RepresentationFile rFile = getRepresentationFileFromDatastream(
                             simpleRO.getPid(), datastream);
                     repFiles.add(rFile);
 
@@ -1607,7 +1620,7 @@ public class BrowserHelper {
         File tempFile = null;
         try {
             String fileUrl = this.fedoraClientUtility.getDatastreamURL(roPID, datastreamDef.getID());
-            tempFile = File.createTempFile(String.valueOf(UUID.randomUUID()), ".droid_tmp");
+            tempFile = File.createTempFile(String.valueOf(UUID.randomUUID()), ".fits_tmp");
             FileOutputStream outputStream = new FileOutputStream(tempFile);
             this.fedoraClientUtility.getDownloader().get(fileUrl, outputStream);
             outputStream.flush();
@@ -1640,10 +1653,11 @@ public class BrowserHelper {
 
         FileFormat fileFormat = new FileFormat();
         fileFormat.setMimetype(datastream.getMIMEType());
+        fileFormat.setPuid(datastream.getFormatURI());
         return new RepresentationFile(datastream.getID(), datastream.getLabel(), datastream.getSize(), accessURL, fileFormat);
     }
 
-    private RepresentationPreservationObject getRepresentationPreservationObject(
+    protected RepresentationPreservationObject getRepresentationPreservationObject(
             SimpleRepresentationPreservationObject simleRPO)
             throws BrowserException {
 

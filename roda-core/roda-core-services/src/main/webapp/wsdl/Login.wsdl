@@ -7,27 +7,16 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
    <import namespace="http://data.core.roda.dgarq.gov.pt"/>
    <import namespace="http://common.core.roda.dgarq.gov.pt"/>
    <import namespace="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
-   <element name="getAuthenticatedUser">
+   <element name="getGuestCredentials">
+    <complexType/>
+   </element>
+   <element name="getGuestCredentialsResponse">
     <complexType>
      <sequence>
-      <element name="username" type="xsd:string"/>
-      <element name="password" type="xsd:string"/>
+      <element maxOccurs="unbounded" name="getGuestCredentialsReturn" type="xsd:string"/>
      </sequence>
     </complexType>
    </element>
-   <element name="getAuthenticatedUserResponse">
-    <complexType>
-     <sequence>
-      <element name="getAuthenticatedUserReturn" type="tns1:User"/>
-     </sequence>
-    </complexType>
-   </element>
-   <complexType name="ArrayOf_xsd_string">
-    <sequence>
-     <element maxOccurs="unbounded" minOccurs="0" name="item" type="xsd:string"/>
-    </sequence>
-   </complexType>
-   <element name="fault" type="tns2:LoginException"/>
    <element name="getGuestUser">
     <complexType/>
    </element>
@@ -38,13 +27,23 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
      </sequence>
     </complexType>
    </element>
-   <element name="getGuestCredentials">
-    <complexType/>
-   </element>
-   <element name="getGuestCredentialsResponse">
+   <complexType name="ArrayOf_xsd_string">
+    <sequence>
+     <element maxOccurs="unbounded" minOccurs="0" name="item" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <element name="fault" type="tns2:LoginException"/>
+   <element name="getAuthenticatedUserCAS">
     <complexType>
      <sequence>
-      <element maxOccurs="unbounded" name="getGuestCredentialsReturn" type="xsd:string"/>
+      <element name="proxyTicket" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="getAuthenticatedUserCASResponse">
+    <complexType>
+     <sequence>
+      <element name="getAuthenticatedUserCASReturn" type="tns1:User"/>
      </sequence>
     </complexType>
    </element>
@@ -180,12 +179,28 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
      </extension>
     </complexContent>
    </complexType>
+   <complexType name="ClassificationSchemeFilterParameter">
+    <complexContent>
+     <extension base="tns3:FilterParameter">
+      <sequence>
+       <element name="classificationSchemeId" nillable="true" type="xsd:string"/>
+       <element name="possibleClassesPids" nillable="true" type="impl:ArrayOf_xsd_string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
   </schema>
  </wsdl:types>
 
-   <wsdl:message name="getAuthenticatedUserRequest">
+   <wsdl:message name="getAuthenticatedUserCASRequest">
 
-      <wsdl:part element="impl:getAuthenticatedUser" name="parameters"/>
+      <wsdl:part element="impl:getAuthenticatedUserCAS" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getAuthenticatedUserCASResponse">
+
+      <wsdl:part element="impl:getAuthenticatedUserCASResponse" name="parameters"/>
 
    </wsdl:message>
 
@@ -219,21 +234,13 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
    </wsdl:message>
 
-   <wsdl:message name="getAuthenticatedUserResponse">
-
-      <wsdl:part element="impl:getAuthenticatedUserResponse" name="parameters"/>
-
-   </wsdl:message>
-
    <wsdl:portType name="Login">
 
-      <wsdl:operation name="getAuthenticatedUser">
+      <wsdl:operation name="getGuestCredentials">
 
-         <wsdl:input message="impl:getAuthenticatedUserRequest" name="getAuthenticatedUserRequest"/>
+         <wsdl:input message="impl:getGuestCredentialsRequest" name="getGuestCredentialsRequest"/>
 
-         <wsdl:output message="impl:getAuthenticatedUserResponse" name="getAuthenticatedUserResponse"/>
-
-         <wsdl:fault message="impl:LoginException" name="LoginException"/>
+         <wsdl:output message="impl:getGuestCredentialsResponse" name="getGuestCredentialsResponse"/>
 
       </wsdl:operation>
 
@@ -247,11 +254,13 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
       </wsdl:operation>
 
-      <wsdl:operation name="getGuestCredentials">
+      <wsdl:operation name="getAuthenticatedUserCAS">
 
-         <wsdl:input message="impl:getGuestCredentialsRequest" name="getGuestCredentialsRequest"/>
+         <wsdl:input message="impl:getAuthenticatedUserCASRequest" name="getAuthenticatedUserCASRequest"/>
 
-         <wsdl:output message="impl:getGuestCredentialsResponse" name="getGuestCredentialsResponse"/>
+         <wsdl:output message="impl:getAuthenticatedUserCASResponse" name="getAuthenticatedUserCASResponse"/>
+
+         <wsdl:fault message="impl:LoginException" name="LoginException"/>
 
       </wsdl:operation>
 
@@ -261,27 +270,21 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
       <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
 
-      <wsdl:operation name="getAuthenticatedUser">
+      <wsdl:operation name="getGuestCredentials">
 
          <wsdlsoap:operation soapAction=""/>
 
-         <wsdl:input name="getAuthenticatedUserRequest">
+         <wsdl:input name="getGuestCredentialsRequest">
 
             <wsdlsoap:body use="literal"/>
 
          </wsdl:input>
 
-         <wsdl:output name="getAuthenticatedUserResponse">
+         <wsdl:output name="getGuestCredentialsResponse">
 
             <wsdlsoap:body use="literal"/>
 
          </wsdl:output>
-
-         <wsdl:fault name="LoginException">
-
-            <wsdlsoap:fault name="LoginException" use="literal"/>
-
-         </wsdl:fault>
 
       </wsdl:operation>
 
@@ -309,21 +312,27 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
       </wsdl:operation>
 
-      <wsdl:operation name="getGuestCredentials">
+      <wsdl:operation name="getAuthenticatedUserCAS">
 
          <wsdlsoap:operation soapAction=""/>
 
-         <wsdl:input name="getGuestCredentialsRequest">
+         <wsdl:input name="getAuthenticatedUserCASRequest">
 
             <wsdlsoap:body use="literal"/>
 
          </wsdl:input>
 
-         <wsdl:output name="getGuestCredentialsResponse">
+         <wsdl:output name="getAuthenticatedUserCASResponse">
 
             <wsdlsoap:body use="literal"/>
 
          </wsdl:output>
+
+         <wsdl:fault name="LoginException">
+
+            <wsdlsoap:fault name="LoginException" use="literal"/>
+
+         </wsdl:fault>
 
       </wsdl:operation>
 

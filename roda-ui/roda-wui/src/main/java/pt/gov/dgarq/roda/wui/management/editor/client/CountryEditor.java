@@ -14,6 +14,7 @@ import com.google.gwt.user.client.ui.Widget;
  * @author Luis Faria
  * 
  */
+@SuppressWarnings("deprecation")
 public class CountryEditor implements MetadataElementEditor {
 
 	private final ControlledVocabularyEditor editor;
@@ -49,5 +50,9 @@ public class CountryEditor implements MetadataElementEditor {
 
 	public void removeChangeListener(ChangeListener listener) {
 		editor.removeChangeListener(listener);
+	}
+	
+	public boolean isValid() {
+		return true;
 	}
 }

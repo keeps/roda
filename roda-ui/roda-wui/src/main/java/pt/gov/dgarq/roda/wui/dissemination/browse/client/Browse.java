@@ -12,6 +12,7 @@ import pt.gov.dgarq.roda.wui.common.client.LoginStatusListener;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
 import pt.gov.dgarq.roda.wui.common.client.tools.PIDTranslator;
 import pt.gov.dgarq.roda.wui.common.client.widgets.LoadingPopup;
+import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.ViewPanel.ViewListener;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.images.BrowseImageBundle;
 import pt.gov.dgarq.roda.wui.dissemination.client.Dissemination;
@@ -79,7 +80,7 @@ public class Browse extends DockPanel implements HistoryResolver {
 
 	private Label total;
 
-	private Image createFonds;
+	private WUIButton createFonds;
 
 	private Image refresh;
 
@@ -116,7 +117,8 @@ public class Browse extends DockPanel implements HistoryResolver {
 					});
 
 			total = new Label();
-			createFonds = browseImageBundle.browseCreateFonds().createImage();
+			createFonds = new WUIButton(constants.addFond(),
+					WUIButton.Left.ROUND, WUIButton.Right.PLUS);
 			refresh = browseImageBundle.refresh().createImage();
 			createFonds.addClickListener(new ClickListener() {
 

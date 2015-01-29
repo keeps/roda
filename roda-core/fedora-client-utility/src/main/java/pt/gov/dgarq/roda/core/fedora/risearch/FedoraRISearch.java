@@ -36,6 +36,7 @@ import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
 import pt.gov.dgarq.roda.core.fedora.FedoraClientUtility;
+import pt.gov.dgarq.roda.servlet.cas.CASUserPrincipal;
 
 /**
  * Wrapper functions to connect to Fedora Resource Index Query Service.
@@ -156,8 +157,8 @@ public class FedoraRISearch {
 	 * 
 	 * @throws FedoraRISearchException
 	 */
-	public FedoraRISearch(FedoraClientUtility fedoraClientUtility, User user,
-			String password) throws FedoraRISearchException {
+	public FedoraRISearch(FedoraClientUtility fedoraClientUtility,
+			CASUserPrincipal user) throws FedoraRISearchException {
 
 		this.fedoraClientUtility = fedoraClientUtility;
 
@@ -389,9 +390,7 @@ public class FedoraRISearch {
 
 			tuples.close();
 
-			logger
-					.trace("getSimpleDescriptionObject(" + sdoPID + ") => "
-							+ sdo);
+			logger.trace("getSimpleDescriptionObject(" + sdoPID + ") => " + sdo);
 
 			return sdo;
 
@@ -574,8 +573,9 @@ public class FedoraRISearch {
 			while (tuples.hasNext()) {
 				Map<String, Node> attributes = tuples.next();
 				childOfMap.put(getPIDFromFedoraURI(attributes.get("child")
-						.stringValue()), getPIDFromFedoraURI(attributes.get(
-						"parent").stringValue()));
+						.stringValue()),
+						getPIDFromFedoraURI(attributes.get("parent")
+								.stringValue()));
 			}
 
 			tuples.close();
@@ -679,9 +679,7 @@ public class FedoraRISearch {
 				getRIFedoraObjectURIFromPID(doPID),
 				ITQL_PREDICATE_RODA_DESCRIPTION_ID);
 
-		logger
-				.trace("getDOChildrenIDs(" + doPID + ") ITQL query: "
-						+ itqlQuery);
+		logger.trace("getDOChildrenIDs(" + doPID + ") ITQL query: " + itqlQuery);
 
 		List<String> childrenIDs = new ArrayList<String>();
 		try {
@@ -730,9 +728,7 @@ public class FedoraRISearch {
 				ITQL_PREDICATE_RODA_CHILD_OF,
 				ITQL_PREDICATE_RODA_DESCRIPTION_LEVEL);
 
-		logger
-				.trace("getDOParentLevel(" + doPID + ") ITQL query: "
-						+ itqlQuery);
+		logger.trace("getDOParentLevel(" + doPID + ") ITQL query: " + itqlQuery);
 
 		String parentLevel;
 		try {
@@ -752,9 +748,8 @@ public class FedoraRISearch {
 			}
 
 			if (tuples.hasNext()) {
-				logger
-						.warn("ITQL Query returned more than one parent level for PID "
-								+ doPID + "!!!");
+				logger.warn("ITQL Query returned more than one parent level for PID "
+						+ doPID + "!!!");
 			}
 
 			tuples.close();
@@ -893,27 +888,31 @@ public class FedoraRISearch {
 		doPIDs.add(doPID);
 
 		if (childDOs) {
-			doPIDs.addAll(getDescendantDescriptionObjectPIDs(doPID));
+			List<String> descendantDescriptionObjectPIDs = getDescendantDescriptionObjectPIDs(doPID);
+			descendantPIDs.addAll(descendantDescriptionObjectPIDs);
+			doPIDs.addAll(descendantDescriptionObjectPIDs);
 		}
 
-		// (DO "represented-by" RO)
-		List<String> roPIDs = getPIDsFromURIs(getTripleObjects(
-				getRIFedoraObjectURIFromPID(doPID),
-				ITQL_PREDICATE_RODA_REPRESENTED_BY));
-		descendantPIDs.addAll(roPIDs);
+		for (String doPIDtoProcess : doPIDs) {
+			// (DO "represented-by" RO)
+			List<String> roPIDs = getPIDsFromURIs(getTripleObjects(
+					getRIFedoraObjectURIFromPID(doPIDtoProcess),
+					ITQL_PREDICATE_RODA_REPRESENTED_BY));
+			descendantPIDs.addAll(roPIDs);
 
-		for (String roPID : roPIDs) {
-			List<String> rpoPIDs = getRORepresentationPreservationObjectPIDs(roPID);
-			descendantPIDs.addAll(rpoPIDs);
+			for (String roPID : roPIDs) {
+				List<String> rpoPIDs = getRORepresentationPreservationObjectPIDs(roPID);
+				descendantPIDs.addAll(rpoPIDs);
 
-			for (String rpoPID : rpoPIDs) {
-				// (EPO "performed-on" RPO)
-				List<String> epoPIDs = getPIDsFromURIs(getTripleSubjects(
-						ITQL_PREDICATE_RODA_PERFORMED_ON,
-						getRIFedoraObjectURIFromPID(rpoPID)));
-				descendantPIDs.addAll(epoPIDs);
+				for (String rpoPID : rpoPIDs) {
+					// (EPO "performed-on" RPO)
+					List<String> epoPIDs = getPIDsFromURIs(getTripleSubjects(
+							ITQL_PREDICATE_RODA_PERFORMED_ON,
+							getRIFedoraObjectURIFromPID(rpoPID)));
+					descendantPIDs.addAll(epoPIDs);
+				}
+
 			}
-
 		}
 
 		return new ArrayList<String>(descendantPIDs);
@@ -1622,8 +1621,8 @@ public class FedoraRISearch {
 				SimpleRepresentationObject sameSRO = srObjects.get(srObjects
 						.indexOf(sro));
 
-				List<String> joinStatuses = new ArrayList<String>(Arrays
-						.asList(sameSRO.getStatuses()));
+				List<String> joinStatuses = new ArrayList<String>(
+						Arrays.asList(sameSRO.getStatuses()));
 				joinStatuses.addAll(Arrays.asList(sro.getStatuses()));
 
 				sameSRO.setStatuses(joinStatuses
@@ -1809,8 +1808,7 @@ public class FedoraRISearch {
 			throws FedoraRISearchException {
 
 		String itqlQuery = String
-				.format(
-						"select $predicate $object from <#ri> where %1$s $predicate $object",
+				.format("select $predicate $object from <#ri> where %1$s $predicate $object",
 						subject);
 
 		logger.trace("getPredicateAndObjects( " + itqlQuery + " )");
@@ -2087,8 +2085,9 @@ public class FedoraRISearch {
 				Map<String, Node> attributes = tuples.next();
 
 				relationships.put(getPIDFromFedoraURI(attributes.get("roPID")
-						.stringValue()), getPIDFromFedoraURI(attributes.get(
-						"rpoPID").stringValue()));
+						.stringValue()),
+						getPIDFromFedoraURI(attributes.get("rpoPID")
+								.stringValue()));
 			}
 
 			tuples.close();

@@ -3,6 +3,16 @@
 	xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
 	<display-name>RODA Web User Interface</display-name>
+	<filter>
+		<display-name>TicketInterceptorFilter</display-name>
+		<filter-name>TicketInterceptorFilter</filter-name>
+		<filter-class>pt.gov.dgarq.roda.wui.filter.TicketInterceptorFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>TicketInterceptorFilter</filter-name>
+		<url-pattern>/Main.html</url-pattern>
+	</filter-mapping>
+	
 	<servlet>
 		<servlet-name>ClientLogger</servlet-name>
 		<servlet-class>pt.gov.dgarq.roda.wui.common.server.ClientLoggerImpl</servlet-class>
@@ -19,75 +29,68 @@
 	<servlet>
 		<servlet-name>ImageCaptchaService</servlet-name>
 		<servlet-class>
-			pt.gov.dgarq.roda.wui.common.captcha.server.ImageCaptchaServlet
-		</servlet-class>
+			pt.gov.dgarq.roda.wui.common.captcha.server.ImageCaptchaServlet</servlet-class>
 		<load-on-startup>0</load-on-startup>
 	</servlet>
 	<servlet>
 		<servlet-name>CaptchaService</servlet-name>
 		<servlet-class>
-			pt.gov.dgarq.roda.wui.common.captcha.server.CaptchaServiceImpl
-		</servlet-class>
+			pt.gov.dgarq.roda.wui.common.captcha.server.CaptchaServiceImpl</servlet-class>
 	</servlet>
 	<servlet>
 		<servlet-name>GAnalyticsService</servlet-name>
 		<servlet-class>
-			pt.gov.dgarq.roda.wui.main.server.GAnalyticsServiceImpl
-		</servlet-class>
+			pt.gov.dgarq.roda.wui.main.server.GAnalyticsServiceImpl</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>DescriptionLevelService</servlet-name>
+		<servlet-class>
+			pt.gov.dgarq.roda.wui.main.server.DescriptionLevelServiceImpl</servlet-class>
 	</servlet>
 	<servlet>
 		<servlet-name>UserManagementService</servlet-name>
 		<servlet-class>
-			pt.gov.dgarq.roda.wui.management.user.server.UserManagementServiceImpl
-		</servlet-class>
+			pt.gov.dgarq.roda.wui.management.user.server.UserManagementServiceImpl</servlet-class>
 	</servlet>
 	<servlet>
 		<servlet-name>UserLoginService</servlet-name>
 		<servlet-class>
-			pt.gov.dgarq.roda.wui.common.server.UserLoginServiceImpl
-		</servlet-class>
+			pt.gov.dgarq.roda.wui.common.server.UserLoginServiceImpl</servlet-class>
 	</servlet>
 	<servlet>
 		<servlet-name>BrowserService</servlet-name>
 		<servlet-class>
-			pt.gov.dgarq.roda.wui.dissemination.browse.server.BrowserServiceImpl
-		</servlet-class>
+			pt.gov.dgarq.roda.wui.dissemination.browse.server.BrowserServiceImpl</servlet-class>
 	</servlet>
 	<servlet>
 		<servlet-name>SearchService</servlet-name>
 		<servlet-class>
-			pt.gov.dgarq.roda.wui.dissemination.search.server.SearchServiceImpl
-		</servlet-class>
+			pt.gov.dgarq.roda.wui.dissemination.search.server.SearchServiceImpl</servlet-class>
 	</servlet>
 	<servlet>
 		<servlet-name>EditorService</servlet-name>
 		<servlet-class>
-			pt.gov.dgarq.roda.wui.management.editor.server.EditorServiceImpl
-		</servlet-class>
+			pt.gov.dgarq.roda.wui.management.editor.server.EditorServiceImpl</servlet-class>
 	</servlet>
 	<servlet>
 		<servlet-name>IngestListService</servlet-name>
 		<servlet-class>
-			pt.gov.dgarq.roda.wui.ingest.list.server.IngestListServiceImpl
-		</servlet-class>
+			pt.gov.dgarq.roda.wui.ingest.list.server.IngestListServiceImpl</servlet-class>
 	</servlet>
 	<servlet>
 		<servlet-name>FileUpload</servlet-name>
 		<servlet-class>
-			pt.gov.dgarq.roda.wui.common.fileupload.server.FileUpload
-		</servlet-class>
+			pt.gov.dgarq.roda.wui.common.fileupload.server.FileUpload</servlet-class>
 	</servlet>
 	<servlet>
 		<servlet-name>IngestSubmitService</servlet-name>
 		<servlet-class>
-			pt.gov.dgarq.roda.wui.ingest.submit.server.IngestSubmitServiceImpl
-		</servlet-class>
+			pt.gov.dgarq.roda.wui.ingest.submit.server.IngestSubmitServiceImpl</servlet-class>
 	</servlet>
 	<servlet>
 		<servlet-name>EventManagementService</servlet-name>
 		<servlet-class>
-			pt.gov.dgarq.roda.wui.management.event.server.EventManagementServiceImpl
-		</servlet-class>
+			pt.gov.dgarq.roda.wui.management.event.server.EventManagementServiceImpl</servlet-class>
 	</servlet>
 	<servlet>
 		<servlet-name>ReportService</servlet-name>
@@ -103,8 +106,7 @@
 	<servlet>
 		<servlet-name>StatisticsService</servlet-name>
 		<servlet-class>
-			pt.gov.dgarq.roda.wui.management.statistics.server.StatisticsServiceImpl
-		</servlet-class>
+			pt.gov.dgarq.roda.wui.management.statistics.server.StatisticsServiceImpl</servlet-class>
 	</servlet>
 	<servlet>
 		<description>
@@ -125,95 +127,102 @@
 		<servlet-name>DIPDownload</servlet-name>
 		<servlet-class>pt.gov.dgarq.roda.wui.common.server.DIPDownload</servlet-class>
 	</servlet>
-	
+
 	<servlet-mapping>
 		<servlet-name>ClientLogger</servlet-name>
-		<url-pattern>/wuilogger</url-pattern>
+		<url-pattern>/pt.gov.dgarq.roda.wui.main.Main/wuilogger</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>ImageCaptchaService</servlet-name>
-		<url-pattern>/jcaptcha</url-pattern>
+		<url-pattern>/pt.gov.dgarq.roda.wui.main.Main/jcaptcha</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>CaptchaService</servlet-name>
-		<url-pattern>/captchaservice</url-pattern>
+		<url-pattern>/pt.gov.dgarq.roda.wui.main.Main/captchaservice</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>GAnalyticsService</servlet-name>
-		<url-pattern>/gaservice</url-pattern>
+		<url-pattern>/pt.gov.dgarq.roda.wui.main.Main/gaservice</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>DescriptionLevelService</servlet-name>
+		<url-pattern>/pt.gov.dgarq.roda.wui.main.Main/descriptionlevel</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>FileDownload</servlet-name>
-		<url-pattern>/wuidownload</url-pattern>
+		<url-pattern>/pt.gov.dgarq.roda.wui.main.Main/wuidownload</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>UserManagementService</servlet-name>
-		<url-pattern>/UserManagementService</url-pattern>
+		<url-pattern>/pt.gov.dgarq.roda.wui.main.Main/UserManagementService</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>UserLoginService</servlet-name>
-		<url-pattern>/userlogin</url-pattern>
+		<url-pattern>/pt.gov.dgarq.roda.wui.main.Main/userlogin</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>BrowserService</servlet-name>
-		<url-pattern>/browserservice</url-pattern>
+		<url-pattern>/pt.gov.dgarq.roda.wui.main.Main/browserservice</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>SearchService</servlet-name>
-		<url-pattern>/searchservice</url-pattern>
+		<url-pattern>/pt.gov.dgarq.roda.wui.main.Main/searchservice</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>EditorService</servlet-name>
-		<url-pattern>/editorservice</url-pattern>
+		<url-pattern>/pt.gov.dgarq.roda.wui.main.Main/editorservice</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>IngestListService</servlet-name>
-		<url-pattern>/ingestlist</url-pattern>
+		<url-pattern>/pt.gov.dgarq.roda.wui.main.Main/ingestlist</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>FileUpload</servlet-name>
-		<url-pattern>/fileUpload</url-pattern>
+		<url-pattern>/pt.gov.dgarq.roda.wui.main.Main/fileUpload</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>IngestSubmitService</servlet-name>
-		<url-pattern>/ingestsubmitservice</url-pattern>
+		<url-pattern>/pt.gov.dgarq.roda.wui.main.Main/ingestsubmitservice</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>EventManagementService</servlet-name>
-		<url-pattern>/eventmanagementservice</url-pattern>
+		<url-pattern>/pt.gov.dgarq.roda.wui.main.Main/eventmanagementservice</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>ReportService</servlet-name>
-		<url-pattern>/reportservice</url-pattern>
+		<url-pattern>/pt.gov.dgarq.roda.wui.main.Main/reportservice</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>ReportDownload</servlet-name>
-		<url-pattern>/ReportDownload</url-pattern>
+		<url-pattern>/pt.gov.dgarq.roda.wui.main.Main/ReportDownload</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>StatisticsService</servlet-name>
-		<url-pattern>/StatisticsService</url-pattern>
+		<url-pattern>/pt.gov.dgarq.roda.wui.main.Main/StatisticsService</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>MetadataDownload</servlet-name>
-		<url-pattern>/MetadataDownload</url-pattern>
+		<url-pattern>/pt.gov.dgarq.roda.wui.main.Main/MetadataDownload</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>AIPDownload</servlet-name>
-		<url-pattern>/AIPDownload</url-pattern>
+		<url-pattern>/pt.gov.dgarq.roda.wui.main.Main/AIPDownload</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>DIPDownload</servlet-name>
-		<url-pattern>/DIPDownload</url-pattern>
+		<url-pattern>/pt.gov.dgarq.roda.wui.main.Main/DIPDownload</url-pattern>
 	</servlet-mapping>
+	
+
+	
+	
 	<!-- RODA Default Disseminators -->
 	<servlet>
 		<description>Download the AIP</description>
 		<display-name>RepresentationDownload</display-name>
 		<servlet-name>RepresentationDownload</servlet-name>
 		<servlet-class>
-			pt.gov.dgarq.roda.disseminators.RepresentationDownload.RepresentationDownload
-		</servlet-class>
+			pt.gov.dgarq.roda.disseminators.RepresentationDownload.RepresentationDownload</servlet-class>
 
 	</servlet>
 	<servlet>
@@ -222,8 +231,7 @@
 		<display-name>SimpleViewer</display-name>
 		<servlet-name>SimpleViewer</servlet-name>
 		<servlet-class>
-			pt.gov.dgarq.roda.disseminators.simpleviewer.SimpleViewer
-		</servlet-class>
+			pt.gov.dgarq.roda.disseminators.simpleviewer.SimpleViewer</servlet-class>
 	</servlet>
 	<servlet>
 		<description>
@@ -232,21 +240,20 @@
 		<servlet-name>Cache</servlet-name>
 		<servlet-class>pt.gov.dgarq.roda.disseminators.common.cache.Cache</servlet-class>
 	</servlet>
-	<servlet>
-		<description>
-		</description>
-		<display-name>PhpMyAdmin</display-name>
-		<servlet-name>PhpMyAdmin</servlet-name>
-		<servlet-class>pt.gov.dgarq.roda.disseminators.PhpMyAdmin.PhpMyAdmin</servlet-class>
-	</servlet>
+<!-- 	<servlet> -->
+<!-- 		<description> -->
+<!-- 		</description> -->
+<!-- 		<display-name>PhpMyAdmin</display-name> -->
+<!-- 		<servlet-name>PhpMyAdmin</servlet-name> -->
+<!-- 		<servlet-class>pt.gov.dgarq.roda.disseminators.PhpMyAdmin.PhpMyAdmin</servlet-class> -->
+<!-- 	</servlet> -->
 	<servlet>
 		<description>
 		</description>
 		<display-name>FlashPageFlipFree</display-name>
 		<servlet-name>FlashPageFlipFree</servlet-name>
 		<servlet-class>
-			pt.gov.dgarq.roda.disseminators.flashpageflipFree.FlashPageFlipFree
-		</servlet-class>
+			pt.gov.dgarq.roda.disseminators.flashpageflipFree.FlashPageFlipFree</servlet-class>
 	</servlet>
 	<servlet>
 		<description>
@@ -254,8 +261,7 @@
 		<display-name>MediaPlayer</display-name>
 		<servlet-name>MediaPlayer</servlet-name>
 		<servlet-class>
-			pt.gov.dgarq.roda.disseminators.mediaplayer.MediaPlayer
-		</servlet-class>
+			pt.gov.dgarq.roda.disseminators.mediaplayer.MediaPlayer</servlet-class>
 	</servlet>
 	<servlet>
 		<description>
@@ -277,10 +283,10 @@
 		<servlet-name>Cache</servlet-name>
 		<url-pattern>/Cache/*</url-pattern>
 	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>PhpMyAdmin</servlet-name>
-		<url-pattern>/PhpMyAdmin/*</url-pattern>
-	</servlet-mapping>
+<!-- 	<servlet-mapping> -->
+<!-- 		<servlet-name>PhpMyAdmin</servlet-name> -->
+<!-- 		<url-pattern>/PhpMyAdmin/*</url-pattern> -->
+<!-- 	</servlet-mapping> -->
 	<servlet-mapping>
 		<servlet-name>FlashPageFlipFree</servlet-name>
 		<url-pattern>/FlashPageFlipFree/*</url-pattern>
@@ -308,8 +314,7 @@
 		<display-name>FlashPageFlipPaid</display-name>
 		<servlet-name>FlashPageFlipPaid</servlet-name>
 		<servlet-class>
-			pt.gov.dgarq.roda.disseminators.flashpageflipPaid.FlashPageFlipPaid
-		</servlet-class>
+			pt.gov.dgarq.roda.disseminators.flashpageflipPaid.FlashPageFlipPaid</servlet-class>
 	</servlet>
 	<servlet>
 		<description>
@@ -317,8 +322,7 @@
 		<display-name>Munin</display-name>
 		<servlet-name>Munin</servlet-name>
 		<servlet-class>
-			pt.gov.dgarq.roda.wui.management.statistics.server.Munin
-		</servlet-class>
+			pt.gov.dgarq.roda.wui.management.statistics.server.Munin</servlet-class>
 	</servlet>
 	<servlet>
 		<description>
@@ -330,8 +334,7 @@
 	<servlet>
 		<servlet-name>FileUploadProgress</servlet-name>
 		<servlet-class>
-			pt.gov.dgarq.roda.wui.common.fileupload.server.FileUploadProgressImpl
-		</servlet-class>
+			pt.gov.dgarq.roda.wui.common.fileupload.server.FileUploadProgressImpl</servlet-class>
 	</servlet>
 
 	<servlet-mapping>
@@ -340,7 +343,7 @@
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>Munin</servlet-name>
-		<url-pattern>/Munin/*</url-pattern>
+		<url-pattern>/pt.gov.dgarq.roda.wui.main.Main/Munin/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>GwtCacheServer</servlet-name>
@@ -356,7 +359,7 @@
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>FileUploadProgress</servlet-name>
-		<url-pattern>/fileuploadprogress</url-pattern>
+		<url-pattern>/pt.gov.dgarq.roda.wui.main.Main/fileuploadprogress</url-pattern>
 	</servlet-mapping>
 
 	<!-- Welcome file -->

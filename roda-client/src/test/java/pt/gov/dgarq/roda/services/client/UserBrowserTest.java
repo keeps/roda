@@ -16,6 +16,7 @@ import pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.stubs.UserBrowser;
+import pt.gov.dgarq.roda.servlet.cas.CASUtility;
 
 /**
  * @author Rui Castro
@@ -32,11 +33,14 @@ public class UserBrowserTest {
 		String hostUrl = args[0];
 		String username = args[1];
 		String password = args[2];
-
+		String casURL = args[3];
+		String coreURL = args[4];
+		String serviceURL = args[5];
 		try {
+			CASUtility casUtility = new CASUtility(new URL(casURL), new URL(coreURL), new URL(serviceURL));
 
 			RODAClient rodaClient = new RODAClient(new URL(hostUrl), username,
-					password);
+					password,casUtility);
 
 			UserBrowser userBrowser = rodaClient.getUserBrowserService();
 

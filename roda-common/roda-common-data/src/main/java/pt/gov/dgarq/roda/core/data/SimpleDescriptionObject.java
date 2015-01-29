@@ -16,11 +16,7 @@ import pt.gov.dgarq.roda.core.data.eadc.Text;
  */
 public class SimpleDescriptionObject extends RODAObject {
 	private static final long serialVersionUID = 38813680938917204L;
-
-	public static final Filter FONDS_FILTER = new Filter(
-			new FilterParameter[] { new SimpleFilterParameter("level",
-					DescriptionLevel.FONDS.getLevel()) });
-
+	
 	public static final String LEVEL = "level";
 	public static final String COUNTRYCODE = "countryCode";
 	public static final String REPOSITORYCODE = "repositoryCode";
@@ -28,6 +24,11 @@ public class SimpleDescriptionObject extends RODAObject {
 	public static final String TITLE = "title";
 	public static final String DATE_INITIAL = "dateInitial";
 	public static final String DATE_FINAL = "dateFinal";
+	
+	// FIXME this should be defined from DescriptionLevelManager information
+	public static final Filter FONDS_FILTER = new Filter(
+          new FilterParameter[] { new SimpleFilterParameter(LEVEL,
+                          DescriptionLevel.FONDS.getLevel()) });
 
 	private static final String[] ELEMENTS = new String[] { ID, COUNTRYCODE,
 			REPOSITORYCODE, LEVEL, TITLE, DATE_INITIAL, DATE_FINAL };

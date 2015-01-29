@@ -65,7 +65,7 @@ public class SIPUploadTask extends IngestTask {
 
 			return new IngestTaskResult(true, report.toString());
 
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			throw new IngestTaskException("Error saving SIP to disk - " //$NON-NLS-1$
 					+ e.getMessage(), e);
 		}

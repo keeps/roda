@@ -23,7 +23,7 @@ public interface SearchService extends RemoteService {
 	/**
 	 * Seach service URI
 	 */
-	public static final String SERVICE_URI = "/searchservice";
+	public static final String SERVICE_URI = "searchservice";
 
 	/**
 	 * Utilities

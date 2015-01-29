@@ -22,4 +22,5 @@ public interface MetadataElementEditor extends SourcesChangeEvents {
 	
 	public boolean isEmpty();
 
+	public boolean isValid();
 }

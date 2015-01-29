@@ -77,7 +77,7 @@ public class MyLightBox implements PopupListener {
 		background.setHeight(Integer.toString(h));
 		if (GWT.isScript()) {
 			background
-					.setWidget(png = new PNGImage("images/lightbox.png", w, h));
+					.setWidget(png = new PNGImage("pt.gov.dgarq.roda.wui.main.Main/images/lightbox.png", w, h));
 		}
 		background.setPopupPosition(0, 0);
 		hideSelects();

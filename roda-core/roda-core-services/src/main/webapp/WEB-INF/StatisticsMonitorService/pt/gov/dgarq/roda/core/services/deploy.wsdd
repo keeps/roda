@@ -151,6 +151,14 @@
       />
       <typeMapping
         xmlns:ns="http://filter.adapter.data.core.roda.dgarq.gov.pt"
+        qname="ns:ClassificationSchemeFilterParameter"
+        type="java:pt.gov.dgarq.roda.core.data.adapter.filter.ClassificationSchemeFilterParameter"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://filter.adapter.data.core.roda.dgarq.gov.pt"
         qname="ns:RegexFilterParameter"
         type="java:pt.gov.dgarq.roda.core.data.adapter.filter.RegexFilterParameter"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"

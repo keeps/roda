@@ -23,5 +23,7 @@
 		<componentDescriptor>src/main/assembly/tomcat.xml</componentDescriptor>
 		<componentDescriptor>src/main/assembly/migrator.xml</componentDescriptor>
 		<componentDescriptor>src/main/assembly/ui.xml</componentDescriptor>
+		<componentDescriptor>src/main/assembly/cas.xml</componentDescriptor>
+		<componentDescriptor>src/main/assembly/fits.xml</componentDescriptor>
 	</componentDescriptors>
 </assembly>

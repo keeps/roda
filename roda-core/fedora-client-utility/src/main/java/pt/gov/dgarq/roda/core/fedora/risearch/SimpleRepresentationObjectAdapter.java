@@ -63,8 +63,8 @@ public class SimpleRepresentationObjectAdapter extends
 	 * 
 	 * @see SortParameterComparator#compare(Object, Object, String)
 	 */
-	public int compare(SimpleRepresentationObject e1, SimpleRepresentationObject e2,
-			String attributeName) {
+	public int compare(SimpleRepresentationObject e1,
+			SimpleRepresentationObject e2, String attributeName) {
 		return 0;
 	}
 
@@ -76,8 +76,8 @@ public class SimpleRepresentationObjectAdapter extends
 	 */
 	@Override
 	public List<String> getAttributeNames() {
-		List<String> list = new ArrayList<String>(rodaObjectAdapter
-				.getAttributeNames());
+		List<String> list = new ArrayList<String>(
+				rodaObjectAdapter.getAttributeNames());
 		list.addAll(Arrays.asList(attributeNames));
 		return list;
 	}
@@ -89,8 +89,8 @@ public class SimpleRepresentationObjectAdapter extends
 	 */
 	@Override
 	public List<String> getITQLSubjects() {
-		List<String> list = new ArrayList<String>(rodaObjectAdapter
-				.getITQLSubjects());
+		List<String> list = new ArrayList<String>(
+				rodaObjectAdapter.getITQLSubjects());
 		list.addAll(Arrays.asList(itqlSubjects));
 		return list;
 	}
@@ -102,8 +102,8 @@ public class SimpleRepresentationObjectAdapter extends
 	 */
 	@Override
 	public List<String> getITQLPredicates() {
-		List<String> list = new ArrayList<String>(rodaObjectAdapter
-				.getITQLPredicates());
+		List<String> list = new ArrayList<String>(
+				rodaObjectAdapter.getITQLPredicates());
 		list.addAll(Arrays.asList(itqlPredicates));
 		return list;
 	}
@@ -220,5 +220,11 @@ public class SimpleRepresentationObjectAdapter extends
 
 		return sro;
 
+	}
+
+	@Override
+	public String getITQLClassificationSchemeCondition(String itqlQuerySubject,
+			String classificationSchemeId, String[] possibleParentsPids) {
+		return null;
 	}
 }

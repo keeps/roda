@@ -1,12 +1,10 @@
 package pt.gov.dgarq.roda.servlet;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Map;
 
-import javax.naming.AuthenticationException;
 import javax.servlet.FilterConfig;
 import javax.servlet.http.HttpServletResponse;
 
@@ -16,7 +14,8 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
 
-import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.servlet.cas.CASUserPrincipal;
+import pt.gov.dgarq.roda.servlet.cas.CASUtility;
 import fedora.server.security.servletfilters.ExtendedHttpServletRequest;
 import fedora.server.security.servletfilters.FilterSetup;
 
@@ -49,57 +48,28 @@ public class RODAFedoraFilter extends FilterSetup {
 	/**
 	 * LDAP filter configuration file
 	 */
-	protected String configFile = "ldap-filter.properties"; //$NON-NLS-1$
+	protected String configFile = "cas-filter.properties"; //$NON-NLS-1$
+	
+	/**
+	 * CAS Core Callback URL URL
+	 */
+	protected String coreURL = null;
+	
+	/**
+	 * CAS URL
+	 */
+	protected String casURL = null;
 
 	/**
-	 * LDAP server host
+	 * CAS Utility 
 	 */
-	protected String host = null;
-
-	/**
-	 * LDAP server port
-	 */
-	protected int port = 389;
-
-	/**
-	 * LDAP DN of the people entry
-	 */
-	protected String peopleDN = null;
-
-	/**
-	 * LDAP DN of the groups entry
-	 */
-	protected String groupsDN = null;
-
-	/**
-	 * LDAP DN of the roles entry
-	 */
-	protected String rolesDN = null;
-
-	/**
-	 * List of protected users. Users in the protected list cannot be modified.
-	 */
-	protected List<String> protectedUsers = new ArrayList<String>();
-
-	/**
-	 * List of protected groups. Groups in the protected list cannot be
-	 * modified.
-	 */
-	protected List<String> protectedGroups = new ArrayList<String>();
-
-	/**
-	 * LDAP utility object
-	 */
-	protected LdapUtility ldapUtility = null;
-
-	private AuthenticationCache authenticationCache = null;
+	protected CASUtility casUtility = null;
 
 	/**
 	 * 
 	 * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
 	 */
 	public void init(FilterConfig filterConfig) {
-
 		Configuration configuration = null;
 		try {
 
@@ -111,107 +81,32 @@ public class RODAFedoraFilter extends FilterSetup {
 		}
 
 		if (configuration != null) {
-
-			host = configuration.getString("host");
-			port = configuration.getInt("port");
-
-			peopleDN = configuration.getString("peopleDN");
-			groupsDN = configuration.getString("groupsDN");
-			rolesDN = configuration.getString("rolesDN");
-
-			protectedUsers = Arrays.asList(configuration
-					.getStringArray("protectedUsers"));
-			protectedGroups = Arrays.asList(configuration
-					.getStringArray("protectedGroups"));
-
+			coreURL = configuration.getString("roda.core.url");
+			casURL = configuration.getString("roda.cas.url");
 		} else {
-
 			if (filterConfig == null) {
-
-				logger.info("init() filter configuration is null. Using defaults... "
-						+ String.format("(%1$s ; %2$d ; %3$s ; %4$s ; %5$s)",
-								host, port, peopleDN, groupsDN, rolesDN));
-
+				logger.info("init() filter configuration is null. Using defaults... "+ String.format("(%1$s ; %2$d ; %3$s)",coreURL, casURL));
 			} else {
-
-				if (filterConfig.getInitParameter("host") != null) {
-					host = filterConfig.getInitParameter("host");
+				if (filterConfig.getInitParameter("roda.cas.url") != null) {
+					casURL = filterConfig.getInitParameter("roda.cas.url");
 				} else {
-					// Default value (localhost)
-					host = "localhost";
+					// Default value
 				}
-
-				try {
-					port = Integer.parseInt(filterConfig
-							.getInitParameter("port"));
-				} catch (NumberFormatException e) {
-					// Default value (389)
-					port = 389;
-				}
-
-				if (filterConfig.getInitParameter("peopleDN") != null) {
-					peopleDN = filterConfig.getInitParameter("peopleDN");
+				if (filterConfig.getInitParameter("roda.core.url") != null) {
+					coreURL = filterConfig.getInitParameter("roda.core.url");
 				} else {
-					// Default value ("")
-				}
-
-				if (filterConfig.getInitParameter("groupsDN") != null) {
-					groupsDN = filterConfig.getInitParameter("groupsDN");
-				} else {
-					// Default value ("")
-				}
-
-				if (filterConfig.getInitParameter("rolesDN") != null) {
-					rolesDN = filterConfig.getInitParameter("rolesDN");
-				} else {
-					// Default value ("")
-				}
-
-				if (filterConfig.getInitParameter("protectedUsers") != null) {
-
-					String protectedUsersValue = filterConfig
-							.getInitParameter("protectedUsers");
-
-					logger.debug("protectedUsersValue: " + protectedUsersValue);
-
-					String[] values = protectedUsersValue.split(",\\e*");
-					protectedUsers = Arrays.asList(values);
-
-					logger.debug("protectedUsers: " + protectedUsers);
-
-				} else {
-					// Default value (null)
-				}
-
-				if (filterConfig.getInitParameter("protectedGroups") != null) {
-
-					String protectedGroupsValue = filterConfig
-							.getInitParameter("protectedGroups");
-
-					logger.debug("protectedGroupsValue: "
-							+ protectedGroupsValue);
-
-					String[] values = protectedGroupsValue.split(",\\e*");
-					protectedGroups = Arrays.asList(values);
-
-					logger.debug("protectedGroups: " + protectedGroups);
-
-				} else {
-					// Default value (null)
+					// Default value
 				}
 
 			}
 
 		}
-
-		this.ldapUtility = new LdapUtility(host, port, peopleDN, groupsDN,
-				rolesDN, protectedUsers, protectedGroups);
-
-		this.authenticationCache = new AuthenticationCache();
-
-		logger.info(String.format("(%1$s ; %2$d ; %3$s ; %4$s ; %5$s)", host,
-				port, peopleDN, groupsDN, rolesDN));
-
+		
+		try {
+			this.casUtility = new CASUtility(new URL(casURL),new URL(coreURL));
+		}catch(MalformedURLException mfue){
+			logger.error("Error initializing CASUtility:"+mfue.getMessage(),mfue);
+		}
 	}
 
 	/**
@@ -283,65 +178,26 @@ public class RODAFedoraFilter extends FilterSetup {
 	 */
 	public void destroy() {
 
-		this.authenticationCache.stopCleanerTimer();
+		//this.authenticationCache.stopCleanerTimer();
 
 		logger.info("destroy()");
 	}
 
 	private void setUserAttributes(String username, String password,
 			ExtendedHttpServletRequest requestWrapper) {
-		try {
-
-			// User user = this.ldapUtility.getUser(username);
-
-			User user = null;
-
-			if (authenticationCache.isAuthenticated(username, password)) {
-
-				logger.debug("User is authenticated in cache. Getting cached user...");
-
-				user = authenticationCache.getUser(username, password);
-			}
-
+		logger.debug("SETUSERATTRIBUTE "+username+" / "+password);
+		CASUserPrincipal user = null;
+		try{
+			user = this.casUtility.getCASUserPrincipal(username, password);
 			if (user == null) {
-
-				logger.debug("User information not available in cache. Getting user from LDAP");
-
-				user = this.ldapUtility
-						.getAuthenticatedUser(username, password);
-
-				logger.debug("Storing user in authentication cache...");
-
-				authenticationCache.addUser(username, password, user);
-			}
-
-			if (user == null) {
-
 				logger.debug("No user named " + username);
-
 			} else {
-
-				UserPrincipal ldapUserPrincipal = new UserPrincipal(user);
-
-				logger.debug("User " + username + " is " + ldapUserPrincipal);
-
-				Map<String, String[]> fedoraAttributeMap = ldapUserPrincipal
-						.getFedoraAttributeMap();
-
-				requestWrapper.setAttribute(FEDORA_AUX_SUBJECT_ATTRIBUTES,
-						fedoraAttributeMap);
+				Map<String, String[]> fedoraAttributeMap = user.getFedoraAttributeMap();
+				requestWrapper.setAuthenticated((UserPrincipal)user, null);
+				requestWrapper.setAttribute(FEDORA_AUX_SUBJECT_ATTRIBUTES,fedoraAttributeMap);
 			}
-
-		} catch (AuthenticationException e) {
-			logger.warn("Exception getting authenticated information from LDAP for user "
-					+ username
-					+ " - "
-					+ e.getMessage()
-					+ ". User attributes not set!");
-			logger.debug(
-					"Exception getting authenticated information from LDAP for user "
-							+ username + " - " + e.getMessage()
-							+ ". User attributes not set!", e);
+		}catch(Exception e){
+			logger.error("Error setting authenticated used:"+e.getMessage());
 		}
 	}
 

@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="http://services.core.roda.dgarq.gov.pt" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="http://services.core.roda.dgarq.gov.pt" xmlns:intf="http://services.core.roda.dgarq.gov.pt" xmlns:tns1="http://common.core.roda.dgarq.gov.pt" xmlns:tns2="http://filter.adapter.data.core.roda.dgarq.gov.pt" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<!--WSDL created by Apache Axis version: 1.4
+Built on Apr 22, 2006 (06:55:48 PDT)-->
+ <wsdl:types>
+  <schema elementFormDefault="qualified" targetNamespace="http://services.core.roda.dgarq.gov.pt" xmlns="http://www.w3.org/2001/XMLSchema">
+   <import namespace="http://common.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+   <element name="getProperty">
+    <complexType>
+     <sequence>
+      <element name="propertyName" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="getPropertyResponse">
+    <complexType>
+     <sequence>
+      <element name="getPropertyReturn" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="fault" type="tns1:RODAServiceException"/>
+   <element name="getProperties">
+    <complexType>
+     <sequence>
+      <element maxOccurs="unbounded" name="propertyNames" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="getPropertiesResponse">
+    <complexType>
+     <sequence>
+      <element maxOccurs="unbounded" name="getPropertiesReturn" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <complexType name="ArrayOf_xsd_string">
+    <sequence>
+     <element maxOccurs="unbounded" minOccurs="0" name="item" type="xsd:string"/>
+    </sequence>
+   </complexType>
+  </schema>
+  <schema elementFormDefault="qualified" targetNamespace="http://common.core.roda.dgarq.gov.pt" xmlns="http://www.w3.org/2001/XMLSchema">
+   <import namespace="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://services.core.roda.dgarq.gov.pt"/>
+   <complexType abstract="true" name="RODAException">
+    <sequence>
+     <element name="message" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="RODAServiceException">
+    <complexContent>
+     <extension base="tns1:RODAException">
+      <sequence/>
+     </extension>
+    </complexContent>
+   </complexType>
+  </schema>
+  <schema elementFormDefault="qualified" targetNamespace="http://filter.adapter.data.core.roda.dgarq.gov.pt" xmlns="http://www.w3.org/2001/XMLSchema">
+   <import namespace="http://common.core.roda.dgarq.gov.pt"/>
+   <import namespace="http://services.core.roda.dgarq.gov.pt"/>
+   <complexType abstract="true" name="FilterParameter">
+    <sequence>
+     <element name="name" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="SimpleFilterParameter">
+    <complexContent>
+     <extension base="tns2:FilterParameter">
+      <sequence>
+       <element name="value" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="OneOfManyFilterParameter">
+    <complexContent>
+     <extension base="tns2:FilterParameter">
+      <sequence>
+       <element name="values" nillable="true" type="impl:ArrayOf_xsd_string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="RangeFilterParameter">
+    <complexContent>
+     <extension base="tns2:FilterParameter">
+      <sequence>
+       <element name="fromValue" nillable="true" type="xsd:string"/>
+       <element name="toValue" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="RegexFilterParameter">
+    <complexContent>
+     <extension base="tns2:FilterParameter">
+      <sequence>
+       <element name="regex" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="ProducerFilterParameter">
+    <complexContent>
+     <extension base="tns2:FilterParameter">
+      <sequence>
+       <element name="groups" nillable="true" type="impl:ArrayOf_xsd_string"/>
+       <element name="username" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="LikeFilterParameter">
+    <complexContent>
+     <extension base="tns2:FilterParameter">
+      <sequence>
+       <element name="expression" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="ClassificationSchemeFilterParameter">
+    <complexContent>
+     <extension base="tns2:FilterParameter">
+      <sequence>
+       <element name="classificationSchemeId" nillable="true" type="xsd:string"/>
+       <element name="possibleClassesPids" nillable="true" type="impl:ArrayOf_xsd_string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+  </schema>
+ </wsdl:types>
+
+   <wsdl:message name="getPropertyResponse">
+
+      <wsdl:part element="impl:getPropertyResponse" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="RODAServiceException">
+
+      <wsdl:part element="impl:fault" name="fault"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getPropertiesResponse">
+
+      <wsdl:part element="impl:getPropertiesResponse" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getPropertiesRequest">
+
+      <wsdl:part element="impl:getProperties" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getPropertyRequest">
+
+      <wsdl:part element="impl:getProperty" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:portType name="ConfigurationManager">
+
+      <wsdl:operation name="getProperty">
+
+         <wsdl:input message="impl:getPropertyRequest" name="getPropertyRequest"/>
+
+         <wsdl:output message="impl:getPropertyResponse" name="getPropertyResponse"/>
+
+         <wsdl:fault message="impl:RODAServiceException" name="RODAServiceException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getProperties">
+
+         <wsdl:input message="impl:getPropertiesRequest" name="getPropertiesRequest"/>
+
+         <wsdl:output message="impl:getPropertiesResponse" name="getPropertiesResponse"/>
+
+         <wsdl:fault message="impl:RODAServiceException" name="RODAServiceException"/>
+
+      </wsdl:operation>
+
+   </wsdl:portType>
+
+   <wsdl:binding name="ConfigurationManagerSoapBinding" type="impl:ConfigurationManager">
+
+      <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+      <wsdl:operation name="getProperty">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getPropertyRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getPropertyResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="RODAServiceException">
+
+            <wsdlsoap:fault name="RODAServiceException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getProperties">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getPropertiesRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getPropertiesResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="RODAServiceException">
+
+            <wsdlsoap:fault name="RODAServiceException" use="literal"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+   </wsdl:binding>
+
+   <wsdl:service name="ConfigurationManagerService">
+
+      <wsdl:port binding="impl:ConfigurationManagerSoapBinding" name="ConfigurationManager">
+
+         <wsdlsoap:address location="http://localhost:8080/roda-core/services/ConfigurationManager"/>
+
+      </wsdl:port>
+
+   </wsdl:service>
+
+</wsdl:definitions>

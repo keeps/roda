@@ -7,7 +7,9 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.MalformedURLException;
 
+import javax.net.ssl.SSLHandshakeException;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -25,6 +27,7 @@ import org.apache.log4j.Logger;
 import pt.gov.dgarq.roda.core.RODAClient;
 import pt.gov.dgarq.roda.core.common.LoginException;
 import pt.gov.dgarq.roda.core.common.RODAClientException;
+import pt.gov.dgarq.roda.servlet.cas.CASUtility;
 
 /**
  * @author Luis Faria
@@ -224,19 +227,34 @@ public class RodaClientFactory {
 
 			public void run() {
 				try {
+					CASUtility casUtility = new CASUtility(SIPCreatorConfig
+							.getInstance().getCasURL(), SIPCreatorConfig
+							.getInstance().getRODACoreServices());
 					rodaClient = new RODAClient(SIPCreatorConfig.getInstance()
 							.getRODACoreServices(), usernameField.getText(),
-							new String(passwordField.getPassword()));
+							new String(passwordField.getPassword()), casUtility);
 
 				} catch (LoginException e1) {
-					JOptionPane.showMessageDialog(getDialog(), Messages
-							.getString("Login.error.LOGIN_EXCEPTION"), Messages
-							.getString("common.ERROR"),
+					JOptionPane.showMessageDialog(getDialog(),
+							Messages.getString("Login.error.LOGIN_EXCEPTION"),
+							Messages.getString("common.ERROR"),
 							JOptionPane.ERROR_MESSAGE);
 				} catch (RODAClientException e1) {
 					JOptionPane.showMessageDialog(getDialog(), Messages
-							.getString("Login.error.RODA_CLIENT_EXCEPTION", e1
-									.getMessage()), Messages
+							.getString("Login.error.RODA_CLIENT_EXCEPTION",
+									e1.getMessage()), Messages
+							.getString("common.ERROR"),
+							JOptionPane.ERROR_MESSAGE);
+				} catch (MalformedURLException e1) {
+					JOptionPane.showMessageDialog(getDialog(), Messages
+							.getString("Login.error.RODA_CLIENT_EXCEPTION",
+									e1.getMessage()), Messages
+							.getString("common.ERROR"),
+							JOptionPane.ERROR_MESSAGE);
+				} catch (Throwable e1) {
+					JOptionPane.showMessageDialog(getDialog(), Messages
+							.getString("Login.error.RODA_CLIENT_EXCEPTION",
+									e1.getMessage()), Messages
 							.getString("common.ERROR"),
 							JOptionPane.ERROR_MESSAGE);
 				}
@@ -255,8 +273,8 @@ public class RodaClientFactory {
 
 	private JButton getCancelButton() {
 		if (cancelButton == null) {
-			cancelButton = new JButton(Messages
-					.getString("Login.action.CANCEL"));
+			cancelButton = new JButton(
+					Messages.getString("Login.action.CANCEL"));
 			cancelButton.addActionListener(new ActionListener() {
 
 				public void actionPerformed(ActionEvent e) {

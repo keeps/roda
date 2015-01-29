@@ -1,9 +1,15 @@
 package pt.gov.dgarq.roda.core;
 
+import java.io.IOException;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.rmi.RemoteException;
 
+import javax.naming.AuthenticationException;
 import javax.xml.rpc.ServiceException;
 
 import org.apache.axis.AxisFault;
@@ -20,6 +26,9 @@ import pt.gov.dgarq.roda.core.stubs.AcceptSIPSoapBindingStub;
 import pt.gov.dgarq.roda.core.stubs.Browser;
 import pt.gov.dgarq.roda.core.stubs.BrowserServiceLocator;
 import pt.gov.dgarq.roda.core.stubs.BrowserSoapBindingStub;
+import pt.gov.dgarq.roda.core.stubs.ConfigurationManager;
+import pt.gov.dgarq.roda.core.stubs.ConfigurationManagerServiceLocator;
+import pt.gov.dgarq.roda.core.stubs.ConfigurationManagerSoapBindingStub;
 import pt.gov.dgarq.roda.core.stubs.Editor;
 import pt.gov.dgarq.roda.core.stubs.EditorServiceLocator;
 import pt.gov.dgarq.roda.core.stubs.EditorSoapBindingStub;
@@ -67,6 +76,8 @@ import pt.gov.dgarq.roda.core.stubs.UserManagementSoapBindingStub;
 import pt.gov.dgarq.roda.core.stubs.UserRegistration;
 import pt.gov.dgarq.roda.core.stubs.UserRegistrationServiceLocator;
 import pt.gov.dgarq.roda.core.stubs.UserRegistrationSoapBindingStub;
+import pt.gov.dgarq.roda.servlet.cas.CASUserPrincipal;
+import pt.gov.dgarq.roda.servlet.cas.CASUtility;
 
 /**
  * @author Rui Castro
@@ -119,6 +130,7 @@ public class RODAClient {
 		return exception;
 	}
 
+	private ConfigurationManager serviceConfigurationManager = null;
 	private Login serviceLogin = null;
 	private UserManagement serviceUserManagement = null;
 	private UserRegistration serviceUserRegistration = null;
@@ -140,11 +152,30 @@ public class RODAClient {
 	private Downloader downloader = null;
 
 	private URL rodaCoreURL = null;
-	private String guestUsername = null;
+	private String[] guestCredentials = null;
 
-	private String username = null;
-	private String password = null;
 	private String userIPAddress = null;
+	
+	private CASUtility casUtility = null;
+	private CASUserPrincipal cup = null;
+
+	
+	
+	public CASUserPrincipal getCup() {
+		return cup;
+	}
+
+	public void setCup(CASUserPrincipal cup) {
+		this.cup = cup;
+	}
+
+	public CASUtility getCasUtility() {
+		return casUtility;
+	}
+
+	public void setCasUtility(CASUtility casUtility) {
+		this.casUtility = casUtility;
+	}
 
 	/**
 	 * Constructs a new anonymous RODAClient for the specified RODA Services
@@ -156,9 +187,11 @@ public class RODAClient {
 	 * @throws LoginException
 	 * @throws RODAClientException
 	 */
-	public RODAClient(URL rodacoreURL) throws RODAClientException,
-			LoginException {
-		this(rodacoreURL, null, null);
+
+	
+	public RODAClient(URL rodacoreURL, CASUtility casUtility) throws RODAClientException,
+	LoginException {
+		this(rodacoreURL, null, null,casUtility);
 	}
 
 	/**
@@ -175,13 +208,74 @@ public class RODAClient {
 	 * @throws LoginException
 	 * @throws RODAClientException
 	 */
-	public RODAClient(URL rodacoreURL, String username, String password)
+	public RODAClient(URL rodacoreURL, String username, String password, CASUtility casUtility)
 			throws RODAClientException, LoginException {
 
 		this.rodaCoreURL = rodacoreURL;
-		this.username = username;
-		this.password = password;
+		this.casUtility = casUtility;
+		if(username!=null && password!=null){
+			try{
+				this.cup = casUtility.getCASUserPrincipal(username, password);
+			}catch(AuthenticationException e){
+			  System.err.println(e);
+				throw new RODAClientException(e.getMessage());
+			}
+		}
 
+		
+
+		if ("/".equals(rodacoreURL.getPath())) {
+			logger.warn("No path to roda-core specified. Using default value '"
+					+ defaultRodaCorePath + "'");
+			try {
+
+				this.rodaCoreURL = new URL(rodacoreURL + defaultRodaCorePath);
+
+			} catch (MalformedURLException e) {
+				logger
+						.warn("Error creating default service URL. Using provided value '"
+								+ rodacoreURL + "'");
+			}
+		}
+
+		// this forces the creation of the login service causing an exception to
+		// be thrown if something goes wrong.
+		this.serviceLogin = getLoginService();
+	}
+	
+	public RODAClient(URL rodacoreURL, String proxyGrantingTicket, CASUtility casUtility) throws RODAClientException, LoginException {
+          this.casUtility = casUtility;
+          this.rodaCoreURL = rodacoreURL;
+          try{
+            this.cup = casUtility.getCASUserPrincipalFromProxyGrantingTicket(proxyGrantingTicket);
+          }catch (AuthenticationException e) {
+            throw new RODAClientException("Unable to get CasUserPrincipal");
+          }
+          
+          if ("/".equals(rodacoreURL.getPath())) {
+
+                  logger.warn("No path to roda-core specified. Using default value '"
+                                  + defaultRodaCorePath + "'");
+                  try {
+
+                          this.rodaCoreURL = new URL(rodacoreURL + defaultRodaCorePath);
+
+                  } catch (MalformedURLException e) {
+                          logger
+                                          .warn("Error creating default service URL. Using provided value '"
+                                                          + rodacoreURL + "'");
+                  }
+          }
+
+          // this forces the creation of the login service causing an exception to
+          // be thrown if something goes wrong.
+          this.serviceLogin = getLoginService();
+        }
+	
+	public RODAClient(URL rodacoreURL, CASUserPrincipal cup, CASUtility casUtility) throws RODAClientException, LoginException {
+		this.casUtility = casUtility;
+		this.rodaCoreURL = rodacoreURL;
+		this.cup = cup;
 		if ("/".equals(rodacoreURL.getPath())) {
 
 			logger.warn("No path to roda-core specified. Using default value '"
@@ -211,7 +305,6 @@ public class RODAClient {
 	 * @throws RODAClientException
 	 */
 	public Login getLoginService() throws LoginException, RODAClientException {
-
 		if (this.serviceLogin == null) {
 
 			LoginServiceLocator loginServiceLocator = new LoginServiceLocator();
@@ -230,20 +323,13 @@ public class RODAClient {
 
 			try {
 
-				String[] guestCredentials = this.serviceLogin
-						.getGuestCredentials();
+				guestCredentials = this.serviceLogin.getGuestCredentials();
 
-				this.guestUsername = guestCredentials[0];
-
-				if (this.username == null) {
-
-					this.username = guestCredentials[0];
-					this.password = guestCredentials[1];
-
-				} else {
-
-					this.serviceLogin.getAuthenticatedUser(this.username,
-							this.password);
+				if(this.cup!=null){
+					String proxyTicket = this.casUtility.generateProxyTicket(this.cup.getProxyGrantingTicket());
+					User u = this.serviceLogin.getAuthenticatedUserCAS(proxyTicket);
+				}else{
+					logger.debug("RodaClient username null. Using guest credentials.");
 				}
 
 			} catch (RemoteException e) {
@@ -295,14 +381,17 @@ public class RODAClient {
 			}
 
 			((UserManagementSoapBindingStub) this.serviceUserManagement)
-					.setUsername(this.username);
+					.setUsername(this.getUsername());
 			((UserManagementSoapBindingStub) this.serviceUserManagement)
-					.setPassword(this.password);
+					.setPassword("");
 			((UserManagementSoapBindingStub) this.serviceUserManagement)
 					.setTimeout(0);
 		}
 
-		return serviceUserManagement;
+		InvocationHandler handler = new UserManagementProxy(serviceUserManagement, getProxyGrantingTicket());
+        Class[] interfaces = this.serviceUserManagement.getClass().getInterfaces();
+        Object myproxy = Proxy.newProxyInstance( this.getClass().getClassLoader(),interfaces,handler);
+		return (UserManagement) myproxy;
 	}
 
 	/**
@@ -334,14 +423,16 @@ public class RODAClient {
 			}
 
 			((UserRegistrationSoapBindingStub) this.serviceUserRegistration)
-					.setUsername(this.username);
+					.setUsername(this.getUsername());
 			((UserRegistrationSoapBindingStub) this.serviceUserRegistration)
-					.setPassword(this.password);
+					.setPassword("");
 			((UserRegistrationSoapBindingStub) this.serviceUserRegistration)
 					.setTimeout(0);
 		}
-
-		return serviceUserRegistration;
+		InvocationHandler handler = new UserRegistrationProxy(serviceUserRegistration, getProxyGrantingTicket());
+        Class[] interfaces = this.serviceUserRegistration.getClass().getInterfaces();
+        Object myproxy = Proxy.newProxyInstance( this.getClass().getClassLoader(),interfaces,handler);
+		return (UserRegistration) myproxy;
 	}
 
 	/**
@@ -371,14 +462,17 @@ public class RODAClient {
 			}
 
 			((UserBrowserSoapBindingStub) this.serviceUserBrowser)
-					.setUsername(this.username);
+					.setUsername(this.getUsername());
 			((UserBrowserSoapBindingStub) this.serviceUserBrowser)
-					.setPassword(this.password);
+					.setPassword("");
 			((UserBrowserSoapBindingStub) this.serviceUserBrowser)
 					.setTimeout(0);
 		}
 
-		return serviceUserBrowser;
+		InvocationHandler handler = new UserBrowserProxy(serviceUserBrowser, getProxyGrantingTicket());
+        Class[] interfaces = this.serviceUserBrowser.getClass().getInterfaces();
+        Object myproxy = Proxy.newProxyInstance( this.getClass().getClassLoader(),interfaces,handler);
+		return (UserBrowser) myproxy;
 	}
 
 	/**
@@ -408,13 +502,55 @@ public class RODAClient {
 			}
 
 			((UserEditorSoapBindingStub) this.serviceUserEditor)
-					.setUsername(this.username);
+					.setUsername(this.getUsername());
 			((UserEditorSoapBindingStub) this.serviceUserEditor)
-					.setPassword(this.password);
+					.setPassword("");
 			((UserEditorSoapBindingStub) this.serviceUserEditor).setTimeout(0);
 		}
+		InvocationHandler handler = new UserEditorProxy(serviceUserEditor, getProxyGrantingTicket());
+        Class[] interfaces = this.serviceUserEditor.getClass().getInterfaces();
+        Object myproxy = Proxy.newProxyInstance( this.getClass().getClassLoader(),interfaces,handler);
+		return (UserEditor) myproxy;
+	}
+	
+	/**
+	 * Returns a stub to the ConfigurationManager service.
+	 * 
+	 * @return a stub to the ConfigurationManager service.
+	 * 
+	 * @throws RODAClientException
+	 *             if the service client could not be created.
+	 */
+	public ConfigurationManager getConfigurationManagerService() throws RODAClientException {
 
-		return serviceUserEditor;
+		if (this.serviceConfigurationManager == null) {
+			ConfigurationManagerServiceLocator serviceLocator = new ConfigurationManagerServiceLocator();
+			serviceLocator
+					.setConfigurationManagerEndpointAddress(getServiceAddress("ConfigurationManager"));
+
+			try {
+
+				this.serviceConfigurationManager = serviceLocator.getConfigurationManager();
+
+			} catch (ServiceException e) {
+				logger.debug("Error accessing ConfigurationManager service - "
+						+ e.getMessage(), e);
+				throw new RODAClientException(
+						"Error accessing ConfigurationManager service - " + e.getMessage(),
+						e);
+			}
+
+			((ConfigurationManagerSoapBindingStub) this.serviceConfigurationManager)
+					.setUsername(this.getUsername());
+			((ConfigurationManagerSoapBindingStub) this.serviceConfigurationManager)
+					.setPassword("");
+			((ConfigurationManagerSoapBindingStub) this.serviceConfigurationManager).setTimeout(0);
+
+		}
+		InvocationHandler handler = new ConfigurationManagerProxy(serviceConfigurationManager, getProxyGrantingTicket());
+        Class[] interfaces = this.serviceConfigurationManager.getClass().getInterfaces();
+        Object myproxy = Proxy.newProxyInstance( this.getClass().getClassLoader(),interfaces,handler);
+		return (ConfigurationManager) myproxy;
 	}
 
 	/**
@@ -445,14 +581,16 @@ public class RODAClient {
 			}
 
 			((BrowserSoapBindingStub) this.serviceBrowser)
-					.setUsername(this.username);
+					.setUsername(this.getUsername());
 			((BrowserSoapBindingStub) this.serviceBrowser)
-					.setPassword(this.password);
+					.setPassword("");
 			((BrowserSoapBindingStub) this.serviceBrowser).setTimeout(0);
 
 		}
-
-		return serviceBrowser;
+		InvocationHandler handler = new BrowserProxy(serviceBrowser, getProxyGrantingTicket());
+        Class[] interfaces = this.serviceBrowser.getClass().getInterfaces();
+        Object myproxy = Proxy.newProxyInstance( this.getClass().getClassLoader(),interfaces,handler);
+		return (Browser) myproxy;
 	}
 
 	/**
@@ -483,13 +621,15 @@ public class RODAClient {
 			}
 
 			((SearchSoapBindingStub) this.serviceSearch)
-					.setUsername(this.username);
+					.setUsername(this.getUsername());
 			((SearchSoapBindingStub) this.serviceSearch)
-					.setPassword(this.password);
+					.setPassword("");
 			((SearchSoapBindingStub) this.serviceSearch).setTimeout(0);
 		}
-
-		return this.serviceSearch;
+		InvocationHandler handler = new SearchProxy(this.serviceSearch, getProxyGrantingTicket());
+        Class[] interfaces = this.serviceSearch.getClass().getInterfaces();
+        Object myproxy = Proxy.newProxyInstance( this.getClass().getClassLoader(),interfaces,handler);
+		return (Search) myproxy;
 	}
 
 	/**
@@ -520,13 +660,15 @@ public class RODAClient {
 			}
 
 			((LoggerSoapBindingStub) this.serviceLogger)
-					.setUsername(this.username);
+					.setUsername(this.getUsername());
 			((LoggerSoapBindingStub) this.serviceLogger)
-					.setPassword(this.password);
+					.setPassword("");
 			((LoggerSoapBindingStub) this.serviceLogger).setTimeout(0);
 		}
-
-		return this.serviceLogger;
+		InvocationHandler handler = new LoggerProxy(this.serviceLogger, getProxyGrantingTicket());
+        Class[] interfaces = this.serviceLogger.getClass().getInterfaces();
+        Object myproxy = Proxy.newProxyInstance( this.getClass().getClassLoader(),interfaces,handler);
+		return (Logger) myproxy;
 	}
 
 	/**
@@ -558,13 +700,15 @@ public class RODAClient {
 			}
 
 			((LogMonitorSoapBindingStub) this.serviceLogMonitor)
-					.setUsername(this.username);
+					.setUsername(this.getUsername());
 			((LogMonitorSoapBindingStub) this.serviceLogMonitor)
-					.setPassword(this.password);
+					.setPassword("");
 			((LogMonitorSoapBindingStub) this.serviceLogMonitor).setTimeout(0);
 		}
-
-		return this.serviceLogMonitor;
+		InvocationHandler handler = new LogMonitorProxy(this.serviceLogMonitor, getProxyGrantingTicket());
+        Class[] interfaces = this.serviceLogMonitor.getClass().getInterfaces();
+        Object myproxy = Proxy.newProxyInstance( this.getClass().getClassLoader(),interfaces,handler);
+		return (LogMonitor) myproxy;
 	}
 
 	/**
@@ -595,13 +739,15 @@ public class RODAClient {
 			}
 
 			((EditorSoapBindingStub) this.serviceEditor)
-					.setUsername(this.username);
+					.setUsername(this.getUsername());
 			((EditorSoapBindingStub) this.serviceEditor)
-					.setPassword(this.password);
+					.setPassword("");
 			((EditorSoapBindingStub) this.serviceEditor).setTimeout(0);
 		}
-
-		return this.serviceEditor;
+		InvocationHandler handler = new EditorProxy(this.serviceEditor, getProxyGrantingTicket());
+        Class[] interfaces = this.serviceEditor.getClass().getInterfaces();
+        Object myproxy = Proxy.newProxyInstance( this.getClass().getClassLoader(),interfaces,handler);
+		return (Editor) myproxy;
 	}
 
 	/**
@@ -634,14 +780,17 @@ public class RODAClient {
 			}
 
 			((IngestMonitorSoapBindingStub) this.serviceIngestMonitor)
-					.setUsername(this.username);
+					.setUsername(this.getUsername());
 			((IngestMonitorSoapBindingStub) this.serviceIngestMonitor)
-					.setPassword(this.password);
+					.setPassword("");
 			((IngestMonitorSoapBindingStub) this.serviceIngestMonitor)
 					.setTimeout(0);
 		}
-
-		return this.serviceIngestMonitor;
+		
+		InvocationHandler handler = new IngestMonitorProxy(this.serviceIngestMonitor, getProxyGrantingTicket());
+        Class[] interfaces = this.serviceIngestMonitor.getClass().getInterfaces();
+        Object myproxy = Proxy.newProxyInstance( this.getClass().getClassLoader(),interfaces,handler);
+		return (IngestMonitor) myproxy;
 	}
 
 	/**
@@ -672,12 +821,15 @@ public class RODAClient {
 			}
 
 			((AcceptSIPSoapBindingStub) this.serviceAcceptSIP)
-					.setUsername(this.username);
+					.setUsername(this.getUsername());
 			((AcceptSIPSoapBindingStub) this.serviceAcceptSIP)
-					.setPassword(this.password);
+					.setPassword("");
 			((AcceptSIPSoapBindingStub) this.serviceAcceptSIP).setTimeout(0);
 		}
-		return serviceAcceptSIP;
+		InvocationHandler handler = new AcceptSIPProxy(serviceAcceptSIP, getProxyGrantingTicket());
+        Class[] interfaces = this.serviceAcceptSIP.getClass().getInterfaces();
+        Object myproxy = Proxy.newProxyInstance( this.getClass().getClassLoader(),interfaces,handler);
+		return (AcceptSIP) myproxy;
 	}
 
 	/**
@@ -706,12 +858,15 @@ public class RODAClient {
 			}
 
 			((IngestSoapBindingStub) this.serviceIngest)
-					.setUsername(this.username);
+					.setUsername(this.getUsername());
 			((IngestSoapBindingStub) this.serviceIngest)
-					.setPassword(this.password);
+					.setPassword("");
 			((IngestSoapBindingStub) this.serviceIngest).setTimeout(0);
 		}
-		return serviceIngest;
+		InvocationHandler handler = new IngestProxy(serviceIngest, getProxyGrantingTicket());
+        Class[] interfaces = this.serviceIngest.getClass().getInterfaces();
+        Object myproxy = Proxy.newProxyInstance( this.getClass().getClassLoader(),interfaces,handler);
+		return (Ingest) myproxy;
 	}
 
 	/**
@@ -741,12 +896,15 @@ public class RODAClient {
 			}
 
 			((SchedulerSoapBindingStub) this.serviceScheduler)
-					.setUsername(this.username);
+					.setUsername(this.getUsername());
 			((SchedulerSoapBindingStub) this.serviceScheduler)
-					.setPassword(this.password);
+					.setPassword("");
 			((SchedulerSoapBindingStub) this.serviceScheduler).setTimeout(0);
 		}
-		return serviceScheduler;
+		InvocationHandler handler = new SchedulerProxy(serviceScheduler, getProxyGrantingTicket());
+        Class[] interfaces = this.serviceScheduler.getClass().getInterfaces();
+        Object myproxy = Proxy.newProxyInstance( this.getClass().getClassLoader(),interfaces,handler);
+		return (Scheduler) myproxy;
 	}
 
 	/**
@@ -776,12 +934,15 @@ public class RODAClient {
 			}
 
 			((PluginsSoapBindingStub) this.servicePlugins)
-					.setUsername(this.username);
+					.setUsername(this.getUsername());
 			((PluginsSoapBindingStub) this.servicePlugins)
-					.setPassword(this.password);
+					.setPassword("");
 			((PluginsSoapBindingStub) this.servicePlugins).setTimeout(0);
 		}
-		return servicePlugins;
+		InvocationHandler handler = new PluginsProxy(servicePlugins, getProxyGrantingTicket());
+        Class[] interfaces = this.servicePlugins.getClass().getInterfaces();
+        Object myproxy = Proxy.newProxyInstance( this.getClass().getClassLoader(),interfaces,handler);
+		return (Plugins) myproxy;
 	}
 
 	/**
@@ -811,12 +972,15 @@ public class RODAClient {
 			}
 
 			((ReportsSoapBindingStub) this.serviceReports)
-					.setUsername(this.username);
+					.setUsername(this.getUsername());
 			((ReportsSoapBindingStub) this.serviceReports)
-					.setPassword(this.password);
+					.setPassword("");
 			((ReportsSoapBindingStub) this.serviceReports).setTimeout(0);
 		}
-		return serviceReports;
+		InvocationHandler handler = new ReportsProxy(serviceReports, getProxyGrantingTicket());
+        Class[] interfaces = this.serviceReports.getClass().getInterfaces();
+        Object myproxy = Proxy.newProxyInstance( this.getClass().getClassLoader(),interfaces,handler);
+		return (Reports) myproxy;
 	}
 
 	/**
@@ -846,12 +1010,15 @@ public class RODAClient {
 			}
 
 			((StatisticsSoapBindingStub) this.serviceStatistics)
-					.setUsername(this.username);
+					.setUsername(this.getUsername());
 			((StatisticsSoapBindingStub) this.serviceStatistics)
-					.setPassword(this.password);
+					.setPassword("");
 			((StatisticsSoapBindingStub) this.serviceStatistics).setTimeout(0);
 		}
-		return serviceStatistics;
+		InvocationHandler handler = new StatisticsProxy(serviceStatistics, getProxyGrantingTicket());
+        Class[] interfaces = this.serviceStatistics.getClass().getInterfaces();
+        Object myproxy = Proxy.newProxyInstance( this.getClass().getClassLoader(),interfaces,handler);
+		return (Statistics) myproxy;
 	}
 
 	/**
@@ -884,14 +1051,17 @@ public class RODAClient {
 			}
 
 			((StatisticsMonitorSoapBindingStub) this.serviceStatisticsMonitor)
-					.setUsername(this.username);
+					.setUsername(this.getUsername());
 			((StatisticsMonitorSoapBindingStub) this.serviceStatisticsMonitor)
-					.setPassword(this.password);
+					.setPassword("");
 			((StatisticsMonitorSoapBindingStub) this.serviceStatisticsMonitor)
 					.setTimeout(0);
 		}
 
-		return serviceStatisticsMonitor;
+        InvocationHandler handler = new StatisticsMonitorProxy(serviceStatisticsMonitor, getProxyGrantingTicket());
+        Class[] interfaces = serviceStatisticsMonitor.getClass().getInterfaces();
+        Object myproxy = Proxy.newProxyInstance( this.getClass().getClassLoader(),interfaces,handler);
+		return (StatisticsMonitor) myproxy;
 	}
 
 	/**
@@ -901,23 +1071,33 @@ public class RODAClient {
 	 * @throws RemoteException
 	 */
 	public User getAuthenticatedUser() throws LoginException, RemoteException {
-		return this.serviceLogin.getAuthenticatedUser(this.username,
-				this.password);
+		try{
+			if(this.cup!=null){
+				User principal = this.serviceLogin.getAuthenticatedUserCAS(this.casUtility.generateProxyTicket(getProxyGrantingTicket()));
+				return principal;
+			}else{
+				String[] guestCredentials = this.serviceLogin.getGuestCredentials();
+				User principal = this.serviceLogin.getAuthenticatedUserCAS(this.casUtility.generateProxyTicket(getProxyGrantingTicket()));
+				return principal;
+			}
+		}catch(LoginException e){
+			throw(e);
+		}catch(RemoteException e){
+			throw(e);
+		}
 	}
 
 	/**
 	 * @return the username
 	 */
 	public String getUsername() {
-		return username;
+		if(cup!=null){
+			return cup.getName();
+		}else{
+			return guestCredentials[0];
+		}
 	}
 
-	/**
-	 * @return the password
-	 */
-	public String getPassword() {
-		return password;
-	}
 
 	/**
 	 * Returns <code>true</code> if current user is the guest user and
@@ -927,7 +1107,7 @@ public class RODAClient {
 	 *         <code>false</code> otherwise.
 	 */
 	public boolean isGuestLogin() {
-		return this.username.equals(this.guestUsername);
+		return this.getUsername().equals(this.guestCredentials[0]);
 	}
 
 	/**
@@ -955,13 +1135,513 @@ public class RODAClient {
 	public Downloader getDownloader() throws LoginException,
 			DownloaderException {
 		if (downloader == null) {
-			downloader = new Downloader(rodaCoreURL, username, password);
+			downloader = new Downloader(rodaCoreURL, getCasUserPrincipal(),this.casUtility);
 		}
 		return downloader;
+	}
+
+	private CASUserPrincipal getCasUserPrincipal() {
+		try{
+			if(this.cup!=null){
+				return cup;
+			}else{
+				return casUtility.getCASUserPrincipal(guestCredentials[0],guestCredentials[1]);
+			}
+		}catch(AuthenticationException ae){
+			return null;
+		}
 	}
 
 	private String getServiceAddress(String serviceName) {
 		return this.rodaCoreURL + "/services/" + serviceName;
 	}
 
+	
+	
+	
+	
+	
+	
+
+	class UserManagementProxy implements InvocationHandler {
+		private UserManagement wrapped;
+		private String proxyGrantingTicket;
+		public UserManagementProxy(UserManagement r,String proxyGrantingTicket) {
+	        this.wrapped = r;
+	        this.proxyGrantingTicket = proxyGrantingTicket;
+	    }
+	    public Object invoke(Object proxy, Method method, Object[] args)
+	            throws Throwable {
+	    	
+	    	if(this.proxyGrantingTicket!=null && !this.proxyGrantingTicket.equalsIgnoreCase("")){
+	    		String ticket = casUtility.generateProxyTicket(this.proxyGrantingTicket);
+	    		((UserManagementSoapBindingStub) this.wrapped).setPassword(ticket);
+	    	}
+	    	logger.debug("Proxy: "+((UserManagementSoapBindingStub) this.wrapped).getUsername()+"/"+((UserManagementSoapBindingStub) this.wrapped).getPassword());
+//	    	SOAPHeaderElement casAuthentication = new SOAPHeaderElement("http://www.keep.pt/","ticket");
+//	    	casAuthentication.setValue(casUtility.generateProxyTicket(this.proxyGrantingTicket));
+//			((UserManagementSoapBindingStub) this.wrapped).setHeader(casAuthentication);
+	    	try {
+	            return method.invoke(wrapped, args);
+	        } catch (InvocationTargetException e) {
+	            throw e.getCause();
+	        }
+	    }
+	}
+	
+	class UserRegistrationProxy implements InvocationHandler {
+		private UserRegistration wrapped;
+		private String proxyGrantingTicket;
+		public UserRegistrationProxy(UserRegistration r,String proxyGrantingTicket) {
+	        this.wrapped = r;
+	        this.proxyGrantingTicket = proxyGrantingTicket;
+	    }
+	    public Object invoke(Object proxy, Method method, Object[] args)
+	            throws Throwable {
+	    	if(this.proxyGrantingTicket!=null && !this.proxyGrantingTicket.equalsIgnoreCase("")){
+	    		String ticket = casUtility.generateProxyTicket(this.proxyGrantingTicket);
+	    		((UserRegistrationSoapBindingStub) this.wrapped).setPassword(ticket);
+	    	}
+	    	logger.debug("Proxy: "+((UserRegistrationSoapBindingStub) this.wrapped).getUsername()+"/"+((UserRegistrationSoapBindingStub) this.wrapped).getPassword());
+//	    	SOAPHeaderElement casAuthentication = new SOAPHeaderElement("http://www.keep.pt/","ticket");
+//	    	casAuthentication.setValue(casUtility.generateProxyTicket(this.proxyGrantingTicket));
+//			((UserRegistrationSoapBindingStub) this.wrapped).setHeader(casAuthentication);
+	    	try {
+	            return method.invoke(wrapped, args);
+	        } catch (InvocationTargetException e) {
+	            throw e.getCause();
+	        }
+	    }
+	}
+	
+	class UserBrowserProxy implements InvocationHandler {
+		private UserBrowser wrapped;
+		private String proxyGrantingTicket;
+		public UserBrowserProxy(UserBrowser r,String proxyGrantingTicket) {
+	        this.wrapped = r;
+	        this.proxyGrantingTicket = proxyGrantingTicket;
+	    }
+	    public Object invoke(Object proxy, Method method, Object[] args)
+	            throws Throwable {
+	    	if(this.proxyGrantingTicket!=null && !this.proxyGrantingTicket.equalsIgnoreCase("")){
+	    		String ticket = casUtility.generateProxyTicket(this.proxyGrantingTicket);
+	    		((UserBrowserSoapBindingStub) this.wrapped).setPassword(ticket);
+	    	}
+	          logger.debug("Proxy: "+((UserBrowserSoapBindingStub) this.wrapped).getUsername()+"/"+((UserBrowserSoapBindingStub) this.wrapped).getPassword());
+
+//	    	SOAPHeaderElement casAuthentication = new SOAPHeaderElement("http://www.keep.pt/","ticket");
+//	    	casAuthentication.setValue(casUtility.generateProxyTicket(this.proxyGrantingTicket));
+//			((UserBrowserSoapBindingStub) this.wrapped).setHeader(casAuthentication);
+	          try {
+		            return method.invoke(wrapped, args);
+		        } catch (InvocationTargetException e) {
+		            throw e.getCause();
+		        }
+	    }
+	}
+	
+	class UserEditorProxy implements InvocationHandler {
+		private UserEditor wrapped;
+		private String proxyGrantingTicket;
+		public UserEditorProxy(UserEditor r,String proxyGrantingTicket) {
+	        this.wrapped = r;
+	        this.proxyGrantingTicket = proxyGrantingTicket;
+	    }
+	    public Object invoke(Object proxy, Method method, Object[] args)
+	            throws Throwable {
+	    	if(this.proxyGrantingTicket!=null && !this.proxyGrantingTicket.equalsIgnoreCase("")){
+	    		String ticket = casUtility.generateProxyTicket(this.proxyGrantingTicket);
+	    		((UserEditorSoapBindingStub) this.wrapped).setPassword(ticket);
+	    	}
+	        logger.debug("Proxy: "+((UserEditorSoapBindingStub) this.wrapped).getUsername()+"/"+((UserEditorSoapBindingStub) this.wrapped).getPassword());
+
+//	    	SOAPHeaderElement casAuthentication = new SOAPHeaderElement("http://www.keep.pt/","ticket");
+//	    	casAuthentication.setValue(casUtility.generateProxyTicket(this.proxyGrantingTicket));
+//			((UserEditorSoapBindingStub) this.wrapped).setHeader(casAuthentication);
+	        try {
+	            return method.invoke(wrapped, args);
+	        } catch (InvocationTargetException e) {
+	            throw e.getCause();
+	        }
+	    }
+	}
+	
+	class ConfigurationManagerProxy implements InvocationHandler {
+		private ConfigurationManager wrapped;
+		private String proxyGrantingTicket;
+		public ConfigurationManagerProxy(ConfigurationManager r,String proxyGrantingTicket) {
+	        this.wrapped = r;
+	        this.proxyGrantingTicket = proxyGrantingTicket;
+	    }
+	    public Object invoke(Object proxy, Method method, Object[] args)
+	            throws Throwable {
+	    	if(this.proxyGrantingTicket!=null && !this.proxyGrantingTicket.equalsIgnoreCase("")){
+	    		String ticket = casUtility.generateProxyTicket(this.proxyGrantingTicket);
+	    		((ConfigurationManagerSoapBindingStub) this.wrapped).setPassword(ticket);
+	    	}
+//	    	SOAPHeaderElement casAuthentication = new SOAPHeaderElement("http://www.keep.pt/","ticket");
+//	    	casAuthentication.setValue(casUtility.generateProxyTicket(this.proxyGrantingTicket));
+//			((BrowserSoapBindingStub) this.wrapped).setHeader(casAuthentication);
+	    	try {
+	            return method.invoke(wrapped, args);
+	        } catch (InvocationTargetException e) {
+	            throw e.getCause();
+	        }
+	    }
+	}
+	class BrowserProxy implements InvocationHandler {
+		private Browser wrapped;
+		private String proxyGrantingTicket;
+		public BrowserProxy(Browser r,String proxyGrantingTicket) {
+	        this.wrapped = r;
+	        this.proxyGrantingTicket = proxyGrantingTicket;
+	    }
+	    public Object invoke(Object proxy, Method method, Object[] args)
+	            throws Throwable {
+	    	if(this.proxyGrantingTicket!=null && !this.proxyGrantingTicket.equalsIgnoreCase("")){
+	    		String ticket = casUtility.generateProxyTicket(this.proxyGrantingTicket);
+	    		((BrowserSoapBindingStub) this.wrapped).setPassword(ticket);
+	    	}
+	        logger.debug("Proxy: "+((BrowserSoapBindingStub) this.wrapped).getUsername()+"/"+((BrowserSoapBindingStub) this.wrapped).getPassword());
+
+//	    	SOAPHeaderElement casAuthentication = new SOAPHeaderElement("http://www.keep.pt/","ticket");
+//	    	casAuthentication.setValue(casUtility.generateProxyTicket(this.proxyGrantingTicket));
+//			((BrowserSoapBindingStub) this.wrapped).setHeader(casAuthentication);
+	        
+	        try {
+	            return method.invoke(wrapped, args);
+	        } catch (InvocationTargetException e) {
+	            throw e.getCause();
+	        }
+	    }
+	}
+	class LoggerProxy implements InvocationHandler {
+		private Logger wrapped;
+		private String proxyGrantingTicket;
+		public LoggerProxy(Logger r,String proxyGrantingTicket) {
+	        this.wrapped = r;
+	        this.proxyGrantingTicket = proxyGrantingTicket;
+	    }
+	    public Object invoke(Object proxy, Method method, Object[] args)
+	            throws Throwable {
+	    	if(this.proxyGrantingTicket!=null && !this.proxyGrantingTicket.equalsIgnoreCase("")){
+	    		String ticket = casUtility.generateProxyTicket(this.proxyGrantingTicket);
+	    		((LoggerSoapBindingStub) this.wrapped).setPassword(ticket);
+	    	}
+	          logger.debug("Proxy: "+((LoggerSoapBindingStub) this.wrapped).getUsername()+"/"+((LoggerSoapBindingStub) this.wrapped).getPassword());
+
+//	    	SOAPHeaderElement casAuthentication = new SOAPHeaderElement("http://www.keep.pt/","ticket");
+//	    	casAuthentication.setValue(casUtility.generateProxyTicket(this.proxyGrantingTicket));
+//			((LoggerSoapBindingStub) this.wrapped).setHeader(casAuthentication);
+	          try {
+		            return method.invoke(wrapped, args);
+		        } catch (InvocationTargetException e) {
+		            throw e.getCause();
+		        }
+	    }
+	}
+	class LogMonitorProxy implements InvocationHandler {
+		private LogMonitor wrapped;
+		private String proxyGrantingTicket;
+		public LogMonitorProxy(LogMonitor r,String proxyGrantingTicket) {
+	        this.wrapped = r;
+	        this.proxyGrantingTicket = proxyGrantingTicket;
+	    }
+	    public Object invoke(Object proxy, Method method, Object[] args)
+	            throws Throwable {
+	    	if(this.proxyGrantingTicket!=null && !this.proxyGrantingTicket.equalsIgnoreCase("")){
+	    		String ticket = casUtility.generateProxyTicket(this.proxyGrantingTicket);
+	    		((LogMonitorSoapBindingStub) this.wrapped).setPassword(ticket);
+	    	}
+	            logger.debug("Proxy: "+((LogMonitorSoapBindingStub) this.wrapped).getUsername()+"/"+((LogMonitorSoapBindingStub) this.wrapped).getPassword());
+
+//	    	SOAPHeaderElement casAuthentication = new SOAPHeaderElement("http://www.keep.pt/","ticket");
+//	    	casAuthentication.setValue(casUtility.generateProxyTicket(this.proxyGrantingTicket));
+//			((LogMonitorSoapBindingStub) this.wrapped).setHeader(casAuthentication);
+	            try {
+		            return method.invoke(wrapped, args);
+		        } catch (InvocationTargetException e) {
+		            throw e.getCause();
+		        }
+	    }
+	}
+	class EditorProxy implements InvocationHandler {
+		private Editor wrapped;
+		private String proxyGrantingTicket;
+		public EditorProxy(Editor r,String proxyGrantingTicket) {
+	        this.wrapped = r;
+	        this.proxyGrantingTicket = proxyGrantingTicket;
+	    }
+	    public Object invoke(Object proxy, Method method, Object[] args)
+	            throws Throwable {
+	    	if(this.proxyGrantingTicket!=null && !this.proxyGrantingTicket.equalsIgnoreCase("")){
+	    		String ticket = casUtility.generateProxyTicket(this.proxyGrantingTicket);
+	    		((EditorSoapBindingStub) this.wrapped).setPassword(ticket);
+	    	}
+	              logger.debug("Proxy: "+((EditorSoapBindingStub) this.wrapped).getUsername()+"/"+((EditorSoapBindingStub) this.wrapped).getPassword());
+
+//	    	SOAPHeaderElement casAuthentication = new SOAPHeaderElement("http://www.keep.pt/","ticket");
+//	    	casAuthentication.setValue(casUtility.generateProxyTicket(this.proxyGrantingTicket));
+//			((EditorSoapBindingStub) this.wrapped).setHeader(casAuthentication);
+	              try {
+	  	            return method.invoke(wrapped, args);
+	  	        } catch (InvocationTargetException e) {
+	  	            throw e.getCause();
+	  	        }
+	    }
+	}
+	class IngestMonitorProxy implements InvocationHandler {
+		private IngestMonitor wrapped;
+		private String proxyGrantingTicket;
+		public IngestMonitorProxy(IngestMonitor r,String proxyGrantingTicket) {
+	        this.wrapped = r;
+	        this.proxyGrantingTicket = proxyGrantingTicket;
+	    }
+	    public Object invoke(Object proxy, Method method, Object[] args)
+	            throws Throwable {
+	    	if(this.proxyGrantingTicket!=null && !this.proxyGrantingTicket.equalsIgnoreCase("")){
+	    		String ticket = casUtility.generateProxyTicket(this.proxyGrantingTicket);
+	    		((IngestMonitorSoapBindingStub) this.wrapped).setPassword(ticket);
+	    	}
+                logger.debug("Proxy: "+((IngestMonitorSoapBindingStub) this.wrapped).getUsername()+"/"+((IngestMonitorSoapBindingStub) this.wrapped).getPassword());
+
+//	    	SOAPHeaderElement casAuthentication = new SOAPHeaderElement("http://www.keep.pt/","ticket");
+//	    	casAuthentication.setValue(casUtility.generateProxyTicket(this.proxyGrantingTicket));
+//			((IngestMonitorSoapBindingStub) this.wrapped).setHeader(casAuthentication);
+                try {
+    	            return method.invoke(wrapped, args);
+    	        } catch (InvocationTargetException e) {
+    	            throw e.getCause();
+    	        }
+	    }
+	}
+	class AcceptSIPProxy implements InvocationHandler {
+		private AcceptSIP wrapped;
+		private String proxyGrantingTicket;
+		public AcceptSIPProxy(AcceptSIP r,String proxyGrantingTicket) {
+	        this.wrapped = r;
+	        this.proxyGrantingTicket = proxyGrantingTicket;
+	    }
+	    public Object invoke(Object proxy, Method method, Object[] args)
+	            throws Throwable {
+	    	if(this.proxyGrantingTicket!=null && !this.proxyGrantingTicket.equalsIgnoreCase("")){
+	    		String ticket = casUtility.generateProxyTicket(this.proxyGrantingTicket);
+	    		((AcceptSIPSoapBindingStub) this.wrapped).setPassword(ticket);
+	    	}
+                logger.debug("Proxy: "+((AcceptSIPSoapBindingStub) this.wrapped).getUsername()+"/"+((AcceptSIPSoapBindingStub) this.wrapped).getPassword());
+
+//	    	SOAPHeaderElement casAuthentication = new SOAPHeaderElement("http://www.keep.pt/","ticket");
+//	    	casAuthentication.setValue(casUtility.generateProxyTicket(this.proxyGrantingTicket));
+//			((AcceptSIPSoapBindingStub) this.wrapped).setHeader(casAuthentication);
+                try {
+    	            return method.invoke(wrapped, args);
+    	        } catch (InvocationTargetException e) {
+    	            throw e.getCause();
+    	        }
+	    }
+	}
+	class IngestProxy implements InvocationHandler {
+		private Ingest wrapped;
+		private String proxyGrantingTicket;
+		public IngestProxy(Ingest r,String proxyGrantingTicket) {
+	        this.wrapped = r;
+	        this.proxyGrantingTicket = proxyGrantingTicket;
+	    }
+	    public Object invoke(Object proxy, Method method, Object[] args)
+	            throws Throwable {
+	    	if(this.proxyGrantingTicket!=null && !this.proxyGrantingTicket.equalsIgnoreCase("")){
+	    		String ticket = casUtility.generateProxyTicket(this.proxyGrantingTicket);
+	    		((IngestSoapBindingStub) this.wrapped).setPassword(ticket);
+	    	}
+                logger.debug("Proxy: "+((IngestSoapBindingStub) this.wrapped).getUsername()+"/"+((IngestSoapBindingStub) this.wrapped).getPassword());
+
+//	    	SOAPHeaderElement casAuthentication = new SOAPHeaderElement("http://www.keep.pt/","ticket");
+//	    	casAuthentication.setValue(casUtility.generateProxyTicket(this.proxyGrantingTicket));
+//			((IngestSoapBindingStub) this.wrapped).setHeader(casAuthentication);
+                try {
+    	            return method.invoke(wrapped, args);
+    	        } catch (InvocationTargetException e) {
+    	            throw e.getCause();
+    	        }
+	    }
+	}
+	class SchedulerProxy implements InvocationHandler {
+		private Scheduler wrapped;
+		private String proxyGrantingTicket;
+		public SchedulerProxy(Scheduler r,String proxyGrantingTicket) {
+	        this.wrapped = r;
+	        this.proxyGrantingTicket = proxyGrantingTicket;
+	    }
+	    public Object invoke(Object proxy, Method method, Object[] args)
+	            throws Throwable {
+	    	if(this.proxyGrantingTicket!=null && !this.proxyGrantingTicket.equalsIgnoreCase("")){
+	    		String ticket = casUtility.generateProxyTicket(this.proxyGrantingTicket);
+	    		((SchedulerSoapBindingStub) this.wrapped).setPassword(ticket);
+	    	}
+                logger.debug("Proxy: "+((SchedulerSoapBindingStub) this.wrapped).getUsername()+"/"+((SchedulerSoapBindingStub) this.wrapped).getPassword());
+
+//	    	SOAPHeaderElement casAuthentication = new SOAPHeaderElement("http://www.keep.pt/","ticket");
+//	    	casAuthentication.setValue(casUtility.generateProxyTicket(this.proxyGrantingTicket));
+//			((SchedulerSoapBindingStub) this.wrapped).setHeader(casAuthentication);
+                try {
+    	            return method.invoke(wrapped, args);
+    	        } catch (InvocationTargetException e) {
+    	            throw e.getCause();
+    	        }
+	    }
+	}
+	
+	class PluginsProxy implements InvocationHandler {
+		private Plugins wrapped;
+		private String proxyGrantingTicket;
+		public PluginsProxy(Plugins r,String proxyGrantingTicket) {
+	        this.wrapped = r;
+	        this.proxyGrantingTicket = proxyGrantingTicket;
+	    }
+	    public Object invoke(Object proxy, Method method, Object[] args)
+	            throws Throwable {
+	    	if(this.proxyGrantingTicket!=null && !this.proxyGrantingTicket.equalsIgnoreCase("")){
+	    		String ticket = casUtility.generateProxyTicket(this.proxyGrantingTicket);
+	    		((PluginsSoapBindingStub) this.wrapped).setPassword(ticket);
+	    	}
+                logger.debug("Proxy: "+((PluginsSoapBindingStub) this.wrapped).getUsername()+"/"+((PluginsSoapBindingStub) this.wrapped).getPassword());
+
+//	    	SOAPHeaderElement casAuthentication = new SOAPHeaderElement("http://www.keep.pt/","ticket");
+//	    	casAuthentication.setValue(casUtility.generateProxyTicket(this.proxyGrantingTicket));
+//			((PluginsSoapBindingStub) this.wrapped).setHeader(casAuthentication);
+                try {
+    	            return method.invoke(wrapped, args);
+    	        } catch (InvocationTargetException e) {
+    	            throw e.getCause();
+    	        }
+	    }
+	}
+	
+	class ReportsProxy implements InvocationHandler {
+		private Reports wrapped;
+		private String proxyGrantingTicket;
+		public ReportsProxy(Reports r,String proxyGrantingTicket) {
+	        this.wrapped = r;
+	        this.proxyGrantingTicket = proxyGrantingTicket;
+	    }
+	    public Object invoke(Object proxy, Method method, Object[] args)
+	            throws Throwable {
+	    	if(this.proxyGrantingTicket!=null && !this.proxyGrantingTicket.equalsIgnoreCase("")){
+	    		String ticket = casUtility.generateProxyTicket(this.proxyGrantingTicket);
+	    		((ReportsSoapBindingStub) this.wrapped).setPassword(ticket);
+	    	}
+                logger.debug("Proxy: "+((ReportsSoapBindingStub) this.wrapped).getUsername()+"/"+((ReportsSoapBindingStub) this.wrapped).getPassword());
+
+//	    	SOAPHeaderElement casAuthentication = new SOAPHeaderElement("http://www.keep.pt/","ticket");
+//	    	casAuthentication.setValue(casUtility.generateProxyTicket(this.proxyGrantingTicket));
+//			((ReportsSoapBindingStub) this.wrapped).setHeader(casAuthentication);
+                try {
+    	            return method.invoke(wrapped, args);
+    	        } catch (InvocationTargetException e) {
+    	            throw e.getCause();
+    	        }
+	    }
+	}
+	class StatisticsProxy implements InvocationHandler {
+		private Statistics wrapped;
+		private String proxyGrantingTicket;
+		public StatisticsProxy(Statistics r,String proxyGrantingTicket) {
+	        this.wrapped = r;
+	        this.proxyGrantingTicket = proxyGrantingTicket;
+	    }
+	    public Object invoke(Object proxy, Method method, Object[] args)
+	            throws Throwable {
+	    	if(this.proxyGrantingTicket!=null && !this.proxyGrantingTicket.equalsIgnoreCase("")){
+	    		String ticket = casUtility.generateProxyTicket(this.proxyGrantingTicket);
+	    		((StatisticsSoapBindingStub) this.wrapped).setPassword(ticket);
+	    	}
+                logger.debug("Proxy: "+((StatisticsSoapBindingStub) this.wrapped).getUsername()+"/"+((StatisticsSoapBindingStub) this.wrapped).getPassword());
+
+//	    	SOAPHeaderElement casAuthentication = new SOAPHeaderElement("http://www.keep.pt/","ticket");
+//	    	casAuthentication.setValue(casUtility.generateProxyTicket(this.proxyGrantingTicket));
+//			((StatisticsSoapBindingStub) this.wrapped).setHeader(casAuthentication);
+                try {
+    	            return method.invoke(wrapped, args);
+    	        } catch (InvocationTargetException e) {
+    	            throw e.getCause();
+    	        }
+	    }
+	}
+	class SearchProxy implements InvocationHandler {
+		private Search wrapped;
+		private String proxyGrantingTicket;
+		public SearchProxy(Search r,String proxyGrantingTicket) {
+	        this.wrapped = r;
+	        this.proxyGrantingTicket = proxyGrantingTicket;
+	    }
+	    public Object invoke(Object proxy, Method method, Object[] args)
+	            throws Throwable {
+	    	if(this.proxyGrantingTicket!=null && !this.proxyGrantingTicket.equalsIgnoreCase("")){
+	    		String ticket = casUtility.generateProxyTicket(this.proxyGrantingTicket);
+	    		((SearchSoapBindingStub) this.wrapped).setPassword(ticket);
+	    	}
+                logger.debug("Proxy: "+((SearchSoapBindingStub) this.wrapped).getUsername()+"/"+((SearchSoapBindingStub) this.wrapped).getPassword());
+
+//	    	SOAPHeaderElement casAuthentication = new SOAPHeaderElement("http://www.keep.pt/","ticket");
+//	    	casAuthentication.setValue(casUtility.generateProxyTicket(this.proxyGrantingTicket));
+//			((SearchSoapBindingStub) this.wrapped).setHeader(casAuthentication);
+                try {
+    	            return method.invoke(wrapped, args);
+    	        } catch (InvocationTargetException e) {
+    	            throw e.getCause();
+    	        }
+	    }
+	}
+	
+	
+	class StatisticsMonitorProxy implements InvocationHandler {
+	    private StatisticsMonitor wrapped;
+	    private String proxyGrantingTicket;
+	    public StatisticsMonitorProxy(StatisticsMonitor r,String proxyGrantingTicket) {
+	        this.wrapped = r;
+	        this.proxyGrantingTicket = proxyGrantingTicket;
+	    }
+	    public Object invoke(Object proxy, Method method, Object[] args)
+	            throws Throwable {
+	    	if(this.proxyGrantingTicket!=null && !this.proxyGrantingTicket.equalsIgnoreCase("")){
+	    		String ticket = casUtility.generateProxyTicket(this.proxyGrantingTicket);
+	    		((StatisticsMonitorSoapBindingStub) this.wrapped).setPassword(ticket);
+	    	}
+                logger.debug("Proxy: "+((StatisticsMonitorSoapBindingStub) this.wrapped).getUsername()+"/"+((StatisticsMonitorSoapBindingStub) this.wrapped).getPassword());
+
+//	    	SOAPHeaderElement casAuthentication = new SOAPHeaderElement("http://www.keep.pt/","ticket");
+//	    	casAuthentication.setValue(casUtility.generateProxyTicket(this.proxyGrantingTicket));
+//			((StatisticsMonitorSoapBindingStub) this.wrapped).setHeader(casAuthentication);
+                try {
+    	            return method.invoke(wrapped, args);
+    	        } catch (InvocationTargetException e) {
+    	            throw e.getCause();
+    	        }
+	    }
+	}
+	
+	public String getProxyGrantingTicket(){
+		try{
+			if(this.cup!=null){
+				return this.cup.getProxyGrantingTicket();
+			}else{
+				return this.casUtility.getProxyGrantingTicket(guestCredentials[0], guestCredentials[1]);
+			}
+		}catch(AuthenticationException ae){
+			return null;
+		}
+	}
+	
+	public URL getIngestSubmitUrl() throws IOException {
+		return new URL(this.rodaCoreURL + "/SIPUpload");
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }

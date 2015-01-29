@@ -65,7 +65,7 @@ public class JodConverter {
     }
 
     /**
-     * Make a convertion
+     * Make a conversion
      *
      * @param inputFile
      * @param outputFile
@@ -76,7 +76,7 @@ public class JodConverter {
     }
 
     /**
-     * Make a convertion
+     * Make a conversion
      *
      * @param inputFile
      * @param outputFile

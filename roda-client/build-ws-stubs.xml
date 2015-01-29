@@ -40,6 +40,9 @@
 
 	<target name="create-stubs">
 		<antcall target="create-stub">
+			<param name="service" value="ConfigurationManager" />
+		</antcall>
+		<antcall target="create-stub">
 			<param name="service" value="Login" />
 		</antcall>
 		<antcall target="create-stub">

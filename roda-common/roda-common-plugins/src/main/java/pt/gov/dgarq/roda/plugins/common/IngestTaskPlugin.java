@@ -84,7 +84,7 @@ public abstract class IngestTaskPlugin extends IngestTask implements Plugin {
 							"Error getting list of available SIPs - "
 									+ e.getMessage()));
 
-			report.addAttribute(new Attribute("Finnish time", DateParser
+			report.addAttribute(new Attribute("Finish time", DateParser
 					.getIsoDate(new Date())));
 
 			throw new PluginException("Error getting list of available SIPs - "
@@ -134,7 +134,7 @@ public abstract class IngestTaskPlugin extends IngestTask implements Plugin {
 								+ e.getMessage()));
 			}
 
-			reportItem.addAttribute(new Attribute("Finnish time", DateParser
+			reportItem.addAttribute(new Attribute("Finish time", DateParser
 					.getIsoDate(new Date())));
 
 			report.addItem(reportItem);
@@ -142,7 +142,7 @@ public abstract class IngestTaskPlugin extends IngestTask implements Plugin {
 
 		report.addAttribute(new Attribute("Summary", availableSIPs.size()
 				+ " SIPs treated"));
-		report.addAttribute(new Attribute("Finnish time", DateParser
+		report.addAttribute(new Attribute("Finish time", DateParser
 				.getIsoDate(Calendar.getInstance().getTime())));
 
 		return report;

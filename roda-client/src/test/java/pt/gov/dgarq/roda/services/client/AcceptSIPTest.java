@@ -5,6 +5,7 @@ import java.net.URL;
 import pt.gov.dgarq.roda.core.RODAClient;
 import pt.gov.dgarq.roda.core.data.SIPState;
 import pt.gov.dgarq.roda.core.stubs.AcceptSIP;
+import pt.gov.dgarq.roda.servlet.cas.CASUtility;
 
 /**
  * @author Rui Castro
@@ -22,33 +23,38 @@ public class AcceptSIPTest {
 			String sipID = null;
 			boolean accept = false;
 
-			if (args.length == 3) {
+			if (args.length == 6) {
 
 				// http://localhost:8180/
 				String hostUrl = args[0];
+				String casURL = args[1];
+				String coreURL = args[2];
+				String serviceURL = args[3];
+				sipID = args[4];
+				accept = Boolean.parseBoolean(args[5]);
+				CASUtility casUtility = new CASUtility(new URL(casURL),new URL(coreURL),new URL(serviceURL));
 
-				sipID = args[1];
-				accept = Boolean.parseBoolean(args[2]);
+				rodaClient = new RODAClient(new URL(hostUrl),casUtility);
 
-				rodaClient = new RODAClient(new URL(hostUrl));
-
-			} else if (args.length >= 4) {
+			} else if (args.length >= 7) {
 
 				// http://localhost:8180/ user pass
 				String hostUrl = args[0];
 				String username = args[1];
 				String password = args[2];
-
-				sipID = args[3];
-				accept = Boolean.parseBoolean(args[4]);
-
+				String casURL = args[3];
+				String coreURL = args[4];
+				String serviceURL = args[5];
+				sipID = args[6];
+				accept = Boolean.parseBoolean(args[7]);
+				CASUtility casUtility = new CASUtility(new URL(casURL),new URL(coreURL),new URL(serviceURL));
 				rodaClient = new RODAClient(new URL(hostUrl), username,
-						password);
+						password,casUtility);
 
 			} else {
 				System.err
 						.println(IngestMonitorTest.class.getSimpleName()
-								+ " protocol://hostname:port/ [username password] SIP_ID true|false");
+								+ " protocol://hostname:port/ [username password] [casURL] [coreServicesURL] [ServiceURL] SIP_ID true|false");
 				System.exit(1);
 			}
 

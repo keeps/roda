@@ -286,7 +286,7 @@ public class DW2SimpleViewer extends ImageMagickConverter {
     }
 
     @Override
-    protected boolean representationNeedsConvertion(
+    protected boolean representationNeedsConversion(
             LocalRepresentationObject localRepresentation)
             throws CommandException, WrongRepresentationTypeException,
             WrongRepresentationSubtypeException {

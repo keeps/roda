@@ -14,6 +14,7 @@ import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.stubs.Scheduler;
+import pt.gov.dgarq.roda.servlet.cas.CASUtility;
 
 /**
  * @author Rui Castro
@@ -29,25 +30,31 @@ public class SchedulerTasksTest {
 
 		try {
 
-			if (args.length == 1) {
+			if (args.length == 4) {
 
 				// http://localhost:8180/
 				String hostUrl = args[0];
+				String casURL = args[1];
+				String coreURL = args[2];
+				String serviceURL = args[3];
+				CASUtility casUtility = new CASUtility(new URL(casURL), new URL(coreURL), new URL(serviceURL));
+				rodaClient = new RODAClient(new URL(hostUrl),casUtility);
 
-				rodaClient = new RODAClient(new URL(hostUrl));
-
-			} else if (args.length >= 3) {
+			} else if (args.length >= 6) {
 
 				// http://localhost:8180/ user pass
 				String hostUrl = args[0];
 				String username = args[1];
 				String password = args[2];
-
+				String casURL = args[3];
+				String coreURL = args[4];
+				String serviceURL = args[5];
+				CASUtility casUtility = new CASUtility(new URL(casURL), new URL(coreURL), new URL(serviceURL));
 				rodaClient = new RODAClient(new URL(hostUrl), username,
-						password);
+						password,casUtility);
 			} else {
 				System.err.println(SchedulerTasksTest.class.getSimpleName()
-						+ " protocol://hostname:port/ [username password]");
+						+ " protocol://hostname:port/ [username password] casURL coreURL serviceURL");
 				System.exit(1);
 			}
 

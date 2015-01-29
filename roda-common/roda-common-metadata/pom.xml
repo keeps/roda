@@ -9,6 +9,90 @@
 		<artifactId>roda-common</artifactId>
 		<version>1.2.0</version>
 	</parent>
+	<profiles>
+		<profile>
+			<id>create-mets-1_9_1-jar</id>
+			<build>
+				<plugins>
+					<plugin>
+						<!-- http://wiki.apache.org/xmlbeans/XmlBeansFaq#configPackageName -->
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>xmlbeans-maven-plugin</artifactId>
+						<configuration>
+							<outputJar>${project.build.directory}/mets-1.9.1.jar</outputJar>
+							<sourceSchemas>
+								<sourceSchema>mets-1.9.1.xsd</sourceSchema>
+								<sourceSchema>xlink.xsd</sourceSchema>
+							</sourceSchemas>
+							<javaSource>1.5</javaSource>
+						</configuration>
+						<executions>
+							<execution>
+								<phase>generate-sources</phase>
+								<goals>
+									<goal>xmlbeans</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>create-ead-c-2008-jar</id>
+			<build>
+				<plugins>
+					<plugin>
+						<!-- http://wiki.apache.org/xmlbeans/XmlBeansFaq#configPackageName -->
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>xmlbeans-maven-plugin</artifactId>
+						<configuration>
+							<outputJar>${project.build.directory}/ead-c-2008.jar</outputJar>
+							<sourceSchemas>
+								<sourceSchema>ead-c.2008.xsd</sourceSchema>
+							</sourceSchemas>
+							<javaSource>1.5</javaSource>
+						</configuration>
+						<executions>
+							<execution>
+								<phase>generate-sources</phase>
+								<goals>
+									<goal>xmlbeans</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>create-ead-c-2014-jar</id>
+			<build>
+				<plugins>
+					<plugin>
+						<!-- http://wiki.apache.org/xmlbeans/XmlBeansFaq#configPackageName -->
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>xmlbeans-maven-plugin</artifactId>
+						<configuration>
+							<outputJar>${project.build.directory}/ead-c-2014.jar</outputJar>
+							<sourceSchemas>
+								<sourceSchema>ead-c.2014.xsd</sourceSchema>
+							</sourceSchemas>
+							<javaSource>1.5</javaSource>
+						</configuration>
+						<executions>
+							<execution>
+								<phase>generate-sources</phase>
+								<goals>
+									<goal>xmlbeans</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 	<dependencies>
 		<dependency>
 			<groupId>pt.gov.dgarq.roda</groupId>
@@ -20,11 +104,11 @@
 		</dependency>
 		<dependency>
 			<groupId>pt.gov.dgarq.roda</groupId>
-			<artifactId>ead-c.2008</artifactId>
+			<artifactId>ead-c.2014</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>pt.gov.dgarq.roda</groupId>
-			<artifactId>mets-1.7</artifactId>
+			<artifactId>mets-1.9.1</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>pt.gov.dgarq.roda</groupId>
@@ -41,6 +125,10 @@
 		<dependency>
 			<groupId>commons-lang</groupId>
 			<artifactId>commons-lang</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-configuration</groupId>
+			<artifactId>commons-configuration</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>log4j</groupId>
@@ -61,6 +149,10 @@
 		<dependency>
 			<groupId>net.sf.saxon</groupId>
 			<artifactId>saxon-dom</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>pt.gov.dgarq.roda</groupId>
+			<artifactId>roda-common-format-utility</artifactId>
 		</dependency>
 	</dependencies>
 </project>

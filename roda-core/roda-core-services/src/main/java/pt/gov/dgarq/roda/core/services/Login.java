@@ -1,5 +1,7 @@
 package pt.gov.dgarq.roda.core.services;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Date;
 import java.util.List;
 
@@ -11,6 +13,8 @@ import pt.gov.dgarq.roda.core.common.LoginException;
 import pt.gov.dgarq.roda.core.common.RODAServiceException;
 import pt.gov.dgarq.roda.core.data.User;
 import pt.gov.dgarq.roda.servlet.LdapUtility;
+import pt.gov.dgarq.roda.servlet.cas.CASUserPrincipal;
+import pt.gov.dgarq.roda.servlet.cas.CASUtility;
 
 /**
  * This class implements the Login service.
@@ -31,7 +35,7 @@ public class Login extends RODAWebService {
 	 */
 	private String guestPassword = "guest";
 
-	private LdapUtility ldapUtility = null;
+	private CASUtility casUtility = null;
 
 	/**
 	 * Constructs a new Login service.
@@ -47,21 +51,41 @@ public class Login extends RODAWebService {
 		this.guestPassword = getConfiguration().getString("guestPassword",
 				this.guestPassword);
 
-		String ldapHost = getConfiguration().getString("ldapHost");
-		int ldapPort = getConfiguration().getInt("ldapPort");
-		String ldapPeopleDN = getConfiguration().getString("ldapPeopleDN");
-		String ldapGroupsDN = getConfiguration().getString("ldapGroupsDN");
-		String ldapRolesDN = getConfiguration().getString("ldapRolesDN");
-		List<String> ldapProtectedUsers = getConfiguration().getList(
-				"ldapProtectedUsers");
-		List<String> ldapProtectedGroups = getConfiguration().getList(
-				"ldapProtectedGroups");
+		
+		
+		String casURL = getConfiguration().getString("roda.cas.url");
+		String coreURL = getConfiguration().getString("roda.core.url");
+		
+		
+		try {
+			this.casUtility = new CASUtility(new URL(casURL),new URL(coreURL));
+		}catch(MalformedURLException mfue){
+			logger.error("Error initializing CASUtility:"+mfue.getMessage(),mfue);
+		}
 
-		this.ldapUtility = new LdapUtility(ldapHost, ldapPort, ldapPeopleDN,
-				ldapGroupsDN, ldapRolesDN, ldapProtectedUsers,
-				ldapProtectedGroups);
 
 		logger.info(getClass().getSimpleName() + " initialised OK");
+	}
+	
+	public User getAuthenticatedUserCAS(String proxyTicket)
+			throws LoginException {
+		try {
+
+			Date start = new Date();
+			CASUserPrincipal user = casUtility.getCASUserPrincipal(null,proxyTicket);
+			
+			long duration = new Date().getTime() - start.getTime();
+
+			registerAction("Login.getAuthenticatedUser", new String[] {
+					"PT", proxyTicket },
+					"User %proxyTicket% called method Login.getAuthenticatedUser("
+							+ proxyTicket + ")", duration);
+
+			return (User)user;
+
+		} catch (AuthenticationException e) {
+			throw new LoginException(e.getMessage(), e);
+		}
 	}
 
 	/**
@@ -75,13 +99,14 @@ public class Login extends RODAWebService {
 	 * @throws LoginException
 	 *             if the given credentials are not valid.
 	 */
+	/*
 	public User getAuthenticatedUser(String username, String password)
 			throws LoginException {
 
 		try {
 
 			Date start = new Date();
-			User user = ldapUtility.getAuthenticatedUser(username, password);
+			User user = casUtility.getAuthenticatedUser(username, password);
 			long duration = new Date().getTime() - start.getTime();
 
 			registerAction("Login.getAuthenticatedUser", new String[] {
@@ -96,7 +121,8 @@ public class Login extends RODAWebService {
 			throw new LoginException(e.getMessage(), e);
 		}
 	}
-
+	*/
+	
 	/**
 	 * Gets the guest user authenticated against stored credentials.
 	 * 
@@ -109,7 +135,7 @@ public class Login extends RODAWebService {
 		try {
 
 			Date start = new Date();
-			User user = ldapUtility.getAuthenticatedUser(guestUsername,
+			User user = casUtility.getCASUserPrincipal(guestUsername,
 					guestPassword);
 			long duration = new Date().getTime() - start.getTime();
 

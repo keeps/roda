@@ -117,6 +117,11 @@ public class AIPDownload extends HttpServlet {
 
         RepresentationPreservationObject[] preservationObjects = rodaClient.getBrowserService().getDOPreservationObjects(pid);
         Set<String> agentPids = new HashSet<String>();
+        
+        if (preservationObjects == null) {
+           throw new NoSuchRODAObjectException("The object with PID \"" + pid
+           + "\" doesn't have preservation information...");
+        }
 
         for (RepresentationPreservationObject pObj : preservationObjects) {
             File repDir = new File(aipDir, "representation_" + pObj.getPid().replace(':', '_'));

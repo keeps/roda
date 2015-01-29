@@ -5,9 +5,6 @@ package pt.gov.dgarq.roda.wui.common.client;
 
 import java.util.Map;
 
-import pt.gov.dgarq.roda.core.common.LoggerException;
-import pt.gov.dgarq.roda.core.common.LoginException;
-import pt.gov.dgarq.roda.core.common.RODAClientException;
 import pt.gov.dgarq.roda.core.common.RODAException;
 
 import com.google.gwt.core.client.GWT;
@@ -23,7 +20,7 @@ public interface UserLoginService extends RemoteService {
 	/**
 	 * Service URI
 	 */
-	public static final String SERVICE_URI = "/userlogin";
+	public static final String SERVICE_URI = "userlogin";
 
 	/**
 	 * Utilities
@@ -44,6 +41,8 @@ public interface UserLoginService extends RemoteService {
 			return instance;
 		}
 	}
+	
+	public String getRodaCasURL();
 
 	/**
 	 * Get the authenticated user
@@ -52,7 +51,7 @@ public interface UserLoginService extends RemoteService {
 	 * @throws RODAException
 	 */
 	public AuthenticatedUser getAuthenticatedUser() throws RODAException;
-
+	
 	/**
 	 * Login into RODA Core
 	 * 
@@ -63,14 +62,15 @@ public interface UserLoginService extends RemoteService {
 	 */
 	public AuthenticatedUser login(String username, String password)
 			throws RODAException;
-
+	
 	/**
-	 * Logout from RODA Core
+	 * Login into RODA Core (CAS)
 	 * 
+	 * @param Proxy Granting Ticket
 	 * @return
-	 * @throws RODAException 
+	 * @throws RODAException
 	 */
-	public AuthenticatedUser logout() throws RODAException;
+	public AuthenticatedUser loginCAS(String location,String PGT) throws RODAException;
 
 	/**
 	 * Get RODA properties
@@ -78,5 +78,7 @@ public interface UserLoginService extends RemoteService {
 	 * @return
 	 */
 	public Map<String, String> getRodaProperties();
+	
+	public AuthenticatedUser logout() throws RODAException;
 
 }

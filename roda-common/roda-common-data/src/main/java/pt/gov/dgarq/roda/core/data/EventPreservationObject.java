@@ -14,6 +14,7 @@ public class EventPreservationObject extends SimpleEventPreservationObject {
 	public static final String PRESERVATION_EVENT_TYPE_INGESTION = "ingestion";
 	public static final String PRESERVATION_EVENT_TYPE_FIXITY_CHECK = "fixity check";
 	public static final String PRESERVATION_EVENT_TYPE_MIGRATION = "migration";
+	public static final String PRESERVATION_EVENT_TYPE_DIGITALIZATION = "digitalization";
 	public static final String PRESERVATION_EVENT_TYPE_NORMALIZATION = "normalization";
 
 	public static final String PRESERVATION_EVENT_AGENT_ROLE_INGEST_TASK = "ingest task";

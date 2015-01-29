@@ -15,13 +15,13 @@ import pt.gov.dgarq.roda.core.data.Attribute;
 import pt.gov.dgarq.roda.core.data.PluginParameter;
 import pt.gov.dgarq.roda.core.data.Report;
 import pt.gov.dgarq.roda.core.data.ReportItem;
-import pt.gov.dgarq.roda.core.data.User;
 import pt.gov.dgarq.roda.core.fedora.FedoraClientException;
 import pt.gov.dgarq.roda.core.fedora.FedoraClientUtility;
 import pt.gov.dgarq.roda.core.plugins.AbstractPlugin;
 import pt.gov.dgarq.roda.core.plugins.Plugin;
 import pt.gov.dgarq.roda.core.plugins.PluginException;
-import pt.gov.dgarq.roda.core.stubs.UserBrowser;
+import pt.gov.dgarq.roda.servlet.cas.CASUserPrincipal;
+import pt.gov.dgarq.roda.servlet.cas.CASUtility;
 
 /**
  * @author Rui Castro
@@ -29,6 +29,8 @@ import pt.gov.dgarq.roda.core.stubs.UserBrowser;
 public class UpgradePreservedByRelationshipPlugin extends AbstractPlugin {
 	private static Logger logger = Logger
 			.getLogger(UpgradePreservedByRelationshipPlugin.class);
+	
+	private boolean initOK = false;
 
 	public static PluginParameter PARAMETER_FEDORA_URL() {
 		return new PluginParameter("fedoraURL", PluginParameter.TYPE_STRING, //$NON-NLS-1$
@@ -42,10 +44,6 @@ public class UpgradePreservedByRelationshipPlugin extends AbstractPlugin {
 				"http://localhost:8080/fedoragsearch", true, false, //$NON-NLS-1$
 				"Fedora GSearch URL"); //$NON-NLS-1$
 	}
-
-	private RODAClient rodaClient = null;
-
-	private UserBrowser userBrowserService = null;
 
 	private FedoraClientUtility fedoraClientUtility = null;
 
@@ -105,6 +103,12 @@ public class UpgradePreservedByRelationshipPlugin extends AbstractPlugin {
 	 */
 	public Report execute() throws PluginException {
 
+		if(!initOK){
+			initRODAServices();
+		}
+		
+		
+		
 		Report report = new Report();
 		report.setType(Report.TYPE_PLUGIN_REPORT);
 		report.setTitle("Report of plugin " + getName()); //$NON-NLS-1$
@@ -229,18 +233,24 @@ public class UpgradePreservedByRelationshipPlugin extends AbstractPlugin {
 				.get(PARAMETER_FEDORAGSEARCH_URL().getName());
 	}
 
+	private URL getCasURL() throws MalformedURLException {
+		return new URL(getParameterValues().get(
+				PARAMETER_RODA_CAS_URL().getName()));
+	}
+
+	private URL getCoreURL() throws MalformedURLException {
+		return new URL(getParameterValues().get(
+				PARAMETER_RODA_CORE_URL().getName()));
+	}
 	private void initRODAServices() throws PluginException {
 
 		try {
+			CASUtility casUtility = new CASUtility(getCasURL(), getCoreURL());
+			CASUserPrincipal cup = casUtility.getCASUserPrincipal(getUsername(), getPassword());
+			new RODAClient(getRodaServicesURL(),cup,casUtility);
 
-			this.rodaClient = new RODAClient(getRodaServicesURL(),
-					getUsername(), getPassword());
-			this.userBrowserService = this.rodaClient.getUserBrowserService();
-
-			User user = this.userBrowserService.getUser(getUsername());
-			this.fedoraClientUtility = new FedoraClientUtility(getFedoraURL(),
-					getFedoraGSearchURL(), user, getPassword());
-
+			this.fedoraClientUtility = new FedoraClientUtility(getFedoraURL(),getFedoraGSearchURL(), cup, casUtility);
+			initOK=true;
 		} catch (Exception e) {
 			logger.debug("Error creating RODA client services - " //$NON-NLS-1$
 					+ e.getMessage(), e);

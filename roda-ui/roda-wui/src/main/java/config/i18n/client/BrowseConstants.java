@@ -11,6 +11,9 @@ import com.google.gwt.i18n.client.ConstantsWithLookup;
  * @author Vladislav Korecký <vladislav_korecky@gordic.cz>
  */
 public interface BrowseConstants extends Constants, ConstantsWithLookup {
+	
+    @DefaultStringValue("Fond")
+    public String addFond();
 
     // Tree
     @DefaultStringValue("_")
@@ -361,4 +364,7 @@ public interface BrowseConstants extends Constants, ConstantsWithLookup {
 
     @DefaultStringValue("Audio Video Interleave File (avi)")
     public String representation_format_video_x_msvideo();
+
+    @DefaultStringValue("Original")
+    public String viewOriginal();
 }

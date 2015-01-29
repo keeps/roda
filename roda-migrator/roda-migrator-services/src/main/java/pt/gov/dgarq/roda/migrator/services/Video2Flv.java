@@ -29,7 +29,7 @@ import pt.gov.dgarq.roda.core.data.RepresentationObject;
 public class Video2Flv extends FFmpegConverter {
 
     /**
-     * Create a new video2flv convertion service
+     * Create a new video2flv conversion service
      *
      * @throws RODAServiceException
      */

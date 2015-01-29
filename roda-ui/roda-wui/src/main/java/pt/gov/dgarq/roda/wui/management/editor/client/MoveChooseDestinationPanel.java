@@ -18,6 +18,8 @@ import pt.gov.dgarq.roda.wui.dissemination.browse.client.CollectionsTreeItem;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.CollectionsTreeVerticalScrollPanel;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.ClickListener;
@@ -92,14 +94,13 @@ public class MoveChooseDestinationPanel extends WUIWindow {
 		listeners = new ArrayList<MoveListener>();
 
 		choose = new WUIButton(constants.moveChooseDestinationChoose(),
-				WUIButton.Left.ROUND,
-				WUIButton.Right.ARROW_FORWARD);
+				WUIButton.Left.ROUND, WUIButton.Right.ARROW_FORWARD);
 
 		choose.setEnabled(false);
 
-		choose.addClickListener(new ClickListener() {
+		choose.addClickHandler(new ClickHandler() {
 
-			public void onClick(Widget sender) {
+			public void onClick(ClickEvent event) {
 				final CollectionsTreeItem selected = collectionsTree
 						.getSelected();
 				loading.show();
@@ -136,12 +137,11 @@ public class MoveChooseDestinationPanel extends WUIWindow {
 		});
 
 		cancel = new WUIButton(constants.moveChooseDestinationCancel(),
-				WUIButton.Left.ROUND,
-				WUIButton.Right.CROSS);
+				WUIButton.Left.ROUND, WUIButton.Right.CROSS);
 
-		cancel.addClickListener(new ClickListener() {
+		cancel.addClickHandler(new ClickHandler() {
 
-			public void onClick(Widget sender) {
+			public void onClick(ClickEvent event) {
 				hide();
 				onCancel();
 			}
@@ -170,7 +170,12 @@ public class MoveChooseDestinationPanel extends WUIWindow {
 
 	protected boolean isMoveValid(SimpleDescriptionObject source,
 			SimpleDescriptionObject target) {
-		return source.getLevel().compareTo(target.getLevel()) > 0;
+		// FIXME this is not valid anymore (see if "target" level can have a
+		// child with the "source" level). At the very best, if the move is
+		// illegal, roda-core will notice it as it validates the changes to the
+		// description level, so returning true here isn't that much problematic
+		// return source.getLevel().compareTo(target.getLevel()) > 0;
+		return true;
 	}
 
 	protected void moveTo(final SimpleDescriptionObject newParent,

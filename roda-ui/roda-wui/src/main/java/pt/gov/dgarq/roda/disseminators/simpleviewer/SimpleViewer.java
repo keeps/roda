@@ -159,7 +159,7 @@ public class SimpleViewer extends HttpServlet implements Servlet {
 				.getSession());
 		SynchronousConverter service = migratorClient
 				.getSynchronousConverterService(migratorUrl, rodaClient
-						.getUsername(), rodaClient.getPassword());
+						.getCup(),rodaClient.getCasUtility());
 		RepresentationObject converted = service.convert(rep)
 				.getRepresentation();
 

@@ -1,6 +1,5 @@
-<?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<name>roda-core-services</name>
 	<artifactId>roda-core-services</artifactId>
@@ -83,7 +82,7 @@
 		</dependency>
 		<dependency>
 			<groupId>pt.gov.dgarq.roda</groupId>
-			<artifactId>ead-c.2008</artifactId>
+			<artifactId>ead-c.2014</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>log4j</groupId>
@@ -142,6 +141,26 @@
 		<dependency>
 			<groupId>pt.gov.dgarq.roda</groupId>
 			<artifactId>fedora-2.2.4-client</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.opensaml</groupId>
+			<artifactId>opensaml1</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jasig.cas.client</groupId>
+			<artifactId>cas-client-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>xml-security</groupId>
+			<artifactId>xmlsec</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.objectweb.carol</groupId>
+			<artifactId>carol</artifactId>
 		</dependency>
 	</dependencies>
 </project>

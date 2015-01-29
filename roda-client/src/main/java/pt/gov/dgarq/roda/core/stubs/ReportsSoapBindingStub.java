@@ -24,29 +24,6 @@ public class ReportsSoapBindingStub extends org.apache.axis.client.Stub implemen
         org.apache.axis.description.OperationDesc oper;
         org.apache.axis.description.ParameterDesc param;
         oper = new org.apache.axis.description.OperationDesc();
-        oper.setName("getReport");
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "reportID"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
-        oper.addParameter(param);
-        oper.setReturnType(new javax.xml.namespace.QName("http://data.core.roda.dgarq.gov.pt", "Report"));
-        oper.setReturnClass(pt.gov.dgarq.roda.core.data.Report.class);
-        oper.setReturnQName(new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "getReportReturn"));
-        oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
-        oper.setUse(org.apache.axis.constants.Use.LITERAL);
-        oper.addFault(new org.apache.axis.description.FaultDesc(
-                      new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "fault"),
-                      "pt.gov.dgarq.roda.core.common.NoSuchReportException",
-                      new javax.xml.namespace.QName("http://common.core.roda.dgarq.gov.pt", "NoSuchReportException"), 
-                      true
-                     ));
-        oper.addFault(new org.apache.axis.description.FaultDesc(
-                      new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "fault1"),
-                      "pt.gov.dgarq.roda.core.common.ReportException",
-                      new javax.xml.namespace.QName("http://common.core.roda.dgarq.gov.pt", "ReportException"), 
-                      true
-                     ));
-        _operations[0] = oper;
-
-        oper = new org.apache.axis.description.OperationDesc();
         oper.setName("getReportsCount");
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "filter"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://filter.adapter.data.core.roda.dgarq.gov.pt", "Filter"), pt.gov.dgarq.roda.core.data.adapter.filter.Filter.class, false, false);
         oper.addParameter(param);
@@ -56,12 +33,12 @@ public class ReportsSoapBindingStub extends org.apache.axis.client.Stub implemen
         oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
         oper.addFault(new org.apache.axis.description.FaultDesc(
-                      new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "fault1"),
+                      new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "fault"),
                       "pt.gov.dgarq.roda.core.common.ReportException",
                       new javax.xml.namespace.QName("http://common.core.roda.dgarq.gov.pt", "ReportException"), 
                       true
                      ));
-        _operations[1] = oper;
+        _operations[0] = oper;
 
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("getReports");
@@ -73,7 +50,30 @@ public class ReportsSoapBindingStub extends org.apache.axis.client.Stub implemen
         oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
         oper.addFault(new org.apache.axis.description.FaultDesc(
+                      new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "fault"),
+                      "pt.gov.dgarq.roda.core.common.ReportException",
+                      new javax.xml.namespace.QName("http://common.core.roda.dgarq.gov.pt", "ReportException"), 
+                      true
+                     ));
+        _operations[1] = oper;
+
+        oper = new org.apache.axis.description.OperationDesc();
+        oper.setName("getReport");
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "reportID"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
+        oper.addParameter(param);
+        oper.setReturnType(new javax.xml.namespace.QName("http://data.core.roda.dgarq.gov.pt", "Report"));
+        oper.setReturnClass(pt.gov.dgarq.roda.core.data.Report.class);
+        oper.setReturnQName(new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "getReportReturn"));
+        oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
+        oper.setUse(org.apache.axis.constants.Use.LITERAL);
+        oper.addFault(new org.apache.axis.description.FaultDesc(
                       new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "fault1"),
+                      "pt.gov.dgarq.roda.core.common.NoSuchReportException",
+                      new javax.xml.namespace.QName("http://common.core.roda.dgarq.gov.pt", "NoSuchReportException"), 
+                      true
+                     ));
+        oper.addFault(new org.apache.axis.description.FaultDesc(
+                      new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "fault"),
                       "pt.gov.dgarq.roda.core.common.ReportException",
                       new javax.xml.namespace.QName("http://common.core.roda.dgarq.gov.pt", "ReportException"), 
                       true
@@ -167,6 +167,13 @@ public class ReportsSoapBindingStub extends org.apache.axis.client.Stub implemen
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
 
+            qName = new javax.xml.namespace.QName("http://filter.adapter.data.core.roda.dgarq.gov.pt", "ClassificationSchemeFilterParameter");
+            cachedSerQNames.add(qName);
+            cls = pt.gov.dgarq.roda.core.data.adapter.filter.ClassificationSchemeFilterParameter.class;
+            cachedSerClasses.add(cls);
+            cachedSerFactories.add(beansf);
+            cachedDeserFactories.add(beandf);
+
             qName = new javax.xml.namespace.QName("http://filter.adapter.data.core.roda.dgarq.gov.pt", "Filter");
             cachedSerQNames.add(qName);
             cls = pt.gov.dgarq.roda.core.data.adapter.filter.Filter.class;
@@ -223,25 +230,7 @@ public class ReportsSoapBindingStub extends org.apache.axis.client.Stub implemen
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
 
-            qName = new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "ArrayOf_tns1_Attribute");
-            cachedSerQNames.add(qName);
-            cls = pt.gov.dgarq.roda.core.data.Attribute[].class;
-            cachedSerClasses.add(cls);
-            qName = new javax.xml.namespace.QName("http://data.core.roda.dgarq.gov.pt", "Attribute");
-            qName2 = new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "item");
-            cachedSerFactories.add(new org.apache.axis.encoding.ser.ArraySerializerFactory(qName, qName2));
-            cachedDeserFactories.add(new org.apache.axis.encoding.ser.ArrayDeserializerFactory());
-
-            qName = new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "ArrayOf_tns1_ReportItem");
-            cachedSerQNames.add(qName);
-            cls = pt.gov.dgarq.roda.core.data.ReportItem[].class;
-            cachedSerClasses.add(cls);
-            qName = new javax.xml.namespace.QName("http://data.core.roda.dgarq.gov.pt", "ReportItem");
-            qName2 = new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "item");
-            cachedSerFactories.add(new org.apache.axis.encoding.ser.ArraySerializerFactory(qName, qName2));
-            cachedDeserFactories.add(new org.apache.axis.encoding.ser.ArrayDeserializerFactory());
-
-            qName = new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "ArrayOf_tns3_FilterParameter");
+            qName = new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "ArrayOf_tns1_FilterParameter");
             cachedSerQNames.add(qName);
             cls = pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter[].class;
             cachedSerClasses.add(cls);
@@ -250,11 +239,29 @@ public class ReportsSoapBindingStub extends org.apache.axis.client.Stub implemen
             cachedSerFactories.add(new org.apache.axis.encoding.ser.ArraySerializerFactory(qName, qName2));
             cachedDeserFactories.add(new org.apache.axis.encoding.ser.ArrayDeserializerFactory());
 
-            qName = new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "ArrayOf_tns5_SortParameter");
+            qName = new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "ArrayOf_tns4_SortParameter");
             cachedSerQNames.add(qName);
             cls = pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter[].class;
             cachedSerClasses.add(cls);
             qName = new javax.xml.namespace.QName("http://sort.adapter.data.core.roda.dgarq.gov.pt", "SortParameter");
+            qName2 = new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "item");
+            cachedSerFactories.add(new org.apache.axis.encoding.ser.ArraySerializerFactory(qName, qName2));
+            cachedDeserFactories.add(new org.apache.axis.encoding.ser.ArrayDeserializerFactory());
+
+            qName = new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "ArrayOf_tns6_Attribute");
+            cachedSerQNames.add(qName);
+            cls = pt.gov.dgarq.roda.core.data.Attribute[].class;
+            cachedSerClasses.add(cls);
+            qName = new javax.xml.namespace.QName("http://data.core.roda.dgarq.gov.pt", "Attribute");
+            qName2 = new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "item");
+            cachedSerFactories.add(new org.apache.axis.encoding.ser.ArraySerializerFactory(qName, qName2));
+            cachedDeserFactories.add(new org.apache.axis.encoding.ser.ArrayDeserializerFactory());
+
+            qName = new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "ArrayOf_tns6_ReportItem");
+            cachedSerQNames.add(qName);
+            cls = pt.gov.dgarq.roda.core.data.ReportItem[].class;
+            cachedSerClasses.add(cls);
+            qName = new javax.xml.namespace.QName("http://data.core.roda.dgarq.gov.pt", "ReportItem");
             qName2 = new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "item");
             cachedSerFactories.add(new org.apache.axis.encoding.ser.ArraySerializerFactory(qName, qName2));
             cachedDeserFactories.add(new org.apache.axis.encoding.ser.ArrayDeserializerFactory());
@@ -355,57 +362,12 @@ public class ReportsSoapBindingStub extends org.apache.axis.client.Stub implemen
         }
     }
 
-    public pt.gov.dgarq.roda.core.data.Report getReport(java.lang.String reportID) throws java.rmi.RemoteException, pt.gov.dgarq.roda.core.common.NoSuchReportException, pt.gov.dgarq.roda.core.common.ReportException {
-        if (super.cachedEndpoint == null) {
-            throw new org.apache.axis.NoEndPointException();
-        }
-        org.apache.axis.client.Call _call = createCall();
-        _call.setOperation(_operations[0]);
-        _call.setUseSOAPAction(true);
-        _call.setSOAPActionURI("");
-        _call.setEncodingStyle(null);
-        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
-        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
-        _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
-        _call.setOperationName(new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "getReport"));
-
-        setRequestHeaders(_call);
-        setAttachments(_call);
- try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {reportID});
-
-        if (_resp instanceof java.rmi.RemoteException) {
-            throw (java.rmi.RemoteException)_resp;
-        }
-        else {
-            extractAttachments(_call);
-            try {
-                return (pt.gov.dgarq.roda.core.data.Report) _resp;
-            } catch (java.lang.Exception _exception) {
-                return (pt.gov.dgarq.roda.core.data.Report) org.apache.axis.utils.JavaUtils.convert(_resp, pt.gov.dgarq.roda.core.data.Report.class);
-            }
-        }
-  } catch (org.apache.axis.AxisFault axisFaultException) {
-    if (axisFaultException.detail != null) {
-        if (axisFaultException.detail instanceof java.rmi.RemoteException) {
-              throw (java.rmi.RemoteException) axisFaultException.detail;
-         }
-        if (axisFaultException.detail instanceof pt.gov.dgarq.roda.core.common.NoSuchReportException) {
-              throw (pt.gov.dgarq.roda.core.common.NoSuchReportException) axisFaultException.detail;
-         }
-        if (axisFaultException.detail instanceof pt.gov.dgarq.roda.core.common.ReportException) {
-              throw (pt.gov.dgarq.roda.core.common.ReportException) axisFaultException.detail;
-         }
-   }
-  throw axisFaultException;
-}
-    }
-
     public int getReportsCount(pt.gov.dgarq.roda.core.data.adapter.filter.Filter filter) throws java.rmi.RemoteException, pt.gov.dgarq.roda.core.common.ReportException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
         org.apache.axis.client.Call _call = createCall();
-        _call.setOperation(_operations[1]);
+        _call.setOperation(_operations[0]);
         _call.setUseSOAPAction(true);
         _call.setSOAPActionURI("");
         _call.setEncodingStyle(null);
@@ -447,7 +409,7 @@ public class ReportsSoapBindingStub extends org.apache.axis.client.Stub implemen
             throw new org.apache.axis.NoEndPointException();
         }
         org.apache.axis.client.Call _call = createCall();
-        _call.setOperation(_operations[2]);
+        _call.setOperation(_operations[1]);
         _call.setUseSOAPAction(true);
         _call.setSOAPActionURI("");
         _call.setEncodingStyle(null);
@@ -475,6 +437,51 @@ public class ReportsSoapBindingStub extends org.apache.axis.client.Stub implemen
     if (axisFaultException.detail != null) {
         if (axisFaultException.detail instanceof java.rmi.RemoteException) {
               throw (java.rmi.RemoteException) axisFaultException.detail;
+         }
+        if (axisFaultException.detail instanceof pt.gov.dgarq.roda.core.common.ReportException) {
+              throw (pt.gov.dgarq.roda.core.common.ReportException) axisFaultException.detail;
+         }
+   }
+  throw axisFaultException;
+}
+    }
+
+    public pt.gov.dgarq.roda.core.data.Report getReport(java.lang.String reportID) throws java.rmi.RemoteException, pt.gov.dgarq.roda.core.common.NoSuchReportException, pt.gov.dgarq.roda.core.common.ReportException {
+        if (super.cachedEndpoint == null) {
+            throw new org.apache.axis.NoEndPointException();
+        }
+        org.apache.axis.client.Call _call = createCall();
+        _call.setOperation(_operations[2]);
+        _call.setUseSOAPAction(true);
+        _call.setSOAPActionURI("");
+        _call.setEncodingStyle(null);
+        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
+        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
+        _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
+        _call.setOperationName(new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "getReport"));
+
+        setRequestHeaders(_call);
+        setAttachments(_call);
+ try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {reportID});
+
+        if (_resp instanceof java.rmi.RemoteException) {
+            throw (java.rmi.RemoteException)_resp;
+        }
+        else {
+            extractAttachments(_call);
+            try {
+                return (pt.gov.dgarq.roda.core.data.Report) _resp;
+            } catch (java.lang.Exception _exception) {
+                return (pt.gov.dgarq.roda.core.data.Report) org.apache.axis.utils.JavaUtils.convert(_resp, pt.gov.dgarq.roda.core.data.Report.class);
+            }
+        }
+  } catch (org.apache.axis.AxisFault axisFaultException) {
+    if (axisFaultException.detail != null) {
+        if (axisFaultException.detail instanceof java.rmi.RemoteException) {
+              throw (java.rmi.RemoteException) axisFaultException.detail;
+         }
+        if (axisFaultException.detail instanceof pt.gov.dgarq.roda.core.common.NoSuchReportException) {
+              throw (pt.gov.dgarq.roda.core.common.NoSuchReportException) axisFaultException.detail;
          }
         if (axisFaultException.detail instanceof pt.gov.dgarq.roda.core.common.ReportException) {
               throw (pt.gov.dgarq.roda.core.common.ReportException) axisFaultException.detail;

@@ -46,8 +46,7 @@ public class Tools {
 		if (imgURL != null) {
 			return new ImageIcon(imgURL);
 		} else {
-
-			System.err.println("Couldn't find file: " + path);
+			logger.error("Couldn't find file: " + path);
 			return null;
 		}
 	}

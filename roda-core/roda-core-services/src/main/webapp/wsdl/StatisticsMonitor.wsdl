@@ -128,6 +128,16 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
      </extension>
     </complexContent>
    </complexType>
+   <complexType name="ClassificationSchemeFilterParameter">
+    <complexContent>
+     <extension base="tns1:FilterParameter">
+      <sequence>
+       <element name="classificationSchemeId" nillable="true" type="xsd:string"/>
+       <element name="possibleClassesPids" nillable="true" type="impl:ArrayOf_xsd_string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
   </schema>
   <schema elementFormDefault="qualified" targetNamespace="http://common.core.roda.dgarq.gov.pt" xmlns="http://www.w3.org/2001/XMLSchema">
    <import namespace="http://data.core.roda.dgarq.gov.pt"/>

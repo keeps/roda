@@ -2,20 +2,20 @@ package pt.gov.dgarq.roda.core.metadata.mets;
 
 import gov.loc.mets.AmdSecType;
 import gov.loc.mets.DivType;
-import gov.loc.mets.FileType;
-import gov.loc.mets.MdSecType;
-import gov.loc.mets.MetsDocument;
-import gov.loc.mets.StructMapType;
 import gov.loc.mets.DivType.Fptr;
+import gov.loc.mets.FileType;
 import gov.loc.mets.FileType.CHECKSUMTYPE;
 import gov.loc.mets.FileType.FLocat;
+import gov.loc.mets.MdSecType;
 import gov.loc.mets.MdSecType.MdRef;
 import gov.loc.mets.MdSecType.MdRef.LOCTYPE;
 import gov.loc.mets.MdSecType.MdRef.MDTYPE;
+import gov.loc.mets.MetsDocument;
 import gov.loc.mets.MetsType.FileSec;
-import gov.loc.mets.MetsType.MetsHdr;
 import gov.loc.mets.MetsType.FileSec.FileGrp;
+import gov.loc.mets.MetsType.MetsHdr;
 import gov.loc.mets.MetsType.MetsHdr.Agent;
+import gov.loc.mets.StructMapType;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -32,8 +32,10 @@ import java.util.Random;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.xmlbeans.XmlError;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
+import org.apache.xmlbeans.XmlOptions;
 
 import pt.gov.dgarq.roda.core.data.AgentPreservationObject;
 import pt.gov.dgarq.roda.core.data.EventPreservationObject;
@@ -104,9 +106,16 @@ public class SIPMetsHelper extends MetsHelper {
 		try {
 
 			MetsDocument document = MetsDocument.Factory.parse(metsInputStream);
-			if (document.validate()) {
+			XmlOptions validationOptions = new XmlOptions();
+			List<XmlError> validationErrors = new ArrayList<XmlError>();
+			validationOptions.setErrorListener(validationErrors);
+			if (document.validate(validationOptions)) {
 				return new SIPMetsHelper(document);
 			} else {
+			  for(XmlError xmlError : validationErrors){
+			    logger.error("XmlError: "+xmlError);
+			  }
+			    
 				throw new MetsMetadataException("Error validating XML document");
 			}
 
@@ -1209,7 +1218,7 @@ public class SIPMetsHelper extends MetsHelper {
 		}
 	}
 
-	private Map<String, FileType> getFileMap() {
+	protected Map<String, FileType> getFileMap() {
 
 		Map<String, FileType> fileMap = new HashMap<String, FileType>();
 

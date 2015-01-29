@@ -29,15 +29,9 @@ public interface UserLoginServiceAsync {
 	 * @return
 	 * @throws RODAException
 	 */
-	public void login(String username, String password, AsyncCallback<AuthenticatedUser> callback);
+	public void login(String username, String password,
+			AsyncCallback<AuthenticatedUser> callback);
 
-	/**
-	 * Logout from RODA Core
-	 * 
-	 * @return
-	 * @throws RODAException 
-	 */
-	public void logout(AsyncCallback<AuthenticatedUser> callback);
 
 	/**
 	 * Get RODA properties
@@ -45,5 +39,12 @@ public interface UserLoginServiceAsync {
 	 * @return
 	 */
 	public void getRodaProperties(AsyncCallback<Map<String, String>> callback);
+
+	public void loginCAS(String location, String serviceTicket,
+			AsyncCallback<AuthenticatedUser> asyncCallback);
+
+	void getRodaCasURL(AsyncCallback<String> callback);
+
+	public void logout(AsyncCallback<AuthenticatedUser> asyncCallback);
 
 }

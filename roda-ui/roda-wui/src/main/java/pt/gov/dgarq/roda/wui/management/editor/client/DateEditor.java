@@ -6,6 +6,7 @@ package pt.gov.dgarq.roda.wui.management.editor.client;
 import pt.gov.dgarq.roda.core.data.eadc.EadCValue;
 import pt.gov.dgarq.roda.core.data.eadc.Text;
 import pt.gov.dgarq.roda.wui.common.client.widgets.DatePicker;
+import pt.gov.dgarq.roda.wui.management.editor.client.MaterialSpecsEditor.MaterialSpecListener;
 
 import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.Widget;
@@ -88,4 +89,12 @@ public class DateEditor implements MetadataElementEditor {
 		datePicker.removeChangeListener(listener);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see pt.gov.dgarq.roda.office.management.editor.client.MetadataElementEditor#isValid()
+	 */
+	public boolean isValid() {
+		return datePicker.isValid();
+	}
 }

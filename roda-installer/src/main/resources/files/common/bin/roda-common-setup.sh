@@ -157,6 +157,20 @@ function ask_fedora_admin_passwd() {
 	fi
 }
 
+function ask_rodadata_mysql_db() {
+	if [ "$RODADATA_MYSQL_DB" == "" ]; then
+		read -p "RODA Data MySQL database name [roda]: " RODADATA_MYSQL_DB
+		if [ "$RODADATA_MYSQL_DB" == "" ]; then
+			RODADATA_MYSQL_DB="roda"
+		fi
+		export RODADATA_MYSQL_DB=$RODADATA_MYSQL_DB
+	else
+		if [ ! "$QUIET" ]; then
+			echo "RODADATA_MYSQL_DB already set to $RODADATA_MYSQL_DB"
+		fi
+	fi
+}
+
 function ask_rodadata_mysql_host() {
 	if [ "$RODADATA_MYSQL_HOST" == "" ]; then
 		read -p "RODA Data MySQL database host [localhost]: " RODADATA_MYSQL_HOST
@@ -640,3 +654,89 @@ function ask_rodacore_public_port(){
 	fi
 }
 
+
+
+
+function ask_roda_core_url(){
+	if [ "$RODA_CORE_URL" == "" ]; then
+		read -p "RODA Core URL [https://localhost:8443/roda-core]: " RODA_CORE_URL
+		if [ "$RODA_CORE_URL" == "" ]; then
+			RODA_CORE_URL="https://localhost:8443/roda-core"
+		fi
+		export RODA_CORE_URL=$RODA_CORE_URL
+	else
+		if [ ! "$QUIET" ]; then
+			echo "RODA_CORE_URL already set to $RODA_CORE_URL"
+		fi
+	fi
+}
+
+function ask_roda_cas_url(){
+	if [ "$RODA_CAS_URL" == "" ]; then
+		read -p "RODA CAS URL [https://localhost:8443/cas]: " RODA_CAS_URL
+		if [ "$RODA_CAS_URL" == "" ]; then
+			RODA_CAS_URL="https://localhost:8443/cas"
+		fi
+		export RODA_CAS_URL=$RODA_CAS_URL
+	else
+		if [ ! "$QUIET" ]; then
+			echo "RODA_CAS_URL already set to $RODA_CAS_URL"
+		fi
+	fi
+}
+
+function ask_roda_cas_external_url(){
+	if [ "$RODA_CAS_EXTERNAL_URL" == "" ]; then
+		read -p "RODA CAS External URL [https://localhost:8443/cas]: " RODA_CAS_EXTERNAL_URL
+		if [ "$RODA_CAS_EXTERNAL_URL" == "" ]; then
+			RODA_CAS_EXTERNAL_URL="https://localhost:8443/cas"
+		fi
+		export RODA_CAS_EXTERNAL_URL=$RODA_CAS_EXTERNAL_URL
+	else
+		if [ ! "$QUIET" ]; then
+			echo "RODA_CAS_EXTERNAL_URL already set to $RODA_CAS_EXTERNAL_URL"
+		fi
+	fi
+}
+
+function ask_cas_server_name(){
+	if [ "$CAS_SERVER_NAME" == "" ]; then
+		read -p "CAS Server Name [https://localhost:8443]: " CAS_SERVER_NAME
+		if [ "$CAS_SERVER_NAME" == "" ]; then
+			CAS_SERVER_NAME="https://localhost:8443"
+		fi
+		export CAS_SERVER_NAME=$CAS_SERVER_NAME
+	else
+		if [ ! "$QUIET" ]; then
+			echo "CAS_SERVER_NAME already set to $CAS_SERVER_NAME"
+		fi
+	fi
+}
+
+function ask_cas_server_prefix(){
+	if [ "$CAS_SERVER_PREFIX" == "" ]; then
+		read -p "CAS Server Prefix [cas]: " CAS_SERVER_PREFIX
+		if [ "$CAS_SERVER_PREFIX" == "" ]; then
+			CAS_SERVER_PREFIX="cas"
+		fi
+		export CAS_SERVER_PREFIX=$CAS_SERVER_PREFIX
+	else
+		if [ ! "$QUIET" ]; then
+			echo "CAS_SERVER_PREFIX already set to $CAS_SERVER_PREFIX"
+		fi
+	fi
+}
+
+function ask_external_domain(){
+	if [ "$RODA_EXTERNAL_DOMAIN" == "" ]; then
+		read -p "RODA External Domain: " RODA_EXTERNAL_DOMAIN
+		if [ "$RODA_EXTERNAL_DOMAIN" == "" ]; then
+			RODA_EXTERNAL_DOMAIN="https://localhost:8443/"
+		fi
+		export RODA_EXTERNAL_DOMAIN=$RODA_EXTERNAL_DOMAIN
+	else
+		if [ ! "$QUIET" ]; then
+			echo "RODA_EXTERNAL_DOMAIN already set to $RODA_EXTERNAL_DOMAIN"
+		fi
+	fi
+}

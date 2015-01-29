@@ -20,17 +20,17 @@
       <parameter name="className" value="pt.gov.dgarq.roda.core.services.IngestMonitor"/>
       <parameter name="wsdlPortType" value="IngestMonitor"/>
       <parameter name="typeMappingVersion" value="1.2"/>
-      <operation name="getSIPsCount" qname="operNS:getSIPsCount" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getSIPsCountReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:int" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
-        <parameter qname="pns:filter" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:Filter" xmlns:tns="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
-        <fault name="IngestMonitorException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.IngestMonitorException" type="tns:IngestMonitorException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
+      <operation name="getPossibleStates" qname="operNS:getPossibleStates" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getPossibleStatesReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:string" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
       </operation>
       <operation name="getSIPs" qname="operNS:getSIPs" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getSIPsReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:SIPState" xmlns:rtns="http://data.core.roda.dgarq.gov.pt" soapAction="" >
         <parameter qname="pns:contentAdapter" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:ContentAdapter" xmlns:tns="http://adapter.data.core.roda.dgarq.gov.pt"/>
         <fault name="IngestMonitorException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.IngestMonitorException" type="tns:IngestMonitorException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
       </operation>
-      <operation name="getPossibleStates" qname="operNS:getPossibleStates" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getPossibleStatesReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:string" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
+      <operation name="getSIPsCount" qname="operNS:getSIPsCount" xmlns:operNS="http://services.core.roda.dgarq.gov.pt" returnQName="retNS:getSIPsCountReturn" xmlns:retNS="http://services.core.roda.dgarq.gov.pt" returnType="rtns:int" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
+        <parameter qname="pns:filter" xmlns:pns="http://services.core.roda.dgarq.gov.pt" type="tns:Filter" xmlns:tns="http://filter.adapter.data.core.roda.dgarq.gov.pt"/>
+        <fault name="IngestMonitorException" qname="fns:fault" xmlns:fns="http://services.core.roda.dgarq.gov.pt" class="pt.gov.dgarq.roda.core.common.IngestMonitorException" type="tns:IngestMonitorException" xmlns:tns="http://common.core.roda.dgarq.gov.pt"/>
       </operation>
-      <parameter name="allowedMethods" value="getPossibleStates getSIPs getSIPsCount"/>
+      <parameter name="allowedMethods" value="getSIPs getPossibleStates getSIPsCount"/>
       <parameter name="scope" value="Application"/>
 
       <typeMapping
@@ -47,13 +47,6 @@
         type="java:pt.gov.dgarq.roda.core.common.IngestMonitorException"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle=""
-      />
-      <arrayMapping
-        xmlns:ns="http://services.core.roda.dgarq.gov.pt"
-        qname="ns:ArrayOf_tns1_FilterParameter"
-        type="java:pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter[]"
-        innerType="cmp-ns:FilterParameter" xmlns:cmp-ns="http://filter.adapter.data.core.roda.dgarq.gov.pt"
         encodingStyle=""
       />
       <typeMapping
@@ -121,7 +114,7 @@
       />
       <arrayMapping
         xmlns:ns="http://services.core.roda.dgarq.gov.pt"
-        qname="ns:ArrayOf_tns6_SIPStateTransition"
+        qname="ns:ArrayOf_tns5_SIPStateTransition"
         type="java:pt.gov.dgarq.roda.core.data.SIPStateTransition[]"
         innerType="cmp-ns:SIPStateTransition" xmlns:cmp-ns="http://data.core.roda.dgarq.gov.pt"
         encodingStyle=""
@@ -158,10 +151,25 @@
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""
       />
+      <arrayMapping
+        xmlns:ns="http://services.core.roda.dgarq.gov.pt"
+        qname="ns:ArrayOf_tns2_FilterParameter"
+        type="java:pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter[]"
+        innerType="cmp-ns:FilterParameter" xmlns:cmp-ns="http://filter.adapter.data.core.roda.dgarq.gov.pt"
+        encodingStyle=""
+      />
       <typeMapping
         xmlns:ns="http://adapter.data.core.roda.dgarq.gov.pt"
         qname="ns:ContentAdapter"
         type="java:pt.gov.dgarq.roda.core.data.adapter.ContentAdapter"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://filter.adapter.data.core.roda.dgarq.gov.pt"
+        qname="ns:ClassificationSchemeFilterParameter"
+        type="java:pt.gov.dgarq.roda.core.data.adapter.filter.ClassificationSchemeFilterParameter"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""
@@ -192,7 +200,7 @@
       />
       <arrayMapping
         xmlns:ns="http://services.core.roda.dgarq.gov.pt"
-        qname="ns:ArrayOf_tns4_SortParameter"
+        qname="ns:ArrayOf_tns3_SortParameter"
         type="java:pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter[]"
         innerType="cmp-ns:SortParameter" xmlns:cmp-ns="http://sort.adapter.data.core.roda.dgarq.gov.pt"
         encodingStyle=""

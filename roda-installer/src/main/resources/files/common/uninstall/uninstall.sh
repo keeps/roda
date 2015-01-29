@@ -6,6 +6,9 @@ cd $(dirname $0)
 . $RODA_HOME/bin/roda-common-setup.sh
 . install.config
 
+export JAVA_HOME=$(readlink -f /usr/bin/javac | sed "s:/bin/javac::")
+sudo keytool -delete -alias mykey -storepass changeit -keypass changeit -keystore $JAVA_HOME/jre/lib/security/cacerts
+
 warn "You're about to uninstall RODA...\nDo you want to procede? [yN]"
 read anwser
 case $anwser in
@@ -16,13 +19,13 @@ case $anwser in
    ;;
 esac
 
-DB_NUMBER=$(echo "show databases;" | mysql -u $RODADATA_MYSQL_RODACORE_USER -p$RODADATA_MYSQL_RODACORE_PASSWD | egrep "^(roda|$FEDORA_DB)$" | wc -l)
+DB_NUMBER=$(echo "show databases;" | mysql -u $RODADATA_MYSQL_RODACORE_USER -p$RODADATA_MYSQL_RODACORE_PASSWD | egrep "^($RODADATA_MYSQL_DB|$FEDORA_DB)$" | wc -l)
 if [ "$DB_NUMBER" -eq "2" ]; then
-   warn "Do you want to delete RODA databases (i.e., \"roda\" & \"$FEDORA_DB\")? [yN]"
+   warn "Do you want to delete RODA databases (i.e., \"$RODADATA_MYSQL_DB\" & \"$FEDORA_DB\")? [yN]"
    read anwser
    case $anwser in
       [yY])
-         echo "drop database roda;" | mysql -u $RODADATA_MYSQL_RODACORE_USER -p$RODADATA_MYSQL_RODACORE_PASSWD
+         echo "drop database $RODADATA_MYSQL_DB;" | mysql -u $RODADATA_MYSQL_RODACORE_USER -p$RODADATA_MYSQL_RODACORE_PASSWD
          echo "drop database $FEDORA_DB;" | mysql -u $RODADATA_MYSQL_RODACORE_USER -p$RODADATA_MYSQL_RODACORE_PASSWD
       ;;
       *)

@@ -6,6 +6,7 @@ import pt.gov.dgarq.roda.core.RODAClient;
 import pt.gov.dgarq.roda.core.common.InvalidTokenException;
 import pt.gov.dgarq.roda.core.data.User;
 import pt.gov.dgarq.roda.core.stubs.UserRegistration;
+import pt.gov.dgarq.roda.servlet.cas.CASUtility;
 
 /**
  * @author Rui Castro
@@ -22,11 +23,14 @@ public class UserRegistrationTest {
 		String hostUrl = args[0];
 		String username = args[1];
 		String password = args[2];
-
+		String casURL = args[3];
+		String coreURL = args[4];
+		String serviceURL = args[5];
 		try {
+			CASUtility casUtility = new CASUtility(new URL(casURL), new URL(coreURL), new URL(serviceURL));
 
 			RODAClient rodaClient = new RODAClient(new URL(hostUrl), username,
-					password);
+					password,casUtility);
 
 			UserRegistration userRegistrationService = rodaClient
 					.getUserRegistrationService();
@@ -151,11 +155,9 @@ public class UserRegistrationTest {
 					+ " with new password");
 			System.out.println("***********************************");
 
-			User authenticatedUser = rodaClient.getLoginService()
-					.getAuthenticatedUser(userToReset.getName(), "newpass");
+			//User authenticatedUser = rodaClient.getLoginService().getAuthenticatedUser(userToReset.getName(), "newpass");
 
-			System.out.println("Login successfull with new password: "
-					+ authenticatedUser);
+			//System.out.println("Login successfull with new password: "+ authenticatedUser);
 
 		} catch (Exception e) {
 			e.printStackTrace();

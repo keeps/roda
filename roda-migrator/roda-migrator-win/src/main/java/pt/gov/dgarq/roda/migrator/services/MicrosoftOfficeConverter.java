@@ -184,7 +184,7 @@ public abstract class MicrosoftOfficeConverter extends AbstractSynchronousConver
         // /tmp/original.../F0
         File originalFile = new File(URI
                 .create(originalRootFile.getAccessURL()));
-        // Detect extension by DROID
+        // Detect extension by FITS
         String origNameWithExt = originalRootFile.getOriginalName();
         FileFormat detectedFileFormat = FormatUtility.getFileFormat(originalFile, origNameWithExt);
         if ((detectedFileFormat != null) && (detectedFileFormat.getExtensions() != null) && (detectedFileFormat.getExtensions().length > 0)) {

@@ -232,7 +232,7 @@ public class DW2FlashPageFlip extends ImageMagickConverter {
     }
 
     @Override
-    protected boolean representationNeedsConvertion(
+    protected boolean representationNeedsConversion(
             LocalRepresentationObject localRepresentation)
             throws CommandException, WrongRepresentationTypeException,
             WrongRepresentationSubtypeException {

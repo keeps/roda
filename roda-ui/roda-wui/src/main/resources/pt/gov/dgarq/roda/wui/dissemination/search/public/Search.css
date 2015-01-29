@@ -49,10 +49,10 @@
 }
 
 .wui-search-result  .disclosure-open {
-	border: 2px solid #a4c3d0;
+    /*border: 2px solid #A4C3D0;*/
 }
 
-.wui-search-result .disclusure-closed {
+.wui-search-result .disclosure-closed {
 	border: 0;
 }
 
@@ -179,10 +179,11 @@
 
 .wui-search-result .descriptionGroup .descriptionGroupDisclosure .header
 	{
-	background-color: #BCCACF;
+	background-color: #D1C1A5;
 	color: #2a2a2b;
 	font-weight: normal;
 	font-size: 11px;
+	text-transform: uppercase;
 }
 
 .wui-search-result .descriptionGroup .descriptionGroupDisclosure .header:hover
@@ -193,19 +194,19 @@
 .wui-search-result .descriptionGroup .descriptionGroupDisclosure .content
 	{
 	color: #2a2a2b;
-	background-color: #BCCACF;
+	/*background-color: #BCCACF;*/
 	border-bottom: 1px dotted white;
 }
 
 .wui-search-result .descriptionGroup .descriptionGroupTable .label-container
 	{
-	background-color: #BCCACF;
+	/*background-color: #BCCACF;*/
 	color: #58595b;
 }
 
 .wui-search-result .descriptionGroup .descriptionGroupTable .value-container
 	{
-	background-color: #BCCACF;
+	/*background-color: #BCCACF;*/
 	color: #58595b;
 }
 
@@ -221,14 +222,18 @@
 
 .wui-search-result .descriptionGroup .descriptionGroup-row:hover .label-container
 	{
-	background-color: #BCCACF;
+	background-color: #E4E4E4;
 }
 
 .wui-search-result .descriptionGroup .descriptionGroup-row:hover .value-container
 	{
-	background-color: #BCCACF;
+	background-color: #E4E4E4;
 }
 
 .highlight {
 	font-weight: bold;
+}
+
+.content-layout .descriptionGroup .descriptionGroupDisclosure .header td {
+    color: #58595B;
 }

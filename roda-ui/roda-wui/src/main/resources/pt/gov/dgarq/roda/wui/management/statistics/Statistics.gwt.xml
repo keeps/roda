@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module>
 
-	<!-- Inherit the core Web Toolkit stuff.                  -->
+	<!-- Inherit the core Web Toolkit stuff. -->
 	<inherits name="com.google.gwt.user.User" />
 
-	<!-- Inherit the other RODA projects                  -->
+	<!-- Inherit the other RODA projects -->
 	<inherits name="pt.gov.dgarq.roda.wui.common.Common" />
 
 	<!-- Inherit required libraries -->
@@ -13,11 +13,4 @@
 	<!-- Specify the cascade stylesheet to use -->
 	<stylesheet src="Statistics.css" />
 
-	<servlet
-		class="pt.gov.dgarq.roda.wui.management.statistics.server.StatisticsServiceImpl"
-		path="/StatisticsService" />
-		
-		<servlet
-		class="pt.gov.dgarq.roda.wui.management.statistics.server.Munin"
-		path="/Munin/*" />
 </module>

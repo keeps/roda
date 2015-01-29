@@ -21,6 +21,7 @@ import pt.gov.dgarq.roda.core.plugins.Plugin;
 import pt.gov.dgarq.roda.core.plugins.PluginException;
 import pt.gov.dgarq.roda.core.stubs.Ingest;
 import pt.gov.dgarq.roda.plugins.common.IngestTaskPlugin;
+import pt.gov.dgarq.roda.servlet.cas.CASUtility;
 
 /**
  * @author Rui Castro
@@ -99,7 +100,7 @@ public abstract class AbstractRejectSIPTaskPlugin extends IngestTaskPlugin {
 		return Arrays.asList(AbstractPlugin.PARAMETER_RODA_CORE_URL(),
 				AbstractPlugin.PARAMETER_RODA_CORE_USERNAME(), AbstractPlugin
 						.PARAMETER_RODA_CORE_PASSWORD(), PARAMETER_USERNAME(),
-				PARAMETER_ORIGINAL_FILENAME());
+				PARAMETER_ORIGINAL_FILENAME(),AbstractPlugin.PARAMETER_RODA_CAS_URL());
 	}
 
 	@Override
@@ -231,11 +232,13 @@ public abstract class AbstractRejectSIPTaskPlugin extends IngestTaskPlugin {
 				AbstractPlugin.PARAMETER_RODA_CORE_USERNAME().getName());
 		String rodaClientPassword = getParameterValues().get(
 				AbstractPlugin.PARAMETER_RODA_CORE_PASSWORD().getName());
-
+		String casURL = getParameterValues().get(AbstractPlugin.PARAMETER_RODA_CAS_URL().getName());
+		String coreURL = getParameterValues().get(AbstractPlugin.PARAMETER_RODA_CORE_URL().getName());
 		try {
+			CASUtility casUtility = new CASUtility(new URL(casURL), new URL(coreURL));
 
 			this.rodaClient = new RODAClient(new URL(rodaClientServiceUrl),
-					rodaClientUsername, rodaClientPassword);
+					rodaClientUsername, rodaClientPassword,casUtility);
 
 			this.ingestService = this.rodaClient.getIngestService();
 

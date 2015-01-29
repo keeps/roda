@@ -2,16 +2,24 @@ package pt.gov.dgarq.roda.core;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.io.InputStream;
+import java.io.StringWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javax.xml.namespace.QName;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.IOUtils;
@@ -31,19 +39,22 @@ import pt.gov.dgarq.roda.core.data.RODAObject;
 import pt.gov.dgarq.roda.core.data.RODAObjectPermissions;
 import pt.gov.dgarq.roda.core.data.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.core.data.SimpleRepresentationObject;
-import pt.gov.dgarq.roda.core.data.User;
 import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevel;
+import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevelManager;
 import pt.gov.dgarq.roda.core.fedora.FedoraClientException;
 import pt.gov.dgarq.roda.core.fedora.FedoraClientUtility;
 import pt.gov.dgarq.roda.core.fedora.risearch.FedoraRISearch;
 import pt.gov.dgarq.roda.core.fedora.risearch.FedoraRISearchException;
 import pt.gov.dgarq.roda.core.metadata.DescriptionObjectValidator;
+import pt.gov.dgarq.roda.core.metadata.MetadataException;
 import pt.gov.dgarq.roda.core.metadata.eadc.EadCHelper;
+import pt.gov.dgarq.roda.core.metadata.eadc.EadCMetadataException;
 import pt.gov.dgarq.roda.core.metadata.xacml.PolicyHelper;
 import pt.gov.dgarq.roda.core.metadata.xacml.PolicyMetadataException;
-import pt.gov.dgarq.roda.core.services.UserBrowser;
+import pt.gov.dgarq.roda.servlet.cas.CASUserPrincipal;
+import pt.gov.dgarq.roda.servlet.cas.CASUtility;
 import pt.gov.dgarq.roda.util.StreamUtility;
-import pt.gov.dgarq.roda.x2008.eadcSchema.EadCDocument;
+import pt.gov.dgarq.roda.x2014.eadcSchema.EadCDocument;
 
 /**
  * @author Rui Castro
@@ -68,11 +79,17 @@ public class EditorHelper {
 	protected final String descriptionObjectDatastreamID;
 	protected final String preservationObjectDatastreamID;
 	protected final String relsExtDatastreamID;
+	protected final boolean descriptionObjectReplaceID;
+
+	protected String casURL;
+	protected String coreURL;
 
 	private FedoraClientUtility adminFedoraClientUtility = null;
 	private FedoraClientUtility fedoraClientUtility = null;
 
-	private BrowserHelper browserHelper = null;
+	private CASUtility casUtility = null;
+
+	protected BrowserHelper browserHelper = null;
 
 	/**
 	 * Constructs a new EditorHelper instance.
@@ -123,8 +140,13 @@ public class EditorHelper {
 				.getString("descriptionObjectDatastreamID");
 		this.relsExtDatastreamID = configuration
 				.getString("relsExtDatastreamID");
+		this.descriptionObjectReplaceID = configuration
+				.getBoolean("descriptionObjectReplaceID");
+		this.casURL = configuration.getString("roda.cas.url");
+		this.coreURL = configuration.getString("roda.core.url");
 
 		try {
+			this.casUtility = new CASUtility(new URL(casURL), new URL(coreURL));
 
 			String fedoraURL = configuration.getString("fedoraURL");
 			String fedoraGSearchURL = configuration
@@ -132,14 +154,22 @@ public class EditorHelper {
 			String adminUsername = configuration.getString("adminUsername");
 			String adminPassword = configuration.getString("adminPassword");
 
-			User adminUser = new UserBrowser().getUser(adminUsername);
+			CASUserPrincipal cup = casUtility.getCASUserPrincipal(
+					adminUsername, adminPassword);
 
 			this.adminFedoraClientUtility = new FedoraClientUtility(fedoraURL,
-					fedoraGSearchURL, adminUser, adminPassword);
+					fedoraGSearchURL, cup, casUtility);
 
+		} catch (MalformedURLException mfue) {
+			logger.error(
+					"Error creating CASUtility for admin - "
+							+ mfue.getMessage(), mfue);
+			throw new EditorException("Error creating CASUtility for admin - "
+					+ mfue.getMessage(), mfue);
 		} catch (Exception e) {
-			logger.error("Error creating FedoraClientUtility for admin - "
-					+ e.getMessage(), e);
+			logger.error(
+					"Error creating FedoraClientUtility for admin - "
+							+ e.getMessage(), e);
 			throw new EditorException(
 					"Error creating FedoraClientUtility for admin - "
 							+ e.getMessage(), e);
@@ -173,6 +203,50 @@ public class EditorHelper {
 	public String createSingleDescriptionObject(DescriptionObject dObject,
 			RODAObjectPermissions permissions) throws EditorException,
 			InvalidDescriptionObjectException {
+
+		return createSingleDescriptionObject(dObject, permissions, null);
+
+	}
+
+	/**
+	 * Creates a {@link DescriptionObject} without a parent. The
+	 * {@link DescriptionObject} created this way is temporary if is not a fonds
+	 * or while is not connected to a parent {@link DescriptionObject}.
+	 * 
+	 * @param dObject
+	 *            the {@link DescriptionObject} to create.
+	 * 
+	 * @return a {@link String} with the PID of the newly created object.
+	 * 
+	 * @throws NoSuchRODAObjectException
+	 * @throws InvalidDescriptionObjectException
+	 * @throws EditorException
+	 */
+	public String createDescriptionObject(DescriptionObject dObject)
+			throws NoSuchRODAObjectException,
+			InvalidDescriptionObjectException, EditorException {
+
+		return createDescriptionObject(dObject, null);
+	}
+
+	/**
+	 * Creates a {@link DescriptionObject} without a parent. The
+	 * {@link DescriptionObject} created this way is temporary if is not a fonds
+	 * or while is not connected to a parent {@link DescriptionObject}.
+	 * 
+	 * @param dObject
+	 *            the {@link DescriptionObject} to create.
+	 * @param permissions
+	 * 
+	 * @return a {@link String} with the PID of the newly created object.
+	 * 
+	 * @throws InvalidDescriptionObjectException
+	 * @throws EditorException
+	 */
+	// FIXME revise javadocs
+	public String createSingleDescriptionObject(DescriptionObject dObject,
+			RODAObjectPermissions permissions, String otherMetadataFilePath)
+			throws EditorException, InvalidDescriptionObjectException {
 
 		if (StringUtils.isBlank(dObject.getCountryCode())) {
 			throw new InvalidDescriptionObjectException(
@@ -254,8 +328,23 @@ public class EditorHelper {
 
 			logger.debug("EAD-C datastream is " + eadcAsString);
 
+			/*
+			 * Other Metadata datastream (other than EAD-C, if it exists)
+			 */
+			String otherMetadataAsString = null;
+			logger.debug("otherMetadataFilePath: "
+					+ otherMetadataFilePath);
+			if (StringUtils.isNotBlank(otherMetadataFilePath)) {
+				otherMetadataAsString = StreamUtility
+						.inputStreamToString(new FileInputStream(
+								otherMetadataFilePath));
+				logger.debug("Other Metadata datastream is "
+						+ otherMetadataAsString);
+			}
+
 			createdPID = getFedoraClientUtility().createDescriptionObject(
-					dObject, rdfAsString, policyAsString, eadcAsString);
+					dObject, rdfAsString, policyAsString, eadcAsString,
+					otherMetadataAsString);
 
 			if (createdPID.equals(pid)) {
 				logger.info("Created PID " + createdPID
@@ -306,17 +395,17 @@ public class EditorHelper {
 	 * @throws InvalidDescriptionObjectException
 	 * @throws EditorException
 	 */
-	public String createDescriptionObject(DescriptionObject dObject)
-			throws NoSuchRODAObjectException,
+	// FIXME revise javadocs
+	public String createDescriptionObject(DescriptionObject dObject,
+			String otherMetadataFilePath) throws NoSuchRODAObjectException,
 			InvalidDescriptionObjectException, EditorException {
-
-		// DescriptionObjectValidator.validateDescriptionObject(dObject);
 
 		RODAObjectPermissions permissions;
 
 		if (dObject.getParentPID() == null) {
 
-			if (!dObject.getLevel().equals(DescriptionLevel.FONDS)) {
+			if (!DescriptionLevelManager.getRootDescriptionLevels().contains(
+					dObject.getLevel())) {
 
 				throw new InvalidDescriptionLevel(
 						"A description object without a parent must have level fonds. Description object has level "
@@ -343,11 +432,12 @@ public class EditorHelper {
 						+ e.getMessage(), e);
 			}
 
-			if (dObject.getLevel().compareTo(parentSDO.getLevel()) <= 0) {
+			if (!DescriptionLevelManager.getChildLevels(parentSDO.getLevel())
+					.contains(dObject.getLevel())) {
 
-				throw new InvalidDescriptionLevel("child level("
+				throw new InvalidDescriptionLevel("child level ("
 						+ dObject.getLevel()
-						+ ") is higher than is parent's level("
+						+ ") is higher than its parent's level ("
 						+ parentSDO.getLevel() + ")");
 			} else {
 				// Continue...
@@ -367,7 +457,8 @@ public class EditorHelper {
 
 		}
 
-		return createSingleDescriptionObject(dObject, permissions);
+		return createSingleDescriptionObject(dObject, permissions,
+				otherMetadataFilePath);
 	}
 
 	/**
@@ -380,10 +471,13 @@ public class EditorHelper {
 	 * @throws InvalidDescriptionObjectException
 	 * @throws EditorException
 	 * @throws BrowserException
+	 * @throws RemoteException
 	 */
-	public DescriptionObject modifyDescriptionObject(DescriptionObject dObject)
-			throws EditorException, NoSuchRODAObjectException,
-			BrowserException, InvalidDescriptionObjectException {
+	public DescriptionObject modifyDescriptionObject(DescriptionObject dObject,
+			byte[] originalMetadata, String streamID,
+			LinkedList<DescriptionObject> parents) throws EditorException,
+			NoSuchRODAObjectException, BrowserException,
+			InvalidDescriptionObjectException, RemoteException {
 
 		// Get the SimpleDescriptionObject we want to edit - throws
 		// NoSuchRODAObjectException
@@ -429,7 +523,8 @@ public class EditorHelper {
 							dObject.getPid(),
 							getFedoraClientUtility().getStateCode(dObject),
 							dObject.getId(),
-							getFedoraClientUtility().getUsername(),
+							getFedoraClientUtility().getCASUserPrincipal()
+									.getName(),
 							"Modified by RODA Core Services");
 				}
 
@@ -444,8 +539,9 @@ public class EditorHelper {
 
 			} catch (Exception e) {
 
-				logger.error("Exception storing description object - "
-						+ e.getMessage(), e);
+				logger.error(
+						"Exception storing description object - "
+								+ e.getMessage(), e);
 
 				throw new EditorException(
 						"Exception storing description object - "
@@ -476,10 +572,56 @@ public class EditorHelper {
 				new GSearchUpdater(getFedoraClientUtility(), dObject.getPid())
 						.start();
 			}
-
 		}
 
 		return this.browserHelper.getDescriptionObject(dObject.getPid());
+	}
+
+	
+
+	/**
+	 * 
+	 * @param dObject
+	 * 
+	 * @return the modified {@link DescriptionObject}.
+	 * 
+	 * @throws NoSuchRODAObjectException
+	 * @throws InvalidDescriptionObjectException
+	 * @throws EditorException
+	 * @throws BrowserException
+	 * @throws EadCMetadataException
+	 * @throws RemoteException
+	 * @throws MetadataException
+	 */
+	public DescriptionObject modifyDescriptionObject(DescriptionObject dObject)
+			throws EditorException, BrowserException,
+			NoSuchRODAObjectException, InvalidDescriptionObjectException,
+			RemoteException, EadCMetadataException, MetadataException {
+		LinkedList<DescriptionObject> parents = new LinkedList<DescriptionObject>();
+
+		boolean exit = false;
+
+		String pPID = null;
+		while (!exit) {
+			try {
+				if (pPID == null) {
+					pPID = dObject.getParentPID();
+				}
+
+				logger.error("ParentPID: " + pPID);
+				DescriptionObject parentDO = getBrowserHelper()
+						.getDescriptionObject(pPID);
+
+				parents.add(parentDO);
+				pPID = parentDO.getParentPID();
+				if (pPID == null) {
+					exit = true;
+				}
+			} catch (Exception e) {
+				exit = true;
+			}
+		}
+		return modifyDescriptionObject(dObject, null, null, parents);
 	}
 
 	/**
@@ -501,16 +643,15 @@ public class EditorHelper {
 			sdo = getBrowserHelper().getSimpleDescriptionObject(doPID);
 
 		} catch (BrowserException e) {
-			logger.debug("Exception getting DO " + doPID + " - "
-					+ e.getMessage(), e);
+			logger.debug(
+					"Exception getting DO " + doPID + " - " + e.getMessage(), e);
 			throw new EditorException("Exception getting DO " + doPID + " - "
 					+ e.getMessage(), e);
 		}
 
 		if (sdo.getState().equals(RODAObject.STATE_INACTIVE)) {
 
-			logger
-					.warn("DO "
+			logger.warn("DO "
 							+ doPID
 							+ " cannot be removed because is inactive. Maybe it belongs to a SIP being ingested.");
 			throw new EditorException(
@@ -547,8 +688,9 @@ public class EditorHelper {
 			}
 
 		} catch (BrowserException e) {
-			logger.debug("Exception removing DO " + doPID + " - "
-					+ e.getMessage() + " - IGNORED", e);
+			logger.debug(
+					"Exception removing DO " + doPID + " - " + e.getMessage()
+							+ " - IGNORED", e);
 		}
 	}
 
@@ -568,93 +710,55 @@ public class EditorHelper {
 	public List<DescriptionLevel> getDOPossibleLevels(String doPID)
 			throws NoSuchRODAObjectException, EditorException {
 
-		List<DescriptionLevel> dLevels = Arrays
-				.asList(DescriptionLevel.DESCRIPTION_LEVELS);
-
 		try {
 
 			// Get SimpleDescriptionObject with PID doPID
 			SimpleDescriptionObject sdo = getBrowserHelper()
 					.getSimpleDescriptionObject(doPID);
 
-			// If it is inactive, it's not approved yet (It's a SIP DO)
-			boolean isSIPDO = sdo.getState().equals(
-					SimpleDescriptionObject.STATE_INACTIVE);
-
 			// Get it's parent's level
 			String parentLevel = getFedoraClientUtility().getFedoraRISearch()
 					.getDOParentLevel(doPID);
 
-			int lowestLevelIndex = -1;
+			List<DescriptionLevel> possibleLevels;
 
-			if (isSIPDO) {
-
-				logger.trace(doPID + " is part of a SIP not yet accepted.");
-
-				// It's lowest level is FILE level
-				lowestLevelIndex = dLevels.indexOf(DescriptionLevel.FILE);
-
-			} else if (parentLevel == null) {
-
-				logger.trace(doPID + " doesn't have a parent.");
-
-				// if it doesn't have a parent it's because it's a fonds
-				lowestLevelIndex = dLevels.indexOf(DescriptionLevel.FONDS);
-
+			if (parentLevel == null) {
+				logger.info(doPID + " doesn't have a parent.");
+				possibleLevels = new ArrayList<DescriptionLevel>(
+						DescriptionLevelManager.getRootDescriptionLevels());
 			} else {
-
-				logger.trace(doPID + " has a parent with level " + parentLevel);
-
-				// if it has a parent, then lowest level is the level above
-				// parent's level.
-				lowestLevelIndex = dLevels.indexOf(new DescriptionLevel(
-						parentLevel)) + 1;
+				logger.info(doPID + " has a parent with level " + parentLevel);
+				// if it has a parent, then the possible levels are the ones
+				// that can be
+				// child of it
+				possibleLevels = new ArrayList<DescriptionLevel>(
+						DescriptionLevelManager
+								.getChildLevels(new DescriptionLevel(
+										parentLevel)));
 			}
 
-			logger.trace("Lowest level is " + dLevels.get(lowestLevelIndex));
+			logger.debug("possible levels: " + possibleLevels);
 
 			// Get it's children's levels
 			List<String> subElementsLevels = getFedoraClientUtility()
 					.getFedoraRISearch().getDOChildrenLevels(doPID);
 
-			int highestLevelIndex = -1;
-			if (!isSIPDO && parentLevel == null) {
-
-				// if is not a SIP DO and it doesn't have a parent it's because
-				// it's a fonds
-				highestLevelIndex = dLevels.indexOf(DescriptionLevel.FONDS);
-
-			} else if (subElementsLevels.size() == 0) {
-				// if it doesn't have children, it can have the highest level
-				// (D).
-				highestLevelIndex = dLevels.indexOf(DescriptionLevel.ITEM);
-
-				logger.trace(doPID + " doesn't have a children.");
-
-			} else {
-
-				// if it has children, it can have the level bellow it's
-				// children's lowest level.
-				Collections.sort(subElementsLevels, new LevelComparator());
-
-				DescriptionLevel lowestChildLevel = new DescriptionLevel(
-						subElementsLevels.get(0));
-				highestLevelIndex = dLevels.indexOf(lowestChildLevel) - 1;
-
-				logger.trace(doPID + " has children with levels "
-						+ subElementsLevels);
+			if (subElementsLevels.size() > 0) {
+				for (String childLevel : subElementsLevels) {
+					possibleLevels.retainAll(DescriptionLevelManager
+							.getParentLevels(childLevel));
+					logger.debug("possible levels (after \"" + childLevel
+							+ "\"): " + possibleLevels);
+				}
 			}
 
-			logger.trace("Highest level is " + dLevels.get(highestLevelIndex));
-
-			List<DescriptionLevel> possibleLevels = dLevels.subList(
-					lowestLevelIndex, highestLevelIndex + 1);
+			logger.info("possible description levels: " + possibleLevels);
 
 			return possibleLevels;
 
 		} catch (FedoraRISearchException e) {
-			logger.debug("Exception getting possible levels - "
-					+ e.getMessage(), e);
+			logger.debug(
+					"Exception getting possible levels - " + e.getMessage(), e);
 			throw new EditorException("Exception getting possible levels - "
 					+ e.getMessage(), e);
 		} catch (BrowserException e) {
@@ -759,8 +863,9 @@ public class EditorHelper {
 		} catch (FedoraClientException e) {
 
 			// This should never happen because stopAtError parameter is false.
-			logger.error("Unexpected exception removing objects - "
-					+ e.getMessage() + ". PLEASE INFORM DEVELOPERS!!!", e);
+			logger.error(
+					"Unexpected exception removing objects - " + e.getMessage()
+							+ ". PLEASE INFORM DEVELOPERS!!!", e);
 
 			return new ArrayList<String>();
 		}
@@ -792,8 +897,9 @@ public class EditorHelper {
 
 		} catch (BrowserException e) {
 
-			logger.debug("Exception accessing object "
-					+ permissions.getObjectPID() + " - " + e.getMessage(), e);
+			logger.debug(
+					"Exception accessing object " + permissions.getObjectPID()
+							+ " - " + e.getMessage(), e);
 			throw new EditorException("Exception accessing object "
 					+ permissions.getObjectPID() + " - " + e.getMessage(), e);
 		}
@@ -807,9 +913,7 @@ public class EditorHelper {
 
 		} catch (BrowserException e) {
 
-			logger
-					.debug("Exception reading POLICY file - " + e.getMessage(),
-							e);
+			logger.debug("Exception reading POLICY file - " + e.getMessage(), e);
 			throw new EditorException("Exception reading POLICY file - "
 					+ e.getMessage(), e);
 		}
@@ -863,9 +967,7 @@ public class EditorHelper {
 
 		} catch (BrowserException e) {
 
-			logger
-					.debug("Exception reading POLICY file - " + e.getMessage(),
-							e);
+			logger.debug("Exception reading POLICY file - " + e.getMessage(), e);
 			throw new EditorException("Exception reading POLICY file - "
 					+ e.getMessage(), e);
 		}
@@ -1008,8 +1110,8 @@ public class EditorHelper {
 		Map<String, String[]> properties = new HashMap<String, String[]>();
 
 		// predicate -> object
-		properties.put(FedoraRISearch.RDF_TAG_REPRESENTATION_STATUS, simpleRO
-				.getStatuses());
+		properties.put(FedoraRISearch.RDF_TAG_REPRESENTATION_STATUS,
+				simpleRO.getStatuses());
 		properties.put(FedoraRISearch.RDF_TAG_REPRESENTATION_TYPE,
 				new String[] { simpleRO.getType() });
 		properties.put(FedoraRISearch.RDF_TAG_REPRESENTATION_SUBTYPE,
@@ -1032,17 +1134,17 @@ public class EditorHelper {
 		// predicate -> object
 		properties.put(FedoraRISearch.RDF_TAG_DESCRIPTION_LEVEL, simpleDO
 				.getLevel().getLevel());
-		properties.put(FedoraRISearch.RDF_TAG_DESCRIPTION_COUNTRYCODE, simpleDO
-				.getCountryCode());
+		properties.put(FedoraRISearch.RDF_TAG_DESCRIPTION_COUNTRYCODE,
+				simpleDO.getCountryCode());
 		properties.put(FedoraRISearch.RDF_TAG_DESCRIPTION_REPOSITORYCODE,
 				simpleDO.getRepositoryCode());
 		properties.put(FedoraRISearch.RDF_TAG_DESCRIPTION_ID, simpleDO.getId());
-		properties.put(FedoraRISearch.RDF_TAG_DESCRIPTION_TITLE, simpleDO
-				.getTitle());
-		properties.put(FedoraRISearch.RDF_TAG_DESCRIPTION_DATEINITIAL, simpleDO
-				.getDateInitial());
-		properties.put(FedoraRISearch.RDF_TAG_DESCRIPTION_DATEFINAL, simpleDO
-				.getDateFinal());
+		properties.put(FedoraRISearch.RDF_TAG_DESCRIPTION_TITLE,
+				simpleDO.getTitle());
+		properties.put(FedoraRISearch.RDF_TAG_DESCRIPTION_DATEINITIAL,
+				simpleDO.getDateInitial());
+		properties.put(FedoraRISearch.RDF_TAG_DESCRIPTION_DATEFINAL,
+				simpleDO.getDateFinal());
 
 		return properties;
 	}
@@ -1055,7 +1157,8 @@ public class EditorHelper {
 
 		Map<String, String> properties = new HashMap<String, String>();
 		// predicate -> object
-		properties.put(FedoraRISearch.RDF_TAG_CHILD_OF,
+		properties.put(
+				FedoraRISearch.RDF_TAG_CHILD_OF,
 				getFedoraClientUtility().getFedoraObjectURIFromPID(
 						simpleDO.getParentPID()));
 
@@ -1067,8 +1170,8 @@ public class EditorHelper {
 
 		Map<String, String[]> properties = new HashMap<String, String[]>();
 		// predicate -> object
-		properties.put(FedoraRISearch.RDF_TAG_PERMISSION_READ_USER, permissions
-				.getReadUsers());
+		properties.put(FedoraRISearch.RDF_TAG_PERMISSION_READ_USER,
+				permissions.getReadUsers());
 		properties.put(FedoraRISearch.RDF_TAG_PERMISSION_READ_GROUP,
 				permissions.getReadGroups());
 
@@ -1212,8 +1315,7 @@ public class EditorHelper {
 
 			setPermissions(permissions, doDescendantPIDs, stopAtFirstError);
 
-			logger
-					.debug("Finnished setting permissions on descendant DO(s) of object "
+			logger.debug("Finished setting permissions on descendant DO(s) of object "
 							+ permissions.getObjectPID());
 
 		} else {
@@ -1295,8 +1397,7 @@ public class EditorHelper {
 
 				setPermissions(permissions, descendantPIDs, false);
 
-				logger
-						.debug("Finnished setting permissions on RO/PO descendants of object "
+				logger.debug("Finished setting permissions on RO/PO descendants of object "
 								+ permissions.getObjectPID());
 
 			} else {
@@ -1306,16 +1407,18 @@ public class EditorHelper {
 
 		} catch (PolicyMetadataException e) {
 
-			logger.debug("Exception creating XACML Policy file - "
-					+ e.getMessage(), e);
+			logger.debug(
+					"Exception creating XACML Policy file - " + e.getMessage(),
+					e);
 			throw new EditorException(
 					"Exception creating XACML Policy file  - " + e.getMessage(),
 					e);
 
 		} catch (Exception e) {
 
-			logger.debug("Exception modifying POLICY datastream - "
-					+ e.getMessage(), e);
+			logger.debug(
+					"Exception modifying POLICY datastream - " + e.getMessage(),
+					e);
 			throw new EditorException(
 					"Exception modifying POLICY datastream - " + e.getMessage(),
 					e);
@@ -1363,23 +1466,7 @@ public class EditorHelper {
 	}
 
 	private String getClientUsername() {
-		return this.fedoraClientUtility.getUsername();
-	}
-
-	class LevelComparator implements Comparator<String> {
-
-		/**
-		 * Compare two description levels
-		 * 
-		 * @param level1
-		 * @param level2
-		 * @return (&lt;0), 0 or (&gt;0) if level1 is lower, equal or bigger
-		 *         than level2.
-		 */
-		public int compare(String level1, String level2) {
-			return new DescriptionLevel(level1).compareTo(new DescriptionLevel(
-					level2));
-		}
+		return this.fedoraClientUtility.getCASUserPrincipal().getName();
 	}
 
 	/**
@@ -1414,9 +1501,7 @@ public class EditorHelper {
 		@Override
 		public void run() {
 
-			logger
-					.debug(getName()
-							+ " started, to update renamed/moved DOs...");
+			logger.debug(getName() + " started, to update renamed/moved DOs...");
 
 			try {
 
@@ -1424,9 +1509,7 @@ public class EditorHelper {
 						this.fedoraClientUtility.getFedoraRISearch()
 								.getDescendantDescriptionObjectPIDs(doPID));
 
-				logger
-						.trace("desdendants of " + doPID + " are "
-								+ pidsToUpdate);
+				logger.trace("desdendants of " + doPID + " are " + pidsToUpdate);
 
 				logger.debug("PIDs to update: " + pidsToUpdate);
 
@@ -1435,11 +1518,13 @@ public class EditorHelper {
 								new ArrayList<String>(pidsToUpdate));
 
 			} catch (NoSuchRODAObjectException e) {
-				logger.error("Exception updating moved objects - "
-						+ e.getMessage() + ". Ignoring", e);
+				logger.error(
+						"Exception updating moved objects - " + e.getMessage()
+								+ ". Ignoring", e);
 			} catch (FedoraRISearchException e) {
-				logger.error("Exception updating moved objects - "
-						+ e.getMessage() + ". Ignoring", e);
+				logger.error(
+						"Exception updating moved objects - " + e.getMessage()
+								+ ". Ignoring", e);
 			}
 
 			logger.debug(getName() + " finished");

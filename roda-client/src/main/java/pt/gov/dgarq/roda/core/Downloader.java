@@ -8,6 +8,8 @@ import java.io.InputStream;
 import java.net.URL;
 import java.rmi.RemoteException;
 
+import javax.naming.AuthenticationException;
+
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
@@ -26,6 +28,8 @@ import pt.gov.dgarq.roda.core.data.RODAObject;
 import pt.gov.dgarq.roda.core.data.RepresentationFile;
 import pt.gov.dgarq.roda.core.data.RepresentationObject;
 import pt.gov.dgarq.roda.core.stubs.Browser;
+import pt.gov.dgarq.roda.servlet.cas.CASUserPrincipal;
+import pt.gov.dgarq.roda.servlet.cas.CASUtility;
 
 /**
  * @author Rui Castro
@@ -34,9 +38,6 @@ public class Downloader {
 	static final private Logger logger = Logger.getLogger(Downloader.class);
 
 	private URL serviceHost = null;
-
-	private String username = null;
-	private String password = null;
 
 	private RODAClient rodaClient = null;
 	private Browser browserService = null;
@@ -50,24 +51,21 @@ public class Downloader {
 	 * 
 	 * @param servicesHost
 	 *            the {@link URL} to the host that hosts the RODA services.
-	 * @param username
-	 *            the username to use in the connection to the service
-	 * @param password
-	 *            the password to use in the connection to the service
+	 * @param cup
+	 *            the user
+	 * @param casUtility
+	 *            the CASUtility
 	 * 
 	 * @throws LoginException
 	 * @throws DownloaderException
+	 * @throws AuthenticationException 
 	 */
-	public Downloader(URL servicesHost, String username, String password)
+	public Downloader(URL servicesHost, CASUserPrincipal cup, CASUtility casUtility)
 			throws LoginException, DownloaderException {
-
 		this.serviceHost = servicesHost;
-		this.username = username;
-		this.password = password;
-
 		try {
 
-			this.rodaClient = new RODAClient(servicesHost, username, password);
+			this.rodaClient = new RODAClient(servicesHost, cup,casUtility);
 			this.browserService = this.rodaClient.getBrowserService();
 
 		} catch (RODAClientException e) {
@@ -79,11 +77,29 @@ public class Downloader {
 		// Set up the client connection
 		this.httpClient = new HttpClient();
 		this.httpClient.getParams().setAuthenticationPreemptive(true);
-		Credentials credentials = new UsernamePasswordCredentials(
-				this.username, this.password);
-		this.httpClient.getState().setCredentials(
-				new AuthScope(this.serviceHost.getHost(), this.serviceHost
-						.getPort(), AuthScope.ANY_REALM), credentials);
+		
+	}
+	
+	
+	/**
+	 * Constructs a new authenticated {@link Downloader} for RODA Access
+	 * service.
+	 * 
+	 * @param servicesHost
+	 *            the {@link URL} to the host that hosts the RODA services.
+	 * @param username
+	 *            the username to use in the connection to the service
+	 * @param password
+	 *            the password to use in the connection to the service
+     * @param casUtility
+	 *            the CASUtility
+	 * 
+	 * @throws LoginException
+	 * @throws DownloaderException
+	 * @throws AuthenticationException 
+	 */
+	public Downloader(URL servicesHost, String username, String password,CASUtility casUtility) throws LoginException, DownloaderException, AuthenticationException {
+			this(servicesHost,casUtility.getCASUserPrincipal(username, password),casUtility);
 	}
 
 	/**
@@ -145,9 +161,21 @@ public class Downloader {
 			logger.trace("HTTP GET " + fileURL);
 
 			// Execute method
+			this.httpClient.getParams().setAuthenticationPreemptive(true);
+			String username = this.rodaClient.getUsername();
+			String password = this.rodaClient.getCasUtility().generateProxyTicket(this.rodaClient.getProxyGrantingTicket());
+			Credentials credentials = new UsernamePasswordCredentials(
+					username, password);
+			
+			this.httpClient.getState().setCredentials(
+					new AuthScope(this.serviceHost.getHost(), this.serviceHost
+							.getPort(), AuthScope.ANY_REALM), credentials);
 			int statusCode = this.httpClient.executeMethod(getFileMethod);
 
-			if (statusCode != HttpStatus.SC_OK) {
+			
+			if (statusCode == HttpStatus.SC_NOT_FOUND){
+				throw new FileNotFoundException(accessURL+ " doesn't exist");
+			}else if (statusCode != HttpStatus.SC_OK) {
 				logger.error("HTTP GET failed - "
 						+ getFileMethod.getStatusLine());
 			}

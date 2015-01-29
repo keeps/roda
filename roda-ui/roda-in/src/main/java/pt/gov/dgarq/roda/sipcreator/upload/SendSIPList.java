@@ -25,14 +25,15 @@ import javax.swing.JProgressBar;
 import org.apache.log4j.Logger;
 
 import pt.gov.dgarq.roda.core.RODAClient;
+import pt.gov.dgarq.roda.core.SipSendUtility;
 import pt.gov.dgarq.roda.ingest.siputility.SIPException;
 import pt.gov.dgarq.roda.ingest.siputility.SIPUtility;
 import pt.gov.dgarq.roda.sipcreator.Messages;
 import pt.gov.dgarq.roda.sipcreator.RodaClientFactory;
+import pt.gov.dgarq.roda.sipcreator.RodaClientFactory.RodaClientFactoryListener;
 import pt.gov.dgarq.roda.sipcreator.SIP;
 import pt.gov.dgarq.roda.sipcreator.SIPCreator;
 import pt.gov.dgarq.roda.sipcreator.SIPCreatorConfig;
-import pt.gov.dgarq.roda.sipcreator.RodaClientFactory.RodaClientFactoryListener;
 
 /**
  * 
@@ -214,7 +215,7 @@ public class SendSIPList {
 							}
 							setProgress(index, sip, ProgressState.UPLOADING);
 							if (type == Type.HTTP) {
-								OnlineSendUtility.sendSIP(sipPackage,
+								SipSendUtility.sendSIP(sipPackage,
 										rodaClient);
 							} else if (type == Type.FTP
 									|| type == Type.POSTAL_MAIL) {

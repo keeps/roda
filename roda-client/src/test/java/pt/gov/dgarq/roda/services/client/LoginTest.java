@@ -5,6 +5,7 @@ import java.net.URL;
 import pt.gov.dgarq.roda.core.RODAClient;
 import pt.gov.dgarq.roda.core.common.LoginException;
 import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.servlet.cas.CASUtility;
 
 /**
  * @author Rui Castro
@@ -20,13 +21,17 @@ public class LoginTest {
 		String hostUrl = args[0];
 		String username = args[1];
 		String password = args[2];
+		String casURL = args[3];
+		String coreURL = args[4];
+		String serviceURL = args[5];
 
 		/*
 		 * Guest login
 		 */
 		try {
+			CASUtility casUtility = new CASUtility(new URL(casURL), new URL(coreURL), new URL(serviceURL));
 
-			RODAClient rodaGuestClient = new RODAClient(new URL(hostUrl));
+			RODAClient rodaGuestClient = new RODAClient(new URL(hostUrl),casUtility);
 
 			User authenticatedGuestUser = rodaGuestClient
 					.getAuthenticatedUser();
@@ -46,9 +51,10 @@ public class LoginTest {
 		 * authenticated login
 		 */
 		try {
+			CASUtility casUtility = new CASUtility(new URL(casURL), new URL(coreURL), new URL(serviceURL));
 
 			RODAClient rodaGuestClient = new RODAClient(new URL(hostUrl),
-					username, password);
+					username, password,casUtility);
 
 			User authenticatedUser = rodaGuestClient.getAuthenticatedUser();
 
@@ -68,9 +74,10 @@ public class LoginTest {
 		try {
 
 			try {
+				CASUtility casUtility = new CASUtility(new URL(casURL), new URL(coreURL), new URL(serviceURL));
 
 				rodaGuestClient = new RODAClient(new URL(hostUrl),
-						"fakeusername", "invalidpassword");
+						"fakeusername", "invalidpassword",casUtility);
 
 				User authenticatedUser = rodaGuestClient.getAuthenticatedUser();
 

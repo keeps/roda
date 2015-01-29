@@ -8,7 +8,7 @@
 package pt.gov.dgarq.roda.core.stubs;
 
 public interface IngestMonitor extends java.rmi.Remote {
-    public int getSIPsCount(pt.gov.dgarq.roda.core.data.adapter.filter.Filter filter) throws java.rmi.RemoteException, pt.gov.dgarq.roda.core.common.IngestMonitorException;
-    public pt.gov.dgarq.roda.core.data.SIPState[] getSIPs(pt.gov.dgarq.roda.core.data.adapter.ContentAdapter contentAdapter) throws java.rmi.RemoteException, pt.gov.dgarq.roda.core.common.IngestMonitorException;
     public java.lang.String[] getPossibleStates() throws java.rmi.RemoteException;
+    public pt.gov.dgarq.roda.core.data.SIPState[] getSIPs(pt.gov.dgarq.roda.core.data.adapter.ContentAdapter contentAdapter) throws java.rmi.RemoteException, pt.gov.dgarq.roda.core.common.IngestMonitorException;
+    public int getSIPsCount(pt.gov.dgarq.roda.core.data.adapter.filter.Filter filter) throws java.rmi.RemoteException, pt.gov.dgarq.roda.core.common.IngestMonitorException;
 }

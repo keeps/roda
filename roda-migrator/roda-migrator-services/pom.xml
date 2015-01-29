@@ -1,9 +1,8 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<name>roda-migrator-services</name>
 	<artifactId>roda-migrator-services</artifactId>
-	<version>1.2.0</version>
 	<parent>
 		<groupId>pt.gov.dgarq.roda</groupId>
 		<artifactId>roda-migrator</artifactId>
@@ -77,7 +76,7 @@
 			<groupId>pt.gov.dgarq.roda</groupId>
 			<artifactId>roda-common-format-utility</artifactId>
 		</dependency>
-<!--
+		<!--
 		<dependency>
 			<groupId>axis</groupId>
 			<artifactId>axis-jaxrpc</artifactId>
@@ -104,7 +103,15 @@
 		</dependency>
 		<dependency>
 			<groupId>pt.gov.dgarq.roda</groupId>
-			<artifactId>mets-1.7</artifactId>
+			<artifactId>mets-1.9.1</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>xerces</groupId>
+			<artifactId>xercesImpl</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>xml-apis</groupId>
+			<artifactId>xml-apis</artifactId>
 		</dependency>
 	</dependencies>
 </project>

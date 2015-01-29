@@ -3,7 +3,6 @@
 	<modelVersion>4.0.0</modelVersion>
 	<name>roda-in</name>
 	<artifactId>roda-in</artifactId>
-	<version>1.2.0</version>
 	<parent>
 		<groupId>pt.gov.dgarq.roda</groupId>
 		<artifactId>roda-ui</artifactId>
@@ -198,7 +197,7 @@
 		</dependency>
 		<dependency>
 			<groupId>pt.gov.dgarq.roda</groupId>
-			<artifactId>mets-1.7</artifactId>
+			<artifactId>mets-1.9.1</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.w3c</groupId>
@@ -248,7 +247,7 @@
 		</dependency>
 		<dependency>
 			<groupId>pt.gov.dgarq.roda</groupId>
-			<artifactId>ead-c.2008</artifactId>
+			<artifactId>ead-c.2014</artifactId>
 		</dependency>
 	</dependencies>
 </project>

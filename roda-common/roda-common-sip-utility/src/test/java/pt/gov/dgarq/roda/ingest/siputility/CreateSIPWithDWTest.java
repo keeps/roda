@@ -43,58 +43,62 @@ public class CreateSIPWithDWTest {
 			System.exit(1);
 
 		} else {
-
-			try {
-
-				String sipFile = args[0];
-				String parentPID = args[1];
-				File imagesDirectory = new File(args[2]);
-
-				List<String> filenames = new ArrayList<String>();
-				List<InputStream> streams = new ArrayList<InputStream>();
-
-				for (File imageFile : imagesDirectory.listFiles()) {
-					filenames.add(imageFile.getName());
-					streams.add(new FileInputStream(imageFile));
-				}
-
-				SIPDescriptionObject sipDO = new SIPDescriptionObject();
-				sipDO.setLevel(DescriptionLevel.ITEM);
-				sipDO.setCountryCode("PT");
-				sipDO.setRepositoryCode("DGARQ");
-				// sipDO.setId(imagesDirectory.getName().replace(" ", "_"));
-				sipDO.setId(imagesDirectory.getName());
-				sipDO.setTitle("Images from " + imagesDirectory.getName());
-				sipDO.setOrigination(CreateSIPWithDWTest.class.getSimpleName());
-				sipDO
-						.setScopecontent("Test DigitalizedWork document created by "
-								+ sipDO.getOrigination());
-
-				StreamRepresentationObject streamRO = new DigitalizedWorkRepresentationBuilder()
-						.createRepresentation(filenames, streams);
-
-				SIPRepresentationObject sipRO = SIPUtility
-						.saveStreamRepresentationToDirectory(streamRO, TempDir
-								.createUniqueDirectory("rep1"));
-				sipDO.addRepresentation(sipRO);
-
-				SIP sip = new SIP();
-				sip.setDescriptionObject(sipDO);
-				sip.setParentPID(parentPID);
-
-				logger.debug("Created SIP " + sip);
-
-				FileOutputStream sipFileOutputStream = new FileOutputStream(
-						sipFile);
-				SIPUtility.writeSIPPackage(sip, sipFileOutputStream);
-				sipFileOutputStream.close();
-
-				System.out.println("SIP created in " + sipFile);
-
-			} catch (Exception e) {
-				e.printStackTrace();
-				System.exit(1);
-			}
+			// FIXME commented because static description levels doesn't
+			// exist anymore - START
+			// try {
+			//
+			// String sipFile = args[0];
+			// String parentPID = args[1];
+			// File imagesDirectory = new File(args[2]);
+			//
+			// List<String> filenames = new ArrayList<String>();
+			// List<InputStream> streams = new ArrayList<InputStream>();
+			//
+			// for (File imageFile : imagesDirectory.listFiles()) {
+			// filenames.add(imageFile.getName());
+			// streams.add(new FileInputStream(imageFile));
+			// }
+			//
+			// SIPDescriptionObject sipDO = new SIPDescriptionObject();
+			// sipDO.setLevel(DescriptionLevel.ITEM);
+			// sipDO.setCountryCode("PT");
+			// sipDO.setRepositoryCode("DGARQ");
+			// // sipDO.setId(imagesDirectory.getName().replace(" ", "_"));
+			// sipDO.setId(imagesDirectory.getName());
+			// sipDO.setTitle("Images from " + imagesDirectory.getName());
+			// sipDO.setOrigination(CreateSIPWithDWTest.class.getSimpleName());
+			// sipDO
+			// .setScopecontent("Test DigitalizedWork document created by "
+			// + sipDO.getOrigination());
+			//
+			// StreamRepresentationObject streamRO = new
+			// DigitalizedWorkRepresentationBuilder()
+			// .createRepresentation(filenames, streams);
+			//
+			// SIPRepresentationObject sipRO = SIPUtility
+			// .saveStreamRepresentationToDirectory(streamRO, TempDir
+			// .createUniqueDirectory("rep1"));
+			// sipDO.addRepresentation(sipRO);
+			//
+			// SIP sip = new SIP();
+			// sip.setDescriptionObject(sipDO);
+			// sip.setParentPID(parentPID);
+			//
+			// logger.debug("Created SIP " + sip);
+			//
+			// FileOutputStream sipFileOutputStream = new FileOutputStream(
+			// sipFile);
+			// SIPUtility.writeSIPPackage(sip, sipFileOutputStream);
+			// sipFileOutputStream.close();
+			//
+			// System.out.println("SIP created in " + sipFile);
+			//
+			// } catch (Exception e) {
+			// e.printStackTrace();
+			// System.exit(1);
+			// }
+			// FIXME commented because static description levels doesn't
+			// exist anymore - END
 
 		}
 	}
