@@ -1,0 +1,27 @@
+################################################################################
+# Using GWT dev mode in eclipse 
+################################################################################
+- Install Google Plugin
+- Go to roda-wui project properties and in the "Google > Web application" 
+separator select both the option "This project has a WAR directory" and
+"Launch and deploy from this directory ..."
+- Create a new run (from the type "Web Application")
+	- Main separator: set main class to "com.google.gwt.dev.DevMode"
+	- GWT separator: 2 modules should appear (if not, one must remove
+		the filter from the resources folder (project properties > 
+		Java Build Path > Source)
+	- Arguments separator: add the VM argument -Droda.home=$RODA_INSTALL_DIR
+
+################################################################################
+# Warning
+################################################################################
+If using Eclipse Plugin (dev mode), before executing "mvn package" to create 
+roda-wui.war you must delete the following folders (created by Eclipse with 
+GWT in dev mode):
+- src/main/gwt-unitCache/
+- src/main/webapp/pt.gov.dgarq.roda.disseminators.common.loading.Loading/
+- src/main/webapp/pt.gov.dgarq.roda.wui.main.Main/  
+- src/main/webapp/WEB-INF/deploy/ 
+- src/main/webapp/WEB-INF/classes/
+
+rm -rf src/main/gwt-unitCache/ src/main/webapp/pt.gov.dgarq.roda.disseminators.common.loading.Loading/ src/main/webapp/pt.gov.dgarq.roda.wui.main.Main/ src/main/webapp/WEB-INF/deploy/ src/main/webapp/WEB-INF/classes/
