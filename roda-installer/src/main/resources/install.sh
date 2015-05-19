@@ -106,7 +106,7 @@ if [ "$SERVLET_CONTAINER" = "tomcat6" ]; then
 	TOMCAT_DIRNAME="apache-tomcat-$TOMCAT_VERSION"
 	export TOMCAT_DIRNAME
 	TOMCAT_ZIP="$TOMCAT_DIRNAME.zip"
-	TOMCAT_ZIP_MD5="25c9223978a12a2b604f24eaccee858c"
+	TOMCAT_ZIP_MD5="314ae7781516a678f44e3067e0006c35"
 	TOMCAT_ZIP_URL="http://www.eu.apache.org/dist/tomcat/tomcat-${TOMCAT_VERSION%%.*}/v$TOMCAT_VERSION/bin/$TOMCAT_ZIP"
 	info "Installing Tomcat"
 	cp -v -r files/tomcat $RODA_HOME &>> $INSTALL_LOG
@@ -192,7 +192,7 @@ fi
 cd $SCRIPT_DIR
 if [ "$INSTALL_FITS" = "yes" ] && [ -f files/fits/bin/fits-setup.sh ]; then
 	FITS_ZIP="fits_v0.8.zip"
-	FITS_ZIP_MD5="ef626c2269b0e229b60b5969d5455529"
+	FITS_ZIP_MD5="e86b3c606b43f35ae2802bcfaeeb1d7d"
 	FITS_ZIP_URL="https://github.com/keeps/fits/releases/download/v0.8/fits_v0.8.zip"
 	info "Installing FITS"
 	cp -v -r files/fits/* $RODA_HOME &>> $INSTALL_LOG

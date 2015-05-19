@@ -50,11 +50,31 @@ The following software is needed:
 For Debian based systems, here is how to install all software other
 than RODA in a glimpse:
 
+12.04
    $> sudo apt-get install mysql-server slapd ldap-utils debconf-utils clamav \
    ant openjdk-6-jdk imagemagick ghostscript mencoder jodconverter \
    soundconverter ffmpeg gstreamer0.10-plugins-bad gstreamer0.10-plugins-ugly \
    gstreamer0.10-plugins-bad-multiverse gstreamer0.10-ffmpeg \
    fonts-ipafont-mincho fonts-ipafont-gothic ttf-arphic-ukai ttf-arphic-uming \
+   munin munin-node postfix unzip
+
+14.04
+   $> echo "deb http://ppa.launchpad.net/jon-severinsson/ffmpeg/ubuntu \
+   trusty main" | \
+   sudo tee -a /etc/apt/sources.list && \
+   sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 1DB8ADC1CFCA9579 && \
+   sudo apt-get update
+
+   $> echo "deb http://ppa.launchpad.net/mc3man/trusty-media/ubuntu trusty main " | \
+   sudo tee -a /etc/apt/sources.list && \
+   sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 90BD7EACED8E640A && \
+   sudo apt-get update
+
+   $> sudo apt-get install mysql-server slapd ldap-utils debconf-utils clamav \
+   ant openjdk-6-jdk imagemagick ghostscript mencoder jodconverter \
+   soundconverter ffmpeg gstreamer0.10-plugins-bad gstreamer0.10-plugins-ugly \
+   gstreamer0.10-plugins-bad gstreamer0.10-ffmpeg \
+   fonts-ipafont-mincho fonts-ipafont-gothic fonts-arphic-ukai fonts-arphic-uming \
    munin munin-node postfix unzip
 
    For demo environments, make the following configurations when

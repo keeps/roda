@@ -237,13 +237,15 @@ public class EditorHelper {
 	 * @param dObject
 	 *            the {@link DescriptionObject} to create.
 	 * @param permissions
-	 * 
+	 *
+	 * @param otherMetadataFilePath 
+	 *            path to other metadata file (might be the original or other one)
+	 *
 	 * @return a {@link String} with the PID of the newly created object.
 	 * 
 	 * @throws InvalidDescriptionObjectException
 	 * @throws EditorException
 	 */
-	// FIXME revise javadocs
 	public String createSingleDescriptionObject(DescriptionObject dObject,
 			RODAObjectPermissions permissions, String otherMetadataFilePath)
 			throws EditorException, InvalidDescriptionObjectException {
@@ -388,6 +390,8 @@ public class EditorHelper {
 	 * 
 	 * @param dObject
 	 *            the {@link DescriptionObject} to create.
+	 * @param otherMetadataFilePath 
+	 *            path to other metadata file (might be the original or other one)
 	 * 
 	 * @return a {@link String} with the PID of the newly created object.
 	 * 
@@ -395,7 +399,6 @@ public class EditorHelper {
 	 * @throws InvalidDescriptionObjectException
 	 * @throws EditorException
 	 */
-	// FIXME revise javadocs
 	public String createDescriptionObject(DescriptionObject dObject,
 			String otherMetadataFilePath) throws NoSuchRODAObjectException,
 			InvalidDescriptionObjectException, EditorException {

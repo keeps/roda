@@ -41,27 +41,21 @@ public interface DisseminationConstants extends Constants, ConstantsWithLookup {
 	@DefaultStringValue("item")
 	public String item();
 
-	// FIXME add i18n values
 	@DefaultStringValue("classification_scheme")
 	public String classification_scheme();
 
-	// FIXME add i18n values
 	@DefaultStringValue("casefile")
 	public String casefile();
 
-	// FIXME add i18n values
 	@DefaultStringValue("subfile")
 	public String subfile();
 
-	// FIXME add i18n values
 	@DefaultStringValue("volume")
 	public String volume();
 
-	// FIXME add i18n values
 	@DefaultStringValue("record")
 	public String record();
 
-	// FIXME add i18n values
 	@DefaultStringValue("component")
 	public String component();
 
@@ -185,16 +179,16 @@ public interface DisseminationConstants extends Constants, ConstantsWithLookup {
 	public String accruals();
 
 	// * Access
-	@DefaultStringValue("Access and use restritions")
+	@DefaultStringValue("Access and use restrictions")
 	public String accessGroupLabel();
 
 	@DefaultStringValue("Physical characteristics and technical requirements")
 	public String physTech();
 
-	@DefaultStringValue("Access restritions")
+	@DefaultStringValue("Access restrictions")
 	public String accessRestrict();
 
-	@DefaultStringValue("Reproduction restritions")
+	@DefaultStringValue("Reproduction restrictions")
 	public String useRestrict();
 	
 	@DefaultStringValue("Controlled access headings")
