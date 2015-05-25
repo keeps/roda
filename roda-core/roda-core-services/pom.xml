@@ -3,12 +3,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<name>roda-core-services</name>
 	<artifactId>roda-core-services</artifactId>
-	<version>1.2.0</version>
+	<version>1.3.0</version>
 	<packaging>war</packaging>
 	<parent>
 		<groupId>pt.gov.dgarq.roda</groupId>
 		<artifactId>roda-core</artifactId>
-		<version>1.2.0</version>
+		<version>1.3.0</version>
 	</parent>
 	<dependencies>
 		<dependency>
