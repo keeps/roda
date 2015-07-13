@@ -265,6 +265,11 @@
 			<groupId>org.objectweb.carol</groupId>
 			<artifactId>carol</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.roda-project</groupId>
+			<artifactId>roda-storage</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<pluginManagement>

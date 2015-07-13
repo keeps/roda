@@ -61,8 +61,7 @@ public interface BrowserServiceAsync {
 	 * @return the sub elements
 	 * @throws RODAException
 	 */
-	public void getSubElements(String pid,
-			ContentAdapter adapter, AsyncCallback<SimpleDescriptionObject[]> callback);
+	public void getSubElements(String pid, ContentAdapter adapter, AsyncCallback<SimpleDescriptionObject[]> callback);
 
 	/**
 	 * Get a RODA object
@@ -125,8 +124,7 @@ public interface BrowserServiceAsync {
 	 * @return the index of the collection
 	 * @throws RODAException
 	 */
-	public void getCollectionIndex(String collectionPID, Filter filter,
-			Sorter sorter, AsyncCallback<Integer> callback);
+	public void getCollectionIndex(String collectionPID, Filter filter, Sorter sorter, AsyncCallback<Integer> callback);
 
 	/**
 	 * Get an item index
@@ -140,8 +138,8 @@ public interface BrowserServiceAsync {
 	 * @return the item index
 	 * @throws RODAException
 	 */
-	public void getItemIndex(String parentPID, String childPID,
-			Filter filter, Sorter sorter, AsyncCallback<Integer> callback);
+	public void getItemIndex(String parentPID, String childPID, Filter filter, Sorter sorter,
+			AsyncCallback<Integer> callback);
 
 	/**
 	 * get sub elements
@@ -157,8 +155,8 @@ public interface BrowserServiceAsync {
 	 * @return the sub elements list
 	 * @throws RODAException
 	 */
-	public void getSubElements(String pid,
-			String focusOnChild, int count, Filter filter, Sorter sorter, AsyncCallback<SimpleDescriptionObject[]> callback);
+	public void getSubElements(String pid, String focusOnChild, int count, Filter filter, Sorter sorter,
+			AsyncCallback<SimpleDescriptionObject[]> callback);
 
 	/**
 	 * Get representations information
@@ -179,8 +177,7 @@ public interface BrowserServiceAsync {
 	 * @return The list of associated Representation Preservation Objects
 	 * @throws RODAException
 	 */
-	public void getDOPreservationObjects(
-			String doPID, AsyncCallback<List<RepresentationPreservationObject>> callback);
+	public void getDOPreservationObjects(String doPID, AsyncCallback<List<RepresentationPreservationObject>> callback);
 
 	/**
 	 * Get the preservation information
@@ -205,7 +202,7 @@ public interface BrowserServiceAsync {
 	 * @return {@link TimelineInfo}
 	 * @throws RODAException
 	 */
-	public void getPreservationTimeline(List<String> repPIDs,
-			List<String> icons, List<String> colors, String locale, AsyncCallback<TimelineInfo> callback);
+	public void getPreservationTimeline(List<String> repPIDs, List<String> icons, List<String> colors, String locale,
+			AsyncCallback<TimelineInfo> callback);
 
 }
