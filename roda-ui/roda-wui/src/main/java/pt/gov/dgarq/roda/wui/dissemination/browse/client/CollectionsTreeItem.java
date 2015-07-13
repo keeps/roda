@@ -5,13 +5,6 @@ package pt.gov.dgarq.roda.wui.dissemination.browse.client;
 
 import java.util.NoSuchElementException;
 
-import pt.gov.dgarq.roda.core.data.SimpleDescriptionObject;
-import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
-import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
-import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
-import pt.gov.dgarq.roda.wui.dissemination.browse.client.images.BrowseImageBundle;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
@@ -24,6 +17,12 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 
 import config.i18n.client.BrowseConstants;
 import config.i18n.client.BrowseMessages;
+import pt.gov.dgarq.roda.core.data.SimpleDescriptionObject;
+import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
+import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
+import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
+import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
+import pt.gov.dgarq.roda.wui.dissemination.browse.client.images.BrowseImageBundle;
 
 /**
  * @author Luis Faria
@@ -31,14 +30,11 @@ import config.i18n.client.BrowseMessages;
  */
 public class CollectionsTreeItem extends TreeItem {
 
-	private static BrowseConstants constants = (BrowseConstants) GWT
-			.create(BrowseConstants.class);
+	private static BrowseConstants constants = (BrowseConstants) GWT.create(BrowseConstants.class);
 
-	private static BrowseMessages messages = (BrowseMessages) GWT
-			.create(BrowseMessages.class);
+	private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
 
-	private static BrowseImageBundle browseImageBundle = (BrowseImageBundle) GWT
-			.create(BrowseImageBundle.class);
+	private static BrowseImageBundle browseImageBundle = (BrowseImageBundle) GWT.create(BrowseImageBundle.class);
 
 	private ClientLogger logger = new ClientLogger(getClass().getName());
 
@@ -83,8 +79,8 @@ public class CollectionsTreeItem extends TreeItem {
 	 * @param showInfo
 	 *            where to show extended info
 	 */
-	public CollectionsTreeItem(SimpleDescriptionObject sdo, Filter filter,
-			Sorter sorter, int childrenVisibleCount, boolean showInfo) {
+	public CollectionsTreeItem(SimpleDescriptionObject sdo, Filter filter, Sorter sorter, int childrenVisibleCount,
+			boolean showInfo) {
 		this.childrenVisibleCount = childrenVisibleCount;
 		this.sdo = sdo;
 		this.filter = filter;
@@ -108,10 +104,10 @@ public class CollectionsTreeItem extends TreeItem {
 		this.initialized = false;
 		this.initialising = false;
 
-		dummy = new TreeItem(constants.treeLoading());
+		dummy = new TreeItem();
+		dummy.setText(constants.treeLoading());
 
-		logger.debug(sdo.getPid() + " has " + sdo.getSubElementsCount()
-				+ " children");
+		logger.debug(sdo.getPid() + " has " + sdo.getSubElementsCount() + " children");
 
 		getChildrenCount(new AsyncCallback<Integer>() {
 
@@ -149,8 +145,8 @@ public class CollectionsTreeItem extends TreeItem {
 				callback.onSuccess(childrenCount);
 
 			} else {
-				BrowserService.Util.getInstance().getSubElementsCount(
-						sdo.getPid(), filter, new AsyncCallback<Integer>() {
+				BrowserService.Util.getInstance().getSubElementsCount(sdo.getPid(), filter,
+						new AsyncCallback<Integer>() {
 
 							public void onFailure(Throwable caught) {
 								callback.onFailure(caught);
@@ -223,8 +219,7 @@ public class CollectionsTreeItem extends TreeItem {
 	public void setChildrenVisibleCount(int childrenVisibleCount) {
 		if (this.childrenVisibleCount != childrenVisibleCount) {
 			this.childrenVisibleCount = childrenVisibleCount;
-			logger.debug("setChildrenVisibleCount calls load(" + currentOffset
-					+ ")");
+			logger.debug("setChildrenVisibleCount calls load(" + currentOffset + ")");
 			load(getCurrentOffset(), null);
 		}
 
@@ -243,24 +238,21 @@ public class CollectionsTreeItem extends TreeItem {
 	protected void load(final int offset, AsyncCallback<Integer> callback) {
 		itemPanel.setWaitImageVisible(true);
 
-		final AsyncCallback<Integer> async = callback != null ? callback
-				: new AsyncCallback<Integer>() {
+		final AsyncCallback<Integer> async = callback != null ? callback : new AsyncCallback<Integer>() {
 
-					public void onFailure(Throwable caught) {
-						logger.error("Error loading " + offset, caught);
-					}
+			public void onFailure(Throwable caught) {
+				logger.error("Error loading " + offset, caught);
+			}
 
-					public void onSuccess(Integer result) {
-						// nothing to do
-					}
+			public void onSuccess(Integer result) {
+				// nothing to do
+			}
 
-				};
+		};
 
-		final int last = (sdo.getSubElementsCount() < offset
-				+ childrenVisibleCount) ? sdo.getSubElementsCount() : offset
-				+ childrenVisibleCount;
-		int newOffset = (last - childrenVisibleCount >= 0) ? last
-				- childrenVisibleCount : 0;
+		final int last = (sdo.getSubElementsCount() < offset + childrenVisibleCount) ? sdo.getSubElementsCount()
+				: offset + childrenVisibleCount;
+		int newOffset = (last - childrenVisibleCount >= 0) ? last - childrenVisibleCount : 0;
 
 		if (currentOffset != newOffset || initialising) {
 			currentOffset = newOffset;
@@ -270,13 +262,10 @@ public class CollectionsTreeItem extends TreeItem {
 
 			previousItem.setVisible(currentOffset > 0);
 
-			nextItem
-					.setVisible(sdo.getSubElementsCount() > childrenVisibleCount
-							&& currentOffset < sdo.getSubElementsCount()
-									- childrenVisibleCount);
+			nextItem.setVisible(sdo.getSubElementsCount() > childrenVisibleCount
+					&& currentOffset < sdo.getSubElementsCount() - childrenVisibleCount);
 
-			logger.debug("Adding items [" + currentOffset + ", " + (last - 1)
-					+ "]");
+			logger.debug("Adding items [" + currentOffset + ", " + (last - 1) + "]");
 
 			ensureLoaded(new AsyncCallback<Integer>() {
 
@@ -295,50 +284,31 @@ public class CollectionsTreeItem extends TreeItem {
 					} else {
 						for (int i = currentOffset; i < last; i++) {
 							final int index = i;
-							memCache
-									.getElement(
-											index,
-											new AsyncCallback<SimpleDescriptionObject>() {
+							memCache.getElement(index, new AsyncCallback<SimpleDescriptionObject>() {
 
-												public void onFailure(
-														Throwable caught) {
-													logger
-															.error(
-																	"Error getting child "
-																			+ index
-																			+ " of "
-																			+ sdo
-																					.getPid(),
-																	caught);
-													dummy.setText("error!");
-													itemPanel
-															.setWaitImageVisible(false);
-													async.onFailure(caught);
-												}
+								public void onFailure(Throwable caught) {
+									logger.error("Error getting child " + index + " of " + sdo.getPid(), caught);
+									dummy.setText("error!");
+									itemPanel.setWaitImageVisible(false);
+									async.onFailure(caught);
+								}
 
-												public void onSuccess(
-														SimpleDescriptionObject sdo) {
-													if (initialising) {
-														initialising = false;
-														removeItems();
-														addItem(previousItem);
-													}
-													CollectionsTreeItem item = new CollectionsTreeItem(
-															sdo,
-															filter,
-															sorter,
-															childrenVisibleCount,
-															showInfo);
-													addCollectionItem(item);
-													if (--waitingToLoad <= 0) {
-														itemPanel
-																.setWaitImageVisible(false);
-														async
-																.onSuccess(currentOffset);
-													}
-												}
+								public void onSuccess(SimpleDescriptionObject sdo) {
+									if (initialising) {
+										initialising = false;
+										removeItems();
+										addItem(previousItem);
+									}
+									CollectionsTreeItem item = new CollectionsTreeItem(sdo, filter, sorter,
+											childrenVisibleCount, showInfo);
+									addCollectionItem(item);
+									if (--waitingToLoad <= 0) {
+										itemPanel.setWaitImageVisible(false);
+										async.onSuccess(currentOffset);
+									}
+								}
 
-											});
+							});
 						}
 					}
 				}
@@ -360,8 +330,7 @@ public class CollectionsTreeItem extends TreeItem {
 		addItem(item);
 		addItem(nextItem);
 
-		Element itemContainer = DOM.getParent(DOM.getParent(item.getWidget()
-				.getElement()));
+		Element itemContainer = DOM.getParent(DOM.getParent(item.getWidget().getElement()));
 		DOM.setElementProperty(itemContainer, "width", "100%");
 	}
 
@@ -395,9 +364,8 @@ public class CollectionsTreeItem extends TreeItem {
 		public JumpCollectionsTreeItem(boolean next) {
 			this.next = next;
 			layout = new HorizontalPanel();
-			icon = next ? browseImageBundle.collectionsTreeNextResults()
-					.createImage() : browseImageBundle
-					.collectionsTreePreviousResults().createImage();
+			icon = next ? browseImageBundle.collectionsTreeNextResults().createImage()
+					: browseImageBundle.collectionsTreePreviousResults().createImage();
 			text = new Label();
 
 			layout.add(icon);
@@ -421,16 +389,11 @@ public class CollectionsTreeItem extends TreeItem {
 
 		protected void updateText() {
 			if (next) {
-				int last = Math.min(currentOffset + 2 * childrenVisibleCount,
-						sdo.getSubElementsCount());
-				text.setText(messages.nextItems(
-						last - childrenVisibleCount + 1, last, sdo
-								.getSubElementsCount()));
+				int last = Math.min(currentOffset + 2 * childrenVisibleCount, sdo.getSubElementsCount());
+				text.setText(messages.nextItems(last - childrenVisibleCount + 1, last, sdo.getSubElementsCount()));
 			} else {
-				int first = currentOffset - childrenVisibleCount < 0 ? 0
-						: currentOffset - childrenVisibleCount;
-				text.setText(messages.previousItems(first + 1, first
-						+ childrenVisibleCount));
+				int first = currentOffset - childrenVisibleCount < 0 ? 0 : currentOffset - childrenVisibleCount;
+				text.setText(messages.previousItems(first + 1, first + childrenVisibleCount));
 			}
 		}
 
@@ -439,14 +402,12 @@ public class CollectionsTreeItem extends TreeItem {
 		 */
 		public void jump() {
 			if (next) {
-				load(Math.min(currentOffset + childrenVisibleCount, sdo
-						.getSubElementsCount()
-						- childrenVisibleCount), null);
+				load(Math.min(currentOffset + childrenVisibleCount, sdo.getSubElementsCount() - childrenVisibleCount),
+						null);
 
 			} else {
 
-				load(currentOffset - childrenVisibleCount < 0 ? 0
-						: currentOffset - childrenVisibleCount, null);
+				load(currentOffset - childrenVisibleCount < 0 ? 0 : currentOffset - childrenVisibleCount, null);
 			}
 		}
 
@@ -489,8 +450,7 @@ public class CollectionsTreeItem extends TreeItem {
 	 * @param callback
 	 *            returns the CollectionsTreeItem witch the path points to
 	 */
-	public void focusOn(final String[] path,
-			final AsyncCallback<CollectionsTreeItem> callback) {
+	public void focusOn(final String[] path, final AsyncCallback<CollectionsTreeItem> callback) {
 		if (path.length == 0) {
 			if (!this.isSelected()) {
 				logger.debug("item " + sdo.getPid() + " selecting itself");
@@ -522,13 +482,12 @@ public class CollectionsTreeItem extends TreeItem {
 	 * @param callback
 	 *            handle the child's CollectionsTreeItem
 	 */
-	public void focusOn(final String pid,
-			final AsyncCallback<CollectionsTreeItem> callback) {
+	public void focusOn(final String pid, final AsyncCallback<CollectionsTreeItem> callback) {
 		if (!initialized) {
 			initialising = true;
 		}
-		BrowserService.Util.getInstance().getItemIndex(sdo.getPid(), pid,
-				getFilter(), getSorter(), new AsyncCallback<Integer>() {
+		BrowserService.Util.getInstance().getItemIndex(sdo.getPid(), pid, getFilter(), getSorter(),
+				new AsyncCallback<Integer>() {
 
 					public void onFailure(Throwable caught) {
 						initialising = false;
@@ -539,8 +498,7 @@ public class CollectionsTreeItem extends TreeItem {
 						final int index = itemIndex.intValue();
 						if (index >= 0) {
 
-							final int newOffset = (index / childrenVisibleCount)
-									* childrenVisibleCount;
+							final int newOffset = (index / childrenVisibleCount) * childrenVisibleCount;
 							load(newOffset, new AsyncCallback<Integer>() {
 
 								public void onFailure(Throwable caught) {
@@ -552,18 +510,14 @@ public class CollectionsTreeItem extends TreeItem {
 									initialized = true;
 									initialising = false;
 									CollectionsTreeItem.this.setState(true);
-									CollectionsTreeItem focusItem = (CollectionsTreeItem) getChild(index
-											- currentOffset + 1);
+									CollectionsTreeItem focusItem = (CollectionsTreeItem) getChild(
+											index - currentOffset + 1);
 									if (focusItem != null) {
 										callback.onSuccess(focusItem);
 									} else {
-										callback
-												.onFailure(new IndexOutOfBoundsException(
-														"Get child "
-																+ (index
-																		- currentOffset + 1)
-																+ " when child count is "
-																+ getChildCount()));
+										callback.onFailure(
+												new IndexOutOfBoundsException("Get child " + (index - currentOffset + 1)
+														+ " when child count is " + getChildCount()));
 									}
 								}
 
@@ -571,8 +525,7 @@ public class CollectionsTreeItem extends TreeItem {
 						} else {
 							initialising = false;
 							callback.onFailure(new NoSuchElementException(
-									"Index of " + pid + " under "
-											+ sdo.getPid() + " not found!"));
+									"Index of " + pid + " under " + sdo.getPid() + " not found!"));
 						}
 					}
 				});
@@ -599,14 +552,11 @@ public class CollectionsTreeItem extends TreeItem {
 	 *            update hierarchy
 	 * @param callback
 	 */
-	public void update(final String[] path, final boolean info,
-			final boolean hierarchy,
+	public void update(final String[] path, final boolean info, final boolean hierarchy,
 			final AsyncCallback<CollectionsTreeItem> callback) {
 		if (path.length == 1) {
-			logger.debug("found the father of the element to update,"
-					+ " refreshing cache");
-			BrowserService.Util.getInstance().getItemIndex(sdo.getPid(),
-					path[0], getFilter(), getSorter(),
+			logger.debug("found the father of the element to update," + " refreshing cache");
+			BrowserService.Util.getInstance().getItemIndex(sdo.getPid(), path[0], getFilter(), getSorter(),
 					new AsyncCallback<Integer>() {
 
 						public void onFailure(Throwable caught) {
@@ -614,8 +564,7 @@ public class CollectionsTreeItem extends TreeItem {
 						}
 
 						public void onSuccess(Integer itemIndex) {
-							update(path[0], itemIndex, info, hierarchy,
-									callback);
+							update(path[0], itemIndex, info, hierarchy, callback);
 						}
 
 					});
@@ -635,8 +584,7 @@ public class CollectionsTreeItem extends TreeItem {
 		}
 	}
 
-	private void update(final String pid, final int index, final boolean info,
-			final boolean hierarchy,
+	private void update(final String pid, final int index, final boolean info, final boolean hierarchy,
 			final AsyncCallback<CollectionsTreeItem> callback) {
 		memCache.clear(index, new AsyncCallback<SimpleDescriptionObject>() {
 

@@ -103,7 +103,7 @@
 		<build.date>${maven.build.timestamp}</build.date>
 		<maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
 		<java_version>1.6</java_version>
-		<gwt_version>2.4.0</gwt_version>
+		<gwt_version>2.7.0</gwt_version>
 		<!-- THE PROPERTY THAT FOLLOWS IS NOT YET IN USE -->
 		<fedora_version>3.6.2</fedora_version>
 		<cas.version>3.5.2</cas.version>

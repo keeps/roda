@@ -1,28 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "-//Google Inc.//DTD Google Web Toolkit 2.7.0//EN"
+  "http://gwtproject.org/doctype/2.7.0/gwt-module.dtd">
 <module>
 
 	<!-- Inherit the core Web Toolkit stuff. -->
 	<inherits name='com.google.gwt.user.User' />
-	<inherits name="com.google.gwt.http.HTTP"/> 
-	
-	<extend-property name="locale" values="pt_PT"/>
+	<inherits name="com.google.gwt.http.HTTP" />
+
+	<extend-property name="locale" values="pt_PT" />
 
 	<!-- Inherit required libraries -->
 	<inherits name='org.adamtacy.GWTEffects' />
-	<inherits name='com.netthreads.gwt.simile.timeline.Timeline' />  
+	<inherits name='com.netthreads.gwt.simile.timeline.Timeline' />
 
-	<!-- Inherit sub-projects                  -->
+	<!-- Inherit sub-projects -->
 	<inherits name="pt.gov.dgarq.roda.wui.common.Common" />
 	<inherits name="pt.gov.dgarq.roda.wui.home.Home" />
 	<inherits name="pt.gov.dgarq.roda.wui.about.About" />
-	<inherits
-		name="pt.gov.dgarq.roda.wui.dissemination.Dissemination" />
+	<inherits name="pt.gov.dgarq.roda.wui.dissemination.Dissemination" />
 	<inherits name="pt.gov.dgarq.roda.wui.management.Management" />
 	<inherits name="pt.gov.dgarq.roda.wui.ingest.Ingest" />
 
-	<!-- Specify the app entry point class.                   -->
+	<!-- Specify the app entry point class. -->
 	<entry-point class='pt.gov.dgarq.roda.wui.main.client.Main' />
 
 	<!-- Specify the cascade stylesheet to use -->
 	<stylesheet src="Main.css" />
-
+	<set-configuration-property name='xsiframe.failIfScriptTag' value='FALSE'/>
 </module>
