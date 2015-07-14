@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<prem:object xsi:type="prem:representation" xmlns:prem="info:lc/xmlns/premis-v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <prem:objectIdentifier>
+    <prem:objectIdentifierType>RODAObjectPID</prem:objectIdentifierType>
+    <prem:objectIdentifierValue>roda:399</prem:objectIdentifierValue>
+  </prem:objectIdentifier>
+  <prem:preservationLevel>
+    <prem:preservationLevelValue>full</prem:preservationLevelValue>
+    <prem:preservationLevelDateAssigned>2013-09-17T10:56:06Z</prem:preservationLevelDateAssigned>
+  </prem:preservationLevel>
+  <prem:relationship>
+    <prem:relationshipType>structural</prem:relationshipType>
+    <prem:relationshipSubType>has root</prem:relationshipSubType>
+    <prem:relatedObjectIdentification>
+      <prem:relatedObjectIdentifierType>RODAObjectDatastreamID</prem:relatedObjectIdentifierType>
+      <prem:relatedObjectIdentifierValue>F0</prem:relatedObjectIdentifierValue>
+      <prem:relatedObjectSequence>0</prem:relatedObjectSequence>
+    </prem:relatedObjectIdentification>
+  </prem:relationship>
+  <prem:relationship>
+    <prem:relationshipType>structural</prem:relationshipType>
+    <prem:relationshipSubType>has part</prem:relationshipSubType>
+    <prem:relatedObjectIdentification>
+      <prem:relatedObjectIdentifierType>RODAObjectDatastreamID</prem:relatedObjectIdentifierType>
+      <prem:relatedObjectIdentifierValue>F1</prem:relatedObjectIdentifierValue>
+      <prem:relatedObjectSequence>1</prem:relatedObjectSequence>
+    </prem:relatedObjectIdentification>
+  </prem:relationship>
+  <prem:relationship>
+    <prem:relationshipType>derivation</prem:relationshipType>
+    <prem:relationshipSubType>derived from</prem:relationshipSubType>
+    <prem:relatedObjectIdentification>
+      <prem:relatedObjectIdentifierType>RODAObjectPID</prem:relatedObjectIdentifierType>
+      <prem:relatedObjectIdentifierValue>roda:396</prem:relatedObjectIdentifierValue>
+    </prem:relatedObjectIdentification>
+    <prem:relatedEventIdentification>
+      <prem:relatedEventIdentifierType>RODAObjectPID</prem:relatedEventIdentifierType>
+      <prem:relatedEventIdentifierValue>roda:400</prem:relatedEventIdentifierValue>
+    </prem:relatedEventIdentification>
+  </prem:relationship>
+</prem:object>

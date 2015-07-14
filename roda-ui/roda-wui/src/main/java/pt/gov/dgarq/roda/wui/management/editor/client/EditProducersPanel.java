@@ -7,19 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
-import pt.gov.dgarq.roda.core.data.Group;
-import pt.gov.dgarq.roda.core.data.RODAMember;
-import pt.gov.dgarq.roda.core.data.SimpleDescriptionObject;
-import pt.gov.dgarq.roda.core.data.User;
-import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
-import pt.gov.dgarq.roda.wui.common.client.SuccessListener;
-import pt.gov.dgarq.roda.wui.common.client.widgets.LoadingPopup;
-import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
-import pt.gov.dgarq.roda.wui.ingest.client.Ingest;
-import pt.gov.dgarq.roda.wui.management.user.client.GroupMiniPanel;
-import pt.gov.dgarq.roda.wui.management.user.client.SelectGroupWindow;
-import pt.gov.dgarq.roda.wui.management.user.client.SelectUserWindow;
-import pt.gov.dgarq.roda.wui.management.user.client.UserMiniPanel;
+import org.roda.legacy.aip.metadata.descriptive.SimpleDescriptionObject;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -33,6 +21,18 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.MetadataEditorConstants;
+import pt.gov.dgarq.roda.core.data.Group;
+import pt.gov.dgarq.roda.core.data.RODAMember;
+import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
+import pt.gov.dgarq.roda.wui.common.client.SuccessListener;
+import pt.gov.dgarq.roda.wui.common.client.widgets.LoadingPopup;
+import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
+import pt.gov.dgarq.roda.wui.ingest.client.Ingest;
+import pt.gov.dgarq.roda.wui.management.user.client.GroupMiniPanel;
+import pt.gov.dgarq.roda.wui.management.user.client.SelectGroupWindow;
+import pt.gov.dgarq.roda.wui.management.user.client.SelectUserWindow;
+import pt.gov.dgarq.roda.wui.management.user.client.UserMiniPanel;
 
 /**
  * @author Luis Faria
@@ -82,14 +82,10 @@ public class EditProducersPanel extends Composite {
 		memberListScroll = new ScrollPanel(memberListPanel);
 
 		actionButtons = new ArrayList<WUIButton>();
-		addUser = new WUIButton(constants.editProducersAddUser(),
-				WUIButton.Left.ROUND, WUIButton.Right.PLUS);
-		addGroup = new WUIButton(constants.editProducersAddGroup(),
-				WUIButton.Left.ROUND, WUIButton.Right.PLUS);
-		delete = new WUIButton(constants.editProducersDelete(),
-				WUIButton.Left.ROUND, WUIButton.Right.MINUS);
-		getRodaIn = new WUIButton(constants.editProducersRodaIn(),
-				WUIButton.Left.ROUND, WUIButton.Right.ARROW_DOWN);
+		addUser = new WUIButton(constants.editProducersAddUser(), WUIButton.Left.ROUND, WUIButton.Right.PLUS);
+		addGroup = new WUIButton(constants.editProducersAddGroup(), WUIButton.Left.ROUND, WUIButton.Right.PLUS);
+		delete = new WUIButton(constants.editProducersDelete(), WUIButton.Left.ROUND, WUIButton.Right.MINUS);
+		getRodaIn = new WUIButton(constants.editProducersRodaIn(), WUIButton.Left.ROUND, WUIButton.Right.ARROW_DOWN);
 
 		actionButtons.add(addUser);
 		actionButtons.add(addGroup);
@@ -258,46 +254,44 @@ public class EditProducersPanel extends Composite {
 
 	private void initializeProducerList() {
 		loading.show();
-		EditorService.Util.getInstance().getProducers(fondsSdo.getPid(),
-				new AsyncCallback<List<RODAMember>>() {
+		EditorService.Util.getInstance().getProducers(fondsSdo.getId(), new AsyncCallback<List<RODAMember>>() {
 
-					public void onFailure(Throwable caught) {
-						loading.hide();
-						logger.error("Error initialing producer list", caught);
-					}
+			public void onFailure(Throwable caught) {
+				loading.hide();
+				logger.error("Error initialing producer list", caught);
+			}
 
-					public void onSuccess(List<RODAMember> producers) {
-						EditProducersPanel.this.producers = producers;
-						updateMemberList();
-						loading.hide();
-					}
+			public void onSuccess(List<RODAMember> producers) {
+				EditProducersPanel.this.producers = producers;
+				updateMemberList();
+				loading.hide();
+			}
 
-				});
+		});
 	}
 
 	private void addProducer(RODAMember producer) {
 		loading.show();
-		EditorService.Util.getInstance().addProducer(producer,
-				fondsSdo.getPid(), new AsyncCallback<List<RODAMember>>() {
+		EditorService.Util.getInstance().addProducer(producer, fondsSdo.getId(), new AsyncCallback<List<RODAMember>>() {
 
-					public void onFailure(Throwable caught) {
-						loading.hide();
-						logger.error("Error adding producer", caught);
-					}
+			public void onFailure(Throwable caught) {
+				loading.hide();
+				logger.error("Error adding producer", caught);
+			}
 
-					public void onSuccess(List<RODAMember> producers) {
-						EditProducersPanel.this.producers = producers;
-						updateMemberList();
-						loading.hide();
-					}
+			public void onSuccess(List<RODAMember> producers) {
+				EditProducersPanel.this.producers = producers;
+				updateMemberList();
+				loading.hide();
+			}
 
-				});
+		});
 	}
 
 	private void removeProducers(List<RODAMember> producers) {
 		loading.show();
-		EditorService.Util.getInstance().removeProducers(producers,
-				fondsSdo.getPid(), new AsyncCallback<List<RODAMember>>() {
+		EditorService.Util.getInstance().removeProducers(producers, fondsSdo.getId(),
+				new AsyncCallback<List<RODAMember>>() {
 
 					public void onFailure(Throwable caught) {
 						loading.hide();
@@ -320,8 +314,7 @@ public class EditProducersPanel extends Composite {
 		} else if (miniPanel instanceof GroupMiniPanel) {
 			ret = ((GroupMiniPanel) miniPanel).isSelected();
 		} else {
-			throw new IllegalArgumentException(
-					"target not a UserMiniPanel nor GroupMiniPanel");
+			throw new IllegalArgumentException("target not a UserMiniPanel nor GroupMiniPanel");
 		}
 		return ret;
 	}
@@ -332,8 +325,7 @@ public class EditProducersPanel extends Composite {
 		} else if (miniPanel instanceof GroupMiniPanel) {
 			((GroupMiniPanel) miniPanel).setSelected(selected);
 		} else {
-			throw new IllegalArgumentException(
-					"target not a UserMiniPanel nor GroupMiniPanel");
+			throw new IllegalArgumentException("target not a UserMiniPanel nor GroupMiniPanel");
 		}
 	}
 
@@ -353,8 +345,7 @@ public class EditProducersPanel extends Composite {
 
 	private void updateVisibles() {
 		delete.setEnabled(selected != null);
-		getRodaIn.setEnabled(selected != null
-				&& selected instanceof UserMiniPanel);
+		getRodaIn.setEnabled(selected != null && selected instanceof UserMiniPanel);
 	}
 
 	private void updateMemberList() {
@@ -378,8 +369,7 @@ public class EditProducersPanel extends Composite {
 
 			} else if (member instanceof Group) {
 				Group group = (Group) member;
-				final GroupMiniPanel groupMiniPanel = new GroupMiniPanel(group
-						.getName());
+				final GroupMiniPanel groupMiniPanel = new GroupMiniPanel(group.getName());
 				memberListPanel.add(groupMiniPanel.getWidget());
 				groupMiniPanels.add(groupMiniPanel);
 				groupMiniPanel.addChangeListener(new ChangeListener() {

@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<prem:object xsi:type="prem:file" xmlns:prem="info:lc/xmlns/premis-v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <prem:objectIdentifier>
+    <prem:objectIdentifierType>RODAObjectDatastreamID</prem:objectIdentifierType>
+    <prem:objectIdentifierValue>F1</prem:objectIdentifierValue>
+  </prem:objectIdentifier>
+  <prem:preservationLevel>
+    <prem:preservationLevelValue>full</prem:preservationLevelValue>
+    <prem:preservationLevelDateAssigned>2013-09-17T10:56:06Z</prem:preservationLevelDateAssigned>
+  </prem:preservationLevel>
+  <prem:objectCharacteristics>
+    <prem:compositionLevel>0</prem:compositionLevel>
+    <prem:fixity>
+      <prem:messageDigestAlgorithm>MD5</prem:messageDigestAlgorithm>
+      <prem:messageDigest>E41B259821BC63E2C3D1F34C6D4EDD95</prem:messageDigest>
+      <prem:messageDigestOriginator>RODA Core Services</prem:messageDigestOriginator>
+    </prem:fixity>
+    <prem:fixity>
+      <prem:messageDigestAlgorithm>SHA-1</prem:messageDigestAlgorithm>
+      <prem:messageDigest>1F85E7789EB61D4EDF20866283FE36338461641F</prem:messageDigest>
+      <prem:messageDigestOriginator>RODA Core Services</prem:messageDigestOriginator>
+    </prem:fixity>
+    <prem:size>0</prem:size>
+    <prem:format>
+      <prem:formatDesignation>
+        <prem:formatName>image/tiff</prem:formatName>
+      </prem:formatDesignation>
+    </prem:format>
+    <prem:objectCharacteristicsExtension>
+      <jhove xsi:schemaLocation="http://hul.harvard.edu/ois/xml/ns/jhove http://hul.harvard.edu/ois/xml/xsd/jhove/1.6/jhove.xsd" name="JhoveUtility" release="1.0" date="2013-08-17" xmlns="http://hul.harvard.edu/ois/xml/ns/jhove">
+        <date>2013-09-17T11:56:05+01:00</date>
+        <repInfo uri="/home/roda/roda/tomcat/apache-tomcat-6.0.37/temp/rFile1918272577561392675temp">
+          <reportingModule release="1.5" date="2007-10-02">TIFF-hul</reportingModule>
+          <lastModified>2013-09-17T11:56:05+01:00</lastModified>
+          <size>3236726</size>
+          <format>TIFF</format>
+          <version>4.0</version>
+          <status>Well-Formed and valid</status>
+          <sigMatch>
+            <module>TIFF-hul</module>
+          </sigMatch>
+          <mimeType>image/tiff</mimeType>
+          <profiles>
+            <profile>Baseline RGB (Class R)</profile>
+          </profiles>
+          <properties>
+            <property>
+              <name>TIFFMetadata</name>
+              <values arity="Array" type="Property">
+                <property>
+                  <name>ByteOrder</name>
+                  <values arity="Scalar" type="String">
+                    <value>little-endian</value>
+                  </values>
+                </property>
+                <property>
+                  <name>IFDs</name>
+                  <values arity="List" type="Property">
+                    <property>
+                      <name>Number</name>
+                      <values arity="Scalar" type="Integer">
+                        <value>1</value>
+                      </values>
+                    </property>
+                    <property>
+                      <name>IFD</name>
+                      <values arity="Array" type="Property">
+                        <property>
+                          <name>Offset</name>
+                          <values arity="Scalar" type="Long">
+                            <value>3232808</value>
+                          </values>
+                        </property>
+                        <property>
+                          <name>Type</name>
+                          <values arity="Scalar" type="String">
+                            <value>TIFF</value>
+                          </values>
+                        </property>
+                        <property>
+                          <name>Entries</name>
+                          <values arity="List" type="Property">
+                            <property>
+                              <name>NisoImageMetadata</name>
+                              <values arity="Scalar" type="NISOImageMetadata">
+                                <value>
+                                  <mix:mix xsi:schemaLocation="http://www.loc.gov/mix/v20 http://www.loc.gov/standards/mix/mix20/mix20.xsd" xmlns:mix="http://www.loc.gov/mix/v20">
+                                    <mix:BasicDigitalObjectInformation>
+                                      <mix:ObjectIdentifier>
+                                        <mix:objectIdentifierType>JHOVE</mix:objectIdentifierType>
+                                      </mix:ObjectIdentifier>
+                                      <mix:byteOrder>little endian</mix:byteOrder>
+                                      <mix:Compression>
+                                        <mix:compressionScheme>Uncompressed</mix:compressionScheme>
+                                      </mix:Compression>
+                                    </mix:BasicDigitalObjectInformation>
+                                    <mix:BasicImageInformation>
+                                      <mix:BasicImageCharacteristics>
+                                        <mix:imageWidth>1200</mix:imageWidth>
+                                        <mix:imageHeight>898</mix:imageHeight>
+                                        <mix:PhotometricInterpretation>
+                                          <mix:colorSpace>RGB</mix:colorSpace>
+                                          <mix:ReferenceBlackWhite>
+                                            <mix:Component>
+                                              <mix:componentPhotometricInterpretation>R</mix:componentPhotometricInterpretation>
+                                              <mix:footroom>
+                                                <mix:numerator>0</mix:numerator>
+                                              </mix:footroom>
+                                              <mix:headroom>
+                                                <mix:numerator>255</mix:numerator>
+                                              </mix:headroom>
+                                            </mix:Component>
+                                            <mix:Component>
+                                              <mix:componentPhotometricInterpretation>G</mix:componentPhotometricInterpretation>
+                                              <mix:footroom>
+                                                <mix:numerator>0</mix:numerator>
+                                              </mix:footroom>
+                                              <mix:headroom>
+                                                <mix:numerator>255</mix:numerator>
+                                              </mix:headroom>
+                                            </mix:Component>
+                                            <mix:Component>
+                                              <mix:componentPhotometricInterpretation>B</mix:componentPhotometricInterpretation>
+                                              <mix:footroom>
+                                                <mix:numerator>0</mix:numerator>
+                                              </mix:footroom>
+                                              <mix:headroom>
+                                                <mix:numerator>255</mix:numerator>
+                                              </mix:headroom>
+                                            </mix:Component>
+                                          </mix:ReferenceBlackWhite>
+                                        </mix:PhotometricInterpretation>
+                                      </mix:BasicImageCharacteristics>
+                                    </mix:BasicImageInformation>
+                                    <mix:ImageCaptureMetadata>
+                                      <mix:orientation>normal*</mix:orientation>
+                                    </mix:ImageCaptureMetadata>
+                                    <mix:ImageAssessmentMetadata>
+                                      <mix:SpatialMetrics>
+                                        <mix:samplingFrequencyUnit>in.</mix:samplingFrequencyUnit>
+                                        <mix:xSamplingFrequency>
+                                          <mix:numerator>1207959552</mix:numerator>
+                                          <mix:denominator>16777216</mix:denominator>
+                                        </mix:xSamplingFrequency>
+                                        <mix:ySamplingFrequency>
+                                          <mix:numerator>1207959552</mix:numerator>
+                                          <mix:denominator>16777216</mix:denominator>
+                                        </mix:ySamplingFrequency>
+                                      </mix:SpatialMetrics>
+                                      <mix:ImageColorEncoding>
+                                        <mix:BitsPerSample>
+                                          <mix:bitsPerSampleValue>8</mix:bitsPerSampleValue>
+                                          <mix:bitsPerSampleValue>8</mix:bitsPerSampleValue>
+                                          <mix:bitsPerSampleUnit>integer</mix:bitsPerSampleUnit>
+                                        </mix:BitsPerSample>
+                                        <mix:samplesPerPixel>3</mix:samplesPerPixel>
+                                      </mix:ImageColorEncoding>
+                                    </mix:ImageAssessmentMetadata>
+                                  </mix:mix>
+                                </value>
+                              </values>
+                            </property>
+                            <property>
+                              <name>NewSubfileType</name>
+                              <values arity="Scalar" type="Long">
+                                <value>0</value>
+                              </values>
+                            </property>
+                            <property>
+                              <name>DocmentName</name>
+                              <values arity="Scalar" type="String">
+                                <value>/home/roda/roda/tomcat/apache-tomcat-6.0.37/temp/convertedRep3255375520741996103temp/F1.tiff</value>
+                              </values>
+                            </property>
+                            <property>
+                              <name>PageNumber</name>
+                              <values arity="Array" type="Integer">
+                                <value>0</value>
+                                <value>1</value>
+                              </values>
+                            </property>
+                            <property>
+                              <name>FillOrder</name>
+                              <values arity="Scalar" type="String">
+                                <value>high-order</value>
+                              </values>
+                            </property>
+                            <property>
+                              <name>SampleFormat</name>
+                              <values arity="Array" type="Integer">
+                                <value>1</value>
+                                <value>1</value>
+                                <value>1</value>
+                              </values>
+                            </property>
+                            <property>
+                              <name>MinSampleValue</name>
+                              <values arity="Array" type="Integer">
+                                <value>0</value>
+                                <value>0</value>
+                                <value>0</value>
+                              </values>
+                            </property>
+                            <property>
+                              <name>MaxSampleValue</name>
+                              <values arity="Array" type="Integer">
+                                <value>255</value>
+                                <value>255</value>
+                                <value>255</value>
+                              </values>
+                            </property>
+                            <property>
+                              <name>TransferRange</name>
+                              <values arity="Array" type="Integer">
+                                <value>0</value>
+                                <value>255</value>
+                                <value>0</value>
+                                <value>255</value>
+                                <value>0</value>
+                                <value>255</value>
+                              </values>
+                            </property>
+                            <property>
+                              <name>Threshholding</name>
+                              <values arity="Scalar" type="Integer">
+                                <value>1</value>
+                              </values>
+                            </property>
+                            <property>
+                              <name>TIFFITProperties</name>
+                              <values arity="List" type="Property">
+                                <property>
+                                  <name>BackgroundColorIndicator</name>
+                                  <values arity="Scalar" type="String">
+                                    <value>background not defined</value>
+                                  </values>
+                                </property>
+                                <property>
+                                  <name>ImageColorIndicator</name>
+                                  <values arity="Scalar" type="String">
+                                    <value>image not defined</value>
+                                  </values>
+                                </property>
+                                <property>
+                                  <name>TransparencyIndicator</name>
+                                  <values arity="Scalar" type="String">
+                                    <value>no transparency</value>
+                                  </values>
+                                </property>
+                                <property>
+                                  <name>PixelIntensityRange</name>
+                                  <values arity="Array" type="Integer">
+                                    <value>0</value>
+                                    <value>255</value>
+                                  </values>
+                                </property>
+                                <property>
+                                  <name>RasterPadding</name>
+                                  <values arity="Scalar" type="String">
+                                    <value>1 byte</value>
+                                  </values>
+                                </property>
+                                <property>
+                                  <name>BitsPerRunLength</name>
+                                  <values arity="Scalar" type="Integer">
+                                    <value>8</value>
+                                  </values>
+                                </property>
+                                <property>
+                                  <name>BitsPerExtendedRunLength</name>
+                                  <values arity="Scalar" type="Integer">
+                                    <value>16</value>
+                                  </values>
+                                </property>
+                              </values>
+                            </property>
+                          </values>
+                        </property>
+                      </values>
+                    </property>
+                  </values>
+                </property>
+              </values>
+            </property>
+          </properties>
+        </repInfo>
+      </jhove>
+    </prem:objectCharacteristicsExtension>
+  </prem:objectCharacteristics>
+  <prem:originalName>fil_7516.jpg.tiff</prem:originalName>
+  <prem:storage>
+    <prem:contentLocation>
+      <prem:contentLocationType>RODAObjectPID/RODAObjectDatastreamID</prem:contentLocationType>
+      <prem:contentLocationValue>roda:399/F1</prem:contentLocationValue>
+    </prem:contentLocation>
+  </prem:storage>
+</prem:object>

@@ -8,19 +8,10 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 import java.util.Map.Entry;
+import java.util.Vector;
 
-import pt.gov.dgarq.roda.core.data.Group;
-import pt.gov.dgarq.roda.core.data.RODAMember;
-import pt.gov.dgarq.roda.core.data.SimpleDescriptionObject;
-import pt.gov.dgarq.roda.core.data.User;
-import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
-import pt.gov.dgarq.roda.wui.common.client.SuccessListener;
-import pt.gov.dgarq.roda.wui.common.client.widgets.LoadingPopup;
-import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
-import pt.gov.dgarq.roda.wui.management.user.client.SelectGroupWindow;
-import pt.gov.dgarq.roda.wui.management.user.client.SelectUserWindow;
+import org.roda.legacy.aip.metadata.descriptive.SimpleDescriptionObject;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -35,6 +26,15 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.MetadataEditorConstants;
+import pt.gov.dgarq.roda.core.data.Group;
+import pt.gov.dgarq.roda.core.data.RODAMember;
+import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
+import pt.gov.dgarq.roda.wui.common.client.SuccessListener;
+import pt.gov.dgarq.roda.wui.common.client.widgets.LoadingPopup;
+import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
+import pt.gov.dgarq.roda.wui.management.user.client.SelectGroupWindow;
+import pt.gov.dgarq.roda.wui.management.user.client.SelectUserWindow;
 
 /**
  * @author Luis Faria
@@ -81,16 +81,12 @@ public class EditObjectPermissionsPanel extends Composite {
 		memberListPanel = new VerticalPanel();
 		memberListScroll = new ScrollPanel(memberListPanel);
 
-		applyRecursivelly = new CheckBox(constants
-				.objectPermissionsApplyRecursivelly());
+		applyRecursivelly = new CheckBox(constants.objectPermissionsApplyRecursivelly());
 
 		actionButtons = new ArrayList<WUIButton>();
-		addUser = new WUIButton(constants.objectPermissionsAddUser(),
-				WUIButton.Left.ROUND, WUIButton.Right.PLUS);
-		addGroup = new WUIButton(constants.objectPermissionsAddGroup(),
-				WUIButton.Left.ROUND, WUIButton.Right.PLUS);
-		apply = new WUIButton(constants.objectPermissionsSave(),
-				WUIButton.Left.ROUND, WUIButton.Right.REC);
+		addUser = new WUIButton(constants.objectPermissionsAddUser(), WUIButton.Left.ROUND, WUIButton.Right.PLUS);
+		addGroup = new WUIButton(constants.objectPermissionsAddGroup(), WUIButton.Left.ROUND, WUIButton.Right.PLUS);
+		apply = new WUIButton(constants.objectPermissionsSave(), WUIButton.Left.ROUND, WUIButton.Right.REC);
 
 		actionButtons.add(addUser);
 		actionButtons.add(addGroup);
@@ -230,17 +226,15 @@ public class EditObjectPermissionsPanel extends Composite {
 
 	private void initializePermissionsList() {
 		loading.show();
-		EditorService.Util.getInstance().getObjectPermissions(sdo.getPid(),
+		EditorService.Util.getInstance().getObjectPermissions(sdo.getId(),
 				new AsyncCallback<Map<RODAMember, ObjectPermissions>>() {
 
 					public void onFailure(Throwable caught) {
 						loading.hide();
-						logger.error("Error initializing permissions list",
-								caught);
+						logger.error("Error initializing permissions list", caught);
 					}
 
-					public void onSuccess(
-							Map<RODAMember, ObjectPermissions> permissions) {
+					public void onSuccess(Map<RODAMember, ObjectPermissions> permissions) {
 						EditObjectPermissionsPanel.this.permissions = permissions;
 						updateMemberList();
 						loading.hide();
@@ -255,23 +249,18 @@ public class EditObjectPermissionsPanel extends Composite {
 	 * @param member
 	 * @param permission
 	 */
-	private void setMemberPermissions(RODAMember member,
-			ObjectPermissions permission) {
+	private void setMemberPermissions(RODAMember member, ObjectPermissions permission) {
 		loading.show();
-		EditorService.Util.getInstance().setPermission(sdo.getPid(), member,
-				permission,
+		EditorService.Util.getInstance().setPermission(sdo.getId(), member, permission,
 				new AsyncCallback<Map<RODAMember, ObjectPermissions>>() {
 
 					public void onFailure(Throwable caught) {
 						loading.hide();
-						logger
-								.error("Error setting member permissions",
-										caught);
+						logger.error("Error setting member permissions", caught);
 
 					}
 
-					public void onSuccess(
-							Map<RODAMember, ObjectPermissions> permissions) {
+					public void onSuccess(Map<RODAMember, ObjectPermissions> permissions) {
 						EditObjectPermissionsPanel.this.permissions = permissions;
 						updateMemberList();
 						loading.hide();
@@ -286,26 +275,21 @@ public class EditObjectPermissionsPanel extends Composite {
 		boolean recursivelly = applyRecursivelly.isChecked();
 		Map<RODAMember, ObjectPermissions> permissions = new LinkedHashMap<RODAMember, ObjectPermissions>();
 		for (UserMiniPermissionPanel userMiniPanel : userMiniPermissionPanels) {
-			permissions.put(userMiniPanel.getUser(), userMiniPanel
-					.getPermissions());
+			permissions.put(userMiniPanel.getUser(), userMiniPanel.getPermissions());
 		}
 		for (GroupMiniPermissionPanel groupMiniPanel : groupMiniPermissionPanels) {
-			permissions.put(groupMiniPanel.getGroup(), groupMiniPanel
-					.getPermissions());
+			permissions.put(groupMiniPanel.getGroup(), groupMiniPanel.getPermissions());
 		}
-		EditorService.Util.getInstance().setObjectPermissions(sdo.getPid(),
-				permissions, recursivelly,
+		EditorService.Util.getInstance().setObjectPermissions(sdo.getId(), permissions, recursivelly,
 				new AsyncCallback<Map<RODAMember, ObjectPermissions>>() {
 
 					public void onFailure(Throwable caught) {
 						loading.hide();
-						logger.error("Error adding applying permissions",
-								caught);
+						logger.error("Error adding applying permissions", caught);
 
 					}
 
-					public void onSuccess(
-							Map<RODAMember, ObjectPermissions> permissions) {
+					public void onSuccess(Map<RODAMember, ObjectPermissions> permissions) {
 						EditObjectPermissionsPanel.this.permissions = permissions;
 						updateMemberList();
 						loading.hide();
@@ -319,14 +303,12 @@ public class EditObjectPermissionsPanel extends Composite {
 		memberListPanel.clear();
 		userMiniPermissionPanels.clear();
 		groupMiniPermissionPanels.clear();
-		for (Entry<RODAMember, ObjectPermissions> entry : permissions
-				.entrySet()) {
+		for (Entry<RODAMember, ObjectPermissions> entry : permissions.entrySet()) {
 			RODAMember member = entry.getKey();
 			ObjectPermissions metaPermissions = entry.getValue();
 			if (member instanceof User) {
 				User user = (User) member;
-				UserMiniPermissionPanel userMiniPanel = new UserMiniPermissionPanel(
-						user, metaPermissions);
+				UserMiniPermissionPanel userMiniPanel = new UserMiniPermissionPanel(user, metaPermissions);
 				memberListPanel.add(userMiniPanel);
 				userMiniPermissionPanels.add(userMiniPanel);
 				userMiniPanel.addChangeListener(new ChangeListener() {
@@ -338,8 +320,7 @@ public class EditObjectPermissionsPanel extends Composite {
 				});
 			} else if (member instanceof Group) {
 				Group group = (Group) member;
-				GroupMiniPermissionPanel groupMiniPanel = new GroupMiniPermissionPanel(
-						group, metaPermissions);
+				GroupMiniPermissionPanel groupMiniPanel = new GroupMiniPermissionPanel(group, metaPermissions);
 				memberListPanel.add(groupMiniPanel);
 				groupMiniPermissionPanels.add(groupMiniPanel);
 				groupMiniPanel.addChangeListener(new ChangeListener() {

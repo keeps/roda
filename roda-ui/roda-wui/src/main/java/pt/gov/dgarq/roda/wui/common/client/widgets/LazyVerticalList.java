@@ -9,15 +9,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
-import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
-import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
-import pt.gov.dgarq.roda.wui.common.client.images.CommonImageBundle;
-import pt.gov.dgarq.roda.wui.common.client.widgets.LazyScroll.LazyScrollListener;
-import pt.gov.dgarq.roda.wui.common.client.widgets.LazyScroll.Loader;
-import pt.gov.dgarq.roda.wui.common.client.widgets.ListHeaderPanel.ListHeaderListener;
+import org.roda.index.filter.Filter;
+import org.roda.index.sorter.Sorter;
+import org.roda.index.sublist.Sublist;
+import org.roda.legacy.old.adapter.ContentAdapter;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Command;
@@ -34,6 +29,11 @@ import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.CommonConstants;
 import config.i18n.client.CommonMessages;
+import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
+import pt.gov.dgarq.roda.wui.common.client.images.CommonImageBundle;
+import pt.gov.dgarq.roda.wui.common.client.widgets.LazyScroll.LazyScrollListener;
+import pt.gov.dgarq.roda.wui.common.client.widgets.LazyScroll.Loader;
+import pt.gov.dgarq.roda.wui.common.client.widgets.ListHeaderPanel.ListHeaderListener;
 
 /**
  * Vertical List that loads elements as it needs

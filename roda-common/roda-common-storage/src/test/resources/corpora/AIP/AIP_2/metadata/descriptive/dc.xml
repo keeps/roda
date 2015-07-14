@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dc="http://purl.org/dc/elements/1.1/">
+	<dc:title>Example title</dc:title>
+	<dc:creator>Example creator</dc:creator>
+	<dc:subject>Example subject</dc:subject>
+	<dc:description>This is just a test</dc:description>
+</metadata>

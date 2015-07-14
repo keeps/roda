@@ -3,19 +3,11 @@
  */
 package pt.gov.dgarq.roda.wui.ingest.pre.client;
 
-import pt.gov.dgarq.roda.core.data.DescriptionObject;
-import pt.gov.dgarq.roda.core.data.SimpleDescriptionObject;
-import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.OneOfManyFilterParameter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.ProducerFilterParameter;
-import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
-import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
-import pt.gov.dgarq.roda.wui.common.client.UserLogin;
-import pt.gov.dgarq.roda.wui.common.client.widgets.HTMLWidgetWrapper;
-import pt.gov.dgarq.roda.wui.dissemination.browse.client.CollectionsTreeVerticalScrollPanel;
-import pt.gov.dgarq.roda.wui.dissemination.browse.client.ViewWindow;
-import pt.gov.dgarq.roda.wui.ingest.client.Ingest;
-import pt.gov.dgarq.roda.wui.main.client.Main;
+import org.roda.common.RodaConstants;
+import org.roda.index.filter.Filter;
+import org.roda.index.filter.OneOfManyFilterParameter;
+import org.roda.index.filter.ProducerFilterParameter;
+import org.roda.legacy.aip.metadata.descriptive.SimpleDescriptionObject;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.History;
@@ -26,6 +18,15 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.PreIngestConstants;
+import pt.gov.dgarq.roda.core.data.DescriptionObject;
+import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
+import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
+import pt.gov.dgarq.roda.wui.common.client.UserLogin;
+import pt.gov.dgarq.roda.wui.common.client.widgets.HTMLWidgetWrapper;
+import pt.gov.dgarq.roda.wui.dissemination.browse.client.CollectionsTreeVerticalScrollPanel;
+import pt.gov.dgarq.roda.wui.dissemination.browse.client.ViewWindow;
+import pt.gov.dgarq.roda.wui.ingest.client.Ingest;
+import pt.gov.dgarq.roda.wui.main.client.Main;
 
 /**
  * @author Luis Faria
@@ -47,8 +48,7 @@ public class PreIngest implements HistoryResolver {
 		return instance;
 	}
 
-	private static PreIngestConstants constants = GWT
-			.create(PreIngestConstants.class);
+	private static PreIngestConstants constants = GWT.create(PreIngestConstants.class);
 
 	private ClientLogger logger = new ClientLogger(getClass().getName());
 
@@ -87,17 +87,13 @@ public class PreIngest implements HistoryResolver {
 			int size = Main.ALL_BUT_REPRESENTATIONS_DESCRIPTION_LEVELS.size();
 			String[] classPlanLevels = new String[size];
 			for (int i = 0; i < size; i++) {
-				classPlanLevels[i] = Main.ALL_BUT_REPRESENTATIONS_DESCRIPTION_LEVELS
-						.get(i).getLevel();
+				classPlanLevels[i] = Main.ALL_BUT_REPRESENTATIONS_DESCRIPTION_LEVELS.get(i).getLevel();
 			}
-			classPlanFilter.add(new OneOfManyFilterParameter(
-					SimpleDescriptionObject.LEVEL, classPlanLevels));
+			classPlanFilter.add(new OneOfManyFilterParameter(RodaConstants.SDO_LEVEL, classPlanLevels));
 
-			classificationPlanLabel = new Label(
-					constants.classificationPlanLabel());
+			classificationPlanLabel = new Label(constants.classificationPlanLabel());
 
-			classificationPlan = new CollectionsTreeVerticalScrollPanel(
-					classPlanFilter,
+			classificationPlan = new CollectionsTreeVerticalScrollPanel(classPlanFilter,
 					CollectionsTreeVerticalScrollPanel.DEFAULT_SORTER, true);
 
 			classificationPlan.addClickListener(new ClickListener() {
@@ -108,19 +104,17 @@ public class PreIngest implements HistoryResolver {
 					 * ViewWindow viewWindow = new ViewWindow(pid);
 					 * viewWindow.show();
 					 */
-					viewWindow = new ViewWindow(pid,
-							new AsyncCallback<DescriptionObject>() {
+					viewWindow = new ViewWindow(pid, new AsyncCallback<DescriptionObject>() {
 
-								public void onFailure(Throwable caught) {
-									logger.error("Error creating view window",
-											caught);
-								}
+						public void onFailure(Throwable caught) {
+							logger.error("Error creating view window", caught);
+						}
 
-								public void onSuccess(DescriptionObject obj) {
-									viewWindow.show();
-								}
+						public void onSuccess(DescriptionObject obj) {
+							viewWindow.show();
+						}
 
-							});
+					});
 
 				}
 

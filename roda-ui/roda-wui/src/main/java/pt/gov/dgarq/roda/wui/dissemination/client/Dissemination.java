@@ -28,10 +28,8 @@ import config.i18n.client.DisseminationConstants;
  */
 public class Dissemination implements HistoryResolver {
 
-	private static CommonConstants commonConstants = (CommonConstants) GWT
-			.create(CommonConstants.class);
-	private static DisseminationConstants constants = (DisseminationConstants) GWT
-			.create(DisseminationConstants.class);
+	private static CommonConstants commonConstants = (CommonConstants) GWT.create(CommonConstants.class);
+	private static DisseminationConstants constants = (DisseminationConstants) GWT.create(DisseminationConstants.class);
 
 	private static Dissemination instance = null;
 
@@ -76,9 +74,8 @@ public class Dissemination implements HistoryResolver {
 	}
 
 	public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-		UserLogin.getInstance().checkRoles(
-				new HistoryResolver[] { Search.getInstance(),
-						Browse.getInstance() }, false, callback);
+		UserLogin.getInstance().checkRoles(new HistoryResolver[] { Search.getInstance(), Browse.getInstance() }, false,
+				callback);
 	}
 
 	public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
@@ -87,20 +84,16 @@ public class Dissemination implements HistoryResolver {
 			callback.onSuccess(page);
 		} else {
 			if (historyTokens[0].equals(Search.getInstance().getHistoryToken())) {
-				Search.getInstance().resolve(Tools.tail(historyTokens),
-						callback);
+				Search.getInstance().resolve(Tools.tail(historyTokens), callback);
 
-			} else if (historyTokens[0].equals(Browse.getInstance()
-					.getHistoryToken())) {
-				Browse.getInstance().resolve(Tools.tail(historyTokens),
-						callback);
+			} else if (historyTokens[0].equals(Browse.getInstance().getHistoryToken())) {
+				Browse.getInstance().resolve(Tools.tail(historyTokens), callback);
 
 			} else if (historyTokens[0].equals("help")) {
 				callback.onSuccess(getHelp());
 
 			} else {
-				callback.onFailure(new BadHistoryTokenException(
-						historyTokens[0]));
+				callback.onFailure(new BadHistoryTokenException(historyTokens[0]));
 			}
 		}
 	}
@@ -119,17 +112,15 @@ public class Dissemination implements HistoryResolver {
 	 * @param level
 	 * @return the icon message
 	 */
-	public Image getElementLevelIcon(DescriptionLevel level) {
+	public Image getElementLevelIcon(String level) {
 		Image ret;
-		final DescriptionLevelInfo levelInfo = Main.getDescriptionLevel(level
-				.getLevel());
+		final DescriptionLevelInfo levelInfo = Main.getDescriptionLevel(level);
 		if (levelInfo != null) {
-			ret = new Image(GWT.getModuleBaseURL() + "description_levels/"
-					+ levelInfo.getCategory().getCategory() + ".png");
+			ret = new Image(
+					GWT.getModuleBaseURL() + "description_levels/" + levelInfo.getCategory().getCategory() + ".png");
 			ret.setAltText(levelInfo.getLabel(commonConstants.locale()));
 		} else {
-			ret = new Image(GWT.getModuleBaseURL()
-					+ "description_levels/default.png");
+			ret = new Image(GWT.getModuleBaseURL() + "description_levels/default.png");
 			ret.setAltText("default");
 		}
 

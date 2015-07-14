@@ -6,23 +6,12 @@ package pt.gov.dgarq.roda.wui.management.user.client;
 import java.util.List;
 import java.util.Vector;
 
-import pt.gov.dgarq.roda.core.data.LogEntry;
-import pt.gov.dgarq.roda.core.data.User;
-import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.RangeFilterParameter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
-import pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter;
-import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
-import pt.gov.dgarq.roda.wui.common.client.UserLogin;
-import pt.gov.dgarq.roda.wui.common.client.widgets.DatePicker;
-import pt.gov.dgarq.roda.wui.common.client.widgets.ElementPanel;
-import pt.gov.dgarq.roda.wui.common.client.widgets.LazyVerticalList;
-import pt.gov.dgarq.roda.wui.common.client.widgets.ListHeaderPanel;
-import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
-import pt.gov.dgarq.roda.wui.common.client.widgets.LazyVerticalList.ContentSource;
-import pt.gov.dgarq.roda.wui.management.client.Management;
+import org.roda.index.filter.Filter;
+import org.roda.index.filter.FilterParameter;
+import org.roda.index.filter.RangeFilterParameter;
+import org.roda.index.filter.SimpleFilterParameter;
+import org.roda.index.sorter.SortParameter;
+import org.roda.legacy.old.adapter.ContentAdapter;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.History;
@@ -38,6 +27,17 @@ import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.UserManagementConstants;
 import config.i18n.client.UserManagementMessages;
+import pt.gov.dgarq.roda.core.data.LogEntry;
+import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
+import pt.gov.dgarq.roda.wui.common.client.UserLogin;
+import pt.gov.dgarq.roda.wui.common.client.widgets.DatePicker;
+import pt.gov.dgarq.roda.wui.common.client.widgets.ElementPanel;
+import pt.gov.dgarq.roda.wui.common.client.widgets.LazyVerticalList;
+import pt.gov.dgarq.roda.wui.common.client.widgets.LazyVerticalList.ContentSource;
+import pt.gov.dgarq.roda.wui.common.client.widgets.ListHeaderPanel;
+import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
+import pt.gov.dgarq.roda.wui.management.client.Management;
 
 /**
  * @author Luis Faria

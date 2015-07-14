@@ -6,12 +6,9 @@ package pt.gov.dgarq.roda.wui.dissemination.browse.client;
 import java.util.List;
 import java.util.Vector;
 
-import pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException;
-import pt.gov.dgarq.roda.core.data.SimpleDescriptionObject;
-import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
-import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
-import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
+import org.roda.index.filter.Filter;
+import org.roda.index.sorter.Sorter;
+import org.roda.legacy.aip.metadata.descriptive.SimpleDescriptionObject;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
@@ -23,16 +20,17 @@ import com.google.gwt.user.client.ui.TreeListener;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.BrowseMessages;
+import pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException;
+import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
+import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
 
 /**
  * @author Luis Faria
  * 
  */
-public class CollectionsTreeVerticalScrollPanel extends
-		ElementVerticalScrollPanel implements SourcesClickEvents {
+public class CollectionsTreeVerticalScrollPanel extends ElementVerticalScrollPanel implements SourcesClickEvents {
 
-	private static BrowseMessages messages = (BrowseMessages) GWT
-			.create(BrowseMessages.class);
+	private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
 
 	/**
 	 * Default scroll block size
@@ -80,8 +78,8 @@ public class CollectionsTreeVerticalScrollPanel extends
 	 *            where to show extended info or not
 	 */
 	public CollectionsTreeVerticalScrollPanel(boolean showInfo) {
-		this(DEFAULT_FILTER, DEFAULT_SORTER, DEFAULT_SCROLL_BLOCK_SIZE,
-				DEFAULT_SCROLL_MAX_SIZE, DEFAULT_TREE_LIMIT, showInfo);
+		this(DEFAULT_FILTER, DEFAULT_SORTER, DEFAULT_SCROLL_BLOCK_SIZE, DEFAULT_SCROLL_MAX_SIZE, DEFAULT_TREE_LIMIT,
+				showInfo);
 	}
 
 	/**
@@ -96,10 +94,8 @@ public class CollectionsTreeVerticalScrollPanel extends
 	 * @param showInfo
 	 *            where to show extended info or not
 	 */
-	public CollectionsTreeVerticalScrollPanel(Filter filter, Sorter sorter,
-			boolean showInfo) {
-		this(filter, sorter, DEFAULT_SCROLL_BLOCK_SIZE,
-				DEFAULT_SCROLL_MAX_SIZE, DEFAULT_TREE_LIMIT, showInfo);
+	public CollectionsTreeVerticalScrollPanel(Filter filter, Sorter sorter, boolean showInfo) {
+		this(filter, sorter, DEFAULT_SCROLL_BLOCK_SIZE, DEFAULT_SCROLL_MAX_SIZE, DEFAULT_TREE_LIMIT, showInfo);
 	}
 
 	/**
@@ -119,16 +115,13 @@ public class CollectionsTreeVerticalScrollPanel extends
 	 * @param showInfo
 	 *            where to show extended info
 	 */
-	public CollectionsTreeVerticalScrollPanel(Filter filter, Sorter sorter,
-			int scrollBlockSize, int scrollMaxSize, int treeLimit,
-			boolean showInfo) {
-		this(filter, sorter, new CollectionsProxy(filter, sorter),
-				scrollBlockSize, scrollMaxSize, treeLimit, showInfo);
+	public CollectionsTreeVerticalScrollPanel(Filter filter, Sorter sorter, int scrollBlockSize, int scrollMaxSize,
+			int treeLimit, boolean showInfo) {
+		this(filter, sorter, new CollectionsProxy(filter, sorter), scrollBlockSize, scrollMaxSize, treeLimit, showInfo);
 	}
 
-	private CollectionsTreeVerticalScrollPanel(Filter filter, Sorter sorter,
-			CollectionsProxy proxy, int scrollBlockSize, int scrollMaxSize,
-			int treeLimit, boolean showInfo) {
+	private CollectionsTreeVerticalScrollPanel(Filter filter, Sorter sorter, CollectionsProxy proxy,
+			int scrollBlockSize, int scrollMaxSize, int treeLimit, boolean showInfo) {
 		super(filter, sorter, proxy, scrollBlockSize, scrollMaxSize);
 		this.cache = proxy;
 		this.treeLimit = treeLimit;
@@ -139,8 +132,7 @@ public class CollectionsTreeVerticalScrollPanel extends
 	}
 
 	protected Widget createWidget(SimpleDescriptionObject sdo, int position) {
-		CollectionsTree tree = new CollectionsTree(sdo, getFilter(),
-				getSorter(), treeLimit, showInfo);
+		CollectionsTree tree = new CollectionsTree(sdo, getFilter(), getSorter(), treeLimit, showInfo);
 		trees.insertElementAt(tree, position);
 		tree.addTreeListener(new TreeListener() {
 
@@ -150,12 +142,10 @@ public class CollectionsTreeVerticalScrollPanel extends
 					if (selectedItem != item) {
 						if (selectedItem != null) {
 							selectedItem.setSelected(false);
-							logger.debug("Deselecting item "
-									+ selectedItem.getPid());
+							logger.debug("Deselecting item " + selectedItem.getPid());
 						}
 						selectedItem = (CollectionsTreeItem) item;
-						logger.debug("Selecting item " + selectedItem.getPid()
-								+ " (shortcut)");
+						logger.debug("Selecting item " + selectedItem.getPid() + " (shortcut)");
 					} else {
 						logger.debug("same element selected");
 					}
@@ -209,44 +199,42 @@ public class CollectionsTreeVerticalScrollPanel extends
 	 *            the collection PID
 	 * @param callback
 	 */
-	public void ensureLoaded(final String collectionPID,
-			final AsyncCallback<CollectionsTree> callback) {
+	public void ensureLoaded(final String collectionPID, final AsyncCallback<CollectionsTree> callback) {
 
-		BrowserService.Util.getInstance().getCollectionIndex(collectionPID,
-				getFilter(), getSorter(), new AsyncCallback<Integer>() {
-
-					public void onFailure(Throwable caught) {
-						callback.onFailure(caught);
-					}
-
-					public void onSuccess(final Integer index) {
-						logger.debug("tree at index " + index);
-						if (index >= 0) {
-							getScroll().ensureLoaded(index, getBlockSize(),
-									new AsyncCallback<Integer>() {
-
-										public void onFailure(Throwable caught) {
-											callback.onFailure(caught);
-										}
-
-										public void onSuccess(Integer result) {
-											CollectionsTree tree = (CollectionsTree) trees
-													.get(index
-															- getScroll()
-																	.getWindowOffset());
-											// getScroll().ensureVisible(tree);
-											callback.onSuccess(tree);
-										}
-
-									});
-						} else {
-							logger.error("Index of collection " + collectionPID
-									+ " not found!");
-						}
-
-					}
-
-				});
+		// TODO fix this
+		// BrowserService.Util.getInstance().getCollectionIndex(collectionPID,
+		// getFilter(), getSorter(),
+		// new AsyncCallback<Integer>() {
+		//
+		// public void onFailure(Throwable caught) {
+		// callback.onFailure(caught);
+		// }
+		//
+		// public void onSuccess(final Integer index) {
+		// logger.debug("tree at index " + index);
+		// if (index >= 0) {
+		// getScroll().ensureLoaded(index, getBlockSize(), new
+		// AsyncCallback<Integer>() {
+		//
+		// public void onFailure(Throwable caught) {
+		// callback.onFailure(caught);
+		// }
+		//
+		// public void onSuccess(Integer result) {
+		// CollectionsTree tree = (CollectionsTree) trees
+		// .get(index - getScroll().getWindowOffset());
+		// // getScroll().ensureVisible(tree);
+		// callback.onSuccess(tree);
+		// }
+		//
+		// });
+		// } else {
+		// logger.error("Index of collection " + collectionPID + " not found!");
+		// }
+		//
+		// }
+		//
+		// });
 
 	}
 
@@ -260,48 +248,38 @@ public class CollectionsTreeVerticalScrollPanel extends
 		ensureLoaded(path[0], new AsyncCallback<CollectionsTree>() {
 
 			public void onFailure(Throwable caught) {
-				logger.error("Error ensuring loading of tree " + path[0],
-						caught);
+				logger.error("Error ensuring loading of tree " + path[0], caught);
 			}
 
 			public void onSuccess(CollectionsTree tree) {
 				if (tree != null) {
-					if (tree.getRoot().getPid().equals(path[0])) {
-						tree.focusOn(Tools.tail(path),
-								new AsyncCallback<CollectionsTreeItem>() {
+					if (tree.getRoot().getId().equals(path[0])) {
+						tree.focusOn(Tools.tail(path), new AsyncCallback<CollectionsTreeItem>() {
 
-									public void onFailure(Throwable caught) {
-										logger.error("Error focusing on "
-												+ Tools.toString(path), caught);
+							public void onFailure(Throwable caught) {
+								logger.error("Error focusing on " + Tools.toString(path), caught);
+							}
+
+							public void onSuccess(CollectionsTreeItem item) {
+								if (selectedItem != item) {
+									if (selectedItem != null) {
+										selectedItem.setSelected(false);
+										logger.debug("Deselecting item " + selectedItem.getPid());
 									}
+									selectedItem = (CollectionsTreeItem) item;
+									getScroll().ensureVisible(selectedItem);
+									logger.debug("Selecting item " + selectedItem.getPid());
+								}
+							}
 
-									public void onSuccess(
-											CollectionsTreeItem item) {
-										if (selectedItem != item) {
-											if (selectedItem != null) {
-												selectedItem.setSelected(false);
-												logger
-														.debug("Deselecting item "
-																+ selectedItem
-																		.getPid());
-											}
-											selectedItem = (CollectionsTreeItem) item;
-											getScroll().ensureVisible(
-													selectedItem);
-											logger.debug("Selecting item "
-													+ selectedItem.getPid());
-										}
-									}
-
-								});
+						});
 					} else {
 						// Tree is considered inconsistent
 						// Deep reload the tree and retry focus
 						clear(new AsyncCallback<Integer>() {
 
 							public void onFailure(Throwable caught) {
-								logger.error("Error clearing tree after focus "
-										+ "giving consistency error", caught);
+								logger.error("Error clearing tree after focus " + "giving consistency error", caught);
 							}
 
 							public void onSuccess(Integer result) {
@@ -331,30 +309,27 @@ public class CollectionsTreeVerticalScrollPanel extends
 			// getScroll().ensureVisible(selectedItem);
 		} else {
 			logger.debug("focusing on " + pid);
-			BrowserService.Util.getInstance().getAncestors(pid,
-					new AsyncCallback<String[]>() {
+			BrowserService.Util.getInstance().getAncestors(pid, new AsyncCallback<String[]>() {
 
-						public void onFailure(Throwable caught) {
-							if (caught instanceof NoSuchRODAObjectException) {
-								Window.alert(messages.noSuchRODAObject(pid));
-								Browse.getInstance().view(null);
-							} else {
-								logger.error("could not get ancestors of "
-										+ pid, caught);
-							}
-						}
+				public void onFailure(Throwable caught) {
+					if (caught instanceof NoSuchRODAObjectException) {
+						Window.alert(messages.noSuchRODAObject(pid));
+						Browse.getInstance().view(null);
+					} else {
+						logger.error("could not get ancestors of " + pid, caught);
+					}
+				}
 
-						public void onSuccess(String[] path) {
-							if (path != null && path.length > 0) {
-								focusOn(path);
-							} else {
-								logger.warn("path of " + pid
-										+ " was null or empty");
-							}
+				public void onSuccess(String[] path) {
+					if (path != null && path.length > 0) {
+						focusOn(path);
+					} else {
+						logger.warn("path of " + pid + " was null or empty");
+					}
 
-						}
+				}
 
-					});
+			});
 		}
 	}
 
@@ -370,8 +345,7 @@ public class CollectionsTreeVerticalScrollPanel extends
 	 * @param callback
 	 *            Handle the updated collections tree item
 	 */
-	public void update(final String pid, final boolean info,
-			final boolean hierarchy,
+	public void update(final String pid, final boolean info, final boolean hierarchy,
 			final AsyncCallback<CollectionsTreeItem> callback) {
 		if (pid == null) {
 			logger.debug("clearing tree vertical panel");
@@ -387,38 +361,32 @@ public class CollectionsTreeVerticalScrollPanel extends
 
 			});
 		} else {
-			BrowserService.Util.getInstance().getAncestors(pid,
-					new AsyncCallback<String[]>() {
+			BrowserService.Util.getInstance().getAncestors(pid, new AsyncCallback<String[]>() {
 
-						public void onFailure(Throwable caught) {
-							callback.onFailure(caught);
+				public void onFailure(Throwable caught) {
+					callback.onFailure(caught);
+				}
+
+				public void onSuccess(String[] path) {
+					if (path != null) {
+						if (path.length == 1) {
+							logger.debug("updating tree root " + path[0]);
+							updateTreeRoot(path[0], info, hierarchy, callback);
+						} else {
+							logger.debug("updating tree recursively");
+							updateTreeRecursively(path, info, hierarchy, callback);
 						}
+					} else {
+						logger.debug("WARNING: ancestor where null of " + pid);
+					}
 
-						public void onSuccess(String[] path) {
-							if (path != null) {
-								if (path.length == 1) {
-									logger.debug("updating tree root "
-											+ path[0]);
-									updateTreeRoot(path[0], info, hierarchy,
-											callback);
-								} else {
-									logger.debug("updating tree recursively");
-									updateTreeRecursively(path, info,
-											hierarchy, callback);
-								}
-							} else {
-								logger.debug("WARNING: ancestor where null of "
-										+ pid);
-							}
+				}
 
-						}
-
-					});
+			});
 		}
 	}
 
-	private void updateTreeRoot(final String rootPID, final boolean info,
-			final boolean hierarchy,
+	private void updateTreeRoot(final String rootPID, final boolean info, final boolean hierarchy,
 			final AsyncCallback<CollectionsTreeItem> callback) {
 		cache.clear(rootPID, new AsyncCallback<SimpleDescriptionObject>() {
 
@@ -447,9 +415,8 @@ public class CollectionsTreeVerticalScrollPanel extends
 							}
 							callback.onSuccess(tree.getRootItem());
 						} else {
-							callback.onFailure(new RuntimeException("Couldn't "
-									+ "update tree root because ensureLoaded "
-									+ "didn't return a tree"));
+							callback.onFailure(new RuntimeException(
+									"Couldn't " + "update tree root because ensureLoaded " + "didn't return a tree"));
 						}
 
 					}
@@ -459,8 +426,7 @@ public class CollectionsTreeVerticalScrollPanel extends
 		});
 	}
 
-	private void updateTreeRecursively(final String[] path, final boolean info,
-			final boolean hierarchy,
+	private void updateTreeRecursively(final String[] path, final boolean info, final boolean hierarchy,
 			final AsyncCallback<CollectionsTreeItem> callback) {
 		ensureLoaded(path[0], new AsyncCallback<CollectionsTree>() {
 

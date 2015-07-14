@@ -47,8 +47,7 @@ public interface EditorService extends RemoteService {
 		 */
 		public static EditorServiceAsync getInstance() {
 
-			EditorServiceAsync instance = (EditorServiceAsync) GWT
-					.create(EditorService.class);
+			EditorServiceAsync instance = (EditorServiceAsync) GWT.create(EditorService.class);
 			ServiceDefTarget target = (ServiceDefTarget) instance;
 			target.setServiceEntryPoint(GWT.getModuleBaseURL() + SERVICE_URI);
 			return instance;
@@ -62,8 +61,7 @@ public interface EditorService extends RemoteService {
 	 *            the changed object
 	 * @throws RODAException
 	 */
-	public void saveEdition(DescriptionObject editedObject)
-			throws RODAException;
+	public void saveEdition(DescriptionObject editedObject) throws RODAException;
 
 	/**
 	 * Create a new top level element
@@ -90,8 +88,7 @@ public interface EditorService extends RemoteService {
 	 *             if the level is not adequate for sub-element of that parent
 	 * @throws RODAException
 	 */
-	public String createChild(String parentPID, DescriptionLevel parentLevel)
-			throws RODAException;
+	public String createChild(String parentPID, String parentLevel) throws RODAException;
 
 	/**
 	 * Create a copy sibling of the element
@@ -124,10 +121,9 @@ public interface EditorService extends RemoteService {
 	 * @throws IllegalOperationException
 	 *             if the destination level is not adequate to be parent of the
 	 *             element to move
-	 * @throws RODAException 
+	 * @throws RODAException
 	 */
-	public void moveElement(String pid, String toFatherPid)
-			throws RODAException;
+	public void moveElement(String pid, String toFatherPid) throws RODAException;
 
 	/**
 	 * Get the list of levels that an element can change to. This is useful when
@@ -138,8 +134,7 @@ public interface EditorService extends RemoteService {
 	 * @return the list of levels
 	 * @throws RODAException
 	 */
-	public DescriptionLevel[] getPossibleLevels(String pid)
-			throws RODAException;
+	public DescriptionLevel[] getPossibleLevels(String pid) throws RODAException;
 
 	/**
 	 * Get the list of possible values for a designated field
@@ -176,8 +171,7 @@ public interface EditorService extends RemoteService {
 	 * @return the list of producers
 	 * @throws RODAException
 	 */
-	public List<RODAMember> getProducers(String fondsPid)
-			throws RODAException;
+	public List<RODAMember> getProducers(String fondsPid) throws RODAException;
 
 	/**
 	 * Add a producer to a fonds producer list
@@ -189,8 +183,7 @@ public interface EditorService extends RemoteService {
 	 * @return the updated producer list
 	 * @throws RODAException
 	 */
-	public List<RODAMember> addProducer(RODAMember producer, String fondsPid)
-			throws RODAException;
+	public List<RODAMember> addProducer(RODAMember producer, String fondsPid) throws RODAException;
 
 	/**
 	 * Remove producer from fonds producer list
@@ -202,8 +195,7 @@ public interface EditorService extends RemoteService {
 	 * @return the updated producer list
 	 * @throws RODAException
 	 */
-	public List<RODAMember> removeProducer(RODAMember producer, String fondsPid)
-			throws RODAException;
+	public List<RODAMember> removeProducer(RODAMember producer, String fondsPid) throws RODAException;
 
 	/**
 	 * Remove producers from fonds producer list
@@ -215,8 +207,7 @@ public interface EditorService extends RemoteService {
 	 * @return the updated producer list
 	 * @throws RODAException
 	 */
-	public List<RODAMember> removeProducers(List<RODAMember> producerList,
-			String fondsPid) throws RODAException;
+	public List<RODAMember> removeProducers(List<RODAMember> producerList, String fondsPid) throws RODAException;
 
 	/**
 	 * Get an object permissions
@@ -225,8 +216,7 @@ public interface EditorService extends RemoteService {
 	 * @return a map of users and their permissions
 	 * @throws RODAException
 	 */
-	public Map<RODAMember, ObjectPermissions> getObjectPermissions(String pid)
-			throws RODAException;
+	public Map<RODAMember, ObjectPermissions> getObjectPermissions(String pid) throws RODAException;
 
 	/**
 	 * Set member permissions for an object. If a user already is in
@@ -241,8 +231,7 @@ public interface EditorService extends RemoteService {
 	 * @return the updated permissions
 	 * @throws RODAException
 	 */
-	public Map<RODAMember, ObjectPermissions> setPermission(String pid,
-			RODAMember member, ObjectPermissions permission)
+	public Map<RODAMember, ObjectPermissions> setPermission(String pid, RODAMember member, ObjectPermissions permission)
 			throws RODAException;
 
 	/**
@@ -255,8 +244,7 @@ public interface EditorService extends RemoteService {
 	 * @throws RODAException
 	 */
 	public Map<RODAMember, ObjectPermissions> setObjectPermissions(String pid,
-			Map<RODAMember, ObjectPermissions> permissions, boolean recursivelly)
-			throws RODAException;
+			Map<RODAMember, ObjectPermissions> permissions, boolean recursivelly) throws RODAException;
 
 	/**
 	 * Get the permissions of the authenticated user to an object
@@ -266,7 +254,6 @@ public interface EditorService extends RemoteService {
 	 * @return the permissions
 	 * @throws RODAException
 	 */
-	public RODAObjectUserPermissions getSelfObjectPermissions(String pid)
-			throws RODAException;
+	public RODAObjectUserPermissions getSelfObjectPermissions(String pid) throws RODAException;
 
 }

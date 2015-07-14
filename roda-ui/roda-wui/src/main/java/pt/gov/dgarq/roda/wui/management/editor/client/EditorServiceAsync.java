@@ -53,7 +53,7 @@ public interface EditorServiceAsync {
 	 *             if the level is not adequate for sub-element of that parent
 	 * @throws RODAException
 	 */
-	public void createChild(String parentPID, DescriptionLevel parentLevel, AsyncCallback<String> callback);
+	public void createChild(String parentPID, String parentLevel, AsyncCallback<String> callback);
 
 	/**
 	 * Create a copy sibling of the element

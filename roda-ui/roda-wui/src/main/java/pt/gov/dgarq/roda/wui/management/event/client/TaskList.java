@@ -3,22 +3,11 @@
  */
 package pt.gov.dgarq.roda.wui.management.event.client;
 
-import pt.gov.dgarq.roda.core.data.Task;
-import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.RegexFilterParameter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
-import pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter;
-import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
-import pt.gov.dgarq.roda.wui.common.client.widgets.ControlPanel;
-import pt.gov.dgarq.roda.wui.common.client.widgets.ElementPanel;
-import pt.gov.dgarq.roda.wui.common.client.widgets.LazyVerticalList;
-import pt.gov.dgarq.roda.wui.common.client.widgets.ListHeaderPanel;
-import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
-import pt.gov.dgarq.roda.wui.common.client.widgets.ControlPanel.ControlPanelListener;
-import pt.gov.dgarq.roda.wui.common.client.widgets.LazyVerticalList.ContentSource;
-import pt.gov.dgarq.roda.wui.common.client.widgets.LazyVerticalList.LazyVerticalListListener;
-import pt.gov.dgarq.roda.wui.management.event.client.CreateTask.CreateTaskListener;
+import org.roda.index.filter.Filter;
+import org.roda.index.filter.RegexFilterParameter;
+import org.roda.index.filter.SimpleFilterParameter;
+import org.roda.index.sorter.SortParameter;
+import org.roda.legacy.old.adapter.ContentAdapter;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -28,6 +17,17 @@ import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.EventManagementConstants;
 import config.i18n.client.EventManagementMessages;
+import pt.gov.dgarq.roda.core.data.Task;
+import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
+import pt.gov.dgarq.roda.wui.common.client.widgets.ControlPanel;
+import pt.gov.dgarq.roda.wui.common.client.widgets.ControlPanel.ControlPanelListener;
+import pt.gov.dgarq.roda.wui.common.client.widgets.ElementPanel;
+import pt.gov.dgarq.roda.wui.common.client.widgets.LazyVerticalList;
+import pt.gov.dgarq.roda.wui.common.client.widgets.LazyVerticalList.ContentSource;
+import pt.gov.dgarq.roda.wui.common.client.widgets.LazyVerticalList.LazyVerticalListListener;
+import pt.gov.dgarq.roda.wui.common.client.widgets.ListHeaderPanel;
+import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
+import pt.gov.dgarq.roda.wui.management.event.client.CreateTask.CreateTaskListener;
 
 /**
  * Panel to manage all tasks
@@ -67,10 +67,9 @@ public class TaskList {
 		/**
 		 * Show only tasks that are NOT running
 		 */
-		NOT_RUNNING,
-		/**
-		 * Show all tasks
-		 */
+		NOT_RUNNING, /**
+						 * Show all tasks
+						 */
 		ALL
 	}
 
@@ -112,8 +111,7 @@ public class TaskList {
 
 			initialized = true;
 
-			controlPanel = new ControlPanel(constants.controlPanelTitle(),
-					constants.controlPanelSearchTitle());
+			controlPanel = new ControlPanel(constants.controlPanelTitle(), constants.controlPanelSearchTitle());
 
 			controlPanel.addOption(constants.optionScheduled());
 			controlPanel.addOption(constants.optionPaused());
@@ -159,20 +157,17 @@ public class TaskList {
 
 			});
 
-			addTask = new WUIButton(constants.actionAddTask(),
-					WUIButton.Left.SQUARE, WUIButton.Right.PLUS);
+			addTask = new WUIButton(constants.actionAddTask(), WUIButton.Left.SQUARE, WUIButton.Right.PLUS);
 
-			editTask = new WUIButton(constants.actionEditTask(),
-					WUIButton.Left.SQUARE, WUIButton.Right.ARROW_FORWARD);
+			editTask = new WUIButton(constants.actionEditTask(), WUIButton.Left.SQUARE, WUIButton.Right.ARROW_FORWARD);
 
-			removeTask = new WUIButton(constants.actionRemoveTask(),
-					WUIButton.Left.SQUARE, WUIButton.Right.CROSS);
+			removeTask = new WUIButton(constants.actionRemoveTask(), WUIButton.Left.SQUARE, WUIButton.Right.CROSS);
 
-			pauseTask = new WUIButton(constants.actionPauseTask(),
-					WUIButton.Left.SQUARE, WUIButton.Right.ARROW_FORWARD);
+			pauseTask = new WUIButton(constants.actionPauseTask(), WUIButton.Left.SQUARE,
+					WUIButton.Right.ARROW_FORWARD);
 
-			resumeTask = new WUIButton(constants.actionResumeTask(),
-					WUIButton.Left.SQUARE, WUIButton.Right.ARROW_FORWARD);
+			resumeTask = new WUIButton(constants.actionResumeTask(), WUIButton.Left.SQUARE,
+					WUIButton.Right.ARROW_FORWARD);
 
 			addTask.addClickListener(new ClickListener() {
 
@@ -214,21 +209,19 @@ public class TaskList {
 					ElementPanel<Task> selected = taskList.getSelected();
 					if (selected != null && selected instanceof TaskPanel) {
 						TaskPanel selectedTaskPanel = (TaskPanel) selected;
-						EventManagementService.Util.getInstance().removeTask(
-								selectedTaskPanel.get().getName(),
+						EventManagementService.Util.getInstance().removeTask(selectedTaskPanel.get().getName(),
 								new AsyncCallback<Void>() {
 
-									public void onFailure(Throwable caught) {
-										logger.error("Error removing task",
-												caught);
-									}
+							public void onFailure(Throwable caught) {
+								logger.error("Error removing task", caught);
+							}
 
-									public void onSuccess(Void result) {
-										taskList.update();
-										updateVisibles();
+							public void onSuccess(Void result) {
+								taskList.update();
+								updateVisibles();
 
-									}
-								});
+							}
+						});
 
 					}
 				}
@@ -241,19 +234,17 @@ public class TaskList {
 					ElementPanel<Task> selected = taskList.getSelected();
 					if (selected != null && selected instanceof TaskPanel) {
 						TaskPanel selectedTaskPanel = (TaskPanel) selected;
-						EventManagementService.Util.getInstance().pauseTask(
-								selectedTaskPanel.get().getName(),
+						EventManagementService.Util.getInstance().pauseTask(selectedTaskPanel.get().getName(),
 								new AsyncCallback<Task>() {
 
-									public void onFailure(Throwable caught) {
-										logger.error("Error removing task",
-												caught);
-									}
+							public void onFailure(Throwable caught) {
+								logger.error("Error removing task", caught);
+							}
 
-									public void onSuccess(Task result) {
-										update();
-									}
-								});
+							public void onSuccess(Task result) {
+								update();
+							}
+						});
 					}
 
 				}
@@ -266,19 +257,17 @@ public class TaskList {
 					ElementPanel<Task> selected = taskList.getSelected();
 					if (selected != null && selected instanceof TaskPanel) {
 						TaskPanel selectedTaskPanel = (TaskPanel) selected;
-						EventManagementService.Util.getInstance().resumeTask(
-								selectedTaskPanel.get().getName(),
+						EventManagementService.Util.getInstance().resumeTask(selectedTaskPanel.get().getName(),
 								new AsyncCallback<Task>() {
 
-									public void onFailure(Throwable caught) {
-										logger.error("Error removing task",
-												caught);
-									}
+							public void onFailure(Throwable caught) {
+								logger.error("Error removing task", caught);
+							}
 
-									public void onSuccess(Task result) {
-										update();
-									}
-								});
+							public void onSuccess(Task result) {
+								update();
+							}
+						});
 					}
 
 				}
@@ -293,51 +282,43 @@ public class TaskList {
 
 			taskList = new LazyVerticalList<Task>(new ContentSource<Task>() {
 
-				public void getCount(
-						pt.gov.dgarq.roda.core.data.adapter.filter.Filter filter,
-						AsyncCallback<Integer> callback) {
-					EventManagementService.Util.getInstance().getTaskCount(
-							filter, callback);
+				public void getCount(Filter filter, AsyncCallback<Integer> callback) {
+					EventManagementService.Util.getInstance().getTaskCount(filter, callback);
 				}
 
 				public ElementPanel<Task> getElementPanel(Task element) {
 					return new TaskPanel(element);
 				}
 
-				public void getElements(ContentAdapter adapter,
-						AsyncCallback<Task[]> callback) {
-					EventManagementService.Util.getInstance().getTasks(adapter,
-							callback);
+				public void getElements(ContentAdapter adapter, AsyncCallback<Task[]> callback) {
+					EventManagementService.Util.getInstance().getTasks(adapter, callback);
 				}
 
 				public String getTotalMessage(int total) {
 					return messages.taskListTotal(total);
 				}
 
-				public void setReportInfo(ContentAdapter adapter,
-						String locale, AsyncCallback<Void> callback) {
-					EventManagementService.Util.getInstance()
-							.setTaskListReportInfo(adapter, locale, callback);
+				public void setReportInfo(ContentAdapter adapter, String locale, AsyncCallback<Void> callback) {
+					EventManagementService.Util.getInstance().setTaskListReportInfo(adapter, locale, callback);
 
 				}
 			}, 30000, getFilter());
 
-			taskList
-					.addLazyVerticalListListener(new LazyVerticalListListener<Task>() {
+			taskList.addLazyVerticalListListener(new LazyVerticalListListener<Task>() {
 
-						public void onElementSelected(ElementPanel<Task> element) {
-							updateVisibles();
-						}
+				public void onElementSelected(ElementPanel<Task> element) {
+					updateVisibles();
+				}
 
-						public void onUpdateBegin() {
-							controlPanel.setOptionsEnabled(false);
-						}
+				public void onUpdateBegin() {
+					controlPanel.setOptionsEnabled(false);
+				}
 
-						public void onUpdateFinish() {
-							controlPanel.setOptionsEnabled(true);
-						}
+				public void onUpdateFinish() {
+					controlPanel.setOptionsEnabled(true);
+				}
 
-					});
+			});
 
 			addTaskListHeaders();
 
@@ -355,17 +336,13 @@ public class TaskList {
 	private Filter getFilter() {
 		Filter filter = new Filter();
 		if (TaskFilter.SCHEDULED.equals(stateFilter)) {
-			filter.add(new SimpleFilterParameter("scheduled", Boolean.TRUE
-					.toString()));
+			filter.add(new SimpleFilterParameter("scheduled", Boolean.TRUE.toString()));
 		} else if (TaskFilter.PAUSED.equals(stateFilter)) {
-			filter.add(new SimpleFilterParameter("paused", Boolean.TRUE
-					.toString()));
+			filter.add(new SimpleFilterParameter("paused", Boolean.TRUE.toString()));
 		} else if (TaskFilter.RUNNING.equals(stateFilter)) {
-			filter.add(new SimpleFilterParameter("running", Boolean.TRUE
-					.toString()));
+			filter.add(new SimpleFilterParameter("running", Boolean.TRUE.toString()));
 		} else if (TaskFilter.NOT_RUNNING.equals(stateFilter)) {
-			filter.add(new SimpleFilterParameter("running", Boolean.FALSE
-					.toString()));
+			filter.add(new SimpleFilterParameter("running", Boolean.FALSE.toString()));
 		}
 
 		if (searchFilter != null && searchFilter.length() > 0) {
@@ -398,33 +375,25 @@ public class TaskList {
 
 	private void addTaskListHeaders() {
 		ListHeaderPanel taskListHeader = taskList.getHeader();
-		
-		taskListHeader.addHeader("", "task-list-header-scheduled",
-				new SortParameter[] {}, true);
-		
-		taskListHeader.addHeader(constants.taskHeaderName(),
-				"task-list-header-name",
+
+		taskListHeader.addHeader("", "task-list-header-scheduled", new SortParameter[] {}, true);
+
+		taskListHeader.addHeader(constants.taskHeaderName(), "task-list-header-name",
 				new SortParameter[] { new SortParameter("name", false) }, true);
 
-		taskListHeader.addHeader(constants.taskHeaderStartDate(),
-				"task-list-header-startDate", new SortParameter[] {
-						new SortParameter("startDate", false),
-						new SortParameter("name", false) }, false);
+		taskListHeader.addHeader(constants.taskHeaderStartDate(), "task-list-header-startDate",
+				new SortParameter[] { new SortParameter("startDate", false), new SortParameter("name", false) }, false);
 
-		taskListHeader.addHeader(constants.taskHeaderRepeat(),
-				"task-list-header-repeat", new SortParameter[] {
-						new SortParameter("repeatCount", false),
-						new SortParameter("repeatInterval", false),
-						new SortParameter("name", false) }, true);
+		taskListHeader.addHeader(constants.taskHeaderRepeat(), "task-list-header-repeat",
+				new SortParameter[] { new SortParameter("repeatCount", false),
+						new SortParameter("repeatInterval", false), new SortParameter("name", false) },
+				true);
 
-		taskListHeader.addHeader(constants.taskHeaderUsername(),
-				"task-list-header-user", new SortParameter[] {
-						new SortParameter("username", false),
-						new SortParameter("name", false) }, true);
+		taskListHeader.addHeader(constants.taskHeaderUsername(), "task-list-header-user",
+				new SortParameter[] { new SortParameter("username", false), new SortParameter("name", false) }, true);
 
 		taskListHeader.addHeader("", "task-list-header-running",
-				new SortParameter[] { new SortParameter("running", false),
-						new SortParameter("name", false) }, true);
+				new SortParameter[] { new SortParameter("running", false), new SortParameter("name", false) }, true);
 
 		taskListHeader.setSelectedHeader(1);
 		taskListHeader.setFillerHeader(3);

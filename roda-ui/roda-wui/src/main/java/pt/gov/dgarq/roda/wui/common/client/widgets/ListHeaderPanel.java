@@ -6,8 +6,8 @@ package pt.gov.dgarq.roda.wui.common.client.widgets;
 import java.util.ArrayList;
 import java.util.List;
 
-import pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter;
-import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
+import org.roda.index.sorter.SortParameter;
+import org.roda.index.sorter.Sorter;
 
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.Composite;
@@ -66,10 +66,9 @@ public class ListHeaderPanel extends Composite {
 	 * @param defaultSortDirection
 	 *            sort direction to be choose on first click
 	 */
-	public void addHeader(String headerLabel, String headerStyle,
-			SortParameter[] ascendingParameters, boolean defaultSortDirection) {
-		ListHeader header = new ListHeader(headerLabel, headerStyle,
-				ascendingParameters, defaultSortDirection);
+	public void addHeader(String headerLabel, String headerStyle, SortParameter[] ascendingParameters,
+			boolean defaultSortDirection) {
+		ListHeader header = new ListHeader(headerLabel, headerStyle, ascendingParameters, defaultSortDirection);
 		headers.add(header);
 		final int headerIndex = headers.indexOf(header);
 		header.addClickListener(new ClickListener() {

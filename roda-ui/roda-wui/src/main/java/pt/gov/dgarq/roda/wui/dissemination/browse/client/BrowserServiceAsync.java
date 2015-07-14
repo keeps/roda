@@ -5,15 +5,18 @@ package pt.gov.dgarq.roda.wui.dissemination.browse.client;
 
 import java.util.List;
 
+import org.roda.index.filter.Filter;
+import org.roda.index.sorter.Sorter;
+import org.roda.index.sublist.Sublist;
+import org.roda.legacy.aip.metadata.descriptive.SimpleDescriptionObject;
+import org.roda.legacy.exception.RODAException;
+import org.roda.legacy.old.adapter.ContentAdapter;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
+
 import pt.gov.dgarq.roda.core.data.DescriptionObject;
 import pt.gov.dgarq.roda.core.data.RODAObject;
 import pt.gov.dgarq.roda.core.data.RepresentationPreservationObject;
-import pt.gov.dgarq.roda.core.data.SimpleDescriptionObject;
-import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
-
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
  * @author Luis Faria
@@ -39,7 +42,8 @@ public interface BrowserServiceAsync {
 	 * @return get collections
 	 * @throws RODAException
 	 */
-	public void getCollections(ContentAdapter adapter, AsyncCallback<SimpleDescriptionObject[]> callback);
+	public void getCollections(Filter filter, Sorter sorter, Sublist sublist,
+			AsyncCallback<SimpleDescriptionObject[]> callback);
 
 	/**
 	 * Get sub elements count
@@ -61,7 +65,8 @@ public interface BrowserServiceAsync {
 	 * @return the sub elements
 	 * @throws RODAException
 	 */
-	public void getSubElements(String pid, ContentAdapter adapter, AsyncCallback<SimpleDescriptionObject[]> callback);
+	public void getSubElements(String pid, Filter filter, Sorter sorter, Sublist sublist,
+			AsyncCallback<SimpleDescriptionObject[]> callback);
 
 	/**
 	 * Get a RODA object
@@ -71,7 +76,8 @@ public interface BrowserServiceAsync {
 	 * @return {@link RODAObject}
 	 * @throws RODAException
 	 */
-	public void getRODAObject(String pid, AsyncCallback<RODAObject> callback);
+	// public void getRODAObject(String pid, AsyncCallback<RODAObject>
+	// callback);
 
 	/**
 	 * Get simple description object
@@ -124,7 +130,8 @@ public interface BrowserServiceAsync {
 	 * @return the index of the collection
 	 * @throws RODAException
 	 */
-	public void getCollectionIndex(String collectionPID, Filter filter, Sorter sorter, AsyncCallback<Integer> callback);
+	// public void getCollectionIndex(String collectionPID, Filter filter,
+	// Sorter sorter, AsyncCallback<Integer> callback);
 
 	/**
 	 * Get an item index
@@ -138,8 +145,9 @@ public interface BrowserServiceAsync {
 	 * @return the item index
 	 * @throws RODAException
 	 */
-	public void getItemIndex(String parentPID, String childPID, Filter filter, Sorter sorter,
-			AsyncCallback<Integer> callback);
+	// public void getItemIndex(String parentPID, String childPID, Filter
+	// filter, Sorter sorter,
+	// AsyncCallback<Integer> callback);
 
 	/**
 	 * get sub elements
@@ -155,8 +163,9 @@ public interface BrowserServiceAsync {
 	 * @return the sub elements list
 	 * @throws RODAException
 	 */
-	public void getSubElements(String pid, String focusOnChild, int count, Filter filter, Sorter sorter,
-			AsyncCallback<SimpleDescriptionObject[]> callback);
+	// public void getSubElements(String pid, String focusOnChild, int count,
+	// Filter filter, Sorter sorter,
+	// AsyncCallback<SimpleDescriptionObject[]> callback);
 
 	/**
 	 * Get representations information

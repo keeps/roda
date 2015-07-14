@@ -3,8 +3,7 @@
  */
 package pt.gov.dgarq.roda.wui.common.client.widgets;
 
-import pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter;
-import pt.gov.dgarq.roda.wui.common.client.images.CommonImageBundle;
+import org.roda.index.sorter.SortParameter;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.ClickListener;
@@ -17,6 +16,8 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SourcesClickEvents;
 import com.google.gwt.user.client.ui.Widget;
+
+import pt.gov.dgarq.roda.wui.common.client.images.CommonImageBundle;
 
 /**
  * @author Luis Faria

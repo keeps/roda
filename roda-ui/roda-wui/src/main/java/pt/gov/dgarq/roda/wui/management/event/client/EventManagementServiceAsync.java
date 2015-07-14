@@ -1,11 +1,15 @@
 package pt.gov.dgarq.roda.wui.management.event.client;
 
+import org.roda.index.filter.Filter;
+import org.roda.legacy.exception.RODAException;
+import org.roda.legacy.old.adapter.ContentAdapter;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
+
 import pt.gov.dgarq.roda.core.data.PluginInfo;
 import pt.gov.dgarq.roda.core.data.Task;
 import pt.gov.dgarq.roda.core.data.TaskInstance;
-import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import pt.gov.dgarq.roda.wui.common.client.PrintReportException;
 
 /**
  * Event Management service interface
@@ -109,8 +113,7 @@ public interface EventManagementServiceAsync {
 	 * @param localeString
 	 * @throws PrintReportException
 	 */
-	public void setTaskListReportInfo(ContentAdapter adapter,
-			String localeString, AsyncCallback<Void> callback);
+	public void setTaskListReportInfo(ContentAdapter adapter, String localeString, AsyncCallback<Void> callback);
 
 	/**
 	 * Set instance list report info parameters

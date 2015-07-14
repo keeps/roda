@@ -3,11 +3,10 @@
  */
 package pt.gov.dgarq.roda.wui.dissemination.browse.client;
 
-import pt.gov.dgarq.roda.core.data.SimpleDescriptionObject;
-import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
-import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
+import org.roda.index.filter.Filter;
+import org.roda.index.sorter.Sorter;
+import org.roda.index.sublist.Sublist;
+import org.roda.legacy.aip.metadata.descriptive.SimpleDescriptionObject;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -37,8 +36,7 @@ public class CollectionsProxy extends ElementsMemCache {
 	 * #getCount(com.google.gwt.user.client.rpc.AsyncCallback)
 	 */
 	public void getCountImpl(AsyncCallback<Integer> callback) {
-		BrowserService.Util.getInstance().getCollectionsCount(getFilter(),
-				callback);
+		BrowserService.Util.getInstance().getCollectionsCount(getFilter(), callback);
 	}
 
 	/*
@@ -48,13 +46,9 @@ public class CollectionsProxy extends ElementsMemCache {
 	 * pt.gov.dgarq.roda.office.dissemination.browse.client.ElementsMemProxy
 	 * #getElements(int, int, com.google.gwt.user.client.rpc.AsyncCallback)
 	 */
-	public void getElements(int firstItemIndex, int count,
-			AsyncCallback<SimpleDescriptionObject[]> callback) {
-		ContentAdapter adapter = new ContentAdapter();
-		adapter.setFilter(getFilter());
-		adapter.setSorter(getSorter());
-		adapter.setSublist(new Sublist(firstItemIndex, count));
-		BrowserService.Util.getInstance().getCollections(adapter, callback);
+	public void getElements(int firstItemIndex, int count, AsyncCallback<SimpleDescriptionObject[]> callback) {
+		BrowserService.Util.getInstance().getCollections(getFilter(), getSorter(), new Sublist(firstItemIndex, count),
+				callback);
 
 	}
 
@@ -64,21 +58,8 @@ public class CollectionsProxy extends ElementsMemCache {
 	 * @param pid
 	 * @param callback
 	 */
-	public void clear(String pid,
-			final AsyncCallback<SimpleDescriptionObject> callback) {
-		BrowserService.Util.getInstance().getCollectionIndex(pid, getFilter(),
-				getSorter(), new AsyncCallback<Integer>() {
-
-					public void onFailure(Throwable caught) {
-						callback.onFailure(caught);
-					}
-
-					public void onSuccess(Integer index) {
-						clear(index, callback);
-
-					}
-
-				});
+	public void clear(String pid, final AsyncCallback<SimpleDescriptionObject> callback) {
+		clear(pid, callback);
 	}
 
 }

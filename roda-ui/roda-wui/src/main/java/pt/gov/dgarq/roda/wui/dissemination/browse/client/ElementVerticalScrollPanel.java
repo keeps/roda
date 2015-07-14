@@ -3,15 +3,10 @@
  */
 package pt.gov.dgarq.roda.wui.dissemination.browse.client;
 
-import pt.gov.dgarq.roda.core.data.SimpleDescriptionObject;
-import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter;
-import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
-import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
-import pt.gov.dgarq.roda.wui.common.client.widgets.LazyScroll;
-import pt.gov.dgarq.roda.wui.common.client.widgets.ListHeaderPanel;
-import pt.gov.dgarq.roda.wui.common.client.widgets.LazyScroll.Loader;
-import pt.gov.dgarq.roda.wui.common.client.widgets.ListHeaderPanel.ListHeaderListener;
+import org.roda.index.filter.Filter;
+import org.roda.index.sorter.SortParameter;
+import org.roda.index.sorter.Sorter;
+import org.roda.legacy.aip.metadata.descriptive.SimpleDescriptionObject;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Command;
@@ -22,6 +17,11 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.BrowseConstants;
+import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
+import pt.gov.dgarq.roda.wui.common.client.widgets.LazyScroll;
+import pt.gov.dgarq.roda.wui.common.client.widgets.LazyScroll.Loader;
+import pt.gov.dgarq.roda.wui.common.client.widgets.ListHeaderPanel;
+import pt.gov.dgarq.roda.wui.common.client.widgets.ListHeaderPanel.ListHeaderListener;
 
 /**
  * @author Luis Faria

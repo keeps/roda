@@ -2,22 +2,7 @@ package pt.gov.dgarq.roda.wui.ingest.list.client;
 
 import java.util.MissingResourceException;
 
-import pt.gov.dgarq.roda.core.common.IllegalOperationException;
-import pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException;
-import pt.gov.dgarq.roda.core.data.DescriptionObject;
-import pt.gov.dgarq.roda.core.data.SIPState;
-import pt.gov.dgarq.roda.core.data.SimpleDescriptionObject;
-import pt.gov.dgarq.roda.core.data.User;
-import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
-import pt.gov.dgarq.roda.wui.common.client.SuccessListener;
-import pt.gov.dgarq.roda.wui.common.client.images.CommonImageBundle;
-import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
-import pt.gov.dgarq.roda.wui.common.client.widgets.ElementPanel;
-import pt.gov.dgarq.roda.wui.common.client.widgets.UserInfoPanel;
-import pt.gov.dgarq.roda.wui.dissemination.browse.client.BrowserService;
-import pt.gov.dgarq.roda.wui.dissemination.browse.client.ViewWindow;
-import pt.gov.dgarq.roda.wui.ingest.list.client.SelectDescriptionObjectWindow.SelectDescriptionObjectListener;
-import pt.gov.dgarq.roda.wui.management.user.client.UserManagementService;
+import org.roda.legacy.aip.metadata.descriptive.SimpleDescriptionObject;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Timer;
@@ -31,10 +16,25 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MouseListener;
 import com.google.gwt.user.client.ui.PopupPanel;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.client.ui.PopupPanel.PositionCallback;
+import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.IngestListConstants;
+import pt.gov.dgarq.roda.core.common.IllegalOperationException;
+import pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException;
+import pt.gov.dgarq.roda.core.data.DescriptionObject;
+import pt.gov.dgarq.roda.core.data.SIPState;
+import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
+import pt.gov.dgarq.roda.wui.common.client.SuccessListener;
+import pt.gov.dgarq.roda.wui.common.client.images.CommonImageBundle;
+import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
+import pt.gov.dgarq.roda.wui.common.client.widgets.ElementPanel;
+import pt.gov.dgarq.roda.wui.common.client.widgets.UserInfoPanel;
+import pt.gov.dgarq.roda.wui.dissemination.browse.client.BrowserService;
+import pt.gov.dgarq.roda.wui.dissemination.browse.client.ViewWindow;
+import pt.gov.dgarq.roda.wui.ingest.list.client.SelectDescriptionObjectWindow.SelectDescriptionObjectListener;
+import pt.gov.dgarq.roda.wui.management.user.client.UserManagementService;
 
 /**
  * 
@@ -43,11 +43,9 @@ import config.i18n.client.IngestListConstants;
  */
 public class SIPPanel extends ElementPanel<SIPState> {
 
-	private static IngestListConstants constants = (IngestListConstants) GWT
-			.create(IngestListConstants.class);
+	private static IngestListConstants constants = (IngestListConstants) GWT.create(IngestListConstants.class);
 
-	private static CommonImageBundle commonImageBundle = (CommonImageBundle) GWT
-			.create(CommonImageBundle.class);
+	private static CommonImageBundle commonImageBundle = (CommonImageBundle) GWT.create(CommonImageBundle.class);
 
 	private ClientLogger logger = new ClientLogger(getClass().getName());
 
@@ -118,22 +116,16 @@ public class SIPPanel extends ElementPanel<SIPState> {
 					}
 
 					public void onSuccess(PopupPanel result) {
-						producer
-								.removeStyleName("wui-ingest-list-producer-loading");
+						producer.removeStyleName("wui-ingest-list-producer-loading");
 						if (showProducerInfoPopup) {
-							producerInfoPopup
-									.setPopupPositionAndShow(new PositionCallback() {
+							producerInfoPopup.setPopupPositionAndShow(new PositionCallback() {
 
-										public void setPosition(
-												int offsetWidth,
-												int offsetHeight) {
-											producerInfoPopup.setPopupPosition(
-													producer.getAbsoluteLeft(),
-													producer.getAbsoluteTop()
-															- offsetHeight);
-										}
+								public void setPosition(int offsetWidth, int offsetHeight) {
+									producerInfoPopup.setPopupPosition(producer.getAbsoluteLeft(),
+											producer.getAbsoluteTop() - offsetHeight);
+								}
 
-									});
+							});
 						}
 
 					}
@@ -171,15 +163,13 @@ public class SIPPanel extends ElementPanel<SIPState> {
 			public void onMouseEnter(Widget sender) {
 				showProducerInfoPopup = true;
 				scheduleProducerInfoPopupHide.cancel();
-				scheduleProducerInfoPopupShow
-						.schedule(PRODUCER_INFO_POPUP_SHOW_DELAY_MS);
+				scheduleProducerInfoPopupShow.schedule(PRODUCER_INFO_POPUP_SHOW_DELAY_MS);
 			}
 
 			public void onMouseLeave(Widget sender) {
 				showProducerInfoPopup = false;
 				scheduleProducerInfoPopupShow.cancel();
-				scheduleProducerInfoPopupHide
-						.schedule(PRODUCER_INFO_POPUP_HIDE_DELAY_MS);
+				scheduleProducerInfoPopupHide.schedule(PRODUCER_INFO_POPUP_HIDE_DELAY_MS);
 
 			}
 
@@ -229,8 +219,7 @@ public class SIPPanel extends ElementPanel<SIPState> {
 	protected void update(SIPState sip) {
 		filename.setText(sip.getOriginalFilename());
 		filename.setTitle(sip.getOriginalFilename());
-		startdate.setText(Tools.formatDateTime(sip.getStateTransitions()[0]
-				.getDatetime()));
+		startdate.setText(Tools.formatDateTime(sip.getStateTransitions()[0].getDatetime()));
 		try {
 			state.setText(constants.getString("state_" + sip.getState()));
 		} catch (MissingResourceException e) {
@@ -272,8 +261,7 @@ public class SIPPanel extends ElementPanel<SIPState> {
 					new AsyncCallback<SimpleDescriptionObject>() {
 
 						public void onFailure(Throwable caught) {
-							logger.error("Error viewing SIP ingested pid",
-									caught);
+							logger.error("Error viewing SIP ingested pid", caught);
 
 						}
 
@@ -281,16 +269,13 @@ public class SIPPanel extends ElementPanel<SIPState> {
 							if (sdo.getSubElementsCount() == 0) {
 								view(sdo);
 							} else {
-								SelectDescriptionObjectWindow selectWindow = new SelectDescriptionObjectWindow(
-										sdo);
-								selectWindow
-										.addSelectDescriptionObjectListener(new SelectDescriptionObjectListener() {
+								SelectDescriptionObjectWindow selectWindow = new SelectDescriptionObjectWindow(sdo);
+								selectWindow.addSelectDescriptionObjectListener(new SelectDescriptionObjectListener() {
 
-											public void onSelect(
-													SimpleDescriptionObject sdo) {
-												view(sdo);
-											}
-										});
+									public void onSelect(SimpleDescriptionObject sdo) {
+										view(sdo);
+									}
+								});
 								selectWindow.show();
 							}
 
@@ -302,73 +287,65 @@ public class SIPPanel extends ElementPanel<SIPState> {
 	}
 
 	private void view(SimpleDescriptionObject sdo) {
-		viewWindow = new ViewWindow(sdo.getPid(),
-				new AsyncCallback<DescriptionObject>() {
+		viewWindow = new ViewWindow(sdo.getId(), new AsyncCallback<DescriptionObject>() {
 
-					public void onFailure(Throwable caught) {
-						if (caught instanceof NoSuchRODAObjectException) {
-							Window.alert(constants.objectNotInRepository());
-						} else {
-							logger.error("Error creating view window", caught);
-						}
+			public void onFailure(Throwable caught) {
+				if (caught instanceof NoSuchRODAObjectException) {
+					Window.alert(constants.objectNotInRepository());
+				} else {
+					logger.error("Error creating view window", caught);
+				}
 
-					}
+			}
 
-					public void onSuccess(DescriptionObject obj) {
-						viewWindow.show();
-					}
+			public void onSuccess(DescriptionObject obj) {
+				viewWindow.show();
+			}
 
-				});
+		});
 	}
 
 	private void initProducerInfoPopup(final AsyncCallback<PopupPanel> callback) {
 		if (producerInfoPopup.getWidget() == null) {
-			UserManagementService.Util.getInstance().getUser(
-					get().getUsername(), new AsyncCallback<User>() {
+			UserManagementService.Util.getInstance().getUser(get().getUsername(), new AsyncCallback<User>() {
 
-						public void onFailure(Throwable caught) {
-							callback.onFailure(caught);
+				public void onFailure(Throwable caught) {
+					callback.onFailure(caught);
+				}
+
+				public void onSuccess(User user) {
+					UserInfoPanel userInfo = new UserInfoPanel(user);
+					FocusPanel focus = new FocusPanel(userInfo.getWidget());
+					producerInfoPopup.setWidget(focus);
+					focus.addMouseListener(new MouseListener() {
+
+						public void onMouseDown(Widget sender, int x, int y) {
 						}
 
-						public void onSuccess(User user) {
-							UserInfoPanel userInfo = new UserInfoPanel(user);
-							FocusPanel focus = new FocusPanel(userInfo
-									.getWidget());
-							producerInfoPopup.setWidget(focus);
-							focus.addMouseListener(new MouseListener() {
+						public void onMouseEnter(Widget sender) {
+							showProducerInfoPopup = true;
+							scheduleProducerInfoPopupHide.cancel();
+						}
 
-								public void onMouseDown(Widget sender, int x,
-										int y) {
-								}
+						public void onMouseLeave(Widget sender) {
+							showProducerInfoPopup = false;
+							scheduleProducerInfoPopupHide.schedule(PRODUCER_INFO_POPUP_HIDE_DELAY_MS);
+						}
 
-								public void onMouseEnter(Widget sender) {
-									showProducerInfoPopup = true;
-									scheduleProducerInfoPopupHide.cancel();
-								}
+						public void onMouseMove(Widget sender, int x, int y) {
 
-								public void onMouseLeave(Widget sender) {
-									showProducerInfoPopup = false;
-									scheduleProducerInfoPopupHide
-											.schedule(PRODUCER_INFO_POPUP_HIDE_DELAY_MS);
-								}
+						}
 
-								public void onMouseMove(Widget sender, int x,
-										int y) {
+						public void onMouseUp(Widget sender, int x, int y) {
 
-								}
-
-								public void onMouseUp(Widget sender, int x,
-										int y) {
-
-								}
-
-							});
-							focus
-									.addStyleName("wui-ingest-list-producer-popup");
-							callback.onSuccess(producerInfoPopup);
 						}
 
 					});
+					focus.addStyleName("wui-ingest-list-producer-popup");
+					callback.onSuccess(producerInfoPopup);
+				}
+
+			});
 		} else {
 			callback.onSuccess(producerInfoPopup);
 		}

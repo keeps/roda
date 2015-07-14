@@ -3,18 +3,18 @@
  */
 package pt.gov.dgarq.roda.wui.dissemination.browse.client;
 
-import pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException;
-import pt.gov.dgarq.roda.core.data.DescriptionObject;
-import pt.gov.dgarq.roda.core.data.SimpleDescriptionObject;
-import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
-import pt.gov.dgarq.roda.wui.common.client.widgets.WUIWindow;
-import pt.gov.dgarq.roda.wui.dissemination.browse.client.ViewPanel.ViewListener;
+import org.roda.legacy.aip.metadata.descriptive.SimpleDescriptionObject;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import config.i18n.client.BrowseConstants;
+import pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException;
+import pt.gov.dgarq.roda.core.data.DescriptionObject;
+import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
+import pt.gov.dgarq.roda.wui.common.client.widgets.WUIWindow;
+import pt.gov.dgarq.roda.wui.dissemination.browse.client.ViewPanel.ViewListener;
 
 /**
  * @author Luis Faria
@@ -22,11 +22,9 @@ import config.i18n.client.BrowseConstants;
  */
 public class ViewWindow extends WUIWindow {
 
-	private static BrowseConstants constants = (BrowseConstants) GWT
-			.create(BrowseConstants.class);
+	private static BrowseConstants constants = (BrowseConstants) GWT.create(BrowseConstants.class);
 
-	private static ClientLogger logger = new ClientLogger(ViewWindow.class
-			.getName());
+	private static ClientLogger logger = new ClientLogger(ViewWindow.class.getName());
 
 	private final ViewPanel viewPanel;
 
@@ -56,8 +54,7 @@ public class ViewWindow extends WUIWindow {
 	 * @param pid
 	 * @param callback
 	 */
-	public ViewWindow(String pid,
-			final AsyncCallback<DescriptionObject> callback) {
+	public ViewWindow(String pid, final AsyncCallback<DescriptionObject> callback) {
 		super(constants.viewWindowLoading(), 850, 400);
 		viewPanel = new ViewPanel(pid, new AsyncCallback<DescriptionObject>() {
 
@@ -106,7 +103,8 @@ public class ViewWindow extends WUIWindow {
 			}
 
 			public void onSave(DescriptionObject obj) {
-				setTitle(obj);
+				// TODO fix this
+				// setTitle(obj);
 
 			}
 
@@ -125,8 +123,7 @@ public class ViewWindow extends WUIWindow {
 
 			}
 
-			public void onMove(String thisPid, String oldParentPid,
-					String newParentPid) {
+			public void onMove(String thisPid, String oldParentPid, String newParentPid) {
 				// nothing to do
 
 			}

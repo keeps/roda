@@ -3,34 +3,10 @@
  */
 package pt.gov.dgarq.roda.wui.dissemination.browse.client;
 
-import java.io.File;
 import java.util.List;
 import java.util.Vector;
 
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
-
-import pt.gov.dgarq.roda.common.RodaClientFactory;
-import pt.gov.dgarq.roda.core.common.InvalidDescriptionLevel;
-import pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException;
-import pt.gov.dgarq.roda.core.data.DescriptionObject;
-import pt.gov.dgarq.roda.core.data.RODAObjectUserPermissions;
-import pt.gov.dgarq.roda.core.data.SimpleDescriptionObject;
-import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevel;
-import pt.gov.dgarq.roda.wui.common.client.AuthenticatedUser;
-import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
-import pt.gov.dgarq.roda.wui.common.client.LoginStatusListener;
-import pt.gov.dgarq.roda.wui.common.client.UserLogin;
-import pt.gov.dgarq.roda.wui.common.client.widgets.LoadingPopup;
-import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
-import pt.gov.dgarq.roda.wui.dissemination.client.DescriptiveMetadataPanel;
-import pt.gov.dgarq.roda.wui.main.client.Main;
-import pt.gov.dgarq.roda.wui.management.editor.client.EditObjectPermissionsPanel;
-import pt.gov.dgarq.roda.wui.management.editor.client.EditProducersPanel;
-import pt.gov.dgarq.roda.wui.management.editor.client.EditorService;
-import pt.gov.dgarq.roda.wui.management.editor.client.MoveChooseDestinationPanel;
-import pt.gov.dgarq.roda.wui.management.editor.client.MoveChooseDestinationPanel.MoveListener;
+import org.roda.legacy.aip.metadata.descriptive.SimpleDescriptionObject;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
@@ -56,19 +32,35 @@ import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.BrowseConstants;
 import config.i18n.client.BrowseMessages;
+import pt.gov.dgarq.roda.core.common.InvalidDescriptionLevel;
+import pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException;
+import pt.gov.dgarq.roda.core.data.DescriptionObject;
+import pt.gov.dgarq.roda.core.data.RODAObjectUserPermissions;
+import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevel;
+import pt.gov.dgarq.roda.wui.common.client.AuthenticatedUser;
+import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
+import pt.gov.dgarq.roda.wui.common.client.LoginStatusListener;
+import pt.gov.dgarq.roda.wui.common.client.UserLogin;
+import pt.gov.dgarq.roda.wui.common.client.widgets.LoadingPopup;
+import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
+import pt.gov.dgarq.roda.wui.dissemination.client.DescriptiveMetadataPanel;
+import pt.gov.dgarq.roda.wui.main.client.Main;
+import pt.gov.dgarq.roda.wui.management.editor.client.EditObjectPermissionsPanel;
+import pt.gov.dgarq.roda.wui.management.editor.client.EditProducersPanel;
+import pt.gov.dgarq.roda.wui.management.editor.client.EditorService;
+import pt.gov.dgarq.roda.wui.management.editor.client.MoveChooseDestinationPanel;
+import pt.gov.dgarq.roda.wui.management.editor.client.MoveChooseDestinationPanel.MoveListener;
 
 /**
- * @author Luis Faria
+ * @author Luis Faria <lfaria@keep.pt>
  * @author Vladislav Korecký <vladislav_korecky@gordic.cz>
  */
 public class ViewPanel extends Composite {
 
 	private static final boolean SHOW_OPTIONAL_FIELDS_DEFAULT = false;
 	private ClientLogger logger = new ClientLogger(getClass().getName());
-	private static BrowseConstants constants = (BrowseConstants) GWT
-			.create(BrowseConstants.class);
-	private static BrowseMessages messages = (BrowseMessages) GWT
-			.create(BrowseMessages.class);
+	private static BrowseConstants constants = (BrowseConstants) GWT.create(BrowseConstants.class);
+	private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
 	private static int selectedTab = 0;
 	private static boolean editmode = false;
 
@@ -187,8 +179,7 @@ public class ViewPanel extends Composite {
 		 * @param newParentPid
 		 *            the new object parent, where the object was moved to
 		 */
-		public void onMove(String thisPid, String oldParentPid,
-				String newParentPid);
+		public void onMove(String thisPid, String oldParentPid, String newParentPid);
 
 		/**
 		 * Called when object is removed
@@ -221,22 +212,21 @@ public class ViewPanel extends Composite {
 
 		optionalFieldsToggle = new Label();
 
-		optionalFieldsToggle.setText(showOptionalFields ? constants
-				.hideOptionalFields() : constants.showOptionalFields());
+		optionalFieldsToggle
+				.setText(showOptionalFields ? constants.hideOptionalFields() : constants.showOptionalFields());
 
 		optionalFieldsToggle.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
 				showOptionalFields = !showOptionalFields;
-				optionalFieldsToggle.setText(showOptionalFields ? constants
-						.hideOptionalFields() : constants.showOptionalFields());
+				optionalFieldsToggle
+						.setText(showOptionalFields ? constants.hideOptionalFields() : constants.showOptionalFields());
 				descriptiveMetadata.setOptionalVisible(showOptionalFields);
 			}
 		});
 
 		bottomToolbar = new HorizontalPanel();
 
-		edit = new WUIButton(constants.editDescriptiveMetadata(),
-				WUIButton.Left.ROUND, WUIButton.Right.ARROW_FORWARD);
+		edit = new WUIButton(constants.editDescriptiveMetadata(), WUIButton.Left.ROUND, WUIButton.Right.ARROW_FORWARD);
 
 		edit.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
@@ -247,34 +237,31 @@ public class ViewPanel extends Composite {
 			}
 		});
 
-		save = new WUIButton(constants.saveDescriptiveMetadata(),
-				WUIButton.Left.ROUND, WUIButton.Right.REC);
+		save = new WUIButton(constants.saveDescriptiveMetadata(), WUIButton.Left.ROUND, WUIButton.Right.REC);
 
 		save.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
 				if (save.isEnabled()) {
-					descriptiveMetadata
-							.commit(new AsyncCallback<DescriptionObject>() {
-								public void onFailure(Throwable caught) {
-									Window.alert(messages.editSaveError(caught
-											.getMessage()));
-								}
+					descriptiveMetadata.commit(new AsyncCallback<DescriptionObject>() {
+						public void onFailure(Throwable caught) {
+							Window.alert(messages.editSaveError(caught.getMessage()));
+						}
 
-								public void onSuccess(DescriptionObject obj) {
-									save.setEnabled(false);
-									sdo = obj;
-									updateCreateChildStatus();
-									onSave(obj);
-								}
-							});
+						public void onSuccess(DescriptionObject obj) {
+							save.setEnabled(false);
+							// TODO fix this
+							// sdo = obj;
+							updateCreateChildStatus();
+							onSave(obj);
+						}
+					});
 				}
 			}
 		});
 
 		save.setEnabled(false);
 
-		createChild = new WUIButton(constants.createElementChild(),
-				WUIButton.Left.ROUND, WUIButton.Right.PLUS);
+		createChild = new WUIButton(constants.createElementChild(), WUIButton.Left.ROUND, WUIButton.Right.PLUS);
 
 		createChild.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
@@ -283,8 +270,7 @@ public class ViewPanel extends Composite {
 					public void onFailure(Throwable caught) {
 						loading.hide();
 						if (caught instanceof InvalidDescriptionLevel) {
-							Window.alert("Cannot create child of item level, "
-									+ "this button should be disabled");
+							Window.alert("Cannot create child of item level, " + "this button should be disabled");
 						} else {
 							logger.error("Error creating child", caught);
 						}
@@ -293,18 +279,16 @@ public class ViewPanel extends Composite {
 					public void onSuccess(final String childPID) {
 						loading.hide();
 						onCreateChild(childPID);
-						Browse.getInstance().update(ViewPanel.this.pid, false,
-								true, new AsyncCallback<CollectionsTreeItem>() {
-									public void onFailure(Throwable caught) {
-										logger.error("Error updating tree",
-												caught);
-									}
+						Browse.getInstance().update(ViewPanel.this.pid, false, true,
+								new AsyncCallback<CollectionsTreeItem>() {
+							public void onFailure(Throwable caught) {
+								logger.error("Error updating tree", caught);
+							}
 
-									public void onSuccess(
-											CollectionsTreeItem treeItem) {
-										editmode = true;
-									}
-								});
+							public void onSuccess(CollectionsTreeItem treeItem) {
+								editmode = true;
+							}
+						});
 					}
 				});
 			}
@@ -312,27 +296,23 @@ public class ViewPanel extends Composite {
 
 		createChild.setEnabled(false);
 
-		move = new WUIButton(constants.moveElement(), WUIButton.Left.ROUND,
-				WUIButton.Right.ARROW_FORWARD);
+		move = new WUIButton(constants.moveElement(), WUIButton.Left.ROUND, WUIButton.Right.ARROW_FORWARD);
 
 		move.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
 				getSDO(new AsyncCallback<SimpleDescriptionObject>() {
 					public void onFailure(Throwable caught) {
-						logger.error("Error getting SDO of "
-								+ ViewPanel.this.pid, caught);
+						logger.error("Error getting SDO of " + ViewPanel.this.pid, caught);
 					}
 
 					public void onSuccess(SimpleDescriptionObject source) {
-						MoveChooseDestinationPanel movePanel = new MoveChooseDestinationPanel(
-								source);
+						MoveChooseDestinationPanel movePanel = new MoveChooseDestinationPanel(source);
 						movePanel.addMoveListener(new MoveListener() {
 							public void onCancel() {
 								// nothing to do
 							}
 
-							public void onMove(String oldParent,
-									String newParentPid) {
+							public void onMove(String oldParent, String newParentPid) {
 								ViewPanel.this.onMove(oldParent, newParentPid);
 
 							}
@@ -367,8 +347,7 @@ public class ViewPanel extends Composite {
 		//
 		// });
 
-		remove = new WUIButton(constants.removeElement(), WUIButton.Left.ROUND,
-				WUIButton.Right.MINUS);
+		remove = new WUIButton(constants.removeElement(), WUIButton.Left.ROUND, WUIButton.Right.MINUS);
 
 		remove.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
@@ -380,21 +359,15 @@ public class ViewPanel extends Composite {
 						}
 
 						public void onSuccess(SimpleDescriptionObject sdo) {
-							if (sdo.getSubElementsCount() == 0
-									|| Window.confirm(constants
-											.confirmRecursiveRemove())) {
+							if (sdo.getSubElementsCount() == 0 || Window.confirm(constants.confirmRecursiveRemove())) {
 								loading.show();
 								remove(new AsyncCallback<Object>() {
 									public void onFailure(Throwable caught) {
 										loading.hide();
 										if (caught instanceof NoSuchRODAObjectException) {
-											Window.alert(messages
-													.noSuchRODAObject(ViewPanel.this.pid));
+											Window.alert(messages.noSuchRODAObject(ViewPanel.this.pid));
 										} else {
-											logger.error(
-													"Error getting parent of "
-															+ ViewPanel.this.pid,
-													caught);
+											logger.error("Error getting parent of " + ViewPanel.this.pid, caught);
 										}
 									}
 
@@ -411,33 +384,26 @@ public class ViewPanel extends Composite {
 			}
 		});
 
-		downloadEADC = new WUIButton(constants.downloadEadC(),
-				WUIButton.Left.ROUND, WUIButton.Right.ARROW_DOWN);
+		downloadEADC = new WUIButton(constants.downloadEadC(), WUIButton.Left.ROUND, WUIButton.Right.ARROW_DOWN);
 
 		downloadEADC.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				Window.open(GWT.getModuleBaseURL()
-						+ "MetadataDownload?type=EAD&pid=" + sdo.getPid(),
-						"_blank", "");
+				Window.open(GWT.getModuleBaseURL() + "MetadataDownload?type=EAD&pid=" + sdo.getId(), "_blank", "");
 
 			}
 		});
 
-		downloadPremis = new WUIButton(constants.downloadPremis(),
-				WUIButton.Left.ROUND, WUIButton.Right.ARROW_DOWN);
+		downloadPremis = new WUIButton(constants.downloadPremis(), WUIButton.Left.ROUND, WUIButton.Right.ARROW_DOWN);
 
 		downloadPremis.addClickHandler(new ClickHandler() {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				Window.open(GWT.getModuleBaseURL()
-						+ "MetadataDownload?type=PREMIS&pid=" + sdo.getPid(),
-						"_blank", "");
+				Window.open(GWT.getModuleBaseURL() + "MetadataDownload?type=PREMIS&pid=" + sdo.getId(), "_blank", "");
 			}
 		});
 
-		close = new WUIButton(constants.close(), WUIButton.Left.ROUND,
-				WUIButton.Right.CROSS);
+		close = new WUIButton(constants.close(), WUIButton.Left.ROUND, WUIButton.Right.CROSS);
 
 		close.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
@@ -463,8 +429,7 @@ public class ViewPanel extends Composite {
 		init(callback);
 
 		bottomToolbar.setCellWidth(close, "100%");
-		bottomToolbar.setCellHorizontalAlignment(close,
-				HasAlignment.ALIGN_RIGHT);
+		bottomToolbar.setCellHorizontalAlignment(close, HasAlignment.ALIGN_RIGHT);
 
 		this.addStyleName("wui-view-panel");
 		tabs.addStyleName("viewPanel-tabs");
@@ -483,22 +448,22 @@ public class ViewPanel extends Composite {
 	}
 
 	private void init(final AsyncCallback<DescriptionObject> callback) {
-		descriptiveMetadata = new DescriptiveMetadataPanel(pid,
-				new AsyncCallback<DescriptionObject>() {
-					public void onFailure(Throwable caught) {
-						callback.onFailure(caught);
-					}
+		descriptiveMetadata = new DescriptiveMetadataPanel(pid, new AsyncCallback<DescriptionObject>() {
+			public void onFailure(Throwable caught) {
+				callback.onFailure(caught);
+			}
 
-					public void onSuccess(DescriptionObject obj) {
-						postInit(obj);
-						callback.onSuccess(obj);
-					}
-				});
+			public void onSuccess(DescriptionObject obj) {
+				postInit(obj);
+				callback.onSuccess(obj);
+			}
+		});
 
 	}
 
 	private void postInit(final DescriptionObject obj) {
-		sdo = obj;
+		// TODO fix this
+		// sdo = obj;
 		descriptiveMetadata.setOptionalVisible(SHOW_OPTIONAL_FIELDS_DEFAULT);
 		updateCreateChildStatus();
 
@@ -512,23 +477,21 @@ public class ViewPanel extends Composite {
 			preservationMetadata = new PreservationMetadataPanel(obj);
 		}
 
-		UserLogin.getInstance().getAuthenticatedUser(
-				new AsyncCallback<AuthenticatedUser>() {
-					public void onFailure(Throwable caught) {
-						logger.error("Error getting authenticated user", caught);
-					}
+		UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<AuthenticatedUser>() {
+			public void onFailure(Throwable caught) {
+				logger.error("Error getting authenticated user", caught);
+			}
 
-					public void onSuccess(AuthenticatedUser user) {
-						onUserUpdated(user);
-					}
-				});
+			public void onSuccess(AuthenticatedUser user) {
+				onUserUpdated(user);
+			}
+		});
 
-		UserLogin.getInstance().addLoginStatusListener(
-				new LoginStatusListener() {
-					public void onLoginStatusChanged(AuthenticatedUser user) {
-						onUserUpdated(user);
-					}
-				});
+		UserLogin.getInstance().addLoginStatusListener(new LoginStatusListener() {
+			public void onLoginStatusChanged(AuthenticatedUser user) {
+				onUserUpdated(user);
+			}
+		});
 
 		descriptiveMetadata.addChangeListener(new ChangeListener() {
 			public void onChange(Widget sender) {
@@ -562,16 +525,14 @@ public class ViewPanel extends Composite {
 	private void onUserUpdated(AuthenticatedUser user) {
 		modifyGlobalPermission = user.hasRole("administration.metadata_editor");
 		listUsersGlobalPermission = user.hasRole("misc.browse_users");
-		EditorService.Util.getInstance().getSelfObjectPermissions(sdo.getPid(),
+		EditorService.Util.getInstance().getSelfObjectPermissions(sdo.getId(),
 				new AsyncCallback<RODAObjectUserPermissions>() {
 					public void onFailure(Throwable caught) {
 						if (caught instanceof NoSuchRODAObjectException) {
 							// No read permissions
 							onCancel();
 						} else {
-							logger.error(
-									"Error getting authenticated user object permissions",
-									caught);
+							logger.error("Error getting authenticated user object permissions", caught);
 						}
 
 					}
@@ -593,8 +554,7 @@ public class ViewPanel extends Composite {
 			editProducersPanel = new EditProducersPanel(sdo);
 			for (WUIButton action : editProducersPanel.getActionButtons()) {
 				action.setVisible(false);
-				bottomToolbar
-						.insert(action, bottomToolbar.getWidgetCount() - 2);
+				bottomToolbar.insert(action, bottomToolbar.getWidgetCount() - 2);
 				action.addStyleName("viewPanel-action");
 			}
 		}
@@ -606,8 +566,7 @@ public class ViewPanel extends Composite {
 			objPermissionsPanel = new EditObjectPermissionsPanel(sdo);
 			for (WUIButton action : objPermissionsPanel.getActionButtons()) {
 				action.setVisible(false);
-				bottomToolbar
-						.insert(action, bottomToolbar.getWidgetCount() - 2);
+				bottomToolbar.insert(action, bottomToolbar.getWidgetCount() - 2);
 				action.addStyleName("viewPanel-action");
 			}
 		}
@@ -618,11 +577,9 @@ public class ViewPanel extends Composite {
 		tabs.clear();
 
 		if (Main.ROOT_DESCRIPTION_LEVELS.contains(sdo.getLevel())) {
-			if (grantObjectPermission && modifyGlobalPermission
-					&& listUsersGlobalPermission) {
+			if (grantObjectPermission && modifyGlobalPermission && listUsersGlobalPermission) {
 				// Description
-				tabs.add(descriptiveMetadataScroll,
-						constants.descriptiveMetadata());
+				tabs.add(descriptiveMetadataScroll, constants.descriptiveMetadata());
 				// Producers
 				tabs.add(getEditProducersPanel(), constants.producers());
 				// Permissions
@@ -635,8 +592,7 @@ public class ViewPanel extends Composite {
 				objPermissionsTabIndex = 2;
 			} else if (modifyGlobalPermission && listUsersGlobalPermission) {
 				// Description
-				tabs.add(descriptiveMetadataScroll,
-						constants.descriptiveMetadata());
+				tabs.add(descriptiveMetadataScroll, constants.descriptiveMetadata());
 				// Producers
 				tabs.add(getEditProducersPanel(), constants.producers());
 
@@ -648,8 +604,7 @@ public class ViewPanel extends Composite {
 
 			} else {
 				// Description
-				tabs.add(descriptiveMetadataScroll,
-						constants.descriptiveMetadata());
+				tabs.add(descriptiveMetadataScroll, constants.descriptiveMetadata());
 
 				descriptiveMetadataTabIndex = 0;
 				disseminationsTabIndex = -1;
@@ -658,13 +613,10 @@ public class ViewPanel extends Composite {
 				objPermissionsTabIndex = -1;
 			}
 
-		} else if (!Main.REPRESENTATION_DESCRIPTION_LEVELS.contains(sdo
-				.getLevel())) {
-			if (grantObjectPermission && modifyGlobalPermission
-					&& listUsersGlobalPermission) {
+		} else if (!Main.REPRESENTATION_DESCRIPTION_LEVELS.contains(sdo.getLevel())) {
+			if (grantObjectPermission && modifyGlobalPermission && listUsersGlobalPermission) {
 				// Description
-				tabs.add(descriptiveMetadataScroll,
-						constants.descriptiveMetadata());
+				tabs.add(descriptiveMetadataScroll, constants.descriptiveMetadata());
 				// Permissions
 				tabs.add(getObjPermissionsPanel(), constants.objPermissions());
 
@@ -676,8 +628,7 @@ public class ViewPanel extends Composite {
 
 			} else {
 				// Description
-				tabs.add(descriptiveMetadataScroll,
-						constants.descriptiveMetadata());
+				tabs.add(descriptiveMetadataScroll, constants.descriptiveMetadata());
 
 				descriptiveMetadataTabIndex = 0;
 				disseminationsTabIndex = -1;
@@ -687,11 +638,9 @@ public class ViewPanel extends Composite {
 			}
 
 		} else {
-			if (grantObjectPermission && modifyGlobalPermission
-					&& listUsersGlobalPermission) {
+			if (grantObjectPermission && modifyGlobalPermission && listUsersGlobalPermission) {
 				// Description
-				tabs.add(descriptiveMetadataScroll,
-						constants.descriptiveMetadata());
+				tabs.add(descriptiveMetadataScroll, constants.descriptiveMetadata());
 				// Disseminations
 				tabs.add(disseminations, constants.representations());
 				// Preservation Metadata
@@ -706,19 +655,15 @@ public class ViewPanel extends Composite {
 				objPermissionsTabIndex = 3;
 
 			} else {
-				if (grantObjectPermission && modifyGlobalPermission
-						&& listUsersGlobalPermission) {
+				if (grantObjectPermission && modifyGlobalPermission && listUsersGlobalPermission) {
 					// Description
-					tabs.add(descriptiveMetadataScroll,
-							constants.descriptiveMetadata());
+					tabs.add(descriptiveMetadataScroll, constants.descriptiveMetadata());
 					// Disseminations
 					tabs.add(disseminations, constants.representations());
 					// Preservation Metadata
-					tabs.add(preservationMetadata,
-							constants.preservationMetadata());
+					tabs.add(preservationMetadata, constants.preservationMetadata());
 					// Permissions
-					tabs.add(getObjPermissionsPanel(),
-							constants.objPermissions());
+					tabs.add(getObjPermissionsPanel(), constants.objPermissions());
 
 					descriptiveMetadataTabIndex = 0;
 					disseminationsTabIndex = 1;
@@ -728,13 +673,11 @@ public class ViewPanel extends Composite {
 
 				} else {
 					// Description
-					tabs.add(descriptiveMetadataScroll,
-							constants.descriptiveMetadata());
+					tabs.add(descriptiveMetadataScroll, constants.descriptiveMetadata());
 					// Disseminations
 					tabs.add(disseminations, constants.representations());
 					// Preservation Metadata
-					tabs.add(preservationMetadata,
-							constants.preservationMetadata());
+					tabs.add(preservationMetadata, constants.preservationMetadata());
 
 					descriptiveMetadataTabIndex = 0;
 					disseminationsTabIndex = 1;
@@ -804,8 +747,7 @@ public class ViewPanel extends Composite {
 				save.setVisible(true);
 				descriptiveMetadata.isValid(new AsyncCallback<Boolean>() {
 					public void onFailure(Throwable caught) {
-						logger.error("Error validating descriptive metadata",
-								caught);
+						logger.error("Error validating descriptive metadata", caught);
 						save.setEnabled(false);
 					}
 
@@ -813,19 +755,15 @@ public class ViewPanel extends Composite {
 						if (!isValid) {
 							save.setEnabled(false);
 						} else {
-							descriptiveMetadata
-									.isChanged(new AsyncCallback<Boolean>() {
-										public void onFailure(Throwable caught) {
-											logger.error(
-													"Error checking descriptive "
-															+ "metadata for changes",
-													caught);
-										}
+							descriptiveMetadata.isChanged(new AsyncCallback<Boolean>() {
+								public void onFailure(Throwable caught) {
+									logger.error("Error checking descriptive " + "metadata for changes", caught);
+								}
 
-										public void onSuccess(Boolean isChanged) {
-											save.setEnabled(isChanged);
-										}
-									});
+								public void onSuccess(Boolean isChanged) {
+									save.setEnabled(isChanged);
+								}
+							});
 						}
 					}
 				});
@@ -850,7 +788,7 @@ public class ViewPanel extends Composite {
 				createChild.setVisible(true);
 				// clone.setVisible(true);
 				move.setVisible(true);
-				
+
 				// TODO make the option of hide remove button when there are
 				// children configurable
 				remove.setVisible(removeObjectPermission);
@@ -860,17 +798,14 @@ public class ViewPanel extends Composite {
 		} // Edit producer tab selected
 		else if (selectedTab == editProducersTabIndex) {
 			if (modifyGlobalPermission && listUsersGlobalPermission) {
-				for (WUIButton action : getEditProducersPanel()
-						.getActionButtons()) {
+				for (WUIButton action : getEditProducersPanel().getActionButtons()) {
 					action.setVisible(true);
 				}
 			}
 		} // Object Permissions tab selected
 		else if (selectedTab == objPermissionsTabIndex) {
-			if (grantObjectPermission && modifyGlobalPermission
-					&& listUsersGlobalPermission) {
-				for (WUIButton action : getObjPermissionsPanel()
-						.getActionButtons()) {
+			if (grantObjectPermission && modifyGlobalPermission && listUsersGlobalPermission) {
+				for (WUIButton action : getObjPermissionsPanel().getActionButtons()) {
 					action.setVisible(true);
 				}
 			}
@@ -883,13 +818,11 @@ public class ViewPanel extends Composite {
 	private void updateCreateChildStatus() {
 		getSDO(new AsyncCallback<SimpleDescriptionObject>() {
 			public void onFailure(Throwable caught) {
-				logger.error("Error getting SDO of " + ViewPanel.this.pid,
-						caught);
+				logger.error("Error getting SDO of " + ViewPanel.this.pid, caught);
 			}
 
 			public void onSuccess(SimpleDescriptionObject sdo) {
-				createChild.setEnabled(!Main.LEAF_DESCRIPTION_LEVELS
-						.contains(sdo.getLevel()));
+				createChild.setEnabled(!Main.LEAF_DESCRIPTION_LEVELS.contains(sdo.getLevel()));
 			}
 		});
 	}
@@ -906,18 +839,15 @@ public class ViewPanel extends Composite {
 			public void onSuccess(Boolean isChanged) {
 				if (isChanged) {
 					if (Window.confirm(constants.saveBeforeClosing())) {
-						descriptiveMetadata
-								.commit(new AsyncCallback<DescriptionObject>() {
-									public void onFailure(Throwable caught) {
-										Window.alert(messages
-												.editSaveError(caught
-														.getMessage()));
-									}
+						descriptiveMetadata.commit(new AsyncCallback<DescriptionObject>() {
+							public void onFailure(Throwable caught) {
+								Window.alert(messages.editSaveError(caught.getMessage()));
+							}
 
-									public void onSuccess(DescriptionObject obj) {
-										ViewPanel.this.onClose();
-									}
-								});
+							public void onSuccess(DescriptionObject obj) {
+								ViewPanel.this.onClose();
+							}
+						});
 					} else {
 						descriptiveMetadata.cancel();
 						onCancel();
@@ -1003,36 +933,34 @@ public class ViewPanel extends Composite {
 			}
 
 			public void onSuccess(SimpleDescriptionObject sdo) {
-				DescriptionLevel level = sdo.getLevel();
-				EditorService.Util.getInstance().createChild(
-						ViewPanel.this.pid, level, new AsyncCallback<String>() {
-							public void onFailure(Throwable caught) {
-								callback.onFailure(caught);
-							}
+				String level = sdo.getLevel();
+				EditorService.Util.getInstance().createChild(ViewPanel.this.pid, level, new AsyncCallback<String>() {
+					public void onFailure(Throwable caught) {
+						callback.onFailure(caught);
+					}
 
-							public void onSuccess(String childPid) {
-								onCreateChild(childPid);
-								callback.onSuccess(childPid);
+					public void onSuccess(String childPid) {
+						onCreateChild(childPid);
+						callback.onSuccess(childPid);
 
-							}
-						});
+					}
+				});
 			}
 		});
 	}
 
 	@SuppressWarnings("unused")
 	private void cloneElement(final AsyncCallback<String> callback) {
-		EditorService.Util.getInstance().clone(ViewPanel.this.pid,
-				new AsyncCallback<String>() {
-					public void onFailure(Throwable caught) {
-						callback.onFailure(caught);
-					}
+		EditorService.Util.getInstance().clone(ViewPanel.this.pid, new AsyncCallback<String>() {
+			public void onFailure(Throwable caught) {
+				callback.onFailure(caught);
+			}
 
-					public void onSuccess(final String clonePID) {
-						onClone(clonePID);
-						callback.onSuccess(clonePID);
-					}
-				});
+			public void onSuccess(final String clonePID) {
+				onClone(clonePID);
+				callback.onSuccess(clonePID);
+			}
+		});
 	}
 
 	/**
@@ -1041,26 +969,24 @@ public class ViewPanel extends Composite {
 	 * @param callback
 	 */
 	public void remove(final AsyncCallback<?> callback) {
-		BrowserService.Util.getInstance().getParent(ViewPanel.this.pid,
-				new AsyncCallback<String>() {
+		BrowserService.Util.getInstance().getParent(ViewPanel.this.pid, new AsyncCallback<String>() {
+			public void onFailure(Throwable caught) {
+				callback.onFailure(caught);
+			}
+
+			public void onSuccess(final String parentPID) {
+				EditorService.Util.getInstance().removeElement(ViewPanel.this.pid, new AsyncCallback<Void>() {
 					public void onFailure(Throwable caught) {
 						callback.onFailure(caught);
 					}
 
-					public void onSuccess(final String parentPID) {
-						EditorService.Util.getInstance().removeElement(
-								ViewPanel.this.pid, new AsyncCallback<Void>() {
-									public void onFailure(Throwable caught) {
-										callback.onFailure(caught);
-									}
-
-									public void onSuccess(Void result) {
-										onRemove(parentPID);
-										callback.onSuccess(null);
-									}
-								});
+					public void onSuccess(Void result) {
+						onRemove(parentPID);
+						callback.onSuccess(null);
 					}
 				});
+			}
+		});
 	}
 
 	/**
@@ -1072,8 +998,7 @@ public class ViewPanel extends Composite {
 		if (sdo != null) {
 			callback.onSuccess(sdo);
 		} else {
-			BrowserService.Util.getInstance().getSimpleDescriptionObject(pid,
-					callback);
+			BrowserService.Util.getInstance().getSimpleDescriptionObject(pid, callback);
 		}
 
 	}
@@ -1086,6 +1011,5 @@ public class ViewPanel extends Composite {
 	public String getPID() {
 		return pid;
 	}
-	
-	
+
 }

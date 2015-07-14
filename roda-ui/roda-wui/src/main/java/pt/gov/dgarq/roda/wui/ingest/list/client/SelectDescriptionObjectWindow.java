@@ -6,11 +6,7 @@ package pt.gov.dgarq.roda.wui.ingest.list.client;
 import java.util.HashSet;
 import java.util.Set;
 
-import pt.gov.dgarq.roda.core.data.SimpleDescriptionObject;
-import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
-import pt.gov.dgarq.roda.wui.common.client.widgets.WUIWindow;
-import pt.gov.dgarq.roda.wui.dissemination.browse.client.CollectionsTree;
-import pt.gov.dgarq.roda.wui.dissemination.browse.client.CollectionsTreeItem;
+import org.roda.legacy.aip.metadata.descriptive.SimpleDescriptionObject;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.ClickListener;
@@ -19,6 +15,10 @@ import com.google.gwt.user.client.ui.TreeListener;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.IngestListConstants;
+import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
+import pt.gov.dgarq.roda.wui.common.client.widgets.WUIWindow;
+import pt.gov.dgarq.roda.wui.dissemination.browse.client.CollectionsTree;
+import pt.gov.dgarq.roda.wui.dissemination.browse.client.CollectionsTreeItem;
 
 /**
  * @author Luis Faria
@@ -30,8 +30,7 @@ public class SelectDescriptionObjectWindow extends WUIWindow {
 		public void onSelect(SimpleDescriptionObject sdo);
 	}
 
-	private static IngestListConstants constants = (IngestListConstants) GWT
-			.create(IngestListConstants.class);
+	private static IngestListConstants constants = (IngestListConstants) GWT.create(IngestListConstants.class);
 	// private ClientLogger logger = new ClientLogger(getClass().getName());
 
 	private final CollectionsTree tree;
@@ -42,8 +41,7 @@ public class SelectDescriptionObjectWindow extends WUIWindow {
 		super(constants.selectDescriptionObjectWindowTitle(), 850, 400);
 
 		this.tree = new CollectionsTree(sdo, null, null, 10, true);
-		this.close = new WUIButton(constants
-				.selectDescriptionObjectWindowClose(), WUIButton.Left.ROUND,
+		this.close = new WUIButton(constants.selectDescriptionObjectWindowClose(), WUIButton.Left.ROUND,
 				WUIButton.Right.CROSS);
 		this.listeners = new HashSet<SelectDescriptionObjectListener>();
 
@@ -74,20 +72,17 @@ public class SelectDescriptionObjectWindow extends WUIWindow {
 			}
 
 		});
-		
+
 		tree.getRootItem().setState(true);
-		
 
 		tree.addStyleName("select-do-window-tree");
 	}
 
-	public void addSelectDescriptionObjectListener(
-			SelectDescriptionObjectListener listener) {
+	public void addSelectDescriptionObjectListener(SelectDescriptionObjectListener listener) {
 		listeners.add(listener);
 	}
 
-	public void removeSelectDescriptionObjectListener(
-			SelectDescriptionObjectListener listener) {
+	public void removeSelectDescriptionObjectListener(SelectDescriptionObjectListener listener) {
 		listeners.remove(listener);
 	}
 

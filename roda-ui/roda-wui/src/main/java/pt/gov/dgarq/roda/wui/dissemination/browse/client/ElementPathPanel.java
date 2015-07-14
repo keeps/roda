@@ -3,12 +3,7 @@
  */
 package pt.gov.dgarq.roda.wui.dissemination.browse.client;
 
-import pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException;
-import pt.gov.dgarq.roda.core.data.DescriptionObject;
-import pt.gov.dgarq.roda.core.data.SimpleDescriptionObject;
-import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
-import pt.gov.dgarq.roda.wui.dissemination.browse.client.images.BrowseImageBundle;
-import pt.gov.dgarq.roda.wui.dissemination.client.Dissemination;
+import org.roda.legacy.aip.metadata.descriptive.SimpleDescriptionObject;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Command;
@@ -22,6 +17,11 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.BrowseMessages;
+import pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException;
+import pt.gov.dgarq.roda.core.data.DescriptionObject;
+import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
+import pt.gov.dgarq.roda.wui.dissemination.browse.client.images.BrowseImageBundle;
+import pt.gov.dgarq.roda.wui.dissemination.client.Dissemination;
 
 /**
  * @author Luis Faria
@@ -31,11 +31,9 @@ public class ElementPathPanel extends HorizontalPanel {
 
 	private ClientLogger logger = new ClientLogger(getClass().getName());
 
-	private static BrowseMessages messages = (BrowseMessages) GWT
-			.create(BrowseMessages.class);
+	private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
 
-	private static BrowseImageBundle browseImageBundle = (BrowseImageBundle) GWT
-			.create(BrowseImageBundle.class);
+	private static BrowseImageBundle browseImageBundle = (BrowseImageBundle) GWT.create(BrowseImageBundle.class);
 
 	private final String pid;
 
@@ -53,21 +51,19 @@ public class ElementPathPanel extends HorizontalPanel {
 
 			public void execute() {
 
-				BrowserService.Util.getInstance().getAncestors(
-						ElementPathPanel.this.pid,
+				BrowserService.Util.getInstance().getAncestors(ElementPathPanel.this.pid,
 						new AsyncCallback<String[]>() {
 
-							public void onFailure(Throwable caught) {
-								logger.error("Error getting ancestors of"
-										+ ElementPathPanel.this.pid, caught);
-							}
+					public void onFailure(Throwable caught) {
+						logger.error("Error getting ancestors of" + ElementPathPanel.this.pid, caught);
+					}
 
-							public void onSuccess(String[] ancestors) {
-								createPanel(ancestors);
+					public void onSuccess(String[] ancestors) {
+						createPanel(ancestors);
 
-							}
+					}
 
-						});
+				});
 			}
 
 		});
@@ -88,13 +84,11 @@ public class ElementPathPanel extends HorizontalPanel {
 		for (int i = 0; i < ancestors.length; i++) {
 			final String elementPid = ancestors[i];
 			final int index = i;
-			BrowserService.Util.getInstance().getSimpleDescriptionObject(
-					elementPid, new AsyncCallback<SimpleDescriptionObject>() {
+			BrowserService.Util.getInstance().getSimpleDescriptionObject(elementPid,
+					new AsyncCallback<SimpleDescriptionObject>() {
 
 						public void onFailure(Throwable caught) {
-							logger.error(
-									"Error getting SimpleDescriptionObject of"
-											+ elementPid, caught);
+							logger.error("Error getting SimpleDescriptionObject of" + elementPid, caught);
 						}
 
 						public void onSuccess(SimpleDescriptionObject sdo) {
@@ -117,8 +111,7 @@ public class ElementPathPanel extends HorizontalPanel {
 			final int index = i;
 			final SimpleDescriptionObject sdo = sdos[index];
 			HorizontalPanel itemPanel = new HorizontalPanel();
-			Image icon = Dissemination.getInstance().getElementLevelIcon(
-					sdo.getLevel());
+			Image icon = Dissemination.getInstance().getElementLevelIcon(sdo.getLevel());
 			Label id = new Label(sdo.getId());
 
 			ClickListener onItemClicked = new ClickListener() {
@@ -143,12 +136,9 @@ public class ElementPathPanel extends HorizontalPanel {
 				itemPanel.addStyleName("elementPathItem-final-layout");
 			}
 
-			ElementPathPanel.this.setCellVerticalAlignment(itemPanel,
-					ALIGN_MIDDLE);
-			itemPanel.setCellVerticalAlignment(icon,
-					HorizontalPanel.ALIGN_MIDDLE);
-			itemPanel
-					.setCellVerticalAlignment(id, HorizontalPanel.ALIGN_MIDDLE);
+			ElementPathPanel.this.setCellVerticalAlignment(itemPanel, ALIGN_MIDDLE);
+			itemPanel.setCellVerticalAlignment(icon, HorizontalPanel.ALIGN_MIDDLE);
+			itemPanel.setCellVerticalAlignment(id, HorizontalPanel.ALIGN_MIDDLE);
 			itemPanel.addStyleName("elementPathItem-layout");
 			icon.addStyleName("elementPathItem-icon");
 			id.addStyleName("elementPathItem-id");
@@ -156,22 +146,21 @@ public class ElementPathPanel extends HorizontalPanel {
 	}
 
 	protected void onElementClick(SimpleDescriptionObject sdo) {
-		viewWindow = new ViewWindow(sdo.getPid(),
-				new AsyncCallback<DescriptionObject>() {
+		viewWindow = new ViewWindow(sdo.getId(), new AsyncCallback<DescriptionObject>() {
 
-					public void onFailure(Throwable caught) {
-						if (caught instanceof NoSuchRODAObjectException) {
-							Window.alert(messages.noSuchRODAObject(pid));
-						} else {
-							logger.error("Error creating view window", caught);
-						}
-					}
+			public void onFailure(Throwable caught) {
+				if (caught instanceof NoSuchRODAObjectException) {
+					Window.alert(messages.noSuchRODAObject(pid));
+				} else {
+					logger.error("Error creating view window", caught);
+				}
+			}
 
-					public void onSuccess(DescriptionObject obj) {
-						viewWindow.show();
-					}
+			public void onSuccess(DescriptionObject obj) {
+				viewWindow.show();
+			}
 
-				});
+		});
 
 	}
 

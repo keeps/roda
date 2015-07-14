@@ -3,11 +3,11 @@
  */
 package pt.gov.dgarq.roda.wui.dissemination.browse.client;
 
-import pt.gov.dgarq.roda.core.data.SimpleDescriptionObject;
-import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
-import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
+import org.roda.index.filter.Filter;
+import org.roda.index.sorter.Sorter;
+import org.roda.index.sublist.Sublist;
+import org.roda.legacy.aip.metadata.descriptive.SimpleDescriptionObject;
+import org.roda.legacy.old.adapter.ContentAdapter;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -28,8 +28,7 @@ public class SubElementsProxy extends ElementsMemCache {
 	 * @param filter
 	 * @param sorter
 	 */
-	public SubElementsProxy(SimpleDescriptionObject sdo, Filter filter,
-			Sorter sorter) {
+	public SubElementsProxy(SimpleDescriptionObject sdo, Filter filter, Sorter sorter) {
 		super(filter, sorter);
 		this.sdo = sdo;
 	}
@@ -42,8 +41,7 @@ public class SubElementsProxy extends ElementsMemCache {
 	 * #getCount(com.google.gwt.user.client.rpc.AsyncCallback)
 	 */
 	public void getCountImpl(AsyncCallback<Integer> callback) {
-		BrowserService.Util.getInstance().getSubElementsCount(sdo.getPid(),
-				getFilter(), callback);
+		BrowserService.Util.getInstance().getSubElementsCount(sdo.getId(), getFilter(), callback);
 	}
 
 	/*
@@ -53,38 +51,10 @@ public class SubElementsProxy extends ElementsMemCache {
 	 * pt.gov.dgarq.roda.office.dissemination.browse.client.ElementsMemProxy
 	 * #getElements(int, int, com.google.gwt.user.client.rpc.AsyncCallback)
 	 */
-	public void getElements(int firstItemIndex, int count,
-			AsyncCallback<SimpleDescriptionObject[]> callback) {
-		ContentAdapter adapter = new ContentAdapter();
-		adapter.setFilter(getFilter());
-		adapter.setSorter(getSorter());
-		adapter.setSublist(new Sublist(firstItemIndex, count));
-		BrowserService.Util.getInstance().getSubElements(sdo.getPid(), adapter,
-				callback);
+	public void getElements(int firstItemIndex, int count, AsyncCallback<SimpleDescriptionObject[]> callback) {
+		BrowserService.Util.getInstance().getSubElements(sdo.getId(), getFilter(), getSorter(),
+				new Sublist(firstItemIndex, count), callback);
 
-	}
-
-	/**
-	 * Clear proxy
-	 * 
-	 * @param pid
-	 * @param callback
-	 */
-	public void clear(String pid,
-			final AsyncCallback<SimpleDescriptionObject> callback) {
-		BrowserService.Util.getInstance().getItemIndex(sdo.getPid(), pid,
-				getFilter(), getSorter(), new AsyncCallback<Integer>() {
-
-					public void onFailure(Throwable caught) {
-						callback.onFailure(caught);
-					}
-
-					public void onSuccess(Integer index) {
-						clear(index, callback);
-
-					}
-
-				});
 	}
 
 	/**

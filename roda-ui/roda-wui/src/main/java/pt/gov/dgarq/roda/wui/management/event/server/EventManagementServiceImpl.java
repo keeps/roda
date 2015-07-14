@@ -13,8 +13,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
+import org.roda.index.filter.Filter;
+import org.roda.legacy.old.adapter.ContentAdapter;
 import org.w3c.util.DateParser;
 
+import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+
+import config.i18n.server.EventManagementMessages;
 import pt.gov.dgarq.roda.common.RodaClientFactory;
 import pt.gov.dgarq.roda.core.RODAClient;
 import pt.gov.dgarq.roda.core.common.RODAException;
@@ -22,17 +27,11 @@ import pt.gov.dgarq.roda.core.data.PluginInfo;
 import pt.gov.dgarq.roda.core.data.PluginParameter;
 import pt.gov.dgarq.roda.core.data.Task;
 import pt.gov.dgarq.roda.core.data.TaskInstance;
-import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.wui.common.client.PrintReportException;
 import pt.gov.dgarq.roda.wui.common.server.ReportContentSource;
 import pt.gov.dgarq.roda.wui.common.server.ReportDownload;
 import pt.gov.dgarq.roda.wui.common.server.ServerTools;
 import pt.gov.dgarq.roda.wui.management.event.client.EventManagementService;
-
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-
-import config.i18n.server.EventManagementMessages;
 
 /**
  * Event Management service implementation
@@ -40,8 +39,7 @@ import config.i18n.server.EventManagementMessages;
  * @author Luis Faria
  * 
  */
-public class EventManagementServiceImpl extends RemoteServiceServlet implements
-		EventManagementService {
+public class EventManagementServiceImpl extends RemoteServiceServlet implements EventManagementService {
 
 	/**
 	 * 
@@ -54,12 +52,10 @@ public class EventManagementServiceImpl extends RemoteServiceServlet implements
 		return getTaskCount(getThreadLocalRequest().getSession(), filter);
 	}
 
-	protected int getTaskCount(HttpSession session, Filter filter)
-			throws RODAException {
+	protected int getTaskCount(HttpSession session, Filter filter) throws RODAException {
 		int taskCount;
 		try {
-			taskCount = RodaClientFactory.getRodaClient(session)
-					.getSchedulerService().getTaskCount(filter);
+			taskCount = RodaClientFactory.getRodaClient(session).getSchedulerService().getTaskCount(filter);
 		} catch (RemoteException e) {
 			logger.error("Remote Exception", e);
 			throw RODAClient.parseRemoteException(e);
@@ -71,13 +67,11 @@ public class EventManagementServiceImpl extends RemoteServiceServlet implements
 		return getTasks(getThreadLocalRequest().getSession(), adapter);
 	}
 
-	protected Task[] getTasks(HttpSession session, ContentAdapter adapter)
-			throws RODAException {
+	protected Task[] getTasks(HttpSession session, ContentAdapter adapter) throws RODAException {
 		Task[] tasks;
 
 		try {
-			tasks = RodaClientFactory.getRodaClient(session)
-					.getSchedulerService().getTasks(adapter);
+			tasks = RodaClientFactory.getRodaClient(session).getSchedulerService().getTasks(adapter);
 			if (tasks == null) {
 				tasks = new Task[] {};
 			}
@@ -96,8 +90,7 @@ public class EventManagementServiceImpl extends RemoteServiceServlet implements
 				task.setStartDate(new Date());
 			}
 			logger.debug("Adding task: " + task);
-			addedTask = RodaClientFactory.getRodaClient(
-					getThreadLocalRequest().getSession()).getSchedulerService()
+			addedTask = RodaClientFactory.getRodaClient(getThreadLocalRequest().getSession()).getSchedulerService()
 					.addTask(task);
 		} catch (RemoteException e) {
 			logger.error("Remote Exception", e);
@@ -113,8 +106,7 @@ public class EventManagementServiceImpl extends RemoteServiceServlet implements
 			if (task.getStartDate() == null) {
 				task.setStartDate(new Date());
 			}
-			modifiedTask = RodaClientFactory.getRodaClient(
-					getThreadLocalRequest().getSession()).getSchedulerService()
+			modifiedTask = RodaClientFactory.getRodaClient(getThreadLocalRequest().getSession()).getSchedulerService()
 					.modifyTask(task);
 		} catch (RemoteException e) {
 			logger.error("Remote Exception", e);
@@ -126,8 +118,7 @@ public class EventManagementServiceImpl extends RemoteServiceServlet implements
 
 	public void removeTask(String taskId) throws RODAException {
 		try {
-			RodaClientFactory.getRodaClient(
-					getThreadLocalRequest().getSession()).getSchedulerService()
+			RodaClientFactory.getRodaClient(getThreadLocalRequest().getSession()).getSchedulerService()
 					.removeTask(taskId);
 		} catch (RemoteException e) {
 			logger.error("Remote Exception", e);
@@ -138,8 +129,7 @@ public class EventManagementServiceImpl extends RemoteServiceServlet implements
 	public Task pauseTask(String taskId) throws RODAException {
 		Task ret = null;
 		try {
-			ret = RodaClientFactory.getRodaClient(
-					getThreadLocalRequest().getSession()).getSchedulerService()
+			ret = RodaClientFactory.getRodaClient(getThreadLocalRequest().getSession()).getSchedulerService()
 					.pauseTask(taskId);
 		} catch (RemoteException e) {
 			logger.error("Remote Exception", e);
@@ -151,8 +141,7 @@ public class EventManagementServiceImpl extends RemoteServiceServlet implements
 	public Task resumeTask(String taskId) throws RODAException {
 		Task ret = null;
 		try {
-			ret = RodaClientFactory.getRodaClient(
-					getThreadLocalRequest().getSession()).getSchedulerService()
+			ret = RodaClientFactory.getRodaClient(getThreadLocalRequest().getSession()).getSchedulerService()
 					.resumeTask(taskId);
 		} catch (RemoteException e) {
 			logger.error("Remote Exception", e);
@@ -164,8 +153,7 @@ public class EventManagementServiceImpl extends RemoteServiceServlet implements
 	public PluginInfo[] getPlugins() throws RODAException {
 		PluginInfo[] plugins;
 		try {
-			plugins = RodaClientFactory.getRodaClient(
-					getThreadLocalRequest().getSession()).getPluginsService()
+			plugins = RodaClientFactory.getRodaClient(getThreadLocalRequest().getSession()).getPluginsService()
 					.getPluginsInfo();
 			if (plugins == null) {
 				plugins = new PluginInfo[] {};
@@ -186,32 +174,26 @@ public class EventManagementServiceImpl extends RemoteServiceServlet implements
 	}
 
 	public int getTaskInstanceCount(Filter filter) throws RODAException {
-		return getTaskInstanceCount(getThreadLocalRequest().getSession(),
-				filter);
+		return getTaskInstanceCount(getThreadLocalRequest().getSession(), filter);
 	}
 
-	protected int getTaskInstanceCount(HttpSession session, Filter filter)
-			throws RODAException {
+	protected int getTaskInstanceCount(HttpSession session, Filter filter) throws RODAException {
 		try {
-			return RodaClientFactory.getRodaClient(session)
-					.getSchedulerService().getTaskInstanceCount(filter);
+			return RodaClientFactory.getRodaClient(session).getSchedulerService().getTaskInstanceCount(filter);
 		} catch (RemoteException e) {
 			logger.error("Remote Exception", e);
 			throw RODAClient.parseRemoteException(e);
 		}
 	}
 
-	public TaskInstance[] getTaskInstances(ContentAdapter adapter)
-			throws RODAException {
+	public TaskInstance[] getTaskInstances(ContentAdapter adapter) throws RODAException {
 		return getTaskInstances(getThreadLocalRequest().getSession(), adapter);
 	}
 
-	protected TaskInstance[] getTaskInstances(HttpSession session,
-			ContentAdapter adapter) throws RODAException {
+	protected TaskInstance[] getTaskInstances(HttpSession session, ContentAdapter adapter) throws RODAException {
 		TaskInstance[] taskInstances;
 		try {
-			taskInstances = RodaClientFactory.getRodaClient(session)
-					.getSchedulerService().getTaskInstances(adapter);
+			taskInstances = RodaClientFactory.getRodaClient(session).getSchedulerService().getTaskInstances(adapter);
 			if (taskInstances == null) {
 				taskInstances = new TaskInstance[] {};
 			}
@@ -223,11 +205,9 @@ public class EventManagementServiceImpl extends RemoteServiceServlet implements
 		return taskInstances;
 	}
 
-	public TaskInstance getTaskInstance(String taskInstanceId)
-			throws RODAException {
+	public TaskInstance getTaskInstance(String taskInstanceId) throws RODAException {
 		try {
-			return RodaClientFactory.getRodaClient(
-					getThreadLocalRequest().getSession()).getSchedulerService()
+			return RodaClientFactory.getRodaClient(getThreadLocalRequest().getSession()).getSchedulerService()
 					.getTaskInstance(taskInstanceId);
 		} catch (RemoteException e) {
 			logger.error("Remote Exception", e);
@@ -235,34 +215,26 @@ public class EventManagementServiceImpl extends RemoteServiceServlet implements
 		}
 	}
 
-	public void setTaskListReportInfo(ContentAdapter adapter,
-			String localeString) throws PrintReportException {
+	public void setTaskListReportInfo(ContentAdapter adapter, String localeString) throws PrintReportException {
 		final Locale locale = ServerTools.parseLocale(localeString);
-		final EventManagementMessages messages = new EventManagementMessages(
-				locale);
-		ReportDownload.getInstance().createPDFReport(
-				getThreadLocalRequest().getSession(),
+		final EventManagementMessages messages = new EventManagementMessages(locale);
+		ReportDownload.getInstance().createPDFReport(getThreadLocalRequest().getSession(),
 				new ReportContentSource<Task>() {
 
-					public int getCount(HttpSession session, Filter filter)
-							throws Exception {
+					public int getCount(HttpSession session, Filter filter) throws Exception {
 						return getTaskCount(session, filter);
 					}
 
-					public Task[] getElements(HttpSession session,
-							ContentAdapter adapter) throws Exception {
+					public Task[] getElements(HttpSession session, ContentAdapter adapter) throws Exception {
 						return getTasks(session, adapter);
 					}
 
-					public Map<String, String> getElementFields(
-							HttpServletRequest req, Task task) {
-						return EventManagementServiceImpl.this.getTaskFields(
-								task, messages);
+					public Map<String, String> getElementFields(HttpServletRequest req, Task task) {
+						return EventManagementServiceImpl.this.getTaskFields(task, messages);
 					}
 
 					public String getElementId(Task task) {
-						return String.format(messages.getString("task.title"),
-								task.getName());
+						return String.format(messages.getString("task.title"), task.getName());
 
 					}
 
@@ -273,8 +245,7 @@ public class EventManagementServiceImpl extends RemoteServiceServlet implements
 					public String getFieldNameTranslation(String name) {
 						String translation;
 						try {
-							translation = messages.getString("task.label."
-									+ name);
+							translation = messages.getString("task.label." + name);
 						} catch (MissingResourceException e) {
 							translation = name;
 						}
@@ -285,8 +256,7 @@ public class EventManagementServiceImpl extends RemoteServiceServlet implements
 					public String getFieldValueTranslation(String value) {
 						String translation;
 						try {
-							translation = messages.getString("task.value."
-									+ value);
+							translation = messages.getString("task.value." + value);
 						} catch (MissingResourceException e) {
 							translation = value;
 						}
@@ -297,71 +267,53 @@ public class EventManagementServiceImpl extends RemoteServiceServlet implements
 				}, adapter);
 	}
 
-	protected Map<String, String> getTaskFields(Task task,
-			EventManagementMessages messages) {
+	protected Map<String, String> getTaskFields(Task task, EventManagementMessages messages) {
 		Map<String, String> ret = new LinkedHashMap<String, String>();
 		ret.put(messages.getString("task.label.name"), task.getName());
-		ret.put(messages.getString("task.label.description"), task
-				.getDescription());
+		ret.put(messages.getString("task.label.description"), task.getDescription());
 		ret.put(messages.getString("task.label.username"), task.getUsername());
-		ret.put(messages.getString("task.label.startDate"), DateParser
-				.getIsoDate(task.getStartDate()));
-		ret.put(messages.getString("task.label.repeatCount"), task
-				.getRepeatCount() < 0 ? messages
-				.getString("task.value.repeatCount.forever") : String.format(
-				messages.getString("task.value.repeatCount"), task
-						.getRepeatCount()));
-		ret.put(messages.getString("task.label.repeatInterval"), task
-				.getRepeatInterval() == 0 ? messages
-				.getString("task.value.repeatInterval.continuously") : String
-				.format(messages.getString("task.value.repeatInterval"), task
-						.getRepeatInterval()));
+		ret.put(messages.getString("task.label.startDate"), DateParser.getIsoDate(task.getStartDate()));
+		ret.put(messages.getString("task.label.repeatCount"),
+				task.getRepeatCount() < 0 ? messages.getString("task.value.repeatCount.forever")
+						: String.format(messages.getString("task.value.repeatCount"), task.getRepeatCount()));
+		ret.put(messages.getString("task.label.repeatInterval"),
+				task.getRepeatInterval() == 0 ? messages.getString("task.value.repeatInterval.continuously")
+						: String.format(messages.getString("task.value.repeatInterval"), task.getRepeatInterval()));
 
-		ret.put(messages.getString("task.label.plugin.name"), String.format(
-				messages.getString("task.value.plugin.name"), task
-						.getPluginInfo().getName(), task.getPluginInfo()
-						.getVersion()));
-		ret.put(messages.getString("task.label.plugin.description"), task
-				.getPluginInfo().getDescription());
+		ret.put(messages.getString("task.label.plugin.name"),
+				String.format(messages.getString("task.value.plugin.name"), task.getPluginInfo().getName(),
+						task.getPluginInfo().getVersion()));
+		ret.put(messages.getString("task.label.plugin.description"), task.getPluginInfo().getDescription());
 		for (PluginParameter parameter : task.getPluginInfo().getParameters()) {
 			if (!parameter.getName().equals("password")) {
-				ret.put(String.format(messages
-						.getString("task.label.plugin.parameter"), parameter
-						.getName()), parameter.getValue());
+				ret.put(String.format(messages.getString("task.label.plugin.parameter"), parameter.getName()),
+						parameter.getValue());
 			}
 		}
 
 		return ret;
 	}
 
-	public void setInstanceListReportInfo(ContentAdapter adapter,
-			String localeString) throws PrintReportException {
+	public void setInstanceListReportInfo(ContentAdapter adapter, String localeString) throws PrintReportException {
 		final Locale locale = ServerTools.parseLocale(localeString);
-		final EventManagementMessages messages = new EventManagementMessages(
-				locale);
-		ReportDownload.getInstance().createPDFReport(
-				getThreadLocalRequest().getSession(),
+		final EventManagementMessages messages = new EventManagementMessages(locale);
+		ReportDownload.getInstance().createPDFReport(getThreadLocalRequest().getSession(),
 				new ReportContentSource<TaskInstance>() {
 
-					public int getCount(HttpSession session, Filter filter)
-							throws Exception {
+					public int getCount(HttpSession session, Filter filter) throws Exception {
 						return getTaskInstanceCount(session, filter);
 					}
 
-					public TaskInstance[] getElements(HttpSession session,
-							ContentAdapter adapter) throws Exception {
+					public TaskInstance[] getElements(HttpSession session, ContentAdapter adapter) throws Exception {
 						return getTaskInstances(session, adapter);
 					}
 
-					public Map<String, String> getElementFields(
-							HttpServletRequest req, TaskInstance instance) {
-						return EventManagementServiceImpl.this
-								.getInstanceFields(instance, messages);
+					public Map<String, String> getElementFields(HttpServletRequest req, TaskInstance instance) {
+						return EventManagementServiceImpl.this.getInstanceFields(instance, messages);
 					}
 
 					public String getElementId(TaskInstance instance) {
-						return String.format(messages
-								.getString("instance.title"), instance.getId());
+						return String.format(messages.getString("instance.title"), instance.getId());
 
 					}
 
@@ -372,8 +324,7 @@ public class EventManagementServiceImpl extends RemoteServiceServlet implements
 					public String getFieldNameTranslation(String name) {
 						String translation;
 						try {
-							translation = messages.getString("instance.label."
-									+ name);
+							translation = messages.getString("instance.label." + name);
 						} catch (MissingResourceException e) {
 							translation = name;
 						}
@@ -384,8 +335,7 @@ public class EventManagementServiceImpl extends RemoteServiceServlet implements
 					public String getFieldValueTranslation(String value) {
 						String translation;
 						try {
-							translation = messages.getString("instance.value."
-									+ value);
+							translation = messages.getString("instance.value." + value);
 						} catch (MissingResourceException e) {
 							translation = value;
 						}
@@ -396,40 +346,29 @@ public class EventManagementServiceImpl extends RemoteServiceServlet implements
 				}, adapter);
 	}
 
-	protected Map<String, String> getInstanceFields(TaskInstance instance,
-			EventManagementMessages messages) {
+	protected Map<String, String> getInstanceFields(TaskInstance instance, EventManagementMessages messages) {
 		Map<String, String> ret = new LinkedHashMap<String, String>();
 		ret.put(messages.getString("instance.label.name"), instance.getName());
-		ret.put(messages.getString("instance.label.description"), instance
-				.getDescription());
-		ret.put(messages.getString("instance.label.username"), instance
-				.getUsername());
-		ret.put(messages.getString("instance.label.state"), messages
-				.getString("instance.value." + instance.getState()));
-		ret.put(messages.getString("instance.label.startDate"), DateParser
-				.getIsoDate(instance.getStartDate()));
+		ret.put(messages.getString("instance.label.description"), instance.getDescription());
+		ret.put(messages.getString("instance.label.username"), instance.getUsername());
+		ret.put(messages.getString("instance.label.state"),
+				messages.getString("instance.value." + instance.getState()));
+		ret.put(messages.getString("instance.label.startDate"), DateParser.getIsoDate(instance.getStartDate()));
 		if (instance.getFinishDate() == null) {
-			ret.put(messages.getString("instance.label.completePercentage"),
-					String.format(messages
-							.getString("instance.value.completePercentage"),
-							instance.getCompletePercentage()));
+			ret.put(messages.getString("instance.label.completePercentage"), String
+					.format(messages.getString("instance.value.completePercentage"), instance.getCompletePercentage()));
 		} else {
-			ret.put(messages.getString("instance.label.finishDate"), DateParser
-					.getIsoDate(instance.getFinishDate()));
+			ret.put(messages.getString("instance.label.finishDate"), DateParser.getIsoDate(instance.getFinishDate()));
 		}
 
-		ret.put(messages.getString("instance.label.plugin.name"), String
-				.format(messages.getString("instance.value.plugin.name"),
-						instance.getPluginInfo().getName(), instance
-								.getPluginInfo().getVersion()));
-		ret.put(messages.getString("instance.label.plugin.description"),
-				instance.getPluginInfo().getDescription());
-		for (PluginParameter parameter : instance.getPluginInfo()
-				.getParameters()) {
+		ret.put(messages.getString("instance.label.plugin.name"),
+				String.format(messages.getString("instance.value.plugin.name"), instance.getPluginInfo().getName(),
+						instance.getPluginInfo().getVersion()));
+		ret.put(messages.getString("instance.label.plugin.description"), instance.getPluginInfo().getDescription());
+		for (PluginParameter parameter : instance.getPluginInfo().getParameters()) {
 			if (!parameter.getName().equals("password")) {
-				ret.put(String.format(messages
-						.getString("instance.label.plugin.parameter"),
-						parameter.getName()), parameter.getValue());
+				ret.put(String.format(messages.getString("instance.label.plugin.parameter"), parameter.getName()),
+						parameter.getValue());
 			}
 		}
 

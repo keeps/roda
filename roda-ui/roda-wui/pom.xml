@@ -267,8 +267,8 @@
 		</dependency>
 		<dependency>
 			<groupId>org.roda-project</groupId>
-			<artifactId>roda-storage</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<artifactId>roda-common-storage</artifactId>
+			<version>0.0.1</version>
 		</dependency>
 	</dependencies>
 	<build>

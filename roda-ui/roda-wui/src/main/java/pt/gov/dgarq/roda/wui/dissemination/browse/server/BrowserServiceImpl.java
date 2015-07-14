@@ -25,8 +25,16 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.roda.CorporaConstants;
+import org.roda.common.RodaConstants;
+import org.roda.index.IndexActionException;
+import org.roda.index.IndexResult;
 import org.roda.index.IndexService;
 import org.roda.index.IndexServiceTest;
+import org.roda.index.filter.Filter;
+import org.roda.index.filter.SimpleFilterParameter;
+import org.roda.index.sorter.Sorter;
+import org.roda.index.sublist.Sublist;
+import org.roda.legacy.aip.metadata.descriptive.SimpleDescriptionObject;
 import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
 import org.roda.storage.DefaultStoragePath;
@@ -48,14 +56,10 @@ import pt.gov.dgarq.roda.core.data.RODAObject;
 import pt.gov.dgarq.roda.core.data.RepresentationFile;
 import pt.gov.dgarq.roda.core.data.RepresentationObject;
 import pt.gov.dgarq.roda.core.data.RepresentationPreservationObject;
-import pt.gov.dgarq.roda.core.data.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.core.data.SimpleRepresentationObject;
 import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
-import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
-import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.stubs.Browser;
+import pt.gov.dgarq.roda.wui.common.client.GenericException;
 import pt.gov.dgarq.roda.wui.common.server.ServerTools;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.BrowserService;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.DisseminationInfo;
@@ -149,55 +153,49 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 		return filter;
 	}
 
-	public Integer getCollectionsCount(Filter filter) throws RODAException {
-		int ret;
-		Browser browser = RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
-				.getBrowserService();
-		try {
-			ret = browser.getSimpleDescriptionObjectCount(addFondsRestrictions(filter));
-		} catch (RemoteException e) {
-			logger.debug("Error getting collections count", e);
-			throw RODAClient.parseRemoteException(e);
+	protected Filter addParentRestrictions(Filter filter, String parentId) {
+		if (filter == null) {
+			filter = new Filter();
 		}
-
-		return new Integer(ret);
+		filter.add(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, parentId));
+		return filter;
 	}
 
-	public SimpleDescriptionObject[] getCollections(ContentAdapter adapter) throws RODAException {
-
-		SimpleDescriptionObject[] fonds;
-		// Get all fonds
+	public Integer getCollectionsCount(Filter filter) throws RODAException {
+		Long count;
 		try {
-			Browser browser = RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
-					.getBrowserService();
-			adapter.setFilter(addFondsRestrictions(adapter.getFilter()));
-			fonds = browser.getSimpleDescriptionObjects(adapter);
-		} catch (RemoteException e) {
+			count = index.countDescriptiveMetadata(addFondsRestrictions(filter));
+		} catch (IndexActionException e) {
+			logger.debug("Error counting collections", e);
+			throw new GenericException("Error counting collections " + e.getMessage());
+		}
+		return count.intValue();
+	}
+
+	public SimpleDescriptionObject[] getCollections(Filter filter, Sorter sorter, Sublist sublist)
+			throws RODAException {
+		IndexResult<SimpleDescriptionObject> sdos;
+		try {
+			sdos = index.findDescriptiveMetadata(addFondsRestrictions(filter), sorter, sublist);
+		} catch (IndexActionException e) {
 			logger.debug("Error getting collections", e);
-			throw RODAClient.parseRemoteException(e);
-		} catch (BrowserException e) {
-			logger.debug("Error getting collections", e);
-			throw e;
+			throw new GenericException("Error getting collections " + e.getMessage());
 		}
 
-		return fonds;
+		// TODO change return type to index result
+		return sdos.getResults().toArray(new SimpleDescriptionObject[] {});
 	}
 
 	public Integer getSubElementsCount(String pid, Filter filter) throws RODAException {
-		int ret;
+		Long count;
 		try {
-			Browser browser = RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
-					.getBrowserService();
-			if (filter == null) {
-				filter = new Filter();
-			}
-			filter.add(new SimpleFilterParameter("parentPID", pid));
-			ret = browser.getSimpleDescriptionObjectCount(filter);
-		} catch (RemoteException e) {
-			logger.debug("Error getting sub elements count", e);
-			throw RODAClient.parseRemoteException(e);
+			count = index.countDescriptiveMetadata(addParentRestrictions(filter, pid));
+		} catch (IndexActionException e) {
+			logger.debug("Error getting sub-elements count", e);
+			throw new GenericException("Error getting sub-elements count " + e.getMessage());
 		}
-		return new Integer(ret);
+
+		return new Integer(count.intValue());
 	}
 
 	/**
@@ -213,55 +211,42 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 	 *            number of items per page.
 	 * @throws RODAException
 	 */
-	public SimpleDescriptionObject[] getSubElements(String pid, ContentAdapter adapter) throws RODAException {
-		SimpleDescriptionObject[] ret;
-
+	public SimpleDescriptionObject[] getSubElements(String pid, Filter filter, Sorter sorter, Sublist sublist)
+			throws RODAException {
+		IndexResult<SimpleDescriptionObject> sdos;
 		try {
-			Browser browser = RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
-					.getBrowserService();
-			if (adapter.getFilter() == null) {
-				adapter.setFilter(new Filter());
-			}
-			adapter.getFilter().add(new SimpleFilterParameter("parentPID", pid));
-			ret = browser.getSimpleDescriptionObjects(adapter);
-
-		} catch (RemoteException e) {
-			logger.debug("Error getting sub elements if " + pid, e);
-			throw RODAClient.parseRemoteException(e);
-		} catch (BrowserException e) {
-			logger.debug("Error getting sub elements of " + pid, e);
-			throw e;
+			sdos = index.findDescriptiveMetadata(addParentRestrictions(filter, pid), sorter, sublist);
+		} catch (IndexActionException e) {
+			logger.debug("Error getting collections", e);
+			throw new GenericException("Error getting collections " + e.getMessage());
 		}
 
-		return ret;
+		// TODO change return type to index result
+		return sdos.getResults().toArray(new SimpleDescriptionObject[] {});
 	}
 
-	public RODAObject getRODAObject(String pid) throws RODAException {
-		RODAObject ret;
-		try {
-			Browser browser = RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
-					.getBrowserService();
-			ret = browser.getRODAObject(pid);
-
-		} catch (RemoteException e) {
-			logger.debug("Error getting RODA object", e);
-			throw RODAClient.parseRemoteException(e);
-		}
-		return ret;
-	}
+	// public RODAObject getRODAObject(String pid) throws RODAException {
+	// RODAObject ret;
+	// try {
+	// Browser browser =
+	// RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
+	// .getBrowserService();
+	// ret = browser.getRODAObject(pid);
+	//
+	// } catch (RemoteException e) {
+	// logger.debug("Error getting RODA object", e);
+	// throw RODAClient.parseRemoteException(e);
+	// }
+	// return ret;
+	// }
 
 	public SimpleDescriptionObject getSimpleDescriptionObject(String pid) throws RODAException {
-		SimpleDescriptionObject ret;
 		try {
-			Browser browser = RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
-					.getBrowserService();
-			ret = browser.getSimpleDescriptionObject(pid);
-
-		} catch (RemoteException e) {
-			logger.error("Remote Exception", e);
-			throw RODAClient.parseRemoteException(e);
+			return index.retrieveDescriptiveMetadata(pid);
+		} catch (IndexActionException e) {
+			logger.error("Error getting SDO", e);
+			throw new GenericException("Error getting SDO: " + e.getMessage());
 		}
-		return ret;
 	}
 
 	public DescriptionObject getDescriptionObject(String pid) throws RODAException {
@@ -279,70 +264,21 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 	}
 
 	public String getParent(String pid) throws RODAException {
-		String ret;
 		try {
-			Browser browser = RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
-					.getBrowserService();
-			SimpleDescriptionObject sdo = browser.getSimpleDescriptionObject(pid);
-			ret = sdo.getParentPID();
-		} catch (RemoteException e) {
-			logger.error("Remote Exception", e);
-			throw RODAClient.parseRemoteException(e);
+			return index.getParent(pid);
+		} catch (IndexActionException e) {
+			logger.error("Error getting parent", e);
+			throw new GenericException("Error getting parent: " + e.getMessage());
 		}
-		return ret;
 	}
 
 	public String[] getAncestors(String pid) throws RODAException {
-		String[] ret;
 		try {
-			Browser browser = RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
-					.getBrowserService();
-			ret = browser.getDOAncestorPIDs(pid);
-		} catch (RemoteException e) {
-			logger.error("Remote Exception", e);
-			throw RODAClient.parseRemoteException(e);
+			return index.getAncestors(pid).toArray(new String[] {});
+		} catch (IndexActionException e) {
+			logger.error("Error getting parent", e);
+			throw new GenericException("Error getting parent: " + e.getMessage());
 		}
-		return ret;
-	}
-
-	public Integer getCollectionIndex(String collectionPID, Filter filter, Sorter sorter) throws RODAException {
-		int ret;
-		try {
-			Browser browser = RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
-					.getBrowserService();
-			ContentAdapter cAdapter = new ContentAdapter(addFondsRestrictions(filter), sorter, null);
-			ret = browser.getSimpleDescriptionObjectIndex(collectionPID, cAdapter);
-		} catch (RemoteException e) {
-			logger.error("Remote Exception", e);
-			throw RODAClient.parseRemoteException(e);
-		}
-		return new Integer(ret);
-	}
-
-	public Integer getItemIndex(String parentPID, String childPID, Filter filter, Sorter sorter) throws RODAException {
-		int ret;
-		try {
-			Browser browser = RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
-					.getBrowserService();
-			if (filter == null) {
-				filter = new Filter();
-			}
-			filter.add(new SimpleFilterParameter("parentPID", parentPID));
-			ContentAdapter cAdapter = new ContentAdapter(filter, sorter, null);
-			ret = browser.getSimpleDescriptionObjectIndex(childPID, cAdapter);
-		} catch (RemoteException e) {
-			logger.error("Remote Exception", e);
-			throw RODAClient.parseRemoteException(e);
-		}
-		return new Integer(ret);
-	}
-
-	public SimpleDescriptionObject[] getSubElements(String pid, String focusOnChild, int count, Filter filter,
-			Sorter sorter) throws RODAException {
-		int index = getItemIndex(pid, focusOnChild, filter, sorter);
-		ContentAdapter cAdapter = new ContentAdapter(filter, sorter, new Sublist(index, count));
-
-		return getSubElements(pid, cAdapter);
 	}
 
 	public List<RepresentationInfo> getRepresentationsInfo(String doPID) throws RODAException {

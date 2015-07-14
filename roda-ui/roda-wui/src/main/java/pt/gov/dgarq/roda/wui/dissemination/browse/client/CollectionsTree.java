@@ -3,11 +3,9 @@
  */
 package pt.gov.dgarq.roda.wui.dissemination.browse.client;
 
-import pt.gov.dgarq.roda.core.data.SimpleDescriptionObject;
-import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
-import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
-import pt.gov.dgarq.roda.wui.dissemination.browse.client.CollectionsTreeItem.JumpCollectionsTreeItem;
+import org.roda.index.filter.Filter;
+import org.roda.index.sorter.Sorter;
+import org.roda.legacy.aip.metadata.descriptive.SimpleDescriptionObject;
 
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
@@ -15,6 +13,9 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Tree;
 import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.TreeListener;
+
+import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
+import pt.gov.dgarq.roda.wui.dissemination.browse.client.CollectionsTreeItem.JumpCollectionsTreeItem;
 
 /**
  * @author Luis Faria
@@ -50,8 +51,8 @@ public class CollectionsTree extends Tree {
 	 * @param showInfo
 	 *            where to show extended info
 	 */
-	public CollectionsTree(SimpleDescriptionObject root, Filter filter,
-			Sorter sorter, int childrenVisibleCount, boolean showInfo) {
+	public CollectionsTree(SimpleDescriptionObject root, Filter filter, Sorter sorter, int childrenVisibleCount,
+			boolean showInfo) {
 		this.filter = filter;
 		this.sorter = sorter;
 		this.childrenVisibleCount = childrenVisibleCount;
@@ -80,7 +81,7 @@ public class CollectionsTree extends Tree {
 		if (root == null) {
 			logger.error("Tryed to create a CollectionsTree with null root");
 		} else {
-			logger.debug("Setting root " + root.getPid());
+			logger.debug("Setting root " + root.getId());
 			setRoot(root);
 		}
 
@@ -104,8 +105,7 @@ public class CollectionsTree extends Tree {
 	public void setRoot(SimpleDescriptionObject root) {
 		if (this.root != root) {
 			this.root = root;
-			this.rootItem = new CollectionsTreeItem(root, getFilter(),
-					getSorter(), childrenVisibleCount, showInfo);
+			this.rootItem = new CollectionsTreeItem(root, getFilter(), getSorter(), childrenVisibleCount, showInfo);
 			this.removeItems();
 			this.addItem(rootItem);
 		}
@@ -118,8 +118,7 @@ public class CollectionsTree extends Tree {
 	 */
 	public void addItem(CollectionsTreeItem item) {
 		super.addItem(item);
-		Element itemContainer = DOM.getParent(DOM.getParent(item.getWidget()
-				.getElement()));
+		Element itemContainer = DOM.getParent(DOM.getParent(item.getWidget().getElement()));
 		DOM.setElementProperty(itemContainer, "width", "100%");
 	}
 
@@ -161,8 +160,7 @@ public class CollectionsTree extends Tree {
 	 * @param path
 	 * @param callback
 	 */
-	public void focusOn(String[] path,
-			AsyncCallback<CollectionsTreeItem> callback) {
+	public void focusOn(String[] path, AsyncCallback<CollectionsTreeItem> callback) {
 		rootItem.focusOn(path, callback);
 	}
 
@@ -183,8 +181,7 @@ public class CollectionsTree extends Tree {
 	 * @param callback
 	 *            callback after the update with the updated tree item
 	 */
-	public void update(String[] path, boolean info, boolean hierarchy,
-			AsyncCallback<CollectionsTreeItem> callback) {
+	public void update(String[] path, boolean info, boolean hierarchy, AsyncCallback<CollectionsTreeItem> callback) {
 		rootItem.update(path, info, hierarchy, callback);
 	}
 

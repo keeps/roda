@@ -5,6 +5,10 @@ package pt.gov.dgarq.roda.wui.dissemination.browse.client;
 
 import java.util.NoSuchElementException;
 
+import org.roda.index.filter.Filter;
+import org.roda.index.sorter.Sorter;
+import org.roda.legacy.aip.metadata.descriptive.SimpleDescriptionObject;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
@@ -17,9 +21,6 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 
 import config.i18n.client.BrowseConstants;
 import config.i18n.client.BrowseMessages;
-import pt.gov.dgarq.roda.core.data.SimpleDescriptionObject;
-import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.images.BrowseImageBundle;
@@ -107,7 +108,7 @@ public class CollectionsTreeItem extends TreeItem {
 		dummy = new TreeItem();
 		dummy.setText(constants.treeLoading());
 
-		logger.debug(sdo.getPid() + " has " + sdo.getSubElementsCount() + " children");
+		logger.debug(sdo.getId() + " has " + sdo.getSubElementsCount() + " children");
 
 		getChildrenCount(new AsyncCallback<Integer>() {
 
@@ -145,7 +146,7 @@ public class CollectionsTreeItem extends TreeItem {
 				callback.onSuccess(childrenCount);
 
 			} else {
-				BrowserService.Util.getInstance().getSubElementsCount(sdo.getPid(), filter,
+				BrowserService.Util.getInstance().getSubElementsCount(sdo.getId(), filter,
 						new AsyncCallback<Integer>() {
 
 							public void onFailure(Throwable caught) {
@@ -287,7 +288,7 @@ public class CollectionsTreeItem extends TreeItem {
 							memCache.getElement(index, new AsyncCallback<SimpleDescriptionObject>() {
 
 								public void onFailure(Throwable caught) {
-									logger.error("Error getting child " + index + " of " + sdo.getPid(), caught);
+									logger.error("Error getting child " + index + " of " + sdo.getId(), caught);
 									dummy.setText("error!");
 									itemPanel.setWaitImageVisible(false);
 									async.onFailure(caught);
@@ -453,7 +454,7 @@ public class CollectionsTreeItem extends TreeItem {
 	public void focusOn(final String[] path, final AsyncCallback<CollectionsTreeItem> callback) {
 		if (path.length == 0) {
 			if (!this.isSelected()) {
-				logger.debug("item " + sdo.getPid() + " selecting itself");
+				logger.debug("item " + sdo.getId() + " selecting itself");
 				this.setSelected(true);
 			}
 			callback.onSuccess(this);
@@ -486,49 +487,50 @@ public class CollectionsTreeItem extends TreeItem {
 		if (!initialized) {
 			initialising = true;
 		}
-		BrowserService.Util.getInstance().getItemIndex(sdo.getPid(), pid, getFilter(), getSorter(),
-				new AsyncCallback<Integer>() {
-
-					public void onFailure(Throwable caught) {
-						initialising = false;
-						callback.onFailure(caught);
-					}
-
-					public void onSuccess(Integer itemIndex) {
-						final int index = itemIndex.intValue();
-						if (index >= 0) {
-
-							final int newOffset = (index / childrenVisibleCount) * childrenVisibleCount;
-							load(newOffset, new AsyncCallback<Integer>() {
-
-								public void onFailure(Throwable caught) {
-									initialising = false;
-									callback.onFailure(caught);
-								}
-
-								public void onSuccess(Integer offset) {
-									initialized = true;
-									initialising = false;
-									CollectionsTreeItem.this.setState(true);
-									CollectionsTreeItem focusItem = (CollectionsTreeItem) getChild(
-											index - currentOffset + 1);
-									if (focusItem != null) {
-										callback.onSuccess(focusItem);
-									} else {
-										callback.onFailure(
-												new IndexOutOfBoundsException("Get child " + (index - currentOffset + 1)
-														+ " when child count is " + getChildCount()));
-									}
-								}
-
-							});
-						} else {
-							initialising = false;
-							callback.onFailure(new NoSuchElementException(
-									"Index of " + pid + " under " + sdo.getPid() + " not found!"));
-						}
-					}
-				});
+		// TODO fix this
+//		BrowserService.Util.getInstance().getItemIndex(sdo.getId(), pid, getFilter(), getSorter(),
+//				new AsyncCallback<Integer>() {
+//
+//					public void onFailure(Throwable caught) {
+//						initialising = false;
+//						callback.onFailure(caught);
+//					}
+//
+//					public void onSuccess(Integer itemIndex) {
+//						final int index = itemIndex.intValue();
+//						if (index >= 0) {
+//
+//							final int newOffset = (index / childrenVisibleCount) * childrenVisibleCount;
+//							load(newOffset, new AsyncCallback<Integer>() {
+//
+//								public void onFailure(Throwable caught) {
+//									initialising = false;
+//									callback.onFailure(caught);
+//								}
+//
+//								public void onSuccess(Integer offset) {
+//									initialized = true;
+//									initialising = false;
+//									CollectionsTreeItem.this.setState(true);
+//									CollectionsTreeItem focusItem = (CollectionsTreeItem) getChild(
+//											index - currentOffset + 1);
+//									if (focusItem != null) {
+//										callback.onSuccess(focusItem);
+//									} else {
+//										callback.onFailure(
+//												new IndexOutOfBoundsException("Get child " + (index - currentOffset + 1)
+//														+ " when child count is " + getChildCount()));
+//									}
+//								}
+//
+//							});
+//						} else {
+//							initialising = false;
+//							callback.onFailure(new NoSuchElementException(
+//									"Index of " + pid + " under " + sdo.getId() + " not found!"));
+//						}
+//					}
+//				});
 
 	}
 
@@ -538,7 +540,7 @@ public class CollectionsTreeItem extends TreeItem {
 	 * @return object PID
 	 */
 	public String getPid() {
-		return sdo.getPid();
+		return sdo.getId();
 	}
 
 	/**
@@ -556,18 +558,20 @@ public class CollectionsTreeItem extends TreeItem {
 			final AsyncCallback<CollectionsTreeItem> callback) {
 		if (path.length == 1) {
 			logger.debug("found the father of the element to update," + " refreshing cache");
-			BrowserService.Util.getInstance().getItemIndex(sdo.getPid(), path[0], getFilter(), getSorter(),
-					new AsyncCallback<Integer>() {
-
-						public void onFailure(Throwable caught) {
-							callback.onFailure(caught);
-						}
-
-						public void onSuccess(Integer itemIndex) {
-							update(path[0], itemIndex, info, hierarchy, callback);
-						}
-
-					});
+			// TODO fix this
+			// BrowserService.Util.getInstance().getItemIndex(sdo.getId(),
+			// path[0], getFilter(), getSorter(),
+			// new AsyncCallback<Integer>() {
+			//
+			// public void onFailure(Throwable caught) {
+			// callback.onFailure(caught);
+			// }
+			//
+			// public void onSuccess(Integer itemIndex) {
+			// update(path[0], itemIndex, info, hierarchy, callback);
+			// }
+			//
+			// });
 
 		} else {
 			focusOn(path[0], new AsyncCallback<CollectionsTreeItem>() {
@@ -644,7 +648,7 @@ public class CollectionsTreeItem extends TreeItem {
 	 * Update collection tree item hierarchy
 	 */
 	public void updateHierarchy() {
-		logger.debug("Updating hierarchy of " + sdo.getPid());
+		logger.debug("Updating hierarchy of " + sdo.getId());
 		memCache.clear();
 		initialized = false;
 		init();

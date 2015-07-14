@@ -24,5 +24,6 @@
 		<module>roda-common-plugins</module>
 		<module>roda-common-servlet-security</module>
 		<module>roda-common-sip-utility</module>
+		<module>roda-common-storage</module>
 	</modules>
 </project>
