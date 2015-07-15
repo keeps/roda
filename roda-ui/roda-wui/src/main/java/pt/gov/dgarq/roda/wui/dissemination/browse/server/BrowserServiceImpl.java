@@ -29,6 +29,8 @@ import org.roda.index.IndexActionException;
 import org.roda.index.IndexResult;
 import org.roda.index.IndexService;
 import org.roda.model.ModelService;
+import org.roda.model.ModelServiceException;
+import org.roda.storage.DefaultStoragePath;
 import org.roda.storage.StorageActionException;
 import org.roda.storage.StorageService;
 import org.roda.storage.fs.FileStorageService;
@@ -107,7 +109,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 			System.setProperty("solr.data.dir", indexPath.toString());
 			System.setProperty("solr.data.dir.aip", indexPath.resolve("aip").toString());
 			System.setProperty("solr.data.dir.sdo", indexPath.resolve("sdo").toString());
-			System.setProperty("solr.data.dir.representation", indexPath.resolve("representation").toString());
+			System.setProperty("solr.data.dir.representations", indexPath.resolve("representation").toString());
 
 			// start embedded solr
 			final EmbeddedSolrServer solr = new EmbeddedSolrServer(solrHome, "test");
@@ -115,16 +117,20 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 			index = new IndexService(solr, model);
 
 			// Copy test corpora
-			// URL corporaURL = IndexServiceTest.class.getResource("/corpora");
-			// Path corporaPath = Paths.get(corporaURL.toURI());
-			// StorageService corporaService = new
-			// FileStorageService(corporaPath);
-			// model.createAIP(CorporaConstants.SOURCE_AIP_ID, corporaService,
-			// DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER,
-			// CorporaConstants.SOURCE_AIP_ID));
-			// model.createAIP(CorporaConstants.OTHER_AIP_ID, corporaService,
-			// DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER,
-			// CorporaConstants.OTHER_AIP_ID));
+
+			String RODA_HOME;
+			if (System.getProperty("roda.home") != null) {
+				RODA_HOME = System.getProperty("roda.home");
+			} else if (System.getenv("RODA_HOME") != null) {
+				RODA_HOME = System.getenv("RODA_HOME");
+			} else {
+				RODA_HOME = null;
+			}
+
+			Path corporaPath = Paths.get(RODA_HOME, "data2");
+			StorageService corporaService = new FileStorageService(corporaPath);
+			model.createAIP("AIP_1", corporaService, DefaultStoragePath.parse("AIP", "AIP_1"));
+			model.createAIP("AIP_2", corporaService, DefaultStoragePath.parse("AIP", "AIP_2"));
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -135,11 +141,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (ModelServiceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		// catch (ModelServiceException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
 	}
 
 	protected Filter addFondsRestrictions(Filter filter) {

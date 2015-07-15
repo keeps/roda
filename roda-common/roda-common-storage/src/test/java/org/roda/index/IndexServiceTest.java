@@ -75,7 +75,7 @@ public class IndexServiceTest {
 		System.setProperty("solr.data.dir", indexPath.toString());
 		System.setProperty("solr.data.dir.aip", indexPath.resolve("aip").toString());
 		System.setProperty("solr.data.dir.sdo", indexPath.resolve("sdo").toString());
-		System.setProperty("solr.data.dir.representation", indexPath.resolve("representation").toString());
+		System.setProperty("solr.data.dir.representations", indexPath.resolve("representation").toString());
 
 		// start embedded solr
 		final EmbeddedSolrServer solr = new EmbeddedSolrServer(solrHome, "test");
