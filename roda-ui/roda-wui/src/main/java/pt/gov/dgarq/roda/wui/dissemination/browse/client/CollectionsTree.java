@@ -3,7 +3,7 @@
  */
 package pt.gov.dgarq.roda.wui.dissemination.browse.client;
 
-import org.roda.index.filter.Filter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import org.roda.index.sorter.Sorter;
 
 import com.google.gwt.user.client.DOM;

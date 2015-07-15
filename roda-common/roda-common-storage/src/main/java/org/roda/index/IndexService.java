@@ -4,14 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.solr.client.solrj.SolrClient;
-import org.roda.index.filter.Filter;
-import org.roda.index.sorter.Sorter;
-import org.roda.index.sublist.Sublist;
 import org.roda.index.utils.SolrUtils;
 import org.roda.model.AIP;
 import org.roda.model.ModelService;
 import org.roda.model.Representation;
 
+import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
+import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
+import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 
 public class IndexService {

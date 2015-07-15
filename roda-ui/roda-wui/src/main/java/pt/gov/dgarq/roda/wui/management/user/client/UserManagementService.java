@@ -3,7 +3,7 @@
  */
 package pt.gov.dgarq.roda.wui.management.user.client;
 
-import org.roda.index.filter.Filter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import org.roda.legacy.old.adapter.ContentAdapter;
 
 import com.google.gwt.core.client.GWT;

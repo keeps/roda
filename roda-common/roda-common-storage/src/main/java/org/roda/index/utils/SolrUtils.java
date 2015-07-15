@@ -38,11 +38,6 @@ import org.roda.common.RodaConstants;
 import org.roda.common.RodaUtils;
 import org.roda.index.IndexActionException;
 import org.roda.index.IndexResult;
-import org.roda.index.filter.Filter;
-import org.roda.index.filter.FilterParameter;
-import org.roda.index.filter.SimpleFilterParameter;
-import org.roda.index.sorter.Sorter;
-import org.roda.index.sublist.Sublist;
 import org.roda.model.AIP;
 import org.roda.model.DescriptiveMetadata;
 import org.roda.model.ModelService;
@@ -55,6 +50,11 @@ import org.roda.storage.StoragePath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
+import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
+import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.data.v2.RODAObject;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 

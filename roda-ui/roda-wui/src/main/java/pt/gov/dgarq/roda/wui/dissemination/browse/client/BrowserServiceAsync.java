@@ -5,7 +5,7 @@ package pt.gov.dgarq.roda.wui.dissemination.browse.client;
 
 import java.util.List;
 
-import org.roda.index.filter.Filter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import org.roda.index.sorter.Sorter;
 import org.roda.index.sublist.Sublist;
 import org.roda.legacy.exception.RODAException;

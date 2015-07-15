@@ -5,8 +5,8 @@ package pt.gov.dgarq.roda.wui.management.statistics.client;
 
 import java.util.List;
 
-import org.roda.index.filter.Filter;
-import org.roda.index.filter.SimpleFilterParameter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.index.sorter.SortParameter;
 import org.roda.index.sorter.Sorter;
 import org.roda.index.sublist.Sublist;

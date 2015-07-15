@@ -9,8 +9,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.MissingResourceException;
 
-import org.roda.index.filter.Filter;
-import org.roda.index.filter.FilterParameter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter;
 import org.roda.legacy.old.adapter.ContentAdapter;
 
 import com.google.gwt.core.client.GWT;

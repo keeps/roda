@@ -23,9 +23,9 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.velocity.VelocityContext;
-import org.roda.index.filter.Filter;
-import org.roda.index.filter.FilterParameter;
-import org.roda.index.filter.RegexFilterParameter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.RegexFilterParameter;
 import org.roda.index.sorter.SortParameter;
 import org.roda.index.sorter.Sorter;
 import org.roda.index.sublist.Sublist;

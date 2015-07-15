@@ -3,9 +3,9 @@
  */
 package pt.gov.dgarq.roda.wui.management.event.client;
 
-import org.roda.index.filter.Filter;
-import org.roda.index.filter.RegexFilterParameter;
-import org.roda.index.filter.SimpleFilterParameter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.RegexFilterParameter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.index.sorter.SortParameter;
 import org.roda.legacy.old.adapter.ContentAdapter;
 

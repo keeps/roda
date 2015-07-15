@@ -4,9 +4,9 @@
 package pt.gov.dgarq.roda.wui.ingest.pre.client;
 
 import org.roda.common.RodaConstants;
-import org.roda.index.filter.Filter;
-import org.roda.index.filter.OneOfManyFilterParameter;
-import org.roda.index.filter.ProducerFilterParameter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.OneOfManyFilterParameter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.ProducerFilterParameter;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.History;

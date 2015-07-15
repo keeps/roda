@@ -1,8 +1,9 @@
 package org.roda.legacy.log.user;
 
-import org.roda.index.filter.Filter;
 import org.roda.legacy.log.LogEntry;
-import org.roda.legacy.old.adapter.ContentAdapter;
+
+import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 
 public interface UserLog {
 	LogEntry[] getLogEntries(ContentAdapter contentAdapter);

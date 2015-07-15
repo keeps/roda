@@ -5,7 +5,7 @@ package pt.gov.dgarq.roda.wui.management.statistics.client;
 
 import java.util.List;
 
-import org.roda.index.filter.Filter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import org.roda.index.sorter.SortParameter;
 import org.roda.legacy.old.adapter.ContentAdapter;
 

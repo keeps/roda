@@ -2,8 +2,8 @@ package pt.gov.dgarq.roda.wui.management.statistics.client;
 
 import java.util.List;
 
-import org.roda.index.filter.FilterParameter;
-import org.roda.index.filter.SimpleFilterParameter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;

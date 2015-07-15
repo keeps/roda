@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.roda.index.filter.FilterParameter;
-import org.roda.index.filter.SimpleFilterParameter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.rednels.ofcgwt.client.ChartWidget;

@@ -6,11 +6,11 @@ package pt.gov.dgarq.roda.wui.ingest.list.client;
 import java.util.List;
 import java.util.Vector;
 
-import org.roda.index.filter.Filter;
-import org.roda.index.filter.FilterParameter;
-import org.roda.index.filter.LikeFilterParameter;
-import org.roda.index.filter.OneOfManyFilterParameter;
-import org.roda.index.filter.SimpleFilterParameter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.LikeFilterParameter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.OneOfManyFilterParameter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.index.sorter.SortParameter;
 import org.roda.legacy.old.adapter.ContentAdapter;
 

@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.roda.index.filter.Filter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import org.roda.index.sorter.Sorter;
 import org.roda.index.sublist.Sublist;
 import org.roda.legacy.old.adapter.ContentAdapter;
