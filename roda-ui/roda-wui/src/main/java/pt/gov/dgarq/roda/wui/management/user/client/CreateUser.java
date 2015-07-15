@@ -65,7 +65,7 @@ public class CreateUser extends WUIWindow {
 				user.setDirectRoles(specialroles);
 
 				UserManagementService.Util.getInstance().createUser(user,
-						password, new AsyncCallback() {
+						password, new AsyncCallback<Void>() {
 
 							public void onFailure(Throwable caught) {
 								if (caught instanceof UserAlreadyExistsException) {
@@ -85,7 +85,7 @@ public class CreateUser extends WUIWindow {
 								}
 							}
 
-							public void onSuccess(Object result) {
+							public void onSuccess(Void result) {
 								CreateUser.this.hide();
 								CreateUser.this.onSuccess();
 							}

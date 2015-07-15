@@ -11,8 +11,8 @@ import pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.LikeFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.OneOfManyFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
-import org.roda.index.sorter.SortParameter;
-import org.roda.legacy.old.adapter.ContentAdapter;
+import pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter;
+import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.History;

@@ -11,7 +11,7 @@ import java.util.MissingResourceException;
 
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter;
-import org.roda.legacy.old.adapter.ContentAdapter;
+import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;

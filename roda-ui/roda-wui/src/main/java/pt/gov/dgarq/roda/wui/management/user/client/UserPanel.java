@@ -23,8 +23,7 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class UserPanel implements SourcesClickEvents {
 
-	private static CommonImageBundle commonImageBundle = (CommonImageBundle) GWT
-			.create(CommonImageBundle.class);
+	private static CommonImageBundle commonImageBundle = (CommonImageBundle) GWT.create(CommonImageBundle.class);
 
 	private static UserManagementImageBundle userManagementImageBundle = (UserManagementImageBundle) GWT
 			.create(UserManagementImageBundle.class);
@@ -49,6 +48,7 @@ public class UserPanel implements SourcesClickEvents {
 
 	/**
 	 * Create a new user panel
+	 * 
 	 * @param user
 	 */
 	public UserPanel(User user) {
@@ -58,8 +58,7 @@ public class UserPanel implements SourcesClickEvents {
 		layout = new HorizontalPanel();
 		icon = user.isActive() ? userManagementImageBundle.user().createImage()
 				: userManagementImageBundle.inactiveUser().createImage();
-		description = new Label(user.getName() + " (" + user.getFullName()
-				+ ")");
+		description = new Label(user.getName() + " (" + user.getFullName() + ")");
 		report = commonImageBundle.report().createImage();
 
 		layout.add(icon);
@@ -156,34 +155,32 @@ public class UserPanel implements SourcesClickEvents {
 	 * @param callback
 	 *            handle operation finish
 	 */
-	public void setActive(boolean active, final AsyncCallback callback) {
+	public void setActive(boolean active, final AsyncCallback<Void> callback) {
 		if (user.isActive() != active) {
 			user.setActive(active);
-			UserManagementService.Util.getInstance().editUser(user, null,
-					new AsyncCallback() {
+			UserManagementService.Util.getInstance().editUser(user, null, new AsyncCallback<Void>() {
 
-						public void onFailure(Throwable caught) {
-							callback.onFailure(caught);
-						}
+				public void onFailure(Throwable caught) {
+					callback.onFailure(caught);
+				}
 
-						public void onSuccess(Object result) {
-							if (isActive()) {
-								focus.removeStyleDependentName("notActive");
-							} else {
-								focus.addStyleDependentName("notActive");
-							}
-							callback.onSuccess(null);
-						}
+				public void onSuccess(Void result) {
+					if (isActive()) {
+						focus.removeStyleDependentName("notActive");
+					} else {
+						focus.addStyleDependentName("notActive");
+					}
+					callback.onSuccess(null);
+				}
 
-					});
+			});
 		} else {
 			callback.onSuccess(null);
 		}
 	}
 
 	public void remove(AsyncCallback<Boolean> callback) {
-		UserManagementService.Util.getInstance().removeUser(user.getName(),
-				callback);
+		UserManagementService.Util.getInstance().removeUser(user.getName(), callback);
 	}
 
 }

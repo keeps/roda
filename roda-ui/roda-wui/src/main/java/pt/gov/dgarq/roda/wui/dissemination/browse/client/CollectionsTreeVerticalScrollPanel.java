@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Vector;
 
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import org.roda.index.sorter.Sorter;
+import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;

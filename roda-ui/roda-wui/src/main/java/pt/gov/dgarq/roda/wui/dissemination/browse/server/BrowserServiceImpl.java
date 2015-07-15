@@ -24,19 +24,11 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
-import org.roda.CorporaConstants;
 import org.roda.common.RodaConstants;
 import org.roda.index.IndexActionException;
 import org.roda.index.IndexResult;
 import org.roda.index.IndexService;
-import org.roda.index.IndexServiceTest;
-import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
-import org.roda.index.sorter.Sorter;
-import org.roda.index.sublist.Sublist;
 import org.roda.model.ModelService;
-import org.roda.model.ModelServiceException;
-import org.roda.storage.DefaultStoragePath;
 import org.roda.storage.StorageActionException;
 import org.roda.storage.StorageService;
 import org.roda.storage.fs.FileStorageService;
@@ -47,16 +39,17 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import config.i18n.server.BrowserServiceMessages;
 import pt.gov.dgarq.roda.common.RodaClientFactory;
 import pt.gov.dgarq.roda.core.RODAClient;
-import pt.gov.dgarq.roda.core.common.BrowserException;
 import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.data.DescriptionObject;
 import pt.gov.dgarq.roda.core.data.EventPreservationObject;
-import pt.gov.dgarq.roda.core.data.RODAObject;
 import pt.gov.dgarq.roda.core.data.RepresentationFile;
 import pt.gov.dgarq.roda.core.data.RepresentationObject;
 import pt.gov.dgarq.roda.core.data.RepresentationPreservationObject;
 import pt.gov.dgarq.roda.core.data.SimpleRepresentationObject;
-import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
+import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
+import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.core.stubs.Browser;
 import pt.gov.dgarq.roda.wui.common.client.GenericException;
@@ -103,14 +96,14 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 			model = new ModelService(storage);
 
 			// Configure Solr
-			URL solrConfigURL = IndexServiceTest.class.getResource("/index/solr.xml");
+			URL solrConfigURL = getClass().getResource("/index/solr.xml");
 			Path solrConfigPath = Paths.get(solrConfigURL.toURI());
 			Files.copy(solrConfigPath, indexPath.resolve("solr.xml"));
 			Path aipSchema = indexPath.resolve("aip");
 			Files.createDirectories(aipSchema);
 			Files.createFile(aipSchema.resolve("core.properties"));
 
-			Path solrHome = Paths.get(IndexServiceTest.class.getResource("/index/").toURI());
+			Path solrHome = Paths.get(getClass().getResource("/index/").toURI());
 			System.setProperty("solr.data.dir", indexPath.toString());
 			System.setProperty("solr.data.dir.aip", indexPath.resolve("aip").toString());
 			System.setProperty("solr.data.dir.sdo", indexPath.resolve("sdo").toString());
@@ -122,13 +115,16 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 			index = new IndexService(solr, model);
 
 			// Copy test corpora
-			URL corporaURL = IndexServiceTest.class.getResource("/corpora");
-			Path corporaPath = Paths.get(corporaURL.toURI());
-			StorageService corporaService = new FileStorageService(corporaPath);
-			model.createAIP(CorporaConstants.SOURCE_AIP_ID, corporaService,
-					DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
-			model.createAIP(CorporaConstants.OTHER_AIP_ID, corporaService,
-					DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.OTHER_AIP_ID));
+			// URL corporaURL = IndexServiceTest.class.getResource("/corpora");
+			// Path corporaPath = Paths.get(corporaURL.toURI());
+			// StorageService corporaService = new
+			// FileStorageService(corporaPath);
+			// model.createAIP(CorporaConstants.SOURCE_AIP_ID, corporaService,
+			// DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER,
+			// CorporaConstants.SOURCE_AIP_ID));
+			// model.createAIP(CorporaConstants.OTHER_AIP_ID, corporaService,
+			// DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER,
+			// CorporaConstants.OTHER_AIP_ID));
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -139,10 +135,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (ModelServiceException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
+		// catch (ModelServiceException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
 	}
 
 	protected Filter addFondsRestrictions(Filter filter) {

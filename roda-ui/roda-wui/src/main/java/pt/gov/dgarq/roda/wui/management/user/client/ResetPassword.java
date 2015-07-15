@@ -105,7 +105,7 @@ public class ResetPassword implements HistoryResolver {
 					String newPassword = newPasswordBox.getText();
 					UserManagementService.Util.getInstance().resetPassword(
 							username, resetPasswordToken, newPassword,
-							new AsyncCallback() {
+							new AsyncCallback<Void>() {
 
 								public void onFailure(Throwable caught) {
 									if (caught instanceof InvalidTokenException) {
@@ -121,7 +121,7 @@ public class ResetPassword implements HistoryResolver {
 
 								}
 
-								public void onSuccess(Object result) {
+								public void onSuccess(Void result) {
 									Window.alert(constants
 											.resetPasswordSuccess());
 									History.newItem(Home.getInstance()

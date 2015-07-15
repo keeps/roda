@@ -14,7 +14,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import org.roda.legacy.old.adapter.ContentAdapter;
+import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
 import org.w3c.util.DateParser;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;

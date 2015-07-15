@@ -5,19 +5,16 @@ package pt.gov.dgarq.roda.wui.dissemination.browse.client;
 
 import java.util.List;
 
-import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import org.roda.index.sorter.Sorter;
-import org.roda.index.sublist.Sublist;
-import org.roda.legacy.old.adapter.ContentAdapter;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 
 import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.data.DescriptionObject;
-import pt.gov.dgarq.roda.core.data.RODAObject;
 import pt.gov.dgarq.roda.core.data.RepresentationPreservationObject;
+import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
+import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
+import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 
 /**

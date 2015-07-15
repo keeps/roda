@@ -31,8 +31,7 @@ public class CreateGroup extends WUIWindow {
 	private static UserManagementConstants constants = (UserManagementConstants) GWT
 			.create(UserManagementConstants.class);
 
-	private static UserManagementMessages messages = (UserManagementMessages) GWT
-			.create(UserManagementMessages.class);
+	private static UserManagementMessages messages = (UserManagementMessages) GWT.create(UserManagementMessages.class);
 
 	private final WUIButton create;
 
@@ -49,13 +48,9 @@ public class CreateGroup extends WUIWindow {
 	public CreateGroup() {
 		super(constants.createGroupTitle(), 690, 346);
 
-		create = new WUIButton(constants.createGroupCreate(),
-				WUIButton.Left.ROUND,
-				WUIButton.Right.ARROW_DOWN);
+		create = new WUIButton(constants.createGroupCreate(), WUIButton.Left.ROUND, WUIButton.Right.ARROW_DOWN);
 
-		cancel = new WUIButton(constants.createGroupCancel(),
-				WUIButton.Left.ROUND,
-				WUIButton.Right.CROSS);
+		cancel = new WUIButton(constants.createGroupCancel(), WUIButton.Left.ROUND, WUIButton.Right.CROSS);
 
 		create.addClickListener(new ClickListener() {
 
@@ -71,27 +66,23 @@ public class CreateGroup extends WUIWindow {
 				group.setGroups(memberGroups);
 				group.setDirectRoles(directRoles);
 
-				UserManagementService.Util.getInstance().createGroup(group,
-						new AsyncCallback() {
+				UserManagementService.Util.getInstance().createGroup(group, new AsyncCallback<Void>() {
 
-							public void onFailure(Throwable caught) {
-								if (caught instanceof GroupAlreadyExistsException) {
-									Window.alert(messages
-											.createGroupAlreadyExists(name));
+					public void onFailure(Throwable caught) {
+						if (caught instanceof GroupAlreadyExistsException) {
+							Window.alert(messages.createGroupAlreadyExists(name));
 
-								} else {
-									Window.alert(messages
-											.createGroupFailure(caught
-													.getMessage()));
-								}
-							}
+						} else {
+							Window.alert(messages.createGroupFailure(caught.getMessage()));
+						}
+					}
 
-							public void onSuccess(Object result) {
-								CreateGroup.this.hide();
-								CreateGroup.this.onSuccess();
-							}
+					public void onSuccess(Void result) {
+						CreateGroup.this.hide();
+						CreateGroup.this.onSuccess();
+					}
 
-						});
+				});
 			}
 
 		});
@@ -113,10 +104,8 @@ public class CreateGroup extends WUIWindow {
 		groupName = new TextBox();
 		groupFullname = new TextBox();
 
-		VerticalPanel namePanel = concatInPanel(constants.groupName(),
-				groupName);
-		VerticalPanel fullnamePanel = concatInPanel(constants.groupFullname(),
-				groupFullname);
+		VerticalPanel namePanel = concatInPanel(constants.groupName(), groupName);
+		VerticalPanel fullnamePanel = concatInPanel(constants.groupFullname(), groupFullname);
 
 		basicInfoPanel.add(namePanel);
 		basicInfoPanel.add(fullnamePanel);
@@ -132,11 +121,9 @@ public class CreateGroup extends WUIWindow {
 
 		this.getTabPanel().addTabListener(new TabListener() {
 
-			public boolean onBeforeTabSelected(SourcesTabEvents sender,
-					int tabIndex) {
+			public boolean onBeforeTabSelected(SourcesTabEvents sender, int tabIndex) {
 				if (tabIndex == 1) {
-					permissionsPanel.updateLockedPermissions(groupSelect
-							.getMemberGroups());
+					permissionsPanel.updateLockedPermissions(groupSelect.getMemberGroups());
 				}
 				return true;
 			}

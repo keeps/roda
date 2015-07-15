@@ -4,9 +4,9 @@
 package pt.gov.dgarq.roda.wui.dissemination.browse.client;
 
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import org.roda.index.sorter.Sorter;
-import org.roda.index.sublist.Sublist;
-import org.roda.legacy.old.adapter.ContentAdapter;
+import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
+import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
+import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 

@@ -6,8 +6,8 @@ package pt.gov.dgarq.roda.wui.common.client.widgets;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.roda.index.sorter.SortParameter;
-import org.roda.index.sorter.Sorter;
+import pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter;
+import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.Composite;

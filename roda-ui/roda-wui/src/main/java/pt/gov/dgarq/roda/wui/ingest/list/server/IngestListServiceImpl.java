@@ -18,8 +18,8 @@ import org.apache.log4j.Logger;
 import org.apache.velocity.VelocityContext;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
-import org.roda.index.sublist.Sublist;
-import org.roda.legacy.old.adapter.ContentAdapter;
+import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
+import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
 import org.w3c.util.DateParser;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;

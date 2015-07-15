@@ -33,8 +33,7 @@ public class EditUser extends WUIWindow {
 	private static UserManagementConstants constants = (UserManagementConstants) GWT
 			.create(UserManagementConstants.class);
 
-	private static UserManagementMessages messages = (UserManagementMessages) GWT
-			.create(UserManagementMessages.class);
+	private static UserManagementMessages messages = (UserManagementMessages) GWT.create(UserManagementMessages.class);
 
 	private ClientLogger logger = new ClientLogger(getClass().getName());
 
@@ -55,13 +54,9 @@ public class EditUser extends WUIWindow {
 	public EditUser(User user) {
 		super(constants.editUserTitle(), 699, 630);
 		this.user = user;
-		apply = new WUIButton(constants.editUserApply(),
-				WUIButton.Left.ROUND,
-				WUIButton.Right.REC);
+		apply = new WUIButton(constants.editUserApply(), WUIButton.Left.ROUND, WUIButton.Right.REC);
 
-		cancel = new WUIButton(constants.editUserCancel(),
-				WUIButton.Left.ROUND,
-				WUIButton.Right.CROSS);
+		cancel = new WUIButton(constants.editUserCancel(), WUIButton.Left.ROUND, WUIButton.Right.CROSS);
 
 		apply.addClickListener(new ClickListener() {
 
@@ -69,37 +64,30 @@ public class EditUser extends WUIWindow {
 				final User user = userDataPanel.getUser();
 				final String password = userDataPanel.getPassword();
 
-				final String[] specialroles = permissionsPanel
-						.getDirectRoles();
+				final String[] specialroles = permissionsPanel.getDirectRoles();
 				user.setDirectRoles(specialroles);
 
-				UserManagementService.Util.getInstance().editUser(user,
-						password, new AsyncCallback() {
+				UserManagementService.Util.getInstance().editUser(user, password, new AsyncCallback<Void>() {
 
-							public void onFailure(Throwable caught) {
-								if (caught instanceof NoSuchUserException) {
-									Window.alert(messages.editUserNotFound(user
-											.getName()));
-									EditUser.this.cancel();
-								} else if (caught instanceof EmailAlreadyExistsException) {
-									Window.alert(messages
-											.editUserEmailAlreadyExists(user
-													.getEmail()));
-									EditUser.this.cancel();
-								} else {
-									Window.alert(messages.editUserFailure(
-											EditUser.this.user.getName(),
-											caught.getMessage()));
-								}
-							}
+					public void onFailure(Throwable caught) {
+						if (caught instanceof NoSuchUserException) {
+							Window.alert(messages.editUserNotFound(user.getName()));
+							EditUser.this.cancel();
+						} else if (caught instanceof EmailAlreadyExistsException) {
+							Window.alert(messages.editUserEmailAlreadyExists(user.getEmail()));
+							EditUser.this.cancel();
+						} else {
+							Window.alert(messages.editUserFailure(EditUser.this.user.getName(), caught.getMessage()));
+						}
+					}
 
-							public void onSuccess(Object result) {
-								EditUser.this.hide();
-								EditUser.this.onSuccess();
+					public void onSuccess(Void result) {
+						EditUser.this.hide();
+						EditUser.this.onSuccess();
 
-							}
+					}
 
-						});
+				});
 			}
 
 		});
@@ -140,11 +128,9 @@ public class EditUser extends WUIWindow {
 
 		this.getTabPanel().addTabListener(new TabListener() {
 
-			public boolean onBeforeTabSelected(SourcesTabEvents sender,
-					int tabIndex) {
+			public boolean onBeforeTabSelected(SourcesTabEvents sender, int tabIndex) {
 				if (tabIndex == 1) {
-					permissionsPanel.updateLockedPermissions(userDataPanel
-							.getMemberGroups());
+					permissionsPanel.updateLockedPermissions(userDataPanel.getMemberGroups());
 				}
 				return true;
 			}
@@ -165,21 +151,18 @@ public class EditUser extends WUIWindow {
 		userDataPanel.setUser(user);
 		userDataPanel.setVisible(true);
 
-		UserManagementService.Util.getInstance().getUserDirectRoles(
-				user.getName(), new AsyncCallback<String[]>() {
+		UserManagementService.Util.getInstance().getUserDirectRoles(user.getName(), new AsyncCallback<String[]>() {
 
-					public void onFailure(Throwable caught) {
-						logger.error("Error while getting "
-								+ EditUser.this.user.getName() + " roles",
-								caught);
-					}
+			public void onFailure(Throwable caught) {
+				logger.error("Error while getting " + EditUser.this.user.getName() + " roles", caught);
+			}
 
-					public void onSuccess(String[] directRoles) {
-						permissionsPanel.checkPermissions(directRoles, false);
-						permissionsPanel.setEnabled(true);
-					}
+			public void onSuccess(String[] directRoles) {
+				permissionsPanel.checkPermissions(directRoles, false);
+				permissionsPanel.setEnabled(true);
+			}
 
-				});
+		});
 
 	}
 

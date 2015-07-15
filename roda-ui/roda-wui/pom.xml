@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<name>roda-wui</name>
 	<artifactId>roda-wui</artifactId>
@@ -35,29 +36,13 @@
 							</execution>
 						</executions>
 					</plugin>
-					<!--					<plugin>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<executions>
-							<execution>
-								<phase>prepare-package</phase>
-								<configuration>
-									<target>
-										<move todir="${project.build.directory}/${project.build.finalName}">
-											<fileset
-												dir="${project.build.directory}/${project.build.finalName}/pt.gov.dgarq.roda.wui.main.Main/" />
-										</move>
-										<move todir="${project.build.directory}/${project.build.finalName}">
-											<fileset
-												dir="${project.build.directory}/${project.build.finalName}/pt.gov.dgarq.roda.disseminators.common.loading.Loading/" />
-										</move>
-									</target>
-								</configuration>
-								<goals>
-									<goal>run</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>-->
+					<!-- <plugin> <artifactId>maven-antrun-plugin</artifactId> <executions> 
+						<execution> <phase>prepare-package</phase> <configuration> <target> <move 
+						todir="${project.build.directory}/${project.build.finalName}"> <fileset dir="${project.build.directory}/${project.build.finalName}/pt.gov.dgarq.roda.wui.main.Main/" 
+						/> </move> <move todir="${project.build.directory}/${project.build.finalName}"> 
+						<fileset dir="${project.build.directory}/${project.build.finalName}/pt.gov.dgarq.roda.disseminators.common.loading.Loading/" 
+						/> </move> </target> </configuration> <goals> <goal>run</goal> </goals> </execution> 
+						</executions> </plugin> -->
 					<plugin>
 						<artifactId>maven-clean-plugin</artifactId>
 						<configuration>
@@ -109,29 +94,13 @@
 							<optimizationLevel>0</optimizationLevel>
 						</configuration>
 					</plugin>
-					<!--					<plugin>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<executions>
-							<execution>
-								<phase>prepare-package</phase>
-								<configuration>
-									<target>
-										<move todir="${project.build.directory}/${project.build.finalName}">
-											<fileset
-												dir="${project.build.directory}/${project.build.finalName}/pt.gov.dgarq.roda.wui.main.Main/" />
-										</move>
-										<move todir="${project.build.directory}/${project.build.finalName}">
-											<fileset
-												dir="${project.build.directory}/${project.build.finalName}/pt.gov.dgarq.roda.disseminators.common.loading.Loading/" />
-										</move>
-									</target>
-								</configuration>
-								<goals>
-									<goal>run</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>-->
+					<!-- <plugin> <artifactId>maven-antrun-plugin</artifactId> <executions> 
+						<execution> <phase>prepare-package</phase> <configuration> <target> <move 
+						todir="${project.build.directory}/${project.build.finalName}"> <fileset dir="${project.build.directory}/${project.build.finalName}/pt.gov.dgarq.roda.wui.main.Main/" 
+						/> </move> <move todir="${project.build.directory}/${project.build.finalName}"> 
+						<fileset dir="${project.build.directory}/${project.build.finalName}/pt.gov.dgarq.roda.disseminators.common.loading.Loading/" 
+						/> </move> </target> </configuration> <goals> <goal>run</goal> </goals> </execution> 
+						</executions> </plugin> -->
 				</plugins>
 			</build>
 		</profile>
@@ -269,12 +238,31 @@
 			<groupId>org.roda-project</groupId>
 			<artifactId>roda-common-storage</artifactId>
 			<version>0.0.1</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>asm</artifactId>
+					<groupId>org.ow2.asm</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>asm-commons</artifactId>
+					<groupId>org.ow2.asm</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>asm-debug-all</artifactId>
+					<groupId>org.ow2.asm</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>*</artifactId>
+					<groupId>org.eclipse.jetty</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 	</dependencies>
 	<build>
 		<pluginManagement>
 			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>

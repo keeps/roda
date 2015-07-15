@@ -6,8 +6,8 @@ package pt.gov.dgarq.roda.wui.management.statistics.client;
 import java.util.List;
 
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import org.roda.index.sorter.SortParameter;
-import org.roda.legacy.old.adapter.ContentAdapter;
+import pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter;
+import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;

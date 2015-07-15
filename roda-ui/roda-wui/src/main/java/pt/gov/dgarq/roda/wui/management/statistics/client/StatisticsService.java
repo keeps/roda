@@ -7,7 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import org.roda.legacy.old.adapter.ContentAdapter;
+import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;

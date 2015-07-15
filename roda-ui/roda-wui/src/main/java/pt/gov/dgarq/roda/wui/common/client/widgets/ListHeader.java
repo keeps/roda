@@ -3,7 +3,7 @@
  */
 package pt.gov.dgarq.roda.wui.common.client.widgets;
 
-import org.roda.index.sorter.SortParameter;
+import pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.ClickListener;
