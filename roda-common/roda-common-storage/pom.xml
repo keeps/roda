@@ -305,5 +305,9 @@
 		</dependency>
 
 		<!-- / FEDORA TESTING GEAR -->
+		<dependency>
+			<groupId>pt.gov.dgarq.roda</groupId>
+			<artifactId>roda-common-data</artifactId>
+		</dependency>
 	</dependencies>
 </project>

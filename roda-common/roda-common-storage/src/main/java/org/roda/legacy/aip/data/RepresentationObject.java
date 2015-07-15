@@ -5,8 +5,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.roda.legacy.aip.metadata.RODAObject;
 import org.roda.legacy.aip.metadata.descriptive.SimpleRepresentationObject;
+
+import pt.gov.dgarq.roda.core.data.v2.RODAObject;
 
 /**
  * This is a {@link RepresentationObject}. It contains the information about a

@@ -33,8 +33,7 @@ public class SearchResultObjectPanel extends SimplePanel {
 
 	// private GWTLogger logger = new GWTLogger(GWT.getTypeName(this));
 
-	private static SearchConstants constants = (SearchConstants) GWT
-			.create(SearchConstants.class);
+	private static SearchConstants constants = (SearchConstants) GWT.create(SearchConstants.class);
 
 	private final SearchResultObject object;
 
@@ -68,14 +67,13 @@ public class SearchResultObjectPanel extends SimplePanel {
 		this.disclosure = new DisclosurePanel();
 		this.disclosure.setAnimationEnabled(true);
 		this.headerLayout = new HorizontalPanel();
-		this.icon = Dissemination.getInstance().getElementLevelIcon(
-				object.getDescriptionObject().getLevel());
+		this.icon = Dissemination.getInstance()
+				.getElementLevelIcon(object.getDescriptionObject().getLevel().getLevel());
 		this.idContainer = new SimplePanel();
 		this.id = new HTML(object.getDescriptionObject().getId());
 		this.titleContainer = new SimplePanel();
 		this.title = new HTML(object.getDescriptionObject().getTitle());
-		this.dateInitial = new Label(object.getDescriptionObject()
-				.getDateInitial());
+		this.dateInitial = new Label(object.getDescriptionObject().getDateInitial());
 		this.dateFinal = new Label(object.getDescriptionObject().getDateFinal());
 		this.score = new ScorePanel(object.getScore());
 		headerLayout.add(icon);
@@ -99,14 +97,11 @@ public class SearchResultObjectPanel extends SimplePanel {
 			public void onOpen(DisclosureEvent event) {
 				if (firstOpen) {
 					firstOpen = false;
-					final String pid = SearchResultObjectPanel.this.object
-							.getDescriptionObject().getPid();
+					final String pid = SearchResultObjectPanel.this.object.getDescriptionObject().getPid();
 					VerticalPanel contentLayout = new VerticalPanel();
 					DescriptiveMetadataPanel descriptiveMetadata = new DescriptiveMetadataPanel(
-							SearchResultObjectPanel.this.object
-									.getDescriptionObject(), true);
-					WUIButton browseResult = new WUIButton(constants
-							.browseResult(), WUIButton.Left.ROUND,
+							SearchResultObjectPanel.this.object.getDescriptionObject(), true);
+					WUIButton browseResult = new WUIButton(constants.browseResult(), WUIButton.Left.ROUND,
 							WUIButton.Right.ARROW_FORWARD);
 					browseResult.addClickListener(new ClickListener() {
 
@@ -127,8 +122,7 @@ public class SearchResultObjectPanel extends SimplePanel {
 
 					disclosure.setContent(contentLayout);
 
-					contentLayout.setCellHorizontalAlignment(browseResult,
-							VerticalPanel.ALIGN_RIGHT);
+					contentLayout.setCellHorizontalAlignment(browseResult, VerticalPanel.ALIGN_RIGHT);
 					contentLayout.addStyleName("content-layout");
 					browseResult.addStyleName("content-browseItem");
 					elementPathWrapper.addStyleName("content-elementPath");

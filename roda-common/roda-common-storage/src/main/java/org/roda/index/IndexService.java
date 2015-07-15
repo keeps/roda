@@ -8,10 +8,11 @@ import org.roda.index.filter.Filter;
 import org.roda.index.sorter.Sorter;
 import org.roda.index.sublist.Sublist;
 import org.roda.index.utils.SolrUtils;
-import org.roda.legacy.aip.metadata.descriptive.SimpleDescriptionObject;
 import org.roda.model.AIP;
 import org.roda.model.ModelService;
 import org.roda.model.Representation;
+
+import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 
 public class IndexService {
 

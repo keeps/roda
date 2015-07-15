@@ -7,7 +7,6 @@ import java.util.NoSuchElementException;
 
 import org.roda.index.filter.Filter;
 import org.roda.index.sorter.Sorter;
-import org.roda.legacy.aip.metadata.descriptive.SimpleDescriptionObject;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.DOM;
@@ -21,6 +20,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 
 import config.i18n.client.BrowseConstants;
 import config.i18n.client.BrowseMessages;
+import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.images.BrowseImageBundle;

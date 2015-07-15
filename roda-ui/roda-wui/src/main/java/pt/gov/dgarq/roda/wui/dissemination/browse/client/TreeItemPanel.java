@@ -6,8 +6,6 @@ package pt.gov.dgarq.roda.wui.dissemination.browse.client;
 import java.util.List;
 import java.util.Vector;
 
-import org.roda.legacy.aip.metadata.descriptive.SimpleDescriptionObject;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.FocusPanel;
@@ -22,6 +20,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.BrowseConstants;
+import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.tools.StringUtility;
 import pt.gov.dgarq.roda.wui.dissemination.client.Dissemination;

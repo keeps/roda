@@ -7,7 +7,6 @@ import org.roda.common.RodaConstants;
 import org.roda.index.filter.Filter;
 import org.roda.index.filter.OneOfManyFilterParameter;
 import org.roda.index.filter.ProducerFilterParameter;
-import org.roda.legacy.aip.metadata.descriptive.SimpleDescriptionObject;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.History;
@@ -19,6 +18,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.PreIngestConstants;
 import pt.gov.dgarq.roda.core.data.DescriptionObject;
+import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;

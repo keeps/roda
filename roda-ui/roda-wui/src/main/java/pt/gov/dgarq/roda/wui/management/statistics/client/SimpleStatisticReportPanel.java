@@ -7,20 +7,21 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import pt.gov.dgarq.roda.core.data.StatisticData;
-import pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
-import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
+import org.roda.index.filter.FilterParameter;
+import org.roda.index.filter.SimpleFilterParameter;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.rednels.ofcgwt.client.ChartWidget;
 import com.rednels.ofcgwt.client.model.ChartData;
+import com.rednels.ofcgwt.client.model.axis.Label.Rotation;
 import com.rednels.ofcgwt.client.model.axis.XAxis;
 import com.rednels.ofcgwt.client.model.axis.YAxis;
-import com.rednels.ofcgwt.client.model.axis.Label.Rotation;
 import com.rednels.ofcgwt.client.model.elements.AreaChart;
 import com.rednels.ofcgwt.client.model.elements.AreaChart.AreaStyle;
 import com.rednels.ofcgwt.client.model.elements.LineChart.Dot;
+
+import pt.gov.dgarq.roda.core.data.StatisticData;
+import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 
 /**
  * @author Luis Faria

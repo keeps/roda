@@ -54,12 +54,15 @@ public class EventManagementServiceImpl extends RemoteServiceServlet implements 
 
 	protected int getTaskCount(HttpSession session, Filter filter) throws RODAException {
 		int taskCount;
-		try {
-			taskCount = RodaClientFactory.getRodaClient(session).getSchedulerService().getTaskCount(filter);
-		} catch (RemoteException e) {
-			logger.error("Remote Exception", e);
-			throw RODAClient.parseRemoteException(e);
-		}
+		// try {
+		// TODO move to new implementation
+		// taskCount =
+		// RodaClientFactory.getRodaClient(session).getSchedulerService().getTaskCount(filter);
+		taskCount = 0;
+		// } catch (RemoteException e) {
+		// logger.error("Remote Exception", e);
+		// throw RODAClient.parseRemoteException(e);
+		// }
 		return taskCount;
 	}
 
@@ -70,15 +73,18 @@ public class EventManagementServiceImpl extends RemoteServiceServlet implements 
 	protected Task[] getTasks(HttpSession session, ContentAdapter adapter) throws RODAException {
 		Task[] tasks;
 
-		try {
-			tasks = RodaClientFactory.getRodaClient(session).getSchedulerService().getTasks(adapter);
-			if (tasks == null) {
-				tasks = new Task[] {};
-			}
-		} catch (RemoteException e) {
-			logger.error("Remote Exception", e);
-			throw RODAClient.parseRemoteException(e);
-		}
+		// try {
+		// TODO move to new implementation
+		// tasks =
+		// RodaClientFactory.getRodaClient(session).getSchedulerService().getTasks(adapter);
+		tasks = new Task[] {};
+		// if (tasks == null) {
+		// tasks = new Task[] {};
+		// }
+		// } catch (RemoteException e) {
+		// logger.error("Remote Exception", e);
+		// throw RODAClient.parseRemoteException(e);
+		// }
 
 		return tasks;
 	}
@@ -178,12 +184,15 @@ public class EventManagementServiceImpl extends RemoteServiceServlet implements 
 	}
 
 	protected int getTaskInstanceCount(HttpSession session, Filter filter) throws RODAException {
-		try {
-			return RodaClientFactory.getRodaClient(session).getSchedulerService().getTaskInstanceCount(filter);
-		} catch (RemoteException e) {
-			logger.error("Remote Exception", e);
-			throw RODAClient.parseRemoteException(e);
-		}
+		// TODO move to new implementation
+		// try {
+		// return
+		// RodaClientFactory.getRodaClient(session).getSchedulerService().getTaskInstanceCount(filter);
+		return 0;
+		// } catch (RemoteException e) {
+		// logger.error("Remote Exception", e);
+		// throw RODAClient.parseRemoteException(e);
+		// }
 	}
 
 	public TaskInstance[] getTaskInstances(ContentAdapter adapter) throws RODAException {
@@ -192,15 +201,19 @@ public class EventManagementServiceImpl extends RemoteServiceServlet implements 
 
 	protected TaskInstance[] getTaskInstances(HttpSession session, ContentAdapter adapter) throws RODAException {
 		TaskInstance[] taskInstances;
-		try {
-			taskInstances = RodaClientFactory.getRodaClient(session).getSchedulerService().getTaskInstances(adapter);
-			if (taskInstances == null) {
-				taskInstances = new TaskInstance[] {};
-			}
-		} catch (RemoteException e) {
-			logger.error("Remote Exception", e);
-			throw RODAClient.parseRemoteException(e);
+		// try {
+		// TODO move to new implementation
+		// taskInstances =
+		// RodaClientFactory.getRodaClient(session).getSchedulerService().getTaskInstances(adapter);
+		taskInstances = new TaskInstance[] {};
+
+		if (taskInstances == null) {
+			taskInstances = new TaskInstance[] {};
 		}
+		// } catch (RemoteException e) {
+		// logger.error("Remote Exception", e);
+		// throw RODAClient.parseRemoteException(e);
+		// }
 
 		return taskInstances;
 	}
@@ -218,53 +231,58 @@ public class EventManagementServiceImpl extends RemoteServiceServlet implements 
 	public void setTaskListReportInfo(ContentAdapter adapter, String localeString) throws PrintReportException {
 		final Locale locale = ServerTools.parseLocale(localeString);
 		final EventManagementMessages messages = new EventManagementMessages(locale);
-		ReportDownload.getInstance().createPDFReport(getThreadLocalRequest().getSession(),
-				new ReportContentSource<Task>() {
-
-					public int getCount(HttpSession session, Filter filter) throws Exception {
-						return getTaskCount(session, filter);
-					}
-
-					public Task[] getElements(HttpSession session, ContentAdapter adapter) throws Exception {
-						return getTasks(session, adapter);
-					}
-
-					public Map<String, String> getElementFields(HttpServletRequest req, Task task) {
-						return EventManagementServiceImpl.this.getTaskFields(task, messages);
-					}
-
-					public String getElementId(Task task) {
-						return String.format(messages.getString("task.title"), task.getName());
-
-					}
-
-					public String getReportTitle() {
-						return messages.getString("task.report.title");
-					}
-
-					public String getFieldNameTranslation(String name) {
-						String translation;
-						try {
-							translation = messages.getString("task.label." + name);
-						} catch (MissingResourceException e) {
-							translation = name;
-						}
-
-						return translation;
-					}
-
-					public String getFieldValueTranslation(String value) {
-						String translation;
-						try {
-							translation = messages.getString("task.value." + value);
-						} catch (MissingResourceException e) {
-							translation = value;
-						}
-
-						return translation;
-					}
-
-				}, adapter);
+		// TODO move to new implementation
+		// ReportDownload.getInstance().createPDFReport(getThreadLocalRequest().getSession(),
+		// new ReportContentSource<Task>() {
+		//
+		// public int getCount(HttpSession session, Filter filter) throws
+		// Exception {
+		// return getTaskCount(session, filter);
+		// }
+		//
+		// public Task[] getElements(HttpSession session, ContentAdapter
+		// adapter) throws Exception {
+		// return getTasks(session, adapter);
+		// }
+		//
+		// public Map<String, String> getElementFields(HttpServletRequest req,
+		// Task task) {
+		// return EventManagementServiceImpl.this.getTaskFields(task, messages);
+		// }
+		//
+		// public String getElementId(Task task) {
+		// return String.format(messages.getString("task.title"),
+		// task.getName());
+		//
+		// }
+		//
+		// public String getReportTitle() {
+		// return messages.getString("task.report.title");
+		// }
+		//
+		// public String getFieldNameTranslation(String name) {
+		// String translation;
+		// try {
+		// translation = messages.getString("task.label." + name);
+		// } catch (MissingResourceException e) {
+		// translation = name;
+		// }
+		//
+		// return translation;
+		// }
+		//
+		// public String getFieldValueTranslation(String value) {
+		// String translation;
+		// try {
+		// translation = messages.getString("task.value." + value);
+		// } catch (MissingResourceException e) {
+		// translation = value;
+		// }
+		//
+		// return translation;
+		// }
+		//
+		// }, adapter);
 	}
 
 	protected Map<String, String> getTaskFields(Task task, EventManagementMessages messages) {
@@ -297,53 +315,59 @@ public class EventManagementServiceImpl extends RemoteServiceServlet implements 
 	public void setInstanceListReportInfo(ContentAdapter adapter, String localeString) throws PrintReportException {
 		final Locale locale = ServerTools.parseLocale(localeString);
 		final EventManagementMessages messages = new EventManagementMessages(locale);
-		ReportDownload.getInstance().createPDFReport(getThreadLocalRequest().getSession(),
-				new ReportContentSource<TaskInstance>() {
-
-					public int getCount(HttpSession session, Filter filter) throws Exception {
-						return getTaskInstanceCount(session, filter);
-					}
-
-					public TaskInstance[] getElements(HttpSession session, ContentAdapter adapter) throws Exception {
-						return getTaskInstances(session, adapter);
-					}
-
-					public Map<String, String> getElementFields(HttpServletRequest req, TaskInstance instance) {
-						return EventManagementServiceImpl.this.getInstanceFields(instance, messages);
-					}
-
-					public String getElementId(TaskInstance instance) {
-						return String.format(messages.getString("instance.title"), instance.getId());
-
-					}
-
-					public String getReportTitle() {
-						return messages.getString("instance.report.title");
-					}
-
-					public String getFieldNameTranslation(String name) {
-						String translation;
-						try {
-							translation = messages.getString("instance.label." + name);
-						} catch (MissingResourceException e) {
-							translation = name;
-						}
-
-						return translation;
-					}
-
-					public String getFieldValueTranslation(String value) {
-						String translation;
-						try {
-							translation = messages.getString("instance.value." + value);
-						} catch (MissingResourceException e) {
-							translation = value;
-						}
-
-						return translation;
-					}
-
-				}, adapter);
+		// TODO move to new implementation
+		// ReportDownload.getInstance().createPDFReport(getThreadLocalRequest().getSession(),
+		// new ReportContentSource<TaskInstance>() {
+		//
+		// public int getCount(HttpSession session, Filter filter) throws
+		// Exception {
+		// return getTaskInstanceCount(session, filter);
+		// }
+		//
+		// public TaskInstance[] getElements(HttpSession session, ContentAdapter
+		// adapter) throws Exception {
+		// return getTaskInstances(session, adapter);
+		// }
+		//
+		// public Map<String, String> getElementFields(HttpServletRequest req,
+		// TaskInstance instance) {
+		// return EventManagementServiceImpl.this.getInstanceFields(instance,
+		// messages);
+		// }
+		//
+		// public String getElementId(TaskInstance instance) {
+		// return String.format(messages.getString("instance.title"),
+		// instance.getId());
+		//
+		// }
+		//
+		// public String getReportTitle() {
+		// return messages.getString("instance.report.title");
+		// }
+		//
+		// public String getFieldNameTranslation(String name) {
+		// String translation;
+		// try {
+		// translation = messages.getString("instance.label." + name);
+		// } catch (MissingResourceException e) {
+		// translation = name;
+		// }
+		//
+		// return translation;
+		// }
+		//
+		// public String getFieldValueTranslation(String value) {
+		// String translation;
+		// try {
+		// translation = messages.getString("instance.value." + value);
+		// } catch (MissingResourceException e) {
+		// translation = value;
+		// }
+		//
+		// return translation;
+		// }
+		//
+		// }, adapter);
 	}
 
 	protected Map<String, String> getInstanceFields(TaskInstance instance, EventManagementMessages messages) {

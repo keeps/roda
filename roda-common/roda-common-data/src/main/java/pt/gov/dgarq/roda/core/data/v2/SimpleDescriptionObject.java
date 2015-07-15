@@ -1,11 +1,11 @@
-package org.roda.legacy.aip.metadata.descriptive;
+package pt.gov.dgarq.roda.core.data.v2;
 
 import java.util.Date;
 
-import org.roda.index.filter.Filter;
-import org.roda.index.filter.FilterParameter;
-import org.roda.index.filter.SimpleFilterParameter;
-import org.roda.legacy.aip.metadata.RODAObject;
+import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
+import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevel;
 
 /**
  * This class contains the basic information about a Description Object.

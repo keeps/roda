@@ -6,15 +6,16 @@ package pt.gov.dgarq.roda.wui.management.statistics.client;
 import java.util.Date;
 import java.util.List;
 
-import pt.gov.dgarq.roda.core.common.RODAException;
-import pt.gov.dgarq.roda.core.data.StatisticData;
-import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import pt.gov.dgarq.roda.wui.common.client.PrintReportException;
+import org.roda.index.filter.Filter;
+import org.roda.legacy.old.adapter.ContentAdapter;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
+
+import pt.gov.dgarq.roda.core.common.RODAException;
+import pt.gov.dgarq.roda.core.data.StatisticData;
+import pt.gov.dgarq.roda.wui.common.client.PrintReportException;
 
 /**
  * @author Luis Faria
@@ -58,8 +59,7 @@ public interface StatisticsService extends RemoteService {
 	 * @return a list of statistic entries
 	 * @throws RODAException
 	 */
-	public List<StatisticData> getStatisticList(ContentAdapter adapter)
-			throws RODAException;
+	public List<StatisticData> getStatisticList(ContentAdapter adapter) throws RODAException;
 
 	/**
 	 * Get statistic data processed by statistic functions
@@ -72,9 +72,8 @@ public interface StatisticsService extends RemoteService {
 	 * @return the result statistic data
 	 * @throws RODAException
 	 */
-	public List<StatisticData> getStatisticList(ContentAdapter adapter,
-			List<StatisticFunction> functions, Segmentation segmentation,
-			Date initialDate, Date finalDate) throws RODAException;
+	public List<StatisticData> getStatisticList(ContentAdapter adapter, List<StatisticFunction> functions,
+			Segmentation segmentation, Date initialDate, Date finalDate) throws RODAException;
 
 	/**
 	 * Get statistic stacked list. When using adapter queries that return a set
@@ -90,12 +89,9 @@ public interface StatisticsService extends RemoteService {
 	 * @return A list of stacks, one for each type.
 	 * @throws RODAException
 	 */
-	public List<List<StatisticData>> getStatisticStackedList(
-			ContentAdapter adapter, List<StatisticFunction> functions,
-			Segmentation segmentation, Date initialDate, Date finalDate)
-			throws RODAException;
+	public List<List<StatisticData>> getStatisticStackedList(ContentAdapter adapter, List<StatisticFunction> functions,
+			Segmentation segmentation, Date initialDate, Date finalDate) throws RODAException;
 
-	public void setStatisticListReportInfo(ContentAdapter adapter,
-			String localeString) throws PrintReportException;
+	public void setStatisticListReportInfo(ContentAdapter adapter, String localeString) throws PrintReportException;
 
 }

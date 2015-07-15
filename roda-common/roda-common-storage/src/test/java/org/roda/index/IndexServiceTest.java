@@ -1,8 +1,6 @@
 package org.roda.index;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.hasProperty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -19,17 +17,11 @@ import java.util.UUID;
 
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.hamcrest.Matchers;
-import org.hamcrest.collection.IsIterableContainingInAnyOrder;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.roda.CorporaConstants;
 import org.roda.common.RodaConstants;
-import org.roda.index.filter.Filter;
-import org.roda.index.filter.SimpleFilterParameter;
-import org.roda.index.sublist.Sublist;
-import org.roda.legacy.aip.metadata.RODAObject;
-import org.roda.legacy.aip.metadata.descriptive.SimpleDescriptionObject;
 import org.roda.model.AIP;
 import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
@@ -43,6 +35,10 @@ import org.roda.storage.fs.FSUtils;
 import org.roda.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
+import pt.gov.dgarq.roda.core.data.v2.RODAObject;
+import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 
 public class IndexServiceTest {
 

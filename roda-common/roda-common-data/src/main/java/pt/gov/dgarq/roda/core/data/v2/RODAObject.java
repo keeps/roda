@@ -1,10 +1,10 @@
-package org.roda.legacy.aip.metadata;
+package pt.gov.dgarq.roda.core.data.v2;
 
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Date;
 
-import org.roda.legacy.exception.InvalidStateException;
+import pt.gov.dgarq.roda.core.common.InvalidStateException;
 
 /**
  * This is a RODA Object. A RODA Object is a Fedora Object that has a ID and a
@@ -33,8 +33,7 @@ public class RODAObject implements Serializable {
 	/**
 	 * Possible states
 	 */
-	public static String[] STATES = new String[] { STATE_INACTIVE,
-			STATE_ACTIVE, STATE_DELETED };
+	public static String[] STATES = new String[] { STATE_INACTIVE, STATE_ACTIVE, STATE_DELETED };
 
 	private String id = null;
 
@@ -60,8 +59,8 @@ public class RODAObject implements Serializable {
 	 *            the {@link RODAObject} to be cloned.
 	 */
 	public RODAObject(RODAObject object) {
-		this(object.getId(), object.getLabel(), object.getLastModifiedDate(),
-				object.getCreatedDate(), object.getState());
+		this(object.getId(), object.getLabel(), object.getLastModifiedDate(), object.getCreatedDate(),
+				object.getState());
 	}
 
 	/**
@@ -88,8 +87,7 @@ public class RODAObject implements Serializable {
 	 * @param createdDate
 	 * @param state
 	 */
-	public RODAObject(String id, String label, Date lastModifiedDate,
-			Date createdDate, String state) {
+	public RODAObject(String id, String label, Date lastModifiedDate, Date createdDate, String state) {
 		setId(id);
 		setLabel(label);
 		setLastModifiedDate(lastModifiedDate);
@@ -115,10 +113,8 @@ public class RODAObject implements Serializable {
 	 */
 	@Override
 	public String toString() {
-		return "RODAObject (ID=" + getId() + ", label=" + getLabel()
-				+ ", lastModifiedDate=" + getLastModifiedDate()
-				+ ", createdDate=" + getCreatedDate() + ", state=" + getState()
-				+ ")";
+		return "RODAObject (ID=" + getId() + ", label=" + getLabel() + ", lastModifiedDate=" + getLastModifiedDate()
+				+ ", createdDate=" + getCreatedDate() + ", state=" + getState() + ")";
 	}
 
 	/**
@@ -198,8 +194,7 @@ public class RODAObject implements Serializable {
 		} else if (Arrays.asList(STATES).contains(state.toLowerCase())) {
 			this.state = state.toLowerCase();
 		} else {
-			throw new InvalidStateException("'" + state
-					+ "' is not a valid state.");
+			throw new InvalidStateException("'" + state + "' is not a valid state.");
 		}
 	}
 }

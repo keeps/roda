@@ -5,10 +5,14 @@ package pt.gov.dgarq.roda.wui.ingest.list.client;
 
 import java.util.Map;
 
-import pt.gov.dgarq.roda.core.data.SIPState;
-import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
+import org.roda.index.filter.Filter;
+import org.roda.legacy.exception.RODAException;
+import org.roda.legacy.old.adapter.ContentAdapter;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
+
+import pt.gov.dgarq.roda.core.data.SIPState;
+import pt.gov.dgarq.roda.wui.common.client.PrintReportException;
 
 /**
  * @author Luis Faria
@@ -47,7 +51,7 @@ public interface IngestListServiceAsync {
 	 * Accept a SIP
 	 * 
 	 * @param sipId
-	 * @param message 
+	 * @param message
 	 * @throws RODAException
 	 */
 	public void acceptSIP(String sipId, String message, AsyncCallback<Void> callback);
@@ -75,7 +79,6 @@ public interface IngestListServiceAsync {
 	 */
 	public void setSIPListReportInfo(ContentAdapter adapter, String locale, AsyncCallback<Void> callback);
 
-	
 	/**
 	 * Get accept message templates
 	 * 
@@ -83,7 +86,7 @@ public interface IngestListServiceAsync {
 	 * @return
 	 */
 	public void getAcceptMessageTemplates(String localeString, AsyncCallback<Map<String, String>> callback);
-	
+
 	/**
 	 * Get reject message templates
 	 * 

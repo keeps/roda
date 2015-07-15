@@ -8,7 +8,6 @@ import java.util.Vector;
 
 import org.roda.index.filter.Filter;
 import org.roda.index.sorter.Sorter;
-import org.roda.legacy.aip.metadata.descriptive.SimpleDescriptionObject;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
@@ -21,6 +20,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.BrowseMessages;
 import pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException;
+import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
 

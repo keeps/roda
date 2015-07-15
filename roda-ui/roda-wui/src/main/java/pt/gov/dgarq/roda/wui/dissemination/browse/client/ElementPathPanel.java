@@ -3,8 +3,6 @@
  */
 package pt.gov.dgarq.roda.wui.dissemination.browse.client;
 
-import org.roda.legacy.aip.metadata.descriptive.SimpleDescriptionObject;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
@@ -19,6 +17,7 @@ import com.google.gwt.user.client.ui.Widget;
 import config.i18n.client.BrowseMessages;
 import pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException;
 import pt.gov.dgarq.roda.core.data.DescriptionObject;
+import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.images.BrowseImageBundle;
 import pt.gov.dgarq.roda.wui.dissemination.client.Dissemination;

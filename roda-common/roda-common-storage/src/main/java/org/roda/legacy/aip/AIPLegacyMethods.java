@@ -3,8 +3,6 @@ package org.roda.legacy.aip;
 import org.roda.index.filter.Filter;
 import org.roda.legacy.aip.data.RepresentationFile;
 import org.roda.legacy.aip.data.RepresentationObject;
-import org.roda.legacy.aip.metadata.RODAObject;
-import org.roda.legacy.aip.metadata.descriptive.SimpleDescriptionObject;
 import org.roda.legacy.aip.metadata.descriptive.SimpleRepresentationObject;
 import org.roda.legacy.aip.metadata.preservation.AgentPreservationObject;
 import org.roda.legacy.aip.metadata.preservation.EventPreservationObject;
@@ -18,6 +16,9 @@ import org.roda.legacy.exception.IndexSearchException;
 import org.roda.legacy.exception.IndexWriteException;
 import org.roda.legacy.old.adapter.ContentAdapter;
 import org.roda.storage.StorageActionException;
+
+import pt.gov.dgarq.roda.core.data.v2.RODAObject;
+import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 
 public interface AIPLegacyMethods {
 	

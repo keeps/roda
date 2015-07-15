@@ -6,8 +6,6 @@ package pt.gov.dgarq.roda.wui.management.editor.client;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.roda.legacy.aip.metadata.descriptive.SimpleDescriptionObject;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -20,6 +18,7 @@ import config.i18n.client.BrowseMessages;
 import config.i18n.client.MetadataEditorConstants;
 import pt.gov.dgarq.roda.core.common.IllegalOperationException;
 import pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException;
+import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.widgets.LoadingPopup;
 import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;

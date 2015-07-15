@@ -8,7 +8,6 @@ import java.util.List;
 import org.roda.index.filter.Filter;
 import org.roda.index.sorter.Sorter;
 import org.roda.index.sublist.Sublist;
-import org.roda.legacy.aip.metadata.descriptive.SimpleDescriptionObject;
 import org.roda.legacy.exception.RODAException;
 import org.roda.legacy.old.adapter.ContentAdapter;
 
@@ -17,6 +16,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import pt.gov.dgarq.roda.core.data.DescriptionObject;
 import pt.gov.dgarq.roda.core.data.RODAObject;
 import pt.gov.dgarq.roda.core.data.RepresentationPreservationObject;
+import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 
 /**
  * @author Luis Faria

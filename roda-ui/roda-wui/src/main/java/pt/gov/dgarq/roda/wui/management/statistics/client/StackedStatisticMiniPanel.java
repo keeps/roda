@@ -6,11 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import pt.gov.dgarq.roda.core.data.StatisticData;
-import pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.RegexFilterParameter;
-import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
-import pt.gov.dgarq.roda.wui.common.client.images.CommonImageBundle;
+import org.roda.index.filter.FilterParameter;
+import org.roda.index.filter.RegexFilterParameter;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -26,6 +23,10 @@ import com.rednels.ofcgwt.client.ChartWidget;
 import com.rednels.ofcgwt.client.IChartListener;
 import com.rednels.ofcgwt.client.model.ChartData;
 import com.rednels.ofcgwt.client.model.elements.PieChart;
+
+import pt.gov.dgarq.roda.core.data.StatisticData;
+import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
+import pt.gov.dgarq.roda.wui.common.client.images.CommonImageBundle;
 
 /**
  * Small sized panel for a simple statistics

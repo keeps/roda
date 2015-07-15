@@ -6,8 +6,6 @@ package pt.gov.dgarq.roda.wui.dissemination.browse.client;
 import java.util.List;
 import java.util.Vector;
 
-import org.roda.legacy.aip.metadata.descriptive.SimpleDescriptionObject;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -37,6 +35,7 @@ import pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException;
 import pt.gov.dgarq.roda.core.data.DescriptionObject;
 import pt.gov.dgarq.roda.core.data.RODAObjectUserPermissions;
 import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevel;
+import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.wui.common.client.AuthenticatedUser;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.LoginStatusListener;

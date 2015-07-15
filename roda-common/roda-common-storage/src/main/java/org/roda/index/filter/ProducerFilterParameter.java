@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.roda.legacy.aip.metadata.descriptive.SimpleDescriptionObject;
+import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 
 /**
  * This filter parameter is used to filter {@link SimpleDescriptionObject}'s

@@ -8,10 +8,10 @@ import java.util.Vector;
 
 import org.roda.index.filter.Filter;
 import org.roda.index.sorter.Sorter;
-import org.roda.legacy.aip.metadata.descriptive.SimpleDescriptionObject;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
+import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 
 /**

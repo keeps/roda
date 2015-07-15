@@ -5,7 +5,6 @@ package pt.gov.dgarq.roda.wui.dissemination.browse.client;
 
 import org.roda.index.filter.Filter;
 import org.roda.index.sorter.Sorter;
-import org.roda.legacy.aip.metadata.descriptive.SimpleDescriptionObject;
 
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
@@ -14,6 +13,7 @@ import com.google.gwt.user.client.ui.Tree;
 import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.TreeListener;
 
+import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.CollectionsTreeItem.JumpCollectionsTreeItem;
 

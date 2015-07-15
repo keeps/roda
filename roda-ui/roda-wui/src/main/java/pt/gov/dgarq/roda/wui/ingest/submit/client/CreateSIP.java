@@ -7,7 +7,6 @@ import org.roda.common.RodaConstants;
 import org.roda.index.filter.Filter;
 import org.roda.index.filter.OneOfManyFilterParameter;
 import org.roda.index.filter.ProducerFilterParameter;
-import org.roda.legacy.aip.metadata.descriptive.SimpleDescriptionObject;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -25,6 +24,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.IngestSubmitConstants;
+import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
 import pt.gov.dgarq.roda.wui.common.fileupload.client.FileUploadPanel;

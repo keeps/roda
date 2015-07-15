@@ -2,8 +2,6 @@ package pt.gov.dgarq.roda.wui.ingest.list.client;
 
 import java.util.MissingResourceException;
 
-import org.roda.legacy.aip.metadata.descriptive.SimpleDescriptionObject;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
@@ -25,6 +23,7 @@ import pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException;
 import pt.gov.dgarq.roda.core.data.DescriptionObject;
 import pt.gov.dgarq.roda.core.data.SIPState;
 import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.SuccessListener;
 import pt.gov.dgarq.roda.wui.common.client.images.CommonImageBundle;

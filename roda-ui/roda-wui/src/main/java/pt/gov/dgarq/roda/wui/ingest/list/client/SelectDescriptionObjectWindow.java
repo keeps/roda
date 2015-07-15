@@ -6,8 +6,6 @@ package pt.gov.dgarq.roda.wui.ingest.list.client;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.roda.legacy.aip.metadata.descriptive.SimpleDescriptionObject;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.TreeItem;
@@ -15,6 +13,7 @@ import com.google.gwt.user.client.ui.TreeListener;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.IngestListConstants;
+import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
 import pt.gov.dgarq.roda.wui.common.client.widgets.WUIWindow;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.CollectionsTree;

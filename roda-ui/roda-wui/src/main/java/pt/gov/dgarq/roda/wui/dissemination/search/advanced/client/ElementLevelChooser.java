@@ -34,28 +34,28 @@ import config.i18n.client.DisseminationConstants;
  */
 public class ElementLevelChooser extends DockPanel {
 
-  private static DisseminationConstants constants = (DisseminationConstants) GWT.create(DisseminationConstants.class);
-  
-  private static CommonConstants commonConstants = (CommonConstants) GWT.create(CommonConstants.class);
+	private static DisseminationConstants constants = (DisseminationConstants) GWT.create(DisseminationConstants.class);
 
-  private final VerticalPanel optionLayout;
+	private static CommonConstants commonConstants = (CommonConstants) GWT.create(CommonConstants.class);
 
-  private final RadioButton allLevelsOption;
+	private final VerticalPanel optionLayout;
 
-  private final RadioButton chooseLevelsOption;
+	private final RadioButton allLevelsOption;
 
-  private final Grid centralLayout;
+	private final RadioButton chooseLevelsOption;
 
-  private final List<CheckBox> checkBoxes;
+	private final Grid centralLayout;
 
-  private final List<Label> labels;
+	private final List<CheckBox> checkBoxes;
 
-  private final List<Image> images;
+	private final List<Label> labels;
 
-  /**
-   * Create new element level chooser
-   */
-  public ElementLevelChooser() {
+	private final List<Image> images;
+
+	/**
+	 * Create new element level chooser
+	 */
+	public ElementLevelChooser() {
 
 		int levelsPerRow = 4;
 		int rows = Main.DESCRIPTION_LEVELS.size() / levelsPerRow;
@@ -71,8 +71,7 @@ public class ElementLevelChooser extends DockPanel {
 		this.add(centralLayout, CENTER);
 
 		allLevelsOption = new RadioButton("level-option", constants.allLevels());
-		chooseLevelsOption = new RadioButton("level-option",
-				constants.chooseLevels());
+		chooseLevelsOption = new RadioButton("level-option", constants.chooseLevels());
 
 		optionLayout.add(allLevelsOption);
 		optionLayout.add(chooseLevelsOption);
@@ -82,10 +81,9 @@ public class ElementLevelChooser extends DockPanel {
 		images = new ArrayList<Image>();
 
 		for (DescriptionLevel level : Main.DESCRIPTION_LEVELS) {
-		  DescriptionLevelInfo levelInfo = Main.getDescriptionLevel(level
-                    .getLevel());
+			DescriptionLevelInfo levelInfo = Main.getDescriptionLevel(level.getLevel());
 			checkBoxes.add(new CheckBox());
-			images.add(Dissemination.getInstance().getElementLevelIcon(level));
+			images.add(Dissemination.getInstance().getElementLevelIcon(level.getLevel()));
 			labels.add(new Label(levelInfo.getLabel(commonConstants.locale())));
 		}
 
@@ -132,93 +130,94 @@ public class ElementLevelChooser extends DockPanel {
 
 	}
 
-  protected void onOptionClick() {
-    for (CheckBox checkBox : checkBoxes) {
-      checkBox.setChecked(allLevelsOption.isChecked());
-    }
-  }
+	protected void onOptionClick() {
+		for (CheckBox checkBox : checkBoxes) {
+			checkBox.setChecked(allLevelsOption.isChecked());
+		}
+	}
 
-  protected void onElementClick() {
-    boolean areAllBoxesChecked = true;
-    for (CheckBox checkBox : checkBoxes) {
-      areAllBoxesChecked = areAllBoxesChecked && checkBox.isChecked();
-    }
-    if (areAllBoxesChecked) {
-      allLevelsOption.setChecked(true);
-    } else {
-      chooseLevelsOption.setChecked(true);
-    }
-  }
+	protected void onElementClick() {
+		boolean areAllBoxesChecked = true;
+		for (CheckBox checkBox : checkBoxes) {
+			areAllBoxesChecked = areAllBoxesChecked && checkBox.isChecked();
+		}
+		if (areAllBoxesChecked) {
+			allLevelsOption.setChecked(true);
+		} else {
+			chooseLevelsOption.setChecked(true);
+		}
+	}
 
-  protected void addListeners(final CheckBox checkBox, final Image icon, final Label label) {
-    ClickListener widgetsClickListener = new ClickListener() {
-      public void onClick(Widget sender) {
-        if (checkBox.isEnabled()) {
-          checkBox.setChecked(!checkBox.isChecked());
-          onElementClick();
-        }
+	protected void addListeners(final CheckBox checkBox, final Image icon, final Label label) {
+		ClickListener widgetsClickListener = new ClickListener() {
+			public void onClick(Widget sender) {
+				if (checkBox.isEnabled()) {
+					checkBox.setChecked(!checkBox.isChecked());
+					onElementClick();
+				}
 
-      }
-    };
+			}
+		};
 
-    icon.addClickListener(widgetsClickListener);
-    label.addClickListener(widgetsClickListener);
+		icon.addClickListener(widgetsClickListener);
+		label.addClickListener(widgetsClickListener);
 
-    checkBox.addClickListener(new ClickListener() {
+		checkBox.addClickListener(new ClickListener() {
 
-      public void onClick(Widget sender) {
-        onElementClick();
+			public void onClick(Widget sender) {
+				onElementClick();
 
-      }
+			}
 
-    });
+		});
 
-  }
+	}
 
-  /**
-   * Get the list of the selected element levels
-   * 
-   * @return A List of the element levels as defined at SimpleDescriptionObject
-   */
-  public List<DescriptionLevel> getSelected() {
-    List<DescriptionLevel> selected = new ArrayList<DescriptionLevel>();
-    if (allLevelsOption.isChecked()) {
-      for (DescriptionLevel level : Main.DESCRIPTION_LEVELS) {
-        selected.add(level);
-      }
-    } else {
-      for (int i = 0; i < Main.DESCRIPTION_LEVELS.size(); i++) {
-        if (checkBoxes.get(i).isChecked()) {
-          selected.add(Main.DESCRIPTION_LEVELS.get(i));
-        }
-      }
-    }
+	/**
+	 * Get the list of the selected element levels
+	 * 
+	 * @return A List of the element levels as defined at
+	 *         SimpleDescriptionObject
+	 */
+	public List<DescriptionLevel> getSelected() {
+		List<DescriptionLevel> selected = new ArrayList<DescriptionLevel>();
+		if (allLevelsOption.isChecked()) {
+			for (DescriptionLevel level : Main.DESCRIPTION_LEVELS) {
+				selected.add(level);
+			}
+		} else {
+			for (int i = 0; i < Main.DESCRIPTION_LEVELS.size(); i++) {
+				if (checkBoxes.get(i).isChecked()) {
+					selected.add(Main.DESCRIPTION_LEVELS.get(i));
+				}
+			}
+		}
 
-    return selected;
-  }
+		return selected;
+	}
 
-  /**
-   * Get search parameters
-   * 
-   * @return an array with the search parameters
-   */
-  public SearchParameter[] getSearchParameters() {
-    SearchParameter[] parameters;
+	/**
+	 * Get search parameters
+	 * 
+	 * @return an array with the search parameters
+	 */
+	public SearchParameter[] getSearchParameters() {
+		SearchParameter[] parameters;
 
-    if (allLevelsOption.isChecked()) {
-      parameters = new SearchParameter[] {};
-    } else {
-      String keyword = "";
-      for (int i = 0; i < Main.DESCRIPTION_LEVELS.size(); i++) {
-        if (checkBoxes.get(i).isChecked()) {
-          keyword += Main.DESCRIPTION_LEVELS.get(i) + " ";
-        }
-      }
+		if (allLevelsOption.isChecked()) {
+			parameters = new SearchParameter[] {};
+		} else {
+			String keyword = "";
+			for (int i = 0; i < Main.DESCRIPTION_LEVELS.size(); i++) {
+				if (checkBoxes.get(i).isChecked()) {
+					keyword += Main.DESCRIPTION_LEVELS.get(i) + " ";
+				}
+			}
 
-      SearchParameter parameter = new DefaultSearchParameter(new String[] {EadcSearchFields.LEVEL}, keyword,
-        DefaultSearchParameter.MATCH_AT_LEAST_ONE_WORD);
-      parameters = new SearchParameter[] {parameter};
-    }
-    return parameters;
-  }
+			SearchParameter parameter = new DefaultSearchParameter(new String[] { EadcSearchFields.LEVEL }, keyword,
+					DefaultSearchParameter.MATCH_AT_LEAST_ONE_WORD);
+			parameters = new SearchParameter[] { parameter };
+		}
+		return parameters;
+	}
 }

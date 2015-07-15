@@ -2,7 +2,7 @@ package org.roda.legacy.aip.metadata.preservation;
 
 import java.util.Date;
 
-import org.roda.legacy.aip.metadata.RODAObject;
+import pt.gov.dgarq.roda.core.data.v2.RODAObject;
 
 /**
  * This is an event preservation object

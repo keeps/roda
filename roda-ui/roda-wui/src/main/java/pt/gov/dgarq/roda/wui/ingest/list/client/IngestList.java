@@ -6,28 +6,13 @@ package pt.gov.dgarq.roda.wui.ingest.list.client;
 import java.util.List;
 import java.util.Vector;
 
-import pt.gov.dgarq.roda.core.data.SIPState;
-import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.LikeFilterParameter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.OneOfManyFilterParameter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
-import pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter;
-import pt.gov.dgarq.roda.wui.common.client.AuthenticatedUser;
-import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
-import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
-import pt.gov.dgarq.roda.wui.common.client.LoginStatusListener;
-import pt.gov.dgarq.roda.wui.common.client.UserLogin;
-import pt.gov.dgarq.roda.wui.common.client.widgets.ControlPanel;
-import pt.gov.dgarq.roda.wui.common.client.widgets.ElementPanel;
-import pt.gov.dgarq.roda.wui.common.client.widgets.LazyVerticalList;
-import pt.gov.dgarq.roda.wui.common.client.widgets.ListHeaderPanel;
-import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
-import pt.gov.dgarq.roda.wui.common.client.widgets.ControlPanel.ControlPanelListener;
-import pt.gov.dgarq.roda.wui.common.client.widgets.LazyVerticalList.ContentSource;
-import pt.gov.dgarq.roda.wui.common.client.widgets.LazyVerticalList.LazyVerticalListListener;
-import pt.gov.dgarq.roda.wui.ingest.client.Ingest;
+import org.roda.index.filter.Filter;
+import org.roda.index.filter.FilterParameter;
+import org.roda.index.filter.LikeFilterParameter;
+import org.roda.index.filter.OneOfManyFilterParameter;
+import org.roda.index.filter.SimpleFilterParameter;
+import org.roda.index.sorter.SortParameter;
+import org.roda.legacy.old.adapter.ContentAdapter;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.History;
@@ -38,6 +23,21 @@ import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.IngestListConstants;
 import config.i18n.client.IngestListMessages;
+import pt.gov.dgarq.roda.core.data.SIPState;
+import pt.gov.dgarq.roda.wui.common.client.AuthenticatedUser;
+import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
+import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
+import pt.gov.dgarq.roda.wui.common.client.LoginStatusListener;
+import pt.gov.dgarq.roda.wui.common.client.UserLogin;
+import pt.gov.dgarq.roda.wui.common.client.widgets.ControlPanel;
+import pt.gov.dgarq.roda.wui.common.client.widgets.ControlPanel.ControlPanelListener;
+import pt.gov.dgarq.roda.wui.common.client.widgets.ElementPanel;
+import pt.gov.dgarq.roda.wui.common.client.widgets.LazyVerticalList;
+import pt.gov.dgarq.roda.wui.common.client.widgets.LazyVerticalList.ContentSource;
+import pt.gov.dgarq.roda.wui.common.client.widgets.LazyVerticalList.LazyVerticalListListener;
+import pt.gov.dgarq.roda.wui.common.client.widgets.ListHeaderPanel;
+import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
+import pt.gov.dgarq.roda.wui.ingest.client.Ingest;
 
 /**
  * @author Luis Faria
@@ -59,11 +59,9 @@ public class IngestList implements HistoryResolver {
 		return instance;
 	}
 
-	private static IngestListConstants constants = GWT
-			.create(IngestListConstants.class);
+	private static IngestListConstants constants = GWT.create(IngestListConstants.class);
 
-	private static IngestListMessages messages = GWT
-			.create(IngestListMessages.class);
+	private static IngestListMessages messages = GWT.create(IngestListMessages.class);
 
 	/**
 	 * Filter state options
@@ -73,22 +71,18 @@ public class IngestList implements HistoryResolver {
 		/**
 		 * SIPs which are in processing state, i.e. before ready state
 		 */
-		PROCESSING,
-		/**
-		 * Ready SIPs, waiting for acceptance
-		 */
-		READY,
-		/**
-		 * Quarantined SIPs
-		 */
-		QUARANTINE,
-		/**
-		 * Accepted SIPs
-		 */
-		ACCEPTED,
-		/**
-		 * All SIPs
-		 */
+		PROCESSING, /**
+					 * Ready SIPs, waiting for acceptance
+					 */
+		READY, /**
+				 * Quarantined SIPs
+				 */
+		QUARANTINE, /**
+					 * Accepted SIPs
+					 */
+		ACCEPTED, /**
+					 * All SIPs
+					 */
 		ALL
 
 	}
@@ -120,17 +114,12 @@ public class IngestList implements HistoryResolver {
 	private IngestList() {
 		layout = new DockPanel();
 
-		controlPanel = new ControlPanel(constants.ingestListControlTitle(),
-				constants.ingestListControlSearchTitle());
+		controlPanel = new ControlPanel(constants.ingestListControlTitle(), constants.ingestListControlSearchTitle());
 
-		report = new WUIButton(constants.ingestReport(), WUIButton.Left.SQUARE,
-				WUIButton.Right.REPORT);
-		view = new WUIButton(constants.ingestView(), WUIButton.Left.SQUARE,
-				WUIButton.Right.ARROW_FORWARD);
-		accept = new WUIButton(constants.ingestAccept(), WUIButton.Left.SQUARE,
-				WUIButton.Right.CHECK);
-		reject = new WUIButton(constants.ingestReject(), WUIButton.Left.SQUARE,
-				WUIButton.Right.CROSS);
+		report = new WUIButton(constants.ingestReport(), WUIButton.Left.SQUARE, WUIButton.Right.REPORT);
+		view = new WUIButton(constants.ingestView(), WUIButton.Left.SQUARE, WUIButton.Right.ARROW_FORWARD);
+		accept = new WUIButton(constants.ingestAccept(), WUIButton.Left.SQUARE, WUIButton.Right.CHECK);
+		reject = new WUIButton(constants.ingestReject(), WUIButton.Left.SQUARE, WUIButton.Right.CROSS);
 
 		initialized = false;
 
@@ -138,33 +127,24 @@ public class IngestList implements HistoryResolver {
 
 	private void addSIPListHeader() {
 		ListHeaderPanel lazySIPListHeader = lazySIPList.getHeader();
-		lazySIPListHeader.addHeader(constants.headerFilename(),
-				"ingest-list-header-filename", new SortParameter[] {
-						new SortParameter("originalFilename", false),
-						new SortParameter("id", false) }, true);
+		lazySIPListHeader.addHeader(constants.headerFilename(), "ingest-list-header-filename",
+				new SortParameter[] { new SortParameter("originalFilename", false), new SortParameter("id", false) },
+				true);
 
-		lazySIPListHeader.addHeader(constants.headerStartDate(),
-				"ingest-list-header-date", new SortParameter[] {
-						new SortParameter("datetime", false),
-						new SortParameter("id", false) }, false);
+		lazySIPListHeader.addHeader(constants.headerStartDate(), "ingest-list-header-date",
+				new SortParameter[] { new SortParameter("datetime", false), new SortParameter("id", false) }, false);
 
-		lazySIPListHeader.addHeader(constants.headerState(),
-				"ingest-list-header-state", new SortParameter[] {
-						new SortParameter("state", false),
-						new SortParameter("id", false) }, true);
+		lazySIPListHeader.addHeader(constants.headerState(), "ingest-list-header-state",
+				new SortParameter[] { new SortParameter("state", false), new SortParameter("id", false) }, true);
 
-		lazySIPListHeader.addHeader(constants.headerPercentage(),
-				"ingest-list-header-percentage", new SortParameter[] {
-						new SortParameter("completePercentage", false),
-						new SortParameter("id", false) }, true);
+		lazySIPListHeader.addHeader(constants.headerPercentage(), "ingest-list-header-percentage",
+				new SortParameter[] { new SortParameter("completePercentage", false), new SortParameter("id", false) },
+				true);
 
-		lazySIPListHeader.addHeader(constants.headerProducer(),
-				"ingest-list-header-producer", new SortParameter[] {
-						new SortParameter("username", false),
-						new SortParameter("id", false) }, true);
+		lazySIPListHeader.addHeader(constants.headerProducer(), "ingest-list-header-producer",
+				new SortParameter[] { new SortParameter("username", false), new SortParameter("id", false) }, true);
 
-		lazySIPListHeader.addHeader("", "ingest-list-header-toolbar",
-				new SortParameter[] {}, true);
+		lazySIPListHeader.addHeader("", "ingest-list-header-toolbar", new SortParameter[] {}, true);
 
 		lazySIPListHeader.setFillerHeader(5);
 		lazySIPListHeader.setSelectedHeader(1);
@@ -183,58 +163,47 @@ public class IngestList implements HistoryResolver {
 			filter_states = new String[] { READY_STATE };
 			filter_complete = Boolean.FALSE;
 
-			lazySIPList = new LazyVerticalList<SIPState>(
-					new ContentSource<SIPState>() {
+			lazySIPList = new LazyVerticalList<SIPState>(new ContentSource<SIPState>() {
 
-						public void getCount(Filter filter,
-								AsyncCallback<Integer> callback) {
-							IngestListService.Util.getInstance().getSIPCount(
-									filter, callback);
+				public void getCount(Filter filter, AsyncCallback<Integer> callback) {
+					IngestListService.Util.getInstance().getSIPCount(filter, callback);
 
-						}
+				}
 
-						public ElementPanel<SIPState> getElementPanel(
-								SIPState element) {
-							return new SIPPanel(element);
-						}
+				public ElementPanel<SIPState> getElementPanel(SIPState element) {
+					return new SIPPanel(element);
+				}
 
-						public void getElements(ContentAdapter adapter,
-								AsyncCallback<SIPState[]> callback) {
-							IngestListService.Util.getInstance().getSIPs(
-									adapter, callback);
-						}
+				public void getElements(ContentAdapter adapter, AsyncCallback<SIPState[]> callback) {
+					IngestListService.Util.getInstance().getSIPs(adapter, callback);
+				}
 
-						public String getTotalMessage(int total) {
-							return messages.total(total);
-						}
+				public String getTotalMessage(int total) {
+					return messages.total(total);
+				}
 
-						public void setReportInfo(ContentAdapter adapter,
-								String locale, AsyncCallback<Void> callback) {
+				public void setReportInfo(ContentAdapter adapter, String locale, AsyncCallback<Void> callback) {
 
-							IngestListService.Util.getInstance()
-									.setSIPListReportInfo(adapter, locale,
-											callback);
-						}
+					IngestListService.Util.getInstance().setSIPListReportInfo(adapter, locale, callback);
+				}
 
-					}, 15000, getFilter());
+			}, 15000, getFilter());
 
-			lazySIPList
-					.addLazyVerticalListListener(new LazyVerticalListListener<SIPState>() {
+			lazySIPList.addLazyVerticalListListener(new LazyVerticalListListener<SIPState>() {
 
-						public void onElementSelected(
-								ElementPanel<SIPState> element) {
-							updateVisibles();
-						}
+				public void onElementSelected(ElementPanel<SIPState> element) {
+					updateVisibles();
+				}
 
-						public void onUpdateBegin() {
-							controlPanel.setOptionsEnabled(false);
-						}
+				public void onUpdateBegin() {
+					controlPanel.setOptionsEnabled(false);
+				}
 
-						public void onUpdateFinish() {
-							controlPanel.setOptionsEnabled(true);
-						}
+				public void onUpdateFinish() {
+					controlPanel.setOptionsEnabled(true);
+				}
 
-					});
+			});
 
 			addSIPListHeader();
 
@@ -288,10 +257,8 @@ public class IngestList implements HistoryResolver {
 			report.addClickListener(new ClickListener() {
 
 				public void onClick(Widget sender) {
-					ElementPanel<SIPState> elementPanel = lazySIPList
-							.getSelected();
-					if (elementPanel != null
-							&& elementPanel instanceof SIPPanel) {
+					ElementPanel<SIPState> elementPanel = lazySIPList.getSelected();
+					if (elementPanel != null && elementPanel instanceof SIPPanel) {
 						((SIPPanel) elementPanel).setReportVisible(true);
 					}
 
@@ -302,10 +269,8 @@ public class IngestList implements HistoryResolver {
 			view.addClickListener(new ClickListener() {
 
 				public void onClick(Widget sender) {
-					ElementPanel<SIPState> elementPanel = lazySIPList
-							.getSelected();
-					if (elementPanel != null
-							&& elementPanel instanceof SIPPanel) {
+					ElementPanel<SIPState> elementPanel = lazySIPList.getSelected();
+					if (elementPanel != null && elementPanel instanceof SIPPanel) {
 						((SIPPanel) elementPanel).view();
 					}
 				}
@@ -315,10 +280,8 @@ public class IngestList implements HistoryResolver {
 			accept.addClickListener(new ClickListener() {
 
 				public void onClick(Widget sender) {
-					ElementPanel<SIPState> elementPanel = lazySIPList
-							.getSelected();
-					if (elementPanel != null
-							&& elementPanel instanceof SIPPanel) {
+					ElementPanel<SIPState> elementPanel = lazySIPList.getSelected();
+					if (elementPanel != null && elementPanel instanceof SIPPanel) {
 						lazySIPList.setUserMessage(constants.acceptingSIP());
 						SIPPanel selected = (SIPPanel) elementPanel;
 						accept.setEnabled(false);
@@ -344,10 +307,8 @@ public class IngestList implements HistoryResolver {
 			reject.addClickListener(new ClickListener() {
 
 				public void onClick(Widget sender) {
-					ElementPanel<SIPState> elementPanel = lazySIPList
-							.getSelected();
-					if (elementPanel != null
-							&& elementPanel instanceof SIPPanel) {
+					ElementPanel<SIPState> elementPanel = lazySIPList.getSelected();
+					if (elementPanel != null && elementPanel instanceof SIPPanel) {
 						lazySIPList.setUserMessage(constants.rejectingSIP());
 						SIPPanel selected = (SIPPanel) elementPanel;
 						accept.setEnabled(false);
@@ -387,26 +348,24 @@ public class IngestList implements HistoryResolver {
 			layout.addStyleName("wui-ingest-list");
 			lazySIPList.getWidget().addStyleName("ingest-lazy-list");
 
-			UserLogin.getInstance().addLoginStatusListener(
-					new LoginStatusListener() {
+			UserLogin.getInstance().addLoginStatusListener(new LoginStatusListener() {
 
-						public void onLoginStatusChanged(AuthenticatedUser user) {
-							isCurrentUserPermitted(new AsyncCallback<Boolean>() {
+				public void onLoginStatusChanged(AuthenticatedUser user) {
+					isCurrentUserPermitted(new AsyncCallback<Boolean>() {
 
-								public void onFailure(Throwable caught) {
-									logger.error("Error getting permissions",
-											caught);
-									lazySIPList.setAutoUpdate(false);
-								}
+						public void onFailure(Throwable caught) {
+							logger.error("Error getting permissions", caught);
+							lazySIPList.setAutoUpdate(false);
+						}
 
-								public void onSuccess(Boolean permitted) {
-									lazySIPList.setAutoUpdate(permitted);
-								}
-
-							});
+						public void onSuccess(Boolean permitted) {
+							lazySIPList.setAutoUpdate(permitted);
 						}
 
 					});
+				}
+
+			});
 
 		}
 	}
@@ -432,28 +391,23 @@ public class IngestList implements HistoryResolver {
 	protected void updateVisibles() {
 		ElementPanel<SIPState> selected = lazySIPList.getSelected();
 		report.setEnabled(selected != null);
-		view.setEnabled(selected != null
-				&& selected.get().getIngestedPID() != null);
+		view.setEnabled(selected != null && selected.get().getIngestedPID() != null);
 
-		UserLogin.getInstance().getAuthenticatedUser(
-				new AsyncCallback<AuthenticatedUser>() {
+		UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<AuthenticatedUser>() {
 
-					public void onFailure(Throwable caught) {
-						logger.error("Error updating visibles", caught);
-					}
+			public void onFailure(Throwable caught) {
+				logger.error("Error updating visibles", caught);
+			}
 
-					public void onSuccess(AuthenticatedUser user) {
-						boolean accept_reject_role = user
-								.hasRole("ingest.accept_reject_sip");
-						accept.setVisible(accept_reject_role);
-						reject.setVisible(accept_reject_role);
-					}
+			public void onSuccess(AuthenticatedUser user) {
+				boolean accept_reject_role = user.hasRole("ingest.accept_reject_sip");
+				accept.setVisible(accept_reject_role);
+				reject.setVisible(accept_reject_role);
+			}
 
-				});
-		accept.setEnabled(selected != null
-				&& selected.get().getState().equals(READY_STATE));
-		reject.setEnabled(selected != null
-				&& selected.get().getState().equals(READY_STATE));
+		});
+		accept.setEnabled(selected != null && selected.get().getState().equals(READY_STATE));
+		reject.setEnabled(selected != null && selected.get().getState().equals(READY_STATE));
 	}
 
 	public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
@@ -479,10 +433,8 @@ public class IngestList implements HistoryResolver {
 		if (currentStateFilter != filter) {
 			currentStateFilter = filter;
 			if (filter == StateFilter.PROCESSING) {
-				filter_states = new String[] { "DROPED_FTP",
-						"DROPED_UPLOAD_SERVICE", "DROPED_LOCAL", "UNPACKED",
-						"VIRUS_FREE", "SIP_VALID", "AUTHORIZED",
-						"REPRESENTATION_PRESENT", "SIP_INGESTED" };
+				filter_states = new String[] { "DROPED_FTP", "DROPED_UPLOAD_SERVICE", "DROPED_LOCAL", "UNPACKED",
+						"VIRUS_FREE", "SIP_VALID", "AUTHORIZED", "REPRESENTATION_PRESENT", "SIP_INGESTED" };
 				filter_complete = Boolean.FALSE;
 				controlPanel.setSelectedOptionIndex(1);
 			} else if (filter == StateFilter.READY) {
@@ -516,22 +468,18 @@ public class IngestList implements HistoryResolver {
 		List<FilterParameter> parameters = new Vector<FilterParameter>();
 
 		if (filter_username != null && filter_username.length() > 0) {
-			parameters.add(new LikeFilterParameter("username", "%"
-					+ filter_username + "%"));
+			parameters.add(new LikeFilterParameter("username", "%" + filter_username + "%"));
 		}
 
 		if (filter_states != null && filter_states.length > 0) {
-			parameters
-					.add(new OneOfManyFilterParameter("state", filter_states));
+			parameters.add(new OneOfManyFilterParameter("state", filter_states));
 		}
 
 		if (filter_complete != null) {
-			parameters.add(new SimpleFilterParameter("complete",
-					filter_complete.toString()));
+			parameters.add(new SimpleFilterParameter("complete", filter_complete.toString()));
 		}
 
-		filter.setParameters((FilterParameter[]) parameters
-				.toArray(new FilterParameter[] {}));
+		filter.setParameters((FilterParameter[]) parameters.toArray(new FilterParameter[] {}));
 
 		return filter;
 	}

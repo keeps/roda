@@ -6,7 +6,6 @@ package pt.gov.dgarq.roda.wui.dissemination.browse.client;
 import org.roda.index.filter.Filter;
 import org.roda.index.sorter.SortParameter;
 import org.roda.index.sorter.Sorter;
-import org.roda.legacy.aip.metadata.descriptive.SimpleDescriptionObject;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Command;
@@ -17,6 +16,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.BrowseConstants;
+import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.widgets.LazyScroll;
 import pt.gov.dgarq.roda.wui.common.client.widgets.LazyScroll.Loader;

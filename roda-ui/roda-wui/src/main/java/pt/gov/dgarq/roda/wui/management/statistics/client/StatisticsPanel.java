@@ -9,19 +9,19 @@ import java.util.Date;
 import java.util.List;
 import java.util.MissingResourceException;
 
-import pt.gov.dgarq.roda.core.data.StatisticData;
-import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter;
-import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
-import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
-import pt.gov.dgarq.roda.wui.common.client.widgets.LoadingPopup;
+import org.roda.index.filter.Filter;
+import org.roda.index.filter.FilterParameter;
+import org.roda.legacy.old.adapter.ContentAdapter;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.ui.Composite;
 
 import config.i18n.client.StatisticsConstants;
+import pt.gov.dgarq.roda.core.data.StatisticData;
+import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
+import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
+import pt.gov.dgarq.roda.wui.common.client.widgets.LoadingPopup;
 
 /**
  * @author Luis Faria
@@ -30,9 +30,8 @@ import config.i18n.client.StatisticsConstants;
 public abstract class StatisticsPanel extends Composite {
 
 	protected static final int Y_STEPS = 10;
-	protected static final List<String> COLORS = Arrays.asList(new String[] {
-			"#88AFBE", "#D7BC00", "#7e8a57", "#ff0000", "#00ff00", "#0000ff",
-			"#ff9900", "#ff00ff", "#79C2FF" });
+	protected static final List<String> COLORS = Arrays.asList(new String[] { "#88AFBE", "#D7BC00", "#7e8a57",
+			"#ff0000", "#00ff00", "#0000ff", "#ff9900", "#ff00ff", "#79C2FF" });
 	protected static final String BACKGROUND = "#e6e7e9";
 	protected static final String HALFGROUND = "#58595b";
 	protected static final String FOREGROUND = "#000000";
@@ -66,17 +65,15 @@ public abstract class StatisticsPanel extends Composite {
 		/**
 		 * No dimension or unit
 		 */
-		ADIMENSIONAL,
-		/**
-		 * Time in milliseconds
-		 */
+		ADIMENSIONAL, /**
+						 * Time in milliseconds
+						 */
 		MILLISECONDS
 	}
 
 	private ClientLogger logger = new ClientLogger(getClass().getName());
 
-	protected StatisticsConstants constants = (StatisticsConstants) GWT
-			.create(StatisticsConstants.class);
+	protected StatisticsConstants constants = (StatisticsConstants) GWT.create(StatisticsConstants.class);
 
 	// variables
 	private final String title;
@@ -89,7 +86,7 @@ public abstract class StatisticsPanel extends Composite {
 
 	private Date initialDate;
 	private Date finalDate;
-	
+
 	protected final LoadingPopup loading;
 
 	/**
@@ -105,10 +102,9 @@ public abstract class StatisticsPanel extends Composite {
 	 *            statistic functions
 	 * @param segmentation
 	 */
-	public StatisticsPanel(String title, String type, ValueDimension dimension,
-			Segmentation segmentation, StatisticFunction... functions) {
-		this(title, type, dimension, segmentation,
-				new ArrayList<StatisticFunction>(Arrays.asList(functions)));
+	public StatisticsPanel(String title, String type, ValueDimension dimension, Segmentation segmentation,
+			StatisticFunction... functions) {
+		this(title, type, dimension, segmentation, new ArrayList<StatisticFunction>(Arrays.asList(functions)));
 	}
 
 	/**
@@ -125,8 +121,8 @@ public abstract class StatisticsPanel extends Composite {
 	 *            of the list
 	 * @param segmentation
 	 */
-	public StatisticsPanel(String title, String type, ValueDimension dimension,
-			Segmentation segmentation, List<StatisticFunction> functions) {
+	public StatisticsPanel(String title, String type, ValueDimension dimension, Segmentation segmentation,
+			List<StatisticFunction> functions) {
 		this.title = title;
 		this.type = type;
 		this.dimension = dimension;
@@ -134,18 +130,16 @@ public abstract class StatisticsPanel extends Composite {
 		this.segmentation = segmentation;
 		this.colorIndex = getNextBaseColorIndex();
 		loading = new LoadingPopup(this);
-		
+
 		finalDate = new Date();
 		initialDate = getPreferredInitialDate(segmentation, finalDate);
 
 		logger.debug("Adding filler function");
 		// show skipped dates as columns with value -1
-		this.functions.add(new StatisticFunction(
-				StatisticFunction.FunctionType.FILLER, "" + DEFAULT_VALUE));
+		this.functions.add(new StatisticFunction(StatisticFunction.FunctionType.FILLER, "" + DEFAULT_VALUE));
 
 		// set maximum number of results
-		this.functions.add(new StatisticFunction(
-				StatisticFunction.FunctionType.SAMPLING, "" + MAX_VALUE_COUNT));
+		this.functions.add(new StatisticFunction(StatisticFunction.FunctionType.SAMPLING, "" + MAX_VALUE_COUNT));
 
 		logger.debug("Setting color list");
 		// Set new color list
@@ -275,12 +269,9 @@ public abstract class StatisticsPanel extends Composite {
 		return adapter;
 	}
 
-	private static final DateTimeFormat YEAR_FORMAT = DateTimeFormat
-			.getFormat("yyyy");
-	private static final DateTimeFormat MONTH_FORMAT = DateTimeFormat
-			.getFormat("yyyy-MM");
-	private static final DateTimeFormat DAY_FORMAT = DateTimeFormat
-			.getFormat("yyyy-MM-dd");
+	private static final DateTimeFormat YEAR_FORMAT = DateTimeFormat.getFormat("yyyy");
+	private static final DateTimeFormat MONTH_FORMAT = DateTimeFormat.getFormat("yyyy-MM");
+	private static final DateTimeFormat DAY_FORMAT = DateTimeFormat.getFormat("yyyy-MM-dd");
 
 	protected String formatDate(Date date, Segmentation segmentation) {
 		String dateFormat;
@@ -297,19 +288,15 @@ public abstract class StatisticsPanel extends Composite {
 		return dateFormat;
 	}
 
-	protected Date getPreferredInitialDate(Segmentation segmentation,
-			Date finalDate) {
+	protected Date getPreferredInitialDate(Segmentation segmentation, Date finalDate) {
 		Date initialDate;
 
 		if (segmentation.equals(Segmentation.DAY)) {
-			initialDate = new Date(finalDate.getTime() - 30
-					* segmentation2Millis(Segmentation.DAY));
+			initialDate = new Date(finalDate.getTime() - 30 * segmentation2Millis(Segmentation.DAY));
 		} else if (segmentation.equals(Segmentation.MONTH)) {
-			initialDate = new Date(finalDate.getTime() - 12
-					* segmentation2Millis(Segmentation.MONTH));
+			initialDate = new Date(finalDate.getTime() - 12 * segmentation2Millis(Segmentation.MONTH));
 		} else {
-			initialDate = new Date(finalDate.getTime() - 10
-					* segmentation2Millis(Segmentation.YEAR));
+			initialDate = new Date(finalDate.getTime() - 10 * segmentation2Millis(Segmentation.YEAR));
 		}
 
 		return initialDate;
@@ -333,8 +320,7 @@ public abstract class StatisticsPanel extends Composite {
 	 * 
 	 * @return the last valid statistics or null if none exists
 	 */
-	protected StatisticData getLastValidStatistics(
-			List<StatisticData> statistics) {
+	protected StatisticData getLastValidStatistics(List<StatisticData> statistics) {
 		StatisticData ret = null;
 		if (statistics != null) {
 			for (int i = statistics.size() - 1; i >= 0; i--) {
@@ -355,8 +341,7 @@ public abstract class StatisticsPanel extends Composite {
 	 * 
 	 * @return the last valid statistics or null if none exists
 	 */
-	protected List<StatisticData> getLastValidStackedStatistics(
-			List<List<StatisticData>> statistics) {
+	protected List<StatisticData> getLastValidStackedStatistics(List<List<StatisticData>> statistics) {
 		List<StatisticData> ret = new ArrayList<StatisticData>();
 
 		for (List<StatisticData> infos : statistics) {

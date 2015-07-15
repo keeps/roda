@@ -2,21 +2,12 @@ package pt.gov.dgarq.roda.wui.management.statistics.client;
 
 import java.util.List;
 
-import pt.gov.dgarq.roda.core.data.SIPState;
-import pt.gov.dgarq.roda.core.data.StatisticData;
-import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
-import pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter;
-import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
-import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
-import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
-import pt.gov.dgarq.roda.wui.common.client.images.CommonImageBundle;
-import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
-import pt.gov.dgarq.roda.wui.dissemination.browse.client.ViewWindow;
-import pt.gov.dgarq.roda.wui.ingest.list.client.IngestListService;
-import pt.gov.dgarq.roda.wui.ingest.list.client.IngestReportWindow;
-import pt.gov.dgarq.roda.wui.management.statistics.client.StatisticsPanel.ValueDimension;
+import org.roda.index.filter.Filter;
+import org.roda.index.filter.SimpleFilterParameter;
+import org.roda.index.sorter.SortParameter;
+import org.roda.index.sorter.Sorter;
+import org.roda.index.sublist.Sublist;
+import org.roda.legacy.old.adapter.ContentAdapter;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
@@ -30,6 +21,16 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
+
+import pt.gov.dgarq.roda.core.data.SIPState;
+import pt.gov.dgarq.roda.core.data.StatisticData;
+import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
+import pt.gov.dgarq.roda.wui.common.client.images.CommonImageBundle;
+import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
+import pt.gov.dgarq.roda.wui.dissemination.browse.client.ViewWindow;
+import pt.gov.dgarq.roda.wui.ingest.list.client.IngestListService;
+import pt.gov.dgarq.roda.wui.ingest.list.client.IngestReportWindow;
+import pt.gov.dgarq.roda.wui.management.statistics.client.StatisticsPanel.ValueDimension;
 
 /**
  * 

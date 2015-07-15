@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
-import org.roda.legacy.aip.metadata.descriptive.SimpleDescriptionObject;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.ChangeListener;
@@ -24,6 +22,7 @@ import config.i18n.client.MetadataEditorConstants;
 import pt.gov.dgarq.roda.core.data.Group;
 import pt.gov.dgarq.roda.core.data.RODAMember;
 import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.SuccessListener;
 import pt.gov.dgarq.roda.wui.common.client.widgets.LoadingPopup;

@@ -43,8 +43,6 @@ import org.roda.index.filter.FilterParameter;
 import org.roda.index.filter.SimpleFilterParameter;
 import org.roda.index.sorter.Sorter;
 import org.roda.index.sublist.Sublist;
-import org.roda.legacy.aip.metadata.RODAObject;
-import org.roda.legacy.aip.metadata.descriptive.SimpleDescriptionObject;
 import org.roda.model.AIP;
 import org.roda.model.DescriptiveMetadata;
 import org.roda.model.ModelService;
@@ -56,6 +54,9 @@ import org.roda.storage.StorageActionException;
 import org.roda.storage.StoragePath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import pt.gov.dgarq.roda.core.data.v2.RODAObject;
+import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 
 public class SolrUtils {
 

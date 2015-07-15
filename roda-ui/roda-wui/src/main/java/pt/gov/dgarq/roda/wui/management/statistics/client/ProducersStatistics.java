@@ -5,14 +5,12 @@ package pt.gov.dgarq.roda.wui.management.statistics.client;
 
 import java.util.List;
 
-import pt.gov.dgarq.roda.core.data.StatisticData;
-import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
-import pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter;
-import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
-import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
-import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
+import org.roda.index.filter.Filter;
+import org.roda.index.filter.SimpleFilterParameter;
+import org.roda.index.sorter.SortParameter;
+import org.roda.index.sorter.Sorter;
+import org.roda.index.sublist.Sublist;
+import org.roda.legacy.old.adapter.ContentAdapter;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.ChangeListener;
@@ -22,6 +20,9 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
+
+import pt.gov.dgarq.roda.core.data.StatisticData;
+import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 
 /**
  * @author Luis Faria
@@ -87,30 +88,28 @@ public class ProducersStatistics extends StatisticTab {
 		sorter.add(new SortParameter("datetime", true));
 		Sublist sublist = new Sublist(0, 1);
 		ContentAdapter adapter = new ContentAdapter(filter, sorter, sublist);
-		StatisticsService.Util.getInstance().getStatisticList(adapter,
-				new AsyncCallback<List<StatisticData>>() {
+		StatisticsService.Util.getInstance().getStatisticList(adapter, new AsyncCallback<List<StatisticData>>() {
 
-					public void onFailure(Throwable caught) {
-						logger.error("Error getting producer list", caught);
+			public void onFailure(Throwable caught) {
+				logger.error("Error getting producer list", caught);
+			}
+
+			public void onSuccess(List<StatisticData> result) {
+				if (result.size() > 0) {
+					String[] producerList = result.get(0).getValue().split(" ");
+					producers.clear();
+					for (String producer : producerList) {
+						producers.addItem(producer);
 					}
+					producers.setSelectedIndex(0);
 
-					public void onSuccess(List<StatisticData> result) {
-						if (result.size() > 0) {
-							String[] producerList = result.get(0).getValue()
-									.split(" ");
-							producers.clear();
-							for (String producer : producerList) {
-								producers.addItem(producer);
-							}
-							producers.setSelectedIndex(0);
+				} else {
+					producers.clear();
+				}
+				updateProducerInfo();
+			}
 
-						} else {
-							producers.clear();
-						}
-						updateProducerInfo();
-					}
-
-				});
+		});
 	}
 
 	/**
@@ -149,29 +148,26 @@ public class ProducersStatistics extends StatisticTab {
 		layout.add(value);
 
 		Filter filter = new Filter();
-		filter.add(new SimpleFilterParameter("type", "producer." + producer
-				+ ".submission.last"));
+		filter.add(new SimpleFilterParameter("type", "producer." + producer + ".submission.last"));
 		Sorter sorter = new Sorter();
 		sorter.add(new SortParameter("datetime", true));
 		Sublist sublist = new Sublist(0, 1);
 		ContentAdapter adapter = new ContentAdapter(filter, sorter, sublist);
-		StatisticsService.Util.getInstance().getStatisticList(adapter,
-				new AsyncCallback<List<StatisticData>>() {
+		StatisticsService.Util.getInstance().getStatisticList(adapter, new AsyncCallback<List<StatisticData>>() {
 
-					public void onFailure(Throwable caught) {
-						logger.error("Error getting producer last submission",
-								caught);
+			public void onFailure(Throwable caught) {
+				logger.error("Error getting producer last submission", caught);
 
-					}
+			}
 
-					public void onSuccess(List<StatisticData> result) {
-						if (result.size() > 0) {
-							value.setText(result.get(0).getValue());
-						}
+			public void onSuccess(List<StatisticData> result) {
+				if (result.size() > 0) {
+					value.setText(result.get(0).getValue());
+				}
 
-					}
+			}
 
-				});
+		});
 
 		layout.addStyleName("submission-last");
 		title.addStyleName("submission-last-title");
@@ -181,10 +177,9 @@ public class ProducersStatistics extends StatisticTab {
 	}
 
 	private Widget createSubmissionChart(String producer) {
-		return createStatisticPanel(constants
-				.producerSubmissionStateChartTitle(), constants
-				.producerSubmissionStateChartDesc(), "producer\\." + producer
-				+ "\\.submission\\.state\\..*", true, AGGREGATION_LAST);
+		return createStatisticPanel(constants.producerSubmissionStateChartTitle(),
+				constants.producerSubmissionStateChartDesc(), "producer\\." + producer + "\\.submission\\.state\\..*",
+				true, AGGREGATION_LAST);
 
 	}
 

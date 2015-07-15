@@ -2,7 +2,7 @@ package org.roda.legacy.aip.data;
 
 import java.io.Serializable;
 
-import org.roda.legacy.aip.metadata.RODAObject;
+import pt.gov.dgarq.roda.core.data.v2.RODAObject;
 
 /**
  * @author Rui Castro
