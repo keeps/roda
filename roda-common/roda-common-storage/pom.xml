@@ -113,6 +113,8 @@
 			</exclusions>
 		</dependency>
 
+
+
 		<!-- FEDORA TESTING GEAR -->
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -322,6 +324,11 @@
 		<dependency>
 			<groupId>pt.gov.dgarq.roda</groupId>
 			<artifactId>roda-common-data</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.saxon</groupId>
+			<artifactId>Saxon-HE</artifactId>
+			<version>9.6.0-6</version>
 		</dependency>
 	</dependencies>
 </project>

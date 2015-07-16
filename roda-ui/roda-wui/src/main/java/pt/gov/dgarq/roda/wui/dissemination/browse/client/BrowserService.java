@@ -15,6 +15,7 @@ import pt.gov.dgarq.roda.core.data.RepresentationPreservationObject;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
+import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 
 /**
@@ -67,6 +68,9 @@ public interface BrowserService extends RemoteService {
 	 * @throws RODAException
 	 */
 	public SimpleDescriptionObject[] getCollections(Filter filter, Sorter sorter, Sublist sublist) throws RODAException;
+
+	public IndexResult<SimpleDescriptionObject> findCollections(Filter filter, Sorter sorter, Sublist sublist)
+			throws RODAException;
 
 	/**
 	 * Get sub elements count

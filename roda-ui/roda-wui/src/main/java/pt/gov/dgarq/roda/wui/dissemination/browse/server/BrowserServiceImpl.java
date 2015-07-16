@@ -26,7 +26,6 @@ import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.roda.common.RodaConstants;
 import org.roda.index.IndexActionException;
-import org.roda.index.IndexResult;
 import org.roda.index.IndexService;
 import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
@@ -52,6 +51,7 @@ import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
+import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.core.stubs.Browser;
 import pt.gov.dgarq.roda.wui.common.client.GenericException;
@@ -167,8 +167,9 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 		Long count;
 		try {
 			count = index.countDescriptiveMetadata(addFondsRestrictions(filter));
+			logger.info(String.format("getCollectionsCount(%1$s)=%2$s", filter, count));
 		} catch (IndexActionException e) {
-			logger.debug("Error counting collections", e);
+			logger.error("Error counting collections", e);
 			throw new GenericException("Error counting collections " + e.getMessage());
 		}
 		return count.intValue();
@@ -179,6 +180,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 		IndexResult<SimpleDescriptionObject> sdos;
 		try {
 			sdos = index.findDescriptiveMetadata(addFondsRestrictions(filter), sorter, sublist);
+			logger.info(String.format("getCollections(%1$s,%2$s,%3$s)=%4$s", filter, sorter, sublist, sdos));
 		} catch (IndexActionException e) {
 			logger.debug("Error getting collections", e);
 			throw new GenericException("Error getting collections " + e.getMessage());
@@ -186,6 +188,20 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
 		// TODO change return type to index result
 		return sdos.getResults().toArray(new SimpleDescriptionObject[] {});
+	}
+
+	public IndexResult<SimpleDescriptionObject> findCollections(Filter filter, Sorter sorter, Sublist sublist)
+			throws RODAException {
+		IndexResult<SimpleDescriptionObject> sdos;
+		try {
+			sdos = index.findDescriptiveMetadata(addFondsRestrictions(filter), sorter, sublist);
+			logger.info(String.format("findCollections(%1$s,%2$s,%3$s)=%4$s", filter, sorter, sublist, sdos));
+		} catch (IndexActionException e) {
+			logger.debug("Error getting collections", e);
+			throw new GenericException("Error getting collections " + e.getMessage());
+		}
+
+		return sdos;
 	}
 
 	public Integer getSubElementsCount(String pid, Filter filter) throws RODAException {

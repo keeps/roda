@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,7 +38,6 @@ import org.apache.solr.handler.loader.XMLLoader;
 import org.roda.common.RodaConstants;
 import org.roda.common.RodaUtils;
 import org.roda.index.IndexActionException;
-import org.roda.index.IndexResult;
 import org.roda.model.AIP;
 import org.roda.model.DescriptiveMetadata;
 import org.roda.model.ModelService;
@@ -55,6 +55,7 @@ import pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
+import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.RODAObject;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 
@@ -87,8 +88,8 @@ public class SolrUtils {
 		return ret.toString();
 	}
 
-	public static <T> IndexResult<T> queryResponseToIndexResult(QueryResponse response, Class<T> responseClass)
-			throws IndexActionException {
+	public static <T extends Serializable> IndexResult<T> queryResponseToIndexResult(QueryResponse response,
+			Class<T> responseClass) throws IndexActionException {
 		final SolrDocumentList docList = response.getResults();
 		final long offset = docList.getStart();
 		final long limit = docList.size();
@@ -322,8 +323,8 @@ public class SolrUtils {
 		return ret;
 	}
 
-	public static <T> IndexResult<T> find(SolrClient index, Class<T> classToRetrieve, Filter filter, Sorter sorter,
-			Sublist sublist) throws IndexActionException {
+	public static <T extends Serializable> IndexResult<T> find(SolrClient index, Class<T> classToRetrieve,
+			Filter filter, Sorter sorter, Sublist sublist) throws IndexActionException {
 		IndexResult<T> ret;
 		SolrQuery query = new SolrQuery();
 		String queryString = parseFilter(filter);
@@ -340,7 +341,7 @@ public class SolrUtils {
 		return ret;
 	}
 
-	public static <T> Long count(SolrClient index, Class<T> classToRetrieve, Filter filter)
+	public static <T extends Serializable> Long count(SolrClient index, Class<T> classToRetrieve, Filter filter)
 			throws IndexActionException {
 		return find(index, classToRetrieve, filter, null, new Sublist(0, 0)).getTotalCount();
 	}
@@ -392,9 +393,8 @@ public class SolrUtils {
 		final String description = descriptions != null ? descriptions.get(0) : null;
 		final int subElementsCount = 0;
 
-		return new SimpleDescriptionObject(id, label, dateModified, dateCreated, state, level, title,
-				RodaUtils.dateToString(dateInitial), RodaUtils.dateToString(dateFinal), description, parentId,
-				subElementsCount);
+		return new SimpleDescriptionObject(id, label, dateModified, dateCreated, state, level, title, dateInitial,
+				dateFinal, description, parentId, subElementsCount);
 	}
 
 	public static SolrInputDocument aipToSolrInputDocumentAsSDO(AIP aip, ModelService model)

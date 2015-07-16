@@ -3,26 +3,12 @@
  */
 package pt.gov.dgarq.roda.wui.dissemination.browse.client;
 
-import pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException;
-import pt.gov.dgarq.roda.core.data.DescriptionObject;
-import pt.gov.dgarq.roda.wui.common.client.AuthenticatedUser;
-import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
-import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
-import pt.gov.dgarq.roda.wui.common.client.LoginStatusListener;
-import pt.gov.dgarq.roda.wui.common.client.UserLogin;
-import pt.gov.dgarq.roda.wui.common.client.tools.PIDTranslator;
-import pt.gov.dgarq.roda.wui.common.client.widgets.LoadingPopup;
-import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
-import pt.gov.dgarq.roda.wui.dissemination.browse.client.ViewPanel.ViewListener;
-import pt.gov.dgarq.roda.wui.dissemination.browse.client.images.BrowseImageBundle;
-import pt.gov.dgarq.roda.wui.dissemination.client.Dissemination;
-import pt.gov.dgarq.roda.wui.management.editor.client.EditorService;
-
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.DockPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.HorizontalSplitPanel;
@@ -34,6 +20,22 @@ import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.BrowseConstants;
 import config.i18n.client.BrowseMessages;
+import pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException;
+import pt.gov.dgarq.roda.core.data.DescriptionObject;
+import pt.gov.dgarq.roda.wui.common.client.AuthenticatedUser;
+import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
+import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
+import pt.gov.dgarq.roda.wui.common.client.LoginStatusListener;
+import pt.gov.dgarq.roda.wui.common.client.UserLogin;
+import pt.gov.dgarq.roda.wui.common.client.tools.PIDTranslator;
+import pt.gov.dgarq.roda.wui.common.client.widgets.AsyncDataGrid;
+import pt.gov.dgarq.roda.wui.common.client.widgets.CollectionsDataGrid;
+import pt.gov.dgarq.roda.wui.common.client.widgets.LoadingPopup;
+import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
+import pt.gov.dgarq.roda.wui.dissemination.browse.client.ViewPanel.ViewListener;
+import pt.gov.dgarq.roda.wui.dissemination.browse.client.images.BrowseImageBundle;
+import pt.gov.dgarq.roda.wui.dissemination.client.Dissemination;
+import pt.gov.dgarq.roda.wui.management.editor.client.EditorService;
 
 /**
  * @author Luis Faria
@@ -55,20 +57,18 @@ public class Browse extends DockPanel implements HistoryResolver {
 		return instance;
 	}
 
-	private static BrowseConstants constants = (BrowseConstants) GWT
-			.create(BrowseConstants.class);
+	private static BrowseConstants constants = (BrowseConstants) GWT.create(BrowseConstants.class);
 
-	private static BrowseMessages messages = (BrowseMessages) GWT
-			.create(BrowseMessages.class);
+	private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
 
-	private static BrowseImageBundle browseImageBundle = (BrowseImageBundle) GWT
-			.create(BrowseImageBundle.class);
+	private static BrowseImageBundle browseImageBundle = (BrowseImageBundle) GWT.create(BrowseImageBundle.class);
 
 	private ClientLogger logger = new ClientLogger(getClass().getName());
 
 	private HorizontalSplitPanel split;
 
-	private CollectionsTreeVerticalScrollPanel fondsPanel;
+	// private CollectionsTreeVerticalScrollPanel fondsPanel;
+	private AsyncDataGrid<pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject> fondsPanel2;
 
 	private SimplePanel viewPanelContainer;
 
@@ -100,76 +100,68 @@ public class Browse extends DockPanel implements HistoryResolver {
 
 			browserHeader = new HorizontalPanel();
 
-			Image viewPanelToggleImage = browseImageBundle.browseViewPanel()
-					.createImage();
-			Image viewWindowToggleImage = browseImageBundle.browseViewWindow()
-					.createImage();
+			Image viewPanelToggleImage = browseImageBundle.browseViewPanel().createImage();
+			Image viewWindowToggleImage = browseImageBundle.browseViewWindow().createImage();
 			viewPanelToggleImage.setTitle(constants.viewPanelToggleTitle());
 			viewWindowToggleImage.setTitle(constants.viewWindowToggleTitle());
 
-			viewToggle = new ToggleButton(viewPanelToggleImage,
-					viewWindowToggleImage, new ClickListener() {
+			viewToggle = new ToggleButton(viewPanelToggleImage, viewWindowToggleImage, new ClickHandler() {
 
-						public void onClick(Widget sender) {
-							updateStyle();
-						}
-
-					});
-
-			total = new Label();
-			createFonds = new WUIButton(constants.addFond(),
-					WUIButton.Left.ROUND, WUIButton.Right.PLUS);
-			refresh = browseImageBundle.refresh().createImage();
-			createFonds.addClickListener(new ClickListener() {
-
-				public void onClick(Widget sender) {
-					final LoadingPopup loading = new LoadingPopup(Browse.this);
-					loading.show();
-					EditorService.Util.getInstance().createCollection(
-							new AsyncCallback<String>() {
-
-								public void onFailure(Throwable caught) {
-									loading.hide();
-									logger
-											.error("Error creating fonds",
-													caught);
-								}
-
-								public void onSuccess(final String pid) {
-									loading.hide();
-									update(new AsyncCallback<CollectionsTreeItem>() {
-										public void onFailure(Throwable caught) {
-											logger.error("Error updating tree",
-													caught);
-										}
-
-										public void onSuccess(
-												CollectionsTreeItem treeItem) {
-											ViewPanel.setEditMode(true);
-											view(pid);
-										}
-
-									});
-								}
-
-							});
+				@Override
+				public void onClick(ClickEvent event) {
+					updateStyle();
 				}
 
 			});
-			refresh.addClickListener(new ClickListener() {
 
-				public void onClick(Widget sender) {
-					fondsPanel.clear(new AsyncCallback<Integer>() {
+			total = new Label();
+			createFonds = new WUIButton(constants.addFond(), WUIButton.Left.ROUND, WUIButton.Right.PLUS);
+			refresh = browseImageBundle.refresh().createImage();
+			createFonds.addClickHandler(new ClickHandler() {
+
+				public void onClick(ClickEvent event) {
+					final LoadingPopup loading = new LoadingPopup(Browse.this);
+					loading.show();
+					EditorService.Util.getInstance().createCollection(new AsyncCallback<String>() {
 
 						public void onFailure(Throwable caught) {
-							logger.error("Error refreshing browser", caught);
+							loading.hide();
+							logger.error("Error creating fonds", caught);
 						}
 
-						public void onSuccess(Integer result) {
-							// nothing to do
+						public void onSuccess(final String pid) {
+							loading.hide();
+							update(new AsyncCallback<CollectionsTreeItem>() {
+								public void onFailure(Throwable caught) {
+									logger.error("Error updating tree", caught);
+								}
+
+								public void onSuccess(CollectionsTreeItem treeItem) {
+									ViewPanel.setEditMode(true);
+									view(pid);
+								}
+
+							});
 						}
 
 					});
+				}
+
+			});
+			refresh.addClickHandler(new ClickHandler() {
+
+				public void onClick(ClickEvent event) {
+					// fondsPanel.clear(new AsyncCallback<Integer>() {
+					//
+					// public void onFailure(Throwable caught) {
+					// logger.error("Error refreshing browser", caught);
+					// }
+					//
+					// public void onSuccess(Integer result) {
+					// // nothing to do
+					// }
+					//
+					// });
 
 				}
 
@@ -184,14 +176,13 @@ public class Browse extends DockPanel implements HistoryResolver {
 			split = new HorizontalSplitPanel();
 			viewPanelContainer = new SimplePanel();
 			split.setRightWidget(viewPanelContainer);
-			add(split, CENTER);
+			// add(split, CENTER);
 
 			viewWindow = null;
 			viewPanel = null;
 
 			browserHeader.setCellWidth(viewToggle, "100%");
-			browserHeader.setCellHorizontalAlignment(viewToggle,
-					HorizontalPanel.ALIGN_RIGHT);
+			browserHeader.setCellHorizontalAlignment(viewToggle, HorizontalPanel.ALIGN_RIGHT);
 
 			this.addStyleName("wui-browse");
 			browserHeader.addStyleName("browse-header");
@@ -202,45 +193,46 @@ public class Browse extends DockPanel implements HistoryResolver {
 			viewPanelContainer.addStyleName("viewPanel-container");
 			viewToggle.addStyleName("view-toggle");
 
-			this.fondsPanel = new CollectionsTreeVerticalScrollPanel(true);
-			split.setLeftWidget(fondsPanel);
+			// this.fondsPanel = new CollectionsTreeVerticalScrollPanel(true);
+			this.fondsPanel2 = new CollectionsDataGrid();
+			this.fondsPanel2.setSize("100%", "600px");
+			// split.setLeftWidget(fondsPanel);
+			// split.setLeftWidget(fondsPanel2);
+			add(fondsPanel2, CENTER);
 			updateTotal();
 
-			fondsPanel.addClickListener(new ClickListener() {
-
-				public void onClick(Widget sender) {
-					CollectionsTreeItem selected = fondsPanel.getSelected();
-					Browse.getInstance().view(selected.getPid());
-				}
-
-			});
+			// fondsPanel.addClickListener(new ClickListener() {
+			//
+			// public void onClick(Widget sender) {
+			// CollectionsTreeItem selected = fondsPanel.getSelected();
+			// Browse.getInstance().view(selected.getPid());
+			// }
+			//
+			// });
 
 			split.setWidth("865px");
 			split.setHeight("460px");
 			updateStyle();
 
-			UserLogin.getInstance().getAuthenticatedUser(
-					new AsyncCallback<AuthenticatedUser>() {
+			UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<AuthenticatedUser>() {
 
-						public void onFailure(Throwable caught) {
-							logger.error("Error getting authenticated user",
-									caught);
-						}
+				public void onFailure(Throwable caught) {
+					logger.error("Error getting authenticated user", caught);
+				}
 
-						public void onSuccess(AuthenticatedUser user) {
-							onPermissionsUpdate(user);
+				public void onSuccess(AuthenticatedUser user) {
+					onPermissionsUpdate(user);
 
-						}
-					});
+				}
+			});
 
-			UserLogin.getInstance().addLoginStatusListener(
-					new LoginStatusListener() {
+			UserLogin.getInstance().addLoginStatusListener(new LoginStatusListener() {
 
-						public void onLoginStatusChanged(AuthenticatedUser user) {
-							onPermissionsUpdate(user);
-						}
+				public void onLoginStatusChanged(AuthenticatedUser user) {
+					onPermissionsUpdate(user);
+				}
 
-					});
+			});
 
 		}
 	}
@@ -249,22 +241,21 @@ public class Browse extends DockPanel implements HistoryResolver {
 	 * Update the total count of collections
 	 */
 	public void updateTotal() {
-		fondsPanel.getCount(new AsyncCallback<Integer>() {
-
-			public void onFailure(Throwable caught) {
-				logger.error("Error getting total number of collections",
-						caught);
-			}
-
-			public void onSuccess(Integer count) {
-				if (count == 0) {
-					total.setText(constants.repositoryEmpty());
-				} else {
-					total.setText(messages.totalFondsNumber(count));
-				}
-			}
-
-		});
+		// fondsPanel.getCount(new AsyncCallback<Integer>() {
+		//
+		// public void onFailure(Throwable caught) {
+		// logger.error("Error getting total number of collections", caught);
+		// }
+		//
+		// public void onSuccess(Integer count) {
+		// if (count == 0) {
+		// total.setText(constants.repositoryEmpty());
+		// } else {
+		// total.setText(messages.totalFondsNumber(count));
+		// }
+		// }
+		//
+		// });
 	}
 
 	protected void onPermissionsUpdate(AuthenticatedUser user) {
@@ -276,17 +267,17 @@ public class Browse extends DockPanel implements HistoryResolver {
 			refresh.setVisible(false);
 		}
 
-		fondsPanel.clear(new AsyncCallback<Integer>() {
-
-			public void onFailure(Throwable caught) {
-				logger.error("Error refreshing browser", caught);
-			}
-
-			public void onSuccess(Integer result) {
-				// nothing to do
-			}
-
-		});
+		// fondsPanel.clear(new AsyncCallback<Integer>() {
+		//
+		// public void onFailure(Throwable caught) {
+		// logger.error("Error refreshing browser", caught);
+		// }
+		//
+		// public void onSuccess(Integer result) {
+		// // nothing to do
+		// }
+		//
+		// });
 
 		updateTotal();
 	}
@@ -296,11 +287,11 @@ public class Browse extends DockPanel implements HistoryResolver {
 			if (viewPanel == null) {
 				split.addStyleDependentName("hidden");
 				split.setSplitPosition("865px");
-				fondsPanel.setShowInfo(true);
+				// fondsPanel.setShowInfo(true);
 			} else {
 				split.removeStyleDependentName("hidden");
 				split.setSplitPosition("210px");
-				fondsPanel.setShowInfo(false);
+				// fondsPanel.setShowInfo(false);
 			}
 		} else {
 			if (viewPanel != null) {
@@ -311,7 +302,7 @@ public class Browse extends DockPanel implements HistoryResolver {
 			}
 			split.addStyleDependentName("hidden");
 			split.setSplitPosition("865px");
-			fondsPanel.setShowInfo(true);
+			// fondsPanel.setShowInfo(true);
 		}
 	}
 
@@ -329,8 +320,7 @@ public class Browse extends DockPanel implements HistoryResolver {
 			updateStyle();
 			callback.onSuccess(this);
 		} else if (historyTokens.length == 1) {
-			fondsPanel.setSelected(PIDTranslator
-					.untranslatePID(historyTokens[0]));
+			// fondsPanel.setSelected(PIDTranslator.untranslatePID(historyTokens[0]));
 			viewAction(PIDTranslator.untranslatePID(historyTokens[0]));
 			callback.onSuccess(this);
 		} else {
@@ -344,8 +334,7 @@ public class Browse extends DockPanel implements HistoryResolver {
 	}
 
 	public String getHistoryPath() {
-		return Dissemination.getInstance().getHistoryPath() + "."
-				+ getHistoryToken();
+		return Dissemination.getInstance().getHistoryPath() + "." + getHistoryToken();
 	}
 
 	private void viewAction(final String pid) {
@@ -357,23 +346,21 @@ public class Browse extends DockPanel implements HistoryResolver {
 			}
 
 			if (viewWindow == null || !viewWindow.getPID().equals(pid)) {
-				viewWindow = new ViewWindow(pid,
-						new AsyncCallback<DescriptionObject>() {
+				viewWindow = new ViewWindow(pid, new AsyncCallback<DescriptionObject>() {
 
-							public void onFailure(Throwable caught) {
-								if (caught instanceof NoSuchRODAObjectException) {
-									onNoSuchObject(pid);
-								} else {
-									logger.error("Error creating view window",
-											caught);
-								}
-							}
+					public void onFailure(Throwable caught) {
+						if (caught instanceof NoSuchRODAObjectException) {
+							onNoSuchObject(pid);
+						} else {
+							logger.error("Error creating view window", caught);
+						}
+					}
 
-							public void onSuccess(DescriptionObject obj) {
-								viewWindow.show();
-							}
+					public void onSuccess(DescriptionObject obj) {
+						viewWindow.show();
+					}
 
-						});
+				});
 				viewWindow.addViewListener(createViewListener(pid));
 			}
 
@@ -384,25 +371,23 @@ public class Browse extends DockPanel implements HistoryResolver {
 
 			if (viewPanel == null || !viewPanel.getPID().equals(pid)) {
 				logger.debug("Opening viewPanel with " + pid);
-				viewPanel = new ViewPanel(pid,
-						new AsyncCallback<DescriptionObject>() {
+				viewPanel = new ViewPanel(pid, new AsyncCallback<DescriptionObject>() {
 
-							public void onFailure(Throwable caught) {
-								if (caught instanceof NoSuchRODAObjectException) {
-									onNoSuchObject(pid);
-								} else {
-									logger.error("Error creating view window",
-											caught);
-								}
+					public void onFailure(Throwable caught) {
+						if (caught instanceof NoSuchRODAObjectException) {
+							onNoSuchObject(pid);
+						} else {
+							logger.error("Error creating view window", caught);
+						}
 
-							}
+					}
 
-							public void onSuccess(DescriptionObject obj) {
-								updateStyle();
-								viewPanelContainer.setWidget(viewPanel);
-							}
+					public void onSuccess(DescriptionObject obj) {
+						updateStyle();
+						viewPanelContainer.setWidget(viewPanel);
+					}
 
-						});
+				});
 
 				viewPanel.addViewListener(createViewListener(pid));
 
@@ -414,8 +399,7 @@ public class Browse extends DockPanel implements HistoryResolver {
 		update(pid, true, true, new AsyncCallback<CollectionsTreeItem>() {
 
 			public void onFailure(Throwable caught) {
-				logger.error("Error creating updating tree"
-						+ " after RODA object not found", caught);
+				logger.error("Error creating updating tree" + " after RODA object not found", caught);
 			}
 
 			public void onSuccess(CollectionsTreeItem treeItem) {
@@ -478,9 +462,8 @@ public class Browse extends DockPanel implements HistoryResolver {
 	 * @param callback
 	 *            interface to handle the finish of the refresh
 	 */
-	public void update(String pid, boolean info, boolean hierarchy,
-			AsyncCallback<CollectionsTreeItem> callback) {
-		fondsPanel.update(pid, info, hierarchy, callback);
+	public void update(String pid, boolean info, boolean hierarchy, AsyncCallback<CollectionsTreeItem> callback) {
+		// fondsPanel.update(pid, info, hierarchy, callback);
 		if (pid == null) {
 			updateTotal();
 		}
@@ -506,27 +489,25 @@ public class Browse extends DockPanel implements HistoryResolver {
 			}
 
 			public void onCreateChild(String thisPid, final String childPid) {
-				update(thisPid, false, true,
-						new AsyncCallback<CollectionsTreeItem>() {
+				update(thisPid, false, true, new AsyncCallback<CollectionsTreeItem>() {
 
-							public void onFailure(Throwable caught) {
-								logger.error("Error updating tree", caught);
-							}
+					public void onFailure(Throwable caught) {
+						logger.error("Error updating tree", caught);
+					}
 
-							public void onSuccess(CollectionsTreeItem treeItem) {
-								view(childPid);
-								ViewPanel.setEditMode(true);
-							}
+					public void onSuccess(CollectionsTreeItem treeItem) {
+						view(childPid);
+						ViewPanel.setEditMode(true);
+					}
 
-						});
+				});
 			}
 
 			public void onEdit(String thisPid) {
 				// nothing to do
 			}
 
-			public void onMove(String thisPid, String oldParentPid,
-					String newParentPid) {
+			public void onMove(String thisPid, String oldParentPid, String newParentPid) {
 				Browse.this.onMove(thisPid, oldParentPid, newParentPid);
 			}
 
@@ -541,80 +522,70 @@ public class Browse extends DockPanel implements HistoryResolver {
 		};
 	}
 
-	protected void onMove(final String targetPid, final String oldParentPid,
-			final String newParentPid) {
+	protected void onMove(final String targetPid, final String oldParentPid, final String newParentPid) {
 
-		update(oldParentPid, false, true,
-				new AsyncCallback<CollectionsTreeItem>() {
+		update(oldParentPid, false, true, new AsyncCallback<CollectionsTreeItem>() {
+
+			public void onFailure(Throwable caught) {
+				logger.error("Error on move event", caught);
+			}
+
+			public void onSuccess(CollectionsTreeItem treeItem) {
+				update(newParentPid, false, true, new AsyncCallback<CollectionsTreeItem>() {
 
 					public void onFailure(Throwable caught) {
 						logger.error("Error on move event", caught);
 					}
 
-					public void onSuccess(CollectionsTreeItem treeItem) {
-						update(newParentPid, false, true,
-								new AsyncCallback<CollectionsTreeItem>() {
-
-									public void onFailure(Throwable caught) {
-										logger.error("Error on move event",
-												caught);
-									}
-
-									public void onSuccess(
-											CollectionsTreeItem result) {
-										fondsPanel.setSelected(null);
-										fondsPanel.setSelected(targetPid);
-									}
-
-								});
-
+					public void onSuccess(CollectionsTreeItem result) {
+						// fondsPanel.setSelected(null);
+						// fondsPanel.setSelected(targetPid);
 					}
 
 				});
+
+			}
+
+		});
 	}
 
 	protected void onClone(final String clonePID) {
-		BrowserService.Util.getInstance().getParent(clonePID,
-				new AsyncCallback<String>() {
+		BrowserService.Util.getInstance().getParent(clonePID, new AsyncCallback<String>() {
+
+			public void onFailure(Throwable caught) {
+				logger.error("Error on cloning event", caught);
+			}
+
+			public void onSuccess(final String parentPID) {
+				update(parentPID, false, true, new AsyncCallback<CollectionsTreeItem>() {
 
 					public void onFailure(Throwable caught) {
 						logger.error("Error on cloning event", caught);
 					}
 
-					public void onSuccess(final String parentPID) {
-						update(parentPID, false, true,
-								new AsyncCallback<CollectionsTreeItem>() {
+					public void onSuccess(CollectionsTreeItem treeItem) {
+						ViewPanel.setEditMode(true);
+						view(clonePID);
 
-									public void onFailure(Throwable caught) {
-										logger.error("Error on cloning event",
-												caught);
-									}
-
-									public void onSuccess(
-											CollectionsTreeItem treeItem) {
-										ViewPanel.setEditMode(true);
-										view(clonePID);
-
-									}
-
-								});
 					}
 
 				});
+			}
+
+		});
 	}
 
 	protected void onRemove(final String parentPID) {
-		update(parentPID, false, true,
-				new AsyncCallback<CollectionsTreeItem>() {
+		update(parentPID, false, true, new AsyncCallback<CollectionsTreeItem>() {
 
-					public void onFailure(Throwable caught) {
-						logger.error("Error on remove event", caught);
-					}
+			public void onFailure(Throwable caught) {
+				logger.error("Error on remove event", caught);
+			}
 
-					public void onSuccess(CollectionsTreeItem treeItem) {
-						view(null);
-					}
+			public void onSuccess(CollectionsTreeItem treeItem) {
+				view(null);
+			}
 
-				});
+		});
 	}
 }

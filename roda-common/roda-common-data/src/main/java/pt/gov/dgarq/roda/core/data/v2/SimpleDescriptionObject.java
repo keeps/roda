@@ -21,8 +21,8 @@ public class SimpleDescriptionObject extends RODAObject {
 
 	private String level = null;
 	private String title = null;
-	private String dateInitial = null;
-	private String dateFinal = null;
+	private Date dateInitial = null;
+	private Date dateFinal = null;
 
 	private String description = null;
 
@@ -77,7 +77,7 @@ public class SimpleDescriptionObject extends RODAObject {
 	 * @param subElementsCount
 	 */
 	public SimpleDescriptionObject(String id, String label, Date lastModifiedDate, Date createdDate, String state,
-			String level, String title, String dateInitial, String dateFinal, String description, String parentID,
+			String level, String title, Date dateInitial, Date dateFinal, String description, String parentID,
 			int subElementsCount) {
 
 		super(id, label, lastModifiedDate, createdDate, state);
@@ -177,14 +177,14 @@ public class SimpleDescriptionObject extends RODAObject {
 	 * @return a {@link String} with the initial date or <code>null</code> if it
 	 *         doesn't exist.
 	 */
-	public String getDateInitial() {
+	public Date getDateInitial() {
 		return dateInitial;
 	}
 
 	/**
 	 * @param dateInitial
 	 */
-	public void setDateInitial(String dateInitial) {
+	public void setDateInitial(Date dateInitial) {
 		this.dateInitial = dateInitial;
 	}
 
@@ -194,14 +194,14 @@ public class SimpleDescriptionObject extends RODAObject {
 	 * @return a {@link String} with the final date or <code>null</code> if it
 	 *         doesn't exist.
 	 */
-	public String getDateFinal() {
+	public Date getDateFinal() {
 		return dateFinal;
 	}
 
 	/**
 	 * @param dateFinal
 	 */
-	public void setDateFinal(String dateFinal) {
+	public void setDateFinal(Date dateFinal) {
 		this.dateFinal = dateFinal;
 	}
 

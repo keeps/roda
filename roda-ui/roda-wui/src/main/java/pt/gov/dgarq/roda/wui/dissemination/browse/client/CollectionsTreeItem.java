@@ -488,49 +488,48 @@ public class CollectionsTreeItem extends TreeItem {
 			initialising = true;
 		}
 		// TODO fix this
-//		BrowserService.Util.getInstance().getItemIndex(sdo.getId(), pid, getFilter(), getSorter(),
-//				new AsyncCallback<Integer>() {
-//
-//					public void onFailure(Throwable caught) {
-//						initialising = false;
-//						callback.onFailure(caught);
-//					}
-//
-//					public void onSuccess(Integer itemIndex) {
-//						final int index = itemIndex.intValue();
-//						if (index >= 0) {
-//
-//							final int newOffset = (index / childrenVisibleCount) * childrenVisibleCount;
-//							load(newOffset, new AsyncCallback<Integer>() {
-//
-//								public void onFailure(Throwable caught) {
-//									initialising = false;
-//									callback.onFailure(caught);
-//								}
-//
-//								public void onSuccess(Integer offset) {
-//									initialized = true;
-//									initialising = false;
-//									CollectionsTreeItem.this.setState(true);
-//									CollectionsTreeItem focusItem = (CollectionsTreeItem) getChild(
-//											index - currentOffset + 1);
-//									if (focusItem != null) {
-//										callback.onSuccess(focusItem);
-//									} else {
-//										callback.onFailure(
-//												new IndexOutOfBoundsException("Get child " + (index - currentOffset + 1)
-//														+ " when child count is " + getChildCount()));
-//									}
-//								}
-//
-//							});
-//						} else {
-//							initialising = false;
-//							callback.onFailure(new NoSuchElementException(
-//									"Index of " + pid + " under " + sdo.getId() + " not found!"));
-//						}
-//					}
-//				});
+		// BrowserService.Util.getInstance().getItemIndex(sdo.getId(), pid,
+		// getFilter(), getSorter(),
+		// new AsyncCallback<Integer>() {
+		//
+		// public void onFailure(Throwable caught) {
+		// initialising = false;
+		// callback.onFailure(caught);
+		// }
+		//
+		// public void onSuccess(Integer itemIndex) {
+		// final int index = itemIndex.intValue();
+		final int index = 0;
+		if (index >= 0) {
+
+			final int newOffset = (index / childrenVisibleCount) * childrenVisibleCount;
+			load(newOffset, new AsyncCallback<Integer>() {
+
+				public void onFailure(Throwable caught) {
+					initialising = false;
+					callback.onFailure(caught);
+				}
+
+				public void onSuccess(Integer offset) {
+					initialized = true;
+					initialising = false;
+					CollectionsTreeItem.this.setState(true);
+					CollectionsTreeItem focusItem = (CollectionsTreeItem) getChild(index - currentOffset + 1);
+					if (focusItem != null) {
+						callback.onSuccess(focusItem);
+					} else {
+						callback.onFailure(new IndexOutOfBoundsException("Get child " + (index - currentOffset + 1)
+								+ " when child count is " + getChildCount()));
+					}
+				}
+
+			});
+		} else {
+			initialising = false;
+			callback.onFailure(new NoSuchElementException("Index of " + pid + " under " + sdo.getId() + " not found!"));
+		}
+		// }
+		// });
 
 	}
 
@@ -568,7 +567,8 @@ public class CollectionsTreeItem extends TreeItem {
 			// }
 			//
 			// public void onSuccess(Integer itemIndex) {
-			// update(path[0], itemIndex, info, hierarchy, callback);
+			int itemIndex = 0;
+			update(path[0], itemIndex, info, hierarchy, callback);
 			// }
 			//
 			// });

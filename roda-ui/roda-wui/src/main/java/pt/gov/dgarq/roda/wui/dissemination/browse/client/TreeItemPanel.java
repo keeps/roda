@@ -130,8 +130,8 @@ public class TreeItemPanel extends FocusPanel implements SourcesSliderEvents {
 				title = new Label();
 				String normalizedTitle = StringUtility.normalizeSpaces(sdo.getTitle());
 				title.setText(normalizedTitle == null ? constants.noTitle() : normalizedTitle);
-				startDate = new Label(sdo.getDateInitial() == null ? constants.noDate() : sdo.getDateInitial());
-				endDate = new Label(sdo.getDateFinal() == null ? constants.noDate() : sdo.getDateFinal());
+				startDate = new Label(sdo.getDateInitial() == null ? constants.noDate() : sdo.getDateInitial().toString());
+				endDate = new Label(sdo.getDateFinal() == null ? constants.noDate() : sdo.getDateFinal().toString());
 
 				title.addStyleName("treeitem-info-title");
 				startDate.addStyleName("treeitem-info-data");

@@ -8,6 +8,7 @@ import java.util.List;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
+
 import org.roda.legacy.exception.RODAException;
 import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
 
@@ -16,6 +17,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import pt.gov.dgarq.roda.core.data.DescriptionObject;
 import pt.gov.dgarq.roda.core.data.RODAObject;
 import pt.gov.dgarq.roda.core.data.RepresentationPreservationObject;
+import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 
 /**
@@ -213,5 +215,8 @@ public interface BrowserServiceAsync {
 	 */
 	public void getPreservationTimeline(List<String> repPIDs, List<String> icons, List<String> colors, String locale,
 			AsyncCallback<TimelineInfo> callback);
+
+	void findCollections(Filter filter, Sorter sorter, Sublist sublist,
+			AsyncCallback<IndexResult<SimpleDescriptionObject>> callback);
 
 }

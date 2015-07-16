@@ -42,7 +42,12 @@
 	</logger>
 
 	<logger name="pt.gov.dgarq.roda" additivity="false">
-		<level value="INFO" />
+		<level value="DEBUG" />
+		<appender-ref ref="FILEOUT" />
+	</logger>
+	
+	<logger name="org.roda" additivity="false">
+		<level value="DEBUG" />
 		<appender-ref ref="FILEOUT" />
 	</logger>
 	

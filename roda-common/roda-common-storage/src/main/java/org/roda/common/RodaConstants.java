@@ -89,8 +89,8 @@ public final class RodaConstants {
 	 */
 	public static final String SDO_LEVEL = "level";
 	public static final String SDO_TITLE = "title";
-	public static final String SDO_DATE_INITIAL = "initialDate";
-	public static final String SDO_DATE_FINAL = "finalDate";
+	public static final String SDO_DATE_INITIAL = "dateInitial";
+	public static final String SDO_DATE_FINAL = "dateFinal";
 	public static final String SDO_CHILDREN_COUNT = "childrenCount";
 	public static final String SDO_DESCRIPTION = "description";
 	public static final String SDO_STATE = "state";

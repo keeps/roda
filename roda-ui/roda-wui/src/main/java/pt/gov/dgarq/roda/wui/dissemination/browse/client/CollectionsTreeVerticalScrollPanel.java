@@ -212,25 +212,24 @@ public class CollectionsTreeVerticalScrollPanel extends ElementVerticalScrollPan
 		//
 		// public void onSuccess(final Integer index) {
 		// logger.debug("tree at index " + index);
-		// if (index >= 0) {
-		// getScroll().ensureLoaded(index, getBlockSize(), new
-		// AsyncCallback<Integer>() {
-		//
-		// public void onFailure(Throwable caught) {
-		// callback.onFailure(caught);
-		// }
-		//
-		// public void onSuccess(Integer result) {
-		// CollectionsTree tree = (CollectionsTree) trees
-		// .get(index - getScroll().getWindowOffset());
-		// // getScroll().ensureVisible(tree);
-		// callback.onSuccess(tree);
-		// }
-		//
-		// });
-		// } else {
-		// logger.error("Index of collection " + collectionPID + " not found!");
-		// }
+		final int index = 0;
+		if (index >= 0) {
+			getScroll().ensureLoaded(index, getBlockSize(), new AsyncCallback<Integer>() {
+
+				public void onFailure(Throwable caught) {
+					callback.onFailure(caught);
+				}
+
+				public void onSuccess(Integer result) {
+					CollectionsTree tree = (CollectionsTree) trees.get(index - getScroll().getWindowOffset());
+					// getScroll().ensureVisible(tree);
+					callback.onSuccess(tree);
+				}
+
+			});
+		} else {
+			logger.error("Index of collection " + collectionPID + " not found!");
+		}
 		//
 		// }
 		//

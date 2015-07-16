@@ -10,6 +10,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -22,6 +23,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.roda.CorporaConstants;
 import org.roda.common.RodaConstants;
+import org.roda.common.RodaUtils;
 import org.roda.model.AIP;
 import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
@@ -39,6 +41,7 @@ import org.slf4j.LoggerFactory;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
+import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.RODAObject;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 
@@ -96,7 +99,8 @@ public class IndexServiceTest {
 	}
 
 	@Test
-	public void testAIPIndexCreateDelete() throws ModelServiceException, StorageActionException, IndexActionException {
+	public void testAIPIndexCreateDelete()
+			throws ModelServiceException, StorageActionException, IndexActionException, ParseException {
 		// generate AIP ID
 		final String aipId = UUID.randomUUID().toString();
 
@@ -143,8 +147,8 @@ public class IndexServiceTest {
 		assertEquals("fonds", sdo.getLevel());
 		assertEquals("My example", sdo.getTitle());
 		assertEquals("This is a very nice example", sdo.getDescription());
-		// assertEquals("0001-01-01", sdo.getDateInitial());
-		// assertEquals("0002-01-01", sdo.getDateFinal());
+		assertEquals(RodaUtils.parseDate("0001-01-01T00:00:00.000+0000"), sdo.getDateInitial());
+		assertEquals(RodaUtils.parseDate("0002-01-01T00:00:00.000+0000"), sdo.getDateFinal());
 
 		// Retrieve, count and list SRO
 		String rep1Id = aip.getRepresentationIds().get(0);

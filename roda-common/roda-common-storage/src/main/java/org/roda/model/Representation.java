@@ -1,22 +1,65 @@
 package org.roda.model;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-public class Representation {
+public class Representation implements Serializable {
 
-	private final String id;
-	private final String aipId;
-	private final boolean active;
-	private final Date dateCreated;
-	private final Date dateModified;
-	private final Set<RepresentationState> statuses;
-	private final String type;
-	private final List<String> fileIds;
+	private static final long serialVersionUID = 3658011895150894795L;
 
-	public Representation(String id, String aipId, boolean active,
-			Date dateCreated, Date dateModified,
+	private String id;
+	private String aipId;
+	private boolean active;
+	private Date dateCreated;
+	private Date dateModified;
+	private Set<RepresentationState> statuses;
+	private String type;
+	private List<String> fileIds;
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public void setAipId(String aipId) {
+		this.aipId = aipId;
+	}
+
+	public void setActive(boolean active) {
+		this.active = active;
+	}
+
+	public void setDateCreated(Date dateCreated) {
+		this.dateCreated = dateCreated;
+	}
+
+	public void setDateModified(Date dateModified) {
+		this.dateModified = dateModified;
+	}
+
+	public void setStatuses(Set<RepresentationState> statuses) {
+		this.statuses = statuses;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public void setFileIds(List<String> fileIds) {
+		this.fileIds = fileIds;
+	}
+
+	public Representation() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	public Representation(String id, String aipId, boolean active, Date dateCreated, Date dateModified,
 			Set<RepresentationState> statuses, String type, List<String> fileIds) {
 		super();
 		this.id = id;
@@ -87,10 +130,9 @@ public class Representation {
 
 	@Override
 	public String toString() {
-		return "Representation [id=" + id + ", aipId=" + aipId + ", active="
-				+ active + ", dateCreated=" + dateCreated + ", dateModified="
-				+ dateModified + ", statuses=" + statuses + ", type=" + type
-				+ ", fileIds=" + fileIds + "]";
+		return "Representation [id=" + id + ", aipId=" + aipId + ", active=" + active + ", dateCreated=" + dateCreated
+				+ ", dateModified=" + dateModified + ", statuses=" + statuses + ", type=" + type + ", fileIds="
+				+ fileIds + "]";
 	}
 
 	@Override
@@ -99,14 +141,11 @@ public class Representation {
 		int result = 1;
 		result = prime * result + (active ? 1231 : 1237);
 		result = prime * result + ((aipId == null) ? 0 : aipId.hashCode());
-		result = prime * result
-				+ ((dateCreated == null) ? 0 : dateCreated.hashCode());
-		result = prime * result
-				+ ((dateModified == null) ? 0 : dateModified.hashCode());
+		result = prime * result + ((dateCreated == null) ? 0 : dateCreated.hashCode());
+		result = prime * result + ((dateModified == null) ? 0 : dateModified.hashCode());
 		result = prime * result + ((fileIds == null) ? 0 : fileIds.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result
-				+ ((statuses == null) ? 0 : statuses.hashCode());
+		result = prime * result + ((statuses == null) ? 0 : statuses.hashCode());
 		result = prime * result + ((type == null) ? 0 : type.hashCode());
 		return result;
 	}
