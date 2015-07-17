@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+	xmlns:i="urn:import:config.i18n.client" xmlns:m="urn:import:pt.gov.dgarq.roda.wui.main.client"
+	xmlns:common="urn:import:pt.gov.dgarq.roda.wui.common.client.widgets">
+
+	<ui:style>
+	
+	</ui:style>
+
+	<g:FlowPanel styleName="browse">
+		<common:CollectionsDataGrid ui:field="fondsPanel" />
+	</g:FlowPanel>
+</ui:UiBinder>

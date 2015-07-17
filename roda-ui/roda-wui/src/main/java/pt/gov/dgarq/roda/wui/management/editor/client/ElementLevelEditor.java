@@ -6,17 +6,17 @@ package pt.gov.dgarq.roda.wui.management.editor.client;
 import java.util.List;
 import java.util.Vector;
 
-import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevel;
-import pt.gov.dgarq.roda.core.data.eadc.EadCValue;
-import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
-import pt.gov.dgarq.roda.wui.dissemination.client.Dissemination;
-import pt.gov.dgarq.roda.wui.main.client.Main;
-
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
+
+import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevel;
+import pt.gov.dgarq.roda.core.data.eadc.EadCValue;
+import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
+import pt.gov.dgarq.roda.wui.common.client.tools.DescriptionLevelUtils;
+import pt.gov.dgarq.roda.wui.dissemination.client.Dissemination;
 
 /**
  * @author Luis Faria
@@ -38,23 +38,20 @@ public class ElementLevelEditor implements MetadataElementEditor {
 		waitingForInitialization = new Vector<Command>();
 
 		if (pid == null) {
-			init(Main.REPRESENTATION_DESCRIPTION_LEVELS
-					.toArray(new DescriptionLevel[Main.REPRESENTATION_DESCRIPTION_LEVELS
-							.size()]));
+			init(DescriptionLevelUtils.REPRESENTATION_DESCRIPTION_LEVELS
+					.toArray(new DescriptionLevel[DescriptionLevelUtils.REPRESENTATION_DESCRIPTION_LEVELS.size()]));
 		} else {
-			EditorService.Util.getInstance().getPossibleLevels(pid,
-					new AsyncCallback<DescriptionLevel[]>() {
+			EditorService.Util.getInstance().getPossibleLevels(pid, new AsyncCallback<DescriptionLevel[]>() {
 
-						public void onFailure(Throwable caught) {
-							logger.error("Error getting possible levels for "
-									+ pid, caught);
-						}
+				public void onFailure(Throwable caught) {
+					logger.error("Error getting possible levels for " + pid, caught);
+				}
 
-						public void onSuccess(DescriptionLevel[] possibleLevels) {
-							init(possibleLevels);
-						}
+				public void onSuccess(DescriptionLevel[] possibleLevels) {
+					init(possibleLevels);
+				}
 
-					});
+			});
 		}
 
 		layout.addStyleName("wui-editor-level");
@@ -63,8 +60,7 @@ public class ElementLevelEditor implements MetadataElementEditor {
 	private void init(DescriptionLevel[] possibleLevels) {
 
 		for (int i = 0; i < possibleLevels.length; i++) {
-			layout.addItem(Dissemination.getInstance()
-					.getElementLevelTranslation(possibleLevels[i]),
+			layout.addItem(Dissemination.getInstance().getElementLevelTranslation(possibleLevels[i]),
 					possibleLevels[i].getLevel());
 		}
 		initialized = true;
@@ -139,8 +135,7 @@ public class ElementLevelEditor implements MetadataElementEditor {
 			}
 		}
 		if (!foundit) {
-			logger.error("Tryed to set level to a illegal value: '" + level
-					+ "'");
+			logger.error("Tryed to set level to a illegal value: '" + level + "'");
 		}
 	}
 

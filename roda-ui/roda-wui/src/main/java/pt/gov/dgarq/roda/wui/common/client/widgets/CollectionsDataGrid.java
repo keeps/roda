@@ -4,24 +4,24 @@ import java.util.Date;
 
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.ImageCell;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.view.client.ProvidesKey;
 
-import config.i18n.client.CommonConstants;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
-import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevelInfo;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
+import pt.gov.dgarq.roda.wui.common.client.tools.DescriptionLevelUtils;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.BrowserService;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.CollectionsTreeVerticalScrollPanel;
-import pt.gov.dgarq.roda.wui.main.client.Main;
 
 public class CollectionsDataGrid extends AsyncDataGrid<SimpleDescriptionObject> {
+
+	private static final int PAGE_SIZE = 25;
 
 	public CollectionsDataGrid() {
 		super();
@@ -30,8 +30,7 @@ public class CollectionsDataGrid extends AsyncDataGrid<SimpleDescriptionObject> 
 				new ImageCell()) {
 			@Override
 			public String getValue(SimpleDescriptionObject sdo) {
-				// return resources.getImageResource();
-				return getElementLevelIcon(sdo.getLevel());
+				return DescriptionLevelUtils.getElementLevelIconPath(sdo.getLevel());
 			}
 		};
 
@@ -64,25 +63,9 @@ public class CollectionsDataGrid extends AsyncDataGrid<SimpleDescriptionObject> 
 		getDisplay().addColumn(dateInitialColumn, "Date initial");
 		getDisplay().addColumn(dateFinalColumn, "Date final");
 		getDisplay().setColumnWidth(levelColumn, "35px");
+		getDisplay().setAutoHeaderRefreshDisabled(true);
+		getDisplay().setEmptyTableWidget(new Label("Table is empty"));
 
-	}
-
-	/**
-	 * Get description level icon
-	 * 
-	 * @param level
-	 * @return the icon message
-	 */
-	public String getElementLevelIcon(String level) {
-		String ret;
-		final DescriptionLevelInfo levelInfo = Main.getDescriptionLevel(level);
-		if (levelInfo != null) {
-			ret = GWT.getModuleBaseURL() + "description_levels/" + levelInfo.getCategory().getCategory() + ".png";
-
-		} else {
-			ret = GWT.getModuleBaseURL() + "description_levels/default.png";
-		}
-		return ret;
 	}
 
 	@Override
@@ -102,6 +85,11 @@ public class CollectionsDataGrid extends AsyncDataGrid<SimpleDescriptionObject> 
 				return item.getId();
 			}
 		};
+	}
+
+	@Override
+	protected int getPageSize() {
+		return PAGE_SIZE;
 	}
 
 }

@@ -34,16 +34,15 @@ import pt.gov.dgarq.roda.core.common.InvalidDescriptionLevel;
 import pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException;
 import pt.gov.dgarq.roda.core.data.DescriptionObject;
 import pt.gov.dgarq.roda.core.data.RODAObjectUserPermissions;
-import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevel;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.wui.common.client.AuthenticatedUser;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.LoginStatusListener;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
+import pt.gov.dgarq.roda.wui.common.client.tools.DescriptionLevelUtils;
 import pt.gov.dgarq.roda.wui.common.client.widgets.LoadingPopup;
 import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
 import pt.gov.dgarq.roda.wui.dissemination.client.DescriptiveMetadataPanel;
-import pt.gov.dgarq.roda.wui.main.client.Main;
 import pt.gov.dgarq.roda.wui.management.editor.client.EditObjectPermissionsPanel;
 import pt.gov.dgarq.roda.wui.management.editor.client.EditProducersPanel;
 import pt.gov.dgarq.roda.wui.management.editor.client.EditorService;
@@ -471,7 +470,7 @@ public class ViewPanel extends Composite {
 		descriptiveMetadataLayout.add(optionalFieldsToggle);
 		descriptiveMetadataLayout.add(descriptiveMetadata);
 
-		if (Main.REPRESENTATION_DESCRIPTION_LEVELS.contains(obj.getLevel())) {
+		if (DescriptionLevelUtils.REPRESENTATION_DESCRIPTION_LEVELS.contains(obj.getLevel())) {
 			disseminations = new RepresentationsPanel(obj);
 			preservationMetadata = new PreservationMetadataPanel(obj);
 		}
@@ -575,7 +574,7 @@ public class ViewPanel extends Composite {
 	private void updateTabs() {
 		tabs.clear();
 
-		if (Main.ROOT_DESCRIPTION_LEVELS.contains(sdo.getLevel())) {
+		if (DescriptionLevelUtils.ROOT_DESCRIPTION_LEVELS.contains(sdo.getLevel())) {
 			if (grantObjectPermission && modifyGlobalPermission && listUsersGlobalPermission) {
 				// Description
 				tabs.add(descriptiveMetadataScroll, constants.descriptiveMetadata());
@@ -612,7 +611,7 @@ public class ViewPanel extends Composite {
 				objPermissionsTabIndex = -1;
 			}
 
-		} else if (!Main.REPRESENTATION_DESCRIPTION_LEVELS.contains(sdo.getLevel())) {
+		} else if (!DescriptionLevelUtils.REPRESENTATION_DESCRIPTION_LEVELS.contains(sdo.getLevel())) {
 			if (grantObjectPermission && modifyGlobalPermission && listUsersGlobalPermission) {
 				// Description
 				tabs.add(descriptiveMetadataScroll, constants.descriptiveMetadata());
@@ -821,7 +820,7 @@ public class ViewPanel extends Composite {
 			}
 
 			public void onSuccess(SimpleDescriptionObject sdo) {
-				createChild.setEnabled(!Main.LEAF_DESCRIPTION_LEVELS.contains(sdo.getLevel()));
+				createChild.setEnabled(!DescriptionLevelUtils.LEAF_DESCRIPTION_LEVELS.contains(sdo.getLevel()));
 			}
 		});
 	}

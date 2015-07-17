@@ -30,6 +30,7 @@ import org.roda.index.IndexService;
 import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
 import org.roda.storage.DefaultStoragePath;
+import org.roda.storage.Resource;
 import org.roda.storage.StorageActionException;
 import org.roda.storage.StorageService;
 import org.roda.storage.fs.FileStorageService;
@@ -129,9 +130,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
 			Path corporaPath = Paths.get(RODA_HOME, "data2");
 			StorageService corporaService = new FileStorageService(corporaPath);
-			model.createAIP("AIP_1", corporaService, DefaultStoragePath.parse("AIP", "AIP_1"));
-			model.createAIP("AIP_2", corporaService, DefaultStoragePath.parse("AIP", "AIP_2"));
-
+			Iterable<Resource> aips = corporaService.listResourcesUnderContainer(DefaultStoragePath.parse("AIP"));
+			for (Resource aip : aips) {
+				logger.info("Loading AIP: " + aip.getStoragePath());
+				model.createAIP(aip.getStoragePath().getName(), corporaService, aip.getStoragePath());
+			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

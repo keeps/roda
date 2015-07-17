@@ -3,70 +3,48 @@
  */
 package pt.gov.dgarq.roda.wui.main.client;
 
-import java.util.List;
-
-import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevel;
-import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevelInfo;
-import pt.gov.dgarq.roda.wui.common.client.AuthenticatedUser;
-import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
-import pt.gov.dgarq.roda.wui.common.client.ClientLoggerService;
-import pt.gov.dgarq.roda.wui.common.client.UserLogin;
-import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
-import pt.gov.dgarq.roda.wui.home.client.Home;
-import pt.gov.dgarq.roda.wui.main.client.logos.LogosBundle;
-
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.http.client.URL;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.History;
-import com.google.gwt.user.client.HistoryListener;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HasAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.LanguageSwitcherPanel;
 import config.i18n.client.MainConstants;
+import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
+import pt.gov.dgarq.roda.wui.common.client.ClientLoggerService;
+import pt.gov.dgarq.roda.wui.common.client.tools.DescriptionLevelUtils;
+import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
+import pt.gov.dgarq.roda.wui.home.client.Home;
+import pt.gov.dgarq.roda.wui.main.client.logos.LogosBundle;
 
 /**
  * @author Luis Faria
  * 
  */
-@SuppressWarnings("deprecation")
-public class Main extends SimplePanel implements EntryPoint, HistoryListener {
+public class Main extends SimplePanel implements EntryPoint {
 
 	private ClientLogger logger = new ClientLogger(getClass().getName());
 
-	private static MainConstants constants = (MainConstants) GWT
-			.create(MainConstants.class);
-
-	public static List<DescriptionLevelInfo> DESCRIPTION_LEVELS_INFO;
-	public static List<DescriptionLevel> DESCRIPTION_LEVELS;
-	public static List<DescriptionLevel> ROOT_DESCRIPTION_LEVELS;
-	public static List<DescriptionLevel> LEAF_DESCRIPTION_LEVELS;
-	public static List<DescriptionLevel> REPRESENTATION_DESCRIPTION_LEVELS;
-	public static List<DescriptionLevel> ALL_BUT_REPRESENTATIONS_DESCRIPTION_LEVELS;
-
-	public static DescriptionLevelInfo getDescriptionLevel(String level) {
-		DescriptionLevelInfo ret = null;
-		for (DescriptionLevelInfo descriptionLevel : DESCRIPTION_LEVELS_INFO) {
-			if (descriptionLevel.getLevel().equals(level)) {
-				ret = descriptionLevel;
-				break;
-			}
-		}
-		return ret;
-	}
+	private static MainConstants constants = (MainConstants) GWT.create(MainConstants.class);
 
 	public void onModuleLoad() {
 
@@ -74,72 +52,59 @@ public class Main extends SimplePanel implements EntryPoint, HistoryListener {
 		ClientLogger.setUncaughtExceptionHandler();
 
 		// Remove loading image
-		DOM.removeChild(RootPanel.getBodyElement(),
-				DOM.getElementById("loading"));
+		RootPanel.getBodyElement().removeChild(DOM.getElementById("loading"));
 
 		// Add main widget to root panel
-		RootPanel.get().add(this);
+		RootLayoutPanel.get().add(this);
+		
 
 		// deferred call to init
 		Scheduler.get().scheduleDeferred(new Command() {
 
 			public void execute() {
-				DescriptionLevelServiceAsync.INSTANCE
-						.getAllDescriptionLevels(new AsyncCallback<DescriptionLevelInfoPack>() {
+				DescriptionLevelUtils.load(new AsyncCallback<Void>() {
 
-							@Override
-							public void onFailure(Throwable caught) {
-								logger.error(
-										"Error getting all the description levels!",
-										caught);
-							}
+					@Override
+					public void onFailure(Throwable caught) {
+						logger.error("Failed loading initial data", caught);
+					}
 
-							@Override
-							public void onSuccess(
-									DescriptionLevelInfoPack result) {
-								DESCRIPTION_LEVELS_INFO = result
-										.getDescriptionLevelsInfo();
-								DESCRIPTION_LEVELS = result
-										.getDescriptionLevels();
-								ROOT_DESCRIPTION_LEVELS = result
-										.getRootDescriptionLevels();
-								LEAF_DESCRIPTION_LEVELS = result
-										.getLeafDescriptionLevels();
-								REPRESENTATION_DESCRIPTION_LEVELS = result
-										.getRepresentationDescriptionLevels();
-								ALL_BUT_REPRESENTATIONS_DESCRIPTION_LEVELS = result
-										.getAllButRepresentationDescriptionLevels();
-								init();
-							}
-						});
+					@Override
+					public void onSuccess(Void result) {
+						init();
+					}
+				});
 			}
 		});
 	}
 
-	private VerticalPanel layout;
+	interface Binder extends UiBinder<Widget, Main> {
+	}
 
-	private HorizontalPanel banner;
+	@UiField
+	FocusPanel homeLinkArea;
 
-	private FocusPanel homeLinkArea;
+	@UiField(provided = true)
+	LanguageSwitcherPanel languageSwitcherPanel;
 
-	private VerticalPanel bannerRight;
+	@UiField(provided = true)
+	LoginPanel loginPanel;
 
-	private LanguageSwitcherPanel languageSwitcherPanel;
+	@UiField(provided = true)
+	Menu2 menu;
 
-	private LoginPanel loginPanel;
+	@UiField(provided = true)
+	BreadcrumbPanel breadcrumbPanel;
 
-	private Menu menu;
-
-	private BreadcrumbPanel breadcrumbPanel;
-
-	private ContentPanel contentPanel;
+	@UiField(provided = true)
+	ContentPanel contentPanel;
 
 	private SimplePanel footer;
 
-	private HorizontalPanel logos;
+	@UiField(provided = true)
+	HorizontalPanel logos;
 
-	private LogosBundle logosBundle = (LogosBundle) GWT
-			.create(LogosBundle.class);
+	private LogosBundle logosBundle = (LogosBundle) GWT.create(LogosBundle.class);
 
 	/**
 	 * Create a new main
@@ -155,51 +120,66 @@ public class Main extends SimplePanel implements EntryPoint, HistoryListener {
 
 		logger.info("Creating banner");
 
-		layout = new VerticalPanel();
+		// layout = new VerticalPanel();
 
-		this.setWidget(layout);
+		// this.setWidget(layout);
 
-		banner = new HorizontalPanel();
-		homeLinkArea = new FocusPanel();
-		bannerRight = new VerticalPanel();
+		// banner = new HorizontalPanel();
+		// homeLinkArea = new FocusPanel();
+		// bannerRight = new VerticalPanel();
 		languageSwitcherPanel = new LanguageSwitcherPanel();
 		loginPanel = new LoginPanel();
 
-		bannerRight.add(languageSwitcherPanel);
-		bannerRight.add(loginPanel);
+		// bannerRight.add(languageSwitcherPanel);
+		// bannerRight.add(loginPanel);
 
-		banner.add(homeLinkArea);
+		// banner.add(homeLinkArea);
 		/*
 		 * banner.add(languageSwitcherPanel); banner.add(loginPanel);
 		 */
-		banner.add(bannerRight);
+		// banner.add(bannerRight);
 
-		banner.addStyleName("banner");
-		homeLinkArea.addStyleName("homeLink");
+		// banner.addStyleName("banner");
+		// homeLinkArea.addStyleName("homeLink");
 		/*
 		 * banner.setCellHorizontalAlignment(languageSwitcherPanel,
 		 * HorizontalPanel.ALIGN_RIGHT);
 		 * banner.setCellHorizontalAlignment(loginPanel,
 		 * HorizontalPanel.ALIGN_RIGHT);
 		 */
-		banner.setCellHorizontalAlignment(bannerRight,
-				HorizontalPanel.ALIGN_RIGHT);
-		bannerRight.setCellHorizontalAlignment(languageSwitcherPanel,
-				HorizontalPanel.ALIGN_RIGHT);
-		bannerRight.setCellHorizontalAlignment(loginPanel,
-				HorizontalPanel.ALIGN_RIGHT);
+		// banner.setCellHorizontalAlignment(bannerRight,
+		// HorizontalPanel.ALIGN_RIGHT);
+		// bannerRight.setCellHorizontalAlignment(languageSwitcherPanel,
+		// HorizontalPanel.ALIGN_RIGHT);
+		// bannerRight.setCellHorizontalAlignment(loginPanel,
+		// HorizontalPanel.ALIGN_RIGHT);
 
-		menu = new Menu();
+		menu = new Menu2();
 		contentPanel = ContentPanel.getInstance();
 		breadcrumbPanel = new BreadcrumbPanel(contentPanel);
 
 		logos = createLogos();
 
-		layout.add(banner);
-		layout.add(menu);
-		layout.add(breadcrumbPanel.getWidget());
-		layout.add(contentPanel);
-		layout.add(logos);
+		// layout.add(banner);
+		// layout.add(menu);
+		// layout.add(breadcrumbPanel.getWidget());
+		// layout.add(contentPanel);
+		// layout.add(logos);
+
+		onHistoryChanged(History.getToken());
+		History.addValueChangeHandler(new ValueChangeHandler<String>() {
+
+			@Override
+			public void onValueChange(ValueChangeEvent<String> event) {
+				onHistoryChanged(event.getValue());
+			}
+		});
+
+		footer = new SimplePanel();
+
+		// RootPanel.get().add(footer);
+		Binder uiBinder = GWT.create(Binder.class);
+		setWidget(uiBinder.createAndBindUi(this));
 
 		homeLinkArea.addClickHandler(new ClickHandler() {
 
@@ -210,20 +190,13 @@ public class Main extends SimplePanel implements EntryPoint, HistoryListener {
 
 		homeLinkArea.setTitle(constants.homeTitle());
 
-		onHistoryChanged(History.getToken());
-		History.addHistoryListener(this);
-
-		footer = new SimplePanel();
-
-		RootPanel.get().add(footer);
-
 		logos.addStyleName("main-logos");
 
 		footer.addStyleName("main-footer");
 
-		layout.setCellHeight(contentPanel, "100%");
+		// layout.setCellHeight(contentPanel, "100%");
 
-		layout.addStyleName("main-layout");
+		// layout.addStyleName("main-layout");
 
 	}
 
@@ -268,39 +241,9 @@ public class Main extends SimplePanel implements EntryPoint, HistoryListener {
 		});
 	}
 
-	// private void applyImages(final Image image,
-	// final AbstractImagePrototype normal,
-	// final AbstractImagePrototype hover) {
-	// normal.applyTo(image);
-	// image.addMouseListener(new MouseListener() {
-	//
-	// public void onMouseDown(Widget sender, int x, int y) {
-	// // nothing to do
-	// }
-	//
-	// public void onMouseEnter(Widget sender) {
-	// hover.applyTo(image);
-	// }
-	//
-	// public void onMouseLeave(Widget sender) {
-	// normal.applyTo(image);
-	// }
-	//
-	// public void onMouseMove(Widget sender, int x, int y) {
-	// // nothing to do
-	// }
-	//
-	// public void onMouseUp(Widget sender, int x, int y) {
-	// // nothing to do
-	// }
-	//
-	// });
-	// }
-
-	public void onHistoryChanged(String historyToken) {
+	private void onHistoryChanged(String historyToken) {
 		if (historyToken.length() == 0) {
-			breadcrumbPanel.updatePath(Tools.splitHistory(Home.getInstance()
-					.getHistoryPath()));
+			breadcrumbPanel.updatePath(Tools.splitHistory(Home.getInstance().getHistoryPath()));
 			History.newItem(Home.getInstance().getHistoryPath());
 		} else {
 			final String decodedHistoryToken = URL.decode(historyToken);
@@ -310,18 +253,17 @@ public class Main extends SimplePanel implements EntryPoint, HistoryListener {
 			Scheduler.get().scheduleDeferred(new Command() {
 
 				public void execute() {
-					ClientLoggerService.Util.getInstance().pagehit(
-							decodedHistoryToken, new AsyncCallback<Void>() {
+					ClientLoggerService.Util.getInstance().pagehit(decodedHistoryToken, new AsyncCallback<Void>() {
 
-								public void onFailure(Throwable caught) {
-									// do nothing
-								}
+						public void onFailure(Throwable caught) {
+							// do nothing
+						}
 
-								public void onSuccess(Void result) {
-									// do nothing
-								}
+						public void onSuccess(Void result) {
+							// do nothing
+						}
 
-							});
+					});
 				}
 
 			});

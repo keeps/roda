@@ -6,10 +6,12 @@ package pt.gov.dgarq.roda.wui.dissemination.browse.client;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.DockPanel;
+import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.HorizontalSplitPanel;
 import com.google.gwt.user.client.ui.Image;
@@ -28,7 +30,6 @@ import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
 import pt.gov.dgarq.roda.wui.common.client.LoginStatusListener;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
 import pt.gov.dgarq.roda.wui.common.client.tools.PIDTranslator;
-import pt.gov.dgarq.roda.wui.common.client.widgets.AsyncDataGrid;
 import pt.gov.dgarq.roda.wui.common.client.widgets.CollectionsDataGrid;
 import pt.gov.dgarq.roda.wui.common.client.widgets.LoadingPopup;
 import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
@@ -41,7 +42,12 @@ import pt.gov.dgarq.roda.wui.management.editor.client.EditorService;
  * @author Luis Faria
  * 
  */
-public class Browse extends DockPanel implements HistoryResolver {
+public class Browse extends Composite implements HistoryResolver {
+
+	private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+
+	interface MyUiBinder extends UiBinder<Widget, Browse> {
+	}
 
 	private static Browse instance = null;
 
@@ -68,7 +74,9 @@ public class Browse extends DockPanel implements HistoryResolver {
 	private HorizontalSplitPanel split;
 
 	// private CollectionsTreeVerticalScrollPanel fondsPanel;
-	private AsyncDataGrid<pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject> fondsPanel2;
+
+	@UiField(provided = true)
+	CollectionsDataGrid fondsPanel;
 
 	private SimplePanel viewPanelContainer;
 
@@ -89,11 +97,25 @@ public class Browse extends DockPanel implements HistoryResolver {
 	private ViewPanel viewPanel;
 
 	private Browse() {
+		this.fondsPanel = new CollectionsDataGrid();
+		// initWidget(uiBinder.createAndBindUi(this));
+
 		init = false;
 
 	}
 
 	private void init() {
+		if (!init) {
+			GWT.log("Browser init");
+			logger.debug("Initializing browser");
+			init = true;
+
+			this.fondsPanel = new CollectionsDataGrid();
+			initWidget(uiBinder.createAndBindUi(this));
+		}
+	}
+
+	private void init_old() {
 		if (!init) {
 			logger.debug("Initializing browser");
 			init = true;
@@ -172,7 +194,7 @@ public class Browse extends DockPanel implements HistoryResolver {
 			browserHeader.add(createFonds);
 			browserHeader.add(refresh);
 			browserHeader.add(viewToggle);
-			add(browserHeader, NORTH);
+			// add(browserHeader, NORTH);
 			split = new HorizontalSplitPanel();
 			viewPanelContainer = new SimplePanel();
 			split.setRightWidget(viewPanelContainer);
@@ -194,11 +216,11 @@ public class Browse extends DockPanel implements HistoryResolver {
 			viewToggle.addStyleName("view-toggle");
 
 			// this.fondsPanel = new CollectionsTreeVerticalScrollPanel(true);
-			this.fondsPanel2 = new CollectionsDataGrid();
-			this.fondsPanel2.setSize("100%", "600px");
+			// this.fondsPanel2 = new CollectionsDataGrid();
+			// this.fondsPanel2.setSize("100%", "600px");
 			// split.setLeftWidget(fondsPanel);
 			// split.setLeftWidget(fondsPanel2);
-			add(fondsPanel2, CENTER);
+			// add(fondsPanel2, CENTER);
 			updateTotal();
 
 			// fondsPanel.addClickListener(new ClickListener() {
@@ -317,7 +339,7 @@ public class Browse extends DockPanel implements HistoryResolver {
 				viewPanel.close();
 				viewPanel = null;
 			}
-			updateStyle();
+			// updateStyle();
 			callback.onSuccess(this);
 		} else if (historyTokens.length == 1) {
 			// fondsPanel.setSelected(PIDTranslator.untranslatePID(historyTokens[0]));

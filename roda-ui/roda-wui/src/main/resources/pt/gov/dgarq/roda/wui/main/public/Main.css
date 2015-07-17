@@ -1,7 +1,6 @@
 @CHARSET "UTF-8";
 
 /* * {	padding: 0;	margin: 0;} */
-
 html, body {
 	margin: 0;
 	padding: 0;
@@ -17,36 +16,15 @@ body {
 	text-align: center;
 }
 
-body,* {
+body, * {
 	font-family: Verdana, Lucida, Helvetica, Arial, sans-serif;
 	font-size: 12px;
 	color: #58595b;
 }
 
 .main {
-	width: 986px;
-	background-image: url("images/bg-repeat.png");
-	background-repeat: repeat-y;
-	margin: 0pt auto;
+	background-color: #959595;
 }
-
-
-/* CSS Hack for Firefox 2.0 */
-.main, x:-moz-any-link {
-}
-
-/* CSS Hack for Firefox 3.0 and newer */
-.main, x:-moz-any-link, x:default {
-	margin-top: -16px;
-}
-
-/* CSS Hack Safari 3.0 and Opera 9 */
-@media screen and (-webkit-min-device-pixel-ratio:0) {
-	.main {
-		margin-top: -16px;
-	}
-}
-
 
 .main-layout {
 	width: 955px;
@@ -55,16 +33,14 @@ body,* {
 	background-repeat: repeat-x;
 	background-color: #959595;
 	border-spacing: 0;
-	
-	font-family:  Verdana, Lucida, Arial, Helvetica, sans-serif;
+	font-family: Verdana, Lucida, Arial, Helvetica, sans-serif;
 	font-size: 9pt;
-	
 	margin-left: auto;
 	margin-right: auto;
 }
 
 a {
-	font-family:  Verdana, Lucida, Arial, Helvetica, sans-serif;
+	font-family: Verdana, Lucida, Arial, Helvetica, sans-serif;
 	font-size: 12px;
 }
 
@@ -81,7 +57,6 @@ a {
 }
 
 .main-logos {
-	width: 955px;
 	border-top: 1px solid black;
 	margin: 0 auto;
 	padding: 5px 35px 5px 25px;
@@ -93,7 +68,7 @@ a {
 }
 
 /* @group Banner */
-
+/*
 .main .banner {
 	background-image: url("images/banner_roda.png");
 	background-repeat: no-repeat;
@@ -101,13 +76,12 @@ a {
 	height: 110px;
 	margin-top: 10px;
 }
-
 .main .banner .homeLink {
 	width: 300px;
 	height: 110px;
 	cursor: pointer;
 	cursor: hand;
-}
+}*/
 
 /* @end */
 
@@ -126,12 +100,12 @@ a {
 /* @end */
 
 /* @group Login Panel */
-
 .wui-login {
 	position: relative;
 	width: 250px;
 	padding-top: 5px;
 }
+
 .wui-login .wui-login-message {
 	width: 250px;
 	position: absolute;
@@ -139,6 +113,7 @@ a {
 	left: 40px;
 	color: #ffffff;
 }
+
 .wui-login .wui-login-layout-guest {
 	
 }
@@ -177,7 +152,7 @@ a {
 	left: 43px;
 	top: 65px;
 	width: 150px;
-	font-family:  Verdana, Lucida, Arial, Helvetica, sans-serif;
+	font-family: Verdana, Lucida, Arial, Helvetica, sans-serif;
 	font-size: 9pt;
 	overflow: hidden;
 	color: #58595b;
@@ -193,7 +168,7 @@ a {
 
 .wui-login .wui-login-box-pass-dummy {
 	width: 150px;
-	font-family:  Verdana, Lucida, Arial, Helvetica, sans-serif;
+	font-family: Verdana, Lucida, Arial, Helvetica, sans-serif;
 	font-size: 9pt;
 	color: #999;
 	margin-bottom: 5px;
@@ -226,19 +201,19 @@ a {
 }
 
 .wui-login .wui-loginLinks .loginLink a {
-	font-family:  Verdana, Lucida, Arial, Helvetica, sans-serif;
+	font-family: Verdana, Lucida, Arial, Helvetica, sans-serif;
 	font-size: 9pt;
 	color: #ffffff;
 	text-decoration: none;
 	white-space: nowrap;
 }
 
-.wui-login .wui-loginLinks .loginLink:hover a{
+.wui-login .wui-loginLinks .loginLink:hover a {
 	text-decoration: underline;
 }
 
 .wui-login .wui-loginLinks .separator {
-	font-family:  Verdana, Lucida, Arial, Helvetica, sans-serif;
+	font-family: Verdana, Lucida, Arial, Helvetica, sans-serif;
 	font-size: 9pt;
 	color: #ffffff;
 }
@@ -254,68 +229,50 @@ a {
 .wui-login-dialog-cell {
 	background-color: #e6e7e8;
 }
+
 .wui-login-dialog .username-label {
 	margin: 5px;
 	white-space: nowrap;
 }
+
 .wui-login-dialog .username-box {
+	
 }
+
 .wui-login-dialog .password-label {
 	margin: 5px;
 	white-space: nowrap;
 }
+
 .wui-login-dialog .password-box {
+	
 }
+
 .wui-login-dialog .login {
+	
 }
+
 .wui-login-dialog .cancel {
+	
 }
 /* @end */
 
 /* @group Menus */
+.gwt-MenuBar-vertical .gwt-MenuItem {
+	text-align: left;
+}
+
+.menu2-item-right {
+	float: right;
+}
 
 .main .menus {
 	border-spacing: 0;
-}
-.main .menu {
-	width: 955px;
-	margin-top: 1px;
-	height: 17px;
+	width: 100%
 }
 
-.main .menu .menu-panel {
-	height: 17px;
-}
-
-.main .menu .menu-items-effects {
-	width: 100%;
-}
-
-.main .menu .menu-items-panel {
-	height: 17px;
-}
-
-
-
-.main .menu .title {
-	padding-left: 40px;
-	width: 200px;
-	margin-top: 3px;
-	font-family:  Verdana, Lucida, Arial, Helvetica, sans-serif;
-	font-size: 8pt;
-	font-weight: bold;
-	font-variant: small-caps;
-	color: #414042;
-	cursor: pointer;
-	cursor: hand;
-}
-
-.main .menu .menu-items-effects {
-	width: 100%;
-}
-
-.main .menu .item {
-	font-family:  Verdana, Lucida, Arial, Helvetica, sans-serif;
+.main .menu_item {
+	font-family: Verdana, Lucida, Arial, Helvetica, sans-serif;
 	font-size: 8pt;
 	font-variant: small-caps;
 	color: #000000;
@@ -324,23 +281,23 @@ a {
 	cursor: hand;
 }
 
-.main .menu .item:hover {
+.main .menu_item:hover {
 	color: #d9d9d9;
 }
 
-.main .menu .menu-item-on {
+.main .menu-item-on {
 	color: #FFFFFF;
 }
 
-.main .menu .menu-item-on:hover {
+.main .menu-item-on:hover {
 	color: #FFFFFF;
 }
 
-.main .menu .separator {
-	font-family:  Verdana, Lucida, Arial, Helvetica, sans-serif;
+.main .menu_separator {
+	font-family: Verdana, Lucida, Arial, Helvetica, sans-serif;
 	font-size: 9pt;
 	font-variant: small-caps;
-	color: #000000;
+	color: #666;
 	margin-left: 2px;
 	margin-right: 2px;
 }
@@ -380,7 +337,6 @@ a {
 /* @end */
 
 /* @group Breadcrumb */
-
 .main .wui-breadcrumbPanel {
 	margin-left: 40px;
 	margin-top: 15px;
@@ -409,7 +365,7 @@ a {
 }
 
 .main .wui-breadcrumbPanel .breadcrumb-separator {
-	font-family:  Verdana, Lucida, Arial, Helvetica, sans-serif;
+	font-family: Verdana, Lucida, Arial, Helvetica, sans-serif;
 	font-size: 12px;
 	color: #a7a9ac;
 	cursor: text;
@@ -418,41 +374,33 @@ a {
 /* @end */
 
 /* @group Content Panel */
-
 .main .contentPanel {
-	width: 955px;
-/*	padding: 0px 35px 40px 35px;*/
 	text-align: center;
 }
 
 .main .contentTitle {
-	margin: 10px 35px 15px 40px;
-	font-family:  Verdana, Lucida, Arial, Helvetica, sans-serif;
+	padding: 10px 35px 15px 40px;
+	font-family: Verdana, Lucida, Arial, Helvetica, sans-serif;
 	font-size: 15pt;
 	font-weight: bold;
 	color: #ffffff;
 	font-variant: small-caps;
+	text-align: left;
 }
 
 .main .contentWrapper {
 	background-color: #e6e7e8;
-	width: 865px;
-	padding: 5px;
+	padding: 30px;
 	margin: 0 35px 40px 35px;
 	text-align: left;
 }
 
 /* @end */
-
-
 .wui-home {
 	color: #58595b;
 }
 
-
-
 /* @group Image Link */
-
 .image-link {
 	cursor: hand;
 	cursor: pointer;
@@ -478,7 +426,6 @@ a {
 /* @end */
 
 /* @group CAS Login Panel */
-
 .wui-login .wui-loginLinks {
 	position: relative;
 	top: 0;
@@ -486,8 +433,7 @@ a {
 	margin-top: 20px;
 }
 
-.wui-login .wui-login-login,
-.wui-login .wui-login-user {
+.wui-login .wui-login-login, .wui-login .wui-login-user {
 	margin-top: 12px;
 }
 
@@ -502,8 +448,3 @@ a {
 }
 
 /* @end */
-
-
-
-
-

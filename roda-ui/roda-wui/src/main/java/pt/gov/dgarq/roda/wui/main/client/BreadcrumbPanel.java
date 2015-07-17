@@ -24,20 +24,17 @@ import config.i18n.client.MainConstants;
  * @author Luis Faria
  * 
  */
-public class BreadcrumbPanel {
+public class BreadcrumbPanel extends HorizontalPanel {
 
 	// private GWTLogger logger = new GWTLogger(GWT.getTypeName(this));
 
-	private static MainConstants mainConstants = (MainConstants) GWT
-			.create(MainConstants.class);
+	private static MainConstants mainConstants = (MainConstants) GWT.create(MainConstants.class);
 
 	private final ContentPanel contentPanel;
 
 	private String[] currentpath;
 
 	private final Stack<Breadcrumb> breadcrumbs;
-
-	private final HorizontalPanel layout;
 
 	/**
 	 * Create a new Breadcrumb panel
@@ -49,20 +46,18 @@ public class BreadcrumbPanel {
 		super();
 		this.contentPanel = contentPanel;
 		this.breadcrumbs = new Stack<Breadcrumb>();
-		this.layout = new HorizontalPanel();
 
 		this.currentpath = null;
 
-		UserLogin.getInstance().addLoginStatusListener(
-				new LoginStatusListener() {
+		UserLogin.getInstance().addLoginStatusListener(new LoginStatusListener() {
 
-					public void onLoginStatusChanged(AuthenticatedUser user) {
-						updatePath(currentpath);
-					}
+			public void onLoginStatusChanged(AuthenticatedUser user) {
+				updatePath(currentpath);
+			}
 
-				});
+		});
 
-		layout.addStyleName("wui-breadcrumbPanel");
+		addStyleName("wui-breadcrumbPanel");
 
 	}
 
@@ -87,8 +82,7 @@ public class BreadcrumbPanel {
 		int minLenght = Math.min(path.length, breadcrumbs.size());
 		while (isCommonPath && commonPathIndex < minLenght) {
 			String pathToken = path[commonPathIndex];
-			Breadcrumb breadcrumb = (Breadcrumb) breadcrumbs
-					.elementAt(commonPathIndex);
+			Breadcrumb breadcrumb = (Breadcrumb) breadcrumbs.elementAt(commonPathIndex);
 			if (pathToken.equals(breadcrumb.getLastToken())) {
 				commonPathIndex++;
 			} else {
@@ -124,20 +118,20 @@ public class BreadcrumbPanel {
 		currentpath = path;
 	}
 
-	protected void clear() {
+	public void clear() {
 		breadcrumbs.clear();
 		updateLayout();
 	}
 
 	protected void updateLayout() {
-		layout.clear();
+		super.clear();
 		for (int i = 0; i < breadcrumbs.size(); i++) {
 			if (i > 0) {
-				layout.add(createSeparator());
+				add(createSeparator());
 			}
 			Breadcrumb breadcrumb = (Breadcrumb) breadcrumbs.get(i);
 			breadcrumb.setLast(i == breadcrumbs.size() - 1);
-			layout.add(breadcrumb);
+			add(breadcrumb);
 		}
 
 	}
@@ -145,15 +139,6 @@ public class BreadcrumbPanel {
 	protected void push(String[] path) {
 		Breadcrumb breadcrumb = new Breadcrumb(path);
 		breadcrumbs.add(breadcrumb);
-	}
-
-	/**
-	 * Get the layout widget
-	 * 
-	 * @return the widget
-	 */
-	public Widget getWidget() {
-		return layout;
 	}
 
 	protected class Breadcrumb extends Hyperlink {
@@ -253,9 +238,7 @@ public class BreadcrumbPanel {
 		protected String getText(String[] path) {
 			String tokenI18N;
 			try {
-				tokenI18N = mainConstants.getString(
-						"title_" + Tools.join(path, "_"))
-						.toLowerCase();
+				tokenI18N = mainConstants.getString("title_" + Tools.join(path, "_")).toLowerCase();
 			} catch (MissingResourceException e) {
 				tokenI18N = path[path.length - 1].toLowerCase();
 			}

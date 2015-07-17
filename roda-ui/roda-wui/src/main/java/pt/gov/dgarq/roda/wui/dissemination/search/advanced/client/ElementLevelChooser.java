@@ -6,14 +6,6 @@ package pt.gov.dgarq.roda.wui.dissemination.search.advanced.client;
 import java.util.ArrayList;
 import java.util.List;
 
-import pt.gov.dgarq.roda.core.data.SearchParameter;
-import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevel;
-import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevelInfo;
-import pt.gov.dgarq.roda.core.data.search.DefaultSearchParameter;
-import pt.gov.dgarq.roda.core.data.search.EadcSearchFields;
-import pt.gov.dgarq.roda.wui.dissemination.client.Dissemination;
-import pt.gov.dgarq.roda.wui.main.client.Main;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.ClickListener;
@@ -27,6 +19,12 @@ import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.CommonConstants;
 import config.i18n.client.DisseminationConstants;
+import pt.gov.dgarq.roda.core.data.SearchParameter;
+import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevel;
+import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevelInfo;
+import pt.gov.dgarq.roda.core.data.search.DefaultSearchParameter;
+import pt.gov.dgarq.roda.core.data.search.EadcSearchFields;
+import pt.gov.dgarq.roda.wui.common.client.tools.DescriptionLevelUtils;
 
 /**
  * @author Luis Faria
@@ -58,8 +56,8 @@ public class ElementLevelChooser extends DockPanel {
 	public ElementLevelChooser() {
 
 		int levelsPerRow = 4;
-		int rows = Main.DESCRIPTION_LEVELS.size() / levelsPerRow;
-		if ((Main.DESCRIPTION_LEVELS.size() % levelsPerRow) != 0) {
+		int rows = DescriptionLevelUtils.DESCRIPTION_LEVELS.size() / levelsPerRow;
+		if ((DescriptionLevelUtils.DESCRIPTION_LEVELS.size() % levelsPerRow) != 0) {
 			rows = rows + 1;
 		}
 		int columns = levelsPerRow * 3;
@@ -80,15 +78,15 @@ public class ElementLevelChooser extends DockPanel {
 		labels = new ArrayList<Label>();
 		images = new ArrayList<Image>();
 
-		for (DescriptionLevel level : Main.DESCRIPTION_LEVELS) {
-			DescriptionLevelInfo levelInfo = Main.getDescriptionLevel(level.getLevel());
+		for (DescriptionLevel level : DescriptionLevelUtils.DESCRIPTION_LEVELS) {
+			DescriptionLevelInfo levelInfo = DescriptionLevelUtils.getDescriptionLevel(level.getLevel());
 			checkBoxes.add(new CheckBox());
-			images.add(Dissemination.getInstance().getElementLevelIcon(level.getLevel()));
+			images.add(DescriptionLevelUtils.getElementLevelIconImage(level.getLevel()));
 			labels.add(new Label(levelInfo.getLabel(commonConstants.locale())));
 		}
 
 		int row = 0, column = 0;
-		for (int i = 0; i < Main.DESCRIPTION_LEVELS.size(); i++) {
+		for (int i = 0; i < DescriptionLevelUtils.DESCRIPTION_LEVELS.size(); i++) {
 			centralLayout.setWidget(row, column, checkBoxes.get(i));
 			centralLayout.setWidget(row, column + 1, images.get(i));
 			centralLayout.setWidget(row, column + 2, labels.get(i));
@@ -99,7 +97,7 @@ public class ElementLevelChooser extends DockPanel {
 			}
 		}
 
-		for (int i = 0; i < Main.DESCRIPTION_LEVELS.size(); i++) {
+		for (int i = 0; i < DescriptionLevelUtils.DESCRIPTION_LEVELS.size(); i++) {
 			addListeners(checkBoxes.get(i), images.get(i), labels.get(i));
 		}
 
@@ -182,13 +180,13 @@ public class ElementLevelChooser extends DockPanel {
 	public List<DescriptionLevel> getSelected() {
 		List<DescriptionLevel> selected = new ArrayList<DescriptionLevel>();
 		if (allLevelsOption.isChecked()) {
-			for (DescriptionLevel level : Main.DESCRIPTION_LEVELS) {
+			for (DescriptionLevel level : DescriptionLevelUtils.DESCRIPTION_LEVELS) {
 				selected.add(level);
 			}
 		} else {
-			for (int i = 0; i < Main.DESCRIPTION_LEVELS.size(); i++) {
+			for (int i = 0; i < DescriptionLevelUtils.DESCRIPTION_LEVELS.size(); i++) {
 				if (checkBoxes.get(i).isChecked()) {
-					selected.add(Main.DESCRIPTION_LEVELS.get(i));
+					selected.add(DescriptionLevelUtils.DESCRIPTION_LEVELS.get(i));
 				}
 			}
 		}
@@ -208,9 +206,9 @@ public class ElementLevelChooser extends DockPanel {
 			parameters = new SearchParameter[] {};
 		} else {
 			String keyword = "";
-			for (int i = 0; i < Main.DESCRIPTION_LEVELS.size(); i++) {
+			for (int i = 0; i < DescriptionLevelUtils.DESCRIPTION_LEVELS.size(); i++) {
 				if (checkBoxes.get(i).isChecked()) {
-					keyword += Main.DESCRIPTION_LEVELS.get(i) + " ";
+					keyword += DescriptionLevelUtils.DESCRIPTION_LEVELS.get(i) + " ";
 				}
 			}
 

@@ -4,9 +4,6 @@
 package pt.gov.dgarq.roda.wui.ingest.submit.client;
 
 import org.roda.common.RodaConstants;
-import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.OneOfManyFilterParameter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.ProducerFilterParameter;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -24,15 +21,17 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.IngestSubmitConstants;
-import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
+import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.OneOfManyFilterParameter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.ProducerFilterParameter;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
+import pt.gov.dgarq.roda.wui.common.client.tools.DescriptionLevelUtils;
 import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
 import pt.gov.dgarq.roda.wui.common.fileupload.client.FileUploadPanel;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.CollectionsTreeVerticalScrollPanel;
 import pt.gov.dgarq.roda.wui.dissemination.client.DescriptiveMetadataPanel;
 import pt.gov.dgarq.roda.wui.ingest.client.Ingest;
 import pt.gov.dgarq.roda.wui.ingest.list.client.IngestList;
-import pt.gov.dgarq.roda.wui.main.client.Main;
 
 /**
  * @author Luis Faria
@@ -128,10 +127,10 @@ public class CreateSIP {
 			destinationHeader = new Label(constants.createDestinationHeader());
 			Filter classPlanFilter = new Filter();
 			classPlanFilter.add(new ProducerFilterParameter());
-			int size = Main.ALL_BUT_REPRESENTATIONS_DESCRIPTION_LEVELS.size();
+			int size = DescriptionLevelUtils.ALL_BUT_REPRESENTATIONS_DESCRIPTION_LEVELS.size();
 			String[] classPlanLevels = new String[size];
 			for (int i = 0; i < size; i++) {
-				classPlanLevels[i] = Main.ALL_BUT_REPRESENTATIONS_DESCRIPTION_LEVELS.get(i).getLevel();
+				classPlanLevels[i] = DescriptionLevelUtils.ALL_BUT_REPRESENTATIONS_DESCRIPTION_LEVELS.get(i).getLevel();
 			}
 			classPlanFilter.add(new OneOfManyFilterParameter(RodaConstants.SDO_LEVEL, classPlanLevels));
 			destinationChooser = new CollectionsTreeVerticalScrollPanel(classPlanFilter,
@@ -279,7 +278,7 @@ public class CreateSIP {
 					submitButton.setEnabled(false);
 					submitMessage.setText(constants.createNoDestinationWarning());
 					submitMessage.addStyleDependentName("error");
-				} else if (!Main.ALL_BUT_REPRESENTATIONS_DESCRIPTION_LEVELS
+				} else if (!DescriptionLevelUtils.ALL_BUT_REPRESENTATIONS_DESCRIPTION_LEVELS
 						.contains(destinationChooser.getSelected().getSDO().getLevel())) {
 					submitButton.setEnabled(false);
 					submitMessage.setText(constants.createInvalidDestinationWarning());

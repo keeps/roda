@@ -22,8 +22,8 @@ import com.google.gwt.user.client.ui.Widget;
 import config.i18n.client.BrowseConstants;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
+import pt.gov.dgarq.roda.wui.common.client.tools.DescriptionLevelUtils;
 import pt.gov.dgarq.roda.wui.common.client.tools.StringUtility;
-import pt.gov.dgarq.roda.wui.dissemination.client.Dissemination;
 
 /**
  * @author Luis Faria
@@ -91,7 +91,7 @@ public class TreeItemPanel extends FocusPanel implements SourcesSliderEvents {
 		label = new Label(labeltext);
 		label.setWordWrap(false);
 
-		image = Dissemination.getInstance().getElementLevelIcon(sdo.getLevel());
+		image = DescriptionLevelUtils.getElementLevelIconImage(sdo.getLevel());
 		if (image != null) {
 			layout.add(image);
 		}
@@ -130,7 +130,8 @@ public class TreeItemPanel extends FocusPanel implements SourcesSliderEvents {
 				title = new Label();
 				String normalizedTitle = StringUtility.normalizeSpaces(sdo.getTitle());
 				title.setText(normalizedTitle == null ? constants.noTitle() : normalizedTitle);
-				startDate = new Label(sdo.getDateInitial() == null ? constants.noDate() : sdo.getDateInitial().toString());
+				startDate = new Label(
+						sdo.getDateInitial() == null ? constants.noDate() : sdo.getDateInitial().toString());
 				endDate = new Label(sdo.getDateFinal() == null ? constants.noDate() : sdo.getDateFinal().toString());
 
 				title.addStyleName("treeitem-info-title");

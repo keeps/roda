@@ -19,8 +19,8 @@ import pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException;
 import pt.gov.dgarq.roda.core.data.DescriptionObject;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
+import pt.gov.dgarq.roda.wui.common.client.tools.DescriptionLevelUtils;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.images.BrowseImageBundle;
-import pt.gov.dgarq.roda.wui.dissemination.client.Dissemination;
 
 /**
  * @author Luis Faria
@@ -110,7 +110,7 @@ public class ElementPathPanel extends HorizontalPanel {
 			final int index = i;
 			final SimpleDescriptionObject sdo = sdos[index];
 			HorizontalPanel itemPanel = new HorizontalPanel();
-			Image icon = Dissemination.getInstance().getElementLevelIcon(sdo.getLevel());
+			Image icon = DescriptionLevelUtils.getElementLevelIconImage(sdo.getLevel());
 			Label id = new Label(sdo.getId());
 
 			ClickListener onItemClicked = new ClickListener() {

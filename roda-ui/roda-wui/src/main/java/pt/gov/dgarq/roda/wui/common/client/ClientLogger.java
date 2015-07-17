@@ -46,12 +46,11 @@ public class ClientLogger implements IsSerializable {
 	 */
 	public static final int FATAL = 5;
 
-	private static final int CURRENT_LOG_LEVEL = WARN;
+	private static final int CURRENT_LOG_LEVEL = TRACE;
 
 	private static boolean SHOW_ERROR_MESSAGES = false;
 
 	private String classname;
-	
 
 	/**
 	 * Create a new client logger
@@ -99,8 +98,7 @@ public class ClientLogger implements IsSerializable {
 					// do nothing
 				}
 			};
-			ClientLoggerService.Util.getInstance().trace(classname, message,
-					errorcallback);
+			ClientLoggerService.Util.getInstance().trace(classname, message, errorcallback);
 		}
 	}
 
@@ -112,6 +110,7 @@ public class ClientLogger implements IsSerializable {
 	 */
 	public void trace(final String message, final Throwable error) {
 		if (CURRENT_LOG_LEVEL <= TRACE) {
+
 			AsyncCallback<Void> errorcallback = new AsyncCallback<Void>() {
 				public void onFailure(Throwable caught) {
 					GWT.log(message, error);
@@ -119,11 +118,10 @@ public class ClientLogger implements IsSerializable {
 				}
 
 				public void onSuccess(Void result) {
-					// do nothing
+					GWT.log(message, error);
 				}
 			};
-			ClientLoggerService.Util.getInstance().trace(classname, message,
-					error, errorcallback);
+			ClientLoggerService.Util.getInstance().trace(classname, message, errorcallback);
 		}
 	}
 
@@ -133,6 +131,7 @@ public class ClientLogger implements IsSerializable {
 	 * @param message
 	 */
 	public void debug(final String message) {
+		GWT.log(message);
 		if (CURRENT_LOG_LEVEL <= DEBUG) {
 			AsyncCallback<Void> errorcallback = new AsyncCallback<Void>() {
 				public void onFailure(Throwable caught) {
@@ -144,8 +143,7 @@ public class ClientLogger implements IsSerializable {
 					// do nothing
 				}
 			};
-			ClientLoggerService.Util.getInstance().debug(classname, message,
-					errorcallback);
+			ClientLoggerService.Util.getInstance().debug(classname, message, errorcallback);
 		}
 	}
 
@@ -165,10 +163,10 @@ public class ClientLogger implements IsSerializable {
 
 				public void onSuccess(Void result) {
 					// do nothing
+					GWT.log(object, error);
 				}
 			};
-			ClientLoggerService.Util.getInstance().debug(classname, object,
-					error, errorcallback);
+			ClientLoggerService.Util.getInstance().debug(classname, object, errorcallback);
 		}
 	}
 
@@ -189,8 +187,7 @@ public class ClientLogger implements IsSerializable {
 					// do nothing
 				}
 			};
-			ClientLoggerService.Util.getInstance().info(classname, message,
-					errorcallback);
+			ClientLoggerService.Util.getInstance().info(classname, message, errorcallback);
 		}
 	}
 
@@ -210,10 +207,10 @@ public class ClientLogger implements IsSerializable {
 
 				public void onSuccess(Void result) {
 					// do nothing
+					GWT.log(message, error);
 				}
 			};
-			ClientLoggerService.Util.getInstance().info(classname, message,
-					error, errorcallback);
+			ClientLoggerService.Util.getInstance().info(classname, message, errorcallback);
 		}
 	}
 
@@ -234,8 +231,7 @@ public class ClientLogger implements IsSerializable {
 					// do nothing
 				}
 			};
-			ClientLoggerService.Util.getInstance().warn(classname, message,
-					errorcallback);
+			ClientLoggerService.Util.getInstance().warn(classname, message, errorcallback);
 		}
 	}
 
@@ -254,11 +250,10 @@ public class ClientLogger implements IsSerializable {
 				}
 
 				public void onSuccess(Void result) {
-					// do nothing
+					GWT.log(message, error);
 				}
 			};
-			ClientLoggerService.Util.getInstance().warn(classname, message,
-					error, errorcallback);
+			ClientLoggerService.Util.getInstance().warn(classname, message, errorcallback);
 		}
 	}
 
@@ -280,8 +275,7 @@ public class ClientLogger implements IsSerializable {
 				}
 			};
 			GWT.log(message, null);
-			ClientLoggerService.Util.getInstance().error(classname, message,
-					errorcallback);
+			ClientLoggerService.Util.getInstance().error(classname, message, errorcallback);
 
 			if (SHOW_ERROR_MESSAGES) {
 				MessagePopup.showError(message);
@@ -299,7 +293,7 @@ public class ClientLogger implements IsSerializable {
 		if (error instanceof AuthorizationDeniedException) {
 			String windowLocation = Window.Location.getHref();
 			CasForwardDialog cfd = new CasForwardDialog(windowLocation);
-			cfd.show(); 
+			cfd.show();
 		} else if (CURRENT_LOG_LEVEL <= ERROR) {
 			AsyncCallback<Void> errorcallback = new AsyncCallback<Void>() {
 				public void onFailure(Throwable caught) {
@@ -308,16 +302,14 @@ public class ClientLogger implements IsSerializable {
 				}
 
 				public void onSuccess(Void result) {
-					// do nothing
+					GWT.log(message, error);
 				}
 			};
-			GWT.log(message, error);
-			ClientLoggerService.Util.getInstance().error(classname, message,
-					error, errorcallback);
+
+			ClientLoggerService.Util.getInstance().error(classname, message, errorcallback);
 			if (SHOW_ERROR_MESSAGES) {
 				MessagePopup.showError(message, error.getMessage()
-						+ (error.getCause() != null ? "\nCause: "
-								+ error.getCause().getMessage() : ""));
+						+ (error.getCause() != null ? "\nCause: " + error.getCause().getMessage() : ""));
 			}
 		}
 	}
@@ -340,8 +332,7 @@ public class ClientLogger implements IsSerializable {
 				}
 			};
 			GWT.log(message, null);
-			ClientLoggerService.Util.getInstance().fatal(classname, message,
-					errorcallback);
+			ClientLoggerService.Util.getInstance().fatal(classname, message, errorcallback);
 			if (SHOW_ERROR_MESSAGES) {
 				MessagePopup.showError(message);
 			}
@@ -363,17 +354,15 @@ public class ClientLogger implements IsSerializable {
 				}
 
 				public void onSuccess(Void result) {
-					// do nothing
+					GWT.log(message, error);
 				}
 			};
-			GWT.log(message, error);
-			ClientLoggerService.Util.getInstance().fatal(classname, message,
-					error, errorcallback);
+			
+			ClientLoggerService.Util.getInstance().fatal(classname, message, errorcallback);
 
 			if (SHOW_ERROR_MESSAGES) {
 				MessagePopup.showError(message, error.getMessage()
-						+ (error.getCause() != null ? "\nCause: "
-								+ error.getCause().getMessage() : ""));
+						+ (error.getCause() != null ? "\nCause: " + error.getCause().getMessage() : ""));
 			}
 		}
 	}

@@ -7,6 +7,18 @@ import java.util.HashSet;
 import java.util.MissingResourceException;
 import java.util.Set;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.History;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
+
+import config.i18n.client.MainConstants;
+import config.i18n.client.MainMessages;
 import pt.gov.dgarq.roda.wui.about.client.About;
 import pt.gov.dgarq.roda.wui.common.client.BadHistoryTokenException;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
@@ -22,30 +34,16 @@ import pt.gov.dgarq.roda.wui.management.user.client.Register;
 import pt.gov.dgarq.roda.wui.management.user.client.ResetPassword;
 import pt.gov.dgarq.roda.wui.management.user.client.VerifyEmail;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.http.client.URL;
-import com.google.gwt.user.client.History;
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.gwt.user.client.ui.Widget;
-
-import config.i18n.client.MainConstants;
-import config.i18n.client.MainMessages;
-
 /**
  * @author Luis Faria
  * 
  */
-public class ContentPanel extends VerticalPanel {
+public class ContentPanel extends FlowPanel {
 
 	private static ContentPanel instance = null;
 
 	private static ClientLogger logger = new ClientLogger(ContentPanel.class.getName());
 
-		
 	/**
 	 * Get the singleton instance
 	 * 
@@ -60,11 +58,9 @@ public class ContentPanel extends VerticalPanel {
 
 	private static final Set<HistoryResolver> resolvers = new HashSet<HistoryResolver>();
 
-	private static MainConstants constants = (MainConstants) GWT
-			.create(MainConstants.class);
+	private static MainConstants constants = (MainConstants) GWT.create(MainConstants.class);
 
-	private static MainMessages messages = (MainMessages) GWT
-			.create(MainMessages.class);
+	private static MainMessages messages = (MainMessages) GWT.create(MainMessages.class);
 
 	private Label title;
 
@@ -113,7 +109,7 @@ public class ContentPanel extends VerticalPanel {
 	 */
 	public void update(final String[] historyTokens) {
 		boolean foundit = false;
-		for(final HistoryResolver resolver: resolvers) {
+		for (final HistoryResolver resolver : resolvers) {
 			if (historyTokens[0].equals(resolver.getHistoryToken())) {
 				foundit = true;
 				currHistoryPath = Tools.join(historyTokens, ".");
@@ -127,38 +123,31 @@ public class ContentPanel extends VerticalPanel {
 						if (!permitted.booleanValue()) {
 							String windowLocation = Window.Location.getHref();
 							CasForwardDialog cfd = new CasForwardDialog(windowLocation);
-							cfd.show(); 
+							cfd.show();
 						} else {
-							resolver.resolve(Tools.tail(historyTokens),
-									new AsyncCallback<Widget>() {
+							resolver.resolve(Tools.tail(historyTokens), new AsyncCallback<Widget>() {
 
-										public void onFailure(Throwable caught) {
-											if (caught instanceof BadHistoryTokenException) {
-												Window.alert(messages
-														.pageNotFound(caught
-																.getMessage()));
-												if (currWidget == null) {
-													History.newItem(Home
-															.getInstance()
-															.getHistoryPath());
-												}
-											}
+								public void onFailure(Throwable caught) {
+									if (caught instanceof BadHistoryTokenException) {
+										Window.alert(messages.pageNotFound(caught.getMessage()));
+										if (currWidget == null) {
+											History.newItem(Home.getInstance().getHistoryPath());
 										}
+									}
+								}
 
-										public void onSuccess(Widget widget) {
-											if (widget != null) {
-												if (widget != currWidget) {
-													currWidget = widget;
-													contentwrapper
-															.setWidget(widget);
-													logger
-															.debug("reloaded content panel widget");
-												}
-												setWindowTitle(historyTokens);
-											}
+								public void onSuccess(Widget widget) {
+									if (widget != null) {
+										if (widget != currWidget) {
+											currWidget = widget;
+											contentwrapper.setWidget(widget);
+											logger.debug("reloaded content panel widget");
 										}
+										setWindowTitle(historyTokens);
+									}
+								}
 
-									});
+							});
 						}
 					}
 
@@ -182,9 +171,7 @@ public class ContentPanel extends VerticalPanel {
 		String[] tokens = historyTokens;
 		while (!resolved && tokens.length > 0) {
 			try {
-				tokenI18N = constants.getString(
-						"title_" + Tools.join(tokens, "_"))
-						.toUpperCase();
+				tokenI18N = constants.getString("title_" + Tools.join(tokens, "_")).toUpperCase();
 				resolved = true;
 			} catch (MissingResourceException e) {
 				tokens = Tools.removeLast(tokens);

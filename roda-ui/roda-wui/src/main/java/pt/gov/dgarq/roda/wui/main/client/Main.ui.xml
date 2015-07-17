@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+	xmlns:i="urn:import:config.i18n.client" xmlns:m="urn:import:pt.gov.dgarq.roda.wui.main.client">
+
+	<ui:style>
+	.banner {
+		background-color: #089de3;
+		position: relative;
+		height: 110px;
+	}
+	
+	.homeLink {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 300px;
+		height: 110px;
+		cursor: pointer;
+		cursor: hand;
+	}
+	
+	.homeText {
+		color: white;
+		font-weight: bolder;
+		font-size: 50px;
+		margin-top: 22px;
+	}
+	
+	.languageSwitcher {
+		position: absolute;
+		top: 10px;
+		right: 10px;
+	}
+	
+	.login {
+		position: absolute;
+		top: 40px;
+		right: 10px;
+	}
+	</ui:style>
+
+	<g:FlowPanel>
+		<!-- Header -->
+		<g:FlowPanel styleName="{style.banner}">
+			<g:FocusPanel styleName="{style.homeLink}" ui:field="homeLinkArea">
+				<g:HTMLPanel styleName="{style.homeText}">HOME</g:HTMLPanel>
+			</g:FocusPanel>
+			<i:LanguageSwitcherPanel styleName="{style.languageSwitcher}"
+				ui:field="languageSwitcherPanel" />
+			<m:LoginPanel styleName="{style.login}" ui:field="loginPanel" />
+		</g:FlowPanel>
+
+		<!-- Menu -->
+		<m:Menu2 ui:field="menu" />
+
+		<!-- Breadcrumb -->
+		<m:BreadcrumbPanel ui:field="breadcrumbPanel" />
+
+		<!-- Content -->
+		<m:ContentPanel ui:field="contentPanel" />
+
+		<!-- Footer -->
+		<g:HorizontalPanel ui:field="logos" />
+
+	</g:FlowPanel>
+</ui:UiBinder>

@@ -4,6 +4,7 @@
 package pt.gov.dgarq.roda.wui.dissemination.search.client;
 
 import pt.gov.dgarq.roda.core.data.SearchResultObject;
+import pt.gov.dgarq.roda.wui.common.client.tools.DescriptionLevelUtils;
 import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.Browse;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.ElementPathPanel;
@@ -67,8 +68,7 @@ public class SearchResultObjectPanel extends SimplePanel {
 		this.disclosure = new DisclosurePanel();
 		this.disclosure.setAnimationEnabled(true);
 		this.headerLayout = new HorizontalPanel();
-		this.icon = Dissemination.getInstance()
-				.getElementLevelIcon(object.getDescriptionObject().getLevel().getLevel());
+		this.icon = DescriptionLevelUtils.getElementLevelIconImage(object.getDescriptionObject().getLevel().getLevel());
 		this.idContainer = new SimplePanel();
 		this.id = new HTML(object.getDescriptionObject().getId());
 		this.titleContainer = new SimplePanel();
