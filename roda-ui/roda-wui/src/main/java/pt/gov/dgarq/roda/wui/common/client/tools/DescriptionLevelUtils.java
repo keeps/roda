@@ -53,6 +53,11 @@ public class DescriptionLevelUtils {
 
 	public static DescriptionLevelInfo getDescriptionLevel(String level) {
 		DescriptionLevelInfo ret = null;
+		if (DESCRIPTION_LEVELS_INFO == null) {
+			logger.error("Requiring a description level while their are not yet loaded");
+			return null;
+		}
+
 		for (DescriptionLevelInfo descriptionLevel : DESCRIPTION_LEVELS_INFO) {
 			if (descriptionLevel.getLevel().equals(level)) {
 				ret = descriptionLevel;

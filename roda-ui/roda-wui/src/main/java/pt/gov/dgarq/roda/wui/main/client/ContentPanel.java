@@ -14,7 +14,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.MainConstants;
@@ -71,6 +70,7 @@ public class ContentPanel extends FlowPanel {
 	private String currHistoryPath;
 
 	private ContentPanel() {
+		super();
 		title = new Label();
 		contentwrapper = new SimplePanel();
 
@@ -83,6 +83,9 @@ public class ContentPanel extends FlowPanel {
 
 		this.currWidget = null;
 
+	}
+
+	public void init() {
 		// About
 		resolvers.add(About.getInstance());
 		// Dissemination

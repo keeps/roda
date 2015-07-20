@@ -151,7 +151,7 @@ public class Menu extends VerticalPanel {
 		Label[] items = { browser, basicSearch, advancedSearch, help };
 
 		disseminationTitle.addClickListener(createClickListener(Dissemination.getInstance().getHistoryPath()));
-		browser.addClickListener(createClickListener(Browse.getInstance().getHistoryPath()));
+		browser.addClickListener(createClickListener(Browse.RESOLVER.getHistoryPath()));
 		basicSearch.addClickListener(createClickListener(BasicSearch.getInstance().getHistoryPath()));
 		advancedSearch.addClickListener(createClickListener(AdvancedSearch.getInstance().getHistoryPath()));
 
@@ -231,7 +231,7 @@ public class Menu extends VerticalPanel {
 		});
 
 		// Dissemination
-		Browse.getInstance().isCurrentUserPermitted(new AsyncCallback<Boolean>() {
+		Browse.RESOLVER.isCurrentUserPermitted(new AsyncCallback<Boolean>() {
 
 			public void onFailure(Throwable caught) {
 				logger.error("Error getting browse permissions", caught);

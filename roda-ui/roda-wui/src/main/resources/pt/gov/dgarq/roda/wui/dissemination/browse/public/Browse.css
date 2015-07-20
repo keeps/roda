@@ -1,4 +1,13 @@
 @CHARSET "UTF-8";
+
+/** v2.0 **/
+.my-collections-table .com-google-gwt-user-cellview-client-CellTable-Style-cellTableCell
+	{
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
 /** Browser**/
 .wui-browse {
 	width: 865px;
@@ -145,10 +154,12 @@
 
 .wui-view-window .viewPanel-tabs .gwt-TabPanelBottom {
 	/*height: 574px;*/
+	
 }
 
 /** Item Popup **/
 .itemPopup-focus {
+	
 }
 
 .itemPopup-layout {
@@ -182,12 +193,10 @@
 	width: 100%;
 }
 
-
 .collection-tree  TABLE {
 	width: 100%;
-	border-spacing: 0px;	
+	border-spacing: 0px;
 }
-
 
 .collection-tree .gwt-TreeItem .treeitem-layout {
 	border: 0;
@@ -199,7 +208,7 @@
 	border: 1px solid #6a9bae;
 }
 
-.TreeItemPanel { 
+.TreeItemPanel {
 	border: 0;
 	cursor: pointer;
 	cursor: hand;
@@ -209,7 +218,7 @@
 	width: 100%;
 }
 
-.TreeItemPanel .treeitem-layout { 
+.TreeItemPanel .treeitem-layout {
 	height: 20px;
 }
 
@@ -247,7 +256,7 @@
 	width: 480px;
 	background-color: #d7d8d9;
 	overflow: hidden;
-	padding-left: 2px; 
+	padding-left: 2px;
 	padding-right: 2px;
 	height: 20px;
 	vertical-align: middle;
@@ -335,7 +344,7 @@
 	/*	background-image: url("images/slider_background.png");*/
 }
 
-/* @end */ 
+/* @end */
 
 /* @group Elements Vertical Scroll Panel */
 .elementVerticalScrollPanel {
@@ -368,6 +377,7 @@
 	background-color: #58595b;
 	color: white;
 }
+
 .elementVerticalScrollPanel .element-header-title {
 	width: 480px;
 	white-space: nowrap;
@@ -376,6 +386,7 @@
 	background-color: #58595b;
 	color: white;
 }
+
 .elementVerticalScrollPanel .element-header-date-initial {
 	width: 84px;
 	white-space: nowrap;
@@ -384,6 +395,7 @@
 	background-color: #58595b;
 	color: white;
 }
+
 .elementVerticalScrollPanel .element-header-date-final {
 	width: 92px;
 	white-space: nowrap;
@@ -396,13 +408,14 @@
 .elementVerticalScrollPanel-noInfo .element-header-title {
 	display: none;
 }
+
 .elementVerticalScrollPanel-noInfo .element-header-date-initial {
 	display: none;
 }
+
 .elementVerticalScrollPanel-noInfo .element-header-date-final {
 	display: none;
 }
-
 
 /* @end */ /* @end */ /** Element Path Panel **/
 .wui-elementPath {
@@ -502,15 +515,19 @@
 .wui-browse-representations .dissemination:hover {
 	background-color: white;
 }
+
 .wui-browse-representations .dissemination-layout {
 	width: 100%;
 }
+
 .wui-browse-representations .dissemination-description {
 	font-size: 11px;
 }
+
 .wui-browse-representations .dissemination-icon {
 	
 }
+
 .wui-browse-representations .dissemination-original-label {
 	color: red;
 }
@@ -519,25 +536,32 @@
 .wui-metadata-preservation {
 	width: 100%;
 }
+
 .wui-metadata-preservation .wui-metadata-preservation-header {
 	width: 100%;
 }
+
 .wui-metadata-preservation-header-reps {
+	
 }
 
 .wui-metadata-preservation .preservation-rep-layout {
 	vertical-align: middle;
 	margin: 1px;
 }
+
 .wui-metadata-preservation .preservation-rep-icon {
+	
 }
+
 .wui-metadata-preservation .preservation-rep-label {
 	font-size: 10px;
 }
-	
+
 .wui-metadata-preservation-header-timeUnit {
 	
 }
+
 .wui-metadata-preservation .wui-metadata-preservation-timeline {
 	width: 100%;
 	margin: 5px 2px;
@@ -547,7 +571,7 @@
 	font-size: 11px;
 }
 
-.wui-metadata-preservation .wui-metadata-preservation-timeline .timeline-copyright {
+.wui-metadata-preservation .wui-metadata-preservation-timeline .timeline-copyright
+	{
 	display: none;
 }
-

@@ -72,7 +72,7 @@ public class Dissemination implements HistoryResolver {
 	}
 
 	public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-		UserLogin.getInstance().checkRoles(new HistoryResolver[] { Search.getInstance(), Browse.getInstance() }, false,
+		UserLogin.getInstance().checkRoles(new HistoryResolver[] { Search.getInstance(), Browse.RESOLVER }, false,
 				callback);
 	}
 
@@ -84,7 +84,7 @@ public class Dissemination implements HistoryResolver {
 			if (historyTokens[0].equals(Search.getInstance().getHistoryToken())) {
 				Search.getInstance().resolve(Tools.tail(historyTokens), callback);
 
-			} else if (historyTokens[0].equals(Browse.getInstance().getHistoryToken())) {
+			} else if (historyTokens[0].equals(Browse.RESOLVER.getHistoryToken())) {
 				Browse.getInstance().resolve(Tools.tail(historyTokens), callback);
 
 			} else if (historyTokens[0].equals("help")) {
@@ -103,8 +103,6 @@ public class Dissemination implements HistoryResolver {
 	public String getHistoryToken() {
 		return "dissemination";
 	}
-
-
 
 	/**
 	 * Get translation of each descriptive level

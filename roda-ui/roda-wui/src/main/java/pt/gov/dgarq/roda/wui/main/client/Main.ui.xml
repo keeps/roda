@@ -16,6 +16,7 @@
 		top: 0;
 		left: 0;
 		width: 300px;
+		padding-left: 30px;
 		height: 110px;
 		cursor: pointer;
 		cursor: hand;
@@ -26,18 +27,17 @@
 		font-weight: bolder;
 		font-size: 50px;
 		margin-top: 22px;
+		text-align: left;
 	}
 	
 	.languageSwitcher {
 		position: absolute;
 		top: 10px;
-		right: 10px;
+		right: 40px;
 	}
-	
-	.login {
-		position: absolute;
-		top: 40px;
-		right: 10px;
+	.menu {
+		padding: 0 30px;
+		background-color: #414042;
 	}
 	</ui:style>
 
@@ -45,24 +45,19 @@
 		<!-- Header -->
 		<g:FlowPanel styleName="{style.banner}">
 			<g:FocusPanel styleName="{style.homeLink}" ui:field="homeLinkArea">
-				<g:HTMLPanel styleName="{style.homeText}">HOME</g:HTMLPanel>
+				<g:HTMLPanel styleName="{style.homeText}">RODA</g:HTMLPanel>
 			</g:FocusPanel>
-			<i:LanguageSwitcherPanel styleName="{style.languageSwitcher}"
+			<i:LanguageSwitcherPanel addStyleNames="{style.languageSwitcher}"
 				ui:field="languageSwitcherPanel" />
-			<m:LoginPanel styleName="{style.login}" ui:field="loginPanel" />
 		</g:FlowPanel>
 
 		<!-- Menu -->
-		<m:Menu2 ui:field="menu" />
+		<m:Menu2 ui:field="menu" addStyleNames="{style.menu}" />
 
 		<!-- Breadcrumb -->
 		<m:BreadcrumbPanel ui:field="breadcrumbPanel" />
 
 		<!-- Content -->
 		<m:ContentPanel ui:field="contentPanel" />
-
-		<!-- Footer -->
-		<g:HorizontalPanel ui:field="logos" />
-
 	</g:FlowPanel>
 </ui:UiBinder>

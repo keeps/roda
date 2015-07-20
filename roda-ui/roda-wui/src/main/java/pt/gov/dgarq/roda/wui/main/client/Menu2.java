@@ -5,10 +5,14 @@ package pt.gov.dgarq.roda.wui.main.client;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
+import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.MainConstants;
 import pt.gov.dgarq.roda.wui.about.client.About;
@@ -27,6 +31,8 @@ import pt.gov.dgarq.roda.wui.ingest.submit.client.IngestSubmit;
 import pt.gov.dgarq.roda.wui.management.client.Management;
 import pt.gov.dgarq.roda.wui.management.event.client.EventManagement;
 import pt.gov.dgarq.roda.wui.management.statistics.client.Statistics;
+import pt.gov.dgarq.roda.wui.management.user.client.Preferences;
+import pt.gov.dgarq.roda.wui.management.user.client.Register;
 import pt.gov.dgarq.roda.wui.management.user.client.UserLog;
 import pt.gov.dgarq.roda.wui.management.user.client.WUIUserManagement;
 
@@ -34,38 +40,40 @@ import pt.gov.dgarq.roda.wui.management.user.client.WUIUserManagement;
  * @author Luis Faria
  * 
  */
-public class Menu2 extends MenuBar {
+public class Menu2 extends Composite {
 
 	private ClientLogger logger = new ClientLogger(getClass().getName());
 
 	private static MainConstants constants = (MainConstants) GWT.create(MainConstants.class);
 
+	private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+
+	interface MyUiBinder extends UiBinder<Widget, Menu2> {
+	}
+
+	@UiField
+	MenuBar leftMenu;
+
+	@UiField
+	MenuBar rightMenu;
+
 	private final MenuBar aboutMenu;
-	private MenuItem about_services;
-	private MenuItem about_policies;
-	private MenuItem about_research;
-	private MenuItem about_contacts;
-	private MenuItem about_register;
-	private MenuItem about_help;
 
 	private final MenuBar disseminationMenu;
 	private MenuItem dissemination_browse;
 	private MenuItem dissemination_searchBasic;
 	private MenuItem dissemination_searchAdvanced;
-	private MenuItem dissemination_help;
 
 	private final MenuBar ingestMenu;
 	private MenuItem ingest_pre;
 	private MenuItem ingest_submit;
 	private MenuItem ingest_list;
-	private MenuItem ingest_help;
 
 	private final MenuBar administrationMenu;
 	private MenuItem administration_user;
 	private MenuItem administration_event;
 	private MenuItem administration_statistics;
 	private MenuItem administration_log;
-	private MenuItem administration_help;
 
 	private final MenuBar userMenu;
 
@@ -74,28 +82,29 @@ public class Menu2 extends MenuBar {
 	 * 
 	 */
 	public Menu2() {
+		initWidget(uiBinder.createAndBindUi(this));
+
 		aboutMenu = new MenuBar(true);
-		about_services = aboutMenu.addItem(constants.title_about_services(),
+		aboutMenu.addItem(constants.title_about_services(),
 				createCommand(About.getInstance().getHistoryPath() + ".services"));
-		about_policies = aboutMenu.addItem(constants.title_about_policies(),
+		aboutMenu.addItem(constants.title_about_policies(),
 				createCommand(About.getInstance().getHistoryPath() + ".policies"));
-		about_research = aboutMenu.addItem(constants.title_about_researchDevelopment(),
+		aboutMenu.addItem(constants.title_about_researchDevelopment(),
 				createCommand(About.getInstance().getHistoryPath() + ".research_development"));
-		about_contacts = aboutMenu.addItem(constants.title_about_contacts(),
+		aboutMenu.addItem(constants.title_about_contacts(),
 				createCommand(About.getInstance().getHistoryPath() + ".contacts"));
-		about_register = aboutMenu.addItem(constants.title_about_register(),
+		aboutMenu.addItem(constants.title_about_register(),
 				createCommand(About.getInstance().getHistoryPath() + ".register"));
-		about_help = aboutMenu.addItem(constants.title_about_help(),
-				createCommand(About.getInstance().getHistoryPath() + ".help"));
+		aboutMenu.addItem(constants.title_about_help(), createCommand(About.getInstance().getHistoryPath() + ".help"));
 
 		disseminationMenu = new MenuBar(true);
 		dissemination_browse = disseminationMenu.addItem(constants.title_dissemination_browse(),
-				createCommand(Browse.getInstance().getHistoryPath()));
+				createCommand(Browse.RESOLVER.getHistoryPath()));
 		dissemination_searchBasic = disseminationMenu.addItem(constants.title_dissemination_search_basic(),
 				createCommand(BasicSearch.getInstance().getHistoryPath()));
 		dissemination_searchAdvanced = disseminationMenu.addItem(constants.title_dissemination_search_advanced(),
 				createCommand(AdvancedSearch.getInstance().getHistoryPath()));
-		dissemination_help = disseminationMenu.addItem(constants.title_dissemination_help(),
+		disseminationMenu.addItem(constants.title_dissemination_help(),
 				createCommand(Dissemination.getInstance().getHistoryPath() + ".help"));
 
 		ingestMenu = new MenuBar(true);
@@ -105,7 +114,7 @@ public class Menu2 extends MenuBar {
 				createCommand(IngestSubmit.getInstance().getHistoryPath()));
 		ingest_list = ingestMenu.addItem(constants.title_ingest_list(),
 				createCommand(IngestList.getInstance().getHistoryPath()));
-		ingest_help = ingestMenu.addItem(constants.title_ingest_help(),
+		ingestMenu.addItem(constants.title_ingest_help(),
 				createCommand(Ingest.getInstance().getHistoryPath() + ".help"));
 
 		administrationMenu = new MenuBar(true);
@@ -117,37 +126,29 @@ public class Menu2 extends MenuBar {
 				createCommand(Statistics.getInstance().getHistoryPath()));
 		administration_log = administrationMenu.addItem(constants.title_administration_log(),
 				createCommand(UserLog.getInstance().getHistoryPath()));
-		administration_help = administrationMenu.addItem(constants.title_administration_help(),
+		administrationMenu.addItem(constants.title_administration_help(),
 				createCommand(Management.getInstance().getHistoryPath() + ".help"));
 
-		aboutMenu.setVisible(false);
-		disseminationMenu.setVisible(false);
-		ingestMenu.setVisible(false);
-		administrationMenu.setVisible(false);
-
 		userMenu = new MenuBar(true);
-		userMenu.addItem("Logout", new ScheduledCommand() {
+		userMenu.addItem(constants.loginLogout(), new ScheduledCommand() {
 
 			@Override
 			public void execute() {
-				// TODO logout
-			}
-		});
-		userMenu.addItem("Preferences", new ScheduledCommand() {
+				UserLogin.getInstance().logout(new AsyncCallback<AuthenticatedUser>() {
 
-			@Override
-			public void execute() {
-				// TODO show preferences
-			}
-		});
-		userMenu.addItem("Change language", new ScheduledCommand() {
+					@Override
+					public void onFailure(Throwable caught) {
+						logger.fatal("Error logging out", caught);
+					}
 
-			@Override
-			public void execute() {
-				// TODO show language switcher
+					@Override
+					public void onSuccess(AuthenticatedUser result) {
+						// do nothing
+					}
+				});
 			}
 		});
-		
+		userMenu.addItem(constants.loginPreferences(), createCommand(Preferences.getInstance().getHistoryPath()));
 
 		UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<AuthenticatedUser>() {
 
@@ -158,11 +159,6 @@ public class Menu2 extends MenuBar {
 
 			public void onSuccess(AuthenticatedUser user) {
 				updateVisibles(user);
-				addItem(constants.title_about(), aboutMenu);
-				addItem(constants.title_dissemination(), disseminationMenu);
-				addItem(constants.title_ingest(), ingestMenu);
-				addItem(constants.title_administration(), administrationMenu);
-				addItem(user.getName(), userMenu);
 			}
 
 		});
@@ -175,10 +171,8 @@ public class Menu2 extends MenuBar {
 
 		});
 
-		setAutoOpen(true);
-
 		this.addStyleName("menus2");
-		userMenu.addStyleName("menu2-item-right");
+		rightMenu.setStyleName("my-MenuBarRight");
 	}
 
 	private ScheduledCommand createCommand(final String path) {
@@ -191,9 +185,22 @@ public class Menu2 extends MenuBar {
 		};
 	}
 
+	private ScheduledCommand createLoginCommand() {
+		return new ScheduledCommand() {
+
+			@Override
+			public void execute() {
+				UserLogin.getInstance().login();
+			}
+		};
+	}
+
 	private void updateVisibles(AuthenticatedUser user) {
 
 		logger.info("Updating menu visibility for user " + user.getName());
+
+		leftMenu.clearItems();
+		rightMenu.clearItems();
 
 		// About
 		About.getInstance().isCurrentUserPermitted(new AsyncCallback<Boolean>() {
@@ -203,13 +210,15 @@ public class Menu2 extends MenuBar {
 			}
 
 			public void onSuccess(Boolean permitted) {
-				aboutMenu.setVisible(permitted);
+				if (permitted) {
+					leftMenu.addItem(constants.title_about(), aboutMenu);
+				}
 			}
 
 		});
 
 		// Dissemination
-		Browse.getInstance().isCurrentUserPermitted(new AsyncCallback<Boolean>() {
+		Browse.RESOLVER.isCurrentUserPermitted(new AsyncCallback<Boolean>() {
 
 			public void onFailure(Throwable caught) {
 				logger.error("Error getting browse permissions", caught);
@@ -253,7 +262,60 @@ public class Menu2 extends MenuBar {
 			}
 
 			public void onSuccess(Boolean asRole) {
-				disseminationMenu.setVisible(asRole);
+				if (asRole) {
+					leftMenu.addItem(constants.title_dissemination(), disseminationMenu);
+				}
+			}
+
+		});
+
+		// Ingest
+		PreIngest.getInstance().isCurrentUserPermitted(new AsyncCallback<Boolean>() {
+
+			public void onFailure(Throwable caught) {
+				logger.error("Error getting browse role", caught);
+			}
+
+			public void onSuccess(Boolean asRole) {
+				ingest_pre.setVisible(asRole);
+			}
+
+		});
+
+		IngestSubmit.getInstance().isCurrentUserPermitted(new AsyncCallback<Boolean>() {
+
+			public void onFailure(Throwable caught) {
+				logger.error("Error getting browse role", caught);
+			}
+
+			public void onSuccess(Boolean asRole) {
+				ingest_submit.setVisible(asRole);
+			}
+
+		});
+
+		IngestList.getInstance().isCurrentUserPermitted(new AsyncCallback<Boolean>() {
+
+			public void onFailure(Throwable caught) {
+				logger.error("Error getting browse role", caught);
+			}
+
+			public void onSuccess(Boolean asRole) {
+				ingest_list.setVisible(asRole);
+			}
+
+		});
+
+		Ingest.getInstance().isCurrentUserPermitted(new AsyncCallback<Boolean>() {
+
+			public void onFailure(Throwable caught) {
+				logger.error("Error getting roles", caught);
+			}
+
+			public void onSuccess(Boolean asRole) {
+				if (asRole) {
+					leftMenu.addItem(constants.title_ingest(), ingestMenu);
+				}
 			}
 
 		});
@@ -315,59 +377,20 @@ public class Menu2 extends MenuBar {
 			}
 
 			public void onSuccess(Boolean asRole) {
-				administrationMenu.setVisible(asRole);
+				if (asRole) {
+					leftMenu.addItem(constants.title_administration(), administrationMenu);
+				}
 			}
 
 		});
 
-		// Ingest
-		PreIngest.getInstance().isCurrentUserPermitted(new AsyncCallback<Boolean>() {
-
-			public void onFailure(Throwable caught) {
-				logger.error("Error getting browse role", caught);
-			}
-
-			public void onSuccess(Boolean asRole) {
-				ingest_pre.setVisible(asRole);
-			}
-
-		});
-
-		IngestSubmit.getInstance().isCurrentUserPermitted(new AsyncCallback<Boolean>() {
-
-			public void onFailure(Throwable caught) {
-				logger.error("Error getting browse role", caught);
-			}
-
-			public void onSuccess(Boolean asRole) {
-				ingest_submit.setVisible(asRole);
-			}
-
-		});
-
-		IngestList.getInstance().isCurrentUserPermitted(new AsyncCallback<Boolean>() {
-
-			public void onFailure(Throwable caught) {
-				logger.error("Error getting browse role", caught);
-			}
-
-			public void onSuccess(Boolean asRole) {
-				ingest_list.setVisible(asRole);
-			}
-
-		});
-
-		Ingest.getInstance().isCurrentUserPermitted(new AsyncCallback<Boolean>() {
-
-			public void onFailure(Throwable caught) {
-				logger.error("Error getting roles", caught);
-			}
-
-			public void onSuccess(Boolean asRole) {
-				ingestMenu.setVisible(asRole);
-			}
-
-		});
+		// User
+		if (user.isGuest()) {
+			rightMenu.addItem(constants.loginLogin(), createLoginCommand());
+			rightMenu.addItem(constants.loginRegister(), createCommand(Register.getInstance().getHistoryPath()));
+		} else {
+			rightMenu.addItem(user.getName(), userMenu);
+		}
 
 	}
 

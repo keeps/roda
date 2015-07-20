@@ -3,9 +3,11 @@ package pt.gov.dgarq.roda.wui.common.client.widgets;
 import java.io.Serializable;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.cellview.client.DataGrid;
+import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.view.client.AsyncDataProvider;
 import com.google.gwt.view.client.HasData;
@@ -14,12 +16,12 @@ import com.google.gwt.view.client.Range;
 
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 
-public abstract class AsyncDataGrid<T extends Serializable> extends FlowPanel {
+public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel {
 
 	private final AsyncDataProvider<T> dataProvider;
-	private final DataGrid<T> display;
+	private final CellTable<T> display;
 
-	public AsyncDataGrid() {
+	public AsyncTableCell() {
 		super();
 
 		this.dataProvider = new AsyncDataProvider<T>() {
@@ -54,7 +56,7 @@ public abstract class AsyncDataGrid<T extends Serializable> extends FlowPanel {
 			}
 		};
 
-		display = new DataGrid<>(getPageSize(), getKeyProvider());
+		display = new CellTable<>(getPageSize(), getKeyProvider());
 		dataProvider.addDataDisplay(display);
 
 		SimplePager pager = new SimplePager();
@@ -67,7 +69,6 @@ public abstract class AsyncDataGrid<T extends Serializable> extends FlowPanel {
 		// TODO add support for selection
 
 		addStyleName("my-asyncdatagrid");
-		display.setHeight("300px");
 	}
 
 	protected abstract int getPageSize();
@@ -76,7 +77,7 @@ public abstract class AsyncDataGrid<T extends Serializable> extends FlowPanel {
 
 	protected abstract void getData(int start, int length, AsyncCallback<IndexResult<T>> callback);
 
-	protected DataGrid<T> getDisplay() {
+	protected CellTable<T> getDisplay() {
 		return display;
 	}
 

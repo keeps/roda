@@ -6,13 +6,13 @@ html, body {
 	padding: 0;
 	border: 0;
 	height: 100%;
+	background-color: white;
 }
 
 body {
 	padding: 0;
 	margin: 0;
 	border: 0;
-	background-color: #58595b;
 	text-align: center;
 }
 
@@ -22,26 +22,14 @@ body, * {
 	color: #58595b;
 }
 
-.main {
-	background-color: #959595;
-}
-
-.main-layout {
-	width: 955px;
-	text-align: center;
-	background-image: url("images/gradiente_fundo.png");
-	background-repeat: repeat-x;
-	background-color: #959595;
-	border-spacing: 0;
-	font-family: Verdana, Lucida, Arial, Helvetica, sans-serif;
-	font-size: 9pt;
-	margin-left: auto;
-	margin-right: auto;
-}
-
 a {
 	font-family: Verdana, Lucida, Arial, Helvetica, sans-serif;
 	font-size: 12px;
+}
+
+.main {
+	background-color: white;
+	margin-top: -15px;
 }
 
 .main-filler {
@@ -87,12 +75,10 @@ a {
 
 /* @group Language Switcher Panel */
 .wui-languageSwitcher {
-	width: 270px;
-	margin-right: 20px;
 }
 
 .wui-languageSwitcher .languageSwitcher-flag {
-	margin: 7px 2px;
+	margin: 0px 1px;
 	cursor: pointer;
 	cursor: hand;
 }
@@ -258,12 +244,51 @@ a {
 /* @end */
 
 /* @group Menus */
-.gwt-MenuBar-vertical .gwt-MenuItem {
+
+.gwt-MenuBar, .my-MenuBarRight {
+	background-color: #414042;
+}
+.gwt-MenuBar .gwt-MenuItem, .my-MenuBarRight .gwt-MenuItem {
+	cursor: pointer;
+	cursor: hand;
+	font-family: Verdana, Lucida, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	font-weight: bold;
+	font-variant: normal;
+	color: #fff;
+	padding: 5px 10px;
 	text-align: left;
 }
 
-.menu2-item-right {
-	float: right;
+.gwt-MenuBar .gwt-MenuItem-selected, .my-MenuBarRight .gwt-MenuItem-selected {
+	color: #414042;
+	background-color: #bcbec0;
+}
+
+.gwt-MenuBarPopup .menuPopupContent, .my-MenuBarRight .menuPopupContent {
+	box-shadow: 1px 1px 5px 0px black;
+	position: relative;
+	top: 5px;
+}
+
+.gwt-MenuBarPopup .menuPopupContent:after, .my-MenuBarRightPopup .menuPopupContent:after {
+	bottom: 100%;
+	left: 20px;
+	border: solid transparent;
+	content: " ";
+	height: 0;
+	width: 0;
+	position: absolute;
+	pointer-events: none;
+	border-color: rgba(188, 190, 192, 0);
+	border-bottom-color: #414042;
+	border-width: 10px;
+	margin-left: -10px;
+}
+
+.my-MenuBarRightPopup .menuPopupContent:after {
+	left: auto;
+	right: 20px;
 }
 
 .main .menus {
@@ -356,11 +381,11 @@ a {
 }
 
 .main .wui-breadcrumbPanel .breadcrumb-last {
-	color: #ffffff;
+	color: #404142;
 }
 
 .main .wui-breadcrumbPanel .breadcrumb-last a {
-	color: #ffffff;
+	color: #404142;
 	text-decoration: none;
 }
 
@@ -383,15 +408,13 @@ a {
 	font-family: Verdana, Lucida, Arial, Helvetica, sans-serif;
 	font-size: 15pt;
 	font-weight: bold;
-	color: #ffffff;
+	color: #404142;
 	font-variant: small-caps;
 	text-align: left;
 }
 
 .main .contentWrapper {
-	background-color: #e6e7e8;
-	padding: 30px;
-	margin: 0 35px 40px 35px;
+	margin: 0 40px 40px 40px;
 	text-align: left;
 }
 

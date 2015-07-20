@@ -6,10 +6,61 @@
 	xmlns:common="urn:import:pt.gov.dgarq.roda.wui.common.client.widgets">
 
 	<ui:style>
+	.browse {
+		margin: 0 auto;
+		position: relative;
+	}
 	
+	.content-wrapper {
+		float: left;
+		width: 100%;
+	}
+	
+	.content-inner {
+		margin-right: 150px;
+		clear: both;
+		overflow: auto;
+	}
+	
+	.sidebar {
+		position: relative;
+		width: 150px;
+		margin-left: -150px;
+		float: right;
+		overflow: hidden;
+	}
+	
+	.title {
+		margin-top: 10px;
+		margin-bottom: 5px;
+		margin-left: 20px;
+		font-size: 14px;
+		font-weight: bold;
+		color: #58595b;
+	}
+	
+	.action {
+		margin-left: 20px;
+	}
+	
+	.footer {
+		clear: both;
+	}
 	</ui:style>
 
-	<g:FlowPanel styleName="browse">
-		<common:CollectionsDataGrid ui:field="fondsPanel" />
+	<g:FlowPanel styleName="browse" addStyleNames="{style.browse}">
+		<g:FlowPanel styleName="{style.content-wrapper}">
+			<common:CollectionsTable ui:field="fondsPanel"
+				addStyleNames="{style.content-inner}" />
+		</g:FlowPanel>
+		<g:FlowPanel styleName="{style.sidebar}">
+			<g:Label addStyleNames="section-label {style.title}">
+				<ui:msg description="Browser actions">Actions</ui:msg>
+			</g:Label>
+			<g:Button addStyleNames="{style.action}">
+				<ui:msg description="Create a top-level AIP">Create new</ui:msg>
+			</g:Button>
+		</g:FlowPanel>
+		<g:FlowPanel styleName="{style.footer}" />
 	</g:FlowPanel>
 </ui:UiBinder>

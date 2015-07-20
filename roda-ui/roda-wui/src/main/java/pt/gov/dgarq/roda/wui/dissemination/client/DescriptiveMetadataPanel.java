@@ -624,24 +624,25 @@ public class DescriptiveMetadataPanel extends Composite implements SourcesChange
 				}
 
 				public void onSuccess(String parentPID) {
-					Browse.getInstance().update(parentPID, false, true, new AsyncCallback<CollectionsTreeItem>() {
-
-						public void onFailure(Throwable caught) {
-							callback.onFailure(caught);
-						}
-
-						public void onSuccess(CollectionsTreeItem treeItem) {
-							callback.onSuccess(null);
-						}
-
-					});
+					// Browse.getInstance().update(parentPID, false, true, new
+					// AsyncCallback<CollectionsTreeItem>() {
+					//
+					// public void onFailure(Throwable caught) {
+					// callback.onFailure(caught);
+					// }
+					//
+					// public void onSuccess(CollectionsTreeItem treeItem) {
+					// callback.onSuccess(null);
+					// }
+					//
+					// });
 
 				}
 
 			});
 
 		} else if (info) {
-			Browse.getInstance().update(pid, true, false, callback);
+			// Browse.getInstance().update(pid, true, false, callback);
 		} else {
 			callback.onSuccess(null);
 		}

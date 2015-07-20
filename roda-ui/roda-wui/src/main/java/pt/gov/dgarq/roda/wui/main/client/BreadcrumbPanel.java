@@ -6,12 +6,11 @@ package pt.gov.dgarq.roda.wui.main.client;
 import java.util.MissingResourceException;
 import java.util.Stack;
 
-import pt.gov.dgarq.roda.wui.common.client.AuthenticatedUser;
-import pt.gov.dgarq.roda.wui.common.client.LoginStatusListener;
-import pt.gov.dgarq.roda.wui.common.client.UserLogin;
-import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
-
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -19,18 +18,23 @@ import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.MainConstants;
+import pt.gov.dgarq.roda.wui.common.client.AuthenticatedUser;
+import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
+import pt.gov.dgarq.roda.wui.common.client.LoginStatusListener;
+import pt.gov.dgarq.roda.wui.common.client.UserLogin;
+import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
 
 /**
  * @author Luis Faria
  * 
  */
-public class BreadcrumbPanel extends HorizontalPanel {
+public class BreadcrumbPanel extends HorizontalPanel implements HasValueChangeHandlers<String[]> {
 
 	// private GWTLogger logger = new GWTLogger(GWT.getTypeName(this));
 
 	private static MainConstants mainConstants = (MainConstants) GWT.create(MainConstants.class);
 
-	private final ContentPanel contentPanel;
+	private ClientLogger logger = new ClientLogger(getClass().getName());
 
 	private String[] currentpath;
 
@@ -42,9 +46,8 @@ public class BreadcrumbPanel extends HorizontalPanel {
 	 * @param contentPanel
 	 *            the content panel this breadcrumb panel will manage
 	 */
-	public BreadcrumbPanel(ContentPanel contentPanel) {
+	public BreadcrumbPanel() {
 		super();
-		this.contentPanel = contentPanel;
 		this.breadcrumbs = new Stack<Breadcrumb>();
 
 		this.currentpath = null;
@@ -113,9 +116,11 @@ public class BreadcrumbPanel extends HorizontalPanel {
 
 		updateLayout();
 
-		// Refresh contentPanel
-		contentPanel.update(path);
 		currentpath = path;
+		logger.debug("Firing breadcrumb value change event");
+		// send event
+		ValueChangeEvent.fire(this, path);
+
 	}
 
 	public void clear() {
@@ -249,5 +254,10 @@ public class BreadcrumbPanel extends HorizontalPanel {
 			return Tools.join(path, ".");
 		}
 
+	}
+
+	@Override
+	public HandlerRegistration addValueChangeHandler(ValueChangeHandler<String[]> handler) {
+		return addHandler(handler, ValueChangeEvent.getType());
 	}
 }

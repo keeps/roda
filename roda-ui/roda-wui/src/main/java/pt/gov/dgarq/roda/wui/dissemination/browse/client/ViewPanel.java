@@ -277,16 +277,17 @@ public class ViewPanel extends Composite {
 					public void onSuccess(final String childPID) {
 						loading.hide();
 						onCreateChild(childPID);
-						Browse.getInstance().update(ViewPanel.this.pid, false, true,
-								new AsyncCallback<CollectionsTreeItem>() {
-							public void onFailure(Throwable caught) {
-								logger.error("Error updating tree", caught);
-							}
-
-							public void onSuccess(CollectionsTreeItem treeItem) {
-								editmode = true;
-							}
-						});
+						// Browse.getInstance().update(ViewPanel.this.pid,
+						// false, true,
+						// new AsyncCallback<CollectionsTreeItem>() {
+						// public void onFailure(Throwable caught) {
+						// logger.error("Error updating tree", caught);
+						// }
+						//
+						// public void onSuccess(CollectionsTreeItem treeItem) {
+						// editmode = true;
+						// }
+						// });
 					}
 				});
 			}

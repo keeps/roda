@@ -24,7 +24,9 @@ import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevel;
 import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevelInfo;
 import pt.gov.dgarq.roda.core.data.search.DefaultSearchParameter;
 import pt.gov.dgarq.roda.core.data.search.EadcSearchFields;
+import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.tools.DescriptionLevelUtils;
+import pt.gov.dgarq.roda.wui.main.client.ContentPanel;
 
 /**
  * @author Luis Faria
@@ -35,6 +37,8 @@ public class ElementLevelChooser extends DockPanel {
 	private static DisseminationConstants constants = (DisseminationConstants) GWT.create(DisseminationConstants.class);
 
 	private static CommonConstants commonConstants = (CommonConstants) GWT.create(CommonConstants.class);
+
+	private ClientLogger logger = new ClientLogger(getClass().getName());
 
 	private final VerticalPanel optionLayout;
 
