@@ -106,7 +106,7 @@ if [ "$SERVLET_CONTAINER" = "tomcat6" ]; then
 	TOMCAT_DIRNAME="apache-tomcat-$TOMCAT_VERSION"
 	export TOMCAT_DIRNAME
 	TOMCAT_ZIP="$TOMCAT_DIRNAME.zip"
-	TOMCAT_ZIP_MD5="314ae7781516a678f44e3067e0006c35"
+	TOMCAT_ZIP_MD5="409e93f383ec476cde4c9b87f2427dbf"
 	TOMCAT_ZIP_URL="http://www.eu.apache.org/dist/tomcat/tomcat-${TOMCAT_VERSION%%.*}/v$TOMCAT_VERSION/bin/$TOMCAT_ZIP"
 	info "Installing Tomcat"
 	cp -v -r files/tomcat $RODA_HOME &>> $INSTALL_LOG

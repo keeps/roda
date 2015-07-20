@@ -41,7 +41,7 @@ FEDORA_VERSION="2.2.4"
 FEDORA_DIRNAME="fedora-$FEDORA_VERSION"
 FEDORA_JAR="$FEDORA_DIRNAME-installer.jar"
 FEDORA_JAR_MD5="a7b85a546be4224a93252c7bc13dd048"
-FEDORA_JAR_URL="http://sourceforge.net/projects/fedora-commons/files/fedora/$FEDORA_VERSION/$FEDORA_JAR/download"
+FEDORA_JAR_URL="http://iweb.dl.sourceforge.net/project/fedora-commons/fedora/$FEDORA_VERSION/$FEDORA_JAR"
 myEcho
 myEcho "Downloading fedora"
 if [ -f "/tmp/$FEDORA_JAR" ] && [ "$FEDORA_JAR_MD5" = "$(md5sum /tmp/$FEDORA_JAR | sed 's# .*$##')" ]; then
@@ -88,7 +88,7 @@ GSEARCH_VERSION="2.1.1"
 GSEARCH_DIRNAME="genericsearch-$GSEARCH_VERSION"
 GSEARCH_ZIP="$GSEARCH_DIRNAME.zip"
 GSEARCH_ZIP_MD5="904fee63c01f52a745cd75c39ce94a62"
-GSEARCH_ZIP_URL="http://sourceforge.net/projects/fedora-commons/files/services/3.0/$GSEARCH_ZIP/download"
+GSEARCH_ZIP_URL="http://iweb.dl.sourceforge.net/project/fedora-commons/services/3.0/$GSEARCH_ZIP"
 myEcho
 myEcho "Downloading genericsearch"
 if [ -f "/tmp/$GSEARCH_ZIP" ] && [ "$GSEARCH_ZIP_MD5" = "$(md5sum /tmp/$GSEARCH_ZIP | sed 's# .*$##')" ]; then
