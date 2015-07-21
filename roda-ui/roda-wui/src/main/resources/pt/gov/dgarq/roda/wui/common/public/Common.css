@@ -1,8 +1,9 @@
 @CHARSET "UTF-8";
 
 /** IE PNG fix **/
-.iepngfix img, .iepngfix div { behavior: url(iepngfix/iepngfix.htc) }
-
+.iepngfix img, .iepngfix div {
+	behavior: url(iepngfix/iepngfix.htc)
+}
 
 /** GWT Look & Feel **/
 .gwt-TabPanel {
@@ -47,20 +48,23 @@
 	font-weight: normal;
 }
 
-.gwt-SuggestBox { 
+.gwt-SuggestBox {
+	
 }
+
 .gwt-SuggestBoxPopup {
 	background-color: #e6e7e8;
 	border: 1px solid #58595b;
 }
+
 .gwt-SuggestBoxPopup .item {
 	color: #58595b;
 	text-align: left;
 }
+
 .gwt-SuggestBoxPopup .item-selected {
 	background-color: #999;
 }
-
 
 /** Office Button **/
 .wui-button {
@@ -144,29 +148,29 @@
 .wui-button-enabled .button-left-round {
 	background-image: url("images/button/normal/left_round.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src = 'images/button/normal/left_round.png', sizingMethod = 'scale');
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src= 'images/button/normal/left_round.png', sizingMethod= 'scale');
 }
 
 .wui-button-hover .button-left-round {
 	background-image: url("images/button/hover/left_round.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src = 'images/button/hover/left_round.png', sizingMethod = 'scale');
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src= 'images/button/hover/left_round.png', sizingMethod= 'scale');
 }
 
 .wui-button-pressed .button-left-round {
 	background-image: url("images/button/pressed/left_round.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src = 'images/button/pressed/left_round.png', sizingMethod = 'scale');
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src= 'images/button/pressed/left_round.png', sizingMethod= 'scale');
 }
 
 .wui-button-disabled .button-left-round {
 	background-image: url("images/button/disabled/left_round.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src = 'images/button/disabled/left_round.png', sizingMethod = 'scale');
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src= 'images/button/disabled/left_round.png', sizingMethod= 'scale');
 }
 
 .wui-button .wui-button-text {
@@ -191,418 +195,408 @@
 .wui-button-enabled .button-right-action_report {
 	background-image: url("images/button/normal/right_action_report.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src = 'images/button/normal/right_action_report.png', sizingMethod = 'scale' );
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src= 'images/button/normal/right_action_report.png', sizingMethod=
+		 'scale');
 }
 
 .wui-button-enabled .button-right-arrow-backward {
 	background-image: url("images/button/normal/right_arrow_backward.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src = 'images/button/normal/right_arrow_backward.png', sizingMethod = 'scale' );
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src= 'images/button/normal/right_arrow_backward.png', sizingMethod=
+		 'scale');
 }
 
 .wui-button-enabled .button-right-arrow-down {
 	background-image: url("images/button/normal/right_arrow_down.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src = 'images/button/normal/right_arrow_down.png', sizingMethod = 'scale' );
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src= 'images/button/normal/right_arrow_down.png', sizingMethod= 'scale');
 }
 
 .wui-button-enabled .button-right-arrow-forward {
 	background-image: url("images/button/normal/right_arrow_forward.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src = 'images/button/normal/right_arrow_forward.png', sizingMethod = 'scale' );
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src= 'images/button/normal/right_arrow_forward.png', sizingMethod=
+		 'scale');
 }
 
 .wui-button-enabled .button-right-arrow-up {
 	background-image: url("images/button/normal/right_arrow_up.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src = 'images/button/normal/right_arrow_up.png', sizingMethod = 'scale' );
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src= 'images/button/normal/right_arrow_up.png', sizingMethod= 'scale');
 }
 
 .wui-button-enabled .button-right-check {
 	background-image: url("images/button/normal/right_check.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src = 'images/button/normal/right_check.png', sizingMethod = 'scale' );
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src= 'images/button/normal/right_check.png', sizingMethod= 'scale');
 }
 
 .wui-button-enabled .button-right-cross {
 	background-image: url("images/button/normal/right_cross.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src = 'images/button/normal/right_cross.png', sizingMethod = 'scale' );
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src= 'images/button/normal/right_cross.png', sizingMethod= 'scale');
 }
 
 .wui-button-enabled .button-right-info {
 	background-image: url("images/button/normal/right_info.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src = 'images/button/normal/right_info.png', sizingMethod = 'scale');
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src= 'images/button/normal/right_info.png', sizingMethod= 'scale');
 }
 
 .wui-button-enabled .button-right-minus {
 	background-image: url("images/button/normal/right_minus.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/button/normal/right_minus.png', sizingMethod =      
-		'scale' );
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/button/normal/right_minus.png', sizingMethod=       
+		'scale');
 }
 
 .wui-button-enabled .button-right-plus {
 	background-image: url("images/button/normal/right_plus.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/button/normal/right_plus.png', sizingMethod =       'scale'
-		);
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/button/normal/right_plus.png', sizingMethod=       'scale');
 }
 
 .wui-button-enabled .button-right-ri {
 	background-image: url("images/button/normal/right_ri.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/button/normal/right_ri.png', sizingMethod =       'scale' )
-		;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/button/normal/right_ri.png', sizingMethod=       'scale');
 }
 
 .wui-button-enabled .button-right-rec {
 	background-image: url("images/button/normal/right_rec.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/button/normal/right_rec.png', sizingMethod =       'scale'
-		);
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/button/normal/right_rec.png', sizingMethod=       'scale');
 }
 
 .wui-button-hover .button-right-action_report {
 	background-image: url("images/button/hover/right_action_report.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/button/hover/right_action_report.png', sizingMethod =    
-		  'scale' );
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/button/hover/right_action_report.png', sizingMethod=    
+		  'scale');
 }
 
 .wui-button-hover .button-right-arrow-backward {
 	background-image: url("images/button/hover/right_arrow_backward.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/button/hover/right_arrow_backward.png', sizingMethod =    
-		  'scale' );
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/button/hover/right_arrow_backward.png', sizingMethod=    
+		  'scale');
 }
 
 .wui-button-hover .button-right-arrow-down {
 	background-image: url("images/button/hover/right_arrow_down.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/button/hover/right_arrow_down.png', sizingMethod =     
-		 'scale' );
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/button/hover/right_arrow_down.png', sizingMethod=     
+		 'scale');
 }
 
 .wui-button-hover .button-right-arrow-forward {
 	background-image: url("images/button/hover/right_arrow_forward.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/button/hover/right_arrow_forward.png', sizingMethod =    
-		  'scale' );
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/button/hover/right_arrow_forward.png', sizingMethod=    
+		  'scale');
 }
 
 .wui-button-hover .button-right-arrow-up {
 	background-image: url("images/button/hover/right_arrow_up.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/button/hover/right_arrow_up.png', sizingMethod =      
-		'scale' );
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/button/hover/right_arrow_up.png', sizingMethod=       
+		'scale');
 }
 
 .wui-button-hover .button-right-check {
 	background-image: url("images/button/hover/right_check.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/button/hover/right_check.png', sizingMethod =       'scale'
-		);
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/button/hover/right_check.png', sizingMethod=       'scale');
 }
 
 .wui-button-hover .button-right-cross {
 	background-image: url("images/button/hover/right_cross.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/button/hover/right_cross.png', sizingMethod =       'scale'
-		);
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/button/hover/right_cross.png', sizingMethod=       'scale');
 }
 
 .wui-button-hover .button-right-info {
 	background-image: url("images/button/hover/right_info.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/button/hover/right_info.png', sizingMethod =       'scale'
-		);
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/button/hover/right_info.png', sizingMethod=       'scale');
 }
 
 .wui-button-hover .button-right-minus {
 	background-image: url("images/button/hover/right_minus.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/button/hover/right_minus.png', sizingMethod =       'scale'
-		);
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/button/hover/right_minus.png', sizingMethod=       'scale');
 }
 
 .wui-button-hover .button-right-plus {
 	background-image: url("images/button/hover/right_plus.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/button/hover/right_plus.png', sizingMethod =       'scale'
-		);
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/button/hover/right_plus.png', sizingMethod=       'scale');
 }
 
 .wui-button-hover .button-right-ri {
 	background-image: url("images/button/hover/right_ri.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/button/hover/right_ri.png', sizingMethod =       'scale' );
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/button/hover/right_ri.png', sizingMethod=       'scale');
 }
 
 .wui-button-hover .button-right-rec {
 	background-image: url("images/button/hover/right_rec.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/button/hover/right_rec.png', sizingMethod =       'scale' )
-		;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/button/hover/right_rec.png', sizingMethod=       'scale');
 }
 
 .wui-button-pressed .button-right-action_report {
 	background-image: url("images/button/pressed/right_action_report.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/button/pressed/right_action_report.png', sizingMethod =   
-		   'scale' );
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/button/pressed/right_action_report.png', sizingMethod=   
+		   'scale');
 }
 
 .wui-button-pressed .button-right-arrow-backward {
 	background-image: url("images/button/pressed/right_arrow_backward.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/button/pressed/right_arrow_backward.png', sizingMethod =   
-		   'scale' );
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/button/pressed/right_arrow_backward.png', sizingMethod=   
+		   'scale');
 }
 
 .wui-button-pressed .button-right-arrow-down {
 	background-image: url("images/button/pressed/right_arrow_down.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/button/pressed/right_arrow_down.png', sizingMethod =    
-		  'scale' );
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/button/pressed/right_arrow_down.png', sizingMethod=    
+		  'scale');
 }
 
 .wui-button-pressed .button-right-arrow-forward {
 	background-image: url("images/button/pressed/right_arrow_forward.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/button/pressed/right_arrow_forward.png', sizingMethod =   
-		   'scale' );
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/button/pressed/right_arrow_forward.png', sizingMethod=   
+		   'scale');
 }
 
 .wui-button-pressed .button-right-arrow-up {
 	background-image: url("images/button/pressed/right_arrow_up.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/button/pressed/right_arrow_up.png', sizingMethod =     
-		 'scale' );
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/button/pressed/right_arrow_up.png', sizingMethod=     
+		 'scale');
 }
 
 .wui-button-pressed .button-right-check {
 	background-image: url("images/button/pressed/right_check.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/button/pressed/right_check.png', sizingMethod =      
-		'scale' );
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/button/pressed/right_check.png', sizingMethod=       
+		'scale');
 }
 
 .wui-button-pressed .button-right-cross {
 	background-image: url("images/button/pressed/right_cross.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/button/pressed/right_cross.png', sizingMethod =      
-		'scale' );
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/button/pressed/right_cross.png', sizingMethod=       
+		'scale');
 }
 
 .wui-button-pressed .button-right-info {
 	background-image: url("images/button/pressed/right_info.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/button/pressed/right_info.png', sizingMethod =      
-		'scale' );
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/button/pressed/right_info.png', sizingMethod=       
+		'scale');
 }
 
 .wui-button-pressed .button-right-minus {
 	background-image: url("images/button/pressed/right_minus.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/button/pressed/right_minus.png', sizingMethod =      
-		'scale' );
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/button/pressed/right_minus.png', sizingMethod=       
+		'scale');
 }
 
 .wui-button-pressed .button-right-plus {
 	background-image: url("images/button/pressed/right_plus.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/button/pressed/right_plus.png', sizingMethod =      
-		'scale' );
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/button/pressed/right_plus.png', sizingMethod=       
+		'scale');
 }
 
 .wui-button-pressed .button-right-ri {
 	background-image: url("images/button/pressed/right_ri.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/button/pressed/right_ri.png', sizingMethod =       'scale'
-		);
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/button/pressed/right_ri.png', sizingMethod=       'scale');
 }
 
 .wui-button-pressed .button-right-rec {
 	background-image: url("images/button/pressed/right_rec.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/button/pressed/right_rec.png', sizingMethod =       'scale'
-		);
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/button/pressed/right_rec.png', sizingMethod=       'scale');
 }
 
 .wui-button-disabled .button-right-action_report {
 	background-image: url("images/button/disabled/right_action_report.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/button/disabled/right_action_report.png', sizingMethod =   
-		   'scale' );
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/button/disabled/right_action_report.png', sizingMethod=   
+		   'scale');
 }
 
 .wui-button-disabled .button-right-arrow-backward {
-	background-image: url("images/button/disabled/right_arrow_backward.png")
-		;
+	background-image: url("images/button/disabled/right_arrow_backward.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/button/disabled/right_arrow_backward.png', sizingMethod =
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/button/disabled/right_arrow_backward.png', sizingMethod=
 		  
-		   'scale' );
+		   'scale');
 }
 
 .wui-button-disabled .button-right-arrow-down {
 	background-image: url("images/button/disabled/right_arrow_down.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/button/disabled/right_arrow_down.png', sizingMethod =    
-		  'scale' );
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/button/disabled/right_arrow_down.png', sizingMethod=    
+		  'scale');
 }
 
 .wui-button-disabled .button-right-arrow-forward {
 	background-image: url("images/button/disabled/right_arrow_forward.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/button/disabled/right_arrow_forward.png', sizingMethod =   
-		   'scale' );
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/button/disabled/right_arrow_forward.png', sizingMethod=   
+		   'scale');
 }
 
 .wui-button-disabled .button-right-arrow-up {
 	background-image: url("images/button/disabled/right_arrow_up.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/button/disabled/right_arrow_up.png', sizingMethod =     
-		 'scale' );
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/button/disabled/right_arrow_up.png', sizingMethod=     
+		 'scale');
 }
 
 .wui-button-disabled .button-right-check {
 	background-image: url("images/button/disabled/right_check.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/button/disabled/right_check.png', sizingMethod =      
-		'scale' );
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/button/disabled/right_check.png', sizingMethod=       
+		'scale');
 }
 
 .wui-button-disabled .button-right-cross {
 	background-image: url("images/button/disabled/right_cross.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/button/disabled/right_cross.png', sizingMethod =      
-		'scale' );
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/button/disabled/right_cross.png', sizingMethod=       
+		'scale');
 }
 
 .wui-button-disabled .button-right-info {
 	background-image: url("images/button/disabled/right_info.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/button/disabled/right_info.png', sizingMethod =      
-		'scale' );
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/button/disabled/right_info.png', sizingMethod=       
+		'scale');
 }
 
 .wui-button-disabled .button-right-minus {
 	background-image: url("images/button/disabled/right_minus.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/button/disabled/right_minus.png', sizingMethod =      
-		'scale' );
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/button/disabled/right_minus.png', sizingMethod=       
+		'scale');
 }
 
 .wui-button-disabled .button-right-plus {
 	background-image: url("images/button/disabled/right_plus.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/button/disabled/right_plus.png', sizingMethod =      
-		'scale' );
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/button/disabled/right_plus.png', sizingMethod=       
+		'scale');
 }
 
 .wui-button-disabled .button-right-ri {
 	background-image: url("images/button/disabled/right_ri.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/button/disabled/right_ri.png', sizingMethod =       'scale'
-		);
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/button/disabled/right_ri.png', sizingMethod=       'scale');
 }
 
 .wui-button-disabled .button-right-rec {
 	background-image: url("images/button/disabled/right_rec.png");
 	_background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/button/disabled/right_rec.png', sizingMethod =      
-		'scale' );
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/button/disabled/right_rec.png', sizingMethod=       
+		'scale');
 }
 
 /** Office Window **/
@@ -631,18 +625,18 @@
 	height: 30px;
 	background: url("images/shadow/shadow-up-left.png") no-repeat;
 	_background: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/shadow/shadow-up-left.png', sizingMethod =       'scale' );
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/shadow/shadow-up-left.png', sizingMethod=       'scale');
 }
 
 .office-window-shadow .shadow-up {
 	height: 30px;
 	background: url("images/shadow/shadow-up.png") repeat-x;
 	_background: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/shadow/shadow-up.png', sizingMethod =       'scale' );
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/shadow/shadow-up.png', sizingMethod=       'scale');
 }
 
 .office-window-shadow .shadow-up-right {
@@ -650,10 +644,9 @@
 	height: 30px;
 	background: url("images/shadow/shadow-up-right.png") no-repeat;
 	_background: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/shadow/shadow-up-right.png', sizingMethod =       'scale' )
-		;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/shadow/shadow-up-right.png', sizingMethod=       'scale');
 }
 
 .office-window-shadow .shadow-left {
@@ -661,9 +654,9 @@
 	height: 100%;
 	background: url("images/shadow/shadow-left.png") repeat-y;
 	_background: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/shadow/shadow-left.png', sizingMethod =       'scale' );
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/shadow/shadow-left.png', sizingMethod=       'scale');
 }
 
 .office-window-shadow .shadow-right {
@@ -671,9 +664,9 @@
 	height: 100%;
 	background: url("images/shadow/shadow-right.png") repeat-y;
 	_background: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/shadow/shadow-right.png', sizingMethod =       'scale' );
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/shadow/shadow-right.png', sizingMethod=       'scale');
 }
 
 .office-window-shadow .shadow-bottom-left {
@@ -681,19 +674,19 @@
 	height: 30px;
 	background: url("images/shadow/shadow-bottom-left.png") no-repeat;
 	_background: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/shadow/shadow-bottom-left.png', sizingMethod =      
-		'scale' );
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/shadow/shadow-bottom-left.png', sizingMethod=       
+		'scale');
 }
 
 .office-window-shadow .shadow-bottom {
 	height: 30px;
 	background: url("images/shadow/shadow-bottom.png") repeat-x;
 	_background: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/shadow/shadow-bottom.png', sizingMethod =       'scale' );
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/shadow/shadow-bottom.png', sizingMethod=       'scale');
 }
 
 .office-window-shadow .shadow-bottom-right {
@@ -701,10 +694,10 @@
 	height: 30px;
 	background: url("images/shadow/shadow-bottom-right.png") no-repeat;
 	_background: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader (  
-		    src =   
-		   'images/shadow/shadow-bottom-right.png', sizingMethod =      
-		'scale' );
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/shadow/shadow-bottom-right.png', sizingMethod=       
+		'scale');
 }
 
 /** Alphabet Sorted List **/
@@ -1045,8 +1038,6 @@
 	cursor: pointer;
 	cursor: hand;
 }
-	
-	
 
 .wui-lazy-list-vertical .lazy-list-vertical-headers {
 	width: 100%;
@@ -1068,7 +1059,6 @@
 }
 
 /** list-header **/
-
 .lazy-list-header {
 	height: 18px;
 	background-color: #58595b;
@@ -1163,21 +1153,44 @@
 }
 
 /** Static pages style **/
-
 .welcome {
 	font-size: 12px;
 	color: black;
 	font-weight: normal;
 	margin-left: 200px;
 	margin-right: 40px;
-	
 }
 
-.paragraph {
-	margin-left: 200px;
-	margin-right: 40px;
+.static-page {
+	padding: 40px;
 	font-size: 12px;
 	line-height: 18px;
+}
+.static-page p {
+	margin-bottom: 1em;
+}
+
+.static-page h1 {
+	font-size: 18pt;
+	font-weight: bold;
+	color: #404142;
+	margin-bottom: 20px;
+}
+
+.static-page h2 {
+	font-size: 14pt;
+	font-weight: bold;
+	color: #404142;
+	margin-bottom: 10px;
+}
+
+.two-columns {
+	display: flex;
+	justify-content: space-between;
+}
+
+.two-columns .column {
+	width: 49%;
 }
 
 .link {
@@ -1280,14 +1293,15 @@
 
 /* File Upload */
 .waitWindow-layout {
-
+	
 }
 
 .waitWindow-image {
 	margin: 5px 0px 5px 15px;
 }
+
 .waitWindow-label {
 	color: #e6e7e8;
 	margin: 14px 0px;
-	font-size: 14px;	
+	font-size: 14px;
 }

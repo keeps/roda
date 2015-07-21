@@ -52,11 +52,11 @@ public class MyLightBox implements PopupListener {
 
 	private native void backgroundFixup(Element e)
 	/*-{
-	 // fixes issue with GWT 1.1.10 by hiding the iframe
-	 if (e.__frame) {
-	 e.__frame.style.visibility = 'hidden';
-	 }
-	 }-*/;
+		// fixes issue with GWT 1.1.10 by hiding the iframe
+		if (e.__frame) {
+			e.__frame.style.visibility = 'hidden';
+		}
+	}-*/;
 
 	public void onPopupClosed(PopupPanel sender, boolean autoClosed) {
 		if (GWT.isScript() && png != null) {
@@ -75,10 +75,11 @@ public class MyLightBox implements PopupListener {
 
 		background.setWidth(Integer.toString(w));
 		background.setHeight(Integer.toString(h));
-		if (GWT.isScript()) {
-			background
-					.setWidget(png = new PNGImage("pt.gov.dgarq.roda.wui.main.Main/images/lightbox.png", w, h));
-		}
+		// if (GWT.isScript()) {
+		// background.setWidget(png = new
+		// PNGImage("pt.gov.dgarq.roda.wui.main.Main/images/lightbox.png", w,
+		// h));
+		// }
 		background.setPopupPosition(0, 0);
 		hideSelects();
 
@@ -148,85 +149,75 @@ public class MyLightBox implements PopupListener {
 	}
 
 	private native void hideSelects() /*-{
-	 var selects = $doc.getElementsByTagName("select");
-	 for (i = 0; i != selects.length; i++) {
-	 selects[i].style.visibility = "hidden";
-	 }
-	 }-*/;
+		var selects = $doc.getElementsByTagName("select");
+		for (i = 0; i != selects.length; i++) {
+			selects[i].style.visibility = "hidden";
+		}
+	}-*/;
 
 	private native void showSelects() /*-{
-	 var selects = $doc.getElementsByTagName("select");
-	 for (i = 0; i != selects.length; i++) {
-	 selects[i].style.visibility = "visible";
-	 }
-	 }-*/;
+		var selects = $doc.getElementsByTagName("select");
+		for (i = 0; i != selects.length; i++) {
+			selects[i].style.visibility = "visible";
+		}
+	}-*/;
 
 	private native int getHeight() /*-{
-	 var yScroll;
-	 
-	 if ($wnd.innerHeight && $wnd.scrollMaxY) {	
-	 yScroll = $wnd.innerHeight + $wnd.scrollMaxY;
-	 }
-	 else if ($doc.body.scrollHeight > $doc.body.offsetHeight){ // all but Explorer Mac
-	 yScroll = $doc.body.scrollHeight;
-	 }
-	 else { // Explorer Mac...would also work in Explorer 6 Strict, Mozilla and Safari
-	 yScroll = $doc.body.offsetHeight;
-	 }
-	 
-	 var windowHeight;
-	 if (self.innerHeight) {	// all except Explorer
-	 windowHeight = self.innerHeight;
-	 }
-	 else if ($doc.documentElement && $doc.documentElement.clientHeight) { // Explorer 6 Strict Mode
-	 windowHeight = $doc.documentElement.clientHeight;
-	 }
-	 else if ($doc.body) { // other Explorers
-	 windowHeight = $doc.body.clientHeight;
-	 }	
-	 
-	 // for small pages with total height less then height of the viewport
-	 if(yScroll < windowHeight){
-	 pageHeight = windowHeight;
-	 }
-	 else { 
-	 pageHeight = yScroll;
-	 }
-	 return pageHeight;
-	 }-*/;
+		var yScroll;
+
+		if ($wnd.innerHeight && $wnd.scrollMaxY) {
+			yScroll = $wnd.innerHeight + $wnd.scrollMaxY;
+		} else if ($doc.body.scrollHeight > $doc.body.offsetHeight) { // all but Explorer Mac
+			yScroll = $doc.body.scrollHeight;
+		} else { // Explorer Mac...would also work in Explorer 6 Strict, Mozilla and Safari
+			yScroll = $doc.body.offsetHeight;
+		}
+
+		var windowHeight;
+		if (self.innerHeight) { // all except Explorer
+			windowHeight = self.innerHeight;
+		} else if ($doc.documentElement && $doc.documentElement.clientHeight) { // Explorer 6 Strict Mode
+			windowHeight = $doc.documentElement.clientHeight;
+		} else if ($doc.body) { // other Explorers
+			windowHeight = $doc.body.clientHeight;
+		}
+
+		// for small pages with total height less then height of the viewport
+		if (yScroll < windowHeight) {
+			pageHeight = windowHeight;
+		} else {
+			pageHeight = yScroll;
+		}
+		return pageHeight;
+	}-*/;
 
 	private native int getWidth() /*-{
-	 var xScroll;
-	 
-	 if ($wnd.innerHeight && $wnd.scrollMaxY) {	
-	 xScroll = $doc.body.scrollWidth;
-	 }
-	 else if ($doc.body.scrollHeight > $doc.body.offsetHeight){ // all but Explorer Mac
-	 xScroll = $doc.body.scrollWidth;
-	 }
-	 else { // Explorer Mac...would also work in Explorer 6 Strict, Mozilla and Safari
-	 xScroll = $doc.body.offsetWidth;
-	 }
-	 
-	 var windowHeight;
-	 if (self.innerHeight) {	// all except Explorer
-	 windowWidth = self.innerWidth;
-	 }
-	 else if ($doc.documentElement && $doc.documentElement.clientHeight) { // Explorer 6 Strict Mode
-	 windowWidth = $doc.documentElement.clientWidth;
-	 }
-	 else if ($doc.body) { // other Explorers
-	 windowWidth = $doc.body.clientWidth;
-	 }	
-	 
-	 // for small pages with total width less then width of the viewport
-	 if(xScroll < windowWidth){	
-	 pageWidth = windowWidth;
-	 }
-	 else {
-	 pageWidth = xScroll;
-	 }
-	 return pageWidth;
-	 }-*/;
+		var xScroll;
+
+		if ($wnd.innerHeight && $wnd.scrollMaxY) {
+			xScroll = $doc.body.scrollWidth;
+		} else if ($doc.body.scrollHeight > $doc.body.offsetHeight) { // all but Explorer Mac
+			xScroll = $doc.body.scrollWidth;
+		} else { // Explorer Mac...would also work in Explorer 6 Strict, Mozilla and Safari
+			xScroll = $doc.body.offsetWidth;
+		}
+
+		var windowHeight;
+		if (self.innerHeight) { // all except Explorer
+			windowWidth = self.innerWidth;
+		} else if ($doc.documentElement && $doc.documentElement.clientHeight) { // Explorer 6 Strict Mode
+			windowWidth = $doc.documentElement.clientWidth;
+		} else if ($doc.body) { // other Explorers
+			windowWidth = $doc.body.clientWidth;
+		}
+
+		// for small pages with total width less then width of the viewport
+		if (xScroll < windowWidth) {
+			pageWidth = windowWidth;
+		} else {
+			pageWidth = xScroll;
+		}
+		return pageWidth;
+	}-*/;
 
 }

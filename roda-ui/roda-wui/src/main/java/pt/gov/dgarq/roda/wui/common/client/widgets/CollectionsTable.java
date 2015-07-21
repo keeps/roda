@@ -53,7 +53,7 @@ public class CollectionsTable extends AsyncTableCell<SimpleDescriptionObject> {
 
 			@Override
 			public String getValue(SimpleDescriptionObject sdo) {
-				return sdo != null ? sdo.getTitle() : null;
+				return sdo != null ? sdo.getTitle() + sdo.getId() : null;
 			}
 		};
 

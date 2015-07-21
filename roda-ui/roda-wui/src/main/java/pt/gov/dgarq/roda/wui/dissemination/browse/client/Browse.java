@@ -9,17 +9,15 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.ToggleButton;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.SelectionChangeEvent;
+import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 
 import config.i18n.client.BrowseConstants;
 import config.i18n.client.BrowseMessages;
-import pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException;
 import pt.gov.dgarq.roda.core.data.DescriptionObject;
+import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.wui.common.client.AuthenticatedUser;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
@@ -98,15 +96,15 @@ public class Browse extends Composite {
 
 	// private boolean init;
 
-	private HorizontalPanel browserHeader;
+	// private HorizontalPanel browserHeader;
 
-	private ToggleButton viewToggle;
+	// private ToggleButton viewToggle;
 
-	private Label total;
+	// private Label total;
 
 	private WUIButton createFonds;
 
-	private Image refresh;
+	// private Image refresh;
 
 	private ViewWindow viewWindow;
 
@@ -115,6 +113,15 @@ public class Browse extends Composite {
 	private Browse() {
 		// this.fondsPanel = new CollectionsDataGrid();
 		initWidget(uiBinder.createAndBindUi(this));
+
+		fondsPanel.getSelectionModel().addSelectionChangeHandler(new Handler() {
+
+			@Override
+			public void onSelectionChange(SelectionChangeEvent event) {
+				SimpleDescriptionObject sdo = fondsPanel.getSelectionModel().getSelectedObject();
+				view(sdo.getId());
+			}
+		});
 
 		// init = false;
 
@@ -296,10 +303,10 @@ public class Browse extends Composite {
 	protected void onPermissionsUpdate(AuthenticatedUser user) {
 		if (user.hasRole("administration.metadata_editor")) {
 			createFonds.setVisible(true);
-			refresh.setVisible(true);
+			// refresh.setVisible(true);
 		} else {
 			createFonds.setVisible(false);
-			refresh.setVisible(false);
+			// refresh.setVisible(false);
 		}
 
 		// fondsPanel.clear(new AsyncCallback<Integer>() {
@@ -361,61 +368,63 @@ public class Browse extends Composite {
 	}
 
 	private void viewAction(final String pid) {
-		if (viewToggle.isDown()) {
-			logger.debug("Opening viewWindow with " + pid);
-			// updateStyle();
-			if (viewWindow != null && !viewWindow.getPID().equals(pid)) {
-				viewWindow.hide();
-			}
-
-			if (viewWindow == null || !viewWindow.getPID().equals(pid)) {
-				viewWindow = new ViewWindow(pid, new AsyncCallback<DescriptionObject>() {
-
-					public void onFailure(Throwable caught) {
-						if (caught instanceof NoSuchRODAObjectException) {
-							// onNoSuchObject(pid);
-						} else {
-							logger.error("Error creating view window", caught);
-						}
-					}
-
-					public void onSuccess(DescriptionObject obj) {
-						viewWindow.show();
-					}
-
-				});
-				viewWindow.addViewListener(createViewListener(pid));
-			}
-
-		} else {
-			if (viewPanel != null && !viewPanel.getPID().equals(pid)) {
-				viewPanel.close();
-			}
-
-			if (viewPanel == null || !viewPanel.getPID().equals(pid)) {
-				logger.debug("Opening viewPanel with " + pid);
-				viewPanel = new ViewPanel(pid, new AsyncCallback<DescriptionObject>() {
-
-					public void onFailure(Throwable caught) {
-						if (caught instanceof NoSuchRODAObjectException) {
-							// onNoSuchObject(pid);
-						} else {
-							logger.error("Error creating view window", caught);
-						}
-
-					}
-
-					public void onSuccess(DescriptionObject obj) {
-						// updateStyle();
-						viewPanelContainer.setWidget(viewPanel);
-					}
-
-				});
-
-				viewPanel.addViewListener(createViewListener(pid));
-
-			}
-		}
+		// if (viewToggle.isDown()) {
+		// logger.debug("Opening viewWindow with " + pid);
+		// // updateStyle();
+		// if (viewWindow != null && !viewWindow.getPID().equals(pid)) {
+		// viewWindow.hide();
+		// }
+		//
+		// if (viewWindow == null || !viewWindow.getPID().equals(pid)) {
+		// viewWindow = new ViewWindow(pid, new
+		// AsyncCallback<DescriptionObject>() {
+		//
+		// public void onFailure(Throwable caught) {
+		// if (caught instanceof NoSuchRODAObjectException) {
+		// // onNoSuchObject(pid);
+		// } else {
+		// logger.error("Error creating view window", caught);
+		// }
+		// }
+		//
+		// public void onSuccess(DescriptionObject obj) {
+		// viewWindow.show();
+		// }
+		//
+		// });
+		// viewWindow.addViewListener(createViewListener(pid));
+		// }
+		//
+		// } else {
+		// if (viewPanel != null && !viewPanel.getPID().equals(pid)) {
+		// viewPanel.close();
+		// }
+		//
+		// if (viewPanel == null || !viewPanel.getPID().equals(pid)) {
+		// logger.debug("Opening viewPanel with " + pid);
+		// viewPanel = new ViewPanel(pid, new AsyncCallback<DescriptionObject>()
+		// {
+		//
+		// public void onFailure(Throwable caught) {
+		// if (caught instanceof NoSuchRODAObjectException) {
+		// // onNoSuchObject(pid);
+		// } else {
+		// logger.error("Error creating view window", caught);
+		// }
+		//
+		// }
+		//
+		// public void onSuccess(DescriptionObject obj) {
+		// // updateStyle();
+		// viewPanelContainer.setWidget(viewPanel);
+		// }
+		//
+		// });
+		//
+		// viewPanel.addViewListener(createViewListener(pid));
+		//
+		// }
+		// }
 	}
 
 	// protected void onNoSuchObject(final String pid) {

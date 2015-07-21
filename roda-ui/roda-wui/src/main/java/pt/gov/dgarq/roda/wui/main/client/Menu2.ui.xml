@@ -5,13 +5,13 @@
 	xmlns:i="urn:import:config.i18n.client" xmlns:m="urn:import:pt.gov.dgarq.roda.wui.main.client">
 
 	<ui:style>
-	
+	.menubar-right {
+		float: right;
+	}
 	</ui:style>
 
-	<g:HorizontalPanel width="100%">
+	<g:FlowPanel>
+		<g:MenuBar ui:field="rightMenu" addStyleNames="{style.menubar-right}" />
 		<g:MenuBar ui:field="leftMenu" />
-		<g:cell horizontalAlignment="ALIGN_RIGHT">
-			<g:MenuBar ui:field="rightMenu" />
-		</g:cell>
-	</g:HorizontalPanel>
+	</g:FlowPanel>
 </ui:UiBinder>

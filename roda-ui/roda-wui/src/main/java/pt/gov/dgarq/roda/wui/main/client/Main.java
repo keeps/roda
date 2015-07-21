@@ -84,9 +84,6 @@ public class Main extends Composite implements EntryPoint {
 	Menu2 menu;
 
 	@UiField(provided = true)
-	BreadcrumbPanel breadcrumbPanel;
-
-	@UiField(provided = true)
 	ContentPanel contentPanel;
 
 	/**
@@ -96,16 +93,6 @@ public class Main extends Composite implements EntryPoint {
 		languageSwitcherPanel = new LanguageSwitcherPanel();
 		menu = new Menu2();
 		contentPanel = ContentPanel.getInstance();
-		breadcrumbPanel = new BreadcrumbPanel();
-		breadcrumbPanel.addValueChangeHandler(new ValueChangeHandler<String[]>() {
-
-			@Override
-			public void onValueChange(ValueChangeEvent<String[]> event) {
-				logger.info("updating content panel");
-				contentPanel.update(event.getValue());
-			}
-		});
-
 		Binder uiBinder = GWT.create(Binder.class);
 		initWidget(uiBinder.createAndBindUi(this));
 		this.addStyleName("main");
@@ -139,12 +126,12 @@ public class Main extends Composite implements EntryPoint {
 
 	private void onHistoryChanged(String historyToken) {
 		if (historyToken.length() == 0) {
-			breadcrumbPanel.updatePath(Tools.splitHistory(Home.getInstance().getHistoryPath()));
+			contentPanel.update(Tools.splitHistory(Home.getInstance().getHistoryPath()));
 			History.newItem(Home.getInstance().getHistoryPath());
 		} else {
 			final String decodedHistoryToken = URL.decode(historyToken);
 			String[] historyPath = Tools.splitHistory(decodedHistoryToken);
-			breadcrumbPanel.updatePath(historyPath);
+			contentPanel.update(historyPath);
 
 			Scheduler.get().scheduleDeferred(new Command() {
 

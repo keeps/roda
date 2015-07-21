@@ -7,6 +7,7 @@ html, body {
 	border: 0;
 	height: 100%;
 	background-color: white;
+	height: 100%;
 }
 
 body {
@@ -14,22 +15,63 @@ body {
 	margin: 0;
 	border: 0;
 	text-align: center;
+	margin-top: -13px;
 }
 
 body, * {
-	font-family: Verdana, Lucida, Helvetica, Arial, sans-serif;
+	font-family: 'Ubuntu', sans-serif;
 	font-size: 12px;
 	color: #58595b;
+	text-align: left;
 }
 
 a {
-	font-family: Verdana, Lucida, Arial, Helvetica, sans-serif;
+	font-family: 'Ubuntu', sans-serif;
 	font-size: 12px;
+}
+
+.btn {
+	border-radius: 15px;
+	padding: 3px 5px;
+	border: 1px solid #404142;
+	background-color: #404142;
+	color: white;
+	font-weight: 500;
+}
+
+.btn:hover {
+	background-color: rgba(64, 65, 66, 0.8); cursor : pointer;
+	cursor: hand;
+	cursor: pointer;
+}
+
+.btn:active {
+	background-color: white;
+	color: #404142;
+	cursor: pointer;
+	cursor: hand;
+}
+
+.btn:focus {
+	outline-color: transparent;
+	outline-style: none;
+}
+
+.btn-plus:before {
+	content: "\f055";
+	display: inline-block;
+	font-family: "fontawesome";
+	padding-right: 5px;
 }
 
 .main {
 	background-color: white;
-	margin-top: -15px;
+	min-height: 100%;
+	margin: 0 auto -200px; 
+}
+
+.footer {
+	height: 200px;
 }
 
 .main-filler {
@@ -75,6 +117,7 @@ a {
 
 /* @group Language Switcher Panel */
 .wui-languageSwitcher {
+	
 }
 
 .wui-languageSwitcher .languageSwitcher-flag {
@@ -138,7 +181,7 @@ a {
 	left: 43px;
 	top: 65px;
 	width: 150px;
-	font-family: Verdana, Lucida, Arial, Helvetica, sans-serif;
+	font-family: 'Ubuntu', sans-serif;
 	font-size: 9pt;
 	overflow: hidden;
 	color: #58595b;
@@ -154,7 +197,7 @@ a {
 
 .wui-login .wui-login-box-pass-dummy {
 	width: 150px;
-	font-family: Verdana, Lucida, Arial, Helvetica, sans-serif;
+	font-family: 'Ubuntu', sans-serif;
 	font-size: 9pt;
 	color: #999;
 	margin-bottom: 5px;
@@ -187,7 +230,7 @@ a {
 }
 
 .wui-login .wui-loginLinks .loginLink a {
-	font-family: Verdana, Lucida, Arial, Helvetica, sans-serif;
+	font-family: 'Ubuntu', sans-serif;
 	font-size: 9pt;
 	color: #ffffff;
 	text-decoration: none;
@@ -199,7 +242,7 @@ a {
 }
 
 .wui-login .wui-loginLinks .separator {
-	font-family: Verdana, Lucida, Arial, Helvetica, sans-serif;
+	font-family: 'Ubuntu', sans-serif;
 	font-size: 9pt;
 	color: #ffffff;
 }
@@ -244,14 +287,27 @@ a {
 /* @end */
 
 /* @group Menus */
-
-.gwt-MenuBar, .my-MenuBarRight {
+.gwt-MenuBar {
 	background-color: #414042;
 }
-.gwt-MenuBar .gwt-MenuItem, .my-MenuBarRight .gwt-MenuItem {
+
+.gwt-MenuBar-horizontal table {
+	border-spacing: 0;
+}
+
+.gwt-MenuBar.gwt-MenuBar-vertical {
+	background-color: #bcbec0;
+}
+
+.gwt-MenuBar.gwt-MenuBar-vertical .gwt-MenuItem {
+	color: #58595b;
+	min-width: 130px;
+}
+
+.gwt-MenuBar .gwt-MenuItem {
 	cursor: pointer;
 	cursor: hand;
-	font-family: Verdana, Lucida, Arial, Helvetica, sans-serif;
+	font-family: 'Ubuntu', sans-serif;
 	font-size: 8pt;
 	font-weight: bold;
 	font-variant: normal;
@@ -260,35 +316,14 @@ a {
 	text-align: left;
 }
 
-.gwt-MenuBar .gwt-MenuItem-selected, .my-MenuBarRight .gwt-MenuItem-selected {
+.gwt-MenuBar .gwt-MenuItem-selected {
 	color: #414042;
 	background-color: #bcbec0;
 }
 
-.gwt-MenuBarPopup .menuPopupContent, .my-MenuBarRight .menuPopupContent {
-	box-shadow: 1px 1px 5px 0px black;
-	position: relative;
-	top: 5px;
-}
-
-.gwt-MenuBarPopup .menuPopupContent:after, .my-MenuBarRightPopup .menuPopupContent:after {
-	bottom: 100%;
-	left: 20px;
-	border: solid transparent;
-	content: " ";
-	height: 0;
-	width: 0;
-	position: absolute;
-	pointer-events: none;
-	border-color: rgba(188, 190, 192, 0);
-	border-bottom-color: #414042;
-	border-width: 10px;
-	margin-left: -10px;
-}
-
-.my-MenuBarRightPopup .menuPopupContent:after {
-	left: auto;
-	right: 20px;
+.gwt-MenuBar.gwt-MenuBar-vertical .gwt-MenuItem-selected {
+	background-color: #58595b;
+	color: white;
 }
 
 .main .menus {
@@ -297,7 +332,7 @@ a {
 }
 
 .main .menu_item {
-	font-family: Verdana, Lucida, Arial, Helvetica, sans-serif;
+	font-family: 'Ubuntu', sans-serif;
 	font-size: 8pt;
 	font-variant: small-caps;
 	color: #000000;
@@ -319,7 +354,7 @@ a {
 }
 
 .main .menu_separator {
-	font-family: Verdana, Lucida, Arial, Helvetica, sans-serif;
+	font-family: 'Ubuntu', sans-serif;
 	font-size: 9pt;
 	font-variant: small-caps;
 	color: #666;
@@ -390,7 +425,7 @@ a {
 }
 
 .main .wui-breadcrumbPanel .breadcrumb-separator {
-	font-family: Verdana, Lucida, Arial, Helvetica, sans-serif;
+	font-family: 'Ubuntu', sans-serif;
 	font-size: 12px;
 	color: #a7a9ac;
 	cursor: text;
@@ -401,20 +436,16 @@ a {
 /* @group Content Panel */
 .main .contentPanel {
 	text-align: center;
+	min-height: 600px;
 }
 
 .main .contentTitle {
 	padding: 10px 35px 15px 40px;
-	font-family: Verdana, Lucida, Arial, Helvetica, sans-serif;
+	font-family: 'Ubuntu', sans-serif;
 	font-size: 15pt;
 	font-weight: bold;
 	color: #404142;
 	font-variant: small-caps;
-	text-align: left;
-}
-
-.main .contentWrapper {
-	margin: 0 40px 40px 40px;
 	text-align: left;
 }
 
@@ -471,3 +502,4 @@ a {
 }
 
 /* @end */
+

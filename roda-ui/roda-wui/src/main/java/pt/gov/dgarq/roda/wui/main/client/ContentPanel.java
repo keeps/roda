@@ -11,8 +11,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -37,7 +35,7 @@ import pt.gov.dgarq.roda.wui.management.user.client.VerifyEmail;
  * @author Luis Faria
  * 
  */
-public class ContentPanel extends FlowPanel {
+public class ContentPanel extends SimplePanel {
 
 	private static ContentPanel instance = null;
 
@@ -61,26 +59,13 @@ public class ContentPanel extends FlowPanel {
 
 	private static MainMessages messages = (MainMessages) GWT.create(MainMessages.class);
 
-	private Label title;
-
-	private SimplePanel contentwrapper;
-
 	private Widget currWidget;
 
 	private String currHistoryPath;
 
 	private ContentPanel() {
 		super();
-		title = new Label();
-		contentwrapper = new SimplePanel();
-
-		this.add(title);
-		this.add(contentwrapper);
-
 		this.addStyleName("contentPanel");
-		title.addStyleName("contentTitle");
-		contentwrapper.addStyleName("contentWrapper");
-
 		this.currWidget = null;
 
 	}
@@ -143,7 +128,7 @@ public class ContentPanel extends FlowPanel {
 									if (widget != null) {
 										if (widget != currWidget) {
 											currWidget = widget;
-											contentwrapper.setWidget(widget);
+											setWidget(widget);
 											logger.debug("reloaded content panel widget");
 										}
 										setWindowTitle(historyTokens);
@@ -184,7 +169,7 @@ public class ContentPanel extends FlowPanel {
 			tokenI18N = historyTokens[historyTokens.length - 1].toUpperCase();
 		}
 
-		title.setText(tokenI18N);
+//		title.setText(tokenI18N);
 		Window.setTitle(messages.windowTitle(tokenI18N));
 	}
 

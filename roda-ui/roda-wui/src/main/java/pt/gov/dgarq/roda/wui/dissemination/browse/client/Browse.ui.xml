@@ -7,40 +7,41 @@
 
 	<ui:style>
 	.browse {
-		margin: 0 auto;
-		position: relative;
+		display: flex;
+		justify-content: space-between;
 	}
 	
-	.content-wrapper {
-		float: left;
+	.content {
+		padding: 40px;
 		width: 100%;
 	}
 	
-	.content-inner {
-		margin-right: 150px;
-		clear: both;
-		overflow: auto;
-	}
-	
 	.sidebar {
-		position: relative;
-		width: 150px;
-		margin-left: -150px;
-		float: right;
-		overflow: hidden;
+		background-color: #eee;
+		padding: 40px;
+		width: 200px;
 	}
 	
-	.title {
-		margin-top: 10px;
-		margin-bottom: 5px;
-		margin-left: 20px;
-		font-size: 14px;
+	.content-title {
+		font-size: 18pt;
+		font-weight: bold;
+		color: #404142;
+		margin-bottom: 20px;
+	}
+	
+	.searchlist {
+		
+	}
+	
+	.sidebar-title {
+		margin-bottom: 10px;
+		font-size: 16px;
 		font-weight: bold;
 		color: #58595b;
 	}
 	
 	.action {
-		margin-left: 20px;
+		
 	}
 	
 	.footer {
@@ -49,16 +50,19 @@
 	</ui:style>
 
 	<g:FlowPanel styleName="browse" addStyleNames="{style.browse}">
-		<g:FlowPanel styleName="{style.content-wrapper}">
+		<g:FlowPanel styleName="{style.content}">
+			<g:Label styleName="{style.content-title}">
+				<ui:msg description="Browser title">Browse</ui:msg>
+			</g:Label>
 			<common:CollectionsTable ui:field="fondsPanel"
-				addStyleNames="{style.content-inner}" />
+				addStyleNames="{style.searchlist}" />
 		</g:FlowPanel>
 		<g:FlowPanel styleName="{style.sidebar}">
-			<g:Label addStyleNames="section-label {style.title}">
+			<g:Label addStyleNames="section-label {style.sidebar-title}">
 				<ui:msg description="Browser actions">Actions</ui:msg>
 			</g:Label>
-			<g:Button addStyleNames="{style.action}">
-				<ui:msg description="Create a top-level AIP">Create new</ui:msg>
+			<g:Button addStyleNames="{style.action} btn btn-plus">
+				<ui:msg description="Create a top-level AIP">New collection</ui:msg>
 			</g:Button>
 		</g:FlowPanel>
 		<g:FlowPanel styleName="{style.footer}" />

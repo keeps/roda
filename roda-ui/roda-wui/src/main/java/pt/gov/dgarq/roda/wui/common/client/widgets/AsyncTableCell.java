@@ -3,23 +3,26 @@ package pt.gov.dgarq.roda.wui.common.client.widgets;
 import java.io.Serializable;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.view.client.AsyncDataProvider;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.ProvidesKey;
 import com.google.gwt.view.client.Range;
+import com.google.gwt.view.client.SingleSelectionModel;
 
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
+import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 
 public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel {
 
 	private final AsyncDataProvider<T> dataProvider;
 	private final CellTable<T> display;
+	private final SingleSelectionModel<T> selectionModel;
+
+	private final ClientLogger logger = new ClientLogger(getClass().getName());
 
 	public AsyncTableCell() {
 		super();
@@ -39,8 +42,7 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						// TODO treat failure
-						GWT.log("Error getting data", caught);
+						logger.error("Error getting data", caught);
 					}
 
 					@Override
@@ -65,8 +67,9 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel {
 		add(pager);
 		add(display);
 
+		selectionModel = new SingleSelectionModel<>(getKeyProvider());
+		display.setSelectionModel(selectionModel);
 		// TODO add support for sorter
-		// TODO add support for selection
 
 		addStyleName("my-asyncdatagrid");
 	}
@@ -79,6 +82,10 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel {
 
 	protected CellTable<T> getDisplay() {
 		return display;
+	}
+
+	public SingleSelectionModel<T> getSelectionModel() {
+		return selectionModel;
 	}
 
 }

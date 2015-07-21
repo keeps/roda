@@ -170,9 +170,6 @@ public class Menu2 extends Composite {
 			}
 
 		});
-
-		this.addStyleName("menus2");
-		rightMenu.setStyleName("my-MenuBarRight");
 	}
 
 	private ScheduledCommand createCommand(final String path) {
