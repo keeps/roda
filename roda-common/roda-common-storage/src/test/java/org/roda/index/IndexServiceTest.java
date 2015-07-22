@@ -2,6 +2,7 @@ package org.roda.index;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
@@ -38,6 +39,7 @@ import org.roda.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import pt.gov.dgarq.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
@@ -257,6 +259,30 @@ public class IndexServiceTest {
 
 		List<String> ancestors = index.getAncestors(CorporaConstants.OTHER_AIP_ID);
 		assertEquals(Arrays.asList(CorporaConstants.SOURCE_AIP_ID), ancestors);
+	}
+
+	@Test
+	public void testGetElementWithoutParentId()
+			throws ModelServiceException, StorageActionException, IndexActionException {
+		// generate AIP ID
+		final String aipId = UUID.randomUUID().toString();
+
+		// Create AIP
+		model.createAIP(aipId, corporaService,
+				DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
+
+		Filter filter = new Filter();
+		filter.add(new SimpleFilterParameter(RodaConstants.SDO_LEVEL, "fonds"));
+		filter.add(new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID));
+		IndexResult<SimpleDescriptionObject> findDescriptiveMetadata = index.findDescriptiveMetadata(filter, null,
+				new Sublist());
+
+		assertNotNull(findDescriptiveMetadata);
+		assertThat(findDescriptiveMetadata.getResults(), Matchers.hasSize(1));
+
+		// cleanup
+		model.deleteAIP(CorporaConstants.SOURCE_AIP_ID);
+
 	}
 
 }

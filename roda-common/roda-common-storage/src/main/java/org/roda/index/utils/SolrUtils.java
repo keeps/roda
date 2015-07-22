@@ -38,7 +38,6 @@ import org.apache.solr.handler.loader.XMLLoader;
 import org.roda.common.RodaConstants;
 import org.roda.common.RodaUtils;
 import org.roda.index.IndexActionException;
-import org.roda.index.SimpleDescriptiveMetadata;
 import org.roda.model.AIP;
 import org.roda.model.DescriptiveMetadata;
 import org.roda.model.ModelService;
@@ -61,6 +60,7 @@ import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.RODAObject;
+import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 
 public class SolrUtils {
 
@@ -197,7 +197,7 @@ public class SolrUtils {
 						appendANDOperator(ret);
 					}
 					EmptyKeyFilterParameter param = (EmptyKeyFilterParameter) parameter;
-					appendExactMatch(ret, param.getName(), "", true);
+					ret.append("(*:* NOT " + param.getName() + ":*)");
 				} else {
 					LOGGER.error("Unsupported filter parameter class: " + parameter.getClass().getName());
 					throw new IndexActionException(
@@ -342,7 +342,7 @@ public class SolrUtils {
 		String indexName;
 		if (resultClass.equals(AIP.class)) {
 			indexName = RodaConstants.INDEX_AIP;
-		} else if (resultClass.equals(SimpleDescriptiveMetadata.class)) {
+		} else if (resultClass.equals(SimpleDescriptionObject.class)) {
 			// FIXME rename INDEX constant
 			indexName = RodaConstants.INDEX_SDO;
 		} else if (resultClass.equals(Representation.class)) {
@@ -358,7 +358,7 @@ public class SolrUtils {
 		T ret;
 		if (resultClass.equals(AIP.class)) {
 			ret = resultClass.cast(solrDocumentToAIP(doc));
-		} else if (resultClass.equals(SimpleDescriptiveMetadata.class)) {
+		} else if (resultClass.equals(SimpleDescriptionObject.class)) {
 			ret = resultClass.cast(solrDocumentToSDO(doc));
 		} else if (resultClass.equals(Representation.class)) {
 			ret = resultClass.cast(solrDocumentToRepresentation(doc));
@@ -438,7 +438,7 @@ public class SolrUtils {
 	}
 
 	// FIXME rename this
-	public static SimpleDescriptiveMetadata solrDocumentToSDO(SolrDocument doc) {
+	public static SimpleDescriptionObject solrDocumentToSDO(SolrDocument doc) {
 		final String id = objectToString(doc.get(RodaConstants.AIP_ID));
 		final String label = id;
 		final Boolean active = objectToBoolean(doc.get(RodaConstants.AIP_ACTIVE));
@@ -457,13 +457,9 @@ public class SolrUtils {
 		final String title = titles != null ? titles.get(0) : null;
 		final String description = descriptions != null ? descriptions.get(0) : null;
 		final int childrenCount = 0;
-
-		List<String> descriptiveMetadataFileIds = new ArrayList<String>();
-		// return new SimpleDescriptiveMetadata(id, label, dateModified,
-		// dateCreated, state, level, title, dateInitial,
-		// dateFinal, description, parentId, subElementsCount);
-		return new SimpleDescriptiveMetadata(level, title, description, dateInitial, dateFinal, parentId, childrenCount,
-				descriptiveMetadataFileIds);
+		
+		return new SimpleDescriptionObject(id, label, dateModified, dateCreated, state, level, title, dateInitial,
+				dateFinal, description, parentId, childrenCount);
 	}
 
 	public static SolrInputDocument aipToSolrInputDocumentAsSDO(AIP aip, ModelService model)
