@@ -38,6 +38,7 @@ import org.apache.solr.handler.loader.XMLLoader;
 import org.roda.common.RodaConstants;
 import org.roda.common.RodaUtils;
 import org.roda.index.IndexActionException;
+import org.roda.index.SimpleDescriptiveMetadata;
 import org.roda.model.AIP;
 import org.roda.model.DescriptiveMetadata;
 import org.roda.model.ModelService;
@@ -50,14 +51,16 @@ import org.roda.storage.StoragePath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import pt.gov.dgarq.roda.core.data.adapter.filter.BasicSearchFilterParameter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.OneOfManyFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.RODAObject;
-import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 
 public class SolrUtils {
 
@@ -163,7 +166,7 @@ public class SolrUtils {
 		return doc;
 	}
 
-	public static String parseFilter(Filter filter) {
+	public static String parseFilter(Filter filter) throws IndexActionException {
 		StringBuilder ret = new StringBuilder();
 
 		if (filter == null) {
@@ -171,12 +174,35 @@ public class SolrUtils {
 		} else {
 			FilterParameter[] parameters = filter.getParameters();
 			for (FilterParameter parameter : parameters) {
-				// TODO separate sub-queries of diferent parameters by AND
 				if (parameter instanceof SimpleFilterParameter) {
 					SimpleFilterParameter simplePar = (SimpleFilterParameter) parameter;
-					ret.append(simplePar.getName()).append(": \"").append(simplePar.getValue()).append("\"");
+					if (ret.length() != 0) {
+						appendANDOperator(ret);
+					}
+					appendExactMatch(ret, simplePar.getName(), simplePar.getValue(), true);
+				} else if (parameter instanceof OneOfManyFilterParameter) {
+					OneOfManyFilterParameter param = (OneOfManyFilterParameter) parameter;
+					if (ret.length() != 0) {
+						appendANDOperator(ret);
+					}
+					appendValuesUsingOROperator(ret, param.getName(), param.getValues());
+				} else if (parameter instanceof BasicSearchFilterParameter) {
+					if (ret.length() != 0) {
+						appendANDOperator(ret);
+					}
+					BasicSearchFilterParameter param = (BasicSearchFilterParameter) parameter;
+					appendBasicSearch(ret, param.getName(), param.getValue(), "OR");
+				} else if (parameter instanceof EmptyKeyFilterParameter) {
+					if (ret.length() != 0) {
+						appendANDOperator(ret);
+					}
+					EmptyKeyFilterParameter param = (EmptyKeyFilterParameter) parameter;
+					appendExactMatch(ret, param.getName(), "", true);
 				} else {
 					LOGGER.error("Unsupported filter parameter class: " + parameter.getClass().getName());
+					throw new IndexActionException(
+							"Unsupported filter parameter class: " + parameter.getClass().getName(),
+							IndexActionException.BAD_REQUEST);
 				}
 			}
 
@@ -187,6 +213,43 @@ public class SolrUtils {
 
 		LOGGER.debug("Converting filter {} to query {}", filter, ret);
 		return ret.toString();
+	}
+
+	private static void appendANDOperator(StringBuilder ret) {
+		ret.append(" AND ");
+	}
+
+	private static void appendValuesUsingOROperator(StringBuilder ret, String key, String[] values) {
+		ret.append("(");
+		for (int i = 0; i < values.length; i++) {
+			if (i != 0) {
+				ret.append(" OR ");
+			}
+			appendExactMatch(ret, key, values[i], true);
+		}
+		ret.append(")");
+	}
+
+	private static void appendExactMatch(StringBuilder ret, String key, String value, boolean appendDoubleQuotes) {
+		ret.append("(").append(key).append(": ").append(appendDoubleQuotes ? "\"" : "").append(value)
+				.append(appendDoubleQuotes ? "\"" : "").append(")");
+	}
+
+	// FIXME escape values for Solr special chars
+	private static void appendBasicSearch(StringBuilder ret, String key, String value, String operator) {
+		if (value.matches("^\".+$")) {
+			appendExactMatch(ret, key, value, false);
+		} else {
+			String[] split = value.split("\\s+");
+			ret.append("(");
+			for (int i = 0; i < split.length; i++) {
+				if (i != 0 && operator != null) {
+					ret.append(" " + operator + " ");
+				}
+				ret.append(key).append(": ").append(split[i]);
+			}
+			ret.append(")");
+		}
 	}
 
 	private static List<String> objectToListString(Object object) {
@@ -279,7 +342,8 @@ public class SolrUtils {
 		String indexName;
 		if (resultClass.equals(AIP.class)) {
 			indexName = RodaConstants.INDEX_AIP;
-		} else if (resultClass.equals(SimpleDescriptionObject.class)) {
+		} else if (resultClass.equals(SimpleDescriptiveMetadata.class)) {
+			// FIXME rename INDEX constant
 			indexName = RodaConstants.INDEX_SDO;
 		} else if (resultClass.equals(Representation.class)) {
 			indexName = RodaConstants.INDEX_REPRESENTATIONS;
@@ -294,7 +358,7 @@ public class SolrUtils {
 		T ret;
 		if (resultClass.equals(AIP.class)) {
 			ret = resultClass.cast(solrDocumentToAIP(doc));
-		} else if (resultClass.equals(SimpleDescriptionObject.class)) {
+		} else if (resultClass.equals(SimpleDescriptiveMetadata.class)) {
 			ret = resultClass.cast(solrDocumentToSDO(doc));
 		} else if (resultClass.equals(Representation.class)) {
 			ret = resultClass.cast(solrDocumentToRepresentation(doc));
@@ -373,7 +437,8 @@ public class SolrUtils {
 		return ret;
 	}
 
-	public static SimpleDescriptionObject solrDocumentToSDO(SolrDocument doc) {
+	// FIXME rename this
+	public static SimpleDescriptiveMetadata solrDocumentToSDO(SolrDocument doc) {
 		final String id = objectToString(doc.get(RodaConstants.AIP_ID));
 		final String label = id;
 		final Boolean active = objectToBoolean(doc.get(RodaConstants.AIP_ACTIVE));
@@ -391,10 +456,14 @@ public class SolrUtils {
 		final String level = levels != null ? levels.get(0) : null;
 		final String title = titles != null ? titles.get(0) : null;
 		final String description = descriptions != null ? descriptions.get(0) : null;
-		final int subElementsCount = 0;
+		final int childrenCount = 0;
 
-		return new SimpleDescriptionObject(id, label, dateModified, dateCreated, state, level, title, dateInitial,
-				dateFinal, description, parentId, subElementsCount);
+		List<String> descriptiveMetadataFileIds = new ArrayList<String>();
+		// return new SimpleDescriptiveMetadata(id, label, dateModified,
+		// dateCreated, state, level, title, dateInitial,
+		// dateFinal, description, parentId, subElementsCount);
+		return new SimpleDescriptiveMetadata(level, title, description, dateInitial, dateFinal, parentId, childrenCount,
+				descriptiveMetadataFileIds);
 	}
 
 	public static SolrInputDocument aipToSolrInputDocumentAsSDO(AIP aip, ModelService model)

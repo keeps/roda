@@ -124,19 +124,15 @@ public final class FedoraConversionUtils {
 		}
 	}
 
-	@SuppressWarnings("serial")
 	private static Map<String, String> extractContentDigest(URI contentDigest) {
-		final String[] values = contentDigest.getSchemeSpecificPart()
-				.split(":");
-		if (values.length == 2) {
-			return new HashMap<String, String>() {
-				{
-					put(values[0], values[1]);
-				}
-			};
-		} else {
-			return new HashMap<String, String>();
+		Map<String, String> ret = new HashMap<String, String>();
+		if (contentDigest != null) {
+			final String[] values = contentDigest.getSchemeSpecificPart().split(":");
+			if (values.length == 2) {
+				ret.put(values[0], values[1]);
+			}
 		}
+		return ret;
 	}
 
 	/**

@@ -4,7 +4,7 @@ public class IndexActionException extends Exception {
 
 	private static final long serialVersionUID = 1L;
 
-	// public static final int BAD_REQUEST = 400;
+	public static final int BAD_REQUEST = 400;
 	// public static final int FORBIDDEN = 403;
 	public static final int NOT_FOUND = 404;
 	// public static final int ALREADY_EXISTS = 409;
