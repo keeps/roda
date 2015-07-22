@@ -21,7 +21,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.roda.common.RodaConstants;
 import org.roda.storage.Container;
 import org.roda.storage.ContentPayload;
 import org.roda.storage.DefaultBinary;
@@ -33,6 +32,8 @@ import org.roda.storage.StorageActionException;
 import org.roda.storage.StoragePath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import pt.gov.dgarq.roda.core.common.RodaConstants;
 
 /**
  * File System related utility class

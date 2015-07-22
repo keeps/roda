@@ -8,8 +8,8 @@ import java.util.Map;
 import java.util.Set;
 
 import jersey.repackaged.com.google.common.collect.Sets;
+import pt.gov.dgarq.roda.core.common.RodaConstants;
 
-import org.roda.common.RodaConstants;
 import org.roda.common.RodaUtils;
 import org.roda.model.utils.ModelUtils;
 import org.roda.storage.Binary;

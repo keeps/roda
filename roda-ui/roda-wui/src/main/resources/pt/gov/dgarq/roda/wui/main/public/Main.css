@@ -30,24 +30,38 @@ a {
 	font-size: 12px;
 }
 
+h1, .h1 {
+	font-size: 18pt;
+	font-weight: bold;
+	color: #404142;
+	margin-bottom: 20px;
+}
+
+h2, .h2 {
+	font-size: 14pt;
+	font-weight: 500;
+	color: #404142;
+	margin-bottom: 20px;
+}
+
 .btn {
 	border-radius: 15px;
-	padding: 3px 5px;
-	border: 1px solid #404142;
-	background-color: #404142;
+	padding: 4px 6px;
+	border: none;
+	background-color: #089de3;
 	color: white;
 	font-weight: 500;
 }
 
 .btn:hover {
-	background-color: rgba(64, 65, 66, 0.8); cursor : pointer;
+	background-color: #3998d0;
+	cursor: pointer;
 	cursor: hand;
 	cursor: pointer;
 }
 
 .btn:active {
-	background-color: white;
-	color: #404142;
+	background-color: #5bbeff;
 	cursor: pointer;
 	cursor: hand;
 }
@@ -64,10 +78,18 @@ a {
 	padding-right: 5px;
 }
 
+.com-google-gwt-user-cellview-client-CellTable-Style-cellTableHeader {
+	white-space: nowrap;
+	font-family: 'Ubuntu', sans-serif;
+	font-size: 14px;
+	font-weight: 500;
+	text-shadow: none !important;
+}
+
 .main {
 	background-color: white;
 	min-height: 100%;
-	margin: 0 auto -200px; 
+	margin: 0 auto -200px;
 }
 
 .footer {
@@ -288,20 +310,20 @@ a {
 
 /* @group Menus */
 .gwt-MenuBar {
-	background-color: #414042;
+	background-color: #5bbeff;
 }
 
-.gwt-MenuBar-horizontal table {
+.gwt-MenuBar table {
 	border-spacing: 0;
 }
 
 .gwt-MenuBar.gwt-MenuBar-vertical {
-	background-color: #bcbec0;
+	background-color: #3998da;
 }
 
 .gwt-MenuBar.gwt-MenuBar-vertical .gwt-MenuItem {
-	color: #58595b;
 	min-width: 130px;
+	background-color: #3998da;
 }
 
 .gwt-MenuBar .gwt-MenuItem {
@@ -317,13 +339,11 @@ a {
 }
 
 .gwt-MenuBar .gwt-MenuItem-selected {
-	color: #414042;
-	background-color: #bcbec0;
+	background-color: #3998da;
 }
 
 .gwt-MenuBar.gwt-MenuBar-vertical .gwt-MenuItem-selected {
-	background-color: #58595b;
-	color: white;
+	background-color: #5bbeff;
 }
 
 .main .menus {
@@ -502,4 +522,3 @@ a {
 }
 
 /* @end */
-

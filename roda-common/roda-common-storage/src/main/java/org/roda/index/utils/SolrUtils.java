@@ -35,7 +35,6 @@ import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;
 import org.apache.solr.common.util.ContentStream;
 import org.apache.solr.handler.loader.XMLLoader;
-import org.roda.common.RodaConstants;
 import org.roda.common.RodaUtils;
 import org.roda.index.IndexActionException;
 import org.roda.model.AIP;
@@ -50,6 +49,7 @@ import org.roda.storage.StoragePath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.adapter.filter.BasicSearchFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
@@ -457,9 +457,10 @@ public class SolrUtils {
 		final String title = titles != null ? titles.get(0) : null;
 		final String description = descriptions != null ? descriptions.get(0) : null;
 		final int childrenCount = 0;
-		
+
 		return new SimpleDescriptionObject(id, label, dateModified, dateCreated, state, level, title, dateInitial,
 				dateFinal, description, parentId, childrenCount);
+
 	}
 
 	public static SolrInputDocument aipToSolrInputDocumentAsSDO(AIP aip, ModelService model)

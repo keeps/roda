@@ -19,9 +19,7 @@ import pt.gov.dgarq.roda.core.data.DescriptionObject;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.tools.DescriptionLevelUtils;
 import pt.gov.dgarq.roda.wui.common.client.widgets.LoadingPopup;
-import pt.gov.dgarq.roda.wui.dissemination.browse.client.Browse;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.BrowserService;
-import pt.gov.dgarq.roda.wui.dissemination.browse.client.CollectionsTreeItem;
 import pt.gov.dgarq.roda.wui.management.editor.client.EditorService;
 
 /**
@@ -599,54 +597,57 @@ public class DescriptiveMetadataPanel extends Composite implements SourcesChange
 			}
 
 			public void onSuccess(Void result) {
-				update(infoUpdateNeeded, hierarchyUpdateNeeded, new AsyncCallback<CollectionsTreeItem>() {
-
-					public void onFailure(Throwable caught) {
-						loading.hide();
-						callback.onFailure(caught);
-					}
-
-					public void onSuccess(CollectionsTreeItem treeItem) {
-						loading.hide();
-						callback.onSuccess(descObj);
-					}
-				});
+				// update(infoUpdateNeeded, hierarchyUpdateNeeded, new
+				// AsyncCallback<CollectionsTreeItem>() {
+				//
+				// public void onFailure(Throwable caught) {
+				// loading.hide();
+				// callback.onFailure(caught);
+				// }
+				//
+				// public void onSuccess(CollectionsTreeItem treeItem) {
+				// loading.hide();
+				// callback.onSuccess(descObj);
+				// }
+				// });
 			}
 		});
 	}
 
-	private void update(boolean info, boolean hierarchy, final AsyncCallback<CollectionsTreeItem> callback) {
-		if (hierarchy) {
-			BrowserService.Util.getInstance().getParent(pid, new AsyncCallback<String>() {
+	// private void update(boolean info, boolean hierarchy, final
+	// AsyncCallback<CollectionsTreeItem> callback) {
+	// if (hierarchy) {
+	// BrowserService.Util.getInstance().getParent(pid, new
+	// AsyncCallback<String>() {
+	//
+	// public void onFailure(Throwable caught) {
+	// logger.error("Error getting " + pid + " parent", caught);
+	// }
+	//
+	// public void onSuccess(String parentPID) {
+	// Browse.getInstance().update(parentPID, false, true, new
+	// AsyncCallback<CollectionsTreeItem>() {
+	//
+	// public void onFailure(Throwable caught) {
+	// callback.onFailure(caught);
+	// }
+	//
+	// public void onSuccess(CollectionsTreeItem treeItem) {
+	// callback.onSuccess(null);
+	// }
+	//
+	// });
 
-				public void onFailure(Throwable caught) {
-					logger.error("Error getting " + pid + " parent", caught);
-				}
-
-				public void onSuccess(String parentPID) {
-					// Browse.getInstance().update(parentPID, false, true, new
-					// AsyncCallback<CollectionsTreeItem>() {
-					//
-					// public void onFailure(Throwable caught) {
-					// callback.onFailure(caught);
-					// }
-					//
-					// public void onSuccess(CollectionsTreeItem treeItem) {
-					// callback.onSuccess(null);
-					// }
-					//
-					// });
-
-				}
-
-			});
-
-		} else if (info) {
-			// Browse.getInstance().update(pid, true, false, callback);
-		} else {
-			callback.onSuccess(null);
-		}
-	}
+	// }
+	//
+	// });
+	//
+	// } else if (info) {
+	// // Browse.getInstance().update(pid, true, false, callback);
+	// } else {
+	// callback.onSuccess(null);
+	// }
+	// }
 
 	public void cancel() {
 		identification.cancel();

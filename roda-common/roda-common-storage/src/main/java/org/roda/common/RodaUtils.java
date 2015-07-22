@@ -24,6 +24,8 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.yaml.snakeyaml.Yaml;
 
+import pt.gov.dgarq.roda.core.common.RodaConstants;
+
 public class RodaUtils {
 
 	public static String dateToString(Date date) {

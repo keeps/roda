@@ -38,7 +38,7 @@
 	
 	.menu {
 		padding: 0 30px;
-		background-color: #414042;
+		background-color: #5bbeff;
 	}
 	
 	.footer {

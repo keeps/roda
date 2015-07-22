@@ -23,7 +23,6 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.roda.CorporaConstants;
-import org.roda.common.RodaConstants;
 import org.roda.common.RodaUtils;
 import org.roda.model.AIP;
 import org.roda.model.ModelService;
@@ -39,6 +38,7 @@ import org.roda.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;

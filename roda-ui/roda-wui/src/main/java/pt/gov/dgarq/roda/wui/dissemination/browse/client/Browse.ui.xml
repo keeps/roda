@@ -9,11 +9,16 @@
 	.browse {
 		display: flex;
 		justify-content: space-between;
+		min-height: 600px;
 	}
 	
 	.content {
 		padding: 40px;
 		width: 100%;
+	}
+	
+	.item_icon {
+		
 	}
 	
 	.sidebar {
@@ -22,22 +27,12 @@
 		width: 200px;
 	}
 	
-	.content-title {
-		font-size: 18pt;
-		font-weight: bold;
-		color: #404142;
-		margin-bottom: 20px;
-	}
-	
 	.searchlist {
 		
 	}
 	
 	.sidebar-title {
 		margin-bottom: 10px;
-		font-size: 16px;
-		font-weight: bold;
-		color: #58595b;
 	}
 	
 	.action {
@@ -51,18 +46,24 @@
 
 	<g:FlowPanel styleName="browse" addStyleNames="{style.browse}">
 		<g:FlowPanel styleName="{style.content}">
-			<g:Label styleName="{style.content-title}">
+			<g:Label styleName="h1">
 				<ui:msg description="Browser title">Browse</ui:msg>
+			</g:Label>
+			<g:SimplePanel addStyleNames="{style.item_icon}"
+				ui:field="itemIcon" />
+			<g:Label styleName="h2" ui:field="itemTitle">
+				<ui:msg description="Item title">All collections</ui:msg>
 			</g:Label>
 			<common:CollectionsTable ui:field="fondsPanel"
 				addStyleNames="{style.searchlist}" />
 		</g:FlowPanel>
 		<g:FlowPanel styleName="{style.sidebar}">
-			<g:Label addStyleNames="section-label {style.sidebar-title}">
+			<g:Label addStyleNames="h2 {style.sidebar-title}">
 				<ui:msg description="Browser actions">Actions</ui:msg>
 			</g:Label>
-			<g:Button addStyleNames="{style.action} btn btn-plus">
-				<ui:msg description="Create a top-level AIP">New collection</ui:msg>
+			<g:Button addStyleNames="{style.action} btn btn-plus"
+				ui:field="createFonds">
+				<ui:msg description="Create new item">New item</ui:msg>
 			</g:Button>
 		</g:FlowPanel>
 		<g:FlowPanel styleName="{style.footer}" />

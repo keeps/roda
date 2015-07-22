@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.roda.common.RodaConstants;
 import org.roda.common.RodaUtils;
 import org.roda.model.FileFormat;
 import org.roda.model.ModelServiceException;
@@ -20,6 +19,8 @@ import org.roda.storage.Resource;
 import org.roda.storage.StorageActionException;
 import org.roda.storage.StoragePath;
 import org.roda.storage.StorageService;
+
+import pt.gov.dgarq.roda.core.common.RodaConstants;
 
 /**
  * Model related utility class

@@ -24,7 +24,6 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
-import org.roda.common.RodaConstants;
 import org.roda.index.IndexActionException;
 import org.roda.index.IndexService;
 import org.roda.model.ModelService;
@@ -42,6 +41,7 @@ import config.i18n.server.BrowserServiceMessages;
 import pt.gov.dgarq.roda.common.RodaClientFactory;
 import pt.gov.dgarq.roda.core.RODAClient;
 import pt.gov.dgarq.roda.core.common.RODAException;
+import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.DescriptionObject;
 import pt.gov.dgarq.roda.core.data.EventPreservationObject;
 import pt.gov.dgarq.roda.core.data.RepresentationFile;
@@ -150,116 +150,32 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 		}
 	}
 
-	protected Filter addFondsRestrictions(Filter filter) {
-		if (filter == null) {
-			filter = new Filter();
-		}
-		filter.add(SimpleDescriptionObject.FONDS_FILTER.getParameters());
-		return filter;
-	}
 
-	protected Filter addParentRestrictions(Filter filter, String parentId) {
-		if (filter == null) {
-			filter = new Filter();
-		}
-		filter.add(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, parentId));
-		return filter;
-	}
-
-	public Integer getCollectionsCount(Filter filter) throws RODAException {
-		Long count;
-		try {
-			count = index.countDescriptiveMetadata(addFondsRestrictions(filter));
-			logger.info(String.format("getCollectionsCount(%1$s)=%2$s", filter, count));
-		} catch (IndexActionException e) {
-			logger.error("Error counting collections", e);
-			throw new GenericException("Error counting collections " + e.getMessage());
-		}
-		return count.intValue();
-	}
-
-	public SimpleDescriptionObject[] getCollections(Filter filter, Sorter sorter, Sublist sublist)
+	public IndexResult<SimpleDescriptionObject> findDescriptiveMetadata(Filter filter, Sorter sorter, Sublist sublist)
 			throws RODAException {
 		IndexResult<SimpleDescriptionObject> sdos;
 		try {
-			sdos = index.findDescriptiveMetadata(addFondsRestrictions(filter), sorter, sublist);
-			logger.info(String.format("getCollections(%1$s,%2$s,%3$s)=%4$s", filter, sorter, sublist, sdos));
-		} catch (IndexActionException e) {
-			logger.debug("Error getting collections", e);
-			throw new GenericException("Error getting collections " + e.getMessage());
-		}
-
-		// TODO change return type to index result
-		return sdos.getResults().toArray(new SimpleDescriptionObject[] {});
-	}
-
-	public IndexResult<SimpleDescriptionObject> findCollections(Filter filter, Sorter sorter, Sublist sublist)
-			throws RODAException {
-		IndexResult<SimpleDescriptionObject> sdos;
-		try {
-			sdos = index.findDescriptiveMetadata(addFondsRestrictions(filter), sorter, sublist);
+			sdos = index.findDescriptiveMetadata(filter, sorter, sublist);
 			logger.info(String.format("findCollections(%1$s,%2$s,%3$s)=%4$s", filter, sorter, sublist, sdos));
 		} catch (IndexActionException e) {
-			logger.debug("Error getting collections", e);
+			logger.error("Error getting collections", e);
 			throw new GenericException("Error getting collections " + e.getMessage());
 		}
 
 		return sdos;
 	}
 
-	public Integer getSubElementsCount(String pid, Filter filter) throws RODAException {
+	public Long countDescriptiveMetadata(Filter filter) throws RODAException {
 		Long count;
 		try {
-			count = index.countDescriptiveMetadata(addParentRestrictions(filter, pid));
+			count = index.countDescriptiveMetadata(filter);
 		} catch (IndexActionException e) {
 			logger.debug("Error getting sub-elements count", e);
 			throw new GenericException("Error getting sub-elements count " + e.getMessage());
 		}
 
-		return new Integer(count.intValue());
+		return count;
 	}
-
-	/**
-	 * Get <code>count</code> the children of current node starting at
-	 * <code>index</code>. A node explicits its children in the relationship
-	 * metadata (RDF) by the roda:parent-of relationship.
-	 *
-	 * @param pid
-	 *            parent pid value
-	 * @param firstitem
-	 *            first item to show
-	 * @param itemsPerPage
-	 *            number of items per page.
-	 * @throws RODAException
-	 */
-	public SimpleDescriptionObject[] getSubElements(String pid, Filter filter, Sorter sorter, Sublist sublist)
-			throws RODAException {
-		IndexResult<SimpleDescriptionObject> sdos;
-		try {
-			sdos = index.findDescriptiveMetadata(addParentRestrictions(filter, pid), sorter, sublist);
-		} catch (IndexActionException e) {
-			logger.debug("Error getting collections", e);
-			throw new GenericException("Error getting collections " + e.getMessage());
-		}
-
-		// TODO change return type to index result
-		return sdos.getResults().toArray(new SimpleDescriptionObject[] {});
-	}
-
-	// public RODAObject getRODAObject(String pid) throws RODAException {
-	// RODAObject ret;
-	// try {
-	// Browser browser =
-	// RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
-	// .getBrowserService();
-	// ret = browser.getRODAObject(pid);
-	//
-	// } catch (RemoteException e) {
-	// logger.debug("Error getting RODA object", e);
-	// throw RODAClient.parseRemoteException(e);
-	// }
-	// return ret;
-	// }
 
 	public SimpleDescriptionObject getSimpleDescriptionObject(String pid) throws RODAException {
 		try {

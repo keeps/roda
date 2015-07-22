@@ -6,7 +6,6 @@ import java.util.List;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
-import org.roda.common.RodaConstants;
 import org.roda.index.utils.SolrUtils;
 import org.roda.model.AIP;
 import org.roda.model.DescriptiveMetadata;
@@ -18,6 +17,8 @@ import org.roda.model.Representation;
 import org.roda.storage.StorageActionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import pt.gov.dgarq.roda.core.common.RodaConstants;
 
 /**
  * 

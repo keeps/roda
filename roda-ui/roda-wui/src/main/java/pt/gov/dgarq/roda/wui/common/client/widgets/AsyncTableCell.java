@@ -2,9 +2,10 @@ package pt.gov.dgarq.roda.wui.common.client.widgets;
 
 import java.io.Serializable;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.PageSizePager;
 import com.google.gwt.user.cellview.client.SimplePager;
+import com.google.gwt.user.cellview.client.SimplePager.TextLocation;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.view.client.AsyncDataProvider;
@@ -19,8 +20,11 @@ import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel {
 
 	private final AsyncDataProvider<T> dataProvider;
-	private final CellTable<T> display;
 	private final SingleSelectionModel<T> selectionModel;
+
+	private final SimplePager resultsPager;
+	private final PageSizePager pageSizePager;
+	private final CellTable<T> display;
 
 	private final ClientLogger logger = new ClientLogger(getClass().getName());
 
@@ -48,8 +52,11 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel {
 					@Override
 					public void onSuccess(IndexResult<T> result) {
 						if (result != null) {
+							int rowCount = (int) result.getTotalCount();
 							updateRowData((int) result.getOffset(), result.getResults());
-							updateRowCount((int) result.getTotalCount(), true);
+							updateRowCount(rowCount, true);
+							resultsPager.setVisible(rowCount > 0);
+							pageSizePager.setVisible(rowCount > 0);
 						} else {
 							// TODO treat this option
 						}
@@ -58,23 +65,30 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel {
 			}
 		};
 
-		display = new CellTable<>(getPageSize(), getKeyProvider());
+		display = new CellTable<>(getInitialPageSize(), getKeyProvider());
+
 		dataProvider.addDataDisplay(display);
 
-		SimplePager pager = new SimplePager();
-		pager.setDisplay(display);
+		resultsPager = new SimplePager(TextLocation.RIGHT, false, true);
+		resultsPager.setDisplay(display);
 
-		add(pager);
+		pageSizePager = new PageSizePager(getInitialPageSize());
+		pageSizePager.setDisplay(display);
+
+		add(resultsPager);
 		add(display);
+		add(pageSizePager);
 
 		selectionModel = new SingleSelectionModel<>(getKeyProvider());
 		display.setSelectionModel(selectionModel);
 		// TODO add support for sorter
 
 		addStyleName("my-asyncdatagrid");
+		resultsPager.addStyleName("my-asyncdatagrid-pager-results");
+		pageSizePager.addStyleName("my-asyncdatagrid-pager-pagesize");
 	}
 
-	protected abstract int getPageSize();
+	protected abstract int getInitialPageSize();
 
 	protected abstract ProvidesKey<T> getKeyProvider();
 

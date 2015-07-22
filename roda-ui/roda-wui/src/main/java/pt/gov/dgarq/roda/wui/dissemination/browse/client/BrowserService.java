@@ -50,60 +50,24 @@ public interface BrowserService extends RemoteService {
 	}
 
 	/**
-	 * Get collection total count
+	 * Get simple descriptive metadata count
 	 *
 	 * @param filter
 	 *
-	 * @return the number of collections that fit the filter
+	 * @return the number of simple descriptive metadata that fit the filter
 	 * @throws RODAException
 	 */
-	public Integer getCollectionsCount(Filter filter) throws RODAException;
+	public Long countDescriptiveMetadata(Filter filter) throws RODAException;
 
 	/**
-	 * Get collections
+	 * Get imple descriptive metadata
 	 *
-	 * @param adapter
 	 *
-	 * @return get collections
+	 * @return 
 	 * @throws RODAException
 	 */
-	public SimpleDescriptionObject[] getCollections(Filter filter, Sorter sorter, Sublist sublist) throws RODAException;
+	public IndexResult<SimpleDescriptionObject> findDescriptiveMetadata(Filter filter, Sorter sorter, Sublist sublist) throws RODAException;
 
-	public IndexResult<SimpleDescriptionObject> findCollections(Filter filter, Sorter sorter, Sublist sublist)
-			throws RODAException;
-
-	/**
-	 * Get sub elements count
-	 *
-	 * @param pid
-	 *            the parent pid
-	 * @param filter
-	 * @return get sub elements count
-	 * @throws RODAException
-	 */
-	public Integer getSubElementsCount(String pid, Filter filter) throws RODAException;
-
-	/**
-	 * Get sub elements
-	 *
-	 * @param pid
-	 *            the parent pid
-	 * @param adapter
-	 * @return the sub elements
-	 * @throws RODAException
-	 */
-	public SimpleDescriptionObject[] getSubElements(String pid, Filter filter, Sorter sorter, Sublist sublist)
-			throws RODAException;
-
-	/**
-	 * Get a RODA object
-	 *
-	 * @param pid
-	 *            the object id
-	 * @return {@link RODAObject}
-	 * @throws RODAException
-	 */
-	// public RODAObject getRODAObject(String pid) throws RODAException;
 
 	/**
 	 * Get simple description object

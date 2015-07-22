@@ -5,18 +5,15 @@ package pt.gov.dgarq.roda.wui.dissemination.browse.client;
 
 import java.util.List;
 
-import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
-import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
-
 import org.roda.legacy.exception.RODAException;
-import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import pt.gov.dgarq.roda.core.data.DescriptionObject;
-import pt.gov.dgarq.roda.core.data.RODAObject;
 import pt.gov.dgarq.roda.core.data.RepresentationPreservationObject;
+import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
+import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
+import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 
@@ -26,60 +23,10 @@ import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
  */
 public interface BrowserServiceAsync {
 
-	/**
-	 * Get collection total count
-	 * 
-	 * @param filter
-	 * 
-	 * @return the number of collections that fit the filter
-	 * @throws RODAException
-	 */
-	public void getCollectionsCount(Filter filter, AsyncCallback<Integer> callback);
+	void countDescriptiveMetadata(Filter filter, AsyncCallback<Long> callback);
 
-	/**
-	 * Get collections
-	 * 
-	 * @param adapter
-	 * 
-	 * @return get collections
-	 * @throws RODAException
-	 */
-	public void getCollections(Filter filter, Sorter sorter, Sublist sublist,
-			AsyncCallback<SimpleDescriptionObject[]> callback);
-
-	/**
-	 * Get sub elements count
-	 * 
-	 * @param pid
-	 *            the parent pid
-	 * @param filter
-	 * @return get sub elements count
-	 * @throws RODAException
-	 */
-	public void getSubElementsCount(String pid, Filter filter, AsyncCallback<Integer> callback);
-
-	/**
-	 * Get sub elements
-	 * 
-	 * @param pid
-	 *            the parent pid
-	 * @param adapter
-	 * @return the sub elements
-	 * @throws RODAException
-	 */
-	public void getSubElements(String pid, Filter filter, Sorter sorter, Sublist sublist,
-			AsyncCallback<SimpleDescriptionObject[]> callback);
-
-	/**
-	 * Get a RODA object
-	 * 
-	 * @param pid
-	 *            the object id
-	 * @return {@link RODAObject}
-	 * @throws RODAException
-	 */
-	// public void getRODAObject(String pid, AsyncCallback<RODAObject>
-	// callback);
+	void findDescriptiveMetadata(Filter filter, Sorter sorter, Sublist sublist,
+			AsyncCallback<IndexResult<SimpleDescriptionObject>> callback);
 
 	/**
 	 * Get simple description object
@@ -215,8 +162,5 @@ public interface BrowserServiceAsync {
 	 */
 	public void getPreservationTimeline(List<String> repPIDs, List<String> icons, List<String> colors, String locale,
 			AsyncCallback<TimelineInfo> callback);
-
-	void findCollections(Filter filter, Sorter sorter, Sublist sublist,
-			AsyncCallback<IndexResult<SimpleDescriptionObject>> callback);
 
 }

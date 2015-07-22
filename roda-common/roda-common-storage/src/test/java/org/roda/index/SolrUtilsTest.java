@@ -14,7 +14,6 @@ import org.apache.solr.common.SolrInputField;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.roda.CorporaConstants;
-import org.roda.common.RodaConstants;
 import org.roda.index.utils.SolrUtils;
 import org.roda.storage.Binary;
 import org.roda.storage.DefaultStoragePath;
@@ -22,6 +21,7 @@ import org.roda.storage.StorageActionException;
 import org.roda.storage.StorageService;
 import org.roda.storage.fs.FileStorageService;
 
+import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.adapter.filter.BasicSearchFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.ClassificationSchemeFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
@@ -32,6 +32,7 @@ import pt.gov.dgarq.roda.core.data.adapter.filter.ProducerFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.RangeFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.RegexFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
+
 
 public class SolrUtilsTest {
 

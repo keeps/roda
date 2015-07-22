@@ -8,6 +8,21 @@
 	text-overflow: ellipsis;
 }
 
+.my-collections-empty-info {
+	padding: 10px;
+}
+
+.my-collections-table .my-asyncdatagrid-pager-results {
+	margin-right: 0px;
+	margin-left: auto;
+}
+
+.my-collections-table .my-asyncdatagrid-pager-pagesize {
+	margin-right: 15px;
+	margin-left: auto;
+	margin-top: 5px;
+}
+
 /** Browser**/
 .wui-browse {
 	width: 865px;

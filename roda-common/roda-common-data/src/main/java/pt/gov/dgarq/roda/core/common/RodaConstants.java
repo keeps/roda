@@ -1,11 +1,10 @@
-package org.roda.common;
+package pt.gov.dgarq.roda.core.common;
 
 public final class RodaConstants {
 
 	/*
 	 * Misc
 	 */
-	public final static String LINE_SEPARATOR = System.getProperty("line.separator");
 	public final static String ISO8601 = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 	public final static String SHA1 = "SHA-1";
 	public final static String MD5 = "MD5";
