@@ -1,5 +1,6 @@
 package org.roda.model;
 
+import pt.gov.dgarq.roda.core.data.v2.Representation;
 
 public interface ModelObserver {
 

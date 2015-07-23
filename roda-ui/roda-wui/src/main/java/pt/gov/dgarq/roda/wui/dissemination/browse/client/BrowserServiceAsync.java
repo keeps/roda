@@ -5,10 +5,9 @@ package pt.gov.dgarq.roda.wui.dissemination.browse.client;
 
 import java.util.List;
 
-import org.roda.legacy.exception.RODAException;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
+import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.data.DescriptionObject;
 import pt.gov.dgarq.roda.core.data.RepresentationPreservationObject;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
@@ -27,6 +26,8 @@ public interface BrowserServiceAsync {
 
 	void findDescriptiveMetadata(Filter filter, Sorter sorter, Sublist sublist,
 			AsyncCallback<IndexResult<SimpleDescriptionObject>> callback);
+	
+	void getItemBundle(String aipId, String lang, AsyncCallback<BrowseItemBundle> callback);
 
 	/**
 	 * Get simple description object

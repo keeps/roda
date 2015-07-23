@@ -44,6 +44,7 @@ public final class RodaConstants {
 	public static final String STORAGE_DIRECTORY_PRESERVATION = "preservation";
 	public static final String STORAGE_DIRECTORY_REPRESENTATION_PREFIX = "representation_";
 	public static final String STORAGE_DIRECTORY_DATA = "data";
+	public static final String STORAGE_DIRECTORY_AGENTS = "agents";
 
 	/*
 	 * STORAGE METADATA
@@ -82,6 +83,8 @@ public final class RodaConstants {
 	public static final String AIP_DATE_MODIFIED = "dateModified";
 	public static final String AIP_DESCRIPTIVE_METADATA_ID = "descriptiveMetadataId";
 	public static final String AIP_REPRESENTATION_ID = "representationId";
+	public static final String AIP_PRESERVATION_OBJECTS_ID = "preservationObjectsId";
+	public static final String AIP_PRESERVATION_EVENTS_ID = "preservationEventsId";
 
 	/*
 	 * SDO FIELDS
@@ -115,6 +118,61 @@ public final class RodaConstants {
 	public static final String SRO_DATE_CREATION = "dateCreated";
 	public static final String SRO_STATUS = "status";
 	public static final String SRO_FILE_IDS = "fileId";
+	public static final String SRO_EVENT_PRESERVATION_IDS = "eventId";
+	public static final String SRO_REPRESENTATION_PRESERVATION_IDS = "representationId";
+	
+	/*
+	 * SEPM FIELDS
+	 */
+	public static final String SEPM_AGENT_ID = "agentId";
+	public static final String SEPM_CREATED_DATE = "dateCreated";
+	public static final String SEPM_ID = "id";
+	public static final String SEPM_LABEL = "label";
+	public static final String SEPM_LAST_MODIFIED_DATE = "dateModified";
+	public static final String SEPM_STATE = "state";
+	public static final String SEPM_TARGET_ID = "targetId";
+	public static final String SEPM_TYPE = "type";
+	public static final String SEPM_AIP_ID = "aipId";
+	public static final String SEPM_DATETIME = "datetime";
+	public static final String SEPM_NAME = "name";
+	public static final String SEPM_DESCRIPTION = "description";
+	public static final String SEPM_OUTCOME_RESULT = "outcomeResult";
+	public static final String SEPM_OUTCOME_DETAILS = "outcomeDetails";
+	public static final String SEPM_REPRESENTATION_ID = "representationId";
+	public static final String SEPM_FILE_ID = "fileId";
+	
+	/*
+	 * SRPM FIELDS
+	 */
+	public static final String SRPM_CREATED_DATE = "dateCreated";
+	public static final String SRPM_ID = "id";
+	public static final String SRPM_LABEL = "label";
+	public static final String SRPM_LAST_MODIFIED_DATE = "dateModified";
+	public static final String SRPM_REPRESENTATION_OBJECT_ID = "representationObjectId";
+	public static final String SRPM_STATE = "state";
+	public static final String SRPM_TYPE = "type";
+	public static final String SRPM_AIP_ID = "aipId";
+	public static final String SRPM_MODEL = "model";
+	public static final String SRPM_REPRESENTATION_ID = "representationId";
+	public static final String SRPM_FILE_ID = "fileId";
+	
+	/*
+	 * SRFM
+	 */
+	public static final String SRFM_CREATED_DATE = "dateCreated";
+	public static final String SRFM_ID = "id";
+	public static final String SRFM_LABEL = "label";
+	public static final String SRFM_LAST_MODIFIED_DATE = "dateModified";
+	public static final String SRFM_REPRESENTATION_OBJECT_ID = "representationObjectId";
+	public static final String SRFM_STATE = "state";
+	public static final String SRFM_TYPE = "type";
+	public static final String SRFM_AIP_ID = "aipId";
+	public static final String SRFM_REPRESENTATION_ID = "representationId";
+	public static final String SRFM_FILE_ID = "fileId";
+	public static final String SRFM_HASH = "hash";
+	public static final String SRFM_MIMETYPE = "mimetype";
+	public static final String SRFM_PRONOM_ID = "pronomId";
+	public static final String SRFM_SIZE = "size";
 
 	/*
 	 * OTHER FIELDS

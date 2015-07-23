@@ -6,13 +6,12 @@ package pt.gov.dgarq.roda.wui.management.statistics.client;
 import java.util.Date;
 import java.util.List;
 
-import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import org.roda.legacy.exception.RODAException;
-import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
+import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.data.StatisticData;
+import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 
 /**
  * @author Luis Faria

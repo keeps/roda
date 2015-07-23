@@ -15,7 +15,7 @@
 
   <!-- Identifier translation chain -->
   <util:list id="translationChain" value-type="org.fcrepo.kernel.identifiers.InternalIdentifierConverter">
-    <bean class="org.fcrepo.kernel.impl.identifiers.NamespaceConverter"/>
+    <bean class="org.fcrepo.kernel.modeshape.identifiers.NamespaceConverter"/>
   </util:list>
 
   <context:annotation-config/>

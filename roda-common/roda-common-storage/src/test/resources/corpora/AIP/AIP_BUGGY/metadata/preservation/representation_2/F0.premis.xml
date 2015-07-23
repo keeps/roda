@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<prem:object xsi:type="prem:file" xmlns:prem="info:lc/xmlns/premis-v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <prem:objectIdentifier>
+    <prem:objectIdentifierType>RODAObjectDatastreamID</prem:objectIdentifierType>
+    <prem:objectIdentifierValue>F0</prem:objectIdentifierValue>
+  </prem:objectIdentifier>
+  <prem:preservationLevel>
+    <prem:preservationLevelValue>full</prem:preservationLevelValue>
+    <prem:preservationLevelDateAssigned>2013-09-17T10:56:06Z</prem:preservationLevelDateAssigned>
+  </prem:preservationLevel>
+  <prem:objectCharacteristics>
+    <prem:compositionLevel>0</prem:compositionLevel>
+    <prem:fixity>
+      <prem:messageDigestAlgorithm>MD5</prem:messageDigestAlgorithm>
+      <prem:messageDigest>5B0CAB55E2BD56070E4EF5D2B2FCFCDA</prem:messageDigest>
+      <prem:messageDigestOriginator>RODA Core Services</prem:messageDigestOriginator>
+    </prem:fixity>
+    <prem:fixity>
+      <prem:messageDigestAlgorithm>SHA-1</prem:messageDigestAlgorithm>
+      <prem:messageDigest>7A308EFD99D77BFEB4BFBB2957191192F5B45C9A</prem:messageDigest>
+      <prem:messageDigestOriginator>RODA Core Services</prem:messageDigestOriginator>
+    </prem:fixity>
+    <prem:size>0</prem:size>
+    <prem:format>
+      <prem:formatDesignation>
+        <prem:formatName>text/xml</prem:formatName>
+      </prem:formatDesignation>
+    </prem:format>
+    <prem:objectCharacteristicsExtension>
+      <jhove xsi:schemaLocation="http://hul.harvard.edu/ois/xml/ns/jhove http://hul.harvard.edu/ois/xml/xsd/jhove/1.6/jhove.xsd" name="JhoveUtility" release="1.0" date="2013-08-17" xmlns="http://hul.harvard.edu/ois/xml/ns/jhove">
+        <date>2013-09-17T11:56:05+01:00</date>
+        <repInfo uri="/home/roda/roda/tomcat/apache-tomcat-6.0.37/temp/rFile18733021802983829temp">
+          <reportingModule release="1.4" date="2007-01-08">XML-hul</reportingModule>
+          <lastModified>2013-09-17T11:56:05+01:00</lastModified>
+          <size>403</size>
+          <format>XML</format>
+          <version>1.0</version>
+          <status>Well-Formed</status>
+          <sigMatch>
+            <module>XML-hul</module>
+          </sigMatch>
+          <mimeType>text/xml</mimeType>
+          <properties>
+            <property>
+              <name>XMLMetadata</name>
+              <values arity="List" type="Property">
+                <property>
+                  <name>Parser</name>
+                  <values arity="Scalar" type="String">
+                    <value>org.apache.xerces.parsers.SAXParser</value>
+                  </values>
+                </property>
+                <property>
+                  <name>Encoding</name>
+                  <values arity="Scalar" type="String">
+                    <value>UTF-8</value>
+                  </values>
+                </property>
+                <property>
+                  <name>Root</name>
+                  <values arity="Scalar" type="String">
+                    <value>mets</value>
+                  </values>
+                </property>
+                <property>
+                  <name>Namespaces</name>
+                  <values arity="List" type="Property">
+                    <property>
+                      <name>Namespace</name>
+                      <values arity="Array" type="Property">
+                        <property>
+                          <name>URI</name>
+                          <values arity="Scalar" type="String">
+                            <value>http://www.loc.gov/METS/</value>
+                          </values>
+                        </property>
+                      </values>
+                    </property>
+                    <property>
+                      <name>Namespace</name>
+                      <values arity="Array" type="Property">
+                        <property>
+                          <name>Prefix</name>
+                          <values arity="Scalar" type="String">
+                            <value>xlin</value>
+                          </values>
+                        </property>
+                        <property>
+                          <name>URI</name>
+                          <values arity="Scalar" type="String">
+                            <value>http://www.w3.org/1999/xlink</value>
+                          </values>
+                        </property>
+                      </values>
+                    </property>
+                  </values>
+                </property>
+              </values>
+            </property>
+          </properties>
+        </repInfo>
+      </jhove>
+    </prem:objectCharacteristicsExtension>
+  </prem:objectCharacteristics>
+  <prem:originalName>METS.xml</prem:originalName>
+  <prem:storage>
+    <prem:contentLocation>
+      <prem:contentLocationType>RODAObjectPID/RODAObjectDatastreamID</prem:contentLocationType>
+      <prem:contentLocationValue>roda:399/F0</prem:contentLocationValue>
+    </prem:contentLocation>
+  </prem:storage>
+</prem:object>

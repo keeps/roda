@@ -24,10 +24,13 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
+import org.roda.common.HTMLUtils;
 import org.roda.index.IndexActionException;
 import org.roda.index.IndexService;
+import org.roda.model.DescriptiveMetadata;
 import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
+import org.roda.storage.Binary;
 import org.roda.storage.DefaultStoragePath;
 import org.roda.storage.Resource;
 import org.roda.storage.StorageActionException;
@@ -41,7 +44,6 @@ import config.i18n.server.BrowserServiceMessages;
 import pt.gov.dgarq.roda.common.RodaClientFactory;
 import pt.gov.dgarq.roda.core.RODAClient;
 import pt.gov.dgarq.roda.core.common.RODAException;
-import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.DescriptionObject;
 import pt.gov.dgarq.roda.core.data.EventPreservationObject;
 import pt.gov.dgarq.roda.core.data.RepresentationFile;
@@ -49,15 +51,17 @@ import pt.gov.dgarq.roda.core.data.RepresentationObject;
 import pt.gov.dgarq.roda.core.data.RepresentationPreservationObject;
 import pt.gov.dgarq.roda.core.data.SimpleRepresentationObject;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
+import pt.gov.dgarq.roda.core.data.v2.Representation;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.core.stubs.Browser;
 import pt.gov.dgarq.roda.wui.common.client.GenericException;
 import pt.gov.dgarq.roda.wui.common.server.ServerTools;
+import pt.gov.dgarq.roda.wui.dissemination.browse.client.BrowseItemBundle;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.BrowserService;
+import pt.gov.dgarq.roda.wui.dissemination.browse.client.DescriptiveMetadataBundle;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.DisseminationInfo;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.PreservationInfo;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.RepresentationInfo;
@@ -150,6 +154,40 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 		}
 	}
 
+	public BrowseItemBundle getItemBundle(String aipId, String lang) throws RODAException {
+		BrowseItemBundle itemBundle = new BrowseItemBundle();
+		try {
+			// set sdo
+			itemBundle.setSdo(getSimpleDescriptionObject(aipId));
+
+			// set descriptive metadata
+			List<DescriptiveMetadataBundle> descriptiveMetadataList = new ArrayList<DescriptiveMetadataBundle>();
+			Iterable<DescriptiveMetadata> listDescriptiveMetadataBinaries = model
+					.listDescriptiveMetadataBinaries(aipId);
+			for (DescriptiveMetadata descriptiveMetadata : listDescriptiveMetadataBinaries) {
+				Binary binary = storage.getBinary(descriptiveMetadata.getStoragePath());
+				// FIXME add proper locale
+				String html = HTMLUtils.descriptiveMetadataToHtml(binary, model, null);
+
+				descriptiveMetadataList
+						.add(new DescriptiveMetadataBundle(descriptiveMetadata.getId(), html, binary.getSizeInBytes()));
+			}
+			itemBundle.setDescriptiveMetadata(descriptiveMetadataList);
+
+			// set representations
+			List<Representation> representationList = new ArrayList<Representation>();
+			Iterable<Representation> representations = model.listRepresentations(aipId);
+			for (Representation representation : representations) {
+				representationList.add(representation);
+			}
+			itemBundle.setRepresentations(representationList);
+
+		} catch (StorageActionException | ModelServiceException | RODAException e) {
+			throw new GenericException("Error getting item bundle " + e.getMessage());
+		}
+
+		return itemBundle;
+	}
 
 	public IndexResult<SimpleDescriptionObject> findDescriptiveMetadata(Filter filter, Sorter sorter, Sublist sublist)
 			throws RODAException {

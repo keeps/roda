@@ -3,6 +3,7 @@ package org.roda.model;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class AIP implements Serializable {
 
@@ -15,13 +16,21 @@ public class AIP implements Serializable {
 	private Date dateModified;
 	private List<String> descriptiveMetadataIds;
 	private List<String> representationIds;
+	//key representationID , value fileID
+	private Map<String,List<String>> preservationRepresentationObjectsIds;
+	//key representationID , value fileID
+	private Map<String,List<String>> preservationEventsIds;
+	//key representationID , value fileID
+	private Map<String,List<String>> preservationFileObjectsIds;
 
 	public AIP() {
 		super();
 	}
 
-	public AIP(String id, String parentId, boolean active, Date dateCreated, Date dateModified,
-			List<String> descriptiveMetadataIds, List<String> representationIds) {
+	public AIP(String id, String parentId, boolean active, Date dateCreated,
+			Date dateModified, List<String> descriptiveMetadataIds,
+			List<String> representationIds,Map<String,List<String>> preservationRepresentationObjectsIds, Map<String,List<String>> preservationEventsIds, 
+			Map<String,List<String>> preservationFileObjectsIds) {
 		super();
 		this.id = id;
 		this.parentId = parentId;
@@ -30,6 +39,9 @@ public class AIP implements Serializable {
 		this.dateModified = dateModified;
 		this.descriptiveMetadataIds = descriptiveMetadataIds;
 		this.representationIds = representationIds;
+		this.preservationRepresentationObjectsIds = preservationRepresentationObjectsIds;
+		this.preservationEventsIds = preservationEventsIds;
+		this.preservationFileObjectsIds = preservationFileObjectsIds;
 	}
 
 	/**
@@ -116,6 +128,28 @@ public class AIP implements Serializable {
 		return representationIds;
 	}
 
+	/**
+	 * @return the preservationRepresentationObjectsIds
+	 */
+	public Map<String,List<String>> getPreservationRepresentationObjectsIds() {
+		return preservationRepresentationObjectsIds;
+	}
+	
+	/**
+	 * @return the preservationFileObjectsIds
+	 */
+	public Map<String,List<String>> getPreservationFileObjectsIds() {
+		return preservationFileObjectsIds;
+	}
+	
+	/**
+	 * @return the preservationEventsIds
+	 */
+	public Map<String,List<String>> getPreservationsEventsIds() {
+		return preservationEventsIds;
+	}
+	
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

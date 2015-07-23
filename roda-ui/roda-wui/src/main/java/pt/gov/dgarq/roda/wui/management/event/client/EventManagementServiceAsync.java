@@ -1,14 +1,13 @@
 package pt.gov.dgarq.roda.wui.management.event.client;
 
-import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import org.roda.legacy.exception.RODAException;
-import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
+import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.data.PluginInfo;
 import pt.gov.dgarq.roda.core.data.Task;
 import pt.gov.dgarq.roda.core.data.TaskInstance;
+import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.wui.common.client.PrintReportException;
 
 /**

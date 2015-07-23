@@ -5,13 +5,12 @@ package pt.gov.dgarq.roda.wui.ingest.list.client;
 
 import java.util.Map;
 
-import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import org.roda.legacy.exception.RODAException;
-import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
+import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.data.SIPState;
+import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.wui.common.client.PrintReportException;
 
 /**

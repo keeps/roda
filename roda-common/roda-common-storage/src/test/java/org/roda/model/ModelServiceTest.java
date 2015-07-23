@@ -40,6 +40,8 @@ import org.roda.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import pt.gov.dgarq.roda.core.data.v2.Representation;
+
 /**
  * Unit tests for ModelService
  * 
@@ -71,6 +73,9 @@ public class ModelServiceTest {
 		corporaPath = Paths.get(corporaURL.toURI());
 		corporaService = new FileStorageService(corporaPath);
 
+		//pre-load the preservation container data
+		storage.copy(corporaService, DefaultStoragePath.parse(CorporaConstants.SOURCE_PRESERVATION_CONTAINER), DefaultStoragePath.parse(CorporaConstants.SOURCE_PRESERVATION_CONTAINER));
+		
 		logger.debug("Running model test under storage: " + basePath);
 	}
 
@@ -206,6 +211,20 @@ public class ModelServiceTest {
 		assertEquals(binary_2_2.getSizeInBytes().intValue(),
 				IOUtils.toByteArray(binary_2_2.getContent().createInputStream()).length);
 
+		
+		//test preservation metadata
+		RepresentationFilePreservationObject rfpo = model.retrieveRepresentationFileObject(aipId, CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.F0_PREMIS_XML);
+		assertEquals(rfpo.getCompositionLevel(), 0);
+		assertEquals(rfpo.getFormatDesignationName(), CorporaConstants.TEXT_XML);
+		
+		
+		EventPreservationObject epo = model.retrieveEventPreservationObject(aipId, CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.EVENT_RODA_398_PREMIS_XML);
+		assertEquals(epo.getEventType(), CorporaConstants.INGESTION);
+		assertEquals(epo.getOutcome(), CorporaConstants.SUCCESS);
+		
+		
+		RepresentationPreservationObject rpo = model.retrieveRepresentationPreservationObject(aipId, CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.REPRESENTATION_PREMIS_XML);
+		assertEquals(rpo.getPreservationLevel(), CorporaConstants.PRESERVATION_LEVEL_FULL);
 	}
 
 	@Test
@@ -551,6 +570,65 @@ public class ModelServiceTest {
 		} catch (ModelServiceException e) {
 			assertEquals(ModelServiceException.NOT_FOUND, e.getCode());
 		}
+	}
+
+	
+	@Test
+	public void testRetrieveEventPreservationObject() throws ModelServiceException, StorageActionException {
+		// set up
+		final String aipId = UUID.randomUUID().toString();
+		model.createAIP(aipId, corporaService,
+				DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
+
+		EventPreservationObject epo = model.retrieveEventPreservationObject(aipId, CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.EVENT_RODA_398_PREMIS_XML);
+		assertEquals(epo.getAgentID(), CorporaConstants.AGENT_RODA_8);
+		assertEquals(epo.getType(), CorporaConstants.INGESTION);
+	}
+	
+	@Test
+	public void testRepresentationFileObject() throws ModelServiceException, StorageActionException {
+		// set up
+		final String aipId = UUID.randomUUID().toString();
+		model.createAIP(aipId, corporaService,
+				DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
+		RepresentationFilePreservationObject rfpo = model.retrieveRepresentationFileObject(aipId, CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.F0_PREMIS_XML);
+		assertEquals(rfpo.getFixities().length, 2);
+		assertEquals(rfpo.getOriginalName(),CorporaConstants.METS_XML);
+	}
+	
+	@Test
+	public void testRepresentationPreservationObject() throws ModelServiceException, StorageActionException {
+		// set up
+		final String aipId = UUID.randomUUID().toString();
+		model.createAIP(aipId, corporaService,
+				DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
+		RepresentationPreservationObject rpo = model.retrieveRepresentationPreservationObject(aipId, CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.REPRESENTATION_PREMIS_XML);
+		assertEquals(rpo.getPreservationLevel(),CorporaConstants.PRESERVATION_LEVEL_FULL);
+	}
+	
+	
+	@Test
+	public void testGetAipPreservationObjects() throws ModelServiceException, StorageActionException {
+		// set up
+		final String aipId = UUID.randomUUID().toString();
+		model.createAIP(aipId, corporaService,
+				DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
+		
+		Iterable<RepresentationPreservationObject> representationPreservationObject = model.getAipPreservationObjects(aipId);
+		List<String> fileIDs = new ArrayList<String>();
+		Iterator<RepresentationPreservationObject> it = representationPreservationObject.iterator();
+		while(it.hasNext()){
+			RepresentationPreservationObject rpo = it.next();
+			fileIDs.add(rpo.getFileId());
+		}
+		assertThat(fileIDs, containsInAnyOrder(CorporaConstants.REPRESENTATION_PREMIS_XML,CorporaConstants.REPRESENTATION_PREMIS_XML));
+	}
+	
+	@Test
+	public void getAgentPreservationObject() throws ModelServiceException, StorageActionException {
+		AgentPreservationObject apo = model.getAgentPreservationObject(CorporaConstants.AGENT_RODA_8_PREMIS_XML);
+		assertEquals(apo.getAgentType(), CorporaConstants.SOFTWARE_INGEST_TASK);
+		assertEquals(apo.getAgentName(), CorporaConstants.INGEST_CREATE_AIP);
 	}
 
 }

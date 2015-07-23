@@ -1,16 +1,24 @@
 package org.roda.model;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import jersey.repackaged.com.google.common.collect.Sets;
-import pt.gov.dgarq.roda.core.common.RodaConstants;
-
 import org.roda.common.RodaUtils;
+import org.roda.model.premis.PremisAgentHelper;
+import org.roda.model.premis.PremisEventHelper;
+import org.roda.model.premis.PremisFileObjectHelper;
+import org.roda.model.premis.PremisMetadataException;
+import org.roda.model.premis.PremisRepresentationObjectHelper;
+import org.roda.model.preservation.AgentPreservationObject;
+import org.roda.model.preservation.EventPreservationObject;
+import org.roda.model.preservation.RepresentationFilePreservationObject;
+import org.roda.model.preservation.RepresentationPreservationObject;
 import org.roda.model.utils.ModelUtils;
 import org.roda.storage.Binary;
 import org.roda.storage.DefaultBinary;
@@ -20,6 +28,16 @@ import org.roda.storage.Resource;
 import org.roda.storage.StorageActionException;
 import org.roda.storage.StoragePath;
 import org.roda.storage.StorageService;
+import org.w3c.util.DateParser;
+import org.w3c.util.InvalidDateException;
+
+import jersey.repackaged.com.google.common.collect.Sets;
+import lc.xmlns.premisV2.EventOutcomeDetailComplexType;
+import lc.xmlns.premisV2.EventOutcomeInformationComplexType;
+import lc.xmlns.premisV2.LinkingObjectIdentifierComplexType;
+import pt.gov.dgarq.roda.core.common.RodaConstants;
+import pt.gov.dgarq.roda.core.data.v2.Representation;
+import pt.gov.dgarq.roda.core.data.v2.RepresentationState;
 
 /**
  * Class that "relates" Model & Storage
@@ -736,7 +754,124 @@ public class ModelService extends ModelObservable {
 		}
 	}
 
-	// TODO add methods for preservation metadata
+	// TODO to improve...
+	public Iterable<RepresentationPreservationObject> getAipPreservationObjects(String aipId) throws ModelServiceException{
+		Iterable<RepresentationPreservationObject> it = null;
+		final List<RepresentationPreservationObject> rpos = new ArrayList<RepresentationPreservationObject>();
+		try {
+			final Iterator<Resource> resourceIterator = storage
+					.listResourcesUnderDirectory(
+							ModelUtils.getRepresentationsPath(aipId))
+					.iterator();
+			while(resourceIterator.hasNext()){
+				Resource resource = resourceIterator.next();
+				Iterator<Resource> preservationIterator = storage.listResourcesUnderDirectory(ModelUtils.getPreservationPath(storage, aipId, resource.getStoragePath().getName())).iterator();
+				while(preservationIterator.hasNext()){
+					Resource preservationObject = preservationIterator.next();
+					Binary preservationBinary = storage.getBinary(preservationObject.getStoragePath());
+					if(ModelUtils.isPreservationRepresentationObject(preservationBinary)){
+						rpos.add(convertResourceToRepresentationPreservationObject(aipId, resource.getStoragePath().getName(), preservationObject.getStoragePath().getName(), preservationBinary));
+					}
+					
+				}
+			}
+			it = new Iterable<RepresentationPreservationObject>() {
+				@Override
+				public Iterator<RepresentationPreservationObject> iterator() {
+					return rpos.iterator();
+				}
+			};
+		}catch (StorageActionException e) {
+			throw new ModelServiceException(
+					"Error while obtaining AIP preservation objects, reason: "
+							+ e.getMessage(), e.getCode());
+		}
+		return it;
+	}
+	
+	public RepresentationPreservationObject getRepresentationPreservationObject(String aipId, String representationId, String fileId) throws ModelServiceException{
+		RepresentationPreservationObject obj = null;
+		try{
+			StoragePath sp =  ModelUtils.getPreservationFilePath(aipId, representationId, fileId);
+			Binary b = storage.getBinary(sp);
+			obj = convertResourceToRepresentationPreservationObject(aipId,representationId,fileId,b);
+		} catch (StorageActionException e) {
+			throw new ModelServiceException(
+					"Error while getting representation preservation object",
+					ModelServiceException.INTERNAL_SERVER_ERROR, e);
+		}
+		return obj;
+	}
+	
+	public EventPreservationObject getEventPreservationObject(String aipId, String representationId, String preservationObjectID) throws ModelServiceException{
+		EventPreservationObject obj = null;
+		try{
+			StoragePath sp =  ModelUtils.getPreservationFilePath(aipId, representationId, preservationObjectID);
+			Binary b = storage.getBinary(sp);
+			obj = convertResourceToEventPreservationObject(aipId,representationId,preservationObjectID,b);
+		} catch (StorageActionException e) {
+			throw new ModelServiceException(
+					"Error while getting event preservation object",
+					ModelServiceException.INTERNAL_SERVER_ERROR, e);
+		}
+		
+		return obj;
+	}
+	public AgentPreservationObject getAgentPreservationObject(String agentID) throws ModelServiceException{
+		AgentPreservationObject apo = null;
+		try{
+			StoragePath sp =  ModelUtils.getPreservationAgentPath(agentID);
+			Binary b = storage.getBinary(sp);
+			apo = convertResourceToAgentPreservationObject(agentID,b);
+		}catch(StorageActionException e){
+			throw new ModelServiceException(
+					"Error while getting agent preservation object",
+					ModelServiceException.INTERNAL_SERVER_ERROR, e);
+		}
+		return apo;
+	}
+	
+	private AgentPreservationObject convertResourceToAgentPreservationObject(
+			String agentID, Binary resource) throws ModelServiceException {
+		if (resource instanceof DefaultBinary) {
+			try{
+				Map<String, Set<String>> directoryMetadata = resource.getMetadata();
+	
+				// retrieve needed information to instantiate Representation
+				Boolean active = ModelUtils.getBoolean(directoryMetadata,
+						RodaConstants.STORAGE_META_ACTIVE);
+				Date dateCreated = ModelUtils.getDate(directoryMetadata,
+						RodaConstants.STORAGE_META_DATE_CREATED);
+				Date dateModified = ModelUtils.getDate(directoryMetadata,
+						RodaConstants.STORAGE_META_DATE_MODIFIED);
+	
+				if (active == null) {
+					// when not stated, considering active=false
+					active = false;
+				}
+				PremisAgentHelper pah = PremisAgentHelper.newInstance(resource.getContent().createInputStream());
+				AgentPreservationObject apo = new AgentPreservationObject();
+				apo.setAgentName((pah.getAgent().getAgentNameList()!=null && pah.getAgent().getAgentNameList().size()>0)?pah.getAgent().getAgentNameList().get(0):"");
+				apo.setAgentType(pah.getAgent().getAgentType());
+				apo.setFileID(agentID);
+				apo.setID((pah.getAgent().getAgentIdentifierList()!=null && pah.getAgent().getAgentIdentifierList().size()>0)?pah.getAgent().getAgentIdentifierList().get(0).getAgentIdentifierValue():"");
+				apo.setType(""); //TODO: ??????????
+				return apo;	
+			}catch(PremisMetadataException e){
+				throw new ModelServiceException(
+						"Error while trying to convert a binary into a representation preservation object",
+						ModelServiceException.INTERNAL_SERVER_ERROR);
+			}catch(IOException e){
+				throw new ModelServiceException(
+						"Error while trying to convert a binary into a representation preservation object",
+						ModelServiceException.INTERNAL_SERVER_ERROR);
+			}
+		} else {
+			throw new ModelServiceException(
+					"Error while trying to convert a binary into a representation preservation object",
+					ModelServiceException.INTERNAL_SERVER_ERROR);
+		}
+	}
 
 	private boolean isAIPvalid(Directory directory) {
 		// FIXME implement this
@@ -777,9 +912,47 @@ public class ModelService extends ModelObservable {
 						.getIds(storage, ModelUtils
 								.getRepresentationsPath(storagePath.getName()));
 
+				
+				Map<String,List<String>> preservationRepresentationObjects = new HashMap<String,List<String>>();
+				Map<String,List<String>> preservationFileObjects = new HashMap<String,List<String>>();
+				Map<String,List<String>> preservationEvents = new HashMap<String,List<String>>();
+				if(representationIds!=null && representationIds.size()>0){
+					for(String representationID : representationIds){
+						try{
+							StoragePath representationPreservationPath = ModelUtils.getPreservationPath(storage, storagePath.getName(),representationID);
+							List<String> preservationFileIds = ModelUtils
+									.getIds(storage,representationPreservationPath);
+							List<String> preservationRepresentationObjectFileIds = new ArrayList<String>();
+							List<String> preservationFileObjectFileIds = new ArrayList<String>();
+							List<String> preservationEventFileIds = new ArrayList<String>();
+							
+							for(String preservationFileId : preservationFileIds){
+								StoragePath binaryPath = ModelUtils.getPreservationFilePath(storagePath.getName(), representationID, preservationFileId);
+								Binary preservationBinary = storage.getBinary(binaryPath);
+								if(ModelUtils.isPreservationRepresentationObject(preservationBinary)){
+									preservationRepresentationObjectFileIds.add(preservationFileId);
+								}else if(ModelUtils.isPreservationEvent(preservationBinary)){
+									preservationEventFileIds.add(preservationFileId);
+								}else if(ModelUtils.isPreservationFileObject(preservationBinary)){
+									preservationFileObjectFileIds.add(preservationFileId);
+								}else{
+									System.out.println("CABOOOOOOOOOOOOOOOOOOOOOOOM");
+									//TODO... not object... not event... 
+								}
+							}
+							preservationRepresentationObjects.put(representationID, preservationRepresentationObjectFileIds);
+							preservationFileObjects.put(representationID, preservationFileObjectFileIds);
+							preservationEvents.put(representationID, preservationEventFileIds);
+						}catch(StorageActionException sae){
+							//TODO: No preservation folder associated to representation...
+						}
+					}
+					
+					
+				}
 				aip = new AIP(storagePath.getName(), parentId, active,
 						dateCreated, dateModified,
-						descriptiveMetadataBinaryIds, representationIds);
+						descriptiveMetadataBinaryIds, representationIds,preservationRepresentationObjects,preservationEvents, preservationFileObjects);
 			} catch (StorageActionException e) {
 				throw new ModelServiceException(
 						"Error while obtaining information to instantiate an AIP, reason: "
@@ -873,6 +1046,279 @@ public class ModelService extends ModelObservable {
 		} else {
 			throw new ModelServiceException(
 					"Error while trying to convert something that it isn't a Binary into a representation file",
+					ModelServiceException.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	public RepresentationPreservationObject retrieveRepresentationPreservationObject(
+			String aipId, String representationId, String fileId) throws ModelServiceException {
+		RepresentationPreservationObject representationPreservationObject = null;
+		try {
+			StoragePath filePath = ModelUtils.getPreservationFilePath(aipId,
+					representationId, fileId);
+			Binary binary = storage.getBinary(filePath);
+			representationPreservationObject = convertResourceToRepresentationPreservationObject(aipId,representationId,fileId,binary);
+			representationPreservationObject.setId(fileId);
+		} catch (StorageActionException e) {
+			throw new ModelServiceException(
+					"Error while obtaining Representation from storage, reason: "
+							+ e.getMessage(), e.getCode());
+		}
+		return representationPreservationObject;
+	}
+
+	public RepresentationFilePreservationObject retrieveRepresentationFileObject(
+			String aipId, String representationId, String fileId) throws ModelServiceException  {
+		RepresentationFilePreservationObject representationPreservationObject = null;
+		try {
+			StoragePath filePath = ModelUtils.getPreservationFilePath(aipId,
+					representationId, fileId);
+			Binary binary = storage.getBinary(filePath);
+			representationPreservationObject = convertResourceToRepresentationFilePreservationObject(aipId,representationId,fileId,binary);
+			representationPreservationObject.setId(fileId);
+		} catch (StorageActionException e) {
+			throw new ModelServiceException(
+					"Error while obtaining Representation File from storage, reason: "
+							+ e.getMessage(), e.getCode());
+		}
+		return representationPreservationObject;
+	}
+	
+	private RepresentationFilePreservationObject convertResourceToRepresentationFilePreservationObject(
+			String aipId, String representationId, String fileId, Binary resource) throws ModelServiceException {
+		if (resource instanceof DefaultBinary) {
+			try{
+				Map<String, Set<String>> directoryMetadata = resource.getMetadata();
+	
+				// retrieve needed information to instantiate Representation
+				Boolean active = ModelUtils.getBoolean(directoryMetadata,
+						RodaConstants.STORAGE_META_ACTIVE);
+				Date dateCreated = ModelUtils.getDate(directoryMetadata,
+						RodaConstants.STORAGE_META_DATE_CREATED);
+				Date dateModified = ModelUtils.getDate(directoryMetadata,
+						RodaConstants.STORAGE_META_DATE_MODIFIED);
+	
+				if (active == null) {
+					// when not stated, considering active=false
+					active = false;
+				}
+				
+				
+				PremisFileObjectHelper pfoh = PremisFileObjectHelper.newInstance(resource.getContent().createInputStream());
+				
+				RepresentationFilePreservationObject rfpo = new RepresentationFilePreservationObject();
+				rfpo.setAipId(aipId);
+				rfpo.setRepresentationId(representationId);
+				rfpo.setFileId(fileId);
+				rfpo.setCompositionLevel(pfoh.getRepresentationFilePreservationObject().getCompositionLevel());
+				rfpo.setContentLocationType(pfoh.getRepresentationFilePreservationObject().getContentLocationType());
+				rfpo.setContentLocationValue(pfoh.getRepresentationFilePreservationObject().getContentLocationValue());
+				rfpo.setCreatedDate(pfoh.getRepresentationFilePreservationObject().getCreatedDate());
+				rfpo.setCreatingApplicationName(pfoh.getRepresentationFilePreservationObject().getCreatingApplicationName());
+				rfpo.setCreatingApplicationVersion(pfoh.getRepresentationFilePreservationObject().getCreatingApplicationVersion());
+				rfpo.setDateCreatedByApplication(pfoh.getRepresentationFilePreservationObject().getDateCreatedByApplication());
+				rfpo.setFileId(fileId);
+				rfpo.setFixities(pfoh.getRepresentationFilePreservationObject().getFixities());
+				rfpo.setFormatDesignationName(pfoh.getRepresentationFilePreservationObject().getFormatDesignationName());
+				rfpo.setFormatDesignationVersion(pfoh.getRepresentationFilePreservationObject().getFormatDesignationVersion());
+				rfpo.setFormatRegistryKey(pfoh.getRepresentationFilePreservationObject().getFormatRegistryKey());
+				rfpo.setFormatRegistryName(pfoh.getRepresentationFilePreservationObject().getFormatRegistryName());
+				rfpo.setFormatRegistryRole(pfoh.getRepresentationFilePreservationObject().getFormatRegistryRole());
+				rfpo.setHash(pfoh.getRepresentationFilePreservationObject().getHash());
+				rfpo.setID(pfoh.getRepresentationFilePreservationObject().getID());
+				rfpo.setId(pfoh.getRepresentationFilePreservationObject().getId());
+				rfpo.setLabel(pfoh.getRepresentationFilePreservationObject().getLabel());
+				rfpo.setLastModifiedDate(pfoh.getRepresentationFilePreservationObject().getLastModifiedDate());
+				rfpo.setMimetype(pfoh.getRepresentationFilePreservationObject().getMimetype());
+				rfpo.setModel(pfoh.getRepresentationFilePreservationObject().getModel());
+				rfpo.setObjectCharacteristicsExtension(pfoh.getRepresentationFilePreservationObject().getObjectCharacteristicsExtension());
+				rfpo.setOriginalName(pfoh.getRepresentationFilePreservationObject().getOriginalName());
+				rfpo.setPreservationLevel(pfoh.getRepresentationFilePreservationObject().getPreservationLevel());
+				rfpo.setPronomId(pfoh.getRepresentationFilePreservationObject().getPronomId());
+				rfpo.setRepresentationObjectId(pfoh.getRepresentationFilePreservationObject().getRepresentationObjectId());
+				rfpo.setSize(pfoh.getRepresentationFilePreservationObject().getSize());
+				rfpo.setState(pfoh.getRepresentationFilePreservationObject().getState());
+				rfpo.setType(pfoh.getRepresentationFilePreservationObject().getType());
+				rfpo.setRepresentationId(representationId);
+				return rfpo;
+						
+						
+			}catch(PremisMetadataException e){
+				throw new ModelServiceException(
+						"Error while trying to convert a binary into a representation preservation object",
+						ModelServiceException.INTERNAL_SERVER_ERROR);
+			}catch(IOException e){
+				throw new ModelServiceException(
+						"Error while trying to convert a binary into a representation preservation object",
+						ModelServiceException.INTERNAL_SERVER_ERROR);
+			}
+		} else {
+			throw new ModelServiceException(
+					"Error while trying to convert a binary into a representation preservation object",
+					ModelServiceException.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	private RepresentationPreservationObject convertResourceToRepresentationPreservationObject(
+			String aipId, String representationId, String fileId, Binary resource) throws ModelServiceException {
+		if (resource instanceof DefaultBinary) {
+			try{
+				Map<String, Set<String>> directoryMetadata = resource.getMetadata();
+	
+				// retrieve needed information to instantiate Representation
+				Boolean active = ModelUtils.getBoolean(directoryMetadata,
+						RodaConstants.STORAGE_META_ACTIVE);
+				Date dateCreated = ModelUtils.getDate(directoryMetadata,
+						RodaConstants.STORAGE_META_DATE_CREATED);
+				Date dateModified = ModelUtils.getDate(directoryMetadata,
+						RodaConstants.STORAGE_META_DATE_MODIFIED);
+	
+				if (active == null) {
+					// when not stated, considering active=false
+					active = false;
+				}
+				
+				PremisRepresentationObjectHelper proh = PremisRepresentationObjectHelper.newInstance(resource.getContent().createInputStream());
+				RepresentationPreservationObject rpo = new RepresentationPreservationObject();
+				rpo.setAipId(aipId);
+				rpo.setRepresentationId(representationId);
+				rpo.setFileId(fileId);
+				rpo.setCreatedDate(proh.getRepresentationPreservationObject().getCreatedDate());
+				rpo.setDerivationEventID(proh.getRepresentationPreservationObject().getDerivationEventID());
+				rpo.setDerivedFromRepresentationObjectID(proh.getRepresentationPreservationObject().getDerivedFromRepresentationObjectID());
+				rpo.setId(proh.getRepresentationPreservationObject().getId());
+				rpo.setID(proh.getRepresentationPreservationObject().getID());
+				rpo.setLabel(proh.getRepresentationPreservationObject().getLabel());
+				rpo.setLastModifiedDate(proh.getRepresentationPreservationObject().getLastModifiedDate());
+				rpo.setModel(proh.getRepresentationPreservationObject().getModel());
+				rpo.setPartFiles(proh.getRepresentationPreservationObject().getPartFiles());
+				rpo.setPreservationEventIDs(proh.getRepresentationPreservationObject().getPreservationEventIDs());
+				rpo.setPreservationLevel(proh.getRepresentationPreservationObject().getPreservationLevel());
+				rpo.setRepresentationObjectID(proh.getRepresentationPreservationObject().getRepresentationObjectID());
+				rpo.setRootFile(proh.getRepresentationPreservationObject().getRootFile());
+				rpo.setState(proh.getRepresentationPreservationObject().getState());
+				rpo.setType(proh.getRepresentationPreservationObject().getType());
+				return rpo;
+			}catch(PremisMetadataException e){
+				throw new ModelServiceException(
+						"Error while trying to convert a binary into a representation preservation object",
+						ModelServiceException.INTERNAL_SERVER_ERROR);
+			}catch(IOException e){
+				throw new ModelServiceException(
+						"Error while trying to convert a binary into a representation preservation object",
+						ModelServiceException.INTERNAL_SERVER_ERROR);
+			}
+		} else {
+			throw new ModelServiceException(
+					"Error while trying to convert a binary into a representation preservation object",
+					ModelServiceException.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	public EventPreservationObject retrieveEventPreservationObject(String aipId,
+			String representationId, String fileId) throws ModelServiceException {
+		EventPreservationObject eventPreservationObject = null;
+		try {
+			StoragePath filePath = ModelUtils.getPreservationFilePath(aipId, representationId, fileId);
+			Binary binary = storage.getBinary(filePath);
+			eventPreservationObject = convertResourceToEventPreservationObject(aipId,representationId,fileId,binary);
+			eventPreservationObject.setId(fileId);
+		} catch (StorageActionException e) {
+			throw new ModelServiceException(
+					"Error while obtaining Representation from storage, reason: "
+							+ e.getMessage(), e.getCode());
+		}
+		return eventPreservationObject;
+	}
+
+	private EventPreservationObject convertResourceToEventPreservationObject(
+			String aipId, String representationId, String fileId, Binary resource) throws ModelServiceException {
+		if (resource instanceof DefaultBinary) {
+			try{
+				Map<String, Set<String>> directoryMetadata = resource.getMetadata();
+				// retrieve needed information to instantiate Representation
+				Boolean active = ModelUtils.getBoolean(directoryMetadata,
+						RodaConstants.STORAGE_META_ACTIVE);
+				Date dateCreated = ModelUtils.getDate(directoryMetadata,
+						RodaConstants.STORAGE_META_DATE_CREATED);
+				Date dateModified = ModelUtils.getDate(directoryMetadata,
+						RodaConstants.STORAGE_META_DATE_MODIFIED);
+	
+				if (active == null) {
+					active = false;
+				}
+				
+				PremisEventHelper peh = PremisEventHelper.newInstance(resource.getContent().createInputStream());
+				
+				//TODO premisevent to EventPreservationObject
+				EventPreservationObject epo = new EventPreservationObject();
+				epo.setAipId(aipId);
+				epo.setRepresentationId(representationId);
+				epo.setFileId(fileId);
+				epo.setLastModifiedDate(dateModified);
+				epo.setCreatedDate(dateCreated);
+				epo.setAgentID((peh.getEvent().getLinkingAgentIdentifierList()!=null && peh.getEvent().getLinkingAgentIdentifierList().size()>0)?peh.getEvent().getLinkingAgentIdentifierList().get(0).getLinkingAgentIdentifierValue():null);
+				epo.setAgentRole((peh.getEvent().getLinkingAgentIdentifierList()!=null && peh.getEvent().getLinkingAgentIdentifierList().size()>0)?peh.getEvent().getLinkingAgentIdentifierList().get(0).getRole():null);
+				epo.setDate(new Date()); //TODO: ????
+				try{
+					epo.setDatetime(DateParser.parse(peh.getEvent().getEventDateTime().toString()));
+				}catch(InvalidDateException ide){
+					epo.setDatetime(new Date());
+				}
+				epo.setDescription(""); //TODO: ????
+				epo.setEventDetail(peh.getEvent().getEventDetail());
+				epo.setEventType(peh.getEvent().getEventType());
+				epo.setFileId(fileId);
+				epo.setId(fileId);
+				epo.setID(""); //TODO: ???
+				epo.setLabel(""); //TODO: ???
+				epo.setModel(""); //TODO: ???
+				epo.setName(""); //TODO: ???
+				List<LinkingObjectIdentifierComplexType> linkingObjects = peh.getEvent().getLinkingObjectIdentifierList();
+				if(linkingObjects!=null && linkingObjects.size()>0){
+					List<String> objectIds = new ArrayList<String>();
+					for(LinkingObjectIdentifierComplexType loi : linkingObjects){
+						objectIds.add(loi.getTitle());
+					}
+					epo.setObjectIDs(objectIds.toArray(new String[objectIds.size()]));
+				}else{
+					epo.setObjectIDs(null);
+				}
+				epo.setOutcome(peh.getEvent().getEventOutcomeInformationList().get(0).getEventOutcome());
+				if(peh.getEvent().getEventOutcomeInformationList()!=null && peh.getEvent().getEventOutcomeInformationList().size()>0){
+					EventOutcomeInformationComplexType eoict = peh.getEvent().getEventOutcomeInformationList().get(0);
+					epo.setOutcome(eoict.getEventOutcome());
+					if(eoict.getEventOutcomeDetailList()!=null && eoict.getEventOutcomeDetailList().size()>0){
+						EventOutcomeDetailComplexType eodc = eoict.getEventOutcomeDetailList().get(0);
+						epo.setOutcomeDetailExtension(eodc.getEventOutcomeDetailExtension().toString());
+						epo.setOutcomeDetailNote(eodc.getEventOutcomeDetailNote());
+					}else{
+						epo.setOutcomeDetailExtension("");
+						epo.setOutcomeDetailNote("");
+					}
+				}else{
+					epo.setOutcome("");
+					epo.setOutcomeDetailExtension("");
+					epo.setOutcomeDetailNote("");
+				}
+				epo.setOutcomeDetails(""); //TODO: ???
+				epo.setOutcomeResult(""); //TODO: ???
+				epo.setState(""); //TODO: ???
+				epo.setTargetID(""); //TODO: ???
+				epo.setType(peh.getEvent().getEventType());
+				return epo;
+			}catch(PremisMetadataException e){
+				throw new ModelServiceException(
+						"Error while trying to convert a binary into a event preservation object",
+						ModelServiceException.INTERNAL_SERVER_ERROR);
+			}catch(IOException e){
+				throw new ModelServiceException(
+						"Error while trying to convert a binary into a event preservation object",
+						ModelServiceException.INTERNAL_SERVER_ERROR);
+			}
+		} else {
+			throw new ModelServiceException(
+					"Error while trying to convert a binary into a event preservation object",
 					ModelServiceException.INTERNAL_SERVER_ERROR);
 		}
 	}

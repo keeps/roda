@@ -1,5 +1,6 @@
 package org.roda.model.utils;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -13,7 +14,11 @@ import java.util.TreeSet;
 import org.roda.common.RodaUtils;
 import org.roda.model.FileFormat;
 import org.roda.model.ModelServiceException;
-import org.roda.model.RepresentationState;
+import org.roda.model.premis.PremisEventHelper;
+import org.roda.model.premis.PremisFileObjectHelper;
+import org.roda.model.premis.PremisMetadataException;
+import org.roda.model.premis.PremisRepresentationObjectHelper;
+import org.roda.storage.Binary;
 import org.roda.storage.DefaultStoragePath;
 import org.roda.storage.Resource;
 import org.roda.storage.StorageActionException;
@@ -21,6 +26,7 @@ import org.roda.storage.StoragePath;
 import org.roda.storage.StorageService;
 
 import pt.gov.dgarq.roda.core.common.RodaConstants;
+import pt.gov.dgarq.roda.core.data.v2.RepresentationState;
 
 /**
  * Model related utility class
@@ -181,6 +187,83 @@ public final class ModelUtils {
 		return ids;
 	}
 
+	/**
+	 * Returns a list of ids from the children of a certain resources
+	 * 
+	 * @param storage
+	 *            the storage service containing the parent resource
+	 * @param path
+	 *            the storage paths for the parent resources
+	 * @throws StorageActionException 
+	 */
+	public static List<String> getIds(StorageService storage,
+			List<StoragePath> paths) throws StorageActionException {
+		List<String> ids = new ArrayList<String>();
+		for(StoragePath path : paths){
+			Iterator<Resource> it = storage.listResourcesUnderDirectory(path)
+					.iterator();
+			while (it.hasNext()) {
+				Resource next = it.next();
+				StoragePath storagePath = next.getStoragePath();
+				ids.add(storagePath.getName());
+			}
+		}
+		return ids;
+		
+		
+	}
+	
+	
+	
+	/**
+	 * Returns a list of ids from the children of a certain resources, starting with the prefix defined
+	 * 
+	 * @param storage
+	 *            the storage service containing the parent resource
+	 * @param path
+	 *            the storage paths for the parent resources
+	 * @param prefix
+	 *            the prefix of the children
+	 * @throws StorageActionException 
+	 */
+	public static List<String> getIds(StorageService storage,
+			List<StoragePath> paths, String prefix) throws StorageActionException {
+		List<String> ids = new ArrayList<String>();
+		for(StoragePath path : paths){
+			if(path.getName().startsWith(prefix)){
+				ids.add(path.getName());
+			}
+		}
+		return ids;
+		
+		
+	}
+	
+	
+	
+	
+	/**
+	 * Returns a list of storagepath from the children of a certain resource
+	 * 
+	 * @param storage
+	 *            the storage service containing the parent resource
+	 * @param path
+	 *            the storage path for the parent resource
+	 */
+	public static List<StoragePath> getStoragePaths(StorageService storage, StoragePath path)
+			throws StorageActionException {
+		List<StoragePath> paths = new ArrayList<StoragePath>();
+		Iterator<Resource> it = storage.listResourcesUnderDirectory(path)
+				.iterator();
+		while (it.hasNext()) {
+			Resource next = it.next();
+			StoragePath storagePath = next.getStoragePath();
+			paths.add(storagePath);
+		}
+
+		return paths;
+	}
+
 	public static StoragePath getAIPcontainerPath()
 			throws StorageActionException {
 		return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP);
@@ -241,4 +324,53 @@ public final class ModelUtils {
 					ModelServiceException.INTERNAL_SERVER_ERROR);
 		}
 	}
+
+	public static StoragePath getPreservationPath(StorageService storage, String aipId,
+			String representationID) throws StorageActionException {
+		return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP,
+				aipId, RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, representationID);
+		
+	}
+	public static StoragePath getPreservationFilePath(String aipId,
+			String representationID, String fileID) throws StorageActionException {
+		return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP,
+				aipId, RodaConstants.STORAGE_DIRECTORY_METADATA,RodaConstants.STORAGE_DIRECTORY_PRESERVATION,representationID, fileID);
+		
+	}
+
+	public static boolean isPreservationRepresentationObject(Binary preservationBinary) {
+		boolean isObject = true;
+		try {
+			PremisRepresentationObjectHelper.newInstance(preservationBinary.getContent().createInputStream());
+		} catch (PremisMetadataException | IOException | ClassCastException e) {
+			isObject = false;
+		}
+		return isObject;
+	}
+
+	public static boolean isPreservationEvent(Binary preservationBinary) {
+		boolean isEvent = true;
+		try {
+			PremisEventHelper.newInstance(preservationBinary.getContent().createInputStream());
+		} catch (PremisMetadataException | IOException | ClassCastException e) {
+			isEvent = false;
+		}
+		return isEvent;
+	}
+	
+
+	public static boolean isPreservationFileObject(Binary preservationBinary) {
+		boolean isObject = true;
+		try {
+			PremisFileObjectHelper.newInstance(preservationBinary.getContent().createInputStream());
+		} catch (PremisMetadataException | IOException | ClassCastException e) {
+			isObject = false;
+		}
+		return isObject;
+	}
+
+	public static StoragePath getPreservationAgentPath(String agentID) throws StorageActionException {
+		return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_PRESERVATION,RodaConstants.STORAGE_DIRECTORY_AGENTS,agentID);
+	}
+
 }

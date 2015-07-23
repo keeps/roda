@@ -3,6 +3,8 @@ package org.roda.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import pt.gov.dgarq.roda.core.data.v2.Representation;
+
 public abstract class ModelObservable {
 	private final List<ModelObserver> observers;
 

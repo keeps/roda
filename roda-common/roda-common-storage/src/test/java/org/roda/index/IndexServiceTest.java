@@ -28,7 +28,6 @@ import org.roda.model.AIP;
 import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
 import org.roda.model.ModelServiceTest;
-import org.roda.model.Representation;
 import org.roda.storage.DefaultStoragePath;
 import org.roda.storage.StorageActionException;
 import org.roda.storage.StoragePath;
@@ -45,6 +44,7 @@ import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.RODAObject;
+import pt.gov.dgarq.roda.core.data.v2.Representation;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 
 public class IndexServiceTest {
@@ -81,7 +81,8 @@ public class IndexServiceTest {
 		System.setProperty("solr.data.dir.aip", indexPath.resolve("aip").toString());
 		System.setProperty("solr.data.dir.sdo", indexPath.resolve("sdo").toString());
 		System.setProperty("solr.data.dir.representations", indexPath.resolve("representation").toString());
-
+		System.setProperty("solr.data.dir.preservationobject", indexPath.resolve("preservationobject").toString());
+		System.setProperty("solr.data.dir.preservationevent", indexPath.resolve("preservationevent").toString());
 		// start embedded solr
 		final EmbeddedSolrServer solr = new EmbeddedSolrServer(solrHome, "test");
 
@@ -169,6 +170,36 @@ public class IndexServiceTest {
 
 		assertThat(sro_IDs, Matchers.contains(aip.getRepresentationIds().toArray()));
 
+		
+		
+		
+		SimpleEventPreservationMetadata sepm = index.retrieveSimpleEventPreservationMetadata(aipId, CorporaConstants.REPRESENTATION_1_ID,CorporaConstants.EVENT_RODA_398_PREMIS_XML);
+		assertEquals(sepm.getType(), CorporaConstants.INGESTION);
+		Filter filterType = new Filter();
+		filterType.add(new SimpleFilterParameter(RodaConstants.SEPM_TYPE, CorporaConstants.INGESTION));
+		assertEquals(""+index.countSimpleEventPreservationMetadata(filterType),""+1L);
+		assertEquals(index.findSimpleEventPreservationMetadata(filterType, null, new Sublist(0, 10)).getTotalCount(),1L);
+		
+		
+		SimpleRepresentationFileMetadata srfm = index.retrieveSimpleRepresentationFileMetadata(aipId, CorporaConstants.REPRESENTATION_1_ID,CorporaConstants.F0_PREMIS_XML);
+		assertEquals(srfm.getAipId(), aipId);
+		Filter filterAIPID = new Filter();
+		filterAIPID.add(new SimpleFilterParameter(RodaConstants.SRFM_AIP_ID, aipId));
+		assertEquals(""+index.countSimpleRepresentationFileMetadata(filterAIPID),""+4L);	//rep1.F0, rep1.F1, rep2.f0, rep2.f1
+		/*
+		filterMimetype.add(new SimpleFilterParameter(RodaConstants.SRFM_MIMETYPE, CorporaConstants.TEXT_XML));
+		assertEquals(index.findSimpleEventPreservationMetadata(filterMimetype, null, new Sublist(0, 10)).getTotalCount(),1L);
+		*/
+		
+		/*
+		SimpleRepresentationPreservationMetadata srpm = index.retrieveSimpleRepresentationPreservationMetadata(aipId, CorporaConstants.REPRESENTATION_1_ID,CorporaConstants.REPRESENTATION_PREMIS_XML);
+		assertEquals(srpm.getAipId(), aipId);
+		assertEquals(srpm.getFileId(),CorporaConstants.REPRESENTATION_PREMIS_XML);
+		Filter filterFileId = new Filter();
+		filterFileId.add(new SimpleFilterParameter(RodaConstants.SRPM_FILE_ID, CorporaConstants.REPRESENTATION_PREMIS_XML));
+		assertEquals(""+index.countSimpleRepresentationPreservationMetadata(filterFileId),""+1L);
+		assertEquals(index.findSimpleEventPreservationMetadata(filterFileId, null, new Sublist(0, 10)).getTotalCount(),1L);
+		*/
 		model.deleteAIP(aipId);
 		try {
 			index.retrieveAIP(aipId);

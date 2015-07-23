@@ -7,12 +7,12 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.roda.index.utils.SolrUtils;
 import org.roda.model.AIP;
 import org.roda.model.ModelService;
-import org.roda.model.Representation;
 
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
+import pt.gov.dgarq.roda.core.data.v2.Representation;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 
 public class IndexService {
@@ -49,7 +49,7 @@ public class IndexService {
 	public Long countDescriptiveMetadata(Filter filter) throws IndexActionException {
 		return SolrUtils.count(index, SimpleDescriptionObject.class, filter);
 	}
-
+	
 	public SimpleDescriptionObject retrieveDescriptiveMetadata(String aipId) throws IndexActionException {
 		// TODO check if return type shouldn't be updated to
 		// SimpleDescriptiveMetadata
@@ -86,4 +86,53 @@ public class IndexService {
 		} while (parentId != null);
 		return ancestors;
 	}
+	
+	//TODO:
+//	public SimpleRepresentationPreservationMetadata retrieveSimpleRepresentationPreservationMetadata(String aipId, String representationId, String fileId) throws IndexActionException{
+//		return SolrUtils.retrieve(index, SimpleRepresentationPreservationMetadata.class, aipId, representationId, fileId);
+//	}
+//	public Long countSimpleRepresentationPreservationMetadata(Filter filter) throws IndexActionException {
+//		return SolrUtils.count(index, SimpleRepresentationPreservationMetadata.class, filter);
+//	}
+//	public IndexResult<SimpleRepresentationPreservationMetadata> findRepresentationPreservationMetadata(Filter filter, Sorter sorter, Sublist sublist)
+//			throws IndexActionException {
+//		return SolrUtils.find(index, SimpleRepresentationPreservationMetadata.class, filter, sorter, sublist);
+//	}
+//	/*
+//	public IndexResult<SimpleRepresentationPreservationObject> findRepresentationPreservationObject(ContentAdapter contentAdapter){
+//		return null;
+//	}
+//	*/
+//	
+//	public SimpleEventPreservationMetadata retrieveSimpleEventPreservationMetadata(String aipId, String representationId, String fileId) throws IndexActionException{
+//		return SolrUtils.retrieve(index, SimpleEventPreservationMetadata.class, aipId, representationId,fileId);
+//	}
+//	public Long countSimpleEventPreservationMetadata(Filter filter) throws IndexActionException {
+//		return SolrUtils.count(index, SimpleEventPreservationMetadata.class, filter);
+//	}
+//	public IndexResult<SimpleEventPreservationMetadata> findSimpleEventPreservationMetadata(Filter filter, Sorter sorter, Sublist sublist)
+//			throws IndexActionException {
+//		return SolrUtils.find(index, SimpleEventPreservationMetadata.class, filter, sorter, sublist);
+//	}
+//	/*
+//	public IndexResult<SimpleEventPreservationObject> findRepresentationPreservationObject(ContentAdapter contentAdapter){
+//		return null;
+//	}
+//	*/
+//	
+//	public SimpleRepresentationFileMetadata retrieveSimpleRepresentationFileMetadata(String aipId, String representationId, String fileId) throws IndexActionException{
+//		return SolrUtils.retrieve(index, SimpleRepresentationFileMetadata.class, aipId, representationId,fileId);
+//	}
+//	public Long countSimpleRepresentationFileMetadata(Filter filter) throws IndexActionException {
+//		return SolrUtils.count(index, SimpleRepresentationFileMetadata.class, filter);
+//	}
+//	public IndexResult<SimpleRepresentationFileMetadata> findSimpleRepresentationFileMetadata(Filter filter, Sorter sorter, Sublist sublist)
+//			throws IndexActionException {
+//		return SolrUtils.find(index, SimpleRepresentationFileMetadata.class, filter, sorter, sublist);
+//	}
+	/*
+	public IndexResult<SimpleRepresentationPreservationObject> findRepresentationPreservationObject(ContentAdapter contentAdapter){
+		return null;
+	}
+	*/
 }
