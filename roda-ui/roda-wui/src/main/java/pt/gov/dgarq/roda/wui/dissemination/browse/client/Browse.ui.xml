@@ -27,6 +27,10 @@
 		width: 200px;
 	}
 	
+	.searchlist-title {
+		position: absolute;
+	}
+	
 	.searchlist {
 		
 	}
@@ -35,8 +39,13 @@
 		margin-bottom: 10px;
 	}
 	
+	.sidebar-group {
+		margin-bottom: 10px;
+	}
+	
 	.action {
-		
+		width: 100%;
+		margin-bottom: 10px;
 	}
 	
 	.footer {
@@ -46,25 +55,59 @@
 
 	<g:FlowPanel styleName="browse" addStyleNames="{style.browse}">
 		<g:FlowPanel styleName="{style.content}">
-			<g:Label styleName="h1">
+			<g:Label styleName="h1" addStyleNames="browseTitle">
 				<ui:msg description="Browser title">Browse</ui:msg>
 			</g:Label>
-			<g:SimplePanel addStyleNames="{style.item_icon}"
-				ui:field="itemIcon" />
-			<g:Label styleName="h2" ui:field="itemTitle">
+			<m:BreadcrumbPanel ui:field="breadcrumb"
+				addStyleNames="browseBreadcrumb" />
+			<g:SimplePanel styleName="browseItemIcon"
+				addStyleNames="{style.item_icon}" ui:field="itemIcon" />
+			<g:Label styleName="h2" addStyleNames="browseItemText"
+				ui:field="itemTitle">
 				<ui:msg description="Item title">All collections</ui:msg>
+			</g:Label>
+			<g:Label addStyleNames="browseItemDates" ui:field="itemDates" />
+			<g:HTML ui:field="itemDescriptiveMetadata" addStyleNames="browseItemDescriptiveMetadata" />
+			<g:Label styleName="{style.searchlist-title}" addStyleNames="h2"
+				ui:field="fondsPanelTitle">
+				<ui:msg>Items</ui:msg>
 			</g:Label>
 			<common:CollectionsTable ui:field="fondsPanel"
 				addStyleNames="{style.searchlist}" />
 		</g:FlowPanel>
 		<g:FlowPanel styleName="{style.sidebar}">
-			<g:Label addStyleNames="h2 {style.sidebar-title}">
-				<ui:msg description="Browser actions">Actions</ui:msg>
-			</g:Label>
-			<g:Button addStyleNames="{style.action} btn btn-plus"
-				ui:field="createFonds">
-				<ui:msg description="Create new item">New item</ui:msg>
-			</g:Button>
+			<g:FlowPanel styleName="{style.sidebar-group}" ui:field="sidebarGroupDownloads">
+				<g:Label addStyleNames="h2 {style.sidebar-title}">
+					<ui:msg>Downloads</ui:msg>
+				</g:Label>
+				<g:FlowPanel ui:field="downloadList">
+				</g:FlowPanel>
+			</g:FlowPanel>
+			<g:FlowPanel styleName="{style.sidebar-group}">
+				<g:Label addStyleNames="h2 {style.sidebar-title}">
+					<ui:msg description="Browser actions">Actions</ui:msg>
+				</g:Label>
+				<g:Button addStyleNames="{style.action} btn btn-plus"
+					ui:field="createItem">
+					<ui:msg>New item</ui:msg>
+				</g:Button>
+				<g:Button addStyleNames="{style.action} btn btn-edit"
+					ui:field="editMetadata">
+					<ui:msg>Edit metadata</ui:msg>
+				</g:Button>
+				<g:Button addStyleNames="{style.action} btn btn-edit"
+					ui:field="moveItem">
+					<ui:msg>Move in hierarchy</ui:msg>
+				</g:Button>
+				<g:Button addStyleNames="{style.action} btn btn-edit"
+					ui:field="editPermissions">
+					<ui:msg>Edit permissions</ui:msg>
+				</g:Button>
+				<g:Button addStyleNames="{style.action} btn btn-play"
+					ui:field="seeLog">
+					<ui:msg>View PREMIS</ui:msg>
+				</g:Button>
+			</g:FlowPanel>
 		</g:FlowPanel>
 		<g:FlowPanel styleName="{style.footer}" />
 	</g:FlowPanel>

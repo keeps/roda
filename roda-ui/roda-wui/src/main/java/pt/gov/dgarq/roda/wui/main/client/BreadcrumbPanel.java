@@ -3,6 +3,7 @@
  */
 package pt.gov.dgarq.roda.wui.main.client;
 
+import java.util.List;
 import java.util.MissingResourceException;
 import java.util.Stack;
 
@@ -28,7 +29,7 @@ import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
  * @author Luis Faria
  * 
  */
-public class BreadcrumbPanel extends HorizontalPanel implements HasValueChangeHandlers<String[]> {
+public class BreadcrumbPanel extends HorizontalPanel implements HasValueChangeHandlers<List<String>> {
 
 	// private GWTLogger logger = new GWTLogger(GWT.getTypeName(this));
 
@@ -36,7 +37,7 @@ public class BreadcrumbPanel extends HorizontalPanel implements HasValueChangeHa
 
 	private ClientLogger logger = new ClientLogger(getClass().getName());
 
-	private String[] currentpath;
+	private List<String> currentpath;
 
 	private final Stack<Breadcrumb> breadcrumbs;
 
@@ -77,14 +78,14 @@ public class BreadcrumbPanel extends HorizontalPanel implements HasValueChangeHa
 	 *            the new history path
 	 * 
 	 */
-	public void updatePath(String[] path) {
+	public void updatePath(List<String> path) {
 
 		// Check for common path
 		int commonPathIndex = 0;
 		boolean isCommonPath = true;
-		int minLenght = Math.min(path.length, breadcrumbs.size());
+		int minLenght = Math.min(path.size(), breadcrumbs.size());
 		while (isCommonPath && commonPathIndex < minLenght) {
-			String pathToken = path[commonPathIndex];
+			String pathToken = path.get(commonPathIndex);
 			Breadcrumb breadcrumb = (Breadcrumb) breadcrumbs.elementAt(commonPathIndex);
 			if (pathToken.equals(breadcrumb.getLastToken())) {
 				commonPathIndex++;
@@ -106,10 +107,10 @@ public class BreadcrumbPanel extends HorizontalPanel implements HasValueChangeHa
 		}
 
 		// Push the remain
-		for (int i = commonPathIndex; i < path.length; i++) {
+		for (int i = commonPathIndex; i < path.size(); i++) {
 			String[] relativePath = new String[i + 1];
 			for (int j = 0; j <= i; j++) {
-				relativePath[j] = path[j];
+				relativePath[j] = path.get(j);
 			}
 			push(relativePath);
 		}
@@ -257,7 +258,7 @@ public class BreadcrumbPanel extends HorizontalPanel implements HasValueChangeHa
 	}
 
 	@Override
-	public HandlerRegistration addValueChangeHandler(ValueChangeHandler<String[]> handler) {
+	public HandlerRegistration addValueChangeHandler(ValueChangeHandler<List<String>> handler) {
 		return addHandler(handler, ValueChangeEvent.getType());
 	}
 }

@@ -3,7 +3,10 @@ package pt.gov.dgarq.roda.wui.common.client.tools;
 import java.util.List;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Image;
 
 import config.i18n.client.CommonConstants;
@@ -67,6 +70,13 @@ public class DescriptionLevelUtils {
 		return ret;
 	}
 
+	/**
+	 * @deprecated use
+	 *             {@link DescriptionLevelUtils#getElementLevelIconSafeHtml(String)}
+	 *             instead
+	 * @param level
+	 * @return
+	 */
 	public static String getElementLevelIconPath(String level) {
 		String ret;
 		final DescriptionLevelInfo levelInfo = getDescriptionLevel(level);
@@ -84,6 +94,10 @@ public class DescriptionLevelUtils {
 	 * 
 	 * @param level
 	 * @return the icon message
+	 * 
+	 * @deprecated use
+	 *             {@link DescriptionLevelUtils#getElementLevelIconHTMLPanel(String)}
+	 *             instead
 	 */
 	public static Image getElementLevelIconImage(String level) {
 		Image ret;
@@ -97,6 +111,31 @@ public class DescriptionLevelUtils {
 			ret.setAltText("default");
 		}
 
+		return ret;
+	}
+
+	/**
+	 * Get description level icon
+	 * 
+	 * @param level
+	 * @return the icon message
+	 */
+	public static HTMLPanel getElementLevelIconHTMLPanel(String level) {
+		return new HTMLPanel(getElementLevelIconSafeHtml(level));
+	}
+
+	public static SafeHtml getElementLevelIconSafeHtml(String level) {
+		return SafeHtmlUtils.fromSafeConstant("<i class='" + getElementLevelIconClasses(level) + "'></i>");
+	}
+
+	public static String getElementLevelIconClasses(String level) {
+		String ret;
+		final DescriptionLevelInfo levelInfo = DescriptionLevelUtils.getDescriptionLevel(level);
+		if (levelInfo != null) {
+			ret = "description-level description-level-" + levelInfo.getCategory().getCategory();
+		} else {
+			ret = "description-level";
+		}
 		return ret;
 	}
 

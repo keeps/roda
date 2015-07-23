@@ -23,6 +23,67 @@
 	margin-top: 5px;
 }
 
+/* Browser v2*/
+.browseTitle {
+	margin-bottom: 10px !important;
+}
+
+.browseBreadcrumb {
+	margin-bottom: 20px;
+}
+
+.browseItemIcon {
+	display: inline-block;
+	width: 50px;
+	position: relative;
+	top: 8px;
+	margin-top: -8px;
+}
+
+.browseItemIcon-all {
+	display: inline-block;
+	font-size: 40px;
+}
+
+.browseItemIcon-other {
+	display: inline-block;
+	font-size: 40px;
+}
+
+.browseItemText {
+	display: inline-block;
+	margin-bottom: 0 !important;
+}
+
+.browseItemDates {
+	margin-left: 50px;
+	color: #a7a9ac;
+}
+
+.browseItemDescriptiveMetadata {
+	padding: 20px;
+}
+
+.descriptiveMetadata {
+	
+}
+
+.descriptiveMetadata-field {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 5px;
+}
+
+.descriptiveMetadata-field-key {
+	width: 150px;
+	font-weight: 600;
+	padding-right: 20px;
+}
+
+.descriptiveMetadata-field-value {
+	width: 100%;
+}
+
 /** Browser**/
 .wui-browse {
 	width: 865px;

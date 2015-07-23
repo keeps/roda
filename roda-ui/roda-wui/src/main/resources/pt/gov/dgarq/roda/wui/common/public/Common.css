@@ -1,8 +1,107 @@
 @CHARSET "UTF-8";
 
-/** IE PNG fix **/
-.iepngfix img, .iepngfix div {
-	behavior: url(iepngfix/iepngfix.htc)
+/** Common styles **/
+a {
+	font-family: 'Ubuntu', sans-serif;
+	font-size: 12px;
+}
+
+h1, .h1 {
+	font-size: 18pt;
+	font-weight: bold;
+	color: #404142;
+	margin-bottom: 20px;
+}
+
+h2, .h2 {
+	font-size: 14pt;
+	font-weight: 500;
+	color: #404142;
+	margin-bottom: 20px;
+}
+
+.btn {
+	border-radius: 15px;
+	padding: 4px 6px;
+	border: none;
+	background-color: #089de3;
+	color: white;
+	font-weight: 500;
+}
+
+.btn:hover {
+	background-color: #3998d0;
+	cursor: pointer;
+	cursor: hand;
+	cursor: pointer;
+}
+
+.btn:active {
+	background-color: #5bbeff;
+	cursor: pointer;
+	cursor: hand;
+}
+
+.btn:focus {
+	outline-color: transparent;
+	outline-style: none;
+}
+
+:focus {
+	outline-color: transparent;
+	outline-style: none;
+}
+
+.btn-plus:before {
+	content: "\f055";
+	display: inline-block;
+	font-family: "fontawesome";
+	padding-right: 5px;
+}
+
+.btn-edit:before {
+	content: "\f14b";
+	display: inline-block;
+	font-family: "fontawesome";
+	padding-right: 5px;
+}
+
+.btn-play:before {
+	content: "\f144";
+	display: inline-block;
+	font-family: "fontawesome";
+	padding-right: 5px;
+}
+
+.com-google-gwt-user-cellview-client-CellTable-Style-cellTableHeader {
+	white-space: nowrap;
+	font-family: 'Ubuntu', sans-serif;
+	font-size: 14px;
+	font-weight: 500;
+	text-shadow: none !important;
+}
+
+/** Description level **/
+.description-level {
+	/*copy from font awesome style */
+	display: inline-block;
+	font: normal normal normal 14px/1 FontAwesome;
+	font-size: inherit;
+	text-rendering: auto;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	transform: translate(0, 0);
+}
+
+.description-level:before {
+	/* Default */
+	/* fa-question-circle */
+	content: "\f059";
+}
+
+.description-level-organizational:before {
+	/* fa-building-o */
+	content: "\f0f7";
 }
 
 /** GWT Look & Feel **/
@@ -197,6 +296,8 @@
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src= 'images/button/normal/right_action_report.png', sizingMethod=
+		
+		
 		 'scale');
 }
 
@@ -205,6 +306,8 @@
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src= 'images/button/normal/right_arrow_backward.png', sizingMethod=
+		
+		
 		 'scale');
 }
 
@@ -220,6 +323,8 @@
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src= 'images/button/normal/right_arrow_forward.png', sizingMethod=
+		
+		
 		 'scale');
 }
 
@@ -256,7 +361,7 @@
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/normal/right_minus.png', sizingMethod=       
+		   'images/button/normal/right_minus.png', sizingMethod=         
 		'scale');
 }
 
@@ -325,7 +430,7 @@
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/hover/right_arrow_up.png', sizingMethod=       
+		   'images/button/hover/right_arrow_up.png', sizingMethod=         
 		'scale');
 }
 
@@ -435,7 +540,7 @@
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/pressed/right_check.png', sizingMethod=       
+		   'images/button/pressed/right_check.png', sizingMethod=         
 		'scale');
 }
 
@@ -444,7 +549,7 @@
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/pressed/right_cross.png', sizingMethod=       
+		   'images/button/pressed/right_cross.png', sizingMethod=         
 		'scale');
 }
 
@@ -453,7 +558,7 @@
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/pressed/right_info.png', sizingMethod=       
+		   'images/button/pressed/right_info.png', sizingMethod=         
 		'scale');
 }
 
@@ -462,7 +567,7 @@
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/pressed/right_minus.png', sizingMethod=       
+		   'images/button/pressed/right_minus.png', sizingMethod=         
 		'scale');
 }
 
@@ -471,7 +576,7 @@
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/pressed/right_plus.png', sizingMethod=       
+		   'images/button/pressed/right_plus.png', sizingMethod=         
 		'scale');
 }
 
@@ -542,7 +647,7 @@
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/disabled/right_check.png', sizingMethod=       
+		   'images/button/disabled/right_check.png', sizingMethod=         
 		'scale');
 }
 
@@ -551,7 +656,7 @@
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/disabled/right_cross.png', sizingMethod=       
+		   'images/button/disabled/right_cross.png', sizingMethod=         
 		'scale');
 }
 
@@ -560,7 +665,7 @@
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/disabled/right_info.png', sizingMethod=       
+		   'images/button/disabled/right_info.png', sizingMethod=         
 		'scale');
 }
 
@@ -569,7 +674,7 @@
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/disabled/right_minus.png', sizingMethod=       
+		   'images/button/disabled/right_minus.png', sizingMethod=         
 		'scale');
 }
 
@@ -578,7 +683,7 @@
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/disabled/right_plus.png', sizingMethod=       
+		   'images/button/disabled/right_plus.png', sizingMethod=         
 		'scale');
 }
 
@@ -595,7 +700,7 @@
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/disabled/right_rec.png', sizingMethod=       
+		   'images/button/disabled/right_rec.png', sizingMethod=         
 		'scale');
 }
 
@@ -676,7 +781,7 @@
 	_background: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/shadow/shadow-bottom-left.png', sizingMethod=       
+		   'images/shadow/shadow-bottom-left.png', sizingMethod=         
 		'scale');
 }
 
@@ -696,7 +801,7 @@
 	_background: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/shadow/shadow-bottom-right.png', sizingMethod=       
+		   'images/shadow/shadow-bottom-right.png', sizingMethod=         
 		'scale');
 }
 
@@ -1166,6 +1271,7 @@
 	font-size: 12px;
 	line-height: 18px;
 }
+
 .static-page p {
 	margin-bottom: 1em;
 }

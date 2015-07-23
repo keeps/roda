@@ -2,6 +2,10 @@ package pt.gov.dgarq.roda.wui.common.client.widgets;
 
 import java.io.Serializable;
 
+import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.PageSizePager;
 import com.google.gwt.user.cellview.client.SimplePager;
@@ -17,7 +21,8 @@ import com.google.gwt.view.client.SingleSelectionModel;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 
-public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel {
+public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
+		implements HasValueChangeHandlers<Integer> {
 
 	private final AsyncDataProvider<T> dataProvider;
 	private final SingleSelectionModel<T> selectionModel;
@@ -55,8 +60,7 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel {
 							int rowCount = (int) result.getTotalCount();
 							updateRowData((int) result.getOffset(), result.getResults());
 							updateRowCount(rowCount, true);
-							resultsPager.setVisible(rowCount > 0);
-							pageSizePager.setVisible(rowCount > 0);
+							ValueChangeEvent.fire(AsyncTableCell.this, Integer.valueOf(rowCount));
 						} else {
 							// TODO treat this option
 						}
@@ -100,6 +104,11 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel {
 
 	public SingleSelectionModel<T> getSelectionModel() {
 		return selectionModel;
+	}
+
+	@Override
+	public HandlerRegistration addValueChangeHandler(ValueChangeHandler<Integer> handler) {
+		return addHandler(handler, ValueChangeEvent.getType());
 	}
 
 }

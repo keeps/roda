@@ -81,7 +81,7 @@
 				</div>
 			</div>
 		</xsl:if>
-		
+
 		<xsl:if test="eadc:did/eadc:origination/text()">
 			<div class="descriptiveMetadata-field">
 				<div class="descriptiveMetadata-field-key">Produtor</div>
@@ -94,7 +94,7 @@
 			<div class="descriptiveMetadata-field">
 				<div class="descriptiveMetadata-field-key">Referência do produtor</div>
 				<div class="descriptiveMetadata-field-value">
-					<xsl:value-of select="eadc:acqinfo/eadc:p/text()" />
+					<xsl:value-of select="eadc:acqinfo/eadc:num/text()" />
 				</div>
 			</div>
 		</xsl:if>
@@ -307,14 +307,22 @@
 			<div class="descriptiveMetadata-field">
 				<div class="descriptiveMetadata-field-key">Organização e ordenação</div>
 				<xsl:variable name="output">
-					<xsl:for-each select="eadc:arrangement/eadc:table/eadc:tgroup/eadc:thead/eadc:row/eadc:entry">
-						<span class="header"><xsl:value-of select="text()" /></span>
+					<xsl:for-each
+						select="eadc:arrangement/eadc:table/eadc:tgroup/eadc:thead/eadc:row/eadc:entry">
+						<span class="header">
+							<xsl:value-of select="text()" />
+						</span>
 					</xsl:for-each>
-					<xsl:for-each select="eadc:arrangement/eadc:table/eadc:tgroup/eadc:tbody/eadc:row/eadc:entry">
-						<span class="value"><xsl:value-of select="text()" /></span>
+					<xsl:for-each
+						select="eadc:arrangement/eadc:table/eadc:tgroup/eadc:tbody/eadc:row/eadc:entry">
+						<span class="value">
+							<xsl:value-of select="text()" />
+						</span>
 					</xsl:for-each>
 				</xsl:variable>
-				<div class="descriptiveMetadata-field-value"><xsl:copy-of select="$output" /></div>
+				<div class="descriptiveMetadata-field-value">
+					<xsl:copy-of select="$output" />
+				</div>
 			</div>
 		</xsl:if>
 

@@ -3,7 +3,17 @@
  */
 package pt.gov.dgarq.roda.wui.dissemination.browse.client;
 
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -11,6 +21,8 @@ import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -18,8 +30,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 
-import config.i18n.client.BrowseConstants;
-import config.i18n.client.BrowseMessages;
+import config.i18n.client.CommonConstants;
 import pt.gov.dgarq.roda.core.data.DescriptionObject;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.wui.common.client.AuthenticatedUser;
@@ -29,8 +40,8 @@ import pt.gov.dgarq.roda.wui.common.client.UserLogin;
 import pt.gov.dgarq.roda.wui.common.client.tools.DescriptionLevelUtils;
 import pt.gov.dgarq.roda.wui.common.client.widgets.CollectionsTable;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.ViewPanel.ViewListener;
-import pt.gov.dgarq.roda.wui.dissemination.browse.client.images.BrowseImageBundle;
 import pt.gov.dgarq.roda.wui.dissemination.client.Dissemination;
+import pt.gov.dgarq.roda.wui.main.client.BreadcrumbPanel;
 
 /**
  * @author Luis Faria
@@ -80,18 +91,23 @@ public class Browse extends Composite {
 		return instance;
 	}
 
-	private static BrowseConstants constants = (BrowseConstants) GWT.create(BrowseConstants.class);
+	private static CommonConstants constants = (CommonConstants) GWT.create(CommonConstants.class);
 
-	private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
+	// private static BrowseConstants constants = (BrowseConstants)
+	// GWT.create(BrowseConstants.class);
 
-	private static BrowseImageBundle browseImageBundle = (BrowseImageBundle) GWT.create(BrowseImageBundle.class);
+	// private static BrowseMessages messages = (BrowseMessages)
+	// GWT.create(BrowseMessages.class);
+	//
+	// private static BrowseImageBundle browseImageBundle = (BrowseImageBundle)
+	// GWT.create(BrowseImageBundle.class);
 
 	private ClientLogger logger = new ClientLogger(getClass().getName());
 
-	@UiField
-	CollectionsTable fondsPanel;
+	// private SimplePanel viewPanelContainer;
 
-	private SimplePanel viewPanelContainer;
+	@UiField(provided = true)
+	BreadcrumbPanel breadcrumb;
 
 	@UiField
 	SimplePanel itemIcon;
@@ -100,9 +116,31 @@ public class Browse extends Composite {
 	Label itemTitle;
 
 	@UiField
-	Button createFonds;
+	Label itemDates;
+
+	@UiField
+	HTML itemDescriptiveMetadata;
+
+	@UiField
+	Label fondsPanelTitle;
+
+	@UiField
+	CollectionsTable fondsPanel;
+
+	@UiField
+	FlowPanel sidebarGroupDownloads;
+
+	@UiField
+	FlowPanel downloadList;
+
+	@UiField
+	Button createItem;
+
+	private boolean viewingTop;
 
 	private Browse() {
+		viewingTop = true;
+		breadcrumb = new BreadcrumbPanel();
 		initWidget(uiBinder.createAndBindUi(this));
 
 		fondsPanel.getSelectionModel().addSelectionChangeHandler(new Handler() {
@@ -111,18 +149,27 @@ public class Browse extends Composite {
 			public void onSelectionChange(SelectionChangeEvent event) {
 				SimpleDescriptionObject sdo = fondsPanel.getSelectionModel().getSelectedObject();
 				if (sdo != null) {
-					view(sdo);
+					view(sdo.getId());
 				}
+			}
+		});
+
+		fondsPanel.addValueChangeHandler(new ValueChangeHandler<Integer>() {
+
+			@Override
+			public void onValueChange(ValueChangeEvent<Integer> event) {
+				fondsPanelTitle.setVisible(!viewingTop && event.getValue() > 0);
+				fondsPanel.setVisible(event.getValue() > 0);
 			}
 		});
 	}
 
 	protected void onPermissionsUpdate(AuthenticatedUser user) {
 		if (user.hasRole("administration.metadata_editor")) {
-			createFonds.setVisible(true);
+			createItem.setVisible(true);
 			// refresh.setVisible(true);
 		} else {
-			createFonds.setVisible(false);
+			createItem.setVisible(false);
 			// refresh.setVisible(false);
 		}
 	}
@@ -155,21 +202,12 @@ public class Browse extends Composite {
 		}
 	}
 
-	public void view(final SimpleDescriptionObject sdo) {
-		logger.debug("view: " + sdo);
-		boolean historyUpdated = updateHistory(sdo != null ? sdo.getId() : null);
-
-		if (!historyUpdated) {
-			viewAction(sdo);
-		}
-	}
-
 	protected void viewAction(final String id) {
 		if (id == null) {
 			viewAction();
 		} else {
-			BrowserService.Util.getInstance().getSimpleDescriptionObject(id,
-					new AsyncCallback<SimpleDescriptionObject>() {
+			BrowserService.Util.getInstance().getItemBundle(id, constants.locale(),
+					new AsyncCallback<BrowseItemBundle>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -177,29 +215,84 @@ public class Browse extends Composite {
 						}
 
 						@Override
-						public void onSuccess(SimpleDescriptionObject sdo) {
-							viewAction(sdo);
+						public void onSuccess(BrowseItemBundle itemBundle) {
+							viewAction(itemBundle);
 						}
 					});
 		}
 	}
 
-	protected void viewAction(SimpleDescriptionObject sdo) {
-		logger.debug("viewAction: " + sdo);
-		if (sdo != null) {
-			itemIcon.setWidget(DescriptionLevelUtils.getElementLevelIconImage(sdo.getLevel()));
+	protected void viewAction(BrowseItemBundle itemBundle) {
+		if (itemBundle != null) {
+			SimpleDescriptionObject sdo = itemBundle.getSdo();
+
+			breadcrumb.updatePath(Arrays.asList("dissemination", "browse", sdo.getId()));
+			HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getElementLevelIconHTMLPanel(sdo.getLevel());
+			itemIconHtmlPanel.addStyleName("browseItemIcon-other");
+			itemIcon.setWidget(itemIconHtmlPanel);
 			itemTitle.setText(sdo.getTitle());
+			itemDates.setText(getDatesText(sdo));
+			SafeHtml html = getDescriptiveMetadataPanelHTML(itemBundle.getDescriptiveMetadata());
+			itemDescriptiveMetadata.setHTML(html);
+			itemDescriptiveMetadata.setVisible(true);
+
+			viewingTop = false;
+			fondsPanelTitle.setVisible(true);
 			fondsPanel.setParentId(sdo.getId());
+
+			sidebarGroupDownloads.setVisible(true);
+			// TODO add all downloads
 		} else {
 			viewAction();
 		}
 	}
 
 	protected void viewAction() {
-		itemIcon.setWidget(
-				new HTMLPanel(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-home' style='font-size: 20px;'></i>")));
+		HTMLPanel topIcon = new HTMLPanel(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-circle-o'></i>"));
+		topIcon.addStyleName("browseItemIcon-all");
+		itemIcon.setWidget(topIcon);
+
+		breadcrumb.updatePath(Arrays.asList("dissemination", "browse"));
 		itemTitle.setText("All collections");
+		itemDates.setText("");
+		itemDescriptiveMetadata.setText("");
+		itemDescriptiveMetadata.setVisible(false);
+		viewingTop = true;
+		fondsPanelTitle.setVisible(false);
 		fondsPanel.setParentId(null);
+
+		sidebarGroupDownloads.setVisible(false);
+	}
+
+	private String getDatesText(SimpleDescriptionObject sdo) {
+		String ret;
+		DateTimeFormat formatter = DateTimeFormat.getFormat(PredefinedFormat.DATE_MEDIUM);
+
+		Date dateInitial = sdo.getDateInitial();
+		Date dateFinal = sdo.getDateFinal();
+
+		if (dateInitial == null && dateFinal == null) {
+			ret = "";
+		} else if (dateInitial != null && dateFinal == null) {
+			ret = "From " + formatter.format(sdo.getDateInitial());
+		} else if (dateInitial == null && dateFinal != null) {
+			ret = "Up to " + formatter.format(sdo.getDateFinal());
+		} else {
+			ret = formatter.format(sdo.getDateInitial()) + " to " + formatter.format(sdo.getDateFinal());
+		}
+
+		return ret;
+	}
+
+	private SafeHtml getDescriptiveMetadataPanelHTML(List<DescriptiveMetadataBundle> descriptiveMetadata) {
+		SafeHtmlBuilder builder = new SafeHtmlBuilder();
+		for (DescriptiveMetadataBundle bundle : descriptiveMetadata) {
+			builder.append(SafeHtmlUtils.fromSafeConstant("<div class='metadataTitle'>"));
+			builder.append(SafeHtmlUtils.fromString(bundle.getId()));
+			builder.append(SafeHtmlUtils.fromSafeConstant("</div>"));
+			builder.append(SafeHtmlUtils.fromTrustedString(bundle.getHtml()));
+		}
+		return builder.toSafeHtml();
 	}
 
 	private boolean updateHistory(String id) {
@@ -225,7 +318,7 @@ public class Browse extends Composite {
 		return new ViewListener() {
 
 			public void onCancel(String thisPid) {
-				viewPanelContainer.clear();
+				// viewPanelContainer.clear();
 				// viewPanel = null;
 				// updateStyle();
 			}
@@ -235,7 +328,7 @@ public class Browse extends Composite {
 			}
 
 			public void onClose(String thisPid) {
-				viewPanelContainer.clear();
+				// viewPanelContainer.clear();
 				// viewPanel = null;
 				// updateStyle();
 			}

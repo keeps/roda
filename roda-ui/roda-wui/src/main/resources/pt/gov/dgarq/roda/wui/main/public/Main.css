@@ -25,66 +25,7 @@ body, * {
 	text-align: left;
 }
 
-a {
-	font-family: 'Ubuntu', sans-serif;
-	font-size: 12px;
-}
 
-h1, .h1 {
-	font-size: 18pt;
-	font-weight: bold;
-	color: #404142;
-	margin-bottom: 20px;
-}
-
-h2, .h2 {
-	font-size: 14pt;
-	font-weight: 500;
-	color: #404142;
-	margin-bottom: 20px;
-}
-
-.btn {
-	border-radius: 15px;
-	padding: 4px 6px;
-	border: none;
-	background-color: #089de3;
-	color: white;
-	font-weight: 500;
-}
-
-.btn:hover {
-	background-color: #3998d0;
-	cursor: pointer;
-	cursor: hand;
-	cursor: pointer;
-}
-
-.btn:active {
-	background-color: #5bbeff;
-	cursor: pointer;
-	cursor: hand;
-}
-
-.btn:focus {
-	outline-color: transparent;
-	outline-style: none;
-}
-
-.btn-plus:before {
-	content: "\f055";
-	display: inline-block;
-	font-family: "fontawesome";
-	padding-right: 5px;
-}
-
-.com-google-gwt-user-cellview-client-CellTable-Style-cellTableHeader {
-	white-space: nowrap;
-	font-family: 'Ubuntu', sans-serif;
-	font-size: 14px;
-	font-weight: 500;
-	text-shadow: none !important;
-}
 
 .main {
 	background-color: white;
@@ -418,8 +359,7 @@ h2, .h2 {
 
 /* @group Breadcrumb */
 .main .wui-breadcrumbPanel {
-	margin-left: 40px;
-	margin-top: 15px;
+
 }
 
 .main .wui-breadcrumbPanel .breadcrumb {

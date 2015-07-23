@@ -3,8 +3,9 @@ package pt.gov.dgarq.roda.wui.common.client.widgets;
 import java.util.Date;
 
 import com.google.gwt.cell.client.DateCell;
-import com.google.gwt.cell.client.ImageCell;
+import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
@@ -43,16 +44,16 @@ public class CollectionsTable extends AsyncTableCell<SimpleDescriptionObject> {
 
 		parentId = null;
 
-		Column<SimpleDescriptionObject, String> levelColumn = new Column<SimpleDescriptionObject, String>(
-				new ImageCell()) {
+		Column<SimpleDescriptionObject, SafeHtml> levelColumn = new Column<SimpleDescriptionObject, SafeHtml>(
+				new SafeHtmlCell()) {
 			@Override
-			public String getValue(SimpleDescriptionObject sdo) {
-				String ret;
+			public SafeHtml getValue(SimpleDescriptionObject sdo) {
+				SafeHtml ret;
 				if (sdo == null) {
 					logger.error("Trying to display a NULL item");
 					ret = null;
 				} else {
-					ret = DescriptionLevelUtils.getElementLevelIconPath(sdo.getLevel());
+					ret = DescriptionLevelUtils.getElementLevelIconSafeHtml(sdo.getLevel());
 				}
 				return ret;
 			}

@@ -61,7 +61,7 @@ import pt.gov.dgarq.roda.core.data.v2.RepresentationState;
  * perhaps with transactions
  * 
  * @author Hélder Silva <hsilva@keep.pt>
- * */
+ */
 public class ModelService extends ModelObservable {
 
 	private final StorageService storage;
@@ -79,9 +79,8 @@ public class ModelService extends ModelObservable {
 		Iterable<AIP> it;
 
 		try {
-			final Iterator<Resource> iterator = storage
-					.listResourcesUnderContainer(
-							ModelUtils.getAIPcontainerPath()).iterator();
+			final Iterator<Resource> iterator = storage.listResourcesUnderContainer(ModelUtils.getAIPcontainerPath())
+					.iterator();
 
 			it = new Iterable<AIP>() {
 
@@ -116,9 +115,8 @@ public class ModelService extends ModelObservable {
 				}
 			};
 		} catch (StorageActionException e) {
-			throw new ModelServiceException(
-					"Error while obtaining AIP list from storage, reason: "
-							+ e.getMessage(), e.getCode());
+			throw new ModelServiceException("Error while obtaining AIP list from storage, reason: " + e.getMessage(),
+					e.getCode());
 		}
 
 		return it;
@@ -127,20 +125,16 @@ public class ModelService extends ModelObservable {
 	public AIP retrieveAIP(String aipId) throws ModelServiceException {
 		AIP aip;
 		try {
-			Directory directory = storage.getDirectory(ModelUtils
-					.getAIPpath(aipId));
+			Directory directory = storage.getDirectory(ModelUtils.getAIPpath(aipId));
 			aip = convertResourceToAIP(directory);
 		} catch (StorageActionException e) {
 			if (e.getCode() == StorageActionException.NOT_FOUND) {
-				throw new ModelServiceException("AIP not found: " + aipId,
-						ModelServiceException.NOT_FOUND, e);
+				throw new ModelServiceException("AIP not found: " + aipId, ModelServiceException.NOT_FOUND, e);
 			} else if (e.getCode() == StorageActionException.FORBIDDEN) {
-				throw new ModelServiceException(
-						"You do not have permission to access AIP: " + aipId,
+				throw new ModelServiceException("You do not have permission to access AIP: " + aipId,
 						ModelServiceException.FORBIDDEN, e);
 			} else {
-				throw new ModelServiceException(
-						"Unexpected error while retrieving AIP",
+				throw new ModelServiceException("Unexpected error while retrieving AIP",
 						ModelServiceException.INTERNAL_SERVER_ERROR, e);
 			}
 
@@ -162,8 +156,8 @@ public class ModelService extends ModelObservable {
 	 * @return
 	 * @throws ModelServiceException
 	 */
-	public AIP createAIP(String aipId, StorageService sourceStorage,
-			StoragePath sourcePath) throws ModelServiceException {
+	public AIP createAIP(String aipId, StorageService sourceStorage, StoragePath sourcePath)
+			throws ModelServiceException {
 		// TODO verify structure of source AIP and copy it to the storage
 		// XXX possible optimization would be to allow move between storage
 		// TODO support asReference
@@ -173,29 +167,25 @@ public class ModelService extends ModelObservable {
 			Directory sourceDirectory = sourceStorage.getDirectory(sourcePath);
 			if (isAIPvalid(sourceDirectory)) {
 
-				storage.copy(sourceStorage, sourcePath,
-						ModelUtils.getAIPpath(aipId));
-				Directory newDirectory = storage.getDirectory(ModelUtils
-						.getAIPpath(aipId));
+				storage.copy(sourceStorage, sourcePath, ModelUtils.getAIPpath(aipId));
+				Directory newDirectory = storage.getDirectory(ModelUtils.getAIPpath(aipId));
 
 				aip = convertResourceToAIP(newDirectory);
 				notifyAipCreated(aip);
 			} else {
-				throw new ModelServiceException(
-						"Error while creating AIP, reason: AIP is not valid",
+				throw new ModelServiceException("Error while creating AIP, reason: AIP is not valid",
 						ModelServiceException.INTERNAL_SERVER_ERROR);
 			}
 		} catch (StorageActionException e) {
-			throw new ModelServiceException("Error creating AIP in storage",
-					e.getCode(), e);
+			throw new ModelServiceException("Error creating AIP in storage", e.getCode(), e);
 		}
 
 		return aip;
 	}
 
 	// TODO support asReference
-	public AIP updateAIP(String aipId, StorageService sourceStorage,
-			StoragePath sourcePath) throws ModelServiceException {
+	public AIP updateAIP(String aipId, StorageService sourceStorage, StoragePath sourcePath)
+			throws ModelServiceException {
 		// TODO verify structure of source AIP and update it in the storage
 		AIP aip;
 		try {
@@ -212,14 +202,11 @@ public class ModelService extends ModelObservable {
 				aip = convertResourceToAIP(directoryUpdated);
 				notifyAipUpdated(aip);
 			} else {
-				throw new ModelServiceException(
-						"Error while creating AIP, reason: AIP is not valid",
+				throw new ModelServiceException("Error while creating AIP, reason: AIP is not valid",
 						ModelServiceException.INTERNAL_SERVER_ERROR);
 			}
 		} catch (StorageActionException e) {
-			throw new ModelServiceException(
-					"Error creating AIP in storage, reason: " + e.getMessage(),
-					e.getCode());
+			throw new ModelServiceException("Error creating AIP in storage, reason: " + e.getMessage(), e.getCode());
 		}
 
 		return aip;
@@ -232,22 +219,17 @@ public class ModelService extends ModelObservable {
 			storage.deleteResource(aipPath);
 			notifyAipDeleted(aipId);
 		} catch (StorageActionException e) {
-			throw new ModelServiceException(
-					"Error deleting AIP from storage, reason: "
-							+ e.getMessage(), e.getCode());
+			throw new ModelServiceException("Error deleting AIP from storage, reason: " + e.getMessage(), e.getCode());
 		}
 	}
 
-	public Iterable<DescriptiveMetadata> listDescriptiveMetadataBinaries(
-			String aipId) throws ModelServiceException {
+	public Iterable<DescriptiveMetadata> listDescriptiveMetadataBinaries(String aipId) throws ModelServiceException {
 
 		Iterable<DescriptiveMetadata> it;
 
 		try {
 			final Iterator<Resource> iterator = storage
-					.listResourcesUnderDirectory(
-							ModelUtils.getDescriptiveMetadataPath(aipId))
-					.iterator();
+					.listResourcesUnderDirectory(ModelUtils.getDescriptiveMetadataPath(aipId)).iterator();
 
 			it = new Iterable<DescriptiveMetadata>() {
 
@@ -266,8 +248,7 @@ public class ModelService extends ModelObservable {
 						@Override
 						public DescriptiveMetadata next() {
 							try {
-								return convertResourceToDescriptiveMetadata(iterator
-										.next());
+								return convertResourceToDescriptiveMetadata(iterator.next());
 							} catch (ModelServiceException e) {
 								// FIXME is this the best way to deal with the
 								// ModelServiceException???
@@ -286,27 +267,26 @@ public class ModelService extends ModelObservable {
 
 		} catch (StorageActionException e) {
 			throw new ModelServiceException(
-					"Error while obtaining descriptive metadata binary list from storage, reason: "
-							+ e.getMessage(), e.getCode());
+					"Error while obtaining descriptive metadata binary list from storage, reason: " + e.getMessage(),
+					e.getCode());
 		}
 
 		return it;
 	}
 
-	public DescriptiveMetadata retrieveDescriptiveMetadata(String aipId,
-			String descriptiveMetadataId) throws ModelServiceException {
+	public DescriptiveMetadata retrieveDescriptiveMetadata(String aipId, String descriptiveMetadataId)
+			throws ModelServiceException {
 		DescriptiveMetadata descriptiveMetadataBinary;
 
 		try {
-			StoragePath binaryPath = ModelUtils.getDescriptiveMetadataPath(
-					aipId, descriptiveMetadataId);
+			StoragePath binaryPath = ModelUtils.getDescriptiveMetadataPath(aipId, descriptiveMetadataId);
 
 			Binary binary = storage.getBinary(binaryPath);
 			descriptiveMetadataBinary = convertResourceToDescriptiveMetadata(binary);
 		} catch (StorageActionException e) {
 			throw new ModelServiceException(
-					"Error while obtaining descriptive metadata binary from storage, reason: "
-							+ e.getMessage(), e.getCode());
+					"Error while obtaining descriptive metadata binary from storage, reason: " + e.getMessage(),
+					e.getCode());
 		}
 
 		return descriptiveMetadataBinary;
@@ -314,28 +294,22 @@ public class ModelService extends ModelObservable {
 
 	// FIXME descriptiveMetadataType shouldn't be a parameter but instead be
 	// already present in the Binary metadata
-	public DescriptiveMetadata createDescriptiveMetadata(String aipId,
-			String descriptiveMetadataId, Binary binary,
+	public DescriptiveMetadata createDescriptiveMetadata(String aipId, String descriptiveMetadataId, Binary binary,
 			String descriptiveMetadataType) throws ModelServiceException {
 		DescriptiveMetadata descriptiveMetadataBinary;
 		try {
 			// StoragePath binaryPath = binary.getStoragePath();
-			StoragePath binaryPath = ModelUtils.getDescriptiveMetadataPath(
-					aipId, descriptiveMetadataId);
+			StoragePath binaryPath = ModelUtils.getDescriptiveMetadataPath(aipId, descriptiveMetadataId);
 			boolean asReference = false;
 			Map<String, Set<String>> binaryMetadata = binary.getMetadata();
-			binaryMetadata.put(RodaConstants.STORAGE_META_TYPE,
-					Sets.newHashSet(descriptiveMetadataType));
+			binaryMetadata.put(RodaConstants.STORAGE_META_TYPE, Sets.newHashSet(descriptiveMetadataType));
 
-			storage.createBinary(binaryPath, binaryMetadata,
-					binary.getContent(), asReference);
-			descriptiveMetadataBinary = new DescriptiveMetadata(
-					descriptiveMetadataId, aipId, descriptiveMetadataType,
+			storage.createBinary(binaryPath, binaryMetadata, binary.getContent(), asReference);
+			descriptiveMetadataBinary = new DescriptiveMetadata(descriptiveMetadataId, aipId, descriptiveMetadataType,
 					binaryPath);
 			notifyDescriptiveMetadataCreated(descriptiveMetadataBinary);
 		} catch (StorageActionException e) {
-			throw new ModelServiceException(
-					"Error creating descriptive metadata binary in storage",
+			throw new ModelServiceException("Error creating descriptive metadata binary in storage",
 					ModelServiceException.INTERNAL_SERVER_ERROR, e);
 		}
 
@@ -345,62 +319,50 @@ public class ModelService extends ModelObservable {
 	// FIXME descriptiveMetadataType shouldn't be a parameter but instead be
 	// already present in the Binary metadata (and therefore to be changed
 	// appropriated method should be called)
-	public DescriptiveMetadata updateDescriptiveMetadata(String aipId,
-			String descriptiveMetadataId, Binary binary,
+	public DescriptiveMetadata updateDescriptiveMetadata(String aipId, String descriptiveMetadataId, Binary binary,
 			String descriptiveMetadataType) throws ModelServiceException {
 
 		DescriptiveMetadata descriptiveMetadataBinary;
 		try {
-			StoragePath binaryPath = ModelUtils.getDescriptiveMetadataPath(
-					aipId, descriptiveMetadataId);
+			StoragePath binaryPath = ModelUtils.getDescriptiveMetadataPath(aipId, descriptiveMetadataId);
 			boolean asReference = false;
 			boolean createIfNotExists = false;
-			storage.updateBinaryContent(binaryPath, binary.getContent(),
-					asReference, createIfNotExists);
+			storage.updateBinaryContent(binaryPath, binary.getContent(), asReference, createIfNotExists);
 
 			Map<String, Set<String>> binaryMetadata = binary.getMetadata();
-			binaryMetadata.put(RodaConstants.STORAGE_META_TYPE,
-					Sets.newHashSet(descriptiveMetadataType));
+			binaryMetadata.put(RodaConstants.STORAGE_META_TYPE, Sets.newHashSet(descriptiveMetadataType));
 			storage.updateMetadata(binaryPath, binaryMetadata, true);
 
-			descriptiveMetadataBinary = new DescriptiveMetadata(
-					descriptiveMetadataId, aipId, descriptiveMetadataType,
+			descriptiveMetadataBinary = new DescriptiveMetadata(descriptiveMetadataId, aipId, descriptiveMetadataType,
 					binaryPath);
 			notifyDescriptiveMetadataUpdated(descriptiveMetadataBinary);
 		} catch (StorageActionException e) {
-			throw new ModelServiceException(
-					"Error updating descriptive metadata binary in the storage",
+			throw new ModelServiceException("Error updating descriptive metadata binary in the storage",
 					ModelServiceException.INTERNAL_SERVER_ERROR, e);
 		}
 
 		return descriptiveMetadataBinary;
 	}
 
-	public void deleteDescriptiveMetadata(String aipId,
-			String descriptiveMetadataId) throws ModelServiceException {
+	public void deleteDescriptiveMetadata(String aipId, String descriptiveMetadataId) throws ModelServiceException {
 		try {
-			StoragePath binaryPath = ModelUtils.getDescriptiveMetadataPath(
-					aipId, descriptiveMetadataId);
+			StoragePath binaryPath = ModelUtils.getDescriptiveMetadataPath(aipId, descriptiveMetadataId);
 
 			storage.deleteResource(binaryPath);
 			notifyDescriptiveMetadataDeleted(aipId, descriptiveMetadataId);
 		} catch (StorageActionException e) {
 			throw new ModelServiceException(
-					"Error deleting descriptive metadata binary from storage, reason: "
-							+ e.getMessage(), e.getCode());
+					"Error deleting descriptive metadata binary from storage, reason: " + e.getMessage(), e.getCode());
 		}
 
 	}
 
-	public Iterable<Representation> listRepresentations(String aipId)
-			throws ModelServiceException {
+	public Iterable<Representation> listRepresentations(String aipId) throws ModelServiceException {
 		Iterable<Representation> it = null;
 
 		try {
 			final Iterator<Resource> iterator = storage
-					.listResourcesUnderDirectory(
-							ModelUtils.getRepresentationsPath(aipId))
-					.iterator();
+					.listResourcesUnderDirectory(ModelUtils.getRepresentationsPath(aipId)).iterator();
 
 			it = new Iterable<Representation>() {
 
@@ -419,8 +381,7 @@ public class ModelService extends ModelObservable {
 						@Override
 						public Representation next() {
 							try {
-								return convertResourceToRepresentation(iterator
-										.next());
+								return convertResourceToRepresentation(iterator.next());
 							} catch (ModelServiceException e) {
 								// FIXME is this the best way to deal with the
 								// ModelServiceException???
@@ -438,40 +399,34 @@ public class ModelService extends ModelObservable {
 
 		} catch (StorageActionException e) {
 			throw new ModelServiceException(
-					"Error while obtaining Representation list from storage, reason: "
-							+ e.getMessage(), e.getCode());
+					"Error while obtaining Representation list from storage, reason: " + e.getMessage(), e.getCode());
 		}
 
 		return it;
 	}
 
-	public Representation retrieveRepresentation(String aipId,
-			String representationId) throws ModelServiceException {
+	public Representation retrieveRepresentation(String aipId, String representationId) throws ModelServiceException {
 		Representation representation;
 
 		try {
-			Directory directory = storage.getDirectory(ModelUtils
-					.getRepresentationPath(aipId, representationId));
+			Directory directory = storage.getDirectory(ModelUtils.getRepresentationPath(aipId, representationId));
 			representation = convertResourceToRepresentation(directory);
 
 		} catch (StorageActionException e) {
 			throw new ModelServiceException(
-					"Error while obtaining Representation from storage, reason: "
-							+ e.getMessage(), e.getCode());
+					"Error while obtaining Representation from storage, reason: " + e.getMessage(), e.getCode());
 		}
 
 		return representation;
 	}
 
 	// TODO support asReference
-	public Representation createRepresentation(String aipId,
-			String representationId, StorageService sourceStorage,
+	public Representation createRepresentation(String aipId, String representationId, StorageService sourceStorage,
 			StoragePath sourcePath) throws ModelServiceException {
 		Representation representation;
 
 		try {
-			StoragePath directoryPath = ModelUtils.getRepresentationPath(aipId,
-					representationId);
+			StoragePath directoryPath = ModelUtils.getRepresentationPath(aipId, representationId);
 
 			// verify structure of source representation
 			Directory sourceDirectory = sourceStorage.getDirectory(sourcePath);
@@ -487,16 +442,14 @@ public class ModelService extends ModelObservable {
 						ModelServiceException.INTERNAL_SERVER_ERROR);
 			}
 		} catch (StorageActionException e) {
-			throw new ModelServiceException(
-					"Error while creating representation in storage, reason: "
-							+ e.getMessage(), e.getCode());
+			throw new ModelServiceException("Error while creating representation in storage, reason: " + e.getMessage(),
+					e.getCode());
 		}
 
 		return representation;
 	}
 
-	public Representation updateRepresentation(String aipId,
-			String representationId, StorageService sourceStorage,
+	public Representation updateRepresentation(String aipId, String representationId, StorageService sourceStorage,
 			StoragePath sourcePath) throws ModelServiceException {
 		Representation representation;
 		Directory sourceDirectory;
@@ -505,28 +458,24 @@ public class ModelService extends ModelObservable {
 		try {
 			sourceDirectory = sourceStorage.getDirectory(sourcePath);
 			if (!isRepresentationValid(sourceDirectory)) {
-				throw new ModelServiceException(
-						"Error while updating AIP, reason: representation is not valid",
+				throw new ModelServiceException("Error while updating AIP, reason: representation is not valid",
 						ModelServiceException.INTERNAL_SERVER_ERROR);
 			}
 		} catch (StorageActionException e) {
-			throw new ModelServiceException(
-					"Error while updating representation in storage, reason: "
-							+ e.getMessage(), e.getCode());
+			throw new ModelServiceException("Error while updating representation in storage, reason: " + e.getMessage(),
+					e.getCode());
 		}
 
 		// update each representation file (from source representation)
 		final List<String> fileIDsToUpdate = new ArrayList<String>();
 		try {
-			Iterable<Resource> files = sourceStorage
-					.listResourcesUnderDirectory(sourcePath);
+			Iterable<Resource> files = sourceStorage.listResourcesUnderDirectory(sourcePath);
 			for (Resource file : files) {
 				if (file instanceof DefaultBinary) {
 					boolean createIfNotExists = true;
 					boolean notify = false;
-					File fileUpdated = updateFile(aipId, representationId, file
-							.getStoragePath().getName(), (Binary) file,
-							createIfNotExists, notify);
+					File fileUpdated = updateFile(aipId, representationId, file.getStoragePath().getName(),
+							(Binary) file, createIfNotExists, notify);
 
 					fileIDsToUpdate.add(fileUpdated.getStoragePath().getName());
 				} else {
@@ -534,16 +483,14 @@ public class ModelService extends ModelObservable {
 				}
 			}
 		} catch (StorageActionException e) {
-			throw new ModelServiceException(
-					"Error while updating representation files",
+			throw new ModelServiceException("Error while updating representation files",
 					ModelServiceException.INTERNAL_SERVER_ERROR, e);
 		}
 
 		// delete files that were removed on representation update
 		try {
 			Iterable<Resource> filesToRemove = storage
-					.listResourcesUnderDirectory(ModelUtils
-							.getRepresentationPath(aipId, representationId));
+					.listResourcesUnderDirectory(ModelUtils.getRepresentationPath(aipId, representationId));
 			for (Resource fileToRemove : filesToRemove) {
 				StoragePath fileToRemovePath = fileToRemove.getStoragePath();
 				if (!fileIDsToUpdate.contains(fileToRemovePath.getName())) {
@@ -552,71 +499,57 @@ public class ModelService extends ModelObservable {
 			}
 
 		} catch (StorageActionException e) {
-			throw new ModelServiceException(
-					"Error while delete removed representation files",
+			throw new ModelServiceException("Error while delete removed representation files",
 					ModelServiceException.INTERNAL_SERVER_ERROR, e);
 		}
 
 		// get representation metadata (from source representation)
-		Map<String, Set<String>> representationMetadata = sourceDirectory
-				.getMetadata();
+		Map<String, Set<String>> representationMetadata = sourceDirectory.getMetadata();
 
 		// obtain information (from metadata) to build representation object
-		boolean active = ModelUtils.getBoolean(representationMetadata,
-				RodaConstants.STORAGE_META_ACTIVE);
-		Date dateCreated = ModelUtils.getDate(representationMetadata,
-				RodaConstants.STORAGE_META_DATE_CREATED);
+		boolean active = ModelUtils.getBoolean(representationMetadata, RodaConstants.STORAGE_META_ACTIVE);
+		Date dateCreated = ModelUtils.getDate(representationMetadata, RodaConstants.STORAGE_META_DATE_CREATED);
 		Date dateModified = new Date();
 		representationMetadata.put(RodaConstants.STORAGE_META_DATE_MODIFIED,
 				Sets.newHashSet(RodaUtils.dateToString(dateModified)));
-		String type = ModelUtils.getString(representationMetadata,
-				RodaConstants.STORAGE_META_TYPE);
-		Set<RepresentationState> statuses = ModelUtils
-				.getStatuses(representationMetadata);
+		String type = ModelUtils.getString(representationMetadata, RodaConstants.STORAGE_META_TYPE);
+		Set<RepresentationState> statuses = ModelUtils.getStatuses(representationMetadata);
 
 		// update representation metadata (essentially date.modified)
 		try {
-			storage.updateMetadata(
-					ModelUtils.getRepresentationPath(aipId, representationId),
-					representationMetadata, true);
+			storage.updateMetadata(ModelUtils.getRepresentationPath(aipId, representationId), representationMetadata,
+					true);
 		} catch (StorageActionException e) {
-			throw new ModelServiceException(
-					"Error while updating representation metadata",
+			throw new ModelServiceException("Error while updating representation metadata",
 					ModelServiceException.INTERNAL_SERVER_ERROR, e);
 		}
 
-		representation = new Representation(representationId, aipId, active,
-				dateCreated, dateModified, statuses, type, fileIDsToUpdate);
+		representation = new Representation(representationId, aipId, active, dateCreated, dateModified, statuses, type,
+				fileIDsToUpdate);
 		notifyRepresentationUpdated(representation);
 		return representation;
 	}
 
-	public void deleteRepresentation(String aipId, String representationId)
-			throws ModelServiceException {
+	public void deleteRepresentation(String aipId, String representationId) throws ModelServiceException {
 		try {
-			StoragePath representationPath = ModelUtils.getRepresentationPath(
-					aipId, representationId);
+			StoragePath representationPath = ModelUtils.getRepresentationPath(aipId, representationId);
 
 			storage.deleteResource(representationPath);
 			notifyRepresentationDeleted(aipId, representationId);
 		} catch (StorageActionException e) {
-			throw new ModelServiceException(
-					"Error deleting representation from storage, reason: "
-							+ e.getMessage(), e.getCode());
+			throw new ModelServiceException("Error deleting representation from storage, reason: " + e.getMessage(),
+					e.getCode());
 		}
 	}
 
 	// FIXME under a certain representation may exist files but also folders.
 	// how to handle that in this method?
-	public Iterable<File> listFiles(String aipId, String representationId)
-			throws ModelServiceException {
+	public Iterable<File> listFiles(String aipId, String representationId) throws ModelServiceException {
 		Iterable<File> it = null;
 
 		try {
 			final Iterator<Resource> iterator = storage
-					.listResourcesUnderDirectory(
-							ModelUtils.getRepresentationsPath(aipId))
-					.iterator();
+					.listResourcesUnderDirectory(ModelUtils.getRepresentationsPath(aipId)).iterator();
 
 			it = new Iterable<File>() {
 
@@ -635,8 +568,7 @@ public class ModelService extends ModelObservable {
 						@Override
 						public File next() {
 							try {
-								return convertResourceToRepresentationFile(iterator
-										.next());
+								return convertResourceToRepresentationFile(iterator.next());
 							} catch (ModelServiceException e) {
 								// FIXME is this the best way to deal with the
 								// ModelServiceException???
@@ -654,8 +586,7 @@ public class ModelService extends ModelObservable {
 
 		} catch (StorageActionException e) {
 			throw new ModelServiceException(
-					"Error while obtaining representation files from storage, reason: "
-							+ e.getMessage(), e.getCode());
+					"Error while obtaining representation files from storage, reason: " + e.getMessage(), e.getCode());
 		}
 
 		return it;
@@ -663,20 +594,17 @@ public class ModelService extends ModelObservable {
 
 	// FIXME under a certain representation may exist files but also folders.
 	// how to handle that in this method?
-	public File retrieveFile(String aipId, String representationId,
-			String fileId) throws ModelServiceException {
+	public File retrieveFile(String aipId, String representationId, String fileId) throws ModelServiceException {
 		File file;
 
 		try {
-			StoragePath filePath = ModelUtils.getRepresentationFilePath(aipId,
-					representationId, fileId);
+			StoragePath filePath = ModelUtils.getRepresentationFilePath(aipId, representationId, fileId);
 
 			Binary binary = storage.getBinary(filePath);
 			file = convertResourceToRepresentationFile(binary);
 		} catch (StorageActionException e) {
 			throw new ModelServiceException(
-					"Error while obtaining representation file from storage, reason: "
-							+ e.getMessage(), e.getCode());
+					"Error while obtaining representation file from storage, reason: " + e.getMessage(), e.getCode());
 		}
 
 		return file;
@@ -684,23 +612,21 @@ public class ModelService extends ModelObservable {
 
 	// FIXME under a certain representation may exist files but also folders.
 	// how to handle that in this method?
-	public File createFile(String aipId, String representationId,
-			String fileId, Binary binary) throws ModelServiceException {
+	public File createFile(String aipId, String representationId, String fileId, Binary binary)
+			throws ModelServiceException {
 		File file;
 		// FIXME how to set this?
 		boolean asReference = false;
 
 		try {
-			StoragePath filePath = ModelUtils.getRepresentationFilePath(aipId,
-					representationId, fileId);
+			StoragePath filePath = ModelUtils.getRepresentationFilePath(aipId, representationId, fileId);
 
-			final Binary createdBinary = storage.createBinary(filePath,
-					binary.getMetadata(), binary.getContent(), asReference);
+			final Binary createdBinary = storage.createBinary(filePath, binary.getMetadata(), binary.getContent(),
+					asReference);
 			file = convertResourceToRepresentationFile(createdBinary);
 			notifyFileCreated(file);
 		} catch (StorageActionException e) {
-			throw new ModelServiceException(
-					"Error creating representation file in storage",
+			throw new ModelServiceException("Error creating representation file in storage",
 					ModelServiceException.INTERNAL_SERVER_ERROR, e);
 		}
 
@@ -709,19 +635,16 @@ public class ModelService extends ModelObservable {
 
 	// FIXME under a certain representation may exist files but also folders.
 	// how to handle that in this method?
-	public File updateFile(String aipId, String representationId,
-			String fileId, Binary binary, boolean createIfNotExists,
-			boolean notify) throws ModelServiceException {
+	public File updateFile(String aipId, String representationId, String fileId, Binary binary,
+			boolean createIfNotExists, boolean notify) throws ModelServiceException {
 		File file = null;
 		// FIXME how to set this?
 		boolean asReference = false;
 
 		try {
-			StoragePath filePath = ModelUtils.getRepresentationFilePath(aipId,
-					representationId, fileId);
+			StoragePath filePath = ModelUtils.getRepresentationFilePath(aipId, representationId, fileId);
 
-			storage.updateBinaryContent(filePath, binary.getContent(),
-					asReference, createIfNotExists);
+			storage.updateBinaryContent(filePath, binary.getContent(), asReference, createIfNotExists);
 			storage.updateMetadata(filePath, binary.getMetadata(), true);
 			Binary binaryUpdated = storage.getBinary(filePath);
 			file = convertResourceToRepresentationFile(binaryUpdated);
@@ -729,8 +652,7 @@ public class ModelService extends ModelObservable {
 				notifyFileUpdated(file);
 			}
 		} catch (StorageActionException e) {
-			throw new ModelServiceException(
-					"Error while updating representation file",
+			throw new ModelServiceException("Error while updating representation file",
 					ModelServiceException.INTERNAL_SERVER_ERROR, e);
 		}
 
@@ -739,40 +661,41 @@ public class ModelService extends ModelObservable {
 
 	// FIXME under a certain representation may exist files but also folders.
 	// how to handle that in this method?
-	public void deleteFile(String aipId, String representationId, String fileId)
-			throws ModelServiceException {
+	public void deleteFile(String aipId, String representationId, String fileId) throws ModelServiceException {
 		try {
-			StoragePath filePath = ModelUtils.getRepresentationFilePath(aipId,
-					representationId, fileId);
+			StoragePath filePath = ModelUtils.getRepresentationFilePath(aipId, representationId, fileId);
 
 			storage.deleteResource(filePath);
 			notifyFileDeleted(aipId, representationId, fileId);
 		} catch (StorageActionException e) {
 			throw new ModelServiceException(
-					"Error deleting representation file from storage, reason: "
-							+ e.getMessage(), e.getCode());
+					"Error deleting representation file from storage, reason: " + e.getMessage(), e.getCode());
 		}
 	}
 
 	// TODO to improve...
-	public Iterable<RepresentationPreservationObject> getAipPreservationObjects(String aipId) throws ModelServiceException{
+	public Iterable<RepresentationPreservationObject> getAipPreservationObjects(String aipId)
+			throws ModelServiceException {
 		Iterable<RepresentationPreservationObject> it = null;
 		final List<RepresentationPreservationObject> rpos = new ArrayList<RepresentationPreservationObject>();
 		try {
 			final Iterator<Resource> resourceIterator = storage
-					.listResourcesUnderDirectory(
-							ModelUtils.getRepresentationsPath(aipId))
-					.iterator();
-			while(resourceIterator.hasNext()){
+					.listResourcesUnderDirectory(ModelUtils.getRepresentationsPath(aipId)).iterator();
+			while (resourceIterator.hasNext()) {
 				Resource resource = resourceIterator.next();
-				Iterator<Resource> preservationIterator = storage.listResourcesUnderDirectory(ModelUtils.getPreservationPath(storage, aipId, resource.getStoragePath().getName())).iterator();
-				while(preservationIterator.hasNext()){
+				Iterator<Resource> preservationIterator = storage
+						.listResourcesUnderDirectory(
+								ModelUtils.getPreservationPath(storage, aipId, resource.getStoragePath().getName()))
+						.iterator();
+				while (preservationIterator.hasNext()) {
 					Resource preservationObject = preservationIterator.next();
 					Binary preservationBinary = storage.getBinary(preservationObject.getStoragePath());
-					if(ModelUtils.isPreservationRepresentationObject(preservationBinary)){
-						rpos.add(convertResourceToRepresentationPreservationObject(aipId, resource.getStoragePath().getName(), preservationObject.getStoragePath().getName(), preservationBinary));
+					if (ModelUtils.isPreservationRepresentationObject(preservationBinary)) {
+						rpos.add(convertResourceToRepresentationPreservationObject(aipId,
+								resource.getStoragePath().getName(), preservationObject.getStoragePath().getName(),
+								preservationBinary));
 					}
-					
+
 				}
 			}
 			it = new Iterable<RepresentationPreservationObject>() {
@@ -781,87 +704,87 @@ public class ModelService extends ModelObservable {
 					return rpos.iterator();
 				}
 			};
-		}catch (StorageActionException e) {
-			throw new ModelServiceException(
-					"Error while obtaining AIP preservation objects, reason: "
-							+ e.getMessage(), e.getCode());
+		} catch (StorageActionException e) {
+			throw new ModelServiceException("Error while obtaining AIP preservation objects, reason: " + e.getMessage(),
+					e.getCode());
 		}
 		return it;
 	}
-	
-	public RepresentationPreservationObject getRepresentationPreservationObject(String aipId, String representationId, String fileId) throws ModelServiceException{
+
+	public RepresentationPreservationObject getRepresentationPreservationObject(String aipId, String representationId,
+			String fileId) throws ModelServiceException {
 		RepresentationPreservationObject obj = null;
-		try{
-			StoragePath sp =  ModelUtils.getPreservationFilePath(aipId, representationId, fileId);
+		try {
+			StoragePath sp = ModelUtils.getPreservationFilePath(aipId, representationId, fileId);
 			Binary b = storage.getBinary(sp);
-			obj = convertResourceToRepresentationPreservationObject(aipId,representationId,fileId,b);
+			obj = convertResourceToRepresentationPreservationObject(aipId, representationId, fileId, b);
 		} catch (StorageActionException e) {
-			throw new ModelServiceException(
-					"Error while getting representation preservation object",
+			throw new ModelServiceException("Error while getting representation preservation object",
 					ModelServiceException.INTERNAL_SERVER_ERROR, e);
 		}
 		return obj;
 	}
-	
-	public EventPreservationObject getEventPreservationObject(String aipId, String representationId, String preservationObjectID) throws ModelServiceException{
+
+	public EventPreservationObject getEventPreservationObject(String aipId, String representationId,
+			String preservationObjectID) throws ModelServiceException {
 		EventPreservationObject obj = null;
-		try{
-			StoragePath sp =  ModelUtils.getPreservationFilePath(aipId, representationId, preservationObjectID);
+		try {
+			StoragePath sp = ModelUtils.getPreservationFilePath(aipId, representationId, preservationObjectID);
 			Binary b = storage.getBinary(sp);
-			obj = convertResourceToEventPreservationObject(aipId,representationId,preservationObjectID,b);
+			obj = convertResourceToEventPreservationObject(aipId, representationId, preservationObjectID, b);
 		} catch (StorageActionException e) {
-			throw new ModelServiceException(
-					"Error while getting event preservation object",
+			throw new ModelServiceException("Error while getting event preservation object",
 					ModelServiceException.INTERNAL_SERVER_ERROR, e);
 		}
-		
+
 		return obj;
 	}
-	public AgentPreservationObject getAgentPreservationObject(String agentID) throws ModelServiceException{
+
+	public AgentPreservationObject getAgentPreservationObject(String agentID) throws ModelServiceException {
 		AgentPreservationObject apo = null;
-		try{
-			StoragePath sp =  ModelUtils.getPreservationAgentPath(agentID);
+		try {
+			StoragePath sp = ModelUtils.getPreservationAgentPath(agentID);
 			Binary b = storage.getBinary(sp);
-			apo = convertResourceToAgentPreservationObject(agentID,b);
-		}catch(StorageActionException e){
-			throw new ModelServiceException(
-					"Error while getting agent preservation object",
+			apo = convertResourceToAgentPreservationObject(agentID, b);
+		} catch (StorageActionException e) {
+			throw new ModelServiceException("Error while getting agent preservation object",
 					ModelServiceException.INTERNAL_SERVER_ERROR, e);
 		}
 		return apo;
 	}
-	
-	private AgentPreservationObject convertResourceToAgentPreservationObject(
-			String agentID, Binary resource) throws ModelServiceException {
+
+	private AgentPreservationObject convertResourceToAgentPreservationObject(String agentID, Binary resource)
+			throws ModelServiceException {
 		if (resource instanceof DefaultBinary) {
-			try{
+			try {
 				Map<String, Set<String>> directoryMetadata = resource.getMetadata();
-	
+
 				// retrieve needed information to instantiate Representation
-				Boolean active = ModelUtils.getBoolean(directoryMetadata,
-						RodaConstants.STORAGE_META_ACTIVE);
-				Date dateCreated = ModelUtils.getDate(directoryMetadata,
-						RodaConstants.STORAGE_META_DATE_CREATED);
-				Date dateModified = ModelUtils.getDate(directoryMetadata,
-						RodaConstants.STORAGE_META_DATE_MODIFIED);
-	
+				Boolean active = ModelUtils.getBoolean(directoryMetadata, RodaConstants.STORAGE_META_ACTIVE);
+				Date dateCreated = ModelUtils.getDate(directoryMetadata, RodaConstants.STORAGE_META_DATE_CREATED);
+				Date dateModified = ModelUtils.getDate(directoryMetadata, RodaConstants.STORAGE_META_DATE_MODIFIED);
+
 				if (active == null) {
 					// when not stated, considering active=false
 					active = false;
 				}
 				PremisAgentHelper pah = PremisAgentHelper.newInstance(resource.getContent().createInputStream());
 				AgentPreservationObject apo = new AgentPreservationObject();
-				apo.setAgentName((pah.getAgent().getAgentNameList()!=null && pah.getAgent().getAgentNameList().size()>0)?pah.getAgent().getAgentNameList().get(0):"");
+				apo.setAgentName(
+						(pah.getAgent().getAgentNameList() != null && pah.getAgent().getAgentNameList().size() > 0)
+								? pah.getAgent().getAgentNameList().get(0) : "");
 				apo.setAgentType(pah.getAgent().getAgentType());
 				apo.setFileID(agentID);
-				apo.setID((pah.getAgent().getAgentIdentifierList()!=null && pah.getAgent().getAgentIdentifierList().size()>0)?pah.getAgent().getAgentIdentifierList().get(0).getAgentIdentifierValue():"");
-				apo.setType(""); //TODO: ??????????
-				return apo;	
-			}catch(PremisMetadataException e){
+				apo.setID((pah.getAgent().getAgentIdentifierList() != null
+						&& pah.getAgent().getAgentIdentifierList().size() > 0)
+								? pah.getAgent().getAgentIdentifierList().get(0).getAgentIdentifierValue() : "");
+				apo.setType(""); // TODO: ??????????
+				return apo;
+			} catch (PremisMetadataException e) {
 				throw new ModelServiceException(
 						"Error while trying to convert a binary into a representation preservation object",
 						ModelServiceException.INTERNAL_SERVER_ERROR);
-			}catch(IOException e){
+			} catch (IOException e) {
 				throw new ModelServiceException(
 						"Error while trying to convert a binary into a representation preservation object",
 						ModelServiceException.INTERNAL_SERVER_ERROR);
@@ -883,20 +806,15 @@ public class ModelService extends ModelObservable {
 		return true;
 	}
 
-	private AIP convertResourceToAIP(Resource resource)
-			throws ModelServiceException {
+	private AIP convertResourceToAIP(Resource resource) throws ModelServiceException {
 		AIP aip;
 		if (resource instanceof DefaultDirectory) {
 			StoragePath storagePath = resource.getStoragePath();
 			Map<String, Set<String>> metadata = resource.getMetadata();
-			String parentId = ModelUtils.getString(metadata,
-					RodaConstants.STORAGE_META_PARENT_ID);
-			Boolean active = ModelUtils.getBoolean(metadata,
-					RodaConstants.STORAGE_META_ACTIVE);
-			Date dateCreated = ModelUtils.getDate(metadata,
-					RodaConstants.STORAGE_META_DATE_CREATED);
-			Date dateModified = ModelUtils.getDate(metadata,
-					RodaConstants.STORAGE_META_DATE_MODIFIED);
+			String parentId = ModelUtils.getString(metadata, RodaConstants.STORAGE_META_PARENT_ID);
+			Boolean active = ModelUtils.getBoolean(metadata, RodaConstants.STORAGE_META_ACTIVE);
+			Date dateCreated = ModelUtils.getDate(metadata, RodaConstants.STORAGE_META_DATE_CREATED);
+			Date dateModified = ModelUtils.getDate(metadata, RodaConstants.STORAGE_META_DATE_MODIFIED);
 
 			if (active == null) {
 				// when not stated, consider active=false
@@ -904,59 +822,58 @@ public class ModelService extends ModelObservable {
 			}
 
 			try {
-				List<String> descriptiveMetadataBinaryIds = ModelUtils.getIds(
-						storage, ModelUtils
-								.getDescriptiveMetadataPath(storagePath
-										.getName()));
-				List<String> representationIds = ModelUtils
-						.getIds(storage, ModelUtils
-								.getRepresentationsPath(storagePath.getName()));
+				List<String> descriptiveMetadataBinaryIds = ModelUtils.getIds(storage,
+						ModelUtils.getDescriptiveMetadataPath(storagePath.getName()));
+				List<String> representationIds = ModelUtils.getIds(storage,
+						ModelUtils.getRepresentationsPath(storagePath.getName()));
 
-				
-				Map<String,List<String>> preservationRepresentationObjects = new HashMap<String,List<String>>();
-				Map<String,List<String>> preservationFileObjects = new HashMap<String,List<String>>();
-				Map<String,List<String>> preservationEvents = new HashMap<String,List<String>>();
-				if(representationIds!=null && representationIds.size()>0){
-					for(String representationID : representationIds){
-						try{
-							StoragePath representationPreservationPath = ModelUtils.getPreservationPath(storage, storagePath.getName(),representationID);
-							List<String> preservationFileIds = ModelUtils
-									.getIds(storage,representationPreservationPath);
+				Map<String, List<String>> preservationRepresentationObjects = new HashMap<String, List<String>>();
+				Map<String, List<String>> preservationFileObjects = new HashMap<String, List<String>>();
+				Map<String, List<String>> preservationEvents = new HashMap<String, List<String>>();
+				if (representationIds != null && representationIds.size() > 0) {
+					for (String representationID : representationIds) {
+						try {
+							StoragePath representationPreservationPath = ModelUtils.getPreservationPath(storage,
+									storagePath.getName(), representationID);
+							List<String> preservationFileIds = ModelUtils.getIds(storage,
+									representationPreservationPath);
 							List<String> preservationRepresentationObjectFileIds = new ArrayList<String>();
 							List<String> preservationFileObjectFileIds = new ArrayList<String>();
 							List<String> preservationEventFileIds = new ArrayList<String>();
-							
-							for(String preservationFileId : preservationFileIds){
-								StoragePath binaryPath = ModelUtils.getPreservationFilePath(storagePath.getName(), representationID, preservationFileId);
+
+							for (String preservationFileId : preservationFileIds) {
+								StoragePath binaryPath = ModelUtils.getPreservationFilePath(storagePath.getName(),
+										representationID, preservationFileId);
 								Binary preservationBinary = storage.getBinary(binaryPath);
-								if(ModelUtils.isPreservationRepresentationObject(preservationBinary)){
+								if (ModelUtils.isPreservationRepresentationObject(preservationBinary)) {
 									preservationRepresentationObjectFileIds.add(preservationFileId);
-								}else if(ModelUtils.isPreservationEvent(preservationBinary)){
+								} else if (ModelUtils.isPreservationEvent(preservationBinary)) {
 									preservationEventFileIds.add(preservationFileId);
-								}else if(ModelUtils.isPreservationFileObject(preservationBinary)){
+								} else if (ModelUtils.isPreservationFileObject(preservationBinary)) {
 									preservationFileObjectFileIds.add(preservationFileId);
-								}else{
+								} else {
 									System.out.println("CABOOOOOOOOOOOOOOOOOOOOOOOM");
-									//TODO... not object... not event... 
+									// TODO... not object... not event...
 								}
 							}
-							preservationRepresentationObjects.put(representationID, preservationRepresentationObjectFileIds);
+							preservationRepresentationObjects.put(representationID,
+									preservationRepresentationObjectFileIds);
 							preservationFileObjects.put(representationID, preservationFileObjectFileIds);
 							preservationEvents.put(representationID, preservationEventFileIds);
-						}catch(StorageActionException sae){
-							//TODO: No preservation folder associated to representation...
+						} catch (StorageActionException sae) {
+							// TODO: No preservation folder associated to
+							// representation...
 						}
 					}
-					
-					
+
 				}
-				aip = new AIP(storagePath.getName(), parentId, active,
-						dateCreated, dateModified,
-						descriptiveMetadataBinaryIds, representationIds,preservationRepresentationObjects,preservationEvents, preservationFileObjects);
+				aip = new AIP(storagePath.getName(), parentId, active, dateCreated, dateModified,
+						descriptiveMetadataBinaryIds, representationIds, preservationRepresentationObjects,
+						preservationEvents, preservationFileObjects);
 			} catch (StorageActionException e) {
 				throw new ModelServiceException(
-						"Error while obtaining information to instantiate an AIP, reason: "
-								+ e.getMessage(), e.getCode());
+						"Error while obtaining information to instantiate an AIP, reason: " + e.getMessage(),
+						e.getCode());
 			}
 		} else {
 			throw new ModelServiceException(
@@ -966,16 +883,13 @@ public class ModelService extends ModelObservable {
 		return aip;
 	}
 
-	private DescriptiveMetadata convertResourceToDescriptiveMetadata(
-			Resource resource) throws ModelServiceException {
+	private DescriptiveMetadata convertResourceToDescriptiveMetadata(Resource resource) throws ModelServiceException {
 		if (resource instanceof DefaultBinary) {
 			// retrieve needed information to instantiate DescriptiveMetadata
-			String type = ModelUtils.getString(resource.getMetadata(),
-					RodaConstants.STORAGE_META_TYPE);
+			String type = ModelUtils.getString(resource.getMetadata(), RodaConstants.STORAGE_META_TYPE);
 
 			return new DescriptiveMetadata(resource.getStoragePath().getName(),
-					ModelUtils.getAIPidFromStoragePath(resource
-							.getStoragePath()), type, resource.getStoragePath());
+					ModelUtils.getAIPidFromStoragePath(resource.getStoragePath()), type, resource.getStoragePath());
 		} else {
 			throw new ModelServiceException(
 					"Error while trying to convert something that it isn't a Binary into a descriptive metadata binary",
@@ -983,23 +897,17 @@ public class ModelService extends ModelObservable {
 		}
 	}
 
-	private Representation convertResourceToRepresentation(Resource resource)
-			throws ModelServiceException {
+	private Representation convertResourceToRepresentation(Resource resource) throws ModelServiceException {
 		if (resource instanceof DefaultDirectory) {
 			StoragePath directoryPath = resource.getStoragePath();
 			Map<String, Set<String>> directoryMetadata = resource.getMetadata();
 
 			// retrieve needed information to instantiate Representation
-			Boolean active = ModelUtils.getBoolean(directoryMetadata,
-					RodaConstants.STORAGE_META_ACTIVE);
-			Date dateCreated = ModelUtils.getDate(directoryMetadata,
-					RodaConstants.STORAGE_META_DATE_CREATED);
-			Date dateModified = ModelUtils.getDate(directoryMetadata,
-					RodaConstants.STORAGE_META_DATE_MODIFIED);
-			Set<RepresentationState> statuses = ModelUtils
-					.getStatuses(directoryMetadata);
-			String type = ModelUtils.getString(directoryMetadata,
-					RodaConstants.STORAGE_META_TYPE);
+			Boolean active = ModelUtils.getBoolean(directoryMetadata, RodaConstants.STORAGE_META_ACTIVE);
+			Date dateCreated = ModelUtils.getDate(directoryMetadata, RodaConstants.STORAGE_META_DATE_CREATED);
+			Date dateModified = ModelUtils.getDate(directoryMetadata, RodaConstants.STORAGE_META_DATE_MODIFIED);
+			Set<RepresentationState> statuses = ModelUtils.getStatuses(directoryMetadata);
+			String type = ModelUtils.getString(directoryMetadata, RodaConstants.STORAGE_META_TYPE);
 			List<String> fileIds = new ArrayList<String>();
 			try {
 				fileIds = ModelUtils.getIds(storage, resource.getStoragePath());
@@ -1012,9 +920,8 @@ public class ModelService extends ModelObservable {
 				active = false;
 			}
 
-			return new Representation(directoryPath.getName(),
-					ModelUtils.getAIPidFromStoragePath(directoryPath), active,
-					dateCreated, dateModified, statuses, type, fileIds);
+			return new Representation(directoryPath.getName(), ModelUtils.getAIPidFromStoragePath(directoryPath),
+					active, dateCreated, dateModified, statuses, type, fileIds);
 
 		} else {
 			throw new ModelServiceException(
@@ -1023,15 +930,13 @@ public class ModelService extends ModelObservable {
 		}
 	}
 
-	private File convertResourceToRepresentationFile(Resource resource)
-			throws ModelServiceException {
+	private File convertResourceToRepresentationFile(Resource resource) throws ModelServiceException {
 		if (resource instanceof DefaultBinary) {
 			StoragePath binaryPath = resource.getStoragePath();
 			Map<String, Set<String>> metadata = resource.getMetadata();
 
 			// retrieve needed information to instantiate File
-			Boolean entryPoint = ModelUtils.getBoolean(metadata,
-					RodaConstants.STORAGE_META_ENTRYPOINT);
+			Boolean entryPoint = ModelUtils.getBoolean(metadata, RodaConstants.STORAGE_META_ENTRYPOINT);
 			FileFormat fileFormat = ModelUtils.getFileFormat(metadata);
 
 			if (entryPoint == null) {
@@ -1039,10 +944,8 @@ public class ModelService extends ModelObservable {
 				entryPoint = false;
 			}
 
-			return new File(binaryPath.getName(),
-					ModelUtils.getAIPidFromStoragePath(binaryPath),
-					ModelUtils.getRepresentationIdFromStoragePath(binaryPath),
-					entryPoint, fileFormat, binaryPath);
+			return new File(binaryPath.getName(), ModelUtils.getAIPidFromStoragePath(binaryPath),
+					ModelUtils.getRepresentationIdFromStoragePath(binaryPath), entryPoint, fileFormat, binaryPath);
 		} else {
 			throw new ModelServiceException(
 					"Error while trying to convert something that it isn't a Binary into a representation file",
@@ -1050,62 +953,57 @@ public class ModelService extends ModelObservable {
 		}
 	}
 
-	public RepresentationPreservationObject retrieveRepresentationPreservationObject(
-			String aipId, String representationId, String fileId) throws ModelServiceException {
+	public RepresentationPreservationObject retrieveRepresentationPreservationObject(String aipId,
+			String representationId, String fileId) throws ModelServiceException {
 		RepresentationPreservationObject representationPreservationObject = null;
 		try {
-			StoragePath filePath = ModelUtils.getPreservationFilePath(aipId,
-					representationId, fileId);
+			StoragePath filePath = ModelUtils.getPreservationFilePath(aipId, representationId, fileId);
 			Binary binary = storage.getBinary(filePath);
-			representationPreservationObject = convertResourceToRepresentationPreservationObject(aipId,representationId,fileId,binary);
+			representationPreservationObject = convertResourceToRepresentationPreservationObject(aipId,
+					representationId, fileId, binary);
 			representationPreservationObject.setId(fileId);
 		} catch (StorageActionException e) {
 			throw new ModelServiceException(
-					"Error while obtaining Representation from storage, reason: "
-							+ e.getMessage(), e.getCode());
+					"Error while obtaining Representation from storage, reason: " + e.getMessage(), e.getCode());
 		}
 		return representationPreservationObject;
 	}
 
-	public RepresentationFilePreservationObject retrieveRepresentationFileObject(
-			String aipId, String representationId, String fileId) throws ModelServiceException  {
+	public RepresentationFilePreservationObject retrieveRepresentationFileObject(String aipId, String representationId,
+			String fileId) throws ModelServiceException {
 		RepresentationFilePreservationObject representationPreservationObject = null;
 		try {
-			StoragePath filePath = ModelUtils.getPreservationFilePath(aipId,
-					representationId, fileId);
+			StoragePath filePath = ModelUtils.getPreservationFilePath(aipId, representationId, fileId);
 			Binary binary = storage.getBinary(filePath);
-			representationPreservationObject = convertResourceToRepresentationFilePreservationObject(aipId,representationId,fileId,binary);
+			representationPreservationObject = convertResourceToRepresentationFilePreservationObject(aipId,
+					representationId, fileId, binary);
 			representationPreservationObject.setId(fileId);
 		} catch (StorageActionException e) {
 			throw new ModelServiceException(
-					"Error while obtaining Representation File from storage, reason: "
-							+ e.getMessage(), e.getCode());
+					"Error while obtaining Representation File from storage, reason: " + e.getMessage(), e.getCode());
 		}
 		return representationPreservationObject;
 	}
-	
-	private RepresentationFilePreservationObject convertResourceToRepresentationFilePreservationObject(
-			String aipId, String representationId, String fileId, Binary resource) throws ModelServiceException {
+
+	private RepresentationFilePreservationObject convertResourceToRepresentationFilePreservationObject(String aipId,
+			String representationId, String fileId, Binary resource) throws ModelServiceException {
 		if (resource instanceof DefaultBinary) {
-			try{
+			try {
 				Map<String, Set<String>> directoryMetadata = resource.getMetadata();
-	
+
 				// retrieve needed information to instantiate Representation
-				Boolean active = ModelUtils.getBoolean(directoryMetadata,
-						RodaConstants.STORAGE_META_ACTIVE);
-				Date dateCreated = ModelUtils.getDate(directoryMetadata,
-						RodaConstants.STORAGE_META_DATE_CREATED);
-				Date dateModified = ModelUtils.getDate(directoryMetadata,
-						RodaConstants.STORAGE_META_DATE_MODIFIED);
-	
+				Boolean active = ModelUtils.getBoolean(directoryMetadata, RodaConstants.STORAGE_META_ACTIVE);
+				Date dateCreated = ModelUtils.getDate(directoryMetadata, RodaConstants.STORAGE_META_DATE_CREATED);
+				Date dateModified = ModelUtils.getDate(directoryMetadata, RodaConstants.STORAGE_META_DATE_MODIFIED);
+
 				if (active == null) {
 					// when not stated, considering active=false
 					active = false;
 				}
-				
-				
-				PremisFileObjectHelper pfoh = PremisFileObjectHelper.newInstance(resource.getContent().createInputStream());
-				
+
+				PremisFileObjectHelper pfoh = PremisFileObjectHelper
+						.newInstance(resource.getContent().createInputStream());
+
 				RepresentationFilePreservationObject rfpo = new RepresentationFilePreservationObject();
 				rfpo.setAipId(aipId);
 				rfpo.setRepresentationId(representationId);
@@ -1114,13 +1012,18 @@ public class ModelService extends ModelObservable {
 				rfpo.setContentLocationType(pfoh.getRepresentationFilePreservationObject().getContentLocationType());
 				rfpo.setContentLocationValue(pfoh.getRepresentationFilePreservationObject().getContentLocationValue());
 				rfpo.setCreatedDate(pfoh.getRepresentationFilePreservationObject().getCreatedDate());
-				rfpo.setCreatingApplicationName(pfoh.getRepresentationFilePreservationObject().getCreatingApplicationName());
-				rfpo.setCreatingApplicationVersion(pfoh.getRepresentationFilePreservationObject().getCreatingApplicationVersion());
-				rfpo.setDateCreatedByApplication(pfoh.getRepresentationFilePreservationObject().getDateCreatedByApplication());
+				rfpo.setCreatingApplicationName(
+						pfoh.getRepresentationFilePreservationObject().getCreatingApplicationName());
+				rfpo.setCreatingApplicationVersion(
+						pfoh.getRepresentationFilePreservationObject().getCreatingApplicationVersion());
+				rfpo.setDateCreatedByApplication(
+						pfoh.getRepresentationFilePreservationObject().getDateCreatedByApplication());
 				rfpo.setFileId(fileId);
 				rfpo.setFixities(pfoh.getRepresentationFilePreservationObject().getFixities());
-				rfpo.setFormatDesignationName(pfoh.getRepresentationFilePreservationObject().getFormatDesignationName());
-				rfpo.setFormatDesignationVersion(pfoh.getRepresentationFilePreservationObject().getFormatDesignationVersion());
+				rfpo.setFormatDesignationName(
+						pfoh.getRepresentationFilePreservationObject().getFormatDesignationName());
+				rfpo.setFormatDesignationVersion(
+						pfoh.getRepresentationFilePreservationObject().getFormatDesignationVersion());
 				rfpo.setFormatRegistryKey(pfoh.getRepresentationFilePreservationObject().getFormatRegistryKey());
 				rfpo.setFormatRegistryName(pfoh.getRepresentationFilePreservationObject().getFormatRegistryName());
 				rfpo.setFormatRegistryRole(pfoh.getRepresentationFilePreservationObject().getFormatRegistryRole());
@@ -1131,23 +1034,24 @@ public class ModelService extends ModelObservable {
 				rfpo.setLastModifiedDate(pfoh.getRepresentationFilePreservationObject().getLastModifiedDate());
 				rfpo.setMimetype(pfoh.getRepresentationFilePreservationObject().getMimetype());
 				rfpo.setModel(pfoh.getRepresentationFilePreservationObject().getModel());
-				rfpo.setObjectCharacteristicsExtension(pfoh.getRepresentationFilePreservationObject().getObjectCharacteristicsExtension());
+				rfpo.setObjectCharacteristicsExtension(
+						pfoh.getRepresentationFilePreservationObject().getObjectCharacteristicsExtension());
 				rfpo.setOriginalName(pfoh.getRepresentationFilePreservationObject().getOriginalName());
 				rfpo.setPreservationLevel(pfoh.getRepresentationFilePreservationObject().getPreservationLevel());
 				rfpo.setPronomId(pfoh.getRepresentationFilePreservationObject().getPronomId());
-				rfpo.setRepresentationObjectId(pfoh.getRepresentationFilePreservationObject().getRepresentationObjectId());
+				rfpo.setRepresentationObjectId(
+						pfoh.getRepresentationFilePreservationObject().getRepresentationObjectId());
 				rfpo.setSize(pfoh.getRepresentationFilePreservationObject().getSize());
 				rfpo.setState(pfoh.getRepresentationFilePreservationObject().getState());
 				rfpo.setType(pfoh.getRepresentationFilePreservationObject().getType());
 				rfpo.setRepresentationId(representationId);
 				return rfpo;
-						
-						
-			}catch(PremisMetadataException e){
+
+			} catch (PremisMetadataException e) {
 				throw new ModelServiceException(
 						"Error while trying to convert a binary into a representation preservation object",
 						ModelServiceException.INTERNAL_SERVER_ERROR);
-			}catch(IOException e){
+			} catch (IOException e) {
 				throw new ModelServiceException(
 						"Error while trying to convert a binary into a representation preservation object",
 						ModelServiceException.INTERNAL_SERVER_ERROR);
@@ -1159,33 +1063,32 @@ public class ModelService extends ModelObservable {
 		}
 	}
 
-	private RepresentationPreservationObject convertResourceToRepresentationPreservationObject(
-			String aipId, String representationId, String fileId, Binary resource) throws ModelServiceException {
+	private RepresentationPreservationObject convertResourceToRepresentationPreservationObject(String aipId,
+			String representationId, String fileId, Binary resource) throws ModelServiceException {
 		if (resource instanceof DefaultBinary) {
-			try{
+			try {
 				Map<String, Set<String>> directoryMetadata = resource.getMetadata();
-	
+
 				// retrieve needed information to instantiate Representation
-				Boolean active = ModelUtils.getBoolean(directoryMetadata,
-						RodaConstants.STORAGE_META_ACTIVE);
-				Date dateCreated = ModelUtils.getDate(directoryMetadata,
-						RodaConstants.STORAGE_META_DATE_CREATED);
-				Date dateModified = ModelUtils.getDate(directoryMetadata,
-						RodaConstants.STORAGE_META_DATE_MODIFIED);
-	
+				Boolean active = ModelUtils.getBoolean(directoryMetadata, RodaConstants.STORAGE_META_ACTIVE);
+				Date dateCreated = ModelUtils.getDate(directoryMetadata, RodaConstants.STORAGE_META_DATE_CREATED);
+				Date dateModified = ModelUtils.getDate(directoryMetadata, RodaConstants.STORAGE_META_DATE_MODIFIED);
+
 				if (active == null) {
 					// when not stated, considering active=false
 					active = false;
 				}
-				
-				PremisRepresentationObjectHelper proh = PremisRepresentationObjectHelper.newInstance(resource.getContent().createInputStream());
+
+				PremisRepresentationObjectHelper proh = PremisRepresentationObjectHelper
+						.newInstance(resource.getContent().createInputStream());
 				RepresentationPreservationObject rpo = new RepresentationPreservationObject();
 				rpo.setAipId(aipId);
 				rpo.setRepresentationId(representationId);
 				rpo.setFileId(fileId);
 				rpo.setCreatedDate(proh.getRepresentationPreservationObject().getCreatedDate());
 				rpo.setDerivationEventID(proh.getRepresentationPreservationObject().getDerivationEventID());
-				rpo.setDerivedFromRepresentationObjectID(proh.getRepresentationPreservationObject().getDerivedFromRepresentationObjectID());
+				rpo.setDerivedFromRepresentationObjectID(
+						proh.getRepresentationPreservationObject().getDerivedFromRepresentationObjectID());
 				rpo.setId(proh.getRepresentationPreservationObject().getId());
 				rpo.setID(proh.getRepresentationPreservationObject().getID());
 				rpo.setLabel(proh.getRepresentationPreservationObject().getLabel());
@@ -1199,11 +1102,11 @@ public class ModelService extends ModelObservable {
 				rpo.setState(proh.getRepresentationPreservationObject().getState());
 				rpo.setType(proh.getRepresentationPreservationObject().getType());
 				return rpo;
-			}catch(PremisMetadataException e){
+			} catch (PremisMetadataException e) {
 				throw new ModelServiceException(
 						"Error while trying to convert a binary into a representation preservation object",
 						ModelServiceException.INTERNAL_SERVER_ERROR);
-			}catch(IOException e){
+			} catch (IOException e) {
 				throw new ModelServiceException(
 						"Error while trying to convert a binary into a representation preservation object",
 						ModelServiceException.INTERNAL_SERVER_ERROR);
@@ -1215,110 +1118,112 @@ public class ModelService extends ModelObservable {
 		}
 	}
 
-	public EventPreservationObject retrieveEventPreservationObject(String aipId,
-			String representationId, String fileId) throws ModelServiceException {
+	public EventPreservationObject retrieveEventPreservationObject(String aipId, String representationId, String fileId)
+			throws ModelServiceException {
 		EventPreservationObject eventPreservationObject = null;
 		try {
 			StoragePath filePath = ModelUtils.getPreservationFilePath(aipId, representationId, fileId);
 			Binary binary = storage.getBinary(filePath);
-			eventPreservationObject = convertResourceToEventPreservationObject(aipId,representationId,fileId,binary);
+			eventPreservationObject = convertResourceToEventPreservationObject(aipId, representationId, fileId, binary);
 			eventPreservationObject.setId(fileId);
 		} catch (StorageActionException e) {
 			throw new ModelServiceException(
-					"Error while obtaining Representation from storage, reason: "
-							+ e.getMessage(), e.getCode());
+					"Error while obtaining Representation from storage, reason: " + e.getMessage(), e.getCode());
 		}
 		return eventPreservationObject;
 	}
 
-	private EventPreservationObject convertResourceToEventPreservationObject(
-			String aipId, String representationId, String fileId, Binary resource) throws ModelServiceException {
+	private EventPreservationObject convertResourceToEventPreservationObject(String aipId, String representationId,
+			String fileId, Binary resource) throws ModelServiceException {
 		if (resource instanceof DefaultBinary) {
-			try{
+			try {
 				Map<String, Set<String>> directoryMetadata = resource.getMetadata();
 				// retrieve needed information to instantiate Representation
-				Boolean active = ModelUtils.getBoolean(directoryMetadata,
-						RodaConstants.STORAGE_META_ACTIVE);
-				Date dateCreated = ModelUtils.getDate(directoryMetadata,
-						RodaConstants.STORAGE_META_DATE_CREATED);
-				Date dateModified = ModelUtils.getDate(directoryMetadata,
-						RodaConstants.STORAGE_META_DATE_MODIFIED);
-	
+				Boolean active = ModelUtils.getBoolean(directoryMetadata, RodaConstants.STORAGE_META_ACTIVE);
+				Date dateCreated = ModelUtils.getDate(directoryMetadata, RodaConstants.STORAGE_META_DATE_CREATED);
+				Date dateModified = ModelUtils.getDate(directoryMetadata, RodaConstants.STORAGE_META_DATE_MODIFIED);
+
 				if (active == null) {
 					active = false;
 				}
-				
+
 				PremisEventHelper peh = PremisEventHelper.newInstance(resource.getContent().createInputStream());
-				
-				//TODO premisevent to EventPreservationObject
+
+				// TODO premisevent to EventPreservationObject
 				EventPreservationObject epo = new EventPreservationObject();
 				epo.setAipId(aipId);
 				epo.setRepresentationId(representationId);
 				epo.setFileId(fileId);
 				epo.setLastModifiedDate(dateModified);
 				epo.setCreatedDate(dateCreated);
-				epo.setAgentID((peh.getEvent().getLinkingAgentIdentifierList()!=null && peh.getEvent().getLinkingAgentIdentifierList().size()>0)?peh.getEvent().getLinkingAgentIdentifierList().get(0).getLinkingAgentIdentifierValue():null);
-				epo.setAgentRole((peh.getEvent().getLinkingAgentIdentifierList()!=null && peh.getEvent().getLinkingAgentIdentifierList().size()>0)?peh.getEvent().getLinkingAgentIdentifierList().get(0).getRole():null);
-				epo.setDate(new Date()); //TODO: ????
-				try{
+				epo.setAgentID((peh.getEvent().getLinkingAgentIdentifierList() != null
+						&& peh.getEvent().getLinkingAgentIdentifierList().size() > 0)
+								? peh.getEvent().getLinkingAgentIdentifierList().get(0).getLinkingAgentIdentifierValue()
+								: null);
+				epo.setAgentRole((peh.getEvent().getLinkingAgentIdentifierList() != null
+						&& peh.getEvent().getLinkingAgentIdentifierList().size() > 0)
+								? peh.getEvent().getLinkingAgentIdentifierList().get(0).getRole() : null);
+				epo.setDate(new Date()); // TODO: ????
+				try {
 					epo.setDatetime(DateParser.parse(peh.getEvent().getEventDateTime().toString()));
-				}catch(InvalidDateException ide){
+				} catch (InvalidDateException ide) {
 					epo.setDatetime(new Date());
 				}
-				epo.setDescription(""); //TODO: ????
+				epo.setDescription(""); // TODO: ????
 				epo.setEventDetail(peh.getEvent().getEventDetail());
 				epo.setEventType(peh.getEvent().getEventType());
 				epo.setFileId(fileId);
 				epo.setId(fileId);
-				epo.setID(""); //TODO: ???
-				epo.setLabel(""); //TODO: ???
-				epo.setModel(""); //TODO: ???
-				epo.setName(""); //TODO: ???
-				List<LinkingObjectIdentifierComplexType> linkingObjects = peh.getEvent().getLinkingObjectIdentifierList();
-				if(linkingObjects!=null && linkingObjects.size()>0){
+				epo.setID(""); // TODO: ???
+				epo.setLabel(""); // TODO: ???
+				epo.setModel(""); // TODO: ???
+				epo.setName(""); // TODO: ???
+				List<LinkingObjectIdentifierComplexType> linkingObjects = peh.getEvent()
+						.getLinkingObjectIdentifierList();
+				if (linkingObjects != null && linkingObjects.size() > 0) {
 					List<String> objectIds = new ArrayList<String>();
-					for(LinkingObjectIdentifierComplexType loi : linkingObjects){
+					for (LinkingObjectIdentifierComplexType loi : linkingObjects) {
 						objectIds.add(loi.getTitle());
 					}
 					epo.setObjectIDs(objectIds.toArray(new String[objectIds.size()]));
-				}else{
+				} else {
 					epo.setObjectIDs(null);
 				}
 				epo.setOutcome(peh.getEvent().getEventOutcomeInformationList().get(0).getEventOutcome());
-				if(peh.getEvent().getEventOutcomeInformationList()!=null && peh.getEvent().getEventOutcomeInformationList().size()>0){
+				if (peh.getEvent().getEventOutcomeInformationList() != null
+						&& peh.getEvent().getEventOutcomeInformationList().size() > 0) {
 					EventOutcomeInformationComplexType eoict = peh.getEvent().getEventOutcomeInformationList().get(0);
 					epo.setOutcome(eoict.getEventOutcome());
-					if(eoict.getEventOutcomeDetailList()!=null && eoict.getEventOutcomeDetailList().size()>0){
+					if (eoict.getEventOutcomeDetailList() != null && eoict.getEventOutcomeDetailList().size() > 0) {
 						EventOutcomeDetailComplexType eodc = eoict.getEventOutcomeDetailList().get(0);
 						epo.setOutcomeDetailExtension(eodc.getEventOutcomeDetailExtension().toString());
 						epo.setOutcomeDetailNote(eodc.getEventOutcomeDetailNote());
-					}else{
+					} else {
 						epo.setOutcomeDetailExtension("");
 						epo.setOutcomeDetailNote("");
 					}
-				}else{
+				} else {
 					epo.setOutcome("");
 					epo.setOutcomeDetailExtension("");
 					epo.setOutcomeDetailNote("");
 				}
-				epo.setOutcomeDetails(""); //TODO: ???
-				epo.setOutcomeResult(""); //TODO: ???
-				epo.setState(""); //TODO: ???
-				epo.setTargetID(""); //TODO: ???
+				epo.setOutcomeDetails(""); // TODO: ???
+				epo.setOutcomeResult(""); // TODO: ???
+				epo.setState(""); // TODO: ???
+				epo.setTargetID(""); // TODO: ???
 				epo.setType(peh.getEvent().getEventType());
 				return epo;
-			}catch(PremisMetadataException e){
+			} catch (PremisMetadataException e) {
 				throw new ModelServiceException(
 						"Error while trying to convert a binary into a event preservation object",
 						ModelServiceException.INTERNAL_SERVER_ERROR);
-			}catch(IOException e){
+			} catch (IOException e) {
 				throw new ModelServiceException(
 						"Error while trying to convert a binary into a event preservation object",
 						ModelServiceException.INTERNAL_SERVER_ERROR);
 			}
 		} else {
-			throw new ModelServiceException(
-					"Error while trying to convert a binary into a event preservation object",
+			throw new ModelServiceException("Error while trying to convert a binary into a event preservation object",
 					ModelServiceException.INTERNAL_SERVER_ERROR);
 		}
 	}
