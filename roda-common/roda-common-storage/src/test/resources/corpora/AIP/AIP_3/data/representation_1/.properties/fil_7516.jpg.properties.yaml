@@ -1,0 +1,7 @@
+entryPoint: false
+format.mimetype: image/jpeg
+format.version: 1.01
+#format.registries:
+#	- 
+#	  key: PRONOM
+#	  value:  fmt/101
