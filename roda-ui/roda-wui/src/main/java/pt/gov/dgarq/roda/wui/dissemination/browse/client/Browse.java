@@ -247,21 +247,39 @@ public class Browse extends Composite {
 			fondsPanelTitle.setVisible(true);
 			fondsPanel.setParentId(sdo.getId());
 
-			sidebarGroupDownloads.clear();
+			downloadList.clear();
 			sidebarGroupDownloads.setVisible(true);
 
 			for (Representation rep : representations) {
-				sidebarGroupDownloads.add(createRepresentationDownloadPanel(rep));
+				downloadList.add(createRepresentationDownloadPanel(rep));
 			}
 
 			for (DescriptiveMetadataBundle desc : descMetadata) {
-				sidebarGroupDownloads.add(createDescriptiveMetadataDownloadPanel(desc));
+				downloadList.add(createDescriptiveMetadataDownloadPanel(desc));
 			}
 
 			// TODO add all downloads
 		} else {
 			viewAction();
 		}
+	}
+	
+	protected void viewAction() {
+		HTMLPanel topIcon = new HTMLPanel(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-circle-o'></i>"));
+		topIcon.addStyleName("browseItemIcon-all");
+		itemIcon.setWidget(topIcon);
+
+		breadcrumb.updatePath(Arrays.asList("dissemination", "browse"));
+		itemTitle.setText("All collections");
+		itemDates.setText("");
+		itemDescriptiveMetadata.setText("");
+		itemDescriptiveMetadata.setVisible(false);
+		viewingTop = true;
+		fondsPanelTitle.setVisible(false);
+		fondsPanel.setParentId(null);
+
+		sidebarGroupDownloads.setVisible(false);
+		downloadList.clear();
 	}
 
 	private Widget createRepresentationDownloadPanel(Representation rep) {
@@ -331,24 +349,6 @@ public class Browse extends Composite {
 		label.addStyleName("browseDownloadLabel");
 		subLabel.addStyleName("browseDownloadSublabel");
 		return downloadPanel;
-	}
-
-	protected void viewAction() {
-		HTMLPanel topIcon = new HTMLPanel(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-circle-o'></i>"));
-		topIcon.addStyleName("browseItemIcon-all");
-		itemIcon.setWidget(topIcon);
-
-		breadcrumb.updatePath(Arrays.asList("dissemination", "browse"));
-		itemTitle.setText("All collections");
-		itemDates.setText("");
-		itemDescriptiveMetadata.setText("");
-		itemDescriptiveMetadata.setVisible(false);
-		viewingTop = true;
-		fondsPanelTitle.setVisible(false);
-		fondsPanel.setParentId(null);
-
-		sidebarGroupDownloads.setVisible(false);
-		sidebarGroupDownloads.clear();
 	}
 
 	private String getDatesText(SimpleDescriptionObject sdo) {
