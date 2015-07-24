@@ -6,12 +6,14 @@ package pt.gov.dgarq.roda.wui.dissemination.browse.client;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
+import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -19,6 +21,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -32,6 +35,8 @@ import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 
 import config.i18n.client.CommonConstants;
 import pt.gov.dgarq.roda.core.data.DescriptionObject;
+import pt.gov.dgarq.roda.core.data.v2.Representation;
+import pt.gov.dgarq.roda.core.data.v2.RepresentationState;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.wui.common.client.AuthenticatedUser;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
@@ -225,6 +230,8 @@ public class Browse extends Composite {
 	protected void viewAction(BrowseItemBundle itemBundle) {
 		if (itemBundle != null) {
 			SimpleDescriptionObject sdo = itemBundle.getSdo();
+			List<DescriptiveMetadataBundle> descMetadata = itemBundle.getDescriptiveMetadata();
+			List<Representation> representations = itemBundle.getRepresentations();
 
 			breadcrumb.updatePath(Arrays.asList("dissemination", "browse", sdo.getId()));
 			HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getElementLevelIconHTMLPanel(sdo.getLevel());
@@ -232,7 +239,7 @@ public class Browse extends Composite {
 			itemIcon.setWidget(itemIconHtmlPanel);
 			itemTitle.setText(sdo.getTitle());
 			itemDates.setText(getDatesText(sdo));
-			SafeHtml html = getDescriptiveMetadataPanelHTML(itemBundle.getDescriptiveMetadata());
+			SafeHtml html = getDescriptiveMetadataPanelHTML(descMetadata);
 			itemDescriptiveMetadata.setHTML(html);
 			itemDescriptiveMetadata.setVisible(true);
 
@@ -240,11 +247,90 @@ public class Browse extends Composite {
 			fondsPanelTitle.setVisible(true);
 			fondsPanel.setParentId(sdo.getId());
 
+			sidebarGroupDownloads.clear();
 			sidebarGroupDownloads.setVisible(true);
+
+			for (Representation rep : representations) {
+				sidebarGroupDownloads.add(createRepresentationDownloadPanel(rep));
+			}
+
+			for (DescriptiveMetadataBundle desc : descMetadata) {
+				sidebarGroupDownloads.add(createDescriptiveMetadataDownloadPanel(desc));
+			}
+
 			// TODO add all downloads
 		} else {
 			viewAction();
 		}
+	}
+
+	private Widget createRepresentationDownloadPanel(Representation rep) {
+		FlowPanel downloadPanel = new FlowPanel();
+		HTML icon = new HTML(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-download'></i>"));
+
+		String labelText;
+		Set<RepresentationState> statuses = rep.getStatuses();
+		if (statuses.containsAll(Arrays.asList(RepresentationState.ORIGINAL, RepresentationState.NORMALIZED))) {
+			labelText = "Original and normalized document";
+		} else if (statuses.contains(RepresentationState.ORIGINAL)) {
+			labelText = "Original document";
+		} else if (statuses.contains(RepresentationState.NORMALIZED)) {
+			labelText = "Normalized document";
+		} else {
+			labelText = "Document";
+		}
+
+		FlowPanel labelsPanel = new FlowPanel();
+
+		Anchor label = new Anchor(labelText);
+		Label subLabel = new Label(rep.getFileIds().size() + " files");
+
+		labelsPanel.add(label);
+		labelsPanel.add(subLabel);
+		downloadPanel.add(icon);
+		downloadPanel.add(labelsPanel);
+
+		downloadPanel.addStyleName("browseDownload");
+		icon.addStyleName("browseDownloadIcon");
+		labelsPanel.addStyleName("browseDownloadLabels");
+		label.addStyleName("browseDownloadLabel");
+		subLabel.addStyleName("browseDownloadSublabel");
+		return downloadPanel;
+	}
+
+	/**
+	 * TODO move this to Utils
+	 * 
+	 * @param size
+	 * @return
+	 */
+	public static String readableFileSize(long size) {
+		if (size <= 0)
+			return "0";
+		final String[] units = new String[] { "B", "KB", "MB", "GB", "TB" };
+		int digitGroups = (int) (Math.log10(size) / Math.log10(1024));
+		return NumberFormat.getFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
+	}
+
+	private Widget createDescriptiveMetadataDownloadPanel(DescriptiveMetadataBundle desc) {
+		FlowPanel downloadPanel = new FlowPanel();
+		HTML icon = new HTML(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-download'></i>"));
+		FlowPanel labelsPanel = new FlowPanel();
+
+		Anchor label = new Anchor("Descriptive metadata");
+		Label subLabel = new Label(desc.getId() + ", " + readableFileSize(desc.getSizeInBytes()));
+
+		labelsPanel.add(label);
+		labelsPanel.add(subLabel);
+		downloadPanel.add(icon);
+		downloadPanel.add(labelsPanel);
+
+		downloadPanel.addStyleName("browseDownload");
+		icon.addStyleName("browseDownloadIcon");
+		labelsPanel.addStyleName("browseDownloadLabels");
+		label.addStyleName("browseDownloadLabel");
+		subLabel.addStyleName("browseDownloadSublabel");
+		return downloadPanel;
 	}
 
 	protected void viewAction() {
@@ -262,6 +348,7 @@ public class Browse extends Composite {
 		fondsPanel.setParentId(null);
 
 		sidebarGroupDownloads.setVisible(false);
+		sidebarGroupDownloads.clear();
 	}
 
 	private String getDatesText(SimpleDescriptionObject sdo) {

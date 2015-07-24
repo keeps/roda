@@ -154,7 +154,8 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 		}
 	}
 
-	public BrowseItemBundle getItemBundle(String aipId, String lang) throws RODAException {
+	public BrowseItemBundle getItemBundle(String aipId, String localeString) throws RODAException {
+		final Locale locale = ServerTools.parseLocale(localeString);
 		BrowseItemBundle itemBundle = new BrowseItemBundle();
 		try {
 			// set sdo
@@ -166,8 +167,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 					.listDescriptiveMetadataBinaries(aipId);
 			for (DescriptiveMetadata descriptiveMetadata : listDescriptiveMetadataBinaries) {
 				Binary binary = storage.getBinary(descriptiveMetadata.getStoragePath());
-				// FIXME add proper locale
-				String html = HTMLUtils.descriptiveMetadataToHtml(binary, model, null);
+				String html = HTMLUtils.descriptiveMetadataToHtml(binary, model, locale);
 
 				descriptiveMetadataList
 						.add(new DescriptiveMetadataBundle(descriptiveMetadata.getId(), html, binary.getSizeInBytes()));

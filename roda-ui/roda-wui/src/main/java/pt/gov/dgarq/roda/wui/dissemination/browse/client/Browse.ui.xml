@@ -63,9 +63,7 @@
 			<g:SimplePanel styleName="browseItemIcon"
 				addStyleNames="{style.item_icon}" ui:field="itemIcon" />
 			<g:Label styleName="h2" addStyleNames="browseItemText"
-				ui:field="itemTitle">
-				<ui:msg description="Item title">All collections</ui:msg>
-			</g:Label>
+				ui:field="itemTitle" />
 			<g:Label addStyleNames="browseItemDates" ui:field="itemDates" />
 			<g:HTML ui:field="itemDescriptiveMetadata" addStyleNames="browseItemDescriptiveMetadata" />
 			<g:Label styleName="{style.searchlist-title}" addStyleNames="h2"

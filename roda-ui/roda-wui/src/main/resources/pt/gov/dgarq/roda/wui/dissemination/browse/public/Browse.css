@@ -61,27 +61,57 @@
 }
 
 .browseItemDescriptiveMetadata {
-	padding: 20px;
+	padding: 20px 0;
+}
+
+.metadataTitle {
+	color: #a7a9ac;
+	border-bottom: 1px solid rgba(167, 169, 172, 0.5);
+	padding-bottom: 5px;
+	margin-bottom: 10px;
 }
 
 .descriptiveMetadata {
-	
+	line-height: 1.4em;
 }
 
 .descriptiveMetadata-field {
 	display: flex;
 	justify-content: space-between;
-	margin-bottom: 5px;
+	margin-bottom: 10px;
 }
 
 .descriptiveMetadata-field-key {
-	width: 150px;
+	width: 180px;
 	font-weight: 600;
 	padding-right: 20px;
 }
 
 .descriptiveMetadata-field-value {
 	width: 100%;
+}
+
+.browseDownload {
+	margin-bottom: 10px;
+}
+
+.browseDownloadIcon {
+	float: left;
+	font-size: 20px;
+	margin-right: 7px;
+}
+
+.browseDownloadLabels {
+	
+}
+
+.browseDownloadLabel {
+	color: #089de3;
+}
+
+.browseDownloadSublabel {
+	font-size: 80%;
+	  margin-left: 25px;
 }
 
 /** Browser**/

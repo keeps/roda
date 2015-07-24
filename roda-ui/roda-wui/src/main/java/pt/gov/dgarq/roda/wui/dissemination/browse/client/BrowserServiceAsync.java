@@ -27,7 +27,7 @@ public interface BrowserServiceAsync {
 	void findDescriptiveMetadata(Filter filter, Sorter sorter, Sublist sublist,
 			AsyncCallback<IndexResult<SimpleDescriptionObject>> callback);
 	
-	void getItemBundle(String aipId, String lang, AsyncCallback<BrowseItemBundle> callback);
+	void getItemBundle(String aipId, String localeString, AsyncCallback<BrowseItemBundle> callback);
 
 	/**
 	 * Get simple description object

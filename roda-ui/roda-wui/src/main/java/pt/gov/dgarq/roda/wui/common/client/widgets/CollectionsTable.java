@@ -5,6 +5,8 @@ import java.util.Date;
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.Column;
@@ -68,7 +70,7 @@ public class CollectionsTable extends AsyncTableCell<SimpleDescriptionObject> {
 		};
 
 		Column<SimpleDescriptionObject, Date> dateInitialColumn = new Column<SimpleDescriptionObject, Date>(
-				new DateCell()) {
+				new DateCell(DateTimeFormat.getFormat(PredefinedFormat.DATE_MEDIUM))) {
 			@Override
 			public Date getValue(SimpleDescriptionObject sdo) {
 				return sdo != null ? sdo.getDateInitial() : null;
@@ -76,7 +78,7 @@ public class CollectionsTable extends AsyncTableCell<SimpleDescriptionObject> {
 		};
 
 		Column<SimpleDescriptionObject, Date> dateFinalColumn = new Column<SimpleDescriptionObject, Date>(
-				new DateCell()) {
+				new DateCell(DateTimeFormat.getFormat(PredefinedFormat.DATE_MEDIUM))) {
 			@Override
 			public Date getValue(SimpleDescriptionObject sdo) {
 				return sdo != null ? sdo.getDateFinal() : null;

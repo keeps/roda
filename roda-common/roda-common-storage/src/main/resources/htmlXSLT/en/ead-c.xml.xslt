@@ -93,7 +93,7 @@
 			<div class="descriptiveMetadata-field">
 				<div class="descriptiveMetadata-field-key">Acquisition number</div>
 				<div class="descriptiveMetadata-field-value">
-					<xsl:value-of select="eadc:acqinfo/eadc:p/text()" />
+					<xsl:value-of select="eadc:acqinfo/eadc:num/text()" />
 				</div>
 			</div>
 		</xsl:if>
@@ -237,35 +237,37 @@
 		<xsl:if test="eadc:bioghist/eadc:chronlist">
 			<div class="descriptiveMetadata-field">
 				<div class="descriptiveMetadata-field-key">Administrative and biographical history</div>
-				<xsl:for-each select="eadc:bioghist/eadc:chronlist/eadc:chronitem">
-					<xsl:variable name="line">
-						<xsl:if test="eadc:date/@normal">
-							<xsl:choose>
-								<xsl:when test="contains(eadc:date/@normal, '/')">
-									<span class="initialDate">
-										<xsl:value-of select="substring-before(eadc:date/@normal, '/')" />
-									</span>
-									<span class="finalDate">
-										<xsl:value-of select="substring-after(eadc:date/@normal, '/')" />
-									</span>
-								</xsl:when>
-								<xsl:otherwise>
-									<span class="initialDate">
-										<xsl:value-of select="eadc:date/@normal" />
-									</span>
-								</xsl:otherwise>
-							</xsl:choose>
-						</xsl:if>
-						<xsl:if test="eadc:event/text()">
-							<span class="event">
-								<xsl:value-of select="eadc:event/text()" />
-							</span>
-						</xsl:if>
-					</xsl:variable>
-					<div class="descriptiveMetadata-field-value">
-						<xsl:copy-of select="$line" />
-					</div>
-				</xsl:for-each>
+				<div class="descriptiveMetadata-field-value">
+					<xsl:for-each select="eadc:bioghist/eadc:chronlist/eadc:chronitem">
+						<xsl:variable name="line">
+							<xsl:if test="eadc:date/@normal">
+								<xsl:choose>
+									<xsl:when test="contains(eadc:date/@normal, '/')">
+										<span class="initialDate">
+											<xsl:value-of select="substring-before(eadc:date/@normal, '/')" />
+										</span>
+										<span class="finalDate">
+											<xsl:value-of select="substring-after(eadc:date/@normal, '/')" />
+										</span>
+									</xsl:when>
+									<xsl:otherwise>
+										<span class="initialDate">
+											<xsl:value-of select="eadc:date/@normal" />
+										</span>
+									</xsl:otherwise>
+								</xsl:choose>
+							</xsl:if>
+							<xsl:if test="eadc:event/text()">
+								<span class="event">
+									<xsl:value-of select="eadc:event/text()" />
+								</span>
+							</xsl:if>
+						</xsl:variable>
+						<div class="descriptiveMetadata-field-value-level1">
+							<xsl:copy-of select="$line" />
+						</div>
+					</xsl:for-each>
+				</div>
 			</div>
 		</xsl:if>
 
@@ -303,19 +305,27 @@
 		</xsl:if>
 		<xsl:if test="eadc:arrangement/eadc:table">
 			<div class="descriptiveMetadata-field">
-				<div class="descriptiveMetadata-field-key">Organização e ordenação</div>
+				<div class="descriptiveMetadata-field-key">Organization and ordering</div>
 				<xsl:variable name="output">
-					<xsl:for-each select="eadc:arrangement/eadc:table/eadc:tgroup/eadc:thead/eadc:row/eadc:entry">
-						<span class="header"><xsl:value-of select="text()" /></span>
+					<xsl:for-each
+						select="eadc:arrangement/eadc:table/eadc:tgroup/eadc:thead/eadc:row/eadc:entry">
+						<span class="header">
+							<xsl:value-of select="text()" />
+						</span>
 					</xsl:for-each>
-					<xsl:for-each select="eadc:arrangement/eadc:table/eadc:tgroup/eadc:tbody/eadc:row/eadc:entry">
-						<span class="value"><xsl:value-of select="text()" /></span>
+					<xsl:for-each
+						select="eadc:arrangement/eadc:table/eadc:tgroup/eadc:tbody/eadc:row/eadc:entry">
+						<span class="value">
+							<xsl:value-of select="text()" />
+						</span>
 					</xsl:for-each>
 				</xsl:variable>
-				<div class="descriptiveMetadata-field-value"><xsl:copy-of select="$output" /></div>
+				<div class="descriptiveMetadata-field-value">
+					<xsl:copy-of select="$output" />
+				</div>
 			</div>
 		</xsl:if>
-		
+
 		<xsl:if test="eadc:appraisal/eadc:p/text()">
 			<div class="descriptiveMetadata-field">
 				<div class="descriptiveMetadata-field-key">Appraisal</div>

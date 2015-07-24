@@ -68,7 +68,7 @@ public interface BrowserService extends RemoteService {
 	 */
 	public IndexResult<SimpleDescriptionObject> findDescriptiveMetadata(Filter filter, Sorter sorter, Sublist sublist) throws RODAException;
 
-	public BrowseItemBundle getItemBundle(String aipId, String lang) throws RODAException;
+	public BrowseItemBundle getItemBundle(String aipId, String localeString) throws RODAException;
 
 	/**
 	 * Get simple description object
