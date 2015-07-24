@@ -12,7 +12,6 @@ import java.util.Locale;
 import java.util.Map;
 
 import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -54,13 +53,8 @@ public class HTMLUtils {
 			stylesheetOpt.put("prefix", RodaConstants.INDEX_OTHER_DESCRIPTIVE_DATA_PREFIX);
 			RodaUtils.applyStylesheet(xsltReader, descMetadataReader, stylesheetOpt, transformerResult);
 			descMetadataReader.close();
-			CharArrayReader transformationResult = new CharArrayReader(transformerResult.toCharArray());
-			XMLStreamReader parser = XMLInputFactory.newInstance().createXMLStreamReader(transformationResult);
-			Transformer transformer = TransformerFactory.newInstance().newTransformer();
-			StringWriter stringWriter = new StringWriter();
-			transformer.transform(new StAXSource(parser), new StreamResult(stringWriter));
-			return stringWriter.toString();
-		} catch (XMLStreamException | TransformerException | IOException e) {
+			return transformerResult.toString();
+		} catch (TransformerException | IOException e) {
 			throw new ModelServiceException(e.getMessage(), ModelServiceException.INTERNAL_SERVER_ERROR);
 		}
 	}

@@ -101,7 +101,7 @@ public class Menu2 extends Composite {
 		dissemination_browse = disseminationMenu.addItem(constants.title_dissemination_browse(),
 				createCommand(Browse.RESOLVER.getHistoryPath()));
 		dissemination_searchBasic = disseminationMenu.addItem(constants.title_dissemination_search_basic(),
-				createCommand(BasicSearch.getInstance().getHistoryPath()));
+				createCommand(BasicSearch.RESOLVER.getHistoryPath()));
 		dissemination_searchAdvanced = disseminationMenu.addItem(constants.title_dissemination_search_advanced(),
 				createCommand(AdvancedSearch.getInstance().getHistoryPath()));
 		disseminationMenu.addItem(constants.title_dissemination_help(),
@@ -228,7 +228,7 @@ public class Menu2 extends Composite {
 
 		});
 
-		BasicSearch.getInstance().isCurrentUserPermitted(new AsyncCallback<Boolean>() {
+		BasicSearch.RESOLVER.isCurrentUserPermitted(new AsyncCallback<Boolean>() {
 
 			public void onFailure(Throwable caught) {
 				logger.error("Error getting basic search role", caught);

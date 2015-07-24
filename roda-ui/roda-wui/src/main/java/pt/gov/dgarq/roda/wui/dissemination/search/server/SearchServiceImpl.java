@@ -4,18 +4,27 @@ import java.rmi.RemoteException;
 import java.util.Arrays;
 
 import org.apache.log4j.Logger;
+import org.roda.index.IndexActionException;
+import org.roda.index.IndexService;
 
+import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+
+import pt.gov.dgarq.roda.common.ModelFactory;
 import pt.gov.dgarq.roda.common.RodaClientFactory;
 import pt.gov.dgarq.roda.core.RODAClient;
 import pt.gov.dgarq.roda.core.common.LoginException;
 import pt.gov.dgarq.roda.core.common.RODAClientException;
 import pt.gov.dgarq.roda.core.common.RODAException;
+import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.SearchParameter;
 import pt.gov.dgarq.roda.core.data.SearchResult;
+import pt.gov.dgarq.roda.core.data.adapter.filter.BasicSearchFilterParameter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
+import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
+import pt.gov.dgarq.roda.core.data.v2.IndexResult;
+import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.core.stubs.Search;
 import pt.gov.dgarq.roda.wui.dissemination.search.client.SearchService;
-
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 /**
  * Search service implementation
@@ -43,18 +52,27 @@ public class SearchServiceImpl extends RemoteServiceServlet implements
 		return search;
 	}
 
-	public SearchResult basicSearch(String query, int startIndex, int limit,
+	public IndexResult<SimpleDescriptionObject> basicSearch(String query, int startIndex, int limit,
 			int snippetsMax, int fieldMaxLength) throws RODAException {
-		SearchResult result;
-
+		
+		IndexResult<SimpleDescriptionObject> result = null;
+		IndexService indexService = ModelFactory.getIndexService();
+		
 		try {
-			result = getSearch().basicSearch(query, startIndex, limit,
-					snippetsMax, fieldMaxLength);
-		} catch (RemoteException e) {
-			logger.error("Remote Exception", e);
-			throw RODAClient.parseRemoteException(e);
+			Sublist sublist = new Sublist(startIndex, limit);
+			result = indexService.findDescriptiveMetadata(getBasicSearchFilter(null,query), null, sublist);
+		} catch (IndexActionException e) {
+			logger.error("error",e);
 		}
 		return result;
+	}
+	
+	protected Filter getBasicSearchFilter(Filter filter, String query) {
+		if (filter == null) {
+			filter = new Filter();
+		}
+		filter.add(new BasicSearchFilterParameter(RodaConstants.SDO__ALL, query));
+		return filter;
 	}
 
 	public SearchResult advancedSearch(SearchParameter[] searchParameters,

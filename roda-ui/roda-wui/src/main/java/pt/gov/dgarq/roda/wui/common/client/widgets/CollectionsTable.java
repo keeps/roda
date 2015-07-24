@@ -4,7 +4,6 @@ import java.util.Date;
 
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.SafeHtmlCell;
-import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -19,9 +18,7 @@ import com.google.gwt.view.client.ProvidesKey;
 import com.google.gwt.view.client.Range;
 
 import pt.gov.dgarq.roda.core.common.RodaConstants;
-import pt.gov.dgarq.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
@@ -42,16 +39,12 @@ public class CollectionsTable extends AsyncTableCell<SimpleDescriptionObject> {
 	private final Column<SimpleDescriptionObject, Date> dateInitialColumn;
 	private final Column<SimpleDescriptionObject, Date> dateFinalColumn;
 
-	private String parentId;
+	private Filter filter;
 
-	public CollectionsTable(Unit unit) {
-		this();
-	}
-
-	public CollectionsTable() {
+	public CollectionsTable(Filter filter) {
 		super();
 
-		parentId = null;
+		this.setFilter(filter);
 
 		levelColumn = new Column<SimpleDescriptionObject, SafeHtml>(new SafeHtmlCell()) {
 			@Override
@@ -112,19 +105,6 @@ public class CollectionsTable extends AsyncTableCell<SimpleDescriptionObject> {
 
 	}
 
-	public String getParentId() {
-		return parentId;
-	}
-
-	public void setParentId(String parentId) {
-		logger.debug("Setting parent id: " + parentId);
-		if (this.parentId == null ? parentId != null : !this.parentId.equals(parentId)) {
-			this.parentId = parentId;
-			getSelectionModel().clear();
-			getDisplay().setVisibleRangeAndClearData(new Range(0, getInitialPageSize()), true);
-		}
-	}
-
 	@Override
 	protected void getData(int start, int length, ColumnSortList columnSortList,
 			AsyncCallback<IndexResult<SimpleDescriptionObject>> callback) {
@@ -154,15 +134,15 @@ public class CollectionsTable extends AsyncTableCell<SimpleDescriptionObject> {
 		sorter.add(new SortParameter(RodaConstants.SDO_TITLE, false));
 		Sublist sublist = new Sublist(start, length);
 
-		if (parentId == null) {
-			Filter filter = new Filter();
-			filter.add(new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID));
-			BrowserService.Util.getInstance().findDescriptiveMetadata(filter, sorter, sublist, callback);
-		} else {
-			Filter filter = new Filter();
-			filter.add(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, parentId));
-			BrowserService.Util.getInstance().findDescriptiveMetadata(filter, sorter, sublist, callback);
-		}
+		// Filter filter = new Filter();
+		// if (parentId == null) {
+		// filter.add(new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID));
+		// } else {
+		// filter.add(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID,
+		// parentId));
+		// }
+
+		BrowserService.Util.getInstance().findDescriptiveMetadata(getFilter(), sorter, sublist, callback);
 
 	}
 
@@ -180,6 +160,20 @@ public class CollectionsTable extends AsyncTableCell<SimpleDescriptionObject> {
 	@Override
 	protected int getInitialPageSize() {
 		return PAGE_SIZE;
+	}
+
+	private void refresh() {
+		getSelectionModel().clear();
+		getDisplay().setVisibleRangeAndClearData(new Range(0, getInitialPageSize()), true);
+	}
+
+	public Filter getFilter() {
+		return filter;
+	}
+
+	public void setFilter(Filter filter) {
+		this.filter = filter;
+		refresh();
 	}
 
 }

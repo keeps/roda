@@ -41,6 +41,7 @@ import org.w3c.util.DateParser;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import config.i18n.server.BrowserServiceMessages;
+import pt.gov.dgarq.roda.common.ModelFactory;
 import pt.gov.dgarq.roda.common.RodaClientFactory;
 import pt.gov.dgarq.roda.core.RODAClient;
 import pt.gov.dgarq.roda.core.common.RODAException;
@@ -84,8 +85,6 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 	static final String FONDLIST_PAGESIZE = "10";
 	static final private Logger logger = Logger.getLogger(BrowserServiceImpl.class);
 
-	private Path basePath;
-	private Path indexPath;
 	private StorageService storage;
 	private ModelService model;
 	private IndexService index;
@@ -95,63 +94,9 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 	 *
 	 */
 	public BrowserServiceImpl() {
-		try {
-			basePath = Files.createTempDirectory("modelTests");
-
-			indexPath = Files.createTempDirectory("indexTests");
-			storage = new FileStorageService(basePath);
-			model = new ModelService(storage);
-
-			// Configure Solr
-			URL solrConfigURL = getClass().getResource("/index/solr.xml");
-			Path solrConfigPath = Paths.get(solrConfigURL.toURI());
-			Files.copy(solrConfigPath, indexPath.resolve("solr.xml"));
-			Path aipSchema = indexPath.resolve("aip");
-			Files.createDirectories(aipSchema);
-			Files.createFile(aipSchema.resolve("core.properties"));
-
-			Path solrHome = Paths.get(getClass().getResource("/index/").toURI());
-			System.setProperty("solr.data.dir", indexPath.toString());
-			System.setProperty("solr.data.dir.aip", indexPath.resolve("aip").toString());
-			System.setProperty("solr.data.dir.sdo", indexPath.resolve("sdo").toString());
-			System.setProperty("solr.data.dir.representations", indexPath.resolve("representation").toString());
-
-			// start embedded solr
-			final EmbeddedSolrServer solr = new EmbeddedSolrServer(solrHome, "test");
-
-			index = new IndexService(solr, model);
-
-			// Copy test corpora
-
-			String RODA_HOME;
-			if (System.getProperty("roda.home") != null) {
-				RODA_HOME = System.getProperty("roda.home");
-			} else if (System.getenv("RODA_HOME") != null) {
-				RODA_HOME = System.getenv("RODA_HOME");
-			} else {
-				RODA_HOME = null;
-			}
-
-			Path corporaPath = Paths.get(RODA_HOME, "data2");
-			StorageService corporaService = new FileStorageService(corporaPath);
-			Iterable<Resource> aips = corporaService.listResourcesUnderContainer(DefaultStoragePath.parse("AIP"));
-			for (Resource aip : aips) {
-				logger.info("Loading AIP: " + aip.getStoragePath());
-				model.createAIP(aip.getStoragePath().getName(), corporaService, aip.getStoragePath());
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (StorageActionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ModelServiceException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		storage = ModelFactory.getStorageService();
+		model = ModelFactory.getModelService();
+		index = ModelFactory.getIndexService();
 	}
 
 	public BrowseItemBundle getItemBundle(String aipId, String localeString) throws RODAException {

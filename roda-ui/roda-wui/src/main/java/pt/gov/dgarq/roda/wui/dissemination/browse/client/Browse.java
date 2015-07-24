@@ -36,6 +36,9 @@ import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 import config.i18n.client.CommonConstants;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.DescriptionObject;
+import pt.gov.dgarq.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationState;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
@@ -100,6 +103,8 @@ public class Browse extends Composite {
 
 	private static CommonConstants constants = (CommonConstants) GWT.create(CommonConstants.class);
 
+	private static Filter COLLECTIONS_FILTER = new Filter(new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID));
+
 	// private static BrowseConstants constants = (BrowseConstants)
 	// GWT.create(BrowseConstants.class);
 
@@ -131,7 +136,7 @@ public class Browse extends Composite {
 	@UiField
 	Label fondsPanelTitle;
 
-	@UiField
+	@UiField(provided = true)
 	CollectionsTable fondsPanel;
 
 	@UiField
@@ -148,6 +153,7 @@ public class Browse extends Composite {
 	private Browse() {
 		viewingTop = true;
 		breadcrumb = new BreadcrumbPanel();
+		fondsPanel = new CollectionsTable(COLLECTIONS_FILTER);
 		initWidget(uiBinder.createAndBindUi(this));
 
 		fondsPanel.getSelectionModel().addSelectionChangeHandler(new Handler() {
@@ -248,7 +254,9 @@ public class Browse extends Composite {
 
 			viewingTop = false;
 			fondsPanelTitle.setVisible(true);
-			fondsPanel.setParentId(sdo.getId());
+			Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID,
+					sdo.getId()));
+			fondsPanel.setFilter(filter);
 
 			downloadList.clear();
 			sidebarGroupDownloads.setVisible(true);
@@ -279,7 +287,7 @@ public class Browse extends Composite {
 		itemDescriptiveMetadata.setVisible(false);
 		viewingTop = true;
 		fondsPanelTitle.setVisible(false);
-		fondsPanel.setParentId(null);
+		fondsPanel.setFilter(COLLECTIONS_FILTER);
 
 		sidebarGroupDownloads.setVisible(false);
 		downloadList.clear();

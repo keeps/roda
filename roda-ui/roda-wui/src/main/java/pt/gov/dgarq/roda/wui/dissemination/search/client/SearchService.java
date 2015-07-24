@@ -9,6 +9,8 @@ import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.common.SearchException;
 import pt.gov.dgarq.roda.core.data.SearchParameter;
 import pt.gov.dgarq.roda.core.data.SearchResult;
+import pt.gov.dgarq.roda.core.data.v2.IndexResult;
+import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
@@ -57,7 +59,7 @@ public interface SearchService extends RemoteService {
 	 * @return
 	 * @throws RODAException 
 	 */
-	public SearchResult basicSearch(String query, int hitPageStart,
+	public IndexResult<SimpleDescriptionObject> basicSearch(String query, int hitPageStart,
 			int hitPageSize, int snippetsMax, int fieldMaxLength)
 			throws RODAException;
 

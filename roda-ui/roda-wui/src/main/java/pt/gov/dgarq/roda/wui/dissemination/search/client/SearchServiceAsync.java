@@ -5,6 +5,8 @@ package pt.gov.dgarq.roda.wui.dissemination.search.client;
 
 import pt.gov.dgarq.roda.core.data.SearchParameter;
 import pt.gov.dgarq.roda.core.data.SearchResult;
+import pt.gov.dgarq.roda.core.data.v2.IndexResult;
+import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -26,7 +28,7 @@ public interface SearchServiceAsync {
 	 * @throws RODAException 
 	 */
 	public void basicSearch(String query, int hitPageStart,
-			int hitPageSize, int snippetsMax, int fieldMaxLength, AsyncCallback<SearchResult> callback);
+			int hitPageSize, int snippetsMax, int fieldMaxLength, AsyncCallback<IndexResult<SimpleDescriptionObject>> callback);
 
 	/**
 	 * Make an advanced search

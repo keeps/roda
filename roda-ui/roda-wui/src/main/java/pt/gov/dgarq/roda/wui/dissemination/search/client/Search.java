@@ -62,7 +62,7 @@ public class Search implements HistoryResolver {
 	
 	public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
 		UserLogin.getInstance().checkRoles(
-				new HistoryResolver[] { BasicSearch.getInstance(),
+				new HistoryResolver[] { BasicSearch.RESOLVER,
 						AdvancedSearch.getInstance() }, false, callback);
 	}
 
@@ -71,7 +71,7 @@ public class Search implements HistoryResolver {
 			init();
 			callback.onSuccess(layout);
 		} else {
-			if (historyTokens[0].equals(BasicSearch.getInstance()
+			if (historyTokens[0].equals(BasicSearch.RESOLVER
 					.getHistoryToken())) {
 				BasicSearch.getInstance().resolve(Tools.tail(historyTokens),
 						callback);
