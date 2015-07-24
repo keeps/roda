@@ -4,14 +4,9 @@
 package pt.gov.dgarq.roda.wui.main.client;
 
 import java.util.List;
-import java.util.MissingResourceException;
 import java.util.Stack;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -29,7 +24,7 @@ import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
  * @author Luis Faria
  * 
  */
-public class BreadcrumbPanel extends HorizontalPanel implements HasValueChangeHandlers<List<String>> {
+public class BreadcrumbPanel extends HorizontalPanel {
 
 	// private GWTLogger logger = new GWTLogger(GWT.getTypeName(this));
 
@@ -37,7 +32,7 @@ public class BreadcrumbPanel extends HorizontalPanel implements HasValueChangeHa
 
 	private ClientLogger logger = new ClientLogger(getClass().getName());
 
-	private List<String> currentpath;
+	private List<BreadcrumbItem> currentpath;
 
 	private final Stack<Breadcrumb> breadcrumbs;
 
@@ -78,49 +73,16 @@ public class BreadcrumbPanel extends HorizontalPanel implements HasValueChangeHa
 	 *            the new history path
 	 * 
 	 */
-	public void updatePath(List<String> path) {
+	public void updatePath(List<BreadcrumbItem> path) {
 
-		// Check for common path
-		int commonPathIndex = 0;
-		boolean isCommonPath = true;
-		int minLenght = Math.min(path.size(), breadcrumbs.size());
-		while (isCommonPath && commonPathIndex < minLenght) {
-			String pathToken = path.get(commonPathIndex);
-			Breadcrumb breadcrumb = (Breadcrumb) breadcrumbs.elementAt(commonPathIndex);
-			if (pathToken.equals(breadcrumb.getLastToken())) {
-				commonPathIndex++;
-			} else {
-				isCommonPath = false;
-			}
+		breadcrumbs.clear();
+		for (BreadcrumbItem item : path) {
+			Breadcrumb breadcrumb = new Breadcrumb(item);
+			breadcrumbs.add(breadcrumb);
 		}
-
-		// Pop path differences
-		if (commonPathIndex == 0) {
-			this.clear();
-			breadcrumbs.clear();
-		} else {
-			int difference = breadcrumbs.size() - commonPathIndex;
-			while (difference > 0) {
-				this.breadcrumbs.pop();
-				difference--;
-			}
-		}
-
-		// Push the remain
-		for (int i = commonPathIndex; i < path.size(); i++) {
-			String[] relativePath = new String[i + 1];
-			for (int j = 0; j <= i; j++) {
-				relativePath[j] = path.get(j);
-			}
-			push(relativePath);
-		}
-
 		updateLayout();
 
 		currentpath = path;
-		logger.debug("Firing breadcrumb value change event");
-		// send event
-		ValueChangeEvent.fire(this, path);
 
 	}
 
@@ -142,14 +104,9 @@ public class BreadcrumbPanel extends HorizontalPanel implements HasValueChangeHa
 
 	}
 
-	protected void push(String[] path) {
-		Breadcrumb breadcrumb = new Breadcrumb(path);
-		breadcrumbs.add(breadcrumb);
-	}
-
 	protected class Breadcrumb extends Hyperlink {
 
-		private String[] path;
+		private BreadcrumbItem item;
 
 		private boolean enabled;
 
@@ -161,11 +118,11 @@ public class BreadcrumbPanel extends HorizontalPanel implements HasValueChangeHa
 		 * @param path
 		 *            the history path that this breadcrumb points to
 		 */
-		public Breadcrumb(String[] path) {
+		public Breadcrumb(BreadcrumbItem item) {
 			super();
-			super.setText(getText(path));
-			super.setTargetHistoryToken(getTargetHistoryToken(path));
-			this.path = path;
+			super.setText(item.getLabel());
+			super.setTargetHistoryToken(item.getPath());
+			this.item = item;
 			enabled = true;
 			last = true;
 
@@ -206,8 +163,8 @@ public class BreadcrumbPanel extends HorizontalPanel implements HasValueChangeHa
 		 * 
 		 * @return the breadcrumb history path
 		 */
-		public String[] getPath() {
-			return path;
+		public BreadcrumbItem getItem() {
+			return item;
 		}
 
 		/**
@@ -215,9 +172,9 @@ public class BreadcrumbPanel extends HorizontalPanel implements HasValueChangeHa
 		 * 
 		 * @return the last history token
 		 */
-		public String getLastToken() {
-			return path[path.length - 1];
-		}
+		// public String getLastToken() {
+		// return path[path.length - 1];
+		// }
 
 		/**
 		 * Set if this breadcrumb is the last one. The last breadcrumb will be
@@ -241,24 +198,9 @@ public class BreadcrumbPanel extends HorizontalPanel implements HasValueChangeHa
 			}
 		}
 
-		protected String getText(String[] path) {
-			String tokenI18N;
-			try {
-				tokenI18N = mainConstants.getString("title_" + Tools.join(path, "_")).toLowerCase();
-			} catch (MissingResourceException e) {
-				tokenI18N = path[path.length - 1].toLowerCase();
-			}
-			return tokenI18N;
-		}
-
 		protected String getTargetHistoryToken(String[] path) {
 			return Tools.join(path, ".");
 		}
 
-	}
-
-	@Override
-	public HandlerRegistration addValueChangeHandler(ValueChangeHandler<List<String>> handler) {
-		return addHandler(handler, ValueChangeEvent.getType());
 	}
 }

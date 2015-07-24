@@ -7,6 +7,8 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.ColumnSortEvent.AsyncHandler;
+import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.PageSizePager;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.SimplePager.TextLocation;
@@ -26,6 +28,7 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
 
 	private final AsyncDataProvider<T> dataProvider;
 	private final SingleSelectionModel<T> selectionModel;
+	private final AsyncHandler columnSortHandler;
 
 	private final SimplePager resultsPager;
 	private final PageSizePager pageSizePager;
@@ -43,11 +46,13 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
 				// Get the new range.
 				final Range range = display.getVisibleRange();
 
-				// Query the data asynchronously.
+				// Get sorting
+				ColumnSortList columnSortList = AsyncTableCell.this.display.getColumnSortList();
 
+				// Query the data asynchronously.
 				final int start = range.getStart();
 				int length = range.getLength();
-				getData(start, length, new AsyncCallback<IndexResult<T>>() {
+				getData(start, length, columnSortList, new AsyncCallback<IndexResult<T>>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -85,7 +90,9 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
 
 		selectionModel = new SingleSelectionModel<>(getKeyProvider());
 		display.setSelectionModel(selectionModel);
-		// TODO add support for sorter
+
+		columnSortHandler = new AsyncHandler(display);
+		display.addColumnSortHandler(columnSortHandler);
 
 		addStyleName("my-asyncdatagrid");
 		resultsPager.addStyleName("my-asyncdatagrid-pager-results");
@@ -96,7 +103,8 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
 
 	protected abstract ProvidesKey<T> getKeyProvider();
 
-	protected abstract void getData(int start, int length, AsyncCallback<IndexResult<T>> callback);
+	protected abstract void getData(int start, int length, ColumnSortList columnSortList,
+			AsyncCallback<IndexResult<T>> callback);
 
 	protected CellTable<T> getDisplay() {
 		return display;

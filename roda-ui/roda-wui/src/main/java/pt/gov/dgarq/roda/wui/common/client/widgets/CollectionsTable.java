@@ -10,6 +10,8 @@ import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.cellview.client.ColumnSortList;
+import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
@@ -35,6 +37,11 @@ public class CollectionsTable extends AsyncTableCell<SimpleDescriptionObject> {
 
 	private final ClientLogger logger = new ClientLogger(getClass().getName());
 
+	private final Column<SimpleDescriptionObject, SafeHtml> levelColumn;
+	private final TextColumn<SimpleDescriptionObject> titleColumn;
+	private final Column<SimpleDescriptionObject, Date> dateInitialColumn;
+	private final Column<SimpleDescriptionObject, Date> dateFinalColumn;
+
 	private String parentId;
 
 	public CollectionsTable(Unit unit) {
@@ -46,8 +53,7 @@ public class CollectionsTable extends AsyncTableCell<SimpleDescriptionObject> {
 
 		parentId = null;
 
-		Column<SimpleDescriptionObject, SafeHtml> levelColumn = new Column<SimpleDescriptionObject, SafeHtml>(
-				new SafeHtmlCell()) {
+		levelColumn = new Column<SimpleDescriptionObject, SafeHtml>(new SafeHtmlCell()) {
 			@Override
 			public SafeHtml getValue(SimpleDescriptionObject sdo) {
 				SafeHtml ret;
@@ -61,7 +67,7 @@ public class CollectionsTable extends AsyncTableCell<SimpleDescriptionObject> {
 			}
 		};
 
-		TextColumn<SimpleDescriptionObject> titleColumn = new TextColumn<SimpleDescriptionObject>() {
+		titleColumn = new TextColumn<SimpleDescriptionObject>() {
 
 			@Override
 			public String getValue(SimpleDescriptionObject sdo) {
@@ -69,7 +75,7 @@ public class CollectionsTable extends AsyncTableCell<SimpleDescriptionObject> {
 			}
 		};
 
-		Column<SimpleDescriptionObject, Date> dateInitialColumn = new Column<SimpleDescriptionObject, Date>(
+		dateInitialColumn = new Column<SimpleDescriptionObject, Date>(
 				new DateCell(DateTimeFormat.getFormat(PredefinedFormat.DATE_MEDIUM))) {
 			@Override
 			public Date getValue(SimpleDescriptionObject sdo) {
@@ -77,7 +83,7 @@ public class CollectionsTable extends AsyncTableCell<SimpleDescriptionObject> {
 			}
 		};
 
-		Column<SimpleDescriptionObject, Date> dateFinalColumn = new Column<SimpleDescriptionObject, Date>(
+		dateFinalColumn = new Column<SimpleDescriptionObject, Date>(
 				new DateCell(DateTimeFormat.getFormat(PredefinedFormat.DATE_MEDIUM))) {
 			@Override
 			public Date getValue(SimpleDescriptionObject sdo) {
@@ -85,13 +91,18 @@ public class CollectionsTable extends AsyncTableCell<SimpleDescriptionObject> {
 			}
 		};
 
+		levelColumn.setSortable(true);
+		titleColumn.setSortable(true);
+		dateFinalColumn.setSortable(true);
+		dateInitialColumn.setSortable(true);
+
 		// TODO externalize strings into constants
 		getDisplay().addColumn(levelColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-tag'></i>"));
 		getDisplay().addColumn(titleColumn, "Title");
 		getDisplay().addColumn(dateInitialColumn, "Date initial");
 		getDisplay().addColumn(dateFinalColumn, "Date final");
 		getDisplay().setColumnWidth(levelColumn, "35px");
-		getDisplay().setAutoHeaderRefreshDisabled(true);
+		// getDisplay().setAutoHeaderRefreshDisabled(true);
 		Label emptyInfo = new Label("No items to display.");
 		getDisplay().setEmptyTableWidget(emptyInfo);
 		getDisplay().setColumnWidth(titleColumn, "100%");
@@ -115,8 +126,31 @@ public class CollectionsTable extends AsyncTableCell<SimpleDescriptionObject> {
 	}
 
 	@Override
-	protected void getData(int start, int length, AsyncCallback<IndexResult<SimpleDescriptionObject>> callback) {
+	protected void getData(int start, int length, ColumnSortList columnSortList,
+			AsyncCallback<IndexResult<SimpleDescriptionObject>> callback) {
 		Sorter sorter = new Sorter();
+		for (int i = 0; i < columnSortList.size(); i++) {
+			ColumnSortInfo columnSortInfo = columnSortList.get(i);
+			String sortParameterKey;
+			if (columnSortInfo.getColumn().equals(levelColumn)) {
+				sortParameterKey = RodaConstants.SDO_LEVEL;
+			} else if (columnSortInfo.getColumn().equals(titleColumn)) {
+				sortParameterKey = RodaConstants.SDO_TITLE;
+			} else if (columnSortInfo.getColumn().equals(dateInitialColumn)) {
+				sortParameterKey = RodaConstants.SDO_DATE_INITIAL;
+			} else if (columnSortInfo.getColumn().equals(dateFinalColumn)) {
+				sortParameterKey = RodaConstants.SDO_DATE_FINAL;
+			} else {
+				sortParameterKey = null;
+			}
+
+			if (sortParameterKey != null) {
+				sorter.add(new SortParameter(sortParameterKey, !columnSortInfo.isAscending()));
+			} else {
+				logger.warn("Selecting a sorter that is not mapped");
+			}
+		}
+
 		sorter.add(new SortParameter(RodaConstants.SDO_TITLE, false));
 		Sublist sublist = new Sublist(start, length);
 

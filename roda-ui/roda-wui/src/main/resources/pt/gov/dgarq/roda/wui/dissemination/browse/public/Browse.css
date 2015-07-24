@@ -76,19 +76,15 @@
 }
 
 .descriptiveMetadata-field {
-	display: flex;
-	justify-content: space-between;
 	margin-bottom: 10px;
 }
 
 .descriptiveMetadata-field-key {
-	width: 180px;
 	font-weight: 600;
-	padding-right: 20px;
 }
 
 .descriptiveMetadata-field-value {
-	width: 100%;
+
 }
 
 .browseDownload {

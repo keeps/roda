@@ -177,13 +177,15 @@ public final class RodaConstants {
 	/*
 	 * OTHER FIELDS
 	 */
-	public static final String PERMISSIONS_PRODUCERS_USERS = "producersUsers";
-	public static final String PERMISSIONS_PRODUCERS_GROUPS = "producersGroups";
-	public static final String PERMISSIONS_MODIFY_USERS = "modifyUsers";
-	public static final String PERMISSIONS_MODIFY_GROUPS = "modifyGroups";
-	public static final String PERMISSIONS_REMOVE_USERS = "removeUsers";
-	public static final String PERMISSIONS_REMOVE_GROUPS = "removeGroups";
-	public static final String PERMISSIONS_GRANT_USERS = "grantUsers";
-	public static final String PERMISSIONS_GRANT_GROUPS = "grantGroups";
+	public static final String OBJECT_PERMISSIONS_PRODUCERS_USERS = "producersUsers";
+	public static final String OBJECT_PERMISSIONS_PRODUCERS_GROUPS = "producersGroups";
+	public static final String OBJECT_PERMISSIONS_MODIFY_USERS = "modifyUsers";
+	public static final String OBJECT_PERMISSIONS_MODIFY_GROUPS = "modifyGroups";
+	public static final String OBJECT_PERMISSIONS_REMOVE_USERS = "removeUsers";
+	public static final String OBJECT_PERMISSIONS_REMOVE_GROUPS = "removeGroups";
+	public static final String OBJECT_PERMISSIONS_GRANT_USERS = "grantUsers";
+	public static final String OBJECT_PERMISSIONS_GRANT_GROUPS = "grantGroups";
+	
+	public static final String REPOSITORY_PERMISSIONS_METADATA_EDITOR = "administration.metadata_editor";
 
 }

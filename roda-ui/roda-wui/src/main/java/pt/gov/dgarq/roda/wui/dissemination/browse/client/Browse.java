@@ -34,6 +34,7 @@ import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 
 import config.i18n.client.CommonConstants;
+import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.DescriptionObject;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationState;
@@ -46,6 +47,7 @@ import pt.gov.dgarq.roda.wui.common.client.tools.DescriptionLevelUtils;
 import pt.gov.dgarq.roda.wui.common.client.widgets.CollectionsTable;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.ViewPanel.ViewListener;
 import pt.gov.dgarq.roda.wui.dissemination.client.Dissemination;
+import pt.gov.dgarq.roda.wui.main.client.BreadcrumbItem;
 import pt.gov.dgarq.roda.wui.main.client.BreadcrumbPanel;
 
 /**
@@ -170,7 +172,7 @@ public class Browse extends Composite {
 	}
 
 	protected void onPermissionsUpdate(AuthenticatedUser user) {
-		if (user.hasRole("administration.metadata_editor")) {
+		if (user.hasRole(RodaConstants.REPOSITORY_PERMISSIONS_METADATA_EDITOR)) {
 			createItem.setVisible(true);
 			// refresh.setVisible(true);
 		} else {
@@ -233,7 +235,8 @@ public class Browse extends Composite {
 			List<DescriptiveMetadataBundle> descMetadata = itemBundle.getDescriptiveMetadata();
 			List<Representation> representations = itemBundle.getRepresentations();
 
-			breadcrumb.updatePath(Arrays.asList("dissemination", "browse", sdo.getId()));
+			breadcrumb.updatePath(Arrays.asList(new BreadcrumbItem("all", RESOLVER.getHistoryPath()),
+					new BreadcrumbItem(sdo.getTitle(), RESOLVER.getHistoryPath() + "." + sdo.getId())));
 			HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getElementLevelIconHTMLPanel(sdo.getLevel());
 			itemIconHtmlPanel.addStyleName("browseItemIcon-other");
 			itemIcon.setWidget(itemIconHtmlPanel);
@@ -263,13 +266,13 @@ public class Browse extends Composite {
 			viewAction();
 		}
 	}
-	
+
 	protected void viewAction() {
 		HTMLPanel topIcon = new HTMLPanel(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-circle-o'></i>"));
 		topIcon.addStyleName("browseItemIcon-all");
 		itemIcon.setWidget(topIcon);
 
-		breadcrumb.updatePath(Arrays.asList("dissemination", "browse"));
+		breadcrumb.updatePath(Arrays.asList(new BreadcrumbItem("all", RESOLVER.getHistoryPath())));
 		itemTitle.setText("All collections");
 		itemDates.setText("");
 		itemDescriptiveMetadata.setText("");
