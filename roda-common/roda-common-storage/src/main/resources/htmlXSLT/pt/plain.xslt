@@ -1,15 +1,16 @@
 <xsl:stylesheet version="2.0"
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 	<xsl:output method="xml" indent="yes" omit-xml-declaration="yes" />
-	<xsl:param name="prefix" />
+	<xsl:param name="title" />
 	<xsl:strip-space elements="*" />
 
 	<xsl:template match="text()" />
 
 	<xsl:template match="/">
-		<span type="descriptiveMetadata">
+		<div type="descriptiveMetadata">
+			<div class='title'><xsl:value-of select="$title"/></div>
 			<xsl:apply-templates />
-		</span>
+		</div>
 	</xsl:template>
 
 
@@ -22,23 +23,17 @@
 			</xsl:variable>
 			<xsl:variable name="attributeName">
 				<xsl:for-each select="ancestor-or-self::*">
-					<xsl:value-of select="concat(local-name(),'.')" />
+					<xsl:value-of select="concat(local-name(),' ')" />
 				</xsl:for-each>
 				<xsl:value-of select="local-name()" />
 			</xsl:variable>
 			<xsl:if
 				test="not(normalize-space($attributeValue)='') and not(normalize-space($attributeName)='')">
 
-				<span>
-					<xsl:attribute name="field">
-                        <xsl:value-of select="$prefix" />.<xsl:value-of
-						select="$attributeName" />_txt</xsl:attribute>
-					<span type="label">  <xsl:value-of select="$prefix" />.<xsl:value-of
-						select="$attributeName" />_txt</span>
-					<span type="value">
-						<xsl:value-of select="$attributeValue" />
-					</span>
-				</span>
+				<div class="descriptiveMetadata-field">
+					<div class="descriptiveMetadata-field-key"><xsl:value-of select="$attributeName" />_txt</div>
+					<div class="descriptiveMetadata-field-value"><xsl:value-of select="$attributeValue" /></div>
+				</div>
 				<xsl:text>&#xA;</xsl:text>
 			</xsl:if>
 
@@ -61,26 +56,17 @@
 						<xsl:value-of select="local-name()" />
 					</xsl:if>
 					<xsl:if test="*">
-						<xsl:value-of select="concat(local-name(),'.')" />
+						<xsl:value-of select="concat(local-name(),' ')" />
 					</xsl:if>
 				</xsl:for-each>
 			</xsl:if>
 		</xsl:variable>
 		<xsl:if
 			test="not(normalize-space($path)='') and not(normalize-space($value)='')">
-			<span>
-				<xsl:attribute name="field">
-                    <xsl:value-of select="$prefix" />.<xsl:value-of
-					select="$path" />_txt</xsl:attribute>
-				<span type="label">
-					<xsl:attribute name="name">
-                    <xsl:value-of select="$prefix" />.<xsl:value-of
-						select="$path" />_txt</xsl:attribute>
-				</span>
-				<span type="value">
-					<xsl:value-of select="$value" />
-				</span>
-			</span>
+			<div class="descriptiveMetadata-field">
+				<div class="descriptiveMetadata-field-key"><xsl:value-of select="$path" />_txt</div>
+				<div class="descriptiveMetadata-field-value"><xsl:value-of select="$value" /></div>
+			</div>
 			<xsl:text>&#xA;</xsl:text>
 		</xsl:if>
 		<xsl:apply-templates select="node()" />

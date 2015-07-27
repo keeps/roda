@@ -25,7 +25,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<sonar.sources>src/main/java</sonar.sources>
 
-		<fcrepo.version>4.2.1-SNAPSHOT</fcrepo.version>
+		<fcrepo.version>4.3.0</fcrepo.version>
 		<jersey.version>2.13</jersey.version>
 		<spring.version>4.1.1.RELEASE</spring.version>
 		<grizzly.version>2.3.16</grizzly.version>
@@ -65,7 +65,7 @@
 		<dependency>
 			<groupId>org.fcrepo</groupId>
 			<artifactId>fcrepo-client-impl</artifactId>
-			<version>${fcrepo.version}</version>
+			<version>${fcrepo.version}-hsilva-datastream-fixes</version>
 		</dependency>
 		<dependency>
 			<groupId>org.yaml</groupId>

@@ -50,7 +50,7 @@ public class HTMLUtils {
 			Reader xsltReader = new InputStreamReader(transformerStream);
 			CharArrayWriter transformerResult = new CharArrayWriter();
 			Map<String, String> stylesheetOpt = new HashMap<String, String>();
-			stylesheetOpt.put("prefix", RodaConstants.INDEX_OTHER_DESCRIPTIVE_DATA_PREFIX);
+			stylesheetOpt.put("title", binary.getStoragePath().getName());
 			RodaUtils.applyStylesheet(xsltReader, descMetadataReader, stylesheetOpt, transformerResult);
 			descMetadataReader.close();
 			return transformerResult.toString();

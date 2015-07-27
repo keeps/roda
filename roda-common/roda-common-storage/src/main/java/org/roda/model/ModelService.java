@@ -1233,6 +1233,7 @@ public class ModelService extends ModelObservable {
 		}
 	}
 
+	// FIXME all the initialization, if needed, should be done only once
 	//LOG
 	public void addLogEntry(LogEntry logEntry) throws StorageActionException{
 		String entryJSON = ModelUtils.getJsonLogEntry(logEntry);
@@ -1240,7 +1241,7 @@ public class ModelService extends ModelObservable {
 		Binary dailyLog;
 		
 		try{
-			storage.createContainer(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG), new HashMap<>());
+			storage.createContainer(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG), new HashMap<String,Set<String>>());
 		}catch(StorageActionException sae){
 			//container already exists...
 		}
@@ -1248,7 +1249,7 @@ public class ModelService extends ModelObservable {
 		try{
 			dailyLog = storage.getBinary(ModelUtils.getLogPath(new Date()));
 		}catch(StorageActionException sae){
-			dailyLog = storage.createBinary(ModelUtils.getLogPath(new Date()), new HashMap<>(), new JsonContentPayload(""), false);
+			dailyLog = storage.createBinary(ModelUtils.getLogPath(new Date()), new HashMap<String,Set<String>>(), new JsonContentPayload(""), false);
 		}
 		try{
 			java.io.File f = new java.io.File(dailyLog.getContent().getURI().getPath());

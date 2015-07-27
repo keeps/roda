@@ -7,6 +7,7 @@
 
 	<xsl:template match="/">
 		<div class="descriptiveMetadata">
+		<div class='title'>Dublin Core</div>
 		<xsl:apply-templates />
 		</div>
 	</xsl:template>
