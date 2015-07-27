@@ -68,7 +68,7 @@ public interface BrowserServiceAsync {
 	 *         and ends in the node itself
 	 * @throws RODAException
 	 */
-	public void getAncestors(String pid, AsyncCallback<String[]> callback);
+	public void getAncestors(SimpleDescriptionObject sdo, AsyncCallback<List<SimpleDescriptionObject>> callback);
 
 	/**
 	 * Get the index of a collection

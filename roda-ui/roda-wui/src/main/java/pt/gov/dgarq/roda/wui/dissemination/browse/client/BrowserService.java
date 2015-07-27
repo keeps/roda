@@ -109,7 +109,7 @@ public interface BrowserService extends RemoteService {
 	 *         and ends in the node itself
 	 * @throws RODAException
 	 */
-	public String[] getAncestors(String pid) throws RODAException;
+	public List<SimpleDescriptionObject> getAncestors(SimpleDescriptionObject sdo) throws RODAException;
 
 	/**
 	 * Get the index of a collection

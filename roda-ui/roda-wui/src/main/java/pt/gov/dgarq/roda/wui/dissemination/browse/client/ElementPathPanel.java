@@ -49,20 +49,20 @@ public class ElementPathPanel extends HorizontalPanel {
 		DeferredCommand.addCommand(new Command() {
 
 			public void execute() {
-
-				BrowserService.Util.getInstance().getAncestors(ElementPathPanel.this.pid,
-						new AsyncCallback<String[]>() {
-
-					public void onFailure(Throwable caught) {
-						logger.error("Error getting ancestors of" + ElementPathPanel.this.pid, caught);
-					}
-
-					public void onSuccess(String[] ancestors) {
-						createPanel(ancestors);
-
-					}
-
-				});
+				// FIXME
+//				BrowserService.Util.getInstance().getAncestors(ElementPathPanel.this.pid,
+//						new AsyncCallback<String[]>() {
+//
+//					public void onFailure(Throwable caught) {
+//						logger.error("Error getting ancestors of" + ElementPathPanel.this.pid, caught);
+//					}
+//
+//					public void onSuccess(String[] ancestors) {
+//						createPanel(ancestors);
+//
+//					}
+//
+//				});
 			}
 
 		});

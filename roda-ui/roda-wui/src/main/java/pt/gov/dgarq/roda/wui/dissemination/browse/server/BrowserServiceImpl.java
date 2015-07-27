@@ -1,11 +1,5 @@
 package pt.gov.dgarq.roda.wui.dissemination.browse.server;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.rmi.NoSuchObjectException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -23,7 +17,6 @@ import java.util.Vector;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.roda.common.HTMLUtils;
 import org.roda.index.IndexActionException;
 import org.roda.index.IndexService;
@@ -31,11 +24,8 @@ import org.roda.model.DescriptiveMetadata;
 import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
 import org.roda.storage.Binary;
-import org.roda.storage.DefaultStoragePath;
-import org.roda.storage.Resource;
 import org.roda.storage.StorageActionException;
 import org.roda.storage.StorageService;
-import org.roda.storage.fs.FileStorageService;
 import org.w3c.util.DateParser;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -104,7 +94,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 		BrowseItemBundle itemBundle = new BrowseItemBundle();
 		try {
 			// set sdo
-			itemBundle.setSdo(getSimpleDescriptionObject(aipId));
+			SimpleDescriptionObject sdo = getSimpleDescriptionObject(aipId);
+			itemBundle.setSdo(sdo);
+
+			// set sdo ancestors
+			itemBundle.setSdoAncestors(getAncestors(sdo));
 
 			// set descriptive metadata
 			List<DescriptiveMetadataBundle> descriptiveMetadataList = new ArrayList<DescriptiveMetadataBundle>();
@@ -183,18 +177,19 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 		return ret;
 	}
 
+	// FIXME see if this method is really needed
 	public String getParent(String pid) throws RODAException {
 		try {
-			return index.getParent(pid);
+			return index.getParentId(pid);
 		} catch (IndexActionException e) {
 			logger.error("Error getting parent", e);
 			throw new GenericException("Error getting parent: " + e.getMessage());
 		}
 	}
 
-	public String[] getAncestors(String pid) throws RODAException {
+	public List<SimpleDescriptionObject> getAncestors(SimpleDescriptionObject sdo) throws RODAException {
 		try {
-			return index.getAncestors(pid).toArray(new String[] {});
+			return index.getAncestors(sdo);
 		} catch (IndexActionException e) {
 			logger.error("Error getting parent", e);
 			throw new GenericException("Error getting parent: " + e.getMessage());

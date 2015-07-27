@@ -60,6 +60,7 @@ import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.OneOfManyFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
+import pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
@@ -218,6 +219,21 @@ public class SolrUtils {
 		}
 
 		LOGGER.debug("Converting filter {} to query {}", filter, ret);
+		return ret.toString();
+	}
+
+	public static String parseSorter(Sorter sorter) throws IndexActionException {
+		StringBuilder ret = new StringBuilder();
+
+		if (sorter != null) {
+			for (SortParameter sortParameter : sorter.getParameters()) {
+				if (ret.length() != 0) {
+					ret.append(", ");
+				}
+				ret.append(sortParameter.getName()).append(" ").append(sortParameter.isDescending() ? "desc" : "asc");
+			}
+		}
+
 		return ret.toString();
 	}
 

@@ -69,21 +69,46 @@ public class IndexService {
 		return SolrUtils.count(index, Representation.class, filter);
 	}
 
-	public String getParent(String id) throws IndexActionException {
+	public String getParentId(String id) throws IndexActionException {
 		return retrieveAIP(id).getParentId();
 	}
 
-	public List<String> getAncestors(String id) throws IndexActionException {
-		List<String> ancestors = new ArrayList<>();
-		String parentId = null;
-		String currId = id;
-		do {
-			parentId = getParent(currId);
-			if (parentId != null) {
-				ancestors.add(parentId);
-				currId = parentId;
+	public SimpleDescriptionObject getParent(String id) throws IndexActionException {
+		return SolrUtils.retrieve(index, SimpleDescriptionObject.class, getParentId(id));
+	}
+
+	public SimpleDescriptionObject getParent(SimpleDescriptionObject sdo) throws IndexActionException {
+		return SolrUtils.retrieve(index, SimpleDescriptionObject.class, sdo.getParentID());
+	}
+
+	public List<SimpleDescriptionObject> getAncestors(SimpleDescriptionObject sdo) throws IndexActionException {
+		List<SimpleDescriptionObject> ancestors = new ArrayList<SimpleDescriptionObject>();
+		SimpleDescriptionObject parent = null, actual = sdo;
+
+		while (actual != null && actual.getParentID() != null) {
+			parent = getParent(actual);
+			if (parent != null) {
+				ancestors.add(parent);
+				actual = parent;
 			}
-		} while (parentId != null);
+		}
+
+		return ancestors;
+	}
+
+	public List<SimpleDescriptionObject> getAncestors(String id) throws IndexActionException {
+		List<SimpleDescriptionObject> ancestors = new ArrayList<SimpleDescriptionObject>();
+		SimpleDescriptionObject parent = null;
+		String currId = id;
+
+		do {
+			parent = getParent(currId);
+			if (parent != null) {
+				ancestors.add(parent);
+				currId = parent.getId();
+			}
+		} while (parent != null && parent.getParentID() != null);
+
 		return ancestors;
 	}
 
@@ -146,7 +171,7 @@ public class IndexService {
 			Sorter sorter, Sublist sublist) throws IndexActionException {
 		return SolrUtils.find(index, SimpleRepresentationFileMetadata.class, filter, sorter, sublist);
 	}
-	
+
 	/*
 	 * public IndexResult<SimpleRepresentationPreservationObject>
 	 * findRepresentationPreservationObject(ContentAdapter contentAdapter){

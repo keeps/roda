@@ -11,6 +11,7 @@ public class BrowseItemBundle implements Serializable {
 	private static final long serialVersionUID = 7901536603462531124L;
 
 	private SimpleDescriptionObject sdo;
+	private List<SimpleDescriptionObject> sdoAncestors;
 	private List<DescriptiveMetadataBundle> descriptiveMetadata;
 	private List<Representation> representations;
 
@@ -19,10 +20,11 @@ public class BrowseItemBundle implements Serializable {
 
 	}
 
-	public BrowseItemBundle(SimpleDescriptionObject sdo, List<DescriptiveMetadataBundle> descriptiveMetadata,
-			List<Representation> representations) {
+	public BrowseItemBundle(SimpleDescriptionObject sdo, List<SimpleDescriptionObject> sdoAncestors,
+			List<DescriptiveMetadataBundle> descriptiveMetadata, List<Representation> representations) {
 		super();
 		this.sdo = sdo;
+		this.setSdoAncestors(sdoAncestors);
 		this.descriptiveMetadata = descriptiveMetadata;
 		this.representations = representations;
 	}
@@ -49,6 +51,14 @@ public class BrowseItemBundle implements Serializable {
 
 	public void setRepresentations(List<Representation> representations) {
 		this.representations = representations;
+	}
+
+	public List<SimpleDescriptionObject> getSdoAncestors() {
+		return sdoAncestors;
+	}
+
+	public void setSdoAncestors(List<SimpleDescriptionObject> sdoAncestors) {
+		this.sdoAncestors = sdoAncestors;
 	}
 
 }

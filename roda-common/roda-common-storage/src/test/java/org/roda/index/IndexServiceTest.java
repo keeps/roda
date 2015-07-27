@@ -170,36 +170,47 @@ public class IndexServiceTest {
 
 		assertThat(sro_IDs, Matchers.contains(aip.getRepresentationIds().toArray()));
 
-		
-		
-		
-		SimpleEventPreservationMetadata sepm = index.retrieveSimpleEventPreservationMetadata(aipId, CorporaConstants.REPRESENTATION_1_ID,CorporaConstants.EVENT_RODA_398_PREMIS_XML);
+		SimpleEventPreservationMetadata sepm = index.retrieveSimpleEventPreservationMetadata(aipId,
+				CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.EVENT_RODA_398_PREMIS_XML);
 		assertEquals(sepm.getType(), CorporaConstants.INGESTION);
 		Filter filterType = new Filter();
 		filterType.add(new SimpleFilterParameter(RodaConstants.SEPM_TYPE, CorporaConstants.INGESTION));
-		assertEquals(""+index.countSimpleEventPreservationMetadata(filterType),""+1L);
-		assertEquals(index.findSimpleEventPreservationMetadata(filterType, null, new Sublist(0, 10)).getTotalCount(),1L);
-		
-		
-		SimpleRepresentationFileMetadata srfm = index.retrieveSimpleRepresentationFileMetadata(aipId, CorporaConstants.REPRESENTATION_1_ID,CorporaConstants.F0_PREMIS_XML);
+		assertEquals("" + index.countSimpleEventPreservationMetadata(filterType), "" + 1L);
+		assertEquals(index.findSimpleEventPreservationMetadata(filterType, null, new Sublist(0, 10)).getTotalCount(),
+				1L);
+
+		SimpleRepresentationFileMetadata srfm = index.retrieveSimpleRepresentationFileMetadata(aipId,
+				CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.F0_PREMIS_XML);
 		assertEquals(srfm.getAipId(), aipId);
 		Filter filterAIPID = new Filter();
 		filterAIPID.add(new SimpleFilterParameter(RodaConstants.SRFM_AIP_ID, aipId));
-		assertEquals(""+index.countSimpleRepresentationFileMetadata(filterAIPID),""+4L);	//rep1.F0, rep1.F1, rep2.f0, rep2.f1
+		assertEquals("" + index.countSimpleRepresentationFileMetadata(filterAIPID), "" + 4L); // rep1.F0,
+																								// rep1.F1,
+																								// rep2.f0,
+																								// rep2.f1
 		/*
-		filterMimetype.add(new SimpleFilterParameter(RodaConstants.SRFM_MIMETYPE, CorporaConstants.TEXT_XML));
-		assertEquals(index.findSimpleEventPreservationMetadata(filterMimetype, null, new Sublist(0, 10)).getTotalCount(),1L);
-		*/
-		
+		 * filterMimetype.add(new
+		 * SimpleFilterParameter(RodaConstants.SRFM_MIMETYPE,
+		 * CorporaConstants.TEXT_XML));
+		 * assertEquals(index.findSimpleEventPreservationMetadata(
+		 * filterMimetype, null, new Sublist(0, 10)).getTotalCount(),1L);
+		 */
+
 		/*
-		SimpleRepresentationPreservationMetadata srpm = index.retrieveSimpleRepresentationPreservationMetadata(aipId, CorporaConstants.REPRESENTATION_1_ID,CorporaConstants.REPRESENTATION_PREMIS_XML);
-		assertEquals(srpm.getAipId(), aipId);
-		assertEquals(srpm.getFileId(),CorporaConstants.REPRESENTATION_PREMIS_XML);
-		Filter filterFileId = new Filter();
-		filterFileId.add(new SimpleFilterParameter(RodaConstants.SRPM_FILE_ID, CorporaConstants.REPRESENTATION_PREMIS_XML));
-		assertEquals(""+index.countSimpleRepresentationPreservationMetadata(filterFileId),""+1L);
-		assertEquals(index.findSimpleEventPreservationMetadata(filterFileId, null, new Sublist(0, 10)).getTotalCount(),1L);
-		*/
+		 * SimpleRepresentationPreservationMetadata srpm =
+		 * index.retrieveSimpleRepresentationPreservationMetadata(aipId,
+		 * CorporaConstants.REPRESENTATION_1_ID,CorporaConstants.
+		 * REPRESENTATION_PREMIS_XML); assertEquals(srpm.getAipId(), aipId);
+		 * assertEquals(srpm.getFileId(),CorporaConstants.
+		 * REPRESENTATION_PREMIS_XML); Filter filterFileId = new Filter();
+		 * filterFileId.add(new
+		 * SimpleFilterParameter(RodaConstants.SRPM_FILE_ID,
+		 * CorporaConstants.REPRESENTATION_PREMIS_XML));
+		 * assertEquals(""+index.countSimpleRepresentationPreservationMetadata(
+		 * filterFileId),""+1L);
+		 * assertEquals(index.findSimpleEventPreservationMetadata(filterFileId,
+		 * null, new Sublist(0, 10)).getTotalCount(),1L);
+		 */
 		model.deleteAIP(aipId);
 		try {
 			index.retrieveAIP(aipId);
@@ -288,8 +299,14 @@ public class IndexServiceTest {
 		model.createAIP(CorporaConstants.OTHER_AIP_ID, corporaService,
 				DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.OTHER_AIP_ID));
 
-		List<String> ancestors = index.getAncestors(CorporaConstants.OTHER_AIP_ID);
-		assertEquals(Arrays.asList(CorporaConstants.SOURCE_AIP_ID), ancestors);
+		List<SimpleDescriptionObject> ancestors = index.getAncestors(CorporaConstants.OTHER_AIP_ID);
+		assertThat(ancestors, Matchers.hasItem(Matchers.<SimpleDescriptionObject> hasProperty("id",
+				Matchers.equalTo(CorporaConstants.SOURCE_AIP_ID))));
+
+		SimpleDescriptionObject sdo = index.retrieveDescriptiveMetadata(CorporaConstants.OTHER_AIP_ID);
+		ancestors = index.getAncestors(sdo);
+		assertThat(ancestors, Matchers.hasItem(Matchers.<SimpleDescriptionObject> hasProperty("id",
+				Matchers.equalTo(CorporaConstants.SOURCE_AIP_ID))));
 	}
 
 	@Test

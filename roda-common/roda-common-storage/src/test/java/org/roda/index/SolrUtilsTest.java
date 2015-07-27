@@ -32,7 +32,8 @@ import pt.gov.dgarq.roda.core.data.adapter.filter.ProducerFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.RangeFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.RegexFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
-
+import pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter;
+import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 
 public class SolrUtilsTest {
 
@@ -195,10 +196,48 @@ public class SolrUtilsTest {
 			filter.add(new EmptyKeyFilterParameter(RodaConstants.SDO__ALL));
 			stringFilter = SolrUtils.parseFilter(filter);
 			assertNotNull(stringFilter);
-			assertEquals(String.format("(%s: \"\")", RodaConstants.SDO__ALL), stringFilter);
+			assertEquals(String.format("(*:* NOT %s:*)", RodaConstants.SDO__ALL), stringFilter);
 		} catch (IndexActionException e) {
 			fail("An exception was not expected!");
 		}
+
+	}
+
+	@Test
+	public void testParseSorter() throws IndexActionException {
+		Sorter sorter = null;
+		String sorterString = null;
+		String field1 = "field1", field2 = "field2";
+		String descendingString = "desc";
+		String ascendingString = "asc";
+		boolean descending = true;
+		boolean ascending = false;
+
+		// 1) null sorter
+		sorterString = SolrUtils.parseSorter(sorter);
+		assertNotNull(sorterString);
+		assertEquals("", sorterString);
+
+		// 2) empty sorter
+		sorter = new Sorter();
+		sorterString = SolrUtils.parseSorter(sorter);
+		assertNotNull(sorterString);
+		assertEquals("", sorterString);
+
+		// 3) sorter with 1 sorter parameter
+		sorter = new Sorter();
+		sorter.add(new SortParameter(field1, descending));
+		sorterString = SolrUtils.parseSorter(sorter);
+		assertNotNull(sorterString);
+		assertEquals(String.format("%s %s", field1, descendingString), sorterString);
+
+		// 4) sorter with 2 sorter parameters
+		sorter = new Sorter();
+		sorter.add(new SortParameter(field1, descending));
+		sorter.add(new SortParameter(field2, ascending));
+		sorterString = SolrUtils.parseSorter(sorter);
+		assertNotNull(sorterString);
+		assertEquals(String.format("%s %s, %s %s", field1, descendingString, field2, ascendingString), sorterString);
 
 	}
 
