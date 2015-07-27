@@ -71,14 +71,9 @@ public class ModelService extends ModelObservable {
 
 	private final StorageService storage;
 
-	public ModelService(StorageService storage) throws ModelServiceException {
+	public ModelService(StorageService storage){
 		super();
 		this.storage = storage;
-		try{
-			storage.createContainer(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG), null);
-		}catch(StorageActionException sae){
-			throw new ModelServiceException("Error initializing the ModelService",0);
-		}
 	}
 
 	public StorageService getStorage() {
@@ -1243,6 +1238,13 @@ public class ModelService extends ModelObservable {
 		String entryJSON = ModelUtils.getJsonLogEntry(logEntry);
 		
 		Binary dailyLog;
+		
+		try{
+			storage.createContainer(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG), new HashMap<>());
+		}catch(StorageActionException sae){
+			//container already exists...
+		}
+		
 		try{
 			dailyLog = storage.getBinary(ModelUtils.getLogPath(new Date()));
 		}catch(StorageActionException sae){

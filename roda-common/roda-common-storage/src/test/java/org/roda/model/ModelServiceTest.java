@@ -82,8 +82,6 @@ public class ModelServiceTest {
 		corporaPath = Paths.get(corporaURL.toURI());
 		corporaService = new FileStorageService(corporaPath);
 
-		//pre-load the preservation container data
-		storage.copy(corporaService, DefaultStoragePath.parse(CorporaConstants.SOURCE_PRESERVATION_CONTAINER), DefaultStoragePath.parse(CorporaConstants.SOURCE_PRESERVATION_CONTAINER));
 		
 		logger.debug("Running model test under storage: " + basePath);
 	}
@@ -635,29 +633,26 @@ public class ModelServiceTest {
 	
 	@Test
 	public void getAgentPreservationObject() throws ModelServiceException, StorageActionException {
+		//pre-load the preservation container data
+		storage.copy(corporaService, DefaultStoragePath.parse(CorporaConstants.SOURCE_PRESERVATION_CONTAINER), DefaultStoragePath.parse(CorporaConstants.SOURCE_PRESERVATION_CONTAINER));
 		AgentPreservationObject apo = model.getAgentPreservationObject(CorporaConstants.AGENT_RODA_8_PREMIS_XML);
 		assertEquals(apo.getAgentType(), CorporaConstants.SOFTWARE_INGEST_TASK);
 		assertEquals(apo.getAgentName(), CorporaConstants.INGEST_CREATE_AIP);
 	}
 	
-	
 	@Test
 	public void createLogEntry() throws ModelServiceException, StorageActionException{
-		try{
-			LogEntry entry = new LogEntry();
-			entry.setAction("Action");
-			entry.setDatetime("Address");
-			entry.setDatetime("Datetime");
-			LogEntryParameter[] parameters = new LogEntryParameter[2];
-			LogEntryParameter p1 = new LogEntryParameter("NAME1","VALUE1");
-			LogEntryParameter p2 = new LogEntryParameter("NAME2", "VALUE2");
-			parameters[0] = p1;
-			parameters[1] = p2;
-			entry.setParameters(parameters);
-			model.addLogEntry(entry);
-		}catch(Exception e){
-			e.printStackTrace();
-		}
+		LogEntry entry = new LogEntry();
+		entry.setAction("Action");
+		entry.setAddress("Address");
+		entry.setDatetime("Datetime");
+		LogEntryParameter[] parameters = new LogEntryParameter[2];
+		LogEntryParameter p1 = new LogEntryParameter("NAME1","VALUE1");
+		LogEntryParameter p2 = new LogEntryParameter("NAME2", "VALUE2");
+		parameters[0] = p1;
+		parameters[1] = p2;
+		entry.setParameters(parameters);
+		model.addLogEntry(entry);
 	}
 
 }
