@@ -1,9 +1,8 @@
-package org.roda.model.preservation;
+package pt.gov.dgarq.roda.core.data.v2;
 
 import java.util.Arrays;
 import java.util.Date;
 
-import org.roda.index.SimpleRepresentationPreservationMetadata;
 
 /**
  * This is a representation preservation object. It contains preservation

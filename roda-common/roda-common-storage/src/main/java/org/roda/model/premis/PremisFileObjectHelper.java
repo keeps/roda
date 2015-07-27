@@ -24,13 +24,13 @@ import lc.xmlns.premisV2.ObjectIdentifierComplexType;
 import lc.xmlns.premisV2.OriginalNameComplexType;
 import lc.xmlns.premisV2.PreservationLevelComplexType;
 import lc.xmlns.premisV2.StorageComplexType;
+import pt.gov.dgarq.roda.core.data.v2.Fixity;
+import pt.gov.dgarq.roda.core.data.v2.RepresentationFilePreservationObject;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
-import org.roda.model.preservation.Fixity;
-import org.roda.model.preservation.RepresentationFilePreservationObject;
 import org.w3c.util.DateParser;
 
 /**

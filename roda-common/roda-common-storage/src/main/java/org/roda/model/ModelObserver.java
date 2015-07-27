@@ -1,5 +1,6 @@
 package org.roda.model;
 
+import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
 
 public interface ModelObserver {
@@ -30,5 +31,7 @@ public interface ModelObserver {
 	public void fileUpdated(File file);
 
 	public void fileDeleted(String aipId, String representationId, String fileId);
+	
+	public void logEntryCreated(LogEntry entry);
 
 }

@@ -9,21 +9,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.roda.common.RodaUtils;
 import org.roda.model.premis.PremisAgentHelper;
 import org.roda.model.premis.PremisEventHelper;
 import org.roda.model.premis.PremisFileObjectHelper;
 import org.roda.model.premis.PremisMetadataException;
 import org.roda.model.premis.PremisRepresentationObjectHelper;
-import org.roda.model.preservation.AgentPreservationObject;
-import org.roda.model.preservation.EventPreservationObject;
-import org.roda.model.preservation.RepresentationFilePreservationObject;
-import org.roda.model.preservation.RepresentationPreservationObject;
 import org.roda.model.utils.ModelUtils;
 import org.roda.storage.Binary;
 import org.roda.storage.DefaultBinary;
 import org.roda.storage.DefaultDirectory;
+import org.roda.storage.DefaultStoragePath;
 import org.roda.storage.Directory;
+import org.roda.storage.JsonContentPayload;
 import org.roda.storage.Resource;
 import org.roda.storage.StorageActionException;
 import org.roda.storage.StoragePath;
@@ -36,7 +36,12 @@ import lc.xmlns.premisV2.EventOutcomeDetailComplexType;
 import lc.xmlns.premisV2.EventOutcomeInformationComplexType;
 import lc.xmlns.premisV2.LinkingObjectIdentifierComplexType;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
+import pt.gov.dgarq.roda.core.data.v2.AgentPreservationObject;
+import pt.gov.dgarq.roda.core.data.v2.EventPreservationObject;
+import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
+import pt.gov.dgarq.roda.core.data.v2.RepresentationFilePreservationObject;
+import pt.gov.dgarq.roda.core.data.v2.RepresentationPreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationState;
 
 /**
@@ -66,9 +71,14 @@ public class ModelService extends ModelObservable {
 
 	private final StorageService storage;
 
-	public ModelService(StorageService storage) {
+	public ModelService(StorageService storage) throws ModelServiceException {
 		super();
 		this.storage = storage;
+		try{
+			storage.createContainer(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG), null);
+		}catch(StorageActionException sae){
+			throw new ModelServiceException("Error initializing the ModelService",0);
+		}
 	}
 
 	public StorageService getStorage() {
@@ -1227,4 +1237,24 @@ public class ModelService extends ModelObservable {
 					ModelServiceException.INTERNAL_SERVER_ERROR);
 		}
 	}
+
+	//LOG
+	public void addLogEntry(LogEntry logEntry) throws StorageActionException{
+		String entryJSON = ModelUtils.getJsonLogEntry(logEntry);
+		
+		Binary dailyLog;
+		try{
+			dailyLog = storage.getBinary(ModelUtils.getLogPath(new Date()));
+		}catch(StorageActionException sae){
+			dailyLog = storage.createBinary(ModelUtils.getLogPath(new Date()), new HashMap<>(), new JsonContentPayload(""), false);
+		}
+		try{
+			java.io.File f = new java.io.File(dailyLog.getContent().getURI().getPath());
+			FileUtils.writeStringToFile(f, entryJSON, true);
+		}catch(IOException e){
+			
+		}
+		notifyLogEntryCreated(logEntry);	
+	}
+
 }

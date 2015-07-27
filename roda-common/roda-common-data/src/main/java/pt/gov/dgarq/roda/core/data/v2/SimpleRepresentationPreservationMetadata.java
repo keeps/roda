@@ -1,6 +1,4 @@
-package org.roda.index;
-
-import org.roda.model.preservation.RepresentationPreservationObject;
+package pt.gov.dgarq.roda.core.data.v2;
 
 public class SimpleRepresentationPreservationMetadata extends SimplePreservationMetadata{
 	private static final long serialVersionUID = 3107262064744644722L;

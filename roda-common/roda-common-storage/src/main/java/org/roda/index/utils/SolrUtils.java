@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Serializable;
+import java.io.StringWriter;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,21 +40,21 @@ import org.apache.solr.common.util.ContentStream;
 import org.apache.solr.handler.loader.XMLLoader;
 import org.roda.common.RodaUtils;
 import org.roda.index.IndexActionException;
-import org.roda.index.SimpleEventPreservationMetadata;
-import org.roda.index.SimpleRepresentationFileMetadata;
-import org.roda.index.SimpleRepresentationPreservationMetadata;
 import org.roda.model.AIP;
 import org.roda.model.DescriptiveMetadata;
 import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
-import org.roda.model.preservation.EventPreservationObject;
-import org.roda.model.preservation.RepresentationFilePreservationObject;
-import org.roda.model.preservation.RepresentationPreservationObject;
 import org.roda.storage.Binary;
 import org.roda.storage.StorageActionException;
 import org.roda.storage.StoragePath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.adapter.filter.BasicSearchFilterParameter;
@@ -65,11 +66,19 @@ import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
+import pt.gov.dgarq.roda.core.data.v2.EventPreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
+import pt.gov.dgarq.roda.core.data.v2.LogEntry;
+import pt.gov.dgarq.roda.core.data.v2.LogEntryParameter;
 import pt.gov.dgarq.roda.core.data.v2.RODAObject;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
+import pt.gov.dgarq.roda.core.data.v2.RepresentationFilePreservationObject;
+import pt.gov.dgarq.roda.core.data.v2.RepresentationPreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationState;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
+import pt.gov.dgarq.roda.core.data.v2.SimpleEventPreservationMetadata;
+import pt.gov.dgarq.roda.core.data.v2.SimpleRepresentationFileMetadata;
+import pt.gov.dgarq.roda.core.data.v2.SimpleRepresentationPreservationMetadata;
 
 public class SolrUtils {
 
@@ -373,6 +382,8 @@ public class SolrUtils {
 			indexName = RodaConstants.INDEX_PRESERVATION_OBJECTS;
 		} else if (resultClass.equals(SimpleEventPreservationMetadata.class)) {
 			indexName = RodaConstants.INDEX_PRESERVATION_EVENTS;
+		}else if (resultClass.equals(LogEntry.class)) {
+			indexName = RodaConstants.INDEX_ACTION_LOG;
 		} else {
 			throw new IndexActionException("Cannot find class index name: " + resultClass.getName(),
 					IndexActionException.INTERNAL_SERVER_ERROR);
@@ -392,6 +403,8 @@ public class SolrUtils {
 			ret = resultClass.cast(solrDocumentToSimpleRepresentationFileMetadata(doc));
 		} else if (resultClass.equals(SimpleEventPreservationMetadata.class)) {
 			ret = resultClass.cast(solrDocumentToSimpleEventPreservationMetadata(doc));
+		} else if (resultClass.equals(LogEntry.class)){
+			ret = resultClass.cast(solrDocumentToLogEntry(doc));
 		} else {
 			throw new IndexActionException("Cannot find class index name: " + resultClass.getName(),
 					IndexActionException.INTERNAL_SERVER_ERROR);
@@ -732,5 +745,79 @@ public class SolrUtils {
 		doc.addField(RodaConstants.SRFM_FILE_ID, representationFile.getFileId());
 		return doc;
 	}
+
+	
+	private static LogEntry solrDocumentToLogEntry(SolrDocument doc) {
+		final String action = objectToString(doc.get(RodaConstants.LOG_ACTION));
+		final String address = objectToString(doc.get(RodaConstants.LOG_ADDRESS));
+		final String datetime = objectToString(doc.get(RodaConstants.LOG_DATETIME));
+		final String description = objectToString(doc.get(RodaConstants.LOG_DESCRIPTION));
+		final long duration = objectToLong(doc.get(RodaConstants.LOG_DURATION));
+		final String id = objectToString(doc.get(RodaConstants.LOG_ID));
+		//final String parameters = objectToString(doc.get(RodaConstants.LOG_PARAMETERS));
+		final String relatedObjectId = objectToString(doc.get(RodaConstants.LOG_RELATED_OBJECT_ID));
+		final String username = objectToString(doc.get(RodaConstants.LOG_USERNAME));
+		LogEntry entry = new LogEntry();
+		entry.setAction(action);
+		entry.setAddress(address);
+		entry.setDatetime(datetime);
+		entry.setDescription(description);
+		entry.setDuration(duration);
+		entry.setId(id);
+		//entry.setParameters(fromJson(parameters));
+		entry.setRelatedObjectID(relatedObjectId);
+		entry.setUsername(username);
+		
+		return entry;
+	}
+	
+	public static SolrInputDocument logEntryToSolrDocument(LogEntry logEntry) {
+		SolrInputDocument doc = new SolrInputDocument();
+		doc.addField(RodaConstants.LOG_ACTION, logEntry.getAction());
+		doc.addField(RodaConstants.LOG_ADDRESS, logEntry.getAddress());
+		doc.addField(RodaConstants.LOG_DATETIME, logEntry.getDatetime());
+		doc.addField(RodaConstants.LOG_DESCRIPTION, logEntry.getDescription());
+		doc.addField(RodaConstants.LOG_DURATION, logEntry.getDuration());
+		doc.addField(RodaConstants.LOG_ID, logEntry.getId());
+		//doc.addField(RodaConstants.LOG_PARAMETERS, toJSON(logEntry.getParameters()));
+		doc.addField(RodaConstants.LOG_RELATED_OBJECT_ID, logEntry.getRelatedObjectID());
+		doc.addField(RodaConstants.LOG_USERNAME, logEntry.getUsername());
+		return doc;
+	}
+
+	private static LogEntryParameter[] fromJson(String parameters) {	
+		try{
+			JsonFactory factory = new JsonFactory();
+			ObjectMapper mapper = new ObjectMapper(factory);
+			return  mapper.readValue(parameters, LogEntryParameter[].class);
+		}catch(JsonGenerationException jge){
+			
+		}catch(JsonMappingException jme){
+
+		}catch(IOException ioe){
+			
+		}
+		return null;
+	}
+	
+	private static String toJSON(LogEntryParameter[] parameters) {
+		try{
+			JsonFactory factory = new JsonFactory();
+			ObjectMapper mapper = new ObjectMapper(factory);
+			StringWriter sw = new StringWriter();
+			for(LogEntryParameter p : parameters){
+				mapper.writeValue(sw, p);
+			}
+			return sw.toString();
+		}catch(JsonGenerationException jge){
+			
+		}catch(JsonMappingException jme){
+
+		}catch(IOException ioe){
+			
+		}
+		return null;
+	}
+	
 
 }

@@ -1,4 +1,4 @@
-package org.roda.index;
+package pt.gov.dgarq.roda.core.data.v2;
 
 import java.io.Serializable;
 import java.util.Date;

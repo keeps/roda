@@ -3,6 +3,7 @@ package org.roda.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
 
 public abstract class ModelObservable {
@@ -96,6 +97,12 @@ public abstract class ModelObservable {
 			String fileId) {
 		for (ModelObserver observer : observers) {
 			observer.fileDeleted(aipId, representationId, fileId);
+		}
+	}
+	
+	protected void notifyLogEntryCreated(LogEntry entry){
+		for (ModelObserver observer : observers) {
+			observer.logEntryCreated(entry);
 		}
 	}
 

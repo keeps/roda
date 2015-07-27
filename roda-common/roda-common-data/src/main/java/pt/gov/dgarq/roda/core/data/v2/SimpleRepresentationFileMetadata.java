@@ -1,4 +1,4 @@
-package org.roda.index;
+package pt.gov.dgarq.roda.core.data.v2;
 
 
 public class SimpleRepresentationFileMetadata extends SimplePreservationMetadata {

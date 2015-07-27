@@ -1,7 +1,13 @@
 package org.roda.model.utils;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.StringWriter;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -11,6 +17,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.roda.common.RodaUtils;
 import org.roda.model.FileFormat;
 import org.roda.model.ModelServiceException;
@@ -19,13 +27,19 @@ import org.roda.model.premis.PremisFileObjectHelper;
 import org.roda.model.premis.PremisMetadataException;
 import org.roda.model.premis.PremisRepresentationObjectHelper;
 import org.roda.storage.Binary;
+import org.roda.storage.DefaultBinary;
 import org.roda.storage.DefaultStoragePath;
 import org.roda.storage.Resource;
 import org.roda.storage.StorageActionException;
 import org.roda.storage.StoragePath;
 import org.roda.storage.StorageService;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hp.hpl.jena.sparql.function.library.e;
+
 import pt.gov.dgarq.roda.core.common.RodaConstants;
+import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationState;
 
 /**
@@ -373,4 +387,20 @@ public final class ModelUtils {
 		return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_PRESERVATION,RodaConstants.STORAGE_DIRECTORY_AGENTS,agentID);
 	}
 
+	public static StoragePath getLogPath(Date d) throws StorageActionException {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		String logFile = sdf.format(d)+".log";
+		return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG,logFile);
+	}
+	
+	public static String getJsonLogEntry(LogEntry entry) {
+		try{
+			JsonFactory factory = new JsonFactory();
+			ObjectMapper mapper = new ObjectMapper(factory);
+			return mapper.writeValueAsString(entry);
+		}catch(IOException ioe){
+			
+		}
+		return null;
+	}
 }

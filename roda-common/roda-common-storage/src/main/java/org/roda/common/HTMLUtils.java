@@ -22,7 +22,6 @@ import javax.xml.transform.stream.StreamResult;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.roda.index.SimplePreservationMetadata;
 import org.roda.index.utils.SolrUtils;
 import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
@@ -31,6 +30,7 @@ import org.roda.storage.Binary;
 import org.roda.storage.StoragePath;
 
 import pt.gov.dgarq.roda.core.common.RodaConstants;
+import pt.gov.dgarq.roda.core.data.v2.SimplePreservationMetadata;
 
 public class HTMLUtils {
 	// TODO improve metadata to HTML stylesheets

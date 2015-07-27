@@ -20,15 +20,11 @@ import org.roda.CorporaConstants;
 import org.roda.index.IndexActionException;
 import org.roda.index.IndexService;
 import org.roda.index.IndexServiceTest;
-import org.roda.index.SimpleEventPreservationMetadata;
-import org.roda.index.SimpleRepresentationFileMetadata;
 import org.roda.model.AIP;
 import org.roda.model.DescriptiveMetadata;
 import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
 import org.roda.model.ModelServiceTest;
-import org.roda.model.preservation.EventPreservationObject;
-import org.roda.model.preservation.RepresentationFilePreservationObject;
 import org.roda.model.utils.ModelUtils;
 import org.roda.storage.DefaultStoragePath;
 import org.roda.storage.StorageActionException;
@@ -37,6 +33,11 @@ import org.roda.storage.fs.FSUtils;
 import org.roda.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import pt.gov.dgarq.roda.core.data.v2.EventPreservationObject;
+import pt.gov.dgarq.roda.core.data.v2.RepresentationFilePreservationObject;
+import pt.gov.dgarq.roda.core.data.v2.SimpleEventPreservationMetadata;
+import pt.gov.dgarq.roda.core.data.v2.SimpleRepresentationFileMetadata;
 
 public class HtmlUtilsTest {
 	private static Path basePath;

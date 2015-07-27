@@ -1,8 +1,7 @@
-package org.roda.model.preservation;
+package pt.gov.dgarq.roda.core.data.v2;
 
 import java.util.Date;
 
-import org.roda.index.SimpleEventPreservationMetadata;
 
 /**
  * This is an event preservation object

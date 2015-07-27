@@ -19,13 +19,13 @@ import lc.xmlns.premisV2.RelatedEventIdentificationComplexType;
 import lc.xmlns.premisV2.RelatedObjectIdentificationComplexType;
 import lc.xmlns.premisV2.RelationshipComplexType;
 import lc.xmlns.premisV2.Representation;
+import pt.gov.dgarq.roda.core.data.v2.RepresentationFilePreservationObject;
+import pt.gov.dgarq.roda.core.data.v2.RepresentationPreservationObject;
+import pt.gov.dgarq.roda.core.data.v2.SimpleRepresentationPreservationMetadata;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
-import org.roda.index.SimpleRepresentationPreservationMetadata;
-import org.roda.model.preservation.RepresentationFilePreservationObject;
-import org.roda.model.preservation.RepresentationPreservationObject;
 import org.w3c.util.DateParser;
 
 

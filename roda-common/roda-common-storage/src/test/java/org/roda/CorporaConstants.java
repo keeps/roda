@@ -95,4 +95,5 @@ public class CorporaConstants {
 	public static final String HTML_MY_EXAMPLE = "My example";
 	public static final String HTML_EVENT_TYPE = "eventType";
 	public static final String HTML_INGESTION = "ingestion";
+	public static final String LOG_ACTION = "Action";
 }

@@ -17,13 +17,13 @@ import lc.xmlns.premisV2.EventOutcomeInformationComplexType;
 import lc.xmlns.premisV2.ExtensionComplexType;
 import lc.xmlns.premisV2.LinkingAgentIdentifierComplexType;
 import lc.xmlns.premisV2.LinkingObjectIdentifierComplexType;
+import pt.gov.dgarq.roda.core.data.v2.EventPreservationObject;
+import pt.gov.dgarq.roda.core.data.v2.SimpleEventPreservationMetadata;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
-import org.roda.index.SimpleEventPreservationMetadata;
-import org.roda.model.preservation.EventPreservationObject;
 import org.w3c.util.DateParser;
 import org.w3c.util.InvalidDateException;
 

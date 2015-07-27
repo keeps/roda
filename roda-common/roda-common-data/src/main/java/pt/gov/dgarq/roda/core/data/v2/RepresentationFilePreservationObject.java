@@ -1,8 +1,6 @@
-package org.roda.model.preservation;
+package pt.gov.dgarq.roda.core.data.v2;
 
 import java.io.Serializable;
-
-import org.roda.index.SimpleRepresentationFileMetadata;
 
 /**
  * This is a Preservation Object for a {@link RepresentationFile}.

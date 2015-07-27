@@ -43,9 +43,13 @@ import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
+import pt.gov.dgarq.roda.core.data.v2.LogEntry;
+import pt.gov.dgarq.roda.core.data.v2.LogEntryParameter;
 import pt.gov.dgarq.roda.core.data.v2.RODAObject;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
+import pt.gov.dgarq.roda.core.data.v2.SimpleEventPreservationMetadata;
+import pt.gov.dgarq.roda.core.data.v2.SimpleRepresentationFileMetadata;
 
 public class IndexServiceTest {
 
@@ -61,7 +65,7 @@ public class IndexServiceTest {
 	private static final Logger logger = LoggerFactory.getLogger(ModelServiceTest.class);
 
 	@BeforeClass
-	public static void setUp() throws IOException, StorageActionException, URISyntaxException {
+	public static void setUp() throws IOException, StorageActionException, URISyntaxException, ModelServiceException {
 
 		basePath = Files.createTempDirectory("modelTests");
 		indexPath = Files.createTempDirectory("indexTests");
@@ -83,6 +87,7 @@ public class IndexServiceTest {
 		System.setProperty("solr.data.dir.representations", indexPath.resolve("representation").toString());
 		System.setProperty("solr.data.dir.preservationobject", indexPath.resolve("preservationobject").toString());
 		System.setProperty("solr.data.dir.preservationevent", indexPath.resolve("preservationevent").toString());
+		System.setProperty("solr.data.dir.actionlog", indexPath.resolve("actionlog").toString());
 		// start embedded solr
 		final EmbeddedSolrServer solr = new EmbeddedSolrServer(solrHome, "test");
 
@@ -330,7 +335,72 @@ public class IndexServiceTest {
 
 		// cleanup
 		model.deleteAIP(CorporaConstants.SOURCE_AIP_ID);
-
+	}
+	
+	
+	
+	
+	@Test
+	public void testGetLogEntriesCount() throws StorageActionException, IndexActionException{
+		LogEntry entry = new LogEntry();
+		entry.setAction("Action");
+		entry.setAddress("Address");
+		entry.setDatetime("Datetime");
+		entry.setDescription("Description");
+		entry.setDuration(10L);
+		entry.setId("ID");
+		entry.setRelatedObjectID("Related");
+		entry.setUsername("Username");
+		LogEntryParameter[] parameters = new LogEntryParameter[2];
+		LogEntryParameter p1 = new LogEntryParameter("NAME1","VALUE1");
+		LogEntryParameter p2 = new LogEntryParameter("NAME2", "VALUE2");
+		parameters[0] = p1;
+		parameters[1] = p2;
+		entry.setParameters(parameters);
+		model.addLogEntry(entry);
+		
+		Filter filterDescription = new Filter();
+		filterDescription.add(new SimpleFilterParameter(RodaConstants.LOG_DESCRIPTION, "Description"));
+		Long n = 1L;
+		assertEquals(index.getLogEntriesCount(filterDescription),n);
+		
+		Filter filterDescription2 = new Filter();
+		filterDescription2.add(new SimpleFilterParameter(RodaConstants.LOG_DESCRIPTION, "Description2"));
+		Long n2 = 0L;
+		assertEquals(index.getLogEntriesCount(filterDescription2),n2);
+	}
+	
+	@Test
+	public void testFindLogEntry() throws StorageActionException, IndexActionException{
+		LogEntry entry = new LogEntry();
+		entry.setAction("Action");
+		entry.setAddress("Address");
+		entry.setDatetime("Datetime");
+		entry.setDescription("Description");
+		entry.setDuration(10L);
+		entry.setId("ID");
+		entry.setRelatedObjectID("Related");
+		entry.setUsername("Username");
+		LogEntryParameter[] parameters = new LogEntryParameter[2];
+		LogEntryParameter p1 = new LogEntryParameter("NAME1","VALUE1");
+		LogEntryParameter p2 = new LogEntryParameter("NAME2", "VALUE2");
+		parameters[0] = p1;
+		parameters[1] = p2;
+		entry.setParameters(parameters);
+		model.addLogEntry(entry);
+		
+		Filter filterDescription = new Filter();
+		filterDescription.add(new SimpleFilterParameter(RodaConstants.LOG_DESCRIPTION, "Description"));
+		
+		IndexResult<LogEntry> entries =  index.findLogEntry(filterDescription, null, null);
+		assertEquals(entries.getTotalCount(),1);
+		assertEquals(entries.getResults().get(0).getAction(),CorporaConstants.LOG_ACTION);
+		
+		Filter filterDescription2 = new Filter();
+		filterDescription2.add(new SimpleFilterParameter(RodaConstants.LOG_DESCRIPTION, "Description2"));
+		
+		IndexResult<LogEntry> entries2 =  index.findLogEntry(filterDescription2, null, null);
+		assertEquals(entries2.getTotalCount(),0);
 	}
 
 }

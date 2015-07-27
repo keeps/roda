@@ -14,13 +14,14 @@ import org.roda.model.File;
 import org.roda.model.ModelObserver;
 import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
-import org.roda.model.preservation.EventPreservationObject;
 import org.roda.storage.StorageActionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.preservation.RepresentationFilePreservationObject;
+import pt.gov.dgarq.roda.core.data.v2.EventPreservationObject;
+import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
 
 /**
@@ -218,4 +219,14 @@ public class IndexModelObserver implements ModelObserver {
 
 	}
 
+	@Override
+	public void logEntryCreated(LogEntry entry) {
+		SolrInputDocument logEntryDocument = SolrUtils.logEntryToSolrDocument(entry);
+		try {
+			index.add(RodaConstants.INDEX_ACTION_LOG, logEntryDocument);
+			index.commit(RodaConstants.INDEX_ACTION_LOG);
+		} catch (SolrServerException | IOException e) {
+			logger.error("Could not index LogEntry: "+e.getMessage(),e);
+		}
+	}
 }

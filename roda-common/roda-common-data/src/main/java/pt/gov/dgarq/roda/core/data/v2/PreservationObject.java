@@ -1,8 +1,6 @@
-package org.roda.model.preservation;
+package pt.gov.dgarq.roda.core.data.v2;
 
 import java.util.Date;
-
-import pt.gov.dgarq.roda.core.data.v2.RODAObject;
 
 /**
  * This is an abstract preservation object. Each specific type of preservation

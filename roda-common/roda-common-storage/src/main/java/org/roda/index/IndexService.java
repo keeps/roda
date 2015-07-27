@@ -8,12 +8,17 @@ import org.roda.index.utils.SolrUtils;
 import org.roda.model.AIP;
 import org.roda.model.ModelService;
 
+import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
+import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
+import pt.gov.dgarq.roda.core.data.v2.SimpleEventPreservationMetadata;
+import pt.gov.dgarq.roda.core.data.v2.SimpleRepresentationFileMetadata;
+import pt.gov.dgarq.roda.core.data.v2.SimpleRepresentationPreservationMetadata;
 
 public class IndexService {
 
@@ -177,4 +182,14 @@ public class IndexService {
 	 * findRepresentationPreservationObject(ContentAdapter contentAdapter){
 	 * return null; }
 	 */
+	
+	//LOG
+	public Long getLogEntriesCount(Filter filter) throws IndexActionException{
+		return SolrUtils.count(index, LogEntry.class, filter);
+	}
+
+	public IndexResult<LogEntry> findLogEntry(Filter filter,
+			Sorter sorter, Sublist sublist) throws IndexActionException {
+		return SolrUtils.find(index, LogEntry.class, filter, sorter, sublist);
+	}
 }

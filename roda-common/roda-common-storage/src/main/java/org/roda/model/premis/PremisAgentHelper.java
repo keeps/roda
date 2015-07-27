@@ -10,11 +10,11 @@ import java.io.InputStream;
 import lc.xmlns.premisV2.AgentComplexType;
 import lc.xmlns.premisV2.AgentDocument;
 import lc.xmlns.premisV2.AgentIdentifierComplexType;
+import pt.gov.dgarq.roda.core.data.v2.AgentPreservationObject;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
-import org.roda.model.preservation.AgentPreservationObject;
 
 /**
  * @author Rui Castro

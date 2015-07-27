@@ -31,10 +31,6 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.roda.CorporaConstants;
 import org.roda.common.RodaUtils;
-import org.roda.model.preservation.AgentPreservationObject;
-import org.roda.model.preservation.EventPreservationObject;
-import org.roda.model.preservation.RepresentationFilePreservationObject;
-import org.roda.model.preservation.RepresentationPreservationObject;
 import org.roda.model.utils.ModelUtils;
 import org.roda.storage.Binary;
 import org.roda.storage.DefaultStoragePath;
@@ -47,7 +43,13 @@ import org.roda.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import pt.gov.dgarq.roda.core.data.v2.AgentPreservationObject;
+import pt.gov.dgarq.roda.core.data.v2.EventPreservationObject;
+import pt.gov.dgarq.roda.core.data.v2.LogEntry;
+import pt.gov.dgarq.roda.core.data.v2.LogEntryParameter;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
+import pt.gov.dgarq.roda.core.data.v2.RepresentationFilePreservationObject;
+import pt.gov.dgarq.roda.core.data.v2.RepresentationPreservationObject;
 
 /**
  * Unit tests for ModelService
@@ -71,7 +73,7 @@ public class ModelServiceTest {
 	private static final Logger logger = LoggerFactory.getLogger(ModelServiceTest.class);
 
 	@BeforeClass
-	public static void setUp() throws IOException, StorageActionException, URISyntaxException {
+	public static void setUp() throws IOException, StorageActionException, URISyntaxException, ModelServiceException {
 		basePath = Files.createTempDirectory("modelTests");
 		storage = new FileStorageService(basePath);
 		model = new ModelService(storage);
@@ -636,6 +638,26 @@ public class ModelServiceTest {
 		AgentPreservationObject apo = model.getAgentPreservationObject(CorporaConstants.AGENT_RODA_8_PREMIS_XML);
 		assertEquals(apo.getAgentType(), CorporaConstants.SOFTWARE_INGEST_TASK);
 		assertEquals(apo.getAgentName(), CorporaConstants.INGEST_CREATE_AIP);
+	}
+	
+	
+	@Test
+	public void createLogEntry() throws ModelServiceException, StorageActionException{
+		try{
+			LogEntry entry = new LogEntry();
+			entry.setAction("Action");
+			entry.setDatetime("Address");
+			entry.setDatetime("Datetime");
+			LogEntryParameter[] parameters = new LogEntryParameter[2];
+			LogEntryParameter p1 = new LogEntryParameter("NAME1","VALUE1");
+			LogEntryParameter p2 = new LogEntryParameter("NAME2", "VALUE2");
+			parameters[0] = p1;
+			parameters[1] = p2;
+			entry.setParameters(parameters);
+			model.addLogEntry(entry);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 	}
 
 }
