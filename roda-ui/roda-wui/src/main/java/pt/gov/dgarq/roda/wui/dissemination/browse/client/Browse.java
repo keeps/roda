@@ -3,6 +3,7 @@
  */
 package pt.gov.dgarq.roda.wui.dissemination.browse.client;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -153,7 +154,7 @@ public class Browse extends Composite {
 	private Browse() {
 		viewingTop = true;
 		breadcrumb = new BreadcrumbPanel();
-		fondsPanel = new CollectionsTable(COLLECTIONS_FILTER);
+		fondsPanel = new CollectionsTable();
 		initWidget(uiBinder.createAndBindUi(this));
 
 		fondsPanel.getSelectionModel().addSelectionChangeHandler(new Handler() {
@@ -241,8 +242,7 @@ public class Browse extends Composite {
 			List<DescriptiveMetadataBundle> descMetadata = itemBundle.getDescriptiveMetadata();
 			List<Representation> representations = itemBundle.getRepresentations();
 
-			breadcrumb.updatePath(Arrays.asList(new BreadcrumbItem("all", RESOLVER.getHistoryPath()),
-					new BreadcrumbItem(sdo.getTitle(), RESOLVER.getHistoryPath() + "." + sdo.getId())));
+			breadcrumb.updatePath(getBreadcrumbsFromAncestors(itemBundle.getSdoAncestors(), sdo));
 			HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getElementLevelIconHTMLPanel(sdo.getLevel());
 			itemIconHtmlPanel.addStyleName("browseItemIcon-other");
 			itemIcon.setWidget(itemIconHtmlPanel);
@@ -254,8 +254,7 @@ public class Browse extends Composite {
 
 			viewingTop = false;
 			fondsPanelTitle.setVisible(true);
-			Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID,
-					sdo.getId()));
+			Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, sdo.getId()));
 			fondsPanel.setFilter(filter);
 
 			downloadList.clear();
@@ -291,6 +290,20 @@ public class Browse extends Composite {
 
 		sidebarGroupDownloads.setVisible(false);
 		downloadList.clear();
+	}
+
+	private List<BreadcrumbItem> getBreadcrumbsFromAncestors(List<SimpleDescriptionObject> sdoAncestors,
+			SimpleDescriptionObject sdo) {
+		List<BreadcrumbItem> ret = new ArrayList<>();
+		ret.add(new BreadcrumbItem("all", RESOLVER.getHistoryPath()));
+		for (SimpleDescriptionObject ancestor : sdoAncestors) {
+			BreadcrumbItem ancestorBreadcrumb = new BreadcrumbItem(ancestor.getTitle(),
+					RESOLVER.getHistoryPath() + "." + ancestor.getId());
+			ret.add(1, ancestorBreadcrumb);
+		}
+
+		ret.add(new BreadcrumbItem(sdo.getTitle(), RESOLVER.getHistoryPath() + "." + sdo.getId()));
+		return ret;
 	}
 
 	private Widget createRepresentationDownloadPanel(Representation rep) {

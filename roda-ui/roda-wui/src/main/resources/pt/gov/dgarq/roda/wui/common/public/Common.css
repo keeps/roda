@@ -20,6 +20,13 @@ h2, .h2 {
 	margin-bottom: 20px;
 }
 
+h3, .h3 {
+	font-size: 12pt;
+	font-weight: 500;
+	color: #404142;
+	margin-bottom: 10px;
+}
+
 .btn {
 	border-radius: 15px;
 	padding: 4px 6px;
@@ -52,25 +59,24 @@ h2, .h2 {
 	outline-style: none;
 }
 
-.btn-plus:before {
+.btn:after {
+	display: inline-block;
+	font-family: "fontawesome";
+	padding-left: 5px;
+	float: right;
+	margin-top: 1px;
+}
+
+.btn-plus:after {
 	content: "\f055";
-	display: inline-block;
-	font-family: "fontawesome";
-	padding-right: 5px;
 }
 
-.btn-edit:before {
-	content: "\f14b";
-	display: inline-block;
-	font-family: "fontawesome";
-	padding-right: 5px;
+.btn-edit:after {
+	content: "\f14b";;
 }
 
-.btn-play:before {
+.btn-play:after {
 	content: "\f144";
-	display: inline-block;
-	font-family: "fontawesome";
-	padding-right: 5px;
 }
 
 .com-google-gwt-user-cellview-client-CellTable-Style-cellTableHeader {

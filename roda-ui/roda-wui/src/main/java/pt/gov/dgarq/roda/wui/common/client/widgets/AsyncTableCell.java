@@ -20,6 +20,7 @@ import com.google.gwt.view.client.ProvidesKey;
 import com.google.gwt.view.client.Range;
 import com.google.gwt.view.client.SingleSelectionModel;
 
+import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 
@@ -34,10 +35,15 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
 	private final PageSizePager pageSizePager;
 	private final CellTable<T> display;
 
+	private Filter filter;
+
 	private final ClientLogger logger = new ClientLogger(getClass().getName());
 
 	public AsyncTableCell() {
 		super();
+
+		// initializing as unready
+		this.filter = null;
 
 		this.dataProvider = new AsyncDataProvider<T>() {
 
@@ -67,7 +73,7 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
 							updateRowCount(rowCount, true);
 							ValueChangeEvent.fire(AsyncTableCell.this, Integer.valueOf(rowCount));
 						} else {
-							// TODO treat this option
+							// search not yet ready, deliver empty result
 						}
 					}
 				});
@@ -112,6 +118,20 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
 
 	public SingleSelectionModel<T> getSelectionModel() {
 		return selectionModel;
+	}
+
+	private void refresh() {
+		getSelectionModel().clear();
+		getDisplay().setVisibleRangeAndClearData(new Range(0, getInitialPageSize()), true);
+	}
+
+	public Filter getFilter() {
+		return filter;
+	}
+
+	public void setFilter(Filter filter) {
+		this.filter = filter;
+		refresh();
 	}
 
 	@Override

@@ -15,7 +15,6 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.view.client.ProvidesKey;
-import com.google.gwt.view.client.Range;
 
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
@@ -35,16 +34,13 @@ public class CollectionsTable extends AsyncTableCell<SimpleDescriptionObject> {
 	private final ClientLogger logger = new ClientLogger(getClass().getName());
 
 	private final Column<SimpleDescriptionObject, SafeHtml> levelColumn;
+	private final TextColumn<SimpleDescriptionObject> idColumn;
 	private final TextColumn<SimpleDescriptionObject> titleColumn;
 	private final Column<SimpleDescriptionObject, Date> dateInitialColumn;
 	private final Column<SimpleDescriptionObject, Date> dateFinalColumn;
 
-	private Filter filter;
-
-	public CollectionsTable(Filter filter) {
+	public CollectionsTable() {
 		super();
-
-		this.setFilter(filter);
 
 		levelColumn = new Column<SimpleDescriptionObject, SafeHtml>(new SafeHtmlCell()) {
 			@Override
@@ -60,11 +56,19 @@ public class CollectionsTable extends AsyncTableCell<SimpleDescriptionObject> {
 			}
 		};
 
+		idColumn = new TextColumn<SimpleDescriptionObject>() {
+
+			@Override
+			public String getValue(SimpleDescriptionObject sdo) {
+				return sdo != null ? sdo.getId() : null;
+			}
+		};
+
 		titleColumn = new TextColumn<SimpleDescriptionObject>() {
 
 			@Override
 			public String getValue(SimpleDescriptionObject sdo) {
-				return sdo != null ? sdo.getTitle() + sdo.getId() : null;
+				return sdo != null ? sdo.getTitle() : null;
 			}
 		};
 
@@ -85,12 +89,14 @@ public class CollectionsTable extends AsyncTableCell<SimpleDescriptionObject> {
 		};
 
 		levelColumn.setSortable(true);
+		idColumn.setSortable(true);
 		titleColumn.setSortable(true);
 		dateFinalColumn.setSortable(true);
 		dateInitialColumn.setSortable(true);
 
 		// TODO externalize strings into constants
 		getDisplay().addColumn(levelColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-tag'></i>"));
+		getDisplay().addColumn(idColumn, "Id");
 		getDisplay().addColumn(titleColumn, "Title");
 		getDisplay().addColumn(dateInitialColumn, "Date initial");
 		getDisplay().addColumn(dateFinalColumn, "Date final");
@@ -108,41 +114,43 @@ public class CollectionsTable extends AsyncTableCell<SimpleDescriptionObject> {
 	@Override
 	protected void getData(int start, int length, ColumnSortList columnSortList,
 			AsyncCallback<IndexResult<SimpleDescriptionObject>> callback) {
-		Sorter sorter = new Sorter();
-		for (int i = 0; i < columnSortList.size(); i++) {
-			ColumnSortInfo columnSortInfo = columnSortList.get(i);
-			String sortParameterKey;
-			if (columnSortInfo.getColumn().equals(levelColumn)) {
-				sortParameterKey = RodaConstants.SDO_LEVEL;
-			} else if (columnSortInfo.getColumn().equals(titleColumn)) {
-				sortParameterKey = RodaConstants.SDO_TITLE;
-			} else if (columnSortInfo.getColumn().equals(dateInitialColumn)) {
-				sortParameterKey = RodaConstants.SDO_DATE_INITIAL;
-			} else if (columnSortInfo.getColumn().equals(dateFinalColumn)) {
-				sortParameterKey = RodaConstants.SDO_DATE_FINAL;
-			} else {
-				sortParameterKey = null;
+
+		Filter filter = getFilter();
+		if (filter == null) {
+			// search not yet ready, deliver empty result
+			callback.onSuccess(null);
+		} else {
+			// calculate sorter
+			Sorter sorter = new Sorter();
+			for (int i = 0; i < columnSortList.size(); i++) {
+				ColumnSortInfo columnSortInfo = columnSortList.get(i);
+				String sortParameterKey;
+				if (columnSortInfo.getColumn().equals(levelColumn)) {
+					sortParameterKey = RodaConstants.SDO_LEVEL;
+				} else if (columnSortInfo.getColumn().equals(idColumn)) {
+					sortParameterKey = RodaConstants.AIP_ID;
+				} else if (columnSortInfo.getColumn().equals(titleColumn)) {
+					sortParameterKey = RodaConstants.SDO_TITLE;
+				} else if (columnSortInfo.getColumn().equals(dateInitialColumn)) {
+					sortParameterKey = RodaConstants.SDO_DATE_INITIAL;
+				} else if (columnSortInfo.getColumn().equals(dateFinalColumn)) {
+					sortParameterKey = RodaConstants.SDO_DATE_FINAL;
+				} else {
+					sortParameterKey = null;
+				}
+
+				if (sortParameterKey != null) {
+					sorter.add(new SortParameter(sortParameterKey, !columnSortInfo.isAscending()));
+				} else {
+					logger.warn("Selecting a sorter that is not mapped");
+				}
 			}
 
-			if (sortParameterKey != null) {
-				sorter.add(new SortParameter(sortParameterKey, !columnSortInfo.isAscending()));
-			} else {
-				logger.warn("Selecting a sorter that is not mapped");
-			}
+			// define sublist
+			Sublist sublist = new Sublist(start, length);
+
+			BrowserService.Util.getInstance().findDescriptiveMetadata(filter, sorter, sublist, callback);
 		}
-
-		sorter.add(new SortParameter(RodaConstants.SDO_TITLE, false));
-		Sublist sublist = new Sublist(start, length);
-
-		// Filter filter = new Filter();
-		// if (parentId == null) {
-		// filter.add(new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID));
-		// } else {
-		// filter.add(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID,
-		// parentId));
-		// }
-
-		BrowserService.Util.getInstance().findDescriptiveMetadata(getFilter(), sorter, sublist, callback);
 
 	}
 
@@ -160,20 +168,6 @@ public class CollectionsTable extends AsyncTableCell<SimpleDescriptionObject> {
 	@Override
 	protected int getInitialPageSize() {
 		return PAGE_SIZE;
-	}
-
-	private void refresh() {
-		getSelectionModel().clear();
-		getDisplay().setVisibleRangeAndClearData(new Range(0, getInitialPageSize()), true);
-	}
-
-	public Filter getFilter() {
-		return filter;
-	}
-
-	public void setFilter(Filter filter) {
-		this.filter = filter;
-		refresh();
 	}
 
 }

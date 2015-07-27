@@ -21,9 +21,8 @@ import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.LoginStatusListener;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.Browse;
-import pt.gov.dgarq.roda.wui.dissemination.client.Dissemination;
-import pt.gov.dgarq.roda.wui.dissemination.search.advanced.client.AdvancedSearch;
 import pt.gov.dgarq.roda.wui.dissemination.search.basic.client.BasicSearch;
+import pt.gov.dgarq.roda.wui.home.client.Home;
 import pt.gov.dgarq.roda.wui.ingest.client.Ingest;
 import pt.gov.dgarq.roda.wui.ingest.list.client.IngestList;
 import pt.gov.dgarq.roda.wui.ingest.pre.client.PreIngest;
@@ -57,12 +56,13 @@ public class Menu2 extends Composite {
 	@UiField
 	MenuBar rightMenu;
 
-	private final MenuBar aboutMenu;
+	// private final MenuBar aboutMenu;
+	private final MenuItem welcome;
 
-	private final MenuBar disseminationMenu;
+	// private final MenuBar disseminationMenu;
 	private MenuItem dissemination_browse;
 	private MenuItem dissemination_searchBasic;
-	private MenuItem dissemination_searchAdvanced;
+	// private MenuItem dissemination_searchAdvanced;
 
 	private final MenuBar ingestMenu;
 	private MenuItem ingest_pre;
@@ -84,28 +84,34 @@ public class Menu2 extends Composite {
 	public Menu2() {
 		initWidget(uiBinder.createAndBindUi(this));
 
-		aboutMenu = new MenuBar(true);
-		aboutMenu.addItem(constants.title_about_services(),
-				createCommand(About.getInstance().getHistoryPath() + ".services"));
-		aboutMenu.addItem(constants.title_about_policies(),
-				createCommand(About.getInstance().getHistoryPath() + ".policies"));
-		aboutMenu.addItem(constants.title_about_researchDevelopment(),
-				createCommand(About.getInstance().getHistoryPath() + ".research_development"));
-		aboutMenu.addItem(constants.title_about_contacts(),
-				createCommand(About.getInstance().getHistoryPath() + ".contacts"));
-		aboutMenu.addItem(constants.title_about_register(),
-				createCommand(About.getInstance().getHistoryPath() + ".register"));
-		aboutMenu.addItem(constants.title_about_help(), createCommand(About.getInstance().getHistoryPath() + ".help"));
+		// TODO externalize string
+		welcome = new MenuItem("Home", createCommand(Home.getInstance().getHistoryPath()));
+		// aboutMenu = new MenuBar(true);
+		// aboutMenu.addItem(constants.title_about_services(),
+		// createCommand(About.getInstance().getHistoryPath() + ".services"));
+		// aboutMenu.addItem(constants.title_about_policies(),
+		// createCommand(About.getInstance().getHistoryPath() + ".policies"));
+		// aboutMenu.addItem(constants.title_about_researchDevelopment(),
+		// createCommand(About.getInstance().getHistoryPath() +
+		// ".research_development"));
+		// aboutMenu.addItem(constants.title_about_contacts(),
+		// createCommand(About.getInstance().getHistoryPath() + ".contacts"));
+		// aboutMenu.addItem(constants.title_about_register(),
+		// createCommand(About.getInstance().getHistoryPath() + ".register"));
+		// aboutMenu.addItem(constants.title_about_help(),
+		// createCommand(About.getInstance().getHistoryPath() + ".help"));
 
-		disseminationMenu = new MenuBar(true);
-		dissemination_browse = disseminationMenu.addItem(constants.title_dissemination_browse(),
+		// disseminationMenu = new MenuBar(true);
+		dissemination_browse = new MenuItem(constants.title_dissemination_browse(),
 				createCommand(Browse.RESOLVER.getHistoryPath()));
-		dissemination_searchBasic = disseminationMenu.addItem(constants.title_dissemination_search_basic(),
+		dissemination_searchBasic = new MenuItem(constants.title_dissemination_search_basic(),
 				createCommand(BasicSearch.RESOLVER.getHistoryPath()));
-		dissemination_searchAdvanced = disseminationMenu.addItem(constants.title_dissemination_search_advanced(),
-				createCommand(AdvancedSearch.getInstance().getHistoryPath()));
-		disseminationMenu.addItem(constants.title_dissemination_help(),
-				createCommand(Dissemination.getInstance().getHistoryPath() + ".help"));
+		// dissemination_searchAdvanced =
+		// disseminationMenu.addItem(constants.title_dissemination_search_advanced(),
+		// createCommand(AdvancedSearch.getInstance().getHistoryPath()));
+		// disseminationMenu.addItem(constants.title_dissemination_help(),
+		// createCommand(Dissemination.getInstance().getHistoryPath() +
+		// ".help"));
 
 		ingestMenu = new MenuBar(true);
 		ingest_pre = ingestMenu.addItem(constants.title_ingest_pre(),
@@ -197,7 +203,10 @@ public class Menu2 extends Composite {
 		logger.info("Updating menu visibility for user " + user.getName());
 
 		leftMenu.clearItems();
+		leftMenuItemCount = 0;
 		rightMenu.clearItems();
+
+		// TODO make creating sync (not async)
 
 		// About
 		About.getInstance().isCurrentUserPermitted(new AsyncCallback<Boolean>() {
@@ -208,7 +217,7 @@ public class Menu2 extends Composite {
 
 			public void onSuccess(Boolean permitted) {
 				if (permitted) {
-					leftMenu.addItem(constants.title_about(), aboutMenu);
+					insertIntoLeftMenu(welcome, 0);
 				}
 			}
 
@@ -223,7 +232,9 @@ public class Menu2 extends Composite {
 			}
 
 			public void onSuccess(Boolean asRole) {
-				dissemination_browse.setVisible(asRole);
+				if (asRole) {
+					insertIntoLeftMenu(dissemination_browse, 1);
+				}
 			}
 
 		});
@@ -235,36 +246,40 @@ public class Menu2 extends Composite {
 			}
 
 			public void onSuccess(Boolean asRole) {
-				dissemination_searchBasic.setVisible(asRole);
-			}
-
-		});
-
-		AdvancedSearch.getInstance().isCurrentUserPermitted(new AsyncCallback<Boolean>() {
-
-			public void onFailure(Throwable caught) {
-				logger.error("Error getting advanced search role", caught);
-			}
-
-			public void onSuccess(Boolean asRole) {
-				dissemination_searchAdvanced.setVisible(asRole);
-			}
-
-		});
-
-		Dissemination.getInstance().isCurrentUserPermitted(new AsyncCallback<Boolean>() {
-
-			public void onFailure(Throwable caught) {
-				logger.error("Error getting roles", caught);
-			}
-
-			public void onSuccess(Boolean asRole) {
 				if (asRole) {
-					leftMenu.addItem(constants.title_dissemination(), disseminationMenu);
+					insertIntoLeftMenu(dissemination_searchBasic, 2);
 				}
 			}
 
 		});
+
+		// AdvancedSearch.getInstance().isCurrentUserPermitted(new
+		// AsyncCallback<Boolean>() {
+		//
+		// public void onFailure(Throwable caught) {
+		// logger.error("Error getting advanced search role", caught);
+		// }
+		//
+		// public void onSuccess(Boolean asRole) {
+		// dissemination_searchAdvanced.setVisible(asRole);
+		// }
+		//
+		// });
+
+		// Dissemination.getInstance().isCurrentUserPermitted(new
+		// AsyncCallback<Boolean>() {
+		//
+		// public void onFailure(Throwable caught) {
+		// logger.error("Error getting roles", caught);
+		// }
+		//
+		// public void onSuccess(Boolean asRole) {
+		// if (asRole) {
+		// leftMenu.addItem(constants.title_dissemination(), disseminationMenu);
+		// }
+		// }
+		//
+		// });
 
 		// Ingest
 		PreIngest.getInstance().isCurrentUserPermitted(new AsyncCallback<Boolean>() {
@@ -311,7 +326,7 @@ public class Menu2 extends Composite {
 
 			public void onSuccess(Boolean asRole) {
 				if (asRole) {
-					leftMenu.addItem(constants.title_ingest(), ingestMenu);
+					insertIntoLeftMenu(new MenuItem(constants.title_ingest(), ingestMenu), 3);
 				}
 			}
 
@@ -375,7 +390,8 @@ public class Menu2 extends Composite {
 
 			public void onSuccess(Boolean asRole) {
 				if (asRole) {
-					leftMenu.addItem(constants.title_administration(), administrationMenu);
+					insertIntoLeftMenu(new MenuItem(constants.title_administration(), administrationMenu), 4);
+
 				}
 			}
 
@@ -389,6 +405,14 @@ public class Menu2 extends Composite {
 			rightMenu.addItem(user.getName(), userMenu);
 		}
 
+	}
+
+	private int leftMenuItemCount = 0;
+
+	private void insertIntoLeftMenu(MenuItem item, int index) {
+		int indexToInsert = index <= leftMenuItemCount ? index : leftMenuItemCount;
+		leftMenu.insertItem(item, indexToInsert);
+		leftMenuItemCount++;
 	}
 
 }

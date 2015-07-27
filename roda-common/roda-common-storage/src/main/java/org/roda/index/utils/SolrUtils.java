@@ -26,6 +26,8 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrQuery.ORDER;
+import org.apache.solr.client.solrj.SolrQuery.SortClause;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -222,19 +224,14 @@ public class SolrUtils {
 		return ret.toString();
 	}
 
-	public static String parseSorter(Sorter sorter) throws IndexActionException {
-		StringBuilder ret = new StringBuilder();
-
+	public static List<SortClause> parseSorter(Sorter sorter) throws IndexActionException {
+		List<SortClause> ret = new ArrayList<>();
 		if (sorter != null) {
 			for (SortParameter sortParameter : sorter.getParameters()) {
-				if (ret.length() != 0) {
-					ret.append(", ");
-				}
-				ret.append(sortParameter.getName()).append(" ").append(sortParameter.isDescending() ? "desc" : "asc");
+				ret.add(new SortClause(sortParameter.getName(), sortParameter.isDescending() ? ORDER.desc : ORDER.asc));
 			}
 		}
-
-		return ret.toString();
+		return ret;
 	}
 
 	private static void appendANDOperator(StringBuilder ret) {
@@ -426,6 +423,7 @@ public class SolrUtils {
 		SolrQuery query = new SolrQuery();
 		String queryString = parseFilter(filter);
 		query.setQuery(queryString);
+		query.setSorts(parseSorter(sorter));
 		query.setStart(sublist.getFirstElementIndex());
 		query.setRows(sublist.getMaximumElementCount());
 		try {

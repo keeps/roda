@@ -150,7 +150,7 @@ public class UserLoginServiceImpl extends RemoteServiceServlet implements
 			return authenticatedUser;
 		} catch (MalformedURLException mfue) {
 			logger.error("Error while loginCAS 3:" + mfue.getMessage(),mfue);
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			logger.error("Error while loginCAS 4:" + e.getMessage(),e);
 		}
 		return null;

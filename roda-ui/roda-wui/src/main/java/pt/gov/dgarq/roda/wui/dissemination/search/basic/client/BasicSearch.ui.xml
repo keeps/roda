@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+	xmlns:i="urn:import:config.i18n.client" xmlns:m="urn:import:pt.gov.dgarq.roda.wui.main.client"
+	xmlns:common="urn:import:pt.gov.dgarq.roda.wui.common.client.widgets">
+
+	<ui:style>
+	.search {
+		display: flex;
+		justify-content: space-between;
+		min-height: 600px;
+	}
+	
+	.content {
+		width: 100%;
+	}
+	
+	.sidebar {
+		background-color: #eee;
+		padding: 40px;
+		width: 200px;
+	}
+	
+	.sidebar-title {
+		margin-bottom: 10px;
+	}
+	
+	.sidebar-group {
+		margin-bottom: 10px;
+	}
+	
+	.action {
+		width: 100%;
+		margin-bottom: 10px;
+	}
+	
+	.footer {
+		clear: both;
+	}
+	</ui:style>
+
+	<g:FlowPanel styleName="wui-search-basic" addStyleNames="{style.search}">
+		<g:FlowPanel styleName="layout" addStyleNames="{style.content}">
+			<g:Label styleName="h1" ui:field="searchInputLabel"
+				addStyleNames="searchLabel" />
+			<g:FlowPanel addStyleNames="searchInput">
+				<g:FlowPanel addStyleNames="searchInputBoxWrapper">
+					<g:TextBox ui:field="searchInputBox" addStyleNames="searchBox" />
+					<g:Hyperlink addStyleNames="searchInputAdvancedLink" targetHistoryToken="dissemination.search.advanced">More search options</g:Hyperlink>
+				</g:FlowPanel>
+				<g:FocusPanel ui:field="searchInputButton"
+					addStyleNames="searchButton">
+					<g:HTML addStyleNames="searchButton-html">
+						<span class="fa-stack fa-lg">
+							<i class="fa fa-circle fa-stack-2x"></i>
+							<i class="fa fa-search fa-stack-1x"></i>
+						</span>
+					</g:HTML>
+				</g:FocusPanel>
+			</g:FlowPanel>
+			<common:CollectionsTable addStyleNames="searchResults"
+				ui:field="searchResultPanel" visible="false" />
+		</g:FlowPanel>
+		<g:FlowPanel styleName="{style.sidebar}">
+			<g:FlowPanel styleName="{style.sidebar-group}" ui:field="sidebarGroupDownloads">
+				<g:Label addStyleNames="h2 {style.sidebar-title} searchFacetsTitle">
+					<ui:msg>Filters</ui:msg>
+				</g:Label>
+				<g:Label addStyleNames="h3 searchFacetTitle">
+					<ui:msg>Description levels</ui:msg>
+				</g:Label>
+				<g:CheckBox addStyleNames="searchFacetLabel">fonds (12)</g:CheckBox>
+				<g:CheckBox addStyleNames="searchFacetLabel">series (123)</g:CheckBox>
+				<g:CheckBox addStyleNames="searchFacetLabel">items (1234)</g:CheckBox>
+
+				<g:Label addStyleNames="h3 searchFacetTitle">
+					<ui:msg>Dates</ui:msg>
+				</g:Label>
+				<g:CheckBox addStyleNames="searchFacetLabel">1980-1990 (123)</g:CheckBox>
+				<g:CheckBox addStyleNames="searchFacetLabel">1990-2000 (123)</g:CheckBox>
+				<g:CheckBox addStyleNames="searchFacetLabel">2000-2010 (12)</g:CheckBox>
+			</g:FlowPanel>
+			<g:Button addStyleNames="btn btn-play searchApplyFilters">Apply filters</g:Button>
+		</g:FlowPanel>
+		<g:FlowPanel styleName="{style.footer}" />
+	</g:FlowPanel>
+</ui:UiBinder>

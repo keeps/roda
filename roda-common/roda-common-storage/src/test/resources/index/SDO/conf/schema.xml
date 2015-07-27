@@ -110,8 +110,8 @@
    <field name="dateCreated" type="tdate" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="dateModified" type="tdate" indexed="true" stored="true" required="false" multiValued="false" /> 
 
-   <field name="level" type="string" indexed="true" stored="true" required="false" multiValued="true" /> 
-   <field name="title" type="text_general" indexed="true" stored="true" required="false" multiValued="true" />
+   <field name="level" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
+   <field name="title" type="text_general" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="description" type="text_general" indexed="true" stored="true" required="false" multiValued="true" /> 
    <field name="dateInitial" type="tdate" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="dateFinal" type="tdate" indexed="true" stored="true" required="false" multiValued="false" />
