@@ -27,7 +27,30 @@ import pt.gov.dgarq.roda.wui.ingest.client.Ingest;
  * @author Luis Faria
  * 
  */
-public class PreIngest implements HistoryResolver {
+public class PreIngest {
+
+	public static final HistoryResolver RESOLVER = new HistoryResolver() {
+
+		@Override
+		public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
+			getInstance().resolve(historyTokens, callback);
+		}
+
+		@Override
+		public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
+			UserLogin.getInstance().checkRole(this, callback);
+		}
+
+		@Override
+		public String getHistoryToken() {
+			return "pre";
+		}
+
+		@Override
+		public String getHistoryPath() {
+			return Ingest.RESOLVER.getHistoryPath() + "." + getHistoryToken();
+		}
+	};
 
 	private static PreIngest instance = null;
 
@@ -118,11 +141,11 @@ public class PreIngest implements HistoryResolver {
 
 			layout.add(html);
 			layout.add(classificationPlanLabel);
-//			layout.add(classificationPlan);
+			// layout.add(classificationPlan);
 
 			layout.addStyleName("wui-ingest-pre");
 			classificationPlanLabel.addStyleName("classificationPlan-label");
-//			classificationPlan.addStyleName("classificationPlan");
+			// classificationPlan.addStyleName("classificationPlan");
 
 		} else {
 			// classificationPlan.clear(new AsyncCallback<Integer>() {
@@ -139,25 +162,12 @@ public class PreIngest implements HistoryResolver {
 		}
 	}
 
-	public String getHistoryPath() {
-		return Ingest.getInstance().getHistoryPath() + "." + getHistoryToken();
-	}
-
-	public String getHistoryToken() {
-		return "pre";
-	}
-
-	public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-		UserLogin.getInstance().checkRole(this, callback);
-
-	}
-
 	public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
 		if (historyTokens.length == 0) {
 			init();
 			callback.onSuccess(layout);
 		} else {
-			History.newItem(getHistoryPath());
+			History.newItem(RESOLVER.getHistoryPath());
 			callback.onSuccess(null);
 		}
 	}

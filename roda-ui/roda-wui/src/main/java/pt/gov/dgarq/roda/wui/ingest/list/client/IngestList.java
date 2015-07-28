@@ -43,7 +43,31 @@ import pt.gov.dgarq.roda.wui.ingest.client.Ingest;
  * @author Luis Faria
  * 
  */
-public class IngestList implements HistoryResolver {
+public class IngestList {
+
+	public static final HistoryResolver RESOLVER = new HistoryResolver() {
+
+		@Override
+		public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
+			getInstance().resolve(historyTokens, callback);
+		}
+
+		@Override
+		public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
+			UserLogin.getInstance().checkRole(this, callback);
+		}
+
+		@Override
+		public String getHistoryToken() {
+			return "list";
+		}
+
+		@Override
+		public String getHistoryPath() {
+			return Ingest.RESOLVER.getHistoryPath() + "." + getHistoryToken();
+		}
+	};
+
 	private static IngestList instance = null;
 	private static String READY_STATE = "SIP_NORMALIZED";
 
@@ -351,7 +375,7 @@ public class IngestList implements HistoryResolver {
 			UserLogin.getInstance().addLoginStatusListener(new LoginStatusListener() {
 
 				public void onLoginStatusChanged(AuthenticatedUser user) {
-					isCurrentUserPermitted(new AsyncCallback<Boolean>() {
+					RESOLVER.isCurrentUserPermitted(new AsyncCallback<Boolean>() {
 
 						public void onFailure(Throwable caught) {
 							logger.error("Error getting permissions", caught);
@@ -370,20 +394,12 @@ public class IngestList implements HistoryResolver {
 		}
 	}
 
-	public String getHistoryPath() {
-		return Ingest.getInstance().getHistoryPath() + "." + getHistoryToken();
-	}
-
-	public String getHistoryToken() {
-		return "list";
-	}
-
 	public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
 		if (historyTokens.length == 0) {
 			init();
 			callback.onSuccess(layout);
 		} else {
-			History.newItem(getHistoryPath());
+			History.newItem(RESOLVER.getHistoryPath());
 			callback.onSuccess(null);
 		}
 	}
@@ -408,11 +424,6 @@ public class IngestList implements HistoryResolver {
 		});
 		accept.setEnabled(selected != null && selected.get().getState().equals(READY_STATE));
 		reject.setEnabled(selected != null && selected.get().getState().equals(READY_STATE));
-	}
-
-	public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-		UserLogin.getInstance().checkRole(this, callback);
-
 	}
 
 	/**

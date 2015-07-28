@@ -57,7 +57,7 @@ public class BasicSearch extends Composite {
 
 		@Override
 		public String getHistoryPath() {
-			return Search.getInstance().getHistoryPath() + "." + getHistoryToken();
+			return Search.RESOLVER.getHistoryPath() + "." + getHistoryToken();
 		}
 
 		@Override

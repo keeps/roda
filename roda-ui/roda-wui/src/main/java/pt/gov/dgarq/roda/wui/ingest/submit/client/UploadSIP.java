@@ -34,8 +34,7 @@ public class UploadSIP {
 
 	private ClientLogger logger = new ClientLogger(getClass().getName());
 
-	private static IngestSubmitConstants constants = (IngestSubmitConstants) GWT
-			.create(IngestSubmitConstants.class);
+	private static IngestSubmitConstants constants = (IngestSubmitConstants) GWT.create(IngestSubmitConstants.class);
 
 	private boolean initialized;
 
@@ -76,13 +75,12 @@ public class UploadSIP {
 
 			title = new Label(constants.uploadHeader());
 			FileNameConstraints fileNameConstraints = new FileNameConstraints();
-			fileNameConstraints
-					.addConstraint(new String[] { "zip", "sip", "xml" }, -1);
+			fileNameConstraints.addConstraint(new String[] { "zip", "sip", "xml" }, -1);
 			fileUpload = new FileUploadPanel(fileNameConstraints);
 			actionLayout = new HorizontalPanel();
 
-			submitButton = new WUIButton(constants.uploadSubmitButton(),
-					WUIButton.Left.ROUND, WUIButton.Right.ARROW_FORWARD);
+			submitButton = new WUIButton(constants.uploadSubmitButton(), WUIButton.Left.ROUND,
+					WUIButton.Right.ARROW_FORWARD);
 
 			submitButton.addClickListener(new ClickListener() {
 
@@ -96,8 +94,8 @@ public class UploadSIP {
 
 			});
 
-			getRodaIn = new WUIButton(constants.uploadSubmitGetRodaIn(),
-					WUIButton.Left.ROUND, WUIButton.Right.ARROW_DOWN);
+			getRodaIn = new WUIButton(constants.uploadSubmitGetRodaIn(), WUIButton.Left.ROUND,
+					WUIButton.Right.ARROW_DOWN);
 
 			getRodaIn.addClickListener(new ClickListener() {
 
@@ -137,13 +135,10 @@ public class UploadSIP {
 			loading.addStyleName("upload-action-loading-image");
 			loadingMessage.addStyleName("upload-action-loading-message");
 			getRodaIn.addStyleName("upload-action-get-roda-in");
-			actionLayout.setCellVerticalAlignment(loading,
-					HasAlignment.ALIGN_MIDDLE);
-			actionLayout.setCellVerticalAlignment(loadingMessage,
-					HasAlignment.ALIGN_MIDDLE);
+			actionLayout.setCellVerticalAlignment(loading, HasAlignment.ALIGN_MIDDLE);
+			actionLayout.setCellVerticalAlignment(loadingMessage, HasAlignment.ALIGN_MIDDLE);
 			actionLayout.setCellWidth(getRodaIn, "100%");
-			actionLayout.setCellHorizontalAlignment(getRodaIn,
-					HasHorizontalAlignment.ALIGN_RIGHT);
+			actionLayout.setCellHorizontalAlignment(getRodaIn, HasHorizontalAlignment.ALIGN_RIGHT);
 		}
 	}
 
@@ -177,40 +172,36 @@ public class UploadSIP {
 
 			public void onSuccess(String[] fileCodes) {
 				loadingMessage.setText(constants.uploadLoadingIngest());
-				IngestSubmitService.Util.getInstance().submitSIPs(fileCodes,
-						new AsyncCallback<Boolean>() {
+				IngestSubmitService.Util.getInstance().submitSIPs(fileCodes, new AsyncCallback<Boolean>() {
 
-							public void onFailure(Throwable caught) {
-								logger.error("Error ingesting files", caught);
-								submitButton.setEnabled(true);
-								loading.setVisible(false);
-								loadingMessage.setVisible(false);
-							}
+					public void onFailure(Throwable caught) {
+						logger.error("Error ingesting files", caught);
+						submitButton.setEnabled(true);
+						loading.setVisible(false);
+						loadingMessage.setVisible(false);
+					}
 
-							public void onSuccess(Boolean allIngested) {
-								if (!allIngested.booleanValue()) {
-									Window.alert(constants
-											.uploadSubmitFailure());
-								}
-								ingesting = false;
-								updateVisibles();
+					public void onSuccess(Boolean allIngested) {
+						if (!allIngested.booleanValue()) {
+							Window.alert(constants.uploadSubmitFailure());
+						}
+						ingesting = false;
+						updateVisibles();
 
-								// Initialize ingest list
-								IngestList.getInstance().init();
+						// Initialize ingest list
+						IngestList.getInstance().init();
 
-								// Set processing state filter
-								IngestList.getInstance().setStateFilter(
-										IngestList.StateFilter.PROCESSING);
+						// Set processing state filter
+						IngestList.getInstance().setStateFilter(IngestList.StateFilter.PROCESSING);
 
-								// Update ingest list
-								IngestList.getInstance().update();
+						// Update ingest list
+						IngestList.getInstance().update();
 
-								// Show ingest list
-								History.newItem(IngestList.getInstance()
-										.getHistoryPath());
-							}
+						// Show ingest list
+						History.newItem(IngestList.RESOLVER.getHistoryPath());
+					}
 
-						});
+				});
 			}
 
 		});

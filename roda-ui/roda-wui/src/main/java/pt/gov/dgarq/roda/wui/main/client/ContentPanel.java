@@ -21,7 +21,9 @@ import pt.gov.dgarq.roda.wui.common.client.BadHistoryTokenException;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
 import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
+import pt.gov.dgarq.roda.wui.dissemination.browse.client.Browse;
 import pt.gov.dgarq.roda.wui.dissemination.client.Dissemination;
+import pt.gov.dgarq.roda.wui.dissemination.search.basic.client.BasicSearch;
 import pt.gov.dgarq.roda.wui.home.client.Home;
 import pt.gov.dgarq.roda.wui.ingest.client.Ingest;
 import pt.gov.dgarq.roda.wui.management.client.Management;
@@ -74,11 +76,11 @@ public class ContentPanel extends SimplePanel {
 		// About
 		resolvers.add(About.getInstance());
 		// Dissemination
-		resolvers.add(Dissemination.getInstance());
+		resolvers.add(Dissemination.RESOLVER);
 		// Home
 		resolvers.add(Home.getInstance());
 		// Ingest
-		resolvers.add(Ingest.getInstance());
+		resolvers.add(Ingest.RESOLVER);
 		// Management
 		resolvers.add(Management.getInstance());
 		// User Management
@@ -169,7 +171,7 @@ public class ContentPanel extends SimplePanel {
 			tokenI18N = historyTokens[historyTokens.length - 1].toUpperCase();
 		}
 
-//		title.setText(tokenI18N);
+		// title.setText(tokenI18N);
 		Window.setTitle(messages.windowTitle(tokenI18N));
 	}
 

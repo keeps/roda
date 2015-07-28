@@ -20,7 +20,30 @@ import com.google.gwt.user.client.ui.Widget;
  * @author Luis Faria
  * 
  */
-public class Search implements HistoryResolver {
+public class Search {
+
+	public static final HistoryResolver RESOLVER = new HistoryResolver() {
+
+		@Override
+		public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
+			getInstance().resolve(historyTokens, callback);
+		}
+
+		@Override
+		public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
+			UserLogin.getInstance().checkRole(this, callback);
+		}
+
+		@Override
+		public String getHistoryToken() {
+			return "search";
+		}
+
+		@Override
+		public String getHistoryPath() {
+			return Dissemination.RESOLVER.getHistoryPath() + "." + getHistoryToken();
+		}
+	};
 
 	private static Search instance = null;
 
@@ -49,21 +72,18 @@ public class Search implements HistoryResolver {
 			initialized = true;
 
 			layout = new VerticalPanel();
-			basicSearchLink = new Hyperlink("Pesquisa Básica",
-					"dissemination.search.basic");
-			advancedSearchLink = new Hyperlink("Pesquisa Avançada",
-					"dissemination.search.advanced");
+			basicSearchLink = new Hyperlink("Pesquisa Básica", "dissemination.search.basic");
+			advancedSearchLink = new Hyperlink("Pesquisa Avançada", "dissemination.search.advanced");
 
 			layout.add(basicSearchLink);
 			layout.add(advancedSearchLink);
 
 		}
 	}
-	
+
 	public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-		UserLogin.getInstance().checkRoles(
-				new HistoryResolver[] { BasicSearch.RESOLVER,
-						AdvancedSearch.getInstance() }, false, callback);
+		UserLogin.getInstance().checkRoles(new HistoryResolver[] { BasicSearch.RESOLVER, AdvancedSearch.RESOLVER },
+				false, callback);
 	}
 
 	public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
@@ -71,30 +91,14 @@ public class Search implements HistoryResolver {
 			init();
 			callback.onSuccess(layout);
 		} else {
-			if (historyTokens[0].equals(BasicSearch.RESOLVER
-					.getHistoryToken())) {
-				BasicSearch.getInstance().resolve(Tools.tail(historyTokens),
-						callback);
-			} else if (historyTokens[0].equals(AdvancedSearch.getInstance()
-					.getHistoryToken())) {
-				AdvancedSearch.getInstance().resolve(Tools.tail(historyTokens),
-						callback);
+			if (historyTokens[0].equals(BasicSearch.RESOLVER.getHistoryToken())) {
+				BasicSearch.getInstance().resolve(Tools.tail(historyTokens), callback);
+			} else if (historyTokens[0].equals(AdvancedSearch.RESOLVER.getHistoryToken())) {
+				AdvancedSearch.getInstance().resolve(Tools.tail(historyTokens), callback);
 			} else {
-				callback.onFailure(new BadHistoryTokenException(
-						historyTokens[0]));
+				callback.onFailure(new BadHistoryTokenException(historyTokens[0]));
 			}
 		}
 	}
-
-	public String getHistoryPath() {
-		return Dissemination.getInstance().getHistoryPath() + "."
-				+ getHistoryToken();
-	}
-
-	public String getHistoryToken() {
-		return "search";
-	}
-
-	
 
 }

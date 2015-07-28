@@ -3,11 +3,6 @@
  */
 package pt.gov.dgarq.roda.wui.ingest.submit.client;
 
-import pt.gov.dgarq.roda.wui.common.client.BadHistoryTokenException;
-import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
-import pt.gov.dgarq.roda.wui.common.client.UserLogin;
-import pt.gov.dgarq.roda.wui.ingest.client.Ingest;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -17,12 +12,40 @@ import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.IngestSubmitConstants;
+import pt.gov.dgarq.roda.wui.common.client.BadHistoryTokenException;
+import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
+import pt.gov.dgarq.roda.wui.common.client.UserLogin;
+import pt.gov.dgarq.roda.wui.ingest.client.Ingest;
 
 /**
  * @author Luis Faria
  * 
  */
-public class IngestSubmit implements HistoryResolver {
+public class IngestSubmit {
+
+	public static final HistoryResolver RESOLVER = new HistoryResolver() {
+
+		@Override
+		public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
+			getInstance().resolve(historyTokens, callback);
+		}
+
+		@Override
+		public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
+			UserLogin.getInstance().checkRole(this, callback);
+		}
+
+		@Override
+		public String getHistoryToken() {
+			return "submit";
+		}
+
+		@Override
+		public String getHistoryPath() {
+			return Ingest.RESOLVER.getHistoryPath() + "." + getHistoryToken();
+		}
+	};
+
 	private static IngestSubmit instance = null;
 
 	/**
@@ -37,8 +60,7 @@ public class IngestSubmit implements HistoryResolver {
 		return instance;
 	}
 
-	private static IngestSubmitConstants constants = (IngestSubmitConstants) GWT
-			.create(IngestSubmitConstants.class);
+	private static IngestSubmitConstants constants = (IngestSubmitConstants) GWT.create(IngestSubmitConstants.class);
 
 	private boolean initialized;
 
@@ -64,15 +86,14 @@ public class IngestSubmit implements HistoryResolver {
 
 			layout.addTabListener(new TabListener() {
 
-				public boolean onBeforeTabSelected(SourcesTabEvents sender,
-						int tabIndex) {
+				public boolean onBeforeTabSelected(SourcesTabEvents sender, int tabIndex) {
 					switch (tabIndex) {
 					case 1:
-						History.newItem(getHistoryPath() + ".create");
+						History.newItem(RESOLVER.getHistoryPath() + ".create");
 						break;
 					case 0:
 					default:
-						History.newItem(getHistoryPath() + ".upload");
+						History.newItem(RESOLVER.getHistoryPath() + ".upload");
 						break;
 					}
 					return true;
@@ -89,21 +110,8 @@ public class IngestSubmit implements HistoryResolver {
 		}
 	}
 
-	public String getHistoryPath() {
-		return Ingest.getInstance().getHistoryPath() + "." + getHistoryToken();
-	}
-
-	public String getHistoryToken() {
-		return "submit";
-	}
-
-	public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-		UserLogin.getInstance().checkRole(this, callback);
-
-	}
-
 	public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
-		String defaultHistoryPath = getHistoryPath() + ".upload";
+		String defaultHistoryPath = RESOLVER.getHistoryPath() + ".upload";
 		if (historyTokens.length == 0) {
 			History.newItem(defaultHistoryPath);
 			callback.onSuccess(null);
@@ -119,8 +127,7 @@ public class IngestSubmit implements HistoryResolver {
 				layout.selectTab(1);
 				callback.onSuccess(layout);
 			} else {
-				callback.onFailure(new BadHistoryTokenException(
-						historyTokens[0]));
+				callback.onFailure(new BadHistoryTokenException(historyTokens[0]));
 			}
 		} else {
 			History.newItem(defaultHistoryPath);

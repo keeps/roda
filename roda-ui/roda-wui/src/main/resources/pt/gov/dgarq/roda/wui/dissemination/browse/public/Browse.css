@@ -64,15 +64,15 @@
 	padding: 20px 0;
 }
 
-.metadataTitle {
+.descriptiveMetadata {
+	line-height: 1.4em;
+}
+
+.descriptiveMetadata .title {
 	color: #a7a9ac;
 	border-bottom: 1px solid rgba(167, 169, 172, 0.5);
 	padding-bottom: 5px;
 	margin-bottom: 10px;
-}
-
-.descriptiveMetadata {
-	line-height: 1.4em;
 }
 
 .descriptiveMetadata-field {

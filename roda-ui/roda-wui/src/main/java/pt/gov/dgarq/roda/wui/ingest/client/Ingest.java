@@ -21,7 +21,28 @@ import com.google.gwt.user.client.ui.Widget;
  * @author Luis Faria
  * 
  */
-public class Ingest implements HistoryResolver {
+public class Ingest {
+
+	public static final HistoryResolver RESOLVER = new HistoryResolver() {
+
+		@Override
+		public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
+			getInstance().resolve(historyTokens, callback);
+		}
+
+		@Override
+		public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
+			UserLogin.getInstance().checkRole(this, callback);
+		}
+
+		public String getHistoryPath() {
+			return getHistoryToken();
+		}
+
+		public String getHistoryToken() {
+			return "ingest";
+		}
+	};
 
 	private static Ingest instance = null;
 
@@ -37,8 +58,7 @@ public class Ingest implements HistoryResolver {
 		return instance;
 	}
 
-	private static ClientLogger logger = new ClientLogger(Ingest.class
-			.getName());
+	private static ClientLogger logger = new ClientLogger(Ingest.class.getName());
 
 	private boolean initialized;
 
@@ -64,43 +84,21 @@ public class Ingest implements HistoryResolver {
 		return help;
 	}
 
-	public String getHistoryPath() {
-		return getHistoryToken();
-	}
-
-	public String getHistoryToken() {
-		return "ingest";
-	}
-
-	public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-		UserLogin.getInstance().checkRoles(
-				new HistoryResolver[] { PreIngest.getInstance(),
-						IngestSubmit.getInstance(), IngestList.getInstance() },
-				false, callback);
-	}
-
 	public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
 		if (historyTokens.length == 0) {
 			init();
 			callback.onSuccess(layout);
 		} else {
-			if (historyTokens[0].equals(PreIngest.getInstance()
-					.getHistoryToken())) {
-				PreIngest.getInstance().resolve(Tools.tail(historyTokens),
-						callback);
-			} else if (historyTokens[0].equals(IngestSubmit.getInstance()
-					.getHistoryToken())) {
-				IngestSubmit.getInstance().resolve(Tools.tail(historyTokens),
-						callback);
-			} else if (historyTokens[0].equals(IngestList.getInstance()
-					.getHistoryToken())) {
-				IngestList.getInstance().resolve(Tools.tail(historyTokens),
-						callback);
+			if (historyTokens[0].equals(PreIngest.RESOLVER.getHistoryToken())) {
+				PreIngest.getInstance().resolve(Tools.tail(historyTokens), callback);
+			} else if (historyTokens[0].equals(IngestSubmit.RESOLVER.getHistoryToken())) {
+				IngestSubmit.getInstance().resolve(Tools.tail(historyTokens), callback);
+			} else if (historyTokens[0].equals(IngestList.RESOLVER.getHistoryToken())) {
+				IngestList.getInstance().resolve(Tools.tail(historyTokens), callback);
 			} else if (historyTokens[0].equals("help")) {
 				callback.onSuccess(getHelp());
 			} else {
-				callback.onFailure(new BadHistoryTokenException(
-						historyTokens[0]));
+				callback.onFailure(new BadHistoryTokenException(historyTokens[0]));
 			}
 		}
 	}
@@ -117,40 +115,34 @@ public class Ingest implements HistoryResolver {
 	 *            null to get a cross-platform installer
 	 */
 	public static void downloadRodaIn(final User targetUser, final String os) {
-		UserLogin.getRodaProperty("roda.in.installer.url",
-				new AsyncCallback<String>() {
+		UserLogin.getRodaProperty("roda.in.installer.url", new AsyncCallback<String>() {
+
+			public void onFailure(Throwable caught) {
+				logger.error("Error getting RODA-in", caught);
+			}
+
+			public void onSuccess(final String rodaInUrl) {
+				UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<AuthenticatedUser>() {
 
 					public void onFailure(Throwable caught) {
 						logger.error("Error getting RODA-in", caught);
 					}
 
-					public void onSuccess(final String rodaInUrl) {
-						UserLogin.getInstance().getAuthenticatedUser(
-								new AsyncCallback<AuthenticatedUser>() {
-
-									public void onFailure(Throwable caught) {
-										logger.error("Error getting RODA-in",
-												caught);
-									}
-
-									public void onSuccess(AuthenticatedUser user) {
-										User target = targetUser == null ? user
-												: targetUser;
-										String url = rodaInUrl.replaceAll(
-												"$USERNAME", user.getName())
-												+ "/" + target.getName();
-										if (os != null) {
-											url += "?os=" + os;
-										}
-										Window.open(url, "_blank", "");
-
-									}
-
-								});
+					public void onSuccess(AuthenticatedUser user) {
+						User target = targetUser == null ? user : targetUser;
+						String url = rodaInUrl.replaceAll("$USERNAME", user.getName()) + "/" + target.getName();
+						if (os != null) {
+							url += "?os=" + os;
+						}
+						Window.open(url, "_blank", "");
 
 					}
 
 				});
+
+			}
+
+		});
 
 	}
 

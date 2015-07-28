@@ -38,14 +38,11 @@ import config.i18n.client.CommonMessages;
  */
 public class UserLogin {
 
-	private static final ClientLogger logger = new ClientLogger(
-			UserLogin.class.getName());
+	private static final ClientLogger logger = new ClientLogger(UserLogin.class.getName());
 
-	private static final CommonConstants constants = (CommonConstants) GWT
-			.create(CommonConstants.class);
+	private static final CommonConstants constants = (CommonConstants) GWT.create(CommonConstants.class);
 
-	private static final CommonMessages messages = (CommonMessages) GWT
-			.create(CommonMessages.class);
+	private static final CommonMessages messages = (CommonMessages) GWT.create(CommonMessages.class);
 
 	private static UserLoginServiceAsync userLoginService;
 
@@ -59,21 +56,20 @@ public class UserLogin {
 		if (!initialized) {
 
 			userLoginService = UserLoginService.Util.getInstance();
-			userLoginService
-					.getRodaProperties(new AsyncCallback<Map<String, String>>() {
+			userLoginService.getRodaProperties(new AsyncCallback<Map<String, String>>() {
 
-						public void onFailure(Throwable caught) {
-							logger.fatal("Error getting role mapping", caught);
-							callback.onFailure(caught);
-						}
+				public void onFailure(Throwable caught) {
+					logger.fatal("Error getting role mapping", caught);
+					callback.onFailure(caught);
+				}
 
-						public void onSuccess(Map<String, String> properties) {
-							rodaProperties = properties;
-							initialized = true;
-							callback.onSuccess(properties);
-						}
+				public void onSuccess(Map<String, String> properties) {
+					rodaProperties = properties;
+					initialized = true;
+					callback.onSuccess(properties);
+				}
 
-					});
+			});
 		} else {
 			callback.onSuccess(rodaProperties);
 		}
@@ -125,54 +121,48 @@ public class UserLogin {
 	 *            call back handler that receives error if failed or
 	 *            AuthOfficeUser if success.
 	 */
-	public void getAuthenticatedUser(
-			final AsyncCallback<AuthenticatedUser> callback) {
+	public void getAuthenticatedUser(final AsyncCallback<AuthenticatedUser> callback) {
 		if (user == null) {
-			userLoginService
-					.getAuthenticatedUser(new AsyncCallback<AuthenticatedUser>() {
+			userLoginService.getAuthenticatedUser(new AsyncCallback<AuthenticatedUser>() {
 
-						public void onFailure(Throwable caught) {
-							callback.onFailure(caught);
+				public void onFailure(Throwable caught) {
+					callback.onFailure(caught);
 
-						}
+				}
 
-						public void onSuccess(AuthenticatedUser user) {
-							callback.onSuccess(user);
-							UserLogin.this.user = user;
-						}
+				public void onSuccess(AuthenticatedUser user) {
+					callback.onSuccess(user);
+					UserLogin.this.user = user;
+				}
 
-					});
+			});
 		} else {
 			callback.onSuccess(user);
 		}
 	}
 
-	public void loginCAS(String location, String serviceTicket,
-			final AsyncCallback<AuthenticatedUser> callback) {
-		userLoginService.loginCAS(location, serviceTicket,
-				new AsyncCallback<AuthenticatedUser>() {
+	public void loginCAS(String location, String serviceTicket, final AsyncCallback<AuthenticatedUser> callback) {
+		userLoginService.loginCAS(location, serviceTicket, new AsyncCallback<AuthenticatedUser>() {
 
-					public void onFailure(Throwable caught) {
-						if (caught instanceof LoginException) {
-							// do nothing
-						} else if (caught instanceof RODAClientException) {
-							Window.alert(messages.rodaClientFailed(caught
-									.getMessage()));
+			public void onFailure(Throwable caught) {
+				if (caught instanceof LoginException) {
+					// do nothing
+				} else if (caught instanceof RODAClientException) {
+					Window.alert(messages.rodaClientFailed(caught.getMessage()));
 
-						} else {
-							Window.alert(messages.genericFailure(caught
-									.getMessage()));
-						}
-						callback.onFailure(caught);
-					}
+				} else {
+					Window.alert(messages.genericFailure(caught.getMessage()));
+				}
+				callback.onFailure(caught);
+			}
 
-					public void onSuccess(AuthenticatedUser user) {
-						callback.onSuccess(user);
-						UserLogin.this.user = user;
-						onLoginStatusChanged(user);
-					}
+			public void onSuccess(AuthenticatedUser user) {
+				callback.onSuccess(user);
+				UserLogin.this.user = user;
+				onLoginStatusChanged(user);
+			}
 
-				});
+		});
 
 	}
 
@@ -191,8 +181,7 @@ public class UserLogin {
 
 				final String casURL = result;
 				StringBuilder forwardURL = new StringBuilder();
-				forwardURL.append(casURL).append("/login?locale=")
-						.append(constants.locale()).append("&service=")
+				forwardURL.append(casURL).append("/login?locale=").append(constants.locale()).append("&service=")
 						.append(Window.Location.getHref());
 				Window.open(forwardURL.toString(), "_self", "");
 			}
@@ -215,72 +204,60 @@ public class UserLogin {
 				userLoginService.logout(new AsyncCallback<AuthenticatedUser>() {
 
 					public void onFailure(Throwable caught) {
-					    logger.error(caught.getMessage(),caught);
+						logger.error(caught.getMessage(), caught);
 						if (caught instanceof LoginException) {
-							Window.alert(messages.loginFailed(caught
-									.getMessage()));
+							Window.alert(messages.loginFailed(caught.getMessage()));
 						} else if (caught instanceof RODAClientException) {
-							Window.alert(messages.rodaClientFailed(caught
-									.getMessage()));
+							Window.alert(messages.rodaClientFailed(caught.getMessage()));
 
 						} else {
-							Window.alert(messages.genericFailure(caught
-									.getMessage()));
+							Window.alert(messages.genericFailure(caught.getMessage()));
 						}
 						callback.onFailure(caught);
 					}
 
 					public void onSuccess(final AuthenticatedUser user) {
-						userLoginService
-								.getRodaCasURL(new AsyncCallback<String>() {
+						userLoginService.getRodaCasURL(new AsyncCallback<String>() {
 
-									@Override
-									public void onSuccess(String result) {
-										String logoutURL = result + "/logout";
-										GWT.log("CAS logout: "+logoutURL);
-										RequestBuilder builder = new RequestBuilder(
-												RequestBuilder.GET, logoutURL);
+							@Override
+							public void onSuccess(String result) {
+								String logoutURL = result + "/logout";
+								GWT.log("CAS logout: " + logoutURL);
+								RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, logoutURL);
 
-										try {
-											builder.sendRequest(null,
-													new RequestCallback() {
-														public void onError(
-																Request request,
-																Throwable exception) {
-															if (exception instanceof RequestTimeoutException) {
-																Window.alert("The request has timed out");
-															} else {
-																Window.alert(exception
-																		.getMessage());
-															}
-														}
-
-														public void onResponseReceived(
-																Request request,
-																Response response) {
-														  logger.error("REMOVING COOKIES...");
-															Cookies.removeCookie("CASTGC", "/cas/");
-															
-															UserLogin.this.user = user;
-															callback.onSuccess(user);
-															onLoginStatusChanged(user);
-														}
-
-													});
-										} catch (RequestException e) {
-											Window.alert(e.getMessage());
-											logger.error(e.getMessage(),e);
+								try {
+									builder.sendRequest(null, new RequestCallback() {
+										public void onError(Request request, Throwable exception) {
+											if (exception instanceof RequestTimeoutException) {
+												Window.alert("The request has timed out");
+											} else {
+												Window.alert(exception.getMessage());
+											}
 										}
-									}
 
-									@Override
-									public void onFailure(Throwable caught) {
-										Window.alert(caught.getMessage());
-										logger.error(caught.getMessage(),caught);
-										logger.fatal("Error with CAS URL",
-												caught);
-									}
-								});
+										public void onResponseReceived(Request request, Response response) {
+											logger.error("REMOVING COOKIES...");
+											Cookies.removeCookie("CASTGC", "/cas/");
+
+											UserLogin.this.user = user;
+											callback.onSuccess(user);
+											onLoginStatusChanged(user);
+										}
+
+									});
+								} catch (RequestException e) {
+									Window.alert(e.getMessage());
+									logger.error(e.getMessage(), e);
+								}
+							}
+
+							@Override
+							public void onFailure(Throwable caught) {
+								Window.alert(caught.getMessage());
+								logger.error(caught.getMessage(), caught);
+								logger.fatal("Error with CAS URL", caught);
+							}
+						});
 					}
 
 				});
@@ -329,12 +306,9 @@ public class UserLogin {
 
 			public void onSuccess(AuthenticatedUser user) {
 				AuthenticatedUser authUser = user;
-				if (member instanceof User
-						&& member.getName().equals(authUser.getName())) {
+				if (member instanceof User && member.getName().equals(authUser.getName())) {
 					onLoginStatusChanged(authUser);
-				} else if (member instanceof Group
-						&& Arrays.asList(authUser.getGroups()).contains(
-								member.getName())) {
+				} else if (member instanceof Group && Arrays.asList(authUser.getGroups()).contains(member.getName())) {
 					onLoginStatusChanged(authUser);
 				}
 			}
@@ -370,8 +344,7 @@ public class UserLogin {
 	 * 
 	 * @param callback
 	 */
-	public static void getRodaProperties(
-			final AsyncCallback<Map<String, String>> callback) {
+	public static void getRodaProperties(final AsyncCallback<Map<String, String>> callback) {
 		init(new AsyncCallback<Map<String, String>>() {
 
 			public void onFailure(Throwable caught) {
@@ -391,8 +364,7 @@ public class UserLogin {
 	 * @param key
 	 * @param callback
 	 */
-	public static void getRodaProperty(final String key,
-			final AsyncCallback<String> callback) {
+	public static void getRodaProperty(final String key, final AsyncCallback<String> callback) {
 		init(new AsyncCallback<Map<String, String>>() {
 
 			public void onFailure(Throwable caught) {
@@ -412,9 +384,9 @@ public class UserLogin {
 	 * @param res
 	 * @param callback
 	 */
-	public void checkRole(HistoryResolver res,
-			final AsyncCallback<Boolean> callback) {
+	public void checkRole(HistoryResolver res, final AsyncCallback<Boolean> callback) {
 		String propertyName = "menu." + res.getHistoryPath() + ".role";
+		GWT.log("getting property " + propertyName);
 		UserLogin.getRodaProperty(propertyName, new AsyncCallback<String>() {
 
 			public void onFailure(Throwable caught) {
@@ -422,6 +394,7 @@ public class UserLogin {
 			}
 
 			public void onSuccess(final String role) {
+				GWT.log("got role " + role);
 				getAuthenticatedUser(new AsyncCallback<AuthenticatedUser>() {
 
 					public void onFailure(Throwable caught) {
@@ -429,6 +402,7 @@ public class UserLogin {
 					}
 
 					public void onSuccess(AuthenticatedUser authUser) {
+						GWT.log("User " + authUser + " has role " + role + " result=" + authUser.hasRole(role));
 						callback.onSuccess(new Boolean(authUser.hasRole(role)));
 					}
 
@@ -446,8 +420,7 @@ public class UserLogin {
 	 * @param exclusive
 	 * @param callback
 	 */
-	public void checkRoles(HistoryResolver[] res, final boolean exclusive,
-			final AsyncCallback<Boolean> callback) {
+	public void checkRoles(HistoryResolver[] res, final boolean exclusive, final AsyncCallback<Boolean> callback) {
 		final Boolean[] results = new Boolean[res.length];
 
 		for (int i = 0; i < res.length; i++) {

@@ -79,7 +79,7 @@ public class Browse extends Composite {
 
 		@Override
 		public String getHistoryPath() {
-			return Dissemination.getInstance().getHistoryPath() + "." + getHistoryToken();
+			return Dissemination.RESOLVER.getHistoryPath() + "." + getHistoryToken();
 		}
 	};
 
@@ -264,11 +264,8 @@ public class Browse extends Composite {
 				downloadList.add(createRepresentationDownloadPanel(rep));
 			}
 
-			for (DescriptiveMetadataBundle desc : descMetadata) {
-				downloadList.add(createDescriptiveMetadataDownloadPanel(desc));
-			}
+			downloadList.add(createDescriptiveMetadataDownloadPanel(descMetadata));
 
-			// TODO add all downloads
 		} else {
 			viewAction();
 		}
@@ -354,13 +351,19 @@ public class Browse extends Composite {
 		return NumberFormat.getFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
 	}
 
-	private Widget createDescriptiveMetadataDownloadPanel(DescriptiveMetadataBundle desc) {
+	private Widget createDescriptiveMetadataDownloadPanel(List<DescriptiveMetadataBundle> descMetadata) {
 		FlowPanel downloadPanel = new FlowPanel();
 		HTML icon = new HTML(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-download'></i>"));
 		FlowPanel labelsPanel = new FlowPanel();
 
+		int files = descMetadata.size();
+		long sizeInBytes = 0;
+		for (DescriptiveMetadataBundle desc : descMetadata) {
+			sizeInBytes += desc.getSizeInBytes();
+		}
+
 		Anchor label = new Anchor("Descriptive metadata");
-		Label subLabel = new Label(desc.getId() + ", " + readableFileSize(desc.getSizeInBytes()));
+		Label subLabel = new Label(files + " files, " + readableFileSize(sizeInBytes));
 
 		labelsPanel.add(label);
 		labelsPanel.add(subLabel);
@@ -398,9 +401,6 @@ public class Browse extends Composite {
 	private SafeHtml getDescriptiveMetadataPanelHTML(List<DescriptiveMetadataBundle> descriptiveMetadata) {
 		SafeHtmlBuilder builder = new SafeHtmlBuilder();
 		for (DescriptiveMetadataBundle bundle : descriptiveMetadata) {
-			builder.append(SafeHtmlUtils.fromSafeConstant("<div class='metadataTitle'>"));
-			builder.append(SafeHtmlUtils.fromString(bundle.getId()));
-			builder.append(SafeHtmlUtils.fromSafeConstant("</div>"));
 			builder.append(SafeHtmlUtils.fromTrustedString(bundle.getHtml()));
 		}
 		return builder.toSafeHtml();

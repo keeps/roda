@@ -5,13 +5,10 @@ package pt.gov.dgarq.roda.wui.dissemination.client;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.CommonConstants;
 import config.i18n.client.DisseminationConstants;
 import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevel;
-import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevelInfo;
 import pt.gov.dgarq.roda.wui.common.client.BadHistoryTokenException;
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
@@ -25,7 +22,28 @@ import pt.gov.dgarq.roda.wui.dissemination.search.client.Search;
  * @author Luis Faria
  * 
  */
-public class Dissemination implements HistoryResolver {
+public class Dissemination {
+
+	public static final HistoryResolver RESOLVER = new HistoryResolver() {
+
+		@Override
+		public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
+			getInstance().resolve(historyTokens, callback);
+		}
+
+		@Override
+		public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
+			UserLogin.getInstance().checkRole(this, callback);
+		}
+
+		public String getHistoryPath() {
+			return getHistoryToken();
+		}
+
+		public String getHistoryToken() {
+			return "dissemination";
+		}
+	};
 
 	private static DisseminationConstants constants = (DisseminationConstants) GWT.create(DisseminationConstants.class);
 
@@ -71,17 +89,12 @@ public class Dissemination implements HistoryResolver {
 		return help;
 	}
 
-	public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-		UserLogin.getInstance().checkRoles(new HistoryResolver[] { Search.getInstance(), Browse.RESOLVER }, false,
-				callback);
-	}
-
 	public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
 		if (historyTokens.length == 0) {
 			init();
 			callback.onSuccess(page);
 		} else {
-			if (historyTokens[0].equals(Search.getInstance().getHistoryToken())) {
+			if (historyTokens[0].equals(Search.RESOLVER.getHistoryToken())) {
 				Search.getInstance().resolve(Tools.tail(historyTokens), callback);
 
 			} else if (historyTokens[0].equals(Browse.RESOLVER.getHistoryToken())) {
@@ -94,14 +107,6 @@ public class Dissemination implements HistoryResolver {
 				callback.onFailure(new BadHistoryTokenException(historyTokens[0]));
 			}
 		}
-	}
-
-	public String getHistoryPath() {
-		return getHistoryToken();
-	}
-
-	public String getHistoryToken() {
-		return "dissemination";
 	}
 
 	/**

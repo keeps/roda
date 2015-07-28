@@ -115,13 +115,12 @@ public class Menu2 extends Composite {
 
 		ingestMenu = new MenuBar(true);
 		ingest_pre = ingestMenu.addItem(constants.title_ingest_pre(),
-				createCommand(PreIngest.getInstance().getHistoryPath()));
+				createCommand(PreIngest.RESOLVER.getHistoryPath()));
 		ingest_submit = ingestMenu.addItem(constants.title_ingest_submit(),
-				createCommand(IngestSubmit.getInstance().getHistoryPath()));
+				createCommand(IngestSubmit.RESOLVER.getHistoryPath()));
 		ingest_list = ingestMenu.addItem(constants.title_ingest_list(),
-				createCommand(IngestList.getInstance().getHistoryPath()));
-		ingestMenu.addItem(constants.title_ingest_help(),
-				createCommand(Ingest.getInstance().getHistoryPath() + ".help"));
+				createCommand(IngestList.RESOLVER.getHistoryPath()));
+		ingestMenu.addItem(constants.title_ingest_help(), createCommand(Ingest.RESOLVER.getHistoryPath() + ".help"));
 
 		administrationMenu = new MenuBar(true);
 		administration_user = administrationMenu.addItem(constants.title_administration_user(),
@@ -253,36 +252,9 @@ public class Menu2 extends Composite {
 
 		});
 
-		// AdvancedSearch.getInstance().isCurrentUserPermitted(new
-		// AsyncCallback<Boolean>() {
-		//
-		// public void onFailure(Throwable caught) {
-		// logger.error("Error getting advanced search role", caught);
-		// }
-		//
-		// public void onSuccess(Boolean asRole) {
-		// dissemination_searchAdvanced.setVisible(asRole);
-		// }
-		//
-		// });
-
-		// Dissemination.getInstance().isCurrentUserPermitted(new
-		// AsyncCallback<Boolean>() {
-		//
-		// public void onFailure(Throwable caught) {
-		// logger.error("Error getting roles", caught);
-		// }
-		//
-		// public void onSuccess(Boolean asRole) {
-		// if (asRole) {
-		// leftMenu.addItem(constants.title_dissemination(), disseminationMenu);
-		// }
-		// }
-		//
-		// });
 
 		// Ingest
-		PreIngest.getInstance().isCurrentUserPermitted(new AsyncCallback<Boolean>() {
+		PreIngest.RESOLVER.isCurrentUserPermitted(new AsyncCallback<Boolean>() {
 
 			public void onFailure(Throwable caught) {
 				logger.error("Error getting browse role", caught);
@@ -294,7 +266,7 @@ public class Menu2 extends Composite {
 
 		});
 
-		IngestSubmit.getInstance().isCurrentUserPermitted(new AsyncCallback<Boolean>() {
+		IngestSubmit.RESOLVER.isCurrentUserPermitted(new AsyncCallback<Boolean>() {
 
 			public void onFailure(Throwable caught) {
 				logger.error("Error getting browse role", caught);
@@ -306,7 +278,7 @@ public class Menu2 extends Composite {
 
 		});
 
-		IngestList.getInstance().isCurrentUserPermitted(new AsyncCallback<Boolean>() {
+		IngestList.RESOLVER.isCurrentUserPermitted(new AsyncCallback<Boolean>() {
 
 			public void onFailure(Throwable caught) {
 				logger.error("Error getting browse role", caught);
@@ -318,7 +290,7 @@ public class Menu2 extends Composite {
 
 		});
 
-		Ingest.getInstance().isCurrentUserPermitted(new AsyncCallback<Boolean>() {
+		Ingest.RESOLVER.isCurrentUserPermitted(new AsyncCallback<Boolean>() {
 
 			public void onFailure(Throwable caught) {
 				logger.error("Error getting roles", caught);
