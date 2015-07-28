@@ -338,17 +338,24 @@
 		<dependency>
 			<groupId>pt.gov.dgarq.roda</groupId>
 			<artifactId>premis-v2.0</artifactId>
-			<version>1.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.w3c</groupId>
 			<artifactId>w3c-utils</artifactId>
-			<version>1.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.xmlbeans</groupId>
 			<artifactId>xmlbeans</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+		</dependency>
+
 		<!-- FIXME remove jsoup -->
 		<dependency>
 			<groupId>org.jsoup</groupId>
