@@ -394,4 +394,15 @@ public final class ModelUtils {
 		}
 		return null;
 	}
+	
+	public static LogEntry getLogEntry(String json) {
+		try{
+			JsonFactory factory = new JsonFactory();
+			ObjectMapper mapper = new ObjectMapper(factory);
+			return mapper.readValue(json, LogEntry.class);
+		}catch(IOException ioe){
+			
+		}
+		return null;
+	}
 }

@@ -77,7 +77,7 @@ import pt.gov.dgarq.roda.core.data.v2.RepresentationPreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationState;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.core.data.v2.SimpleEventPreservationMetadata;
-import pt.gov.dgarq.roda.core.data.v2.SimpleRepresentationFileMetadata;
+import pt.gov.dgarq.roda.core.data.v2.SimpleRepresentationFilePreservationMetadata;
 import pt.gov.dgarq.roda.core.data.v2.SimpleRepresentationPreservationMetadata;
 
 public class SolrUtils {
@@ -378,7 +378,7 @@ public class SolrUtils {
 			indexName = RodaConstants.INDEX_SDO;
 		} else if (resultClass.equals(Representation.class)) {
 			indexName = RodaConstants.INDEX_REPRESENTATIONS;
-		} else if (resultClass.equals(SimpleRepresentationFileMetadata.class)) {
+		} else if (resultClass.equals(SimpleRepresentationFilePreservationMetadata.class)) {
 			indexName = RodaConstants.INDEX_PRESERVATION_OBJECTS;
 		} else if (resultClass.equals(SimpleEventPreservationMetadata.class)) {
 			indexName = RodaConstants.INDEX_PRESERVATION_EVENTS;
@@ -399,7 +399,7 @@ public class SolrUtils {
 			ret = resultClass.cast(solrDocumentToSDO(doc));
 		} else if (resultClass.equals(Representation.class)) {
 			ret = resultClass.cast(solrDocumentToRepresentation(doc));
-		} else if (resultClass.equals(SimpleRepresentationFileMetadata.class)) {
+		} else if (resultClass.equals(SimpleRepresentationFilePreservationMetadata.class)) {
 			ret = resultClass.cast(solrDocumentToSimpleRepresentationFileMetadata(doc));
 		} else if (resultClass.equals(SimpleEventPreservationMetadata.class)) {
 			ret = resultClass.cast(solrDocumentToSimpleEventPreservationMetadata(doc));
@@ -652,7 +652,7 @@ public class SolrUtils {
 		return srpm;
 	}
 
-	public static SimpleRepresentationFileMetadata solrDocumentToSimpleRepresentationFileMetadata(SolrDocument doc) {
+	public static SimpleRepresentationFilePreservationMetadata solrDocumentToSimpleRepresentationFileMetadata(SolrDocument doc) {
 		final Date dateCreated = objectToDate(doc.get(RodaConstants.SRFM_CREATED_DATE));
 		final String id = objectToString(doc.get(RodaConstants.SRFM_ID));
 		final String label = objectToString(doc.get(RodaConstants.SRFM_LABEL));
@@ -667,7 +667,7 @@ public class SolrUtils {
 		final String aipID = objectToString(doc.get(RodaConstants.SRFM_AIP_ID));
 		final String representationID = objectToString(doc.get(RodaConstants.SRFM_REPRESENTATION_ID));
 		final String fileID = objectToString(doc.get(RodaConstants.SRFM_FILE_ID));
-		SimpleRepresentationFileMetadata srpm = new SimpleRepresentationFileMetadata();
+		SimpleRepresentationFilePreservationMetadata srpm = new SimpleRepresentationFilePreservationMetadata();
 		srpm.setCreatedDate(dateCreated);
 		srpm.setFileId(id);
 		srpm.setHash(hash);

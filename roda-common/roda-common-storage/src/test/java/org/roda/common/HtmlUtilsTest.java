@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 import pt.gov.dgarq.roda.core.data.v2.EventPreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationFilePreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.SimpleEventPreservationMetadata;
-import pt.gov.dgarq.roda.core.data.v2.SimpleRepresentationFileMetadata;
+import pt.gov.dgarq.roda.core.data.v2.SimpleRepresentationFilePreservationMetadata;
 
 public class HtmlUtilsTest {
 	private static Path basePath;
@@ -97,7 +97,7 @@ public class HtmlUtilsTest {
 		final String aipId = UUID.randomUUID().toString();
 		final AIP aip = model.createAIP(aipId, corporaService,
 				DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
-		SimpleRepresentationFileMetadata srfm = index.retrieveSimpleRepresentationFileMetadata(aipId, CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.F0_PREMIS_XML);
+		SimpleRepresentationFilePreservationMetadata srfm = index.retrieveSimpleRepresentationFilePreservationMetadata(aipId, CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.F0_PREMIS_XML);
 		Element html = HTMLUtils.preservationObjectFromStorageToHtml(srfm, model, new Locale("pt","PT"));
 		logger.debug("HTML: "+html);
 		Element representationFilePreservationElement = html.getElementsByAttributeValueMatching(CorporaConstants.HTML_TYPE, CorporaConstants.HTML_PREMIS).get(0);
@@ -166,7 +166,7 @@ public class HtmlUtilsTest {
 		final String aipId = UUID.randomUUID().toString();
 		final AIP aip = model.createAIP(aipId, corporaService,
 				DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
-		SimpleRepresentationFileMetadata srfm = index.retrieveSimpleRepresentationFileMetadata(aipId, CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.F0_PREMIS_XML);
+		SimpleRepresentationFilePreservationMetadata srfm = index.retrieveSimpleRepresentationFilePreservationMetadata(aipId, CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.F0_PREMIS_XML);
 		Element html = HTMLUtils.preservationObjectFromStorageToHtml(new RepresentationFilePreservationObject(srfm),model,new Locale("pt", "PT"));
 		Element premisElement = html.getElementsByAttributeValueMatching(CorporaConstants.HTML_TYPE, CorporaConstants.HTML_PREMIS).get(0);
 		Element fieldElement = premisElement.getElementsByAttributeValueMatching(CorporaConstants.HTML_FIELD, CorporaConstants.HTML_PRESERVATION_LEVEL).get(0);

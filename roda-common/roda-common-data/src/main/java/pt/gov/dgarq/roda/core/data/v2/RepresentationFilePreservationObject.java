@@ -7,7 +7,7 @@ import java.io.Serializable;
  * 
  * @author Rui Castro
  */
-public class RepresentationFilePreservationObject extends SimpleRepresentationFileMetadata implements Serializable {
+public class RepresentationFilePreservationObject extends SimpleRepresentationFilePreservationMetadata implements Serializable {
 	private static final long serialVersionUID = 3984141759920127217L;
 	/**
 	 * Full preservation level, from file integrity, file format management, to
@@ -67,9 +67,9 @@ public class RepresentationFilePreservationObject extends SimpleRepresentationFi
 
 	/**
 	 * Constructs a new {@link RepresentationFilePreservationObject} from a
-	 * {@link SimpleRepresentationFileMetadata}.
+	 * {@link SimpleRepresentationFilePreservationMetadata}.
 	 */
-	public RepresentationFilePreservationObject(SimpleRepresentationFileMetadata simple){
+	public RepresentationFilePreservationObject(SimpleRepresentationFilePreservationMetadata simple){
 		super(simple);
 		this.compositionLevel=-1;
 	}

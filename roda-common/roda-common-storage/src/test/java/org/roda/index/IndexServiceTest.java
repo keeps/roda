@@ -49,7 +49,8 @@ import pt.gov.dgarq.roda.core.data.v2.RODAObject;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.core.data.v2.SimpleEventPreservationMetadata;
-import pt.gov.dgarq.roda.core.data.v2.SimpleRepresentationFileMetadata;
+import pt.gov.dgarq.roda.core.data.v2.SimpleRepresentationFilePreservationMetadata;
+import pt.gov.dgarq.roda.core.data.v2.SimpleRepresentationPreservationMetadata;
 
 public class IndexServiceTest {
 
@@ -180,18 +181,14 @@ public class IndexServiceTest {
 		assertEquals(sepm.getType(), CorporaConstants.INGESTION);
 		Filter filterType = new Filter();
 		filterType.add(new SimpleFilterParameter(RodaConstants.SEPM_TYPE, CorporaConstants.INGESTION));
-		assertEquals("" + index.countSimpleEventPreservationMetadata(filterType), "" + 1L);
-		assertEquals(index.findSimpleEventPreservationMetadata(filterType, null, new Sublist(0, 10)).getTotalCount(),
-				1L);
+		assertThat(index.countSimpleEventPreservationMetadata(filterType), Matchers.equalTo(1L));
+		assertThat(index.findSimpleEventPreservationMetadata(filterType, null, new Sublist(0, 10)).getTotalCount(),Matchers.equalTo(1L));
 
-//		SimpleRepresentationFileMetadata srfm = index.retrieveSimpleRepresentationFileMetadata(aipId,
-//				CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.F0_PREMIS_XML);
-//		assertEquals(srfm.getAipId(), aipId);
-//		Filter filterAIPID = new Filter();
-//		filterAIPID.add(new SimpleFilterParameter(RodaConstants.SRFM_AIP_ID, aipId));
-//		assertThat(index.countSimpleRepresentationFileMetadata(filterAIPID), Matchers.equalTo(4L));
-		
-		
+		SimpleRepresentationFilePreservationMetadata srfpm = index.retrieveSimpleRepresentationFilePreservationMetadata(aipId, CorporaConstants.REPRESENTATION_1_ID,CorporaConstants.F0_PREMIS_XML);
+		assertEquals(srfpm.getAipId(), aipId);
+		Filter filterAIPID = new Filter();
+		filterAIPID.add(new SimpleFilterParameter(RodaConstants.SRFM_AIP_ID, aipId));
+		assertThat(index.countSimpleRepresentationFilePreservationMetadata(filterAIPID),Matchers.equalTo(4L));
 		/*
 		 * filterMimetype.add(new
 		 * SimpleFilterParameter(RodaConstants.SRFM_MIMETYPE,
@@ -369,7 +366,7 @@ public class IndexServiceTest {
 		assertEquals(index.getLogEntriesCount(filterDescription2),n2);
 	}
 	
-	@Test
+	/*@Test
 	public void testFindLogEntry() throws StorageActionException, IndexActionException{
 		LogEntry entry = new LogEntry();
 		entry.setAction("Action");
@@ -400,6 +397,6 @@ public class IndexServiceTest {
 		
 		IndexResult<LogEntry> entries2 =  index.findLogEntry(filterDescription2, null, new Sublist());
 		assertEquals(entries2.getTotalCount(),0);
-	}
+	}*/
 
 }

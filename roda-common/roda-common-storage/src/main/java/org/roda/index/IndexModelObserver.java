@@ -19,10 +19,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import pt.gov.dgarq.roda.core.common.RodaConstants;
-import pt.gov.dgarq.roda.core.data.preservation.RepresentationFilePreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.EventPreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
+import pt.gov.dgarq.roda.core.data.v2.RepresentationFilePreservationObject;
 
 /**
  * 
@@ -75,24 +75,24 @@ public class IndexModelObserver implements ModelObserver {
 		}
 
 		
-//		final Map<String,List<String>> preservationFileObjectsIds = aip.getPreservationFileObjectsIds();
-//		for (Map.Entry<String, List<String>> eventPreservationMap : preservationFileObjectsIds.entrySet()) {
-//			try {
-//				for(String fileId : eventPreservationMap.getValue()){
-//					RepresentationFilePreservationObject premisObject = model.retrieveRepresentationFileObject(aip.getId(),eventPreservationMap.getKey(),fileId);
-//					String id = SolrUtils.getId(aip.getId(), eventPreservationMap.getKey(),fileId);
-//					SolrInputDocument premisObjectDocument = SolrUtils.representationFilePreservationObjectToSolrDocument(id,premisObject);
-//					index.add(RodaConstants.INDEX_PRESERVATION_OBJECTS, premisObjectDocument);
-//				}
-//			} catch (SolrServerException | IOException | ModelServiceException e) {
-//				logger.error("Could not index premis object", e);
-//			}
-//		}
-//		try {
-//			index.commit(RodaConstants.INDEX_PRESERVATION_OBJECTS);
-//		} catch (SolrServerException | IOException e) {
-//			logger.error("Could not commit indexed representations", e);
-//		}
+		final Map<String,List<String>> preservationFileObjectsIds = aip.getPreservationFileObjectsIds();
+		for (Map.Entry<String, List<String>> eventPreservationMap : preservationFileObjectsIds.entrySet()) {
+			try {
+				for(String fileId : eventPreservationMap.getValue()){
+					RepresentationFilePreservationObject premisObject = model.retrieveRepresentationFileObject(aip.getId(),eventPreservationMap.getKey(),fileId);
+					String id = SolrUtils.getId(aip.getId(), eventPreservationMap.getKey(),fileId);
+					SolrInputDocument premisObjectDocument = SolrUtils.representationFilePreservationObjectToSolrDocument(id,premisObject);
+					index.add(RodaConstants.INDEX_PRESERVATION_OBJECTS, premisObjectDocument);
+				}
+			} catch (SolrServerException | IOException | ModelServiceException e) {
+				logger.error("Could not index premis object", e);
+			}
+		}
+		try {
+			index.commit(RodaConstants.INDEX_PRESERVATION_OBJECTS);
+		} catch (SolrServerException | IOException e) {
+			logger.error("Could not commit indexed representations", e);
+		}
 
 		final Map<String,List<String>> preservationEventsIds = aip.getPreservationsEventsIds();
 		for (Map.Entry<String, List<String>> representationPreservationMap: preservationEventsIds.entrySet()) {

@@ -17,7 +17,7 @@ import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.core.data.v2.SimpleEventPreservationMetadata;
-import pt.gov.dgarq.roda.core.data.v2.SimpleRepresentationFileMetadata;
+import pt.gov.dgarq.roda.core.data.v2.SimpleRepresentationFilePreservationMetadata;
 import pt.gov.dgarq.roda.core.data.v2.SimpleRepresentationPreservationMetadata;
 
 public class IndexService {
@@ -157,24 +157,18 @@ public class IndexService {
 		return SolrUtils.find(index, SimpleEventPreservationMetadata.class, filter, sorter, sublist);
 	}
 
-	// public IndexResult<SimpleEventPreservationObject>
-	// findRepresentationPreservationObject(
-	// ContentAdapter contentAdapter) {
-	// return null;
-	// }
-
-	public SimpleRepresentationFileMetadata retrieveSimpleRepresentationFileMetadata(String aipId,
+	public SimpleRepresentationFilePreservationMetadata retrieveSimpleRepresentationFilePreservationMetadata(String aipId,
 			String representationId, String fileId) throws IndexActionException {
-		return SolrUtils.retrieve(index, SimpleRepresentationFileMetadata.class, aipId, representationId, fileId);
+		return SolrUtils.retrieve(index, SimpleRepresentationFilePreservationMetadata.class, aipId, representationId, fileId);
 	}
 
-	public Long countSimpleRepresentationFileMetadata(Filter filter) throws IndexActionException {
-		return SolrUtils.count(index, SimpleRepresentationFileMetadata.class, filter);
+	public Long countSimpleRepresentationFilePreservationMetadata(Filter filter) throws IndexActionException {
+		return SolrUtils.count(index, SimpleRepresentationFilePreservationMetadata.class, filter);
 	}
 
-	public IndexResult<SimpleRepresentationFileMetadata> findSimpleRepresentationFileMetadata(Filter filter,
+	public IndexResult<SimpleRepresentationFilePreservationMetadata> findSimpleRepresentationFilePreservationMetadata(Filter filter,
 			Sorter sorter, Sublist sublist) throws IndexActionException {
-		return SolrUtils.find(index, SimpleRepresentationFileMetadata.class, filter, sorter, sublist);
+		return SolrUtils.find(index, SimpleRepresentationFilePreservationMetadata.class, filter, sorter, sublist);
 	}
 
 	/*

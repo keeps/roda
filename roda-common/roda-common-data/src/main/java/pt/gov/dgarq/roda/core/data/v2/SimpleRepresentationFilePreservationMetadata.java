@@ -1,7 +1,7 @@
 package pt.gov.dgarq.roda.core.data.v2;
 
 
-public class SimpleRepresentationFileMetadata extends SimplePreservationMetadata {
+public class SimpleRepresentationFilePreservationMetadata extends SimplePreservationMetadata {
 	private String fileId;
 	private String representationObjectId;
 	private String pronomId;
@@ -10,7 +10,7 @@ public class SimpleRepresentationFileMetadata extends SimplePreservationMetadata
 	private String hash;
 	
 	
-	public SimpleRepresentationFileMetadata(SimpleRepresentationFileMetadata simple) {
+	public SimpleRepresentationFilePreservationMetadata(SimpleRepresentationFilePreservationMetadata simple) {
 		this.setAipId(simple.getAipId());
 		this.setCreatedDate(simple.getCreatedDate());
 		this.setFileId(simple.getFileId());
@@ -28,7 +28,7 @@ public class SimpleRepresentationFileMetadata extends SimplePreservationMetadata
 		this.setState(simple.getState());
 		this.setType(simple.getType());
 	}
-	public SimpleRepresentationFileMetadata() {
+	public SimpleRepresentationFilePreservationMetadata() {
 		this.size=-1;
 	}
 	public String getRepresentationObjectId() {
