@@ -159,6 +159,8 @@ public class LogEntry implements Serializable {
 	private String description;
 	private String relatedObjectID;
 	private long duration;
+	
+	private String fileID;
 
 	private LogEntryParameter[] parameters;
 
@@ -379,5 +381,15 @@ public class LogEntry implements Serializable {
 	public void setDuration(long duration) {
 		this.duration = duration;
 	}
+
+	public String getFileID() {
+		return fileID;
+	}
+
+	public void setFileID(String fileID) {
+		this.fileID = fileID;
+	}
+	
+	
 
 }

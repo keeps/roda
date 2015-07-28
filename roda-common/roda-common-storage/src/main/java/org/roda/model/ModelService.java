@@ -1236,7 +1236,7 @@ public class ModelService extends ModelObservable {
 	// FIXME all the initialization, if needed, should be done only once
 	//LOG
 	public void addLogEntry(LogEntry logEntry) throws StorageActionException{
-		String entryJSON = ModelUtils.getJsonLogEntry(logEntry);
+		
 		
 		Binary dailyLog;
 		
@@ -1245,13 +1245,16 @@ public class ModelService extends ModelObservable {
 		}catch(StorageActionException sae){
 			//container already exists...
 		}
-		
+		StoragePath logPath = ModelUtils.getLogPath(new Date());
+		logEntry.setFileID(logPath.getName());
 		try{
-			dailyLog = storage.getBinary(ModelUtils.getLogPath(new Date()));
+			dailyLog = storage.getBinary(logPath);
 		}catch(StorageActionException sae){
-			dailyLog = storage.createBinary(ModelUtils.getLogPath(new Date()), new HashMap<String,Set<String>>(), new JsonContentPayload(""), false);
+			dailyLog = storage.createBinary(logPath, new HashMap<String,Set<String>>(), new JsonContentPayload(""), false);
 		}
 		try{
+			
+			String entryJSON = ModelUtils.getJsonLogEntry(logEntry);
 			java.io.File f = new java.io.File(dailyLog.getContent().getURI().getPath());
 			FileUtils.writeStringToFile(f, entryJSON, true);
 		}catch(IOException e){

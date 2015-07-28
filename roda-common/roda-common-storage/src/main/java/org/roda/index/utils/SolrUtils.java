@@ -753,6 +753,7 @@ public class SolrUtils {
 		final String description = objectToString(doc.get(RodaConstants.LOG_DESCRIPTION));
 		final long duration = objectToLong(doc.get(RodaConstants.LOG_DURATION));
 		final String id = objectToString(doc.get(RodaConstants.LOG_ID));
+		final String fileID = objectToString(doc.get(RodaConstants.LOG_FILE_ID));
 		//final String parameters = objectToString(doc.get(RodaConstants.LOG_PARAMETERS));
 		final String relatedObjectId = objectToString(doc.get(RodaConstants.LOG_RELATED_OBJECT_ID));
 		final String username = objectToString(doc.get(RodaConstants.LOG_USERNAME));
@@ -763,6 +764,7 @@ public class SolrUtils {
 		entry.setDescription(description);
 		entry.setDuration(duration);
 		entry.setId(id);
+		entry.setFileID(fileID);
 		//entry.setParameters(fromJson(parameters));
 		entry.setRelatedObjectID(relatedObjectId);
 		entry.setUsername(username);
@@ -781,42 +783,7 @@ public class SolrUtils {
 		//doc.addField(RodaConstants.LOG_PARAMETERS, toJSON(logEntry.getParameters()));
 		doc.addField(RodaConstants.LOG_RELATED_OBJECT_ID, logEntry.getRelatedObjectID());
 		doc.addField(RodaConstants.LOG_USERNAME, logEntry.getUsername());
+		doc.addField(RodaConstants.LOG_FILE_ID, logEntry.getFileID());
 		return doc;
 	}
-
-	private static LogEntryParameter[] fromJson(String parameters) {	
-		try{
-			JsonFactory factory = new JsonFactory();
-			ObjectMapper mapper = new ObjectMapper(factory);
-			return  mapper.readValue(parameters, LogEntryParameter[].class);
-		}catch(JsonGenerationException jge){
-			
-		}catch(JsonMappingException jme){
-
-		}catch(IOException ioe){
-			
-		}
-		return null;
-	}
-	
-	private static String toJSON(LogEntryParameter[] parameters) {
-		try{
-			JsonFactory factory = new JsonFactory();
-			ObjectMapper mapper = new ObjectMapper(factory);
-			StringWriter sw = new StringWriter();
-			for(LogEntryParameter p : parameters){
-				mapper.writeValue(sw, p);
-			}
-			return sw.toString();
-		}catch(JsonGenerationException jge){
-			
-		}catch(JsonMappingException jme){
-
-		}catch(IOException ioe){
-			
-		}
-		return null;
-	}
-	
-
 }

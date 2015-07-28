@@ -13,7 +13,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -50,7 +49,6 @@ import pt.gov.dgarq.roda.core.data.v2.Representation;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.core.data.v2.SimpleEventPreservationMetadata;
 import pt.gov.dgarq.roda.core.data.v2.SimpleRepresentationFilePreservationMetadata;
-import pt.gov.dgarq.roda.core.data.v2.SimpleRepresentationPreservationMetadata;
 
 public class IndexServiceTest {
 
@@ -182,13 +180,15 @@ public class IndexServiceTest {
 		Filter filterType = new Filter();
 		filterType.add(new SimpleFilterParameter(RodaConstants.SEPM_TYPE, CorporaConstants.INGESTION));
 		assertThat(index.countSimpleEventPreservationMetadata(filterType), Matchers.equalTo(1L));
-		assertThat(index.findSimpleEventPreservationMetadata(filterType, null, new Sublist(0, 10)).getTotalCount(),Matchers.equalTo(1L));
+		assertThat(index.findSimpleEventPreservationMetadata(filterType, null, new Sublist(0, 10)).getTotalCount(),
+				Matchers.equalTo(1L));
 
-		SimpleRepresentationFilePreservationMetadata srfpm = index.retrieveSimpleRepresentationFilePreservationMetadata(aipId, CorporaConstants.REPRESENTATION_1_ID,CorporaConstants.F0_PREMIS_XML);
+		SimpleRepresentationFilePreservationMetadata srfpm = index.retrieveSimpleRepresentationFilePreservationMetadata(
+				aipId, CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.F0_PREMIS_XML);
 		assertEquals(srfpm.getAipId(), aipId);
 		Filter filterAIPID = new Filter();
 		filterAIPID.add(new SimpleFilterParameter(RodaConstants.SRFM_AIP_ID, aipId));
-		assertThat(index.countSimpleRepresentationFilePreservationMetadata(filterAIPID),Matchers.equalTo(4L));
+		assertThat(index.countSimpleRepresentationFilePreservationMetadata(filterAIPID), Matchers.equalTo(4L));
 		/*
 		 * filterMimetype.add(new
 		 * SimpleFilterParameter(RodaConstants.SRFM_MIMETYPE,
@@ -332,12 +332,9 @@ public class IndexServiceTest {
 		// cleanup
 		model.deleteAIP(aipId);
 	}
-	
-	
-	
-	
+
 	@Test
-	public void testGetLogEntriesCount() throws StorageActionException, IndexActionException{
+	public void testGetLogEntriesCount() throws StorageActionException, IndexActionException {
 		LogEntry entry = new LogEntry();
 		entry.setAction("Action");
 		entry.setAddress("Address");
@@ -348,26 +345,26 @@ public class IndexServiceTest {
 		entry.setRelatedObjectID("Related");
 		entry.setUsername("Username");
 		LogEntryParameter[] parameters = new LogEntryParameter[2];
-		LogEntryParameter p1 = new LogEntryParameter("NAME1","VALUE1");
+		LogEntryParameter p1 = new LogEntryParameter("NAME1", "VALUE1");
 		LogEntryParameter p2 = new LogEntryParameter("NAME2", "VALUE2");
 		parameters[0] = p1;
 		parameters[1] = p2;
 		entry.setParameters(parameters);
 		model.addLogEntry(entry);
-		
+
 		Filter filterDescription = new Filter();
 		filterDescription.add(new SimpleFilterParameter(RodaConstants.LOG_DESCRIPTION, "Description"));
 		Long n = 1L;
-		assertEquals(index.getLogEntriesCount(filterDescription),n);
-		
+		assertEquals(index.getLogEntriesCount(filterDescription), n);
+
 		Filter filterDescription2 = new Filter();
 		filterDescription2.add(new SimpleFilterParameter(RodaConstants.LOG_DESCRIPTION, "Description2"));
 		Long n2 = 0L;
-		assertEquals(index.getLogEntriesCount(filterDescription2),n2);
+		assertEquals(index.getLogEntriesCount(filterDescription2), n2);
 	}
-	
-	/*@Test
-	public void testFindLogEntry() throws StorageActionException, IndexActionException{
+
+	@Test
+	public void testFindLogEntry() throws StorageActionException, IndexActionException {
 		LogEntry entry = new LogEntry();
 		entry.setAction("Action");
 		entry.setAddress("Address");
@@ -378,25 +375,25 @@ public class IndexServiceTest {
 		entry.setRelatedObjectID("Related");
 		entry.setUsername("Username");
 		LogEntryParameter[] parameters = new LogEntryParameter[2];
-		LogEntryParameter p1 = new LogEntryParameter("NAME1","VALUE1");
+		LogEntryParameter p1 = new LogEntryParameter("NAME1", "VALUE1");
 		LogEntryParameter p2 = new LogEntryParameter("NAME2", "VALUE2");
 		parameters[0] = p1;
 		parameters[1] = p2;
 		entry.setParameters(parameters);
 		model.addLogEntry(entry);
-		
+
 		Filter filterDescription = new Filter();
 		filterDescription.add(new SimpleFilterParameter(RodaConstants.LOG_DESCRIPTION, "Description"));
-		
-		IndexResult<LogEntry> entries =  index.findLogEntry(filterDescription, null, new Sublist());
-		assertEquals(entries.getTotalCount(),1);
-		assertEquals(entries.getResults().get(0).getAction(),CorporaConstants.LOG_ACTION);
-		
+
+		IndexResult<LogEntry> entries = index.findLogEntry(filterDescription, null, new Sublist());
+		assertEquals(entries.getTotalCount(), 1);
+		assertEquals(entries.getResults().get(0).getAction(), CorporaConstants.LOG_ACTION);
+
 		Filter filterDescription2 = new Filter();
 		filterDescription2.add(new SimpleFilterParameter(RodaConstants.LOG_DESCRIPTION, "Description2"));
-		
-		IndexResult<LogEntry> entries2 =  index.findLogEntry(filterDescription2, null, new Sublist());
-		assertEquals(entries2.getTotalCount(),0);
-	}*/
+
+		IndexResult<LogEntry> entries2 = index.findLogEntry(filterDescription2, null, new Sublist());
+		assertEquals(entries2.getTotalCount(), 0);
+	}
 
 }
