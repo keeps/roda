@@ -20,10 +20,16 @@ changetype: delete
 dn: cn=dissemination.search.basic,LDAP_ROLES_DN
 changetype: delete
 
+dn: cn=search,LDAP_ROLES_DN
+changetype: delete
+
 dn: cn=dissemination.search.advanced,LDAP_ROLES_DN
 changetype: delete
 
 dn: cn=dissemination.browse,LDAP_ROLES_DN
+changetype: delete
+
+dn: cn=browse,LDAP_ROLES_DN
 changetype: delete
 
 dn: cn=administration.user,LDAP_ROLES_DN

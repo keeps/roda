@@ -10,13 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.roda.common.RodaUtils;
-import org.roda.model.premis.PremisAgentHelper;
-import org.roda.model.premis.PremisEventHelper;
-import org.roda.model.premis.PremisFileObjectHelper;
-import org.roda.model.premis.PremisMetadataException;
-import org.roda.model.premis.PremisRepresentationObjectHelper;
 import org.roda.model.utils.ModelUtils;
 import org.roda.storage.Binary;
 import org.roda.storage.DefaultBinary;
@@ -28,6 +22,8 @@ import org.roda.storage.Resource;
 import org.roda.storage.StorageActionException;
 import org.roda.storage.StoragePath;
 import org.roda.storage.StorageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.util.DateParser;
 import org.w3c.util.InvalidDateException;
 
@@ -43,6 +39,11 @@ import pt.gov.dgarq.roda.core.data.v2.Representation;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationFilePreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationPreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationState;
+import pt.gov.dgarq.roda.core.metadata.v2.premis.PremisAgentHelper;
+import pt.gov.dgarq.roda.core.metadata.v2.premis.PremisEventHelper;
+import pt.gov.dgarq.roda.core.metadata.v2.premis.PremisFileObjectHelper;
+import pt.gov.dgarq.roda.core.metadata.v2.premis.PremisMetadataException;
+import pt.gov.dgarq.roda.core.metadata.v2.premis.PremisRepresentationObjectHelper;
 
 /**
  * Class that "relates" Model & Storage
@@ -69,9 +70,11 @@ import pt.gov.dgarq.roda.core.data.v2.RepresentationState;
  */
 public class ModelService extends ModelObservable {
 
+	private final Logger logger = LoggerFactory.getLogger(getClass());
+
 	private final StorageService storage;
 
-	public ModelService(StorageService storage){
+	public ModelService(StorageService storage) {
 		super();
 		this.storage = storage;
 	}
@@ -688,10 +691,8 @@ public class ModelService extends ModelObservable {
 					.listResourcesUnderDirectory(ModelUtils.getRepresentationsPath(aipId)).iterator();
 			while (resourceIterator.hasNext()) {
 				Resource resource = resourceIterator.next();
-				Iterator<Resource> preservationIterator = storage
-						.listResourcesUnderDirectory(
-								ModelUtils.getPreservationPath(storage, aipId, resource.getStoragePath().getName()))
-						.iterator();
+				Iterator<Resource> preservationIterator = storage.listResourcesUnderDirectory(
+						ModelUtils.getPreservationPath(aipId, resource.getStoragePath().getName())).iterator();
 				while (preservationIterator.hasNext()) {
 					Resource preservationObject = preservationIterator.next();
 					Binary preservationBinary = storage.getBinary(preservationObject.getStoragePath());
@@ -816,10 +817,14 @@ public class ModelService extends ModelObservable {
 		if (resource instanceof DefaultDirectory) {
 			StoragePath storagePath = resource.getStoragePath();
 			Map<String, Set<String>> metadata = resource.getMetadata();
+
+			// obtain basic AIP information
 			String parentId = ModelUtils.getString(metadata, RodaConstants.STORAGE_META_PARENT_ID);
 			Boolean active = ModelUtils.getBoolean(metadata, RodaConstants.STORAGE_META_ACTIVE);
 			Date dateCreated = ModelUtils.getDate(metadata, RodaConstants.STORAGE_META_DATE_CREATED);
 			Date dateModified = ModelUtils.getDate(metadata, RodaConstants.STORAGE_META_DATE_MODIFIED);
+			
+			// TODO retrieve permissions
 
 			if (active == null) {
 				// when not stated, consider active=false
@@ -827,51 +832,21 @@ public class ModelService extends ModelObservable {
 			}
 
 			try {
+				// obtain descriptive metadata information
 				List<String> descriptiveMetadataBinaryIds = ModelUtils.getIds(storage,
 						ModelUtils.getDescriptiveMetadataPath(storagePath.getName()));
+
+				// obtain representations information
 				List<String> representationIds = ModelUtils.getIds(storage,
 						ModelUtils.getRepresentationsPath(storagePath.getName()));
 
-				Map<String, List<String>> preservationRepresentationObjects = new HashMap<String, List<String>>();
-				Map<String, List<String>> preservationFileObjects = new HashMap<String, List<String>>();
-				Map<String, List<String>> preservationEvents = new HashMap<String, List<String>>();
-				if (representationIds != null && representationIds.size() > 0) {
-					for (String representationID : representationIds) {
-						try {
-							StoragePath representationPreservationPath = ModelUtils.getPreservationPath(storage,
-									storagePath.getName(), representationID);
-							List<String> preservationFileIds = ModelUtils.getIds(storage,
-									representationPreservationPath);
-							List<String> preservationRepresentationObjectFileIds = new ArrayList<String>();
-							List<String> preservationFileObjectFileIds = new ArrayList<String>();
-							List<String> preservationEventFileIds = new ArrayList<String>();
+				// obtain preservation information
+				final Map<String, List<String>> preservationRepresentationObjects = new HashMap<String, List<String>>();
+				final Map<String, List<String>> preservationFileObjects = new HashMap<String, List<String>>();
+				final Map<String, List<String>> preservationEvents = new HashMap<String, List<String>>();
+				retrieveAIPPreservationInformation(storagePath, representationIds, preservationRepresentationObjects,
+						preservationFileObjects, preservationEvents);
 
-							for (String preservationFileId : preservationFileIds) {
-								StoragePath binaryPath = ModelUtils.getPreservationFilePath(storagePath.getName(),
-										representationID, preservationFileId);
-								Binary preservationBinary = storage.getBinary(binaryPath);
-								if (ModelUtils.isPreservationRepresentationObject(preservationBinary)) {
-									preservationRepresentationObjectFileIds.add(preservationFileId);
-								} else if (ModelUtils.isPreservationEvent(preservationBinary)) {
-									preservationEventFileIds.add(preservationFileId);
-								} else if (ModelUtils.isPreservationFileObject(preservationBinary)) {
-									preservationFileObjectFileIds.add(preservationFileId);
-								} else {
-									System.out.println("CABOOOOOOOOOOOOOOOOOOOOOOOM");
-									// TODO... not object... not event...
-								}
-							}
-							preservationRepresentationObjects.put(representationID,
-									preservationRepresentationObjectFileIds);
-							preservationFileObjects.put(representationID, preservationFileObjectFileIds);
-							preservationEvents.put(representationID, preservationEventFileIds);
-						} catch (StorageActionException sae) {
-							// TODO: No preservation folder associated to
-							// representation...
-						}
-					}
-
-				}
 				aip = new AIP(storagePath.getName(), parentId, active, dateCreated, dateModified,
 						descriptiveMetadataBinaryIds, representationIds, preservationRepresentationObjects,
 						preservationEvents, preservationFileObjects);
@@ -886,6 +861,47 @@ public class ModelService extends ModelObservable {
 					ModelServiceException.INTERNAL_SERVER_ERROR);
 		}
 		return aip;
+	}
+
+	private void retrieveAIPPreservationInformation(StoragePath storagePath, List<String> representationIds,
+			final Map<String, List<String>> preservationRepresentationObjects,
+			final Map<String, List<String>> preservationFileObjects,
+			final Map<String, List<String>> preservationEvents) {
+		for (String representationID : representationIds) {
+			try {
+				StoragePath representationPreservationPath = ModelUtils.getPreservationPath(storagePath.getName(),
+						representationID);
+				// obtain list of preservation related files
+				List<String> preservationFileIds = ModelUtils.getIds(storage, representationPreservationPath);
+
+				final List<String> preservationRepresentationObjectFileIds = new ArrayList<String>();
+				final List<String> preservationFileObjectFileIds = new ArrayList<String>();
+				final List<String> preservationEventFileIds = new ArrayList<String>();
+
+				for (String preservationFileId : preservationFileIds) {
+					StoragePath binaryPath = ModelUtils.getPreservationFilePath(storagePath.getName(), representationID,
+							preservationFileId);
+					Binary preservationBinary = storage.getBinary(binaryPath);
+
+					if (ModelUtils.isPreservationRepresentationObject(preservationBinary)) {
+						preservationRepresentationObjectFileIds.add(preservationFileId);
+					} else if (ModelUtils.isPreservationEvent(preservationBinary)) {
+						preservationEventFileIds.add(preservationFileId);
+					} else if (ModelUtils.isPreservationFileObject(preservationBinary)) {
+						preservationFileObjectFileIds.add(preservationFileId);
+					} else {
+						logger.warn(
+								"The binary {} is neither a PreservationRepresentationObject or PreservationEvent or PreservationFileObject...Moving on...",
+								binaryPath.asString());
+					}
+				}
+				preservationRepresentationObjects.put(representationID, preservationRepresentationObjectFileIds);
+				preservationFileObjects.put(representationID, preservationFileObjectFileIds);
+				preservationEvents.put(representationID, preservationEventFileIds);
+			} catch (StorageActionException e) {
+				logger.error("Error while obtaining preservation related binaries", e);
+			}
+		}
 	}
 
 	private DescriptiveMetadata convertResourceToDescriptiveMetadata(Resource resource) throws ModelServiceException {
@@ -1234,33 +1250,34 @@ public class ModelService extends ModelObservable {
 	}
 
 	// FIXME all the initialization, if needed, should be done only once
-	//LOG
-	public void addLogEntry(LogEntry logEntry) throws StorageActionException{
-		
-		
+	// LOG
+	public void addLogEntry(LogEntry logEntry) throws StorageActionException {
+
 		Binary dailyLog;
-		
-		try{
-			storage.createContainer(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG), new HashMap<String,Set<String>>());
-		}catch(StorageActionException sae){
-			//container already exists...
+
+		try {
+			storage.createContainer(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG),
+					new HashMap<String, Set<String>>());
+		} catch (StorageActionException sae) {
+			// container already exists...
 		}
 		StoragePath logPath = ModelUtils.getLogPath(new Date());
 		logEntry.setFileID(logPath.getName());
-		try{
+		try {
 			dailyLog = storage.getBinary(logPath);
-		}catch(StorageActionException sae){
-			dailyLog = storage.createBinary(logPath, new HashMap<String,Set<String>>(), new JsonContentPayload(""), false);
+		} catch (StorageActionException sae) {
+			dailyLog = storage.createBinary(logPath, new HashMap<String, Set<String>>(), new JsonContentPayload(""),
+					false);
 		}
-		try{
-			
+		try {
+
 			String entryJSON = ModelUtils.getJsonLogEntry(logEntry);
 			java.io.File f = new java.io.File(dailyLog.getContent().getURI().getPath());
 			FileUtils.writeStringToFile(f, entryJSON, true);
-		}catch(IOException e){
-			
+		} catch (IOException e) {
+
 		}
-		notifyLogEntryCreated(logEntry);	
+		notifyLogEntryCreated(logEntry);
 	}
 
 }

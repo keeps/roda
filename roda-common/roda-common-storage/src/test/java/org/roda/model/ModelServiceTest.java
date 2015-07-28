@@ -107,6 +107,8 @@ public class ModelServiceTest {
 		// testing AIP
 		final AIP aip = model.createAIP(aipId, corporaService,
 				DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
+		
+		System.err.println("AIP> " + aip);
 
 		assertNotNull(aip);
 		assertEquals(aipId, aip.getId());

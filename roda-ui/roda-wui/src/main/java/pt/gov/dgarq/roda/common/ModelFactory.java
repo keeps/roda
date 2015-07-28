@@ -54,6 +54,7 @@ public class ModelFactory {
 			System.setProperty("solr.data.dir.representations", indexPath.resolve("representation").toString());
 			System.setProperty("solr.data.dir.preservationevent", indexPath.resolve("preservationevent").toString());
 			System.setProperty("solr.data.dir.preservationobject", indexPath.resolve("preservationobject").toString());
+			System.setProperty("solr.data.dir.actionlog", indexPath.resolve("actionlog").toString());
 			// FIXME added missing cores
 
 			if (!indexPath.toFile().exists()) {

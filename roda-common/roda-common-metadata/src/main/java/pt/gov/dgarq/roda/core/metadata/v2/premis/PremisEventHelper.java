@@ -1,4 +1,4 @@
-package org.roda.model.premis;
+package pt.gov.dgarq.roda.core.metadata.v2.premis;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,6 +9,13 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.apache.xmlbeans.XmlException;
+import org.apache.xmlbeans.XmlObject;
+import org.w3c.util.DateParser;
+import org.w3c.util.InvalidDateException;
+
 import lc.xmlns.premisV2.EventComplexType;
 import lc.xmlns.premisV2.EventDocument;
 import lc.xmlns.premisV2.EventIdentifierComplexType;
@@ -18,14 +25,9 @@ import lc.xmlns.premisV2.ExtensionComplexType;
 import lc.xmlns.premisV2.LinkingAgentIdentifierComplexType;
 import lc.xmlns.premisV2.LinkingObjectIdentifierComplexType;
 import pt.gov.dgarq.roda.core.data.v2.EventPreservationObject;
+import pt.gov.dgarq.roda.core.data.v2.RODAObject;
 import pt.gov.dgarq.roda.core.data.v2.SimpleEventPreservationMetadata;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.apache.xmlbeans.XmlException;
-import org.apache.xmlbeans.XmlObject;
-import org.w3c.util.DateParser;
-import org.w3c.util.InvalidDateException;
+import pt.gov.dgarq.roda.util.XmlEncodeUtility;
 
 /**
  * @author Rui Castro

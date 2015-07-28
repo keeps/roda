@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Serializable;
-import java.io.StringWriter;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -50,11 +49,6 @@ import org.roda.storage.StoragePath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.adapter.filter.BasicSearchFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
@@ -68,7 +62,6 @@ import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.data.v2.EventPreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
-import pt.gov.dgarq.roda.core.data.v2.LogEntryParameter;
 import pt.gov.dgarq.roda.core.data.v2.RODAObject;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationFilePreservationObject;
@@ -79,10 +72,18 @@ import pt.gov.dgarq.roda.core.data.v2.SimpleEventPreservationMetadata;
 import pt.gov.dgarq.roda.core.data.v2.SimpleRepresentationFilePreservationMetadata;
 import pt.gov.dgarq.roda.core.data.v2.SimpleRepresentationPreservationMetadata;
 
+/**
+ * Utilities class related to Apache Solr
+ * 
+ * @author Hélder Silva <hsilva@keep.pt>
+ * @author Luís Faria <lfaria@keep.pt>
+ * @author Sébastien Leroux <sleroux@keep.pt>
+ */
 public class SolrUtils {
 
 	private static Logger LOGGER = LoggerFactory.getLogger(SolrUtils.class);
 
+	// FIXME 20150729 not in use, most certainly to be deleted
 	public static void update(SolrClient solrClient, String collection, ContentStream contentStream, boolean commitNow)
 			throws SolrServerException, IOException {
 		ContentStreamUpdateRequest request = new ContentStreamUpdateRequest("/update");
@@ -146,7 +147,7 @@ public class SolrUtils {
 
 			Reader xsltReader = new InputStreamReader(transformerStream);
 			CharArrayWriter transformerResult = new CharArrayWriter();
-			Map<String, String> stylesheetOpt = new HashMap<>();
+			Map<String, String> stylesheetOpt = new HashMap<String, String>();
 			stylesheetOpt.put("prefix", RodaConstants.INDEX_OTHER_DESCRIPTIVE_DATA_PREFIX);
 			RodaUtils.applyStylesheet(xsltReader, descMetadataReader, stylesheetOpt, transformerResult);
 			descMetadataReader.close();
@@ -208,7 +209,7 @@ public class SolrUtils {
 						appendANDOperator(ret);
 					}
 					BasicSearchFilterParameter param = (BasicSearchFilterParameter) parameter;
-					appendBasicSearch(ret, param.getName(), param.getValue(), "OR");
+					appendBasicSearch(ret, param.getName(), param.getValue(), "AND");
 				} else if (parameter instanceof EmptyKeyFilterParameter) {
 					if (ret.length() != 0) {
 						appendANDOperator(ret);
@@ -233,7 +234,7 @@ public class SolrUtils {
 	}
 
 	public static List<SortClause> parseSorter(Sorter sorter) throws IndexActionException {
-		List<SortClause> ret = new ArrayList<>();
+		List<SortClause> ret = new ArrayList<SortClause>();
 		if (sorter != null) {
 			for (SortParameter sortParameter : sorter.getParameters()) {
 				ret.add(new SortClause(sortParameter.getName(), sortParameter.isDescending() ? ORDER.desc : ORDER.asc));
@@ -373,7 +374,6 @@ public class SolrUtils {
 		if (resultClass.equals(AIP.class)) {
 			indexName = RodaConstants.INDEX_AIP;
 		} else if (resultClass.equals(SimpleDescriptionObject.class)) {
-			// FIXME rename INDEX constant
 			indexName = RodaConstants.INDEX_SDO;
 		} else if (resultClass.equals(Representation.class)) {
 			indexName = RodaConstants.INDEX_REPRESENTATIONS;
@@ -381,7 +381,7 @@ public class SolrUtils {
 			indexName = RodaConstants.INDEX_PRESERVATION_OBJECTS;
 		} else if (resultClass.equals(SimpleEventPreservationMetadata.class)) {
 			indexName = RodaConstants.INDEX_PRESERVATION_EVENTS;
-		}else if (resultClass.equals(LogEntry.class)) {
+		} else if (resultClass.equals(LogEntry.class)) {
 			indexName = RodaConstants.INDEX_ACTION_LOG;
 		} else {
 			throw new IndexActionException("Cannot find class index name: " + resultClass.getName(),
@@ -402,7 +402,7 @@ public class SolrUtils {
 			ret = resultClass.cast(solrDocumentToSimpleRepresentationFileMetadata(doc));
 		} else if (resultClass.equals(SimpleEventPreservationMetadata.class)) {
 			ret = resultClass.cast(solrDocumentToSimpleEventPreservationMetadata(doc));
-		} else if (resultClass.equals(LogEntry.class)){
+		} else if (resultClass.equals(LogEntry.class)) {
 			ret = resultClass.cast(solrDocumentToLogEntry(doc));
 		} else {
 			throw new IndexActionException("Cannot find class index name: " + resultClass.getName(),
@@ -453,7 +453,7 @@ public class SolrUtils {
 		return find(index, classToRetrieve, filter, null, new Sublist(0, 0)).getTotalCount();
 	}
 
-	// Handle active
+	// FIXME see how to handle active
 	public static AIP solrDocumentToAIP(SolrDocument doc) {
 		final String id = objectToString(doc.get(RodaConstants.AIP_ID));
 		final Boolean active = objectToBoolean(doc.get(RodaConstants.AIP_ACTIVE));
@@ -651,7 +651,8 @@ public class SolrUtils {
 		return srpm;
 	}
 
-	public static SimpleRepresentationFilePreservationMetadata solrDocumentToSimpleRepresentationFileMetadata(SolrDocument doc) {
+	public static SimpleRepresentationFilePreservationMetadata solrDocumentToSimpleRepresentationFileMetadata(
+			SolrDocument doc) {
 		final Date dateCreated = objectToDate(doc.get(RodaConstants.SRFM_CREATED_DATE));
 		final String id = objectToString(doc.get(RodaConstants.SRFM_ID));
 		final String label = objectToString(doc.get(RodaConstants.SRFM_LABEL));
@@ -745,7 +746,6 @@ public class SolrUtils {
 		return doc;
 	}
 
-	
 	private static LogEntry solrDocumentToLogEntry(SolrDocument doc) {
 		final String action = objectToString(doc.get(RodaConstants.LOG_ACTION));
 		final String address = objectToString(doc.get(RodaConstants.LOG_ADDRESS));
@@ -754,7 +754,8 @@ public class SolrUtils {
 		final long duration = objectToLong(doc.get(RodaConstants.LOG_DURATION));
 		final String id = objectToString(doc.get(RodaConstants.LOG_ID));
 		final String fileID = objectToString(doc.get(RodaConstants.LOG_FILE_ID));
-		//final String parameters = objectToString(doc.get(RodaConstants.LOG_PARAMETERS));
+		// final String parameters =
+		// objectToString(doc.get(RodaConstants.LOG_PARAMETERS));
 		final String relatedObjectId = objectToString(doc.get(RodaConstants.LOG_RELATED_OBJECT_ID));
 		final String username = objectToString(doc.get(RodaConstants.LOG_USERNAME));
 		LogEntry entry = new LogEntry();
@@ -765,13 +766,13 @@ public class SolrUtils {
 		entry.setDuration(duration);
 		entry.setId(id);
 		entry.setFileID(fileID);
-		//entry.setParameters(fromJson(parameters));
+		// entry.setParameters(fromJson(parameters));
 		entry.setRelatedObjectID(relatedObjectId);
 		entry.setUsername(username);
-		
+
 		return entry;
 	}
-	
+
 	public static SolrInputDocument logEntryToSolrDocument(LogEntry logEntry) {
 		SolrInputDocument doc = new SolrInputDocument();
 		doc.addField(RodaConstants.LOG_ACTION, logEntry.getAction());
@@ -780,7 +781,8 @@ public class SolrUtils {
 		doc.addField(RodaConstants.LOG_DESCRIPTION, logEntry.getDescription());
 		doc.addField(RodaConstants.LOG_DURATION, logEntry.getDuration());
 		doc.addField(RodaConstants.LOG_ID, logEntry.getId());
-		//doc.addField(RodaConstants.LOG_PARAMETERS, toJSON(logEntry.getParameters()));
+		// doc.addField(RodaConstants.LOG_PARAMETERS,
+		// toJSON(logEntry.getParameters()));
 		doc.addField(RodaConstants.LOG_RELATED_OBJECT_ID, logEntry.getRelatedObjectID());
 		doc.addField(RodaConstants.LOG_USERNAME, logEntry.getUsername());
 		doc.addField(RodaConstants.LOG_FILE_ID, logEntry.getFileID());

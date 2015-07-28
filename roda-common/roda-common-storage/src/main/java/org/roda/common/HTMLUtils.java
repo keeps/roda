@@ -1,27 +1,16 @@
 package org.roda.common;
 
-import java.io.CharArrayReader;
 import java.io.CharArrayWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stax.StAXSource;
-import javax.xml.transform.stream.StreamResult;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.roda.index.utils.SolrUtils;
 import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
@@ -77,7 +66,7 @@ public class HTMLUtils {
 	}
 
 	// TODO: improve html.premis.xml.xslt
-	public static Element preservationObjectFromStorageToHtml(SimplePreservationMetadata object, ModelService model,
+	public static String preservationObjectFromStorageToHtml(SimplePreservationMetadata object, ModelService model,
 			Locale locale) throws ModelServiceException {
 		try {
 			if (locale == null) {
@@ -88,7 +77,6 @@ public class HTMLUtils {
 			Binary binary = model.getStorage().getBinary(storagePath);
 			InputStream inputStream = binary.getContent().createInputStream();
 			Reader descMetadataReader = new InputStreamReader(inputStream);
-			String filename = binary.getStoragePath().getName();
 			// TODO select transformers using file name extension
 			ClassLoader classLoader = SolrUtils.class.getClassLoader();
 			InputStream transformerStream = classLoader
@@ -96,18 +84,11 @@ public class HTMLUtils {
 			// TODO support the use of scripts for non-xml transformers
 			Reader xsltReader = new InputStreamReader(transformerStream);
 			CharArrayWriter transformerResult = new CharArrayWriter();
-			Map<String, String> stylesheetOpt = new HashMap<>();
+			Map<String, String> stylesheetOpt = new HashMap<String, String>();
 			stylesheetOpt.put("prefix", RodaConstants.INDEX_OTHER_DESCRIPTIVE_DATA_PREFIX);
 			RodaUtils.applyStylesheet(xsltReader, descMetadataReader, stylesheetOpt, transformerResult);
 			descMetadataReader.close();
-			CharArrayReader transformationResult = new CharArrayReader(transformerResult.toCharArray());
-			XMLStreamReader parser = XMLInputFactory.newInstance().createXMLStreamReader(transformationResult);
-			Transformer transformer = TransformerFactory.newInstance().newTransformer();
-			StringWriter stringWriter = new StringWriter();
-			transformer.transform(new StAXSource(parser), new StreamResult(stringWriter));
-			Document doc = Jsoup.parseBodyFragment(stringWriter.toString());
-			transformationResult.close();
-			return doc.getElementsByTag("body").get(0).child(0);
+			return transformerResult.toString();
 		} catch (Exception e) {
 			throw new ModelServiceException(e.getMessage(), 100);
 		}

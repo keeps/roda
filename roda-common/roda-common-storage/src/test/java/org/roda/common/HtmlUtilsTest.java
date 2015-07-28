@@ -1,18 +1,14 @@
 package org.roda.common;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Locale;
 import java.util.UUID;
 
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
-import org.jsoup.nodes.Element;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -25,7 +21,6 @@ import org.roda.model.DescriptiveMetadata;
 import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
 import org.roda.model.ModelServiceTest;
-import org.roda.model.utils.ModelUtils;
 import org.roda.storage.DefaultStoragePath;
 import org.roda.storage.StorageActionException;
 import org.roda.storage.StorageService;
@@ -35,7 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import pt.gov.dgarq.roda.core.data.v2.EventPreservationObject;
-import pt.gov.dgarq.roda.core.data.v2.RepresentationFilePreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.SimpleEventPreservationMetadata;
 import pt.gov.dgarq.roda.core.data.v2.SimpleRepresentationFilePreservationMetadata;
 
@@ -85,109 +79,168 @@ public class HtmlUtilsTest {
 
 		logger.debug("Running model test under storage: " + basePath);
 	}
-	
+
 	@AfterClass
 	public static void tearDown() throws StorageActionException {
 		FSUtils.deletePath(basePath);
 		FSUtils.deletePath(indexPath);
 	}
-	
+
 	@Test
-	public void testRepresentationFilePreservationObjectToHtml() throws ModelServiceException, StorageActionException, IndexActionException {
+	public void testRepresentationFilePreservationObjectToHtml()
+			throws ModelServiceException, StorageActionException, IndexActionException {
 		final String aipId = UUID.randomUUID().toString();
 		final AIP aip = model.createAIP(aipId, corporaService,
 				DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
-		SimpleRepresentationFilePreservationMetadata srfm = index.retrieveSimpleRepresentationFilePreservationMetadata(aipId, CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.F0_PREMIS_XML);
-		Element html = HTMLUtils.preservationObjectFromStorageToHtml(srfm, model, new Locale("pt","PT"));
-		logger.debug("HTML: "+html);
-		Element representationFilePreservationElement = html.getElementsByAttributeValueMatching(CorporaConstants.HTML_TYPE, CorporaConstants.HTML_PREMIS).get(0);
-		Element fieldElement = representationFilePreservationElement.getElementsByAttributeValueMatching(CorporaConstants.HTML_FIELD, CorporaConstants.HTML_PRESERVATION_LEVEL).get(0);
-		Element fieldValueElement = fieldElement.getElementsByAttributeValue(CorporaConstants.HTML_TYPE, CorporaConstants.HTML_VALUE).get(0);
-		assertEquals(fieldValueElement.text(),CorporaConstants.HTML_FULL);
+		SimpleRepresentationFilePreservationMetadata srfm = index.retrieveSimpleRepresentationFilePreservationMetadata(
+				aipId, CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.F0_PREMIS_XML);
+		// Element html = HTMLUtils.preservationObjectFromStorageToHtml(srfm,
+		// model, new Locale("pt", "PT"));
+		// logger.debug("HTML: " + html);
+		// Element representationFilePreservationElement = html
+		// .getElementsByAttributeValueMatching(CorporaConstants.HTML_TYPE,
+		// CorporaConstants.HTML_PREMIS).get(0);
+		// Element fieldElement =
+		// representationFilePreservationElement.getElementsByAttributeValueMatching(
+		// CorporaConstants.HTML_FIELD,
+		// CorporaConstants.HTML_PRESERVATION_LEVEL).get(0);
+		// Element fieldValueElement = fieldElement
+		// .getElementsByAttributeValue(CorporaConstants.HTML_TYPE,
+		// CorporaConstants.HTML_VALUE).get(0);
+		// assertEquals(fieldValueElement.text(), CorporaConstants.HTML_FULL);
 	}
-	
+
 	@Test
-	public void testDescriptiveMetadataToHtml() throws ModelServiceException, StorageActionException, IndexActionException {
+	public void testDescriptiveMetadataToHtml()
+			throws ModelServiceException, StorageActionException, IndexActionException {
 		final String aipId = UUID.randomUUID().toString();
 		final AIP aip = model.createAIP(aipId, corporaService,
 				DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 		final DescriptiveMetadata descMetadata = model.retrieveDescriptiveMetadata(aipId,
 				CorporaConstants.DESCRIPTIVE_METADATA_ID);
 
-//		Element html2 = HTMLUtils.descriptiveMetadataToHtml(descMetadata, model, new Locale("pt", "PT"));
-//		Element descriptiveMetadataElement2 = html2.getElementsByAttributeValueMatching(CorporaConstants.HTML_TYPE, CorporaConstants.HTML_DESCRIPTIVE_METADATA).get(0);
-//		Element fieldElement2 = descriptiveMetadataElement2.getElementsByAttributeValueMatching(CorporaConstants.HTML_FIELD, CorporaConstants.HTML_LEVEL).get(0);
-//		Element fieldValueElement2 = fieldElement2.getElementsByAttributeValue(CorporaConstants.HTML_TYPE, CorporaConstants.HTML_VALUE).get(0);
-//		assertEquals(fieldValueElement2.text(),CorporaConstants.HTML_FONDS);
-//
-//		
-//		final DescriptiveMetadata descMetadata2 = model.retrieveDescriptiveMetadata(aipId,
-//				CorporaConstants.DESCRIPTIVE_METADATA_ID);
-//		Element html3 = HTMLUtils.descriptiveMetadataToHtml(descMetadata2, model,new Locale("pt", "PT"));
-//		Element descriptiveMetadataElement3 = html3.getElementsByAttributeValueMatching(CorporaConstants.HTML_TYPE, CorporaConstants.HTML_DESCRIPTIVE_METADATA).get(0);
-//		Element fieldElement3 = descriptiveMetadataElement3.getElementsByAttributeValueMatching(CorporaConstants.HTML_FIELD, CorporaConstants.HTML_TITLE).get(0);
-//		Element fieldValueElement3 = fieldElement3.getElementsByAttributeValue(CorporaConstants.HTML_TYPE, CorporaConstants.HTML_VALUE).get(0);
-//		assertEquals(fieldValueElement3.text(),CorporaConstants.HTML_MY_EXAMPLE);
+		// Element html2 = HTMLUtils.descriptiveMetadataToHtml(descMetadata,
+		// model, new Locale("pt", "PT"));
+		// Element descriptiveMetadataElement2 =
+		// html2.getElementsByAttributeValueMatching(CorporaConstants.HTML_TYPE,
+		// CorporaConstants.HTML_DESCRIPTIVE_METADATA).get(0);
+		// Element fieldElement2 =
+		// descriptiveMetadataElement2.getElementsByAttributeValueMatching(CorporaConstants.HTML_FIELD,
+		// CorporaConstants.HTML_LEVEL).get(0);
+		// Element fieldValueElement2 =
+		// fieldElement2.getElementsByAttributeValue(CorporaConstants.HTML_TYPE,
+		// CorporaConstants.HTML_VALUE).get(0);
+		// assertEquals(fieldValueElement2.text(),CorporaConstants.HTML_FONDS);
+		//
+		//
+		// final DescriptiveMetadata descMetadata2 =
+		// model.retrieveDescriptiveMetadata(aipId,
+		// CorporaConstants.DESCRIPTIVE_METADATA_ID);
+		// Element html3 = HTMLUtils.descriptiveMetadataToHtml(descMetadata2,
+		// model,new Locale("pt", "PT"));
+		// Element descriptiveMetadataElement3 =
+		// html3.getElementsByAttributeValueMatching(CorporaConstants.HTML_TYPE,
+		// CorporaConstants.HTML_DESCRIPTIVE_METADATA).get(0);
+		// Element fieldElement3 =
+		// descriptiveMetadataElement3.getElementsByAttributeValueMatching(CorporaConstants.HTML_FIELD,
+		// CorporaConstants.HTML_TITLE).get(0);
+		// Element fieldValueElement3 =
+		// fieldElement3.getElementsByAttributeValue(CorporaConstants.HTML_TYPE,
+		// CorporaConstants.HTML_VALUE).get(0);
+		// assertEquals(fieldValueElement3.text(),CorporaConstants.HTML_MY_EXAMPLE);
 	}
 	/*
+	 * @Test public void testRepresentationPreservationObjectToHtml() throws
+	 * ModelServiceException, StorageActionException, IndexActionException {
+	 * final String aipId = UUID.randomUUID().toString(); final AIP aip =
+	 * model.createAIP(aipId, corporaService,
+	 * DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER,
+	 * CorporaConstants.SOURCE_AIP_ID));
+	 * SimpleRepresentationPreservationMetadata srpm =
+	 * index.retrieveSimpleRepresentationPreservationMetadata(aipId,
+	 * CorporaConstants.REPRESENTATION_1_ID,
+	 * CorporaConstants.REPRESENTATION_PREMIS_XML); Element html =
+	 * HTMLUtils.representationPreservationObjectToHtml(new
+	 * RepresentationPreservationObject(srpm)); System.out.println(html);
+	 * 
+	 * Element representationFilePreservationElement =
+	 * html.getElementsByAttributeValueMatching("type",
+	 * "representationPreservationObject").get(0); Element fieldElement =
+	 * representationFilePreservationElement.getElementsByAttributeValueMatching
+	 * ("field", "aipID").get(0); Element fieldValueElement =
+	 * fieldElement.getElementsByAttributeValue("type", "value").get(0);
+	 * assertEquals(fieldValueElement.text(),aipId); }
+	 */
+
 	@Test
-	public void testRepresentationPreservationObjectToHtml() throws ModelServiceException, StorageActionException, IndexActionException {
+	public void testRepresentationPreservationObjectToHtml()
+			throws ModelServiceException, StorageActionException, IndexActionException {
 		final String aipId = UUID.randomUUID().toString();
 		final AIP aip = model.createAIP(aipId, corporaService,
 				DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
-		SimpleRepresentationPreservationMetadata srpm = index.retrieveSimpleRepresentationPreservationMetadata(aipId, CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.REPRESENTATION_PREMIS_XML);
-		Element html = HTMLUtils.representationPreservationObjectToHtml(new RepresentationPreservationObject(srpm));
-		System.out.println(html);
-		
-		Element representationFilePreservationElement = html.getElementsByAttributeValueMatching("type", "representationPreservationObject").get(0);
-		Element fieldElement = representationFilePreservationElement.getElementsByAttributeValueMatching("field", "aipID").get(0);
-		Element fieldValueElement = fieldElement.getElementsByAttributeValue("type", "value").get(0);
-		assertEquals(fieldValueElement.text(),aipId);
-	}*/
-	
-	@Test
-	public void testRepresentationPreservationObjectToHtml() throws ModelServiceException, StorageActionException, IndexActionException {
-		final String aipId = UUID.randomUUID().toString();
-		final AIP aip = model.createAIP(aipId, corporaService,
-				DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
-		SimpleEventPreservationMetadata sepm = index.retrieveSimpleEventPreservationMetadata(aipId, CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.EVENT_RODA_398_PREMIS_XML);
-		Element html = HTMLUtils.preservationObjectFromStorageToHtml(sepm,model,new Locale("pt","PT"));
-		logger.debug("HTML: "+html);
-		Element representationFilePreservationElement = html.getElementsByAttributeValueMatching(CorporaConstants.HTML_TYPE, CorporaConstants.HTML_PREMIS).get(0);
-		Element fieldElement = representationFilePreservationElement.getElementsByAttributeValueMatching(CorporaConstants.HTML_FIELD, CorporaConstants.HTML_EVENT_TYPE).get(0);
-		Element fieldValueElement = fieldElement.getElementsByAttributeValue(CorporaConstants.HTML_TYPE, CorporaConstants.HTML_VALUE).get(0);
-		assertEquals(fieldValueElement.text(),CorporaConstants.HTML_INGESTION);
+		SimpleEventPreservationMetadata sepm = index.retrieveSimpleEventPreservationMetadata(aipId,
+				CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.EVENT_RODA_398_PREMIS_XML);
+		// Element html =
+		// HTMLUtils.preservationObjectFromStorageToHtml(sepm,model,new
+		// Locale("pt","PT"));
+		// logger.debug("HTML: "+html);
+		// Element representationFilePreservationElement =
+		// html.getElementsByAttributeValueMatching(CorporaConstants.HTML_TYPE,
+		// CorporaConstants.HTML_PREMIS).get(0);
+		// Element fieldElement =
+		// representationFilePreservationElement.getElementsByAttributeValueMatching(CorporaConstants.HTML_FIELD,
+		// CorporaConstants.HTML_EVENT_TYPE).get(0);
+		// Element fieldValueElement =
+		// fieldElement.getElementsByAttributeValue(CorporaConstants.HTML_TYPE,
+		// CorporaConstants.HTML_VALUE).get(0);
+		// assertEquals(fieldValueElement.text(),CorporaConstants.HTML_INGESTION);
 	}
-	
-	
-	
+
 	@Test
-	public void testRepresentationFilePreservationObjectFromStorageToHtml() throws ModelServiceException, StorageActionException, IndexActionException {
+	public void testRepresentationFilePreservationObjectFromStorageToHtml()
+			throws ModelServiceException, StorageActionException, IndexActionException {
 		final String aipId = UUID.randomUUID().toString();
 		final AIP aip = model.createAIP(aipId, corporaService,
 				DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
-		SimpleRepresentationFilePreservationMetadata srfm = index.retrieveSimpleRepresentationFilePreservationMetadata(aipId, CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.F0_PREMIS_XML);
-		Element html = HTMLUtils.preservationObjectFromStorageToHtml(new RepresentationFilePreservationObject(srfm),model,new Locale("pt", "PT"));
-		Element premisElement = html.getElementsByAttributeValueMatching(CorporaConstants.HTML_TYPE, CorporaConstants.HTML_PREMIS).get(0);
-		Element fieldElement = premisElement.getElementsByAttributeValueMatching(CorporaConstants.HTML_FIELD, CorporaConstants.HTML_PRESERVATION_LEVEL).get(0);
-		Element fieldValueElement = fieldElement.getElementsByAttributeValue(CorporaConstants.HTML_TYPE, CorporaConstants.HTML_VALUE).get(0);
-		assertEquals(fieldValueElement.text(),CorporaConstants.HTML_FULL);
+		SimpleRepresentationFilePreservationMetadata srfm = index.retrieveSimpleRepresentationFilePreservationMetadata(
+				aipId, CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.F0_PREMIS_XML);
+		// Element html = HTMLUtils.preservationObjectFromStorageToHtml(new
+		// RepresentationFilePreservationObject(srfm),model,new Locale("pt",
+		// "PT"));
+		// Element premisElement =
+		// html.getElementsByAttributeValueMatching(CorporaConstants.HTML_TYPE,
+		// CorporaConstants.HTML_PREMIS).get(0);
+		// Element fieldElement =
+		// premisElement.getElementsByAttributeValueMatching(CorporaConstants.HTML_FIELD,
+		// CorporaConstants.HTML_PRESERVATION_LEVEL).get(0);
+		// Element fieldValueElement =
+		// fieldElement.getElementsByAttributeValue(CorporaConstants.HTML_TYPE,
+		// CorporaConstants.HTML_VALUE).get(0);
+		// assertEquals(fieldValueElement.text(),CorporaConstants.HTML_FULL);
 	}
-	
-	
+
 	@Test
-	public void testEventPreservationObjectFromStorageToHtml() throws ModelServiceException, StorageActionException, IndexActionException {
+	public void testEventPreservationObjectFromStorageToHtml()
+			throws ModelServiceException, StorageActionException, IndexActionException {
 		final String aipId = UUID.randomUUID().toString();
 		final AIP aip = model.createAIP(aipId, corporaService,
 				DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
-		EventPreservationObject epo = model.retrieveEventPreservationObject(aipId, CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.EVENT_RODA_398_PREMIS_XML);
-		Element html = HTMLUtils.preservationObjectFromStorageToHtml(epo,model,new Locale("pt", "PT"));
-		logger.debug("HTML: "+html);
-		Element premisElement = html.getElementsByAttributeValueMatching(CorporaConstants.HTML_TYPE, CorporaConstants.HTML_PREMIS).get(0);
-		Element fieldElement = premisElement.getElementsByAttributeValueMatching(CorporaConstants.HTML_FIELD, CorporaConstants.HTML_EVENT_TYPE).get(0);
-		Element fieldValueElement = fieldElement.getElementsByAttributeValue(CorporaConstants.HTML_TYPE, CorporaConstants.HTML_VALUE).get(0);
-		assertEquals(fieldValueElement.text(),CorporaConstants.HTML_INGESTION);
+		EventPreservationObject epo = model.retrieveEventPreservationObject(aipId, CorporaConstants.REPRESENTATION_1_ID,
+				CorporaConstants.EVENT_RODA_398_PREMIS_XML);
+		// Element html =
+		// HTMLUtils.preservationObjectFromStorageToHtml(epo,model,new
+		// Locale("pt", "PT"));
+		// logger.debug("HTML: "+html);
+		// Element premisElement =
+		// html.getElementsByAttributeValueMatching(CorporaConstants.HTML_TYPE,
+		// CorporaConstants.HTML_PREMIS).get(0);
+		// Element fieldElement =
+		// premisElement.getElementsByAttributeValueMatching(CorporaConstants.HTML_FIELD,
+		// CorporaConstants.HTML_EVENT_TYPE).get(0);
+		// Element fieldValueElement =
+		// fieldElement.getElementsByAttributeValue(CorporaConstants.HTML_TYPE,
+		// CorporaConstants.HTML_VALUE).get(0);
+		// assertEquals(fieldValueElement.text(),CorporaConstants.HTML_INGESTION);
 	}
-	
-	
+
 }

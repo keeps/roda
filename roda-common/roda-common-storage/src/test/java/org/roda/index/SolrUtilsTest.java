@@ -2,15 +2,20 @@ package org.roda.index;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
+import org.apache.solr.client.solrj.SolrQuery.ORDER;
+import org.apache.solr.client.solrj.SolrQuery.SortClause;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;
+import org.hamcrest.Matchers;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.roda.CorporaConstants;
@@ -184,7 +189,7 @@ public class SolrUtilsTest {
 			stringFilter = SolrUtils.parseFilter(filter);
 			assertNotNull(stringFilter);
 			assertEquals(
-					String.format("(%s: %s OR %s: %s)", RodaConstants.SDO__ALL, fonds, RodaConstants.SDO__ALL, series),
+					String.format("(%s: %s AND %s: %s)", RodaConstants.SDO__ALL, fonds, RodaConstants.SDO__ALL, series),
 					stringFilter);
 		} catch (IndexActionException e) {
 			fail("An exception was not expected!");
@@ -206,38 +211,42 @@ public class SolrUtilsTest {
 	@Test
 	public void testParseSorter() throws IndexActionException {
 		Sorter sorter = null;
-		String sorterString = null;
+		List<SortClause> sortList = null;
 		String field1 = "field1", field2 = "field2";
-		String descendingString = "desc";
-		String ascendingString = "asc";
 		boolean descending = true;
 		boolean ascending = false;
-		// TODO
+
 		// 1) null sorter
-//		sorterString = SolrUtils.parseSorter(sorter);
-//		assertNotNull(sorterString);
-//		assertEquals("", sorterString);
-//
-//		// 2) empty sorter
-//		sorter = new Sorter();
-//		sorterString = SolrUtils.parseSorter(sorter);
-//		assertNotNull(sorterString);
-//		assertEquals("", sorterString);
-//
-//		// 3) sorter with 1 sorter parameter
-//		sorter = new Sorter();
-//		sorter.add(new SortParameter(field1, descending));
-//		sorterString = SolrUtils.parseSorter(sorter);
-//		assertNotNull(sorterString);
-//		assertEquals(String.format("%s %s", field1, descendingString), sorterString);
-//
-//		// 4) sorter with 2 sorter parameters
-//		sorter = new Sorter();
-//		sorter.add(new SortParameter(field1, descending));
-//		sorter.add(new SortParameter(field2, ascending));
-//		sorterString = SolrUtils.parseSorter(sorter);
-//		assertNotNull(sorterString);
-//		assertEquals(String.format("%s %s, %s %s", field1, descendingString, field2, ascendingString), sorterString);
+		sortList = SolrUtils.parseSorter(sorter);
+		assertNotNull(sortList);
+		assertThat(sortList, Matchers.hasSize(0));
+
+		// 2) empty sorter
+		sorter = new Sorter();
+		sortList = SolrUtils.parseSorter(sorter);
+		assertNotNull(sortList);
+		assertThat(sortList, Matchers.hasSize(0));
+
+		// 3) sorter with 1 sorter parameter
+		sorter = new Sorter();
+		sorter.add(new SortParameter(field1, descending));
+		sortList = SolrUtils.parseSorter(sorter);
+		assertNotNull(sortList);
+		assertThat(sortList, Matchers.hasSize(1));
+		assertThat(sortList.get(0).getItem(), Matchers.equalTo(field1));
+		assertThat(sortList.get(0).getOrder(), Matchers.equalTo(ORDER.desc));
+
+		// 4) sorter with 2 sorter parameters
+		sorter = new Sorter();
+		sorter.add(new SortParameter(field1, descending));
+		sorter.add(new SortParameter(field2, ascending));
+		sortList = SolrUtils.parseSorter(sorter);
+		assertNotNull(sortList);
+		assertThat(sortList, Matchers.hasSize(2));
+		assertThat(sortList.get(0).getItem(), Matchers.equalTo(field1));
+		assertThat(sortList.get(0).getOrder(), Matchers.equalTo(ORDER.desc));
+		assertThat(sortList.get(1).getItem(), Matchers.equalTo(field2));
+		assertThat(sortList.get(1).getOrder(), Matchers.equalTo(ORDER.asc));
 
 	}
 

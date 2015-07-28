@@ -231,11 +231,20 @@ roleOccupant: cn=archivists,LDAP_GROUPS_DN
 roleOccupant: cn=producers,LDAP_GROUPS_DN
 
 #######################
-# dissemination.search.basic
+# dissemination.search.basic FIXME this will be removed in favor of the next entry (search)
 dn: cn=dissemination.search.basic,LDAP_ROLES_DN
 objectClass: organizationalRole
 objectClass: top
 cn: dissemination.search.basic
+roleOccupant: cn=administrators,LDAP_GROUPS_DN
+roleOccupant: cn=users,LDAP_GROUPS_DN
+
+#######################
+# search 
+dn: cn=search,LDAP_ROLES_DN
+objectClass: organizationalRole
+objectClass: top
+cn: search
 roleOccupant: cn=administrators,LDAP_GROUPS_DN
 roleOccupant: cn=users,LDAP_GROUPS_DN
 
@@ -249,11 +258,20 @@ roleOccupant: cn=administrators,LDAP_GROUPS_DN
 roleOccupant: cn=users,LDAP_GROUPS_DN
 
 #######################
-# dissemination.browse
+# dissemination.browse FIXME this will be removed in favor of the next entry (browse)
 dn: cn=dissemination.browse,LDAP_ROLES_DN
 objectClass: organizationalRole
 objectClass: top
 cn: dissemination.browse
+roleOccupant: cn=administrators,LDAP_GROUPS_DN
+roleOccupant: cn=users,LDAP_GROUPS_DN
+
+#######################
+# browse
+dn: cn=browse,LDAP_ROLES_DN
+objectClass: organizationalRole
+objectClass: top
+cn: browse
 roleOccupant: cn=administrators,LDAP_GROUPS_DN
 roleOccupant: cn=users,LDAP_GROUPS_DN
 

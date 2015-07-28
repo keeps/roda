@@ -105,7 +105,7 @@ public class RodaUtils {
 	public static void applyStylesheet(Reader xsltReader, Reader fileReader, Map<String, String> parameters,
 			Writer result) throws IOException, TransformerException {
 
-		TransformerFactory factory = TransformerFactory.newInstance();
+		TransformerFactory factory = new net.sf.saxon.TransformerFactoryImpl();
 		Source xsltSource = new StreamSource(xsltReader);
 		Transformer transformer = factory.newTransformer(xsltSource);
 		for (Entry<String, String> parameter : parameters.entrySet()) {

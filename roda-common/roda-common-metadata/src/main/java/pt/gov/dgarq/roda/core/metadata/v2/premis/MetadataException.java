@@ -1,4 +1,4 @@
-package org.roda.model.premis;
+package pt.gov.dgarq.roda.core.metadata.v2.premis;
 
 
 /**
