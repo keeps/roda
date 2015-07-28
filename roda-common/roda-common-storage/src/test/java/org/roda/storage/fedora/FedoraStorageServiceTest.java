@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
+import java.net.ServerSocket;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Set;
@@ -35,18 +36,14 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/fcrepo/spring-test/test-container.xml")
-public class FedoraStorageServiceTest extends
-		AbstractStorageServiceTest<FedoraStorageService> {
+public class FedoraStorageServiceTest extends AbstractStorageServiceTest<FedoraStorageService> {
 
 	static final String PROTOCOL = "http";
 	static final String HOSTNAME = "localhost";
-	static final int SERVER_PORT = Integer.parseInt(System.getProperty(
-			"fcrepo.dynamic.test.port", "8080"));
-	static final String serverAddress = PROTOCOL + "://" + HOSTNAME + ":"
-			+ SERVER_PORT + "/";
+	static final int SERVER_PORT = getOpenDoor(9999);
+	static final String serverAddress = PROTOCOL + "://" + HOSTNAME + ":" + SERVER_PORT + "/";
 
-	final Logger logger = LoggerFactory
-			.getLogger(FedoraStorageServiceTest.class);
+	final Logger logger = LoggerFactory.getLogger(FedoraStorageServiceTest.class);
 
 	final FedoraStorageService storage = new FedoraStorageService(serverAddress);
 
@@ -55,17 +52,28 @@ public class FedoraStorageServiceTest extends
 		FSUtils.deletePath(Paths.get("fcrepo4-data"));
 	}
 
+	public static int getOpenDoor(int defaultDoor) {
+		int openDoor = defaultDoor;
+		try {
+			ServerSocket s = new ServerSocket(0);
+			openDoor = s.getLocalPort();
+			s.close();
+		} catch (IOException e) {
+			openDoor = defaultDoor;
+		}
+		System.setProperty("fcrepo.dynamic.test.port", openDoor + "");
+		return openDoor;
+	}
+
 	@Override
 	public void testClassInstantiation() throws StorageActionException {
-		final HttpClient client = HttpClientBuilder.create()
-				.setMaxConnPerRoute(Integer.MAX_VALUE)
+		final HttpClient client = HttpClientBuilder.create().setMaxConnPerRoute(Integer.MAX_VALUE)
 				.setMaxConnTotal(Integer.MAX_VALUE).build();
 		final HttpGet request = new HttpGet(serverAddress);
 		HttpResponse response;
 		try {
 			response = client.execute(request);
-			assertEquals(Status.OK.getStatusCode(), response.getStatusLine()
-					.getStatusCode());
+			assertEquals(Status.OK.getStatusCode(), response.getStatusLine().getStatusCode());
 		} catch (IOException e) {
 			fail(e.getMessage());
 		}
@@ -88,24 +96,19 @@ public class FedoraStorageServiceTest extends
 	}
 
 	@Test
-	public void testCreateGetDeleteBinary() throws StorageActionException,
-			IOException {
+	public void testCreateGetDeleteBinary() throws StorageActionException, IOException {
 
 		// create container
-		final StoragePath containerStoragePath = StorageTestUtils
-				.generateRandomContainerStoragePath();
-		final Map<String, Set<String>> containerMetadata = StorageTestUtils
-				.generateRandomMetadata();
+		final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
+		final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
 		getStorage().createContainer(containerStoragePath, containerMetadata);
 
 		// 1) create binary
 		final StoragePath binaryStoragePath = StorageTestUtils
 				.generateRandomResourceStoragePathUnder(containerStoragePath);
-		final Map<String, Set<String>> binaryMetadata = StorageTestUtils
-				.generateRandomMetadata();
+		final Map<String, Set<String>> binaryMetadata = StorageTestUtils.generateRandomMetadata();
 		final ContentPayload payload = new RandomMockContentPayload();
-		getStorage().createBinary(binaryStoragePath, binaryMetadata, payload,
-				false);
+		getStorage().createBinary(binaryStoragePath, binaryMetadata, payload, false);
 
 		// 2) get binary
 		Binary binary = getStorage().getBinary(binaryStoragePath);
@@ -121,8 +124,7 @@ public class FedoraStorageServiceTest extends
 		// datastream when it already exists, very well and therefore catching
 		// the already exists exception will no be tested
 		try {
-			getStorage().createBinary(binaryStoragePath, binaryMetadata,
-					payload, false);
+			getStorage().createBinary(binaryStoragePath, binaryMetadata, payload, false);
 
 		} catch (StorageActionException e) {
 			e.printStackTrace();
