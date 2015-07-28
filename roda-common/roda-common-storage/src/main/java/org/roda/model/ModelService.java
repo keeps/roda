@@ -1,5 +1,7 @@
 package org.roda.model;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -164,7 +166,7 @@ public class ModelService extends ModelObservable {
 	 * @return
 	 * @throws ModelServiceException
 	 */
-	public AIP createAIP(String aipId, StorageService sourceStorage, StoragePath sourcePath)
+	public AIP createAIP(String aipId, StorageService sourceStorage, StoragePath sourcePath, boolean notify)
 			throws ModelServiceException {
 		// TODO verify structure of source AIP and copy it to the storage
 		// XXX possible optimization would be to allow move between storage
@@ -179,7 +181,9 @@ public class ModelService extends ModelObservable {
 				Directory newDirectory = storage.getDirectory(ModelUtils.getAIPpath(aipId));
 
 				aip = convertResourceToAIP(newDirectory);
-				notifyAipCreated(aip);
+				if (notify) {
+					notifyAipCreated(aip);
+				}
 			} else {
 				throw new ModelServiceException("Error while creating AIP, reason: AIP is not valid",
 						ModelServiceException.INTERNAL_SERVER_ERROR);
@@ -189,6 +193,11 @@ public class ModelService extends ModelObservable {
 		}
 
 		return aip;
+	}
+
+	public AIP createAIP(String aipId, StorageService sourceStorage, StoragePath sourcePath)
+			throws ModelServiceException {
+		return createAIP(aipId, sourceStorage, sourcePath, true);
 	}
 
 	// TODO support asReference
@@ -823,7 +832,7 @@ public class ModelService extends ModelObservable {
 			Boolean active = ModelUtils.getBoolean(metadata, RodaConstants.STORAGE_META_ACTIVE);
 			Date dateCreated = ModelUtils.getDate(metadata, RodaConstants.STORAGE_META_DATE_CREATED);
 			Date dateModified = ModelUtils.getDate(metadata, RodaConstants.STORAGE_META_DATE_MODIFIED);
-			
+
 			// TODO retrieve permissions
 
 			if (active == null) {
@@ -1250,9 +1259,7 @@ public class ModelService extends ModelObservable {
 	}
 
 	// FIXME all the initialization, if needed, should be done only once
-	// LOG
-	public void addLogEntry(LogEntry logEntry) throws StorageActionException {
-
+	public void addLogEntry(LogEntry logEntry, boolean notify) throws StorageActionException {
 		Binary dailyLog;
 
 		try {
@@ -1274,10 +1281,53 @@ public class ModelService extends ModelObservable {
 			String entryJSON = ModelUtils.getJsonLogEntry(logEntry);
 			java.io.File f = new java.io.File(dailyLog.getContent().getURI().getPath());
 			FileUtils.writeStringToFile(f, entryJSON, true);
+			FileUtils.writeStringToFile(f, "\n", true);
 		} catch (IOException e) {
 
 		}
-		notifyLogEntryCreated(logEntry);
+		if (notify) {
+			notifyLogEntryCreated(logEntry);
+		}
 	}
 
+	public void addLogEntry(LogEntry logEntry) throws StorageActionException {
+		addLogEntry(logEntry, true);
+	}
+
+	public void reindexAIPs() throws ModelServiceException {
+		Iterable<AIP> aips = listAIPs();
+		for (AIP aip : aips) {
+			reindexAIP(aip);
+		}
+	}
+
+	private void reindexAIP(AIP aip) {
+		notifyAipCreated(aip);
+	}
+
+	public void reindexActionLogs() throws StorageActionException, ModelServiceException {
+		Iterable<Resource> actionLogs = getStorage()
+				.listResourcesUnderContainer(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG));
+		Iterator<Resource> it = actionLogs.iterator();
+		while (it.hasNext()) {
+			Resource r = it.next();
+			try {
+				Binary b = getStorage().getBinary(r.getStoragePath());
+				java.io.File f = new java.io.File(b.getContent().getURI().getPath());
+				try (BufferedReader br = new BufferedReader(new FileReader(f))) {
+					String line;
+					while ((line = br.readLine()) != null) {
+						LogEntry entry = ModelUtils.getLogEntry(line);
+						reindexActionLog(entry);
+					}
+				}
+			} catch (IOException e) {
+				throw new ModelServiceException("Error parsing log file: " + e.getMessage(), 100);
+			}
+		}
+	}
+
+	private void reindexActionLog(LogEntry entry) {
+		notifyLogEntryCreated(entry);
+	}
 }

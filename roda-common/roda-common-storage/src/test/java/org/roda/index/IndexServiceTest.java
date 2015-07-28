@@ -366,14 +366,14 @@ public class IndexServiceTest {
 	@Test
 	public void testFindLogEntry() throws StorageActionException, IndexActionException {
 		LogEntry entry = new LogEntry();
-		entry.setAction("Action");
-		entry.setAddress("Address");
-		entry.setDatetime("Datetime");
-		entry.setDescription("Description");
+		entry.setAction("action");
+		entry.setAddress("address");
+		entry.setDatetime("datetime");
+		entry.setDescription("description");
 		entry.setDuration(10L);
-		entry.setId("ID");
-		entry.setRelatedObjectID("Related");
-		entry.setUsername("Username");
+		entry.setId("id");
+		entry.setRelatedObjectID("related");
+		entry.setUsername("username");
 		LogEntryParameter[] parameters = new LogEntryParameter[2];
 		LogEntryParameter p1 = new LogEntryParameter("NAME1", "VALUE1");
 		LogEntryParameter p2 = new LogEntryParameter("NAME2", "VALUE2");
@@ -383,17 +383,63 @@ public class IndexServiceTest {
 		model.addLogEntry(entry);
 
 		Filter filterDescription = new Filter();
-		filterDescription.add(new SimpleFilterParameter(RodaConstants.LOG_DESCRIPTION, "Description"));
+		filterDescription.add(new SimpleFilterParameter(RodaConstants.LOG_DESCRIPTION, "description"));
 
 		IndexResult<LogEntry> entries = index.findLogEntry(filterDescription, null, new Sublist());
 		assertEquals(entries.getTotalCount(), 1);
 		assertEquals(entries.getResults().get(0).getAction(), CorporaConstants.LOG_ACTION);
 
 		Filter filterDescription2 = new Filter();
-		filterDescription2.add(new SimpleFilterParameter(RodaConstants.LOG_DESCRIPTION, "Description2"));
+		filterDescription2.add(new SimpleFilterParameter(RodaConstants.LOG_DESCRIPTION, "description2"));
 
 		IndexResult<LogEntry> entries2 = index.findLogEntry(filterDescription2, null, new Sublist());
 		assertEquals(entries2.getTotalCount(), 0);
 	}
 
+	
+	
+	@Test
+	public void testReindexLogEntry() throws StorageActionException, ModelServiceException, IndexActionException{
+		for(int i=0;i<100;i++){
+			LogEntry entry = new LogEntry();
+			entry.setId("ID"+i);
+			entry.setDescription("DESCRIPTION:"+i);
+			entry.setAction("ACTION:"+i);
+			entry.setAddress("ADDRESS");
+			entry.setDatetime("DATETIME:"+i);
+			entry.setDuration(i);
+			entry.setRelatedObjectID("RELATED:"+i);
+			entry.setUsername("USER:"+i);
+			LogEntryParameter[] parameters = new LogEntryParameter[2];
+			LogEntryParameter p1 = new LogEntryParameter("NAME1","VALUE1");
+			LogEntryParameter p2 = new LogEntryParameter("NAME2", "VALUE2");
+			parameters[0] = p1;
+			parameters[1] = p2;
+			entry.setParameters(parameters);
+			model.addLogEntry(entry,false);
+		}
+		model.reindexActionLogs();
+		Filter f1 = new Filter();
+		f1.add(new SimpleFilterParameter(CorporaConstants.LOG_ACTION, "ACTION:54"));
+		IndexResult<LogEntry> entries1 = index.findLogEntry(f1, null, new Sublist(0,10));
+		assertEquals(entries1.getTotalCount(), 1L);
+		Filter f2 = new Filter();
+		f2.add(new SimpleFilterParameter(CorporaConstants.LOG_ADDRESS, "ADDRESS"));
+		IndexResult<LogEntry> entries2 = index.findLogEntry(f2, null, new Sublist(0,10));
+		assertEquals(entries2.getTotalCount(), 100L);	
+	}
+	
+	@Test
+	public void testReindexAIP()
+			throws ModelServiceException, StorageActionException, IndexActionException, ParseException {
+		final String aipId = UUID.randomUUID().toString();
+		final AIP aip = model.createAIP(aipId, corporaService,DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),false);
+		model.reindexAIPs();
+		final SimpleDescriptionObject sdo = index.retrieveDescriptiveMetadata(aipId);
+		assertEquals(aip.getId(), sdo.getId());
+		assertEquals(aip.isActive(), RODAObject.STATE_ACTIVE.equals(sdo.getState()));
+		assertEquals(aip.getParentId(), sdo.getParentID());
+		assertEquals(aip.getDateCreated(), sdo.getCreatedDate());
+		assertEquals(aip.getDateModified(), sdo.getLastModifiedDate());
+	}
 }

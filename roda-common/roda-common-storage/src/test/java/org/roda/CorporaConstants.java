@@ -95,5 +95,15 @@ public class CorporaConstants {
 	public static final String HTML_MY_EXAMPLE = "My example";
 	public static final String HTML_EVENT_TYPE = "eventType";
 	public static final String HTML_INGESTION = "ingestion";
-	public static final String LOG_ACTION = "Action";
+	
+	public static final String LOG_ACTION = "action";
+	public static final String LOG_ADDRESS = "address";
+	public static final String LOG_DATETIME = "datetime";
+	public static final String LOG_DESCRIPTION = "description";
+	public static final String LOG_DURATION = "duration";
+	public static final String LOG_ID = "id";
+	public static final String LOG_RELATED_OBJECT_ID = "relatedObject";
+	public static final String LOG_USERNAME = "username";
+	public static final String LOG_PARAMETERS = "parameters";
+	public static final String LOG_FILE_ID = "fileID";
 }
