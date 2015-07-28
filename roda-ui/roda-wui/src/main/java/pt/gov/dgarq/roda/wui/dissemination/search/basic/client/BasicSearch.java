@@ -9,15 +9,20 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.datepicker.client.DateBox;
+import com.google.gwt.user.datepicker.client.DateBox.DefaultFormat;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 
@@ -89,7 +94,17 @@ public class BasicSearch extends Composite {
 	@UiField(provided = true)
 	CollectionsTable searchResultPanel;
 
-	// private boolean firstSearch;
+	// ADVANCED SEARCH
+	@UiField
+	DisclosurePanel advancedSearchDisclosure;
+
+	@UiField
+	TextBox advancedSearchInputTitle;
+
+	@UiField
+	DateBox advancedSearchInputDateInitial;
+	@UiField
+	DateBox advancedSearchInputDateFinal;
 
 	private BasicSearch() {
 		searchResultPanel = new CollectionsTable();
@@ -126,6 +141,12 @@ public class BasicSearch extends Composite {
 				update();
 			}
 		});
+
+		DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat(PredefinedFormat.DATE_MEDIUM));
+		advancedSearchInputDateInitial.setFormat(dateFormat);
+		advancedSearchInputDateFinal.setFormat(dateFormat);
+		advancedSearchInputDateInitial.getDatePicker().setYearArrowsVisible(true);
+		advancedSearchInputDateFinal.getDatePicker().setYearArrowsVisible(true);
 
 	}
 

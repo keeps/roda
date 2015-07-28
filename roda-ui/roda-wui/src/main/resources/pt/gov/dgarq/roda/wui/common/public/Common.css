@@ -1,6 +1,30 @@
 @CHARSET "UTF-8";
 
 /** Common styles **/
+html, body {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	height: 100%;
+	background-color: white;
+	height: 100%;
+}
+
+body {
+	padding: 0;
+	margin: 0;
+	border: 0;
+	text-align: center;
+	margin-top: -13px;
+}
+
+body, * {
+	font-family: 'Ubuntu', sans-serif;
+	font-size: 12px;
+	color: #58595b;
+	text-align: left;
+}
+
 a {
 	font-family: 'Ubuntu', sans-serif;
 	font-size: 12px;
@@ -87,6 +111,111 @@ h3, .h3 {
 	text-shadow: none !important;
 }
 
+.gwt-CheckBox label {
+	position: relative;
+	vertical-align: middle;
+	bottom: 3px;
+}
+
+/** Date box and picker from Chrome theme **/
+.gwt-DateBox input {
+	width: 8em;
+}
+
+.dateBoxFormatError {
+	background: #eed6d6;
+}
+
+.dateBoxPopup {
+	
+}
+
+.gwt-DatePicker {
+	border: 1px solid #888;
+	cursor: default;
+}
+
+.gwt-DatePicker td, .datePickerMonthSelector td:focus {
+	outline: none
+}
+
+.datePickerDays {
+	width: 100%;
+	background: white;
+}
+
+.datePickerDay, .datePickerWeekdayLabel, .datePickerWeekendLabel {
+	font-size: 75%;
+	text-align: center;
+	padding: 4px;
+	outline: none;
+}
+
+.datePickerWeekdayLabel, .datePickerWeekendLabel {
+	background: #c1c1c1;
+	padding: 0px 4px 2px;
+	cursor: default;
+}
+
+.datePickerDay {
+	padding: 4px;
+	cursor: hand;
+	cursor: pointer;
+}
+
+.datePickerDayIsToday {
+	border: 1px solid black;
+	padding: 3px;
+}
+
+.datePickerDayIsWeekend {
+	background: #EEEEEE;
+}
+
+.datePickerDayIsFiller {
+	color: #888888;
+}
+
+.datePickerDayIsValue {
+	background: #abf;
+}
+
+.datePickerDayIsDisabled {
+	color: #AAAAAA;
+	font-style: italic;
+}
+
+.datePickerDayIsHighlighted {
+	background: #dde;
+}
+
+.datePickerDayIsValueAndHighlighted {
+	background: #ccf;
+}
+
+.datePickerMonthSelector {
+	background: #c1c1c1;
+	width: 100%;
+}
+
+td.datePickerMonth, td.datePickerYear {
+	text-align: center;
+	vertical-align: middle;
+	white-space: nowrap;
+	font-size: 70%;
+	font-weight: bold;
+}
+
+.datePickerPreviousButton, .datePickerNextButton,
+	.datePickerPreviousYearButton, .datePickerNextYearButton {
+	font-size: 120%;
+	line-height: 1em;
+	cursor: hand;
+	cursor: pointer;
+	padding: 0px 4px;
+}
+/***/
+
 /** Description level **/
 .description-level {
 	/*copy from font awesome style */
@@ -117,18 +246,16 @@ h3, .h3 {
 }
 
 .gwt-TabPanelBottom {
-	border: 1px solid #58595b;
 	background-color: #e6e7e8;
 	padding: 5px;
 }
 
 .gwt-TabBar {
-	background-color: #999;
 	border: 0;
 }
 
 .gwt-TabBar .gwt-TabBarFirst {
-	
+	display: none;
 }
 
 .gwt-TabBar .gwt-TabBarRest {
@@ -136,21 +263,27 @@ h3, .h3 {
 }
 
 .gwt-TabBar .gwt-TabBarItem {
-	border: 1px solid #58595b;
-	margin: 1px;
-	font-family: Verdana, Lucida, Arial, Helvetica, sans-serif;
-	font-size: 11pt;
-	font-weight: normal;
-	color: #58595b;
-	background-color: #999;
-	padding: 1px 2px;
+	margin: 2px;
+	background-color: #5bbeff;
+	padding: 5px 10px;
 	cursor: pointer;
 	cursor: hand;
 }
 
+.gwt-TabBar .gwt-TabBarItem .gwt-Label {
+	color: white;
+	font-weight: 500;
+}
+
 .gwt-TabBar .gwt-TabBarItem-selected {
+	margin: 0;
 	background-color: #e6e7e8;
-	font-weight: normal;
+	border: 2px solid #e6e7e8;
+}
+
+.gwt-TabBar .gwt-TabBarItem-selected .gwt-Label {
+	font-weight: 800;
+	color: inherit;
 }
 
 .gwt-SuggestBox {
@@ -304,6 +437,10 @@ h3, .h3 {
 		    src= 'images/button/normal/right_action_report.png', sizingMethod=
 		
 		
+		
+		
+		
+		
 		 'scale');
 }
 
@@ -312,6 +449,10 @@ h3, .h3 {
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src= 'images/button/normal/right_arrow_backward.png', sizingMethod=
+		
+		
+		
+		
 		
 		
 		 'scale');
@@ -329,6 +470,10 @@ h3, .h3 {
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src= 'images/button/normal/right_arrow_forward.png', sizingMethod=
+		
+		
+		
+		
 		
 		
 		 'scale');
@@ -367,7 +512,7 @@ h3, .h3 {
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/normal/right_minus.png', sizingMethod=         
+		   'images/button/normal/right_minus.png', sizingMethod=             
 		'scale');
 }
 
@@ -436,7 +581,8 @@ h3, .h3 {
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/hover/right_arrow_up.png', sizingMethod=         
+		   'images/button/hover/right_arrow_up.png', sizingMethod=
+		            
 		'scale');
 }
 
@@ -546,7 +692,7 @@ h3, .h3 {
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/pressed/right_check.png', sizingMethod=         
+		   'images/button/pressed/right_check.png', sizingMethod=             
 		'scale');
 }
 
@@ -555,7 +701,7 @@ h3, .h3 {
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/pressed/right_cross.png', sizingMethod=         
+		   'images/button/pressed/right_cross.png', sizingMethod=             
 		'scale');
 }
 
@@ -564,7 +710,7 @@ h3, .h3 {
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/pressed/right_info.png', sizingMethod=         
+		   'images/button/pressed/right_info.png', sizingMethod=             
 		'scale');
 }
 
@@ -573,7 +719,7 @@ h3, .h3 {
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/pressed/right_minus.png', sizingMethod=         
+		   'images/button/pressed/right_minus.png', sizingMethod=             
 		'scale');
 }
 
@@ -582,7 +728,7 @@ h3, .h3 {
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/pressed/right_plus.png', sizingMethod=         
+		   'images/button/pressed/right_plus.png', sizingMethod=             
 		'scale');
 }
 
@@ -653,7 +799,8 @@ h3, .h3 {
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/disabled/right_check.png', sizingMethod=         
+		   'images/button/disabled/right_check.png', sizingMethod=
+		            
 		'scale');
 }
 
@@ -662,7 +809,8 @@ h3, .h3 {
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/disabled/right_cross.png', sizingMethod=         
+		   'images/button/disabled/right_cross.png', sizingMethod=
+		            
 		'scale');
 }
 
@@ -671,7 +819,7 @@ h3, .h3 {
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/disabled/right_info.png', sizingMethod=         
+		   'images/button/disabled/right_info.png', sizingMethod=             
 		'scale');
 }
 
@@ -680,7 +828,8 @@ h3, .h3 {
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/disabled/right_minus.png', sizingMethod=         
+		   'images/button/disabled/right_minus.png', sizingMethod=
+		            
 		'scale');
 }
 
@@ -689,7 +838,7 @@ h3, .h3 {
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/disabled/right_plus.png', sizingMethod=         
+		   'images/button/disabled/right_plus.png', sizingMethod=             
 		'scale');
 }
 
@@ -706,7 +855,7 @@ h3, .h3 {
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/disabled/right_rec.png', sizingMethod=         
+		   'images/button/disabled/right_rec.png', sizingMethod=             
 		'scale');
 }
 
@@ -787,7 +936,7 @@ h3, .h3 {
 	_background: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/shadow/shadow-bottom-left.png', sizingMethod=         
+		   'images/shadow/shadow-bottom-left.png', sizingMethod=             
 		'scale');
 }
 
@@ -807,7 +956,7 @@ h3, .h3 {
 	_background: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/shadow/shadow-bottom-right.png', sizingMethod=         
+		   'images/shadow/shadow-bottom-right.png', sizingMethod=             
 		'scale');
 }
 

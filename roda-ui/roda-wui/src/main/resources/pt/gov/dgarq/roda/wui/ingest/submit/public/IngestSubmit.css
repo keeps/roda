@@ -3,17 +3,18 @@
 /** Ingest Submit **/
 
 .wui-ingest-submit {
-	width: 98%;	
+	width: 100%;
+	padding: 40px;	
 }
 
 .wui-ingest-submit .gwt-TabBar{
-	background-color: #e6e7e8;
+	
 }
 
 /** Upload SIP **/ 
 
 .wui-ingest-submit-upload {
-	padding: 5px;
+	padding: 25px;
 }
 .wui-ingest-submit-upload .upload-title {
 	margin-bottom: 5px;
@@ -47,7 +48,7 @@
 
 /** Create SIP **/
 .wui-ingest-submit-create {
-	padding: 5px;
+	padding: 25px;
 }
 .wui-ingest-submit-create .create-title {
 	margin-bottom: 5px;

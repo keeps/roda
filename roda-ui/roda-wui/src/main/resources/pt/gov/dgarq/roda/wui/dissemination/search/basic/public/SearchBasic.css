@@ -26,16 +26,12 @@
 	width: 100%;
 }
 
-.wui-search-basic .searchInputAdvancedLink {
-	margin-top: 10px;
-}
-
 .wui-search-basic .searchBox {
-	width: 100%;
+	width: 99%;
 	height: 1em;
 	font-size: 14pt;
 	color: #58595b;
-	padding: 5px;
+	padding: 0.5%;
 	border: 3px solid #ccc;
 	border-radius: 2px;
 }
@@ -93,4 +89,48 @@
 	margin: 10px 0;
 	width: 100%;
 }
+
+.searchAdvancedDisclosure {
+	width: 100%;
+}
+
+.searchAdvancedDisclosure a {
+	text-decoration: underline;
+}
+
+.searchAdvancedPanel {
+	padding: 20px;
+	background-color: #e6e7e8;
+}
+
+.searchAdvancedField {
+	margin-bottom: 15px;
+}
+
+.searchAdvancedFieldLabel {
+	font-weight: 500;
+	margin-bottom: 5px;
+}
+
+.searchAdvancedFieldInput {
+	width: 100%;
+}
+
+.searchAdvancedFieldInputDateLabel {
+	display: inline-block;
+}
+
+.searchAdvancedFieldInputDateInput {
+	width: 8em;
+	text-align: center;
+	margin: 0 5px;
+}
+
+.fieldTextBox {
+	width: 99%;
+	height: 1em;
+	color: #58595b;
+	padding: 0.5%;
+	border: 2px solid #ccc;
+	border-radius: 1px;
 }
