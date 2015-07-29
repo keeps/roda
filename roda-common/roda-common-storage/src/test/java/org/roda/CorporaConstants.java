@@ -16,6 +16,7 @@ public class CorporaConstants {
 	public static final String SOURCE_AIP_CONTAINER = "AIP";
 	public static final String SOURCE_PRESERVATION_CONTAINER = "Preservation";
 	public static final String SOURCE_AIP_ID = "AIP_1";
+	public static final String SOURCE_AIP_ID_3 = "AIP_3";
 	public static final String SOURCE_AIP_BUGGY_ID = "AIP_BUGGY";
 	public static final String DATE_CREATED = "2015-06-06T15:30:00.000+0000";
 	public static final String DATE_MODIFIED = "2015-06-06T16:30:00.000+0000";
@@ -106,4 +107,7 @@ public class CorporaConstants {
 	public static final String LOG_USERNAME = "username";
 	public static final String LOG_PARAMETERS = "parameters";
 	public static final String LOG_FILE_ID = "fileID";
+	public static final String YEAR_1213 = "1213";
+	public static final String YEAR_2003 = "2003";
+	
 }

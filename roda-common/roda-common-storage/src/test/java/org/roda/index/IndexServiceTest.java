@@ -13,6 +13,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
 
@@ -226,6 +227,26 @@ public class IndexServiceTest {
 		} catch (IndexActionException e) {
 			assertEquals(IndexActionException.NOT_FOUND, e.getCode());
 		}
+	}
+	
+	@Test
+	public void testAIPIndexCreateDelete2()
+			throws ModelServiceException, StorageActionException, IndexActionException, ParseException {
+		final String aipId = UUID.randomUUID().toString();
+
+		final AIP aip = model.createAIP(aipId, corporaService,
+				DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID_3));
+		
+		Filter filter = new Filter();
+		filter.add(new SimpleFilterParameter(RodaConstants.AIP_ID, aipId));
+		SimpleDescriptionObject sdo = index.findDescriptiveMetadata(filter, null, new Sublist(0, 10)).getResults().get(0);
+		Calendar calInitial = Calendar.getInstance();
+		calInitial.setTime(sdo.getDateInitial());
+		assertEquals(""+calInitial.get(Calendar.YEAR),CorporaConstants.YEAR_1213);
+		Calendar calFinal = Calendar.getInstance();
+		calFinal.setTime(sdo.getDateFinal());
+		assertEquals(""+calFinal.get(Calendar.YEAR),CorporaConstants.YEAR_2003);
+		
 	}
 
 	@Test
