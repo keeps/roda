@@ -432,14 +432,14 @@ public class IndexServiceTest {
 	@Test
 	public void testReindexAIP()
 			throws ModelServiceException, StorageActionException, IndexActionException, ParseException {
-		final String aipId = UUID.randomUUID().toString();
-		final AIP aip = model.createAIP(aipId, corporaService,DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),false);
+		for(int i=0;i<100;i++){
+			final String aipId = UUID.randomUUID().toString();
+			final AIP aip = model.createAIP(aipId, corporaService,DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),false);
+		}
+		
 		model.reindexAIPs();
-		final SimpleDescriptionObject sdo = index.retrieveDescriptiveMetadata(aipId);
-		assertEquals(aip.getId(), sdo.getId());
-		assertEquals(aip.isActive(), RODAObject.STATE_ACTIVE.equals(sdo.getState()));
-		assertEquals(aip.getParentId(), sdo.getParentID());
-		assertEquals(aip.getDateCreated(), sdo.getCreatedDate());
-		assertEquals(aip.getDateModified(), sdo.getLastModifiedDate());
+		long count = index.countAIP(new Filter());
+		assertEquals(count, 100L);
+		
 	}
 }

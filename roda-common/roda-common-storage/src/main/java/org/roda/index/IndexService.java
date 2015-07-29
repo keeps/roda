@@ -186,9 +186,4 @@ public class IndexService {
 			Sorter sorter, Sublist sublist) throws IndexActionException {
 		return SolrUtils.find(index, LogEntry.class, filter, sorter, sublist);
 	}
-	
-	public SolrClient getSolrClient(){
-		return index;
-	}
-	
 }
