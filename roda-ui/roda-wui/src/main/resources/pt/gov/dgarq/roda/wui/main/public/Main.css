@@ -7,7 +7,7 @@
 }
 
 .footer {
-	height: 200px;
+	
 }
 
 .main-filler {
@@ -338,24 +338,16 @@
 .main .wui-breadcrumbPanel .breadcrumb {
 	font-style: italic;
 	color: #a7a9ac;
+	text-decoration: underline;
 	cursor: pointer;
 	cursor: hand;
 }
 
-.main .wui-breadcrumbPanel .breadcrumb a {
-	color: #a7a9ac;
-	text-decoration: none;
-	font-size: 12px;
-}
-
 .main .wui-breadcrumbPanel .breadcrumb-last {
 	color: #404142;
-}
-
-.main .wui-breadcrumbPanel .breadcrumb-last a {
-	color: #404142;
 	text-decoration: none;
 }
+
 
 .main .wui-breadcrumbPanel .breadcrumb-separator {
 	font-family: 'Ubuntu', sans-serif;

@@ -64,9 +64,11 @@
 								<g:Label addStyleNames="searchAdvancedFieldLabel">Produced between the dates</g:Label>
 								<g:FlowPanel addStyleNames="searchAdvancedFieldInput">
 									<g:Label addStyleNames="searchAdvancedFieldInputDateLabel">From </g:Label>
-									<d:DateBox addStyleNames="searchAdvancedFieldInputDateInput" ui:field="advancedSearchInputDateInitial" />
+									<d:DateBox addStyleNames="searchAdvancedFieldInputDateInput"
+										ui:field="advancedSearchInputDateInitial" />
 									<g:Label addStyleNames="searchAdvancedFieldInputDateLabel"> to </g:Label>
-									<d:DateBox addStyleNames="searchAdvancedFieldInputDateInput" ui:field="advancedSearchInputDateFinal" />
+									<d:DateBox addStyleNames="searchAdvancedFieldInputDateInput"
+										ui:field="advancedSearchInputDateFinal" />
 								</g:FlowPanel>
 							</g:FlowPanel>
 							<g:FlowPanel addStyleNames="searchAdvancedField">
@@ -109,7 +111,7 @@
 					</g:HTML>
 				</g:FocusPanel>
 			</g:FlowPanel>
-			<common:CollectionsTable addStyleNames="searchResults"
+			<common:AIPList addStyleNames="searchResults"
 				ui:field="searchResultPanel" visible="false" />
 		</g:FlowPanel>
 		<g:FlowPanel styleName="{style.sidebar}">

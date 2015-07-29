@@ -1,5 +1,9 @@
 package pt.gov.dgarq.roda.wui.ingest.client;
 
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Widget;
+
 import pt.gov.dgarq.roda.core.data.User;
 import pt.gov.dgarq.roda.wui.common.client.AuthenticatedUser;
 import pt.gov.dgarq.roda.wui.common.client.BadHistoryTokenException;
@@ -11,10 +15,6 @@ import pt.gov.dgarq.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import pt.gov.dgarq.roda.wui.ingest.list.client.IngestList;
 import pt.gov.dgarq.roda.wui.ingest.pre.client.PreIngest;
 import pt.gov.dgarq.roda.wui.ingest.submit.client.IngestSubmit;
-
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Widget;
 
 /**
  * 
@@ -32,7 +32,9 @@ public class Ingest {
 
 		@Override
 		public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-			UserLogin.getInstance().checkRole(this, callback);
+			UserLogin.getInstance().checkRoles(
+					new HistoryResolver[] { PreIngest.RESOLVER, IngestSubmit.RESOLVER, IngestList.RESOLVER }, false,
+					callback);
 		}
 
 		public String getHistoryPath() {

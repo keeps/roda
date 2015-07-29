@@ -4,10 +4,10 @@
 package pt.gov.dgarq.roda.wui.ingest.submit.client;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.SourcesTabEvents;
-import com.google.gwt.user.client.ui.TabListener;
 import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -62,8 +62,6 @@ public class IngestSubmit {
 
 	private static IngestSubmitConstants constants = (IngestSubmitConstants) GWT.create(IngestSubmitConstants.class);
 
-	private boolean initialized;
-
 	private TabPanel layout;
 
 	private UploadSIP uploadSIP;
@@ -71,60 +69,51 @@ public class IngestSubmit {
 	private CreateSIP createSIP;
 
 	private IngestSubmit() {
-		initialized = false;
-	}
 
-	private void init() {
-		if (!initialized) {
-			initialized = true;
+		layout = new TabPanel();
+		uploadSIP = new UploadSIP();
+		createSIP = new CreateSIP();
+		layout.add(createSIP.getWidget(), constants.createTabTitle());
+		layout.add(uploadSIP.getWidget(), constants.uploadTabTitle());
 
-			layout = new TabPanel();
-			uploadSIP = new UploadSIP();
-			createSIP = new CreateSIP();
-			layout.add(uploadSIP.getWidget(), constants.uploadTabTitle());
-			layout.add(createSIP.getWidget(), constants.createTabTitle());
+		layout.addSelectionHandler(new SelectionHandler<Integer>() {
 
-			layout.addTabListener(new TabListener() {
-
-				public boolean onBeforeTabSelected(SourcesTabEvents sender, int tabIndex) {
-					switch (tabIndex) {
-					case 1:
-						History.newItem(RESOLVER.getHistoryPath() + ".create");
-						break;
-					case 0:
-					default:
-						History.newItem(RESOLVER.getHistoryPath() + ".upload");
-						break;
-					}
-					return true;
+			@Override
+			public void onSelection(SelectionEvent<Integer> event) {
+				String newHistoryToken;
+				switch (event.getSelectedItem()) {
+				case 0:
+					newHistoryToken = RESOLVER.getHistoryPath() + ".create";
+					break;
+				case 1:
+				default:
+					newHistoryToken = RESOLVER.getHistoryPath() + ".upload";
+					break;
 				}
 
-				public void onTabSelected(SourcesTabEvents sender, int tabIndex) {
-					// nothing to do
-
+				if (!History.getToken().equals(newHistoryToken)) {
+					History.newItem(newHistoryToken);
 				}
+			}
+		});
 
-			});
-
-			layout.addStyleName("wui-ingest-submit");
-		}
+		layout.addStyleName("wui-ingest-submit");
 	}
 
 	public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
-		String defaultHistoryPath = RESOLVER.getHistoryPath() + ".upload";
+		String defaultHistoryPath = RESOLVER.getHistoryPath() + ".create";
 		if (historyTokens.length == 0) {
 			History.newItem(defaultHistoryPath);
 			callback.onSuccess(null);
 		} else if (historyTokens.length == 1) {
 			if (historyTokens[0].equals("upload")) {
-				init();
+				GWT.log("init upload SIP");
 				uploadSIP.init();
-				layout.selectTab(0);
+				layout.selectTab(1);
 				callback.onSuccess(layout);
 			} else if (historyTokens[0].equals("create")) {
-				init();
 				createSIP.init();
-				layout.selectTab(1);
+				layout.selectTab(0);
 				callback.onSuccess(layout);
 			} else {
 				callback.onFailure(new BadHistoryTokenException(historyTokens[0]));

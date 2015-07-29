@@ -81,7 +81,7 @@ public class Main extends Composite implements EntryPoint {
 	LanguageSwitcherPanel languageSwitcherPanel;
 
 	@UiField(provided = true)
-	Menu2 menu;
+	Menu menu;
 
 	@UiField(provided = true)
 	ContentPanel contentPanel;
@@ -91,7 +91,7 @@ public class Main extends Composite implements EntryPoint {
 	 */
 	public Main() {
 		languageSwitcherPanel = new LanguageSwitcherPanel();
-		menu = new Menu2();
+		menu = new Menu();
 		contentPanel = ContentPanel.getInstance();
 		Binder uiBinder = GWT.create(Binder.class);
 		initWidget(uiBinder.createAndBindUi(this));
@@ -116,7 +116,7 @@ public class Main extends Composite implements EntryPoint {
 		homeLinkArea.addClickHandler(new ClickHandler() {
 
 			public void onClick(ClickEvent event) {
-				History.newItem(Home.getInstance().getHistoryPath());
+				History.newItem(Home.RESOLVER.getHistoryPath());
 			}
 		});
 
@@ -126,8 +126,8 @@ public class Main extends Composite implements EntryPoint {
 
 	private void onHistoryChanged(String historyToken) {
 		if (historyToken.length() == 0) {
-			contentPanel.update(Tools.splitHistory(Home.getInstance().getHistoryPath()));
-			History.newItem(Home.getInstance().getHistoryPath());
+			contentPanel.update(Tools.splitHistory(Home.RESOLVER.getHistoryPath()));
+			History.newItem(Home.RESOLVER.getHistoryPath());
 		} else {
 			final String decodedHistoryToken = URL.decode(historyToken);
 			String[] historyPath = Tools.splitHistory(decodedHistoryToken);

@@ -8,12 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-import pt.gov.dgarq.roda.core.common.LoginException;
-import pt.gov.dgarq.roda.core.common.RODAClientException;
-import pt.gov.dgarq.roda.core.data.Group;
-import pt.gov.dgarq.roda.core.data.RODAMember;
-import pt.gov.dgarq.roda.core.data.User;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
@@ -29,6 +23,11 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import config.i18n.client.CommonConstants;
 import config.i18n.client.CommonMessages;
+import pt.gov.dgarq.roda.core.common.LoginException;
+import pt.gov.dgarq.roda.core.common.RODAClientException;
+import pt.gov.dgarq.roda.core.data.Group;
+import pt.gov.dgarq.roda.core.data.RODAMember;
+import pt.gov.dgarq.roda.core.data.User;
 
 /**
  * @author Luis Faria
@@ -384,9 +383,8 @@ public class UserLogin {
 	 * @param res
 	 * @param callback
 	 */
-	public void checkRole(HistoryResolver res, final AsyncCallback<Boolean> callback) {
+	public void checkRole(final HistoryResolver res, final AsyncCallback<Boolean> callback) {
 		String propertyName = "menu." + res.getHistoryPath() + ".role";
-		GWT.log("getting property " + propertyName);
 		UserLogin.getRodaProperty(propertyName, new AsyncCallback<String>() {
 
 			public void onFailure(Throwable caught) {
@@ -394,7 +392,9 @@ public class UserLogin {
 			}
 
 			public void onSuccess(final String role) {
-				GWT.log("got role " + role);
+				if (role == null) {
+					GWT.log("Could not find role for path " + res.getHistoryPath());
+				}
 				getAuthenticatedUser(new AsyncCallback<AuthenticatedUser>() {
 
 					public void onFailure(Throwable caught) {
@@ -402,7 +402,6 @@ public class UserLogin {
 					}
 
 					public void onSuccess(AuthenticatedUser authUser) {
-						GWT.log("User " + authUser + " has role " + role + " result=" + authUser.hasRole(role));
 						callback.onSuccess(new Boolean(authUser.hasRole(role)));
 					}
 

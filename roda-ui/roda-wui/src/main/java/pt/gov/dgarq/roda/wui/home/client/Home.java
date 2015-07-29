@@ -3,23 +3,47 @@
  */
 package pt.gov.dgarq.roda.wui.home.client;
 
-import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
-import pt.gov.dgarq.roda.wui.common.client.widgets.HTMLWidgetWrapper;
-
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
+
+import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
+import pt.gov.dgarq.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 /**
  * @author Luis Faria
  * 
  */
-public class Home implements HistoryResolver {
+public class Home {
+
+	public static final HistoryResolver RESOLVER = new HistoryResolver() {
+
+		@Override
+		public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
+			getInstance().resolve(historyTokens, callback);
+		}
+
+		@Override
+		public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
+			callback.onSuccess(Boolean.TRUE);
+		}
+
+		@Override
+		public String getHistoryToken() {
+			return "home";
+		}
+
+		@Override
+		public String getHistoryPath() {
+			return getHistoryToken();
+		}
+	};
 
 	private static Home instance = null;
 
 	/**
 	 * Get the singleton instance
+	 * 
 	 * @return the instance
 	 */
 	public static Home getInstance() {
@@ -45,27 +69,14 @@ public class Home implements HistoryResolver {
 		}
 	}
 
-	public String getHistoryPath() {
-		return getHistoryToken();
-	}
-
-	public String getHistoryToken() {
-		return "home";
-	}
-
 	public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
 		if (historyTokens.length == 0) {
 			init();
 			callback.onSuccess(layout);
 		} else {
-			History.newItem(getHistoryPath());
+			History.newItem(RESOLVER.getHistoryPath());
 			callback.onSuccess(null);
 		}
-	}
-
-	public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-		callback.onSuccess(Boolean.TRUE);
-
 	}
 
 }

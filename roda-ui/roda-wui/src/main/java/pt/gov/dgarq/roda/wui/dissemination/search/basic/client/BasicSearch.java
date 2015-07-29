@@ -33,9 +33,8 @@ import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
-import pt.gov.dgarq.roda.wui.common.client.widgets.CollectionsTable;
+import pt.gov.dgarq.roda.wui.common.client.widgets.AIPList;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.Browse;
-import pt.gov.dgarq.roda.wui.dissemination.search.client.Search;
 
 /**
  * @author Luis Faria
@@ -57,12 +56,12 @@ public class BasicSearch extends Composite {
 
 		@Override
 		public String getHistoryPath() {
-			return Search.RESOLVER.getHistoryPath() + "." + getHistoryToken();
+			return getHistoryToken();
 		}
 
 		@Override
 		public String getHistoryToken() {
-			return "basic";
+			return "search";
 		}
 	};
 
@@ -92,7 +91,7 @@ public class BasicSearch extends Composite {
 	FocusPanel searchInputButton;
 
 	@UiField(provided = true)
-	CollectionsTable searchResultPanel;
+	AIPList searchResultPanel;
 
 	// ADVANCED SEARCH
 	@UiField
@@ -107,7 +106,7 @@ public class BasicSearch extends Composite {
 	DateBox advancedSearchInputDateFinal;
 
 	private BasicSearch() {
-		searchResultPanel = new CollectionsTable();
+		searchResultPanel = new AIPList();
 		initWidget(uiBinder.createAndBindUi(this));
 
 		searchInputLabel.setText(constants.basicSearchInputLabel());

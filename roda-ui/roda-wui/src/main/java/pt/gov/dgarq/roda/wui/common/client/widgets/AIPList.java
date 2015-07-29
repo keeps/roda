@@ -27,7 +27,7 @@ import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.tools.DescriptionLevelUtils;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.BrowserService;
 
-public class CollectionsTable extends AsyncTableCell<SimpleDescriptionObject> {
+public class AIPList extends AsyncTableCell<SimpleDescriptionObject> {
 
 	private static final int PAGE_SIZE = 20;
 
@@ -39,7 +39,7 @@ public class CollectionsTable extends AsyncTableCell<SimpleDescriptionObject> {
 	private final Column<SimpleDescriptionObject, Date> dateInitialColumn;
 	private final Column<SimpleDescriptionObject, Date> dateFinalColumn;
 
-	public CollectionsTable() {
+	public AIPList() {
 		super();
 
 		levelColumn = new Column<SimpleDescriptionObject, SafeHtml>(new SafeHtmlCell()) {

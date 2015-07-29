@@ -16,13 +16,11 @@ import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.MainConstants;
 import config.i18n.client.MainMessages;
-import pt.gov.dgarq.roda.wui.about.client.About;
 import pt.gov.dgarq.roda.wui.common.client.BadHistoryTokenException;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
 import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.Browse;
-import pt.gov.dgarq.roda.wui.dissemination.client.Dissemination;
 import pt.gov.dgarq.roda.wui.dissemination.search.basic.client.BasicSearch;
 import pt.gov.dgarq.roda.wui.home.client.Home;
 import pt.gov.dgarq.roda.wui.ingest.client.Ingest;
@@ -73,12 +71,12 @@ public class ContentPanel extends SimplePanel {
 	}
 
 	public void init() {
-		// About
-		resolvers.add(About.getInstance());
-		// Dissemination
-		resolvers.add(Dissemination.RESOLVER);
 		// Home
-		resolvers.add(Home.getInstance());
+		resolvers.add(Home.RESOLVER);
+		// Browse
+		resolvers.add(Browse.RESOLVER);
+		// Search
+		resolvers.add(BasicSearch.RESOLVER);
 		// Ingest
 		resolvers.add(Ingest.RESOLVER);
 		// Management
@@ -121,7 +119,7 @@ public class ContentPanel extends SimplePanel {
 									if (caught instanceof BadHistoryTokenException) {
 										Window.alert(messages.pageNotFound(caught.getMessage()));
 										if (currWidget == null) {
-											History.newItem(Home.getInstance().getHistoryPath());
+											History.newItem(Home.RESOLVER.getHistoryPath());
 										}
 									}
 								}
@@ -147,7 +145,7 @@ public class ContentPanel extends SimplePanel {
 		if (!foundit) {
 			Window.alert(messages.pageNotFound(historyTokens[0]));
 			if (currWidget == null) {
-				History.newItem(Home.getInstance().getHistoryPath());
+				History.newItem(Home.RESOLVER.getHistoryPath());
 			} else {
 				History.newItem(currHistoryPath);
 			}

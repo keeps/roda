@@ -48,9 +48,8 @@ import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
 import pt.gov.dgarq.roda.wui.common.client.tools.DescriptionLevelUtils;
-import pt.gov.dgarq.roda.wui.common.client.widgets.CollectionsTable;
+import pt.gov.dgarq.roda.wui.common.client.widgets.AIPList;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.ViewPanel.ViewListener;
-import pt.gov.dgarq.roda.wui.dissemination.client.Dissemination;
 import pt.gov.dgarq.roda.wui.main.client.BreadcrumbItem;
 import pt.gov.dgarq.roda.wui.main.client.BreadcrumbPanel;
 
@@ -79,7 +78,7 @@ public class Browse extends Composite {
 
 		@Override
 		public String getHistoryPath() {
-			return Dissemination.RESOLVER.getHistoryPath() + "." + getHistoryToken();
+			return getHistoryToken();
 		}
 	};
 
@@ -138,7 +137,7 @@ public class Browse extends Composite {
 	Label fondsPanelTitle;
 
 	@UiField(provided = true)
-	CollectionsTable fondsPanel;
+	AIPList fondsPanel;
 
 	@UiField
 	FlowPanel sidebarGroupDownloads;
@@ -154,7 +153,7 @@ public class Browse extends Composite {
 	private Browse() {
 		viewingTop = true;
 		breadcrumb = new BreadcrumbPanel();
-		fondsPanel = new CollectionsTable();
+		fondsPanel = new AIPList();
 		initWidget(uiBinder.createAndBindUi(this));
 
 		fondsPanel.getSelectionModel().addSelectionChangeHandler(new Handler() {
@@ -410,9 +409,9 @@ public class Browse extends Composite {
 		boolean historyUpdated;
 		String token;
 		if (id == null) {
-			token = "dissemination.browse";
+			token = RESOLVER.getHistoryPath();
 		} else {
-			token = "dissemination.browse." + id;
+			token = RESOLVER.getHistoryPath() + "." + id;
 		}
 
 		if (token.equals(History.getToken())) {

@@ -64,7 +64,6 @@
 	.footer-column-right {
 		width: 30%;
 	}
-	
 	</ui:style>
 
 	<g:FlowPanel>
@@ -78,7 +77,7 @@
 		</g:FlowPanel>
 
 		<!-- Menu -->
-		<m:Menu2 ui:field="menu" addStyleNames="{style.menu}" />
+		<m:Menu ui:field="menu" addStyleNames="{style.menu}" />
 
 		<!-- Content -->
 		<m:ContentPanel ui:field="contentPanel" />

@@ -6,28 +6,24 @@ package pt.gov.dgarq.roda.wui.dissemination.client;
 import java.util.List;
 import java.util.Vector;
 
-import pt.gov.dgarq.roda.core.data.DescriptionObject;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.ChangeListener;
-import com.google.gwt.user.client.ui.DisclosurePanel;
-import com.google.gwt.user.client.ui.FlexTable;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.SourcesChangeEvents;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.DisseminationMessages;
+import pt.gov.dgarq.roda.core.data.DescriptionObject;
 
 /**
  * @author Luis Faria
  * 
  */
-public class DescriptionGroupPanel extends SimplePanel implements
-		SourcesChangeEvents {
+public class DescriptionGroupPanel extends FlowPanel implements SourcesChangeEvents {
 
-	private static DisseminationMessages messages = (DisseminationMessages) GWT
-			.create(DisseminationMessages.class);
+	private static DisseminationMessages messages = (DisseminationMessages) GWT.create(DisseminationMessages.class);
 
 	// private ClientLogger logger = new ClientLogger(getClass().getName());
 
@@ -37,11 +33,11 @@ public class DescriptionGroupPanel extends SimplePanel implements
 
 	private final List<DescriptionElement> elements;
 
-	private final DisclosurePanel disclosure;
+	private final Label header;
 
-	private final FlexTable table;
+	private final FlowPanel content;
 
-	private int rows;
+	// private int rows;
 
 	private boolean readonly;
 
@@ -53,8 +49,7 @@ public class DescriptionGroupPanel extends SimplePanel implements
 		this(name, object, true);
 	}
 
-	public DescriptionGroupPanel(String name, DescriptionObject object,
-			boolean optionalVisible) {
+	public DescriptionGroupPanel(String name, DescriptionObject object, boolean optionalVisible) {
 		this.name = name;
 		this.object = object;
 		readonly = true;
@@ -62,15 +57,15 @@ public class DescriptionGroupPanel extends SimplePanel implements
 		listeners = new Vector<ChangeListener>();
 
 		elements = new Vector<DescriptionElement>();
-		disclosure = new DisclosurePanel(name);
-		table = new FlexTable();
-		disclosure.setContent(table);
-		this.setWidget(disclosure);
-		rows = 0;
+		header = new Label(name);
+		content = new FlowPanel();
+		add(header);
+		add(content);
+		
 
 		this.addStyleName("descriptionGroup");
-		disclosure.addStyleName("descriptionGroupDisclosure");
-		table.addStyleName("descriptionGroupTable");
+		header.addStyleName("descriptionGroup-header");
+		content.addStyleName("descriptionGroup-content");
 		this.setVisible(false);
 	}
 
@@ -89,50 +84,50 @@ public class DescriptionGroupPanel extends SimplePanel implements
 
 	protected void insertElementInTable(DescriptionElement element) {
 
-		Label label = new Label(messages.descriptionLabel(element
-				.getDescription()));
+		Label label = new Label(messages.descriptionLabel(element.getDescription()));
 		SimplePanel body = element.getBody();
 
-		table.setWidget(rows, 0, label);
-		table.setWidget(rows, 1, body);
+		content.add(label);
+		content.add(body);
 
-		table.getCellFormatter().addStyleName(rows, 0, "label-container");
-		table.getCellFormatter().addStyleName(rows, 1, "value-container");
+		boolean visible = element.isSet() || (!readonly && (element.isRequired() || optionalVisible));
 
-		table.getCellFormatter().addStyleName(rows, 0, "label-container-last");
-		table.getCellFormatter().addStyleName(rows, 1, "value-container-last");
+		label.setVisible(visible);
+		body.setVisible(visible);
 
-		table.getRowFormatter().addStyleName(rows, "descriptionGroup-row");
+		// table.getCellFormatter().addStyleName(rows, 0, "label-container");
+		// table.getCellFormatter().addStyleName(rows, 1, "value-container");
+		//
+		// table.getCellFormatter().addStyleName(rows, 0,
+		// "label-container-last");
+		// table.getCellFormatter().addStyleName(rows, 1,
+		// "value-container-last");
+		//
+		// table.getRowFormatter().addStyleName(rows, "descriptionGroup-row");
 
-		table.getRowFormatter().setVisible(rows, element.isSet() || !readonly);
-		if (element.isSet()
-				|| (!readonly && (element.isRequired() || optionalVisible))) {
-			table.getRowFormatter().setVisible(rows, true);
-			this.setVisible(true);
-
-		} else {
-			table.getRowFormatter().setVisible(rows, false);
-		}
-
-		if (rows > 0) {
-			table.getCellFormatter().removeStyleName(rows - 1, 0,
-					"label-container-last");
-			table.getCellFormatter().removeStyleName(rows - 1, 1,
-					"value-container-last");
-		}
+		// table.getRowFormatter().setVisible(rows, element.isSet() ||
+		// !readonly);
+		// if (element.isSet() || (!readonly && (element.isRequired() ||
+		// optionalVisible))) {
+		// table.getRowFormatter().setVisible(rows, true);
+		// this.setVisible(true);
+		//
+		// } else {
+		// table.getRowFormatter().setVisible(rows, false);
+		// }
+		//
+		// if (rows > 0) {
+		// table.getCellFormatter().removeStyleName(rows - 1, 0,
+		// "label-container-last");
+		// table.getCellFormatter().removeStyleName(rows - 1, 1,
+		// "value-container-last");
+		// }
 
 		label.addStyleName("descriptionGroup-label");
+		label.addStyleName("descriptiveMetadata-field-key");
 		body.addStyleName("descriptionGroup-value");
 
-		rows++;
-	}
-
-	public boolean isOpen() {
-		return disclosure.isOpen();
-	}
-
-	public void setOpen(boolean open) {
-		disclosure.setOpen(open);
+		// rows++;
 	}
 
 	public boolean isReadonly() {
@@ -162,12 +157,15 @@ public class DescriptionGroupPanel extends SimplePanel implements
 		for (int i = 0; i < elements.size(); i++) {
 			DescriptionElement element = (DescriptionElement) elements.get(i);
 			element.setReadonly(readonly);
-			if (element.isSet()
-					|| (!readonly && (element.isRequired() || optionalVisible))) {
-				table.getRowFormatter().setVisible(i, true);
+			Widget labelWidget = content.getWidget(2 * i);
+			Widget bodyWidget = content.getWidget(2 * i + 1);
+			if (element.isSet() || (!readonly && (element.isRequired() || optionalVisible))) {
+				labelWidget.setVisible(true);
+				bodyWidget.setVisible(true);
 				visibleItemsCount++;
 			} else {
-				table.getRowFormatter().setVisible(i, false);
+				labelWidget.setVisible(false);
+				bodyWidget.setVisible(false);
 			}
 
 		}

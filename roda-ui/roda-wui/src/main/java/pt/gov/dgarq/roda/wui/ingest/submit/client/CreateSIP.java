@@ -6,10 +6,11 @@ package pt.gov.dgarq.roda.wui.ingest.submit.client;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.History;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.ChangeListener;
-import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.HasAlignment;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -22,14 +23,13 @@ import config.i18n.client.IngestSubmitConstants;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.OneOfManyFilterParameter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.ProducerFilterParameter;
+import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.tools.DescriptionLevelUtils;
-import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
+import pt.gov.dgarq.roda.wui.common.client.widgets.SelectableAIPList;
 import pt.gov.dgarq.roda.wui.common.fileupload.client.FileUploadPanel;
 import pt.gov.dgarq.roda.wui.dissemination.client.DescriptiveMetadataPanel;
 import pt.gov.dgarq.roda.wui.ingest.client.Ingest;
-import pt.gov.dgarq.roda.wui.ingest.list.client.IngestList;
 
 /**
  * @author Luis Faria
@@ -64,10 +64,11 @@ public class CreateSIP {
 	private Label destinationHeader;
 
 	// private CollectionsTreeVerticalScrollPanel destinationChooser;
+	private SelectableAIPList destinationChooser;
 
 	private HorizontalPanel submitLayout;
 
-	private WUIButton submitButton;
+	private Button submitButton;
 
 	private boolean submitting;
 
@@ -75,7 +76,7 @@ public class CreateSIP {
 
 	private Label submitMessage;
 
-	private WUIButton getRodaIn;
+	private Button getRodaIn;
 
 	/**
 	 * Create a new create SIP panel
@@ -124,20 +125,29 @@ public class CreateSIP {
 
 			destinationHeader = new Label(constants.createDestinationHeader());
 			Filter classPlanFilter = new Filter();
-			classPlanFilter.add(new ProducerFilterParameter());
-			int size = DescriptionLevelUtils.ALL_BUT_REPRESENTATIONS_DESCRIPTION_LEVELS.size();
-			String[] classPlanLevels = new String[size];
-			for (int i = 0; i < size; i++) {
-				classPlanLevels[i] = DescriptionLevelUtils.ALL_BUT_REPRESENTATIONS_DESCRIPTION_LEVELS.get(i).getLevel();
-			}
-			classPlanFilter.add(new OneOfManyFilterParameter(RodaConstants.SDO_LEVEL, classPlanLevels));
+			// TODO add producer filter
+			// classPlanFilter.add(new ProducerFilterParameter());
+			// int size =
+			// DescriptionLevelUtils.ALL_BUT_REPRESENTATIONS_DESCRIPTION_LEVELS.size();
+			// String[] classPlanLevels = new String[size];
+			// for (int i = 0; i < size; i++) {
+			// classPlanLevels[i] =
+			// DescriptionLevelUtils.ALL_BUT_REPRESENTATIONS_DESCRIPTION_LEVELS.get(i).getLevel();
+			// }
+			// classPlanFilter.add(new
+			// OneOfManyFilterParameter(RodaConstants.SDO_LEVEL,
+			// classPlanLevels));
 			// destinationChooser = new
 			// CollectionsTreeVerticalScrollPanel(classPlanFilter,
 			// CollectionsTreeVerticalScrollPanel.DEFAULT_SORTER, true);
+			destinationChooser = new SelectableAIPList();
+			destinationChooser.setFilter(classPlanFilter);
 
 			submitLayout = new HorizontalPanel();
-			submitButton = new WUIButton(constants.createSubmitButton(), WUIButton.Left.ROUND,
-					WUIButton.Right.ARROW_FORWARD);
+
+			submitButton = new Button(constants.createSubmitButton());
+			submitButton.addStyleName("btn");
+			submitButton.addStyleName("btn-play");
 
 			submitButton.addClickHandler(new ClickHandler() {
 				public void onClick(ClickEvent event) {
@@ -149,7 +159,9 @@ public class CreateSIP {
 			loadingImage = new Image(GWT.getModuleBaseURL() + "images/loadingSmall.gif");
 			submitMessage = new Label();
 
-			getRodaIn = new WUIButton(constants.createSipGetRodaIn(), WUIButton.Left.ROUND, WUIButton.Right.ARROW_DOWN);
+			getRodaIn = new Button(constants.createSipGetRodaIn());
+			getRodaIn.addStyleName("btn");
+			getRodaIn.addStyleName("btn-download");
 
 			getRodaIn.addClickHandler(new ClickHandler() {
 				public void onClick(ClickEvent event) {
@@ -194,18 +206,26 @@ public class CreateSIP {
 			//
 			// });
 
+			destinationChooser.addValueChangeHandler(new ValueChangeHandler<SimpleDescriptionObject>() {
+
+				@Override
+				public void onValueChange(ValueChangeEvent<SimpleDescriptionObject> event) {
+					updateVisibles();
+				}
+			});
+
 			layout.add(descriptiveMetadataHeaderLayout);
 			layout.add(descriptiveMetadata);
 			layout.add(representationHeader);
 			layout.add(representationLayout);
 			layout.add(destinationHeader);
-			// layout.add(destinationChooser);
+			layout.add(destinationChooser);
 			layout.add(submitLayout);
 
 			layout.addStyleName("wui-ingest-submit-create");
-			descriptiveMetadataHeader.addStyleName("create-title");
-			representationHeader.addStyleName("create-title");
-			destinationHeader.addStyleName("create-title");
+			descriptiveMetadataHeader.addStyleName("h3");
+			representationHeader.addStyleName("h3");
+			destinationHeader.addStyleName("h3");
 			descriptiveMetadataHeaderLayout.addStyleName("create-metadata-header");
 			descriptiveMetadataOptionalToggle.addStyleName("create-metadata-toggle");
 			descriptiveMetadata.addStyleName("create-metadata");

@@ -70,8 +70,7 @@
 				ui:field="fondsPanelTitle">
 				<ui:msg>Items</ui:msg>
 			</g:Label>
-			<common:CollectionsTable ui:field="fondsPanel"
-				addStyleNames="{style.searchlist}" />
+			<common:AIPList ui:field="fondsPanel" addStyleNames="{style.searchlist}" />
 		</g:FlowPanel>
 		<g:FlowPanel styleName="{style.sidebar}">
 			<g:FlowPanel styleName="{style.sidebar-group}" ui:field="sidebarGroupDownloads">

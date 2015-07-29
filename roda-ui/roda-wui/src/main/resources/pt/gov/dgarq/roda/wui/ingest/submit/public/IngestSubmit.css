@@ -68,9 +68,7 @@
 
 .wui-ingest-submit-create .create-metadata-toggle {
 	float: right;
-	margin: 5px;
-	color: #58595b;
-	font-size: 9pt;
+	margin-top: 10px;
 	white-space: nowrap;
 	text-decoration: underline;
 	cursor: pointer;

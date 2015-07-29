@@ -3,13 +3,6 @@
  */
 package pt.gov.dgarq.roda.wui.ingest.submit.client;
 
-import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
-import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
-import pt.gov.dgarq.roda.wui.common.fileupload.client.FileNameConstraints;
-import pt.gov.dgarq.roda.wui.common.fileupload.client.FileUploadPanel;
-import pt.gov.dgarq.roda.wui.ingest.client.Ingest;
-import pt.gov.dgarq.roda.wui.ingest.list.client.IngestList;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
@@ -25,6 +18,12 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.IngestSubmitConstants;
+import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
+import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
+import pt.gov.dgarq.roda.wui.common.fileupload.client.FileNameConstraints;
+import pt.gov.dgarq.roda.wui.common.fileupload.client.FileUploadPanel;
+import pt.gov.dgarq.roda.wui.ingest.client.Ingest;
+import pt.gov.dgarq.roda.wui.ingest.list.client.IngestList;
 
 /**
  * @author Luis Faria
@@ -61,6 +60,7 @@ public class UploadSIP {
 	 */
 	public UploadSIP() {
 		layout = new VerticalPanel();
+		layout.addStyleName("wui-ingest-submit-upload");
 		initialized = false;
 	}
 
@@ -127,7 +127,6 @@ public class UploadSIP {
 			layout.add(fileUpload.getWidget());
 			layout.add(actionLayout);
 
-			layout.addStyleName("wui-ingest-submit-upload");
 			title.addStyleName("upload-title");
 			fileUpload.getWidget().addStyleName("upload-file");
 			actionLayout.addStyleName("upload-action");

@@ -223,13 +223,13 @@ public class DescriptiveMetadataPanel extends Composite implements SourcesChange
 		layout.add(notes);
 		layout.add(processInfo);
 
-		identification.setOpen(true);
-		context.setOpen(true);
-		content.setOpen(true);
-		access.setOpen(true);
-		relatedMaterials.setOpen(true);
-		notes.setOpen(true);
-		processInfo.setOpen(true);
+		// identification.setOpen(true);
+		// context.setOpen(true);
+		// content.setOpen(true);
+		// access.setOpen(true);
+		// relatedMaterials.setOpen(true);
+		// notes.setOpen(true);
+		// processInfo.setOpen(true);
 
 		ChangeListener listener = new ChangeListener() {
 

@@ -39,7 +39,7 @@ import pt.gov.dgarq.roda.wui.management.user.client.WUIUserManagement;
  * @author Luis Faria
  * 
  */
-public class Menu2 extends Composite {
+public class Menu extends Composite {
 
 	private ClientLogger logger = new ClientLogger(getClass().getName());
 
@@ -47,7 +47,7 @@ public class Menu2 extends Composite {
 
 	private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-	interface MyUiBinder extends UiBinder<Widget, Menu2> {
+	interface MyUiBinder extends UiBinder<Widget, Menu> {
 	}
 
 	@UiField
@@ -57,7 +57,7 @@ public class Menu2 extends Composite {
 	MenuBar rightMenu;
 
 	// private final MenuBar aboutMenu;
-	private final MenuItem welcome;
+	private final MenuItem home;
 
 	// private final MenuBar disseminationMenu;
 	private MenuItem dissemination_browse;
@@ -81,37 +81,15 @@ public class Menu2 extends Composite {
 	 * Main menu constructor
 	 * 
 	 */
-	public Menu2() {
+	public Menu() {
 		initWidget(uiBinder.createAndBindUi(this));
 
-		// TODO externalize string
-		welcome = new MenuItem("Home", createCommand(Home.getInstance().getHistoryPath()));
-		// aboutMenu = new MenuBar(true);
-		// aboutMenu.addItem(constants.title_about_services(),
-		// createCommand(About.getInstance().getHistoryPath() + ".services"));
-		// aboutMenu.addItem(constants.title_about_policies(),
-		// createCommand(About.getInstance().getHistoryPath() + ".policies"));
-		// aboutMenu.addItem(constants.title_about_researchDevelopment(),
-		// createCommand(About.getInstance().getHistoryPath() +
-		// ".research_development"));
-		// aboutMenu.addItem(constants.title_about_contacts(),
-		// createCommand(About.getInstance().getHistoryPath() + ".contacts"));
-		// aboutMenu.addItem(constants.title_about_register(),
-		// createCommand(About.getInstance().getHistoryPath() + ".register"));
-		// aboutMenu.addItem(constants.title_about_help(),
-		// createCommand(About.getInstance().getHistoryPath() + ".help"));
+		home = new MenuItem(constants.title_home(), createCommand(Home.RESOLVER.getHistoryPath()));
 
-		// disseminationMenu = new MenuBar(true);
 		dissemination_browse = new MenuItem(constants.title_dissemination_browse(),
 				createCommand(Browse.RESOLVER.getHistoryPath()));
 		dissemination_searchBasic = new MenuItem(constants.title_dissemination_search_basic(),
 				createCommand(BasicSearch.RESOLVER.getHistoryPath()));
-		// dissemination_searchAdvanced =
-		// disseminationMenu.addItem(constants.title_dissemination_search_advanced(),
-		// createCommand(AdvancedSearch.getInstance().getHistoryPath()));
-		// disseminationMenu.addItem(constants.title_dissemination_help(),
-		// createCommand(Dissemination.getInstance().getHistoryPath() +
-		// ".help"));
 
 		ingestMenu = new MenuBar(true);
 		ingest_pre = ingestMenu.addItem(constants.title_ingest_pre(),
@@ -216,7 +194,7 @@ public class Menu2 extends Composite {
 
 			public void onSuccess(Boolean permitted) {
 				if (permitted) {
-					insertIntoLeftMenu(welcome, 0);
+					insertIntoLeftMenu(home, 0);
 				}
 			}
 
@@ -251,7 +229,6 @@ public class Menu2 extends Composite {
 			}
 
 		});
-
 
 		// Ingest
 		PreIngest.RESOLVER.isCurrentUserPermitted(new AsyncCallback<Boolean>() {

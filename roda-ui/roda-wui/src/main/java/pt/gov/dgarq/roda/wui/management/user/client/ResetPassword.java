@@ -89,12 +89,9 @@ public class ResetPassword implements HistoryResolver {
 			tokenBox = new TextBox();
 			newPasswordLabel = new Label(constants.resetPasswordNewPassword());
 			newPasswordBox = new PasswordTextBox();
-			newPasswordRepeatLabel = new Label(constants
-					.resetPasswordRepeatPassword());
+			newPasswordRepeatLabel = new Label(constants.resetPasswordRepeatPassword());
 			newPasswordRepeatBox = new PasswordTextBox();
-			resetPasswordButton = new WUIButton(
-					constants.resetPasswordSubmit(),
-					WUIButton.Left.ROUND,
+			resetPasswordButton = new WUIButton(constants.resetPasswordSubmit(), WUIButton.Left.ROUND,
 					WUIButton.Right.ARROW_FORWARD);
 
 			resetPasswordButton.addClickListener(new ClickListener() {
@@ -103,32 +100,26 @@ public class ResetPassword implements HistoryResolver {
 					String username = usernameBox.getText();
 					String resetPasswordToken = tokenBox.getText();
 					String newPassword = newPasswordBox.getText();
-					UserManagementService.Util.getInstance().resetPassword(
-							username, resetPasswordToken, newPassword,
+					UserManagementService.Util.getInstance().resetPassword(username, resetPasswordToken, newPassword,
 							new AsyncCallback<Void>() {
 
-								public void onFailure(Throwable caught) {
-									if (caught instanceof InvalidTokenException) {
-										Window.alert(constants
-												.resetPasswordInvalidToken());
-									} else if (caught instanceof NoSuchUserException) {
-										Window.alert(constants
-												.resetPasswordNoSuchUser());
-									} else {
-										logger.error("Error reseting password",
-												caught);
-									}
+						public void onFailure(Throwable caught) {
+							if (caught instanceof InvalidTokenException) {
+								Window.alert(constants.resetPasswordInvalidToken());
+							} else if (caught instanceof NoSuchUserException) {
+								Window.alert(constants.resetPasswordNoSuchUser());
+							} else {
+								logger.error("Error reseting password", caught);
+							}
 
-								}
+						}
 
-								public void onSuccess(Void result) {
-									Window.alert(constants
-											.resetPasswordSuccess());
-									History.newItem(Home.getInstance()
-											.getHistoryPath());
-								}
+						public void onSuccess(Void result) {
+							Window.alert(constants.resetPasswordSuccess());
+							History.newItem(Home.RESOLVER.getHistoryPath());
+						}
 
-							});
+					});
 
 				}
 
@@ -141,8 +132,7 @@ public class ResetPassword implements HistoryResolver {
 				public void onKeyDown(Widget sender, char keyCode, int modifiers) {
 				}
 
-				public void onKeyPress(Widget sender, char keyCode,
-						int modifiers) {
+				public void onKeyPress(Widget sender, char keyCode, int modifiers) {
 				}
 
 				public void onKeyUp(Widget sender, char keyCode, int modifiers) {
@@ -258,8 +248,7 @@ public class ResetPassword implements HistoryResolver {
 			tokenBox.setReadOnly(true);
 			callback.onSuccess(layout);
 		} else {
-			callback.onFailure(new BadHistoryTokenException(
-					"Wrong reset password history"));
+			callback.onFailure(new BadHistoryTokenException("Wrong reset password history"));
 		}
 
 	}

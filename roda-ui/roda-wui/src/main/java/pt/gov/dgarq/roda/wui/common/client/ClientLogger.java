@@ -1,14 +1,18 @@
 package pt.gov.dgarq.roda.wui.common.client;
 
-import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
-import pt.gov.dgarq.roda.wui.common.client.widgets.MessagePopup;
-import pt.gov.dgarq.roda.wui.main.client.CasForwardDialog;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.GWT.UncaughtExceptionHandler;
+import com.google.gwt.logging.client.DevelopmentModeLogHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.IsSerializable;
+
+import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
+import pt.gov.dgarq.roda.wui.common.client.widgets.MessagePopup;
+import pt.gov.dgarq.roda.wui.main.client.CasForwardDialog;
 
 /**
  * @author Luis Faria
@@ -51,11 +55,14 @@ public class ClientLogger implements IsSerializable {
 	private static boolean SHOW_ERROR_MESSAGES = false;
 
 	private String classname;
+	private Logger logger;
 
 	/**
 	 * Create a new client logger
 	 */
 	public ClientLogger() {
+		logger = Logger.getLogger("");
+		logger.addHandler(new DevelopmentModeLogHandler());
 	}
 
 	/**
@@ -65,6 +72,8 @@ public class ClientLogger implements IsSerializable {
 	 */
 	public ClientLogger(String classname) {
 		this.classname = classname;
+		logger = Logger.getLogger(classname);
+		logger.addHandler(new DevelopmentModeLogHandler());
 	}
 
 	/**
@@ -72,10 +81,10 @@ public class ClientLogger implements IsSerializable {
 	 */
 	public static void setUncaughtExceptionHandler() {
 		GWT.setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
-			ClientLogger logger = new ClientLogger("Uncaught");
+			ClientLogger clientlogger = new ClientLogger("Uncaught");
 
 			public void onUncaughtException(Throwable e) {
-				logger.fatal("Uncaught Exception", e);
+				clientlogger.fatal("Uncaught Exception", e);
 			}
 
 		});
@@ -299,10 +308,12 @@ public class ClientLogger implements IsSerializable {
 				public void onFailure(Throwable caught) {
 					GWT.log(message, error);
 					GWT.log("Error while logging another error", caught);
+					logger.log(Level.SEVERE, message, error);
 				}
 
 				public void onSuccess(Void result) {
 					GWT.log(message, error);
+					logger.log(Level.SEVERE, message, error);
 				}
 			};
 
@@ -331,7 +342,8 @@ public class ClientLogger implements IsSerializable {
 					// do nothing
 				}
 			};
-			GWT.log(message, null);
+			GWT.log(message);
+			logger.log(Level.SEVERE, message);
 			ClientLoggerService.Util.getInstance().fatal(classname, message, errorcallback);
 			if (SHOW_ERROR_MESSAGES) {
 				MessagePopup.showError(message);
@@ -351,13 +363,15 @@ public class ClientLogger implements IsSerializable {
 				public void onFailure(Throwable caught) {
 					GWT.log(message, error);
 					GWT.log("Error while logging another error", caught);
+					logger.log(Level.SEVERE, message, error);
 				}
 
 				public void onSuccess(Void result) {
 					GWT.log(message, error);
+					logger.log(Level.SEVERE, message, error);
 				}
 			};
-			
+
 			ClientLoggerService.Util.getInstance().fatal(classname, message, errorcallback);
 
 			if (SHOW_ERROR_MESSAGES) {

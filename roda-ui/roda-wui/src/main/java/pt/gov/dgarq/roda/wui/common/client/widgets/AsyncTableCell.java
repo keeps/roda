@@ -42,7 +42,7 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
 	public AsyncTableCell() {
 		super();
 
-		// initializing as unready
+		// initializing as not ready
 		this.filter = null;
 
 		this.dataProvider = new AsyncDataProvider<T>() {
@@ -120,7 +120,7 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
 		return selectionModel;
 	}
 
-	private void refresh() {
+	protected void refresh() {
 		getSelectionModel().clear();
 		getDisplay().setVisibleRangeAndClearData(new Range(0, getInitialPageSize()), true);
 	}

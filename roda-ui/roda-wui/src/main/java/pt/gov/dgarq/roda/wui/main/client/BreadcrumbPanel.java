@@ -6,16 +6,15 @@ package pt.gov.dgarq.roda.wui.main.client;
 import java.util.List;
 import java.util.Stack;
 
-import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Hyperlink;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.MainConstants;
 import pt.gov.dgarq.roda.wui.common.client.AuthenticatedUser;
-import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.LoginStatusListener;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
 import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
@@ -25,12 +24,6 @@ import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
  * 
  */
 public class BreadcrumbPanel extends HorizontalPanel {
-
-	// private GWTLogger logger = new GWTLogger(GWT.getTypeName(this));
-
-	private static MainConstants mainConstants = (MainConstants) GWT.create(MainConstants.class);
-
-	private ClientLogger logger = new ClientLogger(getClass().getName());
 
 	private List<BreadcrumbItem> currentpath;
 
@@ -76,15 +69,23 @@ public class BreadcrumbPanel extends HorizontalPanel {
 	public void updatePath(List<BreadcrumbItem> path) {
 
 		breadcrumbs.clear();
-		for (BreadcrumbItem item : path) {
+		for (final BreadcrumbItem item : path) {
 			Breadcrumb breadcrumb = new Breadcrumb(item);
+			breadcrumb.addClickHandler(new ClickHandler() {
+
+				@Override
+				public void onClick(ClickEvent event) {
+					item.getCommand().execute();
+				}
+			});
 			breadcrumbs.add(breadcrumb);
 		}
 		updateLayout();
 
 		currentpath = path;
-
 	}
+
+
 
 	public void clear() {
 		breadcrumbs.clear();
@@ -104,7 +105,7 @@ public class BreadcrumbPanel extends HorizontalPanel {
 
 	}
 
-	protected class Breadcrumb extends Hyperlink {
+	protected class Breadcrumb extends HTML {
 
 		private BreadcrumbItem item;
 
@@ -118,10 +119,10 @@ public class BreadcrumbPanel extends HorizontalPanel {
 		 * @param path
 		 *            the history path that this breadcrumb points to
 		 */
-		public Breadcrumb(BreadcrumbItem item) {
+		public Breadcrumb(final BreadcrumbItem item) {
 			super();
-			super.setText(item.getLabel());
-			super.setTargetHistoryToken(item.getPath());
+			setHTML(item.getLabel());
+
 			this.item = item;
 			enabled = true;
 			last = true;
