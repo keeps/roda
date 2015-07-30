@@ -5,15 +5,17 @@ package pt.gov.dgarq.roda.wui.ingest.list.client;
 
 import java.util.Map;
 
-import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 
 import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.data.SIPState;
+import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
+import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
+import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
+import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.wui.common.client.PrintReportException;
 
 /**
@@ -39,8 +41,7 @@ public interface IngestListService extends RemoteService {
 		 */
 		public static IngestListServiceAsync getInstance() {
 
-			IngestListServiceAsync instance = (IngestListServiceAsync) GWT
-					.create(IngestListService.class);
+			IngestListServiceAsync instance = (IngestListServiceAsync) GWT.create(IngestListService.class);
 			ServiceDefTarget target = (ServiceDefTarget) instance;
 			target.setServiceEntryPoint(GWT.getModuleBaseURL() + SERVICE_URI);
 			return instance;
@@ -72,13 +73,13 @@ public interface IngestListService extends RemoteService {
 	 * @return
 	 * @throws RODAException
 	 */
-	public SIPState[] getSIPs(ContentAdapter adapter) throws RODAException;
+	public IndexResult<SIPState> getSIPs(Filter filter, Sorter sorter, Sublist sublist) throws RODAException;
 
 	/**
 	 * Accept a SIP
 	 * 
 	 * @param sipId
-	 * @param message 
+	 * @param message
 	 * @throws RODAException
 	 */
 	public void acceptSIP(String sipId, String message) throws RODAException;
@@ -94,8 +95,7 @@ public interface IngestListService extends RemoteService {
 	 *            rejection
 	 * @throws RODAException
 	 */
-	public void rejectSIP(String sipId, String message, boolean notifyProducer)
-			throws RODAException;
+	public void rejectSIP(String sipId, String message, boolean notifyProducer) throws RODAException;
 
 	/**
 	 * Set SIP list report info parameters
@@ -105,10 +105,8 @@ public interface IngestListService extends RemoteService {
 	 * @throws RODAException
 	 * @throws PrintReportException
 	 */
-	public void setSIPListReportInfo(ContentAdapter adapter, String locale)
-			throws PrintReportException;
+	public void setSIPListReportInfo(ContentAdapter adapter, String locale) throws PrintReportException;
 
-	
 	/**
 	 * Get accept message templates
 	 * 
@@ -116,7 +114,7 @@ public interface IngestListService extends RemoteService {
 	 * @return
 	 */
 	public Map<String, String> getAcceptMessageTemplates(String localeString);
-	
+
 	/**
 	 * Get reject message templates
 	 * 

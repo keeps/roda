@@ -6,14 +6,6 @@ package pt.gov.dgarq.roda.wui.ingest.list.client;
 import java.util.List;
 import java.util.Vector;
 
-import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.LikeFilterParameter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.OneOfManyFilterParameter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
-import pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter;
-import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -24,6 +16,11 @@ import com.google.gwt.user.client.ui.Widget;
 import config.i18n.client.IngestListConstants;
 import config.i18n.client.IngestListMessages;
 import pt.gov.dgarq.roda.core.data.SIPState;
+import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.LikeFilterParameter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.OneOfManyFilterParameter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
 import pt.gov.dgarq.roda.wui.common.client.AuthenticatedUser;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
@@ -31,11 +28,7 @@ import pt.gov.dgarq.roda.wui.common.client.LoginStatusListener;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
 import pt.gov.dgarq.roda.wui.common.client.widgets.ControlPanel;
 import pt.gov.dgarq.roda.wui.common.client.widgets.ControlPanel.ControlPanelListener;
-import pt.gov.dgarq.roda.wui.common.client.widgets.ElementPanel;
-import pt.gov.dgarq.roda.wui.common.client.widgets.LazyVerticalList;
-import pt.gov.dgarq.roda.wui.common.client.widgets.LazyVerticalList.ContentSource;
-import pt.gov.dgarq.roda.wui.common.client.widgets.LazyVerticalList.LazyVerticalListListener;
-import pt.gov.dgarq.roda.wui.common.client.widgets.ListHeaderPanel;
+import pt.gov.dgarq.roda.wui.common.client.widgets.SIPStateList;
 import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
 import pt.gov.dgarq.roda.wui.ingest.client.Ingest;
 
@@ -117,7 +110,8 @@ public class IngestList {
 
 	private final DockPanel layout;
 
-	private LazyVerticalList<SIPState> lazySIPList;
+	// private LazyVerticalList<SIPState> lazySIPList;
+	private SIPStateList sipList;
 
 	private final ControlPanel controlPanel;
 
@@ -149,32 +143,6 @@ public class IngestList {
 
 	}
 
-	private void addSIPListHeader() {
-		ListHeaderPanel lazySIPListHeader = lazySIPList.getHeader();
-		lazySIPListHeader.addHeader(constants.headerFilename(), "ingest-list-header-filename",
-				new SortParameter[] { new SortParameter("originalFilename", false), new SortParameter("id", false) },
-				true);
-
-		lazySIPListHeader.addHeader(constants.headerStartDate(), "ingest-list-header-date",
-				new SortParameter[] { new SortParameter("datetime", false), new SortParameter("id", false) }, false);
-
-		lazySIPListHeader.addHeader(constants.headerState(), "ingest-list-header-state",
-				new SortParameter[] { new SortParameter("state", false), new SortParameter("id", false) }, true);
-
-		lazySIPListHeader.addHeader(constants.headerPercentage(), "ingest-list-header-percentage",
-				new SortParameter[] { new SortParameter("completePercentage", false), new SortParameter("id", false) },
-				true);
-
-		lazySIPListHeader.addHeader(constants.headerProducer(), "ingest-list-header-producer",
-				new SortParameter[] { new SortParameter("username", false), new SortParameter("id", false) }, true);
-
-		lazySIPListHeader.addHeader("", "ingest-list-header-toolbar", new SortParameter[] {}, true);
-
-		lazySIPListHeader.setFillerHeader(5);
-		lazySIPListHeader.setSelectedHeader(1);
-
-	}
-
 	/**
 	 * Initialize
 	 */
@@ -187,49 +155,56 @@ public class IngestList {
 			filter_states = new String[] { READY_STATE };
 			filter_complete = Boolean.FALSE;
 
-			lazySIPList = new LazyVerticalList<SIPState>(new ContentSource<SIPState>() {
+			sipList = new SIPStateList();
 
-				public void getCount(Filter filter, AsyncCallback<Integer> callback) {
-					IngestListService.Util.getInstance().getSIPCount(filter, callback);
-
-				}
-
-				public ElementPanel<SIPState> getElementPanel(SIPState element) {
-					return new SIPPanel(element);
-				}
-
-				public void getElements(ContentAdapter adapter, AsyncCallback<SIPState[]> callback) {
-					IngestListService.Util.getInstance().getSIPs(adapter, callback);
-				}
-
-				public String getTotalMessage(int total) {
-					return messages.total(total);
-				}
-
-				public void setReportInfo(ContentAdapter adapter, String locale, AsyncCallback<Void> callback) {
-
-					IngestListService.Util.getInstance().setSIPListReportInfo(adapter, locale, callback);
-				}
-
-			}, 15000, getFilter());
-
-			lazySIPList.addLazyVerticalListListener(new LazyVerticalListListener<SIPState>() {
-
-				public void onElementSelected(ElementPanel<SIPState> element) {
-					updateVisibles();
-				}
-
-				public void onUpdateBegin() {
-					controlPanel.setOptionsEnabled(false);
-				}
-
-				public void onUpdateFinish() {
-					controlPanel.setOptionsEnabled(true);
-				}
-
-			});
-
-			addSIPListHeader();
+			// lazySIPList = new LazyVerticalList<SIPState>(new
+			// ContentSource<SIPState>() {
+			//
+			// public void getCount(Filter filter, AsyncCallback<Integer>
+			// callback) {
+			// IngestListService.Util.getInstance().getSIPCount(filter,
+			// callback);
+			//
+			// }
+			//
+			// public ElementPanel<SIPState> getElementPanel(SIPState element) {
+			// return new SIPPanel(element);
+			// }
+			//
+			// public void getElements(ContentAdapter adapter,
+			// AsyncCallback<SIPState[]> callback) {
+			// IngestListService.Util.getInstance().getSIPs(adapter, callback);
+			// }
+			//
+			// public String getTotalMessage(int total) {
+			// return messages.total(total);
+			// }
+			//
+			// public void setReportInfo(ContentAdapter adapter, String locale,
+			// AsyncCallback<Void> callback) {
+			//
+			// IngestListService.Util.getInstance().setSIPListReportInfo(adapter,
+			// locale, callback);
+			// }
+			//
+			// }, 15000, getFilter());
+			//
+			// lazySIPList.addLazyVerticalListListener(new
+			// LazyVerticalListListener<SIPState>() {
+			//
+			// public void onElementSelected(ElementPanel<SIPState> element) {
+			// updateVisibles();
+			// }
+			//
+			// public void onUpdateBegin() {
+			// controlPanel.setOptionsEnabled(false);
+			// }
+			//
+			// public void onUpdateFinish() {
+			// controlPanel.setOptionsEnabled(true);
+			// }
+			//
+			// });
 
 			controlPanel.clear();
 
@@ -271,8 +246,7 @@ public class IngestList {
 					} else {
 						filter_username = null;
 					}
-					lazySIPList.setFilter(getFilter());
-					lazySIPList.reset();
+					sipList.setFilter(getFilter());
 
 				}
 
@@ -281,10 +255,12 @@ public class IngestList {
 			report.addClickListener(new ClickListener() {
 
 				public void onClick(Widget sender) {
-					ElementPanel<SIPState> elementPanel = lazySIPList.getSelected();
-					if (elementPanel != null && elementPanel instanceof SIPPanel) {
-						((SIPPanel) elementPanel).setReportVisible(true);
-					}
+					// ElementPanel<SIPState> elementPanel =
+					// lazySIPList.getSelected();
+					// if (elementPanel != null && elementPanel instanceof
+					// SIPPanel) {
+					// ((SIPPanel) elementPanel).setReportVisible(true);
+					// }
 
 				}
 
@@ -293,10 +269,12 @@ public class IngestList {
 			view.addClickListener(new ClickListener() {
 
 				public void onClick(Widget sender) {
-					ElementPanel<SIPState> elementPanel = lazySIPList.getSelected();
-					if (elementPanel != null && elementPanel instanceof SIPPanel) {
-						((SIPPanel) elementPanel).view();
-					}
+					// ElementPanel<SIPState> elementPanel =
+					// lazySIPList.getSelected();
+					// if (elementPanel != null && elementPanel instanceof
+					// SIPPanel) {
+					// ((SIPPanel) elementPanel).view();
+					// }
 				}
 
 			});
@@ -304,26 +282,28 @@ public class IngestList {
 			accept.addClickListener(new ClickListener() {
 
 				public void onClick(Widget sender) {
-					ElementPanel<SIPState> elementPanel = lazySIPList.getSelected();
-					if (elementPanel != null && elementPanel instanceof SIPPanel) {
-						lazySIPList.setUserMessage(constants.acceptingSIP());
-						SIPPanel selected = (SIPPanel) elementPanel;
-						accept.setEnabled(false);
-						reject.setEnabled(false);
-						selected.accept(new AsyncCallback<Object>() {
-
-							public void onFailure(Throwable caught) {
-								lazySIPList.removeUserMessage();
-								logger.error("Error publishing sip", caught);
-							}
-
-							public void onSuccess(Object result) {
-								lazySIPList.removeUserMessage();
-								lazySIPList.update();
-							}
-
-						});
-					}
+					// ElementPanel<SIPState> elementPanel =
+					// lazySIPList.getSelected();
+					// if (elementPanel != null && elementPanel instanceof
+					// SIPPanel) {
+					// lazySIPList.setUserMessage(constants.acceptingSIP());
+					// SIPPanel selected = (SIPPanel) elementPanel;
+					// accept.setEnabled(false);
+					// reject.setEnabled(false);
+					// selected.accept(new AsyncCallback<Object>() {
+					//
+					// public void onFailure(Throwable caught) {
+					// lazySIPList.removeUserMessage();
+					// logger.error("Error publishing sip", caught);
+					// }
+					//
+					// public void onSuccess(Object result) {
+					// lazySIPList.removeUserMessage();
+					// lazySIPList.update();
+					// }
+					//
+					// });
+					// }
 				}
 
 			});
@@ -331,26 +311,28 @@ public class IngestList {
 			reject.addClickListener(new ClickListener() {
 
 				public void onClick(Widget sender) {
-					ElementPanel<SIPState> elementPanel = lazySIPList.getSelected();
-					if (elementPanel != null && elementPanel instanceof SIPPanel) {
-						lazySIPList.setUserMessage(constants.rejectingSIP());
-						SIPPanel selected = (SIPPanel) elementPanel;
-						accept.setEnabled(false);
-						reject.setEnabled(false);
-						selected.reject(new AsyncCallback<Object>() {
-
-							public void onFailure(Throwable caught) {
-								lazySIPList.removeUserMessage();
-								logger.error("Error rejecting sip", caught);
-							}
-
-							public void onSuccess(Object result) {
-								lazySIPList.removeUserMessage();
-								lazySIPList.update();
-							}
-
-						});
-					}
+					// ElementPanel<SIPState> elementPanel =
+					// lazySIPList.getSelected();
+					// if (elementPanel != null && elementPanel instanceof
+					// SIPPanel) {
+					// lazySIPList.setUserMessage(constants.rejectingSIP());
+					// SIPPanel selected = (SIPPanel) elementPanel;
+					// accept.setEnabled(false);
+					// reject.setEnabled(false);
+					// selected.reject(new AsyncCallback<Object>() {
+					//
+					// public void onFailure(Throwable caught) {
+					// lazySIPList.removeUserMessage();
+					// logger.error("Error rejecting sip", caught);
+					// }
+					//
+					// public void onSuccess(Object result) {
+					// lazySIPList.removeUserMessage();
+					// lazySIPList.update();
+					// }
+					//
+					// });
+					// }
 				}
 
 			});
@@ -364,13 +346,13 @@ public class IngestList {
 			reject.setVisible(false);
 			updateVisibles();
 
-			layout.add(lazySIPList.getWidget(), DockPanel.CENTER);
+			layout.add(sipList, DockPanel.CENTER);
 			layout.add(controlPanel.getWidget(), DockPanel.EAST);
 
-			layout.setCellWidth(lazySIPList.getWidget(), "100%");
+			layout.setCellWidth(sipList, "100%");
 
 			layout.addStyleName("wui-ingest-list");
-			lazySIPList.getWidget().addStyleName("ingest-lazy-list");
+			sipList.addStyleName("ingest-lazy-list");
 
 			UserLogin.getInstance().addLoginStatusListener(new LoginStatusListener() {
 
@@ -379,11 +361,11 @@ public class IngestList {
 
 						public void onFailure(Throwable caught) {
 							logger.error("Error getting permissions", caught);
-							lazySIPList.setAutoUpdate(false);
+							// lazySIPList.setAutoUpdate(false);
 						}
 
 						public void onSuccess(Boolean permitted) {
-							lazySIPList.setAutoUpdate(permitted);
+							// lazySIPList.setAutoUpdate(permitted);
 						}
 
 					});
@@ -405,9 +387,10 @@ public class IngestList {
 	}
 
 	protected void updateVisibles() {
-		ElementPanel<SIPState> selected = lazySIPList.getSelected();
+		// ElementPanel<SIPState> selected = lazySIPList.getSelected();
+		SIPState selected = sipList.getSelectionModel().getSelectedObject();
 		report.setEnabled(selected != null);
-		view.setEnabled(selected != null && selected.get().getIngestedPID() != null);
+		view.setEnabled(selected != null && selected.getIngestedPID() != null);
 
 		UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<AuthenticatedUser>() {
 
@@ -422,8 +405,8 @@ public class IngestList {
 			}
 
 		});
-		accept.setEnabled(selected != null && selected.get().getState().equals(READY_STATE));
-		reject.setEnabled(selected != null && selected.get().getState().equals(READY_STATE));
+		accept.setEnabled(selected != null && selected.getState().equals(READY_STATE));
+		reject.setEnabled(selected != null && selected.getState().equals(READY_STATE));
 	}
 
 	/**
@@ -467,8 +450,7 @@ public class IngestList {
 			} else {
 				logger.error("State filter not recognized: " + filter);
 			}
-			lazySIPList.setFilter(getFilter());
-			lazySIPList.reset();
+			sipList.setFilter(getFilter());
 		}
 
 	}
@@ -499,6 +481,6 @@ public class IngestList {
 	 * Update ingest list
 	 */
 	public void update() {
-		lazySIPList.update();
+		// lazySIPList.update();
 	}
 }

@@ -1,6 +1,7 @@
 package pt.gov.dgarq.roda.wui.ingest.list.server;
 
 import java.rmi.RemoteException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -16,10 +17,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.apache.velocity.VelocityContext;
-import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
-import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
-import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
 import org.w3c.util.DateParser;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -30,11 +27,20 @@ import config.i18n.server.IngestListReportMessages;
 import pt.gov.dgarq.roda.common.RodaClientFactory;
 import pt.gov.dgarq.roda.core.RODAClient;
 import pt.gov.dgarq.roda.core.common.RODAException;
+import pt.gov.dgarq.roda.core.common.RODAServiceException;
 import pt.gov.dgarq.roda.core.common.UserManagementException;
 import pt.gov.dgarq.roda.core.data.SIPState;
 import pt.gov.dgarq.roda.core.data.SIPStateTransition;
 import pt.gov.dgarq.roda.core.data.User;
-import pt.gov.dgarq.roda.core.stubs.IngestMonitor;
+import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
+import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
+import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
+import pt.gov.dgarq.roda.core.data.v2.IndexResult;
+import pt.gov.dgarq.roda.core.ingest.IngestRegistryException;
+import pt.gov.dgarq.roda.core.services.AcceptSIP;
+import pt.gov.dgarq.roda.core.services.IngestMonitor;
 import pt.gov.dgarq.roda.wui.common.client.GenericException;
 import pt.gov.dgarq.roda.wui.common.client.PrintReportException;
 import pt.gov.dgarq.roda.wui.common.client.tools.PIDTranslator;
@@ -59,25 +65,32 @@ public class IngestListServiceImpl extends RemoteServiceServlet implements Inges
 
 	private static final Logger logger = Logger.getLogger(IngestListServiceImpl.class);
 
+	private IngestMonitor ingestMonitor;
+	private AcceptSIP acceptSIP;
+
+	public IngestListServiceImpl() {
+		super();
+
+		try {
+			this.ingestMonitor = new IngestMonitor();
+			this.acceptSIP = new AcceptSIP();
+		} catch (IngestRegistryException e) {
+			logger.error("Error initializing ingest manager", e);
+		} catch (RODAServiceException e) {
+			logger.error("Error initializing ingest manager", e);
+		}
+	}
+
 	public SIPState getSipState(String sipId) throws RODAException {
 		SIPState ret = null;
-		IngestMonitor ingestMonitor = RodaClientFactory.getRodaClient(getThreadLocalRequest().getSession())
-				.getIngestMonitorService();
 		Filter filter = new Filter();
 		filter.add(new SimpleFilterParameter("id", sipId));
 		Sublist sublist = new Sublist(0, 1);
 		SIPState[] states;
-		// try {
-		// TODO move to new implementation
-		// states = ingestMonitor.getSIPs(new ContentAdapter(filter, null,
-		// sublist));
-		states = null;
+		states = ingestMonitor.getSIPs(new ContentAdapter(filter, null, sublist));
 		if (states != null && states.length > 0) {
 			ret = states[0];
 		}
-		// } catch (RemoteException e) {
-		// throw RODAClient.parseRemoteException(e);
-		// }
 
 		return ret;
 	}
@@ -86,64 +99,45 @@ public class IngestListServiceImpl extends RemoteServiceServlet implements Inges
 		return getSIPCount(getThreadLocalRequest().getSession(), filter);
 	}
 
-	protected int getSIPCount(HttpSession session, Filter filter) throws RODAException {
+	private int getSIPCount(HttpSession session, Filter filter) throws RODAException {
 		int count;
-		// try {
-		IngestMonitor ingestMonitor = RodaClientFactory.getRodaClient(session).getIngestMonitorService();
-		// TODO move to new implementation
-		// count = ingestMonitor.getSIPsCount(filter);
-		count = 0;
-		// } catch (RemoteException e) {
-		// logger.debug("Error getting SIP count", e);
-		// throw RODAClient.parseRemoteException(e);
-		// }
+		count = ingestMonitor.getSIPsCount(filter);
 		return count;
 	}
 
-	public SIPState[] getSIPs(ContentAdapter adapter) throws RODAException {
-		return getSIPs(getThreadLocalRequest().getSession(), adapter);
-	}
-
-	protected SIPState[] getSIPs(HttpSession session, ContentAdapter adapter) throws RODAException {
+	private SIPState[] getSIPs(ContentAdapter adapter) throws RODAException {
 		SIPState[] list;
-//		try {
-			IngestMonitor ingestMonitor = RodaClientFactory.getRodaClient(session).getIngestMonitorService();
-
-			// TODO move to new implementation
-			// list = ingestMonitor.getSIPs(adapter);
+		list = ingestMonitor.getSIPs(adapter);
+		if (list == null) {
 			list = new SIPState[] {};
-			if (list == null) {
-				list = new SIPState[] {};
-			}
-
-		// } catch (RemoteException e) {
-		// logger.debug("Error getting SIPs", e);
-		// throw RODAClient.parseRemoteException(e);
-		// }
+		}
 
 		return list;
 	}
 
+	public IndexResult<SIPState> getSIPs(Filter filter, Sorter sorter, Sublist sublist) throws RODAException {
+		ContentAdapter adapter = new ContentAdapter(filter, sorter, sublist);
+
+		SIPState[] list = ingestMonitor.getSIPs(adapter);
+		IndexResult<SIPState> ret = new IndexResult<SIPState>();
+		ret.setResults(Arrays.asList(list));
+		ret.setOffset(sublist.getFirstElementIndex());
+		ret.setLimit(sublist.getMaximumElementCount());
+		ret.setTotalCount(getSIPCount(filter));
+
+		logger.info("getting sips " + ret);
+		System.out.println("!!! " + ret);
+		return ret;
+	}
+
 	public void acceptSIP(String sipId, String message) throws RODAException {
-		try {
-			RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession()).getAcceptSIPService()
-					.acceptSIP(sipId, true, message);
-		} catch (RemoteException e) {
-			logger.debug("Error setting SIP published", e);
-			throw RODAClient.parseRemoteException(e);
-		}
+		acceptSIP.acceptSIP(sipId, true, message);
 	}
 
 	public void rejectSIP(String sipId, String message, boolean notifyProducer) throws RODAException {
-		try {
-			SIPState sip = RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
-					.getAcceptSIPService().acceptSIP(sipId, false, message);
-			if (notifyProducer) {
-				sendNotifyProducerEmail(sip, message);
-			}
-		} catch (RemoteException e) {
-			logger.debug("Error setting SIP published", e);
-			throw RODAClient.parseRemoteException(e);
+		SIPState sip = acceptSIP.acceptSIP(sipId, false, message);
+		if (notifyProducer) {
+			sendNotifyProducerEmail(sip, message);
 		}
 	}
 
@@ -202,58 +196,54 @@ public class IngestListServiceImpl extends RemoteServiceServlet implements Inges
 	public void setSIPListReportInfo(ContentAdapter adapter, String localeString) throws PrintReportException {
 		final Locale locale = ServerTools.parseLocale(localeString);
 		final IngestListReportMessages messages = new IngestListReportMessages(locale);
-		// TODO move to new implementation
-		// ReportDownload.getInstance().createPDFReport(getThreadLocalRequest().getSession(),
-		// new ReportContentSource<SIPState>() {
-		//
-		// public int getCount(HttpSession session, Filter filter) throws
-		// Exception {
-		// return getSIPCount(session, filter);
-		// }
-		//
-		// public SIPState[] getElements(HttpSession session, ContentAdapter
-		// adapter) throws Exception {
-		// return getSIPs(session, adapter);
-		// }
-		//
-		// public Map<String, String> getElementFields(HttpServletRequest req,
-		// SIPState sip) {
-		// return IngestListServiceImpl.this.getElementFields(req, sip,
-		// messages);
-		// }
-		//
-		// public String getElementId(SIPState sip) {
-		// return String.format(messages.getString("sip.title"), sip.getId());
-		//
-		// }
-		//
-		// public String getReportTitle() {
-		// return messages.getString("report.title");
-		// }
-		//
-		// public String getFieldNameTranslation(String name) {
-		// String translation;
-		// try {
-		// translation = messages.getString("sip.label." + name);
-		// } catch (MissingResourceException e) {
-		// translation = name;
-		// }
-		//
-		// return translation;
-		// }
-		//
-		// public String getFieldValueTranslation(String value) {
-		// String translation;
-		// try {
-		// translation = messages.getString("sip.value." + value);
-		// } catch (MissingResourceException e) {
-		// translation = value;
-		// }
-		//
-		// return translation;
-		// }
-		//
-		// }, adapter);
+
+		ReportDownload.getInstance().createPDFReport(getThreadLocalRequest().getSession(),
+				new ReportContentSource<SIPState>() {
+
+					public int getCount(HttpSession session, Filter filter) throws Exception {
+						return getSIPCount(session, filter);
+					}
+
+					public SIPState[] getElements(HttpSession session, ContentAdapter adapter) throws Exception {
+						return getSIPs(adapter);
+					}
+
+					public Map<String, String> getElementFields(HttpServletRequest req, SIPState sip) {
+						return IngestListServiceImpl.this.getElementFields(req, sip, messages);
+					}
+
+					public String getElementId(SIPState sip) {
+						return String.format(messages.getString("sip.title"), sip.getId());
+
+					}
+
+					public String getReportTitle() {
+						return messages.getString("report.title");
+					}
+
+					public String getFieldNameTranslation(String name) {
+						String translation;
+						try {
+							translation = messages.getString("sip.label." + name);
+						} catch (MissingResourceException e) {
+							translation = name;
+						}
+
+						return translation;
+					}
+
+					public String getFieldValueTranslation(String value) {
+						String translation;
+						try {
+							translation = messages.getString("sip.value." + value);
+						} catch (MissingResourceException e) {
+							translation = value;
+						}
+
+						return translation;
+					}
+
+				}, adapter);
 	}
 
 	protected Map<String, String> getElementFields(HttpServletRequest req, SIPState sip,

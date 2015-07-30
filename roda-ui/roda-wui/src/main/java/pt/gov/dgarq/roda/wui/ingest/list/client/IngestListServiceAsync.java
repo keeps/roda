@@ -11,6 +11,9 @@ import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.data.SIPState;
 import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
+import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
+import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
+import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.wui.common.client.PrintReportException;
 
 /**
@@ -44,7 +47,7 @@ public interface IngestListServiceAsync {
 	 * @return
 	 * @throws RODAException
 	 */
-	public void getSIPs(ContentAdapter adapter, AsyncCallback<SIPState[]> callback);
+	public void getSIPs(Filter filter, Sorter sorter, Sublist sublist, AsyncCallback<IndexResult<SIPState>> callback);
 
 	/**
 	 * Accept a SIP
