@@ -44,6 +44,7 @@
 .wui-ingest-submit-upload .upload-action-get-roda-in {
 	width: 200px;
 	margin: 5px;
+	float: right;
 }
 
 /** Create SIP **/
@@ -114,6 +115,7 @@
 .wui-ingest-submit-create .create-submit-get-roda-in {
 	width: 200px;
 	margin: 5px;
+	float: right;
 }
 
 /** # Content Model Selector **/

@@ -102,7 +102,7 @@ public class AIPList extends AsyncTableCell<SimpleDescriptionObject> {
 		getDisplay().addColumn(dateFinalColumn, "Date final");
 		getDisplay().setColumnWidth(levelColumn, "35px");
 		// getDisplay().setAutoHeaderRefreshDisabled(true);
-		Label emptyInfo = new Label("No items to display.");
+		Label emptyInfo = new Label("No items to display");
 		getDisplay().setEmptyTableWidget(emptyInfo);
 		getDisplay().setColumnWidth(titleColumn, "100%");
 

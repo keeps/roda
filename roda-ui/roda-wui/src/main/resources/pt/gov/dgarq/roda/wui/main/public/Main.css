@@ -2,35 +2,30 @@
 
 .main {
 	background-color: white;
-	min-height: 100%;
-	margin: 0 auto -200px;
 }
 
 .footer {
-	
+	background-color: #414042;
+	padding: 30px;
+	display: flex;
+	justify-content: space-between;
 }
 
-.main-filler {
-	height: 100%;
+.footer-column {
+	color: white;
+	text-align: left;
 }
 
-.main-footer {
-	width: 986px;
-	height: 25px;
-	margin: 0 auto;
-	background-image: url("images/bg-bottom.png");
-	background-repeat: no-repeat;
+.footer-column-left {
+	width: 30%;
 }
 
-.main-logos {
-	border-top: 1px solid black;
-	margin: 0 auto;
-	padding: 5px 35px 5px 25px;
+.footer-column-center {
+	width: 30%;
 }
 
-.main-logos-logo {
-	cursor: pointer;
-	cursor: hand;
+.footer-column-right {
+	width: 30%;
 }
 
 /* @group Banner */
@@ -332,7 +327,7 @@
 
 /* @group Breadcrumb */
 .main .wui-breadcrumbPanel {
-
+	
 }
 
 .main .wui-breadcrumbPanel .breadcrumb {
@@ -347,7 +342,6 @@
 	color: #404142;
 	text-decoration: none;
 }
-
 
 .main .wui-breadcrumbPanel .breadcrumb-separator {
 	font-family: 'Ubuntu', sans-serif;

@@ -10,6 +10,19 @@
 .wui-fileUpload .fileUpload-form-browse {
 
 }
+
+input[type="file"]::-webkit-file-upload-button {
+	border-radius: 15px;
+	padding: 4px 10px;
+	border: none;
+	background-color: #089de3;
+	color: white;
+	font-weight: 500;
+}
+
+
+
+
 .wui-fileUpload .fileUpload-form-add {
 	color: black;
 }

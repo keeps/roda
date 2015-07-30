@@ -40,33 +40,9 @@
 		padding: 0 30px;
 		background-color: #5bbeff;
 	}
-	
-	.footer {
-		background-color: #414042;
-		padding: 30px;
-		display: flex;
-		justify-content: space-between;
-	}
-	
-	.footer-column {
-		color: white;
-		text-align: left;
-	}
-	
-	.footer-column-left {
-		width: 30%;
-	}
-	
-	.footer-column-center {
-		width: 30%;
-	}
-	
-	.footer-column-right {
-		width: 30%;
-	}
 	</ui:style>
 
-	<g:FlowPanel>
+	<g:FlowPanel styleName="main">
 		<!-- Header -->
 		<g:FlowPanel styleName="{style.banner}">
 			<g:FocusPanel styleName="{style.homeLink}" ui:field="homeLinkArea">
@@ -81,35 +57,6 @@
 
 		<!-- Content -->
 		<m:ContentPanel ui:field="contentPanel" />
-
-		<g:HTMLPanel styleName="footer" addStyleNames="{style.footer}">
-			<div class="{style.footer-column} {style.footer-column-left}">
-				Lorem ipsum dolor sit amet, consectetur adipiscing
-				elit. Cras egestas tortor vel ipsum varius vulputate. Aliquam lorem
-				ante, porttitor non diam non, lacinia tempor libero. Class aptent
-				taciti sociosqu ad litora torquent per conubia nostra, per inceptos
-				himenaeos. Donec enim nulla, aliquet quis metus vel, hendrerit
-				interdum est. Morbi egestas pretium lectus, vitae bibendum massa
-				sodales id. Etiam in finibus lorem, eu sagittis sapien. Integer
-				pulvinar nibh eget orci vehicula vestibulum.</div>
-			<div class="{style.footer-column} {style.footer-column-center}">
-				Lorem ipsum dolor sit amet, consectetur adipiscing
-				elit. Cras egestas tortor vel ipsum varius vulputate. Aliquam lorem
-				ante, porttitor non diam non, lacinia tempor libero. Class aptent
-				taciti sociosqu ad litora torquent per conubia nostra, per inceptos
-				himenaeos. Donec enim nulla, aliquet quis metus vel, hendrerit
-				interdum est. Morbi egestas pretium lectus, vitae bibendum massa
-				sodales id. Etiam in finibus lorem, eu sagittis sapien. Integer
-				pulvinar nibh eget orci vehicula vestibulum.</div>
-			<div class="{style.footer-column} {style.footer-column-right}">
-				Lorem ipsum dolor sit amet, consectetur adipiscing
-				elit. Cras egestas tortor vel ipsum varius vulputate. Aliquam lorem
-				ante, porttitor non diam non, lacinia tempor libero. Class aptent
-				taciti sociosqu ad litora torquent per conubia nostra, per inceptos
-				himenaeos. Donec enim nulla, aliquet quis metus vel, hendrerit
-				interdum est. Morbi egestas pretium lectus, vitae bibendum massa
-				sodales id. Etiam in finibus lorem, eu sagittis sapien. Integer
-				pulvinar nibh eget orci vehicula vestibulum.</div>
-		</g:HTMLPanel>
 	</g:FlowPanel>
+
 </ui:UiBinder>

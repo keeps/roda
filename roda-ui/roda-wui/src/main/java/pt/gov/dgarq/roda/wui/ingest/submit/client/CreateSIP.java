@@ -198,13 +198,6 @@ public class CreateSIP {
 
 			descriptiveMetadata.addChangeListener(listener);
 			fileUpload.addChangeListener(listener);
-			// destinationChooser.addClickListener(new ClickListener() {
-			//
-			// public void onClick(Widget sender) {
-			// updateVisibles();
-			// }
-			//
-			// });
 
 			destinationChooser.addValueChangeHandler(new ValueChangeHandler<SimpleDescriptionObject>() {
 
@@ -231,7 +224,6 @@ public class CreateSIP {
 			descriptiveMetadata.addStyleName("create-metadata");
 			representationLayout.addStyleName("create-representation");
 			fileUpload.getWidget().addStyleName("create-representation-file");
-			// destinationChooser.addStyleName("create-destination-chooser");
 			submitLayout.addStyleName("create-submit");
 			submitButton.addStyleName("create-submit-button");
 			loadingImage.addStyleName("create-submit-loading");
@@ -293,18 +285,19 @@ public class CreateSIP {
 					submitButton.setEnabled(false);
 					submitMessage.setText(constants.createInvalidFilesWarning());
 					submitMessage.addStyleDependentName("error");
-					// } else if (destinationChooser.getSelected() == null) {
-					// submitButton.setEnabled(false);
-					// submitMessage.setText(constants.createNoDestinationWarning());
-					// submitMessage.addStyleDependentName("error");
-					// } else if
-					// (!DescriptionLevelUtils.ALL_BUT_REPRESENTATIONS_DESCRIPTION_LEVELS
-					// .contains(destinationChooser.getSelected().getSDO().getLevel()))
-					// {
-					// submitButton.setEnabled(false);
-					// submitMessage.setText(constants.createInvalidDestinationWarning());
-					// submitMessage.addStyleDependentName("error");
-				} else {
+				} else if (destinationChooser.getSelected() == null) {
+					submitButton.setEnabled(false);
+					submitMessage.setText(constants.createNoDestinationWarning());
+					submitMessage.addStyleDependentName("error");
+				} 
+				// else if
+				// (!DescriptionLevelUtils.ALL_BUT_REPRESENTATIONS_DESCRIPTION_LEVELS
+				// .contains(destinationChooser.getSelected().getLevel())) {
+				// submitButton.setEnabled(false);
+				// submitMessage.setText(constants.createInvalidDestinationWarning());
+				// submitMessage.addStyleDependentName("error");
+				// } 
+				else {
 					submitButton.setEnabled(true);
 					submitMessage.setText("");
 					submitMessage.removeStyleDependentName("error");

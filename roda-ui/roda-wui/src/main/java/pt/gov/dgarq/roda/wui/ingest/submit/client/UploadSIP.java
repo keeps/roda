@@ -7,6 +7,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.HasAlignment;
@@ -45,9 +46,9 @@ public class UploadSIP {
 
 	private HorizontalPanel actionLayout;
 
-	private WUIButton getRodaIn;
+	private Button getRodaIn;
 
-	private WUIButton submitButton;
+	private Button submitButton;
 
 	private Image loading;
 
@@ -79,8 +80,8 @@ public class UploadSIP {
 			fileUpload = new FileUploadPanel(fileNameConstraints);
 			actionLayout = new HorizontalPanel();
 
-			submitButton = new WUIButton(constants.uploadSubmitButton(), WUIButton.Left.ROUND,
-					WUIButton.Right.ARROW_FORWARD);
+			submitButton = new Button(constants.uploadSubmitButton());
+			
 
 			submitButton.addClickListener(new ClickListener() {
 
@@ -94,8 +95,7 @@ public class UploadSIP {
 
 			});
 
-			getRodaIn = new WUIButton(constants.uploadSubmitGetRodaIn(), WUIButton.Left.ROUND,
-					WUIButton.Right.ARROW_DOWN);
+			getRodaIn = new Button(constants.uploadSubmitGetRodaIn());
 
 			getRodaIn.addClickListener(new ClickListener() {
 
@@ -127,13 +127,17 @@ public class UploadSIP {
 			layout.add(fileUpload.getWidget());
 			layout.add(actionLayout);
 
-			title.addStyleName("upload-title");
+			title.addStyleName("h3");
 			fileUpload.getWidget().addStyleName("upload-file");
 			actionLayout.addStyleName("upload-action");
 			submitButton.addStyleName("upload-action-button");
+			submitButton.addStyleName("btn");
+			submitButton.addStyleName("btn-play");
 			loading.addStyleName("upload-action-loading-image");
 			loadingMessage.addStyleName("upload-action-loading-message");
 			getRodaIn.addStyleName("upload-action-get-roda-in");
+			getRodaIn.addStyleName("btn");
+			getRodaIn.addStyleName("btn-download");
 			actionLayout.setCellVerticalAlignment(loading, HasAlignment.ALIGN_MIDDLE);
 			actionLayout.setCellVerticalAlignment(loadingMessage, HasAlignment.ALIGN_MIDDLE);
 			actionLayout.setCellWidth(getRodaIn, "100%");

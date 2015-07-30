@@ -25,12 +25,10 @@ public class SelectableAIPList extends FlowPanel implements HasValueChangeHandle
 
 	private static final Filter ROOT_FILTER = new Filter(new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID));
 
-	// private final ClientLogger logger = new
-	// ClientLogger(getClass().getName());
-
 	private SimpleDescriptionObject selected;
 
-	private Label label;
+	private Label selectedLabel;
+	
 	private BreadcrumbPanel breadcrumbPanel;
 	private List<BreadcrumbItem> breadcrumbs;
 
@@ -83,21 +81,20 @@ public class SelectableAIPList extends FlowPanel implements HasValueChangeHandle
 					}
 				}));
 
-		label = new Label("Selected:");
-
-		add(label);
+		selectedLabel = new Label("Selected:");
+		
+		add(selectedLabel);
 		add(breadcrumbPanel);
+		
 		add(aipList);
 
 		breadcrumbPanel.updatePath(breadcrumbs);
+		
+		selectedLabel.addStyleName("selectableAipList-selectedLabel");
+		breadcrumbPanel.addStyleName("selectableAipList-breadcrumb");
+		
+		updateVisibles();
 
-		aipList.addValueChangeHandler(new ValueChangeHandler<Integer>() {
-
-			@Override
-			public void onValueChange(ValueChangeEvent<Integer> event) {
-				aipList.setVisible(event.getValue() > 0);
-			}
-		});
 	}
 
 	protected void removeAfter(int index) {
@@ -116,6 +113,7 @@ public class SelectableAIPList extends FlowPanel implements HasValueChangeHandle
 			Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, sdo.getId()));
 			setInnerFilter(filter);
 			ValueChangeEvent.fire(this, sdo);
+			updateVisibles();
 		}
 	}
 
@@ -123,6 +121,12 @@ public class SelectableAIPList extends FlowPanel implements HasValueChangeHandle
 		setInnerFilter(ROOT_FILTER);
 		selected = null;
 		ValueChangeEvent.fire(this, null);
+		updateVisibles();
+	}
+	
+	private void updateVisibles() {
+		selectedLabel.setVisible(selected != null);
+		breadcrumbPanel.setVisible(selected != null);
 	}
 
 	public SimpleDescriptionObject getSelected() {

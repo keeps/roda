@@ -306,13 +306,11 @@ public class ClientLogger implements IsSerializable {
 		} else if (CURRENT_LOG_LEVEL <= ERROR) {
 			AsyncCallback<Void> errorcallback = new AsyncCallback<Void>() {
 				public void onFailure(Throwable caught) {
-					GWT.log(message, error);
-					GWT.log("Error while logging another error", caught);
 					logger.log(Level.SEVERE, message, error);
+					logger.log(Level.SEVERE, "Error while logging another error", caught);
 				}
 
 				public void onSuccess(Void result) {
-					GWT.log(message, error);
 					logger.log(Level.SEVERE, message, error);
 				}
 			};

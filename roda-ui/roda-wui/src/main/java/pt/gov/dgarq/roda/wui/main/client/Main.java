@@ -50,6 +50,7 @@ public class Main extends Composite implements EntryPoint {
 
 		// Add main widget to root panel
 		RootPanel.get().add(this);
+		RootPanel.get().add(footer);
 
 		// deferred call to init
 		Scheduler.get().scheduleDeferred(new Command() {
@@ -86,6 +87,8 @@ public class Main extends Composite implements EntryPoint {
 	@UiField(provided = true)
 	ContentPanel contentPanel;
 
+	Composite footer;
+
 	/**
 	 * Create a new main
 	 */
@@ -93,9 +96,11 @@ public class Main extends Composite implements EntryPoint {
 		languageSwitcherPanel = new LanguageSwitcherPanel();
 		menu = new Menu();
 		contentPanel = ContentPanel.getInstance();
+
+		footer = new Footer();
+
 		Binder uiBinder = GWT.create(Binder.class);
 		initWidget(uiBinder.createAndBindUi(this));
-		this.addStyleName("main");
 	}
 
 	/**

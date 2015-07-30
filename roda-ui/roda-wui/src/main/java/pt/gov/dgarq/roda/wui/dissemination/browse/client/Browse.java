@@ -275,7 +275,8 @@ public class Browse extends Composite {
 		topIcon.addStyleName("browseItemIcon-all");
 		itemIcon.setWidget(topIcon);
 
-		breadcrumb.updatePath(Arrays.asList(new BreadcrumbItem("all", RESOLVER.getHistoryPath())));
+		breadcrumb.updatePath(Arrays.asList(new BreadcrumbItem(
+				SafeHtmlUtils.fromSafeConstant("<i class='fa fa-circle-o'></i>"), RESOLVER.getHistoryPath())));
 		itemTitle.setText("All collections");
 		itemDates.setText("");
 		itemDescriptiveMetadata.setText("");
@@ -291,7 +292,8 @@ public class Browse extends Composite {
 	private List<BreadcrumbItem> getBreadcrumbsFromAncestors(List<SimpleDescriptionObject> sdoAncestors,
 			SimpleDescriptionObject sdo) {
 		List<BreadcrumbItem> ret = new ArrayList<>();
-		ret.add(new BreadcrumbItem("all", RESOLVER.getHistoryPath()));
+		ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-circle-o'></i>"),
+				RESOLVER.getHistoryPath()));
 		for (SimpleDescriptionObject ancestor : sdoAncestors) {
 			BreadcrumbItem ancestorBreadcrumb = new BreadcrumbItem(ancestor.getTitle(),
 					RESOLVER.getHistoryPath() + "." + ancestor.getId());
