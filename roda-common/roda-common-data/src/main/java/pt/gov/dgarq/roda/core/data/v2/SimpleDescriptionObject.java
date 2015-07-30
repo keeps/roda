@@ -2,6 +2,7 @@ package pt.gov.dgarq.roda.core.data.v2;
 
 import java.util.Date;
 
+import pt.gov.dgarq.roda.core.data.RODAObjectPermissions;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
@@ -28,6 +29,8 @@ public class SimpleDescriptionObject extends RODAObject {
 
 	private String parentID = null;
 	private int subElementsCount = 0;
+	
+	private RODAObjectPermissions permissions = new RODAObjectPermissions();
 
 	/**
 	 * Constructs an empty (<strong>invalid</strong>)
@@ -57,7 +60,7 @@ public class SimpleDescriptionObject extends RODAObject {
 	public SimpleDescriptionObject(SimpleDescriptionObject other) {
 		this(other.getId(), other.getLabel(), other.getLastModifiedDate(), other.getCreatedDate(), other.getState(),
 				other.getLevel(), other.getTitle(), other.getDateInitial(), other.getDateFinal(),
-				other.getDescription(), other.getParentID(), other.getSubElementsCount());
+				other.getDescription(), other.getParentID(), other.getSubElementsCount(), other.getPermissions());
 	}
 
 	/**
@@ -78,7 +81,7 @@ public class SimpleDescriptionObject extends RODAObject {
 	 */
 	public SimpleDescriptionObject(String id, String label, Date lastModifiedDate, Date createdDate, String state,
 			String level, String title, Date dateInitial, Date dateFinal, String description, String parentID,
-			int subElementsCount) {
+			int subElementsCount, RODAObjectPermissions permissions) {
 
 		super(id, label, lastModifiedDate, createdDate, state);
 
@@ -97,6 +100,8 @@ public class SimpleDescriptionObject extends RODAObject {
 
 		setParentID(parentID);
 		setSubElementsCount(subElementsCount);
+		
+		setPermissions(permissions);
 	}
 
 	/**
@@ -248,6 +253,14 @@ public class SimpleDescriptionObject extends RODAObject {
 	 */
 	public void setParentID(String parentID) {
 		this.parentID = parentID;
+	}
+
+	public RODAObjectPermissions getPermissions() {
+		return permissions;
+	}
+
+	public void setPermissions(RODAObjectPermissions permissions) {
+		this.permissions = permissions;
 	}
 
 }

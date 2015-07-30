@@ -38,6 +38,7 @@ import lc.xmlns.premisV2.EventOutcomeDetailComplexType;
 import lc.xmlns.premisV2.EventOutcomeInformationComplexType;
 import lc.xmlns.premisV2.LinkingObjectIdentifierComplexType;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
+import pt.gov.dgarq.roda.core.data.RODAObjectPermissions;
 import pt.gov.dgarq.roda.core.data.v2.AgentPreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.EventPreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
@@ -837,7 +838,8 @@ public class ModelService extends ModelObservable {
 			Date dateCreated = ModelUtils.getDate(metadata, RodaConstants.STORAGE_META_DATE_CREATED);
 			Date dateModified = ModelUtils.getDate(metadata, RodaConstants.STORAGE_META_DATE_MODIFIED);
 
-			// TODO retrieve permissions
+			// obtain permissions
+			RODAObjectPermissions permissions = getPermissions(metadata);
 
 			if (active == null) {
 				// when not stated, consider active=false
@@ -860,7 +862,7 @@ public class ModelService extends ModelObservable {
 				retrieveAIPPreservationInformation(storagePath, representationIds, preservationRepresentationObjects,
 						preservationFileObjects, preservationEvents);
 
-				aip = new AIP(storagePath.getName(), parentId, active, dateCreated, dateModified,
+				aip = new AIP(storagePath.getName(), parentId, active, dateCreated, dateModified, permissions,
 						descriptiveMetadataBinaryIds, representationIds, preservationRepresentationObjects,
 						preservationEvents, preservationFileObjects);
 			} catch (StorageActionException e) {
@@ -874,6 +876,42 @@ public class ModelService extends ModelObservable {
 					ModelServiceException.INTERNAL_SERVER_ERROR);
 		}
 		return aip;
+	}
+
+	private RODAObjectPermissions getPermissions(Map<String, Set<String>> metadata) {
+		RODAObjectPermissions permissions = new RODAObjectPermissions();
+
+		// grant permissions
+		Set<String> set = metadata.get(RodaConstants.STORAGE_META_PERMISSION_GRANT_USERS);
+		permissions.setGrantUsers(set);
+		set = metadata.get(RodaConstants.STORAGE_META_PERMISSION_GRANT_GROUPS);
+		permissions.setGrantGroups(set);
+
+		// read permissions
+		set = metadata.get(RodaConstants.STORAGE_META_PERMISSION_READ_USERS);
+		permissions.setReadUsers(set);
+		set = metadata.get(RodaConstants.STORAGE_META_PERMISSION_READ_GROUPS);
+		permissions.setReadGroups(set);
+
+		// insert permissions
+		set = metadata.get(RodaConstants.STORAGE_META_PERMISSION_INSERT_USERS);
+		permissions.setInsertUsers(set);
+		set = metadata.get(RodaConstants.STORAGE_META_PERMISSION_INSERT_GROUPS);
+		permissions.setInsertGroups(set);
+
+		// modify permissions
+		set = metadata.get(RodaConstants.STORAGE_META_PERMISSION_MODIFY_USERS);
+		permissions.setModifyUsers(set);
+		set = metadata.get(RodaConstants.STORAGE_META_PERMISSION_MODIFY_GROUPS);
+		permissions.setModifyGroups(set);
+
+		// remove permissions
+		set = metadata.get(RodaConstants.STORAGE_META_PERMISSION_REMOVE_USERS);
+		permissions.setRemoveUsers(set);
+		set = metadata.get(RodaConstants.STORAGE_META_PERMISSION_REMOVE_GROUPS);
+		permissions.setRemoveGroups(set);
+
+		return permissions;
 	}
 
 	private void retrieveAIPPreservationInformation(StoragePath storagePath, List<String> representationIds,

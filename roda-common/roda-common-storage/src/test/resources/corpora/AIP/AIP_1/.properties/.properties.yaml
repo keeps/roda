@@ -3,21 +3,21 @@ parentId:
 active: true
 date.created: 2015-06-06T15:30:00.000Z
 date.modified: 2015-06-06T16:30:00.000Z
-grant.users:
+permission.grant.users:
   - user1
   - user2
-grant.groups:
+permission.grant.groups:
   - group1
-remove.users:
+permission.remove.users:
   - user3
-remove.groups:
+permission.remove.groups:
   - group2
   - group3
-modify.users:
+permission.modify.users:
   - user4
   - user5
   - user6
-modify.groups:
+permission.modify.groups:
   - group2
   - group3
 name:

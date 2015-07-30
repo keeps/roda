@@ -102,18 +102,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
 			// set descriptive metadata
 			List<DescriptiveMetadataBundle> descriptiveMetadataList = new ArrayList<DescriptiveMetadataBundle>();
-			Iterable<DescriptiveMetadata> listDescriptiveMetadataBinaries = model
-					.listDescriptiveMetadataBinaries(aipId);
-			for (DescriptiveMetadata descriptiveMetadata : listDescriptiveMetadataBinaries) {
-				Binary binary = storage.getBinary(descriptiveMetadata.getStoragePath());
-				String html = HTMLUtils.descriptiveMetadataToHtml(binary, model, locale);
-
-				descriptiveMetadataList
-						.add(new DescriptiveMetadataBundle(descriptiveMetadata.getId(), html, binary.getSizeInBytes()));
-			}
+			getDescriptiveMetadata(aipId, locale, descriptiveMetadataList);
 			itemBundle.setDescriptiveMetadata(descriptiveMetadataList);
 
-			// set representations
+			// set representations 
+			// FIXME perhaps this information should be indexed as well
 			List<Representation> representationList = new ArrayList<Representation>();
 			Iterable<Representation> representations = model.listRepresentations(aipId);
 			for (Representation representation : representations) {
@@ -126,6 +119,19 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 		}
 
 		return itemBundle;
+	}
+
+	private void getDescriptiveMetadata(String aipId, final Locale locale, List<DescriptiveMetadataBundle> descriptiveMetadataList)
+			throws ModelServiceException, StorageActionException {
+		Iterable<DescriptiveMetadata> listDescriptiveMetadataBinaries = model
+				.listDescriptiveMetadataBinaries(aipId);
+		for (DescriptiveMetadata descriptiveMetadata : listDescriptiveMetadataBinaries) {
+			Binary binary = storage.getBinary(descriptiveMetadata.getStoragePath());
+			String html = HTMLUtils.descriptiveMetadataToHtml(binary, model, locale);
+
+			descriptiveMetadataList
+					.add(new DescriptiveMetadataBundle(descriptiveMetadata.getId(), html, binary.getSizeInBytes()));
+		}
 	}
 
 	public IndexResult<SimpleDescriptionObject> findDescriptiveMetadata(Filter filter, Sorter sorter, Sublist sublist)

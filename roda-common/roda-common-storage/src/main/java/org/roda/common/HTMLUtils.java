@@ -21,6 +21,13 @@ import org.roda.storage.StoragePath;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.v2.SimplePreservationMetadata;
 
+/**
+ * HTML related utility class
+ * 
+ * @author Hélder Silva <hsilva@keep.pt>
+ * @author Luis Faria <lfaria@keep.pt>
+ * @author Sébastien Leroux <sleroux@keep.pt>
+ */
 public class HTMLUtils {
 	// TODO improve metadata to HTML stylesheets
 	// TODO support localization (en/pt)

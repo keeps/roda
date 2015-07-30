@@ -111,6 +111,16 @@
    <field name="dateModified" type="tdate" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="descriptiveMetadataId" type="string" indexed="true" stored="true" required="false" multiValued="true" /> 
    <field name="representationId" type="string" indexed="true" stored="true" required="false" multiValued="true" /> 
+   <field name="permission.grant.users" type="string" indexed="true" stored="true" required="false" multiValued="true" />
+   <field name="permission.grant.groups" type="string" indexed="true" stored="true" required="false" multiValued="true" />
+   <field name="permission.read.users" type="string" indexed="true" stored="true" required="false" multiValued="true" />
+   <field name="permission.read.groups" type="string" indexed="true" stored="true" required="false" multiValued="true" />
+   <field name="permission.insert.users" type="string" indexed="true" stored="true" required="false" multiValued="true" />
+   <field name="permission.insert.groups" type="string" indexed="true" stored="true" required="false" multiValued="true" />
+   <field name="permission.modify.users" type="string" indexed="true" stored="true" required="false" multiValued="true" />
+   <field name="permission.modify.groups" type="string" indexed="true" stored="true" required="false" multiValued="true" />
+   <field name="permission.remove.users" type="string" indexed="true" stored="true" required="false" multiValued="true" />
+   <field name="permission.remove.groups" type="string" indexed="true" stored="true" required="false" multiValued="true" />
 
    <!-- Dynamic field definitions allow using convention over configuration
        for fields via the specification of patterns to match field names. 

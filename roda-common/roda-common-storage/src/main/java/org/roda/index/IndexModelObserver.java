@@ -44,9 +44,7 @@ public class IndexModelObserver implements ModelObserver {
 
 	@Override
 	public void aipCreated(final AIP aip) {
-		SolrInputDocument aipDoc = SolrUtils.aipToSolrInputDocument(aip);
-
-		indexAIPandSDO(aip, aipDoc);
+		indexAIPandSDO(aip);
 		indexRepresentations(aip);
 		indexPreservationFileObjects(aip);
 		indexPreservationsEvents(aip);
@@ -116,8 +114,9 @@ public class IndexModelObserver implements ModelObserver {
 		}
 	}
 
-	private void indexAIPandSDO(final AIP aip, SolrInputDocument aipDoc) {
+	private void indexAIPandSDO(final AIP aip) {
 		try {
+			SolrInputDocument aipDoc = SolrUtils.aipToSolrInputDocument(aip);
 			SolrInputDocument sdoDoc = SolrUtils.aipToSolrInputDocumentAsSDO(aip, model);
 			index.add(RodaConstants.INDEX_AIP, aipDoc);
 			index.commit(RodaConstants.INDEX_AIP);

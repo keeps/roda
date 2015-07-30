@@ -18,10 +18,6 @@ public class Representation implements Serializable {
 	private String type;
 	private List<String> fileIds;
 
-	public static long getSerialversionuid() {
-		return serialVersionUID;
-	}
-
 	public void setId(String id) {
 		this.id = id;
 	}
@@ -56,7 +52,6 @@ public class Representation implements Serializable {
 
 	public Representation() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	public Representation(String id, String aipId, boolean active, Date dateCreated, Date dateModified,

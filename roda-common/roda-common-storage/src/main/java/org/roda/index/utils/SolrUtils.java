@@ -50,6 +50,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import pt.gov.dgarq.roda.core.common.RodaConstants;
+import pt.gov.dgarq.roda.core.data.RODAObjectPermissions;
 import pt.gov.dgarq.roda.core.data.adapter.filter.BasicSearchFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
@@ -122,7 +123,7 @@ public class SolrUtils {
 			docs.add(result);
 		}
 
-		return new IndexResult<>(offset, limit, totalCount, docs);
+		return new IndexResult<T>(offset, limit, totalCount, docs);
 	}
 
 	public static SolrInputDocument getDescriptiveMetataFields(Binary binary) throws IndexActionException {
@@ -463,6 +464,8 @@ public class SolrUtils {
 		final List<String> descriptiveMetadataFileIds = objectToListString(
 				doc.get(RodaConstants.AIP_DESCRIPTIVE_METADATA_ID));
 		final List<String> representationIds = objectToListString(doc.get(RodaConstants.AIP_REPRESENTATION_ID));
+
+		RODAObjectPermissions permissions = getPermissions(doc);
 		/*
 		 * final List<String> preservationObjectsIds =
 		 * objectToListString(doc.get(RodaConstants.AIP_PRESERVATION_OBJECTS_ID)
@@ -470,8 +473,8 @@ public class SolrUtils {
 		 * objectToListString(doc.get(RodaConstants.AIP_PRESERVATION_EVENTS_ID))
 		 * ;
 		 */
-		return new AIP(id, parentId, active, dateCreated, dateModified, descriptiveMetadataFileIds, representationIds,
-				null, null, null);
+		return new AIP(id, parentId, active, dateCreated, dateModified, permissions, descriptiveMetadataFileIds,
+				representationIds, null, null, null);
 	}
 
 	public static SolrInputDocument aipToSolrInputDocument(AIP aip) {
@@ -484,6 +487,8 @@ public class SolrUtils {
 		ret.addField(RodaConstants.AIP_DATE_MODIFIED, aip.getDateModified());
 		ret.addField(RodaConstants.AIP_DESCRIPTIVE_METADATA_ID, aip.getDescriptiveMetadataIds());
 		ret.addField(RodaConstants.AIP_REPRESENTATION_ID, aip.getRepresentationIds());
+
+		setPermissions(aip, ret);
 
 		return ret;
 	}
@@ -509,8 +514,10 @@ public class SolrUtils {
 		final String description = descriptions != null ? descriptions.get(0) : null;
 		final int childrenCount = 0;
 
+		RODAObjectPermissions permissions = getPermissions(doc);
+
 		return new SimpleDescriptionObject(id, label, dateModified, dateCreated, state, level, title, dateInitial,
-				dateFinal, description, parentId, childrenCount);
+				dateFinal, description, parentId, childrenCount, permissions);
 
 	}
 
@@ -525,6 +532,10 @@ public class SolrUtils {
 		ret.addField(RodaConstants.AIP_DATE_CREATED, aip.getDateCreated());
 		ret.addField(RodaConstants.AIP_DATE_MODIFIED, aip.getDateModified());
 
+		// TODO see if this really should be indexed into SDO
+		ret.addField(RodaConstants.AIP_DESCRIPTIVE_METADATA_ID, aip.getDescriptiveMetadataIds());
+		ret.addField(RodaConstants.AIP_REPRESENTATION_ID, aip.getRepresentationIds());
+
 		for (String descId : aip.getDescriptiveMetadataIds()) {
 			DescriptiveMetadata metadata = model.retrieveDescriptiveMetadata(aipId, descId);
 			StoragePath storagePath = metadata.getStoragePath();
@@ -536,10 +547,54 @@ public class SolrUtils {
 			}
 		}
 
+		// add permissions
+		setPermissions(aip, ret);
+
 		// TODO add information for SDO
 		// TODO add sub-documents with full descriptive metadata info
 
 		return ret;
+	}
+
+	private static RODAObjectPermissions getPermissions(SolrDocument doc) {
+		RODAObjectPermissions permissions = new RODAObjectPermissions();
+
+		List<String> list = objectToListString(doc.get(RodaConstants.AIP_PERMISSION_GRANT_USERS));
+		permissions.setGrantUsers(list);
+		list = objectToListString(doc.get(RodaConstants.AIP_PERMISSION_GRANT_GROUPS));
+		permissions.setGrantGroups(list);
+		list = objectToListString(doc.get(RodaConstants.AIP_PERMISSION_READ_USERS));
+		permissions.setReadUsers(list);
+		list = objectToListString(doc.get(RodaConstants.AIP_PERMISSION_READ_GROUPS));
+		permissions.setReadGroups(list);
+		list = objectToListString(doc.get(RodaConstants.AIP_PERMISSION_INSERT_USERS));
+		permissions.setInsertUsers(list);
+		list = objectToListString(doc.get(RodaConstants.AIP_PERMISSION_INSERT_GROUPS));
+		permissions.setInsertGroups(list);
+		list = objectToListString(doc.get(RodaConstants.AIP_PERMISSION_MODIFY_USERS));
+		permissions.setModifyUsers(list);
+		list = objectToListString(doc.get(RodaConstants.AIP_PERMISSION_MODIFY_GROUPS));
+		permissions.setModifyGroups(list);
+		list = objectToListString(doc.get(RodaConstants.AIP_PERMISSION_REMOVE_USERS));
+		permissions.setRemoveUsers(list);
+		list = objectToListString(doc.get(RodaConstants.AIP_PERMISSION_REMOVE_GROUPS));
+		permissions.setRemoveGroups(list);
+
+		return permissions;
+	}
+
+	private static void setPermissions(AIP aip, final SolrInputDocument ret) {
+		RODAObjectPermissions permissions = aip.getPermissions();
+		ret.addField(RodaConstants.AIP_PERMISSION_GRANT_USERS, permissions.getGrantUsers());
+		ret.addField(RodaConstants.AIP_PERMISSION_GRANT_GROUPS, permissions.getGrantGroups());
+		ret.addField(RodaConstants.AIP_PERMISSION_READ_USERS, permissions.getReadUsers());
+		ret.addField(RodaConstants.AIP_PERMISSION_READ_GROUPS, permissions.getReadGroups());
+		ret.addField(RodaConstants.AIP_PERMISSION_INSERT_USERS, permissions.getInsertUsers());
+		ret.addField(RodaConstants.AIP_PERMISSION_INSERT_GROUPS, permissions.getInsertGroups());
+		ret.addField(RodaConstants.AIP_PERMISSION_MODIFY_USERS, permissions.getModifyUsers());
+		ret.addField(RodaConstants.AIP_PERMISSION_MODIFY_GROUPS, permissions.getModifyGroups());
+		ret.addField(RodaConstants.AIP_PERMISSION_REMOVE_USERS, permissions.getRemoveUsers());
+		ret.addField(RodaConstants.AIP_PERMISSION_REMOVE_GROUPS, permissions.getRemoveGroups());
 	}
 
 	public static Representation solrDocumentToRepresentation(SolrDocument doc) {

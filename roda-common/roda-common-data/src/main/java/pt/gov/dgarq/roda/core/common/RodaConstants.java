@@ -14,6 +14,7 @@ public final class RodaConstants {
 	 */
 	public static final String INDEX_AIP = "AIP";
 	public static final String INDEX_SDO = "SDO";
+	// FIXME not in use. is this to remove?
 	public static final String INDEX_DESCRIPTIVE_METADATA = "DescriptiveMetadata";
 	public static final String INDEX_PRESERVATION_EVENTS = "PreservationEvent";
 	public static final String INDEX_PRESERVATION_OBJECTS = "PreservationObject";
@@ -61,6 +62,18 @@ public final class RodaConstants {
 	public static final String STORAGE_META_REPRESENTATION_ID = "representation.id";
 	public static final String STORAGE_META_REPRESENTATION_STATUSES = "representation.statuses";
 	public static final String STORAGE_META_DIGEST_SHA1 = "digest.sha1";
+	public static final String STORAGE_META_PERMISSION_GRANT_USERS = "permission.grant.users";
+	public static final String STORAGE_META_PERMISSION_GRANT_GROUPS = "permission.grant.groups";
+	public static final String STORAGE_META_PERMISSION_READ_USERS = "permission.read.users";
+	public static final String STORAGE_META_PERMISSION_READ_GROUPS = "permission.read.groups";
+	// XXX the following two constants formerly were known as producers
+	// permissions
+	public static final String STORAGE_META_PERMISSION_INSERT_USERS = "permission.insert.users";
+	public static final String STORAGE_META_PERMISSION_INSERT_GROUPS = "permission.insert.groups";
+	public static final String STORAGE_META_PERMISSION_MODIFY_USERS = "permission.modify.users";
+	public static final String STORAGE_META_PERMISSION_MODIFY_GROUPS = "permission.modify.groups";
+	public static final String STORAGE_META_PERMISSION_REMOVE_USERS = "permission.remove.users";
+	public static final String STORAGE_META_PERMISSION_REMOVE_GROUPS = "permission.remove.groups";
 
 	/*
 	 * SIP FIELDS
@@ -85,6 +98,19 @@ public final class RodaConstants {
 	public static final String AIP_REPRESENTATION_ID = "representationId";
 	public static final String AIP_PRESERVATION_OBJECTS_ID = "preservationObjectsId";
 	public static final String AIP_PRESERVATION_EVENTS_ID = "preservationEventsId";
+
+	public static final String AIP_PERMISSION_GRANT_USERS = STORAGE_META_PERMISSION_GRANT_USERS;
+	public static final String AIP_PERMISSION_GRANT_GROUPS = STORAGE_META_PERMISSION_GRANT_GROUPS;
+	public static final String AIP_PERMISSION_READ_USERS = STORAGE_META_PERMISSION_READ_USERS;
+	public static final String AIP_PERMISSION_READ_GROUPS = STORAGE_META_PERMISSION_READ_GROUPS;
+	// XXX the following two constants formerly were known as producers
+	// permissions
+	public static final String AIP_PERMISSION_INSERT_USERS = STORAGE_META_PERMISSION_INSERT_USERS;
+	public static final String AIP_PERMISSION_INSERT_GROUPS = STORAGE_META_PERMISSION_INSERT_GROUPS;
+	public static final String AIP_PERMISSION_MODIFY_USERS = STORAGE_META_PERMISSION_MODIFY_USERS;
+	public static final String AIP_PERMISSION_MODIFY_GROUPS = STORAGE_META_PERMISSION_MODIFY_GROUPS;
+	public static final String AIP_PERMISSION_REMOVE_USERS = STORAGE_META_PERMISSION_REMOVE_USERS;
+	public static final String AIP_PERMISSION_REMOVE_GROUPS = STORAGE_META_PERMISSION_REMOVE_GROUPS;
 
 	/*
 	 * SDO FIELDS
@@ -120,7 +146,7 @@ public final class RodaConstants {
 	public static final String SRO_FILE_IDS = "fileId";
 	public static final String SRO_EVENT_PRESERVATION_IDS = "eventId";
 	public static final String SRO_REPRESENTATION_PRESERVATION_IDS = "representationId";
-	
+
 	/*
 	 * SEPM FIELDS
 	 */
@@ -140,7 +166,7 @@ public final class RodaConstants {
 	public static final String SEPM_OUTCOME_DETAILS = "outcomeDetails";
 	public static final String SEPM_REPRESENTATION_ID = "representationId";
 	public static final String SEPM_FILE_ID = "fileId";
-	
+
 	/*
 	 * SRPM FIELDS
 	 */
@@ -155,7 +181,7 @@ public final class RodaConstants {
 	public static final String SRPM_MODEL = "model";
 	public static final String SRPM_REPRESENTATION_ID = "representationId";
 	public static final String SRPM_FILE_ID = "fileId";
-	
+
 	/*
 	 * SRFM
 	 */
@@ -185,7 +211,7 @@ public final class RodaConstants {
 	public static final String OBJECT_PERMISSIONS_REMOVE_GROUPS = "removeGroups";
 	public static final String OBJECT_PERMISSIONS_GRANT_USERS = "grantUsers";
 	public static final String OBJECT_PERMISSIONS_GRANT_GROUPS = "grantGroups";
-	
+
 	public static final String REPOSITORY_PERMISSIONS_METADATA_EDITOR = "administration.metadata_editor";
 	public static final String LOG_ACTION = "action";
 	public static final String LOG_ADDRESS = "address";
