@@ -107,7 +107,7 @@ public class CorporaConstants {
 	public static final String LOG_USERNAME = "username";
 	public static final String LOG_PARAMETERS = "parameters";
 	public static final String LOG_FILE_ID = "fileID";
-	public static final String YEAR_1213 = "1213";
-	public static final String YEAR_2003 = "2003";
+	public static final int YEAR_1213 = 1213;
+	public static final int YEAR_2003 = 2003;
 	
 }

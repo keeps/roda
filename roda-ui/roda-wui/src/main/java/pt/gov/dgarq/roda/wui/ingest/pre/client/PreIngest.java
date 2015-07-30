@@ -66,105 +66,24 @@ public class PreIngest {
 		return instance;
 	}
 
-	private static PreIngestConstants constants = GWT.create(PreIngestConstants.class);
-
-	private ClientLogger logger = new ClientLogger(getClass().getName());
-
-	private boolean initialized;
-
 	private VerticalPanel layout;
 
 	private HTMLWidgetWrapper html;
 
-	private Label classificationPlanLabel;
-
-	// private CollectionsTreeVerticalScrollPanel classificationPlan;
-
-	private ViewWindow viewWindow;
-
 	private PreIngest() {
-		initialized = false;
-	}
+		layout = new VerticalPanel();
+		html = new HTMLWidgetWrapper("PreIngest.html");
 
-	private void init() {
-		if (!initialized) {
-			initialized = true;
-			layout = new VerticalPanel();
-			html = new HTMLWidgetWrapper("PreIngest.html");
+		Filter classPlanFilter = new Filter();
+		classPlanFilter.add(new ProducerFilterParameter());
 
-			Filter classPlanFilter = new Filter();
-			classPlanFilter.add(new ProducerFilterParameter());
-			// classPlanFilter.add(new OneOfManyFilterParameter(
-			// SimpleDescriptionObject.LEVEL, new String[] {
-			// DescriptionLevel.FONDS.getLevel(),
-			// DescriptionLevel.SUBFONDS.getLevel(),
-			// DescriptionLevel.CLASS.getLevel(),
-			// DescriptionLevel.SUBCLASS.getLevel(),
-			// DescriptionLevel.SERIES.getLevel(),
-			// DescriptionLevel.SUBSERIES.getLevel() }));
-			int size = DescriptionLevelUtils.ALL_BUT_REPRESENTATIONS_DESCRIPTION_LEVELS.size();
-			String[] classPlanLevels = new String[size];
-			for (int i = 0; i < size; i++) {
-				classPlanLevels[i] = DescriptionLevelUtils.ALL_BUT_REPRESENTATIONS_DESCRIPTION_LEVELS.get(i).getLevel();
-			}
-			classPlanFilter.add(new OneOfManyFilterParameter(RodaConstants.SDO_LEVEL, classPlanLevels));
+		layout.add(html);
 
-			classificationPlanLabel = new Label(constants.classificationPlanLabel());
-
-			// classificationPlan = new
-			// CollectionsTreeVerticalScrollPanel(classPlanFilter,
-			// CollectionsTreeVerticalScrollPanel.DEFAULT_SORTER, true);
-			//
-			// classificationPlan.addClickListener(new ClickListener() {
-			//
-			// public void onClick(Widget sender) {
-			// String pid = classificationPlan.getSelected().getPid();
-			/*
-			 * ViewWindow viewWindow = new ViewWindow(pid); viewWindow.show();
-			 */
-			// viewWindow = new ViewWindow(pid, new
-			// AsyncCallback<DescriptionObject>() {
-			//
-			// public void onFailure(Throwable caught) {
-			// logger.error("Error creating view window", caught);
-			// }
-			//
-			// public void onSuccess(DescriptionObject obj) {
-			// viewWindow.show();
-			// }
-			//
-			// });
-			//
-			// }
-
-			// });
-
-			layout.add(html);
-			layout.add(classificationPlanLabel);
-			// layout.add(classificationPlan);
-
-			layout.addStyleName("wui-ingest-pre");
-			classificationPlanLabel.addStyleName("classificationPlan-label");
-			// classificationPlan.addStyleName("classificationPlan");
-
-		} else {
-			// classificationPlan.clear(new AsyncCallback<Integer>() {
-			//
-			// public void onFailure(Throwable caught) {
-			// logger.error("Error updating destination chooser", caught);
-			// }
-			//
-			// public void onSuccess(Integer result) {
-			// // nothing to do
-			//
-			// }
-			// });
-		}
+		layout.addStyleName("wui-ingest-pre");
 	}
 
 	public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
 		if (historyTokens.length == 0) {
-			init();
 			callback.onSuccess(layout);
 		} else {
 			History.newItem(RESOLVER.getHistoryPath());

@@ -22,6 +22,8 @@ import org.xml.sax.SAXException;
 
 public class ValidationUtils {
 
+	private static final String W3C_XML_SCHEMA_NS_URI = "http://www.w3.org/2001/XMLSchema";
+
 	public static boolean validateAIPDescriptiveMetadata(ModelService model, AIP aip) throws ModelServiceException {
 		boolean valid = true;
 		Iterable<DescriptiveMetadata> descriptiveMetadataBinaries = model.listDescriptiveMetadataBinaries(aip.getId());
@@ -49,7 +51,7 @@ public class ValidationUtils {
 						ModelServiceException.INTERNAL_SERVER_ERROR);
 			}
 			Source xmlFile = new StreamSource(inputStream);
-			SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+			SchemaFactory schemaFactory = SchemaFactory.newInstance(W3C_XML_SCHEMA_NS_URI);
 			Schema schema = schemaFactory.newSchema(new StreamSource(schemaStream));
 			Validator validator = schema.newValidator();
 			try {

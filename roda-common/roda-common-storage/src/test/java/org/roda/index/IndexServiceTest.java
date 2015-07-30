@@ -228,7 +228,7 @@ public class IndexServiceTest {
 			assertEquals(IndexActionException.NOT_FOUND, e.getCode());
 		}
 	}
-	
+
 	@Test
 	public void testAIPIndexCreateDelete2()
 			throws ModelServiceException, StorageActionException, IndexActionException, ParseException {
@@ -236,17 +236,18 @@ public class IndexServiceTest {
 
 		final AIP aip = model.createAIP(aipId, corporaService,
 				DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID_3));
-		
+
 		Filter filter = new Filter();
 		filter.add(new SimpleFilterParameter(RodaConstants.AIP_ID, aipId));
-		SimpleDescriptionObject sdo = index.findDescriptiveMetadata(filter, null, new Sublist(0, 10)).getResults().get(0);
+		SimpleDescriptionObject sdo = index.findDescriptiveMetadata(filter, null, new Sublist(0, 10)).getResults()
+				.get(0);
 		Calendar calInitial = Calendar.getInstance();
 		calInitial.setTime(sdo.getDateInitial());
-		assertEquals(""+calInitial.get(Calendar.YEAR),CorporaConstants.YEAR_1213);
+		assertEquals(calInitial.get(Calendar.YEAR), CorporaConstants.YEAR_1213);
 		Calendar calFinal = Calendar.getInstance();
 		calFinal.setTime(sdo.getDateFinal());
-		assertEquals(""+calFinal.get(Calendar.YEAR),CorporaConstants.YEAR_2003);
-		
+		assertEquals(calFinal.get(Calendar.YEAR), CorporaConstants.YEAR_2003);
+
 	}
 
 	@Test
@@ -417,50 +418,50 @@ public class IndexServiceTest {
 		assertEquals(entries2.getTotalCount(), 0);
 	}
 
-	
-	
 	@Test
-	public void testReindexLogEntry() throws StorageActionException, ModelServiceException, IndexActionException{
-		for(int i=0;i<100;i++){
+	public void testReindexLogEntry() throws StorageActionException, ModelServiceException, IndexActionException {
+		for (int i = 0; i < 100; i++) {
 			LogEntry entry = new LogEntry();
-			entry.setId("ID"+i);
-			entry.setDescription("DESCRIPTION:"+i);
-			entry.setAction("ACTION:"+i);
+			entry.setId("ID" + i);
+			entry.setDescription("DESCRIPTION:" + i);
+			entry.setAction("ACTION:" + i);
 			entry.setAddress("ADDRESS");
-			entry.setDatetime("DATETIME:"+i);
+			entry.setDatetime("DATETIME:" + i);
 			entry.setDuration(i);
-			entry.setRelatedObjectID("RELATED:"+i);
-			entry.setUsername("USER:"+i);
+			entry.setRelatedObjectID("RELATED:" + i);
+			entry.setUsername("USER:" + i);
 			LogEntryParameter[] parameters = new LogEntryParameter[2];
-			LogEntryParameter p1 = new LogEntryParameter("NAME1","VALUE1");
+			LogEntryParameter p1 = new LogEntryParameter("NAME1", "VALUE1");
 			LogEntryParameter p2 = new LogEntryParameter("NAME2", "VALUE2");
 			parameters[0] = p1;
 			parameters[1] = p2;
 			entry.setParameters(parameters);
-			model.addLogEntry(entry,false);
+			model.addLogEntry(entry, false);
 		}
 		model.reindexActionLogs();
 		Filter f1 = new Filter();
 		f1.add(new SimpleFilterParameter(CorporaConstants.LOG_ACTION, "ACTION:54"));
-		IndexResult<LogEntry> entries1 = index.findLogEntry(f1, null, new Sublist(0,10));
+		IndexResult<LogEntry> entries1 = index.findLogEntry(f1, null, new Sublist(0, 10));
 		assertEquals(entries1.getTotalCount(), 1L);
 		Filter f2 = new Filter();
 		f2.add(new SimpleFilterParameter(CorporaConstants.LOG_ADDRESS, "ADDRESS"));
-		IndexResult<LogEntry> entries2 = index.findLogEntry(f2, null, new Sublist(0,10));
-		assertEquals(entries2.getTotalCount(), 100L);	
+		IndexResult<LogEntry> entries2 = index.findLogEntry(f2, null, new Sublist(0, 10));
+		assertEquals(entries2.getTotalCount(), 100L);
 	}
-	
+
 	@Test
 	public void testReindexAIP()
 			throws ModelServiceException, StorageActionException, IndexActionException, ParseException {
-		for(int i=0;i<100;i++){
+		for (int i = 0; i < 100; i++) {
 			final String aipId = UUID.randomUUID().toString();
-			final AIP aip = model.createAIP(aipId, corporaService,DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),false);
+			final AIP aip = model.createAIP(aipId, corporaService,
+					DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
+					false);
 		}
-		
+
 		model.reindexAIPs();
 		long count = index.countAIP(new Filter());
 		assertEquals(count, 100L);
-		
+
 	}
 }

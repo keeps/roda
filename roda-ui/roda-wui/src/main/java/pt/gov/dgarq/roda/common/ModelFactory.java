@@ -6,6 +6,8 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
@@ -46,8 +48,11 @@ public class ModelFactory {
 			model = new ModelService(storage);
 
 			// Configure Solr
-			// FIXME this should be changed to RODA installation dir
-			Path solrHome = Paths.get(ModelFactory.class.getResource("/index/").toURI());
+			Path solrHome = Paths.get(RODA_HOME, "config", "index");
+			if (!Files.exists(solrHome)) {
+				solrHome = Paths.get(ModelFactory.class.getResource("/index/").toURI());
+			}
+
 			System.setProperty("solr.data.dir", indexPath.toString());
 			System.setProperty("solr.data.dir.aip", indexPath.resolve("aip").toString());
 			System.setProperty("solr.data.dir.sdo", indexPath.resolve("sdo").toString());
@@ -109,6 +114,21 @@ public class ModelFactory {
 
 	public static IndexService getIndexService() {
 		return index;
+	}
+
+	public static void main(String[] argsArray) throws StorageActionException {
+		List<String> args = Arrays.asList(argsArray);
+		if (Arrays.asList("reindex").equals(args)) {
+			try {
+				model.reindexAIPs();
+			} catch (ModelServiceException e) {
+				System.err.println("An error has occured while reindexing");
+				e.printStackTrace();
+			}
+		} else {
+			System.err.println("Syntax: [java -jar ...] reindex");
+		}
+		System.exit(0);
 	}
 
 }

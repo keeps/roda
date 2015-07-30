@@ -3,6 +3,8 @@ package org.roda.model;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -13,6 +15,7 @@ import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.roda.common.RodaUtils;
+import org.roda.index.IndexService;
 import org.roda.model.utils.ModelUtils;
 import org.roda.storage.Binary;
 import org.roda.storage.DefaultBinary;
@@ -24,6 +27,7 @@ import org.roda.storage.Resource;
 import org.roda.storage.StorageActionException;
 import org.roda.storage.StoragePath;
 import org.roda.storage.StorageService;
+import org.roda.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.util.DateParser;
@@ -1295,10 +1299,13 @@ public class ModelService extends ModelObservable {
 	}
 
 	public void reindexAIPs() throws ModelServiceException {
+		System.out.println("Listing AIPs");
 		Iterable<AIP> aips = listAIPs();
 		for (AIP aip : aips) {
+			System.out.println("Reindexing AIP " + aip.getId());
 			reindexAIP(aip);
 		}
+		System.out.println("Done");
 	}
 
 	private void reindexAIP(AIP aip) {
@@ -1330,4 +1337,5 @@ public class ModelService extends ModelObservable {
 	private void reindexActionLog(LogEntry entry) {
 		notifyLogEntryCreated(entry);
 	}
+
 }

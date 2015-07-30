@@ -102,7 +102,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<build.date>${maven.build.timestamp}</build.date>
 		<maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
-		<java_version>1.7</java_version>
+		<java_version>1.8</java_version>
 		<gwt_version>2.7.0</gwt_version>
 		<!-- THE PROPERTY THAT FOLLOWS IS NOT YET IN USE -->
 		<fedora_version>3.6.2</fedora_version>
