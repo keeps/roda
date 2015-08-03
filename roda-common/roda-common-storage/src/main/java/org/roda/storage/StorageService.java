@@ -76,7 +76,7 @@ public interface StorageService {
 	 * 
 	 * @throws StorageActionException
 	 */
-	public Iterable<Resource> listResourcesUnderContainer(
+	public ClosableIterable<Resource> listResourcesUnderContainer(
 			StoragePath storagePath) throws StorageActionException;
 
 	/**
@@ -114,7 +114,7 @@ public interface StorageService {
 	 * 
 	 * @throws StorageActionException
 	 */
-	public Iterable<Resource> listResourcesUnderDirectory(
+	public ClosableIterable<Resource> listResourcesUnderDirectory(
 			StoragePath storagePath) throws StorageActionException;
 
 	/**

@@ -16,6 +16,7 @@ import org.roda.common.RodaUtils;
 import org.roda.model.FileFormat;
 import org.roda.model.ModelServiceException;
 import org.roda.storage.Binary;
+import org.roda.storage.ClosableIterable;
 import org.roda.storage.DefaultStoragePath;
 import org.roda.storage.Resource;
 import org.roda.storage.StorageActionException;
@@ -171,38 +172,46 @@ public final class ModelUtils {
 	 */
 	public static List<String> getIds(StorageService storage, StoragePath path) throws StorageActionException {
 		List<String> ids = new ArrayList<String>();
-		Iterator<Resource> it = storage.listResourcesUnderDirectory(path).iterator();
+		ClosableIterable<Resource> iterable = storage.listResourcesUnderDirectory(path);
+		Iterator<Resource> it = iterable.iterator();
 		while (it.hasNext()) {
 			Resource next = it.next();
 			StoragePath storagePath = next.getStoragePath();
 			ids.add(storagePath.getName());
 		}
-
-		return ids;
-	}
-
-	/**
-	 * Returns a list of ids from the children of a certain resources
-	 * 
-	 * @param storage
-	 *            the storage service containing the parent resource
-	 * @param path
-	 *            the storage paths for the parent resources
-	 * @throws StorageActionException
-	 */
-	public static List<String> getIds(StorageService storage, List<StoragePath> paths) throws StorageActionException {
-		List<String> ids = new ArrayList<String>();
-		for (StoragePath path : paths) {
-			Iterator<Resource> it = storage.listResourcesUnderDirectory(path).iterator();
-			while (it.hasNext()) {
-				Resource next = it.next();
-				StoragePath storagePath = next.getStoragePath();
-				ids.add(storagePath.getName());
-			}
+		try {
+			iterable.close();
+		} catch (IOException e) {
+			// at the very best, log this information
 		}
-		return ids;
 
+		return ids;
 	}
+
+	// /**
+	// * Returns a list of ids from the children of a certain resources
+	// *
+	// * @param storage
+	// * the storage service containing the parent resource
+	// * @param path
+	// * the storage paths for the parent resources
+	// * @throws StorageActionException
+	// */
+	// public static List<String> getIds(StorageService storage,
+	// List<StoragePath> paths) throws StorageActionException {
+	// List<String> ids = new ArrayList<String>();
+	// for (StoragePath path : paths) {
+	// Iterator<Resource> it =
+	// storage.listResourcesUnderDirectory(path).iterator();
+	// while (it.hasNext()) {
+	// Resource next = it.next();
+	// StoragePath storagePath = next.getStoragePath();
+	// ids.add(storagePath.getName());
+	// }
+	// }
+	// return ids;
+	//
+	// }
 
 	/**
 	 * Returns a list of ids from the children of a certain resources, starting
@@ -228,26 +237,28 @@ public final class ModelUtils {
 
 	}
 
-	/**
-	 * Returns a list of storagepath from the children of a certain resource
-	 * 
-	 * @param storage
-	 *            the storage service containing the parent resource
-	 * @param path
-	 *            the storage path for the parent resource
-	 */
-	public static List<StoragePath> getStoragePaths(StorageService storage, StoragePath path)
-			throws StorageActionException {
-		List<StoragePath> paths = new ArrayList<StoragePath>();
-		Iterator<Resource> it = storage.listResourcesUnderDirectory(path).iterator();
-		while (it.hasNext()) {
-			Resource next = it.next();
-			StoragePath storagePath = next.getStoragePath();
-			paths.add(storagePath);
-		}
-
-		return paths;
-	}
+	// /**
+	// * Returns a list of storagepath from the children of a certain resource
+	// *
+	// * @param storage
+	// * the storage service containing the parent resource
+	// * @param path
+	// * the storage path for the parent resource
+	// */
+	// public static List<StoragePath> getStoragePaths(StorageService storage,
+	// StoragePath path)
+	// throws StorageActionException {
+	// List<StoragePath> paths = new ArrayList<StoragePath>();
+	// Iterator<Resource> it =
+	// storage.listResourcesUnderDirectory(path).iterator();
+	// while (it.hasNext()) {
+	// Resource next = it.next();
+	// StoragePath storagePath = next.getStoragePath();
+	// paths.add(storagePath);
+	// }
+	//
+	// return paths;
+	// }
 
 	public static StoragePath getAIPcontainerPath() throws StorageActionException {
 		return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP);

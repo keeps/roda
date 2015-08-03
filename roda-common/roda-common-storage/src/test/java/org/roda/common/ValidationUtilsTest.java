@@ -88,7 +88,7 @@ public class ValidationUtilsTest {
 				DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 		final DescriptiveMetadata descMetadata = model.retrieveDescriptiveMetadata(aipId,
 				CorporaConstants.DESCRIPTIVE_METADATA_ID);
-		assertEquals(ValidationUtils.validateDescriptiveMetadata(model, descMetadata), true);
+		assertEquals(ValidationUtils.isDescriptiveMetadataValid(model, descMetadata), true);
 	}
 
 	@Test
@@ -100,7 +100,7 @@ public class ValidationUtilsTest {
 				DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_BUGGY_ID));
 		final DescriptiveMetadata descMetadata = model.retrieveDescriptiveMetadata(aipId,
 				CorporaConstants.DESCRIPTIVE_METADATA_ID);
-		assertEquals(ValidationUtils.validateDescriptiveMetadata(model, descMetadata), false);
+		assertEquals(ValidationUtils.isDescriptiveMetadataValid(model, descMetadata), false);
 	}
 
 	@Test
@@ -108,7 +108,7 @@ public class ValidationUtilsTest {
 		final String aipId = UUID.randomUUID().toString();
 		final AIP aip = model.createAIP(aipId, corporaService,
 				DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
-		assertEquals(ValidationUtils.validateAIPDescriptiveMetadata(model, aip), true);
+		assertEquals(ValidationUtils.isAIPDescriptiveMetadataValid(model, aip.getId()), true);
 	}
 
 	@Test
@@ -117,6 +117,6 @@ public class ValidationUtilsTest {
 		final String aipId = UUID.randomUUID().toString();
 		final AIP aip = model.createAIP(aipId, corporaService,
 				DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_BUGGY_ID));
-		assertEquals(ValidationUtils.validateAIPDescriptiveMetadata(model, aip), false);
+		assertEquals(ValidationUtils.isAIPDescriptiveMetadataValid(model, aip.getId()), false);
 	}
 }

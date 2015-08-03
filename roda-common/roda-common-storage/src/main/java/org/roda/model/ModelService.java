@@ -3,8 +3,6 @@ package org.roda.model;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -15,9 +13,10 @@ import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.roda.common.RodaUtils;
-import org.roda.index.IndexService;
+import org.roda.common.ValidationUtils;
 import org.roda.model.utils.ModelUtils;
 import org.roda.storage.Binary;
+import org.roda.storage.ClosableIterable;
 import org.roda.storage.DefaultBinary;
 import org.roda.storage.DefaultDirectory;
 import org.roda.storage.DefaultStoragePath;
@@ -27,7 +26,6 @@ import org.roda.storage.Resource;
 import org.roda.storage.StorageActionException;
 import org.roda.storage.StoragePath;
 import org.roda.storage.StorageService;
-import org.roda.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.util.DateParser;
@@ -90,14 +88,14 @@ public class ModelService extends ModelObservable {
 		return storage;
 	}
 
-	public Iterable<AIP> listAIPs() throws ModelServiceException {
-		Iterable<AIP> it;
+	public ClosableIterable<AIP> listAIPs() throws ModelServiceException {
+		ClosableIterable<AIP> it;
 
 		try {
-			final Iterator<Resource> iterator = storage.listResourcesUnderContainer(ModelUtils.getAIPcontainerPath())
-					.iterator();
+			final ClosableIterable<Resource> iterable = storage.listResourcesUnderContainer(ModelUtils.getAIPcontainerPath());
+			Iterator<Resource> iterator = iterable.iterator();
 
-			it = new Iterable<AIP>() {
+			it = new ClosableIterable<AIP>() {
 
 				@Override
 				public Iterator<AIP> iterator() {
@@ -118,6 +116,7 @@ public class ModelService extends ModelObservable {
 							} catch (ModelServiceException e) {
 								// FIXME is this the best way to deal with the
 								// ModelServiceException???
+								logger.error("Error while listing AIPs", e);
 								throw new RuntimeException(e.getMessage());
 							}
 						}
@@ -128,10 +127,15 @@ public class ModelService extends ModelObservable {
 						}
 					};
 				}
+
+				@Override
+				public void close() throws IOException {
+					iterable.close();
+				}
 			};
 		} catch (StorageActionException e) {
-			throw new ModelServiceException("Error while obtaining AIP list from storage, reason: " + e.getMessage(),
-					e.getCode());
+
+			throw new ModelServiceException("Error while obtaining AIP list from storage", e.getCode(), e);
 		}
 
 		return it;
@@ -817,8 +821,19 @@ public class ModelService extends ModelObservable {
 	}
 
 	private boolean isAIPvalid(Directory directory) {
-		// FIXME implement this
-		return true;
+		boolean valid = true;
+
+		try {
+			// validate metadata (against schemas)
+			valid = ValidationUtils.isAIPDescriptiveMetadataValid(this, directory.getStoragePath().getName());
+
+			// FIXME validate others aspects
+
+		} catch (ModelServiceException e) {
+			valid = false;
+		}
+
+		return valid;
 	}
 
 	private boolean isRepresentationValid(Directory directory) {
@@ -866,13 +881,12 @@ public class ModelService extends ModelObservable {
 						descriptiveMetadataBinaryIds, representationIds, preservationRepresentationObjects,
 						preservationEvents, preservationFileObjects);
 			} catch (StorageActionException e) {
-				throw new ModelServiceException(
-						"Error while obtaining information to instantiate an AIP, reason: " + e.getMessage(),
-						e.getCode());
+				throw new ModelServiceException("Error while obtaining information to instantiate an AIP", e.getCode(),
+						e);
 			}
 		} else {
 			throw new ModelServiceException(
-					"Error while trying to convert something that it isn't a Directory into an AIP",
+					"Error while trying to convert something that it isn't a Directory into an AIP (" + resource + ")",
 					ModelServiceException.INTERNAL_SERVER_ERROR);
 		}
 		return aip;

@@ -3,7 +3,6 @@ package org.roda.common;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.xml.XMLConstants;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
@@ -11,7 +10,6 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
 import org.roda.index.utils.SolrUtils;
-import org.roda.model.AIP;
 import org.roda.model.DescriptiveMetadata;
 import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
@@ -24,11 +22,14 @@ public class ValidationUtils {
 
 	private static final String W3C_XML_SCHEMA_NS_URI = "http://www.w3.org/2001/XMLSchema";
 
-	public static boolean validateAIPDescriptiveMetadata(ModelService model, AIP aip) throws ModelServiceException {
+	/**
+	 * Validates all descriptive metadata files contained in the AIP
+	 */
+	public static boolean isAIPDescriptiveMetadataValid(ModelService model, String aipId) throws ModelServiceException {
 		boolean valid = true;
-		Iterable<DescriptiveMetadata> descriptiveMetadataBinaries = model.listDescriptiveMetadataBinaries(aip.getId());
+		Iterable<DescriptiveMetadata> descriptiveMetadataBinaries = model.listDescriptiveMetadataBinaries(aipId);
 		for (DescriptiveMetadata descriptiveMetadata : descriptiveMetadataBinaries) {
-			if (!validateDescriptiveMetadata(model, descriptiveMetadata)) {
+			if (!isDescriptiveMetadataValid(model, descriptiveMetadata)) {
 				valid = false;
 				break;
 			}
@@ -36,7 +37,11 @@ public class ValidationUtils {
 		return valid;
 	}
 
-	public static boolean validateDescriptiveMetadata(ModelService model, DescriptiveMetadata metadata)
+	/**
+	 * Validates descriptive medatada (e.g. against its schema, but other
+	 * strategies may be used)
+	 */
+	public static boolean isDescriptiveMetadataValid(ModelService model, DescriptiveMetadata metadata)
 			throws ModelServiceException {
 		boolean valid = false;
 		try {
@@ -68,6 +73,5 @@ public class ValidationUtils {
 					ModelServiceException.INTERNAL_SERVER_ERROR, e);
 		}
 		return valid;
-
 	}
 }

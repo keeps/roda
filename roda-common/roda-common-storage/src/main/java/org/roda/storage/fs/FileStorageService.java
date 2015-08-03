@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.roda.storage.Binary;
+import org.roda.storage.ClosableIterable;
 import org.roda.storage.Container;
 import org.roda.storage.ContentPayload;
 import org.roda.storage.DefaultBinary;
@@ -117,7 +118,7 @@ public class FileStorageService implements StorageService {
 	}
 
 	@Override
-	public Iterable<Resource> listResourcesUnderContainer(
+	public ClosableIterable<Resource> listResourcesUnderContainer(
 			StoragePath storagePath) throws StorageActionException {
 		Path path = FSUtils.getEntityPath(basePath, storagePath);
 		return FSUtils.listPath(basePath, path);
@@ -170,7 +171,7 @@ public class FileStorageService implements StorageService {
 	}
 
 	@Override
-	public Iterable<Resource> listResourcesUnderDirectory(
+	public ClosableIterable<Resource> listResourcesUnderDirectory(
 			StoragePath storagePath) throws StorageActionException {
 		Path directoryPath = FSUtils.getEntityPath(basePath, storagePath);
 		return FSUtils.listPath(basePath, directoryPath);

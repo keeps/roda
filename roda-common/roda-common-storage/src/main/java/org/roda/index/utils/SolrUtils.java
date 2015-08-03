@@ -2,6 +2,8 @@ package org.roda.index.utils;
 
 import java.io.CharArrayReader;
 import java.io.CharArrayWriter;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -184,7 +186,7 @@ public class SolrUtils {
 		}
 		return doc;
 	}
-
+	
 	public static String parseFilter(Filter filter) throws IndexActionException {
 		StringBuilder ret = new StringBuilder();
 

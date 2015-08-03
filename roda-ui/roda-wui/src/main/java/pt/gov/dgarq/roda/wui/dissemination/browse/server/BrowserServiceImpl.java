@@ -68,9 +68,6 @@ import pt.gov.dgarq.roda.wui.dissemination.browse.client.TimelineInfo.Phase;
  */
 public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserService {
 
-	/**
-	 *
-	 */
 	private static final long serialVersionUID = 1L;
 	static final String FONDLIST_PAGESIZE = "10";
 	static final private Logger logger = Logger.getLogger(BrowserServiceImpl.class);
@@ -139,7 +136,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 		IndexResult<SimpleDescriptionObject> sdos;
 		try {
 			sdos = index.findDescriptiveMetadata(filter, sorter, sublist);
-			logger.info(String.format("findCollections(%1$s,%2$s,%3$s)=%4$s", filter, sorter, sublist, sdos));
+			logger.debug(String.format("findDescriptiveMetadata(%1$s,%2$s,%3$s)=%4$s", filter, sorter, sublist, sdos));
 		} catch (IndexActionException e) {
 			logger.error("Error getting collections", e);
 			throw new GenericException("Error getting collections " + e.getMessage());

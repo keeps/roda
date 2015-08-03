@@ -1,5 +1,6 @@
 package pt.gov.dgarq.roda.common;
 
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,13 +18,14 @@ import org.roda.storage.StorageService;
 import org.roda.storage.fs.FileStorageService;
 
 public class ModelFactory {
-	private static final Logger logger = Logger.getLogger(ModelFactory.class);
+	private static final Logger LOGGER = Logger.getLogger(ModelFactory.class);
 
 	private static Path storagePath;
 	private static Path indexPath;
 	private static StorageService storage;
 	private static ModelService model;
 	private static IndexService index;
+	private static EmbeddedSolrServer solr;
 
 	static {
 		try {
@@ -57,14 +59,14 @@ public class ModelFactory {
 			// FIXME added missing cores
 
 			// start embedded solr
-			final EmbeddedSolrServer solr = new EmbeddedSolrServer(solrHome, "test");
+			solr = new EmbeddedSolrServer(solrHome, "test");
 
 			index = new IndexService(solr, model);
 
 		} catch (StorageActionException e) {
-			logger.error(e);
+			LOGGER.error(e);
 		} catch (URISyntaxException e) {
-			logger.error(e);
+			LOGGER.error(e);
 		}
 	}
 
@@ -78,6 +80,14 @@ public class ModelFactory {
 
 	public static IndexService getIndexService() {
 		return index;
+	}
+
+	public static void closeSolrServer() {
+		try {
+			solr.close();
+		} catch (IOException e) {
+			LOGGER.error(e);
+		}
 	}
 
 	public static void main(String[] argsArray) throws StorageActionException {

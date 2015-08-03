@@ -234,7 +234,7 @@ public class IndexServiceTest {
 			throws ModelServiceException, StorageActionException, IndexActionException, ParseException {
 		final String aipId = UUID.randomUUID().toString();
 
-		final AIP aip = model.createAIP(aipId, corporaService,
+		model.createAIP(aipId, corporaService,
 				DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID_3));
 
 		Filter filter = new Filter();
@@ -454,7 +454,7 @@ public class IndexServiceTest {
 			throws ModelServiceException, StorageActionException, IndexActionException, ParseException {
 		for (int i = 0; i < 100; i++) {
 			final String aipId = UUID.randomUUID().toString();
-			final AIP aip = model.createAIP(aipId, corporaService,
+			model.createAIP(aipId, corporaService,
 					DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
 					false);
 		}

@@ -17,6 +17,7 @@ import org.fcrepo.client.ForbiddenException;
 import org.fcrepo.client.NotFoundException;
 import org.fcrepo.client.impl.FedoraRepositoryImpl;
 import org.roda.storage.Binary;
+import org.roda.storage.ClosableIterable;
 import org.roda.storage.Container;
 import org.roda.storage.ContentPayload;
 import org.roda.storage.DefaultContainer;
@@ -182,9 +183,11 @@ public class FedoraStorageService implements StorageService {
 	}
 
 	@Override
-	public Iterable<Resource> listResourcesUnderContainer(
+	public ClosableIterable<Resource> listResourcesUnderContainer(
 			StoragePath storagePath) throws StorageActionException {
-		return new IterableResource(fedoraRepository, storagePath);
+		// return new IterableResource(fedoraRepository, storagePath);
+		// FIXME
+		return null;
 	}
 
 	@Override
@@ -241,9 +244,11 @@ public class FedoraStorageService implements StorageService {
 	}
 
 	@Override
-	public Iterable<Resource> listResourcesUnderDirectory(
+	public ClosableIterable<Resource> listResourcesUnderDirectory(
 			StoragePath storagePath) throws StorageActionException {
-		return new IterableResource(fedoraRepository, storagePath);
+		// return new IterableResource(fedoraRepository, storagePath);
+		// FIXME
+		return null;
 	}
 
 	@Override
