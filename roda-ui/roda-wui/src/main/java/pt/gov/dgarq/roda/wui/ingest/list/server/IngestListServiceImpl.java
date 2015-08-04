@@ -1,7 +1,6 @@
 package pt.gov.dgarq.roda.wui.ingest.list.server;
 
 import java.rmi.RemoteException;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -27,7 +26,6 @@ import config.i18n.server.IngestListReportMessages;
 import pt.gov.dgarq.roda.common.RodaClientFactory;
 import pt.gov.dgarq.roda.core.RODAClient;
 import pt.gov.dgarq.roda.core.common.RODAException;
-import pt.gov.dgarq.roda.core.common.RODAServiceException;
 import pt.gov.dgarq.roda.core.common.UserManagementException;
 import pt.gov.dgarq.roda.core.data.SIPState;
 import pt.gov.dgarq.roda.core.data.SIPStateTransition;
@@ -38,9 +36,6 @@ import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
-import pt.gov.dgarq.roda.core.ingest.IngestRegistryException;
-import pt.gov.dgarq.roda.core.services.AcceptSIP;
-import pt.gov.dgarq.roda.core.services.IngestMonitor;
 import pt.gov.dgarq.roda.wui.common.client.GenericException;
 import pt.gov.dgarq.roda.wui.common.client.PrintReportException;
 import pt.gov.dgarq.roda.wui.common.client.tools.PIDTranslator;
@@ -65,20 +60,20 @@ public class IngestListServiceImpl extends RemoteServiceServlet implements Inges
 
 	private static final Logger logger = Logger.getLogger(IngestListServiceImpl.class);
 
-	private IngestMonitor ingestMonitor;
-	private AcceptSIP acceptSIP;
+	// private IngestMonitor ingestMonitor;
+	// private AcceptSIP acceptSIP;
 
 	public IngestListServiceImpl() {
 		super();
 
-		try {
-			this.ingestMonitor = new IngestMonitor();
-			this.acceptSIP = new AcceptSIP();
-		} catch (IngestRegistryException e) {
-			logger.error("Error initializing ingest manager", e);
-		} catch (RODAServiceException e) {
-			logger.error("Error initializing ingest manager", e);
-		}
+		// try {
+		// this.ingestMonitor = new IngestMonitor();
+		// this.acceptSIP = new AcceptSIP();
+		// } catch (IngestRegistryException e) {
+		// logger.error("Error initializing ingest manager", e);
+		// } catch (RODAServiceException e) {
+		// logger.error("Error initializing ingest manager", e);
+		// }
 	}
 
 	public SIPState getSipState(String sipId) throws RODAException {
@@ -87,7 +82,9 @@ public class IngestListServiceImpl extends RemoteServiceServlet implements Inges
 		filter.add(new SimpleFilterParameter("id", sipId));
 		Sublist sublist = new Sublist(0, 1);
 		SIPState[] states;
-		states = ingestMonitor.getSIPs(new ContentAdapter(filter, null, sublist));
+		// states = ingestMonitor.getSIPs(new ContentAdapter(filter, null,
+		// sublist));
+		states = null;
 		if (states != null && states.length > 0) {
 			ret = states[0];
 		}
@@ -101,13 +98,15 @@ public class IngestListServiceImpl extends RemoteServiceServlet implements Inges
 
 	private int getSIPCount(HttpSession session, Filter filter) throws RODAException {
 		int count;
-		count = ingestMonitor.getSIPsCount(filter);
+		// count = ingestMonitor.getSIPsCount(filter);
+		count = 0;
 		return count;
 	}
 
 	private SIPState[] getSIPs(ContentAdapter adapter) throws RODAException {
 		SIPState[] list;
-		list = ingestMonitor.getSIPs(adapter);
+		// list = ingestMonitor.getSIPs(adapter);
+		list = null;
 		if (list == null) {
 			list = new SIPState[] {};
 		}
@@ -118,9 +117,9 @@ public class IngestListServiceImpl extends RemoteServiceServlet implements Inges
 	public IndexResult<SIPState> getSIPs(Filter filter, Sorter sorter, Sublist sublist) throws RODAException {
 		ContentAdapter adapter = new ContentAdapter(filter, sorter, sublist);
 
-		SIPState[] list = ingestMonitor.getSIPs(adapter);
+		// SIPState[] list = ingestMonitor.getSIPs(adapter);
 		IndexResult<SIPState> ret = new IndexResult<SIPState>();
-		ret.setResults(Arrays.asList(list));
+		// ret.setResults(Arrays.asList(list));
 		ret.setOffset(sublist.getFirstElementIndex());
 		ret.setLimit(sublist.getMaximumElementCount());
 		ret.setTotalCount(getSIPCount(filter));
@@ -131,13 +130,13 @@ public class IngestListServiceImpl extends RemoteServiceServlet implements Inges
 	}
 
 	public void acceptSIP(String sipId, String message) throws RODAException {
-		acceptSIP.acceptSIP(sipId, true, message);
+		// acceptSIP.acceptSIP(sipId, true, message);
 	}
 
 	public void rejectSIP(String sipId, String message, boolean notifyProducer) throws RODAException {
-		SIPState sip = acceptSIP.acceptSIP(sipId, false, message);
+		// SIPState sip = acceptSIP.acceptSIP(sipId, false, message);
 		if (notifyProducer) {
-			sendNotifyProducerEmail(sip, message);
+			// sendNotifyProducerEmail(sip, message);
 		}
 	}
 
