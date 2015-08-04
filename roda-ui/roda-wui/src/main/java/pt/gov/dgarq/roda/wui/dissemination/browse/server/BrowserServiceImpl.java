@@ -1,5 +1,6 @@
 package pt.gov.dgarq.roda.wui.dissemination.browse.server;
 
+import java.io.IOException;
 import java.rmi.NoSuchObjectException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ import org.roda.model.DescriptiveMetadata;
 import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
 import org.roda.storage.Binary;
+import org.roda.storage.ClosableIterable;
 import org.roda.storage.StorageActionException;
 import org.roda.storage.StorageService;
 import org.w3c.util.DateParser;
@@ -102,7 +104,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 			getDescriptiveMetadata(aipId, locale, descriptiveMetadataList);
 			itemBundle.setDescriptiveMetadata(descriptiveMetadataList);
 
-			// set representations 
+			// set representations
 			// FIXME perhaps this information should be indexed as well
 			List<Representation> representationList = new ArrayList<Representation>();
 			Iterable<Representation> representations = model.listRepresentations(aipId);
@@ -118,16 +120,24 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 		return itemBundle;
 	}
 
-	private void getDescriptiveMetadata(String aipId, final Locale locale, List<DescriptiveMetadataBundle> descriptiveMetadataList)
-			throws ModelServiceException, StorageActionException {
-		Iterable<DescriptiveMetadata> listDescriptiveMetadataBinaries = model
-				.listDescriptiveMetadataBinaries(aipId);
-		for (DescriptiveMetadata descriptiveMetadata : listDescriptiveMetadataBinaries) {
-			Binary binary = storage.getBinary(descriptiveMetadata.getStoragePath());
-			String html = HTMLUtils.descriptiveMetadataToHtml(binary, model, locale);
+	private void getDescriptiveMetadata(String aipId, final Locale locale,
+			List<DescriptiveMetadataBundle> descriptiveMetadataList)
+					throws ModelServiceException, StorageActionException {
+		ClosableIterable<DescriptiveMetadata> listDescriptiveMetadataBinaries = model.listDescriptiveMetadataBinaries(aipId);
+		try {
+			for (DescriptiveMetadata descriptiveMetadata : listDescriptiveMetadataBinaries) {
+				Binary binary = storage.getBinary(descriptiveMetadata.getStoragePath());
+				String html = HTMLUtils.descriptiveMetadataToHtml(binary, model, locale);
 
-			descriptiveMetadataList
-					.add(new DescriptiveMetadataBundle(descriptiveMetadata.getId(), html, binary.getSizeInBytes()));
+				descriptiveMetadataList
+						.add(new DescriptiveMetadataBundle(descriptiveMetadata.getId(), html, binary.getSizeInBytes()));
+			}
+		} finally {
+			try {
+				listDescriptiveMetadataBinaries.close();
+			} catch (IOException e) {
+				logger.error("Error while while freeing up resources", e);
+			}
 		}
 	}
 

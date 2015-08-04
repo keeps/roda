@@ -29,7 +29,7 @@ public interface StorageService {
 	 * 
 	 * @return
 	 */
-	public Iterable<Container> listContainers() throws StorageActionException;
+	public ClosableIterable<Container> listContainers() throws StorageActionException;
 
 	/**
 	 * Creates a new container with the specified name.

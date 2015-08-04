@@ -104,7 +104,7 @@ public class FedoraStorageService implements StorageService {
 	}
 
 	@Override
-	public Iterable<Container> listContainers() throws StorageActionException {
+	public ClosableIterable<Container> listContainers() throws StorageActionException {
 		return new IterableContainer(fedoraRepository);
 	}
 
@@ -185,9 +185,7 @@ public class FedoraStorageService implements StorageService {
 	@Override
 	public ClosableIterable<Resource> listResourcesUnderContainer(
 			StoragePath storagePath) throws StorageActionException {
-		// return new IterableResource(fedoraRepository, storagePath);
-		// FIXME
-		return null;
+		return new IterableResource(fedoraRepository, storagePath);
 	}
 
 	@Override
@@ -246,9 +244,7 @@ public class FedoraStorageService implements StorageService {
 	@Override
 	public ClosableIterable<Resource> listResourcesUnderDirectory(
 			StoragePath storagePath) throws StorageActionException {
-		// return new IterableResource(fedoraRepository, storagePath);
-		// FIXME
-		return null;
+		return new IterableResource(fedoraRepository, storagePath);
 	}
 
 	@Override

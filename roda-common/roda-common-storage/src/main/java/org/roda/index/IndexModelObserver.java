@@ -119,10 +119,10 @@ public class IndexModelObserver implements ModelObserver {
 			SolrInputDocument aipDoc = SolrUtils.aipToSolrInputDocument(aip);
 			SolrInputDocument sdoDoc = SolrUtils.aipToSolrInputDocumentAsSDO(aip, model);
 			index.add(RodaConstants.INDEX_AIP, aipDoc);
-			index.commit(RodaConstants.INDEX_AIP);
+			// index.commit(RodaConstants.INDEX_AIP);
 			logger.debug("Adding SDO: " + sdoDoc);
 			index.add(RodaConstants.INDEX_SDO, sdoDoc);
-			index.commit(RodaConstants.INDEX_SDO);
+			// index.commit(RodaConstants.INDEX_SDO);
 		} catch (SolrServerException | IOException | ModelServiceException | StorageActionException
 				| IndexActionException e) {
 			logger.error("Could not index created AIP", e);

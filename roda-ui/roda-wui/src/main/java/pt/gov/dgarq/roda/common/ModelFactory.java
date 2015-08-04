@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
+import org.roda.index.IndexActionException;
 import org.roda.index.IndexService;
 import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
@@ -90,12 +91,12 @@ public class ModelFactory {
 		}
 	}
 
-	public static void main(String[] argsArray) throws StorageActionException {
+	public static void main(String[] argsArray) {
 		List<String> args = Arrays.asList(argsArray);
 		if (Arrays.asList("reindex").equals(args)) {
 			try {
-				model.reindexAIPs();
-			} catch (ModelServiceException e) {
+				index.reindexAIPs();
+			} catch (IndexActionException e) {
 				System.err.println("An error has occured while reindexing");
 				e.printStackTrace();
 			}

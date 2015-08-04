@@ -420,7 +420,7 @@ public class IndexServiceTest {
 
 	@Test
 	public void testReindexLogEntry() throws StorageActionException, ModelServiceException, IndexActionException {
-		for (int i = 0; i < 100; i++) {
+		for (int i = 0; i < 10; i++) {
 			LogEntry entry = new LogEntry();
 			entry.setId("ID" + i);
 			entry.setDescription("DESCRIPTION:" + i);
@@ -438,7 +438,7 @@ public class IndexServiceTest {
 			entry.setParameters(parameters);
 			model.addLogEntry(entry, false);
 		}
-		model.reindexActionLogs();
+		index.reindexActionLogs();
 		Filter f1 = new Filter();
 		f1.add(new SimpleFilterParameter(CorporaConstants.LOG_ACTION, "ACTION:54"));
 		IndexResult<LogEntry> entries1 = index.findLogEntry(f1, null, new Sublist(0, 10));
@@ -452,14 +452,14 @@ public class IndexServiceTest {
 	@Test
 	public void testReindexAIP()
 			throws ModelServiceException, StorageActionException, IndexActionException, ParseException {
-		for (int i = 0; i < 100; i++) {
+		for (int i = 0; i < 10; i++) {
 			final String aipId = UUID.randomUUID().toString();
 			model.createAIP(aipId, corporaService,
 					DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
 					false);
 		}
 
-		model.reindexAIPs();
+		index.reindexAIPs();
 		long count = index.countAIP(new Filter());
 		assertEquals(count, 100L);
 

@@ -2,8 +2,6 @@ package org.roda.index.utils;
 
 import java.io.CharArrayReader;
 import java.io.CharArrayWriter;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -186,7 +184,7 @@ public class SolrUtils {
 		}
 		return doc;
 	}
-	
+
 	public static String parseFilter(Filter filter) throws IndexActionException {
 		StringBuilder ret = new StringBuilder();
 
@@ -273,16 +271,28 @@ public class SolrUtils {
 		} else if (value.matches("^\".+$")) {
 			appendExactMatch(ret, key, value, false);
 		} else {
-			String[] split = value.split("\\s+");
+			String[] split = value.trim().split("\\s+");
 			ret.append("(");
 			for (int i = 0; i < split.length; i++) {
 				if (i != 0 && operator != null) {
 					ret.append(" " + operator + " ");
 				}
-				ret.append(key).append(": ").append(split[i]);
+				ret.append(key).append(": ").append(escapeSolrSpecialChars(split[i]));
 			}
 			ret.append(")");
 		}
+	}
+
+	/**
+	 * Method that knows how to escape characters for Solr
+	 * <p><code>+ - && || ! ( ) { } [ ] ^ " ~ * ? : \</code></p>
+	 * <p>Note: chars <code>'-', '"' and '*'</code> are not being escaped on purpose</p>
+	 * 
+	 * @return a string with special characters escaped
+	 */
+	// FIXME perhaps && and || are not being properly escaped: see how to do it
+	public static String escapeSolrSpecialChars(String string) {
+		return string.replaceAll("([+&|!(){}\\[\\]\\^\\\\~?:])", "\\\\$1");
 	}
 
 	private static List<String> objectToListString(Object object) {

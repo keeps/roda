@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
@@ -89,13 +90,14 @@ public class ModelService extends ModelObservable {
 	}
 
 	public ClosableIterable<AIP> listAIPs() throws ModelServiceException {
-		ClosableIterable<AIP> it;
+		ClosableIterable<AIP> aipsIterable;
 
 		try {
-			final ClosableIterable<Resource> iterable = storage.listResourcesUnderContainer(ModelUtils.getAIPcontainerPath());
-			Iterator<Resource> iterator = iterable.iterator();
+			final ClosableIterable<Resource> resourcesIterable = storage
+					.listResourcesUnderContainer(ModelUtils.getAIPcontainerPath());
+			Iterator<Resource> resourcesIterator = resourcesIterable.iterator();
 
-			it = new ClosableIterable<AIP>() {
+			aipsIterable = new ClosableIterable<AIP>() {
 
 				@Override
 				public Iterator<AIP> iterator() {
@@ -103,21 +105,20 @@ public class ModelService extends ModelObservable {
 
 						@Override
 						public boolean hasNext() {
-							if (iterator == null) {
+							if (resourcesIterator == null) {
 								return false;
 							}
-							return iterator.hasNext();
+							return resourcesIterator.hasNext();
 						}
 
 						@Override
 						public AIP next() {
 							try {
-								return convertResourceToAIP(iterator.next());
-							} catch (ModelServiceException e) {
-								// FIXME is this the best way to deal with the
-								// ModelServiceException???
+								Resource next = resourcesIterator.next();
+								return convertResourceToAIP(next);
+							} catch (ModelServiceException | NoSuchElementException e) {
 								logger.error("Error while listing AIPs", e);
-								throw new RuntimeException(e.getMessage());
+								return null;
 							}
 						}
 
@@ -130,7 +131,7 @@ public class ModelService extends ModelObservable {
 
 				@Override
 				public void close() throws IOException {
-					iterable.close();
+					resourcesIterable.close();
 				}
 			};
 		} catch (StorageActionException e) {
@@ -138,7 +139,7 @@ public class ModelService extends ModelObservable {
 			throw new ModelServiceException("Error while obtaining AIP list from storage", e.getCode(), e);
 		}
 
-		return it;
+		return aipsIterable;
 	}
 
 	public AIP retrieveAIP(String aipId) throws ModelServiceException {
@@ -249,15 +250,16 @@ public class ModelService extends ModelObservable {
 		}
 	}
 
-	public Iterable<DescriptiveMetadata> listDescriptiveMetadataBinaries(String aipId) throws ModelServiceException {
-
-		Iterable<DescriptiveMetadata> it;
+	public ClosableIterable<DescriptiveMetadata> listDescriptiveMetadataBinaries(String aipId)
+			throws ModelServiceException {
+		ClosableIterable<DescriptiveMetadata> it;
 
 		try {
-			final Iterator<Resource> iterator = storage
-					.listResourcesUnderDirectory(ModelUtils.getDescriptiveMetadataPath(aipId)).iterator();
+			final ClosableIterable<Resource> resourcesIterable = storage
+					.listResourcesUnderDirectory(ModelUtils.getDescriptiveMetadataPath(aipId));
+			final Iterator<Resource> resourcesIterator = resourcesIterable.iterator();
 
-			it = new Iterable<DescriptiveMetadata>() {
+			it = new ClosableIterable<DescriptiveMetadata>() {
 
 				@Override
 				public Iterator<DescriptiveMetadata> iterator() {
@@ -265,20 +267,19 @@ public class ModelService extends ModelObservable {
 
 						@Override
 						public boolean hasNext() {
-							if (iterator == null) {
+							if (resourcesIterator == null) {
 								return false;
 							}
-							return iterator.hasNext();
+							return resourcesIterator.hasNext();
 						}
 
 						@Override
 						public DescriptiveMetadata next() {
 							try {
-								return convertResourceToDescriptiveMetadata(iterator.next());
-							} catch (ModelServiceException e) {
-								// FIXME is this the best way to deal with the
-								// ModelServiceException???
-								throw new RuntimeException(e.getMessage());
+								return convertResourceToDescriptiveMetadata(resourcesIterator.next());
+							} catch (ModelServiceException | NoSuchElementException e) {
+								logger.error("Error while listing descriptive metadata binaries", e);
+								return null;
 							}
 
 						}
@@ -288,6 +289,11 @@ public class ModelService extends ModelObservable {
 							throw new UnsupportedOperationException();
 						}
 					};
+				}
+
+				@Override
+				public void close() throws IOException {
+					resourcesIterable.close();
 				}
 			};
 
@@ -383,14 +389,15 @@ public class ModelService extends ModelObservable {
 
 	}
 
-	public Iterable<Representation> listRepresentations(String aipId) throws ModelServiceException {
-		Iterable<Representation> it = null;
+	public ClosableIterable<Representation> listRepresentations(String aipId) throws ModelServiceException {
+		ClosableIterable<Representation> it = null;
 
 		try {
-			final Iterator<Resource> iterator = storage
-					.listResourcesUnderDirectory(ModelUtils.getRepresentationsPath(aipId)).iterator();
+			ClosableIterable<Resource> resourcesIterable = storage
+					.listResourcesUnderDirectory(ModelUtils.getRepresentationsPath(aipId));
+			final Iterator<Resource> resourcesIterator = resourcesIterable.iterator();
 
-			it = new Iterable<Representation>() {
+			it = new ClosableIterable<Representation>() {
 
 				@Override
 				public Iterator<Representation> iterator() {
@@ -398,20 +405,19 @@ public class ModelService extends ModelObservable {
 
 						@Override
 						public boolean hasNext() {
-							if (iterator == null) {
+							if (resourcesIterator == null) {
 								return true;
 							}
-							return iterator.hasNext();
+							return resourcesIterator.hasNext();
 						}
 
 						@Override
 						public Representation next() {
 							try {
-								return convertResourceToRepresentation(iterator.next());
-							} catch (ModelServiceException e) {
-								// FIXME is this the best way to deal with the
-								// ModelServiceException???
-								throw new RuntimeException(e.getMessage());
+								return convertResourceToRepresentation(resourcesIterator.next());
+							} catch (ModelServiceException | NoSuchElementException e) {
+								logger.error("Error while listing representations", e);
+								return null;
 							}
 						}
 
@@ -420,6 +426,11 @@ public class ModelService extends ModelObservable {
 							throw new UnsupportedOperationException();
 						}
 					};
+				}
+
+				@Override
+				public void close() throws IOException {
+					resourcesIterable.close();
 				}
 			};
 
@@ -477,57 +488,16 @@ public class ModelService extends ModelObservable {
 
 	public Representation updateRepresentation(String aipId, String representationId, StorageService sourceStorage,
 			StoragePath sourcePath) throws ModelServiceException {
-		Representation representation;
-		Directory sourceDirectory;
 
 		// verify structure of source representation
-		try {
-			sourceDirectory = sourceStorage.getDirectory(sourcePath);
-			if (!isRepresentationValid(sourceDirectory)) {
-				throw new ModelServiceException("Error while updating AIP, reason: representation is not valid",
-						ModelServiceException.INTERNAL_SERVER_ERROR);
-			}
-		} catch (StorageActionException e) {
-			throw new ModelServiceException("Error while updating representation in storage, reason: " + e.getMessage(),
-					e.getCode());
-		}
+		Directory sourceDirectory = verifySourceRepresentation(sourceStorage, sourcePath);
 
 		// update each representation file (from source representation)
-		final List<String> fileIDsToUpdate = new ArrayList<String>();
-		try {
-			Iterable<Resource> files = sourceStorage.listResourcesUnderDirectory(sourcePath);
-			for (Resource file : files) {
-				if (file instanceof DefaultBinary) {
-					boolean createIfNotExists = true;
-					boolean notify = false;
-					File fileUpdated = updateFile(aipId, representationId, file.getStoragePath().getName(),
-							(Binary) file, createIfNotExists, notify);
-
-					fileIDsToUpdate.add(fileUpdated.getStoragePath().getName());
-				} else {
-					// FIXME log error and continue???
-				}
-			}
-		} catch (StorageActionException e) {
-			throw new ModelServiceException("Error while updating representation files",
-					ModelServiceException.INTERNAL_SERVER_ERROR, e);
-		}
+		final List<String> fileIDsToUpdate = updateRepresentationFiles(aipId, representationId, sourceStorage,
+				sourcePath);
 
 		// delete files that were removed on representation update
-		try {
-			Iterable<Resource> filesToRemove = storage
-					.listResourcesUnderDirectory(ModelUtils.getRepresentationPath(aipId, representationId));
-			for (Resource fileToRemove : filesToRemove) {
-				StoragePath fileToRemovePath = fileToRemove.getStoragePath();
-				if (!fileIDsToUpdate.contains(fileToRemovePath.getName())) {
-					storage.deleteResource(fileToRemovePath);
-				}
-			}
-
-		} catch (StorageActionException e) {
-			throw new ModelServiceException("Error while delete removed representation files",
-					ModelServiceException.INTERNAL_SERVER_ERROR, e);
-		}
+		deleteUnneededFilesFromRepresentation(aipId, representationId, fileIDsToUpdate);
 
 		// get representation metadata (from source representation)
 		Map<String, Set<String>> representationMetadata = sourceDirectory.getMetadata();
@@ -542,6 +512,33 @@ public class ModelService extends ModelObservable {
 		Set<RepresentationState> statuses = ModelUtils.getStatuses(representationMetadata);
 
 		// update representation metadata (essentially date.modified)
+		updateRepresentationMetadata(aipId, representationId, representationMetadata);
+
+		// build return object
+		Representation representation = new Representation(representationId, aipId, active, dateCreated, dateModified,
+				statuses, type, fileIDsToUpdate);
+		notifyRepresentationUpdated(representation);
+		return representation;
+	}
+
+	private Directory verifySourceRepresentation(StorageService sourceStorage, StoragePath sourcePath)
+			throws ModelServiceException {
+		Directory sourceDirectory;
+		try {
+			sourceDirectory = sourceStorage.getDirectory(sourcePath);
+			if (!isRepresentationValid(sourceDirectory)) {
+				throw new ModelServiceException("Error while updating AIP, reason: representation is not valid",
+						ModelServiceException.INTERNAL_SERVER_ERROR);
+			}
+		} catch (StorageActionException e) {
+			throw new ModelServiceException("Error while updating representation in storage, reason: " + e.getMessage(),
+					e.getCode());
+		}
+		return sourceDirectory;
+	}
+
+	private void updateRepresentationMetadata(String aipId, String representationId,
+			Map<String, Set<String>> representationMetadata) throws ModelServiceException {
 		try {
 			storage.updateMetadata(ModelUtils.getRepresentationPath(aipId, representationId), representationMetadata,
 					true);
@@ -549,11 +546,66 @@ public class ModelService extends ModelObservable {
 			throw new ModelServiceException("Error while updating representation metadata",
 					ModelServiceException.INTERNAL_SERVER_ERROR, e);
 		}
+	}
 
-		representation = new Representation(representationId, aipId, active, dateCreated, dateModified, statuses, type,
-				fileIDsToUpdate);
-		notifyRepresentationUpdated(representation);
-		return representation;
+	private void deleteUnneededFilesFromRepresentation(String aipId, String representationId,
+			final List<String> fileIDsToUpdate) throws ModelServiceException {
+		ClosableIterable<Resource> filesToRemoveIterable = null;
+		try {
+			filesToRemoveIterable = storage
+					.listResourcesUnderDirectory(ModelUtils.getRepresentationPath(aipId, representationId));
+			for (Resource fileToRemove : filesToRemoveIterable) {
+				StoragePath fileToRemovePath = fileToRemove.getStoragePath();
+				if (!fileIDsToUpdate.contains(fileToRemovePath.getName())) {
+					storage.deleteResource(fileToRemovePath);
+				}
+			}
+
+		} catch (StorageActionException e) {
+			throw new ModelServiceException("Error while delete removed representation files",
+					ModelServiceException.INTERNAL_SERVER_ERROR, e);
+		} finally {
+			try {
+				if (filesToRemoveIterable != null) {
+					filesToRemoveIterable.close();
+				}
+			} catch (IOException e) {
+				logger.error("Error while while freeing up resources", e);
+			}
+		}
+	}
+
+	private List<String> updateRepresentationFiles(String aipId, String representationId, StorageService sourceStorage,
+			StoragePath sourcePath) throws ModelServiceException {
+		final List<String> fileIDsToUpdate = new ArrayList<String>();
+		ClosableIterable<Resource> filesIterable = null;
+		try {
+			filesIterable = sourceStorage.listResourcesUnderDirectory(sourcePath);
+			for (Resource file : filesIterable) {
+				if (file instanceof DefaultBinary) {
+					boolean createIfNotExists = true;
+					boolean notify = false;
+					File fileUpdated = updateFile(aipId, representationId, file.getStoragePath().getName(),
+							(Binary) file, createIfNotExists, notify);
+
+					fileIDsToUpdate.add(fileUpdated.getStoragePath().getName());
+				} else {
+					// FIXME log error and continue???
+				}
+			}
+		} catch (StorageActionException e) {
+			throw new ModelServiceException("Error while updating representation files",
+					ModelServiceException.INTERNAL_SERVER_ERROR, e);
+		} finally {
+			try {
+				if (filesIterable != null) {
+					filesIterable.close();
+				}
+			} catch (IOException e) {
+				logger.error("Error while while freeing up resources", e);
+			}
+		}
+		return fileIDsToUpdate;
 	}
 
 	public void deleteRepresentation(String aipId, String representationId) throws ModelServiceException {
@@ -595,10 +647,9 @@ public class ModelService extends ModelObservable {
 						public File next() {
 							try {
 								return convertResourceToRepresentationFile(iterator.next());
-							} catch (ModelServiceException e) {
-								// FIXME is this the best way to deal with the
-								// ModelServiceException???
-								throw new RuntimeException(e.getMessage());
+							} catch (ModelServiceException | NoSuchElementException e) {
+								logger.error("Error while listing representation files", e);
+								return null;
 							}
 						}
 
@@ -699,6 +750,7 @@ public class ModelService extends ModelObservable {
 		}
 	}
 
+	// FIXME turn this into ClosableIterable
 	// TODO to improve...
 	public Iterable<RepresentationPreservationObject> getAipPreservationObjects(String aipId)
 			throws ModelServiceException {
@@ -1348,46 +1400,6 @@ public class ModelService extends ModelObservable {
 
 	public void addLogEntry(LogEntry logEntry) throws StorageActionException {
 		addLogEntry(logEntry, true);
-	}
-
-	public void reindexAIPs() throws ModelServiceException {
-		System.out.println("Listing AIPs");
-		Iterable<AIP> aips = listAIPs();
-		for (AIP aip : aips) {
-			System.out.println("Reindexing AIP " + aip.getId());
-			reindexAIP(aip);
-		}
-		System.out.println("Done");
-	}
-
-	private void reindexAIP(AIP aip) {
-		notifyAipCreated(aip);
-	}
-
-	public void reindexActionLogs() throws StorageActionException, ModelServiceException {
-		Iterable<Resource> actionLogs = getStorage()
-				.listResourcesUnderContainer(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG));
-		Iterator<Resource> it = actionLogs.iterator();
-		while (it.hasNext()) {
-			Resource r = it.next();
-			try {
-				Binary b = getStorage().getBinary(r.getStoragePath());
-				java.io.File f = new java.io.File(b.getContent().getURI().getPath());
-				try (BufferedReader br = new BufferedReader(new FileReader(f))) {
-					String line;
-					while ((line = br.readLine()) != null) {
-						LogEntry entry = ModelUtils.getLogEntry(line);
-						reindexActionLog(entry);
-					}
-				}
-			} catch (IOException e) {
-				throw new ModelServiceException("Error parsing log file: " + e.getMessage(), 100);
-			}
-		}
-	}
-
-	private void reindexActionLog(LogEntry entry) {
-		notifyLogEntryCreated(entry);
 	}
 
 }

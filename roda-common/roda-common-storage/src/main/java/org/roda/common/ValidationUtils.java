@@ -9,16 +9,19 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import org.apache.log4j.Logger;
 import org.roda.index.utils.SolrUtils;
 import org.roda.model.DescriptiveMetadata;
 import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
 import org.roda.storage.Binary;
+import org.roda.storage.ClosableIterable;
 import org.roda.storage.StorageActionException;
 import org.roda.storage.StoragePath;
 import org.xml.sax.SAXException;
 
 public class ValidationUtils {
+	private static Logger logger = Logger.getLogger(ValidationUtils.class);
 
 	private static final String W3C_XML_SCHEMA_NS_URI = "http://www.w3.org/2001/XMLSchema";
 
@@ -27,11 +30,20 @@ public class ValidationUtils {
 	 */
 	public static boolean isAIPDescriptiveMetadataValid(ModelService model, String aipId) throws ModelServiceException {
 		boolean valid = true;
-		Iterable<DescriptiveMetadata> descriptiveMetadataBinaries = model.listDescriptiveMetadataBinaries(aipId);
-		for (DescriptiveMetadata descriptiveMetadata : descriptiveMetadataBinaries) {
-			if (!isDescriptiveMetadataValid(model, descriptiveMetadata)) {
-				valid = false;
-				break;
+		ClosableIterable<DescriptiveMetadata> descriptiveMetadataBinaries = model
+				.listDescriptiveMetadataBinaries(aipId);
+		try {
+			for (DescriptiveMetadata descriptiveMetadata : descriptiveMetadataBinaries) {
+				if (!isDescriptiveMetadataValid(model, descriptiveMetadata)) {
+					valid = false;
+					break;
+				}
+			}
+		} finally {
+			try {
+				descriptiveMetadataBinaries.close();
+			} catch (IOException e) {
+				logger.error("Error while while freeing up resources", e);
 			}
 		}
 		return valid;

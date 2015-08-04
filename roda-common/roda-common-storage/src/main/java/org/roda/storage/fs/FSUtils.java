@@ -19,6 +19,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.roda.storage.ClosableIterable;
@@ -262,7 +263,7 @@ public final class FSUtils {
 							Resource ret;
 							try {
 								ret = convertPathToResource(basePath, next);
-							} catch (StorageActionException e) {
+							} catch (StorageActionException | NoSuchElementException e) {
 								LOGGER.error("Error while list path " + basePath + " while parsing resource " + next,
 										e);
 								ret = null;
@@ -294,13 +295,13 @@ public final class FSUtils {
 	 * @param basePath
 	 *            base path
 	 */
-	public static Iterable<Container> listContainers(final Path basePath) throws StorageActionException {
-		Iterable<Container> containerIterable;
-		DirectoryStream<Path> directoryStream = null;
+	public static ClosableIterable<Container> listContainers(final Path basePath)
+			throws StorageActionException {
+		ClosableIterable<Container> containerIterable;
 		try {
-			directoryStream = Files.newDirectoryStream(basePath, FSYamlMetadataUtils.PATH_FILTER);
+			final DirectoryStream<Path> directoryStream = Files.newDirectoryStream(basePath, FSYamlMetadataUtils.PATH_FILTER);
 			final Iterator<Path> pathIterator = directoryStream.iterator();
-			containerIterable = new Iterable<Container>() {
+			containerIterable = new ClosableIterable<Container>() {
 
 				@Override
 				public Iterator<Container> iterator() {
@@ -317,7 +318,7 @@ public final class FSUtils {
 							Container ret;
 							try {
 								ret = convertPathToContainer(basePath, next);
-							} catch (StorageActionException e) {
+							} catch (StorageActionException | NoSuchElementException e) {
 								LOGGER.error("Error while listing containers, while parsing resource " + next, e);
 								ret = null;
 							}
@@ -325,27 +326,18 @@ public final class FSUtils {
 							return ret;
 						}
 
-						@Override
-						public void remove() {
-							pathIterator.remove();
-						}
-
 					};
+				}
+
+				@Override
+				public void close() throws IOException {
+					directoryStream.close();
 				}
 			};
 
 		} catch (IOException e) {
 			throw new StorageActionException("Could not list contents of entity at: " + basePath,
 					StorageActionException.INTERNAL_SERVER_ERROR, e);
-		} finally {
-			if (directoryStream != null) {
-				try {
-					directoryStream.close();
-				} catch (IOException e) {
-					LOGGER.error("Error while closing resources associated with Files.newDirectoryStream at path "
-							+ basePath, e);
-				}
-			}
 		}
 
 		return containerIterable;
@@ -361,6 +353,8 @@ public final class FSUtils {
 	 */
 	public static Resource convertPathToResource(Path basePath, Path path) throws StorageActionException {
 		Resource resource;
+		
+		// TODO support binary reference
 
 		if (!Files.exists(path)) {
 			throw new StorageActionException("Cannot find file or directory at " + path,
@@ -388,9 +382,6 @@ public final class FSUtils {
 				throw new StorageActionException("Could not get file size",
 						StorageActionException.INTERNAL_SERVER_ERROR, e);
 			}
-
-			// TODO support binary reference
-
 		}
 		return resource;
 	}

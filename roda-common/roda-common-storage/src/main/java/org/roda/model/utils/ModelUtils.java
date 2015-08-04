@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.log4j.Logger;
 import org.roda.common.RodaUtils;
 import org.roda.model.FileFormat;
 import org.roda.model.ModelServiceException;
@@ -40,6 +41,7 @@ import pt.gov.dgarq.roda.core.metadata.v2.premis.PremisRepresentationObjectHelpe
  * @author Hélder Silva <hsilva@keep.pt>
  */
 public final class ModelUtils {
+	private static final Logger LOGGER = Logger.getLogger(ModelUtils.class);
 
 	/**
 	 * Private empty constructor
@@ -176,8 +178,12 @@ public final class ModelUtils {
 		Iterator<Resource> it = iterable.iterator();
 		while (it.hasNext()) {
 			Resource next = it.next();
-			StoragePath storagePath = next.getStoragePath();
-			ids.add(storagePath.getName());
+			if (next != null) {
+				StoragePath storagePath = next.getStoragePath();
+				ids.add(storagePath.getName());
+			} else {
+				LOGGER.error("Error while getting IDs for path " + path.asString());
+			}
 		}
 		try {
 			iterable.close();

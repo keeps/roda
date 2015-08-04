@@ -41,7 +41,7 @@
 				select="dc:date/text()">
 				<xsl:matching-substring>
 					<xsl:variable name="date">
-						<xsl:value-of select="regex-group(1)" />
+						<xsl:value-of select="regex-group(0)" />
 					</xsl:variable>
 					<xsl:if test="not(normalize-space($date)='')">
 						<field name="dateInitial">

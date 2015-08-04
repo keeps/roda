@@ -58,7 +58,7 @@ public class FileStorageService implements StorageService {
 	}
 
 	@Override
-	public Iterable<Container> listContainers() throws StorageActionException {
+	public ClosableIterable<Container> listContainers() throws StorageActionException {
 		return FSUtils.listContainers(basePath);
 	}
 

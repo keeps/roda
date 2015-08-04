@@ -1,5 +1,6 @@
 package org.roda.storage.fedora;
 
+import java.io.IOException;
 import java.util.Iterator;
 
 import org.fcrepo.client.BadRequestException;
@@ -9,6 +10,7 @@ import org.fcrepo.client.FedoraRepository;
 import org.fcrepo.client.FedoraResource;
 import org.fcrepo.client.ForbiddenException;
 import org.fcrepo.client.NotFoundException;
+import org.roda.storage.ClosableIterable;
 import org.roda.storage.Container;
 import org.roda.storage.StorageActionException;
 import org.roda.storage.fedora.utils.FedoraConversionUtils;
@@ -20,7 +22,7 @@ import org.roda.storage.fedora.utils.FedoraConversionUtils;
  * @author Sébastien Leroux <sleroux@keep.pt>
  * @author Hélder Silva <hsilva@keep.pt>
  * */
-public class IterableContainer implements Iterable<Container> {
+public class IterableContainer implements ClosableIterable<Container> {
 	private Iterator<FedoraResource> fedoraResources;
 
 	public IterableContainer(FedoraRepository repository)
@@ -79,5 +81,10 @@ public class IterableContainer implements Iterable<Container> {
 		public void remove() {
 		}
 
+	}
+
+	@Override
+	public void close() throws IOException {
+		// do nothing
 	}
 }
