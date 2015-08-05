@@ -252,7 +252,7 @@ public class IndexModelObserver implements ModelObserver {
 			index.add(RodaConstants.INDEX_SIP_STATE, sipStateDocument);
 			index.commit(RodaConstants.INDEX_SIP_STATE);
 		} catch (SolrServerException | IOException e) {
-			logger.error("Could not index SIPState: " + e.getMessage(), e);
+			LOGGER.error("Could not index SIPState: " + e.getMessage(), e);
 		}
 	}
 }
