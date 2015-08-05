@@ -28,6 +28,7 @@ import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
+import pt.gov.dgarq.roda.core.data.v2.SIPState;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.core.data.v2.SimpleEventPreservationMetadata;
 import pt.gov.dgarq.roda.core.data.v2.SimpleRepresentationFilePreservationMetadata;
@@ -202,6 +203,16 @@ public class IndexService {
 	public IndexResult<LogEntry> findLogEntry(Filter filter, Sorter sorter, Sublist sublist)
 			throws IndexServiceException {
 		return SolrUtils.find(index, LogEntry.class, filter, sorter, sublist);
+	}
+	
+	//SIPSTATE
+	public Long getSipStatesCount(Filter filter) throws IndexServiceException {
+		return SolrUtils.count(index, SIPState.class, filter);
+	}
+
+	public IndexResult<SIPState> findSipState(Filter filter,
+			Sorter sorter, Sublist sublist) throws IndexServiceException {
+		return SolrUtils.find(index, SIPState.class, filter, sorter, sublist);
 	}
 
 	// FIXME perhaps transform sysout into logger logging

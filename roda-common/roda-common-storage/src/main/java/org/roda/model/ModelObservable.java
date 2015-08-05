@@ -5,6 +5,7 @@ import java.util.List;
 
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
+import pt.gov.dgarq.roda.core.data.v2.SIPState;
 
 public abstract class ModelObservable {
 	private final List<ModelObserver> observers;
@@ -103,6 +104,12 @@ public abstract class ModelObservable {
 	protected void notifyLogEntryCreated(LogEntry entry){
 		for (ModelObserver observer : observers) {
 			observer.logEntryCreated(entry);
+		}
+	}
+	
+	protected void notifySipStateCreated(SIPState state){
+		for (ModelObserver observer : observers) {
+			observer.sipStateCreated(state);
 		}
 	}
 

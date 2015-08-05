@@ -2,6 +2,7 @@ package org.roda.model;
 
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
+import pt.gov.dgarq.roda.core.data.v2.SIPState;
 
 public interface ModelObserver {
 
@@ -33,5 +34,7 @@ public interface ModelObserver {
 	public void fileDeleted(String aipId, String representationId, String fileId);
 	
 	public void logEntryCreated(LogEntry entry);
+	
+	public void sipStateCreated(SIPState state);
 
 }

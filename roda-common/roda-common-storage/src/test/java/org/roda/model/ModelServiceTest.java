@@ -51,6 +51,8 @@ import pt.gov.dgarq.roda.core.data.v2.LogEntryParameter;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationFilePreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationPreservationObject;
+import pt.gov.dgarq.roda.core.data.v2.SIPState;
+import pt.gov.dgarq.roda.core.data.v2.SIPStateTransition;
 
 /**
  * Unit tests for ModelService
@@ -662,6 +664,29 @@ public class ModelServiceTest {
 		parameters.add(new LogEntryParameter("NAME2", "VALUE2"));
 		entry.setParameters(parameters);
 		model.addLogEntry(entry, logPath);
+	}
+	
+	@Test
+	public void createSIPState() throws ModelServiceException, StorageActionException {
+		SIPState state = new SIPState();
+		state.setComplete(true);
+		state.setCompletePercentage(99.9F);
+		state.setDatetime(new Date());
+		state.setFileID("fileID");
+		state.setId("ID");
+		state.setIngestedPID("INGESTED");
+		state.setOriginalFilename("Filename");
+		state.setParentPID("parentPID");
+		state.setProcessing(false);
+		state.setState("State");
+		SIPStateTransition[] stateTransitions = new SIPStateTransition[2];
+		SIPStateTransition st1 = new SIPStateTransition("SIP", "A", "B", new Date(), "TASK", true, "DESC 1");
+		SIPStateTransition st2 = new SIPStateTransition("SIP", "B", "C", new Date(), "TASK", false, "DESC 2");
+		stateTransitions[0] = st1;
+		stateTransitions[1] = st2;
+		state.setStateTransitions(stateTransitions);
+		state.setUsername("Username");
+		model.addSipState(state);
 	}
 
 }

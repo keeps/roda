@@ -1,6 +1,7 @@
 package org.roda.model;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,6 +15,10 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+
 import org.roda.common.RodaUtils;
 import org.roda.common.ValidationUtils;
 import org.roda.model.utils.ModelUtils;
@@ -24,9 +29,10 @@ import org.roda.storage.DefaultDirectory;
 import org.roda.storage.DefaultStoragePath;
 import org.roda.storage.Directory;
 import org.roda.storage.Resource;
-import org.roda.storage.StorageServiceException;
 import org.roda.storage.StoragePath;
 import org.roda.storage.StorageService;
+import org.roda.storage.StorageServiceException;
+import org.roda.storage.XMLContentPayload;
 import org.roda.storage.fs.FSPathContentPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +52,7 @@ import pt.gov.dgarq.roda.core.data.v2.Representation;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationFilePreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationPreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationState;
+import pt.gov.dgarq.roda.core.data.v2.SIPState;
 import pt.gov.dgarq.roda.core.metadata.v2.premis.PremisAgentHelper;
 import pt.gov.dgarq.roda.core.metadata.v2.premis.PremisEventHelper;
 import pt.gov.dgarq.roda.core.metadata.v2.premis.PremisFileObjectHelper;
@@ -1441,4 +1448,36 @@ public class ModelService extends ModelObservable {
 			LOGGER.error("Error listing directory for log files", e);
 		}
 	}
+
+	// FIXME all the initialization, if needed, should be done only once
+	public void addSipState(SIPState sipState, boolean notify) throws StorageServiceException{
+		try {
+			storage.createContainer(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_SIP_STATE),
+					new HashMap<String, Set<String>>());
+		} catch (StorageServiceException sae) {
+			// container already exists...
+		}
+		try {
+			StoragePath sipStatePath = ModelUtils.getSipStatePath(sipState);
+			sipState.setFileID(sipStatePath.getName());
+
+			StringWriter sw = new StringWriter();
+			JAXBContext jc = JAXBContext.newInstance(SIPState.class);
+			Marshaller marshaller = jc.createMarshaller();
+			marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+			marshaller.marshal(sipState, sw);
+			storage.updateBinaryContent(sipStatePath, new XMLContentPayload(sw.toString()), false, true);
+			if (notify) {
+				notifySipStateCreated(sipState);
+			}
+		} catch (JAXBException je) {
+			throw new StorageServiceException("Error adding SIP State to storage: " + je.getMessage(),
+					ModelServiceException.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	public void addSipState(SIPState sipState) throws StorageServiceException{
+		addSipState(sipState, true);
+	}
+
 }

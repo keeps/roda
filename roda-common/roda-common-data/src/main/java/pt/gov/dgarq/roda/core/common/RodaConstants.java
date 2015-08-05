@@ -26,6 +26,7 @@ public final class RodaConstants {
 	public static final String INDEX_USER_LOG = "UserLog";
 	public static final String INDEX_ACTION_LOG = "ActionLog";
 	public static final String INDEX_OTHER_DESCRIPTIVE_DATA_PREFIX = "odd";
+	public static final String INDEX_SIP_STATE = "SIPState";
 
 	/*
 	 * STORAGE CONTAINERS
@@ -36,6 +37,7 @@ public final class RodaConstants {
 	public static final String STORAGE_CONTAINER_PRESERVATION = "Preservation";
 	public static final String STORAGE_CONTAINER_USERLOG = "User log";
 	public static final String STORAGE_CONTAINER_ACTIONLOG = "Action log";
+	public static final String STORAGE_CONTAINER_SIP_STATE = "SIP State";
 
 	/*
 	 * STORAGE DIRECTORIES
@@ -223,5 +225,27 @@ public final class RodaConstants {
 	public static final String LOG_USERNAME = "username";
 	public static final String LOG_PARAMETERS = "parameters";
 	public static final String LOG_FILE_ID = "fileID";
+	
+	public static final String SIPSTATE_ORIGINAL_FILENAME = "originalFilename";
+	public static final String SIPSTATE_ID = "id";
+	public static final String SIPSTATE_USERNAME = "username";
+	public static final String SIPSTATE_STATE = "state";
+	public static final String SIPSTATE_DATETIME = "datetime";
+	public static final String SIPSTATE_PROCESSING = "processing";
+	public static final String SIPSTATE_COMPLETE = "complete";
+	public static final String SIPSTATE_INGESTED_PID = "ingestedPID";
+	public static final String SIPSTATE_COMPLETE_PERCENTAGE = "completePercentage";
+	public static final String SIPSTATE_FILE_ID = "fileID";
+	public static final String SIPSTATE_PARENT_PID = "parentPID";
+	public static final String SIPSTATE_TRANSITION_DATETIME = "transition_datetime";
+	public static final String SIPSTATE_TRANSITION_DESCRIPTION = "transition_description";
+	public static final String SIPSTATE_TRANSITION_FROM = "transition_from";
+	public static final String SIPSTATE_TRANSITION_SIPID = "transition_sipID";
+	public static final String SIPSTATE_TRANSITION_TASKID = "transition_taskID";
+	public static final String SIPSTATE_TRANSITION_TO = "transition_to";
+	public static final String SIPSTATE_TRANSITION_SUCCESS = "transition_success";
+	public static final String SIPSTATE_TRANSITION_ID = "id";
+	
+	
 
 }

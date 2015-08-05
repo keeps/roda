@@ -23,6 +23,7 @@ import pt.gov.dgarq.roda.core.data.v2.EventPreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationFilePreservationObject;
+import pt.gov.dgarq.roda.core.data.v2.SIPState;
 
 /**
  * 
@@ -241,6 +242,17 @@ public class IndexModelObserver implements ModelObserver {
 			index.commit(RodaConstants.INDEX_ACTION_LOG);
 		} catch (SolrServerException | IOException e) {
 			LOGGER.error("Could not index LogEntry: " + e.getMessage(), e);
+		}
+	}
+	
+	@Override
+	public void sipStateCreated(SIPState entry) {
+		SolrInputDocument sipStateDocument = SolrUtils.sipStateToSolrDocument(entry);
+		try {
+			index.add(RodaConstants.INDEX_SIP_STATE, sipStateDocument);
+			index.commit(RodaConstants.INDEX_SIP_STATE);
+		} catch (SolrServerException | IOException e) {
+			logger.error("Could not index SIPState: " + e.getMessage(), e);
 		}
 	}
 }

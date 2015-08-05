@@ -72,6 +72,8 @@ import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.core.data.v2.SimpleEventPreservationMetadata;
 import pt.gov.dgarq.roda.core.data.v2.SimpleRepresentationFilePreservationMetadata;
 import pt.gov.dgarq.roda.core.data.v2.SimpleRepresentationPreservationMetadata;
+import pt.gov.dgarq.roda.core.data.v2.SIPState;
+import pt.gov.dgarq.roda.core.data.v2.SIPStateTransition;
 
 /**
  * Utilities class related to Apache Solr
@@ -338,6 +340,25 @@ public class SolrUtils {
 		}
 		return ret;
 	}
+	
+	private static Float objectToFloat(Object object) {
+		Float ret;
+		if (object instanceof Float) {
+			ret = (Float) object;
+		} else if (object instanceof String) {
+			try {
+				ret = Float.parseFloat((String) object);
+			} catch (NumberFormatException e) {
+				LOGGER.error("Could not convert Solr object to float", e);
+				ret = null;
+			}
+		} else {
+			LOGGER.error("Could not convert Solr object to float" + object.getClass().getName());
+			ret = null;
+		}
+		return ret;
+	}
+
 
 	private static Date objectToDate(Object object) {
 		Date ret;
@@ -401,6 +422,8 @@ public class SolrUtils {
 			indexName = RodaConstants.INDEX_PRESERVATION_EVENTS;
 		} else if (resultClass.equals(LogEntry.class)) {
 			indexName = RodaConstants.INDEX_ACTION_LOG;
+		} else if (resultClass.equals(SIPState.class)) {
+			indexName = RodaConstants.INDEX_SIP_STATE;
 		} else {
 			throw new IndexServiceException("Cannot find class index name: " + resultClass.getName(),
 					IndexServiceException.INTERNAL_SERVER_ERROR);
@@ -422,6 +445,8 @@ public class SolrUtils {
 			ret = resultClass.cast(solrDocumentToSimpleEventPreservationMetadata(doc));
 		} else if (resultClass.equals(LogEntry.class)) {
 			ret = resultClass.cast(solrDocumentToLogEntry(doc));
+		} else if (resultClass.equals(SIPState.class)) {
+			ret = resultClass.cast(solrDocumentToSipState(doc));
 		} else {
 			throw new IndexServiceException("Cannot find class index name: " + resultClass.getName(),
 					IndexServiceException.INTERNAL_SERVER_ERROR);
@@ -855,6 +880,78 @@ public class SolrUtils {
 		// toJSON(logEntry.getParameters()));
 		doc.addField(RodaConstants.LOG_RELATED_OBJECT_ID, logEntry.getRelatedObjectID());
 		doc.addField(RodaConstants.LOG_USERNAME, logEntry.getUsername());
+		return doc;
+	}
+	private static SIPState solrDocumentToSipState(SolrDocument doc) {
+		final String id = objectToString(doc.get(RodaConstants.SIPSTATE_ID));
+		final String username = objectToString(doc.get(RodaConstants.SIPSTATE_USERNAME));
+		final String originalFilename = objectToString(doc.get(RodaConstants.SIPSTATE_ORIGINAL_FILENAME));
+		final String state = objectToString(doc.get(RodaConstants.SIPSTATE_STATE));
+		final Date dateTime = objectToDate(doc.get(RodaConstants.SIPSTATE_DATETIME));
+		final boolean processing = objectToBoolean(doc.get(RodaConstants.SIPSTATE_PROCESSING));
+		final boolean complete = objectToBoolean(doc.get(RodaConstants.SIPSTATE_COMPLETE));
+		final float completePercentage = objectToFloat(doc.get(RodaConstants.SIPSTATE_COMPLETE_PERCENTAGE));
+		final String parentPID = objectToString(doc.get(RodaConstants.SIPSTATE_PARENT_PID));
+		final String ingestedPID = objectToString(doc.get(RodaConstants.SIPSTATE_INGESTED_PID));
+		final String fileID = objectToString(doc.get(RodaConstants.SIPSTATE_FILE_ID));
+		List<SIPStateTransition> ssts = new ArrayList<SIPStateTransition>();
+		/*if(doc.getChildDocumentCount()>0){
+			for(SolrDocument child : doc.getChildDocuments()){
+				SIPStateTransition sst = new SIPStateTransition();
+				sst.setId(objectToString(child.get(RodaConstants.SIPSTATE_TRANSITION_ID)));
+				sst.setDatetime(objectToDate(child.get(RodaConstants.SIPSTATE_TRANSITION_DATETIME)));
+				sst.setDescription(objectToString(child.get(RodaConstants.SIPSTATE_TRANSITION_DESCRIPTION)));
+				sst.setFromState(objectToString(child.get(RodaConstants.SIPSTATE_TRANSITION_FROM)));
+				sst.setSipID(objectToString(child.get(RodaConstants.SIPSTATE_TRANSITION_SIPID)));
+				sst.setSuccess(objectToBoolean(child.get(RodaConstants.SIPSTATE_TRANSITION_SUCCESS)));
+				sst.setTaskID(objectToString(child.get(RodaConstants.SIPSTATE_TRANSITION_TASKID)));
+				sst.setToState(objectToString(child.get(RodaConstants.SIPSTATE_TRANSITION_TO)));
+				ssts.add(sst);
+			}
+		}*/
+		
+		SIPState sipState = new SIPState();
+		sipState.setId(id);
+		sipState.setUsername(username);
+		sipState.setOriginalFilename(originalFilename);
+		sipState.setState(state);
+		sipState.setDatetime(dateTime);
+		sipState.setProcessing(processing);
+		sipState.setComplete(complete);
+		sipState.setCompletePercentage(completePercentage);
+		sipState.setParentPID(parentPID);
+		sipState.setIngestedPID(ingestedPID);
+		sipState.setFileID(fileID);
+		sipState.setStateTransitions(ssts.toArray(new SIPStateTransition[ssts.size()]));
+		return sipState;
+	}
+	public static SolrInputDocument sipStateToSolrDocument(SIPState sipState) {
+		SolrInputDocument doc = new SolrInputDocument();
+		doc.addField(RodaConstants.SIPSTATE_COMPLETE, sipState.isComplete());
+		doc.addField(RodaConstants.SIPSTATE_COMPLETE_PERCENTAGE, sipState.getCompletePercentage());
+		doc.addField(RodaConstants.SIPSTATE_DATETIME, sipState.getDatetime());
+		doc.addField(RodaConstants.SIPSTATE_FILE_ID, sipState.getFileID());
+		doc.addField(RodaConstants.SIPSTATE_ID, sipState.getId());
+		doc.addField(RodaConstants.SIPSTATE_INGESTED_PID, sipState.getIngestedPID());
+		doc.addField(RodaConstants.SIPSTATE_ORIGINAL_FILENAME, sipState.getOriginalFilename());
+		doc.addField(RodaConstants.SIPSTATE_PARENT_PID, sipState.getParentPID());
+		doc.addField(RodaConstants.SIPSTATE_PROCESSING, sipState.isProcessing());
+		doc.addField(RodaConstants.SIPSTATE_STATE, sipState.getState());
+		doc.addField(RodaConstants.SIPSTATE_USERNAME, sipState.getUsername());
+		/*if(sipState.getStateTransitions()!=null && sipState.getStateTransitions().length>0){
+			for(SIPStateTransition sst : sipState.getStateTransitions()){
+				SolrInputDocument sstSolrDoc = new SolrInputDocument();
+				sstSolrDoc.addField(RodaConstants.SIPSTATE_TRANSITION_DATETIME, sst.getDatetime());
+				sstSolrDoc.addField(RodaConstants.SIPSTATE_TRANSITION_DESCRIPTION, sst.getDescription());
+				sstSolrDoc.addField(RodaConstants.SIPSTATE_TRANSITION_FROM, sst.getFromState());
+				sstSolrDoc.addField(RodaConstants.SIPSTATE_TRANSITION_SIPID, sst.getSipID());
+				sstSolrDoc.addField(RodaConstants.SIPSTATE_TRANSITION_SUCCESS, sst.isSuccess());
+				sstSolrDoc.addField(RodaConstants.SIPSTATE_TRANSITION_TASKID, sst.getTaskID());
+				sstSolrDoc.addField(RodaConstants.SIPSTATE_TRANSITION_TO, sst.getToState());
+				sstSolrDoc.addField(RodaConstants.SIPSTATE_TRANSITION_ID, sst.getId());
+				doc.addChildDocument(sstSolrDoc);
+			}
+		}*/
 		return doc;
 	}
 }

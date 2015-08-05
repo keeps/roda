@@ -35,6 +35,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationState;
+import pt.gov.dgarq.roda.core.data.v2.SIPState;
 import pt.gov.dgarq.roda.core.metadata.v2.premis.PremisEventHelper;
 import pt.gov.dgarq.roda.core.metadata.v2.premis.PremisFileObjectHelper;
 import pt.gov.dgarq.roda.core.metadata.v2.premis.PremisMetadataException;
@@ -415,5 +416,31 @@ public final class ModelUtils {
 			LOGGER.error("Error transforming json string to log entry", e);
 		}
 		return ret;
+	}
+	
+	public static String getJsonSipState(SIPState sipState) {
+		try {
+			JsonFactory factory = new JsonFactory();
+			ObjectMapper mapper = new ObjectMapper(factory);
+			return mapper.writeValueAsString(sipState);
+		} catch (IOException ioe) {
+
+		}
+		return null;
+	}
+
+	public static SIPState getSipState(String json) {
+		try {
+			JsonFactory factory = new JsonFactory();
+			ObjectMapper mapper = new ObjectMapper(factory);
+			return mapper.readValue(json, SIPState.class);
+		} catch (IOException ioe) {
+
+		}
+		return null;
+	}
+
+	public static StoragePath getSipStatePath(SIPState sipState) throws StorageServiceException {
+		return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_SIP_STATE,sipState.getId());
 	}
 }

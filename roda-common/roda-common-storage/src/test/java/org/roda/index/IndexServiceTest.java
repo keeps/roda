@@ -48,6 +48,8 @@ import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.LogEntryParameter;
 import pt.gov.dgarq.roda.core.data.v2.RODAObject;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
+import pt.gov.dgarq.roda.core.data.v2.SIPState;
+import pt.gov.dgarq.roda.core.data.v2.SIPStateTransition;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.core.data.v2.SimpleEventPreservationMetadata;
 import pt.gov.dgarq.roda.core.data.v2.SimpleRepresentationFilePreservationMetadata;
@@ -417,6 +419,80 @@ public class IndexServiceTest {
 
 		IndexResult<LogEntry> entries2 = index.findLogEntry(filterDescription2, null, new Sublist());
 		assertEquals(entries2.getTotalCount(), 0);
+	}
+	
+	
+	@Test 
+	public void testGetSIPStatesCount() throws StorageServiceException, IndexServiceException {
+		SIPState state = new SIPState();
+		state.setComplete(true);
+		state.setCompletePercentage(99.9F);
+		state.setDatetime(new Date());
+		state.setFileID("fileID");
+		state.setId("ID");
+		state.setIngestedPID("INGESTED");
+		state.setOriginalFilename("Filename");
+		state.setParentPID("parentPID");
+		state.setProcessing(false);
+		state.setState("State");
+		SIPStateTransition[] stateTransitions = new SIPStateTransition[2];
+		SIPStateTransition st1 = new SIPStateTransition("SIP", "A", "B", new Date(), "TASK", true, "DESC 1");
+		SIPStateTransition st2 = new SIPStateTransition("SIP", "B", "C", new Date(), "TASK", false, "DESC 2");
+		stateTransitions[0] = st1;
+		stateTransitions[1] = st2;
+		state.setStateTransitions(stateTransitions);
+		state.setUsername("Username");
+		
+		model.addSipState(state);
+
+		Filter filterFileName = new Filter();
+		filterFileName.add(new SimpleFilterParameter(RodaConstants.SIPSTATE_ORIGINAL_FILENAME, "Filename"));
+		Long n = 1L;
+		assertEquals(index.getSipStatesCount(filterFileName), n);
+
+		Filter filterFileName2 = new Filter();
+		filterFileName2.add(new SimpleFilterParameter(RodaConstants.SIPSTATE_ORIGINAL_FILENAME, "Filename2"));
+		Long n2 = 0L;
+		assertEquals(index.getSipStatesCount(filterFileName2), n2);
+	}
+
+	@Test
+	public void testFindSipState() throws StorageServiceException, IndexServiceException {
+		SIPState state = new SIPState();
+		state.setComplete(true);
+		state.setCompletePercentage(99.9F);
+		state.setDatetime(new Date());
+		state.setFileID("fileID");
+		state.setId("ID");
+		state.setIngestedPID("INGESTED");
+		state.setOriginalFilename("Filename");
+		state.setParentPID("parentPID");
+		state.setProcessing(false);
+		state.setState("State");
+		SIPStateTransition[] stateTransitions = new SIPStateTransition[2];
+		SIPStateTransition st1 = new SIPStateTransition("SIP", "A", "B", new Date(), "TASK", true, "DESC 1");
+		SIPStateTransition st2 = new SIPStateTransition("SIP", "B", "C", new Date(), "TASK", false, "DESC 2");
+		stateTransitions[0] = st1;
+		stateTransitions[1] = st2;
+		state.setStateTransitions(stateTransitions);
+		state.setUsername("Username");
+		model.addSipState(state);
+
+		Filter filterFileName = new Filter();
+		filterFileName.add(new SimpleFilterParameter(RodaConstants.SIPSTATE_ORIGINAL_FILENAME, "Filename"));
+
+		IndexResult<SIPState> states = index.findSipState(filterFileName, null, new Sublist());
+		assertEquals(states.getTotalCount(), 1);
+		assertEquals(states.getResults().get(0).getIngestedPID(), "INGESTED");
+		//assertEquals(states.getResults().get(0).getStateTransitions()[0].getFromState(), "A");
+		//assertEquals(states.getResults().get(0).getStateTransitions()[1].getFromState(), "B");
+		
+
+		Filter filterFileName2 = new Filter();
+		filterFileName2.add(new SimpleFilterParameter(RodaConstants.SIPSTATE_ORIGINAL_FILENAME, "Filename2"));
+
+		IndexResult<SIPState> states2 = index.findSipState(filterFileName2, null, new Sublist());
+		assertEquals(states2.getTotalCount(), 0);
 	}
 
 	@Test
