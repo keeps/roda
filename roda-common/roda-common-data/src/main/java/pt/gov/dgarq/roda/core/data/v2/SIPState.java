@@ -29,8 +29,8 @@ public class SIPState implements Serializable, Comparable<SIPState> {
 	private SIPStateTransition[] stateTransitions = null;
 	private boolean complete = false;
 	private float completePercentage = 0f;
-	private String parentPID = null;
-	private String ingestedPID = null;
+	private String parentID = null;
+	private String ingestedID = null;
 	
 	private String fileID = null;
 
@@ -49,8 +49,8 @@ public class SIPState implements Serializable, Comparable<SIPState> {
 	public SIPState(SIPState sip) {
 		this(sip.getId(), sip.getUsername(), sip.getOriginalFilename(), sip
 				.getState(), sip.getStateTransitions(), sip.isComplete(), sip
-				.getCompletePercentage(), sip.getIngestedPID(), sip
-				.getParentPID(), sip.getDatetime(), sip.isProcessing());
+				.getCompletePercentage(), sip.getIngestedID(), sip
+				.getParentID(), sip.getDatetime(), sip.isProcessing());
 	}
 
 	/**
@@ -63,15 +63,15 @@ public class SIPState implements Serializable, Comparable<SIPState> {
 	 * @param stateTransitions
 	 * @param complete
 	 * @param completePercentage
-	 * @param ingestedDOPID
-	 * @param parentDOPID
+	 * @param ingestedDOID
+	 * @param parentDOID
 	 * @param datetime 
 	 * @param processing
 	 */
 	public SIPState(String id, String username, String originalFilename,
 			String state, SIPStateTransition[] stateTransitions,
-			boolean complete, float completePercentage, String ingestedDOPID,
-			String parentDOPID, Date datetime, boolean processing) {
+			boolean complete, float completePercentage, String ingestedDOID,
+			String parentDOID, Date datetime, boolean processing) {
 
 		setId(id);
 		setUsername(username);
@@ -80,8 +80,8 @@ public class SIPState implements Serializable, Comparable<SIPState> {
 		setStateTransitions(stateTransitions);
 		setComplete(complete);
 		setCompletePercentage(completePercentage);
-		setIngestedPID(ingestedDOPID);
-		setParentPID(parentDOPID);
+		setIngestedID(ingestedDOID);
+		setParentID(parentDOID);
 		setDatetime(datetime);
 		setProcessing(processing);
 	}
@@ -106,8 +106,8 @@ public class SIPState implements Serializable, Comparable<SIPState> {
 				+ ", originalFilename=" + getOriginalFilename() + ", state="
 				+ getState() + ", complete=" + isComplete()
 				+ ", completePercentage=" + getCompletePercentage() + "% "
-				+ ", ingestedPID=" + getIngestedPID() + ", parentPID="
-				+ getParentPID() + ", datetime=" + getDatetime()
+				+ ", ingestedID=" + getIngestedID() + ", parentID="
+				+ getParentID() + ", datetime=" + getDatetime()
 				+ ", processing=" + isProcessing() + ", stateTransitions="
 				+ Arrays.toString(getStateTransitions()) + ")";
 	}
@@ -262,35 +262,35 @@ public class SIPState implements Serializable, Comparable<SIPState> {
 	}
 
 	/**
-	 * @return the PID of the {@link DescriptionObject} ingested.
+	 * @return the ID of the {@link DescriptionObject} ingested.
 	 */
-	public String getIngestedPID() {
-		return ingestedPID;
+	public String getIngestedID() {
+		return ingestedID;
 	}
 
 	/**
-	 * @param ingestedDOPID
-	 *            the PID of the {@link DescriptionObject} ingested.
+	 * @param ingestedDOID
+	 *            the ID of the {@link DescriptionObject} ingested.
 	 */
 	@XmlElement
-	public void setIngestedPID(String ingestedDOPID) {
-		this.ingestedPID = ingestedDOPID;
+	public void setIngestedID(String ingestedDOID) {
+		this.ingestedID = ingestedDOID;
 	}
 
 	/**
-	 * @return the parentPID
+	 * @return the parentID
 	 */
-	public String getParentPID() {
-		return parentPID;
+	public String getParentID() {
+		return parentID;
 	}
 
 	/**
-	 * @param parentPID
-	 *            the parentPID to set
+	 * @param parentID
+	 *            the parentID to set
 	 */
 	@XmlElement
-	public void setParentPID(String parentPID) {
-		this.parentPID = parentPID;
+	public void setParentID(String parentID) {
+		this.parentID = parentID;
 	}
 
 	/**
