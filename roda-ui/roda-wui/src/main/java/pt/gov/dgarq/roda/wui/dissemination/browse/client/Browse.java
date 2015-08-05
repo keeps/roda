@@ -242,6 +242,7 @@ public class Browse extends Composite {
 			List<Representation> representations = itemBundle.getRepresentations();
 
 			breadcrumb.updatePath(getBreadcrumbsFromAncestors(itemBundle.getSdoAncestors(), sdo));
+			breadcrumb.setVisible(true);
 			HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getElementLevelIconHTMLPanel(sdo.getLevel());
 			itemIconHtmlPanel.addStyleName("browseItemIcon-other");
 			itemIcon.setWidget(itemIconHtmlPanel);
@@ -277,6 +278,7 @@ public class Browse extends Composite {
 
 		breadcrumb.updatePath(Arrays.asList(new BreadcrumbItem(
 				SafeHtmlUtils.fromSafeConstant("<i class='fa fa-circle-o'></i>"), RESOLVER.getHistoryPath())));
+		breadcrumb.setVisible(false);
 		itemTitle.setText("All collections");
 		itemDates.setText("");
 		itemDescriptiveMetadata.setText("");
@@ -295,13 +297,22 @@ public class Browse extends Composite {
 		ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-circle-o'></i>"),
 				RESOLVER.getHistoryPath()));
 		for (SimpleDescriptionObject ancestor : sdoAncestors) {
-			BreadcrumbItem ancestorBreadcrumb = new BreadcrumbItem(ancestor.getTitle(),
+			SafeHtml breadcrumbLabel = getBreadcrumbLabel(ancestor);
+			BreadcrumbItem ancestorBreadcrumb = new BreadcrumbItem(breadcrumbLabel,
 					RESOLVER.getHistoryPath() + "." + ancestor.getId());
 			ret.add(1, ancestorBreadcrumb);
 		}
 
-		ret.add(new BreadcrumbItem(sdo.getTitle(), RESOLVER.getHistoryPath() + "." + sdo.getId()));
+		ret.add(new BreadcrumbItem(getBreadcrumbLabel(sdo), RESOLVER.getHistoryPath() + "." + sdo.getId()));
 		return ret;
+	}
+
+	private SafeHtml getBreadcrumbLabel(SimpleDescriptionObject ancestor) {
+		SafeHtml elementLevelIconSafeHtml = DescriptionLevelUtils.getElementLevelIconSafeHtml(ancestor.getLevel());
+		SafeHtmlBuilder builder = new SafeHtmlBuilder();
+		builder.append(elementLevelIconSafeHtml).append(SafeHtmlUtils.fromString(ancestor.getTitle()));
+		SafeHtml breadcrumbLabel = builder.toSafeHtml();
+		return breadcrumbLabel;
 	}
 
 	private Widget createRepresentationDownloadPanel(Representation rep) {

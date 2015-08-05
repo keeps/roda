@@ -141,7 +141,7 @@ public class BasicSearch extends Composite {
 			}
 		});
 
-		DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat(PredefinedFormat.DATE_MEDIUM));
+		DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
 		advancedSearchInputDateInitial.setFormat(dateFormat);
 		advancedSearchInputDateFinal.setFormat(dateFormat);
 		advancedSearchInputDateInitial.getDatePicker().setYearArrowsVisible(true);

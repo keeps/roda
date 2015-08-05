@@ -34,7 +34,7 @@ public class AIPList extends AsyncTableCell<SimpleDescriptionObject> {
 	private final ClientLogger logger = new ClientLogger(getClass().getName());
 
 	private final Column<SimpleDescriptionObject, SafeHtml> levelColumn;
-	private final TextColumn<SimpleDescriptionObject> idColumn;
+	// private final TextColumn<SimpleDescriptionObject> idColumn;
 	private final TextColumn<SimpleDescriptionObject> titleColumn;
 	private final Column<SimpleDescriptionObject, Date> dateInitialColumn;
 	private final Column<SimpleDescriptionObject, Date> dateFinalColumn;
@@ -56,13 +56,13 @@ public class AIPList extends AsyncTableCell<SimpleDescriptionObject> {
 			}
 		};
 
-		idColumn = new TextColumn<SimpleDescriptionObject>() {
-
-			@Override
-			public String getValue(SimpleDescriptionObject sdo) {
-				return sdo != null ? sdo.getId() : null;
-			}
-		};
+		// idColumn = new TextColumn<SimpleDescriptionObject>() {
+		//
+		// @Override
+		// public String getValue(SimpleDescriptionObject sdo) {
+		// return sdo != null ? sdo.getId() : null;
+		// }
+		// };
 
 		titleColumn = new TextColumn<SimpleDescriptionObject>() {
 
@@ -73,7 +73,7 @@ public class AIPList extends AsyncTableCell<SimpleDescriptionObject> {
 		};
 
 		dateInitialColumn = new Column<SimpleDescriptionObject, Date>(
-				new DateCell(DateTimeFormat.getFormat(PredefinedFormat.DATE_MEDIUM))) {
+				new DateCell(DateTimeFormat.getFormat("yyyy-MM-dd"))) {
 			@Override
 			public Date getValue(SimpleDescriptionObject sdo) {
 				return sdo != null ? sdo.getDateInitial() : null;
@@ -81,7 +81,7 @@ public class AIPList extends AsyncTableCell<SimpleDescriptionObject> {
 		};
 
 		dateFinalColumn = new Column<SimpleDescriptionObject, Date>(
-				new DateCell(DateTimeFormat.getFormat(PredefinedFormat.DATE_MEDIUM))) {
+				new DateCell(DateTimeFormat.getFormat("yyyy-MM-dd"))) {
 			@Override
 			public Date getValue(SimpleDescriptionObject sdo) {
 				return sdo != null ? sdo.getDateFinal() : null;
@@ -89,14 +89,14 @@ public class AIPList extends AsyncTableCell<SimpleDescriptionObject> {
 		};
 
 		levelColumn.setSortable(true);
-		idColumn.setSortable(true);
+		// idColumn.setSortable(true);
 		titleColumn.setSortable(true);
 		dateFinalColumn.setSortable(true);
 		dateInitialColumn.setSortable(true);
 
 		// TODO externalize strings into constants
 		getDisplay().addColumn(levelColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-tag'></i>"));
-		getDisplay().addColumn(idColumn, "Id");
+		// getDisplay().addColumn(idColumn, "Id");
 		getDisplay().addColumn(titleColumn, "Title");
 		getDisplay().addColumn(dateInitialColumn, "Date initial");
 		getDisplay().addColumn(dateFinalColumn, "Date final");
@@ -127,8 +127,8 @@ public class AIPList extends AsyncTableCell<SimpleDescriptionObject> {
 				String sortParameterKey;
 				if (columnSortInfo.getColumn().equals(levelColumn)) {
 					sortParameterKey = RodaConstants.SDO_LEVEL;
-				} else if (columnSortInfo.getColumn().equals(idColumn)) {
-					sortParameterKey = RodaConstants.AIP_ID;
+					// } else if (columnSortInfo.getColumn().equals(idColumn)) {
+					// sortParameterKey = RodaConstants.AIP_ID;
 				} else if (columnSortInfo.getColumn().equals(titleColumn)) {
 					sortParameterKey = RodaConstants.SDO_TITLE;
 				} else if (columnSortInfo.getColumn().equals(dateInitialColumn)) {

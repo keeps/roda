@@ -80,11 +80,14 @@
 }
 
 .descriptiveMetadata-field-key {
-	font-weight: 600;
+	font-weight: 300;
+	color: #999;
+	font-size: 1.1em;
 }
 
 .descriptiveMetadata-field-value {
-
+	line-height: 1.5em;
+	color: #404142;
 }
 
 .browseDownload {
@@ -107,7 +110,7 @@
 
 .browseDownloadSublabel {
 	font-size: 80%;
-	  margin-left: 25px;
+	margin-left: 25px;
 }
 
 /** Browser**/

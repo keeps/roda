@@ -338,9 +338,20 @@
 	cursor: hand;
 }
 
+.main .wui-breadcrumbPanel .breadcrumb .description-level {
+	margin-right: 0.2em;
+    color: #a7a9ac;
+}
+
+
+
 .main .wui-breadcrumbPanel .breadcrumb-last {
 	color: #404142;
 	text-decoration: none;
+}
+
+.main .wui-breadcrumbPanel .breadcrumb-last .description-level {
+	color: #404142;
 }
 
 .main .wui-breadcrumbPanel .breadcrumb-separator {

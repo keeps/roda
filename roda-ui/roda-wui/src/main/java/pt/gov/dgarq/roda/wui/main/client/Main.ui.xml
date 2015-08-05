@@ -12,21 +12,25 @@
 	}
 	
 	.homeLink {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 300px;
 		padding-left: 30px;
 		height: 110px;
 		cursor: pointer;
 		cursor: hand;
 	}
 	
+	.homeLogo {
+		width: 75px;
+	    height: 75px;
+	    float: left;
+	    margin-right: 20px;
+	    margin-top: 18px;
+	}
+	
 	.homeText {
 		color: white;
-		font-weight: bolder;
-		font-size: 50px;
-		margin-top: 22px;
+		font-weight: 400;
+		font-size: 58px;
+		line-height: 110px;
 		text-align: left;
 	}
 	
@@ -42,11 +46,17 @@
 	}
 	</ui:style>
 
+	<ui:with field='res'
+		type='pt.gov.dgarq.roda.wui.main.client.logos.LogosBundle' />
+
 	<g:FlowPanel styleName="main">
 		<!-- Header -->
 		<g:FlowPanel styleName="{style.banner}">
 			<g:FocusPanel styleName="{style.homeLink}" ui:field="homeLinkArea">
-				<g:HTMLPanel styleName="{style.homeText}">RODA</g:HTMLPanel>
+				<g:FlowPanel>
+					<g:Image styleName="{style.homeLogo}" resource='{res.logo}' />
+					<g:Label styleName="{style.homeText}">RODA</g:Label>
+				</g:FlowPanel>
 			</g:FocusPanel>
 			<i:LanguageSwitcherPanel addStyleNames="{style.languageSwitcher}"
 				ui:field="languageSwitcherPanel" />
