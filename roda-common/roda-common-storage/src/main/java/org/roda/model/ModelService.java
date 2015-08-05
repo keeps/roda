@@ -1,6 +1,11 @@
 package org.roda.model;
 
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -25,6 +30,8 @@ import org.roda.storage.Resource;
 import org.roda.storage.StorageActionException;
 import org.roda.storage.StoragePath;
 import org.roda.storage.StorageService;
+import org.roda.storage.fs.FSPathContentPayload;
+import org.roda.storage.fs.FSYamlMetadataUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.util.DateParser;
@@ -1364,24 +1371,82 @@ public class ModelService extends ModelObservable {
 		}
 	}
 
+	public void addLogEntry(LogEntry logEntry, boolean notify, Path logDirectory) throws ModelServiceException {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		String date = sdf.format(new Date()) + ".log";
+		Path logFile = logDirectory.resolve(date);
+
+		if (!Files.exists(logFile)) {
+			// find old logs and move them to storage
+			findOldLogsAndMoveThemToStorage(logDirectory, logFile);
+			try {
+				Files.createFile(logFile);
+			} catch (IOException e) {
+				throw new ModelServiceException("Error creating file to write log into",
+						ModelServiceException.INTERNAL_SERVER_ERROR, e);
+			}
+		}
+		// write to log
+		// emit event
+	}
+
+	private void findOldLogsAndMoveThemToStorage(Path logDirectory, Path currentLogFile) {
+		try {
+			final DirectoryStream<Path> directoryStream = Files.newDirectoryStream(logDirectory);
+			for (Path path : directoryStream) {
+				if (!path.equals(currentLogFile)) {
+					try {
+						StoragePath logPath = ModelUtils.getLogPath(path.getFileName().toString());
+						storage.createBinary(logPath, new HashMap<String, Set<String>>(), new FSPathContentPayload(path),
+								false);
+						Files.delete(path);
+					} catch (StorageActionException e) {
+						LOGGER.error("Error creating binary for log entry file", e);
+					} catch (IOException e) {
+						LOGGER.error("Error deleting");
+					}
+				}
+			}
+			directoryStream.close();
+
+		} catch (IOException e) {
+			
+		}
+
+	}
+
 	// FIXME all the initialization, if needed, should be done only once
-	public void addLogEntry(LogEntry logEntry, boolean notify) throws StorageActionException {
+	public void addLogEntry(LogEntry logEntry, boolean notify) throws ModelServiceException {
+
 		Binary dailyLog;
 
+		// verify if log container exists
 		try {
 			storage.createContainer(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG),
 					new HashMap<String, Set<String>>());
-		} catch (StorageActionException sae) {
-			// container already exists...
+		} catch (StorageActionException e) {
+			if (e.getCode() != StorageActionException.ALREADY_EXISTS) {
+				throw new ModelServiceException("Error creating container to add new log entry",
+						ModelServiceException.INTERNAL_SERVER_ERROR, e);
+			}
 		}
-		StoragePath logPath = ModelUtils.getLogPath(new Date());
-		logEntry.setFileID(logPath.getName());
+
+		// create, if it doesn't already exists, a binary for the log
+		StoragePath logPath = null;
 		try {
+			logPath = ModelUtils.getLogPath(new Date());
+			logEntry.setFileID(logPath.getName());
 			dailyLog = storage.getBinary(logPath);
 		} catch (StorageActionException sae) {
-			dailyLog = storage.createBinary(logPath, new HashMap<String, Set<String>>(), new JsonContentPayload(""),
-					false);
+			if (sae.getCode() == StorageActionException.NOT_FOUND) {
+				dailyLog = storage.createBinary(logPath, new HashMap<String, Set<String>>(), new JsonContentPayload(""),
+						false);
+			} else {
+				throw new ModelServiceException("Error verifying if binary for the entry log already exists",
+						ModelServiceException.INTERNAL_SERVER_ERROR, e);
+			}
 		}
+
 		try {
 
 			String entryJSON = ModelUtils.getJsonLogEntry(logEntry);
@@ -1396,7 +1461,7 @@ public class ModelService extends ModelObservable {
 		}
 	}
 
-	public void addLogEntry(LogEntry logEntry) throws StorageActionException {
+	public void addLogEntry(LogEntry logEntry) throws ModelServiceException {
 		addLogEntry(logEntry, true);
 	}
 

@@ -33,7 +33,7 @@ import org.w3c.util.DateParser;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import config.i18n.server.BrowserServiceMessages;
-import pt.gov.dgarq.roda.common.ModelFactory;
+import pt.gov.dgarq.roda.common.RodaCoreFactory;
 import pt.gov.dgarq.roda.common.RodaClientFactory;
 import pt.gov.dgarq.roda.core.RODAClient;
 import pt.gov.dgarq.roda.core.common.RODAException;
@@ -83,9 +83,9 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 	 *
 	 */
 	public BrowserServiceImpl() {
-		storage = ModelFactory.getStorageService();
-		model = ModelFactory.getModelService();
-		index = ModelFactory.getIndexService();
+		storage = RodaCoreFactory.getStorageService();
+		model = RodaCoreFactory.getModelService();
+		index = RodaCoreFactory.getIndexService();
 	}
 
 	public BrowseItemBundle getItemBundle(String aipId, String localeString) throws RODAException {

@@ -5,7 +5,9 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -18,8 +20,10 @@ import org.roda.storage.StorageActionException;
 import org.roda.storage.StorageService;
 import org.roda.storage.fs.FileStorageService;
 
-public class ModelFactory {
-	private static final Logger LOGGER = Logger.getLogger(ModelFactory.class);
+import pt.gov.dgarq.roda.core.data.v2.LogEntry;
+
+public class RodaCoreFactory {
+	private static final Logger LOGGER = Logger.getLogger(RodaCoreFactory.class);
 
 	private static Path storagePath;
 	private static Path indexPath;
@@ -27,6 +31,8 @@ public class ModelFactory {
 	private static ModelService model;
 	private static IndexService index;
 	private static EmbeddedSolrServer solr;
+	private static Path dataPath;
+	private static Path configPath;
 
 	static {
 		try {
@@ -39,15 +45,18 @@ public class ModelFactory {
 				RODA_HOME = null;
 			}
 
-			storagePath = Paths.get(RODA_HOME, "data", "storage");
-			indexPath = Paths.get(RODA_HOME, "data", "index");
+			dataPath = Paths.get(RODA_HOME, "data");
+			configPath = Paths.get(RODA_HOME, "config");
+
+			storagePath = dataPath.resolve("storage");
+			indexPath = dataPath.resolve("index");
 			storage = new FileStorageService(storagePath);
 			model = new ModelService(storage);
 
 			// Configure Solr
 			Path solrHome = Paths.get(RODA_HOME, "config", "index");
 			if (!Files.exists(solrHome)) {
-				solrHome = Paths.get(ModelFactory.class.getResource("/index/").toURI());
+				solrHome = Paths.get(RodaCoreFactory.class.getResource("/index/").toURI());
 			}
 
 			System.setProperty("solr.data.dir", indexPath.toString());
@@ -81,6 +90,14 @@ public class ModelFactory {
 
 	public static IndexService getIndexService() {
 		return index;
+	}
+
+	public static Path getConfigPath() {
+		return configPath;
+	}
+
+	public static Path getDataPath() {
+		return dataPath;
 	}
 
 	public static void closeSolrServer() {

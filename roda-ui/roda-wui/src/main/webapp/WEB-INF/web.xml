@@ -13,6 +13,15 @@
 		<url-pattern>/Main.html</url-pattern>
 	</filter-mapping>
 	
+	<filter>
+		<filter-name>CASAuthenticationFilter</filter-name>
+		<filter-class>pt.gov.dgarq.roda.servlet.cas.CASAuthenticationFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>CASAuthenticationFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	
 	<servlet>
 		<servlet-name>ClientLogger</servlet-name>
 		<servlet-class>pt.gov.dgarq.roda.wui.common.server.ClientLoggerImpl</servlet-class>

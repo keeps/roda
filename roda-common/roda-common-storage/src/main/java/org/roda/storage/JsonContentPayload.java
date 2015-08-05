@@ -9,8 +9,8 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
 public class JsonContentPayload implements ContentPayload {
-	String content;
-	Path contentPath;
+	private String content;
+	private Path contentPath;
 	public JsonContentPayload(String content) {
 		this.content = content;
 	}

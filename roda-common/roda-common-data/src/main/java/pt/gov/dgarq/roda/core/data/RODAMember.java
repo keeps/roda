@@ -155,6 +155,7 @@ public class RODAMember implements Serializable {
 	 * 
 	 * @return the roles
 	 */
+	// FIXME change array to list
 	public String[] getRoles() {
 		return (String[]) roles.toArray(new String[roles.size()]);
 	}

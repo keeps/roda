@@ -367,11 +367,15 @@ public final class ModelUtils {
 				RodaConstants.STORAGE_DIRECTORY_AGENTS, agentID);
 	}
 
-	public static StoragePath getLogPath(Date d) throws StorageActionException {
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		String logFile = sdf.format(d) + ".log";
+	public static StoragePath getLogPath(String logFile) throws StorageActionException {
 		return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG, logFile);
 	}
+	
+//	public static StoragePath getLogPath(Date d) throws StorageActionException {
+//		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+//		String logFile = sdf.format(d) + ".log";
+//		return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG, logFile);
+//	}
 
 	public static String getJsonLogEntry(LogEntry entry) {
 		try {

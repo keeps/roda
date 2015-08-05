@@ -9,7 +9,7 @@ import org.roda.index.IndexService;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
-import pt.gov.dgarq.roda.common.ModelFactory;
+import pt.gov.dgarq.roda.common.RodaCoreFactory;
 import pt.gov.dgarq.roda.common.RodaClientFactory;
 import pt.gov.dgarq.roda.core.RODAClient;
 import pt.gov.dgarq.roda.core.common.LoginException;
@@ -56,7 +56,7 @@ public class SearchServiceImpl extends RemoteServiceServlet implements
 			int snippetsMax, int fieldMaxLength) throws RODAException {
 		
 		IndexResult<SimpleDescriptionObject> result = null;
-		IndexService indexService = ModelFactory.getIndexService();
+		IndexService indexService = RodaCoreFactory.getIndexService();
 		
 		try {
 			Sublist sublist = new Sublist(startIndex, limit);
