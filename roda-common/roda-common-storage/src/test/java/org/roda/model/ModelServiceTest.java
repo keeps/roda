@@ -674,9 +674,9 @@ public class ModelServiceTest {
 		state.setDatetime(new Date());
 		state.setFileID("fileID");
 		state.setId("ID");
-		state.setIngestedPID("INGESTED");
+		state.setIngestedID("INGESTED");
 		state.setOriginalFilename("Filename");
-		state.setParentPID("parentPID");
+		state.setParentID("parentPID");
 		state.setProcessing(false);
 		state.setState("State");
 		SIPStateTransition[] stateTransitions = new SIPStateTransition[2];

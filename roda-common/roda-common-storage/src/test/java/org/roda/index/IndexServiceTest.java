@@ -430,9 +430,9 @@ public class IndexServiceTest {
 		state.setDatetime(new Date());
 		state.setFileID("fileID");
 		state.setId("ID");
-		state.setIngestedPID("INGESTED");
+		state.setIngestedID("INGESTED");
 		state.setOriginalFilename("Filename");
-		state.setParentPID("parentPID");
+		state.setParentID("parentPID");
 		state.setProcessing(false);
 		state.setState("State");
 		SIPStateTransition[] stateTransitions = new SIPStateTransition[2];
@@ -464,9 +464,9 @@ public class IndexServiceTest {
 		state.setDatetime(new Date());
 		state.setFileID("fileID");
 		state.setId("ID");
-		state.setIngestedPID("INGESTED");
+		state.setIngestedID("INGESTED");
 		state.setOriginalFilename("Filename");
-		state.setParentPID("parentPID");
+		state.setParentID("parentPID");
 		state.setProcessing(false);
 		state.setState("State");
 		SIPStateTransition[] stateTransitions = new SIPStateTransition[2];
@@ -483,7 +483,7 @@ public class IndexServiceTest {
 
 		IndexResult<SIPState> states = index.findSipState(filterFileName, null, new Sublist());
 		assertEquals(states.getTotalCount(), 1);
-		assertEquals(states.getResults().get(0).getIngestedPID(), "INGESTED");
+		assertEquals(states.getResults().get(0).getIngestedID(), "INGESTED");
 		//assertEquals(states.getResults().get(0).getStateTransitions()[0].getFromState(), "A");
 		//assertEquals(states.getResults().get(0).getStateTransitions()[1].getFromState(), "B");
 		

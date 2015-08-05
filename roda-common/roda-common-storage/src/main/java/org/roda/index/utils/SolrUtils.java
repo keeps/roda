@@ -919,8 +919,8 @@ public class SolrUtils {
 		sipState.setProcessing(processing);
 		sipState.setComplete(complete);
 		sipState.setCompletePercentage(completePercentage);
-		sipState.setParentPID(parentPID);
-		sipState.setIngestedPID(ingestedPID);
+		sipState.setParentID(parentPID);
+		sipState.setIngestedID(ingestedPID);
 		sipState.setFileID(fileID);
 		sipState.setStateTransitions(ssts.toArray(new SIPStateTransition[ssts.size()]));
 		return sipState;
@@ -932,9 +932,9 @@ public class SolrUtils {
 		doc.addField(RodaConstants.SIPSTATE_DATETIME, sipState.getDatetime());
 		doc.addField(RodaConstants.SIPSTATE_FILE_ID, sipState.getFileID());
 		doc.addField(RodaConstants.SIPSTATE_ID, sipState.getId());
-		doc.addField(RodaConstants.SIPSTATE_INGESTED_PID, sipState.getIngestedPID());
+		doc.addField(RodaConstants.SIPSTATE_INGESTED_PID, sipState.getIngestedID());
 		doc.addField(RodaConstants.SIPSTATE_ORIGINAL_FILENAME, sipState.getOriginalFilename());
-		doc.addField(RodaConstants.SIPSTATE_PARENT_PID, sipState.getParentPID());
+		doc.addField(RodaConstants.SIPSTATE_PARENT_PID, sipState.getParentID());
 		doc.addField(RodaConstants.SIPSTATE_PROCESSING, sipState.isProcessing());
 		doc.addField(RodaConstants.SIPSTATE_STATE, sipState.getState());
 		doc.addField(RodaConstants.SIPSTATE_USERNAME, sipState.getUsername());
