@@ -11,11 +11,13 @@ import java.util.Map;
 
 import javax.xml.transform.TransformerException;
 
+import org.apache.log4j.Logger;
 import org.roda.index.utils.SolrUtils;
 import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
 import org.roda.model.utils.ModelUtils;
 import org.roda.storage.Binary;
+import org.roda.storage.StorageActionException;
 import org.roda.storage.StoragePath;
 
 import pt.gov.dgarq.roda.core.common.RodaConstants;
@@ -28,7 +30,14 @@ import pt.gov.dgarq.roda.core.data.v2.SimplePreservationMetadata;
  * @author Luis Faria <lfaria@keep.pt>
  * @author Sébastien Leroux <sleroux@keep.pt>
  */
-public class HTMLUtils {
+public final class HTMLUtils {
+	private static final Logger LOGGER = Logger.getLogger(HTMLUtils.class);
+
+	/** Private empty constructor */
+	private HTMLUtils() {
+
+	}
+
 	// TODO improve metadata to HTML stylesheets
 	// TODO support localization (en/pt)
 	public static String descriptiveMetadataToHtml(Binary binary, ModelService model, Locale locale)
@@ -51,11 +60,14 @@ public class HTMLUtils {
 			descMetadataReader.close();
 			return transformerResult.toString();
 		} catch (TransformerException | IOException e) {
-			throw new ModelServiceException(e.getMessage(), ModelServiceException.INTERNAL_SERVER_ERROR);
+			LOGGER.error("Error transforming descriptive metadata file into HTML", e);
+			throw new ModelServiceException("Error transforming descriptive metadata file into HTML",
+					ModelServiceException.INTERNAL_SERVER_ERROR, e);
 		}
 	}
 
 	private static InputStream getStylesheetInputStream(String xsltFolder, Locale locale, String filename) {
+		// FIXME this should be loaded from config folder (to be dynamic)
 		ClassLoader classLoader = SolrUtils.class.getClassLoader();
 		InputStream transformerStream = classLoader.getResourceAsStream(
 				xsltFolder + "/" + locale.getLanguage() + "/" + locale.getCountry() + "/" + filename + ".xslt");
@@ -84,10 +96,7 @@ public class HTMLUtils {
 			Binary binary = model.getStorage().getBinary(storagePath);
 			InputStream inputStream = binary.getContent().createInputStream();
 			Reader descMetadataReader = new InputStreamReader(inputStream);
-			// TODO select transformers using file name extension
-			ClassLoader classLoader = SolrUtils.class.getClassLoader();
-			InputStream transformerStream = classLoader
-					.getResourceAsStream("htmlXSLT/" + locale.getLanguage() + "/premis.xslt");
+			InputStream transformerStream = getStylesheetInputStream("htmlXSLT", locale, "premis");
 			// TODO support the use of scripts for non-xml transformers
 			Reader xsltReader = new InputStreamReader(transformerStream);
 			CharArrayWriter transformerResult = new CharArrayWriter();
@@ -96,8 +105,10 @@ public class HTMLUtils {
 			RodaUtils.applyStylesheet(xsltReader, descMetadataReader, stylesheetOpt, transformerResult);
 			descMetadataReader.close();
 			return transformerResult.toString();
-		} catch (Exception e) {
-			throw new ModelServiceException(e.getMessage(), 100);
+		} catch (StorageActionException | TransformerException | IOException e) {
+			LOGGER.error("Error transforming preservation object file into HTML", e);
+			throw new ModelServiceException("Error transforming preservation object file into HTML",
+					ModelServiceException.INTERNAL_SERVER_ERROR, e);
 		}
 
 	}

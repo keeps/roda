@@ -19,6 +19,7 @@ public class AbstractEntity implements Entity {
 	/**
 	 * @return the storagePath
 	 */
+	@Override
 	public StoragePath getStoragePath() {
 		return storagePath;
 	}
@@ -34,6 +35,7 @@ public class AbstractEntity implements Entity {
 	/**
 	 * @return the metadata
 	 */
+	@Override
 	public Map<String, Set<String>> getMetadata() {
 		return metadata;
 	}

@@ -48,7 +48,7 @@ public class FedoraStorageService implements StorageService {
 	public static final String FEDORA_BINARY = "fedora:Binary";
 	public static final String FEDORA_RESOURCE_METADATA = "fcr:metadata";
 
-	private final Logger logger = LoggerFactory.getLogger(getClass());
+	private static final Logger LOGGER = LoggerFactory.getLogger(FedoraStorageService.class);
 
 	private String fedoraURL;
 	private String fedoraUsername;
@@ -547,7 +547,7 @@ public class FedoraStorageService implements StorageService {
 			final String sparqlUpdate = FedoraUtils.createSparqlUpdateQuery(
 					metadata, null);
 			if (sparqlUpdate != null) {
-				logger.debug("Updating properties of resource: "
+				LOGGER.debug("Updating properties of resource: "
 						+ resource.getName() + "\n" + sparqlUpdate);
 				resource.updateProperties(sparqlUpdate);
 			}

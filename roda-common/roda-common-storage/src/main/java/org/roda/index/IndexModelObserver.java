@@ -31,7 +31,7 @@ import pt.gov.dgarq.roda.core.data.v2.RepresentationFilePreservationObject;
  */
 public class IndexModelObserver implements ModelObserver {
 
-	private final Logger logger = LoggerFactory.getLogger(getClass());
+	private static final Logger LOGGER = LoggerFactory.getLogger(IndexModelObserver.class);
 
 	private final SolrClient index;
 	private final ModelService model;
@@ -63,13 +63,13 @@ public class IndexModelObserver implements ModelObserver {
 					index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisEventDocument);
 				}
 			} catch (SolrServerException | IOException | ModelServiceException e) {
-				logger.error("Could not index premis event", e);
+				LOGGER.error("Could not index premis event", e);
 			}
 		}
 		try {
 			index.commit(RodaConstants.INDEX_PRESERVATION_EVENTS);
 		} catch (SolrServerException | IOException e) {
-			logger.error("Could not commit indexed representations", e);
+			LOGGER.error("Could not commit indexed representations", e);
 		}
 	}
 
@@ -86,13 +86,13 @@ public class IndexModelObserver implements ModelObserver {
 					index.add(RodaConstants.INDEX_PRESERVATION_OBJECTS, premisObjectDocument);
 				}
 			} catch (SolrServerException | IOException | ModelServiceException e) {
-				logger.error("Could not index premis object", e);
+				LOGGER.error("Could not index premis object", e);
 			}
 		}
 		try {
 			index.commit(RodaConstants.INDEX_PRESERVATION_OBJECTS);
 		} catch (SolrServerException | IOException e) {
-			logger.error("Could not commit indexed representations", e);
+			LOGGER.error("Could not commit indexed representations", e);
 		}
 	}
 
@@ -104,13 +104,13 @@ public class IndexModelObserver implements ModelObserver {
 				SolrInputDocument representationDocument = SolrUtils.representationToSolrDocument(representation);
 				index.add(RodaConstants.INDEX_REPRESENTATIONS, representationDocument);
 			} catch (SolrServerException | IOException | ModelServiceException e) {
-				logger.error("Could not index representation", e);
+				LOGGER.error("Could not index representation", e);
 			}
 		}
 		try {
 			index.commit(RodaConstants.INDEX_REPRESENTATIONS);
 		} catch (SolrServerException | IOException e) {
-			logger.error("Could not commit indexed representations", e);
+			LOGGER.error("Could not commit indexed representations", e);
 		}
 	}
 
@@ -120,12 +120,12 @@ public class IndexModelObserver implements ModelObserver {
 			SolrInputDocument sdoDoc = SolrUtils.aipToSolrInputDocumentAsSDO(aip, model);
 			index.add(RodaConstants.INDEX_AIP, aipDoc);
 			// index.commit(RodaConstants.INDEX_AIP);
-			logger.debug("Adding SDO: " + sdoDoc);
+			LOGGER.debug("Adding SDO: " + sdoDoc);
 			index.add(RodaConstants.INDEX_SDO, sdoDoc);
 			// index.commit(RodaConstants.INDEX_SDO);
 		} catch (SolrServerException | IOException | ModelServiceException | StorageActionException
 				| IndexActionException e) {
-			logger.error("Could not index created AIP", e);
+			LOGGER.error("Could not index created AIP", e);
 		}
 	}
 
@@ -146,7 +146,7 @@ public class IndexModelObserver implements ModelObserver {
 			index.deleteById(RodaConstants.INDEX_SDO, aipId);
 			index.commit(RodaConstants.INDEX_SDO);
 		} catch (SolrServerException | IOException e) {
-			logger.error("Could not index delete AIP", e);
+			LOGGER.error("Could not delete AIP from index", e);
 		}
 
 		// TODO delete included representations, descriptive metadata and other
@@ -158,7 +158,7 @@ public class IndexModelObserver implements ModelObserver {
 		try {
 			aipUpdated(model.retrieveAIP(descriptiveMetadata.getAipId()));
 		} catch (ModelServiceException e) {
-			logger.error("Error when descriptive metadata created on retrieving the full AIP", e);
+			LOGGER.error("Error when descriptive metadata created on retrieving the full AIP", e);
 		}
 	}
 
@@ -168,7 +168,7 @@ public class IndexModelObserver implements ModelObserver {
 		try {
 			aipUpdated(model.retrieveAIP(descriptiveMetadata.getAipId()));
 		} catch (ModelServiceException e) {
-			logger.error("Error when descriptive metadata created on retrieving the full AIP", e);
+			LOGGER.error("Error when descriptive metadata created on retrieving the full AIP", e);
 		}
 
 	}
@@ -179,7 +179,7 @@ public class IndexModelObserver implements ModelObserver {
 		try {
 			aipUpdated(model.retrieveAIP(aipId));
 		} catch (ModelServiceException e) {
-			logger.error("Error when descriptive metadata created on retrieving the full AIP", e);
+			LOGGER.error("Error when descriptive metadata created on retrieving the full AIP", e);
 		}
 
 	}
@@ -192,7 +192,7 @@ public class IndexModelObserver implements ModelObserver {
 			index.add(RodaConstants.INDEX_REPRESENTATIONS, representationDocument);
 			index.commit(RodaConstants.INDEX_REPRESENTATIONS);
 		} catch (SolrServerException | IOException e) {
-			logger.error("Could not index created representation", e);
+			LOGGER.error("Could not index created representation", e);
 		}
 
 	}
@@ -208,10 +208,9 @@ public class IndexModelObserver implements ModelObserver {
 		try {
 			index.deleteById(RodaConstants.INDEX_REPRESENTATIONS, SolrUtils.getId(aipId, representationId));
 			index.commit(RodaConstants.INDEX_REPRESENTATIONS);
-		} catch (SolrServerException sse) {
-
-		} catch (IOException ioe) {
-
+		} catch (SolrServerException | IOException e) {
+			LOGGER.error(
+					"Error deleting representation (aipId=" + aipId + "; representationId=" + representationId + ")");
 		}
 
 	}
@@ -241,7 +240,7 @@ public class IndexModelObserver implements ModelObserver {
 			index.add(RodaConstants.INDEX_ACTION_LOG, logEntryDocument);
 			index.commit(RodaConstants.INDEX_ACTION_LOG);
 		} catch (SolrServerException | IOException e) {
-			logger.error("Could not index LogEntry: " + e.getMessage(), e);
+			LOGGER.error("Could not index LogEntry: " + e.getMessage(), e);
 		}
 	}
 }

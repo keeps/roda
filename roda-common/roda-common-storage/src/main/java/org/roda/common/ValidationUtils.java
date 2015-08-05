@@ -21,7 +21,7 @@ import org.roda.storage.StoragePath;
 import org.xml.sax.SAXException;
 
 public class ValidationUtils {
-	private static Logger logger = Logger.getLogger(ValidationUtils.class);
+	private static final Logger LOGGER = Logger.getLogger(ValidationUtils.class);
 
 	private static final String W3C_XML_SCHEMA_NS_URI = "http://www.w3.org/2001/XMLSchema";
 
@@ -43,7 +43,7 @@ public class ValidationUtils {
 			try {
 				descriptiveMetadataBinaries.close();
 			} catch (IOException e) {
-				logger.error("Error while while freeing up resources", e);
+				LOGGER.error("Error while while freeing up resources", e);
 			}
 		}
 		return valid;
@@ -61,6 +61,7 @@ public class ValidationUtils {
 			Binary binary = model.getStorage().getBinary(storagePath);
 			InputStream inputStream = binary.getContent().createInputStream();
 			String filename = binary.getStoragePath().getName();
+			// FIXME this should be loaded from config folder (to be dynamic)
 			ClassLoader classLoader = SolrUtils.class.getClassLoader();
 			InputStream schemaStream = classLoader.getResourceAsStream("XSD/" + filename + ".xsd");
 			if (schemaStream == null) {
@@ -76,12 +77,11 @@ public class ValidationUtils {
 				valid = true;
 			} catch (SAXException e) {
 				// error validating... valid stays false
+				LOGGER.error("Error validating descriptive metadata " + metadata.getStoragePath().asString());
 			}
-		} catch (StorageActionException e) {
-			throw new ModelServiceException("Error validating descriptive metadata",
-					ModelServiceException.INTERNAL_SERVER_ERROR);
-		} catch (SAXException | IOException e) {
-			throw new ModelServiceException("Error validating descriptive metadata",
+		} catch (StorageActionException | SAXException | IOException e) {
+			throw new ModelServiceException(
+					"Error validating descriptive metadata " + metadata.getStoragePath().asString(),
 					ModelServiceException.INTERNAL_SERVER_ERROR, e);
 		}
 		return valid;

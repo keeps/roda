@@ -1,7 +1,5 @@
 package org.roda.model;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -76,7 +74,7 @@ import pt.gov.dgarq.roda.core.metadata.v2.premis.PremisRepresentationObjectHelpe
  */
 public class ModelService extends ModelObservable {
 
-	private final Logger logger = LoggerFactory.getLogger(getClass());
+	private static final Logger LOGGER = LoggerFactory.getLogger(ModelService.class);
 
 	private final StorageService storage;
 
@@ -117,7 +115,7 @@ public class ModelService extends ModelObservable {
 								Resource next = resourcesIterator.next();
 								return convertResourceToAIP(next);
 							} catch (ModelServiceException | NoSuchElementException e) {
-								logger.error("Error while listing AIPs", e);
+								LOGGER.error("Error while listing AIPs", e);
 								return null;
 							}
 						}
@@ -278,7 +276,7 @@ public class ModelService extends ModelObservable {
 							try {
 								return convertResourceToDescriptiveMetadata(resourcesIterator.next());
 							} catch (ModelServiceException | NoSuchElementException e) {
-								logger.error("Error while listing descriptive metadata binaries", e);
+								LOGGER.error("Error while listing descriptive metadata binaries", e);
 								return null;
 							}
 
@@ -416,7 +414,7 @@ public class ModelService extends ModelObservable {
 							try {
 								return convertResourceToRepresentation(resourcesIterator.next());
 							} catch (ModelServiceException | NoSuchElementException e) {
-								logger.error("Error while listing representations", e);
+								LOGGER.error("Error while listing representations", e);
 								return null;
 							}
 						}
@@ -570,7 +568,7 @@ public class ModelService extends ModelObservable {
 					filesToRemoveIterable.close();
 				}
 			} catch (IOException e) {
-				logger.error("Error while while freeing up resources", e);
+				LOGGER.error("Error while while freeing up resources", e);
 			}
 		}
 	}
@@ -602,7 +600,7 @@ public class ModelService extends ModelObservable {
 					filesIterable.close();
 				}
 			} catch (IOException e) {
-				logger.error("Error while while freeing up resources", e);
+				LOGGER.error("Error while while freeing up resources", e);
 			}
 		}
 		return fileIDsToUpdate;
@@ -648,7 +646,7 @@ public class ModelService extends ModelObservable {
 							try {
 								return convertResourceToRepresentationFile(iterator.next());
 							} catch (ModelServiceException | NoSuchElementException e) {
-								logger.error("Error while listing representation files", e);
+								LOGGER.error("Error while listing representation files", e);
 								return null;
 							}
 						}
@@ -1007,7 +1005,7 @@ public class ModelService extends ModelObservable {
 					} else if (ModelUtils.isPreservationFileObject(preservationBinary)) {
 						preservationFileObjectFileIds.add(preservationFileId);
 					} else {
-						logger.warn(
+						LOGGER.warn(
 								"The binary {} is neither a PreservationRepresentationObject or PreservationEvent or PreservationFileObject...Moving on...",
 								binaryPath.asString());
 					}
@@ -1016,7 +1014,7 @@ public class ModelService extends ModelObservable {
 				preservationFileObjects.put(representationID, preservationFileObjectFileIds);
 				preservationEvents.put(representationID, preservationEventFileIds);
 			} catch (StorageActionException e) {
-				logger.error("Error while obtaining preservation related binaries", e);
+				LOGGER.error("Error while obtaining preservation related binaries", e);
 			}
 		}
 	}
@@ -1050,7 +1048,7 @@ public class ModelService extends ModelObservable {
 			try {
 				fileIds = ModelUtils.getIds(storage, resource.getStoragePath());
 			} catch (StorageActionException e) {
-				// FIXME log error but continue???
+				LOGGER.error("Error while obtainting file IDs from " + directoryPath.asString());
 			}
 
 			if (active == null) {
