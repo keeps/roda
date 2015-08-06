@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+	xmlns:i="urn:import:config.i18n.client" xmlns:m="urn:import:pt.gov.dgarq.roda.wui.main.client"
+	xmlns:common="urn:import:pt.gov.dgarq.roda.wui.common.client.widgets"
+	xmlns:d="urn:import:com.google.gwt.user.datepicker.client">
+
+	<ui:style>
+	.search {
+		display: flex;
+		justify-content: space-between;
+		min-height: 600px;
+	}
+	
+	.content {
+		width: 100%;
+		padding: 40px;
+	}
+	
+	.sidebar {
+		background-color: #eee;
+		padding: 40px;
+		width: 200px;
+	}
+	
+	.sidebar-title {
+		margin-bottom: 10px;
+	}
+	
+	.sidebar-group {
+		margin-bottom: 10px;
+	}
+	
+	.action {
+		width: 100%;
+		margin-bottom: 10px;
+	}
+	
+	.footer {
+		clear: both;
+	}
+	</ui:style>
+
+	<g:FlowPanel styleName="wui-log" addStyleNames="{style.search}">
+		<g:FlowPanel styleName="layout" addStyleNames="{style.content}">
+			<g:Label styleName="h1">Log</g:Label>
+			<g:FlowPanel addStyleNames="searchInput">
+				<g:FlowPanel addStyleNames="searchInputBoxWrapper">
+					<g:FlowPanel addStyleNames="searchAdvancedField">
+						<g:Label addStyleNames="searchAdvancedFieldLabel">Action component</g:Label>
+						<g:FlowPanel addStyleNames="searchAdvancedFieldInput">
+							<g:CheckBox>Login</g:CheckBox>
+							<g:CheckBox>Browse</g:CheckBox>
+							<g:CheckBox>Edit</g:CheckBox>
+							<g:CheckBox>Manage</g:CheckBox>
+							<g:CheckBox>Ingest</g:CheckBox>
+						</g:FlowPanel>
+					</g:FlowPanel>
+					<g:FlowPanel addStyleNames="searchAdvancedField">
+						<g:Label addStyleNames="searchAdvancedFieldLabel">Between the dates</g:Label>
+						<g:FlowPanel addStyleNames="searchAdvancedFieldInput">
+							<g:Label addStyleNames="searchAdvancedFieldInputDateLabel">From </g:Label>
+							<d:DateBox addStyleNames="searchAdvancedFieldInputDateInput"
+								ui:field="inputDateInitial" />
+							<g:Label addStyleNames="searchAdvancedFieldInputDateLabel"> to </g:Label>
+							<d:DateBox addStyleNames="searchAdvancedFieldInputDateInput"
+								ui:field="inputDateFinal" />
+						</g:FlowPanel>
+					</g:FlowPanel>
+				</g:FlowPanel>
+				<g:Button addStyleNames="btn btn-play searchApplyFilters">Apply filters</g:Button>
+			</g:FlowPanel>
+			<common:LogEntryList addStyleNames="searchResults"
+				ui:field="logList" />
+		</g:FlowPanel>
+		<g:FlowPanel styleName="{style.sidebar}">
+			<g:FlowPanel styleName="{style.sidebar-group}" ui:field="sidebarGroupDownloads">
+				<g:Label addStyleNames="h2 {style.sidebar-title} searchFacetsTitle">
+					<ui:msg>Filters</ui:msg>
+				</g:Label>
+			</g:FlowPanel>
+			<g:Button addStyleNames="btn btn-play searchApplyFilters">Apply filters</g:Button>
+		</g:FlowPanel>
+		<g:FlowPanel styleName="{style.footer}" />
+	</g:FlowPanel>
+</ui:UiBinder>

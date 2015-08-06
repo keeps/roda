@@ -21,7 +21,29 @@ import com.google.gwt.user.client.ui.Widget;
  * @author Luis Faria
  * 
  */
-public class Management implements HistoryResolver {
+public class Management {
+
+	public static final HistoryResolver RESOLVER = new HistoryResolver() {
+
+		@Override
+		public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
+			getInstance().resolve(historyTokens, callback);
+		}
+
+		@Override
+		public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
+			UserLogin.getInstance().checkRoles(new HistoryResolver[] { WUIUserManagement.getInstance(),
+					EventManagement.getInstance(), Statistics.getInstance(), UserLog.RESOLVER }, false, callback);
+		}
+
+		public String getHistoryPath() {
+			return getHistoryToken();
+		}
+
+		public String getHistoryToken() {
+			return "administration";
+		}
+	};
 
 	private static Management instance = null;
 
@@ -61,53 +83,26 @@ public class Management implements HistoryResolver {
 		return help;
 	}
 
-	public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-		UserLogin.getInstance().checkRoles(
-				new HistoryResolver[] { WUIUserManagement.getInstance(),
-						EventManagement.getInstance(),
-						Statistics.getInstance(), UserLog.getInstance() },
-				false, callback);
-	}
-
 	public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
 		if (historyTokens.length == 0) {
 			init();
 			callback.onSuccess(page);
 		} else {
-			if (historyTokens[0].equals(WUIUserManagement.getInstance()
-					.getHistoryToken())) {
-				WUIUserManagement.getInstance().resolve(
-						Tools.tail(historyTokens), callback);
-			} else if (historyTokens[0].equals(EventManagement.getInstance()
-					.getHistoryToken())) {
-				EventManagement.getInstance().resolve(
-						Tools.tail(historyTokens), callback);
-			} else if (historyTokens[0].equals(MetadataEditor.getInstance()
-					.getHistoryToken())) {
-				MetadataEditor.getInstance().resolve(Tools.tail(historyTokens),
-						callback);
-			} else if (historyTokens[0].equals(Statistics.getInstance()
-					.getHistoryToken())) {
-				Statistics.getInstance().resolve(Tools.tail(historyTokens),
-						callback);
-			} else if (historyTokens[0].equals(UserLog.getInstance()
-					.getHistoryToken())) {
-				UserLog.getInstance().resolve(Tools.tail(historyTokens),
-						callback);
+			if (historyTokens[0].equals(WUIUserManagement.getInstance().getHistoryToken())) {
+				WUIUserManagement.getInstance().resolve(Tools.tail(historyTokens), callback);
+			} else if (historyTokens[0].equals(EventManagement.getInstance().getHistoryToken())) {
+				EventManagement.getInstance().resolve(Tools.tail(historyTokens), callback);
+			} else if (historyTokens[0].equals(MetadataEditor.getInstance().getHistoryToken())) {
+				MetadataEditor.getInstance().resolve(Tools.tail(historyTokens), callback);
+			} else if (historyTokens[0].equals(Statistics.getInstance().getHistoryToken())) {
+				Statistics.getInstance().resolve(Tools.tail(historyTokens), callback);
+			} else if (historyTokens[0].equals(UserLog.RESOLVER.getHistoryToken())) {
+				UserLog.getInstance().resolve(Tools.tail(historyTokens), callback);
 			} else if (historyTokens[0].equals("help")) {
 				callback.onSuccess(getHelp());
 			} else {
-				callback.onFailure(new BadHistoryTokenException(
-						historyTokens[0]));
+				callback.onFailure(new BadHistoryTokenException(historyTokens[0]));
 			}
 		}
-	}
-
-	public String getHistoryPath() {
-		return getHistoryToken();
-	}
-
-	public String getHistoryToken() {
-		return "administration";
 	}
 }

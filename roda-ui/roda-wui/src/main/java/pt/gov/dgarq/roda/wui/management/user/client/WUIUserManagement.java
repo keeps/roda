@@ -67,8 +67,7 @@ public class WUIUserManagement extends DockPanel implements HistoryResolver {
 	private static UserManagementConstants constants = (UserManagementConstants) GWT
 			.create(UserManagementConstants.class);
 
-	private static UserManagementMessages messages = (UserManagementMessages) GWT
-			.create(UserManagementMessages.class);
+	private static UserManagementMessages messages = (UserManagementMessages) GWT.create(UserManagementMessages.class);
 
 	private boolean initialized;
 
@@ -113,69 +112,53 @@ public class WUIUserManagement extends DockPanel implements HistoryResolver {
 			userList = new UserAlphabetList();
 			groupList = new GroupAlphabetList();
 
-			userList
-					.addAlphabetSortedListListener(new AlphabetSortedListListener() {
+			userList.addAlphabetSortedListListener(new AlphabetSortedListListener() {
 
-						public void onItemSelect(AlphabetListItem item) {
-							if (item == null) {
-								updateVisibility(null);
-							} else if (listType == LIST_USERS
-									&& item instanceof UserDisclosurePanel) {
-								UserDisclosurePanel userPanel = (UserDisclosurePanel) item;
-								userPanel
-										.getSelected(new AsyncCallback<RODAMember>() {
+				public void onItemSelect(AlphabetListItem item) {
+					if (item == null) {
+						updateVisibility(null);
+					} else if (listType == LIST_USERS && item instanceof UserDisclosurePanel) {
+						UserDisclosurePanel userPanel = (UserDisclosurePanel) item;
+						userPanel.getSelected(new AsyncCallback<RODAMember>() {
 
-											public void onFailure(
-													Throwable caught) {
-												logger
-														.error(
-																"Error getting selected member",
-																caught);
-											}
-
-											public void onSuccess(
-													RODAMember selected) {
-												updateVisibility(selected);
-											}
-
-										});
+							public void onFailure(Throwable caught) {
+								logger.error("Error getting selected member", caught);
 							}
 
-						}
-
-					});
-
-			groupList
-					.addAlphabetSortedListListener(new AlphabetSortedListListener() {
-
-						public void onItemSelect(AlphabetListItem item) {
-							if (item == null) {
-								updateVisibility(null);
-							} else if (listType == LIST_GROUPS
-									&& item instanceof GroupDisclosurePanel) {
-								GroupDisclosurePanel groupPanel = (GroupDisclosurePanel) item;
-								groupPanel
-										.getSelected(new AsyncCallback<RODAMember>() {
-
-											public void onFailure(
-													Throwable caught) {
-												logger
-														.error(
-																"Error getting selected member",
-																caught);
-											}
-
-											public void onSuccess(
-													RODAMember selected) {
-												updateVisibility(selected);
-											}
-
-										});
+							public void onSuccess(RODAMember selected) {
+								updateVisibility(selected);
 							}
 
-						}
+						});
+					}
 
-					});
+				}
+
+			});
+
+			groupList.addAlphabetSortedListListener(new AlphabetSortedListListener() {
+
+				public void onItemSelect(AlphabetListItem item) {
+					if (item == null) {
+						updateVisibility(null);
+					} else if (listType == LIST_GROUPS && item instanceof GroupDisclosurePanel) {
+						GroupDisclosurePanel groupPanel = (GroupDisclosurePanel) item;
+						groupPanel.getSelected(new AsyncCallback<RODAMember>() {
+
+							public void onFailure(Throwable caught) {
+								logger.error("Error getting selected member", caught);
+							}
+
+							public void onSuccess(RODAMember selected) {
+								updateVisibility(selected);
+							}
+
+						});
+					}
+
+				}
+
+			});
 
 			controlPanel = new ControlPanel();
 
@@ -226,35 +209,29 @@ public class WUIUserManagement extends DockPanel implements HistoryResolver {
 
 		controlActionUserLabel = new Label(constants.userActions());
 
-		controlActionReport = new WUIButton(constants.report(),
-				WUIButton.Left.SQUARE, WUIButton.Right.REPORT);
+		controlActionReport = new WUIButton(constants.report(), WUIButton.Left.SQUARE, WUIButton.Right.REPORT);
 
-		controlActionCreateUser = new WUIButton(constants.createUser(),
-				WUIButton.Left.SQUARE, WUIButton.Right.PLUS);
+		controlActionCreateUser = new WUIButton(constants.createUser(), WUIButton.Left.SQUARE, WUIButton.Right.PLUS);
 
-		controlActionEditUser = new WUIButton(constants.editUser(),
-				WUIButton.Left.SQUARE, WUIButton.Right.ARROW_FORWARD);
+		controlActionEditUser = new WUIButton(constants.editUser(), WUIButton.Left.SQUARE,
+				WUIButton.Right.ARROW_FORWARD);
 
-		controlActionSetActive = new WUIButton(constants.setActive(),
-				WUIButton.Left.SQUARE, WUIButton.Right.ARROW_FORWARD);
-		controlActionSetInactive = new WUIButton(constants.setInactive(),
-				WUIButton.Left.SQUARE, WUIButton.Right.ARROW_FORWARD);
-		controlActionRemoveUser = new WUIButton(constants.removeUser(),
-				WUIButton.Left.SQUARE, WUIButton.Right.CROSS);
+		controlActionSetActive = new WUIButton(constants.setActive(), WUIButton.Left.SQUARE,
+				WUIButton.Right.ARROW_FORWARD);
+		controlActionSetInactive = new WUIButton(constants.setInactive(), WUIButton.Left.SQUARE,
+				WUIButton.Right.ARROW_FORWARD);
+		controlActionRemoveUser = new WUIButton(constants.removeUser(), WUIButton.Left.SQUARE, WUIButton.Right.CROSS);
 
 		controlActionGroupLabel = new Label(constants.groupActions());
 
-		controlActionCreateGroup = new WUIButton(constants.createGroup(),
-				WUIButton.Left.SQUARE, WUIButton.Right.PLUS);
+		controlActionCreateGroup = new WUIButton(constants.createGroup(), WUIButton.Left.SQUARE, WUIButton.Right.PLUS);
 
-		controlActionCreateGroup = new WUIButton(constants.createGroup(),
-				WUIButton.Left.SQUARE, WUIButton.Right.PLUS);
+		controlActionCreateGroup = new WUIButton(constants.createGroup(), WUIButton.Left.SQUARE, WUIButton.Right.PLUS);
 
-		controlActionEditGroup = new WUIButton(constants.editGroup(),
-				WUIButton.Left.SQUARE, WUIButton.Right.ARROW_FORWARD);
+		controlActionEditGroup = new WUIButton(constants.editGroup(), WUIButton.Left.SQUARE,
+				WUIButton.Right.ARROW_FORWARD);
 
-		controlActionRemoveGroup = new WUIButton(constants.removeGroup(),
-				WUIButton.Left.SQUARE, WUIButton.Right.CROSS);
+		controlActionRemoveGroup = new WUIButton(constants.removeGroup(), WUIButton.Left.SQUARE, WUIButton.Right.CROSS);
 
 		controlPanel.addActionWidget(controlActionUserLabel);
 		controlPanel.addActionButton(controlActionReport);
@@ -275,15 +252,13 @@ public class WUIUserManagement extends DockPanel implements HistoryResolver {
 				AsyncCallback<RODAMember> callback = new AsyncCallback<RODAMember>() {
 
 					public void onFailure(Throwable caught) {
-						logger.error("Error getting selected RODA member",
-								caught);
+						logger.error("Error getting selected RODA member", caught);
 
 					}
 
 					public void onSuccess(RODAMember selected) {
 						if (selected != null && selected instanceof User) {
-							ActionReportWindow actionReportWindow = new ActionReportWindow(
-									(User) selected);
+							ActionReportWindow actionReportWindow = new ActionReportWindow((User) selected);
 							actionReportWindow.show();
 						} else {
 							Window.alert(messages.actionReportNoUser());
@@ -357,8 +332,7 @@ public class WUIUserManagement extends DockPanel implements HistoryResolver {
 				AsyncCallback<RODAMember> callback = new AsyncCallback<RODAMember>() {
 
 					public void onFailure(Throwable caught) {
-						logger.error("Error getting selected RODA member",
-								caught);
+						logger.error("Error getting selected RODA member", caught);
 					}
 
 					public void onSuccess(RODAMember selected) {
@@ -387,13 +361,11 @@ public class WUIUserManagement extends DockPanel implements HistoryResolver {
 				AsyncCallback<RODAMember> callback = new AsyncCallback<RODAMember>() {
 
 					public void onFailure(Throwable caught) {
-						logger.error("Error getting selected RODA member",
-								caught);
+						logger.error("Error getting selected RODA member", caught);
 					}
 
 					public void onSuccess(RODAMember selected) {
-						if (selected != null && selected instanceof User
-								&& !((User) selected).isActive()) {
+						if (selected != null && selected instanceof User && !((User) selected).isActive()) {
 							setUserActive((User) selected, true);
 						} else {
 							Window.alert(constants.selectNoInactiveUser());
@@ -417,13 +389,11 @@ public class WUIUserManagement extends DockPanel implements HistoryResolver {
 				AsyncCallback<RODAMember> callback = new AsyncCallback<RODAMember>() {
 
 					public void onFailure(Throwable caught) {
-						logger.error("Error getting selected RODA member",
-								caught);
+						logger.error("Error getting selected RODA member", caught);
 					}
 
 					public void onSuccess(RODAMember selected) {
-						if (selected != null && selected instanceof User
-								&& ((User) selected).isActive()) {
+						if (selected != null && selected instanceof User && ((User) selected).isActive()) {
 							setUserActive((User) selected, false);
 						} else {
 							Window.alert(constants.selectNoActiveUser());
@@ -447,8 +417,7 @@ public class WUIUserManagement extends DockPanel implements HistoryResolver {
 				AsyncCallback<RODAMember> callback = new AsyncCallback<RODAMember>() {
 
 					public void onFailure(Throwable caught) {
-						logger.error("Error getting selected RODA member",
-								caught);
+						logger.error("Error getting selected RODA member", caught);
 					}
 
 					public void onSuccess(RODAMember selected) {
@@ -476,8 +445,7 @@ public class WUIUserManagement extends DockPanel implements HistoryResolver {
 				AsyncCallback<RODAMember> callback = new AsyncCallback<RODAMember>() {
 
 					public void onFailure(Throwable caught) {
-						logger.error("Error getting selected RODA member",
-								caught);
+						logger.error("Error getting selected RODA member", caught);
 					}
 
 					public void onSuccess(RODAMember selected) {
@@ -505,8 +473,7 @@ public class WUIUserManagement extends DockPanel implements HistoryResolver {
 				AsyncCallback<RODAMember> callback = new AsyncCallback<RODAMember>() {
 
 					public void onFailure(Throwable caught) {
-						logger.error("Error getting selected RODA member",
-								caught);
+						logger.error("Error getting selected RODA member", caught);
 					}
 
 					public void onSuccess(RODAMember selected) {
@@ -528,10 +495,8 @@ public class WUIUserManagement extends DockPanel implements HistoryResolver {
 
 		});
 
-		controlActionUserLabel
-				.addStyleName("wui-management-user-actions-title");
-		controlActionGroupLabel
-				.addStyleName("wui-management-user-actions-title");
+		controlActionUserLabel.addStyleName("wui-management-user-actions-title");
+		controlActionGroupLabel.addStyleName("wui-management-user-actions-title");
 	}
 
 	/**
@@ -549,7 +514,7 @@ public class WUIUserManagement extends DockPanel implements HistoryResolver {
 				listType = LIST_USERS;
 				controlPanel.setSelectedOptionIndex(0);
 				userList.update();
-			} else /* if(type == LIST_GROUPS) */{
+			} else /* if(type == LIST_GROUPS) */ {
 				this.remove(userList);
 				this.add(groupList, CENTER);
 				this.setCellWidth(groupList, "100%");
@@ -661,27 +626,23 @@ public class WUIUserManagement extends DockPanel implements HistoryResolver {
 	public void setUserActive(final User user, final boolean active) {
 		if (user.isActive() != active) {
 			user.setActive(active);
-			UserManagementService.Util.getInstance().editUser(user, null,
-					new AsyncCallback<Void>() {
+			UserManagementService.Util.getInstance().editUser(user, null, new AsyncCallback<Void>() {
 
-						public void onFailure(Throwable caught) {
-							logger.error("Error setting user " + user.getName()
-									+ (active ? " active" : " inactive"),
-									caught);
-						}
+				public void onFailure(Throwable caught) {
+					logger.error("Error setting user " + user.getName() + (active ? " active" : " inactive"), caught);
+				}
 
-						public void onSuccess(Void result) {
-							if (listType == LIST_USERS) {
-								userList.update();
-							} else {
-								groupList.update();
-							}
-						}
+				public void onSuccess(Void result) {
+					if (listType == LIST_USERS) {
+						userList.update();
+					} else {
+						groupList.update();
+					}
+				}
 
-					});
+			});
 		} else {
-			logger.warn("Tryed to re-apply " + (active ? "active" : "inactive")
-					+ " status of user " + user.getName());
+			logger.warn("Tryed to re-apply " + (active ? "active" : "inactive") + " status of user " + user.getName());
 		}
 	}
 
@@ -692,44 +653,34 @@ public class WUIUserManagement extends DockPanel implements HistoryResolver {
 	 *            the RODA member to be removed
 	 */
 	public void removeMember(final RODAMember member) {
-		if (member instanceof User
-				&& Window.confirm(messages.removeUserConfirm(member.getName()))) {
-			UserManagementService.Util.getInstance().removeUser(
-					member.getName(), new AsyncCallback<Boolean>() {
+		if (member instanceof User && Window.confirm(messages.removeUserConfirm(member.getName()))) {
+			UserManagementService.Util.getInstance().removeUser(member.getName(), new AsyncCallback<Boolean>() {
 
-						public void onFailure(Throwable caught) {
-							Window.alert(messages.removeUserFailure(member
-									.getName(), caught.getMessage()));
-						}
+				public void onFailure(Throwable caught) {
+					Window.alert(messages.removeUserFailure(member.getName(), caught.getMessage()));
+				}
 
-						public void onSuccess(Boolean removed) {
-							userList.update();
-							if (!removed.booleanValue()) {
-								Window
-										.alert(messages
-												.removeUserNotPossible(member
-														.getName()));
-							}
+				public void onSuccess(Boolean removed) {
+					userList.update();
+					if (!removed.booleanValue()) {
+						Window.alert(messages.removeUserNotPossible(member.getName()));
+					}
 
-						}
+				}
 
-					});
-		} else if (member instanceof Group
-				&& Window
-						.confirm(messages.removeGroupConfirm(member.getName()))) {
-			UserManagementService.Util.getInstance().removeGroup(
-					member.getName(), new AsyncCallback<Void>() {
+			});
+		} else if (member instanceof Group && Window.confirm(messages.removeGroupConfirm(member.getName()))) {
+			UserManagementService.Util.getInstance().removeGroup(member.getName(), new AsyncCallback<Void>() {
 
-						public void onFailure(Throwable caught) {
-							Window.alert(messages.removeGroupFailure(member
-									.getName(), caught.getMessage()));
-						}
+				public void onFailure(Throwable caught) {
+					Window.alert(messages.removeGroupFailure(member.getName(), caught.getMessage()));
+				}
 
-						public void onSuccess(Void result) {
-							groupList.update();
-						}
+				public void onSuccess(Void result) {
+					groupList.update();
+				}
 
-					});
+			});
 		}
 	}
 
@@ -752,8 +703,7 @@ public class WUIUserManagement extends DockPanel implements HistoryResolver {
 				init();
 				setListType(LIST_GROUPS);
 			} else {
-				callback.onFailure(new BadHistoryTokenException(
-						historyTokens[0]));
+				callback.onFailure(new BadHistoryTokenException(historyTokens[0]));
 			}
 		} else {
 			History.newItem(getHistoryPath() + ".users");
@@ -762,8 +712,7 @@ public class WUIUserManagement extends DockPanel implements HistoryResolver {
 	}
 
 	public String getHistoryPath() {
-		return Management.getInstance().getHistoryPath() + "."
-				+ getHistoryToken();
+		return Management.RESOLVER.getHistoryPath() + "." + getHistoryToken();
 	}
 
 	public String getHistoryToken() {

@@ -80,7 +80,7 @@ public class ContentPanel extends SimplePanel {
 		// Ingest
 		resolvers.add(Ingest.RESOLVER);
 		// Management
-		resolvers.add(Management.getInstance());
+		resolvers.add(Management.RESOLVER);
 		// User Management
 		resolvers.add(Preferences.getInstance());
 		resolvers.add(RecoverLoginRequest.getInstance());

@@ -60,7 +60,7 @@ public class Statistics implements HistoryResolver {
 
 			statisticTabs.add(new RepositoryStatistics());
 			statisticTabs.add(new IngestStatistics());
-//			statisticTabs.add(new EventStatistics());
+			// statisticTabs.add(new EventStatistics());
 			statisticTabs.add(new ProducersStatistics());
 			statisticTabs.add(new UserStatistics());
 			statisticTabs.add(new AccessStatistics());
@@ -73,8 +73,7 @@ public class Statistics implements HistoryResolver {
 
 			layout.addTabListener(new TabListener() {
 
-				public boolean onBeforeTabSelected(SourcesTabEvents sender,
-						int tabIndex) {
+				public boolean onBeforeTabSelected(SourcesTabEvents sender, int tabIndex) {
 					return true;
 				}
 
@@ -106,8 +105,7 @@ public class Statistics implements HistoryResolver {
 	}
 
 	public String getHistoryPath() {
-		return Management.getInstance().getHistoryPath() + "."
-				+ getHistoryToken();
+		return Management.RESOLVER.getHistoryPath() + "." + getHistoryToken();
 	}
 
 	public String getHistoryToken() {

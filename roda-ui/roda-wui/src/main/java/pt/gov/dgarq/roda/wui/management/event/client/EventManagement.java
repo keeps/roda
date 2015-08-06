@@ -58,35 +58,32 @@ public class EventManagement implements HistoryResolver {
 			taskInstanceList = new TaskInstanceList();
 
 			tabPanel.add(taskList.getWidget(), constants.taskListTab());
-			tabPanel.add(taskInstanceList.getWidget(), constants
-					.taskInstanceListTab());
+			tabPanel.add(taskInstanceList.getWidget(), constants.taskInstanceListTab());
 
 			tabPanel.addTabListener(new TabListener() {
 
-				public boolean onBeforeTabSelected(SourcesTabEvents sender,
-						int tabIndex) {
+				public boolean onBeforeTabSelected(SourcesTabEvents sender, int tabIndex) {
 					return true;
 				}
 
 				public void onTabSelected(SourcesTabEvents sender, int tabIndex) {
 					if (tabIndex == 0) {
-						History.newItem(getHistoryPath()+".tasks");
+						History.newItem(getHistoryPath() + ".tasks");
 						taskList.init();
 					} else if (tabIndex == 1) {
-						History.newItem(getHistoryPath()+".taskInstances");
+						History.newItem(getHistoryPath() + ".taskInstances");
 						taskInstanceList.init();
 					}
 				}
 
 			});
-			
+
 			tabPanel.addStyleName("wui-management-event-tabs");
 		}
 	}
 
 	public String getHistoryPath() {
-		return Management.getInstance().getHistoryPath() + "."
-				+ getHistoryToken();
+		return Management.RESOLVER.getHistoryPath() + "." + getHistoryToken();
 	}
 
 	public String getHistoryToken() {
@@ -111,8 +108,7 @@ public class EventManagement implements HistoryResolver {
 				tabPanel.selectTab(1);
 				callback.onSuccess(tabPanel);
 			} else {
-				callback.onFailure(new BadHistoryTokenException(
-						historyTokens[0]));
+				callback.onFailure(new BadHistoryTokenException(historyTokens[0]));
 			}
 		} else {
 			History.newItem(getHistoryPath() + ".tasks");

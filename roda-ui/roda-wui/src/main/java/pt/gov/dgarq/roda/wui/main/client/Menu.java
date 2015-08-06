@@ -108,9 +108,8 @@ public class Menu extends Composite {
 		administration_statistics = administrationMenu.addItem(constants.title_administration_statistics(),
 				createCommand(Statistics.getInstance().getHistoryPath()));
 		administration_log = administrationMenu.addItem(constants.title_administration_log(),
-				createCommand(UserLog.getInstance().getHistoryPath()));
-		administrationMenu.addItem(constants.title_administration_help(),
-				createCommand(Management.getInstance().getHistoryPath() + ".help"));
+				createCommand(UserLog.RESOLVER.getHistoryPath()));
+		administrationMenu.addItem(constants.title_administration_help(), createCommand(Management.RESOLVER + ".help"));
 
 		userMenu = new MenuBar(true);
 		userMenu.addItem(constants.loginLogout(), new ScheduledCommand() {
@@ -319,7 +318,7 @@ public class Menu extends Composite {
 
 		});
 
-		UserLog.getInstance().isCurrentUserPermitted(new AsyncCallback<Boolean>() {
+		UserLog.RESOLVER.isCurrentUserPermitted(new AsyncCallback<Boolean>() {
 
 			public void onFailure(Throwable caught) {
 				logger.error("Error getting advanced search role", caught);
@@ -331,7 +330,7 @@ public class Menu extends Composite {
 
 		});
 
-		Management.getInstance().isCurrentUserPermitted(new AsyncCallback<Boolean>() {
+		Management.RESOLVER.isCurrentUserPermitted(new AsyncCallback<Boolean>() {
 
 			public void onFailure(Throwable caught) {
 				logger.error("Error getting roles", caught);

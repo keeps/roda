@@ -60,8 +60,7 @@ public class MetadataEditor implements HistoryResolver {
 	}
 
 	public String getHistoryPath() {
-		return Management.getInstance().getHistoryPath() + "."
-				+ getHistoryToken();
+		return Management.RESOLVER.getHistoryPath() + "." + getHistoryToken();
 	}
 
 	public String getHistoryToken() {
