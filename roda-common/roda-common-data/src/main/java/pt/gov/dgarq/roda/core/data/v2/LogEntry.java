@@ -2,8 +2,8 @@ package pt.gov.dgarq.roda.core.data.v2;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -15,133 +15,94 @@ public class LogEntry implements Serializable {
 
 	public static final String[] ACCEPT_SIP_ACTIONS = new String[] { "AcceptSIP.acceptSIP" };
 
-	public static final String[] BROWSER_ACTIONS = new String[] {
-			"Browser.getRODAObject", "Browser.getRODAObjectCount",
-			"Browser.getRODAObjects", "Browser.getSimpleDescriptionObject",
-			"Browser.getSimpleDescriptionObjectCount",
-			"Browser.getSimpleDescriptionObjects",
-			"Browser.getSimpleDescriptionObjectIndex",
-			"Browser.getDescriptionObject", "Browser.getDOPIDs",
-			"Browser.getDOAncestorPIDs", "Browser.getDORepresentations",
-			"Browser.getDOOriginalRepresentation",
-			"Browser.getDONormalizedRepresentation",
-			"Browser.getDOPreservationObjects",
-			"Browser.getSimpleRepresentationObject",
-			"Browser.getSimpleRepresentationObjectCount",
-			"Browser.getSimpleRepresentationObjects",
-			"Browser.getRepresentationObject", "Browser.getRepresentationFile",
-			"Browser.getROPreservationObject",
+	public static final String[] BROWSER_ACTIONS = new String[] { "Browser.getRODAObject", "Browser.getRODAObjectCount",
+			"Browser.getRODAObjects", "Browser.getSimpleDescriptionObject", "Browser.getSimpleDescriptionObjectCount",
+			"Browser.getSimpleDescriptionObjects", "Browser.getSimpleDescriptionObjectIndex",
+			"Browser.getDescriptionObject", "Browser.getDOPIDs", "Browser.getDOAncestorPIDs",
+			"Browser.getDORepresentations", "Browser.getDOOriginalRepresentation",
+			"Browser.getDONormalizedRepresentation", "Browser.getDOPreservationObjects",
+			"Browser.getSimpleRepresentationObject", "Browser.getSimpleRepresentationObjectCount",
+			"Browser.getSimpleRepresentationObjects", "Browser.getRepresentationObject",
+			"Browser.getRepresentationFile", "Browser.getROPreservationObject",
 			"Browser.getSimpleRepresentationPreservationObject",
 			"Browser.getSimpleRepresentationPreservationObjectCount",
-			"Browser.getSimpleRepresentationPreservationObjects",
-			"Browser.getRepresentationPreservationObject",
-			"Browser.getSimpleEventPreservationObject",
-			"Browser.getSimpleEventPreservationObjectCount",
-			"Browser.getSimpleEventPreservationObjects",
-			"Browser.getEventPreservationObject",
-			"Browser.getPreservationEvents",
-			"Browser.getAgentPreservationObject",
-			"Browser.getRODAObjectPermissions",
-			"Browser.getRODAObjectUserPermissions",
-			"Browser.hasModifyPermission", "Browser.hasRemovePermission",
+			"Browser.getSimpleRepresentationPreservationObjects", "Browser.getRepresentationPreservationObject",
+			"Browser.getSimpleEventPreservationObject", "Browser.getSimpleEventPreservationObjectCount",
+			"Browser.getSimpleEventPreservationObjects", "Browser.getEventPreservationObject",
+			"Browser.getPreservationEvents", "Browser.getAgentPreservationObject", "Browser.getRODAObjectPermissions",
+			"Browser.getRODAObjectUserPermissions", "Browser.hasModifyPermission", "Browser.hasRemovePermission",
 			"Browser.hasGrantPermission", "Browser.getProducers", };
 
-	public static final String[] EDITOR_ACTIONS = new String[] {
-			"Editor.createDescriptionObject", "Editor.modifyDescriptionObject",
-			"Editor.removeDescriptionObject", "Editor.getDOPossibleLevels",
+	public static final String[] EDITOR_ACTIONS = new String[] { "Editor.createDescriptionObject",
+			"Editor.modifyDescriptionObject", "Editor.removeDescriptionObject", "Editor.getDOPossibleLevels",
 			"Editor.setRODAObjectPermissions", "Editor.setProducers", };
 
 	public static final String[] FILE_ACCESS_SERVLET_ACTIONS = new String[] { "FileAccessServlet.GET" };
 
 	public static final String[] FILE_UPLOAD_SERVLET_ACTIONS = new String[] { "FileUploadServlet.POST" };
 
-	public static final String[] INGEST_ACTIONS = new String[] {
-			"Ingest.createDetachedDescriptionObject",
-			"Ingest.createDescriptionObject", "Ingest.removeDescriptionObject",
-			"Ingest.createRepresentationObject",
-			"Ingest.setDONormalizedRepresentation",
-			"Ingest.registerIngestEvent", "Ingest.registerEvent",
+	public static final String[] INGEST_ACTIONS = new String[] { "Ingest.createDetachedDescriptionObject",
+			"Ingest.createDescriptionObject", "Ingest.removeDescriptionObject", "Ingest.createRepresentationObject",
+			"Ingest.setDONormalizedRepresentation", "Ingest.registerIngestEvent", "Ingest.registerEvent",
 			"Ingest.registerDerivationEvent", "Ingest.removeObjects", };
 
-	public static final String[] INGEST_MONITOR_ACTIONS = new String[] {
-			"IngestMonitor.getSIPsCount", "IngestMonitor.getSIPs",
-			"IngestMonitor.getPossibleStates", };
+	public static final String[] INGEST_MONITOR_ACTIONS = new String[] { "IngestMonitor.getSIPsCount",
+			"IngestMonitor.getSIPs", "IngestMonitor.getPossibleStates", };
 
 	public static final String[] LOGGER_ACTIONS = new String[] { "Logger.addLogEntry", };
 
-	public static final String[] LOGIN_ACTIONS = new String[] {
-			"Login.getAuthenticatedUser", "Login.getGuestUser",
+	public static final String[] LOGIN_ACTIONS = new String[] { "Login.getAuthenticatedUser", "Login.getGuestUser",
 			"Login.getGuestCredentials", };
 
 	public static final String[] PLUGINS_ACTIONS = new String[] { "Plugins.getPluginsInfo", };
 
-	public static final String[] REPORTS_ACTIONS = new String[] {
-			"Reports.getReport", "Reports.getReportsCount",
+	public static final String[] REPORTS_ACTIONS = new String[] { "Reports.getReport", "Reports.getReportsCount",
 			"Reports.getReports", };
 
-	public static final String[] SCHEDULER_ACTIONS = new String[] {
-			"Scheduler.getTasks", "Scheduler.getTaskCount",
-			"Scheduler.getTask", "Scheduler.addTask", "Scheduler.modifyTask",
-			"Scheduler.removeTask", "Scheduler.getTaskInstance",
-			"Scheduler.getTaskInstances", "Scheduler.getTaskInstanceCount", };
+	public static final String[] SCHEDULER_ACTIONS = new String[] { "Scheduler.getTasks", "Scheduler.getTaskCount",
+			"Scheduler.getTask", "Scheduler.addTask", "Scheduler.modifyTask", "Scheduler.removeTask",
+			"Scheduler.getTaskInstance", "Scheduler.getTaskInstances", "Scheduler.getTaskInstanceCount", };
 
-	public static final String[] SEARCH_ACTIONS = new String[] {
-			"Search.basicSearch", "Search.advancedSearch", };
+	public static final String[] SEARCH_ACTIONS = new String[] { "Search.basicSearch", "Search.advancedSearch", };
 
 	public static final String[] SIP_UPLOAD_SERVLET_ACTIONS = new String[] { "SIPUploadServlet.POST" };
 
-	public static final String[] STATISTICS_ACTIONS = new String[] {
-			"Statistics.insertStatisticData",
+	public static final String[] STATISTICS_ACTIONS = new String[] { "Statistics.insertStatisticData",
 			"Statistics.insertStatisticDataList", };
 
-	public static final String[] STATISTICS_MONITOR_ACTIONS = new String[] {
-			"StatisticsMonitor.getStatisticDataCount",
+	public static final String[] STATISTICS_MONITOR_ACTIONS = new String[] { "StatisticsMonitor.getStatisticDataCount",
 			"StatisticsMonitor.getStatisticData", };
 
-	public static final String[] USER_BROWSER_ACTIONS = new String[] {
-			"UserBrowser.getGroupCount", "UserBrowser.getGroup",
-			"UserBrowser.getGroups", "UserBrowser.getUsersInGroup",
-			"UserBrowser.getUserCount", "UserBrowser.getUser",
-			"UserBrowser.getUsers", "UserBrowser.getUserNames",
-			"UserBrowser.getRoles", "UserBrowser.getGroupDirectRoles",
-			"UserBrowser.getUserDirectRoles", };
+	public static final String[] USER_BROWSER_ACTIONS = new String[] { "UserBrowser.getGroupCount",
+			"UserBrowser.getGroup", "UserBrowser.getGroups", "UserBrowser.getUsersInGroup", "UserBrowser.getUserCount",
+			"UserBrowser.getUser", "UserBrowser.getUsers", "UserBrowser.getUserNames", "UserBrowser.getRoles",
+			"UserBrowser.getGroupDirectRoles", "UserBrowser.getUserDirectRoles", };
 
 	public static final String[] USER_EDITOR_ACTIONS = new String[] { "UserEditor.modifyUser", };
 
-	public static final String[] USER_MANAGEMENT_ACTIONS = new String[] {
-			"UserManagement.addGroup", "UserManagement.modifyGroup",
-			"UserManagement.removeGroup", "UserManagement.addUser",
-			"UserManagement.modifyUser", "UserManagement.removeUser",
-			"UserManagement.setUserPassword", };
+	public static final String[] USER_MANAGEMENT_ACTIONS = new String[] { "UserManagement.addGroup",
+			"UserManagement.modifyGroup", "UserManagement.removeGroup", "UserManagement.addUser",
+			"UserManagement.modifyUser", "UserManagement.removeUser", "UserManagement.setUserPassword", };
 
-	public static final String[] USER_REGISTRATION_ACTIONS = new String[] {
-			"UserRegistration.registerUser",
-			"UserRegistration.getUnconfirmedUser",
-			"UserRegistration.modifyUnconfirmedEmail",
-			"UserRegistration.confirmUserEmail",
-			"UserRegistration.requestPasswordReset",
+	public static final String[] USER_REGISTRATION_ACTIONS = new String[] { "UserRegistration.registerUser",
+			"UserRegistration.getUnconfirmedUser", "UserRegistration.modifyUnconfirmedEmail",
+			"UserRegistration.confirmUserEmail", "UserRegistration.requestPasswordReset",
 			"UserRegistration.resetUserPassword", };
 
-	public static final String[] RODAWUI_ACTIONS = new String[] {
-			"RODAWUI.pageHit", "RODAWUI.error", "RODAWUI.login" };
+	public static final String[] RODAWUI_ACTIONS = new String[] { "RODAWUI.pageHit", "RODAWUI.error", "RODAWUI.login" };
 
-	public static final String[] DISSEMINATOR_ACTIONS = new String[] {
-			"disseminator.hit.RepresentationDownload", "disseminator.miss.RepresentationDownload",
-			"disseminator.hit.SimpleViewer", "disseminator.miss.SimpleViewer",
-			"disseminator.hit.FlashPageFlip",
-			"disseminator.miss.FlashPageFlip", "disseminator.hit.PhpMyAdmin",
-			"disseminator.miss.PhpMyAdmin", "disseminator.hit.MediaPlayer",
+	public static final String[] DISSEMINATOR_ACTIONS = new String[] { "disseminator.hit.RepresentationDownload",
+			"disseminator.miss.RepresentationDownload", "disseminator.hit.SimpleViewer",
+			"disseminator.miss.SimpleViewer", "disseminator.hit.FlashPageFlip", "disseminator.miss.FlashPageFlip",
+			"disseminator.hit.PhpMyAdmin", "disseminator.miss.PhpMyAdmin", "disseminator.hit.MediaPlayer",
 			"disseminator.miss.MediaPlayer" };
 
-	public static final String[] ACTIONS = join(ACCEPT_SIP_ACTIONS,
-			BROWSER_ACTIONS, EDITOR_ACTIONS, FILE_ACCESS_SERVLET_ACTIONS,
-			FILE_UPLOAD_SERVLET_ACTIONS, INGEST_ACTIONS,
-			INGEST_MONITOR_ACTIONS, LOGGER_ACTIONS, LOGIN_ACTIONS,
-			PLUGINS_ACTIONS, REPORTS_ACTIONS, SCHEDULER_ACTIONS,
-			SEARCH_ACTIONS, SIP_UPLOAD_SERVLET_ACTIONS, STATISTICS_ACTIONS,
-			STATISTICS_MONITOR_ACTIONS, USER_BROWSER_ACTIONS,
-			USER_EDITOR_ACTIONS, USER_MANAGEMENT_ACTIONS,
-			USER_REGISTRATION_ACTIONS, RODAWUI_ACTIONS, DISSEMINATOR_ACTIONS);
+	public static final String[] ACTIONS = join(ACCEPT_SIP_ACTIONS, BROWSER_ACTIONS, EDITOR_ACTIONS,
+			FILE_ACCESS_SERVLET_ACTIONS, FILE_UPLOAD_SERVLET_ACTIONS, INGEST_ACTIONS, INGEST_MONITOR_ACTIONS,
+			LOGGER_ACTIONS, LOGIN_ACTIONS, PLUGINS_ACTIONS, REPORTS_ACTIONS, SCHEDULER_ACTIONS, SEARCH_ACTIONS,
+			SIP_UPLOAD_SERVLET_ACTIONS, STATISTICS_ACTIONS, STATISTICS_MONITOR_ACTIONS, USER_BROWSER_ACTIONS,
+			USER_EDITOR_ACTIONS, USER_MANAGEMENT_ACTIONS, USER_REGISTRATION_ACTIONS, RODAWUI_ACTIONS,
+			DISSEMINATOR_ACTIONS);
 
 	private static String[] join(String[]... lists) {
 		List<String> elements = new ArrayList<String>();
@@ -153,16 +114,14 @@ public class LogEntry implements Serializable {
 
 	private String id;
 	private String address;
-	private String datetime;
+	private Date datetime;
 	private String username;
-	private String action;
-	private String description;
+	private String actionComponent;
+	private String actionMethod;
 	private String relatedObjectID;
 	private long duration;
-	
-	private String fileID;
 
-	private LogEntryParameter[] parameters;
+	private List<LogEntryParameter> parameters;
 
 	/**
 	 * Constructs an empty {@link LogEntry}.
@@ -177,10 +136,9 @@ public class LogEntry implements Serializable {
 	 *            the {@link LogEntry} to clone.
 	 */
 	public LogEntry(LogEntry logEntry) {
-		this(logEntry.getId(), logEntry.getAddress(), logEntry.getDatetime(),
-				logEntry.getUsername(), logEntry.getAction(), logEntry
-						.getParameters(), logEntry.getDescription(), logEntry
-						.getRelatedObjectID(), logEntry.getDuration());
+		this(logEntry.getId(), logEntry.getAddress(), logEntry.getDatetime(), logEntry.getUsername(),
+				logEntry.getActionComponent(), logEntry.getActionMethod(), logEntry.getParameters(),
+				logEntry.getRelatedObjectID(), logEntry.getDuration());
 	}
 
 	/**
@@ -194,7 +152,7 @@ public class LogEntry implements Serializable {
 	 *            the datetime.
 	 * @param username
 	 *            the username.
-	 * @param action
+	 * @param actionComponent
 	 *            the action.
 	 * @param parameters
 	 *            the action parameters.
@@ -203,17 +161,16 @@ public class LogEntry implements Serializable {
 	 * @param relatedObjectID
 	 *            the ID of the object related with this action.
 	 */
-	public LogEntry(String id, String address, String datetime,
-			String username, String action, LogEntryParameter[] parameters,
-			String description, String relatedObjectID, long duration) {
+	public LogEntry(String id, String address, Date datetime, String username, String actionComponent,
+			String actionMethod, List<LogEntryParameter> parameters, String relatedObjectID, long duration) {
 
 		setId(id);
 		setAddress(address);
 		setDatetime(datetime);
 		setUsername(username);
-		setAction(action);
+		setActionComponent(actionComponent);
+		setActionMethod(actionMethod);
 		setParameters(parameters);
-		setDescription(description);
 		setRelatedObjectID(relatedObjectID);
 		setDuration(duration);
 	}
@@ -222,12 +179,9 @@ public class LogEntry implements Serializable {
 	 * @see Object#toString()
 	 */
 	public String toString() {
-		return "LogEntry (datetime=" + getDatetime() + ", address="
-				+ getAddress() + ", username=" + getUsername() + ", action="
-				+ getAction() + ", parameters="
-				+ Arrays.toString(getParameters()) + ", description="
-				+ getDescription() + ", relatedObjectID="
-				+ getRelatedObjectID() + ", duration=" + getDuration() + ")";
+		return "LogEntry (datetime=" + getDatetime() + ", address=" + getAddress() + ", username=" + getUsername()
+				+ ", actionComponent=" + getActionComponent() + ", actionMethod=" + getActionMethod() + ", parameters="
+				+ getParameters() + ", relatedObjectID=" + getRelatedObjectID() + ", duration=" + getDuration() + ")";
 	}
 
 	/**
@@ -280,7 +234,7 @@ public class LogEntry implements Serializable {
 	/**
 	 * @return the datetime
 	 */
-	public String getDatetime() {
+	public Date getDatetime() {
 		return datetime;
 	}
 
@@ -288,7 +242,7 @@ public class LogEntry implements Serializable {
 	 * @param datetime
 	 *            the datetime to set
 	 */
-	public void setDatetime(String datetime) {
+	public void setDatetime(Date datetime) {
 		this.datetime = datetime;
 	}
 
@@ -310,22 +264,30 @@ public class LogEntry implements Serializable {
 	/**
 	 * @return the action
 	 */
-	public String getAction() {
-		return action;
+	public String getActionComponent() {
+		return actionComponent;
 	}
 
 	/**
 	 * @param action
 	 *            the action to set
 	 */
-	public void setAction(String action) {
-		this.action = action;
+	public void setActionComponent(String action) {
+		this.actionComponent = action;
+	}
+
+	public String getActionMethod() {
+		return actionMethod;
+	}
+
+	public void setActionMethod(String actionMethod) {
+		this.actionMethod = actionMethod;
 	}
 
 	/**
 	 * @return the parameters
 	 */
-	public LogEntryParameter[] getParameters() {
+	public List<LogEntryParameter> getParameters() {
 		return parameters;
 	}
 
@@ -333,23 +295,8 @@ public class LogEntry implements Serializable {
 	 * @param parameters
 	 *            the parameters to set
 	 */
-	public void setParameters(LogEntryParameter[] parameters) {
+	public void setParameters(List<LogEntryParameter> parameters) {
 		this.parameters = parameters;
-	}
-
-	/**
-	 * @return the description
-	 */
-	public String getDescription() {
-		return description;
-	}
-
-	/**
-	 * @param description
-	 *            the description to set
-	 */
-	public void setDescription(String description) {
-		this.description = description;
 	}
 
 	/**
@@ -381,15 +328,5 @@ public class LogEntry implements Serializable {
 	public void setDuration(long duration) {
 		this.duration = duration;
 	}
-
-	public String getFileID() {
-		return fileID;
-	}
-
-	public void setFileID(String fileID) {
-		this.fileID = fileID;
-	}
-	
-	
 
 }

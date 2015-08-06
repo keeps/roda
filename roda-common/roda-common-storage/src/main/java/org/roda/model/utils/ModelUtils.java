@@ -1,6 +1,10 @@
 package org.roda.model.utils;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.OpenOption;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -12,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.roda.common.RodaUtils;
 import org.roda.model.FileFormat;
@@ -370,32 +375,45 @@ public final class ModelUtils {
 	public static StoragePath getLogPath(String logFile) throws StorageActionException {
 		return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG, logFile);
 	}
-	
-//	public static StoragePath getLogPath(Date d) throws StorageActionException {
-//		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-//		String logFile = sdf.format(d) + ".log";
-//		return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG, logFile);
-//	}
+
+	@Deprecated
+	public static StoragePath getLogPath(Date d) throws StorageActionException {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		String logFile = sdf.format(d) + ".log";
+		return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG, logFile);
+	}
+
+	public static void writeLogEntryToFile(LogEntry logEntry, Path logFile) throws ModelServiceException {
+		try {
+			String entryJSON = ModelUtils.getJsonLogEntry(logEntry)+"\n";
+			Files.write(logFile, entryJSON.getBytes(), StandardOpenOption.APPEND);
+		} catch (IOException e) {
+			throw new ModelServiceException("Error writing log entry to file",
+					ModelServiceException.INTERNAL_SERVER_ERROR, e);
+		}
+	}
 
 	public static String getJsonLogEntry(LogEntry entry) {
+		String ret = null;
 		try {
 			JsonFactory factory = new JsonFactory();
 			ObjectMapper mapper = new ObjectMapper(factory);
-			return mapper.writeValueAsString(entry);
-		} catch (IOException ioe) {
-
+			ret = mapper.writeValueAsString(entry);
+		} catch (IOException e) {
+			LOGGER.error("Error transforming log entry to json string", e);
 		}
-		return null;
+		return ret;
 	}
 
 	public static LogEntry getLogEntry(String json) {
+		LogEntry ret = null;
 		try {
 			JsonFactory factory = new JsonFactory();
 			ObjectMapper mapper = new ObjectMapper(factory);
-			return mapper.readValue(json, LogEntry.class);
-		} catch (IOException ioe) {
-
+			ret = mapper.readValue(json, LogEntry.class);
+		} catch (IOException e) {
+			LOGGER.error("Error transforming json string to log entry", e);
 		}
-		return null;
+		return ret;
 	}
 }

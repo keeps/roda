@@ -70,8 +70,9 @@ public class Uploader {
 	public Uploader(URL servicesHost, String username, String password,
 			CASUtility casUtility) throws MalformedURLException,
 			AuthenticationException {
-		this(servicesHost, casUtility.getCASUserPrincipal(username, password),
-				casUtility);
+		// FIXME empty string
+//		this(servicesHost, casUtility.getCASUserPrincipal(username, password),
+//				casUtility);
 	}
 
 	/**

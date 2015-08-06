@@ -36,28 +36,24 @@ public class CASUtility {
 	private URL coreURL;
 	private URL serviceURL;
 
-	public CASUtility(URL casURL, URL coreURL, URL serviceURL)
-			throws MalformedURLException {
+	public CASUtility(URL casURL, URL coreURL, URL serviceURL) throws MalformedURLException {
 		this.casURL = casURL;
 		this.coreURL = new URL(coreURL.toString() + "/CasCallback");
 		this.serviceURL = serviceURL;
 	}
-	
-	public CASUtility(URL casURL, URL coreURL)
-          throws MalformedURLException {
-          this.casURL = casURL;
-          this.coreURL = new URL(coreURL.toString() + "/CasCallback");
-          this.serviceURL = coreURL;
-        }
 
-	public String getProxyGrantingTicket(String username, String password)
-			throws AuthenticationException {
+	public CASUtility(URL casURL, URL coreURL) throws MalformedURLException {
+		this.casURL = casURL;
+		this.coreURL = new URL(coreURL.toString() + "/CasCallback");
+		this.serviceURL = coreURL;
+	}
+
+	public String getProxyGrantingTicket(String username, String password) throws AuthenticationException {
 		String pgt = null;
 		try {
 			String tgt = getTgt(username, password);
 			String serviceTicket = getServiceTicket(tgt);
-			Cas20ServiceTicketValidator cstv = new Cas20ServiceTicketValidator(
-					casURL.toString());
+			Cas20ServiceTicketValidator cstv = new Cas20ServiceTicketValidator(casURL.toString());
 			cstv.setProxyCallbackUrl(this.coreURL.toString());
 			Assertion a = cstv.validate(serviceTicket, serviceURL.toString());
 			AttributePrincipal principal = a.getPrincipal();
@@ -86,44 +82,35 @@ public class CASUtility {
 		return pgt;
 	}
 
-	
-
-	private CASUserPrincipal getAuthenticatedUser(String username,
-			String password) throws AuthenticationException {
+	private CASUserPrincipal getAuthenticatedUser(String username, String password, String clientIpAddress)
+			throws AuthenticationException {
 		try {
 			String originalTGT = getTgt(username, password);
 			if (originalTGT != null) {
-				String tgt = originalTGT
-						.substring(originalTGT.lastIndexOf("/") + 1);
+				String tgt = originalTGT.substring(originalTGT.lastIndexOf("/") + 1);
 				String serviceTicket = getServiceTicket(tgt);
 				if (serviceTicket != null) {
 					AttributePrincipal attributePrincipal = getAttributePrincipal(serviceTicket);
-					User u = getUserFromAttributes(attributePrincipal
-							.getAttributes());
+					User u = getUserFromAttributes(attributePrincipal.getAttributes());
 					if (u != null) {
-						return new CASUserPrincipal(u, originalTGT);
+						return new CASUserPrincipal(u, originalTGT, clientIpAddress);
 					} else {
-						throw new AuthenticationException(
-								"Error while getting User");
+						throw new AuthenticationException("Error while getting User");
 					}
 				} else {
-					throw new AuthenticationException(
-							"Error while getting Service Ticket");
+					throw new AuthenticationException("Error while getting Service Ticket");
 				}
 			} else {
 				throw new AuthenticationException("Error while getting TGT");
 			}
 		} catch (Exception e) {
-			throw new AuthenticationException(
-					"Error while getting authenticated user");
+			throw new AuthenticationException("Error while getting authenticated user");
 		}
 	}
 
 	public String generateProxyTicket(String proxyGrantingTicket) {
-		Cas20ProxyRetriever proxyTicketRetriver = new Cas20ProxyRetriever(
-				casURL.toString(), "UTF-8");
-		return proxyTicketRetriver.getProxyTicketIdFor(proxyGrantingTicket,
-				serviceURL.toString());
+		Cas20ProxyRetriever proxyTicketRetriver = new Cas20ProxyRetriever(casURL.toString(), "UTF-8");
+		return proxyTicketRetriver.getProxyTicketIdFor(proxyGrantingTicket, serviceURL.toString());
 	}
 
 	private User getUserFromAttributes(Map<String, Object> userAttributes) {
@@ -141,27 +128,21 @@ public class CASUtility {
 			user.setIdDocumentType((String) userAttributes.get("documentTitle"));
 		}
 		if (userAttributes.get("documentIdentifier") != null) {
-			user.setIdDocument((String) userAttributes
-					.get("documentIdentifier"));
+			user.setIdDocument((String) userAttributes.get("documentIdentifier"));
 		}
 		if (userAttributes.get("documentLocation") != null) {
-			user.setIdDocumentLocation((String) userAttributes
-					.get("documentLocation"));
+			user.setIdDocumentLocation((String) userAttributes.get("documentLocation"));
 		}
 		if (userAttributes.get("documentVersion") != null) {
 			try {
-				user.setIdDocumentDate(DateParser.parse((String) userAttributes
-						.get("documentVersion")));
+				user.setIdDocumentDate(DateParser.parse((String) userAttributes.get("documentVersion")));
 			} catch (InvalidDateException e) {
-				logger.warn(
-						"Error parsing ID document date (documentVersion) - "
-								+ e.getMessage(), e);
+				logger.warn("Error parsing ID document date (documentVersion) - " + e.getMessage(), e);
 			}
 		}
 
 		if (userAttributes.get("serialNumber") != null) {
-			user.setFinanceIdentificationNumber((String) userAttributes
-					.get("serialNumber"));
+			user.setFinanceIdentificationNumber((String) userAttributes.get("serialNumber"));
 		}
 
 		if (userAttributes.get("co") != null) {
@@ -184,8 +165,7 @@ public class CASUtility {
 			user.setCountryName((String) userAttributes.get("c"));
 		}
 		if (userAttributes.get("telephoneNumber") != null) {
-			user.setTelephoneNumber((String) userAttributes
-					.get("telephoneNumber"));
+			user.setTelephoneNumber((String) userAttributes.get("telephoneNumber"));
 		}
 		if (userAttributes.get("facsimileTelephoneNumber") != null) {
 			user.setFax((String) userAttributes.get("facsimileTelephoneNumber"));
@@ -196,8 +176,7 @@ public class CASUtility {
 		}
 
 		if (userAttributes.get("businessCategory") != null) {
-			user.setBusinessCategory((String) userAttributes
-					.get("businessCategory"));
+			user.setBusinessCategory((String) userAttributes.get("businessCategory"));
 		}
 
 		if (userAttributes.get("info") != null) {
@@ -230,8 +209,7 @@ public class CASUtility {
 						directRolesString = directRolesString.substring(1);
 					}
 					if (directRolesString.endsWith("]")) {
-						directRolesString = directRolesString.substring(0,
-								directRolesString.length() - 1);
+						directRolesString = directRolesString.substring(0, directRolesString.length() - 1);
 					}
 					String[] directRoles = directRolesString.split(",");
 					for (int i = 0; i < directRoles.length; i++) {
@@ -241,8 +219,7 @@ public class CASUtility {
 				}
 			} else if (directRolesObject instanceof List<?>) {
 				List<String> directRoles = (List<String>) directRolesObject;
-				String[] directRolesArray = directRoles
-						.toArray(new String[directRoles.size()]);
+				String[] directRolesArray = directRoles.toArray(new String[directRoles.size()]);
 				user.setDirectRoles(directRolesArray);
 			}
 		}
@@ -255,8 +232,7 @@ public class CASUtility {
 						rolesString = rolesString.substring(1);
 					}
 					if (rolesString.endsWith("]")) {
-						rolesString = rolesString.substring(0,
-								rolesString.length() - 1);
+						rolesString = rolesString.substring(0, rolesString.length() - 1);
 					}
 
 					String[] roles = rolesString.split(",");
@@ -280,8 +256,7 @@ public class CASUtility {
 						groupsString = groupsString.substring(1);
 					}
 					if (groupsString.endsWith("]")) {
-						groupsString = groupsString.substring(0,
-								groupsString.length() - 1);
+						groupsString = groupsString.substring(0, groupsString.length() - 1);
 					}
 
 					String[] groups = groupsString.split(",");
@@ -292,43 +267,37 @@ public class CASUtility {
 				}
 			} else if (groupsObject instanceof List<?>) {
 				List<String> groups = (List<String>) groupsObject;
-				String[] groupsArray = groups
-						.toArray(new String[groups.size()]);
+				String[] groupsArray = groups.toArray(new String[groups.size()]);
 				user.setAllGroups(groupsArray);
 			}
 		}
 		return user;
 	}
 
-	private AttributePrincipal getAttributePrincipal(String proxyTicket)
-			throws AuthenticationException {
+	private AttributePrincipal getAttributePrincipal(String proxyTicket) throws AuthenticationException {
 		try {
 			AttributePrincipal principal = null;
-			Cas20ProxyTicketValidator cptv = new Cas20ProxyTicketValidator(
-					casURL.toString());
+			Cas20ProxyTicketValidator cptv = new Cas20ProxyTicketValidator(casURL.toString());
 			cptv.setProxyCallbackUrl(coreURL.toString());
 			cptv.setAcceptAnyProxy(true);
 			Assertion a = cptv.validate(proxyTicket, serviceURL.toString());
 			principal = a.getPrincipal();
 			return principal;
 		} catch (TicketValidationException e) {
-			throw new AuthenticationException(
-					"Error while getting AttributePrincipal with PGT");
+			throw new AuthenticationException("Error while getting AttributePrincipal with PGT");
 		}
 	}
 
-	private AttributePrincipalWithProxyGrantingTicket getAttributePrincipalWithProxyGrantingTicket(
-			String proxyTicket) throws AuthenticationException {
+	private AttributePrincipalWithProxyGrantingTicket getAttributePrincipalWithProxyGrantingTicket(String proxyTicket)
+			throws AuthenticationException {
 		AttributePrincipal attributePrincipal = null;
 		String proxyGrantingTicket = null;
 		try {
-			Cas20ProxyTicketValidator cptv = new Cas20ProxyTicketValidator(
-					casURL.toString());
+			Cas20ProxyTicketValidator cptv = new Cas20ProxyTicketValidator(casURL.toString());
 			cptv.setProxyCallbackUrl(coreURL.toString());
 			cptv.setAcceptAnyProxy(true);
 
-			logger.debug("Validating proxy ticket: " + proxyTicket
-					+ " in service: " + serviceURL);
+			logger.debug("Validating proxy ticket: " + proxyTicket + " in service: " + serviceURL);
 			Assertion a = cptv.validate(proxyTicket, serviceURL.toString());
 			attributePrincipal = a.getPrincipal();
 			final Map attributes = attributePrincipal.getAttributes();
@@ -356,12 +325,9 @@ public class CASUtility {
 				logger.debug("No attributes in AttributePrincipal");
 			}
 		} catch (TicketValidationException tve) {
-			throw new AuthenticationException(
-					"Error while getting AttributePrincipal: "
-							+ tve.getMessage());
+			throw new AuthenticationException("Error while getting AttributePrincipal: " + tve.getMessage());
 		}
-		throw new AuthenticationException(
-				"Error while getting AttributePrincipal with PGT");
+		throw new AuthenticationException("Error while getting AttributePrincipal with PGT");
 	}
 
 	public String getPGT(URL url, String IOU) {
@@ -369,15 +335,13 @@ public class CASUtility {
 		try {
 			URL getURL = new URL(url.toExternalForm() + "?iou=" + IOU);
 
-			HttpsURLConnection hsu = (HttpsURLConnection) openConn(getURL
-					.toExternalForm());
+			HttpsURLConnection hsu = (HttpsURLConnection) openConn(getURL.toExternalForm());
 			TrustModifier.relaxHostChecking(hsu);
 			hsu.setRequestProperty("Request-Method", "GET");
 			hsu.setDoInput(true);
 			hsu.setDoOutput(false);
 			hsu.connect();
-			BufferedReader br = new BufferedReader(new InputStreamReader(
-					hsu.getInputStream()));
+			BufferedReader br = new BufferedReader(new InputStreamReader(hsu.getInputStream()));
 			StringBuffer newData = new StringBuffer(10000);
 			String s = "";
 			while (null != ((s = br.readLine()))) {
@@ -398,20 +362,18 @@ public class CASUtility {
 	private String getServiceTicket(String tgt) {
 		try {
 			String casTicketsUrl = casURL.toString() + "/v1/tickets";
-			String encodedServiceURL = URLEncoder.encode("service", "utf-8")
-					+ "=" + URLEncoder.encode(serviceURL.toString(), "utf-8");
+			String encodedServiceURL = URLEncoder.encode("service", "utf-8") + "="
+					+ URLEncoder.encode(serviceURL.toString(), "utf-8");
 			String myURL = casTicketsUrl + "/" + tgt;
 			HttpsURLConnection hsu = (HttpsURLConnection) openConn(myURL);
 			TrustModifier.relaxHostChecking(hsu);
-			OutputStreamWriter out = new OutputStreamWriter(
-					hsu.getOutputStream());
+			OutputStreamWriter out = new OutputStreamWriter(hsu.getOutputStream());
 			BufferedWriter bwr = new BufferedWriter(out);
 			bwr.write(encodedServiceURL);
 			bwr.flush();
 			bwr.close();
 			out.close();
-			BufferedReader isr = new BufferedReader(new InputStreamReader(
-					hsu.getInputStream()));
+			BufferedReader isr = new BufferedReader(new InputStreamReader(hsu.getInputStream()));
 			String serviceTicket = IOUtils.toString(isr);
 			isr.close();
 			hsu.disconnect();
@@ -421,8 +383,7 @@ public class CASUtility {
 		} catch (UnsupportedEncodingException e) {
 			logger.error("Error while encoding service URL: " + e.getMessage());
 		} catch (Exception e) {
-			logger.error("Error while getting service ticket: "
-					+ e);
+			logger.error("Error while getting service ticket: " + e);
 		}
 		return null;
 	}
@@ -435,13 +396,10 @@ public class CASUtility {
 			hsu.setDoInput(true);
 			hsu.setDoOutput(true);
 			TrustModifier.relaxHostChecking(hsu);
-			String s = URLEncoder.encode("username", "UTF-8") + "="
-					+ URLEncoder.encode(username, "UTF-8");
-			s += "&" + URLEncoder.encode("password", "UTF-8") + "="
-					+ URLEncoder.encode(password, "UTF-8");
+			String s = URLEncoder.encode("username", "UTF-8") + "=" + URLEncoder.encode(username, "UTF-8");
+			s += "&" + URLEncoder.encode("password", "UTF-8") + "=" + URLEncoder.encode(password, "UTF-8");
 
-			OutputStreamWriter out = new OutputStreamWriter(
-					hsu.getOutputStream());
+			OutputStreamWriter out = new OutputStreamWriter(hsu.getOutputStream());
 			BufferedWriter bwr = new BufferedWriter(out);
 			bwr.write(s);
 			bwr.flush();
@@ -456,14 +414,12 @@ public class CASUtility {
 
 			}
 		} catch (Exception e) {
-			logger.error("Error while getting TGT: [" + e.getClass().getName()
-					+ "] " + e.getMessage());
+			logger.error("Error while getting TGT: [" + e.getClass().getName() + "] " + e.getMessage());
 		}
 		return tgt;
 	}
 
-	static URLConnection openConn(String urlk) throws MalformedURLException,
-			IOException {
+	static URLConnection openConn(String urlk) throws MalformedURLException, IOException {
 
 		URL url = new URL(urlk);
 		HttpsURLConnection hsu = (HttpsURLConnection) url.openConnection();
@@ -478,61 +434,51 @@ public class CASUtility {
 		c.disconnect();
 	}
 
-	private CASUserPrincipal getAuthenticatedUserWithProxyGrantingTicket(
-			String proxyTicket) throws AuthenticationException {
+	private CASUserPrincipal getAuthenticatedUserWithProxyGrantingTicket(String proxyTicket, String clientIpAddress)
+			throws AuthenticationException {
 		try {
-			AttributePrincipalWithProxyGrantingTicket attributePrincipalWithProxyGrantingTicket = getAttributePrincipalWithProxyGrantingTicket(proxyTicket);
-			User u = getUserFromAttributes(attributePrincipalWithProxyGrantingTicket
-					.getAttributePrincipal().getAttributes());
+			AttributePrincipalWithProxyGrantingTicket attributePrincipalWithProxyGrantingTicket = getAttributePrincipalWithProxyGrantingTicket(
+					proxyTicket);
+			User u = getUserFromAttributes(
+					attributePrincipalWithProxyGrantingTicket.getAttributePrincipal().getAttributes());
 
-			if (u.getRoles() == null || u.getRoles().length == 0
-					|| u.getDirectRoles() == null
+			if (u.getRoles() == null || u.getRoles().length == 0 || u.getDirectRoles() == null
 					|| u.getDirectRoles().length == 0) {
 				// TODO
 				// deleteTicket(originalTGT);
 			}
-			return new CASUserPrincipal(u,
-						attributePrincipalWithProxyGrantingTicket
-								.getProxyGrantingTicket());
+			return new CASUserPrincipal(u, attributePrincipalWithProxyGrantingTicket.getProxyGrantingTicket(),
+					clientIpAddress);
 		} catch (AuthenticationException e) {
 			throw e;
 		} catch (Throwable e) {
-			throw new AuthenticationException("Error while getting User: "
-					+ e.getMessage());
+			throw new AuthenticationException("Error while getting User: " + e.getMessage());
 		}
 	}
-	
-	
-	
 
-	public CASUserPrincipal getCASUserPrincipal(String username, String password)
+	public CASUserPrincipal getCASUserPrincipal(String username, String password, String clientIpAddress)
 			throws AuthenticationException {
 		CASUserPrincipal cup = null;
 		if (password.startsWith("ST-")) {
 			try { // get using Proxy ticket
-				cup = this
-						.getAuthenticatedUserWithProxyGrantingTicket(password);
+				cup = this.getAuthenticatedUserWithProxyGrantingTicket(password, clientIpAddress);
 			} catch (Throwable e) {
-				logger.warn("Could not authenticate with service ticket: "
-						+ password, e);
+				logger.warn("Could not authenticate with service ticket: " + password, e);
 			}
 		}
 		if (cup == null && password.startsWith("TGT-")) {
 			try { // get using PGT
 				String proxyTicket = this.generateProxyTicket(password);
-				cup = this
-						.getAuthenticatedUserWithProxyGrantingTicket(proxyTicket);
+				cup = this.getAuthenticatedUserWithProxyGrantingTicket(proxyTicket, clientIpAddress);
 			} catch (Throwable e) {
-				logger.warn("Could not authenticate with service ticket: "
-						+ password, e);
+				logger.warn("Could not authenticate with service ticket: " + password, e);
 			}
 		}
 		if (cup == null) {
 			try {
-				cup = this.getAuthenticatedUser(username, password);
+				cup = this.getAuthenticatedUser(username, password, clientIpAddress);
 			} catch (Throwable e) {
-				logger.warn("Could not authenticate with service ticket: "
-						+ password, e);
+				logger.warn("Could not authenticate with service ticket: " + password, e);
 			}
 		}
 		if (cup == null) {
@@ -540,16 +486,17 @@ public class CASUtility {
 		}
 		return cup;
 	}
-	
-	public CASUserPrincipal getCASUserPrincipalFromProxyGrantingTicket(String proxyGrantingTicket) throws AuthenticationException {
-          CASUserPrincipal cup = null;
-          try{
-            String proxyTicket = this.generateProxyTicket(proxyGrantingTicket);
-            cup = this.getAuthenticatedUserWithProxyGrantingTicket(proxyTicket);
-          } catch (Throwable e) {
-            logger.warn("Error while authenticating with proxy granting ticket:"+e.getMessage(), e);
-          }
-          return cup;
-        }
+
+	public CASUserPrincipal getCASUserPrincipalFromProxyGrantingTicket(String proxyGrantingTicket, String clientIpAddress)
+			throws AuthenticationException {
+		CASUserPrincipal cup = null;
+		try {
+			String proxyTicket = this.generateProxyTicket(proxyGrantingTicket);
+			cup = this.getAuthenticatedUserWithProxyGrantingTicket(proxyTicket, clientIpAddress);
+		} catch (Throwable e) {
+			logger.warn("Error while authenticating with proxy granting ticket:" + e.getMessage(), e);
+		}
+		return cup;
+	}
 
 }

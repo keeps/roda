@@ -191,7 +191,7 @@ public class CASAuthenticationFilter extends RODAFilter {
 
 								User user = null;
 
-								CASUserPrincipal userWithPGT = this.casUtility.getCASUserPrincipal(username, password);
+								CASUserPrincipal userWithPGT = this.casUtility.getCASUserPrincipal(username, password, request.getRemoteAddr());
 								if(userWithPGT!=null){
 									user = (User)userWithPGT;
 									request.setCASUserPrincipal(userWithPGT);

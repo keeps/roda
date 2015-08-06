@@ -17,6 +17,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
@@ -64,6 +65,7 @@ import pt.gov.dgarq.roda.core.data.v2.RepresentationPreservationObject;
 public class ModelServiceTest {
 
 	private static Path basePath;
+	private static Path logPath;
 	private static StorageService storage;
 	private static ModelService model;
 
@@ -75,6 +77,7 @@ public class ModelServiceTest {
 	@BeforeClass
 	public static void setUp() throws IOException, StorageActionException, URISyntaxException, ModelServiceException {
 		basePath = Files.createTempDirectory("modelTests");
+		logPath = basePath.resolve("log");
 		storage = new FileStorageService(basePath);
 		model = new ModelService(storage);
 
@@ -645,18 +648,18 @@ public class ModelServiceTest {
 	}
 
 	@Test
-	public void createLogEntry() throws ModelServiceException, StorageActionException {
+	public void createLogEntry() throws ModelServiceException {
 		LogEntry entry = new LogEntry();
-		entry.setAction("Action");
+		entry.setActionComponent("Action");
+		entry.setActionMethod("Method");
 		entry.setAddress("Address");
-		entry.setDatetime("Datetime");
-		LogEntryParameter[] parameters = new LogEntryParameter[2];
-		LogEntryParameter p1 = new LogEntryParameter("NAME1", "VALUE1");
-		LogEntryParameter p2 = new LogEntryParameter("NAME2", "VALUE2");
-		parameters[0] = p1;
-		parameters[1] = p2;
+		entry.setId("ID");
+		entry.setDatetime(new Date());
+		List<LogEntryParameter> parameters = new ArrayList<LogEntryParameter>();
+		parameters.add(new LogEntryParameter("NAME1", "VALUE1"));
+		parameters.add(new LogEntryParameter("NAME2", "VALUE2"));
 		entry.setParameters(parameters);
-		model.addLogEntry(entry);
+		model.addLogEntry(entry, logPath);
 	}
 
 }

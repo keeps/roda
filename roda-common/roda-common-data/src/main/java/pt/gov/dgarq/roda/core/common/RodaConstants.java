@@ -213,10 +213,10 @@ public final class RodaConstants {
 	public static final String OBJECT_PERMISSIONS_GRANT_GROUPS = "grantGroups";
 
 	public static final String REPOSITORY_PERMISSIONS_METADATA_EDITOR = "administration.metadata_editor";
-	public static final String LOG_ACTION = "action";
+	public static final String LOG_ACTION_COMPONENT = "actionComponent";
+	public static final String LOG_ACTION_METHOD = "actionMethod";
 	public static final String LOG_ADDRESS = "address";
 	public static final String LOG_DATETIME = "datetime";
-	public static final String LOG_DESCRIPTION = "description";
 	public static final String LOG_DURATION = "duration";
 	public static final String LOG_ID = "id";
 	public static final String LOG_RELATED_OBJECT_ID = "relatedObject";

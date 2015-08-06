@@ -1,6 +1,5 @@
 package pt.gov.dgarq.roda.wui.dissemination.browse.server;
 
-import java.io.IOException;
 import java.rmi.NoSuchObjectException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -18,23 +17,13 @@ import java.util.Vector;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.roda.common.HTMLUtils;
-import org.roda.index.IndexActionException;
-import org.roda.index.IndexService;
-import org.roda.model.DescriptiveMetadata;
-import org.roda.model.ModelService;
-import org.roda.model.ModelServiceException;
-import org.roda.storage.Binary;
-import org.roda.storage.ClosableIterable;
-import org.roda.storage.StorageActionException;
-import org.roda.storage.StorageService;
 import org.w3c.util.DateParser;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import config.i18n.server.BrowserServiceMessages;
-import pt.gov.dgarq.roda.common.RodaCoreFactory;
 import pt.gov.dgarq.roda.common.RodaClientFactory;
+import pt.gov.dgarq.roda.common.UserUtility;
 import pt.gov.dgarq.roda.core.RODAClient;
 import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.data.DescriptionObject;
@@ -47,14 +36,12 @@ import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
-import pt.gov.dgarq.roda.core.data.v2.Representation;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.core.stubs.Browser;
-import pt.gov.dgarq.roda.wui.common.client.GenericException;
+import pt.gov.dgarq.roda.servlet.cas.CASUserPrincipal;
 import pt.gov.dgarq.roda.wui.common.server.ServerTools;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.BrowseItemBundle;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.BrowserService;
-import pt.gov.dgarq.roda.wui.dissemination.browse.client.DescriptiveMetadataBundle;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.DisseminationInfo;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.PreservationInfo;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.RepresentationInfo;
@@ -72,108 +59,47 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
 	private static final long serialVersionUID = 1L;
 	static final String FONDLIST_PAGESIZE = "10";
-	static final private Logger logger = Logger.getLogger(BrowserServiceImpl.class);
-
-	private StorageService storage;
-	private ModelService model;
-	private IndexService index;
+	private static final Logger LOGGER = Logger.getLogger(BrowserServiceImpl.class);
 
 	/**
 	 * Create a new BrowserService Implementation instance
 	 *
 	 */
 	public BrowserServiceImpl() {
-		storage = RodaCoreFactory.getStorageService();
-		model = RodaCoreFactory.getModelService();
-		index = RodaCoreFactory.getIndexService();
+
 	}
 
 	public BrowseItemBundle getItemBundle(String aipId, String localeString) throws RODAException {
-		final Locale locale = ServerTools.parseLocale(localeString);
-		BrowseItemBundle itemBundle = new BrowseItemBundle();
-		try {
-			// set sdo
-			SimpleDescriptionObject sdo = getSimpleDescriptionObject(aipId);
-			itemBundle.setSdo(sdo);
-
-			// set sdo ancestors
-			itemBundle.setSdoAncestors(getAncestors(sdo));
-
-			// set descriptive metadata
-			List<DescriptiveMetadataBundle> descriptiveMetadataList = new ArrayList<DescriptiveMetadataBundle>();
-			getDescriptiveMetadata(aipId, locale, descriptiveMetadataList);
-			itemBundle.setDescriptiveMetadata(descriptiveMetadataList);
-
-			// set representations
-			// FIXME perhaps this information should be indexed as well
-			List<Representation> representationList = new ArrayList<Representation>();
-			Iterable<Representation> representations = model.listRepresentations(aipId);
-			for (Representation representation : representations) {
-				representationList.add(representation);
-			}
-			itemBundle.setRepresentations(representationList);
-
-		} catch (StorageActionException | ModelServiceException | RODAException e) {
-			throw new GenericException("Error getting item bundle " + e.getMessage());
-		}
-
-		return itemBundle;
-	}
-
-	private void getDescriptiveMetadata(String aipId, final Locale locale,
-			List<DescriptiveMetadataBundle> descriptiveMetadataList)
-					throws ModelServiceException, StorageActionException {
-		ClosableIterable<DescriptiveMetadata> listDescriptiveMetadataBinaries = model.listDescriptiveMetadataBinaries(aipId);
-		try {
-			for (DescriptiveMetadata descriptiveMetadata : listDescriptiveMetadataBinaries) {
-				Binary binary = storage.getBinary(descriptiveMetadata.getStoragePath());
-				String html = HTMLUtils.descriptiveMetadataToHtml(binary, model, locale);
-
-				descriptiveMetadataList
-						.add(new DescriptiveMetadataBundle(descriptiveMetadata.getId(), html, binary.getSizeInBytes()));
-			}
-		} finally {
-			try {
-				listDescriptiveMetadataBinaries.close();
-			} catch (IOException e) {
-				logger.error("Error while while freeing up resources", e);
-			}
-		}
+		CASUserPrincipal user = UserUtility.getUser(getThreadLocalRequest());
+		return pt.gov.dgarq.roda.wui.dissemination.browse.server.Browser.getItemBundle(user, aipId, localeString);
 	}
 
 	public IndexResult<SimpleDescriptionObject> findDescriptiveMetadata(Filter filter, Sorter sorter, Sublist sublist)
 			throws RODAException {
-		IndexResult<SimpleDescriptionObject> sdos;
-		try {
-			sdos = index.findDescriptiveMetadata(filter, sorter, sublist);
-			logger.debug(String.format("findDescriptiveMetadata(%1$s,%2$s,%3$s)=%4$s", filter, sorter, sublist, sdos));
-		} catch (IndexActionException e) {
-			logger.error("Error getting collections", e);
-			throw new GenericException("Error getting collections " + e.getMessage());
-		}
-
-		return sdos;
+		CASUserPrincipal user = UserUtility.getUser(getThreadLocalRequest());
+		return pt.gov.dgarq.roda.wui.dissemination.browse.server.Browser.findDescriptiveMetadata(user, filter, sorter,
+				sublist);
 	}
 
 	public Long countDescriptiveMetadata(Filter filter) throws RODAException {
-		Long count;
-		try {
-			count = index.countDescriptiveMetadata(filter);
-		} catch (IndexActionException e) {
-			logger.debug("Error getting sub-elements count", e);
-			throw new GenericException("Error getting sub-elements count " + e.getMessage());
-		}
-
-		return count;
+		CASUserPrincipal user = UserUtility.getUser(getThreadLocalRequest());
+		return pt.gov.dgarq.roda.wui.dissemination.browse.server.Browser.countDescriptiveMetadata(user, filter);
 	}
 
 	public SimpleDescriptionObject getSimpleDescriptionObject(String pid) throws RODAException {
-		try {
-			return index.retrieveDescriptiveMetadata(pid);
-		} catch (IndexActionException e) {
-			logger.error("Error getting SDO", e);
-			throw new GenericException("Error getting SDO: " + e.getMessage());
-		}
+		CASUserPrincipal user = UserUtility.getUser(getThreadLocalRequest());
+		return pt.gov.dgarq.roda.wui.dissemination.browse.server.Browser.getSimpleDescriptionObject(user, pid);
+	}
+
+	// FIXME see if this method is really needed
+	public String getParent(String pid) throws RODAException {
+		CASUserPrincipal user = UserUtility.getUser(getThreadLocalRequest());
+		return pt.gov.dgarq.roda.wui.dissemination.browse.server.Browser.getParent(user, pid);
+	}
+
+	public List<SimpleDescriptionObject> getAncestors(SimpleDescriptionObject sdo) throws RODAException {
+		CASUserPrincipal user = UserUtility.getUser(getThreadLocalRequest());
+		return pt.gov.dgarq.roda.wui.dissemination.browse.server.Browser.getAncestors(user, sdo);
 	}
 
 	public DescriptionObject getDescriptionObject(String pid) throws RODAException {
@@ -184,29 +110,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 			ret = browser.getDescriptionObject(pid);
 
 		} catch (RemoteException e) {
-			logger.error("Remote Exception", e);
+			LOGGER.error("Remote Exception", e);
 			throw RODAClient.parseRemoteException(e);
 		}
 		return ret;
-	}
-
-	// FIXME see if this method is really needed
-	public String getParent(String pid) throws RODAException {
-		try {
-			return index.getParentId(pid);
-		} catch (IndexActionException e) {
-			logger.error("Error getting parent", e);
-			throw new GenericException("Error getting parent: " + e.getMessage());
-		}
-	}
-
-	public List<SimpleDescriptionObject> getAncestors(SimpleDescriptionObject sdo) throws RODAException {
-		try {
-			return index.getAncestors(sdo);
-		} catch (IndexActionException e) {
-			logger.error("Error getting parent", e);
-			throw new GenericException("Error getting parent: " + e.getMessage());
-		}
 	}
 
 	public List<RepresentationInfo> getRepresentationsInfo(String doPID) throws RODAException {
@@ -238,7 +145,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 			});
 
 		} catch (RemoteException e) {
-			logger.error("Remote Exception", e);
+			LOGGER.error("Remote Exception", e);
 			throw RODAClient.parseRemoteException(e);
 		}
 
@@ -258,7 +165,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 	protected List<DisseminationInfo> getDisseminations(RepresentationObject rep) {
 		List<DisseminationInfo> ret;
 		if (rep != null) {
-			logger.info("REP content-model: " + rep.getContentModel());
+			LOGGER.info("REP content-model: " + rep.getContentModel());
 
 			Properties properties = RodaClientFactory.getRodaProperties();
 			String repType = rep.getType();
@@ -315,7 +222,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 				ret = new ArrayList<RepresentationPreservationObject>();
 			}
 		} catch (RemoteException e) {
-			logger.error("Remote Exception", e);
+			LOGGER.error("Remote Exception", e);
 			throw RODAClient.parseRemoteException(e);
 		}
 		return ret;
@@ -351,7 +258,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 				ret.add(info);
 
 			} catch (RemoteException e) {
-				logger.error("Remote Exception", e);
+				LOGGER.error("Remote Exception", e);
 				throw RODAClient.parseRemoteException(e);
 			}
 
@@ -378,17 +285,17 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 			String color = colors.get(i);
 			try {
 
-				logger.debug("Getting PREMIS Events of " + rpoPID);
+				LOGGER.debug("Getting PREMIS Events of " + rpoPID);
 				EventPreservationObject[] pEvents = browserService.getPreservationEvents(rpoPID);
 				if (pEvents == null) {
 					pEvents = new EventPreservationObject[] {};
 				}
-				logger.debug("Got " + pEvents.length + " PREMIS Events of " + rpoPID);
+				LOGGER.debug("Got " + pEvents.length + " PREMIS Events of " + rpoPID);
 
 				eventXML += createTimelineXML(pEvents, icon, color, locale);
 
 			} catch (RemoteException e) {
-				logger.error("Remote Exception", e);
+				LOGGER.error("Remote Exception", e);
 				throw RODAClient.parseRemoteException(e);
 			}
 		}
@@ -398,8 +305,8 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 		timelineInfo.setEventsXML(eventXML);
 		timelineInfo.setDate(DateParser.getIsoDate(new Date()));
 
-		logger.debug("Timeline events XML: " + eventXML);
-		logger.debug("Timeline date: " + timelineInfo.getDate());
+		LOGGER.debug("Timeline events XML: " + eventXML);
+		LOGGER.debug("Timeline date: " + timelineInfo.getDate());
 
 		return timelineInfo;
 

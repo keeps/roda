@@ -74,7 +74,7 @@ public class TicketInterceptorFilter extends RODAFilter {
 				String cleanURL = getCleanURL(servletRequest);
 				logger.info("Clean URL:"+cleanURL);
 				UserLoginServiceImpl.getInstance()
-						.loginCAS(servletRequest.getSession(true),
+						.loginCAS(servletRequest,
 								cleanURL.toString(), ticket);
 				needChain = false;
 				logger.info("Redirecting to "+cleanURL.toString());

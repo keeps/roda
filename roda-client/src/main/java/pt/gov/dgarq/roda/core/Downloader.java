@@ -99,7 +99,8 @@ public class Downloader {
 	 * @throws AuthenticationException 
 	 */
 	public Downloader(URL servicesHost, String username, String password,CASUtility casUtility) throws LoginException, DownloaderException, AuthenticationException {
-			this(servicesHost,casUtility.getCASUserPrincipal(username, password),casUtility);
+		// FIXME empty string
+//			this(servicesHost,casUtility.getCASUserPrincipal(username, password),casUtility);
 	}
 
 	/**

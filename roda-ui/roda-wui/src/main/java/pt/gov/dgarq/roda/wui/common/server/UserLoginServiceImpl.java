@@ -6,16 +6,19 @@ import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 
 import pt.gov.dgarq.roda.common.RodaClientFactory;
+import pt.gov.dgarq.roda.common.UserUtility;
 import pt.gov.dgarq.roda.core.RODAClient;
 import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.data.LogEntry;
 import pt.gov.dgarq.roda.core.data.LogEntryParameter;
 import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.servlet.cas.CASUserPrincipal;
 import pt.gov.dgarq.roda.wui.common.client.AuthenticatedUser;
 import pt.gov.dgarq.roda.wui.common.client.UserLoginService;
 
@@ -45,27 +48,34 @@ public class UserLoginServiceImpl extends RemoteServiceServlet implements
 	private static Logger logger = Logger.getLogger(UserLoginServiceImpl.class);
 
 	public AuthenticatedUser getAuthenticatedUser() throws RODAException {
-		AuthenticatedUser officeUser;
-		RODAClient rodaClient;
-
-		rodaClient = RodaClientFactory.getRodaClient(this
-				.getThreadLocalRequest().getSession());
-		User user;
-		try {
-			user = rodaClient.getAuthenticatedUser();
-			officeUser = new AuthenticatedUser(user, rodaClient.isGuestLogin());
-		} catch (RemoteException e) {
-			throw RODAClient.parseRemoteException(e);
-		}
-
-		return officeUser;
+//		AuthenticatedUser officeUser;
+//		RODAClient rodaClient;
+//
+//		rodaClient = RodaClientFactory.getRodaClient(this
+//				.getThreadLocalRequest().getSession());
+//		User user;
+//		try {
+//			user = rodaClient.getAuthenticatedUser();
+//			officeUser = new AuthenticatedUser(user, rodaClient.isGuestLogin());
+//		} catch (RemoteException e) {
+//			throw RODAClient.parseRemoteException(e);
+//		}
+//
+//		return officeUser;
+		
+		CASUserPrincipal user = UserUtility.getUser(this
+				.getThreadLocalRequest());
+		AuthenticatedUser authenticatedUser = new AuthenticatedUser(user, false);
+		
+		return authenticatedUser;
+		
 	}
 
 	public AuthenticatedUser login(String username, String password)
 			throws RODAException {
 		AuthenticatedUser authenticatedUser;
 
-		RodaClientFactory.login(this.getThreadLocalRequest().getSession(),
+		RodaClientFactory.login(this.getThreadLocalRequest(),
 				username, password);
 		logLogin(username);
 		authenticatedUser = getAuthenticatedUser();
@@ -77,7 +87,7 @@ public class UserLoginServiceImpl extends RemoteServiceServlet implements
 			throws RODAException {
 		try {
 			AuthenticatedUser authenticatedUser;
-			RodaClientFactory.login(this.getThreadLocalRequest().getSession(),
+			RodaClientFactory.login(this.getThreadLocalRequest(),
 					serviceTicket, new URL(location));
 			authenticatedUser = getAuthenticatedUser();
 			return authenticatedUser;
@@ -143,10 +153,10 @@ public class UserLoginServiceImpl extends RemoteServiceServlet implements
 
 	}
 
-	public AuthenticatedUser loginCAS(HttpSession session, String location,
+	public AuthenticatedUser loginCAS(HttpServletRequest request, String location,
 			String serviceTicket) throws RODAException {
 		try {
-			AuthenticatedUser authenticatedUser = RodaClientFactory.login(session, serviceTicket, new URL(location));
+			AuthenticatedUser authenticatedUser = RodaClientFactory.login(request, serviceTicket, new URL(location));
 			return authenticatedUser;
 		} catch (MalformedURLException mfue) {
 			logger.error("Error while loginCAS 3:" + mfue.getMessage(),mfue);

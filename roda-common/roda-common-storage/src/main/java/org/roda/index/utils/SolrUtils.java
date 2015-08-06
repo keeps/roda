@@ -285,8 +285,13 @@ public class SolrUtils {
 
 	/**
 	 * Method that knows how to escape characters for Solr
-	 * <p><code>+ - && || ! ( ) { } [ ] ^ " ~ * ? : \</code></p>
-	 * <p>Note: chars <code>'-', '"' and '*'</code> are not being escaped on purpose</p>
+	 * <p>
+	 * <code>+ - && || ! ( ) { } [ ] ^ " ~ * ? : \</code>
+	 * </p>
+	 * <p>
+	 * Note: chars <code>'-', '"' and '*'</code> are not being escaped on
+	 * purpose
+	 * </p>
 	 * 
 	 * @return a string with special characters escaped
 	 */
@@ -814,25 +819,23 @@ public class SolrUtils {
 	}
 
 	private static LogEntry solrDocumentToLogEntry(SolrDocument doc) {
-		final String action = objectToString(doc.get(RodaConstants.LOG_ACTION));
+		final String actionComponent = objectToString(doc.get(RodaConstants.LOG_ACTION_COMPONENT));
+		final String actionMethod = objectToString(doc.get(RodaConstants.LOG_ACTION_METHOD));
 		final String address = objectToString(doc.get(RodaConstants.LOG_ADDRESS));
-		final String datetime = objectToString(doc.get(RodaConstants.LOG_DATETIME));
-		final String description = objectToString(doc.get(RodaConstants.LOG_DESCRIPTION));
+		final Date datetime = objectToDate(doc.get(RodaConstants.LOG_DATETIME));
 		final long duration = objectToLong(doc.get(RodaConstants.LOG_DURATION));
 		final String id = objectToString(doc.get(RodaConstants.LOG_ID));
-		final String fileID = objectToString(doc.get(RodaConstants.LOG_FILE_ID));
 		// final String parameters =
 		// objectToString(doc.get(RodaConstants.LOG_PARAMETERS));
 		final String relatedObjectId = objectToString(doc.get(RodaConstants.LOG_RELATED_OBJECT_ID));
 		final String username = objectToString(doc.get(RodaConstants.LOG_USERNAME));
 		LogEntry entry = new LogEntry();
-		entry.setAction(action);
+		entry.setActionComponent(actionComponent);
+		entry.setActionMethod(actionMethod);
 		entry.setAddress(address);
 		entry.setDatetime(datetime);
-		entry.setDescription(description);
 		entry.setDuration(duration);
 		entry.setId(id);
-		entry.setFileID(fileID);
 		// entry.setParameters(fromJson(parameters));
 		entry.setRelatedObjectID(relatedObjectId);
 		entry.setUsername(username);
@@ -842,17 +845,16 @@ public class SolrUtils {
 
 	public static SolrInputDocument logEntryToSolrDocument(LogEntry logEntry) {
 		SolrInputDocument doc = new SolrInputDocument();
-		doc.addField(RodaConstants.LOG_ACTION, logEntry.getAction());
+		doc.addField(RodaConstants.LOG_ACTION_COMPONENT, logEntry.getActionComponent());
+		doc.addField(RodaConstants.LOG_ACTION_METHOD, logEntry.getActionMethod());
 		doc.addField(RodaConstants.LOG_ADDRESS, logEntry.getAddress());
 		doc.addField(RodaConstants.LOG_DATETIME, logEntry.getDatetime());
-		doc.addField(RodaConstants.LOG_DESCRIPTION, logEntry.getDescription());
 		doc.addField(RodaConstants.LOG_DURATION, logEntry.getDuration());
 		doc.addField(RodaConstants.LOG_ID, logEntry.getId());
 		// doc.addField(RodaConstants.LOG_PARAMETERS,
 		// toJSON(logEntry.getParameters()));
 		doc.addField(RodaConstants.LOG_RELATED_OBJECT_ID, logEntry.getRelatedObjectID());
 		doc.addField(RodaConstants.LOG_USERNAME, logEntry.getUsername());
-		doc.addField(RodaConstants.LOG_FILE_ID, logEntry.getFileID());
 		return doc;
 	}
 }

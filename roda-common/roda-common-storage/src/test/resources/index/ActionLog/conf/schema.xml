@@ -104,15 +104,15 @@
      required, it is highly recommended. A <uniqueKey> is present in almost all Solr 
      installations. See the <uniqueKey> declaration below where <uniqueKey> is set to "id".
    -->   
-   <field name="action" type="string" indexed="true" stored="true" required="true" multiValued="false" />
+   <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" />
+   <field name="actionComponent" type="string" indexed="true" stored="true" required="true" multiValued="false" />
+   <field name="actionMethod" type="string" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="address" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
-   <field name="datetime" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
-   <field name="description" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 
+   <field name="datetime" type="tdate" indexed="true" stored="true" required="false" multiValued="false" />  
    <field name="duration" type="long" indexed="true" stored="true" required="true" multiValued="false" /> 
-   <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 
-   <field name="relatedObject" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 
+   <field name="relatedObject" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="username" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 
-    <field name="fileID" type="string" indexed="true" stored="true" required="true" multiValued="false" />
+   
    <!-- Dynamic field definitions allow using convention over configuration
        for fields via the specification of patterns to match field names. 
        EXAMPLE:  name="*_i" will match any field ending in _i (like myid_i, z_i)

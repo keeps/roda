@@ -34,6 +34,7 @@ import pt.gov.dgarq.roda.wui.common.client.AuthenticatedUser;
  * @author Luis Faria
  * 
  */
+@Deprecated
 public class RodaClientFactory {
 
 	private static final String RODA_CLIENT_SESSION_ATTRIBUTE = "RODA_CLIENT";
@@ -169,7 +170,7 @@ public class RodaClientFactory {
 	 * @throws LoginException
 	 * @throws RODAClientException
 	 */
-	public static void login(HttpSession session, String username,
+	public static void login(HttpServletRequest request, String username,
 			String password) throws LoginException, RODAClientException {
 		RODAClient rodaClient;
 		try {
@@ -177,7 +178,8 @@ public class RodaClientFactory {
 			rodaClient = new RODAClient(rodaCoreURL, username, password,
 					casUtility);
 			logger.info("Login as " + username + " successful");
-			session.setAttribute(RODA_CLIENT_SESSION_ATTRIBUTE, rodaClient);
+			// FIXME
+			//session.setAttribute(RODA_CLIENT_SESSION_ATTRIBUTE, rodaClient);
 		} catch (LoginException e) {
 			logger.error("Login as " + username + " failed", e);
 			throw new LoginException(e.getMessage());
@@ -188,19 +190,20 @@ public class RodaClientFactory {
 
 	}
 
-	public static AuthenticatedUser login(HttpSession session, String serviceTicket,
+	public static AuthenticatedUser login(HttpServletRequest request, String serviceTicket,
 			URL location) throws LoginException, RODAClientException {
 		RODAClient rodaClient;
 		try {
 			CASUtility casUtility = new CASUtility(getCasUrl(), getCoreURL(),
 					location);
 			CASUserPrincipal cup = casUtility.getCASUserPrincipal(null,
-					serviceTicket);
+					serviceTicket, request.getRemoteAddr());
 			CASUtility casUtilityClient = new CASUtility(getCasUrl(),
 					getCoreURL());
 			rodaClient = new RODAClient(rodaCoreURL, cup, casUtilityClient);
 			logger.debug("Login using cas successful");
-			session.setAttribute(RODA_CLIENT_SESSION_ATTRIBUTE, rodaClient);
+			// FIXME is the following line needed
+			//session.setAttribute(RODA_CLIENT_SESSION_ATTRIBUTE, rodaClient);
 			return new AuthenticatedUser(cup, rodaClient.isGuestLogin());
 		} catch (LoginException e) {
 			logger.error("Login using cas ticket " + serviceTicket + " failed",

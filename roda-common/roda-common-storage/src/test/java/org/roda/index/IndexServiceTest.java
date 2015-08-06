@@ -14,6 +14,7 @@ import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -55,6 +56,7 @@ public class IndexServiceTest {
 
 	private static Path basePath;
 	private static Path indexPath;
+	private static Path logPath;
 	private static StorageService storage;
 	private static ModelService model;
 	private static IndexService index;
@@ -68,6 +70,7 @@ public class IndexServiceTest {
 	public static void setUp() throws IOException, StorageActionException, URISyntaxException, ModelServiceException {
 
 		basePath = Files.createTempDirectory("modelTests");
+		logPath = basePath.resolve("log");
 		indexPath = Files.createTempDirectory("indexTests");
 		storage = new FileStorageService(basePath);
 		model = new ModelService(storage);
@@ -356,63 +359,57 @@ public class IndexServiceTest {
 	}
 
 	@Test
-	public void testGetLogEntriesCount() throws StorageActionException, IndexActionException {
+	public void testGetLogEntriesCount() throws IndexActionException, ModelServiceException {
 		LogEntry entry = new LogEntry();
-		entry.setAction("Action");
+		entry.setActionComponent("Action");
+		entry.setActionMethod("Method");
 		entry.setAddress("Address");
-		entry.setDatetime("Datetime");
-		entry.setDescription("Description");
+		entry.setDatetime(new Date());
 		entry.setDuration(10L);
 		entry.setId("ID");
 		entry.setRelatedObjectID("Related");
 		entry.setUsername("Username");
-		LogEntryParameter[] parameters = new LogEntryParameter[2];
-		LogEntryParameter p1 = new LogEntryParameter("NAME1", "VALUE1");
-		LogEntryParameter p2 = new LogEntryParameter("NAME2", "VALUE2");
-		parameters[0] = p1;
-		parameters[1] = p2;
+		List<LogEntryParameter> parameters = new ArrayList<LogEntryParameter>();
+		parameters.add(new LogEntryParameter("NAME1", "VALUE1"));
+		parameters.add(new LogEntryParameter("NAME2", "VALUE2"));
 		entry.setParameters(parameters);
-		model.addLogEntry(entry);
+		model.addLogEntry(entry, logPath);
 
 		Filter filterDescription = new Filter();
-		filterDescription.add(new SimpleFilterParameter(RodaConstants.LOG_DESCRIPTION, "Description"));
-		Long n = 1L;
-		assertEquals(index.getLogEntriesCount(filterDescription), n);
+		filterDescription.add(new SimpleFilterParameter(RodaConstants.LOG_ID, "ID"));
+		assertThat(index.getLogEntriesCount(filterDescription), Matchers.is(1L));
 
 		Filter filterDescription2 = new Filter();
-		filterDescription2.add(new SimpleFilterParameter(RodaConstants.LOG_DESCRIPTION, "Description2"));
-		Long n2 = 0L;
-		assertEquals(index.getLogEntriesCount(filterDescription2), n2);
+		filterDescription2.add(new SimpleFilterParameter(RodaConstants.LOG_ID, "ID2"));
+		assertThat(index.getLogEntriesCount(filterDescription2), Matchers.is(0L));
 	}
 
 	@Test
-	public void testFindLogEntry() throws StorageActionException, IndexActionException {
+	public void testFindLogEntry() throws IndexActionException, ModelServiceException {
 		LogEntry entry = new LogEntry();
-		entry.setAction("action");
+		entry.setActionComponent("action");
+		entry.setActionMethod("Method");
 		entry.setAddress("address");
-		entry.setDatetime("datetime");
-		entry.setDescription("description");
+		entry.setDatetime(new Date());
 		entry.setDuration(10L);
 		entry.setId("id");
 		entry.setRelatedObjectID("related");
 		entry.setUsername("username");
-		LogEntryParameter[] parameters = new LogEntryParameter[2];
-		LogEntryParameter p1 = new LogEntryParameter("NAME1", "VALUE1");
-		LogEntryParameter p2 = new LogEntryParameter("NAME2", "VALUE2");
-		parameters[0] = p1;
-		parameters[1] = p2;
+		List<LogEntryParameter> parameters = new ArrayList<LogEntryParameter>();
+		parameters.add(new LogEntryParameter("NAME1", "VALUE1"));
+		parameters.add(new LogEntryParameter("NAME2", "VALUE2"));
 		entry.setParameters(parameters);
-		model.addLogEntry(entry);
+		model.addLogEntry(entry, logPath);
 
 		Filter filterDescription = new Filter();
-		filterDescription.add(new SimpleFilterParameter(RodaConstants.LOG_DESCRIPTION, "description"));
+		filterDescription.add(new SimpleFilterParameter(RodaConstants.LOG_ID, "id"));
 
 		IndexResult<LogEntry> entries = index.findLogEntry(filterDescription, null, new Sublist());
 		assertEquals(entries.getTotalCount(), 1);
-		assertEquals(entries.getResults().get(0).getAction(), CorporaConstants.LOG_ACTION);
+		assertEquals(entries.getResults().get(0).getActionComponent(), CorporaConstants.LOG_ACTION);
 
 		Filter filterDescription2 = new Filter();
-		filterDescription2.add(new SimpleFilterParameter(RodaConstants.LOG_DESCRIPTION, "description2"));
+		filterDescription2.add(new SimpleFilterParameter(RodaConstants.LOG_ID, "id2"));
 
 		IndexResult<LogEntry> entries2 = index.findLogEntry(filterDescription2, null, new Sublist());
 		assertEquals(entries2.getTotalCount(), 0);
@@ -420,33 +417,32 @@ public class IndexServiceTest {
 
 	@Test
 	public void testReindexLogEntry() throws StorageActionException, ModelServiceException, IndexActionException {
-		for (int i = 0; i < 10; i++) {
+		Long number = 10L;
+		for (int i = 0; i < number; i++) {
 			LogEntry entry = new LogEntry();
 			entry.setId("ID" + i);
-			entry.setDescription("DESCRIPTION:" + i);
-			entry.setAction("ACTION:" + i);
+			entry.setActionComponent("ACTION:" + i);
+			entry.setActionMethod("Method:" + i);
 			entry.setAddress("ADDRESS");
-			entry.setDatetime("DATETIME:" + i);
+			entry.setDatetime(new Date());
 			entry.setDuration(i);
 			entry.setRelatedObjectID("RELATED:" + i);
 			entry.setUsername("USER:" + i);
-			LogEntryParameter[] parameters = new LogEntryParameter[2];
-			LogEntryParameter p1 = new LogEntryParameter("NAME1", "VALUE1");
-			LogEntryParameter p2 = new LogEntryParameter("NAME2", "VALUE2");
-			parameters[0] = p1;
-			parameters[1] = p2;
+			List<LogEntryParameter> parameters = new ArrayList<LogEntryParameter>();
+			parameters.add(new LogEntryParameter("NAME1", "VALUE1"));
+			parameters.add(new LogEntryParameter("NAME2", "VALUE2"));
 			entry.setParameters(parameters);
-			model.addLogEntry(entry, false);
+			model.addLogEntry(entry, logPath, false);
 		}
 		index.reindexActionLogs();
 		Filter f1 = new Filter();
 		f1.add(new SimpleFilterParameter(CorporaConstants.LOG_ACTION, "ACTION:54"));
 		IndexResult<LogEntry> entries1 = index.findLogEntry(f1, null, new Sublist(0, 10));
-		assertEquals(entries1.getTotalCount(), 1L);
+		assertThat(entries1.getTotalCount(), Matchers.is(number));
 		Filter f2 = new Filter();
 		f2.add(new SimpleFilterParameter(CorporaConstants.LOG_ADDRESS, "ADDRESS"));
 		IndexResult<LogEntry> entries2 = index.findLogEntry(f2, null, new Sublist(0, 10));
-		assertEquals(entries2.getTotalCount(), 100L);
+		assertThat(entries2.getTotalCount(), Matchers.is(number));
 	}
 
 	@Test
@@ -461,7 +457,7 @@ public class IndexServiceTest {
 
 		index.reindexAIPs();
 		long count = index.countAIP(new Filter());
-		assertEquals(count, 100L);
+		assertEquals(count, 10L);
 
 	}
 }

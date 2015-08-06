@@ -215,7 +215,8 @@ public class RODAClient {
 		this.casUtility = casUtility;
 		if(username!=null && password!=null){
 			try{
-				this.cup = casUtility.getCASUserPrincipal(username, password);
+				// FIXME empty string
+				this.cup = casUtility.getCASUserPrincipal(username, password,"");
 			}catch(AuthenticationException e){
 			  System.err.println(e);
 				throw new RODAClientException(e.getMessage());
@@ -247,7 +248,8 @@ public class RODAClient {
           this.casUtility = casUtility;
           this.rodaCoreURL = rodacoreURL;
           try{
-            this.cup = casUtility.getCASUserPrincipalFromProxyGrantingTicket(proxyGrantingTicket);
+        	 // FIXME empty string
+            this.cup = casUtility.getCASUserPrincipalFromProxyGrantingTicket(proxyGrantingTicket,"");
           }catch (AuthenticationException e) {
             throw new RODAClientException("Unable to get CasUserPrincipal");
           }
@@ -1145,7 +1147,8 @@ public class RODAClient {
 			if(this.cup!=null){
 				return cup;
 			}else{
-				return casUtility.getCASUserPrincipal(guestCredentials[0],guestCredentials[1]);
+				// FIXME empty string
+				return casUtility.getCASUserPrincipal(guestCredentials[0],guestCredentials[1],"");
 			}
 		}catch(AuthenticationException ae){
 			return null;

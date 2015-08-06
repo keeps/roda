@@ -5,9 +5,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -15,24 +13,22 @@ import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.roda.index.IndexActionException;
 import org.roda.index.IndexService;
 import org.roda.model.ModelService;
-import org.roda.model.ModelServiceException;
 import org.roda.storage.StorageActionException;
 import org.roda.storage.StorageService;
 import org.roda.storage.fs.FileStorageService;
-
-import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 
 public class RodaCoreFactory {
 	private static final Logger LOGGER = Logger.getLogger(RodaCoreFactory.class);
 
 	private static Path storagePath;
 	private static Path indexPath;
+	private static Path dataPath;
+	private static Path logPath;
+	private static Path configPath;
 	private static StorageService storage;
 	private static ModelService model;
 	private static IndexService index;
 	private static EmbeddedSolrServer solr;
-	private static Path dataPath;
-	private static Path configPath;
 
 	static {
 		try {
@@ -46,10 +42,12 @@ public class RodaCoreFactory {
 			}
 
 			dataPath = Paths.get(RODA_HOME, "data");
+			logPath = dataPath.resolve("log");
 			configPath = Paths.get(RODA_HOME, "config");
 
 			storagePath = dataPath.resolve("storage");
 			indexPath = dataPath.resolve("index");
+			
 			storage = new FileStorageService(storagePath);
 			model = new ModelService(storage);
 
@@ -98,6 +96,10 @@ public class RodaCoreFactory {
 
 	public static Path getDataPath() {
 		return dataPath;
+	}
+	
+	public static Path getLogPath() {
+		return logPath;
 	}
 
 	public static void closeSolrServer() {

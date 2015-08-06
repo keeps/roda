@@ -1,11 +1,10 @@
 package org.roda.index;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -250,29 +249,28 @@ public class IndexService {
 		observer.aipCreated(aip);
 	}
 
-	// FIXME analyze method & verify if it is correct/the best way to do it
-	public void reindexActionLogs() throws StorageActionException, ModelServiceException {
-		ClosableIterable<Resource> actionLogs = model.getStorage()
-				.listResourcesUnderContainer(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG));
+	public void reindexActionLogs() throws IndexActionException {
+		ClosableIterable<Resource> actionLogs = null;
+
 		try {
-			Iterator<Resource> it = actionLogs.iterator();
-			while (it.hasNext()) {
-				Resource r = it.next();
-				try {
-					Binary b = model.getStorage().getBinary(r.getStoragePath());
-					java.io.File f = new java.io.File(b.getContent().getURI().getPath());
-					try (BufferedReader br = new BufferedReader(new FileReader(f))) {
-						String line;
-						while ((line = br.readLine()) != null) {
-							LogEntry entry = ModelUtils.getLogEntry(line);
-							reindexActionLog(entry);
-						}
+			actionLogs = model.getStorage()
+					.listResourcesUnderContainer(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG));
+
+			for (Resource resource : actionLogs) {
+				Binary b = model.getStorage().getBinary(resource.getStoragePath());
+				BufferedReader br = new BufferedReader(new InputStreamReader(b.getContent().createInputStream()));
+
+				String line;
+				while ((line = br.readLine()) != null) {
+					LogEntry entry = ModelUtils.getLogEntry(line);
+					if (entry != null) {
+						reindexActionLog(entry);
 					}
-				} catch (IOException e) {
-					throw new ModelServiceException("Error parsing log file",
-							ModelServiceException.INTERNAL_SERVER_ERROR, e);
 				}
 			}
+		} catch (StorageActionException | IOException e) {
+			throw new IndexActionException("Error retrieving/processing logs from storage",
+					IndexActionException.INTERNAL_SERVER_ERROR, e);
 		} finally {
 			if (actionLogs != null) {
 				try {
