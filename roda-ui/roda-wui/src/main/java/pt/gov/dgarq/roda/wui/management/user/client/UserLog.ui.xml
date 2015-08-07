@@ -47,6 +47,11 @@
 			<g:Label styleName="h1">Log</g:Label>
 			<g:FlowPanel addStyleNames="searchInput">
 				<g:FlowPanel addStyleNames="searchInputBoxWrapper">
+					<g:FlowPanel addStyleNames="searchAdvancedField" ui:field="inputUserFilterPanel" visible="false">
+						<g:Label addStyleNames="searchAdvancedFieldLabel">User</g:Label>
+						<g:TextBox addStyleNames="searchAdvancedFieldInput fieldTextBox"
+							ui:field="inputUserName" />
+					</g:FlowPanel>
 					<g:FlowPanel addStyleNames="searchAdvancedField">
 						<g:Label addStyleNames="searchAdvancedFieldLabel">Action component</g:Label>
 						<g:FlowPanel addStyleNames="searchAdvancedFieldInput">

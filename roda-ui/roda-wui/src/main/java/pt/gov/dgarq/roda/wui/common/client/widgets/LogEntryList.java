@@ -96,6 +96,7 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
 		};
 
 		dateColumn.setSortable(true);
+		actionComponentColumn.setSortable(true);
 		actionMethodColumn.setSortable(true);
 		relatedObjectColumn.setSortable(true);
 		usernameColumn.setSortable(true);

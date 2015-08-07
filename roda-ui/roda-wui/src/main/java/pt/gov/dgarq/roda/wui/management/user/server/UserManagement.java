@@ -15,6 +15,8 @@ import pt.gov.dgarq.roda.wui.common.client.GenericException;
 
 public class UserManagement extends RodaCoreService {
 
+	private static final String ROLE = "administration.user";
+
 	private UserManagement() {
 		super();
 	}
@@ -24,7 +26,7 @@ public class UserManagement extends RodaCoreService {
 		Date start = new Date();
 
 		// check user permissions
-		UserUtility.checkRoles(user, "administration.log");
+		UserUtility.checkRoles(user, ROLE);
 
 		// delegate
 		Long count = UserManagementHelper.countLogEntries(filter);
@@ -41,15 +43,15 @@ public class UserManagement extends RodaCoreService {
 		Date start = new Date();
 
 		// check user permissions
-		UserUtility.checkRoles(user, "administration.log");
+		UserUtility.checkRoles(user, ROLE);
 
 		// delegate
 		IndexResult<LogEntry> ret = UserManagementHelper.findLogEntries(filter, sorter, sublist);
 
 		// register action
 		long duration = new Date().getTime() - start.getTime();
-		registerAction(user, "UserManagement", "findLogEntries", null, duration, "filter", filter,
-				"sorter", sorter, "sublist", sublist);
+		registerAction(user, "UserManagement", "findLogEntries", null, duration, "filter", filter, "sorter", sorter,
+				"sublist", sublist);
 
 		return ret;
 	}
