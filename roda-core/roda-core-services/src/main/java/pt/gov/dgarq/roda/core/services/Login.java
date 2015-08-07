@@ -72,7 +72,8 @@ public class Login extends RODAWebService {
 		try {
 
 			Date start = new Date();
-			CASUserPrincipal user = casUtility.getCASUserPrincipal(null,proxyTicket);
+			// FIXME empty string
+			CASUserPrincipal user = casUtility.getCASUserPrincipal(null,proxyTicket,"");
 			
 			long duration = new Date().getTime() - start.getTime();
 
@@ -135,8 +136,9 @@ public class Login extends RODAWebService {
 		try {
 
 			Date start = new Date();
+			// FIXME empty string
 			User user = casUtility.getCASUserPrincipal(guestUsername,
-					guestPassword);
+					guestPassword,"");
 			long duration = new Date().getTime() - start.getTime();
 
 			registerAction("Login.getGuestUser", new String[0],

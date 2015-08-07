@@ -21,12 +21,12 @@ import pt.gov.dgarq.roda.core.common.RodaConstants;
 public class StorageTestUtils {
 
 	public static StoragePath generateRandomContainerStoragePath()
-			throws StorageActionException {
+			throws StorageServiceException {
 		return DefaultStoragePath.parse(UUID.randomUUID().toString());
 	}
 
 	public static StoragePath generateRandomResourceStoragePathUnder(
-			StoragePath basePath) throws StorageActionException {
+			StoragePath basePath) throws StorageServiceException {
 		return DefaultStoragePath.parse(basePath.asString(), UUID.randomUUID()
 				.toString());
 	}
@@ -46,7 +46,7 @@ public class StorageTestUtils {
 	}
 
 	public static void populate(StorageService storage, StoragePath basepath)
-			throws StorageActionException {
+			throws StorageServiceException {
 		// create 3 directories with 3 sub-directories each and 3 binaries under
 		// each sub-directory
 		int highLevelSize = 3;
@@ -83,7 +83,7 @@ public class StorageTestUtils {
 
 	public static void testEntityEqualRecursively(StorageService sourceStorage,
 			StoragePath sourceEntityStoragePath, StorageService targetStorage,
-			StoragePath targetEntityStoragePath) throws StorageActionException,
+			StoragePath targetEntityStoragePath) throws StorageServiceException,
 			IOException {
 		testEntityEqualRecursively(sourceStorage, sourceEntityStoragePath,
 				targetStorage, targetEntityStoragePath, false);
@@ -92,7 +92,7 @@ public class StorageTestUtils {
 	public static void testEntityEqualRecursively(StorageService sourceStorage,
 			StoragePath sourceEntityStoragePath, StorageService targetStorage,
 			StoragePath targetEntityStoragePath, boolean ignoreDateModified)
-			throws StorageActionException, IOException {
+			throws StorageServiceException, IOException {
 
 		assertEquals(sourceEntityStoragePath.isFromAContainer(),
 				targetEntityStoragePath.isFromAContainer());

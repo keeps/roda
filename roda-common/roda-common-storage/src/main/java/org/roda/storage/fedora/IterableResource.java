@@ -13,7 +13,7 @@ import org.fcrepo.client.ForbiddenException;
 import org.fcrepo.client.NotFoundException;
 import org.roda.storage.ClosableIterable;
 import org.roda.storage.Resource;
-import org.roda.storage.StorageActionException;
+import org.roda.storage.StorageServiceException;
 import org.roda.storage.StoragePath;
 import org.roda.storage.fedora.utils.FedoraConversionUtils;
 import org.roda.storage.fedora.utils.FedoraUtils;
@@ -30,24 +30,24 @@ public class IterableResource implements ClosableIterable<Resource> {
 	private Iterator<FedoraResource> fedoraResources;
 
 	public IterableResource(FedoraRepository repository, StoragePath storagePath)
-			throws StorageActionException {
+			throws StorageServiceException {
 		this.repository = repository;
 		try {
 			fedoraResources = repository
 					.getObject(FedoraUtils.createFedoraPath(storagePath))
 					.getChildren(null).iterator();
 		} catch (ForbiddenException e) {
-			throw new StorageActionException(e.getMessage(),
-					StorageActionException.FORBIDDEN, e);
+			throw new StorageServiceException(e.getMessage(),
+					StorageServiceException.FORBIDDEN, e);
 		} catch (BadRequestException e) {
-			throw new StorageActionException(e.getMessage(),
-					StorageActionException.BAD_REQUEST, e);
+			throw new StorageServiceException(e.getMessage(),
+					StorageServiceException.BAD_REQUEST, e);
 		} catch (NotFoundException e) {
-			throw new StorageActionException(e.getMessage(),
-					StorageActionException.NOT_FOUND, e);
+			throw new StorageServiceException(e.getMessage(),
+					StorageServiceException.NOT_FOUND, e);
 		} catch (FedoraException e) {
-			throw new StorageActionException(e.getMessage(),
-					StorageActionException.BAD_REQUEST, e);
+			throw new StorageServiceException(e.getMessage(),
+					StorageServiceException.BAD_REQUEST, e);
 		}
 	}
 
@@ -85,7 +85,7 @@ public class IterableResource implements ClosableIterable<Resource> {
 							repository.getRepositoryUrl(),
 							(FedoraObject) resource);
 				}
-			} catch (StorageActionException e) {
+			} catch (StorageServiceException e) {
 				return null;
 			}
 		}

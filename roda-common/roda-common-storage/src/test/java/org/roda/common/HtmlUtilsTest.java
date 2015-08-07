@@ -13,7 +13,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.roda.CorporaConstants;
-import org.roda.index.IndexActionException;
+import org.roda.index.IndexServiceException;
 import org.roda.index.IndexService;
 import org.roda.index.IndexServiceTest;
 import org.roda.model.AIP;
@@ -22,7 +22,7 @@ import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
 import org.roda.model.ModelServiceTest;
 import org.roda.storage.DefaultStoragePath;
-import org.roda.storage.StorageActionException;
+import org.roda.storage.StorageServiceException;
 import org.roda.storage.StorageService;
 import org.roda.storage.fs.FSUtils;
 import org.roda.storage.fs.FileStorageService;
@@ -46,7 +46,7 @@ public class HtmlUtilsTest {
 	private static final Logger logger = LoggerFactory.getLogger(ModelServiceTest.class);
 
 	@BeforeClass
-	public static void setUp() throws IOException, StorageActionException, URISyntaxException {
+	public static void setUp() throws IOException, StorageServiceException, URISyntaxException {
 
 		basePath = Files.createTempDirectory("modelTests");
 		indexPath = Files.createTempDirectory("indexTests");
@@ -81,14 +81,14 @@ public class HtmlUtilsTest {
 	}
 
 	@AfterClass
-	public static void tearDown() throws StorageActionException {
+	public static void tearDown() throws StorageServiceException {
 		FSUtils.deletePath(basePath);
 		FSUtils.deletePath(indexPath);
 	}
 
 	@Test
 	public void testRepresentationFilePreservationObjectToHtml()
-			throws ModelServiceException, StorageActionException, IndexActionException {
+			throws ModelServiceException, StorageServiceException, IndexServiceException {
 		final String aipId = UUID.randomUUID().toString();
 		final AIP aip = model.createAIP(aipId, corporaService,
 				DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
@@ -112,7 +112,7 @@ public class HtmlUtilsTest {
 
 	@Test
 	public void testDescriptiveMetadataToHtml()
-			throws ModelServiceException, StorageActionException, IndexActionException {
+			throws ModelServiceException, StorageServiceException, IndexServiceException {
 		final String aipId = UUID.randomUUID().toString();
 		final AIP aip = model.createAIP(aipId, corporaService,
 				DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
@@ -174,7 +174,7 @@ public class HtmlUtilsTest {
 
 	@Test
 	public void testRepresentationPreservationObjectToHtml()
-			throws ModelServiceException, StorageActionException, IndexActionException {
+			throws ModelServiceException, StorageServiceException, IndexServiceException {
 		final String aipId = UUID.randomUUID().toString();
 		final AIP aip = model.createAIP(aipId, corporaService,
 				DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
@@ -198,7 +198,7 @@ public class HtmlUtilsTest {
 
 	@Test
 	public void testRepresentationFilePreservationObjectFromStorageToHtml()
-			throws ModelServiceException, StorageActionException, IndexActionException {
+			throws ModelServiceException, StorageServiceException, IndexServiceException {
 		final String aipId = UUID.randomUUID().toString();
 		final AIP aip = model.createAIP(aipId, corporaService,
 				DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
@@ -221,7 +221,7 @@ public class HtmlUtilsTest {
 
 	@Test
 	public void testEventPreservationObjectFromStorageToHtml()
-			throws ModelServiceException, StorageActionException, IndexActionException {
+			throws ModelServiceException, StorageServiceException, IndexServiceException {
 		final String aipId = UUID.randomUUID().toString();
 		final AIP aip = model.createAIP(aipId, corporaService,
 				DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));

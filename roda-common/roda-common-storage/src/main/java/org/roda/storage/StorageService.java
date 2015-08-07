@@ -29,7 +29,7 @@ public interface StorageService {
 	 * 
 	 * @return
 	 */
-	public ClosableIterable<Container> listContainers() throws StorageActionException;
+	public ClosableIterable<Container> listContainers() throws StorageServiceException;
 
 	/**
 	 * Creates a new container with the specified name.
@@ -39,11 +39,11 @@ public interface StorageService {
 	 * @param metadata
 	 *            optional metadata for this container
 	 * 
-	 * @throws StorageActionException
+	 * @throws StorageServiceException
 	 * 
 	 */
 	public Container createContainer(StoragePath storagePath,
-			Map<String, Set<String>> metadata) throws StorageActionException;
+			Map<String, Set<String>> metadata) throws StorageServiceException;
 
 	/**
 	 * Get an existing container.
@@ -51,10 +51,10 @@ public interface StorageService {
 	 * @param name
 	 *            storage path that identifies the container.
 	 * @return
-	 * @throws StorageActionException
+	 * @throws StorageServiceException
 	 */
 	public Container getContainer(StoragePath storagePath)
-			throws StorageActionException;
+			throws StorageServiceException;
 
 	/**
 	 * Delete an existing container.
@@ -62,10 +62,10 @@ public interface StorageService {
 	 * @param storagePath
 	 *            storage path that identifies the container.
 	 * @return
-	 * @throws StorageActionException
+	 * @throws StorageServiceException
 	 */
 	public void deleteContainer(StoragePath storagePath)
-			throws StorageActionException;
+			throws StorageServiceException;
 
 	/**
 	 * List all resources directly under this container.
@@ -74,10 +74,10 @@ public interface StorageService {
 	 *            storage path that identifies the container.
 	 * @return
 	 * 
-	 * @throws StorageActionException
+	 * @throws StorageServiceException
 	 */
 	public ClosableIterable<Resource> listResourcesUnderContainer(
-			StoragePath storagePath) throws StorageActionException;
+			StoragePath storagePath) throws StorageServiceException;
 
 	/**
 	 * Creates a new directory with the specified name.
@@ -87,11 +87,11 @@ public interface StorageService {
 	 * @param metadata
 	 *            optional metadata associated with this resource
 	 * 
-	 * @throws StorageActionException
+	 * @throws StorageServiceException
 	 * 
 	 */
 	public Directory createDirectory(StoragePath storagePath,
-			Map<String, Set<String>> metadata) throws StorageActionException;
+			Map<String, Set<String>> metadata) throws StorageServiceException;
 
 	/**
 	 * Get an existing directory.
@@ -100,10 +100,10 @@ public interface StorageService {
 	 *            storage path that identifies the directory
 	 * 
 	 * @return
-	 * @throws StorageActionException
+	 * @throws StorageServiceException
 	 */
 	public Directory getDirectory(StoragePath storagePath)
-			throws StorageActionException;
+			throws StorageServiceException;
 
 	/**
 	 * List all resources, container or binaries, directly under this directory.
@@ -112,10 +112,10 @@ public interface StorageService {
 	 *            storage path that identifies the directory
 	 * @return
 	 * 
-	 * @throws StorageActionException
+	 * @throws StorageServiceException
 	 */
 	public ClosableIterable<Resource> listResourcesUnderDirectory(
-			StoragePath storagePath) throws StorageActionException;
+			StoragePath storagePath) throws StorageServiceException;
 
 	/**
 	 * Create a binary resource with a defined content.
@@ -130,11 +130,11 @@ public interface StorageService {
 	 *            create the binary as a reference to the real content, which is
 	 *            managed externally. If false, content should be copied into
 	 *            the storage service.
-	 * @throws StorageActionException
+	 * @throws StorageServiceException
 	 */
 	public Binary createBinary(StoragePath storagePath,
 			Map<String, Set<String>> metadata, ContentPayload payload,
-			boolean asReference) throws StorageActionException;
+			boolean asReference) throws StorageServiceException;
 
 	/**
 	 * Get an existing binary resource.
@@ -142,10 +142,10 @@ public interface StorageService {
 	 * @param storagePath
 	 *            storage path that identifies the binary
 	 * @return
-	 * @throws StorageActionException
+	 * @throws StorageServiceException
 	 */
 	public Binary getBinary(StoragePath storagePath)
-			throws StorageActionException;
+			throws StorageServiceException;
 
 	/**
 	 * Replace existing binary content with given one, not changing any
@@ -162,15 +162,15 @@ public interface StorageService {
 	 * @param createIfNotExists
 	 *            If <code>true</code> and binary does not exists then it will
 	 *            be create. If <code>false</code> and binary does not exist
-	 *            then a {@link StorageActionException} will be thrown with code
+	 *            then a {@link StorageServiceException} will be thrown with code
 	 *            <code>StorageActionException.NOT_FOUND</code>.
 	 * 
 	 * @return
-	 * @throws StorageActionException
+	 * @throws StorageServiceException
 	 */
 	public Binary updateBinaryContent(StoragePath storagePath,
 			ContentPayload payload, boolean asReference,
-			boolean createIfNotExists) throws StorageActionException;
+			boolean createIfNotExists) throws StorageServiceException;
 
 	/**
 	 * Delete an existing resource, being it a container or a binary. If it is a
@@ -178,10 +178,10 @@ public interface StorageService {
 	 * 
 	 * @param storagePath
 	 *            storage path that identifies the resource
-	 * @throws StorageActionException
+	 * @throws StorageServiceException
 	 */
 	public void deleteResource(StoragePath storagePath)
-			throws StorageActionException;
+			throws StorageServiceException;
 
 	/**
 	 * Get metadata associated to a resource.
@@ -192,7 +192,7 @@ public interface StorageService {
 	 * @throws StorageActionExceptionResource
 	 */
 	public Map<String, Set<String>> getMetadata(StoragePath storagePath)
-			throws StorageActionException;
+			throws StorageServiceException;
 
 	/**
 	 * Update metadata associated with a container.
@@ -204,11 +204,11 @@ public interface StorageService {
 	 *            replaced by the new one; false indicates that existing
 	 *            metadata will be updated to the new values (by replacing the
 	 *            old values with the new ones)
-	 * @throws StorageActionException
+	 * @throws StorageServiceException
 	 */
 	public Map<String, Set<String>> updateMetadata(StoragePath storagePath,
 			Map<String, Set<String>> metadata, boolean replaceAll)
-			throws StorageActionException;
+			throws StorageServiceException;
 
 	/**
 	 * Get entity class
@@ -217,7 +217,7 @@ public interface StorageService {
 	 *            storage path that identifies the resource
 	 * */
 	public Class<? extends Entity> getEntity(StoragePath storagePath)
-			throws StorageActionException;
+			throws StorageServiceException;
 
 	/**
 	 * TODO
@@ -229,10 +229,10 @@ public interface StorageService {
 	 * @param toContainer
 	 * @param toPath
 	 * @param toName
-	 * @throws StorageActionException
+	 * @throws StorageServiceException
 	 */
 	public void copy(StorageService fromService, StoragePath fromStoragePath,
-			StoragePath toStoragePath) throws StorageActionException;
+			StoragePath toStoragePath) throws StorageServiceException;
 
 	/**
 	 * TODO
@@ -244,9 +244,9 @@ public interface StorageService {
 	 * @param toContainer
 	 * @param toPath
 	 * @param toName
-	 * @throws StorageActionException
+	 * @throws StorageServiceException
 	 */
 	public void move(StorageService fromService, StoragePath fromStoragePath,
-			StoragePath toStoragePath) throws StorageActionException;
+			StoragePath toStoragePath) throws StorageServiceException;
 
 }

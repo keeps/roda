@@ -257,7 +257,8 @@ public abstract class RODAWebService {
 					String password = getClientUserPassword();
 					if(username!=null){
 						logger.debug("GETTING CAS USER FROM U/P "+username+"/"+password);
-						user = casUtility.getCASUserPrincipal(username, password);
+						// FIXME empty string
+						user = casUtility.getCASUserPrincipal(username, password,"");
 					}
 				}
 	

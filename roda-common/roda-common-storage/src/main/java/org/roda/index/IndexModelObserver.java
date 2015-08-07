@@ -14,7 +14,7 @@ import org.roda.model.File;
 import org.roda.model.ModelObserver;
 import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
-import org.roda.storage.StorageActionException;
+import org.roda.storage.StorageServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -119,12 +119,12 @@ public class IndexModelObserver implements ModelObserver {
 			SolrInputDocument aipDoc = SolrUtils.aipToSolrInputDocument(aip);
 			SolrInputDocument sdoDoc = SolrUtils.aipToSolrInputDocumentAsSDO(aip, model);
 			index.add(RodaConstants.INDEX_AIP, aipDoc);
-			// index.commit(RodaConstants.INDEX_AIP);
+			index.commit(RodaConstants.INDEX_AIP);
 			LOGGER.debug("Adding SDO: " + sdoDoc);
 			index.add(RodaConstants.INDEX_SDO, sdoDoc);
-			// index.commit(RodaConstants.INDEX_SDO);
-		} catch (SolrServerException | IOException | ModelServiceException | StorageActionException
-				| IndexActionException e) {
+			index.commit(RodaConstants.INDEX_SDO);
+		} catch (SolrServerException | IOException | ModelServiceException | StorageServiceException
+				| IndexServiceException e) {
 			LOGGER.error("Could not index created AIP", e);
 		}
 	}

@@ -38,13 +38,13 @@ import org.apache.solr.common.SolrInputField;
 import org.apache.solr.common.util.ContentStream;
 import org.apache.solr.handler.loader.XMLLoader;
 import org.roda.common.RodaUtils;
-import org.roda.index.IndexActionException;
+import org.roda.index.IndexServiceException;
 import org.roda.model.AIP;
 import org.roda.model.DescriptiveMetadata;
 import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
 import org.roda.storage.Binary;
-import org.roda.storage.StorageActionException;
+import org.roda.storage.StorageServiceException;
 import org.roda.storage.StoragePath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -111,7 +111,7 @@ public class SolrUtils {
 	}
 
 	public static <T extends Serializable> IndexResult<T> queryResponseToIndexResult(QueryResponse response,
-			Class<T> responseClass) throws IndexActionException {
+			Class<T> responseClass) throws IndexServiceException {
 		final SolrDocumentList docList = response.getResults();
 		final long offset = docList.getStart();
 		final long limit = docList.size();
@@ -126,7 +126,7 @@ public class SolrUtils {
 		return new IndexResult<T>(offset, limit, totalCount, docs);
 	}
 
-	public static SolrInputDocument getDescriptiveMetataFields(Binary binary) throws IndexActionException {
+	public static SolrInputDocument getDescriptiveMetataFields(Binary binary) throws IndexServiceException {
 		SolrInputDocument doc;
 		InputStream inputStream;
 		try {
@@ -179,13 +179,13 @@ public class SolrUtils {
 			transformationResult.close();
 
 		} catch (IOException | TransformerException | XMLStreamException | FactoryConfigurationError e) {
-			throw new IndexActionException("Could not process descriptive metadata",
-					IndexActionException.INTERNAL_SERVER_ERROR, e);
+			throw new IndexServiceException("Could not process descriptive metadata",
+					IndexServiceException.INTERNAL_SERVER_ERROR, e);
 		}
 		return doc;
 	}
 
-	public static String parseFilter(Filter filter) throws IndexActionException {
+	public static String parseFilter(Filter filter) throws IndexServiceException {
 		StringBuilder ret = new StringBuilder();
 
 		if (filter == null) {
@@ -219,9 +219,9 @@ public class SolrUtils {
 					ret.append("(*:* NOT " + param.getName() + ":*)");
 				} else {
 					LOGGER.error("Unsupported filter parameter class: " + parameter.getClass().getName());
-					throw new IndexActionException(
+					throw new IndexServiceException(
 							"Unsupported filter parameter class: " + parameter.getClass().getName(),
-							IndexActionException.BAD_REQUEST);
+							IndexServiceException.BAD_REQUEST);
 				}
 			}
 
@@ -234,7 +234,7 @@ public class SolrUtils {
 		return ret.toString();
 	}
 
-	public static List<SortClause> parseSorter(Sorter sorter) throws IndexActionException {
+	public static List<SortClause> parseSorter(Sorter sorter) throws IndexServiceException {
 		List<SortClause> ret = new ArrayList<SortClause>();
 		if (sorter != null) {
 			for (SortParameter sortParameter : sorter.getParameters()) {
@@ -387,7 +387,7 @@ public class SolrUtils {
 	}
 
 	// TODO: Handle SimpleRepresentationPreservationMetadata
-	private static <T> String getIndexName(Class<T> resultClass) throws IndexActionException {
+	private static <T> String getIndexName(Class<T> resultClass) throws IndexServiceException {
 		String indexName;
 		if (resultClass.equals(AIP.class)) {
 			indexName = RodaConstants.INDEX_AIP;
@@ -402,13 +402,13 @@ public class SolrUtils {
 		} else if (resultClass.equals(LogEntry.class)) {
 			indexName = RodaConstants.INDEX_ACTION_LOG;
 		} else {
-			throw new IndexActionException("Cannot find class index name: " + resultClass.getName(),
-					IndexActionException.INTERNAL_SERVER_ERROR);
+			throw new IndexServiceException("Cannot find class index name: " + resultClass.getName(),
+					IndexServiceException.INTERNAL_SERVER_ERROR);
 		}
 		return indexName;
 	}
 
-	private static <T> T solrDocumentTo(Class<T> resultClass, SolrDocument doc) throws IndexActionException {
+	private static <T> T solrDocumentTo(Class<T> resultClass, SolrDocument doc) throws IndexServiceException {
 		T ret;
 		if (resultClass.equals(AIP.class)) {
 			ret = resultClass.cast(solrDocumentToAIP(doc));
@@ -423,32 +423,32 @@ public class SolrUtils {
 		} else if (resultClass.equals(LogEntry.class)) {
 			ret = resultClass.cast(solrDocumentToLogEntry(doc));
 		} else {
-			throw new IndexActionException("Cannot find class index name: " + resultClass.getName(),
-					IndexActionException.INTERNAL_SERVER_ERROR);
+			throw new IndexServiceException("Cannot find class index name: " + resultClass.getName(),
+					IndexServiceException.INTERNAL_SERVER_ERROR);
 		}
 		return ret;
 
 	}
 
 	public static <T> T retrieve(SolrClient index, Class<T> classToRetrieve, String... ids)
-			throws IndexActionException {
+			throws IndexServiceException {
 		T ret;
 		try {
 			SolrDocument doc = index.getById(getIndexName(classToRetrieve), SolrUtils.getId(ids));
 			if (doc != null) {
 				ret = solrDocumentTo(classToRetrieve, doc);
 			} else {
-				throw new IndexActionException("Document not found", IndexActionException.NOT_FOUND);
+				throw new IndexServiceException("Document not found", IndexServiceException.NOT_FOUND);
 			}
 		} catch (SolrServerException | IOException e) {
-			throw new IndexActionException("Could not retrieve AIP from index",
-					IndexActionException.INTERNAL_SERVER_ERROR, e);
+			throw new IndexServiceException("Could not retrieve AIP from index",
+					IndexServiceException.INTERNAL_SERVER_ERROR, e);
 		}
 		return ret;
 	}
 
 	public static <T extends Serializable> IndexResult<T> find(SolrClient index, Class<T> classToRetrieve,
-			Filter filter, Sorter sorter, Sublist sublist) throws IndexActionException {
+			Filter filter, Sorter sorter, Sublist sublist) throws IndexServiceException {
 		IndexResult<T> ret;
 		SolrQuery query = new SolrQuery();
 		String queryString = parseFilter(filter);
@@ -460,14 +460,14 @@ public class SolrUtils {
 			QueryResponse response = index.query(getIndexName(classToRetrieve), query);
 			ret = queryResponseToIndexResult(response, classToRetrieve);
 		} catch (SolrServerException | IOException e) {
-			throw new IndexActionException("Could not query index", IndexActionException.INTERNAL_SERVER_ERROR, e);
+			throw new IndexServiceException("Could not query index", IndexServiceException.INTERNAL_SERVER_ERROR, e);
 		}
 
 		return ret;
 	}
 
 	public static <T extends Serializable> Long count(SolrClient index, Class<T> classToRetrieve, Filter filter)
-			throws IndexActionException {
+			throws IndexServiceException {
 		return find(index, classToRetrieve, filter, null, new Sublist(0, 0)).getTotalCount();
 	}
 
@@ -539,7 +539,7 @@ public class SolrUtils {
 	}
 
 	public static SolrInputDocument aipToSolrInputDocumentAsSDO(AIP aip, ModelService model)
-			throws ModelServiceException, StorageActionException, IndexActionException {
+			throws ModelServiceException, StorageServiceException, IndexServiceException {
 		final SolrInputDocument ret = new SolrInputDocument();
 		final String aipId = aip.getId();
 

@@ -188,7 +188,8 @@ public class RODAFedoraFilter extends FilterSetup {
 		logger.debug("SETUSERATTRIBUTE "+username+" / "+password);
 		CASUserPrincipal user = null;
 		try{
-			user = this.casUtility.getCASUserPrincipal(username, password);
+			// FIXME empty string
+			user = this.casUtility.getCASUserPrincipal(username, password,"");
 			if (user == null) {
 				logger.debug("No user named " + username);
 			} else {

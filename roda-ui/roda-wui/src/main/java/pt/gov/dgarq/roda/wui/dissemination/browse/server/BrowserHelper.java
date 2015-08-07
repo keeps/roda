@@ -7,12 +7,12 @@ import java.util.Locale;
 
 import org.apache.log4j.Logger;
 import org.roda.common.HTMLUtils;
-import org.roda.index.IndexActionException;
+import org.roda.index.IndexServiceException;
 import org.roda.model.DescriptiveMetadata;
 import org.roda.model.ModelServiceException;
 import org.roda.storage.Binary;
 import org.roda.storage.ClosableIterable;
-import org.roda.storage.StorageActionException;
+import org.roda.storage.StorageServiceException;
 
 import pt.gov.dgarq.roda.common.RodaCoreFactory;
 import pt.gov.dgarq.roda.core.common.RODAException;
@@ -55,7 +55,7 @@ public class BrowserHelper {
 			}
 			itemBundle.setRepresentations(representationList);
 
-		} catch (StorageActionException | ModelServiceException | RODAException e) {
+		} catch (StorageServiceException | ModelServiceException | RODAException e) {
 			throw new GenericException("Error getting item bundle " + e.getMessage());
 		}
 
@@ -64,7 +64,7 @@ public class BrowserHelper {
 
 	private static void getDescriptiveMetadata(String aipId, final Locale locale,
 			List<DescriptiveMetadataBundle> descriptiveMetadataList)
-					throws ModelServiceException, StorageActionException {
+					throws ModelServiceException, StorageServiceException {
 		ClosableIterable<DescriptiveMetadata> listDescriptiveMetadataBinaries = RodaCoreFactory.getModelService()
 				.listDescriptiveMetadataBinaries(aipId);
 		try {
@@ -87,7 +87,7 @@ public class BrowserHelper {
 	protected static List<SimpleDescriptionObject> getAncestors(SimpleDescriptionObject sdo) throws GenericException {
 		try {
 			return RodaCoreFactory.getIndexService().getAncestors(sdo);
-		} catch (IndexActionException e) {
+		} catch (IndexServiceException e) {
 			LOGGER.error("Error getting parent", e);
 			throw new GenericException("Error getting parent: " + e.getMessage());
 		}
@@ -99,7 +99,7 @@ public class BrowserHelper {
 		try {
 			sdos = RodaCoreFactory.getIndexService().findDescriptiveMetadata(filter, sorter, sublist);
 			LOGGER.debug(String.format("findDescriptiveMetadata(%1$s,%2$s,%3$s)=%4$s", filter, sorter, sublist, sdos));
-		} catch (IndexActionException e) {
+		} catch (IndexServiceException e) {
 			LOGGER.error("Error getting collections", e);
 			throw new GenericException("Error getting collections " + e.getMessage());
 		}
@@ -112,7 +112,7 @@ public class BrowserHelper {
 		Long count;
 		try {
 			count = RodaCoreFactory.getIndexService().countDescriptiveMetadata(filter);
-		} catch (IndexActionException e) {
+		} catch (IndexServiceException e) {
 			LOGGER.debug("Error getting sub-elements count", e);
 			throw new GenericException("Error getting sub-elements count " + e.getMessage());
 		}
@@ -123,7 +123,7 @@ public class BrowserHelper {
 	protected static SimpleDescriptionObject getSimpleDescriptionObject(String aipId) throws GenericException {
 		try {
 			return RodaCoreFactory.getIndexService().retrieveDescriptiveMetadata(aipId);
-		} catch (IndexActionException e) {
+		} catch (IndexServiceException e) {
 			LOGGER.error("Error getting SDO", e);
 			throw new GenericException("Error getting SDO: " + e.getMessage());
 		}
@@ -132,7 +132,7 @@ public class BrowserHelper {
 	protected static String getParent(String aipId) throws GenericException{
 		try {
 			return RodaCoreFactory.getIndexService().getParentId(aipId);
-		} catch (IndexActionException e) {
+		} catch (IndexServiceException e) {
 			LOGGER.error("Error getting parent", e);
 			throw new GenericException("Error getting parent: " + e.getMessage());
 		}

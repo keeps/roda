@@ -35,7 +35,7 @@ import org.roda.common.RodaUtils;
 import org.roda.model.utils.ModelUtils;
 import org.roda.storage.Binary;
 import org.roda.storage.DefaultStoragePath;
-import org.roda.storage.StorageActionException;
+import org.roda.storage.StorageServiceException;
 import org.roda.storage.StoragePath;
 import org.roda.storage.StorageService;
 import org.roda.storage.StorageTestUtils;
@@ -75,9 +75,10 @@ public class ModelServiceTest {
 	private static final Logger logger = LoggerFactory.getLogger(ModelServiceTest.class);
 
 	@BeforeClass
-	public static void setUp() throws IOException, StorageActionException, URISyntaxException, ModelServiceException {
+	public static void setUp() throws IOException, StorageServiceException, URISyntaxException, ModelServiceException {
 		basePath = Files.createTempDirectory("modelTests");
 		logPath = basePath.resolve("log");
+		Files.createDirectories(logPath);
 		storage = new FileStorageService(basePath);
 		model = new ModelService(storage);
 
@@ -89,19 +90,19 @@ public class ModelServiceTest {
 	}
 
 	@AfterClass
-	public static void tearDown() throws StorageActionException {
+	public static void tearDown() throws StorageServiceException {
 		FSUtils.deletePath(basePath);
 	}
 
 	@After
-	public void cleanup() throws IOException, StorageActionException {
+	public void cleanup() throws IOException, StorageServiceException {
 		tearDown();
 		// re-create directory
 		Files.createDirectory(basePath);
 	}
 
 	@Test
-	public void testCreateAIP() throws ModelServiceException, StorageActionException, ParseException, IOException {
+	public void testCreateAIP() throws ModelServiceException, StorageServiceException, ParseException, IOException {
 
 		// generate AIP ID
 		final String aipId = UUID.randomUUID().toString();
@@ -238,7 +239,7 @@ public class ModelServiceTest {
 	}
 
 	@Test
-	public void testDeleteAIP() throws ModelServiceException, StorageActionException {
+	public void testDeleteAIP() throws ModelServiceException, StorageServiceException {
 		// generate AIP ID
 		final String aipId = UUID.randomUUID().toString();
 
@@ -289,7 +290,7 @@ public class ModelServiceTest {
 	// TODO test if deleting AIP also deletes all sub-AIPs
 
 	@Test
-	public void testListAIPs() throws ModelServiceException, StorageActionException {
+	public void testListAIPs() throws ModelServiceException, StorageServiceException {
 		// generate AIP ID
 		final String aip1Id = UUID.randomUUID().toString();
 		final String aip2Id = UUID.randomUUID().toString();
@@ -308,7 +309,7 @@ public class ModelServiceTest {
 	}
 
 	@Test
-	public void testCreateAIPWithExistingId() throws ModelServiceException, StorageActionException {
+	public void testCreateAIPWithExistingId() throws ModelServiceException, StorageServiceException {
 		// generate AIP ID
 		final String aipId = UUID.randomUUID().toString();
 
@@ -320,12 +321,13 @@ public class ModelServiceTest {
 					DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 			fail("AIP shouldn't have been created and yet it was.");
 		} catch (ModelServiceException e) {
+			e.printStackTrace();
 			assertEquals(ModelServiceException.ALREADY_EXISTS, e.getCode());
 		}
 	}
 
 	@Test
-	public void testUpdateAIP() throws ModelServiceException, StorageActionException, IOException {
+	public void testUpdateAIP() throws ModelServiceException, StorageServiceException, IOException {
 		// set up
 		final String aipId = UUID.randomUUID().toString();
 		model.createAIP(aipId, corporaService,
@@ -345,7 +347,7 @@ public class ModelServiceTest {
 	}
 
 	@Test
-	public void testListDescriptiveMetadata() throws ModelServiceException, StorageActionException {
+	public void testListDescriptiveMetadata() throws ModelServiceException, StorageServiceException {
 		// set up
 		final String aipId = UUID.randomUUID().toString();
 		model.createAIP(aipId, corporaService,
@@ -359,7 +361,7 @@ public class ModelServiceTest {
 	}
 
 	@Test
-	public void testCreateDescriptiveMetadata() throws StorageActionException, ModelServiceException, IOException {
+	public void testCreateDescriptiveMetadata() throws StorageServiceException, ModelServiceException, IOException {
 		// set up
 		final String aipId = UUID.randomUUID().toString();
 		model.createAIP(aipId, corporaService,
@@ -385,7 +387,7 @@ public class ModelServiceTest {
 	}
 
 	@Test
-	public void testUpdateDescriptiveMetadata() throws StorageActionException, ModelServiceException, IOException {
+	public void testUpdateDescriptiveMetadata() throws StorageServiceException, ModelServiceException, IOException {
 		// set up
 		final String aipId = UUID.randomUUID().toString();
 		model.createAIP(aipId, corporaService,
@@ -410,7 +412,7 @@ public class ModelServiceTest {
 	}
 
 	@Test
-	public void testDeleteDescriptiveMetadata() throws ModelServiceException, StorageActionException {
+	public void testDeleteDescriptiveMetadata() throws ModelServiceException, StorageServiceException {
 		// set up
 		final String aipId = UUID.randomUUID().toString();
 		model.createAIP(aipId, corporaService,
@@ -428,7 +430,7 @@ public class ModelServiceTest {
 	}
 
 	@Test
-	public void testListRepresentations() throws ModelServiceException, StorageActionException {
+	public void testListRepresentations() throws ModelServiceException, StorageServiceException {
 		// set up
 		final String aipId = UUID.randomUUID().toString();
 		model.createAIP(aipId, corporaService,
@@ -444,7 +446,7 @@ public class ModelServiceTest {
 	}
 
 	@Test
-	public void testCreateRepresentation() throws ModelServiceException, StorageActionException, IOException {
+	public void testCreateRepresentation() throws ModelServiceException, StorageServiceException, IOException {
 		// set up
 		final String aipId = UUID.randomUUID().toString();
 		model.createAIP(aipId, corporaService,
@@ -466,7 +468,7 @@ public class ModelServiceTest {
 	}
 
 	@Test
-	public void testUpdateRepresentation() throws ModelServiceException, StorageActionException, IOException {
+	public void testUpdateRepresentation() throws ModelServiceException, StorageServiceException, IOException {
 		// set up
 		final String aipId = UUID.randomUUID().toString();
 		model.createAIP(aipId, corporaService,
@@ -488,7 +490,7 @@ public class ModelServiceTest {
 	}
 
 	@Test
-	public void testDeleteRepresentation() throws ModelServiceException, StorageActionException {
+	public void testDeleteRepresentation() throws ModelServiceException, StorageServiceException {
 		// set up
 		final String aipId = UUID.randomUUID().toString();
 		model.createAIP(aipId, corporaService,
@@ -515,7 +517,7 @@ public class ModelServiceTest {
 	}
 
 	@Test
-	public void testCreateFile() throws ModelServiceException, StorageActionException, IOException {
+	public void testCreateFile() throws ModelServiceException, StorageServiceException, IOException {
 		// set up
 		final String aipId = UUID.randomUUID().toString();
 		model.createAIP(aipId, corporaService,
@@ -538,7 +540,7 @@ public class ModelServiceTest {
 	}
 
 	@Test
-	public void testUpdateFile() throws ModelServiceException, StorageActionException, IOException {
+	public void testUpdateFile() throws ModelServiceException, StorageServiceException, IOException {
 		// set up
 		final String aipId = UUID.randomUUID().toString();
 		model.createAIP(aipId, corporaService,
@@ -564,7 +566,7 @@ public class ModelServiceTest {
 	}
 
 	@Test
-	public void testDeleteFile() throws ModelServiceException, StorageActionException {
+	public void testDeleteFile() throws ModelServiceException, StorageServiceException {
 		// set up
 		final String aipId = UUID.randomUUID().toString();
 		model.createAIP(aipId, corporaService,
@@ -583,7 +585,7 @@ public class ModelServiceTest {
 	}
 
 	@Test
-	public void testRetrieveEventPreservationObject() throws ModelServiceException, StorageActionException {
+	public void testRetrieveEventPreservationObject() throws ModelServiceException, StorageServiceException {
 		// set up
 		final String aipId = UUID.randomUUID().toString();
 		model.createAIP(aipId, corporaService,
@@ -596,7 +598,7 @@ public class ModelServiceTest {
 	}
 
 	@Test
-	public void testRepresentationFileObject() throws ModelServiceException, StorageActionException {
+	public void testRepresentationFileObject() throws ModelServiceException, StorageServiceException {
 		// set up
 		final String aipId = UUID.randomUUID().toString();
 		model.createAIP(aipId, corporaService,
@@ -608,7 +610,7 @@ public class ModelServiceTest {
 	}
 
 	@Test
-	public void testRepresentationPreservationObject() throws ModelServiceException, StorageActionException {
+	public void testRepresentationPreservationObject() throws ModelServiceException, StorageServiceException {
 		// set up
 		final String aipId = UUID.randomUUID().toString();
 		model.createAIP(aipId, corporaService,
@@ -619,7 +621,7 @@ public class ModelServiceTest {
 	}
 
 	@Test
-	public void testGetAipPreservationObjects() throws ModelServiceException, StorageActionException {
+	public void testGetAipPreservationObjects() throws ModelServiceException, StorageServiceException {
 		// set up
 		final String aipId = UUID.randomUUID().toString();
 		model.createAIP(aipId, corporaService,
@@ -638,7 +640,7 @@ public class ModelServiceTest {
 	}
 
 	@Test
-	public void getAgentPreservationObject() throws ModelServiceException, StorageActionException {
+	public void getAgentPreservationObject() throws ModelServiceException, StorageServiceException {
 		// pre-load the preservation container data
 		storage.copy(corporaService, DefaultStoragePath.parse(CorporaConstants.SOURCE_PRESERVATION_CONTAINER),
 				DefaultStoragePath.parse(CorporaConstants.SOURCE_PRESERVATION_CONTAINER));

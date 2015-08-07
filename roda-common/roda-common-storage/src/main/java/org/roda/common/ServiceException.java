@@ -1,8 +1,8 @@
-package org.roda.storage;
+package org.roda.common;
 
-public class StorageActionException extends Exception {
+public class ServiceException extends Exception {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -3970536792438366410L;
 
 	public static final int BAD_REQUEST = 400;
 	public static final int FORBIDDEN = 403;
@@ -13,12 +13,12 @@ public class StorageActionException extends Exception {
 
 	private int code;
 
-	public StorageActionException(String message, int code) {
+	public ServiceException(String message, int code) {
 		super(message);
 		this.code = code;
 	}
-
-	public StorageActionException(String message, int code, Throwable cause) {
+	
+	public ServiceException(String message, int code, Throwable cause) {
 		super(message, cause);
 		this.code = code;
 	}
@@ -29,11 +29,6 @@ public class StorageActionException extends Exception {
 
 	public void setCode(int code) {
 		this.code = code;
-	}
-
-	@Override
-	public String getMessage() {
-		return super.getMessage();
 	}
 
 }

@@ -20,7 +20,7 @@ import org.roda.storage.DefaultContainer;
 import org.roda.storage.DefaultDirectory;
 import org.roda.storage.DefaultStoragePath;
 import org.roda.storage.Directory;
-import org.roda.storage.StorageActionException;
+import org.roda.storage.StorageServiceException;
 import org.roda.storage.StoragePath;
 import org.roda.storage.fedora.FedoraContentPayload;
 import org.roda.storage.fedora.FedoraStorageService;
@@ -54,14 +54,14 @@ public final class FedoraConversionUtils {
 	 * */
 	public static FedoraContent contentPayloadToFedoraContent(
 			ContentPayload payload, String mimetype)
-			throws StorageActionException {
+			throws StorageServiceException {
 		try {
 			return new FedoraContent().setContent(payload.createInputStream())
 					.setContentType(mimetype);
 		} catch (IOException e) {
-			throw new StorageActionException(
+			throw new StorageServiceException(
 					"Error while converting content payload into fedora content",
-					StorageActionException.INTERNAL_SERVER_ERROR, e);
+					StorageServiceException.INTERNAL_SERVER_ERROR, e);
 		}
 	}
 
@@ -73,31 +73,31 @@ public final class FedoraConversionUtils {
 	 *            the payload to be converted
 	 * */
 	public static FedoraContent contentPayloadToFedoraContent(
-			ContentPayload payload) throws StorageActionException {
+			ContentPayload payload) throws StorageServiceException {
 		return contentPayloadToFedoraContent(payload,
 				"application/octet-stream");
 	}
 
 	private static StoragePath getStoragePath(FedoraDatastream ds)
-			throws StorageActionException {
+			throws StorageServiceException {
 		try {
 			return DefaultStoragePath.parse(ds.getPath().substring(0,
 					ds.getPath().lastIndexOf("/")));
 		} catch (FedoraException e) {
-			throw new StorageActionException(
+			throw new StorageServiceException(
 					"Error while getting the storage path from a particular Fedora datastream",
-					StorageActionException.INTERNAL_SERVER_ERROR, e);
+					StorageServiceException.INTERNAL_SERVER_ERROR, e);
 		}
 	}
 
 	private static StoragePath getStoragePath(FedoraObject obj)
-			throws StorageActionException {
+			throws StorageServiceException {
 		try {
 			return DefaultStoragePath.parse(obj.getPath());
 		} catch (FedoraException e) {
-			throw new StorageActionException(
+			throw new StorageServiceException(
 					"Error while getting the storage path from a particular Fedora object",
-					StorageActionException.INTERNAL_SERVER_ERROR, e);
+					StorageServiceException.INTERNAL_SERVER_ERROR, e);
 		}
 	}
 
@@ -108,7 +108,7 @@ public final class FedoraConversionUtils {
 	 *            the Fedora datastream to be converted
 	 * */
 	public static Binary fedoraDatastreamToBinary(FedoraDatastream datastream)
-			throws StorageActionException {
+			throws StorageServiceException {
 		try {
 			Map<String, Set<String>> properties = tripleIteratorToMap(datastream
 					.getProperties());
@@ -118,9 +118,9 @@ public final class FedoraConversionUtils {
 			return new DefaultBinary(getStoragePath(datastream), properties,
 					cp, sizeInBytes, false, extractContentDigest(contentDigest));
 		} catch (FedoraException e) {
-			throw new StorageActionException(
+			throw new StorageServiceException(
 					"Error while converting a Fedora datastream into a Binary",
-					StorageActionException.INTERNAL_SERVER_ERROR, e);
+					StorageServiceException.INTERNAL_SERVER_ERROR, e);
 		}
 	}
 
@@ -142,7 +142,7 @@ public final class FedoraConversionUtils {
 	 *            the Fedora object to be converted
 	 * */
 	public static Directory fedoraObjectToDirectory(String fedoraRepositoryURL,
-			FedoraObject object) throws StorageActionException {
+			FedoraObject object) throws StorageServiceException {
 		try {
 			Map<String, Set<String>> metadata = tripleIteratorToMap(
 					fedoraRepositoryURL, object.getProperties(),
@@ -150,9 +150,9 @@ public final class FedoraConversionUtils {
 			Directory d = new DefaultDirectory(getStoragePath(object), metadata);
 			return d;
 		} catch (FedoraException e) {
-			throw new StorageActionException(
+			throw new StorageServiceException(
 					"Error while converting a Fedora object into a Directory",
-					StorageActionException.INTERNAL_SERVER_ERROR, e);
+					StorageServiceException.INTERNAL_SERVER_ERROR, e);
 		}
 
 	}
@@ -241,15 +241,15 @@ public final class FedoraConversionUtils {
 	 *            Fedora object to be converted
 	 * */
 	public static Container fedoraObjectToContainer(FedoraObject object)
-			throws StorageActionException {
+			throws StorageServiceException {
 		try {
 			return new DefaultContainer(getStoragePath(object),
 					tripleIteratorToMap(object.getProperties()));
 		} catch (FedoraException e) {
 
-			throw new StorageActionException(
+			throw new StorageServiceException(
 					"Error while converting a Fedora object into a Container",
-					StorageActionException.INTERNAL_SERVER_ERROR, e);
+					StorageServiceException.INTERNAL_SERVER_ERROR, e);
 		}
 	}
 }

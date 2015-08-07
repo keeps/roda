@@ -16,7 +16,7 @@ import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
 import org.roda.storage.Binary;
 import org.roda.storage.ClosableIterable;
-import org.roda.storage.StorageActionException;
+import org.roda.storage.StorageServiceException;
 import org.roda.storage.StoragePath;
 import org.xml.sax.SAXException;
 
@@ -28,13 +28,14 @@ public class ValidationUtils {
 	/**
 	 * Validates all descriptive metadata files contained in the AIP
 	 */
-	public static boolean isAIPDescriptiveMetadataValid(ModelService model, String aipId) throws ModelServiceException {
+	public static boolean isAIPDescriptiveMetadataValid(ModelService model, String aipId, boolean failIfNoSchema)
+			throws ModelServiceException {
 		boolean valid = true;
 		ClosableIterable<DescriptiveMetadata> descriptiveMetadataBinaries = model
 				.listDescriptiveMetadataBinaries(aipId);
 		try {
 			for (DescriptiveMetadata descriptiveMetadata : descriptiveMetadataBinaries) {
-				if (!isDescriptiveMetadataValid(model, descriptiveMetadata)) {
+				if (!isDescriptiveMetadataValid(model, descriptiveMetadata, failIfNoSchema)) {
 					valid = false;
 					break;
 				}
@@ -52,10 +53,12 @@ public class ValidationUtils {
 	/**
 	 * Validates descriptive medatada (e.g. against its schema, but other
 	 * strategies may be used)
+	 * 
+	 * @param failIfNoSchema
 	 */
-	public static boolean isDescriptiveMetadataValid(ModelService model, DescriptiveMetadata metadata)
-			throws ModelServiceException {
-		boolean valid = false;
+	public static boolean isDescriptiveMetadataValid(ModelService model, DescriptiveMetadata metadata,
+			boolean failIfNoSchema) throws ModelServiceException {
+		boolean valid;
 		try {
 			StoragePath storagePath = metadata.getStoragePath();
 			Binary binary = model.getStorage().getBinary(storagePath);
@@ -64,22 +67,27 @@ public class ValidationUtils {
 			// FIXME this should be loaded from config folder (to be dynamic)
 			ClassLoader classLoader = SolrUtils.class.getClassLoader();
 			InputStream schemaStream = classLoader.getResourceAsStream("XSD/" + filename + ".xsd");
-			if (schemaStream == null) {
-				throw new ModelServiceException("Unable to validate " + filename,
-						ModelServiceException.INTERNAL_SERVER_ERROR);
+			if (schemaStream != null) {
+				Source xmlFile = new StreamSource(inputStream);
+				SchemaFactory schemaFactory = SchemaFactory.newInstance(W3C_XML_SCHEMA_NS_URI);
+				Schema schema = schemaFactory.newSchema(new StreamSource(schemaStream));
+				Validator validator = schema.newValidator();
+				try {
+					validator.validate(xmlFile);
+					valid = true;
+				} catch (SAXException e) {
+					valid = false;
+					LOGGER.error("Error validating descriptive metadata " + metadata.getStoragePath().asString());
+				}
+			} else {
+				if (failIfNoSchema) {
+					throw new ModelServiceException("Unable to validate " + filename,
+							ModelServiceException.INTERNAL_SERVER_ERROR);
+				} else {
+					valid = true;
+				}
 			}
-			Source xmlFile = new StreamSource(inputStream);
-			SchemaFactory schemaFactory = SchemaFactory.newInstance(W3C_XML_SCHEMA_NS_URI);
-			Schema schema = schemaFactory.newSchema(new StreamSource(schemaStream));
-			Validator validator = schema.newValidator();
-			try {
-				validator.validate(xmlFile);
-				valid = true;
-			} catch (SAXException e) {
-				// error validating... valid stays false
-				LOGGER.error("Error validating descriptive metadata " + metadata.getStoragePath().asString());
-			}
-		} catch (StorageActionException | SAXException | IOException e) {
+		} catch (StorageServiceException | SAXException | IOException e) {
 			throw new ModelServiceException(
 					"Error validating descriptive metadata " + metadata.getStoragePath().asString(),
 					ModelServiceException.INTERNAL_SERVER_ERROR, e);

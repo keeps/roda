@@ -19,7 +19,7 @@ import org.roda.storage.Binary;
 import org.roda.storage.ClosableIterable;
 import org.roda.storage.DefaultStoragePath;
 import org.roda.storage.Resource;
-import org.roda.storage.StorageActionException;
+import org.roda.storage.StorageServiceException;
 
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
@@ -50,59 +50,59 @@ public class IndexService {
 		model.addModelObserver(observer);
 	}
 
-	public AIP retrieveAIP(String aipId) throws IndexActionException {
+	public AIP retrieveAIP(String aipId) throws IndexServiceException {
 		return SolrUtils.retrieve(index, AIP.class, aipId);
 	}
 
-	public IndexResult<AIP> findAIP(Filter filter, Sorter sorter, Sublist sublist) throws IndexActionException {
+	public IndexResult<AIP> findAIP(Filter filter, Sorter sorter, Sublist sublist) throws IndexServiceException {
 		return SolrUtils.find(index, AIP.class, filter, sorter, sublist);
 	}
 
-	public Long countAIP(Filter filter) throws IndexActionException {
+	public Long countAIP(Filter filter) throws IndexServiceException {
 		return SolrUtils.count(index, AIP.class, filter);
 	}
 
 	public IndexResult<SimpleDescriptionObject> findDescriptiveMetadata(Filter filter, Sorter sorter, Sublist sublist)
-			throws IndexActionException {
+			throws IndexServiceException {
 		return SolrUtils.find(index, SimpleDescriptionObject.class, filter, sorter, sublist);
 	}
 
-	public Long countDescriptiveMetadata(Filter filter) throws IndexActionException {
+	public Long countDescriptiveMetadata(Filter filter) throws IndexServiceException {
 		return SolrUtils.count(index, SimpleDescriptionObject.class, filter);
 	}
 
-	public SimpleDescriptionObject retrieveDescriptiveMetadata(String aipId) throws IndexActionException {
+	public SimpleDescriptionObject retrieveDescriptiveMetadata(String aipId) throws IndexServiceException {
 		// TODO check if return type shouldn't be updated to
 		// SimpleDescriptiveMetadata
 		return SolrUtils.retrieve(index, SimpleDescriptionObject.class, aipId);
 	}
 
-	public Representation retrieveRepresentation(String aipId, String repId) throws IndexActionException {
+	public Representation retrieveRepresentation(String aipId, String repId) throws IndexServiceException {
 		return SolrUtils.retrieve(index, Representation.class, aipId, repId);
 	}
 
 	public IndexResult<Representation> findRepresentation(Filter filter, Sorter sorter, Sublist sublist)
-			throws IndexActionException {
+			throws IndexServiceException {
 		return SolrUtils.find(index, Representation.class, filter, sorter, sublist);
 	}
 
-	public Long countRepresentations(Filter filter) throws IndexActionException {
+	public Long countRepresentations(Filter filter) throws IndexServiceException {
 		return SolrUtils.count(index, Representation.class, filter);
 	}
 
-	public String getParentId(String id) throws IndexActionException {
+	public String getParentId(String id) throws IndexServiceException {
 		return retrieveAIP(id).getParentId();
 	}
 
-	public SimpleDescriptionObject getParent(String id) throws IndexActionException {
+	public SimpleDescriptionObject getParent(String id) throws IndexServiceException {
 		return SolrUtils.retrieve(index, SimpleDescriptionObject.class, getParentId(id));
 	}
 
-	public SimpleDescriptionObject getParent(SimpleDescriptionObject sdo) throws IndexActionException {
+	public SimpleDescriptionObject getParent(SimpleDescriptionObject sdo) throws IndexServiceException {
 		return SolrUtils.retrieve(index, SimpleDescriptionObject.class, sdo.getParentID());
 	}
 
-	public List<SimpleDescriptionObject> getAncestors(SimpleDescriptionObject sdo) throws IndexActionException {
+	public List<SimpleDescriptionObject> getAncestors(SimpleDescriptionObject sdo) throws IndexServiceException {
 		List<SimpleDescriptionObject> ancestors = new ArrayList<SimpleDescriptionObject>();
 		SimpleDescriptionObject parent = null, actual = sdo;
 
@@ -117,7 +117,7 @@ public class IndexService {
 		return ancestors;
 	}
 
-	public List<SimpleDescriptionObject> getAncestors(String id) throws IndexActionException {
+	public List<SimpleDescriptionObject> getAncestors(String id) throws IndexServiceException {
 		List<SimpleDescriptionObject> ancestors = new ArrayList<SimpleDescriptionObject>();
 		SimpleDescriptionObject parent = null;
 		String currId = id;
@@ -135,7 +135,7 @@ public class IndexService {
 
 	// TODO:
 	public SimpleRepresentationPreservationMetadata retrieveSimpleRepresentationPreservationMetadata(String aipId,
-			String representationId, String fileId) throws IndexActionException {
+			String representationId, String fileId) throws IndexServiceException {
 		return SolrUtils.retrieve(index, SimpleRepresentationPreservationMetadata.class, aipId, representationId,
 				fileId);
 	}
@@ -160,31 +160,31 @@ public class IndexService {
 	// */
 	//
 	public SimpleEventPreservationMetadata retrieveSimpleEventPreservationMetadata(String aipId,
-			String representationId, String fileId) throws IndexActionException {
+			String representationId, String fileId) throws IndexServiceException {
 		return SolrUtils.retrieve(index, SimpleEventPreservationMetadata.class, aipId, representationId, fileId);
 	}
 
-	public Long countSimpleEventPreservationMetadata(Filter filter) throws IndexActionException {
+	public Long countSimpleEventPreservationMetadata(Filter filter) throws IndexServiceException {
 		return SolrUtils.count(index, SimpleEventPreservationMetadata.class, filter);
 	}
 
 	public IndexResult<SimpleEventPreservationMetadata> findSimpleEventPreservationMetadata(Filter filter,
-			Sorter sorter, Sublist sublist) throws IndexActionException {
+			Sorter sorter, Sublist sublist) throws IndexServiceException {
 		return SolrUtils.find(index, SimpleEventPreservationMetadata.class, filter, sorter, sublist);
 	}
 
 	public SimpleRepresentationFilePreservationMetadata retrieveSimpleRepresentationFilePreservationMetadata(
-			String aipId, String representationId, String fileId) throws IndexActionException {
+			String aipId, String representationId, String fileId) throws IndexServiceException {
 		return SolrUtils.retrieve(index, SimpleRepresentationFilePreservationMetadata.class, aipId, representationId,
 				fileId);
 	}
 
-	public Long countSimpleRepresentationFilePreservationMetadata(Filter filter) throws IndexActionException {
+	public Long countSimpleRepresentationFilePreservationMetadata(Filter filter) throws IndexServiceException {
 		return SolrUtils.count(index, SimpleRepresentationFilePreservationMetadata.class, filter);
 	}
 
 	public IndexResult<SimpleRepresentationFilePreservationMetadata> findSimpleRepresentationFilePreservationMetadata(
-			Filter filter, Sorter sorter, Sublist sublist) throws IndexActionException {
+			Filter filter, Sorter sorter, Sublist sublist) throws IndexServiceException {
 		return SolrUtils.find(index, SimpleRepresentationFilePreservationMetadata.class, filter, sorter, sublist);
 	}
 
@@ -195,17 +195,17 @@ public class IndexService {
 	 */
 
 	// LOG
-	public Long getLogEntriesCount(Filter filter) throws IndexActionException {
+	public Long getLogEntriesCount(Filter filter) throws IndexServiceException {
 		return SolrUtils.count(index, LogEntry.class, filter);
 	}
 
 	public IndexResult<LogEntry> findLogEntry(Filter filter, Sorter sorter, Sublist sublist)
-			throws IndexActionException {
+			throws IndexServiceException {
 		return SolrUtils.find(index, LogEntry.class, filter, sorter, sublist);
 	}
 
 	// FIXME perhaps transform sysout into logger logging
-	public void reindexAIPs() throws IndexActionException {
+	public void reindexAIPs() throws IndexServiceException {
 		ClosableIterable<AIP> aips = null;
 		try {
 			System.out.println(new Date().getTime() + " > Listing AIPs");
@@ -222,7 +222,7 @@ public class IndexService {
 			optimizeAIPs();
 			System.out.println(new Date().getTime() + " > Done");
 		} catch (ModelServiceException e) {
-			throw new IndexActionException("Error while reindexing AIPs", IndexActionException.INTERNAL_SERVER_ERROR,
+			throw new IndexServiceException("Error while reindexing AIPs", IndexServiceException.INTERNAL_SERVER_ERROR,
 					e);
 		} finally {
 			try {
@@ -235,12 +235,12 @@ public class IndexService {
 		}
 	}
 
-	public void optimizeAIPs() throws IndexActionException {
+	public void optimizeAIPs() throws IndexServiceException {
 		try {
 			index.optimize(RodaConstants.INDEX_AIP);
 			index.optimize(RodaConstants.INDEX_SDO);
 		} catch (SolrServerException | IOException e) {
-			throw new IndexActionException("Error while optimizing indexes", IndexActionException.INTERNAL_SERVER_ERROR,
+			throw new IndexServiceException("Error while optimizing indexes", IndexServiceException.INTERNAL_SERVER_ERROR,
 					e);
 		}
 	}
@@ -249,7 +249,7 @@ public class IndexService {
 		observer.aipCreated(aip);
 	}
 
-	public void reindexActionLogs() throws IndexActionException {
+	public void reindexActionLogs() throws IndexServiceException {
 		ClosableIterable<Resource> actionLogs = null;
 
 		try {
@@ -268,9 +268,9 @@ public class IndexService {
 					}
 				}
 			}
-		} catch (StorageActionException | IOException e) {
-			throw new IndexActionException("Error retrieving/processing logs from storage",
-					IndexActionException.INTERNAL_SERVER_ERROR, e);
+		} catch (StorageServiceException | IOException e) {
+			throw new IndexServiceException("Error retrieving/processing logs from storage",
+					IndexServiceException.INTERNAL_SERVER_ERROR, e);
 		} finally {
 			if (actionLogs != null) {
 				try {
@@ -284,5 +284,20 @@ public class IndexService {
 
 	private void reindexActionLog(LogEntry entry) {
 		observer.logEntryCreated(entry);
+	}
+
+	public void deleteAllActionLog() throws IndexServiceException {
+		clearIndex(RodaConstants.INDEX_ACTION_LOG);
+	}
+
+	private void clearIndex(String indexName) throws IndexServiceException {
+		try {
+			index.deleteByQuery(indexName, "*:*");
+			index.commit(indexName);
+		} catch (SolrServerException | IOException e) {
+			logger.error("Error cleaning up index " + indexName, e);
+			throw new IndexServiceException("Error cleaning up index " + indexName,
+					IndexServiceException.INTERNAL_SERVER_ERROR, e);
+		}
 	}
 }

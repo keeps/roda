@@ -62,7 +62,7 @@ public class CorporaConstants {
 
 	public static final String SOURCE_DESC_METADATA_CONTAINER = "DescriptiveMetadata";
 	public static final String STRANGE_DESC_METADATA_FILE = "strange.xml";
-	
+
 	public static final String F0_PREMIS_XML = "F0.premis.xml";
 	public static final String TEXT_XML = "text/xml";
 	public static final String EVENT_RODA_398_PREMIS_XML = "event_roda_398.premis.xml";
@@ -71,7 +71,7 @@ public class CorporaConstants {
 	public static final String SUCCESS = "success";
 	public static final String REPRESENTATION_PREMIS_XML = "representation.premis.xml";
 	public static final String PRESERVATION_LEVEL_FULL = "full";
-	
+
 	public static final String AGENT_RODA_8 = "roda:8";
 	public static final String METS_XML = "METS.xml";
 	public static final String SOFTWARE_INGEST_TASK = "software:ingest_task";
@@ -96,18 +96,18 @@ public class CorporaConstants {
 	public static final String HTML_MY_EXAMPLE = "My example";
 	public static final String HTML_EVENT_TYPE = "eventType";
 	public static final String HTML_INGESTION = "ingestion";
-	
-	public static final String LOG_ACTION = "action";
-	public static final String LOG_ADDRESS = "address";
-	public static final String LOG_DATETIME = "datetime";
-	public static final String LOG_DESCRIPTION = "description";
-	public static final String LOG_DURATION = "duration";
-	public static final String LOG_ID = "id";
-	public static final String LOG_RELATED_OBJECT_ID = "relatedObject";
-	public static final String LOG_USERNAME = "username";
-	public static final String LOG_PARAMETERS = "parameters";
-	public static final String LOG_FILE_ID = "fileID";
+
+	// FIXME this should not be used: use RodaConstants instead
+	// public static final String LOG_ACTION = "action";
+	// public static final String LOG_ADDRESS = "address";
+	// public static final String LOG_DATETIME = "datetime";
+	// public static final String LOG_DURATION = "duration";
+	// public static final String LOG_ID = "id";
+	// public static final String LOG_RELATED_OBJECT_ID = "relatedObject";
+	// public static final String LOG_USERNAME = "username";
+	// public static final String LOG_PARAMETERS = "parameters";
+	// public static final String LOG_FILE_ID = "fileID";
 	public static final int YEAR_1213 = 1213;
 	public static final int YEAR_2003 = 2003;
-	
+
 }

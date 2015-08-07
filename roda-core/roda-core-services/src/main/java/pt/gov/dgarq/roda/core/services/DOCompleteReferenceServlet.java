@@ -86,7 +86,8 @@ public class DOCompleteReferenceServlet extends RODAServlet {
 				try {
 
 					if (this.browserHelper == null) {
-						CASUserPrincipal adminUser = getCasUtility().getCASUserPrincipal(adminUsername, adminPassword);
+						// FIXME empty string
+						CASUserPrincipal adminUser = getCasUtility().getCASUserPrincipal(adminUsername, adminPassword,"");
 						FedoraClientUtility fedoraClient = new FedoraClientUtility(
 								fedoraURL, fedoraGSearchURL, adminUser,getCasUtility());
 						this.browserHelper = new BrowserHelper(fedoraClient,

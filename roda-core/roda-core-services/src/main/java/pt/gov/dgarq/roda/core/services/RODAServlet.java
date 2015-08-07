@@ -283,7 +283,7 @@ public abstract class RODAServlet extends HttpServlet implements Servlet {
 				String password = getClientUserPassword();
 				if(username!=null){
 					logger.debug("GETTING CAS USER FROM U/P "+username+"/"+password);
-					user = casUtility.getCASUserPrincipal(username, password);
+					user = casUtility.getCASUserPrincipal(username, password,"");
 				}
 			}
 		}catch(Exception e){

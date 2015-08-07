@@ -17,7 +17,7 @@ import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
 import org.roda.model.utils.ModelUtils;
 import org.roda.storage.Binary;
-import org.roda.storage.StorageActionException;
+import org.roda.storage.StorageServiceException;
 import org.roda.storage.StoragePath;
 
 import pt.gov.dgarq.roda.core.common.RodaConstants;
@@ -105,7 +105,7 @@ public final class HTMLUtils {
 			RodaUtils.applyStylesheet(xsltReader, descMetadataReader, stylesheetOpt, transformerResult);
 			descMetadataReader.close();
 			return transformerResult.toString();
-		} catch (StorageActionException | TransformerException | IOException e) {
+		} catch (StorageServiceException | TransformerException | IOException e) {
 			LOGGER.error("Error transforming preservation object file into HTML", e);
 			throw new ModelServiceException("Error transforming preservation object file into HTML",
 					ModelServiceException.INTERNAL_SERVER_ERROR, e);

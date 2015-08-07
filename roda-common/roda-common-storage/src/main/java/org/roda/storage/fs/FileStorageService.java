@@ -17,7 +17,7 @@ import org.roda.storage.DefaultDirectory;
 import org.roda.storage.Directory;
 import org.roda.storage.Entity;
 import org.roda.storage.Resource;
-import org.roda.storage.StorageActionException;
+import org.roda.storage.StorageServiceException;
 import org.roda.storage.StoragePath;
 import org.roda.storage.StorageService;
 import org.roda.storage.StorageServiceUtils;
@@ -32,39 +32,39 @@ public class FileStorageService implements StorageService {
 
 	private final Path basePath;
 
-	public FileStorageService(Path basePath) throws StorageActionException {
+	public FileStorageService(Path basePath) throws StorageServiceException {
 		this.basePath = basePath;
 		if (!Files.exists(basePath)) {
 			try {
 				Files.createDirectories(basePath);
 			} catch (IOException e) {
-				throw new StorageActionException("Could not created base path "
+				throw new StorageServiceException("Could not created base path "
 						+ basePath,
-						StorageActionException.INTERNAL_SERVER_ERROR);
+						StorageServiceException.INTERNAL_SERVER_ERROR);
 
 			}
 		} else if (!Files.isDirectory(basePath)) {
-			throw new StorageActionException("Base path is not a directory "
-					+ basePath, StorageActionException.INTERNAL_SERVER_ERROR);
+			throw new StorageServiceException("Base path is not a directory "
+					+ basePath, StorageServiceException.INTERNAL_SERVER_ERROR);
 		} else if (!Files.isReadable(basePath)) {
-			throw new StorageActionException("Cannot read from base path "
-					+ basePath, StorageActionException.INTERNAL_SERVER_ERROR);
+			throw new StorageServiceException("Cannot read from base path "
+					+ basePath, StorageServiceException.INTERNAL_SERVER_ERROR);
 		} else if (!Files.isWritable(basePath)) {
-			throw new StorageActionException("Cannot write from base path "
-					+ basePath, StorageActionException.INTERNAL_SERVER_ERROR);
+			throw new StorageServiceException("Cannot write from base path "
+					+ basePath, StorageServiceException.INTERNAL_SERVER_ERROR);
 		} else {
 			// do nothing
 		}
 	}
 
 	@Override
-	public ClosableIterable<Container> listContainers() throws StorageActionException {
+	public ClosableIterable<Container> listContainers() throws StorageServiceException {
 		return FSUtils.listContainers(basePath);
 	}
 
 	@Override
 	public Container createContainer(StoragePath storagePath,
-			Map<String, Set<String>> metadata) throws StorageActionException {
+			Map<String, Set<String>> metadata) throws StorageServiceException {
 		Path containerPath = FSUtils.getEntityPath(basePath, storagePath);
 		Path directory = null;
 		try {
@@ -76,25 +76,25 @@ public class FileStorageService implements StorageService {
 			// cleanup
 			FSUtils.deletePath(directory);
 
-			throw new StorageActionException("Could not create container at "
-					+ containerPath, StorageActionException.ALREADY_EXISTS, e);
+			throw new StorageServiceException("Could not create container at "
+					+ containerPath, StorageServiceException.ALREADY_EXISTS, e);
 		} catch (IOException e) {
 			// cleanup
 			FSUtils.deletePath(directory);
 
-			throw new StorageActionException("Could not create container at "
+			throw new StorageServiceException("Could not create container at "
 					+ containerPath,
-					StorageActionException.INTERNAL_SERVER_ERROR, e);
+					StorageServiceException.INTERNAL_SERVER_ERROR, e);
 		}
 	}
 
 	@Override
 	public Container getContainer(StoragePath storagePath)
-			throws StorageActionException {
+			throws StorageServiceException {
 		if (!storagePath.isFromAContainer()) {
-			throw new StorageActionException(
+			throw new StorageServiceException(
 					"Storage path is not from a container",
-					StorageActionException.BAD_REQUEST);
+					StorageServiceException.BAD_REQUEST);
 		}
 
 		Path containerPath = FSUtils.getEntityPath(basePath, storagePath);
@@ -104,29 +104,29 @@ public class FileStorageService implements StorageService {
 					.readMetadata(containerPath);
 			container = new DefaultContainer(storagePath, metadata);
 		} else {
-			throw new StorageActionException("Container not found: "
-					+ storagePath, StorageActionException.NOT_FOUND);
+			throw new StorageServiceException("Container not found: "
+					+ storagePath, StorageServiceException.NOT_FOUND);
 		}
 		return container;
 	}
 
 	@Override
 	public void deleteContainer(StoragePath storagePath)
-			throws StorageActionException {
+			throws StorageServiceException {
 		Path containerPath = FSUtils.getEntityPath(basePath, storagePath);
 		FSUtils.deletePath(containerPath);
 	}
 
 	@Override
 	public ClosableIterable<Resource> listResourcesUnderContainer(
-			StoragePath storagePath) throws StorageActionException {
+			StoragePath storagePath) throws StorageServiceException {
 		Path path = FSUtils.getEntityPath(basePath, storagePath);
 		return FSUtils.listPath(basePath, path);
 	}
 
 	@Override
 	public Directory createDirectory(StoragePath storagePath,
-			Map<String, Set<String>> metadata) throws StorageActionException {
+			Map<String, Set<String>> metadata) throws StorageServiceException {
 		Path dirPath = FSUtils.getEntityPath(basePath, storagePath);
 		Path directory = null;
 		try {
@@ -138,24 +138,24 @@ public class FileStorageService implements StorageService {
 			// cleanup
 			FSUtils.deletePath(directory);
 
-			throw new StorageActionException("Could not create directory at "
-					+ dirPath, StorageActionException.ALREADY_EXISTS, e);
+			throw new StorageServiceException("Could not create directory at "
+					+ dirPath, StorageServiceException.ALREADY_EXISTS, e);
 		} catch (IOException e) {
 			// cleanup
 			FSUtils.deletePath(directory);
 
-			throw new StorageActionException("Could not create directory at "
-					+ dirPath, StorageActionException.INTERNAL_SERVER_ERROR, e);
+			throw new StorageServiceException("Could not create directory at "
+					+ dirPath, StorageServiceException.INTERNAL_SERVER_ERROR, e);
 		}
 	}
 
 	@Override
 	public Directory getDirectory(StoragePath storagePath)
-			throws StorageActionException {
+			throws StorageServiceException {
 		if (storagePath.isFromAContainer()) {
-			throw new StorageActionException(
+			throw new StorageServiceException(
 					"Invalid storage path for a directory: " + storagePath,
-					StorageActionException.BAD_REQUEST);
+					StorageServiceException.BAD_REQUEST);
 		}
 		Path directoryPath = FSUtils.getEntityPath(basePath, storagePath);
 		Resource resource = FSUtils.convertPathToResource(basePath,
@@ -163,16 +163,16 @@ public class FileStorageService implements StorageService {
 		if (resource instanceof Directory) {
 			return (Directory) resource;
 		} else {
-			throw new StorageActionException(
+			throw new StorageServiceException(
 					"Looking for a directory but found something else: "
-							+ storagePath, StorageActionException.BAD_REQUEST);
+							+ storagePath, StorageServiceException.BAD_REQUEST);
 		}
 
 	}
 
 	@Override
 	public ClosableIterable<Resource> listResourcesUnderDirectory(
-			StoragePath storagePath) throws StorageActionException {
+			StoragePath storagePath) throws StorageServiceException {
 		Path directoryPath = FSUtils.getEntityPath(basePath, storagePath);
 		return FSUtils.listPath(basePath, directoryPath);
 	}
@@ -180,16 +180,16 @@ public class FileStorageService implements StorageService {
 	@Override
 	public Binary createBinary(StoragePath storagePath,
 			Map<String, Set<String>> metadata, ContentPayload payload,
-			boolean asReference) throws StorageActionException {
+			boolean asReference) throws StorageServiceException {
 		if (asReference) {
 			// TODO create binary as a reference
-			throw new StorageActionException("Method not yet implemented",
-					StorageActionException.NOT_IMPLEMENTED);
+			throw new StorageServiceException("Method not yet implemented",
+					StorageServiceException.NOT_IMPLEMENTED);
 		} else {
 			Path binPath = FSUtils.getEntityPath(basePath, storagePath);
 			if (Files.exists(binPath)) {
-				throw new StorageActionException("Binary already exists: "
-						+ binPath, StorageActionException.ALREADY_EXISTS);
+				throw new StorageServiceException("Binary already exists: "
+						+ binPath, StorageServiceException.ALREADY_EXISTS);
 			} else {
 				try {
 					payload.writeToPath(binPath);
@@ -202,8 +202,8 @@ public class FileStorageService implements StorageService {
 							new FSPathContentPayload(binPath),
 							Files.size(binPath), false, contentDigest);
 				} catch (IOException e) {
-					throw new StorageActionException("Could not create binary",
-							StorageActionException.INTERNAL_SERVER_ERROR, e);
+					throw new StorageServiceException("Could not create binary",
+							StorageServiceException.INTERNAL_SERVER_ERROR, e);
 				}
 			}
 		}
@@ -213,24 +213,24 @@ public class FileStorageService implements StorageService {
 	@Override
 	public Binary updateBinaryContent(StoragePath storagePath,
 			ContentPayload payload, boolean asReference,
-			boolean createIfNotExists) throws StorageActionException {
+			boolean createIfNotExists) throws StorageServiceException {
 		if (asReference) {
 			// TODO update binary as a reference
-			throw new StorageActionException("Method not yet implemented",
-					StorageActionException.INTERNAL_SERVER_ERROR);
+			throw new StorageServiceException("Method not yet implemented",
+					StorageServiceException.INTERNAL_SERVER_ERROR);
 		} else {
 
 			Path binaryPath = FSUtils.getEntityPath(basePath, storagePath);
 			if (!Files.exists(binaryPath) && !createIfNotExists) {
-				throw new StorageActionException("Binary does not exist: "
-						+ binaryPath, StorageActionException.NOT_FOUND);
+				throw new StorageServiceException("Binary does not exist: "
+						+ binaryPath, StorageServiceException.NOT_FOUND);
 			} else {
 				try {
 					payload.writeToPath(binaryPath);
 				} catch (IOException e) {
-					throw new StorageActionException(
+					throw new StorageServiceException(
 							"Could not update binary content",
-							StorageActionException.INTERNAL_SERVER_ERROR, e);
+							StorageServiceException.INTERNAL_SERVER_ERROR, e);
 				}
 			}
 			Resource resource = FSUtils.convertPathToResource(basePath,
@@ -250,37 +250,37 @@ public class FileStorageService implements StorageService {
 
 				return binary;
 			} else {
-				throw new StorageActionException(
+				throw new StorageServiceException(
 						"Looking for a binary but found something else",
-						StorageActionException.INTERNAL_SERVER_ERROR);
+						StorageServiceException.INTERNAL_SERVER_ERROR);
 			}
 		}
 	}
 
 	@Override
 	public Binary getBinary(StoragePath storagePath)
-			throws StorageActionException {
+			throws StorageServiceException {
 		Path binaryPath = FSUtils.getEntityPath(basePath, storagePath);
 		Resource resource = FSUtils.convertPathToResource(basePath, binaryPath);
 		if (resource instanceof Binary) {
 			return (Binary) resource;
 		} else {
-			throw new StorageActionException(
+			throw new StorageServiceException(
 					"Looking for a binary but found something else",
-					StorageActionException.BAD_REQUEST);
+					StorageServiceException.BAD_REQUEST);
 		}
 	}
 
 	@Override
 	public void deleteResource(StoragePath storagePath)
-			throws StorageActionException {
+			throws StorageServiceException {
 		Path resourcePath = FSUtils.getEntityPath(basePath, storagePath);
 		FSUtils.deletePath(resourcePath);
 	}
 
 	@Override
 	public Map<String, Set<String>> getMetadata(StoragePath storagePath)
-			throws StorageActionException {
+			throws StorageServiceException {
 		Path resourcePath = FSUtils.getEntityPath(basePath, storagePath);
 		return FSYamlMetadataUtils.readMetadata(resourcePath);
 	}
@@ -288,7 +288,7 @@ public class FileStorageService implements StorageService {
 	@Override
 	public Map<String, Set<String>> updateMetadata(StoragePath storagePath,
 			Map<String, Set<String>> metadata, boolean replaceAll)
-			throws StorageActionException {
+			throws StorageServiceException {
 		Path resourcePath = FSUtils.getEntityPath(basePath, storagePath);
 		return FSYamlMetadataUtils.writeMetadata(resourcePath, metadata,
 				replaceAll);
@@ -296,7 +296,7 @@ public class FileStorageService implements StorageService {
 
 	@Override
 	public void copy(StorageService fromService, StoragePath fromStoragePath,
-			StoragePath toStoragePath) throws StorageActionException {
+			StoragePath toStoragePath) throws StorageServiceException {
 		if (fromService instanceof FileStorageService) {
 			Path sourcePath = ((FileStorageService) fromService).basePath
 					.resolve(fromStoragePath.asString());
@@ -313,7 +313,7 @@ public class FileStorageService implements StorageService {
 
 	@Override
 	public void move(StorageService fromService, StoragePath fromStoragePath,
-			StoragePath toStoragePath) throws StorageActionException {
+			StoragePath toStoragePath) throws StorageServiceException {
 		if (fromService instanceof FileStorageService) {
 			Path sourcePath = ((FileStorageService) fromService).basePath
 					.resolve(fromStoragePath.asString());
@@ -329,7 +329,7 @@ public class FileStorageService implements StorageService {
 
 	@Override
 	public Class<? extends Entity> getEntity(StoragePath storagePath)
-			throws StorageActionException {
+			throws StorageServiceException {
 		Path entity = FSUtils.getEntityPath(basePath, storagePath);
 		if (Files.exists(entity)) {
 			if (Files.isDirectory(entity)) {
@@ -342,10 +342,10 @@ public class FileStorageService implements StorageService {
 				return DefaultBinary.class;
 			}
 		} else {
-			throw new StorageActionException(
+			throw new StorageServiceException(
 					"There isn't a Container or Directory or Binary representated by "
 							+ storagePath.asString(),
-					StorageActionException.INTERNAL_SERVER_ERROR);
+					StorageServiceException.INTERNAL_SERVER_ERROR);
 		}
 	}
 }

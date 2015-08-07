@@ -25,7 +25,7 @@ import org.roda.storage.Binary;
 import org.roda.storage.ClosableIterable;
 import org.roda.storage.DefaultStoragePath;
 import org.roda.storage.Resource;
-import org.roda.storage.StorageActionException;
+import org.roda.storage.StorageServiceException;
 import org.roda.storage.StoragePath;
 import org.roda.storage.StorageService;
 
@@ -177,7 +177,7 @@ public final class ModelUtils {
 	 * @param path
 	 *            the storage path for the parent resource
 	 */
-	public static List<String> getIds(StorageService storage, StoragePath path) throws StorageActionException {
+	public static List<String> getIds(StorageService storage, StoragePath path) throws StorageServiceException {
 		List<String> ids = new ArrayList<String>();
 		ClosableIterable<Resource> iterable = storage.listResourcesUnderDirectory(path);
 		Iterator<Resource> it = iterable.iterator();
@@ -234,10 +234,10 @@ public final class ModelUtils {
 	 *            the storage paths for the parent resources
 	 * @param prefix
 	 *            the prefix of the children
-	 * @throws StorageActionException
+	 * @throws StorageServiceException
 	 */
 	public static List<String> getIds(StorageService storage, List<StoragePath> paths, String prefix)
-			throws StorageActionException {
+			throws StorageServiceException {
 		List<String> ids = new ArrayList<String>();
 		for (StoragePath path : paths) {
 			if (path.getName().startsWith(prefix)) {
@@ -271,39 +271,39 @@ public final class ModelUtils {
 	// return paths;
 	// }
 
-	public static StoragePath getAIPcontainerPath() throws StorageActionException {
+	public static StoragePath getAIPcontainerPath() throws StorageServiceException {
 		return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP);
 	}
 
-	public static StoragePath getAIPpath(String aipId) throws StorageActionException {
+	public static StoragePath getAIPpath(String aipId) throws StorageServiceException {
 		return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId);
 	}
 
-	public static StoragePath getDescriptiveMetadataPath(String aipId) throws StorageActionException {
+	public static StoragePath getDescriptiveMetadataPath(String aipId) throws StorageServiceException {
 		return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
 				RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_DESCRIPTIVE);
 	}
 
 	public static StoragePath getDescriptiveMetadataPath(String aipId, String descriptiveMetadataBinaryId)
-			throws StorageActionException {
+			throws StorageServiceException {
 		return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
 				RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_DESCRIPTIVE,
 				descriptiveMetadataBinaryId);
 	}
 
-	public static StoragePath getRepresentationsPath(String aipId) throws StorageActionException {
+	public static StoragePath getRepresentationsPath(String aipId) throws StorageServiceException {
 		return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
 				RodaConstants.STORAGE_DIRECTORY_DATA);
 	}
 
 	public static StoragePath getRepresentationPath(String aipId, String representationId)
-			throws StorageActionException {
+			throws StorageServiceException {
 		return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
 				RodaConstants.STORAGE_DIRECTORY_DATA, representationId);
 	}
 
 	public static StoragePath getRepresentationFilePath(String aipId, String representationId, String fileId)
-			throws StorageActionException {
+			throws StorageServiceException {
 		return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
 				RodaConstants.STORAGE_DIRECTORY_DATA, representationId, fileId);
 	}
@@ -322,7 +322,7 @@ public final class ModelUtils {
 		}
 	}
 
-	public static StoragePath getPreservationPath(String aipId, String representationID) throws StorageActionException {
+	public static StoragePath getPreservationPath(String aipId, String representationID) throws StorageServiceException {
 		return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
 				RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION,
 				representationID);
@@ -330,7 +330,7 @@ public final class ModelUtils {
 	}
 
 	public static StoragePath getPreservationFilePath(String aipId, String representationID, String fileID)
-			throws StorageActionException {
+			throws StorageServiceException {
 		return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
 				RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION,
 				representationID, fileID);
@@ -367,17 +367,17 @@ public final class ModelUtils {
 		return isObject;
 	}
 
-	public static StoragePath getPreservationAgentPath(String agentID) throws StorageActionException {
+	public static StoragePath getPreservationAgentPath(String agentID) throws StorageServiceException {
 		return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_PRESERVATION,
 				RodaConstants.STORAGE_DIRECTORY_AGENTS, agentID);
 	}
 
-	public static StoragePath getLogPath(String logFile) throws StorageActionException {
+	public static StoragePath getLogPath(String logFile) throws StorageServiceException {
 		return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG, logFile);
 	}
 
 	@Deprecated
-	public static StoragePath getLogPath(Date d) throws StorageActionException {
+	public static StoragePath getLogPath(Date d) throws StorageServiceException {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		String logFile = sdf.format(d) + ".log";
 		return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG, logFile);

@@ -12,7 +12,7 @@ import org.fcrepo.client.ForbiddenException;
 import org.fcrepo.client.NotFoundException;
 import org.roda.storage.ClosableIterable;
 import org.roda.storage.Container;
-import org.roda.storage.StorageActionException;
+import org.roda.storage.StorageServiceException;
 import org.roda.storage.fedora.utils.FedoraConversionUtils;
 
 /**
@@ -26,22 +26,22 @@ public class IterableContainer implements ClosableIterable<Container> {
 	private Iterator<FedoraResource> fedoraResources;
 
 	public IterableContainer(FedoraRepository repository)
-			throws StorageActionException {
+			throws StorageServiceException {
 		try {
 			fedoraResources = repository.getObject("").getChildren(null)
 					.iterator();
 		} catch (ForbiddenException e) {
-			throw new StorageActionException(e.getMessage(),
-					StorageActionException.FORBIDDEN, e);
+			throw new StorageServiceException(e.getMessage(),
+					StorageServiceException.FORBIDDEN, e);
 		} catch (BadRequestException e) {
-			throw new StorageActionException(e.getMessage(),
-					StorageActionException.BAD_REQUEST, e);
+			throw new StorageServiceException(e.getMessage(),
+					StorageServiceException.BAD_REQUEST, e);
 		} catch (NotFoundException e) {
-			throw new StorageActionException(e.getMessage(),
-					StorageActionException.NOT_FOUND, e);
+			throw new StorageServiceException(e.getMessage(),
+					StorageServiceException.NOT_FOUND, e);
 		} catch (FedoraException e) {
-			throw new StorageActionException(e.getMessage(),
-					StorageActionException.BAD_REQUEST, e);
+			throw new StorageServiceException(e.getMessage(),
+					StorageServiceException.BAD_REQUEST, e);
 		}
 	}
 
@@ -72,7 +72,7 @@ public class IterableContainer implements ClosableIterable<Container> {
 				FedoraResource resource = fedoraResources.next();
 				return FedoraConversionUtils
 						.fedoraObjectToContainer((FedoraObject) resource);
-			} catch (StorageActionException e) {
+			} catch (StorageServiceException e) {
 				return null;
 			}
 		}

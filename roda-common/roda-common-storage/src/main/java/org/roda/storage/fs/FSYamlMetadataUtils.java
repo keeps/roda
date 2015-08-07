@@ -21,7 +21,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.roda.common.RodaUtils;
-import org.roda.storage.StorageActionException;
+import org.roda.storage.StorageServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
@@ -124,7 +124,7 @@ public final class FSYamlMetadataUtils {
 	 * */
 	public static Map<String, Set<String>> writeMetadata(Path path,
 			Map<String, Set<String>> metadata, boolean replaceAll)
-			throws StorageActionException {
+			throws StorageServiceException {
 		Path properties = getPropertiesPath(path);
 		return writeMetadataToPath(properties, metadata, replaceAll);
 	}
@@ -132,7 +132,7 @@ public final class FSYamlMetadataUtils {
 	@SuppressWarnings("unchecked")
 	private static Map<String, Set<String>> writeMetadataToPath(
 			Path properties, Map<String, Set<String>> newMetadata,
-			boolean replaceAll) throws StorageActionException {
+			boolean replaceAll) throws StorageServiceException {
 		Yaml yaml = new Yaml();
 		Map<String, Set<String>> metadata;
 		if (replaceAll) {
@@ -150,9 +150,9 @@ public final class FSYamlMetadataUtils {
 						oldMetadata = (Map<String, Set<String>>) o;
 					}
 				} catch (IOException e) {
-					throw new StorageActionException(
+					throw new StorageServiceException(
 							"Could not load from properties file " + properties,
-							StorageActionException.INTERNAL_SERVER_ERROR, e);
+							StorageServiceException.INTERNAL_SERVER_ERROR, e);
 				}
 			}
 
@@ -166,9 +166,9 @@ public final class FSYamlMetadataUtils {
 			return metadata;
 
 		} catch (IOException e) {
-			throw new StorageActionException(
+			throw new StorageServiceException(
 					"Could not write properties back to file " + properties,
-					StorageActionException.INTERNAL_SERVER_ERROR, e);
+					StorageServiceException.INTERNAL_SERVER_ERROR, e);
 		}
 
 	}
@@ -208,14 +208,14 @@ public final class FSYamlMetadataUtils {
 	 *            file where the metadata is written
 	 * */
 	public static Map<String, Set<String>> readMetadata(Path path)
-			throws StorageActionException {
+			throws StorageServiceException {
 		Path properties = getPropertiesPath(path);
 		return readMetadataFromPath(properties);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private static Map<String, Set<String>> readMetadataFromPath(Path properties)
-			throws StorageActionException {
+			throws StorageServiceException {
 		Yaml yaml = new Yaml();
 		Map<String, Set<String>> metadata;
 		if (Files.exists(properties)) {
@@ -265,19 +265,19 @@ public final class FSYamlMetadataUtils {
 						}
 					}
 				} else {
-					throw new StorageActionException(
+					throw new StorageServiceException(
 							"Could not serialize properties to a map on "
 									+ properties,
-							StorageActionException.INTERNAL_SERVER_ERROR);
+							StorageServiceException.INTERNAL_SERVER_ERROR);
 				}
 			} catch (IOException e) {
-				throw new StorageActionException(
+				throw new StorageServiceException(
 						"Could not load from properties file " + properties,
-						StorageActionException.INTERNAL_SERVER_ERROR, e);
+						StorageServiceException.INTERNAL_SERVER_ERROR, e);
 			} catch (ScannerException e) {
-				throw new StorageActionException(
+				throw new StorageServiceException(
 						"Could not load from properties file " + properties,
-						StorageActionException.INTERNAL_SERVER_ERROR, e);
+						StorageServiceException.INTERNAL_SERVER_ERROR, e);
 			}
 		} else {
 			metadata = new HashMap<String, Set<String>>();
@@ -286,7 +286,7 @@ public final class FSYamlMetadataUtils {
 	}
 
 	public static void copyMetadata(Path source, Path target,
-			boolean replaceExisting) throws StorageActionException {
+			boolean replaceExisting) throws StorageServiceException {
 		Path sourceProperties = getPropertiesPath(source);
 		Path targetProperties = getPropertiesPath(target);
 		try {
@@ -294,13 +294,13 @@ public final class FSYamlMetadataUtils {
 					: new CopyOption[] {};
 			Files.copy(sourceProperties, targetProperties, copyOptions);
 		} catch (IOException e) {
-			throw new StorageActionException("Could not copy metadata",
-					StorageActionException.INTERNAL_SERVER_ERROR, e);
+			throw new StorageServiceException("Could not copy metadata",
+					StorageServiceException.INTERNAL_SERVER_ERROR, e);
 		}
 	}
 
 	public static void moveMetadata(Path source, Path target,
-			boolean replaceExisting) throws StorageActionException {
+			boolean replaceExisting) throws StorageServiceException {
 		Path sourceProperties = getPropertiesPath(source);
 		Path targetProperties = getPropertiesPath(target);
 		try {
@@ -308,18 +308,18 @@ public final class FSYamlMetadataUtils {
 					: new CopyOption[] {};
 			Files.move(sourceProperties, targetProperties, copyOptions);
 		} catch (IOException e) {
-			throw new StorageActionException("Could not copy metadata",
-					StorageActionException.INTERNAL_SERVER_ERROR, e);
+			throw new StorageServiceException("Could not copy metadata",
+					StorageServiceException.INTERNAL_SERVER_ERROR, e);
 		}
 	}
 
-	public static void deleteMetadata(Path path) throws StorageActionException {
+	public static void deleteMetadata(Path path) throws StorageServiceException {
 		Path properties = getPropertiesPath(path);
 		try {
 			Files.deleteIfExists(properties);
 		} catch (IOException e) {
-			throw new StorageActionException("Could not delete metadata",
-					StorageActionException.INTERNAL_SERVER_ERROR, e);
+			throw new StorageServiceException("Could not delete metadata",
+					StorageServiceException.INTERNAL_SERVER_ERROR, e);
 		}
 	}
 

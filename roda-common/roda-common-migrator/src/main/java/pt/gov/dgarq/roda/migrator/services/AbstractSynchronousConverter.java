@@ -61,7 +61,8 @@ public abstract class AbstractSynchronousConverter extends ConverterWebService
 			}
 				
 			try{
-				cup = casUtility.getCASUserPrincipal(username,password);
+				// FIXME empty string
+				cup = casUtility.getCASUserPrincipal(username,password,"");
 			}catch(Exception e){
 				throw new RODAServiceException("Unable to get CASUserPrincipal - "+ e.getMessage(), e);
 			}

@@ -34,7 +34,7 @@ public final class StorageServiceUtils {
 	public static void moveBetweenStorageServices(StorageService fromService,
 			StoragePath fromStoragePath, StorageService toService,
 			StoragePath toStoragePath, Class<? extends Entity> rootEntity)
-			throws StorageActionException {
+			throws StorageServiceException {
 		copyOrMoveBetweenStorageServices(fromService, fromStoragePath,
 				toService, toStoragePath, rootEntity, false);
 	}
@@ -57,7 +57,7 @@ public final class StorageServiceUtils {
 	public static void copyBetweenStorageServices(StorageService fromService,
 			StoragePath fromStoragePath, StorageService toService,
 			StoragePath toStoragePath, Class<? extends Entity> rootEntity)
-			throws StorageActionException {
+			throws StorageServiceException {
 		copyOrMoveBetweenStorageServices(fromService, fromStoragePath,
 				toService, toStoragePath, rootEntity, true);
 	}
@@ -66,7 +66,7 @@ public final class StorageServiceUtils {
 			StorageService fromService, StoragePath fromStoragePath,
 			StorageService toService, StoragePath toStoragePath,
 			Class<? extends Entity> rootEntity, boolean copy)
-			throws StorageActionException {
+			throws StorageServiceException {
 		if (Container.class.isAssignableFrom(rootEntity)) {
 			Container container = fromService.getContainer(fromStoragePath);
 			toService.createContainer(toStoragePath, container.getMetadata());
@@ -105,7 +105,7 @@ public final class StorageServiceUtils {
 			StorageService fromService, StoragePath fromStoragePath,
 			StorageService toService, StoragePath toStoragePath,
 			Iterator<Resource> childResourcesIterator, boolean copy)
-			throws StorageActionException {
+			throws StorageServiceException {
 		while (childResourcesIterator.hasNext()) {
 			Resource child = childResourcesIterator.next();
 			if (copy) {
@@ -126,7 +126,7 @@ public final class StorageServiceUtils {
 
 	private static StoragePath extractToStoragePathChild(
 			StoragePath fromStoragePath, StoragePath fromStoragePathChild,
-			StoragePath toStoragePath) throws StorageActionException {
+			StoragePath toStoragePath) throws StorageServiceException {
 		String path = fromStoragePathChild.asString();
 		path = path.replaceFirst(fromStoragePath.asString(),
 				toStoragePath.asString());

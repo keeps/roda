@@ -24,7 +24,7 @@ import org.roda.storage.DefaultDirectory;
 import org.roda.storage.DefaultStoragePath;
 import org.roda.storage.Directory;
 import org.roda.storage.Resource;
-import org.roda.storage.StorageActionException;
+import org.roda.storage.StorageServiceException;
 import org.roda.storage.StoragePath;
 import org.roda.storage.StorageService;
 import org.roda.storage.fs.FSPathContentPayload;
@@ -80,6 +80,8 @@ public class ModelService extends ModelObservable {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ModelService.class);
 
 	private final StorageService storage;
+	private Path logFile;
+	private static final boolean FAIL_IF_NO_DESCRIPTIVE_METADATA_SCHEMA = false;
 
 	public ModelService(StorageService storage) {
 		super();
@@ -92,8 +94,8 @@ public class ModelService extends ModelObservable {
 		try {
 			storage.createContainer(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG),
 					new HashMap<String, Set<String>>());
-		} catch (StorageActionException e) {
-			if (e.getCode() != StorageActionException.ALREADY_EXISTS) {
+		} catch (StorageServiceException e) {
+			if (e.getCode() != StorageServiceException.ALREADY_EXISTS) {
 				LOGGER.error("Error creating container to add new log entry", e);
 			}
 		}
@@ -148,7 +150,7 @@ public class ModelService extends ModelObservable {
 					resourcesIterable.close();
 				}
 			};
-		} catch (StorageActionException e) {
+		} catch (StorageServiceException e) {
 
 			throw new ModelServiceException("Error while obtaining AIP list from storage", e.getCode(), e);
 		}
@@ -161,10 +163,10 @@ public class ModelService extends ModelObservable {
 		try {
 			Directory directory = storage.getDirectory(ModelUtils.getAIPpath(aipId));
 			aip = convertResourceToAIP(directory);
-		} catch (StorageActionException e) {
-			if (e.getCode() == StorageActionException.NOT_FOUND) {
+		} catch (StorageServiceException e) {
+			if (e.getCode() == StorageServiceException.NOT_FOUND) {
 				throw new ModelServiceException("AIP not found: " + aipId, ModelServiceException.NOT_FOUND, e);
-			} else if (e.getCode() == StorageActionException.FORBIDDEN) {
+			} else if (e.getCode() == StorageServiceException.FORBIDDEN) {
 				throw new ModelServiceException("You do not have permission to access AIP: " + aipId,
 						ModelServiceException.FORBIDDEN, e);
 			} else {
@@ -195,11 +197,11 @@ public class ModelService extends ModelObservable {
 		// TODO verify structure of source AIP and copy it to the storage
 		// XXX possible optimization would be to allow move between storage
 		// TODO support asReference
-
+		ModelService sourceModelService = new ModelService(sourceStorage);
 		AIP aip;
 		try {
 			Directory sourceDirectory = sourceStorage.getDirectory(sourcePath);
-			if (isAIPvalid(sourceDirectory)) {
+			if (isAIPvalid(sourceModelService, sourceDirectory, FAIL_IF_NO_DESCRIPTIVE_METADATA_SCHEMA)) {
 
 				storage.copy(sourceStorage, sourcePath, ModelUtils.getAIPpath(aipId));
 				Directory newDirectory = storage.getDirectory(ModelUtils.getAIPpath(aipId));
@@ -212,7 +214,7 @@ public class ModelService extends ModelObservable {
 				throw new ModelServiceException("Error while creating AIP, reason: AIP is not valid",
 						ModelServiceException.INTERNAL_SERVER_ERROR);
 			}
-		} catch (StorageActionException e) {
+		} catch (StorageServiceException e) {
 			throw new ModelServiceException("Error creating AIP in storage", e.getCode(), e);
 		}
 
@@ -228,10 +230,11 @@ public class ModelService extends ModelObservable {
 	public AIP updateAIP(String aipId, StorageService sourceStorage, StoragePath sourcePath)
 			throws ModelServiceException {
 		// TODO verify structure of source AIP and update it in the storage
+		ModelService sourceModelService = new ModelService(sourceStorage);
 		AIP aip;
 		try {
 			Directory sourceDirectory = sourceStorage.getDirectory(sourcePath);
-			if (isAIPvalid(sourceDirectory)) {
+			if (isAIPvalid(sourceModelService, sourceDirectory, FAIL_IF_NO_DESCRIPTIVE_METADATA_SCHEMA)) {
 				StoragePath aipPath = ModelUtils.getAIPpath(aipId);
 
 				// FIXME is this the best way?
@@ -243,11 +246,12 @@ public class ModelService extends ModelObservable {
 				aip = convertResourceToAIP(directoryUpdated);
 				notifyAipUpdated(aip);
 			} else {
-				throw new ModelServiceException("Error while creating AIP, reason: AIP is not valid",
+				throw new ModelServiceException("Error while updating AIP",
 						ModelServiceException.INTERNAL_SERVER_ERROR);
 			}
-		} catch (StorageActionException e) {
-			throw new ModelServiceException("Error creating AIP in storage, reason: " + e.getMessage(), e.getCode());
+		} catch (StorageServiceException e) {
+			throw new ModelServiceException("Error creating AIP in storage",
+					ModelServiceException.INTERNAL_SERVER_ERROR, e);
 		}
 
 		return aip;
@@ -259,7 +263,7 @@ public class ModelService extends ModelObservable {
 
 			storage.deleteResource(aipPath);
 			notifyAipDeleted(aipId);
-		} catch (StorageActionException e) {
+		} catch (StorageServiceException e) {
 			throw new ModelServiceException("Error deleting AIP from storage, reason: " + e.getMessage(), e.getCode());
 		}
 	}
@@ -311,10 +315,9 @@ public class ModelService extends ModelObservable {
 				}
 			};
 
-		} catch (StorageActionException e) {
-			throw new ModelServiceException(
-					"Error while obtaining descriptive metadata binary list from storage, reason: " + e.getMessage(),
-					e.getCode());
+		} catch (StorageServiceException e) {
+			throw new ModelServiceException("Error while obtaining descriptive metadata binary list from storage",
+					ModelServiceException.INTERNAL_SERVER_ERROR, e);
 		}
 
 		return it;
@@ -329,7 +332,7 @@ public class ModelService extends ModelObservable {
 
 			Binary binary = storage.getBinary(binaryPath);
 			descriptiveMetadataBinary = convertResourceToDescriptiveMetadata(binary);
-		} catch (StorageActionException e) {
+		} catch (StorageServiceException e) {
 			throw new ModelServiceException(
 					"Error while obtaining descriptive metadata binary from storage, reason: " + e.getMessage(),
 					e.getCode());
@@ -354,7 +357,7 @@ public class ModelService extends ModelObservable {
 			descriptiveMetadataBinary = new DescriptiveMetadata(descriptiveMetadataId, aipId, descriptiveMetadataType,
 					binaryPath);
 			notifyDescriptiveMetadataCreated(descriptiveMetadataBinary);
-		} catch (StorageActionException e) {
+		} catch (StorageServiceException e) {
 			throw new ModelServiceException("Error creating descriptive metadata binary in storage",
 					ModelServiceException.INTERNAL_SERVER_ERROR, e);
 		}
@@ -382,7 +385,7 @@ public class ModelService extends ModelObservable {
 			descriptiveMetadataBinary = new DescriptiveMetadata(descriptiveMetadataId, aipId, descriptiveMetadataType,
 					binaryPath);
 			notifyDescriptiveMetadataUpdated(descriptiveMetadataBinary);
-		} catch (StorageActionException e) {
+		} catch (StorageServiceException e) {
 			throw new ModelServiceException("Error updating descriptive metadata binary in the storage",
 					ModelServiceException.INTERNAL_SERVER_ERROR, e);
 		}
@@ -396,7 +399,7 @@ public class ModelService extends ModelObservable {
 
 			storage.deleteResource(binaryPath);
 			notifyDescriptiveMetadataDeleted(aipId, descriptiveMetadataId);
-		} catch (StorageActionException e) {
+		} catch (StorageServiceException e) {
 			throw new ModelServiceException(
 					"Error deleting descriptive metadata binary from storage, reason: " + e.getMessage(), e.getCode());
 		}
@@ -448,7 +451,7 @@ public class ModelService extends ModelObservable {
 				}
 			};
 
-		} catch (StorageActionException e) {
+		} catch (StorageServiceException e) {
 			throw new ModelServiceException(
 					"Error while obtaining Representation list from storage, reason: " + e.getMessage(), e.getCode());
 		}
@@ -463,7 +466,7 @@ public class ModelService extends ModelObservable {
 			Directory directory = storage.getDirectory(ModelUtils.getRepresentationPath(aipId, representationId));
 			representation = convertResourceToRepresentation(directory);
 
-		} catch (StorageActionException e) {
+		} catch (StorageServiceException e) {
 			throw new ModelServiceException(
 					"Error while obtaining Representation from storage, reason: " + e.getMessage(), e.getCode());
 		}
@@ -492,7 +495,7 @@ public class ModelService extends ModelObservable {
 						"Error while creating representation, reason: representation is not valid",
 						ModelServiceException.INTERNAL_SERVER_ERROR);
 			}
-		} catch (StorageActionException e) {
+		} catch (StorageServiceException e) {
 			throw new ModelServiceException("Error while creating representation in storage, reason: " + e.getMessage(),
 					e.getCode());
 		}
@@ -544,7 +547,7 @@ public class ModelService extends ModelObservable {
 				throw new ModelServiceException("Error while updating AIP, reason: representation is not valid",
 						ModelServiceException.INTERNAL_SERVER_ERROR);
 			}
-		} catch (StorageActionException e) {
+		} catch (StorageServiceException e) {
 			throw new ModelServiceException("Error while updating representation in storage, reason: " + e.getMessage(),
 					e.getCode());
 		}
@@ -556,7 +559,7 @@ public class ModelService extends ModelObservable {
 		try {
 			storage.updateMetadata(ModelUtils.getRepresentationPath(aipId, representationId), representationMetadata,
 					true);
-		} catch (StorageActionException e) {
+		} catch (StorageServiceException e) {
 			throw new ModelServiceException("Error while updating representation metadata",
 					ModelServiceException.INTERNAL_SERVER_ERROR, e);
 		}
@@ -575,7 +578,7 @@ public class ModelService extends ModelObservable {
 				}
 			}
 
-		} catch (StorageActionException e) {
+		} catch (StorageServiceException e) {
 			throw new ModelServiceException("Error while delete removed representation files",
 					ModelServiceException.INTERNAL_SERVER_ERROR, e);
 		} finally {
@@ -607,7 +610,7 @@ public class ModelService extends ModelObservable {
 					// FIXME log error and continue???
 				}
 			}
-		} catch (StorageActionException e) {
+		} catch (StorageServiceException e) {
 			throw new ModelServiceException("Error while updating representation files",
 					ModelServiceException.INTERNAL_SERVER_ERROR, e);
 		} finally {
@@ -628,7 +631,7 @@ public class ModelService extends ModelObservable {
 
 			storage.deleteResource(representationPath);
 			notifyRepresentationDeleted(aipId, representationId);
-		} catch (StorageActionException e) {
+		} catch (StorageServiceException e) {
 			throw new ModelServiceException("Error deleting representation from storage, reason: " + e.getMessage(),
 					e.getCode());
 		}
@@ -675,7 +678,7 @@ public class ModelService extends ModelObservable {
 				}
 			};
 
-		} catch (StorageActionException e) {
+		} catch (StorageServiceException e) {
 			throw new ModelServiceException(
 					"Error while obtaining representation files from storage, reason: " + e.getMessage(), e.getCode());
 		}
@@ -693,7 +696,7 @@ public class ModelService extends ModelObservable {
 
 			Binary binary = storage.getBinary(filePath);
 			file = convertResourceToRepresentationFile(binary);
-		} catch (StorageActionException e) {
+		} catch (StorageServiceException e) {
 			throw new ModelServiceException(
 					"Error while obtaining representation file from storage, reason: " + e.getMessage(), e.getCode());
 		}
@@ -716,7 +719,7 @@ public class ModelService extends ModelObservable {
 					asReference);
 			file = convertResourceToRepresentationFile(createdBinary);
 			notifyFileCreated(file);
-		} catch (StorageActionException e) {
+		} catch (StorageServiceException e) {
 			throw new ModelServiceException("Error creating representation file in storage",
 					ModelServiceException.INTERNAL_SERVER_ERROR, e);
 		}
@@ -742,7 +745,7 @@ public class ModelService extends ModelObservable {
 			if (notify) {
 				notifyFileUpdated(file);
 			}
-		} catch (StorageActionException e) {
+		} catch (StorageServiceException e) {
 			throw new ModelServiceException("Error while updating representation file",
 					ModelServiceException.INTERNAL_SERVER_ERROR, e);
 		}
@@ -758,7 +761,7 @@ public class ModelService extends ModelObservable {
 
 			storage.deleteResource(filePath);
 			notifyFileDeleted(aipId, representationId, fileId);
-		} catch (StorageActionException e) {
+		} catch (StorageServiceException e) {
 			throw new ModelServiceException(
 					"Error deleting representation file from storage, reason: " + e.getMessage(), e.getCode());
 		}
@@ -794,7 +797,7 @@ public class ModelService extends ModelObservable {
 					return rpos.iterator();
 				}
 			};
-		} catch (StorageActionException e) {
+		} catch (StorageServiceException e) {
 			throw new ModelServiceException("Error while obtaining AIP preservation objects, reason: " + e.getMessage(),
 					e.getCode());
 		}
@@ -808,7 +811,7 @@ public class ModelService extends ModelObservable {
 			StoragePath sp = ModelUtils.getPreservationFilePath(aipId, representationId, fileId);
 			Binary b = storage.getBinary(sp);
 			obj = convertResourceToRepresentationPreservationObject(aipId, representationId, fileId, b);
-		} catch (StorageActionException e) {
+		} catch (StorageServiceException e) {
 			throw new ModelServiceException("Error while getting representation preservation object",
 					ModelServiceException.INTERNAL_SERVER_ERROR, e);
 		}
@@ -822,7 +825,7 @@ public class ModelService extends ModelObservable {
 			StoragePath sp = ModelUtils.getPreservationFilePath(aipId, representationId, preservationObjectID);
 			Binary b = storage.getBinary(sp);
 			obj = convertResourceToEventPreservationObject(aipId, representationId, preservationObjectID, b);
-		} catch (StorageActionException e) {
+		} catch (StorageServiceException e) {
 			throw new ModelServiceException("Error while getting event preservation object",
 					ModelServiceException.INTERNAL_SERVER_ERROR, e);
 		}
@@ -836,7 +839,7 @@ public class ModelService extends ModelObservable {
 			StoragePath sp = ModelUtils.getPreservationAgentPath(agentID);
 			Binary b = storage.getBinary(sp);
 			apo = convertResourceToAgentPreservationObject(agentID, b);
-		} catch (StorageActionException e) {
+		} catch (StorageServiceException e) {
 			throw new ModelServiceException("Error while getting agent preservation object",
 					ModelServiceException.INTERNAL_SERVER_ERROR, e);
 		}
@@ -886,16 +889,18 @@ public class ModelService extends ModelObservable {
 		}
 	}
 
-	private boolean isAIPvalid(Directory directory) {
+	private boolean isAIPvalid(ModelService model, Directory directory, boolean failIfNoDescriptiveMetadataSchema) {
 		boolean valid = true;
 
 		try {
 			// validate metadata (against schemas)
-			valid = ValidationUtils.isAIPDescriptiveMetadataValid(this, directory.getStoragePath().getName());
+			valid = ValidationUtils.isAIPDescriptiveMetadataValid(model, directory.getStoragePath().getName(),
+					failIfNoDescriptiveMetadataSchema);
 
 			// FIXME validate others aspects
 
 		} catch (ModelServiceException e) {
+			LOGGER.error("Error validating AIP", e);
 			valid = false;
 		}
 
@@ -946,7 +951,7 @@ public class ModelService extends ModelObservable {
 				aip = new AIP(storagePath.getName(), parentId, active, dateCreated, dateModified, permissions,
 						descriptiveMetadataBinaryIds, representationIds, preservationRepresentationObjects,
 						preservationEvents, preservationFileObjects);
-			} catch (StorageActionException e) {
+			} catch (StorageServiceException e) {
 				throw new ModelServiceException("Error while obtaining information to instantiate an AIP", e.getCode(),
 						e);
 			}
@@ -1029,7 +1034,7 @@ public class ModelService extends ModelObservable {
 				preservationRepresentationObjects.put(representationID, preservationRepresentationObjectFileIds);
 				preservationFileObjects.put(representationID, preservationFileObjectFileIds);
 				preservationEvents.put(representationID, preservationEventFileIds);
-			} catch (StorageActionException e) {
+			} catch (StorageServiceException e) {
 				LOGGER.error("Error while obtaining preservation related binaries", e);
 			}
 		}
@@ -1063,7 +1068,7 @@ public class ModelService extends ModelObservable {
 			List<String> fileIds = new ArrayList<String>();
 			try {
 				fileIds = ModelUtils.getIds(storage, resource.getStoragePath());
-			} catch (StorageActionException e) {
+			} catch (StorageServiceException e) {
 				LOGGER.error("Error while obtainting file IDs from " + directoryPath.asString());
 			}
 
@@ -1114,7 +1119,7 @@ public class ModelService extends ModelObservable {
 			representationPreservationObject = convertResourceToRepresentationPreservationObject(aipId,
 					representationId, fileId, binary);
 			representationPreservationObject.setId(fileId);
-		} catch (StorageActionException e) {
+		} catch (StorageServiceException e) {
 			throw new ModelServiceException(
 					"Error while obtaining Representation from storage, reason: " + e.getMessage(), e.getCode());
 		}
@@ -1130,7 +1135,7 @@ public class ModelService extends ModelObservable {
 			representationPreservationObject = convertResourceToRepresentationFilePreservationObject(aipId,
 					representationId, fileId, binary);
 			representationPreservationObject.setId(fileId);
-		} catch (StorageActionException e) {
+		} catch (StorageServiceException e) {
 			throw new ModelServiceException(
 					"Error while obtaining Representation File from storage, reason: " + e.getMessage(), e.getCode());
 		}
@@ -1278,7 +1283,7 @@ public class ModelService extends ModelObservable {
 			Binary binary = storage.getBinary(filePath);
 			eventPreservationObject = convertResourceToEventPreservationObject(aipId, representationId, fileId, binary);
 			eventPreservationObject.setId(fileId);
-		} catch (StorageActionException e) {
+		} catch (StorageServiceException e) {
 			throw new ModelServiceException(
 					"Error while obtaining Representation from storage, reason: " + e.getMessage(), e.getCode());
 		}
@@ -1380,10 +1385,11 @@ public class ModelService extends ModelObservable {
 		}
 	}
 
+	// FIXME this should be synchronized (at least access to logFile)
 	public void addLogEntry(LogEntry logEntry, Path logDirectory, boolean notify) throws ModelServiceException {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		String date = sdf.format(new Date()) + ".log";
-		Path logFile = logDirectory.resolve(date);
+		logFile = logDirectory.resolve(date);
 
 		// verify if file exists and if not, if older files exist (in that case,
 		// move them to storage)
@@ -1410,7 +1416,8 @@ public class ModelService extends ModelObservable {
 		addLogEntry(logEntry, logDirectory, true);
 	}
 
-	private void findOldLogsAndMoveThemToStorage(Path logDirectory, Path currentLogFile) {
+	// FIXME this should be synchronized (at least access to logFile)
+	public synchronized void findOldLogsAndMoveThemToStorage(Path logDirectory, Path currentLogFile) {
 		try {
 			final DirectoryStream<Path> directoryStream = Files.newDirectoryStream(logDirectory);
 
@@ -1421,7 +1428,7 @@ public class ModelService extends ModelObservable {
 						storage.createBinary(logPath, new HashMap<String, Set<String>>(),
 								new FSPathContentPayload(path), false);
 						Files.delete(path);
-					} catch (StorageActionException e) {
+					} catch (StorageServiceException e) {
 						LOGGER.error("Error creating binary for old log file", e);
 					} catch (IOException e) {
 						LOGGER.error("Error deleting old log file", e);

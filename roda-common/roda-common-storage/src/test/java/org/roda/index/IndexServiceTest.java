@@ -30,7 +30,7 @@ import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
 import org.roda.model.ModelServiceTest;
 import org.roda.storage.DefaultStoragePath;
-import org.roda.storage.StorageActionException;
+import org.roda.storage.StorageServiceException;
 import org.roda.storage.StoragePath;
 import org.roda.storage.StorageService;
 import org.roda.storage.fs.FSUtils;
@@ -67,10 +67,11 @@ public class IndexServiceTest {
 	private static final Logger logger = LoggerFactory.getLogger(ModelServiceTest.class);
 
 	@BeforeClass
-	public static void setUp() throws IOException, StorageActionException, URISyntaxException, ModelServiceException {
+	public static void setUp() throws IOException, StorageServiceException, URISyntaxException, ModelServiceException {
 
 		basePath = Files.createTempDirectory("modelTests");
 		logPath = basePath.resolve("log");
+		Files.createDirectory(logPath);
 		indexPath = Files.createTempDirectory("indexTests");
 		storage = new FileStorageService(basePath);
 		model = new ModelService(storage);
@@ -104,14 +105,14 @@ public class IndexServiceTest {
 	}
 
 	@AfterClass
-	public static void tearDown() throws StorageActionException {
+	public static void tearDown() throws StorageServiceException {
 		FSUtils.deletePath(basePath);
 		FSUtils.deletePath(indexPath);
 	}
 
 	@Test
 	public void testAIPIndexCreateDelete()
-			throws ModelServiceException, StorageActionException, IndexActionException, ParseException {
+			throws ModelServiceException, StorageServiceException, IndexServiceException, ParseException {
 		// generate AIP ID
 		final String aipId = UUID.randomUUID().toString();
 
@@ -220,21 +221,21 @@ public class IndexServiceTest {
 		try {
 			index.retrieveAIP(aipId);
 			fail("AIP deleted but yet it was retrieved");
-		} catch (IndexActionException e) {
-			assertEquals(IndexActionException.NOT_FOUND, e.getCode());
+		} catch (IndexServiceException e) {
+			assertEquals(IndexServiceException.NOT_FOUND, e.getCode());
 		}
 
 		try {
 			index.retrieveDescriptiveMetadata(aipId);
 			fail("AIP was deleted but yet its descriptive metadata was retrieved");
-		} catch (IndexActionException e) {
-			assertEquals(IndexActionException.NOT_FOUND, e.getCode());
+		} catch (IndexServiceException e) {
+			assertEquals(IndexServiceException.NOT_FOUND, e.getCode());
 		}
 	}
 
 	@Test
 	public void testAIPIndexCreateDelete2()
-			throws ModelServiceException, StorageActionException, IndexActionException, ParseException {
+			throws ModelServiceException, StorageServiceException, IndexServiceException, ParseException {
 		final String aipId = UUID.randomUUID().toString();
 
 		model.createAIP(aipId, corporaService,
@@ -254,7 +255,7 @@ public class IndexServiceTest {
 	}
 
 	@Test
-	public void testAIPUpdate() throws ModelServiceException, StorageActionException, IndexActionException {
+	public void testAIPUpdate() throws ModelServiceException, StorageServiceException, IndexServiceException {
 		// generate AIP ID
 		final String aipId = UUID.randomUUID().toString();
 
@@ -273,7 +274,7 @@ public class IndexServiceTest {
 	}
 
 	@Test
-	public void testListCollections() throws ModelServiceException, StorageActionException, IndexActionException {
+	public void testListCollections() throws ModelServiceException, StorageServiceException, IndexServiceException {
 		// set up
 		model.createAIP(CorporaConstants.SOURCE_AIP_ID, corporaService,
 				DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
@@ -294,7 +295,7 @@ public class IndexServiceTest {
 	}
 
 	@Test
-	public void testSubElements() throws ModelServiceException, StorageActionException, IndexActionException {
+	public void testSubElements() throws ModelServiceException, StorageServiceException, IndexServiceException {
 		// set up
 		model.createAIP(CorporaConstants.SOURCE_AIP_ID, corporaService,
 				DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
@@ -318,7 +319,7 @@ public class IndexServiceTest {
 	}
 
 	@Test
-	public void testGetAncestors() throws ModelServiceException, StorageActionException, IndexActionException {
+	public void testGetAncestors() throws ModelServiceException, StorageServiceException, IndexServiceException {
 		// set up
 		model.createAIP(CorporaConstants.SOURCE_AIP_ID, corporaService,
 				DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
@@ -337,7 +338,7 @@ public class IndexServiceTest {
 
 	@Test
 	public void testGetElementWithoutParentId()
-			throws ModelServiceException, StorageActionException, IndexActionException {
+			throws ModelServiceException, StorageServiceException, IndexServiceException {
 		// generate AIP ID
 		final String aipId = UUID.randomUUID().toString();
 
@@ -359,7 +360,10 @@ public class IndexServiceTest {
 	}
 
 	@Test
-	public void testGetLogEntriesCount() throws IndexActionException, ModelServiceException {
+	public void testGetLogEntriesCount() throws IndexServiceException, ModelServiceException {
+		// cleaning up action log entries on index (if any)
+		index.deleteAllActionLog();
+		
 		LogEntry entry = new LogEntry();
 		entry.setActionComponent("Action");
 		entry.setActionMethod("Method");
@@ -385,9 +389,9 @@ public class IndexServiceTest {
 	}
 
 	@Test
-	public void testFindLogEntry() throws IndexActionException, ModelServiceException {
+	public void testFindLogEntry() throws IndexServiceException, ModelServiceException {
 		LogEntry entry = new LogEntry();
-		entry.setActionComponent("action");
+		entry.setActionComponent(RodaConstants.LOG_ACTION_COMPONENT);
 		entry.setActionMethod("Method");
 		entry.setAddress("address");
 		entry.setDatetime(new Date());
@@ -406,7 +410,7 @@ public class IndexServiceTest {
 
 		IndexResult<LogEntry> entries = index.findLogEntry(filterDescription, null, new Sublist());
 		assertEquals(entries.getTotalCount(), 1);
-		assertEquals(entries.getResults().get(0).getActionComponent(), CorporaConstants.LOG_ACTION);
+		assertEquals(entries.getResults().get(0).getActionComponent(), RodaConstants.LOG_ACTION_COMPONENT);
 
 		Filter filterDescription2 = new Filter();
 		filterDescription2.add(new SimpleFilterParameter(RodaConstants.LOG_ID, "id2"));
@@ -416,8 +420,9 @@ public class IndexServiceTest {
 	}
 
 	@Test
-	public void testReindexLogEntry() throws StorageActionException, ModelServiceException, IndexActionException {
+	public void testReindexLogEntry() throws StorageServiceException, ModelServiceException, IndexServiceException {
 		Long number = 10L;
+		
 		for (int i = 0; i < number; i++) {
 			LogEntry entry = new LogEntry();
 			entry.setId("ID" + i);
@@ -434,20 +439,21 @@ public class IndexServiceTest {
 			entry.setParameters(parameters);
 			model.addLogEntry(entry, logPath, false);
 		}
+		model.findOldLogsAndMoveThemToStorage(logPath, null);
 		index.reindexActionLogs();
 		Filter f1 = new Filter();
-		f1.add(new SimpleFilterParameter(CorporaConstants.LOG_ACTION, "ACTION:54"));
+		f1.add(new SimpleFilterParameter(RodaConstants.LOG_ACTION_COMPONENT, "ACTION:0"));
 		IndexResult<LogEntry> entries1 = index.findLogEntry(f1, null, new Sublist(0, 10));
-		assertThat(entries1.getTotalCount(), Matchers.is(number));
+		assertThat(entries1.getTotalCount(), Matchers.is(1L));
 		Filter f2 = new Filter();
-		f2.add(new SimpleFilterParameter(CorporaConstants.LOG_ADDRESS, "ADDRESS"));
+		f2.add(new SimpleFilterParameter(RodaConstants.LOG_ADDRESS, "ADDRESS"));
 		IndexResult<LogEntry> entries2 = index.findLogEntry(f2, null, new Sublist(0, 10));
 		assertThat(entries2.getTotalCount(), Matchers.is(number));
 	}
 
 	@Test
 	public void testReindexAIP()
-			throws ModelServiceException, StorageActionException, IndexActionException, ParseException {
+			throws ModelServiceException, StorageServiceException, IndexServiceException, ParseException {
 		for (int i = 0; i < 10; i++) {
 			final String aipId = UUID.randomUUID().toString();
 			model.createAIP(aipId, corporaService,

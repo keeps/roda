@@ -30,7 +30,7 @@ import org.roda.storage.DefaultContainer;
 import org.roda.storage.DefaultDirectory;
 import org.roda.storage.DefaultStoragePath;
 import org.roda.storage.Resource;
-import org.roda.storage.StorageActionException;
+import org.roda.storage.StorageServiceException;
 import org.roda.storage.StoragePath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,20 +67,20 @@ public final class FSUtils {
 	 * 
 	 */
 	public static void move(final Path sourcePath, final Path targetPath, boolean replaceExisting)
-			throws StorageActionException {
+			throws StorageServiceException {
 
 		// check if we can replace existing
 		if (!replaceExisting && Files.exists(targetPath)) {
-			throw new StorageActionException("Cannot copy because target path already exists: " + targetPath,
-					StorageActionException.ALREADY_EXISTS);
+			throw new StorageServiceException("Cannot copy because target path already exists: " + targetPath,
+					StorageServiceException.ALREADY_EXISTS);
 		}
 
 		// ensure parent directory exists or can be created
 		try {
 			Files.createDirectories(targetPath.getParent());
 		} catch (IOException e) {
-			throw new StorageActionException("Error while creating target directory parent folder",
-					StorageActionException.INTERNAL_SERVER_ERROR, e);
+			throw new StorageServiceException("Error while creating target directory parent folder",
+					StorageServiceException.INTERNAL_SERVER_ERROR, e);
 		}
 
 		CopyOption[] copyOptions = replaceExisting ? new CopyOption[] { StandardCopyOption.REPLACE_EXISTING }
@@ -90,16 +90,16 @@ public final class FSUtils {
 			try {
 				Files.move(sourcePath, targetPath, copyOptions);
 			} catch (IOException e) {
-				throw new StorageActionException("Error while moving directory from one path to another",
-						StorageActionException.INTERNAL_SERVER_ERROR, e);
+				throw new StorageServiceException("Error while moving directory from one path to another",
+						StorageServiceException.INTERNAL_SERVER_ERROR, e);
 			}
 		} else {
 			try {
 				Files.move(sourcePath, targetPath, copyOptions);
 				FSYamlMetadataUtils.moveMetadata(sourcePath, targetPath, replaceExisting);
 			} catch (IOException e) {
-				throw new StorageActionException("Error while copying one file into another",
-						StorageActionException.INTERNAL_SERVER_ERROR, e);
+				throw new StorageServiceException("Error while copying one file into another",
+						StorageServiceException.INTERNAL_SERVER_ERROR, e);
 			}
 		}
 
@@ -117,20 +117,20 @@ public final class FSUtils {
 	 *            already exists; false otherwise
 	 */
 	public static void copy(final Path sourcePath, final Path targetPath, boolean replaceExisting)
-			throws StorageActionException {
+			throws StorageServiceException {
 
 		// check if we can replace existing
 		if (!replaceExisting && Files.exists(targetPath)) {
-			throw new StorageActionException("Cannot copy because target path already exists: " + targetPath,
-					StorageActionException.ALREADY_EXISTS);
+			throw new StorageServiceException("Cannot copy because target path already exists: " + targetPath,
+					StorageServiceException.ALREADY_EXISTS);
 		}
 
 		// ensure parent directory exists or can be created
 		try {
 			Files.createDirectories(targetPath.getParent());
 		} catch (IOException e) {
-			throw new StorageActionException("Error while creating target directory parent folder",
-					StorageActionException.INTERNAL_SERVER_ERROR, e);
+			throw new StorageServiceException("Error while creating target directory parent folder",
+					StorageServiceException.INTERNAL_SERVER_ERROR, e);
 		}
 
 		if (Files.isDirectory(sourcePath)) {
@@ -151,8 +151,8 @@ public final class FSUtils {
 					}
 				});
 			} catch (IOException e) {
-				throw new StorageActionException("Error while copying one directory into another",
-						StorageActionException.INTERNAL_SERVER_ERROR, e);
+				throw new StorageServiceException("Error while copying one directory into another",
+						StorageServiceException.INTERNAL_SERVER_ERROR, e);
 			}
 		} else {
 			try {
@@ -162,8 +162,8 @@ public final class FSUtils {
 				Files.copy(sourcePath, targetPath, copyOptions);
 				FSYamlMetadataUtils.copyMetadata(sourcePath, targetPath, replaceExisting);
 			} catch (IOException e) {
-				throw new StorageActionException("Error while copying one file into another",
-						StorageActionException.INTERNAL_SERVER_ERROR, e);
+				throw new StorageServiceException("Error while copying one file into another",
+						StorageServiceException.INTERNAL_SERVER_ERROR, e);
 			}
 
 		}
@@ -179,7 +179,7 @@ public final class FSUtils {
 	 *            well. in case of a file, if metadata associated to it exists,
 	 *            it will be deleted as well.
 	 */
-	public static void deletePath(Path path) throws StorageActionException {
+	public static void deletePath(Path path) throws StorageServiceException {
 		if (path == null) {
 			return;
 		}
@@ -192,7 +192,7 @@ public final class FSUtils {
 				FSYamlMetadataUtils.deleteMetadata(path);
 			}
 		} catch (NoSuchFileException e) {
-			throw new StorageActionException("Could not delete path", StorageActionException.NOT_FOUND, e);
+			throw new StorageServiceException("Could not delete path", StorageServiceException.NOT_FOUND, e);
 		} catch (DirectoryNotEmptyException e) {
 			try {
 				Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
@@ -210,11 +210,11 @@ public final class FSUtils {
 
 				});
 			} catch (IOException e1) {
-				throw new StorageActionException("Could not delete entity",
-						StorageActionException.INTERNAL_SERVER_ERROR, e1);
+				throw new StorageServiceException("Could not delete entity",
+						StorageServiceException.INTERNAL_SERVER_ERROR, e1);
 			}
 		} catch (IOException e) {
-			throw new StorageActionException("Could not delete entity", StorageActionException.INTERNAL_SERVER_ERROR,
+			throw new StorageServiceException("Could not delete entity", StorageServiceException.INTERNAL_SERVER_ERROR,
 					e);
 		}
 	}
@@ -241,7 +241,7 @@ public final class FSUtils {
 	 *            relative path to base path
 	 */
 	public static ClosableIterable<Resource> listPath(final Path basePath, final Path path)
-			throws StorageActionException {
+			throws StorageServiceException {
 		ClosableIterable<Resource> resourceIterable;
 		try {
 			final DirectoryStream<Path> directoryStream = Files.newDirectoryStream(path, FSYamlMetadataUtils.PATH_FILTER);
@@ -263,7 +263,7 @@ public final class FSUtils {
 							Resource ret;
 							try {
 								ret = convertPathToResource(basePath, next);
-							} catch (StorageActionException | NoSuchElementException e) {
+							} catch (StorageServiceException | NoSuchElementException e) {
 								LOGGER.error("Error while list path " + basePath + " while parsing resource " + next,
 										e);
 								ret = null;
@@ -282,8 +282,8 @@ public final class FSUtils {
 			};
 
 		} catch (IOException e) {
-			throw new StorageActionException("Could not list contents of entity at: " + path,
-					StorageActionException.INTERNAL_SERVER_ERROR, e);
+			throw new StorageServiceException("Could not list contents of entity at: " + path,
+					StorageServiceException.INTERNAL_SERVER_ERROR, e);
 		}
 
 		return resourceIterable;
@@ -296,7 +296,7 @@ public final class FSUtils {
 	 *            base path
 	 */
 	public static ClosableIterable<Container> listContainers(final Path basePath)
-			throws StorageActionException {
+			throws StorageServiceException {
 		ClosableIterable<Container> containerIterable;
 		try {
 			final DirectoryStream<Path> directoryStream = Files.newDirectoryStream(basePath, FSYamlMetadataUtils.PATH_FILTER);
@@ -318,7 +318,7 @@ public final class FSUtils {
 							Container ret;
 							try {
 								ret = convertPathToContainer(basePath, next);
-							} catch (StorageActionException | NoSuchElementException e) {
+							} catch (StorageServiceException | NoSuchElementException e) {
 								LOGGER.error("Error while listing containers, while parsing resource " + next, e);
 								ret = null;
 							}
@@ -336,8 +336,8 @@ public final class FSUtils {
 			};
 
 		} catch (IOException e) {
-			throw new StorageActionException("Could not list contents of entity at: " + basePath,
-					StorageActionException.INTERNAL_SERVER_ERROR, e);
+			throw new StorageServiceException("Could not list contents of entity at: " + basePath,
+					StorageServiceException.INTERNAL_SERVER_ERROR, e);
 		}
 
 		return containerIterable;
@@ -351,14 +351,14 @@ public final class FSUtils {
 	 * @param path
 	 *            relative path to base path
 	 */
-	public static Resource convertPathToResource(Path basePath, Path path) throws StorageActionException {
+	public static Resource convertPathToResource(Path basePath, Path path) throws StorageServiceException {
 		Resource resource;
 		
 		// TODO support binary reference
 
 		if (!Files.exists(path)) {
-			throw new StorageActionException("Cannot find file or directory at " + path,
-					StorageActionException.NOT_FOUND);
+			throw new StorageServiceException("Cannot find file or directory at " + path,
+					StorageServiceException.NOT_FOUND);
 		}
 
 		// storage path
@@ -379,8 +379,8 @@ public final class FSUtils {
 				Map<String, String> contentDigest = FSUtils.obtainContentDigest(metadata);
 				resource = new DefaultBinary(storagePath, metadata, content, sizeInBytes, false, contentDigest);
 			} catch (IOException e) {
-				throw new StorageActionException("Could not get file size",
-						StorageActionException.INTERNAL_SERVER_ERROR, e);
+				throw new StorageServiceException("Could not get file size",
+						StorageServiceException.INTERNAL_SERVER_ERROR, e);
 			}
 		}
 		return resource;
@@ -408,7 +408,7 @@ public final class FSUtils {
 	 * @param path
 	 *            relative path to base path
 	 */
-	public static Container convertPathToContainer(Path basePath, Path path) throws StorageActionException {
+	public static Container convertPathToContainer(Path basePath, Path path) throws StorageServiceException {
 		Container resource;
 
 		// storage path
@@ -422,8 +422,8 @@ public final class FSUtils {
 		if (Files.isDirectory(path)) {
 			resource = new DefaultContainer(storagePath, metadata);
 		} else {
-			throw new StorageActionException("A file is not a container!",
-					StorageActionException.INTERNAL_SERVER_ERROR);
+			throw new StorageServiceException("A file is not a container!",
+					StorageServiceException.INTERNAL_SERVER_ERROR);
 		}
 		return resource;
 	}
@@ -435,7 +435,7 @@ public final class FSUtils {
 	 * @param path
 	 *            file which digest will be computed
 	 */
-	public static String computeContentDigestMD5(Path path) throws StorageActionException {
+	public static String computeContentDigestMD5(Path path) throws StorageServiceException {
 		return computeContentDigest(path, RodaConstants.MD5);
 	}
 
@@ -446,11 +446,11 @@ public final class FSUtils {
 	 * @param path
 	 *            file which digest will be computed
 	 */
-	public static String computeContentDigestSHA1(Path path) throws StorageActionException {
+	public static String computeContentDigestSHA1(Path path) throws StorageServiceException {
 		return computeContentDigest(path, RodaConstants.SHA1);
 	}
 
-	private static String computeContentDigest(Path path, String algorithm) throws StorageActionException {
+	private static String computeContentDigest(Path path, String algorithm) throws StorageServiceException {
 
 		try {
 			final int bufferSize = 1073741824;
@@ -480,9 +480,9 @@ public final class FSUtils {
 			return hexString.toString();
 
 		} catch (NoSuchAlgorithmException | IOException e) {
-			throw new StorageActionException(
+			throw new StorageServiceException(
 					"Cannot compute content digest for " + path + " using algorithm " + algorithm,
-					StorageActionException.INTERNAL_SERVER_ERROR);
+					StorageServiceException.INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -492,7 +492,7 @@ public final class FSUtils {
 	 * @param path
 	 *            file which digests will be computed
 	 */
-	public static Map<String, String> generateContentDigest(Path path) throws StorageActionException {
+	public static Map<String, String> generateContentDigest(Path path) throws StorageServiceException {
 		Map<String, String> digest = new HashMap<String, String>(1);
 
 		String pathDigest = computeContentDigestSHA1(path);

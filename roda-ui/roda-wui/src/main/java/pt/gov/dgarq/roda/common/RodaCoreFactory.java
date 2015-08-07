@@ -10,10 +10,10 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
-import org.roda.index.IndexActionException;
+import org.roda.index.IndexServiceException;
 import org.roda.index.IndexService;
 import org.roda.model.ModelService;
-import org.roda.storage.StorageActionException;
+import org.roda.storage.StorageServiceException;
 import org.roda.storage.StorageService;
 import org.roda.storage.fs.FileStorageService;
 
@@ -71,7 +71,7 @@ public class RodaCoreFactory {
 
 			index = new IndexService(solr, model);
 
-		} catch (StorageActionException e) {
+		} catch (StorageServiceException e) {
 			LOGGER.error(e);
 		} catch (URISyntaxException e) {
 			LOGGER.error(e);
@@ -115,7 +115,7 @@ public class RodaCoreFactory {
 		if (Arrays.asList("reindex").equals(args)) {
 			try {
 				index.reindexAIPs();
-			} catch (IndexActionException e) {
+			} catch (IndexServiceException e) {
 				System.err.println("An error has occured while reindexing");
 				e.printStackTrace();
 			}

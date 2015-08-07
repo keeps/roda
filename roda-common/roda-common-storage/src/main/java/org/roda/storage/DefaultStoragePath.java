@@ -9,17 +9,17 @@ public class DefaultStoragePath implements StoragePath {
 	private final String path;
 
 	public static DefaultStoragePath parse(String path)
-			throws StorageActionException {
+			throws StorageServiceException {
 		if (isValid(path)) {
 			return new DefaultStoragePath(sanitizePath(path));
 		} else {
-			throw new StorageActionException("The path \"" + path
-					+ "\" is not valid", StorageActionException.BAD_REQUEST);
+			throw new StorageServiceException("The path \"" + path
+					+ "\" is not valid", StorageServiceException.BAD_REQUEST);
 		}
 	}
 
 	public static DefaultStoragePath parse(String... pathPartials)
-			throws StorageActionException {
+			throws StorageServiceException {
 		StringBuilder builder = new StringBuilder();
 		boolean empty = true;
 		for (String pathPartial : pathPartials) {
@@ -35,10 +35,10 @@ public class DefaultStoragePath implements StoragePath {
 	}
 
 	public static DefaultStoragePath parse(StoragePath base, String resourceName)
-			throws StorageActionException {
+			throws StorageServiceException {
 		if (resourceName.contains(SEPARATOR_REGEX)) {
-			throw new StorageActionException("The resource name is not valid: "
-					+ resourceName, StorageActionException.BAD_REQUEST);
+			throw new StorageServiceException("The resource name is not valid: "
+					+ resourceName, StorageServiceException.BAD_REQUEST);
 		} else {
 			return parse(base.asString() + SEPARATOR + resourceName);
 		}

@@ -154,8 +154,9 @@ public class EditorHelper {
 			String adminUsername = configuration.getString("adminUsername");
 			String adminPassword = configuration.getString("adminPassword");
 
+			// FIXME emtpy string
 			CASUserPrincipal cup = casUtility.getCASUserPrincipal(
-					adminUsername, adminPassword);
+					adminUsername, adminPassword,"");
 
 			this.adminFedoraClientUtility = new FedoraClientUtility(fedoraURL,
 					fedoraGSearchURL, cup, casUtility);

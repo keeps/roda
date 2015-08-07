@@ -25,7 +25,7 @@ import org.roda.storage.Binary;
 import org.roda.storage.Container;
 import org.roda.storage.ContentPayload;
 import org.roda.storage.RandomMockContentPayload;
-import org.roda.storage.StorageActionException;
+import org.roda.storage.StorageServiceException;
 import org.roda.storage.StoragePath;
 import org.roda.storage.StorageTestUtils;
 import org.roda.storage.fs.FSUtils;
@@ -48,7 +48,7 @@ public class FedoraStorageServiceTest extends AbstractStorageServiceTest<FedoraS
 	final FedoraStorageService storage = new FedoraStorageService(serverAddress);
 
 	@AfterClass
-	public static void tearDown() throws StorageActionException {
+	public static void tearDown() throws StorageServiceException {
 		FSUtils.deletePath(Paths.get("fcrepo4-data"));
 	}
 
@@ -66,7 +66,7 @@ public class FedoraStorageServiceTest extends AbstractStorageServiceTest<FedoraS
 	}
 
 	@Override
-	public void testClassInstantiation() throws StorageActionException {
+	public void testClassInstantiation() throws StorageServiceException {
 		final HttpClient client = HttpClientBuilder.create().setMaxConnPerRoute(Integer.MAX_VALUE)
 				.setMaxConnTotal(Integer.MAX_VALUE).build();
 		final HttpGet request = new HttpGet(serverAddress);
@@ -90,13 +90,13 @@ public class FedoraStorageServiceTest extends AbstractStorageServiceTest<FedoraS
 			for (Container container : storage.listContainers()) {
 				storage.deleteContainer(container.getStoragePath());
 			}
-		} catch (StorageActionException e) {
+		} catch (StorageServiceException e) {
 			logger.error("Error cleaning up", e);
 		}
 	}
 
 	@Test
-	public void testCreateGetDeleteBinary() throws StorageActionException, IOException {
+	public void testCreateGetDeleteBinary() throws StorageServiceException, IOException {
 
 		// create container
 		final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
@@ -126,7 +126,7 @@ public class FedoraStorageServiceTest extends AbstractStorageServiceTest<FedoraS
 		try {
 			getStorage().createBinary(binaryStoragePath, binaryMetadata, payload, false);
 
-		} catch (StorageActionException e) {
+		} catch (StorageServiceException e) {
 			e.printStackTrace();
 			fail("An exception should not have been thrown while creating a binary that already exists because fedora doesn't support it very well but it happened!");
 		}
@@ -138,8 +138,8 @@ public class FedoraStorageServiceTest extends AbstractStorageServiceTest<FedoraS
 		try {
 			getStorage().getBinary(binaryStoragePath);
 			fail("An exception should have been thrown while getting a binary that was deleted but it didn't happened!");
-		} catch (StorageActionException e) {
-			assertEquals(StorageActionException.NOT_FOUND, e.getCode());
+		} catch (StorageServiceException e) {
+			assertEquals(StorageServiceException.NOT_FOUND, e.getCode());
 		}
 
 		// cleanup

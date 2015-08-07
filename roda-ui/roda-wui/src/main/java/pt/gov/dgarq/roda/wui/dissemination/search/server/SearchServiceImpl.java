@@ -4,7 +4,7 @@ import java.rmi.RemoteException;
 import java.util.Arrays;
 
 import org.apache.log4j.Logger;
-import org.roda.index.IndexActionException;
+import org.roda.index.IndexServiceException;
 import org.roda.index.IndexService;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -61,7 +61,7 @@ public class SearchServiceImpl extends RemoteServiceServlet implements
 		try {
 			Sublist sublist = new Sublist(startIndex, limit);
 			result = indexService.findDescriptiveMetadata(getBasicSearchFilter(null,query), null, sublist);
-		} catch (IndexActionException e) {
+		} catch (IndexServiceException e) {
 			logger.error("error",e);
 		}
 		return result;
