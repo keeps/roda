@@ -916,7 +916,8 @@ public abstract class AbstractRodaMigratorPlugin extends
 			}
 			
 			try {
-				cup = casUtility.getCASUserPrincipal(getParameterRodaServicesUsername(), getParameterRodaServicesPassword());
+				// FIXME empty string
+				cup = casUtility.getCASUserPrincipal(getParameterRodaServicesUsername(), getParameterRodaServicesPassword(),"");
 			} catch (Throwable e) {
 				throw new PluginException("Unable to create CasUserPrincipal - "+ e.getMessage(), e);
 			}

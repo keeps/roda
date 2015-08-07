@@ -203,7 +203,8 @@ public class ExecutePlanPlugin extends AbstractPlugin {
         final String coreURL = getParameterValues().get(AbstractPlugin.PARAMETER_RODA_CORE_URL().getName());
         try {
 			CASUtility casUtility = new CASUtility(new URL(casURL), new URL(coreURL));
-			CASUserPrincipal cup = casUtility.getCASUserPrincipal(rodaClientUsername, rodaClientPassword);
+			// FIXME empty string
+			CASUserPrincipal cup = casUtility.getCASUserPrincipal(rodaClientUsername, rodaClientPassword,"");
             rodaClient = new RODAClient(new URL(rodaClientServiceUrl), cup,casUtility);
             rodaUploader = new Uploader(new URL(rodaClientServiceUrl), cup,casUtility);
             rodaDownloader = rodaClient.getDownloader();

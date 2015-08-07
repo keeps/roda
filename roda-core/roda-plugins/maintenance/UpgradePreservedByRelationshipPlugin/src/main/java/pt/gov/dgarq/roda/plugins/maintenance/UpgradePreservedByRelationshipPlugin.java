@@ -246,7 +246,8 @@ public class UpgradePreservedByRelationshipPlugin extends AbstractPlugin {
 
 		try {
 			CASUtility casUtility = new CASUtility(getCasURL(), getCoreURL());
-			CASUserPrincipal cup = casUtility.getCASUserPrincipal(getUsername(), getPassword());
+			// FIXME empty string
+			CASUserPrincipal cup = casUtility.getCASUserPrincipal(getUsername(), getPassword(),"");
 			new RODAClient(getRodaServicesURL(),cup,casUtility);
 
 			this.fedoraClientUtility = new FedoraClientUtility(getFedoraURL(),getFedoraGSearchURL(), cup, casUtility);
