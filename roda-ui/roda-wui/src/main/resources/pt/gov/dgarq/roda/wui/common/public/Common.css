@@ -142,6 +142,39 @@ h3, .h3 {
 	bottom: 3px;
 }
 
+/** Collections list and My Async Datagrid  **/
+.my-collections-table .com-google-gwt-user-cellview-client-CellTable-Style-cellTableCell
+	{
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.my-collections-empty-info {
+	padding: 10px;
+}
+
+.my-asyncdatagrid-pager-results {
+	margin-right: 0px;
+	margin-left: auto;
+}
+
+.my-asyncdatagrid-pager-pagesize {
+	margin-right: 15px;
+	margin-left: auto;
+	margin-top: 5px;
+}
+
+.my-asyncdatagrid-pager-pagesize {
+	margin-right: 15px;
+	margin-left: auto;
+	margin-top: 5px;
+}
+
+.my-asyncdatagrid-display {
+	width: 100%;
+}
+
 /** Date box and picker from Chrome theme **/
 .gwt-DateBox input {
 	width: 8em;

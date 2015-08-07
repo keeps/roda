@@ -311,7 +311,7 @@ public class UserLog extends Composite {
 
 	public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
 		if (historyTokens.length == 0) {
-			init();
+			logList.refresh();
 			callback.onSuccess(this);
 		} else {
 			History.newItem(RESOLVER.getHistoryPath());

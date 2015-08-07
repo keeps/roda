@@ -381,11 +381,11 @@ public class IndexServiceTest {
 
 		Filter filterDescription = new Filter();
 		filterDescription.add(new SimpleFilterParameter(RodaConstants.LOG_ID, "ID"));
-		assertThat(index.getLogEntriesCount(filterDescription), Matchers.is(1L));
+		assertThat(index.countLogEntries(filterDescription), Matchers.is(1L));
 
 		Filter filterDescription2 = new Filter();
 		filterDescription2.add(new SimpleFilterParameter(RodaConstants.LOG_ID, "ID2"));
-		assertThat(index.getLogEntriesCount(filterDescription2), Matchers.is(0L));
+		assertThat(index.countLogEntries(filterDescription2), Matchers.is(0L));
 	}
 
 	@Test

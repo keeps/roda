@@ -1,6 +1,5 @@
 package pt.gov.dgarq.roda.wui.common.client.widgets;
 
-import java.util.ArrayList;
 import java.util.Date;
 
 import com.google.gwt.cell.client.DateCell;
@@ -21,6 +20,7 @@ import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
+import pt.gov.dgarq.roda.wui.management.user.client.UserManagementService;
 
 public class LogEntryList extends AsyncTableCell<LogEntry> {
 
@@ -31,6 +31,7 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
 	private final Column<LogEntry, Date> dateColumn;
 	private final TextColumn<LogEntry> actionComponentColumn;
 	private final TextColumn<LogEntry> actionMethodColumn;
+	private final TextColumn<LogEntry> relatedObjectColumn;
 	private final TextColumn<LogEntry> usernameColumn;
 	private final TextColumn<LogEntry> durationColumn;
 	private final TextColumn<LogEntry> addressColumn;
@@ -38,7 +39,7 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
 	public LogEntryList() {
 		super();
 
-		dateColumn = new Column<LogEntry, Date>(new DateCell(DateTimeFormat.getFormat("yyyy-MM-dd"))) {
+		dateColumn = new Column<LogEntry, Date>(new DateCell(DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss.SSS"))) {
 			@Override
 			public Date getValue(LogEntry logEntry) {
 				return logEntry != null ? logEntry.getDatetime() : null;
@@ -61,6 +62,14 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
 			}
 		};
 
+		relatedObjectColumn = new TextColumn<LogEntry>() {
+
+			@Override
+			public String getValue(LogEntry logEntry) {
+				return logEntry != null ? logEntry.getRelatedObjectID() : null;
+			}
+		};
+
 		usernameColumn = new TextColumn<LogEntry>() {
 
 			@Override
@@ -74,7 +83,7 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
 			@Override
 			public String getValue(LogEntry logEntry) {
 				// FIXME
-				return logEntry != null ? logEntry.getDuration() + "s" : null;
+				return logEntry != null ? logEntry.getDuration() + "ms" : null;
 			}
 		};
 
@@ -88,6 +97,7 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
 
 		dateColumn.setSortable(true);
 		actionMethodColumn.setSortable(true);
+		relatedObjectColumn.setSortable(true);
 		usernameColumn.setSortable(true);
 		durationColumn.setSortable(true);
 		addressColumn.setSortable(true);
@@ -98,6 +108,7 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
 		getDisplay().addColumn(dateColumn, "Date and time");
 		getDisplay().addColumn(actionComponentColumn, "Component");
 		getDisplay().addColumn(actionMethodColumn, "Method");
+		getDisplay().addColumn(relatedObjectColumn, "Related object");
 		getDisplay().addColumn(usernameColumn, "User");
 		getDisplay().addColumn(durationColumn, "Duration");
 		getDisplay().addColumn(addressColumn, "Address");
@@ -115,46 +126,39 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
 			AsyncCallback<IndexResult<LogEntry>> callback) {
 
 		Filter filter = getFilter();
-		if (filter == null) {
-			// search not yet ready, deliver empty result
-			callback.onSuccess(null);
-		} else {
-			// calculate sorter
-			Sorter sorter = new Sorter();
-			for (int i = 0; i < columnSortList.size(); i++) {
-				ColumnSortInfo columnSortInfo = columnSortList.get(i);
-				String sortParameterKey;
-				if (columnSortInfo.getColumn().equals(dateColumn)) {
-					sortParameterKey = RodaConstants.LOG_DATETIME;
-				} else if (columnSortInfo.getColumn().equals(actionComponentColumn)) {
-					sortParameterKey = RodaConstants.LOG_ACTION_COMPONENT;
-				} else if (columnSortInfo.getColumn().equals(actionMethodColumn)) {
-					sortParameterKey = RodaConstants.LOG_ACTION_METHOD;
-				} else if (columnSortInfo.getColumn().equals(usernameColumn)) {
-					sortParameterKey = RodaConstants.LOG_USERNAME;
-				} else if (columnSortInfo.getColumn().equals(durationColumn)) {
-					sortParameterKey = RodaConstants.LOG_DURATION;
-				} else if (columnSortInfo.getColumn().equals(addressColumn)) {
-					sortParameterKey = RodaConstants.LOG_ADDRESS;
-				} else {
-					sortParameterKey = null;
-				}
 
-				if (sortParameterKey != null) {
-					sorter.add(new SortParameter(sortParameterKey, !columnSortInfo.isAscending()));
-				} else {
-					logger.warn("Selecting a sorter that is not mapped");
-				}
+		// calculate sorter
+		Sorter sorter = new Sorter();
+		for (int i = 0; i < columnSortList.size(); i++) {
+			ColumnSortInfo columnSortInfo = columnSortList.get(i);
+			String sortParameterKey;
+			if (columnSortInfo.getColumn().equals(dateColumn)) {
+				sortParameterKey = RodaConstants.LOG_DATETIME;
+			} else if (columnSortInfo.getColumn().equals(actionComponentColumn)) {
+				sortParameterKey = RodaConstants.LOG_ACTION_COMPONENT;
+			} else if (columnSortInfo.getColumn().equals(actionMethodColumn)) {
+				sortParameterKey = RodaConstants.LOG_ACTION_METHOD;
+			} else if (columnSortInfo.getColumn().equals(usernameColumn)) {
+				sortParameterKey = RodaConstants.LOG_USERNAME;
+			} else if (columnSortInfo.getColumn().equals(durationColumn)) {
+				sortParameterKey = RodaConstants.LOG_DURATION;
+			} else if (columnSortInfo.getColumn().equals(addressColumn)) {
+				sortParameterKey = RodaConstants.LOG_ADDRESS;
+			} else {
+				sortParameterKey = null;
 			}
 
-			// define sublist
-			Sublist sublist = new Sublist(start, length);
-
-			// BrowserService.Util.getInstance().findDescriptiveMetadata(filter,
-			// sorter, sublist, callback);
-			// FIXME
-			callback.onSuccess(new IndexResult<LogEntry>(0, 0, 0, new ArrayList<LogEntry>()));
+			if (sortParameterKey != null) {
+				sorter.add(new SortParameter(sortParameterKey, !columnSortInfo.isAscending()));
+			} else {
+				logger.warn("Selecting a sorter that is not mapped");
+			}
 		}
+
+		// define sublist
+		Sublist sublist = new Sublist(start, length);
+
+		UserManagementService.Util.getInstance().findLogEntries(filter, sorter, sublist, callback);
 
 	}
 

@@ -7,10 +7,13 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.data.Group;
-import pt.gov.dgarq.roda.core.data.LogEntry;
 import pt.gov.dgarq.roda.core.data.User;
 import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
+import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
+import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
+import pt.gov.dgarq.roda.core.data.v2.IndexResult;
+import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.wui.common.client.PrintReportException;
 
 /**
@@ -308,16 +311,9 @@ public interface UserManagementServiceAsync {
 	 * @return
 	 * @throws RODAException
 	 */
-	public void getLogEntriesCount(Filter filter, AsyncCallback<Integer> callback);
+	void getLogEntriesCount(Filter filter, AsyncCallback<Long> callback);
 
-	/**
-	 * Get the log entries
-	 * 
-	 * @param adapter
-	 * @return
-	 * @throws RODAException
-	 */
-	public void getLogEntries(ContentAdapter adapter, AsyncCallback<LogEntry[]> callback);
+	void findLogEntries(Filter filter, Sorter sorter, Sublist sublist, AsyncCallback<IndexResult<LogEntry>> callback);
 
 	/**
 	 * Register a new user

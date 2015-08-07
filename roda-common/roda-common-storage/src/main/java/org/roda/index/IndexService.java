@@ -195,7 +195,7 @@ public class IndexService {
 	 */
 
 	// LOG
-	public Long getLogEntriesCount(Filter filter) throws IndexServiceException {
+	public Long countLogEntries(Filter filter) throws IndexServiceException {
 		return SolrUtils.count(index, LogEntry.class, filter);
 	}
 

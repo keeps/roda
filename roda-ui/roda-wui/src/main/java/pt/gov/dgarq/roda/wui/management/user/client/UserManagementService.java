@@ -3,17 +3,21 @@
  */
 package pt.gov.dgarq.roda.wui.management.user.client;
 
-import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 
+import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
 import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.data.Group;
-import pt.gov.dgarq.roda.core.data.LogEntry;
 import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
+import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
+import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
+import pt.gov.dgarq.roda.core.data.v2.IndexResult;
+import pt.gov.dgarq.roda.core.data.v2.LogEntry;
+import pt.gov.dgarq.roda.wui.common.client.GenericException;
 import pt.gov.dgarq.roda.wui.common.client.PrintReportException;
 
 /**
@@ -39,8 +43,7 @@ public interface UserManagementService extends RemoteService {
 		 */
 		public static UserManagementServiceAsync getInstance() {
 
-			UserManagementServiceAsync instance = (UserManagementServiceAsync) GWT
-					.create(UserManagementService.class);
+			UserManagementServiceAsync instance = (UserManagementServiceAsync) GWT.create(UserManagementService.class);
 			ServiceDefTarget target = (ServiceDefTarget) instance;
 			target.setServiceEntryPoint(GWT.getModuleBaseURL() + SERVICE_URI);
 			return instance;
@@ -57,8 +60,7 @@ public interface UserManagementService extends RemoteService {
 	 * @return
 	 * @throws RODAException
 	 */
-	public User[] getUsers(Character letter, String search)
-			throws RODAException;
+	public User[] getUsers(Character letter, String search) throws RODAException;
 
 	/**
 	 * Get all groups
@@ -70,8 +72,7 @@ public interface UserManagementService extends RemoteService {
 	 * @return
 	 * @throws RODAException
 	 */
-	public Group[] getGroups(Character letter, String search)
-			throws RODAException;
+	public Group[] getGroups(Character letter, String search) throws RODAException;
 
 	/**
 	 * Get the total number of users
@@ -94,8 +95,7 @@ public interface UserManagementService extends RemoteService {
 	 * @return the number of users that pass through the conditions
 	 * @throws RODAException
 	 */
-	public Integer getUserCount(Character letter, String filter)
-			throws RODAException;
+	public Integer getUserCount(Character letter, String filter) throws RODAException;
 
 	/**
 	 * Get a sub-list of users which name starts with the letter and/or matches
@@ -117,8 +117,7 @@ public interface UserManagementService extends RemoteService {
 	 * 
 	 * @throws RODAException
 	 */
-	public User[] getUsers(Character letter, String filter, int startItem,
-			int limit) throws RODAException;
+	public User[] getUsers(Character letter, String filter, int startItem, int limit) throws RODAException;
 
 	/**
 	 * Get the total number of groups
@@ -142,8 +141,7 @@ public interface UserManagementService extends RemoteService {
 	 * 
 	 * @throws RODAException
 	 */
-	public Integer getGroupCount(Character letter, String filter)
-			throws RODAException;
+	public Integer getGroupCount(Character letter, String filter) throws RODAException;
 
 	/**
 	 * Get a sub-list of groups which name starts with the letter and/or matches
@@ -164,8 +162,7 @@ public interface UserManagementService extends RemoteService {
 	 * @return An array with the list of groups that pass through the conditions
 	 * @throws RODAException
 	 */
-	public Group[] getGroups(Character letter, String filter, int startItem,
-			int limit) throws RODAException;
+	public Group[] getGroups(Character letter, String filter, int startItem, int limit) throws RODAException;
 
 	/**
 	 * Get the groups to which a user belongs to
@@ -309,8 +306,7 @@ public interface UserManagementService extends RemoteService {
 	 * @return the list of direct roles
 	 * @throws RODAException
 	 */
-	public String[] getGroupDirectRoles(String groupname)
-			throws RODAException;
+	public String[] getGroupDirectRoles(String groupname) throws RODAException;
 
 	/**
 	 * Get a set that contains the first character of each user name, for all
@@ -343,17 +339,10 @@ public interface UserManagementService extends RemoteService {
 	 * @return
 	 * @throws RODAException
 	 */
-	public int getLogEntriesCount(Filter filter) throws RODAException;
+	public Long getLogEntriesCount(Filter filter) throws RODAException;
 
-	/**
-	 * Get the log entries
-	 * 
-	 * @param adapter
-	 * @return
-	 * @throws RODAException
-	 */
-	public LogEntry[] getLogEntries(ContentAdapter adapter)
-			throws RODAException;
+	public IndexResult<LogEntry> findLogEntries(Filter filter, Sorter sorter, Sublist sublist)
+			throws AuthorizationDeniedException, GenericException;
 
 	/**
 	 * Register a new user
@@ -367,8 +356,7 @@ public interface UserManagementService extends RemoteService {
 	 * @return true if passed the chalenge, false otherwise
 	 * @throws RODAException
 	 */
-	public boolean register(User user, String password, String captcha)
-			throws RODAException;
+	public boolean register(User user, String password, String captcha) throws RODAException;
 
 	/**
 	 * Verify a user email. If verified user will become active
@@ -381,8 +369,7 @@ public interface UserManagementService extends RemoteService {
 	 * @throws RODAException
 	 * 
 	 */
-	public boolean verifyemail(String username, String token)
-			throws RODAException;
+	public boolean verifyemail(String username, String token) throws RODAException;
 
 	/**
 	 * Resend the email chalenge to a user email
@@ -393,8 +380,7 @@ public interface UserManagementService extends RemoteService {
 	 * @throws RODAException
 	 * 
 	 */
-	public boolean resendEmailVerification(String username)
-			throws RODAException;
+	public boolean resendEmailVerification(String username) throws RODAException;
 
 	/**
 	 * Change the email of a user that is still not active due to a email
@@ -405,11 +391,10 @@ public interface UserManagementService extends RemoteService {
 	 * @param email
 	 *            the new email
 	 * @return true if email was successfully changed, false otherwise
-	 * @throws RODAException 
+	 * @throws RODAException
 	 * 
 	 */
-	public boolean changeUnverifiedEmail(String username, String email)
-			throws RODAException;
+	public boolean changeUnverifiedEmail(String username, String email) throws RODAException;
 
 	/**
 	 * Request to reset the password. An email will be sent to the user with the
@@ -422,8 +407,7 @@ public interface UserManagementService extends RemoteService {
 	 * @return true if the user passed the chalenge, false otherwise
 	 * @throws RODAException
 	 */
-	public boolean requestPassordReset(String usernameOrEmail, String captcha)
-			throws RODAException;
+	public boolean requestPassordReset(String usernameOrEmail, String captcha) throws RODAException;
 
 	/**
 	 * Reset a user password
@@ -438,17 +422,15 @@ public interface UserManagementService extends RemoteService {
 	 * @throws RODAException
 	 * 
 	 */
-	public void resetPassword(String username, String resetPasswordToken,
-			String newPassword) throws RODAException;
+	public void resetPassword(String username, String resetPasswordToken, String newPassword) throws RODAException;
 
 	/**
 	 * Set user log report info
 	 * 
 	 * @param adapter
 	 * @param localeString
-	 * @throws PrintReportException 
+	 * @throws PrintReportException
 	 */
-	public void setUserLogReportInfo(ContentAdapter adapter, String localeString)
-			throws PrintReportException;
+	public void setUserLogReportInfo(ContentAdapter adapter, String localeString) throws PrintReportException;
 
 }

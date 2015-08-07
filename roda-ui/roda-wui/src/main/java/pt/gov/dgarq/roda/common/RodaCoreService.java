@@ -16,7 +16,7 @@ public abstract class RodaCoreService {
 	private static final Logger LOGGER = Logger.getLogger(RodaCoreService.class);
 
 	protected static void registerAction(CASUserPrincipal user, String actionComponent, String actionMethod,
-			String aipId, long duration, String... parameters) {
+			String aipId, long duration, Object... parameters) {
 
 		LogEntry logEntry = createLogEntry(user, actionComponent, actionMethod, aipId, duration, parameters);
 		registerAction(logEntry);
@@ -39,7 +39,7 @@ public abstract class RodaCoreService {
 	}
 
 	private static LogEntry createLogEntry(CASUserPrincipal user, String actionComponent, String actionMethod,
-			String aipId, long duration, String... parameters) {
+			String aipId, long duration, Object... parameters) {
 		LogEntry logEntry = null;
 		List<LogEntryParameter> logParameters = null;
 
@@ -53,8 +53,10 @@ public abstract class RodaCoreService {
 				logParameters = new ArrayList<LogEntryParameter>(parameters.length / 2);
 
 				for (int i = 0, j = 0; i < logParameters.size(); i++, j = j + 2) {
-
-					logParameters.add(new LogEntryParameter(parameters[j], parameters[j + 1]));
+					Object key = parameters[j];
+					Object value = parameters[j + 1];
+					logParameters.add(new LogEntryParameter(key != null ? key.toString() : "null",
+							value != null ? value.toString() : "null"));
 				}
 
 			}

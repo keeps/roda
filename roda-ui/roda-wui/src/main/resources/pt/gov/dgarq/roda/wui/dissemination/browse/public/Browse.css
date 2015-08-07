@@ -1,28 +1,5 @@
 @CHARSET "UTF-8";
 
-/** v2.0 **/
-.my-collections-table .com-google-gwt-user-cellview-client-CellTable-Style-cellTableCell
-	{
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-}
-
-.my-collections-empty-info {
-	padding: 10px;
-}
-
-.my-collections-table .my-asyncdatagrid-pager-results {
-	margin-right: 0px;
-	margin-left: auto;
-}
-
-.my-collections-table .my-asyncdatagrid-pager-pagesize {
-	margin-right: 15px;
-	margin-left: auto;
-	margin-top: 5px;
-}
-
 /* Browser v2*/
 .browseTitle {
 	margin-bottom: 10px !important;

@@ -103,6 +103,8 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
 		addStyleName("my-asyncdatagrid");
 		resultsPager.addStyleName("my-asyncdatagrid-pager-results");
 		pageSizePager.addStyleName("my-asyncdatagrid-pager-pagesize");
+		display.addStyleName("my-asyncdatagrid-display");
+
 	}
 
 	protected abstract int getInitialPageSize();
@@ -120,7 +122,7 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
 		return selectionModel;
 	}
 
-	protected void refresh() {
+	public void refresh() {
 		getSelectionModel().clear();
 		getDisplay().setVisibleRangeAndClearData(new Range(0, getInitialPageSize()), true);
 	}
