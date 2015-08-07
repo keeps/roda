@@ -106,6 +106,15 @@ public class ModelService extends ModelObservable {
 				LOGGER.error("Error creating container to add new log entry", e);
 			}
 		}
+
+		try {
+			storage.createContainer(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_SIP_STATE),
+					new HashMap<String, Set<String>>());
+		} catch (StorageServiceException e) {
+			if (e.getCode() != StorageServiceException.ALREADY_EXISTS) {
+				LOGGER.error("Error creating container to add new sip state", e);
+			}
+		}
 	}
 
 	public StorageService getStorage() {
@@ -1450,7 +1459,7 @@ public class ModelService extends ModelObservable {
 	}
 
 	// FIXME all the initialization, if needed, should be done only once
-	public void addSipState(SIPState sipState, boolean notify) throws StorageServiceException{
+	public void addSipState(SIPState sipState, boolean notify) throws StorageServiceException {
 		try {
 			storage.createContainer(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_SIP_STATE),
 					new HashMap<String, Set<String>>());
@@ -1476,7 +1485,7 @@ public class ModelService extends ModelObservable {
 		}
 	}
 
-	public void addSipState(SIPState sipState) throws StorageServiceException{
+	public void addSipState(SIPState sipState) throws StorageServiceException {
 		addSipState(sipState, true);
 	}
 

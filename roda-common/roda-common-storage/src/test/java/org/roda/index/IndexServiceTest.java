@@ -542,4 +542,11 @@ public class IndexServiceTest {
 		assertEquals(count, 10L);
 
 	}
+	
+	private void createLogActionDirectory() {
+		try {
+			Files.createDirectories(logPath);
+		} catch (IOException e) {
+		}
+	}
 }

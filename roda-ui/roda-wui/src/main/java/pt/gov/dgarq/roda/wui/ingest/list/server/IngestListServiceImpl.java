@@ -75,6 +75,11 @@ public class IngestListServiceImpl extends RemoteServiceServlet implements Inges
 		// logger.error("Error initializing ingest manager", e);
 		// }
 	}
+	
+	// TODO
+	// count
+	// get
+	// find
 
 	public SIPState getSipState(String sipId) throws RODAException {
 		SIPState ret = null;

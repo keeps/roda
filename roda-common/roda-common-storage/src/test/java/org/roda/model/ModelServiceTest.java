@@ -35,9 +35,9 @@ import org.roda.common.RodaUtils;
 import org.roda.model.utils.ModelUtils;
 import org.roda.storage.Binary;
 import org.roda.storage.DefaultStoragePath;
-import org.roda.storage.StorageServiceException;
 import org.roda.storage.StoragePath;
 import org.roda.storage.StorageService;
+import org.roda.storage.StorageServiceException;
 import org.roda.storage.StorageTestUtils;
 import org.roda.storage.fs.FSUtils;
 import org.roda.storage.fs.FileStorageService;
@@ -80,7 +80,6 @@ public class ModelServiceTest {
 	public static void setUp() throws IOException, StorageServiceException, URISyntaxException, ModelServiceException {
 		basePath = Files.createTempDirectory("modelTests");
 		logPath = basePath.resolve("log");
-		Files.createDirectories(logPath);
 		storage = new FileStorageService(basePath);
 		model = new ModelService(storage);
 
@@ -653,6 +652,9 @@ public class ModelServiceTest {
 
 	@Test
 	public void createLogEntry() throws ModelServiceException {
+		// setup
+		createLogActionDirectory();
+
 		LogEntry entry = new LogEntry();
 		entry.setActionComponent("Action");
 		entry.setActionMethod("Method");
@@ -665,9 +667,9 @@ public class ModelServiceTest {
 		entry.setParameters(parameters);
 		model.addLogEntry(entry, logPath);
 	}
-	
+
 	@Test
-	public void createSIPState() throws ModelServiceException, StorageActionException {
+	public void createSIPState() throws ModelServiceException, StorageServiceException {
 		SIPState state = new SIPState();
 		state.setComplete(true);
 		state.setCompletePercentage(99.9F);
@@ -689,4 +691,10 @@ public class ModelServiceTest {
 		model.addSipState(state);
 	}
 
+	private void createLogActionDirectory() {
+		try {
+			Files.createDirectories(logPath);
+		} catch (IOException e) {
+		}
+	}
 }
