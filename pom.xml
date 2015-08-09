@@ -730,7 +730,7 @@
 				<version>1.0.0</version>
 			</dependency>
 			<dependency>
-				<!-- THE DEPENDENCY THAT FOLLOWS WILL BE REMOVED WHEN UPGRADING FEDORA 
+				<!-- THE DEPENDENCY THAT FOLLOWS WILL BE REMOVED WHEN UPGRADING FEDORA
 					VERSION -->
 				<groupId>pt.gov.dgarq.roda</groupId>
 				<artifactId>fedora-2.2.4-client</artifactId>
@@ -747,14 +747,14 @@
 				<version>${fedora_version}</version>
 			</dependency>
 			<dependency>
-				<!-- THE DEPENDENCY THAT FOLLOWS WILL BE REMOVED WHEN UPGRADING FEDORA 
+				<!-- THE DEPENDENCY THAT FOLLOWS WILL BE REMOVED WHEN UPGRADING FEDORA
 					VERSION -->
 				<groupId>pt.gov.dgarq.roda</groupId>
 				<artifactId>fedora-2.2.4-getNextPIDInfo</artifactId>
 				<version>1.0.0</version>
 			</dependency>
 			<dependency>
-				<!-- THE DEPENDENCY THAT FOLLOWS WILL BE REMOVED WHEN UPGRADING FEDORA 
+				<!-- THE DEPENDENCY THAT FOLLOWS WILL BE REMOVED WHEN UPGRADING FEDORA
 					VERSION -->
 				<groupId>pt.gov.dgarq.roda</groupId>
 				<artifactId>fedora-2.2.4-server</artifactId>
@@ -766,7 +766,7 @@
 				<version>${fedora_version}</version>
 			</dependency>
 			<dependency>
-				<!-- THE DEPENDENCY THAT FOLLOWS WILL BE REMOVED WHEN UPGRADING FEDORA 
+				<!-- THE DEPENDENCY THAT FOLLOWS WILL BE REMOVED WHEN UPGRADING FEDORA
 					VERSION -->
 				<groupId>pt.gov.dgarq.roda</groupId>
 				<artifactId>fedora-2.2.4-xacml</artifactId>
@@ -1056,11 +1056,6 @@
 				</exclusions>
 			</dependency>
 			<dependency>
-			<groupId>org.yaml</groupId>
-			<artifactId>snakeyaml</artifactId>
-			<version>1.15</version>
-		</dependency>
-		<dependency>
 			<groupId>org.yaml</groupId>
 			<artifactId>snakeyaml</artifactId>
 			<version>1.15</version>
