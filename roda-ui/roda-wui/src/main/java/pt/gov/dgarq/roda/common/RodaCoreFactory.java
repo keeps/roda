@@ -6,16 +6,22 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
-import org.roda.index.IndexServiceException;
 import org.roda.index.IndexService;
+import org.roda.index.IndexServiceException;
 import org.roda.model.ModelService;
-import org.roda.storage.StorageServiceException;
+import org.roda.model.ModelServiceException;
 import org.roda.storage.StorageService;
+import org.roda.storage.StorageServiceException;
 import org.roda.storage.fs.FileStorageService;
+
+import pt.gov.dgarq.roda.core.data.v2.SIPReport;
+import pt.gov.dgarq.roda.core.data.v2.SIPStateTransition;
 
 public class RodaCoreFactory {
 	private static final Logger LOGGER = Logger.getLogger(RodaCoreFactory.class);
@@ -47,7 +53,7 @@ public class RodaCoreFactory {
 
 			storagePath = dataPath.resolve("storage");
 			indexPath = dataPath.resolve("index");
-			
+
 			storage = new FileStorageService(storagePath);
 			model = new ModelService(storage);
 
@@ -65,7 +71,7 @@ public class RodaCoreFactory {
 			System.setProperty("solr.data.dir.preservationobject", indexPath.resolve("preservationobject").toString());
 			System.setProperty("solr.data.dir.actionlog", indexPath.resolve("actionlog").toString());
 			System.setProperty("solr.data.dir.sipreport", indexPath.resolve("sipreport").toString());
-			
+
 			// FIXME added missing cores
 
 			// start embedded solr
@@ -78,6 +84,13 @@ public class RodaCoreFactory {
 		} catch (URISyntaxException e) {
 			LOGGER.error(e);
 		}
+		
+		// try {
+		// populateSipReport();
+		// } catch (ModelServiceException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
 	}
 
 	public static StorageService getStorageService() {
@@ -99,7 +112,7 @@ public class RodaCoreFactory {
 	public static Path getDataPath() {
 		return dataPath;
 	}
-	
+
 	public static Path getLogPath() {
 		return logPath;
 	}
@@ -125,6 +138,14 @@ public class RodaCoreFactory {
 			System.err.println("Syntax: [java -jar ...] reindex");
 		}
 		System.exit(0);
+	}
+
+	public static void populateSipReport() throws ModelServiceException {
+		for (int i = 0; i < 100; i++) {
+			model.addSipReport(new SIPReport(UUID.randomUUID().toString(), "admin", "SIP_" + (i + 1) + ".sip",
+					"authorized", new SIPStateTransition[] {}, false, 0.1f * (i % 10), "AIP_" + i, "AIP_" + i,
+					new Date(), true));
+		}
 	}
 
 }

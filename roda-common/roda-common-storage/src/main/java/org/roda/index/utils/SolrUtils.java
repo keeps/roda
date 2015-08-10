@@ -44,8 +44,8 @@ import org.roda.model.DescriptiveMetadata;
 import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
 import org.roda.storage.Binary;
-import org.roda.storage.StorageServiceException;
 import org.roda.storage.StoragePath;
+import org.roda.storage.StorageServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,12 +68,12 @@ import pt.gov.dgarq.roda.core.data.v2.Representation;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationFilePreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationPreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationState;
+import pt.gov.dgarq.roda.core.data.v2.SIPReport;
+import pt.gov.dgarq.roda.core.data.v2.SIPStateTransition;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.core.data.v2.SimpleEventPreservationMetadata;
 import pt.gov.dgarq.roda.core.data.v2.SimpleRepresentationFilePreservationMetadata;
 import pt.gov.dgarq.roda.core.data.v2.SimpleRepresentationPreservationMetadata;
-import pt.gov.dgarq.roda.core.data.v2.SIPReport;
-import pt.gov.dgarq.roda.core.data.v2.SIPStateTransition;
 
 /**
  * Utilities class related to Apache Solr
@@ -883,17 +883,17 @@ public class SolrUtils {
 		return doc;
 	}
 	private static SIPReport solrDocumentToSipState(SolrDocument doc) {
-		final String id = objectToString(doc.get(RodaConstants.SIPSTATE_ID));
-		final String username = objectToString(doc.get(RodaConstants.SIPSTATE_USERNAME));
-		final String originalFilename = objectToString(doc.get(RodaConstants.SIPSTATE_ORIGINAL_FILENAME));
-		final String state = objectToString(doc.get(RodaConstants.SIPSTATE_STATE));
-		final Date dateTime = objectToDate(doc.get(RodaConstants.SIPSTATE_DATETIME));
-		final boolean processing = objectToBoolean(doc.get(RodaConstants.SIPSTATE_PROCESSING));
-		final boolean complete = objectToBoolean(doc.get(RodaConstants.SIPSTATE_COMPLETE));
-		final float completePercentage = objectToFloat(doc.get(RodaConstants.SIPSTATE_COMPLETE_PERCENTAGE));
-		final String parentPID = objectToString(doc.get(RodaConstants.SIPSTATE_PARENT_PID));
-		final String ingestedPID = objectToString(doc.get(RodaConstants.SIPSTATE_INGESTED_PID));
-		final String fileID = objectToString(doc.get(RodaConstants.SIPSTATE_FILE_ID));
+		final String id = objectToString(doc.get(RodaConstants.SIP_REPORT_ID));
+		final String username = objectToString(doc.get(RodaConstants.SIP_REPORT_USERNAME));
+		final String originalFilename = objectToString(doc.get(RodaConstants.SIP_REPORT_ORIGINAL_FILENAME));
+		final String state = objectToString(doc.get(RodaConstants.SIP_REPORT_STATE));
+		final Date dateTime = objectToDate(doc.get(RodaConstants.SIP_REPORT_DATETIME));
+		final boolean processing = objectToBoolean(doc.get(RodaConstants.SIP_REPORT_PROCESSING));
+		final boolean complete = objectToBoolean(doc.get(RodaConstants.SIP_REPORT_COMPLETE));
+		final float completePercentage = objectToFloat(doc.get(RodaConstants.SIP_REPORT_COMPLETE_PERCENTAGE));
+		final String parentPID = objectToString(doc.get(RodaConstants.SIP_REPORT_PARENT_PID));
+		final String ingestedPID = objectToString(doc.get(RodaConstants.SIP_REPORT_INGESTED_PID));
+		final String fileID = objectToString(doc.get(RodaConstants.SIP_REPORT_FILE_ID));
 		List<SIPStateTransition> ssts = new ArrayList<SIPStateTransition>();
 		/*if(doc.getChildDocumentCount()>0){
 			for(SolrDocument child : doc.getChildDocuments()){
@@ -925,19 +925,19 @@ public class SolrUtils {
 		sipState.setStateTransitions(ssts.toArray(new SIPStateTransition[ssts.size()]));
 		return sipState;
 	}
-	public static SolrInputDocument sipStateToSolrDocument(SIPReport sipState) {
+	public static SolrInputDocument sipReportToSolrDocument(SIPReport sipState) {
 		SolrInputDocument doc = new SolrInputDocument();
-		doc.addField(RodaConstants.SIPSTATE_COMPLETE, sipState.isComplete());
-		doc.addField(RodaConstants.SIPSTATE_COMPLETE_PERCENTAGE, sipState.getCompletePercentage());
-		doc.addField(RodaConstants.SIPSTATE_DATETIME, sipState.getDatetime());
-		doc.addField(RodaConstants.SIPSTATE_FILE_ID, sipState.getFileID());
-		doc.addField(RodaConstants.SIPSTATE_ID, sipState.getId());
-		doc.addField(RodaConstants.SIPSTATE_INGESTED_PID, sipState.getIngestedID());
-		doc.addField(RodaConstants.SIPSTATE_ORIGINAL_FILENAME, sipState.getOriginalFilename());
-		doc.addField(RodaConstants.SIPSTATE_PARENT_PID, sipState.getParentID());
-		doc.addField(RodaConstants.SIPSTATE_PROCESSING, sipState.isProcessing());
-		doc.addField(RodaConstants.SIPSTATE_STATE, sipState.getState());
-		doc.addField(RodaConstants.SIPSTATE_USERNAME, sipState.getUsername());
+		doc.addField(RodaConstants.SIP_REPORT_COMPLETE, sipState.isComplete());
+		doc.addField(RodaConstants.SIP_REPORT_COMPLETE_PERCENTAGE, sipState.getCompletePercentage());
+		doc.addField(RodaConstants.SIP_REPORT_DATETIME, sipState.getDatetime());
+		doc.addField(RodaConstants.SIP_REPORT_FILE_ID, sipState.getFileID());
+		doc.addField(RodaConstants.SIP_REPORT_ID, sipState.getId());
+		doc.addField(RodaConstants.SIP_REPORT_INGESTED_PID, sipState.getIngestedID());
+		doc.addField(RodaConstants.SIP_REPORT_ORIGINAL_FILENAME, sipState.getOriginalFilename());
+		doc.addField(RodaConstants.SIP_REPORT_PARENT_PID, sipState.getParentID());
+		doc.addField(RodaConstants.SIP_REPORT_PROCESSING, sipState.isProcessing());
+		doc.addField(RodaConstants.SIP_REPORT_STATE, sipState.getState());
+		doc.addField(RodaConstants.SIP_REPORT_USERNAME, sipState.getUsername());
 		/*if(sipState.getStateTransitions()!=null && sipState.getStateTransitions().length>0){
 			for(SIPStateTransition sst : sipState.getStateTransitions()){
 				SolrInputDocument sstSolrDoc = new SolrInputDocument();

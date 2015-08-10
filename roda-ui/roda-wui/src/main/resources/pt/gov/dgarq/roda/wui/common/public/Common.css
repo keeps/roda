@@ -111,6 +111,24 @@ h3, .h3 {
 	content: "\f019";
 }
 
+.btn-download:after {
+	content: "\f019";
+}
+
+.btn-check:after {
+	content: "\f05d";
+}
+
+.btn-ban:after {
+	content: "\f05e";
+}
+
+.btn-th-list:after {
+	content: "\f00b";
+}
+
+
+
 .com-google-gwt-user-cellview-client-CellTable-Style-cellTableHeader {
 	white-space: nowrap;
 	font-family: 'Ubuntu', sans-serif;
@@ -144,6 +162,10 @@ h3, .h3 {
 	bottom: 3px;
 }
 
+.nowrap {
+	white-space: nowrap;
+}
+
 /** Collections list and My Async Datagrid  **/
 .my-collections-table .com-google-gwt-user-cellview-client-CellTable-Style-cellTableCell
 	{
@@ -159,6 +181,10 @@ h3, .h3 {
 .my-collections-table-cell-link * {
 	text-decoration: underline;
 	color: #089de3;
+}
+
+.my-collections-table-cell-alignright * {
+	text-align: right;
 }
 
 

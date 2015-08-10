@@ -24,7 +24,7 @@ import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
-import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -78,11 +78,6 @@ public class ModelServiceTest {
 
 	@BeforeClass
 	public static void setUp() throws IOException, StorageServiceException, URISyntaxException, ModelServiceException {
-		basePath = Files.createTempDirectory("modelTests");
-		logPath = basePath.resolve("log");
-		storage = new FileStorageService(basePath);
-		model = new ModelService(storage);
-
 		URL corporaURL = ModelServiceTest.class.getResource("/corpora");
 		corporaPath = Paths.get(corporaURL.toURI());
 		corporaService = new FileStorageService(corporaPath);
@@ -90,16 +85,17 @@ public class ModelServiceTest {
 		logger.debug("Running model test under storage: " + basePath);
 	}
 
-	@AfterClass
-	public static void tearDown() throws StorageServiceException {
-		// FSUtils.deletePath(basePath);
+	@Before
+	public void init() throws IOException, StorageServiceException {
+		basePath = Files.createTempDirectory("modelTests");
+		logPath = basePath.resolve("log");
+		storage = new FileStorageService(basePath);
+		model = new ModelService(storage);
 	}
 
 	@After
 	public void cleanup() throws IOException, StorageServiceException {
-		tearDown();
-		// re-create directory
-		Files.createDirectory(basePath);
+		FSUtils.deletePath(basePath);
 	}
 
 	@Test
@@ -322,7 +318,6 @@ public class ModelServiceTest {
 					DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 			fail("AIP shouldn't have been created and yet it was.");
 		} catch (ModelServiceException e) {
-			e.printStackTrace();
 			assertEquals(ModelServiceException.ALREADY_EXISTS, e.getCode());
 		}
 	}
@@ -643,7 +638,10 @@ public class ModelServiceTest {
 	@Test
 	public void getAgentPreservationObject() throws ModelServiceException, StorageServiceException {
 		// pre-load the preservation container data
-		storage.copy(corporaService, DefaultStoragePath.parse(CorporaConstants.SOURCE_PRESERVATION_CONTAINER),
+		DefaultStoragePath preservationContainerPath = DefaultStoragePath
+				.parse(CorporaConstants.SOURCE_PRESERVATION_CONTAINER);
+		storage.deleteContainer(preservationContainerPath);
+		storage.copy(corporaService, preservationContainerPath,
 				DefaultStoragePath.parse(CorporaConstants.SOURCE_PRESERVATION_CONTAINER));
 		AgentPreservationObject apo = model.getAgentPreservationObject(CorporaConstants.AGENT_RODA_8_PREMIS_XML);
 		assertEquals(apo.getAgentType(), CorporaConstants.SOFTWARE_INGEST_TASK);
@@ -688,7 +686,7 @@ public class ModelServiceTest {
 		stateTransitions[1] = st2;
 		state.setStateTransitions(stateTransitions);
 		state.setUsername("Username");
-		model.addSipState(state);
+		model.addSipReport(state);
 	}
 
 	private void createLogActionDirectory() {

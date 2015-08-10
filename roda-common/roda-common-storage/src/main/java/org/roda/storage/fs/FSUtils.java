@@ -244,7 +244,8 @@ public final class FSUtils {
 			throws StorageServiceException {
 		ClosableIterable<Resource> resourceIterable;
 		try {
-			final DirectoryStream<Path> directoryStream = Files.newDirectoryStream(path, FSYamlMetadataUtils.PATH_FILTER);
+			final DirectoryStream<Path> directoryStream = Files.newDirectoryStream(path,
+					FSYamlMetadataUtils.PATH_FILTER);
 			final Iterator<Path> pathIterator = directoryStream.iterator();
 			resourceIterable = new ClosableIterable<Resource>() {
 
@@ -281,6 +282,9 @@ public final class FSUtils {
 				}
 			};
 
+		} catch (NoSuchFileException e) {
+			throw new StorageServiceException("Could not list contents of entity because it doesn't exist: " + path,
+					StorageServiceException.NOT_FOUND, e);
 		} catch (IOException e) {
 			throw new StorageServiceException("Could not list contents of entity at: " + path,
 					StorageServiceException.INTERNAL_SERVER_ERROR, e);
@@ -295,11 +299,11 @@ public final class FSUtils {
 	 * @param basePath
 	 *            base path
 	 */
-	public static ClosableIterable<Container> listContainers(final Path basePath)
-			throws StorageServiceException {
+	public static ClosableIterable<Container> listContainers(final Path basePath) throws StorageServiceException {
 		ClosableIterable<Container> containerIterable;
 		try {
-			final DirectoryStream<Path> directoryStream = Files.newDirectoryStream(basePath, FSYamlMetadataUtils.PATH_FILTER);
+			final DirectoryStream<Path> directoryStream = Files.newDirectoryStream(basePath,
+					FSYamlMetadataUtils.PATH_FILTER);
 			final Iterator<Path> pathIterator = directoryStream.iterator();
 			containerIterable = new ClosableIterable<Container>() {
 
@@ -353,7 +357,7 @@ public final class FSUtils {
 	 */
 	public static Resource convertPathToResource(Path basePath, Path path) throws StorageServiceException {
 		Resource resource;
-		
+
 		// TODO support binary reference
 
 		if (!Files.exists(path)) {

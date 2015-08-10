@@ -81,7 +81,6 @@ public class UploadSIP {
 			actionLayout = new HorizontalPanel();
 
 			submitButton = new Button(constants.uploadSubmitButton());
-			
 
 			submitButton.addClickListener(new ClickListener() {
 
@@ -192,10 +191,11 @@ public class UploadSIP {
 						updateVisibles();
 
 						// Initialize ingest list
-						IngestList.getInstance().init();
+						// IngestList.getInstance().init();
 
 						// Set processing state filter
-						IngestList.getInstance().setStateFilter(IngestList.StateFilter.PROCESSING);
+						// FIXME
+						// IngestList.getInstance().setStateFilter(IngestList.StateFilter.PROCESSING);
 
 						// Update ingest list
 						IngestList.getInstance().update();

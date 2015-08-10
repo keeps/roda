@@ -30,9 +30,9 @@ import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
 import org.roda.model.ModelServiceTest;
 import org.roda.storage.DefaultStoragePath;
-import org.roda.storage.StorageServiceException;
 import org.roda.storage.StoragePath;
 import org.roda.storage.StorageService;
+import org.roda.storage.StorageServiceException;
 import org.roda.storage.fs.FSUtils;
 import org.roda.storage.fs.FileStorageService;
 import org.slf4j.Logger;
@@ -365,7 +365,7 @@ public class IndexServiceTest {
 	public void testGetLogEntriesCount() throws IndexServiceException, ModelServiceException {
 		// cleaning up action log entries on index (if any)
 		index.deleteAllActionLog();
-		
+
 		LogEntry entry = new LogEntry();
 		entry.setActionComponent("Action");
 		entry.setActionMethod("Method");
@@ -420,10 +420,9 @@ public class IndexServiceTest {
 		IndexResult<LogEntry> entries2 = index.findLogEntry(filterDescription2, null, new Sublist());
 		assertEquals(entries2.getTotalCount(), 0);
 	}
-	
-	
-	@Test 
-	public void testGetSIPStatesCount() throws StorageServiceException, IndexServiceException {
+
+	@Test
+	public void testGetSIPStatesCount() throws ModelServiceException, IndexServiceException {
 		SIPReport state = new SIPReport();
 		state.setComplete(true);
 		state.setCompletePercentage(99.9F);
@@ -442,22 +441,22 @@ public class IndexServiceTest {
 		stateTransitions[1] = st2;
 		state.setStateTransitions(stateTransitions);
 		state.setUsername("Username");
-		
-		model.addSipState(state);
+
+		model.addSipReport(state);
 
 		Filter filterFileName = new Filter();
-		filterFileName.add(new SimpleFilterParameter(RodaConstants.SIPSTATE_ORIGINAL_FILENAME, "Filename"));
+		filterFileName.add(new SimpleFilterParameter(RodaConstants.SIP_REPORT_ORIGINAL_FILENAME, "Filename"));
 		Long n = 1L;
 		assertEquals(index.countSipReports(filterFileName), n);
 
 		Filter filterFileName2 = new Filter();
-		filterFileName2.add(new SimpleFilterParameter(RodaConstants.SIPSTATE_ORIGINAL_FILENAME, "Filename2"));
+		filterFileName2.add(new SimpleFilterParameter(RodaConstants.SIP_REPORT_ORIGINAL_FILENAME, "Filename2"));
 		Long n2 = 0L;
 		assertEquals(index.countSipReports(filterFileName2), n2);
 	}
 
 	@Test
-	public void testFindSipState() throws StorageServiceException, IndexServiceException {
+	public void testFindSipState() throws IndexServiceException, ModelServiceException {
 		SIPReport state = new SIPReport();
 		state.setComplete(true);
 		state.setCompletePercentage(99.9F);
@@ -476,20 +475,21 @@ public class IndexServiceTest {
 		stateTransitions[1] = st2;
 		state.setStateTransitions(stateTransitions);
 		state.setUsername("Username");
-		model.addSipState(state);
+		model.addSipReport(state);
 
 		Filter filterFileName = new Filter();
-		filterFileName.add(new SimpleFilterParameter(RodaConstants.SIPSTATE_ORIGINAL_FILENAME, "Filename"));
+		filterFileName.add(new SimpleFilterParameter(RodaConstants.SIP_REPORT_ORIGINAL_FILENAME, "Filename"));
 
 		IndexResult<SIPReport> states = index.findSipReports(filterFileName, null, new Sublist());
 		assertEquals(states.getTotalCount(), 1);
 		assertEquals(states.getResults().get(0).getIngestedID(), "INGESTED");
-		//assertEquals(states.getResults().get(0).getStateTransitions()[0].getFromState(), "A");
-		//assertEquals(states.getResults().get(0).getStateTransitions()[1].getFromState(), "B");
-		
+		// assertEquals(states.getResults().get(0).getStateTransitions()[0].getFromState(),
+		// "A");
+		// assertEquals(states.getResults().get(0).getStateTransitions()[1].getFromState(),
+		// "B");
 
 		Filter filterFileName2 = new Filter();
-		filterFileName2.add(new SimpleFilterParameter(RodaConstants.SIPSTATE_ORIGINAL_FILENAME, "Filename2"));
+		filterFileName2.add(new SimpleFilterParameter(RodaConstants.SIP_REPORT_ORIGINAL_FILENAME, "Filename2"));
 
 		IndexResult<SIPReport> states2 = index.findSipReports(filterFileName2, null, new Sublist());
 		assertEquals(states2.getTotalCount(), 0);
@@ -498,7 +498,7 @@ public class IndexServiceTest {
 	@Test
 	public void testReindexLogEntry() throws StorageServiceException, ModelServiceException, IndexServiceException {
 		Long number = 10L;
-		
+
 		for (int i = 0; i < number; i++) {
 			LogEntry entry = new LogEntry();
 			entry.setId("ID" + i);
@@ -542,11 +542,5 @@ public class IndexServiceTest {
 		assertEquals(count, 10L);
 
 	}
-	
-	private void createLogActionDirectory() {
-		try {
-			Files.createDirectories(logPath);
-		} catch (IOException e) {
-		}
-	}
+
 }

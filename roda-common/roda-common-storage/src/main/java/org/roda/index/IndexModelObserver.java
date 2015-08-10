@@ -213,7 +213,6 @@ public class IndexModelObserver implements ModelObserver {
 			LOGGER.error(
 					"Error deleting representation (aipId=" + aipId + "; representationId=" + representationId + ")");
 		}
-
 	}
 
 	@Override
@@ -244,15 +243,31 @@ public class IndexModelObserver implements ModelObserver {
 			LOGGER.error("Could not index LogEntry: " + e.getMessage(), e);
 		}
 	}
-	
+
 	@Override
-	public void sipStateCreated(SIPReport entry) {
-		SolrInputDocument sipStateDocument = SolrUtils.sipStateToSolrDocument(entry);
+	public void sipReportCreated(SIPReport sipReport) {
+		SolrInputDocument sipReportDocument = SolrUtils.sipReportToSolrDocument(sipReport);
 		try {
-			index.add(RodaConstants.INDEX_SIP_REPORT, sipStateDocument);
+			index.add(RodaConstants.INDEX_SIP_REPORT, sipReportDocument);
 			index.commit(RodaConstants.INDEX_SIP_REPORT);
 		} catch (SolrServerException | IOException e) {
 			LOGGER.error("Could not index SIPState: " + e.getMessage(), e);
+		}
+	}
+
+	@Override
+	public void sipReportUpdated(SIPReport sipReport) {
+		sipReportDeleted(sipReport.getId());
+		sipReportCreated(sipReport);
+	}
+
+	@Override
+	public void sipReportDeleted(String sipReportId) {
+		try {
+			index.deleteById(RodaConstants.INDEX_SIP_REPORT, sipReportId);
+			index.commit(RodaConstants.INDEX_REPRESENTATIONS);
+		} catch (SolrServerException | IOException e) {
+			LOGGER.error("Error deleting SIP report (id=" + sipReportId + ")");
 		}
 	}
 }

@@ -948,12 +948,12 @@ public class ModelService extends ModelObservable {
 
 			try {
 				// obtain descriptive metadata information
-				List<String> descriptiveMetadataBinaryIds = ModelUtils.getIds(storage,
-						ModelUtils.getDescriptiveMetadataPath(storagePath.getName()));
+				List<String> descriptiveMetadataBinaryIds = ModelUtils.getChildIds(storage,
+						ModelUtils.getDescriptiveMetadataPath(storagePath.getName()), false);
 
 				// obtain representations information
-				List<String> representationIds = ModelUtils.getIds(storage,
-						ModelUtils.getRepresentationsPath(storagePath.getName()));
+				List<String> representationIds = ModelUtils.getChildIds(storage,
+						ModelUtils.getRepresentationsPath(storagePath.getName()), false);
 
 				// obtain preservation information
 				final Map<String, List<String>> preservationRepresentationObjects = new HashMap<String, List<String>>();
@@ -1015,14 +1015,16 @@ public class ModelService extends ModelObservable {
 
 	private void retrieveAIPPreservationInformation(StoragePath storagePath, List<String> representationIds,
 			final Map<String, List<String>> preservationRepresentationObjects,
-			final Map<String, List<String>> preservationFileObjects,
-			final Map<String, List<String>> preservationEvents) {
+			final Map<String, List<String>> preservationFileObjects, final Map<String, List<String>> preservationEvents)
+					throws ModelServiceException {
 		for (String representationID : representationIds) {
 			try {
 				StoragePath representationPreservationPath = ModelUtils.getPreservationPath(storagePath.getName(),
 						representationID);
+
 				// obtain list of preservation related files
-				List<String> preservationFileIds = ModelUtils.getIds(storage, representationPreservationPath);
+				List<String> preservationFileIds = ModelUtils.getChildIds(storage, representationPreservationPath,
+						false);
 
 				final List<String> preservationRepresentationObjectFileIds = new ArrayList<String>();
 				final List<String> preservationFileObjectFileIds = new ArrayList<String>();
@@ -1050,6 +1052,7 @@ public class ModelService extends ModelObservable {
 				preservationEvents.put(representationID, preservationEventFileIds);
 			} catch (StorageServiceException e) {
 				LOGGER.error("Error while obtaining preservation related binaries", e);
+				throw new ModelServiceException("Error while obtaining preservation related binaries", e.getCode(), e);
 			}
 		}
 	}
@@ -1079,12 +1082,7 @@ public class ModelService extends ModelObservable {
 			Date dateModified = ModelUtils.getDate(directoryMetadata, RodaConstants.STORAGE_META_DATE_MODIFIED);
 			Set<RepresentationState> statuses = ModelUtils.getStatuses(directoryMetadata);
 			String type = ModelUtils.getString(directoryMetadata, RodaConstants.STORAGE_META_TYPE);
-			List<String> fileIds = new ArrayList<String>();
-			try {
-				fileIds = ModelUtils.getIds(storage, resource.getStoragePath());
-			} catch (StorageServiceException e) {
-				LOGGER.error("Error while obtainting file IDs from " + directoryPath.asString());
-			}
+			List<String> fileIds = ModelUtils.getChildIds(storage, resource.getStoragePath(), true);
 
 			if (active == null) {
 				// when not stated, considering active=false
@@ -1166,7 +1164,8 @@ public class ModelService extends ModelObservable {
 				Boolean active = ModelUtils.getBoolean(directoryMetadata, RodaConstants.STORAGE_META_ACTIVE);
 				// Date dateCreated = ModelUtils.getDate(directoryMetadata,
 				// RodaConstants.STORAGE_META_DATE_CREATED);
-				// Date dateModified = ModelUtils.getDate(directoryMetadata, RodaConstants.STORAGE_META_DATE_MODIFIED);
+				// Date dateModified = ModelUtils.getDate(directoryMetadata,
+				// RodaConstants.STORAGE_META_DATE_MODIFIED);
 
 				if (active == null) {
 					// when not stated, considering active=false
@@ -1459,28 +1458,35 @@ public class ModelService extends ModelObservable {
 		}
 	}
 
-	public void addSipState(SIPReport sipState, boolean notify) throws StorageServiceException {
+	public void addSipReport(SIPReport sipReport, boolean notify) throws ModelServiceException {
+
+		StoragePath sipStatePath;
 		try {
-			StoragePath sipStatePath = ModelUtils.getSipStatePath(sipState);
-			sipState.setFileID(sipStatePath.getName());
+			sipStatePath = DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_SIP_REPORT, sipReport.getId());
+			sipReport.setFileID(sipStatePath.getName());
 
 			StringWriter sw = new StringWriter();
 			JAXBContext jc = JAXBContext.newInstance(SIPReport.class);
 			Marshaller marshaller = jc.createMarshaller();
 			marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
-			marshaller.marshal(sipState, sw);
+			marshaller.marshal(sipReport, sw);
 			storage.updateBinaryContent(sipStatePath, new XMLContentPayload(sw.toString()), false, true);
 			if (notify) {
-				notifySipStateCreated(sipState);
+				notifySipStateCreated(sipReport);
 			}
-		} catch (JAXBException je) {
-			throw new StorageServiceException("Error adding SIP State to storage: " + je.getMessage(),
-					ModelServiceException.INTERNAL_SERVER_ERROR);
+		} catch (StorageServiceException e) {
+			throw new ModelServiceException("Error adding SIP State to storage", e.getCode(), e);
+		} catch (JAXBException e) {
+			throw new ModelServiceException("Error adding SIP State to storage",
+					ModelServiceException.INTERNAL_SERVER_ERROR, e);
 		}
+
 	}
 
-	public void addSipState(SIPReport sipState) throws StorageServiceException {
-		addSipState(sipState, true);
+	public void addSipReport(SIPReport sipReport) throws ModelServiceException {
+		addSipReport(sipReport, true);
 	}
+
+	
 
 }

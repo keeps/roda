@@ -109,7 +109,7 @@ public abstract class ModelObservable {
 	
 	protected void notifySipStateCreated(SIPReport state){
 		for (ModelObserver observer : observers) {
-			observer.sipStateCreated(state);
+			observer.sipReportCreated(state);
 		}
 	}
 

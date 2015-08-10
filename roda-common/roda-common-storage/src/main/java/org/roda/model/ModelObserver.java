@@ -12,14 +12,11 @@ public interface ModelObserver {
 
 	public void aipDeleted(String aipId);
 
-	public void descriptiveMetadataCreated(
-			DescriptiveMetadata descriptiveMetadataBinary);
+	public void descriptiveMetadataCreated(DescriptiveMetadata descriptiveMetadataBinary);
 
-	public void descriptiveMetadataUpdated(
-			DescriptiveMetadata descriptiveMetadataBinary);
+	public void descriptiveMetadataUpdated(DescriptiveMetadata descriptiveMetadataBinary);
 
-	public void descriptiveMetadataDeleted(String aipId,
-			String descriptiveMetadataBinaryId);
+	public void descriptiveMetadataDeleted(String aipId, String descriptiveMetadataBinaryId);
 
 	public void representationCreated(Representation representation);
 
@@ -32,9 +29,13 @@ public interface ModelObserver {
 	public void fileUpdated(File file);
 
 	public void fileDeleted(String aipId, String representationId, String fileId);
-	
+
 	public void logEntryCreated(LogEntry entry);
-	
-	public void sipStateCreated(SIPReport state);
+
+	public void sipReportCreated(SIPReport sipReport);
+
+	public void sipReportUpdated(SIPReport sipReport);
+
+	public void sipReportDeleted(String sipReportId);
 
 }

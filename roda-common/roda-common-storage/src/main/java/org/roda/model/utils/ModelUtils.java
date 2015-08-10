@@ -2,7 +2,6 @@ package org.roda.model.utils;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.text.ParseException;
@@ -16,7 +15,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.roda.common.RodaUtils;
 import org.roda.model.FileFormat;
@@ -25,9 +23,9 @@ import org.roda.storage.Binary;
 import org.roda.storage.ClosableIterable;
 import org.roda.storage.DefaultStoragePath;
 import org.roda.storage.Resource;
-import org.roda.storage.StorageServiceException;
 import org.roda.storage.StoragePath;
 import org.roda.storage.StorageService;
+import org.roda.storage.StorageServiceException;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -177,24 +175,36 @@ public final class ModelUtils {
 	 *            the storage service containing the parent resource
 	 * @param path
 	 *            the storage path for the parent resource
+	 * @throws ModelServiceException
 	 */
-	public static List<String> getIds(StorageService storage, StoragePath path) throws StorageServiceException {
+	public static List<String> getChildIds(StorageService storage, StoragePath path, boolean failIfParentDoesNotExist)
+			throws ModelServiceException {
 		List<String> ids = new ArrayList<String>();
-		ClosableIterable<Resource> iterable = storage.listResourcesUnderDirectory(path);
-		Iterator<Resource> it = iterable.iterator();
-		while (it.hasNext()) {
-			Resource next = it.next();
-			if (next != null) {
-				StoragePath storagePath = next.getStoragePath();
-				ids.add(storagePath.getName());
-			} else {
-				LOGGER.error("Error while getting IDs for path " + path.asString());
+		ClosableIterable<Resource> iterable = null;
+		try {
+			iterable = storage.listResourcesUnderDirectory(path);
+			Iterator<Resource> it = iterable.iterator();
+			while (it.hasNext()) {
+				Resource next = it.next();
+				if (next != null) {
+					StoragePath storagePath = next.getStoragePath();
+					ids.add(storagePath.getName());
+				} else {
+					LOGGER.error("Error while getting IDs for path " + path.asString());
+				}
+			}
+		} catch (StorageServiceException e) {
+			if (e.getCode() != StorageServiceException.NOT_FOUND || failIfParentDoesNotExist) {
+				throw new ModelServiceException("Could not get ids", e.getCode(), e);
 			}
 		}
-		try {
-			iterable.close();
-		} catch (IOException e) {
-			// at the very best, log this information
+
+		if (iterable != null) {
+			try {
+				iterable.close();
+			} catch (IOException e) {
+				LOGGER.warn("Error closing iterator on getIds()", e);
+			}
 		}
 
 		return ids;
@@ -323,7 +333,8 @@ public final class ModelUtils {
 		}
 	}
 
-	public static StoragePath getPreservationPath(String aipId, String representationID) throws StorageServiceException {
+	public static StoragePath getPreservationPath(String aipId, String representationID)
+			throws StorageServiceException {
 		return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
 				RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION,
 				representationID);
@@ -386,7 +397,7 @@ public final class ModelUtils {
 
 	public static void writeLogEntryToFile(LogEntry logEntry, Path logFile) throws ModelServiceException {
 		try {
-			String entryJSON = ModelUtils.getJsonLogEntry(logEntry)+"\n";
+			String entryJSON = ModelUtils.getJsonLogEntry(logEntry) + "\n";
 			Files.write(logFile, entryJSON.getBytes(), StandardOpenOption.APPEND);
 		} catch (IOException e) {
 			throw new ModelServiceException("Error writing log entry to file",
@@ -417,7 +428,7 @@ public final class ModelUtils {
 		}
 		return ret;
 	}
-	
+
 	public static String getJsonSipState(SIPReport sipState) {
 		try {
 			JsonFactory factory = new JsonFactory();
@@ -440,7 +451,4 @@ public final class ModelUtils {
 		return null;
 	}
 
-	public static StoragePath getSipStatePath(SIPReport sipState) throws StorageServiceException {
-		return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_SIP_REPORT,sipState.getId());
-	}
 }

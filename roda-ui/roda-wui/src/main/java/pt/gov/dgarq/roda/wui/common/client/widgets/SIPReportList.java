@@ -5,7 +5,7 @@ import java.util.Date;
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
+import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
@@ -15,6 +15,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.view.client.ProvidesKey;
 
 import config.i18n.client.IngestListConstants;
+import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
@@ -59,7 +60,7 @@ public class SIPReportList extends AsyncTableCell<SIPReport> {
 		};
 
 		submissionDateColumn = new Column<SIPReport, Date>(
-				new DateCell(DateTimeFormat.getFormat(PredefinedFormat.DATE_MEDIUM))) {
+				new DateCell(DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss.SSS"))) {
 			@Override
 			public Date getValue(SIPReport sip) {
 				return sip != null ? sip.getDatetime() : null;
@@ -76,7 +77,7 @@ public class SIPReportList extends AsyncTableCell<SIPReport> {
 
 			@Override
 			public String getValue(SIPReport sip) {
-				return sip != null ? sip.getCompletePercentage() + "%" : null;
+				return sip != null ? NumberFormat.getPercentFormat().format(sip.getCompletePercentage()) : null;
 			}
 		};
 		producerColumn = new TextColumn<SIPReport>() {
@@ -90,6 +91,9 @@ public class SIPReportList extends AsyncTableCell<SIPReport> {
 		idColumn.setSortable(true);
 		originalFilenameColumn.setSortable(true);
 		submissionDateColumn.setSortable(true);
+		currentStateColumn.setSortable(true);
+		percentageColumn.setSortable(true);
+		producerColumn.setSortable(true);
 
 		// TODO externalize strings into constants
 		getDisplay().addColumn(idColumn, "Id");
@@ -107,6 +111,13 @@ public class SIPReportList extends AsyncTableCell<SIPReport> {
 		addStyleName("my-list-SIPReport");
 		emptyInfo.addStyleName("my-list-SIPReport-empty-info");
 
+		idColumn.setCellStyleNames("nowrap");
+
+		submissionDateColumn.setCellStyleNames("nowrap my-collections-table-cell-alignright");
+		currentStateColumn.setCellStyleNames("nowrap my-collections-table-cell-alignright");
+		percentageColumn.setCellStyleNames("nowrap my-collections-table-cell-alignright");
+		producerColumn.setCellStyleNames("nowrap my-collections-table-cell-alignright");
+
 	}
 
 	@Override
@@ -121,17 +132,17 @@ public class SIPReportList extends AsyncTableCell<SIPReport> {
 			ColumnSortInfo columnSortInfo = columnSortList.get(i);
 			String sortParameterKey;
 			if (columnSortInfo.getColumn().equals(idColumn)) {
-				sortParameterKey = "id"; // RodaConstants.SIP_ID;
+				sortParameterKey = RodaConstants.SIP_REPORT_ID;
 			} else if (columnSortInfo.getColumn().equals(originalFilenameColumn)) {
-				sortParameterKey = "originalFilename";
+				sortParameterKey = RodaConstants.SIP_REPORT_ORIGINAL_FILENAME;
 			} else if (columnSortInfo.getColumn().equals(submissionDateColumn)) {
-				sortParameterKey = "datetime";
+				sortParameterKey = RodaConstants.SIP_REPORT_DATETIME;
 			} else if (columnSortInfo.getColumn().equals(currentStateColumn)) {
-				sortParameterKey = "state";
+				sortParameterKey = RodaConstants.SIP_REPORT_STATE;
 			} else if (columnSortInfo.getColumn().equals(percentageColumn)) {
-				sortParameterKey = "completePercentage";
+				sortParameterKey = RodaConstants.SIP_REPORT_COMPLETE_PERCENTAGE;
 			} else if (columnSortInfo.getColumn().equals(producerColumn)) {
-				sortParameterKey = "username";
+				sortParameterKey = RodaConstants.SIP_REPORT_USERNAME;
 			} else {
 				sortParameterKey = null;
 			}
