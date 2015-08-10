@@ -173,23 +173,7 @@ public class UserLogin {
 	 * @param callback
 	 */
 	public void login() {
-		userLoginService.getRodaCasURL(new AsyncCallback<String>() {
-
-			@Override
-			public void onSuccess(String result) {
-
-				final String casURL = result;
-				StringBuilder forwardURL = new StringBuilder();
-				forwardURL.append(casURL).append("/login?locale=").append(constants.locale()).append("&service=")
-						.append(Window.Location.getHref());
-				Window.open(forwardURL.toString(), "_self", "");
-			}
-
-			@Override
-			public void onFailure(Throwable caught) {
-				logger.fatal("Error with CAS URL", caught);
-			}
-		});
+		Window.open("/login", "_self", "");
 	}
 
 	/**
@@ -197,72 +181,7 @@ public class UserLogin {
 	 * @param callback
 	 */
 	public void logout(final AsyncCallback<AuthenticatedUser> callback) {
-		History.newItem("");
-		Timer t = new Timer() {
-			public void run() {
-				userLoginService.logout(new AsyncCallback<AuthenticatedUser>() {
-
-					public void onFailure(Throwable caught) {
-						logger.error(caught.getMessage(), caught);
-						if (caught instanceof LoginException) {
-							Window.alert(messages.loginFailed(caught.getMessage()));
-						} else if (caught instanceof RODAClientException) {
-							Window.alert(messages.rodaClientFailed(caught.getMessage()));
-
-						} else {
-							Window.alert(messages.genericFailure(caught.getMessage()));
-						}
-						callback.onFailure(caught);
-					}
-
-					public void onSuccess(final AuthenticatedUser user) {
-						userLoginService.getRodaCasURL(new AsyncCallback<String>() {
-
-							@Override
-							public void onSuccess(String result) {
-								String logoutURL = result + "/logout";
-								GWT.log("CAS logout: " + logoutURL);
-								RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, logoutURL);
-
-								try {
-									builder.sendRequest(null, new RequestCallback() {
-										public void onError(Request request, Throwable exception) {
-											if (exception instanceof RequestTimeoutException) {
-												Window.alert("The request has timed out");
-											} else {
-												Window.alert(exception.getMessage());
-											}
-										}
-
-										public void onResponseReceived(Request request, Response response) {
-											logger.error("REMOVING COOKIES...");
-											Cookies.removeCookie("CASTGC", "/cas/");
-
-											UserLogin.this.user = user;
-											callback.onSuccess(user);
-											onLoginStatusChanged(user);
-										}
-
-									});
-								} catch (RequestException e) {
-									Window.alert(e.getMessage());
-									logger.error(e.getMessage(), e);
-								}
-							}
-
-							@Override
-							public void onFailure(Throwable caught) {
-								Window.alert(caught.getMessage());
-								logger.error(caught.getMessage(), caught);
-								logger.fatal("Error with CAS URL", caught);
-							}
-						});
-					}
-
-				});
-			}
-		};
-		t.schedule(500);
+		Window.open("/logout", "_self", "");
 	}
 
 	/**

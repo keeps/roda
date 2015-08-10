@@ -65,12 +65,22 @@ public class UserLoginServiceImpl extends RemoteServiceServlet implements
 		
 		CASUserPrincipal user = UserUtility.getUser(this
 				.getThreadLocalRequest());
-		AuthenticatedUser authenticatedUser = new AuthenticatedUser(user, false);
+		AuthenticatedUser authenticatedUser = new AuthenticatedUser(user, user.isGuest());
 		
 		return authenticatedUser;
 		
 	}
 
+	
+	public AuthenticatedUser loginCUP(HttpServletRequest request, CASUserPrincipal cup)
+			throws RODAException {
+		UserUtility.setUser(request,cup);
+		
+		AuthenticatedUser authenticatedUser;
+		authenticatedUser = getAuthenticatedUser();
+		return authenticatedUser;
+	}
+	
 	public AuthenticatedUser login(String username, String password)
 			throws RODAException {
 		AuthenticatedUser authenticatedUser;

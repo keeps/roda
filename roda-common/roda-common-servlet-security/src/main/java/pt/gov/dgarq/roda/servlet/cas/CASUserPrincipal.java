@@ -7,11 +7,12 @@ public class CASUserPrincipal extends UserPrincipal{
 	private static final long serialVersionUID = 387759283684834603L;
 	private String proxyGrantingTicket;
 	private String clientIpAddress;
-	
+	private boolean guest;
 	public CASUserPrincipal(User user, String proxyGrantingTicket, String clientIpAddress){
 		super(user);
 		this.proxyGrantingTicket = proxyGrantingTicket;
 		this.clientIpAddress = clientIpAddress;
+		this.guest=false;
 	}
 
 	public String getProxyGrantingTicket() {
@@ -30,6 +31,14 @@ public class CASUserPrincipal extends UserPrincipal{
 		this.clientIpAddress = clientIpAddress;
 	}
 
+	public boolean isGuest() {
+		return guest;
+	}
+
+	public void setGuest(boolean guest) {
+		this.guest = guest;
+	}
+	
 	
 	
 	
