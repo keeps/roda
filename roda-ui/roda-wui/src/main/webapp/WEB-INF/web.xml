@@ -3,6 +3,7 @@
 	xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
 	<display-name>RODA Web User Interface</display-name>
+	<!-- 
 	<filter>
 		<display-name>TicketInterceptorFilter</display-name>
 		<filter-name>TicketInterceptorFilter</filter-name>
@@ -11,6 +12,30 @@
 	<filter-mapping>
 		<filter-name>TicketInterceptorFilter</filter-name>
 		<url-pattern>/Main.html</url-pattern>
+	</filter-mapping>
+	-->
+	<!-- 
+	<filter>
+		<filter-name>CASAuthenticationFilter</filter-name>
+		<filter-class>pt.gov.dgarq.roda.servlet.cas.CASAuthenticationFilter</filter-class>
+	</filter>
+	-->
+	<filter>
+		<description>
+		</description>
+		<display-name>CASUpgradedFilter</display-name>
+		<filter-name>CASUpgradedFilter</filter-name>
+		<filter-class>pt.gov.dgarq.roda.wui.filter.CASUpgradedFilter</filter-class>
+	</filter>
+	<!-- 
+	<filter-mapping>
+		<filter-name>CASAuthenticationFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	-->
+	<filter-mapping>
+		<filter-name>CASUpgradedFilter</filter-name>
+		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 	
 	<filter>
