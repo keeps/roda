@@ -17,7 +17,7 @@ import pt.gov.dgarq.roda.core.common.IllegalOperationException;
  * @author Rui Castro
  */
 @XmlRootElement
-public class SIPState implements Serializable, Comparable<SIPState> {
+public class SIPReport implements Serializable, Comparable<SIPReport> {
 	private static final long serialVersionUID = -2028521062931876576L;
 	
 	private String id = null;
@@ -37,16 +37,16 @@ public class SIPState implements Serializable, Comparable<SIPState> {
 	/**
 	 * Constructs an empty (<strong>invalid</strong>) SIP.
 	 */
-	public SIPState() {
+	public SIPReport() {
 	}
 
 	/**
-	 * Constructs a new {@link SIPState} cloning an existing one.
+	 * Constructs a new {@link SIPReport} cloning an existing one.
 	 * 
 	 * @param sip
-	 *            the {@link SIPState} to clone.
+	 *            the {@link SIPReport} to clone.
 	 */
-	public SIPState(SIPState sip) {
+	public SIPReport(SIPReport sip) {
 		this(sip.getId(), sip.getUsername(), sip.getOriginalFilename(), sip
 				.getState(), sip.getStateTransitions(), sip.isComplete(), sip
 				.getCompletePercentage(), sip.getIngestedID(), sip
@@ -54,7 +54,7 @@ public class SIPState implements Serializable, Comparable<SIPState> {
 	}
 
 	/**
-	 * Constructs a new {@link SIPState}.
+	 * Constructs a new {@link SIPReport}.
 	 * 
 	 * @param id
 	 * @param username
@@ -68,7 +68,7 @@ public class SIPState implements Serializable, Comparable<SIPState> {
 	 * @param datetime 
 	 * @param processing
 	 */
-	public SIPState(String id, String username, String originalFilename,
+	public SIPReport(String id, String username, String originalFilename,
 			String state, SIPStateTransition[] stateTransitions,
 			boolean complete, float completePercentage, String ingestedDOID,
 			String parentDOID, Date datetime, boolean processing) {
@@ -90,8 +90,8 @@ public class SIPState implements Serializable, Comparable<SIPState> {
 	 * @see Object#equals(Object)
 	 */
 	public boolean equals(Object obj) {
-		if (obj instanceof SIPState) {
-			SIPState other = (SIPState) obj;
+		if (obj instanceof SIPReport) {
+			SIPReport other = (SIPReport) obj;
 			return getId().equals(other.getId());
 		} else {
 			return false;
@@ -117,7 +117,7 @@ public class SIPState implements Serializable, Comparable<SIPState> {
 	 * @param other 
 	 * @return greater than 0 if other is lesser than this
 	 */
-	public int compareTo(SIPState other) {
+	public int compareTo(SIPReport other) {
 		Date myDatetime = getStateTransitions()[0].getDatetime();
 		Date otherDatetime = other.getStateTransitions()[0].getDatetime();
 		return -myDatetime.compareTo(otherDatetime);
@@ -125,20 +125,20 @@ public class SIPState implements Serializable, Comparable<SIPState> {
 	}
 
 	/**
-	 * Compares two version of the same {@link SIPState}. Two {@link SIPState}
-	 * are the same if {@link SIPState#equals(Object)} returns <code>true</code>
+	 * Compares two version of the same {@link SIPReport}. Two {@link SIPReport}
+	 * are the same if {@link SIPReport#equals(Object)} returns <code>true</code>
 	 * .
 	 * 
 	 * @param sip
-	 *            the other version of this {@link SIPState}.
+	 *            the other version of this {@link SIPReport}.
 	 * 
 	 * @return
-	 *         <code>true<code> if the {@link SIPState}s differ in their states, <code>false<code> if nothing has changed in the {@link SIPState}.
+	 *         <code>true<code> if the {@link SIPReport}s differ in their states, <code>false<code> if nothing has changed in the {@link SIPReport}.
 	 * 
 	 * @throws IllegalOperationException
-	 *             if argument {@link SIPState} is not the same as this.
+	 *             if argument {@link SIPReport} is not the same as this.
 	 */
-	public boolean hasChanges(SIPState sip) throws IllegalOperationException {
+	public boolean hasChanges(SIPReport sip) throws IllegalOperationException {
 		if (this.equals(sip)) {
 			return getState() == null ? sip != null : !getState().equals(
 					sip.getState());

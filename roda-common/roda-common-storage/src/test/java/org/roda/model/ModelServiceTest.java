@@ -51,7 +51,7 @@ import pt.gov.dgarq.roda.core.data.v2.LogEntryParameter;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationFilePreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationPreservationObject;
-import pt.gov.dgarq.roda.core.data.v2.SIPState;
+import pt.gov.dgarq.roda.core.data.v2.SIPReport;
 import pt.gov.dgarq.roda.core.data.v2.SIPStateTransition;
 
 /**
@@ -92,7 +92,7 @@ public class ModelServiceTest {
 
 	@AfterClass
 	public static void tearDown() throws StorageServiceException {
-		FSUtils.deletePath(basePath);
+		// FSUtils.deletePath(basePath);
 	}
 
 	@After
@@ -669,8 +669,8 @@ public class ModelServiceTest {
 	}
 
 	@Test
-	public void createSIPState() throws ModelServiceException, StorageServiceException {
-		SIPState state = new SIPState();
+	public void createSIPReport() throws ModelServiceException, StorageServiceException {
+		SIPReport state = new SIPReport();
 		state.setComplete(true);
 		state.setCompletePercentage(99.9F);
 		state.setDatetime(new Date());

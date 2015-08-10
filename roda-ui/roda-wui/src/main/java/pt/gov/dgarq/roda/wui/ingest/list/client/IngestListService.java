@@ -9,13 +9,15 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 
+import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
 import pt.gov.dgarq.roda.core.common.RODAException;
-import pt.gov.dgarq.roda.core.data.SIPState;
 import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
+import pt.gov.dgarq.roda.core.data.v2.SIPReport;
+import pt.gov.dgarq.roda.wui.common.client.GenericException;
 import pt.gov.dgarq.roda.wui.common.client.PrintReportException;
 
 /**
@@ -48,32 +50,12 @@ public interface IngestListService extends RemoteService {
 		}
 	}
 
-	/**
-	 * Get a SIPState with its SIP id
-	 * 
-	 * @param sipId
-	 * @return the SIP State or null if the sipId does not exist
-	 * @throws RODAException
-	 */
-	public SIPState getSipState(String sipId) throws RODAException;
+	public Long countSipReports(Filter filter) throws AuthorizationDeniedException, GenericException;
 
-	/**
-	 * Get SIP count
-	 * 
-	 * @param filter
-	 * @return
-	 * @throws RODAException
-	 */
-	public int getSIPCount(Filter filter) throws RODAException;
+	public IndexResult<SIPReport> findSipReports(Filter filter, Sorter sorter, Sublist sublist)
+			throws AuthorizationDeniedException, GenericException;
 
-	/**
-	 * Get SIP list
-	 * 
-	 * @param adapter
-	 * @return
-	 * @throws RODAException
-	 */
-	public IndexResult<SIPState> getSIPs(Filter filter, Sorter sorter, Sublist sublist) throws RODAException;
+	public SIPReport retrieveSipReport(String sipReportId) throws AuthorizationDeniedException, GenericException;
 
 	/**
 	 * Accept a SIP

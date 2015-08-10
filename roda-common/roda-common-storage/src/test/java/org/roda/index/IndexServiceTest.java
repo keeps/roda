@@ -48,7 +48,7 @@ import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.LogEntryParameter;
 import pt.gov.dgarq.roda.core.data.v2.RODAObject;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
-import pt.gov.dgarq.roda.core.data.v2.SIPState;
+import pt.gov.dgarq.roda.core.data.v2.SIPReport;
 import pt.gov.dgarq.roda.core.data.v2.SIPStateTransition;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.core.data.v2.SimpleEventPreservationMetadata;
@@ -424,7 +424,7 @@ public class IndexServiceTest {
 	
 	@Test 
 	public void testGetSIPStatesCount() throws StorageServiceException, IndexServiceException {
-		SIPState state = new SIPState();
+		SIPReport state = new SIPReport();
 		state.setComplete(true);
 		state.setCompletePercentage(99.9F);
 		state.setDatetime(new Date());
@@ -448,17 +448,17 @@ public class IndexServiceTest {
 		Filter filterFileName = new Filter();
 		filterFileName.add(new SimpleFilterParameter(RodaConstants.SIPSTATE_ORIGINAL_FILENAME, "Filename"));
 		Long n = 1L;
-		assertEquals(index.getSipStatesCount(filterFileName), n);
+		assertEquals(index.countSipReports(filterFileName), n);
 
 		Filter filterFileName2 = new Filter();
 		filterFileName2.add(new SimpleFilterParameter(RodaConstants.SIPSTATE_ORIGINAL_FILENAME, "Filename2"));
 		Long n2 = 0L;
-		assertEquals(index.getSipStatesCount(filterFileName2), n2);
+		assertEquals(index.countSipReports(filterFileName2), n2);
 	}
 
 	@Test
 	public void testFindSipState() throws StorageServiceException, IndexServiceException {
-		SIPState state = new SIPState();
+		SIPReport state = new SIPReport();
 		state.setComplete(true);
 		state.setCompletePercentage(99.9F);
 		state.setDatetime(new Date());
@@ -481,7 +481,7 @@ public class IndexServiceTest {
 		Filter filterFileName = new Filter();
 		filterFileName.add(new SimpleFilterParameter(RodaConstants.SIPSTATE_ORIGINAL_FILENAME, "Filename"));
 
-		IndexResult<SIPState> states = index.findSipState(filterFileName, null, new Sublist());
+		IndexResult<SIPReport> states = index.findSipReports(filterFileName, null, new Sublist());
 		assertEquals(states.getTotalCount(), 1);
 		assertEquals(states.getResults().get(0).getIngestedID(), "INGESTED");
 		//assertEquals(states.getResults().get(0).getStateTransitions()[0].getFromState(), "A");
@@ -491,7 +491,7 @@ public class IndexServiceTest {
 		Filter filterFileName2 = new Filter();
 		filterFileName2.add(new SimpleFilterParameter(RodaConstants.SIPSTATE_ORIGINAL_FILENAME, "Filename2"));
 
-		IndexResult<SIPState> states2 = index.findSipState(filterFileName2, null, new Sublist());
+		IndexResult<SIPReport> states2 = index.findSipReports(filterFileName2, null, new Sublist());
 		assertEquals(states2.getTotalCount(), 0);
 	}
 

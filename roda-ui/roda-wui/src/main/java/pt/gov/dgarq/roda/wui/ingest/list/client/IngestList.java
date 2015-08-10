@@ -21,6 +21,7 @@ import pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.LikeFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.OneOfManyFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
+import pt.gov.dgarq.roda.core.data.v2.SIPReport;
 import pt.gov.dgarq.roda.wui.common.client.AuthenticatedUser;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
@@ -28,7 +29,7 @@ import pt.gov.dgarq.roda.wui.common.client.LoginStatusListener;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
 import pt.gov.dgarq.roda.wui.common.client.widgets.ControlPanel;
 import pt.gov.dgarq.roda.wui.common.client.widgets.ControlPanel.ControlPanelListener;
-import pt.gov.dgarq.roda.wui.common.client.widgets.SIPStateList;
+import pt.gov.dgarq.roda.wui.common.client.widgets.SIPReportList;
 import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
 import pt.gov.dgarq.roda.wui.ingest.client.Ingest;
 
@@ -110,8 +111,7 @@ public class IngestList {
 
 	private final DockPanel layout;
 
-	// private LazyVerticalList<SIPState> lazySIPList;
-	private SIPStateList sipList;
+	private SIPReportList sipList;
 
 	private final ControlPanel controlPanel;
 
@@ -155,7 +155,7 @@ public class IngestList {
 			filter_states = new String[] { READY_STATE };
 			filter_complete = Boolean.FALSE;
 
-			sipList = new SIPStateList();
+			sipList = new SIPReportList();
 
 			// lazySIPList = new LazyVerticalList<SIPState>(new
 			// ContentSource<SIPState>() {
@@ -388,9 +388,9 @@ public class IngestList {
 
 	protected void updateVisibles() {
 		// ElementPanel<SIPState> selected = lazySIPList.getSelected();
-		SIPState selected = sipList.getSelectionModel().getSelectedObject();
+		SIPReport selected = sipList.getSelectionModel().getSelectedObject();
 		report.setEnabled(selected != null);
-		view.setEnabled(selected != null && selected.getIngestedPID() != null);
+		view.setEnabled(selected != null && selected.getIngestedID() != null);
 
 		UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<AuthenticatedUser>() {
 

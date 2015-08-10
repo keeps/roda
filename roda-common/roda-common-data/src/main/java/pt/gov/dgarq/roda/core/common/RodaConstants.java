@@ -26,7 +26,7 @@ public final class RodaConstants {
 	public static final String INDEX_USER_LOG = "UserLog";
 	public static final String INDEX_ACTION_LOG = "ActionLog";
 	public static final String INDEX_OTHER_DESCRIPTIVE_DATA_PREFIX = "odd";
-	public static final String INDEX_SIP_STATE = "SIPState";
+	public static final String INDEX_SIP_REPORT = "SIPReport";
 
 	/*
 	 * STORAGE CONTAINERS
@@ -37,7 +37,7 @@ public final class RodaConstants {
 	public static final String STORAGE_CONTAINER_PRESERVATION = "Preservation";
 	public static final String STORAGE_CONTAINER_USERLOG = "User log";
 	public static final String STORAGE_CONTAINER_ACTIONLOG = "Action log";
-	public static final String STORAGE_CONTAINER_SIP_STATE = "SIP State";
+	public static final String STORAGE_CONTAINER_SIP_REPORT = "SIP report";
 
 	/*
 	 * STORAGE DIRECTORIES

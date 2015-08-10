@@ -15,17 +15,16 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.view.client.ProvidesKey;
 
 import config.i18n.client.IngestListConstants;
-import pt.gov.dgarq.roda.core.common.RodaConstants;
-import pt.gov.dgarq.roda.core.data.SIPState;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
+import pt.gov.dgarq.roda.core.data.v2.SIPReport;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.ingest.list.client.IngestListService;
 
-public class SIPStateList extends AsyncTableCell<SIPState> {
+public class SIPReportList extends AsyncTableCell<SIPReport> {
 
 	private static final int PAGE_SIZE = 20;
 
@@ -33,57 +32,57 @@ public class SIPStateList extends AsyncTableCell<SIPState> {
 
 	private final ClientLogger logger = new ClientLogger(getClass().getName());
 
-	private final TextColumn<SIPState> idColumn;
-	private final TextColumn<SIPState> originalFilenameColumn;
-	private final Column<SIPState, Date> submissionDateColumn;
-	private final TextColumn<SIPState> currentStateColumn;
-	private final TextColumn<SIPState> percentageColumn;
-	private final TextColumn<SIPState> producerColumn;
+	private final TextColumn<SIPReport> idColumn;
+	private final TextColumn<SIPReport> originalFilenameColumn;
+	private final Column<SIPReport, Date> submissionDateColumn;
+	private final TextColumn<SIPReport> currentStateColumn;
+	private final TextColumn<SIPReport> percentageColumn;
+	private final TextColumn<SIPReport> producerColumn;
 
-	public SIPStateList() {
+	public SIPReportList() {
 		super();
 
-		idColumn = new TextColumn<SIPState>() {
+		idColumn = new TextColumn<SIPReport>() {
 
 			@Override
-			public String getValue(SIPState sip) {
+			public String getValue(SIPReport sip) {
 				return sip != null ? sip.getId() : null;
 			}
 		};
 
-		originalFilenameColumn = new TextColumn<SIPState>() {
+		originalFilenameColumn = new TextColumn<SIPReport>() {
 
 			@Override
-			public String getValue(SIPState sip) {
+			public String getValue(SIPReport sip) {
 				return sip != null ? sip.getOriginalFilename() : null;
 			}
 		};
 
-		submissionDateColumn = new Column<SIPState, Date>(
+		submissionDateColumn = new Column<SIPReport, Date>(
 				new DateCell(DateTimeFormat.getFormat(PredefinedFormat.DATE_MEDIUM))) {
 			@Override
-			public Date getValue(SIPState sip) {
+			public Date getValue(SIPReport sip) {
 				return sip != null ? sip.getDatetime() : null;
 			}
 		};
-		currentStateColumn = new TextColumn<SIPState>() {
+		currentStateColumn = new TextColumn<SIPReport>() {
 
 			@Override
-			public String getValue(SIPState sip) {
+			public String getValue(SIPReport sip) {
 				return sip != null ? sip.getState() : null;
 			}
 		};
-		percentageColumn = new TextColumn<SIPState>() {
+		percentageColumn = new TextColumn<SIPReport>() {
 
 			@Override
-			public String getValue(SIPState sip) {
+			public String getValue(SIPReport sip) {
 				return sip != null ? sip.getCompletePercentage() + "%" : null;
 			}
 		};
-		producerColumn = new TextColumn<SIPState>() {
+		producerColumn = new TextColumn<SIPReport>() {
 
 			@Override
-			public String getValue(SIPState sip) {
+			public String getValue(SIPReport sip) {
 				return sip != null ? sip.getUsername() : null;
 			}
 		};
@@ -105,14 +104,14 @@ public class SIPStateList extends AsyncTableCell<SIPState> {
 		getDisplay().setEmptyTableWidget(emptyInfo);
 		getDisplay().setColumnWidth(originalFilenameColumn, "100%");
 
-		addStyleName("my-list-sipstate");
-		emptyInfo.addStyleName("my-list-sipstate-empty-info");
+		addStyleName("my-list-SIPReport");
+		emptyInfo.addStyleName("my-list-SIPReport-empty-info");
 
 	}
 
 	@Override
 	protected void getData(int start, int length, ColumnSortList columnSortList,
-			AsyncCallback<IndexResult<SIPState>> callback) {
+			AsyncCallback<IndexResult<SIPReport>> callback) {
 
 		Filter filter = getFilter();
 
@@ -149,16 +148,16 @@ public class SIPStateList extends AsyncTableCell<SIPState> {
 
 		GWT.log("Requesting ingest getSIPs");
 
-		IngestListService.Util.getInstance().getSIPs(filter, sorter, sublist, callback);
+		IngestListService.Util.getInstance().findSipReports(filter, sorter, sublist, callback);
 
 	}
 
 	@Override
-	protected ProvidesKey<SIPState> getKeyProvider() {
-		return new ProvidesKey<SIPState>() {
+	protected ProvidesKey<SIPReport> getKeyProvider() {
+		return new ProvidesKey<SIPReport>() {
 
 			@Override
-			public Object getKey(SIPState item) {
+			public Object getKey(SIPReport item) {
 				return item.getId();
 			}
 		};

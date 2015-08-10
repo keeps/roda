@@ -31,10 +31,9 @@ public class UserManagementHelper {
 		IndexResult<LogEntry> ret;
 		try {
 			ret = RodaCoreFactory.getIndexService().findLogEntry(filter, sorter, sublist);
-			LOGGER.debug(String.format("findDescriptiveMetadata(%1$s,%2$s,%3$s)=%4$s", filter, sorter, sublist, ret));
 		} catch (IndexServiceException e) {
-			LOGGER.error("Error getting collections", e);
-			throw new GenericException("Error getting collections " + e.getMessage());
+			LOGGER.error("Error getting log entries", e);
+			throw new GenericException("Error getting log entries " + e.getMessage());
 		}
 
 		return ret;

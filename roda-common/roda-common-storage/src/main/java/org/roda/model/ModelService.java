@@ -52,7 +52,7 @@ import pt.gov.dgarq.roda.core.data.v2.Representation;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationFilePreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationPreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationState;
-import pt.gov.dgarq.roda.core.data.v2.SIPState;
+import pt.gov.dgarq.roda.core.data.v2.SIPReport;
 import pt.gov.dgarq.roda.core.metadata.v2.premis.PremisAgentHelper;
 import pt.gov.dgarq.roda.core.metadata.v2.premis.PremisEventHelper;
 import pt.gov.dgarq.roda.core.metadata.v2.premis.PremisFileObjectHelper;
@@ -96,23 +96,19 @@ public class ModelService extends ModelObservable {
 		ensureAllContainersExist();
 	}
 
-	// FIXME verify all others (not only action log)
 	private void ensureAllContainersExist() {
-		try {
-			storage.createContainer(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG),
-					new HashMap<String, Set<String>>());
-		} catch (StorageServiceException e) {
-			if (e.getCode() != StorageServiceException.ALREADY_EXISTS) {
-				LOGGER.error("Error creating container to add new log entry", e);
-			}
-		}
+		createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_AIP);
+		createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_PRESERVATION);
+		createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_ACTIONLOG);
+		createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_SIP_REPORT);
+	}
 
+	private void createContainerIfNotExists(String containerName) {
 		try {
-			storage.createContainer(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_SIP_STATE),
-					new HashMap<String, Set<String>>());
+			storage.createContainer(DefaultStoragePath.parse(containerName), new HashMap<String, Set<String>>());
 		} catch (StorageServiceException e) {
 			if (e.getCode() != StorageServiceException.ALREADY_EXISTS) {
-				LOGGER.error("Error creating container to add new sip state", e);
+				LOGGER.error("Error initializing container: " + containerName, e);
 			}
 		}
 	}
@@ -870,8 +866,10 @@ public class ModelService extends ModelObservable {
 
 				// retrieve needed information to instantiate Representation
 				Boolean active = ModelUtils.getBoolean(directoryMetadata, RodaConstants.STORAGE_META_ACTIVE);
-				Date dateCreated = ModelUtils.getDate(directoryMetadata, RodaConstants.STORAGE_META_DATE_CREATED);
-				Date dateModified = ModelUtils.getDate(directoryMetadata, RodaConstants.STORAGE_META_DATE_MODIFIED);
+				// Date dateCreated = ModelUtils.getDate(directoryMetadata,
+				// RodaConstants.STORAGE_META_DATE_CREATED);
+				// Date dateModified = ModelUtils.getDate(directoryMetadata,
+				// RodaConstants.STORAGE_META_DATE_MODIFIED);
 
 				if (active == null) {
 					// when not stated, considering active=false
@@ -1166,8 +1164,9 @@ public class ModelService extends ModelObservable {
 
 				// retrieve needed information to instantiate Representation
 				Boolean active = ModelUtils.getBoolean(directoryMetadata, RodaConstants.STORAGE_META_ACTIVE);
-				Date dateCreated = ModelUtils.getDate(directoryMetadata, RodaConstants.STORAGE_META_DATE_CREATED);
-				Date dateModified = ModelUtils.getDate(directoryMetadata, RodaConstants.STORAGE_META_DATE_MODIFIED);
+				// Date dateCreated = ModelUtils.getDate(directoryMetadata,
+				// RodaConstants.STORAGE_META_DATE_CREATED);
+				// Date dateModified = ModelUtils.getDate(directoryMetadata, RodaConstants.STORAGE_META_DATE_MODIFIED);
 
 				if (active == null) {
 					// when not stated, considering active=false
@@ -1244,8 +1243,10 @@ public class ModelService extends ModelObservable {
 
 				// retrieve needed information to instantiate Representation
 				Boolean active = ModelUtils.getBoolean(directoryMetadata, RodaConstants.STORAGE_META_ACTIVE);
-				Date dateCreated = ModelUtils.getDate(directoryMetadata, RodaConstants.STORAGE_META_DATE_CREATED);
-				Date dateModified = ModelUtils.getDate(directoryMetadata, RodaConstants.STORAGE_META_DATE_MODIFIED);
+				// Date dateCreated = ModelUtils.getDate(directoryMetadata,
+				// RodaConstants.STORAGE_META_DATE_CREATED);
+				// Date dateModified = ModelUtils.getDate(directoryMetadata,
+				// RodaConstants.STORAGE_META_DATE_MODIFIED);
 
 				if (active == null) {
 					// when not stated, considering active=false
@@ -1458,20 +1459,13 @@ public class ModelService extends ModelObservable {
 		}
 	}
 
-	// FIXME all the initialization, if needed, should be done only once
-	public void addSipState(SIPState sipState, boolean notify) throws StorageServiceException {
-		try {
-			storage.createContainer(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_SIP_STATE),
-					new HashMap<String, Set<String>>());
-		} catch (StorageServiceException sae) {
-			// container already exists...
-		}
+	public void addSipState(SIPReport sipState, boolean notify) throws StorageServiceException {
 		try {
 			StoragePath sipStatePath = ModelUtils.getSipStatePath(sipState);
 			sipState.setFileID(sipStatePath.getName());
 
 			StringWriter sw = new StringWriter();
-			JAXBContext jc = JAXBContext.newInstance(SIPState.class);
+			JAXBContext jc = JAXBContext.newInstance(SIPReport.class);
 			Marshaller marshaller = jc.createMarshaller();
 			marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
 			marshaller.marshal(sipState, sw);
@@ -1485,7 +1479,7 @@ public class ModelService extends ModelObservable {
 		}
 	}
 
-	public void addSipState(SIPState sipState) throws StorageServiceException {
+	public void addSipState(SIPReport sipState) throws StorageServiceException {
 		addSipState(sipState, true);
 	}
 

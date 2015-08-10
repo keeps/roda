@@ -2,12 +2,15 @@ package pt.gov.dgarq.roda.wui.common.client.widgets;
 
 import java.util.Date;
 
+import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.DateCell;
+import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.view.client.ProvidesKey;
@@ -20,6 +23,7 @@ import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
+import pt.gov.dgarq.roda.wui.dissemination.browse.client.Browse;
 import pt.gov.dgarq.roda.wui.management.user.client.UserManagementService;
 
 public class LogEntryList extends AsyncTableCell<LogEntry> {
@@ -31,7 +35,7 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
 	private final Column<LogEntry, Date> dateColumn;
 	private final TextColumn<LogEntry> actionComponentColumn;
 	private final TextColumn<LogEntry> actionMethodColumn;
-	private final TextColumn<LogEntry> relatedObjectColumn;
+	private final Column<LogEntry, String> relatedObjectColumn;
 	private final TextColumn<LogEntry> usernameColumn;
 	private final TextColumn<LogEntry> durationColumn;
 	private final TextColumn<LogEntry> addressColumn;
@@ -62,13 +66,23 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
 			}
 		};
 
-		relatedObjectColumn = new TextColumn<LogEntry>() {
+		relatedObjectColumn = new Column<LogEntry, String>(new ClickableTextCell()) {
 
 			@Override
 			public String getValue(LogEntry logEntry) {
 				return logEntry != null ? logEntry.getRelatedObjectID() : null;
 			}
 		};
+
+		relatedObjectColumn.setFieldUpdater(new FieldUpdater<LogEntry, String>() {
+
+			@Override
+			public void update(int index, LogEntry logEntry, String value) {
+				if (logEntry != null && logEntry.getRelatedObjectID() != null) {
+					History.newItem(Browse.getViewItemHistoryToken(logEntry.getRelatedObjectID()));
+				}
+			}
+		});
 
 		usernameColumn = new TextColumn<LogEntry>() {
 
@@ -119,6 +133,7 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
 
 		addStyleName("my-collections-table");
 		emptyInfo.addStyleName("my-collections-empty-info");
+		relatedObjectColumn.setCellStyleNames("my-collections-table-cell-link");
 
 	}
 

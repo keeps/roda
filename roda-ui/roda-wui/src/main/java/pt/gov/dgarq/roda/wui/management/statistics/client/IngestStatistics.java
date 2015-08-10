@@ -7,6 +7,7 @@ import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
+import pt.gov.dgarq.roda.core.data.v2.SIPReport;
 import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
 
 import com.google.gwt.core.client.GWT;
@@ -59,36 +60,26 @@ public class IngestStatistics extends StatisticTab {
 		boolean ret = false;
 		if (super.init()) {
 			ret = true;
-			sipComplete = createStatisticPanel(
-					constants.sipCompletenessTitle(), constants
-							.sipCompletenessDesc(), "sips\\.complete\\..*",
+			sipComplete = createStatisticPanel(constants.sipCompletenessTitle(), constants.sipCompletenessDesc(),
+					"sips\\.complete\\..*", true, AGGREGATION_LAST);
+			sipState = createStatisticPanel(constants.sipStateTitle(), constants.sipStateDesc(), "sips\\.state\\..*",
 					true, AGGREGATION_LAST);
-			sipState = createStatisticPanel(constants.sipStateTitle(),
-					constants.sipStateDesc(), "sips\\.state\\..*", true,
-					AGGREGATION_LAST);
 
-			sipDurationAuto = createStatisticPanel(constants
-					.sipDurationAutoTitle(), constants.sipDurationAutoDesc(),
-					"sips.duration.auto", ValueDimension.MILLISECONDS, false,
+			sipDurationAuto = createStatisticPanel(constants.sipDurationAutoTitle(), constants.sipDurationAutoDesc(),
+					"sips.duration.auto", ValueDimension.MILLISECONDS, false, false, AGGREGATION_LAST);
+
+			sipDurationManual = createStatisticPanel(constants.sipDurationManualTitle(),
+					constants.sipDurationManualDesc(), "sips.duration.manual", ValueDimension.MILLISECONDS, false,
 					false, AGGREGATION_LAST);
 
-			sipDurationManual = createStatisticPanel(constants
-					.sipDurationManualTitle(), constants
-					.sipDurationManualDesc(), "sips.duration.manual",
-					ValueDimension.MILLISECONDS, false, false, AGGREGATION_LAST);
-
-			Panel sipMinAutoDurationPanel = createSipLimitDurationPanel(
-					constants.sipMinAutomaticProcessingTimeTitle(), constants
-							.sipMinAutomaticProcessingTimeDesc(), true, false);
-			Panel sipMaxAutoDurationPanel = createSipLimitDurationPanel(
-					constants.sipMaxAutomaticProcessingTimeTitle(), constants
-							.sipMaxAutomaticProcessingTimeDesc(), true, true);
-			Panel sipMinManualDurationPanel = createSipLimitDurationPanel(
-					constants.sipMinManualProcessingTimeTitle(), constants
-							.sipMinManualProcessingTimeDesc(), false, false);
-			Panel sipMaxManualDurationPanel = createSipLimitDurationPanel(
-					constants.sipMaxManualProcessingTimeTitle(), constants
-							.sipMaxManualProcessingTimeDesc(), false, true);
+			Panel sipMinAutoDurationPanel = createSipLimitDurationPanel(constants.sipMinAutomaticProcessingTimeTitle(),
+					constants.sipMinAutomaticProcessingTimeDesc(), true, false);
+			Panel sipMaxAutoDurationPanel = createSipLimitDurationPanel(constants.sipMaxAutomaticProcessingTimeTitle(),
+					constants.sipMaxAutomaticProcessingTimeDesc(), true, true);
+			Panel sipMinManualDurationPanel = createSipLimitDurationPanel(constants.sipMinManualProcessingTimeTitle(),
+					constants.sipMinManualProcessingTimeDesc(), false, false);
+			Panel sipMaxManualDurationPanel = createSipLimitDurationPanel(constants.sipMaxManualProcessingTimeTitle(),
+					constants.sipMaxManualProcessingTimeDesc(), false, true);
 
 			layout.add(sipComplete);
 			layout.add(sipState);
@@ -105,11 +96,9 @@ public class IngestStatistics extends StatisticTab {
 
 	}
 
-	private static CommonImageBundle commonImageBundle = (CommonImageBundle) GWT
-			.create(CommonImageBundle.class);
+	private static CommonImageBundle commonImageBundle = (CommonImageBundle) GWT.create(CommonImageBundle.class);
 
-	private Panel createSipLimitDurationPanel(String title, String description,
-			boolean auto, boolean max) {
+	private Panel createSipLimitDurationPanel(String title, String description, boolean auto, boolean max) {
 		DockPanel ret = new DockPanel();
 		HorizontalPanel header = new HorizontalPanel();
 		Label titleLabel = new Label(title);
@@ -121,84 +110,69 @@ public class IngestStatistics extends StatisticTab {
 		Label descriptionLabel = new Label(description);
 		final Label value = new Label();
 
-		getLastDataOfType("sips.duration." + (auto ? "auto" : "manual") + "."
-				+ (max ? "max" : "min"), new AsyncCallback<StatisticData>() {
-
-			public void onFailure(Throwable caught) {
-				logger.error("Error creating sip duration report", caught);
-			}
-
-			public void onSuccess(StatisticData data) {
-				if (data != null) {
-					value.setText(Tools.formatValueMilliseconds(Long
-							.parseLong(data.getValue()), false));
-				} else {
-					value.setText(constants.noDataAvailable());
-				}
-			}
-		});
-
-		getLastDataOfType("sips.duration." + (auto ? "auto" : "manual") + "."
-				+ (max ? "max" : "min") + ".id",
+		getLastDataOfType("sips.duration." + (auto ? "auto" : "manual") + "." + (max ? "max" : "min"),
 				new AsyncCallback<StatisticData>() {
 
 					public void onFailure(Throwable caught) {
-						logger.error("Error creating sip duration report",
-								caught);
+						logger.error("Error creating sip duration report", caught);
+					}
+
+					public void onSuccess(StatisticData data) {
+						if (data != null) {
+							value.setText(Tools.formatValueMilliseconds(Long.parseLong(data.getValue()), false));
+						} else {
+							value.setText(constants.noDataAvailable());
+						}
+					}
+				});
+
+		getLastDataOfType("sips.duration." + (auto ? "auto" : "manual") + "." + (max ? "max" : "min") + ".id",
+				new AsyncCallback<StatisticData>() {
+
+					public void onFailure(Throwable caught) {
+						logger.error("Error creating sip duration report", caught);
 					}
 
 					public void onSuccess(StatisticData data) {
 						if (data != null) {
 							final String sipId = data.getValue();
-							IngestListService.Util.getInstance().getSipState(
-									sipId, new AsyncCallback<SIPState>() {
+							IngestListService.Util.getInstance().retrieveSipReport(sipId,
+									new AsyncCallback<SIPReport>() {
 
-										public void onFailure(Throwable caught) {
-											logger
-													.error(
-															"Error creating sip duration report",
-															caught);
+								public void onFailure(Throwable caught) {
+									logger.error("Error creating sip duration report", caught);
 
-										}
+								}
 
-										public void onSuccess(
-												final SIPState result) {
-											report
-													.addClickListener(new ClickListener() {
+								public void onSuccess(final SIPReport result) {
+									report.addClickListener(new ClickListener() {
 
-														public void onClick(
-																Widget sender) {
-															IngestReportWindow w = new IngestReportWindow(
-																	result);
-															w.show();
-
-														}
-
-													});
-											info
-													.addClickListener(new ClickListener() {
-
-														public void onClick(
-																Widget sender) {
-															String pid = result
-																	.getIngestedPID();
-															if (pid != null) {
-																ViewWindow viewWindow = new ViewWindow(
-																		pid);
-																viewWindow
-																		.show();
-															} else {
-																Window
-																		.alert(constants
-																				.viewImpossibleBcSipNotIngested());
-															}
-														}
-
-													});
+										public void onClick(Widget sender) {
+											// FIXME
+											// IngestReportWindow w = new
+											// IngestReportWindow(result);
+											// w.show();
 
 										}
 
 									});
+									info.addClickListener(new ClickListener() {
+
+										public void onClick(Widget sender) {
+											String pid = result.getIngestedID();
+											if (pid != null) {
+												ViewWindow viewWindow = new ViewWindow(pid);
+												viewWindow.show();
+											} else {
+												Window.alert(constants.viewImpossibleBcSipNotIngested());
+											}
+										}
+
+									});
+
+								}
+
+							});
 						} else {
 							value.setText(constants.noDataAvailable());
 						}
@@ -228,37 +202,34 @@ public class IngestStatistics extends StatisticTab {
 		header.setCellWidth(titleLabel, "100%");
 
 		centerLayout.setCellWidth(value, "100%");
-		centerLayout.setCellHorizontalAlignment(value,
-				HasAlignment.ALIGN_CENTER);
+		centerLayout.setCellHorizontalAlignment(value, HasAlignment.ALIGN_CENTER);
 
 		return ret;
 	}
 
-	protected void getLastDataOfType(String type,
-			final AsyncCallback<StatisticData> callback) {
+	protected void getLastDataOfType(String type, final AsyncCallback<StatisticData> callback) {
 		Filter filter = new Filter();
 		filter.add(new SimpleFilterParameter("type", type));
 		Sorter sorter = new Sorter();
 		sorter.add(new SortParameter("datetime", true));
 		Sublist subList = new Sublist(0, 1);
 		ContentAdapter adapter = new ContentAdapter(filter, sorter, subList);
-		StatisticsService.Util.getInstance().getStatisticList(adapter,
-				new AsyncCallback<List<StatisticData>>() {
+		StatisticsService.Util.getInstance().getStatisticList(adapter, new AsyncCallback<List<StatisticData>>() {
 
-					public void onFailure(Throwable caught) {
-						callback.onFailure(caught);
-					}
+			public void onFailure(Throwable caught) {
+				callback.onFailure(caught);
+			}
 
-					public void onSuccess(List<StatisticData> result) {
-						if (result.size() > 0) {
-							callback.onSuccess(result.get(0));
-						} else {
-							callback.onSuccess(null);
-						}
+			public void onSuccess(List<StatisticData> result) {
+				if (result.size() > 0) {
+					callback.onSuccess(result.get(0));
+				} else {
+					callback.onSuccess(null);
+				}
 
-					}
+			}
 
-				});
+		});
 
 	}
 

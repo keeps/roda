@@ -28,7 +28,7 @@ import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
-import pt.gov.dgarq.roda.core.data.v2.SIPState;
+import pt.gov.dgarq.roda.core.data.v2.SIPReport;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.core.data.v2.SimpleEventPreservationMetadata;
 import pt.gov.dgarq.roda.core.data.v2.SimpleRepresentationFilePreservationMetadata;
@@ -204,15 +204,19 @@ public class IndexService {
 			throws IndexServiceException {
 		return SolrUtils.find(index, LogEntry.class, filter, sorter, sublist);
 	}
-	
-	//SIPSTATE
-	public Long getSipStatesCount(Filter filter) throws IndexServiceException {
-		return SolrUtils.count(index, SIPState.class, filter);
+
+	// SIPSTATE
+	public Long countSipReports(Filter filter) throws IndexServiceException {
+		return SolrUtils.count(index, SIPReport.class, filter);
 	}
 
-	public IndexResult<SIPState> findSipState(Filter filter,
-			Sorter sorter, Sublist sublist) throws IndexServiceException {
-		return SolrUtils.find(index, SIPState.class, filter, sorter, sublist);
+	public IndexResult<SIPReport> findSipReports(Filter filter, Sorter sorter, Sublist sublist)
+			throws IndexServiceException {
+		return SolrUtils.find(index, SIPReport.class, filter, sorter, sublist);
+	}
+
+	public SIPReport retrieveSipReport(String sipReportId) throws IndexServiceException {
+		return SolrUtils.retrieve(index, SIPReport.class, sipReportId);
 	}
 
 	// FIXME perhaps transform sysout into logger logging
@@ -251,8 +255,8 @@ public class IndexService {
 			index.optimize(RodaConstants.INDEX_AIP);
 			index.optimize(RodaConstants.INDEX_SDO);
 		} catch (SolrServerException | IOException e) {
-			throw new IndexServiceException("Error while optimizing indexes", IndexServiceException.INTERNAL_SERVER_ERROR,
-					e);
+			throw new IndexServiceException("Error while optimizing indexes",
+					IndexServiceException.INTERNAL_SERVER_ERROR, e);
 		}
 	}
 

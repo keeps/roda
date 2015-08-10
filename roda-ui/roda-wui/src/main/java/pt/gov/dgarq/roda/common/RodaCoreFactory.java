@@ -64,6 +64,8 @@ public class RodaCoreFactory {
 			System.setProperty("solr.data.dir.preservationevent", indexPath.resolve("preservationevent").toString());
 			System.setProperty("solr.data.dir.preservationobject", indexPath.resolve("preservationobject").toString());
 			System.setProperty("solr.data.dir.actionlog", indexPath.resolve("actionlog").toString());
+			System.setProperty("solr.data.dir.sipreport", indexPath.resolve("sipreport").toString());
+			
 			// FIXME added missing cores
 
 			// start embedded solr

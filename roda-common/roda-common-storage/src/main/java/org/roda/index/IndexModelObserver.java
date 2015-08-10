@@ -23,7 +23,7 @@ import pt.gov.dgarq.roda.core.data.v2.EventPreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationFilePreservationObject;
-import pt.gov.dgarq.roda.core.data.v2.SIPState;
+import pt.gov.dgarq.roda.core.data.v2.SIPReport;
 
 /**
  * 
@@ -246,11 +246,11 @@ public class IndexModelObserver implements ModelObserver {
 	}
 	
 	@Override
-	public void sipStateCreated(SIPState entry) {
+	public void sipStateCreated(SIPReport entry) {
 		SolrInputDocument sipStateDocument = SolrUtils.sipStateToSolrDocument(entry);
 		try {
-			index.add(RodaConstants.INDEX_SIP_STATE, sipStateDocument);
-			index.commit(RodaConstants.INDEX_SIP_STATE);
+			index.add(RodaConstants.INDEX_SIP_REPORT, sipStateDocument);
+			index.commit(RodaConstants.INDEX_SIP_REPORT);
 		} catch (SolrServerException | IOException e) {
 			LOGGER.error("Could not index SIPState: " + e.getMessage(), e);
 		}

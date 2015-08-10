@@ -35,7 +35,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationState;
-import pt.gov.dgarq.roda.core.data.v2.SIPState;
+import pt.gov.dgarq.roda.core.data.v2.SIPReport;
 import pt.gov.dgarq.roda.core.metadata.v2.premis.PremisEventHelper;
 import pt.gov.dgarq.roda.core.metadata.v2.premis.PremisFileObjectHelper;
 import pt.gov.dgarq.roda.core.metadata.v2.premis.PremisMetadataException;
@@ -418,7 +418,7 @@ public final class ModelUtils {
 		return ret;
 	}
 	
-	public static String getJsonSipState(SIPState sipState) {
+	public static String getJsonSipState(SIPReport sipState) {
 		try {
 			JsonFactory factory = new JsonFactory();
 			ObjectMapper mapper = new ObjectMapper(factory);
@@ -429,18 +429,18 @@ public final class ModelUtils {
 		return null;
 	}
 
-	public static SIPState getSipState(String json) {
+	public static SIPReport getSipState(String json) {
 		try {
 			JsonFactory factory = new JsonFactory();
 			ObjectMapper mapper = new ObjectMapper(factory);
-			return mapper.readValue(json, SIPState.class);
+			return mapper.readValue(json, SIPReport.class);
 		} catch (IOException ioe) {
 
 		}
 		return null;
 	}
 
-	public static StoragePath getSipStatePath(SIPState sipState) throws StorageServiceException {
-		return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_SIP_STATE,sipState.getId());
+	public static StoragePath getSipStatePath(SIPReport sipState) throws StorageServiceException {
+		return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_SIP_REPORT,sipState.getId());
 	}
 }

@@ -72,7 +72,7 @@ import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.core.data.v2.SimpleEventPreservationMetadata;
 import pt.gov.dgarq.roda.core.data.v2.SimpleRepresentationFilePreservationMetadata;
 import pt.gov.dgarq.roda.core.data.v2.SimpleRepresentationPreservationMetadata;
-import pt.gov.dgarq.roda.core.data.v2.SIPState;
+import pt.gov.dgarq.roda.core.data.v2.SIPReport;
 import pt.gov.dgarq.roda.core.data.v2.SIPStateTransition;
 
 /**
@@ -422,8 +422,8 @@ public class SolrUtils {
 			indexName = RodaConstants.INDEX_PRESERVATION_EVENTS;
 		} else if (resultClass.equals(LogEntry.class)) {
 			indexName = RodaConstants.INDEX_ACTION_LOG;
-		} else if (resultClass.equals(SIPState.class)) {
-			indexName = RodaConstants.INDEX_SIP_STATE;
+		} else if (resultClass.equals(SIPReport.class)) {
+			indexName = RodaConstants.INDEX_SIP_REPORT;
 		} else {
 			throw new IndexServiceException("Cannot find class index name: " + resultClass.getName(),
 					IndexServiceException.INTERNAL_SERVER_ERROR);
@@ -445,7 +445,7 @@ public class SolrUtils {
 			ret = resultClass.cast(solrDocumentToSimpleEventPreservationMetadata(doc));
 		} else if (resultClass.equals(LogEntry.class)) {
 			ret = resultClass.cast(solrDocumentToLogEntry(doc));
-		} else if (resultClass.equals(SIPState.class)) {
+		} else if (resultClass.equals(SIPReport.class)) {
 			ret = resultClass.cast(solrDocumentToSipState(doc));
 		} else {
 			throw new IndexServiceException("Cannot find class index name: " + resultClass.getName(),
@@ -882,7 +882,7 @@ public class SolrUtils {
 		doc.addField(RodaConstants.LOG_USERNAME, logEntry.getUsername());
 		return doc;
 	}
-	private static SIPState solrDocumentToSipState(SolrDocument doc) {
+	private static SIPReport solrDocumentToSipState(SolrDocument doc) {
 		final String id = objectToString(doc.get(RodaConstants.SIPSTATE_ID));
 		final String username = objectToString(doc.get(RodaConstants.SIPSTATE_USERNAME));
 		final String originalFilename = objectToString(doc.get(RodaConstants.SIPSTATE_ORIGINAL_FILENAME));
@@ -910,7 +910,7 @@ public class SolrUtils {
 			}
 		}*/
 		
-		SIPState sipState = new SIPState();
+		SIPReport sipState = new SIPReport();
 		sipState.setId(id);
 		sipState.setUsername(username);
 		sipState.setOriginalFilename(originalFilename);
@@ -925,7 +925,7 @@ public class SolrUtils {
 		sipState.setStateTransitions(ssts.toArray(new SIPStateTransition[ssts.size()]));
 		return sipState;
 	}
-	public static SolrInputDocument sipStateToSolrDocument(SIPState sipState) {
+	public static SolrInputDocument sipStateToSolrDocument(SIPReport sipState) {
 		SolrInputDocument doc = new SolrInputDocument();
 		doc.addField(RodaConstants.SIPSTATE_COMPLETE, sipState.isComplete());
 		doc.addField(RodaConstants.SIPSTATE_COMPLETE_PERCENTAGE, sipState.getCompletePercentage());

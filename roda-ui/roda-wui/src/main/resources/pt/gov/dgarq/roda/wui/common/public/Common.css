@@ -118,9 +118,11 @@ h3, .h3 {
 	font-weight: 500;
 	text-shadow: none !important;
 }
+
 .com-google-gwt-user-cellview-client-CellTable-Style-cellTableWidget {
 	border-style: none;
 }
+
 .com-google-gwt-user-cellview-client-CellTable-Style-cellTableSelectedRow
 	{
 	background-color: #90c0dd !important;
@@ -131,10 +133,10 @@ h3, .h3 {
 	border: 2px solid #90c0dd !important;
 }
 
-.com-google-gwt-user-cellview-client-CellTable-Style-cellTableHoveredRow {
+.com-google-gwt-user-cellview-client-CellTable-Style-cellTableHoveredRow
+	{
 	cursor: pointer;
 }
-
 
 .gwt-CheckBox label {
 	position: relative;
@@ -153,6 +155,12 @@ h3, .h3 {
 .my-collections-empty-info {
 	padding: 10px;
 }
+
+.my-collections-table-cell-link * {
+	text-decoration: underline;
+	color: #089de3;
+}
+
 
 .my-asyncdatagrid-pager-results {
 	margin-right: 0px;
@@ -501,6 +509,7 @@ td.datePickerMonth, td.datePickerYear {
 		
 		
 		
+		
 		 'scale');
 }
 
@@ -509,6 +518,7 @@ td.datePickerMonth, td.datePickerYear {
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src= 'images/button/normal/right_arrow_backward.png', sizingMethod=
+		
 		
 		
 		
@@ -532,6 +542,7 @@ td.datePickerMonth, td.datePickerYear {
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src= 'images/button/normal/right_arrow_forward.png', sizingMethod=
+		
 		
 		
 		
@@ -576,7 +587,7 @@ td.datePickerMonth, td.datePickerYear {
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/normal/right_minus.png', sizingMethod=
+		   'images/button/normal/right_minus.png', sizingMethod= 
 		              
 		'scale');
 }
@@ -646,7 +657,7 @@ td.datePickerMonth, td.datePickerYear {
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/hover/right_arrow_up.png', sizingMethod=  
+		   'images/button/hover/right_arrow_up.png', sizingMethod=   
 		            
 		'scale');
 }
@@ -757,7 +768,7 @@ td.datePickerMonth, td.datePickerYear {
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/pressed/right_check.png', sizingMethod= 
+		   'images/button/pressed/right_check.png', sizingMethod=  
 		             
 		'scale');
 }
@@ -767,7 +778,7 @@ td.datePickerMonth, td.datePickerYear {
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/pressed/right_cross.png', sizingMethod= 
+		   'images/button/pressed/right_cross.png', sizingMethod=  
 		             
 		'scale');
 }
@@ -777,7 +788,7 @@ td.datePickerMonth, td.datePickerYear {
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/pressed/right_info.png', sizingMethod=
+		   'images/button/pressed/right_info.png', sizingMethod= 
 		              
 		'scale');
 }
@@ -787,7 +798,7 @@ td.datePickerMonth, td.datePickerYear {
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/pressed/right_minus.png', sizingMethod= 
+		   'images/button/pressed/right_minus.png', sizingMethod=  
 		             
 		'scale');
 }
@@ -797,7 +808,7 @@ td.datePickerMonth, td.datePickerYear {
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/pressed/right_plus.png', sizingMethod=
+		   'images/button/pressed/right_plus.png', sizingMethod= 
 		              
 		'scale');
 }
@@ -869,7 +880,7 @@ td.datePickerMonth, td.datePickerYear {
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/disabled/right_check.png', sizingMethod=  
+		   'images/button/disabled/right_check.png', sizingMethod=   
 		            
 		'scale');
 }
@@ -879,7 +890,7 @@ td.datePickerMonth, td.datePickerYear {
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/disabled/right_cross.png', sizingMethod=  
+		   'images/button/disabled/right_cross.png', sizingMethod=   
 		            
 		'scale');
 }
@@ -889,7 +900,7 @@ td.datePickerMonth, td.datePickerYear {
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/disabled/right_info.png', sizingMethod= 
+		   'images/button/disabled/right_info.png', sizingMethod=  
 		             
 		'scale');
 }
@@ -899,7 +910,7 @@ td.datePickerMonth, td.datePickerYear {
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/disabled/right_minus.png', sizingMethod=  
+		   'images/button/disabled/right_minus.png', sizingMethod=   
 		            
 		'scale');
 }
@@ -909,7 +920,7 @@ td.datePickerMonth, td.datePickerYear {
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/disabled/right_plus.png', sizingMethod= 
+		   'images/button/disabled/right_plus.png', sizingMethod=  
 		             
 		'scale');
 }
@@ -927,7 +938,7 @@ td.datePickerMonth, td.datePickerYear {
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/disabled/right_rec.png', sizingMethod=
+		   'images/button/disabled/right_rec.png', sizingMethod= 
 		              
 		'scale');
 }
@@ -1009,7 +1020,7 @@ td.datePickerMonth, td.datePickerYear {
 	_background: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/shadow/shadow-bottom-left.png', sizingMethod=
+		   'images/shadow/shadow-bottom-left.png', sizingMethod= 
 		              
 		'scale');
 }
@@ -1030,7 +1041,7 @@ td.datePickerMonth, td.datePickerYear {
 	_background: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/shadow/shadow-bottom-right.png', sizingMethod= 
+		   'images/shadow/shadow-bottom-right.png', sizingMethod=  
 		             
 		'scale');
 }
@@ -1645,9 +1656,10 @@ td.datePickerMonth, td.datePickerYear {
 /** Selectable AIP List**/
 .selectableAipList-selectedLabel {
 	float: left;
-    line-height: 25px;
-    margin-right: 5px;
+	line-height: 25px;
+	margin-right: 5px;
 }
+
 .selectableAipList-breadcrumb {
 	background-color: white;
 	padding: 5px;

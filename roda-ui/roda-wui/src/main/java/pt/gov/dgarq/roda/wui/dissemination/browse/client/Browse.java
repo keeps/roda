@@ -82,6 +82,10 @@ public class Browse extends Composite {
 		}
 	};
 
+	public static final String getViewItemHistoryToken(String id) {
+		return RESOLVER.getHistoryPath() + "." + id;
+	}
+
 	interface MyUiBinder extends UiBinder<Widget, Browse> {
 	}
 
@@ -299,11 +303,11 @@ public class Browse extends Composite {
 		for (SimpleDescriptionObject ancestor : sdoAncestors) {
 			SafeHtml breadcrumbLabel = getBreadcrumbLabel(ancestor);
 			BreadcrumbItem ancestorBreadcrumb = new BreadcrumbItem(breadcrumbLabel,
-					RESOLVER.getHistoryPath() + "." + ancestor.getId());
+					getViewItemHistoryToken(ancestor.getId()));
 			ret.add(1, ancestorBreadcrumb);
 		}
 
-		ret.add(new BreadcrumbItem(getBreadcrumbLabel(sdo), RESOLVER.getHistoryPath() + "." + sdo.getId()));
+		ret.add(new BreadcrumbItem(getBreadcrumbLabel(sdo), getViewItemHistoryToken(sdo.getId())));
 		return ret;
 	}
 
@@ -424,7 +428,7 @@ public class Browse extends Composite {
 		if (id == null) {
 			token = RESOLVER.getHistoryPath();
 		} else {
-			token = RESOLVER.getHistoryPath() + "." + id;
+			token = getViewItemHistoryToken(id);
 		}
 
 		if (token.equals(History.getToken())) {

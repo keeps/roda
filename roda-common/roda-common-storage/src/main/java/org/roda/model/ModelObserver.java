@@ -2,7 +2,7 @@ package org.roda.model;
 
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
-import pt.gov.dgarq.roda.core.data.v2.SIPState;
+import pt.gov.dgarq.roda.core.data.v2.SIPReport;
 
 public interface ModelObserver {
 
@@ -35,6 +35,6 @@ public interface ModelObserver {
 	
 	public void logEntryCreated(LogEntry entry);
 	
-	public void sipStateCreated(SIPState state);
+	public void sipStateCreated(SIPReport state);
 
 }
