@@ -143,7 +143,12 @@ public class CASUpgradedFilter extends RODAFilter {
 				
 					CASUserPrincipal cup = UserUtility.getUser(servletRequest);
 					if (cup != null) {
-						if(UserUtility.haveSessionActive(casUtility,servletRequest)){
+						try{
+							logger.debug("Validating...");
+							CASUserPrincipal cupUpdated = this.casUtility.getCASUserPrincipalFromProxyGrantingTicket(cup.getProxyGrantingTicket(), "");
+							cupUpdated.setGuest(cup.isGuest());
+							UserUtility.setUser(servletRequest, cupUpdated);
+						}catch(Exception e){
 							String cleanURL = getCleanURL(servletRequest);
 							String urlToRedirectTo = CommonUtils.constructRedirectUrl(casLoginURL, "service", cleanURL, false,
 									false);
