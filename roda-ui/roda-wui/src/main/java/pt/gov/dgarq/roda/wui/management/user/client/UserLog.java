@@ -9,13 +9,10 @@ import java.util.Map;
 import java.util.Vector;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.TextBox;
@@ -26,19 +23,15 @@ import config.i18n.client.UserManagementConstants;
 import config.i18n.client.UserManagementMessages;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.User;
-import pt.gov.dgarq.roda.core.data.adapter.facet.FacetParameter;
 import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
 import pt.gov.dgarq.roda.core.data.adapter.facet.SimpleFacetParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
-import pt.gov.dgarq.roda.core.data.v2.FacetFieldResult;
-import pt.gov.dgarq.roda.core.data.v2.FacetValue;
-import pt.gov.dgarq.roda.core.data.v2.IndexResult;
-import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
+import pt.gov.dgarq.roda.wui.common.client.tools.FacetUtils;
 import pt.gov.dgarq.roda.wui.common.client.widgets.LogEntryList;
 import pt.gov.dgarq.roda.wui.management.client.Management;
 
@@ -112,13 +105,13 @@ public class UserLog extends Composite {
 	@UiField(provided = true)
 	LogEntryList logList;
 
-	@UiField
+	@UiField(provided = true)
 	FlowPanel facetComponents;
 
-	@UiField
+	@UiField(provided = true)
 	FlowPanel facetMethods;
 
-	@UiField
+	@UiField(provided = true)
 	FlowPanel facetUsers;
 
 	/**
@@ -134,71 +127,19 @@ public class UserLog extends Composite {
 				new SimpleFacetParameter(RodaConstants.LOG_ACTION_METHOD),
 				new SimpleFacetParameter(RodaConstants.LOG_USERNAME));
 		logList = new LogEntryList(filter, facets);
-		logList.addValueChangeHandler(new ValueChangeHandler<IndexResult<LogEntry>>() {
+		facetComponents = new FlowPanel();
+		facetMethods = new FlowPanel();
+		facetUsers = new FlowPanel();
 
-			@Override
-			public void onValueChange(ValueChangeEvent<IndexResult<LogEntry>> event) {
-				GWT.log("facets: " + event.getValue().getFacetResults());
-				Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
-				facetPanels.put(RodaConstants.LOG_ACTION_COMPONENT, facetComponents);
-				facetPanels.put(RodaConstants.LOG_ACTION_METHOD, facetMethods);
-				facetPanels.put(RodaConstants.LOG_USERNAME, facetUsers);
-				updateFacetPanels(facetPanels, event.getValue().getFacetResults());
-
-			}
-		});
+		Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
+		facetPanels.put(RodaConstants.LOG_ACTION_COMPONENT, facetComponents);
+		facetPanels.put(RodaConstants.LOG_ACTION_METHOD, facetMethods);
+		facetPanels.put(RodaConstants.LOG_USERNAME, facetUsers);
+		FacetUtils.bindFacets(logList, facetPanels);
 
 		initWidget(uiBinder.createAndBindUi(this));
+		
 		inputUserFilterPanel.setVisible(user == null);
-	}
-
-	protected void updateFacetPanels(Map<String, FlowPanel> facetPanels, List<FacetFieldResult> facetResults) {
-		for (FacetFieldResult facetResult : facetResults) {
-			final String facetField = facetResult.getField();
-			FlowPanel facetPanel = facetPanels.get(facetResult.getField());
-			if (facetPanel != null) {
-				facetPanel.clear();
-
-				for (FacetValue facetValue : facetResult.getValues()) {
-					final String value = facetValue.getValue();
-					long count = facetValue.getCount();
-
-					CheckBox facetValuePanel = new CheckBox(value + " (" + count + ")");
-					facetValuePanel.addStyleName("sidebar-facet-label");
-					facetPanel.add(facetValuePanel);
-
-					facetValuePanel.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
-
-						@Override
-						public void onValueChange(ValueChangeEvent<Boolean> event) {
-							Facets facets = logList.getFacets();
-							FacetParameter selectedFacetParameter = null;
-							for (FacetParameter facetParameter : facets.getParameters()) {
-								if (facetParameter.getName().equals(facetField)) {
-									selectedFacetParameter = facetParameter;
-									break;
-								}
-							}
-
-							if (selectedFacetParameter != null) {
-								selectedFacetParameter.getValues().add(value);
-							} else {
-								logger.warn("Haven't found the facet parameter: " + facetField);
-							}
-							logList.setFacets(facets);
-
-						}
-					});
-
-					// TODO set checkbox state
-					// TODO add value change to checkbox
-
-				}
-
-			} else {
-				logger.warn("Got a facet but haven't got a panel for it");
-			}
-		}
 	}
 
 	protected Filter getFilter() {

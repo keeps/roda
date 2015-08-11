@@ -3,14 +3,13 @@
  */
 package pt.gov.dgarq.roda.wui.ingest.list.client;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -25,7 +24,6 @@ import com.google.gwt.user.client.ui.Widget;
 import config.i18n.client.IngestListConstants;
 import config.i18n.client.IngestListMessages;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
-import pt.gov.dgarq.roda.core.data.adapter.facet.FacetParameter;
 import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
 import pt.gov.dgarq.roda.core.data.adapter.facet.SimpleFacetParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
@@ -33,14 +31,12 @@ import pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.LikeFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.OneOfManyFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
-import pt.gov.dgarq.roda.core.data.v2.FacetFieldResult;
-import pt.gov.dgarq.roda.core.data.v2.FacetValue;
-import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.SIPReport;
 import pt.gov.dgarq.roda.wui.common.client.AuthenticatedUser;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
+import pt.gov.dgarq.roda.wui.common.client.tools.FacetUtils;
 import pt.gov.dgarq.roda.wui.common.client.widgets.SIPReportList;
 import pt.gov.dgarq.roda.wui.ingest.client.Ingest;
 
@@ -137,7 +133,7 @@ public class IngestList extends Composite {
 	@UiField
 	CheckBox checkRejected;
 
-	@UiField
+	@UiField(provided=true)
 	FlowPanel producerFacets;
 
 	@UiField
@@ -165,27 +161,10 @@ public class IngestList extends Composite {
 		Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.SIP_REPORT_USERNAME));
 
 		sipList = new SIPReportList(filter, facets);
-		sipList.addValueChangeHandler(new ValueChangeHandler<IndexResult<SIPReport>>() {
-
-			@Override
-			public void onValueChange(ValueChangeEvent<IndexResult<SIPReport>> event) {
-				List<FacetFieldResult> facetResults = event.getValue().getFacetResults();
-				GWT.log("Facet results: " + facetResults);
-				producerFacets.clear();
-				for (FacetFieldResult facetResult : facetResults) {
-					if (facetResult.getField().equals(RodaConstants.SIP_REPORT_USERNAME)) {
-						for (FacetValue facetValue : facetResult.getValues()) {
-							String value = facetValue.getValue();
-							long count = facetValue.getCount();
-
-							CheckBox producer = new CheckBox(value + " (" + count + ")");
-							producer.addStyleName("sidebar-facet-label");
-							producerFacets.add(producer);
-						}
-					}
-				}
-			}
-		});
+		producerFacets = new FlowPanel();
+		Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
+		facetPanels.put(RodaConstants.SIP_REPORT_USERNAME, producerFacets);
+		FacetUtils.bindFacets(sipList, facetPanels);
 
 		initWidget(uiBinder.createAndBindUi(this));
 	}
