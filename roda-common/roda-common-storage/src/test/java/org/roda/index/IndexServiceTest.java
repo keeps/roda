@@ -144,7 +144,8 @@ public class IndexServiceTest {
 		assertEquals(aip.getDateCreated(), sdo.getCreatedDate());
 		assertEquals(aip.getDateModified(), sdo.getLastModifiedDate());
 
-		final IndexResult<SimpleDescriptionObject> sdos = index.findDescriptiveMetadata(null, null, new Sublist(0, 10));
+		final IndexResult<SimpleDescriptionObject> sdos = index.findDescriptiveMetadata(null, null, new Sublist(0, 10),
+				null);
 		assertEquals(1, sdos.getTotalCount());
 		assertEquals(1, sdos.getLimit());
 		assertEquals(0, sdos.getOffset());
@@ -245,7 +246,7 @@ public class IndexServiceTest {
 
 		Filter filter = new Filter();
 		filter.add(new SimpleFilterParameter(RodaConstants.AIP_ID, aipId));
-		SimpleDescriptionObject sdo = index.findDescriptiveMetadata(filter, null, new Sublist(0, 10)).getResults()
+		SimpleDescriptionObject sdo = index.findDescriptiveMetadata(filter, null, new Sublist(0, 10), null).getResults()
 				.get(0);
 		Calendar calInitial = Calendar.getInstance();
 		calInitial.setTime(sdo.getDateInitial());
@@ -287,7 +288,7 @@ public class IndexServiceTest {
 		assertEquals(1, sdoCount);
 
 		final IndexResult<SimpleDescriptionObject> sdos = index
-				.findDescriptiveMetadata(SimpleDescriptionObject.FONDS_FILTER, null, new Sublist(0, 10));
+				.findDescriptiveMetadata(SimpleDescriptionObject.FONDS_FILTER, null, new Sublist(0, 10), null);
 
 		assertEquals(1, sdos.getLimit());
 		assertEquals(CorporaConstants.SOURCE_AIP_ID, sdos.getResults().get(0).getId());
@@ -311,7 +312,7 @@ public class IndexServiceTest {
 		assertEquals(1, sdoCount);
 
 		final IndexResult<SimpleDescriptionObject> sdos = index.findDescriptiveMetadata(filter, null,
-				new Sublist(0, 10));
+				new Sublist(0, 10), null);
 
 		assertEquals(1, sdos.getLimit());
 		assertEquals(CorporaConstants.OTHER_AIP_ID, sdos.getResults().get(0).getId());
@@ -352,7 +353,7 @@ public class IndexServiceTest {
 		filter.add(new SimpleFilterParameter(RodaConstants.SDO_LEVEL, "fonds"));
 		filter.add(new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID));
 		IndexResult<SimpleDescriptionObject> findDescriptiveMetadata = index.findDescriptiveMetadata(filter, null,
-				new Sublist());
+				new Sublist(), null);
 
 		assertNotNull(findDescriptiveMetadata);
 		assertThat(findDescriptiveMetadata.getResults(), Matchers.hasSize(1));

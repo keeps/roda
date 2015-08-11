@@ -12,6 +12,7 @@ import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.data.DescriptionObject;
 import pt.gov.dgarq.roda.core.data.RepresentationPreservationObject;
+import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
@@ -66,7 +67,7 @@ public interface BrowserService extends RemoteService {
 	 * @return 
 	 * @throws RODAException
 	 */
-	public IndexResult<SimpleDescriptionObject> findDescriptiveMetadata(Filter filter, Sorter sorter, Sublist sublist) throws RODAException;
+	public IndexResult<SimpleDescriptionObject> findDescriptiveMetadata(Filter filter, Sorter sorter, Sublist sublist, Facets facets) throws RODAException;
 
 	public BrowseItemBundle getItemBundle(String aipId, String localeString) throws RODAException;
 

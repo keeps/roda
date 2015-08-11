@@ -7,6 +7,7 @@ import pt.gov.dgarq.roda.common.RodaCoreService;
 import pt.gov.dgarq.roda.common.UserUtility;
 import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
 import pt.gov.dgarq.roda.core.common.RODAException;
+import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
@@ -40,7 +41,7 @@ public class Browser extends RodaCoreService {
 	}
 
 	public static IndexResult<SimpleDescriptionObject> findDescriptiveMetadata(CASUserPrincipal user, Filter filter,
-			Sorter sorter, Sublist sublist) throws RODAException {
+			Sorter sorter, Sublist sublist, Facets facets) throws RODAException {
 		Date start = new Date();
 
 		// check user permissions
@@ -48,7 +49,7 @@ public class Browser extends RodaCoreService {
 
 		// delegate
 		IndexResult<SimpleDescriptionObject> descriptiveMetadata = BrowserHelper.findDescriptiveMetadata(filter, sorter,
-				sublist);
+				sublist, facets);
 
 		// register action
 		long duration = new Date().getTime() - start.getTime();

@@ -22,6 +22,7 @@ import org.roda.storage.Resource;
 import org.roda.storage.StorageServiceException;
 
 import pt.gov.dgarq.roda.core.common.RodaConstants;
+import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
@@ -63,9 +64,9 @@ public class IndexService {
 		return SolrUtils.count(index, AIP.class, filter);
 	}
 
-	public IndexResult<SimpleDescriptionObject> findDescriptiveMetadata(Filter filter, Sorter sorter, Sublist sublist)
+	public IndexResult<SimpleDescriptionObject> findDescriptiveMetadata(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
 			throws IndexServiceException {
-		return SolrUtils.find(index, SimpleDescriptionObject.class, filter, sorter, sublist);
+		return SolrUtils.find(index, SimpleDescriptionObject.class, filter, sorter, sublist, facets);
 	}
 
 	public Long countDescriptiveMetadata(Filter filter) throws IndexServiceException {

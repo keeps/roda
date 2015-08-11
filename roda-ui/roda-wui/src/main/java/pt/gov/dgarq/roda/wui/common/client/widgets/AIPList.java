@@ -16,6 +16,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.view.client.ProvidesKey;
 
 import pt.gov.dgarq.roda.core.common.RodaConstants;
+import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
@@ -147,8 +148,10 @@ public class AIPList extends AsyncTableCell<SimpleDescriptionObject> {
 
 			// define sublist
 			Sublist sublist = new Sublist(start, length);
-
-			BrowserService.Util.getInstance().findDescriptiveMetadata(filter, sorter, sublist, callback);
+			// FIXME define facets here
+			Facets facets = null;
+			
+			BrowserService.Util.getInstance().findDescriptiveMetadata(filter, sorter, sublist, facets, callback);
 		}
 
 	}

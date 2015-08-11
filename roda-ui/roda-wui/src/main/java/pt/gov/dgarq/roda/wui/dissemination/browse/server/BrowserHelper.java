@@ -16,6 +16,7 @@ import org.roda.storage.StorageServiceException;
 
 import pt.gov.dgarq.roda.common.RodaCoreFactory;
 import pt.gov.dgarq.roda.core.common.RODAException;
+import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
@@ -94,10 +95,10 @@ public class BrowserHelper {
 	}
 
 	protected static IndexResult<SimpleDescriptionObject> findDescriptiveMetadata(Filter filter, Sorter sorter,
-			Sublist sublist) throws GenericException {
+			Sublist sublist, Facets facets) throws GenericException {
 		IndexResult<SimpleDescriptionObject> sdos;
 		try {
-			sdos = RodaCoreFactory.getIndexService().findDescriptiveMetadata(filter, sorter, sublist);
+			sdos = RodaCoreFactory.getIndexService().findDescriptiveMetadata(filter, sorter, sublist, facets);
 			LOGGER.debug(String.format("findDescriptiveMetadata(%1$s,%2$s,%3$s)=%4$s", filter, sorter, sublist, sdos));
 		} catch (IndexServiceException e) {
 			LOGGER.error("Error getting collections", e);

@@ -30,6 +30,8 @@ import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrQuery.SortClause;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
+import org.apache.solr.client.solrj.response.FacetField;
+import org.apache.solr.client.solrj.response.FacetField.Count;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -51,6 +53,10 @@ import org.slf4j.LoggerFactory;
 
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.RODAObjectPermissions;
+import pt.gov.dgarq.roda.core.data.adapter.facet.FacetParameter;
+import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
+import pt.gov.dgarq.roda.core.data.adapter.facet.RangeFacetParameter;
+import pt.gov.dgarq.roda.core.data.adapter.facet.SimpleFacetParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.BasicSearchFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
@@ -61,6 +67,7 @@ import pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.data.v2.EventPreservationObject;
+import pt.gov.dgarq.roda.core.data.v2.FacetFieldResult;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.RODAObject;
@@ -115,6 +122,7 @@ public class SolrUtils {
 	public static <T extends Serializable> IndexResult<T> queryResponseToIndexResult(QueryResponse response,
 			Class<T> responseClass) throws IndexServiceException {
 		final SolrDocumentList docList = response.getResults();
+		final List<FacetFieldResult> facetResults = processFacetFields(response.getFacetFields());
 		final long offset = docList.getStart();
 		final long limit = docList.size();
 		final long totalCount = docList.getNumFound();
@@ -125,7 +133,23 @@ public class SolrUtils {
 			docs.add(result);
 		}
 
-		return new IndexResult<T>(offset, limit, totalCount, docs);
+		return new IndexResult<T>(offset, limit, totalCount, docs, facetResults);
+	}
+
+	private static List<FacetFieldResult> processFacetFields(List<FacetField> facetFields) {
+		List<FacetFieldResult> ret = new ArrayList<FacetFieldResult>();
+		FacetFieldResult facetResult;
+		for (FacetField facet : facetFields) {
+			LOGGER.debug("facet: " + facet.getName() + " count:" + facet.getValueCount());
+			facetResult = new FacetFieldResult(facet.getName(), facet.getValueCount());
+			for (Count count : facet.getValues()) {
+				LOGGER.debug("   value:" + count.getName() + " value: " + count.getCount());
+				facetResult.addFacetValue(count.getName(), count.getCount());
+			}
+			ret.add(facetResult);
+		}
+		return ret;
+
 	}
 
 	public static SolrInputDocument getDescriptiveMetataFields(Binary binary) throws IndexServiceException {
@@ -246,8 +270,46 @@ public class SolrUtils {
 		return ret;
 	}
 
+	private static void parseAndConfigureFacets(Facets facet, SolrQuery query) throws IndexServiceException {
+		if (facet != null) {
+			if (!"".equals(facet.getQuery())) {
+				query.addFacetQuery(facet.getQuery());
+			}
+			StringBuilder filterQuery = new StringBuilder();
+			for (FacetParameter facetParameter : facet.getParameters()) {
+				if (facetParameter instanceof SimpleFacetParameter) {
+					query.addFacetField(facetParameter.getName());
+					generateFilterQueryFromSimpleFacet(filterQuery, facetParameter.getName(),
+							((SimpleFacetParameter) facetParameter).getValues());
+				} else if (facetParameter instanceof RangeFacetParameter) {
+					LOGGER.error("Unsupported facet parameter class: " + facetParameter.getClass().getName());
+				} else {
+					LOGGER.error("Unsupported facet parameter class: " + facetParameter.getClass().getName());
+				}
+			}
+			if (filterQuery.length() > 0) {
+				query.addFilterQuery(filterQuery.toString());
+			}
+		}
+	}
+
 	private static void appendANDOperator(StringBuilder ret) {
 		ret.append(" AND ");
+	}
+
+	private static void generateFilterQueryFromSimpleFacet(StringBuilder filterQuery, String facet,
+			List<String> values) {
+		if (filterQuery.length() > 0) {
+			appendANDOperator(filterQuery);
+		}
+		filterQuery.append("(");
+		for (int i = 0; i < values.size(); i++) {
+			if (i != 0) {
+				filterQuery.append(" OR ");
+			}
+			appendExactMatch(filterQuery, facet, values.get(i), true);
+		}
+		filterQuery.append(")");
 	}
 
 	private static void appendValuesUsingOROperator(StringBuilder ret, String key, String[] values) {
@@ -340,7 +402,7 @@ public class SolrUtils {
 		}
 		return ret;
 	}
-	
+
 	private static Float objectToFloat(Object object) {
 		Float ret;
 		if (object instanceof Float) {
@@ -358,7 +420,6 @@ public class SolrUtils {
 		}
 		return ret;
 	}
-
 
 	private static Date objectToDate(Object object) {
 		Date ret;
@@ -474,6 +535,11 @@ public class SolrUtils {
 
 	public static <T extends Serializable> IndexResult<T> find(SolrClient index, Class<T> classToRetrieve,
 			Filter filter, Sorter sorter, Sublist sublist) throws IndexServiceException {
+		return find(index, classToRetrieve, filter, sorter, sublist, null);
+	}
+
+	public static <T extends Serializable> IndexResult<T> find(SolrClient index, Class<T> classToRetrieve,
+			Filter filter, Sorter sorter, Sublist sublist, Facets facets) throws IndexServiceException {
 		IndexResult<T> ret;
 		SolrQuery query = new SolrQuery();
 		String queryString = parseFilter(filter);
@@ -481,6 +547,7 @@ public class SolrUtils {
 		query.setSorts(parseSorter(sorter));
 		query.setStart(sublist.getFirstElementIndex());
 		query.setRows(sublist.getMaximumElementCount());
+		parseAndConfigureFacets(facets, query);
 		try {
 			QueryResponse response = index.query(getIndexName(classToRetrieve), query);
 			ret = queryResponseToIndexResult(response, classToRetrieve);
@@ -882,6 +949,7 @@ public class SolrUtils {
 		doc.addField(RodaConstants.LOG_USERNAME, logEntry.getUsername());
 		return doc;
 	}
+
 	private static SIPReport solrDocumentToSipState(SolrDocument doc) {
 		final String id = objectToString(doc.get(RodaConstants.SIP_REPORT_ID));
 		final String username = objectToString(doc.get(RodaConstants.SIP_REPORT_USERNAME));
@@ -895,21 +963,28 @@ public class SolrUtils {
 		final String ingestedPID = objectToString(doc.get(RodaConstants.SIP_REPORT_INGESTED_PID));
 		final String fileID = objectToString(doc.get(RodaConstants.SIP_REPORT_FILE_ID));
 		List<SIPStateTransition> ssts = new ArrayList<SIPStateTransition>();
-		/*if(doc.getChildDocumentCount()>0){
-			for(SolrDocument child : doc.getChildDocuments()){
-				SIPStateTransition sst = new SIPStateTransition();
-				sst.setId(objectToString(child.get(RodaConstants.SIPSTATE_TRANSITION_ID)));
-				sst.setDatetime(objectToDate(child.get(RodaConstants.SIPSTATE_TRANSITION_DATETIME)));
-				sst.setDescription(objectToString(child.get(RodaConstants.SIPSTATE_TRANSITION_DESCRIPTION)));
-				sst.setFromState(objectToString(child.get(RodaConstants.SIPSTATE_TRANSITION_FROM)));
-				sst.setSipID(objectToString(child.get(RodaConstants.SIPSTATE_TRANSITION_SIPID)));
-				sst.setSuccess(objectToBoolean(child.get(RodaConstants.SIPSTATE_TRANSITION_SUCCESS)));
-				sst.setTaskID(objectToString(child.get(RodaConstants.SIPSTATE_TRANSITION_TASKID)));
-				sst.setToState(objectToString(child.get(RodaConstants.SIPSTATE_TRANSITION_TO)));
-				ssts.add(sst);
-			}
-		}*/
-		
+		/*
+		 * if(doc.getChildDocumentCount()>0){ for(SolrDocument child :
+		 * doc.getChildDocuments()){ SIPStateTransition sst = new
+		 * SIPStateTransition();
+		 * sst.setId(objectToString(child.get(RodaConstants.
+		 * SIPSTATE_TRANSITION_ID)));
+		 * sst.setDatetime(objectToDate(child.get(RodaConstants.
+		 * SIPSTATE_TRANSITION_DATETIME)));
+		 * sst.setDescription(objectToString(child.get(RodaConstants.
+		 * SIPSTATE_TRANSITION_DESCRIPTION)));
+		 * sst.setFromState(objectToString(child.get(RodaConstants.
+		 * SIPSTATE_TRANSITION_FROM)));
+		 * sst.setSipID(objectToString(child.get(RodaConstants.
+		 * SIPSTATE_TRANSITION_SIPID)));
+		 * sst.setSuccess(objectToBoolean(child.get(RodaConstants.
+		 * SIPSTATE_TRANSITION_SUCCESS)));
+		 * sst.setTaskID(objectToString(child.get(RodaConstants.
+		 * SIPSTATE_TRANSITION_TASKID)));
+		 * sst.setToState(objectToString(child.get(RodaConstants.
+		 * SIPSTATE_TRANSITION_TO))); ssts.add(sst); } }
+		 */
+
 		SIPReport sipState = new SIPReport();
 		sipState.setId(id);
 		sipState.setUsername(username);
@@ -925,6 +1000,7 @@ public class SolrUtils {
 		sipState.setStateTransitions(ssts.toArray(new SIPStateTransition[ssts.size()]));
 		return sipState;
 	}
+
 	public static SolrInputDocument sipReportToSolrDocument(SIPReport sipState) {
 		SolrInputDocument doc = new SolrInputDocument();
 		doc.addField(RodaConstants.SIP_REPORT_COMPLETE, sipState.isComplete());
@@ -938,20 +1014,28 @@ public class SolrUtils {
 		doc.addField(RodaConstants.SIP_REPORT_PROCESSING, sipState.isProcessing());
 		doc.addField(RodaConstants.SIP_REPORT_STATE, sipState.getState());
 		doc.addField(RodaConstants.SIP_REPORT_USERNAME, sipState.getUsername());
-		/*if(sipState.getStateTransitions()!=null && sipState.getStateTransitions().length>0){
-			for(SIPStateTransition sst : sipState.getStateTransitions()){
-				SolrInputDocument sstSolrDoc = new SolrInputDocument();
-				sstSolrDoc.addField(RodaConstants.SIPSTATE_TRANSITION_DATETIME, sst.getDatetime());
-				sstSolrDoc.addField(RodaConstants.SIPSTATE_TRANSITION_DESCRIPTION, sst.getDescription());
-				sstSolrDoc.addField(RodaConstants.SIPSTATE_TRANSITION_FROM, sst.getFromState());
-				sstSolrDoc.addField(RodaConstants.SIPSTATE_TRANSITION_SIPID, sst.getSipID());
-				sstSolrDoc.addField(RodaConstants.SIPSTATE_TRANSITION_SUCCESS, sst.isSuccess());
-				sstSolrDoc.addField(RodaConstants.SIPSTATE_TRANSITION_TASKID, sst.getTaskID());
-				sstSolrDoc.addField(RodaConstants.SIPSTATE_TRANSITION_TO, sst.getToState());
-				sstSolrDoc.addField(RodaConstants.SIPSTATE_TRANSITION_ID, sst.getId());
-				doc.addChildDocument(sstSolrDoc);
-			}
-		}*/
+		/*
+		 * if(sipState.getStateTransitions()!=null &&
+		 * sipState.getStateTransitions().length>0){ for(SIPStateTransition sst
+		 * : sipState.getStateTransitions()){ SolrInputDocument sstSolrDoc = new
+		 * SolrInputDocument();
+		 * sstSolrDoc.addField(RodaConstants.SIPSTATE_TRANSITION_DATETIME,
+		 * sst.getDatetime());
+		 * sstSolrDoc.addField(RodaConstants.SIPSTATE_TRANSITION_DESCRIPTION,
+		 * sst.getDescription());
+		 * sstSolrDoc.addField(RodaConstants.SIPSTATE_TRANSITION_FROM,
+		 * sst.getFromState());
+		 * sstSolrDoc.addField(RodaConstants.SIPSTATE_TRANSITION_SIPID,
+		 * sst.getSipID());
+		 * sstSolrDoc.addField(RodaConstants.SIPSTATE_TRANSITION_SUCCESS,
+		 * sst.isSuccess());
+		 * sstSolrDoc.addField(RodaConstants.SIPSTATE_TRANSITION_TASKID,
+		 * sst.getTaskID());
+		 * sstSolrDoc.addField(RodaConstants.SIPSTATE_TRANSITION_TO,
+		 * sst.getToState());
+		 * sstSolrDoc.addField(RodaConstants.SIPSTATE_TRANSITION_ID,
+		 * sst.getId()); doc.addChildDocument(sstSolrDoc); } }
+		 */
 		return doc;
 	}
 }

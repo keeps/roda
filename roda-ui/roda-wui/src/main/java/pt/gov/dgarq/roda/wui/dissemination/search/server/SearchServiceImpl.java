@@ -18,6 +18,7 @@ import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.SearchParameter;
 import pt.gov.dgarq.roda.core.data.SearchResult;
+import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
 import pt.gov.dgarq.roda.core.data.adapter.filter.BasicSearchFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
@@ -60,7 +61,9 @@ public class SearchServiceImpl extends RemoteServiceServlet implements
 		
 		try {
 			Sublist sublist = new Sublist(startIndex, limit);
-			result = indexService.findDescriptiveMetadata(getBasicSearchFilter(null,query), null, sublist);
+			// FIXME define facets
+			Facets facets = null;
+			result = indexService.findDescriptiveMetadata(getBasicSearchFilter(null,query), null, sublist, facets);
 		} catch (IndexServiceException e) {
 			logger.error("error",e);
 		}

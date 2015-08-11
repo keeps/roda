@@ -97,16 +97,6 @@ public class CorporaConstants {
 	public static final String HTML_EVENT_TYPE = "eventType";
 	public static final String HTML_INGESTION = "ingestion";
 
-	// FIXME this should not be used: use RodaConstants instead
-	// public static final String LOG_ACTION = "action";
-	// public static final String LOG_ADDRESS = "address";
-	// public static final String LOG_DATETIME = "datetime";
-	// public static final String LOG_DURATION = "duration";
-	// public static final String LOG_ID = "id";
-	// public static final String LOG_RELATED_OBJECT_ID = "relatedObject";
-	// public static final String LOG_USERNAME = "username";
-	// public static final String LOG_PARAMETERS = "parameters";
-	// public static final String LOG_FILE_ID = "fileID";
 	public static final int YEAR_1213 = 1213;
 	public static final int YEAR_2003 = 2003;
 

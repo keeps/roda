@@ -32,6 +32,7 @@ import pt.gov.dgarq.roda.core.data.RepresentationFile;
 import pt.gov.dgarq.roda.core.data.RepresentationObject;
 import pt.gov.dgarq.roda.core.data.RepresentationPreservationObject;
 import pt.gov.dgarq.roda.core.data.SimpleRepresentationObject;
+import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
@@ -74,11 +75,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 		return pt.gov.dgarq.roda.wui.dissemination.browse.server.Browser.getItemBundle(user, aipId, localeString);
 	}
 
-	public IndexResult<SimpleDescriptionObject> findDescriptiveMetadata(Filter filter, Sorter sorter, Sublist sublist)
-			throws RODAException {
+	public IndexResult<SimpleDescriptionObject> findDescriptiveMetadata(Filter filter, Sorter sorter, Sublist sublist,
+			Facets facets) throws RODAException {
 		CASUserPrincipal user = UserUtility.getUser(getThreadLocalRequest());
 		return pt.gov.dgarq.roda.wui.dissemination.browse.server.Browser.findDescriptiveMetadata(user, filter, sorter,
-				sublist);
+				sublist, facets);
 	}
 
 	public Long countDescriptiveMetadata(Filter filter) throws RODAException {

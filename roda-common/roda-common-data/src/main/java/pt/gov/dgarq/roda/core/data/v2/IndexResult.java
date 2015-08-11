@@ -11,17 +11,19 @@ public class IndexResult<T extends Serializable> implements Serializable {
 	private long limit;
 	private long totalCount;
 	private List<T> results;
+	private List<FacetFieldResult> facetResults;
 
 	public IndexResult() {
 		super();
 	}
 
-	public IndexResult(long offset, long limit, long totalCount, List<T> results) {
+	public IndexResult(long offset, long limit, long totalCount, List<T> results, List<FacetFieldResult> facetResults) {
 		super();
 		this.offset = offset;
 		this.limit = limit;
 		this.totalCount = totalCount;
 		this.results = results;
+		this.setFacetResults(facetResults);
 	}
 
 	/**
@@ -68,10 +70,17 @@ public class IndexResult<T extends Serializable> implements Serializable {
 		this.results = results;
 	}
 
+	public List<FacetFieldResult> getFacetResults() {
+		return facetResults;
+	}
+
+	public void setFacetResults(List<FacetFieldResult> facetResults) {
+		this.facetResults = facetResults;
+	}
+
 	@Override
 	public String toString() {
 		return "IndexResult [offset=" + offset + ", limit=" + limit + ", totalCount=" + totalCount + ", results="
-				+ results + "]";
+				+ results + ", facetResults=" + facetResults + "]";
 	}
-
 }
