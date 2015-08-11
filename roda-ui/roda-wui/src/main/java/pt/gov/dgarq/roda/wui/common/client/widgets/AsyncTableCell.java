@@ -20,12 +20,13 @@ import com.google.gwt.view.client.ProvidesKey;
 import com.google.gwt.view.client.Range;
 import com.google.gwt.view.client.SingleSelectionModel;
 
+import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 
 public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
-		implements HasValueChangeHandlers<Integer> {
+		implements HasValueChangeHandlers<IndexResult<T>> {
 
 	private final AsyncDataProvider<T> dataProvider;
 	private final SingleSelectionModel<T> selectionModel;
@@ -36,14 +37,19 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
 	private final CellTable<T> display;
 
 	private Filter filter;
+	private Facets facets;
 
 	private final ClientLogger logger = new ClientLogger(getClass().getName());
 
 	public AsyncTableCell() {
+		this(null, null);
+	}
+
+	public AsyncTableCell(Filter filter, Facets facets) {
 		super();
 
-		// initializing as not ready
-		this.filter = null;
+		this.filter = filter;
+		this.facets = facets;
 
 		this.dataProvider = new AsyncDataProvider<T>() {
 
@@ -71,7 +77,7 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
 							int rowCount = (int) result.getTotalCount();
 							updateRowData((int) result.getOffset(), result.getResults());
 							updateRowCount(rowCount, true);
-							ValueChangeEvent.fire(AsyncTableCell.this, Integer.valueOf(rowCount));
+							ValueChangeEvent.fire(AsyncTableCell.this, result);
 						} else {
 							// search not yet ready, deliver empty result
 						}
@@ -137,8 +143,17 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
 	}
 
 	@Override
-	public HandlerRegistration addValueChangeHandler(ValueChangeHandler<Integer> handler) {
+	public HandlerRegistration addValueChangeHandler(ValueChangeHandler<IndexResult<T>> handler) {
 		return addHandler(handler, ValueChangeEvent.getType());
+	}
+
+	public Facets getFacets() {
+		return facets;
+	}
+
+	public void setFacets(Facets facets) {
+		this.facets = facets;
+		refresh();
 	}
 
 }

@@ -9,6 +9,7 @@ import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.data.Group;
 import pt.gov.dgarq.roda.core.data.User;
 import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
+import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
@@ -313,7 +314,8 @@ public interface UserManagementServiceAsync {
 	 */
 	void getLogEntriesCount(Filter filter, AsyncCallback<Long> callback);
 
-	void findLogEntries(Filter filter, Sorter sorter, Sublist sublist, AsyncCallback<IndexResult<LogEntry>> callback);
+	void findLogEntries(Filter filter, Sorter sorter, Sublist sublist, Facets facets,
+			AsyncCallback<IndexResult<LogEntry>> callback);
 
 	/**
 	 * Register a new user

@@ -12,6 +12,7 @@ import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.data.Group;
 import pt.gov.dgarq.roda.core.data.User;
 import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
+import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
@@ -341,7 +342,7 @@ public interface UserManagementService extends RemoteService {
 	 */
 	public Long getLogEntriesCount(Filter filter) throws RODAException;
 
-	public IndexResult<LogEntry> findLogEntries(Filter filter, Sorter sorter, Sublist sublist)
+	public IndexResult<LogEntry> findLogEntries(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
 			throws AuthorizationDeniedException, GenericException;
 
 	/**

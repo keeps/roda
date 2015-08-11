@@ -93,22 +93,6 @@ public class Browser extends RodaCoreService {
 		return sdo;
 	}
 
-	public static String getParent(CASUserPrincipal user, String aipId)
-			throws AuthorizationDeniedException, GenericException {
-		Date start = new Date();
-
-		// check user permissions
-		UserUtility.checkRoles(user, "browse");
-
-		// delegate
-		String parentId = BrowserHelper.getParent(aipId);
-
-		// register action
-		long duration = new Date().getTime() - start.getTime();
-		registerAction(user, "Browser","getParent", aipId, duration, "aipId", aipId);
-
-		return parentId;
-	}
 
 	public static List<SimpleDescriptionObject> getAncestors(CASUserPrincipal user, SimpleDescriptionObject sdo)
 			throws AuthorizationDeniedException, GenericException {

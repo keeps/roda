@@ -40,6 +40,7 @@ import pt.gov.dgarq.roda.core.data.DescriptionObject;
 import pt.gov.dgarq.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
+import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationState;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
@@ -171,12 +172,12 @@ public class Browse extends Composite {
 			}
 		});
 
-		fondsPanel.addValueChangeHandler(new ValueChangeHandler<Integer>() {
+		fondsPanel.addValueChangeHandler(new ValueChangeHandler<IndexResult<SimpleDescriptionObject>>() {
 
 			@Override
-			public void onValueChange(ValueChangeEvent<Integer> event) {
-				fondsPanelTitle.setVisible(!viewingTop && event.getValue() > 0);
-				fondsPanel.setVisible(event.getValue() > 0);
+			public void onValueChange(ValueChangeEvent<IndexResult<SimpleDescriptionObject>> event) {
+				fondsPanelTitle.setVisible(!viewingTop && event.getValue().getTotalCount() > 0);
+				fondsPanel.setVisible(event.getValue().getTotalCount() > 0);
 			}
 		});
 	}
@@ -496,7 +497,7 @@ public class Browse extends Composite {
 	}
 
 	protected void onMove(final String targetPid, final String oldParentPid, final String newParentPid) {
-
+		// FIXME
 		// update(oldParentPid, false, true, new
 		// AsyncCallback<CollectionsTreeItem>() {
 		//
@@ -525,33 +526,37 @@ public class Browse extends Composite {
 	}
 
 	protected void onClone(final String clonePID) {
-		BrowserService.Util.getInstance().getParent(clonePID, new AsyncCallback<String>() {
+		// FIXME
+		// BrowserService.Util.getInstance().getParent(clonePID, new
+		// AsyncCallback<String>() {
+		//
+		// public void onFailure(Throwable caught) {
+		// logger.error("Error on cloning event", caught);
+		// }
+		//
+		// public void onSuccess(final String parentPID) {
+		// update(parentPID, false, true, new
+		// AsyncCallback<CollectionsTreeItem>() {
+		//
+		// public void onFailure(Throwable caught) {
+		// logger.error("Error on cloning event", caught);
+		// }
+		//
+		// public void onSuccess(CollectionsTreeItem treeItem) {
+		// ViewPanel.setEditMode(true);
+		// view(clonePID);
+		//
+		// }
+		//
+		// });
+		// }
 
-			public void onFailure(Throwable caught) {
-				logger.error("Error on cloning event", caught);
-			}
+		// });
 
-			public void onSuccess(final String parentPID) {
-				// update(parentPID, false, true, new
-				// AsyncCallback<CollectionsTreeItem>() {
-				//
-				// public void onFailure(Throwable caught) {
-				// logger.error("Error on cloning event", caught);
-				// }
-				//
-				// public void onSuccess(CollectionsTreeItem treeItem) {
-				// ViewPanel.setEditMode(true);
-				// view(clonePID);
-				//
-				// }
-				//
-				// });
-			}
-
-		});
 	}
 
 	protected void onRemove(final String parentPID) {
+		// FIXME
 		// update(parentPID, false, true, new
 		// AsyncCallback<CollectionsTreeItem>() {
 		//

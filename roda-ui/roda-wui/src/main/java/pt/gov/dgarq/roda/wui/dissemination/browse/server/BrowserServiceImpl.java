@@ -92,12 +92,6 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 		return pt.gov.dgarq.roda.wui.dissemination.browse.server.Browser.getSimpleDescriptionObject(user, pid);
 	}
 
-	// FIXME see if this method is really needed
-	public String getParent(String pid) throws RODAException {
-		CASUserPrincipal user = UserUtility.getUser(getThreadLocalRequest());
-		return pt.gov.dgarq.roda.wui.dissemination.browse.server.Browser.getParent(user, pid);
-	}
-
 	public List<SimpleDescriptionObject> getAncestors(SimpleDescriptionObject sdo) throws RODAException {
 		CASUserPrincipal user = UserUtility.getUser(getThreadLocalRequest());
 		return pt.gov.dgarq.roda.wui.dissemination.browse.server.Browser.getAncestors(user, sdo);

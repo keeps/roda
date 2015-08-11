@@ -5,6 +5,7 @@ import java.util.Date;
 import pt.gov.dgarq.roda.common.RodaCoreService;
 import pt.gov.dgarq.roda.common.UserUtility;
 import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
+import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
@@ -39,14 +40,14 @@ public class IngestList extends RodaCoreService {
 	}
 
 	public static IndexResult<SIPReport> findSipReports(CASUserPrincipal user, Filter filter, Sorter sorter,
-			Sublist sublist) throws AuthorizationDeniedException, GenericException {
+			Sublist sublist, Facets facets) throws AuthorizationDeniedException, GenericException {
 		Date start = new Date();
 
 		// check user permissions
 		UserUtility.checkRoles(user, ROLE);
 
 		// delegate
-		IndexResult<SIPReport> ret = IngestListHelper.findSipReports(filter, sorter, sublist);
+		IndexResult<SIPReport> ret = IngestListHelper.findSipReports(filter, sorter, sublist, facets);
 
 		// register action
 		long duration = new Date().getTime() - start.getTime();

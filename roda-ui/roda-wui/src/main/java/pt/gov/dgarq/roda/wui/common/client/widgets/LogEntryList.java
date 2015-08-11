@@ -16,6 +16,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.view.client.ProvidesKey;
 
 import pt.gov.dgarq.roda.core.common.RodaConstants;
+import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
@@ -41,7 +42,11 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
 	private final TextColumn<LogEntry> addressColumn;
 
 	public LogEntryList() {
-		super();
+		this(null, null);
+	}
+
+	public LogEntryList(Filter filter, Facets facets) {
+		super(filter, facets);
 
 		dateColumn = new Column<LogEntry, Date>(new DateCell(DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss.SSS"))) {
 			@Override
@@ -174,7 +179,7 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
 		// define sublist
 		Sublist sublist = new Sublist(start, length);
 
-		UserManagementService.Util.getInstance().findLogEntries(filter, sorter, sublist, callback);
+		UserManagementService.Util.getInstance().findLogEntries(filter, sorter, sublist, getFacets(), callback);
 
 	}
 

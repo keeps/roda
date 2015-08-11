@@ -139,14 +139,16 @@ public class SolrUtils {
 	private static List<FacetFieldResult> processFacetFields(List<FacetField> facetFields) {
 		List<FacetFieldResult> ret = new ArrayList<FacetFieldResult>();
 		FacetFieldResult facetResult;
-		for (FacetField facet : facetFields) {
-			LOGGER.debug("facet: " + facet.getName() + " count:" + facet.getValueCount());
-			facetResult = new FacetFieldResult(facet.getName(), facet.getValueCount());
-			for (Count count : facet.getValues()) {
-				LOGGER.debug("   value:" + count.getName() + " value: " + count.getCount());
-				facetResult.addFacetValue(count.getName(), count.getCount());
+		if (facetFields != null) {
+			for (FacetField facet : facetFields) {
+				LOGGER.debug("facet: " + facet.getName() + " count:" + facet.getValueCount());
+				facetResult = new FacetFieldResult(facet.getName(), facet.getValueCount());
+				for (Count count : facet.getValues()) {
+					LOGGER.debug("   value:" + count.getName() + " value: " + count.getCount());
+					facetResult.addFacetValue(count.getName(), count.getCount());
+				}
+				ret.add(facetResult);
 			}
-			ret.add(facetResult);
 		}
 		return ret;
 
@@ -299,17 +301,19 @@ public class SolrUtils {
 
 	private static void generateFilterQueryFromSimpleFacet(StringBuilder filterQuery, String facet,
 			List<String> values) {
-		if (filterQuery.length() > 0) {
-			appendANDOperator(filterQuery);
-		}
-		filterQuery.append("(");
-		for (int i = 0; i < values.size(); i++) {
-			if (i != 0) {
-				filterQuery.append(" OR ");
+		if (values.size() > 0) {
+			if (filterQuery.length() > 0) {
+				appendANDOperator(filterQuery);
 			}
-			appendExactMatch(filterQuery, facet, values.get(i), true);
+			filterQuery.append("(");
+			for (int i = 0; i < values.size(); i++) {
+				if (i != 0) {
+					filterQuery.append(" OR ");
+				}
+				appendExactMatch(filterQuery, facet, values.get(i), true);
+			}
+			filterQuery.append(")");
 		}
-		filterQuery.append(")");
 	}
 
 	private static void appendValuesUsingOROperator(StringBuilder ret, String key, String[] values) {

@@ -16,19 +16,30 @@ public class Facets implements Serializable {
 	// field/parameter
 
 	public Facets() {
+		super();
+	}
 
+	public Facets(FacetParameter... parameters) {
+		super();
+		this.parameters = new ArrayList<FacetParameter>();
+		for (FacetParameter parameter : parameters) {
+			this.parameters.add(parameter);
+		}
 	}
 
 	public Facets(List<FacetParameter> parameters) {
+		super();
 		this.parameters = parameters;
 	}
 
 	public Facets(List<FacetParameter> parameters, String query) {
+		super();
 		this.parameters = parameters;
 		this.query = query;
 	}
 
 	public Facets(Facets facet) {
+		super();
 		parameters.clear();
 		parameters = facet.getParameters();
 		query = facet.getQuery();

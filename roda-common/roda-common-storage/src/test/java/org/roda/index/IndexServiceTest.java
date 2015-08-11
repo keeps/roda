@@ -123,13 +123,13 @@ public class IndexServiceTest {
 				DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 
 		// Retrieve, count and list AIP
-		final AIP indexedAIP = index.retrieveAIP(aipId);
+		final AIP indexedAIP = index.retrieve(AIP.class, aipId);
 		assertEquals(aip, indexedAIP);
 
-		final long countAIP = index.countAIP(null);
+		final long countAIP = index.count(AIP.class, null);
 		assertEquals(1, countAIP);
 
-		final IndexResult<AIP> aipList = index.findAIP(null, null, new Sublist(0, 10));
+		final IndexResult<AIP> aipList = index.find(AIP.class, null, null, new Sublist(0, 10), null);
 		assertEquals(1, aipList.getTotalCount());
 		assertEquals(1, aipList.getLimit());
 		assertEquals(0, aipList.getOffset());
@@ -137,15 +137,15 @@ public class IndexServiceTest {
 		assertEquals(aip, aipList.getResults().get(0));
 
 		// Retrieve, count and list SDO
-		final SimpleDescriptionObject sdo = index.retrieveDescriptiveMetadata(aipId);
+		final SimpleDescriptionObject sdo = index.retrieve(SimpleDescriptionObject.class, aipId);
 		assertEquals(aip.getId(), sdo.getId());
 		assertEquals(aip.isActive(), RODAObject.STATE_ACTIVE.equals(sdo.getState()));
 		assertEquals(aip.getParentId(), sdo.getParentID());
 		assertEquals(aip.getDateCreated(), sdo.getCreatedDate());
 		assertEquals(aip.getDateModified(), sdo.getLastModifiedDate());
 
-		final IndexResult<SimpleDescriptionObject> sdos = index.findDescriptiveMetadata(null, null, new Sublist(0, 10),
-				null);
+		final IndexResult<SimpleDescriptionObject> sdos = index.find(SimpleDescriptionObject.class, null, null,
+				new Sublist(0, 10), null);
 		assertEquals(1, sdos.getTotalCount());
 		assertEquals(1, sdos.getLimit());
 		assertEquals(0, sdos.getOffset());
@@ -167,12 +167,13 @@ public class IndexServiceTest {
 
 		// Retrieve, count and list SRO
 		String rep1Id = aip.getRepresentationIds().get(0);
-		Representation rep1 = index.retrieveRepresentation(aipId, rep1Id);
+		Representation rep1 = index.retrieve(Representation.class, aipId, rep1Id);
 		assertEquals(rep1Id, rep1.getId());
 
 		Filter filterParentTheAIP = new Filter();
 		filterParentTheAIP.add(new SimpleFilterParameter(RodaConstants.SRO_AIP_ID, aipId));
-		IndexResult<Representation> sros = index.findRepresentation(filterParentTheAIP, null, new Sublist(0, 10));
+		IndexResult<Representation> sros = index.find(Representation.class, filterParentTheAIP, null,
+				new Sublist(0, 10), null);
 		assertEquals(aip.getRepresentationIds().size(), sros.getTotalCount());
 
 		List<String> sro_IDs = new ArrayList<>();
@@ -182,26 +183,27 @@ public class IndexServiceTest {
 
 		assertThat(sro_IDs, Matchers.contains(aip.getRepresentationIds().toArray()));
 
-		SimpleEventPreservationMetadata sepm = index.retrieveSimpleEventPreservationMetadata(aipId,
+		SimpleEventPreservationMetadata sepm = index.retrieve(SimpleEventPreservationMetadata.class, aipId,
 				CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.EVENT_RODA_398_PREMIS_XML);
 		assertEquals(sepm.getType(), CorporaConstants.INGESTION);
 		Filter filterType = new Filter();
 		filterType.add(new SimpleFilterParameter(RodaConstants.SEPM_TYPE, CorporaConstants.INGESTION));
-		assertThat(index.countSimpleEventPreservationMetadata(filterType), Matchers.equalTo(1L));
-		assertThat(index.findSimpleEventPreservationMetadata(filterType, null, new Sublist(0, 10)).getTotalCount(),
-				Matchers.equalTo(1L));
+		assertThat(index.count(SimpleEventPreservationMetadata.class, filterType), Matchers.equalTo(1L));
+		assertThat(index.find(SimpleEventPreservationMetadata.class, filterType, null, new Sublist(0, 10), null)
+				.getTotalCount(), Matchers.equalTo(1L));
 
-		SimpleRepresentationFilePreservationMetadata srfpm = index.retrieveSimpleRepresentationFilePreservationMetadata(
-				aipId, CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.F0_PREMIS_XML);
+		SimpleRepresentationFilePreservationMetadata srfpm = index.retrieve(
+				SimpleRepresentationFilePreservationMetadata.class, aipId, CorporaConstants.REPRESENTATION_1_ID,
+				CorporaConstants.F0_PREMIS_XML);
 		assertEquals(srfpm.getAipId(), aipId);
 		Filter filterAIPID = new Filter();
 		filterAIPID.add(new SimpleFilterParameter(RodaConstants.SRFM_AIP_ID, aipId));
-		assertThat(index.countSimpleRepresentationFilePreservationMetadata(filterAIPID), Matchers.equalTo(4L));
+		assertThat(index.count(SimpleRepresentationFilePreservationMetadata.class, filterAIPID), Matchers.equalTo(4L));
 		/*
 		 * filterMimetype.add(new
 		 * SimpleFilterParameter(RodaConstants.SRFM_MIMETYPE,
 		 * CorporaConstants.TEXT_XML));
-		 * assertEquals(index.findSimpleEventPreservationMetadata(
+		 * assertEquals(index.find(SimpleEventPreservationMetadata.class,
 		 * filterMimetype, null, new Sublist(0, 10)).getTotalCount(),1L);
 		 */
 
@@ -217,19 +219,19 @@ public class IndexServiceTest {
 		 * CorporaConstants.REPRESENTATION_PREMIS_XML));
 		 * assertEquals(""+index.countSimpleRepresentationPreservationMetadata(
 		 * filterFileId),""+1L);
-		 * assertEquals(index.findSimpleEventPreservationMetadata(filterFileId,
-		 * null, new Sublist(0, 10)).getTotalCount(),1L);
+		 * assertEquals(index.find(SimpleEventPreservationMetadata.class,
+		 * filterFileId, null, new Sublist(0, 10)).getTotalCount(),1L);
 		 */
 		model.deleteAIP(aipId);
 		try {
-			index.retrieveAIP(aipId);
+			index.retrieve(AIP.class, aipId);
 			fail("AIP deleted but yet it was retrieved");
 		} catch (IndexServiceException e) {
 			assertEquals(IndexServiceException.NOT_FOUND, e.getCode());
 		}
 
 		try {
-			index.retrieveDescriptiveMetadata(aipId);
+			index.retrieve(SimpleDescriptionObject.class, aipId);
 			fail("AIP was deleted but yet its descriptive metadata was retrieved");
 		} catch (IndexServiceException e) {
 			assertEquals(IndexServiceException.NOT_FOUND, e.getCode());
@@ -246,8 +248,8 @@ public class IndexServiceTest {
 
 		Filter filter = new Filter();
 		filter.add(new SimpleFilterParameter(RodaConstants.AIP_ID, aipId));
-		SimpleDescriptionObject sdo = index.findDescriptiveMetadata(filter, null, new Sublist(0, 10), null).getResults()
-				.get(0);
+		SimpleDescriptionObject sdo = index.find(SimpleDescriptionObject.class, filter, null, new Sublist(0, 10), null)
+				.getResults().get(0);
 		Calendar calInitial = Calendar.getInstance();
 		calInitial.setTime(sdo.getDateInitial());
 		assertEquals(calInitial.get(Calendar.YEAR), CorporaConstants.YEAR_1213);
@@ -270,7 +272,7 @@ public class IndexServiceTest {
 				CorporaConstants.OTHER_AIP_ID);
 		final AIP updatedAIP = model.updateAIP(aipId, corporaService, otherAipPath);
 
-		final AIP indexedAIP = index.retrieveAIP(aipId);
+		final AIP indexedAIP = index.retrieve(AIP.class, aipId);
 		assertEquals(updatedAIP, indexedAIP);
 
 		model.deleteAIP(aipId);
@@ -284,11 +286,11 @@ public class IndexServiceTest {
 		model.createAIP(CorporaConstants.OTHER_AIP_ID, corporaService,
 				DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.OTHER_AIP_ID));
 
-		long sdoCount = index.countDescriptiveMetadata(SimpleDescriptionObject.FONDS_FILTER);
+		long sdoCount = index.count(SimpleDescriptionObject.class, SimpleDescriptionObject.FONDS_FILTER);
 		assertEquals(1, sdoCount);
 
-		final IndexResult<SimpleDescriptionObject> sdos = index
-				.findDescriptiveMetadata(SimpleDescriptionObject.FONDS_FILTER, null, new Sublist(0, 10), null);
+		final IndexResult<SimpleDescriptionObject> sdos = index.find(SimpleDescriptionObject.class,
+				SimpleDescriptionObject.FONDS_FILTER, null, new Sublist(0, 10), null);
 
 		assertEquals(1, sdos.getLimit());
 		assertEquals(CorporaConstants.SOURCE_AIP_ID, sdos.getResults().get(0).getId());
@@ -308,10 +310,10 @@ public class IndexServiceTest {
 		Filter filter = new Filter();
 		filter.add(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, CorporaConstants.SOURCE_AIP_ID));
 
-		long sdoCount = index.countDescriptiveMetadata(filter);
+		long sdoCount = index.count(SimpleDescriptionObject.class, filter);
 		assertEquals(1, sdoCount);
 
-		final IndexResult<SimpleDescriptionObject> sdos = index.findDescriptiveMetadata(filter, null,
+		final IndexResult<SimpleDescriptionObject> sdos = index.find(SimpleDescriptionObject.class, filter, null,
 				new Sublist(0, 10), null);
 
 		assertEquals(1, sdos.getLimit());
@@ -329,12 +331,8 @@ public class IndexServiceTest {
 		model.createAIP(CorporaConstants.OTHER_AIP_ID, corporaService,
 				DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.OTHER_AIP_ID));
 
-		List<SimpleDescriptionObject> ancestors = index.getAncestors(CorporaConstants.OTHER_AIP_ID);
-		assertThat(ancestors, Matchers.hasItem(Matchers.<SimpleDescriptionObject> hasProperty("id",
-				Matchers.equalTo(CorporaConstants.SOURCE_AIP_ID))));
-
-		SimpleDescriptionObject sdo = index.retrieveDescriptiveMetadata(CorporaConstants.OTHER_AIP_ID);
-		ancestors = index.getAncestors(sdo);
+		SimpleDescriptionObject sdo = index.retrieve(SimpleDescriptionObject.class, CorporaConstants.OTHER_AIP_ID);
+		List<SimpleDescriptionObject> ancestors = index.getAncestors(sdo);
 		assertThat(ancestors, Matchers.hasItem(Matchers.<SimpleDescriptionObject> hasProperty("id",
 				Matchers.equalTo(CorporaConstants.SOURCE_AIP_ID))));
 	}
@@ -352,8 +350,8 @@ public class IndexServiceTest {
 		Filter filter = new Filter();
 		filter.add(new SimpleFilterParameter(RodaConstants.SDO_LEVEL, "fonds"));
 		filter.add(new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID));
-		IndexResult<SimpleDescriptionObject> findDescriptiveMetadata = index.findDescriptiveMetadata(filter, null,
-				new Sublist(), null);
+		IndexResult<SimpleDescriptionObject> findDescriptiveMetadata = index.find(SimpleDescriptionObject.class, filter,
+				null, new Sublist(), null);
 
 		assertNotNull(findDescriptiveMetadata);
 		assertThat(findDescriptiveMetadata.getResults(), Matchers.hasSize(1));
@@ -384,11 +382,11 @@ public class IndexServiceTest {
 
 		Filter filterDescription = new Filter();
 		filterDescription.add(new SimpleFilterParameter(RodaConstants.LOG_ID, "ID"));
-		assertThat(index.countLogEntries(filterDescription), Matchers.is(1L));
+		assertThat(index.count(LogEntry.class, filterDescription), Matchers.is(1L));
 
 		Filter filterDescription2 = new Filter();
 		filterDescription2.add(new SimpleFilterParameter(RodaConstants.LOG_ID, "ID2"));
-		assertThat(index.countLogEntries(filterDescription2), Matchers.is(0L));
+		assertThat(index.count(LogEntry.class, filterDescription2), Matchers.is(0L));
 	}
 
 	@Test
@@ -411,14 +409,14 @@ public class IndexServiceTest {
 		Filter filterDescription = new Filter();
 		filterDescription.add(new SimpleFilterParameter(RodaConstants.LOG_ID, "id"));
 
-		IndexResult<LogEntry> entries = index.findLogEntry(filterDescription, null, new Sublist());
+		IndexResult<LogEntry> entries = index.find(LogEntry.class, filterDescription, null, new Sublist(), null);
 		assertEquals(entries.getTotalCount(), 1);
 		assertEquals(entries.getResults().get(0).getActionComponent(), RodaConstants.LOG_ACTION_COMPONENT);
 
 		Filter filterDescription2 = new Filter();
 		filterDescription2.add(new SimpleFilterParameter(RodaConstants.LOG_ID, "id2"));
 
-		IndexResult<LogEntry> entries2 = index.findLogEntry(filterDescription2, null, new Sublist());
+		IndexResult<LogEntry> entries2 = index.find(LogEntry.class, filterDescription2, null, new Sublist(), null);
 		assertEquals(entries2.getTotalCount(), 0);
 	}
 
@@ -448,12 +446,12 @@ public class IndexServiceTest {
 		Filter filterFileName = new Filter();
 		filterFileName.add(new SimpleFilterParameter(RodaConstants.SIP_REPORT_ORIGINAL_FILENAME, "Filename"));
 		Long n = 1L;
-		assertEquals(index.countSipReports(filterFileName), n);
+		assertEquals(index.count(SIPReport.class, filterFileName), n);
 
 		Filter filterFileName2 = new Filter();
 		filterFileName2.add(new SimpleFilterParameter(RodaConstants.SIP_REPORT_ORIGINAL_FILENAME, "Filename2"));
 		Long n2 = 0L;
-		assertEquals(index.countSipReports(filterFileName2), n2);
+		assertEquals(index.count(SIPReport.class, filterFileName2), n2);
 	}
 
 	@Test
@@ -481,7 +479,7 @@ public class IndexServiceTest {
 		Filter filterFileName = new Filter();
 		filterFileName.add(new SimpleFilterParameter(RodaConstants.SIP_REPORT_ORIGINAL_FILENAME, "Filename"));
 
-		IndexResult<SIPReport> states = index.findSipReports(filterFileName, null, new Sublist());
+		IndexResult<SIPReport> states = index.find(SIPReport.class, filterFileName, null, new Sublist(), null);
 		assertEquals(states.getTotalCount(), 1);
 		assertEquals(states.getResults().get(0).getIngestedID(), "INGESTED");
 		// assertEquals(states.getResults().get(0).getStateTransitions()[0].getFromState(),
@@ -492,7 +490,7 @@ public class IndexServiceTest {
 		Filter filterFileName2 = new Filter();
 		filterFileName2.add(new SimpleFilterParameter(RodaConstants.SIP_REPORT_ORIGINAL_FILENAME, "Filename2"));
 
-		IndexResult<SIPReport> states2 = index.findSipReports(filterFileName2, null, new Sublist());
+		IndexResult<SIPReport> states2 = index.find(SIPReport.class, filterFileName2, null, new Sublist(), null);
 		assertEquals(states2.getTotalCount(), 0);
 	}
 
@@ -520,11 +518,11 @@ public class IndexServiceTest {
 		index.reindexActionLogs();
 		Filter f1 = new Filter();
 		f1.add(new SimpleFilterParameter(RodaConstants.LOG_ACTION_COMPONENT, "ACTION:0"));
-		IndexResult<LogEntry> entries1 = index.findLogEntry(f1, null, new Sublist(0, 10));
+		IndexResult<LogEntry> entries1 = index.find(LogEntry.class, f1, null, new Sublist(0, 10), null);
 		assertThat(entries1.getTotalCount(), Matchers.is(1L));
 		Filter f2 = new Filter();
 		f2.add(new SimpleFilterParameter(RodaConstants.LOG_ADDRESS, "ADDRESS"));
-		IndexResult<LogEntry> entries2 = index.findLogEntry(f2, null, new Sublist(0, 10));
+		IndexResult<LogEntry> entries2 = index.find(LogEntry.class, f2, null, new Sublist(0, 10), null);
 		assertThat(entries2.getTotalCount(), Matchers.is(number));
 	}
 
@@ -539,7 +537,7 @@ public class IndexServiceTest {
 		}
 
 		index.reindexAIPs();
-		long count = index.countAIP(new Filter());
+		long count = index.count(AIP.class, new Filter());
 		assertEquals(count, 10L);
 
 	}

@@ -968,24 +968,27 @@ public class ViewPanel extends Composite {
 	 * @param callback
 	 */
 	public void remove(final AsyncCallback<?> callback) {
-		BrowserService.Util.getInstance().getParent(ViewPanel.this.pid, new AsyncCallback<String>() {
-			public void onFailure(Throwable caught) {
-				callback.onFailure(caught);
-			}
-
-			public void onSuccess(final String parentPID) {
-				EditorService.Util.getInstance().removeElement(ViewPanel.this.pid, new AsyncCallback<Void>() {
-					public void onFailure(Throwable caught) {
-						callback.onFailure(caught);
-					}
-
-					public void onSuccess(Void result) {
-						onRemove(parentPID);
-						callback.onSuccess(null);
-					}
-				});
-			}
-		});
+		// FIXME
+		// BrowserService.Util.getInstance().getParent(ViewPanel.this.pid, new
+		// AsyncCallback<String>() {
+		// public void onFailure(Throwable caught) {
+		// callback.onFailure(caught);
+		// }
+		//
+		// public void onSuccess(final String parentPID) {
+		// EditorService.Util.getInstance().removeElement(ViewPanel.this.pid,
+		// new AsyncCallback<Void>() {
+		// public void onFailure(Throwable caught) {
+		// callback.onFailure(caught);
+		// }
+		//
+		// public void onSuccess(Void result) {
+		// onRemove(parentPID);
+		// callback.onSuccess(null);
+		// }
+		// });
+		// }
+		// });
 	}
 
 	/**

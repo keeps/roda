@@ -3,16 +3,12 @@ package pt.gov.dgarq.roda.wui.management.user.server;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.rmi.RemoteException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.MissingResourceException;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -30,12 +26,12 @@ import pt.gov.dgarq.roda.common.UserUtility;
 import pt.gov.dgarq.roda.core.RODAClient;
 import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
 import pt.gov.dgarq.roda.core.common.InvalidTokenException;
-import pt.gov.dgarq.roda.core.common.NoSuchUserException;
 import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.common.UserManagementException;
 import pt.gov.dgarq.roda.core.data.Group;
 import pt.gov.dgarq.roda.core.data.User;
 import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
+import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.RegexFilterParameter;
@@ -44,7 +40,6 @@ import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
-import pt.gov.dgarq.roda.core.data.v2.LogEntryParameter;
 import pt.gov.dgarq.roda.core.stubs.UserBrowser;
 import pt.gov.dgarq.roda.core.stubs.UserEditor;
 import pt.gov.dgarq.roda.core.stubs.UserRegistration;
@@ -535,10 +530,10 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
 		return UserManagement.countLogEntries(user, filter);
 	}
 
-	public IndexResult<LogEntry> findLogEntries(Filter filter, Sorter sorter, Sublist sublist)
+	public IndexResult<LogEntry> findLogEntries(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
 			throws AuthorizationDeniedException, GenericException {
 		CASUserPrincipal user = UserUtility.getUser(getThreadLocalRequest());
-		return UserManagement.findLogEntries(user, filter, sorter, sublist);
+		return UserManagement.findLogEntries(user, filter, sorter, sublist, facets);
 	}
 
 	public boolean register(User user, String password, String captcha) throws RODAException {

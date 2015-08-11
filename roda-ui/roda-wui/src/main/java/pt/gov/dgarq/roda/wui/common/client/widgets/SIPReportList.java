@@ -16,6 +16,7 @@ import com.google.gwt.view.client.ProvidesKey;
 
 import config.i18n.client.IngestListConstants;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
+import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
@@ -41,7 +42,11 @@ public class SIPReportList extends AsyncTableCell<SIPReport> {
 	private final TextColumn<SIPReport> producerColumn;
 
 	public SIPReportList() {
-		super();
+		this(null, null);
+	}
+
+	public SIPReportList(Filter filter, Facets facets) {
+		super(filter, facets);
 
 		idColumn = new TextColumn<SIPReport>() {
 
@@ -159,7 +164,7 @@ public class SIPReportList extends AsyncTableCell<SIPReport> {
 
 		GWT.log("Requesting ingest getSIPs");
 
-		IngestListService.Util.getInstance().findSipReports(filter, sorter, sublist, callback);
+		IngestListService.Util.getInstance().findSipReports(filter, sorter, sublist, getFacets(), callback);
 
 	}
 

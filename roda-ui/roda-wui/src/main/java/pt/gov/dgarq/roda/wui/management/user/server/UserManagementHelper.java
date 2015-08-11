@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.roda.index.IndexServiceException;
 
 import pt.gov.dgarq.roda.common.RodaCoreFactory;
+import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
@@ -17,7 +18,7 @@ public class UserManagementHelper {
 	protected static Long countLogEntries(Filter filter) throws GenericException {
 		Long count;
 		try {
-			count = RodaCoreFactory.getIndexService().countLogEntries(filter);
+			count = RodaCoreFactory.getIndexService().count(LogEntry.class, filter);
 		} catch (IndexServiceException e) {
 			LOGGER.debug("Error getting log entries count", e);
 			throw new GenericException("Error getting log entries count " + e.getMessage());
@@ -26,11 +27,11 @@ public class UserManagementHelper {
 		return count;
 	}
 
-	protected static IndexResult<LogEntry> findLogEntries(Filter filter, Sorter sorter, Sublist sublist)
+	protected static IndexResult<LogEntry> findLogEntries(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
 			throws GenericException {
 		IndexResult<LogEntry> ret;
 		try {
-			ret = RodaCoreFactory.getIndexService().findLogEntry(filter, sorter, sublist);
+			ret = RodaCoreFactory.getIndexService().find(LogEntry.class, filter, sorter, sublist, facets);
 		} catch (IndexServiceException e) {
 			LOGGER.error("Error getting log entries", e);
 			throw new GenericException("Error getting log entries " + e.getMessage());

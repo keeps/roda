@@ -12,6 +12,7 @@ import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
 import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
+import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
@@ -52,7 +53,7 @@ public interface IngestListService extends RemoteService {
 
 	public Long countSipReports(Filter filter) throws AuthorizationDeniedException, GenericException;
 
-	public IndexResult<SIPReport> findSipReports(Filter filter, Sorter sorter, Sublist sublist)
+	public IndexResult<SIPReport> findSipReports(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
 			throws AuthorizationDeniedException, GenericException;
 
 	public SIPReport retrieveSipReport(String sipReportId) throws AuthorizationDeniedException, GenericException;

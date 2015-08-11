@@ -51,16 +51,6 @@ public interface BrowserServiceAsync {
 	public void getDescriptionObject(String pid, AsyncCallback<DescriptionObject> callback);
 
 	/**
-	 * Get the elements parent
-	 * 
-	 * @param pid
-	 *            the elements pid
-	 * @return the parent pid, or null if none
-	 * @throws RODAException
-	 */
-	public void getParent(String pid, AsyncCallback<String> callback);
-
-	/**
 	 * Get the pid of all ancestors of the node.
 	 * 
 	 * @param pid

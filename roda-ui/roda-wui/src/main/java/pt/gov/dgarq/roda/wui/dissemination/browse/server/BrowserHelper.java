@@ -98,7 +98,8 @@ public class BrowserHelper {
 			Sublist sublist, Facets facets) throws GenericException {
 		IndexResult<SimpleDescriptionObject> sdos;
 		try {
-			sdos = RodaCoreFactory.getIndexService().findDescriptiveMetadata(filter, sorter, sublist, facets);
+			sdos = RodaCoreFactory.getIndexService().find(SimpleDescriptionObject.class, filter, sorter, sublist,
+					facets);
 			LOGGER.debug(String.format("findDescriptiveMetadata(%1$s,%2$s,%3$s)=%4$s", filter, sorter, sublist, sdos));
 		} catch (IndexServiceException e) {
 			LOGGER.error("Error getting collections", e);
@@ -112,7 +113,7 @@ public class BrowserHelper {
 	protected static Long countDescriptiveMetadata(Filter filter) throws GenericException {
 		Long count;
 		try {
-			count = RodaCoreFactory.getIndexService().countDescriptiveMetadata(filter);
+			count = RodaCoreFactory.getIndexService().count(SimpleDescriptionObject.class, filter);
 		} catch (IndexServiceException e) {
 			LOGGER.debug("Error getting sub-elements count", e);
 			throw new GenericException("Error getting sub-elements count " + e.getMessage());
@@ -123,19 +124,11 @@ public class BrowserHelper {
 
 	protected static SimpleDescriptionObject getSimpleDescriptionObject(String aipId) throws GenericException {
 		try {
-			return RodaCoreFactory.getIndexService().retrieveDescriptiveMetadata(aipId);
+			return RodaCoreFactory.getIndexService().retrieve(SimpleDescriptionObject.class, aipId);
 		} catch (IndexServiceException e) {
 			LOGGER.error("Error getting SDO", e);
 			throw new GenericException("Error getting SDO: " + e.getMessage());
 		}
 	}
-	
-	protected static String getParent(String aipId) throws GenericException{
-		try {
-			return RodaCoreFactory.getIndexService().getParentId(aipId);
-		} catch (IndexServiceException e) {
-			LOGGER.error("Error getting parent", e);
-			throw new GenericException("Error getting parent: " + e.getMessage());
-		}
-	}
+
 }

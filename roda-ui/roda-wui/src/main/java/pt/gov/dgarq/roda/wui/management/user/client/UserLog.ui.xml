@@ -47,7 +47,8 @@
 			<g:Label styleName="h1">Log</g:Label>
 			<g:FlowPanel addStyleNames="searchInput">
 				<g:FlowPanel addStyleNames="searchInputBoxWrapper">
-					<g:FlowPanel addStyleNames="searchAdvancedField" ui:field="inputUserFilterPanel" visible="false">
+					<g:FlowPanel addStyleNames="searchAdvancedField"
+						ui:field="inputUserFilterPanel" visible="false">
 						<g:Label addStyleNames="searchAdvancedFieldLabel">User</g:Label>
 						<g:TextBox addStyleNames="searchAdvancedFieldInput fieldTextBox"
 							ui:field="inputUserName" />
@@ -80,12 +81,21 @@
 				ui:field="logList" />
 		</g:FlowPanel>
 		<g:FlowPanel styleName="{style.sidebar}">
-			<g:FlowPanel styleName="{style.sidebar-group}" ui:field="sidebarGroupDownloads">
-				<g:Label addStyleNames="h2 {style.sidebar-title} searchFacetsTitle">
-					<ui:msg>Filters</ui:msg>
-				</g:Label>
-			</g:FlowPanel>
-			<g:Button addStyleNames="btn btn-play searchApplyFilters">Apply filters</g:Button>
+			<g:Label addStyleNames="h2 {style.sidebar-title} searchFacetsTitle">
+				<ui:msg>Filters</ui:msg>
+			</g:Label>
+			<g:Label addStyleNames="h3 sidebar-facet-title">
+				<ui:msg>Components</ui:msg>
+			</g:Label>
+			<g:FlowPanel styleName="{style.sidebar-group}" ui:field="facetComponents" />
+			<g:Label addStyleNames="h3 sidebar-facet-title">
+				<ui:msg>Methods</ui:msg>
+			</g:Label>
+			<g:FlowPanel styleName="{style.sidebar-group}" ui:field="facetMethods" />
+			<g:Label addStyleNames="h3 sidebar-facet-title">
+				<ui:msg>Users</ui:msg>
+			</g:Label>
+			<g:FlowPanel styleName="{style.sidebar-group}" ui:field="facetUsers" />
 		</g:FlowPanel>
 		<g:FlowPanel styleName="{style.footer}" />
 	</g:FlowPanel>

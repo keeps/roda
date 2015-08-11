@@ -92,8 +92,9 @@ public class HtmlUtilsTest {
 		final String aipId = UUID.randomUUID().toString();
 		final AIP aip = model.createAIP(aipId, corporaService,
 				DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
-		SimpleRepresentationFilePreservationMetadata srfm = index.retrieveSimpleRepresentationFilePreservationMetadata(
-				aipId, CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.F0_PREMIS_XML);
+		SimpleRepresentationFilePreservationMetadata srfm = index.retrieve(
+				SimpleRepresentationFilePreservationMetadata.class, aipId, CorporaConstants.REPRESENTATION_1_ID,
+				CorporaConstants.F0_PREMIS_XML);
 		// Element html = HTMLUtils.preservationObjectFromStorageToHtml(srfm,
 		// model, new Locale("pt", "PT"));
 		// logger.debug("HTML: " + html);
@@ -178,7 +179,7 @@ public class HtmlUtilsTest {
 		final String aipId = UUID.randomUUID().toString();
 		final AIP aip = model.createAIP(aipId, corporaService,
 				DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
-		SimpleEventPreservationMetadata sepm = index.retrieveSimpleEventPreservationMetadata(aipId,
+		SimpleEventPreservationMetadata sepm = index.retrieve(SimpleEventPreservationMetadata.class, aipId,
 				CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.EVENT_RODA_398_PREMIS_XML);
 		// Element html =
 		// HTMLUtils.preservationObjectFromStorageToHtml(sepm,model,new
@@ -202,8 +203,9 @@ public class HtmlUtilsTest {
 		final String aipId = UUID.randomUUID().toString();
 		final AIP aip = model.createAIP(aipId, corporaService,
 				DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
-		SimpleRepresentationFilePreservationMetadata srfm = index.retrieveSimpleRepresentationFilePreservationMetadata(
-				aipId, CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.F0_PREMIS_XML);
+		SimpleRepresentationFilePreservationMetadata srfm = index.retrieve(
+				SimpleRepresentationFilePreservationMetadata.class, aipId, CorporaConstants.REPRESENTATION_1_ID,
+				CorporaConstants.F0_PREMIS_XML);
 		// Element html = HTMLUtils.preservationObjectFromStorageToHtml(new
 		// RepresentationFilePreservationObject(srfm),model,new Locale("pt",
 		// "PT"));

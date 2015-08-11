@@ -32,11 +32,6 @@
 		margin-bottom: 10px;
 	}
 	
-	.option {
-		display: block;
-		margin-bottom: 5px;
-	}
-	
 	.action {
 		width: 100%;
 		margin-bottom: 10px;
@@ -47,13 +42,14 @@
 	}
 	
 	.other-producer-label {
-	    margin-left: 5px;
-    	font-weight: 200;
-    	margin-bottom: 2px;
+		margin-left: 5px;
+		font-weight: 200;
+		margin-bottom: 2px;
 	}
+	
 	.other-producer-input {
 		margin-left: 5px;
-	    padding: 4px;
+		padding: 4px;
 	}
 	</ui:style>
 
@@ -71,20 +67,20 @@
 				<g:Label addStyleNames="h3 sidebar-facet-title">
 					<ui:msg>State</ui:msg>
 				</g:Label>
-				<g:CheckBox addStyleNames="sidebar-facet-label  {style.option}"
-					ui:field="checkProcessed">processed (12)</g:CheckBox>
-				<g:CheckBox addStyleNames="sidebar-facet-label  {style.option}"
-					ui:field="checkProcessing">processing (123)</g:CheckBox>
-				<g:CheckBox addStyleNames="sidebar-facet-label  {style.option}"
-					ui:field="checkAccepted">accepted (1234)</g:CheckBox>
-				<g:CheckBox addStyleNames="sidebar-facet-label  {style.option}"
-					ui:field="checkRejected">rejected (1)</g:CheckBox>
+				<g:CheckBox addStyleNames="sidebar-facet-label" ui:field="checkProcessed">processed
+					(12)</g:CheckBox>
+				<g:CheckBox addStyleNames="sidebar-facet-label" ui:field="checkProcessing">processing
+					(123)</g:CheckBox>
+				<g:CheckBox addStyleNames="sidebar-facet-label" ui:field="checkAccepted">accepted
+					(1234)</g:CheckBox>
+				<g:CheckBox addStyleNames="sidebar-facet-label" ui:field="checkRejected">rejected
+					(1)</g:CheckBox>
 				<g:Label addStyleNames="h3 sidebar-facet-title">
 					<ui:msg>Producers</ui:msg>
 				</g:Label>
-				<g:CheckBox addStyleNames="sidebar-facet-label  {style.option}">lfaria (12)</g:CheckBox>
-				<g:CheckBox addStyleNames="sidebar-facet-label  {style.option}">hsilva (12)</g:CheckBox>
-				<g:Label addStyleNames="{style.other-producer-label}">Other producer:</g:Label> <g:TextBox addStyleNames="fieldTextBox {style.other-producer-input}"/>
+				<g:FlowPanel ui:field="producerFacets" />
+				<g:Label addStyleNames="{style.other-producer-label}">Other producer:</g:Label>
+				<g:TextBox addStyleNames="fieldTextBox {style.other-producer-input}" />
 			</g:FlowPanel>
 
 			<g:Button addStyleNames="btn btn-th-list {style.action}"

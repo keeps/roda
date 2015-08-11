@@ -9,6 +9,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
+import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
@@ -24,7 +25,8 @@ public interface IngestListServiceAsync {
 
 	void countSipReports(Filter filter, AsyncCallback<Long> callback);
 
-	void findSipReports(Filter filter, Sorter sorter, Sublist sublist, AsyncCallback<IndexResult<SIPReport>> callback);
+	void findSipReports(Filter filter, Sorter sorter, Sublist sublist, Facets facets,
+			AsyncCallback<IndexResult<SIPReport>> callback);
 
 	void retrieveSipReport(String sipReportId, AsyncCallback<SIPReport> callback);
 

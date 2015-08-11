@@ -92,16 +92,6 @@ public interface BrowserService extends RemoteService {
 	public DescriptionObject getDescriptionObject(String pid) throws RODAException;
 
 	/**
-	 * Get the elements parent
-	 *
-	 * @param pid
-	 *            the elements pid
-	 * @return the parent pid, or null if none
-	 * @throws RODAException
-	 */
-	public String getParent(String pid) throws RODAException;
-
-	/**
 	 * Get the pid of all ancestors of the node.
 	 *
 	 * @param pid
