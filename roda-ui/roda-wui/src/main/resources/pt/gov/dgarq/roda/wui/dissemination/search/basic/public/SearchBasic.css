@@ -63,23 +63,6 @@
 	margin-top: 20px;
 }
 
-.wui-search-basic  .searchFacetTitle {
-	color: #666;
-	font-size: 11pt;
-	font-weight: 200;
-	margin-top: 10px;
-}
-
-.wui-search-basic  .searchFacetLabel {
-	display: block;
-}
-
-.wui-search-basic  .searchFacetLabel label {
-	position: relative;
-	vertical-align: middle;
-	bottom: 3px;
-}
-
 .wui-search-basic  .searchApplyFilters {
 	margin: 10px 0;
 	width: 100%;

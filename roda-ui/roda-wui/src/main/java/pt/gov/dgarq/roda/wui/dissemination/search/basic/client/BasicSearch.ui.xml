@@ -119,19 +119,19 @@
 				<g:Label addStyleNames="h2 {style.sidebar-title} searchFacetsTitle">
 					<ui:msg>Filters</ui:msg>
 				</g:Label>
-				<g:Label addStyleNames="h3 searchFacetTitle">
+				<g:Label addStyleNames="h3 sidebar-facet-title">
 					<ui:msg>Description levels</ui:msg>
 				</g:Label>
-				<g:CheckBox addStyleNames="searchFacetLabel">fonds (12)</g:CheckBox>
-				<g:CheckBox addStyleNames="searchFacetLabel">series (123)</g:CheckBox>
-				<g:CheckBox addStyleNames="searchFacetLabel">items (1234)</g:CheckBox>
+				<g:CheckBox addStyleNames="sidebar-facet-label">fonds (12)</g:CheckBox>
+				<g:CheckBox addStyleNames="sidebar-facet-label">series (123)</g:CheckBox>
+				<g:CheckBox addStyleNames="sidebar-facet-label">items (1234)</g:CheckBox>
 
-				<g:Label addStyleNames="h3 searchFacetTitle">
+				<g:Label addStyleNames="h3 sidebar-facet-title">
 					<ui:msg>Dates</ui:msg>
 				</g:Label>
-				<g:CheckBox addStyleNames="searchFacetLabel">1980-1990 (123)</g:CheckBox>
-				<g:CheckBox addStyleNames="searchFacetLabel">1990-2000 (123)</g:CheckBox>
-				<g:CheckBox addStyleNames="searchFacetLabel">2000-2010 (12)</g:CheckBox>
+				<g:CheckBox addStyleNames="sidebar-facet-label">1980-1990 (123)</g:CheckBox>
+				<g:CheckBox addStyleNames="sidebar-facet-label">1990-2000 (123)</g:CheckBox>
+				<g:CheckBox addStyleNames="sidebar-facet-label">2000-2010 (12)</g:CheckBox>
 			</g:FlowPanel>
 			<g:Button addStyleNames="btn btn-play searchApplyFilters">Apply filters</g:Button>
 		</g:FlowPanel>

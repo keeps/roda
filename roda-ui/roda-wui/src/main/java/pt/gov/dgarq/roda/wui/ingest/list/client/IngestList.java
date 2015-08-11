@@ -125,8 +125,6 @@ public class IngestList extends Composite {
 	CheckBox checkAccepted;
 	@UiField
 	CheckBox checkRejected;
-	@UiField
-	CheckBox checkAll;
 
 	@UiField
 	Button report;

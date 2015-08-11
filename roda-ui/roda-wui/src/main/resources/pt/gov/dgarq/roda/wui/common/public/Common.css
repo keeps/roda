@@ -331,6 +331,27 @@ td.datePickerMonth, td.datePickerYear {
 	content: "\f0f7";
 }
 
+
+/** Sidebar **/
+
+.sidebar-facet-title {
+	color: #666;
+	font-size: 11pt;
+	font-weight: 200;
+	margin-top: 10px;
+	margin-bottom: 5px;
+}
+
+.sidebar-facet-label {
+	display: block;
+}
+
+.sidebar-facet-label label {
+	position: relative;
+	vertical-align: middle;
+	bottom: 3px;
+}
+
 /** GWT Look & Feel **/
 .gwt-TabPanel {
 	margin-left: 10px;

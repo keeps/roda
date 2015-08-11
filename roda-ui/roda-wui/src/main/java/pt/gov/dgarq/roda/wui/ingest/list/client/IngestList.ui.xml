@@ -45,6 +45,16 @@
 	.footer {
 		clear: both;
 	}
+	
+	.other-producer-label {
+	    margin-left: 5px;
+    	font-weight: 200;
+    	margin-bottom: 2px;
+	}
+	.other-producer-input {
+		margin-left: 5px;
+	    padding: 4px;
+	}
 	</ui:style>
 
 	<g:FlowPanel styleName="wui-ingest-list" addStyleNames="{style.search}">
@@ -58,16 +68,23 @@
 				<g:Label addStyleNames="h2 {style.sidebar-title} searchFacetsTitle">
 					<ui:msg>Filters</ui:msg>
 				</g:Label>
-				<g:CheckBox addStyleNames="searchFacetLabel {style.option}"
+				<g:Label addStyleNames="h3 sidebar-facet-title">
+					<ui:msg>State</ui:msg>
+				</g:Label>
+				<g:CheckBox addStyleNames="sidebar-facet-label  {style.option}"
 					ui:field="checkProcessed">processed (12)</g:CheckBox>
-				<g:CheckBox addStyleNames="searchFacetLabel {style.option}"
+				<g:CheckBox addStyleNames="sidebar-facet-label  {style.option}"
 					ui:field="checkProcessing">processing (123)</g:CheckBox>
-				<g:CheckBox addStyleNames="searchFacetLabel {style.option}"
+				<g:CheckBox addStyleNames="sidebar-facet-label  {style.option}"
 					ui:field="checkAccepted">accepted (1234)</g:CheckBox>
-				<g:CheckBox addStyleNames="searchFacetLabel {style.option}"
+				<g:CheckBox addStyleNames="sidebar-facet-label  {style.option}"
 					ui:field="checkRejected">rejected (1)</g:CheckBox>
-				<g:CheckBox addStyleNames="searchFacetLabel {style.option}"
-					ui:field="checkAll">all (1254)</g:CheckBox>
+				<g:Label addStyleNames="h3 sidebar-facet-title">
+					<ui:msg>Producers</ui:msg>
+				</g:Label>
+				<g:CheckBox addStyleNames="sidebar-facet-label  {style.option}">lfaria (12)</g:CheckBox>
+				<g:CheckBox addStyleNames="sidebar-facet-label  {style.option}">hsilva (12)</g:CheckBox>
+				<g:Label addStyleNames="{style.other-producer-label}">Other producer:</g:Label> <g:TextBox addStyleNames="fieldTextBox {style.other-producer-input}"/>
 			</g:FlowPanel>
 
 			<g:Button addStyleNames="btn btn-th-list {style.action}"
