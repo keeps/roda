@@ -1,13 +1,13 @@
 package pt.gov.dgarq.roda.core.data.adapter.facet;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Facets implements Serializable {
 	private static final long serialVersionUID = -1897012583120840693L;
 
-	private List<FacetParameter> parameters = new ArrayList<FacetParameter>();
+	private Map<String, FacetParameter> parameters = new HashMap<String, FacetParameter>();
 	private String query = "";
 	// TODO facet.sort (count or index)? NOTE: can be defined per
 	// field/parameter
@@ -21,18 +21,17 @@ public class Facets implements Serializable {
 
 	public Facets(FacetParameter... parameters) {
 		super();
-		this.parameters = new ArrayList<FacetParameter>();
 		for (FacetParameter parameter : parameters) {
-			this.parameters.add(parameter);
+			this.parameters.put(parameter.getName(), parameter);
 		}
 	}
 
-	public Facets(List<FacetParameter> parameters) {
+	public Facets(Map<String, FacetParameter> parameters) {
 		super();
 		this.parameters = parameters;
 	}
 
-	public Facets(List<FacetParameter> parameters, String query) {
+	public Facets(Map<String, FacetParameter> parameters, String query) {
 		super();
 		this.parameters = parameters;
 		this.query = query;
@@ -45,11 +44,11 @@ public class Facets implements Serializable {
 		query = facet.getQuery();
 	}
 
-	public List<FacetParameter> getParameters() {
+	public Map<String, FacetParameter> getParameters() {
 		return parameters;
 	}
 
-	public void setParameters(List<FacetParameter> parameters) {
+	public void setParameters(Map<String, FacetParameter> parameters) {
 		this.parameters = parameters;
 	}
 

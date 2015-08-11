@@ -51,21 +51,21 @@ public class FacetUtils {
 					facetValuePanel.addStyleName("sidebar-facet-label");
 					facetPanel.add(facetValuePanel);
 
+					facetValuePanel.setValue(facetResult.getSelectedValues().contains(value));
+
 					facetValuePanel.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
 
 						@Override
 						public void onValueChange(ValueChangeEvent<Boolean> event) {
 							Facets facets = list.getFacets();
-							FacetParameter selectedFacetParameter = null;
-							for (FacetParameter facetParameter : facets.getParameters()) {
-								if (facetParameter.getName().equals(facetField)) {
-									selectedFacetParameter = facetParameter;
-									break;
-								}
-							}
+							FacetParameter selectedFacetParameter = facets.getParameters().get(facetField);
 
 							if (selectedFacetParameter != null) {
-								selectedFacetParameter.getValues().add(value);
+								if (event.getValue()) {
+									selectedFacetParameter.getValues().add(value);
+								} else {
+									selectedFacetParameter.getValues().remove(value);
+								}
 							} else {
 								LOGGER.warn("Haven't found the facet parameter: " + facetField);
 							}
@@ -73,7 +73,6 @@ public class FacetUtils {
 
 						}
 					});
-					// TODO set checkbox state
 				}
 
 			} else {

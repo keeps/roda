@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.xml.stream.FactoryConfigurationError;
@@ -120,9 +121,9 @@ public class SolrUtils {
 	}
 
 	public static <T extends Serializable> IndexResult<T> queryResponseToIndexResult(QueryResponse response,
-			Class<T> responseClass) throws IndexServiceException {
+			Class<T> responseClass, Facets facets) throws IndexServiceException {
 		final SolrDocumentList docList = response.getResults();
-		final List<FacetFieldResult> facetResults = processFacetFields(response.getFacetFields());
+		final List<FacetFieldResult> facetResults = processFacetFields(facets, response.getFacetFields());
 		final long offset = docList.getStart();
 		final long limit = docList.size();
 		final long totalCount = docList.getNumFound();
@@ -136,13 +137,14 @@ public class SolrUtils {
 		return new IndexResult<T>(offset, limit, totalCount, docs, facetResults);
 	}
 
-	private static List<FacetFieldResult> processFacetFields(List<FacetField> facetFields) {
+	private static List<FacetFieldResult> processFacetFields(Facets facets, List<FacetField> facetFields) {
 		List<FacetFieldResult> ret = new ArrayList<FacetFieldResult>();
 		FacetFieldResult facetResult;
 		if (facetFields != null) {
 			for (FacetField facet : facetFields) {
 				LOGGER.debug("facet: " + facet.getName() + " count:" + facet.getValueCount());
-				facetResult = new FacetFieldResult(facet.getName(), facet.getValueCount());
+				facetResult = new FacetFieldResult(facet.getName(), facet.getValueCount(),
+						facets.getParameters().get(facet.getName()).getValues());
 				for (Count count : facet.getValues()) {
 					LOGGER.debug("   value:" + count.getName() + " value: " + count.getCount());
 					facetResult.addFacetValue(count.getName(), count.getCount());
@@ -278,7 +280,9 @@ public class SolrUtils {
 				query.addFacetQuery(facet.getQuery());
 			}
 			StringBuilder filterQuery = new StringBuilder();
-			for (FacetParameter facetParameter : facet.getParameters()) {
+			for (Entry<String, FacetParameter> parameter : facet.getParameters().entrySet()) {
+				FacetParameter facetParameter = parameter.getValue();
+
 				if (facetParameter instanceof SimpleFacetParameter) {
 					query.addFacetField(facetParameter.getName());
 					generateFilterQueryFromSimpleFacet(filterQuery, facetParameter.getName(),
@@ -554,7 +558,7 @@ public class SolrUtils {
 		parseAndConfigureFacets(facets, query);
 		try {
 			QueryResponse response = index.query(getIndexName(classToRetrieve), query);
-			ret = queryResponseToIndexResult(response, classToRetrieve);
+			ret = queryResponseToIndexResult(response, classToRetrieve, facets);
 		} catch (SolrServerException | IOException e) {
 			throw new IndexServiceException("Could not query index", IndexServiceException.INTERNAL_SERVER_ERROR, e);
 		}
