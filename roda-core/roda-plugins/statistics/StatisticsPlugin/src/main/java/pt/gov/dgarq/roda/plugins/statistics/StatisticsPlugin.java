@@ -43,7 +43,7 @@ import pt.gov.dgarq.roda.core.data.StatisticData;
 import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.RangeFilterParameter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.DateRangeFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.RegexFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter;
@@ -263,8 +263,8 @@ public class StatisticsPlugin extends AbstractPlugin {
 
 	private FilterParameter sinceDataFilterParameter(StatisticData lastData,
 			String dataField) {
-		return (lastData != null && lastData.getTimestamp() != null) ? new RangeFilterParameter(
-				dataField, DateParser.getIsoDate(lastData.getTimestamp()), null)
+		return (lastData != null && lastData.getTimestamp() != null) ? new DateRangeFilterParameter(
+				dataField, lastData.getTimestamp(), null)
 				: null;
 	}
 
