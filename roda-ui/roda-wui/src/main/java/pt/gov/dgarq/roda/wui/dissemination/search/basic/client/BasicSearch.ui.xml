@@ -61,34 +61,6 @@
 									ui:field="advancedSearchInputTitle" />
 							</g:FlowPanel>
 							<g:FlowPanel addStyleNames="searchAdvancedField">
-								<g:Label addStyleNames="searchAdvancedFieldLabel">Produced between the dates</g:Label>
-								<g:FlowPanel addStyleNames="searchAdvancedFieldInput">
-									<g:Label addStyleNames="searchAdvancedFieldInputDateLabel">From </g:Label>
-									<d:DateBox addStyleNames="searchAdvancedFieldInputDateInput"
-										ui:field="advancedSearchInputDateInitial" />
-									<g:Label addStyleNames="searchAdvancedFieldInputDateLabel"> to </g:Label>
-									<d:DateBox addStyleNames="searchAdvancedFieldInputDateInput"
-										ui:field="advancedSearchInputDateFinal" />
-								</g:FlowPanel>
-							</g:FlowPanel>
-							<g:FlowPanel addStyleNames="searchAdvancedField">
-								<g:Label addStyleNames="searchAdvancedFieldLabel">Digital representation</g:Label>
-								<g:FlowPanel addStyleNames="searchAdvancedFieldInput">
-									<g:CheckBox>With files</g:CheckBox>
-									<g:CheckBox>Without files</g:CheckBox>
-								</g:FlowPanel>
-							</g:FlowPanel>
-							<g:FlowPanel addStyleNames="searchAdvancedField">
-								<g:Label addStyleNames="searchAdvancedFieldLabel">Description level</g:Label>
-								<g:FlowPanel addStyleNames="searchAdvancedFieldInput">
-									<g:CheckBox>Fonds</g:CheckBox>
-									<g:CheckBox>Section</g:CheckBox>
-									<g:CheckBox>Series</g:CheckBox>
-									<g:CheckBox>File</g:CheckBox>
-									<g:CheckBox>Item</g:CheckBox>
-								</g:FlowPanel>
-							</g:FlowPanel>
-							<g:FlowPanel addStyleNames="searchAdvancedField">
 								<g:ListBox addStyleNames="searchAdvancedFieldLabel">
 									<g:item>Scope and content</g:item>
 									<g:item>Producer</g:item>
@@ -119,21 +91,29 @@
 				<g:Label addStyleNames="h2 {style.sidebar-title} searchFacetsTitle">
 					<ui:msg>Filters</ui:msg>
 				</g:Label>
+				<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+					<g:Label addStyleNames="h3 sidebar-facet-title">
+						<ui:msg>Description levels</ui:msg>
+					</g:Label>
+					<g:FlowPanel ui:field="facetDescriptionLevels" />
+				</g:FlowPanel>
+				<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+					<g:Label addStyleNames="h3 sidebar-facet-title">
+						<ui:msg>Has representations</ui:msg>
+					</g:Label>
+					<g:FlowPanel ui:field="facetHasRepresentations" />
+				</g:FlowPanel>
 				<g:Label addStyleNames="h3 sidebar-facet-title">
-					<ui:msg>Description levels</ui:msg>
+					<ui:msg>From date</ui:msg>
 				</g:Label>
-				<g:CheckBox addStyleNames="sidebar-facet-label">fonds (12)</g:CheckBox>
-				<g:CheckBox addStyleNames="sidebar-facet-label">series (123)</g:CheckBox>
-				<g:CheckBox addStyleNames="sidebar-facet-label">items (1234)</g:CheckBox>
-
+				<d:DateBox addStyleNames="sidebar-facet-input fieldTextBox"
+					ui:field="inputDateInitial" />
 				<g:Label addStyleNames="h3 sidebar-facet-title">
-					<ui:msg>Dates</ui:msg>
+					<ui:msg>To date</ui:msg>
 				</g:Label>
-				<g:CheckBox addStyleNames="sidebar-facet-label">1980-1990 (123)</g:CheckBox>
-				<g:CheckBox addStyleNames="sidebar-facet-label">1990-2000 (123)</g:CheckBox>
-				<g:CheckBox addStyleNames="sidebar-facet-label">2000-2010 (12)</g:CheckBox>
+				<d:DateBox addStyleNames="sidebar-facet-input fieldTextBox"
+					ui:field="inputDateFinal" />
 			</g:FlowPanel>
-			<g:Button addStyleNames="btn btn-play searchApplyFilters">Apply filters</g:Button>
 		</g:FlowPanel>
 		<g:FlowPanel styleName="{style.footer}" />
 	</g:FlowPanel>

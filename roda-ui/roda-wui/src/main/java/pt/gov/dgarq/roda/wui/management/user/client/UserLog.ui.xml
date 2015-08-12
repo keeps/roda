@@ -45,20 +45,6 @@
 	<g:FlowPanel styleName="wui-log" addStyleNames="{style.search}">
 		<g:FlowPanel styleName="layout" addStyleNames="{style.content}">
 			<g:Label styleName="h1">Log</g:Label>
-			<g:FlowPanel addStyleNames="searchInput">
-				<g:FlowPanel addStyleNames="searchAdvancedField">
-					<g:Label addStyleNames="searchAdvancedFieldLabel">Between the dates</g:Label>
-					<g:FlowPanel addStyleNames="searchAdvancedFieldInput">
-						<g:Label addStyleNames="searchAdvancedFieldInputDateLabel">From </g:Label>
-						<d:DateBox addStyleNames="searchAdvancedFieldInputDateInput"
-							ui:field="inputDateInitial" />
-						<g:Label addStyleNames="searchAdvancedFieldInputDateLabel"> to </g:Label>
-						<d:DateBox addStyleNames="searchAdvancedFieldInputDateInput"
-							ui:field="inputDateFinal" />
-					</g:FlowPanel>
-				</g:FlowPanel>
-			</g:FlowPanel>
-			<g:Button addStyleNames="btn btn-play searchApplyFilters">Apply filters</g:Button>
 			<common:LogEntryList addStyleNames="searchResults"
 				ui:field="logList" />
 		</g:FlowPanel>
@@ -67,18 +53,34 @@
 			<g:Label addStyleNames="h2 {style.sidebar-title} searchFacetsTitle">
 				<ui:msg>Filters</ui:msg>
 			</g:Label>
+			<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+				<g:Label addStyleNames="h3 sidebar-facet-title">
+					<ui:msg>Components</ui:msg>
+				</g:Label>
+				<g:FlowPanel styleName="{style.sidebar-group}" ui:field="facetComponents" />
+			</g:FlowPanel>
+			<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+				<g:Label addStyleNames="h3 sidebar-facet-title">
+					<ui:msg>Methods</ui:msg>
+				</g:Label>
+				<g:FlowPanel styleName="{style.sidebar-group}" ui:field="facetMethods" />
+			</g:FlowPanel>
+			<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+				<g:Label addStyleNames="h3 sidebar-facet-title">
+					<ui:msg>Users</ui:msg>
+				</g:Label>
+				<g:FlowPanel styleName="{style.sidebar-group}" ui:field="facetUsers" />
+			</g:FlowPanel>
 			<g:Label addStyleNames="h3 sidebar-facet-title">
-				<ui:msg>Components</ui:msg>
+				<ui:msg>From date</ui:msg>
 			</g:Label>
-			<g:FlowPanel styleName="{style.sidebar-group}" ui:field="facetComponents" />
+			<d:DateBox addStyleNames="sidebar-facet-input fieldTextBox"
+				ui:field="inputDateInitial" />
 			<g:Label addStyleNames="h3 sidebar-facet-title">
-				<ui:msg>Methods</ui:msg>
+				<ui:msg>To date</ui:msg>
 			</g:Label>
-			<g:FlowPanel styleName="{style.sidebar-group}" ui:field="facetMethods" />
-			<g:Label addStyleNames="h3 sidebar-facet-title">
-				<ui:msg>Users</ui:msg>
-			</g:Label>
-			<g:FlowPanel styleName="{style.sidebar-group}" ui:field="facetUsers" />
+			<d:DateBox addStyleNames="sidebar-facet-input fieldTextBox"
+				ui:field="inputDateFinal" />
 		</g:FlowPanel>
 		<g:FlowPanel styleName="{style.footer}" />
 	</g:FlowPanel>

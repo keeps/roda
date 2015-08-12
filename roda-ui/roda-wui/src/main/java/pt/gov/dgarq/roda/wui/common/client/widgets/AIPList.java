@@ -40,7 +40,11 @@ public class AIPList extends AsyncTableCell<SimpleDescriptionObject> {
 	private final Column<SimpleDescriptionObject, Date> dateFinalColumn;
 
 	public AIPList() {
-		super();
+		this(null, null);
+	}
+
+	public AIPList(Filter filter, Facets facets) {
+		super(filter, facets);
 
 		levelColumn = new Column<SimpleDescriptionObject, SafeHtml>(new SafeHtmlCell()) {
 			@Override
@@ -148,10 +152,8 @@ public class AIPList extends AsyncTableCell<SimpleDescriptionObject> {
 
 			// define sublist
 			Sublist sublist = new Sublist(start, length);
-			// FIXME define facets here
-			Facets facets = null;
-			
-			BrowserService.Util.getInstance().findDescriptiveMetadata(filter, sorter, sublist, facets, callback);
+
+			BrowserService.Util.getInstance().findDescriptiveMetadata(filter, sorter, sublist, getFacets(), callback);
 		}
 
 	}

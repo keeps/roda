@@ -96,7 +96,7 @@
 }
 
 .searchAdvancedFieldInput {
-	width: 100%;
+	width: 99%;
 }
 
 .searchAdvancedFieldInputDateLabel {
@@ -107,13 +107,4 @@
 	width: 8em;
 	text-align: center;
 	margin: 0 5px;
-}
-
-.fieldTextBox {
-	width: 99%;
-	height: 1em;
-	color: #58595b;
-	padding: 0.5%;
-	border: 2px solid #ccc;
-	border-radius: 1px;
 }

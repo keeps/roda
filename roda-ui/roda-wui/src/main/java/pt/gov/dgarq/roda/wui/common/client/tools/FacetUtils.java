@@ -40,6 +40,11 @@ public class FacetUtils {
 			FlowPanel facetPanel = facetPanels.get(facetResult.getField());
 			if (facetPanel != null) {
 				facetPanel.clear();
+				if (facetResult.getTotalCount() == 0) {
+					facetPanel.getParent().addStyleName("facet-empty");
+				} else {
+					facetPanel.getParent().removeStyleName("facet-empty");
+				}
 
 				for (FacetValue facetValue : facetResult.getValues()) {
 					final String value = facetValue.getValue();

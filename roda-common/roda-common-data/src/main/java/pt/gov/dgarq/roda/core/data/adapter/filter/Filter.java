@@ -40,6 +40,14 @@ public class Filter implements Serializable {
 		add(parameter);
 	}
 
+	public Filter(FilterParameter... parameters) {
+		List<FilterParameter> parameterList = new ArrayList<FilterParameter>();
+		for (FilterParameter parameter : parameters) {
+			parameterList.add(parameter);
+		}
+		setParameters(parameterList);
+	}
+
 	/**
 	 * Constructs a {@link Filter} with the given parameters.
 	 * 
@@ -103,7 +111,7 @@ public class Filter implements Serializable {
 			this.parameters.add(parameter);
 		}
 	}
-	
+
 	public void add(List<FilterParameter> parameters) {
 		if (parameters != null) {
 			this.parameters.addAll(parameters);
