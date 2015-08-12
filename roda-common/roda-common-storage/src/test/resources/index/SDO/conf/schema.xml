@@ -112,6 +112,7 @@
    
    <field name="descriptiveMetadataId" type="string" indexed="true" stored="true" required="false" multiValued="true" /> 
    <field name="representationId" type="string" indexed="true" stored="true" required="false" multiValued="true" />
+   <field name="hasRepresentations" type="boolean" default="false" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="permission.grant.users" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    <field name="permission.grant.groups" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    <field name="permission.read.users" type="string" indexed="true" stored="true" required="false" multiValued="true" />

@@ -1,5 +1,7 @@
 package pt.gov.dgarq.roda.core.adapter.jndi;
 
+import java.util.List;
+
 import javax.naming.directory.Attributes;
 
 import pt.gov.dgarq.roda.core.data.adapter.filter.OneOfManyFilterParameter;
@@ -28,23 +30,23 @@ public class JndiOneOfManyFilterParameter<EA extends JndiEntityAdapter> extends
 				.getJndiAttributeNameForAttribute(
 						getFilterParameter().getName());
 
-		String[] values = getOneOfManyFilterParameter().getValues();
+		List<String> values = getOneOfManyFilterParameter().getValues();
 
 		String jndiCondition = "";
 		if (values != null) {
 
-			if (values.length > 1) {
+			if (values.size() > 1) {
 				jndiCondition += "(| ";
 			}
 
 			String firstJndiValue = getEntityAdapter().getJndiValueForAtribute(
-					getFilterParameter().getName(), values[0]);
+					getFilterParameter().getName(), values.get(0));
 			jndiCondition += "(" + jndiAttributeName + "=" + firstJndiValue
 					+ ")";
 
-			for (int i = 1; i < values.length; i++) {
+			for (int i = 1; i < values.size(); i++) {
 
-				String value = values[i];
+				String value = values.get(i);
 
 				String jndiValue = getEntityAdapter().getJndiValueForAtribute(
 						getFilterParameter().getName(), value);
@@ -53,7 +55,7 @@ public class JndiOneOfManyFilterParameter<EA extends JndiEntityAdapter> extends
 						+ ")";
 			}
 
-			if (values.length > 1) {
+			if (values.size() > 1) {
 				jndiCondition += ")";
 			}
 		}

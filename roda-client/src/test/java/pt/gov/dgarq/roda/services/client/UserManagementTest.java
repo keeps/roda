@@ -72,156 +72,159 @@ public class UserManagementTest {
 			System.out.println("\n***********************************");
 			System.out.println("Count users ==> ");
 
-			Filter userCountfilter = new Filter(new FilterParameter[] {
-					new SimpleFilterParameter("active", "true"),
-					new OneOfManyFilterParameter("fullName", new String[] {
-							"Rui Castro", "Tobias", }) });
-
-			System.out.println("Using " + userCountfilter);
-			System.out.println("***********************************");
-
-			userCount = userBrowser.getUserCount(userCountfilter);
-
-			System.out.println(userCount + " users in repository.");
-
-			/*
-			 * Get users
-			 */
-			System.out.println("\n***********************************");
-			System.out.println("Get first 3 active users ==> ");
-
-			Filter usersFilter = new Filter(
-					new FilterParameter[] { new SimpleFilterParameter("active",
-							"true") });
-			ContentAdapter usersContentAdapter = new ContentAdapter(
-					usersFilter, null, new Sublist(0, 3));
-
-			System.out.println("Using " + usersContentAdapter);
-			System.out.println("***********************************");
-
-			User[] users = userBrowser.getUsers(usersContentAdapter);
-			for (int i = 0; users != null && i < users.length; i++) {
-				System.out.println(users[i]);
-			}
-
-			System.out.println("\n***********************************");
-			System.out.println("Count users with name starting with 'a' ==> ");
-
-			usersFilter = new Filter(
-					new FilterParameter[] { new RegexFilterParameter("name",
-							"^a.*") });
-
-			System.out.println("Using " + usersFilter);
-			System.out.println("***********************************");
-
-			userCount = userBrowser.getUserCount(usersFilter);
-			System.out.println(userCount + " users.");
-
-			System.out.println("\n***********************************");
-			System.out.println("Get users with name starting with 'a' ==> ");
-
-			usersContentAdapter = new ContentAdapter(usersFilter, null, null);
-
-			System.out.println("Using " + usersContentAdapter);
-			System.out.println("***********************************");
-
-			users = userBrowser.getUsers(usersContentAdapter);
-			for (int i = 0; users != null && i < users.length; i++) {
-				System.out.println(users[i]);
-			}
-
-			System.out.println("\n***********************************");
-			System.out.println("Get first 3 users ==> ");
-
-			usersContentAdapter = new ContentAdapter(null, null, new Sublist(0,
-					3));
-
-			System.out.println("Using " + usersContentAdapter);
-			System.out.println("***********************************");
-
-			users = userBrowser.getUsers(usersContentAdapter);
-			for (int i = 0; users != null && i < users.length; i++) {
-				System.out.println(users[i]);
-			}
-
-			System.out.println("\n***********************************");
-			System.out
-					.println("Get all users ordered by businessCategory DESC, fullName ASC ==> ");
-
-			Sorter sorter = new Sorter(new SortParameter[] {
-					new SortParameter("businessCategory", true),
-					new SortParameter("fullName", false) });
-
-			usersContentAdapter = new ContentAdapter(null, sorter, null);
-
-			System.out.println("Using " + usersContentAdapter);
-			System.out.println("***********************************");
-
-			users = userBrowser.getUsers(usersContentAdapter);
-			for (int i = 0; users != null && i < users.length; i++) {
-				System.out.println(users[i]);
-			}
-
-			System.out.println("\n***********************************");
-			System.out.println("Get all users ==> ");
-			System.out.println("***********************************");
-
-			User[] allUsers = userBrowser.getUsers(null);
-			for (int i = 0; allUsers != null && i < allUsers.length; i++) {
-				System.out.println(allUsers[i]);
-			}
-
-			System.out.println("\n***********************************");
-			System.out.println("Get users in group administrators ==> ");
-			System.out.println("***********************************");
-
-			User[] usersInGroupAdmin = userBrowser
-					.getUsersInGroup("administrators");
-			for (int i = 0; usersInGroupAdmin != null
-					&& i < usersInGroupAdmin.length; i++) {
-				System.out.println(usersInGroupAdmin[i]);
-			}
-
-			/*
-			 * Count groups
-			 */
-			System.out
-					.println("\n********************************************");
-			System.out.println("Count groups (administrators, guests)");
-
-			Filter groupCountfilter = new Filter(new FilterParameter[] {
-					new SimpleFilterParameter("active", "true"),
-					new OneOfManyFilterParameter("name", new String[] {
-							"administrators", "guests", }) });
-
-			System.out.println("Using " + groupCountfilter);
-			System.out.println("********************************************");
-
-			int groupCount = userBrowser.getGroupCount(groupCountfilter);
-
-			System.out.println(groupCount + " groups.");
-
-			/*
-			 * Get groups
-			 */
-			System.out.println("\n***********************************");
-			System.out.println("Get groups (administrators, guests) ");
-
-			Filter groupfilter = new Filter(new FilterParameter[] {
-					new SimpleFilterParameter("active", "true"),
-					new OneOfManyFilterParameter("name", new String[] {
-							"administrators", "guests", }) });
-
-			ContentAdapter groupsContentAdapter = new ContentAdapter(
-					groupfilter, null, null);
-
-			System.out.println("Using " + groupsContentAdapter);
-			System.out.println("***********************************");
-
-			Group[] groups = userBrowser.getGroups(groupsContentAdapter);
-			for (int i = 0; groups != null && i < groups.length; i++) {
-				System.out.println(groups[i]);
-			}
+//			Filter userCountfilter = new Filter(new FilterParameter[] {
+//					new SimpleFilterParameter("active", "true"),
+//					// new OneOfManyFilterParameter("fullName", new String[] {
+//					// "Rui Castro", "Tobias", }) 
+//					});
+//
+//			System.out.println("Using " + userCountfilter);
+//			System.out.println("***********************************");
+//
+//			userCount = userBrowser.getUserCount(userCountfilter);
+//
+//			System.out.println(userCount + " users in repository.");
+//
+//			/*
+//			 * Get users
+//			 */
+//			System.out.println("\n***********************************");
+//			System.out.println("Get first 3 active users ==> ");
+//
+//			Filter usersFilter = new Filter(
+//					new FilterParameter[] { new SimpleFilterParameter("active",
+//							"true") });
+//			ContentAdapter usersContentAdapter = new ContentAdapter(
+//					usersFilter, null, new Sublist(0, 3));
+//
+//			System.out.println("Using " + usersContentAdapter);
+//			System.out.println("***********************************");
+//
+//			User[] users = userBrowser.getUsers(usersContentAdapter);
+//			for (int i = 0; users != null && i < users.length; i++) {
+//				System.out.println(users[i]);
+//			}
+//
+//			System.out.println("\n***********************************");
+//			System.out.println("Count users with name starting with 'a' ==> ");
+//
+//			usersFilter = new Filter(
+//					new FilterParameter[] { new RegexFilterParameter("name",
+//							"^a.*") });
+//
+//			System.out.println("Using " + usersFilter);
+//			System.out.println("***********************************");
+//
+//			userCount = userBrowser.getUserCount(usersFilter);
+//			System.out.println(userCount + " users.");
+//
+//			System.out.println("\n***********************************");
+//			System.out.println("Get users with name starting with 'a' ==> ");
+//
+//			usersContentAdapter = new ContentAdapter(usersFilter, null, null);
+//
+//			System.out.println("Using " + usersContentAdapter);
+//			System.out.println("***********************************");
+//
+//			users = userBrowser.getUsers(usersContentAdapter);
+//			for (int i = 0; users != null && i < users.length; i++) {
+//				System.out.println(users[i]);
+//			}
+//
+//			System.out.println("\n***********************************");
+//			System.out.println("Get first 3 users ==> ");
+//
+//			usersContentAdapter = new ContentAdapter(null, null, new Sublist(0,
+//					3));
+//
+//			System.out.println("Using " + usersContentAdapter);
+//			System.out.println("***********************************");
+//
+//			users = userBrowser.getUsers(usersContentAdapter);
+//			for (int i = 0; users != null && i < users.length; i++) {
+//				System.out.println(users[i]);
+//			}
+//
+//			System.out.println("\n***********************************");
+//			System.out
+//					.println("Get all users ordered by businessCategory DESC, fullName ASC ==> ");
+//
+//			Sorter sorter = new Sorter(new SortParameter[] {
+//					new SortParameter("businessCategory", true),
+//					new SortParameter("fullName", false) });
+//
+//			usersContentAdapter = new ContentAdapter(null, sorter, null);
+//
+//			System.out.println("Using " + usersContentAdapter);
+//			System.out.println("***********************************");
+//
+//			users = userBrowser.getUsers(usersContentAdapter);
+//			for (int i = 0; users != null && i < users.length; i++) {
+//				System.out.println(users[i]);
+//			}
+//
+//			System.out.println("\n***********************************");
+//			System.out.println("Get all users ==> ");
+//			System.out.println("***********************************");
+//
+//			User[] allUsers = userBrowser.getUsers(null);
+//			for (int i = 0; allUsers != null && i < allUsers.length; i++) {
+//				System.out.println(allUsers[i]);
+//			}
+//
+//			System.out.println("\n***********************************");
+//			System.out.println("Get users in group administrators ==> ");
+//			System.out.println("***********************************");
+//
+//			User[] usersInGroupAdmin = userBrowser
+//					.getUsersInGroup("administrators");
+//			for (int i = 0; usersInGroupAdmin != null
+//					&& i < usersInGroupAdmin.length; i++) {
+//				System.out.println(usersInGroupAdmin[i]);
+//			}
+//
+//			/*
+//			 * Count groups
+//			 */
+//			System.out
+//					.println("\n********************************************");
+//			System.out.println("Count groups (administrators, guests)");
+//
+//			Filter groupCountfilter = new Filter(new FilterParameter[] {
+//					new SimpleFilterParameter("active", "true"),
+//					// new OneOfManyFilterParameter("name", new String[] {
+//					// "administrators", "guests", }) 
+//					});
+//
+//			System.out.println("Using " + groupCountfilter);
+//			System.out.println("********************************************");
+//
+//			int groupCount = userBrowser.getGroupCount(groupCountfilter);
+//
+//			System.out.println(groupCount + " groups.");
+//
+//			/*
+//			 * Get groups
+//			 */
+//			System.out.println("\n***********************************");
+//			System.out.println("Get groups (administrators, guests) ");
+//
+//			Filter groupfilter = new Filter(new FilterParameter[] {
+//					new SimpleFilterParameter("active", "true"),
+//					// new OneOfManyFilterParameter("name", new String[] {
+//					// "administrators", "guests", }) 
+//					});
+//
+//			ContentAdapter groupsContentAdapter = new ContentAdapter(
+//					groupfilter, null, null);
+//
+//			System.out.println("Using " + groupsContentAdapter);
+//			System.out.println("***********************************");
+//
+//			Group[] groups = userBrowser.getGroups(groupsContentAdapter);
+//			for (int i = 0; groups != null && i < groups.length; i++) {
+//				System.out.println(groups[i]);
+//			}
 
 			/*
 			 * get all roles

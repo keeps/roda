@@ -17,8 +17,7 @@ public class SimpleDescriptionObject extends RODAObject {
 	private static final long serialVersionUID = 38813680938917204L;
 
 	// FIXME this should be defined from DescriptionLevelManager information
-	public static final Filter FONDS_FILTER = new Filter(
-			new FilterParameter[] { new SimpleFilterParameter("level", "fonds") });
+	public static final Filter FONDS_FILTER = new Filter(new SimpleFilterParameter("level", "fonds") );
 
 	private String level = null;
 	private String title = null;

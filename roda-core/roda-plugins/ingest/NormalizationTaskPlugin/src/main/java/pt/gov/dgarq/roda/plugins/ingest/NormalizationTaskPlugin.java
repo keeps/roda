@@ -605,9 +605,8 @@ public class NormalizationTaskPlugin extends IngestTaskPlugin {
 				rObjects = new ArrayList<SimpleRepresentationObject>();
 			}
 			// Get the representations of the given DO
-			Filter filterDOReps = new Filter(
-					new FilterParameter[] { new SimpleFilterParameter(
-							"descriptionObjectPID", doPID) }); //$NON-NLS-1$
+			Filter filterDOReps = new Filter(new SimpleFilterParameter(
+							"descriptionObjectPID", doPID)); //$NON-NLS-1$
 			SimpleRepresentationObject[] simpleROs = this.browserService
 					.getSimpleRepresentationObjects(new ContentAdapter(
 							filterDOReps, null, null));

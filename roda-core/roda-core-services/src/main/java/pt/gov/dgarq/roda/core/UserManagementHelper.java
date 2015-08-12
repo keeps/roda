@@ -351,9 +351,8 @@ public class UserManagementHelper {
 		try {
 
 			int logEntriesCount = this.loggerManager
-					.getLogEntriesCount(new Filter(
-							new FilterParameter[] { new SimpleFilterParameter(
-									"username", username) }));
+					.getLogEntriesCount(new Filter(new SimpleFilterParameter(
+									"username", username)));
 
 			if (logEntriesCount > 0) {
 				this.ldapUtility.deactivateUser(username);

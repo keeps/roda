@@ -534,9 +534,8 @@ public class BrowserHelper {
             throws NoSuchRODAObjectException, BrowserException {
         try {
 
-            Filter filter = new Filter(
-                    new FilterParameter[]{new SimpleFilterParameter(
-                "descriptionObjectPID", doPID)});
+            Filter filter = new Filter(new SimpleFilterParameter(
+                "descriptionObjectPID", doPID));
 
             List<SimpleRepresentationObject> simpleROs = this.fedoraRISearch
                     .getSimpleRepresentationObjects(new ContentAdapter(filter,
@@ -1191,10 +1190,11 @@ public class BrowserHelper {
     public AgentPreservationObject getAgentPreservationObjectWithName(
             String agentName) throws BrowserException {
 
-        Filter filter = new Filter(new FilterParameter[]{
-            new SimpleFilterParameter("label", agentName),
-            new SimpleFilterParameter("contentModel", "roda:p:"
-            + AgentPreservationObject.TYPE)});
+    	List<FilterParameter> parameters = new ArrayList<FilterParameter>();
+    	parameters.add(new SimpleFilterParameter("label", agentName));
+    	parameters.add(new SimpleFilterParameter("contentModel", "roda:p:"
+                + AgentPreservationObject.TYPE));
+        Filter filter = new Filter(parameters);
 
         try {
             List<RODAObject> agentObjects = this.fedoraRISearch
@@ -1528,9 +1528,8 @@ public class BrowserHelper {
             String status) throws BrowserException, NoSuchRODAObjectException {
         try {
 
-            Filter filter = new Filter(
-                    new FilterParameter[]{new SimpleFilterParameter(
-                "descriptionObjectPID", doPID)});
+            Filter filter = new Filter(new SimpleFilterParameter(
+                "descriptionObjectPID", doPID));
 
             if (status != null) {
                 filter.add(new SimpleFilterParameter("statuses", status));

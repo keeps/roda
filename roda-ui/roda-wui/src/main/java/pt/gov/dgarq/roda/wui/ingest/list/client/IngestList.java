@@ -3,6 +3,7 @@
  */
 package pt.gov.dgarq.roda.wui.ingest.list.client;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -140,14 +141,15 @@ public class IngestList extends Composite {
 	Button reject;
 
 	private String filter_username;
-	private String[] filter_states;
+	private List<String> filter_states;
 	private Boolean filter_complete;
 
 	private boolean init = true;
 
 	private IngestList() {
 		filter_username = null;
-		filter_states = new String[] { READY_STATE };
+		filter_states = new ArrayList<String>();
+		filter_states.add(READY_STATE);
 		filter_complete = Boolean.FALSE;
 
 		Filter filter = null;
@@ -473,7 +475,7 @@ public class IngestList extends Composite {
 			parameters.add(new LikeFilterParameter("username", "%" + filter_username + "%"));
 		}
 
-		if (filter_states != null && filter_states.length > 0) {
+		if (filter_states != null && filter_states.size() > 0) {
 			parameters.add(new OneOfManyFilterParameter("state", filter_states));
 		}
 
@@ -481,7 +483,7 @@ public class IngestList extends Composite {
 			parameters.add(new SimpleFilterParameter("complete", filter_complete.toString()));
 		}
 
-		filter.setParameters((FilterParameter[]) parameters.toArray(new FilterParameter[] {}));
+		filter.setParameters(parameters);
 
 		return filter;
 	}

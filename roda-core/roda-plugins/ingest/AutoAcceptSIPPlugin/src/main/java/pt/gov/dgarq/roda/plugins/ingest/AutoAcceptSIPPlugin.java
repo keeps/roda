@@ -212,10 +212,10 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin {
 		String producerName = getParameterValues().get(
 				PARAMETER_PRODUCER_USERNAME().getName());
 
-		Filter availableSIPsFromProducer = new Filter(new FilterParameter[] {
-				new SimpleFilterParameter("state", INITIAL_SIP_STATE),
-				new SimpleFilterParameter("processing", "false"),
-				new SimpleFilterParameter("username", producerName) });
+		Filter availableSIPsFromProducer = new Filter();
+		availableSIPsFromProducer.add(new SimpleFilterParameter("state", INITIAL_SIP_STATE));
+		availableSIPsFromProducer.add(new SimpleFilterParameter("processing", "false"));
+		availableSIPsFromProducer.add(new SimpleFilterParameter("username", producerName));
 		Sorter sorterOlderFirst = new Sorter(
 				new SortParameter[] { new SortParameter("datetime", false) });
 		ContentAdapter firstAvailableSIP = new ContentAdapter(

@@ -55,7 +55,7 @@ public abstract class FilterAdapter<FPA, EA> extends Adapter<EA> {
 	 */
 	public boolean hasParameters() {
 		return getFilter() != null && getFilter().getParameters() != null
-				&& getFilter().getParameters().length > 0;
+				&& getFilter().getParameters().size() > 0;
 	}
 
 	/**

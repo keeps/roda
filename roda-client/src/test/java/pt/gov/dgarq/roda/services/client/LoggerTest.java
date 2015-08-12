@@ -94,7 +94,7 @@ public class LoggerTest {
 			RangeFilterParameter lastMonthFilterParameter = new DateRangeFilterParameter("datetime", cal.getTime(),
 					null);
 
-			Filter filterMainActionLastMonth = new Filter(new FilterParameter[] { mainActionfilterParameter, null });
+			Filter filterMainActionLastMonth = new Filter(mainActionfilterParameter);
 
 			LogEntry[] logEntries2 = logMonitorService
 					.getLogEntries(new ContentAdapter(filterMainActionLastMonth, null, null));
@@ -113,13 +113,12 @@ public class LoggerTest {
 			int logEntriesCount = logMonitorService.getLogEntriesCount(null);
 			System.out.println("ALL Log Entries Count: " + logEntriesCount);
 
-			Filter filter = new Filter(new FilterParameter[] { new SimpleFilterParameter("username", "guest") });
+			Filter filter = new Filter(new SimpleFilterParameter("username", "guest") );
 
 			logEntriesCount = logMonitorService.getLogEntriesCount(filter);
 			System.out.println("GUEST Log Entries Count: " + logEntriesCount);
 
-			filter.setParameters(new FilterParameter[] {
-					new OneOfManyFilterParameter("username", new String[] { "guest", "demo-admin" }) });
+			filter.add(new OneOfManyFilterParameter("username", Arrays.asList("guest", "demo-admin")) );
 
 			logEntriesCount = logMonitorService.getLogEntriesCount(filter);
 			System.out.println("GUEST or demo-admin Log Entries Count: " + logEntriesCount);

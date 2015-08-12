@@ -594,8 +594,10 @@ public class IngestHelper extends EditorHelper {
 
     try {
 
-      Filter normROfilter = new Filter(new FilterParameter[] {new SimpleFilterParameter("descriptionObjectPID", doPID),
-        new SimpleFilterParameter("statuses", RepresentationObject.STATUS_NORMALIZED)});
+    	List<FilterParameter> parameters = new ArrayList<FilterParameter>();
+    	parameters.add(new SimpleFilterParameter("descriptionObjectPID", doPID));
+    	parameters.add(new SimpleFilterParameter("statuses", RepresentationObject.STATUS_NORMALIZED));
+      Filter normROfilter = new Filter(parameters);
       List<SimpleRepresentationObject> normalizedSROs = getBrowserHelper().getSimpleRepresentationObjects(
         new ContentAdapter(normROfilter, null, null));
 
@@ -1725,7 +1727,8 @@ public class IngestHelper extends EditorHelper {
     if (possibleParentsPids != null && possibleParentsPids.length > 0) {
       Filter filter = new Filter();
       filter.add(new ProducerFilterParameter(producerUsername));
-      filter.add(new ClassificationSchemeFilterParameter(classificationSchemeId, possibleParentsPids));
+      // FIXME
+      //filter.add(new ClassificationSchemeFilterParameter(classificationSchemeId, possibleParentsPids));
 
       logger.debug("Filter to be applied: " + filter);
 

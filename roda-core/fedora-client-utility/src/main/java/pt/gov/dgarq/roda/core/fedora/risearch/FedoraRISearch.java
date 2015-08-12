@@ -195,8 +195,7 @@ public class FedoraRISearch {
 	public RODAObject getRODAObject(String PID)
 			throws NoSuchRODAObjectException, FedoraRISearchException {
 
-		Filter filter = new Filter(
-				new FilterParameter[] { new SimpleFilterParameter("pid", PID) });
+		Filter filter = new Filter(new SimpleFilterParameter("pid", PID) );
 
 		ITQLContentAdapterEngine<RODAObjectAdapter, RODAObject> riSearchAdapter = new ITQLContentAdapterEngine<RODAObjectAdapter, RODAObject>(
 				new RODAObjectAdapter(getUser()), new ContentAdapter(filter,
@@ -359,8 +358,7 @@ public class FedoraRISearch {
 	public SimpleDescriptionObject getSimpleDescriptionObject(String sdoPID)
 			throws NoSuchRODAObjectException, FedoraRISearchException {
 
-		Filter filter = new Filter(
-				new FilterParameter[] { new SimpleFilterParameter("pid", sdoPID) });
+		Filter filter = new Filter(new SimpleFilterParameter("pid", sdoPID) );
 
 		ITQLContentAdapterEngine<SimpleDescriptionObjectAdapter, SimpleDescriptionObject> riSearchAdapter = new ITQLContentAdapterEngine<SimpleDescriptionObjectAdapter, SimpleDescriptionObject>(
 				new SimpleDescriptionObjectAdapter(getUser()),
@@ -934,8 +932,7 @@ public class FedoraRISearch {
 			String sroPID) throws NoSuchRODAObjectException,
 			FedoraRISearchException {
 
-		Filter filter = new Filter(
-				new FilterParameter[] { new SimpleFilterParameter("pid", sroPID) });
+		Filter filter = new Filter(new SimpleFilterParameter("pid", sroPID));
 
 		ITQLContentAdapterEngine<SimpleRepresentationObjectAdapter, SimpleRepresentationObject> riSearchAdapter = new ITQLContentAdapterEngine<SimpleRepresentationObjectAdapter, SimpleRepresentationObject>(
 				new SimpleRepresentationObjectAdapter(getUser()),
@@ -1116,9 +1113,8 @@ public class FedoraRISearch {
 			String srpoPID) throws NoSuchRODAObjectException,
 			FedoraRISearchException {
 
-		Filter filter = new Filter(
-				new FilterParameter[] { new SimpleFilterParameter("pid",
-						srpoPID) });
+		Filter filter = new Filter(new SimpleFilterParameter("pid",
+						srpoPID) );
 
 		ITQLContentAdapterEngine<SimpleRepresentationPreservationObjectAdapter, SimpleRepresentationPreservationObject> riSearchAdapter = new ITQLContentAdapterEngine<SimpleRepresentationPreservationObjectAdapter, SimpleRepresentationPreservationObject>(
 				new SimpleRepresentationPreservationObjectAdapter(getUser()),
@@ -1324,9 +1320,8 @@ public class FedoraRISearch {
 			String sepoPID) throws NoSuchRODAObjectException,
 			FedoraRISearchException {
 
-		Filter filter = new Filter(
-				new FilterParameter[] { new SimpleFilterParameter("pid",
-						sepoPID) });
+		Filter filter = new Filter(new SimpleFilterParameter("pid",
+						sepoPID) );
 
 		ITQLContentAdapterEngine<SimpleEventPreservationObjectAdapter, SimpleEventPreservationObject> riSearchAdapter = new ITQLContentAdapterEngine<SimpleEventPreservationObjectAdapter, SimpleEventPreservationObject>(
 				new SimpleEventPreservationObjectAdapter(getUser()),

@@ -7,7 +7,13 @@ import java.util.Date;
  */
 public class DateRangeFilterParameter extends RangeFilterParameter<Date> {
 
+	enum DateGranularity {
+		YEAR, MONTH, DAY //, HOUR, MINUTE, SECOND, MILISECOND
+	}
+
 	private static final long serialVersionUID = -8039972534809175118L;
+
+	private DateGranularity granularity = DateGranularity.DAY;
 
 	public DateRangeFilterParameter() {
 		super();
@@ -19,6 +25,19 @@ public class DateRangeFilterParameter extends RangeFilterParameter<Date> {
 
 	public DateRangeFilterParameter(String name, Date fromValue, Date toValue) {
 		super(name, fromValue, toValue);
+	}
+
+	public DateRangeFilterParameter(String name, Date fromValue, Date toValue, DateGranularity granularity) {
+		super(name, fromValue, toValue);
+		this.setGranularity(granularity);
+	}
+
+	public DateGranularity getGranularity() {
+		return granularity;
+	}
+
+	public void setGranularity(DateGranularity granularity) {
+		this.granularity = granularity;
 	}
 
 }

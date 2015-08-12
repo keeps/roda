@@ -3,6 +3,7 @@
  */
 package pt.gov.dgarq.roda.wui.common.server;
 
+import java.util.List;
 import java.util.Locale;
 
 import config.i18n.server.ContentAdapterHelperMessages;
@@ -117,9 +118,9 @@ public class ContentAdapterHelper {
 		ContentAdapterHelperMessages messages = new ContentAdapterHelperMessages(
 				locale);
 		String ret;
-		FilterParameter[] parameters = filter.getParameters();
+		List<FilterParameter> parameters = filter.getParameters();
 
-		if (parameters != null && parameters.length > 0) {
+		if (parameters != null && parameters.size() > 0) {
 			ret = "";
 			boolean first = true;
 			for (FilterParameter parameter : parameters) {

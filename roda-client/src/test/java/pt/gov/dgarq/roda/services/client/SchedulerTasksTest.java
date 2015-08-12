@@ -128,24 +128,24 @@ public class SchedulerTasksTest {
 			System.out.println("SchedulerContentAdapterEngine tests");
 			System.out.println("********************************");
 
-			Filter filter = new Filter(new FilterParameter[] {
-					new SimpleFilterParameter("paused", "true"),
-					new SimpleFilterParameter("name", "Statistics") });
-
-			System.out.println("\n********************************");
-			System.out.println("Get number of tasks");
-			System.out.println("********************************");
-
-			System.out.println("Using " + filter);
-
-			taskCount = schedulerService.getTaskCount(filter);
-			System.out.println("Scheduler has " + taskCount + " tasks");
-
-			System.out.println("\n********************************");
-			System.out.println("Get tasks");
-			System.out.println("********************************");
-
-			System.out.println("Using " + filter);
+//			Filter filter = new Filter(new FilterParameter[] {
+//					new SimpleFilterParameter("paused", "true"),
+//					new SimpleFilterParameter("name", "Statistics") });
+//
+//			System.out.println("\n********************************");
+//			System.out.println("Get number of tasks");
+//			System.out.println("********************************");
+//
+//			System.out.println("Using " + filter);
+//
+//			taskCount = schedulerService.getTaskCount(filter);
+//			System.out.println("Scheduler has " + taskCount + " tasks");
+//
+//			System.out.println("\n********************************");
+//			System.out.println("Get tasks");
+//			System.out.println("********************************");
+//
+//			System.out.println("Using " + filter);
 
 			tasks = schedulerService.getTasks(null);
 			if (tasks != null) {

@@ -275,7 +275,7 @@ public class FITSPlugin extends AbstractPlugin {
 			// representations that weren't already analyzed with FITS
 			ContentAdapter adapter = new ContentAdapter();
 			adapter.setFilter(new Filter(
-					new FilterParameter[] { new DateRangeFilterParameter("createdDate", lastPluginExecDate, null) }));
+					new DateRangeFilterParameter("createdDate", lastPluginExecDate, null) ));
 			SimpleRepresentationObject[] sros = browserService.getSimpleRepresentationObjects(adapter);
 			dateAfterRetrievingRepresentationsList = new Date();
 

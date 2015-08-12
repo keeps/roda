@@ -73,143 +73,143 @@ public class BrowseRepresentationTest {
 					+ SimpleRepresentationObject.DIGITALIZED_WORK + ")");
 			System.out.println("**************************************");
 
-			ContentAdapter contentAdapter = new ContentAdapter(new Filter(
-					new FilterParameter[] { new SimpleFilterParameter("type",
-							SimpleRepresentationObject.DIGITALIZED_WORK) }),
-					null, null);
-
-			SimpleRepresentationObject[] srObjects = browserService
-					.getSimpleRepresentationObjects(contentAdapter);
-			if (srObjects != null) {
-				for (SimpleRepresentationObject sro : srObjects) {
-					System.out.println(sro);
-				}
-			}
-
-			System.out.println("\n**************************************");
-			System.out.println(" getSimpleRepresentationObjects(type:"
-					+ SimpleRepresentationObject.STRUCTURED_TEXT + ")");
-			System.out.println("**************************************");
-
-			contentAdapter = new ContentAdapter(new Filter(
-					new FilterParameter[] { new SimpleFilterParameter("type",
-							SimpleRepresentationObject.STRUCTURED_TEXT) }),
-					null, null);
-
-			srObjects = browserService
-					.getSimpleRepresentationObjects(contentAdapter);
-			if (srObjects != null) {
-				for (SimpleRepresentationObject sro : srObjects) {
-					System.out.println(sro);
-				}
-			}
-
-			System.out.println("\n**************************************");
-			System.out.println(" getSimpleRepresentationObjects(type:"
-					+ SimpleRepresentationObject.RELATIONAL_DATABASE + ")");
-			System.out.println("**************************************");
-
-			contentAdapter = new ContentAdapter(new Filter(
-					new FilterParameter[] { new SimpleFilterParameter("type",
-							SimpleRepresentationObject.RELATIONAL_DATABASE) }),
-					null, null);
-
-			srObjects = browserService
-					.getSimpleRepresentationObjects(contentAdapter);
-			if (srObjects != null) {
-				for (SimpleRepresentationObject sro : srObjects) {
-					System.out.println(sro);
-				}
-			}
-                        
-                        System.out.println("\n**************************************");
-			System.out.println(" getSimpleRepresentationObjects(type:"
-					+ SimpleRepresentationObject.EMAIL + ")");
-			System.out.println("**************************************");
-
-			contentAdapter = new ContentAdapter(new Filter(
-					new FilterParameter[] { new SimpleFilterParameter("type",
-							SimpleRepresentationObject.EMAIL) }),
-					null, null);
-
-			srObjects = browserService
-					.getSimpleRepresentationObjects(contentAdapter);
-			if (srObjects != null) {
-				for (SimpleRepresentationObject sro : srObjects) {
-					System.out.println(sro);
-				}
-			}
-                        
-                        System.out.println("\n**************************************");
-			System.out.println(" getSimpleRepresentationObjects(type:"
-					+ SimpleRepresentationObject.PRESENTATION + ")");
-			System.out.println("**************************************");
-
-			contentAdapter = new ContentAdapter(new Filter(
-					new FilterParameter[] { new SimpleFilterParameter("type",
-							SimpleRepresentationObject.PRESENTATION) }),
-					null, null);
-
-			srObjects = browserService
-					.getSimpleRepresentationObjects(contentAdapter);
-			if (srObjects != null) {
-				for (SimpleRepresentationObject sro : srObjects) {
-					System.out.println(sro);
-				}
-			}
-                        
-                        System.out.println("\n**************************************");
-			System.out.println(" getSimpleRepresentationObjects(type:"
-					+ SimpleRepresentationObject.SPREADSHEET + ")");
-			System.out.println("**************************************");
-
-			contentAdapter = new ContentAdapter(new Filter(
-					new FilterParameter[] { new SimpleFilterParameter("type",
-							SimpleRepresentationObject.SPREADSHEET) }),
-					null, null);
-
-			srObjects = browserService
-					.getSimpleRepresentationObjects(contentAdapter);
-			if (srObjects != null) {
-				for (SimpleRepresentationObject sro : srObjects) {
-					System.out.println(sro);
-				}
-			}
-                        
-                        System.out.println("\n**************************************");
-			System.out.println(" getSimpleRepresentationObjects(type:"
-					+ SimpleRepresentationObject.VECTOR_GRAPHIC + ")");
-			System.out.println("**************************************");
-
-			contentAdapter = new ContentAdapter(new Filter(
-					new FilterParameter[] { new SimpleFilterParameter("type",
-							SimpleRepresentationObject.VECTOR_GRAPHIC) }),
-					null, null);
-
-			srObjects = browserService
-					.getSimpleRepresentationObjects(contentAdapter);
-			if (srObjects != null) {
-				for (SimpleRepresentationObject sro : srObjects) {
-					System.out.println(sro);
-				}
-			}
-
-			System.out.println("\n**************************************");
-			System.out.println(" getSimpleRepresentationObjects(type:"
-					+ SimpleRepresentationObject.UNKNOWN + ")");
-			System.out.println("**************************************");
-
-			contentAdapter = new ContentAdapter(new Filter(
-					new FilterParameter[] { new SimpleFilterParameter("type",
-							SimpleRepresentationObject.UNKNOWN) }), null, null);
-
-			srObjects = browserService
-					.getSimpleRepresentationObjects(contentAdapter);
-			if (srObjects != null) {
-				for (SimpleRepresentationObject sro : srObjects) {
-					System.out.println(sro);
-				}
-			}
+//			ContentAdapter contentAdapter = new ContentAdapter(new Filter(
+//					new FilterParameter[] { new SimpleFilterParameter("type",
+//							SimpleRepresentationObject.DIGITALIZED_WORK) }),
+//					null, null);
+//
+//			SimpleRepresentationObject[] srObjects = browserService
+//					.getSimpleRepresentationObjects(contentAdapter);
+//			if (srObjects != null) {
+//				for (SimpleRepresentationObject sro : srObjects) {
+//					System.out.println(sro);
+//				}
+//			}
+//
+//			System.out.println("\n**************************************");
+//			System.out.println(" getSimpleRepresentationObjects(type:"
+//					+ SimpleRepresentationObject.STRUCTURED_TEXT + ")");
+//			System.out.println("**************************************");
+//
+//			contentAdapter = new ContentAdapter(new Filter(
+//					new FilterParameter[] { new SimpleFilterParameter("type",
+//							SimpleRepresentationObject.STRUCTURED_TEXT) }),
+//					null, null);
+//
+//			srObjects = browserService
+//					.getSimpleRepresentationObjects(contentAdapter);
+//			if (srObjects != null) {
+//				for (SimpleRepresentationObject sro : srObjects) {
+//					System.out.println(sro);
+//				}
+//			}
+//
+//			System.out.println("\n**************************************");
+//			System.out.println(" getSimpleRepresentationObjects(type:"
+//					+ SimpleRepresentationObject.RELATIONAL_DATABASE + ")");
+//			System.out.println("**************************************");
+//
+//			contentAdapter = new ContentAdapter(new Filter(
+//					new FilterParameter[] { new SimpleFilterParameter("type",
+//							SimpleRepresentationObject.RELATIONAL_DATABASE) }),
+//					null, null);
+//
+//			srObjects = browserService
+//					.getSimpleRepresentationObjects(contentAdapter);
+//			if (srObjects != null) {
+//				for (SimpleRepresentationObject sro : srObjects) {
+//					System.out.println(sro);
+//				}
+//			}
+//                        
+//                        System.out.println("\n**************************************");
+//			System.out.println(" getSimpleRepresentationObjects(type:"
+//					+ SimpleRepresentationObject.EMAIL + ")");
+//			System.out.println("**************************************");
+//
+//			contentAdapter = new ContentAdapter(new Filter(
+//					new FilterParameter[] { new SimpleFilterParameter("type",
+//							SimpleRepresentationObject.EMAIL) }),
+//					null, null);
+//
+//			srObjects = browserService
+//					.getSimpleRepresentationObjects(contentAdapter);
+//			if (srObjects != null) {
+//				for (SimpleRepresentationObject sro : srObjects) {
+//					System.out.println(sro);
+//				}
+//			}
+//                        
+//                        System.out.println("\n**************************************");
+//			System.out.println(" getSimpleRepresentationObjects(type:"
+//					+ SimpleRepresentationObject.PRESENTATION + ")");
+//			System.out.println("**************************************");
+//
+//			contentAdapter = new ContentAdapter(new Filter(
+//					new FilterParameter[] { new SimpleFilterParameter("type",
+//							SimpleRepresentationObject.PRESENTATION) }),
+//					null, null);
+//
+//			srObjects = browserService
+//					.getSimpleRepresentationObjects(contentAdapter);
+//			if (srObjects != null) {
+//				for (SimpleRepresentationObject sro : srObjects) {
+//					System.out.println(sro);
+//				}
+//			}
+//                        
+//                        System.out.println("\n**************************************");
+//			System.out.println(" getSimpleRepresentationObjects(type:"
+//					+ SimpleRepresentationObject.SPREADSHEET + ")");
+//			System.out.println("**************************************");
+//
+//			contentAdapter = new ContentAdapter(new Filter(
+//					new FilterParameter[] { new SimpleFilterParameter("type",
+//							SimpleRepresentationObject.SPREADSHEET) }),
+//					null, null);
+//
+//			srObjects = browserService
+//					.getSimpleRepresentationObjects(contentAdapter);
+//			if (srObjects != null) {
+//				for (SimpleRepresentationObject sro : srObjects) {
+//					System.out.println(sro);
+//				}
+//			}
+//                        
+//                        System.out.println("\n**************************************");
+//			System.out.println(" getSimpleRepresentationObjects(type:"
+//					+ SimpleRepresentationObject.VECTOR_GRAPHIC + ")");
+//			System.out.println("**************************************");
+//
+//			contentAdapter = new ContentAdapter(new Filter(
+//					new FilterParameter[] { new SimpleFilterParameter("type",
+//							SimpleRepresentationObject.VECTOR_GRAPHIC) }),
+//					null, null);
+//
+//			srObjects = browserService
+//					.getSimpleRepresentationObjects(contentAdapter);
+//			if (srObjects != null) {
+//				for (SimpleRepresentationObject sro : srObjects) {
+//					System.out.println(sro);
+//				}
+//			}
+//
+//			System.out.println("\n**************************************");
+//			System.out.println(" getSimpleRepresentationObjects(type:"
+//					+ SimpleRepresentationObject.UNKNOWN + ")");
+//			System.out.println("**************************************");
+//
+//			contentAdapter = new ContentAdapter(new Filter(
+//					new FilterParameter[] { new SimpleFilterParameter("type",
+//							SimpleRepresentationObject.UNKNOWN) }), null, null);
+//
+//			srObjects = browserService
+//					.getSimpleRepresentationObjects(contentAdapter);
+//			if (srObjects != null) {
+//				for (SimpleRepresentationObject sro : srObjects) {
+//					System.out.println(sro);
+//				}
+//			}
 
 		} catch (Throwable e) {
 			e.printStackTrace();

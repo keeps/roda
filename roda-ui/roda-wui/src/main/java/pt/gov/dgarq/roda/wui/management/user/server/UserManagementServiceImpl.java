@@ -158,12 +158,14 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
 		}
 
 		if (searchFilter != null && letterFilter != null) {
-			filter = new Filter(new FilterParameter[] { searchFilter, letterFilter });
+			filter = new Filter();
+			filter.add(searchFilter);
+			filter.add(letterFilter);
 		} else if (letterFilter != null) {
-			filter = new Filter(new FilterParameter[] { letterFilter });
+			filter = new Filter(letterFilter);
 
 		} else if (searchFilter != null) {
-			filter = new Filter(new FilterParameter[] { searchFilter });
+			filter = new Filter(searchFilter);
 
 		} else {
 			filter = null;

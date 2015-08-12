@@ -146,17 +146,6 @@
 			<groupId>pt.gov.dgarq.roda</groupId>
 			<artifactId>roda-common-servlet-security</artifactId>
 		</dependency>
-		<!-- <dependency> <groupId>pt.gov.dgarq.roda</groupId> <artifactId>roda-common-servlet-security</artifactId> 
-			</dependency> <dependency> <groupId>pt.gov.dgarq.roda</groupId> <artifactId>roda-common-utils</artifactId> 
-			</dependency> <dependency> <groupId>pt.gov.dgarq.roda</groupId> <artifactId>roda-common-metadata</artifactId> 
-			</dependency> <dependency> <groupId>pt.gov.dgarq.roda</groupId> <artifactId>ead-c.2008</artifactId> 
-			</dependency> <dependency> <groupId>pt.gov.dgarq.roda</groupId> <artifactId>roda-common-format-utility</artifactId> 
-			</dependency> <dependency> <groupId>pt.gov.dgarq.roda</groupId> <artifactId>roda-common-content-adapter</artifactId> 
-			</dependency> <dependency> <groupId>pt.gov.dgarq.roda</groupId> <artifactId>roda-core-plugins</artifactId> 
-			</dependency> <dependency> <groupId>pt.gov.dgarq.roda</groupId> <artifactId>roda-common-db</artifactId> 
-			</dependency> <dependency> <groupId>pt.gov.dgarq.roda</groupId> <artifactId>roda-common-ingest</artifactId> 
-			</dependency> <dependency> <groupId>pt.gov.dgarq.roda</groupId> <artifactId>fedora-client-utility</artifactId> 
-			</dependency> -->
 		<dependency>
 			<groupId>org.apache.xmlgraphics</groupId>
 			<artifactId>fop</artifactId>

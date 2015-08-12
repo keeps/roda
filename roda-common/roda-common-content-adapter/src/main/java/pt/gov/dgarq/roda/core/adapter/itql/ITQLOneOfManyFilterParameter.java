@@ -1,5 +1,7 @@
 package pt.gov.dgarq.roda.core.adapter.itql;
 
+import java.util.List;
+
 import pt.gov.dgarq.roda.core.adapter.FilterParameterAdapter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.OneOfManyFilterParameter;
@@ -29,23 +31,23 @@ public class ITQLOneOfManyFilterParameter<EA extends ITQLEntityAdapter<E>, E> ex
 	@Override
 	public String getITQLCondition(String itqlSubject) {
 
-		String[] values = getOneOfManyFilterParameter().getValues();
+		List<String> values = getOneOfManyFilterParameter().getValues();
 
 		String itqlCondition = "";
-		if (values != null && values.length > 0) {
+		if (values != null && values.size() > 0) {
 
 			itqlCondition += "(";
 
 			String firstItqlObject = getEntityAdapter()
 					.getITQLObjectForAttribute(getFilterParameter().getName(),
-							values[0]);
+							values.get(0));
 
 			itqlCondition += getEntityAdapter().getITQLCondition(itqlSubject,
 					getFilterParameter().getName(), firstItqlObject);
 
-			for (int i = 1; i < values.length; i++) {
+			for (int i = 1; i < values.size(); i++) {
 
-				String value = values[i];
+				String value = values.get(i);
 
 				String itqlObject = getEntityAdapter()
 						.getITQLObjectForAttribute(

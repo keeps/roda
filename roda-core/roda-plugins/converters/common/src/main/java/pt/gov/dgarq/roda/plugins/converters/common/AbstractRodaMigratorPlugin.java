@@ -773,11 +773,9 @@ public abstract class AbstractRodaMigratorPlugin extends
 			// No sense to use subType without type
 			if (subTypes != null && subTypes.size() > 0) {
 
-				String[] subTypesArray = subTypes.toArray(new String[subTypes
-						.size()]);
 
 				filter.add(new OneOfManyFilterParameter("subtype",
-						subTypesArray));
+						subTypes));
 			}
 		}
 

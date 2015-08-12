@@ -306,9 +306,8 @@ public class IngestManager {
 	public List<SIPState> getSIPsInState(String state)
 			throws IngestRegistryException {
 
-		Filter filterState = new Filter(
-				new FilterParameter[] { new SimpleFilterParameter("state",
-						state) });
+		Filter filterState = new Filter(new SimpleFilterParameter("state",
+						state));
 
 		return getDatabaseUtility().getSIPStates(
 				new ContentAdapter(filterState, null, null));

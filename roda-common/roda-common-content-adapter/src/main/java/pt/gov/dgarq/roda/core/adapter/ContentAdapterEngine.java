@@ -76,7 +76,7 @@ public abstract class ContentAdapterEngine<EA extends SortParameterComparator<E>
 	 */
 	public boolean hasFilter() {
 		return getFilter() != null && getFilter().getParameters() != null
-				&& getFilter().getParameters().length > 0;
+				&& getFilter().getParameters().size() > 0;
 	}
 
 	/**

@@ -89,7 +89,7 @@ public class StatisticsTest {
 			System.out.println("Get StatisticData with values between 0 and 1000");
 			System.out.println("***********************************");
 
-			Filter filter = new Filter(new FilterParameter[] { new LongRangeFilterParameter("value", 0L, 1000L) });
+			Filter filter = new Filter(new LongRangeFilterParameter("value", 0L, 1000L));
 			StatisticData[] statisticData = statisticsMonitorService
 					.getStatisticData(new ContentAdapter(filter, null, null));
 
@@ -99,7 +99,7 @@ public class StatisticsTest {
 			System.out.println("Get StatisticData with type starting with od.bla");
 			System.out.println("***********************************");
 
-			filter = new Filter(new FilterParameter[] { new RegexFilterParameter("type", "od\\.bla.*") });
+			filter = new Filter(new RegexFilterParameter("type", "od\\.bla.*"));
 			statisticData = statisticsMonitorService.getStatisticData(new ContentAdapter(filter, null, null));
 
 			System.out.println(Arrays.toString(statisticData));

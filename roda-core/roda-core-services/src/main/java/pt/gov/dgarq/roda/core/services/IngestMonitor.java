@@ -65,7 +65,7 @@ public class IngestMonitor extends RODAWebService {
 		List<FilterParameter> parametersList = new ArrayList<FilterParameter>();
 
 		if (filter.getParameters() != null) {
-			parametersList.addAll(Arrays.asList(filter.getParameters()));
+			parametersList.addAll(filter.getParameters());
 		}
 
 		List<String> roles = Arrays.asList(this.getClientUser().getRoles());
@@ -73,8 +73,7 @@ public class IngestMonitor extends RODAWebService {
 		if (!roles.contains("ingest.list_all_sips")) {
 			parametersList.add(0, new SimpleFilterParameter("username",
 					getClientUser().getName()));
-			filter.setParameters(parametersList
-					.toArray(new FilterParameter[parametersList.size()]));
+			filter.setParameters(parametersList);
 		}
 
 		try {
@@ -121,8 +120,8 @@ public class IngestMonitor extends RODAWebService {
 		List<FilterParameter> parametersList = new ArrayList<FilterParameter>();
 
 		if (contentAdapterFilter.getParameters() != null) {
-			parametersList.addAll(Arrays.asList(contentAdapterFilter
-					.getParameters()));
+			parametersList.addAll(contentAdapterFilter
+					.getParameters());
 		}
 
 		List<String> roles = Arrays.asList(this.getClientUser().getRoles());
@@ -130,8 +129,7 @@ public class IngestMonitor extends RODAWebService {
 		if (!roles.contains("ingest.list_all_sips")) {
 			parametersList.add(0, new SimpleFilterParameter("username",
 					getClientUser().getName()));
-			contentAdapterFilter.setParameters(parametersList
-					.toArray(new FilterParameter[parametersList.size()]));
+			contentAdapterFilter.setParameters(parametersList);
 		}
 
 		try {

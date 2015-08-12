@@ -13,13 +13,15 @@ public class ITQLClassificationSchemeFilterParameter<EA extends ITQLEntityAdapte
 
 	@Override
 	public String getITQLCondition(String itqlSubject) {
-		return getEntityAdapter()
-				.getITQLClassificationSchemeCondition(
-						itqlSubject,
-						getProducerClassesFilterParameter()
-								.getClassificationSchemeId(),
-						getProducerClassesFilterParameter()
-								.getPossibleClassesPids());
+//		return getEntityAdapter()
+//				.getITQLClassificationSchemeCondition(
+//						itqlSubject,
+//						getProducerClassesFilterParameter()
+//								.getClassificationSchemeId(),
+//						getProducerClassesFilterParameter()
+//								.getPossibleClassesPids());
+		// FIXME
+		return null;
 	}
 
 	@Override

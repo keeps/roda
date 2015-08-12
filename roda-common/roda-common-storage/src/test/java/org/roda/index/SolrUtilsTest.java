@@ -9,6 +9,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
@@ -33,6 +34,7 @@ import pt.gov.dgarq.roda.core.data.adapter.filter.DateRangeFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.LikeFilterParameter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.LongRangeFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.OneOfManyFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.ProducerFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.RegexFilterParameter;
@@ -73,7 +75,8 @@ public class SolrUtilsTest {
 		Filter filter = null;
 		String stringFilter = null;
 		String fonds = "fonds", series = "series", fondsOrSeries = fonds + " " + series;
-		String[] array = new String[] { fonds, series };
+		List<String> oneOfManyValues = Arrays.asList(fonds, series);
+		Long from = 1L, to = 5L;
 
 		// 1) null filter
 		try {
@@ -123,7 +126,7 @@ public class SolrUtilsTest {
 		// each of the values, and they will be combined using OR operator)
 		try {
 			filter = new Filter();
-			filter.add(new OneOfManyFilterParameter(RodaConstants.SDO__ALL, array));
+			filter.add(new OneOfManyFilterParameter(RodaConstants.SDO__ALL, oneOfManyValues));
 			stringFilter = SolrUtils.parseFilter(filter);
 			assertNotNull(stringFilter);
 			assertEquals(String.format("((%s: \"%s\") OR (%s: \"%s\"))", RodaConstants.SDO__ALL, fonds,
@@ -162,12 +165,13 @@ public class SolrUtilsTest {
 			assertEquals(IndexServiceException.BAD_REQUEST, e.getCode());
 		}
 
-		// 9) filter with one RangeFilterParameter
+		// 9) filter with one empty DateRangeFilterParameter
 		try {
 			filter = new Filter();
 			filter.add(new DateRangeFilterParameter());
 			stringFilter = SolrUtils.parseFilter(filter);
-			fail("An exception should have been thrown but it wasn't!");
+			assertNotNull(stringFilter);
+			assertThat(stringFilter, Matchers.is("*:*"));
 		} catch (IndexServiceException e) {
 			assertEquals(IndexServiceException.BAD_REQUEST, e.getCode());
 		}
@@ -204,6 +208,29 @@ public class SolrUtilsTest {
 			assertEquals(String.format("(*:* NOT %s:*)", RodaConstants.SDO__ALL), stringFilter);
 		} catch (IndexServiceException e) {
 			fail("An exception was not expected!");
+		}
+
+		// 13) filter with one empty LongRangeFilterParameter
+		try {
+			filter = new Filter();
+			filter.add(new LongRangeFilterParameter());
+			stringFilter = SolrUtils.parseFilter(filter);
+			assertNotNull(stringFilter);
+			assertThat(stringFilter, Matchers.is("*:*"));
+		} catch (IndexServiceException e) {
+			assertEquals(IndexServiceException.BAD_REQUEST, e.getCode());
+		}
+
+		// 13.1) filter with one LongRangeFilterParameter
+		try {
+			filter = new Filter();
+			filter.add(new LongRangeFilterParameter(RodaConstants.LOG_DURATION, from, to));
+			stringFilter = SolrUtils.parseFilter(filter);
+			assertNotNull(stringFilter);
+			assertThat(stringFilter,
+					Matchers.is(String.format("(%s:[%s TO %s])", RodaConstants.LOG_DURATION, from, to)));
+		} catch (IndexServiceException e) {
+			assertEquals(IndexServiceException.BAD_REQUEST, e.getCode());
 		}
 
 	}

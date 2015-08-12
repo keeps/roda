@@ -1,5 +1,7 @@
 package pt.gov.dgarq.roda.core.adapter.sql;
 
+import java.util.List;
+
 import pt.gov.dgarq.roda.core.adapter.FilterParameterAdapter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.OneOfManyFilterParameter;
 
@@ -31,20 +33,20 @@ public class SQLOneOfManyFilterParameter<EA extends SQLEntityAdapter<E>, E>
 		String sqlColumnName = getEntityAdapter().getSQLColumnNameForAttribute(
 				getFilterParameter().getName());
 
-		String[] values = getOneOfManyFilterParameter().getValues();
+		List<String> values = getOneOfManyFilterParameter().getValues();
 
 		String sqlCondition = "";
-		if (values != null && values.length > 0) {
+		if (values != null && values.size() > 0) {
 
 			sqlCondition += "(";
 
 			String firstSQLValue = getEntityAdapter().getSQLValueForAttribute(
-					getFilterParameter().getName(), (Object) values[0]);
+					getFilterParameter().getName(), (Object) values.get(0));
 			sqlCondition += sqlColumnName + "=" + firstSQLValue;
 
-			for (int i = 1; i < values.length; i++) {
+			for (int i = 1; i < values.size(); i++) {
 
-				String value = values[i];
+				String value = values.get(i);
 
 				String sqlValue = getEntityAdapter().getSQLValueForAttribute(
 						getFilterParameter().getName(), (Object) value);

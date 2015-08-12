@@ -6,9 +6,11 @@ import java.util.List;
 
 public abstract class FacetParameter implements Serializable {
 	private static final long serialVersionUID = 4927529408810091855L;
+	public static final int DEFAULT_MIN_COUNT = 0;
 
 	private String name;
 	private List<String> values;
+	private int minCount = DEFAULT_MIN_COUNT;
 
 	public FacetParameter() {
 
@@ -26,6 +28,13 @@ public abstract class FacetParameter implements Serializable {
 		this.values = values;
 	}
 
+	public FacetParameter(String name, List<String> values, int minCount) {
+		super();
+		this.name = name;
+		this.values = values;
+		this.minCount = minCount;
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -40,6 +49,14 @@ public abstract class FacetParameter implements Serializable {
 
 	public void setValues(List<String> values) {
 		this.values = values;
+	}
+
+	public int getMinCount() {
+		return minCount;
+	}
+
+	public void setMinCount(int minCount) {
+		this.minCount = minCount;
 	}
 
 }

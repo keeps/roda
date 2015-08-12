@@ -1,6 +1,6 @@
 package pt.gov.dgarq.roda.core.data.adapter.filter;
 
-import java.util.Arrays;
+import java.util.List;
 
 /**
  * This filter match one the of the values.
@@ -10,7 +10,7 @@ import java.util.Arrays;
 public class OneOfManyFilterParameter extends FilterParameter {
 	private static final long serialVersionUID = -8705013718226758378L;
 
-	private String[] values = null;
+	private List<String> values = null;
 
 	/**
 	 * Constructs an empty {@link OneOfManyFilterParameter}.
@@ -25,10 +25,8 @@ public class OneOfManyFilterParameter extends FilterParameter {
 	 * @param oneOfManyFilterParameter
 	 *            the {@link OneOfManyFilterParameter} to clone.
 	 */
-	public OneOfManyFilterParameter(
-			OneOfManyFilterParameter oneOfManyFilterParameter) {
-		this(oneOfManyFilterParameter.getName(), oneOfManyFilterParameter
-				.getValues());
+	public OneOfManyFilterParameter(OneOfManyFilterParameter oneOfManyFilterParameter) {
+		this(oneOfManyFilterParameter.getName(), oneOfManyFilterParameter.getValues());
 	}
 
 	/**
@@ -39,7 +37,7 @@ public class OneOfManyFilterParameter extends FilterParameter {
 	 * @param values
 	 *            the list of values for this filter.
 	 */
-	public OneOfManyFilterParameter(String name, String[] values) {
+	public OneOfManyFilterParameter(String name, List<String> values) {
 		setName(name);
 		setValues(values);
 	}
@@ -48,8 +46,7 @@ public class OneOfManyFilterParameter extends FilterParameter {
 	 * @see Object#toString()
 	 */
 	public String toString() {
-		return "OneOfManyFilterParameter(name=" + getName() + ", values="
-				+ Arrays.asList(getValues()) + ")";
+		return "OneOfManyFilterParameter(name=" + getName() + ", values=" + getValues() + ")";
 	}
 
 	/**
@@ -60,10 +57,7 @@ public class OneOfManyFilterParameter extends FilterParameter {
 
 		if (obj != null && obj instanceof OneOfManyFilterParameter) {
 			OneOfManyFilterParameter other = (OneOfManyFilterParameter) obj;
-			equal = super.equals(other)
-					&& (getValues() == other.getValues() || Arrays.asList(
-							getValues()).equals(
-							Arrays.asList(other.getValues())));
+			equal = super.equals(other) && (getValues() == other.getValues() || getValues().equals(other.getValues()));
 		} else {
 			equal = false;
 		}
@@ -74,7 +68,7 @@ public class OneOfManyFilterParameter extends FilterParameter {
 	/**
 	 * @return the values
 	 */
-	public String[] getValues() {
+	public List<String> getValues() {
 		return values;
 	}
 
@@ -82,7 +76,7 @@ public class OneOfManyFilterParameter extends FilterParameter {
 	 * @param values
 	 *            the values to set
 	 */
-	public void setValues(String[] values) {
+	public void setValues(List<String> values) {
 		this.values = values;
 	}
 

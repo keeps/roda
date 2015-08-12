@@ -39,8 +39,8 @@ public class TaskOneOfManyFilterParameterAdapter extends
 
 			List<String> values;
 			if (getOneOfManyFilterParameter().getValues() != null) {
-				values = Arrays.asList(getOneOfManyFilterParameter()
-						.getValues());
+				values = getOneOfManyFilterParameter()
+						.getValues();
 			} else {
 				// Every task will fail to pass an empty set of possibilities
 				values = new ArrayList<String>();

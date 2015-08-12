@@ -79,7 +79,7 @@ public class IngestNotificationPlugin extends AbstractPlugin {
 	private static final String SIP_STATE_ACCEPTED = "ACCEPTED"; //$NON-NLS-1$
 	private static final String SIP_STATE_QUARANTINE = "QUARANTINE"; //$NON-NLS-1$
 
-	private static final String[] COMPLETE_SIP_STATES = new String[] { SIP_STATE_ACCEPTED, SIP_STATE_QUARANTINE };
+	private static final List<String> COMPLETE_SIP_STATES = Arrays.asList(SIP_STATE_ACCEPTED, SIP_STATE_QUARANTINE);
 
 	private RODAClient rodaClient = null;
 	private IngestMonitor ingestMonitorService = null;
@@ -489,10 +489,9 @@ public class IngestNotificationPlugin extends AbstractPlugin {
 
 		List<SIPState> sipStates = new ArrayList<SIPState>();
 
-		Filter filterSIPsSinceLastNotification = new Filter(
-				new FilterParameter[] { new SimpleFilterParameter("username", producer), //$NON-NLS-1$
-						new OneOfManyFilterParameter("state", //$NON-NLS-1$
-								COMPLETE_SIP_STATES) });
+		Filter filterSIPsSinceLastNotification = new Filter();
+		filterSIPsSinceLastNotification.add(new SimpleFilterParameter("username", producer));
+		filterSIPsSinceLastNotification.add(new OneOfManyFilterParameter("state",COMPLETE_SIP_STATES));
 
 		if (datetime != null) {
 			filterSIPsSinceLastNotification.add(new DateRangeFilterParameter("datetime", datetime, null)); //$NON-NLS-1$

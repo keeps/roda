@@ -212,9 +212,9 @@ public abstract class IngestTask {
 	 */
 	public List<SIPState> getAvailableSIPs() throws IngestRegistryException {
 
-		Filter availableSIPsFilter = new Filter(new FilterParameter[] {
-				new SimpleFilterParameter("state", getInitialState()),
-				new SimpleFilterParameter("processing", "false") });
+		Filter availableSIPsFilter = new Filter();
+		availableSIPsFilter.add(new SimpleFilterParameter("state", getInitialState()));
+		availableSIPsFilter.add(new SimpleFilterParameter("processing", "false"));
 
 		return getIngestManager().getSIPs(
 				new ContentAdapter(availableSIPsFilter, null, null));
@@ -230,9 +230,9 @@ public abstract class IngestTask {
 	 */
 	public SIPState getNextAvailableSIP() throws IngestRegistryException {
 
-		Filter availableSIPsFilter = new Filter(new FilterParameter[] {
-				new SimpleFilterParameter("state", getInitialState()),
-				new SimpleFilterParameter("processing", "false") });
+		Filter availableSIPsFilter = new Filter();
+		availableSIPsFilter.add(new SimpleFilterParameter("state", getInitialState()));
+		availableSIPsFilter.add(new SimpleFilterParameter("processing", "false"));
 		Sorter sorterOlderFirst = new Sorter(
 				new SortParameter[] { new SortParameter("datetime", false) });
 		ContentAdapter firstAvailableSIP = new ContentAdapter(

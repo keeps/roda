@@ -79,52 +79,53 @@ public class IngestMonitorTest {
 			System.out.println("Get SIPs not complete count ");
 			System.out.println("****************************************");
 
-			Filter filterNotComplete = new Filter(new FilterParameter[] {
-					new SimpleFilterParameter("complete", "false"),
-					new OneOfManyFilterParameter("state", new String[] {
-							"DROPED_FTP", "DROPED_UPLOAD_SERVICE", "UNPACKED",
-							"VIRUS_FREE", "SIP_VALID", "AUTHORIZED",
-							"SIP_INGESTED" }) });
-
-			sipsCount = ingestMonitorService.getSIPsCount(filterNotComplete);
-
-			System.out.println(sipsCount + " SIPs");
-
-			System.out.println("\n****************************************");
-			System.out.println("Get all SIPs not complete ");
-			System.out.println("****************************************");
-
-			SIPState[] sips = ingestMonitorService.getSIPs(new ContentAdapter(
-					filterNotComplete, null, null));
-
-			if (sips == null) {
-				System.out.println("No SIPs\n");
-			} else {
-
-				System.out.println(sips.length + " SIPs:\n");
-
-				for (int i = 0; i < sips.length; i++) {
-					System.out.println(sips[i]);
-				}
-			}
-
-			System.out.println("\n********************************");
-			System.out.println("Get only the 3 first SIPs");
-			System.out.println("********************************");
-
-			sips = ingestMonitorService.getSIPs(new ContentAdapter(null, null,
-					new Sublist(0, 3)));
-
-			if (sips == null) {
-				System.out.println("No SIPs\n");
-			} else {
-
-				System.out.println(sips.length + " SIPs:\n");
-
-				for (int i = 0; i < sips.length; i++) {
-					System.out.println(sips[i] + "\n\n");
-				}
-			}
+//			Filter filterNotComplete = new Filter(new FilterParameter[] {
+//					new SimpleFilterParameter("complete", "false"),
+//					new OneOfManyFilterParameter("state", new String[] {
+//							"DROPED_FTP", "DROPED_UPLOAD_SERVICE", "UNPACKED",
+//							"VIRUS_FREE", "SIP_VALID", "AUTHORIZED",
+//							"SIP_INGESTED" }) 
+//					});
+//
+//			sipsCount = ingestMonitorService.getSIPsCount(filterNotComplete);
+//
+//			System.out.println(sipsCount + " SIPs");
+//
+//			System.out.println("\n****************************************");
+//			System.out.println("Get all SIPs not complete ");
+//			System.out.println("****************************************");
+//
+//			SIPState[] sips = ingestMonitorService.getSIPs(new ContentAdapter(
+//					filterNotComplete, null, null));
+//
+//			if (sips == null) {
+//				System.out.println("No SIPs\n");
+//			} else {
+//
+//				System.out.println(sips.length + " SIPs:\n");
+//
+//				for (int i = 0; i < sips.length; i++) {
+//					System.out.println(sips[i]);
+//				}
+//			}
+//
+//			System.out.println("\n********************************");
+//			System.out.println("Get only the 3 first SIPs");
+//			System.out.println("********************************");
+//
+//			sips = ingestMonitorService.getSIPs(new ContentAdapter(null, null,
+//					new Sublist(0, 3)));
+//
+//			if (sips == null) {
+//				System.out.println("No SIPs\n");
+//			} else {
+//
+//				System.out.println(sips.length + " SIPs:\n");
+//
+//				for (int i = 0; i < sips.length; i++) {
+//					System.out.println(sips[i] + "\n\n");
+//				}
+//			}
 
 			// System.out.println("\n********************************");
 			// System.out.println("Get all SIPs");
@@ -148,72 +149,72 @@ public class IngestMonitorTest {
 			System.out.println("Get all SIPs complete in state QUARANTINE");
 			System.out.println("****************************************");
 
-			Filter filterCompleteQuarantine = new Filter(new FilterParameter[] {
-					new SimpleFilterParameter("state", "QUARANTINE"),
-					new SimpleFilterParameter("complete", "TRUE") });
-
-			sips = null;
-			sips = ingestMonitorService.getSIPs(new ContentAdapter(
-					filterCompleteQuarantine, null, null));
-
-			if (sips == null) {
-				System.out.println("No SIPs\n");
-			} else {
-
-				System.out.println(sips.length + " SIPs:\n");
-
-				for (int i = 0; i < sips.length; i++) {
-					System.out.println(sips[i]);
-				}
-			}
-
-			System.out.println("\n********************************");
-			System.out.println("Get all SIPs not complete from user "
-					+ rodaClient.getUsername());
-			System.out.println("********************************");
-
-			Filter filterSIPsNotComplete = new Filter(new FilterParameter[] {
-					new SimpleFilterParameter("username", rodaClient
-							.getUsername()),
-					new SimpleFilterParameter("complete", "false") });
-
-			sips = null;
-			sips = ingestMonitorService.getSIPs(new ContentAdapter(
-					filterSIPsNotComplete, null, null));
-
-			if (sips == null) {
-				System.out.println("No SIPs\n");
-			} else {
-
-				System.out.println(sips.length + " SIPs:\n");
-
-				for (int i = 0; i < sips.length; i++) {
-					System.out.println(sips[i]);
-				}
-			}
-
-			System.out.println("\n********************************");
-			System.out.println("Get all SIPs in state DROPED_FTP");
-			System.out.println("********************************");
-
-			Filter filterSIPsDropedFtp = new Filter(
-					new FilterParameter[] { new SimpleFilterParameter("state",
-							"DROPED_FTP") });
-
-			sips = null;
-			sips = ingestMonitorService.getSIPs(new ContentAdapter(
-					filterSIPsDropedFtp, null, null));
-
-			if (sips == null) {
-				System.out.println("No SIPs\n");
-			} else {
-
-				System.out.println(sips.length + " SIPs:\n");
-
-				for (int i = 0; i < sips.length; i++) {
-					System.out.println(sips[i]);
-				}
-			}
+//			Filter filterCompleteQuarantine = new Filter(new FilterParameter[] {
+//					new SimpleFilterParameter("state", "QUARANTINE"),
+//					new SimpleFilterParameter("complete", "TRUE") });
+//
+//			sips = null;
+//			sips = ingestMonitorService.getSIPs(new ContentAdapter(
+//					filterCompleteQuarantine, null, null));
+//
+//			if (sips == null) {
+//				System.out.println("No SIPs\n");
+//			} else {
+//
+//				System.out.println(sips.length + " SIPs:\n");
+//
+//				for (int i = 0; i < sips.length; i++) {
+//					System.out.println(sips[i]);
+//				}
+//			}
+//
+//			System.out.println("\n********************************");
+//			System.out.println("Get all SIPs not complete from user "
+//					+ rodaClient.getUsername());
+//			System.out.println("********************************");
+//
+//			Filter filterSIPsNotComplete = new Filter(new FilterParameter[] {
+//					new SimpleFilterParameter("username", rodaClient
+//							.getUsername()),
+//					new SimpleFilterParameter("complete", "false") });
+//
+//			sips = null;
+//			sips = ingestMonitorService.getSIPs(new ContentAdapter(
+//					filterSIPsNotComplete, null, null));
+//
+//			if (sips == null) {
+//				System.out.println("No SIPs\n");
+//			} else {
+//
+//				System.out.println(sips.length + " SIPs:\n");
+//
+//				for (int i = 0; i < sips.length; i++) {
+//					System.out.println(sips[i]);
+//				}
+//			}
+//
+//			System.out.println("\n********************************");
+//			System.out.println("Get all SIPs in state DROPED_FTP");
+//			System.out.println("********************************");
+//
+//			Filter filterSIPsDropedFtp = new Filter(
+//					new FilterParameter[] { new SimpleFilterParameter("state",
+//							"DROPED_FTP") });
+//
+//			sips = null;
+//			sips = ingestMonitorService.getSIPs(new ContentAdapter(
+//					filterSIPsDropedFtp, null, null));
+//
+//			if (sips == null) {
+//				System.out.println("No SIPs\n");
+//			} else {
+//
+//				System.out.println(sips.length + " SIPs:\n");
+//
+//				for (int i = 0; i < sips.length; i++) {
+//					System.out.println(sips[i]);
+//				}
+//			}
 
 		} catch (Exception e) {
 			e.printStackTrace();

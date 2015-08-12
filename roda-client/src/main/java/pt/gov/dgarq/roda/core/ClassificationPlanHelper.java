@@ -155,8 +155,9 @@ public class ClassificationPlanHelper {
 							.getAllButRepresentationsDescriptionLevels().get(i)
 							.getLevel();
 				}
-				filter.add(new OneOfManyFilterParameter(
-						SimpleDescriptionObject.LEVEL, levels));
+				// FIXME
+				// filter.add(new OneOfManyFilterParameter(
+				// SimpleDescriptionObject.LEVEL, levels));
 				filter.add(new SimpleFilterParameter("parentPID", sdo.getPid()));
 				adapter.setFilter(filter);
 

@@ -125,9 +125,10 @@ public class ResetNormalizedSIPPermissionsPlugin extends AbstractPlugin {
 		int countError = 0;
 
 		ContentAdapter contentAdapter = new ContentAdapter();
-		contentAdapter.setFilter(new Filter(new FilterParameter[] {
-				new SimpleFilterParameter("state", "SIP_NORMALIZED"), //$NON-NLS-1$ //$NON-NLS-2$
-				new SimpleFilterParameter("processing", "false") })); //$NON-NLS-1$ //$NON-NLS-2$
+		Filter f = new Filter();
+		f.add(new SimpleFilterParameter("state", "SIP_NORMALIZED"));
+		f.add(new SimpleFilterParameter("processing", "false"));
+		contentAdapter.setFilter(f);
 
 		SIPState[] normalizedSIPStates = null;
 		try {

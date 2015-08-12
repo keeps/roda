@@ -27,8 +27,7 @@ public class SimpleDescriptionObject extends RODAObject {
 	
 	// FIXME this should be defined from DescriptionLevelManager information
 	public static final Filter FONDS_FILTER = new Filter(
-          new FilterParameter[] { new SimpleFilterParameter(LEVEL,
-                          DescriptionLevel.FONDS.getLevel()) });
+			new SimpleFilterParameter(LEVEL, DescriptionLevel.FONDS.getLevel()));
 
 	private static final String[] ELEMENTS = new String[] { ID, COUNTRYCODE,
 			REPOSITORYCODE, LEVEL, TITLE, DATE_INITIAL, DATE_FINAL };
