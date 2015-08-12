@@ -35,27 +35,28 @@ public class SQLRangeFilterParameter<EA extends SQLEntityAdapter<E>, E> extends
 		String sqlColumnName = getEntityAdapter().getSQLColumnNameForAttribute(
 				getFilterParameter().getName());
 
-		if (!StringUtils.isBlank(getRangeFilterParameter().getFromValue())) {
-
-			String sqlFromValue = getEntityAdapter().getSQLValueForAttribute(
-					getFilterParameter().getName(),
-					(Object) getRangeFilterParameter().getFromValue());
-
-			condition = sqlColumnName + ">=" + sqlFromValue;
-		}
-
-		if (!StringUtils.isBlank(getRangeFilterParameter().getToValue())) {
-
-			if (condition != null) {
-				condition += " AND ";
-			}
-
-			String sqlToValue = getEntityAdapter().getSQLValueForAttribute(
-					getFilterParameter().getName(),
-					(Object) getRangeFilterParameter().getToValue());
-
-			condition += sqlColumnName + "<=" + sqlToValue;
-		}
+		// FIXME delete or fix
+		// if (!StringUtils.isBlank(getRangeFilterParameter().getFromValue())) {
+		//
+		// String sqlFromValue = getEntityAdapter().getSQLValueForAttribute(
+		// getFilterParameter().getName(),
+		// (Object) getRangeFilterParameter().getFromValue());
+		//
+		// condition = sqlColumnName + ">=" + sqlFromValue;
+		// }
+		//
+		// if (!StringUtils.isBlank(getRangeFilterParameter().getToValue())) {
+		//
+		// if (condition != null) {
+		// condition += " AND ";
+		// }
+		//
+		// String sqlToValue = getEntityAdapter().getSQLValueForAttribute(
+		// getFilterParameter().getName(),
+		// (Object) getRangeFilterParameter().getToValue());
+		//
+		// condition += sqlColumnName + "<=" + sqlToValue;
+		// }
 
 		return condition;
 	}

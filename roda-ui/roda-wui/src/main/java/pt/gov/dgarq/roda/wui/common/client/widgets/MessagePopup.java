@@ -3,11 +3,6 @@
  */
 package pt.gov.dgarq.roda.wui.common.client.widgets;
 
-import org.adamtacy.client.ui.EffectPanel;
-import org.adamtacy.client.ui.effects.Effect;
-import org.adamtacy.client.ui.effects.EffectHandler;
-import org.adamtacy.client.ui.effects.impl.Fade;
-
 import pt.gov.dgarq.roda.wui.common.client.images.CommonImageBundle;
 
 import com.google.gwt.core.client.GWT;
@@ -60,17 +55,13 @@ public class MessagePopup extends PopupPanel {
 
 	private Image icon;
 
-	private static final CommonConstants constants = (CommonConstants) GWT
-			.create(CommonConstants.class);
+	private static final CommonConstants constants = (CommonConstants) GWT.create(CommonConstants.class);
 
-	private static CommonImageBundle commonImageBundle = (CommonImageBundle) GWT
-			.create(CommonImageBundle.class);
+	private static CommonImageBundle commonImageBundle = (CommonImageBundle) GWT.create(CommonImageBundle.class);
 
 	private final int slotNumber;
 
 	private final MessagePopupType type;
-
-	private final EffectPanel effects;
 
 	private final FocusPanel focus;
 
@@ -97,7 +88,6 @@ public class MessagePopup extends PopupPanel {
 		slotNumber = getNextSlot(this);
 		layout = new HorizontalPanel();
 		focus = new FocusPanel(layout);
-		effects = new EffectPanel();
 		messageLayout = new VerticalPanel();
 		titleLabel = new Label(title);
 		errorMessage = new Label(message);
@@ -110,28 +100,8 @@ public class MessagePopup extends PopupPanel {
 			icon.addStyleName("error-popup-icon");
 		}
 		layout.add(messageLayout);
-		effects.add(focus);
-		Fade fade = new Fade();
-		fade.getProperties().setEffectLength(1);
-		fade.addEffectHandler(new EffectHandler() {
 
-			public void interruptedEvent(Effect theEffect) {
-				MessagePopup.super.hide();
-			}
-
-			public void postEvent(Effect theEffect) {
-				MessagePopup.super.hide();
-
-			}
-
-			public void preEvent(Effect theEffect) {
-
-			}
-
-		});
-		effects.addEffect(fade);
-
-		setWidget(effects);
+		setWidget(focus);
 
 		focus.addClickListener(new ClickListener() {
 
@@ -155,7 +125,7 @@ public class MessagePopup extends PopupPanel {
 	}
 
 	public void hide() {
-		effects.playEffects();
+		super.hide();
 		slots[slotNumber] = null;
 	}
 
@@ -172,9 +142,8 @@ public class MessagePopup extends PopupPanel {
 						slotOffset += slots[i].getOffsetHeight() + 5;
 					}
 				}
-				MessagePopup.this.setPopupPosition(Window.getClientWidth()
-						- offsetWidth - 5, Window.getScrollTop() + 5
-						+ slotOffset);
+				MessagePopup.this.setPopupPosition(Window.getClientWidth() - offsetWidth - 5,
+						Window.getScrollTop() + 5 + slotOffset);
 			}
 
 		});
@@ -189,8 +158,7 @@ public class MessagePopup extends PopupPanel {
 	 * @param message
 	 */
 	public static void showError(String message) {
-		MessagePopup errorPopup = new MessagePopup(
-				MessagePopupType.ERROR_MESSAGE, constants.alertErrorTitle(),
+		MessagePopup errorPopup = new MessagePopup(MessagePopupType.ERROR_MESSAGE, constants.alertErrorTitle(),
 				message);
 		errorPopup.start();
 	}
@@ -202,8 +170,7 @@ public class MessagePopup extends PopupPanel {
 	 * @param message
 	 */
 	public static void showError(String title, String message) {
-		MessagePopup errorPopup = new MessagePopup(
-				MessagePopupType.ERROR_MESSAGE, title, message);
+		MessagePopup errorPopup = new MessagePopup(MessagePopupType.ERROR_MESSAGE, title, message);
 		errorPopup.start();
 	}
 

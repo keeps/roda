@@ -5,24 +5,19 @@ package pt.gov.dgarq.roda.wui.dissemination.search.advanced.client;
 
 import java.util.List;
 
-import org.adamtacy.client.ui.EffectPanel;
-import org.adamtacy.client.ui.effects.impl.Show;
-
-import pt.gov.dgarq.roda.core.data.search.DefaultSearchParameter;
-import pt.gov.dgarq.roda.wui.common.client.images.CommonImageBundle;
-import pt.gov.dgarq.roda.wui.dissemination.search.advanced.client.DescriptiveFieldChooser.FieldOption;
-import pt.gov.dgarq.roda.wui.dissemination.search.advanced.client.KeywordPicker.KeywordParameter;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.MouseListener;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.AdvancedSearchMessages;
+import pt.gov.dgarq.roda.core.data.search.DefaultSearchParameter;
+import pt.gov.dgarq.roda.wui.common.client.images.CommonImageBundle;
+import pt.gov.dgarq.roda.wui.dissemination.search.advanced.client.DescriptiveFieldChooser.FieldOption;
+import pt.gov.dgarq.roda.wui.dissemination.search.advanced.client.KeywordPicker.KeywordParameter;
 
 /**
  * @author Luis Faria
@@ -43,8 +38,6 @@ public abstract class KeywordItem extends FocusPanel {
 	private final KeywordParameter keywordParameter;
 
 	private final CheckBox checkbox;
-
-	private final EffectPanel removeButtonEffects;
 
 	private final Image removeButton;
 
@@ -78,40 +71,15 @@ public abstract class KeywordItem extends FocusPanel {
 
 		});
 
-		removeButtonEffects = new EffectPanel();
-		removeButtonEffects.add(removeButton);
-		removeButtonEffects.addEffect(new Show());
 
-		this.addMouseListener(new MouseListener() {
-
-			public void onMouseDown(Widget sender, int x, int y) {
-			}
-
-			public void onMouseEnter(Widget sender) {
-				removeButtonEffects.playEffects(0, 1);
-			}
-
-			public void onMouseLeave(Widget sender) {
-				removeButtonEffects.playEffects(1, 0);
-			}
-
-			public void onMouseMove(Widget sender, int x, int y) {
-
-			}
-
-			public void onMouseUp(Widget sender, int x, int y) {
-			}
-
-		});
 
 		setWidget(layout);
 		layout.add(checkbox);
-		layout.add(removeButtonEffects);
+		layout.add(removeButton);
 
 		// layout.setCellVerticalAlignment(checkbox, HasAlignment.ALIGN_TOP);
 		setStylePrimaryName("wui-keywordItem");
 		checkbox.addStyleName("description");
-		removeButtonEffects.addStyleName("remove-effects");
 		removeButton.addStyleName("remove");
 	}
 

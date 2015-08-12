@@ -174,11 +174,6 @@
 			<artifactId>gwt-simile-timeline-dev</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.adamtacy</groupId>
-			<artifactId>gwt-fx</artifactId>
-			<classifier>RC2</classifier>
-		</dependency>
-		<dependency>
 			<groupId>com.google.gwt</groupId>
 			<artifactId>gwt-servlet</artifactId>
 		</dependency>

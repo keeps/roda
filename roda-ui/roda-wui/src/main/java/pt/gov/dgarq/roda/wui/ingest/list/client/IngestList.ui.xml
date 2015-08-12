@@ -67,14 +67,7 @@
 				<g:Label addStyleNames="h3 sidebar-facet-title">
 					<ui:msg>State</ui:msg>
 				</g:Label>
-				<g:CheckBox addStyleNames="sidebar-facet-label" ui:field="checkProcessed">processed
-					(12)</g:CheckBox>
-				<g:CheckBox addStyleNames="sidebar-facet-label" ui:field="checkProcessing">processing
-					(123)</g:CheckBox>
-				<g:CheckBox addStyleNames="sidebar-facet-label" ui:field="checkAccepted">accepted
-					(1234)</g:CheckBox>
-				<g:CheckBox addStyleNames="sidebar-facet-label" ui:field="checkRejected">rejected
-					(1)</g:CheckBox>
+				<g:FlowPanel ui:field="stateFacets" />
 				<g:Label addStyleNames="h3 sidebar-facet-title">
 					<ui:msg>Producers</ui:msg>
 				</g:Label>

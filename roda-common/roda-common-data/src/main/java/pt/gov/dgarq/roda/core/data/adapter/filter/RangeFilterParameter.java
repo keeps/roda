@@ -1,13 +1,16 @@
 package pt.gov.dgarq.roda.core.data.adapter.filter;
 
+import java.io.Serializable;
+
 /**
  * @author Rui Castro
+ * @author Luis Faria <lfaria@keep.pt>
  */
-public class RangeFilterParameter extends FilterParameter {
+public abstract class RangeFilterParameter<T extends Serializable> extends FilterParameter {
 	private static final long serialVersionUID = -2923383960685420739L;
 
-	private String fromValue;
-	private String toValue;
+	private T fromValue;
+	private T toValue;
 
 	/**
 	 * Constructs an empty {@link RangeFilterParameter}.
@@ -22,9 +25,8 @@ public class RangeFilterParameter extends FilterParameter {
 	 * @param rangeFilterParameter
 	 *            the {@link RangeFilterParameter} to clone.
 	 */
-	public RangeFilterParameter(RangeFilterParameter rangeFilterParameter) {
-		this(rangeFilterParameter.getName(), rangeFilterParameter
-				.getFromValue(), rangeFilterParameter.getToValue());
+	public RangeFilterParameter(RangeFilterParameter<T> rangeFilterParameter) {
+		this(rangeFilterParameter.getName(), rangeFilterParameter.getFromValue(), rangeFilterParameter.getToValue());
 	}
 
 	/**
@@ -34,7 +36,7 @@ public class RangeFilterParameter extends FilterParameter {
 	 * @param fromValue
 	 * @param toValue
 	 */
-	public RangeFilterParameter(String name, String fromValue, String toValue) {
+	public RangeFilterParameter(String name, T fromValue, T toValue) {
 		setName(name);
 		setFromValue(fromValue);
 		setToValue(toValue);
@@ -44,36 +46,14 @@ public class RangeFilterParameter extends FilterParameter {
 	 * @see Object#toString()
 	 */
 	public String toString() {
-		return "RangeFilterParameter(name=" + getName() + ", fromValue="
-				+ getFromValue() + ", toValue=" + getToValue() + ")";
-	}
-
-	/**
-	 * @see FilterParameter#equals(Object)
-	 */
-	public boolean equals(Object obj) {
-		boolean equal = true;
-
-		if (obj != null && obj instanceof RangeFilterParameter) {
-			RangeFilterParameter other = (RangeFilterParameter) obj;
-			equal = equal && super.equals(other);
-			equal = equal
-					&& (getFromValue() == other.getFromValue() || getFromValue()
-							.equals(other.getFromValue()));
-			equal = equal
-					&& (getToValue() == other.getToValue() || getToValue()
-							.equals(other.getToValue()));
-		} else {
-			equal = false;
-		}
-
-		return equal;
+		return "RangeFilterParameter(name=" + getName() + ", fromValue=" + getFromValue() + ", toValue=" + getToValue()
+				+ ")";
 	}
 
 	/**
 	 * @return the fromValue
 	 */
-	public String getFromValue() {
+	public T getFromValue() {
 		return fromValue;
 	}
 
@@ -81,14 +61,14 @@ public class RangeFilterParameter extends FilterParameter {
 	 * @param fromValue
 	 *            the fromValue to set
 	 */
-	public void setFromValue(String fromValue) {
+	public void setFromValue(T fromValue) {
 		this.fromValue = fromValue;
 	}
 
 	/**
 	 * @return the toValue
 	 */
-	public String getToValue() {
+	public T getToValue() {
 		return toValue;
 	}
 
@@ -96,8 +76,40 @@ public class RangeFilterParameter extends FilterParameter {
 	 * @param toValue
 	 *            the toValue to set
 	 */
-	public void setToValue(String toValue) {
+	public void setToValue(T toValue) {
 		this.toValue = toValue;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((fromValue == null) ? 0 : fromValue.hashCode());
+		result = prime * result + ((toValue == null) ? 0 : toValue.hashCode());
+		return result;
+	}
+
+	@SuppressWarnings("rawtypes")
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		RangeFilterParameter other = (RangeFilterParameter) obj;
+		if (fromValue == null) {
+			if (other.fromValue != null)
+				return false;
+		} else if (!fromValue.equals(other.fromValue))
+			return false;
+		if (toValue == null) {
+			if (other.toValue != null)
+				return false;
+		} else if (!toValue.equals(other.toValue))
+			return false;
+		return true;
 	}
 
 }

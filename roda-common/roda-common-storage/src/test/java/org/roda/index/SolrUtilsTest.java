@@ -22,19 +22,19 @@ import org.roda.CorporaConstants;
 import org.roda.index.utils.SolrUtils;
 import org.roda.storage.Binary;
 import org.roda.storage.DefaultStoragePath;
-import org.roda.storage.StorageServiceException;
 import org.roda.storage.StorageService;
+import org.roda.storage.StorageServiceException;
 import org.roda.storage.fs.FileStorageService;
 
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.adapter.filter.BasicSearchFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.ClassificationSchemeFilterParameter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.DateRangeFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.LikeFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.OneOfManyFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.ProducerFilterParameter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.RangeFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.RegexFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter;
@@ -165,7 +165,7 @@ public class SolrUtilsTest {
 		// 9) filter with one RangeFilterParameter
 		try {
 			filter = new Filter();
-			filter.add(new RangeFilterParameter());
+			filter.add(new DateRangeFilterParameter());
 			stringFilter = SolrUtils.parseFilter(filter);
 			fail("An exception should have been thrown but it wasn't!");
 		} catch (IndexServiceException e) {

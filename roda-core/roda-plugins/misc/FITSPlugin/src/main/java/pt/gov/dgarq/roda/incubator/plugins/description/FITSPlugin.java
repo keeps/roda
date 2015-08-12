@@ -37,13 +37,12 @@ import pt.gov.dgarq.roda.core.data.RepresentationFile;
 import pt.gov.dgarq.roda.core.data.RepresentationObject;
 import pt.gov.dgarq.roda.core.data.SimpleRepresentationObject;
 import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.DateRangeFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.RangeFilterParameter;
 import pt.gov.dgarq.roda.core.plugins.AbstractPlugin;
 import pt.gov.dgarq.roda.core.plugins.PluginException;
 import pt.gov.dgarq.roda.core.stubs.Browser;
-import pt.gov.dgarq.roda.servlet.cas.CASUserPrincipal;
 import pt.gov.dgarq.roda.servlet.cas.CASUtility;
 
 public class FITSPlugin extends AbstractPlugin {
@@ -53,7 +52,7 @@ public class FITSPlugin extends AbstractPlugin {
 	private Browser browserService = null;
 	private File fitsStateFile;
 	private PropertiesConfiguration lastExecutionState;
-	private String lastPluginExecDate = null;
+	private Date lastPluginExecDate = null;
 	private Date dateAfterRetrievingRepresentationsList;
 	private String RODA_HOME;
 	private String fits_bin;
@@ -75,31 +74,24 @@ public class FITSPlugin extends AbstractPlugin {
 			RODA_HOME = null;
 		}
 		if (StringUtils.isBlank(RODA_HOME)) {
-			throw new PluginException(
-					"RODA_HOME enviroment variable is not set.");
+			throw new PluginException("RODA_HOME enviroment variable is not set.");
 		}
 
-		File RODA_PLUGINS_CONFIG_DIRECTORY = new File(new File(RODA_HOME,
-				"config"), "plugins");
+		File RODA_PLUGINS_CONFIG_DIRECTORY = new File(new File(RODA_HOME, "config"), "plugins");
 
-		File configFile = new File(RODA_PLUGINS_CONFIG_DIRECTORY,
-				CONFIGURATION_FILENAME);
+		File configFile = new File(RODA_PLUGINS_CONFIG_DIRECTORY, CONFIGURATION_FILENAME);
 		PropertiesConfiguration configuration = new PropertiesConfiguration();
 		try {
 			if (configFile.isFile()) {
 				configuration.load(configFile);
 				LOGGER.info("Loading configuration file from " + configFile);
 			} else {
-				configuration.load(getClass().getResourceAsStream(
-						CONFIGURATION_FILENAME));
+				configuration.load(getClass().getResourceAsStream(CONFIGURATION_FILENAME));
 				LOGGER.info("Loading default configuration file from resources");
 			}
 		} catch (ConfigurationException ex) {
-			LOGGER.debug(
-					"Error reading plugin configuration - " + ex.getMessage(),
-					ex);
-			throw new PluginException("Error reading plugin configuration - "
-					+ ex.getMessage(), ex);
+			LOGGER.debug("Error reading plugin configuration - " + ex.getMessage(), ex);
+			throw new PluginException("Error reading plugin configuration - " + ex.getMessage(), ex);
 		}
 		fits_bin = configuration.getString("fits_bin");
 		fits_output_dir = configuration.getString("fits_output_dir");
@@ -128,8 +120,7 @@ public class FITSPlugin extends AbstractPlugin {
 
 	@Override
 	public List<PluginParameter> getParameters() {
-		return Arrays.asList(PARAMETER_RODA_CORE_URL(),
-				PARAMETER_RODA_CORE_USERNAME(), PARAMETER_RODA_CORE_PASSWORD(),
+		return Arrays.asList(PARAMETER_RODA_CORE_URL(), PARAMETER_RODA_CORE_USERNAME(), PARAMETER_RODA_CORE_PASSWORD(),
 				PARAMETER_RODA_CAS_URL());
 	}
 
@@ -139,11 +130,9 @@ public class FITSPlugin extends AbstractPlugin {
 		Report report = new Report();
 		report.setType(Report.TYPE_PLUGIN_REPORT);
 		report.setTitle("Report of plugin " + getName());
-		report.setAttributes(new Attribute[] {
-				new Attribute("Agent name", getName()),
+		report.setAttributes(new Attribute[] { new Attribute("Agent name", getName()),
 				new Attribute("Agent version", Float.toString(getVersion())),
-				new Attribute("Start datetime", DateParser
-						.getIsoDate(new Date())) });
+				new Attribute("Start datetime", DateParser.getIsoDate(new Date())) });
 		try {
 			// initialize RODA services and load state information
 			initRODAServicesAndCreateStateInfo();
@@ -152,8 +141,7 @@ public class FITSPlugin extends AbstractPlugin {
 			LOGGER.debug("Error in initRODAServices - " + e.getMessage(), e);
 
 			report.addAttribute(new Attribute("Error", e.getMessage()));
-			report.addAttribute(new Attribute("Finish datetime", DateParser
-					.getIsoDate(new Date())));
+			report.addAttribute(new Attribute("Finish datetime", DateParser.getIsoDate(new Date())));
 
 			e.setReport(report);
 			throw e;
@@ -162,42 +150,35 @@ public class FITSPlugin extends AbstractPlugin {
 		File fits_out_dir = new File(fits_output_dir);
 		if (!fits_out_dir.exists() && !fits_out_dir.mkdir()) {
 			report.addAttribute(new Attribute("Outcome", "error"));
-			report.addAttribute(new Attribute("Error",
-					"Error creating directory \"" + fits_out_dir + "\""));
+			report.addAttribute(new Attribute("Error", "Error creating directory \"" + fits_out_dir + "\""));
 
 			LOGGER.error("	Error creating directory \"" + fits_out_dir + "\"");
-			throw new PluginException("Error creating directory \""
-					+ fits_out_dir + "\"", null, report);
+			throw new PluginException("Error creating directory \"" + fits_out_dir + "\"", null, report);
 		}
 
 		// execute fits and save state information
 		processRepresentationsWithFITS(fits_output_dir, fits_bin,
-				getParameterValues().get(PARAMETER_RODA_CORE_URL().getName()),
-				report);
+				getParameterValues().get(PARAMETER_RODA_CORE_URL().getName()), report);
 
 		try {
 
 			// save finish date (state) to a properties file
 			lastExecutionState.clearProperty(LAST_EXEC_DATE);
-			lastExecutionState.addProperty(LAST_EXEC_DATE, DateParser
-					.getIsoDate(dateAfterRetrievingRepresentationsList));
+			lastExecutionState.addProperty(LAST_EXEC_DATE,
+					DateParser.getIsoDate(dateAfterRetrievingRepresentationsList));
 			lastExecutionState.save(fitsStateFile);
 
 		} catch (ConfigurationException e) {
 			LOGGER.error("Saving finish date", e);
 
 			report.addAttribute(new Attribute("Error", e.getMessage()));
-			report.addAttribute(new Attribute("Finish datetime", DateParser
-					.getIsoDate(new Date())));
+			report.addAttribute(new Attribute("Finish datetime", DateParser.getIsoDate(new Date())));
 
-			throw new PluginException(
-					"Error while saving plugin state to a properties file", e,
-					report);
+			throw new PluginException("Error while saving plugin state to a properties file", e, report);
 		}
 
 		// set report attributes in the end of the plugin execution
-		report.addAttribute(new Attribute("Finish datetime", DateParser
-				.getIsoDate(new Date())));
+		report.addAttribute(new Attribute("Finish datetime", DateParser.getIsoDate(new Date())));
 
 		return report;
 	}
@@ -205,22 +186,18 @@ public class FITSPlugin extends AbstractPlugin {
 	private void initRODAServicesAndCreateStateInfo() throws PluginException {
 		try {
 			// instantiate all the RODA Core objects
-			String rodaClientServiceUrl = getParameterValues().get(
-					AbstractPlugin.PARAMETER_RODA_CORE_URL().getName());
-			String rodaClientUsername = getParameterValues().get(
-					AbstractPlugin.PARAMETER_RODA_CORE_USERNAME().getName());
-			String rodaClientPassword = getParameterValues().get(
-					AbstractPlugin.PARAMETER_RODA_CORE_PASSWORD().getName());
-			String casURL = getParameterValues().get(
-					AbstractPlugin.PARAMETER_RODA_CAS_URL().getName());
-			String coreURL = getParameterValues().get(
-					AbstractPlugin.PARAMETER_RODA_CORE_URL().getName());
-			
-			CASUtility casUtility = new CASUtility(new URL(casURL), new URL(
-					coreURL));
-			
-			RODAClient rodaClient = new RODAClient(new URL(rodaClientServiceUrl),
-					rodaClientUsername, rodaClientPassword, casUtility);
+			String rodaClientServiceUrl = getParameterValues().get(AbstractPlugin.PARAMETER_RODA_CORE_URL().getName());
+			String rodaClientUsername = getParameterValues()
+					.get(AbstractPlugin.PARAMETER_RODA_CORE_USERNAME().getName());
+			String rodaClientPassword = getParameterValues()
+					.get(AbstractPlugin.PARAMETER_RODA_CORE_PASSWORD().getName());
+			String casURL = getParameterValues().get(AbstractPlugin.PARAMETER_RODA_CAS_URL().getName());
+			String coreURL = getParameterValues().get(AbstractPlugin.PARAMETER_RODA_CORE_URL().getName());
+
+			CASUtility casUtility = new CASUtility(new URL(casURL), new URL(coreURL));
+
+			RODAClient rodaClient = new RODAClient(new URL(rodaClientServiceUrl), rodaClientUsername,
+					rodaClientPassword, casUtility);
 			rodaDownloader = rodaClient.getDownloader();
 			browserService = rodaClient.getBrowserService();
 
@@ -232,19 +209,18 @@ public class FITSPlugin extends AbstractPlugin {
 
 				// if it doesn't exist, create and save it, setting
 				// lastPluginExecDate to null
-				LOGGER.info("FITS plugin state file doesn't exist. A new one will be created in "
-						+ fitsStateFile);
+				LOGGER.info("FITS plugin state file doesn't exist. A new one will be created in " + fitsStateFile);
 				try {
 
 					lastExecutionState.save(fitsStateFile);
 					lastPluginExecDate = null;
 				} catch (ConfigurationException e) {
 					LOGGER.debug(
-							"Exception writting notifications state file - "
-									+ fitsStateFile + " - " + e.getMessage(), e);
+							"Exception writting notifications state file - " + fitsStateFile + " - " + e.getMessage(),
+							e);
 					throw new PluginException(
-							"Exception writting notifications state file - "
-									+ fitsStateFile + " - " + e.getMessage(), e);
+							"Exception writting notifications state file - " + fitsStateFile + " - " + e.getMessage(),
+							e);
 				}
 
 			} else {
@@ -252,54 +228,44 @@ public class FITSPlugin extends AbstractPlugin {
 				// if it does exists, load it and read lastPluginExecDate value
 				try {
 					lastExecutionState.load(fitsStateFile);
-					String dateString = lastExecutionState.getString(
-							LAST_EXEC_DATE, null);
-					lastPluginExecDate = DateParser.getIsoDate(DateParser
-							.parse(dateString));
+					String dateString = lastExecutionState.getString(LAST_EXEC_DATE, null);
+					lastPluginExecDate = DateParser.parse(dateString);
 				} catch (ConfigurationException e) {
-					LOGGER.debug("Exception reading FITS plugin state file - "
-							+ fitsStateFile + " - " + e.getMessage(), e);
+					LOGGER.debug("Exception reading FITS plugin state file - " + fitsStateFile + " - " + e.getMessage(),
+							e);
 					throw new PluginException(
-							"Exception reading FITS plugin state file - "
-									+ fitsStateFile + " - " + e.getMessage(), e);
+							"Exception reading FITS plugin state file - " + fitsStateFile + " - " + e.getMessage(), e);
 				}
 			}
 
 		} catch (Exception e) {
-			LOGGER.debug(
-					"Error creating RODA client services - " + e.getMessage(),
-					e);
-			throw new PluginException("Error creating RODA client services - "
-					+ e.getMessage(), e);
+			LOGGER.debug("Error creating RODA client services - " + e.getMessage(), e);
+			throw new PluginException("Error creating RODA client services - " + e.getMessage(), e);
 		}
 	}
 
 	private URL getRodaServicesURL() throws MalformedURLException {
-		return new URL(getParameterValues().get(
-				PARAMETER_RODA_CORE_URL().getName()));
+		return new URL(getParameterValues().get(PARAMETER_RODA_CORE_URL().getName()));
 	}
 
 	private String getUsername() {
-		return getParameterValues().get(
-				PARAMETER_RODA_CORE_USERNAME().getName());
+		return getParameterValues().get(PARAMETER_RODA_CORE_USERNAME().getName());
 	}
 
 	private String getPassword() {
-		return getParameterValues().get(
-				PARAMETER_RODA_CORE_PASSWORD().getName());
+		return getParameterValues().get(PARAMETER_RODA_CORE_PASSWORD().getName());
 	}
 
 	private URL getCasURL() throws MalformedURLException {
-		return new URL(getParameterValues().get(
-				PARAMETER_RODA_CAS_URL().getName()));
-	}
-	private URL getCoreURL() throws MalformedURLException {
-		return new URL(getParameterValues().get(
-				PARAMETER_RODA_CORE_URL().getName()));
+		return new URL(getParameterValues().get(PARAMETER_RODA_CAS_URL().getName()));
 	}
 
-	public void processRepresentationsWithFITS(String outputDirectory,
-			String fitsSh, String rodaCoreURL, Report report) {
+	private URL getCoreURL() throws MalformedURLException {
+		return new URL(getParameterValues().get(PARAMETER_RODA_CORE_URL().getName()));
+	}
+
+	public void processRepresentationsWithFITS(String outputDirectory, String fitsSh, String rodaCoreURL,
+			Report report) {
 		try {
 			LOGGER.info("Getting simple representations...");
 			// SimpleRepresentationObject[] rObjects = browserService
@@ -309,16 +275,13 @@ public class FITSPlugin extends AbstractPlugin {
 			// representations that weren't already analyzed with FITS
 			ContentAdapter adapter = new ContentAdapter();
 			adapter.setFilter(new Filter(
-					new FilterParameter[] { new RangeFilterParameter(
-							"createdDate", lastPluginExecDate, null) }));
-			SimpleRepresentationObject[] sros = browserService
-					.getSimpleRepresentationObjects(adapter);
+					new FilterParameter[] { new DateRangeFilterParameter("createdDate", lastPluginExecDate, null) }));
+			SimpleRepresentationObject[] sros = browserService.getSimpleRepresentationObjects(adapter);
 			dateAfterRetrievingRepresentationsList = new Date();
 
 			// process each representation
 			for (SimpleRepresentationObject sro : sros) {
-				processSimpleRepresentationObjectWithFITS(sro, outputDirectory,
-						fitsSh, rodaCoreURL, report);
+				processSimpleRepresentationObjectWithFITS(sro, outputDirectory, fitsSh, rodaCoreURL, report);
 			}
 
 		} catch (BrowserException e) {
@@ -328,26 +291,21 @@ public class FITSPlugin extends AbstractPlugin {
 		}
 	}
 
-	private void processSimpleRepresentationObjectWithFITS(
-			SimpleRepresentationObject sro, String outputDirectory,
+	private void processSimpleRepresentationObjectWithFITS(SimpleRepresentationObject sro, String outputDirectory,
 			String fitsSh, String rodaCoreURL, Report report) {
 		try {
-			LOGGER.info("	Getting representation object (repPID="
-					+ sro.getPid() + ") to execute FITS...");
+			LOGGER.info("	Getting representation object (repPID=" + sro.getPid() + ") to execute FITS...");
 			// create report item
-			ReportItem reportItem = new ReportItem("Representation \""
-					+ sro.getPid() + "\"");
+			ReportItem reportItem = new ReportItem("Representation \"" + sro.getPid() + "\"");
 
 			// grab representation object
-			RepresentationObject representationObject = browserService
-					.getRepresentationObject(sro.getPid());
+			RepresentationObject representationObject = browserService.getRepresentationObject(sro.getPid());
 			String roPID = representationObject.getPid();
 			String newDirectory = outputDirectory + roPID;
 
 			// determine if representation is original or not
 			List<String> sroStatuses = Arrays.asList(sro.getStatuses());
-			boolean isSroOriginal = sroStatuses
-					.contains(SimpleRepresentationObject.STATUS_ORIGINAL);
+			boolean isSroOriginal = sroStatuses.contains(SimpleRepresentationObject.STATUS_ORIGINAL);
 
 			// create a new directory to contain fits output for this
 			// representation
@@ -355,38 +313,30 @@ public class FITSPlugin extends AbstractPlugin {
 			if (newDirectoryFile.exists() || newDirectoryFile.mkdir()) {
 				// get root file
 				LOGGER.debug("	Getting root file...");
-				RepresentationFile rootFile = representationObject
-						.getRootFile();
+				RepresentationFile rootFile = representationObject.getRootFile();
 
 				// process the root file and store the result in the report
-				String outcome = processRepresentationFileWithFITS(rootFile,
-						roPID, outputDirectory, newDirectory, fitsSh,
-						rodaCoreURL, isSroOriginal);
+				String outcome = processRepresentationFileWithFITS(rootFile, roPID, outputDirectory, newDirectory,
+						fitsSh, rodaCoreURL, isSroOriginal);
 				if (outcome != null) {
-					reportItem.addAttribute(new Attribute(rootFile.getId(),
-							outcome));
+					reportItem.addAttribute(new Attribute(rootFile.getId(), outcome));
 				} else {
-					reportItem.addAttribute(new Attribute(rootFile.getId(),
-							"success"));
+					reportItem.addAttribute(new Attribute(rootFile.getId(), "success"));
 				}
 
 				// get all the other files
 				LOGGER.debug("	Getting part files...");
-				RepresentationFile[] partFiles = representationObject
-						.getPartFiles();
+				RepresentationFile[] partFiles = representationObject.getPartFiles();
 
 				// process all the other files and store the result in the
 				// report
 				for (RepresentationFile partFile : partFiles) {
-					outcome = processRepresentationFileWithFITS(partFile,
-							roPID, outputDirectory, newDirectory, fitsSh,
+					outcome = processRepresentationFileWithFITS(partFile, roPID, outputDirectory, newDirectory, fitsSh,
 							rodaCoreURL, isSroOriginal);
 					if (outcome != null) {
-						reportItem.addAttribute(new Attribute(partFile.getId(),
-								outcome));
+						reportItem.addAttribute(new Attribute(partFile.getId(), outcome));
 					} else {
-						reportItem.addAttribute(new Attribute(partFile.getId(),
-								"success"));
+						reportItem.addAttribute(new Attribute(partFile.getId(), "success"));
 					}
 				}
 
@@ -399,11 +349,9 @@ public class FITSPlugin extends AbstractPlugin {
 				LOGGER.info("	Done!");
 			} else {
 				reportItem.addAttribute(new Attribute("Outcome", "error"));
-				reportItem.addAttribute(new Attribute("Error",
-						"Error creating directory \"" + newDirectory + "\""));
+				reportItem.addAttribute(new Attribute("Error", "Error creating directory \"" + newDirectory + "\""));
 
-				LOGGER.error("	Error creating directory \"" + newDirectory
-						+ "\"");
+				LOGGER.error("	Error creating directory \"" + newDirectory + "\"");
 			}
 			report.addItem(reportItem);
 		} catch (BrowserException e) {
@@ -415,10 +363,8 @@ public class FITSPlugin extends AbstractPlugin {
 		}
 	}
 
-	private String processRepresentationFileWithFITS(
-			RepresentationFile repFile, String pid, String outputDirectory,
-			String newDirectory, String fitsSh, String rodaCoreURL,
-			boolean isSroOriginal) {
+	private String processRepresentationFileWithFITS(RepresentationFile repFile, String pid, String outputDirectory,
+			String newDirectory, String fitsSh, String rodaCoreURL, boolean isSroOriginal) {
 		String executionResult = null;
 		File tempFile = null;
 		try {
@@ -431,18 +377,14 @@ public class FITSPlugin extends AbstractPlugin {
 			}
 
 			// download file to a temporary location in order to execute FITS
-			LOGGER.debug("		Downloading \"" + originalName + "\" (s=" + size
-					+ ",pid=" + pid + ")...");
+			LOGGER.debug("		Downloading \"" + originalName + "\" (s=" + size + ",pid=" + pid + ")...");
 			InputStream inputStream = rodaDownloader.get(accessURL);
 			tempFile = File.createTempFile(originalName, null);
 			IOUtils.copyLarge(inputStream, new FileOutputStream(tempFile));
-			String fitsIntermediateFile = outputDirectory + pid + "/"
-					+ repFile.getId() + ".fits";
+			String fitsIntermediateFile = outputDirectory + pid + "/" + repFile.getId() + ".fits";
 
 			// execute FITS
-			String command = "bash " + fitsSh + " -i "
-					+ tempFile.getAbsolutePath() + " -o "
-					+ fitsIntermediateFile;
+			String command = "bash " + fitsSh + " -i " + tempFile.getAbsolutePath() + " -o " + fitsIntermediateFile;
 			LOGGER.debug("		Executing \"" + command + "\"");
 			Process exec = Runtime.getRuntime().exec(command);
 			exec.waitFor();
@@ -451,42 +393,33 @@ public class FITSPlugin extends AbstractPlugin {
 				// if FITS was successfully executed, change FITS information to
 				// comply with SCAPE needs
 				executionResult = changeInfoInFITSOutput(fitsIntermediateFile,
-						fitsIntermediateFile.replaceFirst("fits$", "xml"),
-						rodaCoreURL + accessURL, isSroOriginal);
+						fitsIntermediateFile.replaceFirst("fits$", "xml"), rodaCoreURL + accessURL, isSroOriginal);
 			} else {
-				executionResult = "Error executing FITS script on file with ID \""
-						+ repFile.getId() + "\"";
+				executionResult = "Error executing FITS script on file with ID \"" + repFile.getId() + "\"";
 			}
 			LOGGER.debug("		Done! (exitValue=" + exitValue + ")\n");
 		} catch (RemoteException e) {
 			LOGGER.error(e);
-			executionResult = "Error processing representation file with PID \""
-					+ pid + "\"";
+			executionResult = "Error processing representation file with PID \"" + pid + "\"";
 		} catch (IOException e) {
 			LOGGER.error(e);
-			executionResult = "Error processing representation file with PID \""
-					+ pid + "\"";
+			executionResult = "Error processing representation file with PID \"" + pid + "\"";
 		} catch (DownloaderException e) {
 			LOGGER.error(e);
-			executionResult = "Error processing representation file with PID \""
-					+ pid + "\"";
+			executionResult = "Error processing representation file with PID \"" + pid + "\"";
 		} catch (InterruptedException e) {
 			LOGGER.error(e);
-			executionResult = "Error processing representation file with PID \""
-					+ pid + "\"";
+			executionResult = "Error processing representation file with PID \"" + pid + "\"";
 		} finally {
-			if (tempFile != null && !tempFile.delete()
-					&& executionResult == null) {
+			if (tempFile != null && !tempFile.delete() && executionResult == null) {
 				executionResult = "Error deleting file \"" + tempFile + "\"";
 			}
 		}
 		return executionResult;
 	}
 
-	private String changeInfoInFITSOutput(String inFile, String outFile,
-			String accessURL, boolean isSroOriginal) {
-		LOGGER.debug("		Processing file \"" + inFile
-				+ "\" to substitute the filepath element content with \""
+	private String changeInfoInFITSOutput(String inFile, String outFile, String accessURL, boolean isSroOriginal) {
+		LOGGER.debug("		Processing file \"" + inFile + "\" to substitute the filepath element content with \""
 				+ accessURL + "\" and storing it in file \"" + outFile
 				+ "\" (also adding element //representationinfo/original)");
 		String executionResult = null;
@@ -494,27 +427,21 @@ public class FITSPlugin extends AbstractPlugin {
 		File fitsOutFile = new File(outFile);
 		boolean insideFileInfo = false;
 		try {
-			BufferedOutputStream bos = new BufferedOutputStream(
-					new FileOutputStream(fitsOutFile));
+			BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(fitsOutFile));
 
-			LineIterator lineIterator = IOUtils.lineIterator(
-					new FileInputStream(fitsInFile), null);
+			LineIterator lineIterator = IOUtils.lineIterator(new FileInputStream(fitsInFile), null);
 			while (lineIterator.hasNext()) {
 				String nextLine = lineIterator.nextLine();
 				if (nextLine.matches("^.*<fileinfo>.*$")) {
 					insideFileInfo = true;
 					bos.write((nextLine + "\n").getBytes());
-				} else if (nextLine.matches("^.*<filepath [^>]+>.*$")
-						&& insideFileInfo) {
-					nextLine = nextLine.replaceFirst(
-							"^(.*<filepath [^>]+>)[^<]+", "$1" + accessURL);
+				} else if (nextLine.matches("^.*<filepath [^>]+>.*$") && insideFileInfo) {
+					nextLine = nextLine.replaceFirst("^(.*<filepath [^>]+>)[^<]+", "$1" + accessURL);
 					bos.write((nextLine + "\n").getBytes());
 					insideFileInfo = false;
 				} else if (nextLine.matches("^.*</fileinfo>.*$")) {
-					bos.write((nextLine
-							+ "\n<representationinfo>\n<original toolname=\"RODA\" toolversion=\"1.0.0\">"
-							+ isSroOriginal + "</original>\n</representationinfo>\n")
-							.getBytes());
+					bos.write((nextLine + "\n<representationinfo>\n<original toolname=\"RODA\" toolversion=\"1.0.0\">"
+							+ isSroOriginal + "</original>\n</representationinfo>\n").getBytes());
 				} else {
 					bos.write((nextLine + "\n").getBytes());
 				}
@@ -531,8 +458,7 @@ public class FITSPlugin extends AbstractPlugin {
 		return executionResult;
 	}
 
-	public static void main(String[] args) throws ParseException,
-			InvalidDateException {
+	public static void main(String[] args) throws ParseException, InvalidDateException {
 		String date = "2012-08-14T15:27:39.20Z";
 		// Date parse = DateFormat.getInstance().parse(date);
 		Date parse = DateParser.parse(date);

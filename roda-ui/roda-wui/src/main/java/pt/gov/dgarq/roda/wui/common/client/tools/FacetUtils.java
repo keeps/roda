@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.ui.CheckBox;
@@ -45,13 +44,19 @@ public class FacetUtils {
 				for (FacetValue facetValue : facetResult.getValues()) {
 					final String value = facetValue.getValue();
 					long count = facetValue.getCount();
+					boolean selected = facetResult.getSelectedValues().contains(value);
+					StringBuilder checkboxLabel = new StringBuilder();
+					checkboxLabel.append(value);
+					if (count > 0 || facetResult.getSelectedValues().size() == 0 || selected) {
+						checkboxLabel.append(" (").append(count).append(")");
+					}
 
-					CheckBox facetValuePanel = new CheckBox(value + " (" + count + ")");
-					facetValuePanel.setEnabled(count > 0);
+					CheckBox facetValuePanel = new CheckBox(checkboxLabel.toString());
 					facetValuePanel.addStyleName("sidebar-facet-label");
+					facetValuePanel.setEnabled(count > 0 || facetResult.getSelectedValues().size() > 0);
 					facetPanel.add(facetValuePanel);
 
-					facetValuePanel.setValue(facetResult.getSelectedValues().contains(value));
+					facetValuePanel.setValue(selected);
 
 					facetValuePanel.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
 

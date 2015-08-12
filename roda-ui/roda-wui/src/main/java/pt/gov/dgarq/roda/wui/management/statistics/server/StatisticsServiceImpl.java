@@ -12,11 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.RangeFilterParameter;
-import pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter;
-import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
-import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
 import org.w3c.util.DateParser;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -25,6 +20,11 @@ import config.i18n.server.StatisticsListReportMessages;
 import pt.gov.dgarq.roda.common.RodaClientFactory;
 import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.data.StatisticData;
+import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.DateRangeFilterParameter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
+import pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter;
+import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.stubs.StatisticsMonitor;
 import pt.gov.dgarq.roda.wui.common.client.PrintReportException;
 import pt.gov.dgarq.roda.wui.common.server.ServerTools;
@@ -90,8 +90,7 @@ public class StatisticsServiceImpl extends RemoteServiceServlet implements Stati
 		// Put final date time at the last millisecond of the day
 		finalDate = new Date(finalDate.getTime() + 86399999);
 
-		adapter.getFilter().add(new RangeFilterParameter("timestamp", DateParser.getIsoDate(initialDate),
-				DateParser.getIsoDate(finalDate)));
+		adapter.getFilter().add(new DateRangeFilterParameter("timestamp", initialDate, finalDate));
 
 		adapter.setSorter(new Sorter(new SortParameter[] { new SortParameter("timestamp", false) }));
 	}

@@ -13,7 +13,6 @@
 	<!-- Inherit required libraries -->
 	<inherits name="com.bytebybyte.gwt.fontawesome.FontAwesomeLib" />
 	<!-- Libraries to remove -->
-	<inherits name='org.adamtacy.GWTEffects' />
 	<inherits name='com.netthreads.gwt.simile.timeline.Timeline' />
 
 	<!-- Inherit sub-projects -->

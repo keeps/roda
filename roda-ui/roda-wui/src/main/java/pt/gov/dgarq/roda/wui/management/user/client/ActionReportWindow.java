@@ -23,8 +23,7 @@ public class ActionReportWindow extends WUIWindow {
 	private static UserManagementConstants constants = (UserManagementConstants) GWT
 			.create(UserManagementConstants.class);
 
-	private static UserManagementMessages messages = (UserManagementMessages) GWT
-			.create(UserManagementMessages.class);
+	private static UserManagementMessages messages = (UserManagementMessages) GWT.create(UserManagementMessages.class);
 
 	private final WUIButton close;
 
@@ -38,13 +37,13 @@ public class ActionReportWindow extends WUIWindow {
 	public ActionReportWindow(User user) {
 		super(messages.actionResportTitle(user.getName()), 850, 500);
 
-		actionReportPanel = new UserLog(user);
+		// FIXME set user
+		actionReportPanel = new UserLog();
 
 		this.addTab(actionReportPanel, constants.actionReportLogTabTitle());
 		this.selectTab(0);
 
-		close = new WUIButton(constants.actionReportClose(),
-				WUIButton.Left.ROUND, WUIButton.Right.CROSS);
+		close = new WUIButton(constants.actionReportClose(), WUIButton.Left.ROUND, WUIButton.Right.CROSS);
 
 		close.addClickListener(new ClickListener() {
 

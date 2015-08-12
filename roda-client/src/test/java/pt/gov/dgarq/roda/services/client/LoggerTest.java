@@ -7,12 +7,11 @@ import java.util.Calendar;
 import java.util.Iterator;
 import java.util.List;
 
-import org.w3c.util.DateParser;
-
 import pt.gov.dgarq.roda.core.RODAClient;
 import pt.gov.dgarq.roda.core.data.LogEntry;
 import pt.gov.dgarq.roda.core.data.LogEntryParameter;
 import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.DateRangeFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.OneOfManyFilterParameter;
@@ -46,7 +45,7 @@ public class LoggerTest {
 				String coreURL = args[2];
 				String serviceURL = args[3];
 				CASUtility casUtility = new CASUtility(new URL(casURL), new URL(coreURL), new URL(serviceURL));
-				rodaClient = new RODAClient(new URL(hostUrl),casUtility);
+				rodaClient = new RODAClient(new URL(hostUrl), casUtility);
 
 			} else if (args.length == 6) {
 
@@ -58,8 +57,7 @@ public class LoggerTest {
 				String coreURL = args[4];
 				String serviceURL = args[5];
 				CASUtility casUtility = new CASUtility(new URL(casURL), new URL(coreURL), new URL(serviceURL));
-				rodaClient = new RODAClient(new URL(hostUrl), username,
-						password,casUtility);
+				rodaClient = new RODAClient(new URL(hostUrl), username, password, casUtility);
 			} else {
 				System.err.println(LoggerTest.class.getSimpleName()
 						+ " protocol://hostname:port/ [username password] casURL coreURL serviceURL");
@@ -79,9 +77,7 @@ public class LoggerTest {
 			logEntry.setAddress(address);
 			logEntry.setUsername(rodaClient.getUsername());
 			logEntry.setAction("LoggerTest.main");
-			logEntry
-					.setParameters(new LogEntryParameter[] { new LogEntryParameter(
-							"argName", "argValue") });
+			logEntry.setParameters(new LogEntryParameter[] { new LogEntryParameter("argName", "argValue") });
 			logEntry.setDescription("Test message");
 
 			loggerService.addLogEntry(logEntry);
@@ -91,23 +87,19 @@ public class LoggerTest {
 			System.out.println("Get test log entries");
 			System.out.println("********************************");
 
-			FilterParameter mainActionfilterParameter = new SimpleFilterParameter(
-					"action", "LoggerTest.main");
+			FilterParameter mainActionfilterParameter = new SimpleFilterParameter("action", "LoggerTest.main");
 
 			Calendar cal = Calendar.getInstance();
 			cal.add(Calendar.MONDAY, -1);
-			RangeFilterParameter lastMonthFilterParameter = new RangeFilterParameter(
-					"datetime", DateParser.getIsoDate(cal.getTime()), null);
+			RangeFilterParameter lastMonthFilterParameter = new DateRangeFilterParameter("datetime", cal.getTime(),
+					null);
 
-			Filter filterMainActionLastMonth = new Filter(
-					new FilterParameter[] { mainActionfilterParameter, null });
+			Filter filterMainActionLastMonth = new Filter(new FilterParameter[] { mainActionfilterParameter, null });
 
 			LogEntry[] logEntries2 = logMonitorService
-					.getLogEntries(new ContentAdapter(
-							filterMainActionLastMonth, null, null));
+					.getLogEntries(new ContentAdapter(filterMainActionLastMonth, null, null));
 
-			System.out.println("LogEntry for Filter "
-					+ filterMainActionLastMonth + ":");
+			System.out.println("LogEntry for Filter " + filterMainActionLastMonth + ":");
 			if (logEntries2 != null) {
 				for (LogEntry entry : logEntries2) {
 					System.out.println(entry);
@@ -121,24 +113,19 @@ public class LoggerTest {
 			int logEntriesCount = logMonitorService.getLogEntriesCount(null);
 			System.out.println("ALL Log Entries Count: " + logEntriesCount);
 
-			Filter filter = new Filter(
-					new FilterParameter[] { new SimpleFilterParameter(
-							"username", "guest") });
+			Filter filter = new Filter(new FilterParameter[] { new SimpleFilterParameter("username", "guest") });
 
 			logEntriesCount = logMonitorService.getLogEntriesCount(filter);
 			System.out.println("GUEST Log Entries Count: " + logEntriesCount);
 
-			filter
-					.setParameters(new FilterParameter[] { new OneOfManyFilterParameter(
-							"username", new String[] { "guest", "demo-admin" }) });
+			filter.setParameters(new FilterParameter[] {
+					new OneOfManyFilterParameter("username", new String[] { "guest", "demo-admin" }) });
 
 			logEntriesCount = logMonitorService.getLogEntriesCount(filter);
-			System.out.println("GUEST or demo-admin Log Entries Count: "
-					+ logEntriesCount);
+			System.out.println("GUEST or demo-admin Log Entries Count: " + logEntriesCount);
 
 			System.out.println("\n******************************************");
-			System.out
-					.println("* Maximum of 10 Log Entries for guest or demo-admin");
+			System.out.println("* Maximum of 10 Log Entries for guest or demo-admin");
 			System.out.println("******************************************");
 
 			ContentAdapter cAdapter = new ContentAdapter(filter, null, null);
@@ -148,28 +135,22 @@ public class LoggerTest {
 
 			LogEntry[] logEntries = logMonitorService.getLogEntries(cAdapter);
 			List<LogEntry> asList = Arrays.asList(logEntries);
-			for (Iterator<LogEntry> iterator = asList.iterator(); iterator
-					.hasNext();) {
+			for (Iterator<LogEntry> iterator = asList.iterator(); iterator.hasNext();) {
 				logEntry = iterator.next();
 				System.out.println(logEntry);
 			}
 
-			System.out
-					.println("\n****************************************************************");
-			System.out
-					.println("* Maximum of 10 Log Entries for guest or demo-admin ordered by ascending datetime");
-			System.out
-					.println("****************************************************************");
+			System.out.println("\n****************************************************************");
+			System.out.println("* Maximum of 10 Log Entries for guest or demo-admin ordered by ascending datetime");
+			System.out.println("****************************************************************");
 
-			Sorter sorter = new Sorter(new SortParameter[] { new SortParameter(
-					"datetime", false) });
+			Sorter sorter = new Sorter(new SortParameter[] { new SortParameter("datetime", false) });
 			cAdapter.setSorter(sorter);
 
 			logEntries = logMonitorService.getLogEntries(cAdapter);
 
 			asList = Arrays.asList(logEntries);
-			for (Iterator<LogEntry> iterator = asList.iterator(); iterator
-					.hasNext();) {
+			for (Iterator<LogEntry> iterator = asList.iterator(); iterator.hasNext();) {
 				logEntry = (LogEntry) iterator.next();
 				System.out.println(logEntry);
 			}

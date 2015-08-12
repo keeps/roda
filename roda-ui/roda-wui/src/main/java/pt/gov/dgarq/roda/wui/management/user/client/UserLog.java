@@ -3,31 +3,31 @@
  */
 package pt.gov.dgarq.roda.wui.management.user.client;
 
+import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.datepicker.client.DateBox;
+import com.google.gwt.user.datepicker.client.DateBox.DefaultFormat;
 
 import config.i18n.client.UserManagementConstants;
 import config.i18n.client.UserManagementMessages;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
-import pt.gov.dgarq.roda.core.data.User;
 import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
 import pt.gov.dgarq.roda.core.data.adapter.facet.SimpleFacetParameter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.DateRangeFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
@@ -71,7 +71,7 @@ public class UserLog extends Composite {
 	 */
 	public static UserLog getInstance() {
 		if (instance == null) {
-			instance = new UserLog(null);
+			instance = new UserLog();
 		}
 		return instance;
 	}
@@ -87,14 +87,6 @@ public class UserLog extends Composite {
 	private static UserManagementMessages messages = (UserManagementMessages) GWT.create(UserManagementMessages.class);
 
 	private ClientLogger logger = new ClientLogger(getClass().getName());
-
-	private final User user;
-
-	@UiField
-	FlowPanel inputUserFilterPanel;
-
-	@UiField
-	TextBox inputUserName;
 
 	@UiField
 	DateBox inputDateInitial;
@@ -119,9 +111,7 @@ public class UserLog extends Composite {
 	 * 
 	 * @param user
 	 */
-	public UserLog(User user) {
-		this.user = user;
-
+	public UserLog() {
 		Filter filter = null;
 		Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.LOG_ACTION_COMPONENT),
 				new SimpleFacetParameter(RodaConstants.LOG_ACTION_METHOD),
@@ -138,26 +128,39 @@ public class UserLog extends Composite {
 		FacetUtils.bindFacets(logList, facetPanels);
 
 		initWidget(uiBinder.createAndBindUi(this));
-		
-		inputUserFilterPanel.setVisible(user == null);
+
+		DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
+		inputDateInitial.setFormat(dateFormat);
+		inputDateFinal.setFormat(dateFormat);
+
+		inputDateInitial.addValueChangeHandler(new ValueChangeHandler<Date>() {
+
+			@Override
+			public void onValueChange(ValueChangeEvent<Date> event) {
+				updateDateFilter();
+			}
+
+		});
+
+		inputDateFinal.addValueChangeHandler(new ValueChangeHandler<Date>() {
+
+			@Override
+			public void onValueChange(ValueChangeEvent<Date> event) {
+				updateDateFilter();
+			}
+
+		});
+
 	}
 
-	protected Filter getFilter() {
-		List<FilterParameter> parameters = new Vector<FilterParameter>();
-		if (user != null) {
-			parameters.add(new SimpleFilterParameter("username", user.getName()));
-		} else if (!inputUserName.getText().equals("")) {
-			parameters.add(new SimpleFilterParameter("username", inputUserName.getText()));
-		}
-		// if (action != null) {
-		// parameters.add(new SimpleFilterParameter("action", action));
-		// }
-		// if (dateInitial != null || dateFinal != null) {
-		// parameters.add(new RangeFilterParameter("datetime", dateInitial,
-		// dateFinal));
-		// }
+	private void updateDateFilter() {
+		Date dateInitial = inputDateInitial.getDatePicker().getValue();
+		Date dateFinal = inputDateFinal.getDatePicker().getValue();
 
-		return new Filter(parameters.toArray(new FilterParameter[parameters.size()]));
+		DateRangeFilterParameter filterParameter = new DateRangeFilterParameter(RodaConstants.LOG_DATETIME, dateInitial,
+				dateFinal);
+
+		logList.setFilter(new Filter(filterParameter));
 	}
 
 	public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {

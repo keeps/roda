@@ -124,16 +124,10 @@ public class IngestList extends Composite {
 	@UiField(provided = true)
 	SIPReportList sipList;
 
-	@UiField
-	CheckBox checkProcessed;
-	@UiField
-	CheckBox checkProcessing;
-	@UiField
-	CheckBox checkAccepted;
-	@UiField
-	CheckBox checkRejected;
+	@UiField(provided = true)
+	FlowPanel stateFacets;
 
-	@UiField(provided=true)
+	@UiField(provided = true)
 	FlowPanel producerFacets;
 
 	@UiField
@@ -158,11 +152,14 @@ public class IngestList extends Composite {
 
 		Filter filter = null;
 
-		Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.SIP_REPORT_USERNAME));
+		Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.SIP_REPORT_STATE),
+				new SimpleFacetParameter(RodaConstants.SIP_REPORT_USERNAME));
 
 		sipList = new SIPReportList(filter, facets);
 		producerFacets = new FlowPanel();
+		stateFacets = new FlowPanel();
 		Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
+		facetPanels.put(RodaConstants.SIP_REPORT_STATE, stateFacets);
 		facetPanels.put(RodaConstants.SIP_REPORT_USERNAME, producerFacets);
 		FacetUtils.bindFacets(sipList, facetPanels);
 

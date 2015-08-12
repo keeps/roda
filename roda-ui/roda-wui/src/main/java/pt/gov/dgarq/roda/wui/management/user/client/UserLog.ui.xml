@@ -46,40 +46,23 @@
 		<g:FlowPanel styleName="layout" addStyleNames="{style.content}">
 			<g:Label styleName="h1">Log</g:Label>
 			<g:FlowPanel addStyleNames="searchInput">
-				<g:FlowPanel addStyleNames="searchInputBoxWrapper">
-					<g:FlowPanel addStyleNames="searchAdvancedField"
-						ui:field="inputUserFilterPanel" visible="false">
-						<g:Label addStyleNames="searchAdvancedFieldLabel">User</g:Label>
-						<g:TextBox addStyleNames="searchAdvancedFieldInput fieldTextBox"
-							ui:field="inputUserName" />
-					</g:FlowPanel>
-					<g:FlowPanel addStyleNames="searchAdvancedField">
-						<g:Label addStyleNames="searchAdvancedFieldLabel">Action component</g:Label>
-						<g:FlowPanel addStyleNames="searchAdvancedFieldInput">
-							<g:CheckBox>Login</g:CheckBox>
-							<g:CheckBox>Browse</g:CheckBox>
-							<g:CheckBox>Edit</g:CheckBox>
-							<g:CheckBox>Manage</g:CheckBox>
-							<g:CheckBox>Ingest</g:CheckBox>
-						</g:FlowPanel>
-					</g:FlowPanel>
-					<g:FlowPanel addStyleNames="searchAdvancedField">
-						<g:Label addStyleNames="searchAdvancedFieldLabel">Between the dates</g:Label>
-						<g:FlowPanel addStyleNames="searchAdvancedFieldInput">
-							<g:Label addStyleNames="searchAdvancedFieldInputDateLabel">From </g:Label>
-							<d:DateBox addStyleNames="searchAdvancedFieldInputDateInput"
-								ui:field="inputDateInitial" />
-							<g:Label addStyleNames="searchAdvancedFieldInputDateLabel"> to </g:Label>
-							<d:DateBox addStyleNames="searchAdvancedFieldInputDateInput"
-								ui:field="inputDateFinal" />
-						</g:FlowPanel>
+				<g:FlowPanel addStyleNames="searchAdvancedField">
+					<g:Label addStyleNames="searchAdvancedFieldLabel">Between the dates</g:Label>
+					<g:FlowPanel addStyleNames="searchAdvancedFieldInput">
+						<g:Label addStyleNames="searchAdvancedFieldInputDateLabel">From </g:Label>
+						<d:DateBox addStyleNames="searchAdvancedFieldInputDateInput"
+							ui:field="inputDateInitial" />
+						<g:Label addStyleNames="searchAdvancedFieldInputDateLabel"> to </g:Label>
+						<d:DateBox addStyleNames="searchAdvancedFieldInputDateInput"
+							ui:field="inputDateFinal" />
 					</g:FlowPanel>
 				</g:FlowPanel>
-				<g:Button addStyleNames="btn btn-play searchApplyFilters">Apply filters</g:Button>
 			</g:FlowPanel>
+			<g:Button addStyleNames="btn btn-play searchApplyFilters">Apply filters</g:Button>
 			<common:LogEntryList addStyleNames="searchResults"
 				ui:field="logList" />
 		</g:FlowPanel>
+
 		<g:FlowPanel styleName="{style.sidebar}">
 			<g:Label addStyleNames="h2 {style.sidebar-title} searchFacetsTitle">
 				<ui:msg>Filters</ui:msg>
