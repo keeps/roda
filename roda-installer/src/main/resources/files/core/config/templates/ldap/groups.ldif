@@ -1,0 +1,60 @@
+version: 1
+
+dn: ou=groups,dc=keep,dc=pt
+objectClass: top
+objectClass: organizationalUnit
+ou: groups
+
+dn: cn=administrators,ou=groups,dc=keep,dc=pt
+objectClass: extensibleObject
+objectClass: top
+objectClass: groupOfUniqueNames
+cn: administrators
+uniqueMember: uid=admin,ou=users,dc=keep,dc=pt
+uniqueMember: uid=roda-ingest-task,ou=users,dc=keep,dc=pt
+uniqueMember: uid=roda-preservation-task,ou=users,dc=keep,dc=pt
+ou: Administrators
+shadowInactive: 0
+
+dn: cn=producers,ou=groups,dc=keep,dc=pt
+objectClass: extensibleObject
+objectClass: top
+objectClass: groupOfUniqueNames
+cn: producers
+uniqueMember: cn=administrators,ou=groups,dc=keep,dc=pt
+ou: Produtores
+shadowInactive: 0
+
+dn: cn=archivists,ou=groups,dc=keep,dc=pt
+objectClass: extensibleObject
+objectClass: top
+objectClass: groupOfUniqueNames
+cn: archivists
+uniqueMember: cn=administrators,ou=groups,dc=keep,dc=pt
+ou: Archivists
+shadowInactive: 0
+
+dn: cn=users,ou=groups,dc=keep,dc=pt
+objectClass: extensibleObject
+objectClass: top
+objectClass: groupOfUniqueNames
+cn: users
+uniqueMember: cn=administrators,ou=groups,dc=keep,dc=pt
+uniqueMember: cn=producers,ou=groups,dc=keep,dc=pt
+uniqueMember: cn=archivists,ou=groups,dc=keep,dc=pt
+ou: Users
+shadowInactive: 0
+
+dn: cn=guests,ou=groups,dc=keep,dc=pt
+objectClass: extensibleObject
+objectClass: top
+objectClass: groupOfUniqueNames
+cn: guests
+uniqueMember: cn=administrators,ou=groups,dc=keep,dc=pt
+uniqueMember: cn=producers,ou=groups,dc=keep,dc=pt
+uniqueMember: cn=archivists,ou=groups,dc=keep,dc=pt
+uniqueMember: cn=users,ou=groups,dc=keep,dc=pt
+uniqueMember: uid=guest,ou=users,dc=keep,dc=pt
+ou: Guests
+shadowInactive: 0
+

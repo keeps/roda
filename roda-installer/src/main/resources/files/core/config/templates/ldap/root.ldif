@@ -1,0 +1,9 @@
+version: 1
+
+dn: dc=keep,dc=pt
+objectClass: organization
+objectClass: dcObject
+objectClass: top
+dc: keep
+o: KEEPS
+
