@@ -10,9 +10,6 @@ import java.util.Map;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyDownEvent;
-import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
@@ -160,15 +157,6 @@ public class BasicSearch extends Composite {
 			}
 		});
 
-		// this.searchInputBox.addKeyDownHandler(new KeyDownHandler() {
-		//
-		// @Override
-		// public void onKeyDown(KeyDownEvent event) {
-		// if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-		// update();
-		// }
-		// }
-		// });
 
 		this.searchInputButton.addClickHandler(new ClickHandler() {
 
