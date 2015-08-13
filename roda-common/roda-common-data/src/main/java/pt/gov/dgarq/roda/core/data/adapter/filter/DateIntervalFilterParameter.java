@@ -8,7 +8,7 @@ import java.util.Date;
 public class DateIntervalFilterParameter extends RangeFilterParameter<Date> {
 
 	public enum DateGranularity {
-		YEAR, MONTH, DAY // , HOUR, MINUTE, SECOND, MILISECOND
+		YEAR, MONTH, DAY // , HOUR, MINUTE, SECOND, MILLISECOND
 	}
 
 	private static final long serialVersionUID = -8039972534809175118L;

@@ -37,7 +37,7 @@ import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
 import pt.gov.dgarq.roda.core.data.adapter.facet.SimpleFacetParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.BasicSearchFilterParameter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.DateRangeFilterParameter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.DateIntervalFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
@@ -74,8 +74,8 @@ public class BasicSearch extends Composite {
 			return "search";
 		}
 	};
-
-	private static SearchConstants constants = (SearchConstants) GWT.create(SearchConstants.class);
+	private static final Filter DEFAULT_FILTER = new Filter(
+			new BasicSearchFilterParameter(RodaConstants.SDO__ALL, "*"));
 
 	private static BasicSearch instance = null;
 
@@ -90,6 +90,8 @@ public class BasicSearch extends Composite {
 	}
 
 	private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+
+	private SearchConstants constants = (SearchConstants) GWT.create(SearchConstants.class);
 
 	@UiField
 	Label searchInputLabel;
@@ -122,7 +124,7 @@ public class BasicSearch extends Composite {
 	DateBox inputDateFinal;
 
 	private BasicSearch() {
-		Filter filter = null;
+		Filter filter = DEFAULT_FILTER;
 		Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.SDO_LEVEL),
 				new SimpleFacetParameter(RodaConstants.AIP_HAS_REPRESENTATIONS));
 		searchResultPanel = new AIPList(filter, facets);
@@ -150,15 +152,23 @@ public class BasicSearch extends Composite {
 			}
 		});
 
-		this.searchInputBox.addKeyDownHandler(new KeyDownHandler() {
+		this.searchInputBox.addValueChangeHandler(new ValueChangeHandler<String>() {
 
 			@Override
-			public void onKeyDown(KeyDownEvent event) {
-				if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-					update();
-				}
+			public void onValueChange(ValueChangeEvent<String> event) {
+				update();
 			}
 		});
+
+		// this.searchInputBox.addKeyDownHandler(new KeyDownHandler() {
+		//
+		// @Override
+		// public void onKeyDown(KeyDownEvent event) {
+		// if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+		// update();
+		// }
+		// }
+		// });
 
 		this.searchInputButton.addClickHandler(new ClickHandler() {
 
@@ -169,28 +179,24 @@ public class BasicSearch extends Composite {
 		});
 
 		DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
+		ValueChangeHandler<Date> valueChangeHandler = new ValueChangeHandler<Date>() {
+
+			@Override
+			public void onValueChange(ValueChangeEvent<Date> event) {
+				updateDateFilter();
+			}
+
+		};
+
 		inputDateInitial.setFormat(dateFormat);
-		inputDateFinal.setFormat(dateFormat);
 		inputDateInitial.getDatePicker().setYearArrowsVisible(true);
+		inputDateInitial.setFireNullValues(true);
+		inputDateInitial.addValueChangeHandler(valueChangeHandler);
+
+		inputDateFinal.setFormat(dateFormat);
 		inputDateFinal.getDatePicker().setYearArrowsVisible(true);
-
-		inputDateInitial.addValueChangeHandler(new ValueChangeHandler<Date>() {
-
-			@Override
-			public void onValueChange(ValueChangeEvent<Date> event) {
-				updateDateFilter();
-			}
-
-		});
-
-		inputDateFinal.addValueChangeHandler(new ValueChangeHandler<Date>() {
-
-			@Override
-			public void onValueChange(ValueChangeEvent<Date> event) {
-				updateDateFilter();
-			}
-
-		});
+		inputDateFinal.setFireNullValues(true);
+		inputDateFinal.addValueChangeHandler(valueChangeHandler);
 
 	}
 
@@ -198,14 +204,10 @@ public class BasicSearch extends Composite {
 		Date dateInitial = inputDateInitial.getDatePicker().getValue();
 		Date dateFinal = inputDateFinal.getDatePicker().getValue();
 
-		DateRangeFilterParameter initialFilterParameter = new DateRangeFilterParameter(RodaConstants.SDO_DATE_INITIAL,
-				dateInitial, dateFinal);
-		DateRangeFilterParameter finalFilterParameter = new DateRangeFilterParameter(RodaConstants.SDO_DATE_FINAL,
-				dateInitial, dateFinal);
-		// TODO make the date filter allow partial overlaps on the date
-		// intervals (needs OR in filter)
+		DateIntervalFilterParameter filterParameter = new DateIntervalFilterParameter(RodaConstants.SDO_DATE_INITIAL,
+				RodaConstants.SDO_DATE_FINAL, dateInitial, dateFinal);
 
-		searchResultPanel.setFilter(new Filter(initialFilterParameter, finalFilterParameter));
+		searchResultPanel.setFilter(new Filter(filterParameter));
 	}
 
 	protected void view(String id) {
@@ -217,10 +219,9 @@ public class BasicSearch extends Composite {
 		String query = searchInputBox.getText();
 
 		if ("".equals(query)) {
-			searchResultPanel.setVisible(false);
+			searchResultPanel.setFilter(DEFAULT_FILTER);
 		} else {
 			searchResultPanel.setFilter(new Filter(new BasicSearchFilterParameter(RodaConstants.SDO__ALL, query)));
-			searchResultPanel.setVisible(true);
 		}
 
 	}

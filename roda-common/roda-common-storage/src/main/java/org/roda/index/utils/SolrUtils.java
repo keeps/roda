@@ -279,7 +279,7 @@ public class SolrUtils {
 			ret = DateUtil.getThreadLocalDateFormat().format(toValue);
 			switch (granularity) {
 			case DAY:
-				ret += "+1DAY-1MILISECOND";
+				ret += "+1DAY-1MILLISECOND";
 				break;
 
 			default:

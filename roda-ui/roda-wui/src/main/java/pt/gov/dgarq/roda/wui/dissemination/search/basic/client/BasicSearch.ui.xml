@@ -84,7 +84,7 @@
 				</g:FocusPanel>
 			</g:FlowPanel>
 			<common:AIPList addStyleNames="searchResults"
-				ui:field="searchResultPanel" visible="false" />
+				ui:field="searchResultPanel" />
 		</g:FlowPanel>
 		<g:FlowPanel styleName="{style.sidebar}">
 			<g:FlowPanel styleName="{style.sidebar-group}" ui:field="sidebarGroupDownloads">

@@ -130,26 +130,24 @@ public class UserLog extends Composite {
 		initWidget(uiBinder.createAndBindUi(this));
 
 		DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
+		ValueChangeHandler<Date> valueChangeHandler = new ValueChangeHandler<Date>() {
+
+			@Override
+			public void onValueChange(ValueChangeEvent<Date> event) {
+				updateDateFilter();
+			}
+
+		};
+
 		inputDateInitial.setFormat(dateFormat);
+		inputDateInitial.getDatePicker().setYearArrowsVisible(true);
+		inputDateInitial.setFireNullValues(true);
+		inputDateInitial.addValueChangeHandler(valueChangeHandler);
+
 		inputDateFinal.setFormat(dateFormat);
-
-		inputDateInitial.addValueChangeHandler(new ValueChangeHandler<Date>() {
-
-			@Override
-			public void onValueChange(ValueChangeEvent<Date> event) {
-				updateDateFilter();
-			}
-
-		});
-
-		inputDateFinal.addValueChangeHandler(new ValueChangeHandler<Date>() {
-
-			@Override
-			public void onValueChange(ValueChangeEvent<Date> event) {
-				updateDateFilter();
-			}
-
-		});
+		inputDateFinal.getDatePicker().setYearArrowsVisible(true);
+		inputDateFinal.setFireNullValues(true);
+		inputDateFinal.addValueChangeHandler(valueChangeHandler);
 
 	}
 
@@ -158,7 +156,7 @@ public class UserLog extends Composite {
 		Date dateFinal = inputDateFinal.getDatePicker().getValue();
 
 		DateRangeFilterParameter filterParameter = new DateRangeFilterParameter(RodaConstants.LOG_DATETIME, dateInitial,
-				dateFinal);
+				dateFinal, DateRangeFilterParameter.DateGranularity.DAY);
 
 		logList.setFilter(new Filter(filterParameter));
 	}

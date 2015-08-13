@@ -60,7 +60,7 @@
 				ui:field="sipList" />
 		</g:FlowPanel>
 		<g:FlowPanel styleName="{style.sidebar}">
-			<g:FlowPanel styleName="{style.sidebar-group}" ui:field="sidebarGroupDownloads">
+			<g:FlowPanel styleName="{style.sidebar-group}">
 				<g:Label addStyleNames="h2 {style.sidebar-title} searchFacetsTitle">
 					<ui:msg>Filters</ui:msg>
 				</g:Label>
@@ -76,18 +76,32 @@
 					</g:Label>
 					<g:FlowPanel ui:field="producerFacets" />
 				</g:FlowPanel>
-				<g:Label addStyleNames="{style.other-producer-label}">Other producer:</g:Label>
-				<g:TextBox addStyleNames="fieldTextBox {style.other-producer-input}" />
+				<!-- <g:Label addStyleNames="{style.other-producer-label}">Other producer:</g:Label> 
+					<g:TextBox addStyleNames="fieldTextBox {style.other-producer-input}" /> -->
+				<g:Label addStyleNames="h3 sidebar-facet-title">
+					<ui:msg>From date</ui:msg>
+				</g:Label>
+				<d:DateBox addStyleNames="sidebar-facet-input fieldTextBox"
+					ui:field="inputDateInitial" />
+				<g:Label addStyleNames="h3 sidebar-facet-title">
+					<ui:msg>To date</ui:msg>
+				</g:Label>
+				<d:DateBox addStyleNames="sidebar-facet-input fieldTextBox"
+					ui:field="inputDateFinal" />
 			</g:FlowPanel>
-
-			<g:Button addStyleNames="btn btn-th-list {style.action}"
-				ui:field="report">Report</g:Button>
-			<g:Button addStyleNames="btn btn-play {style.action}"
-				ui:field="view">View</g:Button>
-			<g:Button addStyleNames="btn btn-check {style.action}"
-				ui:field="accept">Accept</g:Button>
-			<g:Button addStyleNames="btn btn-ban {style.action}"
-				ui:field="reject">Reject</g:Button>
+			<g:FlowPanel styleName="{style.sidebar-group}">
+				<g:Label addStyleNames="h2 {style.sidebar-title}">
+					<ui:msg>Actions</ui:msg>
+				</g:Label>
+				<g:Button addStyleNames="btn btn-th-list {style.action}"
+					ui:field="report">Report</g:Button>
+				<g:Button addStyleNames="btn btn-play {style.action}"
+					ui:field="view">View</g:Button>
+				<g:Button addStyleNames="btn btn-check {style.action}"
+					ui:field="accept">Accept</g:Button>
+				<g:Button addStyleNames="btn btn-ban {style.action}"
+					ui:field="reject">Reject</g:Button>
+			</g:FlowPanel>
 		</g:FlowPanel>
 		<g:FlowPanel styleName="{style.footer}" />
 	</g:FlowPanel>

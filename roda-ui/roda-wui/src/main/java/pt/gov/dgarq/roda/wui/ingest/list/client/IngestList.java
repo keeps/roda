@@ -4,6 +4,7 @@
 package pt.gov.dgarq.roda.wui.ingest.list.client;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,22 +12,29 @@ import java.util.Vector;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.datepicker.client.DateBox;
+import com.google.gwt.user.datepicker.client.DateBox.DefaultFormat;
+import com.google.gwt.view.client.SelectionChangeEvent;
+import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 
 import config.i18n.client.IngestListConstants;
 import config.i18n.client.IngestListMessages;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
 import pt.gov.dgarq.roda.core.data.adapter.facet.SimpleFacetParameter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.DateRangeFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.LikeFilterParameter;
@@ -132,6 +140,12 @@ public class IngestList extends Composite {
 	FlowPanel producerFacets;
 
 	@UiField
+	DateBox inputDateInitial;
+
+	@UiField
+	DateBox inputDateFinal;
+
+	@UiField
 	Button report;
 	@UiField
 	Button view;
@@ -166,6 +180,56 @@ public class IngestList extends Composite {
 		FacetUtils.bindFacets(sipList, facetPanels);
 
 		initWidget(uiBinder.createAndBindUi(this));
+
+		DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
+		ValueChangeHandler<Date> valueChangeHandler = new ValueChangeHandler<Date>() {
+
+			@Override
+			public void onValueChange(ValueChangeEvent<Date> event) {
+				updateDateFilter();
+			}
+
+		};
+
+		inputDateInitial.setFormat(dateFormat);
+		inputDateInitial.getDatePicker().setYearArrowsVisible(true);
+		inputDateInitial.setFireNullValues(true);
+		inputDateInitial.addValueChangeHandler(valueChangeHandler);
+
+		inputDateFinal.setFormat(dateFormat);
+		inputDateFinal.getDatePicker().setYearArrowsVisible(true);
+		inputDateFinal.setFireNullValues(true);
+		inputDateFinal.addValueChangeHandler(valueChangeHandler);
+
+		sipList.getSelectionModel().addSelectionChangeHandler(new Handler() {
+
+			@Override
+			public void onSelectionChange(SelectionChangeEvent event) {
+				updateVisibles(sipList.getSelectionModel().getSelectedObject());
+			}
+		});
+
+		report.setEnabled(false);
+		view.setEnabled(false);
+		accept.setEnabled(false);
+		reject.setEnabled(false);
+	}
+
+	protected void updateVisibles(SIPReport selected) {
+		report.setEnabled(selected != null);
+		view.setEnabled(selected != null && selected.getIngestedID() != null);
+		accept.setEnabled(selected != null && !selected.isProcessing() && !selected.isComplete());
+		reject.setEnabled(selected != null && !selected.isProcessing() && !selected.isComplete());
+	}
+
+	private void updateDateFilter() {
+		Date dateInitial = inputDateInitial.getDatePicker().getValue();
+		Date dateFinal = inputDateFinal.getDatePicker().getValue();
+
+		DateRangeFilterParameter filterParameter = new DateRangeFilterParameter(RodaConstants.SIP_REPORT_DATETIME,
+				dateInitial, dateFinal, DateRangeFilterParameter.DateGranularity.DAY);
+
+		sipList.setFilter(new Filter(filterParameter));
 	}
 
 	@UiHandler("report")
