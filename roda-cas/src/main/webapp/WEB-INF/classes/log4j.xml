@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration debug="false" xmlns:log4j="http://jakarta.apache.org/log4j/">
+    <!--
+      This default ConsoleAppender is used to log all NON perf4j messages
+      to System.out
+    -->
+    <appender name="console" class="org.apache.log4j.ConsoleAppender">
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d %p [%c] - &lt;%m&gt;%n"/>
+        </layout>
+    </appender>
+
+    <appender name="cas" class="org.apache.log4j.RollingFileAppender">
+        <param name="File" value="/var/log/cas/cas.log" />
+        <param name="MaxFileSize" value="512KB" />
+        <param name="MaxBackupIndex" value="3" />
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d %p [%c] - %m%n"/>
+        </layout>
+    </appender>
+
+    <!--
+        WARNING: Setting the org.springframework logger to DEBUG displays debug information about
+        the request parameter values being bound to the command objects.  This could expose your
+        password in the log file.  If you are sharing your log files, it is recommend you selectively
+        apply DEBUG level logging on a an org.springframework.* package level (i.e. org.springframework.dao)
+    -->
+    <logger name="org.springframework">
+        <level value="WARN" />
+    </logger>
+
+    <logger name="org.springframework.webflow">
+        <level value="WARN" />
+    </logger>
+
+    <logger name="org.jasig" additivity="true">
+        <level value="DEBUG" />
+        <appender-ref ref="cas" />
+    </logger>
+
+    <logger name="net.unicon.cas" additivity="true">
+        <level value="DEBUG" />
+        <appender-ref ref="cas" />
+    </logger>
+
+    <logger name="com.github.inspektr.audit.support.Slf4jLoggingAuditTrailManager">
+        <level value="INFO" />
+        <appender-ref ref="cas" />
+    </logger>
+
+    <!--
+        WARNING: Setting the flow package to DEBUG will display
+        the parameters posted to the login servlet including
+        cleartext authentication credentials
+    -->
+    <logger name="org.jasig.cas.web.flow" additivity="true">
+        <level value="INFO" />
+        <appender-ref ref="cas" />
+    </logger>
+
+    <logger name="org.opensaml">
+        <level value="OFF" />
+    </logger>
+
+    <logger name="org.apache.xml">
+        <level value="OFF" />
+    </logger>
+
+    <!--
+      The root logger sends all log statements EXCEPT those sent to the perf4j
+      logger to System.out.
+    -->
+    <root>
+        <level value="DEBUG" />
+        <appender-ref ref="console" />
+    </root>
+</log4j:configuration>
