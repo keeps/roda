@@ -7,7 +7,7 @@ import java.util.Date;
  */
 public class DateRangeFilterParameter extends RangeFilterParameter<Date> {
 
-	enum DateGranularity {
+	public enum DateGranularity {
 		YEAR, MONTH, DAY //, HOUR, MINUTE, SECOND, MILISECOND
 	}
 

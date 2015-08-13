@@ -30,6 +30,7 @@ import org.roda.storage.fs.FileStorageService;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.adapter.filter.BasicSearchFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.ClassificationSchemeFilterParameter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.DateIntervalFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.DateRangeFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
@@ -229,6 +230,16 @@ public class SolrUtilsTest {
 			assertNotNull(stringFilter);
 			assertThat(stringFilter,
 					Matchers.is(String.format("(%s:[%s TO %s])", RodaConstants.LOG_DURATION, from, to)));
+		} catch (IndexServiceException e) {
+			assertEquals(IndexServiceException.BAD_REQUEST, e.getCode());
+		}
+
+		// 14) filter with one DateIntervalFilterParameter
+		try {
+			filter = new Filter();
+			filter.add(new DateIntervalFilterParameter());
+			stringFilter = SolrUtils.parseFilter(filter);
+			fail("An exception should have been thrown but it wasn't!");
 		} catch (IndexServiceException e) {
 			assertEquals(IndexServiceException.BAD_REQUEST, e.getCode());
 		}

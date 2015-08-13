@@ -61,7 +61,9 @@ import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
 import pt.gov.dgarq.roda.core.data.adapter.facet.RangeFacetParameter;
 import pt.gov.dgarq.roda.core.data.adapter.facet.SimpleFacetParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.BasicSearchFilterParameter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.DateIntervalFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.DateRangeFilterParameter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.DateRangeFilterParameter.DateGranularity;
 import pt.gov.dgarq.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter;
@@ -146,11 +148,11 @@ public class SolrUtils {
 		FacetFieldResult facetResult;
 		if (facetFields != null) {
 			for (FacetField facet : facetFields) {
-				LOGGER.debug("facet: " + facet.getName() + " count:" + facet.getValueCount());
+				LOGGER.debug("facet:" + facet.getName() + " count:" + facet.getValueCount());
 				facetResult = new FacetFieldResult(facet.getName(), facet.getValueCount(),
 						facets.getParameters().get(facet.getName()).getValues());
 				for (Count count : facet.getValues()) {
-					LOGGER.debug("   value:" + count.getName() + " value: " + count.getCount());
+					LOGGER.debug("   value:" + count.getName() + " value:" + count.getCount());
 					facetResult.addFacetValue(count.getName(), count.getCount());
 				}
 				ret.add(facetResult);
@@ -243,7 +245,14 @@ public class SolrUtils {
 					ret.append("(*:* NOT " + param.getName() + ":*)");
 				} else if (parameter instanceof DateRangeFilterParameter) {
 					DateRangeFilterParameter param = (DateRangeFilterParameter) parameter;
-					appendRange(ret, param.getName(), Date.class, param.getFromValue(), param.getToValue(), true);
+					// FIXME support date granularity
+					appendRange(ret, param.getName(), Date.class, param.getFromValue(),
+							processToDate(param.getToValue(), param.getGranularity()), true);
+				} else if (parameter instanceof DateIntervalFilterParameter) {
+					DateIntervalFilterParameter param = (DateIntervalFilterParameter) parameter;
+					// FIXME support date granularity
+					appendRangeFromInterval(ret, param.getFromName(), param.getToName(), Date.class,
+							param.getFromValue(), param.getToValue(), true);
 				} else if (parameter instanceof LongRangeFilterParameter) {
 					LongRangeFilterParameter param = (LongRangeFilterParameter) parameter;
 					appendRange(ret, param.getName(), Long.class, param.getFromValue(), param.getToValue(), true);
@@ -264,14 +273,52 @@ public class SolrUtils {
 		return ret.toString();
 	}
 
+	private static String processToDate(Date toValue, DateGranularity granularity) {
+		String ret;
+		if (toValue != null) {
+			ret = DateUtil.getThreadLocalDateFormat().format(toValue);
+			switch (granularity) {
+			case DAY:
+				ret += "+1DAY-1MILISECOND";
+				break;
+
+			default:
+				// do nothing
+				break;
+			}
+		} else {
+			ret = "*";
+		}
+		return ret;
+	}
+
+	private static <T extends Serializable> void appendRangeFromInterval(StringBuilder ret, String fromKey,
+			String toKey, Class<T> valuesClass, T fromValue, T toValue,
+			boolean prefixWithANDOperatorIfBuilderNotEmpty) {
+
+	}
+
+	private static <T extends Serializable> void appendRange(StringBuilder ret, String key, Class<T> valuesClass,
+			T fromValue, String toValue, boolean prefixWithANDOperatorIfBuilderNotEmpty) {
+		if (fromValue != null || toValue != null) {
+			if (prefixWithANDOperatorIfBuilderNotEmpty && ret.length() > 0) {
+				appendANDOperator(ret);
+			}
+			ret.append("(").append(key).append(":[");
+			generateRangeValue(ret, valuesClass, fromValue);
+			ret.append(" TO ");
+			ret.append(toValue);
+			ret.append("])");
+		}
+	}
+
 	private static <T extends Serializable> void appendRange(StringBuilder ret, String key, Class<T> valuesClass,
 			T fromValue, T toValue, boolean prefixWithANDOperatorIfBuilderNotEmpty) {
 		if (fromValue != null || toValue != null) {
 			if (prefixWithANDOperatorIfBuilderNotEmpty && ret.length() > 0) {
 				appendANDOperator(ret);
 			}
-			ret.append("(");
-			ret.append(key + ":[");
+			ret.append("(").append(key).append(":[");
 			generateRangeValue(ret, valuesClass, fromValue);
 			ret.append(" TO ");
 			generateRangeValue(ret, valuesClass, toValue);
@@ -282,7 +329,9 @@ public class SolrUtils {
 	private static <T extends Serializable> void generateRangeValue(StringBuilder ret, Class<T> valueClass, T value) {
 		if (value != null) {
 			if (valueClass.equals(Date.class)) {
-				ret.append(DateUtil.getThreadLocalDateFormat().format(Date.class.cast(value)));
+				String date = DateUtil.getThreadLocalDateFormat().format(Date.class.cast(value));
+				LOGGER.debug("Appending date value \"" + date + "\" to range");
+				ret.append(date);
 			} else if (valueClass.equals(Long.class)) {
 				ret.append(Long.class.cast(value));
 			} else {
@@ -291,6 +340,12 @@ public class SolrUtils {
 		} else {
 			ret.append("*");
 		}
+	}
+
+	public static void main(String[] args) {
+		String date = DateUtil.getThreadLocalDateFormat().format(new Date());
+
+		System.out.println(date);
 	}
 
 	public static List<SortClause> parseSorter(Sorter sorter) throws IndexServiceException {
@@ -481,6 +536,7 @@ public class SolrUtils {
 			ret = (Date) object;
 		} else if (object instanceof String) {
 			try {
+				LOGGER.debug("Parsing date (" + object + ") from string");
 				ret = RodaUtils.parseDate((String) object);
 			} catch (ParseException e) {
 				LOGGER.error("Could not convert Solr object to date", e);
