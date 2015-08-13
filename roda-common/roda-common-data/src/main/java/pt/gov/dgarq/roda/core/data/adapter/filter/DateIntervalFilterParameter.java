@@ -2,14 +2,12 @@ package pt.gov.dgarq.roda.core.data.adapter.filter;
 
 import java.util.Date;
 
+import pt.gov.dgarq.roda.core.common.RodaConstants.DateGranularity;
+
 /**
  * @author Luis Faria <lfaria@keep.pt>
  */
 public class DateIntervalFilterParameter extends RangeFilterParameter<Date> {
-
-	public enum DateGranularity {
-		YEAR, MONTH, DAY // , HOUR, MINUTE, SECOND, MILLISECOND
-	}
 
 	private static final long serialVersionUID = -8039972534809175118L;
 

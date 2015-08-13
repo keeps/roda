@@ -55,6 +55,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import pt.gov.dgarq.roda.core.common.RodaConstants;
+import pt.gov.dgarq.roda.core.common.RodaConstants.DateGranularity;
 import pt.gov.dgarq.roda.core.data.RODAObjectPermissions;
 import pt.gov.dgarq.roda.core.data.adapter.facet.FacetParameter;
 import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
@@ -63,7 +64,6 @@ import pt.gov.dgarq.roda.core.data.adapter.facet.SimpleFacetParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.BasicSearchFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.DateIntervalFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.DateRangeFilterParameter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.DateRangeFilterParameter.DateGranularity;
 import pt.gov.dgarq.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter;
@@ -238,24 +238,21 @@ public class SolrUtils {
 					BasicSearchFilterParameter param = (BasicSearchFilterParameter) parameter;
 					appendBasicSearch(ret, param.getName(), param.getValue(), "AND", true);
 				} else if (parameter instanceof EmptyKeyFilterParameter) {
-					if (ret.length() != 0) {
-						appendANDOperator(ret);
-					}
 					EmptyKeyFilterParameter param = (EmptyKeyFilterParameter) parameter;
+					appendANDOperator(ret, true);
 					ret.append("(*:* NOT " + param.getName() + ":*)");
 				} else if (parameter instanceof DateRangeFilterParameter) {
 					DateRangeFilterParameter param = (DateRangeFilterParameter) parameter;
-					// FIXME support date granularity
-					appendRange(ret, param.getName(), Date.class, param.getFromValue(),
-							processToDate(param.getToValue(), param.getGranularity()), true);
+					appendRange(ret, param.getName(), Date.class, param.getFromValue(), String.class,
+							processToDate(param.getToValue(), param.getGranularity(), true), true);
 				} else if (parameter instanceof DateIntervalFilterParameter) {
 					DateIntervalFilterParameter param = (DateIntervalFilterParameter) parameter;
-					// FIXME support date granularity
-					appendRangeFromInterval(ret, param.getFromName(), param.getToName(), Date.class,
-							param.getFromValue(), param.getToValue(), true);
+					appendRangeInterval(ret, param.getFromName(), param.getToName(), param.getFromValue(),
+							param.getToValue(), param.getGranularity(), true);
 				} else if (parameter instanceof LongRangeFilterParameter) {
 					LongRangeFilterParameter param = (LongRangeFilterParameter) parameter;
-					appendRange(ret, param.getName(), Long.class, param.getFromValue(), param.getToValue(), true);
+					appendRange(ret, param.getName(), Long.class, param.getFromValue(), Long.class, param.getToValue(),
+							true);
 				} else {
 					LOGGER.error("Unsupported filter parameter class: " + parameter.getClass().getName());
 					throw new IndexServiceException(
@@ -273,55 +270,93 @@ public class SolrUtils {
 		return ret.toString();
 	}
 
-	private static String processToDate(Date toValue, DateGranularity granularity) {
-		String ret;
-		if (toValue != null) {
-			ret = DateUtil.getThreadLocalDateFormat().format(toValue);
-			switch (granularity) {
-			case DAY:
-				ret += "+1DAY-1MILLISECOND";
-				break;
+	private static String processFromDate(Date fromValue) {
+		final String ret;
 
+		if (fromValue != null) {
+			return DateUtil.getThreadLocalDateFormat().format(fromValue);
+		} else {
+			ret = null;
+		}
+
+		return ret;
+	}
+
+	// FIXME see if boolean parameter is still needed
+	private static String processToDate(Date toValue, DateGranularity granularity, boolean returnStartOnNull) {
+		final String ret;
+		StringBuilder sb = new StringBuilder();
+		if (toValue != null) {
+			sb.append(DateUtil.getThreadLocalDateFormat().format(toValue));
+			switch (granularity) {
+			case YEAR:
+				sb.append("+1YEAR-1MILLISECOND");
+				break;
+			case MONTH:
+				sb.append("+1MONTH-1MILLISECOND");
+				break;
+			case DAY:
+				sb.append("+1DAY-1MILLISECOND");
+				break;
+			case HOUR:
+				sb.append("+1HOUR-1MILLISECOND");
+				break;
+			case MINUTE:
+				sb.append("+1MINUTE-1MILLISECOND");
+				break;
+			case SECOND:
+				sb.append("+1SECOND-1MILLISECOND");
+				break;
 			default:
 				// do nothing
 				break;
 			}
+			ret = sb.toString();
 		} else {
-			ret = "*";
+			ret = returnStartOnNull ? "*" : null;
 		}
 		return ret;
 	}
 
-	private static <T extends Serializable> void appendRangeFromInterval(StringBuilder ret, String fromKey,
-			String toKey, Class<T> valuesClass, T fromValue, T toValue,
-			boolean prefixWithANDOperatorIfBuilderNotEmpty) {
-
-	}
-
-	private static <T extends Serializable> void appendRange(StringBuilder ret, String key, Class<T> valuesClass,
-			T fromValue, String toValue, boolean prefixWithANDOperatorIfBuilderNotEmpty) {
+	private static <T extends Serializable> void appendRangeInterval(StringBuilder ret, String fromKey, String toKey,
+			Date fromValue, Date toValue, DateGranularity granularity, boolean prefixWithANDOperatorIfBuilderNotEmpty) {
 		if (fromValue != null || toValue != null) {
-			if (prefixWithANDOperatorIfBuilderNotEmpty && ret.length() > 0) {
-				appendANDOperator(ret);
-			}
-			ret.append("(").append(key).append(":[");
-			generateRangeValue(ret, valuesClass, fromValue);
+			appendANDOperator(ret, true);
+			ret.append("(");
+
+			ret.append(fromKey).append(":[");
+			ret.append(fromValue != null ? processFromDate(fromValue) : "*");
 			ret.append(" TO ");
-			ret.append(toValue);
-			ret.append("])");
+			ret.append(toValue != null ? processToDate(toValue, granularity, false) : "*");
+			ret.append("]").append(" OR ");
+
+			ret.append(toKey).append(":[");
+			ret.append(fromValue != null ? processFromDate(fromValue) : "*");
+			ret.append(" TO ");
+			ret.append(toValue != null ? processToDate(toValue, granularity, false) : "*");
+			ret.append("]");
+
+			if (fromValue != null && toValue != null) {
+				ret.append(" OR ").append("(").append(fromKey).append(":[* TO ")
+						.append(processToDate(fromValue, granularity, false)).append("]");
+				ret.append(" AND ").append(toKey).append(":[").append(processFromDate(toValue)).append(" TO *]")
+						.append(")");
+			}
+
+			ret.append(")");
 		}
 	}
 
-	private static <T extends Serializable> void appendRange(StringBuilder ret, String key, Class<T> valuesClass,
-			T fromValue, T toValue, boolean prefixWithANDOperatorIfBuilderNotEmpty) {
+	private static <T extends Serializable, T1 extends Serializable> void appendRange(StringBuilder ret, String key,
+			Class<T> fromClass, T fromValue, Class<T1> toClass, T1 toValue,
+			boolean prefixWithANDOperatorIfBuilderNotEmpty) {
 		if (fromValue != null || toValue != null) {
-			if (prefixWithANDOperatorIfBuilderNotEmpty && ret.length() > 0) {
-				appendANDOperator(ret);
-			}
+			appendANDOperator(ret, true);
+
 			ret.append("(").append(key).append(":[");
-			generateRangeValue(ret, valuesClass, fromValue);
+			generateRangeValue(ret, fromClass, fromValue);
 			ret.append(" TO ");
-			generateRangeValue(ret, valuesClass, toValue);
+			generateRangeValue(ret, toClass, toValue);
 			ret.append("])");
 		}
 	}
@@ -334,18 +369,14 @@ public class SolrUtils {
 				ret.append(date);
 			} else if (valueClass.equals(Long.class)) {
 				ret.append(Long.class.cast(value));
+			} else if (valueClass.equals(String.class)) {
+				ret.append(String.class.cast(value));
 			} else {
 				LOGGER.error("Cannot process range of the type " + valueClass);
 			}
 		} else {
 			ret.append("*");
 		}
-	}
-
-	public static void main(String[] args) {
-		String date = DateUtil.getThreadLocalDateFormat().format(new Date());
-
-		System.out.println(date);
 	}
 
 	public static List<SortClause> parseSorter(Sorter sorter) throws IndexServiceException {
@@ -396,16 +427,17 @@ public class SolrUtils {
 		}
 	}
 
-	private static void appendANDOperator(StringBuilder ret) {
-		ret.append(" AND ");
+	private static void appendANDOperator(StringBuilder ret, boolean prefixWithANDOperatorIfBuilderNotEmpty) {
+		if (prefixWithANDOperatorIfBuilderNotEmpty && ret.length() > 0) {
+			ret.append(" AND ");
+		}
 	}
 
 	private static void appendValuesUsingOROperator(StringBuilder ret, String key, List<String> values,
 			boolean prefixWithANDOperatorIfBuilderNotEmpty) {
 		if (values.size() > 0) {
-			if (prefixWithANDOperatorIfBuilderNotEmpty && ret.length() > 0) {
-				appendANDOperator(ret);
-			}
+			appendANDOperator(ret, true);
+
 			ret.append("(");
 			for (int i = 0; i < values.size(); i++) {
 				if (i != 0) {
@@ -419,9 +451,8 @@ public class SolrUtils {
 
 	private static void appendExactMatch(StringBuilder ret, String key, String value, boolean appendDoubleQuotes,
 			boolean prefixWithANDOperatorIfBuilderNotEmpty) {
-		if (prefixWithANDOperatorIfBuilderNotEmpty && ret.length() > 0) {
-			appendANDOperator(ret);
-		}
+		appendANDOperator(ret, true);
+
 		ret.append("(").append(key).append(": ").append(appendDoubleQuotes ? "\"" : "").append(value)
 				.append(appendDoubleQuotes ? "\"" : "").append(")");
 	}
@@ -440,9 +471,8 @@ public class SolrUtils {
 	// FIXME escape values for Solr special chars
 	private static void appendWhiteSpaceTokenizedString(StringBuilder ret, String key, String value, String operator,
 			boolean prefixWithANDOperatorIfBuilderNotEmpty) {
-		if (prefixWithANDOperatorIfBuilderNotEmpty && ret.length() > 0) {
-			appendANDOperator(ret);
-		}
+		appendANDOperator(ret, true);
+
 		String[] split = value.trim().split("\\s+");
 		ret.append("(");
 		for (int i = 0; i < split.length; i++) {

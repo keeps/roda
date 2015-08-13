@@ -156,7 +156,7 @@ public class UserLog extends Composite {
 		Date dateFinal = inputDateFinal.getDatePicker().getValue();
 
 		DateRangeFilterParameter filterParameter = new DateRangeFilterParameter(RodaConstants.LOG_DATETIME, dateInitial,
-				dateFinal, DateRangeFilterParameter.DateGranularity.DAY);
+				dateFinal, RodaConstants.DateGranularity.DAY);
 
 		logList.setFilter(new Filter(filterParameter));
 	}

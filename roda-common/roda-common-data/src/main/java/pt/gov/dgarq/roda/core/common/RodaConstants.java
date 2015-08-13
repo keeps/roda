@@ -8,6 +8,10 @@ public final class RodaConstants {
 	public final static String ISO8601 = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 	public final static String SHA1 = "SHA-1";
 	public final static String MD5 = "MD5";
+	
+	public enum DateGranularity {
+		YEAR, MONTH, DAY , HOUR, MINUTE, SECOND, MILLISECOND
+	}
 
 	/*
 	 * INDEX NAMES

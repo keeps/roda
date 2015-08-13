@@ -227,7 +227,7 @@ public class IngestList extends Composite {
 		Date dateFinal = inputDateFinal.getDatePicker().getValue();
 
 		DateRangeFilterParameter filterParameter = new DateRangeFilterParameter(RodaConstants.SIP_REPORT_DATETIME,
-				dateInitial, dateFinal, DateRangeFilterParameter.DateGranularity.DAY);
+				dateInitial, dateFinal, RodaConstants.DateGranularity.DAY);
 
 		sipList.setFilter(new Filter(filterParameter));
 	}
