@@ -9,7 +9,7 @@
 
 	<bean id="contextSource" class="org.springframework.ldap.core.support.LdapContextSource">
 		<property name="pooled" value="false" />
-		<property name="url" value="ldap://localhost" />
+		<property name="url" value="ldap://localhost:10389" />
 		<property name="baseEnvironmentProperties">
 			<map>
 				<entry key="com.sun.jndi.ldap.connect.timeout" value="3000" />

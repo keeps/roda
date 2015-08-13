@@ -96,10 +96,10 @@ public class RodaClientFactory {
 		return getRodaProperties().getProperty("roda.cas.external.url");
 	}
 
-	public static URL getCoreURL() throws IOException {
-		URL coreURL;
-		coreURL = new URL(getRodaProperties().getProperty("roda.core.url"));
-		return coreURL;
+	public static URL getCASCallbackURL() throws IOException {
+		URL casCallbackURL;
+		casCallbackURL = new URL(getRodaProperties().getProperty("roda.cas.callback.url"));
+		return casCallbackURL;
 	}
 
 	/**
@@ -119,7 +119,7 @@ public class RodaClientFactory {
 			try {
 				logger.info("No RODA Client in session, creating a guest one");
 				CASUtility casUtility = new CASUtility(getCasUrl(),
-						getCoreURL());
+						getCASCallbackURL());
 				rodaClient = new RODAClient(rodaCoreURL, casUtility);
 			} catch (LoginException e) {
 				throw new LoginException(e.getMessage());
@@ -174,7 +174,7 @@ public class RodaClientFactory {
 			String password) throws LoginException, RODAClientException {
 		RODAClient rodaClient;
 		try {
-			CASUtility casUtility = new CASUtility(getCasUrl(), getCoreURL());
+			CASUtility casUtility = new CASUtility(getCasUrl(), getCASCallbackURL());
 			rodaClient = new RODAClient(rodaCoreURL, username, password,
 					casUtility);
 			logger.info("Login as " + username + " successful");
@@ -194,12 +194,12 @@ public class RodaClientFactory {
 			URL location) throws LoginException, RODAClientException {
 		RODAClient rodaClient;
 		try {
-			CASUtility casUtility = new CASUtility(getCasUrl(), getCoreURL(),
+			CASUtility casUtility = new CASUtility(getCasUrl(), getCASCallbackURL(),
 					location);
 			CASUserPrincipal cup = casUtility.getCASUserPrincipal(null,
 					serviceTicket, request.getRemoteAddr());
 			CASUtility casUtilityClient = new CASUtility(getCasUrl(),
-					getCoreURL());
+					getCASCallbackURL());
 			rodaClient = new RODAClient(rodaCoreURL, cup, casUtilityClient);
 			logger.debug("Login using cas successful");
 			// FIXME is the following line needed
@@ -237,7 +237,7 @@ public class RodaClientFactory {
 			RODAClientException {
 		RODAClient rodaClient;
 		try {
-			CASUtility casUtility = new CASUtility(getCasUrl(), getCoreURL());
+			CASUtility casUtility = new CASUtility(getCasUrl(), getCASCallbackURL());
 			rodaClient = new RODAClient(rodaCoreURL, casUtility);
 			session.setAttribute(RODA_CLIENT_SESSION_ATTRIBUTE, rodaClient);
 			session.removeAttribute("edu.yale.its.tp.cas.client.filter.user");
@@ -262,7 +262,7 @@ public class RodaClientFactory {
 		if (rodaWuiClient == null) {
 			try {
 				CASUtility casUtility = new CASUtility(getCasUrl(),
-						getCoreURL());
+						getCASCallbackURL());
 
 				rodaWuiClient = new RODAClient(rodaCoreURL,
 						rodaProperties.getProperty("roda.wui.user.name"),

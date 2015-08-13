@@ -33,19 +33,19 @@ public class CASUtility {
 	static final private Logger logger = Logger.getLogger(CASUtility.class);
 
 	private URL casURL;
-	private URL coreURL;
+	private URL callbackURL;
 	private URL serviceURL;
 
-	public CASUtility(URL casURL, URL coreURL, URL serviceURL) throws MalformedURLException {
+	public CASUtility(URL casURL, URL callbackURL, URL serviceURL) throws MalformedURLException {
 		this.casURL = casURL;
-		this.coreURL = new URL(coreURL.toString() + "/CasCallback");
+		this.callbackURL = callbackURL;
 		this.serviceURL = serviceURL;
 	}
 
-	public CASUtility(URL casURL, URL coreURL) throws MalformedURLException {
+	public CASUtility(URL casURL, URL callbackURL) throws MalformedURLException {
 		this.casURL = casURL;
-		this.coreURL = new URL(coreURL.toString() + "/CasCallback");
-		this.serviceURL = coreURL;
+		this.callbackURL = callbackURL;
+		this.serviceURL = callbackURL;
 	}
 
 	public String getProxyGrantingTicket(String username, String password) throws AuthenticationException {
@@ -54,7 +54,7 @@ public class CASUtility {
 			String tgt = getTgt(username, password);
 			String serviceTicket = getServiceTicket(tgt);
 			Cas20ServiceTicketValidator cstv = new Cas20ServiceTicketValidator(casURL.toString());
-			cstv.setProxyCallbackUrl(this.coreURL.toString());
+			cstv.setProxyCallbackUrl(this.callbackURL.toString());
 			Assertion a = cstv.validate(serviceTicket, serviceURL.toString());
 			AttributePrincipal principal = a.getPrincipal();
 			final Map attributes = principal.getAttributes();
@@ -68,7 +68,7 @@ public class CASUtility {
 				}
 				if (IOU != null) {
 					try {
-						pgt = getPGT(this.coreURL, IOU);
+						pgt = getPGT(this.callbackURL, IOU);
 					} catch (Exception e) {
 						logger.error("Error getting PGT:" + e.getMessage());
 					}
@@ -278,7 +278,7 @@ public class CASUtility {
 		try {
 			AttributePrincipal principal = null;
 			Cas20ProxyTicketValidator cptv = new Cas20ProxyTicketValidator(casURL.toString());
-			cptv.setProxyCallbackUrl(coreURL.toString());
+			cptv.setProxyCallbackUrl(callbackURL.toString());
 			cptv.setAcceptAnyProxy(true);
 			Assertion a = cptv.validate(proxyTicket, serviceURL.toString());
 			principal = a.getPrincipal();
@@ -294,7 +294,7 @@ public class CASUtility {
 		String proxyGrantingTicket = null;
 		try {
 			Cas20ProxyTicketValidator cptv = new Cas20ProxyTicketValidator(casURL.toString());
-			cptv.setProxyCallbackUrl(coreURL.toString());
+			cptv.setProxyCallbackUrl(callbackURL.toString());
 			cptv.setAcceptAnyProxy(true);
 
 			logger.debug("Validating proxy ticket: " + proxyTicket + " in service: " + serviceURL);
@@ -311,7 +311,7 @@ public class CASUtility {
 				}
 				if (IOU != null) {
 					try {
-						proxyGrantingTicket = getPGT(this.coreURL, IOU);
+						proxyGrantingTicket = getPGT(this.callbackURL, IOU);
 					} catch (Exception e) {
 						logger.error("Error getting PGT:" + e.getMessage());
 					}

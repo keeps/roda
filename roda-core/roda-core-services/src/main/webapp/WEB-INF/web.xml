@@ -13,17 +13,6 @@
 		<param-name>properties</param-name>
 		<param-value>${roda.home}/config/roda-core.properties</param-value>
 	</context-param>
-	<servlet>
-		<description>
-		</description>
-		<display-name>CasCallback</display-name>
-		<servlet-name>CasCallback</servlet-name>
-		<servlet-class>pt.gov.dgarq.roda.servlet.cas.CasCallbackCore</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>CasCallback</servlet-name>
-		<url-pattern>/CasCallback</url-pattern>
-	</servlet-mapping>
 	<!-- <servlet> <display-name>Quartz Initializer Servlet</display-name> <servlet-name>QuartzInitializer</servlet-name> 
 		<servlet-class> org.quartz.ee.servlet.QuartzInitializerServlet </servlet-class> 
 		<init-param> <param-name>start-scheduler-on-load</param-name> <param-value>true</param-value> 
@@ -128,13 +117,6 @@
 		<display-name>RODA Core Listener</display-name>
 		<listener-class>pt.gov.dgarq.roda.core.RodaWebApplication</listener-class>
 	</listener>
-
-
-
-	<filter>
-		<filter-name>CASAuthenticationFilter</filter-name>
-		<filter-class>pt.gov.dgarq.roda.servlet.cas.CASAuthenticationFilter</filter-class>
-	</filter>
 
 	<!-- Role Filters -->
 
@@ -491,121 +473,6 @@
 			<param-value>127.0.0.1,192.168.111.150,192.168.92.7</param-value>
 		</init-param>
 	</filter>
-
-	<!-- WSDL files authentication filter -->
-	<filter-mapping>
-		<filter-name>CASAuthenticationFilter</filter-name>
-		<url-pattern>/wsdl/*</url-pattern>
-	</filter-mapping>
-	<!-- ConfigurationManager authentication filter -->
-	<filter-mapping>
-		<filter-name>CASAuthenticationFilter</filter-name>
-		<url-pattern>/services/ConfigurationManager</url-pattern>
-	</filter-mapping>
-	<!-- UserManagement authentication filter -->
-	<filter-mapping>
-		<filter-name>CASAuthenticationFilter</filter-name>
-		<url-pattern>/services/UserManagement</url-pattern>
-	</filter-mapping>
-	<!-- UserRegistration authentication filter -->
-	<filter-mapping>
-		<filter-name>CASAuthenticationFilter</filter-name>
-		<url-pattern>/services/UserRegistration</url-pattern>
-	</filter-mapping>
-	<!-- UserBrowser authentication filter -->
-	<filter-mapping>
-		<filter-name>CASAuthenticationFilter</filter-name>
-		<url-pattern>/services/UserBrowser</url-pattern>
-	</filter-mapping>
-	<!-- Logger authentication filter -->
-	<filter-mapping>
-		<filter-name>CASAuthenticationFilter</filter-name>
-		<url-pattern>/services/Logger</url-pattern>
-	</filter-mapping>
-	<!-- LogMonitor authentication filter -->
-	<filter-mapping>
-		<filter-name>CASAuthenticationFilter</filter-name>
-		<url-pattern>/services/LogMonitor</url-pattern>
-	</filter-mapping>
-	<!-- Browser authentication filter -->
-	<filter-mapping>
-		<filter-name>CASAuthenticationFilter</filter-name>
-		<url-pattern>/services/Browser</url-pattern>
-	</filter-mapping>
-	<!-- Search authentication filter -->
-	<filter-mapping>
-		<filter-name>CASAuthenticationFilter</filter-name>
-		<url-pattern>/services/Search</url-pattern>
-	</filter-mapping>
-	<!-- Editor authentication filter -->
-	<filter-mapping>
-		<filter-name>CASAuthenticationFilter</filter-name>
-		<url-pattern>/services/Editor</url-pattern>
-	</filter-mapping>
-	<!-- IngestMonitor authentication filter -->
-	<filter-mapping>
-		<filter-name>CASAuthenticationFilter</filter-name>
-		<url-pattern>/services/IngestMonitor</url-pattern>
-	</filter-mapping>
-	<!-- SIPUpload authentication filter -->
-	<filter-mapping>
-		<filter-name>CASAuthenticationFilter</filter-name>
-		<url-pattern>/SIPUpload</url-pattern>
-	</filter-mapping>
-	<filter-mapping>
-		<filter-name>CASAuthenticationFilter</filter-name>
-		<url-pattern>/SIPUpload/*</url-pattern>
-	</filter-mapping>
-	<!-- AcceptSIP authentication filter -->
-	<filter-mapping>
-		<filter-name>CASAuthenticationFilter</filter-name>
-		<url-pattern>/services/AcceptSIP</url-pattern>
-	</filter-mapping>
-	<!-- File Access authentication filter -->
-	<filter-mapping>
-		<filter-name>CASAuthenticationFilter</filter-name>
-		<url-pattern>/get/*</url-pattern>
-	</filter-mapping>
-	<!-- Ingest authentication filter -->
-	<filter-mapping>
-		<filter-name>CASAuthenticationFilter</filter-name>
-		<url-pattern>/services/Ingest</url-pattern>
-	</filter-mapping>
-	<!-- FileUpload authentication filter -->
-	<filter-mapping>
-		<filter-name>CASAuthenticationFilter</filter-name>
-		<url-pattern>/FileUpload</url-pattern>
-	</filter-mapping>
-	<filter-mapping>
-		<filter-name>CASAuthenticationFilter</filter-name>
-		<url-pattern>/FileUpload/*</url-pattern>
-	</filter-mapping>
-	<!-- Scheduler authentication filter -->
-	<filter-mapping>
-		<filter-name>CASAuthenticationFilter</filter-name>
-		<url-pattern>/services/Scheduler</url-pattern>
-	</filter-mapping>
-	<!-- Plugins authentication filter -->
-	<filter-mapping>
-		<filter-name>CASAuthenticationFilter</filter-name>
-		<url-pattern>/services/Plugins</url-pattern>
-	</filter-mapping>
-	<!-- Statistics authentication filter -->
-	<filter-mapping>
-		<filter-name>CASAuthenticationFilter</filter-name>
-		<url-pattern>/services/Statistics</url-pattern>
-	</filter-mapping>
-	<!-- StatisticsMonitor authentication filter -->
-	<filter-mapping>
-		<filter-name>CASAuthenticationFilter</filter-name>
-		<url-pattern>/services/StatisticsMonitor</url-pattern>
-	</filter-mapping>
-	<!-- PlanResource authentication filter -->
-	<filter-mapping>
-		<filter-name>CASAuthenticationFilter</filter-name>
-		<url-pattern>/rest/plan</url-pattern>
-	</filter-mapping>
-
 
 	<!-- ConfigurationManager role filter -->
 	<filter-mapping>

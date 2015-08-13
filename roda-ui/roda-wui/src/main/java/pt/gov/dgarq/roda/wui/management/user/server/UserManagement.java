@@ -11,7 +11,7 @@ import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
-import pt.gov.dgarq.roda.servlet.cas.CASUserPrincipal;
+import pt.gov.dgarq.roda.core.data.v2.RodaSimpleUser;
 import pt.gov.dgarq.roda.wui.common.client.GenericException;
 
 public class UserManagement extends RodaCoreService {
@@ -22,7 +22,7 @@ public class UserManagement extends RodaCoreService {
 		super();
 	}
 
-	public static Long countLogEntries(CASUserPrincipal user, Filter filter)
+	public static Long countLogEntries(RodaSimpleUser user, Filter filter)
 			throws AuthorizationDeniedException, GenericException {
 		Date start = new Date();
 
@@ -39,7 +39,7 @@ public class UserManagement extends RodaCoreService {
 		return count;
 	}
 
-	public static IndexResult<LogEntry> findLogEntries(CASUserPrincipal user, Filter filter, Sorter sorter,
+	public static IndexResult<LogEntry> findLogEntries(RodaSimpleUser user, Filter filter, Sorter sorter,
 			Sublist sublist, Facets facets) throws AuthorizationDeniedException, GenericException {
 		Date start = new Date();
 

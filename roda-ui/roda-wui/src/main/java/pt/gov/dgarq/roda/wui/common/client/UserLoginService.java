@@ -6,6 +6,8 @@ package pt.gov.dgarq.roda.wui.common.client;
 import java.util.Map;
 
 import pt.gov.dgarq.roda.core.common.RODAException;
+import pt.gov.dgarq.roda.core.data.v2.RodaSimpleUser;
+import pt.gov.dgarq.roda.servlet.cas.CASUserPrincipal;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
@@ -62,15 +64,7 @@ public interface UserLoginService extends RemoteService {
 	 */
 	public AuthenticatedUser login(String username, String password)
 			throws RODAException;
-	
-	/**
-	 * Login into RODA Core (CAS)
-	 * 
-	 * @param Proxy Granting Ticket
-	 * @return
-	 * @throws RODAException
-	 */
-	public AuthenticatedUser loginCAS(String location,String PGT) throws RODAException;
+
 
 	/**
 	 * Get RODA properties

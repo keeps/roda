@@ -40,10 +40,10 @@ import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
+import pt.gov.dgarq.roda.core.data.v2.RodaSimpleUser;
 import pt.gov.dgarq.roda.core.stubs.UserBrowser;
 import pt.gov.dgarq.roda.core.stubs.UserEditor;
 import pt.gov.dgarq.roda.core.stubs.UserRegistration;
-import pt.gov.dgarq.roda.servlet.cas.CASUserPrincipal;
 import pt.gov.dgarq.roda.wui.common.captcha.server.CaptchaServiceImpl;
 import pt.gov.dgarq.roda.wui.common.client.GenericException;
 import pt.gov.dgarq.roda.wui.common.client.PrintReportException;
@@ -528,13 +528,13 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
 	}
 
 	public Long getLogEntriesCount(Filter filter) throws RODAException {
-		CASUserPrincipal user = UserUtility.getUser(getThreadLocalRequest());
+		RodaSimpleUser user = UserUtility.getUser(getThreadLocalRequest());
 		return UserManagement.countLogEntries(user, filter);
 	}
 
 	public IndexResult<LogEntry> findLogEntries(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
 			throws AuthorizationDeniedException, GenericException {
-		CASUserPrincipal user = UserUtility.getUser(getThreadLocalRequest());
+		RodaSimpleUser user = UserUtility.getUser(getThreadLocalRequest());
 		return UserManagement.findLogEntries(user, filter, sorter, sublist, facets);
 	}
 

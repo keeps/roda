@@ -12,8 +12,8 @@ import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
+import pt.gov.dgarq.roda.core.data.v2.RodaSimpleUser;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
-import pt.gov.dgarq.roda.servlet.cas.CASUserPrincipal;
 import pt.gov.dgarq.roda.wui.common.client.GenericException;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.BrowseItemBundle;
 
@@ -23,7 +23,7 @@ public class Browser extends RodaCoreService {
 		super();
 	}
 
-	public static BrowseItemBundle getItemBundle(CASUserPrincipal user, String aipId, String localeString)
+	public static BrowseItemBundle getItemBundle(RodaSimpleUser user, String aipId, String localeString)
 			throws AuthorizationDeniedException, GenericException {
 		Date start = new Date();
 
@@ -35,12 +35,12 @@ public class Browser extends RodaCoreService {
 
 		// register action
 		long duration = new Date().getTime() - start.getTime();
-		registerAction(user, "Browser","getItemBundle", aipId, duration, "aipId", aipId);
+		registerAction(user, "Browser", "getItemBundle", aipId, duration, "aipId", aipId);
 
 		return itemBundle;
 	}
 
-	public static IndexResult<SimpleDescriptionObject> findDescriptiveMetadata(CASUserPrincipal user, Filter filter,
+	public static IndexResult<SimpleDescriptionObject> findDescriptiveMetadata(RodaSimpleUser user, Filter filter,
 			Sorter sorter, Sublist sublist, Facets facets) throws RODAException {
 		Date start = new Date();
 
@@ -53,13 +53,13 @@ public class Browser extends RodaCoreService {
 
 		// register action
 		long duration = new Date().getTime() - start.getTime();
-		registerAction(user, "Browser","findDescriptiveMetadata", null, duration, "filter", filter.toString(), "sorter",
-				sorter.toString(), "sublist", sublist.toString());
+		registerAction(user, "Browser", "findDescriptiveMetadata", null, duration, "filter", filter.toString(),
+				"sorter", sorter.toString(), "sublist", sublist.toString());
 
 		return descriptiveMetadata;
 	}
 
-	public static Long countDescriptiveMetadata(CASUserPrincipal user, Filter filter)
+	public static Long countDescriptiveMetadata(RodaSimpleUser user, Filter filter)
 			throws AuthorizationDeniedException, GenericException {
 		Date start = new Date();
 
@@ -71,12 +71,12 @@ public class Browser extends RodaCoreService {
 
 		// register action
 		long duration = new Date().getTime() - start.getTime();
-		registerAction(user, "Browser","countDescriptiveMetadata", null, duration, "filter", filter.toString());
+		registerAction(user, "Browser", "countDescriptiveMetadata", null, duration, "filter", filter.toString());
 
 		return count;
 	}
 
-	public static SimpleDescriptionObject getSimpleDescriptionObject(CASUserPrincipal user, String aipId)
+	public static SimpleDescriptionObject getSimpleDescriptionObject(RodaSimpleUser user, String aipId)
 			throws AuthorizationDeniedException, GenericException {
 		Date start = new Date();
 
@@ -88,13 +88,12 @@ public class Browser extends RodaCoreService {
 
 		// register action
 		long duration = new Date().getTime() - start.getTime();
-		registerAction(user, "Browser","getSimpleDescriptionObject", aipId, duration, "aipId", aipId);
+		registerAction(user, "Browser", "getSimpleDescriptionObject", aipId, duration, "aipId", aipId);
 
 		return sdo;
 	}
 
-
-	public static List<SimpleDescriptionObject> getAncestors(CASUserPrincipal user, SimpleDescriptionObject sdo)
+	public static List<SimpleDescriptionObject> getAncestors(RodaSimpleUser user, SimpleDescriptionObject sdo)
 			throws AuthorizationDeniedException, GenericException {
 		Date start = new Date();
 
@@ -106,7 +105,7 @@ public class Browser extends RodaCoreService {
 
 		// register action
 		long duration = new Date().getTime() - start.getTime();
-		registerAction(user, "Browser","getParent", sdo.getId(), duration, "sdo", sdo.toString());
+		registerAction(user, "Browser", "getParent", sdo.getId(), duration, "sdo", sdo.toString());
 
 		return ancestors;
 	}

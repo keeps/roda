@@ -37,6 +37,7 @@ import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
+import pt.gov.dgarq.roda.core.data.v2.RodaSimpleUser;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.core.stubs.Browser;
 import pt.gov.dgarq.roda.servlet.cas.CASUserPrincipal;
@@ -71,29 +72,29 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 	}
 
 	public BrowseItemBundle getItemBundle(String aipId, String localeString) throws RODAException {
-		CASUserPrincipal user = UserUtility.getUser(getThreadLocalRequest());
+		RodaSimpleUser user = UserUtility.getUser(getThreadLocalRequest());
 		return pt.gov.dgarq.roda.wui.dissemination.browse.server.Browser.getItemBundle(user, aipId, localeString);
 	}
 
 	public IndexResult<SimpleDescriptionObject> findDescriptiveMetadata(Filter filter, Sorter sorter, Sublist sublist,
 			Facets facets) throws RODAException {
-		CASUserPrincipal user = UserUtility.getUser(getThreadLocalRequest());
+		RodaSimpleUser user = UserUtility.getUser(getThreadLocalRequest());
 		return pt.gov.dgarq.roda.wui.dissemination.browse.server.Browser.findDescriptiveMetadata(user, filter, sorter,
 				sublist, facets);
 	}
 
 	public Long countDescriptiveMetadata(Filter filter) throws RODAException {
-		CASUserPrincipal user = UserUtility.getUser(getThreadLocalRequest());
+		RodaSimpleUser user = UserUtility.getUser(getThreadLocalRequest());
 		return pt.gov.dgarq.roda.wui.dissemination.browse.server.Browser.countDescriptiveMetadata(user, filter);
 	}
 
 	public SimpleDescriptionObject getSimpleDescriptionObject(String pid) throws RODAException {
-		CASUserPrincipal user = UserUtility.getUser(getThreadLocalRequest());
+		RodaSimpleUser user = UserUtility.getUser(getThreadLocalRequest());
 		return pt.gov.dgarq.roda.wui.dissemination.browse.server.Browser.getSimpleDescriptionObject(user, pid);
 	}
 
 	public List<SimpleDescriptionObject> getAncestors(SimpleDescriptionObject sdo) throws RODAException {
-		CASUserPrincipal user = UserUtility.getUser(getThreadLocalRequest());
+		RodaSimpleUser user = UserUtility.getUser(getThreadLocalRequest());
 		return pt.gov.dgarq.roda.wui.dissemination.browse.server.Browser.getAncestors(user, sdo);
 	}
 

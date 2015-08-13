@@ -9,22 +9,11 @@ import java.util.Map;
 import java.util.Vector;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.RequestBuilder;
-import com.google.gwt.http.client.RequestCallback;
-import com.google.gwt.http.client.RequestException;
-import com.google.gwt.http.client.RequestTimeoutException;
-import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.Cookies;
-import com.google.gwt.user.client.History;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import config.i18n.client.CommonConstants;
 import config.i18n.client.CommonMessages;
-import pt.gov.dgarq.roda.core.common.LoginException;
-import pt.gov.dgarq.roda.core.common.RODAClientException;
 import pt.gov.dgarq.roda.core.data.Group;
 import pt.gov.dgarq.roda.core.data.RODAMember;
 import pt.gov.dgarq.roda.core.data.User;
@@ -138,31 +127,6 @@ public class UserLogin {
 		} else {
 			callback.onSuccess(user);
 		}
-	}
-
-	public void loginCAS(String location, String serviceTicket, final AsyncCallback<AuthenticatedUser> callback) {
-		userLoginService.loginCAS(location, serviceTicket, new AsyncCallback<AuthenticatedUser>() {
-
-			public void onFailure(Throwable caught) {
-				if (caught instanceof LoginException) {
-					// do nothing
-				} else if (caught instanceof RODAClientException) {
-					Window.alert(messages.rodaClientFailed(caught.getMessage()));
-
-				} else {
-					Window.alert(messages.genericFailure(caught.getMessage()));
-				}
-				callback.onFailure(caught);
-			}
-
-			public void onSuccess(AuthenticatedUser user) {
-				callback.onSuccess(user);
-				UserLogin.this.user = user;
-				onLoginStatusChanged(user);
-			}
-
-		});
-
 	}
 
 	/**

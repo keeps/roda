@@ -2,41 +2,66 @@
 <web-app id="WebApp_ID" version="2.4"
 	xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
-	<display-name>RODA Web User Interface</display-name>
-	<!-- 
+	<display-name>RODA Web User Interface</display-name>	
 	<filter>
-		<display-name>TicketInterceptorFilter</display-name>
-		<filter-name>TicketInterceptorFilter</filter-name>
-		<filter-class>pt.gov.dgarq.roda.wui.filter.TicketInterceptorFilter</filter-class>
+		<filter-name>CAS Authentication Filter</filter-name>
+		<!-- <filter-class>org.jasig.cas.client.authentication.Saml11AuthenticationFilter</filter-class>-->
+		<filter-class>org.jasig.cas.client.authentication.AuthenticationFilter</filter-class>
+		<init-param>
+			<param-name>casServerLoginUrl</param-name>
+			<param-value>https://roda.fake.domain:8443/cas/login</param-value>
+		</init-param>
+		<init-param>
+			<param-name>serverName</param-name>
+			<param-value>https://roda.fake.domain:8443</param-value>
+		</init-param>
 	</filter>
+
+	<filter>
+		<filter-name>CAS Validation Filter</filter-name>
+		<!-- <filter-class>org.jasig.cas.client.validation.Saml11TicketValidationFilter</filter-class>-->
+		<filter-class>org.jasig.cas.client.validation.Cas10TicketValidationFilter</filter-class>
+		<init-param>
+			<param-name>casServerUrlPrefix</param-name>
+			<param-value>https://roda.fake.domain:8443/cas</param-value>
+		</init-param>
+		<init-param>
+			<param-name>serverName</param-name>
+			<param-value>https://roda.fake.domain:8443</param-value>
+		</init-param>
+	</filter>
+
+	<filter>
+		<filter-name>CAS HttpServletRequest Wrapper Filter</filter-name>
+		<filter-class>org.jasig.cas.client.util.HttpServletRequestWrapperFilter</filter-class>
+	</filter>
+
 	<filter-mapping>
-		<filter-name>TicketInterceptorFilter</filter-name>
-		<url-pattern>/Main.html</url-pattern>
+		<filter-name>CAS Authentication Filter</filter-name>
+		<url-pattern>/login</url-pattern>
 	</filter-mapping>
-	-->
-	<!-- 
-	<filter>
-		<filter-name>CASAuthenticationFilter</filter-name>
-		<filter-class>pt.gov.dgarq.roda.servlet.cas.CASAuthenticationFilter</filter-class>
-	</filter>
-	-->
+	<filter-mapping>
+		<filter-name>CAS Validation Filter</filter-name>
+		<url-pattern>/login</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>CAS HttpServletRequest Wrapper Filter</filter-name>
+		<url-pattern>/login</url-pattern>
+	</filter-mapping>
+	
+	
 	<filter>
 		<description>
 		</description>
-		<display-name>CASUpgradedFilter</display-name>
-		<filter-name>CASUpgradedFilter</filter-name>
-		<filter-class>pt.gov.dgarq.roda.wui.filter.CASUpgradedFilter</filter-class>
+		<display-name>RolesSetterFilter</display-name>
+		<filter-name>RolesSetterFilter</filter-name>
+		<filter-class>pt.gov.dgarq.roda.wui.filter.RolesSetterFilter</filter-class>
 	</filter>
-	<!-- 
 	<filter-mapping>
-		<filter-name>CASAuthenticationFilter</filter-name>
+		<filter-name>RolesSetterFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
-	-->
-	<filter-mapping>
-		<filter-name>CASUpgradedFilter</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>
+	
 	
 	<!-- 
 	<filter>
@@ -48,6 +73,12 @@
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 	-->
+	
+	
+	<listener>
+		<listener-class>pt.gov.dgarq.roda.ds.DSStartStopListener</listener-class>
+	</listener>
+
 	<servlet>
 		<servlet-name>ClientLogger</servlet-name>
 		<servlet-class>pt.gov.dgarq.roda.wui.common.server.ClientLoggerImpl</servlet-class>

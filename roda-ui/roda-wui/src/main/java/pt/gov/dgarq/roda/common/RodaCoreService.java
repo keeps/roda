@@ -10,12 +10,13 @@ import org.roda.model.ModelServiceException;
 
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.LogEntryParameter;
+import pt.gov.dgarq.roda.core.data.v2.RodaSimpleUser;
 import pt.gov.dgarq.roda.servlet.cas.CASUserPrincipal;
 
 public abstract class RodaCoreService {
 	private static final Logger LOGGER = Logger.getLogger(RodaCoreService.class);
 
-	protected static void registerAction(CASUserPrincipal user, String actionComponent, String actionMethod,
+	protected static void registerAction(RodaSimpleUser user, String actionComponent, String actionMethod,
 			String aipId, long duration, Object... parameters) {
 
 		LogEntry logEntry = createLogEntry(user, actionComponent, actionMethod, aipId, duration, parameters);
@@ -38,7 +39,7 @@ public abstract class RodaCoreService {
 		}
 	}
 
-	private static LogEntry createLogEntry(CASUserPrincipal user, String actionComponent, String actionMethod,
+	private static LogEntry createLogEntry(RodaSimpleUser user, String actionComponent, String actionMethod,
 			String aipId, long duration, Object... parameters) {
 		LogEntry logEntry = null;
 		List<LogEntryParameter> logParameters = null;

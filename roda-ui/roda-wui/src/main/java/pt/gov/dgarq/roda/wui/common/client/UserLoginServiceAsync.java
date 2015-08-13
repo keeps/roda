@@ -40,9 +40,6 @@ public interface UserLoginServiceAsync {
 	 */
 	public void getRodaProperties(AsyncCallback<Map<String, String>> callback);
 
-	public void loginCAS(String location, String serviceTicket,
-			AsyncCallback<AuthenticatedUser> asyncCallback);
-
 	void getRodaCasURL(AsyncCallback<String> callback);
 
 	public void logout(AsyncCallback<AuthenticatedUser> asyncCallback);

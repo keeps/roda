@@ -1017,48 +1017,25 @@
 			</dependency>
 			<!-- CAS related dependencies -->
 			<dependency>
-				<groupId>org.jasig.cas</groupId>
-				<artifactId>cas-server-webapp</artifactId>
-				<version>${cas.version}</version>
-				<type>war</type>
-				<scope>runtime</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.jasig.cas</groupId>
-				<artifactId>cas-server-support-ldap</artifactId>
-				<version>${cas.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.jasig.cas</groupId>
-				<artifactId>cas-server-support-generic</artifactId>
-				<version>${cas.version}</version>
-				<type>jar</type>
-				<scope>runtime</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.jasig.cas</groupId>
-				<artifactId>cas-server-integration-restlet</artifactId>
-				<version>${cas.version}</version>
-				<type>jar</type>
-				<exclusions>
-					<exclusion>
-						<groupId>org.springframework</groupId>
-						<artifactId>spring-web</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>javax.servlet</groupId>
-						<artifactId>servlet-api</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.springframework</groupId>
-						<artifactId>spring-beans</artifactId>
-					</exclusion>
-				</exclusions>
-			</dependency>
-			<dependency>
 			<groupId>org.yaml</groupId>
 			<artifactId>snakeyaml</artifactId>
 			<version>1.15</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.directory.server</groupId>
+			<artifactId>apacheds-all</artifactId>
+			<version>1.5.5</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.directory.shared</groupId>
+					<artifactId>shared-ldap</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.5.6</version>
 		</dependency>
 		</dependencies>
 	</dependencyManagement>

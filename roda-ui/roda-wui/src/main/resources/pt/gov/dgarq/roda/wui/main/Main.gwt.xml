@@ -29,7 +29,7 @@
 
 	<!-- Specify the app entry point class. -->
 	<entry-point class='pt.gov.dgarq.roda.wui.main.client.Main' />
-
+<collapse-all-properties />
 	<!-- Specify the cascade stylesheet to use -->
 	<stylesheet src="Main.css" />
 	<set-configuration-property name='xsiframe.failIfScriptTag'
