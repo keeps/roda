@@ -244,7 +244,7 @@ public class SolrUtils {
 				} else if (parameter instanceof DateRangeFilterParameter) {
 					DateRangeFilterParameter param = (DateRangeFilterParameter) parameter;
 					appendRange(ret, param.getName(), Date.class, param.getFromValue(), String.class,
-							processToDate(param.getToValue(), param.getGranularity(), true), true);
+							processToDate(param.getToValue(), param.getGranularity()), true);
 				} else if (parameter instanceof DateIntervalFilterParameter) {
 					DateIntervalFilterParameter param = (DateIntervalFilterParameter) parameter;
 					appendRangeInterval(ret, param.getFromName(), param.getToName(), param.getFromValue(),
@@ -276,14 +276,13 @@ public class SolrUtils {
 		if (fromValue != null) {
 			return DateUtil.getThreadLocalDateFormat().format(fromValue);
 		} else {
-			ret = null;
+			ret = "*";
 		}
 
 		return ret;
 	}
 
-	// FIXME see if boolean parameter is still needed
-	private static String processToDate(Date toValue, DateGranularity granularity, boolean returnStartOnNull) {
+	private static String processToDate(Date toValue, DateGranularity granularity) {
 		final String ret;
 		StringBuilder sb = new StringBuilder();
 		if (toValue != null) {
@@ -313,32 +312,32 @@ public class SolrUtils {
 			}
 			ret = sb.toString();
 		} else {
-			ret = returnStartOnNull ? "*" : null;
+			ret = "*";
 		}
 		return ret;
 	}
 
-	private static <T extends Serializable> void appendRangeInterval(StringBuilder ret, String fromKey, String toKey,
-			Date fromValue, Date toValue, DateGranularity granularity, boolean prefixWithANDOperatorIfBuilderNotEmpty) {
+	private static void appendRangeInterval(StringBuilder ret, String fromKey, String toKey, Date fromValue,
+			Date toValue, DateGranularity granularity, boolean prefixWithANDOperatorIfBuilderNotEmpty) {
 		if (fromValue != null || toValue != null) {
 			appendANDOperator(ret, true);
 			ret.append("(");
 
 			ret.append(fromKey).append(":[");
-			ret.append(fromValue != null ? processFromDate(fromValue) : "*");
+			ret.append(processFromDate(fromValue));
 			ret.append(" TO ");
-			ret.append(toValue != null ? processToDate(toValue, granularity, false) : "*");
+			ret.append(processToDate(toValue, granularity));
 			ret.append("]").append(" OR ");
 
 			ret.append(toKey).append(":[");
-			ret.append(fromValue != null ? processFromDate(fromValue) : "*");
+			ret.append(processFromDate(fromValue));
 			ret.append(" TO ");
-			ret.append(toValue != null ? processToDate(toValue, granularity, false) : "*");
+			ret.append(processToDate(toValue, granularity));
 			ret.append("]");
 
 			if (fromValue != null && toValue != null) {
 				ret.append(" OR ").append("(").append(fromKey).append(":[* TO ")
-						.append(processToDate(fromValue, granularity, false)).append("]");
+						.append(processToDate(fromValue, granularity)).append("]");
 				ret.append(" AND ").append(toKey).append(":[").append(processFromDate(toValue)).append(" TO *]")
 						.append(")");
 			}
