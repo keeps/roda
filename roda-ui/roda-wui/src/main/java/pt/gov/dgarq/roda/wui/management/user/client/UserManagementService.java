@@ -18,6 +18,7 @@ import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
+import pt.gov.dgarq.roda.core.data.v2.RODAMember;
 import pt.gov.dgarq.roda.wui.common.client.GenericException;
 import pt.gov.dgarq.roda.wui.common.client.PrintReportException;
 
@@ -433,5 +434,11 @@ public interface UserManagementService extends RemoteService {
 	 * @throws PrintReportException
 	 */
 	public void setUserLogReportInfo(ContentAdapter adapter, String localeString) throws PrintReportException;
+	
+	
+	public Long getMemberCount(Filter filter) throws RODAException;
+
+	public IndexResult<RODAMember> findMember(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
+			throws AuthorizationDeniedException, GenericException;
 
 }

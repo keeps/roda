@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+	xmlns:i="urn:import:config.i18n.client" xmlns:m="urn:import:pt.gov.dgarq.roda.wui.main.client"
+	xmlns:common="urn:import:pt.gov.dgarq.roda.wui.common.client.widgets"
+	xmlns:d="urn:import:com.google.gwt.user.datepicker.client">
+
+	<ui:style>
+	.search {
+		display: flex;
+		justify-content: space-between;
+		min-height: 600px;
+	}
+	
+	.content {
+		width: 100%;
+		padding: 40px;
+	}
+	
+	.sidebar {
+		background-color: #eee;
+		padding: 40px;
+		width: 200px;
+	}
+	
+	.sidebar-title {
+		margin-bottom: 10px;
+	}
+	
+	.sidebar-group {
+		margin-bottom: 10px;
+	}
+	
+	.action {
+		width: 100%;
+		margin-bottom: 10px;
+	}
+	
+	.footer {
+		clear: both;
+	}
+	</ui:style>
+
+	<g:FlowPanel styleName="wui-management-user" addStyleNames="{style.search}">
+		<g:FlowPanel styleName="layout" addStyleNames="{style.content}">
+			<g:Label styleName="h1">Users and groups</g:Label>
+			<!-- <common:LogEntryList addStyleNames="searchResults" -->
+			<!-- ui:field="logList" /> -->
+			<common:RodaMemberList addStyleNames="searchResults"
+				ui:field="list" />
+		</g:FlowPanel>
+
+		<g:FlowPanel styleName="{style.sidebar}">
+			<g:FlowPanel styleName="{style.sidebar-group}">
+				<g:Label addStyleNames="h2 {style.sidebar-title} searchFacetsTitle">
+					<ui:msg>Filters</ui:msg>
+				</g:Label>
+				<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+					<g:Label addStyleNames="h3 sidebar-facet-title">
+						<ui:msg>Is active</ui:msg>
+					</g:Label>
+					<g:FlowPanel styleName="{style.sidebar-group}"
+						ui:field="facetIsActive" />
+				</g:FlowPanel>
+				<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+					<g:Label addStyleNames="h3 sidebar-facet-title">
+						<ui:msg>Is user</ui:msg>
+					</g:Label>
+					<g:FlowPanel styleName="{style.sidebar-group}"
+						ui:field="facetIsUser" />
+				</g:FlowPanel>
+				<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+					<g:Label addStyleNames="h3 sidebar-facet-title">
+						<ui:msg>Groups</ui:msg>
+					</g:Label>
+					<g:FlowPanel styleName="{style.sidebar-group}"
+						ui:field="facetGroups" />
+				</g:FlowPanel>
+			</g:FlowPanel>
+			<g:FlowPanel styleName="{style.sidebar-group}">
+				<g:Label addStyleNames="h2 {style.sidebar-title}">
+					<ui:msg>Actions</ui:msg>
+				</g:Label>
+				<g:Button addStyleNames="btn btn-th-list {style.action}"
+					ui:field="buttonAddUser">Add user</g:Button>
+				<g:Button addStyleNames="btn btn-play {style.action}"
+					ui:field="buttonAddGroup">Add group</g:Button>
+				<g:Button addStyleNames="btn btn-check {style.action}"
+					ui:field="buttonEdit" enabled="false">Edit</g:Button>
+				<g:Button addStyleNames="btn btn-ban {style.action}"
+					ui:field="buttonRemove" enabled="false">Remove</g:Button>
+				<g:Button addStyleNames="btn btn-ban {style.action}"
+					ui:field="buttonDeActivate" enabled="false">(De)Activate</g:Button>
+			</g:FlowPanel>
+		</g:FlowPanel>
+		<g:FlowPanel styleName="{style.footer}" />
+	</g:FlowPanel>
+</ui:UiBinder>

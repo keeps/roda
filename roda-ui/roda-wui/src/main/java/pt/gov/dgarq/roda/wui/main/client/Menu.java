@@ -32,6 +32,7 @@ import pt.gov.dgarq.roda.wui.management.event.client.EventManagement;
 import pt.gov.dgarq.roda.wui.management.statistics.client.Statistics;
 import pt.gov.dgarq.roda.wui.management.user.client.Preferences;
 import pt.gov.dgarq.roda.wui.management.user.client.Register;
+import pt.gov.dgarq.roda.wui.management.user.client.MemberManagement;
 import pt.gov.dgarq.roda.wui.management.user.client.UserLog;
 import pt.gov.dgarq.roda.wui.management.user.client.WUIUserManagement;
 
@@ -102,7 +103,7 @@ public class Menu extends Composite {
 
 		administrationMenu = new MenuBar(true);
 		administration_user = administrationMenu.addItem(constants.title_administration_user(),
-				createCommand(WUIUserManagement.getInstance().getHistoryPath()));
+				createCommand(MemberManagement.RESOLVER.getHistoryPath()));
 		administration_event = administrationMenu.addItem(constants.title_administration_event(),
 				createCommand(EventManagement.getInstance().getHistoryPath()));
 		administration_statistics = administrationMenu.addItem(constants.title_administration_statistics(),
@@ -282,7 +283,7 @@ public class Menu extends Composite {
 
 		// Administration
 
-		WUIUserManagement.getInstance().isCurrentUserPermitted(new AsyncCallback<Boolean>() {
+		MemberManagement.RESOLVER.isCurrentUserPermitted(new AsyncCallback<Boolean>() {
 
 			public void onFailure(Throwable caught) {
 				logger.error("Error getting browse role", caught);

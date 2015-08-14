@@ -8,9 +8,9 @@ public final class RodaConstants {
 	public final static String ISO8601 = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 	public final static String SHA1 = "SHA-1";
 	public final static String MD5 = "MD5";
-	
+
 	public enum DateGranularity {
-		YEAR, MONTH, DAY , HOUR, MINUTE, SECOND, MILLISECOND
+		YEAR, MONTH, DAY, HOUR, MINUTE, SECOND, MILLISECOND
 	}
 
 	/*
@@ -230,7 +230,7 @@ public final class RodaConstants {
 	public static final String LOG_USERNAME = "username";
 	public static final String LOG_PARAMETERS = "parameters";
 	public static final String LOG_FILE_ID = "fileID";
-	
+
 	public static final String SIP_REPORT_ORIGINAL_FILENAME = "originalFilename";
 	public static final String SIP_REPORT_ID = "id";
 	public static final String SIP_REPORT_USERNAME = "username";
@@ -250,7 +250,13 @@ public final class RodaConstants {
 	public static final String SIP_REPORT_TRANSITION_TO = "transition_to";
 	public static final String SIP_REPORT_TRANSITION_SUCCESS = "transition_success";
 	public static final String SIP_REPORT_TRANSITION_ID = "id";
-	
-	
+
+	// MEMBER: USER or GROUP
+	public static final String MEMBER_ID = "id";
+	public static final String MEMBER_NAME = "name";
+	public static final String MEMBER_IS_ACTIVE = "isActive";
+	public static final String MEMBER_IS_USER = "isUser";
+	public static final String MEMBER_GROUPS_ALL = "groupsAll";
+	public static final String MEMBER_ROLES_ALL = "rolesAll";
 
 }

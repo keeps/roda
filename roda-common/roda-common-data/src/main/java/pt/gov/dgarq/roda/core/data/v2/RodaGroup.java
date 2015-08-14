@@ -3,7 +3,7 @@ package pt.gov.dgarq.roda.core.data.v2;
 import java.util.HashSet;
 import java.util.Set;
 
-public class RodaUser extends RodaSimpleUser implements RODAMember {
+public class RodaGroup extends RodaPrincipal implements RODAMember {
 	private static final long serialVersionUID = -718342371831706371L;
 
 	private boolean active = true;
@@ -12,30 +12,17 @@ public class RodaUser extends RodaSimpleUser implements RODAMember {
 	private Set<String> allGroups = new HashSet<String>();
 	private Set<String> directGroups = new HashSet<String>();
 
-	public RodaUser() {
+	public RodaGroup() {
 		super();
 	}
 
-	public RodaUser(String id, String name, String email, boolean guest) {
-		super(id, name, email, guest);
+	public RodaGroup(String id, String name) {
+		super(id, name);
 	}
 
-	public RodaUser(RodaSimpleUser user) {
-		super(user.getId(), user.getName(), user.getEmail(), user.isGuest());
-	}
-
-	public RodaUser(String id, String name, String email, boolean guest, Set<String> allRoles, Set<String> directRoles,
-			Set<String> allGroups, Set<String> directGroups) {
-		super(id, name, email, guest);
-		this.allRoles = allRoles;
-		this.directRoles = directRoles;
-		this.allGroups = allGroups;
-		this.directGroups = directGroups;
-	}
-
-	public RodaUser(RodaSimpleUser user, Set<String> allRoles, Set<String> directRoles, Set<String> allGroups,
+	public RodaGroup(String id, String name, Set<String> allRoles, Set<String> directRoles, Set<String> allGroups,
 			Set<String> directGroups) {
-		super(user.getId(), user.getName(), user.getEmail(), user.isGuest());
+		super(id, name);
 		this.allRoles = allRoles;
 		this.directRoles = directRoles;
 		this.allGroups = allGroups;
@@ -44,7 +31,7 @@ public class RodaUser extends RodaSimpleUser implements RODAMember {
 
 	@Override
 	public boolean isUser() {
-		return true;
+		return false;
 	}
 
 	public boolean isActive() {
@@ -90,7 +77,7 @@ public class RodaUser extends RodaSimpleUser implements RODAMember {
 	@Override
 	public int hashCode() {
 		final int prime = 31;
-		int result = 1;
+		int result = super.hashCode();
 		result = prime * result + (active ? 1231 : 1237);
 		result = prime * result + ((allGroups == null) ? 0 : allGroups.hashCode());
 		result = prime * result + ((allRoles == null) ? 0 : allRoles.hashCode());
@@ -101,47 +88,67 @@ public class RodaUser extends RodaSimpleUser implements RODAMember {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (!super.equals(obj)) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
-		RodaUser other = (RodaUser) obj;
-		if (active != other.active)
+		}
+		RodaGroup other = (RodaGroup) obj;
+		if (active != other.active) {
 			return false;
+		}
 		if (allGroups == null) {
-			if (other.allGroups != null)
+			if (other.allGroups != null) {
 				return false;
-		} else if (!allGroups.equals(other.allGroups))
+			}
+		} else if (!allGroups.equals(other.allGroups)) {
 			return false;
+		}
 		if (allRoles == null) {
-			if (other.allRoles != null)
+			if (other.allRoles != null) {
 				return false;
-		} else if (!allRoles.equals(other.allRoles))
+			}
+		} else if (!allRoles.equals(other.allRoles)) {
 			return false;
+		}
 		if (directGroups == null) {
-			if (other.directGroups != null)
+			if (other.directGroups != null) {
 				return false;
-		} else if (!directGroups.equals(other.directGroups))
+			}
+		} else if (!directGroups.equals(other.directGroups)) {
 			return false;
+		}
 		if (directRoles == null) {
-			if (other.directRoles != null)
+			if (other.directRoles != null) {
 				return false;
-		} else if (!directRoles.equals(other.directRoles))
+			}
+		} else if (!directRoles.equals(other.directRoles)) {
 			return false;
+		}
 		return true;
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("RodaUser [").append(super.toString());
-		builder.append(", active=").append(active);
-		builder.append(", allRoles=").append(allRoles);
-		builder.append(", directRoles=").append(directRoles);
-		builder.append(", allGroups=").append(allGroups);
-		builder.append(", directGroups=").append(directGroups);
+		builder.append("RodaGroup [getId()=");
+		builder.append(getId());
+		builder.append(", getName()=");
+		builder.append(getName());
+		builder.append(", active=");
+		builder.append(active);
+		builder.append(", allRoles=");
+		builder.append(allRoles);
+		builder.append(", directRoles=");
+		builder.append(directRoles);
+		builder.append(", allGroups=");
+		builder.append(allGroups);
+		builder.append(", directGroups=");
+		builder.append(directGroups);
 		builder.append("]");
 		return builder.toString();
 	}

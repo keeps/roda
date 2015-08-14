@@ -3,10 +3,12 @@ package pt.gov.dgarq.roda.wui.management.user.server;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -27,6 +29,7 @@ import pt.gov.dgarq.roda.core.RODAClient;
 import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
 import pt.gov.dgarq.roda.core.common.InvalidTokenException;
 import pt.gov.dgarq.roda.core.common.RODAException;
+import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.common.UserManagementException;
 import pt.gov.dgarq.roda.core.data.Group;
 import pt.gov.dgarq.roda.core.data.User;
@@ -38,9 +41,14 @@ import pt.gov.dgarq.roda.core.data.adapter.filter.RegexFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
+import pt.gov.dgarq.roda.core.data.v2.FacetFieldResult;
+import pt.gov.dgarq.roda.core.data.v2.FacetValue;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
+import pt.gov.dgarq.roda.core.data.v2.RODAMember;
+import pt.gov.dgarq.roda.core.data.v2.RodaGroup;
 import pt.gov.dgarq.roda.core.data.v2.RodaSimpleUser;
+import pt.gov.dgarq.roda.core.data.v2.RodaUser;
 import pt.gov.dgarq.roda.core.stubs.UserBrowser;
 import pt.gov.dgarq.roda.core.stubs.UserEditor;
 import pt.gov.dgarq.roda.core.stubs.UserRegistration;
@@ -787,6 +795,44 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
 		// }
 		//
 		// }, adapter);
+	}
+
+	private static final Set<String> ALL_ROLES = new HashSet<>(
+			Arrays.asList("browse", "search", "administration.user"));
+	private static final Set<String> DIRECT_ROLES = new HashSet<>(
+			Arrays.asList("browse", "search", "administration.user"));
+
+	private static final Set<String> LFARIA_GROUPS = new HashSet<String>(Arrays.asList("admin"));
+	private static final Set<String> ADMIN_ALL_GROUPS = new HashSet<>(
+			Arrays.asList("users", "producers", "archivists"));
+	private static final Set<String> ADMIN_DIRECT_GROUPS = ADMIN_ALL_GROUPS;
+
+	private static final List<RODAMember> TEST_MEMBERS = new ArrayList<>(Arrays.asList(
+			new RodaUser("lfaria", "Luis Faria", "lfaria@keep.pt", false, ALL_ROLES, new HashSet<String>(),
+					LFARIA_GROUPS, LFARIA_GROUPS),
+			new RodaGroup("admin", "Administrators", ALL_ROLES, DIRECT_ROLES, ADMIN_ALL_GROUPS, ADMIN_DIRECT_GROUPS)));
+
+	@Override
+	public Long getMemberCount(Filter filter) throws RODAException {
+		return Long.valueOf(TEST_MEMBERS.size());
+	}
+
+	@Override
+	public IndexResult<RODAMember> findMember(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
+			throws AuthorizationDeniedException, GenericException {
+		return new IndexResult<RODAMember>(
+				sublist.getFirstElementIndex(), sublist
+						.getMaximumElementCount(),
+				Long.valueOf(TEST_MEMBERS.size()), TEST_MEMBERS,
+				Arrays.asList(new FacetFieldResult(RodaConstants.MEMBER_IS_ACTIVE, 2,
+						Arrays.asList(new FacetValue("true", 2), new FacetValue("false", 0)), new ArrayList<String>()),
+						new FacetFieldResult(RodaConstants.MEMBER_IS_USER, 2,
+								Arrays.asList(new FacetValue("true", 1), new FacetValue("false", 1)),
+								new ArrayList<String>()),
+						new FacetFieldResult(RodaConstants.MEMBER_GROUPS_ALL, 4,
+								Arrays.asList(new FacetValue("admin", 1), new FacetValue("archivists", 1),
+										new FacetValue("users", 1), new FacetValue("producers", 1)),
+								new ArrayList<String>())));
 	}
 
 	// protected final DateFormat FORMAT_DATE = new SimpleDateFormat("yyyy-MM-dd

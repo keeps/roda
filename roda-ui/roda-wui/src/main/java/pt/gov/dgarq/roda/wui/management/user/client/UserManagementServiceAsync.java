@@ -15,6 +15,7 @@ import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
+import pt.gov.dgarq.roda.core.data.v2.RODAMember;
 import pt.gov.dgarq.roda.wui.common.client.PrintReportException;
 
 /**
@@ -406,5 +407,10 @@ public interface UserManagementServiceAsync {
 	 * @throws PrintReportException
 	 */
 	public void setUserLogReportInfo(ContentAdapter adapter, String localeString, AsyncCallback<Void> callback);
+
+	void getMemberCount(Filter filter, AsyncCallback<Long> callback);
+
+	void findMember(Filter filter, Sorter sorter, Sublist sublist, Facets facets,
+			AsyncCallback<IndexResult<RODAMember>> callback);
 
 }

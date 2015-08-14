@@ -2,10 +2,9 @@ package pt.gov.dgarq.roda.core.data.v2;
 
 import java.io.Serializable;
 
-public class RodaSimpleUser implements Serializable {
+public class RodaSimpleUser extends RodaPrincipal implements Serializable {
 	private static final long serialVersionUID = 6514790636010895870L;
 
-	private String username;
 	private String email;
 	private boolean guest;
 
@@ -13,19 +12,10 @@ public class RodaSimpleUser implements Serializable {
 		super();
 	}
 
-	public RodaSimpleUser(String username, String email, boolean guest) {
-		super();
-		this.username = username;
+	public RodaSimpleUser(String id, String name, String email, boolean guest) {
+		super(id, name);
 		this.email = email;
 		this.guest = guest;
-	}
-
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
 	}
 
 	public String getEmail() {
@@ -45,17 +35,11 @@ public class RodaSimpleUser implements Serializable {
 	}
 
 	@Override
-	public String toString() {
-		return "RodaSimpleUser [username=" + username + ", email=" + email + ", guest=" + guest + "]";
-	}
-
-	@Override
 	public int hashCode() {
 		final int prime = 31;
-		int result = 1;
+		int result = super.hashCode();
 		result = prime * result + ((email == null) ? 0 : email.hashCode());
 		result = prime * result + (guest ? 1231 : 1237);
-		result = prime * result + ((username == null) ? 0 : username.hashCode());
 		return result;
 	}
 
@@ -64,10 +48,10 @@ public class RodaSimpleUser implements Serializable {
 		if (this == obj) {
 			return true;
 		}
-		if (obj == null) {
+		if (!super.equals(obj)) {
 			return false;
 		}
-		if (!(obj instanceof RodaSimpleUser)) {
+		if (getClass() != obj.getClass()) {
 			return false;
 		}
 		RodaSimpleUser other = (RodaSimpleUser) obj;
@@ -81,14 +65,22 @@ public class RodaSimpleUser implements Serializable {
 		if (guest != other.guest) {
 			return false;
 		}
-		if (username == null) {
-			if (other.username != null) {
-				return false;
-			}
-		} else if (!username.equals(other.username)) {
-			return false;
-		}
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("RodaSimpleUser [getId()=");
+		builder.append(getId());
+		builder.append(", getName()=");
+		builder.append(getName());
+		builder.append(", email=");
+		builder.append(email);
+		builder.append(", guest=");
+		builder.append(guest);
+		builder.append("]");
+		return builder.toString();
 	}
 
 }

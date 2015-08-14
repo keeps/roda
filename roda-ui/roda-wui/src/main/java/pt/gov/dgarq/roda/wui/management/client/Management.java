@@ -3,6 +3,9 @@
  */
 package pt.gov.dgarq.roda.wui.management.client;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Widget;
+
 import pt.gov.dgarq.roda.wui.common.client.BadHistoryTokenException;
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
@@ -11,11 +14,9 @@ import pt.gov.dgarq.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import pt.gov.dgarq.roda.wui.management.editor.client.MetadataEditor;
 import pt.gov.dgarq.roda.wui.management.event.client.EventManagement;
 import pt.gov.dgarq.roda.wui.management.statistics.client.Statistics;
+import pt.gov.dgarq.roda.wui.management.user.client.MemberManagement;
 import pt.gov.dgarq.roda.wui.management.user.client.UserLog;
 import pt.gov.dgarq.roda.wui.management.user.client.WUIUserManagement;
-
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Widget;
 
 /**
  * @author Luis Faria
@@ -32,7 +33,7 @@ public class Management {
 
 		@Override
 		public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-			UserLogin.getInstance().checkRoles(new HistoryResolver[] { WUIUserManagement.getInstance(),
+			UserLogin.getInstance().checkRoles(new HistoryResolver[] { MemberManagement.RESOLVER,
 					EventManagement.getInstance(), Statistics.getInstance(), UserLog.RESOLVER }, false, callback);
 		}
 
@@ -88,8 +89,8 @@ public class Management {
 			init();
 			callback.onSuccess(page);
 		} else {
-			if (historyTokens[0].equals(WUIUserManagement.getInstance().getHistoryToken())) {
-				WUIUserManagement.getInstance().resolve(Tools.tail(historyTokens), callback);
+			if (historyTokens[0].equals(MemberManagement.RESOLVER.getHistoryToken())) {
+				MemberManagement.RESOLVER.resolve(Tools.tail(historyTokens), callback);
 			} else if (historyTokens[0].equals(EventManagement.getInstance().getHistoryToken())) {
 				EventManagement.getInstance().resolve(Tools.tail(historyTokens), callback);
 			} else if (historyTokens[0].equals(MetadataEditor.getInstance().getHistoryToken())) {
