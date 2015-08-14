@@ -239,7 +239,8 @@ public class SolrUtilsTest {
 			filter = new Filter();
 			filter.add(new DateIntervalFilterParameter());
 			stringFilter = SolrUtils.parseFilter(filter);
-			fail("An exception should have been thrown but it wasn't!");
+			assertNotNull(stringFilter);
+			assertThat(stringFilter, Matchers.is("*:*"));
 		} catch (IndexServiceException e) {
 			assertEquals(IndexServiceException.BAD_REQUEST, e.getCode());
 		}

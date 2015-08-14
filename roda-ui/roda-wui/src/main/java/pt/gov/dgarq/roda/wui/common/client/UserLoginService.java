@@ -5,13 +5,11 @@ package pt.gov.dgarq.roda.wui.common.client;
 
 import java.util.Map;
 
-import pt.gov.dgarq.roda.core.common.RODAException;
-import pt.gov.dgarq.roda.core.data.v2.RodaSimpleUser;
-import pt.gov.dgarq.roda.servlet.cas.CASUserPrincipal;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
+
+import pt.gov.dgarq.roda.core.common.RODAException;
 
 /**
  * @author Luis Faria

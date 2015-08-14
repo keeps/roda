@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<name>RODA - Repositório de Objetos Digitais Autênticos</name>
 	<url>http://roda.keep.pt/</url>
@@ -107,7 +106,8 @@
 		<gwt_version>2.7.0</gwt_version>
 		<!-- THE PROPERTY THAT FOLLOWS IS NOT YET IN USE -->
 		<fedora_version>3.6.2</fedora_version>
-		<cas.version>3.5.2</cas.version>
+		<cas.version>4.0.2</cas.version>
+		<cas.client.version>3.2.1</cas.client.version>
 		<roda_community_url>http://roda-community.org</roda_community_url>
 	</properties>
 	<profiles>
@@ -219,7 +219,6 @@
 				</executions>
 			</plugin>
 		</plugins>
-
 		<!--<plugins>
 			<plugin>
 				<groupId>com.googlecode.maven-java-formatter-plugin</groupId>
@@ -296,7 +295,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-war-plugin</artifactId>
-					<version>2.3</version>
+					<version>2.6</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -340,7 +339,7 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore />
+										<ignore/>
 									</action>
 								</pluginExecution>
 							</pluginExecutions>
@@ -955,17 +954,6 @@
 				<version>1.0</version>
 			</dependency>
 			<dependency>
-				<groupId>org.jasig.cas.client</groupId>
-				<artifactId>cas-client-core</artifactId>
-				<version>3.2.1</version>
-				<exclusions>
-					<exclusion>
-						<groupId>javax.servlet</groupId>
-						<artifactId>servlet-api</artifactId>
-					</exclusion>
-				</exclusions>
-			</dependency>
-			<dependency>
 				<groupId>org.opensaml</groupId>
 				<artifactId>opensaml1</artifactId>
 				<version>1.1</version>
@@ -1017,26 +1005,44 @@
 			</dependency>
 			<!-- CAS related dependencies -->
 			<dependency>
-			<groupId>org.yaml</groupId>
-			<artifactId>snakeyaml</artifactId>
-			<version>1.15</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.directory.server</groupId>
-			<artifactId>apacheds-all</artifactId>
-			<version>1.5.5</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.apache.directory.shared</groupId>
-					<artifactId>shared-ldap</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<version>1.5.6</version>
-		</dependency>
+				<groupId>org.jasig.cas</groupId>
+				<artifactId>cas-server-webapp</artifactId>
+				<version>${cas.version}</version>
+				<type>war</type>
+				<scope>runtime</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.jasig.cas</groupId>
+				<artifactId>cas-server-support-ldap</artifactId>
+				<version>${cas.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jasig.cas.client</groupId>
+				<artifactId>cas-client-core</artifactId>
+				<version>${cas.client.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>javax.servlet</groupId>
+						<artifactId>servlet-api</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.yaml</groupId>
+				<artifactId>snakeyaml</artifactId>
+				<version>1.15</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.directory.server</groupId>
+				<artifactId>apacheds-all</artifactId>
+				<version>2.0.0-M20</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.apache.directory.shared</groupId>
+						<artifactId>shared-ldap</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 	<reporting>

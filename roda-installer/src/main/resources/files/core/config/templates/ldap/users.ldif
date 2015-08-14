@@ -1,11 +1,11 @@
 version: 1
 
-dn: ou=users,dc=keep,dc=pt
+dn: ou=users,dc=roda,dc=org
 objectClass: top
 objectClass: organizationalUnit
 ou: users
 
-dn: uid=admin,ou=users,dc=keep,dc=pt
+dn: uid=admin,ou=users,dc=roda,dc=org
 objectClass: extensibleObject
 objectClass: top
 objectClass: person
@@ -19,7 +19,7 @@ shadowInactive: 0
 uid: admin
 userPassword:: cm9kYQ==
 
-dn: uid=roda-wui,ou=users,dc=keep,dc=pt
+dn: uid=roda-wui,ou=users,dc=roda,dc=org
 objectClass: extensibleObject
 objectClass: top
 objectClass: person
@@ -33,7 +33,7 @@ shadowInactive: 0
 uid: roda-wui
 userPassword:: cm9kYQ==
 
-dn: uid=roda-ingest-task,ou=users,dc=keep,dc=pt
+dn: uid=roda-ingest-task,ou=users,dc=roda,dc=org
 objectClass: extensibleObject
 objectClass: top
 objectClass: person
@@ -47,7 +47,7 @@ shadowInactive: 0
 uid: roda-ingest-task
 userPassword:: cm9kYQ==
 
-dn: uid=fedoraAdmin,ou=users,dc=keep,dc=pt
+dn: uid=fedoraAdmin,ou=users,dc=roda,dc=org
 objectClass: extensibleObject
 objectClass: top
 objectClass: person
@@ -61,7 +61,7 @@ shadowInactive: 0
 uid: fedoraAdmin
 userPassword:: cm9kYQ==
 
-dn: uid=roda-preservation-task,ou=users,dc=keep,dc=pt
+dn: uid=roda-preservation-task,ou=users,dc=roda,dc=org
 objectClass: extensibleObject
 objectClass: top
 objectClass: person
@@ -75,7 +75,7 @@ shadowInactive: 0
 uid: roda-preservation-task
 userPassword:: cm9kYQ==
 
-dn: uid=roda-handle,ou=users,dc=keep,dc=pt
+dn: uid=roda-handle,ou=users,dc=roda,dc=org
 objectClass: extensibleObject
 objectClass: top
 objectClass: person
@@ -89,7 +89,7 @@ shadowInactive: 0
 uid: roda-handle
 userPassword:: cm9kYQ==
 
-dn: uid=guest,ou=users,dc=keep,dc=pt
+dn: uid=guest,ou=users,dc=roda,dc=org
 objectClass: extensibleObject
 objectClass: top
 objectClass: person

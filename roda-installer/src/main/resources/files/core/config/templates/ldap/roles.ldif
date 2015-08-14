@@ -1,160 +1,160 @@
 version: 1
 
-dn: ou=roles,dc=keep,dc=pt
+dn: ou=roles,dc=roda,dc=org
 objectClass: top
 objectClass: organizationalUnit
 ou: roles
 
-dn: cn=administrator,ou=roles,dc=keep,dc=pt
+dn: cn=administrator,ou=roles,dc=roda,dc=org
 objectClass: top
 objectClass: organizationalRole
 cn: administrator
 
-dn: cn=misc.logger,ou=roles,dc=keep,dc=pt
+dn: cn=misc.logger,ou=roles,dc=roda,dc=org
 objectClass: top
 objectClass: organizationalRole
 cn: misc.logger
-roleOccupant: cn=administrators,ou=groups,dc=keep,dc=pt
-roleOccupant: uid=roda-wui,ou=users,dc=keep,dc=pt
-roleOccupant: uid=roda-disseminator,ou=users,dc=keep,dc=pt
+roleOccupant: cn=administrators,ou=groups,dc=roda,dc=org
+roleOccupant: uid=roda-wui,ou=users,dc=roda,dc=org
+roleOccupant: uid=roda-disseminator,ou=users,dc=roda,dc=org
 
-dn: cn=logger.monitor,ou=roles,dc=keep,dc=pt
+dn: cn=logger.monitor,ou=roles,dc=roda,dc=org
 objectClass: top
 objectClass: organizationalRole
 cn: logger.monitor
-roleOccupant: cn=administrators,ou=groups,dc=keep,dc=pt
-roleOccupant: uid=roda-wui,ou=users,dc=keep,dc=pt
+roleOccupant: cn=administrators,ou=groups,dc=roda,dc=org
+roleOccupant: uid=roda-wui,ou=users,dc=roda,dc=org
 
-dn: cn=misc.register_user,ou=roles,dc=keep,dc=pt
+dn: cn=misc.register_user,ou=roles,dc=roda,dc=org
 objectClass: top
 objectClass: organizationalRole
 cn: misc.register_user
-roleOccupant: cn=administrators,ou=groups,dc=keep,dc=pt
-roleOccupant: uid=roda-wui,ou=users,dc=keep,dc=pt
+roleOccupant: cn=administrators,ou=groups,dc=roda,dc=org
+roleOccupant: uid=roda-wui,ou=users,dc=roda,dc=org
 
-dn: cn=misc.browse_users,ou=roles,dc=keep,dc=pt
+dn: cn=misc.browse_users,ou=roles,dc=roda,dc=org
 objectClass: top
 objectClass: organizationalRole
 cn: misc.browse_users
-roleOccupant: cn=administrators,ou=groups,dc=keep,dc=pt
-roleOccupant: cn=archivists,ou=groups,dc=keep,dc=pt
-roleOccupant: cn=producers,ou=groups,dc=keep,dc=pt
+roleOccupant: cn=administrators,ou=groups,dc=roda,dc=org
+roleOccupant: cn=archivists,ou=groups,dc=roda,dc=org
+roleOccupant: cn=producers,ou=groups,dc=roda,dc=org
 
-dn: cn=dissemination.search.basic,ou=roles,dc=keep,dc=pt
+dn: cn=dissemination.search.basic,ou=roles,dc=roda,dc=org
 objectClass: top
 objectClass: organizationalRole
 cn: dissemination.search.basic
-roleOccupant: cn=administrators,ou=groups,dc=keep,dc=pt
-roleOccupant: cn=users,ou=groups,dc=keep,dc=pt
+roleOccupant: cn=administrators,ou=groups,dc=roda,dc=org
+roleOccupant: cn=users,ou=groups,dc=roda,dc=org
 
-dn: cn=search,ou=roles,dc=keep,dc=pt
+dn: cn=search,ou=roles,dc=roda,dc=org
 objectClass: top
 objectClass: organizationalRole
 cn: search
-roleOccupant: cn=administrators,ou=groups,dc=keep,dc=pt
-roleOccupant: cn=users,ou=groups,dc=keep,dc=pt
+roleOccupant: cn=administrators,ou=groups,dc=roda,dc=org
+roleOccupant: cn=users,ou=groups,dc=roda,dc=org
 
-dn: cn=dissemination.search.advanced,ou=roles,dc=keep,dc=pt
+dn: cn=dissemination.search.advanced,ou=roles,dc=roda,dc=org
 objectClass: top
 objectClass: organizationalRole
 cn: dissemination.search.advanced
-roleOccupant: cn=administrators,ou=groups,dc=keep,dc=pt
-roleOccupant: cn=users,ou=groups,dc=keep,dc=pt
+roleOccupant: cn=administrators,ou=groups,dc=roda,dc=org
+roleOccupant: cn=users,ou=groups,dc=roda,dc=org
 
-dn: cn=dissemination.browse,ou=roles,dc=keep,dc=pt
+dn: cn=dissemination.browse,ou=roles,dc=roda,dc=org
 objectClass: top
 objectClass: organizationalRole
 cn: dissemination.browse
-roleOccupant: cn=administrators,ou=groups,dc=keep,dc=pt
-roleOccupant: cn=users,ou=groups,dc=keep,dc=pt
+roleOccupant: cn=administrators,ou=groups,dc=roda,dc=org
+roleOccupant: cn=users,ou=groups,dc=roda,dc=org
 
-dn: cn=browse,ou=roles,dc=keep,dc=pt
+dn: cn=browse,ou=roles,dc=roda,dc=org
 objectClass: top
 objectClass: organizationalRole
 cn: browse
-roleOccupant: cn=administrators,ou=groups,dc=keep,dc=pt
-roleOccupant: cn=users,ou=groups,dc=keep,dc=pt
+roleOccupant: cn=administrators,ou=groups,dc=roda,dc=org
+roleOccupant: cn=users,ou=groups,dc=roda,dc=org
 
-dn: cn=administration.user,ou=roles,dc=keep,dc=pt
+dn: cn=administration.user,ou=roles,dc=roda,dc=org
 objectClass: top
 objectClass: organizationalRole
 cn: administration.user
-roleOccupant: cn=administrators,ou=groups,dc=keep,dc=pt
+roleOccupant: cn=administrators,ou=groups,dc=roda,dc=org
 
-dn: cn=administration.event,ou=roles,dc=keep,dc=pt
+dn: cn=administration.event,ou=roles,dc=roda,dc=org
 objectClass: top
 objectClass: organizationalRole
 cn: administration.event
-roleOccupant: cn=administrators,ou=groups,dc=keep,dc=pt
+roleOccupant: cn=administrators,ou=groups,dc=roda,dc=org
 
-dn: cn=administration.metadata_editor,ou=roles,dc=keep,dc=pt
+dn: cn=administration.metadata_editor,ou=roles,dc=roda,dc=org
 objectClass: top
 objectClass: organizationalRole
 cn: administration.metadata_editor
-roleOccupant: cn=administrators,ou=groups,dc=keep,dc=pt
-roleOccupant: cn=archivists,ou=groups,dc=keep,dc=pt
+roleOccupant: cn=administrators,ou=groups,dc=roda,dc=org
+roleOccupant: cn=archivists,ou=groups,dc=roda,dc=org
 
-dn: cn=administration.statistics,ou=roles,dc=keep,dc=pt
+dn: cn=administration.statistics,ou=roles,dc=roda,dc=org
 objectClass: top
 objectClass: organizationalRole
 cn: administration.statistics
-roleOccupant: cn=administrators,ou=groups,dc=keep,dc=pt
+roleOccupant: cn=administrators,ou=groups,dc=roda,dc=org
 
-dn: cn=administration.statistics.monitor,ou=roles,dc=keep,dc=pt
+dn: cn=administration.statistics.monitor,ou=roles,dc=roda,dc=org
 objectClass: top
 objectClass: organizationalRole
 cn: administration.statistics.monitor
-roleOccupant: cn=administrators,ou=groups,dc=keep,dc=pt
+roleOccupant: cn=administrators,ou=groups,dc=roda,dc=org
 
-dn: cn=ingest.pre_ingest,ou=roles,dc=keep,dc=pt
+dn: cn=ingest.pre_ingest,ou=roles,dc=roda,dc=org
 objectClass: top
 objectClass: organizationalRole
 cn: ingest.pre_ingest
-roleOccupant: cn=administrators,ou=groups,dc=keep,dc=pt
-roleOccupant: cn=producers,ou=groups,dc=keep,dc=pt
+roleOccupant: cn=administrators,ou=groups,dc=roda,dc=org
+roleOccupant: cn=producers,ou=groups,dc=roda,dc=org
 
-dn: cn=ingest.load_sips,ou=roles,dc=keep,dc=pt
+dn: cn=ingest.load_sips,ou=roles,dc=roda,dc=org
 objectClass: top
 objectClass: organizationalRole
 cn: ingest.load_sips
-roleOccupant: cn=administrators,ou=groups,dc=keep,dc=pt
-roleOccupant: cn=producers,ou=groups,dc=keep,dc=pt
+roleOccupant: cn=administrators,ou=groups,dc=roda,dc=org
+roleOccupant: cn=producers,ou=groups,dc=roda,dc=org
 
-dn: cn=ingest.list_batch,ou=roles,dc=keep,dc=pt
+dn: cn=ingest.list_batch,ou=roles,dc=roda,dc=org
 objectClass: top
 objectClass: organizationalRole
 cn: ingest.list_batch
-roleOccupant: cn=administrators,ou=groups,dc=keep,dc=pt
+roleOccupant: cn=administrators,ou=groups,dc=roda,dc=org
 
-dn: cn=ingest.list_all_sips,ou=roles,dc=keep,dc=pt
+dn: cn=ingest.list_all_sips,ou=roles,dc=roda,dc=org
 objectClass: top
 objectClass: organizationalRole
 cn: ingest.list_all_sips
-roleOccupant: cn=administrators,ou=groups,dc=keep,dc=pt
+roleOccupant: cn=administrators,ou=groups,dc=roda,dc=org
 
-dn: cn=ingest.list_my_sips,ou=roles,dc=keep,dc=pt
+dn: cn=ingest.list_my_sips,ou=roles,dc=roda,dc=org
 objectClass: top
 objectClass: organizationalRole
 cn: ingest.list_my_sips
-roleOccupant: cn=producers,ou=groups,dc=keep,dc=pt
-roleOccupant: cn=administrators,ou=groups,dc=keep,dc=pt
+roleOccupant: cn=producers,ou=groups,dc=roda,dc=org
+roleOccupant: cn=administrators,ou=groups,dc=roda,dc=org
 
-dn: cn=ingest.batch_validation,ou=roles,dc=keep,dc=pt
+dn: cn=ingest.batch_validation,ou=roles,dc=roda,dc=org
 objectClass: top
 objectClass: organizationalRole
 cn: ingest.batch_validation
-roleOccupant: cn=administrators,ou=groups,dc=keep,dc=pt
+roleOccupant: cn=administrators,ou=groups,dc=roda,dc=org
 
-dn: cn=ingest.accept_reject_sip,ou=roles,dc=keep,dc=pt
+dn: cn=ingest.accept_reject_sip,ou=roles,dc=roda,dc=org
 objectClass: top
 objectClass: organizationalRole
 cn: ingest.accept_reject_sip
-roleOccupant: cn=administrators,ou=groups,dc=keep,dc=pt
+roleOccupant: cn=administrators,ou=groups,dc=roda,dc=org
 
-dn: cn=ingest.insert_files,ou=roles,dc=keep,dc=pt
+dn: cn=ingest.insert_files,ou=roles,dc=roda,dc=org
 objectClass: top
 objectClass: organizationalRole
 cn: ingest.insert_files
-roleOccupant: uid=roda-ingest-task,ou=users,dc=keep,dc=pt
-roleOccupant: uid=roda-preservation-task,ou=users,dc=keep,dc=pt
+roleOccupant: uid=roda-ingest-task,ou=users,dc=roda,dc=org
+roleOccupant: uid=roda-preservation-task,ou=users,dc=roda,dc=org
 

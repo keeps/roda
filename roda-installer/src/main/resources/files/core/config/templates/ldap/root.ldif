@@ -1,9 +1,8 @@
 version: 1
 
-dn: dc=keep,dc=pt
+dn: dc=roda,dc=org
 objectClass: organization
 objectClass: dcObject
 objectClass: top
-dc: keep
-o: KEEPS
-
+dc: roda
+o: RODA

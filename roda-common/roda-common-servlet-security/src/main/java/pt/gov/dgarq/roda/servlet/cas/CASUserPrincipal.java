@@ -3,6 +3,10 @@ package pt.gov.dgarq.roda.servlet.cas;
 import pt.gov.dgarq.roda.core.data.User;
 import pt.gov.dgarq.roda.servlet.UserPrincipal;
 
+/**
+ * FIXME this will be most certainly removed
+ * */
+@Deprecated
 public class CASUserPrincipal extends UserPrincipal{
 	private static final long serialVersionUID = 387759283684834603L;
 	private String proxyGrantingTicket;

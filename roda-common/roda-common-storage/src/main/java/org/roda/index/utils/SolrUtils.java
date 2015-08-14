@@ -244,7 +244,7 @@ public class SolrUtils {
 				} else if (parameter instanceof DateRangeFilterParameter) {
 					DateRangeFilterParameter param = (DateRangeFilterParameter) parameter;
 					appendRange(ret, param.getName(), Date.class, param.getFromValue(), String.class,
-							processToDate(param.getToValue(), param.getGranularity()), true);
+							processToDate(param.getToValue(), param.getGranularity(), false), true);
 				} else if (parameter instanceof DateIntervalFilterParameter) {
 					DateIntervalFilterParameter param = (DateIntervalFilterParameter) parameter;
 					appendRangeInterval(ret, param.getFromName(), param.getToName(), param.getFromValue(),
@@ -283,6 +283,10 @@ public class SolrUtils {
 	}
 
 	private static String processToDate(Date toValue, DateGranularity granularity) {
+		return processToDate(toValue, granularity, true);
+	}
+
+	private static String processToDate(Date toValue, DateGranularity granularity, boolean returnStartOnNull) {
 		final String ret;
 		StringBuilder sb = new StringBuilder();
 		if (toValue != null) {
@@ -312,7 +316,7 @@ public class SolrUtils {
 			}
 			ret = sb.toString();
 		} else {
-			ret = "*";
+			ret = returnStartOnNull ? "*" : null;
 		}
 		return ret;
 	}
@@ -437,12 +441,16 @@ public class SolrUtils {
 		if (values.size() > 0) {
 			appendANDOperator(ret, true);
 
+			System.err.println("1>" + ret + "<");
+
 			ret.append("(");
 			for (int i = 0; i < values.size(); i++) {
 				if (i != 0) {
 					ret.append(" OR ");
 				}
+				System.err.println("2>" + ret + "<");
 				appendExactMatch(ret, key, values.get(i), true, false);
+				System.err.println("3>" + ret + "<");
 			}
 			ret.append(")");
 		}
@@ -450,7 +458,7 @@ public class SolrUtils {
 
 	private static void appendExactMatch(StringBuilder ret, String key, String value, boolean appendDoubleQuotes,
 			boolean prefixWithANDOperatorIfBuilderNotEmpty) {
-		appendANDOperator(ret, true);
+		appendANDOperator(ret, prefixWithANDOperatorIfBuilderNotEmpty);
 
 		ret.append("(").append(key).append(": ").append(appendDoubleQuotes ? "\"" : "").append(value)
 				.append(appendDoubleQuotes ? "\"" : "").append(")");
