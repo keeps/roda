@@ -1,6 +1,9 @@
 package pt.gov.dgarq.roda.common;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,6 +13,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.roda.index.IndexService;
@@ -84,7 +90,7 @@ public class RodaCoreFactory {
 		} catch (URISyntaxException e) {
 			LOGGER.error(e);
 		}
-		
+
 		// try {
 		// populateSipReport();
 		// } catch (ModelServiceException e) {
@@ -146,6 +152,42 @@ public class RodaCoreFactory {
 					"authorized", new SIPStateTransition[] {}, false, 0.1f * (i % 10), "AIP_" + i, "AIP_" + i,
 					new Date(), true));
 		}
+	}
+
+	public static InputStream getConfigurationFile(String relativePath) {
+		InputStream ret;
+		Path staticConfig = getConfigPath().resolve(relativePath);
+
+		if (Files.exists(staticConfig)) {
+			try {
+				ret = new FileInputStream(staticConfig.toFile());
+				LOGGER.info("Using static configuration");
+			} catch (FileNotFoundException e) {
+				LOGGER.warn("Couldn't find static configuration file - " + staticConfig);
+				LOGGER.info("Using internal configuration");
+				ret = RodaCoreFactory.class.getResourceAsStream("/config/" + relativePath);
+			}
+		} else {
+			LOGGER.info("Using internal configuration");
+			ret = RodaCoreFactory.class.getResourceAsStream("/config/" + relativePath);
+		}
+		return ret;
+	}
+
+	public static Configuration getConfiguration(String configurationFile) throws ConfigurationException {
+		Path config = RodaCoreFactory.getConfigPath().resolve(configurationFile);
+		PropertiesConfiguration propertiesConfiguration = new PropertiesConfiguration();
+		propertiesConfiguration.setDelimiterParsingDisabled(true);
+
+		if (Files.exists(config)) {
+			propertiesConfiguration.load(config.toFile());
+			LOGGER.debug("Loading configuration " + config);
+		} else {
+			propertiesConfiguration = null;
+			LOGGER.error("Configuration " + configurationFile + " doesn't exist");
+		}
+
+		return propertiesConfiguration;
 	}
 
 }

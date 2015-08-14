@@ -441,16 +441,12 @@ public class SolrUtils {
 		if (values.size() > 0) {
 			appendANDOperator(ret, true);
 
-			System.err.println("1>" + ret + "<");
-
 			ret.append("(");
 			for (int i = 0; i < values.size(); i++) {
 				if (i != 0) {
 					ret.append(" OR ");
 				}
-				System.err.println("2>" + ret + "<");
 				appendExactMatch(ret, key, values.get(i), true, false);
-				System.err.println("3>" + ret + "<");
 			}
 			ret.append(")");
 		}

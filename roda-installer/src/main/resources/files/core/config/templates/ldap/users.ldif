@@ -15,7 +15,6 @@ cn: RODA
 sn: Administrator
 email: admin@roda.pt
 givenName: RODA Administrator
-shadowInactive: 0
 uid: admin
 userPassword:: cm9kYQ==
 
@@ -29,7 +28,6 @@ cn: RODA
 sn: WUI
 email: roda-wui@roda.pt
 givenName: RODA WUI
-shadowInactive: 0
 uid: roda-wui
 userPassword:: cm9kYQ==
 
@@ -43,7 +41,6 @@ cn: RODA
 sn: Ingest Task
 email: roda-ingest-task@roda.pt
 givenName: RODA Ingest Task
-shadowInactive: 0
 uid: roda-ingest-task
 userPassword:: cm9kYQ==
 
@@ -57,7 +54,6 @@ cn: RODA
 sn: Fedora Admin
 email: fedoraAdmin@roda.pt
 givenName: Fedora Admin
-shadowInactive: 0
 uid: fedoraAdmin
 userPassword:: cm9kYQ==
 
@@ -71,7 +67,6 @@ cn: RODA
 sn: Preservation Task
 email: roda-preservation-task@roda.pt
 givenName: RODA Preservation Task
-shadowInactive: 0
 uid: roda-preservation-task
 userPassword:: cm9kYQ==
 
@@ -85,7 +80,6 @@ cn: RODA Handle
 sn: Handle
 email: handle@roda.pt
 givenName: RODA
-shadowInactive: 0
 uid: roda-handle
 userPassword:: cm9kYQ==
 
@@ -99,7 +93,6 @@ cn: RODA
 sn: Guest
 email: guest@roda.pt
 givenName: RODA Guest
-shadowInactive: 0
 uid: guest
 userPassword:: cm9kYQ==
 

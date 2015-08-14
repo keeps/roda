@@ -1,7 +1,8 @@
 package pt.gov.dgarq.roda.wui.filter;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.Principal;
 import java.util.Hashtable;
 
@@ -25,8 +26,8 @@ import org.apache.directory.server.core.jndi.CoreContextFactory;
 import org.apache.log4j.Logger;
 import org.jasig.cas.client.util.CommonUtils;
 
+import pt.gov.dgarq.roda.common.RodaCoreFactory;
 import pt.gov.dgarq.roda.common.UserUtility;
-import pt.gov.dgarq.roda.core.data.User;
 import pt.gov.dgarq.roda.core.data.v2.RodaSimpleUser;
 
 /**
@@ -35,9 +36,9 @@ import pt.gov.dgarq.roda.core.data.v2.RodaSimpleUser;
 public class RolesSetterFilter implements Filter {
 	static final private Logger logger = Logger.getLogger(RolesSetterFilter.class);
 	FilterConfig config;
-	
+
 	protected String casLogoutURL = null;
-	
+
 	protected String configFile = "roda-wui.properties";
 
 	public void setFilterConfig(FilterConfig config) {
@@ -53,7 +54,7 @@ public class RolesSetterFilter implements Filter {
 		Configuration configuration = null;
 		try {
 
-			configuration = getConfiguration(configFile);
+			configuration = RodaCoreFactory.getConfiguration(configFile);
 
 		} catch (ConfigurationException e) {
 			logger.error("Error reading configuration file " + configFile + " - " + e.getMessage());
@@ -63,7 +64,7 @@ public class RolesSetterFilter implements Filter {
 			casLogoutURL = configuration.getString("roda.cas.url") + "/logout";
 		}
 
-		logger.error(getClass().getSimpleName() + " initialized ok");
+		logger.info(getClass().getSimpleName() + " initialized ok");
 	}
 
 	/**
@@ -88,43 +89,41 @@ public class RolesSetterFilter implements Filter {
 		try {
 			HttpServletRequest servletRequest = (HttpServletRequest) request;
 			HttpServletResponse servletResponse = (HttpServletResponse) response;
-			if(servletRequest.getUserPrincipal()!=null){
-				logger.error("servletRequest.getUserPrincipal() SET : "+servletRequest.getUserPrincipal().getName());
-				if(existUser(servletRequest.getUserPrincipal().getName())){
+			if (servletRequest.getUserPrincipal() != null) {
+				logger.error("servletRequest.getUserPrincipal() SET : " + servletRequest.getUserPrincipal().getName());
+				if (existUser(servletRequest.getUserPrincipal().getName())) {
 					logger.error("User exists internally...");
 					UserUtility.setUser(servletRequest, getUser(servletRequest.getUserPrincipal()));
-				}else{
+				} else {
 					logger.error("User does not exist internally...");
 					RodaSimpleUser rsu = getUser(servletRequest.getUserPrincipal());
 					addUserToDefault(request, rsu);
-					UserUtility.setUser(servletRequest,rsu);
+					UserUtility.setUser(servletRequest, rsu);
 				}
-			}else{
+			} else {
 				logger.error("servletRequest.getUserPrincipal() NOT SET");
-				if(UserUtility.getUser(servletRequest)==null){
+				if (UserUtility.getUser(servletRequest) == null) {
 					logger.error("User not in request... Setting guest...");
 					UserUtility.setUser(servletRequest, getGuest());
-				}else{
+				} else {
 					logger.error("User in request ;) ");
 				}
-				
-				
-				
+
 			}
-			
+
 			String url = servletRequest.getRequestURL().toString();
 			if (url.endsWith("/login")) {
 				url = url.substring(0, url.indexOf("login"));
 				servletResponse.sendRedirect(url);
-			}else if(url.endsWith("/logout")){
+			} else if (url.endsWith("/logout")) {
 				url = url.substring(0, url.indexOf("logout"));
 				UserUtility.logout(servletRequest);
-				String urlToRedirectTo = CommonUtils.constructRedirectUrl(casLogoutURL, "service", url, false,false);
+				String urlToRedirectTo = CommonUtils.constructRedirectUrl(casLogoutURL, "service", url, false, false);
 				servletResponse.sendRedirect(urlToRedirectTo);
-			}else{
+			} else {
 				chain.doFilter(request, response);
 			}
-			
+
 		} catch (Throwable t) {
 			logger.error(t.getMessage(), t);
 		}
@@ -138,11 +137,11 @@ public class RolesSetterFilter implements Filter {
 	}
 
 	private void addUserToDefault(ServletRequest request, RodaSimpleUser userPrincipal) {
-		//TODO addUser...
+		// TODO addUser...
 	}
 
 	private RodaSimpleUser getUser(Principal userPrincipal) {
-		logger.error("Getting  user: "+userPrincipal.getName());
+		logger.error("Getting  user: " + userPrincipal.getName());
 		RodaSimpleUser rsu = new RodaSimpleUser();
 		rsu.setUsername(userPrincipal.getName());
 		rsu.setGuest(false);
@@ -150,19 +149,17 @@ public class RolesSetterFilter implements Filter {
 	}
 
 	private boolean existUser(String name) {
-		logger.error("Checking if user "+name+" exists...");
+		logger.error("Checking if user " + name + " exists...");
 		return true;
 	}
 
-	
-
 	private SearchControls getSimpleSearchControls() {
-	    SearchControls searchControls = new SearchControls();
-	    searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-	    searchControls.setTimeLimit(30000);
-	    return searchControls;
+		SearchControls searchControls = new SearchControls();
+		searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+		searchControls.setTimeLimit(30000);
+		return searchControls;
 	}
-	
+
 	protected Hashtable<Object, Object> createEnv(ServletContext servletContext) {
 
 		// Fetch directory servive from servlet context
@@ -173,43 +170,12 @@ public class RolesSetterFilter implements Filter {
 		env.put(Context.PROVIDER_URL, "");
 		env.put(Context.INITIAL_CONTEXT_FACTORY, CoreContextFactory.class.getName());
 
+		// FIXME
 		env.put(Context.SECURITY_PRINCIPAL, "uid=admin,ou=system");
 		env.put(Context.SECURITY_CREDENTIALS, "secret");
 		env.put(Context.SECURITY_AUTHENTICATION, "simple");
 
 		return env;
-	}
-	
-	private Configuration getConfiguration(String configurationFile) throws ConfigurationException {
-
-		File RODA_HOME = null;
-		if (System.getProperty("roda.home") != null) {
-			RODA_HOME = new File(System.getProperty("roda.home"));//$NON-NLS-1$
-			logger.error("RODA_HOME defined as " + RODA_HOME);
-		} else if (System.getenv("RODA_HOME") != null) {
-			RODA_HOME = new File(System.getenv("RODA_HOME")); //$NON-NLS-1$
-			logger.error("RODA_HOME defined as " + RODA_HOME);
-		} else {
-			RODA_HOME = new File("."); //$NON-NLS-1$
-			logger.error("RODA_HOME not defined. Using current directory '" + RODA_HOME + "'");
-		}
-
-		File RODA_CONFIG_DIRECTORY = new File(RODA_HOME, "config"); //$NON-NLS-1$
-
-		PropertiesConfiguration propertiesConfiguration = new PropertiesConfiguration();
-		propertiesConfiguration.setDelimiterParsingDisabled(true);
-
-		File externalConfigurationFile = new File(RODA_CONFIG_DIRECTORY, configurationFile);
-
-		if (externalConfigurationFile.isFile()) {
-			propertiesConfiguration.load(externalConfigurationFile);
-			logger.error("Loading configuration " + externalConfigurationFile);
-		} else {
-			propertiesConfiguration = null;
-			logger.error("Configuration " + configurationFile + " doesn't exist");
-		}
-
-		return propertiesConfiguration;
 	}
 
 }
