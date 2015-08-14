@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.directory.server.core.DirectoryService;
+import org.apache.directory.server.core.api.DirectoryService;
 import org.apache.directory.server.core.jndi.CoreContextFactory;
 import org.apache.log4j.Logger;
 import org.jasig.cas.client.util.CommonUtils;

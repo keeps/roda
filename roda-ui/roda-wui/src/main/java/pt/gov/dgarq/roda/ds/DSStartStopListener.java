@@ -6,31 +6,37 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 
-import javax.naming.NamingException;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.apache.directory.server.core.CoreSession;
+import org.apache.directory.api.ldap.model.entry.DefaultEntry;
+import org.apache.directory.api.ldap.model.entry.Entry;
+import org.apache.directory.api.ldap.model.exception.LdapException;
+import org.apache.directory.api.ldap.model.ldif.LdifEntry;
+import org.apache.directory.api.ldap.model.ldif.LdifReader;
+import org.apache.directory.api.ldap.model.name.Dn;
+import org.apache.directory.api.ldap.model.schema.LdapComparator;
+import org.apache.directory.api.ldap.model.schema.SchemaManager;
+import org.apache.directory.api.ldap.model.schema.comparators.NormalizingComparator;
+import org.apache.directory.api.ldap.model.schema.registries.ComparatorRegistry;
+import org.apache.directory.api.ldap.model.schema.registries.SchemaLoader;
+import org.apache.directory.api.ldap.schema.loader.LdifSchemaLoader;
+import org.apache.directory.api.ldap.schema.manager.impl.DefaultSchemaManager;
 import org.apache.directory.server.core.DefaultDirectoryService;
-import org.apache.directory.server.core.DirectoryService;
-import org.apache.directory.server.core.entry.DefaultServerEntry;
-import org.apache.directory.server.core.entry.ServerEntry;
-import org.apache.directory.server.core.partition.Partition;
+import org.apache.directory.server.core.api.DirectoryService;
+import org.apache.directory.server.core.api.InstanceLayout;
+import org.apache.directory.server.core.api.partition.Partition;
 import org.apache.directory.server.core.partition.impl.btree.jdbm.JdbmIndex;
 import org.apache.directory.server.core.partition.impl.btree.jdbm.JdbmPartition;
 import org.apache.directory.server.ldap.LdapServer;
 import org.apache.directory.server.protocol.shared.transport.TcpTransport;
-import org.apache.directory.server.schema.registries.Registries;
-import org.apache.directory.server.xdbm.Index;
-import org.apache.directory.shared.ldap.exception.LdapNameNotFoundException;
-import org.apache.directory.shared.ldap.ldif.LdifEntry;
-import org.apache.directory.shared.ldap.ldif.LdifReader;
-import org.apache.directory.shared.ldap.name.LdapDN;
 import org.apache.log4j.Logger;
 
-import pt.gov.dgarq.roda.common.UserUtility; 
+import pt.gov.dgarq.roda.common.UserUtility;
+
 
 public class DSStartStopListener implements ServletContextListener
 {
@@ -65,7 +71,7 @@ public class DSStartStopListener implements ServletContextListener
 			} else {
 				RODA_HOME = new File(".");
 			}
-        	
+        	 
         	File rodaDataDir = new File(RODA_HOME, "data");
         	RODA_APACHE_DS_DIRECTORY =  new File(rodaDataDir, "ldap");
         	
@@ -78,7 +84,8 @@ public class DSStartStopListener implements ServletContextListener
         		initializeDS = true;
         	}
         	
-        	
+        	File schemaRepository = new File( RODA_APACHE_DS_DIRECTORY, "schema" );
+        	schemaRepository.mkdirs();
         	InputStream relsStream = getConfigurationFile("roda-wui.properties");
 			Properties dsProperties = new Properties();
 			dsProperties.load(relsStream);
@@ -87,17 +94,38 @@ public class DSStartStopListener implements ServletContextListener
 			
             directoryService = new DefaultDirectoryService();
             directoryService.setShutdownHookEnabled( true );
+            
+            SchemaLoader loader = new LdifSchemaLoader( schemaRepository );
+            SchemaManager schemaManager = new DefaultSchemaManager( loader );
+
+            // We have to load the schema now, otherwise we won't be able
+            // to initialize the Partitions, as we won't be able to parse
+            // and normalize their suffix Dn
+            schemaManager.loadAllEnabled();
+
+            // Tell all the normalizer comparators that they should not normalize anything
+            ComparatorRegistry comparatorRegistry = schemaManager.getComparatorRegistry();
+
+            for ( LdapComparator<?> comparator : comparatorRegistry )
+            {
+              if ( comparator instanceof NormalizingComparator )
+              {
+                ( ( NormalizingComparator ) comparator ).setOnServer();
+              }
+            }
+
+            directoryService.setSchemaManager( schemaManager );
+            
  
             ldapServer = new LdapServer();
             ldapServer.setDirectoryService( directoryService );
-            ldapServer.setAllowAnonymousAccess( true );
  
             TcpTransport ldapTransport = new TcpTransport( dsPort );
             ldapServer.setTransports( ldapTransport );
  
             // Determine an appropriate working directory
             ServletContext servletContext = evt.getServletContext();
-            directoryService.setWorkingDirectory( RODA_APACHE_DS_DIRECTORY );
+            directoryService.setInstanceLayout( new InstanceLayout( RODA_APACHE_DS_DIRECTORY ) );
 
             Partition keepPartition = addPartition( "keep", "dc=keep,dc=pt" );
             
@@ -112,12 +140,11 @@ public class DSStartStopListener implements ServletContextListener
             {
                 directoryService.getAdminSession().lookup( keepPartition.getSuffixDn() );
             }
-            catch ( LdapNameNotFoundException lnnfe )
+            catch ( LdapException lnnfe )
             {
-                LdapDN dnFoo = new LdapDN( "dc=keep,dc=pt" );
-                ServerEntry entryKeep = directoryService.newEntry( dnFoo );
+                Dn dnFoo = new Dn( "dc=keep,dc=pt" );
+                Entry entryKeep = directoryService.newEntry( dnFoo );
                 entryKeep.add( "objectClass", "top", "domain", "extensibleObject" );
-                entryKeep.add( "dc", "foo" );
                 directoryService.getAdminSession().add( entryKeep );
             }
             
@@ -158,10 +185,9 @@ public class DSStartStopListener implements ServletContextListener
 			File file = new File(roda_home, "config" + File.separator + "ldap" + File.separator
 					+ fileName);
 			LdifReader entries = new LdifReader(new FileInputStream(file));
-	        CoreSession rootDSE = directoryService.getAdminSession();
 	        for (LdifEntry ldifEntry : entries) {
-	            Registries registries = rootDSE.getDirectoryService().getRegistries();
-	            rootDSE.add(new DefaultServerEntry(rootDSE.getDirectoryService().getRegistries(), ldifEntry.getEntry()));
+	        	 DefaultEntry newEntry = new DefaultEntry(directoryService.getSchemaManager(), ldifEntry.getEntry());
+	        	 directoryService.getAdminSession().add( newEntry );
 	        }
     	}catch(Throwable t){
     		logger.error(t.getMessage(),t);
@@ -186,27 +212,24 @@ public class DSStartStopListener implements ServletContextListener
     }
     
     
-    
     private Partition addPartition( String partitionId, String partitionDn ) throws Exception
     {
         // Create a new partition named 'foo'.
-        Partition partition = new JdbmPartition();
+    	Partition partition = new JdbmPartition( directoryService.getSchemaManager(), directoryService.getDnFactory() );
         partition.setId( partitionId );
-        partition.setSuffix( partitionDn );
+        partition.setSuffixDn(new Dn(partitionDn));
         directoryService.addPartition( partition );
          
         return partition;
     }
     private void addIndex( Partition partition, String... attrs )
     {
-        // Index some attributes on the apache partition
-        HashSet<Index<?, ServerEntry>> indexedAttributes = new HashSet<Index<?, ServerEntry>>();
-        
-        for ( String attribute:attrs )
+    	Set indexedAttributes = new HashSet();
+
+        for ( String attribute : attrs )
         {
-            indexedAttributes.add( new JdbmIndex<String,ServerEntry>( attribute ) );
+            indexedAttributes.add( new JdbmIndex( attribute, false ) );
         }
-        
         ((JdbmPartition)partition).setIndexedAttributes( indexedAttributes );
     }
     
