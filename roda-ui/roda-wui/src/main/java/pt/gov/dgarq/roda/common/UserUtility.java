@@ -42,9 +42,9 @@ public class UserUtility {
 	public static void checkRoles(RodaSimpleUser rsu, List<String> rolesToCheck)
 			throws AuthorizationDeniedException {
 		RodaUser ru = getFullUser(rsu);
-		if (!Arrays.asList(ru.getRoles()).containsAll(rolesToCheck)) {
+		if (!Arrays.asList(ru.getAllRoles()).containsAll(rolesToCheck)) {
 			throw new AuthorizationDeniedException(
-					"The user '" + ru.getUsername() + "' does not have all needed permissions: " + rolesToCheck);
+					"The user '" + ru.getId() + "' does not have all needed permissions: " + rolesToCheck);
 		}
 	}
 	
@@ -52,9 +52,9 @@ public class UserUtility {
 	public static void checkRoles(RodaSimpleUser rsu, List<String> rolesToCheck, HttpServletRequest request)
 			throws AuthorizationDeniedException {
 		RodaUser ru = getFullUser(rsu);
-		if (!Arrays.asList(ru.getRoles()).containsAll(rolesToCheck)) {
+		if (!Arrays.asList(ru.getAllRoles()).containsAll(rolesToCheck)) {
 			throw new AuthorizationDeniedException(
-					"The user '" + ru.getUsername() + "' does not have all needed permissions: " + rolesToCheck);
+					"The user '" + ru.getId() + "' does not have all needed permissions: " + rolesToCheck);
 		}
 	}
 
@@ -78,7 +78,7 @@ public class UserUtility {
 		roles.add("misc.register_user");
 		roles.add("misc.browse_users");
 
-		u.setRoles(roles);
+		u.setAllRoles(roles);
 		u.setDirectRoles(roles);
 		return u;
 	}

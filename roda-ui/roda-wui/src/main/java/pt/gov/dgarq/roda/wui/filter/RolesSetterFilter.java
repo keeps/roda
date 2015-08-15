@@ -131,7 +131,7 @@ public class RolesSetterFilter implements Filter {
 
 	private RodaSimpleUser getGuest() {
 		RodaSimpleUser rsu = new RodaSimpleUser();
-		rsu.setUsername("guest");
+		rsu.setId("guest");
 		rsu.setGuest(true);
 		return rsu;
 	}
@@ -143,7 +143,7 @@ public class RolesSetterFilter implements Filter {
 	private RodaSimpleUser getUser(Principal userPrincipal) {
 		logger.error("Getting  user: " + userPrincipal.getName());
 		RodaSimpleUser rsu = new RodaSimpleUser();
-		rsu.setUsername(userPrincipal.getName());
+		rsu.setId(userPrincipal.getName());
 		rsu.setGuest(false);
 		return rsu;
 	}

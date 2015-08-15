@@ -69,9 +69,9 @@ public class UserLoginServiceImpl extends RemoteServiceServlet implements
 				.getThreadLocalRequest());
 		;
 		AuthenticatedUser u = new AuthenticatedUser();
-		u.setName(user.getUsername());
+		u.setName(user.getId());
 		u.setGuest(user.isGuest());
-		Set<String> roles = UserUtility.getFullUser(user).getRoles();
+		Set<String> roles = UserUtility.getFullUser(user).getAllRoles();
 		String[] rolesArray = roles.toArray(new String[roles.size()]);
 		
 		u.setRoles(rolesArray);

@@ -37,6 +37,7 @@ import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
+import pt.gov.dgarq.roda.core.data.v2.RodaSimpleUser;
 import pt.gov.dgarq.roda.core.data.v2.SIPReport;
 import pt.gov.dgarq.roda.servlet.cas.CASUserPrincipal;
 import pt.gov.dgarq.roda.wui.common.client.GenericException;
@@ -71,18 +72,18 @@ public class IngestListServiceImpl extends RemoteServiceServlet implements Inges
 	// find
 
 	public Long countSipReports(Filter filter) throws AuthorizationDeniedException, GenericException {
-		CASUserPrincipal user = UserUtility.getUser(getThreadLocalRequest());
+		RodaSimpleUser user = UserUtility.getUser(getThreadLocalRequest());
 		return IngestList.countSipReports(user, filter);
 	}
 
 	public IndexResult<SIPReport> findSipReports(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
 			throws AuthorizationDeniedException, GenericException {
-		CASUserPrincipal user = UserUtility.getUser(getThreadLocalRequest());
+		RodaSimpleUser user = UserUtility.getUser(getThreadLocalRequest());
 		return IngestList.findSipReports(user, filter, sorter, sublist, facets);
 	}
 
 	public SIPReport retrieveSipReport(String sipReportId) throws AuthorizationDeniedException, GenericException {
-		CASUserPrincipal user = UserUtility.getUser(getThreadLocalRequest());
+		RodaSimpleUser user = UserUtility.getUser(getThreadLocalRequest());
 		return IngestList.retrieveSipReport(user, sipReportId);
 	}
 

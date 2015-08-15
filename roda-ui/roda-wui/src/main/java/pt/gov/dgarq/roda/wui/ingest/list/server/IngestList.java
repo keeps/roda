@@ -10,6 +10,7 @@ import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
+import pt.gov.dgarq.roda.core.data.v2.RodaSimpleUser;
 import pt.gov.dgarq.roda.core.data.v2.SIPReport;
 import pt.gov.dgarq.roda.servlet.cas.CASUserPrincipal;
 import pt.gov.dgarq.roda.wui.common.client.GenericException;
@@ -22,7 +23,7 @@ public class IngestList extends RodaCoreService {
 		super();
 	}
 
-	public static Long countSipReports(CASUserPrincipal user, Filter filter)
+	public static Long countSipReports(RodaSimpleUser user, Filter filter)
 			throws AuthorizationDeniedException, GenericException {
 		Date start = new Date();
 
@@ -39,7 +40,7 @@ public class IngestList extends RodaCoreService {
 		return count;
 	}
 
-	public static IndexResult<SIPReport> findSipReports(CASUserPrincipal user, Filter filter, Sorter sorter,
+	public static IndexResult<SIPReport> findSipReports(RodaSimpleUser user, Filter filter, Sorter sorter,
 			Sublist sublist, Facets facets) throws AuthorizationDeniedException, GenericException {
 		Date start = new Date();
 
@@ -57,7 +58,7 @@ public class IngestList extends RodaCoreService {
 		return ret;
 	}
 
-	public static SIPReport retrieveSipReport(CASUserPrincipal user, String sipReportId)
+	public static SIPReport retrieveSipReport(RodaSimpleUser user, String sipReportId)
 			throws AuthorizationDeniedException, GenericException {
 		Date start = new Date();
 
