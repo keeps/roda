@@ -77,11 +77,14 @@ import pt.gov.dgarq.roda.core.data.v2.EventPreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.FacetFieldResult;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
+import pt.gov.dgarq.roda.core.data.v2.RODAMember;
 import pt.gov.dgarq.roda.core.data.v2.RODAObject;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationFilePreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationPreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationState;
+import pt.gov.dgarq.roda.core.data.v2.RodaGroup;
+import pt.gov.dgarq.roda.core.data.v2.RodaUser;
 import pt.gov.dgarq.roda.core.data.v2.SIPReport;
 import pt.gov.dgarq.roda.core.data.v2.SIPStateTransition;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
@@ -626,6 +629,8 @@ public class SolrUtils {
 			indexName = RodaConstants.INDEX_ACTION_LOG;
 		} else if (resultClass.equals(SIPReport.class)) {
 			indexName = RodaConstants.INDEX_SIP_REPORT;
+		} else if (resultClass.equals(RODAMember.class)) {
+			indexName = RodaConstants.INDEX_MEMBERS;
 		} else {
 			throw new IndexServiceException("Cannot find class index name: " + resultClass.getName(),
 					IndexServiceException.INTERNAL_SERVER_ERROR);
@@ -1060,7 +1065,7 @@ public class SolrUtils {
 		final long duration = objectToLong(doc.get(RodaConstants.LOG_DURATION));
 		final String id = objectToString(doc.get(RodaConstants.LOG_ID));
 		// final String parameters =
-		// objectToString(doc.get(RodaConstants.LOG_PARAMETERS));
+		// objectToString(docisUser.get(RodaConstants.LOG_PARAMETERS));
 		final String relatedObjectId = objectToString(doc.get(RodaConstants.LOG_RELATED_OBJECT_ID));
 		final String username = objectToString(doc.get(RodaConstants.LOG_USERNAME));
 		LogEntry entry = new LogEntry();
@@ -1179,5 +1184,47 @@ public class SolrUtils {
 		 * sst.getId()); doc.addChildDocument(sstSolrDoc); } }
 		 */
 		return doc;
+	}
+
+	public static SolrInputDocument rodaMemberToSolrDocument(RODAMember member) {
+		SolrInputDocument doc = new SolrInputDocument();
+		doc.addField(RodaConstants.MEMBER_ID, member.getId());
+		doc.addField(RodaConstants.MEMBER_IS_ACTIVE, member.isActive());
+		doc.addField(RodaConstants.MEMBER_IS_USER, member.isUser());
+		doc.addField(RodaConstants.MEMBER_NAME, member.getName());
+		if(member.getAllGroups()!=null){
+			doc.addField(RodaConstants.MEMBER_GROUPS_ALL, new ArrayList<String>(member.getAllGroups()));
+		}
+		if(member.getAllRoles()!=null){
+			doc.addField(RodaConstants.MEMBER_ROLES_ALL, new ArrayList<String>(member.getAllRoles()));
+		}
+		
+		return doc;
+	}
+	
+	private static RODAMember solrDocumentToRodaMember(SolrDocument doc) {
+		final String id = objectToString(doc.get(RodaConstants.MEMBER_ID));
+		final boolean isActive = objectToBoolean(doc.get(RodaConstants.MEMBER_IS_ACTIVE));
+		final boolean isUser = objectToBoolean(doc.get(RodaConstants.MEMBER_IS_USER));
+		final String name = objectToString(doc.get(RodaConstants.MEMBER_NAME));
+		final Set<String> groups = new HashSet<String>(objectToListString(doc.get(RodaConstants.MEMBER_GROUPS_ALL))); 
+		final Set<String> roles = new HashSet<String>(objectToListString(doc.get(RodaConstants.MEMBER_ROLES_ALL))); 
+		if(isUser){
+			RodaUser user = new RodaUser();
+			user.setActive(isActive);
+			user.setAllGroups(groups);
+			user.setAllRoles(roles);
+			user.setActive(isActive);
+			user.setName(name);
+			return user;
+		}else{
+			RodaGroup group = new RodaGroup();
+			group.setActive(isActive);
+			group.setAllGroups(groups);
+			group.setAllRoles(roles);
+			group.setActive(isActive);
+			group.setName(name);
+			return group;
+		}
 	}
 }

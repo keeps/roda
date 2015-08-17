@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
+import pt.gov.dgarq.roda.core.data.v2.RODAMember;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
 import pt.gov.dgarq.roda.core.data.v2.SIPReport;
 
@@ -113,4 +114,21 @@ public abstract class ModelObservable {
 		}
 	}
 
+	protected void notifyRodaMemberCreated(RODAMember member){
+		for (ModelObserver observer : observers) {
+			observer.rodaMemberCreated(member);
+		}
+	}
+	
+	protected void notifyRodaMemberUpdated(RODAMember member){
+		for (ModelObserver observer : observers) {
+			observer.rodaMemberUpdated(member);
+		}
+	}
+	
+	protected void notifyRodaMemberDeleted(String memberID){
+		for (ModelObserver observer : observers) {
+			observer.rodaMemberDeleted(memberID);
+		}
+	}
 }

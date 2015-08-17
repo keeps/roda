@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.v2.EventPreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
+import pt.gov.dgarq.roda.core.data.v2.RODAMember;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationFilePreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.SIPReport;
@@ -268,6 +269,33 @@ public class IndexModelObserver implements ModelObserver {
 			index.commit(RodaConstants.INDEX_REPRESENTATIONS);
 		} catch (SolrServerException | IOException e) {
 			LOGGER.error("Error deleting SIP report (id=" + sipReportId + ")");
+		}
+	}
+	
+	@Override
+	public void rodaMemberCreated(RODAMember member){
+		SolrInputDocument rodaMemberDocument = SolrUtils.rodaMemberToSolrDocument(member);
+		try{
+			index.add(RodaConstants.INDEX_MEMBERS, rodaMemberDocument);
+			index.commit(RodaConstants.INDEX_MEMBERS);
+		} catch (SolrServerException | IOException e) {
+			LOGGER.error("Could not index RodaMember ", e);
+		}
+	}
+	
+	@Override
+	public void rodaMemberUpdated(RODAMember rodaMember) {
+		rodaMemberDeleted(rodaMember.getId());
+		rodaMemberCreated(rodaMember);
+	}
+
+	@Override
+	public void rodaMemberDeleted(String rodaMemberId) {
+		try {
+			index.deleteById(RodaConstants.INDEX_MEMBERS, rodaMemberId);
+			index.commit(RodaConstants.INDEX_MEMBERS);
+		} catch (SolrServerException | IOException e) {
+			LOGGER.error("Error deleting RodaMember (id=" + rodaMemberId + ")");
 		}
 	}
 }

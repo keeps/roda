@@ -15,7 +15,9 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
@@ -46,8 +48,11 @@ import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.LogEntryParameter;
+import pt.gov.dgarq.roda.core.data.v2.RODAMember;
 import pt.gov.dgarq.roda.core.data.v2.RODAObject;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
+import pt.gov.dgarq.roda.core.data.v2.RodaGroup;
+import pt.gov.dgarq.roda.core.data.v2.RodaUser;
 import pt.gov.dgarq.roda.core.data.v2.SIPReport;
 import pt.gov.dgarq.roda.core.data.v2.SIPStateTransition;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
@@ -542,4 +547,48 @@ public class IndexServiceTest {
 
 	}
 
+	
+	
+	@Test
+	public void indexMember() throws IndexServiceException{
+		Set<String> groups = new HashSet<String>();
+		groups.add("admin");
+		Set<String> roles = new HashSet<String>();
+		roles.add("browse");
+		
+		for(int i=0;i<5;i++){
+			if(i%2==0){
+				RodaUser user = new RodaUser();
+				user.setActive(true);
+				user.setAllGroups(groups);
+				user.setAllRoles(roles);
+				user.setDirectGroups(groups);
+				user.setDirectRoles(roles);
+				user.setEmail("mail@example.com");
+				user.setGuest(false);
+				user.setId("USER"+i);
+				user.setName("NAME"+i);
+				model.addRodaMember(user);
+			}else{
+				RodaGroup group = new RodaGroup();
+				group.setActive(true);
+				group.setAllGroups(groups);
+				group.setAllRoles(roles);
+				group.setDirectGroups(groups);
+				group.setDirectRoles(roles);
+				group.setId("USER"+i);
+				group.setName("NAME"+i);
+				model.addRodaMember(group);
+			}
+		}
+		
+		Filter filterUSER1 = new Filter();
+		filterUSER1.add(new SimpleFilterParameter(RodaConstants.MEMBER_ID, "USER1"));
+		assertThat(index.count(RODAMember.class, filterUSER1), Matchers.is(1L));
+		
+		Filter filterGroup = new Filter();
+		filterGroup.add(new SimpleFilterParameter(RodaConstants.MEMBER_IS_USER, "false"));
+		assertThat(index.count(RODAMember.class, filterGroup), Matchers.is(2L));
+
+	}
 }

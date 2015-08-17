@@ -48,6 +48,7 @@ import pt.gov.dgarq.roda.core.data.RODAObjectPermissions;
 import pt.gov.dgarq.roda.core.data.v2.AgentPreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.EventPreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
+import pt.gov.dgarq.roda.core.data.v2.RODAMember;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationFilePreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationPreservationObject;
@@ -1485,6 +1486,12 @@ public class ModelService extends ModelObservable {
 
 	public void addSipReport(SIPReport sipReport) throws ModelServiceException {
 		addSipReport(sipReport, true);
+	}
+	
+	
+	public void addRodaMember(RODAMember member){
+		//dont add to model...
+		notifyRodaMemberCreated(member);
 	}
 
 	
