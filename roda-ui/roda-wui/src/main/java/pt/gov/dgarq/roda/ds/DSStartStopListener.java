@@ -35,11 +35,12 @@ import org.apache.directory.server.core.partition.impl.btree.jdbm.JdbmPartition;
 import org.apache.directory.server.core.partition.ldif.LdifPartition;
 import org.apache.directory.server.ldap.LdapServer;
 import org.apache.directory.server.protocol.shared.transport.TcpTransport;
+import org.apache.log4j.Logger;
 
 import pt.gov.dgarq.roda.common.RodaCoreFactory;
 
 public class DSStartStopListener implements ServletContextListener {
-
+	static final private Logger logger = Logger.getLogger(DSStartStopListener.class);
 	// // First while the server is up and running log into as admin
 	// // (uid=admin,ou=system) using the default password 'secret' and bind to
 	// // ou=system
@@ -208,6 +209,8 @@ public class DSStartStopListener implements ServletContextListener {
 			service.getAdminSession().add(entryApache);
 			
 			applyLdif(RODA_APACHE_DS_CONFIG_DIRECTORY.resolve("users.ldif").toFile());
+			applyLdif(RODA_APACHE_DS_CONFIG_DIRECTORY.resolve("groups.ldif").toFile());
+			applyLdif(RODA_APACHE_DS_CONFIG_DIRECTORY.resolve("roles.ldif").toFile());
 		}
 
 		// We are all done !
@@ -263,6 +266,7 @@ public class DSStartStopListener implements ServletContextListener {
 			initDirectoryService(RODA_APACHE_DS_DATA_DIRECTORY.toFile());
 			startServer();
 		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
 			e.printStackTrace();
 		}
 
