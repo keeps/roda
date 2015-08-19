@@ -28,6 +28,7 @@ import org.roda.storage.fs.FileStorageService;
 
 import pt.gov.dgarq.roda.core.data.v2.SIPReport;
 import pt.gov.dgarq.roda.core.data.v2.SIPStateTransition;
+import pt.gov.dgarq.roda.ds.ApacheDSModelObserver;
 
 public class RodaCoreFactory {
 	private static final Logger LOGGER = Logger.getLogger(RodaCoreFactory.class);
@@ -62,6 +63,8 @@ public class RodaCoreFactory {
 
 			storage = new FileStorageService(storagePath);
 			model = new ModelService(storage);
+			
+			model.addModelObserver(new ApacheDSModelObserver());
 
 			// Configure Solr
 			Path solrHome = Paths.get(RODA_HOME, "config", "index");

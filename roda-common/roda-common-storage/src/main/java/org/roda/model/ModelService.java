@@ -47,6 +47,7 @@ import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.RODAObjectPermissions;
 import pt.gov.dgarq.roda.core.data.v2.AgentPreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.EventPreservationObject;
+import pt.gov.dgarq.roda.core.data.v2.Group;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.RODAMember;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
@@ -54,6 +55,7 @@ import pt.gov.dgarq.roda.core.data.v2.RepresentationFilePreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationPreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationState;
 import pt.gov.dgarq.roda.core.data.v2.SIPReport;
+import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.core.metadata.v2.premis.PremisAgentHelper;
 import pt.gov.dgarq.roda.core.metadata.v2.premis.PremisEventHelper;
 import pt.gov.dgarq.roda.core.metadata.v2.premis.PremisFileObjectHelper;
@@ -1488,12 +1490,40 @@ public class ModelService extends ModelObservable {
 		addSipReport(sipReport, true);
 	}
 	
-	
 	public void addRodaMember(RODAMember member){
-		//dont add to model...
-		notifyRodaMemberCreated(member);
+		notifyRODAMemberCreated(member);
+	}
+	
+	public void updateRODAMember(RODAMember member){
+		notifyRODAMemberUpdated(member);
+	}
+	
+	public void deleteRODAMember(String id){
+		notifyRODAMemberDeleted(id);
+	}
+	
+	public void addUser(User user){
+		notifyUserCreated(user);
+	}
+	
+	public void updateUser(User user){
+		notifyUserUpdated(user);
+	}
+	
+	public void deleteUser(String id){
+		notifyUserDeleted(id);
 	}
 
+	public void addGroup(Group group){
+		notifyGroupCreated(group);
+	}
 	
+	public void updateGroup(Group group){
+		notifyGroupUpdated(group);
+	}
+	
+	public void deleteGroup(String id){
+		notifyGroupDeleted(id);
+	}
 
 }

@@ -20,5 +20,7 @@ public interface RODAMember extends Serializable {
 	public Set<String> getAllRoles();
 
 	public Set<String> getDirectRoles();
+	
+	public boolean isNameValid();
 
 }

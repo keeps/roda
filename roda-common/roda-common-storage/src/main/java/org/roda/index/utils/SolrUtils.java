@@ -75,6 +75,7 @@ import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.data.v2.EventPreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.FacetFieldResult;
+import pt.gov.dgarq.roda.core.data.v2.Group;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.RODAMember;
@@ -91,6 +92,7 @@ import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.core.data.v2.SimpleEventPreservationMetadata;
 import pt.gov.dgarq.roda.core.data.v2.SimpleRepresentationFilePreservationMetadata;
 import pt.gov.dgarq.roda.core.data.v2.SimpleRepresentationPreservationMetadata;
+import pt.gov.dgarq.roda.core.data.v2.User;
 
 /**
  * Utilities class related to Apache Solr
@@ -629,8 +631,10 @@ public class SolrUtils {
 			indexName = RodaConstants.INDEX_ACTION_LOG;
 		} else if (resultClass.equals(SIPReport.class)) {
 			indexName = RodaConstants.INDEX_SIP_REPORT;
-		} else if (resultClass.equals(RODAMember.class)) {
-			indexName = RodaConstants.INDEX_MEMBERS;
+		} else if (resultClass.equals(User.class)) {
+			indexName = RodaConstants.INDEX_USERS;
+		} else if (resultClass.equals(Group.class)) {
+			indexName = RodaConstants.INDEX_GROUPS;
 		} else {
 			throw new IndexServiceException("Cannot find class index name: " + resultClass.getName(),
 					IndexServiceException.INTERNAL_SERVER_ERROR);
@@ -1226,5 +1230,69 @@ public class SolrUtils {
 			group.setName(name);
 			return group;
 		}
+	}
+	
+	public static SolrInputDocument userToSolrDocument(User user) {
+		SolrInputDocument doc = new SolrInputDocument();
+		doc.addField(RodaConstants.MEMBER_ID, user.getId());
+		doc.addField(RodaConstants.MEMBER_IS_ACTIVE, user.isActive());
+		doc.addField(RodaConstants.MEMBER_IS_USER, user.isUser());
+		doc.addField(RodaConstants.MEMBER_NAME, user.getName());
+		if(user.getAllGroups()!=null){
+			doc.addField(RodaConstants.MEMBER_GROUPS_ALL, new ArrayList<String>(user.getAllGroups()));
+		}
+		if(user.getAllRoles()!=null){
+			doc.addField(RodaConstants.MEMBER_ROLES_ALL, new ArrayList<String>(user.getAllRoles()));
+		}
+		
+		return doc;
+	}
+	
+	private static User solrDocumentToUser(SolrDocument doc) {
+		final String id = objectToString(doc.get(RodaConstants.MEMBER_ID));
+		final boolean isActive = objectToBoolean(doc.get(RodaConstants.MEMBER_IS_ACTIVE));
+		final boolean isUser = objectToBoolean(doc.get(RodaConstants.MEMBER_IS_USER));
+		final String name = objectToString(doc.get(RodaConstants.MEMBER_NAME));
+		final Set<String> groups = new HashSet<String>(objectToListString(doc.get(RodaConstants.MEMBER_GROUPS_ALL))); 
+		final Set<String> roles = new HashSet<String>(objectToListString(doc.get(RodaConstants.MEMBER_ROLES_ALL))); 
+		User user = new User();
+		user.setActive(isActive);
+		user.setAllGroups(groups);
+		user.setAllRoles(roles);
+		user.setActive(isActive);
+		user.setName(name);
+		return user;
+	}
+	
+	public static SolrInputDocument groupToSolrDocument(Group group) {
+		SolrInputDocument doc = new SolrInputDocument();
+		doc.addField(RodaConstants.MEMBER_ID, group.getId());
+		doc.addField(RodaConstants.MEMBER_IS_ACTIVE, group.isActive());
+		doc.addField(RodaConstants.MEMBER_IS_USER, group.isUser());
+		doc.addField(RodaConstants.MEMBER_NAME, group.getName());
+		if(group.getAllGroups()!=null){
+			doc.addField(RodaConstants.MEMBER_GROUPS_ALL, new ArrayList<String>(group.getAllGroups()));
+		}
+		if(group.getAllRoles()!=null){
+			doc.addField(RodaConstants.MEMBER_ROLES_ALL, new ArrayList<String>(group.getAllRoles()));
+		}
+		
+		return doc;
+	}
+	
+	private static Group solrDocumentToGroup(SolrDocument doc) {
+		final String id = objectToString(doc.get(RodaConstants.MEMBER_ID));
+		final boolean isActive = objectToBoolean(doc.get(RodaConstants.MEMBER_IS_ACTIVE));
+		final boolean isUser = objectToBoolean(doc.get(RodaConstants.MEMBER_IS_USER));
+		final String name = objectToString(doc.get(RodaConstants.MEMBER_NAME));
+		final Set<String> groups = new HashSet<String>(objectToListString(doc.get(RodaConstants.MEMBER_GROUPS_ALL))); 
+		final Set<String> roles = new HashSet<String>(objectToListString(doc.get(RodaConstants.MEMBER_ROLES_ALL))); 
+		Group group = new Group();
+		group.setActive(isActive);
+		group.setAllGroups(groups);
+		group.setAllRoles(roles);
+		group.setActive(isActive);
+		group.setName(name);
+		return group;
 	}
 }

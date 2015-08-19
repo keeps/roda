@@ -45,6 +45,7 @@ import pt.gov.dgarq.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
+import pt.gov.dgarq.roda.core.data.v2.Group;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.LogEntryParameter;
@@ -58,6 +59,7 @@ import pt.gov.dgarq.roda.core.data.v2.SIPStateTransition;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.core.data.v2.SimpleEventPreservationMetadata;
 import pt.gov.dgarq.roda.core.data.v2.SimpleRepresentationFilePreservationMetadata;
+import pt.gov.dgarq.roda.core.data.v2.User;
 
 public class IndexServiceTest {
 
@@ -550,7 +552,7 @@ public class IndexServiceTest {
 	
 	
 	@Test
-	public void indexMember() throws IndexServiceException{
+	public void indexMembers() throws IndexServiceException{
 		Set<String> groups = new HashSet<String>();
 		groups.add("admin");
 		Set<String> roles = new HashSet<String>();
@@ -558,7 +560,7 @@ public class IndexServiceTest {
 		
 		for(int i=0;i<5;i++){
 			if(i%2==0){
-				RodaUser user = new RodaUser();
+				User user = new User();
 				user.setActive(true);
 				user.setAllGroups(groups);
 				user.setAllRoles(roles);
@@ -567,28 +569,28 @@ public class IndexServiceTest {
 				user.setEmail("mail@example.com");
 				user.setGuest(false);
 				user.setId("USER"+i);
-				user.setName("NAME"+i);
-				model.addRodaMember(user);
+				user.setName("NAMEUSER");
+				model.addUser(user);
 			}else{
-				RodaGroup group = new RodaGroup();
+				Group group = new Group();
 				group.setActive(true);
 				group.setAllGroups(groups);
 				group.setAllRoles(roles);
 				group.setDirectGroups(groups);
 				group.setDirectRoles(roles);
-				group.setId("USER"+i);
-				group.setName("NAME"+i);
-				model.addRodaMember(group);
+				group.setId("GROUP"+i);
+				group.setName("NAMEGROUP");
+				model.addGroup(group);
 			}
 		}
 		
 		Filter filterUSER1 = new Filter();
-		filterUSER1.add(new SimpleFilterParameter(RodaConstants.MEMBER_ID, "USER1"));
-		assertThat(index.count(RODAMember.class, filterUSER1), Matchers.is(1L));
+		filterUSER1.add(new SimpleFilterParameter(RodaConstants.MEMBER_NAME, "NAMEUSER"));
+		assertThat(index.count(User.class, filterUSER1), Matchers.is(3L));
 		
 		Filter filterGroup = new Filter();
-		filterGroup.add(new SimpleFilterParameter(RodaConstants.MEMBER_IS_USER, "false"));
-		assertThat(index.count(RODAMember.class, filterGroup), Matchers.is(2L));
+		filterGroup.add(new SimpleFilterParameter(RodaConstants.MEMBER_NAME, "NAMEGROUP"));
+		assertThat(index.count(Group.class, filterGroup), Matchers.is(2L));
 
 	}
 }

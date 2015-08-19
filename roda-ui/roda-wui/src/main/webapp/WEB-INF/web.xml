@@ -402,6 +402,13 @@
 		<servlet-class>
 			pt.gov.dgarq.roda.wui.common.fileupload.server.FileUploadProgressImpl</servlet-class>
 	</servlet>
+	<servlet>
+		<description>
+		</description>
+		<display-name>DS</display-name>
+		<servlet-name>DS</servlet-name>
+		<servlet-class>pt.gov.dgarq.roda.ds.DS</servlet-class>
+	</servlet>
 
 	<servlet-mapping>
 		<servlet-name>FlashPageFlipPaid</servlet-name>
@@ -426,6 +433,10 @@
 	<servlet-mapping>
 		<servlet-name>FileUploadProgress</servlet-name>
 		<url-pattern>/pt.gov.dgarq.roda.wui.main.Main/fileuploadprogress</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>DS</servlet-name>
+		<url-pattern>/DS</url-pattern>
 	</servlet-mapping>
 
 	<!-- Welcome file -->

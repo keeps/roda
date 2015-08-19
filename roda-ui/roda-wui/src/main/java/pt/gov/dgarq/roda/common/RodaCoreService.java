@@ -23,7 +23,15 @@ public abstract class RodaCoreService {
 		registerAction(logEntry);
 	}
 
-	protected static void registerAction(CASUserPrincipal user, String actionComponent, String actionMethod,
+	public static void registerAction(CASUserPrincipal user, String actionComponent, String actionMethod,
+			String aipId, long duration, List<LogEntryParameter> parameters) {
+
+		LogEntry logEntry = createLogEntry(user, actionComponent, actionMethod, aipId, duration, parameters);
+		registerAction(logEntry);
+
+	}
+	
+	public static void registerAction(RodaSimpleUser user, String actionComponent, String actionMethod,
 			String aipId, long duration, List<LogEntryParameter> parameters) {
 
 		LogEntry logEntry = createLogEntry(user, actionComponent, actionMethod, aipId, duration, parameters);

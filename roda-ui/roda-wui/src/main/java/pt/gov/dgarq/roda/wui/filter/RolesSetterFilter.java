@@ -152,30 +152,4 @@ public class RolesSetterFilter implements Filter {
 		logger.error("Checking if user " + name + " exists...");
 		return true;
 	}
-
-	private SearchControls getSimpleSearchControls() {
-		SearchControls searchControls = new SearchControls();
-		searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-		searchControls.setTimeLimit(30000);
-		return searchControls;
-	}
-
-	protected Hashtable<Object, Object> createEnv(ServletContext servletContext) {
-
-		// Fetch directory servive from servlet context
-		DirectoryService directoryService = (DirectoryService) servletContext.getAttribute(DirectoryService.JNDI_KEY);
-
-		Hashtable<Object, Object> env = new Hashtable<Object, Object>();
-		env.put(DirectoryService.JNDI_KEY, directoryService);
-		env.put(Context.PROVIDER_URL, "");
-		env.put(Context.INITIAL_CONTEXT_FACTORY, CoreContextFactory.class.getName());
-
-		// FIXME
-		env.put(Context.SECURITY_PRINCIPAL, "uid=admin,ou=system");
-		env.put(Context.SECURITY_CREDENTIALS, "secret");
-		env.put(Context.SECURITY_AUTHENTICATION, "simple");
-
-		return env;
-	}
-
 }

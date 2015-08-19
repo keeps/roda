@@ -31,7 +31,8 @@ public final class RodaConstants {
 	public static final String INDEX_ACTION_LOG = "ActionLog";
 	public static final String INDEX_OTHER_DESCRIPTIVE_DATA_PREFIX = "odd";
 	public static final String INDEX_SIP_REPORT = "SIPReport";
-	public static final String INDEX_MEMBERS = "Members";
+	public static final String INDEX_USERS = "Users";
+	public static final String INDEX_GROUPS = "Groups";
 
 	/*
 	 * STORAGE CONTAINERS
@@ -259,6 +260,7 @@ public final class RodaConstants {
 	public static final String MEMBER_IS_USER = "isUser";
 	public static final String MEMBER_GROUPS_ALL = "groupsAll";
 	public static final String MEMBER_ROLES_ALL = "rolesAll";
+
 	
 
 }

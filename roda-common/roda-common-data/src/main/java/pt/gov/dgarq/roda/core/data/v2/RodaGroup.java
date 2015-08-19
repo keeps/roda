@@ -11,7 +11,7 @@ public class RodaGroup extends RodaPrincipal implements RODAMember {
 	private Set<String> directRoles = new HashSet<String>();
 	private Set<String> allGroups = new HashSet<String>();
 	private Set<String> directGroups = new HashSet<String>();
-
+	
 	public RodaGroup() {
 		super();
 	}
@@ -153,4 +153,19 @@ public class RodaGroup extends RodaPrincipal implements RODAMember {
 		return builder.toString();
 	}
 
+	public void addDirectRole(String role) {
+		if(directRoles==null){
+			directRoles = new HashSet<String>();
+		}
+		directRoles.add(role);
+	}
+	public void addDirectGroup(String group) {
+		if(directGroups==null){
+			directGroups = new HashSet<String>();
+		}
+		directGroups.add(group);
+	}
+	public boolean isNameValid() {
+		return true;
+	}
 }

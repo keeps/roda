@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -11,6 +12,7 @@ import java.util.Set;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import org.apache.commons.configuration.Configuration;
 import org.apache.directory.api.ldap.model.entry.DefaultEntry;
 import org.apache.directory.api.ldap.model.entry.Entry;
 import org.apache.directory.api.ldap.model.ldif.LdifEntry;
@@ -38,6 +40,7 @@ import org.apache.directory.server.protocol.shared.transport.TcpTransport;
 import org.apache.log4j.Logger;
 
 import pt.gov.dgarq.roda.common.RodaCoreFactory;
+import pt.gov.dgarq.roda.common.UserUtility;
 
 public class DSStartStopListener implements ServletContextListener {
 	static final private Logger logger = Logger.getLogger(DSStartStopListener.class);
@@ -212,6 +215,36 @@ public class DSStartStopListener implements ServletContextListener {
 			applyLdif(RODA_APACHE_DS_CONFIG_DIRECTORY.resolve("groups.ldif").toFile());
 			applyLdif(RODA_APACHE_DS_CONFIG_DIRECTORY.resolve("roles.ldif").toFile());
 		}
+		
+		UserUtility.setDirectoryService(service);
+		
+		Configuration rodaConfig = RodaCoreFactory.getConfiguration("roda-core.properties");
+		
+		
+		String ldapHost = rodaConfig.getString("ldapHost");
+		int ldapPort = rodaConfig.getInt("ldapPort");
+		String ldapPeopleDN = rodaConfig.getString("ldapPeopleDN");
+		String ldapGroupsDN = rodaConfig.getString("ldapGroupsDN");
+		String ldapRolesDN = rodaConfig.getString("ldapRolesDN");
+		String ldapAdminDN = rodaConfig.getString("ldapAdminDN");
+		String ldapAdminPassword = rodaConfig.getString(
+				"ldapAdminPassword");
+		String ldapPasswordDigestAlgorithm = rodaConfig.getString(
+				"ldapPasswordDigestAlgorithm");
+		List<String> ldapProtectedUsers = Arrays.asList(rodaConfig
+				.getStringArray("ldapProtectedUsers"));
+		List<String> ldapProtectedGroups = Arrays.asList(rodaConfig
+				.getStringArray("ldapProtectedGroups"));
+
+		LdapUtility ldapUtility = new LdapUtility(ldapHost, ldapPort,
+				ldapPeopleDN, ldapGroupsDN, ldapRolesDN, ldapAdminDN,
+				ldapAdminPassword, ldapPasswordDigestAlgorithm,
+				ldapProtectedUsers, ldapProtectedGroups);
+		
+		UserUtility.setLdapUtility(ldapUtility);
+		
+		
+		
 
 		// We are all done !
 	}

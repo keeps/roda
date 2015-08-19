@@ -9,8 +9,8 @@ import com.google.gwt.user.client.rpc.ServiceDefTarget;
 
 import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
 import pt.gov.dgarq.roda.core.common.RODAException;
-import pt.gov.dgarq.roda.core.data.Group;
-import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.core.data.v2.Group;
+import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
 import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
@@ -26,7 +26,7 @@ import pt.gov.dgarq.roda.wui.common.client.PrintReportException;
  * @author Luis Faria
  * 
  */
-public interface UserManagementService extends RemoteService {
+public interface UserManagementService {
 
 	/**
 	 * Service URI path

@@ -146,4 +146,22 @@ public class RodaUser extends RodaSimpleUser implements RODAMember {
 		return builder.toString();
 	}
 
+	public void addDirectRole(String role) {
+		if(directRoles==null){
+			directRoles = new HashSet<String>();
+		}
+		directRoles.add(role);
+	}
+
+	public void addGroup(String group) {
+		if(allGroups==null){
+			allGroups = new HashSet<String>();
+		}
+		allGroups.add(group);
+	}
+
+	public boolean isNameValid() {
+		// TODO Auto-generated method stub
+		return true;
+	}
 }

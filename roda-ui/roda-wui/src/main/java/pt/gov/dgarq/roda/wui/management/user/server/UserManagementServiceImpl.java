@@ -6,8 +6,10 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -19,25 +21,33 @@ import javax.mail.internet.InternetAddress;
 
 import org.apache.log4j.Logger;
 import org.apache.velocity.VelocityContext;
+import org.roda.index.IndexServiceException;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import config.i18n.server.UserLogMessages;
+import pt.gov.dgarq.roda.common.LogUtility;
 import pt.gov.dgarq.roda.common.RodaClientFactory;
+import pt.gov.dgarq.roda.common.RodaCoreFactory;
+import pt.gov.dgarq.roda.common.RodaCoreService;
 import pt.gov.dgarq.roda.common.UserUtility;
 import pt.gov.dgarq.roda.core.RODAClient;
 import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
+import pt.gov.dgarq.roda.core.common.IllegalOperationException;
 import pt.gov.dgarq.roda.core.common.InvalidTokenException;
+import pt.gov.dgarq.roda.core.common.NoSuchUserException;
+import pt.gov.dgarq.roda.core.common.RODAClientException;
 import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.common.UserManagementException;
-import pt.gov.dgarq.roda.core.data.Group;
-import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.core.data.v2.Group;
+import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
 import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.RegexFilterParameter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
@@ -52,6 +62,7 @@ import pt.gov.dgarq.roda.core.data.v2.RodaUser;
 import pt.gov.dgarq.roda.core.stubs.UserBrowser;
 import pt.gov.dgarq.roda.core.stubs.UserEditor;
 import pt.gov.dgarq.roda.core.stubs.UserRegistration;
+import pt.gov.dgarq.roda.ds.LdapUtilityException;
 import pt.gov.dgarq.roda.wui.common.captcha.server.CaptchaServiceImpl;
 import pt.gov.dgarq.roda.wui.common.client.GenericException;
 import pt.gov.dgarq.roda.wui.common.client.PrintReportException;
@@ -91,23 +102,28 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
 
 	public User[] getUsers(Character letter, String search) throws RODAException {
 		User[] users;
-		// try {
-		ContentAdapter contentAdapter = new ContentAdapter();
-		contentAdapter.setFilter(getFilter(letter, search));
-		SortParameter[] sortParameters = new SortParameter[1];
-		sortParameters[0] = new SortParameter("name", false);
-		contentAdapter.setSorter(new Sorter(sortParameters));
-		// TODO migrate to new implementation
-		// users = RodaClientFactory.getRodaClient(
-		// getThreadLocalRequest().getSession())
-		// .getUserBrowserService().getUsers(contentAdapter);
-		users = new User[] {};
-		// } catch (RemoteException e) {
-		// logger.error("Remote Exception", e);
-		// throw RODAClient.parseRemoteException(e);
-		// }
+		try {
+			Filter filterGroup = new Filter();
+			filterGroup.add(new SimpleFilterParameter(RodaConstants.MEMBER_IS_USER, "true"));
+			Filter searchFilter = getFilter(letter, search);
+			if(searchFilter.getParameters()!=null && searchFilter.getParameters().size()>0){
+				for(FilterParameter fp : searchFilter.getParameters()){
+					filterGroup.add(fp);
+				}
+			}
+			ContentAdapter contentAdapter = new ContentAdapter();
+			contentAdapter.setFilter(filterGroup);
+			
+			SortParameter[] sortParameters = new SortParameter[1];
+			sortParameters[0] = new SortParameter("name", false);
+			contentAdapter.setSorter(new Sorter(sortParameters));
 
-		return users;
+			users = UserUtility.getLdapUtility().getUsers(contentAdapter);
+			return users;
+		}catch(LdapUtilityException e){
+			throw new RODAException(e.getMessage(),e) {
+			};
+		}
 	}
 
 	protected String[] getUserNames(Character letter, String search) throws RODAException {
@@ -276,19 +292,29 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
 
 		});
 		try {
-			UserBrowser userBrowser = RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
-					.getUserBrowserService();
-			String[] groupNames = userBrowser.getUser(username).getGroups();
+			Date start = new Date();
+			User user = UserUtility.getLdapUtility().getUser(username);
+			long duration = new Date().getTime() - start.getTime();
+			LogUtility.registerAction(UserUtility.getClientUser(getThreadLocalRequest().getSession()), "UM.getUser", new String[] { "name", username },
+					"User %username% called method UM.getUser(" + username
+							+ ")", duration);
+			Set<String> groupNames = user.getAllGroups();
 			if (groupNames != null) {
-				for (int i = 0; i < groupNames.length; i++) {
-					String groupName = groupNames[i];
-					Group group = userBrowser.getGroup(groupName);
+				Iterator<String> it = groupNames.iterator();
+				while(it.hasNext()){
+					String groupName = it.next();
+					Group group = UserUtility.getLdapUtility().getGroup(groupName);
 					sortGroupNames.add(group);
 				}
 			}
-		} catch (RemoteException e) {
-			logger.error("Remote Exception", e);
-			throw RODAClient.parseRemoteException(e);
+			duration = new Date().getTime() - start.getTime();
+			LogUtility.registerAction(UserUtility.getClientUser(getThreadLocalRequest().getSession()), "UM.getUserGroups", new String[] { "name", username },
+					"User %username% called method UM.getUserGroups(" + username
+							+ ")", duration);
+		} catch (LdapUtilityException e) {
+			logger.error("LdapUtility Exception", e);
+			throw new RODAException(e.getMessage(),e) {
+			};
 		}
 		return sortGroupNames.toArray(new Group[] {});
 	}
@@ -297,34 +323,42 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
 		User[] userMembersInGroup;
 
 		try {
-			UserBrowser userBrowser = RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
-					.getUserBrowserService();
+			Date start = new Date();
+			userMembersInGroup = UserUtility.getLdapUtility().getUsersInGroup(groupname);
+			long duration = new Date().getTime() - start.getTime();
 
-			userMembersInGroup = userBrowser.getUsersInGroup(groupname);
-
+			LogUtility.registerAction(UserUtility.getClientUser(getThreadLocalRequest().getSession()), "UM.getUserMembersInGroup", new String[] {
+					"groupName", groupname },
+					"User %username% called method UM.getUserMembersInGroup("
+							+ groupname + ")", duration);
+			
 			if (userMembersInGroup == null) {
 				userMembersInGroup = new User[] {};
 			}
 
-		} catch (RemoteException e) {
-			logger.error("Remote Exception", e);
-			throw RODAClient.parseRemoteException(e);
-		} catch (Exception e) {
-			throw new GenericException(e.getMessage());
+		} catch (LdapUtilityException e) {
+			logger.error("LdapUtility Exception", e);
+			throw new RODAException(e.getMessage(),e) {
+			};
 		}
-
 		return userMembersInGroup;
 	}
 
 	public Group getGroup(String groupname) throws RODAException {
 		Group group;
 		try {
-			UserBrowser userBrowser = RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
-					.getUserBrowserService();
-			group = userBrowser.getGroup(groupname);
-		} catch (RemoteException e) {
+			Date start = new Date();
+			group = UserUtility.getLdapUtility().getGroup(groupname);
+			long duration = new Date().getTime() - start.getTime();
+
+			LogUtility.registerAction(UserUtility.getClientUser(getThreadLocalRequest().getSession()), "UM.getGroup", new String[] { "groupName",
+					groupname },
+					"User %username% called method UM.getGroup("
+							+ groupname + ")", duration);
+		} catch (LdapUtilityException e) {
 			logger.error("Remote Exception", e);
-			throw RODAClient.parseRemoteException(e);
+			throw new RODAException(e.getMessage(),e) {
+			};
 		}
 		return group;
 	}
@@ -332,46 +366,61 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
 	public User getUser(String username) throws RODAException {
 		User user;
 		try {
-			UserBrowser userBrowser = RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
-					.getUserBrowserService();
-			user = userBrowser.getUser(username);
-		} catch (RemoteException e) {
+			Date start = new Date();
+			user = UserUtility.getLdapUtility().getUser(username);
+			long duration = new Date().getTime() - start.getTime();
+
+			LogUtility.registerAction(UserUtility.getClientUser(getThreadLocalRequest().getSession()), "UM.getUser", new String[] { "userName",
+					username },
+					"User %username% called method UM.getUser("
+							+ username + ")", duration);
+		} catch (LdapUtilityException e) {
 			logger.error("Remote Exception", e);
-			throw RODAClient.parseRemoteException(e);
+			throw new RODAException(e.getMessage(),e) {
+			};
 		}
 		return user;
 	}
 
 	public void createUser(User user, String password) throws RODAException {
-		logger.debug("Creating user " + user.getName());
-
-		// try {
-		// UserManagement userManagement =
-		// RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
-		// .getUserManagementService();
-		// userManagement.addUser(user);
-		// if (password != null) {
-		// userManagement.setUserPassword(user.getName(), password);
-		// }
-		// } catch (RemoteException e) {
-		// logger.error("Remote Exception", e);
-		// throw RODAClient.parseRemoteException(e);
-		// } catch (NoSuchUserException e) {
-		// logger.error("Created user could not be found" + " when changing
-		// password: " + user, e);
-		// }
+		try{
+			logger.debug("Creating user " + user.getName());
+			Date start = new Date();
+			User result = UserUtility.getLdapUtility().addUser(user);
+			UserUtility.getLdapUtility().setUserPassword(result.getName(), password);
+			long duration = new Date().getTime() - start.getTime();
+			LogUtility.registerAction(UserUtility.getClientUser(getThreadLocalRequest().getSession()), "UM.createUser", new String[] { "user",
+					user.toString() },
+					"User %username% called method UM.createUser(" + user
+							+ ")", duration);
+		}catch(LdapUtilityException e){
+			throw new RODAException(e.getMessage(),e) {
+			};
+		}
 	}
 
-	public void editMyUser(User user, String password) throws RODAException {
+	public void editMyUser(User modifiedUser, String password) throws RODAException {
 		try {
-			UserEditor userEditorService = RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
-					.getUserEditorService();
+			Date start = new Date();
+			if (modifiedUser.getName().equals(UserUtility.getClientUser(getThreadLocalRequest().getSession()))) {
 
-			userEditorService.modifyUser(user, password);
+				User user = UserUtility.getLdapUtility().modifySelfUser(modifiedUser,
+						UserUtility.getClientUserPassword(getThreadLocalRequest().getSession()), password);
+				long duration = new Date().getTime() - start.getTime();
 
-		} catch (RemoteException e) {
-			logger.error("Remote Exception", e);
-			throw RODAClient.parseRemoteException(e);
+				LogUtility.registerAction(UserUtility.getClientUser(getThreadLocalRequest().getSession()), "UM.editMyUser",
+						new String[] { "modifiedUser", modifiedUser + "",
+								"newPassword", "*" },
+						"User %username% called method UM.editMyUser("
+								+ modifiedUser + ", " + "*" + ")", duration);
+			} else {
+				throw new IllegalOperationException(
+						"Trying to modify user information for another user");
+			}
+		} catch (LdapUtilityException e) {
+			logger.error("LdapUtility Exception", e);
+			throw new RODAException(e.getMessage(),e) {
+			};
 		}
 
 	}
@@ -396,113 +445,146 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
 	}
 
 	public void createGroup(Group group) throws RODAException {
-		// try {
-		// UserManagement userManagement =
-		// RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
-		// .getUserManagementService();
-		// userManagement.addGroup(group);
-		// } catch (RemoteException e) {
-		// logger.error("Remote Exception", e);
-		// throw RODAClient.parseRemoteException(e);
-		// }
+		try{
+			logger.debug("Creating group " + group.getName());
+			Date start = new Date();
+			Group result = UserUtility.getLdapUtility().addGroup(group);
+			long duration = new Date().getTime() - start.getTime();
+			LogUtility.registerAction(UserUtility.getClientUser(getThreadLocalRequest().getSession()), "UM.createGroup", new String[] { "group",
+					result.toString() },
+					"User %username% called method UM.createGroup(" + result
+							+ ")", duration);
+		}catch(LdapUtilityException e){
+			throw new RODAException(e.getMessage(),e) {
+			};
+		}
 
 	}
 
 	public void editGroup(Group group) throws RODAException {
-		// try {
-		// UserManagement userManagement =
-		// RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
-		// .getUserManagementService();
-		// userManagement.modifyGroup(group);
-		// logger.debug("Editing group: " + group);
-		//
-		// } catch (RemoteException e) {
-		// logger.error("Remote Exception", e);
-		// throw RODAClient.parseRemoteException(e);
-		// }
+		try{
+			logger.debug("Editing group " + group.getName());
+			Date start = new Date();
+			UserUtility.getLdapUtility().modifyGroup(group);
+			long duration = new Date().getTime() - start.getTime();
+			LogUtility.registerAction(UserUtility.getClientUser(getThreadLocalRequest().getSession()), "UM.editGroup", new String[] { "group",
+					group.toString() },
+					"User %username% called method UM.editGroup(" + group
+							+ ")", duration);
+		}catch(LdapUtilityException e){
+			throw new RODAException(e.getMessage(),e) {
+			};
+		}
 	}
 
 	public boolean removeUser(String username) throws RODAException {
-		// boolean removed;
-		// try {
-		// UserManagement userManagement =
-		// RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
-		// .getUserManagementService();
-		// removed = userManagement.removeUser(username);
-		// } catch (RemoteException e) {
-		// logger.error("Remote Exception", e);
-		// throw RODAClient.parseRemoteException(e);
-		// }
-		// return removed;
-		return false;
+		boolean result = false;
+		try{
+			logger.debug("Removing user " + username);
+			Date start = new Date();
+			long logEntriesCount = RodaCoreFactory.getIndexService().count(LogEntry.class, new Filter(new SimpleFilterParameter(
+					"username", username)));
+
+			if (logEntriesCount > 0) {
+				UserUtility.getLdapUtility().deactivateUser(username);
+				result = false;
+			} else {
+				UserUtility.getLdapUtility().removeUser(username);
+				result = true;
+			}
+			
+			long duration = new Date().getTime() - start.getTime();
+			LogUtility.registerAction(UserUtility.getClientUser(getThreadLocalRequest().getSession()), "UM.removeUser", new String[] { "user",
+					username },
+					"User %username% called method UM.removeUser(" + username
+							+ ")", duration);
+		}catch(LdapUtilityException e){
+			throw new RODAException(e.getMessage(),e) {
+			};
+		} catch (IndexServiceException e) {
+			throw new RODAException(e.getMessage(),e) {
+			};
+		}
+		return result;
 	}
 
 	public void removeGroup(String groupname) throws RODAException {
-		// try {
-		// UserManagement userManagement =
-		// RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
-		// .getUserManagementService();
-		// userManagement.removeGroup(groupname);
-		// } catch (RemoteException e) {
-		// logger.error("Remote Exception", e);
-		// throw RODAClient.parseRemoteException(e);
-		// }
+		try{
+		Date start = new Date();
+		UserUtility.getLdapUtility().removeGroup(groupname);
+		long duration = new Date().getTime() - start.getTime();
 
+		LogUtility.registerAction(UserUtility.getClientUser(getThreadLocalRequest().getSession()), "UserManagement.removeGroup", new String[] { "groupname",
+				groupname },
+				"User %username% called method UserManagement.removeGroup("
+						+ groupname + ")", duration);
+		}catch(LdapUtilityException e){
+			throw new RODAException(e.getMessage(),e) {
+			};
+		} 
 	}
 
 	public String[] getGroupsRoles(String[] groupname) throws RODAException {
 		HashSet<String> roleSet = new HashSet<String>();
 
 		try {
-			RODAClient rodaClient = RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession());
-			UserBrowser userBrowser = rodaClient.getUserBrowserService();
 			for (int i = 0; i < groupname.length; i++) {
-				String[] roles = userBrowser.getGroup(groupname[i]).getRoles();
+				Set<String> roles = UserUtility.getLdapUtility().getGroup(groupname[i]).getAllRoles();
 				if (roles != null) {
-					roleSet.addAll(Arrays.asList(roles));
+					roleSet.addAll(roles);
 				}
 			}
-		} catch (RemoteException e) {
-			logger.error("Remote Exception", e);
-			throw RODAClient.parseRemoteException(e);
+		} catch (LdapUtilityException e) {
+			logger.error("LdapUtility Exception", e);
+			throw new RODAException(e.getMessage(),e) {
+			};
 		}
-
 		String[] roleArray = new String[roleSet.size()];
 		Object[] roleSetArray = roleSet.toArray();
 		for (int i = 0; i < roleSet.size(); i++) {
 			roleArray[i] = (String) roleSetArray[i];
 		}
-
 		return roleArray;
 	}
 
 	public String[] getUserDirectRoles(String username) throws RODAException {
 		String[] roles;
 		try {
-			RODAClient rodaClient = RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession());
-			roles = rodaClient.getUserBrowserService().getUserDirectRoles(username);
+			Date start = new Date();
+			roles = UserUtility.getLdapUtility().getUserDirectRoles(username);
+			long duration = new Date().getTime() - start.getTime();
+			LogUtility.registerAction(UserUtility.getClientUser(getThreadLocalRequest().getSession()), "getUserDirectRoles", new String[] {
+					"userName", username },
+					"User %username% called method UserBrowser.getUserDirectRoles("
+							+ username + ")", duration);
+			
 			if (roles == null) {
 				roles = new String[] {};
 			}
-		} catch (RemoteException e) {
-			logger.error("Remote Exception", e);
-			throw RODAClient.parseRemoteException(e);
+		} catch (LdapUtilityException e) {
+			logger.error("LdapUtility Exception", e);
+			throw new RODAClientException(e.getMessage(),e);
 		}
 		return roles;
 	}
 
 	public String[] getGroupDirectRoles(String groupname) throws RODAException {
-
 		String[] roles;
 		try {
-			RODAClient rodaClient = RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession());
-			roles = rodaClient.getUserBrowserService().getGroupDirectRoles(groupname);
+			Date start = new Date();
+			roles = UserUtility.getLdapUtility().getGroupDirectRoles(groupname);
+			long duration = new Date().getTime() - start.getTime();
+			LogUtility.registerAction(UserUtility.getClientUser(getThreadLocalRequest().getSession()), "getGroupDirectRoles", new String[] {
+					"groupName", groupname },
+					"User %username% called method UM.getGroupDirectRoles("
+							+ groupname + ")", duration);
+			
 			if (roles == null) {
 				roles = new String[] {};
 			}
-		} catch (RemoteException e) {
-			logger.error("Remote Exception", e);
-			throw RODAClient.parseRemoteException(e);
+		} catch (LdapUtilityException e) {
+			logger.error("LdapUtility Exception", e);
+			throw new RODAClientException(e.getMessage(),e);
 		}
 		return roles;
 	}
@@ -546,27 +628,29 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
 		return UserManagement.findLogEntries(user, filter, sorter, sublist, facets);
 	}
 
+	
+	//TODO:
 	public boolean register(User user, String password, String captcha) throws RODAException {
 		boolean successful = false;
 		if (CaptchaServiceImpl.check(getThreadLocalRequest().getSession().getId(), captcha).booleanValue()) {
 			UserRegistration userRegistrationService;
 			User registeredUser;
-			try {
+			//try {
 				userRegistrationService = RodaClientFactory.getRodaWuiClient().getUserRegistrationService();
-				user.setGroups(new String[] { "guests" });
-				user.setRoles(new String[] {});
-				registeredUser = userRegistrationService.registerUser(user, password);
-				successful = sendEmailVerification(registeredUser);
+				user.setAllGroups(new HashSet<String>(Arrays.asList("guests")));
+				user.setAllRoles(new HashSet<String>());
+				//registeredUser = userRegistrationService.registerUser(user, password);
+				//successful = sendEmailVerification(registeredUser);
 
-			} catch (RemoteException e) {
-				logger.error("Remote Exception", e);
-				throw RODAClient.parseRemoteException(e);
-			}
+			//} catch (RemoteException e) {
+			//	logger.error("Remote Exception", e);
+			//	throw RODAClient.parseRemoteException(e);
+			//}
 		}
 		return successful;
 	}
 
-	private boolean sendEmailVerification(User user) throws RODAException {
+	private boolean sendEmailVerification(pt.gov.dgarq.roda.core.data.User user) throws RODAException {
 		boolean success = false;
 
 		String token = user.getEmailConfirmationToken();
@@ -628,24 +712,59 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
 		return verified;
 	}
 
+	//TODO
 	public boolean resendEmailVerification(String username) throws RODAException {
 		boolean success = false;
 		User user;
+		String error = null;
 		try {
-			user = RodaClientFactory.getRodaWuiClient().getUserRegistrationService().getUnconfirmedUser(username);
-			success = sendEmailVerification(user);
-		} catch (RemoteException e) {
-			logger.error("Remote Exception", e);
-			throw RODAClient.parseRemoteException(e);
-		}
+			Date start = new Date();
+			user = UserUtility.getLdapUtility().getUser(username);
+			if (user == null) {
+				logger.debug("User " + username
+						+ " doesn't exist. Throwing NoSuchUserException.");
 
+				error = "User " + username
+						+ " doesn't exist.";
+			} else if (user.isActive()
+					|| user.getEmailConfirmationToken() == null) {
+
+				logger
+						.debug("User "
+								+ username
+								+ " is already active or email confirmation token doesn't exist.");
+
+				error = "User "
+								+ username
+								+ " is already active or email confirmation token doesn't exist.";
+			}
+			
+			
+			if(error==null){
+				//success = sendEmailVerification(user);
+				long duration = new Date().getTime() - start.getTime();
+				LogUtility.registerAction(UserUtility.getClientUser(getThreadLocalRequest().getSession()), "UM.resendEmailVerification", new String[] {
+						"username", username },
+						"User %username% called method UM.resendEmailVerification("
+								+ username + ")", duration);
+			}
+			
+		} catch (LdapUtilityException e) {
+			logger.error("LdapUtility Exception", e);
+			throw new RODAException(e.getMessage(),e) {
+			};
+		}
+		if(error!=null){
+			throw new RODAException(error) {
+			};
+		}
 		return success;
 	}
 
 	public boolean changeUnverifiedEmail(String username, String email) throws RODAException {
 		boolean successful = false;
 		try {
-			User user = RodaClientFactory.getRodaWuiClient().getUserRegistrationService()
+			pt.gov.dgarq.roda.core.data.User user = RodaClientFactory.getRodaWuiClient().getUserRegistrationService()
 					.modifyUnconfirmedEmail(username, email);
 			if (user.getEmailConfirmationToken() != null && user.getEmailConfirmationToken().length() > 0) {
 				successful = sendEmailVerification(user);
@@ -657,6 +776,7 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
 		return successful;
 	}
 
+	//TODO
 	public boolean requestPassordReset(String usernameOrEmail, String captcha) throws RODAException {
 		boolean captchaSuccess;
 		if (CaptchaServiceImpl.check(getThreadLocalRequest().getSession().getId(), captcha).booleanValue()) {
@@ -671,9 +791,9 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
 			}
 
 			try {
-				User user = RodaClientFactory.getRodaWuiClient().getUserRegistrationService()
+				pt.gov.dgarq.roda.core.data.User user = RodaClientFactory.getRodaWuiClient().getUserRegistrationService()
 						.requestPasswordReset(username, email);
-				sendRecoverLoginEmail(user);
+				//sendRecoverLoginEmail(user);
 			} catch (RemoteException e) {
 				logger.error("Remote Exception", e);
 				throw RODAClient.parseRemoteException(e);

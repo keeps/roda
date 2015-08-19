@@ -70,7 +70,7 @@
 
 			<map>
 
-				<entry key="mail" value="mail" />
+				<entry key="email" value="email" />
 
 				<entry key="cn" value="cn" />
 
@@ -132,7 +132,7 @@
 	<!-- CHANGE -->
 	<bean id="pooledSearchDnResolver" class="org.ldaptive.auth.PooledSearchDnResolver"
 
-		p:baseDn="dc=keep,dc=pt" p:subtreeSearch="true" p:allowMultipleDns="false"
+		p:baseDn="dc=roda,dc=org" p:subtreeSearch="true" p:allowMultipleDns="false"
 
 		p:connectionFactory-ref="pooledConnectionFactory" p:userFilter="uid={user}" />
 

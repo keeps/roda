@@ -1,26 +1,38 @@
 package pt.gov.dgarq.roda.common;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
+import org.apache.directory.api.ldap.model.exception.LdapException;
 import org.apache.directory.server.core.api.DirectoryService;
+import org.apache.log.output.io.rotate.RotateStrategyBySize;
+import org.apache.log4j.Category;
 import org.apache.log4j.Logger;
 
 import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
 import pt.gov.dgarq.roda.core.data.v2.RodaSimpleUser;
 import pt.gov.dgarq.roda.core.data.v2.RodaUser;
+import pt.gov.dgarq.roda.ds.LdapUtility;
+import pt.gov.dgarq.roda.ds.LdapUtilityException;
 
 public class UserUtility {
 	private static final Logger LOGGER = Logger.getLogger(UserUtility.class);
 	private static final String RODA_USER = "RODA_USER";
-	
-	
-	
+
 	private static DirectoryService DIRECTORY_SERVICE;
+	
+	private static LdapUtility LDAP_UTILITY;
+	
+	public static LdapUtility getLdapUtility(){
+		return LDAP_UTILITY;
+	}
+	
+	public static void setLdapUtility(LdapUtility ldapUtility){
+		LDAP_UTILITY = ldapUtility;
+	}
 
 	public static DirectoryService getDirectoryService() {
 		return DIRECTORY_SERVICE;
@@ -40,7 +52,7 @@ public class UserUtility {
 	}
 
 	public static void checkRoles(RodaSimpleUser rsu, List<String> rolesToCheck)
-			throws AuthorizationDeniedException {
+			throws AuthorizationDeniedException, LdapUtilityException {
 		RodaUser ru = getFullUser(rsu);
 		if (!Arrays.asList(ru.getAllRoles()).containsAll(rolesToCheck)) {
 			throw new AuthorizationDeniedException(
@@ -51,16 +63,53 @@ public class UserUtility {
 	
 	public static void checkRoles(RodaSimpleUser rsu, List<String> rolesToCheck, HttpServletRequest request)
 			throws AuthorizationDeniedException {
-		RodaUser ru = getFullUser(rsu);
-		if (!Arrays.asList(ru.getAllRoles()).containsAll(rolesToCheck)) {
+		try{
+			RodaUser ru = getFullUser(rsu);
+			if (!Arrays.asList(ru.getAllRoles()).containsAll(rolesToCheck)) {
+				throw new AuthorizationDeniedException(
+						"The user '" + ru.getId() + "' does not have all needed permissions: " + rolesToCheck);
+			}
+		}catch(LdapUtilityException e){
 			throw new AuthorizationDeniedException(
-					"The user '" + ru.getId() + "' does not have all needed permissions: " + rolesToCheck);
+					"The user '" + rsu.getId() + "' does not have all needed permissions: " + rolesToCheck);
 		}
 	}
 
-	public static RodaUser getFullUser(RodaSimpleUser rsu) {
-		RodaUser u = new RodaUser(rsu);
-		Set<String> roles = new HashSet<>();
+	public static RodaUser getFullUser(RodaSimpleUser rsu) throws LdapUtilityException {
+		RodaUser u = UserUtility.getLdapUtility().getUser(rsu.getId());
+		
+		u.setAllGroups(u.getAllGroups());
+		u.setDirectGroups(u.getDirectGroups());
+		u.setAllRoles(u.getAllRoles());
+		u.setDirectRoles(u.getDirectRoles());
+		return u;
+	}
+
+	public static void checkRoles(RodaSimpleUser user, HttpServletRequest request, String... rolesToCheck) throws AuthorizationDeniedException{
+		checkRoles(user, Arrays.asList(rolesToCheck),request);
+	}
+	public static void checkRoles(RodaSimpleUser user, String... rolesToCheck) throws AuthorizationDeniedException {
+		checkRoles(user, Arrays.asList(rolesToCheck),null);
+	}
+
+	public static void setUser(HttpServletRequest request,RodaSimpleUser rsu) {
+		request.getSession(true).setAttribute(RODA_USER, rsu);
+	}
+	public static void logout(HttpServletRequest servletRequest){
+		servletRequest.getSession().setAttribute(RODA_USER, null);
+		servletRequest.getSession().removeAttribute("edu.yale.its.tp.cas.client.filter.user");
+		servletRequest.getSession().removeAttribute("_const_cas_assertion_");
+	}
+/*
+	public static boolean haveSessionActive(CASUtility casUtility,HttpServletRequest servletRequest) {
+		try{
+			CASUserPrincipal cup = getUser(servletRequest);
+			CASUserPrincipal cupUpdated = casUtility.getCASUserPrincipalFromProxyGrantingTicket(cup.getProxyGrantingTicket(), "");
+			cupUpdated.setGuest(cup.isGuest());
+			UserUtility.setUser(servletRequest, cupUpdated);
+			return true;
+		}catch(Exception e){
+			return false;Set<String> roles = new HashSet<String>();
 		roles.add("browse");
 		roles.add("search");
 		roles.add("administration.user");
@@ -80,35 +129,29 @@ public class UserUtility {
 
 		u.setAllRoles(roles);
 		u.setDirectRoles(roles);
-		return u;
-	}
-
-	public static void checkRoles(RodaSimpleUser user, HttpServletRequest request, String... rolesToCheck) throws AuthorizationDeniedException {
-		checkRoles(user, Arrays.asList(rolesToCheck),request);
-	}
-	public static void checkRoles(RodaSimpleUser user, String... rolesToCheck) throws AuthorizationDeniedException {
-		checkRoles(user, Arrays.asList(rolesToCheck),null);
-	}
-
-	public static void setUser(HttpServletRequest request,RodaSimpleUser rsu) {
-		request.getSession(true).setAttribute(RODA_USER, rsu);
-		
-	}
-	public static void logout(HttpServletRequest servletRequest){
-		servletRequest.getSession().setAttribute(RODA_USER, null);
-		servletRequest.getSession().removeAttribute("edu.yale.its.tp.cas.client.filter.user");
-		servletRequest.getSession().removeAttribute("_const_cas_assertion_");
-	}
-/*
-	public static boolean haveSessionActive(CASUtility casUtility,HttpServletRequest servletRequest) {
-		try{
-			CASUserPrincipal cup = getUser(servletRequest);
-			CASUserPrincipal cupUpdated = casUtility.getCASUserPrincipalFromProxyGrantingTicket(cup.getProxyGrantingTicket(), "");
-			cupUpdated.setGuest(cup.isGuest());
-			UserUtility.setUser(servletRequest, cupUpdated);
-			return true;
-		}catch(Exception e){
-			return false;
 		}
 	}*/
+	
+	public static RodaSimpleUser getClientUser(HttpSession session){
+		RodaSimpleUser rsu = null;
+		if(session.getAttribute(RODA_USER)!=null){
+			return (RodaSimpleUser) session.getAttribute(RODA_USER);
+		}
+		return null;
+	}
+
+	public static String getClientUserName(HttpSession session) {
+		RodaSimpleUser rsu = null;
+		if(session.getAttribute(RODA_USER)!=null){
+			return ((RodaSimpleUser) session.getAttribute(RODA_USER)).getName();
+		}
+		return null;
+		
+	}
+
+	
+	//TODO ????
+	public static String getClientUserPassword(HttpSession session) {
+		return null;
+	}
 }

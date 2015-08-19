@@ -64,5 +64,10 @@ public abstract class RodaPrincipal implements Serializable {
 			return false;
 		return true;
 	}
+	
+	//TODO: implement validation...
+	public boolean isNameValid(){
+		return true;
+	}
 
 }

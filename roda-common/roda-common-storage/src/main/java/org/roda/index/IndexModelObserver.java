@@ -20,11 +20,13 @@ import org.slf4j.LoggerFactory;
 
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.v2.EventPreservationObject;
+import pt.gov.dgarq.roda.core.data.v2.Group;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.RODAMember;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationFilePreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.SIPReport;
+import pt.gov.dgarq.roda.core.data.v2.User;
 
 /**
  * 
@@ -273,29 +275,57 @@ public class IndexModelObserver implements ModelObserver {
 	}
 	
 	@Override
-	public void rodaMemberCreated(RODAMember member){
-		SolrInputDocument rodaMemberDocument = SolrUtils.rodaMemberToSolrDocument(member);
+	public void userCreated(User user){
+		SolrInputDocument userDocument = SolrUtils.userToSolrDocument(user);
 		try{
-			index.add(RodaConstants.INDEX_MEMBERS, rodaMemberDocument);
-			index.commit(RodaConstants.INDEX_MEMBERS);
+			index.add(RodaConstants.INDEX_USERS, userDocument);
+			index.commit(RodaConstants.INDEX_USERS);
 		} catch (SolrServerException | IOException e) {
-			LOGGER.error("Could not index RodaMember ", e);
+			LOGGER.error("Could not index User ", e);
 		}
 	}
 	
 	@Override
-	public void rodaMemberUpdated(RODAMember rodaMember) {
-		rodaMemberDeleted(rodaMember.getId());
-		rodaMemberCreated(rodaMember);
+	public void userUpdated(User user) {
+		userDeleted(user.getId());
+		userCreated(user);
 	}
 
 	@Override
-	public void rodaMemberDeleted(String rodaMemberId) {
+	public void userDeleted(String userID) {
 		try {
-			index.deleteById(RodaConstants.INDEX_MEMBERS, rodaMemberId);
-			index.commit(RodaConstants.INDEX_MEMBERS);
+			index.deleteById(RodaConstants.INDEX_USERS, userID);
+			index.commit(RodaConstants.INDEX_USERS);
 		} catch (SolrServerException | IOException e) {
-			LOGGER.error("Error deleting RodaMember (id=" + rodaMemberId + ")");
+			LOGGER.error("Error deleting User (id=" + userID + ")");
+		}
+	}
+	
+	
+	@Override
+	public void groupCreated(Group group){
+		SolrInputDocument groupDocument = SolrUtils.groupToSolrDocument(group);
+		try{
+			index.add(RodaConstants.INDEX_GROUPS, groupDocument);
+			index.commit(RodaConstants.INDEX_GROUPS);
+		} catch (SolrServerException | IOException e) {
+			LOGGER.error("Could not index Group ", e);
+		}
+	}
+	
+	@Override
+	public void groupUpdated(Group group) {
+		groupDeleted(group.getId());
+		groupCreated(group);
+	}
+
+	@Override
+	public void groupDeleted(String groupID) {
+		try {
+			index.deleteById(RodaConstants.INDEX_GROUPS, groupID);
+			index.commit(RodaConstants.INDEX_GROUPS);
+		} catch (SolrServerException | IOException e) {
+			LOGGER.error("Error deleting Group (id=" + groupID + ")");
 		}
 	}
 }

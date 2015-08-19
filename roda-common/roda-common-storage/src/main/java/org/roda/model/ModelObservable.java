@@ -3,10 +3,12 @@ package org.roda.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import pt.gov.dgarq.roda.core.data.v2.Group;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.RODAMember;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
 import pt.gov.dgarq.roda.core.data.v2.SIPReport;
+import pt.gov.dgarq.roda.core.data.v2.User;
 
 public abstract class ModelObservable {
 	private final List<ModelObserver> observers;
@@ -114,21 +116,62 @@ public abstract class ModelObservable {
 		}
 	}
 
-	protected void notifyRodaMemberCreated(RODAMember member){
+	protected void notifyUserCreated(User user){
 		for (ModelObserver observer : observers) {
-			observer.rodaMemberCreated(member);
+			observer.userCreated(user);
 		}
 	}
 	
-	protected void notifyRodaMemberUpdated(RODAMember member){
+	protected void notifyUserUpdated(User user){
 		for (ModelObserver observer : observers) {
-			observer.rodaMemberUpdated(member);
+			observer.userUpdated(user);
 		}
 	}
 	
-	protected void notifyRodaMemberDeleted(String memberID){
+	protected void notifyUserDeleted(String userID){
 		for (ModelObserver observer : observers) {
-			observer.rodaMemberDeleted(memberID);
+			observer.userDeleted(userID);
 		}
+	}
+	protected void notifyGroupCreated(Group group){
+		for (ModelObserver observer : observers) {
+			observer.groupCreated(group);
+		}
+	}
+	
+	protected void notifyGroupUpdated(Group group){
+		for (ModelObserver observer : observers) {
+			observer.groupUpdated(group);
+		}
+	}
+	
+	protected void notifyGroupDeleted(String groupID){
+		for (ModelObserver observer : observers) {
+			observer.groupDeleted(groupID);
+		}
+	}
+	
+	
+	protected void notifyRODAMemberCreated(RODAMember member){
+		if(member.isUser()){
+			notifyUserCreated(new User(member));
+		}else{
+			notifyGroupCreated(new Group(member));
+		}
+	}
+	
+	protected void notifyRODAMemberUpdated(RODAMember member){
+		if(member.isUser()){
+			notifyUserUpdated(new User(member));
+		}else{
+			notifyGroupUpdated(new Group(member));
+		}
+	}
+	
+	
+	//TODO: improve this method...
+	protected void notifyRODAMemberDeleted(String memberID){
+		notifyUserDeleted(memberID);
+		notifyGroupDeleted(memberID);
 	}
 }
