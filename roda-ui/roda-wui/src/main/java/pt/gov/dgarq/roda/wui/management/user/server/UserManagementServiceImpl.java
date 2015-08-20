@@ -916,7 +916,7 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
 		//
 		// }, adapter);
 	}
-
+/*
 	private static final Set<String> ALL_ROLES = new HashSet<>(
 			Arrays.asList("browse", "search", "administration.user"));
 	private static final Set<String> DIRECT_ROLES = new HashSet<>(
@@ -931,7 +931,7 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
 			new RodaUser("lfaria", "Luis Faria", "lfaria@keep.pt", false, ALL_ROLES, new HashSet<String>(),
 					LFARIA_GROUPS, LFARIA_GROUPS),
 			new RodaGroup("admin", "Administrators", ALL_ROLES, DIRECT_ROLES, ADMIN_ALL_GROUPS, ADMIN_DIRECT_GROUPS)));
-
+*/
 	@Override
 	public Long getMemberCount(Filter filter) throws RODAException {
 		try{
@@ -946,6 +946,12 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
 	@Override
 	public IndexResult<RODAMember> findMember(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
 			throws AuthorizationDeniedException, GenericException {
+		try{
+			return RodaCoreFactory.getIndexService().find(RODAMember.class, filter, sorter, sublist, facets);
+		}catch(IndexServiceException e){
+			throw new GenericException(e.getMessage());
+		}
+		/*
 		return new IndexResult<RODAMember>(
 				sublist.getFirstElementIndex(), sublist
 						.getMaximumElementCount(),
@@ -958,7 +964,7 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
 						new FacetFieldResult(RodaConstants.MEMBER_GROUPS_ALL, 4,
 								Arrays.asList(new FacetValue("admin", 1), new FacetValue("archivists", 1),
 										new FacetValue("users", 1), new FacetValue("producers", 1)),
-								new ArrayList<String>())));
+								new ArrayList<String>())));*/
 	}
 
 	// protected final DateFormat FORMAT_DATE = new SimpleDateFormat("yyyy-MM-dd
