@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -17,6 +16,7 @@ import org.apache.directory.api.ldap.model.entry.DefaultEntry;
 import org.apache.directory.api.ldap.model.entry.Entry;
 import org.apache.directory.api.ldap.model.ldif.LdifEntry;
 import org.apache.directory.api.ldap.model.ldif.LdifReader;
+import org.apache.directory.api.ldap.model.message.ModifyRequestImpl;
 import org.apache.directory.api.ldap.model.name.Dn;
 import org.apache.directory.api.ldap.model.schema.SchemaManager;
 import org.apache.directory.api.ldap.model.schema.registries.SchemaLoader;
@@ -30,31 +30,29 @@ import org.apache.directory.server.core.api.CacheService;
 import org.apache.directory.server.core.api.DirectoryService;
 import org.apache.directory.server.core.api.DnFactory;
 import org.apache.directory.server.core.api.InstanceLayout;
-import org.apache.directory.server.core.api.partition.Partition;
 import org.apache.directory.server.core.api.schema.SchemaPartition;
 import org.apache.directory.server.core.partition.impl.btree.jdbm.JdbmIndex;
 import org.apache.directory.server.core.partition.impl.btree.jdbm.JdbmPartition;
 import org.apache.directory.server.core.partition.ldif.LdifPartition;
 import org.apache.directory.server.ldap.LdapServer;
 import org.apache.directory.server.protocol.shared.transport.TcpTransport;
+import org.apache.directory.server.xdbm.Index;
 import org.apache.log4j.Logger;
 
 import pt.gov.dgarq.roda.common.RodaCoreFactory;
 import pt.gov.dgarq.roda.common.UserUtility;
 
 public class DSStartStopListener implements ServletContextListener {
-	static final private Logger logger = Logger.getLogger(DSStartStopListener.class);
-	// // First while the server is up and running log into as admin
-	// // (uid=admin,ou=system) using the default password 'secret' and bind to
-	// // ou=system
+	// First while the server is up and running log into as admin
+	// (uid=admin,ou=system) using the default password 'secret' and bind to
+	// ou=system
+	private static final Logger LOGGER = Logger.getLogger(DSStartStopListener.class);
+	private static final String APACHE_DS_DEFAULT_HOST = "localhost";
 	private static final int APACHE_DS_DEFAULT_PORT = 10389;
 	private static Path RODA_APACHE_DS_DATA_DIRECTORY = null;
 	private static Path RODA_APACHE_DS_CONFIG_DIRECTORY = null;
 	private static final String INSTANCE_NAME = "RODA";
 	private static final String BASE_DN = "dc=roda,dc=org";
-
-	private String host;
-	private Integer port;
 
 	/** The directory service */
 	private DirectoryService service;
@@ -75,7 +73,7 @@ public class DSStartStopListener implements ServletContextListener {
 	 * @throws Exception
 	 *             If the partition can't be added
 	 */
-	private Partition addPartition(String partitionId, String partitionDn, DnFactory dnFactory) throws Exception {
+	private JdbmPartition addPartition(String partitionId, String partitionDn, DnFactory dnFactory) throws Exception {
 		// Create a new partition with the given partition id
 		JdbmPartition partition = new JdbmPartition(service.getSchemaManager(), dnFactory);
 		partition.setId(partitionId);
@@ -94,15 +92,15 @@ public class DSStartStopListener implements ServletContextListener {
 	 * @param attrs
 	 *            The list of attributes to index
 	 */
-	private void addIndex(Partition partition, String... attrs) {
+	private void addIndex(JdbmPartition partition, String... attrs) {
 		// Index some attributes on the apache partition
-		Set indexedAttributes = new HashSet();
+		Set<Index<?, String>> indexedAttributes = new HashSet<Index<?, String>>();
 
 		for (String attribute : attrs) {
-			indexedAttributes.add(new JdbmIndex(attribute, false));
+			indexedAttributes.add(new JdbmIndex<String>(attribute, false));
 		}
 
-		((JdbmPartition) partition).setIndexedAttributes(indexedAttributes);
+		partition.setIndexedAttributes(indexedAttributes);
 	}
 
 	/**
@@ -194,8 +192,7 @@ public class DSStartStopListener implements ServletContextListener {
 		service.setDenormalizeOpAttrsEnabled(true);
 
 		// Now we can create as many partitions as we need
-		// Create some new partitions named 'foo', 'bar' and 'apache'.
-		Partition rodaPartition = addPartition(INSTANCE_NAME, BASE_DN, service.getDnFactory());
+		JdbmPartition rodaPartition = addPartition(INSTANCE_NAME, BASE_DN, service.getDnFactory());
 
 		// Index some attributes on the apache partition
 		addIndex(rodaPartition, "objectClass", "ou", "uid");
@@ -203,50 +200,26 @@ public class DSStartStopListener implements ServletContextListener {
 		// And start the service
 		service.startup();
 
-		// Inject the context entry for dc=Apache,dc=Org partition
+		// Inject the context entry for dc=roda,dc=org partition
 		if (!service.getAdminSession().exists(rodaPartition.getSuffixDn())) {
 			Dn dnApache = new Dn(BASE_DN);
 			Entry entryApache = service.newEntry(dnApache);
 			entryApache.add("objectClass", "top", "domain", "extensibleObject");
 			entryApache.add("dc", "roda");
 			service.getAdminSession().add(entryApache);
-			
+
+			// change attribute in order to make things like "shadowinactive" work
+			ModifyRequestImpl modifyRequestImpl = new ModifyRequestImpl();
+			modifyRequestImpl.setName(new Dn("cn=nis,ou=schema"));
+			modifyRequestImpl.replace("m-disabled", "FALSE");
+			service.getAdminSession().modify(modifyRequestImpl);
+
 			applyLdif(RODA_APACHE_DS_CONFIG_DIRECTORY.resolve("users.ldif").toFile());
 			applyLdif(RODA_APACHE_DS_CONFIG_DIRECTORY.resolve("groups.ldif").toFile());
 			applyLdif(RODA_APACHE_DS_CONFIG_DIRECTORY.resolve("roles.ldif").toFile());
 		}
-		
+
 		UserUtility.setDirectoryService(service);
-		
-		Configuration rodaConfig = RodaCoreFactory.getConfiguration("roda-core.properties");
-		
-		
-		String ldapHost = rodaConfig.getString("ldapHost");
-		int ldapPort = rodaConfig.getInt("ldapPort");
-		String ldapPeopleDN = rodaConfig.getString("ldapPeopleDN");
-		String ldapGroupsDN = rodaConfig.getString("ldapGroupsDN");
-		String ldapRolesDN = rodaConfig.getString("ldapRolesDN");
-		String ldapAdminDN = rodaConfig.getString("ldapAdminDN");
-		String ldapAdminPassword = rodaConfig.getString(
-				"ldapAdminPassword");
-		String ldapPasswordDigestAlgorithm = rodaConfig.getString(
-				"ldapPasswordDigestAlgorithm");
-		List<String> ldapProtectedUsers = Arrays.asList(rodaConfig
-				.getStringArray("ldapProtectedUsers"));
-		List<String> ldapProtectedGroups = Arrays.asList(rodaConfig
-				.getStringArray("ldapProtectedGroups"));
-
-		LdapUtility ldapUtility = new LdapUtility(ldapHost, ldapPort,
-				ldapPeopleDN, ldapGroupsDN, ldapRolesDN, ldapAdminDN,
-				ldapAdminPassword, ldapPasswordDigestAlgorithm,
-				ldapProtectedUsers, ldapProtectedGroups);
-		
-		UserUtility.setLdapUtility(ldapUtility);
-		
-		
-		
-
-		// We are all done !
 	}
 
 	public void stop() throws Exception {
@@ -265,8 +238,29 @@ public class DSStartStopListener implements ServletContextListener {
 	 * @throws Exception
 	 */
 	public void startServer() throws Exception {
+		// FIXME these configurations should be relocated, e.g. to
+		// roda-ui.properties
+		Configuration rodaConfig = RodaCoreFactory.getConfiguration("roda-core.properties");
+
+		String ldapHost = rodaConfig.getString("ldapHost", APACHE_DS_DEFAULT_HOST);
+		// int ldapPort = rodaConfig.getInt("ldapPort", APACHE_DS_DEFAULT_PORT);
+		int ldapPort = APACHE_DS_DEFAULT_PORT;
+		String ldapPeopleDN = rodaConfig.getString("ldapPeopleDN");
+		String ldapGroupsDN = rodaConfig.getString("ldapGroupsDN");
+		String ldapRolesDN = rodaConfig.getString("ldapRolesDN");
+		String ldapAdminDN = rodaConfig.getString("ldapAdminDN");
+		String ldapAdminPassword = rodaConfig.getString("ldapAdminPassword");
+		String ldapPasswordDigestAlgorithm = rodaConfig.getString("ldapPasswordDigestAlgorithm");
+		List<String> ldapProtectedUsers = rodaConfig.getList("ldapProtectedUsers");
+		List<String> ldapProtectedGroups = rodaConfig.getList("ldapProtectedGroups");
+
+		LdapUtility ldapUtility = new LdapUtility(ldapHost, ldapPort, ldapPeopleDN, ldapGroupsDN, ldapRolesDN,
+				ldapAdminDN, ldapAdminPassword, ldapPasswordDigestAlgorithm, ldapProtectedUsers, ldapProtectedGroups);
+
+		UserUtility.setLdapUtility(ldapUtility);
+
 		server = new LdapServer();
-		server.setTransports(new TcpTransport(port));
+		server.setTransports(new TcpTransport(ldapPort));
 		server.setDirectoryService(service);
 
 		server.start();
@@ -274,33 +268,32 @@ public class DSStartStopListener implements ServletContextListener {
 
 	@Override
 	public void contextDestroyed(ServletContextEvent arg0) {
-
+		server.stop();
 	}
 
 	public void applyLdif(final File ldifFile) throws Exception {
 		LdifReader entries = new LdifReader(new FileInputStream(ldifFile));
 		for (LdifEntry ldifEntry : entries) {
 			DefaultEntry newEntry = new DefaultEntry(service.getSchemaManager(), ldifEntry.getEntry());
+			LOGGER.debug("ldif entry: " + newEntry);
 			service.getAdminSession().add(newEntry);
 		}
-		// new LdifFileLoader(service.getAdminSession(), ldifFile,
-		// null).execute();
+		entries.close();
 	}
 
 	@Override
 	public void contextInitialized(ServletContextEvent arg0) {
-		host = "localhost";
-		port = APACHE_DS_DEFAULT_PORT;
 		RODA_APACHE_DS_DATA_DIRECTORY = RodaCoreFactory.getDataPath().resolve("ldap");
 		RODA_APACHE_DS_CONFIG_DIRECTORY = RodaCoreFactory.getConfigPath().resolve("ldap");
 
 		try {
-			Files.createDirectories(RODA_APACHE_DS_DATA_DIRECTORY);
-			initDirectoryService(RODA_APACHE_DS_DATA_DIRECTORY.toFile());
+			if (!Files.exists(RODA_APACHE_DS_DATA_DIRECTORY)) {
+				Files.createDirectories(RODA_APACHE_DS_DATA_DIRECTORY);
+				initDirectoryService(RODA_APACHE_DS_DATA_DIRECTORY.toFile());
+			}
 			startServer();
 		} catch (Exception e) {
-			logger.error(e.getMessage(),e);
-			e.printStackTrace();
+			LOGGER.error("Error starting up embedded ApacheDS", e);
 		}
 
 	}
