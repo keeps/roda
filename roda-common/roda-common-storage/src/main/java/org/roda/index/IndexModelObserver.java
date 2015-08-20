@@ -276,10 +276,10 @@ public class IndexModelObserver implements ModelObserver {
 	
 	@Override
 	public void userCreated(User user){
-		SolrInputDocument userDocument = SolrUtils.userToSolrDocument(user);
+		SolrInputDocument userDocument = SolrUtils.rodaMemberToSolrDocument(user);
 		try{
-			index.add(RodaConstants.INDEX_USERS, userDocument);
-			index.commit(RodaConstants.INDEX_USERS);
+			index.add(RodaConstants.INDEX_MEMBERS, userDocument);
+			index.commit(RodaConstants.INDEX_MEMBERS);
 		} catch (SolrServerException | IOException e) {
 			LOGGER.error("Could not index User ", e);
 		}
@@ -294,8 +294,8 @@ public class IndexModelObserver implements ModelObserver {
 	@Override
 	public void userDeleted(String userID) {
 		try {
-			index.deleteById(RodaConstants.INDEX_USERS, userID);
-			index.commit(RodaConstants.INDEX_USERS);
+			index.deleteById(RodaConstants.INDEX_MEMBERS, userID);
+			index.commit(RodaConstants.INDEX_MEMBERS);
 		} catch (SolrServerException | IOException e) {
 			LOGGER.error("Error deleting User (id=" + userID + ")");
 		}
@@ -304,10 +304,10 @@ public class IndexModelObserver implements ModelObserver {
 	
 	@Override
 	public void groupCreated(Group group){
-		SolrInputDocument groupDocument = SolrUtils.groupToSolrDocument(group);
+		SolrInputDocument groupDocument = SolrUtils.rodaMemberToSolrDocument(group);
 		try{
-			index.add(RodaConstants.INDEX_GROUPS, groupDocument);
-			index.commit(RodaConstants.INDEX_GROUPS);
+			index.add(RodaConstants.INDEX_MEMBERS, groupDocument);
+			index.commit(RodaConstants.INDEX_MEMBERS);
 		} catch (SolrServerException | IOException e) {
 			LOGGER.error("Could not index Group ", e);
 		}
@@ -322,39 +322,10 @@ public class IndexModelObserver implements ModelObserver {
 	@Override
 	public void groupDeleted(String groupID) {
 		try {
-			index.deleteById(RodaConstants.INDEX_GROUPS, groupID);
-			index.commit(RodaConstants.INDEX_GROUPS);
+			index.deleteById(RodaConstants.INDEX_MEMBERS, groupID);
+			index.commit(RodaConstants.INDEX_MEMBERS);
 		} catch (SolrServerException | IOException e) {
 			LOGGER.error("Error deleting Group (id=" + groupID + ")");
 		}
-	}
-
-	@Override
-	public void rodaMemberCreated(RODAMember member) {
-		SolrInputDocument memberDocument = SolrUtils.rodaMemberToSolrDocument(member);
-		try{
-			index.add(RodaConstants.INDEX_MEMBERS, memberDocument);
-			index.commit(RodaConstants.INDEX_MEMBERS);
-		} catch (SolrServerException | IOException e) {
-			LOGGER.error("Could not index Member ", e);
-		}
-		
-	}
-
-	@Override
-	public void rodaMemberUpdated(RODAMember member) {
-		rodaMemberDeleted(member.getId());
-		rodaMemberCreated(member);
-	}
-
-	@Override
-	public void rodaMemberDeleted(String memberID) {
-		try {
-			index.deleteById(RodaConstants.INDEX_MEMBERS, memberID);
-			index.commit(RodaConstants.INDEX_MEMBERS);
-		} catch (SolrServerException | IOException e) {
-			LOGGER.error("Error deleting Member (id=" + memberID + ")");
-		}
-		
 	}
 }

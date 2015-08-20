@@ -105,7 +105,7 @@
      installations. See the <uniqueKey> declaration below where <uniqueKey> is set to "id".
    -->   
    <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" />
-   <field name="name" type="boolean" indexed="true" stored="true" required="true" multiValued="false" />
+   <field name="name" type="string" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="isActive" type="boolean" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="isUser" type="boolean" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="groupsAll" type="string" indexed="true" stored="true" required="false" multiValued="true" />

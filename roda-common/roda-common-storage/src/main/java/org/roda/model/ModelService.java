@@ -1490,18 +1490,6 @@ public class ModelService extends ModelObservable {
 		addSipReport(sipReport, true);
 	}
 	
-	public void addRodaMember(RODAMember member){
-		notifyRODAMemberCreated(member);
-	}
-	
-	public void updateRODAMember(RODAMember member){
-		notifyRODAMemberUpdated(member);
-	}
-	
-	public void deleteRODAMember(String id){
-		notifyRODAMemberDeleted(id);
-	}
-	
 	public void addUser(User user){
 		notifyUserCreated(user);
 	}

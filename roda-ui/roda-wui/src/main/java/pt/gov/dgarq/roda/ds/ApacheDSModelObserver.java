@@ -173,56 +173,5 @@ public class ApacheDSModelObserver implements ModelObserver {
 			e.printStackTrace();
 		}
 	}
-	
-	@Override
-	public void rodaMemberCreated(RODAMember member) {
-		try {
-			if(member.isUser()){
-				UserUtility.getLdapUtility().addUser(new User(member));
-			}else{
-				UserUtility.getLdapUtility().addGroup(new Group(member));
-			}
-		} catch (LdapUtilityException e) {
-			e.printStackTrace();
-		} catch (GroupAlreadyExistsException e) {
-			e.printStackTrace();
-		} catch (UserAlreadyExistsException e) {
-			e.printStackTrace();
-		} catch (EmailAlreadyExistsException e) {
-			e.printStackTrace();
-		}
-		
-	}
-
-	@Override
-	public void rodaMemberUpdated(RODAMember member) {
-		try {
-			if(member.isUser()){
-				UserUtility.getLdapUtility().modifyUser(new User(member));
-			}else{
-				UserUtility.getLdapUtility().modifyGroup(new Group(member));
-			}
-		}catch(LdapUtilityException e){
-			e.printStackTrace();
-		} catch (IllegalOperationException e) {
-			e.printStackTrace();
-		} catch (NoSuchGroupException e) {
-			e.printStackTrace();
-		} catch (EmailAlreadyExistsException e) {
-			e.printStackTrace();
-		} catch (NoSuchUserException e) {
-			e.printStackTrace();
-		}
-	}
-
-	@Override
-	public void rodaMemberDeleted(String memberID) {
-		try{
-			UserUtility.getLdapUtility().removeGroup(memberID);
-			UserUtility.getLdapUtility().removeUser(memberID);
-		}catch(LdapUtilityException | IllegalOperationException e){
-			e.printStackTrace();
-		}
-	}
 
 }

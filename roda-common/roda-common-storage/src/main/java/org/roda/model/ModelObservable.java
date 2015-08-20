@@ -150,23 +150,4 @@ public abstract class ModelObservable {
 			observer.groupDeleted(groupID);
 		}
 	}
-	
-	
-	protected void notifyRODAMemberCreated(RODAMember member){
-		for (ModelObserver observer : observers) {
-			observer.rodaMemberCreated(member);
-		}
-	}
-	
-	protected void notifyRODAMemberUpdated(RODAMember member){
-		for (ModelObserver observer : observers) {
-			observer.rodaMemberUpdated(member);
-		}
-	}
-	
-	
-	//TODO: improve this method...
-	protected void notifyRODAMemberDeleted(String memberID){
-		notifyRODAMemberDeleted(memberID);
-	}
 }

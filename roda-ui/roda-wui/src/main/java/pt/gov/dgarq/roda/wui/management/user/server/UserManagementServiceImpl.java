@@ -934,7 +934,13 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
 
 	@Override
 	public Long getMemberCount(Filter filter) throws RODAException {
-		return Long.valueOf(TEST_MEMBERS.size());
+		try{
+			return RodaCoreFactory.getIndexService().count(RODAMember.class, filter)+RodaCoreFactory.getIndexService().count(RODAMember.class, filter);
+		}catch(IndexServiceException ise){
+			throw new RODAException(ise.getMessage(),ise) {
+			};
+		}
+		//return Long.valueOf(TEST_MEMBERS.size());
 	}
 
 	@Override

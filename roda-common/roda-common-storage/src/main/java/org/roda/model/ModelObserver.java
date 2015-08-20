@@ -52,11 +52,5 @@ public interface ModelObserver {
 	public void groupUpdated(Group group);
 	
 	public void groupDeleted(String groupID);
-	
-	public void rodaMemberCreated(RODAMember member);
-	
-	public void rodaMemberUpdated(RODAMember member);
-	
-	public void rodaMemberDeleted(String memberID);
 
 }
