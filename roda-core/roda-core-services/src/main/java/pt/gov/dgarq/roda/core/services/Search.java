@@ -11,7 +11,7 @@ import pt.gov.dgarq.roda.core.common.RODAServiceException;
 import pt.gov.dgarq.roda.core.common.SearchException;
 import pt.gov.dgarq.roda.core.data.SearchParameter;
 import pt.gov.dgarq.roda.core.data.SearchResult;
-import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.core.fedora.gsearch.FedoraGSearch;
 import pt.gov.dgarq.roda.core.fedora.gsearch.FedoraGSearchException;
 

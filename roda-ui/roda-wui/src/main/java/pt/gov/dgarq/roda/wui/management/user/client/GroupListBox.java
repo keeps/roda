@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
-import pt.gov.dgarq.roda.core.data.Group;
+import pt.gov.dgarq.roda.core.data.v2.Group;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;

@@ -9,7 +9,7 @@ import java.util.Set;
 
 import org.w3c.util.DateParser;
 
-import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.servlet.cas.CASAuthenticationFilter;
 
 /**
@@ -111,11 +111,9 @@ public class UserPrincipal extends User implements Principal {
 					getBusinessCategory());
 		}
 
-		getAttributeMapSet(attributeMap, "groups").addAll(
-				new HashSet<String>(Arrays.asList(getAllGroups())));
+		getAttributeMapSet(attributeMap, "groups").addAll(getAllGroups());
 
-		getAttributeMapSet(attributeMap, "roles").addAll(
-				new HashSet<String>(Arrays.asList(getRoles())));
+		getAttributeMapSet(attributeMap, "roles").addAll(getAllRoles());
 
 		// The roles are also fedoraRole's
 		attributeMap.put(CASAuthenticationFilter.FEDORA_ROLE,

@@ -7,6 +7,7 @@ public abstract class RodaPrincipal implements Serializable {
 
 	private String id;
 	private String name;
+	private String fullName;
 
 	public RodaPrincipal() {
 		super();
@@ -70,4 +71,14 @@ public abstract class RodaPrincipal implements Serializable {
 		return true;
 	}
 
+	public String getFullName() {
+		return fullName;
+	}
+
+	public void setFullName(String fullName) {
+		this.fullName = fullName;
+	}
+
+	
+	
 }

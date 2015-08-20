@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import pt.gov.dgarq.roda.core.data.RODAMember;
+
 /**
  * This is a group in RODA.
  * 
@@ -13,7 +15,6 @@ public class Group extends RodaGroup {
 
 	private static final long serialVersionUID = -4051946961307715630L;
 
-	private String fullName = null;
 	private List<String> memberUserNames = new ArrayList<String>();
 
 	private List<String> memberGroupNames = new ArrayList<String>();
@@ -41,23 +42,12 @@ public class Group extends RodaGroup {
 	 *            the Group to be cloned.
 	 */
 	public Group(Group group) {
-		super(group.getId(), group.getName(), group.getAllRoles(), group.getDirectRoles(), group.getAllGroups(), group.getDirectGroups());
+		super(group.getId(), group.getName(), group
+				.getDirectGroups(), group.getAllGroups(), group.getDirectRoles(),
+				group.getAllRoles());
+		setActive(true);
 		setMemberUserNames(group.getMemberUserNames());
 		setMemberGroupNames(group.getMemberGroupNames());
-		setFullName(group.getFullName());
-	}
-
-	public Group(RodaGroup member) {
-		super(member.getId(), member.getName(), member.getAllRoles(), member.getDirectRoles(), member.getAllGroups(), member.getDirectGroups());
-	}
-
-	public Group(RODAMember member) {
-		setId(member.getId());
-		setName(member.getName());
-		setAllGroups(member.getAllGroups());
-		setAllRoles(member.getAllRoles());
-		setDirectGroups(member.getDirectGroups());
-		setDirectRoles(member.getDirectRoles());
 	}
 
 	/**
@@ -67,16 +57,6 @@ public class Group extends RodaGroup {
 		return "Group (" + super.toString() + ", memberUserNames="
 				+ this.memberUserNames + ", memberGroupNames="
 				+ this.memberGroupNames + ")";
-	}
-
-	
-	
-	public String getFullName() {
-		return fullName;
-	}
-
-	public void setFullName(String fullName) {
-		this.fullName = fullName;
 	}
 
 	/**
@@ -181,5 +161,9 @@ public class Group extends RodaGroup {
 	public boolean removeMemberGroup(String memberGroupName) {
 		return this.memberGroupNames.remove(memberGroupName);
 	}
+
+	
+
+	
 
 }

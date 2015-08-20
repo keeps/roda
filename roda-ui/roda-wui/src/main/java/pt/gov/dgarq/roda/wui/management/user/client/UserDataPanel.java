@@ -6,9 +6,10 @@ package pt.gov.dgarq.roda.wui.management.user.client;
 import java.util.Arrays;
 import java.util.List;
 import java.util.MissingResourceException;
+import java.util.Set;
 import java.util.Vector;
 
-import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.wui.common.client.widgets.DatePicker;
 import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
 
@@ -531,7 +532,7 @@ public class UserDataPanel extends VerticalPanel implements SourcesChangeEvents 
 		this.phoneNumber.setText(user.getTelephoneNumber());
 		this.fax.setText(user.getFax());
 
-		this.setMemberGroups(user.getGroups());
+		this.setMemberGroups(user.getAllGroups());
 	}
 
 	/**
@@ -563,7 +564,7 @@ public class UserDataPanel extends VerticalPanel implements SourcesChangeEvents 
 		user.setFax(fax.getText());
 
 		if (enableGroupSelect) {
-			user.setGroups(this.getMemberGroups());
+			user.setAllGroups(this.getMemberGroups());
 		}
 
 		return user;
@@ -574,7 +575,7 @@ public class UserDataPanel extends VerticalPanel implements SourcesChangeEvents 
 	 * 
 	 * @param groups
 	 */
-	public void setMemberGroups(String[] groups) {
+	public void setMemberGroups(Set<String> groups) {
 		if (enableGroupSelect) {
 			groupSelect.setMemberGroups(groups);
 		}
@@ -585,7 +586,7 @@ public class UserDataPanel extends VerticalPanel implements SourcesChangeEvents 
 	 * 
 	 * @return a list of group names
 	 */
-	public String[] getMemberGroups() {
+	public Set<String> getMemberGroups() {
 		return enableGroupSelect ? groupSelect.getMemberGroups() : null;
 	}
 

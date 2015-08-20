@@ -18,8 +18,8 @@ import pt.gov.dgarq.roda.core.RODAClient;
 import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.data.LogEntry;
 import pt.gov.dgarq.roda.core.data.LogEntryParameter;
-import pt.gov.dgarq.roda.core.data.User;
 import pt.gov.dgarq.roda.core.data.v2.RodaSimpleUser;
+import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.servlet.cas.CASUserPrincipal;
 import pt.gov.dgarq.roda.wui.common.client.AuthenticatedUser;
 import pt.gov.dgarq.roda.wui.common.client.UserLoginService;
@@ -72,9 +72,8 @@ public class UserLoginServiceImpl extends RemoteServiceServlet implements
 		u.setName(user.getId());
 		u.setGuest(user.isGuest());
 		Set<String> roles = UserUtility.getFullUser(user).getAllRoles();
-		String[] rolesArray = roles.toArray(new String[roles.size()]);
 		
-		u.setRoles(rolesArray);
+		u.setAllRoles(roles);
 		return u;
 		
 	}

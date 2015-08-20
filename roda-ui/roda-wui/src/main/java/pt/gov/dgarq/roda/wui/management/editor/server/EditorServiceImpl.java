@@ -25,12 +25,12 @@ import pt.gov.dgarq.roda.core.common.RODAClientException;
 import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.common.UserManagementException;
 import pt.gov.dgarq.roda.core.data.DescriptionObject;
-import pt.gov.dgarq.roda.core.data.Group;
 import pt.gov.dgarq.roda.core.data.Producers;
-import pt.gov.dgarq.roda.core.data.RODAMember;
+import pt.gov.dgarq.roda.core.data.v2.Group;
+import pt.gov.dgarq.roda.core.data.v2.RODAMember;
+import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.core.data.RODAObjectPermissions;
 import pt.gov.dgarq.roda.core.data.RODAObjectUserPermissions;
-import pt.gov.dgarq.roda.core.data.User;
 import pt.gov.dgarq.roda.core.data.eadc.ArrangementTable;
 import pt.gov.dgarq.roda.core.data.eadc.ArrangementTableGroup;
 import pt.gov.dgarq.roda.core.data.eadc.ArrangementTableRow;
@@ -538,16 +538,16 @@ public class EditorServiceImpl extends RemoteServiceServlet implements EditorSer
 			User user = userBrowser.getUser(username);
 
 			// Get all groups that this user belongs to
-			String[] allGroups = user.getAllGroups();
+			Set<String> allGroups = user.getAllGroups();
 
 			// Intersect all user groups with each groups permissions
-			List<String> readAllUserGroups = new ArrayList<String>(Arrays.asList(allGroups));
+			List<String> readAllUserGroups = new ArrayList<String>(allGroups);
 			readAllUserGroups.retainAll(readGroupsList);
-			List<String> modifyAllUserGroups = new ArrayList<String>(Arrays.asList(allGroups));
+			List<String> modifyAllUserGroups = new ArrayList<String>(allGroups);
 			modifyAllUserGroups.retainAll(modifyGroupsList);
-			List<String> removeAllUserGroups = new ArrayList<String>(Arrays.asList(allGroups));
+			List<String> removeAllUserGroups = new ArrayList<String>(allGroups);
 			removeAllUserGroups.retainAll(removeGroupsList);
-			List<String> grantAllUserGroups = new ArrayList<String>(Arrays.asList(allGroups));
+			List<String> grantAllUserGroups = new ArrayList<String>(allGroups);
 			grantAllUserGroups.retainAll(grantGroupsList);
 
 			// Calculate permissions
@@ -566,16 +566,16 @@ public class EditorServiceImpl extends RemoteServiceServlet implements EditorSer
 			Group group = userBrowser.getGroup(groupname);
 
 			// Get all groups that this group belongs to
-			String[] allGroups = group.getAllGroups();
+			Set<String> allGroups = group.getAllGroups();
 
 			// Intersect all group groups with each groups permissions
-			List<String> readAllGroupGroups = new ArrayList<String>(Arrays.asList(allGroups));
+			List<String> readAllGroupGroups = new ArrayList<String>(allGroups);
 			readAllGroupGroups.retainAll(readGroupsList);
-			List<String> modifyAllGroupGroups = new ArrayList<String>(Arrays.asList(allGroups));
+			List<String> modifyAllGroupGroups = new ArrayList<String>(allGroups);
 			modifyAllGroupGroups.retainAll(readGroupsList);
-			List<String> removeAllGroupGroups = new ArrayList<String>(Arrays.asList(allGroups));
+			List<String> removeAllGroupGroups = new ArrayList<String>(allGroups);
 			removeAllGroupGroups.retainAll(readGroupsList);
-			List<String> grantAllGroupGroups = new ArrayList<String>(Arrays.asList(allGroups));
+			List<String> grantAllGroupGroups = new ArrayList<String>(allGroups);
 			grantAllGroupGroups.retainAll(readGroupsList);
 
 			// Calculate permissions

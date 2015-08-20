@@ -617,6 +617,8 @@ public class SolrUtils {
 	// TODO: Handle SimpleRepresentationPreservationMetadata
 	private static <T> String getIndexName(Class<T> resultClass) throws IndexServiceException {
 		String indexName;
+		LOGGER.error("CLASS1: "+resultClass);
+		LOGGER.error("CLASS2: "+resultClass.getName());
 		if (resultClass.equals(AIP.class)) {
 			indexName = RodaConstants.INDEX_AIP;
 		} else if (resultClass.equals(SimpleDescriptionObject.class)) {

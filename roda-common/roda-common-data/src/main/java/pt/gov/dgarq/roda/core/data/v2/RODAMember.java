@@ -12,6 +12,8 @@ public interface RODAMember extends Serializable {
 	public String getId();
 
 	public String getName();
+	
+	public String getFullName();
 
 	public Set<String> getAllGroups();
 

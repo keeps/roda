@@ -3,7 +3,7 @@
  */
 package pt.gov.dgarq.roda.wui.management.user.client;
 
-import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
 import pt.gov.dgarq.roda.wui.common.client.widgets.WUIWindow;
 

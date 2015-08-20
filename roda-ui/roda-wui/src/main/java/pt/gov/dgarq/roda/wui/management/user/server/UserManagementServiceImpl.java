@@ -40,8 +40,6 @@ import pt.gov.dgarq.roda.core.common.RODAClientException;
 import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.common.UserManagementException;
-import pt.gov.dgarq.roda.core.data.v2.Group;
-import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
 import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
@@ -53,12 +51,14 @@ import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.data.v2.FacetFieldResult;
 import pt.gov.dgarq.roda.core.data.v2.FacetValue;
+import pt.gov.dgarq.roda.core.data.v2.Group;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.RODAMember;
 import pt.gov.dgarq.roda.core.data.v2.RodaGroup;
 import pt.gov.dgarq.roda.core.data.v2.RodaSimpleUser;
 import pt.gov.dgarq.roda.core.data.v2.RodaUser;
+import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.core.stubs.UserBrowser;
 import pt.gov.dgarq.roda.core.stubs.UserEditor;
 import pt.gov.dgarq.roda.core.stubs.UserRegistration;
@@ -524,12 +524,14 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
 		} 
 	}
 
-	public String[] getGroupsRoles(String[] groupname) throws RODAException {
+	public Set<String> getGroupsRoles(Set<String> groupname) throws RODAException {
 		HashSet<String> roleSet = new HashSet<String>();
 
 		try {
-			for (int i = 0; i < groupname.length; i++) {
-				Set<String> roles = UserUtility.getLdapUtility().getGroup(groupname[i]).getAllRoles();
+			Iterator<String> it = groupname.iterator();
+			while(it.hasNext()){
+				String groupName = it.next();
+				Set<String> roles = UserUtility.getLdapUtility().getGroup(groupName).getAllRoles();
 				if (roles != null) {
 					roleSet.addAll(roles);
 				}
@@ -539,16 +541,11 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
 			throw new RODAException(e.getMessage(),e) {
 			};
 		}
-		String[] roleArray = new String[roleSet.size()];
-		Object[] roleSetArray = roleSet.toArray();
-		for (int i = 0; i < roleSet.size(); i++) {
-			roleArray[i] = (String) roleSetArray[i];
-		}
-		return roleArray;
+		return roleSet;
 	}
 
-	public String[] getUserDirectRoles(String username) throws RODAException {
-		String[] roles;
+	public Set<String> getUserDirectRoles(String username) throws RODAException {
+		Set<String> roles;
 		try {
 			Date start = new Date();
 			roles = UserUtility.getLdapUtility().getUserDirectRoles(username);
@@ -559,7 +556,7 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
 							+ username + ")", duration);
 			
 			if (roles == null) {
-				roles = new String[] {};
+				roles = new HashSet<String>();
 			}
 		} catch (LdapUtilityException e) {
 			logger.error("LdapUtility Exception", e);
@@ -650,7 +647,7 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
 		return successful;
 	}
 
-	private boolean sendEmailVerification(pt.gov.dgarq.roda.core.data.User user) throws RODAException {
+	private boolean sendEmailVerification(pt.gov.dgarq.roda.core.data.v2.User user) throws RODAException {
 		boolean success = false;
 
 		String token = user.getEmailConfirmationToken();
@@ -764,7 +761,7 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
 	public boolean changeUnverifiedEmail(String username, String email) throws RODAException {
 		boolean successful = false;
 		try {
-			pt.gov.dgarq.roda.core.data.User user = RodaClientFactory.getRodaWuiClient().getUserRegistrationService()
+			pt.gov.dgarq.roda.core.data.v2.User user = RodaClientFactory.getRodaWuiClient().getUserRegistrationService()
 					.modifyUnconfirmedEmail(username, email);
 			if (user.getEmailConfirmationToken() != null && user.getEmailConfirmationToken().length() > 0) {
 				successful = sendEmailVerification(user);
@@ -791,7 +788,7 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
 			}
 
 			try {
-				pt.gov.dgarq.roda.core.data.User user = RodaClientFactory.getRodaWuiClient().getUserRegistrationService()
+				pt.gov.dgarq.roda.core.data.v2.User user = RodaClientFactory.getRodaWuiClient().getUserRegistrationService()
 						.requestPasswordReset(username, email);
 				//sendRecoverLoginEmail(user);
 			} catch (RemoteException e) {
@@ -937,6 +934,7 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
 		try{
 			return RodaCoreFactory.getIndexService().count(RODAMember.class, filter)+RodaCoreFactory.getIndexService().count(RODAMember.class, filter);
 		}catch(IndexServiceException ise){
+			logger.error(ise.getMessage(),ise);
 			throw new RODAException(ise.getMessage(),ise) {
 			};
 		}
@@ -949,6 +947,7 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
 		try{
 			return RodaCoreFactory.getIndexService().find(RODAMember.class, filter, sorter, sublist, facets);
 		}catch(IndexServiceException e){
+			logger.error(e.getMessage(),e);
 			throw new GenericException(e.getMessage());
 		}
 		/*

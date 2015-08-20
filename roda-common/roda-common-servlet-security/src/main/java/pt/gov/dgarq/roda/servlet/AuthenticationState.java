@@ -1,6 +1,6 @@
 package pt.gov.dgarq.roda.servlet;
 
-import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.core.data.v2.User;
 
 /**
  * @author Rui Castro

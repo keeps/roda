@@ -5,9 +5,11 @@ package pt.gov.dgarq.roda.wui.management.user.client;
 
 import pt.gov.dgarq.roda.core.common.EmailAlreadyExistsException;
 import pt.gov.dgarq.roda.core.common.UserAlreadyExistsException;
-import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
 import pt.gov.dgarq.roda.wui.common.client.widgets.WUIWindow;
+
+import java.util.Set;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
@@ -60,7 +62,7 @@ public class CreateUser extends WUIWindow {
 			public void onClick(Widget sender) {
 				final User user = userDataPanel.getUser();
 				final String password = userDataPanel.getPassword();
-				final String[] specialroles = permissionsPanel
+				final Set<String> specialroles = permissionsPanel
 						.getDirectRoles();
 				user.setDirectRoles(specialroles);
 

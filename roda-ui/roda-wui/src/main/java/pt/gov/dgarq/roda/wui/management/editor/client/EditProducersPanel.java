@@ -19,10 +19,10 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.MetadataEditorConstants;
-import pt.gov.dgarq.roda.core.data.Group;
-import pt.gov.dgarq.roda.core.data.RODAMember;
-import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.core.data.v2.Group;
+import pt.gov.dgarq.roda.core.data.v2.RODAMember;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
+import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.SuccessListener;
 import pt.gov.dgarq.roda.wui.common.client.widgets.LoadingPopup;

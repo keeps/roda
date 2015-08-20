@@ -1,6 +1,6 @@
 package pt.gov.dgarq.roda.core.common;
 
-import pt.gov.dgarq.roda.core.data.Group;
+import pt.gov.dgarq.roda.core.data.v2.Group;
 
 /**
  * Thrown to indicate that a {@link Group} with the same name already exists

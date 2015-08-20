@@ -3,19 +3,21 @@
  */
 package pt.gov.dgarq.roda.wui.management.user.client;
 
+import java.util.Set;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import pt.gov.dgarq.roda.core.common.RODAException;
-import pt.gov.dgarq.roda.core.data.Group;
-import pt.gov.dgarq.roda.core.data.User;
 import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
 import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
+import pt.gov.dgarq.roda.core.data.v2.Group;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.RODAMember;
+import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.wui.common.client.PrintReportException;
 
 /**
@@ -258,7 +260,7 @@ public interface UserManagementServiceAsync {
 	 * @return a list with the role codes that this group is enabled
 	 * @throws RODAException
 	 */
-	public void getGroupsRoles(String[] groupname, AsyncCallback<String[]> callback);
+	public void getGroupsRoles(Set<String> groupname, AsyncCallback<Set<String>> callback);
 
 	/**
 	 * Get a list of roles that are set directly to this user, i.e. are not
@@ -269,7 +271,7 @@ public interface UserManagementServiceAsync {
 	 * @return the list of direct roles
 	 * @throws RODAException
 	 */
-	public void getUserDirectRoles(String username, AsyncCallback<String[]> callback);
+	public void getUserDirectRoles(String username, AsyncCallback<Set<String>> callback);
 
 	/**
 	 * Get a list of roles that are set directly to this group, i.e. are not

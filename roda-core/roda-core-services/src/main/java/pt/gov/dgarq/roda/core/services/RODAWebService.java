@@ -18,7 +18,7 @@ import pt.gov.dgarq.roda.core.common.LoggerException;
 import pt.gov.dgarq.roda.core.common.RODAServiceException;
 import pt.gov.dgarq.roda.core.data.LogEntry;
 import pt.gov.dgarq.roda.core.data.LogEntryParameter;
-import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.core.logger.LoggerManager;
 import pt.gov.dgarq.roda.servlet.RodaServletRequestWrapper;
 import pt.gov.dgarq.roda.servlet.cas.CASUserPrincipal;

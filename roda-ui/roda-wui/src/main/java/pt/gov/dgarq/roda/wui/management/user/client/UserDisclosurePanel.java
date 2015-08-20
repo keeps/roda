@@ -4,11 +4,13 @@
 package pt.gov.dgarq.roda.wui.management.user.client;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
-import pt.gov.dgarq.roda.core.data.Group;
-import pt.gov.dgarq.roda.core.data.RODAMember;
-import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.core.data.v2.Group;
+import pt.gov.dgarq.roda.core.data.v2.RODAMember;
+import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.images.CommonImageBundle;
 import pt.gov.dgarq.roda.wui.common.client.widgets.AlphabetListItem;
@@ -107,9 +109,10 @@ public class UserDisclosurePanel extends SimplePanel implements
 								}
 
 								public void onSuccess(User user) {
-									String[] groups = user.getGroups();
-									for (int i = 0; i < groups.length; i++) {
-										String groupname = groups[i];
+									Set<String> groups = user.getDirectGroups();
+									Iterator<String> it = groups.iterator();
+									while(it.hasNext()){
+										String groupname = it.next();
 										final GroupMiniPanel groupPanel = new GroupMiniPanel(
 												groupname);
 										groupPanel

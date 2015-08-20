@@ -10,8 +10,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.naming.AuthenticationException;
 import javax.net.ssl.HttpsURLConnection;
@@ -27,7 +30,7 @@ import org.jasig.cas.client.validation.TicketValidationException;
 import org.w3c.util.DateParser;
 import org.w3c.util.InvalidDateException;
 
-import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.core.data.v2.User;
 
 public class CASUtility {
 	static final private Logger logger = Logger.getLogger(CASUtility.class);
@@ -212,15 +215,17 @@ public class CASUtility {
 						directRolesString = directRolesString.substring(0, directRolesString.length() - 1);
 					}
 					String[] directRoles = directRolesString.split(",");
+					Set<String> directRolesSet = new HashSet<String>();
 					for (int i = 0; i < directRoles.length; i++) {
-						directRoles[i] = directRoles[i].trim();
+						directRolesSet.add(directRoles[i].trim());
 					}
-					user.setDirectRoles(directRoles);
+					
+					user.setDirectRoles(directRolesSet);
 				}
 			} else if (directRolesObject instanceof List<?>) {
 				List<String> directRoles = (List<String>) directRolesObject;
-				String[] directRolesArray = directRoles.toArray(new String[directRoles.size()]);
-				user.setDirectRoles(directRolesArray);
+				Set<String> directRolesSet = new HashSet<String>(directRoles);
+				user.setDirectRoles(directRolesSet);
 			}
 		}
 		if (userAttributes.get("roles") != null) {
@@ -239,12 +244,15 @@ public class CASUtility {
 					for (int i = 0; i < roles.length; i++) {
 						roles[i] = roles[i].trim();
 					}
-					user.setRoles(roles);
+					Set<String> rolesSet = new HashSet<String>();
+					rolesSet.addAll(Arrays.asList(roles));
+					user.setAllRoles(rolesSet);
 				}
 			} else if (rolesObject instanceof List<?>) {
 				List<String> roles = (List<String>) rolesObject;
-				String[] rolesArray = roles.toArray(new String[roles.size()]);
-				user.setRoles(rolesArray);
+				Set<String> rolesSet = new HashSet<String>();
+				rolesSet.addAll(roles);
+				user.setAllRoles(rolesSet);
 			}
 		}
 		if (userAttributes.get("groups") != null) {
@@ -260,15 +268,17 @@ public class CASUtility {
 					}
 
 					String[] groups = groupsString.split(",");
+					Set<String> groupsSet = new HashSet<String>();
 					for (int i = 0; i < groups.length; i++) {
-						groups[i] = groups[i].trim();
+						groupsSet.add(groups[i].trim());
 					}
-					user.setAllGroups(groups);
+					user.setAllGroups(groupsSet);
 				}
 			} else if (groupsObject instanceof List<?>) {
 				List<String> groups = (List<String>) groupsObject;
-				String[] groupsArray = groups.toArray(new String[groups.size()]);
-				user.setAllGroups(groupsArray);
+				Set<String> groupsSet = new HashSet<String>();
+				groupsSet.addAll(groups);groups.toArray(new String[groups.size()]);
+				user.setAllGroups(groupsSet);
 			}
 		}
 		return user;
@@ -442,8 +452,8 @@ public class CASUtility {
 			User u = getUserFromAttributes(
 					attributePrincipalWithProxyGrantingTicket.getAttributePrincipal().getAttributes());
 
-			if (u.getRoles() == null || u.getRoles().length == 0 || u.getDirectRoles() == null
-					|| u.getDirectRoles().length == 0) {
+			if (u.getAllRoles() == null || u.getAllRoles().size() == 0 || u.getDirectRoles() == null
+					|| u.getDirectRoles().size() == 0) {
 				// TODO
 				// deleteTicket(originalTGT);
 			}

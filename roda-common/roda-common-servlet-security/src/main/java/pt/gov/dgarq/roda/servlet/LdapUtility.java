@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -44,9 +45,9 @@ import pt.gov.dgarq.roda.core.common.InvalidTokenException;
 import pt.gov.dgarq.roda.core.common.NoSuchGroupException;
 import pt.gov.dgarq.roda.core.common.NoSuchUserException;
 import pt.gov.dgarq.roda.core.common.UserAlreadyExistsException;
-import pt.gov.dgarq.roda.core.data.Group;
-import pt.gov.dgarq.roda.core.data.RODAMember;
-import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.core.data.v2.Group;
+import pt.gov.dgarq.roda.core.data.v2.RODAMember;
+import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.servlet.adapter.GroupAdapter;
@@ -278,7 +279,7 @@ public class LdapUtility {
 				// Add all roles assigned to this user
 				Set<String> memberRoles = getMemberRoles(ctxRoot,
 						getUserDN(user.getName()));
-				user.setRoles(memberRoles.toArray(new String[memberRoles.size()]));
+				user.setAllRoles(memberRoles);
 
 				// Add direct roles assigned to this user
 				for (String role : getMemberDirectRoles(ctxRoot,
@@ -289,8 +290,7 @@ public class LdapUtility {
 				// Add all groups to which this user belongs
 				Set<String> memberGroups = getMemberGroups(ctxRoot,
 						getUserDN(user.getName()));
-				user.setAllGroups(memberGroups.toArray(new String[memberGroups
-						.size()]));
+				user.setAllGroups(memberGroups);
 
 				// Add groups to which this user belongs
 				for (String groupDN : getDNsOfGroupsContainingMember(ctxRoot,
@@ -406,7 +406,7 @@ public class LdapUtility {
 	public User addUser(User user) throws UserAlreadyExistsException,
 			EmailAlreadyExistsException, LdapUtilityException {
 
-		if (!user.isNameValid(user.getName())) {
+		if (!user.isNameValid()) {
 			logger.debug("'" + user.getName() + "' is not a valid user name.");
 			throw new LdapUtilityException("'" + user.getName()
 					+ "' is not a valid user name.");
@@ -431,7 +431,7 @@ public class LdapUtility {
 			setMemberDirectRoles(ctxRoot, getUserDN(user.getName()),
 					user.getDirectRoles());
 			setMemberGroups(ctxRoot, getUserDN(user.getName()),
-					user.getGroups());
+					user.getDirectGroups());
 
 			// Close the context when we're done
 			ctxRoot.close();
@@ -734,8 +734,7 @@ public class LdapUtility {
 				// Add all roles assigned to this group
 				Set<String> memberRoles = getMemberRoles(ctxRoot,
 						getGroupDN(group.getName()));
-				group.setRoles(memberRoles.toArray(new String[memberRoles
-						.size()]));
+				group.setAllRoles(memberRoles);
 
 				// Add direct roles assigned to this group
 				for (String role : getMemberDirectRoles(ctxRoot,
@@ -746,8 +745,7 @@ public class LdapUtility {
 				// Add all groups to which this group belongs
 				Set<String> memberGroups = getMemberGroups(ctxRoot,
 						getGroupDN(group.getName()));
-				group.setAllGroups(memberGroups.toArray(new String[memberGroups
-						.size()]));
+				group.setAllGroups(memberGroups);
 
 				// Add groups to which this group belongs
 				for (String groupDN : getDNsOfGroupsContainingMember(ctxRoot,
@@ -822,7 +820,7 @@ public class LdapUtility {
 	public Group addGroup(Group group) throws GroupAlreadyExistsException,
 			LdapUtilityException {
 
-		if (!group.isNameValid(group.getName())) {
+		if (!group.isNameValid()) {
 			logger.debug("'" + group.getName() + "' is not a valid group name.");
 			throw new LdapUtilityException("'" + group.getName()
 					+ "' is not a valid group name.");
@@ -860,7 +858,7 @@ public class LdapUtility {
 			setMemberDirectRoles(ctxRoot, getGroupDN(group.getName()),
 					group.getDirectRoles());
 			setMemberGroups(ctxRoot, getGroupDN(group.getName()),
-					group.getGroups());
+					group.getAllGroups());
 
 			// Close the context when we're done
 			ctxRoot.close();
@@ -941,7 +939,7 @@ public class LdapUtility {
 					DirContext.REPLACE_ATTRIBUTE, attributes);
 
 			setMemberGroups(ctxRoot, getGroupDN(modifiedGroup.getName()),
-					modifiedGroup.getGroups());
+					modifiedGroup.getDirectGroups());
 			setMemberDirectRoles(ctxRoot, getGroupDN(modifiedGroup.getName()),
 					modifiedGroup.getDirectRoles());
 
@@ -1591,7 +1589,7 @@ public class LdapUtility {
 	 *             if the specified Group doesn't exist.
 	 * @throws LdapUtilityException
 	 */
-	public void setSuperGroups(String groupName, String[] groups)
+	public void setSuperGroups(String groupName, Set<String> groups)
 			throws LdapUtilityException, NoSuchGroupException {
 		try {
 
@@ -1618,7 +1616,7 @@ public class LdapUtility {
 
 		// Add all roles assigned to this user
 		Set<String> memberRoles = getMemberRoles(ctxRoot, getUserDN(username));
-		user.setRoles(memberRoles.toArray(new String[memberRoles.size()]));
+		user.setAllRoles(memberRoles);
 
 		// Add direct roles assigned to this user
 		for (String role : getMemberDirectRoles(ctxRoot, getUserDN(username))) {
@@ -1627,7 +1625,7 @@ public class LdapUtility {
 
 		// Add all groups to which this user belongs
 		Set<String> memberGroups = getMemberGroups(ctxRoot, getUserDN(username));
-		user.setAllGroups(memberGroups.toArray(new String[memberGroups.size()]));
+		user.setAllGroups(memberGroups);
 
 		// Add groups to which this user belongs
 		for (String groupDN : getDNsOfGroupsContainingMember(ctxRoot,
@@ -1882,7 +1880,7 @@ public class LdapUtility {
 
 		// Add all roles assigned to this group
 		Set<String> memberRoles = getMemberRoles(ctxRoot, getGroupDN(name));
-		group.setRoles(memberRoles.toArray(new String[memberRoles.size()]));
+		group.setAllRoles(memberRoles);
 
 		// Add direct roles assigned to this group
 		for (String role : getMemberDirectRoles(ctxRoot, getGroupDN(name))) {
@@ -1891,7 +1889,7 @@ public class LdapUtility {
 
 		// Add all groups to which this group belongs
 		Set<String> memberGroups = getMemberGroups(ctxRoot, getGroupDN(name));
-		group.setAllGroups(memberGroups.toArray(new String[memberGroups.size()]));
+		group.setAllGroups(memberGroups);
 
 		// Add groups to which this group belongs
 		for (String groupDN : getDNsOfGroupsContainingMember(ctxRoot,
@@ -2123,7 +2121,7 @@ public class LdapUtility {
 
 			if (modifyRolesAndGroups) {
 				setMemberGroups(ctxRoot, getUserDN(modifiedUser.getName()),
-						modifiedUser.getGroups());
+						modifiedUser.getAllGroups());
 				setMemberDirectRoles(ctxRoot,
 						getUserDN(modifiedUser.getName()),
 						modifiedUser.getDirectRoles());
@@ -2559,15 +2557,15 @@ public class LdapUtility {
 	 * @throws NamingException
 	 */
 	private void setMemberDirectRoles(DirContext ctxRoot, String memberDN,
-			String[] roles) throws NamingException {
+			Set<String> roles) throws NamingException {
 
 		if (roles == null) {
 			logger.warn("setMemberRoles() - roles is null. no roles");
-			roles = new String[] {};
+			roles = new HashSet<String>();
 		}
 
 		Set<String> oldroles = getMemberDirectRoles(ctxRoot, memberDN);
-		Set<String> newroles = new HashSet<String>(Arrays.asList(roles));
+		Set<String> newroles = new HashSet<String>(roles);
 
 		// removing from oldroles all the roles in newroles, oldroles
 		// becomes the Set of roles that the user doesn't want to own
@@ -2601,18 +2599,20 @@ public class LdapUtility {
 	 * @throws NamingException
 	 */
 	private void setMemberGroups(DirContext ctxRoot, String memberDN,
-			String[] groups) throws NamingException {
+			Set<String> groups) throws NamingException {
 
 		if (groups == null) {
 			logger.warn("setMemberGroups() - groups is null. no groups");
-			groups = new String[] {};
+			groups = new HashSet<String>();
 		}
 
 		Set<String> oldgroupDNs = getDNsOfGroupsContainingMember(ctxRoot,
 				memberDN);
 		Set<String> newgroupDNs = new HashSet<String>();
-		for (int i = 0; i < groups.length; i++) {
-			newgroupDNs.add(getGroupDN(groups[i]));
+		
+		Iterator<String> it = groups.iterator();
+		while(it.hasNext()){
+			newgroupDNs.add(getGroupDN(it.next()));
 		}
 
 		// removing all the groups in newgroups, oldgroups becomes the Set

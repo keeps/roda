@@ -16,7 +16,7 @@ import pt.gov.dgarq.roda.core.common.RODAClientException;
 import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.common.UserManagementException;
 import pt.gov.dgarq.roda.core.data.DescriptionObject;
-import pt.gov.dgarq.roda.core.data.RODAMember;
+import pt.gov.dgarq.roda.core.data.v2.RODAMember;
 import pt.gov.dgarq.roda.core.data.RODAObjectUserPermissions;
 import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevel;
 

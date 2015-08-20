@@ -6,9 +6,9 @@ package pt.gov.dgarq.roda.wui.management.user.client;
 import java.util.HashMap;
 import java.util.Map;
 
-import pt.gov.dgarq.roda.core.data.Group;
-import pt.gov.dgarq.roda.core.data.RODAMember;
-import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.core.data.v2.Group;
+import pt.gov.dgarq.roda.core.data.v2.RODAMember;
+import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.widgets.AlphabetListItem;
 import pt.gov.dgarq.roda.wui.management.user.client.images.UserManagementImageBundle;

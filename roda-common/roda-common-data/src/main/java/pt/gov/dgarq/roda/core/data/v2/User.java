@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Set;
 
+import pt.gov.dgarq.roda.core.data.RODAMember;
+
 /**
  * This is a user of RODA.
  * 
@@ -20,7 +22,6 @@ public class User extends RodaUser {
 	public static final String[] ID_TYPES = new String[] { ID_TYPE_BI,
 			ID_TYPE_PASSPORT, ID_TYPE_CITIZEN_CARD };
 
-	private String fullName = null;
 	// LDAP documentTitle
 	private String idDocumentType = null;
 	// LDAP documentIdentifier
@@ -76,7 +77,8 @@ public class User extends RodaUser {
 	 *            the name of the new user.
 	 */
 	public User(String name) {
-		super(name, name, null, false, null, null, null,null);
+		super(name,name,"",false, null, null, null, null);
+		setActive(true);
 	}
 
 	/**
@@ -86,8 +88,11 @@ public class User extends RodaUser {
 	 *            the User to be cloned.
 	 */
 	public User(User user) {
-		super(user.getId(), user.getName(), user.getEmail(), user.isGuest(), user.getAllRoles(), user.getDirectRoles(), user.getAllGroups(),user.getDirectGroups());
-		setFullName(user.getFullName());
+
+		super(user.getId(), user.getName(),"",false, user
+				.getDirectGroups(), user.getAllGroups(), user.getDirectRoles(), user
+				.getAllRoles());
+		setActive(user.isActive());
 		setIdDocumentType(user.getIdDocumentType());
 		setIdDocument(user.getIdDocument());
 		setIdDocumentLocation(user.getIdDocumentLocation());
@@ -112,29 +117,6 @@ public class User extends RodaUser {
 		setEmailConfirmationToken(user.getResetPasswordToken());
 		setEmailConfirmationTokenExpirationDate(user
 				.getResetPasswordTokenExpirationDate());
-	}
-	
-	
-
-	public String getFullName() {
-		return fullName;
-	}
-
-	public void setFullName(String fullName) {
-		this.fullName = fullName;
-	}
-
-	public User(RodaUser rodaUser) {
-		super(rodaUser.getId(), rodaUser.getName(), rodaUser.getEmail(), rodaUser.isGuest(), rodaUser.getAllRoles(), rodaUser.getDirectRoles(), rodaUser.getAllGroups(), rodaUser.getDirectGroups());
-	}
-
-	public User(RODAMember member) {
-		setId(member.getId());
-		setName(member.getName());
-		setAllGroups(member.getAllGroups());
-		setAllRoles(member.getAllRoles());
-		setDirectGroups(member.getDirectGroups());
-		setDirectRoles(member.getDirectRoles());
 	}
 
 	/**

@@ -17,7 +17,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
 import pt.gov.dgarq.roda.core.common.RODAServiceException;
-import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.servlet.cas.CASAuthenticationFilter;
 import pt.gov.dgarq.roda.servlet.RodaServletRequestWrapper;
 import pt.gov.dgarq.roda.servlet.cas.CASUserPrincipal;

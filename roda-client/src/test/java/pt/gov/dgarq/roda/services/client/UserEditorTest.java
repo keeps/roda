@@ -3,7 +3,7 @@ package pt.gov.dgarq.roda.services.client;
 import java.net.URL;
 
 import pt.gov.dgarq.roda.core.RODAClient;
-import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.core.stubs.UserEditor;
 import pt.gov.dgarq.roda.servlet.cas.CASUtility;
 

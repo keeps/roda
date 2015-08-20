@@ -68,7 +68,7 @@ public class IngestMonitor extends RODAWebService {
 			parametersList.addAll(filter.getParameters());
 		}
 
-		List<String> roles = Arrays.asList(this.getClientUser().getRoles());
+		List<String> roles = new ArrayList<String>(this.getClientUser().getAllRoles());
 
 		if (!roles.contains("ingest.list_all_sips")) {
 			parametersList.add(0, new SimpleFilterParameter("username",
@@ -124,7 +124,7 @@ public class IngestMonitor extends RODAWebService {
 					.getParameters());
 		}
 
-		List<String> roles = Arrays.asList(this.getClientUser().getRoles());
+		List<String> roles = new ArrayList<String>(this.getClientUser().getAllRoles());
 
 		if (!roles.contains("ingest.list_all_sips")) {
 			parametersList.add(0, new SimpleFilterParameter("username",

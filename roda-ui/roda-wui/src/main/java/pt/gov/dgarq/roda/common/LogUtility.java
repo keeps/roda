@@ -6,10 +6,10 @@ import org.apache.log4j.Logger;
 import org.roda.model.ModelServiceException;
 
 import pt.gov.dgarq.roda.core.common.LoggerException;
-import pt.gov.dgarq.roda.core.data.User;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.LogEntryParameter;
 import pt.gov.dgarq.roda.core.data.v2.RodaSimpleUser;
+import pt.gov.dgarq.roda.core.data.v2.User;
 
 public class LogUtility {
 	private static final Logger logger = Logger.getLogger(LogUtility.class);

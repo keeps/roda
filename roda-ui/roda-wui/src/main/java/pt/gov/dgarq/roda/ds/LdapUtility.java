@@ -1086,7 +1086,7 @@ public class LdapUtility {
 	 * 
 	 * @throws LdapUtilityException
 	 */
-	public String[] getUserDirectRoles(String userName)
+	public Set<String> getUserDirectRoles(String userName)
 			throws LdapUtilityException {
 
 		try {
@@ -1098,11 +1098,11 @@ public class LdapUtility {
 
 			ctxRoot.close();
 
-			String[] directRoles = new String[directMemberRolesDN.size()];
-
+			//String[] directRoles = new String[directMemberRolesDN.size()];
+			Set<String> directRoles = new HashSet<String>();
 			int count = 0;
 			for (String roleDN : directMemberRolesDN) {
-				directRoles[count] = getRoleCNFromDN(roleDN);
+				directRoles.add(getRoleCNFromDN(roleDN));
 				count++;
 			}
 

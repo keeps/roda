@@ -6,7 +6,7 @@ package pt.gov.dgarq.roda.wui.management.user.client;
 import java.util.List;
 import java.util.Vector;
 
-import pt.gov.dgarq.roda.core.data.Group;
+import pt.gov.dgarq.roda.core.data.v2.Group;
 import pt.gov.dgarq.roda.wui.management.user.client.images.UserManagementImageBundle;
 
 import com.google.gwt.core.client.GWT;

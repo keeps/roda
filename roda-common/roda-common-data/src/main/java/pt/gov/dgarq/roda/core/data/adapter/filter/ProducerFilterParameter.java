@@ -3,9 +3,10 @@ package pt.gov.dgarq.roda.core.data.adapter.filter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import pt.gov.dgarq.roda.core.data.SimpleDescriptionObject;
-import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.core.data.v2.User;
 
 /**
  * This filter parameter is used to filter {@link SimpleDescriptionObject}'s
@@ -100,9 +101,9 @@ public class ProducerFilterParameter extends FilterParameter {
 	 * @param groups
 	 *            the groups to set
 	 */
-	public void setGroups(String[] groups) {
+	public void setGroups(Set<String> groups) {
 		this.groups.clear();
-		this.groups.addAll(Arrays.asList(groups));
+		this.groups.addAll(groups);
 	}
 
 }

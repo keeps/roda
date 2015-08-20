@@ -19,7 +19,7 @@ import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
 import pt.gov.dgarq.roda.core.common.LoginException;
 import pt.gov.dgarq.roda.core.common.RODAClientException;
 import pt.gov.dgarq.roda.core.common.RODAException;
-import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.core.stubs.AcceptSIP;
 import pt.gov.dgarq.roda.core.stubs.AcceptSIPServiceLocator;
 import pt.gov.dgarq.roda.core.stubs.AcceptSIPSoapBindingStub;

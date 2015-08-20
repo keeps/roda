@@ -13,7 +13,7 @@ import pt.gov.dgarq.roda.core.common.NoSuchUserException;
 import pt.gov.dgarq.roda.core.common.RODAServiceException;
 import pt.gov.dgarq.roda.core.common.UserAlreadyExistsException;
 import pt.gov.dgarq.roda.core.common.UserRegistrationException;
-import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.servlet.LdapUtility;
 
 /**

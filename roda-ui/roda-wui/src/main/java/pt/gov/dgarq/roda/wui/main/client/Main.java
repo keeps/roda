@@ -138,7 +138,7 @@ public class Main extends Composite implements EntryPoint {
 			String[] historyPath = Tools.splitHistory(decodedHistoryToken);
 			contentPanel.update(historyPath);
 
-			Scheduler.get().scheduleDeferred(new Command() {
+			/*Scheduler.get().scheduleDeferred(new Command() {
 
 				public void execute() {
 					ClientLoggerService.Util.getInstance().pagehit(decodedHistoryToken, new AsyncCallback<Void>() {
@@ -154,7 +154,7 @@ public class Main extends Composite implements EntryPoint {
 					});
 				}
 
-			});
+			});*/
 			GAnalyticsTracker.track(historyToken);
 		}
 	}

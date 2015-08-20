@@ -8,7 +8,7 @@
 package pt.gov.dgarq.roda.core.data;
 
 public class RODAGroup  implements java.io.Serializable {
-    private pt.gov.dgarq.roda.core.data.User[] members;
+    private pt.gov.dgarq.roda.core.data.v2.User[] members;
 
     private java.lang.String name;
 
@@ -16,7 +16,7 @@ public class RODAGroup  implements java.io.Serializable {
     }
 
     public RODAGroup(
-           pt.gov.dgarq.roda.core.data.User[] members,
+           pt.gov.dgarq.roda.core.data.v2.User[] members,
            java.lang.String name) {
            this.members = members;
            this.name = name;
@@ -28,7 +28,7 @@ public class RODAGroup  implements java.io.Serializable {
      * 
      * @return members
      */
-    public pt.gov.dgarq.roda.core.data.User[] getMembers() {
+    public pt.gov.dgarq.roda.core.data.v2.User[] getMembers() {
         return members;
     }
 
@@ -38,7 +38,7 @@ public class RODAGroup  implements java.io.Serializable {
      * 
      * @param members
      */
-    public void setMembers(pt.gov.dgarq.roda.core.data.User[] members) {
+    public void setMembers(pt.gov.dgarq.roda.core.data.v2.User[] members) {
         this.members = members;
     }
 

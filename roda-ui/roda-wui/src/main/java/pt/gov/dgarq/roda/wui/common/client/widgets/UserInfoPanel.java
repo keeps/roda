@@ -3,8 +3,6 @@
  */
 package pt.gov.dgarq.roda.wui.common.client.widgets;
 
-import pt.gov.dgarq.roda.core.data.User;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.DockPanel;
@@ -15,6 +13,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.CommonConstants;
+import pt.gov.dgarq.roda.core.data.v2.User;
 
 /**
  * @author Luis Faria

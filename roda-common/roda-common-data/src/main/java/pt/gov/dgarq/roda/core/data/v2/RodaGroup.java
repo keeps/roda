@@ -165,7 +165,25 @@ public class RodaGroup extends RodaPrincipal implements RODAMember {
 		}
 		directGroups.add(group);
 	}
+	public void addGroup(String group) {
+		if(allGroups==null){
+			allGroups = new HashSet<String>();
+		}
+		allGroups.add(group);
+	}
 	public boolean isNameValid() {
 		return true;
+	}
+	
+	public void removeDirectRole(String role) {
+		if(directRoles.contains(role)){
+			directRoles.remove(role);
+		}		
+	}
+	
+	public void removeGroup(String group) {
+		if(directGroups.contains(group)){
+			directGroups.remove(group);
+		}
 	}
 }

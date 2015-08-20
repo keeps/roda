@@ -33,7 +33,7 @@ import pt.gov.dgarq.roda.core.common.InvalidDescriptionObjectException;
 import pt.gov.dgarq.roda.core.common.LoginException;
 import pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException;
 import pt.gov.dgarq.roda.core.common.RODAClientException;
-import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.core.metadata.MetadataException;
 import pt.gov.dgarq.roda.core.metadata.eadc.EadCMetadataException;
 import pt.gov.dgarq.roda.servlet.RodaServletRequestWrapper;

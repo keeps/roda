@@ -12,7 +12,7 @@ public class RODAUser  implements java.io.Serializable {
 
     private java.lang.String fullName;
 
-    private pt.gov.dgarq.roda.core.data.Group[] groups;
+    private pt.gov.dgarq.roda.core.data.v2.Group[] groups;
 
     private java.lang.String name;
 
@@ -28,7 +28,7 @@ public class RODAUser  implements java.io.Serializable {
     public RODAUser(
            java.lang.String address,
            java.lang.String fullName,
-           pt.gov.dgarq.roda.core.data.Group[] groups,
+           pt.gov.dgarq.roda.core.data.v2.Group[] groups,
            java.lang.String name,
            java.lang.String password,
            java.lang.String phoneNumber,
@@ -88,7 +88,7 @@ public class RODAUser  implements java.io.Serializable {
      * 
      * @return groups
      */
-    public pt.gov.dgarq.roda.core.data.Group[] getGroups() {
+    public pt.gov.dgarq.roda.core.data.v2.Group[] getGroups() {
         return groups;
     }
 
@@ -98,7 +98,7 @@ public class RODAUser  implements java.io.Serializable {
      * 
      * @param groups
      */
-    public void setGroups(pt.gov.dgarq.roda.core.data.Group[] groups) {
+    public void setGroups(pt.gov.dgarq.roda.core.data.v2.Group[] groups) {
         this.groups = groups;
     }
 

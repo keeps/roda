@@ -13,11 +13,11 @@ import org.apache.log4j.Logger;
 import pt.gov.dgarq.roda.core.common.NoSuchSIPException;
 import pt.gov.dgarq.roda.core.data.SIPState;
 import pt.gov.dgarq.roda.core.data.SIPStateTransition;
-import pt.gov.dgarq.roda.core.data.User;
 import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
+import pt.gov.dgarq.roda.core.data.v2.User;
 
 /**
  * @author Rui Castro

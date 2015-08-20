@@ -5,7 +5,7 @@ import java.util.List;
 
 import pt.gov.dgarq.roda.core.adapter.SortParameterComparator;
 import pt.gov.dgarq.roda.core.adapter.jndi.JndiEntityAdapter;
-import pt.gov.dgarq.roda.core.data.RODAMember;
+import pt.gov.dgarq.roda.core.data.v2.RODAMember;
 
 /**
  * @author Rui Castro

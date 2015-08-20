@@ -22,7 +22,7 @@ import org.apache.log4j.Logger;
 import pt.gov.dgarq.roda.core.common.IngestException;
 import pt.gov.dgarq.roda.core.common.RODAServiceException;
 import pt.gov.dgarq.roda.core.data.SIPState;
-import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.core.ingest.SIPUploadTask;
 
 /**

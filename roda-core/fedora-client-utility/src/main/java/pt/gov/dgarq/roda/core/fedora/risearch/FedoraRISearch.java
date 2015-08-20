@@ -30,11 +30,11 @@ import pt.gov.dgarq.roda.core.data.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.core.data.SimpleEventPreservationObject;
 import pt.gov.dgarq.roda.core.data.SimpleRepresentationObject;
 import pt.gov.dgarq.roda.core.data.SimpleRepresentationPreservationObject;
-import pt.gov.dgarq.roda.core.data.User;
 import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
+import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.core.fedora.FedoraClientUtility;
 import pt.gov.dgarq.roda.servlet.cas.CASUserPrincipal;
 

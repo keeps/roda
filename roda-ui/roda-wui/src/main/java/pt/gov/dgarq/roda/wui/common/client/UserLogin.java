@@ -14,9 +14,9 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import config.i18n.client.CommonConstants;
 import config.i18n.client.CommonMessages;
-import pt.gov.dgarq.roda.core.data.Group;
-import pt.gov.dgarq.roda.core.data.RODAMember;
-import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.core.data.v2.Group;
+import pt.gov.dgarq.roda.core.data.v2.RODAMember;
+import pt.gov.dgarq.roda.core.data.v2.User;
 
 /**
  * @author Luis Faria
@@ -190,7 +190,7 @@ public class UserLogin {
 				AuthenticatedUser authUser = user;
 				if (member instanceof User && member.getName().equals(authUser.getName())) {
 					onLoginStatusChanged(authUser);
-				} else if (member instanceof Group && Arrays.asList(authUser.getGroups()).contains(member.getName())) {
+				} else if (member instanceof Group && Arrays.asList(authUser.getAllGroups()).contains(member.getName())) {
 					onLoginStatusChanged(authUser);
 				}
 			}

@@ -5,10 +5,12 @@ package pt.gov.dgarq.roda.wui.management.user.client;
 
 import pt.gov.dgarq.roda.core.common.EmailAlreadyExistsException;
 import pt.gov.dgarq.roda.core.common.NoSuchUserException;
-import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
 import pt.gov.dgarq.roda.wui.common.client.widgets.WUIWindow;
+
+import java.util.Set;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
@@ -64,7 +66,7 @@ public class EditUser extends WUIWindow {
 				final User user = userDataPanel.getUser();
 				final String password = userDataPanel.getPassword();
 
-				final String[] specialroles = permissionsPanel.getDirectRoles();
+				final Set<String> specialroles = permissionsPanel.getDirectRoles();
 				user.setDirectRoles(specialroles);
 
 				UserManagementService.Util.getInstance().editUser(user, password, new AsyncCallback<Void>() {
@@ -151,13 +153,13 @@ public class EditUser extends WUIWindow {
 		userDataPanel.setUser(user);
 		userDataPanel.setVisible(true);
 
-		UserManagementService.Util.getInstance().getUserDirectRoles(user.getName(), new AsyncCallback<String[]>() {
+		UserManagementService.Util.getInstance().getUserDirectRoles(user.getName(), new AsyncCallback<Set<String>>() {
 
 			public void onFailure(Throwable caught) {
 				logger.error("Error while getting " + EditUser.this.user.getName() + " roles", caught);
 			}
 
-			public void onSuccess(String[] directRoles) {
+			public void onSuccess(Set<String> directRoles) {
 				permissionsPanel.checkPermissions(directRoles, false);
 				permissionsPanel.setEnabled(true);
 			}

@@ -4,10 +4,12 @@
 package pt.gov.dgarq.roda.wui.management.user.client;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.MissingResourceException;
+import java.util.Set;
 import java.util.Vector;
 
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
@@ -222,9 +224,11 @@ public class PermissionsPanel extends VerticalPanel implements
 	 * @param lock
 	 *            if permissions should also be locked
 	 */
-	public void checkPermissions(String[] roles, boolean lock) {
-		for (int i = 0; i < roles.length; i++) {
-			String role = roles[i];
+	public void checkPermissions(Set<String> roles, boolean lock) {
+		Iterator<String> it = roles.iterator();
+		
+		while(it.hasNext()){
+			String role = it.next();
 			boolean foundit = false;
 			for (Iterator<Permission> j = permissions.iterator(); j.hasNext()
 					&& !foundit;) {
@@ -255,13 +259,13 @@ public class PermissionsPanel extends VerticalPanel implements
 		}
 	}
 
-	public void updateLockedPermissions(String[] memberGroups) {
-		if (memberGroups.length > 0) {
+	public void updateLockedPermissions(Set<String> memberGroups) {
+		if (memberGroups.size() > 0) {
 			logger.debug("Getting group permissions");
 			this.setEnabled(false);
 			loading.show();
 			UserManagementService.Util.getInstance().getGroupsRoles(
-					memberGroups, new AsyncCallback<String[]>() {
+					memberGroups, new AsyncCallback<Set<String>>() {
 
 						public void onFailure(Throwable caught) {
 							loading.hide();
@@ -269,8 +273,8 @@ public class PermissionsPanel extends VerticalPanel implements
 									+ "groups permissions", caught);
 						}
 
-						public void onSuccess(String[] inheritedRoles) {
-							logger.info("got " + inheritedRoles.length
+						public void onSuccess(Set<String> inheritedRoles) {
+							logger.info("got " + inheritedRoles.size()
 									+ " permissions to add");
 
 							// unlock all
@@ -295,17 +299,17 @@ public class PermissionsPanel extends VerticalPanel implements
 	 * 
 	 * @return
 	 */
-	public String[] getDirectRoles() {
+	public Set<String> getDirectRoles() {
 		List<Permission> checkedPermissions = new Vector<Permission>();
 		for (Permission p : permissions) {
 			if (p.isChecked() && !p.isLocked()) {
 				checkedPermissions.add(p);
 			}
 		}
-		String[] specialRoles = new String[checkedPermissions.size()];
+		Set<String> specialRoles = new HashSet<String>();
 		for (int i = 0; i < checkedPermissions.size(); i++) {
-			specialRoles[i] = ((Permission) checkedPermissions.get(i))
-					.getRole();
+			specialRoles.add(((Permission) checkedPermissions.get(i))
+					.getRole());
 		}
 		return specialRoles;
 	}

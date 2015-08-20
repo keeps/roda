@@ -1,6 +1,6 @@
 package pt.gov.dgarq.roda.servlet.cas;
 
-import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.servlet.UserPrincipal;
 
 /**
@@ -41,6 +41,10 @@ public class CASUserPrincipal extends UserPrincipal{
 
 	public void setGuest(boolean guest) {
 		this.guest = guest;
+	}
+	
+	public boolean hasRole(String role){
+		return true;
 	}
 	
 	

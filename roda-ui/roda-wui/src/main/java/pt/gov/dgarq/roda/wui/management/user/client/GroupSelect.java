@@ -3,7 +3,10 @@
  */
 package pt.gov.dgarq.roda.wui.management.user.client;
 
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 
 import pt.gov.dgarq.roda.wui.common.client.images.CommonImageBundle;
@@ -160,12 +163,12 @@ public class GroupSelect extends HorizontalPanel implements SourcesChangeEvents 
 	 * 
 	 * @return
 	 */
-	public String[] getMemberGroups() {
-		String[] memberGroupsArray = new String[memberGroups.getItemCount()];
+	public Set<String> getMemberGroups() {
+		Set<String> memberGroupsSet = new HashSet<String>();
 		for (int i = 0; i < memberGroups.getItemCount(); i++) {
-			memberGroupsArray[i] = memberGroups.getValue(i);
+			memberGroupsSet.add(memberGroups.getValue(i));
 		}
-		return memberGroupsArray;
+		return memberGroupsSet;
 	}
 
 	/**
@@ -173,10 +176,10 @@ public class GroupSelect extends HorizontalPanel implements SourcesChangeEvents 
 	 * 
 	 * @param superGroups
 	 */
-	public void setMemberGroups(String[] superGroups) {
-		for (int i = 0; i < superGroups.length; i++) {
-			String groupname = superGroups[i];
-
+	public void setMemberGroups(Set<String> superGroups) {
+		Iterator<String> it = superGroups.iterator();
+		while(it.hasNext()){
+			String groupname = it.next();
 			this.memberGroups.addItem(groupname);
 			allGroups.exclude(groupname);
 		}

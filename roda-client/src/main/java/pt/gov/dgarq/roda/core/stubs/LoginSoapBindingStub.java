@@ -35,7 +35,7 @@ public class LoginSoapBindingStub extends org.apache.axis.client.Stub implements
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("getGuestUser");
         oper.setReturnType(new javax.xml.namespace.QName("http://data.core.roda.dgarq.gov.pt", "User"));
-        oper.setReturnClass(pt.gov.dgarq.roda.core.data.User.class);
+        oper.setReturnClass(pt.gov.dgarq.roda.core.data.v2.User.class);
         oper.setReturnQName(new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "getGuestUserReturn"));
         oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
@@ -52,7 +52,7 @@ public class LoginSoapBindingStub extends org.apache.axis.client.Stub implements
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "proxyTicket"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
         oper.addParameter(param);
         oper.setReturnType(new javax.xml.namespace.QName("http://data.core.roda.dgarq.gov.pt", "User"));
-        oper.setReturnClass(pt.gov.dgarq.roda.core.data.User.class);
+        oper.setReturnClass(pt.gov.dgarq.roda.core.data.v2.User.class);
         oper.setReturnQName(new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "getAuthenticatedUserCASReturn"));
         oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
@@ -118,14 +118,14 @@ public class LoginSoapBindingStub extends org.apache.axis.client.Stub implements
 
             qName = new javax.xml.namespace.QName("http://data.core.roda.dgarq.gov.pt", "RODAMember");
             cachedSerQNames.add(qName);
-            cls = pt.gov.dgarq.roda.core.data.RODAMember.class;
+            cls = pt.gov.dgarq.roda.core.data.v2.RODAMember.class;
             cachedSerClasses.add(cls);
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
 
             qName = new javax.xml.namespace.QName("http://data.core.roda.dgarq.gov.pt", "User");
             cachedSerQNames.add(qName);
-            cls = pt.gov.dgarq.roda.core.data.User.class;
+            cls = pt.gov.dgarq.roda.core.data.v2.User.class;
             cachedSerClasses.add(cls);
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
@@ -295,7 +295,7 @@ public class LoginSoapBindingStub extends org.apache.axis.client.Stub implements
 }
     }
 
-    public pt.gov.dgarq.roda.core.data.User getGuestUser() throws java.rmi.RemoteException, pt.gov.dgarq.roda.core.common.LoginException {
+    public pt.gov.dgarq.roda.core.data.v2.User getGuestUser() throws java.rmi.RemoteException, pt.gov.dgarq.roda.core.common.LoginException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -319,9 +319,9 @@ public class LoginSoapBindingStub extends org.apache.axis.client.Stub implements
         else {
             extractAttachments(_call);
             try {
-                return (pt.gov.dgarq.roda.core.data.User) _resp;
+                return (pt.gov.dgarq.roda.core.data.v2.User) _resp;
             } catch (java.lang.Exception _exception) {
-                return (pt.gov.dgarq.roda.core.data.User) org.apache.axis.utils.JavaUtils.convert(_resp, pt.gov.dgarq.roda.core.data.User.class);
+                return (pt.gov.dgarq.roda.core.data.v2.User) org.apache.axis.utils.JavaUtils.convert(_resp, pt.gov.dgarq.roda.core.data.v2.User.class);
             }
         }
   } catch (org.apache.axis.AxisFault axisFaultException) {
@@ -337,7 +337,7 @@ public class LoginSoapBindingStub extends org.apache.axis.client.Stub implements
 }
     }
 
-    public pt.gov.dgarq.roda.core.data.User getAuthenticatedUserCAS(java.lang.String proxyTicket) throws java.rmi.RemoteException, pt.gov.dgarq.roda.core.common.LoginException {
+    public pt.gov.dgarq.roda.core.data.v2.User getAuthenticatedUserCAS(java.lang.String proxyTicket) throws java.rmi.RemoteException, pt.gov.dgarq.roda.core.common.LoginException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -361,9 +361,9 @@ public class LoginSoapBindingStub extends org.apache.axis.client.Stub implements
         else {
             extractAttachments(_call);
             try {
-                return (pt.gov.dgarq.roda.core.data.User) _resp;
+                return (pt.gov.dgarq.roda.core.data.v2.User) _resp;
             } catch (java.lang.Exception _exception) {
-                return (pt.gov.dgarq.roda.core.data.User) org.apache.axis.utils.JavaUtils.convert(_resp, pt.gov.dgarq.roda.core.data.User.class);
+                return (pt.gov.dgarq.roda.core.data.v2.User) org.apache.axis.utils.JavaUtils.convert(_resp, pt.gov.dgarq.roda.core.data.v2.User.class);
             }
         }
   } catch (org.apache.axis.AxisFault axisFaultException) {

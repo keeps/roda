@@ -3,7 +3,7 @@
  */
 package pt.gov.dgarq.roda.wui.management.editor.client;
 
-import pt.gov.dgarq.roda.core.data.Group;
+import pt.gov.dgarq.roda.core.data.v2.Group;
 import pt.gov.dgarq.roda.wui.management.user.client.GroupMiniPanel;
 
 import com.google.gwt.user.client.ui.ChangeListener;

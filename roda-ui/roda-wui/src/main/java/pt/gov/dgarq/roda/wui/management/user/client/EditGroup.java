@@ -4,10 +4,12 @@
 package pt.gov.dgarq.roda.wui.management.user.client;
 
 import pt.gov.dgarq.roda.core.common.NoSuchGroupException;
-import pt.gov.dgarq.roda.core.data.Group;
+import pt.gov.dgarq.roda.core.data.v2.Group;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
 import pt.gov.dgarq.roda.wui.common.client.widgets.WUIWindow;
+
+import java.util.Set;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
@@ -75,11 +77,11 @@ public class EditGroup extends WUIWindow {
 				final String name = groupName.getText();
 				String fullname = groupFullname.getText();
 
-				String[] memberGroups = groupSelect.getMemberGroups();
-				String[] directRoles = permissionsPanel.getDirectRoles();
+				Set<String> memberGroups = groupSelect.getMemberGroups();
+				Set<String> directRoles = permissionsPanel.getDirectRoles();
 
 				EditGroup.this.group.setFullName(fullname);
-				EditGroup.this.group.setGroups(memberGroups);
+				EditGroup.this.group.setDirectGroups(memberGroups);
 				EditGroup.this.group.setDirectRoles(directRoles);
 
 				UserManagementService.Util.getInstance().editGroup(
@@ -214,13 +216,13 @@ public class EditGroup extends WUIWindow {
 		groupName.setText(group.getName());
 		groupFullname.setText(group.getFullName());
 
-		String[] superGroups = group.getGroups();
+		Set<String> superGroups = group.getAllGroups();
 		groupSelect.setMemberGroups(superGroups);
 		groupSelect.exclude(group.getName());
 		groupSelect.setVisible(true);
 
 		permissionsPanel.setEnabled(false);
-		String[] roles = group.getRoles();
+		Set<String> roles = group.getAllRoles();
 		permissionsPanel.checkPermissions(roles, false);
 		permissionsPanel.setEnabled(true);
 	}

@@ -16,7 +16,7 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
 
 import pt.gov.dgarq.roda.core.common.RODAServiceException;
-import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.servlet.RodaServletRequestWrapper;
 
 /**

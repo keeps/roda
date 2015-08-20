@@ -4,9 +4,11 @@
 package pt.gov.dgarq.roda.wui.management.user.client;
 
 import pt.gov.dgarq.roda.core.common.GroupAlreadyExistsException;
-import pt.gov.dgarq.roda.core.data.Group;
+import pt.gov.dgarq.roda.core.data.v2.Group;
 import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
 import pt.gov.dgarq.roda.wui.common.client.widgets.WUIWindow;
+
+import java.util.Set;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
@@ -58,12 +60,12 @@ public class CreateGroup extends WUIWindow {
 				final String name = groupName.getText();
 				String fullname = groupFullname.getText();
 
-				String[] memberGroups = groupSelect.getMemberGroups();
-				String[] directRoles = permissionsPanel.getDirectRoles();
+				Set<String> memberGroups = groupSelect.getMemberGroups();
+				Set<String> directRoles = permissionsPanel.getDirectRoles();
 
 				Group group = new Group(name);
 				group.setFullName(fullname);
-				group.setGroups(memberGroups);
+				group.setDirectGroups(memberGroups);
 				group.setDirectRoles(directRoles);
 
 				UserManagementService.Util.getInstance().createGroup(group, new AsyncCallback<Void>() {

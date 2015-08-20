@@ -164,4 +164,8 @@ public class RodaUser extends RodaSimpleUser implements RODAMember {
 		// TODO Auto-generated method stub
 		return true;
 	}
+	
+	public boolean hasRole(String role){
+		return allRoles.contains(role);
+	}
 }

@@ -13,9 +13,9 @@ import org.trippi.RDFUtil.FreeLiteral;
 import pt.gov.dgarq.roda.core.adapter.SortParameterComparator;
 import pt.gov.dgarq.roda.core.adapter.itql.ITQLEntityAdapter;
 import pt.gov.dgarq.roda.core.data.SimpleDescriptionObject;
-import pt.gov.dgarq.roda.core.data.User;
 import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevel;
 import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevelManager;
+import pt.gov.dgarq.roda.core.data.v2.User;
 
 /**
  * @author Rui Castro

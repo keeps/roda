@@ -12,7 +12,7 @@ import pt.gov.dgarq.roda.core.adapter.SortParameterComparator;
 import pt.gov.dgarq.roda.core.adapter.itql.ITQLEntityAdapter;
 import pt.gov.dgarq.roda.core.data.RODAObject;
 import pt.gov.dgarq.roda.core.data.SimpleRepresentationPreservationObject;
-import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.core.data.v2.User;
 
 /**
  * @author Rui Castro

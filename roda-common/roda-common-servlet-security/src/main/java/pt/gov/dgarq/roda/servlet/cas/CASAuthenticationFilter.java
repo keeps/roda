@@ -25,7 +25,7 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
-import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.servlet.RODAFilter;
 import pt.gov.dgarq.roda.servlet.RodaServletRequestWrapper;
 import pt.gov.dgarq.roda.servlet.UserPrincipal;
@@ -141,7 +141,7 @@ public class CASAuthenticationFilter extends RODAFilter {
 
 				logger.debug("Request principal is "
 						+ casUserPrincipal.getName() + " with roles "
-						+ Arrays.asList(casUserPrincipal.getRoles()));
+						+(new ArrayList<String>(casUserPrincipal.getAllRoles())));
 
 			}
 			// continue filter chain
@@ -222,7 +222,7 @@ public class CASAuthenticationFilter extends RODAFilter {
 
 						logger.debug("Request principal is "
 								+ casUserPrincipal.getName() + " with roles "
-								+ Arrays.asList(casUserPrincipal.getRoles()));
+								+ Arrays.asList(casUserPrincipal.getAllRoles()));
 
 					}
 					chain.doFilter(request, httpResponse);

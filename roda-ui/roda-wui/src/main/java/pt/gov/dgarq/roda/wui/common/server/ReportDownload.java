@@ -48,8 +48,8 @@ import pt.gov.dgarq.roda.core.common.ReportException;
 import pt.gov.dgarq.roda.core.data.Attribute;
 import pt.gov.dgarq.roda.core.data.Report;
 import pt.gov.dgarq.roda.core.data.ReportItem;
-import pt.gov.dgarq.roda.core.data.User;
 import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
+import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.wui.common.client.PrintReportException;
 
 /**

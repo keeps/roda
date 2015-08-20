@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import pt.gov.dgarq.roda.core.adapter.jndi.JndiEntityAdapter;
-import pt.gov.dgarq.roda.core.data.Group;
+import pt.gov.dgarq.roda.core.data.v2.Group;
 
 /**
  * @author Rui Castro

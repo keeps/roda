@@ -2,6 +2,7 @@ package pt.gov.dgarq.roda.core;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,7 +15,7 @@ import pt.gov.dgarq.roda.core.common.InvalidTokenException;
 import pt.gov.dgarq.roda.core.common.NoSuchUserException;
 import pt.gov.dgarq.roda.core.common.UserAlreadyExistsException;
 import pt.gov.dgarq.roda.core.common.UserRegistrationException;
-import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.servlet.LdapUtility;
 import pt.gov.dgarq.roda.servlet.LdapUtilityException;
 
@@ -92,9 +93,8 @@ public class UserRegistrationHelper {
 
 		// New users have no roles and have only the default groups defined in
 		// the configuration file.
-		user.setDirectRoles(new String[0]);
-		user.setGroups(this.userDefaultGroups
-				.toArray(new String[this.userDefaultGroups.size()]));
+		user.setDirectRoles(new HashSet<String>());
+		user.setDirectGroups(new HashSet<String>(userDefaultGroups));
 
 		try {
 

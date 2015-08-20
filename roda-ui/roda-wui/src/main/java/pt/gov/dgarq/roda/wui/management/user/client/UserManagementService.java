@@ -3,22 +3,24 @@
  */
 package pt.gov.dgarq.roda.wui.management.user.client;
 
+import java.util.Set;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 
 import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
 import pt.gov.dgarq.roda.core.common.RODAException;
-import pt.gov.dgarq.roda.core.data.v2.Group;
-import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
 import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
+import pt.gov.dgarq.roda.core.data.v2.Group;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.RODAMember;
+import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.wui.common.client.GenericException;
 import pt.gov.dgarq.roda.wui.common.client.PrintReportException;
 
@@ -26,7 +28,7 @@ import pt.gov.dgarq.roda.wui.common.client.PrintReportException;
  * @author Luis Faria
  * 
  */
-public interface UserManagementService {
+public interface UserManagementService extends RemoteService {
 
 	/**
 	 * Service URI path
@@ -286,7 +288,7 @@ public interface UserManagementService {
 	 * @return a list with the role codes that this group is enabled
 	 * @throws RODAException
 	 */
-	public String[] getGroupsRoles(String[] groupname) throws RODAException;
+	public Set<String> getGroupsRoles(Set<String> groupname) throws RODAException;
 
 	/**
 	 * Get a list of roles that are set directly to this user, i.e. are not
@@ -297,7 +299,7 @@ public interface UserManagementService {
 	 * @return the list of direct roles
 	 * @throws RODAException
 	 */
-	public String[] getUserDirectRoles(String username) throws RODAException;
+	public Set<String> getUserDirectRoles(String username) throws RODAException;
 
 	/**
 	 * Get a list of roles that are set directly to this group, i.e. are not

@@ -25,10 +25,10 @@ public class UserManagementSoapBindingStub extends org.apache.axis.client.Stub i
         org.apache.axis.description.ParameterDesc param;
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("modifyGroup");
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "modifiedGroup"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://data.core.roda.dgarq.gov.pt", "Group"), pt.gov.dgarq.roda.core.data.Group.class, false, false);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "modifiedGroup"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://data.core.roda.dgarq.gov.pt", "Group"), pt.gov.dgarq.roda.core.data.v2.Group.class, false, false);
         oper.addParameter(param);
         oper.setReturnType(new javax.xml.namespace.QName("http://data.core.roda.dgarq.gov.pt", "Group"));
-        oper.setReturnClass(pt.gov.dgarq.roda.core.data.Group.class);
+        oper.setReturnClass(pt.gov.dgarq.roda.core.data.v2.Group.class);
         oper.setReturnQName(new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "modifyGroupReturn"));
         oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
@@ -54,10 +54,10 @@ public class UserManagementSoapBindingStub extends org.apache.axis.client.Stub i
 
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("modifyUser");
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "modifiedUser"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://data.core.roda.dgarq.gov.pt", "User"), pt.gov.dgarq.roda.core.data.User.class, false, false);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "modifiedUser"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://data.core.roda.dgarq.gov.pt", "User"), pt.gov.dgarq.roda.core.data.v2.User.class, false, false);
         oper.addParameter(param);
         oper.setReturnType(new javax.xml.namespace.QName("http://data.core.roda.dgarq.gov.pt", "User"));
-        oper.setReturnClass(pt.gov.dgarq.roda.core.data.User.class);
+        oper.setReturnClass(pt.gov.dgarq.roda.core.data.v2.User.class);
         oper.setReturnQName(new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "modifyUserReturn"));
         oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
@@ -147,10 +147,10 @@ public class UserManagementSoapBindingStub extends org.apache.axis.client.Stub i
 
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("addUser");
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "user"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://data.core.roda.dgarq.gov.pt", "User"), pt.gov.dgarq.roda.core.data.User.class, false, false);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "user"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://data.core.roda.dgarq.gov.pt", "User"), pt.gov.dgarq.roda.core.data.v2.User.class, false, false);
         oper.addParameter(param);
         oper.setReturnType(new javax.xml.namespace.QName("http://data.core.roda.dgarq.gov.pt", "User"));
-        oper.setReturnClass(pt.gov.dgarq.roda.core.data.User.class);
+        oper.setReturnClass(pt.gov.dgarq.roda.core.data.v2.User.class);
         oper.setReturnQName(new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "addUserReturn"));
         oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
@@ -176,10 +176,10 @@ public class UserManagementSoapBindingStub extends org.apache.axis.client.Stub i
 
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("addGroup");
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "group"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://data.core.roda.dgarq.gov.pt", "Group"), pt.gov.dgarq.roda.core.data.Group.class, false, false);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "group"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://data.core.roda.dgarq.gov.pt", "Group"), pt.gov.dgarq.roda.core.data.v2.Group.class, false, false);
         oper.addParameter(param);
         oper.setReturnType(new javax.xml.namespace.QName("http://data.core.roda.dgarq.gov.pt", "Group"));
-        oper.setReturnClass(pt.gov.dgarq.roda.core.data.Group.class);
+        oper.setReturnClass(pt.gov.dgarq.roda.core.data.v2.Group.class);
         oper.setReturnQName(new javax.xml.namespace.QName("http://services.core.roda.dgarq.gov.pt", "addGroupReturn"));
         oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
@@ -321,21 +321,21 @@ public class UserManagementSoapBindingStub extends org.apache.axis.client.Stub i
 
             qName = new javax.xml.namespace.QName("http://data.core.roda.dgarq.gov.pt", "Group");
             cachedSerQNames.add(qName);
-            cls = pt.gov.dgarq.roda.core.data.Group.class;
+            cls = pt.gov.dgarq.roda.core.data.v2.Group.class;
             cachedSerClasses.add(cls);
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
 
             qName = new javax.xml.namespace.QName("http://data.core.roda.dgarq.gov.pt", "RODAMember");
             cachedSerQNames.add(qName);
-            cls = pt.gov.dgarq.roda.core.data.RODAMember.class;
+            cls = pt.gov.dgarq.roda.core.data.v2.RODAMember.class;
             cachedSerClasses.add(cls);
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
 
             qName = new javax.xml.namespace.QName("http://data.core.roda.dgarq.gov.pt", "User");
             cachedSerQNames.add(qName);
-            cls = pt.gov.dgarq.roda.core.data.User.class;
+            cls = pt.gov.dgarq.roda.core.data.v2.User.class;
             cachedSerClasses.add(cls);
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
@@ -471,7 +471,7 @@ public class UserManagementSoapBindingStub extends org.apache.axis.client.Stub i
         }
     }
 
-    public pt.gov.dgarq.roda.core.data.Group modifyGroup(pt.gov.dgarq.roda.core.data.Group modifiedGroup) throws java.rmi.RemoteException, pt.gov.dgarq.roda.core.common.NoSuchGroupException, pt.gov.dgarq.roda.core.common.IllegalOperationException, pt.gov.dgarq.roda.core.common.UserManagementException {
+    public pt.gov.dgarq.roda.core.data.v2.Group modifyGroup(pt.gov.dgarq.roda.core.data.v2.Group modifiedGroup) throws java.rmi.RemoteException, pt.gov.dgarq.roda.core.common.NoSuchGroupException, pt.gov.dgarq.roda.core.common.IllegalOperationException, pt.gov.dgarq.roda.core.common.UserManagementException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -495,9 +495,9 @@ public class UserManagementSoapBindingStub extends org.apache.axis.client.Stub i
         else {
             extractAttachments(_call);
             try {
-                return (pt.gov.dgarq.roda.core.data.Group) _resp;
+                return (pt.gov.dgarq.roda.core.data.v2.Group) _resp;
             } catch (java.lang.Exception _exception) {
-                return (pt.gov.dgarq.roda.core.data.Group) org.apache.axis.utils.JavaUtils.convert(_resp, pt.gov.dgarq.roda.core.data.Group.class);
+                return (pt.gov.dgarq.roda.core.data.v2.Group) org.apache.axis.utils.JavaUtils.convert(_resp, pt.gov.dgarq.roda.core.data.v2.Group.class);
             }
         }
   } catch (org.apache.axis.AxisFault axisFaultException) {
@@ -519,7 +519,7 @@ public class UserManagementSoapBindingStub extends org.apache.axis.client.Stub i
 }
     }
 
-    public pt.gov.dgarq.roda.core.data.User modifyUser(pt.gov.dgarq.roda.core.data.User modifiedUser) throws java.rmi.RemoteException, pt.gov.dgarq.roda.core.common.NoSuchUserException, pt.gov.dgarq.roda.core.common.IllegalOperationException, pt.gov.dgarq.roda.core.common.UserManagementException, pt.gov.dgarq.roda.core.common.EmailAlreadyExistsException {
+    public pt.gov.dgarq.roda.core.data.v2.User modifyUser(pt.gov.dgarq.roda.core.data.v2.User modifiedUser) throws java.rmi.RemoteException, pt.gov.dgarq.roda.core.common.NoSuchUserException, pt.gov.dgarq.roda.core.common.IllegalOperationException, pt.gov.dgarq.roda.core.common.UserManagementException, pt.gov.dgarq.roda.core.common.EmailAlreadyExistsException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -543,9 +543,9 @@ public class UserManagementSoapBindingStub extends org.apache.axis.client.Stub i
         else {
             extractAttachments(_call);
             try {
-                return (pt.gov.dgarq.roda.core.data.User) _resp;
+                return (pt.gov.dgarq.roda.core.data.v2.User) _resp;
             } catch (java.lang.Exception _exception) {
-                return (pt.gov.dgarq.roda.core.data.User) org.apache.axis.utils.JavaUtils.convert(_resp, pt.gov.dgarq.roda.core.data.User.class);
+                return (pt.gov.dgarq.roda.core.data.v2.User) org.apache.axis.utils.JavaUtils.convert(_resp, pt.gov.dgarq.roda.core.data.v2.User.class);
             }
         }
   } catch (org.apache.axis.AxisFault axisFaultException) {
@@ -659,7 +659,7 @@ public class UserManagementSoapBindingStub extends org.apache.axis.client.Stub i
 }
     }
 
-    public pt.gov.dgarq.roda.core.data.User addUser(pt.gov.dgarq.roda.core.data.User user) throws java.rmi.RemoteException, pt.gov.dgarq.roda.core.common.UserAlreadyExistsException, pt.gov.dgarq.roda.core.common.UserManagementException, pt.gov.dgarq.roda.core.common.EmailAlreadyExistsException {
+    public pt.gov.dgarq.roda.core.data.v2.User addUser(pt.gov.dgarq.roda.core.data.v2.User user) throws java.rmi.RemoteException, pt.gov.dgarq.roda.core.common.UserAlreadyExistsException, pt.gov.dgarq.roda.core.common.UserManagementException, pt.gov.dgarq.roda.core.common.EmailAlreadyExistsException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -683,9 +683,9 @@ public class UserManagementSoapBindingStub extends org.apache.axis.client.Stub i
         else {
             extractAttachments(_call);
             try {
-                return (pt.gov.dgarq.roda.core.data.User) _resp;
+                return (pt.gov.dgarq.roda.core.data.v2.User) _resp;
             } catch (java.lang.Exception _exception) {
-                return (pt.gov.dgarq.roda.core.data.User) org.apache.axis.utils.JavaUtils.convert(_resp, pt.gov.dgarq.roda.core.data.User.class);
+                return (pt.gov.dgarq.roda.core.data.v2.User) org.apache.axis.utils.JavaUtils.convert(_resp, pt.gov.dgarq.roda.core.data.v2.User.class);
             }
         }
   } catch (org.apache.axis.AxisFault axisFaultException) {
@@ -707,7 +707,7 @@ public class UserManagementSoapBindingStub extends org.apache.axis.client.Stub i
 }
     }
 
-    public pt.gov.dgarq.roda.core.data.Group addGroup(pt.gov.dgarq.roda.core.data.Group group) throws java.rmi.RemoteException, pt.gov.dgarq.roda.core.common.GroupAlreadyExistsException, pt.gov.dgarq.roda.core.common.UserManagementException {
+    public pt.gov.dgarq.roda.core.data.v2.Group addGroup(pt.gov.dgarq.roda.core.data.v2.Group group) throws java.rmi.RemoteException, pt.gov.dgarq.roda.core.common.GroupAlreadyExistsException, pt.gov.dgarq.roda.core.common.UserManagementException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -731,9 +731,9 @@ public class UserManagementSoapBindingStub extends org.apache.axis.client.Stub i
         else {
             extractAttachments(_call);
             try {
-                return (pt.gov.dgarq.roda.core.data.Group) _resp;
+                return (pt.gov.dgarq.roda.core.data.v2.Group) _resp;
             } catch (java.lang.Exception _exception) {
-                return (pt.gov.dgarq.roda.core.data.Group) org.apache.axis.utils.JavaUtils.convert(_resp, pt.gov.dgarq.roda.core.data.Group.class);
+                return (pt.gov.dgarq.roda.core.data.v2.Group) org.apache.axis.utils.JavaUtils.convert(_resp, pt.gov.dgarq.roda.core.data.v2.Group.class);
             }
         }
   } catch (org.apache.axis.AxisFault axisFaultException) {

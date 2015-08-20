@@ -11,7 +11,7 @@ import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
 
-import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.core.data.v2.User;
 
 /**
  * The class managing the user's authentication state. For better performance,
