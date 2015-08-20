@@ -635,6 +635,8 @@ public class SolrUtils {
 			indexName = RodaConstants.INDEX_USERS;
 		} else if (resultClass.equals(Group.class)) {
 			indexName = RodaConstants.INDEX_GROUPS;
+		} else if (resultClass.equals(RODAMember.class)) {
+			indexName = RodaConstants.INDEX_MEMBERS;
 		} else {
 			throw new IndexServiceException("Cannot find class index name: " + resultClass.getName(),
 					IndexServiceException.INTERNAL_SERVER_ERROR);

@@ -328,4 +328,33 @@ public class IndexModelObserver implements ModelObserver {
 			LOGGER.error("Error deleting Group (id=" + groupID + ")");
 		}
 	}
+
+	@Override
+	public void rodaMemberCreated(RODAMember member) {
+		SolrInputDocument memberDocument = SolrUtils.rodaMemberToSolrDocument(member);
+		try{
+			index.add(RodaConstants.INDEX_MEMBERS, memberDocument);
+			index.commit(RodaConstants.INDEX_MEMBERS);
+		} catch (SolrServerException | IOException e) {
+			LOGGER.error("Could not index Member ", e);
+		}
+		
+	}
+
+	@Override
+	public void rodaMemberUpdated(RODAMember member) {
+		rodaMemberDeleted(member.getId());
+		rodaMemberCreated(member);
+	}
+
+	@Override
+	public void rodaMemberDeleted(String memberID) {
+		try {
+			index.deleteById(RodaConstants.INDEX_MEMBERS, memberID);
+			index.commit(RodaConstants.INDEX_MEMBERS);
+		} catch (SolrServerException | IOException e) {
+			LOGGER.error("Error deleting Member (id=" + memberID + ")");
+		}
+		
+	}
 }

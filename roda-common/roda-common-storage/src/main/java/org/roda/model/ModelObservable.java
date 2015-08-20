@@ -153,25 +153,20 @@ public abstract class ModelObservable {
 	
 	
 	protected void notifyRODAMemberCreated(RODAMember member){
-		if(member.isUser()){
-			notifyUserCreated(new User(member));
-		}else{
-			notifyGroupCreated(new Group(member));
+		for (ModelObserver observer : observers) {
+			observer.rodaMemberCreated(member);
 		}
 	}
 	
 	protected void notifyRODAMemberUpdated(RODAMember member){
-		if(member.isUser()){
-			notifyUserUpdated(new User(member));
-		}else{
-			notifyGroupUpdated(new Group(member));
+		for (ModelObserver observer : observers) {
+			observer.rodaMemberUpdated(member);
 		}
 	}
 	
 	
 	//TODO: improve this method...
 	protected void notifyRODAMemberDeleted(String memberID){
-		notifyUserDeleted(memberID);
-		notifyGroupDeleted(memberID);
+		notifyRODAMemberDeleted(memberID);
 	}
 }
