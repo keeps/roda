@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -12,8 +14,10 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.apache.commons.configuration.Configuration;
+import org.apache.directory.api.ldap.model.constants.SchemaConstants;
 import org.apache.directory.api.ldap.model.entry.DefaultEntry;
 import org.apache.directory.api.ldap.model.entry.Entry;
+import org.apache.directory.api.ldap.model.exception.LdapInvalidAttributeValueException;
 import org.apache.directory.api.ldap.model.ldif.LdifEntry;
 import org.apache.directory.api.ldap.model.ldif.LdifReader;
 import org.apache.directory.api.ldap.model.message.ModifyRequestImpl;
@@ -38,9 +42,15 @@ import org.apache.directory.server.ldap.LdapServer;
 import org.apache.directory.server.protocol.shared.transport.TcpTransport;
 import org.apache.directory.server.xdbm.Index;
 import org.apache.log4j.Logger;
+import org.roda.common.LdapUtility;
+import org.roda.common.UserUtility;
 
 import pt.gov.dgarq.roda.common.RodaCoreFactory;
-import pt.gov.dgarq.roda.common.UserUtility;
+import pt.gov.dgarq.roda.core.data.v2.Group;
+import pt.gov.dgarq.roda.core.data.v2.RODAMember;
+import pt.gov.dgarq.roda.core.data.v2.RodaGroup;
+import pt.gov.dgarq.roda.core.data.v2.RodaUser;
+import pt.gov.dgarq.roda.core.data.v2.User;
 
 public class DSStartStopListener implements ServletContextListener {
 	// First while the server is up and running log into as admin
@@ -214,12 +224,49 @@ public class DSStartStopListener implements ServletContextListener {
 			modifyRequestImpl.replace("m-disabled", "FALSE");
 			service.getAdminSession().modify(modifyRequestImpl);
 
+			
 			applyLdif(RODA_APACHE_DS_CONFIG_DIRECTORY.resolve("users.ldif").toFile());
 			applyLdif(RODA_APACHE_DS_CONFIG_DIRECTORY.resolve("groups.ldif").toFile());
 			applyLdif(RODA_APACHE_DS_CONFIG_DIRECTORY.resolve("roles.ldif").toFile());
 		}
-
 		UserUtility.setDirectoryService(service);
+		/*
+		try{
+			Set<String> ALL_ROLES = new HashSet<>(
+					Arrays.asList("browse", "search", "administration.user"));
+			Set<String> DIRECT_ROLES = new HashSet<>(
+					Arrays.asList("browse", "search", "administration.user"));
+
+			Set<String> LFARIA_GROUPS = new HashSet<String>(Arrays.asList("admin"));
+			Set<String> ADMIN_ALL_GROUPS = new HashSet<>(
+					Arrays.asList("users", "producers", "archivists"));
+			Set<String> ADMIN_DIRECT_GROUPS = ADMIN_ALL_GROUPS;
+
+			User u1 = new User();
+			u1.setActive(true);
+			u1.setId("lfaria");
+			u1.setName("Luis Faria");
+			u1.setEmail("lfaria@keep.pt");
+			u1.setGuest(false);
+			u1.setDirectRoles(ALL_ROLES);
+			u1.setDirectGroups(LFARIA_GROUPS);
+			u1.setAllGroups(LFARIA_GROUPS);
+			u1.setAllRoles(ALL_ROLES);
+			Group g1 = new Group();
+			g1.setActive(true);;
+			g1.setId("admin1");
+			g1.setName("Administrators1");
+			g1.setAllRoles(ALL_ROLES);
+			g1.setDirectRoles(DIRECT_ROLES);
+			g1.setDirectGroups(ADMIN_DIRECT_GROUPS);
+			g1.setAllGroups(ADMIN_ALL_GROUPS);
+			RodaCoreFactory.getModelService().addUser(u1);
+			
+			RodaCoreFactory.getModelService().addGroup(g1);
+		}catch(Throwable t){
+			LOGGER.error(t.getMessage(),t);
+		}
+		*/
 	}
 
 	public void stop() throws Exception {
@@ -240,11 +287,12 @@ public class DSStartStopListener implements ServletContextListener {
 	public void startServer() throws Exception {
 		// FIXME these configurations should be relocated, e.g. to
 		// roda-ui.properties
-		Configuration rodaConfig = RodaCoreFactory.getConfiguration("roda-core.properties");
+		Configuration rodaConfig = RodaCoreFactory.getConfiguration("roda-wui.properties");
 
 		String ldapHost = rodaConfig.getString("ldapHost", APACHE_DS_DEFAULT_HOST);
 		// int ldapPort = rodaConfig.getInt("ldapPort", APACHE_DS_DEFAULT_PORT);
 		int ldapPort = APACHE_DS_DEFAULT_PORT;
+		
 		String ldapPeopleDN = rodaConfig.getString("ldapPeopleDN");
 		String ldapGroupsDN = rodaConfig.getString("ldapGroupsDN");
 		String ldapRolesDN = rodaConfig.getString("ldapRolesDN");
@@ -273,14 +321,25 @@ public class DSStartStopListener implements ServletContextListener {
 
 	public void applyLdif(final File ldifFile) throws Exception {
 		LdifReader entries = new LdifReader(new FileInputStream(ldifFile));
+		Configuration rodaConfig = RodaCoreFactory.getConfiguration("roda-wui.properties");
+		String groupDN = rodaConfig.getString("ldapGroupsDN");
+		String userDN = rodaConfig.getString("ldapPeopleDN");
 		for (LdifEntry ldifEntry : entries) {
+			if(ldifEntry.getDn().toString().contains(groupDN)){
+				Group group = ldifEntryToGroup(ldifEntry);
+				RodaCoreFactory.getModelService().addGroup(group, false, true);
+			}else if(ldifEntry.getDn().toString().contains(userDN)){
+				User user = ldifEntryToUser(ldifEntry);
+				RodaCoreFactory.getModelService().addUser(user, false, true);
+			}
+			
 			DefaultEntry newEntry = new DefaultEntry(service.getSchemaManager(), ldifEntry.getEntry());
 			LOGGER.debug("ldif entry: " + newEntry);
 			service.getAdminSession().add(newEntry);
 		}
 		entries.close();
 	}
-
+	
 	@Override
 	public void contextInitialized(ServletContextEvent arg0) {
 		RODA_APACHE_DS_DATA_DIRECTORY = RodaCoreFactory.getDataPath().resolve("ldap");
@@ -296,5 +355,55 @@ public class DSStartStopListener implements ServletContextListener {
 			LOGGER.error("Error starting up embedded ApacheDS", e);
 		}
 
+	}
+	
+	
+	
+	private User ldifEntryToUser(LdifEntry ldifEntry) {
+		User u = new User();
+		try{
+			u.setId(ldifEntry.get(SchemaConstants.ENTRY_UUID_AT).toString());
+		}catch(Throwable e){
+			u.setId("ID"+System.currentTimeMillis());
+		}
+		try{
+			u.setName(ldifEntry.get(SchemaConstants.NAME_AT).toString());
+		}catch(Throwable e){
+			u.setName("NAME");
+		}
+		try{
+			u.setFullName("FULLNAME");
+		}catch(Throwable e){
+			
+		}
+		try{
+			u.setEmail(ldifEntry.get(SchemaConstants.EMAIL_AT).toString());
+		}catch(Throwable e){
+			u.setEmail("mail"+System.currentTimeMillis()+"@keep.pt");
+		}
+		u.setActive(true);
+		u.setGuest(false);
+		return u;
+	}
+
+	private Group ldifEntryToGroup(LdifEntry ldifEntry) {
+		Group g = new Group();
+		try{
+			g.setId(ldifEntry.get(SchemaConstants.ENTRY_UUID_AT).toString());
+		}catch(Throwable e){
+			g.setId("ID"+System.currentTimeMillis());
+		}
+		try{
+			g.setName(ldifEntry.get(SchemaConstants.NAME_AT).toString());
+		}catch(Throwable e){
+			g.setName("NAME");
+		}
+		try{
+			g.setFullName("FULLNAME");
+		}catch(Throwable e){
+			
+		}
+		g.setActive(true);
+		return g;
 	}
 }

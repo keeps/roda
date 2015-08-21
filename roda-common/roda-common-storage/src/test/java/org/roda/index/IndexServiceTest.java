@@ -552,7 +552,7 @@ public class IndexServiceTest {
 	
 	
 	@Test
-	public void indexMembers() throws IndexServiceException{
+	public void indexMembers() throws IndexServiceException, ModelServiceException{
 		Set<String> groups = new HashSet<String>();
 		groups.add("admin");
 		Set<String> roles = new HashSet<String>();
@@ -570,7 +570,7 @@ public class IndexServiceTest {
 				user.setGuest(false);
 				user.setId("USER"+i);
 				user.setName("NAMEUSER");
-				model.addUser(user);
+				model.addUser(user,true,true);
 			}else{
 				Group group = new Group();
 				group.setActive(true);
@@ -580,7 +580,7 @@ public class IndexServiceTest {
 				group.setDirectRoles(roles);
 				group.setId("GROUP"+i);
 				group.setName("NAMEGROUP");
-				model.addGroup(group);
+				model.addGroup(group,true,true);
 			}
 		}
 		

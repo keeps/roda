@@ -1,7 +1,7 @@
 /**
  * 
  */
-package pt.gov.dgarq.roda.ds;
+package org.roda.common;
 
 import pt.gov.dgarq.roda.core.common.RODAException;
 

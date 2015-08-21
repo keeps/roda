@@ -17,13 +17,13 @@ import java.util.Vector;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.roda.common.UserUtility;
 import org.w3c.util.DateParser;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import config.i18n.server.BrowserServiceMessages;
 import pt.gov.dgarq.roda.common.RodaClientFactory;
-import pt.gov.dgarq.roda.common.UserUtility;
 import pt.gov.dgarq.roda.core.RODAClient;
 import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.data.DescriptionObject;

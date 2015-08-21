@@ -25,9 +25,9 @@ import org.apache.directory.server.core.api.DirectoryService;
 import org.apache.directory.server.core.jndi.CoreContextFactory;
 import org.apache.log4j.Logger;
 import org.jasig.cas.client.util.CommonUtils;
+import org.roda.common.UserUtility;
 
 import pt.gov.dgarq.roda.common.RodaCoreFactory;
-import pt.gov.dgarq.roda.common.UserUtility;
 import pt.gov.dgarq.roda.core.data.v2.RodaSimpleUser;
 
 /**
@@ -90,23 +90,16 @@ public class RolesSetterFilter implements Filter {
 			HttpServletRequest servletRequest = (HttpServletRequest) request;
 			HttpServletResponse servletResponse = (HttpServletResponse) response;
 			if (servletRequest.getUserPrincipal() != null) {
-				logger.error("servletRequest.getUserPrincipal() SET : " + servletRequest.getUserPrincipal().getName());
 				if (existUser(servletRequest.getUserPrincipal().getName())) {
-					logger.error("User exists internally...");
 					UserUtility.setUser(servletRequest, getUser(servletRequest.getUserPrincipal()));
 				} else {
-					logger.error("User does not exist internally...");
 					RodaSimpleUser rsu = getUser(servletRequest.getUserPrincipal());
 					addUserToDefault(request, rsu);
 					UserUtility.setUser(servletRequest, rsu);
 				}
 			} else {
-				logger.error("servletRequest.getUserPrincipal() NOT SET");
 				if (UserUtility.getUser(servletRequest) == null) {
-					logger.error("User not in request... Setting guest...");
 					UserUtility.setUser(servletRequest, getGuest());
-				} else {
-					logger.error("User in request ;) ");
 				}
 
 			}
@@ -141,7 +134,6 @@ public class RolesSetterFilter implements Filter {
 	}
 
 	private RodaSimpleUser getUser(Principal userPrincipal) {
-		logger.error("Getting  user: " + userPrincipal.getName());
 		RodaSimpleUser rsu = new RodaSimpleUser();
 		rsu.setId(userPrincipal.getName());
 		rsu.setGuest(false);
@@ -149,7 +141,6 @@ public class RolesSetterFilter implements Filter {
 	}
 
 	private boolean existUser(String name) {
-		logger.error("Checking if user " + name + " exists...");
 		return true;
 	}
 }

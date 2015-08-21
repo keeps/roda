@@ -116,6 +116,10 @@
 		</dependency>
 		<dependency>
 			<groupId>pt.gov.dgarq.roda</groupId>
+			<artifactId>roda-common-content-adapter</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>pt.gov.dgarq.roda</groupId>
 			<artifactId>roda-common-metadata</artifactId>
 		</dependency>
 		<dependency>
@@ -305,6 +309,14 @@
 					<artifactId>log4j</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.directory.server</groupId>
+			<artifactId>apacheds-all</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
 		</dependency>
 		<!-- fixes for ldp-testsuite convergence problems -->
 		<dependency>

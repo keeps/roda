@@ -19,7 +19,9 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
+import org.roda.common.LdapUtilityException;
 import org.roda.common.RodaUtils;
+import org.roda.common.UserUtility;
 import org.roda.common.ValidationUtils;
 import org.roda.model.utils.ModelUtils;
 import org.roda.storage.Binary;
@@ -43,7 +45,13 @@ import jersey.repackaged.com.google.common.collect.Sets;
 import lc.xmlns.premisV2.EventOutcomeDetailComplexType;
 import lc.xmlns.premisV2.EventOutcomeInformationComplexType;
 import lc.xmlns.premisV2.LinkingObjectIdentifierComplexType;
+import pt.gov.dgarq.roda.core.common.EmailAlreadyExistsException;
+import pt.gov.dgarq.roda.core.common.GroupAlreadyExistsException;
+import pt.gov.dgarq.roda.core.common.IllegalOperationException;
+import pt.gov.dgarq.roda.core.common.NoSuchGroupException;
+import pt.gov.dgarq.roda.core.common.NoSuchUserException;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
+import pt.gov.dgarq.roda.core.common.UserAlreadyExistsException;
 import pt.gov.dgarq.roda.core.data.RODAObjectPermissions;
 import pt.gov.dgarq.roda.core.data.v2.AgentPreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.EventPreservationObject;
@@ -1490,28 +1498,118 @@ public class ModelService extends ModelObservable {
 		addSipReport(sipReport, true);
 	}
 	
-	public void addUser(User user){
-		notifyUserCreated(user);
+	public void addUser(User user,boolean useModel, boolean notify) throws ModelServiceException{
+		try{
+			if(useModel){
+				UserUtility.getLdapUtility().addUser(user);
+			}
+		}catch(LdapUtilityException e){
+			throw new ModelServiceException("Error adding user to LDAP",
+					ModelServiceException.INTERNAL_SERVER_ERROR, e);
+		} catch (UserAlreadyExistsException e) {
+			throw new ModelServiceException("User already exists",
+					ModelServiceException.INTERNAL_SERVER_ERROR, e);
+		} catch (EmailAlreadyExistsException e) {
+			throw new ModelServiceException("Email already exists",
+					ModelServiceException.INTERNAL_SERVER_ERROR, e);
+		}
+		if(notify){
+			notifyUserCreated(user);
+		}
 	}
 	
-	public void updateUser(User user){
-		notifyUserUpdated(user);
+	public void updateUser(User user,boolean useModel, boolean notify) throws ModelServiceException{
+		try{
+			if(useModel){
+				UserUtility.getLdapUtility().modifyUser(user);
+			}
+		}catch(LdapUtilityException e){
+			throw new ModelServiceException("Error updating user to LDAP",
+					ModelServiceException.INTERNAL_SERVER_ERROR, e);
+		} catch (EmailAlreadyExistsException e) {
+			throw new ModelServiceException("User already exists",
+					ModelServiceException.INTERNAL_SERVER_ERROR, e);
+		} catch (NoSuchUserException e) {
+			throw new ModelServiceException("User doesn't exist",
+					ModelServiceException.INTERNAL_SERVER_ERROR, e);
+		} catch (IllegalOperationException e) {
+			throw new ModelServiceException("Illegal operation",
+					ModelServiceException.INTERNAL_SERVER_ERROR, e);
+		}
+		if(notify){
+			notifyUserUpdated(user);
+		}
 	}
 	
-	public void deleteUser(String id){
-		notifyUserDeleted(id);
+	public void deleteUser(String id,boolean useModel, boolean notify) throws ModelServiceException{
+		try{
+			if(useModel){
+				UserUtility.getLdapUtility().removeUser(id);
+			}
+		}catch(LdapUtilityException e){
+			throw new ModelServiceException("Error deleting user from LDAP",
+					ModelServiceException.INTERNAL_SERVER_ERROR, e);
+		} catch (IllegalOperationException e) {
+			throw new ModelServiceException("Illegal operation",
+					ModelServiceException.INTERNAL_SERVER_ERROR, e);
+		}
+		if(notify){
+			notifyUserDeleted(id);
+		}
 	}
 
-	public void addGroup(Group group){
-		notifyGroupCreated(group);
+	public void addGroup(Group group,boolean useModel, boolean notify) throws ModelServiceException{
+		try{
+			if(useModel){
+				UserUtility.getLdapUtility().addGroup(group);
+			}
+		}catch(LdapUtilityException e){
+			throw new ModelServiceException("Error adding group to LDAP",
+					ModelServiceException.INTERNAL_SERVER_ERROR, e);
+		} catch (GroupAlreadyExistsException e) {
+			throw new ModelServiceException("Group already exists",
+					ModelServiceException.INTERNAL_SERVER_ERROR, e);
+		}
+		if(notify){
+			notifyGroupCreated(group);
+		}
 	}
 	
-	public void updateGroup(Group group){
-		notifyGroupUpdated(group);
+	public void updateGroup(Group group,boolean useModel, boolean notify) throws ModelServiceException{
+		try{
+			if(useModel){
+				UserUtility.getLdapUtility().modifyGroup(group);
+			}
+		}catch(LdapUtilityException e){
+			throw new ModelServiceException("Error updating group to LDAP",
+					ModelServiceException.INTERNAL_SERVER_ERROR, e);
+		} catch (NoSuchGroupException e) {
+			throw new ModelServiceException("Group doesn't exist",
+					ModelServiceException.INTERNAL_SERVER_ERROR, e);
+		} catch (IllegalOperationException e) {
+			throw new ModelServiceException("Illegal operation",
+					ModelServiceException.INTERNAL_SERVER_ERROR, e);
+		}
+		if(notify){
+			notifyGroupUpdated(group);
+		}
 	}
 	
-	public void deleteGroup(String id){
-		notifyGroupDeleted(id);
+	public void deleteGroup(String id,boolean useModel, boolean notify) throws ModelServiceException{
+		try{
+			if(useModel){
+				UserUtility.getLdapUtility().removeGroup(id);
+			}
+		}catch(LdapUtilityException e){
+			throw new ModelServiceException("Error updating group to LDAP",
+					ModelServiceException.INTERNAL_SERVER_ERROR, e);
+		} catch (IllegalOperationException e) {
+			throw new ModelServiceException("Illegal operation",
+					ModelServiceException.INTERNAL_SERVER_ERROR, e);
+		}
+		if(notify){
+			notifyGroupDeleted(id);
+		}
 	}
 
 }

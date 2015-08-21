@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.apache.velocity.VelocityContext;
+import org.roda.common.UserUtility;
 import org.w3c.util.DateParser;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -23,7 +24,6 @@ import config.i18n.server.IngestListAcceptMessages;
 import config.i18n.server.IngestListRejectMessages;
 import config.i18n.server.IngestListReportMessages;
 import pt.gov.dgarq.roda.common.RodaClientFactory;
-import pt.gov.dgarq.roda.common.UserUtility;
 import pt.gov.dgarq.roda.core.RODAClient;
 import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
 import pt.gov.dgarq.roda.core.common.RODAException;

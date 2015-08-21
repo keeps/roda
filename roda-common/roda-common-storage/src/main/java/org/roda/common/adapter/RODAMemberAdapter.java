@@ -1,4 +1,4 @@
-package pt.gov.dgarq.roda.ds.adapter;
+package org.roda.common.adapter;
 
 import java.util.Arrays;
 import java.util.List;

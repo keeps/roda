@@ -617,8 +617,6 @@ public class SolrUtils {
 	// TODO: Handle SimpleRepresentationPreservationMetadata
 	private static <T> String getIndexName(Class<T> resultClass) throws IndexServiceException {
 		String indexName;
-		LOGGER.error("CLASS1: "+resultClass);
-		LOGGER.error("CLASS2: "+resultClass.getName());
 		if (resultClass.equals(AIP.class)) {
 			indexName = RodaConstants.INDEX_AIP;
 		} else if (resultClass.equals(SimpleDescriptionObject.class)) {
@@ -662,6 +660,8 @@ public class SolrUtils {
 			ret = resultClass.cast(solrDocumentToLogEntry(doc));
 		} else if (resultClass.equals(SIPReport.class)) {
 			ret = resultClass.cast(solrDocumentToSipState(doc));
+		} else if (resultClass.equals(RODAMember.class)) {
+			ret = resultClass.cast(solrDocumentToRodaMember(doc));
 		} else {
 			throw new IndexServiceException("Cannot find class index name: " + resultClass.getName(),
 					IndexServiceException.INTERNAL_SERVER_ERROR);

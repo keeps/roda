@@ -21,6 +21,8 @@ import javax.mail.internet.InternetAddress;
 
 import org.apache.log4j.Logger;
 import org.apache.velocity.VelocityContext;
+import org.roda.common.LdapUtilityException;
+import org.roda.common.UserUtility;
 import org.roda.index.IndexServiceException;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -30,7 +32,6 @@ import pt.gov.dgarq.roda.common.LogUtility;
 import pt.gov.dgarq.roda.common.RodaClientFactory;
 import pt.gov.dgarq.roda.common.RodaCoreFactory;
 import pt.gov.dgarq.roda.common.RodaCoreService;
-import pt.gov.dgarq.roda.common.UserUtility;
 import pt.gov.dgarq.roda.core.RODAClient;
 import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
 import pt.gov.dgarq.roda.core.common.IllegalOperationException;
@@ -62,7 +63,6 @@ import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.core.stubs.UserBrowser;
 import pt.gov.dgarq.roda.core.stubs.UserEditor;
 import pt.gov.dgarq.roda.core.stubs.UserRegistration;
-import pt.gov.dgarq.roda.ds.LdapUtilityException;
 import pt.gov.dgarq.roda.wui.common.captcha.server.CaptchaServiceImpl;
 import pt.gov.dgarq.roda.wui.common.client.GenericException;
 import pt.gov.dgarq.roda.wui.common.client.PrintReportException;

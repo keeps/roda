@@ -3,8 +3,9 @@ package pt.gov.dgarq.roda.wui.dissemination.browse.server;
 import java.util.Date;
 import java.util.List;
 
+import org.roda.common.UserUtility;
+
 import pt.gov.dgarq.roda.common.RodaCoreService;
-import pt.gov.dgarq.roda.common.UserUtility;
 import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
 import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;

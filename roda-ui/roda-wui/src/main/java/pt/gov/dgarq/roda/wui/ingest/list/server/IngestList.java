@@ -2,8 +2,9 @@ package pt.gov.dgarq.roda.wui.ingest.list.server;
 
 import java.util.Date;
 
+import org.roda.common.UserUtility;
+
 import pt.gov.dgarq.roda.common.RodaCoreService;
-import pt.gov.dgarq.roda.common.UserUtility;
 import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
 import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;

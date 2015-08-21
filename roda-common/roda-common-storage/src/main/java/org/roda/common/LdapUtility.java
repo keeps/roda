@@ -1,4 +1,4 @@
-package pt.gov.dgarq.roda.ds;
+package org.roda.common;
 
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
@@ -33,6 +33,8 @@ import javax.naming.ldap.LdapName;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.roda.common.adapter.GroupAdapter;
+import org.roda.common.adapter.UserAdapter;
 import org.w3c.util.DateParser;
 import org.w3c.util.InvalidDateException;
 
@@ -50,8 +52,6 @@ import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.v2.Group;
 import pt.gov.dgarq.roda.core.data.v2.RODAMember;
 import pt.gov.dgarq.roda.core.data.v2.User;
-import pt.gov.dgarq.roda.ds.adapter.GroupAdapter;
-import pt.gov.dgarq.roda.ds.adapter.UserAdapter;
 import pt.gov.dgarq.roda.util.PasswordHandler;
 
 /**
@@ -72,7 +72,7 @@ public class LdapUtility {
 	/**
 	 * LDAP server port
 	 */
-	private int ldapPort = 389;
+	private int ldapPort = 10389;
 
 	/**
 	 * LDAP administrator Distinguished Name (DN)
@@ -195,6 +195,7 @@ public class LdapUtility {
 		this.ldapRolesDN = ldapRolesDN;
 		this.ldapAdminDN = ldapAdminDN;
 		this.ldapAdminPassword = ldapAdminPassword;
+	
 
 		if (ldapPasswordDigestAlgorithm != null) {
 			this.ldapPasswordDigestAlgorithm = ldapPasswordDigestAlgorithm;
@@ -2265,7 +2266,9 @@ public class LdapUtility {
 	 */
 	private DirContext getLDAPDirContext(String contextName)
 			throws NamingException {
-		return getLDAPDirContext(contextName, null, null);
+		//FIX ME
+		//return getLDAPDirContext(contextName, null, null);
+		return getLDAPDirContext(contextName, ldapAdminDN, ldapAdminPassword);
 	}
 
 	/**
@@ -2307,7 +2310,7 @@ public class LdapUtility {
 		env.put(Context.PROVIDER_URL, String.format("ldap://%1$s:%2$d/%3$s",
 				ldapHost, ldapPort, contextDN));
 
-		// env.put(Context.SECURITY_AUTHENTICATION, AUTHENTICATION_SIMPLE);
+		env.put(Context.SECURITY_AUTHENTICATION, AUTHENTICATION_SIMPLE);
 		
 		if (accessUserDN != null) {
 			env.put(Context.SECURITY_PRINCIPAL, accessUserDN);

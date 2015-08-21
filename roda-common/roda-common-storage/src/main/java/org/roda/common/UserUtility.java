@@ -1,4 +1,4 @@
-package pt.gov.dgarq.roda.common;
+package org.roda.common;
 
 import java.util.Arrays;
 import java.util.List;
@@ -8,15 +8,12 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.directory.api.ldap.model.exception.LdapException;
 import org.apache.directory.server.core.api.DirectoryService;
-import org.apache.log.output.io.rotate.RotateStrategyBySize;
 import org.apache.log4j.Category;
 import org.apache.log4j.Logger;
 
 import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
 import pt.gov.dgarq.roda.core.data.v2.RodaSimpleUser;
 import pt.gov.dgarq.roda.core.data.v2.RodaUser;
-import pt.gov.dgarq.roda.ds.LdapUtility;
-import pt.gov.dgarq.roda.ds.LdapUtilityException;
 
 public class UserUtility {
 	private static final Logger LOGGER = Logger.getLogger(UserUtility.class);

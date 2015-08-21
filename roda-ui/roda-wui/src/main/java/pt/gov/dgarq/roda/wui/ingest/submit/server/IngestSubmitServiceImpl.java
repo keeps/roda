@@ -4,26 +4,16 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.List;
 import java.util.Vector;
 
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.httpclient.Credentials;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.multipart.FilePart;
-import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
-import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.PartSource;
-import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
+
+import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import pt.gov.dgarq.roda.common.RodaClientFactory;
 import pt.gov.dgarq.roda.core.RODAClient;
@@ -40,8 +30,6 @@ import pt.gov.dgarq.roda.util.TempDir;
 import pt.gov.dgarq.roda.wui.common.client.GenericException;
 import pt.gov.dgarq.roda.wui.common.fileupload.server.FileUpload;
 import pt.gov.dgarq.roda.wui.ingest.submit.client.IngestSubmitService;
-
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 /**
  * Ingest submit service implementation
