@@ -23,6 +23,7 @@ public class Group extends RodaGroup {
 	 * Constructs a new empty group.
 	 */
 	public Group() {
+		super();
 	}
 
 	/**
@@ -32,7 +33,7 @@ public class Group extends RodaGroup {
 	 *            the name of the group.
 	 */
 	public Group(String name) {
-		super(name, name, null, null, null, null);
+		super(name, name);
 	}
 
 	/**
@@ -42,8 +43,7 @@ public class Group extends RodaGroup {
 	 *            the Group to be cloned.
 	 */
 	public Group(Group group) {
-		super(group.getId(), group.getName(), group
-				.getDirectGroups(), group.getAllGroups(), group.getDirectRoles(),
+		super(group.getId(), group.getName(), group.getDirectGroups(), group.getAllGroups(), group.getDirectRoles(),
 				group.getAllRoles());
 		setActive(true);
 		setMemberUserNames(group.getMemberUserNames());
@@ -54,8 +54,7 @@ public class Group extends RodaGroup {
 	 * @see RODAMember#toString()
 	 */
 	public String toString() {
-		return "Group (" + super.toString() + ", memberUserNames="
-				+ this.memberUserNames + ", memberGroupNames="
+		return "Group (" + super.toString() + ", memberUserNames=" + this.memberUserNames + ", memberGroupNames="
 				+ this.memberGroupNames + ")";
 	}
 
@@ -63,8 +62,7 @@ public class Group extends RodaGroup {
 	 * @return the memberUserNames
 	 */
 	public String[] getMemberUserNames() {
-		return (String[]) memberUserNames.toArray(new String[memberUserNames
-				.size()]);
+		return (String[]) memberUserNames.toArray(new String[memberUserNames.size()]);
 	}
 
 	/**
@@ -82,8 +80,7 @@ public class Group extends RodaGroup {
 	 * @return the memberGroupNames
 	 */
 	public String[] getMemberGroupNames() {
-		return (String[]) memberGroupNames.toArray(new String[memberGroupNames
-				.size()]);
+		return (String[]) memberGroupNames.toArray(new String[memberGroupNames.size()]);
 	}
 
 	/**
@@ -161,9 +158,5 @@ public class Group extends RodaGroup {
 	public boolean removeMemberGroup(String memberGroupName) {
 		return this.memberGroupNames.remove(memberGroupName);
 	}
-
-	
-
-	
 
 }

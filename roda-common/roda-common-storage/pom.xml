@@ -9,15 +9,7 @@
 		<artifactId>roda-common</artifactId>
 		<version>2.0.0-SNAPSHOT</version>
 	</parent>
-	<repositories>
-		<repository>
-			<id>Sonatype-public</id>
-			<name>SnakeYAML repository</name>
-			<url>http://oss.sonatype.org/content/groups/public/</url>
-		</repository>
-	</repositories>
 	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<sonar.sources>src/main/java</sonar.sources>
 
 		<fcrepo.version>4.3.0</fcrepo.version>

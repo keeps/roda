@@ -100,11 +100,12 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
 		return getGroupCount(null, null);
 	}
 
+	// FIXME re-do this with index
 	public User[] getUsers(Character letter, String search) throws RODAException {
 		User[] users;
 		try {
 			Filter filterGroup = new Filter();
-			filterGroup.add(new SimpleFilterParameter(RodaConstants.MEMBER_IS_USER, "true"));
+			filterGroup.add(new SimpleFilterParameter(RodaConstants.MEMBERS_IS_USER, "true"));
 			Filter searchFilter = getFilter(letter, search);
 			if(searchFilter.getParameters()!=null && searchFilter.getParameters().size()>0){
 				for(FilterParameter fp : searchFilter.getParameters()){

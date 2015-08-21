@@ -3,9 +3,6 @@
  */
 package pt.gov.dgarq.roda.wui.common.client;
 
-import java.util.Iterator;
-import java.util.Set;
-
 import pt.gov.dgarq.roda.core.data.v2.User;
 
 /**
@@ -56,15 +53,7 @@ public class AuthenticatedUser extends User {
 	}
 
 	public boolean hasRole(String role) {
-		boolean found = false;
-		Set<String> roles = this.getAllRoles();
-		Iterator<String> it = roles.iterator();
-		while(it.hasNext()){
-			if (it.next().equals(role)) {
-				found = true;
-			}
-		}
-		return found;
+		return this.getAllRoles().contains(role);
 	}
 
 	/**

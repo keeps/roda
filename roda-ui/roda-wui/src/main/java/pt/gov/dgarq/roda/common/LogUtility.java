@@ -11,6 +11,8 @@ import pt.gov.dgarq.roda.core.data.v2.LogEntryParameter;
 import pt.gov.dgarq.roda.core.data.v2.RodaSimpleUser;
 import pt.gov.dgarq.roda.core.data.v2.User;
 
+// FIXME remove this RodaCoreService from roda-wui already provides these functionalities 
+@Deprecated
 public class LogUtility {
 	private static final Logger logger = Logger.getLogger(LogUtility.class);
 	

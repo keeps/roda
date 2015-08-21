@@ -31,8 +31,6 @@ public final class RodaConstants {
 	public static final String INDEX_ACTION_LOG = "ActionLog";
 	public static final String INDEX_OTHER_DESCRIPTIVE_DATA_PREFIX = "odd";
 	public static final String INDEX_SIP_REPORT = "SIPReport";
-	public static final String INDEX_USERS = "Users";
-	public static final String INDEX_GROUPS = "Groups";
 	public static final String INDEX_MEMBERS = "Members";
 
 	/*
@@ -255,14 +253,11 @@ public final class RodaConstants {
 	public static final String SIP_REPORT_TRANSITION_ID = "id";
 
 	// MEMBER: USER or GROUP
-	public static final String MEMBER_ID = "id";
-	public static final String MEMBER_NAME = "name";
-	public static final String MEMBER_IS_ACTIVE = "isActive";
-	public static final String MEMBER_IS_USER = "isUser";
-	public static final String MEMBER_GROUPS_ALL = "groupsAll";
-	public static final String MEMBER_ROLES_ALL = "rolesAll";
-	
-
-	
+	public static final String MEMBERS_ID = "id";
+	public static final String MEMBERS_NAME = "name";
+	public static final String MEMBERS_IS_ACTIVE = "isActive";
+	public static final String MEMBERS_IS_USER = "isUser";
+	public static final String MEMBERS_GROUPS_ALL = "groupsAll";
+	public static final String MEMBERS_ROLES_ALL = "rolesAll";
 
 }

@@ -127,7 +127,9 @@
 
 		p:blockWaitTime="3000" p:validator-ref="searchValidator"
 
-		p:pruneStrategy-ref="pruneStrategy" p:connectionFactory-ref="connectionFactory" />
+		p:pruneStrategy-ref="pruneStrategy" p:failFastInitialize="false" 
+		
+		p:connectionFactory-ref="connectionFactory" />
 
 	<!-- CHANGE -->
 	<bean id="pooledSearchDnResolver" class="org.ldaptive.auth.PooledSearchDnResolver"

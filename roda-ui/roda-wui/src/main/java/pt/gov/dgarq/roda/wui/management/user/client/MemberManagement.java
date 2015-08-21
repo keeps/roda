@@ -95,18 +95,18 @@ public class MemberManagement extends Composite {
 
 	public MemberManagement() {
 		Filter filter = null;
-		Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.MEMBER_IS_ACTIVE),
-				new SimpleFacetParameter(RodaConstants.MEMBER_IS_USER),
-				new SimpleFacetParameter(RodaConstants.MEMBER_GROUPS_ALL));
+		Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.MEMBERS_IS_ACTIVE),
+				new SimpleFacetParameter(RodaConstants.MEMBERS_IS_USER),
+				new SimpleFacetParameter(RodaConstants.MEMBERS_GROUPS_ALL));
 		list = new RodaMemberList(filter, facets);
 		facetIsActive = new FlowPanel();
 		facetIsUser = new FlowPanel();
 		facetGroups = new FlowPanel();
 
 		Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
-		facetPanels.put(RodaConstants.MEMBER_IS_ACTIVE, facetIsActive);
-		facetPanels.put(RodaConstants.MEMBER_IS_USER, facetIsUser);
-		facetPanels.put(RodaConstants.MEMBER_GROUPS_ALL, facetGroups);
+		facetPanels.put(RodaConstants.MEMBERS_IS_ACTIVE, facetIsActive);
+		facetPanels.put(RodaConstants.MEMBERS_IS_USER, facetIsUser);
+		facetPanels.put(RodaConstants.MEMBERS_GROUPS_ALL, facetGroups);
 
 		FacetUtils.bindFacets(list, facetPanels);
 

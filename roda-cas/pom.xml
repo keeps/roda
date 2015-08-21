@@ -34,6 +34,57 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 			</plugin>
+			<!--<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>keytool-maven-plugin</artifactId>
+				<version>1.5</version>
+				<executions>
+					<execution>
+						<phase>generate-resources</phase>
+						<id>clean</id>
+						<goals>
+							<goal>clean</goal>
+						</goals>
+					</execution>
+					<execution>
+						<phase>generate-resources</phase>
+						<id>genkey</id>
+						<goals>
+							<goal>generateKeyPair</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<keystore>${project.build.directory}/jetty-ssl.keystore</keystore>
+					<dname>CN=roda.fake.domain, OU="", O="", L="", ST="", C="PT"</dname>
+					<keypass>changeit</keypass>
+					<storepass>changeit</storepass>
+					<alias>roda</alias>
+					<keyalg>RSA</keyalg>
+				</configuration>
+			</plugin>-->
+			<plugin>
+				<groupId>org.mortbay.jetty</groupId>
+				<artifactId>maven-jetty-plugin</artifactId>
+				<version>6.1.26</version>
+				<configuration>
+					<contextPath>/cas</contextPath>
+					<scanIntervalSeconds>5</scanIntervalSeconds>
+					<connectors>
+						<connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
+							<port>8080</port>
+							<maxIdleTime>60000</maxIdleTime>
+						</connector>
+						<connector implementation="org.mortbay.jetty.security.SslSocketConnector">
+							<port>8443</port>
+							<maxIdleTime>60000</maxIdleTime>
+							<keystore>${user.home}/roda/tomcat/bin/rodaKeystore.jks</keystore>
+							<password>changeit</password>
+							<keyPassword>changeit</keyPassword>
+						</connector>
+					</connectors>
+				</configuration>
+			</plugin>
 		</plugins>
 		<finalName>cas</finalName>
 	</build>

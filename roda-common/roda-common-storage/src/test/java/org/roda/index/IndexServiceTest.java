@@ -585,11 +585,11 @@ public class IndexServiceTest {
 		}
 		
 		Filter filterUSER1 = new Filter();
-		filterUSER1.add(new SimpleFilterParameter(RodaConstants.MEMBER_NAME, "NAMEUSER"));
+		filterUSER1.add(new SimpleFilterParameter(RodaConstants.MEMBERS_NAME, "NAMEUSER"));
 		assertThat(index.count(User.class, filterUSER1), Matchers.is(3L));
 		
 		Filter filterGroup = new Filter();
-		filterGroup.add(new SimpleFilterParameter(RodaConstants.MEMBER_NAME, "NAMEGROUP"));
+		filterGroup.add(new SimpleFilterParameter(RodaConstants.MEMBERS_NAME, "NAMEGROUP"));
 		assertThat(index.count(Group.class, filterGroup), Matchers.is(2L));
 
 	}

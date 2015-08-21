@@ -1,17 +1,11 @@
 package pt.gov.dgarq.roda.wui.filter;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.security.Principal;
-import java.util.Hashtable;
 
-import javax.naming.Context;
-import javax.naming.directory.SearchControls;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -20,22 +14,23 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.directory.server.core.api.DirectoryService;
-import org.apache.directory.server.core.jndi.CoreContextFactory;
 import org.apache.log4j.Logger;
 import org.jasig.cas.client.util.CommonUtils;
 import org.roda.common.UserUtility;
+import org.roda.index.IndexServiceException;
 
 import pt.gov.dgarq.roda.common.RodaCoreFactory;
+import pt.gov.dgarq.roda.core.common.RodaConstants;
+import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
 import pt.gov.dgarq.roda.core.data.v2.RodaSimpleUser;
+import pt.gov.dgarq.roda.core.data.v2.User;
 
 /**
  * Servlet Filter implementation class RolesSetterFilter
  */
 public class RolesSetterFilter implements Filter {
 	static final private Logger logger = Logger.getLogger(RolesSetterFilter.class);
-	FilterConfig config;
+	private FilterConfig config;
 
 	protected String casLogoutURL = null;
 
@@ -122,15 +117,15 @@ public class RolesSetterFilter implements Filter {
 		}
 	}
 
+	private void addUserToDefault(ServletRequest request, RodaSimpleUser userPrincipal) {
+		// TODO addUser...
+	}
+
 	private RodaSimpleUser getGuest() {
 		RodaSimpleUser rsu = new RodaSimpleUser();
 		rsu.setId("guest");
 		rsu.setGuest(true);
 		return rsu;
-	}
-
-	private void addUserToDefault(ServletRequest request, RodaSimpleUser userPrincipal) {
-		// TODO addUser...
 	}
 
 	private RodaSimpleUser getUser(Principal userPrincipal) {
@@ -141,6 +136,21 @@ public class RolesSetterFilter implements Filter {
 	}
 
 	private boolean existUser(String name) {
-		return true;
+		boolean exist;
+		pt.gov.dgarq.roda.core.data.adapter.filter.Filter filter = new pt.gov.dgarq.roda.core.data.adapter.filter.Filter();
+		filter.add(new SimpleFilterParameter(RodaConstants.MEMBERS_ID, name));
+		filter.add(new SimpleFilterParameter(RodaConstants.MEMBERS_IS_USER, "true"));
+		try {
+			Long count = RodaCoreFactory.getIndexService().count(User.class, filter);
+			if (count == 1) {
+				exist = true;
+			} else {
+				exist = false;
+			}
+		} catch (IndexServiceException e) {
+			exist = false;
+		}
+
+		return exist;
 	}
 }

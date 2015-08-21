@@ -2,7 +2,6 @@ package pt.gov.dgarq.roda.core.data.v2;
 
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Set;
 
 import pt.gov.dgarq.roda.core.data.RODAMember;
 
@@ -19,8 +18,8 @@ public class User extends RodaUser {
 	public static final String ID_TYPE_PASSPORT = "passport";
 	public static final String ID_TYPE_CITIZEN_CARD = "citizen_card";
 
-	public static final String[] ID_TYPES = new String[] { ID_TYPE_BI,
-			ID_TYPE_PASSPORT, ID_TYPE_CITIZEN_CARD };
+	// FIXME change this to list?
+	public static final String[] ID_TYPES = new String[] { ID_TYPE_BI, ID_TYPE_PASSPORT, ID_TYPE_CITIZEN_CARD };
 
 	// LDAP documentTitle
 	private String idDocumentType = null;
@@ -49,8 +48,8 @@ public class User extends RodaUser {
 	private String telephoneNumber = null;
 	// LDAP fax
 	private String fax = null;
-	// LDAP email
-	private String email = null;
+	// // LDAP email
+	// private String email = null;
 
 	// LDAP businessCategory
 	private String businessCategory = null;
@@ -68,6 +67,7 @@ public class User extends RodaUser {
 	 * Constructs a new empty user.
 	 */
 	public User() {
+		super();
 	}
 
 	/**
@@ -77,7 +77,8 @@ public class User extends RodaUser {
 	 *            the name of the new user.
 	 */
 	public User(String name) {
-		super(name,name,"",false, null, null, null, null);
+		super();
+		super.setName(name);
 		setActive(true);
 	}
 
@@ -89,9 +90,8 @@ public class User extends RodaUser {
 	 */
 	public User(User user) {
 
-		super(user.getId(), user.getName(),"",false, user
-				.getDirectGroups(), user.getAllGroups(), user.getDirectRoles(), user
-				.getAllRoles());
+		super(user.getId(), user.getName(), user.getEmail(), false, user.getDirectGroups(), user.getAllGroups(),
+				user.getDirectRoles(), user.getAllRoles());
 		setActive(user.isActive());
 		setIdDocumentType(user.getIdDocumentType());
 		setIdDocument(user.getIdDocument());
@@ -112,34 +112,24 @@ public class User extends RodaUser {
 		setBusinessCategory(user.getBusinessCategory());
 
 		setResetPasswordToken(user.getResetPasswordToken());
-		setResetPasswordTokenExpirationDate(user
-				.getResetPasswordTokenExpirationDate());
+		setResetPasswordTokenExpirationDate(user.getResetPasswordTokenExpirationDate());
 		setEmailConfirmationToken(user.getResetPasswordToken());
-		setEmailConfirmationTokenExpirationDate(user
-				.getResetPasswordTokenExpirationDate());
+		setEmailConfirmationTokenExpirationDate(user.getResetPasswordTokenExpirationDate());
 	}
 
 	/**
 	 * @see RODAMember#toString()
 	 */
 	public String toString() {
-		return "User (" + super.toString() + ", idDocumentType="
-				+ getIdDocumentType() + ", idDocument=" + getIdDocument()
-				+ ", idDocumentLocation=" + getIdDocumentLocation()
-				+ ", idDocumentDate=" + getIdDocumentDate()
-				+ ", financeIdentificationNumber="
-				+ getFinanceIdentificationNumber() + ", birthCountry="
-				+ getBirthCountry() + ", postalAddress=" + getPostalAddress()
-				+ ", postalCode=" + getPostalCode() + ", localityName="
-				+ getLocalityName() + ", countryName=" + getCountryName()
-				+ ", telephoneName=" + getTelephoneNumber() + ", fax="
-				+ getFax() + ", email=" + getEmail() + ", businessCategory="
-				+ getBusinessCategory() + ", resetPasswordToken="
-				+ getResetPasswordToken()
-				+ ", resetPasswordTokenExpirationDate="
-				+ getResetPasswordTokenExpirationDate()
-				+ ", emailConfirmationToken=" + getEmailConfirmationToken()
-				+ ", emailConfirmationTokenExpirationDate="
+		return "User (" + super.toString() + ", idDocumentType=" + getIdDocumentType() + ", idDocument="
+				+ getIdDocument() + ", idDocumentLocation=" + getIdDocumentLocation() + ", idDocumentDate="
+				+ getIdDocumentDate() + ", financeIdentificationNumber=" + getFinanceIdentificationNumber()
+				+ ", birthCountry=" + getBirthCountry() + ", postalAddress=" + getPostalAddress() + ", postalCode="
+				+ getPostalCode() + ", localityName=" + getLocalityName() + ", countryName=" + getCountryName()
+				+ ", telephoneName=" + getTelephoneNumber() + ", fax=" + getFax() + ", email=" + getEmail()
+				+ ", businessCategory=" + getBusinessCategory() + ", resetPasswordToken=" + getResetPasswordToken()
+				+ ", resetPasswordTokenExpirationDate=" + getResetPasswordTokenExpirationDate()
+				+ ", emailConfirmationToken=" + getEmailConfirmationToken() + ", emailConfirmationTokenExpirationDate="
 				+ getEmailConfirmationTokenExpirationDate() + ")";
 	}
 
@@ -156,15 +146,12 @@ public class User extends RodaUser {
 	 */
 	public void setIdDocumentType(String idDocumentType) {
 
-		if (idDocumentType == null
-				|| Arrays.asList(ID_TYPES).contains(
-						idDocumentType.toLowerCase())) {
+		if (idDocumentType == null || Arrays.asList(ID_TYPES).contains(idDocumentType.toLowerCase())) {
 
 			this.idDocumentType = idDocumentType;
 
 		} else {
-			throw new IllegalArgumentException("'" + idDocumentType
-					+ "' is not a valid ID document type");
+			throw new IllegalArgumentException("'" + idDocumentType + "' is not a valid ID document type");
 		}
 	}
 
@@ -224,8 +211,7 @@ public class User extends RodaUser {
 	 * @param financeIdentificationNumber
 	 *            the financeIdentificationNumber to set
 	 */
-	public void setFinanceIdentificationNumber(
-			String financeIdentificationNumber) {
+	public void setFinanceIdentificationNumber(String financeIdentificationNumber) {
 		this.financeIdentificationNumber = financeIdentificationNumber;
 	}
 
@@ -248,7 +234,7 @@ public class User extends RodaUser {
 	 * @return the email
 	 */
 	public String getEmail() {
-		return email;
+		return super.getEmail();
 	}
 
 	/**
@@ -256,7 +242,7 @@ public class User extends RodaUser {
 	 *            the email to set
 	 */
 	public void setEmail(String email) {
-		this.email = email;
+		super.setEmail(email);
 	}
 
 	/**
@@ -393,8 +379,7 @@ public class User extends RodaUser {
 	 * @param resetPasswordTokenExpirationDate
 	 *            the resetPasswordTokenExpirationDate to set
 	 */
-	public void setResetPasswordTokenExpirationDate(
-			String resetPasswordTokenExpirationDate) {
+	public void setResetPasswordTokenExpirationDate(String resetPasswordTokenExpirationDate) {
 		this.resetPasswordTokenExpirationDate = resetPasswordTokenExpirationDate;
 	}
 
@@ -424,8 +409,7 @@ public class User extends RodaUser {
 	 * @param emailConfirmationTokenExpirationDate
 	 *            the emailConfirmationTokenExpirationDate to set
 	 */
-	public void setEmailConfirmationTokenExpirationDate(
-			String emailConfirmationTokenExpirationDate) {
+	public void setEmailConfirmationTokenExpirationDate(String emailConfirmationTokenExpirationDate) {
 		this.emailConfirmationTokenExpirationDate = emailConfirmationTokenExpirationDate;
 	}
 

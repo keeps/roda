@@ -3,7 +3,6 @@ package org.roda.common;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -58,6 +57,7 @@ import pt.gov.dgarq.roda.util.PasswordHandler;
  * @author Rui Castro
  * 
  */
+// FIXME this should be moved back to roda-common-servlet-security
 public class LdapUtility {
 
 	static final private Logger logger = Logger.getLogger(LdapUtility.class);
@@ -224,6 +224,7 @@ public class LdapUtility {
 	 * @return an <code>int</code> with the number of users in the repository.
 	 * @throws LdapUtilityException
 	 */
+	// FIXME this code must certainly should be rethink as this should be done directly to the index and not to ldap
 	public int getUserCount(Filter contentAdapterFilter)
 			throws LdapUtilityException {
 
@@ -681,6 +682,7 @@ public class LdapUtility {
 	 * @return an <code>int</code> with the number of groups in the repository.
 	 * @throws LdapUtilityException
 	 */
+	// FIXME this code must certainly should be rethink as this should be done directly to the index and not to ldap 
 	public int getGroupCount(Filter contentAdapterFilter)
 			throws LdapUtilityException {
 
@@ -2266,7 +2268,7 @@ public class LdapUtility {
 	 */
 	private DirContext getLDAPDirContext(String contextName)
 			throws NamingException {
-		//FIX ME
+		// FIXME
 		//return getLDAPDirContext(contextName, null, null);
 		return getLDAPDirContext(contextName, ldapAdminDN, ldapAdminPassword);
 	}

@@ -87,10 +87,10 @@ objectClass: person
 objectClass: organizationalPerson
 objectClass: inetOrgPerson
 objectClass: shadowAccount
-cn: RODA Handle
+cn: RODA
 sn: Handle
 email: handle@roda.pt
-givenName: RODA
+givenName: RODA handle
 shadowInactive: 0
 uid: roda-handle
 userPassword:: cm9kYQ==

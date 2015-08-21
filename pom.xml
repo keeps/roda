@@ -58,6 +58,11 @@
 			<id>ja-sig</id>
 			<url>http://oss.sonatype.org/content/repositories/releases/</url>
 		</repository>
+		<repository>
+			<id>Sonatype-public</id>
+			<name>SnakeYAML repository</name>
+			<url>http://oss.sonatype.org/content/groups/public/</url>
+		</repository>
 	</repositories>
 	<ciManagement>
 		<system>Jenkins</system>

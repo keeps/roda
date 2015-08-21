@@ -1,30 +1,25 @@
 package pt.gov.dgarq.roda.wui.common.server;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.roda.common.UserUtility;
 
+import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+
 import pt.gov.dgarq.roda.common.RodaClientFactory;
-import pt.gov.dgarq.roda.core.RODAClient;
 import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.data.LogEntry;
 import pt.gov.dgarq.roda.core.data.LogEntryParameter;
 import pt.gov.dgarq.roda.core.data.v2.RodaSimpleUser;
-import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.servlet.cas.CASUserPrincipal;
 import pt.gov.dgarq.roda.wui.common.client.AuthenticatedUser;
 import pt.gov.dgarq.roda.wui.common.client.UserLoginService;
-
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 /**
  * User login servlet
