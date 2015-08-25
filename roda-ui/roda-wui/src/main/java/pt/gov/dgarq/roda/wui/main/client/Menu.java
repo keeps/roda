@@ -347,6 +347,7 @@ public class Menu extends Composite {
 		});
 
 		// User
+		logger.debug("user in menu bar: "+user);
 		if (user.isGuest()) {
 			rightMenu.addItem(constants.loginLogin(), createLoginCommand());
 			rightMenu.addItem(constants.loginRegister(), createCommand(Register.getInstance().getHistoryPath()));

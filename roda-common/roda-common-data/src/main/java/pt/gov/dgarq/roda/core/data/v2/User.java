@@ -79,6 +79,7 @@ public class User extends RodaUser {
 	public User(String name) {
 		super();
 		super.setName(name);
+		super.setId(name);
 		setActive(true);
 	}
 
@@ -115,6 +116,10 @@ public class User extends RodaUser {
 		setResetPasswordTokenExpirationDate(user.getResetPasswordTokenExpirationDate());
 		setEmailConfirmationToken(user.getResetPasswordToken());
 		setEmailConfirmationTokenExpirationDate(user.getResetPasswordTokenExpirationDate());
+	}
+
+	public User(RodaUser rodaUser) {
+		super(rodaUser);
 	}
 
 	/**

@@ -7,8 +7,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
+import org.roda.index.IndexService;
+import org.roda.index.IndexServiceException;
 
 import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
+import pt.gov.dgarq.roda.core.common.RodaConstants;
+import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
+import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
+import pt.gov.dgarq.roda.core.data.v2.IndexResult;
+import pt.gov.dgarq.roda.core.data.v2.RODAMember;
 import pt.gov.dgarq.roda.core.data.v2.RodaSimpleUser;
 import pt.gov.dgarq.roda.core.data.v2.RodaUser;
 
@@ -26,68 +34,46 @@ public class UserUtility {
 		LDAP_UTILITY = ldapUtility;
 	}
 
-	public static RodaSimpleUser getUser(HttpServletRequest request) {
+	public static RodaUser getUser(HttpServletRequest request, IndexService indexService) {
+		RodaUser user = null;
 		RodaSimpleUser rsu = null;
 		if (request.getSession().getAttribute(RODA_USER) != null) {
 			rsu = (RodaSimpleUser) request.getSession().getAttribute(RODA_USER);
+
+			Filter filter = new Filter();
+			filter.add(new SimpleFilterParameter(RodaConstants.MEMBERS_ID, rsu.getId()));
+			filter.add(new SimpleFilterParameter(RodaConstants.MEMBERS_IS_USER, "true"));
+			try {
+				IndexResult<RODAMember> indexUsers = indexService.find(RODAMember.class, filter, null, new Sublist(),
+						null);
+				if (indexUsers.getTotalCount() == 1) {
+					user = (RodaUser) indexUsers.getResults().get(0);
+					user.setGuest(rsu.isGuest());
+					LOGGER.debug("User obtained from index: " + user + "\n" + "user in session: " + rsu);
+				} else {
+					LOGGER.debug("List of users found: " + indexUsers.getResults());
+					LOGGER.error("The number of users obtained from the index is different from 1");
+				}
+			} catch (IndexServiceException e) {
+				LOGGER.error("Error obtaining user \"" + rsu.getId() + "\" from index", e);
+			}
 		}
-		return rsu;
+		return user;
 	}
 
-	// public static RodaUser getUser(HttpServletRequest request, IndexService
-	// indexService) {
-	// RodaUser user = null;
-	// RodaSimpleUser rsu = null;
-	// if (request.getSession().getAttribute(RODA_USER) != null) {
-	// rsu = (RodaSimpleUser) request.getSession().getAttribute(RODA_USER);
-	//
-	// Filter filter = new Filter();
-	// filter.add(new SimpleFilterParameter(RodaConstants.MEMBERS_NAME,
-	// rsu.getId()));
-	// filter.add(new SimpleFilterParameter(RodaConstants.MEMBERS_IS_USER,
-	// "true"));
-	// try {
-	// IndexResult<User> indexUsers = indexService.find(User.class, filter,
-	// null, new Sublist(), null);
-	// if (indexUsers.getTotalCount() == 1) {
-	// User indexUser = indexUsers.getResults().get(0);
-	// user = new RodaUser();
-	// user.setId(indexUser.getId());
-	// user.setActive(indexUser.isActive());
-	// user.setName(indexUser.getName());
-	// user.setAllGroups(indexUser.getAllGroups());
-	// user.setAllRoles(indexUser.getAllRoles());
-	// user.setDirectGroups(indexUser.getDirectGroups());
-	// user.setDirectRoles(indexUser.getDirectRoles());
-	// }
-	// } catch (IndexServiceException e) {
-	// LOGGER.error("Error obtaining user \"" + rsu.getId() + "\" from index",
-	// e);
-	// }
-	// }
-	// return user;
-	// }
-
-	public static void checkRoles(RodaSimpleUser rsu, List<String> rolesToCheck)
+	public static void checkRoles(RodaUser rsu, List<String> rolesToCheck)
 			throws AuthorizationDeniedException, LdapUtilityException {
-		RodaUser ru = getFullUser(rsu);
+		if (!Arrays.asList(rsu.getAllRoles()).containsAll(rolesToCheck)) {
+			throw new AuthorizationDeniedException(
+					"The user '" + rsu.getId() + "' does not have all needed permissions: " + rolesToCheck);
+		}
+	}
+
+	public static void checkRoles(RodaUser ru, List<String> rolesToCheck, HttpServletRequest request)
+			throws AuthorizationDeniedException {
 		if (!Arrays.asList(ru.getAllRoles()).containsAll(rolesToCheck)) {
 			throw new AuthorizationDeniedException(
 					"The user '" + ru.getId() + "' does not have all needed permissions: " + rolesToCheck);
-		}
-	}
-
-	public static void checkRoles(RodaSimpleUser rsu, List<String> rolesToCheck, HttpServletRequest request)
-			throws AuthorizationDeniedException {
-		try {
-			RodaUser ru = getFullUser(rsu);
-			if (!Arrays.asList(ru.getAllRoles()).containsAll(rolesToCheck)) {
-				throw new AuthorizationDeniedException(
-						"The user '" + ru.getId() + "' does not have all needed permissions: " + rolesToCheck);
-			}
-		} catch (LdapUtilityException e) {
-			throw new AuthorizationDeniedException(
-					"The user '" + rsu.getId() + "' does not have all needed permissions: " + rolesToCheck);
 		}
 	}
 
@@ -103,12 +89,12 @@ public class UserUtility {
 		return u;
 	}
 
-	public static void checkRoles(RodaSimpleUser user, HttpServletRequest request, String... rolesToCheck)
+	public static void checkRoles(RodaUser user, HttpServletRequest request, String... rolesToCheck)
 			throws AuthorizationDeniedException {
 		checkRoles(user, Arrays.asList(rolesToCheck), request);
 	}
 
-	public static void checkRoles(RodaSimpleUser user, String... rolesToCheck) throws AuthorizationDeniedException {
+	public static void checkRoles(RodaUser user, String... rolesToCheck) throws AuthorizationDeniedException {
 		checkRoles(user, Arrays.asList(rolesToCheck), null);
 	}
 

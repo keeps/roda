@@ -18,18 +18,20 @@ import org.apache.log4j.Logger;
 import org.jasig.cas.client.util.CommonUtils;
 import org.roda.common.UserUtility;
 import org.roda.index.IndexServiceException;
+import org.roda.model.ModelServiceException;
 
 import pt.gov.dgarq.roda.common.RodaCoreFactory;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
 import pt.gov.dgarq.roda.core.data.v2.RodaSimpleUser;
+import pt.gov.dgarq.roda.core.data.v2.RodaUser;
 import pt.gov.dgarq.roda.core.data.v2.User;
 
 /**
  * Servlet Filter implementation class RolesSetterFilter
  */
 public class RolesSetterFilter implements Filter {
-	static final private Logger logger = Logger.getLogger(RolesSetterFilter.class);
+	private static final Logger logger = Logger.getLogger(RolesSetterFilter.class);
 	private FilterConfig config;
 
 	protected String casLogoutURL = null;
@@ -86,15 +88,22 @@ public class RolesSetterFilter implements Filter {
 			HttpServletResponse servletResponse = (HttpServletResponse) response;
 			if (servletRequest.getUserPrincipal() != null) {
 				if (existUser(servletRequest.getUserPrincipal().getName())) {
+					logger.debug("User principal and user exist (" + servletRequest.getUserPrincipal().getName() + ")");
 					UserUtility.setUser(servletRequest, getUser(servletRequest.getUserPrincipal()));
 				} else {
+					logger.debug("User principal exist but user doesn't (" + servletRequest.getUserPrincipal().getName()
+							+ ")");
 					RodaSimpleUser rsu = getUser(servletRequest.getUserPrincipal());
-					addUserToDefault(request, rsu);
+					addUserToLdapAndIndex(request, rsu);
 					UserUtility.setUser(servletRequest, rsu);
 				}
 			} else {
-				if (UserUtility.getUser(servletRequest) == null) {
+				if (UserUtility.getUser(servletRequest, RodaCoreFactory.getIndexService()) == null) {
+					logger.debug(
+							"User principal doesn't exist neither the user is already in session: setting user to guest");
 					UserUtility.setUser(servletRequest, getGuest());
+				} else {
+					logger.debug("User is already in session");
 				}
 
 			}
@@ -117,8 +126,14 @@ public class RolesSetterFilter implements Filter {
 		}
 	}
 
-	private void addUserToDefault(ServletRequest request, RodaSimpleUser userPrincipal) {
-		// TODO addUser...
+	// TODO test this
+	private void addUserToLdapAndIndex(ServletRequest request, RodaSimpleUser userPrincipal) {
+		try {
+			User user = new User(new RodaUser(userPrincipal));
+			RodaCoreFactory.getModelService().addUser(user, true, true);
+		} catch (ModelServiceException e) {
+			logger.error("Error while creating and indexing user", e);
+		}
 	}
 
 	private RodaSimpleUser getGuest() {

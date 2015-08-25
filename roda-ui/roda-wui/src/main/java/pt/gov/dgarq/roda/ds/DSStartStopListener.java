@@ -13,7 +13,6 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.apache.commons.configuration.Configuration;
-import org.apache.directory.api.ldap.model.constants.SchemaConstants;
 import org.apache.directory.api.ldap.model.entry.DefaultEntry;
 import org.apache.directory.api.ldap.model.entry.Entry;
 import org.apache.directory.api.ldap.model.ldif.LdifEntry;
@@ -44,6 +43,7 @@ import org.roda.common.LdapUtility;
 import org.roda.common.UserUtility;
 
 import pt.gov.dgarq.roda.common.RodaCoreFactory;
+import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.v2.Group;
 import pt.gov.dgarq.roda.core.data.v2.User;
 
@@ -121,9 +121,7 @@ public class DSStartStopListener implements ServletContextListener {
 		File schemaPartitionDirectory = new File(instanceLayout.getPartitionsDirectory(), "schema");
 
 		// Extract the schema on disk (a brand new one) and load the registries
-		if (schemaPartitionDirectory.exists()) {
-			LOGGER.info("schema partition already exists, skipping schema extraction");
-		} else {
+		if (!schemaPartitionDirectory.exists()) {
 			SchemaLdifExtractor extractor = new DefaultSchemaLdifExtractor(instanceLayout.getPartitionsDirectory());
 			extractor.extractOrCopy();
 		}
@@ -186,12 +184,11 @@ public class DSStartStopListener implements ServletContextListener {
 			applyLdif(RODA_APACHE_DS_CONFIG_DIRECTORY.resolve("groups.ldif").toFile());
 			applyLdif(RODA_APACHE_DS_CONFIG_DIRECTORY.resolve("roles.ldif").toFile());
 		}
-
-		// UserUtility.setDirectoryService(service);
 	}
 
 	private JdbmPartition instantiateDirectoryService(File workDir) throws Exception, IOException {
 		service = new DefaultDirectoryService();
+		service.setInstanceId(INSTANCE_NAME);
 		service.setInstanceLayout(new InstanceLayout(workDir));
 
 		CacheService cacheService = new CacheService();
@@ -286,18 +283,7 @@ public class DSStartStopListener implements ServletContextListener {
 
 	public void applyLdif(final File ldifFile) throws Exception {
 		LdifReader entries = new LdifReader(new FileInputStream(ldifFile));
-		Configuration rodaConfig = RodaCoreFactory.getConfiguration("roda-wui.properties");
-		String groupDN = rodaConfig.getString("ldapGroupsDN");
-		String userDN = rodaConfig.getString("ldapPeopleDN");
 		for (LdifEntry ldifEntry : entries) {
-			if (ldifEntry.getDn().toString().contains(groupDN)) {
-				Group group = ldifEntryToGroup(ldifEntry);
-				RodaCoreFactory.getModelService().addGroup(group, false, true);
-			} else if (ldifEntry.getDn().toString().contains(userDN)) {
-				User user = ldifEntryToUser(ldifEntry);
-				RodaCoreFactory.getModelService().addUser(user, false, true);
-			}
-
 			DefaultEntry newEntry = new DefaultEntry(service.getSchemaManager(), ldifEntry.getEntry());
 			LOGGER.debug("ldif entry: " + newEntry);
 			service.getAdminSession().add(newEntry);
@@ -314,63 +300,23 @@ public class DSStartStopListener implements ServletContextListener {
 			if (!Files.exists(RODA_APACHE_DS_DATA_DIRECTORY)) {
 				Files.createDirectories(RODA_APACHE_DS_DATA_DIRECTORY);
 				initDirectoryService(RODA_APACHE_DS_DATA_DIRECTORY.toFile());
+				startServer();
+				for (User user : UserUtility.getLdapUtility().getUsers(new Filter())) {
+					LOGGER.debug("User to be indexed: " + user);
+					RodaCoreFactory.getModelService().addUser(user, false, true);
+				}
+				for (Group group : UserUtility.getLdapUtility().getGroups(new Filter())) {
+					LOGGER.debug("Group to be indexed: " + group);
+					RodaCoreFactory.getModelService().addGroup(group, false, true);
+				}
 			} else {
 				instantiateDirectoryService(RODA_APACHE_DS_DATA_DIRECTORY.toFile());
+				startServer();
 			}
-			startServer();
+
 		} catch (Exception e) {
 			LOGGER.error("Error starting up embedded ApacheDS", e);
 		}
 
-	}
-
-	private User ldifEntryToUser(LdifEntry ldifEntry) {
-		User u = new User();
-		try {
-			u.setId(ldifEntry.get(SchemaConstants.ENTRY_UUID_AT).toString());
-		} catch (Throwable e) {
-			u.setId("ID" + System.currentTimeMillis());
-		}
-		try {
-			u.setName(ldifEntry.get(SchemaConstants.GIVENNAME_AT).toString());
-		} catch (Throwable e) {
-			u.setName("NAME");
-		}
-		try {
-			u.setFullName("FULLNAME");
-		} catch (Throwable e) {
-
-		}
-		try {
-			u.setEmail(ldifEntry.get(SchemaConstants.EMAIL_AT).toString());
-		} catch (Throwable e) {
-			u.setEmail("mail" + System.currentTimeMillis() + "@keep.pt");
-		}
-		u.setActive(true);
-		u.setGuest(false);
-		LOGGER.debug("Adding user (from ldif) to index: " + u);
-		return u;
-	}
-
-	private Group ldifEntryToGroup(LdifEntry ldifEntry) {
-		Group g = new Group();
-		try {
-			g.setId(ldifEntry.get(SchemaConstants.ENTRY_UUID_AT).toString());
-		} catch (Throwable e) {
-			g.setId("ID" + System.currentTimeMillis());
-		}
-		try {
-			g.setName(ldifEntry.get(SchemaConstants.NAME_AT).toString());
-		} catch (Throwable e) {
-			g.setName("NAME");
-		}
-		try {
-			g.setFullName("FULLNAME");
-		} catch (Throwable e) {
-
-		}
-		g.setActive(true);
-		LOGGER.debug("Adding groupd (from ldif) to index: " + g);
-		return g;
 	}
 }

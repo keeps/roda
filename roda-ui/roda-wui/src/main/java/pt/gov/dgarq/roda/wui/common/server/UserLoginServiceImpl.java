@@ -13,10 +13,12 @@ import org.roda.common.UserUtility;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import pt.gov.dgarq.roda.common.RodaClientFactory;
+import pt.gov.dgarq.roda.common.RodaCoreFactory;
 import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.data.LogEntry;
 import pt.gov.dgarq.roda.core.data.LogEntryParameter;
 import pt.gov.dgarq.roda.core.data.v2.RodaSimpleUser;
+import pt.gov.dgarq.roda.core.data.v2.RodaUser;
 import pt.gov.dgarq.roda.servlet.cas.CASUserPrincipal;
 import pt.gov.dgarq.roda.wui.common.client.AuthenticatedUser;
 import pt.gov.dgarq.roda.wui.common.client.UserLoginService;
@@ -60,13 +62,12 @@ public class UserLoginServiceImpl extends RemoteServiceServlet implements
 //
 //		return officeUser;
 		
-		RodaSimpleUser user = UserUtility.getUser(this
-				.getThreadLocalRequest());
-		;
+		RodaUser user = UserUtility.getUser(this
+				.getThreadLocalRequest(), RodaCoreFactory.getIndexService());
 		AuthenticatedUser u = new AuthenticatedUser();
 		u.setName(user.getId());
 		u.setGuest(user.isGuest());
-		Set<String> roles = UserUtility.getFullUser(user).getAllRoles();
+		Set<String> roles = user.getAllRoles();
 		
 		u.setAllRoles(roles);
 		return u;

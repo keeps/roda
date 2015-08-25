@@ -135,26 +135,20 @@ public class RodaUser extends RodaSimpleUser implements RODAMember {
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("RodaUser [").append(super.toString());
-		builder.append(", active=").append(active);
-		builder.append(", allRoles=").append(allRoles);
-		builder.append(", directRoles=").append(directRoles);
-		builder.append(", allGroups=").append(allGroups);
-		builder.append(", directGroups=").append(directGroups);
-		builder.append("]");
-		return builder.toString();
+		return "RodaUser [active=" + active + ", allRoles=" + allRoles + ", directRoles=" + directRoles + ", allGroups="
+				+ allGroups + ", directGroups=" + directGroups + ", isUser()=" + isUser() + ", " + super.toString()
+				+ "]";
 	}
 
 	public void addDirectRole(String role) {
-		if(directRoles==null){
+		if (directRoles == null) {
 			directRoles = new HashSet<String>();
 		}
 		directRoles.add(role);
 	}
 
 	public void addGroup(String group) {
-		if(allGroups==null){
+		if (allGroups == null) {
 			allGroups = new HashSet<String>();
 		}
 		allGroups.add(group);
@@ -164,8 +158,8 @@ public class RodaUser extends RodaSimpleUser implements RODAMember {
 		// TODO Auto-generated method stub
 		return true;
 	}
-	
-	public boolean hasRole(String role){
+
+	public boolean hasRole(String role) {
 		return allRoles.contains(role);
 	}
 }

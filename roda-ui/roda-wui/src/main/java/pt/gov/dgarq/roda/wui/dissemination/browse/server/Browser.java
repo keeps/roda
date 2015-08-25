@@ -14,6 +14,7 @@ import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.RodaSimpleUser;
+import pt.gov.dgarq.roda.core.data.v2.RodaUser;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.wui.common.client.GenericException;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.BrowseItemBundle;
@@ -24,7 +25,7 @@ public class Browser extends RodaCoreService {
 		super();
 	}
 
-	public static BrowseItemBundle getItemBundle(RodaSimpleUser user, String aipId, String localeString)
+	public static BrowseItemBundle getItemBundle(RodaUser user, String aipId, String localeString)
 			throws AuthorizationDeniedException, GenericException {
 		Date start = new Date();
 
@@ -41,7 +42,7 @@ public class Browser extends RodaCoreService {
 		return itemBundle;
 	}
 
-	public static IndexResult<SimpleDescriptionObject> findDescriptiveMetadata(RodaSimpleUser user, Filter filter,
+	public static IndexResult<SimpleDescriptionObject> findDescriptiveMetadata(RodaUser user, Filter filter,
 			Sorter sorter, Sublist sublist, Facets facets) throws RODAException {
 		Date start = new Date();
 
@@ -60,7 +61,7 @@ public class Browser extends RodaCoreService {
 		return descriptiveMetadata;
 	}
 
-	public static Long countDescriptiveMetadata(RodaSimpleUser user, Filter filter)
+	public static Long countDescriptiveMetadata(RodaUser user, Filter filter)
 			throws AuthorizationDeniedException, GenericException {
 		Date start = new Date();
 
@@ -77,7 +78,7 @@ public class Browser extends RodaCoreService {
 		return count;
 	}
 
-	public static SimpleDescriptionObject getSimpleDescriptionObject(RodaSimpleUser user, String aipId)
+	public static SimpleDescriptionObject getSimpleDescriptionObject(RodaUser user, String aipId)
 			throws AuthorizationDeniedException, GenericException {
 		Date start = new Date();
 
@@ -94,7 +95,7 @@ public class Browser extends RodaCoreService {
 		return sdo;
 	}
 
-	public static List<SimpleDescriptionObject> getAncestors(RodaSimpleUser user, SimpleDescriptionObject sdo)
+	public static List<SimpleDescriptionObject> getAncestors(RodaUser user, SimpleDescriptionObject sdo)
 			throws AuthorizationDeniedException, GenericException {
 		Date start = new Date();
 

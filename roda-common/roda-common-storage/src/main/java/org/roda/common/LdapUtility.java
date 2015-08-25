@@ -147,11 +147,10 @@ public class LdapUtility {
 	 *            list of protected groups. Groups in the protected list cannot
 	 *            be modified.
 	 */
-	public LdapUtility(String ldapHost, int ldapPort, String ldapPopleDN,
-			String ldapGroupsDN, String ldapRolesDN,
+	public LdapUtility(String ldapHost, int ldapPort, String ldapPopleDN, String ldapGroupsDN, String ldapRolesDN,
 			List<String> ldapProtectedUsers, List<String> ldapProtectedGroups) {
-		this(ldapHost, ldapPort, ldapPopleDN, ldapGroupsDN, ldapRolesDN, null,
-				null, null, ldapProtectedUsers, ldapProtectedGroups);
+		this(ldapHost, ldapPort, ldapPopleDN, ldapGroupsDN, ldapRolesDN, null, null, null, ldapProtectedUsers,
+				ldapProtectedGroups);
 	}
 
 	/**
@@ -184,9 +183,8 @@ public class LdapUtility {
 	 *            list of protected groups. Groups in the protected list cannot
 	 *            be modified.
 	 */
-	public LdapUtility(String ldapHost, int ldapPort, String ldapPeopleDN,
-			String ldapGroupsDN, String ldapRolesDN, String ldapAdminDN,
-			String ldapAdminPassword, String ldapPasswordDigestAlgorithm,
+	public LdapUtility(String ldapHost, int ldapPort, String ldapPeopleDN, String ldapGroupsDN, String ldapRolesDN,
+			String ldapAdminDN, String ldapAdminPassword, String ldapPasswordDigestAlgorithm,
 			List<String> ldapProtectedUsers, List<String> ldapProtectedGroups) {
 		this.ldapHost = ldapHost;
 		this.ldapPort = ldapPort;
@@ -195,7 +193,6 @@ public class LdapUtility {
 		this.ldapRolesDN = ldapRolesDN;
 		this.ldapAdminDN = ldapAdminDN;
 		this.ldapAdminPassword = ldapAdminPassword;
-	
 
 		if (ldapPasswordDigestAlgorithm != null) {
 			this.ldapPasswordDigestAlgorithm = ldapPasswordDigestAlgorithm;
@@ -224,20 +221,16 @@ public class LdapUtility {
 	 * @return an <code>int</code> with the number of users in the repository.
 	 * @throws LdapUtilityException
 	 */
-	// FIXME this code must certainly should be rethink as this should be done directly to the index and not to ldap
-	public int getUserCount(Filter contentAdapterFilter)
-			throws LdapUtilityException {
+	public int getUserCount(Filter contentAdapterFilter) throws LdapUtilityException {
 
 		JndiContentAdapterEngine<UserAdapter, User> jndiAdapterEngine = new JndiContentAdapterEngine<UserAdapter, User>(
-				new UserAdapter(), new ContentAdapter(contentAdapterFilter,
-						null, null));
+				new UserAdapter(), new ContentAdapter(contentAdapterFilter, null, null));
 
 		try {
 
 			DirContext ctxRoot = getLDAPDirContext(ldapRootDN);
 
-			List<Attributes> attributesList = searchAttributes(ctxRoot,
-					ldapPeopleDN, "uid", jndiAdapterEngine);
+			List<Attributes> attributesList = searchAttributes(ctxRoot, ldapPeopleDN, "uid", jndiAdapterEngine);
 
 			ctxRoot.close();
 
@@ -245,8 +238,7 @@ public class LdapUtility {
 
 		} catch (NamingException e) {
 			logger.debug("Error counting users - " + e.getMessage(), e);
-			throw new LdapUtilityException("Error counting users - "
-					+ e.getMessage(), e);
+			throw new LdapUtilityException("Error counting users - " + e.getMessage(), e);
 		}
 	}
 
@@ -260,18 +252,13 @@ public class LdapUtility {
 	 * 
 	 * @throws LdapUtilityException
 	 */
-	public User[] getUsers(ContentAdapter contentAdapter)
-			throws LdapUtilityException {
-
-		JndiContentAdapterEngine<UserAdapter, User> jndiAdapter = new JndiContentAdapterEngine<UserAdapter, User>(
-				new UserAdapter(), contentAdapter);
+	public List<User> getUsers(Filter filter) throws LdapUtilityException {
 
 		try {
 
 			DirContext ctxRoot = getLDAPDirContext(ldapRootDN);
 
-			List<Attributes> attributesList = searchAttributes(ctxRoot,
-					ldapPeopleDN, "uid", jndiAdapter);
+			List<Attributes> attributesList = searchAttributes(ctxRoot, ldapPeopleDN, "uid", filter);
 
 			List<User> users = new ArrayList<User>();
 			for (Attributes attributes : attributesList) {
@@ -279,24 +266,20 @@ public class LdapUtility {
 				User user = getUserFromAttributes(attributes);
 
 				// Add all roles assigned to this user
-				Set<String> memberRoles = getMemberRoles(ctxRoot,
-						getUserDN(user.getName()));
+				Set<String> memberRoles = getMemberRoles(ctxRoot, getUserDN(user.getName()));
 				user.setAllRoles(memberRoles);
 
 				// Add direct roles assigned to this user
-				for (String role : getMemberDirectRoles(ctxRoot,
-						getUserDN(user.getName()))) {
+				for (String role : getMemberDirectRoles(ctxRoot, getUserDN(user.getName()))) {
 					user.addDirectRole(role);
 				}
 
 				// Add all groups to which this user belongs
-				Set<String> memberGroups = getMemberGroups(ctxRoot,
-						getUserDN(user.getName()));
+				Set<String> memberGroups = getMemberGroups(ctxRoot, getUserDN(user.getName()));
 				user.setAllGroups(memberGroups);
 
 				// Add groups to which this user belongs
-				for (String groupDN : getDNsOfGroupsContainingMember(ctxRoot,
-						getUserDN(user.getName()))) {
+				for (String groupDN : getDNsOfGroupsContainingMember(ctxRoot, getUserDN(user.getName()))) {
 					user.addGroup(getGroupCNFromDN(groupDN));
 				}
 
@@ -305,12 +288,11 @@ public class LdapUtility {
 
 			ctxRoot.close();
 
-			return users.toArray(new User[users.size()]);
+			return users;
 
 		} catch (NamingException e) {
 			logger.debug("Error getting users - " + e.getMessage(), e);
-			throw new LdapUtilityException("Error getting users - "
-					+ e.getMessage(), e);
+			throw new LdapUtilityException("Error getting users - " + e.getMessage(), e);
 		}
 	}
 
@@ -383,8 +365,7 @@ public class LdapUtility {
 
 		} catch (NamingException e) {
 			logger.debug("Error getting user with email " + email, e);
-			throw new LdapUtilityException("Error getting user with email "
-					+ email, e);
+			throw new LdapUtilityException("Error getting user with email " + email, e);
 		}
 
 		return user;
@@ -405,20 +386,17 @@ public class LdapUtility {
 	 * @throws LdapUtilityException
 	 *             if something goes wrong with the creation of the new user.
 	 */
-	public User addUser(User user) throws UserAlreadyExistsException,
-			EmailAlreadyExistsException, LdapUtilityException {
+	public User addUser(User user)
+			throws UserAlreadyExistsException, EmailAlreadyExistsException, LdapUtilityException {
 
 		if (!user.isNameValid()) {
 			logger.debug("'" + user.getName() + "' is not a valid user name.");
-			throw new LdapUtilityException("'" + user.getName()
-					+ "' is not a valid user name.");
+			throw new LdapUtilityException("'" + user.getName() + "' is not a valid user name.");
 		}
 
 		if (getUserWithEmail(user.getEmail()) != null) {
-			logger.debug("The email address " + user.getEmail()
-					+ " is already used.");
-			throw new EmailAlreadyExistsException("The email address "
-					+ user.getEmail() + " is already used.");
+			logger.debug("The email address " + user.getEmail() + " is already used.");
+			throw new EmailAlreadyExistsException("The email address " + user.getEmail() + " is already used.");
 		}
 
 		try {
@@ -430,18 +408,15 @@ public class LdapUtility {
 
 			ctxRoot.bind(getUserDN(user.getName()), null, attributes);
 
-			setMemberDirectRoles(ctxRoot, getUserDN(user.getName()),
-					user.getDirectRoles());
-			setMemberGroups(ctxRoot, getUserDN(user.getName()),
-					user.getDirectGroups());
+			setMemberDirectRoles(ctxRoot, getUserDN(user.getName()), user.getDirectRoles());
+			setMemberGroups(ctxRoot, getUserDN(user.getName()), user.getDirectGroups());
 
 			// Close the context when we're done
 			ctxRoot.close();
 
 			if (!user.isActive()) {
 				try {
-					setUserPasswordUnchecked(user.getName(),
-							PasswordHandler.generateRandomPassword(12));
+					setUserPasswordUnchecked(user.getName(), PasswordHandler.generateRandomPassword(12));
 				} catch (NoSuchUserException e) {
 					logger.warn("Created user doesn't exist! Notify developers!!!");
 				}
@@ -450,14 +425,12 @@ public class LdapUtility {
 		} catch (NameAlreadyBoundException e) {
 
 			logger.debug("User " + user.getName() + " already exists.", e);
-			throw new UserAlreadyExistsException("User " + user.getName()
-					+ " already exists.", e);
+			throw new UserAlreadyExistsException("User " + user.getName() + " already exists.", e);
 
 		} catch (NamingException e) {
 
 			logger.debug("Error adding user " + user.getName(), e);
-			throw new LdapUtilityException("Error adding user "
-					+ user.getName(), e);
+			throw new LdapUtilityException("Error adding user " + user.getName(), e);
 
 		}
 
@@ -485,9 +458,8 @@ public class LdapUtility {
 	 *             if the user is one of the protected users.
 	 * @throws LdapUtilityException
 	 */
-	public User modifyUser(User modifiedUser) throws NoSuchUserException,
-			IllegalOperationException, EmailAlreadyExistsException,
-			LdapUtilityException {
+	public User modifyUser(User modifiedUser)
+			throws NoSuchUserException, IllegalOperationException, EmailAlreadyExistsException, LdapUtilityException {
 
 		logger.trace("modifyUser() - " + modifiedUser.getName());
 
@@ -499,11 +471,8 @@ public class LdapUtility {
 
 		} catch (NamingException e) {
 
-			logger.debug("Error creating LDAP context with user - "
-					+ modifiedUser.getName(), e);
-			throw new LdapUtilityException(
-					"Error creating LDAP context with user - "
-							+ modifiedUser.getName(), e);
+			logger.debug("Error creating LDAP context with user - " + modifiedUser.getName(), e);
+			throw new LdapUtilityException("Error creating LDAP context with user - " + modifiedUser.getName(), e);
 		}
 
 		modifyUser(ctxRoot, modifiedUser, null, true);
@@ -514,9 +483,7 @@ public class LdapUtility {
 
 		} catch (NamingException e) {
 			// TODO Should I ignore this?
-			logger.warn(
-					"Ignoring error closing LDAP context - "
-							+ modifiedUser.getName(), e);
+			logger.warn("Ignoring error closing LDAP context - " + modifiedUser.getName(), e);
 		}
 
 		return getUser(modifiedUser.getName());
@@ -535,12 +502,10 @@ public class LdapUtility {
 	 * @throws LdapUtilityException
 	 */
 	public void setUserPassword(String username, String password)
-			throws IllegalOperationException, NoSuchUserException,
-			LdapUtilityException {
+			throws IllegalOperationException, NoSuchUserException, LdapUtilityException {
 
 		if (this.ldapProtectedUsers.contains(username)) {
-			throw new IllegalOperationException("User (" + username
-					+ ") is protected and cannot be modified.");
+			throw new IllegalOperationException("User (" + username + ") is protected and cannot be modified.");
 		}
 
 		setUserPasswordUnchecked(username, password);
@@ -568,10 +533,8 @@ public class LdapUtility {
 	 *             if the user is one of the protected users.
 	 * @throws LdapUtilityException
 	 */
-	public User modifySelfUser(User modifiedUser, String currentPassword,
-			String newPassword) throws NoSuchUserException,
-			EmailAlreadyExistsException, IllegalOperationException,
-			LdapUtilityException {
+	public User modifySelfUser(User modifiedUser, String currentPassword, String newPassword)
+			throws NoSuchUserException, EmailAlreadyExistsException, IllegalOperationException, LdapUtilityException {
 
 		logger.trace("modifySelfUser() - " + modifiedUser.getName());
 
@@ -579,16 +542,12 @@ public class LdapUtility {
 		DirContext ctxRoot;
 		try {
 
-			ctxRoot = getLDAPDirContext(ldapRootDN,
-					getUserDN(modifiedUser.getName()), currentPassword);
+			ctxRoot = getLDAPDirContext(ldapRootDN, getUserDN(modifiedUser.getName()), currentPassword);
 
 		} catch (NamingException e) {
 
-			logger.debug("Error creating LDAP context with user - "
-					+ modifiedUser.getName(), e);
-			throw new LdapUtilityException(
-					"Error creating LDAP context with user - "
-							+ modifiedUser.getName(), e);
+			logger.debug("Error creating LDAP context with user - " + modifiedUser.getName(), e);
+			throw new LdapUtilityException("Error creating LDAP context with user - " + modifiedUser.getName(), e);
 		}
 
 		modifyUser(ctxRoot, modifiedUser, newPassword, false);
@@ -599,9 +558,7 @@ public class LdapUtility {
 
 		} catch (NamingException e) {
 			// TODO Should I ignore this?
-			logger.warn(
-					"Ignoring error closing LDAP context - "
-							+ modifiedUser.getName(), e);
+			logger.warn("Ignoring error closing LDAP context - " + modifiedUser.getName(), e);
 		}
 
 		return getUser(modifiedUser.getName());
@@ -616,12 +573,10 @@ public class LdapUtility {
 	 * @throws IllegalOperationException
 	 * @throws LdapUtilityException
 	 */
-	public void removeUser(String username) throws IllegalOperationException,
-			LdapUtilityException {
+	public void removeUser(String username) throws IllegalOperationException, LdapUtilityException {
 
 		if (this.ldapProtectedUsers.contains(username)) {
-			throw new IllegalOperationException("User " + username
-					+ " is protected and cannot be removed.");
+			throw new IllegalOperationException("User " + username + " is protected and cannot be removed.");
 		}
 
 		try {
@@ -651,8 +606,8 @@ public class LdapUtility {
 	 * @throws LdapUtilityException
 	 * 
 	 */
-	public void deactivateUser(String username) throws NoSuchUserException,
-			IllegalOperationException, LdapUtilityException {
+	public void deactivateUser(String username)
+			throws NoSuchUserException, IllegalOperationException, LdapUtilityException {
 
 		User user = getUser(username);
 
@@ -667,8 +622,7 @@ public class LdapUtility {
 			}
 
 		} else {
-			throw new NoSuchUserException("user " + username
-					+ " doesn't exist.");
+			throw new NoSuchUserException("user " + username + " doesn't exist.");
 
 		}
 
@@ -682,20 +636,18 @@ public class LdapUtility {
 	 * @return an <code>int</code> with the number of groups in the repository.
 	 * @throws LdapUtilityException
 	 */
-	// FIXME this code must certainly should be rethink as this should be done directly to the index and not to ldap 
-	public int getGroupCount(Filter contentAdapterFilter)
-			throws LdapUtilityException {
+	// FIXME this code must certainly should be rethink as this should be done
+	// directly to the index and not to ldap
+	public int getGroupCount(Filter contentAdapterFilter) throws LdapUtilityException {
 
 		JndiContentAdapterEngine<GroupAdapter, Group> jndiAdapterEngine = new JndiContentAdapterEngine<GroupAdapter, Group>(
-				new GroupAdapter(), new ContentAdapter(contentAdapterFilter,
-						null, null));
+				new GroupAdapter(), new ContentAdapter(contentAdapterFilter, null, null));
 
 		try {
 
 			DirContext ctxRoot = getLDAPDirContext(ldapRootDN);
 
-			List<Attributes> attributesList = searchAttributes(ctxRoot,
-					ldapGroupsDN, "cn", jndiAdapterEngine);
+			List<Attributes> attributesList = searchAttributes(ctxRoot, ldapGroupsDN, "cn", jndiAdapterEngine);
 
 			ctxRoot.close();
 
@@ -703,8 +655,7 @@ public class LdapUtility {
 
 		} catch (NamingException e) {
 			logger.debug("Error counting groups - " + e.getMessage(), e);
-			throw new LdapUtilityException("Error counting groups - "
-					+ e.getMessage(), e);
+			throw new LdapUtilityException("Error counting groups - " + e.getMessage(), e);
 		}
 	}
 
@@ -717,42 +668,33 @@ public class LdapUtility {
 	 * 
 	 * @throws LdapUtilityException
 	 */
-	public Group[] getGroups(ContentAdapter contentAdapter)
-			throws LdapUtilityException {
-
-		JndiContentAdapterEngine<GroupAdapter, Group> jndiAdapter = new JndiContentAdapterEngine<GroupAdapter, Group>(
-				new GroupAdapter(), contentAdapter);
+	public List<Group> getGroups(Filter filter) throws LdapUtilityException {
 
 		try {
 
 			DirContext ctxRoot = getLDAPDirContext(ldapRootDN);
 
-			List<Attributes> attributesList = searchAttributes(ctxRoot,
-					ldapGroupsDN, "cn", jndiAdapter);
+			List<Attributes> attributesList = searchAttributes(ctxRoot, ldapGroupsDN, "cn", filter);
 
 			List<Group> groups = new ArrayList<Group>();
 			for (Attributes attributes : attributesList) {
 				Group group = getGroupFromAttributes(attributes);
 
 				// Add all roles assigned to this group
-				Set<String> memberRoles = getMemberRoles(ctxRoot,
-						getGroupDN(group.getName()));
+				Set<String> memberRoles = getMemberRoles(ctxRoot, getGroupDN(group.getName()));
 				group.setAllRoles(memberRoles);
 
 				// Add direct roles assigned to this group
-				for (String role : getMemberDirectRoles(ctxRoot,
-						getGroupDN(group.getName()))) {
+				for (String role : getMemberDirectRoles(ctxRoot, getGroupDN(group.getName()))) {
 					group.addDirectRole(role);
 				}
 
 				// Add all groups to which this group belongs
-				Set<String> memberGroups = getMemberGroups(ctxRoot,
-						getGroupDN(group.getName()));
+				Set<String> memberGroups = getMemberGroups(ctxRoot, getGroupDN(group.getName()));
 				group.setAllGroups(memberGroups);
 
 				// Add groups to which this group belongs
-				for (String groupDN : getDNsOfGroupsContainingMember(ctxRoot,
-						getGroupDN(group.getName()))) {
+				for (String groupDN : getDNsOfGroupsContainingMember(ctxRoot, getGroupDN(group.getName()))) {
 					group.addDirectGroup(getGroupCNFromDN(groupDN));
 				}
 
@@ -761,12 +703,11 @@ public class LdapUtility {
 
 			ctxRoot.close();
 
-			return groups.toArray(new Group[groups.size()]);
+			return groups;
 
 		} catch (NamingException e) {
 			logger.debug("Error getting groups - " + e.getMessage(), e);
-			throw new LdapUtilityException("Error getting groups - "
-					+ e.getMessage(), e);
+			throw new LdapUtilityException("Error getting groups - " + e.getMessage(), e);
 		}
 	}
 
@@ -802,8 +743,7 @@ public class LdapUtility {
 
 		} catch (NamingException e) {
 			logger.debug("Error searching for group " + name, e);
-			throw new LdapUtilityException("Error searching for group " + name,
-					e);
+			throw new LdapUtilityException("Error searching for group " + name, e);
 		}
 
 		return group;
@@ -820,13 +760,11 @@ public class LdapUtility {
 	 * @throws LdapUtilityException
 	 *             if something goes wrong with the creation of the new group.
 	 */
-	public Group addGroup(Group group) throws GroupAlreadyExistsException,
-			LdapUtilityException {
+	public Group addGroup(Group group) throws GroupAlreadyExistsException, LdapUtilityException {
 
 		if (!group.isNameValid()) {
 			logger.debug("'" + group.getName() + "' is not a valid group name.");
-			throw new LdapUtilityException("'" + group.getName()
-					+ "' is not a valid group name.");
+			throw new LdapUtilityException("'" + group.getName() + "' is not a valid group name.");
 		}
 
 		try {
@@ -858,10 +796,8 @@ public class LdapUtility {
 
 			ctxRoot.bind(getGroupDN(group.getName()), null, attributes);
 
-			setMemberDirectRoles(ctxRoot, getGroupDN(group.getName()),
-					group.getDirectRoles());
-			setMemberGroups(ctxRoot, getGroupDN(group.getName()),
-					group.getDirectGroups());
+			setMemberDirectRoles(ctxRoot, getGroupDN(group.getName()), group.getDirectRoles());
+			setMemberGroups(ctxRoot, getGroupDN(group.getName()), group.getDirectGroups());
 
 			// Close the context when we're done
 			ctxRoot.close();
@@ -869,13 +805,11 @@ public class LdapUtility {
 		} catch (NameAlreadyBoundException e) {
 
 			logger.debug("Group " + group.getName() + " already exists.", e);
-			throw new GroupAlreadyExistsException("Group " + group.getName()
-					+ " already exists.", e);
+			throw new GroupAlreadyExistsException("Group " + group.getName() + " already exists.", e);
 
 		} catch (NamingException e) {
 			logger.debug("Error adding group " + group.getName(), e);
-			throw new LdapUtilityException("Error adding group "
-					+ group.getName(), e);
+			throw new LdapUtilityException("Error adding group " + group.getName(), e);
 		}
 
 		Group newGroup = getGroup(group.getName());
@@ -899,15 +833,14 @@ public class LdapUtility {
 	 * @throws IllegalOperationException
 	 * @throws LdapUtilityException
 	 */
-	public Group modifyGroup(Group modifiedGroup) throws NoSuchGroupException,
-			IllegalOperationException, LdapUtilityException {
+	public Group modifyGroup(Group modifiedGroup)
+			throws NoSuchGroupException, IllegalOperationException, LdapUtilityException {
 
 		logger.trace("modifyGroup() - " + modifiedGroup.getName());
 
 		if (this.ldapProtectedGroups.contains(modifiedGroup.getName())) {
-			throw new IllegalOperationException("Group ("
-					+ modifiedGroup.getName()
-					+ ") is protected and cannot be modified.");
+			throw new IllegalOperationException(
+					"Group (" + modifiedGroup.getName() + ") is protected and cannot be modified.");
 		}
 
 		try {
@@ -916,8 +849,7 @@ public class LdapUtility {
 
 			Attributes attributes = new BasicAttributes();
 
-			attributes.put("shadowInactive", modifiedGroup.isActive() ? "0"
-					: "1");
+			attributes.put("shadowInactive", modifiedGroup.isActive() ? "0" : "1");
 
 			attributes.put("ou", modifiedGroup.getFullName());
 
@@ -938,26 +870,20 @@ public class LdapUtility {
 			}
 			attributes.put(attributeUniqueMember);
 
-			ctxRoot.modifyAttributes(getGroupDN(modifiedGroup.getName()),
-					DirContext.REPLACE_ATTRIBUTE, attributes);
+			ctxRoot.modifyAttributes(getGroupDN(modifiedGroup.getName()), DirContext.REPLACE_ATTRIBUTE, attributes);
 
-			setMemberGroups(ctxRoot, getGroupDN(modifiedGroup.getName()),
-					modifiedGroup.getDirectGroups());
-			setMemberDirectRoles(ctxRoot, getGroupDN(modifiedGroup.getName()),
-					modifiedGroup.getDirectRoles());
+			setMemberGroups(ctxRoot, getGroupDN(modifiedGroup.getName()), modifiedGroup.getDirectGroups());
+			setMemberDirectRoles(ctxRoot, getGroupDN(modifiedGroup.getName()), modifiedGroup.getDirectRoles());
 
 			// Close the context when we're done
 			ctxRoot.close();
 
 		} catch (NameNotFoundException e) {
-			logger.debug(
-					"Group " + modifiedGroup.getName() + " doesn't exist.", e);
-			throw new NoSuchGroupException("Group " + modifiedGroup.getName()
-					+ " doesn't exist.", e);
+			logger.debug("Group " + modifiedGroup.getName() + " doesn't exist.", e);
+			throw new NoSuchGroupException("Group " + modifiedGroup.getName() + " doesn't exist.", e);
 		} catch (NamingException e) {
 			logger.debug("Error modifying group " + modifiedGroup.getName(), e);
-			throw new LdapUtilityException("Error modifying group "
-					+ modifiedGroup.getName(), e);
+			throw new LdapUtilityException("Error modifying group " + modifiedGroup.getName(), e);
 		}
 
 		return getGroup(modifiedGroup.getName());
@@ -971,12 +897,10 @@ public class LdapUtility {
 	 * @throws IllegalOperationException
 	 * @throws LdapUtilityException
 	 */
-	public void removeGroup(String groupname) throws LdapUtilityException,
-			IllegalOperationException {
+	public void removeGroup(String groupname) throws LdapUtilityException, IllegalOperationException {
 
 		if (this.ldapProtectedGroups.contains(groupname)) {
-			throw new IllegalOperationException("Group (" + groupname
-					+ ") is protected and cannot be removed.");
+			throw new IllegalOperationException("Group (" + groupname + ") is protected and cannot be removed.");
 		}
 
 		try {
@@ -992,8 +916,7 @@ public class LdapUtility {
 
 			logger.debug("Error removing group " + groupname, e);
 
-			throw new LdapUtilityException("Error removing group " + groupname,
-					e);
+			throw new LdapUtilityException("Error removing group " + groupname, e);
 		}
 
 	}
@@ -1018,8 +941,7 @@ public class LdapUtility {
 
 			DirContext ctxRoot = getLDAPDirContext(ldapRootDN);
 
-			Set<String> directGroupMembersDN = getDNsOfDirectGroupMembers(
-					ctxRoot, getGroupDN(groupName));
+			Set<String> directGroupMembersDN = getDNsOfDirectGroupMembers(ctxRoot, getGroupDN(groupName));
 
 			for (String memberDN : directGroupMembersDN) {
 
@@ -1030,8 +952,7 @@ public class LdapUtility {
 						users.add(getUser(ctxRoot, getUserUIDFromDN(memberDN)));
 
 					} catch (NamingException e) {
-						logger.error("Error getting user " + memberDN + " - "
-								+ e.getMessage() + " - IGNORING!", e);
+						logger.error("Error getting user " + memberDN + " - " + e.getMessage() + " - IGNORING!", e);
 					}
 
 				} else {
@@ -1046,8 +967,7 @@ public class LdapUtility {
 
 		} catch (NamingException e) {
 			logger.debug("Error getting users in group - " + e.getMessage(), e);
-			throw new LdapUtilityException("Error getting users in group - "
-					+ e.getMessage(), e);
+			throw new LdapUtilityException("Error getting users in group - " + e.getMessage(), e);
 		}
 	}
 
@@ -1059,15 +979,13 @@ public class LdapUtility {
 	 * @return a Set of roles assigned to a user.
 	 * @throws LdapUtilityException
 	 */
-	public Set<String> getUserRoles(String userName)
-			throws LdapUtilityException {
+	public Set<String> getUserRoles(String userName) throws LdapUtilityException {
 
 		try {
 
 			DirContext ctxRoot = getLDAPDirContext(ldapRootDN);
 
-			Set<String> userRoleNames = getMemberRoles(ctxRoot,
-					getUserDN(userName));
+			Set<String> userRoleNames = getMemberRoles(ctxRoot, getUserDN(userName));
 
 			ctxRoot.close();
 
@@ -1089,19 +1007,17 @@ public class LdapUtility {
 	 * 
 	 * @throws LdapUtilityException
 	 */
-	public Set<String> getUserDirectRoles(String userName)
-			throws LdapUtilityException {
+	public Set<String> getUserDirectRoles(String userName) throws LdapUtilityException {
 
 		try {
 
 			DirContext ctxRoot = getLDAPDirContext(ldapRootDN);
 
-			Set<String> directMemberRolesDN = getDNsOfDirectRolesForMember(
-					ctxRoot, getUserDN(userName));
+			Set<String> directMemberRolesDN = getDNsOfDirectRolesForMember(ctxRoot, getUserDN(userName));
 
 			ctxRoot.close();
 
-			//String[] directRoles = new String[directMemberRolesDN.size()];
+			// String[] directRoles = new String[directMemberRolesDN.size()];
 			Set<String> directRoles = new HashSet<String>();
 			int count = 0;
 			for (String roleDN : directMemberRolesDN) {
@@ -1132,14 +1048,12 @@ public class LdapUtility {
 	 * @throws AuthenticationException
 	 *             if the username or password are not valid.
 	 */
-	public User getAuthenticatedUser(String username, String password)
-			throws AuthenticationException {
+	public User getAuthenticatedUser(String username, String password) throws AuthenticationException {
 
 		try {
 
 			// Create initial context
-			DirContext ctxRoot = getLDAPDirContext(ldapRootDN,
-					getUserDN(username), password);
+			DirContext ctxRoot = getLDAPDirContext(ldapRootDN, getUserDN(username), password);
 
 			User user = getUser(ctxRoot, username);
 
@@ -1148,8 +1062,7 @@ public class LdapUtility {
 			if (user.isActive()) {
 				return user;
 			} else {
-				throw new AuthenticationException(
-						"invalid username or password");
+				throw new AuthenticationException("invalid username or password");
 			}
 
 		} catch (NamingException e) {
@@ -1180,8 +1093,7 @@ public class LdapUtility {
 	 * @deprecated should not be called anymore.
 	 */
 	public User registerUser(User user, String password)
-			throws UserAlreadyExistsException, EmailAlreadyExistsException,
-			LdapUtilityException {
+			throws UserAlreadyExistsException, EmailAlreadyExistsException, LdapUtilityException {
 
 		// A new registered user, is always inactive.
 		user.setActive(false);
@@ -1190,8 +1102,7 @@ public class LdapUtility {
 		UUID uuidToken = UUID.randomUUID();
 		Calendar calendar = Calendar.getInstance();
 		calendar.add(Calendar.DAY_OF_MONTH, 1);
-		String isoDateNoMillis = DateParser.getIsoDateNoMillis(calendar
-				.getTime());
+		String isoDateNoMillis = DateParser.getIsoDateNoMillis(calendar.getTime());
 
 		user.setEmailConfirmationToken(uuidToken.toString());
 		user.setEmailConfirmationTokenExpirationDate(isoDateNoMillis);
@@ -1202,11 +1113,9 @@ public class LdapUtility {
 			setUserPassword(newUser.getName(), password);
 
 		} catch (IllegalOperationException e) {
-			throw new LdapUtilityException("Error setting user password - "
-					+ e.getMessage(), e);
+			throw new LdapUtilityException("Error setting user password - " + e.getMessage(), e);
 		} catch (NoSuchUserException e) {
-			throw new LdapUtilityException("Error setting user password - "
-					+ e.getMessage(), e);
+			throw new LdapUtilityException("Error setting user password - " + e.getMessage(), e);
 		}
 
 		return newUser;
@@ -1239,10 +1148,8 @@ public class LdapUtility {
 	 * @throws LdapUtilityException
 	 *             if something goes wrong with the operation.
 	 */
-	public User confirmUserEmail(String username, String email,
-			String emailConfirmationToken) throws NoSuchUserException,
-			IllegalArgumentException, InvalidTokenException,
-			LdapUtilityException {
+	public User confirmUserEmail(String username, String email, String emailConfirmationToken)
+			throws NoSuchUserException, IllegalArgumentException, InvalidTokenException, LdapUtilityException {
 
 		User user = null;
 		if (username != null) {
@@ -1250,8 +1157,7 @@ public class LdapUtility {
 		} else if (email != null) {
 			user = getUserWithEmail(email);
 		} else {
-			throw new IllegalArgumentException(
-					"username and email can not both be null");
+			throw new IllegalArgumentException("username and email can not both be null");
 		}
 
 		if (user == null) {
@@ -1269,15 +1175,12 @@ public class LdapUtility {
 
 			if (user.getEmailConfirmationToken() == null) {
 
-				throw new InvalidTokenException(
-						"There's no active email confirmation token.");
+				throw new InvalidTokenException("There's no active email confirmation token.");
 
-			} else if (!user.getEmailConfirmationToken().equals(
-					emailConfirmationToken)) {
+			} else if (!user.getEmailConfirmationToken().equals(emailConfirmationToken)) {
 
 				// Token argument is not equal to stored token.
-				throw new InvalidTokenException(
-						"Email confirmation token is invalid.");
+				throw new InvalidTokenException("Email confirmation token is invalid.");
 
 			} else if (user.getEmailConfirmationTokenExpirationDate() == null) {
 
@@ -1285,15 +1188,12 @@ public class LdapUtility {
 
 			} else {
 
-				String currentIsoDate = DateParser.getIsoDateNoMillis(Calendar
-						.getInstance().getTime());
+				String currentIsoDate = DateParser.getIsoDateNoMillis(Calendar.getInstance().getTime());
 
-				if (currentIsoDate.compareToIgnoreCase(user
-						.getEmailConfirmationTokenExpirationDate()) > 0) {
+				if (currentIsoDate.compareToIgnoreCase(user.getEmailConfirmationTokenExpirationDate()) > 0) {
 
 					throw new InvalidTokenException(
-							"Email confirmation token expired in "
-									+ user.getEmailConfirmationTokenExpirationDate());
+							"Email confirmation token expired in " + user.getEmailConfirmationTokenExpirationDate());
 
 				} else {
 					// Good, token didn't expired yet.
@@ -1310,11 +1210,9 @@ public class LdapUtility {
 				return modifyUser(user);
 
 			} catch (IllegalOperationException e) {
-				throw new LdapUtilityException("Error confirming user email - "
-						+ e.getMessage(), e);
+				throw new LdapUtilityException("Error confirming user email - " + e.getMessage(), e);
 			} catch (EmailAlreadyExistsException e) {
-				throw new LdapUtilityException("Error confirming user email - "
-						+ e.getMessage(), e);
+				throw new LdapUtilityException("Error confirming user email - " + e.getMessage(), e);
 			}
 		}
 	}
@@ -1348,8 +1246,7 @@ public class LdapUtility {
 	 *             if something goes wrong with the operation.
 	 */
 	public User requestPasswordReset(String username, String email)
-			throws NoSuchUserException, IllegalOperationException,
-			LdapUtilityException {
+			throws NoSuchUserException, IllegalOperationException, LdapUtilityException {
 
 		User user = null;
 		if (username != null) {
@@ -1357,8 +1254,7 @@ public class LdapUtility {
 		} else if (email != null) {
 			user = getUserWithEmail(email);
 		} else {
-			throw new IllegalArgumentException(
-					"username and email can not both be null");
+			throw new IllegalArgumentException("username and email can not both be null");
 		}
 
 		if (user == null) {
@@ -1378,8 +1274,7 @@ public class LdapUtility {
 			UUID uuidToken = UUID.randomUUID();
 			Calendar calendar = Calendar.getInstance();
 			calendar.add(Calendar.DAY_OF_MONTH, 1);
-			String isoDateNoMillis = DateParser.getIsoDateNoMillis(calendar
-					.getTime());
+			String isoDateNoMillis = DateParser.getIsoDateNoMillis(calendar.getTime());
 
 			user.setResetPasswordToken(uuidToken.toString());
 			user.setResetPasswordTokenExpirationDate(isoDateNoMillis);
@@ -1389,9 +1284,7 @@ public class LdapUtility {
 				return modifyUser(user);
 
 			} catch (EmailAlreadyExistsException e) {
-				throw new LdapUtilityException(
-						"Error setting password reset token - "
-								+ e.getMessage(), e);
+				throw new LdapUtilityException("Error setting password reset token - " + e.getMessage(), e);
 			}
 		}
 	}
@@ -1418,10 +1311,8 @@ public class LdapUtility {
 	 * @throws LdapUtilityException
 	 *             if something goes wrong with the operation.
 	 */
-	public User resetUserPassword(String username, String password,
-			String resetPasswordToken) throws NoSuchUserException,
-			InvalidTokenException, IllegalOperationException,
-			LdapUtilityException {
+	public User resetUserPassword(String username, String password, String resetPasswordToken)
+			throws NoSuchUserException, InvalidTokenException, IllegalOperationException, LdapUtilityException {
 
 		User user = getUser(username);
 
@@ -1433,14 +1324,12 @@ public class LdapUtility {
 
 			if (user.getResetPasswordToken() == null) {
 
-				throw new InvalidTokenException(
-						"There's no active password reset token.");
+				throw new InvalidTokenException("There's no active password reset token.");
 
 			} else if (!user.getResetPasswordToken().equals(resetPasswordToken)) {
 
 				// Token argument is not equal to stored token.
-				throw new InvalidTokenException(
-						"Password reset token is invalid.");
+				throw new InvalidTokenException("Password reset token is invalid.");
 
 			} else if (user.getResetPasswordTokenExpirationDate() == null) {
 
@@ -1448,15 +1337,12 @@ public class LdapUtility {
 
 			} else {
 
-				String currentIsoDate = DateParser.getIsoDateNoMillis(Calendar
-						.getInstance().getTime());
+				String currentIsoDate = DateParser.getIsoDateNoMillis(Calendar.getInstance().getTime());
 
-				if (currentIsoDate.compareToIgnoreCase(user
-						.getResetPasswordTokenExpirationDate()) > 0) {
+				if (currentIsoDate.compareToIgnoreCase(user.getResetPasswordTokenExpirationDate()) > 0) {
 
 					throw new InvalidTokenException(
-							"Password reset token expired in "
-									+ user.getResetPasswordTokenExpirationDate());
+							"Password reset token expired in " + user.getResetPasswordTokenExpirationDate());
 
 				} else {
 					// Good, token didn't expired yet.
@@ -1474,11 +1360,9 @@ public class LdapUtility {
 				return modifyUser(user);
 
 			} catch (IllegalOperationException e) {
-				throw new LdapUtilityException(
-						"Error reseting user password - " + e.getMessage(), e);
+				throw new LdapUtilityException("Error reseting user password - " + e.getMessage(), e);
 			} catch (EmailAlreadyExistsException e) {
-				throw new LdapUtilityException(
-						"Error reseting user password - " + e.getMessage(), e);
+				throw new LdapUtilityException("Error reseting user password - " + e.getMessage(), e);
 			}
 		}
 	}
@@ -1525,8 +1409,7 @@ public class LdapUtility {
 	 * @return a Set of roles assigned to a group.
 	 * @throws LdapUtilityException
 	 */
-	public Set<String> getGroupRoles(String groupName)
-			throws LdapUtilityException {
+	public Set<String> getGroupRoles(String groupName) throws LdapUtilityException {
 		try {
 
 			DirContext ctxRoot = getLDAPDirContext(ldapRootDN);
@@ -1553,15 +1436,13 @@ public class LdapUtility {
 	 * 
 	 * @throws LdapUtilityException
 	 */
-	public String[] getGroupDirectRoles(String groupName)
-			throws LdapUtilityException {
+	public String[] getGroupDirectRoles(String groupName) throws LdapUtilityException {
 
 		try {
 
 			DirContext ctxRoot = getLDAPDirContext(ldapRootDN);
 
-			Set<String> directMemberRolesDN = getDNsOfDirectRolesForMember(
-					ctxRoot, getGroupDN(groupName));
+			Set<String> directMemberRolesDN = getDNsOfDirectRolesForMember(ctxRoot, getGroupDN(groupName));
 
 			ctxRoot.close();
 
@@ -1592,8 +1473,7 @@ public class LdapUtility {
 	 *             if the specified Group doesn't exist.
 	 * @throws LdapUtilityException
 	 */
-	public void setSuperGroups(String groupName, Set<String> groups)
-			throws LdapUtilityException, NoSuchGroupException {
+	public void setSuperGroups(String groupName, Set<String> groups) throws LdapUtilityException, NoSuchGroupException {
 		try {
 
 			DirContext ctxRoot = getLDAPAdminDirContext(ldapRootDN);
@@ -1602,16 +1482,14 @@ public class LdapUtility {
 
 		} catch (NameNotFoundException e) {
 			logger.debug("Group " + groupName + " doesn't exist.", e);
-			throw new NoSuchGroupException("Group " + groupName
-					+ " doesn't exist.", e);
+			throw new NoSuchGroupException("Group " + groupName + " doesn't exist.", e);
 		} catch (NamingException e) {
 			logger.debug("Error setting user groups", e);
 			throw new LdapUtilityException("Error setting user groups", e);
 		}
 	}
 
-	private User getUser(DirContext ctxRoot, String username)
-			throws NamingException {
+	private User getUser(DirContext ctxRoot, String username) throws NamingException {
 
 		Attributes attributes = ctxRoot.getAttributes(getUserDN(username));
 
@@ -1631,53 +1509,43 @@ public class LdapUtility {
 		user.setAllGroups(memberGroups);
 
 		// Add groups to which this user belongs
-		for (String groupDN : getDNsOfGroupsContainingMember(ctxRoot,
-				getUserDN(username))) {
+		for (String groupDN : getDNsOfGroupsContainingMember(ctxRoot, getUserDN(username))) {
 			user.addGroup(getGroupCNFromDN(groupDN));
 		}
 
 		return user;
 	}
 
-	private User getUserFromAttributes(Attributes userAttributes)
-			throws NamingException {
+	private User getUserFromAttributes(Attributes userAttributes) throws NamingException {
 
 		User user = new User(userAttributes.get("uid").get().toString());
 
 		if (userAttributes.get("shadowInactive") != null) {
-			String zeroOrOne = userAttributes.get("shadowInactive").get()
-					.toString();
+			String zeroOrOne = userAttributes.get("shadowInactive").get().toString();
 			user.setActive("0".equalsIgnoreCase(zeroOrOne));
 		} else {
 			user.setActive(true);
 		}
 
 		if (userAttributes.get("documentTitle") != null) {
-			user.setIdDocumentType(userAttributes.get("documentTitle").get()
-					.toString());
+			user.setIdDocumentType(userAttributes.get("documentTitle").get().toString());
 		}
 		if (userAttributes.get("documentIdentifier") != null) {
-			user.setIdDocument(userAttributes.get("documentIdentifier").get()
-					.toString());
+			user.setIdDocument(userAttributes.get("documentIdentifier").get().toString());
 		}
 		if (userAttributes.get("documentLocation") != null) {
-			user.setIdDocumentLocation(userAttributes.get("documentLocation")
-					.get().toString());
+			user.setIdDocumentLocation(userAttributes.get("documentLocation").get().toString());
 		}
 		if (userAttributes.get("documentVersion") != null) {
 			try {
-				user.setIdDocumentDate(DateParser.parse(userAttributes
-						.get("documentVersion").get().toString()));
+				user.setIdDocumentDate(DateParser.parse(userAttributes.get("documentVersion").get().toString()));
 			} catch (InvalidDateException e) {
-				logger.warn(
-						"Error parsing ID document date (documentVersion) - "
-								+ e.getMessage(), e);
+				logger.warn("Error parsing ID document date (documentVersion) - " + e.getMessage(), e);
 			}
 		}
 
 		if (userAttributes.get("serialNumber") != null) {
-			user.setFinanceIdentificationNumber(userAttributes
-					.get("serialNumber").get().toString());
+			user.setFinanceIdentificationNumber(userAttributes.get("serialNumber").get().toString());
 		}
 
 		if (userAttributes.get("co") != null) {
@@ -1688,12 +1556,10 @@ public class LdapUtility {
 			user.setFullName(userAttributes.get("cn").get().toString());
 		}
 		if (userAttributes.get("postalAddress") != null) {
-			user.setPostalAddress(userAttributes.get("postalAddress").get()
-					.toString());
+			user.setPostalAddress(userAttributes.get("postalAddress").get().toString());
 		}
 		if (userAttributes.get("postalCode") != null) {
-			user.setPostalCode(userAttributes.get("postalCode").get()
-					.toString());
+			user.setPostalCode(userAttributes.get("postalCode").get().toString());
 		}
 		if (userAttributes.get("l") != null) {
 			user.setLocalityName(userAttributes.get("l").get().toString());
@@ -1702,12 +1568,10 @@ public class LdapUtility {
 			user.setCountryName(userAttributes.get("c").get().toString());
 		}
 		if (userAttributes.get("telephoneNumber") != null) {
-			user.setTelephoneNumber(userAttributes.get("telephoneNumber").get()
-					.toString());
+			user.setTelephoneNumber(userAttributes.get("telephoneNumber").get().toString());
 		}
 		if (userAttributes.get("facsimileTelephoneNumber") != null) {
-			user.setFax(userAttributes.get("facsimileTelephoneNumber").get()
-					.toString());
+			user.setFax(userAttributes.get("facsimileTelephoneNumber").get().toString());
 		}
 
 		if (userAttributes.get("email") != null) {
@@ -1715,8 +1579,7 @@ public class LdapUtility {
 		}
 
 		if (userAttributes.get("businessCategory") != null) {
-			user.setBusinessCategory(userAttributes.get("businessCategory")
-					.get().toString());
+			user.setBusinessCategory(userAttributes.get("businessCategory").get().toString());
 		}
 
 		if (userAttributes.get("info") != null) {
@@ -1743,8 +1606,7 @@ public class LdapUtility {
 		return user;
 	}
 
-	private Attributes getAttributesFromUser(User user,
-			boolean removeUnsetValues) {
+	private Attributes getAttributesFromUser(User user, boolean removeUnsetValues) {
 
 		Attributes attributes = new BasicAttributes();
 
@@ -1786,15 +1648,13 @@ public class LdapUtility {
 			attributes.remove("documentLocation");
 		}
 		if (user.getIdDocumentDate() != null) {
-			attributes.put("documentVersion",
-					DateParser.getIsoDate(user.getIdDocumentDate()));
+			attributes.put("documentVersion", DateParser.getIsoDate(user.getIdDocumentDate()));
 		} else if (removeUnsetValues) {
 			attributes.remove("documentVersion");
 		}
 
 		if (!StringUtils.isBlank(user.getFinanceIdentificationNumber())) {
-			attributes.put("serialNumber",
-					user.getFinanceIdentificationNumber());
+			attributes.put("serialNumber", user.getFinanceIdentificationNumber());
 		} else if (removeUnsetValues) {
 			attributes.remove("serialNumber");
 		}
@@ -1849,19 +1709,16 @@ public class LdapUtility {
 		}
 
 		String infoStr = "";
-		if (user.getEmailConfirmationToken() != null
-				&& user.getEmailConfirmationToken().trim().length() > 0) {
+		if (user.getEmailConfirmationToken() != null && user.getEmailConfirmationToken().trim().length() > 0) {
 			infoStr = user.getEmailConfirmationToken();
 		}
 		infoStr += ";";
 		if (user.getEmailConfirmationTokenExpirationDate() != null
-				&& user.getEmailConfirmationTokenExpirationDate().trim()
-						.length() > 0) {
+				&& user.getEmailConfirmationTokenExpirationDate().trim().length() > 0) {
 			infoStr += user.getEmailConfirmationTokenExpirationDate();
 		}
 		infoStr += ";";
-		if (user.getResetPasswordToken() != null
-				&& user.getResetPasswordToken().trim().length() > 0) {
+		if (user.getResetPasswordToken() != null && user.getResetPasswordToken().trim().length() > 0) {
 			infoStr += user.getResetPasswordToken();
 		}
 		infoStr += ";";
@@ -1874,8 +1731,7 @@ public class LdapUtility {
 		return attributes;
 	}
 
-	private Group getGroup(DirContext ctxRoot, String name)
-			throws InvalidNameException, NamingException {
+	private Group getGroup(DirContext ctxRoot, String name) throws InvalidNameException, NamingException {
 
 		Attributes attributes = ctxRoot.getAttributes(getGroupDN(name));
 
@@ -1895,22 +1751,19 @@ public class LdapUtility {
 		group.setAllGroups(memberGroups);
 
 		// Add groups to which this group belongs
-		for (String groupDN : getDNsOfGroupsContainingMember(ctxRoot,
-				getGroupDN(name))) {
+		for (String groupDN : getDNsOfGroupsContainingMember(ctxRoot, getGroupDN(name))) {
 			group.addDirectGroup(getGroupCNFromDN(groupDN));
 		}
 
 		return group;
 	}
 
-	private Group getGroupFromAttributes(Attributes attributes)
-			throws NamingException {
+	private Group getGroupFromAttributes(Attributes attributes) throws NamingException {
 
 		Group group = new Group(attributes.get("cn").get().toString());
 
 		if (attributes.get("shadowInactive") != null) {
-			String zeroOrOne = attributes.get("shadowInactive").get()
-					.toString();
+			String zeroOrOne = attributes.get("shadowInactive").get().toString();
 			group.setActive("0".equalsIgnoreCase(zeroOrOne));
 		} else {
 			group.setActive(true);
@@ -1950,12 +1803,9 @@ public class LdapUtility {
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<Attributes> searchAttributes(
-			DirContext ctxRoot,
-			String ctxDN,
-			String keyAttribute,
+	private List<Attributes> searchAttributes(DirContext ctxRoot, String ctxDN, String keyAttribute,
 			JndiContentAdapterEngine<? extends JndiEntityAdapter, ? extends RODAMember> jndiAdapter)
-			throws NamingException {
+					throws NamingException {
 
 		// Create the default search controls
 		SearchControls searchControls = new SearchControls();
@@ -1965,8 +1815,7 @@ public class LdapUtility {
 		logger.trace("searchAttributes() JNDI filter: " + filter);
 
 		// Search for objects using the filter
-		NamingEnumeration<SearchResult> answer = ctxRoot.search(ctxDN, filter,
-				searchControls);
+		NamingEnumeration<SearchResult> answer = ctxRoot.search(ctxDN, filter, searchControls);
 
 		List<Attributes> filteredAttributesList = new ArrayList<Attributes>();
 
@@ -1975,16 +1824,36 @@ public class LdapUtility {
 			filteredAttributesList.add(sr.getAttributes());
 		}
 
-		filteredAttributesList = (List<Attributes>) jndiAdapter
-				.filterValues(filteredAttributesList);
+		filteredAttributesList = (List<Attributes>) jndiAdapter.filterValues(filteredAttributesList);
 
-		List<Attributes> sortedAttributesList = jndiAdapter
-				.sortAttributes(filteredAttributesList);
+		List<Attributes> sortedAttributesList = jndiAdapter.sortAttributes(filteredAttributesList);
 
-		List<Attributes> attributesList = jndiAdapter
-				.getSublist(sortedAttributesList);
+		List<Attributes> attributesList = jndiAdapter.getSublist(sortedAttributesList);
 
 		return attributesList;
+	}
+
+	// FIXME filter is not being used: see if it is needed
+	private List<Attributes> searchAttributes(DirContext ctxRoot, String ctxDN, String keyAttribute, Filter filter)
+			throws NamingException {
+		// Create the default search controls
+		SearchControls searchControls = new SearchControls();
+
+		String jndiFilter = "(" + keyAttribute + "=*)";
+
+		logger.trace("searchAttributes() JNDI filter: " + jndiFilter);
+
+		// Search for objects using the filter
+		NamingEnumeration<SearchResult> answer = ctxRoot.search(ctxDN, jndiFilter, searchControls);
+
+		List<Attributes> filteredAttributesList = new ArrayList<Attributes>();
+
+		while (answer.hasMore()) {
+			SearchResult sr = answer.next();
+			filteredAttributesList.add(sr.getAttributes());
+		}
+
+		return filteredAttributesList;
 	}
 
 	/**
@@ -2084,72 +1953,55 @@ public class LdapUtility {
 	 *             if the user is one of the protected users.
 	 * @throws LdapUtilityException
 	 */
-	private void modifyUser(DirContext ctxRoot, User modifiedUser,
-			String newPassword, boolean modifyRolesAndGroups)
-			throws NoSuchUserException, IllegalOperationException,
-			EmailAlreadyExistsException, LdapUtilityException {
+	private void modifyUser(DirContext ctxRoot, User modifiedUser, String newPassword, boolean modifyRolesAndGroups)
+			throws NoSuchUserException, IllegalOperationException, EmailAlreadyExistsException, LdapUtilityException {
 
 		logger.trace("modifyUser() - " + modifiedUser.getName());
 
 		if (this.ldapProtectedUsers.contains(modifiedUser.getName())) {
-			throw new IllegalOperationException("User ("
-					+ modifiedUser.getName()
-					+ ") is protected and cannot be modified.");
+			throw new IllegalOperationException(
+					"User (" + modifiedUser.getName() + ") is protected and cannot be modified.");
 		}
 
 		try {
 
-			User currentEmailOwner = getUserWithEmail(ctxRoot,
-					modifiedUser.getEmail());
-			if (currentEmailOwner != null
-					&& !modifiedUser.getName().equals(
-							currentEmailOwner.getName())) {
+			User currentEmailOwner = getUserWithEmail(ctxRoot, modifiedUser.getEmail());
+			if (currentEmailOwner != null && !modifiedUser.getName().equals(currentEmailOwner.getName())) {
 
-				logger.debug("The email address " + modifiedUser.getEmail()
-						+ " is already used by another user.");
+				logger.debug("The email address " + modifiedUser.getEmail() + " is already used by another user.");
 
-				throw new EmailAlreadyExistsException("The email address "
-						+ modifiedUser.getEmail()
-						+ " is already used by another user.");
+				throw new EmailAlreadyExistsException(
+						"The email address " + modifiedUser.getEmail() + " is already used by another user.");
 			}
 
 			Attributes attributes = getAttributesFromUser(modifiedUser, true);
 
-			ctxRoot.modifyAttributes(getUserDN(modifiedUser.getName()),
-					DirContext.REPLACE_ATTRIBUTE, attributes);
+			ctxRoot.modifyAttributes(getUserDN(modifiedUser.getName()), DirContext.REPLACE_ATTRIBUTE, attributes);
 
 			if (newPassword != null) {
 				modifyUserPassword(ctxRoot, modifiedUser.getName(), newPassword);
 			}
 
 			if (modifyRolesAndGroups) {
-				setMemberGroups(ctxRoot, getUserDN(modifiedUser.getName()),
-						modifiedUser.getDirectGroups());
-				setMemberDirectRoles(ctxRoot,
-						getUserDN(modifiedUser.getName()),
-						modifiedUser.getDirectRoles());
+				setMemberGroups(ctxRoot, getUserDN(modifiedUser.getName()), modifiedUser.getDirectGroups());
+				setMemberDirectRoles(ctxRoot, getUserDN(modifiedUser.getName()), modifiedUser.getDirectRoles());
 			}
 
 		} catch (NameNotFoundException e) {
 
-			logger.debug("User " + modifiedUser.getName() + " doesn't exist.",
-					e);
-			throw new NoSuchUserException("User " + modifiedUser.getName()
-					+ " doesn't exist.", e);
+			logger.debug("User " + modifiedUser.getName() + " doesn't exist.", e);
+			throw new NoSuchUserException("User " + modifiedUser.getName() + " doesn't exist.", e);
 
 		} catch (NamingException e) {
 
 			logger.debug("Error modifying user " + modifiedUser.getName(), e);
-			throw new LdapUtilityException("Error modifying user "
-					+ modifiedUser.getName() + " - " + e.getMessage(), e);
+			throw new LdapUtilityException("Error modifying user " + modifiedUser.getName() + " - " + e.getMessage(),
+					e);
 
 		} catch (NoSuchAlgorithmException e) {
 
-			logger.debug(
-					"Error encoding password for user "
-							+ modifiedUser.getName(), e);
-			throw new LdapUtilityException("Error encoding password for user "
-					+ modifiedUser.getName(), e);
+			logger.debug("Error encoding password for user " + modifiedUser.getName(), e);
+			throw new LdapUtilityException("Error encoding password for user " + modifiedUser.getName(), e);
 		}
 
 	}
@@ -2164,41 +2016,33 @@ public class LdapUtility {
 	 * @throws UnsupportedEncodingException
 	 * @throws NoSuchAlgorithmException
 	 */
-	private void modifyUserPassword(DirContext ctxRoot, String username,
-			String password) throws NamingException, NoSuchAlgorithmException {
+	private void modifyUserPassword(DirContext ctxRoot, String username, String password)
+			throws NamingException, NoSuchAlgorithmException {
 
 		PasswordHandler passwordHandler = PasswordHandler.getInstance();
-		String passwordDigest = passwordHandler.generateDigest(password, null,
-				ldapPasswordDigestAlgorithm);
+		String passwordDigest = passwordHandler.generateDigest(password, null, ldapPasswordDigestAlgorithm);
 
-		Attribute attributePassword = new BasicAttribute("userPassword",
-				passwordDigest);
+		Attribute attributePassword = new BasicAttribute("userPassword", passwordDigest);
 
 		ModificationItem[] modificationItem = new ModificationItem[1];
-		modificationItem[0] = new ModificationItem(
-				DirContext.REPLACE_ATTRIBUTE, attributePassword);
+		modificationItem[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, attributePassword);
 
 		ctxRoot.modifyAttributes(getUserDN(username), modificationItem);
 	}
 
-	private void addMemberToGroup(DirContext ctxRoot, String groupDN,
-			String memberDN) throws NamingException {
+	private void addMemberToGroup(DirContext ctxRoot, String groupDN, String memberDN) throws NamingException {
 
-		Attributes attributes = ctxRoot.getAttributes(groupDN,
-				new String[] { "uniqueMember" });
+		Attributes attributes = ctxRoot.getAttributes(groupDN, new String[] { "uniqueMember" });
 
 		Attribute attribute = attributes.get("uniqueMember");
 		attribute.add(memberDN);
 
-		ctxRoot.modifyAttributes(groupDN, DirContext.REPLACE_ATTRIBUTE,
-				attributes);
+		ctxRoot.modifyAttributes(groupDN, DirContext.REPLACE_ATTRIBUTE, attributes);
 	}
 
-	private void addMemberToRole(DirContext ctxRoot, String roleDN,
-			String memberDN) throws NamingException {
+	private void addMemberToRole(DirContext ctxRoot, String roleDN, String memberDN) throws NamingException {
 
-		Attributes attributes = ctxRoot.getAttributes(roleDN,
-				new String[] { "roleOccupant" });
+		Attributes attributes = ctxRoot.getAttributes(roleDN, new String[] { "roleOccupant" });
 
 		Attribute attribute = attributes.get("roleOccupant");
 		if (attribute == null) {
@@ -2206,49 +2050,39 @@ public class LdapUtility {
 		}
 		attribute.add(memberDN);
 
-		ctxRoot.modifyAttributes(roleDN, DirContext.REPLACE_ATTRIBUTE,
-				attributes);
+		ctxRoot.modifyAttributes(roleDN, DirContext.REPLACE_ATTRIBUTE, attributes);
 	}
 
-	private void removeMemberFromGroup(DirContext ctxRoot, String groupDN,
-			String memberDN) throws NamingException {
+	private void removeMemberFromGroup(DirContext ctxRoot, String groupDN, String memberDN) throws NamingException {
 
-		Attributes attributes = ctxRoot.getAttributes(groupDN,
-				new String[] { "uniqueMember" });
+		Attributes attributes = ctxRoot.getAttributes(groupDN, new String[] { "uniqueMember" });
 		Attribute attribute = attributes.get("uniqueMember");
 		attribute.remove(memberDN);
 
-		ctxRoot.modifyAttributes(groupDN, DirContext.REPLACE_ATTRIBUTE,
-				attributes);
+		ctxRoot.modifyAttributes(groupDN, DirContext.REPLACE_ATTRIBUTE, attributes);
 	}
 
-	private void removeMemberFromRole(DirContext ctxRoot, String roleDN,
-			String memberDN) throws NamingException {
+	private void removeMemberFromRole(DirContext ctxRoot, String roleDN, String memberDN) throws NamingException {
 
-		Attributes attributes = ctxRoot.getAttributes(roleDN,
-				new String[] { "roleOccupant" });
+		Attributes attributes = ctxRoot.getAttributes(roleDN, new String[] { "roleOccupant" });
 
 		Attribute attribute = attributes.get("roleOccupant");
 		attribute.remove(memberDN);
 
-		ctxRoot.modifyAttributes(roleDN, DirContext.REPLACE_ATTRIBUTE,
-				attributes);
+		ctxRoot.modifyAttributes(roleDN, DirContext.REPLACE_ATTRIBUTE, attributes);
 	}
 
-	private void removeMember(DirContext ctxRoot, String memberDN)
-			throws NamingException {
+	private void removeMember(DirContext ctxRoot, String memberDN) throws NamingException {
 
 		// For each group the member is in, remove that member from the group
-		Set<String> directMemberGroupsDN = getDNsOfGroupsContainingMember(
-				ctxRoot, memberDN);
+		Set<String> directMemberGroupsDN = getDNsOfGroupsContainingMember(ctxRoot, memberDN);
 		for (String groupDN : directMemberGroupsDN) {
 			removeMemberFromGroup(ctxRoot, groupDN, memberDN);
 		}
 
 		// For each role the member owns, remove that member from the
 		// roleOccupant
-		Set<String> directMemberRolesDN = getDNsOfDirectRolesForMember(ctxRoot,
-				memberDN);
+		Set<String> directMemberRolesDN = getDNsOfDirectRolesForMember(ctxRoot, memberDN);
 		for (String roleDN : directMemberRolesDN) {
 			removeMemberFromRole(ctxRoot, roleDN, memberDN);
 		}
@@ -2266,10 +2100,9 @@ public class LdapUtility {
 	 * @return DirContext
 	 * @throws NamingException
 	 */
-	private DirContext getLDAPDirContext(String contextName)
-			throws NamingException {
+	private DirContext getLDAPDirContext(String contextName) throws NamingException {
 		// FIXME
-		//return getLDAPDirContext(contextName, null, null);
+		// return getLDAPDirContext(contextName, null, null);
 		return getLDAPDirContext(contextName, ldapAdminDN, ldapAdminPassword);
 	}
 
@@ -2283,8 +2116,7 @@ public class LdapUtility {
 	 * @return DirContext
 	 * @throws NamingException
 	 */
-	private DirContext getLDAPAdminDirContext(String contextName)
-			throws NamingException {
+	private DirContext getLDAPAdminDirContext(String contextName) throws NamingException {
 		return getLDAPDirContext(contextName, ldapAdminDN, ldapAdminPassword);
 	}
 
@@ -2301,19 +2133,17 @@ public class LdapUtility {
 	 * @return the DirContext.
 	 * @throws NamingException
 	 */
-	private DirContext getLDAPDirContext(String contextDN, String accessUserDN,
-			String accessPassword) throws NamingException {
+	private DirContext getLDAPDirContext(String contextDN, String accessUserDN, String accessPassword)
+			throws NamingException {
 
 		// Set up the environment for creating the initial context
 		final Hashtable<String, Object> env = new Hashtable<String, Object>(11);
 
-		env.put(Context.INITIAL_CONTEXT_FACTORY,
-				"com.sun.jndi.ldap.LdapCtxFactory");
-		env.put(Context.PROVIDER_URL, String.format("ldap://%1$s:%2$d/%3$s",
-				ldapHost, ldapPort, contextDN));
+		env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+		env.put(Context.PROVIDER_URL, String.format("ldap://%1$s:%2$d/%3$s", ldapHost, ldapPort, contextDN));
 
 		env.put(Context.SECURITY_AUTHENTICATION, AUTHENTICATION_SIMPLE);
-		
+
 		if (accessUserDN != null) {
 			env.put(Context.SECURITY_PRINCIPAL, accessUserDN);
 			env.put(Context.SECURITY_CREDENTIALS, accessPassword);
@@ -2324,13 +2154,11 @@ public class LdapUtility {
 		return new InitialDirContext(env);
 	}
 
-	private Set<String> getDNsOfDirectGroupMembers(DirContext ctxRoot,
-			String groupDN) throws NamingException {
+	private Set<String> getDNsOfDirectGroupMembers(DirContext ctxRoot, String groupDN) throws NamingException {
 
 		Set<String> membersDN = new HashSet<String>();
 
-		Attributes attributes = ctxRoot.getAttributes(groupDN,
-				new String[] { "uniqueMember" });
+		Attributes attributes = ctxRoot.getAttributes(groupDN, new String[] { "uniqueMember" });
 
 		Attribute attrUniqueMember = attributes.get("uniqueMember");
 
@@ -2357,8 +2185,7 @@ public class LdapUtility {
 	 * @return the DNs of the groups that has memberDN as member.
 	 * @throws NamingException
 	 */
-	private Set<String> getDNsOfGroupsContainingMember(DirContext ctxRoot,
-			String memberDN) throws NamingException {
+	private Set<String> getDNsOfGroupsContainingMember(DirContext ctxRoot, String memberDN) throws NamingException {
 		Set<String> groupsDN = new HashSet<String>();
 
 		// Specify the attributes to match
@@ -2367,8 +2194,7 @@ public class LdapUtility {
 		matchAttrs.put(new BasicAttribute("uniqueMember", memberDN));
 
 		// Search for objects that have those matching attributes
-		NamingEnumeration<SearchResult> answer = ctxRoot.search(getGroupsDN(),
-				matchAttrs, new String[] {});
+		NamingEnumeration<SearchResult> answer = ctxRoot.search(getGroupsDN(), matchAttrs, new String[] {});
 
 		while (answer.hasMore()) {
 
@@ -2388,8 +2214,8 @@ public class LdapUtility {
 	 * @return the DNs of the groups that has memberDN as member.
 	 * @throws NamingException
 	 */
-	private Set<String> getDNsOfActiveGroupsContainingMember(
-			DirContext ctxRoot, String memberDN) throws NamingException {
+	private Set<String> getDNsOfActiveGroupsContainingMember(DirContext ctxRoot, String memberDN)
+			throws NamingException {
 
 		Set<String> groupsDN = new HashSet<String>();
 
@@ -2401,8 +2227,8 @@ public class LdapUtility {
 		matchAttrs.put(new BasicAttribute("uniqueMember", memberDN));
 
 		// Search for objects that have those matching attributes
-		NamingEnumeration<SearchResult> answer = ctxRoot.search(getGroupsDN(),
-				matchAttrs, new String[] { "shadowInactive" });
+		NamingEnumeration<SearchResult> answer = ctxRoot.search(getGroupsDN(), matchAttrs,
+				new String[] { "shadowInactive" });
 
 		while (answer.hasMore()) {
 
@@ -2410,8 +2236,7 @@ public class LdapUtility {
 
 			String shadowInactive = "0";
 			if (sr.getAttributes().get("shadowInactive") != null) {
-				shadowInactive = sr.getAttributes().get("shadowInactive").get()
-						.toString();
+				shadowInactive = sr.getAttributes().get("shadowInactive").get().toString();
 			}
 
 			if ("0".equalsIgnoreCase(shadowInactive)) {
@@ -2425,28 +2250,24 @@ public class LdapUtility {
 		return groupsDN;
 	}
 
-	private Set<String> getDNsOfAllActiveGroupsForMember(DirContext ctxRoot,
-			String memberDN) throws NamingException {
+	private Set<String> getDNsOfAllActiveGroupsForMember(DirContext ctxRoot, String memberDN) throws NamingException {
 
 		Set<String> allMemberActiveGroupsDN = new HashSet<String>();
 
-		Set<String> directMemberGroupsDN = getDNsOfActiveGroupsContainingMember(
-				ctxRoot, memberDN);
+		Set<String> directMemberGroupsDN = getDNsOfActiveGroupsContainingMember(ctxRoot, memberDN);
 
 		// add the groups that the member directly belongs to
 		allMemberActiveGroupsDN.addAll(directMemberGroupsDN);
 
 		// For each group, get the groups to which it belongs
 		for (String memberGroupDN : directMemberGroupsDN) {
-			allMemberActiveGroupsDN.addAll(getDNsOfAllActiveGroupsForMember(
-					ctxRoot, memberGroupDN));
+			allMemberActiveGroupsDN.addAll(getDNsOfAllActiveGroupsForMember(ctxRoot, memberGroupDN));
 		}
 
 		return allMemberActiveGroupsDN;
 	}
 
-	private Set<String> getDNsOfDirectRolesForMember(DirContext ctxRoot,
-			String memberDN) throws NamingException {
+	private Set<String> getDNsOfDirectRolesForMember(DirContext ctxRoot, String memberDN) throws NamingException {
 		Set<String> rolesDN = new HashSet<String>();
 
 		// Specify the attributes to match
@@ -2455,8 +2276,7 @@ public class LdapUtility {
 		matchAttrs.put(new BasicAttribute("roleOccupant", memberDN));
 
 		// Search for objects that have those matching attributes
-		NamingEnumeration<SearchResult> answer = ctxRoot.search(getRolesDN(),
-				matchAttrs, new String[] {});
+		NamingEnumeration<SearchResult> answer = ctxRoot.search(getRolesDN(), matchAttrs, new String[] {});
 
 		while (answer.hasMore()) {
 
@@ -2467,35 +2287,29 @@ public class LdapUtility {
 		return rolesDN;
 	}
 
-	private Set<String> getDNsOfAllRolesForMember(DirContext ctxRoot,
-			String memberDN) throws NamingException {
+	private Set<String> getDNsOfAllRolesForMember(DirContext ctxRoot, String memberDN) throws NamingException {
 		Set<String> allMemberRolesDN = new HashSet<String>();
 
-		Set<String> directMemberRolesDN = getDNsOfDirectRolesForMember(ctxRoot,
-				memberDN);
+		Set<String> directMemberRolesDN = getDNsOfDirectRolesForMember(ctxRoot, memberDN);
 
 		// add the roles that the member directly owns
 		allMemberRolesDN.addAll(directMemberRolesDN);
 
 		// for each group that the member belongs to, get it's roles
 		// too..
-		Set<String> directMemberGroupsDN = getDNsOfActiveGroupsContainingMember(
-				ctxRoot, memberDN);
+		Set<String> directMemberGroupsDN = getDNsOfActiveGroupsContainingMember(ctxRoot, memberDN);
 
 		for (String memberGroupDN : directMemberGroupsDN) {
-			allMemberRolesDN.addAll(getDNsOfAllRolesForMember(ctxRoot,
-					memberGroupDN));
+			allMemberRolesDN.addAll(getDNsOfAllRolesForMember(ctxRoot, memberGroupDN));
 		}
 
 		return allMemberRolesDN;
 	}
 
-	private Set<String> getMemberRoles(DirContext ctxRoot, String memberDN)
-			throws NamingException {
+	private Set<String> getMemberRoles(DirContext ctxRoot, String memberDN) throws NamingException {
 		Set<String> roles = new HashSet<String>();
 
-		Set<String> allMemberRolesDN = getDNsOfAllRolesForMember(ctxRoot,
-				memberDN);
+		Set<String> allMemberRolesDN = getDNsOfAllRolesForMember(ctxRoot, memberDN);
 		for (String roleDN : allMemberRolesDN) {
 			roles.add(getRoleCNFromDN(roleDN));
 		}
@@ -2503,12 +2317,10 @@ public class LdapUtility {
 		return roles;
 	}
 
-	private Set<String> getMemberDirectRoles(DirContext ctxRoot, String memberDN)
-			throws NamingException {
+	private Set<String> getMemberDirectRoles(DirContext ctxRoot, String memberDN) throws NamingException {
 		Set<String> directRoles = new HashSet<String>();
 
-		Set<String> memberDirectRolesDN = getDNsOfDirectRolesForMember(ctxRoot,
-				memberDN);
+		Set<String> memberDirectRolesDN = getDNsOfDirectRolesForMember(ctxRoot, memberDN);
 
 		for (String roleDN : memberDirectRolesDN) {
 			directRoles.add(getRoleCNFromDN(roleDN));
@@ -2517,12 +2329,10 @@ public class LdapUtility {
 		return directRoles;
 	}
 
-	private Set<String> getMemberGroups(DirContext ctxRoot, String memberDN)
-			throws NamingException {
+	private Set<String> getMemberGroups(DirContext ctxRoot, String memberDN) throws NamingException {
 		Set<String> groups = new HashSet<String>();
 
-		Set<String> allMemberGroupsDN = getDNsOfAllActiveGroupsForMember(
-				ctxRoot, memberDN);
+		Set<String> allMemberGroupsDN = getDNsOfAllActiveGroupsForMember(ctxRoot, memberDN);
 		for (String groupDN : allMemberGroupsDN) {
 			groups.add(getGroupCNFromDN(groupDN));
 		}
@@ -2530,16 +2340,14 @@ public class LdapUtility {
 		return groups;
 	}
 
-	private User getUserWithEmail(DirContext ctxRoot, String email)
-			throws NamingException {
+	private User getUserWithEmail(DirContext ctxRoot, String email) throws NamingException {
 
 		// Specify the attributes to match
 		Attributes matchAttrs = new BasicAttributes(true); // ignore case
 		matchAttrs.put(new BasicAttribute("email", email));
 
 		// Search for objects that have those matching attributes
-		NamingEnumeration<SearchResult> answer = ctxRoot.search(getPeopleDN(),
-				matchAttrs);
+		NamingEnumeration<SearchResult> answer = ctxRoot.search(getPeopleDN(), matchAttrs);
 
 		User user = null;
 		while (answer.hasMore() && user != null) {
@@ -2561,8 +2369,7 @@ public class LdapUtility {
 	 *            a list of roles that this member should own.
 	 * @throws NamingException
 	 */
-	private void setMemberDirectRoles(DirContext ctxRoot, String memberDN,
-			Set<String> roles) throws NamingException {
+	private void setMemberDirectRoles(DirContext ctxRoot, String memberDN, Set<String> roles) throws NamingException {
 
 		if (roles == null) {
 			logger.warn("setMemberRoles() - roles is null. no roles");
@@ -2603,19 +2410,17 @@ public class LdapUtility {
 	 *            a list of groups that this member should belong to.
 	 * @throws NamingException
 	 */
-	private void setMemberGroups(DirContext ctxRoot, String memberDN,
-			Set<String> groups) throws NamingException {
+	private void setMemberGroups(DirContext ctxRoot, String memberDN, Set<String> groups) throws NamingException {
 
 		if (groups == null) {
 			logger.warn("setMemberGroups() - groups is null. no groups");
 			groups = new HashSet<String>();
 		}
 
-		Set<String> oldgroupDNs = getDNsOfGroupsContainingMember(ctxRoot,
-				memberDN);
+		Set<String> oldgroupDNs = getDNsOfGroupsContainingMember(ctxRoot, memberDN);
 		Set<String> newgroupDNs = new HashSet<String>();
 		Iterator<String> it = groups.iterator();
-		while(it.hasNext()){
+		while (it.hasNext()) {
 			newgroupDNs.add(getGroupDN(it.next()));
 		}
 
@@ -2664,16 +2469,13 @@ public class LdapUtility {
 
 		} catch (NameNotFoundException e) {
 			logger.debug("User " + username + " doesn't exist.", e);
-			throw new NoSuchUserException("User " + username
-					+ " doesn't exist.", e);
+			throw new NoSuchUserException("User " + username + " doesn't exist.", e);
 		} catch (NamingException e) {
 			logger.debug("Error setting password for user " + username, e);
-			throw new LdapUtilityException("Error setting password for user "
-					+ username, e);
+			throw new LdapUtilityException("Error setting password for user " + username, e);
 		} catch (NoSuchAlgorithmException e) {
 			logger.debug("Error encoding password for user " + username, e);
-			throw new LdapUtilityException("Error encoding password for user "
-					+ username, e);
+			throw new LdapUtilityException("Error encoding password for user " + username, e);
 		}
 
 	}
@@ -2716,8 +2518,8 @@ public class LdapUtility {
 		return getDNsOfUsersGroupsRoles(ctxRoot, ldapRolesDN, "cn");
 	}
 
-	private List<String> getDNsOfUsersGroupsRoles(DirContext ctxRoot,
-			String ctxDN, String keyAttribute) throws NamingException {
+	private List<String> getDNsOfUsersGroupsRoles(DirContext ctxRoot, String ctxDN, String keyAttribute)
+			throws NamingException {
 
 		List<String> dnList = new ArrayList<String>();
 
@@ -2726,8 +2528,7 @@ public class LdapUtility {
 		matchAttrs.put(new BasicAttribute(keyAttribute));
 
 		// Search for objects that have those matching attributes
-		NamingEnumeration<SearchResult> answer = ctxRoot.search(ctxDN,
-				matchAttrs, new String[] {});
+		NamingEnumeration<SearchResult> answer = ctxRoot.search(ctxDN, matchAttrs, new String[] {});
 
 		while (answer.hasMore()) {
 			SearchResult sr = answer.next();

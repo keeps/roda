@@ -631,10 +631,6 @@ public class SolrUtils {
 			indexName = RodaConstants.INDEX_ACTION_LOG;
 		} else if (resultClass.equals(SIPReport.class)) {
 			indexName = RodaConstants.INDEX_SIP_REPORT;
-		} else if (resultClass.equals(User.class)) {
-			indexName = RodaConstants.INDEX_MEMBERS;
-		} else if (resultClass.equals(Group.class)) {
-			indexName = RodaConstants.INDEX_MEMBERS;
 		} else if (resultClass.equals(RODAMember.class)) {
 			indexName = RodaConstants.INDEX_MEMBERS;
 		} else {
