@@ -1,19 +1,11 @@
 package pt.gov.dgarq.roda.disseminators.signature;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.rmi.RemoteException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertStoreException;
-import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,15 +19,9 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.bouncycastle.cms.CMSException;
 
-import pt.gov.dgarq.roda.common.RodaClientFactory;
 import pt.gov.dgarq.roda.common.certification.SignatureUtility;
-import pt.gov.dgarq.roda.core.RODAClient;
-import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
-import pt.gov.dgarq.roda.core.common.BrowserException;
 import pt.gov.dgarq.roda.core.common.LoginException;
-import pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException;
 import pt.gov.dgarq.roda.core.common.RODAClientException;
-import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.data.RepresentationObject;
 import pt.gov.dgarq.roda.disseminators.RepresentationDownload.RepresentationDownload;
 import pt.gov.dgarq.roda.disseminators.common.RepresentationHelper;
@@ -57,45 +43,45 @@ public class Signature extends HttpServlet {
 	 */
 	public Signature() {
 		super();
-		try {
-			signatureUtility = new SignatureUtility();
-			String keystorePath = RodaClientFactory.getRodaProperties()
-					.getProperty("roda.disseminators.signature.keystore.path");
-			String keystorePassword = RodaClientFactory.getRodaProperties()
-					.getProperty(
-							"roda.disseminators.signature.keystore.password");
-			String keystoreAlias = RodaClientFactory.getRodaProperties()
-					.getProperty("roda.disseminators.signature.keystore.alias");
-
-			if (keystorePath != null) {
-				try {
-					signatureUtility.loadKeyStore(new FileInputStream(
-							keystorePath), keystorePassword.toCharArray());
-				} catch (CertificateException e) {
-					logger.error("Cannot load keystore " + keystorePath, e);
-				} catch (FileNotFoundException e) {
-					logger.error("Cannot load keystore " + keystorePath, e);
-				} catch (IOException e) {
-					logger.error("Cannot load keystore " + keystorePath, e);
-				}
-			}
-			signatureUtility.initSign(keystoreAlias, keystorePassword
-					.toCharArray());
-		} catch (KeyStoreException e) {
-			logger.error("Cannot create signature utility", e);
-		} catch (NoSuchAlgorithmException e) {
-			logger.error("Cannot create signature utility", e);
-		} catch (NoSuchProviderException e) {
-			logger.error("Cannot create signature utility", e);
-		} catch (UnrecoverableKeyException e) {
-			logger.error("Cannot create signature utility", e);
-		} catch (InvalidAlgorithmParameterException e) {
-			logger.error("Cannot create signature utility", e);
-		} catch (CertStoreException e) {
-			logger.error("Cannot create signature utility", e);
-		} catch (CMSException e) {
-			logger.error("Cannot create signature utility", e);
-		}
+		// try {
+		// signatureUtility = new SignatureUtility();
+		// String keystorePath = RodaClientFactory.getRodaProperties()
+		// .getProperty("roda.disseminators.signature.keystore.path");
+		// String keystorePassword = RodaClientFactory.getRodaProperties()
+		// .getProperty(
+		// "roda.disseminators.signature.keystore.password");
+		// String keystoreAlias = RodaClientFactory.getRodaProperties()
+		// .getProperty("roda.disseminators.signature.keystore.alias");
+		//
+		// if (keystorePath != null) {
+		// try {
+		// signatureUtility.loadKeyStore(new FileInputStream(
+		// keystorePath), keystorePassword.toCharArray());
+		// } catch (CertificateException e) {
+		// logger.error("Cannot load keystore " + keystorePath, e);
+		// } catch (FileNotFoundException e) {
+		// logger.error("Cannot load keystore " + keystorePath, e);
+		// } catch (IOException e) {
+		// logger.error("Cannot load keystore " + keystorePath, e);
+		// }
+		// }
+		// signatureUtility.initSign(keystoreAlias, keystorePassword
+		// .toCharArray());
+		// } catch (KeyStoreException e) {
+		// logger.error("Cannot create signature utility", e);
+		// } catch (NoSuchAlgorithmException e) {
+		// logger.error("Cannot create signature utility", e);
+		// } catch (NoSuchProviderException e) {
+		// logger.error("Cannot create signature utility", e);
+		// } catch (UnrecoverableKeyException e) {
+		// logger.error("Cannot create signature utility", e);
+		// } catch (InvalidAlgorithmParameterException e) {
+		// logger.error("Cannot create signature utility", e);
+		// } catch (CertStoreException e) {
+		// logger.error("Cannot create signature utility", e);
+		// } catch (CMSException e) {
+		// logger.error("Cannot create signature utility", e);
+		// }
 	}
 
 	private RepresentationHelper getRepresentationHelper() throws IOException {
@@ -126,60 +112,60 @@ public class Signature extends HttpServlet {
 				.length();
 		String pid = pathInfo.substring(1, separatorIndex);
 		logger.info("pid=" + pid);
-		try {
-			RepresentationObject rep = RodaClientFactory.getRodaClient(
-					request.getSession()).getBrowserService()
-					.getRepresentationObject(pid);
-
-			if (pid != null) {
-				sendSignedRepresentation(request, rep, response);
-			} else {
-				logger.error("Request with no PID defined");
-				response.sendError(HttpServletResponse.SC_BAD_REQUEST,
-						"parameter pid must be defined");
-			}
-
-		} catch (LoginException e) {
-			logger.error("Login Failure", e);
-			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e
-					.getMessage());
-		} catch (NoSuchRODAObjectException e) {
-			logger.error("Object does not exist", e);
-			response
-					.sendError(HttpServletResponse.SC_NOT_FOUND, e.getMessage());
-		} catch (BrowserException e) {
-			logger.error("Browser Exception", e);
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e
-					.getMessage());
-		} catch (RODAClientException e) {
-			logger.error("RODA Client Exception", e);
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e
-					.getMessage());
-		} catch (NoSuchAlgorithmException e) {
-			logger.error("Signature Utility", e);
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e
-					.getMessage());
-		} catch (NoSuchProviderException e) {
-			logger.error("Signature Utility", e);
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e
-					.getMessage());
-		} catch (CMSException e) {
-			logger.error("Signature Utility", e);
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e
-					.getMessage());
-		}catch (RemoteException e) {
-			RODAException exception = RODAClient.parseRemoteException(e);
-			if (exception instanceof AuthorizationDeniedException) {
-				response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
-						exception.getMessage());
-			} else {
-				logger.error("RODA Exception", e);
-				response.sendError(
-						HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e
-								.getMessage());
-			}
-
-		}
+		// try {
+		// RepresentationObject rep = RodaClientFactory.getRodaClient(
+		// request.getSession()).getBrowserService()
+		// .getRepresentationObject(pid);
+		//
+		// if (pid != null) {
+		// sendSignedRepresentation(request, rep, response);
+		// } else {
+		// logger.error("Request with no PID defined");
+		// response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+		// "parameter pid must be defined");
+		// }
+		//
+		// } catch (LoginException e) {
+		// logger.error("Login Failure", e);
+		// response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e
+		// .getMessage());
+		// } catch (NoSuchRODAObjectException e) {
+		// logger.error("Object does not exist", e);
+		// response
+		// .sendError(HttpServletResponse.SC_NOT_FOUND, e.getMessage());
+		// } catch (BrowserException e) {
+		// logger.error("Browser Exception", e);
+		// response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e
+		// .getMessage());
+		// } catch (RODAClientException e) {
+		// logger.error("RODA Client Exception", e);
+		// response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e
+		// .getMessage());
+		// } catch (NoSuchAlgorithmException e) {
+		// logger.error("Signature Utility", e);
+		// response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e
+		// .getMessage());
+		// } catch (NoSuchProviderException e) {
+		// logger.error("Signature Utility", e);
+		// response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e
+		// .getMessage());
+		// } catch (CMSException e) {
+		// logger.error("Signature Utility", e);
+		// response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e
+		// .getMessage());
+		// }catch (RemoteException e) {
+		// RODAException exception = RODAClient.parseRemoteException(e);
+		// if (exception instanceof AuthorizationDeniedException) {
+		// response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+		// exception.getMessage());
+		// } else {
+		// logger.error("RODA Exception", e);
+		// response.sendError(
+		// HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e
+		// .getMessage());
+		// }
+		//
+		// }
 	}
 
 	private void sendSignedRepresentation(HttpServletRequest request,

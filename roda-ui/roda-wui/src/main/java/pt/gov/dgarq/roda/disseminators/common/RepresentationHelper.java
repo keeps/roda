@@ -11,19 +11,14 @@ import java.net.URLDecoder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
-import pt.gov.dgarq.roda.common.RodaClientFactory;
-import pt.gov.dgarq.roda.core.RODAClient;
 import pt.gov.dgarq.roda.core.common.LoginException;
 import pt.gov.dgarq.roda.core.common.RODAClientException;
 import pt.gov.dgarq.roda.core.data.RepresentationFile;
@@ -50,7 +45,8 @@ public class RepresentationHelper {
 		client = new HttpClient();
 		client.getParams().setAuthenticationPreemptive(true);
 
-		rodaCoreURL = RodaClientFactory.getRodaCoreUrl();
+		// rodaCoreURL = RodaClientFactory.getRodaCoreUrl();
+		rodaCoreURL = null;
 	}
 
 	/**
@@ -177,24 +173,26 @@ public class RepresentationHelper {
 		// Prepare method
 		GetMethod getFileMethod = new GetMethod(rodaCoreURL + path);
 
-		// Set up the client connection
-		HttpClient client = new HttpClient();
-		client.getParams().setAuthenticationPreemptive(true);
-		RODAClient rodaClient = RodaClientFactory.getRodaClient(request
-				.getSession());
-		String username = rodaClient.getUsername();
-		String password = rodaClient.getCasUtility().generateProxyTicket(rodaClient.getProxyGrantingTicket());
-		Credentials credentials = new UsernamePasswordCredentials(username, password);
-		
-		
-		client.getState().setCredentials(
-				new AuthScope(rodaCoreURL.getHost(), rodaCoreURL.getPort(),
-						AuthScope.ANY_REALM), credentials);
-
-		// Execute method
-		client.executeMethod(getFileMethod);
-
-		// getFileMethod.releaseConnection();
+		// // Set up the client connection
+		// HttpClient client = new HttpClient();
+		// client.getParams().setAuthenticationPreemptive(true);
+		// RODAClient rodaClient = RodaClientFactory.getRodaClient(request
+		// .getSession());
+		// String username = rodaClient.getUsername();
+		// String password =
+		// rodaClient.getCasUtility().generateProxyTicket(rodaClient.getProxyGrantingTicket());
+		// Credentials credentials = new UsernamePasswordCredentials(username,
+		// password);
+		//
+		//
+		// client.getState().setCredentials(
+		// new AuthScope(rodaCoreURL.getHost(), rodaCoreURL.getPort(),
+		// AuthScope.ANY_REALM), credentials);
+		//
+		// // Execute method
+		// client.executeMethod(getFileMethod);
+		//
+		// // getFileMethod.releaseConnection();
 
 		return getFileMethod;
 	}

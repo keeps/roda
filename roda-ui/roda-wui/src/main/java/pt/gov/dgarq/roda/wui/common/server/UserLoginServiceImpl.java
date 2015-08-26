@@ -1,18 +1,19 @@
 package pt.gov.dgarq.roda.wui.common.server;
 
-import java.rmi.RemoteException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.roda.common.UserUtility;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
-import pt.gov.dgarq.roda.common.RodaClientFactory;
 import pt.gov.dgarq.roda.common.RodaCoreFactory;
 import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.data.LogEntry;
@@ -29,8 +30,7 @@ import pt.gov.dgarq.roda.wui.common.client.UserLoginService;
  * @author Luis Faria
  * 
  */
-public class UserLoginServiceImpl extends RemoteServiceServlet implements
-		UserLoginService {
+public class UserLoginServiceImpl extends RemoteServiceServlet implements UserLoginService {
 
 	/**
 	 * 
@@ -47,110 +47,94 @@ public class UserLoginServiceImpl extends RemoteServiceServlet implements
 	private static Logger logger = Logger.getLogger(UserLoginServiceImpl.class);
 
 	public AuthenticatedUser getAuthenticatedUser() throws RODAException {
-//		AuthenticatedUser officeUser;
-//		RODAClient rodaClient;
-//
-//		rodaClient = RodaClientFactory.getRodaClient(this
-//				.getThreadLocalRequest().getSession());
-//		User user;
-//		try {
-//			user = rodaClient.getAuthenticatedUser();
-//			officeUser = new AuthenticatedUser(user, rodaClient.isGuestLogin());
-//		} catch (RemoteException e) {
-//			throw RODAClient.parseRemoteException(e);
-//		}
-//
-//		return officeUser;
-		
-		RodaUser user = UserUtility.getUser(this
-				.getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+		// AuthenticatedUser officeUser;
+		// RODAClient rodaClient;
+		//
+		// rodaClient = RodaClientFactory.getRodaClient(this
+		// .getThreadLocalRequest().getSession());
+		// User user;
+		// try {
+		// user = rodaClient.getAuthenticatedUser();
+		// officeUser = new AuthenticatedUser(user, rodaClient.isGuestLogin());
+		// } catch (RemoteException e) {
+		// throw RODAClient.parseRemoteException(e);
+		// }
+		//
+		// return officeUser;
+
+		RodaUser user = UserUtility.getUser(this.getThreadLocalRequest(), RodaCoreFactory.getIndexService());
 		AuthenticatedUser u = new AuthenticatedUser();
-		u.setName(user.getId());
+		u.setId(user.getId());
+		u.setName(user.getName());
+		u.setFullName(user.getFullName());
 		u.setGuest(user.isGuest());
 		Set<String> roles = user.getAllRoles();
-		
+
 		u.setAllRoles(roles);
+
+		logger.info("Serving user " + u + " from user " + user);
 		return u;
-		
+
 	}
 
-	
-	public AuthenticatedUser loginCUP(HttpServletRequest request, CASUserPrincipal cup)
-			throws RODAException {
-		UserUtility.setUser(request,new RodaSimpleUser());
-		
+	public AuthenticatedUser loginCUP(HttpServletRequest request, CASUserPrincipal cup) throws RODAException {
+		logger.info("Login with CUP: " + cup);
+		UserUtility.setUser(request, new RodaSimpleUser());
+
 		AuthenticatedUser authenticatedUser;
 		authenticatedUser = getAuthenticatedUser();
 		return authenticatedUser;
 	}
-	
-	public AuthenticatedUser login(String username, String password)
-			throws RODAException {
-		AuthenticatedUser authenticatedUser;
 
-		RodaClientFactory.login(this.getThreadLocalRequest(),
-				username, password);
-		logLogin(username);
-		authenticatedUser = getAuthenticatedUser();
+	public AuthenticatedUser login(String username, String password) throws RODAException {
+		AuthenticatedUser authenticatedUser = null;
+
+		// RodaClientFactory.login(this.getThreadLocalRequest(),
+		// username, password);
+		// logLogin(username);
+		// authenticatedUser = getAuthenticatedUser();
 
 		return authenticatedUser;
 	}
-	
+
 	protected void logLogin(String username) {
 		try {
 			LogEntryParameter[] parameters = new LogEntryParameter[] {
-					new LogEntryParameter("hostname", getThreadLocalRequest()
-							.getRemoteHost()),
-					new LogEntryParameter("address", getThreadLocalRequest()
-							.getRemoteAddr()),
-					new LogEntryParameter("port", getThreadLocalRequest()
-							.getRemotePort() + "") };
+					new LogEntryParameter("hostname", getThreadLocalRequest().getRemoteHost()),
+					new LogEntryParameter("address", getThreadLocalRequest().getRemoteAddr()),
+					new LogEntryParameter("port", getThreadLocalRequest().getRemotePort() + "") };
 
 			LogEntry logEntry = new LogEntry();
 			logEntry.setAction(LOG_ACTION_WUI_LOGIN);
 			logEntry.setParameters(parameters);
 			logEntry.setUsername(username);
 
-			RodaClientFactory.getRodaWuiClient().getLoggerService()
-					.addLogEntry(logEntry);
+			// RodaClientFactory.getRodaWuiClient().getLoggerService()
+			// .addLogEntry(logEntry);
 
-		} catch (RemoteException e) {
-			logger.error("Error logging login", e);
+			// } catch (RemoteException e) {
+			// logger.error("Error logging login", e);
 		} catch (Exception e) {
 			logger.error("Error logging login", e);
 		}
 	}
 
 	public AuthenticatedUser logout() throws RODAException {
-		AuthenticatedUser authenticatedUser;
+		AuthenticatedUser authenticatedUser = null;
 
-		RodaClientFactory.logout(this.getThreadLocalRequest().getSession());
-		authenticatedUser = getAuthenticatedUser();
+		// RodaClientFactory.logout(this.getThreadLocalRequest().getSession());
+		// authenticatedUser = getAuthenticatedUser();
 
 		return authenticatedUser;
 	}
 
 	public Map<String, String> getRodaProperties() {
-		Map<String, String> properties = new HashMap<String, String>();
-
-		for (Map.Entry<Object, Object> entry : RodaClientFactory
-				.getRodaProperties().entrySet()) {
-			Object key = entry.getKey();
-			Object value = entry.getValue();
-
-			if (key instanceof String && value instanceof String) {
-				String sKey = (String) key;
-				if (sKey.startsWith("menu.") || sKey.startsWith("role.")
-						|| sKey.equals("roda.in.installer.url")) {
-					properties.put((String) key, (String) value);
-				}
-			}
-		}
-		return properties;
+		return RodaCoreFactory.getLoginRelatedProperties();
 
 	}
+
 	@Override
 	public String getRodaCasURL() {
-		return RodaClientFactory.getCasUrlAsString();
+		return RodaCoreFactory.getRodaConfiguration().getString("roda.cas.external.url", "");
 	}
 }

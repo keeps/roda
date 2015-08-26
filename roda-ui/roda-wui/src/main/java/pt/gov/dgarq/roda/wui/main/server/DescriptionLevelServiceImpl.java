@@ -1,19 +1,17 @@
 package pt.gov.dgarq.roda.wui.main.server;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
-import pt.gov.dgarq.roda.common.RodaClientFactory;
-import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevel;
+import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+
+import pt.gov.dgarq.roda.common.RodaCoreFactory;
 import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevelManager;
 import pt.gov.dgarq.roda.wui.main.client.DescriptionLevelInfoPack;
 import pt.gov.dgarq.roda.wui.main.client.DescriptionLevelService;
-
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 public class DescriptionLevelServiceImpl extends RemoteServiceServlet implements
 		DescriptionLevelService {
@@ -27,7 +25,7 @@ public class DescriptionLevelServiceImpl extends RemoteServiceServlet implements
 		try {
 			Properties descriptionLevels = new Properties();
 			descriptionLevels
-					.load(RodaClientFactory
+					.load(RodaCoreFactory
 							.getConfigurationFile("roda-description-levels-hierarchy.properties"));
 
 			new DescriptionLevelManager(descriptionLevels);

@@ -10,7 +10,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.configuration.Configuration;
@@ -42,6 +45,9 @@ public class RodaCoreFactory {
 	private static IndexService index;
 	private static EmbeddedSolrServer solr;
 
+	private static Configuration rodaConfiguration = null;
+	private static Map<String, String> loginProperties = null;
+
 	static {
 		try {
 			String RODA_HOME;
@@ -62,7 +68,7 @@ public class RodaCoreFactory {
 
 			storage = new FileStorageService(storagePath);
 			model = new ModelService(storage);
-			
+
 			// Configure Solr
 			Path solrHome = Paths.get(RODA_HOME, "config", "index");
 			if (!Files.exists(solrHome)) {
@@ -89,6 +95,13 @@ public class RodaCoreFactory {
 			LOGGER.error(e);
 		} catch (URISyntaxException e) {
 			LOGGER.error(e);
+		}
+
+		try {
+			rodaConfiguration = getConfiguration("roda-wui.properties");
+			processLoginRelatedProperties();
+		} catch (ConfigurationException e) {
+			LOGGER.error("Error loading roda-wui properties", e);
 		}
 
 		// try {
@@ -146,6 +159,7 @@ public class RodaCoreFactory {
 		System.exit(0);
 	}
 
+	// FIXME this should not be here! remove it
 	public static void populateSipReport() throws ModelServiceException {
 		for (int i = 0; i < 100; i++) {
 			model.addSipReport(new SIPReport(UUID.randomUUID().toString(), "admin", "SIP_" + (i + 1) + ".sip",
@@ -188,6 +202,29 @@ public class RodaCoreFactory {
 		}
 
 		return propertiesConfiguration;
+	}
+
+	public static Configuration getRodaConfiguration() {
+		return rodaConfiguration;
+	}
+
+	public static Map<String, String> getLoginRelatedProperties() {
+		return loginProperties;
+	}
+
+	private static void processLoginRelatedProperties() {
+		loginProperties = new HashMap<String, String>();
+
+		Configuration configuration = RodaCoreFactory.getRodaConfiguration();
+		Iterator keys = configuration.getKeys();
+		while (keys.hasNext()) {
+			String key = String.class.cast(keys.next());
+			String value = configuration.getString(key, "");
+			if (key.startsWith("menu.") || key.startsWith("role.") || key.equals("roda.in.installer.url")) {
+				loginProperties.put(key, value);
+			}
+		}
+
 	}
 
 }

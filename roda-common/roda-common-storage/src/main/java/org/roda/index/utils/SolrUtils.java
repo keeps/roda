@@ -631,6 +631,12 @@ public class SolrUtils {
 			indexName = RodaConstants.INDEX_ACTION_LOG;
 		} else if (resultClass.equals(SIPReport.class)) {
 			indexName = RodaConstants.INDEX_SIP_REPORT;
+		} else if (resultClass.equals(User.class)) {
+			LOGGER.warn("Use " + RODAMember.class.getCanonicalName() + " instead of " + User.class.getCanonicalName());
+			indexName = RodaConstants.INDEX_MEMBERS;
+		} else if (resultClass.equals(Group.class)) {
+			LOGGER.warn("Use " + RODAMember.class.getCanonicalName() + " instead of " + Group.class.getCanonicalName());
+			indexName = RodaConstants.INDEX_MEMBERS;
 		} else if (resultClass.equals(RODAMember.class)) {
 			indexName = RodaConstants.INDEX_MEMBERS;
 		} else {

@@ -11,28 +11,29 @@ import org.roda.model.ModelServiceException;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.LogEntryParameter;
 import pt.gov.dgarq.roda.core.data.v2.RodaSimpleUser;
-import pt.gov.dgarq.roda.servlet.cas.CASUserPrincipal;
 
 public abstract class RodaCoreService {
 	private static final Logger LOGGER = Logger.getLogger(RodaCoreService.class);
 
-	protected static void registerAction(RodaSimpleUser user, String actionComponent, String actionMethod,
-			String aipId, long duration, Object... parameters) {
+	protected static void registerAction(RodaSimpleUser user, String actionComponent, String actionMethod, String aipId,
+			long duration, Object... parameters) {
 
 		LogEntry logEntry = createLogEntry(user, actionComponent, actionMethod, aipId, duration, parameters);
 		registerAction(logEntry);
 	}
 
-	public static void registerAction(CASUserPrincipal user, String actionComponent, String actionMethod,
-			String aipId, long duration, List<LogEntryParameter> parameters) {
+	// public static void registerAction(CASUserPrincipal user, String
+	// actionComponent, String actionMethod,
+	// String aipId, long duration, List<LogEntryParameter> parameters) {
+	//
+	// LogEntry logEntry = createLogEntry(user, actionComponent, actionMethod,
+	// aipId, duration, parameters);
+	// registerAction(logEntry);
+	//
+	// }
 
-		LogEntry logEntry = createLogEntry(user, actionComponent, actionMethod, aipId, duration, parameters);
-		registerAction(logEntry);
-
-	}
-	
-	public static void registerAction(RodaSimpleUser user, String actionComponent, String actionMethod,
-			String aipId, long duration, List<LogEntryParameter> parameters) {
+	public static void registerAction(RodaSimpleUser user, String actionComponent, String actionMethod, String aipId,
+			long duration, List<LogEntryParameter> parameters) {
 
 		LogEntry logEntry = createLogEntry(user, actionComponent, actionMethod, aipId, duration, parameters);
 		registerAction(logEntry);
@@ -74,7 +75,7 @@ public abstract class RodaCoreService {
 		return logEntry;
 	}
 
-	private static LogEntry createLogEntry(CASUserPrincipal user, String actionComponent, String actionMethod,
+	private static LogEntry createLogEntry(RodaSimpleUser user, String actionComponent, String actionMethod,
 			String aipId, long duration, List<LogEntryParameter> parameters) {
 		if (parameters == null) {
 			parameters = new ArrayList<LogEntryParameter>();
@@ -82,7 +83,8 @@ public abstract class RodaCoreService {
 
 		LogEntry logEntry = new LogEntry();
 		logEntry.setId(UUID.randomUUID().toString());
-		logEntry.setAddress(user.getClientIpAddress());
+		// logEntry.setAddress(user.getClientIpAddress());
+		logEntry.setAddress("FIXME");
 		logEntry.setUsername(user.getName());
 		logEntry.setActionComponent(actionComponent);
 		logEntry.setActionMethod(actionMethod);

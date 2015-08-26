@@ -34,7 +34,7 @@ import pt.gov.dgarq.roda.core.data.Report;
 import pt.gov.dgarq.roda.core.data.ReportItem;
 import pt.gov.dgarq.roda.core.data.RepresentationPreservationObject;
 import pt.gov.dgarq.roda.core.data.SimpleRepresentationObject;
-import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.core.data.preservation.Fixity;
 import pt.gov.dgarq.roda.core.data.preservation.RepresentationFilePreservationObject;
 import pt.gov.dgarq.roda.core.plugins.AbstractPlugin;

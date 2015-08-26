@@ -25,7 +25,7 @@ import org.apache.velocity.context.Context;
 import org.apache.velocity.runtime.RuntimeServices;
 import org.apache.velocity.runtime.log.LogChute;
 
-import pt.gov.dgarq.roda.common.RodaClientFactory;
+import pt.gov.dgarq.roda.common.RodaCoreFactory;
 
 /**
  * This class is used to execute velocity templates and send the result via
@@ -126,7 +126,7 @@ public class VelocityMail implements LogChute {
 	 */
 	public static VelocityMail getDefaultInstance() throws Exception {
 		if (defaultInstance == null) {
-			InputStream inputStream = RodaClientFactory
+			InputStream inputStream = RodaCoreFactory
 					.getConfigurationFile("mail/velocity.mail.properties");
 			ExtendedProperties extendedProperties = new ExtendedProperties();
 			extendedProperties.load(inputStream);

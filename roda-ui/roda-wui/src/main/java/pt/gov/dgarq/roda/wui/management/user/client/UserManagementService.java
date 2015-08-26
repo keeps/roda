@@ -3,6 +3,7 @@
  */
 package pt.gov.dgarq.roda.wui.management.user.client;
 
+import java.util.List;
 import java.util.Set;
 
 import com.google.gwt.core.client.GWT;
@@ -64,7 +65,7 @@ public interface UserManagementService extends RemoteService {
 	 * @return
 	 * @throws RODAException
 	 */
-	public User[] getUsers(Character letter, String search) throws RODAException;
+	public List<User> getUsers(Character letter, String search) throws RODAException;
 
 	/**
 	 * Get all groups

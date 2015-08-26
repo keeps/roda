@@ -29,6 +29,10 @@ public class Sorter implements Serializable {
 		this(sorter.getParameters());
 	}
 
+	public Sorter(SortParameter parameter) {
+		add(parameter);
+	}
+	
 	/**
 	 * Constructs a {@link Sorter} with the given parameters.
 	 * 

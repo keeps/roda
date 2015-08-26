@@ -285,6 +285,7 @@ public class UserLogin {
 					}
 
 					public void onSuccess(AuthenticatedUser authUser) {
+						logger.debug("Checking user " + authUser.getId() + " for role " + role);
 						callback.onSuccess(new Boolean(authUser.hasRole(role)));
 					}
 

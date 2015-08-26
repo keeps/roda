@@ -49,9 +49,8 @@ public class UserUtility {
 				if (indexUsers.getTotalCount() == 1) {
 					user = (RodaUser) indexUsers.getResults().get(0);
 					user.setGuest(rsu.isGuest());
-					LOGGER.debug("User obtained from index: " + user + "\n" + "user in session: " + rsu);
+					LOGGER.trace("User obtained from index: " + user + "\n" + "user in session: " + rsu);
 				} else {
-					LOGGER.debug("List of users found: " + indexUsers.getResults());
 					LOGGER.error("The number of users obtained from the index is different from 1");
 				}
 			} catch (IndexServiceException e) {
@@ -63,7 +62,9 @@ public class UserUtility {
 
 	public static void checkRoles(RodaUser rsu, List<String> rolesToCheck)
 			throws AuthorizationDeniedException, LdapUtilityException {
-		if (!Arrays.asList(rsu.getAllRoles()).containsAll(rolesToCheck)) {
+		if (!rsu.getAllRoles().containsAll(rolesToCheck)) {
+			LOGGER.debug("User \"" + rsu.getId() + "\" roles: " + rsu.getAllRoles() + " vs. roles to check: "
+					+ rolesToCheck);
 			throw new AuthorizationDeniedException(
 					"The user '" + rsu.getId() + "' does not have all needed permissions: " + rolesToCheck);
 		}
@@ -71,7 +72,9 @@ public class UserUtility {
 
 	public static void checkRoles(RodaUser ru, List<String> rolesToCheck, HttpServletRequest request)
 			throws AuthorizationDeniedException {
-		if (!Arrays.asList(ru.getAllRoles()).containsAll(rolesToCheck)) {
+		if (!ru.getAllRoles().containsAll(rolesToCheck)) {
+			LOGGER.debug(
+					"User \"" + ru.getId() + "\" roles: " + ru.getAllRoles() + " vs. roles to check: " + rolesToCheck);
 			throw new AuthorizationDeniedException(
 					"The user '" + ru.getId() + "' does not have all needed permissions: " + rolesToCheck);
 		}
@@ -79,9 +82,6 @@ public class UserUtility {
 
 	public static RodaUser getFullUser(RodaSimpleUser rsu) throws LdapUtilityException {
 		RodaUser u = UserUtility.getLdapUtility().getUser(rsu.getId());
-
-		LOGGER.debug("Getting user " + rsu);
-
 		u.setAllGroups(u.getAllGroups());
 		u.setDirectGroups(u.getDirectGroups());
 		u.setAllRoles(u.getAllRoles());

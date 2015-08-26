@@ -3,6 +3,7 @@
  */
 package pt.gov.dgarq.roda.wui.management.user.client;
 
+import java.util.List;
 import java.util.Set;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -36,7 +37,7 @@ public interface UserManagementServiceAsync {
 	 * @return
 	 * @throws RODAException
 	 */
-	public void getUsers(Character letter, String search, AsyncCallback<User[]> callback);
+	public void getUsers(Character letter, String search, AsyncCallback<List<User>> callback);
 
 	/**
 	 * Get all groups

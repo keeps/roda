@@ -12,8 +12,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.jasig.cas.client.util.CommonUtils;
 import org.roda.common.UserUtility;
@@ -23,6 +21,7 @@ import org.roda.model.ModelServiceException;
 import pt.gov.dgarq.roda.common.RodaCoreFactory;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
+import pt.gov.dgarq.roda.core.data.v2.RODAMember;
 import pt.gov.dgarq.roda.core.data.v2.RodaSimpleUser;
 import pt.gov.dgarq.roda.core.data.v2.RodaUser;
 import pt.gov.dgarq.roda.core.data.v2.User;
@@ -36,8 +35,6 @@ public class RolesSetterFilter implements Filter {
 
 	protected String casLogoutURL = null;
 
-	protected String configFile = "roda-wui.properties";
-
 	public void setFilterConfig(FilterConfig config) {
 		this.config = config;
 	}
@@ -48,18 +45,8 @@ public class RolesSetterFilter implements Filter {
 
 	public void init(FilterConfig config) throws ServletException {
 		setFilterConfig(config);
-		Configuration configuration = null;
-		try {
 
-			configuration = RodaCoreFactory.getConfiguration(configFile);
-
-		} catch (ConfigurationException e) {
-			logger.error("Error reading configuration file " + configFile + " - " + e.getMessage());
-		}
-
-		if (configuration != null) {
-			casLogoutURL = configuration.getString("roda.cas.url") + "/logout";
-		}
+		casLogoutURL = RodaCoreFactory.getRodaConfiguration().getString("roda.cas.url") + "/logout";
 
 		logger.info(getClass().getSimpleName() + " initialized ok");
 	}
@@ -68,14 +55,14 @@ public class RolesSetterFilter implements Filter {
 	 * Default constructor.
 	 */
 	public RolesSetterFilter() {
-		// TODO Auto-generated constructor stub
+		// do nothing
 	}
 
 	/**
 	 * @see Filter#destroy()
 	 */
 	public void destroy() {
-		// TODO Auto-generated method stub
+		// do nothing
 	}
 
 	/**
@@ -94,6 +81,7 @@ public class RolesSetterFilter implements Filter {
 					logger.debug("User principal exist but user doesn't (" + servletRequest.getUserPrincipal().getName()
 							+ ")");
 					RodaSimpleUser rsu = getUser(servletRequest.getUserPrincipal());
+					logger.debug("Adding user to ldap/index: " + rsu);
 					addUserToLdapAndIndex(request, rsu);
 					UserUtility.setUser(servletRequest, rsu);
 				}
@@ -156,7 +144,7 @@ public class RolesSetterFilter implements Filter {
 		filter.add(new SimpleFilterParameter(RodaConstants.MEMBERS_ID, name));
 		filter.add(new SimpleFilterParameter(RodaConstants.MEMBERS_IS_USER, "true"));
 		try {
-			Long count = RodaCoreFactory.getIndexService().count(User.class, filter);
+			Long count = RodaCoreFactory.getIndexService().count(RODAMember.class, filter);
 			if (count == 1) {
 				exist = true;
 			} else {

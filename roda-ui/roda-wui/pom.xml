@@ -112,10 +112,6 @@
 		</dependency>
 		<dependency>
 			<groupId>pt.gov.dgarq.roda</groupId>
-			<artifactId>roda-migrator-client</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>pt.gov.dgarq.roda</groupId>
 			<artifactId>roda-common-convert-db</artifactId>
 		</dependency>
 		<dependency>
@@ -127,20 +123,6 @@
 		<dependency>
 			<groupId>pt.gov.dgarq.roda</groupId>
 			<artifactId>roda-common-data</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>pt.gov.dgarq.roda</groupId>
-			<artifactId>roda-common-sip-utility</artifactId>
-			<exclusions>
-				<exclusion>
-					<artifactId>saxon</artifactId>
-					<groupId>net.sf.saxon</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>saxon-dom</artifactId>
-					<groupId>net.sf.saxon</groupId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>pt.gov.dgarq.roda</groupId>
@@ -244,14 +226,22 @@
 					<artifactId>*</artifactId>
 					<groupId>org.eclipse.jetty</groupId>
 				</exclusion>
+
+				<exclusion>
+					<artifactId>saxon</artifactId>
+					<groupId>net.sf.saxon</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>saxon-dom</artifactId>
+					<groupId>net.sf.saxon</groupId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.bytebybyte.gwt</groupId>
 			<artifactId>fontawesome-lib</artifactId>
-			<version>4.3.0</version>
 		</dependency>
-		
+
 	</dependencies>
 	<build>
 		<pluginManagement>

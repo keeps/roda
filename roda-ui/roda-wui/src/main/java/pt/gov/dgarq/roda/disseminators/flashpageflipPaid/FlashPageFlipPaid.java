@@ -4,42 +4,30 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.transaction.util.FileHelper;
 import org.apache.log4j.Logger;
 import org.apache.log4j.lf5.util.StreamUtils;
 
-import pt.gov.dgarq.roda.common.RodaClientFactory;
-import pt.gov.dgarq.roda.core.RODAClient;
-import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
 import pt.gov.dgarq.roda.core.common.BrowserException;
 import pt.gov.dgarq.roda.core.common.LoginException;
 import pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException;
 import pt.gov.dgarq.roda.core.common.RODAClientException;
-import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.data.RepresentationObject;
-import pt.gov.dgarq.roda.core.data.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.disseminators.common.UnsupportedContentModel;
 import pt.gov.dgarq.roda.disseminators.common.cache.Cache;
 import pt.gov.dgarq.roda.disseminators.common.cache.CacheController;
 import pt.gov.dgarq.roda.disseminators.flashpageflipFree.FlashPageFlipFree;
 import pt.gov.dgarq.roda.disseminators.simpleviewer.SimpleViewer;
-import pt.gov.dgarq.roda.migrator.MigratorClient;
-import pt.gov.dgarq.roda.migrator.MigratorClientException;
-import pt.gov.dgarq.roda.migrator.common.ConverterException;
-import pt.gov.dgarq.roda.migrator.stubs.SynchronousConverter;
 
 /**
  * Servlet implementation class for Servlet: FlashPageFlipPaid
@@ -58,7 +46,7 @@ public class FlashPageFlipPaid extends javax.servlet.http.HttpServlet implements
 
 	private final Map<String, String> resources;
 
-	private final MigratorClient migratorClient;
+	// private final MigratorClient migratorClient;
 	private final String dwMigratorUrl;
 	private final String pdfMigratorUrl;
 
@@ -88,11 +76,13 @@ public class FlashPageFlipPaid extends javax.servlet.http.HttpServlet implements
 				.put("/mp3/silent.mp3",
 						"/pt/gov/dgarq/roda/disseminators/flashpageflipPaid/mp3/silent.mp3");
 
-		migratorClient = new MigratorClient();
-		dwMigratorUrl = RodaClientFactory.getRodaProperties().getProperty(
-				"roda.disseminators.flashpageflip.digitalizedwork.migrator");
-		pdfMigratorUrl = RodaClientFactory.getRodaProperties().getProperty(
-				"roda.disseminators.flashpageflip.pdf.migrator");
+		// migratorClient = new MigratorClient();
+		// dwMigratorUrl = RodaClientFactory.getRodaProperties().getProperty(
+		// "roda.disseminators.flashpageflip.digitalizedwork.migrator");
+		// pdfMigratorUrl = RodaClientFactory.getRodaProperties().getProperty(
+		// "roda.disseminators.flashpageflip.pdf.migrator");
+		dwMigratorUrl = null;
+		pdfMigratorUrl = null;
 
 		cacheController = new CacheController(DISSEMINATOR_NAME,
 				"FlashPageFlipPaid") {
@@ -185,17 +175,17 @@ public class FlashPageFlipPaid extends javax.servlet.http.HttpServlet implements
 			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e
 					.getMessage());
 		} catch (NoSuchRODAObjectException e) {
-			try {
-				logger.error("Object does not exist, user="
-						+ RodaClientFactory.getRodaClient(request.getSession())
-								.getUsername(), e);
-			} catch (Exception e1) {
-				logger
-						.error("Object does not exist, and could not get user",
-								e);
-				logger.error("Object does not exist, and could not get user",
-						e1);
-			}
+			// try {
+			// logger.error("Object does not exist, user="
+			// + RodaClientFactory.getRodaClient(request.getSession())
+			// .getUsername(), e);
+			// } catch (Exception e1) {
+			// logger
+			// .error("Object does not exist, and could not get user",
+			// e);
+			// logger.error("Object does not exist, and could not get user",
+			// e1);
+			// }
 			response
 					.sendError(HttpServletResponse.SC_NOT_FOUND, e.getMessage());
 		} catch (BrowserException e) {
@@ -207,16 +197,16 @@ public class FlashPageFlipPaid extends javax.servlet.http.HttpServlet implements
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e
 					.getMessage());
 		} catch (RemoteException e) {
-			RODAException exception = RODAClient.parseRemoteException(e);
-			if (exception instanceof AuthorizationDeniedException) {
-				response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
-						exception.getMessage());
-			} else {
-				logger.error("RODA Exception", e);
-				response.sendError(
-						HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e
-								.getMessage());
-			}
+			// RODAException exception = RODAClient.parseRemoteException(e);
+			// if (exception instanceof AuthorizationDeniedException) {
+			// response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+			// exception.getMessage());
+			// } else {
+			// logger.error("RODA Exception", e);
+			// response.sendError(
+			// HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e
+			// .getMessage());
+			// }
 
 		}
 	}
@@ -241,42 +231,46 @@ public class FlashPageFlipPaid extends javax.servlet.http.HttpServlet implements
 	public void createResources(HttpServletRequest request,
 			RepresentationObject rep, String cacheURL, File cache)
 			throws LoginException, RODAClientException,
-			MigratorClientException, UnsupportedContentModel,
-			ConverterException, IOException {
+//			MigratorClientException, UnsupportedContentModel,
+//			ConverterException, 
+			IOException {
 
 		if (cache.canWrite()) {
 			// clear resources
 			cache.delete();
 			cache.mkdir();
 
-			// Convert representation
-			RODAClient rodaClient = RodaClientFactory.getRodaClient(request
-					.getSession());
-			SynchronousConverter service;
-			if (rep.getType().equals(RepresentationObject.DIGITALIZED_WORK)) {
-				service = migratorClient.getSynchronousConverterService(
-						dwMigratorUrl, rodaClient.getCup() ,rodaClient.getCasUtility());
-			} else if (rep.getType().equals(RepresentationObject.STRUCTURED_TEXT) || rep.getType().equals(RepresentationObject.PRESENTATION)) {
-				service = migratorClient.getSynchronousConverterService(
-						pdfMigratorUrl, rodaClient.getCup(),rodaClient.getCasUtility());
-			} else {
-				logger.error("Unsuported representation type: "
-						+ rep.getContentModel());
-				throw new UnsupportedContentModel("" + rep.getContentModel());
-			}
-
-			RepresentationObject converted = service.convert(rep)
-					.getRepresentation();
-
-			// Download converted representation
-			migratorClient.writeRepresentationObject(converted, cache);
-
-			// Move F0.xml to xml/Pages.xml
-			File xmlFolder = new File(cache, "xml");
-			xmlFolder.mkdir();
-			File f0 = new File(cache, "F0.xml");
-			File pages = new File(xmlFolder, "Pages.xml");
-			FileUtils.moveFile(f0, pages);
+			// // Convert representation
+			// RODAClient rodaClient = RodaClientFactory.getRodaClient(request
+			// .getSession());
+			// SynchronousConverter service;
+			// if (rep.getType().equals(RepresentationObject.DIGITALIZED_WORK))
+			// {
+			// service = migratorClient.getSynchronousConverterService(
+			// dwMigratorUrl, rodaClient.getCup() ,rodaClient.getCasUtility());
+			// } else if
+			// (rep.getType().equals(RepresentationObject.STRUCTURED_TEXT) ||
+			// rep.getType().equals(RepresentationObject.PRESENTATION)) {
+			// service = migratorClient.getSynchronousConverterService(
+			// pdfMigratorUrl, rodaClient.getCup(),rodaClient.getCasUtility());
+			// } else {
+			// logger.error("Unsuported representation type: "
+			// + rep.getContentModel());
+			// throw new UnsupportedContentModel("" + rep.getContentModel());
+			// }
+			//
+			// RepresentationObject converted = service.convert(rep)
+			// .getRepresentation();
+			//
+			// // Download converted representation
+			// migratorClient.writeRepresentationObject(converted, cache);
+			//
+			// // Move F0.xml to xml/Pages.xml
+			// File xmlFolder = new File(cache, "xml");
+			// xmlFolder.mkdir();
+			// File f0 = new File(cache, "F0.xml");
+			// File pages = new File(xmlFolder, "Pages.xml");
+			// FileUtils.moveFile(f0, pages);
 
 		} else {
 			logger.error("Cannot write to cache");
@@ -294,21 +288,22 @@ public class FlashPageFlipPaid extends javax.servlet.http.HttpServlet implements
 
 		index = new String(StreamUtils.getBytes(indexTemplate));
 
-		String title;
-		try {
-			SimpleDescriptionObject sdo = RodaClientFactory.getRodaClient(
-					request.getSession()).getBrowserService()
-					.getSimpleDescriptionObject(rep.getDescriptionObjectPID());
-			title = sdo.getTitle();
-		} catch (Exception e) {
-			title = "";
-		}
-
-		index = index.replaceAll("\\@TITLE", Matcher.quoteReplacement(title));
-		PrintWriter printer = new PrintWriter(response.getOutputStream());
-		printer.write(index);
-		printer.flush();
-		printer.close();
+		// String title;
+		// try {
+		// SimpleDescriptionObject sdo = RodaClientFactory.getRodaClient(
+		// request.getSession()).getBrowserService()
+		// .getSimpleDescriptionObject(rep.getDescriptionObjectPID());
+		// title = sdo.getTitle();
+		// } catch (Exception e) {
+		// title = "";
+		// }
+		//
+		// index = index.replaceAll("\\@TITLE",
+		// Matcher.quoteReplacement(title));
+		// PrintWriter printer = new PrintWriter(response.getOutputStream());
+		// printer.write(index);
+		// printer.flush();
+		// printer.close();
 
 	}
 }

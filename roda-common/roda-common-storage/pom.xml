@@ -41,6 +41,7 @@
 			<version>${fcrepo.version}</version>
 		</dependency>
 		<dependency>
+			<!-- available at artifactory.keep.pt -->
 			<groupId>org.fcrepo</groupId>
 			<artifactId>fcrepo-client-impl</artifactId>
 			<version>${fcrepo.version}-hsilva-datastream-fixes</version>
@@ -305,10 +306,6 @@
 		<dependency>
 			<groupId>org.apache.directory.server</groupId>
 			<artifactId>apacheds-all</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
 		</dependency>
 		<!-- fixes for ldp-testsuite convergence problems -->
 		<dependency>

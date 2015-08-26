@@ -12,14 +12,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.jboss.web.php.Handler;
 
-import pt.gov.dgarq.roda.common.RodaClientFactory;
-import pt.gov.dgarq.roda.core.RODAClient;
-import pt.gov.dgarq.roda.core.common.BrowserException;
-import pt.gov.dgarq.roda.core.common.LoginException;
-import pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException;
-import pt.gov.dgarq.roda.core.common.RODAClientException;
-import pt.gov.dgarq.roda.core.stubs.Browser;
-
 /**
  * @author Rui Castro
  * @author Luis Faria
@@ -60,35 +52,35 @@ public class PhpMyAdminHandler extends Handler {
 			super.service(request, response);
 		} else {
 			String pid = db.replace("_", ":");
-			try {
-
-				RODAClient rodaClient = RodaClientFactory.getRodaClient(request
-						.getSession());
-				Browser browserService = rodaClient.getBrowserService();
-
-				browserService.getSimpleRepresentationObject(pid);
-
-				super.service(request, response);
-
-			} catch (RODAClientException e) {
-				response.sendError(
-						HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e
-								.getMessage());
-				response.flushBuffer();
-			} catch (BrowserException e) {
-				response.sendError(
-						HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e
-								.getMessage());
-				response.flushBuffer();
-			} catch (LoginException e) {
-				response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e
-						.getMessage());
-				response.flushBuffer();
-			} catch (NoSuchRODAObjectException e) {
-				response.sendError(HttpServletResponse.SC_NOT_FOUND, e
-						.getMessage());
-				response.flushBuffer();
-			}
+			// try {
+			//
+			// RODAClient rodaClient = RodaClientFactory.getRodaClient(request
+			// .getSession());
+			// Browser browserService = rodaClient.getBrowserService();
+			//
+			// browserService.getSimpleRepresentationObject(pid);
+			//
+			// super.service(request, response);
+			//
+			// } catch (RODAClientException e) {
+			// response.sendError(
+			// HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e
+			// .getMessage());
+			// response.flushBuffer();
+			// } catch (BrowserException e) {
+			// response.sendError(
+			// HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e
+			// .getMessage());
+			// response.flushBuffer();
+			// } catch (LoginException e) {
+			// response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e
+			// .getMessage());
+			// response.flushBuffer();
+			// } catch (NoSuchRODAObjectException e) {
+			// response.sendError(HttpServletResponse.SC_NOT_FOUND, e
+			// .getMessage());
+			// response.flushBuffer();
+			// }
 
 		}
 

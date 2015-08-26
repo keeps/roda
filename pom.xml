@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<name>RODA - Repositório de Objetos Digitais Autênticos</name>
 	<url>http://roda.keep.pt/</url>
@@ -187,10 +188,10 @@
 		<profile>
 			<id>wui</id>
 			<modules>
-				<module>roda-common</module>
-				<module>roda-client</module>
-				<module>roda-migrator</module>
-				<module>roda-core/roda-core-plugins</module>
+				<module>roda-common/roda-common-content-adapter</module>
+				<module>roda-common/roda-common-data</module>
+				<module>roda-common/roda-common-storage</module>
+				<module>roda-common/roda-common-servlet-security</module>
 				<module>roda-ui/roda-wui</module>
 			</modules>
 		</profile>
@@ -532,6 +533,11 @@
 				<groupId>com.toedter</groupId>
 				<artifactId>jcalendar</artifactId>
 				<version>1.3.2</version>
+			</dependency>
+			<dependency>
+				<groupId>com.bytebybyte.gwt</groupId>
+				<artifactId>fontawesome-lib</artifactId>
+				<version>4.3.0</version>
 			</dependency>
 			<dependency>
 				<groupId>javax.activation</groupId>

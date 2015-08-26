@@ -17,7 +17,7 @@ import pt.gov.dgarq.roda.core.common.UserManagementException;
 import pt.gov.dgarq.roda.core.data.PluginParameter;
 import pt.gov.dgarq.roda.core.data.Producers;
 import pt.gov.dgarq.roda.core.data.SIPState;
-import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.core.ingest.IngestRegistryException;
 import pt.gov.dgarq.roda.core.ingest.IngestTask;
 import pt.gov.dgarq.roda.core.ingest.IngestTaskResult;

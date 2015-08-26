@@ -7,7 +7,7 @@ import org.apache.log4j.Logger;
 import pt.gov.dgarq.roda.core.data.SearchParameter;
 import pt.gov.dgarq.roda.core.data.SearchResult;
 import pt.gov.dgarq.roda.core.data.SearchResultObject;
-import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.core.data.search.DateRangeSearchParameter;
 import pt.gov.dgarq.roda.core.data.search.DefaultSearchParameter;
 

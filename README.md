@@ -57,4 +57,3 @@ To start developing for RODA check the [Developer guide](https://github.com/keep
 4. [How to contribute](https://github.com/keeps/roda/wiki/Developer-guide#-how-to-contribute)
 
 [![Build Status](https://travis-ci.org/keeps/roda.png?branch=master)](https://travis-ci.org/keeps/roda)
-[![Build Status](https://codeship.com/projects/97131/status?branch=master)](https://codeship.com/projects/97131)

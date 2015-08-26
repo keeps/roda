@@ -20,7 +20,7 @@ import pt.gov.dgarq.roda.core.data.PluginParameter;
 import pt.gov.dgarq.roda.core.data.Report;
 import pt.gov.dgarq.roda.core.data.ReportItem;
 import pt.gov.dgarq.roda.core.data.SimpleDescriptionObject;
-import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
 import pt.gov.dgarq.roda.core.plugins.AbstractPlugin;
 import pt.gov.dgarq.roda.core.plugins.Plugin;

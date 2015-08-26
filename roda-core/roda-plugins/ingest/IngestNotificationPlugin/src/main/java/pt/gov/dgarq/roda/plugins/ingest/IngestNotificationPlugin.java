@@ -31,7 +31,7 @@ import pt.gov.dgarq.roda.core.data.PluginParameter;
 import pt.gov.dgarq.roda.core.data.Report;
 import pt.gov.dgarq.roda.core.data.SIPState;
 import pt.gov.dgarq.roda.core.data.SIPStateTransition;
-import pt.gov.dgarq.roda.core.data.User;
+import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.DateRangeFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;

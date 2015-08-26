@@ -1,35 +1,25 @@
 package pt.gov.dgarq.roda.wui.management.event.server;
 
-import java.rmi.RemoteException;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.MissingResourceException;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
 import org.w3c.util.DateParser;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import config.i18n.server.EventManagementMessages;
-import pt.gov.dgarq.roda.common.RodaClientFactory;
-import pt.gov.dgarq.roda.core.RODAClient;
 import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.data.PluginInfo;
 import pt.gov.dgarq.roda.core.data.PluginParameter;
 import pt.gov.dgarq.roda.core.data.Task;
 import pt.gov.dgarq.roda.core.data.TaskInstance;
+import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.wui.common.client.PrintReportException;
-import pt.gov.dgarq.roda.wui.common.server.ReportContentSource;
-import pt.gov.dgarq.roda.wui.common.server.ReportDownload;
 import pt.gov.dgarq.roda.wui.common.server.ServerTools;
 import pt.gov.dgarq.roda.wui.management.event.client.EventManagementService;
 
@@ -91,92 +81,97 @@ public class EventManagementServiceImpl extends RemoteServiceServlet implements 
 
 	public Task addTask(Task task) throws RODAException {
 		Task addedTask;
-		try {
-			if (task.getStartDate() == null) {
-				task.setStartDate(new Date());
-			}
-			logger.debug("Adding task: " + task);
-			addedTask = RodaClientFactory.getRodaClient(getThreadLocalRequest().getSession()).getSchedulerService()
-					.addTask(task);
-		} catch (RemoteException e) {
-			logger.error("Remote Exception", e);
-			throw RODAClient.parseRemoteException(e);
-		}
+		// try {
+		// if (task.getStartDate() == null) {
+		// task.setStartDate(new Date());
+		// }
+		// logger.debug("Adding task: " + task);
+		// addedTask =
+		// RodaClientFactory.getRodaClient(getThreadLocalRequest().getSession()).getSchedulerService()
+		// .addTask(task);
+		// } catch (RemoteException e) {
+		// logger.error("Remote Exception", e);
+		// throw RODAClient.parseRemoteException(e);
+		// }
 
-		return addedTask;
+		return null;
 	}
 
 	public Task modifyTask(Task task) throws RODAException {
 		Task modifiedTask;
-		try {
-			if (task.getStartDate() == null) {
-				task.setStartDate(new Date());
-			}
-			modifiedTask = RodaClientFactory.getRodaClient(getThreadLocalRequest().getSession()).getSchedulerService()
-					.modifyTask(task);
-		} catch (RemoteException e) {
-			logger.error("Remote Exception", e);
-			throw RODAClient.parseRemoteException(e);
-		}
-		return modifiedTask;
+		// try {
+		// if (task.getStartDate() == null) {
+		// task.setStartDate(new Date());
+		// }
+		// modifiedTask =
+		// RodaClientFactory.getRodaClient(getThreadLocalRequest().getSession()).getSchedulerService()
+		// .modifyTask(task);
+		// } catch (RemoteException e) {
+		// logger.error("Remote Exception", e);
+		// throw RODAClient.parseRemoteException(e);
+		// }
+		return null;
 
 	}
 
 	public void removeTask(String taskId) throws RODAException {
-		try {
-			RodaClientFactory.getRodaClient(getThreadLocalRequest().getSession()).getSchedulerService()
-					.removeTask(taskId);
-		} catch (RemoteException e) {
-			logger.error("Remote Exception", e);
-			throw RODAClient.parseRemoteException(e);
-		}
+		// try {
+		// RodaClientFactory.getRodaClient(getThreadLocalRequest().getSession()).getSchedulerService()
+		// .removeTask(taskId);
+		// } catch (RemoteException e) {
+		// logger.error("Remote Exception", e);
+		// throw RODAClient.parseRemoteException(e);
+		// }
 	}
 
 	public Task pauseTask(String taskId) throws RODAException {
 		Task ret = null;
-		try {
-			ret = RodaClientFactory.getRodaClient(getThreadLocalRequest().getSession()).getSchedulerService()
-					.pauseTask(taskId);
-		} catch (RemoteException e) {
-			logger.error("Remote Exception", e);
-			throw RODAClient.parseRemoteException(e);
-		}
+		// try {
+		// ret =
+		// RodaClientFactory.getRodaClient(getThreadLocalRequest().getSession()).getSchedulerService()
+		// .pauseTask(taskId);
+		// } catch (RemoteException e) {
+		// logger.error("Remote Exception", e);
+		// throw RODAClient.parseRemoteException(e);
+		// }
 		return ret;
 	}
 
 	public Task resumeTask(String taskId) throws RODAException {
 		Task ret = null;
-		try {
-			ret = RodaClientFactory.getRodaClient(getThreadLocalRequest().getSession()).getSchedulerService()
-					.resumeTask(taskId);
-		} catch (RemoteException e) {
-			logger.error("Remote Exception", e);
-			throw RODAClient.parseRemoteException(e);
-		}
+		// try {
+		// ret =
+		// RodaClientFactory.getRodaClient(getThreadLocalRequest().getSession()).getSchedulerService()
+		// .resumeTask(taskId);
+		// } catch (RemoteException e) {
+		// logger.error("Remote Exception", e);
+		// throw RODAClient.parseRemoteException(e);
+		// }
 		return ret;
 	}
 
 	public PluginInfo[] getPlugins() throws RODAException {
-		PluginInfo[] plugins;
-		try {
-			plugins = RodaClientFactory.getRodaClient(getThreadLocalRequest().getSession()).getPluginsService()
-					.getPluginsInfo();
-			if (plugins == null) {
-				plugins = new PluginInfo[] {};
-			}
-
-			Arrays.sort(plugins, new Comparator<PluginInfo>() {
-
-				public int compare(PluginInfo o1, PluginInfo o2) {
-					return o1.getName().compareTo(o2.getName());
-				}
-
-			});
-		} catch (RemoteException e) {
-			logger.error("Remote Exception", e);
-			throw RODAClient.parseRemoteException(e);
-		}
-		return plugins;
+		// PluginInfo[] plugins;
+		// try {
+		// plugins =
+		// RodaClientFactory.getRodaClient(getThreadLocalRequest().getSession()).getPluginsService()
+		// .getPluginsInfo();
+		// if (plugins == null) {
+		// plugins = new PluginInfo[] {};
+		// }
+		//
+		// Arrays.sort(plugins, new Comparator<PluginInfo>() {
+		//
+		// public int compare(PluginInfo o1, PluginInfo o2) {
+		// return o1.getName().compareTo(o2.getName());
+		// }
+		//
+		// });
+		// } catch (RemoteException e) {
+		// logger.error("Remote Exception", e);
+		// throw RODAClient.parseRemoteException(e);
+		// }
+		return null;
 	}
 
 	public int getTaskInstanceCount(Filter filter) throws RODAException {
@@ -219,13 +214,15 @@ public class EventManagementServiceImpl extends RemoteServiceServlet implements 
 	}
 
 	public TaskInstance getTaskInstance(String taskInstanceId) throws RODAException {
-		try {
-			return RodaClientFactory.getRodaClient(getThreadLocalRequest().getSession()).getSchedulerService()
-					.getTaskInstance(taskInstanceId);
-		} catch (RemoteException e) {
-			logger.error("Remote Exception", e);
-			throw RODAClient.parseRemoteException(e);
-		}
+		// try {
+		// return
+		// RodaClientFactory.getRodaClient(getThreadLocalRequest().getSession()).getSchedulerService()
+		// .getTaskInstance(taskInstanceId);
+		// } catch (RemoteException e) {
+		// logger.error("Remote Exception", e);
+		// throw RODAClient.parseRemoteException(e);
+		// }
+		return null;
 	}
 
 	public void setTaskListReportInfo(ContentAdapter adapter, String localeString) throws PrintReportException {

@@ -17,7 +17,6 @@ import org.w3c.util.DateParser;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import config.i18n.server.StatisticsListReportMessages;
-import pt.gov.dgarq.roda.common.RodaClientFactory;
 import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.data.StatisticData;
 import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
@@ -25,7 +24,6 @@ import pt.gov.dgarq.roda.core.data.adapter.filter.DateRangeFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
-import pt.gov.dgarq.roda.core.stubs.StatisticsMonitor;
 import pt.gov.dgarq.roda.wui.common.client.PrintReportException;
 import pt.gov.dgarq.roda.wui.common.server.ServerTools;
 import pt.gov.dgarq.roda.wui.management.statistics.client.Segmentation;
@@ -50,7 +48,8 @@ public class StatisticsServiceImpl extends RemoteServiceServlet implements Stati
 	}
 
 	public int getStatisticCount(Filter filter, HttpSession session) throws RODAException {
-		StatisticsMonitor statistics = RodaClientFactory.getRodaClient(session).getStatisticsMonitorService();
+		// StatisticsMonitor statistics =
+		// RodaClientFactory.getRodaClient(session).getStatisticsMonitorService();
 		int count;
 		// try {
 		// TODO move to new implementation
@@ -69,7 +68,8 @@ public class StatisticsServiceImpl extends RemoteServiceServlet implements Stati
 	}
 
 	public List<StatisticData> getStatisticList(ContentAdapter adapter, HttpSession session) throws RODAException {
-		StatisticsMonitor statistics = RodaClientFactory.getRodaClient(session).getStatisticsMonitorService();
+		// StatisticsMonitor statistics =
+		// RodaClientFactory.getRodaClient(session).getStatisticsMonitorService();
 
 		StatisticData[] data;
 		// try {

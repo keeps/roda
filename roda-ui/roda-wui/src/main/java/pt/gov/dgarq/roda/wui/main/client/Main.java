@@ -25,7 +25,6 @@ import com.google.gwt.user.client.ui.Widget;
 import config.i18n.client.LanguageSwitcherPanel;
 import config.i18n.client.MainConstants;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
-import pt.gov.dgarq.roda.wui.common.client.ClientLoggerService;
 import pt.gov.dgarq.roda.wui.common.client.tools.DescriptionLevelUtils;
 import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
 import pt.gov.dgarq.roda.wui.home.client.Home;

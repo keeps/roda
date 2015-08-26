@@ -1,7 +1,6 @@
 package pt.gov.dgarq.roda.disseminators.common.cache;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.rmi.RemoteException;
@@ -13,10 +12,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.transaction.util.FileHelper;
 import org.apache.log4j.Logger;
 
-import pt.gov.dgarq.roda.common.RodaClientFactory;
 import pt.gov.dgarq.roda.core.common.BrowserException;
 import pt.gov.dgarq.roda.core.common.LoginException;
 import pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException;
@@ -39,8 +36,8 @@ public class Cache extends HttpServlet implements Servlet {
 
 	private static File getCacheDir() {
 		if (cacheDir == null) {
-			cacheDir = new File(RodaClientFactory.getRodaProperties()
-					.getProperty("roda.disseminators.cache.path"));
+			// cacheDir = new File(RodaClientFactory.getRodaProperties()
+			// .getProperty("roda.disseminators.cache.path"));
 		}
 		return cacheDir;
 	}
@@ -247,37 +244,37 @@ public class Cache extends HttpServlet implements Servlet {
 			}
 			logger.info("pid=" + pid + " disseminator=" + disseminator
 					+ " relative path=" + relativePath);
-			try {
-				// test if current user has access permissions
-				RodaClientFactory.getRodaClient(request.getSession())
-						.getBrowserService().getRepresentationObject(pid);
-
-				File cacheFile = getCacheFile(pid, disseminator);
-				File resource = new File(cacheFile.getAbsolutePath()
-						+ relativePath);
-				if (resource.exists()) {
-					response.setContentLength((int) resource.length());
-					FileHelper.copy(new FileInputStream(resource), response
-							.getOutputStream());
-				} else {
-					response.sendError(HttpServletResponse.SC_NOT_FOUND);
-				}
-
-			} catch (LoginException e) {
-				logger.error("Login Exception", e);
-				response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-			} catch (NoSuchRODAObjectException e) {
-				logger.error("Login Exception", e);
-				response.sendError(HttpServletResponse.SC_NOT_FOUND);
-			} catch (BrowserException e) {
-				logger.error("Browser Exception", e);
-				response
-						.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			} catch (RODAClientException e) {
-				logger.error("RODA Client Exception", e);
-				response
-						.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			}
+			// try {
+			// // test if current user has access permissions
+			// RodaClientFactory.getRodaClient(request.getSession())
+			// .getBrowserService().getRepresentationObject(pid);
+			//
+			// File cacheFile = getCacheFile(pid, disseminator);
+			// File resource = new File(cacheFile.getAbsolutePath()
+			// + relativePath);
+			// if (resource.exists()) {
+			// response.setContentLength((int) resource.length());
+			// FileHelper.copy(new FileInputStream(resource), response
+			// .getOutputStream());
+			// } else {
+			// response.sendError(HttpServletResponse.SC_NOT_FOUND);
+			// }
+			//
+			// } catch (LoginException e) {
+			// logger.error("Login Exception", e);
+			// response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+			// } catch (NoSuchRODAObjectException e) {
+			// logger.error("Login Exception", e);
+			// response.sendError(HttpServletResponse.SC_NOT_FOUND);
+			// } catch (BrowserException e) {
+			// logger.error("Browser Exception", e);
+			// response
+			// .sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			// } catch (RODAClientException e) {
+			// logger.error("RODA Client Exception", e);
+			// response
+			// .sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			// }
 		} else {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 		}

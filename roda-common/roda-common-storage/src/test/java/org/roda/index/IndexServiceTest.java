@@ -5,14 +5,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
@@ -20,13 +19,17 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.apache.commons.configuration.BaseConfiguration;
+import org.apache.commons.configuration.Configuration;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.hamcrest.Matchers;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.roda.CorporaConstants;
+import org.roda.common.ApacheDS;
 import org.roda.common.RodaUtils;
+import org.roda.common.UserUtility;
 import org.roda.model.AIP;
 import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
@@ -52,8 +55,6 @@ import pt.gov.dgarq.roda.core.data.v2.LogEntryParameter;
 import pt.gov.dgarq.roda.core.data.v2.RODAMember;
 import pt.gov.dgarq.roda.core.data.v2.RODAObject;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
-import pt.gov.dgarq.roda.core.data.v2.RodaGroup;
-import pt.gov.dgarq.roda.core.data.v2.RodaUser;
 import pt.gov.dgarq.roda.core.data.v2.SIPReport;
 import pt.gov.dgarq.roda.core.data.v2.SIPStateTransition;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
@@ -73,10 +74,12 @@ public class IndexServiceTest {
 	private static Path corporaPath;
 	private static StorageService corporaService;
 
+	private static ApacheDS apacheDS;
+
 	private static final Logger logger = LoggerFactory.getLogger(ModelServiceTest.class);
 
 	@BeforeClass
-	public static void setUp() throws IOException, StorageServiceException, URISyntaxException, ModelServiceException {
+	public static void setUp() throws Exception {
 
 		basePath = Files.createTempDirectory("modelTests");
 		logPath = basePath.resolve("log");
@@ -110,11 +113,46 @@ public class IndexServiceTest {
 		corporaPath = Paths.get(corporaURL.toURI());
 		corporaService = new FileStorageService(corporaPath);
 
+		// set of properties that will most certainly be in a default roda
+		// installation
+		Configuration rodaConfig = setAndRetrieveRodaProperties();
+
+		// start ApacheDS
+		apacheDS = new ApacheDS();
+		Files.createDirectories(basePath.resolve("ldapData"));
+		Path ldapConfigs = Paths.get(IndexServiceTest.class.getResource("/ldap/config/").toURI());
+		apacheDS.initDirectoryService(ldapConfigs, basePath.resolve("ldapData"));
+		apacheDS.startServer(rodaConfig);
+		for (User user : UserUtility.getLdapUtility().getUsers(new Filter())) {
+			model.addUser(user, false, true);
+		}
+		for (Group group : UserUtility.getLdapUtility().getGroups(new Filter())) {
+			model.addGroup(group, false, true);
+		}
+
 		logger.debug("Running model test under storage: " + basePath);
 	}
 
+	private static Configuration setAndRetrieveRodaProperties() {
+		Configuration rodaConfig = new BaseConfiguration();
+		rodaConfig.addProperty("ldapHost", "localhost");
+		rodaConfig.addProperty("ldapPort", "10389");
+		rodaConfig.addProperty("ldapPeopleDN", "ou=users\\,dc=roda\\,dc=org");
+		rodaConfig.addProperty("ldapGroupsDN", "ou=groups\\,dc=roda\\,dc=org");
+		rodaConfig.addProperty("ldapRolesDN", "ou=roles\\,dc=roda\\,dc=org");
+		rodaConfig.addProperty("ldapAdminDN", "uid=admin\\,ou=system");
+		rodaConfig.addProperty("ldapAdminPassword", "secret");
+		rodaConfig.addProperty("ldapPasswordDigestAlgorithm", "MD5");
+		rodaConfig.addProperty("ldapProtectedUsers",
+				Arrays.asList("admin", "guest", "roda-ingest-task", "roda-wui", "roda-disseminator"));
+		rodaConfig.addProperty("ldapProtectedGroups",
+				Arrays.asList("administrators", "archivists", "producers", "users", "guests"));
+		return rodaConfig;
+	}
+
 	@AfterClass
-	public static void tearDown() throws StorageServiceException {
+	public static void tearDown() throws Exception {
+		apacheDS.stop();
 		FSUtils.deletePath(basePath);
 		FSUtils.deletePath(indexPath);
 	}
@@ -549,17 +587,15 @@ public class IndexServiceTest {
 
 	}
 
-	
-	
 	@Test
-	public void indexMembers() throws IndexServiceException, ModelServiceException{
+	public void indexMembers() throws IndexServiceException, ModelServiceException {
 		Set<String> groups = new HashSet<String>();
-		groups.add("admin");
+		groups.add("administrators");
 		Set<String> roles = new HashSet<String>();
 		roles.add("browse");
-		
-		for(int i=0;i<5;i++){
-			if(i%2==0){
+
+		for (int i = 0; i < 5; i++) {
+			if (i % 2 == 0) {
 				User user = new User();
 				user.setActive(true);
 				user.setAllGroups(groups);
@@ -568,29 +604,33 @@ public class IndexServiceTest {
 				user.setDirectRoles(roles);
 				user.setEmail("mail@example.com");
 				user.setGuest(false);
-				user.setId("USER"+i);
-				user.setName("NAMEUSER");
-				model.addUser(user,true,true);
-			}else{
+				user.setId("USER" + i);
+				user.setName("NAMEUSER" + i);
+				user.setFullName("NAMEUSER" + i);
+				model.addUser(user, true, true);
+			} else {
 				Group group = new Group();
 				group.setActive(true);
 				group.setAllGroups(groups);
 				group.setAllRoles(roles);
 				group.setDirectGroups(groups);
 				group.setDirectRoles(roles);
-				group.setId("GROUP"+i);
-				group.setName("NAMEGROUP");
-				model.addGroup(group,true,true);
+				group.setId("GROUP" + i);
+				group.setName("NAMEGROUP" + i);
+				group.setFullName("NAMEGROUP" + i);
+				model.addGroup(group, true, true);
 			}
 		}
-		
+
 		Filter filterUSER1 = new Filter();
-		filterUSER1.add(new SimpleFilterParameter(RodaConstants.MEMBERS_NAME, "NAMEUSER"));
-		assertThat(index.count(User.class, filterUSER1), Matchers.is(3L));
-		
+		filterUSER1.add(new SimpleFilterParameter(RodaConstants.MEMBERS_NAME, "NAMEUSER0"));
+		filterUSER1.add(new SimpleFilterParameter(RodaConstants.MEMBERS_IS_USER, "true"));
+		assertThat(index.count(RODAMember.class, filterUSER1), Matchers.is(1L));
+
 		Filter filterGroup = new Filter();
-		filterGroup.add(new SimpleFilterParameter(RodaConstants.MEMBERS_NAME, "NAMEGROUP"));
-		assertThat(index.count(Group.class, filterGroup), Matchers.is(2L));
+		filterGroup.add(new SimpleFilterParameter(RodaConstants.MEMBERS_NAME, "NAMEGROUP1"));
+		filterGroup.add(new SimpleFilterParameter(RodaConstants.MEMBERS_IS_USER, "false"));
+		assertThat(index.count(RODAMember.class, filterGroup), Matchers.is(1L));
 
 	}
 }

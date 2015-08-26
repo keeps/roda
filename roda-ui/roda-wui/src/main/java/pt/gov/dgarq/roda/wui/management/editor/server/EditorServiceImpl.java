@@ -10,15 +10,15 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
-import java.util.TreeSet;
-import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 
-import pt.gov.dgarq.roda.common.RodaClientFactory;
-import pt.gov.dgarq.roda.core.RODAClient;
+import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+
+import pt.gov.dgarq.roda.common.RodaCoreFactory;
 import pt.gov.dgarq.roda.core.common.InvalidDescriptionLevel;
 import pt.gov.dgarq.roda.core.common.LoginException;
 import pt.gov.dgarq.roda.core.common.RODAClientException;
@@ -26,9 +26,6 @@ import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.common.UserManagementException;
 import pt.gov.dgarq.roda.core.data.DescriptionObject;
 import pt.gov.dgarq.roda.core.data.Producers;
-import pt.gov.dgarq.roda.core.data.v2.Group;
-import pt.gov.dgarq.roda.core.data.v2.RODAMember;
-import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.core.data.RODAObjectPermissions;
 import pt.gov.dgarq.roda.core.data.RODAObjectUserPermissions;
 import pt.gov.dgarq.roda.core.data.eadc.ArrangementTable;
@@ -41,13 +38,11 @@ import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevelManager;
 import pt.gov.dgarq.roda.core.data.eadc.EadCValue;
 import pt.gov.dgarq.roda.core.data.eadc.PhysdescElement;
 import pt.gov.dgarq.roda.core.data.eadc.Text;
-import pt.gov.dgarq.roda.core.stubs.Browser;
-import pt.gov.dgarq.roda.core.stubs.Editor;
-import pt.gov.dgarq.roda.core.stubs.UserBrowser;
+import pt.gov.dgarq.roda.core.data.v2.Group;
+import pt.gov.dgarq.roda.core.data.v2.RODAMember;
+import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.wui.management.editor.client.EditorService;
 import pt.gov.dgarq.roda.wui.management.editor.client.ObjectPermissions;
-
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 /**
  * Editor service implementation
@@ -65,7 +60,7 @@ public class EditorServiceImpl extends RemoteServiceServlet implements EditorSer
 	static {
 
 		Properties elementDefaults = new Properties();
-		InputStream relsStream = RodaClientFactory.getConfigurationFile("roda-element-defaults.properties");
+		InputStream relsStream = RodaCoreFactory.getConfigurationFile("roda-element-defaults.properties");
 		try {
 			elementDefaults.load(relsStream);
 			for (Entry<Object, Object> entry : elementDefaults.entrySet()) {
@@ -81,15 +76,16 @@ public class EditorServiceImpl extends RemoteServiceServlet implements EditorSer
 	}
 
 	public void saveEdition(DescriptionObject editedObject) throws RODAException {
-		try {
-			Editor editorService = RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
-					.getEditorService();
-			safeEncode(editedObject);
-			editorService.modifyDescriptionObject(editedObject);
-		} catch (RemoteException e) {
-			logger.error("Remote Exception", e);
-			throw RODAClient.parseRemoteException(e);
-		}
+		// try {
+		// Editor editorService =
+		// RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
+		// .getEditorService();
+		// safeEncode(editedObject);
+		// editorService.modifyDescriptionObject(editedObject);
+		// } catch (RemoteException e) {
+		// logger.error("Remote Exception", e);
+		// throw RODAClient.parseRemoteException(e);
+		// }
 	}
 
 	private void safeEncode(DescriptionObject object) {
@@ -161,21 +157,22 @@ public class EditorServiceImpl extends RemoteServiceServlet implements EditorSer
 	}
 
 	public String createCollection() throws RODAException {
-		String pid;
-		try {
-			Editor editorService = RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
-					.getEditorService();
-
-			DescriptionObject fonds = DEFAULT_DESCRIPTION_OBJECT;
-			fonds.setLevel(DescriptionLevelManager.getFirstRootDescriptionLevel());
-			fonds.setParentPID(null);
-
-			pid = editorService.createDescriptionObject(fonds);
-		} catch (RemoteException e) {
-			logger.error("Remote Exception", e);
-			throw RODAClient.parseRemoteException(e);
-		}
-		return pid;
+		// String pid;
+		// try {
+		// Editor editorService =
+		// RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
+		// .getEditorService();
+		//
+		// DescriptionObject fonds = DEFAULT_DESCRIPTION_OBJECT;
+		// fonds.setLevel(DescriptionLevelManager.getFirstRootDescriptionLevel());
+		// fonds.setParentPID(null);
+		//
+		// pid = editorService.createDescriptionObject(fonds);
+		// } catch (RemoteException e) {
+		// logger.error("Remote Exception", e);
+		// throw RODAClient.parseRemoteException(e);
+		// }
+		return null;
 	}
 
 	public String createChild(String parentPID, String parentLevel) throws RODAException {
@@ -191,80 +188,87 @@ public class EditorServiceImpl extends RemoteServiceServlet implements EditorSer
 		child.setLevel(newLevel);
 		child.setParentPID(parentPID);
 
-		try {
-			Editor editorService = RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
-					.getEditorService();
-			childPid = editorService.createDescriptionObject(child);
-		} catch (RemoteException e) {
-			logger.error("Remote Exception", e);
-			throw RODAClient.parseRemoteException(e);
-		}
-		return childPid;
+		// try {
+		// Editor editorService =
+		// RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
+		// .getEditorService();
+		// childPid = editorService.createDescriptionObject(child);
+		// } catch (RemoteException e) {
+		// logger.error("Remote Exception", e);
+		// throw RODAClient.parseRemoteException(e);
+		// }
+		return null;
 	}
 
 	public String clone(String pid) throws RODAException {
 		String clonePID;
 		DescriptionObject object;
-		try {
-			Browser browser = RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
-					.getBrowserService();
-			Editor editor = RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
-					.getEditorService();
-
-			object = browser.getDescriptionObject(pid);
-
-			// Append "*" to object id
-			object.setId(object.getId() + "*");
-
-			clonePID = editor.createDescriptionObject(object);
-		} catch (RemoteException e) {
-			logger.error("Remote Exception", e);
-			throw RODAClient.parseRemoteException(e);
-		}
-		return clonePID;
+		// try {
+		// Browser browser =
+		// RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
+		// .getBrowserService();
+		// Editor editor =
+		// RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
+		// .getEditorService();
+		//
+		// object = browser.getDescriptionObject(pid);
+		//
+		// // Append "*" to object id
+		// object.setId(object.getId() + "*");
+		//
+		// clonePID = editor.createDescriptionObject(object);
+		// } catch (RemoteException e) {
+		// logger.error("Remote Exception", e);
+		// throw RODAClient.parseRemoteException(e);
+		// }
+		return null;
 	}
 
 	public void moveElement(String pid, String parentPID) throws RODAException {
 		DescriptionObject object;
-		try {
-			Browser browser = RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
-					.getBrowserService();
-			Editor editor = RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
-					.getEditorService();
-
-			object = browser.getDescriptionObject(pid);
-
-			object.setParentPID(parentPID);
-
-			editor.modifyDescriptionObject(object);
-		} catch (RemoteException e) {
-			logger.error("Remote Exception", e);
-			throw RODAClient.parseRemoteException(e);
-		}
+		// try {
+		// Browser browser =
+		// RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
+		// .getBrowserService();
+		// Editor editor =
+		// RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
+		// .getEditorService();
+		//
+		// object = browser.getDescriptionObject(pid);
+		//
+		// object.setParentPID(parentPID);
+		//
+		// editor.modifyDescriptionObject(object);
+		// } catch (RemoteException e) {
+		// logger.error("Remote Exception", e);
+		// throw RODAClient.parseRemoteException(e);
+		// }
 	}
 
 	public void removeElement(String pid) throws RODAException {
-		try {
-			Editor editorService = RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
-					.getEditorService();
-			editorService.removeDescriptionObject(pid);
-		} catch (RemoteException e) {
-			logger.error("Remote Exception", e);
-			throw RODAClient.parseRemoteException(e);
-		}
+		// try {
+		// Editor editorService =
+		// RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
+		// .getEditorService();
+		// editorService.removeDescriptionObject(pid);
+		// } catch (RemoteException e) {
+		// logger.error("Remote Exception", e);
+		// throw RODAClient.parseRemoteException(e);
+		// }
 	}
 
 	public DescriptionLevel[] getPossibleLevels(String pid) throws RODAException {
 		DescriptionLevel[] ret;
-		try {
-			Editor editorService = RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
-					.getEditorService();
-			ret = editorService.getDOPossibleLevels(pid);
-		} catch (RemoteException e) {
-			logger.error("Remote Exception", e);
-			throw RODAClient.parseRemoteException(e);
-		}
-		return ret;
+		// try {
+		// Editor editorService =
+		// RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
+		// .getEditorService();
+		// ret = editorService.getDOPossibleLevels(pid);
+		// } catch (RemoteException e) {
+		// logger.error("Remote Exception", e);
+		// throw RODAClient.parseRemoteException(e);
+		// }
+		return null;
 	}
 
 	private static Map<String, String[]> controlledVoc = new HashMap<String, String[]>();
@@ -308,17 +312,18 @@ public class EditorServiceImpl extends RemoteServiceServlet implements EditorSer
 	private List<RODAMember> translateProducers(Producers producers)
 			throws LoginException, RODAClientException, UserManagementException, RemoteException {
 		List<RODAMember> producerList = new ArrayList<RODAMember>();
-		UserBrowser userBrowser = RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
-				.getUserBrowserService();
-		for (String username : producers.getUsers()) {
-			User user = userBrowser.getUser(username);
-			producerList.add(user);
-		}
-
-		for (String groupname : producers.getGroups()) {
-			Group group = userBrowser.getGroup(groupname);
-			producerList.add(group);
-		}
+		// UserBrowser userBrowser =
+		// RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
+		// .getUserBrowserService();
+		// for (String username : producers.getUsers()) {
+		// User user = userBrowser.getUser(username);
+		// producerList.add(user);
+		// }
+		//
+		// for (String groupname : producers.getGroups()) {
+		// Group group = userBrowser.getGroup(groupname);
+		// producerList.add(group);
+		// }
 
 		return producerList;
 	}
@@ -357,16 +362,17 @@ public class EditorServiceImpl extends RemoteServiceServlet implements EditorSer
 	public List<RODAMember> getProducers(String fondsPid) throws RODAException {
 
 		List<RODAMember> producerList = new ArrayList<RODAMember>();
-		Browser browserService = RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
-				.getBrowserService();
-		try {
-			Producers producers = browserService.getProducers(fondsPid);
-			producerList = translateProducers(producers);
-
-		} catch (RemoteException e) {
-			logger.error("Remote Exception", e);
-			throw RODAClient.parseRemoteException(e);
-		}
+		// Browser browserService =
+		// RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
+		// .getBrowserService();
+		// try {
+		// Producers producers = browserService.getProducers(fondsPid);
+		// producerList = translateProducers(producers);
+		//
+		// } catch (RemoteException e) {
+		// logger.error("Remote Exception", e);
+		// throw RODAClient.parseRemoteException(e);
+		// }
 		return producerList;
 	}
 
@@ -412,13 +418,13 @@ public class EditorServiceImpl extends RemoteServiceServlet implements EditorSer
 
 				Producers producers = untranslateProducers(fondsProducers, fondsPid);
 
-				try {
-					RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession()).getEditorService()
-							.setProducers(fondsPid, producers);
-				} catch (RemoteException e) {
-					logger.error("Remote Exception", e);
-					throw RODAClient.parseRemoteException(e);
-				}
+				// try {
+				// RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession()).getEditorService()
+				// .setProducers(fondsPid, producers);
+				// } catch (RemoteException e) {
+				// logger.error("Remote Exception", e);
+				// throw RODAClient.parseRemoteException(e);
+				// }
 
 			} else {
 				logger.info("producer already included in a producing group");
@@ -452,13 +458,13 @@ public class EditorServiceImpl extends RemoteServiceServlet implements EditorSer
 
 			Producers producers = untranslateProducers(fondsProducers, fondsPid);
 
-			try {
-				RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession()).getEditorService()
-						.setProducers(fondsPid, producers);
-			} catch (RemoteException e) {
-				logger.error("Remote Exception", e);
-				throw RODAClient.parseRemoteException(e);
-			}
+			// try {
+			// RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession()).getEditorService()
+			// .setProducers(fondsPid, producers);
+			// } catch (RemoteException e) {
+			// logger.error("Remote Exception", e);
+			// throw RODAClient.parseRemoteException(e);
+			// }
 		} else {
 			logger.info("cannot remove producer because it is not in list");
 			// TODO send exception
@@ -485,13 +491,13 @@ public class EditorServiceImpl extends RemoteServiceServlet implements EditorSer
 
 		Producers producers = untranslateProducers(fondsProducers, fondsPid);
 
-		try {
-			RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession()).getEditorService()
-					.setProducers(fondsPid, producers);
-		} catch (RemoteException e) {
-			logger.error("Remote Exception", e);
-			throw RODAClient.parseRemoteException(e);
-		}
+		// try {
+		// RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession()).getEditorService()
+		// .setProducers(fondsPid, producers);
+		// } catch (RemoteException e) {
+		// logger.error("Remote Exception", e);
+		// throw RODAClient.parseRemoteException(e);
+		// }
 
 		return fondsProducers;
 	}
@@ -499,95 +505,114 @@ public class EditorServiceImpl extends RemoteServiceServlet implements EditorSer
 	private Map<RODAMember, ObjectPermissions> translatePermissions(RODAObjectPermissions rodaPermissions)
 			throws LoginException, RODAClientException, UserManagementException, RemoteException {
 		Map<RODAMember, ObjectPermissions> permissions = new LinkedHashMap<RODAMember, ObjectPermissions>();
-		UserBrowser userBrowser = RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
-				.getUserBrowserService();
-
-		// All user names defined in permissions
-		Set<String> usernames = new TreeSet<String>();
-
-		// Put user permissions into lists
-		List<String> readUsersList = Arrays.asList(rodaPermissions.getReadUsers());
-		List<String> modifyUsersList = Arrays.asList(rodaPermissions.getModifyUsers());
-		List<String> removeUsersList = Arrays.asList(rodaPermissions.getRemoveUsers());
-		List<String> grantUsersList = Arrays.asList(rodaPermissions.getGrantUsers());
-
-		// Add all users to user name list
-		usernames.addAll(readUsersList);
-		usernames.addAll(modifyUsersList);
-		usernames.addAll(removeUsersList);
-		usernames.addAll(grantUsersList);
-
-		// All group names defined in permissions
-		Set<String> groupnames = new TreeSet<String>();
-
-		// Put group permissions into lists
-		List<String> readGroupsList = Arrays.asList(rodaPermissions.getReadGroups());
-		List<String> modifyGroupsList = Arrays.asList(rodaPermissions.getModifyGroups());
-		List<String> removeGroupsList = Arrays.asList(rodaPermissions.getRemoveGroups());
-		List<String> grantGroupsList = Arrays.asList(rodaPermissions.getGrantGroups());
-
-		// Add all groups to group name list
-		groupnames.addAll(readGroupsList);
-		groupnames.addAll(modifyGroupsList);
-		groupnames.addAll(removeGroupsList);
-		groupnames.addAll(grantGroupsList);
-
-		// Process all users
-		for (String username : usernames) {
-
-			User user = userBrowser.getUser(username);
-
-			// Get all groups that this user belongs to
-			Set<String> allGroups = user.getAllGroups();
-
-			// Intersect all user groups with each groups permissions
-			List<String> readAllUserGroups = new ArrayList<String>(allGroups);
-			readAllUserGroups.retainAll(readGroupsList);
-			List<String> modifyAllUserGroups = new ArrayList<String>(allGroups);
-			modifyAllUserGroups.retainAll(modifyGroupsList);
-			List<String> removeAllUserGroups = new ArrayList<String>(allGroups);
-			removeAllUserGroups.retainAll(removeGroupsList);
-			List<String> grantAllUserGroups = new ArrayList<String>(allGroups);
-			grantAllUserGroups.retainAll(grantGroupsList);
-
-			// Calculate permissions
-			boolean canRead = readUsersList.contains(username) || readAllUserGroups.size() > 0;
-			boolean canModify = modifyUsersList.contains(username) || modifyAllUserGroups.size() > 0;
-			boolean canRemove = removeUsersList.contains(username) || removeAllUserGroups.size() > 0;
-			boolean canGrant = grantUsersList.contains(username) || grantAllUserGroups.size() > 0;
-
-			// Create object permissions and add to map
-			ObjectPermissions objPermissions = new ObjectPermissions(canRead, canModify, canRemove, canGrant);
-			permissions.put(user, objPermissions);
-		}
-
-		// Process all groups
-		for (String groupname : groupnames) {
-			Group group = userBrowser.getGroup(groupname);
-
-			// Get all groups that this group belongs to
-			Set<String> allGroups = group.getAllGroups();
-
-			// Intersect all group groups with each groups permissions
-			List<String> readAllGroupGroups = new ArrayList<String>(allGroups);
-			readAllGroupGroups.retainAll(readGroupsList);
-			List<String> modifyAllGroupGroups = new ArrayList<String>(allGroups);
-			modifyAllGroupGroups.retainAll(readGroupsList);
-			List<String> removeAllGroupGroups = new ArrayList<String>(allGroups);
-			removeAllGroupGroups.retainAll(readGroupsList);
-			List<String> grantAllGroupGroups = new ArrayList<String>(allGroups);
-			grantAllGroupGroups.retainAll(readGroupsList);
-
-			// Calculate permissions
-			boolean canRead = readGroupsList.contains(groupname) || readAllGroupGroups.size() > 0;
-			boolean canModify = modifyGroupsList.contains(groupname) || modifyAllGroupGroups.size() > 0;
-			boolean canRemove = removeGroupsList.contains(groupname) || removeAllGroupGroups.size() > 0;
-			boolean canGrant = grantGroupsList.contains(groupname) || grantAllGroupGroups.size() > 0;
-
-			// Create object permissions and add to map
-			ObjectPermissions objPermissions = new ObjectPermissions(canRead, canModify, canRemove, canGrant);
-			permissions.put(group, objPermissions);
-		}
+		// UserBrowser userBrowser =
+		// RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
+		// .getUserBrowserService();
+		//
+		// // All user names defined in permissions
+		// Set<String> usernames = new TreeSet<String>();
+		//
+		// // Put user permissions into lists
+		// List<String> readUsersList =
+		// Arrays.asList(rodaPermissions.getReadUsers());
+		// List<String> modifyUsersList =
+		// Arrays.asList(rodaPermissions.getModifyUsers());
+		// List<String> removeUsersList =
+		// Arrays.asList(rodaPermissions.getRemoveUsers());
+		// List<String> grantUsersList =
+		// Arrays.asList(rodaPermissions.getGrantUsers());
+		//
+		// // Add all users to user name list
+		// usernames.addAll(readUsersList);
+		// usernames.addAll(modifyUsersList);
+		// usernames.addAll(removeUsersList);
+		// usernames.addAll(grantUsersList);
+		//
+		// // All group names defined in permissions
+		// Set<String> groupnames = new TreeSet<String>();
+		//
+		// // Put group permissions into lists
+		// List<String> readGroupsList =
+		// Arrays.asList(rodaPermissions.getReadGroups());
+		// List<String> modifyGroupsList =
+		// Arrays.asList(rodaPermissions.getModifyGroups());
+		// List<String> removeGroupsList =
+		// Arrays.asList(rodaPermissions.getRemoveGroups());
+		// List<String> grantGroupsList =
+		// Arrays.asList(rodaPermissions.getGrantGroups());
+		//
+		// // Add all groups to group name list
+		// groupnames.addAll(readGroupsList);
+		// groupnames.addAll(modifyGroupsList);
+		// groupnames.addAll(removeGroupsList);
+		// groupnames.addAll(grantGroupsList);
+		//
+		// // Process all users
+		// for (String username : usernames) {
+		//
+		// User user = userBrowser.getUser(username);
+		//
+		// // Get all groups that this user belongs to
+		// Set<String> allGroups = user.getAllGroups();
+		//
+		// // Intersect all user groups with each groups permissions
+		// List<String> readAllUserGroups = new ArrayList<String>(allGroups);
+		// readAllUserGroups.retainAll(readGroupsList);
+		// List<String> modifyAllUserGroups = new ArrayList<String>(allGroups);
+		// modifyAllUserGroups.retainAll(modifyGroupsList);
+		// List<String> removeAllUserGroups = new ArrayList<String>(allGroups);
+		// removeAllUserGroups.retainAll(removeGroupsList);
+		// List<String> grantAllUserGroups = new ArrayList<String>(allGroups);
+		// grantAllUserGroups.retainAll(grantGroupsList);
+		//
+		// // Calculate permissions
+		// boolean canRead = readUsersList.contains(username) ||
+		// readAllUserGroups.size() > 0;
+		// boolean canModify = modifyUsersList.contains(username) ||
+		// modifyAllUserGroups.size() > 0;
+		// boolean canRemove = removeUsersList.contains(username) ||
+		// removeAllUserGroups.size() > 0;
+		// boolean canGrant = grantUsersList.contains(username) ||
+		// grantAllUserGroups.size() > 0;
+		//
+		// // Create object permissions and add to map
+		// ObjectPermissions objPermissions = new ObjectPermissions(canRead,
+		// canModify, canRemove, canGrant);
+		// permissions.put(user, objPermissions);
+		// }
+		//
+		// // Process all groups
+		// for (String groupname : groupnames) {
+		// Group group = userBrowser.getGroup(groupname);
+		//
+		// // Get all groups that this group belongs to
+		// Set<String> allGroups = group.getAllGroups();
+		//
+		// // Intersect all group groups with each groups permissions
+		// List<String> readAllGroupGroups = new ArrayList<String>(allGroups);
+		// readAllGroupGroups.retainAll(readGroupsList);
+		// List<String> modifyAllGroupGroups = new ArrayList<String>(allGroups);
+		// modifyAllGroupGroups.retainAll(readGroupsList);
+		// List<String> removeAllGroupGroups = new ArrayList<String>(allGroups);
+		// removeAllGroupGroups.retainAll(readGroupsList);
+		// List<String> grantAllGroupGroups = new ArrayList<String>(allGroups);
+		// grantAllGroupGroups.retainAll(readGroupsList);
+		//
+		// // Calculate permissions
+		// boolean canRead = readGroupsList.contains(groupname) ||
+		// readAllGroupGroups.size() > 0;
+		// boolean canModify = modifyGroupsList.contains(groupname) ||
+		// modifyAllGroupGroups.size() > 0;
+		// boolean canRemove = removeGroupsList.contains(groupname) ||
+		// removeAllGroupGroups.size() > 0;
+		// boolean canGrant = grantGroupsList.contains(groupname) ||
+		// grantAllGroupGroups.size() > 0;
+		//
+		// // Create object permissions and add to map
+		// ObjectPermissions objPermissions = new ObjectPermissions(canRead,
+		// canModify, canRemove, canGrant);
+		// permissions.put(group, objPermissions);
+		// }
 
 		return permissions;
 	}
@@ -670,16 +695,18 @@ public class EditorServiceImpl extends RemoteServiceServlet implements EditorSer
 	 */
 	public Map<RODAMember, ObjectPermissions> getObjectPermissions(String pid) throws RODAException {
 		Map<RODAMember, ObjectPermissions> ret;
-		Browser browserService = RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
-				.getBrowserService();
-		try {
-			RODAObjectPermissions rodaPermissions = browserService.getRODAObjectPermissions(pid);
-			ret = translatePermissions(rodaPermissions);
-		} catch (RemoteException e) {
-			logger.error("Remote Exception", e);
-			throw RODAClient.parseRemoteException(e);
-		}
-		return ret;
+		// Browser browserService =
+		// RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
+		// .getBrowserService();
+		// try {
+		// RODAObjectPermissions rodaPermissions =
+		// browserService.getRODAObjectPermissions(pid);
+		// ret = translatePermissions(rodaPermissions);
+		// } catch (RemoteException e) {
+		// logger.error("Remote Exception", e);
+		// throw RODAClient.parseRemoteException(e);
+		// }
+		return null;
 	}
 
 	/**
@@ -702,16 +729,17 @@ public class EditorServiceImpl extends RemoteServiceServlet implements EditorSer
 		RODAObjectPermissions rodaPermissions = untranslatePermissions(permissions, pid);
 		RODAObjectPermissions newRodaPermissions;
 		Map<RODAMember, ObjectPermissions> newPermissions;
-		try {
-			newRodaPermissions = RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
-					.getEditorService().setRODAObjectPermissions(rodaPermissions, false);
-			newPermissions = translatePermissions(newRodaPermissions);
-		} catch (RemoteException e) {
-			logger.error("Remote Exception", e);
-			throw RODAClient.parseRemoteException(e);
-		}
+		// try {
+		// newRodaPermissions =
+		// RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
+		// .getEditorService().setRODAObjectPermissions(rodaPermissions, false);
+		// newPermissions = translatePermissions(newRodaPermissions);
+		// } catch (RemoteException e) {
+		// logger.error("Remote Exception", e);
+		// throw RODAClient.parseRemoteException(e);
+		// }
 
-		return newPermissions;
+		return null;
 	}
 
 	public Map<RODAMember, ObjectPermissions> setObjectPermissions(String pid,
@@ -719,26 +747,30 @@ public class EditorServiceImpl extends RemoteServiceServlet implements EditorSer
 		RODAObjectPermissions rodaPermissions = untranslatePermissions(permissions, pid);
 		RODAObjectPermissions newRodaPermissions;
 		Map<RODAMember, ObjectPermissions> newPermissions;
-		try {
-			newRodaPermissions = RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
-					.getEditorService().setRODAObjectPermissions(rodaPermissions, recursivelly);
-			newPermissions = translatePermissions(newRodaPermissions);
-		} catch (RemoteException e) {
-			logger.error("Remote Exception", e);
-			throw RODAClient.parseRemoteException(e);
-		}
+		// try {
+		// newRodaPermissions =
+		// RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())
+		// .getEditorService().setRODAObjectPermissions(rodaPermissions,
+		// recursivelly);
+		// newPermissions = translatePermissions(newRodaPermissions);
+		// } catch (RemoteException e) {
+		// logger.error("Remote Exception", e);
+		// throw RODAClient.parseRemoteException(e);
+		// }
 
-		return newPermissions;
+		return null;
 	}
 
 	public RODAObjectUserPermissions getSelfObjectPermissions(String pid) throws RODAException {
-		try {
-			return RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession()).getBrowserService()
-					.getRODAObjectUserPermissions(pid);
-		} catch (RemoteException e) {
-			logger.error("Remote Exception", e);
-			throw RODAClient.parseRemoteException(e);
-		}
+		// try {
+		// return
+		// RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession()).getBrowserService()
+		// .getRODAObjectUserPermissions(pid);
+		// } catch (RemoteException e) {
+		// logger.error("Remote Exception", e);
+		// throw RODAClient.parseRemoteException(e);
+		// }
+		return null;
 	}
 
 }

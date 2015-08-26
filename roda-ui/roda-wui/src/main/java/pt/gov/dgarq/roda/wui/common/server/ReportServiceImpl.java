@@ -1,16 +1,12 @@
 package pt.gov.dgarq.roda.wui.common.server;
 
-import java.rmi.RemoteException;
-
 import org.apache.log4j.Logger;
 
-import pt.gov.dgarq.roda.common.RodaClientFactory;
-import pt.gov.dgarq.roda.core.RODAClient;
+import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+
 import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.data.Report;
 import pt.gov.dgarq.roda.wui.common.client.ReportService;
-
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 /**
  * Report service implementation
@@ -36,15 +32,15 @@ public class ReportServiceImpl extends RemoteServiceServlet implements
 	}
 
 	public Report getReport(String reportId) throws RODAException {
-		Report report;
-		try {
-			report = RodaClientFactory.getRodaClient(
-					getThreadLocalRequest().getSession()).getReportsService()
-					.getReport(reportId);
-		} catch (RemoteException e) {
-			logger.error("Error getting report " + reportId, e);
-			throw RODAClient.parseRemoteException(e);
-		}
+		Report report = null;
+		// try {
+		// report = RodaClientFactory.getRodaClient(
+		// getThreadLocalRequest().getSession()).getReportsService()
+		// .getReport(reportId);
+		// } catch (RemoteException e) {
+		// logger.error("Error getting report " + reportId, e);
+		// throw RODAClient.parseRemoteException(e);
+//		}
 		return report;
 	}
 }

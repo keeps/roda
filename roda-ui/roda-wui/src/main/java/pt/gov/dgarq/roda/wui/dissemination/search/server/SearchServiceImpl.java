@@ -1,19 +1,12 @@
 package pt.gov.dgarq.roda.wui.dissemination.search.server;
 
-import java.rmi.RemoteException;
-import java.util.Arrays;
-
 import org.apache.log4j.Logger;
-import org.roda.index.IndexServiceException;
 import org.roda.index.IndexService;
+import org.roda.index.IndexServiceException;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import pt.gov.dgarq.roda.common.RodaCoreFactory;
-import pt.gov.dgarq.roda.common.RodaClientFactory;
-import pt.gov.dgarq.roda.core.RODAClient;
-import pt.gov.dgarq.roda.core.common.LoginException;
-import pt.gov.dgarq.roda.core.common.RODAClientException;
 import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.SearchParameter;
@@ -24,7 +17,6 @@ import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
-import pt.gov.dgarq.roda.core.stubs.Search;
 import pt.gov.dgarq.roda.wui.dissemination.search.client.SearchService;
 
 /**
@@ -42,13 +34,14 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 
 	static final private Logger logger = Logger.getLogger(SearchServiceImpl.class);
 
-	protected Search getSearch() throws LoginException, RODAClientException {
-		Search search;
-
-		search = RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession()).getSearchService();
-
-		return search;
-	}
+	// protected Search getSearch() throws LoginException, RODAClientException {
+	// Search search;
+	//
+	// search =
+	// RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession()).getSearchService();
+	//
+	// return null;
+	// }
 
 	public IndexResult<SimpleDescriptionObject> basicSearch(String query, int startIndex, int limit, int snippetsMax,
 			int fieldMaxLength) throws RODAException {
@@ -78,16 +71,17 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 
 	public SearchResult advancedSearch(SearchParameter[] searchParameters, int hitPageStart, int hitPageSize,
 			int snippetsMax, int fieldMaxLength) throws RODAException {
-		SearchResult result;
-		try {
-			logger.debug("Searching in " + Arrays.asList(searchParameters));
-			result = getSearch().advancedSearch(searchParameters, hitPageStart, hitPageSize, snippetsMax,
-					fieldMaxLength);
-		} catch (RemoteException e) {
-			logger.error("Remote Exception", e);
-			throw RODAClient.parseRemoteException(e);
-		}
-		return result;
+		// SearchResult result;
+		// try {
+		// logger.debug("Searching in " + Arrays.asList(searchParameters));
+		// result = getSearch().advancedSearch(searchParameters, hitPageStart,
+		// hitPageSize, snippetsMax,
+		// fieldMaxLength);
+		// } catch (RemoteException e) {
+		// logger.error("Remote Exception", e);
+		// throw RODAClient.parseRemoteException(e);
+		// }
+		return null;
 	}
 
 }

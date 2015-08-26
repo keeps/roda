@@ -48,6 +48,7 @@ import pt.gov.dgarq.roda.core.common.NoSuchUserException;
 import pt.gov.dgarq.roda.core.common.UserAlreadyExistsException;
 import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
+import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.v2.Group;
 import pt.gov.dgarq.roda.core.data.v2.RODAMember;
 import pt.gov.dgarq.roda.core.data.v2.User;
@@ -57,7 +58,8 @@ import pt.gov.dgarq.roda.util.PasswordHandler;
  * @author Rui Castro
  * 
  */
-// FIXME this should be moved back to roda-common-servlet-security
+// FIXME this should be moved back to roda-common-servlet-security or any place
+// more meaningful
 public class LdapUtility {
 
 	static final private Logger logger = Logger.getLogger(LdapUtility.class);
@@ -253,6 +255,10 @@ public class LdapUtility {
 	 * @throws LdapUtilityException
 	 */
 	public List<User> getUsers(Filter filter) throws LdapUtilityException {
+		return getUsers(filter, null);
+	}
+
+	public List<User> getUsers(Filter filter, Sorter sorter) throws LdapUtilityException {
 
 		try {
 
@@ -1852,6 +1858,15 @@ public class LdapUtility {
 			SearchResult sr = answer.next();
 			filteredAttributesList.add(sr.getAttributes());
 		}
+
+		// filteredAttributesList = (List<Attributes>) jndiAdapter
+		// .filterValues(filteredAttributesList);
+		//
+		// List<Attributes> sortedAttributesList = jndiAdapter
+		// .sortAttributes(filteredAttributesList);
+		//
+		// List<Attributes> attributesList = jndiAdapter
+		// .getSublist(sortedAttributesList);
 
 		return filteredAttributesList;
 	}

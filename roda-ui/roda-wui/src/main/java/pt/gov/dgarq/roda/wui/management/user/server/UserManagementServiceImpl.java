@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TreeSet;
@@ -75,29 +76,25 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
 	}
 
 	// FIXME re-do this with index
-	public User[] getUsers(Character letter, String search) throws RODAException {
-		User[] users;
+	public List<User> getUsers(Character letter, String search) throws RODAException {
+		List<User> users;
 		try {
-			Filter filterGroup = new Filter();
-			filterGroup.add(new SimpleFilterParameter(RodaConstants.MEMBERS_IS_USER, "true"));
+			Filter filter = new Filter();
+			filter.add(new SimpleFilterParameter(RodaConstants.MEMBERS_IS_USER, "true"));
 			Filter searchFilter = getFilter(letter, search);
 			if (searchFilter.getParameters() != null && searchFilter.getParameters().size() > 0) {
 				for (FilterParameter fp : searchFilter.getParameters()) {
-					filterGroup.add(fp);
+					filter.add(fp);
 				}
 			}
-			ContentAdapter contentAdapter = new ContentAdapter();
-			contentAdapter.setFilter(filterGroup);
 
-			SortParameter[] sortParameters = new SortParameter[1];
-			sortParameters[0] = new SortParameter("name", false);
-			contentAdapter.setSorter(new Sorter(sortParameters));
+			Sorter sorter = new Sorter(new SortParameter("name", false));
 
-			users = UserUtility.getLdapUtility().getUsers(contentAdapter);
+			// FIXME verify this because filter usage in the method may not be implemented
+			users = UserUtility.getLdapUtility().getUsers(filter, sorter);
 			return users;
 		} catch (LdapUtilityException e) {
-			throw new RODAException(e.getMessage(), e) {
-			};
+			throw new GenericException("Error getting users from LDAP: " + e.getMessage());
 		}
 	}
 

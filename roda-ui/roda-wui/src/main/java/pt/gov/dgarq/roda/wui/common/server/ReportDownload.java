@@ -1,12 +1,9 @@
 package pt.gov.dgarq.roda.wui.common.server;
 
 import java.io.ByteArrayInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.SocketException;
 import java.rmi.RemoteException;
-import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Map;
@@ -28,28 +25,19 @@ import javax.xml.transform.URIResolver;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.avalon.framework.configuration.Configuration;
-import org.apache.avalon.framework.configuration.ConfigurationException;
 import org.apache.avalon.framework.configuration.DefaultConfigurationBuilder;
-import org.apache.commons.io.IOUtils;
 import org.apache.fop.apps.FOPException;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.MimeConstants;
 import org.apache.fop.servlet.ServletContextURIResolver;
 import org.apache.log4j.Logger;
-import org.xml.sax.SAXException;
 
-import pt.gov.dgarq.roda.common.RodaClientFactory;
 import pt.gov.dgarq.roda.core.common.LoginException;
 import pt.gov.dgarq.roda.core.common.NoSuchReportException;
 import pt.gov.dgarq.roda.core.common.RODAClientException;
 import pt.gov.dgarq.roda.core.common.ReportException;
-import pt.gov.dgarq.roda.core.data.Attribute;
-import pt.gov.dgarq.roda.core.data.Report;
-import pt.gov.dgarq.roda.core.data.ReportItem;
 import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
-import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.wui.common.client.PrintReportException;
 
 /**
@@ -183,20 +171,20 @@ public class ReportDownload extends javax.servlet.http.HttpServlet implements
 	public ReportDownload() throws ServletException {
 		fopFactory = FopFactory.newInstance();
 		DefaultConfigurationBuilder cfgBuilder = new DefaultConfigurationBuilder();
-		try {
-			Configuration cfg = cfgBuilder.build(RodaClientFactory
-					.getConfigurationFile("reports/xml-fo/fop.xconf"));
-			fopFactory.setUserConfig(cfg);
-		} catch (IOException e) {
-			logger.fatal("Error loading templates", e);
-			throw new ServletException("Error loading templates", e);
-		} catch (ConfigurationException e) {
-			logger.fatal("Error loading FOP configuration", e);
-			throw new ServletException("Error loading FOP configuration", e);
-		} catch (SAXException e) {
-			logger.fatal("Error parsing FOP configuration", e);
-			throw new ServletException("Error parsing FOP configuration", e);
-		}
+		// try {
+		// Configuration cfg = cfgBuilder.build(RodaClientFactory
+		// .getConfigurationFile("reports/xml-fo/fop.xconf"));
+		// fopFactory.setUserConfig(cfg);
+		// } catch (IOException e) {
+		// logger.fatal("Error loading templates", e);
+		// throw new ServletException("Error loading templates", e);
+		// } catch (ConfigurationException e) {
+		// logger.fatal("Error loading FOP configuration", e);
+		// throw new ServletException("Error loading FOP configuration", e);
+		// } catch (SAXException e) {
+		// logger.fatal("Error parsing FOP configuration", e);
+		// throw new ServletException("Error parsing FOP configuration", e);
+		// }
 
 		instance = this;
 
@@ -236,12 +224,13 @@ public class ReportDownload extends javax.servlet.http.HttpServlet implements
 			Locale locale) throws IOException {
 		String xmlFoTemplate = getResourceBundle(bundleName, locale).getString(
 				templateName);
-		InputStream configurationFile = RodaClientFactory
-				.getConfigurationFile("reports/xml-fo/" + xmlFoTemplate);
-		if (configurationFile == null) {
-			throw new FileNotFoundException(xmlFoTemplate);
-		}
-		return IOUtils.toString(configurationFile);
+		// InputStream configurationFile = RodaClientFactory
+		// .getConfigurationFile("reports/xml-fo/" + xmlFoTemplate);
+		// if (configurationFile == null) {
+		// throw new FileNotFoundException(xmlFoTemplate);
+		// }
+		// return IOUtils.toString(configurationFile);
+		return null;
 	}
 
 	public void init() throws ServletException {
@@ -411,13 +400,13 @@ public class ReportDownload extends javax.servlet.http.HttpServlet implements
 
 		Object[] reportInfo = new Object[10];
 		reportInfo[0] = content.getReportTitle();
-		reportInfo[1] = RodaClientFactory.getServletUrl(request);
-		reportInfo[2] = new Date();
-		User user = RodaClientFactory.getRodaClient(request.getSession())
-				.getAuthenticatedUser();
-		reportInfo[3] = user.getFullName();
-		reportInfo[4] = user.getName();
-		reportInfo[5] = user.getEmail();
+		// reportInfo[1] = RodaClientFactory.getServletUrl(request);
+		// reportInfo[2] = new Date();
+		// User user = RodaClientFactory.getRodaClient(request.getSession())
+		// .getAuthenticatedUser();
+		// reportInfo[3] = user.getFullName();
+		// reportInfo[4] = user.getName();
+		// reportInfo[5] = user.getEmail();
 		reportInfo[6] = ContentAdapterHelper.translateFilter(
 				adapter.getFilter(), content, locale);
 		int total = content.getCount(request.getSession(), adapter.getFilter());
@@ -482,69 +471,70 @@ public class ReportDownload extends javax.servlet.http.HttpServlet implements
 
 		String reportId = request.getParameter("id");
 		if (reportId != null) {
-			try {
-				Report report = RodaClientFactory
-						.getRodaClient(request.getSession())
-						.getReportsService().getReport(reportId);
-				Object[] reportInfo = new Object[6];
-				reportInfo[0] = report.getTitle();
-				reportInfo[1] = RodaClientFactory.getServletUrl(request);
-				reportInfo[2] = new Date();
-				User user = RodaClientFactory.getRodaClient(
-						request.getSession()).getAuthenticatedUser();
-				reportInfo[3] = user.getFullName();
-				reportInfo[4] = user.getName();
-				reportInfo[5] = user.getEmail();
-				buffer.append(String.format(header, reportInfo));
-
-				StringBuilder attributesFO = new StringBuilder();
-				for (Attribute attribute : report.getAttributes()) {
-					String name = ServerTools.encodeXML(attribute.getName());
-					String value;
-					if (ServerTools.isURL(attribute.getValue())) {
-						value = String.format("<fo:basic-link "
-								+ "external-destination=\"%1$s\">%1$s"
-								+ "</fo:basic-link>", attribute.getValue());
-					} else {
-						value = ServerTools.encodeXML(attribute.getValue());
-					}
-					attributesFO.append(String.format(attributesAttribute,
-							name, value));
-				}
-				buffer.append(String.format(attributes, attributesFO.toString()));
-
-				for (ReportItem item : report.getItems()) {
-					String itemId = item.getTitle();
-					StringBuilder itemAttributesFO = new StringBuilder();
-					for (Attribute attribute : item.getAttributes()) {
-						if (attribute.getValue() != null) {
-							String name = ServerTools.encodeXML(attribute
-									.getName());
-							String value;
-							if (ServerTools.isURL(attribute.getValue())) {
-								value = String.format("<fo:basic-link "
-										+ "external-destination=\"%1$s\">%1$s"
-										+ "</fo:basic-link>",
-										attribute.getValue());
-							} else {
-								value = ServerTools.encodeXML(attribute
-										.getValue());
-							}
-							itemAttributesFO.append(String.format(
-									itemsAttribute,
-									new Object[] { name, value }));
-						}
-					}
-
-					buffer.append(String.format(items, new Object[] { itemId,
-							itemAttributesFO.toString() }));
-				}
-
-				buffer.append(footerTemplate);
-				ret = buffer.toString();
-			} catch (Exception e) {
-				logger.error("Error creating report XML FO", e);
-			}
+			// try {
+			// Report report = RodaClientFactory
+			// .getRodaClient(request.getSession())
+			// .getReportsService().getReport(reportId);
+			// Object[] reportInfo = new Object[6];
+			// reportInfo[0] = report.getTitle();
+			// reportInfo[1] = RodaClientFactory.getServletUrl(request);
+			// reportInfo[2] = new Date();
+			// User user = RodaClientFactory.getRodaClient(
+			// request.getSession()).getAuthenticatedUser();
+			// reportInfo[3] = user.getFullName();
+			// reportInfo[4] = user.getName();
+			// reportInfo[5] = user.getEmail();
+			// buffer.append(String.format(header, reportInfo));
+			//
+			// StringBuilder attributesFO = new StringBuilder();
+			// for (Attribute attribute : report.getAttributes()) {
+			// String name = ServerTools.encodeXML(attribute.getName());
+			// String value;
+			// if (ServerTools.isURL(attribute.getValue())) {
+			// value = String.format("<fo:basic-link "
+			// + "external-destination=\"%1$s\">%1$s"
+			// + "</fo:basic-link>", attribute.getValue());
+			// } else {
+			// value = ServerTools.encodeXML(attribute.getValue());
+			// }
+			// attributesFO.append(String.format(attributesAttribute,
+			// name, value));
+			// }
+			// buffer.append(String.format(attributes,
+			// attributesFO.toString()));
+			//
+			// for (ReportItem item : report.getItems()) {
+			// String itemId = item.getTitle();
+			// StringBuilder itemAttributesFO = new StringBuilder();
+			// for (Attribute attribute : item.getAttributes()) {
+			// if (attribute.getValue() != null) {
+			// String name = ServerTools.encodeXML(attribute
+			// .getName());
+			// String value;
+			// if (ServerTools.isURL(attribute.getValue())) {
+			// value = String.format("<fo:basic-link "
+			// + "external-destination=\"%1$s\">%1$s"
+			// + "</fo:basic-link>",
+			// attribute.getValue());
+			// } else {
+			// value = ServerTools.encodeXML(attribute
+			// .getValue());
+			// }
+			// itemAttributesFO.append(String.format(
+			// itemsAttribute,
+			// new Object[] { name, value }));
+			// }
+			// }
+			//
+			// buffer.append(String.format(items, new Object[] { itemId,
+			// itemAttributesFO.toString() }));
+			// }
+			//
+			// buffer.append(footerTemplate);
+			// ret = buffer.toString();
+			// } catch (Exception e) {
+			// logger.error("Error creating report XML FO", e);
+			// }
 		}
 
 		return ret;
@@ -625,27 +615,28 @@ public class ReportDownload extends javax.servlet.http.HttpServlet implements
 			NoSuchReportException, RODAClientException {
 		StringBuffer sBuffer = new StringBuffer();
 		String reportId = request.getParameter("id");
-		Report report = RodaClientFactory.getRodaClient(request.getSession())
-				.getReportsService().getReport(reportId);
-
-		// Add headers
-		sBuffer.append("\"Report Title\", \"Attribute Name\", \"Attribute Value\"\n");
-
-		// Add top level attributes
-		for (Attribute attrib : report.getAttributes()) {
-			sBuffer.append(ServerTools.encodeCSV(report.getTitle()) + ", "
-					+ ServerTools.encodeCSV(attrib.getName()) + ", "
-					+ ServerTools.encodeCSV(attrib.getValue()) + "\n");
-		}
-
-		// Add items
-		for (ReportItem item : report.getItems()) {
-			for (Attribute attrib : item.getAttributes()) {
-				sBuffer.append(ServerTools.encodeCSV(item.getTitle()) + ", "
-						+ ServerTools.encodeCSV(attrib.getName()) + ", "
-						+ ServerTools.encodeCSV(attrib.getValue()) + "\n");
-			}
-		}
+		// Report report = RodaClientFactory.getRodaClient(request.getSession())
+		// .getReportsService().getReport(reportId);
+		//
+		// // Add headers
+		// sBuffer.append("\"Report Title\", \"Attribute Name\", \"Attribute
+		// Value\"\n");
+		//
+		// // Add top level attributes
+		// for (Attribute attrib : report.getAttributes()) {
+		// sBuffer.append(ServerTools.encodeCSV(report.getTitle()) + ", "
+		// + ServerTools.encodeCSV(attrib.getName()) + ", "
+		// + ServerTools.encodeCSV(attrib.getValue()) + "\n");
+		// }
+		//
+		// // Add items
+		// for (ReportItem item : report.getItems()) {
+		// for (Attribute attrib : item.getAttributes()) {
+		// sBuffer.append(ServerTools.encodeCSV(item.getTitle()) + ", "
+		// + ServerTools.encodeCSV(attrib.getName()) + ", "
+		// + ServerTools.encodeCSV(attrib.getValue()) + "\n");
+		// }
+		// }
 
 		return sBuffer.toString();
 	}

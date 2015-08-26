@@ -29,7 +29,7 @@ import pt.gov.dgarq.roda.core.common.StatisticsException;
 import pt.gov.dgarq.roda.core.common.UserManagementException;
 import pt.gov.dgarq.roda.core.data.Attribute;
 import pt.gov.dgarq.roda.core.data.DescriptionObject;
-import pt.gov.dgarq.roda.core.data.Group;
+import pt.gov.dgarq.roda.core.data.v2.Group;
 import pt.gov.dgarq.roda.core.data.LogEntry;
 import pt.gov.dgarq.roda.core.data.PluginParameter;
 import pt.gov.dgarq.roda.core.data.RODAObject;

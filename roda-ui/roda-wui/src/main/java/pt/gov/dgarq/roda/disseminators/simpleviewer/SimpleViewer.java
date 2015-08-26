@@ -1,15 +1,10 @@
 package pt.gov.dgarq.roda.disseminators.simpleviewer;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.rmi.RemoteException;
-import java.util.regex.Matcher;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -17,23 +12,15 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.lf5.util.StreamUtils;
 
-import pt.gov.dgarq.roda.common.RodaClientFactory;
-import pt.gov.dgarq.roda.core.RODAClient;
-import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
 import pt.gov.dgarq.roda.core.common.BrowserException;
 import pt.gov.dgarq.roda.core.common.LoginException;
 import pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException;
 import pt.gov.dgarq.roda.core.common.RODAClientException;
-import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.data.RepresentationObject;
-import pt.gov.dgarq.roda.core.data.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.disseminators.common.cache.CacheController;
-import pt.gov.dgarq.roda.migrator.MigratorClient;
-import pt.gov.dgarq.roda.migrator.stubs.SynchronousConverter;
 
 /**
  * Servlet implementation class for Servlet: SimpleViewer
@@ -52,7 +39,7 @@ public class SimpleViewer extends HttpServlet implements Servlet {
 
 	private Logger logger = Logger.getLogger(SimpleViewer.class);
 
-	private final MigratorClient migratorClient;
+	// private final MigratorClient migratorClient;
 	private final String migratorUrl;
 
 	private final CacheController cacheController;
@@ -62,9 +49,10 @@ public class SimpleViewer extends HttpServlet implements Servlet {
 	 * 
 	 */
 	public SimpleViewer() {
-		migratorClient = new MigratorClient();
-		migratorUrl = RodaClientFactory.getRodaProperties().getProperty(
-				"roda.disseminators.simpleviewer.migrator");
+		// migratorClient = new MigratorClient();
+		// migratorUrl = RodaClientFactory.getRodaProperties().getProperty(
+		// "roda.disseminators.simpleviewer.migrator");
+		migratorUrl = null;
 
 		cacheController = new CacheController(DISSEMINATOR_NAME, "SimpleViewer") {
 
@@ -121,16 +109,16 @@ public class SimpleViewer extends HttpServlet implements Servlet {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e
 					.getMessage());
 		} catch (RemoteException e) {
-			RODAException exception = RODAClient.parseRemoteException(e);
-			if (exception instanceof AuthorizationDeniedException) {
-				response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
-						exception.getMessage());
-			} else {
-				logger.error("RODA Exception", e);
-				response.sendError(
-						HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e
-								.getMessage());
-			}
+			// RODAException exception = RODAClient.parseRemoteException(e);
+			// if (exception instanceof AuthorizationDeniedException) {
+			// response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+			// exception.getMessage());
+			// } else {
+			// logger.error("RODA Exception", e);
+			// response.sendError(
+			// HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e
+			// .getMessage());
+			// }
 
 		}
 
@@ -155,75 +143,76 @@ public class SimpleViewer extends HttpServlet implements Servlet {
 
 		logger.debug("Creating resources of " + rep);
 
-		RODAClient rodaClient = RodaClientFactory.getRodaClient(request
-				.getSession());
-		SynchronousConverter service = migratorClient
-				.getSynchronousConverterService(migratorUrl, rodaClient
-						.getCup(),rodaClient.getCasUtility());
-		RepresentationObject converted = service.convert(rep)
-				.getRepresentation();
-
-		// Download converted representation
-		migratorClient.writeRepresentationObject(converted, cache);
-
-		// Make modifications on image and thumbs path in gallery.xml
-		File galleryFile = new File(cache, converted.getRootFile().getId());
-
-		String imagePath = "../../Cache/" + rep.getPid() + "/"
-				+ DISSEMINATOR_NAME + "/images/";
-		String thumbPath = "../../Cache/" + rep.getPid() + "/"
-				+ DISSEMINATOR_NAME + "/thumbs/";
-
-		String galleryXml = new String(StreamUtils
-				.getBytes(new FileInputStream(galleryFile)));
-		galleryXml = galleryXml.replaceAll("\\@IMAGEPATH", Matcher
-				.quoteReplacement(imagePath));
-		galleryXml = galleryXml.replaceAll("\\@THUMBPATH", Matcher
-				.quoteReplacement(thumbPath));
-
-		PrintWriter printer = new PrintWriter(new FileOutputStream(galleryFile));
-		printer.write(galleryXml);
-		printer.flush();
-		printer.close();
-
-		// Move images to 'images' folder
-		File images = new File(cache, "images");
-		images.mkdir();
-		File[] imageFiles = cache.listFiles(new FilenameFilter() {
-
-			public boolean accept(File dir, String name) {
-				return name.matches("image_.*");
-			}
-
-		});
-
-		for (File imageFile : imageFiles) {
-			String name = imageFile.getName();
-			File newImageFile = new File(images, name.substring(name
-					.indexOf('_') + 1));
-			FileUtils.moveFile(imageFile, newImageFile);
-		}
-
-		// Move thumbs to 'thumbs' folder
-		File thumbs = new File(cache, "thumbs");
-		thumbs.mkdir();
-		File[] thumbFiles = cache.listFiles(new FilenameFilter() {
-
-			public boolean accept(File dir, String name) {
-				return name.matches("thumb_.*");
-			}
-
-		});
-
-		for (File thumbFile : thumbFiles) {
-			String name = thumbFile.getName();
-			File newThumbFile = new File(thumbs, name.substring(name
-					.indexOf('_') + 1));
-			FileUtils.moveFile(thumbFile, newThumbFile);
-		}
-
-		// delete migration from cache
-		migratorClient.deleteCachedRepresentation(converted);
+		// RODAClient rodaClient = RodaClientFactory.getRodaClient(request
+		// .getSession());
+		// SynchronousConverter service = migratorClient
+		// .getSynchronousConverterService(migratorUrl, rodaClient
+		// .getCup(),rodaClient.getCasUtility());
+		// RepresentationObject converted = service.convert(rep)
+		// .getRepresentation();
+		//
+		// // Download converted representation
+		// migratorClient.writeRepresentationObject(converted, cache);
+		//
+		// // Make modifications on image and thumbs path in gallery.xml
+		// File galleryFile = new File(cache, converted.getRootFile().getId());
+		//
+		// String imagePath = "../../Cache/" + rep.getPid() + "/"
+		// + DISSEMINATOR_NAME + "/images/";
+		// String thumbPath = "../../Cache/" + rep.getPid() + "/"
+		// + DISSEMINATOR_NAME + "/thumbs/";
+		//
+		// String galleryXml = new String(StreamUtils
+		// .getBytes(new FileInputStream(galleryFile)));
+		// galleryXml = galleryXml.replaceAll("\\@IMAGEPATH", Matcher
+		// .quoteReplacement(imagePath));
+		// galleryXml = galleryXml.replaceAll("\\@THUMBPATH", Matcher
+		// .quoteReplacement(thumbPath));
+		//
+		// PrintWriter printer = new PrintWriter(new
+		// FileOutputStream(galleryFile));
+		// printer.write(galleryXml);
+		// printer.flush();
+		// printer.close();
+		//
+		// // Move images to 'images' folder
+		// File images = new File(cache, "images");
+		// images.mkdir();
+		// File[] imageFiles = cache.listFiles(new FilenameFilter() {
+		//
+		// public boolean accept(File dir, String name) {
+		// return name.matches("image_.*");
+		// }
+		//
+		// });
+		//
+		// for (File imageFile : imageFiles) {
+		// String name = imageFile.getName();
+		// File newImageFile = new File(images, name.substring(name
+		// .indexOf('_') + 1));
+		// FileUtils.moveFile(imageFile, newImageFile);
+		// }
+		//
+		// // Move thumbs to 'thumbs' folder
+		// File thumbs = new File(cache, "thumbs");
+		// thumbs.mkdir();
+		// File[] thumbFiles = cache.listFiles(new FilenameFilter() {
+		//
+		// public boolean accept(File dir, String name) {
+		// return name.matches("thumb_.*");
+		// }
+		//
+		// });
+		//
+		// for (File thumbFile : thumbFiles) {
+		// String name = thumbFile.getName();
+		// File newThumbFile = new File(thumbs, name.substring(name
+		// .indexOf('_') + 1));
+		// FileUtils.moveFile(thumbFile, newThumbFile);
+		// }
+		//
+		// // delete migration from cache
+		// migratorClient.deleteCachedRepresentation(converted);
 	}
 
 	private void sendIndex(HttpServletRequest request,
@@ -240,24 +229,25 @@ public class SimpleViewer extends HttpServlet implements Servlet {
 				+ "/F0.xml";
 		String index = new String(StreamUtils.getBytes(indexTemplate));
 
-		String title;
-		try {
-			SimpleDescriptionObject sdo = RodaClientFactory.getRodaClient(
-					request.getSession()).getBrowserService()
-					.getSimpleDescriptionObject(rep.getDescriptionObjectPID());
-			title = sdo.getTitle();
-		} catch (Exception e) {
-			title = "";
-		}
-
-		index = index.replaceAll("\\@TITLE", Matcher.quoteReplacement(title));
-		index = index.replaceAll("\\@GALLERYURL", Matcher
-				.quoteReplacement(galleryURL));
-		index = index.replaceAll("\\@CONTEXT", request.getContextPath());
-		PrintWriter printer = new PrintWriter(out);
-		printer.write(index);
-		printer.flush();
-		printer.close();
+		// String title;
+		// try {
+		// SimpleDescriptionObject sdo = RodaClientFactory.getRodaClient(
+		// request.getSession()).getBrowserService()
+		// .getSimpleDescriptionObject(rep.getDescriptionObjectPID());
+		// title = sdo.getTitle();
+		// } catch (Exception e) {
+		// title = "";
+		// }
+		//
+		// index = index.replaceAll("\\@TITLE",
+		// Matcher.quoteReplacement(title));
+		// index = index.replaceAll("\\@GALLERYURL", Matcher
+		// .quoteReplacement(galleryURL));
+		// index = index.replaceAll("\\@CONTEXT", request.getContextPath());
+		// PrintWriter printer = new PrintWriter(out);
+		// printer.write(index);
+		// printer.flush();
+		// printer.close();
 	}
 
 }
