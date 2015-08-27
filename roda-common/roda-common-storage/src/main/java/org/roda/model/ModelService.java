@@ -57,7 +57,6 @@ import pt.gov.dgarq.roda.core.data.v2.AgentPreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.EventPreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.Group;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
-import pt.gov.dgarq.roda.core.data.v2.RODAMember;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationFilePreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationPreservationObject;
@@ -356,9 +355,8 @@ public class ModelService extends ModelObservable {
 			Binary binary = storage.getBinary(binaryPath);
 			descriptiveMetadataBinary = convertResourceToDescriptiveMetadata(binary);
 		} catch (StorageServiceException e) {
-			throw new ModelServiceException(
-					"Error while obtaining descriptive metadata binary from storage, reason: " + e.getMessage(),
-					e.getCode());
+			throw new ModelServiceException("Error while obtaining descriptive metadata binary from storage",
+					e.getCode(), e);
 		}
 
 		return descriptiveMetadataBinary;

@@ -188,6 +188,7 @@
 		<profile>
 			<id>wui</id>
 			<modules>
+				<module>roda-cas</module>
 				<module>roda-common/roda-common-content-adapter</module>
 				<module>roda-common/roda-common-data</module>
 				<module>roda-common/roda-common-storage</module>

@@ -74,7 +74,7 @@ public class RolesSetterFilter implements Filter {
 			HttpServletRequest servletRequest = (HttpServletRequest) request;
 			HttpServletResponse servletResponse = (HttpServletResponse) response;
 			if (servletRequest.getUserPrincipal() != null) {
-				if (existUser(servletRequest.getUserPrincipal().getName())) {
+				if (userExists(servletRequest.getUserPrincipal().getName())) {
 					logger.debug("User principal and user exist (" + servletRequest.getUserPrincipal().getName() + ")");
 					UserUtility.setUser(servletRequest, getUser(servletRequest.getUserPrincipal()));
 				} else {
@@ -89,7 +89,7 @@ public class RolesSetterFilter implements Filter {
 				if (UserUtility.getUser(servletRequest, RodaCoreFactory.getIndexService()) == null) {
 					logger.debug(
 							"User principal doesn't exist neither the user is already in session: setting user to guest");
-					UserUtility.setUser(servletRequest, getGuest());
+					UserUtility.setUser(servletRequest, UserUtility.getGuest());
 				} else {
 					logger.debug("User is already in session");
 				}
@@ -124,13 +124,6 @@ public class RolesSetterFilter implements Filter {
 		}
 	}
 
-	private RodaSimpleUser getGuest() {
-		RodaSimpleUser rsu = new RodaSimpleUser();
-		rsu.setId("guest");
-		rsu.setGuest(true);
-		return rsu;
-	}
-
 	private RodaSimpleUser getUser(Principal userPrincipal) {
 		RodaSimpleUser rsu = new RodaSimpleUser();
 		rsu.setId(userPrincipal.getName());
@@ -138,18 +131,14 @@ public class RolesSetterFilter implements Filter {
 		return rsu;
 	}
 
-	private boolean existUser(String name) {
+	private boolean userExists(String name) {
 		boolean exist;
 		pt.gov.dgarq.roda.core.data.adapter.filter.Filter filter = new pt.gov.dgarq.roda.core.data.adapter.filter.Filter();
 		filter.add(new SimpleFilterParameter(RodaConstants.MEMBERS_ID, name));
 		filter.add(new SimpleFilterParameter(RodaConstants.MEMBERS_IS_USER, "true"));
 		try {
 			Long count = RodaCoreFactory.getIndexService().count(RODAMember.class, filter);
-			if (count == 1) {
-				exist = true;
-			} else {
-				exist = false;
-			}
+			exist = (count == 1);
 		} catch (IndexServiceException e) {
 			exist = false;
 		}

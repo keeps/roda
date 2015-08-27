@@ -16,9 +16,6 @@ import pt.gov.dgarq.roda.wui.common.client.ClientLoggerService;
 public class ClientLoggerImpl extends RemoteServiceServlet implements
 		ClientLoggerService {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 3694771724613537482L;
 
 	private static final String LOG_ACTION_WUI_ERROR = "RODAWUI.error";

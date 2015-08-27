@@ -103,10 +103,18 @@ public class UserUtility {
 	}
 
 	public static void logout(HttpServletRequest servletRequest) {
-		servletRequest.getSession().setAttribute(RODA_USER, null);
+		servletRequest.getSession().setAttribute(RODA_USER, getGuest());
 		servletRequest.getSession().removeAttribute("edu.yale.its.tp.cas.client.filter.user");
 		servletRequest.getSession().removeAttribute("_const_cas_assertion_");
 	}
+	
+	public static RodaSimpleUser getGuest() {
+		RodaSimpleUser rsu = new RodaSimpleUser();
+		rsu.setId("guest");
+		rsu.setGuest(true);
+		return rsu;
+	}
+	
 	/*
 	 * public static boolean haveSessionActive(CASUtility
 	 * casUtility,HttpServletRequest servletRequest) { try{ CASUserPrincipal cup

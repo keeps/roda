@@ -109,7 +109,7 @@ public class LdapUtility {
 	/**
 	 * Password Digest Algorithm
 	 */
-	private String ldapPasswordDigestAlgorithm = "MD5";
+	private String ldapDigestAlgorithm = "MD5";
 
 	/**
 	 * List of protected users. Users in the protected list cannot be modified.
@@ -197,7 +197,7 @@ public class LdapUtility {
 		this.ldapAdminPassword = ldapAdminPassword;
 
 		if (ldapPasswordDigestAlgorithm != null) {
-			this.ldapPasswordDigestAlgorithm = ldapPasswordDigestAlgorithm;
+			this.ldapDigestAlgorithm = ldapPasswordDigestAlgorithm;
 		}
 		this.ldapProtectedUsers.clear();
 		if (ldapProtectedUsers != null) {
@@ -330,9 +330,8 @@ public class LdapUtility {
 			ctxRoot.close();
 
 		} catch (NameNotFoundException e) {
-
+			logger.debug("User " + name + " doesn't exist", e);
 			user = null;
-			logger.debug("User " + name + " doesn't exist - " + e.getMessage());
 
 		} catch (NamingException e) {
 			logger.debug("Error getting user " + name, e);
@@ -424,7 +423,7 @@ public class LdapUtility {
 				try {
 					setUserPasswordUnchecked(user.getName(), PasswordHandler.generateRandomPassword(12));
 				} catch (NoSuchUserException e) {
-					logger.warn("Created user doesn't exist! Notify developers!!!");
+					logger.error("Created user doesn't exist! Notify developers!!!", e);
 				}
 			}
 
@@ -624,7 +623,7 @@ public class LdapUtility {
 			try {
 				modifyUser(user);
 			} catch (EmailAlreadyExistsException e) {
-				logger.error("EmailAlreadyExistsException should not occcur here!!! This is problably a bug!");
+				logger.error("EmailAlreadyExistsException should not occcur here!!! This is problably a bug!", e);
 			}
 
 		} else {
@@ -2035,7 +2034,7 @@ public class LdapUtility {
 			throws NamingException, NoSuchAlgorithmException {
 
 		PasswordHandler passwordHandler = PasswordHandler.getInstance();
-		String passwordDigest = passwordHandler.generateDigest(password, null, ldapPasswordDigestAlgorithm);
+		String passwordDigest = passwordHandler.generateDigest(password, null, ldapDigestAlgorithm);
 
 		Attribute attributePassword = new BasicAttribute("userPassword", passwordDigest);
 

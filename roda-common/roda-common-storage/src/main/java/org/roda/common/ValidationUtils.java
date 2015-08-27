@@ -76,8 +76,8 @@ public class ValidationUtils {
 					validator.validate(xmlFile);
 					valid = true;
 				} catch (SAXException e) {
+					LOGGER.debug("Error validating descriptive metadata " + metadata.getStoragePath().asString(), e);
 					valid = false;
-					LOGGER.error("Error validating descriptive metadata " + metadata.getStoragePath().asString());
 				}
 			} else {
 				if (failIfNoSchema) {

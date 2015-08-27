@@ -1,14 +1,7 @@
 package pt.gov.dgarq.roda.wui.common.server;
 
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.roda.common.UserUtility;
 
@@ -18,9 +11,8 @@ import pt.gov.dgarq.roda.common.RodaCoreFactory;
 import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.data.LogEntry;
 import pt.gov.dgarq.roda.core.data.LogEntryParameter;
-import pt.gov.dgarq.roda.core.data.v2.RodaSimpleUser;
 import pt.gov.dgarq.roda.core.data.v2.RodaUser;
-import pt.gov.dgarq.roda.servlet.cas.CASUserPrincipal;
+import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.wui.common.client.AuthenticatedUser;
 import pt.gov.dgarq.roda.wui.common.client.UserLoginService;
 
@@ -32,59 +24,31 @@ import pt.gov.dgarq.roda.wui.common.client.UserLoginService;
  */
 public class UserLoginServiceImpl extends RemoteServiceServlet implements UserLoginService {
 
-	/**
-	 * 
-	 */
+	private static final long serialVersionUID = -6898933466651262033L;
+	private static final String LOG_ACTION_WUI_LOGIN = "RODAWUI.login";
+	private static Logger logger = Logger.getLogger(UserLoginServiceImpl.class);
 
 	public static UserLoginServiceImpl getInstance() {
 		return new UserLoginServiceImpl();
 	}
 
-	private static final long serialVersionUID = -6898933466651262033L;
-
-	private static final String LOG_ACTION_WUI_LOGIN = "RODAWUI.login";
-
-	private static Logger logger = Logger.getLogger(UserLoginServiceImpl.class);
-
 	public AuthenticatedUser getAuthenticatedUser() throws RODAException {
-		// AuthenticatedUser officeUser;
-		// RODAClient rodaClient;
-		//
-		// rodaClient = RodaClientFactory.getRodaClient(this
-		// .getThreadLocalRequest().getSession());
-		// User user;
-		// try {
-		// user = rodaClient.getAuthenticatedUser();
-		// officeUser = new AuthenticatedUser(user, rodaClient.isGuestLogin());
-		// } catch (RemoteException e) {
-		// throw RODAClient.parseRemoteException(e);
-		// }
-		//
-		// return officeUser;
-
 		RodaUser user = UserUtility.getUser(this.getThreadLocalRequest(), RodaCoreFactory.getIndexService());
-		AuthenticatedUser u = new AuthenticatedUser();
-		u.setId(user.getId());
-		u.setName(user.getName());
-		u.setFullName(user.getFullName());
-		u.setGuest(user.isGuest());
-		Set<String> roles = user.getAllRoles();
-
-		u.setAllRoles(roles);
-
-		logger.info("Serving user " + u + " from user " + user);
+		AuthenticatedUser u = new AuthenticatedUser(new User(user), user.isGuest());
+		u.setAllRoles(user.getAllRoles());
+		logger.debug("Serving user " + u + " from user " + user);
 		return u;
-
 	}
 
-	public AuthenticatedUser loginCUP(HttpServletRequest request, CASUserPrincipal cup) throws RODAException {
-		logger.info("Login with CUP: " + cup);
-		UserUtility.setUser(request, new RodaSimpleUser());
-
-		AuthenticatedUser authenticatedUser;
-		authenticatedUser = getAuthenticatedUser();
-		return authenticatedUser;
-	}
+	// public AuthenticatedUser loginCUP(HttpServletRequest request,
+	// CASUserPrincipal cup) throws RODAException {
+	// logger.info("Login with CUP: " + cup);
+	// UserUtility.setUser(request, new RodaSimpleUser());
+	//
+	// AuthenticatedUser authenticatedUser;
+	// authenticatedUser = getAuthenticatedUser();
+	// return authenticatedUser;
+	// }
 
 	public AuthenticatedUser login(String username, String password) throws RODAException {
 		AuthenticatedUser authenticatedUser = null;
