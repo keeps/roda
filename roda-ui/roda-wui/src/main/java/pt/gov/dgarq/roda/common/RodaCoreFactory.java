@@ -47,6 +47,9 @@ public class RodaCoreFactory {
 
 	private static Configuration rodaConfiguration = null;
 	private static Map<String, String> loginProperties = null;
+	
+	// FIXME read this from configuration file or environment
+	public static boolean DEVELOPMENT = true;
 
 	static {
 		try {

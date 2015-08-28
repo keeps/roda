@@ -31,8 +31,8 @@ import pt.gov.dgarq.roda.core.data.v2.User;
  */
 public class RolesSetterFilter implements Filter {
 	private static final Logger logger = Logger.getLogger(RolesSetterFilter.class);
+	
 	private FilterConfig config;
-
 	protected String casLogoutURL = null;
 
 	public void setFilterConfig(FilterConfig config) {

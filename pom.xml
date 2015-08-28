@@ -112,8 +112,8 @@
 		<gwt_version>2.7.0</gwt_version>
 		<!-- THE PROPERTY THAT FOLLOWS IS NOT YET IN USE -->
 		<fedora_version>3.6.2</fedora_version>
-		<cas.version>4.0.2</cas.version>
-		<cas.client.version>3.2.1</cas.client.version>
+		<cas.version>4.0.4</cas.version>
+		<cas.client.version>3.4.0</cas.client.version>
 		<roda_community_url>http://roda-community.org</roda_community_url>
 	</properties>
 	<profiles>
