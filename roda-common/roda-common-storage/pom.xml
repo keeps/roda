@@ -109,10 +109,6 @@
 		</dependency>
 		<dependency>
 			<groupId>pt.gov.dgarq.roda</groupId>
-			<artifactId>roda-common-content-adapter</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>pt.gov.dgarq.roda</groupId>
 			<artifactId>roda-common-metadata</artifactId>
 		</dependency>
 		<dependency>

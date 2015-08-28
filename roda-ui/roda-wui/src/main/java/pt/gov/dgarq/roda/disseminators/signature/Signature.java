@@ -1,32 +1,16 @@
 package pt.gov.dgarq.roda.disseminators.signature;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.bouncycastle.cms.CMSException;
 
-import pt.gov.dgarq.roda.common.certification.SignatureUtility;
-import pt.gov.dgarq.roda.core.common.LoginException;
-import pt.gov.dgarq.roda.core.common.RODAClientException;
-import pt.gov.dgarq.roda.core.data.RepresentationObject;
 import pt.gov.dgarq.roda.disseminators.RepresentationDownload.RepresentationDownload;
 import pt.gov.dgarq.roda.disseminators.common.RepresentationHelper;
-import pt.gov.dgarq.roda.disseminators.common.tools.ZipEntryInfo;
-import pt.gov.dgarq.roda.disseminators.common.tools.ZipTools;
 
 /**
  * Servlet implementation class Signature
@@ -35,7 +19,7 @@ public class Signature extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	private Logger logger = Logger.getLogger(RepresentationDownload.class);
-	private SignatureUtility signatureUtility = null;
+	// private SignatureUtility signatureUtility = null;
 	private RepresentationHelper representationHelper = null;
 
 	/**
@@ -168,88 +152,88 @@ public class Signature extends HttpServlet {
 		// }
 	}
 
-	private void sendSignedRepresentation(HttpServletRequest request,
-			RepresentationObject rep, HttpServletResponse response)
-			throws LoginException, RODAClientException, HttpException,
-			IOException, NoSuchAlgorithmException, NoSuchProviderException,
-			CMSException {
-		// If representation consists of a single file, create a file with the
-		// signature and send a zip with both files to user
-		if (rep.getPartFiles().length == 0) {
-			// Get root file input stream
-			InputStream rootInputStream = getRepresentationHelper()
-					.getRootInputStream(request, rep);
-
-			// Create temporary files
-			File rootTempFile = File.createTempFile("root", null);
-			File signatureTempFile = File.createTempFile("sign", null);
-
-			// Copy root file into temporary root file
-			IOUtils.copy(rootInputStream, new FileOutputStream(rootTempFile));
-
-			// Sign root file into temporary signature file
-			signatureUtility.sign(rootTempFile, signatureTempFile);
-
-			// Add root file and signature to a list
-			List<ZipEntryInfo> files = new ArrayList<ZipEntryInfo>();
-			files.add(new ZipEntryInfo(rep.getRootFile().getOriginalName(),
-					rootTempFile));
-			files.add(new ZipEntryInfo(rep.getRootFile().getOriginalName()
-					+ ".p7s", signatureTempFile));
-
-			// Create and send the zipped list to user
-			response.setContentType("application/zip");
-			response.setHeader("Content-Disposition", "attachment; filename="
-					+ rep.getLabel() + "-signed.zip");
-
-			ZipTools.zip(files, response.getOutputStream());
-
-			// Delete temporary files
-			rootTempFile.delete();
-			signatureTempFile.delete();
-
-		}
-		// If representation consists of multiple files, create a zip with
-		// multiple files, create a signature of the zip and send a zip with the
-		// representation files zip and the signature to user
-		else {
-			response.setContentType("application/zip");
-			response.setHeader("Content-Disposition", "attachment; filename="
-					+ rep.getLabel() + ".zip");
-			try {
-				// Create needed temporary files
-				File repTempFile = File.createTempFile("root", null);
-				File signatureTempFile = File.createTempFile("sign", null);
-
-				// Zip representation into the temporary representation file
-				ZipTools.sendZippedRepresentation(request, rep,
-						new FileOutputStream(repTempFile));
-
-				// Sign the representation zip into the temporary signature file
-				signatureUtility.sign(repTempFile, signatureTempFile);
-
-				// Create a list with the representation zip and signature
-				List<ZipEntryInfo> files = new ArrayList<ZipEntryInfo>();
-				files
-						.add(new ZipEntryInfo(rep.getLabel() + ".zip",
-								repTempFile));
-				files.add(new ZipEntryInfo(rep.getLabel() + ".p7s",
-						signatureTempFile));
-
-				// Send the final zip to user
-				response.setContentType("application/zip");
-				response.setHeader("Content-Disposition",
-						"attachment; filename=" + rep.getLabel()
-								+ "-signed.zip");
-				ZipTools.zip(files, response.getOutputStream());
-
-				// Delete temporary files
-				repTempFile.delete();
-				signatureTempFile.delete();
-			} catch (IOException e) {
-				logger.info("User canceled download");
-			}
-		}
-
-	}
+	// private void sendSignedRepresentation(HttpServletRequest request,
+	// RepresentationObject rep, HttpServletResponse response)
+	// throws LoginException, RODAClientException, HttpException,
+	// IOException, NoSuchAlgorithmException, NoSuchProviderException,
+	// CMSException {
+	// // If representation consists of a single file, create a file with the
+	// // signature and send a zip with both files to user
+	// if (rep.getPartFiles().length == 0) {
+	// // Get root file input stream
+	// InputStream rootInputStream = getRepresentationHelper()
+	// .getRootInputStream(request, rep);
+	//
+	// // Create temporary files
+	// File rootTempFile = File.createTempFile("root", null);
+	// File signatureTempFile = File.createTempFile("sign", null);
+	//
+	// // Copy root file into temporary root file
+	// IOUtils.copy(rootInputStream, new FileOutputStream(rootTempFile));
+	//
+	// // Sign root file into temporary signature file
+	// signatureUtility.sign(rootTempFile, signatureTempFile);
+	//
+	// // Add root file and signature to a list
+	// List<ZipEntryInfo> files = new ArrayList<ZipEntryInfo>();
+	// files.add(new ZipEntryInfo(rep.getRootFile().getOriginalName(),
+	// rootTempFile));
+	// files.add(new ZipEntryInfo(rep.getRootFile().getOriginalName()
+	// + ".p7s", signatureTempFile));
+	//
+	// // Create and send the zipped list to user
+	// response.setContentType("application/zip");
+	// response.setHeader("Content-Disposition", "attachment; filename="
+	// + rep.getLabel() + "-signed.zip");
+	//
+	// ZipTools.zip(files, response.getOutputStream());
+	//
+	// // Delete temporary files
+	// rootTempFile.delete();
+	// signatureTempFile.delete();
+	//
+	// }
+	// // If representation consists of multiple files, create a zip with
+	// // multiple files, create a signature of the zip and send a zip with the
+	// // representation files zip and the signature to user
+	// else {
+	// response.setContentType("application/zip");
+	// response.setHeader("Content-Disposition", "attachment; filename="
+	// + rep.getLabel() + ".zip");
+	// try {
+	// // Create needed temporary files
+	// File repTempFile = File.createTempFile("root", null);
+	// File signatureTempFile = File.createTempFile("sign", null);
+	//
+	// // Zip representation into the temporary representation file
+	// ZipTools.sendZippedRepresentation(request, rep,
+	// new FileOutputStream(repTempFile));
+	//
+	// // Sign the representation zip into the temporary signature file
+	// signatureUtility.sign(repTempFile, signatureTempFile);
+	//
+	// // Create a list with the representation zip and signature
+	// List<ZipEntryInfo> files = new ArrayList<ZipEntryInfo>();
+	// files
+	// .add(new ZipEntryInfo(rep.getLabel() + ".zip",
+	// repTempFile));
+	// files.add(new ZipEntryInfo(rep.getLabel() + ".p7s",
+	// signatureTempFile));
+	//
+	// // Send the final zip to user
+	// response.setContentType("application/zip");
+	// response.setHeader("Content-Disposition",
+	// "attachment; filename=" + rep.getLabel()
+	// + "-signed.zip");
+	// ZipTools.zip(files, response.getOutputStream());
+	//
+	// // Delete temporary files
+	// repTempFile.delete();
+	// signatureTempFile.delete();
+	// } catch (IOException e) {
+	// logger.info("User canceled download");
+	// }
+	// }
+	//
+	// }
 }

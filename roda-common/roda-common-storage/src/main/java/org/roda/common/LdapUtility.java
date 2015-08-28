@@ -32,13 +32,9 @@ import javax.naming.ldap.LdapName;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.roda.common.adapter.GroupAdapter;
-import org.roda.common.adapter.UserAdapter;
 import org.w3c.util.DateParser;
 import org.w3c.util.InvalidDateException;
 
-import pt.gov.dgarq.roda.core.adapter.jndi.JndiContentAdapterEngine;
-import pt.gov.dgarq.roda.core.adapter.jndi.JndiEntityAdapter;
 import pt.gov.dgarq.roda.core.common.EmailAlreadyExistsException;
 import pt.gov.dgarq.roda.core.common.GroupAlreadyExistsException;
 import pt.gov.dgarq.roda.core.common.IllegalOperationException;
@@ -50,7 +46,6 @@ import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.v2.Group;
-import pt.gov.dgarq.roda.core.data.v2.RODAMember;
 import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.util.PasswordHandler;
 
@@ -223,26 +218,30 @@ public class LdapUtility {
 	 * @return an <code>int</code> with the number of users in the repository.
 	 * @throws LdapUtilityException
 	 */
-	public int getUserCount(Filter contentAdapterFilter) throws LdapUtilityException {
-
-		JndiContentAdapterEngine<UserAdapter, User> jndiAdapterEngine = new JndiContentAdapterEngine<UserAdapter, User>(
-				new UserAdapter(), new ContentAdapter(contentAdapterFilter, null, null));
-
-		try {
-
-			DirContext ctxRoot = getLDAPDirContext(ldapRootDN);
-
-			List<Attributes> attributesList = searchAttributes(ctxRoot, ldapPeopleDN, "uid", jndiAdapterEngine);
-
-			ctxRoot.close();
-
-			return attributesList.size();
-
-		} catch (NamingException e) {
-			logger.debug("Error counting users - " + e.getMessage(), e);
-			throw new LdapUtilityException("Error counting users - " + e.getMessage(), e);
-		}
-	}
+	// public int getUserCount(Filter contentAdapterFilter) throws
+	// LdapUtilityException {
+	//
+	// JndiContentAdapterEngine<UserAdapter, User> jndiAdapterEngine = new
+	// JndiContentAdapterEngine<UserAdapter, User>(
+	// new UserAdapter(), new ContentAdapter(contentAdapterFilter, null, null));
+	//
+	// try {
+	//
+	// DirContext ctxRoot = getLDAPDirContext(ldapRootDN);
+	//
+	// List<Attributes> attributesList = searchAttributes(ctxRoot, ldapPeopleDN,
+	// "uid", jndiAdapterEngine);
+	//
+	// ctxRoot.close();
+	//
+	// return attributesList.size();
+	//
+	// } catch (NamingException e) {
+	// logger.debug("Error counting users - " + e.getMessage(), e);
+	// throw new LdapUtilityException("Error counting users - " +
+	// e.getMessage(), e);
+	// }
+	// }
 
 	/**
 	 * Return the users that match the given {@link ContentAdapter}.
@@ -643,26 +642,31 @@ public class LdapUtility {
 	 */
 	// FIXME this code must certainly should be rethink as this should be done
 	// directly to the index and not to ldap
-	public int getGroupCount(Filter contentAdapterFilter) throws LdapUtilityException {
-
-		JndiContentAdapterEngine<GroupAdapter, Group> jndiAdapterEngine = new JndiContentAdapterEngine<GroupAdapter, Group>(
-				new GroupAdapter(), new ContentAdapter(contentAdapterFilter, null, null));
-
-		try {
-
-			DirContext ctxRoot = getLDAPDirContext(ldapRootDN);
-
-			List<Attributes> attributesList = searchAttributes(ctxRoot, ldapGroupsDN, "cn", jndiAdapterEngine);
-
-			ctxRoot.close();
-
-			return attributesList.size();
-
-		} catch (NamingException e) {
-			logger.debug("Error counting groups - " + e.getMessage(), e);
-			throw new LdapUtilityException("Error counting groups - " + e.getMessage(), e);
-		}
-	}
+	// public int getGroupCount(Filter contentAdapterFilter) throws
+	// LdapUtilityException {
+	//
+	// JndiContentAdapterEngine<GroupAdapter, Group> jndiAdapterEngine = new
+	// JndiContentAdapterEngine<GroupAdapter, Group>(
+	// new GroupAdapter(), new ContentAdapter(contentAdapterFilter, null,
+	// null));
+	//
+	// try {
+	//
+	// DirContext ctxRoot = getLDAPDirContext(ldapRootDN);
+	//
+	// List<Attributes> attributesList = searchAttributes(ctxRoot, ldapGroupsDN,
+	// "cn", jndiAdapterEngine);
+	//
+	// ctxRoot.close();
+	//
+	// return attributesList.size();
+	//
+	// } catch (NamingException e) {
+	// logger.debug("Error counting groups - " + e.getMessage(), e);
+	// throw new LdapUtilityException("Error counting groups - " +
+	// e.getMessage(), e);
+	// }
+	// }
 
 	/**
 	 * Return groups that match the given {@link ContentAdapter}.
@@ -1808,35 +1812,41 @@ public class LdapUtility {
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<Attributes> searchAttributes(DirContext ctxRoot, String ctxDN, String keyAttribute,
-			JndiContentAdapterEngine<? extends JndiEntityAdapter, ? extends RODAMember> jndiAdapter)
-					throws NamingException {
-
-		// Create the default search controls
-		SearchControls searchControls = new SearchControls();
-
-		String filter = jndiAdapter.getJndiFilter(keyAttribute);
-
-		logger.trace("searchAttributes() JNDI filter: " + filter);
-
-		// Search for objects using the filter
-		NamingEnumeration<SearchResult> answer = ctxRoot.search(ctxDN, filter, searchControls);
-
-		List<Attributes> filteredAttributesList = new ArrayList<Attributes>();
-
-		while (answer.hasMore()) {
-			SearchResult sr = answer.next();
-			filteredAttributesList.add(sr.getAttributes());
-		}
-
-		filteredAttributesList = (List<Attributes>) jndiAdapter.filterValues(filteredAttributesList);
-
-		List<Attributes> sortedAttributesList = jndiAdapter.sortAttributes(filteredAttributesList);
-
-		List<Attributes> attributesList = jndiAdapter.getSublist(sortedAttributesList);
-
-		return attributesList;
-	}
+	// private List<Attributes> searchAttributes(DirContext ctxRoot, String
+	// ctxDN, String keyAttribute,
+	// JndiContentAdapterEngine<? extends JndiEntityAdapter, ? extends
+	// RODAMember> jndiAdapter)
+	// throws NamingException {
+	//
+	// // Create the default search controls
+	// SearchControls searchControls = new SearchControls();
+	//
+	// String filter = jndiAdapter.getJndiFilter(keyAttribute);
+	//
+	// logger.trace("searchAttributes() JNDI filter: " + filter);
+	//
+	// // Search for objects using the filter
+	// NamingEnumeration<SearchResult> answer = ctxRoot.search(ctxDN, filter,
+	// searchControls);
+	//
+	// List<Attributes> filteredAttributesList = new ArrayList<Attributes>();
+	//
+	// while (answer.hasMore()) {
+	// SearchResult sr = answer.next();
+	// filteredAttributesList.add(sr.getAttributes());
+	// }
+	//
+	// filteredAttributesList = (List<Attributes>)
+	// jndiAdapter.filterValues(filteredAttributesList);
+	//
+	// List<Attributes> sortedAttributesList =
+	// jndiAdapter.sortAttributes(filteredAttributesList);
+	//
+	// List<Attributes> attributesList =
+	// jndiAdapter.getSublist(sortedAttributesList);
+	//
+	// return attributesList;
+	// }
 
 	// FIXME filter is not being used: see if it is needed
 	private List<Attributes> searchAttributes(DirContext ctxRoot, String ctxDN, String keyAttribute, Filter filter)
