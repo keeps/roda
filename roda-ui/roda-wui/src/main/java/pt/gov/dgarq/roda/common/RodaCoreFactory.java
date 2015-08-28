@@ -29,6 +29,14 @@ import org.roda.storage.StorageService;
 import org.roda.storage.StorageServiceException;
 import org.roda.storage.fs.FileStorageService;
 
+import pt.gov.dgarq.roda.core.common.RodaConstants;
+import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
+import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
+import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
+import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
+import pt.gov.dgarq.roda.core.data.v2.IndexResult;
+import pt.gov.dgarq.roda.core.data.v2.RODAMember;
 import pt.gov.dgarq.roda.core.data.v2.SIPReport;
 import pt.gov.dgarq.roda.core.data.v2.SIPStateTransition;
 
@@ -47,7 +55,7 @@ public class RodaCoreFactory {
 
 	private static Configuration rodaConfiguration = null;
 	private static Map<String, String> loginProperties = null;
-	
+
 	// FIXME read this from configuration file or environment
 	public static boolean DEVELOPMENT = true;
 
@@ -147,21 +155,6 @@ public class RodaCoreFactory {
 		}
 	}
 
-	public static void main(String[] argsArray) {
-		List<String> args = Arrays.asList(argsArray);
-		if (Arrays.asList("reindex").equals(args)) {
-			try {
-				index.reindexAIPs();
-			} catch (IndexServiceException e) {
-				System.err.println("An error has occured while reindexing");
-				e.printStackTrace();
-			}
-		} else {
-			System.err.println("Syntax: [java -jar ...] reindex");
-		}
-		System.exit(0);
-	}
-
 	// FIXME this should not be here! remove it
 	public static void populateSipReport() throws ModelServiceException {
 		for (int i = 0; i < 100; i++) {
@@ -228,6 +221,47 @@ public class RodaCoreFactory {
 			}
 		}
 
+	}
+
+	/*
+	 * Command-line accessible functionalities
+	 */
+	private static void printMainUsage() {
+		System.err.println("Syntax:");
+		System.err.println("java -jar x.jar index reindex");
+		System.err.println("java -jar x.jar index list users|groups");
+	}
+
+	private static void printIndexMembers(List<String> args, Filter filter, Sorter sorter, Sublist sublist,
+			Facets facets) throws IndexServiceException {
+		System.out.println("index list " + args.get(2));
+		IndexResult<RODAMember> users = index.find(RODAMember.class, filter, sorter, sublist, facets);
+		for (RODAMember rodaMember : users.getResults()) {
+			System.out.println("\t" + rodaMember);
+		}
+	}
+
+	public static void main(String[] argsArray) throws IndexServiceException {
+		List<String> args = Arrays.asList(argsArray);
+		if (args.size() > 0) {
+			if ("index".equals(args.get(0))) {
+				if ("list".equals(args.get(1)) && ("users".equals(args.get(2)) || "groups".equals(args.get(2)))) {
+					Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.MEMBERS_IS_USER,
+							"users".equals(args.get(2)) ? "true" : "false"));
+					Sorter sorter = null;
+					Sublist sublist = new Sublist(0, 10000);
+					Facets facets = null;
+					printIndexMembers(args, filter, sorter, sublist, facets);
+				} else if ("reindex".equals(args.get(1))) {
+					index.reindexAIPs();
+				}
+			} else {
+				printMainUsage();
+			}
+		} else {
+			printMainUsage();
+		}
+		System.exit(0);
 	}
 
 }
