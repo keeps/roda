@@ -30,8 +30,8 @@ import org.roda.storage.DefaultContainer;
 import org.roda.storage.DefaultDirectory;
 import org.roda.storage.DefaultStoragePath;
 import org.roda.storage.Resource;
-import org.roda.storage.StorageServiceException;
 import org.roda.storage.StoragePath;
+import org.roda.storage.StorageServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -455,10 +455,10 @@ public final class FSUtils {
 	}
 
 	private static String computeContentDigest(Path path, String algorithm) throws StorageServiceException {
-
+		FileChannel fc = null;
 		try {
 			final int bufferSize = 1073741824;
-			final FileChannel fc = FileChannel.open(path);
+			fc = FileChannel.open(path);
 			final long size = fc.size();
 			final MessageDigest hash = MessageDigest.getInstance(algorithm);
 			long position = 0;
@@ -487,6 +487,14 @@ public final class FSUtils {
 			throw new StorageServiceException(
 					"Cannot compute content digest for " + path + " using algorithm " + algorithm,
 					StorageServiceException.INTERNAL_SERVER_ERROR);
+		} finally {
+			if (fc != null) {
+				try {
+					fc.close();
+				} catch (IOException e) {
+					LOGGER.warn("Cannot close file channel", e);
+				}
+			}
 		}
 	}
 
