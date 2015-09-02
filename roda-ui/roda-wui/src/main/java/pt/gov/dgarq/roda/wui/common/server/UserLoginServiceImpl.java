@@ -2,15 +2,17 @@ package pt.gov.dgarq.roda.wui.common.server;
 
 import java.util.Map;
 
+import javax.naming.AuthenticationException;
+
 import org.apache.log4j.Logger;
+import org.roda.common.LdapUtilityException;
 import org.roda.common.UserUtility;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import pt.gov.dgarq.roda.common.RodaCoreFactory;
 import pt.gov.dgarq.roda.core.common.RODAException;
-import pt.gov.dgarq.roda.core.data.LogEntry;
-import pt.gov.dgarq.roda.core.data.LogEntryParameter;
+import pt.gov.dgarq.roda.core.data.v2.RodaSimpleUser;
 import pt.gov.dgarq.roda.core.data.v2.RodaUser;
 import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.wui.common.client.AuthenticatedUser;
@@ -51,38 +53,46 @@ public class UserLoginServiceImpl extends RemoteServiceServlet implements UserLo
 	// }
 
 	public AuthenticatedUser login(String username, String password) throws RODAException {
-		AuthenticatedUser authenticatedUser = null;
-
-		// RodaClientFactory.login(this.getThreadLocalRequest(),
-		// username, password);
-		// logLogin(username);
-		// authenticatedUser = getAuthenticatedUser();
-
-		return authenticatedUser;
-	}
-
-	protected void logLogin(String username) {
+		// FIXME log action
 		try {
-			LogEntryParameter[] parameters = new LogEntryParameter[] {
-					new LogEntryParameter("hostname", getThreadLocalRequest().getRemoteHost()),
-					new LogEntryParameter("address", getThreadLocalRequest().getRemoteAddr()),
-					new LogEntryParameter("port", getThreadLocalRequest().getRemotePort() + "") };
-
-			LogEntry logEntry = new LogEntry();
-			logEntry.setAction(LOG_ACTION_WUI_LOGIN);
-			logEntry.setParameters(parameters);
-			logEntry.setUsername(username);
-
-			// RodaClientFactory.getRodaWuiClient().getLoggerService()
-			// .addLogEntry(logEntry);
-
-			// } catch (RemoteException e) {
-			// logger.error("Error logging login", e);
-		} catch (Exception e) {
-			logger.error("Error logging login", e);
+			User user = UserUtility.getLdapUtility().getAuthenticatedUser(username, password);
+			AuthenticatedUser u = new AuthenticatedUser(user, user.isGuest());
+			u.setAllRoles(user.getAllRoles());
+			UserUtility.setUser(this.getThreadLocalRequest(),
+					new RodaSimpleUser(u.getId(), u.getName(), u.getEmail(), u.isGuest()));
+			return u;
+		} catch (AuthenticationException e) {
+			// FIXME see if this is the best exception to be thrown
+			throw new LdapUtilityException(e);
 		}
 	}
 
+	// protected void logLogin(String username) {
+	// try {
+	// LogEntryParameter[] parameters = new LogEntryParameter[] {
+	// new LogEntryParameter("hostname",
+	// getThreadLocalRequest().getRemoteHost()),
+	// new LogEntryParameter("address",
+	// getThreadLocalRequest().getRemoteAddr()),
+	// new LogEntryParameter("port", getThreadLocalRequest().getRemotePort() +
+	// "") };
+	//
+	// LogEntry logEntry = new LogEntry();
+	// logEntry.setAction(LOG_ACTION_WUI_LOGIN);
+	// logEntry.setParameters(parameters);
+	// logEntry.setUsername(username);
+	//
+	// // RodaClientFactory.getRodaWuiClient().getLoggerService()
+	// // .addLogEntry(logEntry);
+	//
+	// // } catch (RemoteException e) {
+	// // logger.error("Error logging login", e);
+	// } catch (Exception e) {
+	// logger.error("Error logging login", e);
+	// }
+	// }
+
+	// FIXME perhaps this should be removed
 	public AuthenticatedUser logout() throws RODAException {
 		AuthenticatedUser authenticatedUser = null;
 

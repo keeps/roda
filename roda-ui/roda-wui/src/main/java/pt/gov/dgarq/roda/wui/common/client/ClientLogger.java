@@ -299,6 +299,7 @@ public class ClientLogger implements IsSerializable {
 	 * @param error
 	 */
 	public void error(final String message, final Throwable error) {
+		// FIXME should this be done if internal authentication is being used? I don't think so
 		if (error instanceof AuthorizationDeniedException) {
 			String windowLocation = Window.Location.getHref();
 			CasForwardDialog cfd = new CasForwardDialog(windowLocation);

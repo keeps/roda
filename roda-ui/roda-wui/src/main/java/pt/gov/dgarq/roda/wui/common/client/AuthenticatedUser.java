@@ -10,9 +10,9 @@ import pt.gov.dgarq.roda.core.data.v2.User;
  * 
  */
 public class AuthenticatedUser extends User {
-
+	private static final long serialVersionUID = -2998504947077587864L;
+	
 	private boolean guest;
-
 
 	/**
 	 * @deprecated Only for GWT serialization purposes
@@ -56,32 +56,32 @@ public class AuthenticatedUser extends User {
 		return this.getAllRoles().contains(role);
 	}
 
-	/**
-	 * Check is authenticated user as all indicated roles
-	 * 
-	 * @param roles
-	 * @return
-	 */
-	public boolean hasAllRoles(String[] roles) {
-		boolean hasAll = true;
-		for (int i = 0; i < roles.length && hasAll; i++) {
-			hasAll = hasRole(roles[i]);
-		}
-		return hasAll;
-	}
-
-	/**
-	 * Check is authenticated user as at least one of the indicated roles
-	 * 
-	 * @param roles
-	 * @return
-	 */
-	public boolean hasAtLeastOneRole(String[] roles) {
-		boolean found = false;
-		for (int i = 0; i < roles.length && !found; i++) {
-			found = hasRole(roles[i]);
-		}
-		return found;
-	}
+	// /**
+	// * Check is authenticated user as all indicated roles
+	// *
+	// * @param roles
+	// * @return
+	// */
+	// public boolean hasAllRoles(String[] roles) {
+	// boolean hasAll = true;
+	// for (int i = 0; i < roles.length && hasAll; i++) {
+	// hasAll = hasRole(roles[i]);
+	// }
+	// return hasAll;
+	// }
+	//
+	// /**
+	// * Check is authenticated user as at least one of the indicated roles
+	// *
+	// * @param roles
+	// * @return
+	// */
+	// public boolean hasAtLeastOneRole(String[] roles) {
+	// boolean found = false;
+	// for (int i = 0; i < roles.length && !found; i++) {
+	// found = hasRole(roles[i]);
+	// }
+	// return found;
+	// }
 
 }

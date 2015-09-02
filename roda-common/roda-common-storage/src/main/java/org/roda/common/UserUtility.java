@@ -25,6 +25,7 @@ public class UserUtility {
 	private static final String RODA_USER = "RODA_USER";
 
 	private static LdapUtility LDAP_UTILITY;
+	private static RodaSimpleUser GUEST = null;
 
 	public static LdapUtility getLdapUtility() {
 		return LDAP_UTILITY;
@@ -36,9 +37,8 @@ public class UserUtility {
 
 	public static RodaUser getUser(HttpServletRequest request, IndexService indexService) {
 		RodaUser user = null;
-		RodaSimpleUser rsu = null;
 		if (request.getSession().getAttribute(RODA_USER) != null) {
-			rsu = (RodaSimpleUser) request.getSession().getAttribute(RODA_USER);
+			RodaSimpleUser rsu = (RodaSimpleUser) request.getSession().getAttribute(RODA_USER);
 
 			Filter filter = new Filter();
 			filter.add(new SimpleFilterParameter(RodaConstants.MEMBERS_ID, rsu.getId()));
@@ -56,6 +56,8 @@ public class UserUtility {
 			} catch (IndexServiceException e) {
 				LOGGER.error("Error obtaining user \"" + rsu.getId() + "\" from index", e);
 			}
+		} else {
+			user = new RodaUser(getGuest());
 		}
 		return user;
 	}
@@ -104,17 +106,23 @@ public class UserUtility {
 
 	public static void logout(HttpServletRequest servletRequest) {
 		servletRequest.getSession().setAttribute(RODA_USER, getGuest());
+		// CAS specific clean up
 		servletRequest.getSession().removeAttribute("edu.yale.its.tp.cas.client.filter.user");
 		servletRequest.getSession().removeAttribute("_const_cas_assertion_");
 	}
-	
+
+	/**
+	 * Retrieves guest used. Note: this should be used as a read-only object
+	 */
 	public static RodaSimpleUser getGuest() {
-		RodaSimpleUser rsu = new RodaSimpleUser();
-		rsu.setId("guest");
-		rsu.setGuest(true);
-		return rsu;
+		if (GUEST == null) {
+			GUEST = new RodaSimpleUser();
+			GUEST.setId("guest");
+			GUEST.setGuest(true);
+		}
+		return GUEST;
 	}
-	
+
 	/*
 	 * public static boolean haveSessionActive(CASUtility
 	 * casUtility,HttpServletRequest servletRequest) { try{ CASUserPrincipal cup

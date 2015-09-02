@@ -1,6 +1,7 @@
 package org.roda.model.utils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -46,6 +47,10 @@ import pt.gov.dgarq.roda.core.metadata.v2.premis.PremisRepresentationObjectHelpe
  */
 public final class ModelUtils {
 	private static final Logger LOGGER = Logger.getLogger(ModelUtils.class);
+
+	public enum PREMIS_TYPE {
+		OBJECT, EVENT, AGENT, UNKNOWN
+	}
 
 	/**
 	 * Private empty constructor
@@ -351,32 +356,84 @@ public final class ModelUtils {
 
 	public static boolean isPreservationRepresentationObject(Binary preservationBinary) {
 		boolean isObject = true;
+		InputStream binaryInputStream = null;
 		try {
-			PremisRepresentationObjectHelper.newInstance(preservationBinary.getContent().createInputStream());
+			binaryInputStream = preservationBinary.getContent().createInputStream();
+			PremisRepresentationObjectHelper.newInstance(binaryInputStream);
 		} catch (PremisMetadataException | IOException | ClassCastException e) {
 			isObject = false;
+		} finally {
+			if (binaryInputStream != null) {
+				try {
+					binaryInputStream.close();
+				} catch (IOException e1) {
+					LOGGER.warn("Cannot close file inputstream", e1);
+				}
+			}
 		}
 		return isObject;
 	}
 
 	public static boolean isPreservationEvent(Binary preservationBinary) {
 		boolean isEvent = true;
+		InputStream binaryInputStream = null;
 		try {
-			PremisEventHelper.newInstance(preservationBinary.getContent().createInputStream());
+			binaryInputStream = preservationBinary.getContent().createInputStream();
+			PremisEventHelper.newInstance(binaryInputStream);
 		} catch (PremisMetadataException | IOException | ClassCastException e) {
 			isEvent = false;
+		} finally {
+			if (binaryInputStream != null) {
+				try {
+					binaryInputStream.close();
+				} catch (IOException e1) {
+					LOGGER.warn("Cannot close file inputstream", e1);
+				}
+			}
 		}
 		return isEvent;
 	}
 
 	public static boolean isPreservationFileObject(Binary preservationBinary) {
 		boolean isObject = true;
+		InputStream binaryInputStream = null;
 		try {
-			PremisFileObjectHelper.newInstance(preservationBinary.getContent().createInputStream());
+			binaryInputStream = preservationBinary.getContent().createInputStream();
+			PremisFileObjectHelper.newInstance(binaryInputStream);
 		} catch (PremisMetadataException | IOException | ClassCastException e) {
 			isObject = false;
+		} finally {
+			if (binaryInputStream != null) {
+				try {
+					binaryInputStream.close();
+				} catch (IOException e1) {
+					LOGGER.warn("Cannot close file inputstream", e1);
+				}
+			}
 		}
 		return isObject;
+	}
+
+	// FIXME finish to implement this for deleting the 3 methods above
+	// (isPreservation*)
+	public static PREMIS_TYPE getPremisType(Binary preservationBinary) {
+		PREMIS_TYPE ret = PREMIS_TYPE.UNKNOWN;
+		InputStream binaryInputStream = null;
+		try {
+			binaryInputStream = preservationBinary.getContent().createInputStream();
+			PremisFileObjectHelper.newInstance(binaryInputStream);
+		} catch (PremisMetadataException | IOException | ClassCastException e) {
+
+		} finally {
+			if (binaryInputStream != null) {
+				try {
+					binaryInputStream.close();
+				} catch (IOException e1) {
+					LOGGER.warn("Cannot close file inputstream", e1);
+				}
+			}
+		}
+		return ret;
 	}
 
 	public static StoragePath getPreservationAgentPath(String agentID) throws StorageServiceException {

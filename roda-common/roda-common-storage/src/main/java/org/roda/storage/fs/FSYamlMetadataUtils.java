@@ -219,11 +219,13 @@ public final class FSYamlMetadataUtils {
 		Yaml yaml = new Yaml();
 		Map<String, Set<String>> metadata;
 		if (Files.exists(properties)) {
+			FileInputStream fileInputStream = null;
 			try {
 				// XXX for some unknown reason, snakeyaml doesn't like NIO2
 				// Object o = yaml.load(Files.newInputStream(properties));
 				// Object o = yaml.load(Files.newBufferedReader(properties));
-				Object o = yaml.load(new FileInputStream(properties.toFile()));
+				fileInputStream = new FileInputStream(properties.toFile());
+				Object o = yaml.load(fileInputStream);
 
 				if (o instanceof Map) {
 					Map<Object, Object> m = (Map) o;
@@ -278,6 +280,14 @@ public final class FSYamlMetadataUtils {
 				throw new StorageServiceException(
 						"Could not load from properties file " + properties,
 						StorageServiceException.INTERNAL_SERVER_ERROR, e);
+			} finally {
+				if(fileInputStream!=null){
+					try {
+						fileInputStream.close();
+					} catch (IOException e) {
+						LOGGER.warn("Cannot close file inputstream", e);
+					}
+				}
 			}
 		} else {
 			metadata = new HashMap<String, Set<String>>();

@@ -29,9 +29,9 @@ import pt.gov.dgarq.roda.core.data.v2.User;
 /**
  * Servlet Filter implementation class RolesSetterFilter
  */
-public class RolesSetterFilter implements Filter {
-	private static final Logger logger = Logger.getLogger(RolesSetterFilter.class);
-	
+public class RodaCasAuthenticationFilter implements Filter {
+	private static final Logger logger = Logger.getLogger(RodaCasAuthenticationFilter.class);
+
 	private FilterConfig config;
 	protected String casLogoutURL = null;
 
@@ -54,7 +54,7 @@ public class RolesSetterFilter implements Filter {
 	/**
 	 * Default constructor.
 	 */
-	public RolesSetterFilter() {
+	public RodaCasAuthenticationFilter() {
 		// do nothing
 	}
 
@@ -86,14 +86,8 @@ public class RolesSetterFilter implements Filter {
 					UserUtility.setUser(servletRequest, rsu);
 				}
 			} else {
-				if (UserUtility.getUser(servletRequest, RodaCoreFactory.getIndexService()) == null) {
-					logger.debug(
-							"User principal doesn't exist neither the user is already in session: setting user to guest");
-					UserUtility.setUser(servletRequest, UserUtility.getGuest());
-				} else {
-					logger.debug("User is already in session");
-				}
-
+				UserUtility.setUser(servletRequest,
+						UserUtility.getUser(servletRequest, RodaCoreFactory.getIndexService()));
 			}
 
 			String url = servletRequest.getRequestURL().toString();
