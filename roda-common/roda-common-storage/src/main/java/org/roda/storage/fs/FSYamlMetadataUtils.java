@@ -1,17 +1,18 @@
 package org.roda.storage.fs;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.CopyOption;
 import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -133,37 +134,47 @@ public final class FSYamlMetadataUtils {
 		} else {
 			Map<String, Set<String>> oldMetadata = new HashMap<String, Set<String>>();
 			if (Files.exists(properties)) {
+				BufferedReader bufferedReader = null;
 				try {
-					// XXX for some unknown reason, snakeyaml doesn't like NIO2
-					// Object o = yaml.load(Files.newInputStream(properties));
-					// Object o =
-					// yaml.load(Files.newBufferedReader(properties));
-					FileReader fileReader = new FileReader(properties.toFile());
-					Object o = yaml.load(fileReader);
+					bufferedReader = Files.newBufferedReader(properties, Charset.defaultCharset());
+					Object o = yaml.load(bufferedReader);
 					if (o instanceof Map) {
 						oldMetadata = (Map<String, Set<String>>) o;
 					}
-					fileReader.close();
 				} catch (IOException e) {
 					throw new StorageServiceException("Could not load from properties file " + properties,
 							StorageServiceException.INTERNAL_SERVER_ERROR, e);
+				} finally {
+					if (bufferedReader != null) {
+						try {
+							bufferedReader.close();
+						} catch (IOException e) {
+							LOGGER.warn("Cannot close buffered reader", e);
+						}
+					}
 				}
 			}
 
 			metadata = replaceMetadataIfExists(oldMetadata, newMetadata);
 		}
+		BufferedWriter bufferedWriter = null;
 		try {
-			// XXX for some unknown reason, snakeyaml doesn't like NIO2
-			// yaml.dump(metadata, Files.newBufferedWriter(properties,
-			// StandardOpenOption.CREATE));
-			FileWriter fileWriter = new FileWriter(properties.toFile());
-			yaml.dump(metadata, fileWriter);
-			fileWriter.close();
+			bufferedWriter = Files.newBufferedWriter(properties, Charset.defaultCharset(), StandardOpenOption.CREATE,
+					StandardOpenOption.TRUNCATE_EXISTING);
+			yaml.dump(metadata, bufferedWriter);
 			return metadata;
 
 		} catch (IOException e) {
 			throw new StorageServiceException("Could not write properties back to file " + properties,
 					StorageServiceException.INTERNAL_SERVER_ERROR, e);
+		} finally {
+			if (bufferedWriter != null) {
+				try {
+					bufferedWriter.close();
+				} catch (IOException e) {
+					LOGGER.warn("Cannot close buffered writer", e);
+				}
+			}
 		}
 
 	}
@@ -208,13 +219,10 @@ public final class FSYamlMetadataUtils {
 		Yaml yaml = new Yaml();
 		Map<String, Set<String>> metadata;
 		if (Files.exists(properties)) {
-			FileInputStream fileInputStream = null;
+			BufferedReader bufferedReader = null;
 			try {
-				// XXX for some unknown reason, snakeyaml doesn't like NIO2
-				// Object o = yaml.load(Files.newInputStream(properties));
-				// Object o = yaml.load(Files.newBufferedReader(properties));
-				fileInputStream = new FileInputStream(properties.toFile());
-				Object o = yaml.load(fileInputStream);
+				bufferedReader = Files.newBufferedReader(properties, Charset.defaultCharset());
+				Object o = yaml.load(bufferedReader);
 
 				if (o instanceof Map) {
 					Map<Object, Object> m = (Map) o;
@@ -260,11 +268,11 @@ public final class FSYamlMetadataUtils {
 				throw new StorageServiceException("Could not load from properties file " + properties,
 						StorageServiceException.INTERNAL_SERVER_ERROR, e);
 			} finally {
-				if (fileInputStream != null) {
+				if (bufferedReader != null) {
 					try {
-						fileInputStream.close();
+						bufferedReader.close();
 					} catch (IOException e) {
-						LOGGER.warn("Cannot close file inputstream", e);
+						LOGGER.warn("Cannot close buffered reader", e);
 					}
 				}
 			}
