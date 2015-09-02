@@ -26,321 +26,339 @@ import pt.gov.dgarq.roda.core.data.v2.User;
  */
 public class UserLogin {
 
-	private static final ClientLogger logger = new ClientLogger(UserLogin.class.getName());
+  private static final ClientLogger logger = new ClientLogger(UserLogin.class.getName());
 
-	private static final CommonConstants constants = (CommonConstants) GWT.create(CommonConstants.class);
+  private static final CommonConstants constants = (CommonConstants) GWT.create(CommonConstants.class);
 
-	private static final CommonMessages messages = (CommonMessages) GWT.create(CommonMessages.class);
+  private static final CommonMessages messages = (CommonMessages) GWT.create(CommonMessages.class);
 
-	private static UserLoginServiceAsync userLoginService;
+  private static UserLoginServiceAsync userLoginService;
 
-	private static UserLogin instance = null;
+  private static UserLogin instance = null;
 
-	private static Map<String, String> rodaProperties;
+  private static Map<String, String> rodaProperties;
 
-	private static boolean initialized = false;
+  private static boolean initialized = false;
 
-	private static void init(final AsyncCallback<Map<String, String>> callback) {
-		if (!initialized) {
+  private static void init(final AsyncCallback<Map<String, String>> callback) {
+    if (!initialized) {
 
-			userLoginService = UserLoginService.Util.getInstance();
-			userLoginService.getRodaProperties(new AsyncCallback<Map<String, String>>() {
+      userLoginService = UserLoginService.Util.getInstance();
+      userLoginService.getRodaProperties(new AsyncCallback<Map<String, String>>() {
 
-				public void onFailure(Throwable caught) {
-					logger.fatal("Error getting role mapping", caught);
-					callback.onFailure(caught);
-				}
+        public void onFailure(Throwable caught) {
+          logger.fatal("Error getting role mapping", caught);
+          callback.onFailure(caught);
+        }
 
-				public void onSuccess(Map<String, String> properties) {
-					rodaProperties = properties;
-					initialized = true;
-					callback.onSuccess(properties);
-				}
+        public void onSuccess(Map<String, String> properties) {
+          rodaProperties = properties;
+          initialized = true;
+          callback.onSuccess(properties);
+        }
 
-			});
-		} else {
-			callback.onSuccess(rodaProperties);
-		}
-	}
+      });
+    } else {
+      callback.onSuccess(rodaProperties);
+    }
+  }
 
-	static {
-		init(new AsyncCallback<Map<String, String>>() {
+  static {
+    init(new AsyncCallback<Map<String, String>>() {
 
-			public void onFailure(Throwable caught) {
-				logger.error("Error initializing", caught);
-			}
+      public void onFailure(Throwable caught) {
+        logger.error("Error initializing", caught);
+      }
 
-			public void onSuccess(Map<String, String> properties) {
-				// nothing to do
-			}
+      public void onSuccess(Map<String, String> properties) {
+        // nothing to do
+      }
 
-		});
-	}
+    });
+  }
 
-	/**
-	 * Get the singleton instance
-	 * 
-	 * @return the instance
-	 */
-	public static UserLogin getInstance() {
-		if (instance == null) {
-			instance = new UserLogin();
-		}
-		return instance;
-	}
+  /**
+   * Get the singleton instance
+   * 
+   * @return the instance
+   */
+  public static UserLogin getInstance() {
+    if (instance == null) {
+      instance = new UserLogin();
+    }
+    return instance;
+  }
 
-	private final List<LoginStatusListener> listeners;
+  private final List<LoginStatusListener> listeners;
 
-	private AuthenticatedUser user = null;
+  private AuthenticatedUser user = null;
 
-	public void setUser(AuthenticatedUser user) {
-		this.user = user;
-	}
+  public void setUser(AuthenticatedUser user) {
+    this.user = user;
+  }
 
-	private UserLogin() {
-		listeners = new Vector<LoginStatusListener>();
-	}
+  private UserLogin() {
+    listeners = new Vector<LoginStatusListener>();
+  }
 
-	/**
-	 * Get current authenticated user. User is cached and only refreshed when
-	 * login or logout actions are called.
-	 * 
-	 * @param callback
-	 *            call back handler that receives error if failed or
-	 *            AuthOfficeUser if success.
-	 */
-	public void getAuthenticatedUser(final AsyncCallback<AuthenticatedUser> callback) {
-		if (user == null) {
-			userLoginService.getAuthenticatedUser(new AsyncCallback<AuthenticatedUser>() {
+  /**
+   * Get current authenticated user. User is cached and only refreshed when
+   * login or logout actions are called.
+   * 
+   * @param callback
+   *          call back handler that receives error if failed or AuthOfficeUser
+   *          if success.
+   */
+  public void getAuthenticatedUser(final AsyncCallback<AuthenticatedUser> callback) {
+    if (user == null) {
+      userLoginService.getAuthenticatedUser(new AsyncCallback<AuthenticatedUser>() {
 
-				public void onFailure(Throwable caught) {
-					callback.onFailure(caught);
+        public void onFailure(Throwable caught) {
+          callback.onFailure(caught);
 
-				}
+        }
 
-				public void onSuccess(AuthenticatedUser user) {
-					callback.onSuccess(user);
-					UserLogin.this.user = user;
-				}
+        public void onSuccess(AuthenticatedUser user) {
+          callback.onSuccess(user);
+          UserLogin.this.user = user;
+        }
 
-			});
-		} else {
-			callback.onSuccess(user);
-		}
-	}
+      });
+    } else {
+      callback.onSuccess(user);
+    }
+  }
 
-	/**
-	 * Login into RODA Core
-	 * 
-	 * @param username
-	 * @param password
-	 * @param callback
-	 */
-	public void login() {
-		Window.open("/login", "_self", "");
-	}
+  /**
+   * Login into RODA Core
+   * 
+   * @param username
+   * @param password
+   * @param callback
+   */
+  public void login() {
+    Window.open("/login", "_self", "");
+  }
 
-	/**
-	 * 
-	 * @param callback
-	 */
-	public void logout(final AsyncCallback<AuthenticatedUser> callback) {
-		Window.open("/logout", "_self", "");
-	}
+  public void login(String username, String password, final AsyncCallback<AuthenticatedUser> callback) {
+    userLoginService.login(username, password, new AsyncCallback<AuthenticatedUser>() {
 
-	/**
-	 * Add a login status listener
-	 * 
-	 * @param listener
-	 */
-	public void addLoginStatusListener(LoginStatusListener listener) {
-		listeners.add(listener);
-	}
+      @Override
+      public void onFailure(Throwable caught) {
+        callback.onFailure(caught);
+      }
 
-	/**
-	 * Remove a login status listener
-	 * 
-	 * @param listener
-	 */
-	public void removeLoginStatusListener(LoginStatusListener listener) {
-		listeners.remove(listener);
-	}
+      @Override
+      public void onSuccess(AuthenticatedUser newUser) {
+        UserLogin.this.user = newUser;
+        onLoginStatusChanged(newUser);
+        callback.onSuccess(newUser);
+      }
+    });
+  }
 
-	public void onLoginStatusChanged(AuthenticatedUser newUser) {
-		for (LoginStatusListener listener : listeners) {
-			listener.onLoginStatusChanged(newUser);
-		}
-	}
+  /**
+   * 
+   * @param callback
+   */
+  public void logout(final AsyncCallback<AuthenticatedUser> callback) {
+    Window.open("/logout", "_self", "");
+    UserLogin.this.user = null;
+  }
 
-	/**
-	 * Check if the changing of the permissions of the RODA member affects
-	 * current authenticated user and alert login status listeners
-	 * 
-	 * @param member
-	 *            the member which had his permissions changed
-	 */
-	public void permissionsChanged(final RODAMember member) {
-		getAuthenticatedUser(new AsyncCallback<AuthenticatedUser>() {
+  /**
+   * Add a login status listener
+   * 
+   * @param listener
+   */
+  public void addLoginStatusListener(LoginStatusListener listener) {
+    listeners.add(listener);
+  }
 
-			public void onFailure(Throwable caught) {
-				// do nothing
-			}
+  /**
+   * Remove a login status listener
+   * 
+   * @param listener
+   */
+  public void removeLoginStatusListener(LoginStatusListener listener) {
+    listeners.remove(listener);
+  }
 
-			public void onSuccess(AuthenticatedUser user) {
-				AuthenticatedUser authUser = user;
-				if (member instanceof User && member.getName().equals(authUser.getName())) {
-					onLoginStatusChanged(authUser);
-				} else if (member instanceof Group && Arrays.asList(authUser.getAllGroups()).contains(member.getName())) {
-					onLoginStatusChanged(authUser);
-				}
-			}
+  public void onLoginStatusChanged(AuthenticatedUser newUser) {
+    for (LoginStatusListener listener : listeners) {
+      listener.onLoginStatusChanged(newUser);
+    }
+  }
 
-		});
-	}
+  /**
+   * Check if the changing of the permissions of the RODA member affects current
+   * authenticated user and alert login status listeners
+   * 
+   * @param member
+   *          the member which had his permissions changed
+   */
+  public void permissionsChanged(final RODAMember member) {
+    getAuthenticatedUser(new AsyncCallback<AuthenticatedUser>() {
 
-	/**
-	 * If any evidence is found that the login was reset, call this method to
-	 * update login and alert all listeners
-	 */
-	public void checkForLoginReset() {
-		final User currentUser = user;
-		user = null;
-		getAuthenticatedUser(new AsyncCallback<AuthenticatedUser>() {
+      public void onFailure(Throwable caught) {
+        // do nothing
+      }
 
-			public void onFailure(Throwable caught) {
-				logger.error("Error getting current authenticated user", caught);
-			}
+      public void onSuccess(AuthenticatedUser user) {
+        AuthenticatedUser authUser = user;
+        if (member instanceof User && member.getName().equals(authUser.getName())) {
+          onLoginStatusChanged(authUser);
+        } else if (member instanceof Group && Arrays.asList(authUser.getAllGroups()).contains(member.getName())) {
+          onLoginStatusChanged(authUser);
+        }
+      }
 
-			public void onSuccess(AuthenticatedUser user) {
-				if (!user.equals(currentUser)) {
-					onLoginStatusChanged(user);
-				}
+    });
+  }
 
-			}
+  /**
+   * If any evidence is found that the login was reset, call this method to
+   * update login and alert all listeners
+   */
+  public void checkForLoginReset() {
+    final User currentUser = user;
+    user = null;
+    getAuthenticatedUser(new AsyncCallback<AuthenticatedUser>() {
 
-		});
-	}
+      public void onFailure(Throwable caught) {
+        logger.error("Error getting current authenticated user", caught);
+      }
 
-	/**
-	 * Get RODA properties
-	 * 
-	 * @param callback
-	 */
-	public static void getRodaProperties(final AsyncCallback<Map<String, String>> callback) {
-		init(new AsyncCallback<Map<String, String>>() {
+      public void onSuccess(AuthenticatedUser user) {
+        if (!user.equals(currentUser)) {
+          onLoginStatusChanged(user);
+        }
 
-			public void onFailure(Throwable caught) {
-				callback.onFailure(caught);
-			}
+      }
 
-			public void onSuccess(Map<String, String> properties) {
-				callback.onSuccess(properties);
+    });
+  }
 
-			}
-		});
-	}
+  /**
+   * Get RODA properties
+   * 
+   * @param callback
+   */
+  public static void getRodaProperties(final AsyncCallback<Map<String, String>> callback) {
+    init(new AsyncCallback<Map<String, String>>() {
 
-	/**
-	 * Get a RODA property
-	 * 
-	 * @param key
-	 * @param callback
-	 */
-	public static void getRodaProperty(final String key, final AsyncCallback<String> callback) {
-		init(new AsyncCallback<Map<String, String>>() {
+      public void onFailure(Throwable caught) {
+        callback.onFailure(caught);
+      }
 
-			public void onFailure(Throwable caught) {
-				callback.onFailure(caught);
-			}
+      public void onSuccess(Map<String, String> properties) {
+        callback.onSuccess(properties);
 
-			public void onSuccess(Map<String, String> properties) {
-				callback.onSuccess(properties.get(key));
-			}
+      }
+    });
+  }
 
-		});
-	}
+  /**
+   * Get a RODA property
+   * 
+   * @param key
+   * @param callback
+   */
+  public static void getRodaProperty(final String key, final AsyncCallback<String> callback) {
+    init(new AsyncCallback<Map<String, String>>() {
 
-	/**
-	 * Check if current user has permission to access a history resolver
-	 * 
-	 * @param res
-	 * @param callback
-	 */
-	public void checkRole(final HistoryResolver res, final AsyncCallback<Boolean> callback) {
-		String propertyName = "menu." + res.getHistoryPath() + ".role";
-		UserLogin.getRodaProperty(propertyName, new AsyncCallback<String>() {
+      public void onFailure(Throwable caught) {
+        callback.onFailure(caught);
+      }
 
-			public void onFailure(Throwable caught) {
-				callback.onFailure(caught);
-			}
+      public void onSuccess(Map<String, String> properties) {
+        callback.onSuccess(properties.get(key));
+      }
 
-			public void onSuccess(final String role) {
-				if (role == null) {
-					GWT.log("Could not find role for path " + res.getHistoryPath());
-				}
-				getAuthenticatedUser(new AsyncCallback<AuthenticatedUser>() {
+    });
+  }
 
-					public void onFailure(Throwable caught) {
-						callback.onFailure(caught);
-					}
+  /**
+   * Check if current user has permission to access a history resolver
+   * 
+   * @param res
+   * @param callback
+   */
+  public void checkRole(final HistoryResolver res, final AsyncCallback<Boolean> callback) {
+    String propertyName = "menu." + res.getHistoryPath() + ".role";
+    UserLogin.getRodaProperty(propertyName, new AsyncCallback<String>() {
 
-					public void onSuccess(AuthenticatedUser authUser) {
-						logger.debug("Checking user " + authUser.getId() + " for role " + role);
-						callback.onSuccess(new Boolean(authUser.hasRole(role)));
-					}
+      public void onFailure(Throwable caught) {
+        callback.onFailure(caught);
+      }
 
-				});
+      public void onSuccess(final String role) {
+        if (role == null) {
+          GWT.log("Could not find role for path " + res.getHistoryPath());
+        }
+        getAuthenticatedUser(new AsyncCallback<AuthenticatedUser>() {
 
-			}
+          public void onFailure(Throwable caught) {
+            callback.onFailure(caught);
+          }
 
-		});
-	}
+          public void onSuccess(AuthenticatedUser authUser) {
+            logger.debug("Checking user " + authUser.getId() + " for role " + role);
+            callback.onSuccess(new Boolean(authUser.hasRole(role)));
+          }
 
-	/**
-	 * Check if current authenticated user can access some history resolvers
-	 * 
-	 * @param res
-	 * @param exclusive
-	 * @param callback
-	 */
-	public void checkRoles(HistoryResolver[] res, final boolean exclusive, final AsyncCallback<Boolean> callback) {
-		final Boolean[] results = new Boolean[res.length];
+        });
 
-		for (int i = 0; i < res.length; i++) {
-			final int index = i;
-			checkRole(res[i], new AsyncCallback<Boolean>() {
+      }
 
-				public void onFailure(Throwable caught) {
-					callback.onFailure(caught);
-				}
+    });
+  }
 
-				public void onSuccess(Boolean rolePermitted) {
-					results[index] = rolePermitted;
-					boolean lastOne = true;
-					for (int i = 0; i < results.length; i++) {
-						if (results[i] == null) {
-							lastOne = false;
-						}
-					}
-					if (lastOne) {
-						if (exclusive) {
-							boolean ret = true;
-							for (int i = 0; i < results.length; i++) {
-								ret = results[i].booleanValue() ? ret : false;
-							}
-							callback.onSuccess(new Boolean(ret));
-						} else {
-							boolean ret = false;
-							for (int i = 0; i < results.length; i++) {
-								ret = results[i].booleanValue() ? true : ret;
-							}
-							callback.onSuccess(new Boolean(ret));
-						}
-					}
-				}
+  /**
+   * Check if current authenticated user can access some history resolvers
+   * 
+   * @param res
+   * @param exclusive
+   * @param callback
+   */
+  public void checkRoles(HistoryResolver[] res, final boolean exclusive, final AsyncCallback<Boolean> callback) {
+    final Boolean[] results = new Boolean[res.length];
 
-			});
-		}
-	}
+    for (int i = 0; i < res.length; i++) {
+      final int index = i;
+      checkRole(res[i], new AsyncCallback<Boolean>() {
+
+        public void onFailure(Throwable caught) {
+          callback.onFailure(caught);
+        }
+
+        public void onSuccess(Boolean rolePermitted) {
+          results[index] = rolePermitted;
+          boolean lastOne = true;
+          for (int i = 0; i < results.length; i++) {
+            if (results[i] == null) {
+              lastOne = false;
+            }
+          }
+          if (lastOne) {
+            if (exclusive) {
+              boolean ret = true;
+              for (int i = 0; i < results.length; i++) {
+                ret = results[i].booleanValue() ? ret : false;
+              }
+              callback.onSuccess(new Boolean(ret));
+            } else {
+              boolean ret = false;
+              for (int i = 0; i < results.length; i++) {
+                ret = results[i].booleanValue() ? true : ret;
+              }
+              callback.onSuccess(new Boolean(ret));
+            }
+          }
+        }
+
+      });
+    }
+  }
 
 }

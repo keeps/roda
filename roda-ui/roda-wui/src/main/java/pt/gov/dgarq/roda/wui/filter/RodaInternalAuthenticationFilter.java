@@ -18,37 +18,38 @@ import org.roda.common.UserUtility;
  * @author Hélder Silva <hsilva@keep.pt>
  */
 public class RodaInternalAuthenticationFilter implements Filter {
-	private static final Logger LOGGER = Logger.getLogger(RodaInternalAuthenticationFilter.class);
+  private static final Logger LOGGER = Logger.getLogger(RodaInternalAuthenticationFilter.class);
 
-	@Override
-	public void init(FilterConfig arg0) throws ServletException {
-		LOGGER.info(getClass().getSimpleName() + " initialized ok");
-	}
+  @Override
+  public void init(FilterConfig arg0) throws ServletException {
+    LOGGER.info(getClass().getSimpleName() + " initialized ok");
+  }
 
-	@Override
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-			throws IOException, ServletException {
-		LOGGER.debug("executing doFilter");
+  @Override
+  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+    throws IOException, ServletException {
+    LOGGER.debug("executing doFilter");
 
-		final HttpServletRequest httpRequest = (HttpServletRequest) request;
-		final HttpServletResponse httpResponse = (HttpServletResponse) response;
+    final HttpServletRequest httpRequest = (HttpServletRequest) request;
+    final HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-		String url = httpRequest.getRequestURL().toString();
-		if (url.endsWith("/login")) {
-			// FIXME add this to configuration
-			httpRequest.getRequestDispatcher("/login.html").forward(httpRequest, httpResponse);
-		} else if (url.endsWith("/logout")) {
-			url = url.substring(0, url.indexOf("logout"));
-			UserUtility.logout(httpRequest);
-			httpRequest.getRequestDispatcher("/#home").forward(httpRequest, httpResponse);
-		} else {
-			chain.doFilter(request, response);
-		}
-	}
+    String url = httpRequest.getRequestURL().toString();
+    LOGGER.debug("roda internal filter url: " + url);
+    if (url.endsWith("/login")) {
+      // FIXME add this to configuration
+      httpResponse.sendRedirect("/#login");
+    } else if (url.endsWith("/logout")) {
+      url = url.substring(0, url.indexOf("logout"));
+      UserUtility.logout(httpRequest);
+      httpResponse.sendRedirect("/#home");
+    } else {
+      chain.doFilter(request, response);
+    }
+  }
 
-	@Override
-	public void destroy() {
-		// do nothing
-	}
+  @Override
+  public void destroy() {
+    // do nothing
+  }
 
 }

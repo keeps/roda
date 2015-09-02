@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+	xmlns:i="urn:import:config.i18n.client" xmlns:m="urn:import:pt.gov.dgarq.roda.wui.main.client"
+	xmlns:common="urn:import:pt.gov.dgarq.roda.wui.common.client.widgets">
+
+	<ui:style>
+	.login {
+		margin: 40px 100px;
+	}
+	.button {
+		margin-top: 10px;
+	}
+	</ui:style>
+
+	<g:FlowPanel styleName="login {style.login}">
+		<g:HTML>
+			<h1>Login</h1>
+		</g:HTML>
+		<g:FlowPanel>
+			<g:Label>Username</g:Label>
+			<g:TextBox ui:field="username"></g:TextBox>
+			<g:Label>Password</g:Label>
+			<g:PasswordTextBox ui:field="password"></g:PasswordTextBox>
+		</g:FlowPanel>
+		<g:Button ui:field="login" addStyleNames="btn btn-play {style.button}">Login</g:Button>
+
+	</g:FlowPanel>
+
+</ui:UiBinder>
