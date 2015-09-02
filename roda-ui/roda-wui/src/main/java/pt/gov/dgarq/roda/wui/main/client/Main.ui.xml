@@ -54,7 +54,7 @@
 		<g:FlowPanel styleName="{style.banner}">
 			<g:FocusPanel styleName="{style.homeLink}" ui:field="homeLinkArea">
 				<g:FlowPanel>
-					<g:Image styleName="{style.homeLogo}" resource='{res.logo}' />
+					<g:Image title="logo" altText="logo" styleName="{style.homeLogo}" resource='{res.logo}' />
 					<g:Label styleName="{style.homeText}">RODA</g:Label>
 				</g:FlowPanel>
 			</g:FocusPanel>

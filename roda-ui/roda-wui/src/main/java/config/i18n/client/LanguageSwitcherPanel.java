@@ -24,6 +24,9 @@ public class LanguageSwitcherPanel extends Composite {
 
 	private static final FlagsBundle flags = (FlagsBundle) GWT
 			.create(FlagsBundle.class);
+	
+	private static LanguageSwitcherPanelConstants constants = (LanguageSwitcherPanelConstants) GWT
+			.create(LanguageSwitcherPanelConstants.class);
 
 	private final Map<String, Image> languages;
 
@@ -35,9 +38,18 @@ public class LanguageSwitcherPanel extends Composite {
 		initWidget(layout);
 
 		// insert new languages here
-		languages.put("pt_PT", new Image(flags.pt_PT()));
-		languages.put("en", new Image(flags.en()));
-		languages.put("cs_CZ", new Image(flags.cs_CZ()));
+		Image ptImage = new Image(flags.pt_PT());
+		ptImage.setAltText(constants.lang_pt());
+		ptImage.setTitle(constants.lang_pt());
+		languages.put("pt_PT", ptImage);
+		Image enImage = new Image(flags.en());
+		enImage.setAltText(constants.lang_en());
+		enImage.setTitle(constants.lang_en());
+		languages.put("en", enImage);
+		Image czImage = new Image(flags.cs_CZ());
+		czImage.setAltText(constants.lang_cz());
+		czImage.setTitle(constants.lang_cz());
+		languages.put("cs_CZ", czImage);
 
 		// Adding all defined languages
 		for (Entry<String, Image> entry : languages.entrySet()) {
