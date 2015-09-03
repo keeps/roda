@@ -1,6 +1,7 @@
 package pt.gov.dgarq.roda.wui.filter;
 
 import java.io.IOException;
+import java.net.URI;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -34,12 +35,30 @@ public class RodaInternalAuthenticationFilter implements Filter {
     final HttpServletResponse httpResponse = (HttpServletResponse) response;
 
     String url = httpRequest.getRequestURL().toString();
-    LOGGER.debug("roda internal filter url: " + url);
-    if (url.endsWith("/login")) {
+    String requestURI = httpRequest.getRequestURI();
+    String service = httpRequest.getParameter("service");
+
+    LOGGER.debug("URL: " + url);
+    LOGGER.debug("Request URI: " + requestURI);
+    LOGGER.debug("Service: " + service);
+
+    String serviceFrag = null;
+    try {
+      serviceFrag = URI.create(service).getFragment();
+    } catch (IllegalArgumentException e) {
+      LOGGER.warn("Bad format for service parameter", e);
+    }
+
+    if (requestURI.equals("/login")) {
       // FIXME add this to configuration
-      httpResponse.sendRedirect("/#login");
-    } else if (url.endsWith("/logout")) {
-      url = url.substring(0, url.indexOf("logout"));
+      String redirect = "/#login";
+
+      if (serviceFrag != null) {
+        redirect += "." + serviceFrag;
+      }
+
+      httpResponse.sendRedirect(redirect);
+    } else if (requestURI.equals("/logout")) {
       UserUtility.logout(httpRequest);
       httpResponse.sendRedirect("/#home");
     } else {

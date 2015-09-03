@@ -182,12 +182,7 @@
 
 /* @group Login Dialog */
 .wui-login-dialog {
-	padding: 10px 5px;
-	background-color: #e6e7e8;
-}
 
-.wui-login-dialog-cell {
-	background-color: #e6e7e8;
 }
 
 .wui-login-dialog .username-label {
@@ -209,7 +204,7 @@
 }
 
 .wui-login-dialog .login {
-	
+	float: right;
 }
 
 .wui-login-dialog .cancel {
@@ -331,10 +326,14 @@
 }
 
 .main .wui-breadcrumbPanel .breadcrumb {
-	font-style: italic;
+	display: inline;
 	color: #a7a9ac;
 	cursor: pointer;
 	cursor: hand;
+}
+
+.main .wui-breadcrumbPanel .breadcrumb * {
+	color: #a7a9ac;
 }
 
 .main .wui-breadcrumbPanel .breadcrumb .description-level {
@@ -354,6 +353,7 @@
 }
 
 .main .wui-breadcrumbPanel .breadcrumb-separator {
+	display: inline;
 	font-family: 'Ubuntu', sans-serif;
 	font-size: 12px;
 	color: #a7a9ac;

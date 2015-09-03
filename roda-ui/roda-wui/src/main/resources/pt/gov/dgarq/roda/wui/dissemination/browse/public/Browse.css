@@ -10,7 +10,7 @@
 }
 
 .browseItemIcon {
-	display: inline-block;
+	float: left;
 	width: 50px;
 	position: relative;
 	top: 8px;
@@ -28,7 +28,7 @@
 }
 
 .browseItemText {
-	display: inline-block;
+	display: inline;
 	margin-bottom: 0 !important;
 }
 

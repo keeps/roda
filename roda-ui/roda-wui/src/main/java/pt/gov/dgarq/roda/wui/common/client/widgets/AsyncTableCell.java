@@ -131,8 +131,8 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
   }
 
   public void refresh() {
-    getSelectionModel().clear();
     getDisplay().setVisibleRangeAndClearData(new Range(0, getInitialPageSize()), true);
+    getSelectionModel().clear();
   }
 
   public Filter getFilter() {

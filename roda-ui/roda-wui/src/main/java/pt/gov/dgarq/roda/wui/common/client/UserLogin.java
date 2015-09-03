@@ -137,7 +137,8 @@ public class UserLogin {
    * @param callback
    */
   public void login() {
-    Window.open("/login", "_self", "");
+    String currentURL = Window.Location.getHref();
+    Window.open("/login?service=" + currentURL, "_self", "");
   }
 
   public void login(String username, String password, final AsyncCallback<AuthenticatedUser> callback) {
@@ -162,7 +163,8 @@ public class UserLogin {
    * @param callback
    */
   public void logout(final AsyncCallback<AuthenticatedUser> callback) {
-    Window.open("/logout", "_self", "");
+    String currentURL = Window.Location.getHref();
+    Window.open("/logout?service=" + currentURL, "_self", "");
     UserLogin.this.user = null;
   }
 

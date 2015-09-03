@@ -24,6 +24,7 @@ import pt.gov.dgarq.roda.wui.common.client.AuthenticatedUser;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
+import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
 import pt.gov.dgarq.roda.wui.home.client.Home;
 
 /**
@@ -32,121 +33,122 @@ import pt.gov.dgarq.roda.wui.home.client.Home;
  */
 public class Login extends Composite {
 
-	public static final HistoryResolver RESOLVER = new HistoryResolver() {
+  public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
-		@Override
-		public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
-			getInstance().resolve(historyTokens, callback);
-		}
+    @Override
+    public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
+      getInstance().resolve(historyTokens, callback);
+    }
 
-		@Override
-		public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-			callback.onSuccess(true);
-		}
+    @Override
+    public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
+      callback.onSuccess(true);
+    }
 
-		@Override
-		public String getHistoryToken() {
-			return "login";
-		}
+    @Override
+    public String getHistoryToken() {
+      return "login";
+    }
 
-		@Override
-		public String getHistoryPath() {
-			return getHistoryToken();
-		}
-	};
+    @Override
+    public String getHistoryPath() {
+      return getHistoryToken();
+    }
+  };
 
-	public static final String getViewItemHistoryToken(String id) {
-		return RESOLVER.getHistoryPath() + "." + id;
-	}
+  public static final String getViewItemHistoryToken(String id) {
+    return RESOLVER.getHistoryPath() + "." + id;
+  }
 
-	interface MyUiBinder extends UiBinder<Widget, Login> {
-	}
+  interface MyUiBinder extends UiBinder<Widget, Login> {
+  }
 
-	private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-	private static Login instance = null;
+  private static Login instance = null;
 
-	/**
-	 * Get the singleton instance
-	 * 
-	 * @return the instance
-	 */
-	public static Login getInstance() {
-		if (instance == null) {
-			instance = new Login();
-		}
-		return instance;
-	}
+  /**
+   * Get the singleton instance
+   * 
+   * @return the instance
+   */
+  public static Login getInstance() {
+    if (instance == null) {
+      instance = new Login();
+    }
+    return instance;
+  }
 
-	private static CommonConstants constants = (CommonConstants) GWT.create(CommonConstants.class);
+  private ClientLogger logger = new ClientLogger(getClass().getName());
 
-	private ClientLogger logger = new ClientLogger(getClass().getName());
+  @UiField
+  TextBox username;
 
-	@UiField
-	TextBox username;
+  @UiField
+  PasswordTextBox password;
 
-	@UiField
-	PasswordTextBox password;
+  @UiField
+  Button login;
 
-	@UiField
-	Button login;
+  private String service = null;
 
-	private Login() {
-		initWidget(uiBinder.createAndBindUi(this));
-	}
+  private Login() {
+    initWidget(uiBinder.createAndBindUi(this));
+  }
 
-	public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
-		if (historyTokens.length == 0) {
-			username.setText("");
-			password.setText("");
-			callback.onSuccess(this);
-		} else {
-			History.newItem(RESOLVER.getHistoryPath());
-			callback.onSuccess(null);
-		}
-	}
+  public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
+    username.setText("");
+    password.setText("");
+    service = Tools.join(historyTokens, ".");
+    callback.onSuccess(this);
+  }
 
-	@UiHandler("login")
-	void handleClick(ClickEvent e) {
-		doLogin();
-	}
+  @UiHandler("login")
+  void handleClick(ClickEvent e) {
+    doLogin();
+  }
 
-	@UiHandler("username")
-	void handleUsernameKeyPress(KeyPressEvent event) {
-		tryToLoginWhenEnterIsPressed(event);
-	}
+  @UiHandler("username")
+  void handleUsernameKeyPress(KeyPressEvent event) {
+    tryToLoginWhenEnterIsPressed(event);
+  }
 
-	@UiHandler("password")
-	void handlePasswordKeyPress(KeyPressEvent event) {
-		tryToLoginWhenEnterIsPressed(event);
-	}
+  @UiHandler("password")
+  void handlePasswordKeyPress(KeyPressEvent event) {
+    tryToLoginWhenEnterIsPressed(event);
+  }
 
-	private void tryToLoginWhenEnterIsPressed(KeyPressEvent event) {
-		if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
-			doLogin();
-		}
-	}
+  private void tryToLoginWhenEnterIsPressed(KeyPressEvent event) {
+    if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
+      doLogin();
+    }
+  }
 
-	private void doLogin() {
-		String usernameText = username.getText();
-		String passwordText = password.getText();
+  private void doLogin() {
+    String usernameText = username.getText();
+    String passwordText = password.getText();
 
-		UserLogin.getInstance().login(usernameText, passwordText, new AsyncCallback<AuthenticatedUser>() {
+    UserLogin.getInstance().login(usernameText, passwordText, new AsyncCallback<AuthenticatedUser>() {
 
-			@Override
-			public void onFailure(Throwable caught) {
-				// TODO show message
-				if (caught instanceof AuthenticationDeniedException) {
-					GWT.log("Bad credentials");
-				} else {
-					GWT.log("Unexpected exception");
-				}
-			}
+      @Override
+      public void onFailure(Throwable caught) {
+        // TODO show message
+        if (caught instanceof AuthenticationDeniedException) {
+          GWT.log("Bad credentials");
+        } else {
+          GWT.log("Unexpected exception");
+        }
+      }
 
-			@Override
-			public void onSuccess(AuthenticatedUser user) {
-				History.newItem(Home.RESOLVER.getHistoryPath());
-			}
-		});
-	}
+      @Override
+      public void onSuccess(AuthenticatedUser user) {
+        if (service != null && service.length() > 0) {
+          History.newItem(service);
+        } else {
+          History.newItem(Home.RESOLVER.getHistoryPath());
+        }
+
+      }
+    });
+  }
 }

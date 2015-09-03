@@ -7,22 +7,33 @@
 
 	<ui:style>
 	.login {
-		margin: 40px 100px;
+		margin: 40px auto;
+		width: 400px;
+		background-color: #eee;
+		padding: 5px 25px;
 	}
+	
+	.label {
+		font-weight: 500;
+		margin-bottom: 5px;
+	}
+	
 	.button {
 		margin-top: 10px;
+		margin-bottom: 20px;
 	}
 	</ui:style>
 
-	<g:FlowPanel styleName="login {style.login}">
+	<g:FlowPanel addStyleNames="login {style.login}">
 		<g:HTML>
 			<h1>Login</h1>
 		</g:HTML>
 		<g:FlowPanel>
-			<g:Label>Username</g:Label>
-			<g:TextBox ui:field="username"></g:TextBox>
-			<g:Label>Password</g:Label>
-			<g:PasswordTextBox ui:field="password"></g:PasswordTextBox>
+			<g:Label addStyleNames="{style.label}">Username</g:Label>
+			<g:TextBox ui:field="username" addStyleNames="fieldTextBox"></g:TextBox>
+			<g:Label addStyleNames="{style.label}">Password</g:Label>
+			<g:PasswordTextBox ui:field="password"
+				addStyleNames="fieldTextBox"></g:PasswordTextBox>
 		</g:FlowPanel>
 		<g:Button ui:field="login" addStyleNames="btn btn-play {style.button}">Login</g:Button>
 
