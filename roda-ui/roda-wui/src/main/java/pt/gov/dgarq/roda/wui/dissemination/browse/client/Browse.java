@@ -36,7 +36,6 @@ import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 
 import config.i18n.client.CommonConstants;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
-import pt.gov.dgarq.roda.core.data.DescriptionObject;
 import pt.gov.dgarq.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
@@ -50,7 +49,6 @@ import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
 import pt.gov.dgarq.roda.wui.common.client.tools.DescriptionLevelUtils;
 import pt.gov.dgarq.roda.wui.common.client.widgets.AIPList;
-import pt.gov.dgarq.roda.wui.dissemination.browse.client.ViewPanel.ViewListener;
 import pt.gov.dgarq.roda.wui.main.client.BreadcrumbItem;
 import pt.gov.dgarq.roda.wui.main.client.BreadcrumbPanel;
 
@@ -442,59 +440,7 @@ public class Browse extends Composite {
 		return historyUpdated;
 	}
 
-	protected ViewListener createViewListener(String pid) {
-		return new ViewListener() {
-
-			public void onCancel(String thisPid) {
-				// viewPanelContainer.clear();
-				// viewPanel = null;
-				// updateStyle();
-			}
-
-			public void onClone(String thisPid, String clonePid) {
-				Browse.this.onClone(clonePid);
-			}
-
-			public void onClose(String thisPid) {
-				// viewPanelContainer.clear();
-				// viewPanel = null;
-				// updateStyle();
-			}
-
-			public void onCreateChild(String thisPid, final String childPid) {
-				// update(thisPid, false, true, new
-				// AsyncCallback<CollectionsTreeItem>() {
-				//
-				// public void onFailure(Throwable caught) {
-				// logger.error("Error updating tree", caught);
-				// }
-				//
-				// public void onSuccess(CollectionsTreeItem treeItem) {
-				// view(childPid);
-				// ViewPanel.setEditMode(true);
-				// }
-				//
-				// });
-			}
-
-			public void onEdit(String thisPid) {
-				// nothing to do
-			}
-
-			public void onMove(String thisPid, String oldParentPid, String newParentPid) {
-				Browse.this.onMove(thisPid, oldParentPid, newParentPid);
-			}
-
-			public void onRemove(String thisPid, String parentPid) {
-				Browse.this.onRemove(parentPid);
-			}
-
-			public void onSave(DescriptionObject obj) {
-				// nothing to do?
-			}
-
-		};
-	}
+	
 
 	protected void onMove(final String targetPid, final String oldParentPid, final String newParentPid) {
 		// FIXME

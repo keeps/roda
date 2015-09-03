@@ -1,0 +1,31 @@
+/* Incremental changes from CellTable.css */ 
+
+.cellTableHeader {
+	white-space: nowrap;
+	font-family: 'Ubuntu', sans-serif;
+	font-size: 14px;
+	font-weight: 500;
+	text-shadow: none !important;
+}
+
+.cellTableWidget {
+	border-style: none;
+}
+
+.cellTableSelectedRow {
+	background-color: #90c0dd !important;
+}
+
+.cellTableSelectedRowCell {
+	border: 2px solid #90c0dd !important;
+}
+
+.cellTableHoveredRow {
+	cursor: pointer;
+}
+
+.cellTableCell {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}

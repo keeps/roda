@@ -127,32 +127,7 @@ h3, .h3 {
 	content: "\f00b";
 }
 
-.com-google-gwt-user-cellview-client-CellTable-Style-cellTableHeader {
-	white-space: nowrap;
-	font-family: 'Ubuntu', sans-serif;
-	font-size: 14px;
-	font-weight: 500;
-	text-shadow: none !important;
-}
 
-.com-google-gwt-user-cellview-client-CellTable-Style-cellTableWidget {
-	border-style: none;
-}
-
-.com-google-gwt-user-cellview-client-CellTable-Style-cellTableSelectedRow
-	{
-	background-color: #90c0dd !important;
-}
-
-.com-google-gwt-user-cellview-client-CellTable-Style-cellTableSelectedRowCell
-	{
-	border: 2px solid #90c0dd !important;
-}
-
-.com-google-gwt-user-cellview-client-CellTable-Style-cellTableHoveredRow
-	{
-	cursor: pointer;
-}
 
 .gwt-CheckBox label {
 	position: relative;
@@ -164,13 +139,6 @@ h3, .h3 {
 	white-space: nowrap;
 }
 
-/** Collections list and My Async Datagrid  **/
-.my-collections-table .com-google-gwt-user-cellview-client-CellTable-Style-cellTableCell
-	{
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-}
 
 .my-collections-empty-info {
 	padding: 10px;
