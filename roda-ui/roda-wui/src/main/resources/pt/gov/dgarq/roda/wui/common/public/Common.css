@@ -336,6 +336,21 @@ td.datePickerMonth, td.datePickerYear {
 	content: "\f0f7";
 }
 
+.description-level-categorization:before {
+	/* fa-bars */
+	content: "\f0c9";
+}
+
+.description-level-intellectual_entity:before {
+	/* fa-folder-o */
+	content: "\f114";
+}
+
+.description-level-representational:before {
+	/* fa-file-o */
+	content: "\f016";
+}
+
 /** Sidebar **/
 .sidebar-facet-title {
 	color: #666;
