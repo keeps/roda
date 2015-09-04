@@ -8,7 +8,6 @@ import pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -18,6 +17,7 @@ import com.google.gwt.user.client.ui.SourcesClickEvents;
 import com.google.gwt.user.client.ui.Widget;
 
 import pt.gov.dgarq.roda.wui.common.client.images.CommonImageBundle;
+import pt.gov.dgarq.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 
 /**
  * @author Luis Faria
@@ -28,7 +28,7 @@ public class ListHeader extends Composite implements SourcesClickEvents {
 	private static CommonImageBundle commonImageBundle = (CommonImageBundle) GWT
 			.create(CommonImageBundle.class);
 
-	private final FocusPanel focus;
+	private final AccessibleFocusPanel focus;
 	private final HorizontalPanel layout;
 	private final Label label;
 	private final Image sortDirection;
@@ -51,7 +51,7 @@ public class ListHeader extends Composite implements SourcesClickEvents {
 	 */
 	public ListHeader(String text, String stylename,
 			SortParameter[] sortParameters, boolean defaultSortDirection) {
-		focus = new FocusPanel();
+		focus = new AccessibleFocusPanel();
 		layout = new HorizontalPanel();
 		label = new Label(text);
 		sortDirection = new Image();

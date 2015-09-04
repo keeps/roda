@@ -2,7 +2,8 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
-	xmlns:i="urn:import:config.i18n.client" xmlns:m="urn:import:pt.gov.dgarq.roda.wui.main.client">
+	xmlns:i="urn:import:config.i18n.client" xmlns:m="urn:import:pt.gov.dgarq.roda.wui.main.client" 
+	xmlns:wcag="urn:import:pt.gov.dgarq.roda.wui.common.client.widgets.wcag">
 
 	<ui:style>
 	.banner {
@@ -52,12 +53,12 @@
 	<g:FlowPanel styleName="main">
 		<!-- Header -->
 		<g:FlowPanel styleName="{style.banner}">
-			<g:FocusPanel styleName="{style.homeLink}" ui:field="homeLinkArea">
+			<wcag:AccessibleFocusPanel styleName="{style.homeLink}" ui:field="homeLinkArea">
 				<g:FlowPanel>
 					<g:Image title="logo" altText="logo" styleName="{style.homeLogo}" resource='{res.logo}' />
 					<g:Label styleName="{style.homeText}">RODA</g:Label>
 				</g:FlowPanel>
-			</g:FocusPanel>
+			</wcag:AccessibleFocusPanel>
 			<i:LanguageSwitcherPanel addStyleNames="{style.languageSwitcher}"
 				ui:field="languageSwitcherPanel" />
 		</g:FlowPanel>

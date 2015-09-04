@@ -4,12 +4,12 @@ import java.util.List;
 import java.util.Vector;
 
 import pt.gov.dgarq.roda.core.data.v2.User;
+import pt.gov.dgarq.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 import pt.gov.dgarq.roda.wui.management.user.client.images.UserManagementImageBundle;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.ClickListener;
-import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
@@ -27,7 +27,7 @@ public class UserMiniPanel {
 
 	protected final User user;
 
-	protected final FocusPanel focus;
+	protected final AccessibleFocusPanel focus;
 
 	protected final HorizontalPanel layout;
 
@@ -46,7 +46,7 @@ public class UserMiniPanel {
 	 */
 	public UserMiniPanel(User user) {
 		this.user = user;
-		focus = new FocusPanel();
+		focus = new AccessibleFocusPanel();
 		layout = new HorizontalPanel();
 		userIcon = user.isActive() ? userManagementImageBundle.user()
 				.createImage() : userManagementImageBundle.inactiveUser()

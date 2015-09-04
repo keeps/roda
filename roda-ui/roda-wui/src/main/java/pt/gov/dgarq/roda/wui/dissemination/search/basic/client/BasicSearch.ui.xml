@@ -4,6 +4,7 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:i="urn:import:config.i18n.client" xmlns:m="urn:import:pt.gov.dgarq.roda.wui.main.client"
 	xmlns:common="urn:import:pt.gov.dgarq.roda.wui.common.client.widgets"
+	xmlns:wcag="urn:import:pt.gov.dgarq.roda.wui.common.client.widgets.wcag"
 	xmlns:d="urn:import:com.google.gwt.user.datepicker.client">
 
 	<ui:style>
@@ -43,7 +44,7 @@
 
 	<g:FlowPanel styleName="wui-search-basic" addStyleNames="{style.search}">
 		<g:FlowPanel styleName="layout" addStyleNames="{style.content}">
-			<g:Label styleName="h1" ui:field="searchInputLabel"
+			<g:HTML styleName="h1" ui:field="searchInputLabel"
 				addStyleNames="searchLabel" />
 			<g:FlowPanel addStyleNames="searchInput">
 				<g:FlowPanel addStyleNames="searchInputBoxWrapper">
@@ -56,7 +57,7 @@
 						<g:header>More search options</g:header>
 						<g:FlowPanel addStyleNames="searchAdvancedPanel">
 							<g:FlowPanel addStyleNames="searchAdvancedField">
-								<g:Label addStyleNames="searchAdvancedFieldLabel">Title</g:Label>
+								<g:Label addStyleNames="searchAdvancedFieldLabel" ui:field="advancedSearchInputTitleLabel">Title</g:Label>
 								<g:TextBox addStyleNames="searchAdvancedFieldInput fieldTextBox"
 									ui:field="advancedSearchInputTitle" />
 							</g:FlowPanel>
@@ -73,7 +74,7 @@
 						</g:FlowPanel>
 					</g:DisclosurePanel>
 				</g:FlowPanel>
-				<g:FocusPanel ui:field="searchInputButton"
+				<wcag:AccessibleFocusPanel ui:field="searchInputButton"
 					addStyleNames="searchButton">
 					<g:HTML addStyleNames="searchButton-html">
 						<span class="fa-stack fa-lg">
@@ -81,7 +82,7 @@
 							<i class="fa fa-search fa-stack-1x"></i>
 						</span>
 					</g:HTML>
-				</g:FocusPanel>
+				</wcag:AccessibleFocusPanel>
 			</g:FlowPanel>
 			<common:AIPList addStyleNames="searchResults"
 				ui:field="searchResultPanel" />

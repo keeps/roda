@@ -27,6 +27,7 @@ import config.i18n.client.MainConstants;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.tools.DescriptionLevelUtils;
 import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
+import pt.gov.dgarq.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 import pt.gov.dgarq.roda.wui.home.client.Home;
 
 /**
@@ -75,7 +76,7 @@ public class Main extends Composite implements EntryPoint {
 	}
 
 	@UiField
-	FocusPanel homeLinkArea;
+	AccessibleFocusPanel homeLinkArea;
 
 	@UiField(provided = true)
 	LanguageSwitcherPanel languageSwitcherPanel;

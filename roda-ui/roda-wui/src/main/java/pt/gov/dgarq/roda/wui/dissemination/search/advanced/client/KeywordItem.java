@@ -9,13 +9,13 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.AdvancedSearchMessages;
 import pt.gov.dgarq.roda.core.data.search.DefaultSearchParameter;
 import pt.gov.dgarq.roda.wui.common.client.images.CommonImageBundle;
+import pt.gov.dgarq.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 import pt.gov.dgarq.roda.wui.dissemination.search.advanced.client.DescriptiveFieldChooser.FieldOption;
 import pt.gov.dgarq.roda.wui.dissemination.search.advanced.client.KeywordPicker.KeywordParameter;
 
@@ -23,7 +23,7 @@ import pt.gov.dgarq.roda.wui.dissemination.search.advanced.client.KeywordPicker.
  * @author Luis Faria
  * 
  */
-public abstract class KeywordItem extends FocusPanel {
+public abstract class KeywordItem extends AccessibleFocusPanel {
 
 	private static AdvancedSearchMessages messages = (AdvancedSearchMessages) GWT
 			.create(AdvancedSearchMessages.class);

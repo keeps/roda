@@ -5,12 +5,12 @@ package pt.gov.dgarq.roda.wui.management.user.client;
 
 import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.wui.common.client.images.CommonImageBundle;
+import pt.gov.dgarq.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 import pt.gov.dgarq.roda.wui.management.user.client.images.UserManagementImageBundle;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.ClickListener;
-import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
@@ -30,7 +30,7 @@ public class UserPanel implements SourcesClickEvents {
 
 	private final User user;
 
-	private final FocusPanel focus;
+	private final AccessibleFocusPanel focus;
 
 	private final HorizontalPanel layout;
 
@@ -54,7 +54,7 @@ public class UserPanel implements SourcesClickEvents {
 	public UserPanel(User user) {
 		this.user = user;
 
-		focus = new FocusPanel();
+		focus = new AccessibleFocusPanel();
 		layout = new HorizontalPanel();
 		icon = user.isActive() ? userManagementImageBundle.user().createImage()
 				: userManagementImageBundle.inactiveUser().createImage();

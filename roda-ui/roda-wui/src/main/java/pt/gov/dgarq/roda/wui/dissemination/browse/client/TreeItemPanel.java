@@ -8,7 +8,6 @@ import java.util.Vector;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HasAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
@@ -24,12 +23,13 @@ import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.tools.DescriptionLevelUtils;
 import pt.gov.dgarq.roda.wui.common.client.tools.StringUtility;
+import pt.gov.dgarq.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 
 /**
  * @author Luis Faria
  * 
  */
-public class TreeItemPanel extends FocusPanel implements SourcesSliderEvents {
+public class TreeItemPanel extends AccessibleFocusPanel implements SourcesSliderEvents {
 
 	private static boolean SHOW_ITEM_POPUP = false;
 
@@ -173,7 +173,7 @@ public class TreeItemPanel extends FocusPanel implements SourcesSliderEvents {
 
 		private static final int HIDE_DELAY_MS = 500;
 
-		private final FocusPanel focus;
+		private final AccessibleFocusPanel focus;
 
 		private boolean showPopup;
 
@@ -196,7 +196,7 @@ public class TreeItemPanel extends FocusPanel implements SourcesSliderEvents {
 		 */
 		public ItemPopup() {
 			super(true, false);
-			focus = new FocusPanel();
+			focus = new AccessibleFocusPanel();
 			layout = new VerticalPanel();
 			header = new Label(sdo.getId());
 

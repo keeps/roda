@@ -2,21 +2,22 @@ package pt.gov.dgarq.roda.wui.common.client.widgets;
 
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 
+import pt.gov.dgarq.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
+
 public class ImageLink extends Composite {
 
-	private final FocusPanel layout;
+	private final AccessibleFocusPanel layout;
 	private final HorizontalPanel panel;
 
 	private final Image image;
 	private final Label label;
 
 	public ImageLink(Image linkImage, String text) {
-		layout = new FocusPanel();
+		layout = new AccessibleFocusPanel();
 		panel = new HorizontalPanel();
 		
 		image = linkImage;

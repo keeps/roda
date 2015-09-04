@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Vector;
 
 import com.google.gwt.user.client.ui.ClickListener;
-import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasText;
@@ -15,11 +14,13 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MouseListener;
 import com.google.gwt.user.client.ui.Widget;
 
+import pt.gov.dgarq.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
+
 /**
  * @author Luis Faria
  * 
  */
-public class WUIButton extends FocusPanel implements HasText {
+public class WUIButton extends AccessibleFocusPanel implements HasText {
 
 	private List<ClickListener> clickListeners;
 

@@ -7,12 +7,12 @@ import java.util.List;
 import java.util.Vector;
 
 import pt.gov.dgarq.roda.core.data.SimpleRepresentationObject;
+import pt.gov.dgarq.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 import pt.gov.dgarq.roda.wui.common.fileupload.client.FileNameConstraints;
 
 import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.DockPanel;
-import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HasAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
@@ -127,7 +127,7 @@ public class ContentModelSelector implements SourcesChangeEvents {
     public class ContentModelItem implements SourcesChangeEvents {
 
         private ContentModelInfo cModelInfo;
-        private FocusPanel focus;
+        private AccessibleFocusPanel focus;
         private DockPanel layout;
         private RadioButton radioButton;
         private Label title;
@@ -143,7 +143,7 @@ public class ContentModelSelector implements SourcesChangeEvents {
         public ContentModelItem(ContentModelInfo cModelInfo) {
             this.cModelInfo = cModelInfo;
 
-            focus = new FocusPanel();
+            focus = new AccessibleFocusPanel();
             layout = new DockPanel();
             radioButton = new RadioButton("contentModelSelector");
             title = new Label(cModelInfo.getTitle());

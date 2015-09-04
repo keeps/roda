@@ -7,13 +7,13 @@ import java.util.List;
 import java.util.Vector;
 
 import pt.gov.dgarq.roda.core.data.v2.Group;
+import pt.gov.dgarq.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 import pt.gov.dgarq.roda.wui.management.user.client.images.UserManagementImageBundle;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.ClickListener;
-import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
@@ -29,7 +29,7 @@ public class GroupMiniPanel {
 
 	protected final String groupName;
 
-	protected final FocusPanel focus;
+	protected final AccessibleFocusPanel focus;
 
 	protected final HorizontalPanel layout;
 
@@ -49,7 +49,7 @@ public class GroupMiniPanel {
 	 */
 	public GroupMiniPanel(String groupName) {
 		this.groupName = groupName;
-		focus = new FocusPanel();
+		focus = new AccessibleFocusPanel();
 		layout = new HorizontalPanel();
 		groupIcon = userManagementImageBundle.group().createImage();
 		groupNameLabel = new Label(groupName);

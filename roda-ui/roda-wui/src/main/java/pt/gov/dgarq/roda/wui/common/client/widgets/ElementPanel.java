@@ -1,6 +1,6 @@
 package pt.gov.dgarq.roda.wui.common.client.widgets;
 
-import com.google.gwt.user.client.ui.FocusPanel;
+import pt.gov.dgarq.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 
 /**
  * Element Panel
@@ -10,7 +10,7 @@ import com.google.gwt.user.client.ui.FocusPanel;
  * @param <T>
  *            the element type
  */
-public abstract class ElementPanel<T> extends FocusPanel {
+public abstract class ElementPanel<T> extends AccessibleFocusPanel {
 
 	private T element;
 

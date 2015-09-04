@@ -5,6 +5,7 @@ import java.io.Serializable;
 public class FacetValue implements Serializable {
 	private static final long serialVersionUID = 8898599554012120196L;
 
+	private String label;
 	private String value;
 	private long count;
 
@@ -32,6 +33,14 @@ public class FacetValue implements Serializable {
 
 	public void setCount(long count) {
 		this.count = count;
+	}
+
+	public String getLabel() {
+		return label;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
 	}
 
 	@Override

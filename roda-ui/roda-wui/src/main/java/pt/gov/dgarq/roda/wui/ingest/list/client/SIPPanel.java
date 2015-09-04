@@ -7,7 +7,6 @@ import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.ClickListener;
-import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HasAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
@@ -30,6 +29,7 @@ import pt.gov.dgarq.roda.wui.common.client.images.CommonImageBundle;
 import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
 import pt.gov.dgarq.roda.wui.common.client.widgets.ElementPanel;
 import pt.gov.dgarq.roda.wui.common.client.widgets.UserInfoPanel;
+import pt.gov.dgarq.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.BrowserService;
 import pt.gov.dgarq.roda.wui.ingest.list.client.SelectDescriptionObjectWindow.SelectDescriptionObjectListener;
 import pt.gov.dgarq.roda.wui.management.user.client.UserManagementService;
@@ -313,7 +313,7 @@ public class SIPPanel extends ElementPanel<SIPState> {
 
         public void onSuccess(User user) {
           UserInfoPanel userInfo = new UserInfoPanel(user);
-          FocusPanel focus = new FocusPanel(userInfo.getWidget());
+          AccessibleFocusPanel focus = new AccessibleFocusPanel(userInfo.getWidget());
           producerInfoPopup.setWidget(focus);
           focus.addMouseListener(new MouseListener() {
 

@@ -4,12 +4,12 @@
 package pt.gov.dgarq.roda.wui.common.client.widgets;
 
 import pt.gov.dgarq.roda.wui.common.client.images.CommonImageBundle;
+import pt.gov.dgarq.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.ClickListener;
-import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
@@ -63,7 +63,7 @@ public class MessagePopup extends PopupPanel {
 
 	private final MessagePopupType type;
 
-	private final FocusPanel focus;
+	private final AccessibleFocusPanel focus;
 
 	private final HorizontalPanel layout;
 
@@ -87,7 +87,7 @@ public class MessagePopup extends PopupPanel {
 		this.type = type;
 		slotNumber = getNextSlot(this);
 		layout = new HorizontalPanel();
-		focus = new FocusPanel(layout);
+		focus = new AccessibleFocusPanel(layout);
 		messageLayout = new VerticalPanel();
 		titleLabel = new Label(title);
 		errorMessage = new Label(message);
