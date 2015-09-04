@@ -6,24 +6,21 @@ public class AccessibleSimplePager extends SimplePager{
 
 	public AccessibleSimplePager(TextLocation location, boolean showFastForwardButton, boolean showLastPageButton){
 		super(location, showFastForwardButton, showLastPageButton);
-		makeAccessible();
+		WCAGUtilities.getInstance().makeAccessible(this.getElement());
 	}
 	
 	public AccessibleSimplePager(){
 		super();
-		makeAccessible();
+		WCAGUtilities.getInstance().makeAccessible(this.getElement());
 	}
 	public AccessibleSimplePager(TextLocation location){
 		super(location);
-		makeAccessible();
+		WCAGUtilities.getInstance().makeAccessible(this.getElement());
 	}
 	public AccessibleSimplePager(TextLocation location, boolean showFastForwardButton, int fastForwardRows, boolean showLastPageButton){
 		super(location, showFastForwardButton,fastForwardRows, showLastPageButton);
-		makeAccessible();
+		WCAGUtilities.getInstance().makeAccessible(this.getElement());
 	}
 	
-	private void makeAccessible() {
-		// TODO Auto-generated method stub
-		
-	}
+	
 }

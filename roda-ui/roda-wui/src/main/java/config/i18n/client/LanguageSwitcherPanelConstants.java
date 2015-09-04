@@ -3,10 +3,10 @@
  */
 package config.i18n.client;
 
-import com.google.gwt.i18n.client.Constants.DefaultStringValue;
-import com.google.gwt.i18n.client.Messages;
+import com.google.gwt.i18n.client.Constants;
+import com.google.gwt.i18n.client.ConstantsWithLookup;
 
-public interface LanguageSwitcherPanelConstants extends Messages{
+public interface LanguageSwitcherPanelConstants extends Constants, ConstantsWithLookup{
 	@Key("lang.en")
 	@DefaultStringValue("English")
 	public String lang_en();

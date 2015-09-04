@@ -37,7 +37,7 @@ public class RodaMemberList extends AsyncTableCell<RODAMember> {
 	}
 
 	public RodaMemberList(Filter filter, Facets facets) {
-		super(filter, facets);
+		super(filter, facets,"MEMBERS");
 
 		activeColumn = new Column<RODAMember, SafeHtml>(new SafeHtmlCell()) {
 			@Override

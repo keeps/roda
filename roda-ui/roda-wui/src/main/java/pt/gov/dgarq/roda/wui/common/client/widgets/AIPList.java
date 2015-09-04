@@ -44,7 +44,7 @@ public class AIPList extends AsyncTableCell<SimpleDescriptionObject> {
 	}
 
 	public AIPList(Filter filter, Facets facets) {
-		super(filter, facets);
+		super(filter, facets,"AIPS");
 
 		levelColumn = new Column<SimpleDescriptionObject, SafeHtml>(new SafeHtmlCell()) {
 			@Override

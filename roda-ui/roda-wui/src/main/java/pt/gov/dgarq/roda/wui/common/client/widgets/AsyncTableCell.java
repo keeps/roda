@@ -7,12 +7,10 @@ import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.ColumnSortEvent.AsyncHandler;
 import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.PageSizePager;
-import com.google.gwt.user.cellview.client.SimplePager;
-import com.google.gwt.user.cellview.client.SimplePager.TextLocation;
+import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.view.client.AsyncDataProvider;
@@ -25,6 +23,8 @@ import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
+import pt.gov.dgarq.roda.wui.common.client.widgets.wcag.AccessibleCellTable;
+import pt.gov.dgarq.roda.wui.common.client.widgets.wcag.AccessibleSimplePager;
 
 public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
   implements HasValueChangeHandlers<IndexResult<T>> {
@@ -33,24 +33,30 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
   private final SingleSelectionModel<T> selectionModel;
   private final AsyncHandler columnSortHandler;
 
-  private final SimplePager resultsPager;
+
+  private final AccessibleSimplePager resultsPager;
   private final PageSizePager pageSizePager;
-  private final CellTable<T> display;
+  private final AccessibleCellTable<T> display;
 
   private Filter filter;
   private Facets facets;
 
   private final ClientLogger logger = new ClientLogger(getClass().getName());
 
-  public AsyncTableCell() {
-    this(null, null);
-  }
+	public AsyncTableCell() {
+		this(null, null,null);
+	}
 
-  public AsyncTableCell(Filter filter, Facets facets) {
-    super();
+	public AsyncTableCell(Filter filter, Facets facets,String summary) {
+		super();
 
-    this.filter = filter;
-    this.facets = facets;
+		if(summary==null){
+			summary="summary"+Random.nextInt(1000);
+		}
+		
+		
+		this.filter = filter;
+		this.facets = facets;
 
     this.dataProvider = new AsyncDataProvider<T>() {
 
@@ -86,14 +92,11 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
         });
       }
     };
-
-    display = new CellTable<T>(getInitialPageSize(), (MyCellTableResources) GWT.create(MyCellTableResources.class),
-      getKeyProvider());
+		display = new AccessibleCellTable<>(getInitialPageSize(), getKeyProvider(),summary);
 
     dataProvider.addDataDisplay(display);
-
-    resultsPager = new SimplePager(TextLocation.RIGHT, false, true);
-    resultsPager.setDisplay(display);
+		resultsPager = new AccessibleSimplePager(AccessibleSimplePager.TextLocation.RIGHT, false, true);
+		resultsPager.setDisplay(display);
 
     pageSizePager = new PageSizePager(getInitialPageSize());
     pageSizePager.setDisplay(display);
@@ -122,9 +125,9 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
   protected abstract void getData(int start, int length, ColumnSortList columnSortList,
     AsyncCallback<IndexResult<T>> callback);
 
-  protected CellTable<T> getDisplay() {
-    return display;
-  }
+	protected AccessibleCellTable<T> getDisplay() {
+		return display;
+	}
 
   public SingleSelectionModel<T> getSelectionModel() {
     return selectionModel;
