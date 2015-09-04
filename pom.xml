@@ -25,21 +25,21 @@
 			<name>KEEP Artifacts-releases</name>
 			<url>http://artifactory.keep.pt/keep</url>
 		</repository>
-		<repository>
-			<id>duraspace-third-party</id>
-			<name>DuraSpace Repository (third party)</name>
-			<url>http://m2.duraspace.org/content/repositories/thirdparty</url>
-		</repository>
-		<repository>
-			<id>duraspace-central</id>
-			<name>DuraSpace Repository (central)</name>
-			<url>https://m2.duraspace.org/content/repositories/central</url>
-		</repository>
-		<repository>
-			<id>duraspace-releases</id>
-			<name>DuraSpace Repository (releases)</name>
-			<url>http://m2.duraspace.org/content/repositories/releases</url>
-		</repository>
+	<repository>
+		<id>duraspace-third-party</id>
+		<name>DuraSpace Repository (third party)</name>
+		<url>http://m2.duraspace.org/content/repositories/thirdparty</url>
+	</repository>
+	<repository>
+		<id>duraspace-central</id>
+		<name>DuraSpace Repository (central)</name>
+		<url>http://m2.duraspace.org/content/repositories/central</url>
+	</repository>
+	<repository>
+		<id>duraspace-releases</id>
+		<name>DuraSpace Repository (releases)</name>
+		<url>http://m2.duraspace.org/content/repositories/releases</url>
+	</repository>
 		<repository>
 			<id>com.springsource.repository.bundles.external</id>
 			<name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>

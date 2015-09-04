@@ -217,6 +217,8 @@ public interface MainConstants extends Constants, ConstantsWithLookup {
 	
 	@DefaultStringValue("You need to be authenticated to access this page. Do you want to authenticate?")
 	public String casForwardWarning();
+	
+	
 
 
 }

@@ -14,11 +14,11 @@ import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.CommonConstants;
 import pt.gov.dgarq.roda.core.common.AuthenticationDeniedException;
 import pt.gov.dgarq.roda.wui.common.client.AuthenticatedUser;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
@@ -90,6 +90,9 @@ public class Login extends Composite {
   @UiField
   Button login;
 
+  @UiField
+  Label error;
+
   private String service = null;
 
   private Login() {
@@ -99,6 +102,7 @@ public class Login extends Composite {
   public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
     username.setText("");
     password.setText("");
+    error.setText("");
     service = Tools.join(historyTokens, ".");
     callback.onSuccess(this);
   }
@@ -127,16 +131,16 @@ public class Login extends Composite {
   private void doLogin() {
     String usernameText = username.getText();
     String passwordText = password.getText();
+    error.setText("");
 
     UserLogin.getInstance().login(usernameText, passwordText, new AsyncCallback<AuthenticatedUser>() {
 
       @Override
       public void onFailure(Throwable caught) {
-        // TODO show message
         if (caught instanceof AuthenticationDeniedException) {
-          GWT.log("Bad credentials");
+          error.setText("Wrong username or password");
         } else {
-          GWT.log("Unexpected exception");
+          error.setText("System currently unavailable");
         }
       }
 

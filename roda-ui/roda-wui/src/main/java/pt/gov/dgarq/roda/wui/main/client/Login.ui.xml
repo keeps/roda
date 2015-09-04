@@ -22,6 +22,13 @@
 		margin-top: 10px;
 		margin-bottom: 20px;
 	}
+	
+	.error {
+		color: #F53E3E;
+		display: inline;
+		margin-left: 10px;
+		font-weight: 500;
+	}
 	</ui:style>
 
 	<g:FlowPanel addStyleNames="login {style.login}">
@@ -36,6 +43,7 @@
 				addStyleNames="fieldTextBox"></g:PasswordTextBox>
 		</g:FlowPanel>
 		<g:Button ui:field="login" addStyleNames="btn btn-play {style.button}">Login</g:Button>
+		<g:Label ui:field="error" addStyleNames="{style.error}"></g:Label>
 
 	</g:FlowPanel>
 
