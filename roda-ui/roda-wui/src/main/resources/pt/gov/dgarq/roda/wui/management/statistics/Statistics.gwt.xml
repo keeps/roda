@@ -12,5 +12,8 @@
 
 	<!-- Specify the cascade stylesheet to use -->
 	<stylesheet src="Statistics.css" />
+	
+	<set-configuration-property name='xsiframe.failIfScriptTag'
+		value='FALSE' />
 
 </module>

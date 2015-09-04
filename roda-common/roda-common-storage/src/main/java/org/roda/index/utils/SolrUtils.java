@@ -590,7 +590,9 @@ public class SolrUtils {
 
 	private static Boolean objectToBoolean(Object object) {
 		Boolean ret;
-		if (object instanceof Boolean) {
+		if (object == null) {
+			ret = null;
+		} else if (object instanceof Boolean) {
 			ret = (Boolean) object;
 		} else if (object instanceof String) {
 			ret = Boolean.parseBoolean((String) object);

@@ -46,9 +46,18 @@
 			<url>http://repository.springsource.com/maven/bundles/external</url>
 		</repository>
 		<repository>
+			<!-- FIXME this repository should be removed as it isn't probably being 
+				used -->
 			<id>gwt</id>
 			<name>gwt</name>
 			<url>http://gwt-maven-rewraps.googlecode.com/git/</url>
+		</repository>
+		<repository>
+			<id>google-snapshots</id>
+			<url>https://oss.sonatype.org/content/repositories/google-snapshots/</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
 		</repository>
 		<repository>
 			<id>ApacheSVN</id>
@@ -114,6 +123,8 @@
 		<fedora_version>3.6.2</fedora_version>
 		<cas.version>4.0.4</cas.version>
 		<cas.client.version>3.4.0</cas.client.version>
+		<jersey.version>2.21</jersey.version>
+		<swagger.version>1.5.3</swagger.version>
 		<roda_community_url>http://roda-community.org</roda_community_url>
 	</properties>
 	<profiles>
@@ -188,8 +199,6 @@
 		<profile>
 			<id>wui</id>
 			<modules>
-				<module>roda-cas</module>
-				<module>roda-common/roda-common-content-adapter</module>
 				<module>roda-common/roda-common-data</module>
 				<module>roda-common/roda-common-storage</module>
 				<module>roda-common/roda-common-servlet-security</module>
@@ -226,28 +235,13 @@
 				</executions>
 			</plugin>
 		</plugins>
-		<!--<plugins>
-			<plugin>
-				<groupId>com.googlecode.maven-java-formatter-plugin</groupId>
-				<artifactId>maven-java-formatter-plugin</artifactId>
-				<version>0.4</version>
-				<configuration>
-					<configFile>${session.executionRootDirectory}/code-style/eclipse_formatter.xml</configFile>
-					<excludes>
-						<exclude>pt/gov/dgarq/roda/core/stubs/</exclude>
-						<exclude>pt/gov/dgarq/roda/migrator/stubs/</exclude>
-					</excludes>
-				</configuration>
-				<executions>
-					<execution>
-						<phase>process-resources</phase>
-						<goals>
-							<goal>format</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>-->
+		<!--<plugins> <plugin> <groupId>com.googlecode.maven-java-formatter-plugin</groupId> 
+			<artifactId>maven-java-formatter-plugin</artifactId> <version>0.4</version> 
+			<configuration> <configFile>${session.executionRootDirectory}/code-style/eclipse_formatter.xml</configFile> 
+			<excludes> <exclude>pt/gov/dgarq/roda/core/stubs/</exclude> <exclude>pt/gov/dgarq/roda/migrator/stubs/</exclude> 
+			</excludes> </configuration> <executions> <execution> <phase>process-resources</phase> 
+			<goals> <goal>format</goal> </goals> </execution> </executions> </plugin> 
+			</plugins> -->
 		<pluginManagement>
 			<plugins>
 				<plugin>
@@ -346,7 +340,7 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore/>
+										<ignore />
 									</action>
 								</pluginExecution>
 							</pluginExecutions>
@@ -741,7 +735,7 @@
 				<version>1.0.0</version>
 			</dependency>
 			<dependency>
-				<!-- THE DEPENDENCY THAT FOLLOWS WILL BE REMOVED WHEN UPGRADING FEDORA
+				<!-- THE DEPENDENCY THAT FOLLOWS WILL BE REMOVED WHEN UPGRADING FEDORA 
 					VERSION -->
 				<groupId>pt.gov.dgarq.roda</groupId>
 				<artifactId>fedora-2.2.4-client</artifactId>
@@ -758,14 +752,14 @@
 				<version>${fedora_version}</version>
 			</dependency>
 			<dependency>
-				<!-- THE DEPENDENCY THAT FOLLOWS WILL BE REMOVED WHEN UPGRADING FEDORA
+				<!-- THE DEPENDENCY THAT FOLLOWS WILL BE REMOVED WHEN UPGRADING FEDORA 
 					VERSION -->
 				<groupId>pt.gov.dgarq.roda</groupId>
 				<artifactId>fedora-2.2.4-getNextPIDInfo</artifactId>
 				<version>1.0.0</version>
 			</dependency>
 			<dependency>
-				<!-- THE DEPENDENCY THAT FOLLOWS WILL BE REMOVED WHEN UPGRADING FEDORA
+				<!-- THE DEPENDENCY THAT FOLLOWS WILL BE REMOVED WHEN UPGRADING FEDORA 
 					VERSION -->
 				<groupId>pt.gov.dgarq.roda</groupId>
 				<artifactId>fedora-2.2.4-server</artifactId>
@@ -777,7 +771,7 @@
 				<version>${fedora_version}</version>
 			</dependency>
 			<dependency>
-				<!-- THE DEPENDENCY THAT FOLLOWS WILL BE REMOVED WHEN UPGRADING FEDORA
+				<!-- THE DEPENDENCY THAT FOLLOWS WILL BE REMOVED WHEN UPGRADING FEDORA 
 					VERSION -->
 				<groupId>pt.gov.dgarq.roda</groupId>
 				<artifactId>fedora-2.2.4-xacml</artifactId>
@@ -1048,22 +1042,52 @@
 				<groupId>org.apache.directory.server</groupId>
 				<artifactId>apacheds-all</artifactId>
 				<version>2.0.0-M20</version>
-				<exclusions>
-					<!--<exclusion>
-						<groupId>org.apache.directory.shared</groupId>
-						<artifactId>shared-ldap</artifactId>
-					</exclusion>-->
-<!--<exclusion>
-					<groupId>org.apache.directory.shared</groupId>
-					<artifactId>shared-ldap-schema</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.directory.api</groupId>
-					<artifactId>api-ldap-schema-data</artifactId>
-				</exclusion>-->
-
-				</exclusions>
 			</dependency>
+
+			<!-- REST API related dependencies - start -->
+			<dependency>
+				<groupId>org.glassfish.jersey</groupId>
+				<artifactId>jersey-bom</artifactId>
+				<version>${jersey.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.glassfish.jersey.bundles</groupId>
+				<artifactId>jaxrs-ri</artifactId>
+				<version>${jersey.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>javax.ws.rs</groupId>
+				<artifactId>javax.ws.rs-api</artifactId>
+				<version>2.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.glassfish.jersey.core</groupId>
+				<artifactId>jersey-server</artifactId>
+				<version>${jersey.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.glassfish.jersey.containers</groupId>
+				<artifactId>jersey-container-servlet-core</artifactId>
+				<version>${jersey.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.glassfish.jersey.media</groupId>
+				<artifactId>jersey-media-moxy</artifactId>
+				<version>${jersey.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.glassfish.jersey.media</groupId>
+				<artifactId>jersey-media-multipart</artifactId>
+				<version>${jersey.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.swagger</groupId>
+				<artifactId>swagger-jersey2-jaxrs</artifactId>
+				<version>${swagger.version}</version>
+			</dependency>
+			<!-- REST API related dependencies - end -->
 		</dependencies>
 	</dependencyManagement>
 	<reporting>
