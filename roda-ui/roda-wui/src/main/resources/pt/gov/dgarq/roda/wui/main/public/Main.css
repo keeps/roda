@@ -337,7 +337,7 @@
 }
 
 .main .wui-breadcrumbPanel .breadcrumb .description-level {
-	margin-right: 0.2em;
+	margin: 0 3px;
     color: #a7a9ac;
 }
 
