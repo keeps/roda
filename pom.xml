@@ -25,21 +25,21 @@
 			<name>KEEP Artifacts-releases</name>
 			<url>http://artifactory.keep.pt/keep</url>
 		</repository>
-	<repository>
-		<id>duraspace-third-party</id>
-		<name>DuraSpace Repository (third party)</name>
-		<url>http://m2.duraspace.org/content/repositories/thirdparty</url>
-	</repository>
-	<repository>
-		<id>duraspace-central</id>
-		<name>DuraSpace Repository (central)</name>
-		<url>http://m2.duraspace.org/content/repositories/central</url>
-	</repository>
-	<repository>
-		<id>duraspace-releases</id>
-		<name>DuraSpace Repository (releases)</name>
-		<url>http://m2.duraspace.org/content/repositories/releases</url>
-	</repository>
+		<repository>
+			<id>duraspace-third-party</id>
+			<name>DuraSpace Repository (third party)</name>
+			<url>http://m2.duraspace.org/content/repositories/thirdparty</url>
+		</repository>
+		<repository>
+			<id>duraspace-central</id>
+			<name>DuraSpace Repository (central)</name>
+			<url>http://m2.duraspace.org/content/repositories/central</url>
+		</repository>
+		<repository>
+			<id>duraspace-releases</id>
+			<name>DuraSpace Repository (releases)</name>
+			<url>http://m2.duraspace.org/content/repositories/releases</url>
+		</repository>
 		<repository>
 			<id>com.springsource.repository.bundles.external</id>
 			<name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
@@ -61,7 +61,7 @@
 		</repository>
 		<repository>
 			<id>ApacheSVN</id>
-			<name>Apache SVN</name>
+			<name>Apache SVN (saxon, etc.)</name>
 			<url>http://svn.apache.org/repos/asf/servicemix/m2-repo</url>
 		</repository>
 		<repository>
@@ -119,12 +119,17 @@
 		<maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
 		<java_version>1.8</java_version>
 		<gwt_version>2.7.0</gwt_version>
-		<!-- THE PROPERTY THAT FOLLOWS IS NOT YET IN USE -->
-		<fedora_version>3.6.2</fedora_version>
 		<cas.version>4.0.4</cas.version>
 		<cas.client.version>3.4.0</cas.client.version>
 		<jersey.version>2.21</jersey.version>
 		<swagger.version>1.5.3</swagger.version>
+		<jackson.version>2.6.1</jackson.version>
+
+		<fcrepo.version>4.3.0</fcrepo.version>
+		<spring.version>4.1.1.RELEASE</spring.version>
+		<grizzly.version>2.3.16</grizzly.version>
+		<jena.version>2.12.1</jena.version>
+		<solr.version>5.2.1</solr.version>
 		<roda_community_url>http://roda-community.org</roda_community_url>
 	</properties>
 	<profiles>
@@ -134,90 +139,81 @@
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<modules>
-				<module>roda-common</module>
-				<module>roda-core</module>
-				<module>roda-client</module>
-				<module>roda-handle</module>
-				<module>roda-migrator</module>
-				<module>roda-ui</module>
+				<module>roda-common/roda-common-data</module>
+				<module>roda-common/roda-common-storage</module>
+				<module>roda-ui/roda-wui</module>
 				<module>roda-cas</module>
 			</modules>
 		</profile>
-		<profile>
-			<id>all-but-ui</id>
-			<modules>
-				<module>roda-common</module>
-				<module>roda-core</module>
-				<module>roda-client</module>
-				<module>roda-handle</module>
-				<module>roda-migrator</module>
-				<module>roda-cas</module>
-			</modules>
-		</profile>
-		<profile>
-			<id>all-but-wui</id>
-			<modules>
-				<module>roda-common</module>
-				<module>roda-core</module>
-				<module>roda-client</module>
-				<module>roda-handle</module>
-				<module>roda-migrator</module>
-				<module>roda-ui/roda-in</module>
-				<module>roda-ui/roda-in-installer</module>
-				<module>roda-cas</module>
-			</modules>
-		</profile>
-		<profile>
-			<id>plugins</id>
-			<modules>
-				<module>roda-common</module>
-				<module>roda-core/roda-plugins</module>
-				<module>roda-core/roda-core-plugins</module>
-				<module>roda-core/fedora-client-utility</module>
-				<module>roda-client</module>
-				<module>roda-migrator</module>
-			</modules>
-		</profile>
-		<profile>
-			<id>core</id>
-			<modules>
-				<module>roda-common</module>
-				<module>roda-client</module>
-				<module>roda-core</module>
-				<module>roda-migrator/roda-migrator-client</module>
-				<module>roda-cas</module>
-			</modules>
-		</profile>
-		<profile>
-			<id>handle</id>
-			<modules>
-				<module>roda-handle</module>
-				<module>roda-common</module>
-				<module>roda-client</module>
-			</modules>
-		</profile>
+		<!-- <profile> -->
+		<!-- <id>all-but-ui</id> -->
+		<!-- <modules> -->
+		<!-- <module>roda-common</module> -->
+		<!-- <module>roda-core</module> -->
+		<!-- <module>roda-client</module> -->
+		<!-- <module>roda-handle</module> -->
+		<!-- <module>roda-migrator</module> -->
+		<!-- <module>roda-cas</module> -->
+		<!-- </modules> -->
+		<!-- </profile> -->
+		<!-- <profile> -->
+		<!-- <id>all-but-wui</id> -->
+		<!-- <modules> -->
+		<!-- <module>roda-common/roda-common-data</module> -->
+		<!-- <module>roda-common/roda-common-storage</module> -->
+		<!-- <module>roda-common/roda-common-servlet-security</module> -->
+		<!-- </modules> -->
+		<!-- </profile> -->
+		<!-- <profile> -->
+		<!-- <id>plugins</id> -->
+		<!-- <modules> -->
+		<!-- <module>roda-common</module> -->
+		<!-- <module>roda-core/roda-plugins</module> -->
+		<!-- <module>roda-core/roda-core-plugins</module> -->
+		<!-- <module>roda-core/fedora-client-utility</module> -->
+		<!-- <module>roda-client</module> -->
+		<!-- <module>roda-migrator</module> -->
+		<!-- </modules> -->
+		<!-- </profile> -->
+		<!-- <profile> -->
+		<!-- <id>core</id> -->
+		<!-- <modules> -->
+		<!-- <module>roda-common</module> -->
+		<!-- <module>roda-client</module> -->
+		<!-- <module>roda-core</module> -->
+		<!-- <module>roda-migrator/roda-migrator-client</module> -->
+		<!-- <module>roda-cas</module> -->
+		<!-- </modules> -->
+		<!-- </profile> -->
+		<!-- <profile> -->
+		<!-- <id>handle</id> -->
+		<!-- <modules> -->
+		<!-- <module>roda-handle</module> -->
+		<!-- <module>roda-common</module> -->
+		<!-- <module>roda-client</module> -->
+		<!-- </modules> -->
+		<!-- </profile> -->
 		<profile>
 			<id>wui</id>
 			<modules>
 				<module>roda-common/roda-common-data</module>
 				<module>roda-common/roda-common-storage</module>
-				<module>roda-common/roda-common-servlet-security</module>
 				<module>roda-ui/roda-wui</module>
 			</modules>
 		</profile>
-		<profile>
-			<id>create-installer</id>
-			<modules>
-				<module>roda-common</module>
-				<module>roda-core</module>
-				<module>roda-client</module>
-				<module>roda-handle</module>
-				<module>roda-migrator</module>
-				<module>roda-ui</module>
-				<module>roda-cas</module>
-				<module>roda-installer</module>
-			</modules>
-		</profile>
+		<!-- <profile> -->
+		<!-- <id>create-installer</id> -->
+		<!-- <modules> -->
+		<!-- <module>roda-common</module> -->
+		<!-- <module>roda-core</module> -->
+		<!-- <module>roda-client</module> -->
+		<!-- <module>roda-handle</module> -->
+		<!-- <module>roda-migrator</module> -->
+		<!-- <module>roda-ui</module> -->
+		<!-- <module>roda-cas</module> -->
+		<!-- <module>roda-installer</module> -->
+		<!-- </modules> -->
+		<!-- </profile> -->
 	</profiles>
 	<build>
 		<plugins>
@@ -390,12 +386,12 @@
 			<dependency>
 				<groupId>com.fasterxml.jackson.core</groupId>
 				<artifactId>jackson-core</artifactId>
-				<version>2.2.2</version>
+				<version>${jackson.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.fasterxml.jackson.core</groupId>
 				<artifactId>jackson-databind</artifactId>
-				<version>2.2.2</version>
+				<version>${jackson.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.google.gwt</groupId>
@@ -421,32 +417,32 @@
 			<dependency>
 				<groupId>commons-cli</groupId>
 				<artifactId>commons-cli</artifactId>
-				<version>1.2</version>
+				<version>1.3.1</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-codec</groupId>
 				<artifactId>commons-codec</artifactId>
-				<version>1.6</version>
+				<version>1.10</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-collections</groupId>
 				<artifactId>commons-collections</artifactId>
-				<version>3.2</version>
+				<version>3.2.1</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-configuration</groupId>
 				<artifactId>commons-configuration</artifactId>
-				<version>1.5</version>
+				<version>1.10</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-dbcp</groupId>
 				<artifactId>commons-dbcp</artifactId>
-				<version>1.2.1</version>
+				<version>1.4</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-discovery</groupId>
 				<artifactId>commons-discovery</artifactId>
-				<version>0.2</version>
+				<version>0.5</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-fileupload</groupId>
@@ -461,9 +457,10 @@
 			<dependency>
 				<groupId>commons-io</groupId>
 				<artifactId>commons-io</artifactId>
-				<version>1.4</version>
+				<version>2.4</version>
 			</dependency>
 			<dependency>
+				<!-- FIXME replace by commons-lang3 -->
 				<groupId>commons-lang</groupId>
 				<artifactId>commons-lang</artifactId>
 				<version>2.6</version>
@@ -471,12 +468,12 @@
 			<dependency>
 				<groupId>commons-logging</groupId>
 				<artifactId>commons-logging</artifactId>
-				<version>1.1</version>
+				<version>1.2</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-transaction</groupId>
 				<artifactId>commons-transaction</artifactId>
-				<version>1.1</version>
+				<version>1.2</version>
 			</dependency>
 			<dependency>
 				<groupId>com.netthreads</groupId>
@@ -492,32 +489,6 @@
 				<groupId>com.rednels</groupId>
 				<artifactId>ofcgwt</artifactId>
 				<version>1.1.0</version>
-			</dependency>
-			<dependency>
-				<groupId>com.sun.jersey.contribs</groupId>
-				<artifactId>jersey-multipart</artifactId>
-				<version>1.13</version>
-			</dependency>
-			<dependency>
-				<groupId>com.sun.jersey</groupId>
-				<artifactId>jersey-core</artifactId>
-				<version>1.13</version>
-			</dependency>
-			<dependency>
-				<groupId>com.sun.jersey</groupId>
-				<artifactId>jersey-client</artifactId>
-				<version>1.13</version>
-			</dependency>
-			<dependency>
-				<groupId>com.sun.jersey</groupId>
-				<artifactId>jersey-servlet</artifactId>
-				<version>1.13</version>
-			</dependency>
-			<dependency>
-				<groupId>com.sun.jersey.jersey-test-framework</groupId>
-				<artifactId>jersey-test-framework-grizzly2</artifactId>
-				<version>1.13</version>
-				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>com.thoughtworks.xstream</groupId>
@@ -542,7 +513,7 @@
 			<dependency>
 				<groupId>javax.mail</groupId>
 				<artifactId>mail</artifactId>
-				<version>1.4.5</version>
+				<version>1.4.7</version>
 			</dependency>
 			<dependency>
 				<groupId>javax.media.jai</groupId>
@@ -579,7 +550,7 @@
 			<dependency>
 				<groupId>junit</groupId>
 				<artifactId>junit</artifactId>
-				<version>4.8.2</version>
+				<version>4.12</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
@@ -590,6 +561,11 @@
 			<dependency>
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-log4j12</artifactId>
+				<version>1.7.12</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-jdk14</artifactId>
 				<version>1.7.12</version>
 			</dependency>
 			<dependency>
@@ -626,7 +602,7 @@
 			<dependency>
 				<groupId>org.apache.velocity</groupId>
 				<artifactId>velocity</artifactId>
-				<version>1.5</version>
+				<version>1.7</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.xmlbeans</groupId>
@@ -674,51 +650,16 @@
 				<version>6.2</version>
 			</dependency>
 			<dependency>
-				<groupId>org.fcrepo</groupId>
-				<artifactId>emory-util-remote</artifactId>
-				<version>2.1</version>
-			</dependency>
-			<dependency>
-				<groupId>org.fcrepo</groupId>
-				<artifactId>mulgara-core</artifactId>
-				<version>2.0.6</version>
-			</dependency>
-			<dependency>
-				<groupId>org.fcrepo</groupId>
-				<artifactId>openrdf-sesame-onejar</artifactId>
-				<version>2.2.1</version>
-			</dependency>
-			<dependency>
-				<groupId>org.fcrepo</groupId>
-				<artifactId>trippi-core</artifactId>
-				<version>1.4.1</version>
-			</dependency>
-			<dependency>
-				<groupId>org.jboss</groupId>
-				<artifactId>jbossweb-extras</artifactId>
-				<version>1.0.3</version>
-			</dependency>
-			<dependency>
-				<groupId>org.objectweb.carol</groupId>
-				<artifactId>carol</artifactId>
-				<version>2.0.5</version>
-			</dependency>
-			<dependency>
 				<groupId>org.quartz-scheduler</groupId>
 				<artifactId>quartz</artifactId>
-				<version>1.7.2</version>
+				<version>1.8.4</version>
 			</dependency>
-			<dependency>
-				<groupId>org.simpleframework</groupId>
-				<artifactId>simple</artifactId>
-				<version>4.1.21</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>slf4j-jdk14</artifactId>
-				<version>1.5.5</version>
-			</dependency>
+			<!-- <dependency> -->
+			<!-- <groupId>org.simpleframework</groupId> -->
+			<!-- <artifactId>simple</artifactId> -->
+			<!-- <version>4.1.21</version> -->
+			<!-- <scope>test</scope> -->
+			<!-- </dependency> -->
 			<dependency>
 				<groupId>org.w3c</groupId>
 				<artifactId>w3c-utils</artifactId>
@@ -734,64 +675,7 @@
 				<artifactId>ead-c.2014</artifactId>
 				<version>1.0.0</version>
 			</dependency>
-			<dependency>
-				<!-- THE DEPENDENCY THAT FOLLOWS WILL BE REMOVED WHEN UPGRADING FEDORA 
-					VERSION -->
-				<groupId>pt.gov.dgarq.roda</groupId>
-				<artifactId>fedora-2.2.4-client</artifactId>
-				<version>1.0.0</version>
-			</dependency>
-			<dependency>
-				<groupId>org.fcrepo</groupId>
-				<artifactId>fcrepo-client-admin</artifactId>
-				<version>${fedora_version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.fcrepo</groupId>
-				<artifactId>fcrepo-client-messaging</artifactId>
-				<version>${fedora_version}</version>
-			</dependency>
-			<dependency>
-				<!-- THE DEPENDENCY THAT FOLLOWS WILL BE REMOVED WHEN UPGRADING FEDORA 
-					VERSION -->
-				<groupId>pt.gov.dgarq.roda</groupId>
-				<artifactId>fedora-2.2.4-getNextPIDInfo</artifactId>
-				<version>1.0.0</version>
-			</dependency>
-			<dependency>
-				<!-- THE DEPENDENCY THAT FOLLOWS WILL BE REMOVED WHEN UPGRADING FEDORA 
-					VERSION -->
-				<groupId>pt.gov.dgarq.roda</groupId>
-				<artifactId>fedora-2.2.4-server</artifactId>
-				<version>1.0.0</version>
-			</dependency>
-			<dependency>
-				<groupId>org.fcrepo</groupId>
-				<artifactId>fcrepo-server</artifactId>
-				<version>${fedora_version}</version>
-			</dependency>
-			<dependency>
-				<!-- THE DEPENDENCY THAT FOLLOWS WILL BE REMOVED WHEN UPGRADING FEDORA 
-					VERSION -->
-				<groupId>pt.gov.dgarq.roda</groupId>
-				<artifactId>fedora-2.2.4-xacml</artifactId>
-				<version>1.0.0</version>
-			</dependency>
-			<dependency>
-				<groupId>pt.gov.dgarq.roda</groupId>
-				<artifactId>fedora-client-utility</artifactId>
-				<version>2.0.0-SNAPSHOT</version>
-			</dependency>
-			<dependency>
-				<groupId>pt.gov.dgarq.roda</groupId>
-				<artifactId>gsearch-2.2.1-client</artifactId>
-				<version>1.0.0</version>
-			</dependency>
-			<dependency>
-				<groupId>pt.gov.dgarq.roda</groupId>
-				<artifactId>gsearch-2.2.1-result-page</artifactId>
-				<version>1.0.0</version>
-			</dependency>
+
 			<dependency>
 				<groupId>pt.gov.dgarq.roda</groupId>
 				<artifactId>mets-1.9.1</artifactId>
@@ -822,11 +706,7 @@
 				<artifactId>premis-v2.0</artifactId>
 				<version>1.0.0</version>
 			</dependency>
-			<dependency>
-				<groupId>pt.gov.dgarq.roda</groupId>
-				<artifactId>roda-client</artifactId>
-				<version>2.0.0-SNAPSHOT</version>
-			</dependency>
+			<!-- RODA own modules dependencies - start -->
 			<dependency>
 				<groupId>pt.gov.dgarq.roda</groupId>
 				<artifactId>roda-common-certification</artifactId>
@@ -923,6 +803,7 @@
 				<artifactId>roda-migrator-client</artifactId>
 				<version>2.0.0-SNAPSHOT</version>
 			</dependency>
+			<!-- RODA own modules dependencies - end -->
 			<dependency>
 				<groupId>stax</groupId>
 				<artifactId>stax-api</artifactId>
@@ -1009,7 +890,7 @@
 				<artifactId>xml-apis</artifactId>
 				<version>1.4.01</version>
 			</dependency>
-			<!-- CAS related dependencies -->
+			<!-- CAS related dependencies - start -->
 			<dependency>
 				<groupId>org.jasig.cas</groupId>
 				<artifactId>cas-server-webapp</artifactId>
@@ -1033,6 +914,7 @@
 					</exclusion>
 				</exclusions>
 			</dependency>
+			<!-- CAS related dependencies - end -->
 			<dependency>
 				<groupId>org.yaml</groupId>
 				<artifactId>snakeyaml</artifactId>
@@ -1043,7 +925,49 @@
 				<artifactId>apacheds-all</artifactId>
 				<version>2.0.0-M20</version>
 			</dependency>
-
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-lang3</artifactId>
+				<version>3.4</version>
+			</dependency>
+			<dependency>
+				<groupId>com.google.guava</groupId>
+				<artifactId>guava</artifactId>
+				<version>18.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.solr</groupId>
+				<artifactId>solr-solrj</artifactId>
+				<version>${solr.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.solr</groupId>
+				<artifactId>solr-core</artifactId>
+				<version>${solr.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>net.sf.saxon</groupId>
+				<artifactId>Saxon-HE</artifactId>
+				<version>9.6.0-6</version>
+			</dependency>
+			<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-all</artifactId>
+				<version>1.10.19</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.powermock</groupId>
+				<artifactId>powermock-api-mockito</artifactId>
+				<version>1.6.2</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.powermock</groupId>
+				<artifactId>powermock-module-junit4</artifactId>
+				<version>1.6.2</version>
+				<scope>test</scope>
+			</dependency>
 			<!-- REST API related dependencies - start -->
 			<dependency>
 				<groupId>org.glassfish.jersey</groupId>

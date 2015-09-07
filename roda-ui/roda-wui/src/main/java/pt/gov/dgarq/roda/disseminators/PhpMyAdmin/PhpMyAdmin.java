@@ -10,8 +10,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
-import pt.gov.dgarq.roda.common.convert.db.modules.mySql.out.PhpMyAdminExportModule;
-
 /**
  * Servlet implementation class for Servlet: PhpMyAdmin
  * 
@@ -100,10 +98,10 @@ public class PhpMyAdmin extends javax.servlet.http.HttpServlet implements
 		logger.debug("Using MySQL host: " + mysqlHost + " port: " + mysqlPort);
 	}
 
-	private PhpMyAdminExportModule getExportModule(String databaseName) {
-		return new PhpMyAdminExportModule(mysqlHost, mysqlPort, databaseName,
-				mysqlAdminUser, mysqlAdminPass, pmaDatabase, pmaColumnInfo);
-	}
+//	private PhpMyAdminExportModule getExportModule(String databaseName) {
+//		return new PhpMyAdminExportModule(mysqlHost, mysqlPort, databaseName,
+//				mysqlAdminUser, mysqlAdminPass, pmaDatabase, pmaColumnInfo);
+//	}
 
 	protected void loading(String pid, HttpServletRequest request,
 			HttpServletResponse response) throws IOException {
@@ -121,91 +119,91 @@ public class PhpMyAdmin extends javax.servlet.http.HttpServlet implements
 				.length();
 		String pid = pathInfo.substring(1, separatorIndex);
 		String databaseName = pid.replace(':', '_');
-		try {
-			final PhpMyAdminExportModule exportModule = getExportModule(databaseName);
-
-			// if (exportingPIDs.contains(pid)) {
-			// loading(pid, request, response);
-			// } else if (!exportModule.databaseExists()) {
-			// RODAClient rodaClient = RodaClientFactory.getRodaClient(request
-			// .getSession());
-			// final RepresentationObject rep = rodaClient.getBrowserService()
-			// .getRepresentationObject(pid);
-			// final SynchronousConverter service = migratorClient
-			// .getSynchronousConverterService(migratorUrl, rodaClient
-			// .getCup(),rodaClient.getCasUtility());
-			// new Thread() {
-			// public void run() {
-			// try {
-			// service.convert(rep);
-			// } catch (ConverterException e) {
-			// logger.error("Error exporting database", e);
-			// } catch (RemoteException e) {
-			// logger.error("Error exporting database", e);
-			// }
-			// exportingPIDs.remove(rep.getPid());
-			// }
-			// }.start();
-			//
-			// loading(pid, request, response);
-			// RodaClientFactory.log(DISSEMINATOR_NAME, false, pid, request);
-			// } else {
-			// response.sendRedirect(pmaUrl + "/index.php?db=" + databaseName);
-			// RodaClientFactory.log(DISSEMINATOR_NAME, true, pid, request);
-			// }
-
-			// } catch (ModuleException e) {
-			// if (e.getModuleErrors() != null) {
-			// for (Entry<String, Throwable> entry : e.getModuleErrors()
-			// .entrySet()) {
-			// logger.error(entry.getKey(), entry.getValue());
-			// }
-			// }
-			// response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-			// e
-			// .getMessage());
-			// } catch (LoginException e) {
-			// logger.error("Error getting phpMyAdmin disseminator", e);
-			// response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-			// e
-			// .getMessage());
-			// } catch (RODAClientException e) {
-			// logger.error("Error getting phpMyAdmin disseminator", e);
-			// response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-			// e
-			// .getMessage());
-			// } catch (BrowserException e) {
-			// logger.error("Error getting phpMyAdmin disseminator", e);
-			// response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-			// e
-			// .getMessage());
-			// } catch (NoSuchRODAObjectException e) {
-			// logger.error("Error getting phpMyAdmin disseminator", e);
-			// response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-			// e
-			// .getMessage());
-			// } catch (MigratorClientException e) {
-			// logger.error("Error getting phpMyAdmin disseminator", e);
-			// response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-			// e
-			// .getMessage());
-			// } catch (RemoteException e) {
-			// RODAException exception = RODAClient.parseRemoteException(e);
-			// if (exception instanceof AuthorizationDeniedException) {
-			// response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
-			// exception.getMessage());
-			// } else {
-			// logger.error("RODA Exception", e);
-			// response.sendError(
-			// HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e
-			// .getMessage());
-			// }
-
-		} catch (Throwable e) {
-			logger.error("Uncaught exception", e);
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e
-					.getMessage());
-		}
+//		try {
+//			final PhpMyAdminExportModule exportModule = getExportModule(databaseName);
+//
+//			// if (exportingPIDs.contains(pid)) {
+//			// loading(pid, request, response);
+//			// } else if (!exportModule.databaseExists()) {
+//			// RODAClient rodaClient = RodaClientFactory.getRodaClient(request
+//			// .getSession());
+//			// final RepresentationObject rep = rodaClient.getBrowserService()
+//			// .getRepresentationObject(pid);
+//			// final SynchronousConverter service = migratorClient
+//			// .getSynchronousConverterService(migratorUrl, rodaClient
+//			// .getCup(),rodaClient.getCasUtility());
+//			// new Thread() {
+//			// public void run() {
+//			// try {
+//			// service.convert(rep);
+//			// } catch (ConverterException e) {
+//			// logger.error("Error exporting database", e);
+//			// } catch (RemoteException e) {
+//			// logger.error("Error exporting database", e);
+//			// }
+//			// exportingPIDs.remove(rep.getPid());
+//			// }
+//			// }.start();
+//			//
+//			// loading(pid, request, response);
+//			// RodaClientFactory.log(DISSEMINATOR_NAME, false, pid, request);
+//			// } else {
+//			// response.sendRedirect(pmaUrl + "/index.php?db=" + databaseName);
+//			// RodaClientFactory.log(DISSEMINATOR_NAME, true, pid, request);
+//			// }
+//
+//			// } catch (ModuleException e) {
+//			// if (e.getModuleErrors() != null) {
+//			// for (Entry<String, Throwable> entry : e.getModuleErrors()
+//			// .entrySet()) {
+//			// logger.error(entry.getKey(), entry.getValue());
+//			// }
+//			// }
+//			// response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+//			// e
+//			// .getMessage());
+//			// } catch (LoginException e) {
+//			// logger.error("Error getting phpMyAdmin disseminator", e);
+//			// response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+//			// e
+//			// .getMessage());
+//			// } catch (RODAClientException e) {
+//			// logger.error("Error getting phpMyAdmin disseminator", e);
+//			// response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+//			// e
+//			// .getMessage());
+//			// } catch (BrowserException e) {
+//			// logger.error("Error getting phpMyAdmin disseminator", e);
+//			// response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+//			// e
+//			// .getMessage());
+//			// } catch (NoSuchRODAObjectException e) {
+//			// logger.error("Error getting phpMyAdmin disseminator", e);
+//			// response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+//			// e
+//			// .getMessage());
+//			// } catch (MigratorClientException e) {
+//			// logger.error("Error getting phpMyAdmin disseminator", e);
+//			// response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+//			// e
+//			// .getMessage());
+//			// } catch (RemoteException e) {
+//			// RODAException exception = RODAClient.parseRemoteException(e);
+//			// if (exception instanceof AuthorizationDeniedException) {
+//			// response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+//			// exception.getMessage());
+//			// } else {
+//			// logger.error("RODA Exception", e);
+//			// response.sendError(
+//			// HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e
+//			// .getMessage());
+//			// }
+//
+//		} catch (Throwable e) {
+//			logger.error("Uncaught exception", e);
+//			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e
+//					.getMessage());
+//		}
 	}
 
 	protected void doPost(HttpServletRequest request,

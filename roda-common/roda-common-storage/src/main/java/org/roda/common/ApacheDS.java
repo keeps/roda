@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -245,8 +246,8 @@ public class ApacheDS {
 		String ldapAdminDN = rodaConfig.getString("ldapAdminDN");
 		String ldapAdminPassword = rodaConfig.getString("ldapAdminPassword");
 		String ldapPasswordDigestAlgorithm = rodaConfig.getString("ldapPasswordDigestAlgorithm");
-		List<String> ldapProtectedUsers = rodaConfig.getList("ldapProtectedUsers");
-		List<String> ldapProtectedGroups = rodaConfig.getList("ldapProtectedGroups");
+		List<String> ldapProtectedUsers = RodaUtils.copyList(rodaConfig.getList("ldapProtectedUsers"));
+		List<String> ldapProtectedGroups = RodaUtils.copyList(rodaConfig.getList("ldapProtectedGroups"));
 
 		LdapUtility ldapUtility = new LdapUtility(ldapHost, ldapPort, ldapPeopleDN, ldapGroupsDN, ldapRolesDN,
 				ldapAdminDN, ldapAdminPassword, ldapPasswordDigestAlgorithm, ldapProtectedUsers, ldapProtectedGroups);

@@ -9,16 +9,6 @@
 		<artifactId>roda-common</artifactId>
 		<version>2.0.0-SNAPSHOT</version>
 	</parent>
-	<properties>
-		<sonar.sources>src/main/java</sonar.sources>
-
-		<fcrepo.version>4.3.0</fcrepo.version>
-		<jersey.version>2.13</jersey.version>
-		<spring.version>4.1.1.RELEASE</spring.version>
-		<grizzly.version>2.3.16</grizzly.version>
-		<jena.version>2.12.1</jena.version>
-		<solr.version>5.2.1</solr.version>
-	</properties>
 	<build>
 		<plugins>
 			<!-- Include to allow testing on compile -->
@@ -54,22 +44,18 @@
 		<dependency>
 			<groupId>commons-logging</groupId>
 			<artifactId>commons-logging</artifactId>
-			<version>1.2</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-			<version>2.4</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
-			<version>3.4</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>18.0</version>
 		</dependency>
 		<dependency>
 			<groupId>log4j</groupId>
@@ -82,12 +68,10 @@
 		<dependency>
 			<groupId>org.apache.solr</groupId>
 			<artifactId>solr-solrj</artifactId>
-			<version>${solr.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.solr</groupId>
 			<artifactId>solr-core</artifactId>
-			<version>${solr.version}</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>asm</artifactId>
@@ -112,9 +96,12 @@
 			<artifactId>roda-common-metadata</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>pt.gov.dgarq.roda</groupId>
+			<artifactId>roda-common-utils</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>net.sf.saxon</groupId>
 			<artifactId>Saxon-HE</artifactId>
-			<version>9.6.0-6</version>
 		</dependency>
 		<dependency>
 			<groupId>pt.gov.dgarq.roda</groupId>
@@ -148,31 +135,26 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-all</artifactId>
-			<version>1.10.19</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.powermock</groupId>
 			<artifactId>powermock-api-mockito</artifactId>
-			<version>1.6.2</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.powermock</groupId>
 			<artifactId>powermock-module-junit4</artifactId>
-			<version>1.6.2</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>javax.ws.rs</groupId>
 			<artifactId>javax.ws.rs-api</artifactId>
-			<version>2.0.1</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -239,17 +221,14 @@
 			<groupId>org.glassfish.jersey.ext</groupId>
 			<artifactId>jersey-spring3</artifactId>
 			<scope>test</scope>
-			<version>${jersey.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish.jersey.core</groupId>
 			<artifactId>jersey-common</artifactId>
-			<version>${jersey.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish.jersey.media</groupId>
 			<artifactId>jersey-media-multipart</artifactId>
-			<version>${jersey.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.w3</groupId>

@@ -1,11 +1,11 @@
-package org.roda.api.v1;
+package org.roda.api;
 
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 
-public class RestApplicationV1 extends ResourceConfig {
-	public RestApplicationV1() {
+public class RestApplication extends ResourceConfig {
+	public RestApplication() {
 		super();
 		// packages("io.swagger.jaxrs.listing", "org.roda.api",
 		// "org.roda.api.v1");

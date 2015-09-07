@@ -27,8 +27,8 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
 
-@Path("/aips")
-@Api(value = "/aips", description = "the aips API")
+@Path("/v1/aips")
+@Api(value = "/v1/aips", description = "the aips API")
 @javax.annotation.Generated(value = "class io.swagger.codegen.languages.JaxRSServerCodegen", date = "2015-09-03T11:38:49.275+01:00")
 public class AipsResource {
 
