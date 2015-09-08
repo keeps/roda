@@ -32,4 +32,5 @@ public class I18nUtility {
     ResourceBundle resourceBundle = ResourceBundle.getBundle(bundleName, locale);
     return resourceBundle.getString(key);
   }
+
 }
