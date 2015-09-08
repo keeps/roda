@@ -12,11 +12,10 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
-import config.i18n.client.CommonConstants;
-import config.i18n.client.CommonMessages;
 import pt.gov.dgarq.roda.core.data.v2.Group;
 import pt.gov.dgarq.roda.core.data.v2.RODAMember;
 import pt.gov.dgarq.roda.core.data.v2.User;
+import pt.gov.dgarq.roda.wui.common.client.tools.CachedAsynRequest;
 
 /**
  * @author Luis Faria
@@ -28,9 +27,11 @@ public class UserLogin {
 
   private static final ClientLogger logger = new ClientLogger(UserLogin.class.getName());
 
-  private static final CommonConstants constants = (CommonConstants) GWT.create(CommonConstants.class);
-
-  private static final CommonMessages messages = (CommonMessages) GWT.create(CommonMessages.class);
+  // private static final CommonConstants constants = (CommonConstants)
+  // GWT.create(CommonConstants.class);
+  //
+  // private static final CommonMessages messages = (CommonMessages)
+  // GWT.create(CommonMessages.class);
 
   private static UserLoginServiceAsync userLoginService;
 
@@ -91,15 +92,19 @@ public class UserLogin {
 
   private final List<LoginStatusListener> listeners;
 
-  private AuthenticatedUser user = null;
-
-  public void setUser(AuthenticatedUser user) {
-    this.user = user;
-  }
+  // private AuthenticatedUser user = null;
 
   private UserLogin() {
     listeners = new Vector<LoginStatusListener>();
   }
+
+  private final CachedAsynRequest<AuthenticatedUser> getUserRequest = new CachedAsynRequest<AuthenticatedUser>() {
+
+    @Override
+    public void getFromServer(AsyncCallback<AuthenticatedUser> callback) {
+      userLoginService.getAuthenticatedUser(callback);
+    }
+  };
 
   /**
    * Get current authenticated user. User is cached and only refreshed when
@@ -110,23 +115,7 @@ public class UserLogin {
    *          if success.
    */
   public void getAuthenticatedUser(final AsyncCallback<AuthenticatedUser> callback) {
-    if (user == null) {
-      userLoginService.getAuthenticatedUser(new AsyncCallback<AuthenticatedUser>() {
-
-        public void onFailure(Throwable caught) {
-          callback.onFailure(caught);
-
-        }
-
-        public void onSuccess(AuthenticatedUser user) {
-          callback.onSuccess(user);
-          UserLogin.this.user = user;
-        }
-
-      });
-    } else {
-      callback.onSuccess(user);
-    }
+    getUserRequest.request(callback);
   }
 
   /**
@@ -151,7 +140,7 @@ public class UserLogin {
 
       @Override
       public void onSuccess(AuthenticatedUser newUser) {
-        UserLogin.this.user = newUser;
+        getUserRequest.setCached(newUser);
         onLoginStatusChanged(newUser);
         callback.onSuccess(newUser);
       }
@@ -165,7 +154,7 @@ public class UserLogin {
   public void logout(final AsyncCallback<AuthenticatedUser> callback) {
     String currentURL = Window.Location.getHref();
     Window.open("/logout?service=" + currentURL, "_self", "");
-    UserLogin.this.user = null;
+    getUserRequest.clearCache();
   }
 
   /**
@@ -222,24 +211,24 @@ public class UserLogin {
    * If any evidence is found that the login was reset, call this method to
    * update login and alert all listeners
    */
-  public void checkForLoginReset() {
-    final User currentUser = user;
-    user = null;
-    getAuthenticatedUser(new AsyncCallback<AuthenticatedUser>() {
-
-      public void onFailure(Throwable caught) {
-        logger.error("Error getting current authenticated user", caught);
-      }
-
-      public void onSuccess(AuthenticatedUser user) {
-        if (!user.equals(currentUser)) {
-          onLoginStatusChanged(user);
-        }
-
-      }
-
-    });
-  }
+  // public void checkForLoginReset() {
+  // final User currentUser = user;
+  // user = null;
+  // getAuthenticatedUser(new AsyncCallback<AuthenticatedUser>() {
+  //
+  // public void onFailure(Throwable caught) {
+  // logger.error("Error getting current authenticated user", caught);
+  // }
+  //
+  // public void onSuccess(AuthenticatedUser user) {
+  // if (!user.equals(currentUser)) {
+  // onLoginStatusChanged(user);
+  // }
+  //
+  // }
+  //
+  // });
+  // }
 
   /**
    * Get RODA properties
@@ -305,7 +294,6 @@ public class UserLogin {
           }
 
           public void onSuccess(AuthenticatedUser authUser) {
-            logger.debug("Checking user " + authUser.getId() + " for role " + role);
             callback.onSuccess(new Boolean(authUser.hasRole(role)));
           }
 

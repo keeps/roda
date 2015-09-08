@@ -21,6 +21,7 @@ import pt.gov.dgarq.roda.core.common.IllegalOperationException;
 import pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException;
 import pt.gov.dgarq.roda.core.data.DescriptionObject;
 import pt.gov.dgarq.roda.core.data.SIPState;
+import pt.gov.dgarq.roda.core.data.v2.RodaUser;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
@@ -305,13 +306,13 @@ public class SIPPanel extends ElementPanel<SIPState> {
 
   private void initProducerInfoPopup(final AsyncCallback<PopupPanel> callback) {
     if (producerInfoPopup.getWidget() == null) {
-      UserManagementService.Util.getInstance().getUser(get().getUsername(), new AsyncCallback<User>() {
+      UserManagementService.Util.getInstance().getUser(get().getUsername(), new AsyncCallback<RodaUser>() {
 
         public void onFailure(Throwable caught) {
           callback.onFailure(caught);
         }
 
-        public void onSuccess(User user) {
+        public void onSuccess(RodaUser user) {
           UserInfoPanel userInfo = new UserInfoPanel(user);
           AccessibleFocusPanel focus = new AccessibleFocusPanel(userInfo.getWidget());
           producerInfoPopup.setWidget(focus);

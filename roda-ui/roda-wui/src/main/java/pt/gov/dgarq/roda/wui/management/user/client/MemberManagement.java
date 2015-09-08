@@ -8,7 +8,6 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -22,119 +21,122 @@ import pt.gov.dgarq.roda.core.data.v2.RODAMember;
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
 import pt.gov.dgarq.roda.wui.common.client.tools.FacetUtils;
+import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
 import pt.gov.dgarq.roda.wui.common.client.widgets.RodaMemberList;
 import pt.gov.dgarq.roda.wui.management.client.Management;
 
 public class MemberManagement extends Composite {
-	public static final HistoryResolver RESOLVER = new HistoryResolver() {
+  private static final String EDIT_GROUP_HISTORY_TOKEN = "edit_group";
 
-		@Override
-		public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
-			getInstance().resolve(historyTokens, callback);
-		}
+  private static final String EDIT_USER_HISTORY_TOKEN = "edit_user";
 
-		@Override
-		public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-			UserLogin.getInstance().checkRoles(new HistoryResolver[] { MemberManagement.RESOLVER }, false, callback);
-		}
+  public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
-		public String getHistoryPath() {
-			return Management.RESOLVER.getHistoryPath() + "." + getHistoryToken();
-		}
+    @Override
+    public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
+      getInstance().resolve(historyTokens, callback);
+    }
 
-		public String getHistoryToken() {
-			return "user";
-		}
-	};
+    @Override
+    public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
+      UserLogin.getInstance().checkRoles(new HistoryResolver[] {MemberManagement.RESOLVER}, false, callback);
+    }
 
-	private static MemberManagement instance = null;
+    public String getHistoryPath() {
+      return Management.RESOLVER.getHistoryPath() + "." + getHistoryToken();
+    }
 
-	/**
-	 * Get the singleton instance
-	 * 
-	 * @return the instance
-	 */
-	public static MemberManagement getInstance() {
-		if (instance == null) {
-			instance = new MemberManagement();
-		}
-		return instance;
-	}
+    public String getHistoryToken() {
+      return "user";
+    }
+  };
 
-	interface MyUiBinder extends UiBinder<Widget, MemberManagement> {
-	}
+  private static MemberManagement instance = null;
 
-	private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+  /**
+   * Get the singleton instance
+   * 
+   * @return the instance
+   */
+  public static MemberManagement getInstance() {
+    if (instance == null) {
+      instance = new MemberManagement();
+    }
+    return instance;
+  }
 
-	// private UserManagementConstants constants = (UserManagementConstants)
-	// GWT.create(UserManagementConstants.class);
+  interface MyUiBinder extends UiBinder<Widget, MemberManagement> {
+  }
 
-	// private UserManagementMessages messages = (UserManagementMessages)
-	// GWT.create(UserManagementMessages.class);
+  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-	@UiField(provided = true)
-	RodaMemberList list;
+  // private UserManagementConstants constants = (UserManagementConstants)
+  // GWT.create(UserManagementConstants.class);
 
-	@UiField(provided = true)
-	FlowPanel facetIsActive;
+  // private UserManagementMessages messages = (UserManagementMessages)
+  // GWT.create(UserManagementMessages.class);
 
-	@UiField(provided = true)
-	FlowPanel facetIsUser;
+  @UiField(provided = true)
+  RodaMemberList list;
 
-	@UiField(provided = true)
-	FlowPanel facetGroups;
+  @UiField(provided = true)
+  FlowPanel facetIsActive;
 
-	@UiField
-	Button buttonEdit;
+  @UiField(provided = true)
+  FlowPanel facetIsUser;
 
-	@UiField
-	Button buttonRemove;
+  @UiField(provided = true)
+  FlowPanel facetGroups;
 
-	@UiField
-	Button buttonDeActivate;
+  public MemberManagement() {
+    Filter filter = null;
+    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.MEMBERS_IS_ACTIVE),
+      new SimpleFacetParameter(RodaConstants.MEMBERS_IS_USER),
+      new SimpleFacetParameter(RodaConstants.MEMBERS_GROUPS_ALL));
+    list = new RodaMemberList(filter, facets);
+    facetIsActive = new FlowPanel();
+    facetIsUser = new FlowPanel();
+    facetGroups = new FlowPanel();
 
-	public MemberManagement() {
-		Filter filter = null;
-		Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.MEMBERS_IS_ACTIVE),
-				new SimpleFacetParameter(RodaConstants.MEMBERS_IS_USER),
-				new SimpleFacetParameter(RodaConstants.MEMBERS_GROUPS_ALL));
-		list = new RodaMemberList(filter, facets);
-		facetIsActive = new FlowPanel();
-		facetIsUser = new FlowPanel();
-		facetGroups = new FlowPanel();
+    Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
+    facetPanels.put(RodaConstants.MEMBERS_IS_ACTIVE, facetIsActive);
+    facetPanels.put(RodaConstants.MEMBERS_IS_USER, facetIsUser);
+    facetPanels.put(RodaConstants.MEMBERS_GROUPS_ALL, facetGroups);
 
-		Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
-		facetPanels.put(RodaConstants.MEMBERS_IS_ACTIVE, facetIsActive);
-		facetPanels.put(RodaConstants.MEMBERS_IS_USER, facetIsUser);
-		facetPanels.put(RodaConstants.MEMBERS_GROUPS_ALL, facetGroups);
+    FacetUtils.bindFacets(list, facetPanels);
 
-		FacetUtils.bindFacets(list, facetPanels);
+    initWidget(uiBinder.createAndBindUi(this));
 
-		initWidget(uiBinder.createAndBindUi(this));
+    list.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
 
-		list.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
+      @Override
+      public void onSelectionChange(SelectionChangeEvent event) {
+        RODAMember selected = list.getSelectionModel().getSelectedObject();
 
-			@Override
-			public void onSelectionChange(SelectionChangeEvent event) {
-				RODAMember selected = list.getSelectionModel().getSelectedObject();
-				updateVisibles(selected);
-			}
-		});
-	}
+        History.newItem(RESOLVER.getHistoryPath() + "."
+          + (selected.isUser() ? EDIT_USER_HISTORY_TOKEN : EDIT_GROUP_HISTORY_TOKEN) + "." + selected.getId());
+      }
+    });
+  }
 
-	protected void updateVisibles(RODAMember selected) {
-		buttonEdit.setEnabled(selected != null);
-		buttonRemove.setEnabled(selected != null);
-		buttonDeActivate.setEnabled(selected != null);
-	}
-
-	public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
-		if (historyTokens.length == 0) {
-			// TODO ?list.refresh();
-			callback.onSuccess(this);
-		} else {
-			History.newItem(RESOLVER.getHistoryPath());
-			callback.onSuccess(null);
-		}
-	}
+  public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
+    if (historyTokens.length == 0) {
+      // TODO ?list.refresh();
+      callback.onSuccess(this);
+    } else if (historyTokens.length == 2) {
+      if (historyTokens[0].equals(EDIT_USER_HISTORY_TOKEN)) {
+        EditUser.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+      } else if (historyTokens[0].equals(EDIT_GROUP_HISTORY_TOKEN)) {
+        // TODO EditGroup.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+        History.newItem(RESOLVER.getHistoryPath());
+        callback.onSuccess(null);
+      } else {
+        History.newItem(RESOLVER.getHistoryPath());
+        callback.onSuccess(null);
+      }
+    } else {
+      History.newItem(RESOLVER.getHistoryPath());
+      callback.onSuccess(null);
+    }
+  }
 }

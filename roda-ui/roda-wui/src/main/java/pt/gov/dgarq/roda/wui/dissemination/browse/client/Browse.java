@@ -250,6 +250,7 @@ public class Browse extends Composite {
       itemIconHtmlPanel.addStyleName("browseItemIcon-other");
       itemIcon.setWidget(itemIconHtmlPanel);
       itemTitle.setText(sdo.getTitle());
+      itemTitle.removeStyleName("browseTitle-allCollections");
       itemDates.setText(getDatesText(sdo));
       SafeHtml html = getDescriptiveMetadataPanelHTML(descMetadata);
       itemDescriptiveMetadata.setHTML(html);
@@ -283,6 +284,7 @@ public class Browse extends Composite {
       new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-circle-o'></i>"), RESOLVER.getHistoryPath())));
     breadcrumb.setVisible(false);
     itemTitle.setText("All collections");
+    itemTitle.addStyleName("browseTitle-allCollections");
     itemDates.setText("");
     itemDescriptiveMetadata.setText("");
     itemDescriptiveMetadata.setVisible(false);

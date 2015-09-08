@@ -30,11 +30,10 @@ import pt.gov.dgarq.roda.wui.ingest.submit.client.IngestSubmit;
 import pt.gov.dgarq.roda.wui.management.client.Management;
 import pt.gov.dgarq.roda.wui.management.event.client.EventManagement;
 import pt.gov.dgarq.roda.wui.management.statistics.client.Statistics;
+import pt.gov.dgarq.roda.wui.management.user.client.MemberManagement;
 import pt.gov.dgarq.roda.wui.management.user.client.Preferences;
 import pt.gov.dgarq.roda.wui.management.user.client.Register;
-import pt.gov.dgarq.roda.wui.management.user.client.MemberManagement;
 import pt.gov.dgarq.roda.wui.management.user.client.UserLog;
-import pt.gov.dgarq.roda.wui.management.user.client.WUIUserManagement;
 
 /**
  * @author Luis Faria

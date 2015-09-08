@@ -264,32 +264,32 @@ public class PermissionsPanel extends VerticalPanel implements
 			logger.debug("Getting group permissions");
 			this.setEnabled(false);
 			loading.show();
-			UserManagementService.Util.getInstance().getGroupsRoles(
-					memberGroups, new AsyncCallback<Set<String>>() {
-
-						public void onFailure(Throwable caught) {
-							loading.hide();
-							logger.error("Error while getting member"
-									+ "groups permissions", caught);
-						}
-
-						public void onSuccess(Set<String> inheritedRoles) {
-							logger.info("got " + inheritedRoles.size()
-									+ " permissions to add");
-
-							// unlock all
-							for (Permission p : permissions) {
-								p.setLocked(false);
-
-							}
-							// Lock inherited roles
-							checkPermissions(inheritedRoles, true);
-
-							PermissionsPanel.this.setEnabled(true);
-							loading.hide();
-						}
-
-					});
+      // UserManagementService.Util.getInstance().getGroupsRoles(
+      // memberGroups, new AsyncCallback<Set<String>>() {
+      //
+      // public void onFailure(Throwable caught) {
+      // loading.hide();
+      // logger.error("Error while getting member"
+      // + "groups permissions", caught);
+      // }
+      //
+      // public void onSuccess(Set<String> inheritedRoles) {
+      // logger.info("got " + inheritedRoles.size()
+      // + " permissions to add");
+      //
+      // // unlock all
+      // for (Permission p : permissions) {
+      // p.setLocked(false);
+      //
+      // }
+      // // Lock inherited roles
+      // checkPermissions(inheritedRoles, true);
+      //
+      // PermissionsPanel.this.setEnabled(true);
+      // loading.hide();
+      // }
+      //
+      // });
 		}
 
 	}

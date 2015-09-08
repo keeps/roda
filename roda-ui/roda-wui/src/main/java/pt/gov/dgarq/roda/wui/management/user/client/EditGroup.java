@@ -33,215 +33,204 @@ import config.i18n.client.UserManagementMessages;
  */
 public class EditGroup extends WUIWindow {
 
-	private static UserManagementConstants constants = (UserManagementConstants) GWT
-			.create(UserManagementConstants.class);
+  private static UserManagementConstants constants = (UserManagementConstants) GWT
+    .create(UserManagementConstants.class);
 
-	private static UserManagementMessages messages = (UserManagementMessages) GWT
-			.create(UserManagementMessages.class);
+  private static UserManagementMessages messages = (UserManagementMessages) GWT.create(UserManagementMessages.class);
 
-	private ClientLogger logger = new ClientLogger(getClass().getName());
+  private ClientLogger logger = new ClientLogger(getClass().getName());
 
-	private final Group group;
+  private final Group group;
 
-	private final WUIButton apply;
+  private final WUIButton apply;
 
-	private final WUIButton cancel;
+  private final WUIButton cancel;
 
-	private TextBox groupName;
+  private TextBox groupName;
 
-	private final TextBox groupFullname;
+  private final TextBox groupFullname;
 
-	private final GroupSelect groupSelect;
+  // private final GroupSelect groupSelect;
 
-	private final PermissionsPanel permissionsPanel;
+  private final PermissionsPanel permissionsPanel;
 
-	/**
-	 * Create a new panel to edit a group
-	 * 
-	 * @param group
-	 *            the group to edit
-	 */
-	public EditGroup(Group group) {
-		super(constants.editGroupTitle(), 690, 346);
-		this.group = group;
+  /**
+   * Create a new panel to edit a group
+   * 
+   * @param group
+   *          the group to edit
+   */
+  public EditGroup(Group group) {
+    super(constants.editGroupTitle(), 690, 346);
+    this.group = group;
 
-		apply = new WUIButton(constants.editGroupApply(), WUIButton.Left.ROUND,
-				WUIButton.Right.REC);
+    apply = new WUIButton(constants.editGroupApply(), WUIButton.Left.ROUND, WUIButton.Right.REC);
 
-		cancel = new WUIButton(constants.editGroupCancel(),
-				WUIButton.Left.ROUND, WUIButton.Right.CROSS);
+    cancel = new WUIButton(constants.editGroupCancel(), WUIButton.Left.ROUND, WUIButton.Right.CROSS);
 
-		apply.addClickListener(new ClickListener() {
+    apply.addClickListener(new ClickListener() {
 
-			public void onClick(Widget sender) {
-				final String name = groupName.getText();
-				String fullname = groupFullname.getText();
+      public void onClick(Widget sender) {
+        final String name = groupName.getText();
+        String fullname = groupFullname.getText();
 
-				Set<String> memberGroups = groupSelect.getMemberGroups();
-				Set<String> directRoles = permissionsPanel.getDirectRoles();
+        // Set<String> memberGroups = groupSelect.getMemberGroups();
+        Set<String> directRoles = permissionsPanel.getDirectRoles();
 
-				EditGroup.this.group.setFullName(fullname);
-				EditGroup.this.group.setDirectGroups(memberGroups);
-				EditGroup.this.group.setDirectRoles(directRoles);
+        EditGroup.this.group.setFullName(fullname);
+        // EditGroup.this.group.setDirectGroups(memberGroups);
+        EditGroup.this.group.setDirectRoles(directRoles);
 
-				UserManagementService.Util.getInstance().editGroup(
-						EditGroup.this.group, new AsyncCallback<Void>() {
+        UserManagementService.Util.getInstance().editGroup(EditGroup.this.group, new AsyncCallback<Void>() {
 
-							public void onFailure(Throwable caught) {
-								if (caught instanceof NoSuchGroupException) {
-									Window.alert(messages
-											.editGroupNotFound(name));
-									EditGroup.this.cancel();
-								} else {
-									Window.alert(messages.editGroupFailure(
-											EditGroup.this.group.getName(),
-											caught.getMessage()));
-								}
-							}
+          public void onFailure(Throwable caught) {
+            if (caught instanceof NoSuchGroupException) {
+              Window.alert(messages.editGroupNotFound(name));
+              EditGroup.this.cancel();
+            } else {
+              Window.alert(messages.editGroupFailure(EditGroup.this.group.getName(), caught.getMessage()));
+            }
+          }
 
-							public void onSuccess(Void result) {
-								EditGroup.this.hide();
-								EditGroup.this.onSuccess();
-							}
+          public void onSuccess(Void result) {
+            EditGroup.this.hide();
+            EditGroup.this.onSuccess();
+          }
 
-						});
-			}
+        });
+      }
 
-		});
+    });
 
-		cancel.addClickListener(new ClickListener() {
+    cancel.addClickListener(new ClickListener() {
 
-			public void onClick(Widget sender) {
-				EditGroup.this.cancel();
-			}
+      public void onClick(Widget sender) {
+        EditGroup.this.cancel();
+      }
 
-		});
+    });
 
-		this.addToBottom(apply);
-		this.addToBottom(cancel);
+    this.addToBottom(apply);
+    this.addToBottom(cancel);
 
-		VerticalPanel groupDataPanel = new VerticalPanel();
+    VerticalPanel groupDataPanel = new VerticalPanel();
 
-		VerticalPanel basicInfoPanel = new VerticalPanel();
+    VerticalPanel basicInfoPanel = new VerticalPanel();
 
-		groupName = new TextBox();
-		groupFullname = new TextBox();
+    groupName = new TextBox();
+    groupFullname = new TextBox();
 
-		groupName.setEnabled(false);
+    groupName.setEnabled(false);
 
-		VerticalPanel namePanel = concatInPanel(constants.groupName(),
-				groupName);
-		VerticalPanel fullnamePanel = concatInPanel(constants.groupFullname(),
-				groupFullname);
+    VerticalPanel namePanel = concatInPanel(constants.groupName(), groupName);
+    VerticalPanel fullnamePanel = concatInPanel(constants.groupFullname(), groupFullname);
 
-		basicInfoPanel.add(namePanel);
-		basicInfoPanel.add(fullnamePanel);
+    basicInfoPanel.add(namePanel);
+    basicInfoPanel.add(fullnamePanel);
 
-		groupSelect = new GroupSelect(false);
+    // groupSelect = new GroupSelect(false);
 
-		groupDataPanel.add(basicInfoPanel);
-		groupDataPanel.add(groupSelect);
+    groupDataPanel.add(basicInfoPanel);
+    // groupDataPanel.add(groupSelect);
 
-		groupSelect.addChangeListener(new ChangeListener() {
+    // groupSelect.addChangeListener(new ChangeListener() {
+    //
+    // public void onChange(Widget sender) {
+    // apply.setEnabled(true);
+    // }
+    //
+    // });
 
-			public void onChange(Widget sender) {
-				apply.setEnabled(true);
-			}
+    apply.setEnabled(false);
 
-		});
+    groupFullname.addKeyboardListener(new KeyboardListener() {
 
-		apply.setEnabled(false);
+      public void onKeyDown(Widget sender, char keyCode, int modifiers) {
+      }
 
-		groupFullname.addKeyboardListener(new KeyboardListener() {
+      public void onKeyPress(Widget sender, char keyCode, int modifiers) {
+      }
 
-			public void onKeyDown(Widget sender, char keyCode, int modifiers) {
-			}
+      public void onKeyUp(Widget sender, char keyCode, int modifiers) {
+        if (groupFullname.getText().length() > 0) {
+          apply.setEnabled(true);
+        } else {
+          apply.setEnabled(false);
+        }
 
-			public void onKeyPress(Widget sender, char keyCode, int modifiers) {
-			}
+      }
 
-			public void onKeyUp(Widget sender, char keyCode, int modifiers) {
-				if (groupFullname.getText().length() > 0) {
-					apply.setEnabled(true);
-				} else {
-					apply.setEnabled(false);
-				}
+    });
 
-			}
+    permissionsPanel = new PermissionsPanel();
+    permissionsPanel.addChangeListener(new ChangeListener() {
 
-		});
+      public void onChange(Widget sender) {
+        apply.setEnabled(true);
+      }
 
-		permissionsPanel = new PermissionsPanel();
-		permissionsPanel.addChangeListener(new ChangeListener() {
+    });
 
-			public void onChange(Widget sender) {
-				apply.setEnabled(true);
-			}
+    this.addTab(groupDataPanel, constants.dataTabTitle());
+    this.addTab(permissionsPanel, constants.permissionsTabTitle());
 
-		});
+    this.getTabPanel().addTabListener(new TabListener() {
 
-		this.addTab(groupDataPanel, constants.dataTabTitle());
-		this.addTab(permissionsPanel, constants.permissionsTabTitle());
+      public boolean onBeforeTabSelected(SourcesTabEvents sender, int tabIndex) {
+        if (tabIndex == 1) {
+          // permissionsPanel.updateLockedPermissions(groupSelect.getMemberGroups());
 
-		this.getTabPanel().addTabListener(new TabListener() {
+        }
+        return true;
+      }
 
-			public boolean onBeforeTabSelected(SourcesTabEvents sender,
-					int tabIndex) {
-				if (tabIndex == 1) {
-					permissionsPanel.updateLockedPermissions(groupSelect
-							.getMemberGroups());
+      public void onTabSelected(SourcesTabEvents sender, int tabIndex) {
 
-				}
-				return true;
-			}
+      }
 
-			public void onTabSelected(SourcesTabEvents sender, int tabIndex) {
+    });
 
-			}
+    this.selectTab(0);
 
-		});
+    this.init();
 
-		this.selectTab(0);
+    getTabPanel().addStyleName("office-edit-group-tabpanel");
+    basicInfoPanel.addStyleName("basicInfoPanel");
+    namePanel.addStyleName("namePanel");
+    fullnamePanel.addStyleName("fullnamePanel");
 
-		this.init();
+  }
 
-		getTabPanel().addStyleName("office-edit-group-tabpanel");
-		basicInfoPanel.addStyleName("basicInfoPanel");
-		namePanel.addStyleName("namePanel");
-		fullnamePanel.addStyleName("fullnamePanel");
+  protected void init() {
+    groupName.setText(group.getName());
+    groupFullname.setText(group.getFullName());
 
-	}
+    Set<String> superGroups = group.getAllGroups();
+    // groupSelect.setMemberGroups(superGroups);
+    // groupSelect.exclude(group.getName());
+    // groupSelect.setVisible(true);
 
-	protected void init() {
-		groupName.setText(group.getName());
-		groupFullname.setText(group.getFullName());
+    permissionsPanel.setEnabled(false);
+    Set<String> roles = group.getAllRoles();
+    permissionsPanel.checkPermissions(roles, false);
+    permissionsPanel.setEnabled(true);
+  }
 
-		Set<String> superGroups = group.getAllGroups();
-		groupSelect.setMemberGroups(superGroups);
-		groupSelect.exclude(group.getName());
-		groupSelect.setVisible(true);
+  protected void cancel() {
+    this.hide();
+    super.onCancel();
+  }
 
-		permissionsPanel.setEnabled(false);
-		Set<String> roles = group.getAllRoles();
-		permissionsPanel.checkPermissions(roles, false);
-		permissionsPanel.setEnabled(true);
-	}
+  private VerticalPanel concatInPanel(String title, Widget input) {
+    VerticalPanel vp = new VerticalPanel();
+    Label label = new Label(title);
+    vp.add(label);
+    vp.add(input);
 
-	protected void cancel() {
-		this.hide();
-		super.onCancel();
-	}
+    vp.addStyleName("office-input-panel");
+    label.addStyleName("office-input-title");
+    input.addStyleName("office-input-widget");
 
-	private VerticalPanel concatInPanel(String title, Widget input) {
-		VerticalPanel vp = new VerticalPanel();
-		Label label = new Label(title);
-		vp.add(label);
-		vp.add(input);
-
-		vp.addStyleName("office-input-panel");
-		label.addStyleName("office-input-title");
-		input.addStyleName("office-input-widget");
-
-		return vp;
-	}
+    return vp;
+  }
 }

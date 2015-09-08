@@ -5,6 +5,9 @@
 	xmlns:i="urn:import:config.i18n.client" xmlns:m="urn:import:pt.gov.dgarq.roda.wui.main.client"
 	xmlns:common="urn:import:pt.gov.dgarq.roda.wui.common.client.widgets"
 	xmlns:d="urn:import:com.google.gwt.user.datepicker.client">
+	
+	<ui:with field='constants' type='config.i18n.client.UserManagementConstants'/>
+	<ui:with field='messages' type='config.i18n.client.UserManagementMessages'/>
 
 	<ui:style>
 	.search {
@@ -45,47 +48,25 @@
 	<g:FlowPanel styleName="wui-management-user" addStyleNames="{style.search}">
 		<g:FlowPanel styleName="layout" addStyleNames="{style.content}">
 			<g:Label styleName="h1">Users and groups</g:Label>
-			<!-- <common:LogEntryList addStyleNames="searchResults" -->
-			<!-- ui:field="logList" /> -->
-			<common:RodaMemberList addStyleNames="searchResults"
-				ui:field="list" />
+
 		</g:FlowPanel>
 
 		<g:FlowPanel styleName="{style.sidebar}">
 			<g:FlowPanel styleName="{style.sidebar-group}">
-				<g:Label addStyleNames="h2 {style.sidebar-title} searchFacetsTitle">
-					<ui:msg>Filters</ui:msg>
-				</g:Label>
-				<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-					<g:Label addStyleNames="h3 sidebar-facet-title">
-						<ui:msg>Is active</ui:msg>
-					</g:Label>
-					<g:FlowPanel styleName="{style.sidebar-group}"
-						ui:field="facetIsActive" />
-				</g:FlowPanel>
-				<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-					<g:Label addStyleNames="h3 sidebar-facet-title">
-						<ui:msg>Is user</ui:msg>
-					</g:Label>
-					<g:FlowPanel styleName="{style.sidebar-group}"
-						ui:field="facetIsUser" />
-				</g:FlowPanel>
-				<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-					<g:Label addStyleNames="h3 sidebar-facet-title">
-						<ui:msg>Groups</ui:msg>
-					</g:Label>
-					<g:FlowPanel styleName="{style.sidebar-group}"
-						ui:field="facetGroups" />
-				</g:FlowPanel>
-			</g:FlowPanel>
-			<g:FlowPanel styleName="{style.sidebar-group}">
 				<g:Label addStyleNames="h2 {style.sidebar-title}">
 					<ui:msg>Actions</ui:msg>
 				</g:Label>
-				<g:Button addStyleNames="btn btn-plus {style.action}"
-					ui:field="buttonAddUser">Add user</g:Button>
-				<g:Button addStyleNames="btn btn-plus {style.action}"
-					ui:field="buttonAddGroup">Add group</g:Button>
+				<g:Button addStyleNames="btn btn-play {style.action}"
+					ui:field="buttonApply">{constants.editUserApply}</g:Button>
+				<g:Button addStyleNames="btn btn-times-circle {style.action}"
+					ui:field="buttonCancel">{constants.editUserCancel}</g:Button>
+				<g:Button addStyleNames="btn btn-check {style.action}"
+					ui:field="buttonEdit" enabled="false">Edit</g:Button>
+				<g:Button addStyleNames="btn btn-check {style.action}"
+					ui:field="buttonDeActivate" enabled="false">(De)Activate</g:Button>
+				<g:Button addStyleNames="btn btn-ban {style.action}"
+					ui:field="buttonRemove" enabled="false">Remove</g:Button>
+
 			</g:FlowPanel>
 		</g:FlowPanel>
 		<g:FlowPanel styleName="{style.footer}" />

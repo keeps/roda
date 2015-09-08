@@ -16,7 +16,6 @@ import pt.gov.dgarq.roda.wui.management.event.client.EventManagement;
 import pt.gov.dgarq.roda.wui.management.statistics.client.Statistics;
 import pt.gov.dgarq.roda.wui.management.user.client.MemberManagement;
 import pt.gov.dgarq.roda.wui.management.user.client.UserLog;
-import pt.gov.dgarq.roda.wui.management.user.client.WUIUserManagement;
 
 /**
  * @author Luis Faria

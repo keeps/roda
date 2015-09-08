@@ -6,10 +6,6 @@ package pt.gov.dgarq.roda.wui.management.user.client;
 import java.util.List;
 import java.util.Vector;
 
-import pt.gov.dgarq.roda.core.data.v2.Group;
-import pt.gov.dgarq.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
-import pt.gov.dgarq.roda.wui.management.user.client.images.UserManagementImageBundle;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.ChangeListener;
@@ -18,6 +14,10 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
+
+import pt.gov.dgarq.roda.core.data.v2.RodaGroup;
+import pt.gov.dgarq.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
+import pt.gov.dgarq.roda.wui.management.user.client.images.UserManagementImageBundle;
 
 /**
  * @author Luis Faria
@@ -99,7 +99,7 @@ public class GroupMiniPanel {
 	 * @param callback
 	 *            the callback to handle the asynchronously returned group
 	 */
-	public void getGroup(AsyncCallback<Group> callback) {
+	public void getGroup(AsyncCallback<RodaGroup> callback) {
 		UserManagementService.Util.getInstance().getGroup(groupName, callback);
 	}
 
