@@ -6,6 +6,7 @@ import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.Column;
@@ -41,8 +42,6 @@ public class AIPList extends AsyncTableCell<SimpleDescriptionObject> {
 	private final Column<SimpleDescriptionObject, Date> dateInitialColumn;
 	private final Column<SimpleDescriptionObject, Date> dateFinalColumn;
 	
-	private static CommonConstants constants = (CommonConstants) GWT.create(CommonConstants.class);
-
 	public AIPList() {
 		this(null, null);
 	}
@@ -157,7 +156,7 @@ public class AIPList extends AsyncTableCell<SimpleDescriptionObject> {
 			// define sublist
 			Sublist sublist = new Sublist(start, length);
 
-			BrowserService.Util.getInstance().findDescriptiveMetadata(filter, sorter, sublist, getFacets(), constants.locale(), callback);
+			BrowserService.Util.getInstance().findDescriptiveMetadata(filter, sorter, sublist, getFacets(), LocaleInfo.getCurrentLocale().getLocaleName(), callback);
 		}
 
 	}
