@@ -242,7 +242,7 @@ public class AipsResource {
     @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam("limit") String limit,
     @ApiParam(value = "Choose format in which to get the representation", allowableValues = "{values=[json, zip]}") @QueryParam("acceptFormat") String acceptFormat)
       throws NotFoundException {
-    return delegate.aipsAipIdDescriptiveMetadataGet(aipId, start, limit);
+    return delegate.aipsAipIdDescriptiveMetadataGet(aipId, start, limit, acceptFormat);
   }
 
   @GET
