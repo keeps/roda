@@ -155,14 +155,6 @@
 		<profile>
 			<id>dev-rest</id>
 			<build>
-				<resources>
-					<resource>
-						<directory>${basedir}/src/main/webapp/WEB-INF/</directory>
-						<includes>
-							<include>web.xml</include>
-						</includes>
-					</resource>
-				</resources>
 				<plugins>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
@@ -219,7 +211,6 @@
 			<classifier>sources</classifier>
 			<scope>compile</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>commons-httpclient</groupId>
 			<artifactId>commons-httpclient</artifactId>

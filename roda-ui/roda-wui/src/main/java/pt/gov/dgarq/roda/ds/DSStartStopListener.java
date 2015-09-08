@@ -34,6 +34,7 @@ public class DSStartStopListener implements ServletContextListener {
 
 	@Override
 	public void contextInitialized(ServletContextEvent arg0) {
+		RodaCoreFactory.instantiate();
 		ldap = new ApacheDS();
 		rodaApacheDsConfigDirectory = RodaCoreFactory.getConfigPath().resolve("ldap");
 		rodaApacheDsDataDirectory = RodaCoreFactory.getDataPath().resolve("ldap");

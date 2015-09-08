@@ -199,10 +199,13 @@
 			<id>wui</id>
 			<modules>
 				<module>roda-common/roda-common-data</module>
+				<module>roda-common/roda-common-metadata</module>
+				<module>roda-common/roda-common-utils</module>
 				<module>roda-common/roda-common-storage</module>
 				<module>roda-ui/roda-wui</module>
 			</modules>
 		</profile>
+		
 		<!-- <profile> -->
 		<!-- <id>create-installer</id> -->
 		<!-- <modules> -->

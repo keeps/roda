@@ -24,6 +24,10 @@
 			</plugin>
 		</plugins>
 	</build>
+	<properties>
+		<!-- XXX fedora tests really need jersey 2.12 -->
+		<jersey.version>2.12</jersey.version>
+	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>org.fcrepo</groupId>
@@ -203,7 +207,7 @@
 		<dependency>
 			<groupId>org.glassfish.jersey.test-framework.providers</groupId>
 			<artifactId>jersey-test-framework-provider-grizzly2</artifactId>
-			<version>${jersey.version}</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -225,10 +229,17 @@
 		<dependency>
 			<groupId>org.glassfish.jersey.core</groupId>
 			<artifactId>jersey-common</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish.jersey.media</groupId>
 			<artifactId>jersey-media-multipart</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.bundles.repackaged</groupId>
+			<artifactId>jersey-guava</artifactId>
+			<version>${jersey.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.w3</groupId>

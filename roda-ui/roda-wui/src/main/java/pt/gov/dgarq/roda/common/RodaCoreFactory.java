@@ -48,6 +48,8 @@ import pt.gov.dgarq.roda.core.data.v2.SIPStateTransition;
 public class RodaCoreFactory {
   private static final Logger LOGGER = Logger.getLogger(RodaCoreFactory.class);
 
+  private static boolean instantiated = false;
+
   private static Path storagePath;
   private static Path indexPath;
   private static Path dataPath;
@@ -65,70 +67,74 @@ public class RodaCoreFactory {
   // FIXME read this from configuration file or environment
   public static boolean DEVELOPMENT = true;
 
-  static {
-    try {
-      String RODA_HOME;
-      if (System.getProperty("roda.home") != null) {
-        RODA_HOME = System.getProperty("roda.home");
-      } else if (System.getenv("RODA_HOME") != null) {
-        RODA_HOME = System.getenv("RODA_HOME");
-      } else {
-        RODA_HOME = null;
+  public static void instantiate() {
+    if (!instantiated) {
+      try {
+        String RODA_HOME;
+        if (System.getProperty("roda.home") != null) {
+          RODA_HOME = System.getProperty("roda.home");
+        } else if (System.getenv("RODA_HOME") != null) {
+          RODA_HOME = System.getenv("RODA_HOME");
+        } else {
+          RODA_HOME = null;
+        }
+
+        dataPath = Paths.get(RODA_HOME, "data");
+        logPath = dataPath.resolve("log");
+        configPath = Paths.get(RODA_HOME, "config");
+
+        storagePath = dataPath.resolve("storage");
+        indexPath = dataPath.resolve("index");
+
+        storage = new FileStorageService(storagePath);
+        model = new ModelService(storage);
+
+        // Configure Solr
+        Path solrHome = Paths.get(RODA_HOME, "config", "index");
+        if (!Files.exists(solrHome)) {
+          solrHome = Paths.get(RodaCoreFactory.class.getResource("/index/").toURI());
+        }
+
+        System.setProperty("solr.data.dir", indexPath.toString());
+        System.setProperty("solr.data.dir.aip", indexPath.resolve("aip").toString());
+        System.setProperty("solr.data.dir.sdo", indexPath.resolve("sdo").toString());
+        System.setProperty("solr.data.dir.representations", indexPath.resolve("representation").toString());
+        System.setProperty("solr.data.dir.preservationevent", indexPath.resolve("preservationevent").toString());
+        System.setProperty("solr.data.dir.preservationobject", indexPath.resolve("preservationobject").toString());
+        System.setProperty("solr.data.dir.actionlog", indexPath.resolve("actionlog").toString());
+        System.setProperty("solr.data.dir.sipreport", indexPath.resolve("sipreport").toString());
+        System.setProperty("solr.data.dir.members", indexPath.resolve("members").toString());
+        // FIXME added missing cores
+
+        // start embedded solr
+        solr = new EmbeddedSolrServer(solrHome, "test");
+
+        index = new IndexService(solr, model);
+
+      } catch (StorageServiceException e) {
+        LOGGER.error(e);
+      } catch (URISyntaxException e) {
+        LOGGER.error(e);
       }
 
-      dataPath = Paths.get(RODA_HOME, "data");
-      logPath = dataPath.resolve("log");
-      configPath = Paths.get(RODA_HOME, "config");
+      actionOrchestrator = new EmbeddedActionOrchestrator();
 
-      storagePath = dataPath.resolve("storage");
-      indexPath = dataPath.resolve("index");
-
-      storage = new FileStorageService(storagePath);
-      model = new ModelService(storage);
-
-      // Configure Solr
-      Path solrHome = Paths.get(RODA_HOME, "config", "index");
-      if (!Files.exists(solrHome)) {
-        solrHome = Paths.get(RodaCoreFactory.class.getResource("/index/").toURI());
+      try {
+        rodaConfiguration = getConfiguration("roda-wui.properties");
+        processLoginRelatedProperties();
+      } catch (ConfigurationException e) {
+        LOGGER.error("Error loading roda-wui properties", e);
       }
 
-      System.setProperty("solr.data.dir", indexPath.toString());
-      System.setProperty("solr.data.dir.aip", indexPath.resolve("aip").toString());
-      System.setProperty("solr.data.dir.sdo", indexPath.resolve("sdo").toString());
-      System.setProperty("solr.data.dir.representations", indexPath.resolve("representation").toString());
-      System.setProperty("solr.data.dir.preservationevent", indexPath.resolve("preservationevent").toString());
-      System.setProperty("solr.data.dir.preservationobject", indexPath.resolve("preservationobject").toString());
-      System.setProperty("solr.data.dir.actionlog", indexPath.resolve("actionlog").toString());
-      System.setProperty("solr.data.dir.sipreport", indexPath.resolve("sipreport").toString());
-      System.setProperty("solr.data.dir.members", indexPath.resolve("members").toString());
-      // FIXME added missing cores
-
-      // start embedded solr
-      solr = new EmbeddedSolrServer(solrHome, "test");
-
-      index = new IndexService(solr, model);
-
-    } catch (StorageServiceException e) {
-      LOGGER.error(e);
-    } catch (URISyntaxException e) {
-      LOGGER.error(e);
+      instantiated = true;
     }
 
-    actionOrchestrator = new EmbeddedActionOrchestrator();
+  }
 
-    try {
-      rodaConfiguration = getConfiguration("roda-wui.properties");
-      processLoginRelatedProperties();
-    } catch (ConfigurationException e) {
-      LOGGER.error("Error loading roda-wui properties", e);
+  public static void shutdown() throws IOException {
+    if (instantiated) {
+      solr.close();
     }
-
-    // try {
-    // populateSipReport();
-    // } catch (ModelServiceException e) {
-    // // TODO Auto-generated catch block
-    // e.printStackTrace();
-    // }
   }
 
   public static StorageService getStorageService() {
@@ -223,7 +229,7 @@ public class RodaCoreFactory {
     loginProperties = new HashMap<String, String>();
 
     Configuration configuration = RodaCoreFactory.getRodaConfiguration();
-    Iterator keys = configuration.getKeys();
+    Iterator<String> keys = configuration.getKeys();
     while (keys.hasNext()) {
       String key = String.class.cast(keys.next());
       String value = configuration.getString(key, "");
@@ -255,6 +261,7 @@ public class RodaCoreFactory {
   public static void main(String[] argsArray) throws IndexServiceException {
     List<String> args = Arrays.asList(argsArray);
     if (args.size() > 0) {
+      instantiate();
       if ("index".equals(args.get(0))) {
         if ("list".equals(args.get(1)) && ("users".equals(args.get(2)) || "groups".equals(args.get(2)))) {
           Filter filter = new Filter(
@@ -266,7 +273,6 @@ public class RodaCoreFactory {
         } else if ("reindex".equals(args.get(1))) {
           Plugin<AIP> reindexAction = new ReindexAction();
           getActionOrchestrator().runActionOnAllAIPs(reindexAction);
-          // index.reindexAIPs();
         }
       } else {
         printMainUsage();

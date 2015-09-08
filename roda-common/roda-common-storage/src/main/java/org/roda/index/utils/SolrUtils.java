@@ -39,6 +39,7 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;
+import org.apache.solr.common.params.FacetParams;
 import org.apache.solr.common.util.ContentStream;
 import org.apache.solr.common.util.DateUtil;
 import org.apache.solr.handler.loader.XMLLoader;
@@ -395,6 +396,7 @@ public class SolrUtils {
 
   private static void parseAndConfigureFacets(Facets facets, SolrQuery query) throws IndexServiceException {
     if (facets != null) {
+      query.setFacetSort(FacetParams.FACET_SORT_INDEX);
       if (!"".equals(facets.getQuery())) {
         query.addFacetQuery(facets.getQuery());
       }

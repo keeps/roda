@@ -5,6 +5,13 @@
 	version="2.5">
 	<display-name>RODA Web User Interface</display-name>
 
+	<servlet>
+		<servlet-name>RodaWuiServlet</servlet-name>
+		<servlet-class>org.roda.servlets.RodaWuiServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	
+
 	<!-- ********************************************** -->
 	<!-- Authentication related filters/filter-mappings -->
 	<!-- ********************************************** -->
@@ -107,7 +114,7 @@
 			<param-name>log4j-init-file</param-name>
 			<param-value>WEB-INF/classes/config/log4j.xml</param-value>
 		</init-param>
-		<load-on-startup>1</load-on-startup>
+		<load-on-startup>2</load-on-startup>
 	</servlet>
 	<servlet>
 		<servlet-name>FileDownload</servlet-name>
@@ -117,7 +124,7 @@
 		<servlet-name>ImageCaptchaService</servlet-name>
 		<servlet-class>
 			pt.gov.dgarq.roda.wui.common.captcha.server.ImageCaptchaServlet</servlet-class>
-		<load-on-startup>0</load-on-startup>
+		<load-on-startup>2</load-on-startup>
 	</servlet>
 	<servlet>
 		<servlet-name>CaptchaService</servlet-name>
