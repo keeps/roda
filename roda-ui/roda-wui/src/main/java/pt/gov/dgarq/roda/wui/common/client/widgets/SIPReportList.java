@@ -46,7 +46,7 @@ public class SIPReportList extends AsyncTableCell<SIPReport> {
 	}
 
 	public SIPReportList(Filter filter, Facets facets) {
-		super(filter, facets,"SIP");
+		super(filter, facets, "SIP");
 
 		idColumn = new TextColumn<SIPReport>() {
 

@@ -2,7 +2,6 @@ package pt.gov.dgarq.roda.wui.common.client.widgets;
 
 import java.io.Serializable;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
@@ -33,7 +32,6 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
   private final SingleSelectionModel<T> selectionModel;
   private final AsyncHandler columnSortHandler;
 
-
   private final AccessibleSimplePager resultsPager;
   private final PageSizePager pageSizePager;
   private final AccessibleCellTable<T> display;
@@ -43,20 +41,19 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
 
   private final ClientLogger logger = new ClientLogger(getClass().getName());
 
-	public AsyncTableCell() {
-		this(null, null,null);
-	}
+  public AsyncTableCell() {
+    this(null, null, null);
+  }
 
-	public AsyncTableCell(Filter filter, Facets facets,String summary) {
-		super();
+  public AsyncTableCell(Filter filter, Facets facets, String summary) {
+    super();
 
-		if(summary==null){
-			summary="summary"+Random.nextInt(1000);
-		}
-		
-		
-		this.filter = filter;
-		this.facets = facets;
+    if (summary == null) {
+      summary = "summary" + Random.nextInt(1000);
+    }
+
+    this.filter = filter;
+    this.facets = facets;
 
     this.dataProvider = new AsyncDataProvider<T>() {
 
@@ -92,11 +89,11 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
         });
       }
     };
-		display = new AccessibleCellTable<>(getInitialPageSize(), getKeyProvider(),summary);
+    display = new AccessibleCellTable<>(getInitialPageSize(), getKeyProvider(), summary);
 
     dataProvider.addDataDisplay(display);
-		resultsPager = new AccessibleSimplePager(AccessibleSimplePager.TextLocation.RIGHT, false, true);
-		resultsPager.setDisplay(display);
+    resultsPager = new AccessibleSimplePager(AccessibleSimplePager.TextLocation.RIGHT, false, true);
+    resultsPager.setDisplay(display);
 
     pageSizePager = new PageSizePager(getInitialPageSize());
     pageSizePager.setDisplay(display);
@@ -125,9 +122,9 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
   protected abstract void getData(int start, int length, ColumnSortList columnSortList,
     AsyncCallback<IndexResult<T>> callback);
 
-	protected AccessibleCellTable<T> getDisplay() {
-		return display;
-	}
+  protected AccessibleCellTable<T> getDisplay() {
+    return display;
+  }
 
   public SingleSelectionModel<T> getSelectionModel() {
     return selectionModel;

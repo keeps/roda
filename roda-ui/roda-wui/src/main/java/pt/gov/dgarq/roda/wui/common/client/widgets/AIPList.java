@@ -4,6 +4,7 @@ import java.util.Date;
 
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.SafeHtmlCell;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -15,6 +16,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.view.client.ProvidesKey;
 
+import config.i18n.client.CommonConstants;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
@@ -38,13 +40,15 @@ public class AIPList extends AsyncTableCell<SimpleDescriptionObject> {
 	private final TextColumn<SimpleDescriptionObject> titleColumn;
 	private final Column<SimpleDescriptionObject, Date> dateInitialColumn;
 	private final Column<SimpleDescriptionObject, Date> dateFinalColumn;
+	
+	private static CommonConstants constants = (CommonConstants) GWT.create(CommonConstants.class);
 
 	public AIPList() {
 		this(null, null);
 	}
 
 	public AIPList(Filter filter, Facets facets) {
-		super(filter, facets,"AIPS");
+		super(filter, facets, "AIPS");
 
 		levelColumn = new Column<SimpleDescriptionObject, SafeHtml>(new SafeHtmlCell()) {
 			@Override
@@ -153,7 +157,7 @@ public class AIPList extends AsyncTableCell<SimpleDescriptionObject> {
 			// define sublist
 			Sublist sublist = new Sublist(start, length);
 
-			BrowserService.Util.getInstance().findDescriptiveMetadata(filter, sorter, sublist, getFacets(), callback);
+			BrowserService.Util.getInstance().findDescriptiveMetadata(filter, sorter, sublist, getFacets(), constants.locale(), callback);
 		}
 
 	}

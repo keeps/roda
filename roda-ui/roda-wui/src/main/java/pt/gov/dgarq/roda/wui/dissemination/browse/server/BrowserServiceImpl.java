@@ -62,7 +62,8 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   public IndexResult<SimpleDescriptionObject> findDescriptiveMetadata(Filter filter, Sorter sorter, Sublist sublist,
     Facets facets, String localeString) throws RODAException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
-    IndexResult<SimpleDescriptionObject> result = Browser.findDescriptiveMetadata(user, filter, sorter, sublist, facets);
+    IndexResult<SimpleDescriptionObject> result = Browser.findDescriptiveMetadata(user, filter, sorter, sublist,
+      facets);
     Locale locale = ServerTools.parseLocale(localeString);
     return (IndexResult<SimpleDescriptionObject>) I18nUtility.translate(result, locale);
   }

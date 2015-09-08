@@ -46,7 +46,7 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
 	}
 
 	public LogEntryList(Filter filter, Facets facets) {
-		super(filter, facets,"LOGS");
+		super(filter, facets, "LOGS");
 
 		dateColumn = new Column<LogEntry, Date>(new DateCell(DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss.SSS"))) {
 			@Override
