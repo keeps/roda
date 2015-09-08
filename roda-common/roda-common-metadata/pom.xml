@@ -3,7 +3,6 @@
 	<modelVersion>4.0.0</modelVersion>
 	<name>roda-common-metadata</name>
 	<artifactId>roda-common-metadata</artifactId>
-	<version>2.0.0-SNAPSHOT</version>
 	<parent>
 		<groupId>pt.gov.dgarq.roda</groupId>
 		<artifactId>roda-common</artifactId>
@@ -98,10 +97,7 @@
 			<groupId>pt.gov.dgarq.roda</groupId>
 			<artifactId>roda-common-data</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>pt.gov.dgarq.roda</groupId>
-			<artifactId>roda-common-utils</artifactId>
-		</dependency>
+
 		<dependency>
 			<groupId>pt.gov.dgarq.roda</groupId>
 			<artifactId>ead-c.2014</artifactId>
@@ -113,10 +109,6 @@
 		<dependency>
 			<groupId>pt.gov.dgarq.roda</groupId>
 			<artifactId>premis-v2.0</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>pt.gov.dgarq.roda</groupId>
-			<artifactId>fedora-2.2.4-xacml</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.w3c</groupId>
@@ -152,7 +144,7 @@
 		</dependency>
 		<dependency>
 			<groupId>pt.gov.dgarq.roda</groupId>
-			<artifactId>roda-common-format-utility</artifactId>
+			<artifactId>roda-common-utils</artifactId>
 		</dependency>
 	</dependencies>
 </project>
