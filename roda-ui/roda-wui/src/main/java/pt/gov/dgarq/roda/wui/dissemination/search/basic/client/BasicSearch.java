@@ -140,9 +140,9 @@ public class BasicSearch extends Composite {
 		facetPanels.put(RodaConstants.AIP_HAS_REPRESENTATIONS, facetHasRepresentations);
 		FacetUtils.bindFacets(searchResultPanel, facetPanels);
 		
-		searchInputBox.getElement().setId(Document.get().createUniqueId());
+		//searchInputBox.getElement().setId(Document.get().createUniqueId());
 		initWidget(uiBinder.createAndBindUi(this));
-		searchInputLabel.setHTML("<label class='searchLabel' for='"+searchInputBox.getElement().getId()+"'>"+constants.basicSearchInputLabel()+"</label>");
+		//searchInputLabel.setHTML("<label class='searchLabel' for='"+searchInputBox.getElement().getId()+"'>"+constants.basicSearchInputLabel()+"</label>");
 		
 		
 		// searchInputButton.setText(constants.basicSearchButtonLabel());

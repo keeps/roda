@@ -11,6 +11,7 @@ import org.w3c.util.DateParser;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import config.i18n.server.BrowserServiceMessages;
+import pt.gov.dgarq.roda.common.I18nUtility;
 import pt.gov.dgarq.roda.common.RodaCoreFactory;
 import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.data.DescriptionObject;
@@ -24,6 +25,7 @@ import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.RodaUser;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
+import pt.gov.dgarq.roda.wui.common.server.ServerTools;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.BrowseItemBundle;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.BrowserService;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.DisseminationInfo;
@@ -58,9 +60,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   public IndexResult<SimpleDescriptionObject> findDescriptiveMetadata(Filter filter, Sorter sorter, Sublist sublist,
-    Facets facets) throws RODAException {
+    Facets facets, String localeString) throws RODAException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
-    return Browser.findDescriptiveMetadata(user, filter, sorter, sublist, facets);
+    IndexResult<SimpleDescriptionObject> result = Browser.findDescriptiveMetadata(user, filter, sorter, sublist, facets);
+    Locale locale = ServerTools.parseLocale(localeString);
+    return (IndexResult<SimpleDescriptionObject>) I18nUtility.translate(result, locale);
   }
 
   public Long countDescriptiveMetadata(Filter filter) throws RODAException {

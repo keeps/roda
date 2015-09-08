@@ -48,10 +48,11 @@ public class FacetUtils {
 
 				for (FacetValue facetValue : facetResult.getValues()) {
 					final String value = facetValue.getValue();
+					final String label = facetValue.getLabel();
 					long count = facetValue.getCount();
 					boolean selected = facetResult.getSelectedValues().contains(value);
 					StringBuilder checkboxLabel = new StringBuilder();
-					checkboxLabel.append(value);
+					checkboxLabel.append(label);
 					if (count > 0 || facetResult.getSelectedValues().size() == 0 || selected) {
 						checkboxLabel.append(" (").append(count).append(")");
 					}
