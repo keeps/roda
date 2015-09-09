@@ -13,6 +13,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 
+import org.apache.commons.io.IOUtils;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.roda.api.v1.AipsService;
 import org.roda.api.v1.ApiResponseMessage;
@@ -75,7 +76,7 @@ public class AipsServiceImpl extends AipsService {
   public Response aipsAipIdDataRepresentationIdGet(String aipId, String representationId, String acceptFormat)
     throws NotFoundException {
     try {
-      if (acceptFormat != null && acceptFormat.equalsIgnoreCase("zip")) {
+      if (acceptFormat != null && acceptFormat.equalsIgnoreCase("bin")) {
         ModelService model = RodaCoreFactory.getModelService();
         StorageService storage = RodaCoreFactory.getStorageService();
         Representation representation = model.retrieveRepresentation(aipId, representationId);
@@ -92,15 +93,28 @@ public class AipsServiceImpl extends AipsService {
             zipEntries.add(info);
           }
         }
-        StreamingOutput stream = new StreamingOutput() {
-          @Override
-          public void write(OutputStream os) throws IOException, WebApplicationException {
-            ZipTools.zip(zipEntries, os);
-          }
-        };
 
+        String filename = "";
+        StreamingOutput stream = null;
+        if (zipEntries.size() == 1) {
+          stream = new StreamingOutput() {
+            @Override
+            public void write(OutputStream os) throws IOException, WebApplicationException {
+              IOUtils.copy(zipEntries.get(0).getInputStream(), os);
+            }
+          };
+          filename = zipEntries.get(0).getName();
+        } else {
+          stream = new StreamingOutput() {
+            @Override
+            public void write(OutputStream os) throws IOException, WebApplicationException {
+              ZipTools.zip(zipEntries, os);
+            }
+          };
+          filename = aipId + "_" + representationId + ".zip";
+        }
         return Response.ok(stream, MediaType.APPLICATION_OCTET_STREAM)
-          .header("content-disposition", "attachment; filename = " + aipId+"_"+representationId + ".zip").build();
+          .header("content-disposition", "attachment; filename = " + filename).build();
       } else {
         return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Not yet implemented"))
           .build();
@@ -108,12 +122,12 @@ public class AipsServiceImpl extends AipsService {
     } catch (IOException e) {
       return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
     } catch (StorageServiceException | ModelServiceException e) {
-      if(e.getCode()==ModelServiceException.NOT_FOUND){
+      if (e.getCode() == ModelServiceException.NOT_FOUND) {
         throw new NotFoundException(e.getCode(), e.getMessage());
-      }else{
+      } else {
         return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
       }
-    } 
+    }
   }
 
   @Override
@@ -173,7 +187,7 @@ public class AipsServiceImpl extends AipsService {
       ClosableIterable<DescriptiveMetadata> metadata = model.listDescriptiveMetadataBinaries(aipId);
       int startInt = (start == null) ? 0 : Integer.parseInt(start);
       int limitInt = (limit == null) ? -1 : Integer.parseInt(limit);
-      if (acceptFormat != null && acceptFormat.equalsIgnoreCase("zip")) {
+      if (acceptFormat != null && acceptFormat.equalsIgnoreCase("bin")) {
         int counter = 0;
         List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
         for (DescriptiveMetadata dm : metadata) {
@@ -188,14 +202,27 @@ public class AipsServiceImpl extends AipsService {
           }
           counter++;
         }
-        StreamingOutput stream = new StreamingOutput() {
-          @Override
-          public void write(OutputStream os) throws IOException, WebApplicationException {
-            ZipTools.zip(zipEntries, os);
-          }
-        };
+        String filename = "";
+        StreamingOutput stream = null;
+        if (zipEntries.size() == 1) {
+          stream = new StreamingOutput() {
+            @Override
+            public void write(OutputStream os) throws IOException, WebApplicationException {
+              IOUtils.copy(zipEntries.get(0).getInputStream(), os);
+            }
+          };
+          filename = zipEntries.get(0).getName();
+        } else {
+          stream = new StreamingOutput() {
+            @Override
+            public void write(OutputStream os) throws IOException, WebApplicationException {
+              ZipTools.zip(zipEntries, os);
+            }
+          };
+          filename = aipId + ".zip";
+        }
         return Response.ok(stream, MediaType.APPLICATION_OCTET_STREAM)
-          .header("content-disposition", "attachment; filename = " + aipId + ".zip").build();
+          .header("content-disposition", "attachment; filename = " + filename).build();
       } else {
         return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Not yet implemented"))
           .build();
@@ -203,12 +230,12 @@ public class AipsServiceImpl extends AipsService {
     } catch (IOException e) {
       return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
     } catch (StorageServiceException | ModelServiceException e) {
-      if(e.getCode()==ModelServiceException.NOT_FOUND){
+      if (e.getCode() == ModelServiceException.NOT_FOUND) {
         throw new NotFoundException(e.getCode(), e.getMessage());
-      }else{
+      } else {
         return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
       }
-    } 
+    }
 
   }
 

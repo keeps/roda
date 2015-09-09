@@ -123,7 +123,7 @@ public class AipsResource {
   public Response aipsAipIdDataRepresentationIdGet(
     @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam("aip_id") String aipId,
     @ApiParam(value = "The ID of the existing representation", required = true) @PathParam("representation_id") String representationId,
-    @ApiParam(value = "Choose format in which to get the representation", allowableValues = "{values=[json, zip]}") @QueryParam("acceptFormat") String acceptFormat)
+    @ApiParam(value = "Choose format in which to get the representation", allowableValues = "{values=[json, bin]}") @QueryParam("acceptFormat") String acceptFormat)
       throws NotFoundException {
     return delegate.aipsAipIdDataRepresentationIdGet(aipId, representationId, acceptFormat);
   }
@@ -240,7 +240,7 @@ public class AipsResource {
     @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam("aip_id") String aipId,
     @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam("start") String start,
     @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam("limit") String limit,
-    @ApiParam(value = "Choose format in which to get the representation", allowableValues = "{values=[json, zip]}") @QueryParam("acceptFormat") String acceptFormat)
+    @ApiParam(value = "Choose format in which to get the representation", allowableValues = "{values=[json, bin]}") @QueryParam("acceptFormat") String acceptFormat)
       throws NotFoundException {
     return delegate.aipsAipIdDescriptiveMetadataGet(aipId, start, limit, acceptFormat);
   }
