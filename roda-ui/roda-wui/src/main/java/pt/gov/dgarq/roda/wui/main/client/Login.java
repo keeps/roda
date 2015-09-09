@@ -7,6 +7,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyPressEvent;
+import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -97,6 +98,15 @@ public class Login extends Composite {
 
   private Login() {
     initWidget(uiBinder.createAndBindUi(this));
+    addAttachHandler(new AttachEvent.Handler() {
+
+      @Override
+      public void onAttachOrDetach(AttachEvent event) {
+        if (event.isAttached()) {
+          username.setFocus(true);
+        }
+      }
+    });
   }
 
   public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {

@@ -13,8 +13,9 @@ public class FacetValue implements Serializable {
 		super();
 	}
 
-	public FacetValue(String value, long count) {
+	public FacetValue(String label, String value, long count) {
 		super();
+		this.label = label;
 		this.value = value;
 		this.count = count;
 	}

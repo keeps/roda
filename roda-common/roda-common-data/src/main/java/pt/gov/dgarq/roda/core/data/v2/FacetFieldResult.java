@@ -65,8 +65,8 @@ public class FacetFieldResult implements Serializable {
 		this.values = values;
 	}
 
-	public void addFacetValue(String value, long count) {
-		values.add(new FacetValue(value, count));
+	public void addFacetValue(String label, String value, long count) {
+		values.add(new FacetValue(label, value, count));
 	}
 
 	public List<String> getSelectedValues() {

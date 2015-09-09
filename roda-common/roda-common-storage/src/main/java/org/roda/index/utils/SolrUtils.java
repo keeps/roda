@@ -159,7 +159,7 @@ public class SolrUtils {
           facets.getParameters().get(facet.getName()).getValues());
         for (Count count : facet.getValues()) {
           LOGGER.trace("   value:" + count.getName() + " value:" + count.getCount());
-          facetResult.addFacetValue(count.getName(), count.getCount());
+          facetResult.addFacetValue(count.getName(), count.getName(), count.getCount());
         }
         ret.add(facetResult);
       }

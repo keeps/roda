@@ -5,6 +5,7 @@ import java.util.Locale;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.roda.common.UserUtility;
 import org.w3c.util.DateParser;
 
@@ -25,6 +26,7 @@ import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.RodaUser;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
+import pt.gov.dgarq.roda.wui.common.client.GenericException;
 import pt.gov.dgarq.roda.wui.common.server.ServerTools;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.BrowseItemBundle;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.BrowserService;
@@ -43,8 +45,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   private static final long serialVersionUID = 1L;
   static final String FONDLIST_PAGESIZE = "10";
-  // private static final Logger LOGGER =
-  // Logger.getLogger(BrowserServiceImpl.class);
+  private static final Logger LOGGER = Logger.getLogger(BrowserServiceImpl.class);
 
   /**
    * Create a new BrowserService Implementation instance
@@ -61,11 +62,18 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   public IndexResult<SimpleDescriptionObject> findDescriptiveMetadata(Filter filter, Sorter sorter, Sublist sublist,
     Facets facets, String localeString) throws RODAException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
-    IndexResult<SimpleDescriptionObject> result = Browser.findDescriptiveMetadata(user, filter, sorter, sublist,
-      facets);
-    Locale locale = ServerTools.parseLocale(localeString);
-    return (IndexResult<SimpleDescriptionObject>) I18nUtility.translate(result, locale);
+    try {
+      RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+      IndexResult<SimpleDescriptionObject> result = Browser.findDescriptiveMetadata(user, filter, sorter, sublist,
+        facets);
+      Locale locale = ServerTools.parseLocale(localeString);
+      return I18nUtility.translate(SimpleDescriptionObject.class, result, locale);
+    } catch (RODAException e) {
+      throw e;
+    } catch (Throwable e) {
+      LOGGER.error(e);
+      throw new GenericException(e.getMessage());
+    }
   }
 
   public Long countDescriptiveMetadata(Filter filter) throws RODAException {
