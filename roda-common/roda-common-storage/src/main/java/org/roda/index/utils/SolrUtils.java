@@ -864,8 +864,8 @@ public class SolrUtils {
 
   public static Representation solrDocumentToRepresentation(SolrDocument doc) {
     final String id = objectToString(doc.get(RodaConstants.SRO_ID));
-    final String aipId = objectToString(RodaConstants.SRO_AIP_ID);
-    final Boolean active = objectToBoolean(RodaConstants.SRO_ACTIVE);
+    final String aipId = objectToString(doc.get(RodaConstants.SRO_AIP_ID));
+    final Boolean active = objectToBoolean(doc.get(RodaConstants.SRO_ACTIVE));
     final Date dateCreated = objectToDate(doc.get(RodaConstants.SRO_DATE_CREATION));
     final Date dateModified = objectToDate(doc.get(RodaConstants.SRO_DATE_MODIFICATION));
     final Set<RepresentationState> statuses = new HashSet<RepresentationState>();

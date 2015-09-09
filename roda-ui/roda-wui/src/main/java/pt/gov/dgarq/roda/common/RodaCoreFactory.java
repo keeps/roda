@@ -126,6 +126,8 @@ public class RodaCoreFactory {
         LOGGER.error("Error loading roda-wui properties", e);
       }
 
+      // TODO also instantiate apacheds here
+
       instantiated = true;
     }
 
@@ -134,6 +136,7 @@ public class RodaCoreFactory {
   public static void shutdown() throws IOException {
     if (instantiated) {
       solr.close();
+      // TODO also shutdown apacheds here
     }
   }
 
