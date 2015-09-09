@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.servlet.ServletContextEvent;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -25,6 +27,8 @@ import org.roda.action.orchestrate.ActionOrchestrator;
 import org.roda.action.orchestrate.Plugin;
 import org.roda.action.orchestrate.ReindexAction;
 import org.roda.action.orchestrate.embed.EmbeddedActionOrchestrator;
+import org.roda.common.ApacheDS;
+import org.roda.common.UserUtility;
 import org.roda.index.IndexService;
 import org.roda.index.IndexServiceException;
 import org.roda.model.AIP;
@@ -40,10 +44,12 @@ import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
+import pt.gov.dgarq.roda.core.data.v2.Group;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.RODAMember;
 import pt.gov.dgarq.roda.core.data.v2.SIPReport;
 import pt.gov.dgarq.roda.core.data.v2.SIPStateTransition;
+import pt.gov.dgarq.roda.core.data.v2.User;
 
 public class RodaCoreFactory {
   private static final Logger LOGGER = Logger.getLogger(RodaCoreFactory.class);
@@ -60,6 +66,10 @@ public class RodaCoreFactory {
   private static IndexService index;
   private static EmbeddedSolrServer solr;
   private static ActionOrchestrator actionOrchestrator;
+
+  private static ApacheDS ldap;
+  private static Path rodaApacheDsConfigDirectory = null;
+  private static Path rodaApacheDsDataDirectory = null;
 
   private static Configuration rodaConfiguration = null;
   private static Map<String, String> loginProperties = null;
@@ -126,7 +136,7 @@ public class RodaCoreFactory {
         LOGGER.error("Error loading roda-wui properties", e);
       }
 
-      // TODO also instantiate apacheds here
+      startApacheDS();
 
       instantiated = true;
     }
@@ -136,7 +146,46 @@ public class RodaCoreFactory {
   public static void shutdown() throws IOException {
     if (instantiated) {
       solr.close();
-      // TODO also shutdown apacheds here
+      stopApacheDS();
+    }
+  }
+
+  public static void startApacheDS() {
+    ldap = new ApacheDS();
+    rodaApacheDsConfigDirectory = RodaCoreFactory.getConfigPath().resolve("ldap");
+    rodaApacheDsDataDirectory = RodaCoreFactory.getDataPath().resolve("ldap");
+
+    try {
+      Configuration rodaConfig = RodaCoreFactory.getRodaConfiguration();
+
+      if (!Files.exists(rodaApacheDsDataDirectory)) {
+        Files.createDirectories(rodaApacheDsDataDirectory);
+        ldap.initDirectoryService(rodaApacheDsConfigDirectory, rodaApacheDsDataDirectory);
+        ldap.startServer(rodaConfig);
+        for (User user : UserUtility.getLdapUtility().getUsers(new Filter())) {
+          LOGGER.debug("User to be indexed: " + user);
+          RodaCoreFactory.getModelService().addUser(user, false, true);
+        }
+        for (Group group : UserUtility.getLdapUtility().getGroups(new Filter())) {
+          LOGGER.debug("Group to be indexed: " + group);
+          RodaCoreFactory.getModelService().addGroup(group, false, true);
+        }
+      } else {
+        ldap.instantiateDirectoryService(rodaApacheDsDataDirectory);
+        ldap.startServer(rodaConfig);
+      }
+
+    } catch (Exception e) {
+      LOGGER.error("Error starting up embedded ApacheDS", e);
+    }
+
+  }
+
+  public static void stopApacheDS() {
+    try {
+      ldap.stop();
+    } catch (Exception e) {
+      LOGGER.error("Error while shutting down ApacheDS embedded server", e);
     }
   }
 
