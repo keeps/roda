@@ -22,30 +22,6 @@
 			<build>
 				<plugins>
 					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-war-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>copy-resources</id>
-								<phase>prepare-package</phase>
-								<goals>
-									<goal>exploded</goal>
-								</goals>
-								<configuration>
-									<webResources>
-										<resource>
-											<directory>${basedir}/src/main/WEB-INF/without_rest/</directory>
-											<includes>
-												<include>web.xml</include>
-											</includes>
-											<targetPath>WEB-INF</targetPath>
-										</resource>
-									</webResources>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
 						<groupId>org.codehaus.mojo</groupId>
 						<artifactId>gwt-maven-plugin</artifactId>
 						<configuration>
@@ -103,125 +79,12 @@
 			<build>
 				<plugins>
 					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-war-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>copy-resources</id>
-								<phase>prepare-package</phase>
-								<goals>
-									<goal>exploded</goal>
-								</goals>
-								<configuration>
-									<webResources>
-										<resource>
-											<directory>${project.build.directory}</directory>
-											<excludes>
-												<exclude>**/web.xml</exclude>
-											</excludes>
-										</resource>
-										<resource>
-											<directory>${basedir}/src/main/WEB-INF/all/</directory>
-											<includes>
-												<include>web.xml</include>
-											</includes>
-											<targetPath>WEB-INF</targetPath>
-										</resource>
-									</webResources>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-<!-- 					<plugin> -->
-<!-- 						<groupId>org.codehaus.mojo</groupId> -->
-<!-- 						<artifactId>gwt-maven-plugin</artifactId> -->
-<!-- 						<configuration> -->
-<!-- 							<runTarget>pt.gov.dgarq.roda.wui.main.Main/Main.html</runTarget> -->
-<!-- 							<buildOutputDirectory>target/classes</buildOutputDirectory> -->
-<!-- 						</configuration> -->
-<!-- 						<executions> -->
-<!-- 							<execution> -->
-<!-- 								<id>compile-gwt</id> -->
-<!-- 								<phase>prepare-package</phase> -->
-<!-- 								<goals> -->
-<!-- 									<goal>compile</goal> -->
-<!-- 								</goals> -->
-<!-- 							</execution> -->
-<!-- 						</executions> -->
-<!-- 					</plugin> -->
-					<plugin>
-						<artifactId>maven-clean-plugin</artifactId>
-						<configuration>
-							<filesets>
-								<fileset>
-									<directory>${basedir}</directory>
-									<includes>
-										<include>gwt-unitCache/</include>
-									</includes>
-								</fileset>
-								<fileset>
-									<directory>src/main</directory>
-									<includes>
-										<include>gwt-unitCache/**</include>
-										<include>webapp/pt.gov.dgarq.roda.disseminators.common.loading.Loading/**</include>
-										<include>webapp/pt.gov.dgarq.roda.wui.main.Main/**</include>
-										<include>webapp/WEB-INF/deploy/**</include>
-										<include>webapp/WEB-INF/classes/**</include>
-									</includes>
-									<followSymlinks>false</followSymlinks>
-								</fileset>
-							</filesets>
-						</configuration>
-						<executions>
-							<execution>
-								<id>gwt-clean</id>
-								<phase>initialize</phase>
-								<goals>
-									<goal>clean</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>dev</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-war-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>copy-resources</id>
-								<phase>prepare-package</phase>
-								<goals>
-									<goal>exploded</goal>
-								</goals>
-								<configuration>
-									<webResources>
-										<resource>
-											<directory>${basedir}/src/main/WEB-INF/all/</directory>
-											<includes>
-												<include>web.xml</include>
-											</includes>
-											<targetPath>WEB-INF</targetPath>
-										</resource>
-										<resource>
-											<directory>${project.build.directory}</directory>
-											<excludes>
-												<exclude>**/web.xml</exclude>
-											</excludes>
-										</resource>
-									</webResources>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
 						<groupId>org.codehaus.mojo</groupId>
 						<artifactId>gwt-maven-plugin</artifactId>
+						<configuration>
+							<runTarget>pt.gov.dgarq.roda.wui.main.Main/Main.html</runTarget>
+							<buildOutputDirectory>target/classes</buildOutputDirectory>
+						</configuration>
 						<executions>
 							<execution>
 								<id>compile-gwt</id>
@@ -231,10 +94,30 @@
 								</goals>
 							</execution>
 						</executions>
-						<configuration>
-							<draftCompile>true</draftCompile>
-							<optimizationLevel>0</optimizationLevel>
-						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-war-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>default-war</id>
+								<phase>package</phase>
+								<goals>
+									<goal>war</goal>
+								</goals>
+								<configuration>
+									<webResources>
+										<resource>
+											<directory>${basedir}/src/main/WEB-INF/all/</directory>
+											<includes>
+												<include>web.xml</include>
+											</includes>
+											<targetPath>WEB-INF</targetPath>
+										</resource>
+									</webResources>
+								</configuration>
+							</execution>
+						</executions>
 					</plugin>
 				</plugins>
 			</build>
@@ -248,10 +131,10 @@
 						<artifactId>maven-war-plugin</artifactId>
 						<executions>
 							<execution>
-								<id>copy-resources</id>
+								<id>default-war</id>
 								<phase>prepare-package</phase>
 								<goals>
-									<goal>exploded</goal>
+									<goal>war</goal>
 								</goals>
 								<configuration>
 									<webResources>
@@ -261,12 +144,6 @@
 												<include>web.xml</include>
 											</includes>
 											<targetPath>WEB-INF</targetPath>
-										</resource>
-										<resource>
-											<directory>${project.build.directory}</directory>
-											<excludes>
-												<exclude>**/web.xml</exclude>
-											</excludes>
 										</resource>
 									</webResources>
 								</configuration>
@@ -409,6 +286,10 @@
 						org.glassfish.jersey.test-framework.providers
 					</groupId>
 				</exclusion>
+				<exclusion>
+					<artifactId>javax.servlet-api</artifactId>
+					<groupId>javax.servlet</groupId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -433,10 +314,10 @@
 			<groupId>org.glassfish.jersey.containers</groupId>
 			<artifactId>jersey-container-servlet-core</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.glassfish.jersey.media</groupId>
-			<artifactId>jersey-media-json-jackson</artifactId>
-		</dependency>
+		<!-- <dependency> -->
+		<!-- <groupId>org.glassfish.jersey.media</groupId> -->
+		<!-- <artifactId>jersey-media-json-jackson</artifactId> -->
+		<!-- </dependency> -->
 		<!-- <dependency> -->
 		<!-- <groupId>org.glassfish.jersey.media</groupId> -->
 		<!-- <artifactId>jersey-media-moxy</artifactId> -->
