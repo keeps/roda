@@ -4,7 +4,6 @@ import java.util.Date;
 
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.SafeHtmlCell;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -17,7 +16,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.view.client.ProvidesKey;
 
-import config.i18n.client.CommonConstants;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
@@ -32,149 +30,149 @@ import pt.gov.dgarq.roda.wui.dissemination.browse.client.BrowserService;
 
 public class AIPList extends AsyncTableCell<SimpleDescriptionObject> {
 
-	private static final int PAGE_SIZE = 20;
+  private static final int PAGE_SIZE = 20;
 
-	private final ClientLogger logger = new ClientLogger(getClass().getName());
+  private final ClientLogger logger = new ClientLogger(getClass().getName());
 
-	private final Column<SimpleDescriptionObject, SafeHtml> levelColumn;
-	// private final TextColumn<SimpleDescriptionObject> idColumn;
-	private final TextColumn<SimpleDescriptionObject> titleColumn;
-	private final Column<SimpleDescriptionObject, Date> dateInitialColumn;
-	private final Column<SimpleDescriptionObject, Date> dateFinalColumn;
-	
-	public AIPList() {
-		this(null, null);
-	}
+  private final Column<SimpleDescriptionObject, SafeHtml> levelColumn;
+  // private final TextColumn<SimpleDescriptionObject> idColumn;
+  private final TextColumn<SimpleDescriptionObject> titleColumn;
+  private final Column<SimpleDescriptionObject, Date> dateInitialColumn;
+  private final Column<SimpleDescriptionObject, Date> dateFinalColumn;
 
-	public AIPList(Filter filter, Facets facets) {
-		super(filter, facets, "AIPS");
+  public AIPList() {
+    this(null, null);
+  }
 
-		levelColumn = new Column<SimpleDescriptionObject, SafeHtml>(new SafeHtmlCell()) {
-			@Override
-			public SafeHtml getValue(SimpleDescriptionObject sdo) {
-				SafeHtml ret;
-				if (sdo == null) {
-					logger.error("Trying to display a NULL item");
-					ret = null;
-				} else {
-					ret = DescriptionLevelUtils.getElementLevelIconSafeHtml(sdo.getLevel());
-				}
-				return ret;
-			}
-		};
+  public AIPList(Filter filter, Facets facets) {
+    super(filter, facets, "AIPS");
 
-		// idColumn = new TextColumn<SimpleDescriptionObject>() {
-		//
-		// @Override
-		// public String getValue(SimpleDescriptionObject sdo) {
-		// return sdo != null ? sdo.getId() : null;
-		// }
-		// };
+    levelColumn = new Column<SimpleDescriptionObject, SafeHtml>(new SafeHtmlCell()) {
+      @Override
+      public SafeHtml getValue(SimpleDescriptionObject sdo) {
+        SafeHtml ret;
+        if (sdo == null) {
+          logger.error("Trying to display a NULL item");
+          ret = null;
+        } else {
+          ret = DescriptionLevelUtils.getElementLevelIconSafeHtml(sdo.getLevel());
+        }
+        return ret;
+      }
+    };
 
-		titleColumn = new TextColumn<SimpleDescriptionObject>() {
+    // idColumn = new TextColumn<SimpleDescriptionObject>() {
+    //
+    // @Override
+    // public String getValue(SimpleDescriptionObject sdo) {
+    // return sdo != null ? sdo.getId() : null;
+    // }
+    // };
 
-			@Override
-			public String getValue(SimpleDescriptionObject sdo) {
-				return sdo != null ? sdo.getTitle() : null;
-			}
-		};
+    titleColumn = new TextColumn<SimpleDescriptionObject>() {
 
-		dateInitialColumn = new Column<SimpleDescriptionObject, Date>(
-				new DateCell(DateTimeFormat.getFormat("yyyy-MM-dd"))) {
-			@Override
-			public Date getValue(SimpleDescriptionObject sdo) {
-				return sdo != null ? sdo.getDateInitial() : null;
-			}
-		};
+      @Override
+      public String getValue(SimpleDescriptionObject sdo) {
+        return sdo != null ? sdo.getTitle() : null;
+      }
+    };
 
-		dateFinalColumn = new Column<SimpleDescriptionObject, Date>(
-				new DateCell(DateTimeFormat.getFormat("yyyy-MM-dd"))) {
-			@Override
-			public Date getValue(SimpleDescriptionObject sdo) {
-				return sdo != null ? sdo.getDateFinal() : null;
-			}
-		};
+    dateInitialColumn = new Column<SimpleDescriptionObject, Date>(
+      new DateCell(DateTimeFormat.getFormat("yyyy-MM-dd"))) {
+      @Override
+      public Date getValue(SimpleDescriptionObject sdo) {
+        return sdo != null ? sdo.getDateInitial() : null;
+      }
+    };
 
-		levelColumn.setSortable(true);
-		// idColumn.setSortable(true);
-		titleColumn.setSortable(true);
-		dateFinalColumn.setSortable(true);
-		dateInitialColumn.setSortable(true);
+    dateFinalColumn = new Column<SimpleDescriptionObject, Date>(new DateCell(DateTimeFormat.getFormat("yyyy-MM-dd"))) {
+      @Override
+      public Date getValue(SimpleDescriptionObject sdo) {
+        return sdo != null ? sdo.getDateFinal() : null;
+      }
+    };
 
-		// TODO externalize strings into constants
-		getDisplay().addColumn(levelColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-tag'></i>"));
-		// getDisplay().addColumn(idColumn, "Id");
-		getDisplay().addColumn(titleColumn, "Title");
-		getDisplay().addColumn(dateInitialColumn, "Date initial");
-		getDisplay().addColumn(dateFinalColumn, "Date final");
-		getDisplay().setColumnWidth(levelColumn, "35px");
-		// getDisplay().setAutoHeaderRefreshDisabled(true);
-		Label emptyInfo = new Label("No items to display");
-		getDisplay().setEmptyTableWidget(emptyInfo);
-		getDisplay().setColumnWidth(titleColumn, "100%");
+    levelColumn.setSortable(true);
+    // idColumn.setSortable(true);
+    titleColumn.setSortable(true);
+    dateFinalColumn.setSortable(true);
+    dateInitialColumn.setSortable(true);
 
-		addStyleName("my-collections-table");
-		emptyInfo.addStyleName("my-collections-empty-info");
+    // TODO externalize strings into constants
+    getDisplay().addColumn(levelColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-tag'></i>"));
+    // getDisplay().addColumn(idColumn, "Id");
+    getDisplay().addColumn(titleColumn, "Title");
+    getDisplay().addColumn(dateInitialColumn, "Date initial");
+    getDisplay().addColumn(dateFinalColumn, "Date final");
+    getDisplay().setColumnWidth(levelColumn, "35px");
+    // getDisplay().setAutoHeaderRefreshDisabled(true);
+    Label emptyInfo = new Label("No items to display");
+    getDisplay().setEmptyTableWidget(emptyInfo);
+    getDisplay().setColumnWidth(titleColumn, "100%");
 
-	}
+    addStyleName("my-collections-table");
+    emptyInfo.addStyleName("my-collections-empty-info");
 
-	@Override
-	protected void getData(int start, int length, ColumnSortList columnSortList,
-			AsyncCallback<IndexResult<SimpleDescriptionObject>> callback) {
+  }
 
-		Filter filter = getFilter();
-		if (filter == null) {
-			// search not yet ready, deliver empty result
-			callback.onSuccess(null);
-		} else {
-			// calculate sorter
-			Sorter sorter = new Sorter();
-			for (int i = 0; i < columnSortList.size(); i++) {
-				ColumnSortInfo columnSortInfo = columnSortList.get(i);
-				String sortParameterKey;
-				if (columnSortInfo.getColumn().equals(levelColumn)) {
-					sortParameterKey = RodaConstants.SDO_LEVEL;
-					// } else if (columnSortInfo.getColumn().equals(idColumn)) {
-					// sortParameterKey = RodaConstants.AIP_ID;
-				} else if (columnSortInfo.getColumn().equals(titleColumn)) {
-					sortParameterKey = RodaConstants.SDO_TITLE;
-				} else if (columnSortInfo.getColumn().equals(dateInitialColumn)) {
-					sortParameterKey = RodaConstants.SDO_DATE_INITIAL;
-				} else if (columnSortInfo.getColumn().equals(dateFinalColumn)) {
-					sortParameterKey = RodaConstants.SDO_DATE_FINAL;
-				} else {
-					sortParameterKey = null;
-				}
+  @Override
+  protected void getData(int start, int length, ColumnSortList columnSortList,
+    AsyncCallback<IndexResult<SimpleDescriptionObject>> callback) {
 
-				if (sortParameterKey != null) {
-					sorter.add(new SortParameter(sortParameterKey, !columnSortInfo.isAscending()));
-				} else {
-					logger.warn("Selecting a sorter that is not mapped");
-				}
-			}
+    Filter filter = getFilter();
+    if (filter == null) {
+      // search not yet ready, deliver empty result
+      callback.onSuccess(null);
+    } else {
+      // calculate sorter
+      Sorter sorter = new Sorter();
+      for (int i = 0; i < columnSortList.size(); i++) {
+        ColumnSortInfo columnSortInfo = columnSortList.get(i);
+        String sortParameterKey;
+        if (columnSortInfo.getColumn().equals(levelColumn)) {
+          sortParameterKey = RodaConstants.SDO_LEVEL;
+          // } else if (columnSortInfo.getColumn().equals(idColumn)) {
+          // sortParameterKey = RodaConstants.AIP_ID;
+        } else if (columnSortInfo.getColumn().equals(titleColumn)) {
+          sortParameterKey = RodaConstants.SDO_TITLE;
+        } else if (columnSortInfo.getColumn().equals(dateInitialColumn)) {
+          sortParameterKey = RodaConstants.SDO_DATE_INITIAL;
+        } else if (columnSortInfo.getColumn().equals(dateFinalColumn)) {
+          sortParameterKey = RodaConstants.SDO_DATE_FINAL;
+        } else {
+          sortParameterKey = null;
+        }
 
-			// define sublist
-			Sublist sublist = new Sublist(start, length);
+        if (sortParameterKey != null) {
+          sorter.add(new SortParameter(sortParameterKey, !columnSortInfo.isAscending()));
+        } else {
+          logger.warn("Selecting a sorter that is not mapped");
+        }
+      }
 
-			BrowserService.Util.getInstance().findDescriptiveMetadata(filter, sorter, sublist, getFacets(), LocaleInfo.getCurrentLocale().getLocaleName(), callback);
-		}
+      // define sublist
+      Sublist sublist = new Sublist(start, length);
 
-	}
+      BrowserService.Util.getInstance().findDescriptiveMetadata(filter, sorter, sublist, getFacets(),
+        LocaleInfo.getCurrentLocale().getLocaleName(), callback);
+    }
 
-	@Override
-	protected ProvidesKey<SimpleDescriptionObject> getKeyProvider() {
-		return new ProvidesKey<SimpleDescriptionObject>() {
+  }
 
-			@Override
-			public Object getKey(SimpleDescriptionObject item) {
-				return item.getId();
-			}
-		};
-	}
+  @Override
+  protected ProvidesKey<SimpleDescriptionObject> getKeyProvider() {
+    return new ProvidesKey<SimpleDescriptionObject>() {
 
-	@Override
-	protected int getInitialPageSize() {
-		return PAGE_SIZE;
-	}
+      @Override
+      public Object getKey(SimpleDescriptionObject item) {
+        return item.getId();
+      }
+    };
+  }
+
+  @Override
+  protected int getInitialPageSize() {
+    return PAGE_SIZE;
+  }
 
 }

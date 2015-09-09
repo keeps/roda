@@ -131,7 +131,6 @@ public class ContentPanel extends SimplePanel {
                     if (widget != currWidget) {
                       currWidget = widget;
                       setWidget(widget);
-                      logger.debug("reloaded content panel widget");
                     }
                     setWindowTitle(historyTokens);
                   }

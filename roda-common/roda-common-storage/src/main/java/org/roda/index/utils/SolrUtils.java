@@ -171,19 +171,21 @@ public class SolrUtils {
   public static SolrInputDocument getDescriptiveMetataFields(Binary binary) throws IndexServiceException {
     SolrInputDocument doc;
     InputStream inputStream;
+    String xsltFilename = null;
     try {
       inputStream = binary.getContent().createInputStream();
 
       Reader descMetadataReader = new InputStreamReader(inputStream);
-      String filename = binary.getStoragePath().getName();
+      xsltFilename = binary.getStoragePath().getName() + ".xslt";
 
       // TODO select transformers using file name extension
       ClassLoader classLoader = SolrUtils.class.getClassLoader();
-      InputStream transformerStream = classLoader.getResourceAsStream(filename + ".xslt");
+      InputStream transformerStream = classLoader.getResourceAsStream(xsltFilename);
 
       if (transformerStream == null) {
         // use default
-        transformerStream = classLoader.getResourceAsStream("plain.xslt");
+        xsltFilename = "plain.xslt";
+        transformerStream = classLoader.getResourceAsStream(xsltFilename);
       }
 
       // TODO support the use of scripts for non-xml transformers
@@ -221,7 +223,8 @@ public class SolrUtils {
       transformationResult.close();
 
     } catch (IOException | TransformerException | XMLStreamException | FactoryConfigurationError e) {
-      throw new IndexServiceException("Could not process descriptive metadata",
+      throw new IndexServiceException(
+        "Could not process descriptive metadata binary " + binary.getStoragePath() + " using xslt " + xsltFilename,
         IndexServiceException.INTERNAL_SERVER_ERROR, e);
     }
     return doc;

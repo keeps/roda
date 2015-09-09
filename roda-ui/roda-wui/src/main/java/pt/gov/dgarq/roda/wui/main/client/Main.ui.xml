@@ -55,7 +55,7 @@
 		<g:FlowPanel styleName="{style.banner}">
 			<wcag:AccessibleFocusPanel styleName="{style.homeLink}" ui:field="homeLinkArea">
 				<g:FlowPanel>
-					<g:Image title="logo" altText="logo" styleName="{style.homeLogo}" resource='{res.logo}' />
+					<g:Image title="RODA" altText="RODA" styleName="{style.homeLogo}" resource='{res.logo}' />
 					<g:Label styleName="{style.homeText}">RODA</g:Label>
 				</g:FlowPanel>
 			</wcag:AccessibleFocusPanel>

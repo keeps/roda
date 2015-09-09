@@ -126,7 +126,7 @@ public class UserLogin {
    * @param callback
    */
   public void login() {
-    String currentURL = Window.Location.getHref();
+    String currentURL = Window.Location.getHref().replaceAll("#", "%23");
     Window.open("/login?service=" + currentURL, "_self", "");
   }
 
@@ -152,7 +152,7 @@ public class UserLogin {
    * @param callback
    */
   public void logout(final AsyncCallback<AuthenticatedUser> callback) {
-    String currentURL = Window.Location.getHref();
+    String currentURL = Window.Location.getHref().replaceAll("#", "%23");
     Window.open("/logout?service=" + currentURL, "_self", "");
     getUserRequest.clearCache();
   }

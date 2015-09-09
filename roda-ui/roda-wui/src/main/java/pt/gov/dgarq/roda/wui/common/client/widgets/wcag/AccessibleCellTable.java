@@ -5,9 +5,11 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ProvidesKey;
 
 public class AccessibleCellTable<T> extends CellTable<T> {
+
   public AccessibleCellTable(String summary) {
     super();
     WCAGUtilities.getInstance().makeAccessible(this.getElement());
+    WCAGUtilities.addAttributeIfNonExistent(this.getElement(), "summary", summary);
   }
 
   public AccessibleCellTable(int pageSize, String summary) {

@@ -28,7 +28,7 @@ public interface UserManagementServiceAsync {
 
   public void getMemberCount(Filter filter, AsyncCallback<Long> callback);
 
-  public void findMembers(Filter filter, Sorter sorter, Sublist sublist, Facets facets,
+  void findMembers(Filter filter, Sorter sorter, Sublist sublist, Facets facets, String localeString,
     AsyncCallback<IndexResult<RODAMember>> callback);
 
   void getGroup(String groupname, AsyncCallback<RodaGroup> callback);

@@ -7,7 +7,7 @@
 	<xsl:template match="text()" />
 
 	<xsl:template match="/">
-		<div type="descriptiveMetadata">
+		<div class="descriptiveMetadata">
 			<div class='title'><xsl:value-of select="$title"/></div>
 			<xsl:apply-templates />
 		</div>
@@ -31,7 +31,7 @@
 				test="not(normalize-space($attributeValue)='') and not(normalize-space($attributeName)='')">
 
 				<div class="descriptiveMetadata-field">
-					<div class="descriptiveMetadata-field-key"><xsl:value-of select="$attributeName" />_txt</div>
+					<div class="descriptiveMetadata-field-key"><xsl:value-of select="$attributeName" /></div>
 					<div class="descriptiveMetadata-field-value"><xsl:value-of select="$attributeValue" /></div>
 				</div>
 				<xsl:text>&#xA;</xsl:text>
@@ -64,7 +64,7 @@
 		<xsl:if
 			test="not(normalize-space($path)='') and not(normalize-space($value)='')">
 			<div class="descriptiveMetadata-field">
-				<div class="descriptiveMetadata-field-key"><xsl:value-of select="$path" />_txt</div>
+				<div class="descriptiveMetadata-field-key"><xsl:value-of select="$path" /></div>
 				<div class="descriptiveMetadata-field-value"><xsl:value-of select="$value" /></div>
 			</div>
 			<xsl:text>&#xA;</xsl:text>

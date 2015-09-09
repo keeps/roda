@@ -11,92 +11,98 @@ import com.google.gwt.i18n.client.Constants;
  */
 public interface CommonConstants extends Constants {
 
-	// Locale
-	@DefaultStringValue("en")
-	public String locale();
+  // Locale
+  @DefaultStringValue("en")
+  public String locale();
 
-	// Alphabet Sorted List
-	@DefaultStringValue("ALL")
-	public String AlphabetSortedListAll();
+  // Alphabet Sorted List
+  @DefaultStringValue("ALL")
+  public String AlphabetSortedListAll();
 
-	// User Info Panel
-	@DefaultStringValue("Details")
-	public String userInfoDetails();
+  // User Info Panel
+  @DefaultStringValue("Details")
+  public String userInfoDetails();
 
-	@DefaultStringValue("Full Name")
-	public String userInfoFullname();
+  @DefaultStringValue("Full Name")
+  public String userInfoFullname();
 
-	@DefaultStringValue("Business category")
-	public String userInfoBusinessCategory();
+  @DefaultStringValue("Business category")
+  public String userInfoBusinessCategory();
 
-	@DefaultStringValue("Organization")
-	public String userInfoOrganization();
+  @DefaultStringValue("Organization")
+  public String userInfoOrganization();
 
-	@DefaultStringValue("Email")
-	public String userInfoEmail();
+  @DefaultStringValue("Email")
+  public String userInfoEmail();
 
-	@DefaultStringValue("Telephone number")
-	public String userInfoTelephoneNumber();
+  @DefaultStringValue("Telephone number")
+  public String userInfoTelephoneNumber();
 
-	@DefaultStringValue("Fax")
-	public String userInfoFax();
+  @DefaultStringValue("Fax")
+  public String userInfoFax();
 
-	@DefaultStringValue("Address")
-	public String userInfoPostalAddress();
+  @DefaultStringValue("Address")
+  public String userInfoPostalAddress();
 
-	@DefaultStringValue("Postcode")
-	public String userInfoPostalCode();
+  @DefaultStringValue("Postcode")
+  public String userInfoPostalCode();
 
-	@DefaultStringValue("City")
-	public String userInfoLocality();
+  @DefaultStringValue("City")
+  public String userInfoLocality();
 
-	@DefaultStringValue("Country")
-	public String userInfoCountry();
+  @DefaultStringValue("Country")
+  public String userInfoCountry();
 
-	// Logger
-	@DefaultStringValue("Error")
-	public String alertErrorTitle();
+  // Logger
+  @DefaultStringValue("Error")
+  public String alertErrorTitle();
 
-	// Lazy Vertical List
-	@DefaultStringValue("loading list")
-	public String lazyListLoading();
+  // Lazy Vertical List
+  @DefaultStringValue("loading list")
+  public String lazyListLoading();
 
-	@DefaultStringValue("updating list")
-	public String lazyListUpdating();
+  @DefaultStringValue("updating list")
+  public String lazyListUpdating();
 
-	@DefaultStringValue("reseting list")
-	public String lazyListReseting();
+  @DefaultStringValue("reseting list")
+  public String lazyListReseting();
 
-	@DefaultStringValue("printing list")
-	public String lazyListPrinting();
+  @DefaultStringValue("printing list")
+  public String lazyListPrinting();
 
-	@DefaultStringValue("Export the current list to PDF")
-	public String lazyListPrintPDF();
+  @DefaultStringValue("Export the current list to PDF")
+  public String lazyListPrintPDF();
 
-	@DefaultStringValue("Export the current list to CSV")
-	public String lazyListPrintCSV();
+  @DefaultStringValue("Export the current list to CSV")
+  public String lazyListPrintCSV();
 
-	// Report Window
-	@DefaultStringValue("CLOSE")
-	public String reportWindowClose();
+  // Report Window
+  @DefaultStringValue("CLOSE")
+  public String reportWindowClose();
 
-	@DefaultStringValue("PDF")
-	public String reportWindowPrintPDF();
+  @DefaultStringValue("PDF")
+  public String reportWindowPrintPDF();
 
-	@DefaultStringValue("CSV")
-	public String reportWindowPrintCSV();
+  @DefaultStringValue("CSV")
+  public String reportWindowPrintCSV();
 
-	// ID Type
-	@DefaultStringValue("Simple identifier")
-	public String simpleID();
+  // ID Type
+  @DefaultStringValue("Simple identifier")
+  public String simpleID();
 
-	@DefaultStringValue("Full identifier")
-	public String fullID();
-	
-	// Redaction Type
-	@DefaultStringValue("Input")
-	public String input();
+  @DefaultStringValue("Full identifier")
+  public String fullID();
 
-	@DefaultStringValue("Output")
-	public String output();
+  // Redaction Type
+  @DefaultStringValue("Input")
+  public String input();
+
+  @DefaultStringValue("Output")
+  public String output();
+
+  // Accessibility
+  
+  @DefaultStringValue("Click here")
+  public String focusPanelTitle();
+
 }

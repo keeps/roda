@@ -18,7 +18,6 @@ import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -36,126 +35,123 @@ import pt.gov.dgarq.roda.wui.home.client.Home;
  */
 public class Main extends Composite implements EntryPoint {
 
-	private ClientLogger logger = new ClientLogger(getClass().getName());
+  private ClientLogger logger = new ClientLogger(getClass().getName());
 
-	private static MainConstants constants = (MainConstants) GWT.create(MainConstants.class);
+  private static MainConstants constants = (MainConstants) GWT.create(MainConstants.class);
 
-	public void onModuleLoad() {
+  public void onModuleLoad() {
 
-		// Set uncaught exception handler
-		ClientLogger.setUncaughtExceptionHandler();
+    // Set uncaught exception handler
+    ClientLogger.setUncaughtExceptionHandler();
 
-		// Remove loading image
-		RootPanel.getBodyElement().removeChild(DOM.getElementById("loading"));
+    // Remove loading image
+    RootPanel.getBodyElement().removeChild(DOM.getElementById("loading"));
 
-		// Add main widget to root panel
-		RootPanel.get().add(this);
-		RootPanel.get().add(footer);
+    // Add main widget to root panel
+    RootPanel.get().add(this);
+    RootPanel.get().add(footer);
 
-		// deferred call to init
-		Scheduler.get().scheduleDeferred(new Command() {
+    // deferred call to init
+    Scheduler.get().scheduleDeferred(new Command() {
 
-			public void execute() {
-				DescriptionLevelUtils.load(new AsyncCallback<Void>() {
+      public void execute() {
+        DescriptionLevelUtils.load(new AsyncCallback<Void>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						logger.error("Failed loading initial data", caught);
-					}
+          @Override
+          public void onFailure(Throwable caught) {
+            logger.error("Failed loading initial data", caught);
+          }
 
-					@Override
-					public void onSuccess(Void result) {
-						init();
-					}
-				});
-			}
-		});
-	}
+          @Override
+          public void onSuccess(Void result) {
+            init();
+          }
+        });
+      }
+    });
+  }
 
-	interface Binder extends UiBinder<Widget, Main> {
-	}
+  interface Binder extends UiBinder<Widget, Main> {
+  }
 
-	@UiField
-	AccessibleFocusPanel homeLinkArea;
+  @UiField
+  AccessibleFocusPanel homeLinkArea;
 
-	@UiField(provided = true)
-	LanguageSwitcherPanel languageSwitcherPanel;
+  @UiField(provided = true)
+  LanguageSwitcherPanel languageSwitcherPanel;
 
-	@UiField(provided = true)
-	Menu menu;
+  @UiField(provided = true)
+  Menu menu;
 
-	@UiField(provided = true)
-	ContentPanel contentPanel;
+  @UiField(provided = true)
+  ContentPanel contentPanel;
 
-	Composite footer;
+  Composite footer;
 
-	/**
-	 * Create a new main
-	 */
-	public Main() {
-		languageSwitcherPanel = new LanguageSwitcherPanel();
-		menu = new Menu();
-		contentPanel = ContentPanel.getInstance();
+  /**
+   * Create a new main
+   */
+  public Main() {
+    languageSwitcherPanel = new LanguageSwitcherPanel();
+    menu = new Menu();
+    contentPanel = ContentPanel.getInstance();
 
-		footer = new Footer();
+    footer = new Footer();
 
-		Binder uiBinder = GWT.create(Binder.class);
-		initWidget(uiBinder.createAndBindUi(this));
-	}
+    Binder uiBinder = GWT.create(Binder.class);
+    initWidget(uiBinder.createAndBindUi(this));
+  }
 
-	/**
-	 * Initialize
-	 */
-	public void init() {
-		logger.debug("Initializing main");
-		contentPanel.init();
-		onHistoryChanged(History.getToken());
-		History.addValueChangeHandler(new ValueChangeHandler<String>() {
+  /**
+   * Initialize
+   */
+  public void init() {
+    contentPanel.init();
+    onHistoryChanged(History.getToken());
+    History.addValueChangeHandler(new ValueChangeHandler<String>() {
 
-			@Override
-			public void onValueChange(ValueChangeEvent<String> event) {
-				onHistoryChanged(event.getValue());
-			}
-		});
+      @Override
+      public void onValueChange(ValueChangeEvent<String> event) {
+        onHistoryChanged(event.getValue());
+      }
+    });
 
-		homeLinkArea.addClickHandler(new ClickHandler() {
+    homeLinkArea.addClickHandler(new ClickHandler() {
 
-			public void onClick(ClickEvent event) {
-				History.newItem(Home.RESOLVER.getHistoryPath());
-			}
-		});
+      public void onClick(ClickEvent event) {
+        History.newItem(Home.RESOLVER.getHistoryPath());
+      }
+    });
 
-		homeLinkArea.setTitle(constants.homeTitle());
+    homeLinkArea.setTitle(constants.homeTitle());
 
-	}
+  }
 
-	private void onHistoryChanged(String historyToken) {
-		if (historyToken.length() == 0) {
-			contentPanel.update(Tools.splitHistory(Home.RESOLVER.getHistoryPath()));
-			History.newItem(Home.RESOLVER.getHistoryPath());
-		} else {
-			final String decodedHistoryToken = URL.decode(historyToken);
-			String[] historyPath = Tools.splitHistory(decodedHistoryToken);
-			contentPanel.update(historyPath);
+  private void onHistoryChanged(String historyToken) {
+    if (historyToken.length() == 0) {
+      contentPanel.update(Tools.splitHistory(Home.RESOLVER.getHistoryPath()));
+      History.newItem(Home.RESOLVER.getHistoryPath());
+    } else {
+      final String decodedHistoryToken = URL.decode(historyToken);
+      String[] historyPath = Tools.splitHistory(decodedHistoryToken);
+      contentPanel.update(historyPath);
 
-			/*Scheduler.get().scheduleDeferred(new Command() {
-
-				public void execute() {
-					ClientLoggerService.Util.getInstance().pagehit(decodedHistoryToken, new AsyncCallback<Void>() {
-
-						public void onFailure(Throwable caught) {
-							// do nothing
-						}
-
-						public void onSuccess(Void result) {
-							// do nothing
-						}
-
-					});
-				}
-
-			});*/
-			GAnalyticsTracker.track(historyToken);
-		}
-	}
+      /*
+       * Scheduler.get().scheduleDeferred(new Command() {
+       * 
+       * public void execute() {
+       * ClientLoggerService.Util.getInstance().pagehit(decodedHistoryToken, new
+       * AsyncCallback<Void>() {
+       * 
+       * public void onFailure(Throwable caught) { // do nothing }
+       * 
+       * public void onSuccess(Void result) { // do nothing }
+       * 
+       * }); }
+       * 
+       * });
+       */
+      GAnalyticsTracker.track(historyToken);
+    }
+  }
 }

@@ -2,10 +2,12 @@ package pt.gov.dgarq.roda.wui.common.client.widgets;
 
 import java.io.Serializable;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.ColumnSortEvent.AsyncHandler;
 import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.PageSizePager;
@@ -34,7 +36,7 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
 
   private final AccessibleSimplePager resultsPager;
   private final PageSizePager pageSizePager;
-  private final AccessibleCellTable<T> display;
+  private final CellTable<T> display;
 
   private Filter filter;
   private Facets facets;
@@ -89,7 +91,8 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
         });
       }
     };
-    display = new AccessibleCellTable<>(getInitialPageSize(), getKeyProvider(), summary);
+    display = new AccessibleCellTable<>(getInitialPageSize(),
+      (MyCellTableResources) GWT.create(MyCellTableResources.class), getKeyProvider(), summary);
 
     dataProvider.addDataDisplay(display);
     resultsPager = new AccessibleSimplePager(AccessibleSimplePager.TextLocation.RIGHT, false, true);
@@ -122,7 +125,7 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
   protected abstract void getData(int start, int length, ColumnSortList columnSortList,
     AsyncCallback<IndexResult<T>> callback);
 
-  protected AccessibleCellTable<T> getDisplay() {
+  protected CellTable<T> getDisplay() {
     return display;
   }
 

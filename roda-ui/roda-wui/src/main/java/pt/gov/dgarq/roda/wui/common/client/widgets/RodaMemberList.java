@@ -1,6 +1,7 @@
 package pt.gov.dgarq.roda.wui.common.client.widgets;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.Column;
@@ -141,7 +142,8 @@ public class RodaMemberList extends AsyncTableCell<RODAMember> {
     // define sublist
     Sublist sublist = new Sublist(start, length);
 
-    UserManagementService.Util.getInstance().findMembers(filter, sorter, sublist, getFacets(), callback);
+    UserManagementService.Util.getInstance().findMembers(filter, sorter, sublist, getFacets(),
+      LocaleInfo.getCurrentLocale().getLocaleName(), callback);
   }
 
   @Override

@@ -100,7 +100,7 @@
 				</g:FlowPanel>
 				<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
 					<g:Label addStyleNames="h3 sidebar-facet-title">
-						<ui:msg>Has representations</ui:msg>
+						<ui:msg>Representations</ui:msg>
 					</g:Label>
 					<g:FlowPanel ui:field="facetHasRepresentations" />
 				</g:FlowPanel>

@@ -11,6 +11,7 @@ import org.roda.index.IndexServiceException;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import config.i18n.server.UserLogMessages;
+import pt.gov.dgarq.roda.common.I18nUtility;
 import pt.gov.dgarq.roda.common.LogUtility;
 import pt.gov.dgarq.roda.common.RodaCoreFactory;
 import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
@@ -28,6 +29,7 @@ import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.RODAMember;
 import pt.gov.dgarq.roda.core.data.v2.RodaGroup;
 import pt.gov.dgarq.roda.core.data.v2.RodaUser;
+import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.wui.common.client.GenericException;
 import pt.gov.dgarq.roda.wui.common.client.PrintReportException;
@@ -63,10 +65,11 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public IndexResult<RODAMember> findMembers(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
+  public IndexResult<RODAMember> findMembers(Filter filter, Sorter sorter, Sublist sublist, Facets facets, String localeString)
     throws AuthorizationDeniedException, GenericException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
-    return UserManagement.findMembers(user, filter, sorter, sublist, facets);
+    IndexResult<RODAMember> result = UserManagement.findMembers(user, filter, sorter, sublist, facets);
+    return I18nUtility.translate(result, localeString);
   }
 
   @Override

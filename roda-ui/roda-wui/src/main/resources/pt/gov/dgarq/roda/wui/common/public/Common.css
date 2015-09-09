@@ -128,12 +128,6 @@ h3, .h3 {
 	content: "\f00b";
 }
 
-.gwt-CheckBox label {
-	position: relative;
-	vertical-align: middle;
-	bottom: 3px;
-}
-
 .nowrap {
 	white-space: nowrap;
 }
@@ -333,12 +327,6 @@ td.datePickerMonth, td.datePickerYear {
 	display: block;
 	white-space: nowrap;
 	margin-bottom: 5px;
-}
-
-.sidebar-facet-label label {
-	position: relative;
-	vertical-align: middle;
-	bottom: 3px;
 }
 
 .sidebar-facet-input {

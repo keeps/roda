@@ -56,7 +56,7 @@ public interface UserManagementService extends RemoteService {
 
   public Long getMemberCount(Filter filter) throws AuthorizationDeniedException, GenericException;
 
-  public IndexResult<RODAMember> findMembers(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
+  public IndexResult<RODAMember> findMembers(Filter filter, Sorter sorter, Sublist sublist, Facets facets, String localeString)
     throws AuthorizationDeniedException, GenericException;
 
   /**
@@ -251,5 +251,7 @@ public interface UserManagementService extends RemoteService {
    * @throws PrintReportException
    */
   public void setUserLogReportInfo(ContentAdapter adapter, String localeString) throws PrintReportException;
+
+  
 
 }
