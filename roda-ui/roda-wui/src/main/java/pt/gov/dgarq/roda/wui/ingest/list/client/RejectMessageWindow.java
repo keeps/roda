@@ -31,155 +31,140 @@ import config.i18n.client.IngestListMessages;
  */
 public class RejectMessageWindow extends WUIWindow {
 
-	private static CommonConstants commonConstants = (CommonConstants) GWT
-			.create(CommonConstants.class);
+  private static CommonConstants commonConstants = (CommonConstants) GWT.create(CommonConstants.class);
 
-	private static IngestListConstants constants = (IngestListConstants) GWT
-			.create(IngestListConstants.class);
+  private static IngestListConstants constants = (IngestListConstants) GWT.create(IngestListConstants.class);
 
-	private static IngestListMessages messages = (IngestListMessages) GWT
-			.create(IngestListMessages.class);
+  private static IngestListMessages messages = (IngestListMessages) GWT.create(IngestListMessages.class);
 
-	private ClientLogger logger = new ClientLogger(getClass().getName());
+  private ClientLogger logger = new ClientLogger(getClass().getName());
 
-	private final SIPState sip;
+  private final SIPState sip;
 
-	private final DockPanel layout;
+  private final DockPanel layout;
 
-	private final HorizontalPanel header;
-	private final Label templatesLabel;
-	private final ListBox templatesList;
-	private final TextArea message;
-	private final CheckBox notifyProducer;
-	private final WUIButton reject;
-	private final WUIButton cancel;
-	
-	private final LoadingPopup loading;
+  private final HorizontalPanel header;
+  private final Label templatesLabel;
+  private final ListBox templatesList;
+  private final TextArea message;
+  private final CheckBox notifyProducer;
+  private final WUIButton reject;
+  private final WUIButton cancel;
 
-	/**
-	 * Create new reject message window
-	 * 
-	 * @param sip
-	 */
-	public RejectMessageWindow(SIPState sip) {
-		super(messages.rejectMessageWindowTitle(sip.getOriginalFilename()),
-				500, 250);
-		this.sip = sip;
+  private final LoadingPopup loading;
 
-		layout = new DockPanel();
-		loading = new LoadingPopup(layout);
+  /**
+   * Create new reject message window
+   * 
+   * @param sip
+   */
+  public RejectMessageWindow(SIPState sip) {
+    super(messages.rejectMessageWindowTitle(sip.getOriginalFilename()), 500, 250);
+    this.sip = sip;
 
-		header = new HorizontalPanel();
-		templatesLabel = new Label(constants.rejectMessageWindowTemplates()
-				+ ":");
-		templatesList = new ListBox();
-		templatesList.setVisibleItemCount(1);
-		templatesList.addItem("");
-		updateTemplates();
-		templatesList.addChangeListener(new ChangeListener() {
+    layout = new DockPanel();
+    loading = new LoadingPopup(layout);
 
-			public void onChange(Widget sender) {
-				String value = templatesList.getValue(templatesList
-						.getSelectedIndex());
-				if (value.length() > 0) {
-					message.setText(value);
-				}
-			}
+    header = new HorizontalPanel();
+    templatesLabel = new Label(constants.rejectMessageWindowTemplates() + ":");
+    templatesList = new ListBox();
+    templatesList.setVisibleItemCount(1);
+    templatesList.addItem("");
+    updateTemplates();
+    templatesList.addChangeListener(new ChangeListener() {
 
-		});
+      public void onChange(Widget sender) {
+        String value = templatesList.getValue(templatesList.getSelectedIndex());
+        if (value.length() > 0) {
+          message.setText(value);
+        }
+      }
 
-		message = new TextArea();
+    });
 
-		notifyProducer = new CheckBox(constants
-				.rejectMessageWindowNotifyProducer());
+    message = new TextArea();
 
-		reject = new WUIButton(constants.rejectMessageWindowReject(),
-				WUIButton.Left.ROUND, WUIButton.Right.ARROW_FORWARD);
+    notifyProducer = new CheckBox(constants.rejectMessageWindowNotifyProducer());
 
-		reject.addClickListener(new ClickListener() {
+    reject = new WUIButton(constants.rejectMessageWindowReject(), WUIButton.Left.ROUND, WUIButton.Right.ARROW_FORWARD);
 
-			public void onClick(Widget sender) {
-				reject.setEnabled(false);
-				cancel.setEnabled(false);
-				loading.show();
-				IngestListService.Util.getInstance().rejectSIP(
-						RejectMessageWindow.this.sip.getId(),
-						message.getText(), notifyProducer.isChecked(),
-						new AsyncCallback<Void>() {
+    reject.addClickListener(new ClickListener() {
 
-							public void onFailure(Throwable caught) {
-								logger.error("Error rejecting SIP", caught);
-								reject.setEnabled(true);
-								cancel.setEnabled(true);
-								loading.hide();
-							}
+      public void onClick(Widget sender) {
+        reject.setEnabled(false);
+        cancel.setEnabled(false);
+        loading.show();
+        IngestListService.Util.getInstance().rejectSIP(RejectMessageWindow.this.sip.getId(), message.getText(),
+          notifyProducer.isChecked(), new AsyncCallback<Void>() {
 
-							public void onSuccess(Void result) {
-								RejectMessageWindow.this.onSuccess();
-								loading.hide();
-								hide();
-							}
-						});
+            public void onFailure(Throwable caught) {
+              logger.error("Error rejecting SIP", caught);
+              reject.setEnabled(true);
+              cancel.setEnabled(true);
+              loading.hide();
+            }
 
-			}
+            public void onSuccess(Void result) {
+              RejectMessageWindow.this.onSuccess();
+              loading.hide();
+              hide();
+            }
+          });
 
-		});
+      }
 
-		cancel = new WUIButton(constants.rejectMessageWindowCancel(),
-				WUIButton.Left.ROUND, WUIButton.Right.CROSS);
+    });
 
-		cancel.addClickListener(new ClickListener() {
+    cancel = new WUIButton(constants.rejectMessageWindowCancel(), WUIButton.Left.ROUND, WUIButton.Right.CROSS);
 
-			public void onClick(Widget sender) {
-				onCancel();
-				hide();
+    cancel.addClickListener(new ClickListener() {
 
-			}
+      public void onClick(Widget sender) {
+        onCancel();
+        hide();
 
-		});
+      }
 
-		header.add(templatesLabel);
-		header.add(templatesList);
+    });
 
-		layout.add(header, DockPanel.NORTH);
-		layout.add(message, DockPanel.CENTER);
-		layout.add(notifyProducer, DockPanel.SOUTH);
+    header.add(templatesLabel);
+    header.add(templatesList);
 
-		setWidget(layout);
+    layout.add(header, DockPanel.NORTH);
+    layout.add(message, DockPanel.CENTER);
+    layout.add(notifyProducer, DockPanel.SOUTH);
 
-		addToBottom(reject);
-		addToBottom(cancel);
+    setWidget(layout);
 
-		layout.addStyleName("wui-ingest-reject-window");
-		header.addStyleName("reject-window-header");
-		templatesLabel.addStyleName("reject-window-templates-header");
-		templatesList.addStyleName("reject-window-templates-list");
-		message.addStyleName("reject-window-message");
-		notifyProducer.addStyleName("reject-window-notifyProducer");
+    addToBottom(reject);
+    addToBottom(cancel);
 
-	}
+    layout.addStyleName("wui-ingest-reject-window");
+    header.addStyleName("reject-window-header");
+    templatesLabel.addStyleName("reject-window-templates-header");
+    templatesList.addStyleName("reject-window-templates-list");
+    message.addStyleName("reject-window-message");
+    notifyProducer.addStyleName("reject-window-notifyProducer");
 
-	private void updateTemplates() {
-		IngestListService.Util.getInstance().getRejectMessageTemplates(
-				commonConstants.locale(),
-				new AsyncCallback<Map<String, String>>() {
+  }
 
-					public void onFailure(Throwable caught) {
-						logger.error("Error getting reject message templates",
-								caught);
-					}
+  private void updateTemplates() {
+    IngestListService.Util.getInstance().getRejectMessageTemplates(commonConstants.locale(),
+      new AsyncCallback<Map<String, String>>() {
 
-					public void onSuccess(Map<String, String> result) {
-						for (Map.Entry<String, String> entry : result
-								.entrySet()) {
-							templatesList.addItem(entry.getKey(), entry
-									.getValue());
-						}
-						
-						templatesList.setSelectedIndex(0);
-					}
+        public void onFailure(Throwable caught) {
+          logger.error("Error getting reject message templates", caught);
+        }
 
-				});
+        public void onSuccess(Map<String, String> result) {
+          for (Map.Entry<String, String> entry : result.entrySet()) {
+            templatesList.addItem(entry.getKey(), entry.getValue());
+          }
 
-	}
+          templatesList.setSelectedIndex(0);
+        }
+
+      });
+
+  }
 }

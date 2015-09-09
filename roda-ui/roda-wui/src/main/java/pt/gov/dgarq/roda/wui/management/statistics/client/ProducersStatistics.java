@@ -30,165 +30,165 @@ import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
  */
 public class ProducersStatistics extends StatisticTab {
 
-	private ClientLogger logger = new ClientLogger(getClass().getName());
+  private ClientLogger logger = new ClientLogger(getClass().getName());
 
-	private DockPanel layout;
-	private Label title;
-	private ListBox producers;
-	private VerticalPanel centerLayout;
+  private DockPanel layout;
+  private Label title;
+  private ListBox producers;
+  private VerticalPanel centerLayout;
 
-	/**
-	 * Create new producer statistics
-	 */
-	public ProducersStatistics() {
-		layout = new DockPanel();
-		initWidget(layout);
-	}
+  /**
+   * Create new producer statistics
+   */
+  public ProducersStatistics() {
+    layout = new DockPanel();
+    initWidget(layout);
+  }
 
-	protected boolean init() {
-		boolean ret = false;
-		if (super.init()) {
-			ret = true;
-			title = new Label(constants.producerTitle());
+  protected boolean init() {
+    boolean ret = false;
+    if (super.init()) {
+      ret = true;
+      title = new Label(constants.producerTitle());
 
-			producers = new ListBox();
-			producers.setMultipleSelect(false);
-			producers.setVisibleItemCount(10);
+      producers = new ListBox();
+      producers.setMultipleSelect(false);
+      producers.setVisibleItemCount(10);
 
-			producers.addChangeListener(new ChangeListener() {
+      producers.addChangeListener(new ChangeListener() {
 
-				public void onChange(Widget sender) {
-					updateProducerInfo();
-				}
+        public void onChange(Widget sender) {
+          updateProducerInfo();
+        }
 
-			});
+      });
 
-			centerLayout = new VerticalPanel();
+      centerLayout = new VerticalPanel();
 
-			layout.add(title, DockPanel.NORTH);
-			layout.add(producers, DockPanel.WEST);
-			layout.add(centerLayout, DockPanel.CENTER);
+      layout.add(title, DockPanel.NORTH);
+      layout.add(producers, DockPanel.WEST);
+      layout.add(centerLayout, DockPanel.CENTER);
 
-			updateProducerList();
+      updateProducerList();
 
-			layout.addStyleName("wui-statistics-producers");
-			title.addStyleName("producers-title");
-			producers.addStyleName("producers-list");
-			centerLayout.addStyleName("producers-center");
+      layout.addStyleName("wui-statistics-producers");
+      title.addStyleName("producers-title");
+      producers.addStyleName("producers-list");
+      centerLayout.addStyleName("producers-center");
 
-		}
+    }
 
-		return ret;
-	}
+    return ret;
+  }
 
-	private void updateProducerList() {
-		Filter filter = new Filter();
-		filter.add(new SimpleFilterParameter("type", "producers"));
-		Sorter sorter = new Sorter();
-		sorter.add(new SortParameter("datetime", true));
-		Sublist sublist = new Sublist(0, 1);
-		ContentAdapter adapter = new ContentAdapter(filter, sorter, sublist);
-		StatisticsService.Util.getInstance().getStatisticList(adapter, new AsyncCallback<List<StatisticData>>() {
+  private void updateProducerList() {
+    Filter filter = new Filter();
+    filter.add(new SimpleFilterParameter("type", "producers"));
+    Sorter sorter = new Sorter();
+    sorter.add(new SortParameter("datetime", true));
+    Sublist sublist = new Sublist(0, 1);
+    ContentAdapter adapter = new ContentAdapter(filter, sorter, sublist);
+    StatisticsService.Util.getInstance().getStatisticList(adapter, new AsyncCallback<List<StatisticData>>() {
 
-			public void onFailure(Throwable caught) {
-				logger.error("Error getting producer list", caught);
-			}
+      public void onFailure(Throwable caught) {
+        logger.error("Error getting producer list", caught);
+      }
 
-			public void onSuccess(List<StatisticData> result) {
-				if (result.size() > 0) {
-					String[] producerList = result.get(0).getValue().split(" ");
-					producers.clear();
-					for (String producer : producerList) {
-						producers.addItem(producer);
-					}
-					producers.setSelectedIndex(0);
+      public void onSuccess(List<StatisticData> result) {
+        if (result.size() > 0) {
+          String[] producerList = result.get(0).getValue().split(" ");
+          producers.clear();
+          for (String producer : producerList) {
+            producers.addItem(producer);
+          }
+          producers.setSelectedIndex(0);
 
-				} else {
-					producers.clear();
-				}
-				updateProducerInfo();
-			}
+        } else {
+          producers.clear();
+        }
+        updateProducerInfo();
+      }
 
-		});
-	}
+    });
+  }
 
-	/**
-	 * Get selected producer
-	 * 
-	 * @return the producer user name or null if none selected
-	 */
-	protected String getSelectedProducer() {
-		String ret = null;
-		int selectedIndex = producers.getSelectedIndex();
-		if (selectedIndex >= 0) {
-			ret = producers.getValue(selectedIndex);
-		}
-		return ret;
-	}
+  /**
+   * Get selected producer
+   * 
+   * @return the producer user name or null if none selected
+   */
+  protected String getSelectedProducer() {
+    String ret = null;
+    int selectedIndex = producers.getSelectedIndex();
+    if (selectedIndex >= 0) {
+      ret = producers.getValue(selectedIndex);
+    }
+    return ret;
+  }
 
-	protected void updateProducerInfo() {
-		updateProducerInfo(getSelectedProducer());
-	}
+  protected void updateProducerInfo() {
+    updateProducerInfo(getSelectedProducer());
+  }
 
-	protected void updateProducerInfo(String selected) {
-		centerLayout.clear();
-		if (selected != null) {
-			centerLayout.add(createLastSubmissionPanel(selected));
-			centerLayout.add(createSubmissionChart(selected));
+  protected void updateProducerInfo(String selected) {
+    centerLayout.clear();
+    if (selected != null) {
+      centerLayout.add(createLastSubmissionPanel(selected));
+      centerLayout.add(createSubmissionChart(selected));
 
-		}
-	}
+    }
+  }
 
-	private Widget createLastSubmissionPanel(String producer) {
-		HorizontalPanel layout = new HorizontalPanel();
-		Label title = new Label(constants.producerLastSubmissionDate() + ":");
-		final Label value = new Label();
+  private Widget createLastSubmissionPanel(String producer) {
+    HorizontalPanel layout = new HorizontalPanel();
+    Label title = new Label(constants.producerLastSubmissionDate() + ":");
+    final Label value = new Label();
 
-		layout.add(title);
-		layout.add(value);
+    layout.add(title);
+    layout.add(value);
 
-		Filter filter = new Filter();
-		filter.add(new SimpleFilterParameter("type", "producer." + producer + ".submission.last"));
-		Sorter sorter = new Sorter();
-		sorter.add(new SortParameter("datetime", true));
-		Sublist sublist = new Sublist(0, 1);
-		ContentAdapter adapter = new ContentAdapter(filter, sorter, sublist);
-		StatisticsService.Util.getInstance().getStatisticList(adapter, new AsyncCallback<List<StatisticData>>() {
+    Filter filter = new Filter();
+    filter.add(new SimpleFilterParameter("type", "producer." + producer + ".submission.last"));
+    Sorter sorter = new Sorter();
+    sorter.add(new SortParameter("datetime", true));
+    Sublist sublist = new Sublist(0, 1);
+    ContentAdapter adapter = new ContentAdapter(filter, sorter, sublist);
+    StatisticsService.Util.getInstance().getStatisticList(adapter, new AsyncCallback<List<StatisticData>>() {
 
-			public void onFailure(Throwable caught) {
-				logger.error("Error getting producer last submission", caught);
+      public void onFailure(Throwable caught) {
+        logger.error("Error getting producer last submission", caught);
 
-			}
+      }
 
-			public void onSuccess(List<StatisticData> result) {
-				if (result.size() > 0) {
-					value.setText(result.get(0).getValue());
-				}
+      public void onSuccess(List<StatisticData> result) {
+        if (result.size() > 0) {
+          value.setText(result.get(0).getValue());
+        }
 
-			}
+      }
 
-		});
+    });
 
-		layout.addStyleName("submission-last");
-		title.addStyleName("submission-last-title");
-		value.addStyleName("submission-last-value");
+    layout.addStyleName("submission-last");
+    title.addStyleName("submission-last-title");
+    value.addStyleName("submission-last-value");
 
-		return layout;
-	}
+    return layout;
+  }
 
-	private Widget createSubmissionChart(String producer) {
-		return createStatisticPanel(constants.producerSubmissionStateChartTitle(),
-				constants.producerSubmissionStateChartDesc(), "producer\\." + producer + "\\.submission\\.state\\..*",
-				true, AGGREGATION_LAST);
+  private Widget createSubmissionChart(String producer) {
+    return createStatisticPanel(constants.producerSubmissionStateChartTitle(),
+      constants.producerSubmissionStateChartDesc(), "producer\\." + producer + "\\.submission\\.state\\..*", true,
+      AGGREGATION_LAST);
 
-	}
+  }
 
-	/**
-	 * @see pt.gov.dgarq.roda.wui.management.statistics.client.StatisticTab#getTabText()
-	 */
-	@Override
-	public String getTabText() {
-		return constants.producersStatistics();
-	}
+  /**
+   * @see pt.gov.dgarq.roda.wui.management.statistics.client.StatisticTab#getTabText()
+   */
+  @Override
+  public String getTabText() {
+    return constants.producersStatistics();
+  }
 
 }

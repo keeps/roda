@@ -9,106 +9,103 @@ import java.util.List;
  * @author Rui Castro
  */
 public class Sorter implements Serializable {
-	private static final long serialVersionUID = 4255866410869992178L;
+  private static final long serialVersionUID = 4255866410869992178L;
 
-	private List<SortParameter> parameters = new ArrayList<SortParameter>();
+  private List<SortParameter> parameters = new ArrayList<SortParameter>();
 
-	/**
-	 * Constructs an empty {@link Sorter}.
-	 */
-	public Sorter() {
-	}
+  /**
+   * Constructs an empty {@link Sorter}.
+   */
+  public Sorter() {
+  }
 
-	/**
-	 * Constructs a {@link Sorter} cloning an existing {@link Sorter}.
-	 * 
-	 * @param sorter
-	 *            the {@link Sorter} to clone.
-	 */
-	public Sorter(Sorter sorter) {
-		this(sorter.getParameters());
-	}
+  /**
+   * Constructs a {@link Sorter} cloning an existing {@link Sorter}.
+   * 
+   * @param sorter
+   *          the {@link Sorter} to clone.
+   */
+  public Sorter(Sorter sorter) {
+    this(sorter.getParameters());
+  }
 
-	public Sorter(SortParameter parameter) {
-		add(parameter);
-	}
-	
-	/**
-	 * Constructs a {@link Sorter} with the given parameters.
-	 * 
-	 * @param parameters
-	 *            the sort parameters.
-	 */
-	public Sorter(SortParameter[] parameters) {
-		setParameters(parameters);
-	}
+  public Sorter(SortParameter parameter) {
+    add(parameter);
+  }
 
-	/**
-	 * @see Object#equals(Object)
-	 */
-	public boolean equals(Object obj) {
-		boolean equal = true;
+  /**
+   * Constructs a {@link Sorter} with the given parameters.
+   * 
+   * @param parameters
+   *          the sort parameters.
+   */
+  public Sorter(SortParameter[] parameters) {
+    setParameters(parameters);
+  }
 
-		if (obj != null && obj instanceof Sorter) {
-			Sorter other = (Sorter) obj;
-			equal = equal
-					&& (getParameters() == other.getParameters() || getParameters()
-							.equals(other.getParameters()));
-		} else {
-			equal = false;
-		}
+  /**
+   * @see Object#equals(Object)
+   */
+  public boolean equals(Object obj) {
+    boolean equal = true;
 
-		return equal;
-	}
+    if (obj != null && obj instanceof Sorter) {
+      Sorter other = (Sorter) obj;
+      equal = equal && (getParameters() == other.getParameters() || getParameters().equals(other.getParameters()));
+    } else {
+      equal = false;
+    }
 
-	/**
-	 * @see Object#toString()
-	 */
-	public String toString() {
-		if (getParameters() != null) {
-			return "Sorter (" + Arrays.asList(getParameters()) + ")";
-		} else {
-			return "Sorter ()";
-		}
-	}
+    return equal;
+  }
 
-	/**
-	 * @return the parameters
-	 */
-	public SortParameter[] getParameters() {
-		return (SortParameter[]) parameters
-				.toArray(new SortParameter[parameters.size()]);
-	}
+  /**
+   * @see Object#toString()
+   */
+  public String toString() {
+    if (getParameters() != null) {
+      return "Sorter (" + Arrays.asList(getParameters()) + ")";
+    } else {
+      return "Sorter ()";
+    }
+  }
 
-	/**
-	 * @param parameters
-	 *            the parameters to set
-	 */
-	public void setParameters(SortParameter[] parameters) {
-		this.parameters.clear();
-		add(parameters);
-	}
+  /**
+   * @return the parameters
+   */
+  public SortParameter[] getParameters() {
+    return (SortParameter[]) parameters.toArray(new SortParameter[parameters.size()]);
+  }
 
-	/**
-	 * Adds the given parameters.
-	 * 
-	 * @param parameters
-	 */
-	public void add(SortParameter[] parameters) {
-		if (parameters != null) {
-			this.parameters.addAll(Arrays.asList(parameters));
-		}
-	}
+  /**
+   * @param parameters
+   *          the parameters to set
+   */
+  public void setParameters(SortParameter[] parameters) {
+    this.parameters.clear();
+    add(parameters);
+  }
 
-	/**
-	 * Adds the given parameter.
-	 * 
-	 * @param parameter
-	 */
-	public void add(SortParameter parameter) {
-		if (parameters != null) {
-			this.parameters.add(parameter);
-		}
-	}
+  /**
+   * Adds the given parameters.
+   * 
+   * @param parameters
+   */
+  public void add(SortParameter[] parameters) {
+    if (parameters != null) {
+      this.parameters.addAll(Arrays.asList(parameters));
+    }
+  }
+
+  /**
+   * Adds the given parameter.
+   * 
+   * @param parameter
+   */
+  public void add(SortParameter parameter) {
+    if (parameters != null) {
+      this.parameters.add(parameter);
+    }
+  }
 
 }

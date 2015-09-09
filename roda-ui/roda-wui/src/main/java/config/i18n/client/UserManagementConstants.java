@@ -14,300 +14,299 @@ import com.google.gwt.i18n.client.ConstantsWithLookup;
  */
 public interface UserManagementConstants extends Constants, ConstantsWithLookup {
 
-	// Control Panel
-	public String list();
+  // Control Panel
+  public String list();
 
-	public String users();
+  public String users();
 
-	public String groups();
+  public String groups();
 
-	public String search();
+  public String search();
 
-	public String userActions();
+  public String userActions();
 
-	public String report();
+  public String report();
 
-	public String createUser();
+  public String createUser();
 
-	public String editUser();
+  public String editUser();
 
-	public String removeUser();
+  public String removeUser();
 
-	public String setActive();
+  public String setActive();
 
-	public String setInactive();
+  public String setInactive();
 
-	public String groupActions();
+  public String groupActions();
 
-	public String createGroup();
+  public String createGroup();
 
-	public String editGroup();
+  public String editGroup();
 
-	public String removeGroup();
+  public String removeGroup();
 
-	// Select user or group
-	public String selectNoUser();
+  // Select user or group
+  public String selectNoUser();
 
-	public String selectNoGroup();
+  public String selectNoGroup();
 
-	public String selectNoActiveUser();
+  public String selectNoActiveUser();
 
-	public String selectNoInactiveUser();
+  public String selectNoInactiveUser();
 
-	public String selectNoUserOrGroup();
+  public String selectNoUserOrGroup();
 
-	// Create/Edit User/Group
-	public String dataTabTitle();
+  // Create/Edit User/Group
+  public String dataTabTitle();
 
-	public String permissionsTabTitle();
+  public String permissionsTabTitle();
 
-	// * Create User
-	public String createUserTitle();
+  // * Create User
+  public String createUserTitle();
 
-	public String createUserCancel();
+  public String createUserCancel();
 
-	public String createUserCreate();
+  public String createUserCreate();
 
-	// ** Create User Data
+  // ** Create User Data
 
-	public String username();
+  public String username();
 
-	public String password();
+  public String password();
 
-	public String passwordNote();
+  public String passwordNote();
 
-	public String userDataChangePassword();
+  public String userDataChangePassword();
 
-	public String fullname();
+  public String fullname();
 
-	public String jobFunction();
+  public String jobFunction();
 
-	public String[] getJobFunctions();
+  public String[] getJobFunctions();
 
-	public String idTypeAndNumber();
+  public String idTypeAndNumber();
 
-	public String id_type_bi();
+  public String id_type_bi();
 
-	public String id_type_passport();
+  public String id_type_passport();
 
-	public String id_type_citizen_card();
+  public String id_type_citizen_card();
 
-	public String idDateAndLocality();
+  public String idDateAndLocality();
 
-	public String nationality();
+  public String nationality();
 
-	public String[] nationalityList();
+  public String[] nationalityList();
 
-	public String address();
+  public String address();
 
-	public String postalCodeAndLocality();
+  public String postalCodeAndLocality();
 
-	public String country();
+  public String country();
 
-	public String[] countryList();
+  public String[] countryList();
 
-	public String nif();
+  public String nif();
 
-	public String email();
+  public String email();
 
-	public String phonenumber();
+  public String phonenumber();
 
-	public String fax();
+  public String fax();
 
-	public String userDataNote();
+  public String userDataNote();
 
-	public String allGroups();
+  public String allGroups();
 
-	public String memberGroups();
+  public String memberGroups();
 
-	// * Edit User
-	public String editUserTitle();
+  // * Edit User
+  public String editUserTitle();
 
-	public String editUserCancel();
+  public String editUserCancel();
 
-	public String editUserApply();
+  public String editUserApply();
 
-	public String editUserData();
+  public String editUserData();
 
-	public String editUserPermissions();
+  public String editUserPermissions();
 
-	// * Create Group
-	public String createGroupTitle();
+  // * Create Group
+  public String createGroupTitle();
 
-	public String createGroupCreate();
+  public String createGroupCreate();
 
-	public String createGroupCancel();
+  public String createGroupCancel();
 
-	public String groupName();
+  public String groupName();
 
-	public String groupFullname();
+  public String groupFullname();
 
-	// * Edit Group
-	public String editGroupTitle();
+  // * Edit Group
+  public String editGroupTitle();
 
-	public String editGroupApply();
+  public String editGroupApply();
 
-	public String editGroupCancel();
+  public String editGroupCancel();
 
-	// * Roles Description
-	public String role_01();
+  // * Roles Description
+  public String role_01();
 
-	public String role_02();
+  public String role_02();
 
-	public String role_03();
+  public String role_03();
 
-	public String role_04();
+  public String role_04();
 
-	public String role_05();
+  public String role_05();
 
-	public String role_06();
+  public String role_06();
 
-	public String role_07();
+  public String role_07();
 
-	public String role_08();
+  public String role_08();
 
-	public String role_09();
+  public String role_09();
 
-	public String role_10();
+  public String role_10();
 
-	public String role_11();
+  public String role_11();
 
-	public String role_12();
+  public String role_12();
 
-	public String role_13();
+  public String role_13();
 
-	public String role_14();
+  public String role_14();
 
-	public String role_15();
+  public String role_15();
 
-	public String role_16();
+  public String role_16();
 
-	public String role_17();
+  public String role_17();
 
-	// Action Report Window
-	public String actionReportClose();
+  // Action Report Window
+  public String actionReportClose();
 
-	public String actionReportLogTabTitle();
+  public String actionReportLogTabTitle();
 
-	// User log
-	public String actionReportLogDateTime();
+  // User log
+  public String actionReportLogDateTime();
 
-	public String actionReportLogAction();
+  public String actionReportLogAction();
 
-	public String actionReportLogParameters();
+  public String actionReportLogParameters();
 
-	public String actionReportLogUser();
+  public String actionReportLogUser();
 
-	public String userlog_initialDate();
+  public String userlog_initialDate();
 
-	public String userlog_finalDate();
+  public String userlog_finalDate();
 
-	public String userlog_setFilter();
+  public String userlog_setFilter();
 
-	public String userlog_actions();
+  public String userlog_actions();
 
-	public String userlog_allActions();
+  public String userlog_allActions();
 
-	// Register
-	public String registerUserDataTitle();
-	
-	public String registerDisclaimer();
+  // Register
+  public String registerUserDataTitle();
 
-	public String registerCaptchaTitle();
+  public String registerDisclaimer();
 
-	public String registerSubmit();
+  public String registerCaptchaTitle();
 
-	public String registerUserExists();
+  public String registerSubmit();
 
-	public String registerEmailAlreadyExists();
+  public String registerUserExists();
 
-	public String registerSuccess();
+  public String registerEmailAlreadyExists();
 
-	public String registerWrongCaptcha();
+  public String registerSuccess();
 
-	// Verify email
-	public String verifyEmailUsername();
+  public String registerWrongCaptcha();
 
-	public String verifyEmailToken();
+  // Verify email
+  public String verifyEmailUsername();
 
-	public String verifyEmailVerify();
+  public String verifyEmailToken();
 
-	public String verifyEmailResend();
+  public String verifyEmailVerify();
 
-	public String verifyEmailChange();
+  public String verifyEmailResend();
 
-	public String verifyEmailNoSuchUser();
+  public String verifyEmailChange();
 
-	public String verifyEmailSuccess();
+  public String verifyEmailNoSuchUser();
 
-	public String verifyEmailWrongToken();
+  public String verifyEmailSuccess();
 
-	public String verifyEmailResendSuccess();
+  public String verifyEmailWrongToken();
 
-	public String verifyEmailResendFailure();
+  public String verifyEmailResendSuccess();
 
-	public String verifyEmailChangePrompt();
+  public String verifyEmailResendFailure();
 
-	public String verifyEmailChangeSuccess();
+  public String verifyEmailChangePrompt();
 
-	public String verifyEmailChangeFailure();
+  public String verifyEmailChangeSuccess();
 
-	public String verifyEmailAlreadyExists();
+  public String verifyEmailChangeFailure();
 
-	// Preferences
-	public String preferencesUserDataTitle();
+  public String verifyEmailAlreadyExists();
 
-	public String preferencesSubmit();
+  // Preferences
+  public String preferencesUserDataTitle();
 
-	public String preferencesEmailAlreadyExists();
+  public String preferencesSubmit();
 
-	public String preferencesSubmitSuccess();
+  public String preferencesEmailAlreadyExists();
 
-	// Recover Login
-	public String recoverLoginUsernameOrEmail();
+  public String preferencesSubmitSuccess();
 
-	public String recoverLoginCaptchaTitle();
+  // Recover Login
+  public String recoverLoginUsernameOrEmail();
 
-	public String recoverLoginSubmit();
+  public String recoverLoginCaptchaTitle();
 
-	public String recoverLoginSuccess();
+  public String recoverLoginSubmit();
 
-	public String recoverLoginCaptchaFailed();
-	
-	public String recoverLoginNoSuchUser();
+  public String recoverLoginSuccess();
 
-	// Reset password
-	public String resetPassordUsername();
+  public String recoverLoginCaptchaFailed();
 
-	public String resetPasswordToken();
+  public String recoverLoginNoSuchUser();
 
-	public String resetPasswordNewPassword();
+  // Reset password
+  public String resetPassordUsername();
 
-	public String resetPasswordRepeatPassword();
+  public String resetPasswordToken();
 
-	public String resetPasswordSubmit();
+  public String resetPasswordNewPassword();
 
-	public String resetPasswordInvalidToken();
+  public String resetPasswordRepeatPassword();
 
-	public String resetPasswordNoSuchUser();
+  public String resetPasswordSubmit();
 
-	public String resetPasswordSuccess();
+  public String resetPasswordInvalidToken();
 
-	// Select User Window
+  public String resetPasswordNoSuchUser();
 
-	public String selectUserWindowTitle();
+  public String resetPasswordSuccess();
 
-	public String selectUserWindowSelect();
+  // Select User Window
 
-	public String selectUserWindowCancel();
+  public String selectUserWindowTitle();
 
-	// Select Group Window
+  public String selectUserWindowSelect();
 
-	public String selectGroupWindowTitle();
+  public String selectUserWindowCancel();
 
-	public String selectGroupWindowSelect();
+  // Select Group Window
 
-	public String selectGroupWindowCancel();
+  public String selectGroupWindowTitle();
 
+  public String selectGroupWindowSelect();
+
+  public String selectGroupWindowCancel();
 
 }

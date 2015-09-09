@@ -17,62 +17,62 @@ import pt.gov.dgarq.roda.wui.common.client.GenericException;
 
 public class IngestList extends RodaCoreService {
 
-	private static final String ROLE = "ingest.list_all_sips";
+  private static final String ROLE = "ingest.list_all_sips";
 
-	private IngestList() {
-		super();
-	}
+  private IngestList() {
+    super();
+  }
 
-	public static Long countSipReports(RodaUser user, Filter filter)
-			throws AuthorizationDeniedException, GenericException {
-		Date start = new Date();
+  public static Long countSipReports(RodaUser user, Filter filter) throws AuthorizationDeniedException,
+    GenericException {
+    Date start = new Date();
 
-		// check user permissions
-		UserUtility.checkRoles(user, ROLE);
+    // check user permissions
+    UserUtility.checkRoles(user, ROLE);
 
-		// delegate
-		Long count = IngestListHelper.countSipReports(filter);
+    // delegate
+    Long count = IngestListHelper.countSipReports(filter);
 
-		// register action
-		long duration = new Date().getTime() - start.getTime();
-		registerAction(user, "IngestList", "countSipEntries", null, duration, "filter", filter.toString());
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, "IngestList", "countSipEntries", null, duration, "filter", filter.toString());
 
-		return count;
-	}
+    return count;
+  }
 
-	public static IndexResult<SIPReport> findSipReports(RodaUser user, Filter filter, Sorter sorter,
-			Sublist sublist, Facets facets) throws AuthorizationDeniedException, GenericException {
-		Date start = new Date();
+  public static IndexResult<SIPReport> findSipReports(RodaUser user, Filter filter, Sorter sorter, Sublist sublist,
+    Facets facets) throws AuthorizationDeniedException, GenericException {
+    Date start = new Date();
 
-		// check user permissions
-		UserUtility.checkRoles(user, ROLE);
+    // check user permissions
+    UserUtility.checkRoles(user, ROLE);
 
-		// delegate
-		IndexResult<SIPReport> ret = IngestListHelper.findSipReports(filter, sorter, sublist, facets);
+    // delegate
+    IndexResult<SIPReport> ret = IngestListHelper.findSipReports(filter, sorter, sublist, facets);
 
-		// register action
-		long duration = new Date().getTime() - start.getTime();
-		registerAction(user, "IngestList", "findSipReports", null, duration, "filter", filter, "sorter", sorter,
-				"sublist", sublist);
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, "IngestList", "findSipReports", null, duration, "filter", filter, "sorter", sorter, "sublist",
+      sublist);
 
-		return ret;
-	}
+    return ret;
+  }
 
-	public static SIPReport retrieveSipReport(RodaUser user, String sipReportId)
-			throws AuthorizationDeniedException, GenericException {
-		Date start = new Date();
+  public static SIPReport retrieveSipReport(RodaUser user, String sipReportId) throws AuthorizationDeniedException,
+    GenericException {
+    Date start = new Date();
 
-		// check user permissions
-		UserUtility.checkRoles(user, ROLE);
+    // check user permissions
+    UserUtility.checkRoles(user, ROLE);
 
-		// delegate
-		SIPReport ret = IngestListHelper.retrieveSipReport(sipReportId);
+    // delegate
+    SIPReport ret = IngestListHelper.retrieveSipReport(sipReportId);
 
-		// register action
-		long duration = new Date().getTime() - start.getTime();
-		registerAction(user, "IngestList", "getSipReport", null, duration, "sipReportId", sipReportId);
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, "IngestList", "getSipReport", null, duration, "sipReportId", sipReportId);
 
-		return ret;
-	}
+    return ret;
+  }
 
 }

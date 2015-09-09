@@ -5,24 +5,24 @@ import java.util.Set;
 
 public interface RODAMember extends Serializable {
 
-	public boolean isActive();
+  public boolean isActive();
 
-	public boolean isUser();
+  public boolean isUser();
 
-	public String getId();
+  public String getId();
 
-	public String getName();
-	
-	public String getFullName();
+  public String getName();
 
-	public Set<String> getAllGroups();
+  public String getFullName();
 
-	public Set<String> getDirectGroups();
+  public Set<String> getAllGroups();
 
-	public Set<String> getAllRoles();
+  public Set<String> getDirectGroups();
 
-	public Set<String> getDirectRoles();
-	
-	public boolean isNameValid();
+  public Set<String> getAllRoles();
+
+  public Set<String> getDirectRoles();
+
+  public boolean isNameValid();
 
 }

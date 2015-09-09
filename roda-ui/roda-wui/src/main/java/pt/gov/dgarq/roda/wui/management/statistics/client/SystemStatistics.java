@@ -17,47 +17,46 @@ import com.google.gwt.user.client.ui.HasAlignment;
  */
 public class SystemStatistics extends StatisticTab {
 
-	private ClientLogger logger = new ClientLogger(getClass().getName());
+  private ClientLogger logger = new ClientLogger(getClass().getName());
 
-	private DockPanel layout;
-	private HTML link;
-	private Frame iframe;
+  private DockPanel layout;
+  private HTML link;
+  private Frame iframe;
 
-	/**
-	 * Create a new System Statistics
-	 */
-	public SystemStatistics() {
-		super();
-		layout = new DockPanel();
-		initWidget(layout);
-		this.addStyleName("statistics-system");
-	}
+  /**
+   * Create a new System Statistics
+   */
+  public SystemStatistics() {
+    super();
+    layout = new DockPanel();
+    initWidget(layout);
+    this.addStyleName("statistics-system");
+  }
 
-	protected boolean init() {
-		boolean ret = false;
-		if (super.init()) {
-			link = new HTML("<a href='"+GWT.getModuleBaseURL() +"Munin/index.html' target='_blank'>"
-					+ constants.systemStatisticsLink() + "</a>");
+  protected boolean init() {
+    boolean ret = false;
+    if (super.init()) {
+      link = new HTML("<a href='" + GWT.getModuleBaseURL() + "Munin/index.html' target='_blank'>"
+        + constants.systemStatisticsLink() + "</a>");
 
-			iframe = new Frame(GWT.getModuleBaseURL() +"Munin/index.html");
-			
-			layout.add(link, DockPanel.NORTH);
-			layout.add(iframe, DockPanel.CENTER);
-			
-			iframe.setWidth("100%");
-			iframe.setHeight("450px");
-			
-			layout.setCellHorizontalAlignment(link, HasAlignment.ALIGN_RIGHT);
+      iframe = new Frame(GWT.getModuleBaseURL() + "Munin/index.html");
 
-			link.addStyleName("statistics-system-link");
-			iframe.addStyleName("statistics-system-frame");
-		}
-		return ret;
-	}
+      layout.add(link, DockPanel.NORTH);
+      layout.add(iframe, DockPanel.CENTER);
 
+      iframe.setWidth("100%");
+      iframe.setHeight("450px");
 
-	@Override
-	public String getTabText() {
-		return constants.systemStatistics();
-	}
+      layout.setCellHorizontalAlignment(link, HasAlignment.ALIGN_RIGHT);
+
+      link.addStyleName("statistics-system-link");
+      iframe.addStyleName("statistics-system-frame");
+    }
+    return ret;
+  }
+
+  @Override
+  public String getTabText() {
+    return constants.systemStatistics();
+  }
 }

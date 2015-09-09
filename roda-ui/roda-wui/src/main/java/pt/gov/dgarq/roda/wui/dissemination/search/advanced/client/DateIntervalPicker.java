@@ -25,128 +25,123 @@ import config.i18n.client.AdvancedSearchConstants;
  */
 public class DateIntervalPicker extends DockPanel {
 
-	private static AdvancedSearchConstants constants = (AdvancedSearchConstants) GWT
-			.create(AdvancedSearchConstants.class);
+  private static AdvancedSearchConstants constants = (AdvancedSearchConstants) GWT
+    .create(AdvancedSearchConstants.class);
 
-	private final VerticalPanel optionsLayout;
+  private final VerticalPanel optionsLayout;
 
-	private final RadioButton anyDateInterval;
+  private final RadioButton anyDateInterval;
 
-	private final RadioButton chooseDateInterval;
+  private final RadioButton chooseDateInterval;
 
-	private final HorizontalPanel centralLayout;
+  private final HorizontalPanel centralLayout;
 
-	private final Label fromDateLabel;
+  private final Label fromDateLabel;
 
-	private final DatePicker startDatePicker;
+  private final DatePicker startDatePicker;
 
-	private final Label toDateLabel;
+  private final Label toDateLabel;
 
-	private final DatePicker endDatePicker;
+  private final DatePicker endDatePicker;
 
-	/**
-	 * Create new date interval picker
-	 */
-	public DateIntervalPicker() {
-		optionsLayout = new VerticalPanel();
-		anyDateInterval = new RadioButton("date-interval-option", constants
-				.anyDateInterval());
-		chooseDateInterval = new RadioButton("date-interval-option", constants
-				.chooseDateInterval());
-		optionsLayout.add(anyDateInterval);
-		optionsLayout.add(chooseDateInterval);
+  /**
+   * Create new date interval picker
+   */
+  public DateIntervalPicker() {
+    optionsLayout = new VerticalPanel();
+    anyDateInterval = new RadioButton("date-interval-option", constants.anyDateInterval());
+    chooseDateInterval = new RadioButton("date-interval-option", constants.chooseDateInterval());
+    optionsLayout.add(anyDateInterval);
+    optionsLayout.add(chooseDateInterval);
 
-		centralLayout = new HorizontalPanel();
-		this.fromDateLabel = new Label(constants.from());
-		this.startDatePicker = new DatePicker(true);
-		this.toDateLabel = new Label(constants.to());
-		this.endDatePicker = new DatePicker(false);
+    centralLayout = new HorizontalPanel();
+    this.fromDateLabel = new Label(constants.from());
+    this.startDatePicker = new DatePicker(true);
+    this.toDateLabel = new Label(constants.to());
+    this.endDatePicker = new DatePicker(false);
 
-		centralLayout.add(fromDateLabel);
-		centralLayout.add(startDatePicker);
-		centralLayout.add(toDateLabel);
-		centralLayout.add(endDatePicker);
+    centralLayout.add(fromDateLabel);
+    centralLayout.add(startDatePicker);
+    centralLayout.add(toDateLabel);
+    centralLayout.add(endDatePicker);
 
-		this.add(optionsLayout, WEST);
-		this.add(centralLayout, CENTER);
+    this.add(optionsLayout, WEST);
+    this.add(centralLayout, CENTER);
 
-		anyDateInterval.setChecked(true);
-		centralLayout.setVisible(false);
+    anyDateInterval.setChecked(true);
+    centralLayout.setVisible(false);
 
-		ClickListener optionListener = new ClickListener() {
+    ClickListener optionListener = new ClickListener() {
 
-			public void onClick(Widget sender) {
-				centralLayout.setVisible(chooseDateInterval.isChecked());
-			}
+      public void onClick(Widget sender) {
+        centralLayout.setVisible(chooseDateInterval.isChecked());
+      }
 
-		};
-		anyDateInterval.addClickListener(optionListener);
-		chooseDateInterval.addClickListener(optionListener);
+    };
+    anyDateInterval.addClickListener(optionListener);
+    chooseDateInterval.addClickListener(optionListener);
 
-		addStyleName("wui-dateIntervalPicker");
-		optionsLayout.addStyleName("dateInterval-option-layout");
-		centralLayout.addStyleName("dateInterval-choose-layout");
-		fromDateLabel.addStyleName("label-from");
-		toDateLabel.addStyleName("label-to");
-	}
+    addStyleName("wui-dateIntervalPicker");
+    optionsLayout.addStyleName("dateInterval-option-layout");
+    centralLayout.addStyleName("dateInterval-choose-layout");
+    fromDateLabel.addStyleName("label-from");
+    toDateLabel.addStyleName("label-to");
+  }
 
-	/**
-	 * Get start ISO date
-	 * 
-	 * @return the date in ISO 8601
-	 */
-	public String getStartISODate() {
-		return startDatePicker.getISODate();
-	}
+  /**
+   * Get start ISO date
+   * 
+   * @return the date in ISO 8601
+   */
+  public String getStartISODate() {
+    return startDatePicker.getISODate();
+  }
 
-	/**
-	 * Get end ISO date
-	 * 
-	 * @return the date in ISO 8601
-	 */
-	public String getEndISODate() {
-		return endDatePicker.getISODate();
-	}
+  /**
+   * Get end ISO date
+   * 
+   * @return the date in ISO 8601
+   */
+  public String getEndISODate() {
+    return endDatePicker.getISODate();
+  }
 
-	/**
-	 * Is the date interval valid
-	 * 
-	 * @return true if valid
-	 */
-	public boolean isValid() {
-		boolean ret = true;
+  /**
+   * Is the date interval valid
+   * 
+   * @return true if valid
+   */
+  public boolean isValid() {
+    boolean ret = true;
 
-		if (startDatePicker.isValid() && endDatePicker.isValid()) {
-			ret = startDatePicker.getDate().compareTo(endDatePicker.getDate()) >= 0;
-		}
+    if (startDatePicker.isValid() && endDatePicker.isValid()) {
+      ret = startDatePicker.getDate().compareTo(endDatePicker.getDate()) >= 0;
+    }
 
-		return ret;
-	}
+    return ret;
+  }
 
-	/**
-	 * Get search parameters
-	 * 
-	 * @return the search parameters
-	 */
-	public SearchParameter[] getSearchParameters() {
-		SearchParameter[] parameters;
-		if (anyDateInterval.isChecked()) {
-			parameters = new SearchParameter[] {};
-		} else {
-			String startDate = startDatePicker.isValid() ? startDatePicker
-					.getISODate() : null;
-			String endDate = endDatePicker.isValid() ? endDatePicker
-					.getISODate() : null;
-			if (startDate == null && endDate == null) {
-				parameters = new SearchParameter[] {};
-			} else {
-				SearchParameter parameter = new DateRangeSearchParameter(
-						EadcSearchFields.UNITDATE, startDate, endDate);
-				parameters = new SearchParameter[] { parameter };
-			}
-		}
+  /**
+   * Get search parameters
+   * 
+   * @return the search parameters
+   */
+  public SearchParameter[] getSearchParameters() {
+    SearchParameter[] parameters;
+    if (anyDateInterval.isChecked()) {
+      parameters = new SearchParameter[] {};
+    } else {
+      String startDate = startDatePicker.isValid() ? startDatePicker.getISODate() : null;
+      String endDate = endDatePicker.isValid() ? endDatePicker.getISODate() : null;
+      if (startDate == null && endDate == null) {
+        parameters = new SearchParameter[] {};
+      } else {
+        SearchParameter parameter = new DateRangeSearchParameter(EadcSearchFields.UNITDATE, startDate, endDate);
+        parameters = new SearchParameter[] {parameter};
+      }
+    }
 
-		return parameters;
-	}
+    return parameters;
+  }
 
 }

@@ -91,8 +91,8 @@ public class BrowserHelper {
         Binary binary = RodaCoreFactory.getStorageService().getBinary(descriptiveMetadata.getStoragePath());
         String html = HTMLUtils.descriptiveMetadataToHtml(binary, RodaCoreFactory.getModelService(), locale);
 
-        descriptiveMetadataList
-          .add(new DescriptiveMetadataBundle(descriptiveMetadata.getId(), html, binary.getSizeInBytes()));
+        descriptiveMetadataList.add(new DescriptiveMetadataBundle(descriptiveMetadata.getId(), html, binary
+          .getSizeInBytes()));
       }
     } finally {
       try {

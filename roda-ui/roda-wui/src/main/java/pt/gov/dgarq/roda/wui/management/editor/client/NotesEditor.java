@@ -34,272 +34,269 @@ import config.i18n.client.MetadataEditorConstants;
 @SuppressWarnings("deprecation")
 public class NotesEditor implements MetadataElementEditor {
 
-	private static MetadataEditorConstants constants = (MetadataEditorConstants) GWT
-			.create(MetadataEditorConstants.class);
+  private static MetadataEditorConstants constants = (MetadataEditorConstants) GWT
+    .create(MetadataEditorConstants.class);
 
-	private static CommonImageBundle commonImageBundle = (CommonImageBundle) GWT
-			.create(CommonImageBundle.class);
+  private static CommonImageBundle commonImageBundle = (CommonImageBundle) GWT.create(CommonImageBundle.class);
 
-	private final VerticalPanel layout;
+  private final VerticalPanel layout;
 
-	private final WUIButton addNote;
-	private final VerticalPanel notesLayout;
-	private final List<NoteEditor> noteEditors;
-	private final List<ChangeListener> listeners;
+  private final WUIButton addNote;
+  private final VerticalPanel notesLayout;
+  private final List<NoteEditor> noteEditors;
+  private final List<ChangeListener> listeners;
 
-	/**
-	 * Listener for note
-	 * 
-	 */
-	public interface NoteListener extends ChangeListener {
-		/**
-		 * Called when an note is removed
-		 * 
-		 * @param sender
-		 */
-		public void onRemove(NoteEditor sender);
-	}
+  /**
+   * Listener for note
+   * 
+   */
+  public interface NoteListener extends ChangeListener {
+    /**
+     * Called when an note is removed
+     * 
+     * @param sender
+     */
+    public void onRemove(NoteEditor sender);
+  }
 
-	/**
-	 * Editor for notes
-	 */
-	public NotesEditor() {
-		layout = new VerticalPanel();
-		addNote = new WUIButton(constants.notesAdd(), WUIButton.Left.ROUND,
-				WUIButton.Right.PLUS);
-		notesLayout = new VerticalPanel();
-		
-		layout.add(notesLayout);
-		layout.add(addNote);
+  /**
+   * Editor for notes
+   */
+  public NotesEditor() {
+    layout = new VerticalPanel();
+    addNote = new WUIButton(constants.notesAdd(), WUIButton.Left.ROUND, WUIButton.Right.PLUS);
+    notesLayout = new VerticalPanel();
 
-		noteEditors = new Vector<NoteEditor>();
-		listeners = new Vector<ChangeListener>();
+    layout.add(notesLayout);
+    layout.add(addNote);
 
-		addNote.addClickListener(new ClickListener() {
+    noteEditors = new Vector<NoteEditor>();
+    listeners = new Vector<ChangeListener>();
 
-			public void onClick(Widget sender) {
-				createNoteEditor();
-				updateLayout();
-				onChange(layout);
-			}
+    addNote.addClickListener(new ClickListener() {
 
-		});
+      public void onClick(Widget sender) {
+        createNoteEditor();
+        updateLayout();
+        onChange(layout);
+      }
 
-		layout.addStyleName("wui-editor-notes");
-		addNote.addStyleName("wui-editor-notes-add");
-		notesLayout.addStyleName("wui-editor-notes-layout");
-	}
+    });
 
-	protected NoteEditor createNoteEditor() {
-		NoteEditor editor = new NoteEditor();
-		editor.addNoteListener(new NoteListener() {
-			public void onRemove(NoteEditor sender) {
-				noteEditors.remove(sender);
-				updateLayout();
-				NotesEditor.this.onChange(layout);
-			}
+    layout.addStyleName("wui-editor-notes");
+    addNote.addStyleName("wui-editor-notes-add");
+    notesLayout.addStyleName("wui-editor-notes-layout");
+  }
 
-			public void onChange(Widget sender) {
-				NotesEditor.this.onChange(sender);
-			}
-		});
-		noteEditors.add(editor);
-		return editor;
-	}
+  protected NoteEditor createNoteEditor() {
+    NoteEditor editor = new NoteEditor();
+    editor.addNoteListener(new NoteListener() {
+      public void onRemove(NoteEditor sender) {
+        noteEditors.remove(sender);
+        updateLayout();
+        NotesEditor.this.onChange(layout);
+      }
 
-	protected void updateLayout() {
-		notesLayout.clear();
-		for (NoteEditor noteEditor : noteEditors) {
-			notesLayout.add(noteEditor.getWidget());
-		}
-	}
+      public void onChange(Widget sender) {
+        NotesEditor.this.onChange(sender);
+      }
+    });
+    noteEditors.add(editor);
+    return editor;
+  }
 
-	public void addChangeListener(ChangeListener listener) {
-		listeners.add(listener);
-	}
+  protected void updateLayout() {
+    notesLayout.clear();
+    for (NoteEditor noteEditor : noteEditors) {
+      notesLayout.add(noteEditor.getWidget());
+    }
+  }
 
-	public void removeChangeListener(ChangeListener listener) {
-		listeners.remove(listener);
-	}
+  public void addChangeListener(ChangeListener listener) {
+    listeners.add(listener);
+  }
 
-	public EadCValue getValue() {
-		List<Note> notes = new Vector<Note>();
-		for (NoteEditor noteEditor : noteEditors) {
-			Note note = noteEditor.getNote();
-			if (note != null) {
-				notes.add(note);
-			}
-		}
-		return notes.size() == 0 ? null : new Notes(
-				notes.toArray(new Note[] {}));
-	}
+  public void removeChangeListener(ChangeListener listener) {
+    listeners.remove(listener);
+  }
 
-	public void setValue(EadCValue value) {
-		if (value instanceof Notes) {
-			Notes notes = (Notes) value;
-			noteEditors.clear();
-			for (int i = 0; i < notes.getNotes().length; i++) {
-				Note note = notes.getNotes()[i];
-				if (note.getP() != null) {
-					NoteEditor noteEditor = createNoteEditor();
-					noteEditor.setNote(note);
-				}
-			}
-			updateLayout();
-		}
-	}
+  public EadCValue getValue() {
+    List<Note> notes = new Vector<Note>();
+    for (NoteEditor noteEditor : noteEditors) {
+      Note note = noteEditor.getNote();
+      if (note != null) {
+        notes.add(note);
+      }
+    }
+    return notes.size() == 0 ? null : new Notes(notes.toArray(new Note[] {}));
+  }
 
-	public Widget getWidget() {
-		return layout;
-	}
+  public void setValue(EadCValue value) {
+    if (value instanceof Notes) {
+      Notes notes = (Notes) value;
+      noteEditors.clear();
+      for (int i = 0; i < notes.getNotes().length; i++) {
+        Note note = notes.getNotes()[i];
+        if (note.getP() != null) {
+          NoteEditor noteEditor = createNoteEditor();
+          noteEditor.setNote(note);
+        }
+      }
+      updateLayout();
+    }
+  }
 
-	public boolean isEmpty() {
-		return noteEditors.size() == 0;
-	}
+  public Widget getWidget() {
+    return layout;
+  }
 
-	public boolean isValid() {
-		return true;
-	}
+  public boolean isEmpty() {
+    return noteEditors.size() == 0;
+  }
 
-	protected void onChange(Widget sender) {
-		for (ChangeListener listener : listeners) {
-			listener.onChange(sender);
-		}
-	}
+  public boolean isValid() {
+    return true;
+  }
 
-	public static Widget getReadonlyWidget(EadCValue value) {
-		FlexTable panel = new FlexTable();
-		Notes notes = (Notes) value;
-		for (int i = 0; i < notes.getNotes().length; i++) {
-			Note note = notes.getNotes()[i];
-			if (note.getP() != null) {
-				Label column0 = new Label(note.getP().getText());
-				panel.setWidget(i, 0, column0);
-				panel.getColumnFormatter().setWidth(0, "100%");
-				column0.addStyleName("wui-editor-notes-readonly-column0");
-			}
-		}
+  protected void onChange(Widget sender) {
+    for (ChangeListener listener : listeners) {
+      listener.onChange(sender);
+    }
+  }
 
-		panel.addStyleName("wui-editor-notes-readonly");
-		return panel;
-	}
+  public static Widget getReadonlyWidget(EadCValue value) {
+    FlexTable panel = new FlexTable();
+    Notes notes = (Notes) value;
+    for (int i = 0; i < notes.getNotes().length; i++) {
+      Note note = notes.getNotes()[i];
+      if (note.getP() != null) {
+        Label column0 = new Label(note.getP().getText());
+        panel.setWidget(i, 0, column0);
+        panel.getColumnFormatter().setWidth(0, "100%");
+        column0.addStyleName("wui-editor-notes-readonly-column0");
+      }
+    }
 
-	/**
-	 * Editor for note
-	 * 
-	 */
-	public class NoteEditor {
+    panel.addStyleName("wui-editor-notes-readonly");
+    return panel;
+  }
 
-		private final List<NoteListener> listeners;
+  /**
+   * Editor for note
+   * 
+   */
+  public class NoteEditor {
 
-		private final HorizontalPanel layout;
+    private final List<NoteListener> listeners;
 
-		private final VerticalPanel subLayout;
-		private final TextArea noteArea;
-		private final Image remove;
+    private final HorizontalPanel layout;
 
-		public NoteEditor() {
-			layout = new HorizontalPanel();
-			subLayout = new VerticalPanel();
-			noteArea = new TextArea();
-			remove = commonImageBundle.minus().createImage();
+    private final VerticalPanel subLayout;
+    private final TextArea noteArea;
+    private final Image remove;
 
-			subLayout.add(noteArea);
+    public NoteEditor() {
+      layout = new HorizontalPanel();
+      subLayout = new VerticalPanel();
+      noteArea = new TextArea();
+      remove = commonImageBundle.minus().createImage();
 
-			layout.add(subLayout);
-			layout.add(remove);
+      subLayout.add(noteArea);
 
-			listeners = new Vector<NoteListener>();
+      layout.add(subLayout);
+      layout.add(remove);
 
-			remove.addClickListener(new ClickListener() {
+      listeners = new Vector<NoteListener>();
 
-				public void onClick(Widget sender) {
-					onRemove();
-				}
+      remove.addClickListener(new ClickListener() {
 
-			});
+        public void onClick(Widget sender) {
+          onRemove();
+        }
 
-			ChangeListener changeListener = new ChangeListener() {
+      });
 
-				public void onChange(Widget sender) {
-					NoteEditor.this.onChange(sender);
-				}
+      ChangeListener changeListener = new ChangeListener() {
 
-			};
+        public void onChange(Widget sender) {
+          NoteEditor.this.onChange(sender);
+        }
 
-			noteArea.addChangeListener(changeListener);
+      };
 
-			layout.setCellWidth(subLayout, "100%");
-			layout.setCellVerticalAlignment(remove, HasAlignment.ALIGN_MIDDLE);
-			layout.setCellHorizontalAlignment(remove, HasAlignment.ALIGN_CENTER);
-			layout.addStyleName("wui-editor-note");
-			subLayout.setCellWidth(noteArea, "100%");
-			subLayout.addStyleName("wui-editor-note-center");
-			remove.addStyleName("wui-editor-note-remove");
-			noteArea.addStyleName("wui-editor-note-area");
-		}
+      noteArea.addChangeListener(changeListener);
 
-		/**
-		 * Get editor widget
-		 * 
-		 * @return
-		 */
-		public Widget getWidget() {
-			return layout;
-		}
+      layout.setCellWidth(subLayout, "100%");
+      layout.setCellVerticalAlignment(remove, HasAlignment.ALIGN_MIDDLE);
+      layout.setCellHorizontalAlignment(remove, HasAlignment.ALIGN_CENTER);
+      layout.addStyleName("wui-editor-note");
+      subLayout.setCellWidth(noteArea, "100%");
+      subLayout.addStyleName("wui-editor-note-center");
+      remove.addStyleName("wui-editor-note-remove");
+      noteArea.addStyleName("wui-editor-note-area");
+    }
 
-		/**
-		 * Set the note value
-		 * 
-		 * @param note
-		 */
-		public void setNote(Note note) {
-			if (note.getP().getText() != null) {
-				noteArea.setText(note.getP().getText());
-			}
-		}
+    /**
+     * Get editor widget
+     * 
+     * @return
+     */
+    public Widget getWidget() {
+      return layout;
+    }
 
-		/**
-		 * Get the note value
-		 * 
-		 * @return
-		 */
-		public Note getNote() {
-			Note note = null;
-			if (!noteArea.getText().isEmpty()) {
-				note = new Note(new P(noteArea.getText()));
-			}
-			return note;
-		}
+    /**
+     * Set the note value
+     * 
+     * @param note
+     */
+    public void setNote(Note note) {
+      if (note.getP().getText() != null) {
+        noteArea.setText(note.getP().getText());
+      }
+    }
 
-		/**
-		 * Add a note listener
-		 * 
-		 * @param listener
-		 */
-		public void addNoteListener(NoteListener listener) {
-			listeners.add(listener);
-		}
+    /**
+     * Get the note value
+     * 
+     * @return
+     */
+    public Note getNote() {
+      Note note = null;
+      if (!noteArea.getText().isEmpty()) {
+        note = new Note(new P(noteArea.getText()));
+      }
+      return note;
+    }
 
-		/**
-		 * Remove a note listener
-		 * 
-		 * @param listener
-		 */
-		public void removeNoteListener(NoteListener listener) {
-			listeners.remove(listener);
-		}
+    /**
+     * Add a note listener
+     * 
+     * @param listener
+     */
+    public void addNoteListener(NoteListener listener) {
+      listeners.add(listener);
+    }
 
-		protected void onChange(Widget sender) {
-			for (NoteListener listener : listeners) {
-				listener.onChange(sender);
-			}
-		}
+    /**
+     * Remove a note listener
+     * 
+     * @param listener
+     */
+    public void removeNoteListener(NoteListener listener) {
+      listeners.remove(listener);
+    }
 
-		protected void onRemove() {
-			for (NoteListener listener : listeners) {
-				listener.onRemove(this);
-			}
-		}
-	}
+    protected void onChange(Widget sender) {
+      for (NoteListener listener : listeners) {
+        listener.onChange(sender);
+      }
+    }
+
+    protected void onRemove() {
+      for (NoteListener listener : listeners) {
+        listener.onRemove(this);
+      }
+    }
+  }
 }

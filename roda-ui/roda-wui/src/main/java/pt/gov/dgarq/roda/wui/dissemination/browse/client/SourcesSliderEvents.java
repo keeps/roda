@@ -9,18 +9,18 @@ package pt.gov.dgarq.roda.wui.dissemination.browse.client;
  */
 public interface SourcesSliderEvents {
 
-	/**
-	 * Add slider event listener
-	 * 
-	 * @param listener
-	 */
-	public void addSliderEventListener(SliderEventListener listener);
+  /**
+   * Add slider event listener
+   * 
+   * @param listener
+   */
+  public void addSliderEventListener(SliderEventListener listener);
 
-	/**
-	 * Remove slider event listener
-	 * 
-	 * @param listener
-	 */
-	public void removeSliderEventListener(SliderEventListener listener);
+  /**
+   * Remove slider event listener
+   * 
+   * @param listener
+   */
+  public void removeSliderEventListener(SliderEventListener listener);
 
 }

@@ -58,8 +58,8 @@ public interface UserLoginService extends RemoteService {
    * @return
    * @throws RODAException
    */
-  public AuthenticatedUser login(String username, String password)
-    throws AuthenticationDeniedException, GenericException;
+  public AuthenticatedUser login(String username, String password) throws AuthenticationDeniedException,
+    GenericException;
 
   /**
    * Get RODA properties

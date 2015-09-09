@@ -14,37 +14,37 @@ import java.util.Iterator;
  */
 public class DirDeleter extends Thread {
 
-	private ArrayList<File> dirList = new ArrayList<File>();
+  private ArrayList<File> dirList = new ArrayList<File>();
 
-	/**
-	 * @param dir
-	 */
-	public synchronized void add(File dir) {
-		dirList.add(dir);
-	}
+  /**
+   * @param dir
+   */
+  public synchronized void add(File dir) {
+    dirList.add(dir);
+  }
 
-	public void run() {
-		synchronized (this) {
-			Iterator iterator = dirList.iterator();
-			while (iterator.hasNext()) {
-				File dir = (File) iterator.next();
-				deleteDirectory(dir);
-				iterator.remove();
-			}
-		}
-	}
+  public void run() {
+    synchronized (this) {
+      Iterator iterator = dirList.iterator();
+      while (iterator.hasNext()) {
+        File dir = (File) iterator.next();
+        deleteDirectory(dir);
+        iterator.remove();
+      }
+    }
+  }
 
-	private void deleteDirectory(File dir) {
-		File[] fileArray = dir.listFiles();
+  private void deleteDirectory(File dir) {
+    File[] fileArray = dir.listFiles();
 
-		if (fileArray != null) {
-			for (int i = 0; i < fileArray.length; i++) {
-				if (fileArray[i].isDirectory())
-					deleteDirectory(fileArray[i]);
-				else
-					fileArray[i].delete();
-			}
-		}
-		dir.delete();
-	}
+    if (fileArray != null) {
+      for (int i = 0; i < fileArray.length; i++) {
+        if (fileArray[i].isDirectory())
+          deleteDirectory(fileArray[i]);
+        else
+          fileArray[i].delete();
+      }
+    }
+    dir.delete();
+  }
 }

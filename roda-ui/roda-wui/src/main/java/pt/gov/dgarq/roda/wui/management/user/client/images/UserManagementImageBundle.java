@@ -12,13 +12,11 @@ import com.google.gwt.user.client.ui.ImageBundle;
  */
 public interface UserManagementImageBundle extends ImageBundle {
 
-	public AbstractImagePrototype user();
-	
-	@Resource("user_red.png")
-	public AbstractImagePrototype inactiveUser();
-	
-	public AbstractImagePrototype group();
+  public AbstractImagePrototype user();
 
+  @Resource("user_red.png")
+  public AbstractImagePrototype inactiveUser();
 
+  public AbstractImagePrototype group();
 
 }

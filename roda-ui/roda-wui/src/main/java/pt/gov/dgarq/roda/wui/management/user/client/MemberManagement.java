@@ -90,9 +90,8 @@ public class MemberManagement extends Composite {
 
   public MemberManagement() {
     Filter filter = null;
-    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.MEMBERS_IS_ACTIVE),
-      new SimpleFacetParameter(RodaConstants.MEMBERS_IS_USER),
-      new SimpleFacetParameter(RodaConstants.MEMBERS_GROUPS_ALL));
+    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.MEMBERS_IS_ACTIVE), new SimpleFacetParameter(
+      RodaConstants.MEMBERS_IS_USER), new SimpleFacetParameter(RodaConstants.MEMBERS_GROUPS_ALL));
     list = new RodaMemberList(filter, facets);
     facetIsActive = new FlowPanel();
     facetIsUser = new FlowPanel();

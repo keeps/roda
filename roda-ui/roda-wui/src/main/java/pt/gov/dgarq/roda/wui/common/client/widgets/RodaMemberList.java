@@ -46,8 +46,9 @@ public class RodaMemberList extends AsyncTableCell<RODAMember> {
     activeColumn = new Column<RODAMember, SafeHtml>(new SafeHtmlCell()) {
       @Override
       public SafeHtml getValue(RODAMember member) {
-        return SafeHtmlUtils.fromSafeConstant(member != null
-          ? (member.isActive() ? "<i class='fa fa-check-circle'></i>" : "<i class='fa fa-ban'></i>") : "");
+        return SafeHtmlUtils
+          .fromSafeConstant(member != null ? (member.isActive() ? "<i class='fa fa-check-circle'></i>"
+            : "<i class='fa fa-ban'></i>") : "");
 
       }
     };
@@ -55,8 +56,8 @@ public class RodaMemberList extends AsyncTableCell<RODAMember> {
     typeColumn = new Column<RODAMember, SafeHtml>(new SafeHtmlCell()) {
       @Override
       public SafeHtml getValue(RODAMember member) {
-        return SafeHtmlUtils.fromSafeConstant(
-          member != null ? (member.isUser() ? "<i class='fa fa-user'></i>" : "<i class='fa fa-users'></i>") : "");
+        return SafeHtmlUtils.fromSafeConstant(member != null ? (member.isUser() ? "<i class='fa fa-user'></i>"
+          : "<i class='fa fa-users'></i>") : "");
 
       }
     };

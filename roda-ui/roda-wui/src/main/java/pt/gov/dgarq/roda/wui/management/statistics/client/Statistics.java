@@ -23,92 +23,92 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class Statistics implements HistoryResolver {
 
-	private static Statistics instance = null;
+  private static Statistics instance = null;
 
-	/**
-	 * Get statistics instance
-	 * 
-	 * @return the singleton
-	 */
-	public static Statistics getInstance() {
-		if (instance == null) {
-			instance = new Statistics();
-		}
-		return instance;
-	}
+  /**
+   * Get statistics instance
+   * 
+   * @return the singleton
+   */
+  public static Statistics getInstance() {
+    if (instance == null) {
+      instance = new Statistics();
+    }
+    return instance;
+  }
 
-	// private ClientLogger logger = new ClientLogger(getClass().getName());
-	// private StatisticsConstants constants = (StatisticsConstants) GWT
-	// .create(StatisticsConstants.class);
+  // private ClientLogger logger = new ClientLogger(getClass().getName());
+  // private StatisticsConstants constants = (StatisticsConstants) GWT
+  // .create(StatisticsConstants.class);
 
-	private boolean initialized;
-	private TabPanel layout;
-	private List<StatisticTab> statisticTabs;
+  private boolean initialized;
+  private TabPanel layout;
+  private List<StatisticTab> statisticTabs;
 
-	/**
-	 * Create a new statistics
-	 */
-	public Statistics() {
-		initialized = false;
-	}
+  /**
+   * Create a new statistics
+   */
+  public Statistics() {
+    initialized = false;
+  }
 
-	private void init() {
-		if (!initialized) {
-			initialized = true;
-			statisticTabs = new ArrayList<StatisticTab>();
-			layout = new TabPanel();
+  private void init() {
+    if (!initialized) {
+      initialized = true;
+      statisticTabs = new ArrayList<StatisticTab>();
+      layout = new TabPanel();
 
-			statisticTabs.add(new RepositoryStatistics());
-			statisticTabs.add(new IngestStatistics());
-			// statisticTabs.add(new EventStatistics());
-			statisticTabs.add(new ProducersStatistics());
-			statisticTabs.add(new UserStatistics());
-			statisticTabs.add(new AccessStatistics());
-			statisticTabs.add(new ActionsStatistics());
-			statisticTabs.add(new SystemStatistics());
+      statisticTabs.add(new RepositoryStatistics());
+      statisticTabs.add(new IngestStatistics());
+      // statisticTabs.add(new EventStatistics());
+      statisticTabs.add(new ProducersStatistics());
+      statisticTabs.add(new UserStatistics());
+      statisticTabs.add(new AccessStatistics());
+      statisticTabs.add(new ActionsStatistics());
+      statisticTabs.add(new SystemStatistics());
 
-			for (StatisticTab tab : statisticTabs) {
-				layout.add(tab, tab.getTabText());
-			}
+      for (StatisticTab tab : statisticTabs) {
+        layout.add(tab, tab.getTabText());
+      }
 
-			layout.addTabListener(new TabListener() {
+      layout.addTabListener(new TabListener() {
 
-				public boolean onBeforeTabSelected(SourcesTabEvents sender, int tabIndex) {
-					return true;
-				}
+        public boolean onBeforeTabSelected(SourcesTabEvents sender, int tabIndex) {
+          return true;
+        }
 
-				public void onTabSelected(SourcesTabEvents sender, int tabIndex) {
-					statisticTabs.get(tabIndex).init();
-				}
+        public void onTabSelected(SourcesTabEvents sender, int tabIndex) {
+          statisticTabs.get(tabIndex).init();
+        }
 
-			});
+      });
 
-			layout.selectTab(0);
-			layout.setAnimationEnabled(true);
+      layout.selectTab(0);
+      layout.setAnimationEnabled(true);
 
-			layout.addStyleName("wui-statistics");
-		}
-	}
+      layout.addStyleName("wui-statistics");
+    }
+  }
 
-	public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-		UserLogin.getInstance().checkRole(this, callback);
-	}
+  public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
+    UserLogin.getInstance().checkRole(this, callback);
+  }
 
-	public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
-		if (historyTokens.length == 0) {
-			init();
-			callback.onSuccess(layout);
-		} else {
-			History.newItem(getHistoryPath());
-			callback.onSuccess(null);
-		}
-	}
+  public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
+    if (historyTokens.length == 0) {
+      init();
+      callback.onSuccess(layout);
+    } else {
+      History.newItem(getHistoryPath());
+      callback.onSuccess(null);
+    }
+  }
 
-	public String getHistoryPath() {
-		return Management.RESOLVER.getHistoryPath() + "." + getHistoryToken();
-	}
+  public String getHistoryPath() {
+    return Management.RESOLVER.getHistoryPath() + "." + getHistoryToken();
+  }
 
-	public String getHistoryToken() {
-		return "statistics";
-	}
+  public String getHistoryToken() {
+    return "statistics";
+  }
 }

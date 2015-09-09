@@ -52,8 +52,8 @@ public class PremisRepresentationObjectHelper extends PremisObjectHelper {
    * @throws PremisMetadataException
    *           if the PREMIS XML document is invalid.
    */
-  public static PremisRepresentationObjectHelper newInstance(File premisFile)
-    throws PremisMetadataException, FileNotFoundException, IOException {
+  public static PremisRepresentationObjectHelper newInstance(File premisFile) throws PremisMetadataException,
+    FileNotFoundException, IOException {
     FileInputStream premisInputStream = new FileInputStream(premisFile);
     PremisRepresentationObjectHelper instance = newInstance(premisInputStream);
     premisInputStream.close();
@@ -282,8 +282,8 @@ public class PremisRepresentationObjectHelper extends PremisObjectHelper {
 
               RelatedObjectIdentificationComplexType relatedObjectIdentification = relationship
                 .getRelatedObjectIdentificationArray(0);
-              pObject
-                .setDerivedFromRepresentationObjectID(relatedObjectIdentification.getRelatedObjectIdentifierValue());
+              pObject.setDerivedFromRepresentationObjectID(relatedObjectIdentification
+                .getRelatedObjectIdentifierValue());
             }
 
             if (relationship.getRelatedEventIdentificationList() != null
@@ -353,8 +353,8 @@ public class PremisRepresentationObjectHelper extends PremisObjectHelper {
         premisRelationshipTypeStructural, premisRelationshipSubTypeHasRoot);
 
       // <relationship><relatedObjectIdentification>
-      addNewRelatedObject(relationshipHasRoot, PremisHelper.premisIdentifierTypeDatastreamID, rpo.getRootFile().getID(),
-        0);
+      addNewRelatedObject(relationshipHasRoot, PremisHelper.premisIdentifierTypeDatastreamID,
+        rpo.getRootFile().getID(), 0);
     }
 
     if (rpo.getPartFiles() != null && rpo.getPartFiles().length > 0) {

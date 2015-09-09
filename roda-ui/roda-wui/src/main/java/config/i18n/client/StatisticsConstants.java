@@ -12,345 +12,345 @@ import com.google.gwt.i18n.client.ConstantsWithLookup;
  */
 public interface StatisticsConstants extends ConstantsWithLookup {
 
-	String timeSegmentationLabel();
+  String timeSegmentationLabel();
 
-	// segmentation
-	String segmentation_YEAR();
+  // segmentation
+  String segmentation_YEAR();
 
-	String segmentation_MONTH();
+  String segmentation_MONTH();
 
-	String segmentation_DAY();
+  String segmentation_DAY();
 
-	// statistic type classes
+  // statistic type classes
 
-	String systemStatistics();
+  String systemStatistics();
 
-	String repositoryStatistics();
+  String repositoryStatistics();
 
-	String userStatistics();
+  String userStatistics();
 
-	String userActionsStatistics();
+  String userActionsStatistics();
 
-	String eventStatistics();
+  String eventStatistics();
 
-	String ingestStatistics();
+  String ingestStatistics();
 
-	String accessStatistics();
+  String accessStatistics();
 
-	String actionsStatistics();
+  String actionsStatistics();
 
-	String producersStatistics();
+  String producersStatistics();
 
-	String chartActual();
+  String chartActual();
 
-	String chartHistory();
+  String chartHistory();
 
-	String chartPieTooltip();
+  String chartPieTooltip();
 
-	String noDataAvailable();
+  String noDataAvailable();
 
-	String viewImpossibleBcSipNotIngested();
+  String viewImpossibleBcSipNotIngested();
 
-	String dateIntervalPickerWindowTitle();
+  String dateIntervalPickerWindowTitle();
 
-	String dateIntervalLabelInitial();
+  String dateIntervalLabelInitial();
 
-	String dateIntervalLabelFinal();
+  String dateIntervalLabelFinal();
 
-	String dateIntervalPickerWindowApply();
+  String dateIntervalPickerWindowApply();
 
-	// Statistic panel titles
+  // Statistic panel titles
 
-	String descriptiveObjectsCountTitle();
+  String descriptiveObjectsCountTitle();
 
-	String descriptiveObjectsCountDesc();
+  String descriptiveObjectsCountDesc();
 
-	String fondsCountTitle();
+  String fondsCountTitle();
 
-	String fondsCountDesc();
+  String fondsCountDesc();
 
-	String presEventCountTitle();
+  String presEventCountTitle();
 
-	String presEventCountDesc();
+  String presEventCountDesc();
 
-	String presRepCountTitle();
+  String presRepCountTitle();
 
-	String presRepCountDesc();
+  String presRepCountDesc();
 
-	String representationObjectsCountTitle();
+  String representationObjectsCountTitle();
 
-	String representationObjectsCountDesc();
+  String representationObjectsCountDesc();
 
-	String representationObjectTypeTitle();
+  String representationObjectTypeTitle();
 
-	String representationObjectTypeDesc();
+  String representationObjectTypeDesc();
 
-	String representationObjectSubTypeTitle();
+  String representationObjectSubTypeTitle();
 
-	String representationObjectSubTypeDesc();
+  String representationObjectSubTypeDesc();
 
-	String userCountTitle();
+  String userCountTitle();
 
-	String userCountDesc();
+  String userCountDesc();
 
-	String groupCountTitle();
+  String groupCountTitle();
 
-	String groupCountDesc();
+  String groupCountDesc();
 
-	String groupTop5Title();
+  String groupTop5Title();
 
-	String groupTop5Desc();
+  String groupTop5Desc();
 
-	String logWuiLoginTitle();
+  String logWuiLoginTitle();
 
-	String logWuiLoginDesc();
+  String logWuiLoginDesc();
 
-	String logWuiPageHitsTitle();
+  String logWuiPageHitsTitle();
 
-	String logWuiPageHitsDesc();
+  String logWuiPageHitsDesc();
 
-	String logWuiErrorsTitle();
+  String logWuiErrorsTitle();
 
-	String logWuiErrorsDesc();
+  String logWuiErrorsDesc();
 
-	String logDescriptiveMetadataViewsTitle();
+  String logDescriptiveMetadataViewsTitle();
 
-	String logDescriptiveMetadataViewsDesc();
+  String logDescriptiveMetadataViewsDesc();
 
-	String logPreservationMetadataViewsTitle();
+  String logPreservationMetadataViewsTitle();
 
-	String logPreservationMetadataViewsDesc();
+  String logPreservationMetadataViewsDesc();
 
-	String logBasicSearchTitle();
+  String logBasicSearchTitle();
 
-	String logBasicSearchDesc();
+  String logBasicSearchDesc();
 
-	String logAdvancedSearchTitle();
+  String logAdvancedSearchTitle();
 
-	String logAdvancedSearchDesc();
+  String logAdvancedSearchDesc();
 
-	String disseminatorHitsTitle();
+  String disseminatorHitsTitle();
 
-	String disseminatorHitsDesc();
+  String disseminatorHitsDesc();
 
-	String disseminatorMissTitle();
+  String disseminatorMissTitle();
 
-	String disseminatorMissDesc();
+  String disseminatorMissDesc();
 
-	String logRegisterUserTitle();
+  String logRegisterUserTitle();
 
-	String logRegisterUserDesc();
+  String logRegisterUserDesc();
 
-	String logUserEmailConfirmationTitle();
+  String logUserEmailConfirmationTitle();
 
-	String logUserEmailConfirmationDesc();
+  String logUserEmailConfirmationDesc();
 
-	String logUserPasswordResetTitle();
+  String logUserPasswordResetTitle();
 
-	String logUserPasswordResetDesc();
+  String logUserPasswordResetDesc();
 
-	String taskCountTitle();
+  String taskCountTitle();
 
-	String taskCountDesc();
+  String taskCountDesc();
 
-	String taskStateTitle();
+  String taskStateTitle();
 
-	String taskStateDesc();
+  String taskStateDesc();
 
-	String taskInstanceCountTitle();
+  String taskInstanceCountTitle();
 
-	String taskInstanceCountDesc();
+  String taskInstanceCountDesc();
 
-	String taskInstanceStateTitle();
+  String taskInstanceStateTitle();
 
-	String taskInstanceStateDesc();
+  String taskInstanceStateDesc();
 
-	String sipCountTitle();
+  String sipCountTitle();
 
-	String sipCountDesc();
+  String sipCountDesc();
 
-	String sipCompletenessTitle();
+  String sipCompletenessTitle();
 
-	String sipCompletenessDesc();
+  String sipCompletenessDesc();
 
-	String sipStateTitle();
+  String sipStateTitle();
 
-	String sipStateDesc();
+  String sipStateDesc();
 
-	String sipDurationAutoTitle();
+  String sipDurationAutoTitle();
 
-	String sipDurationAutoDesc();
+  String sipDurationAutoDesc();
 
-	String sipDurationManualTitle();
+  String sipDurationManualTitle();
 
-	String sipDurationManualDesc();
+  String sipDurationManualDesc();
 
-	String sipMinAutomaticProcessingTimeTitle();
+  String sipMinAutomaticProcessingTimeTitle();
 
-	String sipMinAutomaticProcessingTimeDesc();
+  String sipMinAutomaticProcessingTimeDesc();
 
-	String sipMaxAutomaticProcessingTimeTitle();
+  String sipMaxAutomaticProcessingTimeTitle();
 
-	String sipMaxAutomaticProcessingTimeDesc();
+  String sipMaxAutomaticProcessingTimeDesc();
 
-	String sipMinManualProcessingTimeTitle();
+  String sipMinManualProcessingTimeTitle();
 
-	String sipMinManualProcessingTimeDesc();
+  String sipMinManualProcessingTimeDesc();
 
-	String sipMaxManualProcessingTimeTitle();
+  String sipMaxManualProcessingTimeTitle();
 
-	String sipMaxManualProcessingTimeDesc();
+  String sipMaxManualProcessingTimeDesc();
 
-	String producerTitle();
+  String producerTitle();
 
-	String producerLastSubmissionDate();
+  String producerLastSubmissionDate();
 
-	String producerSubmissionStateChartTitle();
+  String producerSubmissionStateChartTitle();
 
-	String producerSubmissionStateChartDesc();
+  String producerSubmissionStateChartDesc();
 
-	String createDescriptionObjectTitle();
+  String createDescriptionObjectTitle();
 
-	String createDescriptionObjectDesc();
+  String createDescriptionObjectDesc();
 
-	String modifyDescriptionObjectTitle();
+  String modifyDescriptionObjectTitle();
 
-	String modifyDescriptionObjectDesc();
+  String modifyDescriptionObjectDesc();
 
-	String removeDescriptionObjectTitle();
+  String removeDescriptionObjectTitle();
 
-	String removeDescriptionObjectDesc();
+  String removeDescriptionObjectDesc();
 
-	String moveDescriptionObjectTitle();
+  String moveDescriptionObjectTitle();
 
-	String moveDescriptionObjectDesc();
+  String moveDescriptionObjectDesc();
 
-	String addUserTitle();
+  String addUserTitle();
 
-	String addUserDesc();
+  String addUserDesc();
 
-	String modifyUserTitle();
+  String modifyUserTitle();
 
-	String modifyUserDesc();
+  String modifyUserDesc();
 
-	String removeUserTitle();
+  String removeUserTitle();
 
-	String removeUserDesc();
+  String removeUserDesc();
 
-	String addGroupTitle();
+  String addGroupTitle();
 
-	String addGroupDesc();
+  String addGroupDesc();
 
-	String modifyGroupTitle();
+  String modifyGroupTitle();
 
-	String modifyGroupDesc();
+  String modifyGroupDesc();
 
-	String removeGroupTitle();
+  String removeGroupTitle();
 
-	String removeGroupDesc();
+  String removeGroupDesc();
 
-	String setUserPasswordTitle();
+  String setUserPasswordTitle();
 
-	String setUserPasswordDesc();
+  String setUserPasswordDesc();
 
-	String acceptSIPTitle();
+  String acceptSIPTitle();
 
-	String acceptSIPDesc();
+  String acceptSIPDesc();
 
-	String addTaskTitle();
+  String addTaskTitle();
 
-	String addTaskDesc();
+  String addTaskDesc();
 
-	String modifyTaskTitle();
+  String modifyTaskTitle();
 
-	String modifyTaskDesc();
+  String modifyTaskDesc();
 
-	String removeTaskTitle();
+  String removeTaskTitle();
 
-	String removeTaskDesc();
+  String removeTaskDesc();
 
-	String systemStatisticsLink();
+  String systemStatisticsLink();
 
-	// Reports
-	String statisticsReportClose();
+  // Reports
+  String statisticsReportClose();
 
-	String statisticsReportSegmentationLabel();
+  String statisticsReportSegmentationLabel();
 
-	String statisticsReportDateSeparatorLabel();
+  String statisticsReportDateSeparatorLabel();
 
-	String statisticsReportChart();
+  String statisticsReportChart();
 
-	String statisticsReportList();
+  String statisticsReportList();
 
-	String statisticsReportListTotal();
+  String statisticsReportListTotal();
 
-	String statisticsReportListHeaderDate();
+  String statisticsReportListHeaderDate();
 
-	String statisticsReportListHeaderType();
+  String statisticsReportListHeaderType();
 
-	String statisticsReportListHeaderValue();
+  String statisticsReportListHeaderValue();
 
-	// Statistic types
-	String statistic_type_others();
+  // Statistic types
+  String statistic_type_others();
 
-	String tasks_state_running();
+  String tasks_state_running();
 
-	String tasks_state_suspended();
+  String tasks_state_suspended();
 
-	String instances_state_running();
+  String instances_state_running();
 
-	String instances_state_paused();
+  String instances_state_paused();
 
-	String instances_state_stopped();
+  String instances_state_stopped();
 
-	String sips_complete_true();
+  String sips_complete_true();
 
-	String sips_complete_false();
+  String sips_complete_false();
 
-	String sips_state_DROPED_FTP();
+  String sips_state_DROPED_FTP();
 
-	String sips_state_DROPED_UPLOAD_SERVICE();
+  String sips_state_DROPED_UPLOAD_SERVICE();
 
-	String sips_state_DROPED_LOCAL();
+  String sips_state_DROPED_LOCAL();
 
-	String sips_state_UNPACKED();
+  String sips_state_UNPACKED();
 
-	String sips_state_VIRUS_FREE();
+  String sips_state_VIRUS_FREE();
 
-	String sips_state_SIP_VALID();
+  String sips_state_SIP_VALID();
 
-	String sips_state_AUTHORIZED();
+  String sips_state_AUTHORIZED();
 
-	String sips_state_SIP_INGESTED();
+  String sips_state_SIP_INGESTED();
 
-	String sips_state_SIP_NORMALIZED();
+  String sips_state_SIP_NORMALIZED();
 
-	String sips_state_ACCEPTED();
+  String sips_state_ACCEPTED();
 
-	String sips_state_QUARANTINE();
+  String sips_state_QUARANTINE();
 
-	String object_representation_type_digitalized_work();
-        
-        String object_representation_type_email();
+  String object_representation_type_digitalized_work();
 
-	String object_representation_type_structured_text();
-        
-        String object_representation_type_presentation();
-        
-        String object_representation_type_spreadsheet();
-        
-        String object_representation_type_vector_graphic();
+  String object_representation_type_email();
 
-	String object_representation_type_relational_database();
+  String object_representation_type_structured_text();
 
-	String object_representation_type_video();
+  String object_representation_type_presentation();
 
-	String object_representation_type_audio();              
+  String object_representation_type_spreadsheet();
 
-	String object_representation_type_unknown();
+  String object_representation_type_vector_graphic();
 
-	String users_state_active();
+  String object_representation_type_relational_database();
 
-	String users_state_inactive();
+  String object_representation_type_video();
+
+  String object_representation_type_audio();
+
+  String object_representation_type_unknown();
+
+  String users_state_active();
+
+  String users_state_inactive();
 
 }

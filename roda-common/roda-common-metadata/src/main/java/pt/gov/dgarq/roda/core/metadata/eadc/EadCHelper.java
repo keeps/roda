@@ -734,7 +734,7 @@ public class EadCHelper {
           XmlCursor cursor = eadP.newCursor();
           cursor.toLastAttribute();
           TokenType nextToken = cursor.toNextToken();
-          if (nextToken.isText() && cursor.getChars()!=null && !"".equals(cursor.getChars().trim())) {
+          if (nextToken.isText() && cursor.getChars() != null && !"".equals(cursor.getChars().trim())) {
             p.setText(cursor.getTextValue());
           }
           cursor.dispose();

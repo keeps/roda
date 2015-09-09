@@ -120,8 +120,8 @@ public class SIPPanel extends ElementPanel<SIPState> {
               producerInfoPopup.setPopupPositionAndShow(new PositionCallback() {
 
                 public void setPosition(int offsetWidth, int offsetHeight) {
-                  producerInfoPopup.setPopupPosition(producer.getAbsoluteLeft(),
-                    producer.getAbsoluteTop() - offsetHeight);
+                  producerInfoPopup.setPopupPosition(producer.getAbsoluteLeft(), producer.getAbsoluteTop()
+                    - offsetHeight);
                 }
 
               });

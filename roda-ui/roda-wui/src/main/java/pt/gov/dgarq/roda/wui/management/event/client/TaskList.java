@@ -37,375 +37,371 @@ import pt.gov.dgarq.roda.wui.management.event.client.CreateTask.CreateTaskListen
  */
 public class TaskList {
 
-	private ClientLogger logger = new ClientLogger(getClass().getName());
-
-	private static EventManagementConstants constants = (EventManagementConstants) GWT
-			.create(EventManagementConstants.class);
-
-	private static EventManagementMessages messages = (EventManagementMessages) GWT
-			.create(EventManagementMessages.class);
-
-	/**
-	 * Filter to use in the task list
-	 */
-	public static enum TaskFilter {
-		/**
-		 * Show only tasks that are scheduled
-		 */
-		SCHEDULED,
-
-		/**
-		 * Show only paused tasks
-		 */
-		PAUSED,
-
-		/**
-		 * Show only tasks that are running
-		 */
-		RUNNING,
-
-		/**
-		 * Show only tasks that are NOT running
-		 */
-		NOT_RUNNING, /**
-						 * Show all tasks
-						 */
-		ALL
-	}
+  private ClientLogger logger = new ClientLogger(getClass().getName());
+
+  private static EventManagementConstants constants = (EventManagementConstants) GWT
+    .create(EventManagementConstants.class);
+
+  private static EventManagementMessages messages = (EventManagementMessages) GWT.create(EventManagementMessages.class);
+
+  /**
+   * Filter to use in the task list
+   */
+  public static enum TaskFilter {
+    /**
+     * Show only tasks that are scheduled
+     */
+    SCHEDULED,
+
+    /**
+     * Show only paused tasks
+     */
+    PAUSED,
+
+    /**
+     * Show only tasks that are running
+     */
+    RUNNING,
+
+    /**
+     * Show only tasks that are NOT running
+     */
+    NOT_RUNNING, /**
+     * Show all tasks
+     */
+    ALL
+  }
 
-	private boolean initialized;
-
-	private DockPanel layout;
+  private boolean initialized;
 
-	private LazyVerticalList<Task> taskList;
-
-	private ControlPanel controlPanel;
+  private DockPanel layout;
 
-	private TaskFilter stateFilter;
-
-	private String searchFilter;
-
-	private WUIButton addTask;
-
-	private WUIButton editTask;
+  private LazyVerticalList<Task> taskList;
 
-	private WUIButton removeTask;
+  private ControlPanel controlPanel;
 
-	private WUIButton pauseTask;
+  private TaskFilter stateFilter;
 
-	private WUIButton resumeTask;
+  private String searchFilter;
 
-	/**
-	 * Create a new Task list panel
-	 */
-	public TaskList() {
-		layout = new DockPanel();
-		initialized = false;
-	}
+  private WUIButton addTask;
 
-	/**
-	 * Initialize task list
-	 */
-	public void init() {
-		if (!initialized) {
+  private WUIButton editTask;
 
-			initialized = true;
+  private WUIButton removeTask;
 
-			controlPanel = new ControlPanel(constants.controlPanelTitle(), constants.controlPanelSearchTitle());
+  private WUIButton pauseTask;
 
-			controlPanel.addOption(constants.optionScheduled());
-			controlPanel.addOption(constants.optionPaused());
-			controlPanel.addOption(constants.optionRunning());
-			controlPanel.addOption(constants.optionNotRunning());
-			controlPanel.addOption(constants.optionAll());
+  private WUIButton resumeTask;
 
-			controlPanel.setSelectedOptionIndex(0);
-			stateFilter = TaskFilter.SCHEDULED;
-			searchFilter = "";
+  /**
+   * Create a new Task list panel
+   */
+  public TaskList() {
+    layout = new DockPanel();
+    initialized = false;
+  }
 
-			controlPanel.addControlPanelListener(new ControlPanelListener() {
+  /**
+   * Initialize task list
+   */
+  public void init() {
+    if (!initialized) {
 
-				public void onOptionSelected(int option) {
-					switch (option) {
-					case 0:
-						stateFilter = TaskFilter.SCHEDULED;
-						break;
-					case 1:
-						stateFilter = TaskFilter.PAUSED;
-						break;
-					case 2:
-						stateFilter = TaskFilter.RUNNING;
-						break;
-					case 3:
-						stateFilter = TaskFilter.NOT_RUNNING;
-						break;
-					case 4:
-						stateFilter = TaskFilter.ALL;
-						break;
-					}
-					update();
-				}
+      initialized = true;
 
-				public void onSearch(String keywords) {
-					if (keywords.length() > 0) {
-						searchFilter = ".*(?i)" + keywords + ".*";
-					} else {
-						searchFilter = "";
-					}
-					update();
-				}
+      controlPanel = new ControlPanel(constants.controlPanelTitle(), constants.controlPanelSearchTitle());
 
-			});
+      controlPanel.addOption(constants.optionScheduled());
+      controlPanel.addOption(constants.optionPaused());
+      controlPanel.addOption(constants.optionRunning());
+      controlPanel.addOption(constants.optionNotRunning());
+      controlPanel.addOption(constants.optionAll());
 
-			addTask = new WUIButton(constants.actionAddTask(), WUIButton.Left.SQUARE, WUIButton.Right.PLUS);
+      controlPanel.setSelectedOptionIndex(0);
+      stateFilter = TaskFilter.SCHEDULED;
+      searchFilter = "";
 
-			editTask = new WUIButton(constants.actionEditTask(), WUIButton.Left.SQUARE, WUIButton.Right.ARROW_FORWARD);
+      controlPanel.addControlPanelListener(new ControlPanelListener() {
 
-			removeTask = new WUIButton(constants.actionRemoveTask(), WUIButton.Left.SQUARE, WUIButton.Right.CROSS);
+        public void onOptionSelected(int option) {
+          switch (option) {
+            case 0:
+              stateFilter = TaskFilter.SCHEDULED;
+              break;
+            case 1:
+              stateFilter = TaskFilter.PAUSED;
+              break;
+            case 2:
+              stateFilter = TaskFilter.RUNNING;
+              break;
+            case 3:
+              stateFilter = TaskFilter.NOT_RUNNING;
+              break;
+            case 4:
+              stateFilter = TaskFilter.ALL;
+              break;
+          }
+          update();
+        }
 
-			pauseTask = new WUIButton(constants.actionPauseTask(), WUIButton.Left.SQUARE,
-					WUIButton.Right.ARROW_FORWARD);
+        public void onSearch(String keywords) {
+          if (keywords.length() > 0) {
+            searchFilter = ".*(?i)" + keywords + ".*";
+          } else {
+            searchFilter = "";
+          }
+          update();
+        }
 
-			resumeTask = new WUIButton(constants.actionResumeTask(), WUIButton.Left.SQUARE,
-					WUIButton.Right.ARROW_FORWARD);
+      });
 
-			addTask.addClickListener(new ClickListener() {
+      addTask = new WUIButton(constants.actionAddTask(), WUIButton.Left.SQUARE, WUIButton.Right.PLUS);
 
-				public void onClick(Widget sender) {
-					CreateTask createTask = new CreateTask();
-					createTask.show();
-					createTask.addCreateTaskListener(new CreateTaskListener() {
+      editTask = new WUIButton(constants.actionEditTask(), WUIButton.Left.SQUARE, WUIButton.Right.ARROW_FORWARD);
 
-						public void onCancel() {
-							// nothing to do
-						}
+      removeTask = new WUIButton(constants.actionRemoveTask(), WUIButton.Left.SQUARE, WUIButton.Right.CROSS);
 
-						public void onCreate(Task task) {
-							taskList.update();
-							updateVisibles();
-						}
+      pauseTask = new WUIButton(constants.actionPauseTask(), WUIButton.Left.SQUARE, WUIButton.Right.ARROW_FORWARD);
 
-					});
-				}
+      resumeTask = new WUIButton(constants.actionResumeTask(), WUIButton.Left.SQUARE, WUIButton.Right.ARROW_FORWARD);
 
-			});
+      addTask.addClickListener(new ClickListener() {
 
-			editTask.addClickListener(new ClickListener() {
+        public void onClick(Widget sender) {
+          CreateTask createTask = new CreateTask();
+          createTask.show();
+          createTask.addCreateTaskListener(new CreateTaskListener() {
 
-				public void onClick(Widget sender) {
-					ElementPanel<Task> selected = taskList.getSelected();
-					if (selected != null && selected instanceof TaskPanel) {
-						TaskPanel selectedTaskPanel = (TaskPanel) selected;
-						selectedTaskPanel.edit();
-					}
+            public void onCancel() {
+              // nothing to do
+            }
 
-				}
+            public void onCreate(Task task) {
+              taskList.update();
+              updateVisibles();
+            }
 
-			});
+          });
+        }
 
-			removeTask.addClickListener(new ClickListener() {
+      });
 
-				public void onClick(Widget sender) {
-					ElementPanel<Task> selected = taskList.getSelected();
-					if (selected != null && selected instanceof TaskPanel) {
-						TaskPanel selectedTaskPanel = (TaskPanel) selected;
-						EventManagementService.Util.getInstance().removeTask(selectedTaskPanel.get().getName(),
-								new AsyncCallback<Void>() {
+      editTask.addClickListener(new ClickListener() {
 
-							public void onFailure(Throwable caught) {
-								logger.error("Error removing task", caught);
-							}
+        public void onClick(Widget sender) {
+          ElementPanel<Task> selected = taskList.getSelected();
+          if (selected != null && selected instanceof TaskPanel) {
+            TaskPanel selectedTaskPanel = (TaskPanel) selected;
+            selectedTaskPanel.edit();
+          }
 
-							public void onSuccess(Void result) {
-								taskList.update();
-								updateVisibles();
+        }
 
-							}
-						});
+      });
 
-					}
-				}
+      removeTask.addClickListener(new ClickListener() {
 
-			});
+        public void onClick(Widget sender) {
+          ElementPanel<Task> selected = taskList.getSelected();
+          if (selected != null && selected instanceof TaskPanel) {
+            TaskPanel selectedTaskPanel = (TaskPanel) selected;
+            EventManagementService.Util.getInstance().removeTask(selectedTaskPanel.get().getName(),
+              new AsyncCallback<Void>() {
 
-			pauseTask.addClickListener(new ClickListener() {
+                public void onFailure(Throwable caught) {
+                  logger.error("Error removing task", caught);
+                }
 
-				public void onClick(Widget sender) {
-					ElementPanel<Task> selected = taskList.getSelected();
-					if (selected != null && selected instanceof TaskPanel) {
-						TaskPanel selectedTaskPanel = (TaskPanel) selected;
-						EventManagementService.Util.getInstance().pauseTask(selectedTaskPanel.get().getName(),
-								new AsyncCallback<Task>() {
+                public void onSuccess(Void result) {
+                  taskList.update();
+                  updateVisibles();
 
-							public void onFailure(Throwable caught) {
-								logger.error("Error removing task", caught);
-							}
+                }
+              });
 
-							public void onSuccess(Task result) {
-								update();
-							}
-						});
-					}
+          }
+        }
 
-				}
+      });
 
-			});
+      pauseTask.addClickListener(new ClickListener() {
 
-			resumeTask.addClickListener(new ClickListener() {
+        public void onClick(Widget sender) {
+          ElementPanel<Task> selected = taskList.getSelected();
+          if (selected != null && selected instanceof TaskPanel) {
+            TaskPanel selectedTaskPanel = (TaskPanel) selected;
+            EventManagementService.Util.getInstance().pauseTask(selectedTaskPanel.get().getName(),
+              new AsyncCallback<Task>() {
 
-				public void onClick(Widget sender) {
-					ElementPanel<Task> selected = taskList.getSelected();
-					if (selected != null && selected instanceof TaskPanel) {
-						TaskPanel selectedTaskPanel = (TaskPanel) selected;
-						EventManagementService.Util.getInstance().resumeTask(selectedTaskPanel.get().getName(),
-								new AsyncCallback<Task>() {
+                public void onFailure(Throwable caught) {
+                  logger.error("Error removing task", caught);
+                }
 
-							public void onFailure(Throwable caught) {
-								logger.error("Error removing task", caught);
-							}
+                public void onSuccess(Task result) {
+                  update();
+                }
+              });
+          }
 
-							public void onSuccess(Task result) {
-								update();
-							}
-						});
-					}
+        }
 
-				}
+      });
 
-			});
+      resumeTask.addClickListener(new ClickListener() {
 
-			controlPanel.addActionButton(addTask);
-			controlPanel.addActionButton(editTask);
-			controlPanel.addActionButton(removeTask);
-			controlPanel.addActionButton(pauseTask);
-			controlPanel.addActionButton(resumeTask);
+        public void onClick(Widget sender) {
+          ElementPanel<Task> selected = taskList.getSelected();
+          if (selected != null && selected instanceof TaskPanel) {
+            TaskPanel selectedTaskPanel = (TaskPanel) selected;
+            EventManagementService.Util.getInstance().resumeTask(selectedTaskPanel.get().getName(),
+              new AsyncCallback<Task>() {
 
-			taskList = new LazyVerticalList<Task>(new ContentSource<Task>() {
+                public void onFailure(Throwable caught) {
+                  logger.error("Error removing task", caught);
+                }
 
-				public void getCount(Filter filter, AsyncCallback<Integer> callback) {
-					EventManagementService.Util.getInstance().getTaskCount(filter, callback);
-				}
+                public void onSuccess(Task result) {
+                  update();
+                }
+              });
+          }
 
-				public ElementPanel<Task> getElementPanel(Task element) {
-					return new TaskPanel(element);
-				}
+        }
 
-				public void getElements(ContentAdapter adapter, AsyncCallback<Task[]> callback) {
-					EventManagementService.Util.getInstance().getTasks(adapter, callback);
-				}
+      });
 
-				public String getTotalMessage(int total) {
-					return messages.taskListTotal(total);
-				}
+      controlPanel.addActionButton(addTask);
+      controlPanel.addActionButton(editTask);
+      controlPanel.addActionButton(removeTask);
+      controlPanel.addActionButton(pauseTask);
+      controlPanel.addActionButton(resumeTask);
 
-				public void setReportInfo(ContentAdapter adapter, String locale, AsyncCallback<Void> callback) {
-					EventManagementService.Util.getInstance().setTaskListReportInfo(adapter, locale, callback);
+      taskList = new LazyVerticalList<Task>(new ContentSource<Task>() {
 
-				}
-			}, 30000, getFilter());
+        public void getCount(Filter filter, AsyncCallback<Integer> callback) {
+          EventManagementService.Util.getInstance().getTaskCount(filter, callback);
+        }
 
-			taskList.addLazyVerticalListListener(new LazyVerticalListListener<Task>() {
+        public ElementPanel<Task> getElementPanel(Task element) {
+          return new TaskPanel(element);
+        }
 
-				public void onElementSelected(ElementPanel<Task> element) {
-					updateVisibles();
-				}
+        public void getElements(ContentAdapter adapter, AsyncCallback<Task[]> callback) {
+          EventManagementService.Util.getInstance().getTasks(adapter, callback);
+        }
 
-				public void onUpdateBegin() {
-					controlPanel.setOptionsEnabled(false);
-				}
+        public String getTotalMessage(int total) {
+          return messages.taskListTotal(total);
+        }
 
-				public void onUpdateFinish() {
-					controlPanel.setOptionsEnabled(true);
-				}
+        public void setReportInfo(ContentAdapter adapter, String locale, AsyncCallback<Void> callback) {
+          EventManagementService.Util.getInstance().setTaskListReportInfo(adapter, locale, callback);
 
-			});
+        }
+      }, 30000, getFilter());
 
-			addTaskListHeaders();
+      taskList.addLazyVerticalListListener(new LazyVerticalListListener<Task>() {
 
-			layout.add(taskList.getWidget(), DockPanel.CENTER);
-			layout.add(controlPanel.getWidget(), DockPanel.EAST);
+        public void onElementSelected(ElementPanel<Task> element) {
+          updateVisibles();
+        }
 
-			updateVisibles();
+        public void onUpdateBegin() {
+          controlPanel.setOptionsEnabled(false);
+        }
 
-			layout.addStyleName("wui-management-event");
-			taskList.getWidget().addStyleName("event-task-list");
+        public void onUpdateFinish() {
+          controlPanel.setOptionsEnabled(true);
+        }
 
-		}
-	}
+      });
 
-	private Filter getFilter() {
-		Filter filter = new Filter();
-		if (TaskFilter.SCHEDULED.equals(stateFilter)) {
-			filter.add(new SimpleFilterParameter("scheduled", Boolean.TRUE.toString()));
-		} else if (TaskFilter.PAUSED.equals(stateFilter)) {
-			filter.add(new SimpleFilterParameter("paused", Boolean.TRUE.toString()));
-		} else if (TaskFilter.RUNNING.equals(stateFilter)) {
-			filter.add(new SimpleFilterParameter("running", Boolean.TRUE.toString()));
-		} else if (TaskFilter.NOT_RUNNING.equals(stateFilter)) {
-			filter.add(new SimpleFilterParameter("running", Boolean.FALSE.toString()));
-		}
+      addTaskListHeaders();
 
-		if (searchFilter != null && searchFilter.length() > 0) {
-			filter.add(new RegexFilterParameter("name", searchFilter));
-		}
+      layout.add(taskList.getWidget(), DockPanel.CENTER);
+      layout.add(controlPanel.getWidget(), DockPanel.EAST);
 
-		return filter;
-	}
+      updateVisibles();
 
-	protected void update() {
-		taskList.setFilter(getFilter());
-		taskList.reset();
-		updateVisibles();
-	}
+      layout.addStyleName("wui-management-event");
+      taskList.getWidget().addStyleName("event-task-list");
 
-	protected void updateVisibles() {
-		ElementPanel<Task> selected = taskList.getSelected();
-		if (selected != null) {
-			editTask.setEnabled(true);
-			removeTask.setEnabled(true);
-			pauseTask.setEnabled(!selected.get().isPaused());
-			resumeTask.setEnabled(selected.get().isPaused());
-		} else {
-			editTask.setEnabled(false);
-			removeTask.setEnabled(false);
-			pauseTask.setEnabled(false);
-			resumeTask.setEnabled(false);
-		}
-	}
+    }
+  }
 
-	private void addTaskListHeaders() {
-		ListHeaderPanel taskListHeader = taskList.getHeader();
+  private Filter getFilter() {
+    Filter filter = new Filter();
+    if (TaskFilter.SCHEDULED.equals(stateFilter)) {
+      filter.add(new SimpleFilterParameter("scheduled", Boolean.TRUE.toString()));
+    } else if (TaskFilter.PAUSED.equals(stateFilter)) {
+      filter.add(new SimpleFilterParameter("paused", Boolean.TRUE.toString()));
+    } else if (TaskFilter.RUNNING.equals(stateFilter)) {
+      filter.add(new SimpleFilterParameter("running", Boolean.TRUE.toString()));
+    } else if (TaskFilter.NOT_RUNNING.equals(stateFilter)) {
+      filter.add(new SimpleFilterParameter("running", Boolean.FALSE.toString()));
+    }
 
-		taskListHeader.addHeader("", "task-list-header-scheduled", new SortParameter[] {}, true);
+    if (searchFilter != null && searchFilter.length() > 0) {
+      filter.add(new RegexFilterParameter("name", searchFilter));
+    }
 
-		taskListHeader.addHeader(constants.taskHeaderName(), "task-list-header-name",
-				new SortParameter[] { new SortParameter("name", false) }, true);
+    return filter;
+  }
 
-		taskListHeader.addHeader(constants.taskHeaderStartDate(), "task-list-header-startDate",
-				new SortParameter[] { new SortParameter("startDate", false), new SortParameter("name", false) }, false);
+  protected void update() {
+    taskList.setFilter(getFilter());
+    taskList.reset();
+    updateVisibles();
+  }
 
-		taskListHeader.addHeader(constants.taskHeaderRepeat(), "task-list-header-repeat",
-				new SortParameter[] { new SortParameter("repeatCount", false),
-						new SortParameter("repeatInterval", false), new SortParameter("name", false) },
-				true);
+  protected void updateVisibles() {
+    ElementPanel<Task> selected = taskList.getSelected();
+    if (selected != null) {
+      editTask.setEnabled(true);
+      removeTask.setEnabled(true);
+      pauseTask.setEnabled(!selected.get().isPaused());
+      resumeTask.setEnabled(selected.get().isPaused());
+    } else {
+      editTask.setEnabled(false);
+      removeTask.setEnabled(false);
+      pauseTask.setEnabled(false);
+      resumeTask.setEnabled(false);
+    }
+  }
 
-		taskListHeader.addHeader(constants.taskHeaderUsername(), "task-list-header-user",
-				new SortParameter[] { new SortParameter("username", false), new SortParameter("name", false) }, true);
+  private void addTaskListHeaders() {
+    ListHeaderPanel taskListHeader = taskList.getHeader();
 
-		taskListHeader.addHeader("", "task-list-header-running",
-				new SortParameter[] { new SortParameter("running", false), new SortParameter("name", false) }, true);
+    taskListHeader.addHeader("", "task-list-header-scheduled", new SortParameter[] {}, true);
 
-		taskListHeader.setSelectedHeader(1);
-		taskListHeader.setFillerHeader(3);
+    taskListHeader.addHeader(constants.taskHeaderName(), "task-list-header-name",
+      new SortParameter[] {new SortParameter("name", false)}, true);
 
-	}
+    taskListHeader.addHeader(constants.taskHeaderStartDate(), "task-list-header-startDate", new SortParameter[] {
+      new SortParameter("startDate", false), new SortParameter("name", false)}, false);
 
-	/**
-	 * Get the panel widget
-	 * 
-	 * @return get task list widget
-	 */
-	public Widget getWidget() {
-		return layout;
-	}
+    taskListHeader.addHeader(constants.taskHeaderRepeat(), "task-list-header-repeat", new SortParameter[] {
+      new SortParameter("repeatCount", false), new SortParameter("repeatInterval", false),
+      new SortParameter("name", false)}, true);
+
+    taskListHeader.addHeader(constants.taskHeaderUsername(), "task-list-header-user", new SortParameter[] {
+      new SortParameter("username", false), new SortParameter("name", false)}, true);
+
+    taskListHeader.addHeader("", "task-list-header-running", new SortParameter[] {new SortParameter("running", false),
+      new SortParameter("name", false)}, true);
+
+    taskListHeader.setSelectedHeader(1);
+    taskListHeader.setFillerHeader(3);
+
+  }
+
+  /**
+   * Get the panel widget
+   * 
+   * @return get task list widget
+   */
+  public Widget getWidget() {
+    return layout;
+  }
 }

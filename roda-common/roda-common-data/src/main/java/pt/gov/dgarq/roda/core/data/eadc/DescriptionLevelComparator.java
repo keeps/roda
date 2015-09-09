@@ -21,18 +21,17 @@ import java.util.Comparator;
  * 
  * @author Rui Castro
  */
-public class DescriptionLevelComparator implements
-		Comparator<DescriptionLevel>, Serializable {
-	private static final long serialVersionUID = -8726486397243945069L;
+public class DescriptionLevelComparator implements Comparator<DescriptionLevel>, Serializable {
+  private static final long serialVersionUID = -8726486397243945069L;
 
-	/**
-	 * @param level1
-	 * @param level2
-	 * @return greater than 0 if other level1 is greater than level2. returns 0
-	 *         if they are equal.
-	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-	 */
-	public int compare(DescriptionLevel level1, DescriptionLevel level2) {
-		return level1.compareTo(level2);
-	}
+  /**
+   * @param level1
+   * @param level2
+   * @return greater than 0 if other level1 is greater than level2. returns 0 if
+   *         they are equal.
+   * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+   */
+  public int compare(DescriptionLevel level1, DescriptionLevel level2) {
+    return level1.compareTo(level2);
+  }
 }

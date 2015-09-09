@@ -9,16 +9,16 @@ import java.io.Serializable;
  * 
  */
 public enum Segmentation implements Serializable {
-	/**
-	 * Per year segmentation
-	 */
-	YEAR,
-	/**
-	 * Per month segmentation
-	 */
-	MONTH,
-	/**
-	 * Per day segmentation
-	 */
-	DAY
+  /**
+   * Per year segmentation
+   */
+  YEAR,
+  /**
+   * Per month segmentation
+   */
+  MONTH,
+  /**
+   * Per day segmentation
+   */
+  DAY
 }

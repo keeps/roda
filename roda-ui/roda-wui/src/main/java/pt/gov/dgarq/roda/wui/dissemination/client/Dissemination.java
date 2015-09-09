@@ -24,104 +24,104 @@ import pt.gov.dgarq.roda.wui.dissemination.search.client.Search;
  */
 public class Dissemination {
 
-	public static final HistoryResolver RESOLVER = new HistoryResolver() {
+  public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
-		@Override
-		public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
-			getInstance().resolve(historyTokens, callback);
-		}
+    @Override
+    public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
+      getInstance().resolve(historyTokens, callback);
+    }
 
-		@Override
-		public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-			UserLogin.getInstance().checkRole(this, callback);
-		}
+    @Override
+    public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
+      UserLogin.getInstance().checkRole(this, callback);
+    }
 
-		public String getHistoryPath() {
-			return getHistoryToken();
-		}
+    public String getHistoryPath() {
+      return getHistoryToken();
+    }
 
-		public String getHistoryToken() {
-			return "dissemination";
-		}
-	};
+    public String getHistoryToken() {
+      return "dissemination";
+    }
+  };
 
-	private static DisseminationConstants constants = (DisseminationConstants) GWT.create(DisseminationConstants.class);
+  private static DisseminationConstants constants = (DisseminationConstants) GWT.create(DisseminationConstants.class);
 
-	private static Dissemination instance = null;
+  private static Dissemination instance = null;
 
-	/**
-	 * Get the singleton instance
-	 * 
-	 * @return the instance
-	 */
-	public static Dissemination getInstance() {
-		if (instance == null) {
-			instance = new Dissemination();
-		}
-		return instance;
-	}
+  /**
+   * Get the singleton instance
+   * 
+   * @return the instance
+   */
+  public static Dissemination getInstance() {
+    if (instance == null) {
+      instance = new Dissemination();
+    }
+    return instance;
+  }
 
-	// private GWTLogger logger = new GWTLogger(GWT.getTypeName(this));
+  // private GWTLogger logger = new GWTLogger(GWT.getTypeName(this));
 
-	private boolean initialized;
+  private boolean initialized;
 
-	private HTMLWidgetWrapper page;
+  private HTMLWidgetWrapper page;
 
-	private HTMLWidgetWrapper help = null;
+  private HTMLWidgetWrapper help = null;
 
-	private Dissemination() {
-		initialized = false;
+  private Dissemination() {
+    initialized = false;
 
-	}
+  }
 
-	private void init() {
-		if (!initialized) {
-			initialized = true;
-			page = new HTMLWidgetWrapper("Dissemination.html");
-			page.addStyleName("wui-dissemination");
-		}
-	}
+  private void init() {
+    if (!initialized) {
+      initialized = true;
+      page = new HTMLWidgetWrapper("Dissemination.html");
+      page.addStyleName("wui-dissemination");
+    }
+  }
 
-	private HTMLWidgetWrapper getHelp() {
-		if (help == null) {
-			help = new HTMLWidgetWrapper("DisseminationHelp.html");
-		}
-		return help;
-	}
+  private HTMLWidgetWrapper getHelp() {
+    if (help == null) {
+      help = new HTMLWidgetWrapper("DisseminationHelp.html");
+    }
+    return help;
+  }
 
-	public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
-		if (historyTokens.length == 0) {
-			init();
-			callback.onSuccess(page);
-		} else {
-			if (historyTokens[0].equals(Search.RESOLVER.getHistoryToken())) {
-				Search.getInstance().resolve(Tools.tail(historyTokens), callback);
+  public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
+    if (historyTokens.length == 0) {
+      init();
+      callback.onSuccess(page);
+    } else {
+      if (historyTokens[0].equals(Search.RESOLVER.getHistoryToken())) {
+        Search.getInstance().resolve(Tools.tail(historyTokens), callback);
 
-			} else if (historyTokens[0].equals(Browse.RESOLVER.getHistoryToken())) {
-				Browse.getInstance().resolve(Tools.tail(historyTokens), callback);
+      } else if (historyTokens[0].equals(Browse.RESOLVER.getHistoryToken())) {
+        Browse.getInstance().resolve(Tools.tail(historyTokens), callback);
 
-			} else if (historyTokens[0].equals("help")) {
-				callback.onSuccess(getHelp());
+      } else if (historyTokens[0].equals("help")) {
+        callback.onSuccess(getHelp());
 
-			} else {
-				callback.onFailure(new BadHistoryTokenException(historyTokens[0]));
-			}
-		}
-	}
+      } else {
+        callback.onFailure(new BadHistoryTokenException(historyTokens[0]));
+      }
+    }
+  }
 
-	/**
-	 * Get translation of each descriptive level
-	 * 
-	 * @param level
-	 * @return the translation string
-	 */
-	public String getElementLevelTranslation(DescriptionLevel level) {
-		String ret;
-		if (DescriptionLevelUtils.DESCRIPTION_LEVELS.contains(level)) {
-			ret = constants.getString(level.getLevelSanitized());
-		} else {
-			ret = null;
-		}
-		return ret;
-	}
+  /**
+   * Get translation of each descriptive level
+   * 
+   * @param level
+   * @return the translation string
+   */
+  public String getElementLevelTranslation(DescriptionLevel level) {
+    String ret;
+    if (DescriptionLevelUtils.DESCRIPTION_LEVELS.contains(level)) {
+      ret = constants.getString(level.getLevelSanitized());
+    } else {
+      ret = null;
+    }
+    return ret;
+  }
 }

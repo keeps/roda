@@ -9,30 +9,30 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
 public class XMLContentPayload implements ContentPayload {
-	String content;
-	Path contentPath;
-	public XMLContentPayload(String content) {
-		this.content = content;
-	}
+  String content;
+  Path contentPath;
 
-	@Override
-	public InputStream createInputStream() throws IOException {
-		return new ByteArrayInputStream(content.getBytes());
-	}
+  public XMLContentPayload(String content) {
+    this.content = content;
+  }
 
-	@Override
-	public void writeToPath(Path path) throws IOException {
-		Files.copy(createInputStream(), path,
-				StandardCopyOption.REPLACE_EXISTING);
-	}
+  @Override
+  public InputStream createInputStream() throws IOException {
+    return new ByteArrayInputStream(content.getBytes());
+  }
 
-	@Override
-	public URI getURI() throws IOException, UnsupportedOperationException {
-		if (contentPath == null) {
-			contentPath = Files.createTempFile("content", ".xml");
-			writeToPath(contentPath);
-		}
-		return contentPath.toUri();
-	}
+  @Override
+  public void writeToPath(Path path) throws IOException {
+    Files.copy(createInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+  }
+
+  @Override
+  public URI getURI() throws IOException, UnsupportedOperationException {
+    if (contentPath == null) {
+      contentPath = Files.createTempFile("content", ".xml");
+      writeToPath(contentPath);
+    }
+    return contentPath.toUri();
+  }
 
 }

@@ -10,19 +10,18 @@ import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 
 public interface ReportContentSource<T> {
 
-	public String getReportTitle();
+  public String getReportTitle();
 
-	public int getCount(HttpSession session, Filter filter) throws Exception;
+  public int getCount(HttpSession session, Filter filter) throws Exception;
 
-	public T[] getElements(HttpSession session, ContentAdapter adapter)
-			throws Exception;
+  public T[] getElements(HttpSession session, ContentAdapter adapter) throws Exception;
 
-	public String getElementId(T element);
+  public String getElementId(T element);
 
-	public Map<String, String> getElementFields(HttpServletRequest req, T element);
+  public Map<String, String> getElementFields(HttpServletRequest req, T element);
 
-	public String getFieldNameTranslation(String name);
+  public String getFieldNameTranslation(String name);
 
-	public String getFieldValueTranslation(String value);
+  public String getFieldValueTranslation(String value);
 
 }

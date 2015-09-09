@@ -74,7 +74,7 @@ public class CasForwardDialog extends WUIWindow {
   }
 
   private native void reload() /*-{
-		$wnd.location.reload();
-  }-*/;
+                               $wnd.location.reload();
+                               }-*/;
 
 }

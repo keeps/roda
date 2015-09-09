@@ -9,158 +9,154 @@ import java.util.Date;
  * @author Rui Castro
  */
 public abstract class PreservationObject {
-	private static final long serialVersionUID = -1666581836175629839L;
+  private static final long serialVersionUID = -1666581836175629839L;
 
-	private String ID = null;
-	private String type;
-	private String fileID;
-	
-	
-	/**
-	 * Inactive state
-	 */
-	public static String STATE_INACTIVE = "inactive";
+  private String ID = null;
+  private String type;
+  private String fileID;
 
-	/**
-	 * Active state
-	 */
-	public static String STATE_ACTIVE = "active";
+  /**
+   * Inactive state
+   */
+  public static String STATE_INACTIVE = "inactive";
 
-	/**
-	 * Deleted state
-	 */
-	public static String STATE_DELETED = "deleted";
+  /**
+   * Active state
+   */
+  public static String STATE_ACTIVE = "active";
 
-	/**
-	 * Possible states
-	 */
-	public static String[] STATES = new String[] { STATE_INACTIVE,
-			STATE_ACTIVE, STATE_DELETED };
+  /**
+   * Deleted state
+   */
+  public static String STATE_DELETED = "deleted";
 
-	private String id = null;
+  /**
+   * Possible states
+   */
+  public static String[] STATES = new String[] {STATE_INACTIVE, STATE_ACTIVE, STATE_DELETED};
 
-	private String label = null;
+  private String id = null;
 
-	private Date lastModifiedDate = null;
+  private String label = null;
 
-	private Date createdDate = null;
+  private Date lastModifiedDate = null;
 
-	private String state = null;
-	/**
-	 * Constructs an empty {@link PreservationObject}.
-	 */
-	public PreservationObject() {
-		super();
-	}
+  private Date createdDate = null;
 
-	/**
-	 * Constructs a new {@link PreservationObject} with the given parameters.
-	 * 
-	 * @param id
-	 *            object ID
-	 * @param label
-	 *            object label
-	 * @param cModel
-	 *            object content model (<strong>must start with
-	 *            roda:p:</strong>).
-	 * @param lastModifiedDate
-	 * @param createdDate
-	 * @param state
-	 * @param ID
-	 *            the identifier of the preservation object
-	 */
-	public PreservationObject(String id, String label, Date lastModifiedDate,
-			Date createdDate, String state, String ID) {
-		this.id = id;
-		this.label = label;
-		this.lastModifiedDate = lastModifiedDate;
-		this.createdDate = createdDate;
-		this.state = state;
-		this.ID = ID;
-	}
-	
-	/**
-	 * @see RODAObject#toString()
-	 */
-	@Override
-	public String toString() {
-		return "PreservationObject( " + super.toString() + ", type=" //$NON-NLS-1$ //$NON-NLS-2$
-				+ getType() + ", ID=" + getID() + " )"; //$NON-NLS-1$//$NON-NLS-2$
-	}
+  private String state = null;
 
-	/**
-	 * Gets the identifier of this {@link PreservationObject}.
-	 * 
-	 * @return a {@link String}
-	 */
-	public String getID() {
-		return this.ID;
-	}
+  /**
+   * Constructs an empty {@link PreservationObject}.
+   */
+  public PreservationObject() {
+    super();
+  }
 
-	/**
-	 * Sets the identifier of this {@link PreservationObject}.
-	 * 
-	 * @param ID
-	 */
-	public void setID(String ID) {
-		this.ID = ID;
-	}
+  /**
+   * Constructs a new {@link PreservationObject} with the given parameters.
+   * 
+   * @param id
+   *          object ID
+   * @param label
+   *          object label
+   * @param cModel
+   *          object content model (<strong>must start with roda:p:</strong>).
+   * @param lastModifiedDate
+   * @param createdDate
+   * @param state
+   * @param ID
+   *          the identifier of the preservation object
+   */
+  public PreservationObject(String id, String label, Date lastModifiedDate, Date createdDate, String state, String ID) {
+    this.id = id;
+    this.label = label;
+    this.lastModifiedDate = lastModifiedDate;
+    this.createdDate = createdDate;
+    this.state = state;
+    this.ID = ID;
+  }
 
-	public String getType() {
-		return type;
-	}
+  /**
+   * @see RODAObject#toString()
+   */
+  @Override
+  public String toString() {
+    return "PreservationObject( " + super.toString() + ", type=" //$NON-NLS-1$ //$NON-NLS-2$
+      + getType() + ", ID=" + getID() + " )"; //$NON-NLS-1$//$NON-NLS-2$
+  }
 
-	public void setType(String type) {
-		this.type = type;
-	}
+  /**
+   * Gets the identifier of this {@link PreservationObject}.
+   * 
+   * @return a {@link String}
+   */
+  public String getID() {
+    return this.ID;
+  }
 
-	public String getFileID() {
-		return fileID;
-	}
+  /**
+   * Sets the identifier of this {@link PreservationObject}.
+   * 
+   * @param ID
+   */
+  public void setID(String ID) {
+    this.ID = ID;
+  }
 
-	public void setFileID(String fileID) {
-		this.fileID = fileID;
-	}
+  public String getType() {
+    return type;
+  }
 
-	protected String getId() {
-		return id;
-	}
+  public void setType(String type) {
+    this.type = type;
+  }
 
-	protected void setId(String id) {
-		this.id = id;
-	}
+  public String getFileID() {
+    return fileID;
+  }
 
-	protected String getLabel() {
-		return label;
-	}
+  public void setFileID(String fileID) {
+    this.fileID = fileID;
+  }
 
-	protected void setLabel(String label) {
-		this.label = label;
-	}
+  protected String getId() {
+    return id;
+  }
 
-	protected Date getLastModifiedDate() {
-		return lastModifiedDate;
-	}
+  protected void setId(String id) {
+    this.id = id;
+  }
 
-	protected void setLastModifiedDate(Date lastModifiedDate) {
-		this.lastModifiedDate = lastModifiedDate;
-	}
+  protected String getLabel() {
+    return label;
+  }
 
-	protected Date getCreatedDate() {
-		return createdDate;
-	}
+  protected void setLabel(String label) {
+    this.label = label;
+  }
 
-	protected void setCreatedDate(Date createdDate) {
-		this.createdDate = createdDate;
-	}
+  protected Date getLastModifiedDate() {
+    return lastModifiedDate;
+  }
 
-	protected String getState() {
-		return state;
-	}
+  protected void setLastModifiedDate(Date lastModifiedDate) {
+    this.lastModifiedDate = lastModifiedDate;
+  }
 
-	protected void setState(String state) {
-		this.state = state;
-	}
+  protected Date getCreatedDate() {
+    return createdDate;
+  }
 
-	
+  protected void setCreatedDate(Date createdDate) {
+    this.createdDate = createdDate;
+  }
+
+  protected String getState() {
+    return state;
+  }
+
+  protected void setState(String state) {
+    this.state = state;
+  }
+
 }

@@ -7,12 +7,10 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface DescriptionLevelServiceAsync {
 
-	DescriptionLevelServiceAsync INSTANCE = GWT
-			.create(DescriptionLevelService.class);
+  DescriptionLevelServiceAsync INSTANCE = GWT.create(DescriptionLevelService.class);
 
-	void getDescriptionLevels(AsyncCallback<List<String>> callback);
+  void getDescriptionLevels(AsyncCallback<List<String>> callback);
 
-	void getAllDescriptionLevels(
-			AsyncCallback<DescriptionLevelInfoPack> callback);
+  void getAllDescriptionLevels(AsyncCallback<DescriptionLevelInfoPack> callback);
 
 }

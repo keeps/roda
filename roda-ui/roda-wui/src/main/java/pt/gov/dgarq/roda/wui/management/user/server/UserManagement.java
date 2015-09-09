@@ -25,8 +25,8 @@ public class UserManagement extends RodaCoreService {
     super();
   }
 
-  public static Long countLogEntries(RodaUser user, Filter filter)
-    throws AuthorizationDeniedException, GenericException {
+  public static Long countLogEntries(RodaUser user, Filter filter) throws AuthorizationDeniedException,
+    GenericException {
     Date start = new Date();
 
     // check user permissions
@@ -88,14 +88,14 @@ public class UserManagement extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "UserManagement", "findMembers", null, duration, "filter", filter, "sorter", sorter, "sublist",
-      sublist);
+    registerAction(user, "UserManagement", "findMembers", null, duration, "filter", filter, "sorter", sorter,
+      "sublist", sublist);
 
     return ret;
   }
 
-  public static RodaUser retrieveUser(RodaUser user, String username)
-    throws AuthorizationDeniedException, GenericException {
+  public static RodaUser retrieveUser(RodaUser user, String username) throws AuthorizationDeniedException,
+    GenericException {
     Date start = new Date();
 
     // check user permissions
@@ -111,8 +111,8 @@ public class UserManagement extends RodaCoreService {
     return ret;
   }
 
-  public static RodaGroup retrieveGroup(RodaUser user, String groupname)
-    throws AuthorizationDeniedException, GenericException {
+  public static RodaGroup retrieveGroup(RodaUser user, String groupname) throws AuthorizationDeniedException,
+    GenericException {
     Date start = new Date();
 
     // check user permissions

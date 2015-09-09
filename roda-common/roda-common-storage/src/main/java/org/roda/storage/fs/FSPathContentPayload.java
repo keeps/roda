@@ -16,25 +16,25 @@ import org.roda.storage.ContentPayload;
  * */
 public class FSPathContentPayload implements ContentPayload {
 
-	private final Path path;
+  private final Path path;
 
-	public FSPathContentPayload(Path path) {
-		this.path = path;
-	}
+  public FSPathContentPayload(Path path) {
+    this.path = path;
+  }
 
-	@Override
-	public InputStream createInputStream() throws IOException {
-		return Files.newInputStream(path);
-	}
+  @Override
+  public InputStream createInputStream() throws IOException {
+    return Files.newInputStream(path);
+  }
 
-	@Override
-	public void writeToPath(Path outPath) throws IOException {
-		Files.copy(path, outPath, StandardCopyOption.REPLACE_EXISTING);
-	}
+  @Override
+  public void writeToPath(Path outPath) throws IOException {
+    Files.copy(path, outPath, StandardCopyOption.REPLACE_EXISTING);
+  }
 
-	@Override
-	public URI getURI() throws IOException, UnsupportedOperationException {
-		return path.toUri();
-	}
+  @Override
+  public URI getURI() throws IOException, UnsupportedOperationException {
+    return path.toUri();
+  }
 
 }

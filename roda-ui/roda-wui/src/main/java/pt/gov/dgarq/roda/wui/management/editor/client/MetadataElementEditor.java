@@ -13,14 +13,14 @@ import com.google.gwt.user.client.ui.Widget;
  *
  */
 public interface MetadataElementEditor extends SourcesChangeEvents {
-	
-	public EadCValue getValue();
-	
-	public void setValue(EadCValue value);
-	
-	public Widget getWidget();
-	
-	public boolean isEmpty();
 
-	public boolean isValid();
+  public EadCValue getValue();
+
+  public void setValue(EadCValue value);
+
+  public Widget getWidget();
+
+  public boolean isEmpty();
+
+  public boolean isValid();
 }

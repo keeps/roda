@@ -15,7 +15,7 @@ public abstract class CachedAsynRequest<T> {
   public void clearCache() {
     this.cached = null;
   }
-  
+
   public void setCached(T cached) {
     this.cached = cached;
   }

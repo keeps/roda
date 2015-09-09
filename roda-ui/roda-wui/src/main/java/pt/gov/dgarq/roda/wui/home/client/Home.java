@@ -16,67 +16,67 @@ import pt.gov.dgarq.roda.wui.common.client.widgets.HTMLWidgetWrapper;
  */
 public class Home {
 
-	public static final HistoryResolver RESOLVER = new HistoryResolver() {
+  public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
-		@Override
-		public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
-			getInstance().resolve(historyTokens, callback);
-		}
+    @Override
+    public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
+      getInstance().resolve(historyTokens, callback);
+    }
 
-		@Override
-		public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-			callback.onSuccess(Boolean.TRUE);
-		}
+    @Override
+    public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
+      callback.onSuccess(Boolean.TRUE);
+    }
 
-		@Override
-		public String getHistoryToken() {
-			return "home";
-		}
+    @Override
+    public String getHistoryToken() {
+      return "home";
+    }
 
-		@Override
-		public String getHistoryPath() {
-			return getHistoryToken();
-		}
-	};
+    @Override
+    public String getHistoryPath() {
+      return getHistoryToken();
+    }
+  };
 
-	private static Home instance = null;
+  private static Home instance = null;
 
-	/**
-	 * Get the singleton instance
-	 * 
-	 * @return the instance
-	 */
-	public static Home getInstance() {
-		if (instance == null) {
-			instance = new Home();
-		}
-		return instance;
-	}
+  /**
+   * Get the singleton instance
+   * 
+   * @return the instance
+   */
+  public static Home getInstance() {
+    if (instance == null) {
+      instance = new Home();
+    }
+    return instance;
+  }
 
-	private boolean initialized;
+  private boolean initialized;
 
-	private HTMLWidgetWrapper layout;
+  private HTMLWidgetWrapper layout;
 
-	private Home() {
-		initialized = false;
-	}
+  private Home() {
+    initialized = false;
+  }
 
-	private void init() {
-		if (!initialized) {
-			initialized = true;
-			layout = new HTMLWidgetWrapper("Home.html");
-			layout.addStyleName("wui-home");
-		}
-	}
+  private void init() {
+    if (!initialized) {
+      initialized = true;
+      layout = new HTMLWidgetWrapper("Home.html");
+      layout.addStyleName("wui-home");
+    }
+  }
 
-	public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
-		if (historyTokens.length == 0) {
-			init();
-			callback.onSuccess(layout);
-		} else {
-			History.newItem(RESOLVER.getHistoryPath());
-			callback.onSuccess(null);
-		}
-	}
+  public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
+    if (historyTokens.length == 0) {
+      init();
+      callback.onSuccess(layout);
+    } else {
+      History.newItem(RESOLVER.getHistoryPath());
+      callback.onSuccess(null);
+    }
+  }
 
 }

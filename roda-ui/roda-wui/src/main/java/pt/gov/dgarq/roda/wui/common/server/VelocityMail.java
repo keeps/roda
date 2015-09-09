@@ -73,303 +73,291 @@ import pt.gov.dgarq.roda.common.RodaCoreFactory;
  */
 public class VelocityMail implements LogChute {
 
-	private static final String INPUT_ENCODING = "UTF-8";
+  private static final String INPUT_ENCODING = "UTF-8";
 
-	/**
-	 * The default instance for the Velocity Mail class
-	 */
-	private static VelocityMail defaultInstance;
+  /**
+   * The default instance for the Velocity Mail class
+   */
+  private static VelocityMail defaultInstance;
 
-	/**
+  /**
 	 * 
 	 */
-	private static Logger logger = Logger.getLogger(VelocityMail.class);
+  private static Logger logger = Logger.getLogger(VelocityMail.class);
 
-	/**
-	 * The configuration for Velocity Mail
-	 */
-	private ExtendedProperties properties;
+  /**
+   * The configuration for Velocity Mail
+   */
+  private ExtendedProperties properties;
 
-	/**
-	 * The list of email configurations that are available.
-	 */
-	private Map<String, ExtendedProperties> configurations;
+  /**
+   * The list of email configurations that are available.
+   */
+  private Map<String, ExtendedProperties> configurations;
 
-	/**
-	 * Create a new Velocity Mail object with a properties object
-	 * 
-	 * @param properties
-	 * @throws Exception
-	 */
-	public VelocityMail(ExtendedProperties properties) throws Exception {
-		this.configurations = new HashMap<String, ExtendedProperties>();
-		this.properties = properties;
+  /**
+   * Create a new Velocity Mail object with a properties object
+   * 
+   * @param properties
+   * @throws Exception
+   */
+  public VelocityMail(ExtendedProperties properties) throws Exception {
+    this.configurations = new HashMap<String, ExtendedProperties>();
+    this.properties = properties;
 
-		Velocity.setProperty(Velocity.RUNTIME_LOG_LOGSYSTEM, this);
-		Velocity.setProperty(Velocity.RESOURCE_LOADER, "class");
-		Velocity.setProperty("class.resource.loader.description",
-				"Velocity Classpath Resource Loader");
-		Velocity
-				.setProperty("class.resource.loader.class",
-						"org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+    Velocity.setProperty(Velocity.RUNTIME_LOG_LOGSYSTEM, this);
+    Velocity.setProperty(Velocity.RESOURCE_LOADER, "class");
+    Velocity.setProperty("class.resource.loader.description", "Velocity Classpath Resource Loader");
+    Velocity.setProperty("class.resource.loader.class",
+      "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
 
-		Velocity.init();
+    Velocity.init();
 
-	}
+  }
 
-	/**
-	 * Return the default instance for VelocityMail. It attempts to load the
-	 * resources "velocity.mail.properties" from the classpath.
-	 * 
-	 * @return the default instance
-	 * @throws Exception
-	 */
-	public static VelocityMail getDefaultInstance() throws Exception {
-		if (defaultInstance == null) {
-			InputStream inputStream = RodaCoreFactory
-					.getConfigurationFile("mail/velocity.mail.properties");
-			ExtendedProperties extendedProperties = new ExtendedProperties();
-			extendedProperties.load(inputStream);
-			defaultInstance = new VelocityMail(extendedProperties);
-		}
-		return defaultInstance;
-	}
+  /**
+   * Return the default instance for VelocityMail. It attempts to load the
+   * resources "velocity.mail.properties" from the classpath.
+   * 
+   * @return the default instance
+   * @throws Exception
+   */
+  public static VelocityMail getDefaultInstance() throws Exception {
+    if (defaultInstance == null) {
+      InputStream inputStream = RodaCoreFactory.getConfigurationFile("mail/velocity.mail.properties");
+      ExtendedProperties extendedProperties = new ExtendedProperties();
+      extendedProperties.load(inputStream);
+      defaultInstance = new VelocityMail(extendedProperties);
+    }
+    return defaultInstance;
+  }
 
-	/**
-	 * Send an email message to a single address using the default
-	 * configuration.
-	 * 
-	 * @param address
-	 *            The receiver of the email
-	 * @param context
-	 *            The velocity context used to merge the email template
-	 * 
-	 * @throws Exception
-	 */
-	public void send(InternetAddress address, Context context) throws Exception {
-		InternetAddress[] addresses = new InternetAddress[1];
-		addresses[0] = address;
-		send(addresses, context);
-	}
+  /**
+   * Send an email message to a single address using the default configuration.
+   * 
+   * @param address
+   *          The receiver of the email
+   * @param context
+   *          The velocity context used to merge the email template
+   * 
+   * @throws Exception
+   */
+  public void send(InternetAddress address, Context context) throws Exception {
+    InternetAddress[] addresses = new InternetAddress[1];
+    addresses[0] = address;
+    send(addresses, context);
+  }
 
-	/**
-	 * Send an email message to a single address
-	 * 
-	 * @param config
-	 *            The configuration to use (specified in the email properties)
-	 * @param address
-	 *            The receiver of the email
-	 * @param context
-	 *            The velocity context used to merge the email template
-	 * @throws Exception
-	 */
-	public void send(String config, InternetAddress address, Context context)
-			throws Exception {
-		InternetAddress[] addresses = new InternetAddress[1];
-		addresses[0] = address;
-		send(config, addresses, context);
-	}
+  /**
+   * Send an email message to a single address
+   * 
+   * @param config
+   *          The configuration to use (specified in the email properties)
+   * @param address
+   *          The receiver of the email
+   * @param context
+   *          The velocity context used to merge the email template
+   * @throws Exception
+   */
+  public void send(String config, InternetAddress address, Context context) throws Exception {
+    InternetAddress[] addresses = new InternetAddress[1];
+    addresses[0] = address;
+    send(config, addresses, context);
+  }
 
-	/**
-	 * Send an email message to a list of addresses using the default
-	 * configuration.
-	 * 
-	 * @param addresses
-	 *            The receivers of the email
-	 * @param context
-	 *            The velocity context used to merge the email template
-	 * 
-	 * @throws Exception
-	 */
-	public void send(InternetAddress[] addresses, Context context)
-			throws Exception {
-		send("default", addresses, context);
-	}
+  /**
+   * Send an email message to a list of addresses using the default
+   * configuration.
+   * 
+   * @param addresses
+   *          The receivers of the email
+   * @param context
+   *          The velocity context used to merge the email template
+   * 
+   * @throws Exception
+   */
+  public void send(InternetAddress[] addresses, Context context) throws Exception {
+    send("default", addresses, context);
+  }
 
-	/**
-	 * Send an email message to a list of addresses
-	 * 
-	 * @param config
-	 *            The configuration to use (specified in the email properties)
-	 * @param addresses
-	 *            The receivers of the email
-	 * @param context
-	 *            The velocity context used to merge the email template
-	 * @throws Exception
-	 */
-	public void send(String config, InternetAddress[] addresses, Context context)
-			throws Exception {
+  /**
+   * Send an email message to a list of addresses
+   * 
+   * @param config
+   *          The configuration to use (specified in the email properties)
+   * @param addresses
+   *          The receivers of the email
+   * @param context
+   *          The velocity context used to merge the email template
+   * @throws Exception
+   */
+  public void send(String config, InternetAddress[] addresses, Context context) throws Exception {
 
-		ExtendedProperties configuration = getConfiguration(config);
+    ExtendedProperties configuration = getConfiguration(config);
 
-		Message message = createMessage(configuration, context);
-		setMessageContent(message, configuration, context);
-		message.setRecipients(Message.RecipientType.TO, addresses);
+    Message message = createMessage(configuration, context);
+    setMessageContent(message, configuration, context);
+    message.setRecipients(Message.RecipientType.TO, addresses);
 
-		Transport.send(message);
+    Transport.send(message);
 
-	}
+  }
 
-	/**
-	 * Create a JavaMail message object from a specified configuration
-	 * 
-	 * @param configuration
-	 *            A configuration object that was created from VelocityMail
-	 *            properties
-	 * 
-	 * @param context
-	 *            The velocity context to use to merge the email template
-	 * 
-	 * @throws Exception
-	 */
-	protected Message createMessage(ExtendedProperties configuration,
-			Context context) throws Exception {
-		String host = configuration.getString("host");
-		Properties properties = new Properties();
-		properties.put("mail.smtp.host", host);
-		Session session = Session.getInstance(properties);
+  /**
+   * Create a JavaMail message object from a specified configuration
+   * 
+   * @param configuration
+   *          A configuration object that was created from VelocityMail
+   *          properties
+   * 
+   * @param context
+   *          The velocity context to use to merge the email template
+   * 
+   * @throws Exception
+   */
+  protected Message createMessage(ExtendedProperties configuration, Context context) throws Exception {
+    String host = configuration.getString("host");
+    Properties properties = new Properties();
+    properties.put("mail.smtp.host", host);
+    Session session = Session.getInstance(properties);
 
-		MimeMessage result = new MimeMessage(session);
+    MimeMessage result = new MimeMessage(session);
 
-		String subject = evaluate(configuration, "subject", context);
-		result.setSubject(subject, INPUT_ENCODING);
+    String subject = evaluate(configuration, "subject", context);
+    result.setSubject(subject, INPUT_ENCODING);
 
-		String fromAddr = evaluate(configuration, "from.address", context);
-		String fromName = evaluate(configuration, "from.name", context);
-		InternetAddress fromAddress = new InternetAddress(fromAddr, fromName);
-		result.setFrom(fromAddress);
+    String fromAddr = evaluate(configuration, "from.address", context);
+    String fromName = evaluate(configuration, "from.name", context);
+    InternetAddress fromAddress = new InternetAddress(fromAddr, fromName);
+    result.setFrom(fromAddress);
 
-		return result;
-	}
+    return result;
+  }
 
-	/**
-	 * Merge the email template(s) using the velocity context and add the
-	 * content to the JavaMail message object
-	 * 
-	 * @param message
-	 *            The message that will receive the message content
-	 * 
-	 * @param configuration
-	 *            The configuration to use
-	 * 
-	 * @param context
-	 *            The velocity context that will be used to merge the mail
-	 *            templates
-	 * 
-	 * @throws Exception
-	 */
-	protected void setMessageContent(Message message,
-			ExtendedProperties configuration, Context context) throws Exception {
-		ExtendedProperties content = configuration.subset("message");
-		Enumeration<String> keys = content.keys();
+  /**
+   * Merge the email template(s) using the velocity context and add the content
+   * to the JavaMail message object
+   * 
+   * @param message
+   *          The message that will receive the message content
+   * 
+   * @param configuration
+   *          The configuration to use
+   * 
+   * @param context
+   *          The velocity context that will be used to merge the mail templates
+   * 
+   * @throws Exception
+   */
+  protected void setMessageContent(Message message, ExtendedProperties configuration, Context context) throws Exception {
+    ExtendedProperties content = configuration.subset("message");
+    Enumeration<String> keys = content.keys();
 
-		Multipart multipart = new MimeMultipart();
+    Multipart multipart = new MimeMultipart();
 
-		while (keys.hasMoreElements()) {
-			String key = keys.nextElement();
-			String templateName = content.getString(key);
-			Template template = Velocity.getTemplate(templateName);
-			StringWriter writer = new StringWriter();
-			template.merge(context, writer);
-			writer.close();
-			BodyPart bodyPart = new MimeBodyPart();
-			bodyPart.setContent(writer.toString(), key);
-			multipart.addBodyPart(bodyPart);
-		}
+    while (keys.hasMoreElements()) {
+      String key = keys.nextElement();
+      String templateName = content.getString(key);
+      Template template = Velocity.getTemplate(templateName);
+      StringWriter writer = new StringWriter();
+      template.merge(context, writer);
+      writer.close();
+      BodyPart bodyPart = new MimeBodyPart();
+      bodyPart.setContent(writer.toString(), key);
+      multipart.addBodyPart(bodyPart);
+    }
 
-		message.setContent(multipart);
+    message.setContent(multipart);
 
-	}
+  }
 
-	/**
-	 * Helper method to evaluate a string
-	 * 
-	 * @param configuration
-	 * @param property
-	 * @param context
-	 * @return the evaluation
-	 * @throws Exception
-	 */
-	protected String evaluate(ExtendedProperties configuration,
-			String property, Context context) throws Exception {
-		String subjectTemplate = configuration.getString(property);
-		StringWriter stringWriter = new StringWriter();
-		Velocity.evaluate(context, stringWriter, "email", subjectTemplate);
-		stringWriter.close();
-		return stringWriter.toString();
-	}
+  /**
+   * Helper method to evaluate a string
+   * 
+   * @param configuration
+   * @param property
+   * @param context
+   * @return the evaluation
+   * @throws Exception
+   */
+  protected String evaluate(ExtendedProperties configuration, String property, Context context) throws Exception {
+    String subjectTemplate = configuration.getString(property);
+    StringWriter stringWriter = new StringWriter();
+    Velocity.evaluate(context, stringWriter, "email", subjectTemplate);
+    stringWriter.close();
+    return stringWriter.toString();
+  }
 
-	/**
-	 * Get the configuration for a given configuration name
-	 * 
-	 * @param name
-	 * @return the extended properties of the configuration subset
-	 */
-	protected ExtendedProperties getConfiguration(String name) {
-		ExtendedProperties config = (ExtendedProperties) configurations
-				.get(name);
-		if (config == null) {
-			config = properties.subset(name);
-			configurations.put(name, config);
-		}
-		return config;
-	}
+  /**
+   * Get the configuration for a given configuration name
+   * 
+   * @param name
+   * @return the extended properties of the configuration subset
+   */
+  protected ExtendedProperties getConfiguration(String name) {
+    ExtendedProperties config = (ExtendedProperties) configurations.get(name);
+    if (config == null) {
+      config = properties.subset(name);
+      configurations.put(name, config);
+    }
+    return config;
+  }
 
-	public void init(RuntimeServices arg0) throws Exception {
-		logger.info("Velocity log enabled");
-	}
+  public void init(RuntimeServices arg0) throws Exception {
+    logger.info("Velocity log enabled");
+  }
 
-	public boolean isLevelEnabled(int arg0) {
-		// All log levels enabled
-		return true;
-	}
+  public boolean isLevelEnabled(int arg0) {
+    // All log levels enabled
+    return true;
+  }
 
-	public void log(int level, String message) {
-		switch (level) {
-		case LogChute.DEBUG_ID:
-			logger.debug(message);
-			break;
-		case LogChute.ERROR_ID:
-			logger.error(message);
-			break;
-		case LogChute.INFO_ID:
-			logger.info(message);
-			break;
-		case LogChute.TRACE_ID:
-			logger.trace(message);
-			break;
-		case LogChute.WARN_ID:
-			logger.warn(message);
-			break;
-		default:
-			logger.error(message);
-			break;
-		}
+  public void log(int level, String message) {
+    switch (level) {
+      case LogChute.DEBUG_ID:
+        logger.debug(message);
+        break;
+      case LogChute.ERROR_ID:
+        logger.error(message);
+        break;
+      case LogChute.INFO_ID:
+        logger.info(message);
+        break;
+      case LogChute.TRACE_ID:
+        logger.trace(message);
+        break;
+      case LogChute.WARN_ID:
+        logger.warn(message);
+        break;
+      default:
+        logger.error(message);
+        break;
+    }
 
-	}
+  }
 
-	public void log(int level, String message, Throwable caught) {
-		switch (level) {
-		case LogChute.DEBUG_ID:
-			logger.debug(message, caught);
-			break;
-		case LogChute.ERROR_ID:
-			logger.error(message, caught);
-			break;
-		case LogChute.INFO_ID:
-			logger.info(message, caught);
-			break;
-		case LogChute.TRACE_ID:
-			logger.trace(message, caught);
-			break;
-		case LogChute.WARN_ID:
-			logger.warn(message, caught);
-			break;
-		default:
-			logger.error(message, caught);
-			break;
-		}
+  public void log(int level, String message, Throwable caught) {
+    switch (level) {
+      case LogChute.DEBUG_ID:
+        logger.debug(message, caught);
+        break;
+      case LogChute.ERROR_ID:
+        logger.error(message, caught);
+        break;
+      case LogChute.INFO_ID:
+        logger.info(message, caught);
+        break;
+      case LogChute.TRACE_ID:
+        logger.trace(message, caught);
+        break;
+      case LogChute.WARN_ID:
+        logger.warn(message, caught);
+        break;
+      default:
+        logger.error(message, caught);
+        break;
+    }
 
-	}
+  }
 
 }

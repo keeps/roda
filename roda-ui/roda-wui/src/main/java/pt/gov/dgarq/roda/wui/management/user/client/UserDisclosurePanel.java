@@ -100,37 +100,37 @@ public class UserDisclosurePanel extends SimplePanel implements AlphabetListItem
           UserManagementService.Util.getInstance().getUser(UserDisclosurePanel.this.user.getName(),
             new AsyncCallback<RodaUser>() {
 
-            public void onFailure(Throwable caught) {
-              logger.error("Error getting user " + UserDisclosurePanel.this.user.getName(), caught);
-            }
-
-            public void onSuccess(RodaUser user) {
-              Set<String> groups = user.getDirectGroups();
-              Iterator<String> it = groups.iterator();
-              while (it.hasNext()) {
-                String groupname = it.next();
-                final GroupMiniPanel groupPanel = new GroupMiniPanel(groupname);
-                groupPanel.addChangeListener(new ChangeListener() {
-
-                  public void onChange(Widget sender) {
-                    if (selectedGroupPanel != null) {
-                      selectedGroupPanel.setSelected(false);
-                    }
-                    if (groupPanel.isSelected()) {
-                      selectedGroupPanel = groupPanel;
-                    } else {
-                      selectedGroupPanel = null;
-                    }
-                    UserDisclosurePanel.this.onChange();
-                  }
-
-                });
-                groupList.add(groupPanel.getWidget());
-
+              public void onFailure(Throwable caught) {
+                logger.error("Error getting user " + UserDisclosurePanel.this.user.getName(), caught);
               }
-              loaded = true;
-            }
-          });
+
+              public void onSuccess(RodaUser user) {
+                Set<String> groups = user.getDirectGroups();
+                Iterator<String> it = groups.iterator();
+                while (it.hasNext()) {
+                  String groupname = it.next();
+                  final GroupMiniPanel groupPanel = new GroupMiniPanel(groupname);
+                  groupPanel.addChangeListener(new ChangeListener() {
+
+                    public void onChange(Widget sender) {
+                      if (selectedGroupPanel != null) {
+                        selectedGroupPanel.setSelected(false);
+                      }
+                      if (groupPanel.isSelected()) {
+                        selectedGroupPanel = groupPanel;
+                      } else {
+                        selectedGroupPanel = null;
+                      }
+                      UserDisclosurePanel.this.onChange();
+                    }
+
+                  });
+                  groupList.add(groupPanel.getWidget());
+
+                }
+                loaded = true;
+              }
+            });
         }
       }
 
@@ -152,8 +152,8 @@ public class UserDisclosurePanel extends SimplePanel implements AlphabetListItem
 
   private HorizontalPanel createHeader() {
     HorizontalPanel layout = new HorizontalPanel();
-    userIcon = user.isActive() ? userManagementImageBundle.user().createImage()
-      : userManagementImageBundle.inactiveUser().createImage();
+    userIcon = user.isActive() ? userManagementImageBundle.user().createImage() : userManagementImageBundle
+      .inactiveUser().createImage();
     userName = new Label(user.getName());
     userFullName = new Label(user.getFullName());
     viewActionsReport = commonImageBundle.report().createImage();

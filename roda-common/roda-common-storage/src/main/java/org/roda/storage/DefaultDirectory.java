@@ -13,25 +13,24 @@ import java.util.Set;
  */
 public class DefaultDirectory extends AbstractResource implements Directory {
 
-	public DefaultDirectory(StoragePath storagePath,
-			Map<String, Set<String>> metadata) {
-		super(storagePath, metadata, true);
-	}
+  public DefaultDirectory(StoragePath storagePath, Map<String, Set<String>> metadata) {
+    super(storagePath, metadata, true);
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("DefaultDirectory [getStoragePath()=");
-		builder.append(getStoragePath());
-		builder.append(", getMetadata()=");
-		builder.append(getMetadata());
-		builder.append("]");
-		return builder.toString();
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    builder.append("DefaultDirectory [getStoragePath()=");
+    builder.append(getStoragePath());
+    builder.append(", getMetadata()=");
+    builder.append(getMetadata());
+    builder.append("]");
+    return builder.toString();
+  }
 
 }

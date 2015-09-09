@@ -77,8 +77,7 @@ public class AIPList extends AsyncTableCell<SimpleDescriptionObject> {
       }
     };
 
-    dateInitialColumn = new Column<SimpleDescriptionObject, Date>(
-      new DateCell(DateTimeFormat.getFormat("yyyy-MM-dd"))) {
+    dateInitialColumn = new Column<SimpleDescriptionObject, Date>(new DateCell(DateTimeFormat.getFormat("yyyy-MM-dd"))) {
       @Override
       public Date getValue(SimpleDescriptionObject sdo) {
         return sdo != null ? sdo.getDateInitial() : null;

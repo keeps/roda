@@ -20,25 +20,24 @@ import java.util.Set;
  * */
 public class DefaultContainer extends AbstractEntity implements Container {
 
-	public DefaultContainer(StoragePath storagePath,
-			Map<String, Set<String>> metadata) {
-		super(storagePath, metadata);
-	}
+  public DefaultContainer(StoragePath storagePath, Map<String, Set<String>> metadata) {
+    super(storagePath, metadata);
+  }
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("DefaultContainer [getStoragePath()=");
-		builder.append(getStoragePath());
-		builder.append(", getMetadata()=");
-		builder.append(getMetadata());
-		builder.append("]");
-		return builder.toString();
-	}
-	
-	
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    builder.append("DefaultContainer [getStoragePath()=");
+    builder.append(getStoragePath());
+    builder.append(", getMetadata()=");
+    builder.append(getMetadata());
+    builder.append("]");
+    return builder.toString();
+  }
 
 }

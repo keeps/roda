@@ -54,8 +54,8 @@ public class PremisEventHelper {
    * @throws PremisMetadataException
    *           if the PREMIS XML document is invalid.
    */
-  public static PremisEventHelper newInstance(File premisFile)
-    throws PremisMetadataException, FileNotFoundException, IOException {
+  public static PremisEventHelper newInstance(File premisFile) throws PremisMetadataException, FileNotFoundException,
+    IOException {
     FileInputStream premisInputStream = new FileInputStream(premisFile);
     PremisEventHelper instance = newInstance(premisInputStream);
     premisInputStream.close();
@@ -77,8 +77,8 @@ public class PremisEventHelper {
    * @throws PremisMetadataException
    *           if the PREMIS XML document is invalid.
    */
-  public static PremisEventHelper newInstance(InputStream premisInputStream)
-    throws PremisMetadataException, IOException {
+  public static PremisEventHelper newInstance(InputStream premisInputStream) throws PremisMetadataException,
+    IOException {
 
     try {
 

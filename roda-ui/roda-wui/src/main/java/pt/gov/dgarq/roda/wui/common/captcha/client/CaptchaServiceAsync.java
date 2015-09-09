@@ -11,13 +11,13 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  */
 public interface CaptchaServiceAsync {
 
-	/**
-	 * Submit the captcha response to server
-	 * 
-	 * @param response
-	 *            the response to the captcha challenge
-	 * @return Boolean.TRUE if response is correct
-	 */
-	public void submit(String response, AsyncCallback<Boolean> callback);
+  /**
+   * Submit the captcha response to server
+   * 
+   * @param response
+   *          the response to the captcha challenge
+   * @return Boolean.TRUE if response is correct
+   */
+  public void submit(String response, AsyncCallback<Boolean> callback);
 
 }

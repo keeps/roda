@@ -101,7 +101,7 @@ public interface CommonConstants extends Constants {
   public String output();
 
   // Accessibility
-  
+
   @DefaultStringValue("Click here")
   public String focusPanelTitle();
 

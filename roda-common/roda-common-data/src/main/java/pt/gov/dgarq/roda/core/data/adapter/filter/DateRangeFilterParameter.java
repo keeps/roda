@@ -9,33 +9,33 @@ import pt.gov.dgarq.roda.core.common.RodaConstants.DateGranularity;
  */
 public class DateRangeFilterParameter extends RangeFilterParameter<Date> {
 
-	private static final long serialVersionUID = -8039972534809175118L;
+  private static final long serialVersionUID = -8039972534809175118L;
 
-	private DateGranularity granularity = DateGranularity.DAY;
+  private DateGranularity granularity = DateGranularity.DAY;
 
-	public DateRangeFilterParameter() {
-		super();
-	}
+  public DateRangeFilterParameter() {
+    super();
+  }
 
-	public DateRangeFilterParameter(RangeFilterParameter<Date> rangeFilterParameter) {
-		super(rangeFilterParameter);
-	}
+  public DateRangeFilterParameter(RangeFilterParameter<Date> rangeFilterParameter) {
+    super(rangeFilterParameter);
+  }
 
-	public DateRangeFilterParameter(String name, Date fromValue, Date toValue) {
-		super(name, fromValue, toValue);
-	}
+  public DateRangeFilterParameter(String name, Date fromValue, Date toValue) {
+    super(name, fromValue, toValue);
+  }
 
-	public DateRangeFilterParameter(String name, Date fromValue, Date toValue, DateGranularity granularity) {
-		super(name, fromValue, toValue);
-		this.setGranularity(granularity);
-	}
+  public DateRangeFilterParameter(String name, Date fromValue, Date toValue, DateGranularity granularity) {
+    super(name, fromValue, toValue);
+    this.setGranularity(granularity);
+  }
 
-	public DateGranularity getGranularity() {
-		return granularity;
-	}
+  public DateGranularity getGranularity() {
+    return granularity;
+  }
 
-	public void setGranularity(DateGranularity granularity) {
-		this.granularity = granularity;
-	}
+  public void setGranularity(DateGranularity granularity) {
+    this.granularity = granularity;
+  }
 
 }

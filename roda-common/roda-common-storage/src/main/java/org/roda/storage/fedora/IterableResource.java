@@ -26,78 +26,67 @@ import org.roda.storage.fedora.utils.FedoraUtils;
  * @author Hélder Silva <hsilva@keep.pt>
  * */
 public class IterableResource implements ClosableIterable<Resource> {
-	private FedoraRepository repository;
-	private Iterator<FedoraResource> fedoraResources;
+  private FedoraRepository repository;
+  private Iterator<FedoraResource> fedoraResources;
 
-	public IterableResource(FedoraRepository repository, StoragePath storagePath)
-			throws StorageServiceException {
-		this.repository = repository;
-		try {
-			fedoraResources = repository
-					.getObject(FedoraUtils.createFedoraPath(storagePath))
-					.getChildren(null).iterator();
-		} catch (ForbiddenException e) {
-			throw new StorageServiceException(e.getMessage(),
-					StorageServiceException.FORBIDDEN, e);
-		} catch (BadRequestException e) {
-			throw new StorageServiceException(e.getMessage(),
-					StorageServiceException.BAD_REQUEST, e);
-		} catch (NotFoundException e) {
-			throw new StorageServiceException(e.getMessage(),
-					StorageServiceException.NOT_FOUND, e);
-		} catch (FedoraException e) {
-			throw new StorageServiceException(e.getMessage(),
-					StorageServiceException.BAD_REQUEST, e);
-		}
-	}
+  public IterableResource(FedoraRepository repository, StoragePath storagePath) throws StorageServiceException {
+    this.repository = repository;
+    try {
+      fedoraResources = repository.getObject(FedoraUtils.createFedoraPath(storagePath)).getChildren(null).iterator();
+    } catch (ForbiddenException e) {
+      throw new StorageServiceException(e.getMessage(), StorageServiceException.FORBIDDEN, e);
+    } catch (BadRequestException e) {
+      throw new StorageServiceException(e.getMessage(), StorageServiceException.BAD_REQUEST, e);
+    } catch (NotFoundException e) {
+      throw new StorageServiceException(e.getMessage(), StorageServiceException.NOT_FOUND, e);
+    } catch (FedoraException e) {
+      throw new StorageServiceException(e.getMessage(), StorageServiceException.BAD_REQUEST, e);
+    }
+  }
 
-	@Override
-	public Iterator<Resource> iterator() {
-		return new ResourceIterator(repository, fedoraResources);
-	}
+  @Override
+  public Iterator<Resource> iterator() {
+    return new ResourceIterator(repository, fedoraResources);
+  }
 
-	public class ResourceIterator implements Iterator<Resource> {
-		private Iterator<FedoraResource> fedoraResources;
+  public class ResourceIterator implements Iterator<Resource> {
+    private Iterator<FedoraResource> fedoraResources;
 
-		public ResourceIterator(FedoraRepository repository,
-				Iterator<FedoraResource> fedoraResources) {
-			this.fedoraResources = fedoraResources;
-		}
+    public ResourceIterator(FedoraRepository repository, Iterator<FedoraResource> fedoraResources) {
+      this.fedoraResources = fedoraResources;
+    }
 
-		@Override
-		public boolean hasNext() {
-			if (fedoraResources == null) {
-				return false;
-			}
-			return fedoraResources.hasNext();
+    @Override
+    public boolean hasNext() {
+      if (fedoraResources == null) {
+        return false;
+      }
+      return fedoraResources.hasNext();
 
-		}
+    }
 
-		@Override
-		public Resource next() {
-			try {
-				FedoraResource resource = fedoraResources.next();
-				if (resource instanceof FedoraDatastream) {
-					return FedoraConversionUtils
-							.fedoraDatastreamToBinary((FedoraDatastream) resource);
-				} else {
-					return FedoraConversionUtils.fedoraObjectToDirectory(
-							repository.getRepositoryUrl(),
-							(FedoraObject) resource);
-				}
-			} catch (StorageServiceException e) {
-				return null;
-			}
-		}
+    @Override
+    public Resource next() {
+      try {
+        FedoraResource resource = fedoraResources.next();
+        if (resource instanceof FedoraDatastream) {
+          return FedoraConversionUtils.fedoraDatastreamToBinary((FedoraDatastream) resource);
+        } else {
+          return FedoraConversionUtils.fedoraObjectToDirectory(repository.getRepositoryUrl(), (FedoraObject) resource);
+        }
+      } catch (StorageServiceException e) {
+        return null;
+      }
+    }
 
-		@Override
-		public void remove() {
-		}
+    @Override
+    public void remove() {
+    }
 
-	}
+  }
 
-	@Override
-	public void close() throws IOException {
-		// do nothing
-	}
+  @Override
+  public void close() throws IOException {
+    // do nothing
+  }
 }

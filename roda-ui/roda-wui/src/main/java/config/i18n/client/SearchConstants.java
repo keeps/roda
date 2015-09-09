@@ -11,26 +11,26 @@ import com.google.gwt.i18n.client.Constants;
  */
 public interface SearchConstants extends Constants {
 
-	// Basic Search
-	@DefaultStringValue("Search in the repository:")
-	public String basicSearchInputLabel();
+  // Basic Search
+  @DefaultStringValue("Search in the repository:")
+  public String basicSearchInputLabel();
 
-	@DefaultStringValue("SEARCH")
-	public String basicSearchButtonLabel();
+  @DefaultStringValue("SEARCH")
+  public String basicSearchButtonLabel();
 
-	@DefaultStringValue("Please enter the words to search")
-	public String basicSearchNoKeywords();
+  @DefaultStringValue("Please enter the words to search")
+  public String basicSearchNoKeywords();
 
-	// Advanced Search
+  // Advanced Search
 
-	// Search Results
-	@DefaultStringValue("searching...")
-	public String searching();
+  // Search Results
+  @DefaultStringValue("searching...")
+  public String searching();
 
-	@DefaultStringValue("BROWSE")
-	public String browseResult();
+  @DefaultStringValue("BROWSE")
+  public String browseResult();
 
-	@DefaultStringValue("loading...")
-	public String searchResultLoading();
+  @DefaultStringValue("loading...")
+  public String searchResultLoading();
 
 }

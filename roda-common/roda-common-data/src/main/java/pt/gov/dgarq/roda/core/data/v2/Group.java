@@ -44,8 +44,8 @@ public class Group extends RodaGroup {
    *          the Group to be cloned.
    */
   public Group(Group group) {
-    super(group.getId(), group.getName(), group.getDirectGroups(), group.getAllGroups(), group.getDirectRoles(),
-      group.getAllRoles());
+    super(group.getId(), group.getName(), group.getDirectGroups(), group.getAllGroups(), group.getDirectRoles(), group
+      .getAllRoles());
     setActive(true);
     setMemberUserNames(group.getMemberUserNames());
     setMemberGroupNames(group.getMemberGroupNames());

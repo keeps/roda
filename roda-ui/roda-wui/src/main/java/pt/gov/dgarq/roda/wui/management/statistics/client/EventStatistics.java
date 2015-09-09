@@ -9,57 +9,52 @@ import com.google.gwt.user.client.ui.VerticalPanel;
  */
 public class EventStatistics extends StatisticTab {
 
-	private VerticalPanel layout;
-	private StatisticMiniPanel taskCount;
-	private StatisticMiniPanel taskState;
-	private StatisticMiniPanel instanceCount;
-	private StatisticMiniPanel instanceState;
+  private VerticalPanel layout;
+  private StatisticMiniPanel taskCount;
+  private StatisticMiniPanel taskState;
+  private StatisticMiniPanel instanceCount;
+  private StatisticMiniPanel instanceState;
 
-	/**
-	 * Create new repository statistics
-	 */
-	public EventStatistics() {
-		layout = new VerticalPanel();
-		initWidget(layout);
-	}
+  /**
+   * Create new repository statistics
+   */
+  public EventStatistics() {
+    layout = new VerticalPanel();
+    initWidget(layout);
+  }
 
-	@Override
-	protected boolean init() {
-		boolean ret = false;
-		if (super.init()) {
-			ret = true;
-			taskCount = createStatisticPanel(constants.taskCountTitle(),
-					constants.taskCountDesc(), "tasks", false, AGGREGATION_LAST);
+  @Override
+  protected boolean init() {
+    boolean ret = false;
+    if (super.init()) {
+      ret = true;
+      taskCount = createStatisticPanel(constants.taskCountTitle(), constants.taskCountDesc(), "tasks", false,
+        AGGREGATION_LAST);
 
-			taskState = createStatisticPanel(constants.taskStateTitle(),
-					constants.taskStateDesc(), "tasks\\.state\\..*", true,
-					AGGREGATION_LAST);
+      taskState = createStatisticPanel(constants.taskStateTitle(), constants.taskStateDesc(), "tasks\\.state\\..*",
+        true, AGGREGATION_LAST);
 
-			instanceCount = createStatisticPanel(constants
-					.taskInstanceCountTitle(), constants
-					.taskInstanceCountDesc(), "instances", false,
-					AGGREGATION_LAST);
+      instanceCount = createStatisticPanel(constants.taskInstanceCountTitle(), constants.taskInstanceCountDesc(),
+        "instances", false, AGGREGATION_LAST);
 
-			instanceState = createStatisticPanel(constants
-					.taskInstanceStateTitle(), constants
-					.taskInstanceStateDesc(), "instances\\.state\\..*", true,
-					AGGREGATION_LAST);
+      instanceState = createStatisticPanel(constants.taskInstanceStateTitle(), constants.taskInstanceStateDesc(),
+        "instances\\.state\\..*", true, AGGREGATION_LAST);
 
-			layout.add(taskCount);
-			layout.add(taskState);
-			layout.add(instanceCount);
-			layout.add(instanceState);
+      layout.add(taskCount);
+      layout.add(taskState);
+      layout.add(instanceCount);
+      layout.add(instanceState);
 
-			layout.addStyleName("wui-statistics-events");
+      layout.addStyleName("wui-statistics-events");
 
-		}
-		return ret;
+    }
+    return ret;
 
-	}
+  }
 
-	@Override
-	public String getTabText() {
-		return constants.repositoryStatistics();
-	}
+  @Override
+  public String getTabText() {
+    return constants.repositoryStatistics();
+  }
 
 }

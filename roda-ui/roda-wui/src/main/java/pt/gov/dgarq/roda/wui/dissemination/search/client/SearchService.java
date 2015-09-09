@@ -22,60 +22,57 @@ import com.google.gwt.user.client.rpc.ServiceDefTarget;
  */
 public interface SearchService extends RemoteService {
 
-	/**
-	 * Seach service URI
-	 */
-	public static final String SERVICE_URI = "searchservice";
+  /**
+   * Seach service URI
+   */
+  public static final String SERVICE_URI = "searchservice";
 
-	/**
-	 * Utilities
-	 * 
-	 */
-	public static class Util {
+  /**
+   * Utilities
+   * 
+   */
+  public static class Util {
 
-		/**
-		 * Get service instance
-		 * 
-		 * @return
-		 */
-		public static SearchServiceAsync getInstance() {
+    /**
+     * Get service instance
+     * 
+     * @return
+     */
+    public static SearchServiceAsync getInstance() {
 
-			SearchServiceAsync instance = (SearchServiceAsync) GWT
-					.create(SearchService.class);
-			ServiceDefTarget target = (ServiceDefTarget) instance;
-			target.setServiceEntryPoint(GWT.getModuleBaseURL() + SERVICE_URI);
-			return instance;
-		}
-	}
+      SearchServiceAsync instance = (SearchServiceAsync) GWT.create(SearchService.class);
+      ServiceDefTarget target = (ServiceDefTarget) instance;
+      target.setServiceEntryPoint(GWT.getModuleBaseURL() + SERVICE_URI);
+      return instance;
+    }
+  }
 
-	/**
-	 * Make a basic search
-	 * 
-	 * @param query
-	 * @param hitPageStart
-	 * @param hitPageSize
-	 * @param snippetsMax
-	 * @param fieldMaxLength
-	 * @return
-	 * @throws RODAException 
-	 */
-	public IndexResult<SimpleDescriptionObject> basicSearch(String query, int hitPageStart,
-			int hitPageSize, int snippetsMax, int fieldMaxLength)
-			throws RODAException;
+  /**
+   * Make a basic search
+   * 
+   * @param query
+   * @param hitPageStart
+   * @param hitPageSize
+   * @param snippetsMax
+   * @param fieldMaxLength
+   * @return
+   * @throws RODAException
+   */
+  public IndexResult<SimpleDescriptionObject> basicSearch(String query, int hitPageStart, int hitPageSize,
+    int snippetsMax, int fieldMaxLength) throws RODAException;
 
-	/**
-	 * Make an advanced search
-	 * 
-	 * @param searchParameters
-	 * @param hitPageStart
-	 * @param hitPageSize
-	 * @param snippetsMax
-	 * @param fieldMaxLength
-	 * @return
-	 * @throws RODAException
-	 */
-	public SearchResult advancedSearch(SearchParameter[] searchParameters,
-			int hitPageStart, int hitPageSize, int snippetsMax,
-			int fieldMaxLength) throws RODAException;
+  /**
+   * Make an advanced search
+   * 
+   * @param searchParameters
+   * @param hitPageStart
+   * @param hitPageSize
+   * @param snippetsMax
+   * @param fieldMaxLength
+   * @return
+   * @throws RODAException
+   */
+  public SearchResult advancedSearch(SearchParameter[] searchParameters, int hitPageStart, int hitPageSize,
+    int snippetsMax, int fieldMaxLength) throws RODAException;
 
 }

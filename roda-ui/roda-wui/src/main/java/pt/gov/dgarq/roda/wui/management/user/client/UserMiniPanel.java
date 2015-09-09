@@ -22,121 +22,119 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class UserMiniPanel {
 
-	protected static UserManagementImageBundle userManagementImageBundle = (UserManagementImageBundle) GWT
-			.create(UserManagementImageBundle.class);
+  protected static UserManagementImageBundle userManagementImageBundle = (UserManagementImageBundle) GWT
+    .create(UserManagementImageBundle.class);
 
-	protected final User user;
+  protected final User user;
 
-	protected final AccessibleFocusPanel focus;
+  protected final AccessibleFocusPanel focus;
 
-	protected final HorizontalPanel layout;
+  protected final HorizontalPanel layout;
 
-	protected Image userIcon;
+  protected Image userIcon;
 
-	protected Label userNameLabel;
+  protected Label userNameLabel;
 
-	protected boolean selected;
+  protected boolean selected;
 
-	protected List<ChangeListener> changeListeners;
+  protected List<ChangeListener> changeListeners;
 
-	/**
-	 * Create a new user panel
-	 * 
-	 * @param user
-	 */
-	public UserMiniPanel(User user) {
-		this.user = user;
-		focus = new AccessibleFocusPanel();
-		layout = new HorizontalPanel();
-		userIcon = user.isActive() ? userManagementImageBundle.user()
-				.createImage() : userManagementImageBundle.inactiveUser()
-				.createImage();
-		userNameLabel = new Label(user.getFullName() + " (" + user.getName()
-				+ ")");
-		selected = false;
-		changeListeners = new Vector<ChangeListener>();
+  /**
+   * Create a new user panel
+   * 
+   * @param user
+   */
+  public UserMiniPanel(User user) {
+    this.user = user;
+    focus = new AccessibleFocusPanel();
+    layout = new HorizontalPanel();
+    userIcon = user.isActive() ? userManagementImageBundle.user().createImage() : userManagementImageBundle
+      .inactiveUser().createImage();
+    userNameLabel = new Label(user.getFullName() + " (" + user.getName() + ")");
+    selected = false;
+    changeListeners = new Vector<ChangeListener>();
 
-		focus.setWidget(layout);
-		layout.add(userIcon);
-		layout.add(userNameLabel);
+    focus.setWidget(layout);
+    layout.add(userIcon);
+    layout.add(userNameLabel);
 
-		focus.addClickListener(new ClickListener() {
+    focus.addClickListener(new ClickListener() {
 
-			public void onClick(Widget sender) {
-				UserMiniPanel.this.setSelected(!selected);
-				onChange();
-			}
+      public void onClick(Widget sender) {
+        UserMiniPanel.this.setSelected(!selected);
+        onChange();
+      }
 
-		});
+    });
 
-		focus.setStylePrimaryName("wui-user-mini");
-		layout.addStyleName("user-layout");
-		userIcon.addStyleName("user-icon");
-		userNameLabel.addStyleName("user-label");
-	}
+    focus.setStylePrimaryName("wui-user-mini");
+    layout.addStyleName("user-layout");
+    userIcon.addStyleName("user-icon");
+    userNameLabel.addStyleName("user-label");
+  }
 
-	/**
-	 * Get the user panel widget
-	 * 
-	 * @return the widget
-	 */
-	public Widget getWidget() {
-		return focus;
-	}
+  /**
+   * Get the user panel widget
+   * 
+   * @return the widget
+   */
+  public Widget getWidget() {
+    return focus;
+  }
 
-	/**
-	 * Get the user defined by this panel
-	 * 
-	 * @return the user
-	 */
-	public User getUser() {
-		return user;
-	}
+  /**
+   * Get the user defined by this panel
+   * 
+   * @return the user
+   */
+  public User getUser() {
+    return user;
+  }
 
-	/**
-	 * Is this user selected
-	 * 
-	 * @return true if selected, false otherwise
-	 */
-	public boolean isSelected() {
-		return selected;
-	}
+  /**
+   * Is this user selected
+   * 
+   * @return true if selected, false otherwise
+   */
+  public boolean isSelected() {
+    return selected;
+  }
 
-	/**
-	 * Set this selected selected
-	 * 
-	 * @param selected
-	 */
-	public void setSelected(boolean selected) {
-		this.selected = selected;
-		if (selected) {
-			focus.addStyleDependentName("selected");
-		} else {
-			focus.removeStyleDependentName("selected");
-		}
-	}
+  /**
+   * Set this selected selected
+   * 
+   * @param selected
+   */
+  public void setSelected(boolean selected) {
+    this.selected = selected;
+    if (selected) {
+      focus.addStyleDependentName("selected");
+    } else {
+      focus.removeStyleDependentName("selected");
+    }
+  }
 
-	/**
-	 * Add a change listener
-	 * 
-	 * @param listener
-	 */
-	public void addChangeListener(ChangeListener listener) {
-		changeListeners.add(listener);
-	}
+  /**
+   * Add a change listener
+   * 
+   * @param listener
+   */
+  public void addChangeListener(ChangeListener listener) {
+    changeListeners.add(listener);
+  }
 
-	/**
-	 * Remove a change listener
-	 * 
-	 * @param listener
-	 */
-	public void removeChangeListenere(ChangeListener listener) {
-		changeListeners.remove(listener);
-	}
+  /**
+   * Remove a change listener
+   * 
+   * @param listener
+   */
+  public void removeChangeListenere(ChangeListener listener) {
+    changeListeners.remove(listener);
+  }
 
-	protected void onChange() {
-		for (ChangeListener listener : changeListeners) {
-			listener.onChange(getWidget());
-		}
-	}
+  protected void onChange() {
+    for (ChangeListener listener : changeListeners) {
+      listener.onChange(getWidget());
+    }
+  }
 }

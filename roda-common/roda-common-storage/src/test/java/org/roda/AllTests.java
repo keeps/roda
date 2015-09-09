@@ -10,8 +10,8 @@ import org.roda.storage.fedora.FedoraStorageServiceTest;
 import org.roda.storage.fs.FileStorageServiceTest;
 
 @RunWith(Suite.class)
-@SuiteClasses({ IndexServiceTest.class, ModelServiceTest.class, FileStorageServiceTest.class,
-		FedoraStorageServiceTest.class, SolrUtilsTest.class })
+@SuiteClasses({IndexServiceTest.class, ModelServiceTest.class, FileStorageServiceTest.class,
+  FedoraStorageServiceTest.class, SolrUtilsTest.class})
 public class AllTests {
 
 }

@@ -205,7 +205,7 @@
 				<module>roda-ui/roda-wui</module>
 			</modules>
 		</profile>
-		
+
 		<!-- <profile> -->
 		<!-- <id>create-installer</id> -->
 		<!-- <modules> -->
@@ -235,14 +235,15 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>net.revelc.code</groupId>
+				<artifactId>formatter-maven-plugin</artifactId>
+				<version>0.5.2</version>
+				<configuration>
+					<configFile>${session.executionRootDirectory}/code-style/eclipse_formatter.xml</configFile>
+				</configuration>
+			</plugin>
 		</plugins>
-		<!--<plugins> <plugin> <groupId>com.googlecode.maven-java-formatter-plugin</groupId> 
-			<artifactId>maven-java-formatter-plugin</artifactId> <version>0.4</version> 
-			<configuration> <configFile>${session.executionRootDirectory}/code-style/eclipse_formatter.xml</configFile> 
-			<excludes> <exclude>pt/gov/dgarq/roda/core/stubs/</exclude> <exclude>pt/gov/dgarq/roda/migrator/stubs/</exclude> 
-			</excludes> </configuration> <executions> <execution> <phase>process-resources</phase> 
-			<goals> <goal>format</goal> </goals> </execution> </executions> </plugin> 
-			</plugins> -->
 		<pluginManagement>
 			<plugins>
 				<plugin>

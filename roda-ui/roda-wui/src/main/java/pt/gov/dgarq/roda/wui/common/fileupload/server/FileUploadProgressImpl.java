@@ -8,20 +8,18 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
  * @author Luis Faria
  * 
  */
-public class FileUploadProgressImpl extends RemoteServiceServlet implements
-		FileUploadProgress {
+public class FileUploadProgressImpl extends RemoteServiceServlet implements FileUploadProgress {
 
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	public double getProgress() {
-		double ret = -1;
-		Object attribute = getThreadLocalRequest().getSession().getAttribute(
-				FileUpload.UPLOADED_PROGRESS_ATTRIBUTE);
-		if (attribute != null) {
-			ret = (Double) attribute;
-		}
+  public double getProgress() {
+    double ret = -1;
+    Object attribute = getThreadLocalRequest().getSession().getAttribute(FileUpload.UPLOADED_PROGRESS_ATTRIBUTE);
+    if (attribute != null) {
+      ret = (Double) attribute;
+    }
 
-		return ret;
-	}
+    return ret;
+  }
 
 }

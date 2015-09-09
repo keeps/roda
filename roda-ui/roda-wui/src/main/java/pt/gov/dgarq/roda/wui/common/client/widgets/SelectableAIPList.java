@@ -23,145 +23,144 @@ import pt.gov.dgarq.roda.wui.main.client.BreadcrumbPanel;
 
 public class SelectableAIPList extends FlowPanel implements HasValueChangeHandlers<SimpleDescriptionObject> {
 
-	private static final Filter ROOT_FILTER = new Filter(new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID));
+  private static final Filter ROOT_FILTER = new Filter(new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID));
 
-	private SimpleDescriptionObject selected;
+  private SimpleDescriptionObject selected;
 
-	private Label selectedLabel;
-	
-	private BreadcrumbPanel breadcrumbPanel;
-	private List<BreadcrumbItem> breadcrumbs;
+  private Label selectedLabel;
 
-	private AIPList aipList;
+  private BreadcrumbPanel breadcrumbPanel;
+  private List<BreadcrumbItem> breadcrumbs;
 
-	private Filter filter;
-	private Filter innerFilter;
+  private AIPList aipList;
 
-	public SelectableAIPList() {
-		super();
+  private Filter filter;
+  private Filter innerFilter;
 
-		selected = null;
-		filter = null;
-		innerFilter = ROOT_FILTER;
+  public SelectableAIPList() {
+    super();
 
-		aipList = new AIPList();
+    selected = null;
+    filter = null;
+    innerFilter = ROOT_FILTER;
 
-		aipList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
+    aipList = new AIPList();
 
-			@Override
-			public void onSelectionChange(SelectionChangeEvent event) {
-				final SimpleDescriptionObject sdo = aipList.getSelectionModel().getSelectedObject();
-				if (sdo != null) {
-					final int index = breadcrumbs.size();
-					BreadcrumbItem breadcrumbItem = new BreadcrumbItem(sdo.getTitle(), new Command() {
+    aipList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
 
-						@Override
-						public void execute() {
-							select(sdo);
-							removeAfter(index);
-						}
+      @Override
+      public void onSelectionChange(SelectionChangeEvent event) {
+        final SimpleDescriptionObject sdo = aipList.getSelectionModel().getSelectedObject();
+        if (sdo != null) {
+          final int index = breadcrumbs.size();
+          BreadcrumbItem breadcrumbItem = new BreadcrumbItem(sdo.getTitle(), new Command() {
 
-					});
-					breadcrumbs.add(breadcrumbItem);
-					breadcrumbPanel.updatePath(breadcrumbs);
-					select(sdo);
-				}
-			}
-		});
+            @Override
+            public void execute() {
+              select(sdo);
+              removeAfter(index);
+            }
 
-		breadcrumbPanel = new BreadcrumbPanel();
-		breadcrumbs = new ArrayList<BreadcrumbItem>();
-		breadcrumbs.add(
-				new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-circle-o'></i>"), new Command() {
+          });
+          breadcrumbs.add(breadcrumbItem);
+          breadcrumbPanel.updatePath(breadcrumbs);
+          select(sdo);
+        }
+      }
+    });
 
-					@Override
-					public void execute() {
-						selectRoot();
-						removeAfter(0);
-					}
-				}));
+    breadcrumbPanel = new BreadcrumbPanel();
+    breadcrumbs = new ArrayList<BreadcrumbItem>();
+    breadcrumbs.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-circle-o'></i>"), new Command() {
 
-		selectedLabel = new Label("Selected:");
-		
-		add(selectedLabel);
-		add(breadcrumbPanel);
-		
-		add(aipList);
+      @Override
+      public void execute() {
+        selectRoot();
+        removeAfter(0);
+      }
+    }));
 
-		breadcrumbPanel.updatePath(breadcrumbs);
-		
-		selectedLabel.addStyleName("selectableAipList-selectedLabel");
-		breadcrumbPanel.addStyleName("selectableAipList-breadcrumb");
-		
-		updateVisibles();
+    selectedLabel = new Label("Selected:");
 
-	}
+    add(selectedLabel);
+    add(breadcrumbPanel);
 
-	protected void removeAfter(int index) {
-		int size = breadcrumbs.size();
-		if (index < size) {
-			for (int i = size - 1; i > index; i--) {
-				breadcrumbs.remove(i);
-			}
-		}
-		breadcrumbPanel.updatePath(breadcrumbs);
-	}
+    add(aipList);
 
-	private void select(SimpleDescriptionObject sdo) {
-		if (sdo != null) {
-			selected = sdo;
-			Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, sdo.getId()));
-			setInnerFilter(filter);
-			ValueChangeEvent.fire(this, sdo);
-			updateVisibles();
-		}
-	}
+    breadcrumbPanel.updatePath(breadcrumbs);
 
-	private void selectRoot() {
-		setInnerFilter(ROOT_FILTER);
-		selected = null;
-		ValueChangeEvent.fire(this, null);
-		updateVisibles();
-	}
-	
-	private void updateVisibles() {
-		selectedLabel.setVisible(selected != null);
-		breadcrumbPanel.setVisible(selected != null);
-	}
+    selectedLabel.addStyleName("selectableAipList-selectedLabel");
+    breadcrumbPanel.addStyleName("selectableAipList-breadcrumb");
 
-	public SimpleDescriptionObject getSelected() {
-		return selected;
-	}
+    updateVisibles();
 
-	public Filter getFilter() {
-		return filter;
-	}
+  }
 
-	public void setFilter(Filter filter) {
-		this.filter = filter;
-		refresh();
-	}
+  protected void removeAfter(int index) {
+    int size = breadcrumbs.size();
+    if (index < size) {
+      for (int i = size - 1; i > index; i--) {
+        breadcrumbs.remove(i);
+      }
+    }
+    breadcrumbPanel.updatePath(breadcrumbs);
+  }
 
-	public Filter getInnerFilter() {
-		return innerFilter;
-	}
+  private void select(SimpleDescriptionObject sdo) {
+    if (sdo != null) {
+      selected = sdo;
+      Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, sdo.getId()));
+      setInnerFilter(filter);
+      ValueChangeEvent.fire(this, sdo);
+      updateVisibles();
+    }
+  }
 
-	public void setInnerFilter(Filter innerFilter) {
-		this.innerFilter = innerFilter;
-		refresh();
-	}
+  private void selectRoot() {
+    setInnerFilter(ROOT_FILTER);
+    selected = null;
+    ValueChangeEvent.fire(this, null);
+    updateVisibles();
+  }
 
-	private void refresh() {
-		Filter composedFilter = new Filter(innerFilter);
-		if (filter != null) {
-			composedFilter.add(filter.getParameters());
-		}
-		aipList.setFilter(composedFilter);
-	}
+  private void updateVisibles() {
+    selectedLabel.setVisible(selected != null);
+    breadcrumbPanel.setVisible(selected != null);
+  }
 
-	@Override
-	public HandlerRegistration addValueChangeHandler(ValueChangeHandler<SimpleDescriptionObject> handler) {
-		return addHandler(handler, ValueChangeEvent.getType());
-	}
+  public SimpleDescriptionObject getSelected() {
+    return selected;
+  }
+
+  public Filter getFilter() {
+    return filter;
+  }
+
+  public void setFilter(Filter filter) {
+    this.filter = filter;
+    refresh();
+  }
+
+  public Filter getInnerFilter() {
+    return innerFilter;
+  }
+
+  public void setInnerFilter(Filter innerFilter) {
+    this.innerFilter = innerFilter;
+    refresh();
+  }
+
+  private void refresh() {
+    Filter composedFilter = new Filter(innerFilter);
+    if (filter != null) {
+      composedFilter.add(filter.getParameters());
+    }
+    aipList.setFilter(composedFilter);
+  }
+
+  @Override
+  public HandlerRegistration addValueChangeHandler(ValueChangeHandler<SimpleDescriptionObject> handler) {
+    return addHandler(handler, ValueChangeEvent.getType());
+  }
 
 }

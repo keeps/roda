@@ -9,11 +9,11 @@ package pt.gov.dgarq.roda.wui.common.client;
  */
 public class PrintReportException extends Exception {
 
-	public PrintReportException() {
-	}
+  public PrintReportException() {
+  }
 
-	public PrintReportException(String arg0) {
-		super(arg0);
-	}
+  public PrintReportException(String arg0) {
+    super(arg0);
+  }
 
 }

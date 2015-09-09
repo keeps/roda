@@ -11,15 +11,15 @@ import com.google.gwt.i18n.client.Constants;
  */
 public interface LoadingConstants extends Constants {
 
-	/**
-	 * 
-	 * @return Loading title
-	 */
-	public String loadingTitle();
+  /**
+   * 
+   * @return Loading title
+   */
+  public String loadingTitle();
 
-	/**
-	 * 
-	 * @return Loading description
-	 */
-	public String loadingDescription();
+  /**
+   * 
+   * @return Loading description
+   */
+  public String loadingDescription();
 }

@@ -15,76 +15,75 @@ import com.google.gwt.user.client.ui.VerticalPanel;
  */
 public class Legends extends Composite {
 
-	private static final boolean DEFAULT_VERTICAL = true;
+  private static final boolean DEFAULT_VERTICAL = true;
 
-	private final boolean vertical;
+  private final boolean vertical;
 
-	private Panel layout;
+  private Panel layout;
 
-	/**
-	 * Create a new legends
-	 */
-	public Legends() {
-		this(DEFAULT_VERTICAL);
-	}
+  /**
+   * Create a new legends
+   */
+  public Legends() {
+    this(DEFAULT_VERTICAL);
+  }
 
-	/**
-	 * Create a new legends
-	 * 
-	 * @param vertical
-	 */
-	public Legends(boolean vertical) {
-		this.vertical = vertical;
+  /**
+   * Create a new legends
+   * 
+   * @param vertical
+   */
+  public Legends(boolean vertical) {
+    this.vertical = vertical;
 
-		if (vertical) {
-			layout = new VerticalPanel();
-		} else {
-			layout = new FlowPanel();
-		}
+    if (vertical) {
+      layout = new VerticalPanel();
+    } else {
+      layout = new FlowPanel();
+    }
 
-		initWidget(layout);
+    initWidget(layout);
 
-		layout.setStylePrimaryName("wui-statistic-legends");
+    layout.setStylePrimaryName("wui-statistic-legends");
 
-		if (vertical) {
-			layout.addStyleDependentName("vertical");
-		} else {
-			layout.addStyleDependentName("horizontal");
-		}
+    if (vertical) {
+      layout.addStyleDependentName("vertical");
+    } else {
+      layout.addStyleDependentName("horizontal");
+    }
 
-	}
+  }
 
-	/**
-	 * Is orientation vertical
-	 * 
-	 * @return true if vertical, false if horizontal
-	 */
-	public boolean isVertical() {
-		return vertical;
-	}
+  /**
+   * Is orientation vertical
+   * 
+   * @return true if vertical, false if horizontal
+   */
+  public boolean isVertical() {
+    return vertical;
+  }
 
-	/**
-	 * Add a new legend
-	 * 
-	 * @param color
-	 *            the color style, e.g. #000000
-	 * @param text
-	 *            the legend text
-	 */
-	public void addLegend(String color, String text) {
-		HTML legend = new HTML("<li class='legend-bullet' style='color: "
-				+ color + "'><span class='legend-text'>" + text
-				+ "</span></li>");
-		legend.addStyleName("legend");
-		layout.add(legend);
-	}
+  /**
+   * Add a new legend
+   * 
+   * @param color
+   *          the color style, e.g. #000000
+   * @param text
+   *          the legend text
+   */
+  public void addLegend(String color, String text) {
+    HTML legend = new HTML("<li class='legend-bullet' style='color: " + color + "'><span class='legend-text'>" + text
+      + "</span></li>");
+    legend.addStyleName("legend");
+    layout.add(legend);
+  }
 
-	/**
-	 * Clear legends list
-	 */
-	public void clear() {
-		layout.clear();
+  /**
+   * Clear legends list
+   */
+  public void clear() {
+    layout.clear();
 
-	}
+  }
 
 }

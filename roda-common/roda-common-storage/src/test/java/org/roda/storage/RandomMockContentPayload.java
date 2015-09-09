@@ -11,32 +11,31 @@ import java.nio.file.StandardCopyOption;
 import org.apache.commons.lang3.RandomStringUtils;
 
 public class RandomMockContentPayload implements ContentPayload {
-	private String content;
-	private Path contentPath;
+  private String content;
+  private Path contentPath;
 
-	public RandomMockContentPayload() {
-		content = RandomStringUtils.randomAlphanumeric(2000);
-		contentPath = null;
-	}
+  public RandomMockContentPayload() {
+    content = RandomStringUtils.randomAlphanumeric(2000);
+    contentPath = null;
+  }
 
-	@Override
-	public InputStream createInputStream() throws IOException {
-		return new ByteArrayInputStream(content.getBytes());
-	}
+  @Override
+  public InputStream createInputStream() throws IOException {
+    return new ByteArrayInputStream(content.getBytes());
+  }
 
-	@Override
-	public void writeToPath(Path path) throws IOException {
-		Files.copy(createInputStream(), path,
-				StandardCopyOption.REPLACE_EXISTING);
-	}
+  @Override
+  public void writeToPath(Path path) throws IOException {
+    Files.copy(createInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+  }
 
-	@Override
-	public URI getURI() throws IOException, UnsupportedOperationException {
-		if (contentPath == null) {
-			contentPath = Files.createTempFile("test", ".tmp");
-			writeToPath(contentPath);
-		}
-		return contentPath.toUri();
-	}
+  @Override
+  public URI getURI() throws IOException, UnsupportedOperationException {
+    if (contentPath == null) {
+      contentPath = Files.createTempFile("test", ".tmp");
+      writeToPath(contentPath);
+    }
+    return contentPath.toUri();
+  }
 
 }

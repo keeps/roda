@@ -196,8 +196,7 @@ public interface UserManagementServiceAsync {
    * @throws RODAException
    * 
    */
-  public void resetPassword(String username, String resetPasswordToken, String newPassword,
-    AsyncCallback<Void> callback);
+  public void resetPassword(String username, String resetPasswordToken, String newPassword, AsyncCallback<Void> callback);
 
   /**
    * Set user log report info

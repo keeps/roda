@@ -673,8 +673,8 @@ public class UserDataPanel extends VerticalPanel implements SourcesChangeEvents 
       nationality.removeStyleName("isWrong");
     }
 
-    if (!email.getText()
-      .matches("^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[_A-Za-z0-9-]+)")) {
+    if (!email.getText().matches(
+      "^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[_A-Za-z0-9-]+)")) {
       valid = false;
       email.addStyleName("isWrong");
     } else {

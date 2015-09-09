@@ -28,142 +28,132 @@ import config.i18n.client.IngestListConstants;
  */
 public class IngestReportPanel {
 
-	private static IngestListConstants constants = (IngestListConstants) GWT
-			.create(IngestListConstants.class);
+  private static IngestListConstants constants = (IngestListConstants) GWT.create(IngestListConstants.class);
 
-	private ClientLogger logger = new ClientLogger(getClass().getName());
+  private ClientLogger logger = new ClientLogger(getClass().getName());
 
-	private SIPState sip;
+  private SIPState sip;
 
-	private final VerticalPanel layout;
+  private final VerticalPanel layout;
 
-	private final HorizontalPanel filenameLayout;
+  private final HorizontalPanel filenameLayout;
 
-	private final Label filenameLabel;
+  private final Label filenameLabel;
 
-	private final Label filenameValue;
+  private final Label filenameValue;
 
-	private final VerticalPanel transitionsLayout;
+  private final VerticalPanel transitionsLayout;
 
-	/**
-	 * Create a new ingest report panel
-	 * 
-	 * @param sip
-	 */
-	public IngestReportPanel(SIPState sip) {
-		this.sip = sip;
-		layout = new VerticalPanel();
+  /**
+   * Create a new ingest report panel
+   * 
+   * @param sip
+   */
+  public IngestReportPanel(SIPState sip) {
+    this.sip = sip;
+    layout = new VerticalPanel();
 
-		filenameLayout = new HorizontalPanel();
-		filenameLabel = new Label(constants.reportFilenameLabel());
-		filenameValue = new Label(sip.getOriginalFilename());
-		filenameLayout.add(filenameLabel);
-		filenameLayout.add(filenameValue);
-		layout.add(filenameLayout);
+    filenameLayout = new HorizontalPanel();
+    filenameLabel = new Label(constants.reportFilenameLabel());
+    filenameValue = new Label(sip.getOriginalFilename());
+    filenameLayout.add(filenameLabel);
+    filenameLayout.add(filenameValue);
+    layout.add(filenameLayout);
 
-		transitionsLayout = new VerticalPanel();
-		layout.add(transitionsLayout);
+    transitionsLayout = new VerticalPanel();
+    layout.add(transitionsLayout);
 
-		SIPStateTransition[] transitions = sip.getStateTransitions();
-		for (int i = 0; i < transitions.length; i++) {
-			transitionsLayout.add(createTransitionPanel(transitions[i]));
-		}
+    SIPStateTransition[] transitions = sip.getStateTransitions();
+    for (int i = 0; i < transitions.length; i++) {
+      transitionsLayout.add(createTransitionPanel(transitions[i]));
+    }
 
-		layout.addStyleName("wui-ingest-report");
-		filenameLayout.addStyleName("report-file");
-		filenameLabel.addStyleName("report-file-label");
-		filenameValue.addStyleName("report-file-value");
-		transitionsLayout.addStyleName("report-transitions");
-	}
+    layout.addStyleName("wui-ingest-report");
+    filenameLayout.addStyleName("report-file");
+    filenameLabel.addStyleName("report-file-label");
+    filenameValue.addStyleName("report-file-value");
+    transitionsLayout.addStyleName("report-transitions");
+  }
 
-	private Widget createTransitionPanel(SIPStateTransition transition) {
+  private Widget createTransitionPanel(SIPStateTransition transition) {
 
-		DisclosurePanel layout;
-		try {
-			layout = new DisclosurePanel(constants.getString("state_"
-					+ transition.getToState()));
-			new Label(constants.getString("state_" + transition.getToState()));
-		} catch (MissingResourceException e) {
-			layout = new DisclosurePanel(transition.getToState());
-		}
+    DisclosurePanel layout;
+    try {
+      layout = new DisclosurePanel(constants.getString("state_" + transition.getToState()));
+      new Label(constants.getString("state_" + transition.getToState()));
+    } catch (MissingResourceException e) {
+      layout = new DisclosurePanel(transition.getToState());
+    }
 
-		Grid content = new Grid(4, 2);
-		Label dateLabel = new Label(constants.reportTransitionDate());
-		Label taskLabel = new Label(constants.reportTransitionTask());
-		Label outcomeLabel = new Label(constants.reportTransitionOutcome());
-		Label outcomeDetailsLabel = new Label(constants
-				.reportTransitionOutcomeDetails());
+    Grid content = new Grid(4, 2);
+    Label dateLabel = new Label(constants.reportTransitionDate());
+    Label taskLabel = new Label(constants.reportTransitionTask());
+    Label outcomeLabel = new Label(constants.reportTransitionOutcome());
+    Label outcomeDetailsLabel = new Label(constants.reportTransitionOutcomeDetails());
 
-		Label dateValue = new Label(Tools.formatDateTimeMs(transition
-				.getDatetime()));
-		Label taskValue;
-		try {
-			taskValue = new Label(constants.getString("task_"
-					+ transition.getTaskID()));
-		} catch (MissingResourceException e) {
-			taskValue = new Label(transition.getTaskID());
-		}
-		Label outcomeValue = new Label(transition.isSuccess() ? constants
-				.reportTransitionSuccess() : constants
-				.reportTransitionFailure());
-		Label outcomeDetailsValue = new Label(transition.getDescription());
+    Label dateValue = new Label(Tools.formatDateTimeMs(transition.getDatetime()));
+    Label taskValue;
+    try {
+      taskValue = new Label(constants.getString("task_" + transition.getTaskID()));
+    } catch (MissingResourceException e) {
+      taskValue = new Label(transition.getTaskID());
+    }
+    Label outcomeValue = new Label(transition.isSuccess() ? constants.reportTransitionSuccess()
+      : constants.reportTransitionFailure());
+    Label outcomeDetailsValue = new Label(transition.getDescription());
 
-		logger.info("outcome details: " + transition.getDescription());
+    logger.info("outcome details: " + transition.getDescription());
 
-		content.setWidget(0, 0, dateLabel);
-		content.setWidget(0, 1, dateValue);
-		content.setWidget(1, 0, taskLabel);
-		content.setWidget(1, 1, taskValue);
-		content.setWidget(2, 0, outcomeLabel);
-		content.setWidget(2, 1, outcomeValue);
-		content.setWidget(3, 0, outcomeDetailsLabel);
-		content.setWidget(3, 1, outcomeDetailsValue);
+    content.setWidget(0, 0, dateLabel);
+    content.setWidget(0, 1, dateValue);
+    content.setWidget(1, 0, taskLabel);
+    content.setWidget(1, 1, taskValue);
+    content.setWidget(2, 0, outcomeLabel);
+    content.setWidget(2, 1, outcomeValue);
+    content.setWidget(3, 0, outcomeDetailsLabel);
+    content.setWidget(3, 1, outcomeDetailsValue);
 
-		layout.setContent(content);
+    layout.setContent(content);
 
-		content.getColumnFormatter().setWidth(1, "100%");
-		content.getColumnFormatter().setStyleName(0,
-				"sip-transition-content-labels");
-		content.getCellFormatter().setVerticalAlignment(3, 0,
-				HasAlignment.ALIGN_TOP);
+    content.getColumnFormatter().setWidth(1, "100%");
+    content.getColumnFormatter().setStyleName(0, "sip-transition-content-labels");
+    content.getCellFormatter().setVerticalAlignment(3, 0, HasAlignment.ALIGN_TOP);
 
-		layout.addStyleName("sip-transition");
-		content.addStyleName("sip-transition-content");
-		dateLabel.addStyleName("sip-transition-content-label");
-		taskLabel.addStyleName("sip-transition-content-label");
-		outcomeLabel.addStyleName("sip-transition-content-label");
-		outcomeDetailsLabel.addStyleName("sip-transition-content-label");
-		dateValue.addStyleName("sip-transition-content-value");
-		taskValue.addStyleName("sip-transition-content-value");
-		outcomeValue.addStyleName("sip-transition-content-value");
-		outcomeDetailsValue.addStyleName("sip-transition-content-value");
+    layout.addStyleName("sip-transition");
+    content.addStyleName("sip-transition-content");
+    dateLabel.addStyleName("sip-transition-content-label");
+    taskLabel.addStyleName("sip-transition-content-label");
+    outcomeLabel.addStyleName("sip-transition-content-label");
+    outcomeDetailsLabel.addStyleName("sip-transition-content-label");
+    dateValue.addStyleName("sip-transition-content-value");
+    taskValue.addStyleName("sip-transition-content-value");
+    outcomeValue.addStyleName("sip-transition-content-value");
+    outcomeDetailsValue.addStyleName("sip-transition-content-value");
 
-		return layout;
-	}
+    return layout;
+  }
 
-	public SIPState getSip() {
-		return sip;
-	}
+  public SIPState getSip() {
+    return sip;
+  }
 
-	public Widget getWidget() {
-		return layout;
-	}
+  public Widget getWidget() {
+    return layout;
+  }
 
-	public void update(SIPState updatedSIP) {
-		try {
-			if (sip.hasChanges(updatedSIP)) {
-				sip = updatedSIP;
-				transitionsLayout.clear();
-				SIPStateTransition[] transitions = sip.getStateTransitions();
-				for (int i = 0; i < transitions.length; i++) {
-					transitionsLayout
-							.add(createTransitionPanel(transitions[i]));
-				}
-			}
-		} catch (IllegalOperationException e) {
-			logger.error("Tryed to update ingest report with different SIP id",
-					e);
-		}
+  public void update(SIPState updatedSIP) {
+    try {
+      if (sip.hasChanges(updatedSIP)) {
+        sip = updatedSIP;
+        transitionsLayout.clear();
+        SIPStateTransition[] transitions = sip.getStateTransitions();
+        for (int i = 0; i < transitions.length; i++) {
+          transitionsLayout.add(createTransitionPanel(transitions[i]));
+        }
+      }
+    } catch (IllegalOperationException e) {
+      logger.error("Tryed to update ingest report with different SIP id", e);
+    }
 
-	}
+  }
 }

@@ -12,30 +12,30 @@ import java.util.List;
  */
 public class TooManyOpenFilesTest {
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
+  /**
+   * @param args
+   */
+  public static void main(String[] args) {
 
-		File file = null;
-		try {
-			file = File.createTempFile("tmof", "xxx"); //$NON-NLS-1$ //$NON-NLS-2$
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+    File file = null;
+    try {
+      file = File.createTempFile("tmof", "xxx"); //$NON-NLS-1$ //$NON-NLS-2$
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
 
-		List<FileInputStream> fis = new ArrayList<FileInputStream>();
+    List<FileInputStream> fis = new ArrayList<FileInputStream>();
 
-		try {
+    try {
 
-			for (int i = 0; true; i++) {
-				fis.add(new FileInputStream(file));
-				System.out.println("Open files " + i);
-			}
+      for (int i = 0; true; i++) {
+        fis.add(new FileInputStream(file));
+        System.out.println("Open files " + i);
+      }
 
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    }
+  }
 
 }

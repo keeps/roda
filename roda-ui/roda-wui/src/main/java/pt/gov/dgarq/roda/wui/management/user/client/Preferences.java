@@ -84,22 +84,22 @@ public class Preferences implements HistoryResolver {
           UserManagementService.Util.getInstance().editMyUser(userdata.getUser(), userdata.getPassword(),
             new AsyncCallback<Void>() {
 
-            public void onFailure(Throwable caught) {
-              if (caught instanceof EmailAlreadyExistsException) {
-                Window.alert(constants.preferencesEmailAlreadyExists());
-              } else {
-                logger.error("Error saving preferences", caught);
+              public void onFailure(Throwable caught) {
+                if (caught instanceof EmailAlreadyExistsException) {
+                  Window.alert(constants.preferencesEmailAlreadyExists());
+                } else {
+                  logger.error("Error saving preferences", caught);
+                }
+
               }
 
-            }
+              public void onSuccess(Void result) {
+                Window.alert(constants.preferencesSubmitSuccess());
+                // UserLogin.getInstance()
+                // .checkForLoginReset();
+              }
 
-            public void onSuccess(Void result) {
-              Window.alert(constants.preferencesSubmitSuccess());
-              // UserLogin.getInstance()
-              // .checkForLoginReset();
-            }
-
-          });
+            });
         }
 
       });

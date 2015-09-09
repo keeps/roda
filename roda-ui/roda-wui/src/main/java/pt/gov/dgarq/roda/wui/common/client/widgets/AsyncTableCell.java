@@ -27,8 +27,8 @@ import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.widgets.wcag.AccessibleCellTable;
 import pt.gov.dgarq.roda.wui.common.client.widgets.wcag.AccessibleSimplePager;
 
-public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
-  implements HasValueChangeHandlers<IndexResult<T>> {
+public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel implements
+  HasValueChangeHandlers<IndexResult<T>> {
 
   private final AsyncDataProvider<T> dataProvider;
   private final SingleSelectionModel<T> selectionModel;

@@ -10,38 +10,38 @@ import pt.gov.dgarq.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 
 public class ImageLink extends Composite {
 
-	private final AccessibleFocusPanel layout;
-	private final HorizontalPanel panel;
+  private final AccessibleFocusPanel layout;
+  private final HorizontalPanel panel;
 
-	private final Image image;
-	private final Label label;
+  private final Image image;
+  private final Label label;
 
-	public ImageLink(Image linkImage, String text) {
-		layout = new AccessibleFocusPanel();
-		panel = new HorizontalPanel();
-		
-		image = linkImage;
-		label = new Label(text);
+  public ImageLink(Image linkImage, String text) {
+    layout = new AccessibleFocusPanel();
+    panel = new HorizontalPanel();
 
-		panel.add(image);
-		panel.add(label);
+    image = linkImage;
+    label = new Label(text);
 
-		layout.add(panel);
+    panel.add(image);
+    panel.add(label);
 
-		initWidget(layout);
+    layout.add(panel);
 
-		layout.addStyleName("image-link");
-		layout.addStyleName("image-link-panel");
-		image.addStyleName("image-link-image");
-		label.addStyleName("image-link-label");
-	}
+    initWidget(layout);
 
-	public void addClickHandler(ClickHandler handler) {
-		layout.addClickHandler(handler);
-	}
-	
-	public void setText (String text) {
-		label.setText(text);
-	}
+    layout.addStyleName("image-link");
+    layout.addStyleName("image-link-panel");
+    image.addStyleName("image-link-image");
+    label.addStyleName("image-link-label");
+  }
+
+  public void addClickHandler(ClickHandler handler) {
+    layout.addClickHandler(handler);
+  }
+
+  public void setText(String text) {
+    label.setText(text);
+  }
 
 }

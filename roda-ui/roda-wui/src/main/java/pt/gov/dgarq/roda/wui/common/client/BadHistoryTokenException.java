@@ -11,20 +11,20 @@ import pt.gov.dgarq.roda.core.common.RODAException;
  */
 public class BadHistoryTokenException extends RODAException {
 
-	/**
-	 * Create a new bad history token exception
-	 */
-	public BadHistoryTokenException() {
-		super();
-	}
+  /**
+   * Create a new bad history token exception
+   */
+  public BadHistoryTokenException() {
+    super();
+  }
 
-	/**
-	 * Create a new bad history token exception
-	 * 
-	 * @param message
-	 */
-	public BadHistoryTokenException(String message) {
-		super(message);
-	}
+  /**
+   * Create a new bad history token exception
+   * 
+   * @param message
+   */
+  public BadHistoryTokenException(String message) {
+    super(message);
+  }
 
 }

@@ -1,6 +1,5 @@
 package pt.gov.dgarq.roda.core.metadata.premis;
 
-
 /**
  * Test class for {@link PremisRepresentationObjectHelper}.
  * 
@@ -8,21 +7,20 @@ package pt.gov.dgarq.roda.core.metadata.premis;
  */
 public class PremisRepresentationTest {
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		try {
+  /**
+   * @param args
+   */
+  public static void main(String[] args) {
+    try {
 
-			PremisRepresentationObjectHelper rObjectHelper = new PremisRepresentationObjectHelper();
+      PremisRepresentationObjectHelper rObjectHelper = new PremisRepresentationObjectHelper();
 
-			System.out.println("Getting Representation from Object");
-			System.out.println(rObjectHelper
-					.getRepresentationPreservationObject());
+      System.out.println("Getting Representation from Object");
+      System.out.println(rObjectHelper.getRepresentationPreservationObject());
 
-		} catch (PremisMetadataException e) {
-			e.printStackTrace();
-		}
-	}
+    } catch (PremisMetadataException e) {
+      e.printStackTrace();
+    }
+  }
 
 }

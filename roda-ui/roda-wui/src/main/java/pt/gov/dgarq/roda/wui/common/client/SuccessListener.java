@@ -9,8 +9,8 @@ package pt.gov.dgarq.roda.wui.common.client;
  */
 public interface SuccessListener {
 
-	public void onSuccess();
-	
-	public void onCancel();
-	
+  public void onSuccess();
+
+  public void onCancel();
+
 }

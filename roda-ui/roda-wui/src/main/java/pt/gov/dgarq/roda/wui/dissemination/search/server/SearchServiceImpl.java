@@ -27,61 +27,61 @@ import pt.gov.dgarq.roda.wui.dissemination.search.client.SearchService;
  */
 public class SearchServiceImpl extends RemoteServiceServlet implements SearchService {
 
-	/**
+  /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	static final private Logger logger = Logger.getLogger(SearchServiceImpl.class);
+  static final private Logger logger = Logger.getLogger(SearchServiceImpl.class);
 
-	// protected Search getSearch() throws LoginException, RODAClientException {
-	// Search search;
-	//
-	// search =
-	// RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession()).getSearchService();
-	//
-	// return null;
-	// }
+  // protected Search getSearch() throws LoginException, RODAClientException {
+  // Search search;
+  //
+  // search =
+  // RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession()).getSearchService();
+  //
+  // return null;
+  // }
 
-	public IndexResult<SimpleDescriptionObject> basicSearch(String query, int startIndex, int limit, int snippetsMax,
-			int fieldMaxLength) throws RODAException {
+  public IndexResult<SimpleDescriptionObject> basicSearch(String query, int startIndex, int limit, int snippetsMax,
+    int fieldMaxLength) throws RODAException {
 
-		IndexResult<SimpleDescriptionObject> result = null;
-		IndexService indexService = RodaCoreFactory.getIndexService();
+    IndexResult<SimpleDescriptionObject> result = null;
+    IndexService indexService = RodaCoreFactory.getIndexService();
 
-		try {
-			Sublist sublist = new Sublist(startIndex, limit);
-			// FIXME define facets
-			Facets facets = null;
-			result = indexService.find(SimpleDescriptionObject.class, getBasicSearchFilter(null, query), null, sublist,
-					facets);
-		} catch (IndexServiceException e) {
-			logger.error("error", e);
-		}
-		return result;
-	}
+    try {
+      Sublist sublist = new Sublist(startIndex, limit);
+      // FIXME define facets
+      Facets facets = null;
+      result = indexService.find(SimpleDescriptionObject.class, getBasicSearchFilter(null, query), null, sublist,
+        facets);
+    } catch (IndexServiceException e) {
+      logger.error("error", e);
+    }
+    return result;
+  }
 
-	protected Filter getBasicSearchFilter(Filter filter, String query) {
-		if (filter == null) {
-			filter = new Filter();
-		}
-		filter.add(new BasicSearchFilterParameter(RodaConstants.SDO__ALL, query));
-		return filter;
-	}
+  protected Filter getBasicSearchFilter(Filter filter, String query) {
+    if (filter == null) {
+      filter = new Filter();
+    }
+    filter.add(new BasicSearchFilterParameter(RodaConstants.SDO__ALL, query));
+    return filter;
+  }
 
-	public SearchResult advancedSearch(SearchParameter[] searchParameters, int hitPageStart, int hitPageSize,
-			int snippetsMax, int fieldMaxLength) throws RODAException {
-		// SearchResult result;
-		// try {
-		// logger.debug("Searching in " + Arrays.asList(searchParameters));
-		// result = getSearch().advancedSearch(searchParameters, hitPageStart,
-		// hitPageSize, snippetsMax,
-		// fieldMaxLength);
-		// } catch (RemoteException e) {
-		// logger.error("Remote Exception", e);
-		// throw RODAClient.parseRemoteException(e);
-		// }
-		return null;
-	}
+  public SearchResult advancedSearch(SearchParameter[] searchParameters, int hitPageStart, int hitPageSize,
+    int snippetsMax, int fieldMaxLength) throws RODAException {
+    // SearchResult result;
+    // try {
+    // logger.debug("Searching in " + Arrays.asList(searchParameters));
+    // result = getSearch().advancedSearch(searchParameters, hitPageStart,
+    // hitPageSize, snippetsMax,
+    // fieldMaxLength);
+    // } catch (RemoteException e) {
+    // logger.error("Remote Exception", e);
+    // throw RODAClient.parseRemoteException(e);
+    // }
+    return null;
+  }
 
 }

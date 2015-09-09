@@ -134,8 +134,8 @@ public class IndexService {
     ClosableIterable<Resource> actionLogs = null;
 
     try {
-      actionLogs = model.getStorage()
-        .listResourcesUnderContainer(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG));
+      actionLogs = model.getStorage().listResourcesUnderContainer(
+        DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG));
 
       for (Resource resource : actionLogs) {
         Binary b = model.getStorage().getBinary(resource.getStoragePath());

@@ -12,24 +12,24 @@ import pt.gov.dgarq.roda.core.metadata.MetadataException;
  * @author Rui Castro
  */
 public class MetsFileAlreadyExistsException extends MetadataException {
-	private static final long serialVersionUID = -6804558406230272070L;
+  private static final long serialVersionUID = -6804558406230272070L;
 
-	/**
-	 * Construct a new {@link MetsFileAlreadyExistsException}.
-	 */
-	public MetsFileAlreadyExistsException() {
-		super();
-	}
+  /**
+   * Construct a new {@link MetsFileAlreadyExistsException}.
+   */
+  public MetsFileAlreadyExistsException() {
+    super();
+  }
 
-	/**
-	 * Construct a new {@link MetsFileAlreadyExistsException} with the given
-	 * message.
-	 * 
-	 * @param message
-	 *            the error message.
-	 */
-	public MetsFileAlreadyExistsException(String message) {
-		super(message);
-	}
+  /**
+   * Construct a new {@link MetsFileAlreadyExistsException} with the given
+   * message.
+   * 
+   * @param message
+   *          the error message.
+   */
+  public MetsFileAlreadyExistsException(String message) {
+    super(message);
+  }
 
 }

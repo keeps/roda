@@ -21,61 +21,58 @@ import com.google.gwt.user.client.ui.VerticalPanel;
  */
 public class Loading implements EntryPoint {
 
-	private static final int REFRESH_TIMEOUT_MS = 10000;
-	private static LoadingConstants loadingConstants = (LoadingConstants) GWT
-			.create(LoadingConstants.class);
+  private static final int REFRESH_TIMEOUT_MS = 10000;
+  private static LoadingConstants loadingConstants = (LoadingConstants) GWT.create(LoadingConstants.class);
 
-	private final HorizontalPanel layout;
-	private final Image loadingImage;
-	private final VerticalPanel labelLayout;
-	private final Label loadingTitle;
-	private final Label loadingDescription;
-	private final Timer refreshTimer;
+  private final HorizontalPanel layout;
+  private final Image loadingImage;
+  private final VerticalPanel labelLayout;
+  private final Label loadingTitle;
+  private final Label loadingDescription;
+  private final Timer refreshTimer;
 
-	/**
-	 * Create a new loading panel
-	 */
-	public Loading() {
-		layout = new HorizontalPanel();
-		loadingImage = new Image("loading.gif");
+  /**
+   * Create a new loading panel
+   */
+  public Loading() {
+    layout = new HorizontalPanel();
+    loadingImage = new Image("loading.gif");
 
-		labelLayout = new VerticalPanel();
-		loadingTitle = new Label(loadingConstants.loadingTitle());
-		loadingDescription = new Label(loadingConstants.loadingDescription());
+    labelLayout = new VerticalPanel();
+    loadingTitle = new Label(loadingConstants.loadingTitle());
+    loadingDescription = new Label(loadingConstants.loadingDescription());
 
-		labelLayout.add(loadingTitle);
-		labelLayout.add(loadingDescription);
+    labelLayout.add(loadingTitle);
+    labelLayout.add(loadingDescription);
 
-		layout.add(loadingImage);
-		layout.add(labelLayout);
+    layout.add(loadingImage);
+    layout.add(labelLayout);
 
-		refreshTimer = new Timer() {
+    refreshTimer = new Timer() {
 
-			@Override
-			public void run() {
-				refresh();
-			}
+      @Override
+      public void run() {
+        refresh();
+      }
 
-		};
-		refreshTimer.scheduleRepeating(REFRESH_TIMEOUT_MS);
+    };
+    refreshTimer.scheduleRepeating(REFRESH_TIMEOUT_MS);
 
-		layout
-				.setCellVerticalAlignment(loadingImage,
-						HasAlignment.ALIGN_MIDDLE);
+    layout.setCellVerticalAlignment(loadingImage, HasAlignment.ALIGN_MIDDLE);
 
-		layout.addStyleName("loading-layout");
-		loadingImage.addStyleName("loading-image");
-		labelLayout.addStyleName("loading-labels");
-		loadingTitle.addStyleName("loading-title");
-		loadingDescription.addStyleName("loading-description");
-	}
+    layout.addStyleName("loading-layout");
+    loadingImage.addStyleName("loading-image");
+    labelLayout.addStyleName("loading-labels");
+    loadingTitle.addStyleName("loading-title");
+    loadingDescription.addStyleName("loading-description");
+  }
 
-	public void onModuleLoad() {
-		RootPanel.get().add(layout);
-	}
+  public void onModuleLoad() {
+    RootPanel.get().add(layout);
+  }
 
-	protected void refresh() {
-		Window.open(History.getToken(), "_self", "");
-	}
+  protected void refresh() {
+    Window.open(History.getToken(), "_self", "");
+  }
 
 }

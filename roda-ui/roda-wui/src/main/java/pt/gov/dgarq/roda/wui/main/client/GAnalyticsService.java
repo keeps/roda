@@ -9,6 +9,6 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 @RemoteServiceRelativePath("gaservice")
 public interface GAnalyticsService extends RemoteService {
 
-	public String getGoogleAnalyticsAccount();
+  public String getGoogleAnalyticsAccount();
 
 }

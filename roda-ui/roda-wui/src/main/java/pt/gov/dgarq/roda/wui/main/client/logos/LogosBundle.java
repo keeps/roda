@@ -12,7 +12,7 @@ import com.google.gwt.resources.client.ImageResource;
  */
 public interface LogosBundle extends ClientBundle {
 
-	@Source("roda2-logo.png")
-	public ImageResource logo();
+  @Source("roda2-logo.png")
+  public ImageResource logo();
 
 }

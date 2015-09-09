@@ -42,8 +42,8 @@ public class UserLoginServiceImpl extends RemoteServiceServlet implements UserLo
     return u;
   }
 
-  public AuthenticatedUser login(String username, String password)
-    throws AuthenticationDeniedException, GenericException {
+  public AuthenticatedUser login(String username, String password) throws AuthenticationDeniedException,
+    GenericException {
     // FIXME log action
     try {
       User user = UserUtility.getLdapUtility().getAuthenticatedUser(username, password);

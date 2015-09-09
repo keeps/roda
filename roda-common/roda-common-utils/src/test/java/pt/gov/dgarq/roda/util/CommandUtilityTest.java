@@ -6,21 +6,21 @@ package pt.gov.dgarq.roda.util;
  */
 public class CommandUtilityTest {
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
+  /**
+   * @param args
+   */
+  public static void main(String[] args) {
 
-		try {
+    try {
 
-			String output = CommandUtility.execute(args);
+      String output = CommandUtility.execute(args);
 
-			//			System.out.println("Output:\n" + output); //$NON-NLS-1$
-			System.out.println("Output length: " + output.length()); //$NON-NLS-1$
+      //			System.out.println("Output:\n" + output); //$NON-NLS-1$
+      System.out.println("Output length: " + output.length()); //$NON-NLS-1$
 
-		} catch (CommandException e) {
-			e.printStackTrace();
-		}
-	}
+    } catch (CommandException e) {
+      e.printStackTrace();
+    }
+  }
 
 }

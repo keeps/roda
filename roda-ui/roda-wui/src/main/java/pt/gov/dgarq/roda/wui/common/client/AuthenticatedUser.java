@@ -10,78 +10,78 @@ import pt.gov.dgarq.roda.core.data.v2.User;
  * 
  */
 public class AuthenticatedUser extends User {
-	private static final long serialVersionUID = -2998504947077587864L;
-	
-	private boolean guest;
+  private static final long serialVersionUID = -2998504947077587864L;
 
-	/**
-	 * @deprecated Only for GWT serialization purposes
-	 * 
-	 */
-	@Deprecated
-	public AuthenticatedUser() {
-		super();
-	}
+  private boolean guest;
 
-	/**
-	 * Create a new authenticated user
-	 * 
-	 * @param user
-	 * @param guest
-	 */
-	public AuthenticatedUser(User user, boolean guest) {
-		super(user);
-		this.guest = guest;
-	}
+  /**
+   * @deprecated Only for GWT serialization purposes
+   * 
+   */
+  @Deprecated
+  public AuthenticatedUser() {
+    super();
+  }
 
-	/**
-	 * Is authenticated user a guest
-	 * 
-	 * @return
-	 */
-	public boolean isGuest() {
-		return guest;
-	}
+  /**
+   * Create a new authenticated user
+   * 
+   * @param user
+   * @param guest
+   */
+  public AuthenticatedUser(User user, boolean guest) {
+    super(user);
+    this.guest = guest;
+  }
 
-	/**
-	 * Set if authenticated user is a guest
-	 * 
-	 * @param guest
-	 */
-	public void setGuest(boolean guest) {
-		this.guest = guest;
-	}
+  /**
+   * Is authenticated user a guest
+   * 
+   * @return
+   */
+  public boolean isGuest() {
+    return guest;
+  }
 
-	public boolean hasRole(String role) {
-		return this.getAllRoles().contains(role);
-	}
+  /**
+   * Set if authenticated user is a guest
+   * 
+   * @param guest
+   */
+  public void setGuest(boolean guest) {
+    this.guest = guest;
+  }
 
-	// /**
-	// * Check is authenticated user as all indicated roles
-	// *
-	// * @param roles
-	// * @return
-	// */
-	// public boolean hasAllRoles(String[] roles) {
-	// boolean hasAll = true;
-	// for (int i = 0; i < roles.length && hasAll; i++) {
-	// hasAll = hasRole(roles[i]);
-	// }
-	// return hasAll;
-	// }
-	//
-	// /**
-	// * Check is authenticated user as at least one of the indicated roles
-	// *
-	// * @param roles
-	// * @return
-	// */
-	// public boolean hasAtLeastOneRole(String[] roles) {
-	// boolean found = false;
-	// for (int i = 0; i < roles.length && !found; i++) {
-	// found = hasRole(roles[i]);
-	// }
-	// return found;
-	// }
+  public boolean hasRole(String role) {
+    return this.getAllRoles().contains(role);
+  }
+
+  // /**
+  // * Check is authenticated user as all indicated roles
+  // *
+  // * @param roles
+  // * @return
+  // */
+  // public boolean hasAllRoles(String[] roles) {
+  // boolean hasAll = true;
+  // for (int i = 0; i < roles.length && hasAll; i++) {
+  // hasAll = hasRole(roles[i]);
+  // }
+  // return hasAll;
+  // }
+  //
+  // /**
+  // * Check is authenticated user as at least one of the indicated roles
+  // *
+  // * @param roles
+  // * @return
+  // */
+  // public boolean hasAtLeastOneRole(String[] roles) {
+  // boolean found = false;
+  // for (int i = 0; i < roles.length && !found; i++) {
+  // found = hasRole(roles[i]);
+  // }
+  // return found;
+  // }
 
 }

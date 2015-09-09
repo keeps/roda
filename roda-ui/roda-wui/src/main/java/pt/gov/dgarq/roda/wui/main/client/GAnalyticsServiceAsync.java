@@ -12,8 +12,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  */
 public interface GAnalyticsServiceAsync {
 
-	GAnalyticsServiceAsync INSTANCE = GWT.create(GAnalyticsService.class);
+  GAnalyticsServiceAsync INSTANCE = GWT.create(GAnalyticsService.class);
 
-	void getGoogleAnalyticsAccount(AsyncCallback<String> callback);
+  void getGoogleAnalyticsAccount(AsyncCallback<String> callback);
 
 }

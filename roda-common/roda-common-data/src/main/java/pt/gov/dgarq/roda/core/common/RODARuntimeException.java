@@ -12,62 +12,61 @@ import java.io.Serializable;
  * 
  * @author Rui Castro
  */
-public abstract class RODARuntimeException extends RuntimeException implements
-		Serializable {
-	private static final long serialVersionUID = -2472221537766705700L;
-	
-	private String message = "";
+public abstract class RODARuntimeException extends RuntimeException implements Serializable {
+  private static final long serialVersionUID = -2472221537766705700L;
 
-	/**
-	 * Constructs a new RODAServiceException.
-	 */
-	public RODARuntimeException() {
-	}
+  private String message = "";
 
-	/**
-	 * Constructs a new RODAServiceException with the given message.
-	 * 
-	 * @param message
-	 */
-	public RODARuntimeException(String message) {
-		super(message);
-		this.message = message;
-	}
+  /**
+   * Constructs a new RODAServiceException.
+   */
+  public RODARuntimeException() {
+  }
 
-	/**
-	 * Constructs a new RODAServiceException with the given cause Exception.
-	 * 
-	 * @param cause
-	 */
-	public RODARuntimeException(Throwable cause) {
-		super(cause);
-	}
+  /**
+   * Constructs a new RODAServiceException with the given message.
+   * 
+   * @param message
+   */
+  public RODARuntimeException(String message) {
+    super(message);
+    this.message = message;
+  }
 
-	/**
-	 * Constructs a new RODAServiceException with the given message and cause
-	 * Exception.
-	 * 
-	 * @param message
-	 * @param cause
-	 */
-	public RODARuntimeException(String message, Throwable cause) {
-		super(message, cause);
-		this.message = message;
-	}
+  /**
+   * Constructs a new RODAServiceException with the given cause Exception.
+   * 
+   * @param cause
+   */
+  public RODARuntimeException(Throwable cause) {
+    super(cause);
+  }
 
-	/**
-	 * @return the message
-	 */
-	public String getMessage() {
-		return message;
-	}
+  /**
+   * Constructs a new RODAServiceException with the given message and cause
+   * Exception.
+   * 
+   * @param message
+   * @param cause
+   */
+  public RODARuntimeException(String message, Throwable cause) {
+    super(message, cause);
+    this.message = message;
+  }
 
-	/**
-	 * @param message
-	 *            the message to set
-	 */
-	public void setMessage(String message) {
-		this.message = message;
-	}
+  /**
+   * @return the message
+   */
+  public String getMessage() {
+    return message;
+  }
+
+  /**
+   * @param message
+   *          the message to set
+   */
+  public void setMessage(String message) {
+    this.message = message;
+  }
 
 }

@@ -11,54 +11,54 @@ import com.google.gwt.i18n.client.Messages;
  */
 public interface UserManagementMessages extends Messages {
 
-	// Action Report
-	String actionReportNoUser();
+  // Action Report
+  String actionReportNoUser();
 
-	// Create
-	String createUserFailure(String reason);
+  // Create
+  String createUserFailure(String reason);
 
-	String createGroupFailure(String reason);
+  String createGroupFailure(String reason);
 
-	String createUserAlreadyExists(String username);
+  String createUserAlreadyExists(String username);
 
-	String createUserEmailAlreadyExists(String email);
+  String createUserEmailAlreadyExists(String email);
 
-	String createGroupAlreadyExists(String groupname);
+  String createGroupAlreadyExists(String groupname);
 
-	// Edit
-	String editUserFailure(String username, String reason);
+  // Edit
+  String editUserFailure(String username, String reason);
 
-	String editGroupFailure(String groupname, String reason);
+  String editGroupFailure(String groupname, String reason);
 
-	String editUserNotFound(String username);
+  String editUserNotFound(String username);
 
-	String editUserEmailAlreadyExists(String email);
+  String editUserEmailAlreadyExists(String email);
 
-	String editGroupNotFound(String groupname);
+  String editGroupNotFound(String groupname);
 
-	// Remove
-	String removeUserConfirm(String username);
+  // Remove
+  String removeUserConfirm(String username);
 
-	String removeUserFailure(String username, String reason);
-	
-	String removeUserNotPossible(String name);
+  String removeUserFailure(String username, String reason);
 
-	String removeGroupConfirm(String groupname);
+  String removeUserNotPossible(String name);
 
-	String removeGroupFailure(String groupname, String reason);
+  String removeGroupConfirm(String groupname);
 
-	// User/Group Alphabet Sorted List
+  String removeGroupFailure(String groupname, String reason);
 
-	String userCount(int count);
+  // User/Group Alphabet Sorted List
 
-	String groupCount(int count);
+  String userCount(int count);
 
-	// Action Report Window
-	String actionResportTitle(String username);
+  String groupCount(int count);
 
-	// User log
-	String userLogEntriesTotal(int total);
+  // Action Report Window
+  String actionResportTitle(String username);
 
-	String logParameter(String name, String value);
+  // User log
+  String userLogEntriesTotal(int total);
+
+  String logParameter(String name, String value);
 
 }

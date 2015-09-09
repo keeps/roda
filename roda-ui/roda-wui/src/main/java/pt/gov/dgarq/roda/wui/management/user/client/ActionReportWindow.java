@@ -20,40 +20,40 @@ import config.i18n.client.UserManagementMessages;
  */
 public class ActionReportWindow extends WUIWindow {
 
-	private static UserManagementConstants constants = (UserManagementConstants) GWT
-			.create(UserManagementConstants.class);
+  private static UserManagementConstants constants = (UserManagementConstants) GWT
+    .create(UserManagementConstants.class);
 
-	private static UserManagementMessages messages = (UserManagementMessages) GWT.create(UserManagementMessages.class);
+  private static UserManagementMessages messages = (UserManagementMessages) GWT.create(UserManagementMessages.class);
 
-	private final WUIButton close;
+  private final WUIButton close;
 
-	private final UserLog actionReportPanel;
+  private final UserLog actionReportPanel;
 
-	/**
-	 * Create new user action report window
-	 * 
-	 * @param user
-	 */
-	public ActionReportWindow(User user) {
-		super(messages.actionResportTitle(user.getName()), 850, 500);
+  /**
+   * Create new user action report window
+   * 
+   * @param user
+   */
+  public ActionReportWindow(User user) {
+    super(messages.actionResportTitle(user.getName()), 850, 500);
 
-		// FIXME set user
-		actionReportPanel = new UserLog();
+    // FIXME set user
+    actionReportPanel = new UserLog();
 
-		this.addTab(actionReportPanel, constants.actionReportLogTabTitle());
-		this.selectTab(0);
+    this.addTab(actionReportPanel, constants.actionReportLogTabTitle());
+    this.selectTab(0);
 
-		close = new WUIButton(constants.actionReportClose(), WUIButton.Left.ROUND, WUIButton.Right.CROSS);
+    close = new WUIButton(constants.actionReportClose(), WUIButton.Left.ROUND, WUIButton.Right.CROSS);
 
-		close.addClickListener(new ClickListener() {
+    close.addClickListener(new ClickListener() {
 
-			public void onClick(Widget sender) {
-				hide();
-			}
+      public void onClick(Widget sender) {
+        hide();
+      }
 
-		});
+    });
 
-		this.addToBottom(close);
+    this.addToBottom(close);
 
-	}
+  }
 }

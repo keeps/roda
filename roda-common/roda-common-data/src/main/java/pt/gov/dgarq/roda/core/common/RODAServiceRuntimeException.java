@@ -12,41 +12,41 @@ package pt.gov.dgarq.roda.core.common;
  * @author Rui Castro
  */
 public abstract class RODAServiceRuntimeException extends RODARuntimeException {
-	private static final long serialVersionUID = 3043032404754693116L;
+  private static final long serialVersionUID = 3043032404754693116L;
 
-	/**
-	 * Constructs a new RODAServiceException.
-	 */
-	public RODAServiceRuntimeException() {
-	}
+  /**
+   * Constructs a new RODAServiceException.
+   */
+  public RODAServiceRuntimeException() {
+  }
 
-	/**
-	 * Constructs a new RODAServiceException with the given message.
-	 * 
-	 * @param message
-	 */
-	public RODAServiceRuntimeException(String message) {
-		super(message);
-	}
+  /**
+   * Constructs a new RODAServiceException with the given message.
+   * 
+   * @param message
+   */
+  public RODAServiceRuntimeException(String message) {
+    super(message);
+  }
 
-	/**
-	 * Constructs a new RODAServiceException with the given cause Exception.
-	 * 
-	 * @param cause
-	 */
-	public RODAServiceRuntimeException(Throwable cause) {
-		super(cause);
-	}
+  /**
+   * Constructs a new RODAServiceException with the given cause Exception.
+   * 
+   * @param cause
+   */
+  public RODAServiceRuntimeException(Throwable cause) {
+    super(cause);
+  }
 
-	/**
-	 * Constructs a new RODAServiceException with the given message and cause
-	 * Exception.
-	 * 
-	 * @param message
-	 * @param cause
-	 */
-	public RODAServiceRuntimeException(String message, Throwable cause) {
-		super(message, cause);
-	}
+  /**
+   * Constructs a new RODAServiceException with the given message and cause
+   * Exception.
+   * 
+   * @param message
+   * @param cause
+   */
+  public RODAServiceRuntimeException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
 }

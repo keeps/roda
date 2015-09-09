@@ -11,16 +11,16 @@ import pt.gov.dgarq.roda.core.common.RODAException;
  */
 public class GenericException extends RODAException {
 
-	public GenericException() {
-		super();
-	}
+  public GenericException() {
+    super();
+  }
 
-	public GenericException(String message) {
-		super(message);
-	}
+  public GenericException(String message) {
+    super(message);
+  }
 
-	public GenericException(String message, GenericException e) {
-		super(message, e);
-	}
+  public GenericException(String message, GenericException e) {
+    super(message, e);
+  }
 
 }

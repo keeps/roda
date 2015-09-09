@@ -32,229 +32,202 @@ import pt.gov.dgarq.roda.wui.common.client.widgets.ListHeaderPanel;
  * 
  */
 public class TaskInstanceList {
-	// private ClientLogger logger = new ClientLogger(getClass().getName());
+  // private ClientLogger logger = new ClientLogger(getClass().getName());
 
-	private static EventManagementConstants constants = (EventManagementConstants) GWT
-			.create(EventManagementConstants.class);
+  private static EventManagementConstants constants = (EventManagementConstants) GWT
+    .create(EventManagementConstants.class);
 
-	private static EventManagementMessages messages = (EventManagementMessages) GWT
-			.create(EventManagementMessages.class);
+  private static EventManagementMessages messages = (EventManagementMessages) GWT.create(EventManagementMessages.class);
 
-	/**
-	 * Filter to use in the instance list
-	 */
-	public static enum TaskInstanceFilter {
-		/**
-		 * Only show running instances
-		 */
-		RUNNING,
-		/**
-		 * Only show stopped instances
-		 */
-		STOPPED,
-		/**
-		 * Show all instances
-		 */
-		ALL
-	}
+  /**
+   * Filter to use in the instance list
+   */
+  public static enum TaskInstanceFilter {
+    /**
+     * Only show running instances
+     */
+    RUNNING,
+    /**
+     * Only show stopped instances
+     */
+    STOPPED,
+    /**
+     * Show all instances
+     */
+    ALL
+  }
 
-	private boolean initialized;
+  private boolean initialized;
 
-	private DockPanel layout;
+  private DockPanel layout;
 
-	private LazyVerticalList<TaskInstance> instanceList;
+  private LazyVerticalList<TaskInstance> instanceList;
 
-	private ControlPanel controlPanel;
+  private ControlPanel controlPanel;
 
-	private TaskInstanceFilter stateFilter;
+  private TaskInstanceFilter stateFilter;
 
-	private String searchFilter;
+  private String searchFilter;
 
-	/**
-	 * Create a new Task Instance list panel
-	 */
-	public TaskInstanceList() {
-		initialized = false;
-		layout = new DockPanel();
-	}
+  /**
+   * Create a new Task Instance list panel
+   */
+  public TaskInstanceList() {
+    initialized = false;
+    layout = new DockPanel();
+  }
 
-	/**
-	 * Initialize task instance list
-	 */
-	public void init() {
-		if (!initialized) {
-			initialized = true;
+  /**
+   * Initialize task instance list
+   */
+  public void init() {
+    if (!initialized) {
+      initialized = true;
 
-			controlPanel = new ControlPanel(constants.controlPanelTitle(),
-					constants.controlPanelSearchTitle());
+      controlPanel = new ControlPanel(constants.controlPanelTitle(), constants.controlPanelSearchTitle());
 
-			controlPanel.addOption(constants.optionRunning());
-			controlPanel.addOption(constants.optionStopped());
-			controlPanel.addOption(constants.optionAll());
+      controlPanel.addOption(constants.optionRunning());
+      controlPanel.addOption(constants.optionStopped());
+      controlPanel.addOption(constants.optionAll());
 
-			controlPanel.setSelectedOptionIndex(1);
-			stateFilter = TaskInstanceFilter.STOPPED;
+      controlPanel.setSelectedOptionIndex(1);
+      stateFilter = TaskInstanceFilter.STOPPED;
 
-			controlPanel.addControlPanelListener(new ControlPanelListener() {
+      controlPanel.addControlPanelListener(new ControlPanelListener() {
 
-				public void onOptionSelected(int option) {
-					switch (option) {
-					case 0:
-						stateFilter = TaskInstanceFilter.RUNNING;
-						break;
-					case 1:
-						stateFilter = TaskInstanceFilter.STOPPED;
-						break;
-					case 2:
-						stateFilter = TaskInstanceFilter.ALL;
-						break;
-					}
+        public void onOptionSelected(int option) {
+          switch (option) {
+            case 0:
+              stateFilter = TaskInstanceFilter.RUNNING;
+              break;
+            case 1:
+              stateFilter = TaskInstanceFilter.STOPPED;
+              break;
+            case 2:
+              stateFilter = TaskInstanceFilter.ALL;
+              break;
+          }
 
-					update();
-				}
+          update();
+        }
 
-				public void onSearch(String keywords) {
-					searchFilter = keywords;
-					update();
-				}
+        public void onSearch(String keywords) {
+          searchFilter = keywords;
+          update();
+        }
 
-			});
+      });
 
-			instanceList = new LazyVerticalList<TaskInstance>(
-					new ContentSource<TaskInstance>() {
+      instanceList = new LazyVerticalList<TaskInstance>(new ContentSource<TaskInstance>() {
 
-						public void getCount(Filter filter,
-								AsyncCallback<Integer> callback) {
-							EventManagementService.Util.getInstance()
-									.getTaskInstanceCount(filter, callback);
-						}
+        public void getCount(Filter filter, AsyncCallback<Integer> callback) {
+          EventManagementService.Util.getInstance().getTaskInstanceCount(filter, callback);
+        }
 
-						public ElementPanel<TaskInstance> getElementPanel(
-								TaskInstance elementPanel) {
-							return new TaskInstancePanel(elementPanel);
-						}
+        public ElementPanel<TaskInstance> getElementPanel(TaskInstance elementPanel) {
+          return new TaskInstancePanel(elementPanel);
+        }
 
-						public void getElements(ContentAdapter adapter,
-								AsyncCallback<TaskInstance[]> callback) {
-							EventManagementService.Util.getInstance()
-									.getTaskInstances(adapter, callback);
+        public void getElements(ContentAdapter adapter, AsyncCallback<TaskInstance[]> callback) {
+          EventManagementService.Util.getInstance().getTaskInstances(adapter, callback);
 
-						}
+        }
 
-						public String getTotalMessage(int total) {
-							return messages.instanceListTotal(total);
-						}
+        public String getTotalMessage(int total) {
+          return messages.instanceListTotal(total);
+        }
 
-						public void setReportInfo(ContentAdapter adapter,
-								String locale, AsyncCallback<Void> callback) {
-							EventManagementService.Util.getInstance()
-									.setInstanceListReportInfo(adapter, locale,
-											callback);
+        public void setReportInfo(ContentAdapter adapter, String locale, AsyncCallback<Void> callback) {
+          EventManagementService.Util.getInstance().setInstanceListReportInfo(adapter, locale, callback);
 
-						}
-					}, 30000, getFilter());
+        }
+      }, 30000, getFilter());
 
-			instanceList
-					.addLazyVerticalListListener(new LazyVerticalListListener<TaskInstance>() {
+      instanceList.addLazyVerticalListListener(new LazyVerticalListListener<TaskInstance>() {
 
-						public void onElementSelected(
-								ElementPanel<TaskInstance> element) {
-							updateVisibles();
+        public void onElementSelected(ElementPanel<TaskInstance> element) {
+          updateVisibles();
 
-						}
+        }
 
-						public void onUpdateBegin() {
-							controlPanel.setOptionsEnabled(false);
+        public void onUpdateBegin() {
+          controlPanel.setOptionsEnabled(false);
 
-						}
+        }
 
-						public void onUpdateFinish() {
-							controlPanel.setOptionsEnabled(true);
-						}
-					});
-			addInstanceListHeaders();
+        public void onUpdateFinish() {
+          controlPanel.setOptionsEnabled(true);
+        }
+      });
+      addInstanceListHeaders();
 
-			layout.add(instanceList.getWidget(), DockPanel.CENTER);
-			layout.add(controlPanel.getWidget(), DockPanel.EAST);
+      layout.add(instanceList.getWidget(), DockPanel.CENTER);
+      layout.add(controlPanel.getWidget(), DockPanel.EAST);
 
-			updateVisibles();
+      updateVisibles();
 
-			layout.addStyleName("wui-management-event");
-			instanceList.getWidget().addStyleName("event-instance-list");
+      layout.addStyleName("wui-management-event");
+      instanceList.getWidget().addStyleName("event-instance-list");
 
-		}
-	}
+    }
+  }
 
-	private Filter getFilter() {
-		Filter filter = new Filter();
-		if (TaskInstanceFilter.RUNNING.equals(stateFilter)) {
-			filter.add(new SimpleFilterParameter("state",
-					TaskInstance.STATE_RUNNING));
-		} else if (TaskInstanceFilter.STOPPED.equals(stateFilter)) {
-			filter.add(new SimpleFilterParameter("state",
-					TaskInstance.STATE_STOPPED));
-		}
+  private Filter getFilter() {
+    Filter filter = new Filter();
+    if (TaskInstanceFilter.RUNNING.equals(stateFilter)) {
+      filter.add(new SimpleFilterParameter("state", TaskInstance.STATE_RUNNING));
+    } else if (TaskInstanceFilter.STOPPED.equals(stateFilter)) {
+      filter.add(new SimpleFilterParameter("state", TaskInstance.STATE_STOPPED));
+    }
 
-		if (searchFilter != null && searchFilter.length() > 0) {
-			filter
-					.add(new LikeFilterParameter("name", "%" + searchFilter
-							+ "%"));
-		}
+    if (searchFilter != null && searchFilter.length() > 0) {
+      filter.add(new LikeFilterParameter("name", "%" + searchFilter + "%"));
+    }
 
-		return filter;
-	}
+    return filter;
+  }
 
-	protected void update() {
-		instanceList.setFilter(getFilter());
-		instanceList.reset();
-	}
+  protected void update() {
+    instanceList.setFilter(getFilter());
+    instanceList.reset();
+  }
 
-	protected void updateVisibles() {
+  protected void updateVisibles() {
 
-	}
+  }
 
-	private void addInstanceListHeaders() {
-		ListHeaderPanel instanceListHeader = instanceList.getHeader();
+  private void addInstanceListHeaders() {
+    ListHeaderPanel instanceListHeader = instanceList.getHeader();
 
-		instanceListHeader.addHeader("", "instance-header-running",
-				new SortParameter[] { new SortParameter("state", false),
-						new SortParameter("id", false) }, true);
+    instanceListHeader.addHeader("", "instance-header-running", new SortParameter[] {new SortParameter("state", false),
+      new SortParameter("id", false)}, true);
 
-		instanceListHeader.addHeader(constants.instanceHeaderName(),
-				"instance-header-name", new SortParameter[] {
-						new SortParameter("name", false),
-						new SortParameter("id", false) }, true);
+    instanceListHeader.addHeader(constants.instanceHeaderName(), "instance-header-name", new SortParameter[] {
+      new SortParameter("name", false), new SortParameter("id", false)}, true);
 
-		instanceListHeader.addHeader(constants.instanceHeaderStartDate(),
-				"instance-header-startDate", new SortParameter[] {
-						new SortParameter("startDate", false),
-						new SortParameter("id", false) }, false);
+    instanceListHeader.addHeader(constants.instanceHeaderStartDate(), "instance-header-startDate", new SortParameter[] {
+      new SortParameter("startDate", false), new SortParameter("id", false)}, false);
 
-		instanceListHeader.addHeader(constants.instanceHeaderCompleteness(),
-				"instance-header-completeness", new SortParameter[] {
-						new SortParameter("completePercentage", true),
-						new SortParameter("finishDate", false),
-						new SortParameter("id", false) }, true);
+    instanceListHeader.addHeader(constants.instanceHeaderCompleteness(), "instance-header-completeness",
+      new SortParameter[] {new SortParameter("completePercentage", true), new SortParameter("finishDate", false),
+        new SortParameter("id", false)}, true);
 
-		instanceListHeader.addHeader(constants.instanceHeaderUser(),
-				"instance-header-user", new SortParameter[] {
-						new SortParameter("username", false),
-						new SortParameter("id", false) }, true);
+    instanceListHeader.addHeader(constants.instanceHeaderUser(), "instance-header-user", new SortParameter[] {
+      new SortParameter("username", false), new SortParameter("id", false)}, true);
 
-		instanceListHeader.addHeader("", "instance-header-report",
-				new SortParameter[] {}, true);
+    instanceListHeader.addHeader("", "instance-header-report", new SortParameter[] {}, true);
 
-		instanceListHeader.setSelectedHeader(2);
-		instanceListHeader.setFillerHeader(4);
+    instanceListHeader.setSelectedHeader(2);
+    instanceListHeader.setFillerHeader(4);
 
-	}
+  }
 
-	/**
-	 * Get the panel widget
-	 * 
-	 * @return the widget
-	 */
-	public Widget getWidget() {
-		return layout;
-	}
+  /**
+   * Get the panel widget
+   * 
+   * @return the widget
+   */
+  public Widget getWidget() {
+    return layout;
+  }
 }

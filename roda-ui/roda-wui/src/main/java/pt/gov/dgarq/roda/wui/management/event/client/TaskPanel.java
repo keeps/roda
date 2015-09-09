@@ -24,172 +24,170 @@ import config.i18n.client.EventManagementMessages;
  */
 public class TaskPanel extends ElementPanel<Task> {
 
-	private static EventManagementImageBundle images = (EventManagementImageBundle) GWT
-			.create(EventManagementImageBundle.class);
+  private static EventManagementImageBundle images = (EventManagementImageBundle) GWT
+    .create(EventManagementImageBundle.class);
 
-	private static EventManagementMessages messages = (EventManagementMessages) GWT
-			.create(EventManagementMessages.class);
+  private static EventManagementMessages messages = (EventManagementMessages) GWT.create(EventManagementMessages.class);
 
-	private final HorizontalPanel layout;
+  private final HorizontalPanel layout;
 
-	private final Image scheduledState;
+  private final Image scheduledState;
 
-	private final Label name;
+  private final Label name;
 
-	private final Label startDate;
+  private final Label startDate;
 
-	private final Label repeat;
+  private final Label repeat;
 
-	private final Label username;
+  private final Label username;
 
-	private final Image runningState;
+  private final Image runningState;
 
-	private EditTask editTask;
+  private EditTask editTask;
 
-	/**
-	 * Create a new task panel
-	 * 
-	 * @param task
-	 */
-	public TaskPanel(Task task) {
-		super(task);
-		layout = new HorizontalPanel();
-		scheduledState = new Image();
-		name = new Label();
-		startDate = new Label();
-		repeat = new Label();
-		username = new Label();
-		runningState = new Image();
+  /**
+   * Create a new task panel
+   * 
+   * @param task
+   */
+  public TaskPanel(Task task) {
+    super(task);
+    layout = new HorizontalPanel();
+    scheduledState = new Image();
+    name = new Label();
+    startDate = new Label();
+    repeat = new Label();
+    username = new Label();
+    runningState = new Image();
 
-		this.setWidget(layout);
+    this.setWidget(layout);
 
-		layout.add(scheduledState);
-		layout.add(name);
-		layout.add(startDate);
-		layout.add(repeat);
-		layout.add(username);
-		layout.add(runningState);
+    layout.add(scheduledState);
+    layout.add(name);
+    layout.add(startDate);
+    layout.add(repeat);
+    layout.add(username);
+    layout.add(runningState);
 
-		layout.setCellWidth(repeat, "100%");
+    layout.setCellWidth(repeat, "100%");
 
-		name.addStyleName("task-name");
-		startDate.addStyleName("task-startDate");
-		repeat.addStyleName("task-repeat");
-		username.addStyleName("task-user");
-		runningState.addStyleName("task-state-running");
-		scheduledState.addStyleName("task-state-scheduled");
+    name.addStyleName("task-name");
+    startDate.addStyleName("task-startDate");
+    repeat.addStyleName("task-repeat");
+    username.addStyleName("task-user");
+    runningState.addStyleName("task-state-running");
+    scheduledState.addStyleName("task-state-scheduled");
 
-		update(task);
+    update(task);
 
-		this.addClickListener(new ClickListener() {
+    this.addClickListener(new ClickListener() {
 
-			public void onClick(Widget sender) {
-				setSelected(true);
-			}
+      public void onClick(Widget sender) {
+        setSelected(true);
+      }
 
-		});
+    });
 
-		editTask = null;
+    editTask = null;
 
-		this.setStylePrimaryName("wui-task");
-	}
+    this.setStylePrimaryName("wui-task");
+  }
 
-	protected void update(Task task) {
-		if (task.isPaused()) {
-			images.taskPaused().applyTo(scheduledState);
-		} else if (task.isScheduled()) {
-			images.taskScheduled().applyTo(scheduledState);
-		} else {
-			images.taskSuspended().applyTo(scheduledState);
-		}
+  protected void update(Task task) {
+    if (task.isPaused()) {
+      images.taskPaused().applyTo(scheduledState);
+    } else if (task.isScheduled()) {
+      images.taskScheduled().applyTo(scheduledState);
+    } else {
+      images.taskSuspended().applyTo(scheduledState);
+    }
 
-		name.setText(task.getName());
-		name.setTitle(task.getDescription());
+    name.setText(task.getName());
+    name.setTitle(task.getDescription());
 
-		startDate.setText(Tools.formatDateTime(task.getStartDate()));
-		repeat.setText(getRepeatMessage(task.getRepeatCount(), task
-				.getRepeatInterval()));
+    startDate.setText(Tools.formatDateTime(task.getStartDate()));
+    repeat.setText(getRepeatMessage(task.getRepeatCount(), task.getRepeatInterval()));
 
-		username.setText(task.getUsername());
+    username.setText(task.getUsername());
 
-		if (task.isRunning()) {
-			images.taskInstanceRunning().applyTo(runningState);
-		} else {
-			images.taskInstanceStopped().applyTo(runningState);
-		}
-		
-		runningState.addStyleName("task-state-running");
-		scheduledState.addStyleName("task-state-scheduled");
-	}
+    if (task.isRunning()) {
+      images.taskInstanceRunning().applyTo(runningState);
+    } else {
+      images.taskInstanceStopped().applyTo(runningState);
+    }
 
-	protected String getRepeatMessage(int repeatCount, long interval) {
-		String ret;
-		if (repeatCount == -1 && interval == 0) {
-			ret = messages.repeatContinuouslyForever();
-		} else if (repeatCount == 0) {
-			ret = messages.runOnce();
-		} else if (interval == 0) {
-			ret = messages.repeatContinuously(repeatCount);
-		} else if (interval % 31557600 == 0) {
-			if (repeatCount == -1) {
-				ret = messages.repeatForeverYears(interval / 31557600);
-			} else {
-				ret = messages.repeatYears(repeatCount, interval / 31557600);
-			}
-		} else if (interval % 2678400 == 0) {
-			if (repeatCount == -1) {
-				ret = messages.repeatForeverMonths(interval / 2678400);
-			} else {
-				ret = messages.repeatMonths(repeatCount, interval / 2678400);
-			}
-		} else if (interval % 86400 == 0) {
-			if (repeatCount == -1) {
-				ret = messages.repeatForeverDays(interval / 86400);
-			} else {
-				ret = messages.repeatDays(repeatCount, interval / 86400);
-			}
-		} else if (interval % 3600 == 0) {
-			if (repeatCount == -1) {
-				ret = messages.repeatForeverHours(interval / 3600);
-			} else {
-				ret = messages.repeatHours(repeatCount, interval / 3600);
-			}
-		} else if (interval % 60 == 0) {
-			if (repeatCount == -1) {
-				ret = messages.repeatForeverMinutes(interval / 60);
-			} else {
-				ret = messages.repeatMinutes(repeatCount, interval / 60);
-			}
-		} else /* SECONDS */{
-			if (repeatCount == -1) {
-				ret = messages.repeatForeverSeconds(interval);
-			} else {
-				ret = messages.repeatSeconds(repeatCount, interval);
-			}
-		}
+    runningState.addStyleName("task-state-running");
+    scheduledState.addStyleName("task-state-scheduled");
+  }
 
-		return ret;
-	}
+  protected String getRepeatMessage(int repeatCount, long interval) {
+    String ret;
+    if (repeatCount == -1 && interval == 0) {
+      ret = messages.repeatContinuouslyForever();
+    } else if (repeatCount == 0) {
+      ret = messages.runOnce();
+    } else if (interval == 0) {
+      ret = messages.repeatContinuously(repeatCount);
+    } else if (interval % 31557600 == 0) {
+      if (repeatCount == -1) {
+        ret = messages.repeatForeverYears(interval / 31557600);
+      } else {
+        ret = messages.repeatYears(repeatCount, interval / 31557600);
+      }
+    } else if (interval % 2678400 == 0) {
+      if (repeatCount == -1) {
+        ret = messages.repeatForeverMonths(interval / 2678400);
+      } else {
+        ret = messages.repeatMonths(repeatCount, interval / 2678400);
+      }
+    } else if (interval % 86400 == 0) {
+      if (repeatCount == -1) {
+        ret = messages.repeatForeverDays(interval / 86400);
+      } else {
+        ret = messages.repeatDays(repeatCount, interval / 86400);
+      }
+    } else if (interval % 3600 == 0) {
+      if (repeatCount == -1) {
+        ret = messages.repeatForeverHours(interval / 3600);
+      } else {
+        ret = messages.repeatHours(repeatCount, interval / 3600);
+      }
+    } else if (interval % 60 == 0) {
+      if (repeatCount == -1) {
+        ret = messages.repeatForeverMinutes(interval / 60);
+      } else {
+        ret = messages.repeatMinutes(repeatCount, interval / 60);
+      }
+    } else /* SECONDS */{
+      if (repeatCount == -1) {
+        ret = messages.repeatForeverSeconds(interval);
+      } else {
+        ret = messages.repeatSeconds(repeatCount, interval);
+      }
+    }
 
-	/**
-	 * Edit task
-	 */
-	public void edit() {
-		if (editTask == null) {
-			editTask = new EditTask(get());
-			editTask.addEditTaskListener(new EditTaskListener() {
+    return ret;
+  }
 
-				public void onCancel() {
-					// nothing to do
-				}
+  /**
+   * Edit task
+   */
+  public void edit() {
+    if (editTask == null) {
+      editTask = new EditTask(get());
+      editTask.addEditTaskListener(new EditTaskListener() {
 
-				public void onSave(Task task) {
-					set(task);
-				}
+        public void onCancel() {
+          // nothing to do
+        }
 
-			});
-		}
-		editTask.show();
-	}
+        public void onSave(Task task) {
+          set(task);
+        }
+
+      });
+    }
+    editTask.show();
+  }
 
 }

@@ -13,40 +13,40 @@ import com.google.gwt.user.client.ui.ImageBundle;
 @SuppressWarnings("deprecation")
 public interface CommonImageBundle extends ImageBundle {
 
-	public AbstractImagePrototype forwardLight();
+  public AbstractImagePrototype forwardLight();
 
-	public AbstractImagePrototype crossLight();
+  public AbstractImagePrototype crossLight();
 
-	@Resource("error_48x48.png")
-	public AbstractImagePrototype bigRedCross();
+  @Resource("error_48x48.png")
+  public AbstractImagePrototype bigRedCross();
 
-	public AbstractImagePrototype report();
+  public AbstractImagePrototype report();
 
-	public AbstractImagePrototype info();
+  public AbstractImagePrototype info();
 
-	public AbstractImagePrototype plus();
+  public AbstractImagePrototype plus();
 
-	public AbstractImagePrototype plusLight();
+  public AbstractImagePrototype plusLight();
 
-	public AbstractImagePrototype minus();
+  public AbstractImagePrototype minus();
 
-	public AbstractImagePrototype minusLight();
+  public AbstractImagePrototype minusLight();
 
-	public AbstractImagePrototype listSortDirection();
+  public AbstractImagePrototype listSortDirection();
 
-	public AbstractImagePrototype listAscending();
+  public AbstractImagePrototype listAscending();
 
-	public AbstractImagePrototype listDescending();
+  public AbstractImagePrototype listDescending();
 
-	public AbstractImagePrototype printPDF();
+  public AbstractImagePrototype printPDF();
 
-	public AbstractImagePrototype printCSV();
+  public AbstractImagePrototype printCSV();
 
-	public AbstractImagePrototype chart();
+  public AbstractImagePrototype chart();
 
-	public AbstractImagePrototype date_edit();
+  public AbstractImagePrototype date_edit();
 
-	public AbstractImagePrototype login();
-	
-	public AbstractImagePrototype user();
+  public AbstractImagePrototype login();
+
+  public AbstractImagePrototype user();
 }

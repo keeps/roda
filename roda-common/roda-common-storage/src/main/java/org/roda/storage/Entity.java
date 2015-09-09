@@ -10,17 +10,17 @@ import java.util.Set;
  * @author Hélder Silva <hsilva@keep.pt>
  * */
 public interface Entity {
-	/**
-	 * The path of the entity in storage
-	 * 
-	 * @return
-	 */
-	public StoragePath getStoragePath();
+  /**
+   * The path of the entity in storage
+   * 
+   * @return
+   */
+  public StoragePath getStoragePath();
 
-	/**
-	 * The metadata of the current resource.
-	 * 
-	 * @return
-	 */
-	public Map<String, Set<String>> getMetadata();
+  /**
+   * The metadata of the current resource.
+   * 
+   * @return
+   */
+  public Map<String, Set<String>> getMetadata();
 }

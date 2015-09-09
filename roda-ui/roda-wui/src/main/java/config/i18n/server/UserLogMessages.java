@@ -11,27 +11,27 @@ import java.util.ResourceBundle;
  *
  */
 public class UserLogMessages {
-	private static final String BUNDLE_NAME = "config.i18n.server.UserLogMessages"; //$NON-NLS-1$
+  private static final String BUNDLE_NAME = "config.i18n.server.UserLogMessages"; //$NON-NLS-1$
 
-	private ResourceBundle resourceBundle;
+  private ResourceBundle resourceBundle;
 
-	/**
-	 * Create a new user log list report messages translations for a defined
-	 * locale
-	 * 
-	 * @param locale
-	 */
-	public UserLogMessages(Locale locale) {
-		this.resourceBundle = ResourceBundle.getBundle(BUNDLE_NAME, locale);		
-	}
+  /**
+   * Create a new user log list report messages translations for a defined
+   * locale
+   * 
+   * @param locale
+   */
+  public UserLogMessages(Locale locale) {
+    this.resourceBundle = ResourceBundle.getBundle(BUNDLE_NAME, locale);
+  }
 
-	/**
-	 * Get translation
-	 * 
-	 * @param key
-	 * @return
-	 */
-	public String getString(String key) {
-		return resourceBundle.getString(key);
-	}
+  /**
+   * Get translation
+   * 
+   * @param key
+   * @return
+   */
+  public String getString(String key) {
+    return resourceBundle.getString(key);
+  }
 }

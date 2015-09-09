@@ -53,183 +53,180 @@ import pt.gov.dgarq.roda.wui.dissemination.browse.client.Browse;
  */
 public class BasicSearch extends Composite {
 
-	public static final HistoryResolver RESOLVER = new HistoryResolver() {
+  public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
-		@Override
-		public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
-			getInstance().resolve(historyTokens, callback);
-		}
+    @Override
+    public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
+      getInstance().resolve(historyTokens, callback);
+    }
 
-		@Override
-		public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-			UserLogin.getInstance().checkRole(this, callback);
-		}
+    @Override
+    public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
+      UserLogin.getInstance().checkRole(this, callback);
+    }
 
-		@Override
-		public String getHistoryPath() {
-			return getHistoryToken();
-		}
+    @Override
+    public String getHistoryPath() {
+      return getHistoryToken();
+    }
 
-		@Override
-		public String getHistoryToken() {
-			return "search";
-		}
-	};
-	private static final Filter DEFAULT_FILTER = new Filter(
-			new BasicSearchFilterParameter(RodaConstants.SDO__ALL, "*"));
+    @Override
+    public String getHistoryToken() {
+      return "search";
+    }
+  };
+  private static final Filter DEFAULT_FILTER = new Filter(new BasicSearchFilterParameter(RodaConstants.SDO__ALL, "*"));
 
-	private static BasicSearch instance = null;
+  private static BasicSearch instance = null;
 
-	public static BasicSearch getInstance() {
-		if (instance == null) {
-			instance = new BasicSearch();
-		}
-		return instance;
-	}
+  public static BasicSearch getInstance() {
+    if (instance == null) {
+      instance = new BasicSearch();
+    }
+    return instance;
+  }
 
-	interface MyUiBinder extends UiBinder<Widget, BasicSearch> {
-	}
+  interface MyUiBinder extends UiBinder<Widget, BasicSearch> {
+  }
 
-	private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-	private SearchConstants constants = (SearchConstants) GWT.create(SearchConstants.class);
+  private SearchConstants constants = (SearchConstants) GWT.create(SearchConstants.class);
 
-	@UiField
-	HTML searchInputLabel;
+  @UiField
+  HTML searchInputLabel;
 
-	@UiField
-	TextBox searchInputBox;
+  @UiField
+  TextBox searchInputBox;
 
-	@UiField
-	AccessibleFocusPanel searchInputButton;
+  @UiField
+  AccessibleFocusPanel searchInputButton;
 
-	@UiField(provided = true)
-	AIPList searchResultPanel;
+  @UiField(provided = true)
+  AIPList searchResultPanel;
 
-	// ADVANCED SEARCH
-	@UiField
-	DisclosurePanel advancedSearchDisclosure;
+  // ADVANCED SEARCH
+  @UiField
+  DisclosurePanel advancedSearchDisclosure;
 
-	@UiField
-	TextBox advancedSearchInputTitle;
-	
-	@UiField 
-	Label advancedSearchInputTitleLabel;
+  @UiField
+  TextBox advancedSearchInputTitle;
 
-	// FILTERS
-	@UiField(provided = true)
-	FlowPanel facetDescriptionLevels;
-	@UiField(provided = true)
-	FlowPanel facetHasRepresentations;
+  @UiField
+  Label advancedSearchInputTitleLabel;
 
-	@UiField
-	DateBox inputDateInitial;
-	@UiField
-	DateBox inputDateFinal;
+  // FILTERS
+  @UiField(provided = true)
+  FlowPanel facetDescriptionLevels;
+  @UiField(provided = true)
+  FlowPanel facetHasRepresentations;
 
-	private BasicSearch() {
-		Filter filter = DEFAULT_FILTER;
-		Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.SDO_LEVEL),
-				new SimpleFacetParameter(RodaConstants.AIP_HAS_REPRESENTATIONS));
-		searchResultPanel = new AIPList(filter, facets);
-		facetDescriptionLevels = new FlowPanel();
-		facetHasRepresentations = new FlowPanel();
+  @UiField
+  DateBox inputDateInitial;
+  @UiField
+  DateBox inputDateFinal;
 
-		Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
-		facetPanels.put(RodaConstants.SDO_LEVEL, facetDescriptionLevels);
-		facetPanels.put(RodaConstants.AIP_HAS_REPRESENTATIONS, facetHasRepresentations);
-		FacetUtils.bindFacets(searchResultPanel, facetPanels);
-		
-		//searchInputBox.getElement().setId(Document.get().createUniqueId());
-		initWidget(uiBinder.createAndBindUi(this));
-		//searchInputLabel.setHTML("<label class='searchLabel' for='"+searchInputBox.getElement().getId()+"'>"+constants.basicSearchInputLabel()+"</label>");
-		
-		
-		// searchInputButton.setText(constants.basicSearchButtonLabel());
+  private BasicSearch() {
+    Filter filter = DEFAULT_FILTER;
+    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.SDO_LEVEL), new SimpleFacetParameter(
+      RodaConstants.AIP_HAS_REPRESENTATIONS));
+    searchResultPanel = new AIPList(filter, facets);
+    facetDescriptionLevels = new FlowPanel();
+    facetHasRepresentations = new FlowPanel();
 
-		searchResultPanel.getSelectionModel().addSelectionChangeHandler(new Handler() {
+    Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
+    facetPanels.put(RodaConstants.SDO_LEVEL, facetDescriptionLevels);
+    facetPanels.put(RodaConstants.AIP_HAS_REPRESENTATIONS, facetHasRepresentations);
+    FacetUtils.bindFacets(searchResultPanel, facetPanels);
 
-			@Override
-			public void onSelectionChange(SelectionChangeEvent event) {
-				SimpleDescriptionObject sdo = searchResultPanel.getSelectionModel().getSelectedObject();
-				if (sdo != null) {
-					view(sdo.getId());
-				}
-			}
-		});
+    // searchInputBox.getElement().setId(Document.get().createUniqueId());
+    initWidget(uiBinder.createAndBindUi(this));
+    // searchInputLabel.setHTML("<label class='searchLabel' for='"+searchInputBox.getElement().getId()+"'>"+constants.basicSearchInputLabel()+"</label>");
 
-		this.searchInputBox.addValueChangeHandler(new ValueChangeHandler<String>() {
+    // searchInputButton.setText(constants.basicSearchButtonLabel());
 
-			@Override
-			public void onValueChange(ValueChangeEvent<String> event) {
-				update();
-			}
-		});
+    searchResultPanel.getSelectionModel().addSelectionChangeHandler(new Handler() {
 
+      @Override
+      public void onSelectionChange(SelectionChangeEvent event) {
+        SimpleDescriptionObject sdo = searchResultPanel.getSelectionModel().getSelectedObject();
+        if (sdo != null) {
+          view(sdo.getId());
+        }
+      }
+    });
 
-		this.searchInputButton.addClickHandler(new ClickHandler() {
+    this.searchInputBox.addValueChangeHandler(new ValueChangeHandler<String>() {
 
-			@Override
-			public void onClick(ClickEvent event) {
-				update();
-			}
-		});
+      @Override
+      public void onValueChange(ValueChangeEvent<String> event) {
+        update();
+      }
+    });
 
-		DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
-		ValueChangeHandler<Date> valueChangeHandler = new ValueChangeHandler<Date>() {
+    this.searchInputButton.addClickHandler(new ClickHandler() {
 
-			@Override
-			public void onValueChange(ValueChangeEvent<Date> event) {
-				updateDateFilter();
-			}
+      @Override
+      public void onClick(ClickEvent event) {
+        update();
+      }
+    });
 
-		};
+    DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
+    ValueChangeHandler<Date> valueChangeHandler = new ValueChangeHandler<Date>() {
 
-		inputDateInitial.setFormat(dateFormat);
-		inputDateInitial.getDatePicker().setYearArrowsVisible(true);
-		inputDateInitial.setFireNullValues(true);
-		inputDateInitial.addValueChangeHandler(valueChangeHandler);
+      @Override
+      public void onValueChange(ValueChangeEvent<Date> event) {
+        updateDateFilter();
+      }
 
-		inputDateFinal.setFormat(dateFormat);
-		inputDateFinal.getDatePicker().setYearArrowsVisible(true);
-		inputDateFinal.setFireNullValues(true);
-		inputDateFinal.addValueChangeHandler(valueChangeHandler);
+    };
 
-	}
+    inputDateInitial.setFormat(dateFormat);
+    inputDateInitial.getDatePicker().setYearArrowsVisible(true);
+    inputDateInitial.setFireNullValues(true);
+    inputDateInitial.addValueChangeHandler(valueChangeHandler);
 
-	private void updateDateFilter() {
-		Date dateInitial = inputDateInitial.getDatePicker().getValue();
-		Date dateFinal = inputDateFinal.getDatePicker().getValue();
+    inputDateFinal.setFormat(dateFormat);
+    inputDateFinal.getDatePicker().setYearArrowsVisible(true);
+    inputDateFinal.setFireNullValues(true);
+    inputDateFinal.addValueChangeHandler(valueChangeHandler);
 
-		DateIntervalFilterParameter filterParameter = new DateIntervalFilterParameter(RodaConstants.SDO_DATE_INITIAL,
-				RodaConstants.SDO_DATE_FINAL, dateInitial, dateFinal);
+  }
 
-		searchResultPanel.setFilter(new Filter(filterParameter));
-	}
+  private void updateDateFilter() {
+    Date dateInitial = inputDateInitial.getDatePicker().getValue();
+    Date dateFinal = inputDateFinal.getDatePicker().getValue();
 
-	protected void view(String id) {
-		String path = Browse.RESOLVER.getHistoryPath() + "." + id;
-		History.newItem(path);
-	}
+    DateIntervalFilterParameter filterParameter = new DateIntervalFilterParameter(RodaConstants.SDO_DATE_INITIAL,
+      RodaConstants.SDO_DATE_FINAL, dateInitial, dateFinal);
 
-	public void update() {
-		String query = searchInputBox.getText();
+    searchResultPanel.setFilter(new Filter(filterParameter));
+  }
 
-		if ("".equals(query)) {
-			searchResultPanel.setFilter(DEFAULT_FILTER);
-		} else {
-			searchResultPanel.setFilter(new Filter(new BasicSearchFilterParameter(RodaConstants.SDO__ALL, query)));
-		}
+  protected void view(String id) {
+    String path = Browse.RESOLVER.getHistoryPath() + "." + id;
+    History.newItem(path);
+  }
 
-	}
+  public void update() {
+    String query = searchInputBox.getText();
 
-	public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
-		if (historyTokens.length == 0) {
-			callback.onSuccess(this);
-		} else {
-			History.newItem(RESOLVER.getHistoryPath());
-			callback.onSuccess(null);
-		}
-	}
+    if ("".equals(query)) {
+      searchResultPanel.setFilter(DEFAULT_FILTER);
+    } else {
+      searchResultPanel.setFilter(new Filter(new BasicSearchFilterParameter(RodaConstants.SDO__ALL, query)));
+    }
+
+  }
+
+  public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
+    if (historyTokens.length == 0) {
+      callback.onSuccess(this);
+    } else {
+      History.newItem(RESOLVER.getHistoryPath());
+      callback.onSuccess(null);
+    }
+  }
 
 }

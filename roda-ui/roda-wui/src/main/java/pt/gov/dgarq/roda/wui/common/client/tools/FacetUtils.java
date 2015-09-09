@@ -19,76 +19,76 @@ import pt.gov.dgarq.roda.wui.common.client.widgets.AsyncTableCell;
 
 public class FacetUtils {
 
-	private static ClientLogger LOGGER = new ClientLogger(FacetUtils.class.getName());
+  private static ClientLogger LOGGER = new ClientLogger(FacetUtils.class.getName());
 
-	public static <T extends Serializable> void bindFacets(final AsyncTableCell<T> list,
-			final Map<String, FlowPanel> facetPanels) {
-		list.addValueChangeHandler(new ValueChangeHandler<IndexResult<T>>() {
+  public static <T extends Serializable> void bindFacets(final AsyncTableCell<T> list,
+    final Map<String, FlowPanel> facetPanels) {
+    list.addValueChangeHandler(new ValueChangeHandler<IndexResult<T>>() {
 
-			@Override
-			public void onValueChange(ValueChangeEvent<IndexResult<T>> event) {
-				FacetUtils.updateFacetPanels(list, facetPanels, event.getValue().getFacetResults());
-			}
-		});
-	}
+      @Override
+      public void onValueChange(ValueChangeEvent<IndexResult<T>> event) {
+        FacetUtils.updateFacetPanels(list, facetPanels, event.getValue().getFacetResults());
+      }
+    });
+  }
 
-	private static <T extends Serializable> void updateFacetPanels(final AsyncTableCell<T> list,
-			final Map<String, FlowPanel> facetPanels, final List<FacetFieldResult> facetResults) {
+  private static <T extends Serializable> void updateFacetPanels(final AsyncTableCell<T> list,
+    final Map<String, FlowPanel> facetPanels, final List<FacetFieldResult> facetResults) {
 
-		for (FacetFieldResult facetResult : facetResults) {
-			final String facetField = facetResult.getField();
-			FlowPanel facetPanel = facetPanels.get(facetResult.getField());
-			if (facetPanel != null) {
-				facetPanel.clear();
-				if (facetResult.getTotalCount() == 0) {
-					facetPanel.getParent().addStyleName("facet-empty");
-				} else {
-					facetPanel.getParent().removeStyleName("facet-empty");
-				}
+    for (FacetFieldResult facetResult : facetResults) {
+      final String facetField = facetResult.getField();
+      FlowPanel facetPanel = facetPanels.get(facetResult.getField());
+      if (facetPanel != null) {
+        facetPanel.clear();
+        if (facetResult.getTotalCount() == 0) {
+          facetPanel.getParent().addStyleName("facet-empty");
+        } else {
+          facetPanel.getParent().removeStyleName("facet-empty");
+        }
 
-				for (FacetValue facetValue : facetResult.getValues()) {
-					final String value = facetValue.getValue();
-					final String label = facetValue.getLabel();
-					long count = facetValue.getCount();
-					boolean selected = facetResult.getSelectedValues().contains(value);
-					StringBuilder checkboxLabel = new StringBuilder();
-					checkboxLabel.append(label);
-					if (count > 0 || facetResult.getSelectedValues().size() == 0 || selected) {
-						checkboxLabel.append(" (").append(count).append(")");
-					}
+        for (FacetValue facetValue : facetResult.getValues()) {
+          final String value = facetValue.getValue();
+          final String label = facetValue.getLabel();
+          long count = facetValue.getCount();
+          boolean selected = facetResult.getSelectedValues().contains(value);
+          StringBuilder checkboxLabel = new StringBuilder();
+          checkboxLabel.append(label);
+          if (count > 0 || facetResult.getSelectedValues().size() == 0 || selected) {
+            checkboxLabel.append(" (").append(count).append(")");
+          }
 
-					CheckBox facetValuePanel = new CheckBox(checkboxLabel.toString());
-					facetValuePanel.addStyleName("sidebar-facet-label");
-					facetValuePanel.setEnabled(count > 0 || facetResult.getSelectedValues().size() > 0);
-					facetPanel.add(facetValuePanel);
+          CheckBox facetValuePanel = new CheckBox(checkboxLabel.toString());
+          facetValuePanel.addStyleName("sidebar-facet-label");
+          facetValuePanel.setEnabled(count > 0 || facetResult.getSelectedValues().size() > 0);
+          facetPanel.add(facetValuePanel);
 
-					facetValuePanel.setValue(selected);
+          facetValuePanel.setValue(selected);
 
-					facetValuePanel.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+          facetValuePanel.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
 
-						@Override
-						public void onValueChange(ValueChangeEvent<Boolean> event) {
-							Facets facets = list.getFacets();
-							FacetParameter selectedFacetParameter = facets.getParameters().get(facetField);
+            @Override
+            public void onValueChange(ValueChangeEvent<Boolean> event) {
+              Facets facets = list.getFacets();
+              FacetParameter selectedFacetParameter = facets.getParameters().get(facetField);
 
-							if (selectedFacetParameter != null) {
-								if (event.getValue()) {
-									selectedFacetParameter.getValues().add(value);
-								} else {
-									selectedFacetParameter.getValues().remove(value);
-								}
-							} else {
-								LOGGER.warn("Haven't found the facet parameter: " + facetField);
-							}
-							list.setFacets(facets);
+              if (selectedFacetParameter != null) {
+                if (event.getValue()) {
+                  selectedFacetParameter.getValues().add(value);
+                } else {
+                  selectedFacetParameter.getValues().remove(value);
+                }
+              } else {
+                LOGGER.warn("Haven't found the facet parameter: " + facetField);
+              }
+              list.setFacets(facets);
 
-						}
-					});
-				}
+            }
+          });
+        }
 
-			} else {
-				LOGGER.warn("Got a facet but haven't got a panel for it");
-			}
-		}
-	}
+      } else {
+        LOGGER.warn("Got a facet but haven't got a panel for it");
+      }
+    }
+  }
 }

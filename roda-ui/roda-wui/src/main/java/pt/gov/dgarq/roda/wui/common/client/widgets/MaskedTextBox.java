@@ -157,9 +157,9 @@ public class MaskedTextBox extends TextBox {
   private void updateCursorPos() {
     int cursorPos;
     int nextInputPos = super.getText().indexOf('_');
-    
+
     if (nextInputPos < 0) {
-      cursorPos = super.getText().length()-1;
+      cursorPos = super.getText().length() - 1;
     } else {
       cursorPos = nextInputPos;
     }
@@ -169,26 +169,26 @@ public class MaskedTextBox extends TextBox {
   }
 
   private native String getPastedText(Event event) /*-{
-		var clipboard = event.clipboardData | $wnd.clipboardData;
+                                                   var clipboard = event.clipboardData | $wnd.clipboardData;
 
-		try {
-			return clipboard.getData("Text");
-		} catch (e) {
-			return "";
-		}
-  }-*/;
+                                                   try {
+                                                   return clipboard.getData("Text");
+                                                   } catch (e) {
+                                                   return "";
+                                                   }
+                                                   }-*/;
 
   private native void setCaretPosition(Element elem, Integer pos) /*-{
-		if (elem.setSelectionRange) {
-			elem.setSelectionRange(pos, pos);
-		} else if (elem.createTextRange) {
-			var range = elem.createTextRange();
-			range.collapse = true;
-			range.moveStart('character', pos);
-			range.moveEnd('character', pos);
-			range.select();
-		}
-  }-*/;
+                                                                  if (elem.setSelectionRange) {
+                                                                  elem.setSelectionRange(pos, pos);
+                                                                  } else if (elem.createTextRange) {
+                                                                  var range = elem.createTextRange();
+                                                                  range.collapse = true;
+                                                                  range.moveStart('character', pos);
+                                                                  range.moveEnd('character', pos);
+                                                                  range.select();
+                                                                  }
+                                                                  }-*/;
 
   private void transformMask() {
     for (Integer i = 0; i < this.mask.toCharArray().length; i++) {

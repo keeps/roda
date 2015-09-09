@@ -7,21 +7,20 @@ package pt.gov.dgarq.roda.core.metadata.premis;
  */
 public class PremisFileTest {
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		try {
+  /**
+   * @param args
+   */
+  public static void main(String[] args) {
+    try {
 
-			PremisFileObjectHelper rObjectHelper = new PremisFileObjectHelper();
+      PremisFileObjectHelper rObjectHelper = new PremisFileObjectHelper();
 
-			System.out.println("Getting File from Object");
-			System.out.println(rObjectHelper
-					.getRepresentationFilePreservationObject());
+      System.out.println("Getting File from Object");
+      System.out.println(rObjectHelper.getRepresentationFilePreservationObject());
 
-		} catch (PremisMetadataException e) {
-			e.printStackTrace();
-		}
-	}
+    } catch (PremisMetadataException e) {
+      e.printStackTrace();
+    }
+  }
 
 }

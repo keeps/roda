@@ -12,16 +12,16 @@ import pt.gov.dgarq.roda.wui.common.client.GenericException;
  */
 public class FileUploadException extends RODAException {
 
-	public FileUploadException() {
-		super();
-	}
+  public FileUploadException() {
+    super();
+  }
 
-	public FileUploadException(String message, GenericException cause) {
-		super(message, cause);
-	}
+  public FileUploadException(String message, GenericException cause) {
+    super(message, cause);
+  }
 
-	public FileUploadException(String message) {
-		super(message);
-	}
+  public FileUploadException(String message) {
+    super(message);
+  }
 
 }

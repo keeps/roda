@@ -10,9 +10,9 @@ import com.google.gwt.i18n.client.Messages;
  *
  */
 public interface SearchMessages extends Messages {
-	
-	// Common Search Messages
-	@DefaultMessage("{0} results")
-	public String totalResultsMessage(int total);
+
+  // Common Search Messages
+  @DefaultMessage("{0} results")
+  public String totalResultsMessage(int total);
 
 }

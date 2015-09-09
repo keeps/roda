@@ -65,8 +65,8 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public IndexResult<RODAMember> findMembers(Filter filter, Sorter sorter, Sublist sublist, Facets facets, String localeString)
-    throws AuthorizationDeniedException, GenericException {
+  public IndexResult<RODAMember> findMembers(Filter filter, Sorter sorter, Sublist sublist, Facets facets,
+    String localeString) throws AuthorizationDeniedException, GenericException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     IndexResult<RODAMember> result = UserManagement.findMembers(user, filter, sorter, sublist, facets);
     return I18nUtility.translate(result, localeString);
@@ -168,9 +168,9 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
       Date start = new Date();
       UserUtility.getLdapUtility().modifyGroup(group);
       long duration = new Date().getTime() - start.getTime();
-      LogUtility.registerAction(UserUtility.getClientUser(getThreadLocalRequest().getSession()), "UM.editGroup",
-        new String[] {"group", group.toString()}, "User %username% called method UM.editGroup(" + group + ")",
-        duration);
+      LogUtility
+        .registerAction(UserUtility.getClientUser(getThreadLocalRequest().getSession()), "UM.editGroup", new String[] {
+          "group", group.toString()}, "User %username% called method UM.editGroup(" + group + ")", duration);
     } catch (LdapUtilityException e) {
       throw new RODAException(e.getMessage(), e) {
       };

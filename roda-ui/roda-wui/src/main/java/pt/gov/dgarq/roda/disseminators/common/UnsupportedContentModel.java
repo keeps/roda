@@ -9,23 +9,23 @@ package pt.gov.dgarq.roda.disseminators.common;
  */
 public class UnsupportedContentModel extends Exception {
 
-	/**
+  /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	/**
+  /**
 	 * 
 	 */
-	public UnsupportedContentModel() {
-		super();
-	}
+  public UnsupportedContentModel() {
+    super();
+  }
 
-	/**
-	 * @param arg0
-	 */
-	public UnsupportedContentModel(String arg0) {
-		super(arg0);
-	}
+  /**
+   * @param arg0
+   */
+  public UnsupportedContentModel(String arg0) {
+    super(arg0);
+  }
 
 }

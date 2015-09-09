@@ -23,68 +23,61 @@ import org.roda.storage.fedora.utils.FedoraConversionUtils;
  * @author Hélder Silva <hsilva@keep.pt>
  * */
 public class IterableContainer implements ClosableIterable<Container> {
-	private Iterator<FedoraResource> fedoraResources;
+  private Iterator<FedoraResource> fedoraResources;
 
-	public IterableContainer(FedoraRepository repository)
-			throws StorageServiceException {
-		try {
-			fedoraResources = repository.getObject("").getChildren(null)
-					.iterator();
-		} catch (ForbiddenException e) {
-			throw new StorageServiceException(e.getMessage(),
-					StorageServiceException.FORBIDDEN, e);
-		} catch (BadRequestException e) {
-			throw new StorageServiceException(e.getMessage(),
-					StorageServiceException.BAD_REQUEST, e);
-		} catch (NotFoundException e) {
-			throw new StorageServiceException(e.getMessage(),
-					StorageServiceException.NOT_FOUND, e);
-		} catch (FedoraException e) {
-			throw new StorageServiceException(e.getMessage(),
-					StorageServiceException.BAD_REQUEST, e);
-		}
-	}
+  public IterableContainer(FedoraRepository repository) throws StorageServiceException {
+    try {
+      fedoraResources = repository.getObject("").getChildren(null).iterator();
+    } catch (ForbiddenException e) {
+      throw new StorageServiceException(e.getMessage(), StorageServiceException.FORBIDDEN, e);
+    } catch (BadRequestException e) {
+      throw new StorageServiceException(e.getMessage(), StorageServiceException.BAD_REQUEST, e);
+    } catch (NotFoundException e) {
+      throw new StorageServiceException(e.getMessage(), StorageServiceException.NOT_FOUND, e);
+    } catch (FedoraException e) {
+      throw new StorageServiceException(e.getMessage(), StorageServiceException.BAD_REQUEST, e);
+    }
+  }
 
-	@Override
-	public Iterator<Container> iterator() {
-		return new ContainerIterator(fedoraResources);
-	}
+  @Override
+  public Iterator<Container> iterator() {
+    return new ContainerIterator(fedoraResources);
+  }
 
-	public class ContainerIterator implements Iterator<Container> {
-		private Iterator<FedoraResource> fedoraResources;
+  public class ContainerIterator implements Iterator<Container> {
+    private Iterator<FedoraResource> fedoraResources;
 
-		public ContainerIterator(Iterator<FedoraResource> fedoraResources) {
-			this.fedoraResources = fedoraResources;
-		}
+    public ContainerIterator(Iterator<FedoraResource> fedoraResources) {
+      this.fedoraResources = fedoraResources;
+    }
 
-		@Override
-		public boolean hasNext() {
-			if (fedoraResources == null) {
-				return false;
-			}
-			return fedoraResources.hasNext();
+    @Override
+    public boolean hasNext() {
+      if (fedoraResources == null) {
+        return false;
+      }
+      return fedoraResources.hasNext();
 
-		}
+    }
 
-		@Override
-		public Container next() {
-			try {
-				FedoraResource resource = fedoraResources.next();
-				return FedoraConversionUtils
-						.fedoraObjectToContainer((FedoraObject) resource);
-			} catch (StorageServiceException e) {
-				return null;
-			}
-		}
+    @Override
+    public Container next() {
+      try {
+        FedoraResource resource = fedoraResources.next();
+        return FedoraConversionUtils.fedoraObjectToContainer((FedoraObject) resource);
+      } catch (StorageServiceException e) {
+        return null;
+      }
+    }
 
-		@Override
-		public void remove() {
-		}
+    @Override
+    public void remove() {
+    }
 
-	}
+  }
 
-	@Override
-	public void close() throws IOException {
-		// do nothing
-	}
+  @Override
+  public void close() throws IOException {
+    // do nothing
+  }
 }

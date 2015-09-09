@@ -9,28 +9,27 @@ import java.util.ResourceBundle;
  * 
  */
 public class BrowserServiceMessages {
-	private static final String BUNDLE_NAME = "config.i18n.server.BrowserServiceMessages"; //$NON-NLS-1$
+  private static final String BUNDLE_NAME = "config.i18n.server.BrowserServiceMessages"; //$NON-NLS-1$
 
-	private ResourceBundle resourceBundle;
+  private ResourceBundle resourceBundle;
 
-	/**
-	 * Create a new ingest list report messages translations for a defined
-	 * locale
-	 * 
-	 * @param locale
-	 */
-	public BrowserServiceMessages(Locale locale) {
-		this.resourceBundle = ResourceBundle.getBundle(BUNDLE_NAME, locale);
-	}
+  /**
+   * Create a new ingest list report messages translations for a defined locale
+   * 
+   * @param locale
+   */
+  public BrowserServiceMessages(Locale locale) {
+    this.resourceBundle = ResourceBundle.getBundle(BUNDLE_NAME, locale);
+  }
 
-	/**
-	 * Get translation
-	 * 
-	 * @param key
-	 * @return
-	 */
-	public String getString(String key) {
-		return resourceBundle.getString(key);
-	}
+  /**
+   * Get translation
+   * 
+   * @param key
+   * @return
+   */
+  public String getString(String key) {
+    return resourceBundle.getString(key);
+  }
 
 }

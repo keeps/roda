@@ -31,179 +31,164 @@ import config.i18n.client.UserManagementConstants;
  */
 public class Register implements HistoryResolver {
 
-	private static Register instance = null;
+  private static Register instance = null;
 
-	/**
-	 * Get the singleton instance
-	 * 
-	 * @return the instance
-	 */
-	public static Register getInstance() {
-		if (instance == null) {
-			instance = new Register();
-		}
-		return instance;
-	}
+  /**
+   * Get the singleton instance
+   * 
+   * @return the instance
+   */
+  public static Register getInstance() {
+    if (instance == null) {
+      instance = new Register();
+    }
+    return instance;
+  }
 
-	private ClientLogger logger = new ClientLogger(getClass().getName());
+  private ClientLogger logger = new ClientLogger(getClass().getName());
 
-	private static UserManagementConstants constants = (UserManagementConstants) GWT
-			.create(UserManagementConstants.class);
+  private static UserManagementConstants constants = (UserManagementConstants) GWT
+    .create(UserManagementConstants.class);
 
-	private boolean initialized;
+  private boolean initialized;
 
-	private VerticalPanel layout;
+  private VerticalPanel layout;
 
-	private Label userdataTitle;
+  private Label userdataTitle;
 
-	private UserDataPanel userdata;
-	
-	private Label disclaimer;
+  private UserDataPanel userdata;
 
-	private Label captchaTitle;
+  private Label disclaimer;
 
-	private AbstractImageCaptcha captcha;
+  private Label captchaTitle;
 
-	private WUIButton submit;
+  private AbstractImageCaptcha captcha;
 
-	private Register() {
-		initialized = false;
-	}
+  private WUIButton submit;
 
-	private void init() {
-		if (!initialized) {
-			initialized = true;
+  private Register() {
+    initialized = false;
+  }
 
-			layout = new VerticalPanel();
-			userdataTitle = new Label(constants.registerUserDataTitle());
-			userdata = new UserDataPanel(false, false);
-			disclaimer = new Label(constants.registerDisclaimer());
-			captchaTitle = new Label(constants.registerCaptchaTitle());
-			captcha = new DefaultImageCaptcha();
-			submit = new WUIButton(constants.registerSubmit(),
-					WUIButton.Left.ROUND,
-					WUIButton.Right.ARROW_FORWARD);
+  private void init() {
+    if (!initialized) {
+      initialized = true;
 
-			submit.addClickListener(new ClickListener() {
+      layout = new VerticalPanel();
+      userdataTitle = new Label(constants.registerUserDataTitle());
+      userdata = new UserDataPanel(false, false);
+      disclaimer = new Label(constants.registerDisclaimer());
+      captchaTitle = new Label(constants.registerCaptchaTitle());
+      captcha = new DefaultImageCaptcha();
+      submit = new WUIButton(constants.registerSubmit(), WUIButton.Left.ROUND, WUIButton.Right.ARROW_FORWARD);
 
-				public void onClick(Widget sender) {
-					if (userdata.isValid()) {
-						UserManagementService.Util.getInstance().register(
-								userdata.getUser(), userdata.getPassword(),
-								captcha.getResponse(),
-								new AsyncCallback<Boolean>() {
+      submit.addClickListener(new ClickListener() {
 
-									public void onFailure(Throwable caught) {
-										if (caught instanceof UserAlreadyExistsException) {
-											Window.alert(constants
-													.registerUserExists());
-										} else if (caught instanceof EmailAlreadyExistsException) {
-											Window
-													.alert(constants
-															.registerEmailAlreadyExists());
-										} else {
-											logger.error(
-													"Error while registering",
-													caught);
-										}
-										captcha.refresh();
-									}
+        public void onClick(Widget sender) {
+          if (userdata.isValid()) {
+            UserManagementService.Util.getInstance().register(userdata.getUser(), userdata.getPassword(),
+              captcha.getResponse(), new AsyncCallback<Boolean>() {
 
-									public void onSuccess(Boolean passed) {
-										if (passed.booleanValue()) {
-											Window.alert(constants
-													.registerSuccess());
-											History.newItem(VerifyEmail
-													.getInstance()
-													.getHistoryPath()
-													+ "."
-													+ userdata.getUser()
-															.getName());
-										} else {
-											Window.alert(constants
-													.registerWrongCaptcha());
-											captcha.refresh();
-										}
+                public void onFailure(Throwable caught) {
+                  if (caught instanceof UserAlreadyExistsException) {
+                    Window.alert(constants.registerUserExists());
+                  } else if (caught instanceof EmailAlreadyExistsException) {
+                    Window.alert(constants.registerEmailAlreadyExists());
+                  } else {
+                    logger.error("Error while registering", caught);
+                  }
+                  captcha.refresh();
+                }
 
-									}
+                public void onSuccess(Boolean passed) {
+                  if (passed.booleanValue()) {
+                    Window.alert(constants.registerSuccess());
+                    History.newItem(VerifyEmail.getInstance().getHistoryPath() + "." + userdata.getUser().getName());
+                  } else {
+                    Window.alert(constants.registerWrongCaptcha());
+                    captcha.refresh();
+                  }
 
-								});
-					}
-				}
+                }
 
-			});
+              });
+          }
+        }
 
-			submit.setEnabled(false);
-			userdata.addChangeListener(new ChangeListener() {
+      });
 
-				public void onChange(Widget sender) {
-					submit.setEnabled(userdata.isValid());
-				}
+      submit.setEnabled(false);
+      userdata.addChangeListener(new ChangeListener() {
 
-			});
+        public void onChange(Widget sender) {
+          submit.setEnabled(userdata.isValid());
+        }
 
-			layout.add(userdataTitle);
-			layout.add(userdata);
-			layout.add(disclaimer);
-			layout.add(captchaTitle);
-			layout.add(captcha.getWidget());
-			layout.add(submit);
+      });
 
-			layout.addStyleName("wui-register");
-			userdataTitle.addStyleName("register-title");
-			userdata.addStyleName("register-userdata");
-			disclaimer.addStyleName("register-disclaimer");
-			captchaTitle.addStyleName("register-title");
-			captcha.getWidget().addStyleName("register-captcha");
-			submit.addStyleName("register-submit");
-		}
-	}
+      layout.add(userdataTitle);
+      layout.add(userdata);
+      layout.add(disclaimer);
+      layout.add(captchaTitle);
+      layout.add(captcha.getWidget());
+      layout.add(submit);
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see pt.gov.dgarq.roda.office.common.client.HistoryResolver#getHistoryPath()
-	 */
-	public String getHistoryPath() {
-		return getHistoryToken();
-	}
+      layout.addStyleName("wui-register");
+      userdataTitle.addStyleName("register-title");
+      userdata.addStyleName("register-userdata");
+      disclaimer.addStyleName("register-disclaimer");
+      captchaTitle.addStyleName("register-title");
+      captcha.getWidget().addStyleName("register-captcha");
+      submit.addStyleName("register-submit");
+    }
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see pt.gov.dgarq.roda.office.common.client.HistoryResolver#getHistoryToken()
-	 */
-	public String getHistoryToken() {
-		return "register";
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * pt.gov.dgarq.roda.office.common.client.HistoryResolver#getHistoryPath()
+   */
+  public String getHistoryPath() {
+    return getHistoryToken();
+  }
 
-	public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
-		if (historyTokens.length == 0) {
-			if (initialized) {
-				captcha.refresh();
-				userdata.clear();
-			}
-			init();
-			callback.onSuccess(layout);
-		} else {
-			History.newItem(getHistoryPath());
-			callback.onSuccess(null);
-		}
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * pt.gov.dgarq.roda.office.common.client.HistoryResolver#getHistoryToken()
+   */
+  public String getHistoryToken() {
+    return "register";
+  }
 
-	public void isCurrentUserPermitted(final AsyncCallback<Boolean> callback) {
-		UserLogin.getInstance().getAuthenticatedUser(
-				new AsyncCallback<AuthenticatedUser>() {
+  public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
+    if (historyTokens.length == 0) {
+      if (initialized) {
+        captcha.refresh();
+        userdata.clear();
+      }
+      init();
+      callback.onSuccess(layout);
+    } else {
+      History.newItem(getHistoryPath());
+      callback.onSuccess(null);
+    }
+  }
 
-					public void onFailure(Throwable caught) {
-						callback.onFailure(caught);
-					}
+  public void isCurrentUserPermitted(final AsyncCallback<Boolean> callback) {
+    UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<AuthenticatedUser>() {
 
-					public void onSuccess(AuthenticatedUser user) {
-						callback.onSuccess(new Boolean(user.isGuest()));
-					}
+      public void onFailure(Throwable caught) {
+        callback.onFailure(caught);
+      }
 
-				});
-	}
+      public void onSuccess(AuthenticatedUser user) {
+        callback.onSuccess(new Boolean(user.isGuest()));
+      }
+
+    });
+  }
 
 }

@@ -23,92 +23,92 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class ReportPanel extends Composite {
 
-	private Report report;
-	private VerticalPanel layout;
-	private FlexTable attributes;
-	private VerticalPanel items;
+  private Report report;
+  private VerticalPanel layout;
+  private FlexTable attributes;
+  private VerticalPanel items;
 
-	/**
-	 * Create report panel
-	 * 
-	 * @param report
-	 */
-	public ReportPanel(Report report) {
-		this.report = report;
+  /**
+   * Create report panel
+   * 
+   * @param report
+   */
+  public ReportPanel(Report report) {
+    this.report = report;
 
-		layout = new VerticalPanel();
-		attributes = new FlexTable();
-		items = new VerticalPanel();
+    layout = new VerticalPanel();
+    attributes = new FlexTable();
+    items = new VerticalPanel();
 
-		layout.add(attributes);
-		layout.add(items);
+    layout.add(attributes);
+    layout.add(items);
 
-		updateAttributes();
-		updateItems();
+    updateAttributes();
+    updateItems();
 
-		initWidget(layout);
+    initWidget(layout);
 
-		this.addStyleName("wui-report");
-		layout.addStyleName("report-layout");
-		attributes.addStyleName("report-attributes");
-		items.addStyleName("report-items");
-	}
+    this.addStyleName("wui-report");
+    layout.addStyleName("report-layout");
+    attributes.addStyleName("report-attributes");
+    items.addStyleName("report-items");
+  }
 
-	private void updateAttributes() {
-		int row = 0;
-		for (Attribute attrb : report.getAttributes()) {
-			Label name = new Label(attrb.getName());
-			Label value = new Label(attrb.getValue());
+  private void updateAttributes() {
+    int row = 0;
+    for (Attribute attrb : report.getAttributes()) {
+      Label name = new Label(attrb.getName());
+      Label value = new Label(attrb.getValue());
 
-			attributes.setWidget(row, 0, name);
-			attributes.setWidget(row, 1, value);
-			
-			attributes.getCellFormatter().setVerticalAlignment(row, 0, HasAlignment.ALIGN_TOP);
-			name.addStyleName("attribute-name");
-			value.addStyleName("attribute-value");
-			
-			row++;
-		}
-	}
+      attributes.setWidget(row, 0, name);
+      attributes.setWidget(row, 1, value);
 
-	private void updateItems() {
-		for (ReportItem item : report.getItems()) {
-			Widget reportItemPanel = createReportItemPanel(item);
-			items.add(reportItemPanel);
-		}
-	}
+      attributes.getCellFormatter().setVerticalAlignment(row, 0, HasAlignment.ALIGN_TOP);
+      name.addStyleName("attribute-name");
+      value.addStyleName("attribute-value");
 
-	private Widget createReportItemPanel(ReportItem item) {
-		DisclosurePanel disclosure = new DisclosurePanel(item.getTitle());
-		FlexTable attributes = new FlexTable();
-		int row = 0;
-		for (Attribute attrb : item.getAttributes()) {
-			Label name = new Label(attrb.getName());
-			Label value = new Label(attrb.getValue());
+      row++;
+    }
+  }
 
-			attributes.setWidget(row, 0, name);
-			attributes.setWidget(row, 1, value);			
+  private void updateItems() {
+    for (ReportItem item : report.getItems()) {
+      Widget reportItemPanel = createReportItemPanel(item);
+      items.add(reportItemPanel);
+    }
+  }
 
-			attributes.getCellFormatter().setVerticalAlignment(row, 0, HasAlignment.ALIGN_TOP);
-			name.addStyleName("attribute-name");
-			value.addStyleName("attribute-value");
-			
-			row++;
-		}
-		
-		disclosure.setContent(attributes);
-		disclosure.addStyleName("report-item");
-		attributes.addStyleName("report-item-attributes");
-		return disclosure;
-	}
+  private Widget createReportItemPanel(ReportItem item) {
+    DisclosurePanel disclosure = new DisclosurePanel(item.getTitle());
+    FlexTable attributes = new FlexTable();
+    int row = 0;
+    for (Attribute attrb : item.getAttributes()) {
+      Label name = new Label(attrb.getName());
+      Label value = new Label(attrb.getValue());
 
-	/**
-	 * Get report
-	 * 
-	 * @return
-	 */
-	public Report getReport() {
-		return report;
-	}
+      attributes.setWidget(row, 0, name);
+      attributes.setWidget(row, 1, value);
+
+      attributes.getCellFormatter().setVerticalAlignment(row, 0, HasAlignment.ALIGN_TOP);
+      name.addStyleName("attribute-name");
+      value.addStyleName("attribute-value");
+
+      row++;
+    }
+
+    disclosure.setContent(attributes);
+    disclosure.addStyleName("report-item");
+    attributes.addStyleName("report-item-attributes");
+    return disclosure;
+  }
+
+  /**
+   * Get report
+   * 
+   * @return
+   */
+  public Report getReport() {
+    return report;
+  }
 
 }

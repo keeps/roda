@@ -10,6 +10,6 @@ import com.google.gwt.i18n.client.Constants;
  * 
  */
 public interface PreIngestConstants extends Constants {
-	@DefaultStringValue("Your current Classification plan")
-	String classificationPlanLabel();
+  @DefaultStringValue("Your current Classification plan")
+  String classificationPlanLabel();
 }

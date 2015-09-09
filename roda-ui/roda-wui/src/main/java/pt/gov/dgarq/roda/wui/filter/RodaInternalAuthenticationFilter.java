@@ -27,8 +27,8 @@ public class RodaInternalAuthenticationFilter implements Filter {
   }
 
   @Override
-  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-    throws IOException, ServletException {
+  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
+    ServletException {
     LOGGER.debug("executing doFilter");
 
     final HttpServletRequest httpRequest = (HttpServletRequest) request;

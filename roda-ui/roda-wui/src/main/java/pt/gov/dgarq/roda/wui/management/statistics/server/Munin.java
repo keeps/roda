@@ -15,73 +15,71 @@ import pt.gov.dgarq.roda.common.RodaCoreFactory;
  * Servlet implementation class Munin
  */
 public class Munin extends HttpServlet {
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	private Logger logger = Logger.getLogger(Munin.class);
+  private Logger logger = Logger.getLogger(Munin.class);
 
-	private String role;
-	private String munin_dir;
+  private String role;
+  private String munin_dir;
 
-	/**
-	 * @see HttpServlet#HttpServlet()
-	 */
-	public Munin() {
-		super();
+  /**
+   * @see HttpServlet#HttpServlet()
+   */
+  public Munin() {
+    super();
 
-		role = RodaCoreFactory.getRodaConfiguration().getString("roda.wui.munin.role", null);
-		munin_dir = RodaCoreFactory.getRodaConfiguration().getString("roda.wui.munin.dir", null);
+    role = RodaCoreFactory.getRodaConfiguration().getString("roda.wui.munin.role", null);
+    munin_dir = RodaCoreFactory.getRodaConfiguration().getString("roda.wui.munin.dir", null);
 
-	}
+  }
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
-	 *      response)
-	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		doPost(request, response);
-	}
+  /**
+   * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+   *      response)
+   */
+  protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    doPost(request, response);
+  }
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
-	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		// try {
-		// RODAClient rodaClient = RodaClientFactory.getRodaClient(request
-		// .getSession());
-		// User authenticatedUser = rodaClient.getAuthenticatedUser();
-		//
-		// if (authenticatedUser.hasRole(role)) {
-		// String pathInfo = request.getPathInfo();
-		// File resource = new File(munin_dir, pathInfo);
-		// response.setContentLength((int) resource.length());
-		// IOUtils.copy(new FileInputStream(resource), response
-		// .getOutputStream());
-		//
-		// } else {
-		// logger.warn("Access denied because user "
-		// + authenticatedUser.getName() + " does not have role "
-		// + role);
-		// response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "User "
-		// + authenticatedUser.getName() + " does not have role "
-		// + role);
-		// }
-		//
-		// } catch (LoginException e) {
-		// logger.error("Error getting RODA Client", e);
-		// response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
-		// "Login exception: " + e.getMessage());
-		// } catch (RODAClientException e) {
-		// logger.error("Error getting RODA Client", e);
-		// response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e
-		// .getMessage());
-		// } catch (Throwable e) {
-		// logger.error("Error getting RODA Client", e);
-		// response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e
-		// .getMessage());
-		// }
-	}
+  /**
+   * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+   *      response)
+   */
+  protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    // try {
+    // RODAClient rodaClient = RodaClientFactory.getRodaClient(request
+    // .getSession());
+    // User authenticatedUser = rodaClient.getAuthenticatedUser();
+    //
+    // if (authenticatedUser.hasRole(role)) {
+    // String pathInfo = request.getPathInfo();
+    // File resource = new File(munin_dir, pathInfo);
+    // response.setContentLength((int) resource.length());
+    // IOUtils.copy(new FileInputStream(resource), response
+    // .getOutputStream());
+    //
+    // } else {
+    // logger.warn("Access denied because user "
+    // + authenticatedUser.getName() + " does not have role "
+    // + role);
+    // response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "User "
+    // + authenticatedUser.getName() + " does not have role "
+    // + role);
+    // }
+    //
+    // } catch (LoginException e) {
+    // logger.error("Error getting RODA Client", e);
+    // response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+    // "Login exception: " + e.getMessage());
+    // } catch (RODAClientException e) {
+    // logger.error("Error getting RODA Client", e);
+    // response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e
+    // .getMessage());
+    // } catch (Throwable e) {
+    // logger.error("Error getting RODA Client", e);
+    // response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e
+    // .getMessage());
+    // }
+  }
 
 }

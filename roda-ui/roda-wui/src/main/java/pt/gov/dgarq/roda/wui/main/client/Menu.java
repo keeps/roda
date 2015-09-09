@@ -95,8 +95,8 @@ public class Menu extends Composite {
     ingest_pre = ingestMenu.addItem(constants.title_ingest_pre(), createCommand(PreIngest.RESOLVER.getHistoryPath()));
     ingest_submit = ingestMenu.addItem(constants.title_ingest_submit(),
       createCommand(IngestSubmit.RESOLVER.getHistoryPath()));
-    ingest_list = ingestMenu.addItem(constants.title_ingest_list(),
-      createCommand(IngestList.RESOLVER.getHistoryPath()));
+    ingest_list = ingestMenu
+      .addItem(constants.title_ingest_list(), createCommand(IngestList.RESOLVER.getHistoryPath()));
     ingestMenu.addItem(constants.title_ingest_help(), createCommand(Ingest.RESOLVER.getHistoryPath() + ".help"));
 
     administrationMenu = new MenuBar(true);

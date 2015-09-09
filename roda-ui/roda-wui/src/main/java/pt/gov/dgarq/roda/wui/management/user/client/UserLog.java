@@ -41,134 +41,133 @@ import pt.gov.dgarq.roda.wui.management.client.Management;
  */
 public class UserLog extends Composite {
 
-	public static final HistoryResolver RESOLVER = new HistoryResolver() {
+  public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
-		@Override
-		public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
-			getInstance().resolve(historyTokens, callback);
-		}
+    @Override
+    public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
+      getInstance().resolve(historyTokens, callback);
+    }
 
-		@Override
-		public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-			UserLogin.getInstance().checkRoles(new HistoryResolver[] { UserLog.RESOLVER }, false, callback);
-		}
+    @Override
+    public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
+      UserLogin.getInstance().checkRoles(new HistoryResolver[] {UserLog.RESOLVER}, false, callback);
+    }
 
-		public String getHistoryPath() {
-			return Management.RESOLVER.getHistoryPath() + "." + getHistoryToken();
-		}
+    public String getHistoryPath() {
+      return Management.RESOLVER.getHistoryPath() + "." + getHistoryToken();
+    }
 
-		public String getHistoryToken() {
-			return "log";
-		}
-	};
+    public String getHistoryToken() {
+      return "log";
+    }
+  };
 
-	private static UserLog instance = null;
+  private static UserLog instance = null;
 
-	/**
-	 * Get the singleton instance
-	 * 
-	 * @return the instance
-	 */
-	public static UserLog getInstance() {
-		if (instance == null) {
-			instance = new UserLog();
-		}
-		return instance;
-	}
+  /**
+   * Get the singleton instance
+   * 
+   * @return the instance
+   */
+  public static UserLog getInstance() {
+    if (instance == null) {
+      instance = new UserLog();
+    }
+    return instance;
+  }
 
-	interface MyUiBinder extends UiBinder<Widget, UserLog> {
-	}
+  interface MyUiBinder extends UiBinder<Widget, UserLog> {
+  }
 
-	private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-	private static UserManagementConstants constants = (UserManagementConstants) GWT
-			.create(UserManagementConstants.class);
+  private static UserManagementConstants constants = (UserManagementConstants) GWT
+    .create(UserManagementConstants.class);
 
-	private static UserManagementMessages messages = (UserManagementMessages) GWT.create(UserManagementMessages.class);
+  private static UserManagementMessages messages = (UserManagementMessages) GWT.create(UserManagementMessages.class);
 
-	private ClientLogger logger = new ClientLogger(getClass().getName());
+  private ClientLogger logger = new ClientLogger(getClass().getName());
 
-	@UiField
-	DateBox inputDateInitial;
+  @UiField
+  DateBox inputDateInitial;
 
-	@UiField
-	DateBox inputDateFinal;
+  @UiField
+  DateBox inputDateFinal;
 
-	@UiField(provided = true)
-	LogEntryList logList;
+  @UiField(provided = true)
+  LogEntryList logList;
 
-	@UiField(provided = true)
-	FlowPanel facetComponents;
+  @UiField(provided = true)
+  FlowPanel facetComponents;
 
-	@UiField(provided = true)
-	FlowPanel facetMethods;
+  @UiField(provided = true)
+  FlowPanel facetMethods;
 
-	@UiField(provided = true)
-	FlowPanel facetUsers;
+  @UiField(provided = true)
+  FlowPanel facetUsers;
 
-	/**
-	 * Create a new user log
-	 * 
-	 * @param user
-	 */
-	public UserLog() {
-		Filter filter = null;
-		Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.LOG_ACTION_COMPONENT),
-				new SimpleFacetParameter(RodaConstants.LOG_ACTION_METHOD),
-				new SimpleFacetParameter(RodaConstants.LOG_USERNAME));
-		logList = new LogEntryList(filter, facets);
-		facetComponents = new FlowPanel();
-		facetMethods = new FlowPanel();
-		facetUsers = new FlowPanel();
+  /**
+   * Create a new user log
+   * 
+   * @param user
+   */
+  public UserLog() {
+    Filter filter = null;
+    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.LOG_ACTION_COMPONENT), new SimpleFacetParameter(
+      RodaConstants.LOG_ACTION_METHOD), new SimpleFacetParameter(RodaConstants.LOG_USERNAME));
+    logList = new LogEntryList(filter, facets);
+    facetComponents = new FlowPanel();
+    facetMethods = new FlowPanel();
+    facetUsers = new FlowPanel();
 
-		Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
-		facetPanels.put(RodaConstants.LOG_ACTION_COMPONENT, facetComponents);
-		facetPanels.put(RodaConstants.LOG_ACTION_METHOD, facetMethods);
-		facetPanels.put(RodaConstants.LOG_USERNAME, facetUsers);
-		FacetUtils.bindFacets(logList, facetPanels);
+    Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
+    facetPanels.put(RodaConstants.LOG_ACTION_COMPONENT, facetComponents);
+    facetPanels.put(RodaConstants.LOG_ACTION_METHOD, facetMethods);
+    facetPanels.put(RodaConstants.LOG_USERNAME, facetUsers);
+    FacetUtils.bindFacets(logList, facetPanels);
 
-		initWidget(uiBinder.createAndBindUi(this));
+    initWidget(uiBinder.createAndBindUi(this));
 
-		DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
-		ValueChangeHandler<Date> valueChangeHandler = new ValueChangeHandler<Date>() {
+    DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
+    ValueChangeHandler<Date> valueChangeHandler = new ValueChangeHandler<Date>() {
 
-			@Override
-			public void onValueChange(ValueChangeEvent<Date> event) {
-				updateDateFilter();
-			}
+      @Override
+      public void onValueChange(ValueChangeEvent<Date> event) {
+        updateDateFilter();
+      }
 
-		};
+    };
 
-		inputDateInitial.setFormat(dateFormat);
-		inputDateInitial.getDatePicker().setYearArrowsVisible(true);
-		inputDateInitial.setFireNullValues(true);
-		inputDateInitial.addValueChangeHandler(valueChangeHandler);
+    inputDateInitial.setFormat(dateFormat);
+    inputDateInitial.getDatePicker().setYearArrowsVisible(true);
+    inputDateInitial.setFireNullValues(true);
+    inputDateInitial.addValueChangeHandler(valueChangeHandler);
 
-		inputDateFinal.setFormat(dateFormat);
-		inputDateFinal.getDatePicker().setYearArrowsVisible(true);
-		inputDateFinal.setFireNullValues(true);
-		inputDateFinal.addValueChangeHandler(valueChangeHandler);
+    inputDateFinal.setFormat(dateFormat);
+    inputDateFinal.getDatePicker().setYearArrowsVisible(true);
+    inputDateFinal.setFireNullValues(true);
+    inputDateFinal.addValueChangeHandler(valueChangeHandler);
 
-	}
+  }
 
-	private void updateDateFilter() {
-		Date dateInitial = inputDateInitial.getDatePicker().getValue();
-		Date dateFinal = inputDateFinal.getDatePicker().getValue();
+  private void updateDateFilter() {
+    Date dateInitial = inputDateInitial.getDatePicker().getValue();
+    Date dateFinal = inputDateFinal.getDatePicker().getValue();
 
-		DateRangeFilterParameter filterParameter = new DateRangeFilterParameter(RodaConstants.LOG_DATETIME, dateInitial,
-				dateFinal, RodaConstants.DateGranularity.DAY);
+    DateRangeFilterParameter filterParameter = new DateRangeFilterParameter(RodaConstants.LOG_DATETIME, dateInitial,
+      dateFinal, RodaConstants.DateGranularity.DAY);
 
-		logList.setFilter(new Filter(filterParameter));
-	}
+    logList.setFilter(new Filter(filterParameter));
+  }
 
-	public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
-		if (historyTokens.length == 0) {
-			logList.refresh();
-			callback.onSuccess(this);
-		} else {
-			History.newItem(RESOLVER.getHistoryPath());
-			callback.onSuccess(null);
-		}
-	}
+  public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
+    if (historyTokens.length == 0) {
+      logList.refresh();
+      callback.onSuccess(this);
+    } else {
+      History.newItem(RESOLVER.getHistoryPath());
+      callback.onSuccess(null);
+    }
+  }
 
 }

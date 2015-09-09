@@ -14,43 +14,43 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class DefaultImageCaptcha extends AbstractImageCaptcha {
 
-	private final VerticalPanel layout;
+  private final VerticalPanel layout;
 
-	private final Image image;
+  private final Image image;
 
-	private final TextBox input;
+  private final TextBox input;
 
-	/**
-	 * Default image captcha constructor.
-	 *
-	 */
-	public DefaultImageCaptcha() {
-		super();
-		layout = new VerticalPanel();
-		image = getImage();
-		input = new TextBox();
+  /**
+   * Default image captcha constructor.
+   *
+   */
+  public DefaultImageCaptcha() {
+    super();
+    layout = new VerticalPanel();
+    image = getImage();
+    input = new TextBox();
 
-		layout.add(image);
-		layout.add(input);
+    layout.add(image);
+    layout.add(input);
 
-		input.setWidth("100%");
+    input.setWidth("100%");
 
-		layout.addStyleName("wui-captcha-image-default");
-		image.addStyleName("captcha-image");
-		input.addStyleName("captcha-input");
-	}
+    layout.addStyleName("wui-captcha-image-default");
+    image.addStyleName("captcha-image");
+    input.addStyleName("captcha-input");
+  }
 
-	public String getResponse() {
-		return input.getText();
-	}
+  public String getResponse() {
+    return input.getText();
+  }
 
-	public Widget getWidget() {
-		return layout;
-	}
+  public Widget getWidget() {
+    return layout;
+  }
 
-	public void refresh() {
-		super.refresh();
-		input.setText("");
-	}
+  public void refresh() {
+    super.refresh();
+    input.setText("");
+  }
 
 }

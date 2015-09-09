@@ -316,8 +316,8 @@ public class RodaCoreFactory {
       instantiate();
       if ("index".equals(args.get(0))) {
         if ("list".equals(args.get(1)) && ("users".equals(args.get(2)) || "groups".equals(args.get(2)))) {
-          Filter filter = new Filter(
-            new SimpleFilterParameter(RodaConstants.MEMBERS_IS_USER, "users".equals(args.get(2)) ? "true" : "false"));
+          Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.MEMBERS_IS_USER, "users".equals(args
+            .get(2)) ? "true" : "false"));
           Sorter sorter = null;
           Sublist sublist = new Sublist(0, 10000);
           Facets facets = null;

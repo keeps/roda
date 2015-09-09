@@ -13,42 +13,42 @@ import pt.gov.dgarq.roda.core.data.v2.SIPReport;
 import pt.gov.dgarq.roda.wui.common.client.GenericException;
 
 public class IngestListHelper {
-	private static final Logger LOGGER = Logger.getLogger(IngestListHelper.class);
+  private static final Logger LOGGER = Logger.getLogger(IngestListHelper.class);
 
-	static Long countSipReports(Filter filter) throws GenericException {
-		Long count;
-		try {
-			count = RodaCoreFactory.getIndexService().count(SIPReport.class, filter);
-		} catch (IndexServiceException e) {
-			LOGGER.debug("Error getting SIP reports count", e);
-			throw new GenericException("Error getting SIP reports count " + e.getMessage());
-		}
+  static Long countSipReports(Filter filter) throws GenericException {
+    Long count;
+    try {
+      count = RodaCoreFactory.getIndexService().count(SIPReport.class, filter);
+    } catch (IndexServiceException e) {
+      LOGGER.debug("Error getting SIP reports count", e);
+      throw new GenericException("Error getting SIP reports count " + e.getMessage());
+    }
 
-		return count;
-	}
+    return count;
+  }
 
-	static IndexResult<SIPReport> findSipReports(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
-			throws GenericException {
-		IndexResult<SIPReport> ret;
-		try {
-			ret = RodaCoreFactory.getIndexService().find(SIPReport.class, filter, sorter, sublist, facets);
-		} catch (IndexServiceException e) {
-			LOGGER.error("Error getting SIP reports", e);
-			throw new GenericException("Error getting SIP reports " + e.getMessage());
-		}
+  static IndexResult<SIPReport> findSipReports(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
+    throws GenericException {
+    IndexResult<SIPReport> ret;
+    try {
+      ret = RodaCoreFactory.getIndexService().find(SIPReport.class, filter, sorter, sublist, facets);
+    } catch (IndexServiceException e) {
+      LOGGER.error("Error getting SIP reports", e);
+      throw new GenericException("Error getting SIP reports " + e.getMessage());
+    }
 
-		return ret;
-	}
+    return ret;
+  }
 
-	static SIPReport retrieveSipReport(String sipReportId) throws GenericException {
-		SIPReport ret;
-		try {
-			ret = RodaCoreFactory.getIndexService().retrieve(SIPReport.class, sipReportId);
-		} catch (IndexServiceException e) {
-			LOGGER.error("Error getting SIP reports", e);
-			throw new GenericException("Error getting SIP reports " + e.getMessage());
-		}
+  static SIPReport retrieveSipReport(String sipReportId) throws GenericException {
+    SIPReport ret;
+    try {
+      ret = RodaCoreFactory.getIndexService().retrieve(SIPReport.class, sipReportId);
+    } catch (IndexServiceException e) {
+      LOGGER.error("Error getting SIP reports", e);
+      throw new GenericException("Error getting SIP reports " + e.getMessage());
+    }
 
-		return ret;
-	}
+    return ret;
+  }
 }

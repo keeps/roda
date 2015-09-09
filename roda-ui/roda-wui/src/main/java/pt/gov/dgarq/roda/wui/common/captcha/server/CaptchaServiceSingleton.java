@@ -12,14 +12,14 @@ import com.octo.captcha.service.image.ImageCaptchaService;
  *      quick integration tutorial</a>
  */
 public class CaptchaServiceSingleton {
-	private static ImageCaptchaService instance = new DefaultManageableImageCaptchaService();
+  private static ImageCaptchaService instance = new DefaultManageableImageCaptchaService();
 
-	/**
-	 * Get the singleton instance
-	 * 
-	 * @return the instance
-	 */
-	public static ImageCaptchaService getInstance() {
-		return instance;
-	}
+  /**
+   * Get the singleton instance
+   * 
+   * @return the instance
+   */
+  public static ImageCaptchaService getInstance() {
+    return instance;
+  }
 }

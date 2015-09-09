@@ -11,23 +11,23 @@ import com.google.gwt.user.client.ui.ImageBundle;
  * 
  */
 public interface EditorsIconBundle extends ImageBundle {
-	
-	@Resource("textfield.png")
-	public AbstractImagePrototype editorText();
 
-	@Resource("date.png")
-	public AbstractImagePrototype editorDate();
+  @Resource("textfield.png")
+  public AbstractImagePrototype editorText();
 
-	@Resource("time.png")
-	public AbstractImagePrototype editorChronList();
+  @Resource("date.png")
+  public AbstractImagePrototype editorDate();
 
-	@Resource("flag_red.png")
-	public AbstractImagePrototype editorLanguagesList();
+  @Resource("time.png")
+  public AbstractImagePrototype editorChronList();
 
-	@Resource("table.png")
-	public AbstractImagePrototype editorArrangementTable();
+  @Resource("flag_red.png")
+  public AbstractImagePrototype editorLanguagesList();
 
-	@Resource("application_edit.png")
-	public AbstractImagePrototype editorOther();
+  @Resource("table.png")
+  public AbstractImagePrototype editorArrangementTable();
+
+  @Resource("application_edit.png")
+  public AbstractImagePrototype editorOther();
 
 }

@@ -31,299 +31,297 @@ import pt.gov.dgarq.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
  */
 public class TreeItemPanel extends AccessibleFocusPanel implements SourcesSliderEvents {
 
-	private static boolean SHOW_ITEM_POPUP = false;
+  private static boolean SHOW_ITEM_POPUP = false;
 
-	private ClientLogger logger = new ClientLogger(getClass().getName());
+  private ClientLogger logger = new ClientLogger(getClass().getName());
 
-	private static BrowseConstants constants = (BrowseConstants) GWT.create(BrowseConstants.class);
+  private static BrowseConstants constants = (BrowseConstants) GWT.create(BrowseConstants.class);
 
-	private final List<SliderEventListener> sliderListeners;
+  private final List<SliderEventListener> sliderListeners;
 
-	private SimpleDescriptionObject sdo;
+  private SimpleDescriptionObject sdo;
 
-	private final HorizontalPanel layout;
+  private final HorizontalPanel layout;
 
-	private Image image;
+  private Image image;
 
-	private final Label label;
+  private final Label label;
 
-	// private final int childrenCount;
+  // private final int childrenCount;
 
-	final private Image waitImage = new Image(GWT.getModuleBaseURL() + "images/loadingSmall.gif");
+  final private Image waitImage = new Image(GWT.getModuleBaseURL() + "images/loadingSmall.gif");
 
-	private boolean showInfo;
+  private boolean showInfo;
 
-	private Label title;
+  private Label title;
 
-	private Label startDate;
-
-	private Label endDate;
-
-	private MouseListener itemPopupMouseListener;
-
-	/**
-	 * Create a new tree item panel
-	 * 
-	 * @param sdo
-	 *            the simple description object relative to this item
-	 * @param childrenCount
-	 *            the number of children this item has
-	 * @param showInfo
-	 *            whereas extended information should be presented
-	 */
-	public TreeItemPanel(SimpleDescriptionObject sdo, int childrenCount, boolean showInfo) {
-		this.sdo = sdo;
-		this.showInfo = false;
-		// this.childrenCount = childrenCount;
-		this.sliderListeners = new Vector<SliderEventListener>();
+  private Label startDate;
+
+  private Label endDate;
 
-		layout = new HorizontalPanel();
-		this.setWidget(layout);
+  private MouseListener itemPopupMouseListener;
+
+  /**
+   * Create a new tree item panel
+   * 
+   * @param sdo
+   *          the simple description object relative to this item
+   * @param childrenCount
+   *          the number of children this item has
+   * @param showInfo
+   *          whereas extended information should be presented
+   */
+  public TreeItemPanel(SimpleDescriptionObject sdo, int childrenCount, boolean showInfo) {
+    this.sdo = sdo;
+    this.showInfo = false;
+    // this.childrenCount = childrenCount;
+    this.sliderListeners = new Vector<SliderEventListener>();
 
-		addStyleName("TreeItemPanel");
+    layout = new HorizontalPanel();
+    this.setWidget(layout);
 
-		layout.add(waitImage);
-		waitImage.setVisible(false);
-		waitImage.addStyleName("itemWaitingImage");
+    addStyleName("TreeItemPanel");
 
-		final String labeltext = sdo.getLabel();
+    layout.add(waitImage);
+    waitImage.setVisible(false);
+    waitImage.addStyleName("itemWaitingImage");
 
-		label = new Label(labeltext);
-		label.setWordWrap(false);
+    final String labeltext = sdo.getLabel();
 
-		image = DescriptionLevelUtils.getElementLevelIconImage(sdo.getLevel());
-		if (image != null) {
-			layout.add(image);
-		}
+    label = new Label(labeltext);
+    label.setWordWrap(false);
 
-		layout.add(label);
+    image = DescriptionLevelUtils.getElementLevelIconImage(sdo.getLevel());
+    if (image != null) {
+      layout.add(image);
+    }
 
-		layout.setVerticalAlignment(HasAlignment.ALIGN_MIDDLE);
-		layout.setCellVerticalAlignment(image, HorizontalPanel.ALIGN_MIDDLE);
-		layout.setCellHorizontalAlignment(image, HorizontalPanel.ALIGN_CENTER);
-		layout.setCellWidth(image, "24px");
-		layout.setCellVerticalAlignment(label, HorizontalPanel.ALIGN_MIDDLE);
-		layout.setCellHorizontalAlignment(label, HorizontalPanel.ALIGN_LEFT);
+    layout.add(label);
 
-		layout.setCellWidth(label, "100%");
-		image.addStyleName("treeitem-icon");
-		label.addStyleName("treeitem-label");
-		layout.addStyleName("treeitem-layout");
+    layout.setVerticalAlignment(HasAlignment.ALIGN_MIDDLE);
+    layout.setCellVerticalAlignment(image, HorizontalPanel.ALIGN_MIDDLE);
+    layout.setCellHorizontalAlignment(image, HorizontalPanel.ALIGN_CENTER);
+    layout.setCellWidth(image, "24px");
+    layout.setCellVerticalAlignment(label, HorizontalPanel.ALIGN_MIDDLE);
+    layout.setCellHorizontalAlignment(label, HorizontalPanel.ALIGN_LEFT);
 
-		setShowInfo(showInfo);
+    layout.setCellWidth(label, "100%");
+    image.addStyleName("treeitem-icon");
+    label.addStyleName("treeitem-label");
+    layout.addStyleName("treeitem-layout");
 
-		if (SHOW_ITEM_POPUP) {
-			itemPopupMouseListener = createPopupMouseListener();
-			this.addMouseListener(itemPopupMouseListener);
-		}
-	}
+    setShowInfo(showInfo);
 
-	/**
-	 * Show or hide extended information
-	 * 
-	 * @param showInfo
-	 */
-	public void setShowInfo(boolean showInfo) {
-		if (this.showInfo != showInfo) {
-			this.showInfo = showInfo;
-			if (showInfo) {
-				title = new Label();
-				String normalizedTitle = StringUtility.normalizeSpaces(sdo.getTitle());
-				title.setText(normalizedTitle == null ? constants.noTitle() : normalizedTitle);
-				startDate = new Label(
-						sdo.getDateInitial() == null ? constants.noDate() : sdo.getDateInitial().toString());
-				endDate = new Label(sdo.getDateFinal() == null ? constants.noDate() : sdo.getDateFinal().toString());
+    if (SHOW_ITEM_POPUP) {
+      itemPopupMouseListener = createPopupMouseListener();
+      this.addMouseListener(itemPopupMouseListener);
+    }
+  }
 
-				title.addStyleName("treeitem-info-title");
-				startDate.addStyleName("treeitem-info-data");
-				endDate.addStyleName("treeitem-info-data");
+  /**
+   * Show or hide extended information
+   * 
+   * @param showInfo
+   */
+  public void setShowInfo(boolean showInfo) {
+    if (this.showInfo != showInfo) {
+      this.showInfo = showInfo;
+      if (showInfo) {
+        title = new Label();
+        String normalizedTitle = StringUtility.normalizeSpaces(sdo.getTitle());
+        title.setText(normalizedTitle == null ? constants.noTitle() : normalizedTitle);
+        startDate = new Label(sdo.getDateInitial() == null ? constants.noDate() : sdo.getDateInitial().toString());
+        endDate = new Label(sdo.getDateFinal() == null ? constants.noDate() : sdo.getDateFinal().toString());
 
-				layout.add(title);
-				layout.add(startDate);
-				layout.add(endDate);
+        title.addStyleName("treeitem-info-title");
+        startDate.addStyleName("treeitem-info-data");
+        endDate.addStyleName("treeitem-info-data");
 
-			} else {
-				layout.remove(title);
-				layout.remove(startDate);
-				layout.remove(endDate);
-			}
-		}
-	}
+        layout.add(title);
+        layout.add(startDate);
+        layout.add(endDate);
 
-	/**
-	 * Show or hide the loading image
-	 * 
-	 * @param visible
-	 */
-	public void setWaitImageVisible(boolean visible) {
-		waitImage.setVisible(visible);
-	}
+      } else {
+        layout.remove(title);
+        layout.remove(startDate);
+        layout.remove(endDate);
+      }
+    }
+  }
 
-	public void addSliderEventListener(SliderEventListener listener) {
-		sliderListeners.add(listener);
-	}
+  /**
+   * Show or hide the loading image
+   * 
+   * @param visible
+   */
+  public void setWaitImageVisible(boolean visible) {
+    waitImage.setVisible(visible);
+  }
 
-	public void removeSliderEventListener(SliderEventListener listener) {
-		sliderListeners.remove(listener);
-	}
+  public void addSliderEventListener(SliderEventListener listener) {
+    sliderListeners.add(listener);
+  }
 
-	class ItemPopup extends PopupPanel {
+  public void removeSliderEventListener(SliderEventListener listener) {
+    sliderListeners.remove(listener);
+  }
 
-		private static final int SHOW_DELAY_MS = 3500;
+  class ItemPopup extends PopupPanel {
 
-		private static final int HIDE_DELAY_MS = 500;
+    private static final int SHOW_DELAY_MS = 3500;
 
-		private final AccessibleFocusPanel focus;
+    private static final int HIDE_DELAY_MS = 500;
 
-		private boolean showPopup;
+    private final AccessibleFocusPanel focus;
 
-		private boolean isMouseInsidePanel;
+    private boolean showPopup;
 
-		private final VerticalPanel layout;
+    private boolean isMouseInsidePanel;
 
-		private final Label header;
+    private final VerticalPanel layout;
 
-		private final ScrollPanel scroll;
+    private final Label header;
 
-		private final Label description;
+    private final ScrollPanel scroll;
 
-		private final Timer showDelayTimer;
-
-		private final Timer hideDelayTimer;
-
-		/**
-		 * Create a new item popup
-		 */
-		public ItemPopup() {
-			super(true, false);
-			focus = new AccessibleFocusPanel();
-			layout = new VerticalPanel();
-			header = new Label(sdo.getId());
+    private final Label description;
 
-			scroll = new ScrollPanel();
-			description = new Label(sdo.getDescription() == null ? constants.noDescription()
-					: StringUtility.normalizeSpaces(sdo.getDescription()));
+    private final Timer showDelayTimer;
 
-			scroll.setWidget(description);
-			layout.add(header);
-			layout.add(scroll);
-			focus.setWidget(layout);
-			this.setWidget(focus);
-
-			showDelayTimer = new Timer() {
-				public void run() {
-					if (showPopup) {
-						setPopupPositionAndShow(new PositionCallback() {
+    private final Timer hideDelayTimer;
+
+    /**
+     * Create a new item popup
+     */
+    public ItemPopup() {
+      super(true, false);
+      focus = new AccessibleFocusPanel();
+      layout = new VerticalPanel();
+      header = new Label(sdo.getId());
 
-							public void setPosition(int offsetWidth, int offsetHeight) {
-								ItemPopup.this.setPopupPosition(label.getAbsoluteLeft(),
-										label.getAbsoluteTop() - offsetHeight);
-							}
+      scroll = new ScrollPanel();
+      description = new Label(sdo.getDescription() == null ? constants.noDescription()
+        : StringUtility.normalizeSpaces(sdo.getDescription()));
 
-						});
-						logger.warn("Setting popup position and showing");
+      scroll.setWidget(description);
+      layout.add(header);
+      layout.add(scroll);
+      focus.setWidget(layout);
+      this.setWidget(focus);
+
+      showDelayTimer = new Timer() {
+        public void run() {
+          if (showPopup) {
+            setPopupPositionAndShow(new PositionCallback() {
 
-					}
-				}
-			};
+              public void setPosition(int offsetWidth, int offsetHeight) {
+                ItemPopup.this.setPopupPosition(label.getAbsoluteLeft(), label.getAbsoluteTop() - offsetHeight);
+              }
 
-			hideDelayTimer = new Timer() {
-				public void run() {
-					if (!showPopup) {
-						ItemPopup.super.hide();
-					}
-				}
-			};
+            });
+            logger.warn("Setting popup position and showing");
 
-			showPopup = false;
-			isMouseInsidePanel = false;
+          }
+        }
+      };
 
-			focus.addMouseListener(new MouseListener() {
+      hideDelayTimer = new Timer() {
+        public void run() {
+          if (!showPopup) {
+            ItemPopup.super.hide();
+          }
+        }
+      };
 
-				public void onMouseDown(Widget sender, int x, int y) {
-				}
+      showPopup = false;
+      isMouseInsidePanel = false;
 
-				public void onMouseEnter(Widget sender) {
-					showPopup = true;
-					isMouseInsidePanel = true;
-					hideDelayTimer.cancel();
-				}
+      focus.addMouseListener(new MouseListener() {
 
-				public void onMouseLeave(Widget sender) {
-					showPopup = false;
-					isMouseInsidePanel = false;
-					hideDelayTimer.schedule(HIDE_DELAY_MS);
-				}
+        public void onMouseDown(Widget sender, int x, int y) {
+        }
 
-				public void onMouseMove(Widget sender, int x, int y) {
-				}
+        public void onMouseEnter(Widget sender) {
+          showPopup = true;
+          isMouseInsidePanel = true;
+          hideDelayTimer.cancel();
+        }
 
-				public void onMouseUp(Widget sender, int x, int y) {
+        public void onMouseLeave(Widget sender) {
+          showPopup = false;
+          isMouseInsidePanel = false;
+          hideDelayTimer.schedule(HIDE_DELAY_MS);
+        }
 
-				}
+        public void onMouseMove(Widget sender, int x, int y) {
+        }
 
-			});
+        public void onMouseUp(Widget sender, int x, int y) {
 
-			this.addStyleName("itemPopup");
-			focus.addStyleName("itemPopup-focus");
-			scroll.addStyleName("itemPopup-scroll");
-			layout.addStyleName("itemPopup-layout");
-			header.addStyleName("header");
-			description.addStyleName("description");
+        }
 
-		}
+      });
 
-		/**
-		 * Schedule show after delay
-		 */
-		public void scheduleShow() {
-			showPopup = true;
-			hideDelayTimer.cancel();
-			showDelayTimer.schedule(SHOW_DELAY_MS);
-		}
+      this.addStyleName("itemPopup");
+      focus.addStyleName("itemPopup-focus");
+      scroll.addStyleName("itemPopup-scroll");
+      layout.addStyleName("itemPopup-layout");
+      header.addStyleName("header");
+      description.addStyleName("description");
 
-		/**
-		 * Schedule hide after delay
-		 */
-		public void scheduleHide() {
-			if (!isMouseInsidePanel) {
-				showPopup = false;
-				showDelayTimer.cancel();
-				hideDelayTimer.schedule(HIDE_DELAY_MS);
-			}
-		}
+    }
 
-	}
+    /**
+     * Schedule show after delay
+     */
+    public void scheduleShow() {
+      showPopup = true;
+      hideDelayTimer.cancel();
+      showDelayTimer.schedule(SHOW_DELAY_MS);
+    }
 
-	private MouseListener createPopupMouseListener() {
-		MouseListener listener = new MouseListener() {
-			ItemPopup itemPopup = new ItemPopup();
+    /**
+     * Schedule hide after delay
+     */
+    public void scheduleHide() {
+      if (!isMouseInsidePanel) {
+        showPopup = false;
+        showDelayTimer.cancel();
+        hideDelayTimer.schedule(HIDE_DELAY_MS);
+      }
+    }
 
-			public void onMouseDown(Widget sender, int x, int y) {
-				itemPopup.hide();
-			}
+  }
 
-			public void onMouseEnter(Widget sender) {
-				itemPopup.scheduleShow();
-			}
+  private MouseListener createPopupMouseListener() {
+    MouseListener listener = new MouseListener() {
+      ItemPopup itemPopup = new ItemPopup();
 
-			public void onMouseLeave(Widget sender) {
-				itemPopup.scheduleHide();
-			}
+      public void onMouseDown(Widget sender, int x, int y) {
+        itemPopup.hide();
+      }
 
-			public void onMouseMove(Widget sender, int x, int y) {
-			}
+      public void onMouseEnter(Widget sender) {
+        itemPopup.scheduleShow();
+      }
 
-			public void onMouseUp(Widget sender, int x, int y) {
+      public void onMouseLeave(Widget sender) {
+        itemPopup.scheduleHide();
+      }
 
-			}
+      public void onMouseMove(Widget sender, int x, int y) {
+      }
 
-		};
-		return listener;
-	}
+      public void onMouseUp(Widget sender, int x, int y) {
 
-	public void setFocus(boolean inFocus) {
-		// XXX this is a workarround to prevent focus jumping to top in FireFox
-	}
+      }
+
+    };
+    return listener;
+  }
+
+  public void setFocus(boolean inFocus) {
+    // XXX this is a workarround to prevent focus jumping to top in FireFox
+  }
 
 }

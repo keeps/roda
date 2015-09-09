@@ -10,7 +10,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 @RemoteServiceRelativePath("descriptionlevel")
 public interface DescriptionLevelService extends RemoteService {
 
-	List<String> getDescriptionLevels();
+  List<String> getDescriptionLevels();
 
-	DescriptionLevelInfoPack getAllDescriptionLevels();
+  DescriptionLevelInfoPack getAllDescriptionLevels();
 }

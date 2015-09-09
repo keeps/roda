@@ -17,42 +17,42 @@ import com.google.gwt.user.client.ui.Widget;
 @SuppressWarnings("deprecation")
 public class CountryEditor implements MetadataElementEditor {
 
-	private final ControlledVocabularyEditor editor;
+  private final ControlledVocabularyEditor editor;
 
-	public CountryEditor() {
-		editor = new ControlledVocabularyEditor(DescriptionObject.COUNTRYCODE);
-		editor.getWidget().addStyleName("wui-editor-country");
-	}
+  public CountryEditor() {
+    editor = new ControlledVocabularyEditor(DescriptionObject.COUNTRYCODE);
+    editor.getWidget().addStyleName("wui-editor-country");
+  }
 
-	public EadCValue getValue() {
-		return new Text(editor.getSelected());
-	}
+  public EadCValue getValue() {
+    return new Text(editor.getSelected());
+  }
 
-	public Widget getWidget() {
-		return editor.getWidget();
-	}
+  public Widget getWidget() {
+    return editor.getWidget();
+  }
 
-	public boolean isEmpty() {
-		return false;
-	}
+  public boolean isEmpty() {
+    return false;
+  }
 
-	public void setValue(EadCValue value) {
-		if (value instanceof Text) {
-			Text text = (Text) value;
-			editor.setSelected(text.getText());
-		}
-	}
+  public void setValue(EadCValue value) {
+    if (value instanceof Text) {
+      Text text = (Text) value;
+      editor.setSelected(text.getText());
+    }
+  }
 
-	public void addChangeListener(ChangeListener listener) {
-		editor.addChangeListener(listener);
+  public void addChangeListener(ChangeListener listener) {
+    editor.addChangeListener(listener);
 
-	}
+  }
 
-	public void removeChangeListener(ChangeListener listener) {
-		editor.removeChangeListener(listener);
-	}
-	
-	public boolean isValid() {
-		return true;
-	}
+  public void removeChangeListener(ChangeListener listener) {
+    editor.removeChangeListener(listener);
+  }
+
+  public boolean isValid() {
+    return true;
+  }
 }

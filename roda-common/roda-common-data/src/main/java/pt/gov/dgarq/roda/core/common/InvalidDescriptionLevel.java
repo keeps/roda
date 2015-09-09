@@ -19,44 +19,44 @@ import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevel;
  * @author Rui Castro
  */
 public class InvalidDescriptionLevel extends RODARuntimeException {
-	private static final long serialVersionUID = -1898256310507091558L;
+  private static final long serialVersionUID = -1898256310507091558L;
 
-	/**
-	 * Constructs a new InvalidDescriptionLevel.
-	 */
-	public InvalidDescriptionLevel() {
-	}
+  /**
+   * Constructs a new InvalidDescriptionLevel.
+   */
+  public InvalidDescriptionLevel() {
+  }
 
-	/**
-	 * Constructs a new InvalidDescriptionLevel with the given error message.
-	 * 
-	 * @param message
-	 *            the error message
-	 */
-	public InvalidDescriptionLevel(String message) {
-		super(message);
-	}
+  /**
+   * Constructs a new InvalidDescriptionLevel with the given error message.
+   * 
+   * @param message
+   *          the error message
+   */
+  public InvalidDescriptionLevel(String message) {
+    super(message);
+  }
 
-	/**
-	 * Constructs a new InvalidDescriptionLevel with the given cause exception.
-	 * 
-	 * @param cause
-	 *            the cause exception
-	 */
-	public InvalidDescriptionLevel(Throwable cause) {
-		super(cause);
-	}
+  /**
+   * Constructs a new InvalidDescriptionLevel with the given cause exception.
+   * 
+   * @param cause
+   *          the cause exception
+   */
+  public InvalidDescriptionLevel(Throwable cause) {
+    super(cause);
+  }
 
-	/**
-	 * Constructs a new InvalidDescriptionLevel with the given error message and
-	 * cause exception.
-	 * 
-	 * @param message
-	 *            the error message
-	 * @param cause
-	 *            the cause exception
-	 */
-	public InvalidDescriptionLevel(String message, Throwable cause) {
-		super(message, cause);
-	}
+  /**
+   * Constructs a new InvalidDescriptionLevel with the given error message and
+   * cause exception.
+   * 
+   * @param message
+   *          the error message
+   * @param cause
+   *          the cause exception
+   */
+  public InvalidDescriptionLevel(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

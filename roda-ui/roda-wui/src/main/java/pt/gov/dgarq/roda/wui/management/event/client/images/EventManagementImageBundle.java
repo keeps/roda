@@ -12,16 +12,16 @@ import com.google.gwt.user.client.ui.ImageBundle;
  */
 public interface EventManagementImageBundle extends ImageBundle {
 
-	public AbstractImagePrototype taskScheduled();
+  public AbstractImagePrototype taskScheduled();
 
-	public AbstractImagePrototype taskPaused();
+  public AbstractImagePrototype taskPaused();
 
-	public AbstractImagePrototype taskSuspended();
+  public AbstractImagePrototype taskSuspended();
 
-	public AbstractImagePrototype taskInstanceRunning();
+  public AbstractImagePrototype taskInstanceRunning();
 
-	public AbstractImagePrototype taskInstancePaused();
+  public AbstractImagePrototype taskInstancePaused();
 
-	public AbstractImagePrototype taskInstanceStopped();
+  public AbstractImagePrototype taskInstanceStopped();
 
 }

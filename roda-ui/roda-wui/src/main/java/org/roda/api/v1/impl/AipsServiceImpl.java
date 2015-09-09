@@ -289,8 +289,8 @@ public class AipsServiceImpl extends AipsService {
               Binary binary = storage.getBinary(preservationFile.getStoragePath());
               Path tempFile = Files.createTempFile("test", ".tmp");
               Files.copy(binary.getContent().createInputStream(), tempFile, StandardCopyOption.REPLACE_EXISTING);
-              ZipEntryInfo info = new ZipEntryInfo(
-                r.getId() + File.separator + preservationFile.getStoragePath().getName(), tempFile.toFile());
+              ZipEntryInfo info = new ZipEntryInfo(r.getId() + File.separator
+                + preservationFile.getStoragePath().getName(), tempFile.toFile());
               zipEntries.add(info);
             } else {
               break;

@@ -12,14 +12,14 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  */
 public interface ReportServiceAsync {
 
-	/**
-	 * Get report
-	 * 
-	 * @param reportId
-	 *            the report id
-	 * @return
-	 * @throws RODAException
-	 */
-	public void getReport(String reportId, AsyncCallback<Report> callback);
+  /**
+   * Get report
+   * 
+   * @param reportId
+   *          the report id
+   * @return
+   * @throws RODAException
+   */
+  public void getReport(String reportId, AsyncCallback<Report> callback);
 
 }

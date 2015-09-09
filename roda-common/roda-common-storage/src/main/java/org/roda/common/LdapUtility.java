@@ -461,8 +461,8 @@ public class LdapUtility {
    *           if the user is one of the protected users.
    * @throws LdapUtilityException
    */
-  public User modifyUser(User modifiedUser)
-    throws NoSuchUserException, IllegalOperationException, EmailAlreadyExistsException, LdapUtilityException {
+  public User modifyUser(User modifiedUser) throws NoSuchUserException, IllegalOperationException,
+    EmailAlreadyExistsException, LdapUtilityException {
 
     logger.trace("modifyUser() - " + modifiedUser.getName());
 
@@ -504,8 +504,8 @@ public class LdapUtility {
    *           if the user is one of the protected users.
    * @throws LdapUtilityException
    */
-  public void setUserPassword(String username, String password)
-    throws IllegalOperationException, NoSuchUserException, LdapUtilityException {
+  public void setUserPassword(String username, String password) throws IllegalOperationException, NoSuchUserException,
+    LdapUtilityException {
 
     if (this.ldapProtectedUsers.contains(username)) {
       throw new IllegalOperationException("User (" + username + ") is protected and cannot be modified.");
@@ -536,8 +536,8 @@ public class LdapUtility {
    *           if the user is one of the protected users.
    * @throws LdapUtilityException
    */
-  public User modifySelfUser(User modifiedUser, String currentPassword, String newPassword)
-    throws NoSuchUserException, EmailAlreadyExistsException, IllegalOperationException, LdapUtilityException {
+  public User modifySelfUser(User modifiedUser, String currentPassword, String newPassword) throws NoSuchUserException,
+    EmailAlreadyExistsException, IllegalOperationException, LdapUtilityException {
 
     logger.trace("modifySelfUser() - " + modifiedUser.getName());
 
@@ -609,8 +609,8 @@ public class LdapUtility {
    * @throws LdapUtilityException
    * 
    */
-  public void deactivateUser(String username)
-    throws NoSuchUserException, IllegalOperationException, LdapUtilityException {
+  public void deactivateUser(String username) throws NoSuchUserException, IllegalOperationException,
+    LdapUtilityException {
 
     User user = getUser(username);
 
@@ -841,14 +841,14 @@ public class LdapUtility {
    * @throws IllegalOperationException
    * @throws LdapUtilityException
    */
-  public Group modifyGroup(Group modifiedGroup)
-    throws NoSuchGroupException, IllegalOperationException, LdapUtilityException {
+  public Group modifyGroup(Group modifiedGroup) throws NoSuchGroupException, IllegalOperationException,
+    LdapUtilityException {
 
     logger.trace("modifyGroup() - " + modifiedGroup.getName());
 
     if (this.ldapProtectedGroups.contains(modifiedGroup.getName())) {
-      throw new IllegalOperationException(
-        "Group (" + modifiedGroup.getName() + ") is protected and cannot be modified.");
+      throw new IllegalOperationException("Group (" + modifiedGroup.getName()
+        + ") is protected and cannot be modified.");
     }
 
     try {
@@ -1056,8 +1056,8 @@ public class LdapUtility {
    * @throws AuthenticationDeniedException
    * @throws ServiceException
    */
-  public User getAuthenticatedUser(String username, String password)
-    throws AuthenticationDeniedException, ServiceException {
+  public User getAuthenticatedUser(String username, String password) throws AuthenticationDeniedException,
+    ServiceException {
 
     try {
       // Create initial context
@@ -1106,8 +1106,8 @@ public class LdapUtility {
    * 
    * @deprecated should not be called anymore.
    */
-  public User registerUser(User user, String password)
-    throws UserAlreadyExistsException, EmailAlreadyExistsException, LdapUtilityException {
+  public User registerUser(User user, String password) throws UserAlreadyExistsException, EmailAlreadyExistsException,
+    LdapUtilityException {
 
     // A new registered user, is always inactive.
     user.setActive(false);
@@ -1205,8 +1205,8 @@ public class LdapUtility {
 
         if (currentIsoDate.compareToIgnoreCase(user.getEmailConfirmationTokenExpirationDate()) > 0) {
 
-          throw new InvalidTokenException(
-            "Email confirmation token expired in " + user.getEmailConfirmationTokenExpirationDate());
+          throw new InvalidTokenException("Email confirmation token expired in "
+            + user.getEmailConfirmationTokenExpirationDate());
 
         } else {
           // Good, token didn't expired yet.
@@ -1256,8 +1256,8 @@ public class LdapUtility {
    * @throws LdapUtilityException
    *           if something goes wrong with the operation.
    */
-  public User requestPasswordReset(String username, String email)
-    throws NoSuchUserException, IllegalOperationException, LdapUtilityException {
+  public User requestPasswordReset(String username, String email) throws NoSuchUserException,
+    IllegalOperationException, LdapUtilityException {
 
     User user = null;
     if (username != null) {
@@ -1352,8 +1352,8 @@ public class LdapUtility {
 
         if (currentIsoDate.compareToIgnoreCase(user.getResetPasswordTokenExpirationDate()) > 0) {
 
-          throw new InvalidTokenException(
-            "Password reset token expired in " + user.getResetPasswordTokenExpirationDate());
+          throw new InvalidTokenException("Password reset token expired in "
+            + user.getResetPasswordTokenExpirationDate());
 
         } else {
           // Good, token didn't expired yet.
@@ -1849,7 +1849,6 @@ public class LdapUtility {
   //
   // return attributesList;
   // }
-
   // FIXME filter is not being used: see if it is needed
   private List<Attributes> searchAttributes(DirContext ctxRoot, String ctxDN, String keyAttribute, Filter filter)
     throws NamingException {
@@ -1995,8 +1994,8 @@ public class LdapUtility {
 
         logger.debug("The email address " + modifiedUser.getEmail() + " is already used by another user.");
 
-        throw new EmailAlreadyExistsException(
-          "The email address " + modifiedUser.getEmail() + " is already used by another user.");
+        throw new EmailAlreadyExistsException("The email address " + modifiedUser.getEmail()
+          + " is already used by another user.");
       }
 
       Attributes attributes = getAttributesFromUser(modifiedUser, true);
@@ -2040,8 +2039,8 @@ public class LdapUtility {
    * @throws UnsupportedEncodingException
    * @throws NoSuchAlgorithmException
    */
-  private void modifyUserPassword(DirContext ctxRoot, String username, String password)
-    throws NamingException, NoSuchAlgorithmException {
+  private void modifyUserPassword(DirContext ctxRoot, String username, String password) throws NamingException,
+    NoSuchAlgorithmException {
 
     PasswordHandler passwordHandler = PasswordHandler.getInstance();
     String passwordDigest = passwordHandler.generateDigest(password, null, ldapDigestAlgorithm);
@@ -2477,8 +2476,8 @@ public class LdapUtility {
    *           if specified {@link User} doesn't exist.
    * @throws LdapUtilityException
    */
-  private void setUserPasswordUnchecked(String username, String password)
-    throws NoSuchUserException, LdapUtilityException {
+  private void setUserPasswordUnchecked(String username, String password) throws NoSuchUserException,
+    LdapUtilityException {
 
     try {
 
