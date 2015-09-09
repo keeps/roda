@@ -1,5 +1,6 @@
 package org.roda.api.v1.impl;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
@@ -21,6 +22,7 @@ import org.roda.api.v1.NotFoundException;
 import org.roda.model.DescriptiveMetadata;
 import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
+import org.roda.model.PreservationMetadata;
 import org.roda.model.utils.ModelUtils;
 import org.roda.storage.Binary;
 import org.roda.storage.ClosableIterable;
@@ -263,6 +265,181 @@ public class AipsServiceImpl extends AipsService {
   @Override
   public Response aipsAipIdDescriptiveMetadataMetadataIdDelete(String aipId, String metadataId)
     throws NotFoundException {
+    // do some magic!
+    return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
+  }
+
+  @Override
+  public Response aipsAipIdPreservationMetadataGet(String aipId, String start, String limit, String acceptFormat)
+    throws NotFoundException {
+    try {
+      ModelService model = RodaCoreFactory.getModelService();
+      StorageService storage = RodaCoreFactory.getStorageService();
+      ClosableIterable<Representation> representations = model.listRepresentations(aipId);
+      int startInt = (start == null) ? 0 : Integer.parseInt(start);
+      int limitInt = (limit == null) ? -1 : Integer.parseInt(limit);
+      if (acceptFormat != null && acceptFormat.equalsIgnoreCase("bin")) {
+        int counter = 0;
+        List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
+        for (Representation r : representations) {
+          ClosableIterable<PreservationMetadata> preservationFiles = model.listPreservationMetadataBinaries(aipId,
+            r.getId());
+          for (PreservationMetadata preservationFile : preservationFiles) {
+            if (counter >= startInt && (counter <= limitInt || limitInt == -1)) {
+              Binary binary = storage.getBinary(preservationFile.getStoragePath());
+              Path tempFile = Files.createTempFile("test", ".tmp");
+              Files.copy(binary.getContent().createInputStream(), tempFile, StandardCopyOption.REPLACE_EXISTING);
+              ZipEntryInfo info = new ZipEntryInfo(
+                r.getId() + File.separator + preservationFile.getStoragePath().getName(), tempFile.toFile());
+              zipEntries.add(info);
+            } else {
+              break;
+            }
+
+            counter++;
+          }
+        }
+        String filename = "";
+        StreamingOutput stream = null;
+        if (zipEntries.size() == 1) {
+          stream = new StreamingOutput() {
+            @Override
+            public void write(OutputStream os) throws IOException, WebApplicationException {
+              IOUtils.copy(zipEntries.get(0).getInputStream(), os);
+            }
+          };
+          filename = zipEntries.get(0).getName();
+        } else {
+          stream = new StreamingOutput() {
+            @Override
+            public void write(OutputStream os) throws IOException, WebApplicationException {
+              ZipTools.zip(zipEntries, os);
+            }
+          };
+          filename = aipId + ".zip";
+        }
+        return Response.ok(stream, MediaType.APPLICATION_OCTET_STREAM)
+          .header("content-disposition", "attachment; filename = " + filename).build();
+      } else {
+        return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Not yet implemented"))
+          .build();
+      }
+    } catch (IOException e) {
+      return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+    } catch (StorageServiceException | ModelServiceException e) {
+      if (e.getCode() == ModelServiceException.NOT_FOUND) {
+        throw new NotFoundException(e.getCode(), e.getMessage());
+      } else {
+        return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+      }
+    }
+  }
+
+  @Override
+  public Response aipsAipIdPreservationMetadataRepresentationIdGet(String aipId, String representationId, String start,
+    String limit, String acceptFormat) throws NotFoundException {
+    try {
+      StorageService storage = RodaCoreFactory.getStorageService();
+      ModelService model = RodaCoreFactory.getModelService();
+      int startInt = (start == null) ? 0 : Integer.parseInt(start);
+      int limitInt = (limit == null) ? -1 : Integer.parseInt(limit);
+      if (acceptFormat != null && acceptFormat.equalsIgnoreCase("bin")) {
+        int counter = 0;
+        List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
+        ClosableIterable<PreservationMetadata> preservationFiles = model.listPreservationMetadataBinaries(aipId,
+          representationId);
+        for (PreservationMetadata preservationFile : preservationFiles) {
+          if (counter >= startInt && (counter <= limitInt || limitInt == -1)) {
+            Binary binary = storage.getBinary(preservationFile.getStoragePath());
+            Path tempFile = Files.createTempFile("test", ".tmp");
+            Files.copy(binary.getContent().createInputStream(), tempFile, StandardCopyOption.REPLACE_EXISTING);
+            ZipEntryInfo info = new ZipEntryInfo(preservationFile.getStoragePath().getName(), tempFile.toFile());
+            zipEntries.add(info);
+          } else {
+            break;
+          }
+          counter++;
+        }
+
+        String filename = "";
+        StreamingOutput stream = null;
+        if (zipEntries.size() == 1) {
+          stream = new StreamingOutput() {
+            @Override
+            public void write(OutputStream os) throws IOException, WebApplicationException {
+              IOUtils.copy(zipEntries.get(0).getInputStream(), os);
+            }
+          };
+          filename = zipEntries.get(0).getName();
+        } else {
+          stream = new StreamingOutput() {
+            @Override
+            public void write(OutputStream os) throws IOException, WebApplicationException {
+              ZipTools.zip(zipEntries, os);
+            }
+          };
+          filename = aipId + "_" + representationId + ".zip";
+        }
+        return Response.ok(stream, MediaType.APPLICATION_OCTET_STREAM)
+          .header("content-disposition", "attachment; filename = " + filename).build();
+      } else {
+        return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Not yet implemented"))
+          .build();
+      }
+    } catch (IOException e) {
+      return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+    } catch (StorageServiceException | ModelServiceException e) {
+      if (e.getCode() == ModelServiceException.NOT_FOUND) {
+        throw new NotFoundException(e.getCode(), e.getMessage());
+      } else {
+        return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+      }
+    }
+  }
+
+  @Override
+  public Response aipsAipIdPreservationMetadataRepresentationIdFileIdGet(String aipId, String representationId,
+    String fileId) throws NotFoundException {
+    try {
+      StorageService storage = RodaCoreFactory.getStorageService();
+      Binary binary = storage.getBinary(ModelUtils.getPreservationFilePath(aipId, representationId, fileId));
+
+      String filename = binary.getStoragePath().getName();
+      StreamingOutput stream = new StreamingOutput() {
+        @Override
+        public void write(OutputStream os) throws IOException, WebApplicationException {
+          IOUtils.copy(binary.getContent().createInputStream(), os);
+        }
+      };
+
+      return Response.ok(stream, MediaType.APPLICATION_OCTET_STREAM)
+        .header("content-disposition", "attachment; filename = " + filename).build();
+    } catch (StorageServiceException e) {
+      if (e.getCode() == ModelServiceException.NOT_FOUND) {
+        throw new NotFoundException(e.getCode(), e.getMessage());
+      } else {
+        return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+      }
+    }
+  }
+
+  @Override
+  public Response aipsAipIdPreservationMetadataRepresentationIdFileIdPost(String aipId, String representationId,
+    FormDataContentDisposition fileDetail) throws NotFoundException {
+    // do some magic!
+    return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
+  }
+
+  @Override
+  public Response aipsAipIdPreservationMetadataRepresentationIdFileIdPut(String aipId, String representationId,
+    FormDataContentDisposition fileDetail) throws NotFoundException {
+    // do some magic!
+    return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
+  }
+
+  @Override
+  public Response aipsAipIdPreservationMetadataRepresentationIdFileIdDelete(String aipId, String representationId,
+    String fileId, String acceptFormat) throws NotFoundException {
     // do some magic!
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }

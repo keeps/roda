@@ -14,6 +14,7 @@ import org.roda.model.File;
 import org.roda.model.ModelObserver;
 import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
+import org.roda.model.PreservationMetadata;
 import org.roda.storage.StorageServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,6 @@ import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.v2.EventPreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.Group;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
-import pt.gov.dgarq.roda.core.data.v2.RODAMember;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationFilePreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.SIPReport;
@@ -323,6 +323,34 @@ public class IndexModelObserver implements ModelObserver {
       index.commit(RodaConstants.INDEX_MEMBERS);
     } catch (SolrServerException | IOException e) {
       LOGGER.error("Error deleting Group (id=" + groupID + ")");
+    }
+  }
+
+  @Override
+  public void preservationMetadataCreated(PreservationMetadata preservationMetadata) {
+    try {
+      aipUpdated(model.retrieveAIP(preservationMetadata.getAipId()));
+    } catch (ModelServiceException e) {
+      LOGGER.error("Error when preservation metadata created on retrieving the full AIP", e);
+    }
+
+  }
+
+  @Override
+  public void preservationMetadataUpdated(PreservationMetadata preservationMetadata) {
+    try {
+      aipUpdated(model.retrieveAIP(preservationMetadata.getAipId()));
+    } catch (ModelServiceException e) {
+      LOGGER.error("Error when preservation metadata updated on retrieving the full AIP", e);
+    }
+  }
+
+  @Override
+  public void preservationMetadataDeleted(String aipId, String representationId, String preservationMetadataBinaryId) {
+    try {
+      aipUpdated(model.retrieveAIP(aipId));
+    } catch (ModelServiceException e) {
+      LOGGER.error("Error when descriptive metadata deleted on retrieving the full AIP", e);
     }
   }
 }

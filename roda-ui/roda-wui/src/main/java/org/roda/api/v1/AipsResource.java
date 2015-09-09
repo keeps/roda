@@ -26,6 +26,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
+import pt.gov.dgarq.roda.core.data.v2.SimpleEventPreservationMetadata;
 
 @Path("/v1/aips")
 @Api(value = "/v1/aips", description = "the aips API")
@@ -300,5 +301,94 @@ public class AipsResource {
     @ApiParam(value = "The ID of the existing metadata file to delete", required = true) @PathParam("metadata_id") String metadataId)
       throws NotFoundException {
     return delegate.aipsAipIdDescriptiveMetadataMetadataIdDelete(aipId, metadataId);
+  }
+
+  @GET
+  @Path("/{aip_id}/preservation_metadata/")
+  @Produces({"application/json", "application/zip", "text/html"})
+  @ApiOperation(value = "", notes = "Get preservation metadata (JSON info, ZIP file or HTML conversion).\nOptional query params of **start** and **limit** defined the returned array.", response = SimpleEventPreservationMetadata.class)
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = SimpleEventPreservationMetadata.class)})
+
+  public Response aipsAipIdPreservationMetadataGet(
+    @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam("aip_id") String aipId,
+    @ApiParam(value = "Choose format in which to get the metadata", allowableValues = "{values=[json, xml, html]}", defaultValue = "json") @QueryParam("acceptFormat") String acceptFormat,
+    @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam("start") String start,
+    @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam("limit") String limit)
+      throws NotFoundException {
+    return delegate.aipsAipIdPreservationMetadataGet(aipId, start, limit, acceptFormat);
+  }
+
+  @GET
+  @Path("/{aip_id}/preservation_metadata/{representation_id}")
+  @Produces({"application/json", "application/zip", "text/html"})
+  @ApiOperation(value = "", notes = "Get preservation metadata (JSON info, ZIP file or HTML conversion) for a given representation.\nOptional query params of **start** and **limit** defined the returned array.", response = SimpleEventPreservationMetadata.class)
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = SimpleEventPreservationMetadata.class)})
+
+  public Response aipsAipIdPreservationMetadataRepresentationIdGet(
+    @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam("aip_id") String aipId,
+    @ApiParam(value = "The ID of the existing representation", required = true) @PathParam("representation_id") String representationId,
+    @ApiParam(value = "Choose format in which to get the metadata", allowableValues = "{values=[json, xml, html]}", defaultValue = "json") @QueryParam("acceptFormat") String acceptFormat,
+    @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam("start") String start,
+    @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam("limit") String limit)
+      throws NotFoundException {
+    return delegate.aipsAipIdPreservationMetadataRepresentationIdGet(aipId, representationId, start, limit,
+      acceptFormat);
+  }
+
+  @GET
+  @Path("/{aip_id}/preservation_metadata/{representation_id}/{file_id}")
+  @Produces({"application/xml"})
+  @ApiOperation(value = "", notes = "Get the preservation file (XML) for a given representation.", response = SimpleEventPreservationMetadata.class)
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = SimpleEventPreservationMetadata.class)})
+
+  public Response aipsAipIdPreservationMetadataRepresentationIdFileIdGet(
+    @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam("aip_id") String aipId,
+    @ApiParam(value = "The ID of the existing representation", required = true) @PathParam("representation_id") String representationId,
+    @ApiParam(value = "The ID of the existing file", required = true) @PathParam("file_id") String fileId)
+      throws NotFoundException {
+    return delegate.aipsAipIdPreservationMetadataRepresentationIdFileIdGet(aipId, representationId, fileId);
+  }
+
+  @POST
+  @Path("/{aip_id}/preservation_metadata/{representation_id}/{file_id}")
+  @ApiOperation(value = "", notes = "Upload a preservation file to a representation (create)", response = SimpleEventPreservationMetadata.class)
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = DescriptiveMetadata.class),
+    @ApiResponse(code = 404, message = "Not found", response = DescriptiveMetadata.class)})
+
+  public Response aipsAipIdPreservationMetadataRepresentationIdFileIdPost(
+    @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam("aip_id") String aipId,
+    @ApiParam(value = "The ID of the existing representation", required = true) @PathParam("representation_id") String representationId,
+    @FormDataParam("file") InputStream inputStream, @FormDataParam("file") FormDataContentDisposition fileDetail)
+      throws NotFoundException {
+    return delegate.aipsAipIdPreservationMetadataRepresentationIdFileIdPost(aipId, representationId, fileDetail);
+  }
+
+  @PUT
+  @Path("/{aip_id}/preservation_metadata/{representation_id}/{file_id}")
+  @ApiOperation(value = "", notes = "Upload a preservation file to a representation (update)", response = SimpleEventPreservationMetadata.class)
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = DescriptiveMetadata.class),
+    @ApiResponse(code = 404, message = "Not found", response = DescriptiveMetadata.class)})
+
+  public Response aipsAipIdPreservationMetadataRepresentationIdFileIdPut(
+    @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam("aip_id") String aipId,
+    @ApiParam(value = "The ID of the existing representation", required = true) @PathParam("representation_id") String representationId,
+    @FormDataParam("file") InputStream inputStream, @FormDataParam("file") FormDataContentDisposition fileDetail)
+      throws NotFoundException {
+    return delegate.aipsAipIdPreservationMetadataRepresentationIdFileIdPut(aipId, representationId, fileDetail);
+  }
+
+  @DELETE
+  @Path("/{aip_id}/preservation_metadata/{representation_id}/{file_id}")
+  @ApiOperation(value = "", notes = "Delete a preservation file for a representation.", response = SimpleEventPreservationMetadata.class)
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = SimpleEventPreservationMetadata.class)})
+
+  public Response aipsAipIdPreservationMetadataRepresentationIdFileIdDelete(
+    @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam("aip_id") String aipId,
+    @ApiParam(value = "The ID of the existing representation", required = true) @PathParam("representation_id") String representationId,
+    @ApiParam(value = "The ID of the existing file", required = true) @PathParam("file_id") String fileId,
+    @ApiParam(value = "Choose format in which to get the metadata", allowableValues = "{values=[json, xml, html]}", defaultValue = "json") @QueryParam("acceptFormat") String acceptFormat)
+      throws NotFoundException {
+    return delegate.aipsAipIdPreservationMetadataRepresentationIdFileIdDelete(aipId, representationId, fileId,
+      acceptFormat);
   }
 }
