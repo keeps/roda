@@ -1723,37 +1723,4 @@ public class ModelService extends ModelObservable {
       notifyGroupDeleted(id);
     }
   }
-
-  public void updateParent(String aipId, String parentId) throws ModelServiceException {
-    boolean success = true;
-    try {
-      if(parentId!=null && !parentId.trim().equalsIgnoreCase("")){
-        StoragePath parentAipPath = ModelUtils.getAIPpath(parentId);
-        storage.getDirectory(parentAipPath); //check if parent exist
-      }
-      StoragePath aipPath = ModelUtils.getAIPpath(aipId);
-      Map<String, Set<String>> metadata = storage.getMetadata(aipPath);
-      if(parentId!=null && !parentId.trim().equalsIgnoreCase("")){
-        metadata.put(RodaConstants.STORAGE_META_PARENT_ID, new HashSet<String>(Arrays.asList(parentId)));
-      }else{
-        metadata.remove(RodaConstants.STORAGE_META_PARENT_ID);
-      }
-      storage.updateMetadata(aipPath, metadata, true);
-    } catch (StorageServiceException e) {
-      success = false;
-      if (e.getCode() == StorageServiceException.NOT_FOUND) {
-        throw new ModelServiceException("AIP not found: " + aipId, ModelServiceException.NOT_FOUND, e);
-      } else if (e.getCode() == StorageServiceException.FORBIDDEN) {
-        throw new ModelServiceException("You do not have permission to access AIP: " + aipId,
-          ModelServiceException.FORBIDDEN, e);
-      } else {
-        throw new ModelServiceException("Error updating parent in storage", ModelServiceException.INTERNAL_SERVER_ERROR,
-          e);
-      }
-    }
-    if (success) {
-      notifyAipUpdated(retrieveAIP(aipId));
-    }
-
-  }
 }

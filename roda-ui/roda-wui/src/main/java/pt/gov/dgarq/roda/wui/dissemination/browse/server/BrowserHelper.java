@@ -2,16 +2,25 @@ package pt.gov.dgarq.roda.wui.dissemination.browse.server;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.roda.common.HTMLUtils;
+import org.roda.index.IndexService;
 import org.roda.index.IndexServiceException;
 import org.roda.model.DescriptiveMetadata;
+import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
+import org.roda.model.utils.ModelUtils;
 import org.roda.storage.Binary;
 import org.roda.storage.ClosableIterable;
+import org.roda.storage.StoragePath;
+import org.roda.storage.StorageService;
 import org.roda.storage.StorageServiceException;
 
 import pt.gov.dgarq.roda.common.RodaCoreFactory;
@@ -175,10 +184,32 @@ public class BrowserHelper {
 
   public static SimpleDescriptionObject moveInHierarchy(String aipId, String parentId) throws GenericException {
     try {
-      RodaCoreFactory.getModelService().updateParent(aipId, parentId);
+      StorageService storage = RodaCoreFactory.getStorageService();
+      ModelService model = RodaCoreFactory.getModelService();
+      StoragePath aipPath = ModelUtils.getAIPpath(aipId);
+      if (parentId == null || parentId.trim().equals("")) {
+        StoragePath parentPath = ModelUtils.getAIPpath(parentId);
+        storage.getDirectory(parentPath);
+      }
+      Map<String, Set<String>> metadata = storage.getMetadata(aipPath);
+      if (parentId == null || parentId.trim().equalsIgnoreCase("")) {
+        metadata.remove(RodaConstants.STORAGE_META_PARENT_ID);
+      } else {
+        metadata.put(RodaConstants.STORAGE_META_PARENT_ID, new HashSet<String>(Arrays.asList(parentId)));
+      }
+      storage.updateMetadata(aipPath, metadata, true);
+      model.updateAIP(aipId, storage, aipPath);
+
       return RodaCoreFactory.getIndexService().retrieve(SimpleDescriptionObject.class, aipId);
-    } catch (ModelServiceException | IndexServiceException e) {
-      throw new GenericException("Error moving item in hierarchy" + e.getMessage());
+    } catch (ModelServiceException | IndexServiceException | StorageServiceException e) {
+      if (e.getCode() == StorageServiceException.NOT_FOUND) {
+        throw new GenericException("AIP not found: " + aipId);
+      } else if (e.getCode() == StorageServiceException.FORBIDDEN) {
+        throw new GenericException("You do not have permission to access AIP: " + aipId);
+      } else {
+        throw new GenericException("Error moving in hierarchy ");
+      }
+
     }
 
   }

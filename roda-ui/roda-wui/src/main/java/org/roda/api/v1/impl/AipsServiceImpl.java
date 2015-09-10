@@ -9,8 +9,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -29,14 +27,10 @@ import org.roda.model.PreservationMetadata;
 import org.roda.model.utils.ModelUtils;
 import org.roda.storage.Binary;
 import org.roda.storage.ClosableIterable;
-import org.roda.storage.ContentPayload;
-import org.roda.storage.DefaultBinary;
 import org.roda.storage.StoragePath;
 import org.roda.storage.StorageService;
 import org.roda.storage.StorageServiceException;
-import org.roda.storage.fs.FSPathContentPayload;
 import org.roda.storage.fs.FSUtils;
-import org.roda.storage.fs.FSYamlMetadataUtils;
 
 import pt.gov.dgarq.roda.common.RodaCoreFactory;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
@@ -297,8 +291,8 @@ public class AipsServiceImpl extends AipsService {
               Binary binary = storage.getBinary(preservationFile.getStoragePath());
               Path tempFile = Files.createTempFile("test", ".tmp");
               Files.copy(binary.getContent().createInputStream(), tempFile, StandardCopyOption.REPLACE_EXISTING);
-              ZipEntryInfo info = new ZipEntryInfo(r.getId() + File.separator
-                + preservationFile.getStoragePath().getName(), tempFile.toFile());
+              ZipEntryInfo info = new ZipEntryInfo(
+                r.getId() + File.separator + preservationFile.getStoragePath().getName(), tempFile.toFile());
               zipEntries.add(info);
             } else {
               break;
@@ -439,13 +433,7 @@ public class AipsServiceImpl extends AipsService {
       ModelService model = RodaCoreFactory.getModelService();
       Path p = Files.createTempFile("preservation", ".tmp");
       Files.copy(is, p, StandardCopyOption.REPLACE_EXISTING);
-      StoragePath storagePath = ModelUtils.getPreservationFilePath(aipId, representationId, fileDetail.getFileName());
-      Map<String, Set<String>> metadata = FSYamlMetadataUtils.readMetadata(p);
-      ContentPayload content = new FSPathContentPayload(p);
-      long sizeInBytes;
-      sizeInBytes = Files.size(p);
-      Map<String, String> contentDigest = FSUtils.obtainContentDigest(metadata);
-      Binary resource = new DefaultBinary(storagePath, metadata, content, sizeInBytes, false, contentDigest);
+      Binary resource = (Binary) FSUtils.convertPathToResource(p.getParent(), p);
       model.createPreservationMetadata(aipId, representationId, fileDetail.getFileName(), resource);
       return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
     } catch (ModelServiceException | StorageServiceException e) {
@@ -466,13 +454,7 @@ public class AipsServiceImpl extends AipsService {
       ModelService model = RodaCoreFactory.getModelService();
       Path p = Files.createTempFile("preservation", ".tmp");
       Files.copy(is, p, StandardCopyOption.REPLACE_EXISTING);
-      StoragePath storagePath = ModelUtils.getPreservationFilePath(aipId, representationId, fileDetail.getFileName());
-      Map<String, Set<String>> metadata = FSYamlMetadataUtils.readMetadata(p);
-      ContentPayload content = new FSPathContentPayload(p);
-      long sizeInBytes;
-      sizeInBytes = Files.size(p);
-      Map<String, String> contentDigest = FSUtils.obtainContentDigest(metadata);
-      Binary resource = new DefaultBinary(storagePath, metadata, content, sizeInBytes, false, contentDigest);
+      Binary resource = (Binary) FSUtils.convertPathToResource(p.getParent(), p);
       model.updatePreservationMetadata(aipId, representationId, fileDetail.getFileName(), resource);
       return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
     } catch (ModelServiceException | StorageServiceException e) {
