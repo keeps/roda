@@ -43,7 +43,6 @@ public class SimpleEventPreservationMetadata extends SimplePreservationMetadata 
     this.setDescription(simple.getDescription());
     this.setFileId(simple.getFileId());
     this.setId(simple.getId());
-    this.setID(simple.getID());
     this.setLabel(simple.getLabel());
     this.setLastModifiedDate(simple.getLastModifiedDate());
     this.setModel(simple.getModel());

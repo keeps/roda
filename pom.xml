@@ -400,6 +400,11 @@
 				<version>${jackson.version}</version>
 			</dependency>
 			<dependency>
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-annotations</artifactId>
+				<version>${jackson.version}</version>
+			</dependency>
+			<dependency>
 				<groupId>com.google.gwt</groupId>
 				<artifactId>gwt-servlet</artifactId>
 				<version>${gwt_version}</version>
@@ -1020,7 +1025,7 @@
 			</dependency>
 			<dependency>
 				<groupId>org.glassfish.jersey.test-framework.providers</groupId>
-				<artifactId>jersey-test-framework-provider-jetty</artifactId>
+				<artifactId>jersey-test-framework-provider-grizzly2</artifactId>
 				<version>${jersey.version}</version>
 				<scope>test</scope>
 			</dependency>

@@ -13,7 +13,6 @@ public class SimplePreservationMetadata implements Serializable {
   private Date lastModifiedDate;
   private Date createdDate;
   private String state;
-  private String ID;
   private String type;
 
   private String aipId;
@@ -74,14 +73,6 @@ public class SimplePreservationMetadata implements Serializable {
 
   public void setState(String state) {
     this.state = state;
-  }
-
-  public String getID() {
-    return ID;
-  }
-
-  public void setID(String iD) {
-    ID = iD;
   }
 
   public String getAipId() {

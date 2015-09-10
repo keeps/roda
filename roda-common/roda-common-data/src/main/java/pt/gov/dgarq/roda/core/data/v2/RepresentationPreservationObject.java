@@ -98,7 +98,6 @@ public class RepresentationPreservationObject extends SimpleRepresentationPreser
     setLastModifiedDate(lastModifiedDate);
     setCreatedDate(createdDate);
     setState(state);
-    setID(ID);
   }
 
   /**
@@ -148,7 +147,7 @@ public class RepresentationPreservationObject extends SimpleRepresentationPreser
   public void setRootFile(RepresentationFilePreservationObject rootFile) throws NullPointerException {
     this.rootFile = rootFile;
     // if (rootFile == null) {
-    //			throw new NullPointerException("rootFile cannot be null"); //$NON-NLS-1$
+    // throw new NullPointerException("rootFile cannot be null"); //$NON-NLS-1$
     // } else {
     // this.rootFile = rootFile;
     // }

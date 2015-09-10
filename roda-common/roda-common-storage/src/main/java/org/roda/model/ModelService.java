@@ -1275,7 +1275,6 @@ public class ModelService extends ModelObservable {
         rpo.setDerivedFromRepresentationObjectID(proh.getRepresentationPreservationObject()
           .getDerivedFromRepresentationObjectID());
         rpo.setId(proh.getRepresentationPreservationObject().getId());
-        rpo.setID(proh.getRepresentationPreservationObject().getID());
         rpo.setLabel(proh.getRepresentationPreservationObject().getLabel());
         rpo.setLastModifiedDate(proh.getRepresentationPreservationObject().getLastModifiedDate());
         rpo.setModel(proh.getRepresentationPreservationObject().getModel());
@@ -1359,7 +1358,6 @@ public class ModelService extends ModelObservable {
         epo.setEventType(peh.getEvent().getEventType());
         epo.setFileId(fileId);
         epo.setId(fileId);
-        epo.setID(""); // TODO: ???
         epo.setLabel(""); // TODO: ???
         epo.setModel(""); // TODO: ???
         epo.setName(""); // TODO: ???

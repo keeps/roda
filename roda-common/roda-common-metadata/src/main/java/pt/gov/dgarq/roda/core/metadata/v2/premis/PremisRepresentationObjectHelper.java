@@ -187,7 +187,7 @@ public class PremisRepresentationObjectHelper extends PremisObjectHelper {
     RepresentationPreservationObject representationPO = getRepresentationPreservationObject();
 
     // Copy the values from the SimpleRepresentationPreservationObject
-    representationPO.setID(simpleRPO.getID());
+    representationPO.setId(simpleRPO.getId());
     representationPO.setLabel(simpleRPO.getLabel());
     representationPO.setLastModifiedDate(simpleRPO.getLastModifiedDate());
     representationPO.setCreatedDate(simpleRPO.getCreatedDate());
@@ -217,14 +217,14 @@ public class PremisRepresentationObjectHelper extends PremisObjectHelper {
       for (ObjectIdentifierComplexType objectIdentifier : objectIdentifierList) {
 
         if (PremisHelper.premisIdentifierTypePID.equals(objectIdentifier.getObjectIdentifierType())) {
-          pObject.setID(objectIdentifier.getObjectIdentifierValue());
+          pObject.setId(objectIdentifier.getObjectIdentifierValue());
         }
       }
 
       // If we don't have an ID, it's because the <ObjectIdentifierType>
       // is unknown. Let's use the first value as ID.
-      if (pObject.getID() == null) {
-        pObject.setID(objectIdentifierList.get(0).getObjectIdentifierValue());
+      if (pObject.getId() == null) {
+        pObject.setId(objectIdentifierList.get(0).getObjectIdentifierValue());
       }
 
     } else {
@@ -337,7 +337,7 @@ public class PremisRepresentationObjectHelper extends PremisObjectHelper {
     // <objectIdentifier>
     ObjectIdentifierComplexType objectIdentifier = getRepresentation().addNewObjectIdentifier();
     objectIdentifier.setObjectIdentifierType(PremisHelper.premisIdentifierTypePID);
-    objectIdentifier.setObjectIdentifierValue(rpo.getID());
+    objectIdentifier.setObjectIdentifierValue(rpo.getId());
 
     // <preservationLevel>
     PreservationLevelComplexType preservationLevel = getRepresentation().addNewPreservationLevel();

@@ -54,8 +54,8 @@ public class PremisEventHelper {
    * @throws PremisMetadataException
    *           if the PREMIS XML document is invalid.
    */
-  public static PremisEventHelper newInstance(File premisFile) throws PremisMetadataException, FileNotFoundException,
-    IOException {
+  public static PremisEventHelper newInstance(File premisFile)
+    throws PremisMetadataException, FileNotFoundException, IOException {
     FileInputStream premisInputStream = new FileInputStream(premisFile);
     PremisEventHelper instance = newInstance(premisInputStream);
     premisInputStream.close();
@@ -77,8 +77,8 @@ public class PremisEventHelper {
    * @throws PremisMetadataException
    *           if the PREMIS XML document is invalid.
    */
-  public static PremisEventHelper newInstance(InputStream premisInputStream) throws PremisMetadataException,
-    IOException {
+  public static PremisEventHelper newInstance(InputStream premisInputStream)
+    throws PremisMetadataException, IOException {
 
     try {
 
@@ -161,7 +161,7 @@ public class PremisEventHelper {
   public EventPreservationObject getEventPreservationObject(SimpleEventPreservationMetadata simpleEPO)
     throws PremisMetadataException {
     EventPreservationObject event = getEventPreservationObject();
-    event.setID(simpleEPO.getFileId());
+    event.setId(simpleEPO.getFileId());
     event.setLabel(simpleEPO.getLabel());
     event.setLastModifiedDate(simpleEPO.getLastModifiedDate());
     event.setCreatedDate(simpleEPO.getCreatedDate());
@@ -187,7 +187,7 @@ public class PremisEventHelper {
     // <eventIdentifier>
     EventIdentifierComplexType eventIdentifier = getEvent().getEventIdentifier();
     if (eventIdentifier != null) {
-      pObject.setID(eventIdentifier.getEventIdentifierValue());
+      pObject.setId(eventIdentifier.getEventIdentifierValue());
     } else {
       logger.warn("PREMIS Event doesn't have an ID");
     }
@@ -286,7 +286,7 @@ public class PremisEventHelper {
     // <eventIdentifier>
     EventIdentifierComplexType eventIdentifier = getEvent().addNewEventIdentifier();
     eventIdentifier.setEventIdentifierType(PremisHelper.premisIdentifierTypePID);
-    eventIdentifier.setEventIdentifierValue(eventPObject.getID());
+    eventIdentifier.setEventIdentifierValue(eventPObject.getId());
 
     // <eventType>
     getEvent().setEventType(eventPObject.getEventType());

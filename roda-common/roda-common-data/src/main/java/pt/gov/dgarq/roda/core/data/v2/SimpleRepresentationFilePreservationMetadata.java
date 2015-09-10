@@ -13,7 +13,6 @@ public class SimpleRepresentationFilePreservationMetadata extends SimplePreserva
     this.setCreatedDate(simple.getCreatedDate());
     this.setFileId(simple.getFileId());
     this.setHash(simple.getHash());
-    this.setID(simple.getID());
     this.setId(simple.getId());
     this.setLabel(simple.getLabel());
     this.setLastModifiedDate(simple.getLastModifiedDate());

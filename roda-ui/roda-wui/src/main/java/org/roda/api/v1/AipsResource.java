@@ -28,10 +28,11 @@ import io.swagger.annotations.ApiResponses;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
 import pt.gov.dgarq.roda.core.data.v2.SimpleEventPreservationMetadata;
 
-@Path("/v1/aips")
-@Api(value = "/v1/aips", description = "the aips API")
+@Path(AipsResource.ENDPOINT)
+@Api(value = AipsResource.ENDPOINT, description = "the aips API")
 @javax.annotation.Generated(value = "class io.swagger.codegen.languages.JaxRSServerCodegen", date = "2015-09-03T11:38:49.275+01:00")
 public class AipsResource {
+  public static final String ENDPOINT = "/v1/aips";
 
   private final AipsService delegate = AipsServiceFactory.getAipsApi();
 

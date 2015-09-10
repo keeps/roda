@@ -959,7 +959,6 @@ public class SolrUtils {
     SimpleRepresentationPreservationMetadata srpm = new SimpleRepresentationPreservationMetadata();
     srpm.setCreatedDate(dateCreated);
     srpm.setId(id);
-    srpm.setID(id); // TODO ???
     srpm.setLabel(label);
     srpm.setLastModifiedDate(modifiedDate);
     srpm.setModel(model);
@@ -994,7 +993,6 @@ public class SolrUtils {
     srpm.setFileId(id);
     srpm.setHash(hash);
     srpm.setId(id);
-    srpm.setID(id); // TODO: ??????????
     srpm.setLabel(label);
     srpm.setLastModifiedDate(modifiedDate);
     srpm.setMimetype(mimetype);
