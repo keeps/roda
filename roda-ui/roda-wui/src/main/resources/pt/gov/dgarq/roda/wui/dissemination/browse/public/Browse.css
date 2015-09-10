@@ -39,10 +39,12 @@
 .browseItemDates {
 	margin-left: 50px;
 	color: #a7a9ac;
+	font-size: 90%;
 }
 
 .browseItemDescriptiveMetadata {
 	padding: 20px 0;
+	font-size: 90%;
 }
 
 .descriptiveMetadata {
@@ -87,10 +89,11 @@
 
 .browseDownloadLabel {
 	color: #089de3;
+	font-size: 90%
 }
 
 .browseDownloadSublabel {
-	font-size: 80%;
+	font-size: 70%;
 	margin-left: 25px;
 }
 

@@ -1,0 +1,169 @@
+/* Reset. */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+body {
+	line-height: 1;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+/* FlexGRID. */
+.wrapper {
+	width: 100%;
+	border-collapse: collapse;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	padding: 0 0 4%;
+	margin: 4% 0 0;
+}
+body .wrapper:first-child {
+	margin: 0;
+}
+.row {
+	clear: both;
+	max-width: 92%;
+	height: 100%;
+	margin: 0 auto;
+}
+.row:after {
+	content:"";
+	display:table;
+	clear:both;
+}
+.col_1, .col_2, .col_3, .col_4, .col_5, .col_6, .col_7, .col_8, .col_9, .col_10, .col_11, .col_12 {
+	font-size: 14px;
+	float: left;
+	width: 100%;
+	border-collapse:collapse;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	word-break: break-word;
+	margin: 4% 0 0;
+}
+.wrapper .row .col_1,
+.wrapper .row .col_2,
+.wrapper .row .col_3,
+.wrapper .row .col_4,
+.wrapper .row .col_5,
+.wrapper .row .col_6,
+.wrapper .row .col_7,
+.wrapper .row .col_8,
+.wrapper .row .col_9,
+.wrapper .row .col_10,
+.wrapper .row .col_11,
+.wrapper .row .col_12 {
+	padding: 20px;
+}
+.no_padding,
+.row.no_padding .col_1,
+.row.no_padding .col_2,
+.row.no_padding .col_3,
+.row.no_padding .col_4,
+.row.no_padding .col_5,
+.row.no_padding .col_6,
+.row.no_padding .col_7,
+.row.no_padding .col_8,
+.row.no_padding .col_9,
+.row.no_padding .col_10,
+.row.no_padding .col_11,
+.row.no_padding .col_12 {
+	padding: 0 !important;
+}
+
+@media all and (min-width : 768px) {
+	.wrapper {
+		width: 100%;
+		padding: 1% 0;
+		margin: 2% 0 0;
+	}
+	.row {
+		display: -webkit-box;
+		display: -moz-box;
+		display: -ms-flexbox;
+		display: -webkit-flex;
+		display: flex;
+		clear: both;
+		margin: 0 auto;
+		max-width: 90%;
+		height: 100%;
+		padding: 2% 0 0;
+	}
+	.wrapper .row {
+		padding: 1% 0;
+	}
+	.row:after {
+		content:"";
+		display:table;
+		clear:both;
+	}
+	.col_1, .col_2, .col_3, .col_4, .col_5, .col_6, .col_7, .col_8, .col_9, .col_10, .col_11, .col_12 {
+		margin: 0 2% 0 0;
+		float: left;
+		word-break: break-word;
+		position: relative;
+	}
+
+	.col_1 { width: 6.5%; }
+	.col_2 { width: 15%; }
+	.col_3 { width: 23.5%; }
+	.col_4 { width: 32%; }
+	.col_5 { width: 40.5%; }
+	.col_6 { width: 49%; }
+	.col_7 { width: 57.5%; }
+	.col_8 { width: 66%; }
+	.col_9 { width: 74.5%; }
+	.col_10 { width: 83%; }
+	.col_11 { width: 91.5%; }
+	.col_12 { width: 100%; margin: 0; }
+
+	.last {
+		margin: 0;
+	}
+}
+
+
+/* Your styles go here. */
+.full_width {
+	max-width: 100% !important;
+}
+
+.skip_padding {
+	padding: 0 !important;
+}

@@ -6,26 +6,11 @@
 
 .footer {
 	background-color: #414042;
-	padding: 30px;
-	display: flex;
-	justify-content: space-between;
 }
 
-.footer-column {
+.footer * {
 	color: white;
-	text-align: left;
-}
-
-.footer-column-left {
-	width: 30%;
-}
-
-.footer-column-center {
-	width: 30%;
-}
-
-.footer-column-right {
-	width: 30%;
+	font-size: 90%;
 }
 
 /* @group Banner */
@@ -234,7 +219,7 @@
 	cursor: pointer;
 	cursor: hand;
 	font-family: 'Ubuntu', sans-serif;
-	font-size: 8pt;
+	font-size: 0.8em;
 	font-weight: bold;
 	font-variant: normal;
 	color: #fff;
@@ -330,6 +315,7 @@
 	color: #a7a9ac;
 	cursor: pointer;
 	cursor: hand;
+	font-size: 90%
 }
 
 .main .wui-breadcrumbPanel .breadcrumb * {
