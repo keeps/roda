@@ -339,7 +339,7 @@ public class Browse extends Composite {
     FlowPanel labelsPanel = new FlowPanel();
 
     Anchor label = new Anchor(labelText, RestUtils.createRepresentationDownloadUri(rep.getAipId(), rep.getId()));
-    Label subLabel = new Label(rep.getFileIds().size() + " files");
+    Label subLabel = new Label(rep.getFileIds().size() + " files, " + readableFileSize(rep.getSizeInBytes()));
 
     labelsPanel.add(label);
     labelsPanel.add(subLabel);

@@ -539,6 +539,7 @@ public class ModelService extends ModelObservable {
     boolean active = ModelUtils.getBoolean(representationMetadata, RodaConstants.STORAGE_META_ACTIVE);
     Date dateCreated = ModelUtils.getDate(representationMetadata, RodaConstants.STORAGE_META_DATE_CREATED);
     Date dateModified = new Date();
+    Long sizeInBytes = ModelUtils.getLong(representationMetadata, RodaConstants.STORAGE_META_SIZE_IN_BYTES);
     representationMetadata.put(RodaConstants.STORAGE_META_DATE_MODIFIED,
       Sets.newHashSet(RodaUtils.dateToString(dateModified)));
     String type = ModelUtils.getString(representationMetadata, RodaConstants.STORAGE_META_TYPE);
@@ -549,7 +550,7 @@ public class ModelService extends ModelObservable {
 
     // build return object
     Representation representation = new Representation(representationId, aipId, active, dateCreated, dateModified,
-      statuses, type, fileIDsToUpdate);
+      statuses, type, sizeInBytes, fileIDsToUpdate);
     notifyRepresentationUpdated(representation);
     return representation;
   }
@@ -1097,6 +1098,7 @@ public class ModelService extends ModelObservable {
       Set<RepresentationState> statuses = ModelUtils.getStatuses(directoryMetadata);
       String type = ModelUtils.getString(directoryMetadata, RodaConstants.STORAGE_META_TYPE);
       List<String> fileIds = ModelUtils.getChildIds(storage, resource.getStoragePath(), true);
+      Long sizeInBytes = ModelUtils.getLong(directoryMetadata, RodaConstants.STORAGE_META_SIZE_IN_BYTES);
 
       if (active == null) {
         // when not stated, considering active=false
@@ -1104,7 +1106,7 @@ public class ModelService extends ModelObservable {
       }
 
       return new Representation(directoryPath.getName(), ModelUtils.getAIPidFromStoragePath(directoryPath), active,
-        dateCreated, dateModified, statuses, type, fileIds);
+        dateCreated, dateModified, statuses, type, sizeInBytes, fileIds);
 
     } else {
       throw new ModelServiceException(

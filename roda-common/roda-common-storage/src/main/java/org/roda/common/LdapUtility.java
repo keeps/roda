@@ -58,9 +58,11 @@ import pt.gov.dgarq.roda.util.PasswordHandler;
 // more meaningful
 public class LdapUtility {
 
-  static final private Logger logger = Logger.getLogger(LdapUtility.class);
+  private static final Logger LOGGER = Logger.getLogger(LdapUtility.class);
 
-  static final private String AUTHENTICATION_SIMPLE = "simple";
+  private static final String AUTHENTICATION_SIMPLE = "simple";
+  private static final String SHADOW_INACTIVE = "shadowInactive";
+  private static final String UNIQUE_MEMBER = "uniqueMember";
 
   /**
    * LDAP server host
@@ -197,12 +199,12 @@ public class LdapUtility {
     this.ldapProtectedUsers.clear();
     if (ldapProtectedUsers != null) {
       this.ldapProtectedUsers.addAll(ldapProtectedUsers);
-      logger.debug("protected users: " + this.ldapProtectedUsers);
+      LOGGER.debug("protected users: " + this.ldapProtectedUsers);
     }
     this.ldapProtectedGroups.clear();
     if (ldapProtectedGroups != null) {
       this.ldapProtectedGroups.addAll(ldapProtectedGroups);
-      logger.debug("protected groups: " + this.ldapProtectedGroups);
+      LOGGER.debug("protected groups: " + this.ldapProtectedGroups);
     }
   }
 
@@ -296,7 +298,7 @@ public class LdapUtility {
       return users;
 
     } catch (NamingException e) {
-      logger.debug("Error getting users - " + e.getMessage(), e);
+      LOGGER.debug("Error getting users - " + e.getMessage(), e);
       throw new LdapUtilityException("Error getting users - " + e.getMessage(), e);
     }
   }
@@ -329,11 +331,11 @@ public class LdapUtility {
       ctxRoot.close();
 
     } catch (NameNotFoundException e) {
-      logger.debug("User " + name + " doesn't exist", e);
+      LOGGER.debug(userMessage(name, " doesn't exist"), e);
       user = null;
 
     } catch (NamingException e) {
-      logger.debug("Error getting user " + name, e);
+      LOGGER.debug("Error getting user " + name, e);
       throw new LdapUtilityException("Error getting user " + name, e);
     }
 
@@ -368,7 +370,7 @@ public class LdapUtility {
       ctxRoot.close();
 
     } catch (NamingException e) {
-      logger.debug("Error getting user with email " + email, e);
+      LOGGER.debug("Error getting user with email " + email, e);
       throw new LdapUtilityException("Error getting user with email " + email, e);
     }
 
@@ -393,12 +395,12 @@ public class LdapUtility {
   public User addUser(User user) throws UserAlreadyExistsException, EmailAlreadyExistsException, LdapUtilityException {
 
     if (!user.isNameValid()) {
-      logger.debug("'" + user.getName() + "' is not a valid user name.");
+      LOGGER.debug("'" + user.getName() + "' is not a valid user name.");
       throw new LdapUtilityException("'" + user.getName() + "' is not a valid user name.");
     }
 
     if (getUserWithEmail(user.getEmail()) != null) {
-      logger.debug("The email address " + user.getEmail() + " is already used.");
+      LOGGER.debug("The email address " + user.getEmail() + " is already used.");
       throw new EmailAlreadyExistsException("The email address " + user.getEmail() + " is already used.");
     }
 
@@ -421,18 +423,18 @@ public class LdapUtility {
         try {
           setUserPasswordUnchecked(user.getName(), PasswordHandler.generateRandomPassword(12));
         } catch (NoSuchUserException e) {
-          logger.error("Created user doesn't exist! Notify developers!!!", e);
+          LOGGER.error("Created user doesn't exist! Notify developers!!!", e);
         }
       }
 
     } catch (NameAlreadyBoundException e) {
 
-      logger.debug("User " + user.getName() + " already exists.", e);
-      throw new UserAlreadyExistsException("User " + user.getName() + " already exists.", e);
+      LOGGER.debug(userMessage(user.getName(), " already exists."), e);
+      throw new UserAlreadyExistsException(userMessage(user.getName(), " already exists."), e);
 
     } catch (NamingException e) {
 
-      logger.debug("Error adding user " + user.getName(), e);
+      LOGGER.debug("Error adding user " + user.getName(), e);
       throw new LdapUtilityException("Error adding user " + user.getName(), e);
 
     }
@@ -461,10 +463,10 @@ public class LdapUtility {
    *           if the user is one of the protected users.
    * @throws LdapUtilityException
    */
-  public User modifyUser(User modifiedUser) throws NoSuchUserException, IllegalOperationException,
-    EmailAlreadyExistsException, LdapUtilityException {
+  public User modifyUser(User modifiedUser)
+    throws NoSuchUserException, IllegalOperationException, EmailAlreadyExistsException, LdapUtilityException {
 
-    logger.trace("modifyUser() - " + modifiedUser.getName());
+    LOGGER.trace("modifyUser() - " + modifiedUser.getName());
 
     // Create initial context
     DirContext ctxRoot;
@@ -474,7 +476,7 @@ public class LdapUtility {
 
     } catch (NamingException e) {
 
-      logger.debug("Error creating LDAP context with user - " + modifiedUser.getName(), e);
+      LOGGER.debug("Error creating LDAP context with user - " + modifiedUser.getName(), e);
       throw new LdapUtilityException("Error creating LDAP context with user - " + modifiedUser.getName(), e);
     }
 
@@ -486,7 +488,7 @@ public class LdapUtility {
 
     } catch (NamingException e) {
       // TODO Should I ignore this?
-      logger.warn("Ignoring error closing LDAP context - " + modifiedUser.getName(), e);
+      LOGGER.warn("Ignoring error closing LDAP context - " + modifiedUser.getName(), e);
     }
 
     return getUser(modifiedUser.getName());
@@ -504,8 +506,8 @@ public class LdapUtility {
    *           if the user is one of the protected users.
    * @throws LdapUtilityException
    */
-  public void setUserPassword(String username, String password) throws IllegalOperationException, NoSuchUserException,
-    LdapUtilityException {
+  public void setUserPassword(String username, String password)
+    throws IllegalOperationException, NoSuchUserException, LdapUtilityException {
 
     if (this.ldapProtectedUsers.contains(username)) {
       throw new IllegalOperationException("User (" + username + ") is protected and cannot be modified.");
@@ -536,10 +538,10 @@ public class LdapUtility {
    *           if the user is one of the protected users.
    * @throws LdapUtilityException
    */
-  public User modifySelfUser(User modifiedUser, String currentPassword, String newPassword) throws NoSuchUserException,
-    EmailAlreadyExistsException, IllegalOperationException, LdapUtilityException {
+  public User modifySelfUser(User modifiedUser, String currentPassword, String newPassword)
+    throws NoSuchUserException, EmailAlreadyExistsException, IllegalOperationException, LdapUtilityException {
 
-    logger.trace("modifySelfUser() - " + modifiedUser.getName());
+    LOGGER.trace("modifySelfUser() - " + modifiedUser.getName());
 
     // Create initial context
     DirContext ctxRoot;
@@ -549,7 +551,7 @@ public class LdapUtility {
 
     } catch (NamingException e) {
 
-      logger.debug("Error creating LDAP context with user - " + modifiedUser.getName(), e);
+      LOGGER.debug("Error creating LDAP context with user - " + modifiedUser.getName(), e);
       throw new LdapUtilityException("Error creating LDAP context with user - " + modifiedUser.getName(), e);
     }
 
@@ -561,7 +563,7 @@ public class LdapUtility {
 
     } catch (NamingException e) {
       // TODO Should I ignore this?
-      logger.warn("Ignoring error closing LDAP context - " + modifiedUser.getName(), e);
+      LOGGER.warn("Ignoring error closing LDAP context - " + modifiedUser.getName(), e);
     }
 
     return getUser(modifiedUser.getName());
@@ -579,7 +581,7 @@ public class LdapUtility {
   public void removeUser(String username) throws IllegalOperationException, LdapUtilityException {
 
     if (this.ldapProtectedUsers.contains(username)) {
-      throw new IllegalOperationException("User " + username + " is protected and cannot be removed.");
+      throw new IllegalOperationException(userMessage(username, " is protected and cannot be removed."));
     }
 
     try {
@@ -591,7 +593,7 @@ public class LdapUtility {
       ctxRoot.close();
 
     } catch (NamingException e) {
-      logger.debug("Error removing user " + username, e);
+      LOGGER.debug("Error removing user " + username, e);
       throw new LdapUtilityException("Error removing user " + username, e);
     }
 
@@ -609,8 +611,8 @@ public class LdapUtility {
    * @throws LdapUtilityException
    * 
    */
-  public void deactivateUser(String username) throws NoSuchUserException, IllegalOperationException,
-    LdapUtilityException {
+  public void deactivateUser(String username)
+    throws NoSuchUserException, IllegalOperationException, LdapUtilityException {
 
     User user = getUser(username);
 
@@ -621,11 +623,11 @@ public class LdapUtility {
       try {
         modifyUser(user);
       } catch (EmailAlreadyExistsException e) {
-        logger.error("EmailAlreadyExistsException should not occcur here!!! This is problably a bug!", e);
+        LOGGER.error("EmailAlreadyExistsException should not occcur here!!! This is problably a bug!", e);
       }
 
     } else {
-      throw new NoSuchUserException("user " + username + " doesn't exist.");
+      throw new NoSuchUserException(userMessage(username, " doesn't exist."));
 
     }
 
@@ -639,8 +641,6 @@ public class LdapUtility {
    * @return an <code>int</code> with the number of groups in the repository.
    * @throws LdapUtilityException
    */
-  // FIXME this code must certainly should be rethink as this should be done
-  // directly to the index and not to ldap
   // public int getGroupCount(Filter contentAdapterFilter) throws
   // LdapUtilityException {
   //
@@ -714,7 +714,7 @@ public class LdapUtility {
       return groups;
 
     } catch (NamingException e) {
-      logger.debug("Error getting groups - " + e.getMessage(), e);
+      LOGGER.debug("Error getting groups - " + e.getMessage(), e);
       throw new LdapUtilityException("Error getting groups - " + e.getMessage(), e);
     }
   }
@@ -747,10 +747,10 @@ public class LdapUtility {
     } catch (NameNotFoundException e) {
 
       group = null;
-      logger.debug("Group " + name + " doesn't exist.", e);
+      LOGGER.debug("Group " + name + " doesn't exist.", e);
 
     } catch (NamingException e) {
-      logger.debug("Error searching for group " + name, e);
+      LOGGER.debug("Error searching for group " + name, e);
       throw new LdapUtilityException("Error searching for group " + name, e);
     }
 
@@ -771,7 +771,7 @@ public class LdapUtility {
   public Group addGroup(Group group) throws GroupAlreadyExistsException, LdapUtilityException {
 
     if (!group.isNameValid()) {
-      logger.debug("'" + group.getName() + "' is not a valid group name.");
+      LOGGER.debug("'" + group.getName() + "' is not a valid group name.");
       throw new LdapUtilityException("'" + group.getName() + "' is not a valid group name.");
     }
 
@@ -789,9 +789,9 @@ public class LdapUtility {
       attributes.put(objectClass);
       attributes.put("cn", group.getName());
       attributes.put("ou", group.getFullName());
-      attributes.put("shadowInactive", group.isActive() ? "0" : "1");
+      attributes.put(SHADOW_INACTIVE, group.isActive() ? "0" : "1");
 
-      Attribute attributeUniqueMember = new BasicAttribute("uniqueMember");
+      Attribute attributeUniqueMember = new BasicAttribute(UNIQUE_MEMBER);
 
       // Add admin to all groups
       attributeUniqueMember.add(ldapAdminDN);
@@ -812,11 +812,11 @@ public class LdapUtility {
 
     } catch (NameAlreadyBoundException e) {
 
-      logger.debug("Group " + group.getName() + " already exists.", e);
+      LOGGER.debug("Group " + group.getName() + " already exists.", e);
       throw new GroupAlreadyExistsException("Group " + group.getName() + " already exists.", e);
 
     } catch (NamingException e) {
-      logger.debug("Error adding group " + group.getName(), e);
+      LOGGER.debug("Error adding group " + group.getName(), e);
       throw new LdapUtilityException("Error adding group " + group.getName(), e);
     }
 
@@ -841,14 +841,14 @@ public class LdapUtility {
    * @throws IllegalOperationException
    * @throws LdapUtilityException
    */
-  public Group modifyGroup(Group modifiedGroup) throws NoSuchGroupException, IllegalOperationException,
-    LdapUtilityException {
+  public Group modifyGroup(Group modifiedGroup)
+    throws NoSuchGroupException, IllegalOperationException, LdapUtilityException {
 
-    logger.trace("modifyGroup() - " + modifiedGroup.getName());
+    LOGGER.trace("modifyGroup() - " + modifiedGroup.getName());
 
     if (this.ldapProtectedGroups.contains(modifiedGroup.getName())) {
-      throw new IllegalOperationException("Group (" + modifiedGroup.getName()
-        + ") is protected and cannot be modified.");
+      throw new IllegalOperationException(
+        "Group (" + modifiedGroup.getName() + ") is protected and cannot be modified.");
     }
 
     try {
@@ -857,11 +857,11 @@ public class LdapUtility {
 
       Attributes attributes = new BasicAttributes();
 
-      attributes.put("shadowInactive", modifiedGroup.isActive() ? "0" : "1");
+      attributes.put(SHADOW_INACTIVE, modifiedGroup.isActive() ? "0" : "1");
 
       attributes.put("ou", modifiedGroup.getFullName());
 
-      Attribute attributeUniqueMember = new BasicAttribute("uniqueMember");
+      Attribute attributeUniqueMember = new BasicAttribute(UNIQUE_MEMBER);
 
       // Add admin to all groups
       attributeUniqueMember.add(ldapAdminDN);
@@ -887,10 +887,10 @@ public class LdapUtility {
       ctxRoot.close();
 
     } catch (NameNotFoundException e) {
-      logger.debug("Group " + modifiedGroup.getName() + " doesn't exist.", e);
+      LOGGER.debug("Group " + modifiedGroup.getName() + " doesn't exist.", e);
       throw new NoSuchGroupException("Group " + modifiedGroup.getName() + " doesn't exist.", e);
     } catch (NamingException e) {
-      logger.debug("Error modifying group " + modifiedGroup.getName(), e);
+      LOGGER.debug("Error modifying group " + modifiedGroup.getName(), e);
       throw new LdapUtilityException("Error modifying group " + modifiedGroup.getName(), e);
     }
 
@@ -922,7 +922,7 @@ public class LdapUtility {
 
     } catch (NamingException e) {
 
-      logger.debug("Error removing group " + groupname, e);
+      LOGGER.debug("Error removing group " + groupname, e);
 
       throw new LdapUtilityException("Error removing group " + groupname, e);
     }
@@ -960,7 +960,7 @@ public class LdapUtility {
             users.add(getUser(ctxRoot, getUserUIDFromDN(memberDN)));
 
           } catch (NamingException e) {
-            logger.error("Error getting user " + memberDN + " - " + e.getMessage() + " - IGNORING!", e);
+            LOGGER.error("Error getting user " + memberDN + " - " + e.getMessage() + " - IGNORING!", e);
           }
 
         } else {
@@ -974,7 +974,7 @@ public class LdapUtility {
       return users.toArray(new User[users.size()]);
 
     } catch (NamingException e) {
-      logger.debug("Error getting users in group - " + e.getMessage(), e);
+      LOGGER.debug("Error getting users in group - " + e.getMessage(), e);
       throw new LdapUtilityException("Error getting users in group - " + e.getMessage(), e);
     }
   }
@@ -1000,7 +1000,7 @@ public class LdapUtility {
       return userRoleNames;
 
     } catch (NamingException e) {
-      logger.debug("Error getting user group names", e);
+      LOGGER.debug("Error getting user group names", e);
       throw new LdapUtilityException("Error getting user group names", e);
     }
   }
@@ -1025,18 +1025,15 @@ public class LdapUtility {
 
       ctxRoot.close();
 
-      // String[] directRoles = new String[directMemberRolesDN.size()];
       Set<String> directRoles = new HashSet<String>();
-      int count = 0;
       for (String roleDN : directMemberRolesDN) {
         directRoles.add(getRoleCNFromDN(roleDN));
-        count++;
       }
 
       return directRoles;
 
     } catch (NamingException e) {
-      logger.debug("Error getting user group names", e);
+      LOGGER.debug("Error getting user group names", e);
       throw new LdapUtilityException("Error getting user group names", e);
     }
   }
@@ -1056,8 +1053,8 @@ public class LdapUtility {
    * @throws AuthenticationDeniedException
    * @throws ServiceException
    */
-  public User getAuthenticatedUser(String username, String password) throws AuthenticationDeniedException,
-    ServiceException {
+  public User getAuthenticatedUser(String username, String password)
+    throws AuthenticationDeniedException, ServiceException {
 
     try {
       // Create initial context
@@ -1072,11 +1069,11 @@ public class LdapUtility {
       if (isInvalidCredentials(e.getMessage())) {
         throw new AuthenticationDeniedException(e.getMessage());
       } else {
-        logger.debug("Error searching for user " + username, e);
+        LOGGER.debug("Error searching for user " + username, e);
         throw new ServiceException(e.getMessage(), ServiceException.INTERNAL_SERVER_ERROR);
       }
     } catch (NamingException e) {
-      logger.debug("Error searching for user " + username, e);
+      LOGGER.debug("Error searching for user " + username, e);
       throw new ServiceException(e.getMessage(), ServiceException.INTERNAL_SERVER_ERROR);
     }
 
@@ -1103,11 +1100,9 @@ public class LdapUtility {
    *           if the {@link User}'s email is already used.
    * @throws LdapUtilityException
    *           if something goes wrong with the register process.
-   * 
-   * @deprecated should not be called anymore.
    */
-  public User registerUser(User user, String password) throws UserAlreadyExistsException, EmailAlreadyExistsException,
-    LdapUtilityException {
+  public User registerUser(User user, String password)
+    throws UserAlreadyExistsException, EmailAlreadyExistsException, LdapUtilityException {
 
     // A new registered user, is always inactive.
     user.setActive(false);
@@ -1177,7 +1172,7 @@ public class LdapUtility {
 
       String message;
       if (username != null) {
-        message = "User " + username + " doesn't exist";
+        message = userMessage(username, " doesn't exist");
       } else {
         message = "Email " + email + " is not registered by any user";
       }
@@ -1205,8 +1200,8 @@ public class LdapUtility {
 
         if (currentIsoDate.compareToIgnoreCase(user.getEmailConfirmationTokenExpirationDate()) > 0) {
 
-          throw new InvalidTokenException("Email confirmation token expired in "
-            + user.getEmailConfirmationTokenExpirationDate());
+          throw new InvalidTokenException(
+            "Email confirmation token expired in " + user.getEmailConfirmationTokenExpirationDate());
 
         } else {
           // Good, token didn't expired yet.
@@ -1256,8 +1251,8 @@ public class LdapUtility {
    * @throws LdapUtilityException
    *           if something goes wrong with the operation.
    */
-  public User requestPasswordReset(String username, String email) throws NoSuchUserException,
-    IllegalOperationException, LdapUtilityException {
+  public User requestPasswordReset(String username, String email)
+    throws NoSuchUserException, IllegalOperationException, LdapUtilityException {
 
     User user = null;
     if (username != null) {
@@ -1272,7 +1267,7 @@ public class LdapUtility {
 
       String message;
       if (username != null) {
-        message = "User " + username + " doesn't exist";
+        message = userMessage(username, " doesn't exist");
       } else {
         message = "Email " + email + " is not registered by any user";
       }
@@ -1329,7 +1324,7 @@ public class LdapUtility {
 
     if (user == null) {
 
-      throw new NoSuchUserException("User " + username + " doesn't exist");
+      throw new NoSuchUserException(userMessage(username, " doesn't exist"));
 
     } else {
 
@@ -1352,8 +1347,8 @@ public class LdapUtility {
 
         if (currentIsoDate.compareToIgnoreCase(user.getResetPasswordTokenExpirationDate()) > 0) {
 
-          throw new InvalidTokenException("Password reset token expired in "
-            + user.getResetPasswordTokenExpirationDate());
+          throw new InvalidTokenException(
+            "Password reset token expired in " + user.getResetPasswordTokenExpirationDate());
 
         } else {
           // Good, token didn't expired yet.
@@ -1406,7 +1401,7 @@ public class LdapUtility {
       return roleNames;
 
     } catch (NamingException e) {
-      logger.debug("Error getting role names", e);
+      LOGGER.debug("Error getting role names", e);
       throw new LdapUtilityException("Error getting role names", e);
     }
   }
@@ -1432,7 +1427,7 @@ public class LdapUtility {
       return roles;
 
     } catch (NamingException e) {
-      logger.debug("Error getting group names", e);
+      LOGGER.debug("Error getting group names", e);
       throw new LdapUtilityException("Error getting group names", e);
     }
   }
@@ -1468,7 +1463,7 @@ public class LdapUtility {
       return directRoles;
 
     } catch (NamingException e) {
-      logger.debug("Error getting group group names", e);
+      LOGGER.debug("Error getting group group names", e);
       throw new LdapUtilityException("Error getting group group names", e);
     }
   }
@@ -1492,10 +1487,10 @@ public class LdapUtility {
       ctxRoot.close();
 
     } catch (NameNotFoundException e) {
-      logger.debug("Group " + groupName + " doesn't exist.", e);
+      LOGGER.debug("Group " + groupName + " doesn't exist.", e);
       throw new NoSuchGroupException("Group " + groupName + " doesn't exist.", e);
     } catch (NamingException e) {
-      logger.debug("Error setting user groups", e);
+      LOGGER.debug("Error setting user groups", e);
       throw new LdapUtilityException("Error setting user groups", e);
     }
   }
@@ -1531,8 +1526,8 @@ public class LdapUtility {
 
     User user = new User(userAttributes.get("uid").get().toString());
 
-    if (userAttributes.get("shadowInactive") != null) {
-      String zeroOrOne = userAttributes.get("shadowInactive").get().toString();
+    if (userAttributes.get(SHADOW_INACTIVE) != null) {
+      String zeroOrOne = userAttributes.get(SHADOW_INACTIVE).get().toString();
       user.setActive("0".equalsIgnoreCase(zeroOrOne));
     } else {
       user.setActive(true);
@@ -1551,7 +1546,7 @@ public class LdapUtility {
       try {
         user.setIdDocumentDate(DateParser.parse(userAttributes.get("documentVersion").get().toString()));
       } catch (InvalidDateException e) {
-        logger.warn("Error parsing ID document date (documentVersion) - " + e.getMessage(), e);
+        LOGGER.warn("Error parsing ID document date (documentVersion) - " + e.getMessage(), e);
       }
     }
 
@@ -1631,7 +1626,7 @@ public class LdapUtility {
     attributes.put(objectClass);
     attributes.put("uid", user.getName());
     attributes.put("cn", user.getFullName());
-    attributes.put("shadowInactive", user.isActive() ? "0" : "1");
+    attributes.put(SHADOW_INACTIVE, user.isActive() ? "0" : "1");
 
     if (!StringUtils.isBlank(user.getFullName())) {
       String[] names = user.getFullName().split(" ");
@@ -1773,8 +1768,8 @@ public class LdapUtility {
 
     Group group = new Group(attributes.get("cn").get().toString());
 
-    if (attributes.get("shadowInactive") != null) {
-      String zeroOrOne = attributes.get("shadowInactive").get().toString();
+    if (attributes.get(SHADOW_INACTIVE) != null) {
+      String zeroOrOne = attributes.get(SHADOW_INACTIVE).get().toString();
       group.setActive("0".equalsIgnoreCase(zeroOrOne));
     } else {
       group.setActive(true);
@@ -1784,7 +1779,7 @@ public class LdapUtility {
       group.setFullName(attributes.get("ou").get().toString());
     }
 
-    Attribute attributeUniqueMember = attributes.get("uniqueMember");
+    Attribute attributeUniqueMember = attributes.get(UNIQUE_MEMBER);
 
     if (attributeUniqueMember != null) {
 
@@ -1857,7 +1852,7 @@ public class LdapUtility {
 
     String jndiFilter = "(" + keyAttribute + "=*)";
 
-    logger.trace("searchAttributes() JNDI filter: " + jndiFilter);
+    LOGGER.trace("searchAttributes() JNDI filter: " + jndiFilter);
 
     // Search for objects using the filter
     NamingEnumeration<SearchResult> answer = ctxRoot.search(ctxDN, jndiFilter, searchControls);
@@ -1981,7 +1976,7 @@ public class LdapUtility {
   private void modifyUser(DirContext ctxRoot, User modifiedUser, String newPassword, boolean modifyRolesAndGroups)
     throws NoSuchUserException, IllegalOperationException, EmailAlreadyExistsException, LdapUtilityException {
 
-    logger.trace("modifyUser() - " + modifiedUser.getName());
+    LOGGER.trace("modifyUser() - " + modifiedUser.getName());
 
     if (this.ldapProtectedUsers.contains(modifiedUser.getName())) {
       throw new IllegalOperationException("User (" + modifiedUser.getName() + ") is protected and cannot be modified.");
@@ -1992,10 +1987,10 @@ public class LdapUtility {
       User currentEmailOwner = getUserWithEmail(ctxRoot, modifiedUser.getEmail());
       if (currentEmailOwner != null && !modifiedUser.getName().equals(currentEmailOwner.getName())) {
 
-        logger.debug("The email address " + modifiedUser.getEmail() + " is already used by another user.");
+        LOGGER.debug("The email address " + modifiedUser.getEmail() + " is already used by another user.");
 
-        throw new EmailAlreadyExistsException("The email address " + modifiedUser.getEmail()
-          + " is already used by another user.");
+        throw new EmailAlreadyExistsException(
+          "The email address " + modifiedUser.getEmail() + " is already used by another user.");
       }
 
       Attributes attributes = getAttributesFromUser(modifiedUser, true);
@@ -2013,17 +2008,17 @@ public class LdapUtility {
 
     } catch (NameNotFoundException e) {
 
-      logger.debug("User " + modifiedUser.getName() + " doesn't exist.", e);
-      throw new NoSuchUserException("User " + modifiedUser.getName() + " doesn't exist.", e);
+      LOGGER.debug(userMessage(modifiedUser.getName(), " doesn't exist."), e);
+      throw new NoSuchUserException(userMessage(modifiedUser.getName(), " doesn't exist."), e);
 
     } catch (NamingException e) {
 
-      logger.debug("Error modifying user " + modifiedUser.getName(), e);
+      LOGGER.debug("Error modifying user " + modifiedUser.getName(), e);
       throw new LdapUtilityException("Error modifying user " + modifiedUser.getName() + " - " + e.getMessage(), e);
 
     } catch (NoSuchAlgorithmException e) {
 
-      logger.debug("Error encoding password for user " + modifiedUser.getName(), e);
+      LOGGER.debug("Error encoding password for user " + modifiedUser.getName(), e);
       throw new LdapUtilityException("Error encoding password for user " + modifiedUser.getName(), e);
     }
 
@@ -2039,8 +2034,8 @@ public class LdapUtility {
    * @throws UnsupportedEncodingException
    * @throws NoSuchAlgorithmException
    */
-  private void modifyUserPassword(DirContext ctxRoot, String username, String password) throws NamingException,
-    NoSuchAlgorithmException {
+  private void modifyUserPassword(DirContext ctxRoot, String username, String password)
+    throws NamingException, NoSuchAlgorithmException {
 
     PasswordHandler passwordHandler = PasswordHandler.getInstance();
     String passwordDigest = passwordHandler.generateDigest(password, null, ldapDigestAlgorithm);
@@ -2055,9 +2050,9 @@ public class LdapUtility {
 
   private void addMemberToGroup(DirContext ctxRoot, String groupDN, String memberDN) throws NamingException {
 
-    Attributes attributes = ctxRoot.getAttributes(groupDN, new String[] {"uniqueMember"});
+    Attributes attributes = ctxRoot.getAttributes(groupDN, new String[] {UNIQUE_MEMBER});
 
-    Attribute attribute = attributes.get("uniqueMember");
+    Attribute attribute = attributes.get(UNIQUE_MEMBER);
     attribute.add(memberDN);
 
     ctxRoot.modifyAttributes(groupDN, DirContext.REPLACE_ATTRIBUTE, attributes);
@@ -2078,8 +2073,8 @@ public class LdapUtility {
 
   private void removeMemberFromGroup(DirContext ctxRoot, String groupDN, String memberDN) throws NamingException {
 
-    Attributes attributes = ctxRoot.getAttributes(groupDN, new String[] {"uniqueMember"});
-    Attribute attribute = attributes.get("uniqueMember");
+    Attributes attributes = ctxRoot.getAttributes(groupDN, new String[] {UNIQUE_MEMBER});
+    Attribute attribute = attributes.get(UNIQUE_MEMBER);
     attribute.remove(memberDN);
 
     ctxRoot.modifyAttributes(groupDN, DirContext.REPLACE_ATTRIBUTE, attributes);
@@ -2181,9 +2176,9 @@ public class LdapUtility {
 
     Set<String> membersDN = new HashSet<String>();
 
-    Attributes attributes = ctxRoot.getAttributes(groupDN, new String[] {"uniqueMember"});
+    Attributes attributes = ctxRoot.getAttributes(groupDN, new String[] {UNIQUE_MEMBER});
 
-    Attribute attrUniqueMember = attributes.get("uniqueMember");
+    Attribute attrUniqueMember = attributes.get(UNIQUE_MEMBER);
 
     NamingEnumeration<?> e = attrUniqueMember.getAll();
 
@@ -2214,7 +2209,7 @@ public class LdapUtility {
     // Specify the attributes to match
     Attributes matchAttrs = new BasicAttributes(true); // ignore case
     matchAttrs.put(new BasicAttribute("cn"));
-    matchAttrs.put(new BasicAttribute("uniqueMember", memberDN));
+    matchAttrs.put(new BasicAttribute(UNIQUE_MEMBER, memberDN));
 
     // Search for objects that have those matching attributes
     NamingEnumeration<SearchResult> answer = ctxRoot.search(getGroupsDN(), matchAttrs, new String[] {});
@@ -2245,19 +2240,19 @@ public class LdapUtility {
     Attributes matchAttrs = new BasicAttributes(true); // ignore case
     matchAttrs.put(new BasicAttribute("cn"));
     // matchAttrs.put(new BasicAttribute("olcReadOnly", "FALSE"));
-    // matchAttrs.put(new BasicAttribute("shadowInactive", "FALSE"));
-    matchAttrs.put(new BasicAttribute("uniqueMember", memberDN));
+    // matchAttrs.put(new BasicAttribute(SHADOW_INACTIVE, "FALSE"));
+    matchAttrs.put(new BasicAttribute(UNIQUE_MEMBER, memberDN));
 
     // Search for objects that have those matching attributes
-    NamingEnumeration<SearchResult> answer = ctxRoot.search(getGroupsDN(), matchAttrs, new String[] {"shadowInactive"});
+    NamingEnumeration<SearchResult> answer = ctxRoot.search(getGroupsDN(), matchAttrs, new String[] {SHADOW_INACTIVE});
 
     while (answer.hasMore()) {
 
       SearchResult sr = answer.next();
 
       String shadowInactive = "0";
-      if (sr.getAttributes().get("shadowInactive") != null) {
-        shadowInactive = sr.getAttributes().get("shadowInactive").get().toString();
+      if (sr.getAttributes().get(SHADOW_INACTIVE) != null) {
+        shadowInactive = sr.getAttributes().get(SHADOW_INACTIVE).get().toString();
       }
 
       if ("0".equalsIgnoreCase(shadowInactive)) {
@@ -2390,15 +2385,16 @@ public class LdapUtility {
    *          a list of roles that this member should own.
    * @throws NamingException
    */
-  private void setMemberDirectRoles(DirContext ctxRoot, String memberDN, Set<String> roles) throws NamingException {
+  private void setMemberDirectRoles(DirContext ctxRoot, String memberDN, final Set<String> roles) throws NamingException {
 
-    if (roles == null) {
-      logger.warn("setMemberRoles() - roles is null. no roles");
-      roles = new HashSet<String>();
+    Set<String> properRoles = roles;
+    if (properRoles == null) {
+      LOGGER.warn("setMemberRoles() - roles is null. no roles");
+      properRoles = new HashSet<String>();
     }
 
     Set<String> oldroles = getMemberDirectRoles(ctxRoot, memberDN);
-    Set<String> newroles = new HashSet<String>(roles);
+    Set<String> newroles = new HashSet<String>(properRoles);
 
     // removing from oldroles all the roles in newroles, oldroles
     // becomes the Set of roles that the user doesn't want to own
@@ -2434,7 +2430,7 @@ public class LdapUtility {
   private void setMemberGroups(DirContext ctxRoot, String memberDN, Set<String> groups) throws NamingException {
 
     if (groups == null) {
-      logger.warn("setMemberGroups() - groups is null. no groups");
+      LOGGER.warn("setMemberGroups() - groups is null. no groups");
       groups = new HashSet<String>();
     }
 
@@ -2476,8 +2472,8 @@ public class LdapUtility {
    *           if specified {@link User} doesn't exist.
    * @throws LdapUtilityException
    */
-  private void setUserPasswordUnchecked(String username, String password) throws NoSuchUserException,
-    LdapUtilityException {
+  private void setUserPasswordUnchecked(String username, String password)
+    throws NoSuchUserException, LdapUtilityException {
 
     try {
 
@@ -2489,13 +2485,13 @@ public class LdapUtility {
       ctxRoot.close();
 
     } catch (NameNotFoundException e) {
-      logger.debug("User " + username + " doesn't exist.", e);
-      throw new NoSuchUserException("User " + username + " doesn't exist.", e);
+      LOGGER.debug(userMessage(username, " doesn't exist."), e);
+      throw new NoSuchUserException(userMessage(username, " doesn't exist."), e);
     } catch (NamingException e) {
-      logger.debug("Error setting password for user " + username, e);
+      LOGGER.debug("Error setting password for user " + username, e);
       throw new LdapUtilityException("Error setting password for user " + username, e);
     } catch (NoSuchAlgorithmException e) {
-      logger.debug("Error encoding password for user " + username, e);
+      LOGGER.debug("Error encoding password for user " + username, e);
       throw new LdapUtilityException("Error encoding password for user " + username, e);
     }
 
@@ -2559,6 +2555,10 @@ public class LdapUtility {
     }
 
     return dnList;
+  }
+
+  private String userMessage(String user, String message) {
+    return "User " + user + message;
   }
 
 }

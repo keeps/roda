@@ -16,8 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.servlet.ServletContextEvent;
-
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -316,13 +314,13 @@ public class RodaCoreFactory {
       instantiate();
       if ("index".equals(args.get(0))) {
         if ("list".equals(args.get(1)) && ("users".equals(args.get(2)) || "groups".equals(args.get(2)))) {
-          Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.MEMBERS_IS_USER, "users".equals(args
-            .get(2)) ? "true" : "false"));
+          Filter filter = new Filter(
+            new SimpleFilterParameter(RodaConstants.MEMBERS_IS_USER, "users".equals(args.get(2)) ? "true" : "false"));
           Sorter sorter = null;
           Sublist sublist = new Sublist(0, 10000);
           Facets facets = null;
           printIndexMembers(args, filter, sorter, sublist, facets);
-        } else if ("reindex".equals(args.get(1))) {
+        } else if ("reindex".equals(args.get(1)) && args.size() == 2) {
           Plugin<AIP> reindexAction = new ReindexAction();
           getActionOrchestrator().runActionOnAllAIPs(reindexAction);
         }

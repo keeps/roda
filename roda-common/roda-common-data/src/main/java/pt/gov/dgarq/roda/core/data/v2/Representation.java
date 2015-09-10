@@ -17,6 +17,7 @@ public class Representation implements Serializable {
   private Set<RepresentationState> statuses;
   private String type;
   private List<String> fileIds;
+  private long sizeInBytes;
 
   public void setId(String id) {
     this.id = id;
@@ -55,7 +56,7 @@ public class Representation implements Serializable {
   }
 
   public Representation(String id, String aipId, boolean active, Date dateCreated, Date dateModified,
-    Set<RepresentationState> statuses, String type, List<String> fileIds) {
+    Set<RepresentationState> statuses, String type, long sizeInBytes, List<String> fileIds) {
     super();
     this.id = id;
     this.aipId = aipId;
@@ -64,7 +65,13 @@ public class Representation implements Serializable {
     this.dateModified = dateModified;
     this.statuses = statuses;
     this.type = type;
+    this.sizeInBytes = sizeInBytes;
     this.fileIds = fileIds;
+  }
+
+  public Representation(String id, String aipId, boolean active, Date dateCreated, Date dateModified,
+    Set<RepresentationState> statuses, String type, List<String> fileIds) {
+    this(id, aipId, active, dateCreated, dateModified, statuses, type, 0, fileIds);
   }
 
   /**
@@ -123,10 +130,19 @@ public class Representation implements Serializable {
     return fileIds;
   }
 
+  public long getSizeInBytes() {
+    return sizeInBytes;
+  }
+
+  public void setSizeInBytes(long sizeInBytes) {
+    this.sizeInBytes = sizeInBytes;
+  }
+
   @Override
   public String toString() {
     return "Representation [id=" + id + ", aipId=" + aipId + ", active=" + active + ", dateCreated=" + dateCreated
-      + ", dateModified=" + dateModified + ", statuses=" + statuses + ", type=" + type + ", fileIds=" + fileIds + "]";
+      + ", dateModified=" + dateModified + ", statuses=" + statuses + ", type=" + type + ", sizeInBytes=" + sizeInBytes
+      + ", fileIds=" + fileIds + "]";
   }
 
   @Override
@@ -157,6 +173,9 @@ public class Representation implements Serializable {
     }
     Representation other = (Representation) obj;
     if (active != other.active) {
+      return false;
+    }
+    if (sizeInBytes != other.sizeInBytes) {
       return false;
     }
     if (aipId == null) {

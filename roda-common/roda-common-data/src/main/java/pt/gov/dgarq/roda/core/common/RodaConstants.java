@@ -60,6 +60,7 @@ public final class RodaConstants {
   public static final String STORAGE_META_PARENT_ID = "parentId";
   public static final String STORAGE_META_TYPE = "type";
   public static final String STORAGE_META_ACTIVE = "active";
+  public static final String STORAGE_META_SIZE_IN_BYTES = "sizeInBytes";
   public static final String STORAGE_META_ENTRYPOINT = "entryPoint";
   public static final String STORAGE_META_FORMAT_MIME = "format.mimetype";
   public static final String STORAGE_META_FORMAT_VERSION = "format.version";
@@ -154,6 +155,7 @@ public final class RodaConstants {
   public static final String SRO_FILE_IDS = "fileId";
   public static final String SRO_EVENT_PRESERVATION_IDS = "eventId";
   public static final String SRO_REPRESENTATION_PRESERVATION_IDS = "representationId";
+  public static final String SRO_SIZE_IN_BYTES = "sizeInBytes";
 
   /*
    * SEPM FIELDS

@@ -101,11 +101,13 @@ public final class ModelUtils {
         try {
           ret = type.cast(RodaUtils.parseDate(set.iterator().next()));
         } catch (ParseException e) {
-          throw new ModelServiceException("Could not parse date: " + value,
-            ModelServiceException.INTERNAL_SERVER_ERROR, e);
+          throw new ModelServiceException("Could not parse date: " + value, ModelServiceException.INTERNAL_SERVER_ERROR,
+            e);
         }
       } else if (type.equals(Boolean.class)) {
         ret = type.cast(Boolean.valueOf(value));
+      } else if (type.equals(Long.class)) {
+        ret = type.cast(Long.valueOf(value));
       } else {
         throw new ModelServiceException(
           "Could not parse date because metadata field has not a single value class is not supported" + type,
@@ -143,6 +145,19 @@ public final class ModelUtils {
    */
   public static Boolean getBoolean(Map<String, Set<String>> metadata, String key) throws ModelServiceException {
     return getAs(metadata, key, Boolean.class);
+  }
+
+  /**
+   * Reads, from metadata and for a metadata key, a boolean if it exists
+   * 
+   * @param metadata
+   *          metadata
+   * @param key
+   *          metadata key
+   * @throws ModelServiceException
+   */
+  public static Long getLong(Map<String, Set<String>> metadata, String key) throws ModelServiceException {
+    return getAs(metadata, key, Long.class);
   }
 
   /**
@@ -307,7 +322,8 @@ public final class ModelUtils {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId, RodaConstants.STORAGE_DIRECTORY_DATA);
   }
 
-  public static StoragePath getRepresentationPath(String aipId, String representationId) throws StorageServiceException {
+  public static StoragePath getRepresentationPath(String aipId, String representationId)
+    throws StorageServiceException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId, RodaConstants.STORAGE_DIRECTORY_DATA,
       representationId);
   }
@@ -448,7 +464,8 @@ public final class ModelUtils {
       String entryJSON = ModelUtils.getJsonLogEntry(logEntry) + "\n";
       Files.write(logFile, entryJSON.getBytes(), StandardOpenOption.APPEND);
     } catch (IOException e) {
-      throw new ModelServiceException("Error writing log entry to file", ModelServiceException.INTERNAL_SERVER_ERROR, e);
+      throw new ModelServiceException("Error writing log entry to file", ModelServiceException.INTERNAL_SERVER_ERROR,
+        e);
     }
   }
 

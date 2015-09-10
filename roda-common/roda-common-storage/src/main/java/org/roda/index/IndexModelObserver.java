@@ -104,6 +104,7 @@ public class IndexModelObserver implements ModelObserver {
     for (String representationId : representationIds) {
       try {
         Representation representation = model.retrieveRepresentation(aip.getId(), representationId);
+        LOGGER.debug(representation.toString());
         SolrInputDocument representationDocument = SolrUtils.representationToSolrDocument(representation);
         index.add(RodaConstants.INDEX_REPRESENTATIONS, representationDocument);
       } catch (SolrServerException | IOException | ModelServiceException e) {

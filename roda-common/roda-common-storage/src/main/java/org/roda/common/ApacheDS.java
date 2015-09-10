@@ -2,9 +2,9 @@ package org.roda.common;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -12,6 +12,7 @@ import java.util.Set;
 import org.apache.commons.configuration.Configuration;
 import org.apache.directory.api.ldap.model.entry.DefaultEntry;
 import org.apache.directory.api.ldap.model.entry.Entry;
+import org.apache.directory.api.ldap.model.exception.LdapException;
 import org.apache.directory.api.ldap.model.ldif.LdifEntry;
 import org.apache.directory.api.ldap.model.ldif.LdifReader;
 import org.apache.directory.api.ldap.model.message.ModifyRequestImpl;
@@ -125,8 +126,8 @@ public class ApacheDS {
 
     List<Throwable> errors = schemaManager.getErrors();
 
-    if (errors.size() != 0) {
-      throw new Exception("");
+    if (!errors.isEmpty()) {
+      throw new LdapUtilityException("Error while loading apacheds schemas");
     }
 
     service.setSchemaManager(schemaManager);
@@ -175,7 +176,7 @@ public class ApacheDS {
     }
   }
 
-  public JdbmPartition instantiateDirectoryService(Path dataDirectory) throws Exception, IOException {
+  public JdbmPartition instantiateDirectoryService(Path dataDirectory) throws Exception {
     service = new DefaultDirectoryService();
     service.setInstanceId(INSTANCE_NAME);
     service.setInstanceLayout(new InstanceLayout(dataDirectory.toFile()));
@@ -195,8 +196,8 @@ public class ApacheDS {
     // while initializing
     JdbmPartition systemPartition = new JdbmPartition(service.getSchemaManager(), service.getDnFactory());
     systemPartition.setId("system");
-    systemPartition.setPartitionPath(new File(service.getInstanceLayout().getPartitionsDirectory(), systemPartition
-      .getId()).toURI());
+    systemPartition.setPartitionPath(
+      new File(service.getInstanceLayout().getPartitionsDirectory(), systemPartition.getId()).toURI());
     systemPartition.setSuffixDn(new Dn(ServerDNConstants.SYSTEM_DN));
     systemPartition.setSchemaManager(service.getSchemaManager());
 
@@ -261,7 +262,7 @@ public class ApacheDS {
     server.start();
   }
 
-  private void applyLdif(final File ldifFile) throws Exception {
+  private void applyLdif(final File ldifFile) throws LdapException, IOException {
     LdifReader entries = new LdifReader(new FileInputStream(ldifFile));
     for (LdifEntry ldifEntry : entries) {
       DefaultEntry newEntry = new DefaultEntry(service.getSchemaManager(), ldifEntry.getEntry());

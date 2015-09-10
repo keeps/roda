@@ -11,7 +11,6 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.roda.common.HTMLUtils;
-import org.roda.index.IndexService;
 import org.roda.index.IndexServiceException;
 import org.roda.model.DescriptiveMetadata;
 import org.roda.model.ModelService;
@@ -100,8 +99,8 @@ public class BrowserHelper {
         Binary binary = RodaCoreFactory.getStorageService().getBinary(descriptiveMetadata.getStoragePath());
         String html = HTMLUtils.descriptiveMetadataToHtml(binary, locale);
 
-        descriptiveMetadataList.add(new DescriptiveMetadataBundle(descriptiveMetadata.getId(), html, binary
-          .getSizeInBytes()));
+        descriptiveMetadataList
+          .add(new DescriptiveMetadataBundle(descriptiveMetadata.getId(), html, binary.getSizeInBytes()));
       }
     } finally {
       try {

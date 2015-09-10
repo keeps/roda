@@ -111,6 +111,7 @@
    <field name="label" type="text_general" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="type" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="subtype" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
+   <field name="sizeInBytes" type="long" indexed="true" stored="true" />
    <field name="dateCreated" type="tdate" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="dateModified" type="tdate" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="status" type="string" indexed="true" stored="true" required="false" multiValued="true" /> 

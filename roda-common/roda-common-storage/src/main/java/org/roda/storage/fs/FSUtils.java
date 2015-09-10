@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
+import org.apache.commons.lang3.mutable.MutableLong;
 import org.roda.storage.ClosableIterable;
 import org.roda.storage.Container;
 import org.roda.storage.ContentPayload;
@@ -35,6 +36,7 @@ import org.roda.storage.StorageServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jersey.repackaged.com.google.common.collect.Sets;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 
 /**
@@ -366,7 +368,21 @@ public final class FSUtils {
 
     // construct
     if (Files.isDirectory(path)) {
-      resource = new DefaultDirectory(storagePath, metadata);
+      try {
+        MutableLong size = new MutableLong();
+        Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+          @Override
+          public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+            size.add(attrs.size());
+            return FileVisitResult.CONTINUE;
+          }
+        });
+
+        metadata.put(RodaConstants.STORAGE_META_SIZE_IN_BYTES, Sets.newHashSet(Long.toString(size.longValue())));
+        resource = new DefaultDirectory(storagePath, metadata);
+      } catch (IOException e) {
+        throw new StorageServiceException("Could not get file size", StorageServiceException.INTERNAL_SERVER_ERROR, e);
+      }
     } else {
       ContentPayload content = new FSPathContentPayload(path);
       long sizeInBytes;

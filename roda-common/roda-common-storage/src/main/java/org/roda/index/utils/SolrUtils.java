@@ -155,8 +155,8 @@ public class SolrUtils {
     if (facetFields != null) {
       for (FacetField facet : facetFields) {
         LOGGER.trace("facet:" + facet.getName() + " count:" + facet.getValueCount());
-        facetResult = new FacetFieldResult(facet.getName(), facet.getValueCount(), facets.getParameters()
-          .get(facet.getName()).getValues());
+        facetResult = new FacetFieldResult(facet.getName(), facet.getValueCount(),
+          facets.getParameters().get(facet.getName()).getValues());
         for (Count count : facet.getValues()) {
           LOGGER.trace("   value:" + count.getName() + " value:" + count.getCount());
           facetResult.addFacetValue(count.getName(), count.getName(), count.getCount());
@@ -223,8 +223,9 @@ public class SolrUtils {
       transformationResult.close();
 
     } catch (IOException | TransformerException | XMLStreamException | FactoryConfigurationError e) {
-      throw new IndexServiceException("Could not process descriptive metadata binary " + binary.getStoragePath()
-        + " using xslt " + xsltFilename, IndexServiceException.INTERNAL_SERVER_ERROR, e);
+      throw new IndexServiceException(
+        "Could not process descriptive metadata binary " + binary.getStoragePath() + " using xslt " + xsltFilename,
+        IndexServiceException.INTERNAL_SERVER_ERROR, e);
     }
     return doc;
   }
@@ -327,8 +328,8 @@ public class SolrUtils {
     return ret;
   }
 
-  private static void appendRangeInterval(StringBuilder ret, String fromKey, String toKey, Date fromValue,
-    Date toValue, DateGranularity granularity, boolean prefixWithANDOperatorIfBuilderNotEmpty) {
+  private static void appendRangeInterval(StringBuilder ret, String fromKey, String toKey, Date fromValue, Date toValue,
+    DateGranularity granularity, boolean prefixWithANDOperatorIfBuilderNotEmpty) {
     if (fromValue != null || toValue != null) {
       appendANDOperator(ret, true);
       ret.append("(");
@@ -725,8 +726,8 @@ public class SolrUtils {
     final String parentId = objectToString(doc.get(RodaConstants.AIP_PARENT_ID));
     final Date dateCreated = objectToDate(doc.get(RodaConstants.AIP_DATE_CREATED));
     final Date dateModified = objectToDate(doc.get(RodaConstants.AIP_DATE_MODIFIED));
-    final List<String> descriptiveMetadataFileIds = objectToListString(doc
-      .get(RodaConstants.AIP_DESCRIPTIVE_METADATA_ID));
+    final List<String> descriptiveMetadataFileIds = objectToListString(
+      doc.get(RodaConstants.AIP_DESCRIPTIVE_METADATA_ID));
     final List<String> representationIds = objectToListString(doc.get(RodaConstants.AIP_REPRESENTATION_ID));
 
     RODAObjectPermissions permissions = getPermissions(doc);
@@ -865,6 +866,7 @@ public class SolrUtils {
     final String id = objectToString(doc.get(RodaConstants.SRO_ID));
     final String aipId = objectToString(doc.get(RodaConstants.SRO_AIP_ID));
     final Boolean active = objectToBoolean(doc.get(RodaConstants.SRO_ACTIVE));
+    final Long sizeInBytes = objectToLong(doc.get(RodaConstants.SRO_SIZE_IN_BYTES));
     final Date dateCreated = objectToDate(doc.get(RodaConstants.SRO_DATE_CREATION));
     final Date dateModified = objectToDate(doc.get(RodaConstants.SRO_DATE_MODIFICATION));
     final Set<RepresentationState> statuses = new HashSet<RepresentationState>();
@@ -881,7 +883,7 @@ public class SolrUtils {
     final List<String> fileIds = objectToListString(doc.get(RodaConstants.SRO_FILE_IDS));
 
     final String type = objectToString(doc.get(RodaConstants.SRO_TYPE));
-    return new Representation(id, aipId, active, dateCreated, dateModified, statuses, type, fileIds);
+    return new Representation(id, aipId, active, dateCreated, dateModified, statuses, type, sizeInBytes, fileIds);
   }
 
   public static SolrInputDocument representationToSolrDocument(Representation rep) {
@@ -889,6 +891,7 @@ public class SolrUtils {
     doc.addField(RodaConstants.SRO_UUID, getId(rep.getAipId(), rep.getId()));
     doc.addField(RodaConstants.SRO_ID, rep.getId());
     doc.addField(RodaConstants.SRO_AIP_ID, rep.getAipId());
+    doc.addField(RodaConstants.SRO_SIZE_IN_BYTES, rep.getSizeInBytes());
     doc.addField(RodaConstants.SRO_DATE_CREATION, rep.getDateCreated());
     doc.addField(RodaConstants.SRO_DATE_MODIFICATION, rep.getDateModified());
     if (rep.getStatuses() != null && rep.getStatuses().size() > 0) {
@@ -1023,7 +1026,8 @@ public class SolrUtils {
     return doc;
   }
 
-  public static SolrInputDocument eventPreservationObjectToSolrDocument(String id, EventPreservationObject premisEvent) {
+  public static SolrInputDocument eventPreservationObjectToSolrDocument(String id,
+    EventPreservationObject premisEvent) {
     SolrInputDocument doc = new SolrInputDocument();
     doc.addField(RodaConstants.SEPM_AGENT_ID, premisEvent.getAgentID());
     doc.addField(RodaConstants.SEPM_CREATED_DATE, premisEvent.getCreatedDate());
