@@ -173,4 +173,14 @@ public class BrowserHelper {
     }
   }
 
+  public static SimpleDescriptionObject moveInHierarchy(String aipId, String parentId) throws GenericException {
+    try {
+      RodaCoreFactory.getModelService().updateParent(aipId, parentId);
+      return RodaCoreFactory.getIndexService().retrieve(SimpleDescriptionObject.class, aipId);
+    } catch (ModelServiceException | IndexServiceException e) {
+      throw new GenericException("Error moving item in hierarchy" + e.getMessage());
+    }
+
+  }
+
 }

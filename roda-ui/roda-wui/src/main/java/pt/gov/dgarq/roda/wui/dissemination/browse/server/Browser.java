@@ -60,8 +60,8 @@ public class Browser extends RodaCoreService {
     return descriptiveMetadata;
   }
 
-  public static Long countDescriptiveMetadata(RodaUser user, Filter filter) throws AuthorizationDeniedException,
-    GenericException {
+  public static Long countDescriptiveMetadata(RodaUser user, Filter filter)
+    throws AuthorizationDeniedException, GenericException {
     Date start = new Date();
 
     // check user permissions
@@ -109,6 +109,24 @@ public class Browser extends RodaCoreService {
     registerAction(user, "Browser", "getParent", sdo.getId(), duration, "sdo", sdo.toString());
 
     return ancestors;
+  }
+
+  public static SimpleDescriptionObject moveInHierarchy(RodaUser user, String aipId, String parentId)
+    throws AuthorizationDeniedException, GenericException {
+    Date start = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, "administration.metadata_editor");
+
+    // delegate
+    SimpleDescriptionObject sdo = BrowserHelper.moveInHierarchy(aipId, parentId);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, "Browser", "moveInHierarchy", sdo.getId(), duration, "aip", aipId, "toParent", parentId);
+
+    return sdo;
+
   }
 
 }

@@ -2,12 +2,15 @@ package org.roda.api.v1.impl;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -26,9 +29,14 @@ import org.roda.model.PreservationMetadata;
 import org.roda.model.utils.ModelUtils;
 import org.roda.storage.Binary;
 import org.roda.storage.ClosableIterable;
+import org.roda.storage.ContentPayload;
+import org.roda.storage.DefaultBinary;
 import org.roda.storage.StoragePath;
 import org.roda.storage.StorageService;
 import org.roda.storage.StorageServiceException;
+import org.roda.storage.fs.FSPathContentPayload;
+import org.roda.storage.fs.FSUtils;
+import org.roda.storage.fs.FSYamlMetadataUtils;
 
 import pt.gov.dgarq.roda.common.RodaCoreFactory;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
@@ -425,23 +433,73 @@ public class AipsServiceImpl extends AipsService {
 
   @Override
   public Response aipsAipIdPreservationMetadataRepresentationIdFileIdPost(String aipId, String representationId,
-    FormDataContentDisposition fileDetail) throws NotFoundException {
-    // do some magic!
-    return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
+    InputStream is, FormDataContentDisposition fileDetail) throws NotFoundException {
+
+    try {
+      ModelService model = RodaCoreFactory.getModelService();
+      Path p = Files.createTempFile("preservation", ".tmp");
+      Files.copy(is, p, StandardCopyOption.REPLACE_EXISTING);
+      StoragePath storagePath = ModelUtils.getPreservationFilePath(aipId, representationId, fileDetail.getFileName());
+      Map<String, Set<String>> metadata = FSYamlMetadataUtils.readMetadata(p);
+      ContentPayload content = new FSPathContentPayload(p);
+      long sizeInBytes;
+      sizeInBytes = Files.size(p);
+      Map<String, String> contentDigest = FSUtils.obtainContentDigest(metadata);
+      Binary resource = new DefaultBinary(storagePath, metadata, content, sizeInBytes, false, contentDigest);
+      model.createPreservationMetadata(aipId, representationId, fileDetail.getFileName(), resource);
+      return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
+    } catch (ModelServiceException | StorageServiceException e) {
+      if (e.getCode() == ModelServiceException.NOT_FOUND) {
+        throw new NotFoundException(e.getCode(), e.getMessage());
+      } else {
+        return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+      }
+    } catch (IOException e) {
+      return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+    }
   }
 
   @Override
   public Response aipsAipIdPreservationMetadataRepresentationIdFileIdPut(String aipId, String representationId,
-    FormDataContentDisposition fileDetail) throws NotFoundException {
-    // do some magic!
-    return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
+    InputStream is, FormDataContentDisposition fileDetail) throws NotFoundException {
+    try {
+      ModelService model = RodaCoreFactory.getModelService();
+      Path p = Files.createTempFile("preservation", ".tmp");
+      Files.copy(is, p, StandardCopyOption.REPLACE_EXISTING);
+      StoragePath storagePath = ModelUtils.getPreservationFilePath(aipId, representationId, fileDetail.getFileName());
+      Map<String, Set<String>> metadata = FSYamlMetadataUtils.readMetadata(p);
+      ContentPayload content = new FSPathContentPayload(p);
+      long sizeInBytes;
+      sizeInBytes = Files.size(p);
+      Map<String, String> contentDigest = FSUtils.obtainContentDigest(metadata);
+      Binary resource = new DefaultBinary(storagePath, metadata, content, sizeInBytes, false, contentDigest);
+      model.updatePreservationMetadata(aipId, representationId, fileDetail.getFileName(), resource);
+      return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
+    } catch (ModelServiceException | StorageServiceException e) {
+      if (e.getCode() == ModelServiceException.NOT_FOUND) {
+        throw new NotFoundException(e.getCode(), e.getMessage());
+      } else {
+        return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+      }
+    } catch (IOException e) {
+      return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+    }
   }
 
   @Override
   public Response aipsAipIdPreservationMetadataRepresentationIdFileIdDelete(String aipId, String representationId,
-    String fileId, String acceptFormat) throws NotFoundException {
-    // do some magic!
-    return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
+    String fileId) throws NotFoundException {
+    try {
+      ModelService model = RodaCoreFactory.getModelService();
+      model.deletePreservationMetadata(aipId, representationId, fileId);
+      return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
+    } catch (ModelServiceException e) {
+      if (e.getCode() == ModelServiceException.NOT_FOUND) {
+        throw new NotFoundException(e.getCode(), e.getMessage());
+      } else {
+        return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+      }
+    }
   }
 
 }

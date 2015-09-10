@@ -1,5 +1,7 @@
 package org.roda.api.v1;
 
+import java.io.InputStream;
+
 import javax.ws.rs.core.Response;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
@@ -37,14 +39,14 @@ public abstract class AipsService {
   public abstract Response aipsAipIdDataRepresentationIdFileIdPut(String aipId, String representationId, String fileId,
     String filepath) throws NotFoundException;
 
-  public abstract Response aipsAipIdDataRepresentationIdFileIdPost(String aipId, String representationId,
-    String fileId, String filepath) throws NotFoundException;
+  public abstract Response aipsAipIdDataRepresentationIdFileIdPost(String aipId, String representationId, String fileId,
+    String filepath) throws NotFoundException;
 
   public abstract Response aipsAipIdDataRepresentationIdFileIdDelete(String aipId, String representationId,
     String fileId) throws NotFoundException;
 
-  public abstract Response aipsAipIdDescriptiveMetadataGet(String aipId, String start, String limit, String acceptFormat)
-    throws NotFoundException;
+  public abstract Response aipsAipIdDescriptiveMetadataGet(String aipId, String start, String limit,
+    String acceptFormat) throws NotFoundException;
 
   public abstract Response aipsAipIdDescriptiveMetadataMetadataIdGet(String aipId, String metadataId,
     String acceptFormat) throws NotFoundException;
@@ -64,16 +66,16 @@ public abstract class AipsService {
   public abstract Response aipsAipIdPreservationMetadataRepresentationIdGet(String aipId, String representationId,
     String start, String limit, String acceptFormat) throws NotFoundException;
 
-  public abstract Response aipsAipIdPreservationMetadataRepresentationIdFileIdGet(String aipId,
-    String representationId, String fileId) throws NotFoundException;
+  public abstract Response aipsAipIdPreservationMetadataRepresentationIdFileIdGet(String aipId, String representationId,
+    String fileId) throws NotFoundException;
 
   public abstract Response aipsAipIdPreservationMetadataRepresentationIdFileIdPost(String aipId,
-    String representationId, FormDataContentDisposition fileDetail) throws NotFoundException;
+    String representationId, InputStream is, FormDataContentDisposition fileDetail) throws NotFoundException;
 
-  public abstract Response aipsAipIdPreservationMetadataRepresentationIdFileIdPut(String aipId,
-    String representationId, FormDataContentDisposition fileDetail) throws NotFoundException;
+  public abstract Response aipsAipIdPreservationMetadataRepresentationIdFileIdPut(String aipId, String representationId,
+    InputStream is, FormDataContentDisposition fileDetail) throws NotFoundException;
 
   public abstract Response aipsAipIdPreservationMetadataRepresentationIdFileIdDelete(String aipId,
-    String representationId, String fileId, String acceptFormat) throws NotFoundException;
+    String representationId, String fileId) throws NotFoundException;
 
 }
