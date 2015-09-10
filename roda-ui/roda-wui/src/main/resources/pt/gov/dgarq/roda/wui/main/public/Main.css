@@ -10,7 +10,7 @@
 
 .footer * {
 	color: white;
-	font-size: 90%;
+	font-size: 1rem;
 }
 
 /* @group Banner */
@@ -218,9 +218,8 @@
 .gwt-MenuBar .gwt-MenuItem {
 	cursor: pointer;
 	cursor: hand;
-	font-family: 'Ubuntu', sans-serif;
-	font-size: 0.8em;
-	font-weight: bold;
+	font-size: 1rem;
+	font-weight: 500;
 	font-variant: normal;
 	color: #fff;
 	padding: 5px 10px;
@@ -315,7 +314,7 @@
 	color: #a7a9ac;
 	cursor: pointer;
 	cursor: hand;
-	font-size: 90%
+	font-size: 1rem;
 }
 
 .main .wui-breadcrumbPanel .breadcrumb * {

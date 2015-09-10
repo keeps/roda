@@ -151,7 +151,7 @@ public class UserLogin {
    * 
    * @param callback
    */
-  public void logout(final AsyncCallback<AuthenticatedUser> callback) {
+  public void logout() {
     String currentURL = Window.Location.getHref().replaceAll("#", "%23");
     Window.open("/logout?service=" + currentURL, "_self", "");
     getUserRequest.clearCache();

@@ -10,17 +10,17 @@
 		margin: 40px auto;
 		width: 400px;
 		background-color: #eee;
-		padding: 5px 25px;
+		padding: 40px;
 	}
 	
 	.label {
 		font-weight: 500;
-		margin-bottom: 5px;
+		margin: 5px 0;
 	}
 	
 	.button {
-		margin-top: 10px;
-		margin-bottom: 20px;
+		margin-top: 20px;
+		width: 100px;
 	}
 	
 	.error {
@@ -44,7 +44,6 @@
 		</g:FlowPanel>
 		<g:Button ui:field="login" addStyleNames="btn btn-play {style.button}">Login</g:Button>
 		<g:Label ui:field="error" addStyleNames="{style.error}"></g:Label>
-
 	</g:FlowPanel>
 
 </ui:UiBinder>

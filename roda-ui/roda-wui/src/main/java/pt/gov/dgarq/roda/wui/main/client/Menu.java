@@ -95,9 +95,10 @@ public class Menu extends Composite {
     ingest_pre = ingestMenu.addItem(constants.title_ingest_pre(), createCommand(PreIngest.RESOLVER.getHistoryPath()));
     ingest_submit = ingestMenu.addItem(constants.title_ingest_submit(),
       createCommand(IngestSubmit.RESOLVER.getHistoryPath()));
-    ingest_list = ingestMenu
-      .addItem(constants.title_ingest_list(), createCommand(IngestList.RESOLVER.getHistoryPath()));
-    ingestMenu.addItem(constants.title_ingest_help(), createCommand(Ingest.RESOLVER.getHistoryPath() + ".help"));
+    ingest_list = ingestMenu.addItem(constants.title_ingest_list(),
+      createCommand(IngestList.RESOLVER.getHistoryPath()));
+    // ingestMenu.addItem(constants.title_ingest_help(),
+    // createCommand(Ingest.RESOLVER.getHistoryPath() + ".help"));
 
     administrationMenu = new MenuBar(true);
     administration_user = administrationMenu.addItem(constants.title_administration_user(),
@@ -108,28 +109,18 @@ public class Menu extends Composite {
       createCommand(Statistics.getInstance().getHistoryPath()));
     administration_log = administrationMenu.addItem(constants.title_administration_log(),
       createCommand(UserLog.RESOLVER.getHistoryPath()));
-    administrationMenu.addItem(constants.title_administration_help(), createCommand(Management.RESOLVER + ".help"));
+    // administrationMenu.addItem(constants.title_administration_help(),
+    // createCommand(Management.RESOLVER + ".help"));
 
     userMenu = new MenuBar(true);
+    userMenu.addItem(constants.loginPreferences(), createCommand(Preferences.getInstance().getHistoryPath()));
     userMenu.addItem(constants.loginLogout(), new ScheduledCommand() {
 
       @Override
       public void execute() {
-        UserLogin.getInstance().logout(new AsyncCallback<AuthenticatedUser>() {
-
-          @Override
-          public void onFailure(Throwable caught) {
-            logger.fatal("Error logging out", caught);
-          }
-
-          @Override
-          public void onSuccess(AuthenticatedUser result) {
-            // do nothing
-          }
-        });
+        UserLogin.getInstance().logout();
       }
     });
-    userMenu.addItem(constants.loginPreferences(), createCommand(Preferences.getInstance().getHistoryPath()));
 
     UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<AuthenticatedUser>() {
 

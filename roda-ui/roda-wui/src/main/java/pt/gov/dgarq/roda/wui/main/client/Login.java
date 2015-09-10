@@ -143,26 +143,31 @@ public class Login extends Composite {
     String passwordText = password.getText();
     error.setText("");
 
-    UserLogin.getInstance().login(usernameText, passwordText, new AsyncCallback<AuthenticatedUser>() {
+    if (usernameText.trim().length() == 0 || passwordText.trim().length() == 0) {
+      error.setText("Please fill the username and password");
+    } else {
 
-      @Override
-      public void onFailure(Throwable caught) {
-        if (caught instanceof AuthenticationDeniedException) {
-          error.setText("Wrong username or password");
-        } else {
-          error.setText("System currently unavailable");
-        }
-      }
+      UserLogin.getInstance().login(usernameText, passwordText, new AsyncCallback<AuthenticatedUser>() {
 
-      @Override
-      public void onSuccess(AuthenticatedUser user) {
-        if (service != null && service.length() > 0) {
-          History.newItem(service);
-        } else {
-          History.newItem(Home.RESOLVER.getHistoryPath());
+        @Override
+        public void onFailure(Throwable caught) {
+          if (caught instanceof AuthenticationDeniedException) {
+            error.setText("Wrong username or password");
+          } else {
+            error.setText("System currently unavailable");
+          }
         }
 
-      }
-    });
+        @Override
+        public void onSuccess(AuthenticatedUser user) {
+          if (service != null && service.length() > 0) {
+            History.newItem(service);
+          } else {
+            History.newItem(Home.RESOLVER.getHistoryPath());
+          }
+
+        }
+      });
+    }
   }
 }

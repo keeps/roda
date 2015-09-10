@@ -75,6 +75,7 @@
 
 .searchAdvancedDisclosure {
 	width: 100%;
+	margin-top: 10px;
 }
 
 .searchAdvancedDisclosure a {
@@ -82,7 +83,7 @@
 }
 
 .searchAdvancedPanel {
-	padding: 20px;
+	padding: 20px !important;
 	background-color: #e6e7e8;
 }
 
@@ -93,6 +94,7 @@
 .searchAdvancedFieldLabel {
 	font-weight: 500;
 	margin-bottom: 5px;
+	font-size: 1.1rem;
 }
 
 .searchAdvancedFieldInputDateLabel {

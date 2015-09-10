@@ -5,47 +5,44 @@ html, body {
 	margin: 0;
 	padding: 0;
 	border: 0;
-	height: 100%;
 	background-color: #414042;
 	height: 100%;
+	font-size: 0.8em;
+	font-family: 'Ubuntu', sans-serif;
 }
 
 body {
-	padding: 0;
-	margin: 0;
-	border: 0;
 	text-align: center;
-	margin-top: -13px;
+	margin-top: -18px;
 }
 
 body, * {
 	font-family: 'Ubuntu', sans-serif;
-	font-size: 0.9em;
 	color: #58595b;
 	text-align: left;
 	line-height: normal;
 }
 
 a {
-	font-size: 90%;
+	font-size: 1rem;
 }
 
 h1, .h1 {
-	font-size: 200%;
+	font-size: 2rem;
 	font-weight: bold;
 	color: #404142;
 	margin-bottom: 20px;
 }
 
 h2, .h2 {
-	font-size: 130%;
+	font-size: 1.5rem;
 	font-weight: 500;
 	color: #404142;
 	margin-bottom: 20px;
 }
 
 h3, .h3 {
-	font-size: 100%;
+	font-size: 1rem;
 	font-weight: 500;
 	color: #404142;
 	margin-bottom: 10px;
@@ -58,11 +55,12 @@ h3, .h3 {
 .sidebar {
 	background: #eee;
 	padding: 40px !important;
-	min-width: 220px;
+	min-width: 230px;
+	min-height: 600px;
 }
 
 .sidebar .btn {
-	width: 140px;
+	width: 150px;
 	margin-right: 10px;
 }
 
@@ -73,7 +71,6 @@ h3, .h3 {
 	background-color: #089de3;
 	color: white;
 	font-weight: 500;
-	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
@@ -343,6 +340,12 @@ td.datePickerMonth, td.datePickerYear {
 	display: block;
 	white-space: nowrap;
 	margin-bottom: 5px;
+	font-size: 1rem;
+}
+
+.sidebar-facet-label label {
+	position: relative;
+    top: -3px;
 }
 
 .sidebar-facet-input {
@@ -1601,15 +1604,6 @@ td.datePickerMonth, td.datePickerYear {
 	font-weight: bold;
 	color: #404142;
 	margin-bottom: 10px;
-}
-
-.two-columns {
-	display: flex;
-	justify-content: space-between;
-}
-
-.two-columns .column {
-	width: 49%;
 }
 
 .link {
