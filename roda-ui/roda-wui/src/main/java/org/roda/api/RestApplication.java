@@ -21,7 +21,6 @@ public class RestApplication extends ResourceConfig {
     BeanConfig beanConfig = new BeanConfig();
     beanConfig.setVersion("1");
     beanConfig.setBasePath("/api");
-    beanConfig.setSchemes(new String[] {"http"});
     beanConfig.setResourcePackage("org.roda.api");
     beanConfig.setScan(true);
   }
