@@ -88,7 +88,7 @@
 	<!-- REST related servlets/servlet-mappings -->
 	<!-- ************************************ -->
 	<servlet>
-		<servlet-name>rest</servlet-name>
+		<servlet-name>rest_api</servlet-name>
 		<servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
 		<init-param>
 			<param-name>javax.ws.rs.Application</param-name>
@@ -98,8 +98,8 @@
 	</servlet>
 
 	<servlet-mapping>
-		<servlet-name>rest</servlet-name>
-		<url-pattern>/rest/*</url-pattern>
+		<servlet-name>rest_api</servlet-name>
+		<url-pattern>/api/*</url-pattern>
 	</servlet-mapping>
 
 
@@ -456,6 +456,7 @@
 
 	<welcome-file-list>
 		<welcome-file>Main.html</welcome-file>
+		<welcome-file>index.html</welcome-file>
 		<welcome-file>index.php</welcome-file>
 	</welcome-file-list>
 

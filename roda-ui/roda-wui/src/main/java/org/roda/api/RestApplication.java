@@ -17,11 +17,10 @@ public class RestApplication extends ResourceConfig {
 
     // https://github.com/swagger-api/swagger-core/wiki/Java-JAXRS-Quickstart
     register(ApiListingResource.class);
-    // register(ApiListingResourceJSON.class);
     register(SwaggerSerializers.class);
     BeanConfig beanConfig = new BeanConfig();
     beanConfig.setVersion("1");
-    beanConfig.setBasePath("/rest");
+    beanConfig.setBasePath("/api");
     beanConfig.setSchemes(new String[] {"http"});
     beanConfig.setResourcePackage("org.roda.api");
     beanConfig.setScan(true);
