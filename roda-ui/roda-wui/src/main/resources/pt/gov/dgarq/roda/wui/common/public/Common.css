@@ -50,13 +50,13 @@ h3, .h3 {
 
 .content {
 	padding: 40px !important;
+	min-height: 600px;
 }
 
 .sidebar {
 	background: #eee;
 	padding: 40px !important;
 	min-width: 230px;
-	min-height: 600px;
 }
 
 .sidebar .btn {
