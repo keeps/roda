@@ -6,33 +6,8 @@
 	xmlns:common="urn:import:pt.gov.dgarq.roda.wui.common.client.widgets">
 
 	<ui:style>
-	.item_icon {
-		
-	}
-	
-	.sidebar {
-		background-color: #eee;
-	}
-	
 	.searchlist-title {
 		position: absolute;
-	}
-	
-	.searchlist {
-		
-	}
-	
-	.sidebar-title {
-		margin-bottom: 10px;
-	}
-	
-	.sidebar-group {
-		margin-bottom: 10px;
-	}
-	
-	.action {
-		width: 100%;
-		margin-bottom: 10px;
 	}
 	</ui:style>
 
@@ -44,48 +19,46 @@
 				</g:Label>
 				<m:BreadcrumbPanel ui:field="breadcrumb"
 					addStyleNames="browseBreadcrumb" />
-				<g:SimplePanel styleName="browseItemIcon"
-					addStyleNames="{style.item_icon}" ui:field="itemIcon" />
-				<g:Label styleName="h2" addStyleNames="browseItemText"
-					ui:field="itemTitle" />
-				<g:Label addStyleNames="browseItemDates" ui:field="itemDates" />
+				<g:FlowPanel styleName="browseItemPanel">
+					<g:SimplePanel styleName="browseItemIcon" ui:field="itemIcon" />
+					<g:FlowPanel styleName="browseItemPanelText">
+						<g:Label styleName="h4" addStyleNames="browseItemText"
+							ui:field="itemTitle" />
+						<g:Label addStyleNames="browseItemDates" ui:field="itemDates" />
+					</g:FlowPanel>
+				</g:FlowPanel>
 				<g:HTML ui:field="itemDescriptiveMetadata" addStyleNames="browseItemDescriptiveMetadata" />
-				<g:Label styleName="{style.searchlist-title}" addStyleNames="h2"
+				<g:Label styleName="{style.searchlist-title}" addStyleNames="h4"
 					ui:field="fondsPanelTitle">
 					<ui:msg>Items</ui:msg>
 				</g:Label>
-				<common:AIPList ui:field="fondsPanel" addStyleNames="{style.searchlist}" />
+				<common:AIPList ui:field="fondsPanel" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
-				<g:FlowPanel styleName="{style.sidebar-group}" ui:field="sidebarGroupDownloads">
-					<g:Label addStyleNames="h2 {style.sidebar-title}">
+				<g:FlowPanel ui:field="sidebarGroupDownloads">
+					<g:Label addStyleNames="h4">
 						<ui:msg>Downloads</ui:msg>
 					</g:Label>
 					<g:FlowPanel ui:field="downloadList">
 					</g:FlowPanel>
 				</g:FlowPanel>
-				<g:FlowPanel styleName="{style.sidebar-group}">
-					<g:Label addStyleNames="h2 {style.sidebar-title}">
+				<g:FlowPanel>
+					<g:Label addStyleNames="h4">
 						<ui:msg description="Browser actions">Actions</ui:msg>
 					</g:Label>
-					<g:Button addStyleNames="{style.action} btn btn-plus"
-						ui:field="createItem">
+					<g:Button addStyleNames="btn btn-plus" ui:field="createItem">
 						<ui:msg>New item</ui:msg>
 					</g:Button>
-					<g:Button addStyleNames="{style.action} btn btn-edit"
-						ui:field="editMetadata">
+					<g:Button addStyleNames="btn btn-edit" ui:field="editMetadata">
 						<ui:msg>Edit metadata</ui:msg>
 					</g:Button>
-					<g:Button addStyleNames="{style.action} btn btn-edit"
-						ui:field="moveItem">
+					<g:Button addStyleNames="btn btn-edit" ui:field="moveItem">
 						<ui:msg>Move in hierarchy</ui:msg>
 					</g:Button>
-					<g:Button addStyleNames="{style.action} btn btn-edit"
-						ui:field="editPermissions">
+					<g:Button addStyleNames="btn btn-edit" ui:field="editPermissions">
 						<ui:msg>Edit permissions</ui:msg>
 					</g:Button>
-					<g:Button addStyleNames="{style.action} btn btn-play"
-						ui:field="seeLog">
+					<g:Button addStyleNames="btn btn-play" ui:field="seeLog">
 						<ui:msg>View PREMIS</ui:msg>
 					</g:Button>
 				</g:FlowPanel>

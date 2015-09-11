@@ -71,8 +71,8 @@ public class Menu extends Composite {
 
   private final MenuBar administrationMenu;
   private MenuItem administration_user;
-  private MenuItem administration_event;
-  private MenuItem administration_statistics;
+  // private MenuItem administration_event;
+  // private MenuItem administration_statistics;
   private MenuItem administration_log;
 
   private final MenuBar userMenu;
@@ -103,10 +103,12 @@ public class Menu extends Composite {
     administrationMenu = new MenuBar(true);
     administration_user = administrationMenu.addItem(constants.title_administration_user(),
       createCommand(MemberManagement.RESOLVER.getHistoryPath()));
-    administration_event = administrationMenu.addItem(constants.title_administration_event(),
-      createCommand(EventManagement.getInstance().getHistoryPath()));
-    administration_statistics = administrationMenu.addItem(constants.title_administration_statistics(),
-      createCommand(Statistics.getInstance().getHistoryPath()));
+    // administration_event =
+    // administrationMenu.addItem(constants.title_administration_event(),
+    // createCommand(EventManagement.getInstance().getHistoryPath()));
+    // administration_statistics =
+    // administrationMenu.addItem(constants.title_administration_statistics(),
+    // createCommand(Statistics.getInstance().getHistoryPath()));
     administration_log = administrationMenu.addItem(constants.title_administration_log(),
       createCommand(UserLog.RESOLVER.getHistoryPath()));
     // administrationMenu.addItem(constants.title_administration_help(),
@@ -291,7 +293,7 @@ public class Menu extends Composite {
       }
 
       public void onSuccess(Boolean asRole) {
-        administration_event.setVisible(asRole);
+        // administration_event.setVisible(asRole);
       }
 
     });
@@ -303,7 +305,7 @@ public class Menu extends Composite {
       }
 
       public void onSuccess(Boolean asRole) {
-        administration_statistics.setVisible(asRole);
+        // administration_statistics.setVisible(asRole);
       }
 
     });

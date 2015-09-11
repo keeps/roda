@@ -6,11 +6,12 @@
 
 .footer {
 	background-color: #414042;
+	margin-top: 0;
 }
 
 .footer * {
 	color: white;
-	font-size: 1rem;
+	font-size: 1.2rem;
 }
 
 /* @group Banner */
@@ -189,11 +190,11 @@
 }
 
 .wui-login-dialog .login {
-	float: right;
+	
 }
 
 .wui-login-dialog .cancel {
-	
+	margin-right: 10px;
 }
 /* @end */
 
@@ -218,8 +219,8 @@
 .gwt-MenuBar .gwt-MenuItem {
 	cursor: pointer;
 	cursor: hand;
-	font-size: 1rem;
 	font-weight: 500;
+	font-size: 1.3rem;
 	font-variant: normal;
 	color: #fff;
 	padding: 5px 10px;
@@ -314,7 +315,7 @@
 	color: #a7a9ac;
 	cursor: pointer;
 	cursor: hand;
-	font-size: 1rem;
+	font-size: 1.2rem;
 }
 
 .main .wui-breadcrumbPanel .breadcrumb * {
@@ -349,7 +350,6 @@
 
 /* @group Content Panel */
 .main .contentPanel {
-	text-align: center;
 	min-height: 600px;
 }
 

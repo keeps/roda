@@ -93,10 +93,7 @@ public class BasicSearch extends Composite {
 
   private SearchConstants constants = (SearchConstants) GWT.create(SearchConstants.class);
 
-  @UiField
-  HTML searchInputLabel;
-
-  @UiField
+   @UiField
   TextBox searchInputBox;
 
   @UiField

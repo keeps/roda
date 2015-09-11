@@ -7,81 +7,50 @@
 	xmlns:d="urn:import:com.google.gwt.user.datepicker.client">
 
 	<ui:style>
-	.search {
-		display: flex;
-		justify-content: space-between;
-		min-height: 600px;
-	}
 	
-	.content {
-		width: 100%;
-		padding: 40px;
-	}
-	
-	.sidebar {
-		background-color: #eee;
-		padding: 40px;
-		width: 200px;
-	}
-	
-	.sidebar-title {
-		margin-bottom: 10px;
-	}
-	
-	.sidebar-group {
-		margin-bottom: 10px;
-	}
-	
-	.action {
-		width: 100%;
-		margin-bottom: 10px;
-	}
-	
-	.footer {
-		clear: both;
-	}
 	</ui:style>
 
-	<g:FlowPanel styleName="wui-log" addStyleNames="{style.search}">
-		<g:FlowPanel styleName="layout" addStyleNames="{style.content}">
-			<g:Label styleName="h1">Log</g:Label>
-			<common:LogEntryList addStyleNames="searchResults"
-				ui:field="logList" />
-		</g:FlowPanel>
+	<g:FlowPanel styleName="wui-log" addStyleNames="wrapper skip_padding">
+		<g:FlowPanel addStyleNames="row full_width skip_padding">
+			<g:FlowPanel addStyleNames="col_10 content">
+				<g:Label styleName="h1">Log</g:Label>
+				<common:LogEntryList addStyleNames="searchResults"
+					ui:field="logList" />
+			</g:FlowPanel>
 
-		<g:FlowPanel styleName="{style.sidebar}">
-			<g:Label addStyleNames="h2 {style.sidebar-title} searchFacetsTitle">
-				<ui:msg>Filters</ui:msg>
-			</g:Label>
-			<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-				<g:Label addStyleNames="h3 sidebar-facet-title">
-					<ui:msg>Components</ui:msg>
+			<g:FlowPanel addStyleNames="col_2 last sidebar">
+				<g:Label addStyleNames="h4">
+					<ui:msg>Filters</ui:msg>
 				</g:Label>
-				<g:FlowPanel styleName="{style.sidebar-group}" ui:field="facetComponents" />
-			</g:FlowPanel>
-			<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-				<g:Label addStyleNames="h3 sidebar-facet-title">
-					<ui:msg>Methods</ui:msg>
+				<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+					<g:Label addStyleNames="h5 sidebar-facet-title">
+						<ui:msg>Components</ui:msg>
+					</g:Label>
+					<g:FlowPanel ui:field="facetComponents" />
+				</g:FlowPanel>
+				<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+					<g:Label addStyleNames="h5 sidebar-facet-title">
+						<ui:msg>Methods</ui:msg>
+					</g:Label>
+					<g:FlowPanel ui:field="facetMethods" />
+				</g:FlowPanel>
+				<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+					<g:Label addStyleNames="h5 sidebar-facet-title">
+						<ui:msg>Users</ui:msg>
+					</g:Label>
+					<g:FlowPanel ui:field="facetUsers" />
+				</g:FlowPanel>
+				<g:Label addStyleNames="h5 sidebar-facet-title">
+					<ui:msg>From date</ui:msg>
 				</g:Label>
-				<g:FlowPanel styleName="{style.sidebar-group}" ui:field="facetMethods" />
-			</g:FlowPanel>
-			<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-				<g:Label addStyleNames="h3 sidebar-facet-title">
-					<ui:msg>Users</ui:msg>
+				<d:DateBox addStyleNames="sidebar-facet-input fieldTextBox"
+					ui:field="inputDateInitial" />
+				<g:Label addStyleNames="h5 sidebar-facet-title">
+					<ui:msg>To date</ui:msg>
 				</g:Label>
-				<g:FlowPanel styleName="{style.sidebar-group}" ui:field="facetUsers" />
+				<d:DateBox addStyleNames="sidebar-facet-input fieldTextBox"
+					ui:field="inputDateFinal" />
 			</g:FlowPanel>
-			<g:Label addStyleNames="h3 sidebar-facet-title">
-				<ui:msg>From date</ui:msg>
-			</g:Label>
-			<d:DateBox addStyleNames="sidebar-facet-input fieldTextBox"
-				ui:field="inputDateInitial" />
-			<g:Label addStyleNames="h3 sidebar-facet-title">
-				<ui:msg>To date</ui:msg>
-			</g:Label>
-			<d:DateBox addStyleNames="sidebar-facet-input fieldTextBox"
-				ui:field="inputDateFinal" />
 		</g:FlowPanel>
-		<g:FlowPanel styleName="{style.footer}" />
 	</g:FlowPanel>
 </ui:UiBinder>

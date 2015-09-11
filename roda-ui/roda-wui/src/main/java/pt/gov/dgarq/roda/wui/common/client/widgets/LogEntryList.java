@@ -6,6 +6,7 @@ import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
@@ -48,7 +49,7 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
   public LogEntryList(Filter filter, Facets facets) {
     super(filter, facets, "LOGS");
 
-    dateColumn = new Column<LogEntry, Date>(new DateCell(DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss.SSS"))) {
+    dateColumn = new Column<LogEntry, Date>(new DateCell(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_MEDIUM))) {
       @Override
       public Date getValue(LogEntry logEntry) {
         return logEntry != null ? logEntry.getDatetime() : null;

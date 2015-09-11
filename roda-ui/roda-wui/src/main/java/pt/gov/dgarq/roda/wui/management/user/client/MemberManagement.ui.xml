@@ -7,87 +7,50 @@
 	xmlns:d="urn:import:com.google.gwt.user.datepicker.client">
 
 	<ui:style>
-	.search {
-		display: flex;
-		justify-content: space-between;
-		min-height: 600px;
-	}
 	
-	.content {
-		width: 100%;
-		padding: 40px;
-	}
-	
-	.sidebar {
-		background-color: #eee;
-		padding: 40px;
-		width: 200px;
-	}
-	
-	.sidebar-title {
-		margin-bottom: 10px;
-	}
-	
-	.sidebar-group {
-		margin-bottom: 10px;
-	}
-	
-	.action {
-		width: 100%;
-		margin-bottom: 10px;
-	}
-	
-	.footer {
-		clear: both;
-	}
 	</ui:style>
 
-	<g:FlowPanel styleName="wui-management-user" addStyleNames="{style.search}">
-		<g:FlowPanel styleName="layout" addStyleNames="{style.content}">
-			<g:Label styleName="h1">Users and groups</g:Label>
-			<!-- <common:LogEntryList addStyleNames="searchResults" -->
-			<!-- ui:field="logList" /> -->
-			<common:RodaMemberList addStyleNames="searchResults"
-				ui:field="list" />
-		</g:FlowPanel>
-
-		<g:FlowPanel styleName="{style.sidebar}">
-			<g:FlowPanel styleName="{style.sidebar-group}">
-				<g:Label addStyleNames="h2 {style.sidebar-title} searchFacetsTitle">
-					<ui:msg>Filters</ui:msg>
-				</g:Label>
-				<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-					<g:Label addStyleNames="h3 sidebar-facet-title">
-						<ui:msg>Status</ui:msg>
+	<g:FlowPanel styleName="wui-management-user" addStyleNames="wrapper skip_padding">
+		<g:FlowPanel addStyleNames="row full_width skip_padding">
+			<g:FlowPanel addStyleNames="col_10 content">
+				<g:Label styleName="h1">Users and groups</g:Label>
+				<!-- <common:LogEntryList addStyleNames="searchResults" -->
+				<!-- ui:field="logList" /> -->
+				<common:RodaMemberList addStyleNames="searchResults"
+					ui:field="list" />
+			</g:FlowPanel>
+			<g:FlowPanel addStyleNames="col_2 last sidebar">
+				<g:FlowPanel>
+					<g:Label addStyleNames="h4">
+						<ui:msg>Filters</ui:msg>
 					</g:Label>
-					<g:FlowPanel styleName="{style.sidebar-group}"
-						ui:field="facetIsActive" />
+					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+						<g:Label addStyleNames="h5 sidebar-facet-title">
+							<ui:msg>Status</ui:msg>
+						</g:Label>
+						<g:FlowPanel ui:field="facetIsActive" />
+					</g:FlowPanel>
+					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+						<g:Label addStyleNames="h5 sidebar-facet-title">
+							<ui:msg>Type</ui:msg>
+						</g:Label>
+						<g:FlowPanel ui:field="facetIsUser" />
+					</g:FlowPanel>
+					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+						<g:Label addStyleNames="h5 sidebar-facet-title">
+							<ui:msg>Groups</ui:msg>
+						</g:Label>
+						<g:FlowPanel ui:field="facetGroups" />
+					</g:FlowPanel>
 				</g:FlowPanel>
-				<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-					<g:Label addStyleNames="h3 sidebar-facet-title">
-						<ui:msg>Type</ui:msg>
+				<g:FlowPanel>
+					<g:Label addStyleNames="h5">
+						<ui:msg>Actions</ui:msg>
 					</g:Label>
-					<g:FlowPanel styleName="{style.sidebar-group}"
-						ui:field="facetIsUser" />
-				</g:FlowPanel>
-				<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-					<g:Label addStyleNames="h3 sidebar-facet-title">
-						<ui:msg>Groups</ui:msg>
-					</g:Label>
-					<g:FlowPanel styleName="{style.sidebar-group}"
-						ui:field="facetGroups" />
+					<g:Button addStyleNames="btn btn-plus" ui:field="buttonAddUser">Add user</g:Button>
+					<g:Button addStyleNames="btn btn-plus" ui:field="buttonAddGroup">Add group</g:Button>
 				</g:FlowPanel>
 			</g:FlowPanel>
-			<g:FlowPanel styleName="{style.sidebar-group}">
-				<g:Label addStyleNames="h2 {style.sidebar-title}">
-					<ui:msg>Actions</ui:msg>
-				</g:Label>
-				<g:Button addStyleNames="btn btn-plus {style.action}"
-					ui:field="buttonAddUser">Add user</g:Button>
-				<g:Button addStyleNames="btn btn-plus {style.action}"
-					ui:field="buttonAddGroup">Add group</g:Button>
-			</g:FlowPanel>
 		</g:FlowPanel>
-		<g:FlowPanel styleName="{style.footer}" />
 	</g:FlowPanel>
 </ui:UiBinder>

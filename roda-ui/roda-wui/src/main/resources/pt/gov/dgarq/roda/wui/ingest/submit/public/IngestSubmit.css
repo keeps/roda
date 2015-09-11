@@ -1,21 +1,19 @@
 @CHARSET "UTF-8";
 
 /** Ingest Submit **/
-
 .wui-ingest-submit {
-	width: 100%;
-	padding: 40px;	
+	margin: 40px;
 }
 
-.wui-ingest-submit .gwt-TabBar{
+.wui-ingest-submit .gwt-TabBar {
 	
 }
 
-/** Upload SIP **/ 
-
+/** Upload SIP **/
 .wui-ingest-submit-upload {
 	padding: 25px;
 }
+
 .wui-ingest-submit-upload .upload-title {
 	margin-bottom: 5px;
 	margin-left: 5px;
@@ -23,19 +21,24 @@
 	font-weight: bold;
 	color: #58595b;
 }
+
 .wui-ingest-submit-upload .upload-file {
 	margin: 5px 5px 5px 10px;
 }
+
 .wui-ingest-submit-upload .upload-action {
 	width: 100%;
 }
+
 .wui-ingest-submit-upload .upload-action-button {
 	margin: 5px;
 	width: 100px;
 }
-.wui-ingest-submit-upload .upload-action-loading-image {
 
+.wui-ingest-submit-upload .upload-action-loading-image {
+	
 }
+
 .wui-ingest-submit-upload .upload-action-loading-message {
 	color: #58595b;
 	white-space: nowrap;
@@ -51,6 +54,7 @@
 .wui-ingest-submit-create {
 	padding: 25px;
 }
+
 .wui-ingest-submit-create .create-title {
 	margin-bottom: 5px;
 	margin-left: 5px;
@@ -60,11 +64,17 @@
 }
 
 .wui-ingest-submit-create .create-metadata {
-	margin: 5px 5px 10px 10px;
+	
 }
 
 .wui-ingest-submit-create .create-metadata-header {
-	width: 100%;
+	width: 96%;
+	margin: 2% 2% 0;
+}
+
+.wui-ingest-submit-create .create-metadata .descriptionGroup {
+	width: 96%;
+	margin: 0 2%;
 }
 
 .wui-ingest-submit-create .create-metadata-toggle {
@@ -75,7 +85,9 @@
 	cursor: pointer;
 	cursor: hand;
 }
+
 .wui-ingest-submit-create .create-representation {
+	
 }
 
 .wui-ingest-submit-create .create-representation-file {
@@ -86,21 +98,24 @@
 	margin: 5px 5px 5px 10px;
 }
 
-.wui-ingest-submit-create  .create-destination-chooser .scrollAutoLoader {
+.wui-ingest-submit-create  .create-destination-chooser .scrollAutoLoader
+	{
 	height: 350px;
 }
 
 .wui-ingest-submit-create .create-submit {
-
+	
 }
 
 .wui-ingest-submit-create .create-submit-button {
 	margin: 5px;
 	width: 100px;
 }
+
 .wui-ingest-submit-create .create-submit-loading {
 	
 }
+
 .wui-ingest-submit-create .create-submit-message {
 	color: #58595b;
 	font-size: 9pt;
@@ -129,22 +144,28 @@
 	cursor: pointer;
 	cursor: hand;
 }
+
 .wui-cModelSelector .contentModel-layout {
 	vertical-align: top;
 }
+
 .wui-cModelSelector .contentModel-radio {
 	margin: 2px;
 }
+
 .wui-cModelSelector .contentModel-title {
 	font-size: 12px;
 }
+
 .wui-cModelSelector .contentModel-description {
 	font-size: 11px;
 	margin-left: 2px;
 }
+
 .wui-cModelSelector .contentModel-icons {
 	
 }
+
 .wui-cModelSelector .contentModel-icons .icon {
 	
 }

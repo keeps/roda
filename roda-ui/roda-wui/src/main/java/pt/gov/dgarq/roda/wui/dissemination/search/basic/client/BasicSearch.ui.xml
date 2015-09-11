@@ -8,114 +8,84 @@
 	xmlns:d="urn:import:com.google.gwt.user.datepicker.client">
 
 	<ui:style>
-	.search {
-		display: flex;
-		justify-content: space-between;
-		min-height: 600px;
-	}
 	
-	.content {
-		width: 100%;
-	}
-	
-	.sidebar {
-		background-color: #eee;
-		padding: 40px;
-		width: 200px;
-	}
-	
-	.sidebar-title {
-		margin-bottom: 10px;
-	}
-	
-	.sidebar-group {
-		margin-bottom: 10px;
-	}
-	
-	.action {
-		width: 100%;
-		margin-bottom: 10px;
-	}
-	
-	.footer {
-		clear: both;
-	}
 	</ui:style>
 
-	<g:FlowPanel styleName="wui-search-basic" addStyleNames="{style.search}">
-		<g:FlowPanel styleName="layout" addStyleNames="{style.content}">
-			<g:HTML styleName="h1" ui:field="searchInputLabel"
-				addStyleNames="searchLabel" />
-			<g:FlowPanel addStyleNames="searchInput">
-				<g:FlowPanel addStyleNames="searchInputBoxWrapper">
-					<g:TextBox ui:field="searchInputBox" addStyleNames="searchBox" />
-					<!-- <g:Hyperlink addStyleNames="searchInputAdvancedLink" -->
-					<!-- targetHistoryToken="dissemination.search.advanced">More search 
-						options</g:Hyperlink> -->
-					<g:DisclosurePanel addStyleNames="searchAdvancedDisclosure"
-						ui:field="advancedSearchDisclosure">
-						<g:header>More search options</g:header>
-						<g:FlowPanel addStyleNames="searchAdvancedPanel">
-							<g:FlowPanel addStyleNames="searchAdvancedField">
-								<g:Label addStyleNames="searchAdvancedFieldLabel" ui:field="advancedSearchInputTitleLabel">Title</g:Label>
-								<g:TextBox addStyleNames="searchAdvancedFieldInput fieldTextBox"
-									ui:field="advancedSearchInputTitle" />
+	<g:FlowPanel styleName="search" addStyleNames="wrapper skip_padding">
+		<g:FlowPanel addStyleNames="row full_width skip_padding">
+			<g:FlowPanel addStyleNames="col_10 content">
+				<g:HTML>
+					<h1>Search</h1>
+				</g:HTML>
+				<g:FlowPanel  styleName="searchPanel">
+					<g:FlowPanel styleName="searchPanelLeft">
+						<g:TextBox ui:field="searchInputBox" addStyleNames="searchBox" />
+						<!-- <g:Hyperlink addStyleNames="searchInputAdvancedLink" -->
+						<!-- targetHistoryToken="dissemination.search.advanced">More search 
+							options</g:Hyperlink> -->
+						<g:DisclosurePanel addStyleNames="searchAdvancedDisclosure"
+							ui:field="advancedSearchDisclosure">
+							<g:header>More search options</g:header>
+							<g:FlowPanel addStyleNames="searchAdvancedPanel">
+								<g:FlowPanel addStyleNames="searchAdvancedField">
+									<g:Label addStyleNames="form-label" ui:field="advancedSearchInputTitleLabel">Title</g:Label>
+									<g:TextBox addStyleNames="form-textbox" ui:field="advancedSearchInputTitle" />
+								</g:FlowPanel>
+								<g:FlowPanel addStyleNames="searchAdvancedField">
+									<g:ListBox addStyleNames="searchAdvancedFieldLabel">
+										<g:item>Scope and content</g:item>
+										<g:item>Producer</g:item>
+										<g:item>Author</g:item>
+										<g:item>Physical location</g:item>
+										<g:item>Arrangement</g:item>
+									</g:ListBox>
+									<g:TextBox addStyleNames="searchAdvancedFieldInput fieldTextBox" />
+								</g:FlowPanel>
 							</g:FlowPanel>
-							<g:FlowPanel addStyleNames="searchAdvancedField">
-								<g:ListBox addStyleNames="searchAdvancedFieldLabel">
-									<g:item>Scope and content</g:item>
-									<g:item>Producer</g:item>
-									<g:item>Author</g:item>
-									<g:item>Physical location</g:item>
-									<g:item>Arrangement</g:item>
-								</g:ListBox>
-								<g:TextBox addStyleNames="searchAdvancedFieldInput fieldTextBox" />
-							</g:FlowPanel>
-						</g:FlowPanel>
-					</g:DisclosurePanel>
+						</g:DisclosurePanel>
+					</g:FlowPanel>
+					<wcag:AccessibleFocusPanel styleName="searchButton"
+						ui:field="searchInputButton">
+						<g:HTML addStyleNames="searchButton-html">
+							<span class="fa-stack fa-lg">
+								<i class="fa fa-circle fa-stack-2x"></i>
+								<i class="fa fa-search fa-stack-1x"></i>
+							</span>
+						</g:HTML>
+					</wcag:AccessibleFocusPanel>
 				</g:FlowPanel>
-				<wcag:AccessibleFocusPanel ui:field="searchInputButton"
-					addStyleNames="searchButton">
-					<g:HTML addStyleNames="searchButton-html">
-						<span class="fa-stack fa-lg">
-							<i class="fa fa-circle fa-stack-2x"></i>
-							<i class="fa fa-search fa-stack-1x"></i>
-						</span>
-					</g:HTML>
-				</wcag:AccessibleFocusPanel>
+				<common:AIPList addStyleNames="searchResults"
+					ui:field="searchResultPanel" />
 			</g:FlowPanel>
-			<common:AIPList addStyleNames="searchResults"
-				ui:field="searchResultPanel" />
-		</g:FlowPanel>
-		<g:FlowPanel styleName="{style.sidebar}">
-			<g:FlowPanel styleName="{style.sidebar-group}" ui:field="sidebarGroupDownloads">
-				<g:Label addStyleNames="h2 {style.sidebar-title} searchFacetsTitle">
-					<ui:msg>Filters</ui:msg>
-				</g:Label>
-				<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-					<g:Label addStyleNames="h3 sidebar-facet-title">
-						<ui:msg>Description levels</ui:msg>
+			<g:FlowPanel addStyleNames="col_2 last sidebar">
+				<g:FlowPanel styleName="sidebar-group" ui:field="sidebarGroupDownloads">
+					<g:Label addStyleNames="h4">
+						<ui:msg>Filters</ui:msg>
 					</g:Label>
-					<g:FlowPanel ui:field="facetDescriptionLevels" />
-				</g:FlowPanel>
-				<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-					<g:Label addStyleNames="h3 sidebar-facet-title">
-						<ui:msg>Representations</ui:msg>
+					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+						<g:Label addStyleNames="h5 sidebar-facet-title">
+							<ui:msg>Description levels</ui:msg>
+						</g:Label>
+						<g:FlowPanel ui:field="facetDescriptionLevels" />
+					</g:FlowPanel>
+					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+						<g:Label addStyleNames="h5 sidebar-facet-title">
+							<ui:msg>Representations</ui:msg>
+						</g:Label>
+						<g:FlowPanel ui:field="facetHasRepresentations" />
+					</g:FlowPanel>
+					<g:Label addStyleNames="h5 sidebar-facet-title">
+						<ui:msg>From date</ui:msg>
 					</g:Label>
-					<g:FlowPanel ui:field="facetHasRepresentations" />
+					<d:DateBox addStyleNames="sidebar-facet-input fieldTextBox"
+						ui:field="inputDateInitial" />
+					<g:Label addStyleNames="h5 sidebar-facet-title">
+						<ui:msg>To date</ui:msg>
+					</g:Label>
+					<d:DateBox addStyleNames="sidebar-facet-input fieldTextBox"
+						ui:field="inputDateFinal" />
 				</g:FlowPanel>
-				<g:Label addStyleNames="h3 sidebar-facet-title">
-					<ui:msg>From date</ui:msg>
-				</g:Label>
-				<d:DateBox addStyleNames="sidebar-facet-input fieldTextBox"
-					ui:field="inputDateInitial" />
-				<g:Label addStyleNames="h3 sidebar-facet-title">
-					<ui:msg>To date</ui:msg>
-				</g:Label>
-				<d:DateBox addStyleNames="sidebar-facet-input fieldTextBox"
-					ui:field="inputDateFinal" />
 			</g:FlowPanel>
 		</g:FlowPanel>
-		<g:FlowPanel styleName="{style.footer}" />
 	</g:FlowPanel>
 </ui:UiBinder>

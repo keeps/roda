@@ -15,8 +15,8 @@ time, mark, audio, video {
 	margin: 0;
 	padding: 0;
 	border: 0;
-	font-size: 100%;
-	font: inherit;
+	/*font-size: 100%;
+	font: inherit;*/
 	vertical-align: baseline;
 }
 article, aside, details, figcaption, figure,
@@ -67,7 +67,7 @@ body .wrapper:first-child {
 	clear:both;
 }
 .col_1, .col_2, .col_3, .col_4, .col_5, .col_6, .col_7, .col_8, .col_9, .col_10, .col_11, .col_12 {
-	font-size: 14px;
+	/*font-size: 14px;*/
 	float: left;
 	width: 100%;
 	border-collapse:collapse;
