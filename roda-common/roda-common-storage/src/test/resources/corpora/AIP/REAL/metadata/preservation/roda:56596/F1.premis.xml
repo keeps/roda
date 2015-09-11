@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<prem:object xsi:type="prem:file" xmlns:prem="info:lc/xmlns/premis-v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <prem:objectIdentifier>
+    <prem:objectIdentifierType>RODAObjectDatastreamID</prem:objectIdentifierType>
+    <prem:objectIdentifierValue>F1</prem:objectIdentifierValue>
+  </prem:objectIdentifier>
+  <prem:preservationLevel>
+    <prem:preservationLevelValue>full</prem:preservationLevelValue>
+    <prem:preservationLevelDateAssigned>2009-05-14T00:07:21Z</prem:preservationLevelDateAssigned>
+  </prem:preservationLevel>
+  <prem:objectCharacteristics>
+    <prem:compositionLevel>0</prem:compositionLevel>
+    <prem:fixity>
+      <prem:messageDigestAlgorithm>MD5</prem:messageDigestAlgorithm>
+      <prem:messageDigest>cd1251e41b75c3e4d1bf245986b09371</prem:messageDigest>
+    </prem:fixity>
+    <prem:size>2140460</prem:size>
+    <prem:format>
+      <prem:formatDesignation>
+        <prem:formatName>image/tiff</prem:formatName>
+      </prem:formatDesignation>
+      <prem:formatRegistry>
+        <prem:formatRegistryName>JHOVE</prem:formatRegistryName>
+        <prem:formatRegistryKey>TIFF 5.0</prem:formatRegistryKey>
+      </prem:formatRegistry>
+    </prem:format>
+    <prem:creatingApplication>
+      <prem:creatingApplicationName>tiffcp (libtiff-tools)</prem:creatingApplicationName>
+      <prem:creatingApplicationVersion>3.7.3-1ubuntu1.1</prem:creatingApplicationVersion>
+    </prem:creatingApplication>
+    <prem:objectCharacteristicsExtension>
+      <mix:mix xsi:schemaLocation="http://www.loc.gov/mix/ http://www.loc.gov/standards/mix/mix02/mix02.xsd" xmlns:mix="http://www.loc.gov/mix/" xmlns="http://hul.harvard.edu/ois/xml/ns/jhove" xmlns:premis="http://www.loc.gov/standards/premis">
+        <mix:BasicImageParameters>
+          <mix:Format>
+            <mix:MIMEType>image/tiff</mix:MIMEType>
+            <mix:ByteOrder>little-endian</mix:ByteOrder>
+            <mix:Compression>
+              <mix:CompressionScheme>1</mix:CompressionScheme>
+            </mix:Compression>
+            <mix:PhotometricInterpretation>
+              <mix:ColorSpace>0</mix:ColorSpace>
+            </mix:PhotometricInterpretation>
+            <mix:Segments>
+              <mix:StripOffsets>8</mix:StripOffsets>
+              <mix:RowsPerStrip>2339</mix:RowsPerStrip>
+              <mix:StripByteCounts>481834</mix:StripByteCounts>
+            </mix:Segments>
+            <mix:PlanarConfiguration>1</mix:PlanarConfiguration>
+          </mix:Format>
+          <mix:File>
+            <mix:Orientation>1</mix:Orientation>
+          </mix:File>
+        </mix:BasicImageParameters>
+        <mix:ImageCreation>
+          <mix:ScanningSystemCapture>
+            <mix:ScanningSystemSoftware>
+              <mix:ScanningSoftware>Kofax Image Processing Platform v1.10.018; KIPP TIFF Storage Filter v1.10.018</mix:ScanningSoftware>
+            </mix:ScanningSystemSoftware>
+          </mix:ScanningSystemCapture>
+        </mix:ImageCreation>
+        <mix:ImagingPerformanceAssessment>
+          <mix:SpatialMetrics>
+            <mix:SamplingFrequencyUnit>2</mix:SamplingFrequencyUnit>
+            <mix:XSamplingFrequency>300</mix:XSamplingFrequency>
+            <mix:YSamplingFrequency>300</mix:YSamplingFrequency>
+            <mix:ImageWidth>4864</mix:ImageWidth>
+            <mix:ImageLength>3520</mix:ImageLength>
+          </mix:SpatialMetrics>
+          <mix:Energetics>
+            <mix:BitsPerSample>1</mix:BitsPerSample>
+            <mix:SamplesPerPixel>1</mix:SamplesPerPixel>
+          </mix:Energetics>
+        </mix:ImagingPerformanceAssessment>
+      </mix:mix>
+    </prem:objectCharacteristicsExtension>
+  </prem:objectCharacteristics>
+  <prem:originalName>1464</prem:originalName>
+  <prem:storage>
+    <prem:contentLocation>
+      <prem:contentLocationType>URI</prem:contentLocationType>
+      <prem:contentLocationValue>dvd:[AACC-195]/R2006.10.01464/F2006.10.01464.0000001.tiff</prem:contentLocationValue>
+    </prem:contentLocation>
+  </prem:storage>
+</prem:object>

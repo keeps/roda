@@ -57,5 +57,11 @@ public interface ModelObserver {
   public void preservationMetadataUpdated(PreservationMetadata preservationMetadataBinary);
 
   public void preservationMetadataDeleted(String aipId, String representationId, String preservationMetadataBinaryId);
+  
+  public void agentMetadataCreated(AgentMetadata agentMetadataBinary);
+
+  public void agentMetadataUpdated(AgentMetadata agentMetadataBinary);
+
+  public void agentMetadataDeleted(String agentMetadataBinaryId);
 
 }

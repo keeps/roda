@@ -104,6 +104,11 @@ public class ModelService extends ModelObservable {
     super();
     this.storage = storage;
     ensureAllContainersExist();
+    try {
+      ensureAllDiretoriesExist();
+    } catch (StorageServiceException e) {
+      LOGGER.error("Error initializing directories", e);
+    }
   }
 
   private void ensureAllContainersExist() {
@@ -113,12 +118,27 @@ public class ModelService extends ModelObservable {
     createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_SIP_REPORT);
   }
 
+  private void ensureAllDiretoriesExist() throws StorageServiceException {
+    createDirectoryIfNotExists(
+      DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_PRESERVATION, RodaConstants.STORAGE_DIRECTORY_AGENTS));
+  }
+
   private void createContainerIfNotExists(String containerName) {
     try {
       storage.createContainer(DefaultStoragePath.parse(containerName), new HashMap<String, Set<String>>());
     } catch (StorageServiceException e) {
       if (e.getCode() != StorageServiceException.ALREADY_EXISTS) {
         LOGGER.error("Error initializing container: " + containerName, e);
+      }
+    }
+  }
+
+  private void createDirectoryIfNotExists(StoragePath directoryPath) {
+    try {
+      storage.createDirectory(directoryPath, new HashMap<String, Set<String>>());
+    } catch (StorageServiceException e) {
+      if (e.getCode() != StorageServiceException.ALREADY_EXISTS) {
+        LOGGER.error("Error initializing directory: " + directoryPath.asString(), e);
       }
     }
   }
@@ -1505,8 +1525,67 @@ public class ModelService extends ModelObservable {
       throw new ModelServiceException("Error creating preservation metadata binary in storage",
         ModelServiceException.INTERNAL_SERVER_ERROR, e);
     }
-
     return preservationMetadataBinary;
+  }
+
+  public AgentMetadata createAgentMetadata(String agentID, StorageService sourceStorage, StoragePath sourcePath,
+    boolean notify) throws ModelServiceException {
+    AgentMetadata agentMetadata;
+    try {
+      // TODO validate agent
+      storage.copy(sourceStorage, sourcePath, ModelUtils.getPreservationAgentPath(agentID));
+      agentMetadata = new AgentMetadata(agentID, ModelUtils.getPreservationAgentPath(agentID));
+      if (notify) {
+        notifyAgentMetadataCreated(agentMetadata);
+      }
+    } catch (StorageServiceException e) {
+      throw new ModelServiceException("Error creating AgentMetadata in storage", e.getCode(), e);
+    }
+
+    return agentMetadata;
+  }
+
+  // TODO verify
+  public AgentMetadata createAgentMetadata(String agentID, Binary binary) throws ModelServiceException {
+    AgentMetadata agentMetadataBinary;
+    try {
+      StoragePath binaryPath = ModelUtils.getPreservationAgentPath(agentID);
+      boolean asReference = false;
+      Map<String, Set<String>> binaryMetadata = binary.getMetadata();
+      storage.createBinary(binaryPath, binaryMetadata, binary.getContent(), asReference);
+
+      agentMetadataBinary = new AgentMetadata(agentID, binaryPath);
+      notifyAgentMetadataCreated(agentMetadataBinary);
+    } catch (StorageServiceException e) {
+      throw new ModelServiceException("Error creating agent metadata binary in storage",
+        ModelServiceException.INTERNAL_SERVER_ERROR, e);
+    }
+    return agentMetadataBinary;
+  }
+
+  // TODO verify
+  public AgentMetadata updateAgentMetadata(String agentID, Binary binary) throws ModelServiceException {
+    AgentMetadata agentMetadataBinary;
+    try {
+      storage.updateBinaryContent(binary.getStoragePath(), binary.getContent(), binary.isReference(), true);
+      storage.updateMetadata(binary.getStoragePath(), binary.getMetadata(), true);
+      agentMetadataBinary = new AgentMetadata(agentID, binary.getStoragePath());
+      notifyAgentMetadataUpdated(agentMetadataBinary);
+    } catch (StorageServiceException e) {
+      throw new ModelServiceException("Error creating agent metadata binary in storage",
+        ModelServiceException.INTERNAL_SERVER_ERROR, e);
+    }
+    return agentMetadataBinary;
+  }
+
+  public void deleteAgentMetadata(String agentID) throws ModelServiceException {
+    try {
+      storage.deleteResource(ModelUtils.getPreservationAgentPath(agentID));
+      notifyAgentMetadataDeleted(agentID);
+    } catch (StorageServiceException e) {
+      throw new ModelServiceException("Error creating agent metadata binary in storage",
+        ModelServiceException.INTERNAL_SERVER_ERROR, e);
+    }
   }
 
   // TODO verify
@@ -1532,6 +1611,7 @@ public class ModelService extends ModelObservable {
     return preservationMetadataBinary;
   }
 
+  // TODO verify
   public void deletePreservationMetadata(String aipId, String representationId, String preservationMetadataId)
     throws ModelServiceException {
     try {

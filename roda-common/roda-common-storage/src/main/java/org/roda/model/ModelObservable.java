@@ -163,4 +163,23 @@ public abstract class ModelObservable {
       observer.preservationMetadataDeleted(aipId, representationId, preservationMetadataBinaryId);
     }
   }
+  
+  
+  protected void notifyAgentMetadataCreated(AgentMetadata agentMetadataBinary) {
+    for (ModelObserver observer : observers) {
+      observer.agentMetadataCreated(agentMetadataBinary);
+    }
+  }
+
+  protected void notifyAgentMetadataUpdated(AgentMetadata agentMetadataBinary) {
+    for (ModelObserver observer : observers) {
+      observer.agentMetadataUpdated(agentMetadataBinary);
+    }
+  }
+
+  protected void notifyAgentMetadataDeleted(String agentMetadataBinaryId) {
+    for (ModelObserver observer : observers) {
+      observer.agentMetadataDeleted(agentMetadataBinaryId);
+    }
+  }
 }

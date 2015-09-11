@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<event xmlns="info:lc/xmlns/premis-v2">
+  <eventIdentifier>
+    <eventIdentifierType>RODAObjectPID</eventIdentifierType>
+    <eventIdentifierValue>roda:619836</eventIdentifierValue>
+  </eventIdentifier>
+  <eventType>fixity check</eventType>
+  <eventDateTime>2010-06-17T06:14:32.19Z</eventDateTime>
+  <eventDetail>Checksums recorded in PREMIS were compared with the files in the repository</eventDetail>
+  <eventOutcomeInformation>
+    <eventOutcome>success</eventOutcome>
+    <eventOutcomeDetail>
+      <eventOutcomeDetailNote>files checked</eventOutcomeDetailNote>
+      <eventOutcomeDetailExtension>
+        <p xmlns="http://www.w3.org/1999/xhtml">[F0, F1]</p>
+      </eventOutcomeDetailExtension>
+    </eventOutcomeDetail>
+  </eventOutcomeInformation>
+  <linkingAgentIdentifier>
+    <linkingAgentIdentifierType>RODAObjectPID</linkingAgentIdentifierType>
+    <linkingAgentIdentifierValue>roda:189</linkingAgentIdentifierValue>
+    <linkingAgentRole>preservation task</linkingAgentRole>
+  </linkingAgentIdentifier>
+  <linkingObjectIdentifier>
+    <linkingObjectIdentifierType>RODAObjectPID</linkingObjectIdentifierType>
+    <linkingObjectIdentifierValue>roda:56597</linkingObjectIdentifierValue>
+    <linkingObjectRole>target</linkingObjectRole>
+  </linkingObjectIdentifier>
+</event>

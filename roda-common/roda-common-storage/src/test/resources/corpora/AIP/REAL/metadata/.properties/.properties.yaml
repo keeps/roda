@@ -1,0 +1,16 @@
+grant.users: !!set {admin: null, fbarbedo: null}
+modify.users: !!set {omartins: null, admin: null, fbarbedo: null}
+read.users: !!set {torcato: null, admin: null, omartins: null, fbarbedo: null}
+pid: !!set {'roda:56595': null}
+label: !!set {'56595': null}
+parentId: !!set {'roda:836': null}
+content.model: !!set {'roda:d': null}
+remove.users: !!set {admin: null, fbarbedo: null}
+grant.groups: !!set {archivists: null, administrators: null, producers: null}
+name: !!set {metadata: null}
+remove.groups: !!set {archivists: null, administrators: null, producers: null}
+state: !!set {active: null}
+modify.groups: !!set {archivists: null, administrators: null, producers: null}
+read.groups: !!set {archivists: null, users: null, administrators: null, producers: null}
+date.modified: !!set {'2013-04-20T17:56:08.669+0100': null}
+date.created: !!set {'2009-05-14T01:07:13.058+0100': null}

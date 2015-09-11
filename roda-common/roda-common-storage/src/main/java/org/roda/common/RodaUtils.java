@@ -28,11 +28,6 @@ import pt.gov.dgarq.roda.core.common.RodaConstants;
 
 public class RodaUtils {
 
-  /** Private empty constructor */
-  private RodaUtils() {
-
-  }
-
   public static String dateToString(Date date) {
     String ret;
     if (date != null) {
@@ -74,7 +69,7 @@ public class RodaUtils {
 
   public static List<String> copyList(Object object) {
     if (!(object instanceof List)) {
-      return new ArrayList<String>();
+      return null;
     }
     List<?> list = (List<?>) object;
     List<String> temp = new ArrayList<String>();
@@ -84,7 +79,7 @@ public class RodaUtils {
       } else if (ob == null) {
         temp.add(null);
       } else {
-        return new ArrayList<String>();
+        return null;
       }
     }
     return temp;
@@ -102,19 +97,23 @@ public class RodaUtils {
     return properties;
   }
 
-  public static void applyStylesheet(Reader xsltReader, Reader fileReader, Writer result)
-    throws IOException, TransformerException {
-    applyStylesheet(xsltReader, fileReader, new HashMap<String, String>(), result);
+  public static void applyStylesheet(Reader xsltReader, Reader fileReader, Writer result) throws IOException,
+    TransformerException {
+    applyStylesheet(xsltReader, fileReader, new HashMap<String, Object>(), result);
   }
 
-  public static void applyStylesheet(Reader xsltReader, Reader fileReader, Map<String, String> parameters,
-    Writer result) throws IOException, TransformerException {
+  public static void applyStylesheet(Reader xsltReader, Reader fileReader, Map<String, Object> parameters, Writer result)
+    throws IOException, TransformerException {
 
     TransformerFactory factory = new net.sf.saxon.TransformerFactoryImpl();
     Source xsltSource = new StreamSource(xsltReader);
     Transformer transformer = factory.newTransformer(xsltSource);
-    for (Entry<String, String> parameter : parameters.entrySet()) {
-      transformer.setParameter(parameter.getKey(), parameter.getValue());
+    for (Entry<String, Object> parameter : parameters.entrySet()) {
+      if(parameter.getValue() instanceof String){
+        transformer.setParameter(parameter.getKey(), (String)parameter.getValue());
+      }else if(parameter.getValue() instanceof List<?>){
+        transformer.setParameter(parameter.getKey(), (List<String>)parameter.getValue());
+      }
     }
     Source text = new StreamSource(fileReader);
     transformer.transform(text, new StreamResult(result));

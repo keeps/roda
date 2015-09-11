@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mets xmlns="http://www.loc.gov/METS/"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:xlink="http://www.w3.org/1999/xlink"
+      xsi:schemaLocation="http://www.loc.gov/METS/ http://www.loc.gov/standards/mets/mets.xsd"
+      OBJID="F2006.10.01464"
+      LABEL="1464"
+      TYPE="Despachos">
+   <fileSec>
+      <fileGrp>
+         <file ID="F2006.10.01464.0000001" MIMETYPE="image/tiff">
+            <FLocat LOCTYPE="URL" xlink:href="F1"/>
+         </file>
+      </fileGrp>
+   </fileSec>
+   <structMap>
+      <div LABEL="R2006.10.01464">
+         <fptr FILEID="F2006.10.01464.0000001"/>
+      </div>
+   </structMap>
+</mets>

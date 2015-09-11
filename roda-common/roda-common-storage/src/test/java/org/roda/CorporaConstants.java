@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.roda.storage.StoragePath;
+
 import pt.gov.dgarq.roda.core.data.v2.RepresentationState;
 
 /**
@@ -15,9 +17,11 @@ public class CorporaConstants {
   // Corpora constants
   public static final String SOURCE_AIP_CONTAINER = "AIP";
   public static final String SOURCE_PRESERVATION_CONTAINER = "Preservation";
+  public static final String SOURCE_AGENT_CONTAINER = "agents";
   public static final String SOURCE_AIP_ID = "AIP_1";
   public static final String SOURCE_AIP_ID_3 = "AIP_3";
   public static final String SOURCE_AIP_BUGGY_ID = "AIP_BUGGY";
+  public static final String SOURCE_AIP_ID_REAL = "REAL";
   public static final String DATE_CREATED = "2015-06-06T15:30:00.000+0000";
   public static final String DATE_MODIFIED = "2015-06-06T16:30:00.000+0000";
 
@@ -99,5 +103,7 @@ public class CorporaConstants {
 
   public static final int YEAR_1213 = 1213;
   public static final int YEAR_2003 = 2003;
+  
+  
 
 }

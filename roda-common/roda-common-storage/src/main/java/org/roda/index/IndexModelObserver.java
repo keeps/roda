@@ -9,6 +9,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
 import org.roda.index.utils.SolrUtils;
 import org.roda.model.AIP;
+import org.roda.model.AgentMetadata;
 import org.roda.model.DescriptiveMetadata;
 import org.roda.model.File;
 import org.roda.model.ModelObserver;
@@ -352,5 +353,23 @@ public class IndexModelObserver implements ModelObserver {
     } catch (ModelServiceException e) {
       LOGGER.error("Error when descriptive metadata deleted on retrieving the full AIP", e);
     }
+  }
+
+  @Override
+  public void agentMetadataCreated(AgentMetadata agentMetadata) {
+    // TODO handle indexing...
+  }
+
+  @Override
+  public void agentMetadataUpdated(AgentMetadata agentMetadata) {
+    agentMetadataDeleted(agentMetadata.getId());
+    agentMetadataCreated(agentMetadata);
+    
+  }
+
+  @Override
+  public void agentMetadataDeleted(String agentMetadataId) {
+    //TODO: handle deleting
+    
   }
 }

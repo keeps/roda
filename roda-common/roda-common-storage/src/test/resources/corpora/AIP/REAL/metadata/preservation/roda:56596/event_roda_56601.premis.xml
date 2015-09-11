@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<event xmlns="info:lc/xmlns/premis-v2">
+  <eventIdentifier>
+    <eventIdentifierType>RODAObjectPID</eventIdentifierType>
+    <eventIdentifierValue>roda:56601</eventIdentifierValue>
+  </eventIdentifier>
+  <eventType>ingestion</eventType>
+  <eventDateTime>2009-05-14T00:07:39.24Z</eventDateTime>
+  <eventDetail>The objects inside the SIP were added to the preservation repository</eventDetail>
+  <eventOutcomeInformation>
+    <eventOutcome>success</eventOutcome>
+    <eventOutcomeDetail>
+      <eventOutcomeDetailNote>Ingest details</eventOutcomeDetailNote>
+      <eventOutcomeDetailExtension>
+        <p xmlns="http://www.w3.org/1999/xhtml">O SIP foi ingerido com sucesso como filho do objecto roda:836. Foram criados 1 objectos de descrição. Foram criadas 1 representações.</p>
+      </eventOutcomeDetailExtension>
+    </eventOutcomeDetail>
+  </eventOutcomeInformation>
+  <linkingAgentIdentifier>
+    <linkingAgentIdentifierType>RODAObjectPID</linkingAgentIdentifierType>
+    <linkingAgentIdentifierValue>roda:6</linkingAgentIdentifierValue>
+    <linkingAgentRole>ingest task</linkingAgentRole>
+  </linkingAgentIdentifier>
+  <linkingObjectIdentifier>
+    <linkingObjectIdentifierType>RODAObjectPID</linkingObjectIdentifierType>
+    <linkingObjectIdentifierValue>roda:56597</linkingObjectIdentifierValue>
+    <linkingObjectRole>target</linkingObjectRole>
+  </linkingObjectIdentifier>
+</event>

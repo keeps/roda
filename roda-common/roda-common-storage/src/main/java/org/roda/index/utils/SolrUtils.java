@@ -44,6 +44,7 @@ import org.apache.solr.handler.loader.XMLLoader;
 import org.roda.common.RodaUtils;
 import org.roda.index.IndexServiceException;
 import org.roda.model.AIP;
+import org.roda.model.AgentMetadata;
 import org.roda.model.DescriptiveMetadata;
 import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
@@ -180,7 +181,7 @@ public class SolrUtils {
 
       Reader xsltReader = new InputStreamReader(transformerStream);
       CharArrayWriter transformerResult = new CharArrayWriter();
-      Map<String, String> stylesheetOpt = new HashMap<String, String>();
+      Map<String, Object> stylesheetOpt = new HashMap<String, Object>();
       stylesheetOpt.put("prefix", RodaConstants.INDEX_OTHER_DESCRIPTIVE_DATA_PREFIX);
       RodaUtils.applyStylesheet(xsltReader, descMetadataReader, stylesheetOpt, transformerResult);
       descMetadataReader.close();
@@ -1284,6 +1285,7 @@ public class SolrUtils {
 
     return doc;
   }
+
 
   // private static Group solrDocumentToGroup(SolrDocument doc) {
   // final String id = objectToString(doc.get(RodaConstants.MEMBERS_ID));

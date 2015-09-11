@@ -40,7 +40,7 @@ public class PreservationMetadata {
 
   @Override
   public String toString() {
-    return "DescriptiveMetadata [id=" + id + ", aipId=" + aipId + ", storagePath=" + storagePath + "]";
+    return "PreservationMetadata [id=" + id + ", aipId=" + aipId + ", storagePath=" + storagePath + "]";
   }
 
   @Override

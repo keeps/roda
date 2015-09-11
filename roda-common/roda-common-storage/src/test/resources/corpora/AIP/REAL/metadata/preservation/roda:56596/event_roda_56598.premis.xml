@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<event xmlns="info:lc/xmlns/premis-v2">
+  <eventIdentifier>
+    <eventIdentifierType>RODAObjectPID</eventIdentifierType>
+    <eventIdentifierValue>roda:56598</eventIdentifierValue>
+  </eventIdentifier>
+  <eventType>Refrescamento</eventType>
+  <eventDateTime>2006-05-12T12:30:00.00Z</eventDateTime>
+  <eventDetail>Todos os objectos foram gravados num novo suporte (DVD)</eventDetail>
+  <eventOutcomeInformation>
+    <eventOutcome>Sucesso</eventOutcome>
+  </eventOutcomeInformation>
+  <linkingAgentIdentifier>
+    <linkingAgentIdentifierType>RODAObjectPID</linkingAgentIdentifierType>
+    <linkingAgentIdentifierValue>roda:1080</linkingAgentIdentifierValue>
+    <linkingAgentRole>Executing program</linkingAgentRole>
+  </linkingAgentIdentifier>
+  <linkingObjectIdentifier>
+    <linkingObjectIdentifierType>RODAObjectPID</linkingObjectIdentifierType>
+    <linkingObjectIdentifierValue>roda:56597</linkingObjectIdentifierValue>
+    <linkingObjectRole>target</linkingObjectRole>
+  </linkingObjectIdentifier>
+</event>

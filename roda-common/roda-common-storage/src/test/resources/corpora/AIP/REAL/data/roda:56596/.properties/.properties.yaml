@@ -1,0 +1,20 @@
+representation.id: !!set {R2006.10.01464: null}
+representation.subtype: !!set {image/mets+tiff: null}
+grant.users: !!set {admin: null, fbarbedo: null}
+modify.users: !!set {omartins: null, admin: null, fbarbedo: null}
+active: !!set {'true': null}
+representation.label: !!set {R2006.10.01464: null}
+read.users: !!set {torcato: null, admin: null, omartins: null, fbarbedo: null}
+representation.content.model: !!set {'roda:r:digitalized_work:image/mets+tiff': null}
+remove.users: !!set {admin: null, fbarbedo: null}
+representation.state: !!set {active: null}
+representation.statuses: !!set {normalized: null, original: null}
+grant.groups: !!set {archivists: null, administrators: null, producers: null}
+representation.pid: !!set {'roda:56596': null}
+remove.groups: !!set {archivists: null, administrators: null, producers: null}
+modify.groups: !!set {archivists: null, administrators: null, producers: null}
+read.groups: !!set {archivists: null, users: null, administrators: null, producers: null}
+date.modified: !!set {'2013-04-20T18:03:01.582+0100': null}
+representation.type: !!set {digitalized_work: null}
+representation.dObject.pid: !!set {'roda:56595': null}
+date.created: !!set {'2009-05-14T01:07:15.754+0100': null}

@@ -8,12 +8,14 @@ import java.nio.file.StandardOpenOption;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
@@ -31,6 +33,10 @@ import org.roda.storage.StorageServiceException;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lc.xmlns.premisV2.EventComplexType;
+import lc.xmlns.premisV2.File;
+import lc.xmlns.premisV2.LinkingAgentIdentifierComplexType;
+import lc.xmlns.premisV2.Representation;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationState;
@@ -381,6 +387,26 @@ public final class ModelUtils {
     return isObject;
   }
 
+  public static Representation binaryToRepresentation(Binary representationBinary)  throws ModelServiceException{
+    InputStream binaryInputStream = null;
+    Representation representation = null;
+    try {
+      binaryInputStream = representationBinary.getContent().createInputStream();
+       representation =  PremisRepresentationObjectHelper.newInstance(binaryInputStream).getRepresentation();
+    } catch (PremisMetadataException | IOException | ClassCastException e) {
+      throw new ModelServiceException(e.getMessage(), ModelServiceException.INTERNAL_SERVER_ERROR);
+    } finally {
+      if (binaryInputStream != null) {
+        try {
+          binaryInputStream.close();
+        } catch (IOException e1) {
+          LOGGER.warn("Cannot close file inputstream", e1);
+        }
+      }
+    }
+    return representation;
+  }
+  
   public static boolean isPreservationEvent(Binary preservationBinary) {
     boolean isEvent = true;
     InputStream binaryInputStream = null;
@@ -400,6 +426,27 @@ public final class ModelUtils {
     }
     return isEvent;
   }
+  
+  public static EventComplexType binaryToEvent(Binary eventBinary)  throws ModelServiceException{
+    InputStream binaryInputStream = null;
+    EventComplexType event = null;
+    try {
+      binaryInputStream = eventBinary.getContent().createInputStream();
+       event = PremisEventHelper.newInstance(binaryInputStream).getEvent();
+    } catch (PremisMetadataException | IOException | ClassCastException e) {
+      throw new ModelServiceException(e.getMessage(), ModelServiceException.INTERNAL_SERVER_ERROR);
+    } finally {
+      if (binaryInputStream != null) {
+        try {
+          binaryInputStream.close();
+        } catch (IOException e1) {
+          LOGGER.warn("Cannot close file inputstream", e1);
+        }
+      }
+    }
+    return event;
+  }
+  
 
   public static boolean isPreservationFileObject(Binary preservationBinary) {
     boolean isObject = true;
@@ -420,7 +467,25 @@ public final class ModelUtils {
     }
     return isObject;
   }
-
+  public static File binaryToFile(Binary eventBinary)  throws ModelServiceException{
+    InputStream binaryInputStream = null;
+    File file = null;
+    try {
+      binaryInputStream = eventBinary.getContent().createInputStream();
+       file = PremisFileObjectHelper.newInstance(binaryInputStream).getFile();
+    } catch (PremisMetadataException | IOException | ClassCastException e) {
+      throw new ModelServiceException(e.getMessage(), ModelServiceException.INTERNAL_SERVER_ERROR);
+    } finally {
+      if (binaryInputStream != null) {
+        try {
+          binaryInputStream.close();
+        } catch (IOException e1) {
+          LOGGER.warn("Cannot close file inputstream", e1);
+        }
+      }
+    }
+    return file;
+  }
   // FIXME finish to implement this for deleting the 3 methods above
   // (isPreservation*)
   public static PREMIS_TYPE getPremisType(Binary preservationBinary) {
@@ -444,8 +509,12 @@ public final class ModelUtils {
   }
 
   public static StoragePath getPreservationAgentPath(String agentID) throws StorageServiceException {
+    if(agentID.contains(":")){
+      agentID = agentID.replace(":", "_")+".premis.xml";
+    }
+    
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_PRESERVATION,
-      RodaConstants.STORAGE_DIRECTORY_AGENTS, agentID);
+      RodaConstants.STORAGE_DIRECTORY_AGENTS, agentID.replace(":","_"));
   }
 
   public static StoragePath getLogPath(String logFile) throws StorageServiceException {
@@ -513,6 +582,35 @@ public final class ModelUtils {
 
     }
     return null;
+  }
+
+  public static List<Binary> sortEventsByDate(List<Binary> events) throws ModelServiceException {
+    TreeMap<String, Binary> sortedMap = new TreeMap<String,Binary>();
+    for(Binary b : events){
+      sortedMap.put(binaryToEvent(b).xgetEventDateTime().getStringValue(), b);
+    }
+    return new ArrayList<Binary>(sortedMap.values());
+  }
+
+  public static <T> List<String> extractAgentIdsFromPreservationBinary(Binary b, Class<T> c) throws ModelServiceException {
+    List<String> ids = new ArrayList<String>();
+    if(c.equals(File.class)){
+      //
+    }else if(c.equals(EventComplexType.class)){
+      EventComplexType event = binaryToEvent(b);
+      List<LinkingAgentIdentifierComplexType> identifiers = event.getLinkingAgentIdentifierList();
+      if(identifiers!=null && identifiers.size()>0){
+        for(LinkingAgentIdentifierComplexType laict : identifiers){
+          ids.add(laict.getLinkingAgentIdentifierValue());
+        }
+      }
+    }else if(c.equals(Representation.class)){
+      //
+    }else{
+      
+    }
+    // TODO Auto-generated method stub
+    return ids;
   }
 
 }

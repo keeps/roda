@@ -6,6 +6,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Locale;
 import java.util.UUID;
 
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
@@ -13,17 +14,21 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.roda.CorporaConstants;
-import org.roda.index.IndexServiceException;
 import org.roda.index.IndexService;
+import org.roda.index.IndexServiceException;
 import org.roda.index.IndexServiceTest;
 import org.roda.model.AIP;
+import org.roda.model.AgentMetadata;
 import org.roda.model.DescriptiveMetadata;
 import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
 import org.roda.model.ModelServiceTest;
+import org.roda.model.PreservationMetadata;
+import org.roda.model.utils.ModelUtils;
+import org.roda.storage.ClosableIterable;
 import org.roda.storage.DefaultStoragePath;
-import org.roda.storage.StorageServiceException;
 import org.roda.storage.StorageService;
+import org.roda.storage.StorageServiceException;
 import org.roda.storage.fs.FSUtils;
 import org.roda.storage.fs.FileStorageService;
 import org.slf4j.Logger;
@@ -87,8 +92,8 @@ public class HtmlUtilsTest {
   }
 
   @Test
-  public void testRepresentationFilePreservationObjectToHtml() throws ModelServiceException, StorageServiceException,
-    IndexServiceException {
+  public void testRepresentationFilePreservationObjectToHtml()
+    throws ModelServiceException, StorageServiceException, IndexServiceException {
     final String aipId = UUID.randomUUID().toString();
     final AIP aip = model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
@@ -112,8 +117,8 @@ public class HtmlUtilsTest {
   }
 
   @Test
-  public void testDescriptiveMetadataToHtml() throws ModelServiceException, StorageServiceException,
-    IndexServiceException {
+  public void testDescriptiveMetadataToHtml()
+    throws ModelServiceException, StorageServiceException, IndexServiceException {
     final String aipId = UUID.randomUUID().toString();
     final AIP aip = model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
@@ -174,8 +179,8 @@ public class HtmlUtilsTest {
    */
 
   @Test
-  public void testRepresentationPreservationObjectToHtml() throws ModelServiceException, StorageServiceException,
-    IndexServiceException {
+  public void testRepresentationPreservationObjectToHtml()
+    throws ModelServiceException, StorageServiceException, IndexServiceException {
     final String aipId = UUID.randomUUID().toString();
     final AIP aip = model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
@@ -198,8 +203,8 @@ public class HtmlUtilsTest {
   }
 
   @Test
-  public void testRepresentationFilePreservationObjectFromStorageToHtml() throws ModelServiceException,
-    StorageServiceException, IndexServiceException {
+  public void testRepresentationFilePreservationObjectFromStorageToHtml()
+    throws ModelServiceException, StorageServiceException, IndexServiceException {
     final String aipId = UUID.randomUUID().toString();
     final AIP aip = model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
@@ -222,8 +227,8 @@ public class HtmlUtilsTest {
   }
 
   @Test
-  public void testEventPreservationObjectFromStorageToHtml() throws ModelServiceException, StorageServiceException,
-    IndexServiceException {
+  public void testEventPreservationObjectFromStorageToHtml()
+    throws ModelServiceException, StorageServiceException, IndexServiceException {
     final String aipId = UUID.randomUUID().toString();
     final AIP aip = model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
@@ -245,4 +250,24 @@ public class HtmlUtilsTest {
     // assertEquals(fieldValueElement.text(),CorporaConstants.HTML_INGESTION);
   }
 
+  @Test
+  public void testAIPPremisToHtml() throws ModelServiceException, StorageServiceException {
+    final String aipId = UUID.randomUUID().toString();
+    final AIP aip = model.createAIP(aipId, corporaService,
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID_REAL));
+    final AgentMetadata agent1080 = model.createAgentMetadata("roda_1080.premis.xml", corporaService,
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_PRESERVATION_CONTAINER, CorporaConstants.SOURCE_AGENT_CONTAINER,
+        "roda_1080.premis.xml"),
+      true);
+    final AgentMetadata agent189 = model.createAgentMetadata("roda_189.premis.xml", corporaService,
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_PRESERVATION_CONTAINER, CorporaConstants.SOURCE_AGENT_CONTAINER,
+        "roda_189.premis.xml"),
+      true);
+    final AgentMetadata agent6 = model.createAgentMetadata("roda_6.premis.xml", corporaService,
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_PRESERVATION_CONTAINER, CorporaConstants.SOURCE_AGENT_CONTAINER,
+        "roda_6.premis.xml"),
+      true);
+
+    System.out.println(HTMLUtils.aipPremisToHTML(aip, model, storage, new Locale("pt", "PT")));
+  }
 }

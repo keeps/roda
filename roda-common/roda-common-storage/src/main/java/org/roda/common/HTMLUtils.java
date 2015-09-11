@@ -5,17 +5,36 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.xml.transform.TransformerException;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.roda.index.utils.SolrUtils;
+import org.roda.model.AIP;
+import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
+import org.roda.model.PreservationMetadata;
+import org.roda.model.utils.ModelUtils;
 import org.roda.storage.Binary;
+import org.roda.storage.ClosableIterable;
+import org.roda.storage.Directory;
+import org.roda.storage.StorageService;
+import org.roda.storage.StorageServiceException;
 
+import lc.xmlns.premisV2.EventComplexType;
+import lc.xmlns.premisV2.File;
+import lc.xmlns.premisV2.Representation;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 
 /**
@@ -34,19 +53,122 @@ public final class HTMLUtils {
   }
 
   public static String descriptiveMetadataToHtml(Binary binary, final Locale locale) throws ModelServiceException {
-    Map<String, String> stylesheetOpt = new HashMap<String, String>();
+    Map<String, Object> stylesheetOpt = new HashMap<String, Object>();
     stylesheetOpt.put("title", binary.getStoragePath().getName());
     return binaryToHtml(binary, locale, true, null, stylesheetOpt);
   }
 
   public static String preservationObjectToHtml(Binary binary, final Locale locale) throws ModelServiceException {
-    Map<String, String> stylesheetOpt = new HashMap<String, String>();
+    Map<String, Object> stylesheetOpt = new HashMap<String, Object>();
     stylesheetOpt.put("prefix", RodaConstants.INDEX_OTHER_DESCRIPTIVE_DATA_PREFIX);
     return binaryToHtml(binary, locale, false, "premis", stylesheetOpt);
   }
 
+  
+  public static String aipPremisToHTML(AIP aip, ModelService model, StorageService storage, Locale locale) throws ModelServiceException, StorageServiceException{
+    TreeSet<String> agentsID = null;
+    StringBuffer s = new StringBuffer();
+    s.append("<span class='representations'>");
+    if(aip.getRepresentationIds()!=null && aip.getRepresentationIds().size()>0){
+      for(String representationId : aip.getRepresentationIds()){
+        ClosableIterable<PreservationMetadata> preservationMetadata = model.listPreservationMetadataBinaries(aip.getId(), representationId);
+        s.append(representationPremisToHtml(preservationMetadata, storage, locale));
+      }
+      agentsID = new TreeSet<String>();
+      for(String representationId : aip.getRepresentationIds()){
+        ClosableIterable<PreservationMetadata> preservationMetadata = model.listPreservationMetadataBinaries(aip.getId(), representationId);
+        agentsID.addAll(extractAgents(preservationMetadata, storage));
+      }
+    }
+    s.append("</span>");
+    /*
+    if(agentsID!=null && agentsID.size()>0){
+      s.append("<span class='agents'>");
+      for(String agentId : agentsID){
+        Binary agentBinary = storage.getBinary(ModelUtils.getPreservationAgentPath(agentId));
+        s.append(preservationObjectToHtml(agentBinary,locale));
+      }
+      s.append("</span>");
+    }*/
+    return s.toString();
+  }
+  
+  private static String representationPremisToHtml(ClosableIterable<PreservationMetadata> preservationMetadata, StorageService storage, final Locale locale) throws ModelServiceException, StorageServiceException {
+    Map<String, Object> stylesheetOpt = new HashMap<String, Object>();
+    stylesheetOpt.put("prefix", RodaConstants.INDEX_OTHER_DESCRIPTIVE_DATA_PREFIX);
+    
+    List<Binary> events = new ArrayList<Binary>();
+    List<Binary> files = new ArrayList<Binary>();
+    Binary representation = null;
+    
+    Iterator<PreservationMetadata> iterator = preservationMetadata.iterator();
+    //TreeSet<String> agentsIDs = new TreeSet<String>();
+    while (iterator.hasNext()) {
+      PreservationMetadata pm = iterator.next();
+      Binary b = storage.getBinary(pm.getStoragePath());
+      if(ModelUtils.isPreservationEvent(b)){
+        //agentsIDs.addAll(ModelUtils.extractAgentIdsFromPreservationBinary(b,EventComplexType.class));
+        events.add(b);
+      }else if(ModelUtils.isPreservationFileObject(b)){
+        //agentsIDs.addAll(ModelUtils.extractAgentIdsFromPreservationBinary(b,File.class));
+        files.add(b);
+      }else{
+        //agentsIDs.addAll(ModelUtils.extractAgentIdsFromPreservationBinary(b,Representation.class));
+        representation = b;
+      }
+    }
+    
+    events = ModelUtils.sortEventsByDate(events);
+
+    List<String> htmlEvents = new ArrayList<String>();
+    for(Binary event : events){
+      String html = preservationObjectToHtml(event,locale);
+      htmlEvents.add(html);
+    }
+    stylesheetOpt.put("events", htmlEvents);
+
+    List<String> htmlFiles = new ArrayList<String>();
+    for(Binary file : files){
+      String html = preservationObjectToHtml(file,locale);
+      htmlFiles.add(html);
+    }
+    stylesheetOpt.put("files", htmlFiles);
+    /*
+    List<String> htmlAgents = new ArrayList<String>();
+    
+  if(agentsIDs!=null && agentsIDs.size()>0){
+      
+      for(String s : agentsIDs){
+        System.out.println("AGENTID: "+s);
+        //Binary agent = storage.getBinary(ModelUtils.getPreservationAgentPath(s));
+        //String html = preservationObjectToHtml(agent,locale);
+        //htmlAgents.add(html);
+      }
+      stylesheetOpt.put("agents", htmlAgents);
+      
+    }*/
+    return binaryToHtml(representation, locale, false, "premis", stylesheetOpt);
+  }
+  
+  public static TreeSet<String> extractAgents(ClosableIterable<PreservationMetadata> preservationMetadata, StorageService storage) throws ModelServiceException, StorageServiceException {
+    Iterator<PreservationMetadata> iterator = preservationMetadata.iterator();
+    TreeSet<String> agentsIDs = new TreeSet<String>();
+    while (iterator.hasNext()) {
+      PreservationMetadata pm = iterator.next();
+      Binary b = storage.getBinary(pm.getStoragePath());
+      if(ModelUtils.isPreservationEvent(b)){
+        agentsIDs.addAll(ModelUtils.extractAgentIdsFromPreservationBinary(b,EventComplexType.class));
+      }else if(ModelUtils.isPreservationFileObject(b)){
+        agentsIDs.addAll(ModelUtils.extractAgentIdsFromPreservationBinary(b,File.class));
+      }else{
+        agentsIDs.addAll(ModelUtils.extractAgentIdsFromPreservationBinary(b,Representation.class));
+      }
+    }
+    return agentsIDs;
+  }
+  
   private static String binaryToHtml(Binary binary, final Locale locale, boolean useFilename,
-    String alternativeFilenameToUse, Map<String, String> stylesheetOpt) throws ModelServiceException {
+    String alternativeFilenameToUse, Map<String, Object> stylesheetOpt) throws ModelServiceException {
     String filename;
     if (useFilename) {
       filename = binary.getStoragePath().getName();
