@@ -15,6 +15,7 @@ import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.RODAMember;
 import pt.gov.dgarq.roda.core.data.v2.RodaGroup;
 import pt.gov.dgarq.roda.core.data.v2.RodaUser;
+import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.wui.common.client.GenericException;
 
 public class UserManagement extends RodaCoreService {
@@ -25,8 +26,8 @@ public class UserManagement extends RodaCoreService {
     super();
   }
 
-  public static Long countLogEntries(RodaUser user, Filter filter) throws AuthorizationDeniedException,
-    GenericException {
+  public static Long countLogEntries(RodaUser user, Filter filter)
+    throws AuthorizationDeniedException, GenericException {
     Date start = new Date();
 
     // check user permissions
@@ -88,21 +89,21 @@ public class UserManagement extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "UserManagement", "findMembers", null, duration, "filter", filter, "sorter", sorter,
-      "sublist", sublist);
+    registerAction(user, "UserManagement", "findMembers", null, duration, "filter", filter, "sorter", sorter, "sublist",
+      sublist);
 
     return ret;
   }
 
-  public static RodaUser retrieveUser(RodaUser user, String username) throws AuthorizationDeniedException,
-    GenericException {
+  public static User retrieveUser(RodaUser user, String username)
+    throws AuthorizationDeniedException, GenericException {
     Date start = new Date();
 
     // check user permissions
     UserUtility.checkRoles(user, ROLE);
 
     // delegate
-    RodaUser ret = UserManagementHelper.retrieveUser(username);
+    User ret = UserManagementHelper.retrieveUser(username);
 
     // register action
     long duration = new Date().getTime() - start.getTime();
@@ -111,8 +112,8 @@ public class UserManagement extends RodaCoreService {
     return ret;
   }
 
-  public static RodaGroup retrieveGroup(RodaUser user, String groupname) throws AuthorizationDeniedException,
-    GenericException {
+  public static RodaGroup retrieveGroup(RodaUser user, String groupname)
+    throws AuthorizationDeniedException, GenericException {
     Date start = new Date();
 
     // check user permissions

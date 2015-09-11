@@ -306,13 +306,13 @@ public class SIPPanel extends ElementPanel<SIPState> {
 
   private void initProducerInfoPopup(final AsyncCallback<PopupPanel> callback) {
     if (producerInfoPopup.getWidget() == null) {
-      UserManagementService.Util.getInstance().getUser(get().getUsername(), new AsyncCallback<RodaUser>() {
+      UserManagementService.Util.getInstance().getUser(get().getUsername(), new AsyncCallback<User>() {
 
         public void onFailure(Throwable caught) {
           callback.onFailure(caught);
         }
 
-        public void onSuccess(RodaUser user) {
+        public void onSuccess(User user) {
           UserInfoPanel userInfo = new UserInfoPanel(user);
           AccessibleFocusPanel focus = new AccessibleFocusPanel(userInfo.getWidget());
           producerInfoPopup.setWidget(focus);

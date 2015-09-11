@@ -663,7 +663,8 @@ public class SolrUtils {
       ret = resultClass.cast(solrDocumentToLogEntry(doc));
     } else if (resultClass.equals(SIPReport.class)) {
       ret = resultClass.cast(solrDocumentToSipState(doc));
-    } else if (resultClass.equals(RODAMember.class)) {
+    } else
+      if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class) || resultClass.equals(Group.class)) {
       ret = resultClass.cast(solrDocumentToRodaMember(doc));
     } else {
       throw new IndexServiceException("Cannot find class index name: " + resultClass.getName(),
@@ -1226,16 +1227,17 @@ public class SolrUtils {
       roles.addAll(possibleRoles);
     }
     if (isUser) {
-      RodaUser user = new RodaUser();
+      User user = new User();
       user.setId(id);
       user.setActive(isActive);
       user.setAllGroups(groups);
       user.setAllRoles(roles);
       user.setActive(isActive);
       user.setName(name);
+      // TODO get all user other info
       return user;
     } else {
-      RodaGroup group = new RodaGroup();
+      Group group = new Group();
       group.setId(id);
       group.setActive(isActive);
       group.setAllGroups(groups);

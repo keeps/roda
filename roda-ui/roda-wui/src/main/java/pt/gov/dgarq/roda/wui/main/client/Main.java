@@ -50,6 +50,7 @@ public class Main extends Composite implements EntryPoint {
     // Add main widget to root panel
     RootPanel.get().add(this);
     RootPanel.get().add(footer);
+    RootPanel.get().addStyleName("roda");
 
     // deferred call to init
     Scheduler.get().scheduleDeferred(new Command() {

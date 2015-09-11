@@ -19,7 +19,6 @@ import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.RODAMember;
 import pt.gov.dgarq.roda.core.data.v2.RodaGroup;
-import pt.gov.dgarq.roda.core.data.v2.RodaUser;
 import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.wui.common.client.GenericException;
 import pt.gov.dgarq.roda.wui.common.client.PrintReportException;
@@ -78,7 +77,7 @@ public interface UserManagementService extends RemoteService {
    * 
    * @throws RODAException
    */
-  public RodaUser getUser(String username) throws RODAException;
+  public User getUser(String username) throws RODAException;
 
   /**
    * Create a new user

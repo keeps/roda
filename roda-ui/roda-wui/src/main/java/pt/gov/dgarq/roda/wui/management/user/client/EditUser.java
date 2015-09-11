@@ -20,7 +20,6 @@ import com.google.gwt.user.client.ui.Widget;
 import config.i18n.client.UserManagementMessages;
 import pt.gov.dgarq.roda.core.common.EmailAlreadyExistsException;
 import pt.gov.dgarq.roda.core.common.NoSuchUserException;
-import pt.gov.dgarq.roda.core.data.v2.RodaUser;
 import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
@@ -38,7 +37,7 @@ public class EditUser extends Composite {
     public void resolve(String[] historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.length == 1) {
         String username = historyTokens[0];
-        UserManagementService.Util.getInstance().getUser(username, new AsyncCallback<RodaUser>() {
+        UserManagementService.Util.getInstance().getUser(username, new AsyncCallback<User>() {
 
           @Override
           public void onFailure(Throwable caught) {
@@ -46,7 +45,7 @@ public class EditUser extends Composite {
           }
 
           @Override
-          public void onSuccess(RodaUser user) {
+          public void onSuccess(User user) {
             EditUser editUser = new EditUser(user);
             callback.onSuccess(editUser);
           }
@@ -76,7 +75,7 @@ public class EditUser extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  private final RodaUser user;
+  private final User user;
 
   private static UserManagementMessages messages = (UserManagementMessages) GWT.create(UserManagementMessages.class);
 
@@ -98,7 +97,7 @@ public class EditUser extends Composite {
    * @param user
    *          the user to edit
    */
-  public EditUser(RodaUser user) {
+  public EditUser(User user) {
     this.user = user;
 
     initWidget(uiBinder.createAndBindUi(this));

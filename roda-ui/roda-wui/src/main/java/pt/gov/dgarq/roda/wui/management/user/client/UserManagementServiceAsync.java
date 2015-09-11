@@ -16,7 +16,6 @@ import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.RODAMember;
 import pt.gov.dgarq.roda.core.data.v2.RodaGroup;
-import pt.gov.dgarq.roda.core.data.v2.RodaUser;
 import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.wui.common.client.PrintReportException;
 
@@ -33,7 +32,7 @@ public interface UserManagementServiceAsync {
 
   void getGroup(String groupname, AsyncCallback<RodaGroup> callback);
 
-  void getUser(String username, AsyncCallback<RodaUser> callback);
+  void getUser(String username, AsyncCallback<User> callback);
 
   /**
    * Create a new user
@@ -196,7 +195,8 @@ public interface UserManagementServiceAsync {
    * @throws RODAException
    * 
    */
-  public void resetPassword(String username, String resetPasswordToken, String newPassword, AsyncCallback<Void> callback);
+  public void resetPassword(String username, String resetPasswordToken, String newPassword,
+    AsyncCallback<Void> callback);
 
   /**
    * Set user log report info

@@ -10,7 +10,6 @@ import pt.gov.dgarq.roda.core.data.RODAMember;
  * This is a group in RODA.
  * 
  * @author Rui Castro
- * @deprecated use RodaGroup instead
  */
 public class Group extends RodaGroup {
 
@@ -44,8 +43,8 @@ public class Group extends RodaGroup {
    *          the Group to be cloned.
    */
   public Group(Group group) {
-    super(group.getId(), group.getName(), group.getDirectGroups(), group.getAllGroups(), group.getDirectRoles(), group
-      .getAllRoles());
+    super(group.getId(), group.getName(), group.getDirectGroups(), group.getAllGroups(), group.getDirectRoles(),
+      group.getAllRoles());
     setActive(true);
     setMemberUserNames(group.getMemberUserNames());
     setMemberGroupNames(group.getMemberGroupNames());

@@ -79,7 +79,7 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public RodaUser getUser(String username) throws RODAException {
+  public User getUser(String username) throws RODAException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     return UserManagement.retrieveUser(user, username);
   }

@@ -9,11 +9,11 @@ import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
+import pt.gov.dgarq.roda.core.data.v2.Group;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.RODAMember;
-import pt.gov.dgarq.roda.core.data.v2.RodaGroup;
-import pt.gov.dgarq.roda.core.data.v2.RodaUser;
+import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.wui.common.client.GenericException;
 
 public class UserManagementHelper {
@@ -68,10 +68,10 @@ public class UserManagementHelper {
     return ret;
   }
 
-  protected static RodaUser retrieveUser(String username) throws AuthorizationDeniedException, GenericException {
-    RodaUser ret;
+  protected static User retrieveUser(String username) throws AuthorizationDeniedException, GenericException {
+    User ret;
     try {
-      ret = RodaCoreFactory.getIndexService().retrieve(RodaUser.class, username);
+      ret = RodaCoreFactory.getIndexService().retrieve(User.class, username);
     } catch (IndexServiceException e) {
       LOGGER.error("Error getting user", e);
       throw new GenericException("Error getting user: " + e.getMessage());
@@ -79,10 +79,10 @@ public class UserManagementHelper {
     return ret;
   }
 
-  protected static RodaGroup retrieveGroup(String groupname) throws AuthorizationDeniedException, GenericException {
-    RodaGroup ret;
+  protected static Group retrieveGroup(String groupname) throws AuthorizationDeniedException, GenericException {
+    Group ret;
     try {
-      ret = RodaCoreFactory.getIndexService().retrieve(RodaGroup.class, groupname);
+      ret = RodaCoreFactory.getIndexService().retrieve(Group.class, groupname);
     } catch (IndexServiceException e) {
       LOGGER.error("Error getting group", e);
       throw new GenericException("Error getting group: " + e.getMessage());
