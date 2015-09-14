@@ -53,7 +53,7 @@
 						<ui:msg>Edit metadata</ui:msg>
 					</g:Button>
 					<g:Button addStyleNames="btn btn-edit" ui:field="moveItem">
-						<ui:msg>Move in hierarchy</ui:msg>
+						<ui:msg>Move</ui:msg>
 					</g:Button>
 					<g:Button addStyleNames="btn btn-edit" ui:field="editPermissions">
 						<ui:msg>Edit permissions</ui:msg>

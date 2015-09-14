@@ -4,6 +4,7 @@
 package pt.gov.dgarq.roda.wui.management.user.client;
 
 import pt.gov.dgarq.roda.core.common.EmailAlreadyExistsException;
+import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.wui.common.client.AuthenticatedUser;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
@@ -11,6 +12,8 @@ import pt.gov.dgarq.roda.wui.common.client.UserLogin;
 import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -70,36 +73,36 @@ public class Preferences implements HistoryResolver {
       submit = new WUIButton(constants.preferencesSubmit(), WUIButton.Left.ROUND, WUIButton.Right.REC);
       submit.setEnabled(false);
 
-      userdata.addChangeListener(new ChangeListener() {
+      userdata.addValueChangeHandler(new ValueChangeHandler<User>() {
 
-        public void onChange(Widget sender) {
+        @Override
+        public void onValueChange(ValueChangeEvent<User> event) {
           submit.setEnabled(userdata.isValid());
         }
-
       });
 
       submit.addClickListener(new ClickListener() {
 
         public void onClick(Widget sender) {
-          UserManagementService.Util.getInstance().editMyUser(userdata.getUser(), userdata.getPassword(),
+          UserManagementService.Util.getInstance().editMyUser(userdata.getValue(), userdata.getPassword(),
             new AsyncCallback<Void>() {
 
-              public void onFailure(Throwable caught) {
-                if (caught instanceof EmailAlreadyExistsException) {
-                  Window.alert(constants.preferencesEmailAlreadyExists());
-                } else {
-                  logger.error("Error saving preferences", caught);
-                }
-
+            public void onFailure(Throwable caught) {
+              if (caught instanceof EmailAlreadyExistsException) {
+                Window.alert(constants.preferencesEmailAlreadyExists());
+              } else {
+                logger.error("Error saving preferences", caught);
               }
 
-              public void onSuccess(Void result) {
-                Window.alert(constants.preferencesSubmitSuccess());
-                // UserLogin.getInstance()
-                // .checkForLoginReset();
-              }
+            }
 
-            });
+            public void onSuccess(Void result) {
+              Window.alert(constants.preferencesSubmitSuccess());
+              // UserLogin.getInstance()
+              // .checkForLoginReset();
+            }
+
+          });
         }
 
       });

@@ -90,8 +90,9 @@ public class MemberManagement extends Composite {
 
   public MemberManagement() {
     Filter filter = null;
-    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.MEMBERS_IS_ACTIVE), new SimpleFacetParameter(
-      RodaConstants.MEMBERS_IS_USER), new SimpleFacetParameter(RodaConstants.MEMBERS_GROUPS_ALL));
+    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.MEMBERS_IS_ACTIVE),
+      new SimpleFacetParameter(RodaConstants.MEMBERS_IS_USER),
+      new SimpleFacetParameter(RodaConstants.MEMBERS_GROUPS_ALL));
     list = new RodaMemberList(filter, facets);
     facetIsActive = new FlowPanel();
     facetIsUser = new FlowPanel();
@@ -111,9 +112,10 @@ public class MemberManagement extends Composite {
       @Override
       public void onSelectionChange(SelectionChangeEvent event) {
         RODAMember selected = list.getSelectionModel().getSelectedObject();
-
-        History.newItem(RESOLVER.getHistoryPath() + "."
-          + (selected.isUser() ? EDIT_USER_HISTORY_TOKEN : EDIT_GROUP_HISTORY_TOKEN) + "." + selected.getId());
+        if (selected != null) {
+          History.newItem(RESOLVER.getHistoryPath() + "."
+            + (selected.isUser() ? EDIT_USER_HISTORY_TOKEN : EDIT_GROUP_HISTORY_TOKEN) + "." + selected.getId());
+        }
       }
     });
   }

@@ -1,6 +1,7 @@
 package pt.gov.dgarq.roda.wui.management.user.server;
 
 import java.util.Date;
+import java.util.List;
 
 import org.roda.common.UserUtility;
 
@@ -10,6 +11,7 @@ import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
+import pt.gov.dgarq.roda.core.data.v2.Group;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.RODAMember;
@@ -112,6 +114,23 @@ public class UserManagement extends RodaCoreService {
     return ret;
   }
 
+  public static RodaUser retrieveRodaUser(RodaUser user, String username)
+    throws AuthorizationDeniedException, GenericException {
+    Date start = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, ROLE);
+
+    // delegate
+    RodaUser ret = UserManagementHelper.retrieveRodaUser(username);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, "UserManagement", "retrieveRodaUser", null, duration, "username", username);
+
+    return ret;
+  }
+
   public static RodaGroup retrieveGroup(RodaUser user, String groupname)
     throws AuthorizationDeniedException, GenericException {
     Date start = new Date();
@@ -125,6 +144,22 @@ public class UserManagement extends RodaCoreService {
     // register action
     long duration = new Date().getTime() - start.getTime();
     registerAction(user, "UserManagement", "retrieveGroup", null, duration, "groupname", groupname);
+
+    return ret;
+  }
+
+  public static List<Group> listAllGroups(RodaUser user) throws AuthorizationDeniedException, GenericException {
+    Date start = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, ROLE);
+
+    // delegate
+    List<Group> ret = UserManagementHelper.listAllGroups();
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, "UserManagement", "listAllGroups", null, duration);
 
     return ret;
   }

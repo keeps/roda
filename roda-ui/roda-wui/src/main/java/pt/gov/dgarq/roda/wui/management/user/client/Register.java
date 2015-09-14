@@ -5,6 +5,7 @@ package pt.gov.dgarq.roda.wui.management.user.client;
 
 import pt.gov.dgarq.roda.core.common.EmailAlreadyExistsException;
 import pt.gov.dgarq.roda.core.common.UserAlreadyExistsException;
+import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.wui.common.captcha.client.AbstractImageCaptcha;
 import pt.gov.dgarq.roda.wui.common.captcha.client.DefaultImageCaptcha;
 import pt.gov.dgarq.roda.wui.common.client.AuthenticatedUser;
@@ -14,6 +15,8 @@ import pt.gov.dgarq.roda.wui.common.client.UserLogin;
 import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -86,44 +89,45 @@ public class Register implements HistoryResolver {
 
         public void onClick(Widget sender) {
           if (userdata.isValid()) {
-            UserManagementService.Util.getInstance().register(userdata.getUser(), userdata.getPassword(),
+            UserManagementService.Util.getInstance().register(userdata.getValue(), userdata.getPassword(),
               captcha.getResponse(), new AsyncCallback<Boolean>() {
 
-                public void onFailure(Throwable caught) {
-                  if (caught instanceof UserAlreadyExistsException) {
-                    Window.alert(constants.registerUserExists());
-                  } else if (caught instanceof EmailAlreadyExistsException) {
-                    Window.alert(constants.registerEmailAlreadyExists());
-                  } else {
-                    logger.error("Error while registering", caught);
-                  }
+              public void onFailure(Throwable caught) {
+                if (caught instanceof UserAlreadyExistsException) {
+                  Window.alert(constants.registerUserExists());
+                } else if (caught instanceof EmailAlreadyExistsException) {
+                  Window.alert(constants.registerEmailAlreadyExists());
+                } else {
+                  logger.error("Error while registering", caught);
+                }
+                captcha.refresh();
+              }
+
+              public void onSuccess(Boolean passed) {
+                if (passed.booleanValue()) {
+                  Window.alert(constants.registerSuccess());
+                  History.newItem(VerifyEmail.getInstance().getHistoryPath() + "." + userdata.getValue().getName());
+                } else {
+                  Window.alert(constants.registerWrongCaptcha());
                   captcha.refresh();
                 }
 
-                public void onSuccess(Boolean passed) {
-                  if (passed.booleanValue()) {
-                    Window.alert(constants.registerSuccess());
-                    History.newItem(VerifyEmail.getInstance().getHistoryPath() + "." + userdata.getUser().getName());
-                  } else {
-                    Window.alert(constants.registerWrongCaptcha());
-                    captcha.refresh();
-                  }
+              }
 
-                }
-
-              });
+            });
           }
         }
 
       });
 
       submit.setEnabled(false);
-      userdata.addChangeListener(new ChangeListener() {
 
-        public void onChange(Widget sender) {
+      userdata.addValueChangeHandler(new ValueChangeHandler<User>() {
+
+        @Override
+        public void onValueChange(ValueChangeEvent<User> event) {
           submit.setEnabled(userdata.isValid());
         }
-
       });
 
       layout.add(userdataTitle);

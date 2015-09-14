@@ -83,6 +83,14 @@ h6, .h6 {
 	margin-bottom: 5px;
 }
 
+.form-textbox-small {
+	width: auto;
+}
+
+.form-textbox-small + .form-textbox-small {
+	margin-left: 5px;
+}
+
 .content {
 	padding: 40px !important;
 	min-height: 600px;
@@ -149,9 +157,9 @@ h6, .h6 {
 .btn:after {
 	display: inline-block;
 	font-family: "fontawesome";
-	padding-left: 5px;
 	float: right;
 	margin-top: 1px;
+	padding-left: 5px;
 }
 
 .btn-plus:after {

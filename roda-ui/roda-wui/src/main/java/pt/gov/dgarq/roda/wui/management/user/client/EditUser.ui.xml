@@ -4,71 +4,40 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:i="urn:import:config.i18n.client" xmlns:m="urn:import:pt.gov.dgarq.roda.wui.main.client"
 	xmlns:common="urn:import:pt.gov.dgarq.roda.wui.common.client.widgets"
-	xmlns:d="urn:import:com.google.gwt.user.datepicker.client">
-	
-	<ui:with field='constants' type='config.i18n.client.UserManagementConstants'/>
-	<ui:with field='messages' type='config.i18n.client.UserManagementMessages'/>
+	xmlns:d="urn:import:com.google.gwt.user.datepicker.client" xmlns:u="urn:import:pt.gov.dgarq.roda.wui.management.user.client">
+
+	<ui:with field='constants' type='config.i18n.client.UserManagementConstants' />
+	<ui:with field='messages' type='config.i18n.client.UserManagementMessages' />
 
 	<ui:style>
-	.search {
-		display: flex;
-		justify-content: space-between;
-		min-height: 600px;
-	}
 	
-	.content {
-		width: 100%;
-		padding: 40px;
-	}
-	
-	.sidebar {
-		background-color: #eee;
-		padding: 40px;
-		width: 200px;
-	}
-	
-	.sidebar-title {
-		margin-bottom: 10px;
-	}
-	
-	.sidebar-group {
-		margin-bottom: 10px;
-	}
-	
-	.action {
-		width: 100%;
-		margin-bottom: 10px;
-	}
-	
-	.footer {
-		clear: both;
-	}
 	</ui:style>
 
-	<g:FlowPanel styleName="wui-management-user" addStyleNames="{style.search}">
-		<g:FlowPanel styleName="layout" addStyleNames="{style.content}">
-			<g:Label styleName="h1">Users and groups</g:Label>
+	<g:FlowPanel styleName="wui-management-user" addStyleNames="wrapper skip_padding">
+		<g:FlowPanel addStyleNames="row full_width skip_padding">
+			<g:FlowPanel addStyleNames="col_10 content">
+				<g:Label styleName="h1">User</g:Label>
+				<u:UserDataPanel ui:field="userDataPanel"/>
+			</g:FlowPanel>
 
-		</g:FlowPanel>
+			<g:FlowPanel addStyleNames="col_2 last sidebar">
+				<g:FlowPanel>
+					<g:Label addStyleNames="h4">
+						<ui:msg>Actions</ui:msg>
+					</g:Label>
+					<g:Button addStyleNames="btn btn-play" ui:field="buttonApply">
+						<ui:text from='{constants.editUserApply}' />
+					</g:Button>
+					<g:Button addStyleNames="btn btn-check" ui:field="buttonDeActivate"
+						enabled="false">(De)Activate</g:Button>
+					<g:Button addStyleNames="btn btn-ban" ui:field="buttonRemove"
+						enabled="false">Remove</g:Button>
+					<g:Button addStyleNames="btn btn-times-circle" ui:field="buttonCancel">
+						<ui:text from='{constants.editUserCancel}' />
+					</g:Button>
 
-		<g:FlowPanel styleName="{style.sidebar}">
-			<g:FlowPanel styleName="{style.sidebar-group}">
-				<g:Label addStyleNames="h2 {style.sidebar-title}">
-					<ui:msg>Actions</ui:msg>
-				</g:Label>
-				<g:Button addStyleNames="btn btn-play {style.action}"
-					ui:field="buttonApply">{constants.editUserApply}</g:Button>
-				<g:Button addStyleNames="btn btn-times-circle {style.action}"
-					ui:field="buttonCancel">{constants.editUserCancel}</g:Button>
-				<g:Button addStyleNames="btn btn-check {style.action}"
-					ui:field="buttonEdit" enabled="false">Edit</g:Button>
-				<g:Button addStyleNames="btn btn-check {style.action}"
-					ui:field="buttonDeActivate" enabled="false">(De)Activate</g:Button>
-				<g:Button addStyleNames="btn btn-ban {style.action}"
-					ui:field="buttonRemove" enabled="false">Remove</g:Button>
-
+				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>
-		<g:FlowPanel styleName="{style.footer}" />
 	</g:FlowPanel>
 </ui:UiBinder>

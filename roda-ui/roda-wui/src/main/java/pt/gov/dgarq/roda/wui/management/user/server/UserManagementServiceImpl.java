@@ -1,6 +1,7 @@
 package pt.gov.dgarq.roda.wui.management.user.server;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import org.apache.log4j.Logger;
@@ -29,7 +30,6 @@ import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.RODAMember;
 import pt.gov.dgarq.roda.core.data.v2.RodaGroup;
 import pt.gov.dgarq.roda.core.data.v2.RodaUser;
-import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.wui.common.client.GenericException;
 import pt.gov.dgarq.roda.wui.common.client.PrintReportException;
@@ -76,6 +76,12 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   public RodaGroup getGroup(String groupname) throws AuthorizationDeniedException, GenericException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     return UserManagement.retrieveGroup(user, groupname);
+  }
+
+  @Override
+  public List<Group> listAllGroups() throws AuthorizationDeniedException, GenericException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    return UserManagement.listAllGroups(user);
   }
 
   @Override
@@ -168,9 +174,9 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
       Date start = new Date();
       UserUtility.getLdapUtility().modifyGroup(group);
       long duration = new Date().getTime() - start.getTime();
-      LogUtility
-        .registerAction(UserUtility.getClientUser(getThreadLocalRequest().getSession()), "UM.editGroup", new String[] {
-          "group", group.toString()}, "User %username% called method UM.editGroup(" + group + ")", duration);
+      LogUtility.registerAction(UserUtility.getClientUser(getThreadLocalRequest().getSession()), "UM.editGroup",
+        new String[] {"group", group.toString()}, "User %username% called method UM.editGroup(" + group + ")",
+        duration);
     } catch (LdapUtilityException e) {
       throw new RODAException(e.getMessage(), e) {
       };

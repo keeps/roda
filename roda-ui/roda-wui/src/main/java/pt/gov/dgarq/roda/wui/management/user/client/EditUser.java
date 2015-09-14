@@ -3,10 +3,10 @@
  */
 package pt.gov.dgarq.roda.wui.management.user.client;
 
-import java.util.Set;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -87,9 +87,10 @@ public class EditUser extends Composite {
   @UiField
   Button buttonCancel;
 
-  private final UserDataPanel userDataPanel;
+  @UiField(provided = true)
+  UserDataPanel userDataPanel;
 
-  private final PermissionsPanel permissionsPanel;
+  // private final PermissionsPanel permissionsPanel;
 
   /**
    * Create a new panel to edit a user
@@ -100,27 +101,28 @@ public class EditUser extends Composite {
   public EditUser(User user) {
     this.user = user;
 
+    this.userDataPanel = new UserDataPanel(true, true, true);
+    this.userDataPanel.setUser(user);
+    // this.permissionsPanel = new PermissionsPanel();
     initWidget(uiBinder.createAndBindUi(this));
-
-    this.userDataPanel = new UserDataPanel(false, true, true);
-    this.permissionsPanel = new PermissionsPanel();
 
     buttonApply.setEnabled(false);
 
-    // userDataPanel.setUsernameReadOnly(true);
-    // userDataPanel.addChangeListener(new ChangeListener() {
-    //
-    // public void onChange(Widget sender) {
-    // buttonApply.setEnabled(userDataPanel.isValid());
-    // }
-    //
-    // });
+    userDataPanel.setUsernameReadOnly(true);
+
+    userDataPanel.addValueChangeHandler(new ValueChangeHandler<User>() {
+
+      @Override
+      public void onValueChange(ValueChangeEvent<User> event) {
+        buttonApply.setEnabled(userDataPanel.isValid());
+      }
+    });
 
     // permissionsPanel.addChangeListener(new ChangeListener() {
     // public void onChange(Widget sender) {
     // apply.setEnabled(userDataPanel.isValid());
     // }
-    // });
+    // // });
 
     // this.addTab(userDataPanel, constants.dataTabTitle());
     // this.addTab(permissionsPanel, constants.permissionsTabTitle());
@@ -142,8 +144,6 @@ public class EditUser extends Composite {
     //
     // this.selectTab(0);
 
-    this.init();
-
     // getTabPanel().addStyleName("office-edit-user-tabpanel");
   }
 
@@ -152,8 +152,8 @@ public class EditUser extends Composite {
     final User user = userDataPanel.getUser();
     final String password = userDataPanel.getPassword();
 
-    final Set<String> specialroles = permissionsPanel.getDirectRoles();
-    user.setDirectRoles(specialroles);
+    // final Set<String> specialroles = permissionsPanel.getDirectRoles();
+    // user.setDirectRoles(specialroles);
 
     UserManagementService.Util.getInstance().editUser(user, password, new AsyncCallback<Void>() {
 
@@ -183,27 +183,6 @@ public class EditUser extends Composite {
 
   private void cancel() {
     History.newItem(MemberManagement.RESOLVER.getHistoryPath());
-  }
-
-  private void init() {
-    // userDataPanel.setUser(user);
-    // userDataPanel.setVisible(true);
-
-    // UserManagementService.Util.getInstance().getUserDirectRoles(user.getName(),
-    // new AsyncCallback<Set<String>>() {
-    //
-    // public void onFailure(Throwable caught) {
-    // logger.error("Error while getting " + EditUser.this.user.getName() + "
-    // roles", caught);
-    // }
-    //
-    // public void onSuccess(Set<String> directRoles) {
-    // permissionsPanel.checkPermissions(directRoles, false);
-    // permissionsPanel.setEnabled(true);
-    // }
-    //
-    // });
-
   }
 
 }

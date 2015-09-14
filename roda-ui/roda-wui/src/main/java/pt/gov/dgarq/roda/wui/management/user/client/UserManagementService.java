@@ -3,6 +3,8 @@
  */
 package pt.gov.dgarq.roda.wui.management.user.client;
 
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
@@ -67,6 +69,8 @@ public interface UserManagementService extends RemoteService {
    * @throws RODAException
    */
   public RodaGroup getGroup(String groupname) throws RODAException;
+
+  public List<Group> listAllGroups() throws AuthorizationDeniedException, GenericException;
 
   /**
    * Get a user

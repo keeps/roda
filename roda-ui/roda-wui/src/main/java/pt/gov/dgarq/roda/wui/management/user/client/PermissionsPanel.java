@@ -12,29 +12,28 @@ import java.util.MissingResourceException;
 import java.util.Set;
 import java.util.Vector;
 
-import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
-import pt.gov.dgarq.roda.wui.common.client.UserLogin;
-import pt.gov.dgarq.roda.wui.common.client.widgets.LoadingPopup;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.ClickListener;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SourcesChangeEvents;
 import com.google.gwt.user.client.ui.SourcesClickEvents;
-import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.UserManagementConstants;
+import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
+import pt.gov.dgarq.roda.wui.common.client.UserLogin;
+import pt.gov.dgarq.roda.wui.common.client.widgets.LoadingPopup;
 
 /**
  * @author Luis Faria
  * 
  */
-public class PermissionsPanel extends VerticalPanel implements SourcesChangeEvents {
+public class PermissionsPanel extends FlowPanel implements SourcesChangeEvents {
 
   private final List<ChangeListener> changelisteners;
 
@@ -152,8 +151,8 @@ public class PermissionsPanel extends VerticalPanel implements SourcesChangeEven
   private final LoadingPopup loading;
 
   /**
-	 * 
-	 */
+   * 
+   */
   public PermissionsPanel() {
 
     this.changelisteners = new Vector<ChangeListener>();

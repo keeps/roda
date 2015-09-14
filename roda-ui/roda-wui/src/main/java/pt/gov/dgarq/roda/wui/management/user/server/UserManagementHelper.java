@@ -1,6 +1,10 @@
 package pt.gov.dgarq.roda.wui.management.user.server;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
+import org.roda.common.LdapUtilityException;
+import org.roda.common.UserUtility;
 import org.roda.index.IndexServiceException;
 
 import pt.gov.dgarq.roda.common.RodaCoreFactory;
@@ -13,6 +17,8 @@ import pt.gov.dgarq.roda.core.data.v2.Group;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.RODAMember;
+import pt.gov.dgarq.roda.core.data.v2.RodaGroup;
+import pt.gov.dgarq.roda.core.data.v2.RodaUser;
 import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.wui.common.client.GenericException;
 
@@ -68,15 +74,24 @@ public class UserManagementHelper {
     return ret;
   }
 
-  protected static User retrieveUser(String username) throws AuthorizationDeniedException, GenericException {
-    User ret;
+  protected static RodaUser retrieveRodaUser(String username) throws GenericException {
+    RodaUser ret;
     try {
-      ret = RodaCoreFactory.getIndexService().retrieve(User.class, username);
+      ret = RodaCoreFactory.getIndexService().retrieve(RodaUser.class, username);
     } catch (IndexServiceException e) {
       LOGGER.error("Error getting user", e);
       throw new GenericException("Error getting user: " + e.getMessage());
     }
     return ret;
+  }
+
+  protected static User retrieveUser(String username) throws GenericException {
+    try {
+      return UserUtility.getLdapUtility().getUser(username);
+    } catch (LdapUtilityException e) {
+      LOGGER.error("Error getting user", e);
+      throw new GenericException("Error getting user: " + e.getMessage());
+    }
   }
 
   protected static Group retrieveGroup(String groupname) throws AuthorizationDeniedException, GenericException {
@@ -88,6 +103,15 @@ public class UserManagementHelper {
       throw new GenericException("Error getting group: " + e.getMessage());
     }
     return ret;
+  }
+
+  protected static List<Group> listAllGroups() throws GenericException {
+    try {
+      return UserUtility.getLdapUtility().getGroups(null);
+    } catch (LdapUtilityException e) {
+      LOGGER.error("Error getting user", e);
+      throw new GenericException("Error getting user: " + e.getMessage());
+    }
   }
 
 }

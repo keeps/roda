@@ -1,0 +1,142 @@
+package pt.gov.dgarq.roda.wui.management.user.client;
+
+import com.google.gwt.core.shared.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyPressEvent;
+import com.google.gwt.event.dom.client.KeyPressHandler;
+import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.DockPanel;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.PasswordTextBox;
+import com.google.gwt.user.client.ui.SimplePanel;
+
+import config.i18n.client.UserManagementConstants;
+
+public class PasswordPanel extends SimplePanel implements HasValueChangeHandlers<String> {
+
+  private static UserManagementConstants constants = (UserManagementConstants) GWT
+    .create(UserManagementConstants.class);
+
+  private DockPanel editLayout;
+
+  private PasswordTextBox editPassword;
+
+  private PasswordTextBox editPasswordRepeat;
+
+  private Label editPasswordNote;
+
+  private Button editButton;
+
+  private boolean buttonMode;
+
+  private boolean changed;
+
+  public PasswordPanel(boolean editmode) {
+    changed = false;
+    editLayout = new DockPanel();
+    editPassword = new PasswordTextBox();
+    editPasswordRepeat = new PasswordTextBox();
+    editPasswordNote = new Label(constants.passwordNote());
+
+    editLayout.add(editPassword, DockPanel.CENTER);
+    editLayout.add(editPasswordRepeat, DockPanel.EAST);
+    editLayout.add(editPasswordNote, DockPanel.SOUTH);
+
+    editButton = new Button(constants.userDataChangePassword());
+    editButton.addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        setWidget(editLayout);
+        buttonMode = false;
+        onChange();
+      }
+    });
+
+    if (editmode) {
+      setWidget(editButton);
+      buttonMode = true;
+    } else {
+      setWidget(editLayout);
+      buttonMode = false;
+    }
+
+    KeyPressHandler handler = new KeyPressHandler() {
+
+      @Override
+      public void onKeyPress(KeyPressEvent event) {
+        onChange();
+      }
+    };
+
+    editPassword.addKeyPressHandler(handler);
+    editPasswordRepeat.addKeyPressHandler(handler);
+
+    this.addStyleName("password");
+    editPassword.addStyleName("password-input");
+    editPassword.addStyleName("form-textbox");
+    editPasswordRepeat.addStyleName("passwordinput-repeat");
+    editPasswordRepeat.addStyleName("form-textbox");
+    editPasswordNote.addStyleName("password-note");
+    editButton.addStyleName("password-button");
+    editButton.addStyleName("btn");
+    editButton.addStyleName("btn-play");
+
+  }
+
+  public boolean isChanged() {
+    return changed;
+  }
+
+  public boolean isValid() {
+    boolean valid = true;
+    if (buttonMode) {
+      valid = true;
+    } else if (!editPassword.getValue().equals(editPasswordRepeat.getValue())) {
+      valid = false;
+    } else if (editPassword.getValue().length() < 6) {
+      valid = false;
+    }
+
+    if (!valid) {
+      editPassword.addStyleName("isWrong");
+      editPasswordRepeat.addStyleName("isWrong");
+    } else {
+      editPassword.removeStyleName("isWrong");
+      editPasswordRepeat.removeStyleName("isWrong");
+    }
+
+    return valid;
+  }
+
+  protected void onChange() {
+    changed = true;
+    ValueChangeEvent.fire(this, getValue());
+  }
+
+  /**
+   * Get the new password
+   * 
+   * @return the new password or null if none set
+   * 
+   */
+  public String getValue() {
+    return changed && isValid() ? editPassword.getText() : null;
+  }
+
+  public void clear() {
+    editPassword.setText("");
+    editPasswordRepeat.setText("");
+  }
+
+  @Override
+  public HandlerRegistration addValueChangeHandler(ValueChangeHandler<String> handler) {
+    return addHandler(handler, ValueChangeEvent.getType());
+  }
+
+}

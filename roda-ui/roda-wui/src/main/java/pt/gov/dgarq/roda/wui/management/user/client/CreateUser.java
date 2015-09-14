@@ -12,6 +12,8 @@ import pt.gov.dgarq.roda.wui.common.client.widgets.WUIWindow;
 import java.util.Set;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.ChangeListener;
@@ -55,7 +57,7 @@ public class CreateUser extends WUIWindow {
     create.addClickListener(new ClickListener() {
 
       public void onClick(Widget sender) {
-        final User user = userDataPanel.getUser();
+        final User user = userDataPanel.getValue();
         final String password = userDataPanel.getPassword();
         final Set<String> specialroles = permissionsPanel.getDirectRoles();
         user.setDirectRoles(specialroles);
@@ -100,12 +102,12 @@ public class CreateUser extends WUIWindow {
 
     create.setEnabled(userDataPanel.isValid());
 
-    userDataPanel.addChangeListener(new ChangeListener() {
+    userDataPanel.addValueChangeHandler(new ValueChangeHandler<User>() {
 
-      public void onChange(Widget sender) {
+      @Override
+      public void onValueChange(ValueChangeEvent<User> event) {
         create.setEnabled(userDataPanel.isValid());
       }
-
     });
 
     this.addTab(userDataPanel, constants.dataTabTitle());

@@ -4,251 +4,108 @@
 package pt.gov.dgarq.roda.wui.management.user.client;
 
 import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.MissingResourceException;
 import java.util.Set;
-import java.util.Vector;
-
-import pt.gov.dgarq.roda.core.data.v2.User;
-import pt.gov.dgarq.roda.wui.common.client.widgets.DatePicker;
-import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.ui.ChangeListener;
-import com.google.gwt.user.client.ui.ClickListener;
-import com.google.gwt.user.client.ui.DockPanel;
-import com.google.gwt.user.client.ui.Grid;
-import com.google.gwt.user.client.ui.HasAlignment;
-import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.KeyboardListener;
-import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyPressEvent;
+import com.google.gwt.event.dom.client.KeyPressHandler;
+import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
-import com.google.gwt.user.client.ui.PasswordTextBox;
-import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.SourcesChangeEvents;
 import com.google.gwt.user.client.ui.SuggestBox;
-import com.google.gwt.user.client.ui.SuggestionEvent;
-import com.google.gwt.user.client.ui.SuggestionHandler;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.datepicker.client.DateBox;
+import com.google.gwt.user.datepicker.client.DateBox.DefaultFormat;
 
 import config.i18n.client.UserManagementConstants;
+import pt.gov.dgarq.roda.core.data.v2.User;
 
 /**
  * @author Luis Faria
  * 
  */
-public class UserDataPanel extends VerticalPanel implements SourcesChangeEvents {
+public class UserDataPanel extends Composite implements HasValueChangeHandlers<User> {
+
+  interface MyUiBinder extends UiBinder<Widget, UserDataPanel> {
+  }
+
+  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
   private static UserManagementConstants constants = (UserManagementConstants) GWT
     .create(UserManagementConstants.class);
 
-  private class PasswordPanel extends SimplePanel implements SourcesChangeEvents {
+  @UiField
+  TextBox username;
 
-    private DockPanel editLayout;
+  @UiField(provided = true)
+  PasswordPanel password;
 
-    private PasswordTextBox editPassword;
+  @UiField
+  TextBox fullname;
 
-    private PasswordTextBox editPasswordRepeat;
+  @UiField
+  ListBox businessCategory;
 
-    private Label editPasswordNote;
+  @UiField
+  ListBox idType;
 
-    private WUIButton editButton;
+  @UiField
+  TextBox idNumber;
 
-    private boolean buttonMode;
+  @UiField
+  DateBox idDate;
 
-    private boolean changed;
+  @UiField
+  TextBox idLocality;
 
-    private List<ChangeListener> changeListeners;
+  @UiField(provided = true)
+  SuggestBox nationality;
 
-    public PasswordPanel(boolean editmode) {
-      changed = false;
-      changeListeners = new Vector<ChangeListener>();
-      editLayout = new DockPanel();
-      editPassword = new PasswordTextBox();
-      editPasswordRepeat = new PasswordTextBox();
-      editPasswordNote = new Label(constants.passwordNote());
+  @UiField
+  TextBox nif;
 
-      editLayout.add(editPassword, DockPanel.CENTER);
-      editLayout.add(editPasswordRepeat, DockPanel.EAST);
-      editLayout.add(editPasswordNote, DockPanel.SOUTH);
+  @UiField
+  TextBox email;
 
-      editButton = new WUIButton(constants.userDataChangePassword(), WUIButton.Left.ROUND,
-        WUIButton.Right.ARROW_FORWARD);
+  @UiField
+  TextArea postalAddress;
 
-      editButton.addClickListener(new ClickListener() {
+  @UiField
+  TextBox postalCode;
 
-        public void onClick(Widget sender) {
-          setWidget(editLayout);
-          buttonMode = false;
-          onChange();
-        }
+  @UiField
+  TextBox locality;
 
-      });
+  @UiField(provided = true)
+  SuggestBox country;
 
-      if (editmode) {
-        setWidget(editButton);
-        buttonMode = true;
-      } else {
-        setWidget(editLayout);
-        buttonMode = false;
-      }
+  @UiField
+  TextBox phoneNumber;
 
-      KeyboardListener listener = new KeyboardListener() {
+  @UiField
+  TextBox fax;
 
-        public void onKeyDown(Widget sender, char keyCode, int modifiers) {
-        }
+  @UiField(provided = true)
+  GroupSelect groupSelect;
 
-        public void onKeyPress(Widget sender, char keyCode, int modifiers) {
-        }
-
-        public void onKeyUp(Widget sender, char keyCode, int modifiers) {
-          PasswordPanel.this.onChange();
-        }
-      };
-      editPassword.addKeyboardListener(listener);
-      editPasswordRepeat.addKeyboardListener(listener);
-
-      this.addStyleName("password");
-      editPassword.addStyleName("password-input");
-      editPasswordRepeat.addStyleName("password-input-repeat");
-      editPasswordNote.addStyleName("password-note");
-      editButton.addStyleName("password-button");
-
-    }
-
-    public boolean isChanged() {
-      return changed;
-    }
-
-    public boolean isValid() {
-      boolean valid = true;
-      if (buttonMode) {
-        valid = true;
-      } else if (!editPassword.getText().equals(editPasswordRepeat.getText())) {
-        valid = false;
-      } else if (editPassword.getText().length() < 6) {
-        valid = false;
-      }
-
-      if (!valid) {
-        editPassword.addStyleName("isWrong");
-        editPasswordRepeat.addStyleName("isWrong");
-      } else {
-        editPassword.removeStyleName("isWrong");
-        editPasswordRepeat.removeStyleName("isWrong");
-      }
-
-      return valid;
-    }
-
-    public void addChangeListener(ChangeListener listener) {
-      changeListeners.add(listener);
-    }
-
-    public void removeChangeListener(ChangeListener listener) {
-      changeListeners.remove(listener);
-    }
-
-    protected void onChange() {
-      changed = true;
-      for (ChangeListener listener : changeListeners) {
-        listener.onChange(this);
-      }
-    }
-
-    /**
-     * Get the new password
-     * 
-     * @return the new password or null if none set
-     * 
-     */
-    public String getPassword() {
-      return changed && isValid() ? editPassword.getText() : null;
-    }
-
-    public void clear() {
-      editPassword.setText("");
-      editPasswordRepeat.setText("");
-    }
-
-  }
-
-  private final List<ChangeListener> changeListeners;
-
-  private final TextBox username;
-
-  private final PasswordPanel password;
-
-  private final TextBox fullname;
-
-  private final ListBox businessCategory;
-  // memberGroups, new AsyncCallback<Set<String>>() {
-  //
-  // public void onFailure(Throwable caught) {
-  // loading.hide();
-  // logger.error("Error while getting member"
-  // + "groups permissions", caught);
-  // }
-  //
-  // public void onSuccess(Set<String> inheritedRoles) {
-  // logger.info("got " + inheritedRoles.size()
-  // + " permissions to add");
-  //
-  // // unlock all
-  // for (Permission p : permissions) {
-  // p.setLocked(false);
-  //
-  // }
-  // // Lock inherited roles
-  // checkPermissions(inheritedRoles, true);
-  //
-  // PermissionsPanel.this.setEnabled(true);
-  // loading.hide();
-  // }
-  //
-  // });
-
-  private final ListBox idType;
-
-  private final TextBox idNumber;
-
-  private final DatePicker idDate;
-
-  private final TextBox idLocality;
-
-  private final SuggestBox nationality;
-
-  private final List<String> nationalityList;
-
-  private final MultiWordSuggestOracle nationalityOracle;
-
-  private final TextBox nif;
-
-  private final TextBox email;
-
-  private final TextArea postalAddress;
-
-  private final TextBox postalCode;
-
-  private final TextBox locality;
-
-  private final SuggestBox country;
-
-  private final List<String> countryList;
-
-  private final MultiWordSuggestOracle countryOracle;
-
-  private final TextBox phoneNumber;
-
-  private final TextBox fax;
-
-  private final Label userdataNote;
-
-  // private GroupSelect groupSelect;
+  @UiField
+  PermissionsPanel permissionsPanel;
 
   private boolean enableGroupSelect;
 
@@ -275,40 +132,35 @@ public class UserDataPanel extends VerticalPanel implements SourcesChangeEvents 
    * @param enableGroupSelect
    */
   public UserDataPanel(boolean visible, boolean editmode, boolean enableGroupSelect) {
-    this.editmode = editmode;
-    super.setVisible(visible);
-    this.changeListeners = new Vector<ChangeListener>();
-    this.enableGroupSelect = enableGroupSelect;
 
-    HorizontalPanel loginAttributes = new HorizontalPanel();
-    this.add(loginAttributes);
-
-    username = new TextBox();
-    username.setReadOnly(editmode);
     password = new PasswordPanel(editmode);
 
-    loginAttributes.add(concatInPanel(constants.username(), username));
-    VerticalPanel passwordpanel = concatInPanel(constants.password(), password);
-    loginAttributes.add(passwordpanel);
+    MultiWordSuggestOracle nationalityOracle = new MultiWordSuggestOracle();
+    List<String> nationalityList = Arrays.asList(constants.nationalityList());
+    nationalityOracle.addAll(nationalityList);
+    nationality = new SuggestBox(nationalityOracle);
 
-    Grid personalAttributes = new Grid(1, 2);
-    VerticalPanel leftColumn = new VerticalPanel();
-    VerticalPanel rightColumn = new VerticalPanel();
-    this.add(personalAttributes);
-    personalAttributes.setWidget(0, 0, leftColumn);
-    personalAttributes.setWidget(0, 1, rightColumn);
+    MultiWordSuggestOracle countryOracle = new MultiWordSuggestOracle();
+    List<String> countryList = Arrays.asList(constants.countryList());
+    countryOracle.addAll(countryList);
+    country = new SuggestBox(countryOracle);
 
-    personalAttributes.getCellFormatter().setVerticalAlignment(0, 0, HasAlignment.ALIGN_TOP);
-    personalAttributes.getCellFormatter().setVerticalAlignment(0, 1, HasAlignment.ALIGN_TOP);
+    groupSelect = new GroupSelect(enableGroupSelect);
 
-    fullname = new TextBox();
-    businessCategory = new ListBox();
+    // TODO add change handler
+
+    initWidget(uiBinder.createAndBindUi(this));
+
+    this.editmode = editmode;
+    super.setVisible(visible);
+    this.enableGroupSelect = enableGroupSelect;
+
+    username.setReadOnly(editmode);
     businessCategory.setVisibleItemCount(1);
     for (String function : constants.getJobFunctions()) {
       businessCategory.addItem(function);
     }
 
-    idType = new ListBox();
     idType.setVisibleItemCount(1);
     for (String type : User.ID_TYPES) {
       String typeText;
@@ -320,192 +172,90 @@ public class UserDataPanel extends VerticalPanel implements SourcesChangeEvents 
       idType.addItem(typeText, type);
     }
 
-    idNumber = new TextBox();
-    HorizontalPanel idTypeAndNumber = new HorizontalPanel();
-    idTypeAndNumber.add(idType);
-    idTypeAndNumber.add(idNumber);
+    DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
+    idDate.setFormat(dateFormat);
+    idDate.getDatePicker().setYearArrowsVisible(true);
+    idDate.setFireNullValues(true);
 
-    idDate = new DatePicker();
-    idLocality = new TextBox();
-    HorizontalPanel idDateAndLocality = new HorizontalPanel();
-    idDateAndLocality.add(idDate);
-    idDateAndLocality.add(idLocality);
+    // username.setFocus(true);
 
-    nif = new TextBox();
+    ValueChangeHandler<String> valueChangedHandler = new ValueChangeHandler<String>() {
 
-    nationalityOracle = new MultiWordSuggestOracle();
-    nationalityList = Arrays.asList(constants.nationalityList());
-    nationalityOracle.addAll(nationalityList);
-    nationality = new SuggestBox(nationalityOracle);
-
-    postalAddress = new TextArea();
-    postalCode = new TextBox();
-    locality = new TextBox();
-    HorizontalPanel postalCodeAndLocality = new HorizontalPanel();
-    postalCodeAndLocality.add(postalCode);
-    postalCodeAndLocality.add(locality);
-
-    countryOracle = new MultiWordSuggestOracle();
-    countryList = Arrays.asList(constants.countryList());
-    countryOracle.addAll(countryList);
-    country = new SuggestBox(countryOracle);
-
-    email = new TextBox();
-    phoneNumber = new TextBox();
-    fax = new TextBox();
-
-    leftColumn.add(concatInPanel(constants.fullname(), fullname));
-    leftColumn.add(concatInPanel(constants.jobFunction(), businessCategory));
-
-    leftColumn.add(concatInPanel(constants.idTypeAndNumber(), idTypeAndNumber));
-    leftColumn.add(concatInPanel(constants.idDateAndLocality(), idDateAndLocality));
-
-    leftColumn.add(concatInPanel(constants.nationality(), nationality));
-
-    leftColumn.add(concatInPanel(constants.nif(), nif));
-
-    rightColumn.add(concatInPanel(constants.email(), email));
-
-    rightColumn.add(concatInPanel(constants.address(), postalAddress));
-
-    rightColumn.add(concatInPanel(constants.postalCodeAndLocality(), postalCodeAndLocality));
-
-    rightColumn.add(concatInPanel(constants.country(), country));
-    rightColumn.add(concatInPanel(constants.phonenumber(), phoneNumber));
-    rightColumn.add(concatInPanel(constants.fax(), fax));
-
-    if (enableGroupSelect) {
-      // groupSelect = new GroupSelect(visible);
-      // this.add(groupSelect);
-      //
-      // groupSelect.addChangeListener(new ChangeListener() {
-      //
-      // public void onChange(Widget sender) {
-      // UserDataPanel.this.onChange(sender);
-      // }
-      //
-      // });
-    }
-
-    userdataNote = new Label(constants.userDataNote());
-    this.add(userdataNote);
-
-    this.addStyleName("wui-user-data");
-
-    loginAttributes.addStyleName("wui-user-data-loginAttributes");
-    personalAttributes.addStyleName("wui-user-data-personalPanel");
-
-    username.setFocus(true);
-
-    KeyboardListener keyboardListener = new KeyboardListener() {
-
-      public void onKeyDown(Widget sender, char keyCode, int modifiers) {
+      @Override
+      public void onValueChange(ValueChangeEvent<String> event) {
+        onChange();
       }
-
-      public void onKeyPress(Widget sender, char keyCode, int modifiers) {
-      }
-
-      public void onKeyUp(Widget sender, char keyCode, int modifiers) {
-        UserDataPanel.this.onChange(sender);
-      }
-
     };
 
-    ChangeListener changeListener = new ChangeListener() {
+    ChangeHandler changeHandler = new ChangeHandler() {
 
-      public void onChange(Widget sender) {
-        UserDataPanel.this.onChange(sender);
+      @Override
+      public void onChange(ChangeEvent event) {
+        UserDataPanel.this.onChange();
       }
-
     };
 
-    SuggestionHandler suggestionHandler = new SuggestionHandler() {
+    username.addKeyPressHandler(new KeyPressHandler() {
 
-      public void onSuggestionSelected(SuggestionEvent event) {
-        UserDataPanel.this.onChange(null);
-      }
+      @Override
+      public void onKeyPress(KeyPressEvent event) {
+        char keyCode = event.getCharCode();
 
-    };
-
-    username.addKeyboardListener(new KeyboardListener() {
-
-      public void onKeyDown(Widget sender, char keyCode, int modifiers) {
-      }
-
-      public void onKeyPress(Widget sender, char keyCode, int modifiers) {
         if (!(keyCode >= '0' && keyCode <= '9') && !(keyCode >= 'A' && keyCode <= 'Z')
-          && !(keyCode >= 'a' && keyCode <= 'z') && keyCode != '.' && keyCode != '_' && (keyCode != (char) KEY_TAB)
-          && (keyCode != (char) KEY_BACKSPACE) && (keyCode != (char) KEY_DELETE) && (keyCode != (char) KEY_ENTER)
-          && (keyCode != (char) KEY_HOME) && (keyCode != (char) KEY_END) && (keyCode != (char) KEY_LEFT)
-          && (keyCode != (char) KEY_UP) && (keyCode != (char) KEY_RIGHT) && (keyCode != (char) KEY_DOWN)) {
-          ((TextBox) sender).cancelKey();
+          && !(keyCode >= 'a' && keyCode <= 'z') && keyCode != '.' && keyCode != '_'
+          && (keyCode != (char) KeyCodes.KEY_TAB) && (keyCode != (char) KeyCodes.KEY_BACKSPACE)
+          && (keyCode != (char) KeyCodes.KEY_DELETE) && (keyCode != (char) KeyCodes.KEY_ENTER)
+          && (keyCode != (char) KeyCodes.KEY_HOME) && (keyCode != (char) KeyCodes.KEY_END)
+          && (keyCode != (char) KeyCodes.KEY_LEFT) && (keyCode != (char) KeyCodes.KEY_UP)
+          && (keyCode != (char) KeyCodes.KEY_RIGHT) && (keyCode != (char) KeyCodes.KEY_DOWN)) {
+          ((TextBox) event.getSource()).cancelKey();
         }
-
       }
-
-      public void onKeyUp(Widget sender, char keyCode, int modifiers) {
-      }
-
     });
+    username.addChangeHandler(changeHandler);
+    password.addValueChangeHandler(valueChangedHandler);
+    fullname.addChangeHandler(changeHandler);
+    businessCategory.addChangeHandler(changeHandler);
+    idType.addChangeHandler(changeHandler);
+    idNumber.addChangeHandler(changeHandler);
+    idDate.addValueChangeHandler(new ValueChangeHandler<Date>() {
 
-    username.addKeyboardListener(keyboardListener);
-    password.addChangeListener(changeListener);
+      @Override
+      public void onValueChange(ValueChangeEvent<Date> event) {
+        onChange();
+      }
+    });
+    idLocality.addChangeHandler(changeHandler);
+    nationality.addValueChangeHandler(valueChangedHandler);
+    nif.addChangeHandler(changeHandler);
 
-    fullname.addKeyboardListener(keyboardListener);
-    businessCategory.addChangeListener(changeListener);
-    idType.addChangeListener(changeListener);
-    idNumber.addKeyboardListener(keyboardListener);
-    idDate.addChangeListener(changeListener);
-    idLocality.addKeyboardListener(keyboardListener);
-    nationality.addKeyboardListener(keyboardListener);
-    nationality.addEventHandler(suggestionHandler);
-    nif.addKeyboardListener(keyboardListener);
-
-    email.addKeyboardListener(keyboardListener);
-    postalAddress.addKeyboardListener(keyboardListener);
-    postalCode.addKeyboardListener(keyboardListener);
-    locality.addKeyboardListener(keyboardListener);
-    country.addKeyboardListener(keyboardListener);
-    country.addEventHandler(suggestionHandler);
-    phoneNumber.addKeyboardListener(keyboardListener);
-    fax.addKeyboardListener(keyboardListener);
-
-    postalAddress.addStyleName("postalAddress");
-    postalCode.addStyleName("postalCode");
-    locality.addStyleName("locality");
-    idLocality.addStyleName("id-locality");
-
-    userdataNote.addStyleName("wui-user-data-note");
-
-  }
-
-  private VerticalPanel concatInPanel(String title, Widget input) {
-    VerticalPanel vp = new VerticalPanel();
-    Label label = new Label(title);
-    vp.add(label);
-    vp.add(input);
-
-    vp.addStyleName("office-input-panel");
-    label.addStyleName("office-input-title");
-    input.addStyleName("office-input-widget");
-
-    return vp;
+    email.addChangeHandler(changeHandler);
+    postalAddress.addChangeHandler(changeHandler);
+    postalCode.addChangeHandler(changeHandler);
+    locality.addChangeHandler(changeHandler);
+    country.addValueChangeHandler(valueChangedHandler);
+    phoneNumber.addChangeHandler(changeHandler);
+    fax.addChangeHandler(changeHandler);
   }
 
   private int setSelected(ListBox listbox, String text) {
     int index = -1;
-    for (int i = 0; i < listbox.getItemCount(); i++) {
-      if (listbox.getValue(i).equals(text)) {
-        index = i;
-        break;
+    if (text != null) {
+      for (int i = 0; i < listbox.getItemCount(); i++) {
+        if (listbox.getValue(i).equals(text)) {
+          index = i;
+          break;
+        }
       }
-    }
-    if (index >= 0) {
-      listbox.setSelectedIndex(index);
+      if (index >= 0) {
+        listbox.setSelectedIndex(index);
+      } else {
+        listbox.addItem(text);
+        index = listbox.getItemCount() - 1;
+        listbox.setSelectedIndex(index);
+      }
     } else {
-      listbox.addItem(text);
-      index = listbox.getItemCount() - 1;
-      listbox.setSelectedIndex(index);
+      listbox.setSelectedIndex(-1);
     }
     return index;
   }
@@ -519,10 +269,9 @@ public class UserDataPanel extends VerticalPanel implements SourcesChangeEvents 
     this.username.setText(user.getName());
     this.fullname.setText(user.getFullName());
     setSelected(businessCategory, user.getBusinessCategory());
-
     setSelected(idType, user.getIdDocumentType());
     this.idNumber.setText(user.getIdDocument());
-    this.idDate.setDate(user.getIdDocumentDate());
+    this.idDate.setValue(user.getIdDocumentDate());
     this.idLocality.setText(user.getIdDocumentLocation());
     this.nationality.setText(user.getBirthCountry());
     this.nif.setText(user.getFinanceIdentificationNumber());
@@ -536,6 +285,17 @@ public class UserDataPanel extends VerticalPanel implements SourcesChangeEvents 
     this.fax.setText(user.getFax());
 
     this.setMemberGroups(user.getAllGroups());
+    this.setPermissions(user.getDirectRoles(), user.getAllRoles());
+
+  }
+
+  private void setPermissions(Set<String> directRoles, Set<String> allRoles) {
+
+    Set<String> indirectRoles = new HashSet<String>(allRoles);
+    indirectRoles.removeAll(directRoles);
+
+    permissionsPanel.checkPermissions(directRoles, false);
+    permissionsPanel.checkPermissions(indirectRoles, true);
   }
 
   /**
@@ -552,7 +312,7 @@ public class UserDataPanel extends VerticalPanel implements SourcesChangeEvents 
     user.setBusinessCategory(businessCategory.getValue(businessCategory.getSelectedIndex()));
     user.setIdDocumentType(idType.getValue(idType.getSelectedIndex()));
     user.setIdDocument(idNumber.getText());
-    user.setIdDocumentDate(idDate.getDate());
+    user.setIdDocumentDate(idDate.getValue());
     user.setIdDocumentLocation(idLocality.getText());
     user.setBirthCountry(nationality.getText());
     user.setFinanceIdentificationNumber(nif.getText());
@@ -572,6 +332,10 @@ public class UserDataPanel extends VerticalPanel implements SourcesChangeEvents 
     return user;
   }
 
+  public User getValue() {
+    return getUser();
+  }
+
   /**
    * Set the groups of which this user is member of
    * 
@@ -579,7 +343,7 @@ public class UserDataPanel extends VerticalPanel implements SourcesChangeEvents 
    */
   public void setMemberGroups(Set<String> groups) {
     if (enableGroupSelect) {
-      // groupSelect.setMemberGroups(groups);
+      groupSelect.setMemberGroups(groups);
     }
   }
 
@@ -589,8 +353,7 @@ public class UserDataPanel extends VerticalPanel implements SourcesChangeEvents 
    * @return a list of group names
    */
   public Set<String> getMemberGroups() {
-    // return enableGroupSelect ? groupSelect.getMemberGroups() : null;
-    return null;
+    return enableGroupSelect ? groupSelect.getMemberGroups() : null;
   }
 
   /**
@@ -599,7 +362,7 @@ public class UserDataPanel extends VerticalPanel implements SourcesChangeEvents 
    * @return the password if changed, or null if it remains the same
    */
   public String getPassword() {
-    return password.getPassword();
+    return password.getValue();
   }
 
   /**
@@ -611,19 +374,8 @@ public class UserDataPanel extends VerticalPanel implements SourcesChangeEvents 
     return password.isChanged();
   }
 
-  public void addChangeListener(ChangeListener listener) {
-    this.changeListeners.add(listener);
-
-  }
-
-  public void removeChangeListener(ChangeListener listener) {
-    this.changeListeners.remove(listener);
-  }
-
-  protected void onChange(Widget sender) {
-    for (ChangeListener listener : changeListeners) {
-      listener.onChange(sender);
-    }
+  protected void onChange() {
+    ValueChangeEvent.fire(this, getValue());
   }
 
   /**
@@ -657,7 +409,7 @@ public class UserDataPanel extends VerticalPanel implements SourcesChangeEvents 
       idNumber.removeStyleName("isWrong");
     }
 
-    idDate.setValidStyle(idDate.isValid(), "isWrong");
+    // idDate.setValidStyle(idDate.isValid(), "isWrong");
 
     if (idLocality.getText().length() == 0) {
       valid = false;
@@ -666,27 +418,27 @@ public class UserDataPanel extends VerticalPanel implements SourcesChangeEvents 
       idLocality.removeStyleName("isWrong");
     }
 
-    if (!nationalityList.contains(nationality.getText())) {
-      valid = false;
-      nationality.addStyleName("isWrong");
-    } else {
-      nationality.removeStyleName("isWrong");
-    }
+    // if (!nationalityList.contains(nationality.getText())) {
+    // valid = false;
+    // nationality.addStyleName("isWrong");
+    // } else {
+    // nationality.removeStyleName("isWrong");
+    // }
 
-    if (!email.getText().matches(
-      "^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[_A-Za-z0-9-]+)")) {
+    if (!email.getText()
+      .matches("^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[_A-Za-z0-9-]+)")) {
       valid = false;
       email.addStyleName("isWrong");
     } else {
       email.removeStyleName("isWrong");
     }
 
-    if (!countryList.contains(country.getText())) {
-      valid = false;
-      country.addStyleName("isWrong");
-    } else {
-      country.removeStyleName("isWrong");
-    }
+    // if (!countryList.contains(country.getText())) {
+    // valid = false;
+    // country.addStyleName("isWrong");
+    // } else {
+    // country.removeStyleName("isWrong");
+    // }
 
     return valid;
   }
@@ -712,7 +464,7 @@ public class UserDataPanel extends VerticalPanel implements SourcesChangeEvents 
   public void setVisible(boolean visible) {
     super.setVisible(visible);
     if (enableGroupSelect) {
-      // groupSelect.setVisible(visible);
+      groupSelect.setVisible(visible);
     }
   }
 
@@ -739,6 +491,11 @@ public class UserDataPanel extends VerticalPanel implements SourcesChangeEvents 
    */
   public boolean isEditmode() {
     return editmode;
+  }
+
+  @Override
+  public HandlerRegistration addValueChangeHandler(ValueChangeHandler<User> handler) {
+    return addHandler(handler, ValueChangeEvent.getType());
   }
 
 }
