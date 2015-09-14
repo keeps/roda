@@ -1,0 +1,48 @@
+html {
+  font-size: 62.5%;
+}
+
+body {
+  font-size: 1.5em;
+  /* currently ems cause chrome bug misinterpreting rems on body element */
+  line-height: 1.6;
+  font-weight: 400;
+  font-family: "Ubuntu", "HelveticaNeue", "Helvetica Neue", Helvetica,
+    Arial, sans-serif;
+  color: #222;
+}
+
+.representation .header {
+  font-size: 2rem;
+  display: block;
+}
+
+.representation .header:before {
+  content: '\f1b3';
+  font-family: 'FontAwesome';
+}
+
+.representation .header .identifiers {
+  font-size: 1.5rem;
+}
+.representation .header .identifiers:before {
+  content: '(';
+}
+.representation .header .identifiers:after {
+  content: ')';
+}
+
+.representation .header .identifiers .identifier .identifierType {
+  display: none;
+}
+
+.representation .identifier + .identifier:before {
+  content: ',';
+}
+
+.representation .preservationLevel {
+  color: #888;
+  display: block;
+  margin-bottom: 1rem;
+  margin-left: 3.2rem;
+}
