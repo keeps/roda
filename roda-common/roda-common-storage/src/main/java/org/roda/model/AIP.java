@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import pt.gov.dgarq.roda.core.data.RODAObjectPermissions;
+import pt.gov.dgarq.roda.core.data.v2.RODAObjectPermissions;
 
 public class AIP implements Serializable {
 
@@ -164,10 +164,10 @@ public class AIP implements Serializable {
   @Override
   public String toString() {
     return "AIP [id=" + id + ", parentId=" + parentId + ", active=" + active + ", dateCreated=" + dateCreated
-      + ", dateModified=" + dateModified + ", descriptiveMetadataIds=" + descriptiveMetadataIds
-      + ", representationIds=" + representationIds + ", preservationRepresentationObjectsIds="
-      + preservationRepresentationObjectsIds + ", preservationEventsIds=" + preservationEventsIds
-      + ", preservationFileObjectsIds=" + preservationFileObjectsIds + ", permissions=" + permissions + "]";
+      + ", dateModified=" + dateModified + ", descriptiveMetadataIds=" + descriptiveMetadataIds + ", representationIds="
+      + representationIds + ", preservationRepresentationObjectsIds=" + preservationRepresentationObjectsIds
+      + ", preservationEventsIds=" + preservationEventsIds + ", preservationFileObjectsIds="
+      + preservationFileObjectsIds + ", permissions=" + permissions + "]";
   }
 
   @Override

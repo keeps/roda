@@ -1,4 +1,4 @@
-package pt.gov.dgarq.roda.core.data;
+package pt.gov.dgarq.roda.core.data.v2;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -8,9 +8,7 @@ import java.util.Set;
 
 /**
  * @author Rui Castro
- * @deprecated use {@link pt.gov.dgarq.roda.core.data.v2.RODAObjectPermissions}
  */
-@Deprecated
 public class RODAObjectPermissions implements Serializable {
   private static final long serialVersionUID = -3534275853026959624L;
 
@@ -96,20 +94,9 @@ public class RODAObjectPermissions implements Serializable {
   /**
    * @return the insertUsers
    */
-  public String[] getInsertUsers() {
-    return (String[]) insertUsers.toArray(new String[insertUsers.size()]);
+  public Set<String> getInsertUsers() {
+    return insertUsers;
   }
-
-  // /**
-  // * @param insertUsers
-  // * the insertUsers to set
-  // */
-  // public void setInsertUsers(String[] insertUsers) {
-  // this.insertUsers.clear();
-  // if (insertUsers != null) {
-  // this.insertUsers.addAll(Arrays.asList(insertUsers));
-  // }
-  // }
 
   /**
    * @param insertUsers
@@ -144,20 +131,9 @@ public class RODAObjectPermissions implements Serializable {
   /**
    * @return the insertGroups
    */
-  public String[] getInsertGroups() {
-    return (String[]) insertGroups.toArray(new String[insertGroups.size()]);
+  public Set<String> getInsertGroups() {
+    return insertGroups;
   }
-
-  // /**
-  // * @param insertGroups
-  // * the insertGroups to set
-  // */
-  // public void setInsertGroups(String[] insertGroups) {
-  // this.insertGroups.clear();
-  // if (insertGroups != null) {
-  // this.insertGroups.addAll(Arrays.asList(insertGroups));
-  // }
-  // }
 
   /**
    * @param insertGroups
@@ -192,20 +168,9 @@ public class RODAObjectPermissions implements Serializable {
   /**
    * @return the readUsers
    */
-  public String[] getReadUsers() {
-    return (String[]) readUsers.toArray(new String[readUsers.size()]);
+  public Set<String> getReadUsers() {
+    return readUsers;
   }
-
-  // /**
-  // * @param readUsers
-  // * the readUsers to set
-  // */
-  // public void setReadUsers(String[] readUsers) {
-  // this.readUsers.clear();
-  // if (readUsers != null) {
-  // this.readUsers.addAll(Arrays.asList(readUsers));
-  // }
-  // }
 
   /**
    * @param readUsers
@@ -240,20 +205,9 @@ public class RODAObjectPermissions implements Serializable {
   /**
    * @return the readGroups
    */
-  public String[] getReadGroups() {
-    return (String[]) readGroups.toArray(new String[readGroups.size()]);
+  public Set<String> getReadGroups() {
+    return readGroups;
   }
-
-  // /**
-  // * @param readGroups
-  // * the readGroups to set
-  // */
-  // public void setReadGroups(String[] readGroups) {
-  // this.readGroups.clear();
-  // if (readGroups != null) {
-  // this.readGroups.addAll(Arrays.asList(readGroups));
-  // }
-  // }
 
   /**
    * @param readGroups
@@ -288,20 +242,9 @@ public class RODAObjectPermissions implements Serializable {
   /**
    * @return the modifyUsers
    */
-  public String[] getModifyUsers() {
-    return (String[]) modifyUsers.toArray(new String[modifyUsers.size()]);
+  public Set<String> getModifyUsers() {
+    return modifyUsers;
   }
-
-  // /**
-  // * @param modifyUsers
-  // * the modifyUsers to set
-  // */
-  // public void setModifyUsers(String[] modifyUsers) {
-  // this.modifyUsers.clear();
-  // if (modifyUsers != null) {
-  // this.modifyUsers.addAll(Arrays.asList(modifyUsers));
-  // }
-  // }
 
   /**
    * @param modifyUsers
@@ -336,20 +279,9 @@ public class RODAObjectPermissions implements Serializable {
   /**
    * @return the modifyGroups
    */
-  public String[] getModifyGroups() {
-    return (String[]) modifyGroups.toArray(new String[modifyGroups.size()]);
+  public Set<String> getModifyGroups() {
+    return modifyGroups;
   }
-
-  // /**
-  // * @param modifyGroups
-  // * the modifyGroups to set
-  // */
-  // public void setModifyGroups(String[] modifyGroups) {
-  // this.modifyGroups.clear();
-  // if (modifyGroups != null) {
-  // this.modifyGroups.addAll(Arrays.asList(modifyGroups));
-  // }
-  // }
 
   /**
    * @param modifyGroups
@@ -384,20 +316,9 @@ public class RODAObjectPermissions implements Serializable {
   /**
    * @return the removeUsers
    */
-  public String[] getRemoveUsers() {
-    return (String[]) removeUsers.toArray(new String[removeUsers.size()]);
+  public Set<String> getRemoveUsers() {
+    return removeUsers;
   }
-
-  // /**
-  // * @param removeUsers
-  // * the removeUsers to set
-  // */
-  // public void setRemoveUsers(String[] removeUsers) {
-  // this.removeUsers.clear();
-  // if (removeUsers != null) {
-  // this.removeUsers.addAll(Arrays.asList(removeUsers));
-  // }
-  // }
 
   /**
    * @param removeUsers
@@ -432,20 +353,9 @@ public class RODAObjectPermissions implements Serializable {
   /**
    * @return the removeGroups
    */
-  public String[] getRemoveGroups() {
-    return (String[]) removeGroups.toArray(new String[removeGroups.size()]);
+  public Set<String> getRemoveGroups() {
+    return removeGroups;
   }
-
-  // /**
-  // * @param removeGroups
-  // * the removeGroups to set
-  // */
-  // public void setRemoveGroups(String[] removeGroups) {
-  // this.removeGroups.clear();
-  // if (removeGroups != null) {
-  // this.removeGroups.addAll(Arrays.asList(removeGroups));
-  // }
-  // }
 
   /**
    * @param removeGroups
@@ -480,20 +390,9 @@ public class RODAObjectPermissions implements Serializable {
   /**
    * @return the grantUsers
    */
-  public String[] getGrantUsers() {
-    return (String[]) grantUsers.toArray(new String[grantUsers.size()]);
+  public Set<String> getGrantUsers() {
+    return grantUsers;
   }
-
-  // /**
-  // * @param grantUsers
-  // * the grantUsers to set
-  // */
-  // public void setGrantUsers(String[] grantUsers) {
-  // this.grantUsers.clear();
-  // if (grantUsers != null) {
-  // this.grantUsers.addAll(Arrays.asList(grantUsers));
-  // }
-  // }
 
   /**
    * @param grantUsers
@@ -528,22 +427,9 @@ public class RODAObjectPermissions implements Serializable {
   /**
    * @return the grantGroups
    */
-  public String[] getGrantGroups() {
-    return (String[]) grantGroups.toArray(new String[grantGroups.size()]);
+  public Set<String> getGrantGroups() {
+    return grantGroups;
   }
-
-  // /**
-  // * @param grantGroups
-  // * the grantGroups to set
-  // */
-  // public void setGrantGroups(String[] grantGroups) {
-  // this.grantGroups.clear();
-  // // FIXME is the following line needed? doing duplicate work?
-  // addGrantGroups(grantGroups);
-  // if (grantGroups != null) {
-  // this.grantGroups.addAll(Arrays.asList(grantGroups));
-  // }
-  // }
 
   /**
    * @param grantGroups

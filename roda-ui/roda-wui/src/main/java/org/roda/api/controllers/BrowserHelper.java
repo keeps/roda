@@ -31,6 +31,7 @@ import org.roda.storage.StorageService;
 import org.roda.storage.StorageServiceException;
 
 import pt.gov.dgarq.roda.common.RodaCoreFactory;
+import pt.gov.dgarq.roda.core.common.Pair;
 import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
@@ -222,7 +223,7 @@ public class BrowserHelper {
     }
   }
 
-  protected static StreamingOutput getAipRepresentation(String aipId, String representationId)
+  protected static Pair<String, StreamingOutput> getAipRepresentation(String aipId, String representationId)
     throws ModelServiceException, StorageServiceException, GenericException {
     try {
       ModelService model = RodaCoreFactory.getModelService();
@@ -262,8 +263,56 @@ public class BrowserHelper {
         filename = aipId + "_" + representationId + ".zip";
       }
 
-      return stream;
+      return new Pair<String, StreamingOutput>(filename, stream);
 
+    } catch (IOException e) {
+      // FIXME see what better exception should be thrown
+      throw new GenericException("");
+    }
+  }
+
+  protected static Pair<String, StreamingOutput> listAipDescriptiveMetadata(String aipId, String start, String limit)
+    throws ModelServiceException, StorageServiceException, GenericException {
+    try {
+      ModelService model = RodaCoreFactory.getModelService();
+      StorageService storage = RodaCoreFactory.getStorageService();
+      ClosableIterable<DescriptiveMetadata> metadata = model.listDescriptiveMetadataBinaries(aipId);
+      int startInt = (start == null) ? 0 : Integer.parseInt(start);
+      int limitInt = (limit == null) ? -1 : Integer.parseInt(limit);
+      int counter = 0;
+      List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
+      for (DescriptiveMetadata dm : metadata) {
+        if (counter >= startInt && (counter <= limitInt || limitInt == -1)) {
+          Binary binary = storage.getBinary(dm.getStoragePath());
+          Path tempFile = Files.createTempFile("test", ".tmp");
+          Files.copy(binary.getContent().createInputStream(), tempFile, StandardCopyOption.REPLACE_EXISTING);
+          ZipEntryInfo info = new ZipEntryInfo(dm.getStoragePath().getName(), tempFile.toFile());
+          zipEntries.add(info);
+        } else {
+          break;
+        }
+        counter++;
+      }
+      String filename = "";
+      StreamingOutput stream = null;
+      if (zipEntries.size() == 1) {
+        stream = new StreamingOutput() {
+          @Override
+          public void write(OutputStream os) throws IOException, WebApplicationException {
+            IOUtils.copy(zipEntries.get(0).getInputStream(), os);
+          }
+        };
+        filename = zipEntries.get(0).getName();
+      } else {
+        stream = new StreamingOutput() {
+          @Override
+          public void write(OutputStream os) throws IOException, WebApplicationException {
+            ZipTools.zip(zipEntries, os);
+          }
+        };
+        filename = aipId + ".zip";
+      }
+      return new Pair<String, StreamingOutput>(filename, stream);
     } catch (IOException e) {
       // FIXME see what better exception should be thrown
       throw new GenericException("");

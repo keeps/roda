@@ -1,7 +1,10 @@
 package org.roda.common;
 
+import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -10,7 +13,9 @@ import org.apache.log4j.Logger;
 import org.roda.index.IndexService;
 import org.roda.index.IndexServiceException;
 
+import pt.gov.dgarq.roda.core.common.AuthenticationDeniedException;
 import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
+import pt.gov.dgarq.roda.core.common.Pair;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
@@ -26,7 +31,7 @@ public class UserUtility {
   private static final String RODA_USER = "RODA_USER";
 
   private static LdapUtility LDAP_UTILITY;
-  private static RodaSimpleUser GUEST = null;
+  private static RodaUser GUEST = null;
 
   /** Private empty constructor */
   private UserUtility() {
@@ -41,7 +46,46 @@ public class UserUtility {
     LDAP_UTILITY = ldapUtility;
   }
 
-  public static RodaUser getUser(HttpServletRequest request, IndexService indexService) {
+  public static RodaUser getApiUser(HttpServletRequest request, IndexService indexService)
+    throws AuthorizationDeniedException {
+
+    RodaUser user;
+    Pair<String, String> credentials = getUserCredentialsFromBasicAuth(request);
+    if (credentials != null) {
+      try {
+        user = UserUtility.getLdapUtility().getAuthenticatedUser(credentials.getFirst(), credentials.getSecond());
+      } catch (AuthenticationDeniedException e) {
+        throw new AuthorizationDeniedException("Unable to authenticate user!");
+      } catch (ServiceException e) {
+        throw new AuthorizationDeniedException("Unable to authenticate user!");
+      }
+    } else {
+      user = getUser(request, indexService, false);
+      if (user == null) {
+        throw new AuthorizationDeniedException("No user provided!");
+      }
+    }
+    return user;
+
+  }
+
+  public static Pair<String, String> getUserCredentialsFromBasicAuth(HttpServletRequest request) {
+    Pair<String, String> ret = null;
+    String authorization = request.getHeader("Authorization");
+    if (authorization != null && authorization.startsWith("Basic")) {
+      String credentials = new String(authorization);
+      credentials = credentials.replaceFirst("[B|b]asic ", "");
+      credentials = new String(Base64.getDecoder().decode(credentials), Charset.forName("UTF-8"));
+      final String[] values = credentials.split(":", 2);
+      if (values[0] != null && values[1] != null) {
+        ret = new Pair<String, String>(values[0], values[1]);
+      }
+    }
+    return ret;
+  }
+
+  public static RodaUser getUser(HttpServletRequest request, IndexService indexService,
+    boolean returnGuestIfNoUserInSession) {
     RodaUser user = null;
     if (request.getSession().getAttribute(RODA_USER) != null) {
       RodaSimpleUser rsu = (RodaSimpleUser) request.getSession().getAttribute(RODA_USER);
@@ -62,9 +106,13 @@ public class UserUtility {
         LOGGER.error("Error obtaining user \"" + rsu.getId() + "\" from index", e);
       }
     } else {
-      user = new RodaUser(getGuest());
+      user = returnGuestIfNoUserInSession ? getGuest() : null;
     }
     return user;
+  }
+
+  public static RodaUser getUser(HttpServletRequest request, IndexService indexService) {
+    return getUser(request, indexService, true);
   }
 
   public static void checkRoles(RodaUser rsu, List<String> rolesToCheck) throws AuthorizationDeniedException {
@@ -98,10 +146,11 @@ public class UserUtility {
   /**
    * Retrieves guest used. Note: this should be used as a read-only object
    */
-  public static RodaSimpleUser getGuest() {
+  public static RodaUser getGuest() {
     if (GUEST == null) {
-      GUEST = new RodaSimpleUser();
+      GUEST = new RodaUser();
       GUEST.setId("guest");
+      GUEST.setName("guest");
       GUEST.setGuest(true);
     }
     return GUEST;
@@ -137,8 +186,33 @@ public class UserUtility {
     return session.getId();
   }
 
-  public static void checkObjectPermissions(RodaUser user, SimpleDescriptionObject sdo) {
+  public static void checkObjectReadPermissions(RodaUser user, SimpleDescriptionObject sdo)
+    throws AuthorizationDeniedException {
     // FIXME implement
+    LOGGER.debug("Checking if user \"" + user.getId() + "\" has permissions to read object " + sdo.getId()
+      + " (object read permissions: " + sdo.getPermissions().getReadUsers() + " & "
+      + sdo.getPermissions().getReadGroups() + ")");
 
+    // // FIXME remove this for final release???
+    // if (user.isGuest()) {
+    // throw new AuthorizationDeniedException("The user '" + user.getId() + "'
+    // does not have permissions to access!");
+    // }
+
+    if (!sdo.getPermissions().getReadUsers().contains(user.getId())
+      && iterativeDisjoint(sdo.getPermissions().getReadGroups(), user.getAllGroups())) {
+      throw new AuthorizationDeniedException("The user '" + user.getId() + "' does not have permissions to access!");
+    }
+  }
+
+  private static boolean iterativeDisjoint(Set<String> set1, Set<String> set2) {
+    boolean noCommonElement = true;
+    for (String string : set1) {
+      if (set2.contains(string)) {
+        noCommonElement = false;
+        break;
+      }
+    }
+    return noCommonElement;
   }
 }

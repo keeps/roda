@@ -30,7 +30,7 @@ import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.LdapName;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.w3c.util.DateParser;
 import org.w3c.util.InvalidDateException;
@@ -1081,6 +1081,10 @@ public class LdapUtility {
    */
   public RodaUser getAuthenticatedUser(String username, String password)
     throws AuthenticationDeniedException, ServiceException {
+
+    if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
+      throw new AuthenticationDeniedException("Username and password cannot be blank!");
+    }
 
     try {
       // Create initial context

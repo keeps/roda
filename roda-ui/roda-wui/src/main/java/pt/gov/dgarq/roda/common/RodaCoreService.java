@@ -10,12 +10,12 @@ import org.roda.model.ModelServiceException;
 
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.LogEntryParameter;
-import pt.gov.dgarq.roda.core.data.v2.RodaSimpleUser;
+import pt.gov.dgarq.roda.core.data.v2.RodaUser;
 
 public abstract class RodaCoreService {
   private static final Logger LOGGER = Logger.getLogger(RodaCoreService.class);
 
-  protected static void registerAction(RodaSimpleUser user, String actionComponent, String actionMethod, String aipId,
+  protected static void registerAction(RodaUser user, String actionComponent, String actionMethod, String aipId,
     long duration, Object... parameters) {
 
     LogEntry logEntry = createLogEntry(user, actionComponent, actionMethod, aipId, duration, parameters);
@@ -32,7 +32,7 @@ public abstract class RodaCoreService {
   //
   // }
 
-  public static void registerAction(RodaSimpleUser user, String actionComponent, String actionMethod, String aipId,
+  public static void registerAction(RodaUser user, String actionComponent, String actionMethod, String aipId,
     long duration, List<LogEntryParameter> parameters) {
 
     LogEntry logEntry = createLogEntry(user, actionComponent, actionMethod, aipId, duration, parameters);
@@ -48,8 +48,8 @@ public abstract class RodaCoreService {
     }
   }
 
-  private static LogEntry createLogEntry(RodaSimpleUser user, String actionComponent, String actionMethod,
-    String aipId, long duration, Object... parameters) {
+  private static LogEntry createLogEntry(RodaUser user, String actionComponent, String actionMethod, String aipId,
+    long duration, Object... parameters) {
     LogEntry logEntry = null;
     List<LogEntryParameter> logParameters = null;
 
@@ -65,8 +65,8 @@ public abstract class RodaCoreService {
         for (int i = 0, j = 0; i < logParameters.size(); i++, j = j + 2) {
           Object key = parameters[j];
           Object value = parameters[j + 1];
-          logParameters.add(new LogEntryParameter(key != null ? key.toString() : "null", value != null ? value
-            .toString() : "null"));
+          logParameters.add(
+            new LogEntryParameter(key != null ? key.toString() : "null", value != null ? value.toString() : "null"));
         }
 
       }
@@ -75,11 +75,13 @@ public abstract class RodaCoreService {
     return logEntry;
   }
 
-  private static LogEntry createLogEntry(RodaSimpleUser user, String actionComponent, String actionMethod,
-    String aipId, long duration, List<LogEntryParameter> parameters) {
+  private static LogEntry createLogEntry(RodaUser user, String actionComponent, String actionMethod, String aipId,
+    long duration, List<LogEntryParameter> parameters) {
     if (parameters == null) {
       parameters = new ArrayList<LogEntryParameter>();
     }
+
+    LOGGER.debug("Logging user action: " + user);
 
     LogEntry logEntry = new LogEntry();
     logEntry.setId(UUID.randomUUID().toString());

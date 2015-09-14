@@ -55,7 +55,7 @@ import org.slf4j.LoggerFactory;
 
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.common.RodaConstants.DateGranularity;
-import pt.gov.dgarq.roda.core.data.RODAObjectPermissions;
+import pt.gov.dgarq.roda.core.data.v2.RODAObjectPermissions;
 import pt.gov.dgarq.roda.core.data.adapter.facet.FacetParameter;
 import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
 import pt.gov.dgarq.roda.core.data.adapter.facet.RangeFacetParameter;

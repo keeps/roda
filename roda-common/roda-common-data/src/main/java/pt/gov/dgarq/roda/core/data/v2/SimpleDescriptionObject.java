@@ -2,9 +2,7 @@ package pt.gov.dgarq.roda.core.data.v2;
 
 import java.util.Date;
 
-import pt.gov.dgarq.roda.core.data.RODAObjectPermissions;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
 import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevel;
 
@@ -57,9 +55,9 @@ public class SimpleDescriptionObject extends RODAObject {
    *          the {@link SimpleDescriptionObject} to be cloned.
    */
   public SimpleDescriptionObject(SimpleDescriptionObject other) {
-    this(other.getId(), other.getLabel(), other.getLastModifiedDate(), other.getCreatedDate(), other.getState(), other
-      .getLevel(), other.getTitle(), other.getDateInitial(), other.getDateFinal(), other.getDescription(), other
-      .getParentID(), other.getSubElementsCount(), other.getPermissions());
+    this(other.getId(), other.getLabel(), other.getLastModifiedDate(), other.getCreatedDate(), other.getState(),
+      other.getLevel(), other.getTitle(), other.getDateInitial(), other.getDateFinal(), other.getDescription(),
+      other.getParentID(), other.getSubElementsCount(), other.getPermissions());
   }
 
   /**
@@ -109,10 +107,9 @@ public class SimpleDescriptionObject extends RODAObject {
   // @Override
   @Override
   public String toString() {
-    return "SimpleDescriptionObject(" + super.toString() + ", " + "level=" + getLevel() + ", id=" + getId()
-      + ", title=" + getTitle() + ", dateInitial=" + getDateInitial() + ", dateFinal=" + getDateFinal()
-      + ", description=" + getDescription() + ", parentID=" + getParentID() + ", childCount=" + getSubElementsCount()
-      + ")";
+    return "SimpleDescriptionObject(" + super.toString() + ", " + "level=" + getLevel() + ", id=" + getId() + ", title="
+      + getTitle() + ", dateInitial=" + getDateInitial() + ", dateFinal=" + getDateFinal() + ", description="
+      + getDescription() + ", parentID=" + getParentID() + ", childCount=" + getSubElementsCount() + ")";
   }
 
   // TODO:

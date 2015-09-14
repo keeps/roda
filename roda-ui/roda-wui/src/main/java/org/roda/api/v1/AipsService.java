@@ -22,8 +22,8 @@ public abstract class AipsService {
 
   public abstract Response aipsAipIdDataGet(String aipId, String start, String limit) throws NotFoundException;
 
-  public abstract Response aipsAipIdDataRepresentationIdGet(HttpServletRequest request, String aipId, String representationId, String acceptFormat)
-    throws NotFoundException;
+  public abstract Response getAipRepresentation(HttpServletRequest request, String aipId, String representationId,
+    String acceptFormat) throws NotFoundException;
 
   public abstract Response aipsAipIdDataRepresentationIdPut(String aipId, String representationId, String filepath)
     throws NotFoundException;
@@ -46,7 +46,7 @@ public abstract class AipsService {
   public abstract Response aipsAipIdDataRepresentationIdFileIdDelete(String aipId, String representationId,
     String fileId) throws NotFoundException;
 
-  public abstract Response aipsAipIdDescriptiveMetadataGet(String aipId, String start, String limit,
+  public abstract Response listAipDescriptiveMetadata(HttpServletRequest request, String aipId, String start, String limit,
     String acceptFormat) throws NotFoundException;
 
   public abstract Response aipsAipIdDescriptiveMetadataMetadataIdGet(String aipId, String metadataId,

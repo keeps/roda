@@ -11,6 +11,7 @@ import org.roda.storage.StorageServiceException;
 
 import pt.gov.dgarq.roda.common.RodaCoreService;
 import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
+import pt.gov.dgarq.roda.core.common.Pair;
 import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
@@ -30,7 +31,7 @@ public class Browser extends RodaCoreService {
 
   public static BrowseItemBundle getItemBundle(RodaUser user, String aipId, String localeString)
     throws AuthorizationDeniedException, GenericException {
-    Date start = new Date();
+    Date startDate = new Date();
 
     // check user permissions
     UserUtility.checkRoles(user, "browse");
@@ -39,7 +40,7 @@ public class Browser extends RodaCoreService {
     BrowseItemBundle itemBundle = BrowserHelper.getItemBundle(aipId, localeString);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
+    long duration = new Date().getTime() - startDate.getTime();
     registerAction(user, "Browser", "getItemBundle", aipId, duration, "aipId", aipId);
 
     return itemBundle;
@@ -47,7 +48,7 @@ public class Browser extends RodaCoreService {
 
   public static IndexResult<SimpleDescriptionObject> findDescriptiveMetadata(RodaUser user, Filter filter,
     Sorter sorter, Sublist sublist, Facets facets) throws RODAException {
-    Date start = new Date();
+    Date startDate = new Date();
 
     // check user permissions
     UserUtility.checkRoles(user, "browse");
@@ -57,7 +58,7 @@ public class Browser extends RodaCoreService {
       sublist, facets);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
+    long duration = new Date().getTime() - startDate.getTime();
     registerAction(user, "Browser", "findDescriptiveMetadata", null, duration, "filter", filter.toString(), "sorter",
       sorter.toString(), "sublist", sublist.toString());
 
@@ -66,7 +67,7 @@ public class Browser extends RodaCoreService {
 
   public static Long countDescriptiveMetadata(RodaUser user, Filter filter)
     throws AuthorizationDeniedException, GenericException {
-    Date start = new Date();
+    Date startDate = new Date();
 
     // check user permissions
     UserUtility.checkRoles(user, "browse");
@@ -75,7 +76,7 @@ public class Browser extends RodaCoreService {
     Long count = BrowserHelper.countDescriptiveMetadata(filter);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
+    long duration = new Date().getTime() - startDate.getTime();
     registerAction(user, "Browser", "countDescriptiveMetadata", null, duration, "filter", filter.toString());
 
     return count;
@@ -83,7 +84,7 @@ public class Browser extends RodaCoreService {
 
   public static SimpleDescriptionObject getSimpleDescriptionObject(RodaUser user, String aipId)
     throws AuthorizationDeniedException, GenericException {
-    Date start = new Date();
+    Date startDate = new Date();
 
     // check user permissions
     UserUtility.checkRoles(user, "browse");
@@ -92,7 +93,7 @@ public class Browser extends RodaCoreService {
     SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(aipId);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
+    long duration = new Date().getTime() - startDate.getTime();
     registerAction(user, "Browser", "getSimpleDescriptionObject", aipId, duration, "aipId", aipId);
 
     return sdo;
@@ -100,7 +101,7 @@ public class Browser extends RodaCoreService {
 
   public static List<SimpleDescriptionObject> getAncestors(RodaUser user, SimpleDescriptionObject sdo)
     throws AuthorizationDeniedException, GenericException {
-    Date start = new Date();
+    Date startDate = new Date();
 
     // check user permissions
     UserUtility.checkRoles(user, "browse");
@@ -109,7 +110,7 @@ public class Browser extends RodaCoreService {
     List<SimpleDescriptionObject> ancestors = BrowserHelper.getAncestors(sdo);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
+    long duration = new Date().getTime() - startDate.getTime();
     registerAction(user, "Browser", "getParent", sdo.getId(), duration, "sdo", sdo.toString());
 
     return ancestors;
@@ -117,7 +118,7 @@ public class Browser extends RodaCoreService {
 
   public static SimpleDescriptionObject moveInHierarchy(RodaUser user, String aipId, String parentId)
     throws AuthorizationDeniedException, GenericException {
-    Date start = new Date();
+    Date startDate = new Date();
 
     // check user permissions
     UserUtility.checkRoles(user, "administration.metadata_editor");
@@ -126,31 +127,49 @@ public class Browser extends RodaCoreService {
     SimpleDescriptionObject sdo = BrowserHelper.moveInHierarchy(aipId, parentId);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
+    long duration = new Date().getTime() - startDate.getTime();
     registerAction(user, "Browser", "moveInHierarchy", sdo.getId(), duration, "aip", aipId, "toParent", parentId);
 
     return sdo;
 
   }
 
-  public static StreamingOutput getAipRepresentation(RodaUser user, String aipId, String representationId)
+  public static Pair<String, StreamingOutput> getAipRepresentation(RodaUser user, String aipId, String representationId)
     throws AuthorizationDeniedException, GenericException, ModelServiceException, StorageServiceException {
-    Date start = new Date();
+    Date startDate = new Date();
 
-    SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(aipId);
     // check user permissions
-    // FIXME set proper role check
-    UserUtility.checkObjectPermissions(user, sdo);
+    SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(aipId);
+    UserUtility.checkObjectReadPermissions(user, sdo);
 
     // delegate
-    StreamingOutput stream = BrowserHelper.getAipRepresentation(aipId, representationId);
+    Pair<String, StreamingOutput> aipRepresentation = BrowserHelper.getAipRepresentation(aipId, representationId);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
+    long duration = new Date().getTime() - startDate.getTime();
     registerAction(user, "Browser", "getAipRepresentation", aipId, duration, "aip", aipId, "representationId",
       representationId);
 
-    return stream;
+    return aipRepresentation;
+  }
+
+  public static Pair<String, StreamingOutput> listAipDescriptiveMetadata(RodaUser user, String aipId, String start,
+    String limit)
+      throws AuthorizationDeniedException, GenericException, ModelServiceException, StorageServiceException {
+    Date startDate = new Date();
+
+    // check user permissions
+    SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(aipId);
+    UserUtility.checkObjectReadPermissions(user, sdo);
+
+    // delegate
+    Pair<String, StreamingOutput> aipRepresentation = BrowserHelper.listAipDescriptiveMetadata(aipId, start, limit);
+
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, "Browser", "listAipDescriptiveMetadata", aipId, duration, "aip", aipId);
+
+    return aipRepresentation;
   }
 
 }

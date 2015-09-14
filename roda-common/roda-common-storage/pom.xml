@@ -293,6 +293,10 @@
 			<groupId>org.apache.directory.server</groupId>
 			<artifactId>apacheds-all</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>net.sf.ehcache</groupId>
+			<artifactId>ehcache</artifactId>
+		</dependency>
 		<!-- fixes for ldp-testsuite convergence problems -->
 		<dependency>
 			<groupId>org.openrdf.sesame</groupId>
