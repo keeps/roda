@@ -122,7 +122,9 @@ public class Browser extends RodaCoreService {
 
     // check user permissions
     UserUtility.checkRoles(user, "administration.metadata_editor");
-
+    UserUtility.checkModify(user, aipId);
+    UserUtility.checkModify(user, parentId);
+    
     // delegate
     SimpleDescriptionObject sdo = BrowserHelper.moveInHierarchy(aipId, parentId);
 

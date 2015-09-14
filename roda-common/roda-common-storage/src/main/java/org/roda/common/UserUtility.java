@@ -215,4 +215,8 @@ public class UserUtility {
     }
     return noCommonElement;
   }
+
+  public static void checkModify(RodaUser user, String pid) {
+    //TODO
+  }
 }
