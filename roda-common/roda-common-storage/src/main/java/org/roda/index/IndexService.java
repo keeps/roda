@@ -33,7 +33,7 @@ import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 
 public class IndexService {
 
-  private final Logger logger = Logger.getLogger(getClass());
+  private static final Logger LOGGER = Logger.getLogger(IndexService.class);
 
   private final SolrClient index;
   private final ModelService model;
@@ -112,7 +112,7 @@ public class IndexService {
           aips.close();
         }
       } catch (IOException e) {
-        logger.error("Error while while freeing up resources", e);
+        LOGGER.error("Error while while freeing up resources", e);
       }
     }
   }
@@ -134,20 +134,14 @@ public class IndexService {
     ClosableIterable<Resource> actionLogs = null;
 
     try {
-      actionLogs = model.getStorage().listResourcesUnderContainer(
-        DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG));
+      actionLogs = model.getStorage()
+        .listResourcesUnderContainer(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG));
 
       for (Resource resource : actionLogs) {
         Binary b = model.getStorage().getBinary(resource.getStoragePath());
         BufferedReader br = new BufferedReader(new InputStreamReader(b.getContent().createInputStream()));
 
-        String line;
-        while ((line = br.readLine()) != null) {
-          LogEntry entry = ModelUtils.getLogEntry(line);
-          if (entry != null) {
-            reindexActionLog(entry);
-          }
-        }
+        reindexActionLog(br);
       }
     } catch (StorageServiceException | IOException e) {
       throw new IndexServiceException("Error retrieving/processing logs from storage",
@@ -157,10 +151,21 @@ public class IndexService {
         try {
           actionLogs.close();
         } catch (IOException e) {
-          logger.error("Error while while freeing up resources", e);
+          LOGGER.error("Error while while freeing up resources", e);
         }
       }
     }
+  }
+
+  private void reindexActionLog(BufferedReader br) throws IOException {
+    String line;
+    while ((line = br.readLine()) != null) {
+      LogEntry entry = ModelUtils.getLogEntry(line);
+      if (entry != null) {
+        reindexActionLog(entry);
+      }
+    }
+    br.close();
   }
 
   private void reindexActionLog(LogEntry entry) {
@@ -176,7 +181,7 @@ public class IndexService {
       index.deleteByQuery(indexName, "*:*");
       index.commit(indexName);
     } catch (SolrServerException | IOException e) {
-      logger.error("Error cleaning up index " + indexName, e);
+      LOGGER.error("Error cleaning up index " + indexName, e);
       throw new IndexServiceException("Error cleaning up index " + indexName,
         IndexServiceException.INTERNAL_SERVER_ERROR, e);
     }

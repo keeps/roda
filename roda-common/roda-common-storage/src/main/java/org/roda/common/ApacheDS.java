@@ -2,7 +2,6 @@ package org.roda.common;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashSet;
@@ -40,9 +39,6 @@ import org.apache.log4j.Logger;
 
 // FIXME this should be moved to a more meaningful maven module
 public class ApacheDS {
-  // First while the server is up and running log into as admin
-  // (uid=admin,ou=system) using the default password 'secret' and bind to
-  // ou=system
   private static final Logger LOGGER = Logger.getLogger(ApacheDS.class);
   private static final String DEFAULT_HOST = "localhost";
   private static final int DEFAULT_PORT = 10389;
@@ -158,10 +154,10 @@ public class ApacheDS {
     // Inject the context entry for dc=roda,dc=org partition
     if (!service.getAdminSession().exists(rodaPartition.getSuffixDn())) {
       Dn dnApache = new Dn(BASE_DN);
-      Entry entryApache = service.newEntry(dnApache);
-      entryApache.add("objectClass", "top", "domain", "extensibleObject");
-      entryApache.add("dc", "roda");
-      service.getAdminSession().add(entryApache);
+      Entry entryRoda = service.newEntry(dnApache);
+      entryRoda.add("objectClass", "top", "domain", "extensibleObject");
+      entryRoda.add("dc", "roda");
+      service.getAdminSession().add(entryRoda);
 
       // change nis attribute in order to make things like
       // "shadowinactive" work
@@ -169,6 +165,13 @@ public class ApacheDS {
       modifyRequestImpl.setName(new Dn("cn=nis,ou=schema"));
       modifyRequestImpl.replace("m-disabled", "FALSE");
       service.getAdminSession().modify(modifyRequestImpl);
+
+      // FIXME remove comment & also change value in roda-wui.properties
+      // change apacheds admin password
+      // modifyRequestImpl = new ModifyRequestImpl();
+      // modifyRequestImpl.setName(new Dn("uid=admin,ou=system"));
+      // modifyRequestImpl.replace("userPassword", "roda");
+      // service.getAdminSession().modify(modifyRequestImpl);
 
       applyLdif(configDirectory.resolve("users.ldif").toFile());
       applyLdif(configDirectory.resolve("groups.ldif").toFile());

@@ -2,6 +2,7 @@ package org.roda.api.v1;
 
 import java.io.InputStream;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
@@ -21,7 +22,7 @@ public abstract class AipsService {
 
   public abstract Response aipsAipIdDataGet(String aipId, String start, String limit) throws NotFoundException;
 
-  public abstract Response aipsAipIdDataRepresentationIdGet(String aipId, String representationId, String acceptFormat)
+  public abstract Response aipsAipIdDataRepresentationIdGet(HttpServletRequest request, String aipId, String representationId, String acceptFormat)
     throws NotFoundException;
 
   public abstract Response aipsAipIdDataRepresentationIdPut(String aipId, String representationId, String filepath)

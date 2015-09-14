@@ -3,6 +3,8 @@
  */
 package pt.gov.dgarq.roda.wui.common.client;
 
+import pt.gov.dgarq.roda.core.data.v2.RodaUser;
+
 /**
  * @author Luis Faria
  * 
@@ -14,6 +16,6 @@ public interface LoginStatusListener {
    * 
    * @param user
    */
-  public void onLoginStatusChanged(AuthenticatedUser user);
+  public void onLoginStatusChanged(RodaUser user);
 
 }

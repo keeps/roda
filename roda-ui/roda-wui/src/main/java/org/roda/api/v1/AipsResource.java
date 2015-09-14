@@ -3,6 +3,7 @@ package org.roda.api.v1;
 import java.io.File;
 import java.io.InputStream;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -12,6 +13,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
@@ -36,6 +38,9 @@ public class AipsResource {
   public static final String SWAGGER_ENDPOINT = "v1 aips";
 
   private final AipsService delegate = AipsServiceFactory.getAipsApi();
+
+  @Context
+  private HttpServletRequest request;
 
   @GET
   @ApiOperation(value = "List AIPs", notes = "Gets a list of archival information packages (AIPs).", response = AIP.class, responseContainer = "List")
@@ -128,7 +133,7 @@ public class AipsResource {
     @ApiParam(value = "The ID of the existing representation", required = true) @PathParam("representation_id") String representationId,
     @ApiParam(value = "Choose format in which to get the representation", allowableValues = "json, bin") @QueryParam("acceptFormat") String acceptFormat)
       throws NotFoundException {
-    return delegate.aipsAipIdDataRepresentationIdGet(aipId, representationId, acceptFormat);
+    return delegate.aipsAipIdDataRepresentationIdGet(request, aipId, representationId, acceptFormat);
   }
 
   @PUT

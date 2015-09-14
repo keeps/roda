@@ -7,6 +7,9 @@ import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
+import pt.gov.dgarq.roda.core.common.RODAException;
+import pt.gov.dgarq.roda.core.data.v2.RodaUser;
+
 /**
  * @author Luis Faria
  * 
@@ -19,7 +22,7 @@ public interface UserLoginServiceAsync {
    * @return
    * @throws RODAException
    */
-  public void getAuthenticatedUser(AsyncCallback<AuthenticatedUser> callback);
+  public void getAuthenticatedUser(AsyncCallback<RodaUser> callback);
 
   /**
    * Login into RODA Core
@@ -29,7 +32,7 @@ public interface UserLoginServiceAsync {
    * @return
    * @throws RODAException
    */
-  public void login(String username, String password, AsyncCallback<AuthenticatedUser> callback);
+  public void login(String username, String password, AsyncCallback<RodaUser> callback);
 
   /**
    * Get RODA properties

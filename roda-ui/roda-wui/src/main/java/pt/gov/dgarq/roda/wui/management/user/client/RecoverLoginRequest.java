@@ -17,9 +17,9 @@ import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.UserManagementConstants;
 import pt.gov.dgarq.roda.core.common.NoSuchUserException;
+import pt.gov.dgarq.roda.core.data.v2.RodaUser;
 import pt.gov.dgarq.roda.wui.common.captcha.client.AbstractImageCaptcha;
 import pt.gov.dgarq.roda.wui.common.captcha.client.DefaultImageCaptcha;
-import pt.gov.dgarq.roda.wui.common.client.AuthenticatedUser;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
@@ -90,25 +90,25 @@ public class RecoverLoginRequest implements HistoryResolver {
           UserManagementService.Util.getInstance().requestPassordReset(usernameOrEmailBox.getText(),
             captcha.getResponse(), new AsyncCallback<Boolean>() {
 
-              public void onFailure(Throwable caught) {
-                if (caught instanceof NoSuchUserException) {
-                  Window.alert(constants.recoverLoginNoSuchUser());
-                } else {
-                  logger.error("Error requesting password reset", caught);
-                }
+            public void onFailure(Throwable caught) {
+              if (caught instanceof NoSuchUserException) {
+                Window.alert(constants.recoverLoginNoSuchUser());
+              } else {
+                logger.error("Error requesting password reset", caught);
               }
+            }
 
-              public void onSuccess(Boolean captchaSuccess) {
-                if (captchaSuccess.booleanValue()) {
-                  Window.alert(constants.recoverLoginSuccess());
-                  History.newItem(Home.RESOLVER.getHistoryPath());
-                } else {
-                  Window.alert(constants.recoverLoginCaptchaFailed());
-                  captcha.refresh();
-                }
+            public void onSuccess(Boolean captchaSuccess) {
+              if (captchaSuccess.booleanValue()) {
+                Window.alert(constants.recoverLoginSuccess());
+                History.newItem(Home.RESOLVER.getHistoryPath());
+              } else {
+                Window.alert(constants.recoverLoginCaptchaFailed());
+                captcha.refresh();
               }
+            }
 
-            });
+          });
         }
 
       });
@@ -155,13 +155,13 @@ public class RecoverLoginRequest implements HistoryResolver {
   }
 
   public void isCurrentUserPermitted(final AsyncCallback<Boolean> callback) {
-    UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<AuthenticatedUser>() {
+    UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<RodaUser>() {
 
       public void onFailure(Throwable caught) {
         callback.onFailure(caught);
       }
 
-      public void onSuccess(AuthenticatedUser user) {
+      public void onSuccess(RodaUser user) {
         callback.onSuccess(new Boolean(user.isGuest()));
       }
 

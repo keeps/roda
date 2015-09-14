@@ -13,7 +13,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 
-import pt.gov.dgarq.roda.wui.common.client.AuthenticatedUser;
+import pt.gov.dgarq.roda.core.data.v2.RodaUser;
 import pt.gov.dgarq.roda.wui.common.client.LoginStatusListener;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
 import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
@@ -42,7 +42,7 @@ public class BreadcrumbPanel extends FlowPanel {
 
     UserLogin.getInstance().addLoginStatusListener(new LoginStatusListener() {
 
-      public void onLoginStatusChanged(AuthenticatedUser user) {
+      public void onLoginStatusChanged(RodaUser user) {
         updatePath(currentpath);
       }
 

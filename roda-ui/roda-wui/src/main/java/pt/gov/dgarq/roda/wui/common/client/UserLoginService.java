@@ -11,6 +11,7 @@ import com.google.gwt.user.client.rpc.ServiceDefTarget;
 
 import pt.gov.dgarq.roda.core.common.AuthenticationDeniedException;
 import pt.gov.dgarq.roda.core.common.RODAException;
+import pt.gov.dgarq.roda.core.data.v2.RodaUser;
 
 /**
  * @author Luis Faria
@@ -48,7 +49,7 @@ public interface UserLoginService extends RemoteService {
    * @return
    * @throws RODAException
    */
-  public AuthenticatedUser getAuthenticatedUser() throws RODAException;
+  public RodaUser getAuthenticatedUser() throws RODAException;
 
   /**
    * Login into RODA Core
@@ -58,7 +59,7 @@ public interface UserLoginService extends RemoteService {
    * @return
    * @throws RODAException
    */
-  public AuthenticatedUser login(String username, String password) throws AuthenticationDeniedException,
+  public RodaUser login(String username, String password) throws AuthenticationDeniedException,
     GenericException;
 
   /**

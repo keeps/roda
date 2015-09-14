@@ -31,7 +31,6 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrQuery.SortClause;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.FacetField.Count;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -40,7 +39,6 @@ import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;
 import org.apache.solr.common.params.FacetParams;
-import org.apache.solr.common.util.ContentStream;
 import org.apache.solr.common.util.DateUtil;
 import org.apache.solr.handler.loader.XMLLoader;
 import org.roda.common.RodaUtils;
@@ -101,22 +99,13 @@ import pt.gov.dgarq.roda.core.data.v2.User;
  * @author Sébastien Leroux <sleroux@keep.pt>
  */
 public class SolrUtils {
-
-  private static Logger LOGGER = LoggerFactory.getLogger(SolrUtils.class);
-
-  // FIXME 20150729 not in use, most certainly to be deleted
-  public static void update(SolrClient solrClient, String collection, ContentStream contentStream, boolean commitNow)
-    throws SolrServerException, IOException {
-    ContentStreamUpdateRequest request = new ContentStreamUpdateRequest("/update");
-    request.addContentStream(contentStream);
-    solrClient.request(request, collection);
-
-    if (commitNow) {
-      solrClient.commit(collection);
-    }
-  }
-
+  private static final Logger LOGGER = LoggerFactory.getLogger(SolrUtils.class);
   private static final String ID_SEPARATOR = ".";
+
+  /** Private empty constructor */
+  private SolrUtils() {
+
+  }
 
   public static String getId(String... ids) {
     StringBuilder ret = new StringBuilder();
@@ -176,7 +165,6 @@ public class SolrUtils {
       Reader descMetadataReader = new InputStreamReader(inputStream);
       xsltFilename = binary.getStoragePath().getName() + ".xslt";
 
-      // TODO select transformers using file name extension
       ClassLoader classLoader = SolrUtils.class.getClassLoader();
       InputStream transformerStream = classLoader.getResourceAsStream(xsltFilename);
 
@@ -204,17 +192,15 @@ public class SolrUtils {
       doc = null;
       while (parsing) {
         int event = parser.next();
-        switch (event) {
-          case XMLStreamConstants.END_DOCUMENT:
-            parser.close();
-            parsing = false;
-            break;
-          case XMLStreamConstants.START_ELEMENT:
-            String currTag = parser.getLocalName();
-            if ("doc".equals(currTag)) {
-              doc = loader.readDoc(parser);
-            }
-            break;
+
+        if (event == XMLStreamConstants.END_DOCUMENT) {
+          parser.close();
+          parsing = false;
+        } else if (event == XMLStreamConstants.START_ELEMENT) {
+          String currTag = parser.getLocalName();
+          if ("doc".equals(currTag)) {
+            doc = loader.readDoc(parser);
+          }
         }
 
       }
@@ -231,7 +217,7 @@ public class SolrUtils {
   public static String parseFilter(Filter filter) throws IndexServiceException {
     StringBuilder ret = new StringBuilder();
 
-    if (filter == null || filter.getParameters().size() == 0) {
+    if (filter == null || filter.getParameters().isEmpty()) {
       ret.append("*:*");
     } else {
       for (FilterParameter parameter : filter.getParameters()) {
@@ -240,7 +226,7 @@ public class SolrUtils {
           appendExactMatch(ret, simplePar.getName(), simplePar.getValue(), true, true);
         } else if (parameter instanceof OneOfManyFilterParameter) {
           OneOfManyFilterParameter param = (OneOfManyFilterParameter) parameter;
-          appendValuesUsingOROperator(ret, param.getName(), param.getValues(), true);
+          appendValuesUsingOROperator(ret, param.getName(), param.getValues());
         } else if (parameter instanceof BasicSearchFilterParameter) {
           BasicSearchFilterParameter param = (BasicSearchFilterParameter) parameter;
           appendBasicSearch(ret, param.getName(), param.getValue(), "AND", true);
@@ -251,14 +237,14 @@ public class SolrUtils {
         } else if (parameter instanceof DateRangeFilterParameter) {
           DateRangeFilterParameter param = (DateRangeFilterParameter) parameter;
           appendRange(ret, param.getName(), Date.class, param.getFromValue(), String.class,
-            processToDate(param.getToValue(), param.getGranularity(), false), true);
+            processToDate(param.getToValue(), param.getGranularity(), false));
         } else if (parameter instanceof DateIntervalFilterParameter) {
           DateIntervalFilterParameter param = (DateIntervalFilterParameter) parameter;
           appendRangeInterval(ret, param.getFromName(), param.getToName(), param.getFromValue(), param.getToValue(),
-            param.getGranularity(), true);
+            param.getGranularity());
         } else if (parameter instanceof LongRangeFilterParameter) {
           LongRangeFilterParameter param = (LongRangeFilterParameter) parameter;
-          appendRange(ret, param.getName(), Long.class, param.getFromValue(), Long.class, param.getToValue(), true);
+          appendRange(ret, param.getName(), Long.class, param.getFromValue(), Long.class, param.getToValue());
         } else {
           LOGGER.error("Unsupported filter parameter class: " + parameter.getClass().getName());
           throw new IndexServiceException("Unsupported filter parameter class: " + parameter.getClass().getName(),
@@ -327,7 +313,7 @@ public class SolrUtils {
   }
 
   private static void appendRangeInterval(StringBuilder ret, String fromKey, String toKey, Date fromValue, Date toValue,
-    DateGranularity granularity, boolean prefixWithANDOperatorIfBuilderNotEmpty) {
+    DateGranularity granularity) {
     if (fromValue != null || toValue != null) {
       appendANDOperator(ret, true);
       ret.append("(");
@@ -355,7 +341,7 @@ public class SolrUtils {
   }
 
   private static <T extends Serializable, T1 extends Serializable> void appendRange(StringBuilder ret, String key,
-    Class<T> fromClass, T fromValue, Class<T1> toClass, T1 toValue, boolean prefixWithANDOperatorIfBuilderNotEmpty) {
+    Class<T> fromClass, T fromValue, Class<T1> toClass, T1 toValue) {
     if (fromValue != null || toValue != null) {
       appendANDOperator(ret, true);
 
@@ -408,7 +394,7 @@ public class SolrUtils {
         if (facetParameter instanceof SimpleFacetParameter) {
           setQueryFacetParameter(query, (SimpleFacetParameter) facetParameter);
           appendValuesUsingOROperator(filterQuery, facetParameter.getName(),
-            ((SimpleFacetParameter) facetParameter).getValues(), true);
+            ((SimpleFacetParameter) facetParameter).getValues());
         } else if (facetParameter instanceof RangeFacetParameter) {
           LOGGER.error("Unsupported facet parameter class: " + facetParameter.getClass().getName());
         } else {
@@ -439,9 +425,8 @@ public class SolrUtils {
     }
   }
 
-  private static void appendValuesUsingOROperator(StringBuilder ret, String key, List<String> values,
-    boolean prefixWithANDOperatorIfBuilderNotEmpty) {
-    if (values.size() > 0) {
+  private static void appendValuesUsingOROperator(StringBuilder ret, String key, List<String> values) {
+    if (!values.isEmpty()) {
       appendANDOperator(ret, true);
 
       ret.append("(");
@@ -470,13 +455,12 @@ public class SolrUtils {
     } else if (value.matches("^\".+\"$")) {
       appendExactMatch(ret, key, value, false, prefixWithANDOperatorIfBuilderNotEmpty);
     } else {
-      appendWhiteSpaceTokenizedString(ret, key, value, operator, prefixWithANDOperatorIfBuilderNotEmpty);
+      appendWhiteSpaceTokenizedString(ret, key, value, operator);
     }
   }
 
   // FIXME escape values for Solr special chars
-  private static void appendWhiteSpaceTokenizedString(StringBuilder ret, String key, String value, String operator,
-    boolean prefixWithANDOperatorIfBuilderNotEmpty) {
+  private static void appendWhiteSpaceTokenizedString(StringBuilder ret, String key, String value, String operator) {
     appendANDOperator(ret, true);
 
     String[] split = value.trim().split("\\s+");
@@ -798,7 +782,7 @@ public class SolrUtils {
     // TODO see if this really should be indexed into SDO
     ret.addField(RodaConstants.AIP_DESCRIPTIVE_METADATA_ID, aip.getDescriptiveMetadataIds());
     ret.addField(RodaConstants.AIP_REPRESENTATION_ID, aip.getRepresentationIds());
-    ret.addField(RodaConstants.AIP_HAS_REPRESENTATIONS, aip.getRepresentationIds().size() > 0);
+    ret.addField(RodaConstants.AIP_HAS_REPRESENTATIONS, !aip.getRepresentationIds().isEmpty());
 
     for (String descId : aip.getDescriptiveMetadataIds()) {
       DescriptiveMetadata metadata = model.retrieveDescriptiveMetadata(aipId, descId);
@@ -893,7 +877,7 @@ public class SolrUtils {
     doc.addField(RodaConstants.SRO_SIZE_IN_BYTES, rep.getSizeInBytes());
     doc.addField(RodaConstants.SRO_DATE_CREATION, rep.getDateCreated());
     doc.addField(RodaConstants.SRO_DATE_MODIFICATION, rep.getDateModified());
-    if (rep.getStatuses() != null && rep.getStatuses().size() > 0) {
+    if (rep.getStatuses() != null && !rep.getStatuses().isEmpty()) {
       for (RepresentationState rs : rep.getStatuses()) {
         doc.addField(RodaConstants.SRO_STATUS, rs.toString());
       }
@@ -923,6 +907,7 @@ public class SolrUtils {
     final String outcomeDetails = objectToString(doc.get(RodaConstants.SEPM_OUTCOME_DETAILS));
 
     SimpleEventPreservationMetadata sepm = new SimpleEventPreservationMetadata();
+    sepm.setId(id);
     sepm.setAgentID(agentID);
     sepm.setAipId(aipID);
     sepm.setRepresentationId(representationID);

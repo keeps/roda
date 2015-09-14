@@ -134,7 +134,7 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void aipUpdated(AIP aip) {
-    // TODO Is this the best way to update? What about the commit?
+    // TODO Is this the best way to update?
     aipDeleted(aip.getId());
     aipCreated(aip);
   }

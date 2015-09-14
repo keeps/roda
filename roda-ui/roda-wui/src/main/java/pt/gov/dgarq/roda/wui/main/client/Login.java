@@ -21,7 +21,7 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 import pt.gov.dgarq.roda.core.common.AuthenticationDeniedException;
-import pt.gov.dgarq.roda.wui.common.client.AuthenticatedUser;
+import pt.gov.dgarq.roda.core.data.v2.RodaUser;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
@@ -147,7 +147,7 @@ public class Login extends Composite {
       error.setText("Please fill the username and password");
     } else {
 
-      UserLogin.getInstance().login(usernameText, passwordText, new AsyncCallback<AuthenticatedUser>() {
+      UserLogin.getInstance().login(usernameText, passwordText, new AsyncCallback<RodaUser>() {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -159,7 +159,7 @@ public class Login extends Composite {
         }
 
         @Override
-        public void onSuccess(AuthenticatedUser user) {
+        public void onSuccess(RodaUser user) {
           if (service != null && service.length() > 0) {
             History.newItem(service);
           } else {

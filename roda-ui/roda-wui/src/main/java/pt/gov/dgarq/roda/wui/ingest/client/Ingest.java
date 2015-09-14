@@ -4,8 +4,8 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
+import pt.gov.dgarq.roda.core.data.v2.RodaUser;
 import pt.gov.dgarq.roda.core.data.v2.User;
-import pt.gov.dgarq.roda.wui.common.client.AuthenticatedUser;
 import pt.gov.dgarq.roda.wui.common.client.BadHistoryTokenException;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
@@ -123,14 +123,14 @@ public class Ingest {
       }
 
       public void onSuccess(final String rodaInUrl) {
-        UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<AuthenticatedUser>() {
+        UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<RodaUser>() {
 
           public void onFailure(Throwable caught) {
             logger.error("Error getting RODA-in", caught);
           }
 
-          public void onSuccess(AuthenticatedUser user) {
-            User target = targetUser == null ? user : targetUser;
+          public void onSuccess(RodaUser user) {
+            RodaUser target = targetUser == null ? user : targetUser;
             String url = rodaInUrl.replaceAll("$USERNAME", user.getName()) + "/" + target.getName();
             if (os != null) {
               url += "?os=" + os;

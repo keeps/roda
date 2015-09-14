@@ -15,8 +15,8 @@ import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.MainConstants;
+import pt.gov.dgarq.roda.core.data.v2.RodaUser;
 import pt.gov.dgarq.roda.wui.about.client.About;
-import pt.gov.dgarq.roda.wui.common.client.AuthenticatedUser;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.LoginStatusListener;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
@@ -124,14 +124,14 @@ public class Menu extends Composite {
       }
     });
 
-    UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<AuthenticatedUser>() {
+    UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<RodaUser>() {
 
       public void onFailure(Throwable caught) {
         logger.fatal("Error getting Authenticated user", caught);
 
       }
 
-      public void onSuccess(AuthenticatedUser user) {
+      public void onSuccess(RodaUser user) {
         updateVisibles(user);
       }
 
@@ -139,7 +139,7 @@ public class Menu extends Composite {
 
     UserLogin.getInstance().addLoginStatusListener(new LoginStatusListener() {
 
-      public void onLoginStatusChanged(AuthenticatedUser user) {
+      public void onLoginStatusChanged(RodaUser user) {
         updateVisibles(user);
       }
 
@@ -166,7 +166,7 @@ public class Menu extends Composite {
     };
   }
 
-  private void updateVisibles(AuthenticatedUser user) {
+  private void updateVisibles(RodaUser user) {
 
     logger.info("Updating menu visibility for user " + user.getName());
 

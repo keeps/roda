@@ -1,6 +1,10 @@
-package pt.gov.dgarq.roda.wui.dissemination.browse.server;
+package org.roda.api.controllers;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -9,6 +13,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.StreamingOutput;
+
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.roda.common.HTMLUtils;
 import org.roda.index.IndexServiceException;
@@ -35,6 +43,8 @@ import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationState;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
+import pt.gov.dgarq.roda.disseminators.common.tools.ZipEntryInfo;
+import pt.gov.dgarq.roda.disseminators.common.tools.ZipTools;
 import pt.gov.dgarq.roda.wui.common.client.GenericException;
 import pt.gov.dgarq.roda.wui.common.server.ServerTools;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.BrowseItemBundle;
@@ -210,7 +220,54 @@ public class BrowserHelper {
       }
 
     }
+  }
 
+  protected static StreamingOutput getAipRepresentation(String aipId, String representationId)
+    throws ModelServiceException, StorageServiceException, GenericException {
+    try {
+      ModelService model = RodaCoreFactory.getModelService();
+      StorageService storage = RodaCoreFactory.getStorageService();
+      Representation representation = model.retrieveRepresentation(aipId, representationId);
+
+      List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
+      List<String> fileIds = representation.getFileIds();
+      if (fileIds != null && fileIds.size() > 0) {
+        for (String fileId : fileIds) {
+          StoragePath filePath = ModelUtils.getRepresentationFilePath(aipId, representationId, fileId);
+          Binary binary = storage.getBinary(filePath);
+          Path tempFile = Files.createTempFile("test", ".tmp");
+          Files.copy(binary.getContent().createInputStream(), tempFile, StandardCopyOption.REPLACE_EXISTING);
+          ZipEntryInfo info = new ZipEntryInfo(filePath.getName(), tempFile.toFile());
+          zipEntries.add(info);
+        }
+      }
+
+      String filename = "";
+      StreamingOutput stream = null;
+      if (zipEntries.size() == 1) {
+        stream = new StreamingOutput() {
+          @Override
+          public void write(OutputStream os) throws IOException, WebApplicationException {
+            IOUtils.copy(zipEntries.get(0).getInputStream(), os);
+          }
+        };
+        filename = zipEntries.get(0).getName();
+      } else {
+        stream = new StreamingOutput() {
+          @Override
+          public void write(OutputStream os) throws IOException, WebApplicationException {
+            ZipTools.zip(zipEntries, os);
+          }
+        };
+        filename = aipId + "_" + representationId + ".zip";
+      }
+
+      return stream;
+
+    } catch (IOException e) {
+      // FIXME see what better exception should be thrown
+      throw new GenericException("");
+    }
   }
 
 }

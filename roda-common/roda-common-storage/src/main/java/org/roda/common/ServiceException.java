@@ -11,7 +11,7 @@ public class ServiceException extends Exception {
   public static final int INTERNAL_SERVER_ERROR = 500;
   public static final int NOT_IMPLEMENTED = 501;
 
-  private int code;
+  private final int code;
 
   public ServiceException(String message, int code) {
     super(message);
@@ -25,10 +25,6 @@ public class ServiceException extends Exception {
 
   public int getCode() {
     return code;
-  }
-
-  public void setCode(int code) {
-    this.code = code;
   }
 
 }

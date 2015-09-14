@@ -14,6 +14,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import pt.gov.dgarq.roda.core.data.v2.Group;
 import pt.gov.dgarq.roda.core.data.v2.RODAMember;
+import pt.gov.dgarq.roda.core.data.v2.RodaUser;
 import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.wui.common.client.tools.CachedAsynRequest;
 
@@ -98,10 +99,10 @@ public class UserLogin {
     listeners = new Vector<LoginStatusListener>();
   }
 
-  private final CachedAsynRequest<AuthenticatedUser> getUserRequest = new CachedAsynRequest<AuthenticatedUser>() {
+  private final CachedAsynRequest<RodaUser> getUserRequest = new CachedAsynRequest<RodaUser>() {
 
     @Override
-    public void getFromServer(AsyncCallback<AuthenticatedUser> callback) {
+    public void getFromServer(AsyncCallback<RodaUser> callback) {
       userLoginService.getAuthenticatedUser(callback);
     }
   };
@@ -114,7 +115,7 @@ public class UserLogin {
    *          call back handler that receives error if failed or AuthOfficeUser
    *          if success.
    */
-  public void getAuthenticatedUser(final AsyncCallback<AuthenticatedUser> callback) {
+  public void getAuthenticatedUser(final AsyncCallback<RodaUser> callback) {
     getUserRequest.request(callback);
   }
 
@@ -130,8 +131,8 @@ public class UserLogin {
     Window.open("/login?service=" + currentURL, "_self", "");
   }
 
-  public void login(String username, String password, final AsyncCallback<AuthenticatedUser> callback) {
-    userLoginService.login(username, password, new AsyncCallback<AuthenticatedUser>() {
+  public void login(String username, String password, final AsyncCallback<RodaUser> callback) {
+    userLoginService.login(username, password, new AsyncCallback<RodaUser>() {
 
       @Override
       public void onFailure(Throwable caught) {
@@ -139,7 +140,7 @@ public class UserLogin {
       }
 
       @Override
-      public void onSuccess(AuthenticatedUser newUser) {
+      public void onSuccess(RodaUser newUser) {
         getUserRequest.setCached(newUser);
         onLoginStatusChanged(newUser);
         callback.onSuccess(newUser);
@@ -175,7 +176,7 @@ public class UserLogin {
     listeners.remove(listener);
   }
 
-  public void onLoginStatusChanged(AuthenticatedUser newUser) {
+  public void onLoginStatusChanged(RodaUser newUser) {
     for (LoginStatusListener listener : listeners) {
       listener.onLoginStatusChanged(newUser);
     }
@@ -189,14 +190,14 @@ public class UserLogin {
    *          the member which had his permissions changed
    */
   public void permissionsChanged(final RODAMember member) {
-    getAuthenticatedUser(new AsyncCallback<AuthenticatedUser>() {
+    getAuthenticatedUser(new AsyncCallback<RodaUser>() {
 
       public void onFailure(Throwable caught) {
         // do nothing
       }
 
-      public void onSuccess(AuthenticatedUser user) {
-        AuthenticatedUser authUser = user;
+      public void onSuccess(RodaUser user) {
+        RodaUser authUser = user;
         if (member instanceof User && member.getName().equals(authUser.getName())) {
           onLoginStatusChanged(authUser);
         } else if (member instanceof Group && Arrays.asList(authUser.getAllGroups()).contains(member.getName())) {
@@ -287,13 +288,13 @@ public class UserLogin {
         if (role == null) {
           GWT.log("Could not find role for path " + res.getHistoryPath());
         }
-        getAuthenticatedUser(new AsyncCallback<AuthenticatedUser>() {
+        getAuthenticatedUser(new AsyncCallback<RodaUser>() {
 
           public void onFailure(Throwable caught) {
             callback.onFailure(caught);
           }
 
-          public void onSuccess(AuthenticatedUser authUser) {
+          public void onSuccess(RodaUser authUser) {
             callback.onSuccess(new Boolean(authUser.hasRole(role)));
           }
 

@@ -1,9 +1,13 @@
-package pt.gov.dgarq.roda.wui.dissemination.browse.server;
+package org.roda.api.controllers;
 
 import java.util.Date;
 import java.util.List;
 
+import javax.ws.rs.core.StreamingOutput;
+
 import org.roda.common.UserUtility;
+import org.roda.model.ModelServiceException;
+import org.roda.storage.StorageServiceException;
 
 import pt.gov.dgarq.roda.common.RodaCoreService;
 import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
@@ -127,6 +131,26 @@ public class Browser extends RodaCoreService {
 
     return sdo;
 
+  }
+
+  public static StreamingOutput getAipRepresentation(RodaUser user, String aipId, String representationId)
+    throws AuthorizationDeniedException, GenericException, ModelServiceException, StorageServiceException {
+    Date start = new Date();
+
+    SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(aipId);
+    // check user permissions
+    // FIXME set proper role check
+    UserUtility.checkObjectPermissions(user, sdo);
+
+    // delegate
+    StreamingOutput stream = BrowserHelper.getAipRepresentation(aipId, representationId);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, "Browser", "getAipRepresentation", aipId, duration, "aip", aipId, "representationId",
+      representationId);
+
+    return stream;
   }
 
 }

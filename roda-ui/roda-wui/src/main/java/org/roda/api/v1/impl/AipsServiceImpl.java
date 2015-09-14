@@ -10,6 +10,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -17,9 +18,11 @@ import javax.ws.rs.core.StreamingOutput;
 
 import org.apache.commons.io.IOUtils;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.roda.api.controllers.Browser;
 import org.roda.api.v1.AipsService;
 import org.roda.api.v1.ApiResponseMessage;
 import org.roda.api.v1.NotFoundException;
+import org.roda.common.UserUtility;
 import org.roda.model.DescriptiveMetadata;
 import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
@@ -27,13 +30,13 @@ import org.roda.model.PreservationMetadata;
 import org.roda.model.utils.ModelUtils;
 import org.roda.storage.Binary;
 import org.roda.storage.ClosableIterable;
-import org.roda.storage.StoragePath;
 import org.roda.storage.StorageService;
 import org.roda.storage.StorageServiceException;
 import org.roda.storage.fs.FSUtils;
 
 import pt.gov.dgarq.roda.common.RodaCoreFactory;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
+import pt.gov.dgarq.roda.core.data.v2.RodaUser;
 import pt.gov.dgarq.roda.disseminators.common.tools.ZipEntryInfo;
 import pt.gov.dgarq.roda.disseminators.common.tools.ZipTools;
 
@@ -77,47 +80,13 @@ public class AipsServiceImpl extends AipsService {
   }
 
   @Override
-  public Response aipsAipIdDataRepresentationIdGet(String aipId, String representationId, String acceptFormat)
-    throws NotFoundException {
+  public Response aipsAipIdDataRepresentationIdGet(HttpServletRequest request, String aipId, String representationId,
+    String acceptFormat) throws NotFoundException {
     try {
       if (acceptFormat != null && acceptFormat.equalsIgnoreCase("bin")) {
-        ModelService model = RodaCoreFactory.getModelService();
-        StorageService storage = RodaCoreFactory.getStorageService();
-        Representation representation = model.retrieveRepresentation(aipId, representationId);
-
-        List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
-        List<String> fileIds = representation.getFileIds();
-        if (fileIds != null && fileIds.size() > 0) {
-          for (String fileId : fileIds) {
-            StoragePath filePath = ModelUtils.getRepresentationFilePath(aipId, representationId, fileId);
-            Binary binary = storage.getBinary(filePath);
-            Path tempFile = Files.createTempFile("test", ".tmp");
-            Files.copy(binary.getContent().createInputStream(), tempFile, StandardCopyOption.REPLACE_EXISTING);
-            ZipEntryInfo info = new ZipEntryInfo(filePath.getName(), tempFile.toFile());
-            zipEntries.add(info);
-          }
-        }
-
-        String filename = "";
-        StreamingOutput stream = null;
-        if (zipEntries.size() == 1) {
-          stream = new StreamingOutput() {
-            @Override
-            public void write(OutputStream os) throws IOException, WebApplicationException {
-              IOUtils.copy(zipEntries.get(0).getInputStream(), os);
-            }
-          };
-          filename = zipEntries.get(0).getName();
-        } else {
-          stream = new StreamingOutput() {
-            @Override
-            public void write(OutputStream os) throws IOException, WebApplicationException {
-              ZipTools.zip(zipEntries, os);
-            }
-          };
-          filename = aipId + "_" + representationId + ".zip";
-        }
-        return Response.ok(stream, MediaType.APPLICATION_OCTET_STREAM)
+        RodaUser user = UserUtility.getUser(request, RodaCoreFactory.getIndexService());
+        StreamingOutput aipRepresentation = Browser.getAipRepresentation(user, aipId, representationId);
+        return Response.ok(aipRepresentation, MediaType.APPLICATION_OCTET_STREAM)
           .header("content-disposition", "attachment; filename = " + filename).build();
       } else {
         return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Not yet implemented"))

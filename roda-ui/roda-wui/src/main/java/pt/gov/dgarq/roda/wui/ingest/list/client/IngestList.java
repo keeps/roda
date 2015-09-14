@@ -40,8 +40,8 @@ import pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.LikeFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.OneOfManyFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
+import pt.gov.dgarq.roda.core.data.v2.RodaUser;
 import pt.gov.dgarq.roda.core.data.v2.SIPReport;
-import pt.gov.dgarq.roda.wui.common.client.AuthenticatedUser;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
@@ -463,13 +463,13 @@ public class IngestList extends Composite {
     // view.setEnabled(selected != null && selected.getIngestedID() !=
     // null);
 
-    UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<AuthenticatedUser>() {
+    UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<RodaUser>() {
 
       public void onFailure(Throwable caught) {
         logger.error("Error updating visibles", caught);
       }
 
-      public void onSuccess(AuthenticatedUser user) {
+      public void onSuccess(RodaUser user) {
         boolean accept_reject_role = user.hasRole("ingest.accept_reject_sip");
         // accept.setVisible(accept_reject_role);
         // reject.setVisible(accept_reject_role);

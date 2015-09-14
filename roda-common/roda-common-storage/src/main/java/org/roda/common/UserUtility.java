@@ -19,6 +19,7 @@ import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.RODAMember;
 import pt.gov.dgarq.roda.core.data.v2.RodaSimpleUser;
 import pt.gov.dgarq.roda.core.data.v2.RodaUser;
+import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 
 public class UserUtility {
   private static final Logger LOGGER = Logger.getLogger(UserUtility.class);
@@ -26,6 +27,11 @@ public class UserUtility {
 
   private static LdapUtility LDAP_UTILITY;
   private static RodaSimpleUser GUEST = null;
+
+  /** Private empty constructor */
+  private UserUtility() {
+
+  }
 
   public static LdapUtility getLdapUtility() {
     return LDAP_UTILITY;
@@ -61,40 +67,21 @@ public class UserUtility {
     return user;
   }
 
-  public static void checkRoles(RodaUser rsu, List<String> rolesToCheck) throws AuthorizationDeniedException,
-    LdapUtilityException {
+  public static void checkRoles(RodaUser rsu, List<String> rolesToCheck) throws AuthorizationDeniedException {
     if (!rsu.getAllRoles().containsAll(rolesToCheck)) {
       LOGGER.debug("User \"" + rsu.getId() + "\" roles: " + rsu.getAllRoles() + " vs. roles to check: " + rolesToCheck);
-      throw new AuthorizationDeniedException("The user '" + rsu.getId() + "' does not have all needed permissions: "
-        + rolesToCheck);
+      throw new AuthorizationDeniedException(
+        "The user '" + rsu.getId() + "' does not have all needed permissions: " + rolesToCheck);
     }
   }
 
-  public static void checkRoles(RodaUser ru, List<String> rolesToCheck, HttpServletRequest request)
-    throws AuthorizationDeniedException {
-    if (!ru.getAllRoles().containsAll(rolesToCheck)) {
-      LOGGER.debug("User \"" + ru.getId() + "\" roles: " + ru.getAllRoles() + " vs. roles to check: " + rolesToCheck);
-      throw new AuthorizationDeniedException("The user '" + ru.getId() + "' does not have all needed permissions: "
-        + rolesToCheck);
-    }
+  public static void checkRoles(RodaUser user, String... rolesToCheck) throws AuthorizationDeniedException {
+    checkRoles(user, Arrays.asList(rolesToCheck));
   }
 
   public static RodaUser getFullUser(RodaSimpleUser rsu) throws LdapUtilityException {
     RodaUser u = UserUtility.getLdapUtility().getUser(rsu.getId());
-    u.setAllGroups(u.getAllGroups());
-    u.setDirectGroups(u.getDirectGroups());
-    u.setAllRoles(u.getAllRoles());
-    u.setDirectRoles(u.getDirectRoles());
     return u;
-  }
-
-  public static void checkRoles(RodaUser user, HttpServletRequest request, String... rolesToCheck)
-    throws AuthorizationDeniedException {
-    checkRoles(user, Arrays.asList(rolesToCheck), request);
-  }
-
-  public static void checkRoles(RodaUser user, String... rolesToCheck) throws AuthorizationDeniedException {
-    checkRoles(user, Arrays.asList(rolesToCheck), null);
   }
 
   public static void setUser(HttpServletRequest request, RodaSimpleUser rsu) {
@@ -120,28 +107,6 @@ public class UserUtility {
     return GUEST;
   }
 
-  /*
-   * public static boolean haveSessionActive(CASUtility
-   * casUtility,HttpServletRequest servletRequest) { try{ CASUserPrincipal cup =
-   * getUser(servletRequest); CASUserPrincipal cupUpdated =
-   * casUtility.getCASUserPrincipalFromProxyGrantingTicket(cup.
-   * getProxyGrantingTicket(), ""); cupUpdated.setGuest(cup.isGuest());
-   * UserUtility.setUser(servletRequest, cupUpdated); return true;
-   * }catch(Exception e){ return false;Set<String> roles = new
-   * HashSet<String>(); roles.add("browse"); roles.add("search");
-   * roles.add("administration.user"); roles.add("administration.event");
-   * roles.add("administration.metadata_editor");
-   * roles.add("administration.statistics");
-   * roles.add("administration.statistics.monitor");
-   * roles.add("logger.monitor"); roles.add("ingest.pre_ingest");
-   * roles.add("ingest.load_sips"); roles.add("ingest.list_my_sips");
-   * roles.add("ingest.list_all_sips"); roles.add("ingest.accept_reject_sip");
-   * roles.add("misc.logger"); roles.add("misc.register_user");
-   * roles.add("misc.browse_users");
-   * 
-   * u.setAllRoles(roles); u.setDirectRoles(roles); } }
-   */
-
   public static RodaSimpleUser getClientUser(HttpSession session) {
     final RodaSimpleUser rsu;
     if (session.getAttribute(RODA_USER) != null) {
@@ -163,8 +128,17 @@ public class UserUtility {
 
   }
 
-  // TODO ????
+  /**
+   * @deprecated this method should not be used; it always returns
+   *             {@code session.getId()}
+   */
+  @Deprecated
   public static String getClientUserPassword(HttpSession session) {
-    return null;
+    return session.getId();
+  }
+
+  public static void checkObjectPermissions(RodaUser user, SimpleDescriptionObject sdo) {
+    // FIXME implement
+
   }
 }

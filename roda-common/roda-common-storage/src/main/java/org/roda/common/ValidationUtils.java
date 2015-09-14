@@ -22,8 +22,12 @@ import org.xml.sax.SAXException;
 
 public class ValidationUtils {
   private static final Logger LOGGER = Logger.getLogger(ValidationUtils.class);
-
   private static final String W3C_XML_SCHEMA_NS_URI = "http://www.w3.org/2001/XMLSchema";
+
+  /** Private empty constructor */
+  private ValidationUtils() {
+
+  }
 
   /**
    * Validates all descriptive metadata files contained in the AIP
@@ -80,7 +84,8 @@ public class ValidationUtils {
         }
       } else {
         if (failIfNoSchema) {
-          throw new ModelServiceException("Unable to validate " + filename, ModelServiceException.INTERNAL_SERVER_ERROR);
+          throw new ModelServiceException("Unable to validate " + filename,
+            ModelServiceException.INTERNAL_SERVER_ERROR);
         } else {
           valid = true;
         }

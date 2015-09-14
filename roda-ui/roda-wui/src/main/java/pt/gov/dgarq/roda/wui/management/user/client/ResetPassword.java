@@ -3,16 +3,6 @@
  */
 package pt.gov.dgarq.roda.wui.management.user.client;
 
-import pt.gov.dgarq.roda.core.common.InvalidTokenException;
-import pt.gov.dgarq.roda.core.common.NoSuchUserException;
-import pt.gov.dgarq.roda.wui.common.client.AuthenticatedUser;
-import pt.gov.dgarq.roda.wui.common.client.BadHistoryTokenException;
-import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
-import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
-import pt.gov.dgarq.roda.wui.common.client.UserLogin;
-import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
-import pt.gov.dgarq.roda.wui.home.client.Home;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
@@ -26,6 +16,15 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.UserManagementConstants;
+import pt.gov.dgarq.roda.core.common.InvalidTokenException;
+import pt.gov.dgarq.roda.core.common.NoSuchUserException;
+import pt.gov.dgarq.roda.core.data.v2.RodaUser;
+import pt.gov.dgarq.roda.wui.common.client.BadHistoryTokenException;
+import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
+import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
+import pt.gov.dgarq.roda.wui.common.client.UserLogin;
+import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
+import pt.gov.dgarq.roda.wui.home.client.Home;
 
 /**
  * @author Luis Faria
@@ -103,23 +102,23 @@ public class ResetPassword implements HistoryResolver {
           UserManagementService.Util.getInstance().resetPassword(username, resetPasswordToken, newPassword,
             new AsyncCallback<Void>() {
 
-              public void onFailure(Throwable caught) {
-                if (caught instanceof InvalidTokenException) {
-                  Window.alert(constants.resetPasswordInvalidToken());
-                } else if (caught instanceof NoSuchUserException) {
-                  Window.alert(constants.resetPasswordNoSuchUser());
-                } else {
-                  logger.error("Error reseting password", caught);
-                }
-
+            public void onFailure(Throwable caught) {
+              if (caught instanceof InvalidTokenException) {
+                Window.alert(constants.resetPasswordInvalidToken());
+              } else if (caught instanceof NoSuchUserException) {
+                Window.alert(constants.resetPasswordNoSuchUser());
+              } else {
+                logger.error("Error reseting password", caught);
               }
 
-              public void onSuccess(Void result) {
-                Window.alert(constants.resetPasswordSuccess());
-                History.newItem(Home.RESOLVER.getHistoryPath());
-              }
+            }
 
-            });
+            public void onSuccess(Void result) {
+              Window.alert(constants.resetPasswordSuccess());
+              History.newItem(Home.RESOLVER.getHistoryPath());
+            }
+
+          });
 
         }
 
@@ -223,13 +222,13 @@ public class ResetPassword implements HistoryResolver {
   }
 
   public void isCurrentUserPermitted(final AsyncCallback<Boolean> callback) {
-    UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<AuthenticatedUser>() {
+    UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<RodaUser>() {
 
       public void onFailure(Throwable caught) {
         callback.onFailure(caught);
       }
 
-      public void onSuccess(AuthenticatedUser user) {
+      public void onSuccess(RodaUser user) {
         callback.onSuccess(new Boolean(user.isGuest()));
       }
 

@@ -39,7 +39,6 @@ public final class HTMLUtils {
     return binaryToHtml(binary, locale, true, null, stylesheetOpt);
   }
 
-  // TODO: improve html.premis.xml.xslt
   public static String preservationObjectToHtml(Binary binary, final Locale locale) throws ModelServiceException {
     Map<String, String> stylesheetOpt = new HashMap<String, String>();
     stylesheetOpt.put("prefix", RodaConstants.INDEX_OTHER_DESCRIPTIVE_DATA_PREFIX);

@@ -47,6 +47,7 @@ import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.v2.Group;
+import pt.gov.dgarq.roda.core.data.v2.RodaUser;
 import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.util.PasswordHandler;
 
@@ -326,6 +327,31 @@ public class LdapUtility {
       DirContext ctxRoot = getLDAPDirContext(ldapRootDN);
 
       user = getUser(ctxRoot, name);
+
+      // Close the context when we're done
+      ctxRoot.close();
+
+    } catch (NameNotFoundException e) {
+      LOGGER.debug(userMessage(name, " doesn't exist"), e);
+      user = null;
+
+    } catch (NamingException e) {
+      LOGGER.debug("Error getting user " + name, e);
+      throw new LdapUtilityException("Error getting user " + name, e);
+    }
+
+    return user;
+  }
+
+  public RodaUser getRodaUser(String name) throws LdapUtilityException {
+
+    RodaUser user = null;
+
+    try {
+      // Create initial context
+      DirContext ctxRoot = getLDAPDirContext(ldapRootDN);
+
+      user = getRodaUser(ctxRoot, name);
 
       // Close the context when we're done
       ctxRoot.close();
@@ -1053,14 +1079,14 @@ public class LdapUtility {
    * @throws AuthenticationDeniedException
    * @throws ServiceException
    */
-  public User getAuthenticatedUser(String username, String password)
+  public RodaUser getAuthenticatedUser(String username, String password)
     throws AuthenticationDeniedException, ServiceException {
 
     try {
       // Create initial context
       DirContext ctxRoot = getLDAPDirContext(ldapRootDN, getUserDN(username), password);
 
-      User user = getUser(ctxRoot, username);
+      RodaUser user = getRodaUser(ctxRoot, username);
       ctxRoot.close();
       return user;
 
@@ -1495,6 +1521,33 @@ public class LdapUtility {
     }
   }
 
+  private RodaUser getRodaUser(DirContext ctxRoot, String username) throws NamingException {
+
+    Attributes attributes = ctxRoot.getAttributes(getUserDN(username));
+
+    RodaUser user = getRodaUserFromAttributes(attributes);
+
+    // Add all roles assigned to this user
+    Set<String> memberRoles = getMemberRoles(ctxRoot, getUserDN(username));
+    user.setAllRoles(memberRoles);
+
+    // Add direct roles assigned to this user
+    for (String role : getMemberDirectRoles(ctxRoot, getUserDN(username))) {
+      user.addDirectRole(role);
+    }
+
+    // Add all groups to which this user belongs
+    Set<String> memberGroups = getMemberGroups(ctxRoot, getUserDN(username));
+    user.setAllGroups(memberGroups);
+
+    // Add groups to which this user belongs
+    for (String groupDN : getDNsOfGroupsContainingMember(ctxRoot, getUserDN(username))) {
+      user.addGroup(getGroupCNFromDN(groupDN));
+    }
+
+    return user;
+  }
+
   private User getUser(DirContext ctxRoot, String username) throws NamingException {
 
     Attributes attributes = ctxRoot.getAttributes(getUserDN(username));
@@ -1520,6 +1573,26 @@ public class LdapUtility {
     }
 
     return user;
+  }
+
+  private RodaUser getRodaUserFromAttributes(Attributes userAttributes) throws NamingException {
+    RodaUser rodaUser = new RodaUser();
+    rodaUser.setId(userAttributes.get("uid").get().toString());
+    rodaUser.setName(rodaUser.getId());
+    if (userAttributes.get("email") != null) {
+      rodaUser.setEmail(userAttributes.get("email").get().toString());
+    }
+    if (userAttributes.get("cn") != null) {
+      rodaUser.setFullName(userAttributes.get("cn").get().toString());
+    }
+    if (userAttributes.get(SHADOW_INACTIVE) != null) {
+      String zeroOrOne = userAttributes.get(SHADOW_INACTIVE).get().toString();
+      rodaUser.setActive("0".equalsIgnoreCase(zeroOrOne));
+    } else {
+      rodaUser.setActive(true);
+    }
+    rodaUser.setGuest(false);
+    return rodaUser;
   }
 
   private User getUserFromAttributes(Attributes userAttributes) throws NamingException {
@@ -2385,7 +2458,8 @@ public class LdapUtility {
    *          a list of roles that this member should own.
    * @throws NamingException
    */
-  private void setMemberDirectRoles(DirContext ctxRoot, String memberDN, final Set<String> roles) throws NamingException {
+  private void setMemberDirectRoles(DirContext ctxRoot, String memberDN, final Set<String> roles)
+    throws NamingException {
 
     Set<String> properRoles = roles;
     if (properRoles == null) {
