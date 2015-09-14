@@ -65,6 +65,13 @@ public final class HTMLUtils {
   }
 
   
+  public static String aipPremisToHTML2(AIP aip, ModelService model, StorageService storage, Locale locale) throws ModelServiceException, StorageServiceException{
+
+    
+    
+    return null;
+  }
+  
   public static String aipPremisToHTML(AIP aip, ModelService model, StorageService storage, Locale locale) throws ModelServiceException, StorageServiceException{
     TreeSet<String> agentsID = null;
     StringBuffer s = new StringBuffer();
@@ -99,26 +106,27 @@ public final class HTMLUtils {
     
     List<Binary> events = new ArrayList<Binary>();
     List<Binary> files = new ArrayList<Binary>();
+    List<Binary> agents = new ArrayList<Binary>();
     Binary representation = null;
     
     Iterator<PreservationMetadata> iterator = preservationMetadata.iterator();
-    //TreeSet<String> agentsIDs = new TreeSet<String>();
     while (iterator.hasNext()) {
       PreservationMetadata pm = iterator.next();
       Binary b = storage.getBinary(pm.getStoragePath());
       if(ModelUtils.isPreservationEvent(b)){
-        //agentsIDs.addAll(ModelUtils.extractAgentIdsFromPreservationBinary(b,EventComplexType.class));
         events.add(b);
       }else if(ModelUtils.isPreservationFileObject(b)){
-        //agentsIDs.addAll(ModelUtils.extractAgentIdsFromPreservationBinary(b,File.class));
         files.add(b);
+      }else if(ModelUtils.isPreservationAgentObject(b)){
+        agents.add(b);
       }else{
-        //agentsIDs.addAll(ModelUtils.extractAgentIdsFromPreservationBinary(b,Representation.class));
         representation = b;
       }
     }
     
     events = ModelUtils.sortEventsByDate(events);
+    files = ModelUtils.sortFilesByRepresentationOrder(representation,files);
+    
 
     List<String> htmlEvents = new ArrayList<String>();
     for(Binary event : events){
@@ -133,20 +141,15 @@ public final class HTMLUtils {
       htmlFiles.add(html);
     }
     stylesheetOpt.put("files", htmlFiles);
-    /*
-    List<String> htmlAgents = new ArrayList<String>();
     
-  if(agentsIDs!=null && agentsIDs.size()>0){
-      
-      for(String s : agentsIDs){
-        System.out.println("AGENTID: "+s);
-        //Binary agent = storage.getBinary(ModelUtils.getPreservationAgentPath(s));
-        //String html = preservationObjectToHtml(agent,locale);
-        //htmlAgents.add(html);
-      }
-      stylesheetOpt.put("agents", htmlAgents);
-      
-    }*/
+    List<String> htmlAgents = new ArrayList<String>();
+    for(Binary agent : agents){
+      String html = preservationObjectToHtml(agent,locale);
+      htmlAgents.add(html);
+    }
+    stylesheetOpt.put("agents", htmlAgents);
+    
+    
     return binaryToHtml(representation, locale, false, "premis", stylesheetOpt);
   }
   

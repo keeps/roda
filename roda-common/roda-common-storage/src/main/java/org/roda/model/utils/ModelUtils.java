@@ -33,14 +33,17 @@ import org.roda.storage.StorageServiceException;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lc.xmlns.premisV2.AgentComplexType;
 import lc.xmlns.premisV2.EventComplexType;
 import lc.xmlns.premisV2.File;
 import lc.xmlns.premisV2.LinkingAgentIdentifierComplexType;
+import lc.xmlns.premisV2.RelationshipComplexType;
 import lc.xmlns.premisV2.Representation;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationState;
 import pt.gov.dgarq.roda.core.data.v2.SIPReport;
+import pt.gov.dgarq.roda.core.metadata.v2.premis.PremisAgentHelper;
 import pt.gov.dgarq.roda.core.metadata.v2.premis.PremisEventHelper;
 import pt.gov.dgarq.roda.core.metadata.v2.premis.PremisFileObjectHelper;
 import pt.gov.dgarq.roda.core.metadata.v2.premis.PremisMetadataException;
@@ -486,6 +489,49 @@ public final class ModelUtils {
     }
     return file;
   }
+  
+  public static boolean isPreservationAgentObject(Binary preservationBinary) {
+    boolean isAgent = true;
+    InputStream binaryInputStream = null;
+    try {
+      binaryInputStream = preservationBinary.getContent().createInputStream();
+      PremisAgentHelper.newInstance(binaryInputStream);
+    } catch (PremisMetadataException | IOException | ClassCastException e) {
+      isAgent = false;
+    } finally {
+      if (binaryInputStream != null) {
+        try {
+          binaryInputStream.close();
+        } catch (IOException e1) {
+          LOGGER.warn("Cannot close file inputstream", e1);
+        }
+      }
+    }
+    return isAgent;
+  }
+  
+  
+  public static AgentComplexType binaryToAgent(Binary eventBinary)  throws ModelServiceException{
+    InputStream binaryInputStream = null;
+    AgentComplexType agent = null;
+    try {
+      binaryInputStream = eventBinary.getContent().createInputStream();
+       agent = PremisAgentHelper.newInstance(binaryInputStream).getAgent();
+    } catch (PremisMetadataException | IOException | ClassCastException e) {
+      throw new ModelServiceException(e.getMessage(), ModelServiceException.INTERNAL_SERVER_ERROR);
+    } finally {
+      if (binaryInputStream != null) {
+        try {
+          binaryInputStream.close();
+        } catch (IOException e1) {
+          LOGGER.warn("Cannot close file inputstream", e1);
+        }
+      }
+    }
+    return agent;
+  }
+  
+  
   // FIXME finish to implement this for deleting the 3 methods above
   // (isPreservation*)
   public static PREMIS_TYPE getPremisType(Binary preservationBinary) {
@@ -611,6 +657,14 @@ public final class ModelUtils {
     }
     // TODO Auto-generated method stub
     return ids;
+  }
+;
+  public static List<Binary> sortFilesByRepresentationOrder(Binary representation, List<Binary> files) throws ModelServiceException {
+    TreeMap<String, Binary> sortedMap = new TreeMap<String,Binary>();
+    for(Binary b : files){
+      sortedMap.put(binaryToFile(b).getObjectIdentifierList().get(0).getObjectIdentifierValue() , b);
+    }
+    return new ArrayList<Binary>(sortedMap.values());
   }
 
 }
