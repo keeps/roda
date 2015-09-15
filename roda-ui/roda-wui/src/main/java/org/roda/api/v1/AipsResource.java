@@ -18,7 +18,8 @@ import javax.ws.rs.core.Response;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
-import org.roda.api.v1.factories.AipsServiceFactory;
+import org.roda.api.v1.impl.AipsResourceImpl;
+import org.roda.api.v1.utils.NotFoundException;
 import org.roda.model.AIP;
 import org.roda.model.DescriptiveMetadata;
 
@@ -37,7 +38,7 @@ public class AipsResource {
   public static final String ENDPOINT = "/v1/aips";
   public static final String SWAGGER_ENDPOINT = "v1 aips";
 
-  private final AipsService delegate = AipsServiceFactory.getAipsApi();
+  private final AipsResourceImpl delegate = new AipsResourceImpl();
 
   @Context
   private HttpServletRequest request;

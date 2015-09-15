@@ -22,9 +22,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.roda.api.controllers.Browser;
-import org.roda.api.v1.AipsService;
-import org.roda.api.v1.ApiResponseMessage;
-import org.roda.api.v1.NotFoundException;
+import org.roda.api.v1.utils.ApiResponseMessage;
+import org.roda.api.v1.utils.NotFoundException;
 import org.roda.common.UserUtility;
 import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
@@ -46,52 +45,47 @@ import pt.gov.dgarq.roda.disseminators.common.tools.ZipTools;
 import pt.gov.dgarq.roda.wui.common.client.GenericException;
 
 @javax.annotation.Generated(value = "class io.swagger.codegen.languages.JaxRSServerCodegen", date = "2015-09-03T11:38:49.275+01:00")
-public class AipsServiceImpl extends AipsService {
-  private static final Logger LOGGER = Logger.getLogger(AipsServiceImpl.class);
+public class AipsResourceImpl {
+  private static final Logger LOGGER = Logger.getLogger(AipsResourceImpl.class);
 
-  @Override
   public Response aipsGet(String start, String limit) throws NotFoundException {
     // do some magic!
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic2!")).build();
   }
 
-  @Override
   public Response aipsAipIdGet(String aipId, String acceptFormat) throws NotFoundException {
     // do some magic!
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 
-  @Override
   public Response aipsAipIdPut(String aipId, String filepath) throws NotFoundException {
     // do some magic!
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 
-  @Override
   public Response aipsAipIdPost(String aipId, String filepath) throws NotFoundException {
     // do some magic!
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 
-  @Override
   public Response aipsAipIdDelete(String aipId) throws NotFoundException {
     // do some magic!
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 
-  @Override
   public Response aipsAipIdDataGet(String aipId, String start, String limit) throws NotFoundException {
     // do some magic!
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 
-  @Override
   public Response getAipRepresentation(HttpServletRequest request, String aipId, String representationId,
     String acceptFormat) throws NotFoundException {
     String authorization = request.getHeader("Authorization");
     try {
       if (acceptFormat != null && acceptFormat.equalsIgnoreCase("bin")) {
+        // get user
         RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+        // delegate action to controller
         Pair<String, StreamingOutput> aipRepresentation = Browser.getAipRepresentation(user, aipId, representationId);
         return Response.ok(aipRepresentation.getSecond(), MediaType.APPLICATION_OCTET_STREAM)
           .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename = " + aipRepresentation.getFirst()).build();
@@ -119,62 +113,55 @@ public class AipsServiceImpl extends AipsService {
     }
   }
 
-  @Override
   public Response aipsAipIdDataRepresentationIdPut(String aipId, String representationId, String filepath)
     throws NotFoundException {
     // do some magic!
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 
-  @Override
   public Response aipsAipIdDataRepresentationIdPost(String aipId, String representationId, String filepath)
     throws NotFoundException {
     // do some magic!
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 
-  @Override
   public Response aipsAipIdDataRepresentationIdDelete(String aipId, String representationId) throws NotFoundException {
     // do some magic!
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 
-  @Override
   public Response aipsAipIdDataRepresentationIdFileIdGet(String aipId, String representationId, String fileId,
     String acceptFormat) throws NotFoundException {
     // do some magic!
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 
-  @Override
   public Response aipsAipIdDataRepresentationIdFileIdPut(String aipId, String representationId, String fileId,
     String filepath) throws NotFoundException {
     // do some magic!
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 
-  @Override
   public Response aipsAipIdDataRepresentationIdFileIdPost(String aipId, String representationId, String fileId,
     String filepath) throws NotFoundException {
     // do some magic!
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 
-  @Override
   public Response aipsAipIdDataRepresentationIdFileIdDelete(String aipId, String representationId, String fileId)
     throws NotFoundException {
     // do some magic!
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 
-  @Override
   public Response listAipDescriptiveMetadata(HttpServletRequest request, String aipId, String start, String limit,
     String acceptFormat) throws NotFoundException {
     String authorization = request.getHeader("Authorization");
     try {
       if (acceptFormat != null && acceptFormat.equalsIgnoreCase("bin")) {
-
+        // get user
         RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+        // delegate action to controller
         Pair<String, StreamingOutput> aipRepresentation = Browser.listAipDescriptiveMetadata(user, aipId, start, limit);
         return Response.ok(aipRepresentation.getSecond(), MediaType.APPLICATION_OCTET_STREAM)
           .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename = " + aipRepresentation.getFirst()).build();
@@ -203,35 +190,30 @@ public class AipsServiceImpl extends AipsService {
 
   }
 
-  @Override
   public Response aipsAipIdDescriptiveMetadataMetadataIdGet(String aipId, String metadataId, String acceptFormat)
     throws NotFoundException {
     // do some magic!
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 
-  @Override
   public Response aipsAipIdDescriptiveMetadataMetadataIdPut(String aipId, String metadataId,
     FormDataContentDisposition fileDetail, String metadataType) throws NotFoundException {
     // do some magic!
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 
-  @Override
   public Response aipsAipIdDescriptiveMetadataMetadataIdPost(String aipId, String metadataId,
     FormDataContentDisposition fileDetail, String metadataType) throws NotFoundException {
     // do some magic!
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 
-  @Override
   public Response aipsAipIdDescriptiveMetadataMetadataIdDelete(String aipId, String metadataId)
     throws NotFoundException {
     // do some magic!
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 
-  @Override
   public Response aipsAipIdPreservationMetadataGet(String aipId, String start, String limit, String acceptFormat)
     throws NotFoundException {
     try {
@@ -265,7 +247,7 @@ public class AipsServiceImpl extends AipsService {
         StreamingOutput stream = null;
         if (zipEntries.size() == 1) {
           stream = new StreamingOutput() {
-            @Override
+
             public void write(OutputStream os) throws IOException, WebApplicationException {
               IOUtils.copy(zipEntries.get(0).getInputStream(), os);
             }
@@ -273,7 +255,7 @@ public class AipsServiceImpl extends AipsService {
           filename = zipEntries.get(0).getName();
         } else {
           stream = new StreamingOutput() {
-            @Override
+
             public void write(OutputStream os) throws IOException, WebApplicationException {
               ZipTools.zip(zipEntries, os);
             }
@@ -297,7 +279,6 @@ public class AipsServiceImpl extends AipsService {
     }
   }
 
-  @Override
   public Response aipsAipIdPreservationMetadataRepresentationIdGet(String aipId, String representationId, String start,
     String limit, String acceptFormat) throws NotFoundException {
     try {
@@ -327,7 +308,7 @@ public class AipsServiceImpl extends AipsService {
         StreamingOutput stream = null;
         if (zipEntries.size() == 1) {
           stream = new StreamingOutput() {
-            @Override
+
             public void write(OutputStream os) throws IOException, WebApplicationException {
               IOUtils.copy(zipEntries.get(0).getInputStream(), os);
             }
@@ -335,7 +316,7 @@ public class AipsServiceImpl extends AipsService {
           filename = zipEntries.get(0).getName();
         } else {
           stream = new StreamingOutput() {
-            @Override
+
             public void write(OutputStream os) throws IOException, WebApplicationException {
               ZipTools.zip(zipEntries, os);
             }
@@ -359,7 +340,6 @@ public class AipsServiceImpl extends AipsService {
     }
   }
 
-  @Override
   public Response aipsAipIdPreservationMetadataRepresentationIdFileIdGet(String aipId, String representationId,
     String fileId) throws NotFoundException {
     try {
@@ -368,7 +348,7 @@ public class AipsServiceImpl extends AipsService {
 
       String filename = binary.getStoragePath().getName();
       StreamingOutput stream = new StreamingOutput() {
-        @Override
+
         public void write(OutputStream os) throws IOException, WebApplicationException {
           IOUtils.copy(binary.getContent().createInputStream(), os);
         }
@@ -385,7 +365,6 @@ public class AipsServiceImpl extends AipsService {
     }
   }
 
-  @Override
   public Response aipsAipIdPreservationMetadataRepresentationIdFileIdPost(String aipId, String representationId,
     InputStream is, FormDataContentDisposition fileDetail) throws NotFoundException {
 
@@ -407,7 +386,6 @@ public class AipsServiceImpl extends AipsService {
     }
   }
 
-  @Override
   public Response aipsAipIdPreservationMetadataRepresentationIdFileIdPut(String aipId, String representationId,
     InputStream is, FormDataContentDisposition fileDetail) throws NotFoundException {
     try {
@@ -428,7 +406,6 @@ public class AipsServiceImpl extends AipsService {
     }
   }
 
-  @Override
   public Response aipsAipIdPreservationMetadataRepresentationIdFileIdDelete(String aipId, String representationId,
     String fileId) throws NotFoundException {
     try {

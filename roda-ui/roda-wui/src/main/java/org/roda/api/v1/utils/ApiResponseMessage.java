@@ -1,4 +1,4 @@
-package org.roda.api.v1;
+package org.roda.api.v1.utils;
 
 import javax.xml.bind.annotation.XmlTransient;
 
