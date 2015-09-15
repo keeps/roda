@@ -25,6 +25,7 @@ import org.roda.api.controllers.Browser;
 import org.roda.api.v1.utils.ApiResponseMessage;
 import org.roda.api.v1.utils.NotFoundException;
 import org.roda.common.UserUtility;
+import org.roda.model.DescriptiveMetadata;
 import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
 import org.roda.model.PreservationMetadata;

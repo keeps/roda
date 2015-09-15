@@ -104,11 +104,7 @@ public class ModelService extends ModelObservable {
     super();
     this.storage = storage;
     ensureAllContainersExist();
-    try {
-      ensureAllDiretoriesExist();
-    } catch (StorageServiceException e) {
-      LOGGER.error("Error initializing directories", e);
-    }
+    ensureAllDiretoriesExist();
   }
 
   private void ensureAllContainersExist() {
@@ -118,11 +114,6 @@ public class ModelService extends ModelObservable {
     createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_SIP_REPORT);
   }
 
-  private void ensureAllDiretoriesExist() throws StorageServiceException {
-    createDirectoryIfNotExists(
-      DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_PRESERVATION, RodaConstants.STORAGE_DIRECTORY_AGENTS));
-  }
-
   private void createContainerIfNotExists(String containerName) {
     try {
       storage.createContainer(DefaultStoragePath.parse(containerName), new HashMap<String, Set<String>>());
@@ -130,6 +121,15 @@ public class ModelService extends ModelObservable {
       if (e.getCode() != StorageServiceException.ALREADY_EXISTS) {
         LOGGER.error("Error initializing container: " + containerName, e);
       }
+    }
+  }
+
+  private void ensureAllDiretoriesExist() {
+    try {
+      createDirectoryIfNotExists(
+        DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_PRESERVATION, RodaConstants.STORAGE_DIRECTORY_AGENTS));
+    } catch (StorageServiceException e) {
+      LOGGER.error("Error initializing directories", e);
     }
   }
 

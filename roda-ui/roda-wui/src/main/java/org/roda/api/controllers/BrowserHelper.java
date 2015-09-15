@@ -1,12 +1,14 @@
 package org.roda.api.controllers;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -29,6 +31,7 @@ import org.roda.storage.ClosableIterable;
 import org.roda.storage.StoragePath;
 import org.roda.storage.StorageService;
 import org.roda.storage.StorageServiceException;
+import org.roda.storage.fs.FSUtils;
 
 import pt.gov.dgarq.roda.common.RodaCoreFactory;
 import pt.gov.dgarq.roda.core.common.Pair;
@@ -43,6 +46,7 @@ import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationState;
+import pt.gov.dgarq.roda.core.data.v2.RodaUser;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.disseminators.common.tools.ZipEntryInfo;
 import pt.gov.dgarq.roda.disseminators.common.tools.ZipTools;
@@ -192,37 +196,6 @@ public class BrowserHelper {
     }
   }
 
-  public static SimpleDescriptionObject moveInHierarchy(String aipId, String parentId) throws GenericException {
-    try {
-      StorageService storage = RodaCoreFactory.getStorageService();
-      ModelService model = RodaCoreFactory.getModelService();
-      StoragePath aipPath = ModelUtils.getAIPpath(aipId);
-      if (parentId == null || parentId.trim().equals("")) {
-        StoragePath parentPath = ModelUtils.getAIPpath(parentId);
-        storage.getDirectory(parentPath);
-      }
-      Map<String, Set<String>> metadata = storage.getMetadata(aipPath);
-      if (parentId == null || parentId.trim().equalsIgnoreCase("")) {
-        metadata.remove(RodaConstants.STORAGE_META_PARENT_ID);
-      } else {
-        metadata.put(RodaConstants.STORAGE_META_PARENT_ID, new HashSet<String>(Arrays.asList(parentId)));
-      }
-      storage.updateMetadata(aipPath, metadata, true);
-      model.updateAIP(aipId, storage, aipPath);
-
-      return RodaCoreFactory.getIndexService().retrieve(SimpleDescriptionObject.class, aipId);
-    } catch (ModelServiceException | IndexServiceException | StorageServiceException e) {
-      if (e.getCode() == StorageServiceException.NOT_FOUND) {
-        throw new GenericException("AIP not found: " + aipId);
-      } else if (e.getCode() == StorageServiceException.FORBIDDEN) {
-        throw new GenericException("You do not have permission to access AIP: " + aipId);
-      } else {
-        throw new GenericException("Error moving in hierarchy ");
-      }
-
-    }
-  }
-
   protected static Pair<String, StreamingOutput> getAipRepresentation(String aipId, String representationId)
     throws ModelServiceException, StorageServiceException, GenericException {
     try {
@@ -344,6 +317,141 @@ public class BrowserHelper {
     } catch (IOException e) {
       // FIXME see what better exception should be thrown
       throw new GenericException("");
+    }
+  }
+
+  public static SimpleDescriptionObject moveInHierarchy(String aipId, String parentId) throws GenericException {
+    try {
+      StorageService storage = RodaCoreFactory.getStorageService();
+      ModelService model = RodaCoreFactory.getModelService();
+      StoragePath aipPath = ModelUtils.getAIPpath(aipId);
+      if (parentId == null || parentId.trim().equals("")) {
+        StoragePath parentPath = ModelUtils.getAIPpath(parentId);
+        storage.getDirectory(parentPath);
+      }
+      Map<String, Set<String>> metadata = storage.getMetadata(aipPath);
+      if (parentId == null || parentId.trim().equalsIgnoreCase("")) {
+        metadata.remove(RodaConstants.STORAGE_META_PARENT_ID);
+      } else {
+        metadata.put(RodaConstants.STORAGE_META_PARENT_ID, new HashSet<String>(Arrays.asList(parentId)));
+      }
+      storage.updateMetadata(aipPath, metadata, true);
+      model.updateAIP(aipId, storage, aipPath);
+
+      return RodaCoreFactory.getIndexService().retrieve(SimpleDescriptionObject.class, aipId);
+    } catch (ModelServiceException | IndexServiceException | StorageServiceException e) {
+      if (e.getCode() == StorageServiceException.NOT_FOUND) {
+        throw new GenericException("AIP not found: " + aipId);
+      } else if (e.getCode() == StorageServiceException.FORBIDDEN) {
+        throw new GenericException("You do not have permission to access AIP: " + aipId);
+      } else {
+        throw new GenericException("Error moving in hierarchy: " + e.getMessage());
+      }
+
+    }
+
+  }
+
+  public static SimpleDescriptionObject createNewItem(RodaUser user, String aipId, String parentAipId)
+    throws GenericException {
+    try {
+      StorageService storage = RodaCoreFactory.getStorageService();
+      ModelService model = RodaCoreFactory.getModelService();
+      StoragePath aipPath = ModelUtils.getAIPpath(aipId);
+      Map<String, Set<String>> itemMetadata = new HashMap<String, Set<String>>();
+      if (parentAipId != null) {
+        itemMetadata.put(RodaConstants.STORAGE_META_PARENT_ID, new HashSet<String>(Arrays.asList(parentAipId)));
+      }
+      storage.createContainer(aipPath, itemMetadata);
+      model.updateAIP(aipId, storage, aipPath);
+      return RodaCoreFactory.getIndexService().retrieve(SimpleDescriptionObject.class, aipId);
+    } catch (StorageServiceException | ModelServiceException | IndexServiceException e) {
+      if (e.getCode() == StorageServiceException.NOT_FOUND) {
+        throw new GenericException("AIP not found: " + aipId);
+      } else if (e.getCode() == StorageServiceException.FORBIDDEN) {
+        throw new GenericException("You do not have permission to access AIP: " + aipId);
+      } else {
+        throw new GenericException("Error creating new item: " + e.getMessage());
+      }
+
+    }
+  }
+
+  public static SimpleDescriptionObject addNewMetadataFile(String aipId, InputStream metadataStream,
+    String descriptiveMetadataId) throws GenericException {
+    try {
+      ModelService model = RodaCoreFactory.getModelService();
+      Path p = Files.createTempFile("preservation", ".tmp");
+      Files.copy(metadataStream, p, StandardCopyOption.REPLACE_EXISTING);
+      Binary binary = (Binary) FSUtils.convertPathToResource(p.getParent(), p);
+      model.createDescriptiveMetadata(aipId, descriptiveMetadataId, binary, descriptiveMetadataId);
+      return RodaCoreFactory.getIndexService().retrieve(SimpleDescriptionObject.class, aipId);
+    } catch (StorageServiceException | ModelServiceException | IndexServiceException e) {
+      if (e.getCode() == StorageServiceException.NOT_FOUND) {
+        throw new GenericException("AIP not found: " + aipId);
+      } else if (e.getCode() == StorageServiceException.FORBIDDEN) {
+        throw new GenericException("You do not have permission to access AIP: " + aipId);
+      } else {
+        throw new GenericException("Error creating new item: " + e.getMessage());
+      }
+
+    } catch (IOException e) {
+      throw new GenericException("Internal error: " + e.getMessage());
+    }
+  }
+
+  public static SimpleDescriptionObject editMetadataFile(String aipId, InputStream metadataStream,
+    String descriptiveMetadataId) throws GenericException {
+    try {
+      ModelService model = RodaCoreFactory.getModelService();
+      Path p = Files.createTempFile("preservation", ".tmp");
+      Files.copy(metadataStream, p, StandardCopyOption.REPLACE_EXISTING);
+      Binary binary = (Binary) FSUtils.convertPathToResource(p.getParent(), p);
+      model.updateDescriptiveMetadata(aipId, descriptiveMetadataId, binary, descriptiveMetadataId);
+      return RodaCoreFactory.getIndexService().retrieve(SimpleDescriptionObject.class, aipId);
+    } catch (StorageServiceException | ModelServiceException | IndexServiceException e) {
+      if (e.getCode() == StorageServiceException.NOT_FOUND) {
+        throw new GenericException("AIP not found: " + aipId);
+      } else if (e.getCode() == StorageServiceException.FORBIDDEN) {
+        throw new GenericException("You do not have permission to access AIP: " + aipId);
+      } else {
+        throw new GenericException("Error creating new item: " + e.getMessage());
+      }
+    } catch (IOException e) {
+      throw new GenericException("Internal error: " + e.getMessage());
+    }
+  }
+
+  public static SimpleDescriptionObject removeMetadataFile(String aipId, String descriptiveMetadataId)
+    throws GenericException {
+    try {
+      ModelService model = RodaCoreFactory.getModelService();
+      model.deleteDescriptiveMetadata(aipId, descriptiveMetadataId);
+      return RodaCoreFactory.getIndexService().retrieve(SimpleDescriptionObject.class, aipId);
+    } catch (ModelServiceException | IndexServiceException e) {
+      if (e.getCode() == StorageServiceException.NOT_FOUND) {
+        throw new GenericException("AIP not found: " + aipId);
+      } else if (e.getCode() == StorageServiceException.FORBIDDEN) {
+        throw new GenericException("You do not have permission to access AIP: " + aipId);
+      } else {
+        throw new GenericException("Error creating new item: " + e.getMessage());
+      }
+    }
+  }
+
+  public static DescriptiveMetadata retrieveMetadataFile(String aipId, String descriptiveMetadataId)
+    throws GenericException {
+    try {
+      ModelService model = RodaCoreFactory.getModelService();
+      return model.retrieveDescriptiveMetadata(aipId, descriptiveMetadataId);
+    } catch (ModelServiceException e) {
+      if (e.getCode() == StorageServiceException.NOT_FOUND) {
+        throw new GenericException("AIP not found: " + aipId);
+      } else if (e.getCode() == StorageServiceException.FORBIDDEN) {
+        throw new GenericException("You do not have permission to access AIP: " + aipId);
+      } else {
+        throw new GenericException("Error creating new item: " + e.getMessage());
+      }
     }
   }
 

@@ -3,7 +3,10 @@
  */
 package pt.gov.dgarq.roda.wui.dissemination.browse.client;
 
+import java.io.InputStream;
 import java.util.List;
+
+import org.roda.model.DescriptiveMetadata;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
@@ -195,4 +198,19 @@ public interface BrowserService extends RemoteService {
    */
   public TimelineInfo getPreservationTimeline(List<String> repPIDs, List<String> icons, List<String> colors,
     String locale) throws RODAException;
+
+  public SimpleDescriptionObject moveInHierarchy(String aipId, String parentId) throws RODAException;
+
+  public SimpleDescriptionObject createNewItem(String itemId, String parentId) throws RODAException;
+
+  public SimpleDescriptionObject addNewMetadataFile(String itemId, InputStream metadataStream,
+    String descriptiveMetadataId) throws RODAException;
+
+  public SimpleDescriptionObject editMetadataFile(String itemId, InputStream metadataStream,
+    String descriptiveMetadataId) throws RODAException;
+
+  public SimpleDescriptionObject removeMetadataFile(String itemId, String descriptiveMetadataId) throws RODAException;
+
+  public DescriptiveMetadata retrieveMetadataFile(String itemId, String descriptiveMetadataId) throws RODAException;
+
 }

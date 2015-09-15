@@ -6,19 +6,15 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.SortedSet;
 import java.util.TreeSet;
 
 import javax.xml.transform.TransformerException;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.roda.index.utils.SolrUtils;
 import org.roda.model.AIP;
@@ -28,7 +24,6 @@ import org.roda.model.PreservationMetadata;
 import org.roda.model.utils.ModelUtils;
 import org.roda.storage.Binary;
 import org.roda.storage.ClosableIterable;
-import org.roda.storage.Directory;
 import org.roda.storage.StorageService;
 import org.roda.storage.StorageServiceException;
 
@@ -64,112 +59,106 @@ public final class HTMLUtils {
     return binaryToHtml(binary, locale, false, "premis", stylesheetOpt);
   }
 
-  
-  public static String aipPremisToHTML2(AIP aip, ModelService model, StorageService storage, Locale locale) throws ModelServiceException, StorageServiceException{
+  public static String aipPremisToHTML2(AIP aip, ModelService model, StorageService storage, Locale locale)
+    throws ModelServiceException, StorageServiceException {
 
-    
-    
     return null;
   }
-  
-  public static String aipPremisToHTML(AIP aip, ModelService model, StorageService storage, Locale locale) throws ModelServiceException, StorageServiceException{
+
+  // FIXME close properly model related methods that may generate file
+  // descriptor leaks
+  public static String aipPremisToHTML(AIP aip, ModelService model, StorageService storage, Locale locale)
+    throws ModelServiceException, StorageServiceException {
     TreeSet<String> agentsID = null;
     StringBuffer s = new StringBuffer();
     s.append("<span class='representations'>");
-    if(aip.getRepresentationIds()!=null && aip.getRepresentationIds().size()>0){
-      for(String representationId : aip.getRepresentationIds()){
-        ClosableIterable<PreservationMetadata> preservationMetadata = model.listPreservationMetadataBinaries(aip.getId(), representationId);
+    if (aip.getRepresentationIds() != null && aip.getRepresentationIds().size() > 0) {
+      for (String representationId : aip.getRepresentationIds()) {
+        ClosableIterable<PreservationMetadata> preservationMetadata = model
+          .listPreservationMetadataBinaries(aip.getId(), representationId);
         s.append(representationPremisToHtml(preservationMetadata, storage, locale));
       }
       agentsID = new TreeSet<String>();
-      for(String representationId : aip.getRepresentationIds()){
-        ClosableIterable<PreservationMetadata> preservationMetadata = model.listPreservationMetadataBinaries(aip.getId(), representationId);
+      for (String representationId : aip.getRepresentationIds()) {
+        ClosableIterable<PreservationMetadata> preservationMetadata = model
+          .listPreservationMetadataBinaries(aip.getId(), representationId);
         agentsID.addAll(extractAgents(preservationMetadata, storage));
       }
     }
     s.append("</span>");
-    /*
-    if(agentsID!=null && agentsID.size()>0){
-      s.append("<span class='agents'>");
-      for(String agentId : agentsID){
-        Binary agentBinary = storage.getBinary(ModelUtils.getPreservationAgentPath(agentId));
-        s.append(preservationObjectToHtml(agentBinary,locale));
-      }
-      s.append("</span>");
-    }*/
     return s.toString();
   }
-  
-  private static String representationPremisToHtml(ClosableIterable<PreservationMetadata> preservationMetadata, StorageService storage, final Locale locale) throws ModelServiceException, StorageServiceException {
+
+  private static String representationPremisToHtml(ClosableIterable<PreservationMetadata> preservationMetadata,
+    StorageService storage, final Locale locale) throws ModelServiceException, StorageServiceException {
     Map<String, Object> stylesheetOpt = new HashMap<String, Object>();
     stylesheetOpt.put("prefix", RodaConstants.INDEX_OTHER_DESCRIPTIVE_DATA_PREFIX);
-    
+
     List<Binary> events = new ArrayList<Binary>();
     List<Binary> files = new ArrayList<Binary>();
     List<Binary> agents = new ArrayList<Binary>();
     Binary representation = null;
-    
+
     Iterator<PreservationMetadata> iterator = preservationMetadata.iterator();
     while (iterator.hasNext()) {
       PreservationMetadata pm = iterator.next();
       Binary b = storage.getBinary(pm.getStoragePath());
-      if(ModelUtils.isPreservationEvent(b)){
+      if (ModelUtils.isPreservationEvent(b)) {
         events.add(b);
-      }else if(ModelUtils.isPreservationFileObject(b)){
+      } else if (ModelUtils.isPreservationFileObject(b)) {
         files.add(b);
-      }else if(ModelUtils.isPreservationAgentObject(b)){
+      } else if (ModelUtils.isPreservationAgentObject(b)) {
         agents.add(b);
-      }else{
+      } else {
         representation = b;
       }
     }
-    
+
     events = ModelUtils.sortEventsByDate(events);
-    files = ModelUtils.sortFilesByRepresentationOrder(representation,files);
-    
+    files = ModelUtils.sortFilesByRepresentationOrder(representation, files);
 
     List<String> htmlEvents = new ArrayList<String>();
-    for(Binary event : events){
-      String html = preservationObjectToHtml(event,locale);
+    for (Binary event : events) {
+      String html = preservationObjectToHtml(event, locale);
       htmlEvents.add(html);
     }
     stylesheetOpt.put("events", htmlEvents);
 
     List<String> htmlFiles = new ArrayList<String>();
-    for(Binary file : files){
-      String html = preservationObjectToHtml(file,locale);
+    for (Binary file : files) {
+      String html = preservationObjectToHtml(file, locale);
       htmlFiles.add(html);
     }
     stylesheetOpt.put("files", htmlFiles);
-    
+
     List<String> htmlAgents = new ArrayList<String>();
-    for(Binary agent : agents){
-      String html = preservationObjectToHtml(agent,locale);
+    for (Binary agent : agents) {
+      String html = preservationObjectToHtml(agent, locale);
       htmlAgents.add(html);
     }
     stylesheetOpt.put("agents", htmlAgents);
-    
-    
+
     return binaryToHtml(representation, locale, false, "premis", stylesheetOpt);
   }
-  
-  public static TreeSet<String> extractAgents(ClosableIterable<PreservationMetadata> preservationMetadata, StorageService storage) throws ModelServiceException, StorageServiceException {
+
+  public static TreeSet<String> extractAgents(ClosableIterable<PreservationMetadata> preservationMetadata,
+    StorageService storage) throws ModelServiceException, StorageServiceException {
     Iterator<PreservationMetadata> iterator = preservationMetadata.iterator();
     TreeSet<String> agentsIDs = new TreeSet<String>();
     while (iterator.hasNext()) {
       PreservationMetadata pm = iterator.next();
       Binary b = storage.getBinary(pm.getStoragePath());
-      if(ModelUtils.isPreservationEvent(b)){
-        agentsIDs.addAll(ModelUtils.extractAgentIdsFromPreservationBinary(b,EventComplexType.class));
-      }else if(ModelUtils.isPreservationFileObject(b)){
-        agentsIDs.addAll(ModelUtils.extractAgentIdsFromPreservationBinary(b,File.class));
-      }else{
-        agentsIDs.addAll(ModelUtils.extractAgentIdsFromPreservationBinary(b,Representation.class));
+      if (ModelUtils.isPreservationEvent(b)) {
+        agentsIDs.addAll(ModelUtils.extractAgentIdsFromPreservationBinary(b, EventComplexType.class));
+      } else if (ModelUtils.isPreservationFileObject(b)) {
+        agentsIDs.addAll(ModelUtils.extractAgentIdsFromPreservationBinary(b, File.class));
+      } else {
+        agentsIDs.addAll(ModelUtils.extractAgentIdsFromPreservationBinary(b, Representation.class));
       }
     }
     return agentsIDs;
   }
-  
+
   private static String binaryToHtml(Binary binary, final Locale locale, boolean useFilename,
     String alternativeFilenameToUse, Map<String, Object> stylesheetOpt) throws ModelServiceException {
     String filename;

@@ -4,8 +4,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.roda.storage.StoragePath;
-
 import pt.gov.dgarq.roda.core.data.v2.RepresentationState;
 
 /**

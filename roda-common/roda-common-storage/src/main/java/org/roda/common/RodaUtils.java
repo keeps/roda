@@ -28,6 +28,11 @@ import pt.gov.dgarq.roda.core.common.RodaConstants;
 
 public class RodaUtils {
 
+  /** Private empty constructor */
+  private RodaUtils() {
+
+  }
+
   public static String dateToString(Date date) {
     String ret;
     if (date != null) {
@@ -69,7 +74,7 @@ public class RodaUtils {
 
   public static List<String> copyList(Object object) {
     if (!(object instanceof List)) {
-      return null;
+      return new ArrayList<String>();
     }
     List<?> list = (List<?>) object;
     List<String> temp = new ArrayList<String>();
@@ -79,7 +84,7 @@ public class RodaUtils {
       } else if (ob == null) {
         temp.add(null);
       } else {
-        return null;
+        return new ArrayList<String>();
       }
     }
     return temp;

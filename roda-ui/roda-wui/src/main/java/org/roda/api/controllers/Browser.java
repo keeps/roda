@@ -1,11 +1,13 @@
 package org.roda.api.controllers;
 
+import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 
 import javax.ws.rs.core.StreamingOutput;
 
 import org.roda.common.UserUtility;
+import org.roda.model.DescriptiveMetadata;
 import org.roda.model.ModelServiceException;
 import org.roda.storage.StorageServiceException;
 
@@ -23,6 +25,10 @@ import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.wui.common.client.GenericException;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.BrowseItemBundle;
 
+/**
+ * FIXME 1) verify all checkObject*Permissions (because now also a permission
+ * for insert is available)
+ */
 public class Browser extends RodaCoreService {
 
   private Browser() {
@@ -122,9 +128,13 @@ public class Browser extends RodaCoreService {
 
     // check user permissions
     UserUtility.checkRoles(user, "administration.metadata_editor");
+    SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(aipId);
+    UserUtility.checkObjectModifyPermissions(user, sdo);
+    sdo = BrowserHelper.getSimpleDescriptionObject(parentId);
+    UserUtility.checkObjectModifyPermissions(user, sdo);
 
     // delegate
-    SimpleDescriptionObject sdo = BrowserHelper.moveInHierarchy(aipId, parentId);
+    sdo = BrowserHelper.moveInHierarchy(aipId, parentId);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
@@ -170,6 +180,106 @@ public class Browser extends RodaCoreService {
     registerAction(user, "Browser", "listAipDescriptiveMetadata", aipId, duration, "aip", aipId);
 
     return aipRepresentation;
+  }
+
+  public static SimpleDescriptionObject createNewItem(RodaUser user, String itemId, String parentId)
+    throws AuthorizationDeniedException, GenericException {
+    Date start = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, "administration.metadata_editor");
+    SimpleDescriptionObject parentSDO = BrowserHelper.getSimpleDescriptionObject(parentId);
+    UserUtility.checkObjectModifyPermissions(user, parentSDO);
+
+    // delegate
+    SimpleDescriptionObject sdo = BrowserHelper.createNewItem(user, itemId, parentId);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, "Browser", "createNewItem", sdo.getId(), duration, "itemId", itemId, "parentId", parentId);
+
+    return sdo;
+
+  }
+
+  public static SimpleDescriptionObject addNewMetadataFile(RodaUser user, String itemId, InputStream metadataStream,
+    String descriptiveMetadataId) throws AuthorizationDeniedException, GenericException {
+    Date start = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, "administration.metadata_editor");
+    SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(itemId);
+    UserUtility.checkObjectModifyPermissions(user, sdo);
+
+    // delegate
+    sdo = BrowserHelper.addNewMetadataFile(itemId, metadataStream, descriptiveMetadataId);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, "Browser", "addNewMetadataFile", sdo.getId(), duration, "itemId", itemId,
+      "descriptiveMetadataId", descriptiveMetadataId);
+
+    return sdo;
+  }
+
+  public static SimpleDescriptionObject editMetadataFile(RodaUser user, String itemId, InputStream metadataStream,
+    String descriptiveMetadataId) throws AuthorizationDeniedException, GenericException {
+    Date start = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, "administration.metadata_editor");
+    SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(itemId);
+    UserUtility.checkObjectModifyPermissions(user, sdo);
+
+    // delegate
+    sdo = BrowserHelper.editMetadataFile(itemId, metadataStream, descriptiveMetadataId);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, "Browser", "editMetadataFile", sdo.getId(), duration, "itemId", itemId,
+      "descriptiveMetadataId", descriptiveMetadataId);
+
+    return sdo;
+  }
+
+  public static SimpleDescriptionObject removeMetadataFile(RodaUser user, String itemId, String descriptiveMetadataId)
+    throws AuthorizationDeniedException, GenericException {
+    Date start = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, "administration.metadata_editor");
+    SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(itemId);
+    UserUtility.checkObjectModifyPermissions(user, sdo);
+
+    // delegate
+    sdo = BrowserHelper.removeMetadataFile(itemId, descriptiveMetadataId);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, "Browser", "removeMetadataFile", sdo.getId(), duration, "itemId", itemId,
+      "descriptiveMetadataId", descriptiveMetadataId);
+
+    return sdo;
+  }
+
+  public static DescriptiveMetadata retrieveMetadataFile(RodaUser user, String itemId, String descriptiveMetadataId)
+    throws AuthorizationDeniedException, GenericException {
+    Date start = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, "administration.metadata_editor");
+    SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(itemId);
+    UserUtility.checkObjectModifyPermissions(user, sdo);
+
+    // delegate
+    DescriptiveMetadata dm = BrowserHelper.retrieveMetadataFile(itemId, descriptiveMetadataId);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, "Browser", "retrieveMetadataFile", itemId, duration, "itemId", itemId, "descriptiveMetadataId",
+      descriptiveMetadataId);
+
+    return dm;
   }
 
 }

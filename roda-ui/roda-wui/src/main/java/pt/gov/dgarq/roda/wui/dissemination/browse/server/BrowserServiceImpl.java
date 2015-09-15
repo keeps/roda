@@ -1,5 +1,7 @@
 package pt.gov.dgarq.roda.wui.dissemination.browse.server;
 
+import java.io.InputStream;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -8,6 +10,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.roda.api.controllers.Browser;
 import org.roda.common.UserUtility;
+import org.roda.model.DescriptiveMetadata;
 import org.w3c.util.DateParser;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -15,6 +18,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import config.i18n.server.BrowserServiceMessages;
 import pt.gov.dgarq.roda.common.I18nUtility;
 import pt.gov.dgarq.roda.common.RodaCoreFactory;
+import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
 import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.data.DescriptionObject;
 import pt.gov.dgarq.roda.core.data.EventPreservationObject;
@@ -91,6 +95,39 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     return Browser.getAncestors(user, sdo);
   }
 
+  public SimpleDescriptionObject moveInHierarchy(String aipId, String parentId) throws RODAException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    return Browser.moveInHierarchy(user, aipId, parentId);
+  }
+
+  public SimpleDescriptionObject createNewItem(String itemId, String parentId) throws RODAException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    return Browser.createNewItem(user, itemId, parentId);
+
+  }
+  
+  public SimpleDescriptionObject addNewMetadataFile(String itemId, InputStream metadataStream, String descriptiveMetadataId) throws RODAException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    return Browser.addNewMetadataFile(user, itemId, metadataStream, descriptiveMetadataId);
+  }
+  
+  public SimpleDescriptionObject editMetadataFile(String itemId, InputStream metadataStream, String descriptiveMetadataId) throws RODAException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    return Browser.editMetadataFile(user, itemId, metadataStream, descriptiveMetadataId);
+  }
+  
+  public SimpleDescriptionObject removeMetadataFile(String itemId, String descriptiveMetadataId) throws RODAException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    return Browser.removeMetadataFile(user, itemId, descriptiveMetadataId);
+  }
+  
+  public DescriptiveMetadata retrieveMetadataFile(String itemId, String descriptiveMetadataId) throws RODAException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    return Browser.retrieveMetadataFile(user, itemId, descriptiveMetadataId);
+  }
+  
+  
+  
   public DescriptionObject getDescriptionObject(String pid) throws RODAException {
     // DescriptionObject ret;
     // try {
