@@ -3,27 +3,25 @@
  */
 package pt.gov.dgarq.roda.wui.management.user.client;
 
-import pt.gov.dgarq.roda.core.common.EmailAlreadyExistsException;
-import pt.gov.dgarq.roda.core.data.v2.User;
-import pt.gov.dgarq.roda.wui.common.client.AuthenticatedUser;
-import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
-import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
-import pt.gov.dgarq.roda.wui.common.client.UserLogin;
-import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.UserManagementConstants;
+import pt.gov.dgarq.roda.core.common.EmailAlreadyExistsException;
+import pt.gov.dgarq.roda.core.data.v2.RodaUser;
+import pt.gov.dgarq.roda.core.data.v2.User;
+import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
+import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
+import pt.gov.dgarq.roda.wui.common.client.UserLogin;
+import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
 
 /**
  * @author Luis Faria
@@ -123,14 +121,15 @@ public class Preferences implements HistoryResolver {
   }
 
   private void update() {
-    UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<AuthenticatedUser>() {
+    UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<RodaUser>() {
 
       public void onFailure(Throwable caught) {
         logger.error("Error getting authenticated user", caught);
       }
 
-      public void onSuccess(AuthenticatedUser user) {
-        userdata.setUser(user);
+      public void onSuccess(RodaUser user) {
+        // FIXME
+        // userdata.setUser(user);
       }
 
     });
@@ -167,13 +166,13 @@ public class Preferences implements HistoryResolver {
   }
 
   public void isCurrentUserPermitted(final AsyncCallback<Boolean> callback) {
-    UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<AuthenticatedUser>() {
+    UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<RodaUser>() {
 
       public void onFailure(Throwable caught) {
         callback.onFailure(caught);
       }
 
-      public void onSuccess(AuthenticatedUser user) {
+      public void onSuccess(RodaUser user) {
         callback.onSuccess(new Boolean(!user.isGuest()));
       }
 

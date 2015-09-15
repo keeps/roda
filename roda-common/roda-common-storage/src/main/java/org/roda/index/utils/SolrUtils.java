@@ -55,7 +55,6 @@ import org.slf4j.LoggerFactory;
 
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.common.RodaConstants.DateGranularity;
-import pt.gov.dgarq.roda.core.data.v2.RODAObjectPermissions;
 import pt.gov.dgarq.roda.core.data.adapter.facet.FacetParameter;
 import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
 import pt.gov.dgarq.roda.core.data.adapter.facet.RangeFacetParameter;
@@ -79,10 +78,13 @@ import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.RODAMember;
 import pt.gov.dgarq.roda.core.data.v2.RODAObject;
+import pt.gov.dgarq.roda.core.data.v2.RODAObjectPermissions;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationFilePreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationPreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationState;
+import pt.gov.dgarq.roda.core.data.v2.RodaGroup;
+import pt.gov.dgarq.roda.core.data.v2.RodaUser;
 import pt.gov.dgarq.roda.core.data.v2.SIPReport;
 import pt.gov.dgarq.roda.core.data.v2.SIPStateTransition;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
@@ -1210,17 +1212,16 @@ public class SolrUtils {
       roles.addAll(possibleRoles);
     }
     if (isUser) {
-      User user = new User();
+      RodaUser user = new RodaUser();
       user.setId(id);
       user.setActive(isActive);
       user.setAllGroups(groups);
       user.setAllRoles(roles);
       user.setActive(isActive);
       user.setName(name);
-      // TODO get all user other info
       return user;
     } else {
-      Group group = new Group();
+      RodaGroup group = new RodaGroup();
       group.setId(id);
       group.setActive(isActive);
       group.setAllGroups(groups);

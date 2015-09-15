@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.apache.log4j.Logger;
+import org.roda.api.controllers.UserManagement;
 import org.roda.common.LdapUtilityException;
 import org.roda.common.UserUtility;
 import org.roda.index.IndexServiceException;

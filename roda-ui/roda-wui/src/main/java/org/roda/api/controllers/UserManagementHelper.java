@@ -1,4 +1,4 @@
-package pt.gov.dgarq.roda.wui.management.user.server;
+package org.roda.api.controllers;
 
 import java.util.List;
 

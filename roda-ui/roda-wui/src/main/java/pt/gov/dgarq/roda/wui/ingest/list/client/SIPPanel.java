@@ -120,8 +120,8 @@ public class SIPPanel extends ElementPanel<SIPState> {
               producerInfoPopup.setPopupPositionAndShow(new PositionCallback() {
 
                 public void setPosition(int offsetWidth, int offsetHeight) {
-                  producerInfoPopup.setPopupPosition(producer.getAbsoluteLeft(), producer.getAbsoluteTop()
-                    - offsetHeight);
+                  producerInfoPopup.setPopupPosition(producer.getAbsoluteLeft(),
+                    producer.getAbsoluteTop() - offsetHeight);
                 }
 
               });
@@ -306,45 +306,48 @@ public class SIPPanel extends ElementPanel<SIPState> {
 
   private void initProducerInfoPopup(final AsyncCallback<PopupPanel> callback) {
     if (producerInfoPopup.getWidget() == null) {
-      UserManagementService.Util.getInstance().getUser(get().getUsername(), new AsyncCallback<User>() {
-
-        public void onFailure(Throwable caught) {
-          callback.onFailure(caught);
-        }
-
-        public void onSuccess(User user) {
-          UserInfoPanel userInfo = new UserInfoPanel(user);
-          AccessibleFocusPanel focus = new AccessibleFocusPanel(userInfo.getWidget());
-          producerInfoPopup.setWidget(focus);
-          focus.addMouseListener(new MouseListener() {
-
-            public void onMouseDown(Widget sender, int x, int y) {
-            }
-
-            public void onMouseEnter(Widget sender) {
-              showProducerInfoPopup = true;
-              scheduleProducerInfoPopupHide.cancel();
-            }
-
-            public void onMouseLeave(Widget sender) {
-              showProducerInfoPopup = false;
-              scheduleProducerInfoPopupHide.schedule(PRODUCER_INFO_POPUP_HIDE_DELAY_MS);
-            }
-
-            public void onMouseMove(Widget sender, int x, int y) {
-
-            }
-
-            public void onMouseUp(Widget sender, int x, int y) {
-
-            }
-
-          });
-          focus.addStyleName("wui-ingest-list-producer-popup");
-          callback.onSuccess(producerInfoPopup);
-        }
-
-      });
+      // FIXME
+      // UserManagementService.Util.getInstance().getUser(get().getUsername(),
+      // new AsyncCallback<RodaUser>() {
+      //
+      // public void onFailure(Throwable caught) {
+      // callback.onFailure(caught);
+      // }
+      //
+      // public void onSuccess(RodaUser user) {
+      // UserInfoPanel userInfo = new UserInfoPanel(user);
+      // AccessibleFocusPanel focus = new
+      // AccessibleFocusPanel(userInfo.getWidget());
+      // producerInfoPopup.setWidget(focus);
+      // focus.addMouseListener(new MouseListener() {
+      //
+      // public void onMouseDown(Widget sender, int x, int y) {
+      // }
+      //
+      // public void onMouseEnter(Widget sender) {
+      // showProducerInfoPopup = true;
+      // scheduleProducerInfoPopupHide.cancel();
+      // }
+      //
+      // public void onMouseLeave(Widget sender) {
+      // showProducerInfoPopup = false;
+      // scheduleProducerInfoPopupHide.schedule(PRODUCER_INFO_POPUP_HIDE_DELAY_MS);
+      // }
+      //
+      // public void onMouseMove(Widget sender, int x, int y) {
+      //
+      // }
+      //
+      // public void onMouseUp(Widget sender, int x, int y) {
+      //
+      // }
+      //
+      // });
+      // focus.addStyleName("wui-ingest-list-producer-popup");
+      // callback.onSuccess(producerInfoPopup);
+      // }
+      //
+      // });
     } else {
       callback.onSuccess(producerInfoPopup);
     }
