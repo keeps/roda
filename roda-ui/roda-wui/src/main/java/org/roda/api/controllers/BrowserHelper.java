@@ -208,9 +208,7 @@ public class BrowserHelper {
       for (String fileId : fileIds) {
         StoragePath filePath = ModelUtils.getRepresentationFilePath(aipId, representationId, fileId);
         Binary binary = storage.getBinary(filePath);
-        Path tempFile = Files.createTempFile("test", ".tmp");
-        Files.copy(binary.getContent().createInputStream(), tempFile, StandardCopyOption.REPLACE_EXISTING);
-        ZipEntryInfo info = new ZipEntryInfo(filePath.getName(), tempFile.toFile());
+        ZipEntryInfo info = new ZipEntryInfo(filePath.getName(), binary.getContent().createInputStream());
         zipEntries.add(info);
       }
 
@@ -283,9 +281,7 @@ public class BrowserHelper {
       for (DescriptiveMetadata dm : metadata) {
         if (counter >= startInt && (counter <= limitInt || limitInt == -1)) {
           Binary binary = storage.getBinary(dm.getStoragePath());
-          Path tempFile = Files.createTempFile("test", ".tmp");
-          Files.copy(binary.getContent().createInputStream(), tempFile, StandardCopyOption.REPLACE_EXISTING);
-          ZipEntryInfo info = new ZipEntryInfo(dm.getStoragePath().getName(), tempFile.toFile());
+          ZipEntryInfo info = new ZipEntryInfo(dm.getStoragePath().getName(), binary.getContent().createInputStream());
           zipEntries.add(info);
         } else {
           break;

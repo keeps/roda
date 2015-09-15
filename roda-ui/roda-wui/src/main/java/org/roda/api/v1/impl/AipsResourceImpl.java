@@ -193,7 +193,7 @@ public class AipsResourceImpl {
 
   public Response aipsAipIdDescriptiveMetadataMetadataIdGet(String aipId, String metadataId, String acceptFormat)
     throws NotFoundException {
-    try{
+    try {
       ModelService model = RodaCoreFactory.getModelService();
       StorageService storage = RodaCoreFactory.getStorageService();
       DescriptiveMetadata dm = model.retrieveDescriptiveMetadata(aipId, metadataId);
@@ -205,7 +205,8 @@ public class AipsResourceImpl {
         }
       };
       return Response.ok(stream, MediaType.APPLICATION_OCTET_STREAM)
-        .header("content-disposition", "attachment; filename = " + descriptiveMetadataBinary.getStoragePath().getName()).build();
+        .header("content-disposition", "attachment; filename = " + descriptiveMetadataBinary.getStoragePath().getName())
+        .build();
     } catch (StorageServiceException | ModelServiceException e) {
       if (e.getCode() == ModelServiceException.NOT_FOUND) {
         throw new NotFoundException(e.getCode(), e.getMessage());

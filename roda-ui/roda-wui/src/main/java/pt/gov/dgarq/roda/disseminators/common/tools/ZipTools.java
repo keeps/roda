@@ -125,5 +125,7 @@ public class ZipTools {
       }
     } while (retval != -1);
 
+    in.close();
+
   }
 }
