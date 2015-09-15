@@ -363,18 +363,25 @@ public class ModelService extends ModelObservable {
     return it;
   }
 
-  public DescriptiveMetadata retrieveDescriptiveMetadata(String aipId, String descriptiveMetadataId)
+  public Binary retrieveDescriptiveMetadataBinary(String aipId, String descriptiveMetadataId)
     throws ModelServiceException {
-    DescriptiveMetadata descriptiveMetadataBinary;
+    Binary binary;
 
     try {
       StoragePath binaryPath = ModelUtils.getDescriptiveMetadataPath(aipId, descriptiveMetadataId);
-
-      Binary binary = storage.getBinary(binaryPath);
-      descriptiveMetadataBinary = convertResourceToDescriptiveMetadata(binary);
+      binary = storage.getBinary(binaryPath);
     } catch (StorageServiceException e) {
       throw new ModelServiceException("Error while obtaining descriptive metadata binary from storage", e.getCode(), e);
     }
+
+    return binary;
+  }
+
+  public DescriptiveMetadata retrieveDescriptiveMetadata(String aipId, String descriptiveMetadataId)
+    throws ModelServiceException {
+
+    Binary binary = retrieveDescriptiveMetadataBinary(aipId, descriptiveMetadataId);
+    DescriptiveMetadata descriptiveMetadataBinary = convertResourceToDescriptiveMetadata(binary);
 
     return descriptiveMetadataBinary;
   }

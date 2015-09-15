@@ -3,10 +3,7 @@
  */
 package pt.gov.dgarq.roda.wui.dissemination.browse.client;
 
-import java.io.InputStream;
 import java.util.List;
-
-import org.roda.model.DescriptiveMetadata;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -162,16 +159,19 @@ public interface BrowserServiceAsync {
 
   public void createNewItem(String itemId, String parentId, AsyncCallback<SimpleDescriptionObject> callback);
 
-  public void addNewMetadataFile(String itemId, InputStream metadataStream, String descriptiveMetadataId,
-    AsyncCallback<SimpleDescriptionObject> callback);
-
-  public void editMetadataFile(String itemId, InputStream metadataStream, String descriptiveMetadataId,
-    AsyncCallback<SimpleDescriptionObject> callback);
+  // public void addNewMetadataFile(String itemId, InputStream metadataStream,
+  // String descriptiveMetadataId,
+  // AsyncCallback<SimpleDescriptionObject> callback);
+  //
+  // public void editMetadataFile(String itemId, InputStream metadataStream,
+  // String descriptiveMetadataId,
+  // AsyncCallback<SimpleDescriptionObject> callback);
 
   public void removeMetadataFile(String itemId, String descriptiveMetadataId,
     AsyncCallback<SimpleDescriptionObject> callback);
 
-  public void retrieveMetadataFile(String itemId, String descriptiveMetadataId,
-    AsyncCallback<DescriptiveMetadata> callback);
+  // public void retrieveMetadataFile(String itemId, String
+  // descriptiveMetadataId,
+  // AsyncCallback<DescriptiveMetadata> callback);
 
 }

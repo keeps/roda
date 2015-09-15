@@ -117,9 +117,31 @@ public class Browser extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, "Browser", "getParent", sdo.getId(), duration, "sdo", sdo.toString());
+    registerAction(user, "Browser", "getAncestors", sdo.getId(), duration, "sdo", sdo.toString());
 
     return ancestors;
+  }
+
+  public static Pair<String, StreamingOutput> getAipDescritiveMetadata(RodaUser user, String aipId,
+    String metadataId)
+      throws AuthorizationDeniedException, GenericException, ModelServiceException, StorageServiceException {
+    Date startDate = new Date();
+
+    // check user permissions
+    SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(aipId);
+    UserUtility.checkObjectModifyPermissions(user, sdo);
+
+    // delegate
+    Pair<String, StreamingOutput> aipsAipIdDescriptiveMetadataMetadataIdGet = BrowserHelper
+      .getAipDescritiveMetadata(aipId, metadataId);
+
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, "Browser", "getAipDescritiveMetadata", aipId, duration, "metadataId",
+      metadataId);
+
+    return aipsAipIdDescriptiveMetadataMetadataIdGet;
+
   }
 
   public static SimpleDescriptionObject moveInHierarchy(RodaUser user, String aipId, String parentId)

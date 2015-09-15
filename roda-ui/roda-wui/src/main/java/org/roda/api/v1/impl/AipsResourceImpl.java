@@ -25,7 +25,6 @@ import org.roda.api.controllers.Browser;
 import org.roda.api.v1.utils.ApiResponseMessage;
 import org.roda.api.v1.utils.NotFoundException;
 import org.roda.common.UserUtility;
-import org.roda.model.DescriptiveMetadata;
 import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
 import org.roda.model.PreservationMetadata;
@@ -191,28 +190,33 @@ public class AipsResourceImpl {
 
   }
 
-  public Response aipsAipIdDescriptiveMetadataMetadataIdGet(String aipId, String metadataId, String acceptFormat)
-    throws NotFoundException {
+  public Response aipsAipIdDescriptiveMetadataMetadataIdGet(HttpServletRequest request, String aipId, String metadataId,
+    String acceptFormat) throws NotFoundException {
+    String authorization = request.getHeader("Authorization");
     try {
-      ModelService model = RodaCoreFactory.getModelService();
-      StorageService storage = RodaCoreFactory.getStorageService();
-      DescriptiveMetadata dm = model.retrieveDescriptiveMetadata(aipId, metadataId);
-      Binary descriptiveMetadataBinary = storage.getBinary(dm.getStoragePath());
-      StreamingOutput stream = new StreamingOutput() {
-        @Override
-        public void write(OutputStream os) throws IOException, WebApplicationException {
-          IOUtils.copy(descriptiveMetadataBinary.getContent().createInputStream(), os);
-        }
-      };
-      return Response.ok(stream, MediaType.APPLICATION_OCTET_STREAM)
-        .header("content-disposition", "attachment; filename = " + descriptiveMetadataBinary.getStoragePath().getName())
-        .build();
+      // get user
+      RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+      // delegate action to controller
+      Pair<String, StreamingOutput> aipDescriptiveMetadata = Browser.getAipDescritiveMetadata(user, aipId, metadataId);
+      return Response.ok(aipDescriptiveMetadata.getSecond(), MediaType.APPLICATION_OCTET_STREAM)
+        .header("content-disposition", "attachment; filename = " + aipDescriptiveMetadata.getFirst()).build();
     } catch (StorageServiceException | ModelServiceException e) {
       if (e.getCode() == ModelServiceException.NOT_FOUND) {
         throw new NotFoundException(e.getCode(), e.getMessage());
       } else {
         return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
       }
+    } catch (AuthorizationDeniedException e) {
+      if (authorization == null) {
+        return Response.status(Status.UNAUTHORIZED)
+          .header(HttpHeaders.WWW_AUTHENTICATE, "Basic realm=\"RODA REST API\"")
+          .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+      } else {
+        return Response.status(Status.UNAUTHORIZED)
+          .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+      }
+    } catch (GenericException e) {
+      return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
     }
   }
 

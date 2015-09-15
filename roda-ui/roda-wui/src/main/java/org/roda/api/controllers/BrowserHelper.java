@@ -316,6 +316,21 @@ public class BrowserHelper {
     }
   }
 
+  public static Pair<String, StreamingOutput> getAipDescritiveMetadata(String aipId, String metadataId)
+    throws ModelServiceException, StorageServiceException, GenericException {
+
+    ModelService model = RodaCoreFactory.getModelService();
+    Binary descriptiveMetadataBinary = model.retrieveDescriptiveMetadataBinary(aipId, metadataId);
+    StreamingOutput stream = new StreamingOutput() {
+      @Override
+      public void write(OutputStream os) throws IOException, WebApplicationException {
+        IOUtils.copy(descriptiveMetadataBinary.getContent().createInputStream(), os);
+      }
+    };
+
+    return new Pair<String, StreamingOutput>(descriptiveMetadataBinary.getStoragePath().getName(), stream);
+  }
+
   public static SimpleDescriptionObject moveInHierarchy(String aipId, String parentId) throws GenericException {
     try {
       StorageService storage = RodaCoreFactory.getStorageService();
