@@ -1,6 +1,13 @@
 package org.roda.api.v1.impl;
 
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.HttpHeaders;
@@ -14,6 +21,7 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.roda.api.controllers.Browser;
 import org.roda.api.v1.utils.ApiResponseMessage;
 import org.roda.api.v1.utils.NotFoundException;
+import org.roda.common.HTMLUtils;
 import org.roda.common.UserUtility;
 import org.roda.model.ModelServiceException;
 import org.roda.storage.StorageServiceException;
@@ -23,6 +31,7 @@ import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
 import pt.gov.dgarq.roda.core.common.Pair;
 import pt.gov.dgarq.roda.core.data.v2.RodaUser;
 import pt.gov.dgarq.roda.wui.common.client.GenericException;
+import pt.gov.dgarq.roda.wui.common.server.ServerTools;
 
 @javax.annotation.Generated(value = "class io.swagger.codegen.languages.JaxRSServerCodegen", date = "2015-09-03T11:38:49.275+01:00")
 public class AipsResourceImpl {
@@ -173,7 +182,7 @@ public class AipsResourceImpl {
   }
 
   public Response getAipDescriptiveMetadata(HttpServletRequest request, String aipId, String metadataId,
-    String acceptFormat) throws NotFoundException {
+    String acceptFormat, String language) throws NotFoundException {
     String authorization = request.getHeader("Authorization");
     try {
       if (acceptFormat != null && acceptFormat.equalsIgnoreCase("bin")) {
