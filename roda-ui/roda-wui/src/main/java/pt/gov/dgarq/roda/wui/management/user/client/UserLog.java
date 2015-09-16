@@ -5,6 +5,7 @@ package pt.gov.dgarq.roda.wui.management.user.client;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.google.gwt.core.client.GWT;
@@ -13,7 +14,6 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -32,6 +32,7 @@ import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
 import pt.gov.dgarq.roda.wui.common.client.tools.FacetUtils;
+import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
 import pt.gov.dgarq.roda.wui.common.client.widgets.LogEntryList;
 import pt.gov.dgarq.roda.wui.management.client.Management;
 
@@ -44,7 +45,7 @@ public class UserLog extends Composite {
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
-    public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
+    public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
       getInstance().resolve(historyTokens, callback);
     }
 
@@ -53,8 +54,8 @@ public class UserLog extends Composite {
       UserLogin.getInstance().checkRoles(new HistoryResolver[] {UserLog.RESOLVER}, false, callback);
     }
 
-    public String getHistoryPath() {
-      return Management.RESOLVER.getHistoryPath() + "." + getHistoryToken();
+    public List<String> getHistoryPath() {
+      return Tools.concat(Management.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     public String getHistoryToken() {
@@ -113,8 +114,8 @@ public class UserLog extends Composite {
    */
   public UserLog() {
     Filter filter = null;
-    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.LOG_ACTION_COMPONENT), new SimpleFacetParameter(
-      RodaConstants.LOG_ACTION_METHOD), new SimpleFacetParameter(RodaConstants.LOG_USERNAME));
+    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.LOG_ACTION_COMPONENT),
+      new SimpleFacetParameter(RodaConstants.LOG_ACTION_METHOD), new SimpleFacetParameter(RodaConstants.LOG_USERNAME));
     logList = new LogEntryList(filter, facets);
     facetComponents = new FlowPanel();
     facetMethods = new FlowPanel();
@@ -160,12 +161,12 @@ public class UserLog extends Composite {
     logList.setFilter(new Filter(filterParameter));
   }
 
-  public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
-    if (historyTokens.length == 0) {
+  public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
+    if (historyTokens.size() == 0) {
       logList.refresh();
       callback.onSuccess(this);
     } else {
-      History.newItem(RESOLVER.getHistoryPath());
+      Tools.newHistory(RESOLVER);
       callback.onSuccess(null);
     }
   }

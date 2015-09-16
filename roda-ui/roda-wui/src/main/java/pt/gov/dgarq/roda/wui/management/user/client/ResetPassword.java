@@ -3,6 +3,9 @@
  */
 package pt.gov.dgarq.roda.wui.management.user.client;
 
+import java.util.Arrays;
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
@@ -23,6 +26,7 @@ import pt.gov.dgarq.roda.wui.common.client.BadHistoryTokenException;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
+import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
 import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
 import pt.gov.dgarq.roda.wui.home.client.Home;
 
@@ -115,7 +119,7 @@ public class ResetPassword implements HistoryResolver {
 
             public void onSuccess(Void result) {
               Window.alert(constants.resetPasswordSuccess());
-              History.newItem(Home.RESOLVER.getHistoryPath());
+              Tools.newHistory(Home.RESOLVER);
             }
 
           });
@@ -213,8 +217,8 @@ public class ResetPassword implements HistoryResolver {
     return valid;
   }
 
-  public String getHistoryPath() {
-    return getHistoryToken();
+  public List<String> getHistoryPath() {
+    return Arrays.asList(getHistoryToken());
   }
 
   public String getHistoryToken() {
@@ -235,14 +239,14 @@ public class ResetPassword implements HistoryResolver {
     });
   }
 
-  public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
-    if (historyTokens.length == 0) {
+  public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
+    if (historyTokens.size() == 0) {
       init();
       callback.onSuccess(layout);
-    } else if (historyTokens.length == 2) {
+    } else if (historyTokens.size() == 2) {
       init();
-      usernameBox.setText(historyTokens[0]);
-      tokenBox.setText(historyTokens[1]);
+      usernameBox.setText(historyTokens.get(0));
+      tokenBox.setText(historyTokens.get(1));
       usernameBox.setReadOnly(true);
       tokenBox.setReadOnly(true);
       callback.onSuccess(layout);

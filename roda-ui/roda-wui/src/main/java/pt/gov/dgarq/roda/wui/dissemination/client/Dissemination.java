@@ -3,6 +3,9 @@
  */
 package pt.gov.dgarq.roda.wui.dissemination.client;
 
+import java.util.Arrays;
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -27,7 +30,7 @@ public class Dissemination {
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
-    public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
+    public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
       getInstance().resolve(historyTokens, callback);
     }
 
@@ -36,8 +39,8 @@ public class Dissemination {
       UserLogin.getInstance().checkRole(this, callback);
     }
 
-    public String getHistoryPath() {
-      return getHistoryToken();
+    public List<String> getHistoryPath() {
+      return Arrays.asList(getHistoryToken());
     }
 
     public String getHistoryToken() {
@@ -89,22 +92,22 @@ public class Dissemination {
     return help;
   }
 
-  public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
-    if (historyTokens.length == 0) {
+  public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
+    if (historyTokens.size() == 0) {
       init();
       callback.onSuccess(page);
     } else {
-      if (historyTokens[0].equals(Search.RESOLVER.getHistoryToken())) {
+      if (historyTokens.get(0).equals(Search.RESOLVER.getHistoryToken())) {
         Search.getInstance().resolve(Tools.tail(historyTokens), callback);
 
-      } else if (historyTokens[0].equals(Browse.RESOLVER.getHistoryToken())) {
+      } else if (historyTokens.get(0).equals(Browse.RESOLVER.getHistoryToken())) {
         Browse.getInstance().resolve(Tools.tail(historyTokens), callback);
 
-      } else if (historyTokens[0].equals("help")) {
+      } else if (historyTokens.get(0).equals("help")) {
         callback.onSuccess(getHelp());
 
       } else {
-        callback.onFailure(new BadHistoryTokenException(historyTokens[0]));
+        callback.onFailure(new BadHistoryTokenException(historyTokens.get(0)));
       }
     }
   }

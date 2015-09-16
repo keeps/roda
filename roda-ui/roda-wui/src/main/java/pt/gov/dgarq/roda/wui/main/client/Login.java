@@ -3,6 +3,9 @@
  */
 package pt.gov.dgarq.roda.wui.main.client;
 
+import java.util.Arrays;
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -37,7 +40,7 @@ public class Login extends Composite {
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
-    public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
+    public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
       getInstance().resolve(historyTokens, callback);
     }
 
@@ -52,8 +55,8 @@ public class Login extends Composite {
     }
 
     @Override
-    public String getHistoryPath() {
-      return getHistoryToken();
+    public List<String> getHistoryPath() {
+      return Arrays.asList(getHistoryToken());
     }
   };
 
@@ -109,7 +112,7 @@ public class Login extends Composite {
     });
   }
 
-  public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
+  public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     username.setText("");
     password.setText("");
     error.setText("");
@@ -163,7 +166,7 @@ public class Login extends Composite {
           if (service != null && service.length() > 0) {
             History.newItem(service);
           } else {
-            History.newItem(Home.RESOLVER.getHistoryPath());
+            Tools.newHistory(Home.RESOLVER);
           }
 
         }

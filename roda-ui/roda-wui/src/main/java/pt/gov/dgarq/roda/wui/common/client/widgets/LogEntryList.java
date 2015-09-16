@@ -25,6 +25,7 @@ import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
+import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.Browse;
 import pt.gov.dgarq.roda.wui.management.user.client.UserManagementService;
 
@@ -85,7 +86,7 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
       @Override
       public void update(int index, LogEntry logEntry, String value) {
         if (logEntry != null && logEntry.getRelatedObjectID() != null) {
-          History.newItem(Browse.getViewItemHistoryToken(logEntry.getRelatedObjectID()));
+          Tools.newHistory(Browse.getViewItemHistoryToken(logEntry.getRelatedObjectID()));
         }
       }
     });

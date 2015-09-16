@@ -3,11 +3,18 @@
  */
 package pt.gov.dgarq.roda.wui.common.client.tools;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
+import com.google.gwt.http.client.URL;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.ListBox;
+
+import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
 
 /**
  * Useful methods
@@ -30,6 +37,10 @@ public class Tools {
     return tail;
   }
 
+  public static <T> List<T> tail(List<T> list) {
+    return list.subList(1, list.size());
+  }
+
   /**
    * Remove last item from the string array
    * 
@@ -44,20 +55,73 @@ public class Tools {
     return ret;
   }
 
+  public static <T> List<T> removeLast(List<T> list) {
+    return list.subList(0, list.size() - 1);
+
+  }
+
   /**
    * Split history string to history path using '.' as the separator
    * 
    * @param history
    * @return the history path
    */
-  public static String[] splitHistory(String history) {
-    String[] historyPath;
+  public static List<String> splitHistory(String history) {
+    List<String> historyPath;
     if (history.indexOf('.') == -1) {
-      historyPath = new String[] {history};
+      historyPath = Arrays.asList(history);
     } else {
-      historyPath = history.split("\\.");
+      historyPath = Arrays.asList(history.split("\\."));
     }
     return historyPath;
+  }
+
+  public static List<String> getCurrentHistoryPath() {
+    String hash = Window.Location.getHash();
+    if (hash.length() > 0) {
+      hash = hash.substring(1);
+    }
+
+    List<String> splitted = Arrays.asList(hash.split("\\."));
+    List<String> tokens = new ArrayList<String>();
+    for (String item : splitted) {
+      tokens.add(URL.decode(item));
+    }
+    return tokens;
+  }
+
+  private static String createHistoryToken(List<String> tokens) {
+    StringBuilder builder = new StringBuilder();
+    boolean first = true;
+    for (String token : tokens) {
+      if (first) {
+        first = false;
+      } else {
+        builder.append(".");
+      }
+
+      String encodedToken = URL.encode(token).replaceAll("\\.", "%2E");
+      builder.append(encodedToken);
+    }
+
+    return builder.toString();
+
+  }
+
+  public static void newHistory(List<String> path) {
+    // History.newItem(createHistoryToken(path)
+    String hash = createHistoryToken(path);
+    Window.Location.assign("#" + hash);
+  }
+
+  public static void newHistory(HistoryResolver resolver) {
+    newHistory(resolver.getHistoryPath());
+  }
+
+  public static <T> List<T> concat(List<T> list, T item) {
+    List<T> ret = new ArrayList<>(list);
+    ret.add(item);
+    return ret;
   }
 
   /**
@@ -76,6 +140,17 @@ public class Tools {
     }
     for (int i = 1; i < tokens.length; i++) {
       history += separator + tokens[i];
+    }
+    return history;
+  }
+
+  public static String join(List<String> tokens, String separator) {
+    String history = "";
+    if (tokens.size() > 0) {
+      history = tokens.get(0);
+    }
+    for (int i = 1; i < tokens.size(); i++) {
+      history += separator + tokens.get(i);
     }
     return history;
   }

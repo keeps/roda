@@ -20,6 +20,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.IngestSubmitConstants;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
+import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
 import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
 import pt.gov.dgarq.roda.wui.common.fileupload.client.FileNameConstraints;
 import pt.gov.dgarq.roda.wui.common.fileupload.client.FileUploadPanel;
@@ -201,7 +202,7 @@ public class UploadSIP {
             IngestList.getInstance().update();
 
             // Show ingest list
-            History.newItem(IngestList.RESOLVER.getHistoryPath());
+            Tools.newHistory(IngestList.RESOLVER);
           }
 
         });

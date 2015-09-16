@@ -47,10 +47,10 @@
 						<ui:msg description="Browser actions">Actions</ui:msg>
 					</g:Label>
 					<g:Button addStyleNames="btn btn-plus" ui:field="createItem">
-						<ui:msg>New item</ui:msg>
+						<ui:msg>New sub-item</ui:msg>
 					</g:Button>
-					<g:Button addStyleNames="btn btn-edit" ui:field="editMetadata">
-						<ui:msg>Edit metadata</ui:msg>
+					<g:Button addStyleNames="btn btn-plus" ui:field="editMetadata">
+						<ui:msg>New metadata</ui:msg>
 					</g:Button>
 					<g:Button addStyleNames="btn btn-edit" ui:field="moveItem">
 						<ui:msg>Move</ui:msg>
@@ -58,8 +58,8 @@
 					<g:Button addStyleNames="btn btn-edit" ui:field="editPermissions">
 						<ui:msg>Edit permissions</ui:msg>
 					</g:Button>
-					<g:Button addStyleNames="btn btn-play" ui:field="seeLog">
-						<ui:msg>View PREMIS</ui:msg>
+					<g:Button addStyleNames="btn btn-ban" ui:field="remove">
+						<ui:msg>Remove</ui:msg>
 					</g:Button>
 				</g:FlowPanel>
 			</g:FlowPanel>

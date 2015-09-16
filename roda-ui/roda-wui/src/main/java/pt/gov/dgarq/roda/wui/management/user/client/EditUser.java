@@ -3,6 +3,8 @@
  */
 package pt.gov.dgarq.roda.wui.management.user.client;
 
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -10,7 +12,6 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
@@ -23,6 +24,7 @@ import pt.gov.dgarq.roda.core.common.NoSuchUserException;
 import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
+import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
 import pt.gov.dgarq.roda.wui.management.client.Management;
 
 /**
@@ -34,9 +36,9 @@ public class EditUser extends Composite {
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
-    public void resolve(String[] historyTokens, final AsyncCallback<Widget> callback) {
-      if (historyTokens.length == 1) {
-        String username = historyTokens[0];
+    public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
+      if (historyTokens.size() == 1) {
+        String username = historyTokens.get(0);
         UserManagementService.Util.getInstance().getUser(username, new AsyncCallback<User>() {
 
           @Override
@@ -51,7 +53,7 @@ public class EditUser extends Composite {
           }
         });
       } else {
-        History.newItem(MemberManagement.RESOLVER.getHistoryPath());
+        Tools.newHistory(MemberManagement.RESOLVER);
         callback.onSuccess(null);
       }
     }
@@ -61,8 +63,8 @@ public class EditUser extends Composite {
       UserLogin.getInstance().checkRoles(new HistoryResolver[] {MemberManagement.RESOLVER}, false, callback);
     }
 
-    public String getHistoryPath() {
-      return Management.RESOLVER.getHistoryPath() + "." + getHistoryToken();
+    public List<String> getHistoryPath() {
+      return Tools.concat(Management.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     public String getHistoryToken() {
@@ -170,7 +172,7 @@ public class EditUser extends Composite {
       }
 
       public void onSuccess(Void result) {
-        History.newItem(MemberManagement.RESOLVER.getHistoryPath());
+        Tools.newHistory(MemberManagement.RESOLVER);
       }
 
     });
@@ -182,7 +184,7 @@ public class EditUser extends Composite {
   }
 
   private void cancel() {
-    History.newItem(MemberManagement.RESOLVER.getHistoryPath());
+    Tools.newHistory(MemberManagement.RESOLVER);
   }
 
 }

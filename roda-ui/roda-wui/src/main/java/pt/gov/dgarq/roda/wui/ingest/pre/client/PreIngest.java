@@ -3,6 +3,8 @@
  */
 package pt.gov.dgarq.roda.wui.ingest.pre.client;
 
+import java.util.List;
+
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -12,6 +14,7 @@ import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.ProducerFilterParameter;
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
+import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
 import pt.gov.dgarq.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import pt.gov.dgarq.roda.wui.ingest.client.Ingest;
 
@@ -24,7 +27,7 @@ public class PreIngest {
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
-    public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
+    public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
       getInstance().resolve(historyTokens, callback);
     }
 
@@ -39,8 +42,8 @@ public class PreIngest {
     }
 
     @Override
-    public String getHistoryPath() {
-      return Ingest.RESOLVER.getHistoryPath() + "." + getHistoryToken();
+    public List<String> getHistoryPath() {
+      return Tools.concat(Ingest.RESOLVER.getHistoryPath(), getHistoryToken());
     }
   };
 
@@ -74,11 +77,11 @@ public class PreIngest {
     layout.addStyleName("wui-ingest-pre");
   }
 
-  public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
-    if (historyTokens.length == 0) {
+  public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
+    if (historyTokens.size() == 0) {
       callback.onSuccess(layout);
     } else {
-      History.newItem(RESOLVER.getHistoryPath());
+      Tools.newHistory(RESOLVER);
       callback.onSuccess(null);
     }
   }

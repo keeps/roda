@@ -17,6 +17,7 @@ import pt.gov.dgarq.roda.core.data.v2.RODAMember;
 import pt.gov.dgarq.roda.core.data.v2.RodaUser;
 import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.wui.common.client.tools.CachedAsynRequest;
+import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
 
 /**
  * @author Luis Faria
@@ -277,7 +278,8 @@ public class UserLogin {
    * @param callback
    */
   public void checkRole(final HistoryResolver res, final AsyncCallback<Boolean> callback) {
-    String propertyName = "menu." + res.getHistoryPath() + ".role";
+    String historyKey = Tools.join(res.getHistoryPath(), ".");
+    String propertyName = "menu." + historyKey + ".role";
     UserLogin.getRodaProperty(propertyName, new AsyncCallback<String>() {
 
       public void onFailure(Throwable caught) {

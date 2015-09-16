@@ -1,6 +1,7 @@
 package pt.gov.dgarq.roda.wui.management.user.client;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.google.gwt.core.client.GWT;
@@ -33,7 +34,7 @@ public class MemberManagement extends Composite {
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
-    public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
+    public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
       getInstance().resolve(historyTokens, callback);
     }
 
@@ -42,8 +43,8 @@ public class MemberManagement extends Composite {
       UserLogin.getInstance().checkRoles(new HistoryResolver[] {MemberManagement.RESOLVER}, false, callback);
     }
 
-    public String getHistoryPath() {
-      return Management.RESOLVER.getHistoryPath() + "." + getHistoryToken();
+    public List<String> getHistoryPath() {
+      return Tools.concat(Management.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     public String getHistoryToken() {
@@ -120,23 +121,23 @@ public class MemberManagement extends Composite {
     });
   }
 
-  public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
-    if (historyTokens.length == 0) {
+  public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
+    if (historyTokens.size() == 0) {
       // TODO ?list.refresh();
       callback.onSuccess(this);
-    } else if (historyTokens.length == 2) {
-      if (historyTokens[0].equals(EDIT_USER_HISTORY_TOKEN)) {
+    } else if (historyTokens.size() == 2) {
+      if (historyTokens.get(0).equals(EDIT_USER_HISTORY_TOKEN)) {
         EditUser.RESOLVER.resolve(Tools.tail(historyTokens), callback);
-      } else if (historyTokens[0].equals(EDIT_GROUP_HISTORY_TOKEN)) {
+      } else if (historyTokens.get(0).equals(EDIT_GROUP_HISTORY_TOKEN)) {
         // TODO EditGroup.RESOLVER.resolve(Tools.tail(historyTokens), callback);
-        History.newItem(RESOLVER.getHistoryPath());
+        Tools.newHistory(RESOLVER);
         callback.onSuccess(null);
       } else {
-        History.newItem(RESOLVER.getHistoryPath());
+        Tools.newHistory(RESOLVER);
         callback.onSuccess(null);
       }
     } else {
-      History.newItem(RESOLVER.getHistoryPath());
+      Tools.newHistory(RESOLVER);
       callback.onSuccess(null);
     }
   }

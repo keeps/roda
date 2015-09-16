@@ -95,7 +95,8 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     return Browser.getAncestors(user, sdo);
   }
 
-  public SimpleDescriptionObject moveInHierarchy(String aipId, String parentId) throws RODAException {
+  public SimpleDescriptionObject moveInHierarchy(String aipId, String parentId)
+    throws AuthorizationDeniedException, GenericException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     return Browser.moveInHierarchy(user, aipId, parentId);
   }

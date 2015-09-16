@@ -34,7 +34,7 @@ public class SIPReportList extends AsyncTableCell<SIPReport> {
 
   private final ClientLogger logger = new ClientLogger(getClass().getName());
 
-  private final TextColumn<SIPReport> idColumn;
+  // private final TextColumn<SIPReport> idColumn;
   private final TextColumn<SIPReport> originalFilenameColumn;
   private final Column<SIPReport, Date> submissionDateColumn;
   private final TextColumn<SIPReport> currentStateColumn;
@@ -48,13 +48,13 @@ public class SIPReportList extends AsyncTableCell<SIPReport> {
   public SIPReportList(Filter filter, Facets facets) {
     super(filter, facets, "SIP");
 
-    idColumn = new TextColumn<SIPReport>() {
-
-      @Override
-      public String getValue(SIPReport sip) {
-        return sip != null ? sip.getId() : null;
-      }
-    };
+    // idColumn = new TextColumn<SIPReport>() {
+    //
+    // @Override
+    // public String getValue(SIPReport sip) {
+    // return sip != null ? sip.getId() : null;
+    // }
+    // };
 
     originalFilenameColumn = new TextColumn<SIPReport>() {
 
@@ -93,7 +93,7 @@ public class SIPReportList extends AsyncTableCell<SIPReport> {
       }
     };
 
-    idColumn.setSortable(true);
+    // idColumn.setSortable(true);
     originalFilenameColumn.setSortable(true);
     submissionDateColumn.setSortable(true);
     currentStateColumn.setSortable(true);
@@ -101,7 +101,7 @@ public class SIPReportList extends AsyncTableCell<SIPReport> {
     producerColumn.setSortable(true);
 
     // TODO externalize strings into constants
-    getDisplay().addColumn(idColumn, "Id");
+    // getDisplay().addColumn(idColumn, "Id");
     getDisplay().addColumn(originalFilenameColumn, constants.headerFilename());
     getDisplay().addColumn(submissionDateColumn, constants.headerStartDate());
     getDisplay().addColumn(currentStateColumn, constants.headerState());
@@ -116,7 +116,7 @@ public class SIPReportList extends AsyncTableCell<SIPReport> {
     addStyleName("my-list-SIPReport");
     emptyInfo.addStyleName("my-list-SIPReport-empty-info");
 
-    idColumn.setCellStyleNames("nowrap");
+    // idColumn.setCellStyleNames("nowrap");
 
     submissionDateColumn.setCellStyleNames("nowrap my-collections-table-cell-alignright");
     currentStateColumn.setCellStyleNames("nowrap my-collections-table-cell-alignright");
@@ -136,9 +136,10 @@ public class SIPReportList extends AsyncTableCell<SIPReport> {
     for (int i = 0; i < columnSortList.size(); i++) {
       ColumnSortInfo columnSortInfo = columnSortList.get(i);
       String sortParameterKey;
-      if (columnSortInfo.getColumn().equals(idColumn)) {
-        sortParameterKey = RodaConstants.SIP_REPORT_ID;
-      } else if (columnSortInfo.getColumn().equals(originalFilenameColumn)) {
+      // if (columnSortInfo.getColumn().equals(idColumn)) {
+      // sortParameterKey = RodaConstants.SIP_REPORT_ID;
+      // } else
+      if (columnSortInfo.getColumn().equals(originalFilenameColumn)) {
         sortParameterKey = RodaConstants.SIP_REPORT_ORIGINAL_FILENAME;
       } else if (columnSortInfo.getColumn().equals(submissionDateColumn)) {
         sortParameterKey = RodaConstants.SIP_REPORT_DATETIME;

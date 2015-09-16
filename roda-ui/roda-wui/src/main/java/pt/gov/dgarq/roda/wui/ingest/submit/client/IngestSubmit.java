@@ -3,6 +3,8 @@
  */
 package pt.gov.dgarq.roda.wui.ingest.submit.client;
 
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
@@ -15,6 +17,7 @@ import config.i18n.client.IngestSubmitConstants;
 import pt.gov.dgarq.roda.wui.common.client.BadHistoryTokenException;
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
+import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
 import pt.gov.dgarq.roda.wui.ingest.client.Ingest;
 
 /**
@@ -26,7 +29,7 @@ public class IngestSubmit {
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
-    public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
+    public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
       getInstance().resolve(historyTokens, callback);
     }
 
@@ -41,8 +44,8 @@ public class IngestSubmit {
     }
 
     @Override
-    public String getHistoryPath() {
-      return Ingest.RESOLVER.getHistoryPath() + "." + getHistoryToken();
+    public List<String> getHistoryPath() {
+      return Tools.concat(Ingest.RESOLVER.getHistoryPath(), getHistoryToken());
     }
   };
 
@@ -100,23 +103,23 @@ public class IngestSubmit {
     layout.addStyleName("wui-ingest-submit");
   }
 
-  public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
+  public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     String defaultHistoryPath = RESOLVER.getHistoryPath() + ".create";
-    if (historyTokens.length == 0) {
+    if (historyTokens.size() == 0) {
       History.newItem(defaultHistoryPath);
       callback.onSuccess(null);
-    } else if (historyTokens.length == 1) {
-      if (historyTokens[0].equals("upload")) {
+    } else if (historyTokens.size() == 1) {
+      if (historyTokens.get(0).equals("upload")) {
         GWT.log("init upload SIP");
         uploadSIP.init();
         layout.selectTab(1);
         callback.onSuccess(layout);
-      } else if (historyTokens[0].equals("create")) {
+      } else if (historyTokens.get(0).equals("create")) {
         createSIP.init();
         layout.selectTab(0);
         callback.onSuccess(layout);
       } else {
-        callback.onFailure(new BadHistoryTokenException(historyTokens[0]));
+        callback.onFailure(new BadHistoryTokenException(historyTokens.get(0)));
       }
     } else {
       History.newItem(defaultHistoryPath);

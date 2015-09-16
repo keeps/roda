@@ -3,6 +3,9 @@
  */
 package pt.gov.dgarq.roda.wui.management.user.client;
 
+import java.util.Arrays;
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
@@ -21,6 +24,7 @@ import pt.gov.dgarq.roda.core.data.v2.User;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
+import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
 import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
 
 /**
@@ -141,8 +145,8 @@ public class Preferences implements HistoryResolver {
    * @see
    * pt.gov.dgarq.roda.office.common.client.HistoryResolver#getHistoryPath()
    */
-  public String getHistoryPath() {
-    return getHistoryToken();
+  public List<String> getHistoryPath() {
+    return Arrays.asList(getHistoryToken());
   }
 
   /*
@@ -155,12 +159,12 @@ public class Preferences implements HistoryResolver {
     return "preferences";
   }
 
-  public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
-    if (historyTokens.length == 0) {
+  public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
+    if (historyTokens.size() == 0) {
       init();
       callback.onSuccess(layout);
     } else {
-      History.newItem(getHistoryPath());
+      Tools.newHistory(this);
       callback.onSuccess(null);
     }
   }

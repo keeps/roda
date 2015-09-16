@@ -77,7 +77,8 @@ public class AIPList extends AsyncTableCell<SimpleDescriptionObject> {
       }
     };
 
-    dateInitialColumn = new Column<SimpleDescriptionObject, Date>(new DateCell(DateTimeFormat.getFormat("yyyy-MM-dd"))) {
+    dateInitialColumn = new Column<SimpleDescriptionObject, Date>(
+      new DateCell(DateTimeFormat.getFormat("yyyy-MM-dd"))) {
       @Override
       public Date getValue(SimpleDescriptionObject sdo) {
         return sdo != null ? sdo.getDateInitial() : null;
@@ -108,6 +109,9 @@ public class AIPList extends AsyncTableCell<SimpleDescriptionObject> {
     Label emptyInfo = new Label("No items to display");
     getDisplay().setEmptyTableWidget(emptyInfo);
     getDisplay().setColumnWidth(titleColumn, "100%");
+
+    dateInitialColumn.setCellStyleNames("nowrap");
+    dateFinalColumn.setCellStyleNames("nowrap");
 
     addStyleName("my-collections-table");
     emptyInfo.addStyleName("my-collections-empty-info");

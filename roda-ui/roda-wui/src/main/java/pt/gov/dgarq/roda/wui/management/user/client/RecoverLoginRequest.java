@@ -3,6 +3,9 @@
  */
 package pt.gov.dgarq.roda.wui.management.user.client;
 
+import java.util.Arrays;
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
@@ -23,6 +26,7 @@ import pt.gov.dgarq.roda.wui.common.captcha.client.DefaultImageCaptcha;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
+import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
 import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
 import pt.gov.dgarq.roda.wui.home.client.Home;
 
@@ -101,7 +105,7 @@ public class RecoverLoginRequest implements HistoryResolver {
             public void onSuccess(Boolean captchaSuccess) {
               if (captchaSuccess.booleanValue()) {
                 Window.alert(constants.recoverLoginSuccess());
-                History.newItem(Home.RESOLVER.getHistoryPath());
+                Tools.newHistory(Home.RESOLVER);
               } else {
                 Window.alert(constants.recoverLoginCaptchaFailed());
                 captcha.refresh();
@@ -146,8 +150,8 @@ public class RecoverLoginRequest implements HistoryResolver {
     }
   }
 
-  public String getHistoryPath() {
-    return getHistoryToken();
+  public List<String> getHistoryPath() {
+    return Arrays.asList(getHistoryToken());
   }
 
   public String getHistoryToken() {
@@ -168,12 +172,12 @@ public class RecoverLoginRequest implements HistoryResolver {
     });
   }
 
-  public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
-    if (historyTokens.length == 0) {
+  public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
+    if (historyTokens.size() == 0) {
       init();
       callback.onSuccess(layout);
     } else {
-      History.newItem(getHistoryPath());
+      Tools.newHistory(this);
       callback.onSuccess(null);
     }
   }

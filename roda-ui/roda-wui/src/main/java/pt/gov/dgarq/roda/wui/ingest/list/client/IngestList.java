@@ -18,7 +18,6 @@ import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -46,6 +45,7 @@ import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
 import pt.gov.dgarq.roda.wui.common.client.tools.FacetUtils;
+import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
 import pt.gov.dgarq.roda.wui.common.client.widgets.SIPReportList;
 import pt.gov.dgarq.roda.wui.ingest.client.Ingest;
 
@@ -58,7 +58,7 @@ public class IngestList extends Composite {
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
-    public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
+    public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
       getInstance().resolve(historyTokens, callback);
     }
 
@@ -73,8 +73,8 @@ public class IngestList extends Composite {
     }
 
     @Override
-    public String getHistoryPath() {
-      return Ingest.RESOLVER.getHistoryPath() + "." + getHistoryToken();
+    public List<String> getHistoryPath() {
+      return Tools.concat(Ingest.RESOLVER.getHistoryPath(), getHistoryToken());
     }
   };
 
@@ -106,17 +106,17 @@ public class IngestList extends Composite {
      * SIPs which are in processing state, i.e. before ready state
      */
     PROCESSING, /**
-     * Ready SIPs, waiting for acceptance
-     */
+                 * Ready SIPs, waiting for acceptance
+                 */
     READY, /**
-     * Quarantined SIPs
-     */
+            * Quarantined SIPs
+            */
     QUARANTINE, /**
-     * Accepted SIPs
-     */
+                 * Accepted SIPs
+                 */
     ACCEPTED, /**
-     * All SIPs
-     */
+               * All SIPs
+               */
     ALL
 
   }
@@ -168,8 +168,8 @@ public class IngestList extends Composite {
 
     Filter filter = null;
 
-    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.SIP_REPORT_STATE), new SimpleFacetParameter(
-      RodaConstants.SIP_REPORT_USERNAME));
+    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.SIP_REPORT_STATE),
+      new SimpleFacetParameter(RodaConstants.SIP_REPORT_USERNAME));
 
     sipList = new SIPReportList(filter, facets);
     producerFacets = new FlowPanel();
@@ -441,8 +441,8 @@ public class IngestList extends Composite {
 
   // }
 
-  public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
-    if (historyTokens.length == 0) {
+  public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
+    if (historyTokens.size() == 0) {
       if (init) {
         init = false;
       } else {
@@ -451,7 +451,7 @@ public class IngestList extends Composite {
 
       callback.onSuccess(this);
     } else {
-      History.newItem(RESOLVER.getHistoryPath());
+      Tools.newHistory(RESOLVER);
       callback.onSuccess(null);
     }
   }

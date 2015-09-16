@@ -3,11 +3,12 @@
  */
 package pt.gov.dgarq.roda.wui.main.client;
 
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.MenuBar;
@@ -20,6 +21,7 @@ import pt.gov.dgarq.roda.wui.about.client.About;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.LoginStatusListener;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
+import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.Browse;
 import pt.gov.dgarq.roda.wui.dissemination.search.basic.client.BasicSearch;
 import pt.gov.dgarq.roda.wui.home.client.Home;
@@ -146,12 +148,12 @@ public class Menu extends Composite {
     });
   }
 
-  private ScheduledCommand createCommand(final String path) {
+  private ScheduledCommand createCommand(final List<String> path) {
     return new ScheduledCommand() {
 
       @Override
       public void execute() {
-        History.newItem(path);
+        Tools.newHistory(path);
       }
     };
   }

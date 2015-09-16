@@ -49,6 +49,7 @@ import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
 import pt.gov.dgarq.roda.wui.common.client.tools.DescriptionLevelUtils;
 import pt.gov.dgarq.roda.wui.common.client.tools.RestUtils;
+import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
 import pt.gov.dgarq.roda.wui.common.client.widgets.AIPList;
 import pt.gov.dgarq.roda.wui.main.client.BreadcrumbItem;
 import pt.gov.dgarq.roda.wui.main.client.BreadcrumbPanel;
@@ -62,7 +63,7 @@ public class Browse extends Composite {
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
-    public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
+    public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
       getInstance().resolve(historyTokens, callback);
     }
 
@@ -77,13 +78,13 @@ public class Browse extends Composite {
     }
 
     @Override
-    public String getHistoryPath() {
-      return getHistoryToken();
+    public List<String> getHistoryPath() {
+      return Arrays.asList(getHistoryToken());
     }
   };
 
-  public static final String getViewItemHistoryToken(String id) {
-    return RESOLVER.getHistoryPath() + "." + id;
+  public static final List<String> getViewItemHistoryToken(String id) {
+    return Tools.concat(RESOLVER.getHistoryPath(), id);
   }
 
   interface MyUiBinder extends UiBinder<Widget, Browse> {
@@ -152,6 +153,18 @@ public class Browse extends Composite {
   @UiField
   Button createItem;
 
+  @UiField
+  Button editMetadata;
+
+  @UiField
+  Button moveItem;
+
+  @UiField
+  Button editPermissions;
+
+  @UiField
+  Button remove;
+
   private boolean viewingTop;
 
   private Browse() {
@@ -191,15 +204,15 @@ public class Browse extends Composite {
     }
   }
 
-  public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
-    if (historyTokens.length == 0) {
+  public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
+    if (historyTokens.size() == 0) {
       viewAction();
       callback.onSuccess(this);
-    } else if (historyTokens.length == 1) {
-      viewAction(historyTokens[0]);
+    } else if (historyTokens.size() == 1) {
+      viewAction(historyTokens.get(0));
       callback.onSuccess(this);
     } else {
-      History.newItem(RESOLVER.getHistoryPath());
+      Tools.newHistory(RESOLVER);
       callback.onSuccess(null);
     }
   }
@@ -252,7 +265,8 @@ public class Browse extends Composite {
       itemTitle.setText(sdo.getTitle());
       itemTitle.removeStyleName("browseTitle-allCollections");
       itemDates.setText(getDatesText(sdo));
-      SafeHtml html = getDescriptiveMetadataPanelHTML(descMetadata);
+
+      SafeHtml html = getDescriptiveMetadataPanelHTML(sdo.getId(), descMetadata);
       itemDescriptiveMetadata.setHTML(html);
       itemDescriptiveMetadata.setVisible(true);
 
@@ -269,6 +283,15 @@ public class Browse extends Composite {
       }
 
       downloadList.add(createDescriptiveMetadataDownloadPanel(sdo.getId(), descMetadata));
+      // TODO change to presMetadata
+      downloadList.add(createPreservationMetadataDownloadPanel(sdo.getId(), descMetadata));
+
+      // Set button visibility
+      createItem.setVisible(true);
+      editMetadata.setVisible(true);
+      moveItem.setVisible(true);
+      editPermissions.setVisible(true);
+      remove.setVisible(true);
 
     } else {
       viewAction();
@@ -294,6 +317,13 @@ public class Browse extends Composite {
 
     sidebarGroupDownloads.setVisible(false);
     downloadList.clear();
+
+    // Set button visibility
+    createItem.setVisible(true);
+    editMetadata.setVisible(false);
+    moveItem.setVisible(false);
+    editPermissions.setVisible(false);
+    remove.setVisible(false);
   }
 
   private List<BreadcrumbItem> getBreadcrumbsFromAncestors(List<SimpleDescriptionObject> sdoAncestors,
@@ -396,6 +426,35 @@ public class Browse extends Composite {
     return downloadPanel;
   }
 
+  private Widget createPreservationMetadataDownloadPanel(String aipId, List<DescriptiveMetadataBundle> descMetadata) {
+    FlowPanel downloadPanel = new FlowPanel();
+    HTML icon = new HTML(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-download'></i>"));
+    FlowPanel labelsPanel = new FlowPanel();
+
+    int files = descMetadata.size();
+    long sizeInBytes = 0;
+    for (DescriptiveMetadataBundle desc : descMetadata) {
+      sizeInBytes += desc.getSizeInBytes();
+    }
+
+    // TODO externalize strings
+    Anchor label = new Anchor(SafeHtmlUtils.fromSafeConstant("Preservation metadata"),
+      RestUtils.createDescriptiveMetadataDownloadUri(aipId));
+    Label subLabel = new Label(files + " files, " + readableFileSize(sizeInBytes));
+
+    labelsPanel.add(label);
+    labelsPanel.add(subLabel);
+    downloadPanel.add(icon);
+    downloadPanel.add(labelsPanel);
+
+    downloadPanel.addStyleName("browseDownload");
+    icon.addStyleName("browseDownloadIcon");
+    labelsPanel.addStyleName("browseDownloadLabels");
+    label.addStyleName("browseDownloadLabel");
+    subLabel.addStyleName("browseDownloadSublabel");
+    return downloadPanel;
+  }
+
   private String getDatesText(SimpleDescriptionObject sdo) {
     String ret;
     DateTimeFormat formatter = DateTimeFormat.getFormat(PredefinedFormat.DATE_MEDIUM);
@@ -416,9 +475,11 @@ public class Browse extends Composite {
     return ret;
   }
 
-  private SafeHtml getDescriptiveMetadataPanelHTML(List<DescriptiveMetadataBundle> descriptiveMetadata) {
+  private SafeHtml getDescriptiveMetadataPanelHTML(String aipId, List<DescriptiveMetadataBundle> descriptiveMetadata) {
     SafeHtmlBuilder builder = new SafeHtmlBuilder();
     for (DescriptiveMetadataBundle bundle : descriptiveMetadata) {
+      builder.append(SafeHtmlUtils.fromSafeConstant(
+        "<a href='#edit.metadata." + aipId + "." + bundle.getId() + "' class='descriptiveMetadataEdit'>edit</a>"));
       builder.append(SafeHtmlUtils.fromTrustedString(bundle.getHtml()));
     }
     return builder.toSafeHtml();
@@ -426,18 +487,18 @@ public class Browse extends Composite {
 
   private boolean updateHistory(String id) {
     boolean historyUpdated;
-    String token;
+    List<String> path;
     if (id == null) {
-      token = RESOLVER.getHistoryPath();
+      path = RESOLVER.getHistoryPath();
     } else {
-      token = getViewItemHistoryToken(id);
+      path = getViewItemHistoryToken(id);
     }
 
-    if (token.equals(History.getToken())) {
+    if (path.equals(History.getToken())) {
       historyUpdated = false;
     } else {
       logger.debug("calling new history token");
-      History.newItem(token);
+      Tools.newHistory(path);
       historyUpdated = true;
     }
     return historyUpdated;

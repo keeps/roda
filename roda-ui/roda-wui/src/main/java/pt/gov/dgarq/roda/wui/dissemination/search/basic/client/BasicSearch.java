@@ -3,13 +3,13 @@
  */
 package pt.gov.dgarq.roda.wui.dissemination.search.basic.client;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.Document;
-import com.google.gwt.dom.client.LabelElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -18,12 +18,10 @@ import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.History;
-import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -43,6 +41,7 @@ import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
 import pt.gov.dgarq.roda.wui.common.client.tools.FacetUtils;
+import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
 import pt.gov.dgarq.roda.wui.common.client.widgets.AIPList;
 import pt.gov.dgarq.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.Browse;
@@ -56,7 +55,7 @@ public class BasicSearch extends Composite {
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
-    public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
+    public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
       getInstance().resolve(historyTokens, callback);
     }
 
@@ -66,8 +65,8 @@ public class BasicSearch extends Composite {
     }
 
     @Override
-    public String getHistoryPath() {
-      return getHistoryToken();
+    public List<String> getHistoryPath() {
+      return Arrays.asList(getHistoryToken());
     }
 
     @Override
@@ -93,7 +92,7 @@ public class BasicSearch extends Composite {
 
   private SearchConstants constants = (SearchConstants) GWT.create(SearchConstants.class);
 
-   @UiField
+  @UiField
   TextBox searchInputBox;
 
   @UiField
@@ -125,8 +124,8 @@ public class BasicSearch extends Composite {
 
   private BasicSearch() {
     Filter filter = DEFAULT_FILTER;
-    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.SDO_LEVEL), new SimpleFacetParameter(
-      RodaConstants.AIP_HAS_REPRESENTATIONS));
+    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.SDO_LEVEL),
+      new SimpleFacetParameter(RodaConstants.AIP_HAS_REPRESENTATIONS));
     searchResultPanel = new AIPList(filter, facets);
     facetDescriptionLevels = new FlowPanel();
     facetHasRepresentations = new FlowPanel();
@@ -138,7 +137,8 @@ public class BasicSearch extends Composite {
 
     // searchInputBox.getElement().setId(Document.get().createUniqueId());
     initWidget(uiBinder.createAndBindUi(this));
-    // searchInputLabel.setHTML("<label class='searchLabel' for='"+searchInputBox.getElement().getId()+"'>"+constants.basicSearchInputLabel()+"</label>");
+    // searchInputLabel.setHTML("<label class='searchLabel'
+    // for='"+searchInputBox.getElement().getId()+"'>"+constants.basicSearchInputLabel()+"</label>");
 
     // searchInputButton.setText(constants.basicSearchButtonLabel());
 
@@ -217,11 +217,11 @@ public class BasicSearch extends Composite {
 
   }
 
-  public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
-    if (historyTokens.length == 0) {
+  public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
+    if (historyTokens.size() == 0) {
       callback.onSuccess(this);
     } else {
-      History.newItem(RESOLVER.getHistoryPath());
+      Tools.newHistory(RESOLVER);
       callback.onSuccess(null);
     }
   }

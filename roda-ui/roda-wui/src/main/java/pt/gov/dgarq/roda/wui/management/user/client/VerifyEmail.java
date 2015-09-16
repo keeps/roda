@@ -3,12 +3,8 @@
  */
 package pt.gov.dgarq.roda.wui.management.user.client;
 
-import pt.gov.dgarq.roda.core.common.EmailAlreadyExistsException;
-import pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException;
-import pt.gov.dgarq.roda.core.common.NoSuchUserException;
-import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
-import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
-import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
+import java.util.Arrays;
+import java.util.List;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.History;
@@ -24,6 +20,12 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.UserManagementConstants;
+import pt.gov.dgarq.roda.core.common.EmailAlreadyExistsException;
+import pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException;
+import pt.gov.dgarq.roda.core.common.NoSuchUserException;
+import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
+import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
+import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
 
 /**
  * @author Luis Faria
@@ -98,27 +100,27 @@ public class VerifyEmail implements HistoryResolver {
           UserManagementService.Util.getInstance().verifyemail(userInputBox.getText(), tokenInputBox.getText(),
             new AsyncCallback<Boolean>() {
 
-              public void onFailure(Throwable caught) {
-                if (caught instanceof NoSuchRODAObjectException) {
-                  Window.alert(constants.verifyEmailNoSuchUser());
-                  userInputBox.setFocus(true);
-                } else {
-                  logger.error("Error verifying token", caught);
-                }
+            public void onFailure(Throwable caught) {
+              if (caught instanceof NoSuchRODAObjectException) {
+                Window.alert(constants.verifyEmailNoSuchUser());
+                userInputBox.setFocus(true);
+              } else {
+                logger.error("Error verifying token", caught);
+              }
+            }
+
+            public void onSuccess(Boolean verified) {
+              if (verified.booleanValue()) {
+                Window.alert(constants.verifyEmailSuccess());
+                History.newItem("home");
+              } else {
+                Window.alert(constants.verifyEmailWrongToken());
+                tokenInputBox.setFocus(true);
               }
 
-              public void onSuccess(Boolean verified) {
-                if (verified.booleanValue()) {
-                  Window.alert(constants.verifyEmailSuccess());
-                  History.newItem("home");
-                } else {
-                  Window.alert(constants.verifyEmailWrongToken());
-                  tokenInputBox.setFocus(true);
-                }
+            }
 
-              }
-
-            });
+          });
         }
 
       });
@@ -129,20 +131,20 @@ public class VerifyEmail implements HistoryResolver {
           UserManagementService.Util.getInstance().resendEmailVerification(userInputBox.getText(),
             new AsyncCallback<Boolean>() {
 
-              public void onFailure(Throwable caught) {
-                logger.error("Error resending " + "verification email", caught);
+            public void onFailure(Throwable caught) {
+              logger.error("Error resending " + "verification email", caught);
+            }
+
+            public void onSuccess(Boolean successful) {
+              if (successful.booleanValue()) {
+                Window.alert(constants.verifyEmailResendSuccess());
+              } else {
+                Window.alert(constants.verifyEmailResendFailure());
               }
 
-              public void onSuccess(Boolean successful) {
-                if (successful.booleanValue()) {
-                  Window.alert(constants.verifyEmailResendSuccess());
-                } else {
-                  Window.alert(constants.verifyEmailResendFailure());
-                }
+            }
 
-              }
-
-            });
+          });
         }
 
       });
@@ -153,37 +155,36 @@ public class VerifyEmail implements HistoryResolver {
           String email = "";
           do {
             email = Window.prompt(constants.verifyEmailChangePrompt(), email);
-          } while (email != null
-            && !email
-              .matches("^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[_A-Za-z0-9-]+)"));
+          } while (email != null && !email
+            .matches("^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[_A-Za-z0-9-]+)"));
 
           if (email != null) {
             UserManagementService.Util.getInstance().changeUnverifiedEmail(userInputBox.getText(), email,
               new AsyncCallback<Boolean>() {
 
-                public void onFailure(Throwable caught) {
-                  if (caught instanceof NoSuchUserException) {
-                    Window.alert(constants.verifyEmailNoSuchUser());
-                  } else if (caught instanceof EmailAlreadyExistsException) {
-                    Window.alert(constants.verifyEmailAlreadyExists());
-                  } else {
-                    logger.error("Error changing unverified email", caught);
-                  }
+              public void onFailure(Throwable caught) {
+                if (caught instanceof NoSuchUserException) {
+                  Window.alert(constants.verifyEmailNoSuchUser());
+                } else if (caught instanceof EmailAlreadyExistsException) {
+                  Window.alert(constants.verifyEmailAlreadyExists());
+                } else {
+                  logger.error("Error changing unverified email", caught);
+                }
+              }
+
+              public void onSuccess(Boolean success) {
+                if (success.booleanValue()) {
+                  Window.alert(constants.verifyEmailChangeSuccess());
+                  tokenInputBox.setText("");
+                  tokenInputBox.setFocus(true);
+                } else {
+                  Window.alert(constants.verifyEmailChangeFailure());
+                  userInputBox.setFocus(true);
                 }
 
-                public void onSuccess(Boolean success) {
-                  if (success.booleanValue()) {
-                    Window.alert(constants.verifyEmailChangeSuccess());
-                    tokenInputBox.setText("");
-                    tokenInputBox.setFocus(true);
-                  } else {
-                    Window.alert(constants.verifyEmailChangeFailure());
-                    userInputBox.setFocus(true);
-                  }
+              }
 
-                }
-
-              });
+            });
           }
 
         }
@@ -243,8 +244,8 @@ public class VerifyEmail implements HistoryResolver {
    * @see
    * pt.gov.dgarq.roda.office.common.client.HistoryResolver#getHistoryPath()
    */
-  public String getHistoryPath() {
-    return getHistoryToken();
+  public List<String> getHistoryPath() {
+    return Arrays.asList(getHistoryToken());
   }
 
   /*
@@ -261,23 +262,23 @@ public class VerifyEmail implements HistoryResolver {
     callback.onSuccess(Boolean.TRUE);
   }
 
-  public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
-    if (historyTokens.length == 0) {
+  public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
+    if (historyTokens.size() == 0) {
       init();
       callback.onSuccess(layout);
-    } else if (historyTokens.length == 1) {
+    } else if (historyTokens.size() == 1) {
       init();
-      userInputBox.setText(historyTokens[0]);
+      userInputBox.setText(historyTokens.get(0));
       updateVisibles();
       callback.onSuccess(layout);
-    } else if (historyTokens.length == 2) {
+    } else if (historyTokens.size() == 2) {
       init();
-      userInputBox.setText(historyTokens[0]);
-      tokenInputBox.setText(historyTokens[1]);
+      userInputBox.setText(historyTokens.get(0));
+      tokenInputBox.setText(historyTokens.get(1));
       updateVisibles();
       callback.onSuccess(layout);
     } else {
-      History.newItem(getHistoryPath() + "." + historyTokens[0] + "." + historyTokens[1]);
+      History.newItem(getHistoryPath() + "." + historyTokens.get(0) + "." + historyTokens.get(1));
       callback.onSuccess(null);
     }
   }

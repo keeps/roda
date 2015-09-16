@@ -8,6 +8,7 @@ import java.util.List;
 
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
+import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
 import pt.gov.dgarq.roda.wui.management.client.Management;
 
 import com.google.gwt.user.client.History;
@@ -94,18 +95,18 @@ public class Statistics implements HistoryResolver {
     UserLogin.getInstance().checkRole(this, callback);
   }
 
-  public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
-    if (historyTokens.length == 0) {
+  public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
+    if (historyTokens.size() == 0) {
       init();
       callback.onSuccess(layout);
     } else {
-      History.newItem(getHistoryPath());
+      Tools.newHistory(this);
       callback.onSuccess(null);
     }
   }
 
-  public String getHistoryPath() {
-    return Management.RESOLVER.getHistoryPath() + "." + getHistoryToken();
+  public List<String> getHistoryPath() {
+    return Tools.concat(Management.RESOLVER.getHistoryPath(), getHistoryToken());
   }
 
   public String getHistoryToken() {

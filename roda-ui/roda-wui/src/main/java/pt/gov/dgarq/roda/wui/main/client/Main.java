@@ -3,6 +3,8 @@
  */
 package pt.gov.dgarq.roda.wui.main.client;
 
+import java.util.List;
+
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
@@ -10,7 +12,6 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.http.client.URL;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Command;
@@ -120,7 +121,7 @@ public class Main extends Composite implements EntryPoint {
     homeLinkArea.addClickHandler(new ClickHandler() {
 
       public void onClick(ClickEvent event) {
-        History.newItem(Home.RESOLVER.getHistoryPath());
+        Tools.newHistory(Home.RESOLVER);
       }
     });
 
@@ -130,12 +131,13 @@ public class Main extends Composite implements EntryPoint {
 
   private void onHistoryChanged(String historyToken) {
     if (historyToken.length() == 0) {
-      contentPanel.update(Tools.splitHistory(Home.RESOLVER.getHistoryPath()));
-      History.newItem(Home.RESOLVER.getHistoryPath());
+      contentPanel.update(Home.RESOLVER.getHistoryPath());
+      Tools.newHistory(Home.RESOLVER);
     } else {
-      final String decodedHistoryToken = URL.decode(historyToken);
-      String[] historyPath = Tools.splitHistory(decodedHistoryToken);
-      contentPanel.update(historyPath);
+
+      List<String> currentHistoryPath = Tools.getCurrentHistoryPath();
+      GWT.log("History path: " + currentHistoryPath);
+      contentPanel.update(currentHistoryPath);
 
       /*
        * Scheduler.get().scheduleDeferred(new Command() {

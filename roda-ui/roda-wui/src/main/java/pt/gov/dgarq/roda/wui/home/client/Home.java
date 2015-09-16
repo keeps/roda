@@ -3,11 +3,14 @@
  */
 package pt.gov.dgarq.roda.wui.home.client;
 
-import com.google.gwt.user.client.History;
+import java.util.Arrays;
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
+import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
 import pt.gov.dgarq.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 /**
@@ -19,7 +22,7 @@ public class Home {
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
-    public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
+    public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
       getInstance().resolve(historyTokens, callback);
     }
 
@@ -34,8 +37,8 @@ public class Home {
     }
 
     @Override
-    public String getHistoryPath() {
-      return getHistoryToken();
+    public List<String> getHistoryPath() {
+      return Arrays.asList(getHistoryToken());
     }
   };
 
@@ -69,12 +72,12 @@ public class Home {
     }
   }
 
-  public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
-    if (historyTokens.length == 0) {
+  public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
+    if (historyTokens.size() == 0) {
       init();
       callback.onSuccess(layout);
     } else {
-      History.newItem(RESOLVER.getHistoryPath());
+      Tools.newHistory(Home.RESOLVER);
       callback.onSuccess(null);
     }
   }

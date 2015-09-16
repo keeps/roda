@@ -4,11 +4,11 @@
 package pt.gov.dgarq.roda.wui.main.client;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.MissingResourceException;
 import java.util.Set;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -61,7 +61,7 @@ public class ContentPanel extends SimplePanel {
 
   private Widget currWidget;
 
-  private String currHistoryPath;
+  private List<String> currHistoryPath;
 
   private ContentPanel() {
     super();
@@ -97,12 +97,12 @@ public class ContentPanel extends SimplePanel {
    * @param historyTokens
    *          the history tokens
    */
-  public void update(final String[] historyTokens) {
+  public void update(final List<String> historyTokens) {
     boolean foundit = false;
     for (final HistoryResolver resolver : resolvers) {
-      if (historyTokens[0].equals(resolver.getHistoryToken())) {
+      if (historyTokens.get(0).equals(resolver.getHistoryToken())) {
         foundit = true;
-        currHistoryPath = Tools.join(historyTokens, ".");
+        currHistoryPath = historyTokens;
         resolver.isCurrentUserPermitted(new AsyncCallback<Boolean>() {
 
           public void onFailure(Throwable caught) {
@@ -121,7 +121,7 @@ public class ContentPanel extends SimplePanel {
                   if (caught instanceof BadHistoryTokenException) {
                     Window.alert(messages.pageNotFound(caught.getMessage()));
                     if (currWidget == null) {
-                      History.newItem(Home.RESOLVER.getHistoryPath());
+                      Tools.newHistory(Home.RESOLVER);
                     }
                   }
                 }
@@ -144,21 +144,21 @@ public class ContentPanel extends SimplePanel {
       }
     }
     if (!foundit) {
-      Window.alert(messages.pageNotFound(historyTokens[0]));
+      Window.alert(messages.pageNotFound(historyTokens.get(0)));
       if (currWidget == null) {
-        History.newItem(Home.RESOLVER.getHistoryPath());
+        Tools.newHistory(Home.RESOLVER);
       } else {
-        History.newItem(currHistoryPath);
+        Tools.newHistory(currHistoryPath);
       }
     }
 
   }
 
-  private void setWindowTitle(String[] historyTokens) {
+  private void setWindowTitle(List<String> historyTokens) {
     String tokenI18N = "";
     boolean resolved = false;
-    String[] tokens = historyTokens;
-    while (!resolved && tokens.length > 0) {
+    List<String> tokens = historyTokens;
+    while (!resolved && tokens.size() > 0) {
       try {
         tokenI18N = constants.getString("title_" + Tools.join(tokens, "_")).toUpperCase();
         resolved = true;
@@ -167,7 +167,7 @@ public class ContentPanel extends SimplePanel {
       }
     }
     if (!resolved) {
-      tokenI18N = historyTokens[historyTokens.length - 1].toUpperCase();
+      tokenI18N = historyTokens.get(historyTokens.size() - 1).toUpperCase();
     }
 
     // title.setText(tokenI18N);

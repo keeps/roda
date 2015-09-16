@@ -3,6 +3,8 @@
  */
 package pt.gov.dgarq.roda.wui.dissemination.search.client;
 
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -24,7 +26,7 @@ public class Search {
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
-    public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
+    public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
       getInstance().resolve(historyTokens, callback);
     }
 
@@ -39,8 +41,8 @@ public class Search {
     }
 
     @Override
-    public String getHistoryPath() {
-      return Dissemination.RESOLVER.getHistoryPath() + "." + getHistoryToken();
+    public List<String> getHistoryPath() {
+      return Tools.concat(Dissemination.RESOLVER.getHistoryPath(), getHistoryToken());
     }
   };
 
@@ -84,15 +86,15 @@ public class Search {
     UserLogin.getInstance().checkRoles(new HistoryResolver[] {BasicSearch.RESOLVER}, false, callback);
   }
 
-  public void resolve(String[] historyTokens, AsyncCallback<Widget> callback) {
-    if (historyTokens.length == 0) {
+  public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
+    if (historyTokens.size() == 0) {
       init();
       callback.onSuccess(layout);
     } else {
-      if (historyTokens[0].equals(BasicSearch.RESOLVER.getHistoryToken())) {
+      if (historyTokens.get(0).equals(BasicSearch.RESOLVER.getHistoryToken())) {
         BasicSearch.getInstance().resolve(Tools.tail(historyTokens), callback);
       } else {
-        callback.onFailure(new BadHistoryTokenException(historyTokens[0]));
+        callback.onFailure(new BadHistoryTokenException(historyTokens.get(0)));
       }
     }
   }

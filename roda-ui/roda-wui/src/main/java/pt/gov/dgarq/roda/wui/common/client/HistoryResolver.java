@@ -3,6 +3,8 @@
  */
 package pt.gov.dgarq.roda.wui.common.client;
 
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -26,7 +28,7 @@ public interface HistoryResolver {
    * 
    * @return
    */
-  public String getHistoryPath();
+  public List<String> getHistoryPath();
 
   /**
    * Check the current user permissions of accessing this resolver
@@ -46,6 +48,6 @@ public interface HistoryResolver {
    *          Callback to handle the result Widget or the exception
    *          BadHistoryTokenException or AuthorizationDeniedException
    */
-  public void resolve(String[] historyTokens, AsyncCallback<Widget> callback);
+  public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback);
 
 }
