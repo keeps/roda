@@ -91,8 +91,8 @@ public class User extends RodaUser {
    */
   public User(User user) {
 
-    super(user.getId(), user.getName(), user.getEmail(), false, user.getDirectGroups(), user.getAllGroups(), user
-      .getDirectRoles(), user.getAllRoles());
+    super(user.getId(), user.getName(), user.getEmail(), false, user.getIpAddress(), user.getDirectGroups(),
+      user.getAllGroups(), user.getDirectRoles(), user.getAllRoles());
     setActive(user.isActive());
     setIdDocumentType(user.getIdDocumentType());
     setIdDocument(user.getIdDocument());

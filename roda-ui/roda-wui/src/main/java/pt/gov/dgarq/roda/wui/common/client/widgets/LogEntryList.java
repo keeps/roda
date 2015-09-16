@@ -103,7 +103,7 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
       @Override
       public String getValue(LogEntry logEntry) {
         // FIXME
-        return logEntry != null ? logEntry.getDuration() + "ms" : null;
+        return logEntry != null ? logEntry.getDuration() + " ms" : null;
       }
     };
 

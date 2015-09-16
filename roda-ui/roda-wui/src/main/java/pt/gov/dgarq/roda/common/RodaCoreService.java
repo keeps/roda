@@ -85,8 +85,7 @@ public abstract class RodaCoreService {
 
     LogEntry logEntry = new LogEntry();
     logEntry.setId(UUID.randomUUID().toString());
-    // logEntry.setAddress(user.getClientIpAddress());
-    logEntry.setAddress("FIXME");
+    logEntry.setAddress(user.getIpAddress());
     logEntry.setUsername(user.getName());
     logEntry.setActionComponent(actionComponent);
     logEntry.setActionMethod(actionMethod);

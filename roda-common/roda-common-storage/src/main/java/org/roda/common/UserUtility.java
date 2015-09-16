@@ -54,6 +54,7 @@ public class UserUtility {
     if (credentials != null) {
       try {
         user = UserUtility.getLdapUtility().getAuthenticatedUser(credentials.getFirst(), credentials.getSecond());
+        user.setIpAddress(request.getRemoteAddr());
       } catch (AuthenticationDeniedException e) {
         throw new AuthorizationDeniedException("Unable to authenticate user!");
       } catch (ServiceException e) {
@@ -64,12 +65,13 @@ public class UserUtility {
       if (user == null) {
         throw new AuthorizationDeniedException("No user provided!");
       }
+      user.setIpAddress(request.getRemoteAddr());
     }
     return user;
 
   }
 
-  public static Pair<String, String> getUserCredentialsFromBasicAuth(HttpServletRequest request) {
+  private static Pair<String, String> getUserCredentialsFromBasicAuth(HttpServletRequest request) {
     Pair<String, String> ret = null;
     String authorization = request.getHeader("Authorization");
     if (authorization != null && authorization.startsWith("Basic")) {
@@ -98,6 +100,7 @@ public class UserUtility {
         if (indexUsers.getTotalCount() == 1) {
           user = (RodaUser) indexUsers.getResults().get(0);
           user.setGuest(rsu.isGuest());
+          user.setIpAddress(request.getRemoteAddr());
           LOGGER.trace("User obtained from index: " + user + "\n" + "user in session: " + rsu);
         } else {
           LOGGER.error("The number of users obtained from the index is different from 1");

@@ -7,6 +7,7 @@ public class RodaUser extends RodaSimpleUser implements RODAMember {
   private static final long serialVersionUID = -718342371831706371L;
 
   private boolean active = true;
+  private String ipAddress = "";
   private Set<String> allRoles = new HashSet<String>();
   private Set<String> directRoles = new HashSet<String>();
   private Set<String> allGroups = new HashSet<String>();
@@ -24,18 +25,20 @@ public class RodaUser extends RodaSimpleUser implements RODAMember {
     super(user.getId(), user.getName(), user.getEmail(), user.isGuest());
   }
 
-  public RodaUser(String id, String name, String email, boolean guest, Set<String> allRoles, Set<String> directRoles,
-    Set<String> allGroups, Set<String> directGroups) {
+  public RodaUser(String id, String name, String email, boolean guest, String ipAddress, Set<String> allRoles,
+    Set<String> directRoles, Set<String> allGroups, Set<String> directGroups) {
     super(id, name, email, guest);
+    this.ipAddress = ipAddress;
     this.allRoles = allRoles;
     this.directRoles = directRoles;
     this.allGroups = allGroups;
     this.directGroups = directGroups;
   }
 
-  public RodaUser(RodaSimpleUser user, Set<String> allRoles, Set<String> directRoles, Set<String> allGroups,
-    Set<String> directGroups) {
+  public RodaUser(RodaSimpleUser user, String ipAddress, Set<String> allRoles, Set<String> directRoles,
+    Set<String> allGroups, Set<String> directGroups) {
     super(user.getId(), user.getName(), user.getEmail(), user.isGuest());
+    this.ipAddress = ipAddress;
     this.allRoles = allRoles;
     this.directRoles = directRoles;
     this.allGroups = allGroups;
@@ -49,6 +52,14 @@ public class RodaUser extends RodaSimpleUser implements RODAMember {
 
   public boolean isActive() {
     return active;
+  }
+
+  public String getIpAddress() {
+    return ipAddress;
+  }
+
+  public void setIpAddress(String ipAddress) {
+    this.ipAddress = ipAddress;
   }
 
   public void setActive(boolean active) {
@@ -90,53 +101,74 @@ public class RodaUser extends RodaSimpleUser implements RODAMember {
   @Override
   public int hashCode() {
     final int prime = 31;
-    int result = 1;
+    int result = super.hashCode();
     result = prime * result + (active ? 1231 : 1237);
     result = prime * result + ((allGroups == null) ? 0 : allGroups.hashCode());
     result = prime * result + ((allRoles == null) ? 0 : allRoles.hashCode());
     result = prime * result + ((directGroups == null) ? 0 : directGroups.hashCode());
     result = prime * result + ((directRoles == null) ? 0 : directRoles.hashCode());
+    result = prime * result + ((ipAddress == null) ? 0 : ipAddress.hashCode());
     return result;
   }
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj)
+    if (this == obj) {
       return true;
-    if (obj == null)
+    }
+    if (!super.equals(obj)) {
       return false;
-    if (getClass() != obj.getClass())
+    }
+    if (!(obj instanceof RodaUser)) {
       return false;
+    }
     RodaUser other = (RodaUser) obj;
-    if (active != other.active)
+    if (active != other.active) {
       return false;
+    }
     if (allGroups == null) {
-      if (other.allGroups != null)
+      if (other.allGroups != null) {
         return false;
-    } else if (!allGroups.equals(other.allGroups))
+      }
+    } else if (!allGroups.equals(other.allGroups)) {
       return false;
+    }
     if (allRoles == null) {
-      if (other.allRoles != null)
+      if (other.allRoles != null) {
         return false;
-    } else if (!allRoles.equals(other.allRoles))
+      }
+    } else if (!allRoles.equals(other.allRoles)) {
       return false;
+    }
     if (directGroups == null) {
-      if (other.directGroups != null)
+      if (other.directGroups != null) {
         return false;
-    } else if (!directGroups.equals(other.directGroups))
+      }
+    } else if (!directGroups.equals(other.directGroups)) {
       return false;
+    }
     if (directRoles == null) {
-      if (other.directRoles != null)
+      if (other.directRoles != null) {
         return false;
-    } else if (!directRoles.equals(other.directRoles))
+      }
+    } else if (!directRoles.equals(other.directRoles)) {
       return false;
+    }
+    if (ipAddress == null) {
+      if (other.ipAddress != null) {
+        return false;
+      }
+    } else if (!ipAddress.equals(other.ipAddress)) {
+      return false;
+    }
     return true;
   }
 
   @Override
   public String toString() {
-    return "RodaUser [active=" + active + ", allRoles=" + allRoles + ", directRoles=" + directRoles + ", allGroups="
-      + allGroups + ", directGroups=" + directGroups + ", isUser()=" + isUser() + ", " + super.toString() + "]";
+    return "RodaUser [active=" + active + ", ipAddress=" + ipAddress + ", allRoles=" + allRoles + ", directRoles="
+      + directRoles + ", allGroups=" + allGroups + ", directGroups=" + directGroups + ", isUser()=" + isUser() + ", "
+      + super.toString() + "]";
   }
 
   public void addDirectRole(String role) {
