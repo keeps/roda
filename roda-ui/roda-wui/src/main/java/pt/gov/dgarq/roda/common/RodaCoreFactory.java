@@ -19,8 +19,13 @@ import java.util.UUID;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 import org.roda.action.orchestrate.ActionOrchestrator;
 import org.roda.action.orchestrate.Plugin;
 import org.roda.action.orchestrate.ReindexAction;
@@ -29,6 +34,7 @@ import org.roda.common.ApacheDS;
 import org.roda.common.UserUtility;
 import org.roda.index.IndexService;
 import org.roda.index.IndexServiceException;
+import org.roda.index.utils.SolrUtils;
 import org.roda.model.AIP;
 import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
@@ -323,6 +329,21 @@ public class RodaCoreFactory {
         } else if ("reindex".equals(args.get(1)) && args.size() == 2) {
           Plugin<AIP> reindexAction = new ReindexAction();
           getActionOrchestrator().runActionOnAllAIPs(reindexAction);
+        } else if ("query".equals(args.get(1)) && args.size() == 4 && StringUtils.isNotBlank(args.get(2))
+          && StringUtils.isNotBlank(args.get(3))) {
+          String collection = args.get(2);
+          String solrQueryString = args.get(3);
+          try {
+            QueryResponse executeSolrQuery = SolrUtils.executeSolrQuery(solr, collection, solrQueryString);
+            ;
+            SolrDocumentList results = executeSolrQuery.getResults();
+            System.out.println("Size: " + results.getNumFound() + "; Returned: " + results.size());
+            for (SolrDocument solrDocument : results) {
+              System.out.println(">" + solrDocument);
+            }
+          } catch (SolrServerException | IOException e) {
+            e.printStackTrace();
+          }
         }
       } else {
         printMainUsage();

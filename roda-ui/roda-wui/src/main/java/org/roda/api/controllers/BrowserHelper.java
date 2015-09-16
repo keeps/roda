@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -17,11 +18,13 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.StreamingOutput;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.roda.api.v1.utils.StreamResponse;
 import org.roda.common.HTMLUtils;
 import org.roda.index.IndexServiceException;
 import org.roda.model.DescriptiveMetadata;
@@ -260,19 +263,44 @@ public class BrowserHelper {
     }
   }
 
-  public static Pair<String, StreamingOutput> getAipDescritiveMetadata(String aipId, String metadataId)
-    throws ModelServiceException, StorageServiceException, GenericException {
+  public static StreamResponse getAipDescritiveMetadata(String aipId, String metadataId, String acceptFormat,
+    String language) throws ModelServiceException, StorageServiceException, GenericException {
+
+    final String filename;
+    final String mediaType;
+    final StreamingOutput stream;
+    StreamResponse ret = null;
 
     ModelService model = RodaCoreFactory.getModelService();
     Binary descriptiveMetadataBinary = model.retrieveDescriptiveMetadataBinary(aipId, metadataId);
-    StreamingOutput stream = new StreamingOutput() {
-      @Override
-      public void write(OutputStream os) throws IOException, WebApplicationException {
-        IOUtils.copy(descriptiveMetadataBinary.getContent().createInputStream(), os);
-      }
-    };
 
-    return new Pair<String, StreamingOutput>(descriptiveMetadataBinary.getStoragePath().getName(), stream);
+    if (acceptFormat == null || acceptFormat.equalsIgnoreCase("bin")) {
+      filename = descriptiveMetadataBinary.getStoragePath().getName();
+      mediaType = MediaType.APPLICATION_OCTET_STREAM;
+      stream = new StreamingOutput() {
+        @Override
+        public void write(OutputStream os) throws IOException, WebApplicationException {
+          IOUtils.copy(descriptiveMetadataBinary.getContent().createInputStream(), os);
+        }
+      };
+      ret = new StreamResponse(filename, mediaType, stream);
+    } else if (acceptFormat.equalsIgnoreCase("html")) {
+      filename = descriptiveMetadataBinary.getStoragePath().getName() + ".html";
+      mediaType = MediaType.TEXT_HTML;
+      String htmlDescriptive = HTMLUtils.descriptiveMetadataToHtml(descriptiveMetadataBinary,
+        ServerTools.parseLocale(language));
+      stream = new StreamingOutput() {
+        @Override
+        public void write(OutputStream os) throws IOException, WebApplicationException {
+          PrintStream printStream = new PrintStream(os);
+          printStream.print(htmlDescriptive);
+          printStream.close();
+        }
+      };
+      ret = new StreamResponse(filename, mediaType, stream);
+    }
+
+    return ret;
   }
 
   public static Pair<String, StreamingOutput> aipsAipIdPreservationMetadataGet(String aipId, String start, String limit)
@@ -395,8 +423,8 @@ public class BrowserHelper {
     return new Pair<String, StreamingOutput>(filename, stream);
   }
 
-  public static void createOrUpdateAipRepresentationPreservationMetadataFile(String aipId,
-    String representationId, InputStream is, FormDataContentDisposition fileDetail, boolean create)
+  public static void createOrUpdateAipRepresentationPreservationMetadataFile(String aipId, String representationId,
+    InputStream is, FormDataContentDisposition fileDetail, boolean create)
       throws ModelServiceException, StorageServiceException, GenericException {
     Path file = null;
     try {

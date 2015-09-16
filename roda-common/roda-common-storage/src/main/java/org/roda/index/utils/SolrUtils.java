@@ -44,7 +44,6 @@ import org.apache.solr.handler.loader.XMLLoader;
 import org.roda.common.RodaUtils;
 import org.roda.index.IndexServiceException;
 import org.roda.model.AIP;
-import org.roda.model.AgentMetadata;
 import org.roda.model.DescriptiveMetadata;
 import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
@@ -690,6 +689,9 @@ public class SolrUtils {
     query.setStart(sublist.getFirstElementIndex());
     query.setRows(sublist.getMaximumElementCount());
     parseAndConfigureFacets(facets, query);
+
+    LOGGER.debug("Solr Query: " + query);
+
     try {
       QueryResponse response = index.query(getIndexName(classToRetrieve), query);
       ret = queryResponseToIndexResult(response, classToRetrieve, facets);
@@ -1286,6 +1288,25 @@ public class SolrUtils {
     return doc;
   }
 
+  /**
+   * WARNING: this should only be used to debug/tests only
+   * 
+   * @return
+   * @throws IOException
+   * @throws SolrServerException
+   */
+  public static QueryResponse executeSolrQuery(SolrClient index, String collection, String solrQueryString)
+    throws SolrServerException, IOException {
+    LOGGER.debug("query string: " + solrQueryString);
+    SolrQuery query = new SolrQuery();
+    for (String string : solrQueryString.split("&")) {
+      String[] split = string.split("=");
+      LOGGER.debug(split[0] + " > " + split[1]);
+      query.add(split[0], split[1]);
+    }
+    LOGGER.debug("executeSolrQuery: " + query);
+    return index.query(collection, query);
+  }
 
   // private static Group solrDocumentToGroup(SolrDocument doc) {
   // final String id = objectToString(doc.get(RodaConstants.MEMBERS_ID));

@@ -1,13 +1,6 @@
 package org.roda.api.v1.impl;
 
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.HttpHeaders;
@@ -21,7 +14,7 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.roda.api.controllers.Browser;
 import org.roda.api.v1.utils.ApiResponseMessage;
 import org.roda.api.v1.utils.NotFoundException;
-import org.roda.common.HTMLUtils;
+import org.roda.api.v1.utils.StreamResponse;
 import org.roda.common.UserUtility;
 import org.roda.model.ModelServiceException;
 import org.roda.storage.StorageServiceException;
@@ -31,7 +24,6 @@ import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
 import pt.gov.dgarq.roda.core.common.Pair;
 import pt.gov.dgarq.roda.core.data.v2.RodaUser;
 import pt.gov.dgarq.roda.wui.common.client.GenericException;
-import pt.gov.dgarq.roda.wui.common.server.ServerTools;
 
 @javax.annotation.Generated(value = "class io.swagger.codegen.languages.JaxRSServerCodegen", date = "2015-09-03T11:38:49.275+01:00")
 public class AipsResourceImpl {
@@ -185,14 +177,14 @@ public class AipsResourceImpl {
     String acceptFormat, String language) throws NotFoundException {
     String authorization = request.getHeader("Authorization");
     try {
-      if (acceptFormat != null && acceptFormat.equalsIgnoreCase("bin")) {
+      if (acceptFormat != null) { // && acceptFormat.equalsIgnoreCase("bin")) {
         // get user
         RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
         // delegate action to controller
-        Pair<String, StreamingOutput> aipDescriptiveMetadata = Browser.getAipDescritiveMetadata(user, aipId,
-          metadataId);
-        return Response.ok(aipDescriptiveMetadata.getSecond(), MediaType.APPLICATION_OCTET_STREAM)
-          .header("content-disposition", "attachment; filename = " + aipDescriptiveMetadata.getFirst()).build();
+        StreamResponse aipDescriptiveMetadata = Browser.getAipDescritiveMetadata(user, aipId, metadataId, acceptFormat,
+          language);
+        return Response.ok(aipDescriptiveMetadata.getStream(), aipDescriptiveMetadata.getMediaType())
+          .header("content-disposition", "attachment; filename = " + aipDescriptiveMetadata.getFilename()).build();
       } else {
         return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Not yet implemented"))
           .build();
@@ -314,10 +306,8 @@ public class AipsResourceImpl {
       Pair<String, StreamingOutput> aipRepresentationPreservationMetadataFile = Browser
         .getAipRepresentationPreservationMetadataFile(user, aipId, representationId, fileId);
 
-      return Response
-        .ok(aipRepresentationPreservationMetadataFile.getSecond(), MediaType.APPLICATION_OCTET_STREAM)
-        .header("content-disposition",
-          "attachment; filename = " + aipRepresentationPreservationMetadataFile.getFirst())
+      return Response.ok(aipRepresentationPreservationMetadataFile.getSecond(), MediaType.APPLICATION_OCTET_STREAM)
+        .header("content-disposition", "attachment; filename = " + aipRepresentationPreservationMetadataFile.getFirst())
         .build();
     } catch (StorageServiceException e) {
       if (e.getCode() == ModelServiceException.NOT_FOUND) {

@@ -7,6 +7,7 @@ import java.util.List;
 import javax.ws.rs.core.StreamingOutput;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.roda.api.v1.utils.StreamResponse;
 import org.roda.common.UserUtility;
 import org.roda.model.DescriptiveMetadata;
 import org.roda.model.ModelServiceException;
@@ -168,8 +169,9 @@ public class Browser extends RodaCoreService {
     return aipDescriptiveMetadataList;
   }
 
-  public static Pair<String, StreamingOutput> getAipDescritiveMetadata(RodaUser user, String aipId, String metadataId)
-    throws AuthorizationDeniedException, GenericException, ModelServiceException, StorageServiceException {
+  public static StreamResponse getAipDescritiveMetadata(RodaUser user, String aipId, String metadataId,
+    String acceptFormat, String language)
+      throws AuthorizationDeniedException, GenericException, ModelServiceException, StorageServiceException {
     Date startDate = new Date();
 
     // check user permissions
@@ -177,7 +179,8 @@ public class Browser extends RodaCoreService {
     UserUtility.checkObjectModifyPermissions(user, sdo);
 
     // delegate
-    Pair<String, StreamingOutput> aipDescritiveMetadata = BrowserHelper.getAipDescritiveMetadata(aipId, metadataId);
+    StreamResponse aipDescritiveMetadata = BrowserHelper.getAipDescritiveMetadata(aipId, metadataId, acceptFormat,
+      language);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
@@ -272,8 +275,8 @@ public class Browser extends RodaCoreService {
 
   }
 
-  public static void putAipRepresentationPreservationMetadataFile(RodaUser user, String aipId,
-    String representationId, InputStream is, FormDataContentDisposition fileDetail)
+  public static void putAipRepresentationPreservationMetadataFile(RodaUser user, String aipId, String representationId,
+    InputStream is, FormDataContentDisposition fileDetail)
       throws AuthorizationDeniedException, GenericException, ModelServiceException, StorageServiceException {
     Date startDate = new Date();
 
