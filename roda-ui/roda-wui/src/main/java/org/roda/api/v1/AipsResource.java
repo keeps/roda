@@ -52,7 +52,7 @@ public class AipsResource {
     @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam("start") String start,
     @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam("limit") String limit)
       throws NotFoundException {
-    return DELEGATE.aipsGet(start, limit);
+    return DELEGATE.aipsGet(request, start, limit);
   }
 
   @GET
@@ -66,7 +66,7 @@ public class AipsResource {
     @ApiParam(value = "The ID of the AIP to retrieve.", required = true) @PathParam("aip_id") String aipId,
     @ApiParam(value = "Choose format in which to get the AIP", allowableValues = "json, zip", defaultValue = "json") @QueryParam("acceptFormat") String acceptFormat)
       throws NotFoundException {
-    return DELEGATE.aipsAipIdGet(aipId, acceptFormat);
+    return DELEGATE.aipsAipIdGet(request, aipId, acceptFormat);
   }
 
   @PUT
@@ -79,7 +79,7 @@ public class AipsResource {
     @ApiParam(value = "The ID of the existing AIP to update", required = true) @PathParam("aip_id") String aipId,
     @ApiParam(value = "The path to the directory in the shared file system where the AIP should be provided.", required = true) @FormParam("filepath") String filepath)
       throws NotFoundException {
-    return DELEGATE.aipsAipIdPut(aipId, filepath);
+    return DELEGATE.aipsAipIdPut(request, aipId, filepath);
   }
 
   @POST
@@ -92,7 +92,7 @@ public class AipsResource {
     @ApiParam(value = "The requested ID of the new AIP", required = true) @PathParam("aip_id") String aipId,
     @ApiParam(value = "The path to the directory in the shared file system where the AIP should be provided.", required = true) @FormParam("filepath") String filepath)
       throws NotFoundException {
-    return DELEGATE.aipsAipIdPost(aipId, filepath);
+    return DELEGATE.aipsAipIdPost(request, aipId, filepath);
   }
 
   @DELETE
@@ -104,7 +104,7 @@ public class AipsResource {
   public Response aipsAipIdDelete(
     @ApiParam(value = "The ID of the AIP to delete.", required = true) @PathParam("aip_id") String aipId)
       throws NotFoundException {
-    return DELEGATE.aipsAipIdDelete(aipId);
+    return DELEGATE.aipsAipIdDelete(request, aipId);
   }
 
   @GET
@@ -119,7 +119,7 @@ public class AipsResource {
     @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam("start") String start,
     @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam("limit") String limit)
       throws NotFoundException {
-    return DELEGATE.aipsAipIdDataGet(aipId, start, limit);
+    return DELEGATE.aipsAipIdDataGet(request, aipId, start, limit);
   }
 
   @GET
@@ -148,7 +148,7 @@ public class AipsResource {
     @ApiParam(value = "The ID of the existing representation to update", required = true) @PathParam("representation_id") String representationId,
     @ApiParam(value = "The path to the directory in the shared file system where the representation should be provided.", required = true) @FormParam("filepath") String filepath)
       throws NotFoundException {
-    return DELEGATE.aipsAipIdDataRepresentationIdPut(aipId, representationId, filepath);
+    return DELEGATE.aipsAipIdDataRepresentationIdPut(request, aipId, representationId, filepath);
   }
 
   @POST
@@ -162,7 +162,7 @@ public class AipsResource {
     @ApiParam(value = "The requested ID for the new representation", required = true) @PathParam("representation_id") String representationId,
     @ApiParam(value = "The path to the directory in the shared file system where the representation should be provided.", required = true) @FormParam("filepath") String filepath)
       throws NotFoundException {
-    return DELEGATE.aipsAipIdDataRepresentationIdPost(aipId, representationId, filepath);
+    return DELEGATE.aipsAipIdDataRepresentationIdPost(request, aipId, representationId, filepath);
   }
 
   @DELETE
@@ -175,7 +175,7 @@ public class AipsResource {
     @ApiParam(value = "The ID of the AIP where the representation is.", required = true) @PathParam("aip_id") String aipId,
     @ApiParam(value = "The ID of the existing representation to delete", required = true) @PathParam("representation_id") String representationId)
       throws NotFoundException {
-    return DELEGATE.aipsAipIdDataRepresentationIdDelete(aipId, representationId);
+    return DELEGATE.aipsAipIdDataRepresentationIdDelete(request, aipId, representationId);
   }
 
   @GET
@@ -191,7 +191,7 @@ public class AipsResource {
     @ApiParam(value = "The ID of the existing file", required = true) @PathParam("file_id") String fileId,
     @ApiParam(value = "Choose format in which to get the file", allowableValues = "json, bin") @QueryParam("acceptFormat") String acceptFormat)
       throws NotFoundException {
-    return DELEGATE.aipsAipIdDataRepresentationIdFileIdGet(aipId, representationId, fileId, acceptFormat);
+    return DELEGATE.aipsAipIdDataRepresentationIdFileIdGet(request, aipId, representationId, fileId, acceptFormat);
   }
 
   @PUT
@@ -206,7 +206,7 @@ public class AipsResource {
     @ApiParam(value = "The ID of the existing file", required = true) @PathParam("file_id") String fileId,
     @ApiParam(value = "The path to the file in the shared file system where the file should be provided.", required = true) @FormParam("filepath") String filepath)
       throws NotFoundException {
-    return DELEGATE.aipsAipIdDataRepresentationIdFileIdPut(aipId, representationId, fileId, filepath);
+    return DELEGATE.aipsAipIdDataRepresentationIdFileIdPut(request, aipId, representationId, fileId, filepath);
   }
 
   @POST
@@ -221,7 +221,7 @@ public class AipsResource {
     @ApiParam(value = "The requested ID of the new file", required = true) @PathParam("file_id") String fileId,
     @ApiParam(value = "The path to the directory in the shared file system where the representation should be provided.", required = true) @FormParam("filepath") String filepath)
       throws NotFoundException {
-    return DELEGATE.aipsAipIdDataRepresentationIdFileIdPost(aipId, representationId, fileId, filepath);
+    return DELEGATE.aipsAipIdDataRepresentationIdFileIdPost(request, aipId, representationId, fileId, filepath);
   }
 
   @DELETE
@@ -235,7 +235,7 @@ public class AipsResource {
     @ApiParam(value = "The ID of the existing representation", required = true) @PathParam("representation_id") String representationId,
     @ApiParam(value = "The ID of the existing file", required = true) @PathParam("file_id") String fileId)
       throws NotFoundException {
-    return DELEGATE.aipsAipIdDataRepresentationIdFileIdDelete(aipId, representationId, fileId);
+    return DELEGATE.aipsAipIdDataRepresentationIdFileIdDelete(request, aipId, representationId, fileId);
   }
 
   @GET
@@ -265,7 +265,7 @@ public class AipsResource {
     @ApiParam(value = "The ID of the existing metadata file to retrieve", required = true) @PathParam("metadata_id") String metadataId,
     @ApiParam(value = "Choose format in which to get the metadata", allowableValues = "json, xml, html", defaultValue = "json") @QueryParam("acceptFormat") String acceptFormat)
       throws NotFoundException {
-    return DELEGATE.aipsAipIdDescriptiveMetadataMetadataIdGet(request, aipId, metadataId, acceptFormat);
+    return DELEGATE.getAipDescriptiveMetadata(request, aipId, metadataId, acceptFormat);
   }
 
   @PUT
@@ -280,7 +280,7 @@ public class AipsResource {
     @FormDataParam("file") InputStream inputStream, @FormDataParam("file") FormDataContentDisposition fileDetail,
     @ApiParam(value = "The type of the metadata file (e.g. eadc2014, dc)", required = true) @FormParam("metadataType") String metadataType)
       throws NotFoundException {
-    return DELEGATE.aipsAipIdDescriptiveMetadataMetadataIdPut(aipId, metadataId, fileDetail, metadataType);
+    return DELEGATE.aipsAipIdDescriptiveMetadataMetadataIdPut(request, aipId, metadataId, fileDetail, metadataType);
   }
 
   @POST
@@ -295,7 +295,7 @@ public class AipsResource {
     @FormDataParam("file") InputStream inputStream, @FormDataParam("file") FormDataContentDisposition fileDetail,
     @ApiParam(value = "The type of the metadata file (e.g. eadc2014, dc)", required = true) @FormParam("metadataType") String metadataType)
       throws NotFoundException {
-    return DELEGATE.aipsAipIdDescriptiveMetadataMetadataIdPost(aipId, metadataId, fileDetail, metadataType);
+    return DELEGATE.aipsAipIdDescriptiveMetadataMetadataIdPost(request, aipId, metadataId, fileDetail, metadataType);
   }
 
   @DELETE
@@ -308,7 +308,7 @@ public class AipsResource {
     @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam("aip_id") String aipId,
     @ApiParam(value = "The ID of the existing metadata file to delete", required = true) @PathParam("metadata_id") String metadataId)
       throws NotFoundException {
-    return DELEGATE.aipsAipIdDescriptiveMetadataMetadataIdDelete(aipId, metadataId);
+    return DELEGATE.aipsAipIdDescriptiveMetadataMetadataIdDelete(request, aipId, metadataId);
   }
 
   @GET
@@ -323,7 +323,7 @@ public class AipsResource {
     @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam("start") String start,
     @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam("limit") String limit)
       throws NotFoundException {
-    return DELEGATE.aipsAipIdPreservationMetadataGet(request, aipId, start, limit, acceptFormat);
+    return DELEGATE.listAipPreservationMetadata(request, aipId, start, limit, acceptFormat);
   }
 
   @GET
@@ -339,14 +339,14 @@ public class AipsResource {
     @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam("start") String start,
     @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam("limit") String limit)
       throws NotFoundException {
-    return DELEGATE.aipsAipIdPreservationMetadataRepresentationIdGet(aipId, representationId, start, limit,
+    return DELEGATE.getAipRepresentationPreservationMetadata(request, aipId, representationId, start, limit,
       acceptFormat);
   }
 
   @GET
   @Path("/{aip_id}/preservation_metadata/{representation_id}/{file_id}")
   @Produces({"application/xml"})
-  @ApiOperation(value = "Get representation preservation file", notes = "Get the preservation file (XML) for a given representation.", response = SimpleEventPreservationMetadata.class)
+  @ApiOperation(value = "Get representation preservation metadata file", notes = "Get the preservation file (XML) for a given representation.", response = SimpleEventPreservationMetadata.class)
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = SimpleEventPreservationMetadata.class)})
 
   public Response aipsAipIdPreservationMetadataRepresentationIdFileIdGet(
@@ -354,7 +354,7 @@ public class AipsResource {
     @ApiParam(value = "The ID of the existing representation", required = true) @PathParam("representation_id") String representationId,
     @ApiParam(value = "The ID of the existing file", required = true) @PathParam("file_id") String fileId)
       throws NotFoundException {
-    return DELEGATE.aipsAipIdPreservationMetadataRepresentationIdFileIdGet(aipId, representationId, fileId);
+    return DELEGATE.getAipRepresentationPreservationMetadataFile(request, aipId, representationId, fileId);
   }
 
   @POST
@@ -368,8 +368,8 @@ public class AipsResource {
     @ApiParam(value = "The ID of the existing representation", required = true) @PathParam("representation_id") String representationId,
     @FormDataParam("file") InputStream inputStream, @FormDataParam("file") FormDataContentDisposition fileDetail)
       throws NotFoundException {
-    return DELEGATE.aipsAipIdPreservationMetadataRepresentationIdFileIdPost(aipId, representationId, inputStream,
-      fileDetail);
+    return DELEGATE.postAipRepresentationPreservationMetadataFile(request, aipId, representationId,
+      inputStream, fileDetail);
   }
 
   @PUT
@@ -383,8 +383,8 @@ public class AipsResource {
     @ApiParam(value = "The ID of the existing representation", required = true) @PathParam("representation_id") String representationId,
     @FormDataParam("file") InputStream inputStream, @FormDataParam("file") FormDataContentDisposition fileDetail)
       throws NotFoundException {
-    return DELEGATE.aipsAipIdPreservationMetadataRepresentationIdFileIdPut(aipId, representationId, inputStream,
-      fileDetail);
+    return DELEGATE.putAipRepresentationPreservationMetadataFile(request, aipId, representationId,
+      inputStream, fileDetail);
   }
 
   @DELETE
@@ -398,6 +398,6 @@ public class AipsResource {
     @ApiParam(value = "The ID of the existing file", required = true) @PathParam("file_id") String fileId,
     @ApiParam(value = "Choose format in which to get the metadata", allowableValues = "json, xml, html", defaultValue = "json") @QueryParam("acceptFormat") String acceptFormat)
       throws NotFoundException {
-    return DELEGATE.aipsAipIdPreservationMetadataRepresentationIdFileIdDelete(aipId, representationId, fileId);
+    return DELEGATE.aipsAipIdPreservationMetadataRepresentationIdFileIdDelete(request, aipId, representationId, fileId);
   }
 }

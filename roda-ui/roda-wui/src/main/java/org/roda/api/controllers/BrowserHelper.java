@@ -21,6 +21,7 @@ import javax.ws.rs.core.StreamingOutput;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.roda.common.HTMLUtils;
 import org.roda.index.IndexServiceException;
 import org.roda.model.DescriptiveMetadata;
@@ -76,6 +77,12 @@ public class BrowserHelper {
       // set descriptive metadata
       List<DescriptiveMetadataBundle> descriptiveMetadataList = getDescriptiveMetadataBundles(aipId, locale);
       itemBundle.setDescriptiveMetadata(descriptiveMetadataList);
+
+      // TODO
+      // // set preservation metadata
+      // List<PreservationMetadataBundle> preservationMetadataList =
+      // getPreservationMetadataBundles(aipId, locale);
+      // itemBundle.setPreservationMetadata(preservationMetadataList);
 
       // set representations
       // getting the last 2 representations
@@ -328,6 +335,98 @@ public class BrowserHelper {
       }
     }
 
+  }
+
+  public static Pair<String, StreamingOutput> getAipRepresentationPreservationMetadata(String aipId,
+    String representationId, String start, String limit)
+      throws ModelServiceException, StorageServiceException, GenericException {
+    ClosableIterable<PreservationMetadata> preservationFiles = null;
+    try {
+      StorageService storage = RodaCoreFactory.getStorageService();
+      ModelService model = RodaCoreFactory.getModelService();
+      Pair<Integer, Integer> pagingParams = processPagingParams(start, limit);
+      int startInt = pagingParams.getFirst();
+      int limitInt = pagingParams.getSecond();
+      int counter = 0;
+      List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
+      preservationFiles = model.listPreservationMetadataBinaries(aipId, representationId);
+      for (PreservationMetadata preservationFile : preservationFiles) {
+        if (counter >= startInt && (counter <= limitInt || limitInt == -1)) {
+          Binary binary = storage.getBinary(preservationFile.getStoragePath());
+          ZipEntryInfo info = new ZipEntryInfo(preservationFile.getStoragePath().getName(),
+            binary.getContent().createInputStream());
+          zipEntries.add(info);
+        } else {
+          break;
+        }
+        counter++;
+      }
+
+      return createZipReturnPair(zipEntries, aipId + "_" + representationId);
+
+    } catch (IOException e) {
+      // FIXME see what better exception should be thrown
+      throw new GenericException("");
+    } finally {
+      if (preservationFiles != null) {
+        try {
+          preservationFiles.close();
+        } catch (IOException e) {
+          // FIXME see what better exception should be thrown
+          throw new GenericException("");
+        }
+      }
+    }
+  }
+
+  public static Pair<String, StreamingOutput> getAipRepresentationPreservationMetadataFile(String aipId,
+    String representationId, String fileId) throws StorageServiceException {
+
+    StorageService storage = RodaCoreFactory.getStorageService();
+    Binary binary = storage.getBinary(ModelUtils.getPreservationFilePath(aipId, representationId, fileId));
+
+    String filename = binary.getStoragePath().getName();
+    StreamingOutput stream = new StreamingOutput() {
+
+      public void write(OutputStream os) throws IOException, WebApplicationException {
+        IOUtils.copy(binary.getContent().createInputStream(), os);
+      }
+    };
+    return new Pair<String, StreamingOutput>(filename, stream);
+  }
+
+  public static void createOrUpdateAipRepresentationPreservationMetadataFile(String aipId,
+    String representationId, InputStream is, FormDataContentDisposition fileDetail, boolean create)
+      throws ModelServiceException, StorageServiceException, GenericException {
+    Path file = null;
+    try {
+      ModelService model = RodaCoreFactory.getModelService();
+      file = Files.createTempFile("preservation", ".tmp");
+      Files.copy(is, file, StandardCopyOption.REPLACE_EXISTING);
+      Binary resource = (Binary) FSUtils.convertPathToResource(file.getParent(), file);
+      if (create) {
+        model.createPreservationMetadata(aipId, representationId, fileDetail.getFileName(), resource);
+      } else {
+        model.updatePreservationMetadata(aipId, representationId, fileDetail.getFileName(), resource);
+      }
+    } catch (IOException e) {
+      // FIXME see what better exception should be thrown
+      throw new GenericException("");
+    } finally {
+      if (file != null && Files.exists(file)) {
+        try {
+          Files.delete(file);
+        } catch (IOException e) {
+          LOGGER.warn("Error while deleting temporary file", e);
+        }
+      }
+    }
+  }
+
+  public static void aipsAipIdPreservationMetadataRepresentationIdFileIdDelete(String aipId, String representationId,
+    String fileId) throws ModelServiceException {
+    ModelService model = RodaCoreFactory.getModelService();
+    model.deletePreservationMetadata(aipId, representationId, fileId);
   }
 
   public static SimpleDescriptionObject moveInHierarchy(String aipId, String parentId) throws GenericException {

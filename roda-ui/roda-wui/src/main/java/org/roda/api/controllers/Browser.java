@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.ws.rs.core.StreamingOutput;
 
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.roda.common.UserUtility;
 import org.roda.model.DescriptiveMetadata;
 import org.roda.model.ModelServiceException;
@@ -122,6 +123,51 @@ public class Browser extends RodaCoreService {
     return ancestors;
   }
 
+  /*
+   * ---------------------------------------------------------------------------
+   * ---------------- REST related methods - start -----------------------------
+   * ---------------------------------------------------------------------------
+   */
+  public static Pair<String, StreamingOutput> getAipRepresentation(RodaUser user, String aipId, String representationId)
+    throws AuthorizationDeniedException, GenericException, ModelServiceException, StorageServiceException {
+    Date startDate = new Date();
+
+    // check user permissions
+    SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(aipId);
+    UserUtility.checkObjectReadPermissions(user, sdo);
+
+    // delegate
+    Pair<String, StreamingOutput> aipRepresentation = BrowserHelper.getAipRepresentation(aipId, representationId);
+
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, "Browser", "getAipRepresentation", aipId, duration, "aip", aipId, "representationId",
+      representationId);
+
+    return aipRepresentation;
+  }
+
+  public static Pair<String, StreamingOutput> listAipDescriptiveMetadata(RodaUser user, String aipId, String start,
+    String limit)
+      throws AuthorizationDeniedException, GenericException, ModelServiceException, StorageServiceException {
+    Date startDate = new Date();
+
+    // check user permissions
+    SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(aipId);
+    UserUtility.checkObjectReadPermissions(user, sdo);
+
+    // delegate
+    Pair<String, StreamingOutput> aipDescriptiveMetadataList = BrowserHelper.listAipDescriptiveMetadata(aipId, start,
+      limit);
+
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, "Browser", "listAipDescriptiveMetadata", aipId, duration, "aip", aipId, "start", start,
+      "limit", limit);
+
+    return aipDescriptiveMetadataList;
+  }
+
   public static Pair<String, StreamingOutput> getAipDescritiveMetadata(RodaUser user, String aipId, String metadataId)
     throws AuthorizationDeniedException, GenericException, ModelServiceException, StorageServiceException {
     Date startDate = new Date();
@@ -131,16 +177,145 @@ public class Browser extends RodaCoreService {
     UserUtility.checkObjectModifyPermissions(user, sdo);
 
     // delegate
-    Pair<String, StreamingOutput> aipsAipIdDescriptiveMetadataMetadataIdGet = BrowserHelper
-      .getAipDescritiveMetadata(aipId, metadataId);
+    Pair<String, StreamingOutput> aipDescritiveMetadata = BrowserHelper.getAipDescritiveMetadata(aipId, metadataId);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
     registerAction(user, "Browser", "getAipDescritiveMetadata", aipId, duration, "metadataId", metadataId);
 
-    return aipsAipIdDescriptiveMetadataMetadataIdGet;
+    return aipDescritiveMetadata;
 
   }
+
+  public static Pair<String, StreamingOutput> listAipPreservationMetadata(RodaUser user, String aipId, String start,
+    String limit)
+      throws AuthorizationDeniedException, GenericException, ModelServiceException, StorageServiceException {
+    Date startDate = new Date();
+
+    // check user permissions
+    SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(aipId);
+    UserUtility.checkObjectReadPermissions(user, sdo);
+
+    // delegate
+    Pair<String, StreamingOutput> aipPreservationMetadataList = BrowserHelper.aipsAipIdPreservationMetadataGet(aipId,
+      start, limit);
+
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, "Browser", "listAipPreservationMetadata", aipId, duration, "aip", aipId, "start", start,
+      "limit", limit);
+
+    return aipPreservationMetadataList;
+  }
+
+  public static Pair<String, StreamingOutput> getAipRepresentationPreservationMetadata(RodaUser user, String aipId,
+    String representationId, String start, String limit)
+      throws AuthorizationDeniedException, GenericException, ModelServiceException, StorageServiceException {
+    Date startDate = new Date();
+
+    // check user permissions
+    SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(aipId);
+    UserUtility.checkObjectReadPermissions(user, sdo);
+
+    // delegate
+    Pair<String, StreamingOutput> aipRepresentationPreservationMetadata = BrowserHelper
+      .getAipRepresentationPreservationMetadata(aipId, representationId, start, limit);
+
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, "Browser", "getAipRepresentationPreservationMetadata", aipId, duration, "aip", aipId, "start",
+      start, "limit", limit);
+
+    return aipRepresentationPreservationMetadata;
+
+  }
+
+  public static Pair<String, StreamingOutput> getAipRepresentationPreservationMetadataFile(RodaUser user, String aipId,
+    String representationId, String fileId)
+      throws AuthorizationDeniedException, GenericException, StorageServiceException {
+    Date startDate = new Date();
+
+    // check user permissions
+    SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(aipId);
+    UserUtility.checkObjectReadPermissions(user, sdo);
+
+    // delegate
+    Pair<String, StreamingOutput> aipRepresentationPreservationMetadataFile = BrowserHelper
+      .getAipRepresentationPreservationMetadataFile(aipId, representationId, fileId);
+
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, "Browser", "getAipRepresentationPreservationMetadataFile", aipId, duration, "aip", aipId,
+      "representationId", representationId, "fileId", fileId);
+
+    return aipRepresentationPreservationMetadataFile;
+  }
+
+  public static void postAipRepresentationPreservationMetadataFile(RodaUser user, String aipId, String representationId,
+    InputStream is, FormDataContentDisposition fileDetail)
+      throws AuthorizationDeniedException, GenericException, ModelServiceException, StorageServiceException {
+
+    Date startDate = new Date();
+
+    // check user permissions
+    SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(aipId);
+    UserUtility.checkObjectInsertPermissions(user, sdo);
+
+    // delegate
+    BrowserHelper.createOrUpdateAipRepresentationPreservationMetadataFile(aipId, representationId, is, fileDetail,
+      true);
+
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, "Browser", "postAipRepresentationPreservationMetadataFile", aipId, duration, "aip", aipId,
+      "representationId", representationId);
+
+  }
+
+  public static void putAipRepresentationPreservationMetadataFile(RodaUser user, String aipId,
+    String representationId, InputStream is, FormDataContentDisposition fileDetail)
+      throws AuthorizationDeniedException, GenericException, ModelServiceException, StorageServiceException {
+    Date startDate = new Date();
+
+    // check user permissions
+    SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(aipId);
+    UserUtility.checkObjectInsertPermissions(user, sdo);
+
+    // delegate
+    BrowserHelper.createOrUpdateAipRepresentationPreservationMetadataFile(aipId, representationId, is, fileDetail,
+      false);
+
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, "Browser", "aipsAipIdPreservationMetadataRepresentationIdFileIdPut", aipId, duration, "aip",
+      aipId, "representationId", representationId);
+
+  }
+
+  public static void aipsAipIdPreservationMetadataRepresentationIdFileIdDelete(RodaUser user, String aipId,
+    String representationId, String fileId)
+      throws AuthorizationDeniedException, GenericException, ModelServiceException {
+    Date startDate = new Date();
+
+    // check user permissions
+    SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(aipId);
+    UserUtility.checkObjectRemovePermissions(user, sdo);
+
+    // delegate
+    BrowserHelper.aipsAipIdPreservationMetadataRepresentationIdFileIdDelete(aipId, representationId, fileId);
+
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, "Browser", "aipsAipIdPreservationMetadataRepresentationIdFileIdDelete", aipId, duration, "aip",
+      aipId, "representationId", representationId, "fileId", fileId);
+
+  }
+
+  /*
+   * ---------------------------------------------------------------------------
+   * ---------------- REST related methods - end -------------------------------
+   * ---------------------------------------------------------------------------
+   */
 
   public static SimpleDescriptionObject moveInHierarchy(RodaUser user, String aipId, String parentId)
     throws AuthorizationDeniedException, GenericException {
@@ -162,64 +337,6 @@ public class Browser extends RodaCoreService {
 
     return sdo;
 
-  }
-
-  public static Pair<String, StreamingOutput> getAipRepresentation(RodaUser user, String aipId, String representationId)
-    throws AuthorizationDeniedException, GenericException, ModelServiceException, StorageServiceException {
-    Date startDate = new Date();
-
-    // check user permissions
-    SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(aipId);
-    UserUtility.checkObjectReadPermissions(user, sdo);
-
-    // delegate
-    Pair<String, StreamingOutput> aipRepresentation = BrowserHelper.getAipRepresentation(aipId, representationId);
-
-    // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, "Browser", "getAipRepresentation", aipId, duration, "aip", aipId, "representationId",
-      representationId);
-
-    return aipRepresentation;
-  }
-
-  public static Pair<String, StreamingOutput> aipsAipIdPreservationMetadataGet(RodaUser user, String aipId,
-    String start, String limit)
-      throws AuthorizationDeniedException, GenericException, ModelServiceException, StorageServiceException {
-    Date startDate = new Date();
-
-    // check user permissions
-    SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(aipId);
-    UserUtility.checkObjectReadPermissions(user, sdo);
-
-    // delegate
-    Pair<String, StreamingOutput> aipsAipIdPreservationMetadataGet = BrowserHelper
-      .aipsAipIdPreservationMetadataGet(aipId, start, limit);
-
-    // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, "Browser", "aipsAipIdPreservationMetadataGet", aipId, duration, "aip", aipId);
-
-    return aipsAipIdPreservationMetadataGet;
-  }
-
-  public static Pair<String, StreamingOutput> listAipDescriptiveMetadata(RodaUser user, String aipId, String start,
-    String limit)
-      throws AuthorizationDeniedException, GenericException, ModelServiceException, StorageServiceException {
-    Date startDate = new Date();
-
-    // check user permissions
-    SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(aipId);
-    UserUtility.checkObjectReadPermissions(user, sdo);
-
-    // delegate
-    Pair<String, StreamingOutput> aipRepresentation = BrowserHelper.listAipDescriptiveMetadata(aipId, start, limit);
-
-    // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, "Browser", "listAipDescriptiveMetadata", aipId, duration, "aip", aipId);
-
-    return aipRepresentation;
   }
 
   public static SimpleDescriptionObject createNewItem(RodaUser user, String itemId, String parentId)
