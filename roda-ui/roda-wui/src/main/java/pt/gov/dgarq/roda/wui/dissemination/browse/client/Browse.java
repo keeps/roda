@@ -478,8 +478,10 @@ public class Browse extends Composite {
   private SafeHtml getDescriptiveMetadataPanelHTML(String aipId, List<DescriptiveMetadataBundle> descriptiveMetadata) {
     SafeHtmlBuilder builder = new SafeHtmlBuilder();
     for (DescriptiveMetadataBundle bundle : descriptiveMetadata) {
-      builder.append(SafeHtmlUtils.fromSafeConstant(
-        "<a href='#edit.metadata." + aipId + "." + bundle.getId() + "' class='descriptiveMetadataEdit'>edit</a>"));
+      List<String> editPath = Tools.concat(RESOLVER.getHistoryPath(), aipId, "edit", bundle.getId());
+      String editLink = Tools.createHistoryHashLink(editPath);
+      builder
+        .append(SafeHtmlUtils.fromSafeConstant("<a href='" + editLink + "' class='descriptiveMetadataEdit'>edit</a>"));
       builder.append(SafeHtmlUtils.fromTrustedString(bundle.getHtml()));
     }
     return builder.toSafeHtml();

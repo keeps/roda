@@ -118,9 +118,16 @@ public class Tools {
     newHistory(resolver.getHistoryPath());
   }
 
-  public static <T> List<T> concat(List<T> list, T item) {
+  public static String createHistoryHashLink(List<String> path) {
+    String hash = createHistoryToken(path);
+    return "#" + hash;
+  }
+
+  public static <T> List<T> concat(List<T> list, T... items) {
     List<T> ret = new ArrayList<>(list);
-    ret.add(item);
+    for (T item : items) {
+      ret.add(item);
+    }
     return ret;
   }
 
