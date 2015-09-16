@@ -26,7 +26,7 @@ public class PreservationMetadataBundle implements Serializable {
     this.sizeInBytes = sizeInBytes;
     this.numberOfFiles = numberOfFiles;
   }
-  
+
   public String getId() {
     return id;
   }

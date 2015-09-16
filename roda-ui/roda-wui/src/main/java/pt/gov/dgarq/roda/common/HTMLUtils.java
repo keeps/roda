@@ -69,8 +69,8 @@ public final class HTMLUtils {
 
   // FIXME close properly model related methods that may generate file
   // descriptor leaks
-  public static PreservationMetadataBundle getPreservationMeatadataBundle(String aipId, ModelService model, StorageService storage, Locale locale)
-    throws ModelServiceException, StorageServiceException {
+  public static PreservationMetadataBundle getPreservationMeatadataBundle(String aipId, ModelService model,
+    StorageService storage, Locale locale) throws ModelServiceException, StorageServiceException {
     AIP aip = model.retrieveAIP(aipId);
     TreeSet<String> agentsID = null;
     long totalSizeInBytes = 0L;
@@ -78,31 +78,34 @@ public final class HTMLUtils {
     StringBuffer s = new StringBuffer();
     s.append("<span class='representations'>");
     if (aip.getRepresentationIds() != null && aip.getRepresentationIds().size() > 0) {
-      for (String representationId : aip.getRepresentationIds()) {
-        ClosableIterable<PreservationMetadata> preservationMetadata = model
-          .listPreservationMetadataBinaries(aip.getId(), representationId);
-          PreservationMetadataBundle representationPreservationMetadataBundle = getRepresentationPreservationMeatadataBundle(preservationMetadata, storage, locale);
-        s.append(representationPreservationMetadataBundle.getHtml());
-        totalSizeInBytes+=representationPreservationMetadataBundle.getSizeInBytes();
-        numberOfFiles+=representationPreservationMetadataBundle.getNumberOfFiles();
-      }
-      /*agentsID = new TreeSet<String>();
+      agentsID = new TreeSet<String>();
       for (String representationId : aip.getRepresentationIds()) {
         ClosableIterable<PreservationMetadata> preservationMetadata = model
           .listPreservationMetadataBinaries(aip.getId(), representationId);
         agentsID.addAll(extractAgents(preservationMetadata, storage));
-      }*/
+      }
+      for (String representationId : aip.getRepresentationIds()) {
+        ClosableIterable<PreservationMetadata> preservationMetadata = model
+          .listPreservationMetadataBinaries(aip.getId(), representationId);
+        PreservationMetadataBundle representationPreservationMetadataBundle = getRepresentationPreservationMeatadataBundle(
+          preservationMetadata, storage, locale);
+        s.append(representationPreservationMetadataBundle.getHtml());
+        totalSizeInBytes += representationPreservationMetadataBundle.getSizeInBytes();
+        numberOfFiles += representationPreservationMetadataBundle.getNumberOfFiles();
+      }
+
     }
     s.append("</span>");
-    
+
     return new PreservationMetadataBundle(aipId, s.toString(), totalSizeInBytes, numberOfFiles);
   }
 
-  private static PreservationMetadataBundle getRepresentationPreservationMeatadataBundle(ClosableIterable<PreservationMetadata> preservationMetadata,
-    StorageService storage, final Locale locale) throws ModelServiceException, StorageServiceException {
+  private static PreservationMetadataBundle getRepresentationPreservationMeatadataBundle(
+    ClosableIterable<PreservationMetadata> preservationMetadata, StorageService storage, final Locale locale)
+      throws ModelServiceException, StorageServiceException {
     long totalSizeInBytes = 0L;
     int numberOfFiles = 0;
-    
+
     Map<String, Object> stylesheetOpt = new HashMap<String, Object>();
     stylesheetOpt.put("prefix", RodaConstants.INDEX_OTHER_DESCRIPTIVE_DATA_PREFIX);
 
@@ -115,7 +118,7 @@ public final class HTMLUtils {
     while (iterator.hasNext()) {
       PreservationMetadata pm = iterator.next();
       Binary b = storage.getBinary(pm.getStoragePath());
-      totalSizeInBytes+=b.getSizeInBytes();
+      totalSizeInBytes += b.getSizeInBytes();
       numberOfFiles++;
       if (ModelUtils.isPreservationEvent(b)) {
         events.add(b);
@@ -151,9 +154,9 @@ public final class HTMLUtils {
       htmlAgents.add(html);
     }
     stylesheetOpt.put("agents", htmlAgents);
-    
+
     String html = binaryToHtml(representation, locale, false, "premis", stylesheetOpt);
-    return new PreservationMetadataBundle("",html,totalSizeInBytes,numberOfFiles);
+    return new PreservationMetadataBundle("", html, totalSizeInBytes, numberOfFiles);
   }
 
   public static TreeSet<String> extractAgents(ClosableIterable<PreservationMetadata> preservationMetadata,
