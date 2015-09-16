@@ -78,20 +78,28 @@ public final class HTMLUtils {
     StringBuffer s = new StringBuffer();
     s.append("<span class='representations'>");
     if (aip.getRepresentationIds() != null && aip.getRepresentationIds().size() > 0) {
-      agentsID = new TreeSet<String>();
+      /*agentsID = new TreeSet<String>();
       for (String representationId : aip.getRepresentationIds()) {
         ClosableIterable<PreservationMetadata> preservationMetadata = model
           .listPreservationMetadataBinaries(aip.getId(), representationId);
         agentsID.addAll(extractAgents(preservationMetadata, storage));
-      }
+      }*/
       for (String representationId : aip.getRepresentationIds()) {
         ClosableIterable<PreservationMetadata> preservationMetadata = model
           .listPreservationMetadataBinaries(aip.getId(), representationId);
-        PreservationMetadataBundle representationPreservationMetadataBundle = getRepresentationPreservationMeatadataBundle(
-          preservationMetadata, storage, locale);
-        s.append(representationPreservationMetadataBundle.getHtml());
-        totalSizeInBytes += representationPreservationMetadataBundle.getSizeInBytes();
-        numberOfFiles += representationPreservationMetadataBundle.getNumberOfFiles();
+        try{
+          PreservationMetadataBundle representationPreservationMetadataBundle = getRepresentationPreservationMeatadataBundle(
+            preservationMetadata, storage, locale);
+          s.append(representationPreservationMetadataBundle.getHtml());
+          totalSizeInBytes += representationPreservationMetadataBundle.getSizeInBytes();
+          numberOfFiles += representationPreservationMetadataBundle.getNumberOfFiles();
+        } finally {
+          try {
+            preservationMetadata.close();
+          } catch (IOException e) {
+            LOGGER.error("Error while while freeing up resources", e);
+          }
+        }
       }
 
     }
