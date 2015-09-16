@@ -122,9 +122,8 @@ public class Browser extends RodaCoreService {
     return ancestors;
   }
 
-  public static Pair<String, StreamingOutput> getAipDescritiveMetadata(RodaUser user, String aipId,
-    String metadataId)
-      throws AuthorizationDeniedException, GenericException, ModelServiceException, StorageServiceException {
+  public static Pair<String, StreamingOutput> getAipDescritiveMetadata(RodaUser user, String aipId, String metadataId)
+    throws AuthorizationDeniedException, GenericException, ModelServiceException, StorageServiceException {
     Date startDate = new Date();
 
     // check user permissions
@@ -137,8 +136,7 @@ public class Browser extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, "Browser", "getAipDescritiveMetadata", aipId, duration, "metadataId",
-      metadataId);
+    registerAction(user, "Browser", "getAipDescritiveMetadata", aipId, duration, "metadataId", metadataId);
 
     return aipsAipIdDescriptiveMetadataMetadataIdGet;
 
@@ -183,6 +181,26 @@ public class Browser extends RodaCoreService {
       representationId);
 
     return aipRepresentation;
+  }
+
+  public static Pair<String, StreamingOutput> aipsAipIdPreservationMetadataGet(RodaUser user, String aipId,
+    String start, String limit)
+      throws AuthorizationDeniedException, GenericException, ModelServiceException, StorageServiceException {
+    Date startDate = new Date();
+
+    // check user permissions
+    SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(aipId);
+    UserUtility.checkObjectReadPermissions(user, sdo);
+
+    // delegate
+    Pair<String, StreamingOutput> aipsAipIdPreservationMetadataGet = BrowserHelper
+      .aipsAipIdPreservationMetadataGet(aipId, start, limit);
+
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, "Browser", "aipsAipIdPreservationMetadataGet", aipId, duration, "aip", aipId);
+
+    return aipsAipIdPreservationMetadataGet;
   }
 
   public static Pair<String, StreamingOutput> listAipDescriptiveMetadata(RodaUser user, String aipId, String start,

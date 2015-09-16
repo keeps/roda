@@ -1,6 +1,5 @@
 package org.roda.api.v1.impl;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -38,7 +37,6 @@ import org.roda.storage.fs.FSUtils;
 import pt.gov.dgarq.roda.common.RodaCoreFactory;
 import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
 import pt.gov.dgarq.roda.core.common.Pair;
-import pt.gov.dgarq.roda.core.data.v2.Representation;
 import pt.gov.dgarq.roda.core.data.v2.RodaUser;
 import pt.gov.dgarq.roda.disseminators.common.tools.ZipEntryInfo;
 import pt.gov.dgarq.roda.disseminators.common.tools.ZipTools;
@@ -194,12 +192,18 @@ public class AipsResourceImpl {
     String acceptFormat) throws NotFoundException {
     String authorization = request.getHeader("Authorization");
     try {
-      // get user
-      RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
-      // delegate action to controller
-      Pair<String, StreamingOutput> aipDescriptiveMetadata = Browser.getAipDescritiveMetadata(user, aipId, metadataId);
-      return Response.ok(aipDescriptiveMetadata.getSecond(), MediaType.APPLICATION_OCTET_STREAM)
-        .header("content-disposition", "attachment; filename = " + aipDescriptiveMetadata.getFirst()).build();
+      if (acceptFormat != null && acceptFormat.equalsIgnoreCase("bin")) {
+        // get user
+        RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+        // delegate action to controller
+        Pair<String, StreamingOutput> aipDescriptiveMetadata = Browser.getAipDescritiveMetadata(user, aipId,
+          metadataId);
+        return Response.ok(aipDescriptiveMetadata.getSecond(), MediaType.APPLICATION_OCTET_STREAM)
+          .header("content-disposition", "attachment; filename = " + aipDescriptiveMetadata.getFirst()).build();
+      } else {
+        return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Not yet implemented"))
+          .build();
+      }
     } catch (StorageServiceException | ModelServiceException e) {
       if (e.getCode() == ModelServiceException.NOT_FOUND) {
         throw new NotFoundException(e.getCode(), e.getMessage());
@@ -238,68 +242,34 @@ public class AipsResourceImpl {
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 
-  public Response aipsAipIdPreservationMetadataGet(String aipId, String start, String limit, String acceptFormat)
-    throws NotFoundException {
+  public Response aipsAipIdPreservationMetadataGet(HttpServletRequest request, String aipId, String start, String limit,
+    String acceptFormat) throws NotFoundException {
+    String authorization = request.getHeader("Authorization");
     try {
-      ModelService model = RodaCoreFactory.getModelService();
-      StorageService storage = RodaCoreFactory.getStorageService();
-      ClosableIterable<Representation> representations = model.listRepresentations(aipId);
-      int startInt = (start == null) ? 0 : Integer.parseInt(start);
-      int limitInt = (limit == null) ? -1 : Integer.parseInt(limit);
-      if (acceptFormat != null && acceptFormat.equalsIgnoreCase("bin")) {
-        int counter = 0;
-        List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
-        for (Representation r : representations) {
-          ClosableIterable<PreservationMetadata> preservationFiles = model.listPreservationMetadataBinaries(aipId,
-            r.getId());
-          for (PreservationMetadata preservationFile : preservationFiles) {
-            if (counter >= startInt && (counter <= limitInt || limitInt == -1)) {
-              Binary binary = storage.getBinary(preservationFile.getStoragePath());
-              Path tempFile = Files.createTempFile("test", ".tmp");
-              Files.copy(binary.getContent().createInputStream(), tempFile, StandardCopyOption.REPLACE_EXISTING);
-              ZipEntryInfo info = new ZipEntryInfo(
-                r.getId() + File.separator + preservationFile.getStoragePath().getName(), tempFile.toFile());
-              zipEntries.add(info);
-            } else {
-              break;
-            }
-
-            counter++;
-          }
-        }
-        String filename = "";
-        StreamingOutput stream = null;
-        if (zipEntries.size() == 1) {
-          stream = new StreamingOutput() {
-
-            public void write(OutputStream os) throws IOException, WebApplicationException {
-              IOUtils.copy(zipEntries.get(0).getInputStream(), os);
-            }
-          };
-          filename = zipEntries.get(0).getName();
-        } else {
-          stream = new StreamingOutput() {
-
-            public void write(OutputStream os) throws IOException, WebApplicationException {
-              ZipTools.zip(zipEntries, os);
-            }
-          };
-          filename = aipId + ".zip";
-        }
-        return Response.ok(stream, MediaType.APPLICATION_OCTET_STREAM)
-          .header("content-disposition", "attachment; filename = " + filename).build();
-      } else {
-        return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Not yet implemented"))
-          .build();
-      }
-    } catch (IOException e) {
-      return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+      // get user
+      RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+      // delegate action to controller
+      Pair<String, StreamingOutput> aipsAipIdPreservationMetadataGet = Browser.aipsAipIdPreservationMetadataGet(user,
+        aipId, start, limit);
+      return Response.ok(aipsAipIdPreservationMetadataGet.getSecond(), MediaType.APPLICATION_OCTET_STREAM)
+        .header("content-disposition", "attachment; filename = " + aipsAipIdPreservationMetadataGet.getFirst()).build();
     } catch (StorageServiceException | ModelServiceException e) {
       if (e.getCode() == ModelServiceException.NOT_FOUND) {
         throw new NotFoundException(e.getCode(), e.getMessage());
       } else {
         return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
       }
+    } catch (AuthorizationDeniedException e) {
+      if (authorization == null) {
+        return Response.status(Status.UNAUTHORIZED)
+          .header(HttpHeaders.WWW_AUTHENTICATE, "Basic realm=\"RODA REST API\"")
+          .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+      } else {
+        return Response.status(Status.UNAUTHORIZED)
+          .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+      }
+    } catch (GenericException e) {
+      return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
     }
   }
 

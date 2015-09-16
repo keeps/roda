@@ -265,7 +265,7 @@ public class AipsResource {
     @ApiParam(value = "The ID of the existing metadata file to retrieve", required = true) @PathParam("metadata_id") String metadataId,
     @ApiParam(value = "Choose format in which to get the metadata", allowableValues = "json, xml, html", defaultValue = "json") @QueryParam("acceptFormat") String acceptFormat)
       throws NotFoundException {
-    return DELEGATE.aipsAipIdDescriptiveMetadataMetadataIdGet(aipId, metadataId, acceptFormat);
+    return DELEGATE.aipsAipIdDescriptiveMetadataMetadataIdGet(request, aipId, metadataId, acceptFormat);
   }
 
   @PUT
@@ -323,7 +323,7 @@ public class AipsResource {
     @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam("start") String start,
     @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam("limit") String limit)
       throws NotFoundException {
-    return DELEGATE.aipsAipIdPreservationMetadataGet(aipId, start, limit, acceptFormat);
+    return DELEGATE.aipsAipIdPreservationMetadataGet(request, aipId, start, limit, acceptFormat);
   }
 
   @GET

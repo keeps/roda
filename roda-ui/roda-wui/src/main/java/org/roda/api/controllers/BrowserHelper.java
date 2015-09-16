@@ -1,5 +1,6 @@
 package org.roda.api.controllers;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -25,6 +26,7 @@ import org.roda.index.IndexServiceException;
 import org.roda.model.DescriptiveMetadata;
 import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
+import org.roda.model.PreservationMetadata;
 import org.roda.model.utils.ModelUtils;
 import org.roda.storage.Binary;
 import org.roda.storage.ClosableIterable;
@@ -212,59 +214,13 @@ public class BrowserHelper {
         zipEntries.add(info);
       }
 
-      final String filename;
-      final StreamingOutput stream;
-      if (zipEntries.size() == 1) {
-        stream = new StreamingOutput() {
-          @Override
-          public void write(OutputStream os) throws IOException, WebApplicationException {
-            IOUtils.copy(zipEntries.get(0).getInputStream(), os);
-          }
-        };
-        filename = zipEntries.get(0).getName();
-      } else {
-        stream = new StreamingOutput() {
-          @Override
-          public void write(OutputStream os) throws IOException, WebApplicationException {
-            ZipTools.zip(zipEntries, os);
-          }
-        };
-        filename = aipId + "_" + representationId + ".zip";
-      }
-
-      return new Pair<String, StreamingOutput>(filename, stream);
+      return createZipReturnPair(zipEntries, aipId + "_" + representationId);
 
     } catch (IOException e) {
       // FIXME see what better exception should be thrown
       throw new GenericException("");
     }
-  }
 
-  /**
-   * Returns valid start (pair first elem) and limit (pair second elem) paging
-   * parameters defaulting to start = 0 and limit = 100 if none or invalid
-   * values are provided.
-   */
-  private static Pair<Integer, Integer> processPagingParams(String start, String limit) {
-    Integer startInteger, limitInteger;
-    try {
-      startInteger = Integer.parseInt(start);
-      if (startInteger < 0) {
-        startInteger = 0;
-      }
-    } catch (NumberFormatException e) {
-      startInteger = 0;
-    }
-    try {
-      limitInteger = Integer.parseInt(limit);
-      if (limitInteger < 0) {
-        limitInteger = 100;
-      }
-    } catch (NumberFormatException e) {
-      limitInteger = 100;
-    }
-
-    return new Pair<Integer, Integer>(startInteger, limitInteger);
   }
 
   protected static Pair<String, StreamingOutput> listAipDescriptiveMetadata(String aipId, String start, String limit)
@@ -289,27 +245,8 @@ public class BrowserHelper {
         counter++;
       }
 
-      final String filename;
-      final StreamingOutput stream;
-      if (zipEntries.size() == 1) {
-        stream = new StreamingOutput() {
-          @Override
-          public void write(OutputStream os) throws IOException, WebApplicationException {
-            IOUtils.copy(zipEntries.get(0).getInputStream(), os);
-          }
-        };
-        filename = zipEntries.get(0).getName();
-      } else {
-        stream = new StreamingOutput() {
-          @Override
-          public void write(OutputStream os) throws IOException, WebApplicationException {
-            ZipTools.zip(zipEntries, os);
-          }
-        };
-        filename = aipId + ".zip";
-      }
+      return createZipReturnPair(zipEntries, aipId);
 
-      return new Pair<String, StreamingOutput>(filename, stream);
     } catch (IOException e) {
       // FIXME see what better exception should be thrown
       throw new GenericException("");
@@ -329,6 +266,68 @@ public class BrowserHelper {
     };
 
     return new Pair<String, StreamingOutput>(descriptiveMetadataBinary.getStoragePath().getName(), stream);
+  }
+
+  public static Pair<String, StreamingOutput> aipsAipIdPreservationMetadataGet(String aipId, String start, String limit)
+    throws ModelServiceException, StorageServiceException, GenericException {
+
+    ClosableIterable<Representation> representations = null;
+    ClosableIterable<PreservationMetadata> preservationFiles = null;
+
+    try {
+      ModelService model = RodaCoreFactory.getModelService();
+      StorageService storage = RodaCoreFactory.getStorageService();
+      // FIXME leak
+      representations = model.listRepresentations(aipId);
+      Pair<Integer, Integer> pagingParams = processPagingParams(start, limit);
+      int startInt = pagingParams.getFirst();
+      int limitInt = pagingParams.getSecond();
+      int counter = 0;
+      List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
+      for (Representation r : representations) {
+        preservationFiles = model.listPreservationMetadataBinaries(aipId, r.getId());
+        for (PreservationMetadata preservationFile : preservationFiles) {
+          if (counter >= startInt && (counter <= limitInt || limitInt == -1)) {
+            Binary binary = storage.getBinary(preservationFile.getStoragePath());
+            ZipEntryInfo info = new ZipEntryInfo(
+              r.getId() + File.separator + preservationFile.getStoragePath().getName(),
+              binary.getContent().createInputStream());
+            zipEntries.add(info);
+          } else {
+            break;
+          }
+
+          counter++;
+        }
+      }
+
+      return createZipReturnPair(zipEntries, aipId);
+
+    } catch (IOException e) {
+      // FIXME see what better exception should be thrown
+      throw new GenericException("");
+    } finally {
+      boolean throwException = false;
+      if (representations != null) {
+        try {
+          representations.close();
+        } catch (IOException e) {
+          throwException = true;
+        }
+      }
+      if (preservationFiles != null) {
+        try {
+          preservationFiles.close();
+        } catch (IOException e) {
+          throwException = throwException && true;
+        }
+      }
+      if (throwException) {
+        // FIXME see what better exception should be thrown
+        throw new GenericException("");
+      }
+    }
+
   }
 
   public static SimpleDescriptionObject moveInHierarchy(String aipId, String parentId) throws GenericException {
@@ -464,6 +463,59 @@ public class BrowserHelper {
         throw new GenericException("Error creating new item: " + e.getMessage());
       }
     }
+  }
+
+  /**
+   * Returns valid start (pair first elem) and limit (pair second elem) paging
+   * parameters defaulting to start = 0 and limit = 100 if none or invalid
+   * values are provided.
+   */
+  private static Pair<Integer, Integer> processPagingParams(String start, String limit) {
+    Integer startInteger, limitInteger;
+    try {
+      startInteger = Integer.parseInt(start);
+      if (startInteger < 0) {
+        startInteger = 0;
+      }
+    } catch (NumberFormatException e) {
+      startInteger = 0;
+    }
+    try {
+      limitInteger = Integer.parseInt(limit);
+      if (limitInteger < 0) {
+        limitInteger = 100;
+      }
+    } catch (NumberFormatException e) {
+      limitInteger = 100;
+    }
+
+    return new Pair<Integer, Integer>(startInteger, limitInteger);
+  }
+
+  private static Pair<String, StreamingOutput> createZipReturnPair(List<ZipEntryInfo> zipEntries, String zipName) {
+    final String filename;
+    final StreamingOutput stream;
+    if (zipEntries.size() == 1) {
+      stream = new StreamingOutput() {
+        @Override
+        public void write(OutputStream os) throws IOException, WebApplicationException {
+          IOUtils.copy(zipEntries.get(0).getInputStream(), os);
+        }
+      };
+      filename = zipEntries.get(0).getName();
+    } else {
+      stream = new StreamingOutput() {
+
+        @Override
+        public void write(OutputStream os) throws IOException, WebApplicationException {
+          ZipTools.zip(zipEntries, os);
+        }
+      };
+      filename = zipName + ".zip";
+    }
+
+    return new Pair<String, StreamingOutput>(filename, stream);
+
   }
 
 }
