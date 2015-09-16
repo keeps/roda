@@ -25,7 +25,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.roda.api.v1.utils.StreamResponse;
-import org.roda.common.HTMLUtils;
 import org.roda.common.ValidationUtils;
 import org.roda.index.IndexServiceException;
 import org.roda.model.DescriptiveMetadata;
@@ -41,6 +40,7 @@ import org.roda.storage.StorageService;
 import org.roda.storage.StorageServiceException;
 import org.roda.storage.fs.FSUtils;
 
+import pt.gov.dgarq.roda.common.HTMLUtils;
 import pt.gov.dgarq.roda.common.RodaCoreFactory;
 import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
 import pt.gov.dgarq.roda.core.common.Pair;
@@ -64,6 +64,7 @@ import pt.gov.dgarq.roda.wui.common.server.ServerTools;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.BrowseItemBundle;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.DescriptiveMetadataEditBundle;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.DescriptiveMetadataViewBundle;
+import pt.gov.dgarq.roda.wui.dissemination.browse.client.PreservationMetadataBundle;
 
 public class BrowserHelper {
   private static final int BUNDLE_MAX_REPRESENTATION_COUNT = 2;
@@ -146,6 +147,13 @@ public class BrowserHelper {
     }
 
     return descriptiveMetadataList;
+  }
+  
+  private static PreservationMetadataBundle getPreservationMetadataBundle(String aipId, final Locale locale)
+    throws ModelServiceException, StorageServiceException {
+    ModelService model = RodaCoreFactory.getModelService();
+    StorageService storage = RodaCoreFactory.getStorageService();
+    return HTMLUtils.getPreservationMeatadataBundle(aipId, model, storage, locale);
   }
 
   public static DescriptiveMetadataEditBundle getDescriptiveMetadataEditBundle(String aipId,

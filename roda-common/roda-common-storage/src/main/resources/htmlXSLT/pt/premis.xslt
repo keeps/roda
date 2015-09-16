@@ -14,8 +14,10 @@
 	</xsl:template>
 	<xsl:template match="prem:agent">
 		<span class="agent">
-			<xsl:attribute name="id"><xsl:value-of
-				select="normalize-space(prem:agentIdentifierValue/text())" /></xsl:attribute>
+			<a>
+			<xsl:attribute name="name"><xsl:value-of
+				select="normalize-space(prem:agentIdentifier[1]/prem:agentIdentifierValue/text())" /></xsl:attribute>
+			</a> 
 			<span class="header">
 				<xsl:if test="prem:agentName">
 					<span class="agentName">
@@ -50,6 +52,10 @@
 			test='resolve-QName(@xsi:type, .) = QName("info:lc/xmlns/premis-v2", "representation")'>
 			<span xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 				class="representation">
+				<a>
+				<xsl:attribute name="name"><xsl:value-of
+					select="normalize-space(prem:objectIdentifier[1]/prem:objectIdentifierType/text())" /></xsl:attribute>
+				</a>
 				<span class="header">
 					<xsl:text>Representação</xsl:text>
 					<xsl:if test="prem:objectIdentifier">
@@ -107,6 +113,10 @@
 		<xsl:if
 			test='resolve-QName(@xsi:type, .) = QName("info:lc/xmlns/premis-v2", "file")'>
 			<span class="file">
+				<a>
+				<xsl:attribute name="name"><xsl:value-of
+					select="normalize-space(prem:objectIdentifier[1]/prem:objectIdentifierType/text())" /></xsl:attribute>
+				</a>
 				<span class="header">
 					<xsl:text>Ficheiro</xsl:text>
 					<xsl:if test="prem:originalName">
