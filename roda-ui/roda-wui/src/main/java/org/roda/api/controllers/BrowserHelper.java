@@ -40,6 +40,7 @@ import org.roda.storage.StorageServiceException;
 import org.roda.storage.fs.FSUtils;
 
 import pt.gov.dgarq.roda.common.RodaCoreFactory;
+import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
 import pt.gov.dgarq.roda.core.common.Pair;
 import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
@@ -59,7 +60,8 @@ import pt.gov.dgarq.roda.disseminators.common.tools.ZipTools;
 import pt.gov.dgarq.roda.wui.common.client.GenericException;
 import pt.gov.dgarq.roda.wui.common.server.ServerTools;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.BrowseItemBundle;
-import pt.gov.dgarq.roda.wui.dissemination.browse.client.DescriptiveMetadataBundle;
+import pt.gov.dgarq.roda.wui.dissemination.browse.client.DescriptiveMetadataEditBundle;
+import pt.gov.dgarq.roda.wui.dissemination.browse.client.DescriptiveMetadataViewBundle;
 
 public class BrowserHelper {
   private static final int BUNDLE_MAX_REPRESENTATION_COUNT = 2;
@@ -78,7 +80,7 @@ public class BrowserHelper {
       itemBundle.setSdoAncestors(getAncestors(sdo));
 
       // set descriptive metadata
-      List<DescriptiveMetadataBundle> descriptiveMetadataList = getDescriptiveMetadataBundles(aipId, locale);
+      List<DescriptiveMetadataViewBundle> descriptiveMetadataList = getDescriptiveMetadataBundles(aipId, locale);
       itemBundle.setDescriptiveMetadata(descriptiveMetadataList);
 
       // TODO
@@ -115,19 +117,19 @@ public class BrowserHelper {
     return itemBundle;
   }
 
-  private static List<DescriptiveMetadataBundle> getDescriptiveMetadataBundles(String aipId, final Locale locale)
+  private static List<DescriptiveMetadataViewBundle> getDescriptiveMetadataBundles(String aipId, final Locale locale)
     throws ModelServiceException, StorageServiceException {
     ClosableIterable<DescriptiveMetadata> listDescriptiveMetadataBinaries = RodaCoreFactory.getModelService()
       .listDescriptiveMetadataBinaries(aipId);
 
-    List<DescriptiveMetadataBundle> descriptiveMetadataList = new ArrayList<DescriptiveMetadataBundle>();
+    List<DescriptiveMetadataViewBundle> descriptiveMetadataList = new ArrayList<DescriptiveMetadataViewBundle>();
     try {
       for (DescriptiveMetadata descriptiveMetadata : listDescriptiveMetadataBinaries) {
         Binary binary = RodaCoreFactory.getStorageService().getBinary(descriptiveMetadata.getStoragePath());
         String html = HTMLUtils.descriptiveMetadataToHtml(binary, locale);
 
         descriptiveMetadataList
-          .add(new DescriptiveMetadataBundle(descriptiveMetadata.getId(), html, binary.getSizeInBytes()));
+          .add(new DescriptiveMetadataViewBundle(descriptiveMetadata.getId(), html, binary.getSizeInBytes()));
       }
     } finally {
       try {
@@ -138,6 +140,32 @@ public class BrowserHelper {
     }
 
     return descriptiveMetadataList;
+  }
+
+  public static DescriptiveMetadataEditBundle getDescriptiveMetadataEditBundle(String aipId,
+    String descriptiveMetadataId) throws GenericException {
+    DescriptiveMetadataEditBundle ret;
+    InputStream inputStream = null;
+    try {
+      DescriptiveMetadata metadata = RodaCoreFactory.getModelService().retrieveDescriptiveMetadata(aipId,
+        descriptiveMetadataId);
+      Binary binary = RodaCoreFactory.getModelService().retrieveDescriptiveMetadataBinary(aipId, descriptiveMetadataId);
+      inputStream = binary.getContent().createInputStream();
+      String xml = IOUtils.toString(inputStream);
+      ret = new DescriptiveMetadataEditBundle(descriptiveMetadataId, metadata.getType(), xml);
+    } catch (ModelServiceException | IOException e) {
+      throw new GenericException("Error getting descriptive metadata edit bundle: " + e.getMessage());
+    } finally {
+      if (inputStream != null) {
+        try {
+          inputStream.close();
+        } catch (IOException e) {
+          LOGGER.warn("Error closing input stream", e);
+        }
+      }
+    }
+
+    return ret;
   }
 
   protected static List<SimpleDescriptionObject> getAncestors(SimpleDescriptionObject sdo) throws GenericException {
@@ -537,25 +565,21 @@ public class BrowserHelper {
     }
   }
 
-  public static SimpleDescriptionObject editMetadataFile(String aipId, InputStream metadataStream,
-    String descriptiveMetadataId) throws GenericException {
+  public static DescriptiveMetadata editDescriptiveMetadataFile(String aipId, String descriptiveMetadataId,
+    Binary descriptiveMetadataIdBinary, String descriptiveMetadataType)
+      throws GenericException, AuthorizationDeniedException {
     try {
       ModelService model = RodaCoreFactory.getModelService();
-      Path p = Files.createTempFile("preservation", ".tmp");
-      Files.copy(metadataStream, p, StandardCopyOption.REPLACE_EXISTING);
-      Binary binary = (Binary) FSUtils.convertPathToResource(p.getParent(), p);
-      model.updateDescriptiveMetadata(aipId, descriptiveMetadataId, binary, descriptiveMetadataId);
-      return RodaCoreFactory.getIndexService().retrieve(SimpleDescriptionObject.class, aipId);
-    } catch (StorageServiceException | ModelServiceException | IndexServiceException e) {
-      if (e.getCode() == StorageServiceException.NOT_FOUND) {
+      return model.updateDescriptiveMetadata(aipId, descriptiveMetadataId, descriptiveMetadataIdBinary,
+        descriptiveMetadataId);
+    } catch (ModelServiceException e) {
+      if (e.getCode() == ModelServiceException.NOT_FOUND) {
         throw new GenericException("AIP not found: " + aipId);
-      } else if (e.getCode() == StorageServiceException.FORBIDDEN) {
-        throw new GenericException("You do not have permission to access AIP: " + aipId);
+      } else if (e.getCode() == ModelServiceException.FORBIDDEN) {
+        throw new AuthorizationDeniedException("You do not have permission to access AIP: " + aipId);
       } else {
         throw new GenericException("Error creating new item: " + e.getMessage());
       }
-    } catch (IOException e) {
-      throw new GenericException("Internal error: " + e.getMessage());
     }
   }
 

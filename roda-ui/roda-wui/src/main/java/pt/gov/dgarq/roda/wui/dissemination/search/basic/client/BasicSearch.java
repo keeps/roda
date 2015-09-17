@@ -17,7 +17,6 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DisclosurePanel;
@@ -202,8 +201,7 @@ public class BasicSearch extends Composite {
   }
 
   protected void view(String id) {
-    String path = Browse.RESOLVER.getHistoryPath() + "." + id;
-    History.newItem(path);
+    Tools.newHistory(Browse.RESOLVER, id);
   }
 
   public void update() {

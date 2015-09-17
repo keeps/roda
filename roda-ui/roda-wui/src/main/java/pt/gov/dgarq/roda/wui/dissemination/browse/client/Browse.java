@@ -211,6 +211,9 @@ public class Browse extends Composite {
     } else if (historyTokens.size() == 1) {
       viewAction(historyTokens.get(0));
       callback.onSuccess(this);
+    } else
+      if (historyTokens.size() > 1 && historyTokens.get(0).equals(EditDescriptiveMetadata.RESOLVER.getHistoryToken())) {
+      EditDescriptiveMetadata.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else {
       Tools.newHistory(RESOLVER);
       callback.onSuccess(null);
@@ -254,7 +257,7 @@ public class Browse extends Composite {
   protected void viewAction(BrowseItemBundle itemBundle) {
     if (itemBundle != null) {
       SimpleDescriptionObject sdo = itemBundle.getSdo();
-      List<DescriptiveMetadataBundle> descMetadata = itemBundle.getDescriptiveMetadata();
+      List<DescriptiveMetadataViewBundle> descMetadata = itemBundle.getDescriptiveMetadata();
       List<Representation> representations = itemBundle.getRepresentations();
 
       breadcrumb.updatePath(getBreadcrumbsFromAncestors(itemBundle.getSdoAncestors(), sdo));
@@ -398,14 +401,14 @@ public class Browse extends Composite {
     return NumberFormat.getFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
   }
 
-  private Widget createDescriptiveMetadataDownloadPanel(String aipId, List<DescriptiveMetadataBundle> descMetadata) {
+  private Widget createDescriptiveMetadataDownloadPanel(String aipId, List<DescriptiveMetadataViewBundle> descMetadata) {
     FlowPanel downloadPanel = new FlowPanel();
     HTML icon = new HTML(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-download'></i>"));
     FlowPanel labelsPanel = new FlowPanel();
 
     int files = descMetadata.size();
     long sizeInBytes = 0;
-    for (DescriptiveMetadataBundle desc : descMetadata) {
+    for (DescriptiveMetadataViewBundle desc : descMetadata) {
       sizeInBytes += desc.getSizeInBytes();
     }
 
@@ -426,14 +429,14 @@ public class Browse extends Composite {
     return downloadPanel;
   }
 
-  private Widget createPreservationMetadataDownloadPanel(String aipId, List<DescriptiveMetadataBundle> descMetadata) {
+  private Widget createPreservationMetadataDownloadPanel(String aipId, List<DescriptiveMetadataViewBundle> descMetadata) {
     FlowPanel downloadPanel = new FlowPanel();
     HTML icon = new HTML(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-download'></i>"));
     FlowPanel labelsPanel = new FlowPanel();
 
     int files = descMetadata.size();
     long sizeInBytes = 0;
-    for (DescriptiveMetadataBundle desc : descMetadata) {
+    for (DescriptiveMetadataViewBundle desc : descMetadata) {
       sizeInBytes += desc.getSizeInBytes();
     }
 
@@ -475,13 +478,12 @@ public class Browse extends Composite {
     return ret;
   }
 
-  private SafeHtml getDescriptiveMetadataPanelHTML(String aipId, List<DescriptiveMetadataBundle> descriptiveMetadata) {
+  private SafeHtml getDescriptiveMetadataPanelHTML(String aipId, List<DescriptiveMetadataViewBundle> descriptiveMetadata) {
     SafeHtmlBuilder builder = new SafeHtmlBuilder();
-    for (DescriptiveMetadataBundle bundle : descriptiveMetadata) {
-      List<String> editPath = Tools.concat(RESOLVER.getHistoryPath(), aipId, "edit", bundle.getId());
-      String editLink = Tools.createHistoryHashLink(editPath);
-      builder
-        .append(SafeHtmlUtils.fromSafeConstant("<a href='" + editLink + "' class='descriptiveMetadataEdit'>edit</a>"));
+    for (DescriptiveMetadataViewBundle bundle : descriptiveMetadata) {
+      String editLink = Tools.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId, bundle.getId());
+      String editLinkHtml = "<a href='" + editLink + "' class='descriptiveMetadataEdit'>edit</a>";
+      builder.append(SafeHtmlUtils.fromSafeConstant(editLinkHtml));
       builder.append(SafeHtmlUtils.fromTrustedString(bundle.getHtml()));
     }
     return builder.toSafeHtml();

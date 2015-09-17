@@ -7,7 +7,6 @@ import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -24,7 +23,8 @@ public class StorageTestUtils {
     return DefaultStoragePath.parse(UUID.randomUUID().toString());
   }
 
-  public static StoragePath generateRandomResourceStoragePathUnder(StoragePath basePath) throws StorageServiceException {
+  public static StoragePath generateRandomResourceStoragePathUnder(StoragePath basePath)
+    throws StorageServiceException {
     return DefaultStoragePath.parse(basePath.asString(), UUID.randomUUID().toString());
   }
 
@@ -78,7 +78,7 @@ public class StorageTestUtils {
 
   public static void testEntityEqualRecursively(StorageService sourceStorage, StoragePath sourceEntityStoragePath,
     StorageService targetStorage, StoragePath targetEntityStoragePath, boolean ignoreDateModified)
-    throws StorageServiceException, IOException {
+      throws StorageServiceException, IOException {
 
     assertEquals(sourceEntityStoragePath.isFromAContainer(), targetEntityStoragePath.isFromAContainer());
 
@@ -134,8 +134,8 @@ public class StorageTestUtils {
       assertEquals(sourceBinary.getContentDigest(), targetBinary.getContentDigest());
       assertEquals(sourceBinary.getSizeInBytes(), targetBinary.getSizeInBytes());
       assertEquals(sourceBinary.isReference(), targetBinary.isReference());
-      assertTrue(IOUtils.contentEquals(sourceBinary.getContent().createInputStream(), targetBinary.getContent()
-        .createInputStream()));
+      assertTrue(IOUtils.contentEquals(sourceBinary.getContent().createInputStream(),
+        targetBinary.getContent().createInputStream()));
 
     } else {
       fail("Compared entities are not of the same type. source=" + sourceEntity + " target=" + targetEntity);
@@ -144,8 +144,8 @@ public class StorageTestUtils {
     // Recursive call
     if (sourceResourceList != null) {
       for (Resource r : sourceResourceList) {
-        StoragePath targetResourceStoragePath = DefaultStoragePath.parse(targetEntityStoragePath, r.getStoragePath()
-          .getName());
+        StoragePath targetResourceStoragePath = DefaultStoragePath.parse(targetEntityStoragePath,
+          r.getStoragePath().getName());
         testEntityEqualRecursively(sourceStorage, r.getStoragePath(), targetStorage, targetResourceStoragePath,
           ignoreDateModified);
       }

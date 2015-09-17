@@ -70,10 +70,10 @@ public class EventManagement implements HistoryResolver {
 
         public void onTabSelected(SourcesTabEvents sender, int tabIndex) {
           if (tabIndex == 0) {
-            History.newItem(getHistoryPath() + ".tasks");
+            Tools.newHistory(EventManagement.this, "tasks");
             taskList.init();
           } else if (tabIndex == 1) {
-            History.newItem(getHistoryPath() + ".taskInstances");
+            Tools.newHistory(EventManagement.this, "tasksInstances");
             taskInstanceList.init();
           }
         }
@@ -98,7 +98,7 @@ public class EventManagement implements HistoryResolver {
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 0) {
-      History.newItem(getHistoryPath() + ".tasks");
+      Tools.newHistory(this, "tasks");
       callback.onSuccess(null);
     } else if (historyTokens.size() == 1) {
       if (historyTokens.get(0).equals("tasks")) {
@@ -113,7 +113,7 @@ public class EventManagement implements HistoryResolver {
         callback.onFailure(new BadHistoryTokenException(historyTokens.get(0)));
       }
     } else {
-      History.newItem(getHistoryPath() + ".tasks");
+      Tools.newHistory(this, "tasks");
       callback.onSuccess(null);
     }
 

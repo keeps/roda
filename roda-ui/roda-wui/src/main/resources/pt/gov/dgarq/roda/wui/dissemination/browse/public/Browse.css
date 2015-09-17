@@ -67,6 +67,7 @@
 	color: #089de3;
 	float: right;
 	font-size: 1.3rem;
+	margin-right: 1px;
 }
 
 .descriptiveMetadata-field {
@@ -104,6 +105,10 @@
 .browseDownloadSublabel {
 	font-size: 1rem;
 	margin-left: 25px;
+}
+
+.metadata-edit-area {
+	height: 300px;
 }
 
 /** Browser**/

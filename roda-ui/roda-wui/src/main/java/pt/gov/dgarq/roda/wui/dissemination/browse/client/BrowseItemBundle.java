@@ -12,7 +12,7 @@ public class BrowseItemBundle implements Serializable {
 
   private SimpleDescriptionObject sdo;
   private List<SimpleDescriptionObject> sdoAncestors;
-  private List<DescriptiveMetadataBundle> descriptiveMetadata;
+  private List<DescriptiveMetadataViewBundle> descriptiveMetadata;
   private List<Representation> representations;
 
   public BrowseItemBundle() {
@@ -21,7 +21,7 @@ public class BrowseItemBundle implements Serializable {
   }
 
   public BrowseItemBundle(SimpleDescriptionObject sdo, List<SimpleDescriptionObject> sdoAncestors,
-    List<DescriptiveMetadataBundle> descriptiveMetadata, List<Representation> representations) {
+    List<DescriptiveMetadataViewBundle> descriptiveMetadata, List<Representation> representations) {
     super();
     this.sdo = sdo;
     this.setSdoAncestors(sdoAncestors);
@@ -37,11 +37,11 @@ public class BrowseItemBundle implements Serializable {
     this.sdo = sdo;
   }
 
-  public List<DescriptiveMetadataBundle> getDescriptiveMetadata() {
+  public List<DescriptiveMetadataViewBundle> getDescriptiveMetadata() {
     return descriptiveMetadata;
   }
 
-  public void setDescriptiveMetadata(List<DescriptiveMetadataBundle> descriptiveMetadata) {
+  public void setDescriptiveMetadata(List<DescriptiveMetadataViewBundle> descriptiveMetadata) {
     this.descriptiveMetadata = descriptiveMetadata;
   }
 

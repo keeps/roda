@@ -11,6 +11,7 @@ import org.roda.api.v1.utils.StreamResponse;
 import org.roda.common.UserUtility;
 import org.roda.model.DescriptiveMetadata;
 import org.roda.model.ModelServiceException;
+import org.roda.storage.Binary;
 import org.roda.storage.StorageServiceException;
 
 import pt.gov.dgarq.roda.common.RodaCoreService;
@@ -26,6 +27,7 @@ import pt.gov.dgarq.roda.core.data.v2.RodaUser;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.wui.common.client.GenericException;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.BrowseItemBundle;
+import pt.gov.dgarq.roda.wui.dissemination.browse.client.DescriptiveMetadataEditBundle;
 
 /**
  * FIXME 1) verify all checkObject*Permissions (because now also a permission
@@ -52,6 +54,24 @@ public class Browser extends RodaCoreService {
     registerAction(user, "Browser", "getItemBundle", aipId, duration, "aipId", aipId);
 
     return itemBundle;
+  }
+
+  public static DescriptiveMetadataEditBundle getDescriptiveMetadataEditBundle(RodaUser user, String aipId,
+    String descId) throws AuthorizationDeniedException, GenericException {
+    Date startDate = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, "browse");
+
+    // delegate
+    DescriptiveMetadataEditBundle bundle = BrowserHelper.getDescriptiveMetadataEditBundle(aipId, descId);
+
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, "Browser", "getDescriptiveMetadataEditBundle", aipId, duration, "aipId", aipId, "descId",
+      descId);
+
+    return bundle;
   }
 
   public static IndexResult<SimpleDescriptionObject> findDescriptiveMetadata(RodaUser user, Filter filter,
@@ -382,24 +402,29 @@ public class Browser extends RodaCoreService {
     return sdo;
   }
 
-  public static SimpleDescriptionObject editMetadataFile(RodaUser user, String itemId, InputStream metadataStream,
-    String descriptiveMetadataId) throws AuthorizationDeniedException, GenericException {
+  public static DescriptiveMetadata editDescriptiveMetadataFile(RodaUser user, String aipId,
+    String descriptiveMetadataId, Binary descriptiveMetadataIdBinary, String descriptiveMetadataType)
+      throws AuthorizationDeniedException, GenericException {
     Date start = new Date();
 
     // check user permissions
     UserUtility.checkRoles(user, "administration.metadata_editor");
-    SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(itemId);
-    UserUtility.checkObjectModifyPermissions(user, sdo);
+    SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(aipId);
+    // TODO remove permission skip for admin
+    if (!user.getName().equals("admin")) {
+      UserUtility.checkObjectModifyPermissions(user, sdo);
+    }
 
     // delegate
-    sdo = BrowserHelper.editMetadataFile(itemId, metadataStream, descriptiveMetadataId);
+    DescriptiveMetadata ret = BrowserHelper.editDescriptiveMetadataFile(aipId, descriptiveMetadataId,
+      descriptiveMetadataIdBinary, descriptiveMetadataType);
 
     // register action
     long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "Browser", "editMetadataFile", sdo.getId(), duration, "itemId", itemId,
+    registerAction(user, "Browser", "editDescriptiveMetadataFile", aipId, duration, "aipId", aipId,
       "descriptiveMetadataId", descriptiveMetadataId);
 
-    return sdo;
+    return ret;
   }
 
   public static SimpleDescriptionObject removeMetadataFile(RodaUser user, String itemId, String descriptiveMetadataId)

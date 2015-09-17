@@ -30,6 +30,9 @@ public interface BrowserServiceAsync {
 
   void getItemBundle(String aipId, String localeString, AsyncCallback<BrowseItemBundle> callback);
 
+  void getDescriptiveMetadataEditBundle(String aipId, String descId,
+    AsyncCallback<DescriptiveMetadataEditBundle> callback);
+
   /**
    * Get simple description object
    * 
@@ -162,10 +165,8 @@ public interface BrowserServiceAsync {
   // public void addNewMetadataFile(String itemId, InputStream metadataStream,
   // String descriptiveMetadataId,
   // AsyncCallback<SimpleDescriptionObject> callback);
-  //
-  // public void editMetadataFile(String itemId, InputStream metadataStream,
-  // String descriptiveMetadataId,
-  // AsyncCallback<SimpleDescriptionObject> callback);
+
+  void editDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle bundle, AsyncCallback<Void> callback);
 
   public void removeMetadataFile(String itemId, String descriptiveMetadataId,
     AsyncCallback<SimpleDescriptionObject> callback);

@@ -104,9 +104,8 @@ public class IngestSubmit {
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-    String defaultHistoryPath = RESOLVER.getHistoryPath() + ".create";
     if (historyTokens.size() == 0) {
-      History.newItem(defaultHistoryPath);
+      Tools.newHistory(RESOLVER, "create");
       callback.onSuccess(null);
     } else if (historyTokens.size() == 1) {
       if (historyTokens.get(0).equals("upload")) {
@@ -122,7 +121,7 @@ public class IngestSubmit {
         callback.onFailure(new BadHistoryTokenException(historyTokens.get(0)));
       }
     } else {
-      History.newItem(defaultHistoryPath);
+      Tools.newHistory(RESOLVER, "create");
       callback.onSuccess(null);
     }
   }

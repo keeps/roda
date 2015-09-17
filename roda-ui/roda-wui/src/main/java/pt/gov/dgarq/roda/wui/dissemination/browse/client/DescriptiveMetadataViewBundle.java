@@ -2,7 +2,7 @@ package pt.gov.dgarq.roda.wui.dissemination.browse.client;
 
 import java.io.Serializable;
 
-public class DescriptiveMetadataBundle implements Serializable {
+public class DescriptiveMetadataViewBundle implements Serializable {
 
   private static final long serialVersionUID = 515251862250083594L;
 
@@ -10,11 +10,11 @@ public class DescriptiveMetadataBundle implements Serializable {
   private String html;
   private Long sizeInBytes;
 
-  public DescriptiveMetadataBundle() {
+  public DescriptiveMetadataViewBundle() {
     super();
   }
 
-  public DescriptiveMetadataBundle(String id, String html, Long sizeInBytes) {
+  public DescriptiveMetadataViewBundle(String id, String html, Long sizeInBytes) {
     super();
     this.id = id;
     this.html = html;

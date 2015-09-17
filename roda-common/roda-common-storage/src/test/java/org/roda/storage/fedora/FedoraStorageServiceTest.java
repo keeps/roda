@@ -25,8 +25,8 @@ import org.roda.storage.Binary;
 import org.roda.storage.Container;
 import org.roda.storage.ContentPayload;
 import org.roda.storage.RandomMockContentPayload;
-import org.roda.storage.StorageServiceException;
 import org.roda.storage.StoragePath;
+import org.roda.storage.StorageServiceException;
 import org.roda.storage.StorageTestUtils;
 import org.roda.storage.fs.FSUtils;
 import org.slf4j.Logger;
@@ -127,7 +127,8 @@ public class FedoraStorageServiceTest extends AbstractStorageServiceTest<FedoraS
 
     } catch (StorageServiceException e) {
       e.printStackTrace();
-      fail("An exception should not have been thrown while creating a binary that already exists because fedora doesn't support it very well but it happened!");
+      fail(
+        "An exception should not have been thrown while creating a binary that already exists because fedora doesn't support it very well but it happened!");
     }
 
     // 4) delete binary

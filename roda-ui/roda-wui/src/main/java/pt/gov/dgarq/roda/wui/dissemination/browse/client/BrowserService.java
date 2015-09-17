@@ -3,15 +3,13 @@
  */
 package pt.gov.dgarq.roda.wui.dissemination.browse.client;
 
-import java.io.InputStream;
 import java.util.List;
-
-import org.roda.model.DescriptiveMetadata;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 
+import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
 import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.data.DescriptionObject;
 import pt.gov.dgarq.roda.core.data.RepresentationPreservationObject;
@@ -21,6 +19,7 @@ import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
+import pt.gov.dgarq.roda.wui.common.client.GenericException;
 
 /**
  * @author Luis Faria
@@ -74,6 +73,9 @@ public interface BrowserService extends RemoteService {
     Facets facets, String locale) throws RODAException;
 
   public BrowseItemBundle getItemBundle(String aipId, String localeString) throws RODAException;
+
+  public DescriptiveMetadataEditBundle getDescriptiveMetadataEditBundle(String aipId, String descId)
+    throws AuthorizationDeniedException, GenericException;
 
   /**
    * Get simple description object
@@ -212,6 +214,9 @@ public interface BrowserService extends RemoteService {
   // String descriptiveMetadataId) throws RODAException;
 
   public SimpleDescriptionObject removeMetadataFile(String itemId, String descriptiveMetadataId) throws RODAException;
+
+  public void editDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle bundle)
+    throws AuthorizationDeniedException, GenericException;
 
   // public DescriptiveMetadata retrieveMetadataFile(String itemId, String
   // descriptiveMetadataId) throws RODAException;

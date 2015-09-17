@@ -114,8 +114,8 @@ public class MemberManagement extends Composite {
       public void onSelectionChange(SelectionChangeEvent event) {
         RODAMember selected = list.getSelectionModel().getSelectedObject();
         if (selected != null) {
-          History.newItem(RESOLVER.getHistoryPath() + "."
-            + (selected.isUser() ? EDIT_USER_HISTORY_TOKEN : EDIT_GROUP_HISTORY_TOKEN) + "." + selected.getId());
+          Tools.newHistory(RESOLVER, (selected.isUser() ? EDIT_USER_HISTORY_TOKEN : EDIT_GROUP_HISTORY_TOKEN),
+            selected.getId());
         }
       }
     });

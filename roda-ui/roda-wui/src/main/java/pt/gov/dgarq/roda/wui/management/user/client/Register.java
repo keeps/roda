@@ -108,7 +108,7 @@ public class Register implements HistoryResolver {
               public void onSuccess(Boolean passed) {
                 if (passed.booleanValue()) {
                   Window.alert(constants.registerSuccess());
-                  History.newItem(VerifyEmail.getInstance().getHistoryPath() + "." + userdata.getValue().getName());
+                  Tools.newHistory(VerifyEmail.getInstance(), userdata.getValue().getName());
                 } else {
                   Window.alert(constants.registerWrongCaptcha());
                   captcha.refresh();

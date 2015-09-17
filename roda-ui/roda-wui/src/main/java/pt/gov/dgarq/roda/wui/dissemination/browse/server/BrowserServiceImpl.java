@@ -1,16 +1,20 @@
 package pt.gov.dgarq.roda.wui.dissemination.browse.server;
 
-import java.io.InputStream;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.roda.api.controllers.Browser;
 import org.roda.common.UserUtility;
-import org.roda.model.DescriptiveMetadata;
+import org.roda.storage.Binary;
+import org.roda.storage.DefaultBinary;
+import org.roda.storage.StoragePath;
+import org.roda.storage.StringContentPayload;
 import org.w3c.util.DateParser;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -32,9 +36,9 @@ import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.RodaUser;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.wui.common.client.GenericException;
-import pt.gov.dgarq.roda.wui.common.server.ServerTools;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.BrowseItemBundle;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.BrowserService;
+import pt.gov.dgarq.roda.wui.dissemination.browse.client.DescriptiveMetadataEditBundle;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.DisseminationInfo;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.PreservationInfo;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.RepresentationInfo;
@@ -60,11 +64,20 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   }
 
+  @Override
   public BrowseItemBundle getItemBundle(String aipId, String localeString) throws RODAException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     return Browser.getItemBundle(user, aipId, localeString);
   }
 
+  @Override
+  public DescriptiveMetadataEditBundle getDescriptiveMetadataEditBundle(String aipId, String descId)
+    throws AuthorizationDeniedException, GenericException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    return Browser.getDescriptiveMetadataEditBundle(user, aipId, descId);
+  }
+
+  @Override
   public IndexResult<SimpleDescriptionObject> findDescriptiveMetadata(Filter filter, Sorter sorter, Sublist sublist,
     Facets facets, String localeString) throws RODAException {
     try {
@@ -115,14 +128,27 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   // return Browser.addNewMetadataFile(user, itemId, metadataStream,
   // descriptiveMetadataId);
   // }
-  //
-  // public SimpleDescriptionObject editMetadataFile(String itemId, InputStream
-  // metadataStream, String descriptiveMetadataId) throws RODAException {
-  // RodaUser user = UserUtility.getUser(getThreadLocalRequest(),
-  // RodaCoreFactory.getIndexService());
-  // return Browser.editMetadataFile(user, itemId, metadataStream,
-  // descriptiveMetadataId);
-  // }
+
+  @Override
+  public void editDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle bundle)
+    throws AuthorizationDeniedException, GenericException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    String descriptiveMetadataId = bundle.getId();
+    String descriptiveMetadataType = bundle.getType();
+
+    StoragePath storagePath = null;
+    Map<String, Set<String>> metadata = new HashMap<>();
+    StringContentPayload payload = new StringContentPayload(bundle.getXml());
+    Long sizeInBytes = Long.valueOf(bundle.getXml().getBytes().length);
+    boolean reference = false;
+    Map<String, String> contentDigest = new HashMap<>();
+
+    Binary descriptiveMetadataIdBinary = new DefaultBinary(storagePath, metadata, payload, sizeInBytes, reference,
+      contentDigest);
+
+    Browser.editDescriptiveMetadataFile(user, aipId, descriptiveMetadataId, descriptiveMetadataIdBinary,
+      descriptiveMetadataType);
+  }
 
   public SimpleDescriptionObject removeMetadataFile(String itemId, String descriptiveMetadataId) throws RODAException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());

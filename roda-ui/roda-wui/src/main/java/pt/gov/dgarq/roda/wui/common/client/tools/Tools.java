@@ -118,9 +118,19 @@ public class Tools {
     newHistory(resolver.getHistoryPath());
   }
 
+  public static void newHistory(HistoryResolver resolver, String... extrapath) {
+    List<String> path = Tools.concat(resolver.getHistoryPath(), extrapath);
+    newHistory(path);
+  }
+
   public static String createHistoryHashLink(List<String> path) {
     String hash = createHistoryToken(path);
     return "#" + hash;
+  }
+
+  public static String createHistoryHashLink(HistoryResolver resolver, String... extrapath) {
+    List<String> path = Tools.concat(resolver.getHistoryPath(), extrapath);
+    return createHistoryHashLink(path);
   }
 
   public static <T> List<T> concat(List<T> list, T... items) {

@@ -25,7 +25,9 @@ import pt.gov.dgarq.roda.core.common.NoSuchRODAObjectException;
 import pt.gov.dgarq.roda.core.common.NoSuchUserException;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
+import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
 import pt.gov.dgarq.roda.wui.common.client.widgets.WUIButton;
+import pt.gov.dgarq.roda.wui.home.client.Home;
 
 /**
  * @author Luis Faria
@@ -112,7 +114,7 @@ public class VerifyEmail implements HistoryResolver {
             public void onSuccess(Boolean verified) {
               if (verified.booleanValue()) {
                 Window.alert(constants.verifyEmailSuccess());
-                History.newItem("home");
+                Tools.newHistory(Home.RESOLVER);
               } else {
                 Window.alert(constants.verifyEmailWrongToken());
                 tokenInputBox.setFocus(true);
@@ -278,7 +280,7 @@ public class VerifyEmail implements HistoryResolver {
       updateVisibles();
       callback.onSuccess(layout);
     } else {
-      History.newItem(getHistoryPath() + "." + historyTokens.get(0) + "." + historyTokens.get(1));
+      Tools.newHistory(this, historyTokens.get(0), historyTokens.get(1));
       callback.onSuccess(null);
     }
   }

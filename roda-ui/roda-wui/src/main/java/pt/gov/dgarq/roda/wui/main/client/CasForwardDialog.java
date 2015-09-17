@@ -13,7 +13,9 @@ import com.google.gwt.user.client.ui.Label;
 import config.i18n.client.MainConstants;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
+import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
 import pt.gov.dgarq.roda.wui.common.client.widgets.WUIWindow;
+import pt.gov.dgarq.roda.wui.home.client.Home;
 
 /**
  * @author Luis Faria
@@ -63,7 +65,7 @@ public class CasForwardDialog extends WUIWindow {
       @Override
       public void onClick(ClickEvent arg0) {
         hide();
-        History.newItem("");
+        Tools.newHistory(Home.RESOLVER);
       }
     });
 

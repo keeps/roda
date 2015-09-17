@@ -135,7 +135,8 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     // get directory as it was a binary
     try {
       getStorage().getContainer(directoryStoragePath);
-      fail("An exception should have been thrown while getting a container which actually isn't a container but instead a directory but it didn't happened!");
+      fail(
+        "An exception should have been thrown while getting a container which actually isn't a container but instead a directory but it didn't happened!");
     } catch (StorageServiceException e) {
       assertEquals(StorageServiceException.BAD_REQUEST, e.getCode());
     }
@@ -159,7 +160,8 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     // get binary as it was a directory
     try {
       getStorage().getContainer(binaryStoragePath);
-      fail("An exception should have been thrown while getting a container which actually isn't a container but instead a binary but it didn't happened!");
+      fail(
+        "An exception should have been thrown while getting a container which actually isn't a container but instead a binary but it didn't happened!");
     } catch (StorageServiceException e) {
       assertEquals(StorageServiceException.BAD_REQUEST, e.getCode());
     }
@@ -182,7 +184,8 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     // 2) delete container that no longer exists
     try {
       getStorage().deleteContainer(containerStoragePath);
-      fail("An exception should have been thrown while deleting a container that no longer exists but it didn't happened!");
+      fail(
+        "An exception should have been thrown while deleting a container that no longer exists but it didn't happened!");
     } catch (StorageServiceException e) {
       assertEquals(StorageServiceException.NOT_FOUND, e.getCode());
     }
@@ -274,7 +277,8 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     // 3) create directory that already exists
     try {
       getStorage().createDirectory(directoryStoragePath, directoryMetadata);
-      fail("An exception should have been thrown while creating a directory that already exists but it didn't happened!");
+      fail(
+        "An exception should have been thrown while creating a directory that already exists but it didn't happened!");
     } catch (StorageServiceException e) {
       assertEquals(StorageServiceException.ALREADY_EXISTS, e.getCode());
     }
@@ -330,7 +334,8 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     // get binary as it was a directory
     try {
       getStorage().getDirectory(binaryStoragePath);
-      fail("An exception should have been thrown while getting a directory which actually isn't a directory but instead a binary but it didn't happened!");
+      fail(
+        "An exception should have been thrown while getting a directory which actually isn't a directory but instead a binary but it didn't happened!");
     } catch (StorageServiceException e) {
       assertEquals(StorageServiceException.BAD_REQUEST, e.getCode());
     }
@@ -349,7 +354,8 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     // get container as it was a directory
     try {
       getStorage().getDirectory(containerStoragePath);
-      fail("An exception should have been thrown while getting a directory which actually isn't a directory but instead a container but it didn't happened!");
+      fail(
+        "An exception should have been thrown while getting a directory which actually isn't a directory but instead a container but it didn't happened!");
     } catch (StorageServiceException e) {
       assertEquals(StorageServiceException.BAD_REQUEST, e.getCode());
     }
@@ -495,7 +501,8 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
       // 3) create binary that already exists
       try {
         getStorage().createBinary(binaryStoragePath, binaryMetadata, payload, false);
-        fail("An exception should have been thrown while creating a binary that already exists but it didn't happened!");
+        fail(
+          "An exception should have been thrown while creating a binary that already exists but it didn't happened!");
       } catch (StorageServiceException e) {
         assertEquals(StorageServiceException.ALREADY_EXISTS, e.getCode());
       }
@@ -617,7 +624,8 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     // get directory as it was a binary
     try {
       getStorage().getBinary(directoryStoragePath);
-      fail("An exception should have been thrown while getting a binary which actually isn't a binary but instead a directory but it didn't happened!");
+      fail(
+        "An exception should have been thrown while getting a binary which actually isn't a binary but instead a directory but it didn't happened!");
     } catch (StorageServiceException e) {
       assertEquals(StorageServiceException.BAD_REQUEST, e.getCode());
     }
@@ -636,7 +644,8 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     // get container as it was a binary
     try {
       getStorage().getBinary(containerStoragePath);
-      fail("An exception should have been thrown while getting a binary which actually isn't a binary but instead a container but it didn't happened!");
+      fail(
+        "An exception should have been thrown while getting a binary which actually isn't a binary but instead a container but it didn't happened!");
     } catch (StorageServiceException e) {
       assertEquals(StorageServiceException.BAD_REQUEST, e.getCode());
     }
@@ -883,8 +892,8 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     assertEquals(sourceBinary.getContentDigest(), targetBinary.getContentDigest());
     assertEquals(sourceBinary.getSizeInBytes(), targetBinary.getSizeInBytes());
     assertEquals(sourceBinary.isReference(), targetBinary.isReference());
-    assertTrue(IOUtils.contentEquals(sourceBinary.getContent().createInputStream(), targetBinary.getContent()
-      .createInputStream()));
+    assertTrue(IOUtils.contentEquals(sourceBinary.getContent().createInputStream(),
+      targetBinary.getContent().createInputStream()));
 
     // cleanup
     getStorage().deleteContainer(containerStoragePath);
@@ -1004,8 +1013,8 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     assertEquals(copyBinary.getContentDigest(), targetBinary.getContentDigest());
     assertEquals(copyBinary.getSizeInBytes(), targetBinary.getSizeInBytes());
     assertEquals(copyBinary.isReference(), targetBinary.isReference());
-    assertTrue(IOUtils.contentEquals(copyBinary.getContent().createInputStream(), targetBinary.getContent()
-      .createInputStream()));
+    assertTrue(IOUtils.contentEquals(copyBinary.getContent().createInputStream(),
+      targetBinary.getContent().createInputStream()));
 
     // test source does not exist
     try {

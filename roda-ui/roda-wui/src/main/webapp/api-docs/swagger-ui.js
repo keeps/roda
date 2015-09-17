@@ -6289,7 +6289,7 @@ function decodeUtf8Char (str) {
   }
 }
 
-},{"base64-js":14,"ieee754":15,"is-array":16}],14:[function(require,module,exports){
+},{"base64-js":14,"ieee754":15,"is-array":16},14:[function(require,module,exports){
 var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
 ;(function (exports) {
