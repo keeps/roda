@@ -22,9 +22,10 @@ import org.roda.model.DescriptiveMetadata;
 import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
 import org.roda.model.ModelServiceTest;
+import org.roda.model.ValidationException;
 import org.roda.storage.DefaultStoragePath;
-import org.roda.storage.StorageServiceException;
 import org.roda.storage.StorageService;
+import org.roda.storage.StorageServiceException;
 import org.roda.storage.fs.FSUtils;
 import org.roda.storage.fs.FileStorageService;
 import org.slf4j.Logger;
@@ -81,8 +82,8 @@ public class ValidationUtilsTest {
   }
 
   @Test
-  public void testValidateDescriptiveMetadata() throws ModelServiceException, StorageServiceException,
-    IndexServiceException {
+  public void testValidateDescriptiveMetadata()
+    throws ModelServiceException, StorageServiceException, IndexServiceException, ValidationException {
     final String aipId = UUID.randomUUID().toString();
     final AIP aip = model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
@@ -92,8 +93,8 @@ public class ValidationUtilsTest {
   }
 
   @Test
-  public void testValidateDescriptiveMetadataBuggy() throws ModelServiceException, StorageServiceException,
-    IndexServiceException {
+  public void testValidateDescriptiveMetadataBuggy()
+    throws ModelServiceException, StorageServiceException, IndexServiceException, ValidationException {
     // buggy aip have acqinfo2 instead of acqinfo in ead-c.xml
     final String aipId = UUID.randomUUID().toString();
     final AIP aip = model.createAIP(aipId, corporaService,
@@ -104,7 +105,8 @@ public class ValidationUtilsTest {
   }
 
   @Test
-  public void testValidateAIP() throws ModelServiceException, StorageServiceException, IndexServiceException {
+  public void testValidateAIP()
+    throws ModelServiceException, StorageServiceException, IndexServiceException, ValidationException {
     final String aipId = UUID.randomUUID().toString();
     final AIP aip = model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
@@ -112,7 +114,8 @@ public class ValidationUtilsTest {
   }
 
   @Test
-  public void testValidateAIPBuggy() throws ModelServiceException, StorageServiceException, IndexServiceException {
+  public void testValidateAIPBuggy()
+    throws ModelServiceException, StorageServiceException, IndexServiceException, ValidationException {
     // buggy aip have acqinfo2 instead of acqinfo in ead-c.xml
     final String aipId = UUID.randomUUID().toString();
     final AIP aip = model.createAIP(aipId, corporaService,

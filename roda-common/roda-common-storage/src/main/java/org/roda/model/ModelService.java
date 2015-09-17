@@ -414,24 +414,24 @@ public class ModelService extends ModelObservable {
   // already present in the Binary metadata (and therefore to be changed
   // appropriated method should be called)
   public DescriptiveMetadata updateDescriptiveMetadata(String aipId, String descriptiveMetadataId, Binary binary,
-    String descriptiveMetadataType) throws ModelServiceException {
-
-    DescriptiveMetadata descriptiveMetadataBinary;
+    String descriptiveMetadataType) throws ModelServiceException, ValidationException {
+    DescriptiveMetadata descriptiveMetadataBinary = null;
     try {
       StoragePath binaryPath = ModelUtils.getDescriptiveMetadataPath(aipId, descriptiveMetadataId);
       boolean asReference = false;
       boolean createIfNotExists = false;
-      storage.updateBinaryContent(binaryPath, binary.getContent(), asReference, createIfNotExists);
+      if (ValidationUtils.isDescriptiveBinaryValid(this, binary, descriptiveMetadataId, true)) {
+        storage.updateBinaryContent(binaryPath, binary.getContent(), asReference, createIfNotExists);
+        Map<String, Set<String>> binaryMetadata = binary.getMetadata();
+        binaryMetadata.put(RodaConstants.STORAGE_META_TYPE, Sets.newHashSet(descriptiveMetadataType));
+        storage.updateMetadata(binaryPath, binaryMetadata, true);
 
-      Map<String, Set<String>> binaryMetadata = binary.getMetadata();
-      binaryMetadata.put(RodaConstants.STORAGE_META_TYPE, Sets.newHashSet(descriptiveMetadataType));
-      storage.updateMetadata(binaryPath, binaryMetadata, true);
-
-      descriptiveMetadataBinary = new DescriptiveMetadata(descriptiveMetadataId, aipId, descriptiveMetadataType,
-        binaryPath);
-      notifyDescriptiveMetadataUpdated(descriptiveMetadataBinary);
+        descriptiveMetadataBinary = new DescriptiveMetadata(descriptiveMetadataId, aipId, descriptiveMetadataType,
+          binaryPath);
+        notifyDescriptiveMetadataUpdated(descriptiveMetadataBinary);
+      }
     } catch (StorageServiceException e) {
-      throw new ModelServiceException("Error updating descriptive metadata binary in the storage",
+      throw new ModelServiceException("Error updating descriptive metadata binary",
         ModelServiceException.INTERNAL_SERVER_ERROR, e);
     }
 
@@ -944,6 +944,9 @@ public class ModelService extends ModelObservable {
       // FIXME validate others aspects
 
     } catch (ModelServiceException e) {
+      LOGGER.error("Error validating AIP", e);
+      valid = false;
+    } catch (ValidationException e) {
       LOGGER.error("Error validating AIP", e);
       valid = false;
     }

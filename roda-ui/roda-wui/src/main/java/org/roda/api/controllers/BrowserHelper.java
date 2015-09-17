@@ -31,6 +31,7 @@ import org.roda.model.DescriptiveMetadata;
 import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
 import org.roda.model.PreservationMetadata;
+import org.roda.model.ValidationException;
 import org.roda.model.utils.ModelUtils;
 import org.roda.storage.Binary;
 import org.roda.storage.ClosableIterable;
@@ -577,6 +578,8 @@ public class BrowserHelper {
       } else {
         throw new GenericException("Error creating new item: " + e.getMessage());
       }
+    } catch (ValidationException e) {
+      throw new GenericException("Validation error...");
     }
   }
 

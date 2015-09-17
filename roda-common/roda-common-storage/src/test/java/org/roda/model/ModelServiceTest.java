@@ -361,8 +361,8 @@ public class ModelServiceTest {
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 
     final String newDescriptiveMetadataId = UUID.randomUUID().toString();
-    final Binary binary = corporaService.getBinary(DefaultStoragePath
-      .parse(CorporaConstants.OTHER_DESCRIPTIVE_METADATA_STORAGEPATH));
+    final Binary binary = corporaService
+      .getBinary(DefaultStoragePath.parse(CorporaConstants.OTHER_DESCRIPTIVE_METADATA_STORAGEPATH));
 
     final DescriptiveMetadata newDescriptiveMetadata = model.createDescriptiveMetadata(aipId, newDescriptiveMetadataId,
       binary, CorporaConstants.OTHER_DESCRIPTIVE_METADATA_TYPE);
@@ -374,20 +374,21 @@ public class ModelServiceTest {
 
     // check content
     Binary newDescriptiveMetadataBinary = storage.getBinary(newDescriptiveMetadata.getStoragePath());
-    assertTrue(IOUtils.contentEquals(binary.getContent().createInputStream(), newDescriptiveMetadataBinary.getContent()
-      .createInputStream()));
+    assertTrue(IOUtils.contentEquals(binary.getContent().createInputStream(),
+      newDescriptiveMetadataBinary.getContent().createInputStream()));
 
   }
 
   @Test
-  public void testUpdateDescriptiveMetadata() throws StorageServiceException, ModelServiceException, IOException {
+  public void testUpdateDescriptiveMetadata()
+    throws StorageServiceException, ModelServiceException, IOException, ValidationException {
     // set up
     final String aipId = UUID.randomUUID().toString();
     model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 
-    final Binary binary = corporaService.getBinary(DefaultStoragePath
-      .parse(CorporaConstants.OTHER_DESCRIPTIVE_METADATA_STORAGEPATH));
+    final Binary binary = corporaService
+      .getBinary(DefaultStoragePath.parse(CorporaConstants.OTHER_DESCRIPTIVE_METADATA_STORAGEPATH));
 
     final DescriptiveMetadata updatedDescriptiveMetadata = model.updateDescriptiveMetadata(aipId,
       CorporaConstants.DESCRIPTIVE_METADATA_ID, binary, CorporaConstants.OTHER_DESCRIPTIVE_METADATA_TYPE);
@@ -399,8 +400,8 @@ public class ModelServiceTest {
 
     // check content
     Binary updatedDescriptiveMetadataBinary = storage.getBinary(updatedDescriptiveMetadata.getStoragePath());
-    assertTrue(IOUtils.contentEquals(binary.getContent().createInputStream(), updatedDescriptiveMetadataBinary
-      .getContent().createInputStream()));
+    assertTrue(IOUtils.contentEquals(binary.getContent().createInputStream(),
+      updatedDescriptiveMetadataBinary.getContent().createInputStream()));
 
   }
 
@@ -524,8 +525,8 @@ public class ModelServiceTest {
 
     // check content
     Binary createdFileBinary = storage.getBinary(createdFile.getStoragePath());
-    assertTrue(IOUtils.contentEquals(binary.getContent().createInputStream(), createdFileBinary.getContent()
-      .createInputStream()));
+    assertTrue(IOUtils.contentEquals(binary.getContent().createInputStream(),
+      createdFileBinary.getContent().createInputStream()));
   }
 
   @Test
@@ -550,8 +551,8 @@ public class ModelServiceTest {
 
     // check content
     Binary createdFileBinary = storage.getBinary(createdFile.getStoragePath());
-    assertTrue(IOUtils.contentEquals(binary.getContent().createInputStream(), createdFileBinary.getContent()
-      .createInputStream()));
+    assertTrue(IOUtils.contentEquals(binary.getContent().createInputStream(),
+      createdFileBinary.getContent().createInputStream()));
   }
 
   @Test

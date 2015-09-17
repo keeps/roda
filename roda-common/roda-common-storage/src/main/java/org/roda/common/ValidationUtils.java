@@ -2,6 +2,8 @@ package org.roda.common;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
@@ -10,15 +12,19 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
 import org.apache.log4j.Logger;
+import org.dom4j.util.XMLErrorHandler;
 import org.roda.index.utils.SolrUtils;
 import org.roda.model.DescriptiveMetadata;
 import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
+import org.roda.model.ValidationException;
 import org.roda.storage.Binary;
 import org.roda.storage.ClosableIterable;
-import org.roda.storage.StorageServiceException;
 import org.roda.storage.StoragePath;
+import org.roda.storage.StorageServiceException;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+import org.xml.sax.helpers.DefaultHandler;
 
 public class ValidationUtils {
   private static final Logger LOGGER = Logger.getLogger(ValidationUtils.class);
@@ -31,9 +37,10 @@ public class ValidationUtils {
 
   /**
    * Validates all descriptive metadata files contained in the AIP
+   * @throws ValidationException 
    */
   public static boolean isAIPDescriptiveMetadataValid(ModelService model, String aipId, boolean failIfNoSchema)
-    throws ModelServiceException {
+    throws ModelServiceException, ValidationException {
     boolean valid = true;
     ClosableIterable<DescriptiveMetadata> descriptiveMetadataBinaries = model.listDescriptiveMetadataBinaries(aipId);
     try {
@@ -58,42 +65,87 @@ public class ValidationUtils {
    * strategies may be used)
    * 
    * @param failIfNoSchema
+   * @throws ValidationException 
    */
   public static boolean isDescriptiveMetadataValid(ModelService model, DescriptiveMetadata metadata,
-    boolean failIfNoSchema) throws ModelServiceException {
-    boolean valid;
+    boolean failIfNoSchema) throws ModelServiceException, ValidationException {
     try {
       StoragePath storagePath = metadata.getStoragePath();
       Binary binary = model.getStorage().getBinary(storagePath);
+      return isDescriptiveBinaryValid(model, binary, binary.getStoragePath().getName(), failIfNoSchema);
+    } catch (StorageServiceException e) {
+      throw new ModelServiceException("Error validating descriptive metadata " + metadata.getStoragePath().asString(),
+        ModelServiceException.INTERNAL_SERVER_ERROR, e);
+    }
+  }
+
+  /**
+   * Validates descriptive medatada (e.g. against its schema, but other
+   * strategies may be used)
+   * @param descriptiveMetadataId 
+   * 
+   * @param failIfNoSchema
+   * @throws ValidationException 
+   */
+  public static boolean isDescriptiveBinaryValid(ModelService model, Binary binary, String descriptiveMetadataId, boolean failIfNoSchema)
+    throws ModelServiceException, ValidationException {
+    boolean valid;
+    try {
       InputStream inputStream = binary.getContent().createInputStream();
-      String filename = binary.getStoragePath().getName();
       // FIXME this should be loaded from config folder (to be dynamic)
       ClassLoader classLoader = SolrUtils.class.getClassLoader();
-      InputStream schemaStream = classLoader.getResourceAsStream("XSD/" + filename + ".xsd");
+      InputStream schemaStream = classLoader.getResourceAsStream("XSD/" + descriptiveMetadataId + ".xsd");
       if (schemaStream != null) {
         Source xmlFile = new StreamSource(inputStream);
         SchemaFactory schemaFactory = SchemaFactory.newInstance(W3C_XML_SCHEMA_NS_URI);
         Schema schema = schemaFactory.newSchema(new StreamSource(schemaStream));
         Validator validator = schema.newValidator();
+        RodaErrorHandler errorHandler = new RodaErrorHandler();
+        validator.setErrorHandler(errorHandler);
         try {
           validator.validate(xmlFile);
           valid = true;
         } catch (SAXException e) {
-          LOGGER.debug("Error validating descriptive metadata " + metadata.getStoragePath().asString(), e);
-          valid = false;
+          LOGGER.debug("Error validating descriptive binary " + descriptiveMetadataId, e);
+          throw new ValidationException("Error validating descriptive binary ", ModelServiceException.INTERNAL_SERVER_ERROR, errorHandler.getErrors());
         }
       } else {
         if (failIfNoSchema) {
-          throw new ModelServiceException("Unable to validate " + filename,
+          throw new ModelServiceException("Unable to validate " + descriptiveMetadataId,
             ModelServiceException.INTERNAL_SERVER_ERROR);
         } else {
           valid = true;
         }
       }
-    } catch (StorageServiceException | SAXException | IOException e) {
-      throw new ModelServiceException("Error validating descriptive metadata " + metadata.getStoragePath().asString(),
+    } catch (SAXException | IOException e) {
+      throw new ModelServiceException("Error validating descriptive binary " + binary.getStoragePath().asString(),
         ModelServiceException.INTERNAL_SERVER_ERROR, e);
     }
     return valid;
   }
+  
+  private static class RodaErrorHandler extends DefaultHandler {
+    List<SAXParseException> errors;
+    
+    public RodaErrorHandler(){
+      errors = new ArrayList<SAXParseException>();
+    }
+    public void warning(SAXParseException e) throws SAXException {
+      errors.add(e);
+    }
+    public void error(SAXParseException e) throws SAXException {
+       errors.add(e); 
+    }
+    public void fatalError(SAXParseException e) throws SAXException {
+      errors.add(e); 
+    }
+    public List<SAXParseException> getErrors() {
+      return errors;
+    }
+    public void setErrors(List<SAXParseException> errors) {
+      this.errors = errors;
+    }
+    
+    
+ }
 }
