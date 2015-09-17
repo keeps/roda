@@ -3,9 +3,6 @@
  */
 package pt.gov.dgarq.roda.wui.common.client.widgets;
 
-import pt.gov.dgarq.roda.wui.common.client.images.CommonImageBundle;
-import pt.gov.dgarq.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
@@ -18,6 +15,8 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.CommonConstants;
+import pt.gov.dgarq.roda.wui.common.client.images.CommonImageBundle;
+import pt.gov.dgarq.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 
 /**
  * @author Luis Faria
@@ -50,7 +49,7 @@ public class MessagePopup extends PopupPanel {
     /**
      * An error message
      */
-    ERROR_MESSAGE
+    ERROR_MESSAGE, INFO
   }
 
   private Image icon;
@@ -98,6 +97,8 @@ public class MessagePopup extends PopupPanel {
       icon = commonImageBundle.bigRedCross().createImage();
       layout.add(icon);
       icon.addStyleName("error-popup-icon");
+    } else if (type.equals(MessagePopupType.INFO)) {
+      // TODO add green check icon
     }
     layout.add(messageLayout);
 
@@ -142,8 +143,8 @@ public class MessagePopup extends PopupPanel {
             slotOffset += slots[i].getOffsetHeight() + 5;
           }
         }
-        MessagePopup.this.setPopupPosition(Window.getClientWidth() - offsetWidth - 5, Window.getScrollTop() + 5
-          + slotOffset);
+        MessagePopup.this.setPopupPosition(Window.getClientWidth() - offsetWidth - 5,
+          Window.getScrollTop() + 5 + slotOffset);
       }
 
     });
@@ -170,6 +171,16 @@ public class MessagePopup extends PopupPanel {
    */
   public static void showError(String title, String message) {
     MessagePopup errorPopup = new MessagePopup(MessagePopupType.ERROR_MESSAGE, title, message);
+    errorPopup.start();
+  }
+
+  /**
+   * Show a error message
+   * 
+   * @param message
+   */
+  public static void showInfo(String title, String message) {
+    MessagePopup errorPopup = new MessagePopup(MessagePopupType.INFO, title, message);
     errorPopup.start();
   }
 

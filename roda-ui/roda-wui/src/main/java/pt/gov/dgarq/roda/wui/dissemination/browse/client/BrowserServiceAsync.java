@@ -162,14 +162,12 @@ public interface BrowserServiceAsync {
 
   public void createNewItem(String itemId, String parentId, AsyncCallback<SimpleDescriptionObject> callback);
 
-  // public void addNewMetadataFile(String itemId, InputStream metadataStream,
-  // String descriptiveMetadataId,
-  // AsyncCallback<SimpleDescriptionObject> callback);
+  void updateDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle bundle, AsyncCallback<Void> callback);
 
-  void editDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle bundle, AsyncCallback<Void> callback);
+  public void removeDescriptiveMetadataFile(String itemId, String descriptiveMetadataId, AsyncCallback<Void> callback);
 
-  public void removeMetadataFile(String itemId, String descriptiveMetadataId,
-    AsyncCallback<SimpleDescriptionObject> callback);
+  void createDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle newBundle,
+    AsyncCallback<Void> asyncCallback);
 
   // public void retrieveMetadataFile(String itemId, String
   // descriptiveMetadataId,

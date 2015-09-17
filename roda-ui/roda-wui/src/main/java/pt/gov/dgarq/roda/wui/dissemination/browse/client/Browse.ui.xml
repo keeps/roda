@@ -49,7 +49,7 @@
 					<g:Button addStyleNames="btn btn-plus" ui:field="createItem">
 						<ui:msg>New sub-item</ui:msg>
 					</g:Button>
-					<g:Button addStyleNames="btn btn-plus" ui:field="editMetadata">
+					<g:Button addStyleNames="btn btn-plus" ui:field="createDescriptiveMetadata">
 						<ui:msg>New metadata</ui:msg>
 					</g:Button>
 					<g:Button addStyleNames="btn btn-edit" ui:field="moveItem">

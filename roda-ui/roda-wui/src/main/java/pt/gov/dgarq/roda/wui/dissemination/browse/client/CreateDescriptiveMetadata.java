@@ -17,7 +17,6 @@ import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
-import pt.gov.dgarq.roda.core.data.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
 import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
@@ -27,30 +26,17 @@ import pt.gov.dgarq.roda.wui.common.client.widgets.MessagePopup;
  * @author Luis Faria
  * 
  */
-public class EditDescriptiveMetadata extends Composite {
+public class CreateDescriptiveMetadata extends Composite {
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      if (historyTokens.size() == 2) {
+      if (historyTokens.size() == 1) {
         final String aipId = historyTokens.get(0);
-        final String descriptiveMetadataId = historyTokens.get(1);
+        CreateDescriptiveMetadata create = new CreateDescriptiveMetadata(aipId);
+        callback.onSuccess(create);
 
-        BrowserService.Util.getInstance().getDescriptiveMetadataEditBundle(aipId, descriptiveMetadataId,
-          new AsyncCallback<DescriptiveMetadataEditBundle>() {
-
-          @Override
-          public void onFailure(Throwable caught) {
-            callback.onFailure(caught);
-          }
-
-          @Override
-          public void onSuccess(DescriptiveMetadataEditBundle bundle) {
-            EditDescriptiveMetadata edit = new EditDescriptiveMetadata(aipId, bundle);
-            callback.onSuccess(edit);
-          }
-        });
       } else {
         Tools.newHistory(Browse.RESOLVER);
         callback.onSuccess(null);
@@ -68,17 +54,16 @@ public class EditDescriptiveMetadata extends Composite {
     }
 
     public String getHistoryToken() {
-      return "edit_metadata";
+      return "create_metadata";
     }
   };
 
-  interface MyUiBinder extends UiBinder<Widget, EditDescriptiveMetadata> {
+  interface MyUiBinder extends UiBinder<Widget, CreateDescriptiveMetadata> {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
   private final String aipId;
-  private final DescriptiveMetadataEditBundle bundle;
 
   // private ClientLogger logger = new ClientLogger(getClass().getName());
 
@@ -95,9 +80,6 @@ public class EditDescriptiveMetadata extends Composite {
   Button buttonApply;
 
   @UiField
-  Button buttonRemove;
-
-  @UiField
   Button buttonCancel;
 
   /**
@@ -106,47 +88,22 @@ public class EditDescriptiveMetadata extends Composite {
    * @param user
    *          the user to edit
    */
-  public EditDescriptiveMetadata(String aipId, DescriptiveMetadataEditBundle bundle) {
+  public CreateDescriptiveMetadata(String aipId) {
     this.aipId = aipId;
-    this.bundle = bundle;
 
     initWidget(uiBinder.createAndBindUi(this));
-
-    id.setText(bundle.getId());
-    type.setText(bundle.getType());
-    xml.setText(bundle.getXml());
-
-    id.setEnabled(false);
 
   }
 
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
+    String idText = id.getText();
     String typeText = type.getText();
     String xmlText = xml.getText();
 
-    DescriptiveMetadataEditBundle updatedBundle = new DescriptiveMetadataEditBundle(bundle.getId(), typeText, xmlText);
+    DescriptiveMetadataEditBundle newBundle = new DescriptiveMetadataEditBundle(idText, typeText, xmlText);
 
-    BrowserService.Util.getInstance().updateDescriptiveMetadataFile(aipId, updatedBundle, new AsyncCallback<Void>() {
-
-      @Override
-      public void onFailure(Throwable caught) {
-        // TODO show error
-        MessagePopup.showError(caught.getMessage());
-      }
-
-      @Override
-      public void onSuccess(Void result) {
-        MessagePopup.showInfo("Success", "Saved descriptive metadata file");
-        Tools.newHistory(Browse.RESOLVER, aipId);
-      }
-    });
-
-  }
-
-  @UiHandler("buttonRemove")
-  void buttonRemoveHandler(ClickEvent e) {
-    BrowserService.Util.getInstance().removeDescriptiveMetadataFile(aipId, bundle.getId(), new AsyncCallback<Void>() {
+    BrowserService.Util.getInstance().createDescriptiveMetadataFile(aipId, newBundle, new AsyncCallback<Void>() {
 
       @Override
       public void onFailure(Throwable caught) {
@@ -156,10 +113,11 @@ public class EditDescriptiveMetadata extends Composite {
 
       @Override
       public void onSuccess(Void result) {
-        MessagePopup.showInfo("Success", "Removed descriptive metadata file");
+        MessagePopup.showInfo("Success", "Created descriptive metadata file");
         Tools.newHistory(Browse.RESOLVER, aipId);
       }
     });
+
   }
 
   @UiHandler("buttonCancel")

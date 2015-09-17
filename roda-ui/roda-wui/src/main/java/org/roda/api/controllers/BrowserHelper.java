@@ -542,16 +542,14 @@ public class BrowserHelper {
     }
   }
 
-  public static SimpleDescriptionObject addNewMetadataFile(String aipId, InputStream metadataStream,
-    String descriptiveMetadataId) throws GenericException {
+  public static DescriptiveMetadata createDescriptiveMetadataFile(String aipId, String descriptiveMetadataId,
+    String descriptiveMetadataType, Binary descriptiveMetadataIdBinary) throws GenericException {
+    DescriptiveMetadata ret;
     try {
       ModelService model = RodaCoreFactory.getModelService();
-      Path p = Files.createTempFile("preservation", ".tmp");
-      Files.copy(metadataStream, p, StandardCopyOption.REPLACE_EXISTING);
-      Binary binary = (Binary) FSUtils.convertPathToResource(p.getParent(), p);
-      model.createDescriptiveMetadata(aipId, descriptiveMetadataId, binary, descriptiveMetadataId);
-      return RodaCoreFactory.getIndexService().retrieve(SimpleDescriptionObject.class, aipId);
-    } catch (StorageServiceException | ModelServiceException | IndexServiceException e) {
+      ret = model.createDescriptiveMetadata(aipId, descriptiveMetadataId, descriptiveMetadataIdBinary,
+        descriptiveMetadataId);
+    } catch (ModelServiceException e) {
       if (e.getCode() == StorageServiceException.NOT_FOUND) {
         throw new GenericException("AIP not found: " + aipId);
       } else if (e.getCode() == StorageServiceException.FORBIDDEN) {
@@ -559,19 +557,18 @@ public class BrowserHelper {
       } else {
         throw new GenericException("Error creating new item: " + e.getMessage());
       }
-
-    } catch (IOException e) {
-      throw new GenericException("Internal error: " + e.getMessage());
     }
+
+    return ret;
   }
 
-  public static DescriptiveMetadata editDescriptiveMetadataFile(String aipId, String descriptiveMetadataId,
-    Binary descriptiveMetadataIdBinary, String descriptiveMetadataType)
+  public static DescriptiveMetadata updateDescriptiveMetadataFile(String aipId, String descriptiveMetadataId,
+    String descriptiveMetadataType, Binary descriptiveMetadataIdBinary)
       throws GenericException, AuthorizationDeniedException {
     try {
       ModelService model = RodaCoreFactory.getModelService();
       return model.updateDescriptiveMetadata(aipId, descriptiveMetadataId, descriptiveMetadataIdBinary,
-        descriptiveMetadataId);
+        descriptiveMetadataType);
     } catch (ModelServiceException e) {
       if (e.getCode() == ModelServiceException.NOT_FOUND) {
         throw new GenericException("AIP not found: " + aipId);
@@ -583,13 +580,11 @@ public class BrowserHelper {
     }
   }
 
-  public static SimpleDescriptionObject removeMetadataFile(String aipId, String descriptiveMetadataId)
-    throws GenericException {
+  public static void removeDescriptiveMetadataFile(String aipId, String descriptiveMetadataId) throws GenericException {
     try {
       ModelService model = RodaCoreFactory.getModelService();
       model.deleteDescriptiveMetadata(aipId, descriptiveMetadataId);
-      return RodaCoreFactory.getIndexService().retrieve(SimpleDescriptionObject.class, aipId);
-    } catch (ModelServiceException | IndexServiceException e) {
+    } catch (ModelServiceException e) {
       if (e.getCode() == StorageServiceException.NOT_FOUND) {
         throw new GenericException("AIP not found: " + aipId);
       } else if (e.getCode() == StorageServiceException.FORBIDDEN) {

@@ -205,18 +205,13 @@ public interface BrowserService extends RemoteService {
 
   public SimpleDescriptionObject createNewItem(String itemId, String parentId) throws RODAException;
 
-  // public SimpleDescriptionObject addNewMetadataFile(String itemId,
-  // InputStream metadataStream,
-  // String descriptiveMetadataId) throws RODAException;
-  //
-  // public SimpleDescriptionObject editMetadataFile(String itemId, InputStream
-  // metadataStream,
-  // String descriptiveMetadataId) throws RODAException;
+  public void removeDescriptiveMetadataFile(String itemId, String descriptiveMetadataId) throws RODAException;
 
-  public SimpleDescriptionObject removeMetadataFile(String itemId, String descriptiveMetadataId) throws RODAException;
-
-  public void editDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle bundle)
+  public void updateDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle bundle)
     throws AuthorizationDeniedException, GenericException;
+
+  public void createDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle newBundle)
+    throws AuthorizationDeniedException, GenericException;;
 
   // public DescriptiveMetadata retrieveMetadataFile(String itemId, String
   // descriptiveMetadataId) throws RODAException;

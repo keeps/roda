@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
@@ -20,6 +21,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
@@ -123,6 +125,8 @@ public class Browse extends Composite {
 
   // private SimplePanel viewPanelContainer;
 
+  private String aipId;
+
   @UiField(provided = true)
   BreadcrumbPanel breadcrumb;
 
@@ -154,7 +158,7 @@ public class Browse extends Composite {
   Button createItem;
 
   @UiField
-  Button editMetadata;
+  Button createDescriptiveMetadata;
 
   @UiField
   Button moveItem;
@@ -214,6 +218,9 @@ public class Browse extends Composite {
     } else
       if (historyTokens.size() > 1 && historyTokens.get(0).equals(EditDescriptiveMetadata.RESOLVER.getHistoryToken())) {
       EditDescriptiveMetadata.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+    } else if (historyTokens.size() > 1
+      && historyTokens.get(0).equals(CreateDescriptiveMetadata.RESOLVER.getHistoryToken())) {
+      CreateDescriptiveMetadata.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else {
       Tools.newHistory(RESOLVER);
       callback.onSuccess(null);
@@ -239,6 +246,7 @@ public class Browse extends Composite {
     if (id == null) {
       viewAction();
     } else {
+      aipId = id;
       BrowserService.Util.getInstance().getItemBundle(id, constants.locale(), new AsyncCallback<BrowseItemBundle>() {
 
         @Override
@@ -265,7 +273,7 @@ public class Browse extends Composite {
       HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getElementLevelIconHTMLPanel(sdo.getLevel());
       itemIconHtmlPanel.addStyleName("browseItemIcon-other");
       itemIcon.setWidget(itemIconHtmlPanel);
-      itemTitle.setText(sdo.getTitle());
+      itemTitle.setText(sdo.getTitle() != null ? sdo.getTitle() : sdo.getId());
       itemTitle.removeStyleName("browseTitle-allCollections");
       itemDates.setText(getDatesText(sdo));
 
@@ -291,7 +299,7 @@ public class Browse extends Composite {
 
       // Set button visibility
       createItem.setVisible(true);
-      editMetadata.setVisible(true);
+      createDescriptiveMetadata.setVisible(true);
       moveItem.setVisible(true);
       editPermissions.setVisible(true);
       remove.setVisible(true);
@@ -302,6 +310,7 @@ public class Browse extends Composite {
   }
 
   protected void viewAction() {
+    aipId = null;
     HTMLPanel topIcon = new HTMLPanel(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-circle-o'></i>"));
     topIcon.addStyleName("browseItemIcon-all");
     itemIcon.setWidget(topIcon);
@@ -323,7 +332,7 @@ public class Browse extends Composite {
 
     // Set button visibility
     createItem.setVisible(true);
-    editMetadata.setVisible(false);
+    createDescriptiveMetadata.setVisible(false);
     moveItem.setVisible(false);
     editPermissions.setVisible(false);
     remove.setVisible(false);
@@ -348,7 +357,8 @@ public class Browse extends Composite {
   private SafeHtml getBreadcrumbLabel(SimpleDescriptionObject ancestor) {
     SafeHtml elementLevelIconSafeHtml = DescriptionLevelUtils.getElementLevelIconSafeHtml(ancestor.getLevel());
     SafeHtmlBuilder builder = new SafeHtmlBuilder();
-    builder.append(elementLevelIconSafeHtml).append(SafeHtmlUtils.fromString(ancestor.getTitle()));
+    String label = ancestor.getTitle() != null ? ancestor.getTitle() : ancestor.getId();
+    builder.append(elementLevelIconSafeHtml).append(SafeHtmlUtils.fromString(label));
     SafeHtml breadcrumbLabel = builder.toSafeHtml();
     return breadcrumbLabel;
   }
@@ -395,13 +405,14 @@ public class Browse extends Composite {
    */
   public static String readableFileSize(long size) {
     if (size <= 0)
-      return "0";
+      return "0 B";
     final String[] units = new String[] {"B", "KB", "MB", "GB", "TB"};
     int digitGroups = (int) (Math.log10(size) / Math.log10(1024));
     return NumberFormat.getFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
   }
 
-  private Widget createDescriptiveMetadataDownloadPanel(String aipId, List<DescriptiveMetadataViewBundle> descMetadata) {
+  private Widget createDescriptiveMetadataDownloadPanel(String aipId,
+    List<DescriptiveMetadataViewBundle> descMetadata) {
     FlowPanel downloadPanel = new FlowPanel();
     HTML icon = new HTML(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-download'></i>"));
     FlowPanel labelsPanel = new FlowPanel();
@@ -429,7 +440,8 @@ public class Browse extends Composite {
     return downloadPanel;
   }
 
-  private Widget createPreservationMetadataDownloadPanel(String aipId, List<DescriptiveMetadataViewBundle> descMetadata) {
+  private Widget createPreservationMetadataDownloadPanel(String aipId,
+    List<DescriptiveMetadataViewBundle> descMetadata) {
     FlowPanel downloadPanel = new FlowPanel();
     HTML icon = new HTML(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-download'></i>"));
     FlowPanel labelsPanel = new FlowPanel();
@@ -478,7 +490,8 @@ public class Browse extends Composite {
     return ret;
   }
 
-  private SafeHtml getDescriptiveMetadataPanelHTML(String aipId, List<DescriptiveMetadataViewBundle> descriptiveMetadata) {
+  private SafeHtml getDescriptiveMetadataPanelHTML(String aipId,
+    List<DescriptiveMetadataViewBundle> descriptiveMetadata) {
     SafeHtmlBuilder builder = new SafeHtmlBuilder();
     for (DescriptiveMetadataViewBundle bundle : descriptiveMetadata) {
       String editLink = Tools.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId, bundle.getId());
@@ -506,6 +519,13 @@ public class Browse extends Composite {
       historyUpdated = true;
     }
     return historyUpdated;
+  }
+
+  @UiHandler("createDescriptiveMetadata")
+  void buttonCreateDescriptiveMetadataHandler(ClickEvent e) {
+    if (aipId != null) {
+      Tools.newHistory(RESOLVER, CreateDescriptiveMetadata.RESOLVER.getHistoryToken(), aipId);
+    }
   }
 
   protected void onMove(final String targetPid, final String oldParentPid, final String newParentPid) {

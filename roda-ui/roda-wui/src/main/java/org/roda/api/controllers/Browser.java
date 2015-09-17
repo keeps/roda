@@ -382,28 +382,34 @@ public class Browser extends RodaCoreService {
 
   }
 
-  public static SimpleDescriptionObject addNewMetadataFile(RodaUser user, String itemId, InputStream metadataStream,
-    String descriptiveMetadataId) throws AuthorizationDeniedException, GenericException {
+  public static DescriptiveMetadata createDescriptiveMetadataFile(RodaUser user, String aipId,
+    String descriptiveMetadataId, String descriptiveMetadataType, Binary descriptiveMetadataIdBinary)
+      throws AuthorizationDeniedException, GenericException {
     Date start = new Date();
 
     // check user permissions
     UserUtility.checkRoles(user, "administration.metadata_editor");
-    SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(itemId);
-    UserUtility.checkObjectModifyPermissions(user, sdo);
+    SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(aipId);
+
+    // TODO remove permission skip for admin
+    if (!user.getName().equals("admin")) {
+      UserUtility.checkObjectModifyPermissions(user, sdo);
+    }
 
     // delegate
-    sdo = BrowserHelper.addNewMetadataFile(itemId, metadataStream, descriptiveMetadataId);
+    DescriptiveMetadata ret = BrowserHelper.createDescriptiveMetadataFile(aipId, descriptiveMetadataId,
+      descriptiveMetadataType, descriptiveMetadataIdBinary);
 
     // register action
     long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "Browser", "addNewMetadataFile", sdo.getId(), duration, "itemId", itemId,
+    registerAction(user, "Browser", "createDescriptiveMetadataFile", sdo.getId(), duration, "aipId", aipId,
       "descriptiveMetadataId", descriptiveMetadataId);
 
-    return sdo;
+    return ret;
   }
 
-  public static DescriptiveMetadata editDescriptiveMetadataFile(RodaUser user, String aipId,
-    String descriptiveMetadataId, Binary descriptiveMetadataIdBinary, String descriptiveMetadataType)
+  public static DescriptiveMetadata updateDescriptiveMetadataFile(RodaUser user, String aipId,
+    String descriptiveMetadataId, String descriptiveMetadataType, Binary descriptiveMetadataIdBinary)
       throws AuthorizationDeniedException, GenericException {
     Date start = new Date();
 
@@ -416,8 +422,8 @@ public class Browser extends RodaCoreService {
     }
 
     // delegate
-    DescriptiveMetadata ret = BrowserHelper.editDescriptiveMetadataFile(aipId, descriptiveMetadataId,
-      descriptiveMetadataIdBinary, descriptiveMetadataType);
+    DescriptiveMetadata ret = BrowserHelper.updateDescriptiveMetadataFile(aipId, descriptiveMetadataId,
+      descriptiveMetadataType, descriptiveMetadataIdBinary);
 
     // register action
     long duration = new Date().getTime() - start.getTime();
@@ -427,24 +433,26 @@ public class Browser extends RodaCoreService {
     return ret;
   }
 
-  public static SimpleDescriptionObject removeMetadataFile(RodaUser user, String itemId, String descriptiveMetadataId)
+  public static void removeDescriptiveMetadataFile(RodaUser user, String itemId, String descriptiveMetadataId)
     throws AuthorizationDeniedException, GenericException {
     Date start = new Date();
 
     // check user permissions
     UserUtility.checkRoles(user, "administration.metadata_editor");
     SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(itemId);
-    UserUtility.checkObjectModifyPermissions(user, sdo);
+
+    // TODO remove permission skip for admin
+    if (!user.getName().equals("admin")) {
+      UserUtility.checkObjectModifyPermissions(user, sdo);
+    }
 
     // delegate
-    sdo = BrowserHelper.removeMetadataFile(itemId, descriptiveMetadataId);
+    BrowserHelper.removeDescriptiveMetadataFile(itemId, descriptiveMetadataId);
 
     // register action
     long duration = new Date().getTime() - start.getTime();
     registerAction(user, "Browser", "removeMetadataFile", sdo.getId(), duration, "itemId", itemId,
       "descriptiveMetadataId", descriptiveMetadataId);
-
-    return sdo;
   }
 
   public static DescriptiveMetadata retrieveMetadataFile(RodaUser user, String itemId, String descriptiveMetadataId)

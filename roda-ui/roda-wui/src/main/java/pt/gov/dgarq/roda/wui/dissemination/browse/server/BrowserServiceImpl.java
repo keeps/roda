@@ -120,17 +120,29 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   }
 
-  // public SimpleDescriptionObject addNewMetadataFile(String itemId,
-  // InputStream metadataStream, String descriptiveMetadataId) throws
-  // RODAException {
-  // RodaUser user = UserUtility.getUser(getThreadLocalRequest(),
-  // RodaCoreFactory.getIndexService());
-  // return Browser.addNewMetadataFile(user, itemId, metadataStream,
-  // descriptiveMetadataId);
-  // }
+  @Override
+  public void createDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle bundle)
+    throws AuthorizationDeniedException, GenericException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+
+    String descriptiveMetadataId = bundle.getId();
+    String descriptiveMetadataType = bundle.getType();
+
+    StoragePath storagePath = null;
+    Map<String, Set<String>> metadata = new HashMap<>();
+    StringContentPayload payload = new StringContentPayload(bundle.getXml());
+    Long sizeInBytes = Long.valueOf(bundle.getXml().getBytes().length);
+    boolean reference = false;
+    Map<String, String> contentDigest = new HashMap<>();
+    Binary descriptiveMetadataIdBinary = new DefaultBinary(storagePath, metadata, payload, sizeInBytes, reference,
+      contentDigest);
+
+    Browser.createDescriptiveMetadataFile(user, aipId, descriptiveMetadataId, descriptiveMetadataType,
+      descriptiveMetadataIdBinary);
+  }
 
   @Override
-  public void editDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle bundle)
+  public void updateDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle bundle)
     throws AuthorizationDeniedException, GenericException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     String descriptiveMetadataId = bundle.getId();
@@ -142,17 +154,16 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     Long sizeInBytes = Long.valueOf(bundle.getXml().getBytes().length);
     boolean reference = false;
     Map<String, String> contentDigest = new HashMap<>();
-
     Binary descriptiveMetadataIdBinary = new DefaultBinary(storagePath, metadata, payload, sizeInBytes, reference,
       contentDigest);
 
-    Browser.editDescriptiveMetadataFile(user, aipId, descriptiveMetadataId, descriptiveMetadataIdBinary,
-      descriptiveMetadataType);
+    Browser.updateDescriptiveMetadataFile(user, aipId, descriptiveMetadataId, descriptiveMetadataType,
+      descriptiveMetadataIdBinary);
   }
 
-  public SimpleDescriptionObject removeMetadataFile(String itemId, String descriptiveMetadataId) throws RODAException {
+  public void removeDescriptiveMetadataFile(String itemId, String descriptiveMetadataId) throws RODAException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
-    return Browser.removeMetadataFile(user, itemId, descriptiveMetadataId);
+    Browser.removeDescriptiveMetadataFile(user, itemId, descriptiveMetadataId);
   }
 
   // public DescriptiveMetadata retrieveMetadataFile(String itemId, String
@@ -449,4 +460,5 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   protected String escapeXML(String xml) {
     return StringEscapeUtils.escapeXml(xml);
   }
+
 }
