@@ -13,7 +13,8 @@
 	
 	</ui:style>
 
-	<g:FlowPanel styleName="wui-browse-edit-metadata" addStyleNames="wrapper skip_padding">
+	<g:FlowPanel styleName="wui-browse-edit-metadata"
+		addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
 				<g:Label styleName="h1">Edit descriptive metadata</g:Label>
@@ -29,6 +30,8 @@
 					Content
 				</g:Label>
 				<g:TextArea ui:field="xml" addStyleNames="form-textbox metadata-edit-area" />
+				<g:HTML visible="false" ui:field="errors" addStyleNames="metadata-edit-errors" />
+
 			</g:FlowPanel>
 
 			<g:FlowPanel addStyleNames="col_2 last sidebar">

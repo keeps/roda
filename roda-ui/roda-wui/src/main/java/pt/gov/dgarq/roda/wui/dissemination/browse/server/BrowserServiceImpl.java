@@ -1,5 +1,6 @@
 package pt.gov.dgarq.roda.wui.dissemination.browse.server;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -11,11 +12,13 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.roda.api.controllers.Browser;
 import org.roda.common.UserUtility;
+import org.roda.model.ValidationException;
 import org.roda.storage.Binary;
 import org.roda.storage.DefaultBinary;
 import org.roda.storage.StoragePath;
 import org.roda.storage.StringContentPayload;
 import org.w3c.util.DateParser;
+import org.xml.sax.SAXParseException;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
@@ -40,6 +43,8 @@ import pt.gov.dgarq.roda.wui.dissemination.browse.client.BrowseItemBundle;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.BrowserService;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.DescriptiveMetadataEditBundle;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.DisseminationInfo;
+import pt.gov.dgarq.roda.wui.dissemination.browse.client.MetadataParseException;
+import pt.gov.dgarq.roda.wui.dissemination.browse.client.ParseError;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.PreservationInfo;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.RepresentationInfo;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.TimelineInfo;
@@ -122,7 +127,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   @Override
   public void createDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle bundle)
-    throws AuthorizationDeniedException, GenericException {
+    throws AuthorizationDeniedException, GenericException, MetadataParseException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
 
     String descriptiveMetadataId = bundle.getId();
@@ -137,13 +142,17 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     Binary descriptiveMetadataIdBinary = new DefaultBinary(storagePath, metadata, payload, sizeInBytes, reference,
       contentDigest);
 
-    Browser.createDescriptiveMetadataFile(user, aipId, descriptiveMetadataId, descriptiveMetadataType,
-      descriptiveMetadataIdBinary);
+    try {
+      Browser.createDescriptiveMetadataFile(user, aipId, descriptiveMetadataId, descriptiveMetadataType,
+        descriptiveMetadataIdBinary);
+    } catch (ValidationException e) {
+      throw convertValidationException(e);
+    }
   }
 
   @Override
   public void updateDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle bundle)
-    throws AuthorizationDeniedException, GenericException {
+    throws AuthorizationDeniedException, GenericException, MetadataParseException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     String descriptiveMetadataId = bundle.getId();
     String descriptiveMetadataType = bundle.getType();
@@ -157,8 +166,33 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     Binary descriptiveMetadataIdBinary = new DefaultBinary(storagePath, metadata, payload, sizeInBytes, reference,
       contentDigest);
 
-    Browser.updateDescriptiveMetadataFile(user, aipId, descriptiveMetadataId, descriptiveMetadataType,
-      descriptiveMetadataIdBinary);
+    try {
+      Browser.updateDescriptiveMetadataFile(user, aipId, descriptiveMetadataId, descriptiveMetadataType,
+        descriptiveMetadataIdBinary);
+    } catch (ValidationException e) {
+      throw convertValidationException(e);
+    }
+  }
+
+  private MetadataParseException convertValidationException(ValidationException e) {
+    MetadataParseException ex = new MetadataParseException(e.getMessage());
+    List<SAXParseException> errors = e.getErrors();
+    List<ParseError> mappedList = new ArrayList<>();
+
+    if (errors != null) {
+      for (SAXParseException saxParseException : errors) {
+        ParseError parseError = new ParseError();
+        parseError.setMessage(saxParseException.getMessage());
+        parseError.setLineNumber(saxParseException.getLineNumber());
+        parseError.setColumnNumber(saxParseException.getColumnNumber());
+        parseError.setPublicId(saxParseException.getPublicId());
+        parseError.setSystemId(saxParseException.getSystemId());
+        mappedList.add(parseError);
+      }
+    }
+    ex.setErrors(mappedList);
+
+    return ex;
   }
 
   public void removeDescriptiveMetadataFile(String itemId, String descriptiveMetadataId) throws RODAException {

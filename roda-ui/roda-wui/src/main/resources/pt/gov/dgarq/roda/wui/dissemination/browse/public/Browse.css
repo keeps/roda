@@ -109,6 +109,17 @@
 
 .metadata-edit-area {
 	height: 300px;
+	max-width: 100%;
+}
+
+.metadata-edit-errors {
+	color: #D20707;
+	font-size: 1.2rem;
+}
+
+.metadata-edit-errors .error {
+	margin-bottom: 5px;
+	display: block;
 }
 
 /** Browser**/

@@ -208,10 +208,10 @@ public interface BrowserService extends RemoteService {
   public void removeDescriptiveMetadataFile(String itemId, String descriptiveMetadataId) throws RODAException;
 
   public void updateDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle bundle)
-    throws AuthorizationDeniedException, GenericException;
+    throws AuthorizationDeniedException, GenericException, MetadataParseException;
 
   public void createDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle newBundle)
-    throws AuthorizationDeniedException, GenericException;;
+    throws AuthorizationDeniedException, GenericException, MetadataParseException;
 
   // public DescriptiveMetadata retrieveMetadataFile(String itemId, String
   // descriptiveMetadataId) throws RODAException;

@@ -11,6 +11,7 @@ import org.roda.api.v1.utils.StreamResponse;
 import org.roda.common.UserUtility;
 import org.roda.model.DescriptiveMetadata;
 import org.roda.model.ModelServiceException;
+import org.roda.model.ValidationException;
 import org.roda.storage.Binary;
 import org.roda.storage.StorageServiceException;
 
@@ -384,7 +385,7 @@ public class Browser extends RodaCoreService {
 
   public static DescriptiveMetadata createDescriptiveMetadataFile(RodaUser user, String aipId,
     String descriptiveMetadataId, String descriptiveMetadataType, Binary descriptiveMetadataIdBinary)
-      throws AuthorizationDeniedException, GenericException {
+      throws AuthorizationDeniedException, GenericException, ValidationException {
     Date start = new Date();
 
     // check user permissions
@@ -410,7 +411,7 @@ public class Browser extends RodaCoreService {
 
   public static DescriptiveMetadata updateDescriptiveMetadataFile(RodaUser user, String aipId,
     String descriptiveMetadataId, String descriptiveMetadataType, Binary descriptiveMetadataIdBinary)
-      throws AuthorizationDeniedException, GenericException {
+      throws AuthorizationDeniedException, GenericException, ValidationException {
     Date start = new Date();
 
     // check user permissions

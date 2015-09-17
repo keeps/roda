@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.roda.api.v1.utils.StreamResponse;
 import org.roda.common.HTMLUtils;
+import org.roda.common.ValidationUtils;
 import org.roda.index.IndexServiceException;
 import org.roda.model.DescriptiveMetadata;
 import org.roda.model.ModelService;
@@ -544,12 +545,15 @@ public class BrowserHelper {
   }
 
   public static DescriptiveMetadata createDescriptiveMetadataFile(String aipId, String descriptiveMetadataId,
-    String descriptiveMetadataType, Binary descriptiveMetadataIdBinary) throws GenericException {
+    String descriptiveMetadataType, Binary descriptiveMetadataIdBinary) throws GenericException, ValidationException {
+    
+    ValidationUtils.validateDescriptiveBinary(descriptiveMetadataIdBinary, descriptiveMetadataId, false);
+    
     DescriptiveMetadata ret;
     try {
       ModelService model = RodaCoreFactory.getModelService();
       ret = model.createDescriptiveMetadata(aipId, descriptiveMetadataId, descriptiveMetadataIdBinary,
-        descriptiveMetadataId);
+        descriptiveMetadataType);
     } catch (ModelServiceException e) {
       if (e.getCode() == StorageServiceException.NOT_FOUND) {
         throw new GenericException("AIP not found: " + aipId);
@@ -565,7 +569,10 @@ public class BrowserHelper {
 
   public static DescriptiveMetadata updateDescriptiveMetadataFile(String aipId, String descriptiveMetadataId,
     String descriptiveMetadataType, Binary descriptiveMetadataIdBinary)
-      throws GenericException, AuthorizationDeniedException {
+      throws GenericException, AuthorizationDeniedException, ValidationException {
+
+    ValidationUtils.validateDescriptiveBinary(descriptiveMetadataIdBinary, descriptiveMetadataId, false);
+    
     try {
       ModelService model = RodaCoreFactory.getModelService();
       return model.updateDescriptiveMetadata(aipId, descriptiveMetadataId, descriptiveMetadataIdBinary,
@@ -578,9 +585,8 @@ public class BrowserHelper {
       } else {
         throw new GenericException("Error creating new item: " + e.getMessage());
       }
-    } catch (ValidationException e) {
-      throw new GenericException("Validation error...");
     }
+
   }
 
   public static void removeDescriptiveMetadataFile(String aipId, String descriptiveMetadataId) throws GenericException {

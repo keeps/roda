@@ -4,6 +4,7 @@
 package config.i18n.client;
 
 import com.google.gwt.i18n.client.Messages;
+import com.google.gwt.safehtml.shared.SafeHtml;
 
 /**
  * @author Luis Faria
@@ -64,5 +65,9 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("{0} files, {1} bytes")
   public String preservationRepTooltip(int numberOfFiles, long sizeOfFiles);
+  
+  
+  @DefaultMessage("Error in line {0}, column {1}: {2}")
+  SafeHtml metadataParseError(int line, int column, String message);
 
 }
