@@ -310,18 +310,30 @@
 			<div class="descriptiveMetadata-field">
 				<div class="descriptiveMetadata-field-key">Organização e ordenação</div>
 				<xsl:variable name="output">
-					<xsl:for-each
-						select="eadc:arrangement/eadc:table/eadc:tgroup/eadc:thead/eadc:row/eadc:entry">
-						<span class="header">
-							<xsl:value-of select="text()" />
-						</span>
-					</xsl:for-each>
-					<xsl:for-each
-						select="eadc:arrangement/eadc:table/eadc:tgroup/eadc:tbody/eadc:row/eadc:entry">
-						<span class="value">
-							<xsl:value-of select="text()" />
-						</span>
-					</xsl:for-each>
+					<table>
+						<thead>
+							<tr>
+								<xsl:for-each
+									select="eadc:arrangement/eadc:table/eadc:tgroup/eadc:thead/eadc:row/eadc:entry">
+									<td>
+										<xsl:value-of select="text()" />
+									</td>
+								</xsl:for-each>
+							</tr>
+						</thead>
+						<tbody>
+							<xsl:for-each
+								select="eadc:arrangement/eadc:table/eadc:tgroup/eadc:tbody/eadc:row">
+								<tr>
+									<xsl:for-each select="eadc:entry">
+										<td>
+											<xsl:value-of select="text()" />
+										</td>
+									</xsl:for-each>
+								</tr>
+							</xsl:for-each>
+						</tbody>
+					</table>
 				</xsl:variable>
 				<div class="descriptiveMetadata-field-value">
 					<xsl:copy-of select="$output" />
