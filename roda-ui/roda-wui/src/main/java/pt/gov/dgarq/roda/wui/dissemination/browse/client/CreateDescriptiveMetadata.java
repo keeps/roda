@@ -7,16 +7,20 @@ import java.util.List;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
+import config.i18n.client.BrowseMessages;
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
 import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
@@ -62,6 +66,8 @@ public class CreateDescriptiveMetadata extends Composite {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+  
+  private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   private final String aipId;
 
@@ -81,6 +87,9 @@ public class CreateDescriptiveMetadata extends Composite {
 
   @UiField
   Button buttonCancel;
+
+  @UiField
+  HTML errors;
 
   /**
    * Create a new panel to edit a user
@@ -107,17 +116,36 @@ public class CreateDescriptiveMetadata extends Composite {
 
       @Override
       public void onFailure(Throwable caught) {
-        // TODO show error
-        MessagePopup.showError(caught.getMessage());
+        if (caught instanceof MetadataParseException) {
+          MetadataParseException e = (MetadataParseException) caught;
+          updateErrors(e);
+        } else {
+          // TODO show error
+          MessagePopup.showError(caught.getMessage());
+        }
       }
 
       @Override
       public void onSuccess(Void result) {
+        errors.setText("");
+        errors.setVisible(false);
         MessagePopup.showInfo("Success", "Created descriptive metadata file");
         Tools.newHistory(Browse.RESOLVER, aipId);
       }
     });
 
+  }
+
+  protected void updateErrors(MetadataParseException e) {
+    SafeHtmlBuilder b = new SafeHtmlBuilder();
+    for (ParseError error : e.getErrors()) {
+      b.append(SafeHtmlUtils.fromSafeConstant("<span class='error'>"));
+      b.append(messages.metadataParseError(error.getLineNumber(), error.getColumnNumber(), error.getMessage()));
+      b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
+    }
+
+    errors.setHTML(b.toSafeHtml());
+    errors.setVisible(true);
   }
 
   @UiHandler("buttonCancel")
