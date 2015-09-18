@@ -793,10 +793,13 @@ public class SolrUtils {
       DescriptiveMetadata metadata = model.retrieveDescriptiveMetadata(aipId, descId);
       StoragePath storagePath = metadata.getStoragePath();
       Binary binary = model.getStorage().getBinary(storagePath);
-      SolrInputDocument fields = getDescriptiveMetataFields(binary);
-
-      for (SolrInputField field : fields) {
-        ret.addField(field.getName(), field.getValue(), field.getBoost());
+      try{
+        SolrInputDocument fields = getDescriptiveMetataFields(binary);
+        for (SolrInputField field : fields) {
+          ret.addField(field.getName(), field.getValue(), field.getBoost());
+        }
+      }catch(IndexServiceException ise){
+        LOGGER.warn("Error processing descriptive metadata "+descId+" from AIP "+aipId);
       }
     }
 
