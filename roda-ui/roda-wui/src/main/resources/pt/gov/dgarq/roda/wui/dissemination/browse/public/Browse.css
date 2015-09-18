@@ -224,9 +224,11 @@
 
 .file .subheader {
 	display: block;
-	color: #888;
-	font-size: 1.2rem;
-	margin-left: 2rem;
+    color: #888;
+    font-size: 1.2rem;
+    margin-left: 7px;
+    border-left: 1px solid #ccc;
+    padding-left: 10px;
 }
 
 .file .subheader .size:after {
@@ -247,9 +249,9 @@
 
 .browseItemMetadata .content {
 	display: block;
-	margin-left: 2rem;
-	border-left: 1px solid #ccc;
-	padding-left: 10px;
+    margin-left: 7px;
+    border-left: 1px solid #ccc;
+    padding-left: 10px;
 }
 
 .field {
@@ -270,22 +272,8 @@
 	font-size: 1.2rem;
 }
 
-.field-value table {
-	display: inline;
-	margin: 0px 15px;
-}
-
-.field-value table th, td {
-	font-size: 1.2rem;
-	padding: 5px 10px;
-}
-
-.field-value th:first-child, td:first-child {
-	padding-left: 0;
-}
-
-.field-value th:last-child, td:last-child {
-	padding-right: 0;
+.browseItemMetadata code {
+	max-height: 300px;
 }
 
 .event .header {

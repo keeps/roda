@@ -513,6 +513,7 @@ public class Browse extends Composite {
       @Override
       public void onClick(ClickEvent event) {
         itemMetadata.setHTML(SafeHtmlUtils.fromTrustedString(html));
+        runHighlighter();
       }
     });
 
@@ -522,6 +523,13 @@ public class Browse extends Composite {
     subLabel.addStyleName("browseDownloadSublabel");
     return downloadPanel;
   }
+
+  // $wnd.hljs.initHighlightingOnLoad();
+  public static native void runHighlighter() /*-{
+		$wnd.jQuery('pre code').each(function(i, block) {
+			$wnd.hljs.highlightBlock(block);
+		});
+  }-*/;
 
   private String getDatesText(SimpleDescriptionObject sdo) {
     String ret;
