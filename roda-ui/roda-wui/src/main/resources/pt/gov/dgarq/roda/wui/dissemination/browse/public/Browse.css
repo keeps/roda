@@ -63,6 +63,20 @@
 	margin-bottom: 10px;
 }
 
+.descriptiveMetadata.indexError .title {
+	color: #D20707;
+	border-color: #D20707;
+}
+
+.descriptiveMetadata.indexError .title:after {
+	content: '\f071';
+	font-family: FontAwesome;
+	padding-left: 5px;
+	text-rendering: auto;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
 .descriptiveMetadataEdit {
 	color: #089de3;
 	float: right;

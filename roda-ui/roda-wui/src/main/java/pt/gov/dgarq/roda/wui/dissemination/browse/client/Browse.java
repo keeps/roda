@@ -252,6 +252,7 @@ public class Browse extends Composite {
         @Override
         public void onFailure(Throwable caught) {
           logger.error("Could not view id=" + id, caught);
+          showError(id, caught);
         }
 
         @Override
@@ -260,6 +261,34 @@ public class Browse extends Composite {
         }
       });
     }
+  }
+
+  protected void showError(String id, Throwable caught) {
+    breadcrumb.updatePath(new ArrayList<BreadcrumbItem>());
+    breadcrumb.setVisible(false);
+
+    HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getElementLevelIconHTMLPanel(null);
+    itemIconHtmlPanel.addStyleName("browseItemIcon-other");
+    itemIcon.setWidget(itemIconHtmlPanel);
+    itemTitle.setText(id);
+    itemDates.setText("");
+
+    itemDescriptiveMetadata.setHTML(SafeHtmlUtils.fromSafeConstant(caught.getMessage()));
+    itemDescriptiveMetadata.setVisible(true);
+
+    viewingTop = false;
+    fondsPanelTitle.setVisible(false);
+    fondsPanel.setVisible(false);
+
+    downloadList.clear();
+    sidebarGroupDownloads.setVisible(false);
+
+    // Set button visibility
+    createItem.setVisible(false);
+    createDescriptiveMetadata.setVisible(false);
+    moveItem.setVisible(false);
+    editPermissions.setVisible(false);
+    remove.setVisible(true);
   }
 
   protected void viewAction(BrowseItemBundle itemBundle) {
@@ -293,7 +322,9 @@ public class Browse extends Composite {
         downloadList.add(createRepresentationDownloadPanel(rep));
       }
 
-      downloadList.add(createDescriptiveMetadataDownloadPanel(sdo.getId(), descMetadata));
+      if (!descMetadata.isEmpty()) {
+        downloadList.add(createDescriptiveMetadataDownloadPanel(sdo.getId(), descMetadata));
+      }
       // TODO change to presMetadata
       downloadList.add(createPreservationMetadataDownloadPanel(sdo.getId(), descMetadata));
 
@@ -454,7 +485,7 @@ public class Browse extends Composite {
 
     // TODO externalize strings
     Anchor label = new Anchor(SafeHtmlUtils.fromSafeConstant("Preservation metadata"),
-      RestUtils.createDescriptiveMetadataDownloadUri(aipId));
+      RestUtils.createPreservationMetadataDownloadUri(aipId));
     Label subLabel = new Label(files + " files, " + readableFileSize(sizeInBytes));
 
     labelsPanel.add(label);

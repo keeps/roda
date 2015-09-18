@@ -799,6 +799,7 @@ public class SolrUtils {
           ret.addField(field.getName(), field.getValue(), field.getBoost());
         }
       }catch(IndexServiceException ise){
+        // TODO index the index errors for later processing
         LOGGER.warn("Error processing descriptive metadata "+descId+" from AIP "+aipId);
       }
     }
