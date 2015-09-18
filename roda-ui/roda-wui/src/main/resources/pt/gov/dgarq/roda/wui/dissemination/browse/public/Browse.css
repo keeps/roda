@@ -97,6 +97,26 @@
 	
 }
 
+.descriptiveMetadata-field-value thead td {
+	font-weight: 500;
+}
+
+.descriptiveMetadata-field-value th, .descriptiveMetadata-field-value td
+	{
+	padding: 7px 10px;
+	text-align: left;
+	border-bottom: 1px solid #E1E1E1;
+}
+
+.descriptiveMetadata-field-value  th:first-child,
+	.descriptiveMetadata-field-value  td:first-child {
+	padding-left: 0;
+}
+
+.descriptiveMetadata-field-value th:last-child, .descriptiveMetadata-field-value td:last-child {
+	padding-right: 0;
+}
+
 .browseDownload {
 	margin-bottom: 5px;
 }
