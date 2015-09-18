@@ -128,8 +128,12 @@ public class BrowserHelper {
     try {
       for (DescriptiveMetadata descriptiveMetadata : listDescriptiveMetadataBinaries) {
         Binary binary = RodaCoreFactory.getStorageService().getBinary(descriptiveMetadata.getStoragePath());
-        String html = HTMLUtils.descriptiveMetadataToHtml(binary, locale);
-
+        String html = "";
+        try{
+          html = HTMLUtils.descriptiveMetadataToHtml(binary, locale);
+        }catch(ModelServiceException e){
+          html = "<div class=\"descriptiveMetadata indexError\"><div class='title'>"+descriptiveMetadata.getId()+"</div></div>";
+        }
         descriptiveMetadataList
           .add(new DescriptiveMetadataViewBundle(descriptiveMetadata.getId(), html, binary.getSizeInBytes()));
       }
