@@ -11,6 +11,7 @@ import java.util.Set;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
@@ -19,6 +20,7 @@ import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -53,6 +55,7 @@ import pt.gov.dgarq.roda.wui.common.client.tools.DescriptionLevelUtils;
 import pt.gov.dgarq.roda.wui.common.client.tools.RestUtils;
 import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
 import pt.gov.dgarq.roda.wui.common.client.widgets.AIPList;
+import pt.gov.dgarq.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 import pt.gov.dgarq.roda.wui.main.client.BreadcrumbItem;
 import pt.gov.dgarq.roda.wui.main.client.BreadcrumbPanel;
 
@@ -140,7 +143,7 @@ public class Browse extends Composite {
   Label itemDates;
 
   @UiField
-  HTML itemDescriptiveMetadata;
+  HTML itemMetadata;
 
   @UiField
   Label fondsPanelTitle;
@@ -153,6 +156,9 @@ public class Browse extends Composite {
 
   @UiField
   FlowPanel downloadList;
+
+  @UiField
+  FlowPanel viewersList;
 
   @UiField
   Button createItem;
@@ -273,8 +279,8 @@ public class Browse extends Composite {
     itemTitle.setText(id);
     itemDates.setText("");
 
-    itemDescriptiveMetadata.setHTML(SafeHtmlUtils.fromSafeConstant(caught.getMessage()));
-    itemDescriptiveMetadata.setVisible(true);
+    itemMetadata.setHTML(SafeHtmlUtils.fromSafeConstant(caught.getMessage()));
+    itemMetadata.setVisible(true);
 
     viewingTop = false;
     fondsPanelTitle.setVisible(false);
@@ -295,6 +301,7 @@ public class Browse extends Composite {
     if (itemBundle != null) {
       SimpleDescriptionObject sdo = itemBundle.getSdo();
       List<DescriptiveMetadataViewBundle> descMetadata = itemBundle.getDescriptiveMetadata();
+      PreservationMetadataBundle preservationMetadata = itemBundle.getPreservationMetadata();
       List<Representation> representations = itemBundle.getRepresentations();
 
       breadcrumb.updatePath(getBreadcrumbsFromAncestors(itemBundle.getSdoAncestors(), sdo));
@@ -307,8 +314,8 @@ public class Browse extends Composite {
       itemDates.setText(getDatesText(sdo));
 
       SafeHtml html = getDescriptiveMetadataPanelHTML(sdo.getId(), descMetadata);
-      itemDescriptiveMetadata.setHTML(html);
-      itemDescriptiveMetadata.setVisible(true);
+      itemMetadata.setHTML(html);
+      itemMetadata.setVisible(true);
 
       viewingTop = false;
       fondsPanelTitle.setVisible(true);
@@ -316,6 +323,7 @@ public class Browse extends Composite {
       fondsPanel.setFilter(filter);
 
       downloadList.clear();
+      viewersList.clear();
       sidebarGroupDownloads.setVisible(true);
 
       for (Representation rep : representations) {
@@ -323,10 +331,12 @@ public class Browse extends Composite {
       }
 
       if (!descMetadata.isEmpty()) {
-        downloadList.add(createDescriptiveMetadataDownloadPanel(sdo.getId(), descMetadata));
+        viewersList.add(createDescriptiveMetadataDownloadPanel(sdo.getId(), descMetadata));
       }
-      // TODO change to presMetadata
-      downloadList.add(createPreservationMetadataDownloadPanel(sdo.getId(), descMetadata));
+
+      if (preservationMetadata.getNumberOfFiles() > 0) {
+        viewersList.add(createPreservationMetadataDownloadPanel(sdo.getId(), preservationMetadata));
+      }
 
       // Set button visibility
       createItem.setVisible(true);
@@ -352,8 +362,8 @@ public class Browse extends Composite {
     itemTitle.setText("All collections");
     itemTitle.addStyleName("browseTitle-allCollections");
     itemDates.setText("");
-    itemDescriptiveMetadata.setText("");
-    itemDescriptiveMetadata.setVisible(false);
+    itemMetadata.setText("");
+    itemMetadata.setVisible(false);
     viewingTop = true;
     fondsPanelTitle.setVisible(false);
     fondsPanel.setFilter(COLLECTIONS_FILTER);
@@ -396,7 +406,8 @@ public class Browse extends Composite {
 
   private Widget createRepresentationDownloadPanel(Representation rep) {
     FlowPanel downloadPanel = new FlowPanel();
-    HTML icon = new HTML(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-download'></i>"));
+    // HTML icon = new HTML(SafeHtmlUtils.fromSafeConstant("<i class='fa
+    // fa-download'></i>"));
 
     SafeHtml labelText;
     Set<RepresentationState> statuses = rep.getStatuses();
@@ -417,11 +428,11 @@ public class Browse extends Composite {
 
     labelsPanel.add(label);
     labelsPanel.add(subLabel);
-    downloadPanel.add(icon);
+    // downloadPanel.add(icon);
     downloadPanel.add(labelsPanel);
 
     downloadPanel.addStyleName("browseDownload");
-    icon.addStyleName("browseDownloadIcon");
+    // icon.addStyleName("browseDownloadIcon");
     labelsPanel.addStyleName("browseDownloadLabels");
     label.addStyleName("browseDownloadLabel");
     subLabel.addStyleName("browseDownloadSublabel");
@@ -445,7 +456,8 @@ public class Browse extends Composite {
   private Widget createDescriptiveMetadataDownloadPanel(String aipId,
     List<DescriptiveMetadataViewBundle> descMetadata) {
     FlowPanel downloadPanel = new FlowPanel();
-    HTML icon = new HTML(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-download'></i>"));
+    // HTML icon = new HTML(SafeHtmlUtils.fromSafeConstant("<i class='fa
+    // fa-download'></i>"));
     FlowPanel labelsPanel = new FlowPanel();
 
     int files = descMetadata.size();
@@ -460,11 +472,11 @@ public class Browse extends Composite {
 
     labelsPanel.add(label);
     labelsPanel.add(subLabel);
-    downloadPanel.add(icon);
+    // downloadPanel.add(icon);
     downloadPanel.add(labelsPanel);
 
     downloadPanel.addStyleName("browseDownload");
-    icon.addStyleName("browseDownloadIcon");
+    // icon.addStyleName("browseDownloadIcon");
     labelsPanel.addStyleName("browseDownloadLabels");
     label.addStyleName("browseDownloadLabel");
     subLabel.addStyleName("browseDownloadSublabel");
@@ -472,29 +484,39 @@ public class Browse extends Composite {
   }
 
   private Widget createPreservationMetadataDownloadPanel(String aipId,
-    List<DescriptiveMetadataViewBundle> descMetadata) {
-    FlowPanel downloadPanel = new FlowPanel();
-    HTML icon = new HTML(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-download'></i>"));
+    PreservationMetadataBundle preservationMetadata) {
+    AccessibleFocusPanel downloadPanel = new AccessibleFocusPanel();
+    // HTML icon = new HTML(SafeHtmlUtils.fromSafeConstant("<i class='fa
+    // fa-download'></i>"));
     FlowPanel labelsPanel = new FlowPanel();
 
-    int files = descMetadata.size();
-    long sizeInBytes = 0;
-    for (DescriptiveMetadataViewBundle desc : descMetadata) {
-      sizeInBytes += desc.getSizeInBytes();
-    }
+    final int files = preservationMetadata.getNumberOfFiles();
+    final long sizeInBytes = preservationMetadata.getSizeInBytes();
+    final String html = preservationMetadata.getHtml();
 
     // TODO externalize strings
-    Anchor label = new Anchor(SafeHtmlUtils.fromSafeConstant("Preservation metadata"),
-      RestUtils.createPreservationMetadataDownloadUri(aipId));
+    // Anchor label = new Anchor(SafeHtmlUtils.fromSafeConstant("Preservation
+    // metadata"),
+    // RestUtils.createPreservationMetadataDownloadUri(aipId));
+    Label label = new Label("Preservation metadata");
     Label subLabel = new Label(files + " files, " + readableFileSize(sizeInBytes));
 
     labelsPanel.add(label);
     labelsPanel.add(subLabel);
-    downloadPanel.add(icon);
+    // downloadPanel.add(icon);
     downloadPanel.add(labelsPanel);
 
     downloadPanel.addStyleName("browseDownload");
-    icon.addStyleName("browseDownloadIcon");
+
+    downloadPanel.addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        itemMetadata.setHTML(SafeHtmlUtils.fromTrustedString(html));
+      }
+    });
+
+    // icon.addStyleName("browseDownloadIcon");
     labelsPanel.addStyleName("browseDownloadLabels");
     label.addStyleName("browseDownloadLabel");
     subLabel.addStyleName("browseDownloadSublabel");
@@ -525,9 +547,17 @@ public class Browse extends Composite {
     List<DescriptiveMetadataViewBundle> descriptiveMetadata) {
     SafeHtmlBuilder builder = new SafeHtmlBuilder();
     for (DescriptiveMetadataViewBundle bundle : descriptiveMetadata) {
+      // Download link
+      SafeUri downloadUri = RestUtils.createDescriptiveMetadataDownloadUri(aipId, bundle.getId());
+      String downloadLinkHtml = "<a href='" + downloadUri.asString() + "' class='descriptiveMetadataLink'>download</a>";
+      builder.append(SafeHtmlUtils.fromSafeConstant(downloadLinkHtml));
+
+      // Edit link
       String editLink = Tools.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId, bundle.getId());
-      String editLinkHtml = "<a href='" + editLink + "' class='descriptiveMetadataEdit'>edit</a>";
+      String editLinkHtml = "<a href='" + editLink + "' class='descriptiveMetadataLink'>edit</a>";
       builder.append(SafeHtmlUtils.fromSafeConstant(editLinkHtml));
+
+      // Content
       builder.append(SafeHtmlUtils.fromTrustedString(bundle.getHtml()));
     }
     return builder.toSafeHtml();

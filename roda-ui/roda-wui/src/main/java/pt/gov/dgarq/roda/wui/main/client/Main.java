@@ -136,24 +136,7 @@ public class Main extends Composite implements EntryPoint {
     } else {
 
       List<String> currentHistoryPath = Tools.getCurrentHistoryPath();
-      GWT.log("History path: " + currentHistoryPath);
       contentPanel.update(currentHistoryPath);
-
-      /*
-       * Scheduler.get().scheduleDeferred(new Command() {
-       * 
-       * public void execute() {
-       * ClientLoggerService.Util.getInstance().pagehit(decodedHistoryToken, new
-       * AsyncCallback<Void>() {
-       * 
-       * public void onFailure(Throwable caught) { // do nothing }
-       * 
-       * public void onSuccess(Void result) { // do nothing }
-       * 
-       * }); }
-       * 
-       * });
-       */
       GAnalyticsTracker.track(historyToken);
     }
   }

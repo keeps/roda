@@ -86,11 +86,9 @@ public class BrowserHelper {
       List<DescriptiveMetadataViewBundle> descriptiveMetadataList = getDescriptiveMetadataBundles(aipId, locale);
       itemBundle.setDescriptiveMetadata(descriptiveMetadataList);
 
-      // TODO
-      // // set preservation metadata
-      // List<PreservationMetadataBundle> preservationMetadataList =
-      // getPreservationMetadataBundles(aipId, locale);
-      // itemBundle.setPreservationMetadata(preservationMetadataList);
+      // set preservation metadata
+      PreservationMetadataBundle preservationMetadata = getPreservationMetadataBundle(aipId, locale);
+      itemBundle.setPreservationMetadata(preservationMetadata);
 
       // set representations
       // getting the last 2 representations
@@ -130,10 +128,11 @@ public class BrowserHelper {
       for (DescriptiveMetadata descriptiveMetadata : listDescriptiveMetadataBinaries) {
         Binary binary = RodaCoreFactory.getStorageService().getBinary(descriptiveMetadata.getStoragePath());
         String html = "";
-        try{
+        try {
           html = HTMLUtils.descriptiveMetadataToHtml(binary, locale);
-        }catch(ModelServiceException e){
-          html = "<div class=\"descriptiveMetadata indexError\"><div class='title'>"+descriptiveMetadata.getId()+"</div></div>";
+        } catch (ModelServiceException e) {
+          html = "<div class=\"descriptiveMetadata indexError\"><div class='title'>" + descriptiveMetadata.getId()
+            + "</div></div>";
         }
         descriptiveMetadataList
           .add(new DescriptiveMetadataViewBundle(descriptiveMetadata.getId(), html, binary.getSizeInBytes()));
@@ -148,7 +147,7 @@ public class BrowserHelper {
 
     return descriptiveMetadataList;
   }
-  
+
   private static PreservationMetadataBundle getPreservationMetadataBundle(String aipId, final Locale locale)
     throws ModelServiceException, StorageServiceException {
     ModelService model = RodaCoreFactory.getModelService();
@@ -558,9 +557,9 @@ public class BrowserHelper {
 
   public static DescriptiveMetadata createDescriptiveMetadataFile(String aipId, String descriptiveMetadataId,
     String descriptiveMetadataType, Binary descriptiveMetadataIdBinary) throws GenericException, ValidationException {
-    
+
     ValidationUtils.validateDescriptiveBinary(descriptiveMetadataIdBinary, descriptiveMetadataId, false);
-    
+
     DescriptiveMetadata ret;
     try {
       ModelService model = RodaCoreFactory.getModelService();
@@ -584,7 +583,7 @@ public class BrowserHelper {
       throws GenericException, AuthorizationDeniedException, ValidationException {
 
     ValidationUtils.validateDescriptiveBinary(descriptiveMetadataIdBinary, descriptiveMetadataId, false);
-    
+
     try {
       ModelService model = RodaCoreFactory.getModelService();
       return model.updateDescriptiveMetadata(aipId, descriptiveMetadataId, descriptiveMetadataIdBinary,

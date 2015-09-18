@@ -13,6 +13,7 @@ public class BrowseItemBundle implements Serializable {
   private SimpleDescriptionObject sdo;
   private List<SimpleDescriptionObject> sdoAncestors;
   private List<DescriptiveMetadataViewBundle> descriptiveMetadata;
+  private PreservationMetadataBundle preservationMetadata;
   private List<Representation> representations;
 
   public BrowseItemBundle() {
@@ -21,11 +22,13 @@ public class BrowseItemBundle implements Serializable {
   }
 
   public BrowseItemBundle(SimpleDescriptionObject sdo, List<SimpleDescriptionObject> sdoAncestors,
-    List<DescriptiveMetadataViewBundle> descriptiveMetadata, List<Representation> representations) {
+    List<DescriptiveMetadataViewBundle> descriptiveMetadata, PreservationMetadataBundle preservationMetadata,
+    List<Representation> representations) {
     super();
     this.sdo = sdo;
     this.setSdoAncestors(sdoAncestors);
     this.descriptiveMetadata = descriptiveMetadata;
+    this.preservationMetadata = preservationMetadata;
     this.representations = representations;
   }
 
@@ -43,6 +46,14 @@ public class BrowseItemBundle implements Serializable {
 
   public void setDescriptiveMetadata(List<DescriptiveMetadataViewBundle> descriptiveMetadata) {
     this.descriptiveMetadata = descriptiveMetadata;
+  }
+
+  public PreservationMetadataBundle getPreservationMetadata() {
+    return preservationMetadata;
+  }
+
+  public void setPreservationMetadata(PreservationMetadataBundle preservationMetadata) {
+    this.preservationMetadata = preservationMetadata;
   }
 
   public List<Representation> getRepresentations() {

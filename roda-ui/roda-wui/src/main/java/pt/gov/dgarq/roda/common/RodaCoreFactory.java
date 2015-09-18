@@ -335,7 +335,6 @@ public class RodaCoreFactory {
           String solrQueryString = args.get(3);
           try {
             QueryResponse executeSolrQuery = SolrUtils.executeSolrQuery(solr, collection, solrQueryString);
-            ;
             SolrDocumentList results = executeSolrQuery.getResults();
             System.out.println("Size: " + results.getNumFound() + "; Returned: " + results.size());
             for (SolrDocument solrDocument : results) {

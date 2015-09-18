@@ -48,7 +48,7 @@
 	font-size: 1.2rem;
 }
 
-.browseItemDescriptiveMetadata {
+.browseItemMetadata {
 	padding: 20px 0;
 }
 
@@ -77,11 +77,16 @@
 	-moz-osx-font-smoothing: grayscale;
 }
 
-.descriptiveMetadataEdit {
-	color: #089de3;
+.descriptiveMetadataLink {
 	float: right;
 	font-size: 1.3rem;
 	margin-right: 1px;
+	margin-left: 5px;
+}
+
+.descriptiveMetadataLink+.descriptiveMetadataLink:after {
+	content: '·';
+	margin-left: 5px;
 }
 
 .descriptiveMetadata-field {
@@ -95,26 +100,6 @@
 
 .descriptiveMetadata-field-value {
 	
-}
-
-.descriptiveMetadata-field-value thead td {
-	font-weight: 500;
-}
-
-.descriptiveMetadata-field-value th, .descriptiveMetadata-field-value td
-	{
-	padding: 7px 10px;
-	text-align: left;
-	border-bottom: 1px solid #E1E1E1;
-}
-
-.descriptiveMetadata-field-value  th:first-child,
-	.descriptiveMetadata-field-value  td:first-child {
-	padding-left: 0;
-}
-
-.descriptiveMetadata-field-value th:last-child, .descriptiveMetadata-field-value td:last-child {
-	padding-right: 0;
 }
 
 .browseDownload {
@@ -138,7 +123,7 @@
 
 .browseDownloadSublabel {
 	font-size: 1rem;
-	margin-left: 25px;
+	/*margin-left: 25px;*/
 }
 
 .metadata-edit-area {
@@ -154,6 +139,216 @@
 .metadata-edit-errors .error {
 	margin-bottom: 5px;
 	display: block;
+}
+
+/* --------------------------------------------------
+
+  ****************** PREMIS ************************
+
+  –––––––––––––––––––––––––––––––––––––––––––––––––– */
+.representation .header {
+	font-size: 3rem;
+	display: block;
+}
+
+.representation .header:before {
+	content: '\f1b3';
+	font-family: 'FontAwesome';
+}
+
+.representation .header .identifiers {
+	font-size: 1.5rem;
+}
+
+.header .identifiers:before {
+	content: '(';
+}
+
+.header .identifiers:after {
+	content: ')';
+}
+
+.header .identifierType {
+	display: none;
+}
+
+.identifier+.identifier:before {
+	content: ',';
+}
+
+.representation .header .identifiers {
+	font-size: 1.5rem;
+}
+
+.representation .preservationLevel, .derivation {
+	color: #888;
+	display: block;
+	margin-left: 3.2rem;
+}
+
+.section {
+	display: block;
+}
+
+.sectionTitle {
+	display: block;
+	font-size: 2.2rem;
+	margin-left: 3.2rem;
+	margin-top: 1rem;
+}
+
+.sectionContent {
+	display: block;
+	margin-left: 3.2rem;
+}
+
+.file, .event {
+	margin-bottom: 2rem;
+	display: block;
+}
+
+.file .header {
+	display: block;
+	font-size: 1.6rem;
+	display: block;
+}
+
+.file .header:before {
+	content: '\f1b2';
+	font-family: 'FontAwesome';
+}
+
+.file .header .identifiers {
+	font-size: 1.3rem;
+}
+
+.file .subheader {
+	display: block;
+	color: #888;
+	font-size: 1.2rem;
+	margin-left: 2rem;
+}
+
+.file .subheader .size:after {
+	content: ' B,';
+}
+
+.formatRegistry:before {
+	content: '(';
+}
+
+.formatRegistry:after {
+	content: ')';
+}
+
+.formatRegistryName:after {
+	content: ':';
+}
+
+.browseItemMetadata .content {
+	display: block;
+	margin-left: 2rem;
+	border-left: 1px solid #ccc;
+	padding-left: 10px;
+}
+
+.field {
+	display: block;
+	line-height: 1.6rem;
+}
+
+.field-label {
+	font-weight: bold;
+	font-size: 1.2rem;
+}
+
+.field-label:after {
+	content: ':';
+}
+
+.field-value {
+	font-size: 1.2rem;
+}
+
+.field-value table {
+	display: inline;
+	margin: 0px 15px;
+}
+
+.field-value table th, td {
+	font-size: 1.2rem;
+	padding: 5px 10px;
+}
+
+.field-value th:first-child, td:first-child {
+	padding-left: 0;
+}
+
+.field-value th:last-child, td:last-child {
+	padding-right: 0;
+}
+
+.event .header {
+	display: block;
+	font-size: 1.6rem;
+	display: block;
+}
+
+.event .header:before {
+	content: '\f017';
+	font-family: 'FontAwesome';
+	text-rendering: auto;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+.event .header .identifier {
+	font-size: 1.3rem;
+}
+
+.event .header .identifier:before {
+	content: '(';
+}
+
+.event .header .identifier:after {
+	content: ')';
+}
+
+.event .subheader {
+	display: block;
+	color: #888;
+	font-size: 1.2rem;
+	margin-left: 2rem;
+}
+
+.event .linkingAgent .type, .event .linkingObject .type {
+	display: none;
+}
+
+.event .linkingAgent .value:before, .event .linkingObject .value:before
+	{
+	content: '(';
+}
+
+.event .linkingAgent .value:after, .event .linkingObject .value:after {
+	content: ')';
+}
+
+.agent .header {
+	font-size: 1.6rem;
+	display: block;
+}
+
+.agent .header:before {
+	content: '\f007';
+	font-family: 'FontAwesome';
+}
+
+.agent .subheader {
+	display: block;
+	color: #888;
+	font-size: 1.2rem;
+	margin-left: 2rem;
 }
 
 /** Browser**/

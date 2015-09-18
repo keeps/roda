@@ -41,6 +41,19 @@ public class RestUtils {
     return UriUtils.fromSafeConstant(b.toString());
   }
 
+  public static SafeUri createDescriptiveMetadataDownloadUri(String aipId, String descId) {
+
+    // api/v1/aips/{aip_id}/descriptive_metadata/{descId}?acceptFormat=bin
+    StringBuilder b = new StringBuilder();
+    // base uri
+    b.append(REST_V1_AIPS).append(UriUtils.encode(aipId)).append(SEP).append(DESCRIPTIVE_METADATA).append(SEP)
+      .append(descId);
+    // accept format attribute
+    b.append(QUERY_START).append(ATTR_ACCEPT_FORMAT).append(ATTR_ASSIGN_SYMBOL).append(ATTR_ACCEPT_FORMAT_BIN);
+
+    return UriUtils.fromSafeConstant(b.toString());
+  }
+
   public static SafeUri createPreservationMetadataDownloadUri(String aipId) {
 
     // api/v1/aips/{aip_id}/preservation_metadata/?acceptFormat=bin
