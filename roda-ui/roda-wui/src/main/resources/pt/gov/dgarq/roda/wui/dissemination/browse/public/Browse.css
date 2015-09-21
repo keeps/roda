@@ -191,10 +191,6 @@
 	content: ':';
 }
 
-.identifier+.identifier:before {
-	content: ',';
-}
-
 .representation .header .identifiers {
 	font-size: 1.5rem;
 }

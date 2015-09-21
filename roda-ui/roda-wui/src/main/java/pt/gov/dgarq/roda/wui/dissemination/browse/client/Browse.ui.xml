@@ -35,14 +35,14 @@
 				<common:AIPList ui:field="fondsPanel" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
-				<g:FlowPanel>
+				<g:FlowPanel ui:field="sidebarMetadata">
 					<g:Label addStyleNames="h4">
 						<ui:msg>Metadata</ui:msg>
 					</g:Label>
 					<g:FlowPanel ui:field="viewersList">
 					</g:FlowPanel>
 				</g:FlowPanel>
-				<g:FlowPanel ui:field="sidebarGroupDownloads">
+				<g:FlowPanel ui:field="sidebarData">
 					<g:Label addStyleNames="h4">
 						<ui:msg>Data</ui:msg>
 					</g:Label>

@@ -157,7 +157,10 @@ public class Browse extends Composite {
   AIPList fondsPanel;
 
   @UiField
-  FlowPanel sidebarGroupDownloads;
+  FlowPanel sidebarMetadata;
+
+  @UiField
+  FlowPanel sidebarData;
 
   @UiField
   FlowPanel downloadList;
@@ -296,7 +299,8 @@ public class Browse extends Composite {
     fondsPanel.setVisible(false);
 
     downloadList.clear();
-    sidebarGroupDownloads.setVisible(false);
+    sidebarMetadata.setVisible(false);
+    sidebarData.setVisible(false);
 
     // Set button visibility
     createItem.setVisible(false);
@@ -333,7 +337,7 @@ public class Browse extends Composite {
 
       downloadList.clear();
       viewersList.clear();
-      sidebarGroupDownloads.setVisible(true);
+      sidebarData.setVisible(representations.size() > 0);
 
       for (Representation rep : representations) {
         downloadList.add(createRepresentationDownloadPanel(rep));
@@ -346,6 +350,8 @@ public class Browse extends Composite {
       if (preservationMetadata.getNumberOfFiles() > 0) {
         viewersList.add(createPreservationMetadataDownloadPanel(sdo.getId(), preservationMetadata));
       }
+
+      sidebarMetadata.setVisible(!descMetadata.isEmpty() || preservationMetadata.getNumberOfFiles() > 0);
 
       // Set button visibility
       createItem.setVisible(true);
@@ -377,7 +383,8 @@ public class Browse extends Composite {
     fondsPanelTitle.setVisible(false);
     fondsPanel.setFilter(COLLECTIONS_FILTER);
 
-    sidebarGroupDownloads.setVisible(false);
+    sidebarData.setVisible(false);
+    sidebarMetadata.setVisible(false);
     downloadList.clear();
 
     // Set button visibility
