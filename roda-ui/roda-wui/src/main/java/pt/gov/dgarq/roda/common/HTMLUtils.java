@@ -76,7 +76,7 @@ public final class HTMLUtils {
     long totalSizeInBytes = 0L;
     int numberOfFiles = 0;
     StringBuffer s = new StringBuffer();
-    s.append("<span class='representations'>");
+    s.append("<span class='preservationMetadata'><div class='title'>PREMIS</div>");    
     if (aip.getRepresentationIds() != null && aip.getRepresentationIds().size() > 0) {
       /*agentsID = new TreeSet<String>();
       for (String representationId : aip.getRepresentationIds()) {

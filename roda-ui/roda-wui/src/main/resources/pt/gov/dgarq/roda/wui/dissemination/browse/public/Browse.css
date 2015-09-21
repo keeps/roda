@@ -56,7 +56,7 @@
 	font-size: 1.3rem;
 }
 
-.descriptiveMetadata .title {
+.descriptiveMetadata .title, .preservationMetadata .title {
 	color: #a7a9ac;
 	border-bottom: 1px solid rgba(167, 169, 172, 0.5);
 	padding-bottom: 5px;
@@ -103,12 +103,13 @@
 }
 
 .browseDownload {
-	margin-bottom: 5px;
+	margin-bottom: 10px;
 }
 
 .browseDownloadIcon {
 	float: left;
 	font-size: 20px;
+	line-height: 30px;
 	margin-right: 7px;
 }
 
@@ -118,7 +119,8 @@
 
 .browseDownloadLabel {
 	color: #089de3;
-	font-size: 1.2rem
+	font-size: 1.2rem;
+	cursor: pointer;
 }
 
 .browseDownloadSublabel {
@@ -146,30 +148,47 @@
   ****************** PREMIS ************************
 
   –––––––––––––––––––––––––––––––––––––––––––––––––– */
+.toggle-next {
+	cursor: pointer;
+}
+
 .representation .header {
-	font-size: 3rem;
+	font-size: 2rem;
 	display: block;
 }
 
 .representation .header:before {
 	content: '\f1b3';
 	font-family: 'FontAwesome';
+	text-rendering: auto;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	margin-right: 5px;
 }
 
 .representation .header .identifiers {
 	font-size: 1.5rem;
 }
 
-.header .identifiers:before {
-	content: '(';
+.header .field {
+	display: inline;
+	font-size: 1rem;
+	background-color: #eee;
+	padding: 4px;
+	border-radius: 3px;
+	margin: 0 2px;
 }
 
-.header .identifiers:after {
-	content: ')';
+.header>.field .field-label:after {
+	content: ':';
 }
 
 .header .identifierType {
-	display: none;
+	display: none;	
+}
+
+.header .identifierType:after {
+	content: ':';
 }
 
 .identifier+.identifier:before {
@@ -184,51 +203,55 @@
 	color: #888;
 	display: block;
 	margin-left: 3.2rem;
+	font-size: 1.1rem;
 }
 
 .section {
 	display: block;
+	margin-left: 3.2rem;
 }
 
 .sectionTitle {
 	display: block;
-	font-size: 2.2rem;
-	margin-left: 3.2rem;
+	font-size: 1.8rem;
 	margin-top: 1rem;
 }
 
 .sectionContent {
 	display: block;
-	margin-left: 3.2rem;
 }
 
 .file, .event {
-	margin-bottom: 2rem;
+	margin-bottom: 0.1rem;
 	display: block;
 }
 
 .file .header {
 	display: block;
-	font-size: 1.6rem;
+	font-size: 1.4rem;
 	display: block;
 }
 
 .file .header:before {
 	content: '\f1b2';
 	font-family: 'FontAwesome';
+	text-rendering: auto;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	margin-right: 5px;
 }
 
 .file .header .identifiers {
-	font-size: 1.3rem;
+	
 }
 
 .file .subheader {
 	display: block;
-    color: #888;
-    font-size: 1.2rem;
-    margin-left: 7px;
-    border-left: 1px solid #ccc;
-    padding-left: 10px;
+	color: #888;
+	font-size: 1.2rem;
+	margin-left: 7px;
+	border-left: 1px solid #ccc;
+	padding-left: 13px;
 }
 
 .file .subheader .size:after {
@@ -248,27 +271,51 @@
 }
 
 .browseItemMetadata .content {
-	display: block;
-    margin-left: 7px;
-    border-left: 1px solid #ccc;
-    padding-left: 10px;
+	/*display: block;*/
+	display: none; /* for toggle */
+	margin-left: 7px;
+	border-left: 1px solid #ccc;
+	padding-left: 13px;
+	padding-top: 5px;
 }
 
-.field {
+/* Tables
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+.browseItemMetadata thead td {
+	font-weight: 500;
+}
+
+.browseItemMetadata th, .browseItemMetadata td {
+	/*padding: 12px 15px;*/
+	padding: 7px 10px;
+	text-align: left;
+	border-bottom: 1px solid #E1E1E1;
+}
+
+.browseItemMetadata th:first-child, .browseItemMetadata td:first-child {
+	padding-left: 0;
+}
+
+.browseItemMetadata th:last-child, .browseItemMetadata td:last-child {
+	padding-right: 0;
+}
+
+.content>.field {
 	display: block;
 	line-height: 1.6rem;
+	margin-bottom: 0.5rem;
 }
 
-.field-label {
+.content>.field .field-label {
 	font-weight: bold;
 	font-size: 1.2rem;
 }
 
-.field-label:after {
+.content>.field .field-label:after {
 	content: ':';
 }
 
-.field-value {
+.content>.field .field-value {
 	font-size: 1.2rem;
 }
 
@@ -278,8 +325,7 @@
 
 .event .header {
 	display: block;
-	font-size: 1.6rem;
-	display: block;
+	font-size: 1.4rem;
 }
 
 .event .header:before {
@@ -291,15 +337,7 @@
 }
 
 .event .header .identifier {
-	font-size: 1.3rem;
-}
 
-.event .header .identifier:before {
-	content: '(';
-}
-
-.event .header .identifier:after {
-	content: ')';
 }
 
 .event .subheader {

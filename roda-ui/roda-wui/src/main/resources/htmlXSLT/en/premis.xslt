@@ -3,7 +3,8 @@
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:prem="info:lc/xmlns/premis-v2"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	exclude-result-prefixes="prem">
-	<xsl:strip-space elements="*" />
+	<!-- <xsl:strip-space elements="*" /> -->
+	<xsl:preserve-space elements="*" />
 	<xsl:output method="xml" indent="yes" encoding="UTF-8"
 		omit-xml-declaration="yes" />
 	<xsl:param name="events" />
@@ -24,25 +25,25 @@
 				</xsl:if>
 				<xsl:if test="prem:agentIdentifier/prem:agentIdentifierType/text()">
 					<xsl:for-each select="prem:agentIdentifier">
-						<span class="identifier">
-							<span class="identifierType">
+						<span class="identifier field">
+							<span class="identifierType field-label">
 								<xsl:value-of select="normalize-space(prem:agentIdentifierType/text())" />
 							</span>
-							<span class="identifierValue">
+							<span class="identifierValue field-value">
 								<xsl:value-of
 									select="normalize-space(prem:agentIdentifierValue/text())" />
 							</span>
 						</span>
 					</xsl:for-each>
 				</xsl:if>
-			</span>
-			<xsl:if test="prem:agentType">
-				<span class="subheader">
+				<xsl:if test="prem:agentType">
 					<span class="field agentType">
-						<xsl:value-of select="normalize-space(prem:agentType/text())" />
+						<span class="field-value">
+							<xsl:value-of select="normalize-space(prem:agentType/text())" />
+						</span>
 					</span>
-				</span>
-			</xsl:if>
+				</xsl:if>
+			</span>
 		</span>
 	</xsl:template>
 	<xsl:template match="prem:object">
@@ -51,18 +52,18 @@
 			<span xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 				class="representation">
 				<xsl:attribute name="id"><xsl:value-of
-					select="normalize-space(prem:objectIdentifier[1]/prem:objectIdentifierType/text())" /></xsl:attribute>
+					select="normalize-space(prem:objectIdentifier[1]/prem:objectIdentifierValue/text())" /></xsl:attribute>
 				<span class="header">
 					<xsl:text>Representation</xsl:text>
 					<xsl:if test="prem:objectIdentifier">
 						<span class="identifiers">
 							<xsl:for-each select="prem:objectIdentifier">
-								<span class="identifier">
-									<span class="identifierType">
+								<span class="identifier field">
+									<span class="identifierType field-label">
 										<xsl:value-of
 											select="normalize-space(prem:objectIdentifierType/text())" />
 									</span>
-									<span class="identifierValue">
+									<span class="identifierValue field-value">
 										<xsl:value-of
 											select="normalize-space(prem:objectIdentifierValue/text())" />
 									</span>
@@ -74,7 +75,7 @@
 				<xsl:if test="prem:preservationLevel">
 					<xsl:for-each select="prem:preservationLevel">
 						<span class="preservationLevel">
-							<xsl:text>Preservation level:</xsl:text>
+							<xsl:text>Preservation level: </xsl:text>
 							<xsl:value-of select="prem:preservationLevelValue/text()" />
 							<xsl:text> since </xsl:text>
 							<xsl:value-of select="prem:preservationLevelDateAssigned/text()" />
@@ -110,25 +111,22 @@
 			test='resolve-QName(@xsi:type, .) = QName("info:lc/xmlns/premis-v2", "file")'>
 			<span class="file">
 				<xsl:attribute name="id"><xsl:value-of
-					select="normalize-space(prem:objectIdentifier[1]/prem:objectIdentifierType/text())" /></xsl:attribute>
-				<span class="header">
-					<xsl:text>File</xsl:text>
+					select="normalize-space(prem:objectIdentifier[1]/prem:objectIdentifierValue/text())" /></xsl:attribute>
+				<span class="header toggle-next">
 					<xsl:if test="prem:originalName">
 						<span class="originalName">
-							<xsl:text>"</xsl:text>
 							<xsl:value-of select="normalize-space(prem:originalName/text())" />
-							<xsl:text>"</xsl:text>
 						</span>
 					</xsl:if>
 					<xsl:if test="prem:objectIdentifier">
 						<span class="identifiers">
 							<xsl:for-each select="prem:objectIdentifier">
-								<span class="identifier">
-									<span class="identifierType">
+								<span class="identifier field">
+									<span class="identifierType field-label">
 										<xsl:value-of
 											select="normalize-space(prem:objectIdentifierType/text())" />
 									</span>
-									<span class="identifierValue">
+									<span class="identifierValue field-value">
 										<xsl:value-of
 											select="normalize-space(prem:objectIdentifierValue/text())" />
 									</span>
@@ -136,38 +134,46 @@
 							</xsl:for-each>
 						</span>
 					</xsl:if>
-				</span>
-				<span class="subheader">
 					<xsl:if test="prem:objectCharacteristics/prem:size">
-						<span class="size">
-							<xsl:value-of select="prem:objectCharacteristics/prem:size/text()" />
+						<span class="field size">
+							<span class="field-label">
+								<xsl:text>size</xsl:text>
+							</span>
+							<span class="field-value">
+								<xsl:value-of select="prem:objectCharacteristics/prem:size/text()" />
+							</span>
 						</span>
 					</xsl:if>
 					<xsl:if test="prem:objectCharacteristics/prem:format">
-						<span class="format">
-							<xsl:if
-								test="prem:objectCharacteristics/prem:format/prem:formatDesignation/prem:formatName">
-								<span class="formatName">
-									<xsl:value-of
-										select="prem:objectCharacteristics/prem:format/prem:formatDesignation/prem:formatName/text()" />
-								</span>
-							</xsl:if>
-							<xsl:if
-								test="prem:objectCharacteristics/prem:format/prem:formatRegistry/prem:formatRegistryName">
-								<span class="formatRegistry">
-									<span class="formatRegistryName">
+						<span class="field format">
+							<span class="field-label">
+								<xsl:text>format</xsl:text>
+							</span>
+							<span class="field-value">
+								<xsl:if
+									test="prem:objectCharacteristics/prem:format/prem:formatDesignation/prem:formatName">
+									<span class="formatName">
 										<xsl:value-of
-											select="prem:objectCharacteristics/prem:format/prem:formatRegistry/prem:formatRegistryName/text()" />
+											select="prem:objectCharacteristics/prem:format/prem:formatDesignation/prem:formatName/text()" />
 									</span>
-									<xsl:if
-										test="prem:objectCharacteristics/prem:format/prem:formatRegistry/prem:formatRegistryKey">
-										<span class="formatRegistryKey">
+								</xsl:if>
+								<xsl:if
+									test="prem:objectCharacteristics/prem:format/prem:formatRegistry/prem:formatRegistryName">
+									<span class="formatRegistry">
+										<span class="formatRegistryName">
 											<xsl:value-of
-												select="prem:objectCharacteristics/prem:format/prem:formatRegistry/prem:formatRegistryKey/text()" />
+												select="prem:objectCharacteristics/prem:format/prem:formatRegistry/prem:formatRegistryName/text()" />
 										</span>
-									</xsl:if>
-								</span>
-							</xsl:if>
+										<xsl:if
+											test="prem:objectCharacteristics/prem:format/prem:formatRegistry/prem:formatRegistryKey">
+											<span class="formatRegistryKey">
+												<xsl:value-of
+													select="prem:objectCharacteristics/prem:format/prem:formatRegistry/prem:formatRegistryKey/text()" />
+											</span>
+										</xsl:if>
+									</span>
+								</xsl:if>
+							</span>
 						</span>
 					</xsl:if>
 				</span>
@@ -179,8 +185,8 @@
 								<table>
 									<thead>
 										<tr>
-											<td>Algoritmo</td>
-											<td>Valor</td>
+											<td>Algorithm</td>
+											<td>Value</td>
 										</tr>
 									</thead>
 									<tbody>
@@ -268,8 +274,11 @@
 									<code>
 										<xsl:apply-templates mode="escape"
 											select="prem:objectCharacteristics/prem:objectCharacteristicsExtension/*" />
-										<!-- <xsl:copy-of select="prem:objectCharacteristics/prem:objectCharacteristicsExtension/*" 
+
+										<!-- <xsl:copy-of -->
+										<!-- select="prem:objectCharacteristics/prem:objectCharacteristicsExtension/*" 
 											/> -->
+
 									</code>
 								</pre>
 							</span>
@@ -321,33 +330,32 @@
 	</xsl:template>
 	<xsl:template match="prem:event">
 		<span class="event">
-			<span class="header">
+			<span class="header toggle-next">
 				<xsl:if test="prem:eventType">
 					<span class="type">
 						<xsl:value-of select="prem:eventType/text()" />
 					</span>
 				</xsl:if>
-
 				<xsl:if test="prem:eventIdentifier">
 					<xsl:for-each select="prem:eventIdentifier">
-						<span class="identifier">
-							<span class="identifierType">
+						<span class="identifier field">
+							<span class="identifierType field-label">
 								<xsl:value-of select="prem:eventIdentifierType/text()" />
 							</span>
-							<span class="identifierValue">
+							<span class="identifierValue field-value">
 								<xsl:value-of select="prem:eventIdentifierValue/text()" />
 							</span>
 						</span>
 					</xsl:for-each>
 				</xsl:if>
-			</span>
-			<xsl:if test="prem:eventDateTime">
-				<span class="subheader">
-					<span class="date">
-						<xsl:value-of select="prem:eventDateTime/text()" />
+				<xsl:if test="prem:eventDateTime">
+					<span class="datetime field">
+						<span class="field-value">
+							<xsl:value-of select="prem:eventDateTime/text()" />
+						</span>
 					</span>
-				</span>
-			</xsl:if>
+				</xsl:if>
+			</span>
 			<span class="content">
 				<xsl:if test="prem:eventDetail">
 					<span class="field eventDetail">

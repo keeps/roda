@@ -52,6 +52,7 @@ import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
 import pt.gov.dgarq.roda.wui.common.client.tools.DescriptionLevelUtils;
+import pt.gov.dgarq.roda.wui.common.client.tools.JavascriptUtils;
 import pt.gov.dgarq.roda.wui.common.client.tools.RestUtils;
 import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
 import pt.gov.dgarq.roda.wui.common.client.widgets.AIPList;
@@ -64,6 +65,10 @@ import pt.gov.dgarq.roda.wui.main.client.BreadcrumbPanel;
  * 
  */
 public class Browse extends Composite {
+
+  private static final String ICON_METADATA_SELECTED = "<i class='fa fa-dot-circle-o'></i>";
+
+  private static final String ICON_METADATA_DESELECTED = "<i class='fa fa-circle-o'></i>";
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
@@ -176,6 +181,10 @@ public class Browse extends Composite {
   Button remove;
 
   private boolean viewingTop;
+
+  private HTML preservationMetadataIcon;
+
+  private HTML descriptiveMetadataIcon;
 
   private Browse() {
     viewingTop = true;
@@ -331,7 +340,7 @@ public class Browse extends Composite {
       }
 
       if (!descMetadata.isEmpty()) {
-        viewersList.add(createDescriptiveMetadataDownloadPanel(sdo.getId(), descMetadata));
+        viewersList.add(createDescriptiveMetadataDownloadPanel(sdo.getId(), descMetadata, html));
       }
 
       if (preservationMetadata.getNumberOfFiles() > 0) {
@@ -352,12 +361,12 @@ public class Browse extends Composite {
 
   protected void viewAction() {
     aipId = null;
-    HTMLPanel topIcon = new HTMLPanel(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-circle-o'></i>"));
+    HTMLPanel topIcon = new HTMLPanel(SafeHtmlUtils.fromSafeConstant(ICON_METADATA_DESELECTED));
     topIcon.addStyleName("browseItemIcon-all");
     itemIcon.setWidget(topIcon);
 
-    breadcrumb.updatePath(Arrays.asList(
-      new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-circle-o'></i>"), RESOLVER.getHistoryPath())));
+    breadcrumb.updatePath(Arrays
+      .asList(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(ICON_METADATA_DESELECTED), RESOLVER.getHistoryPath())));
     breadcrumb.setVisible(false);
     itemTitle.setText("All collections");
     itemTitle.addStyleName("browseTitle-allCollections");
@@ -382,8 +391,7 @@ public class Browse extends Composite {
   private List<BreadcrumbItem> getBreadcrumbsFromAncestors(List<SimpleDescriptionObject> sdoAncestors,
     SimpleDescriptionObject sdo) {
     List<BreadcrumbItem> ret = new ArrayList<>();
-    ret.add(
-      new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-circle-o'></i>"), RESOLVER.getHistoryPath()));
+    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(ICON_METADATA_DESELECTED), RESOLVER.getHistoryPath()));
     for (SimpleDescriptionObject ancestor : sdoAncestors) {
       SafeHtml breadcrumbLabel = getBreadcrumbLabel(ancestor);
       BreadcrumbItem ancestorBreadcrumb = new BreadcrumbItem(breadcrumbLabel,
@@ -406,8 +414,7 @@ public class Browse extends Composite {
 
   private Widget createRepresentationDownloadPanel(Representation rep) {
     FlowPanel downloadPanel = new FlowPanel();
-    // HTML icon = new HTML(SafeHtmlUtils.fromSafeConstant("<i class='fa
-    // fa-download'></i>"));
+    HTML icon = new HTML(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-download'></i>"));
 
     SafeHtml labelText;
     Set<RepresentationState> statuses = rep.getStatuses();
@@ -428,11 +435,11 @@ public class Browse extends Composite {
 
     labelsPanel.add(label);
     labelsPanel.add(subLabel);
-    // downloadPanel.add(icon);
+    downloadPanel.add(icon);
     downloadPanel.add(labelsPanel);
 
     downloadPanel.addStyleName("browseDownload");
-    // icon.addStyleName("browseDownloadIcon");
+    icon.addStyleName("browseDownloadIcon");
     labelsPanel.addStyleName("browseDownloadLabels");
     label.addStyleName("browseDownloadLabel");
     subLabel.addStyleName("browseDownloadSublabel");
@@ -453,11 +460,11 @@ public class Browse extends Composite {
     return NumberFormat.getFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
   }
 
-  private Widget createDescriptiveMetadataDownloadPanel(String aipId,
-    List<DescriptiveMetadataViewBundle> descMetadata) {
-    FlowPanel downloadPanel = new FlowPanel();
-    // HTML icon = new HTML(SafeHtmlUtils.fromSafeConstant("<i class='fa
-    // fa-download'></i>"));
+  private Widget createDescriptiveMetadataDownloadPanel(String aipId, List<DescriptiveMetadataViewBundle> descMetadata,
+    final SafeHtml html) {
+    AccessibleFocusPanel downloadPanel = new AccessibleFocusPanel();
+    FlowPanel layout = new FlowPanel();
+    descriptiveMetadataIcon = new HTML(SafeHtmlUtils.fromSafeConstant(ICON_METADATA_SELECTED));
     FlowPanel labelsPanel = new FlowPanel();
 
     int files = descMetadata.size();
@@ -466,17 +473,27 @@ public class Browse extends Composite {
       sizeInBytes += desc.getSizeInBytes();
     }
 
-    Anchor label = new Anchor(SafeHtmlUtils.fromSafeConstant("Descriptive metadata"),
-      RestUtils.createDescriptiveMetadataDownloadUri(aipId));
+    Label label = new Label("Descriptive metadata");
     Label subLabel = new Label(files + " files, " + readableFileSize(sizeInBytes));
 
     labelsPanel.add(label);
     labelsPanel.add(subLabel);
-    // downloadPanel.add(icon);
-    downloadPanel.add(labelsPanel);
+    layout.add(descriptiveMetadataIcon);
+    layout.add(labelsPanel);
+    downloadPanel.setWidget(layout);
 
-    downloadPanel.addStyleName("browseDownload");
-    // icon.addStyleName("browseDownloadIcon");
+    downloadPanel.addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        itemMetadata.setHTML(html);
+        descriptiveMetadataIcon.setHTML(SafeHtmlUtils.fromSafeConstant(ICON_METADATA_SELECTED));
+        preservationMetadataIcon.setHTML(SafeHtmlUtils.fromSafeConstant(ICON_METADATA_DESELECTED));
+      }
+    });
+
+    downloadPanel.addStyleName("browseDownload clickable");
+    descriptiveMetadataIcon.addStyleName("browseDownloadIcon");
     labelsPanel.addStyleName("browseDownloadLabels");
     label.addStyleName("browseDownloadLabel");
     subLabel.addStyleName("browseDownloadSublabel");
@@ -486,50 +503,56 @@ public class Browse extends Composite {
   private Widget createPreservationMetadataDownloadPanel(String aipId,
     PreservationMetadataBundle preservationMetadata) {
     AccessibleFocusPanel downloadPanel = new AccessibleFocusPanel();
-    // HTML icon = new HTML(SafeHtmlUtils.fromSafeConstant("<i class='fa
-    // fa-download'></i>"));
+    FlowPanel layout = new FlowPanel();
+    preservationMetadataIcon = new HTML(SafeHtmlUtils.fromSafeConstant(ICON_METADATA_DESELECTED));
     FlowPanel labelsPanel = new FlowPanel();
 
     final int files = preservationMetadata.getNumberOfFiles();
     final long sizeInBytes = preservationMetadata.getSizeInBytes();
-    final String html = preservationMetadata.getHtml();
+
+    SafeHtmlBuilder builder = new SafeHtmlBuilder();
+
+    // Download link
+    SafeUri downloadUri = RestUtils.createPreservationMetadataDownloadUri(aipId);
+    String downloadLinkHtml = "<a href='" + downloadUri.asString() + "' class='descriptiveMetadataLink'>download</a>";
+    builder.append(SafeHtmlUtils.fromSafeConstant(downloadLinkHtml));
+
+    // Content
+    builder.append(SafeHtmlUtils.fromTrustedString(preservationMetadata.getHtml()));
+
+    final SafeHtml html = builder.toSafeHtml();
 
     // TODO externalize strings
-    // Anchor label = new Anchor(SafeHtmlUtils.fromSafeConstant("Preservation
-    // metadata"),
-    // RestUtils.createPreservationMetadataDownloadUri(aipId));
     Label label = new Label("Preservation metadata");
     Label subLabel = new Label(files + " files, " + readableFileSize(sizeInBytes));
 
     labelsPanel.add(label);
     labelsPanel.add(subLabel);
-    // downloadPanel.add(icon);
-    downloadPanel.add(labelsPanel);
+    layout.add(preservationMetadataIcon);
+    layout.add(labelsPanel);
+    downloadPanel.setWidget(layout);
 
-    downloadPanel.addStyleName("browseDownload");
+    downloadPanel.addStyleName("browseDownload clickable");
 
     downloadPanel.addClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent event) {
-        itemMetadata.setHTML(SafeHtmlUtils.fromTrustedString(html));
-        runHighlighter();
+        itemMetadata.setHTML(html);
+        preservationMetadataIcon.setHTML(SafeHtmlUtils.fromSafeConstant(ICON_METADATA_SELECTED));
+        descriptiveMetadataIcon.setHTML(SafeHtmlUtils.fromSafeConstant(ICON_METADATA_DESELECTED));
+        JavascriptUtils.runHighlighter();
+        JavascriptUtils.slideToggle(".toggle-next");
+        JavascriptUtils.smoothScroll();
       }
     });
 
-    // icon.addStyleName("browseDownloadIcon");
+    preservationMetadataIcon.addStyleName("browseDownloadIcon");
     labelsPanel.addStyleName("browseDownloadLabels");
     label.addStyleName("browseDownloadLabel");
     subLabel.addStyleName("browseDownloadSublabel");
     return downloadPanel;
   }
-
-  // $wnd.hljs.initHighlightingOnLoad();
-  public static native void runHighlighter() /*-{
-		$wnd.jQuery('pre code').each(function(i, block) {
-			$wnd.hljs.highlightBlock(block);
-		});
-  }-*/;
 
   private String getDatesText(SimpleDescriptionObject sdo) {
     String ret;
