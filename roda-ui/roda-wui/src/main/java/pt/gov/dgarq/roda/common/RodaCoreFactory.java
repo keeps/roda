@@ -27,6 +27,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.roda.action.orchestrate.ActionOrchestrator;
+import org.roda.action.orchestrate.FixityAction;
 import org.roda.action.orchestrate.Plugin;
 import org.roda.action.orchestrate.ReindexAction;
 import org.roda.action.orchestrate.RemoveOrphansAction;
@@ -305,6 +306,7 @@ public class RodaCoreFactory {
     System.err.println("java -jar x.jar index reindex");
     System.err.println("java -jar x.jar index list users|groups");
     System.err.println("java -jar x.jar orphans [newParentID]");
+    System.err.println("java -jar x.jar fixity");
   }
 
   private static void printIndexMembers(List<String> args, Filter filter, Sorter sorter, Sublist sublist, Facets facets)
@@ -350,6 +352,9 @@ public class RodaCoreFactory {
         RemoveOrphansAction removeOrphansAction = new RemoveOrphansAction();
         removeOrphansAction.setParentID(args.get(1));
         getActionOrchestrator().runActionOnAllAIPs(removeOrphansAction);
+      } else if ("fixity".equals(args.get(0))) {
+        Plugin<AIP> fixityAction = new FixityAction();
+        getActionOrchestrator().runActionOnAllAIPs(fixityAction);
       } else {
         printMainUsage();
       }

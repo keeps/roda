@@ -1,8 +1,12 @@
 package org.roda.action.orchestrate;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -22,21 +26,25 @@ import org.roda.storage.fs.FSUtils;
 
 import pt.gov.dgarq.roda.core.common.InvalidParameterException;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
-import pt.gov.dgarq.roda.core.data.AgentPreservationObject;
 import pt.gov.dgarq.roda.core.data.PluginParameter;
 import pt.gov.dgarq.roda.core.data.Report;
+import pt.gov.dgarq.roda.core.data.v2.AgentPreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.EventPreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
+import pt.gov.dgarq.roda.core.metadata.v2.premis.PremisAgentHelper;
+import pt.gov.dgarq.roda.core.metadata.v2.premis.PremisEventHelper;
+import pt.gov.dgarq.roda.core.metadata.v2.premis.PremisMetadataException;
 
 public class FixityAction implements Plugin<AIP> {
-  private AgentPreservationObject agent;
+  private AgentPreservationObject fixityAgent;
   private final Logger logger = Logger.getLogger(getClass());
 
   @Override
   public void init() throws PluginException {
-    agent = new AgentPreservationObject();
-    agent.setAgentName(getName() + "/" + getVersion()); //$NON-NLS-1$
-    agent.setAgentType(AgentPreservationObject.PRESERVATION_AGENT_TYPE_FIXITY_CHECK_PLUGIN);
+    fixityAgent = new AgentPreservationObject();
+    fixityAgent.setAgentName(getName() + "/" + getVersion()); //$NON-NLS-1$
+    fixityAgent.setAgentType(AgentPreservationObject.PRESERVATION_AGENT_TYPE_FIXITY_CHECK_PLUGIN);
+    fixityAgent.setID("fixityCheck");
   }
 
   @Override
@@ -78,10 +86,26 @@ public class FixityAction implements Plugin<AIP> {
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
 
+    try {
+      model.getAgentPreservationObject(fixityAgent.getID());
+    } catch (ModelServiceException mse) {
+      try {
+        byte[] serializedPremisEvent = new PremisAgentHelper(fixityAgent).saveToByteArray();
+        Path file = Files.createTempFile("agent", ".xml");
+        Files.copy(new ByteArrayInputStream(serializedPremisEvent), file, StandardCopyOption.REPLACE_EXISTING);
+        Binary resource = (Binary) FSUtils.convertPathToResource(file.getParent(), file);
+        model.createAgentMetadata(fixityAgent.getID(), resource);
+      } catch (Throwable e) {
+        logger.error(e.getMessage(), e);
+        return null;
+      }
+    }
+
     for (AIP aip : list) {
       List<String> representationIds = aip.getRepresentationIds();
       if (representationIds != null && representationIds.size() > 0) {
         for (String representationID : representationIds) {
+          logger.debug("Checking fixity for files in representation " + representationID + " of AIP " + aip.getId());
           EventPreservationObject epo = new EventPreservationObject();
           epo.setDatetime(new Date());
           epo.setEventType(EventPreservationObject.PRESERVATION_EVENT_TYPE_FIXITY_CHECK);
@@ -94,6 +118,7 @@ public class FixityAction implements Plugin<AIP> {
             List<String> koFileIDS = new ArrayList<String>();
             if (fileIDs != null && fileIDs.size() > 0) {
               for (String fileID : fileIDs) {
+                logger.debug("Checking fixity for " + fileID);
                 File f = model.retrieveFile(aip.getId(), representationID, fileID);
                 Binary b = storage.getBinary(f.getStoragePath());
                 Path p = Files.createTempFile("temp", "");
@@ -107,24 +132,54 @@ public class FixityAction implements Plugin<AIP> {
                 }
               }
               if (okFileIDS.size() < fileIDs.size()) {
+                logger.debug("Fixity error for representation " + representationID + " of AIP " + aip.getId());
                 epo.setOutcome("error");
                 epo.setOutcomeDetailNote("Reason");
-                epo.setOutcomeDetailExtension("<p>Some files failed...</p>");
+                StringBuilder sb = new StringBuilder();
+                sb.append("<p>The following file have bad checksums:</p>");
+                sb.append("<ul>");
+                for (String s : koFileIDS) {
+                  sb.append("<li>" + s + "</li>");
+                }
+                sb.append("</ul>");
+                epo.setOutcomeDetailExtension(sb.toString());
                 notifyUserOfFixityCheckError(representationID, okFileIDS, koFileIDS, epo);
               } else {
+                logger.debug("Fixity OK for representation " + representationID + " of AIP " + aip.getId());
                 epo.setOutcome("success");
-                epo.setOutcomeDetailNote("files checked");
+                epo.setOutcomeDetailNote(fileIDs.size() + " files checked successfully");
                 epo.setOutcomeDetailExtension(fileIDs.toString());
                 notifyUserOfFixityCheckSucess(representationID, okFileIDS, koFileIDS, epo);
               }
             }
           } catch (ModelServiceException | IOException | StorageServiceException e) {
-            logger.debug("Error processing Representation " + representationID + " - " + e.getMessage(), e);
+            logger.error("Error processing Representation " + representationID + " - " + e.getMessage(), e);
             epo.setOutcome("undetermined");
             epo.setOutcomeDetailNote("Reason");
             epo.setOutcomeDetailExtension("<p>" + e.getMessage() + "</p>");
             notifyUserOfFixityCheckUndetermined(representationID, epo, e.getMessage());
           }
+          try {
+            DateFormat format = new SimpleDateFormat("yyyy-MM-dd_hh:mm:ss.SSS");
+            String name = "fixityCheck_" + format.format(new Date()) + ".premis.xml";
+            epo.setId(name);
+            epo.setAgentID(fixityAgent.getID());
+            epo.setObjectIDs(new String[] {"?????"});
+            byte[] serializedPremisEvent = new PremisEventHelper(epo).saveToByteArray();
+            Path file = Files.createTempFile("preservation", ".xml");
+            Files.copy(new ByteArrayInputStream(serializedPremisEvent), file, StandardCopyOption.REPLACE_EXISTING);
+            Binary resource = (Binary) FSUtils.convertPathToResource(file.getParent(), file);
+            model.createPreservationMetadata(aip.getId(), representationID, name, resource);
+          } catch (ModelServiceException e) {
+            logger.error(e.getMessage(), e);
+          } catch (PremisMetadataException e) {
+            logger.error(e.getMessage(), e);
+          } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+          } catch (StorageServiceException e) {
+            logger.error(e.getMessage(), e);
+          }
+
         }
       }
     }
