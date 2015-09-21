@@ -23,8 +23,7 @@ import pt.gov.dgarq.roda.core.common.InvalidParameterException;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.PluginParameter;
 import pt.gov.dgarq.roda.core.data.Report;
-import pt.gov.dgarq.roda.core.data.SimpleDescriptionObject;
-import pt.gov.dgarq.roda.core.data.eadc.DescriptionLevel;
+import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 
 public class RemoveOrphansAction implements Plugin<AIP> {
   private final Logger logger = Logger.getLogger(getClass());
@@ -83,13 +82,16 @@ public class RemoveOrphansAction implements Plugin<AIP> {
     throws PluginException {
 
     try {
+      logger.debug("Getting parent");
       model.retrieveAIP(parentID);
+      logger.debug("Parent OK");
       for (AIP aip : list) {
         try {
           StoragePath aipPath = ModelUtils.getAIPpath(aip.getId());
           SimpleDescriptionObject sdo = index.retrieve(SimpleDescriptionObject.class, aip.getId());
-          if (sdo.getParentPID() == null || sdo.getParentPID().trim().equals("")) {
-            if (sdo.getLevel() == null || sdo.getLevel() != DescriptionLevel.FONDS) {
+          if (sdo.getParentID() == null || sdo.getParentID().trim().equals("")) {
+            if (sdo.getLevel() == null || !sdo.getLevel().trim().equalsIgnoreCase("fonds")) {
+              logger.debug("Moving orphan "+aip.getId() + " to under "+parentID);
               Map<String, Set<String>> aipMetadata = storage.getMetadata(aipPath);
               aipMetadata.put(RodaConstants.STORAGE_META_PARENT_ID, new HashSet<String>(Arrays.asList(parentID)));
               storage.updateMetadata(aipPath, aipMetadata, true);
@@ -98,6 +100,7 @@ public class RemoveOrphansAction implements Plugin<AIP> {
           }
         } catch (StorageServiceException | IndexServiceException e) {
           logger.error("Error processing AIP " + aip.getId() + " (RemoveOrphansAction)");
+          logger.error(e.getMessage(), e);
         }
       }
     } catch (ModelServiceException e1) {
@@ -114,7 +117,7 @@ public class RemoveOrphansAction implements Plugin<AIP> {
 
   @Override
   public Report afterExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-
+    logger.debug("End");
     return null;
   }
 
