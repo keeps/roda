@@ -29,6 +29,7 @@ import org.apache.solr.common.SolrDocumentList;
 import org.roda.action.orchestrate.ActionOrchestrator;
 import org.roda.action.orchestrate.Plugin;
 import org.roda.action.orchestrate.ReindexAction;
+import org.roda.action.orchestrate.RemoveOrphansAction;
 import org.roda.action.orchestrate.embed.EmbeddedActionOrchestrator;
 import org.roda.common.ApacheDS;
 import org.roda.common.UserUtility;
@@ -303,6 +304,7 @@ public class RodaCoreFactory {
     System.err.println("Syntax:");
     System.err.println("java -jar x.jar index reindex");
     System.err.println("java -jar x.jar index list users|groups");
+    System.err.println("java -jar x.jar orphans [newParentID]");
   }
 
   private static void printIndexMembers(List<String> args, Filter filter, Sorter sorter, Sublist sublist, Facets facets)
@@ -344,6 +346,10 @@ public class RodaCoreFactory {
             e.printStackTrace();
           }
         }
+      } else if ("orphans".equals(args.get(0)) && args.size() == 2) {
+        RemoveOrphansAction removeOrphansAction = new RemoveOrphansAction();
+        removeOrphansAction.setParentID(args.get(1));
+        getActionOrchestrator().runActionOnAllAIPs(removeOrphansAction);
       } else {
         printMainUsage();
       }
