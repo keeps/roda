@@ -330,6 +330,8 @@
 	</xsl:template>
 	<xsl:template match="prem:event">
 		<span class="event">
+			<xsl:attribute name="id"><xsl:value-of
+				select="normalize-space(prem:eventIdentifier[1]/prem:eventIdentifierValue/text())" /></xsl:attribute>
 			<span class="header toggle-next">
 				<xsl:if test="prem:eventType">
 					<span class="type">
@@ -375,6 +377,32 @@
 						<span class="field-value">
 							<xsl:value-of
 								select="prem:eventOutcomeInformation/prem:eventOutcome/text()" />
+						</span>
+					</span>
+				</xsl:if>
+				<xsl:if test="prem:eventOutcomeInformation/prem:eventOutcomeDetail/prem:eventOutcomeDetailNote">
+					<span class="field eventOutcome">
+						<span class="field-label">
+							<xsl:text>Result (note)</xsl:text>
+						</span>
+						<span class="field-value">
+							<xsl:value-of
+								select="prem:eventOutcomeInformation/prem:eventOutcomeDetail/prem:eventOutcomeDetailNote/text()" />
+						</span>
+					</span>
+				</xsl:if>
+				<xsl:if test="prem:eventOutcomeInformation/prem:eventOutcomeDetail/prem:eventOutcomeDetailExtension">
+					<span class="field eventOutcome">
+						<span class="field-label">
+							<xsl:text>Result (extension)</xsl:text>
+						</span>
+						<span class="field-value">
+							<pre>
+								<code>
+									<xsl:apply-templates mode="escape"
+										select="prem:eventOutcomeInformation/prem:eventOutcomeDetail/prem:eventOutcomeDetailExtension/*" />
+								</code>
+							</pre>
 						</span>
 					</span>
 				</xsl:if>
