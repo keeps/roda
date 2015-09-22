@@ -38,6 +38,7 @@ import lc.xmlns.premisV2.File;
 import lc.xmlns.premisV2.LinkingAgentIdentifierComplexType;
 import lc.xmlns.premisV2.Representation;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
+import pt.gov.dgarq.roda.core.data.v2.EventPreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationState;
 import pt.gov.dgarq.roda.core.data.v2.SIPReport;
@@ -368,34 +369,14 @@ public final class ModelUtils {
 
   }
 
-  public static boolean isPreservationRepresentationObject(Binary preservationBinary) {
-    boolean isObject = true;
+  public static Representation getPreservationRepresentationObject(Binary preservationBinary) {
+    Representation representation = null;
     InputStream binaryInputStream = null;
     try {
       binaryInputStream = preservationBinary.getContent().createInputStream();
-      PremisRepresentationObjectHelper.newInstance(binaryInputStream);
-    } catch (PremisMetadataException | IOException | ClassCastException e) {
-      isObject = false;
-    } finally {
-      if (binaryInputStream != null) {
-        try {
-          binaryInputStream.close();
-        } catch (IOException e1) {
-          LOGGER.warn("Cannot close file inputstream", e1);
-        }
-      }
-    }
-    return isObject;
-  }
-
-  public static Representation binaryToRepresentation(Binary representationBinary) throws ModelServiceException {
-    InputStream binaryInputStream = null;
-    Representation representation = null;
-    try {
-      binaryInputStream = representationBinary.getContent().createInputStream();
       representation = PremisRepresentationObjectHelper.newInstance(binaryInputStream).getRepresentation();
     } catch (PremisMetadataException | IOException | ClassCastException e) {
-      throw new ModelServiceException(e.getMessage(), ModelServiceException.INTERNAL_SERVER_ERROR);
+      representation = null;
     } finally {
       if (binaryInputStream != null) {
         try {
@@ -408,34 +389,14 @@ public final class ModelUtils {
     return representation;
   }
 
-  public static boolean isPreservationEvent(Binary preservationBinary) {
-    boolean isEvent = true;
+  public static EventComplexType getPreservationEvent(Binary preservationBinary) {
+    EventComplexType event = null;
     InputStream binaryInputStream = null;
     try {
       binaryInputStream = preservationBinary.getContent().createInputStream();
-      PremisEventHelper.newInstance(binaryInputStream);
-    } catch (PremisMetadataException | IOException | ClassCastException e) {
-      isEvent = false;
-    } finally {
-      if (binaryInputStream != null) {
-        try {
-          binaryInputStream.close();
-        } catch (IOException e1) {
-          LOGGER.warn("Cannot close file inputstream", e1);
-        }
-      }
-    }
-    return isEvent;
-  }
-
-  public static EventComplexType binaryToEvent(Binary eventBinary) throws ModelServiceException {
-    InputStream binaryInputStream = null;
-    EventComplexType event = null;
-    try {
-      binaryInputStream = eventBinary.getContent().createInputStream();
       event = PremisEventHelper.newInstance(binaryInputStream).getEvent();
     } catch (PremisMetadataException | IOException | ClassCastException e) {
-      throw new ModelServiceException(e.getMessage(), ModelServiceException.INTERNAL_SERVER_ERROR);
+      event=null;
     } finally {
       if (binaryInputStream != null) {
         try {
@@ -448,34 +409,14 @@ public final class ModelUtils {
     return event;
   }
 
-  public static boolean isPreservationFileObject(Binary preservationBinary) {
-    boolean isObject = true;
+  public static File getPreservationFileObject(Binary preservationBinary) {
+    File file = null;
     InputStream binaryInputStream = null;
     try {
       binaryInputStream = preservationBinary.getContent().createInputStream();
-      PremisFileObjectHelper.newInstance(binaryInputStream);
-    } catch (PremisMetadataException | IOException | ClassCastException e) {
-      isObject = false;
-    } finally {
-      if (binaryInputStream != null) {
-        try {
-          binaryInputStream.close();
-        } catch (IOException e1) {
-          LOGGER.warn("Cannot close file inputstream", e1);
-        }
-      }
-    }
-    return isObject;
-  }
-
-  public static File binaryToFile(Binary eventBinary) throws ModelServiceException {
-    InputStream binaryInputStream = null;
-    File file = null;
-    try {
-      binaryInputStream = eventBinary.getContent().createInputStream();
       file = PremisFileObjectHelper.newInstance(binaryInputStream).getFile();
     } catch (PremisMetadataException | IOException | ClassCastException e) {
-      throw new ModelServiceException(e.getMessage(), ModelServiceException.INTERNAL_SERVER_ERROR);
+      file = null;
     } finally {
       if (binaryInputStream != null) {
         try {
@@ -488,34 +429,14 @@ public final class ModelUtils {
     return file;
   }
 
-  public static boolean isPreservationAgentObject(Binary preservationBinary) {
-    boolean isAgent = true;
+  public static AgentComplexType getPreservationAgentObject(Binary preservationBinary) {
+    AgentComplexType agent = null;
     InputStream binaryInputStream = null;
     try {
       binaryInputStream = preservationBinary.getContent().createInputStream();
-      PremisAgentHelper.newInstance(binaryInputStream);
-    } catch (PremisMetadataException | IOException | ClassCastException e) {
-      isAgent = false;
-    } finally {
-      if (binaryInputStream != null) {
-        try {
-          binaryInputStream.close();
-        } catch (IOException e1) {
-          LOGGER.warn("Cannot close file inputstream", e1);
-        }
-      }
-    }
-    return isAgent;
-  }
-
-  public static AgentComplexType binaryToAgent(Binary eventBinary) throws ModelServiceException {
-    InputStream binaryInputStream = null;
-    AgentComplexType agent = null;
-    try {
-      binaryInputStream = eventBinary.getContent().createInputStream();
       agent = PremisAgentHelper.newInstance(binaryInputStream).getAgent();
     } catch (PremisMetadataException | IOException | ClassCastException e) {
-      throw new ModelServiceException(e.getMessage(), ModelServiceException.INTERNAL_SERVER_ERROR);
+      agent = null;
     } finally {
       if (binaryInputStream != null) {
         try {
@@ -527,6 +448,7 @@ public final class ModelUtils {
     }
     return agent;
   }
+
 
   // FIXME finish to implement this for deleting the 3 methods above
   // (isPreservation*)
@@ -622,21 +544,13 @@ public final class ModelUtils {
     return null;
   }
 
-  public static List<Binary> sortEventsByDate(List<Binary> events) throws ModelServiceException {
-    TreeMap<String, Binary> sortedMap = new TreeMap<String, Binary>();
-    for (Binary b : events) {
-      sortedMap.put(binaryToEvent(b).xgetEventDateTime().getStringValue(), b);
-    }
-    return new ArrayList<Binary>(sortedMap.values());
-  }
-
   public static <T> List<String> extractAgentIdsFromPreservationBinary(Binary b, Class<T> c)
     throws ModelServiceException {
     List<String> ids = new ArrayList<String>();
     if (c.equals(File.class)) {
       //
     } else if (c.equals(EventComplexType.class)) {
-      EventComplexType event = binaryToEvent(b);
+      EventComplexType event = getPreservationEvent(b);
       List<LinkingAgentIdentifierComplexType> identifiers = event.getLinkingAgentIdentifierList();
       if (identifiers != null && identifiers.size() > 0) {
         for (LinkingAgentIdentifierComplexType laict : identifiers) {
@@ -651,15 +565,5 @@ public final class ModelUtils {
     return ids;
   };
 
-  // FIXME revise order logic and if premis bean should be more carefully used
-  // (to avoid nullpointerexceptions, etc.)
-  public static List<Binary> sortFilesByRepresentationOrder(Binary representation, List<Binary> files)
-    throws ModelServiceException {
-    TreeMap<String, Binary> sortedMap = new TreeMap<String, Binary>();
-    for (Binary b : files) {
-      sortedMap.put(binaryToFile(b).getObjectIdentifierList().get(0).getObjectIdentifierValue(), b);
-    }
-    return new ArrayList<Binary>(sortedMap.values());
-  }
 
 }

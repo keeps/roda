@@ -42,6 +42,7 @@ import org.w3c.util.DateParser;
 import org.w3c.util.InvalidDateException;
 
 import jersey.repackaged.com.google.common.collect.Sets;
+import lc.xmlns.premisV2.EventComplexType;
 import lc.xmlns.premisV2.EventOutcomeDetailComplexType;
 import lc.xmlns.premisV2.EventOutcomeInformationComplexType;
 import lc.xmlns.premisV2.LinkingObjectIdentifierComplexType;
@@ -827,7 +828,8 @@ public class ModelService extends ModelObservable {
         while (preservationIterator.hasNext()) {
           Resource preservationObject = preservationIterator.next();
           Binary preservationBinary = storage.getBinary(preservationObject.getStoragePath());
-          if (ModelUtils.isPreservationRepresentationObject(preservationBinary)) {
+          lc.xmlns.premisV2.Representation r = ModelUtils.getPreservationRepresentationObject(preservationBinary);
+          if (r!= null) {
             rpos.add(convertResourceToRepresentationPreservationObject(aipId, resource.getStoragePath().getName(),
               preservationObject.getStoragePath().getName(), preservationBinary));
           }
@@ -1063,16 +1065,23 @@ public class ModelService extends ModelObservable {
             preservationFileId);
           Binary preservationBinary = storage.getBinary(binaryPath);
 
-          if (ModelUtils.isPreservationRepresentationObject(preservationBinary)) {
+          lc.xmlns.premisV2.Representation representation = ModelUtils.getPreservationRepresentationObject(preservationBinary);
+          if (representation!=null) {
             preservationRepresentationObjectFileIds.add(preservationFileId);
-          } else if (ModelUtils.isPreservationEvent(preservationBinary)) {
-            preservationEventFileIds.add(preservationFileId);
-          } else if (ModelUtils.isPreservationFileObject(preservationBinary)) {
-            preservationFileObjectFileIds.add(preservationFileId);
           } else {
-            LOGGER.warn(
-              "The binary {} is neither a PreservationRepresentationObject or PreservationEvent or PreservationFileObject...Moving on...",
-              binaryPath.asString());
+            EventComplexType event = ModelUtils.getPreservationEvent(preservationBinary);
+            if(event!=null){
+              preservationEventFileIds.add(preservationFileId);
+            }else{
+              lc.xmlns.premisV2.File file = ModelUtils.getPreservationFileObject(preservationBinary);
+              if(file!=null){
+                preservationFileObjectFileIds.add(preservationFileId);
+              }else{
+                LOGGER.warn(
+                  "The binary {} is neither a PreservationRepresentationObject or PreservationEvent or PreservationFileObject...Moving on...",
+                  binaryPath.asString());
+              }
+            }
           }
         }
         preservationRepresentationObjects.put(representationID, preservationRepresentationObjectFileIds);
