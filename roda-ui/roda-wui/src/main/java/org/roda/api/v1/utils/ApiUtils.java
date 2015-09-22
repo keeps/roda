@@ -13,30 +13,30 @@ public class ApiUtils {
   /**
    * Get media type
    * 
-   * @param format
+   * @param acceptFormat
    *          String with required format
-   * @param headers
+   * @param acceptHeaders
    *          String with request headers
    * @return media type
    */
-  public static String getMediaType(String format, String headers) {
+  public static String getMediaType(String acceptFormat, String acceptHeaders) {
     final String APPLICATION_JS = "application/javascript; charset=UTF-8";
 
     String mediaType = MediaType.APPLICATION_JSON + "; charset=UTF-8";
 
-    if (StringUtils.isNotBlank(format)) {
-      if (format.equalsIgnoreCase("XML")) {
+    if (StringUtils.isNotBlank(acceptFormat)) {
+      if (acceptFormat.equalsIgnoreCase("XML")) {
         mediaType = MediaType.APPLICATION_XML;
-      } else if (format.equalsIgnoreCase("JSONP")) {
+      } else if (acceptFormat.equalsIgnoreCase("JSONP")) {
         mediaType = APPLICATION_JS;
-      } else if (format.equalsIgnoreCase("bin")) {
+      } else if (acceptFormat.equalsIgnoreCase("bin")) {
         mediaType = MediaType.APPLICATION_OCTET_STREAM;
-      } else if (format.equalsIgnoreCase("html")) {
+      } else if (acceptFormat.equalsIgnoreCase("html")) {
         mediaType = MediaType.TEXT_HTML;
       }
-    } else if (headers.contains(MediaType.APPLICATION_XML)) {
+    } else if (acceptHeaders.contains(MediaType.APPLICATION_XML)) {
       mediaType = MediaType.APPLICATION_XML;
-    } else if (headers.contains(APPLICATION_JS)) {
+    } else if (acceptHeaders.contains(APPLICATION_JS)) {
       mediaType = APPLICATION_JS;
     }
 

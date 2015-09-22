@@ -325,9 +325,9 @@ public class BrowserHelper {
     ModelService model = RodaCoreFactory.getModelService();
     Binary descriptiveMetadataBinary = model.retrieveDescriptiveMetadataBinary(aipId, metadataId);
 
-    if (acceptFormat == null || acceptFormat.equalsIgnoreCase("bin")) {
+    if (acceptFormat == null || acceptFormat.equalsIgnoreCase("xml")) {
       filename = descriptiveMetadataBinary.getStoragePath().getName();
-      mediaType = MediaType.APPLICATION_OCTET_STREAM;
+      mediaType = MediaType.TEXT_XML;
       stream = new StreamingOutput() {
         @Override
         public void write(OutputStream os) throws IOException, WebApplicationException {

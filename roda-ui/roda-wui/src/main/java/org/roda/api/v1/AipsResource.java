@@ -264,7 +264,7 @@ public class AipsResource {
   public Response aipsAipIdDescriptiveMetadataMetadataIdGet(
     @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam("aip_id") String aipId,
     @ApiParam(value = "The ID of the existing metadata file to retrieve", required = true) @PathParam("metadata_id") String metadataId,
-    @ApiParam(value = "Choose format in which to get the metadata", allowableValues = "json, xml, html", defaultValue = "json") @QueryParam("acceptFormat") String acceptFormat,
+    @ApiParam(value = "Choose format in which to get the metadata", allowableValues = "xml, html", defaultValue = "xml") @QueryParam("acceptFormat") String acceptFormat,
     @ApiParam(value = "The language for the HTML output", allowableValues = "pt_PT, en_US", defaultValue = "pt_PT") @DefaultValue("pt_PT") @QueryParam("lang") String language)
       throws NotFoundException {
     return DELEGATE.getAipDescriptiveMetadata(request, aipId, metadataId, acceptFormat, language);
