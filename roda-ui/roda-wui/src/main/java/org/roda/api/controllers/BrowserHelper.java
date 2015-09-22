@@ -71,8 +71,7 @@ public class BrowserHelper {
   private static final int BUNDLE_MAX_ADDED_ORIGINAL_REPRESENTATION_COUNT = 1;
   private static final Logger LOGGER = Logger.getLogger(BrowserHelper.class);
 
-  protected static BrowseItemBundle getItemBundle(String aipId, String localeString) throws GenericException {
-    final Locale locale = ServerTools.parseLocale(localeString);
+  protected static BrowseItemBundle getItemBundle(String aipId, Locale locale) throws GenericException {
     BrowseItemBundle itemBundle = new BrowseItemBundle();
     try {
       // set sdo
@@ -155,13 +154,17 @@ public class BrowserHelper {
     return HTMLUtils.getPreservationMetadataBundle(aipId, model, storage);
   }
 
-  private static String getPreservationMetadataHTML(String aipId, final Locale locale)
-    throws ModelServiceException, StorageServiceException {
+  public static String getPreservationMetadataHTML(String aipId, final Locale locale) throws GenericException {
     ModelService model = RodaCoreFactory.getModelService();
     StorageService storage = RodaCoreFactory.getStorageService();
-    return HTMLUtils.getPreservationMetadataHTML(aipId, model, storage, locale);
+    try {
+      return HTMLUtils.getPreservationMetadataHTML(aipId, model, storage, locale);
+    } catch (ModelServiceException | StorageServiceException e) {
+      LOGGER.error("Could not get preservation metadata HTML", e);
+      throw new GenericException("Could not get preservation metadata HTML: " + e.getMessage());
+    }
   }
-  
+
   public static DescriptiveMetadataEditBundle getDescriptiveMetadataEditBundle(String aipId,
     String descriptiveMetadataId) throws GenericException {
     DescriptiveMetadataEditBundle ret;

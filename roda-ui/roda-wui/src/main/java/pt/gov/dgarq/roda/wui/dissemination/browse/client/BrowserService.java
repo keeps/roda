@@ -72,7 +72,10 @@ public interface BrowserService extends RemoteService {
   public IndexResult<SimpleDescriptionObject> findDescriptiveMetadata(Filter filter, Sorter sorter, Sublist sublist,
     Facets facets, String locale) throws RODAException;
 
-  public BrowseItemBundle getItemBundle(String aipId, String localeString) throws RODAException;
+  public BrowseItemBundle getItemBundle(String aipId, String localeString) throws AuthorizationDeniedException, GenericException;
+  
+  public String getPreservationMetadataHTML(String aipId, String localeString)
+    throws AuthorizationDeniedException, GenericException;
 
   public DescriptiveMetadataEditBundle getDescriptiveMetadataEditBundle(String aipId, String descId)
     throws AuthorizationDeniedException, GenericException;
@@ -212,6 +215,7 @@ public interface BrowserService extends RemoteService {
 
   public void createDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle newBundle)
     throws AuthorizationDeniedException, GenericException, MetadataParseException;
+
 
   // public DescriptiveMetadata retrieveMetadataFile(String itemId, String
   // descriptiveMetadataId) throws RODAException;

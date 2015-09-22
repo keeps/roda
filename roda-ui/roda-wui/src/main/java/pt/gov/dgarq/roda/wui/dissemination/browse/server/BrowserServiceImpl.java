@@ -39,6 +39,7 @@ import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.RodaUser;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.wui.common.client.GenericException;
+import pt.gov.dgarq.roda.wui.common.server.ServerTools;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.BrowseItemBundle;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.BrowserService;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.DescriptiveMetadataEditBundle;
@@ -70,9 +71,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public BrowseItemBundle getItemBundle(String aipId, String localeString) throws RODAException {
+  public BrowseItemBundle getItemBundle(String aipId, String localeString)
+    throws AuthorizationDeniedException, GenericException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
-    return Browser.getItemBundle(user, aipId, localeString);
+    Locale locale = ServerTools.parseLocale(localeString);
+    return Browser.getItemBundle(user, aipId, locale);
   }
 
   @Override
@@ -80,6 +83,14 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     throws AuthorizationDeniedException, GenericException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     return Browser.getDescriptiveMetadataEditBundle(user, aipId, descId);
+  }
+
+  @Override
+  public String getPreservationMetadataHTML(String aipId, String localeString)
+    throws AuthorizationDeniedException, GenericException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    Locale locale = ServerTools.parseLocale(localeString);
+    return Browser.getPreservationMetadataHTML(user, aipId, locale);
   }
 
   @Override

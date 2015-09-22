@@ -3,6 +3,7 @@ package org.roda.api.controllers;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import javax.ws.rs.core.StreamingOutput;
 
@@ -40,7 +41,7 @@ public class Browser extends RodaCoreService {
     super();
   }
 
-  public static BrowseItemBundle getItemBundle(RodaUser user, String aipId, String localeString)
+  public static BrowseItemBundle getItemBundle(RodaUser user, String aipId, Locale locale)
     throws AuthorizationDeniedException, GenericException {
     Date startDate = new Date();
 
@@ -48,7 +49,7 @@ public class Browser extends RodaCoreService {
     UserUtility.checkRoles(user, "browse");
 
     // delegate
-    BrowseItemBundle itemBundle = BrowserHelper.getItemBundle(aipId, localeString);
+    BrowseItemBundle itemBundle = BrowserHelper.getItemBundle(aipId, locale);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
@@ -73,6 +74,23 @@ public class Browser extends RodaCoreService {
       descId);
 
     return bundle;
+  }
+
+  public static String getPreservationMetadataHTML(RodaUser user, String aipId, Locale locale)
+    throws GenericException, AuthorizationDeniedException {
+    Date startDate = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, "browse");
+
+    // delegate
+    String html = BrowserHelper.getPreservationMetadataHTML(aipId, locale);
+
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, "Browser", "getPreservationMetadataHTML", aipId, duration, "aipId", aipId);
+
+    return html;
   }
 
   public static IndexResult<SimpleDescriptionObject> findDescriptiveMetadata(RodaUser user, Filter filter,

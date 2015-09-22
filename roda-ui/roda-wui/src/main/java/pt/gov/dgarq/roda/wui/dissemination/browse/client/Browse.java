@@ -16,6 +16,7 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -38,7 +39,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 
-import config.i18n.client.CommonConstants;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
@@ -56,6 +56,7 @@ import pt.gov.dgarq.roda.wui.common.client.tools.JavascriptUtils;
 import pt.gov.dgarq.roda.wui.common.client.tools.RestUtils;
 import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
 import pt.gov.dgarq.roda.wui.common.client.widgets.AIPList;
+import pt.gov.dgarq.roda.wui.common.client.widgets.MessagePopup;
 import pt.gov.dgarq.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 import pt.gov.dgarq.roda.wui.main.client.BreadcrumbItem;
 import pt.gov.dgarq.roda.wui.main.client.BreadcrumbPanel;
@@ -116,7 +117,8 @@ public class Browse extends Composite {
     return instance;
   }
 
-  private static CommonConstants constants = (CommonConstants) GWT.create(CommonConstants.class);
+  // private static CommonConstants constants = (CommonConstants)
+  // GWT.create(CommonConstants.class);
 
   private static Filter COLLECTIONS_FILTER = new Filter(new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID));
 
@@ -265,19 +267,20 @@ public class Browse extends Composite {
       viewAction();
     } else {
       aipId = id;
-      BrowserService.Util.getInstance().getItemBundle(id, constants.locale(), new AsyncCallback<BrowseItemBundle>() {
+      BrowserService.Util.getInstance().getItemBundle(id, LocaleInfo.getCurrentLocale().getLocaleName(),
+        new AsyncCallback<BrowseItemBundle>() {
 
-        @Override
-        public void onFailure(Throwable caught) {
-          logger.error("Could not view id=" + id, caught);
-          showError(id, caught);
-        }
+          @Override
+          public void onFailure(Throwable caught) {
+            logger.error("Could not view id=" + id, caught);
+            showError(id, caught);
+          }
 
-        @Override
-        public void onSuccess(BrowseItemBundle itemBundle) {
-          viewAction(itemBundle);
-        }
-      });
+          @Override
+          public void onSuccess(BrowseItemBundle itemBundle) {
+            viewAction(itemBundle);
+          }
+        });
     }
   }
 
@@ -517,18 +520,6 @@ public class Browse extends Composite {
     final int files = preservationMetadata.getNumberOfFiles();
     final long sizeInBytes = preservationMetadata.getSizeInBytes();
 
-    SafeHtmlBuilder builder = new SafeHtmlBuilder();
-
-    // Download link
-    SafeUri downloadUri = RestUtils.createPreservationMetadataDownloadUri(aipId);
-    String downloadLinkHtml = "<a href='" + downloadUri.asString() + "' class='descriptiveMetadataLink'>download</a>";
-    builder.append(SafeHtmlUtils.fromSafeConstant(downloadLinkHtml));
-
-    // Content
-    builder.append(SafeHtmlUtils.fromTrustedString(preservationMetadata.getHtml()));
-
-    final SafeHtml html = builder.toSafeHtml();
-
     // TODO externalize strings
     Label label = new Label("Preservation metadata");
     Label subLabel = new Label(files + " files, " + readableFileSize(sizeInBytes));
@@ -545,6 +536,27 @@ public class Browse extends Composite {
 
       @Override
       public void onClick(ClickEvent event) {
+        showPreservationMetadata();
+      }
+    });
+
+    preservationMetadataIcon.addStyleName("browseDownloadIcon");
+    labelsPanel.addStyleName("browseDownloadLabels");
+    label.addStyleName("browseDownloadLabel");
+    subLabel.addStyleName("browseDownloadSublabel");
+    return downloadPanel;
+  }
+
+  private void showPreservationMetadata() {
+    getPreservationMetadataHTML(new AsyncCallback<SafeHtml>() {
+
+      @Override
+      public void onFailure(Throwable caught) {
+        MessagePopup.showError("Error getting preservation metadata");
+      }
+
+      @Override
+      public void onSuccess(SafeHtml html) {
         itemMetadata.setHTML(html);
         preservationMetadataIcon.setHTML(SafeHtmlUtils.fromSafeConstant(ICON_METADATA_SELECTED));
         descriptiveMetadataIcon.setHTML(SafeHtmlUtils.fromSafeConstant(ICON_METADATA_DESELECTED));
@@ -554,11 +566,39 @@ public class Browse extends Composite {
       }
     });
 
-    preservationMetadataIcon.addStyleName("browseDownloadIcon");
-    labelsPanel.addStyleName("browseDownloadLabels");
-    label.addStyleName("browseDownloadLabel");
-    subLabel.addStyleName("browseDownloadSublabel");
-    return downloadPanel;
+  }
+
+  private SafeHtml preservationMetadataHTML = null;
+
+  private void getPreservationMetadataHTML(final AsyncCallback<SafeHtml> callback) {
+    if (preservationMetadataHTML != null) {
+      callback.onSuccess(preservationMetadataHTML);
+    } else {
+      BrowserService.Util.getInstance().getPreservationMetadataHTML(aipId,
+        LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<String>() {
+
+          @Override
+          public void onFailure(Throwable caught) {
+            callback.onFailure(caught);
+          }
+
+          @Override
+          public void onSuccess(String html) {
+            // Download link
+            SafeHtmlBuilder builder = new SafeHtmlBuilder();
+            SafeUri downloadUri = RestUtils.createPreservationMetadataDownloadUri(aipId);
+            String downloadLinkHtml = "<a href='" + downloadUri.asString()
+              + "' class='descriptiveMetadataLink'>download</a>";
+            builder.append(SafeHtmlUtils.fromSafeConstant(downloadLinkHtml));
+
+            // Content
+            builder.append(SafeHtmlUtils.fromTrustedString(html));
+
+            preservationMetadataHTML = builder.toSafeHtml();
+            callback.onSuccess(preservationMetadataHTML);
+          }
+        });
+    }
   }
 
   private String getDatesText(SimpleDescriptionObject sdo) {
