@@ -2,6 +2,7 @@ package org.roda.api;
 
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
+import org.glassfish.jersey.moxy.xml.MoxyXmlFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 
 import io.swagger.jaxrs.config.BeanConfig;
@@ -12,8 +13,9 @@ public class RestApplication extends ResourceConfig {
   public RestApplication() {
     super();
     packages("io.swagger.jaxrs.listing", "org.roda.api");
-    register(MultiPartFeature.class);
     register(JacksonFeature.class);
+    register(MoxyXmlFeature.class);
+    register(MultiPartFeature.class);
 
     // https://github.com/swagger-api/swagger-core/wiki/Java-JAXRS-Quickstart
     register(ApiListingResource.class);

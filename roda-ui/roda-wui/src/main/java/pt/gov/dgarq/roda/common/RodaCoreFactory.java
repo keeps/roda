@@ -27,11 +27,11 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.roda.action.orchestrate.ActionOrchestrator;
-import org.roda.action.orchestrate.FixityAction;
 import org.roda.action.orchestrate.Plugin;
-import org.roda.action.orchestrate.ReindexAction;
-import org.roda.action.orchestrate.RemoveOrphansAction;
-import org.roda.action.orchestrate.embed.EmbeddedActionOrchestrator;
+import org.roda.action.orchestrate.actions.FixityAction;
+import org.roda.action.orchestrate.actions.ReindexAction;
+import org.roda.action.orchestrate.actions.RemoveOrphansAction;
+import org.roda.action.orchestrate.embed.AkkaEmbeddedActionOrchestrator;
 import org.roda.common.ApacheDS;
 import org.roda.common.UserUtility;
 import org.roda.index.IndexService;
@@ -133,7 +133,8 @@ public class RodaCoreFactory {
         LOGGER.error(e);
       }
 
-      actionOrchestrator = new EmbeddedActionOrchestrator();
+      // actionOrchestrator = new EmbeddedActionOrchestrator();
+      actionOrchestrator = new AkkaEmbeddedActionOrchestrator();
 
       try {
         rodaConfiguration = getConfiguration("roda-wui.properties");
@@ -298,6 +299,11 @@ public class RodaCoreFactory {
 
   }
 
+  public static void reindexAips() {
+    Plugin<AIP> reindexAction = new ReindexAction();
+    getActionOrchestrator().runActionOnAllAIPs(reindexAction);
+  }
+
   /*
    * Command-line accessible functionalities
    */
@@ -331,8 +337,7 @@ public class RodaCoreFactory {
           Facets facets = null;
           printIndexMembers(args, filter, sorter, sublist, facets);
         } else if ("reindex".equals(args.get(1)) && args.size() == 2) {
-          Plugin<AIP> reindexAction = new ReindexAction();
-          getActionOrchestrator().runActionOnAllAIPs(reindexAction);
+          reindexAips();
         } else if ("query".equals(args.get(1)) && args.size() == 4 && StringUtils.isNotBlank(args.get(2))
           && StringUtils.isNotBlank(args.get(3))) {
           String collection = args.get(2);

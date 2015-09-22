@@ -17,5 +17,9 @@ public interface ActionOrchestrator {
   public void runActionOnAllRepresentations(Plugin<Representation> action);
 
   public void runActionOnAllFiles(Plugin<File> action);
+  
+  public void setup();
+  
+  public void shutdown();
 
 }

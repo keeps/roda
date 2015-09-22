@@ -94,7 +94,7 @@ public interface Plugin<T extends Serializable> {
   public Report execute(IndexService index, ModelService model, StorageService storage, List<T> list)
     throws PluginException;
 
-  public Report beforeExecute(IndexService index, ModelService model, StorageService storage) throws PluginException;;
+  public Report beforeExecute(IndexService index, ModelService model, StorageService storage) throws PluginException;
 
-  public Report afterExecute(IndexService index, ModelService model, StorageService storage) throws PluginException;;
+  public Report afterExecute(IndexService index, ModelService model, StorageService storage) throws PluginException;
 }

@@ -1,4 +1,4 @@
-package org.roda.action.orchestrate;
+package org.roda.action.orchestrate.actions;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.roda.action.orchestrate.Plugin;
+import org.roda.action.orchestrate.PluginException;
 import org.roda.index.IndexService;
 import org.roda.model.AIP;
 import org.roda.model.File;
