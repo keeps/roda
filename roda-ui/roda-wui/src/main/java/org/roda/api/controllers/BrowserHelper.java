@@ -87,7 +87,7 @@ public class BrowserHelper {
       itemBundle.setDescriptiveMetadata(descriptiveMetadataList);
 
       // set preservation metadata
-      PreservationMetadataBundle preservationMetadata = getPreservationMetadataBundle(aipId, locale);
+      PreservationMetadataBundle preservationMetadata = getPreservationMetadataBundle(aipId);
       itemBundle.setPreservationMetadata(preservationMetadata);
 
       // set representations
@@ -148,13 +148,20 @@ public class BrowserHelper {
     return descriptiveMetadataList;
   }
 
-  private static PreservationMetadataBundle getPreservationMetadataBundle(String aipId, final Locale locale)
+  private static PreservationMetadataBundle getPreservationMetadataBundle(String aipId)
     throws ModelServiceException, StorageServiceException {
     ModelService model = RodaCoreFactory.getModelService();
     StorageService storage = RodaCoreFactory.getStorageService();
-    return HTMLUtils.getPreservationMeatadataBundle(aipId, model, storage, locale);
+    return HTMLUtils.getPreservationMetadataBundle(aipId, model, storage);
   }
 
+  private static String getPreservationMetadataHTML(String aipId, final Locale locale)
+    throws ModelServiceException, StorageServiceException {
+    ModelService model = RodaCoreFactory.getModelService();
+    StorageService storage = RodaCoreFactory.getStorageService();
+    return HTMLUtils.getPreservationMetadataHTML(aipId, model, storage, locale);
+  }
+  
   public static DescriptiveMetadataEditBundle getDescriptiveMetadataEditBundle(String aipId,
     String descriptiveMetadataId) throws GenericException {
     DescriptiveMetadataEditBundle ret;

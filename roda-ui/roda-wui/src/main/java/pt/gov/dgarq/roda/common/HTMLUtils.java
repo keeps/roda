@@ -69,12 +69,41 @@ public final class HTMLUtils {
 
   // FIXME close properly model related methods that may generate file
   // descriptor leaks
-  public static PreservationMetadataBundle getPreservationMeatadataBundle(String aipId, ModelService model,
-    StorageService storage, Locale locale) throws ModelServiceException, StorageServiceException {
+  public static PreservationMetadataBundle getPreservationMetadataBundle(String aipId, ModelService model,
+    StorageService storage) throws ModelServiceException, StorageServiceException {
     AIP aip = model.retrieveAIP(aipId);
-    TreeSet<String> agentsID = null;
     long totalSizeInBytes = 0L;
     int numberOfFiles = 0;
+    if (aip.getRepresentationIds() != null && aip.getRepresentationIds().size() > 0) {
+      /*agentsID = new TreeSet<String>();
+      for (String representationId : aip.getRepresentationIds()) {
+        ClosableIterable<PreservationMetadata> preservationMetadata = model
+          .listPreservationMetadataBinaries(aip.getId(), representationId);
+        agentsID.addAll(extractAgents(preservationMetadata, storage));
+      }*/
+      for (String representationId : aip.getRepresentationIds()) {
+        ClosableIterable<PreservationMetadata> preservationMetadata = model
+          .listPreservationMetadataBinaries(aip.getId(), representationId);
+        try{
+          PreservationMetadataBundle representationPreservationMetadataBundle = getRepresentationPreservationMetadataBundle(
+            preservationMetadata, storage);
+          totalSizeInBytes += representationPreservationMetadataBundle.getSizeInBytes();
+          numberOfFiles += representationPreservationMetadataBundle.getNumberOfFiles();
+        } finally {
+          try {
+            preservationMetadata.close();
+          } catch (IOException e) {
+            LOGGER.error("Error while while freeing up resources", e);
+          }
+        }
+      }
+    }
+    return new PreservationMetadataBundle(totalSizeInBytes, numberOfFiles);
+  }
+
+  public static String getPreservationMetadataHTML(String aipId, ModelService model,
+    StorageService storage, Locale locale) throws ModelServiceException, StorageServiceException {
+    AIP aip = model.retrieveAIP(aipId);
     StringBuffer s = new StringBuffer();
     s.append("<span class='preservationMetadata'><div class='title'>PREMIS</div>");    
     if (aip.getRepresentationIds() != null && aip.getRepresentationIds().size() > 0) {
@@ -88,11 +117,8 @@ public final class HTMLUtils {
         ClosableIterable<PreservationMetadata> preservationMetadata = model
           .listPreservationMetadataBinaries(aip.getId(), representationId);
         try{
-          PreservationMetadataBundle representationPreservationMetadataBundle = getRepresentationPreservationMeatadataBundle(
-            preservationMetadata, storage, locale);
-          s.append(representationPreservationMetadataBundle.getHtml());
-          totalSizeInBytes += representationPreservationMetadataBundle.getSizeInBytes();
-          numberOfFiles += representationPreservationMetadataBundle.getNumberOfFiles();
+          String html = getRepresentationPreservationMetadataHtml(preservationMetadata, storage, locale);
+          s.append(html);
         } finally {
           try {
             preservationMetadata.close();
@@ -105,14 +131,29 @@ public final class HTMLUtils {
     }
     s.append("</span>");
 
-    return new PreservationMetadataBundle(aipId, s.toString(), totalSizeInBytes, numberOfFiles);
+    return s.toString();
   }
-
-  private static PreservationMetadataBundle getRepresentationPreservationMeatadataBundle(
-    ClosableIterable<PreservationMetadata> preservationMetadata, StorageService storage, final Locale locale)
+  
+  private static PreservationMetadataBundle getRepresentationPreservationMetadataBundle(
+    ClosableIterable<PreservationMetadata> preservationMetadata, StorageService storage)
       throws ModelServiceException, StorageServiceException {
     long totalSizeInBytes = 0L;
     int numberOfFiles = 0;
+
+    Iterator<PreservationMetadata> iterator = preservationMetadata.iterator();
+    while (iterator.hasNext()) {
+      PreservationMetadata pm = iterator.next();
+      Binary b = storage.getBinary(pm.getStoragePath());
+      totalSizeInBytes += b.getSizeInBytes();
+      numberOfFiles++;
+
+    }
+    return new PreservationMetadataBundle(totalSizeInBytes, numberOfFiles);
+  }
+  
+  private static String getRepresentationPreservationMetadataHtml(
+    ClosableIterable<PreservationMetadata> preservationMetadata, StorageService storage, final Locale locale)
+      throws ModelServiceException, StorageServiceException {
 
     Map<String, Object> stylesheetOpt = new HashMap<String, Object>();
     stylesheetOpt.put("prefix", RodaConstants.INDEX_OTHER_DESCRIPTIVE_DATA_PREFIX);
@@ -126,8 +167,6 @@ public final class HTMLUtils {
     while (iterator.hasNext()) {
       PreservationMetadata pm = iterator.next();
       Binary b = storage.getBinary(pm.getStoragePath());
-      totalSizeInBytes += b.getSizeInBytes();
-      numberOfFiles++;
       if (ModelUtils.isPreservationEvent(b)) {
         events.add(b);
       } else if (ModelUtils.isPreservationFileObject(b)) {
@@ -164,7 +203,7 @@ public final class HTMLUtils {
     stylesheetOpt.put("agents", htmlAgents);
 
     String html = binaryToHtml(representation, locale, false, "premis", stylesheetOpt);
-    return new PreservationMetadataBundle("", html, totalSizeInBytes, numberOfFiles);
+    return html;
   }
 
   public static TreeSet<String> extractAgents(ClosableIterable<PreservationMetadata> preservationMetadata,

@@ -10,8 +10,6 @@ public class PreservationMetadataBundle implements Serializable {
 
   private static final long serialVersionUID = 515251862250083594L;
 
-  private String id;
-  private String html;
   private long sizeInBytes;
   private int numberOfFiles;
 
@@ -19,28 +17,10 @@ public class PreservationMetadataBundle implements Serializable {
     super();
   }
 
-  public PreservationMetadataBundle(String id, String html, long sizeInBytes, int numberOfFiles) {
+  public PreservationMetadataBundle(long sizeInBytes, int numberOfFiles) {
     super();
-    this.id = id;
-    this.html = html;
     this.sizeInBytes = sizeInBytes;
     this.numberOfFiles = numberOfFiles;
-  }
-
-  public String getId() {
-    return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
-  }
-
-  public String getHtml() {
-    return html;
-  }
-
-  public void setHtml(String html) {
-    this.html = html;
   }
 
   public long getSizeInBytes() {
