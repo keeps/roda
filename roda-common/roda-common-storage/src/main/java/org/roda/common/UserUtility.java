@@ -31,7 +31,6 @@ public class UserUtility {
   private static final String RODA_USER = "RODA_USER";
 
   private static LdapUtility LDAP_UTILITY;
-  private static RodaUser GUEST = null;
 
   /** Private empty constructor */
   private UserUtility() {
@@ -147,16 +146,14 @@ public class UserUtility {
   }
 
   /**
-   * Retrieves guest used. Note: this should be used as a read-only object
+   * Retrieves guest used
    */
   public static RodaUser getGuest() {
-    if (GUEST == null) {
-      GUEST = new RodaUser();
-      GUEST.setId("guest");
-      GUEST.setName("guest");
-      GUEST.setGuest(true);
-    }
-    return GUEST;
+    RodaUser guest = new RodaUser();
+    guest.setId("guest");
+    guest.setName("guest");
+    guest.setGuest(true);
+    return guest;
   }
 
   public static RodaSimpleUser getClientUser(HttpSession session) {
