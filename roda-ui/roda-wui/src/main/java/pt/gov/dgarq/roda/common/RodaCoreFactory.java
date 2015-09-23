@@ -46,6 +46,7 @@ import org.roda.storage.fs.FileStorageService;
 
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
+import pt.gov.dgarq.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
@@ -354,9 +355,15 @@ public class RodaCoreFactory {
           }
         }
       } else if ("orphans".equals(args.get(0)) && args.size() == 2) {
-        RemoveOrphansAction removeOrphansAction = new RemoveOrphansAction();
-        removeOrphansAction.setParentID(args.get(1));
-        getActionOrchestrator().runActionOnAllAIPs(removeOrphansAction);
+        try{
+          Filter filter = new Filter(new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID));
+          RemoveOrphansAction removeOrphansAction = new RemoveOrphansAction();
+          removeOrphansAction.setNewParent(model.retrieveAIP(args.get(1)));
+          getActionOrchestrator().runActionFromIndex(AIP.class, filter, removeOrphansAction);
+        }catch(ModelServiceException mse){
+          mse.printStackTrace();
+        }
+        
       } else if ("fixity".equals(args.get(0))) {
         Plugin<AIP> fixityAction = new FixityAction();
         getActionOrchestrator().runActionOnAllAIPs(fixityAction);

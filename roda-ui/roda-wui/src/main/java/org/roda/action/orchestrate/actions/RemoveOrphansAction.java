@@ -29,7 +29,7 @@ import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 
 public class RemoveOrphansAction implements Plugin<AIP> {
   private final Logger logger = Logger.getLogger(getClass());
-  private String parentID;
+  private AIP newParent;
 
   @Override
   public void init() throws PluginException {
@@ -71,42 +71,49 @@ public class RemoveOrphansAction implements Plugin<AIP> {
     // no params
   }
 
-  public String getParentID() {
-    return parentID;
+  public AIP getNewParent() {
+    return newParent;
   }
 
-  public void setParentID(String parentID) {
-    this.parentID = parentID;
+  public void setNewParent(AIP newParent) {
+    this.newParent = newParent;
   }
 
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
 
-    try {
-      logger.debug("Getting parent");
-      model.retrieveAIP(parentID);
-      logger.debug("Parent OK");
-      for (AIP aip : list) {
-        try {
-          StoragePath aipPath = ModelUtils.getAIPpath(aip.getId());
-          SimpleDescriptionObject sdo = index.retrieve(SimpleDescriptionObject.class, aip.getId());
-          if (sdo.getParentID() == null || sdo.getParentID().trim().equals("")) {
-            if (sdo.getLevel() == null || !sdo.getLevel().trim().equalsIgnoreCase("fonds")) {
-              logger.debug("Moving orphan "+aip.getId() + " to under "+parentID);
-              Map<String, Set<String>> aipMetadata = storage.getMetadata(aipPath);
-              aipMetadata.put(RodaConstants.STORAGE_META_PARENT_ID, new HashSet<String>(Arrays.asList(parentID)));
-              storage.updateMetadata(aipPath, aipMetadata, true);
-              index.reindexAIP(aip);
-            }
-          }
-        } catch (StorageServiceException | IndexServiceException e) {
-          logger.error("Error processing AIP " + aip.getId() + " (RemoveOrphansAction)");
-          logger.error(e.getMessage(), e);
+    boolean reindexParent = false;
+    for (AIP aip : list) {
+      try {
+        logger.debug("Processing AIP " + aip.getId());
+        StoragePath aipPath = ModelUtils.getAIPpath(aip.getId());
+        SimpleDescriptionObject sdo = index.retrieve(SimpleDescriptionObject.class, aip.getId());
+        if (sdo.getLevel() == null || !sdo.getLevel().trim().equalsIgnoreCase("fonds")) {
+          logger.debug("Moving orphan " + aip.getId() + " to under " + newParent.getId());
+          Map<String, Set<String>> aipMetadata = storage.getMetadata(aipPath);
+          aipMetadata.put(RodaConstants.STORAGE_META_PARENT_ID, new HashSet<String>(Arrays.asList(newParent.getId())));
+          storage.updateMetadata(aipPath, aipMetadata, true);
+          index.reindexAIP(aip);
+          reindexParent=true;
+        } else {
+          logger.debug("AIP doesn't need to be moved... Level: " + sdo.getLevel());
         }
+      } catch (StorageServiceException | IndexServiceException e) {
+        logger.error("Error processing AIP " + aip.getId() + " (RemoveOrphansAction)");
+        logger.error(e.getMessage(), e);
       }
-    } catch (ModelServiceException e1) {
-      logger.error("New parent (" + parentID + ") doesn't exist.");
+    }
+    
+    if(reindexParent){
+      logger.debug("Reindexing parent");
+      try{
+        newParent = model.retrieveAIP(newParent.getId());
+        index.reindexAIP(newParent);
+      } catch (ModelServiceException e) {
+        logger.error("Error reindexing parent " + newParent.getId() + " (RemoveOrphansAction)");
+        logger.error(e.getMessage(), e);
+      }
     }
     return null;
   }

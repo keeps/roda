@@ -57,46 +57,50 @@ public class IndexModelObserver implements ModelObserver {
 
   private void indexPreservationsEvents(final AIP aip) {
     final Map<String, List<String>> preservationEventsIds = aip.getPreservationsEventsIds();
-    for (Map.Entry<String, List<String>> representationPreservationMap : preservationEventsIds.entrySet()) {
-      try {
-        for (String fileId : representationPreservationMap.getValue()) {
-          EventPreservationObject premisEvent = model.retrieveEventPreservationObject(aip.getId(),
-            representationPreservationMap.getKey(), fileId);
-          String id = SolrUtils.getId(aip.getId(), representationPreservationMap.getKey(), fileId);
-          SolrInputDocument premisEventDocument = SolrUtils.eventPreservationObjectToSolrDocument(id, premisEvent);
-          index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisEventDocument);
+    if(preservationEventsIds!=null){
+      for (Map.Entry<String, List<String>> representationPreservationMap : preservationEventsIds.entrySet()) {
+        try {
+          for (String fileId : representationPreservationMap.getValue()) {
+            EventPreservationObject premisEvent = model.retrieveEventPreservationObject(aip.getId(),
+              representationPreservationMap.getKey(), fileId);
+            String id = SolrUtils.getId(aip.getId(), representationPreservationMap.getKey(), fileId);
+            SolrInputDocument premisEventDocument = SolrUtils.eventPreservationObjectToSolrDocument(id, premisEvent);
+            index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisEventDocument);
+          }
+        } catch (SolrServerException | IOException | ModelServiceException e) {
+          LOGGER.error("Could not index premis event", e);
         }
-      } catch (SolrServerException | IOException | ModelServiceException e) {
-        LOGGER.error("Could not index premis event", e);
       }
-    }
-    try {
-      index.commit(RodaConstants.INDEX_PRESERVATION_EVENTS);
-    } catch (SolrServerException | IOException e) {
-      LOGGER.error("Could not commit indexed representations", e);
+      try {
+        index.commit(RodaConstants.INDEX_PRESERVATION_EVENTS);
+      } catch (SolrServerException | IOException e) {
+        LOGGER.error("Could not commit indexed representations", e);
+      }
     }
   }
 
   private void indexPreservationFileObjects(final AIP aip) {
     final Map<String, List<String>> preservationFileObjectsIds = aip.getPreservationFileObjectsIds();
-    for (Map.Entry<String, List<String>> eventPreservationMap : preservationFileObjectsIds.entrySet()) {
-      try {
-        for (String fileId : eventPreservationMap.getValue()) {
-          RepresentationFilePreservationObject premisObject = model.retrieveRepresentationFileObject(aip.getId(),
-            eventPreservationMap.getKey(), fileId);
-          String id = SolrUtils.getId(aip.getId(), eventPreservationMap.getKey(), fileId);
-          SolrInputDocument premisObjectDocument = SolrUtils.representationFilePreservationObjectToSolrDocument(id,
-            premisObject);
-          index.add(RodaConstants.INDEX_PRESERVATION_OBJECTS, premisObjectDocument);
+    if(preservationFileObjectsIds!=null){
+      for (Map.Entry<String, List<String>> eventPreservationMap : preservationFileObjectsIds.entrySet()) {
+        try {
+          for (String fileId : eventPreservationMap.getValue()) {
+            RepresentationFilePreservationObject premisObject = model.retrieveRepresentationFileObject(aip.getId(),
+              eventPreservationMap.getKey(), fileId);
+            String id = SolrUtils.getId(aip.getId(), eventPreservationMap.getKey(), fileId);
+            SolrInputDocument premisObjectDocument = SolrUtils.representationFilePreservationObjectToSolrDocument(id,
+              premisObject);
+            index.add(RodaConstants.INDEX_PRESERVATION_OBJECTS, premisObjectDocument);
+          }
+        } catch (SolrServerException | IOException | ModelServiceException e) {
+          LOGGER.error("Could not index premis object", e);
         }
-      } catch (SolrServerException | IOException | ModelServiceException e) {
-        LOGGER.error("Could not index premis object", e);
       }
-    }
-    try {
-      index.commit(RodaConstants.INDEX_PRESERVATION_OBJECTS);
-    } catch (SolrServerException | IOException e) {
-      LOGGER.error("Could not commit indexed representations", e);
+      try {
+        index.commit(RodaConstants.INDEX_PRESERVATION_OBJECTS);
+      } catch (SolrServerException | IOException e) {
+        LOGGER.error("Could not commit indexed representations", e);
+      }
     }
   }
 
