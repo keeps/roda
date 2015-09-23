@@ -206,7 +206,8 @@ public interface BrowserService extends RemoteService {
 
   public SimpleDescriptionObject moveInHierarchy(String aipId, String parentId) throws RODAException;
 
-  public SimpleDescriptionObject createNewItem(String itemId, String parentId) throws RODAException;
+  public String createAIP(String parentId) throws AuthorizationDeniedException, GenericException;
+  public void removeAIP(String aipId) throws AuthorizationDeniedException, GenericException;
 
   public void removeDescriptiveMetadataFile(String itemId, String descriptiveMetadataId) throws RODAException;
 
@@ -215,6 +216,8 @@ public interface BrowserService extends RemoteService {
 
   public void createDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle newBundle)
     throws AuthorizationDeniedException, GenericException, MetadataParseException;
+
+  
 
 
   // public DescriptiveMetadata retrieveMetadataFile(String itemId, String

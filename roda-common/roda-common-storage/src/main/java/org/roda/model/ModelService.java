@@ -30,6 +30,7 @@ import org.roda.storage.DefaultBinary;
 import org.roda.storage.DefaultDirectory;
 import org.roda.storage.DefaultStoragePath;
 import org.roda.storage.Directory;
+import org.roda.storage.EmptyClosableIterable;
 import org.roda.storage.Resource;
 import org.roda.storage.StoragePath;
 import org.roda.storage.StorageService;
@@ -264,6 +265,34 @@ public class ModelService extends ModelObservable {
     return aip;
   }
 
+  public AIP createAIP(Map<String, Set<String>> metadata) throws ModelServiceException {
+    return createAIP(metadata, true);
+  }
+
+  public AIP createAIP(Map<String, Set<String>> metadata, boolean notify) throws ModelServiceException {
+
+    // set basic AIP information
+    ModelUtils.setAs(metadata, RodaConstants.STORAGE_META_ACTIVE, Boolean.TRUE);
+    ModelUtils.setAs(metadata, RodaConstants.STORAGE_META_DATE_CREATED, new Date());
+    ModelUtils.setAs(metadata, RodaConstants.STORAGE_META_DATE_MODIFIED, new Date());
+
+    // set default permissions
+    // TODO setPermissions(metadata, defaultPermissions);
+
+    AIP aip;
+    try {
+      Directory directory = storage.createRandomDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP),
+        metadata);
+      aip = convertResourceToAIP(directory);
+      if (notify) {
+        notifyAipCreated(aip);
+      }
+    } catch (StorageServiceException e) {
+      throw new ModelServiceException("Error creating AIP in storage", e.getCode(), e);
+    }
+    return aip;
+  }
+
   public AIP createAIP(String aipId, StorageService sourceStorage, StoragePath sourcePath)
     throws ModelServiceException {
     return createAIP(aipId, sourceStorage, sourcePath, true);
@@ -357,8 +386,12 @@ public class ModelService extends ModelObservable {
       };
 
     } catch (StorageServiceException e) {
-      throw new ModelServiceException("Error while obtaining descriptive metadata binary list from storage",
-        ModelServiceException.INTERNAL_SERVER_ERROR, e);
+      if (e.getCode() == StorageServiceException.NOT_FOUND) {
+        it = new EmptyClosableIterable<DescriptiveMetadata>();
+      } else {
+        throw new ModelServiceException("Error while obtaining descriptive metadata binary list from storage",
+          ModelServiceException.INTERNAL_SERVER_ERROR, e);
+      }
     }
 
     return it;

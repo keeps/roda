@@ -162,7 +162,9 @@ public interface BrowserServiceAsync {
 
   public void moveInHierarchy(String aipId, String parentId, AsyncCallback<SimpleDescriptionObject> callback);
 
-  public void createNewItem(String itemId, String parentId, AsyncCallback<SimpleDescriptionObject> callback);
+  void createAIP(String parentId, AsyncCallback<String> callback);
+
+  void removeAIP(String aipId, AsyncCallback<Void> callback);
 
   void updateDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle bundle, AsyncCallback<Void> callback);
 

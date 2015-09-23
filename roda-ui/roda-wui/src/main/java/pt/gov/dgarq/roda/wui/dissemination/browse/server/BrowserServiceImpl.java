@@ -124,16 +124,24 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     return Browser.getAncestors(user, sdo);
   }
 
+  @Override
   public SimpleDescriptionObject moveInHierarchy(String aipId, String parentId)
     throws AuthorizationDeniedException, GenericException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     return Browser.moveInHierarchy(user, aipId, parentId);
   }
 
-  public SimpleDescriptionObject createNewItem(String itemId, String parentId) throws RODAException {
+  @Override
+  public String createAIP(String parentId) throws AuthorizationDeniedException, GenericException{
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
-    return Browser.createNewItem(user, itemId, parentId);
+    return Browser.createAIP(user, parentId).getId();
 
+  }
+  
+  @Override
+  public void removeAIP(String aipId) throws AuthorizationDeniedException, GenericException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    Browser.removeAIP(user, aipId);
   }
 
   @Override

@@ -14,6 +14,7 @@ import org.roda.storage.ContentPayload;
 import org.roda.storage.DefaultBinary;
 import org.roda.storage.DefaultContainer;
 import org.roda.storage.DefaultDirectory;
+import org.roda.storage.DefaultStoragePath;
 import org.roda.storage.Directory;
 import org.roda.storage.Entity;
 import org.roda.storage.Resource;
@@ -110,7 +111,8 @@ public class FileStorageService implements StorageService {
   }
 
   @Override
-  public ClosableIterable<Resource> listResourcesUnderContainer(StoragePath storagePath) throws StorageServiceException {
+  public ClosableIterable<Resource> listResourcesUnderContainer(StoragePath storagePath)
+    throws StorageServiceException {
     Path path = FSUtils.getEntityPath(basePath, storagePath);
     return FSUtils.listPath(basePath, path);
   }
@@ -141,6 +143,33 @@ public class FileStorageService implements StorageService {
   }
 
   @Override
+  public Directory createRandomDirectory(StoragePath parentStoragePath, Map<String, Set<String>> metadata)
+    throws StorageServiceException {
+    Path parentDirPath = FSUtils.getEntityPath(basePath, parentStoragePath);
+    Path directory = null;
+
+    try {
+      directory = FSUtils.createRandomDirectory(parentDirPath);
+      FSYamlMetadataUtils.createPropertiesDirectory(directory);
+      FSYamlMetadataUtils.writeMetadata(directory, metadata, true);
+      return new DefaultDirectory(DefaultStoragePath.parse(directory.toString()), metadata);
+    } catch (FileAlreadyExistsException e) {
+      // cleanup
+      FSUtils.deletePath(directory);
+
+      throw new StorageServiceException("Could not create random directory under " + parentDirPath,
+        StorageServiceException.ALREADY_EXISTS, e);
+    } catch (IOException e) {
+      // cleanup
+      FSUtils.deletePath(directory);
+
+      throw new StorageServiceException("Could not create random directory under " + parentDirPath,
+        StorageServiceException.INTERNAL_SERVER_ERROR, e);
+    }
+
+  }
+
+  @Override
   public Directory getDirectory(StoragePath storagePath) throws StorageServiceException {
     if (storagePath.isFromAContainer()) {
       throw new StorageServiceException("Invalid storage path for a directory: " + storagePath,
@@ -158,7 +187,8 @@ public class FileStorageService implements StorageService {
   }
 
   @Override
-  public ClosableIterable<Resource> listResourcesUnderDirectory(StoragePath storagePath) throws StorageServiceException {
+  public ClosableIterable<Resource> listResourcesUnderDirectory(StoragePath storagePath)
+    throws StorageServiceException {
     Path directoryPath = FSUtils.getEntityPath(basePath, storagePath);
     return FSUtils.listPath(basePath, directoryPath);
   }
@@ -174,19 +204,58 @@ public class FileStorageService implements StorageService {
       if (Files.exists(binPath)) {
         throw new StorageServiceException("Binary already exists: " + binPath, StorageServiceException.ALREADY_EXISTS);
       } else {
+
         try {
+          // ensuring parent exists
+          Path parent = binPath.getParent();
+          if (!Files.exists(parent)) {
+            Files.createDirectories(parent);
+          }
+
+          // writing file
           payload.writeToPath(binPath);
           Map<String, String> contentDigest = FSUtils.generateContentDigest(binPath);
           FSYamlMetadataUtils.addContentDigestToMetadata(metadata, contentDigest);
           FSYamlMetadataUtils.writeMetadata(binPath, metadata, true);
-          return new DefaultBinary(storagePath, metadata, new FSPathContentPayload(binPath), Files.size(binPath),
-            false, contentDigest);
+          return new DefaultBinary(storagePath, metadata, new FSPathContentPayload(binPath), Files.size(binPath), false,
+            contentDigest);
         } catch (IOException e) {
-          throw new StorageServiceException("Could not create binary", StorageServiceException.INTERNAL_SERVER_ERROR, e);
+          throw new StorageServiceException("Could not create binary", StorageServiceException.INTERNAL_SERVER_ERROR,
+            e);
         }
       }
     }
+  }
 
+  @Override
+  public Binary createRandomBinary(StoragePath parentStoragePath, Map<String, Set<String>> metadata,
+    ContentPayload payload, boolean asReference) throws StorageServiceException {
+    if (asReference) {
+      // TODO create binary as a reference
+      throw new StorageServiceException("Method not yet implemented", StorageServiceException.NOT_IMPLEMENTED);
+    } else {
+      Path parent = FSUtils.getEntityPath(basePath, parentStoragePath);
+      try {
+        // ensure parent exists
+        if (!Files.exists(parent)) {
+          Files.createDirectories(parent);
+        }
+        
+        // create file
+        Path binPath = FSUtils.createRandomFile(parent);
+
+        // writing file
+        payload.writeToPath(binPath);
+        Map<String, String> contentDigest = FSUtils.generateContentDigest(binPath);
+        FSYamlMetadataUtils.addContentDigestToMetadata(metadata, contentDigest);
+        FSYamlMetadataUtils.writeMetadata(binPath, metadata, true);
+        StoragePath storagePath = DefaultStoragePath.parse(binPath.toString());
+        return new DefaultBinary(storagePath, metadata, new FSPathContentPayload(binPath), Files.size(binPath), false,
+          contentDigest);
+      } catch (IOException e) {
+        throw new StorageServiceException("Could not create binary", StorageServiceException.INTERNAL_SERVER_ERROR, e);
+      }
+    }
   }
 
   @Override
@@ -299,8 +368,10 @@ public class FileStorageService implements StorageService {
         return DefaultBinary.class;
       }
     } else {
-      throw new StorageServiceException("There isn't a Container or Directory or Binary representated by "
-        + storagePath.asString(), StorageServiceException.INTERNAL_SERVER_ERROR);
+      throw new StorageServiceException(
+        "There isn't a Container or Directory or Binary representated by " + storagePath.asString(),
+        StorageServiceException.INTERNAL_SERVER_ERROR);
     }
   }
+
 }

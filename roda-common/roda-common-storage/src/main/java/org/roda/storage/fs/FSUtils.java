@@ -6,6 +6,7 @@ import java.nio.channels.FileChannel;
 import java.nio.file.CopyOption;
 import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.DirectoryStream;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -21,6 +22,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.commons.lang3.mutable.MutableLong;
 import org.roda.storage.ClosableIterable;
@@ -517,4 +519,33 @@ public final class FSUtils {
 
     return digest;
   }
+
+  public static Path createRandomDirectory(Path parent) throws IOException {
+    Path directory;
+    do {
+      try {
+        directory = Files.createDirectory(parent.resolve(UUID.randomUUID().toString()));
+      } catch (FileAlreadyExistsException e) {
+        LOGGER.warn("Got colision when creating random directory", e);
+        directory = null;
+      }
+    } while (directory == null);
+
+    return directory;
+  }
+
+  public static Path createRandomFile(Path parent) throws IOException {
+    Path file;
+    do {
+      try {
+        file = Files.createFile(parent.resolve(UUID.randomUUID().toString()));
+      } catch (FileAlreadyExistsException e) {
+        LOGGER.warn("Got colision when creating random directory", e);
+        file = null;
+      }
+    } while (file == null);
+
+    return file;
+  }
+
 }

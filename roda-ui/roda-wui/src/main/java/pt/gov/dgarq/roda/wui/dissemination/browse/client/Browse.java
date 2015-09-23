@@ -660,6 +660,22 @@ public class Browse extends Composite {
     return historyUpdated;
   }
 
+  @UiHandler("createItem")
+  void buttonCreateItemHandler(ClickEvent e) {
+    BrowserService.Util.getInstance().createAIP(aipId, new AsyncCallback<String>() {
+
+      @Override
+      public void onFailure(Throwable caught) {
+        MessagePopup.showError("Error creating item");
+      }
+
+      @Override
+      public void onSuccess(String itemAIPId) {
+        view(itemAIPId);
+      }
+    });
+  }
+
   @UiHandler("createDescriptiveMetadata")
   void buttonCreateDescriptiveMetadataHandler(ClickEvent e) {
     if (aipId != null) {
@@ -667,78 +683,22 @@ public class Browse extends Composite {
     }
   }
 
-  protected void onMove(final String targetPid, final String oldParentPid, final String newParentPid) {
-    // FIXME
-    // update(oldParentPid, false, true, new
-    // AsyncCallback<CollectionsTreeItem>() {
-    //
-    // public void onFailure(Throwable caught) {
-    // logger.error("Error on move event", caught);
-    // }
-    //
-    // public void onSuccess(CollectionsTreeItem treeItem) {
-    // update(newParentPid, false, true, new
-    // AsyncCallback<CollectionsTreeItem>() {
-    //
-    // public void onFailure(Throwable caught) {
-    // logger.error("Error on move event", caught);
-    // }
-    //
-    // public void onSuccess(CollectionsTreeItem result) {
-    // // fondsPanel.setSelected(null);
-    // // fondsPanel.setSelected(targetPid);
-    // }
-    //
-    // });
-    //
-    // }
+  @UiHandler("remove")
+  void buttonRemoveHandler(ClickEvent e) {
+    if (aipId != null) {
+      BrowserService.Util.getInstance().removeAIP(aipId, new AsyncCallback<Void>() {
 
-    // });
+        @Override
+        public void onFailure(Throwable caught) {
+          MessagePopup.showError("Error deleteing item");
+        }
+
+        @Override
+        public void onSuccess(Void result) {
+          Tools.newHistory(RESOLVER);
+        }
+      });
+    }
   }
 
-  protected void onClone(final String clonePID) {
-    // FIXME
-    // BrowserService.Util.getInstance().getParent(clonePID, new
-    // AsyncCallback<String>() {
-    //
-    // public void onFailure(Throwable caught) {
-    // logger.error("Error on cloning event", caught);
-    // }
-    //
-    // public void onSuccess(final String parentPID) {
-    // update(parentPID, false, true, new
-    // AsyncCallback<CollectionsTreeItem>() {
-    //
-    // public void onFailure(Throwable caught) {
-    // logger.error("Error on cloning event", caught);
-    // }
-    //
-    // public void onSuccess(CollectionsTreeItem treeItem) {
-    // ViewPanel.setEditMode(true);
-    // view(clonePID);
-    //
-    // }
-    //
-    // });
-    // }
-
-    // });
-
-  }
-
-  protected void onRemove(final String parentPID) {
-    // FIXME
-    // update(parentPID, false, true, new
-    // AsyncCallback<CollectionsTreeItem>() {
-    //
-    // public void onFailure(Throwable caught) {
-    // logger.error("Error on remove event", caught);
-    // }
-    //
-    // public void onSuccess(CollectionsTreeItem treeItem) {
-    // view(null);
-    // }
-    //
-    // });
-  }
 }

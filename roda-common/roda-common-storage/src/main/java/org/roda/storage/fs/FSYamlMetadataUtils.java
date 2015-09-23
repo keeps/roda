@@ -159,6 +159,13 @@ public final class FSYamlMetadataUtils {
     }
     BufferedWriter bufferedWriter = null;
     try {
+      // ensure parent exists
+      Path parent = properties.getParent();
+      if(!Files.exists(parent)) {
+        Files.createDirectories(parent);
+      }
+      
+      // write file
       bufferedWriter = Files.newBufferedWriter(properties, Charset.defaultCharset(), StandardOpenOption.CREATE,
         StandardOpenOption.TRUNCATE_EXISTING);
       yaml.dump(metadata, bufferedWriter);

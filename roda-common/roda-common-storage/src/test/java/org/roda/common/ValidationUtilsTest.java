@@ -10,7 +10,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
 
-import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -51,22 +50,29 @@ public class ValidationUtilsTest {
     model = new ModelService(storage);
 
     // Configure Solr
-    URL solrConfigURL = IndexServiceTest.class.getResource("/index/solr.xml");
-    Path solrConfigPath = Paths.get(solrConfigURL.toURI());
-    Files.copy(solrConfigPath, indexPath.resolve("solr.xml"));
-    Path aipSchema = indexPath.resolve("aip");
-    Files.createDirectories(aipSchema);
-    Files.createFile(aipSchema.resolve("core.properties"));
+    // URL solrConfigURL =
+    // IndexServiceTest.class.getResource("/index/solr.xml");
+    // Path solrConfigPath = Paths.get(solrConfigURL.toURI());
+    // Files.copy(solrConfigPath, indexPath.resolve("solr.xml"));
+    // Path aipSchema = indexPath.resolve("aip");
+    // Files.createDirectories(aipSchema);
+    // Files.createFile(aipSchema.resolve("core.properties"));
 
-    Path solrHome = Paths.get(IndexServiceTest.class.getResource("/index/").toURI());
-    System.setProperty("solr.data.dir", indexPath.toString());
-    System.setProperty("solr.data.dir.aip", indexPath.resolve("aip").toString());
-    System.setProperty("solr.data.dir.sdo", indexPath.resolve("sdo").toString());
-    System.setProperty("solr.data.dir.representation", indexPath.resolve("representation").toString());
-    System.setProperty("solr.data.dir.preservationobject", indexPath.resolve("preservationobject").toString());
-    System.setProperty("solr.data.dir.preservationevent", indexPath.resolve("preservationevent").toString());
+    // Path solrHome =
+    // Paths.get(IndexServiceTest.class.getResource("/index/").toURI());
+    // System.setProperty("solr.data.dir", indexPath.toString());
+    // System.setProperty("solr.data.dir.aip",
+    // indexPath.resolve("aip").toString());
+    // System.setProperty("solr.data.dir.sdo",
+    // indexPath.resolve("sdo").toString());
+    // System.setProperty("solr.data.dir.representation",
+    // indexPath.resolve("representation").toString());
+    // System.setProperty("solr.data.dir.preservationobject",
+    // indexPath.resolve("preservationobject").toString());
+    // System.setProperty("solr.data.dir.preservationevent",
+    // indexPath.resolve("preservationevent").toString());
     // start embedded solr
-    final EmbeddedSolrServer solr = new EmbeddedSolrServer(solrHome, "test");
+    // final EmbeddedSolrServer solr = new EmbeddedSolrServer(solrHome, "test");
 
     URL corporaURL = IndexServiceTest.class.getResource("/corpora");
     corporaPath = Paths.get(corporaURL.toURI());

@@ -27,6 +27,7 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.roda.api.v1.utils.StreamResponse;
 import org.roda.common.ValidationUtils;
 import org.roda.index.IndexServiceException;
+import org.roda.model.AIP;
 import org.roda.model.DescriptiveMetadata;
 import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
@@ -111,6 +112,7 @@ public class BrowserHelper {
       itemBundle.setRepresentations(representations);
 
     } catch (StorageServiceException | ModelServiceException | RODAException e) {
+      LOGGER.error("Error getting item bundle", e);
       throw new GenericException("Error getting item bundle " + e.getMessage());
     }
 
@@ -540,33 +542,44 @@ public class BrowserHelper {
 
   }
 
-  public static SimpleDescriptionObject createNewItem(RodaUser user, String aipId, String parentAipId)
-    throws GenericException {
+  public static AIP createAIP(String parentAipId) throws GenericException, AuthorizationDeniedException {
     try {
-      StorageService storage = RodaCoreFactory.getStorageService();
       ModelService model = RodaCoreFactory.getModelService();
-      StoragePath aipPath = ModelUtils.getAIPpath(aipId);
-      Map<String, Set<String>> itemMetadata = new HashMap<String, Set<String>>();
+      // IndexService index = RodaCoreFactory.getIndexService();
+
+      Map<String, Set<String>> metadata = new HashMap<String, Set<String>>();
       if (parentAipId != null) {
-        itemMetadata.put(RodaConstants.STORAGE_META_PARENT_ID, new HashSet<String>(Arrays.asList(parentAipId)));
+        metadata.put(RodaConstants.STORAGE_META_PARENT_ID, new HashSet<String>(Arrays.asList(parentAipId)));
       }
-      storage.createContainer(aipPath, itemMetadata);
-      model.updateAIP(aipId, storage, aipPath);
-      return RodaCoreFactory.getIndexService().retrieve(SimpleDescriptionObject.class, aipId);
-    } catch (StorageServiceException | ModelServiceException | IndexServiceException e) {
-      if (e.getCode() == StorageServiceException.NOT_FOUND) {
-        throw new GenericException("AIP not found: " + aipId);
-      } else if (e.getCode() == StorageServiceException.FORBIDDEN) {
-        throw new GenericException("You do not have permission to access AIP: " + aipId);
+
+      AIP aip = model.createAIP(metadata);
+      return aip;
+      // return index.retrieve(SimpleDescriptionObject.class, aip.getId());
+    } catch (ModelServiceException e) {
+      if (e.getCode() == StorageServiceException.FORBIDDEN) {
+        throw new AuthorizationDeniedException("You do not have permission to create AIPS");
       } else {
         throw new GenericException("Error creating new item: " + e.getMessage());
       }
+    }
+  }
 
+  public static void removeAIP(String aipId) throws AuthorizationDeniedException, GenericException {
+    try {
+      ModelService model = RodaCoreFactory.getModelService();
+      model.deleteAIP(aipId);
+    } catch (ModelServiceException e) {
+      if (e.getCode() == StorageServiceException.FORBIDDEN) {
+        throw new AuthorizationDeniedException("You do not have permission to create AIPS");
+      } else {
+        throw new GenericException("Error creating new item: " + e.getMessage());
+      }
     }
   }
 
   public static DescriptiveMetadata createDescriptiveMetadataFile(String aipId, String descriptiveMetadataId,
-    String descriptiveMetadataType, Binary descriptiveMetadataIdBinary) throws GenericException, ValidationException {
+    String descriptiveMetadataType, Binary descriptiveMetadataIdBinary)
+      throws GenericException, ValidationException, AuthorizationDeniedException {
 
     ValidationUtils.validateDescriptiveBinary(descriptiveMetadataIdBinary, descriptiveMetadataId, false);
 
@@ -579,8 +592,9 @@ public class BrowserHelper {
       if (e.getCode() == StorageServiceException.NOT_FOUND) {
         throw new GenericException("AIP not found: " + aipId);
       } else if (e.getCode() == StorageServiceException.FORBIDDEN) {
-        throw new GenericException("You do not have permission to access AIP: " + aipId);
+        throw new AuthorizationDeniedException("You do not have permission to access AIP: " + aipId);
       } else {
+        LOGGER.error("Error creating new item", e);
         throw new GenericException("Error creating new item: " + e.getMessage());
       }
     }

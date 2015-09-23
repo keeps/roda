@@ -8,8 +8,10 @@ import java.nio.file.StandardOpenOption;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -129,6 +131,23 @@ public final class ModelUtils {
     }
 
     return ret;
+  }
+
+  public static <T> void setAs(Map<String, Set<String>> metadata, String key, T value) throws ModelServiceException {
+    if (value instanceof Date) {
+      Date dateValue = (Date) value;
+      metadata.put(key, new HashSet<>(Arrays.asList(RodaUtils.dateToString(dateValue))));
+    } else if (value instanceof Boolean) {
+      Boolean booleanValue = (Boolean) value;
+      metadata.put(key, new HashSet<>(Arrays.asList(booleanValue.toString())));
+    } else if (value instanceof Long) {
+      Long longValue = (Long) value;
+      metadata.put(key, new HashSet<>(Arrays.asList(longValue.toString())));
+    } else {
+      throw new ModelServiceException(
+        "Could not set data because value class is not supported" + value.getClass().getName(),
+        ModelServiceException.INTERNAL_SERVER_ERROR);
+    }
   }
 
   /**

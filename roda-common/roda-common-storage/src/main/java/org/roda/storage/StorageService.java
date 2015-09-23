@@ -89,6 +89,21 @@ public interface StorageService {
    */
   public Directory createDirectory(StoragePath storagePath, Map<String, Set<String>> metadata)
     throws StorageServiceException;
+  
+  
+  /**
+   * Creates a new directory with a random name.
+   * 
+   * @param parentStoragePath
+   *          storage path that identifies parent of the directory
+   * @param metadata
+   *          optional metadata associated with this resource
+   * 
+   * @throws StorageServiceException
+   * 
+   */
+  public Directory createRandomDirectory(StoragePath parentStoragePath, Map<String, Set<String>> metadata)
+    throws StorageServiceException;
 
   /**
    * Get an existing directory.
@@ -128,6 +143,24 @@ public interface StorageService {
    * @throws StorageServiceException
    */
   public Binary createBinary(StoragePath storagePath, Map<String, Set<String>> metadata, ContentPayload payload,
+    boolean asReference) throws StorageServiceException;
+  
+  /**
+   * Create a binary resource with a defined content with a generated id.
+   * 
+   * @param parentStoragePath
+   *          storage path that identifies the parent of the binary
+   * @param metadata
+   *          optional associated metadata
+   * @param payload
+   *          the content payload
+   * @param asReference
+   *          create the binary as a reference to the real content, which is
+   *          managed externally. If false, content should be copied into the
+   *          storage service.
+   * @throws StorageServiceException
+   */
+  public Binary createRandomBinary(StoragePath parentStoragePath, Map<String, Set<String>> metadata, ContentPayload payload,
     boolean asReference) throws StorageServiceException;
 
   /**
