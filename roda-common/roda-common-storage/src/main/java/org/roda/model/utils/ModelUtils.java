@@ -30,6 +30,7 @@ import org.roda.storage.StorageService;
 import org.roda.storage.StorageServiceException;
 
 import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lc.xmlns.premisV2.AgentComplexType;
@@ -40,6 +41,7 @@ import lc.xmlns.premisV2.Representation;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.v2.EventPreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
+import pt.gov.dgarq.roda.core.data.v2.LogEntryParameter;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationState;
 import pt.gov.dgarq.roda.core.data.v2.SIPReport;
 import pt.gov.dgarq.roda.core.metadata.v2.premis.PremisAgentHelper;
@@ -497,7 +499,31 @@ public final class ModelUtils {
         e);
     }
   }
+  
+  public static String getJsonLogEntryParameters(List<LogEntryParameter> parameters) {
+    String ret = "";
+    try {
+      JsonFactory factory = new JsonFactory();
+      ObjectMapper mapper = new ObjectMapper(factory);
+      ret = mapper.writeValueAsString(parameters);
+    } catch (IOException e) {
+      LOGGER.error("Error transforming log entry parameter to json string", e);
+    }
+    return ret;
+  }
 
+  public static List<LogEntryParameter> getLogEntryParameters(String json) {
+    List<LogEntryParameter> ret = new ArrayList<LogEntryParameter>();
+    try {
+      JsonFactory factory = new JsonFactory();
+      ObjectMapper mapper = new ObjectMapper(factory);
+      ret = mapper.readValue(json, new TypeReference<List<LogEntryParameter>>(){});
+    } catch (IOException e) {
+      LOGGER.error("Error transforming json string to log entry parameters", e);
+    }
+    return ret;
+  }
+  
   public static String getJsonLogEntry(LogEntry entry) {
     String ret = null;
     try {

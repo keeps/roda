@@ -112,6 +112,7 @@
    <field name="duration" type="long" indexed="true" stored="true" required="true" multiValued="false" /> 
    <field name="relatedObject" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="username" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 
+   <field name="parameters" type="string" indexed="false" stored="true" required="false" multiValued="false" /> 
    
    <!-- Dynamic field definitions allow using convention over configuration
        for fields via the specification of patterns to match field names. 

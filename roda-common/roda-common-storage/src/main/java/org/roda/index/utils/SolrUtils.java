@@ -47,6 +47,7 @@ import org.roda.model.AIP;
 import org.roda.model.DescriptiveMetadata;
 import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
+import org.roda.model.utils.ModelUtils;
 import org.roda.storage.Binary;
 import org.roda.storage.StoragePath;
 import org.roda.storage.StorageServiceException;
@@ -793,14 +794,14 @@ public class SolrUtils {
       DescriptiveMetadata metadata = model.retrieveDescriptiveMetadata(aipId, descId);
       StoragePath storagePath = metadata.getStoragePath();
       Binary binary = model.getStorage().getBinary(storagePath);
-      try{
+      try {
         SolrInputDocument fields = getDescriptiveMetataFields(binary);
         for (SolrInputField field : fields) {
           ret.addField(field.getName(), field.getValue(), field.getBoost());
         }
-      }catch(IndexServiceException ise){
+      } catch (IndexServiceException ise) {
         // TODO index the index errors for later processing
-        LOGGER.warn("Error processing descriptive metadata "+descId+" from AIP "+aipId);
+        LOGGER.warn("Error processing descriptive metadata " + descId + " from AIP " + aipId);
       }
     }
 
@@ -1066,8 +1067,7 @@ public class SolrUtils {
     final Date datetime = objectToDate(doc.get(RodaConstants.LOG_DATETIME));
     final long duration = objectToLong(doc.get(RodaConstants.LOG_DURATION));
     final String id = objectToString(doc.get(RodaConstants.LOG_ID));
-    // final String parameters =
-    // objectToString(docisUser.get(RodaConstants.LOG_PARAMETERS));
+    final String parameters = objectToString(doc.get(RodaConstants.LOG_PARAMETERS));
     final String relatedObjectId = objectToString(doc.get(RodaConstants.LOG_RELATED_OBJECT_ID));
     final String username = objectToString(doc.get(RodaConstants.LOG_USERNAME));
     LogEntry entry = new LogEntry();
@@ -1077,7 +1077,7 @@ public class SolrUtils {
     entry.setDatetime(datetime);
     entry.setDuration(duration);
     entry.setId(id);
-    // entry.setParameters(fromJson(parameters));
+    entry.setParameters(ModelUtils.getLogEntryParameters(parameters==null?"":parameters));
     entry.setRelatedObjectID(relatedObjectId);
     entry.setUsername(username);
 
@@ -1092,8 +1092,7 @@ public class SolrUtils {
     doc.addField(RodaConstants.LOG_DATETIME, logEntry.getDatetime());
     doc.addField(RodaConstants.LOG_DURATION, logEntry.getDuration());
     doc.addField(RodaConstants.LOG_ID, logEntry.getId());
-    // doc.addField(RodaConstants.LOG_PARAMETERS,
-    // toJSON(logEntry.getParameters()));
+    doc.addField(RodaConstants.LOG_PARAMETERS,ModelUtils.getJsonLogEntryParameters(logEntry.getParameters()));
     doc.addField(RodaConstants.LOG_RELATED_OBJECT_ID, logEntry.getRelatedObjectID());
     doc.addField(RodaConstants.LOG_USERNAME, logEntry.getUsername());
     return doc;

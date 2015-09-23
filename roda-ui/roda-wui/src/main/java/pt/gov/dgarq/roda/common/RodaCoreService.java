@@ -51,20 +51,16 @@ public abstract class RodaCoreService {
   private static LogEntry createLogEntry(RodaUser user, String actionComponent, String actionMethod, String aipId,
     long duration, Object... parameters) {
     LogEntry logEntry = null;
-    List<LogEntryParameter> logParameters = null;
-
+    List<LogEntryParameter> logParameters = new ArrayList<LogEntryParameter>();
     if (parameters != null) {
       if ((parameters.length % 2) != 0) {
 
         LOGGER.warn("registerAction(" + actionComponent + "/" + actionMethod
           + ",...) failed because parameters array must have pairs of elements (even length)");
       } else {
-
-        logParameters = new ArrayList<LogEntryParameter>(parameters.length / 2);
-
-        for (int i = 0, j = 0; i < logParameters.size(); i++, j = j + 2) {
-          Object key = parameters[j];
-          Object value = parameters[j + 1];
+        for (int i = 0; i < parameters.length; i+=2) {
+          Object key = parameters[i];
+          Object value = parameters[i + 1];
           logParameters.add(
             new LogEntryParameter(key != null ? key.toString() : "null", value != null ? value.toString() : "null"));
         }
@@ -77,9 +73,6 @@ public abstract class RodaCoreService {
 
   private static LogEntry createLogEntry(RodaUser user, String actionComponent, String actionMethod, String aipId,
     long duration, List<LogEntryParameter> parameters) {
-    if (parameters == null) {
-      parameters = new ArrayList<LogEntryParameter>();
-    }
 
     LOGGER.debug("Logging user action: " + user);
 
