@@ -10,6 +10,26 @@
 	<xsl:param name="events" />
 	<xsl:param name="files" />
 	<xsl:param name="agents" />
+	<xsl:param name="premisrepresentation" />
+	<xsl:param name="premispreservationlevel" />
+	<xsl:param name="premissince" />
+	<xsl:param name="premisderivedfrom" />
+	<xsl:param name="premissize" />
+	<xsl:param name="premisformat" />
+	<xsl:param name="premiscompositionlevel" />
+	<xsl:param name="premiscreatingapplicationname" />
+	<xsl:param name="premiscreatingapplicationversion" />
+	<xsl:param name="premisdetailedcharacteristics" />
+	<xsl:param name="premisfiles" />
+	<xsl:param name="premisevents" />
+	<xsl:param name="premisagents" />
+	<xsl:param name="premisdetails" />
+	<xsl:param name="premisresult" />
+	<xsl:param name="premisresultnote" />
+	<xsl:param name="premisresultextension" />
+	<xsl:param name="premisrelatedagents" />
+	<xsl:param name="premisrelatedobjects" />
+	<xsl:param name="premisthroughevent" />
 	<xsl:template match="/">
 		<xsl:apply-templates />
 	</xsl:template>
@@ -54,7 +74,7 @@
 				<xsl:attribute name="id"><xsl:value-of
 					select="normalize-space(prem:objectIdentifier[1]/prem:objectIdentifierValue/text())" /></xsl:attribute>
 				<span class="header">
-					<xsl:text>Representation</xsl:text>
+					<xsl:value-of select="$premisrepresentation" />
 					<xsl:if test="prem:objectIdentifier">
 						<span class="identifiers">
 							<xsl:for-each select="prem:objectIdentifier">
@@ -75,9 +95,12 @@
 				<xsl:if test="prem:preservationLevel">
 					<xsl:for-each select="prem:preservationLevel">
 						<span class="preservationLevel">
-							<xsl:text>Preservation level: </xsl:text>
+							<xsl:value-of select="$premispreservationlevel" />
+							<xsl:text> </xsl:text>
 							<xsl:value-of select="prem:preservationLevelValue/text()" />
-							<xsl:text> since </xsl:text>
+							<xsl:text> </xsl:text>
+							<xsl:value-of select="$premissince" />
+							<xsl:text> </xsl:text>
 							<xsl:value-of select="prem:preservationLevelDateAssigned/text()" />
 						</span>
 					</xsl:for-each>
@@ -86,7 +109,7 @@
 					<xsl:for-each select="prem:relationship">
 						<xsl:if test="prem:relationshipType/text()='derivation'">
 							<span class="derivation">
-								<xsl:text>Derived from </xsl:text>
+								<xsl:value-of select="$premisderivedfrom" /><xsl:text> </xsl:text>
 								<a>
 									<xsl:attribute name="href">#<xsl:value-of
 										select="prem:relatedObjectIdentification/prem:relatedObjectIdentifierValue/text()" /></xsl:attribute>
@@ -94,7 +117,9 @@
 									<xsl:value-of
 										select="prem:relatedObjectIdentification/prem:relatedObjectIdentifierValue/text()" />
 								</a>
-								<xsl:text> through event </xsl:text>
+								<xsl:text> </xsl:text>
+								<xsl:value-of select="$premisthroughevent" />
+								<xsl:text> </xsl:text>
 								<a>
 									<xsl:attribute name="href">#<xsl:value-of
 										select="prem:relatedEventIdentification/prem:relatedEventIdentifierValue/text()" /></xsl:attribute>
@@ -137,7 +162,7 @@
 					<xsl:if test="prem:objectCharacteristics/prem:size">
 						<span class="field size">
 							<span class="field-label">
-								<xsl:text>size</xsl:text>
+								<xsl:value-of select="$premissize" />
 							</span>
 							<span class="field-value">
 								<xsl:value-of select="prem:objectCharacteristics/prem:size/text()" />
@@ -147,7 +172,7 @@
 					<xsl:if test="prem:objectCharacteristics/prem:format">
 						<span class="field format">
 							<span class="field-label">
-								<xsl:text>format</xsl:text>
+								<xsl:value-of select="$premisformat" />
 							</span>
 							<span class="field-value">
 								<xsl:if
@@ -209,7 +234,7 @@
 					<xsl:if test="prem:objectCharacteristics/prem:compositionLevel">
 						<span class="field compositionLevel">
 							<span class="field-label">
-								<xsl:text>Composition level</xsl:text>
+								<xsl:value-of select="$premiscompositionlevel" />
 							</span>
 							<span class="field-value">
 								<xsl:value-of
@@ -223,7 +248,7 @@
 							test="prem:objectCharacteristics/prem:creatingApplication/prem:creatingApplicationName">
 							<span class="field creatingApplicationName">
 								<span class="field-label">
-									<xsl:text>Software name</xsl:text>
+									<xsl:value-of select="$premiscreatingapplicationname" />
 								</span>
 								<span class="field-value">
 									<xsl:value-of
@@ -235,7 +260,7 @@
 							test="prem:objectCharacteristics/prem:creatingApplication/prem:creatingApplicationVersion">
 							<span class="field creatingApplicationVersion">
 								<span class="field-label">
-									<xsl:text>Software version</xsl:text>
+									<xsl:value-of select="$premiscreatingapplicationversion" />
 								</span>
 								<span class="field-value">
 									<xsl:value-of
@@ -267,7 +292,7 @@
 						test="prem:objectCharacteristics/prem:objectCharacteristicsExtension">
 						<span class="field objectCharacteristicsExtension">
 							<span class="field-label">
-								<xsl:text>Detailed characteristics</xsl:text>
+								<xsl:value-of select="$premisdetailedcharacteristics" />
 							</span>
 							<span class="field-value">
 								<pre>
@@ -291,7 +316,7 @@
 		<xsl:if test="prem:relationship">
 			<span class="section files">
 				<span class="sectionTitle">
-					<xsl:text>Files</xsl:text>
+					<xsl:value-of select="$premisfiles" />
 				</span>
 				<span class="sectionContent">
 					<xsl:for-each select="$files">
@@ -303,7 +328,7 @@
 			<xsl:if test="count($events) gt 0">
 				<span class="section events">
 					<span class="sectionTitle">
-						<xsl:text>Events</xsl:text>
+						<xsl:value-of select="$premisevents" />
 					</span>
 					<span class="sectionContent">
 						<xsl:for-each select="$events">
@@ -316,7 +341,7 @@
 			<xsl:if test="count($agents) gt 0">
 				<span class="section agents">
 					<span class="sectionTitle">
-						<xsl:text>Agents</xsl:text>
+						<xsl:value-of select="$premisagents" />
 					</span>
 					<span class="sectionContent">
 						<xsl:for-each select="$agents">
@@ -362,7 +387,7 @@
 				<xsl:if test="prem:eventDetail">
 					<span class="field eventDetail">
 						<span class="field-label">
-							<xsl:text>Details</xsl:text>
+							<xsl:value-of select="$premisdetails" />
 						</span>
 						<span class="field-value">
 							<xsl:value-of select="prem:eventDetail/text()" />
@@ -372,7 +397,7 @@
 				<xsl:if test="prem:eventOutcomeInformation/prem:eventOutcome">
 					<span class="field eventOutcome">
 						<span class="field-label">
-							<xsl:text>Result</xsl:text>
+							<xsl:value-of select="$premisresult" />
 						</span>
 						<span class="field-value">
 							<xsl:value-of
@@ -380,10 +405,11 @@
 						</span>
 					</span>
 				</xsl:if>
-				<xsl:if test="prem:eventOutcomeInformation/prem:eventOutcomeDetail/prem:eventOutcomeDetailNote">
+				<xsl:if
+					test="prem:eventOutcomeInformation/prem:eventOutcomeDetail/prem:eventOutcomeDetailNote">
 					<span class="field eventOutcome">
 						<span class="field-label">
-							<xsl:text>Result (note)</xsl:text>
+							<xsl:value-of select="$premisresultnote" />
 						</span>
 						<span class="field-value">
 							<xsl:value-of
@@ -391,10 +417,11 @@
 						</span>
 					</span>
 				</xsl:if>
-				<xsl:if test="prem:eventOutcomeInformation/prem:eventOutcomeDetail/prem:eventOutcomeDetailExtension">
+				<xsl:if
+					test="prem:eventOutcomeInformation/prem:eventOutcomeDetail/prem:eventOutcomeDetailExtension">
 					<span class="field eventOutcome">
 						<span class="field-label">
-							<xsl:text>Result (extension)</xsl:text>
+							<xsl:value-of select="$premisresultextension" />
 						</span>
 						<span class="field-value">
 							<pre>
@@ -409,7 +436,7 @@
 				<xsl:if test="prem:linkingAgentIdentifier">
 					<span class="field linkingAgents">
 						<span class="field-label">
-							<xsl:text>Related agents</xsl:text>
+							<xsl:value-of select="$premisrelatedagents" />
 						</span>
 						<span class="field-value">
 							<xsl:for-each select="prem:linkingAgentIdentifier">
@@ -435,7 +462,7 @@
 				<xsl:if test="prem:linkingObjectIdentifier">
 					<span class="field linkingObjects">
 						<span class="field-label">
-							<xsl:text>Related objects</xsl:text>
+							<xsl:value-of select="$premisrelatedobjects" />
 						</span>
 						<span class="field-value">
 							<xsl:for-each select="prem:linkingObjectIdentifier">

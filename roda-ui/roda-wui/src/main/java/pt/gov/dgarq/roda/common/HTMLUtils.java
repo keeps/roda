@@ -29,14 +29,13 @@ import org.roda.storage.ClosableIterable;
 import org.roda.storage.StorageService;
 import org.roda.storage.StorageServiceException;
 
+import config.i18n.server.XSLTMessages;
 import lc.xmlns.premisV2.AgentComplexType;
 import lc.xmlns.premisV2.EventComplexType;
 import lc.xmlns.premisV2.File;
 import lc.xmlns.premisV2.Representation;
 import pt.gov.dgarq.roda.core.common.Pair;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
-import pt.gov.dgarq.roda.core.metadata.v2.premis.PremisMetadataException;
-import pt.gov.dgarq.roda.core.metadata.v2.premis.PremisRepresentationObjectHelper;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.PreservationMetadataBundle;
 
 /**
@@ -57,12 +56,20 @@ public final class HTMLUtils {
   public static String descriptiveMetadataToHtml(Binary binary, final Locale locale) throws ModelServiceException {
     Map<String, Object> stylesheetOpt = new HashMap<String, Object>();
     stylesheetOpt.put("title", binary.getStoragePath().getName());
+    XSLTMessages messages = new XSLTMessages(locale);
+    for (Map.Entry<String, String> entry : messages.getTranslations(binary.getStoragePath().getName()).entrySet()) {
+      stylesheetOpt.put(entry.getKey(), entry.getValue());
+    }
     return binaryToHtml(binary, locale, true, null, stylesheetOpt);
   }
 
   public static String preservationObjectToHtml(Binary binary, final Locale locale) throws ModelServiceException {
     Map<String, Object> stylesheetOpt = new HashMap<String, Object>();
     stylesheetOpt.put("prefix", RodaConstants.INDEX_OTHER_DESCRIPTIVE_DATA_PREFIX);
+    XSLTMessages messages = new XSLTMessages(locale);
+    for (Map.Entry<String, String> entry : messages.getTranslations("premis").entrySet()) {
+      stylesheetOpt.put(entry.getKey(), entry.getValue());
+    }
     return binaryToHtml(binary, locale, false, "premis", stylesheetOpt);
   }
 
@@ -198,16 +205,17 @@ public final class HTMLUtils {
       @Override
       public int compare(Pair<Binary, EventComplexType> o1, Pair<Binary, EventComplexType> o2) {
         int ret = 0;
-        if(o1.getSecond().xgetEventDateTime().getStringValue()!=null){
-          if(o2.getSecond().xgetEventDateTime().getStringValue()!=null){
-            ret = o1.getSecond().xgetEventDateTime().getStringValue().compareTo(o2.getSecond().xgetEventDateTime().getStringValue());
-          }else{
+        if (o1.getSecond().xgetEventDateTime().getStringValue() != null) {
+          if (o2.getSecond().xgetEventDateTime().getStringValue() != null) {
+            ret = o1.getSecond().xgetEventDateTime().getStringValue()
+              .compareTo(o2.getSecond().xgetEventDateTime().getStringValue());
+          } else {
             ret = 0;
           }
-        }else{
-          if(o2.getSecond().xgetEventDateTime().getStringValue()!=null){
+        } else {
+          if (o2.getSecond().xgetEventDateTime().getStringValue() != null) {
             ret = 1;
-          }else{
+          } else {
             ret = 0;
           }
         }
@@ -236,6 +244,11 @@ public final class HTMLUtils {
       htmlAgents.add(html);
     }
     stylesheetOpt.put("agents", htmlAgents);
+
+    XSLTMessages messages = new XSLTMessages(locale);
+    for (Map.Entry<String, String> entry : messages.getTranslations("premis").entrySet()) {
+      stylesheetOpt.put(entry.getKey(), entry.getValue());
+    }
 
     String html = binaryToHtml(representation, locale, false, "premis", stylesheetOpt);
     return html;
@@ -280,10 +293,12 @@ public final class HTMLUtils {
       if (locale == null) {
         properLocale = new Locale("pt", "PT");
       }
+      
+      
       InputStream inputStream = binary.getContent().createInputStream();
       Reader reader = new InputStreamReader(inputStream);
 
-      InputStream transformerStream = getStylesheetInputStream("htmlXSLT", properLocale, filename);
+      InputStream transformerStream = getStylesheetInputStream("htmlXSLT", filename);
       // TODO support the use of scripts for non-xml transformers
       Reader xsltReader = new InputStreamReader(transformerStream);
       CharArrayWriter transformerResult = new CharArrayWriter();
@@ -297,20 +312,16 @@ public final class HTMLUtils {
     }
   }
 
-  private static InputStream getStylesheetInputStream(String xsltFolder, Locale locale, String filename) {
+  private static InputStream getStylesheetInputStream(String xsltFolder, String filename) {
     // FIXME this should be loaded from config folder (to be dynamic)
     ClassLoader classLoader = SolrUtils.class.getClassLoader();
-    InputStream transformerStream = classLoader.getResourceAsStream(
-      xsltFolder + "/" + locale.getLanguage() + "/" + locale.getCountry() + "/" + filename + ".xslt");
+    InputStream transformerStream = classLoader.getResourceAsStream(xsltFolder + "/" + filename + ".xslt");
     if (transformerStream == null) {
-      transformerStream = classLoader
-        .getResourceAsStream(xsltFolder + "/" + locale.getLanguage() + "/" + filename + ".xslt");
-      if (transformerStream == null) {
-        LOGGER.warn("Didn't found proper stylesheet for dealing with file \"" + filename + "\" in the locale \""
-          + locale + "\". Using " + xsltFolder + "/" + locale.getLanguage() + "/plain.xslt");
-        transformerStream = classLoader.getResourceAsStream(xsltFolder + "/" + locale.getLanguage() + "/plain.xslt");
-      }
+      LOGGER.warn("Didn't found proper stylesheet for dealing with file \"" + filename + "\". Using " + xsltFolder
+        + "/plain.xslt");
+      transformerStream = classLoader.getResourceAsStream(xsltFolder + "/plain.xslt");
     }
+
     return transformerStream;
   }
 
