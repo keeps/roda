@@ -15,7 +15,6 @@ import org.roda.index.IndexService;
 import org.roda.index.IndexServiceException;
 import org.roda.model.AIP;
 import org.roda.model.ModelService;
-import org.roda.model.ModelServiceException;
 import org.roda.model.utils.ModelUtils;
 import org.roda.storage.StoragePath;
 import org.roda.storage.StorageService;
@@ -83,7 +82,6 @@ public class RemoveOrphansAction implements Plugin<AIP> {
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
 
-    boolean reindexParent = false;
     for (AIP aip : list) {
       try {
         logger.debug("Processing AIP " + aip.getId());
@@ -94,24 +92,13 @@ public class RemoveOrphansAction implements Plugin<AIP> {
           Map<String, Set<String>> aipMetadata = storage.getMetadata(aipPath);
           aipMetadata.put(RodaConstants.STORAGE_META_PARENT_ID, new HashSet<String>(Arrays.asList(newParent.getId())));
           storage.updateMetadata(aipPath, aipMetadata, true);
+          aip.setParentId(newParent.getId());
           index.reindexAIP(aip);
-          reindexParent=true;
         } else {
           logger.debug("AIP doesn't need to be moved... Level: " + sdo.getLevel());
         }
       } catch (StorageServiceException | IndexServiceException e) {
         logger.error("Error processing AIP " + aip.getId() + " (RemoveOrphansAction)");
-        logger.error(e.getMessage(), e);
-      }
-    }
-    
-    if(reindexParent){
-      logger.debug("Reindexing parent");
-      try{
-        newParent = model.retrieveAIP(newParent.getId());
-        index.reindexAIP(newParent);
-      } catch (ModelServiceException e) {
-        logger.error("Error reindexing parent " + newParent.getId() + " (RemoveOrphansAction)");
         logger.error(e.getMessage(), e);
       }
     }

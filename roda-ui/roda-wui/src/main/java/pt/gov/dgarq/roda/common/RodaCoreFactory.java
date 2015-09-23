@@ -354,16 +354,16 @@ public class RodaCoreFactory {
             e.printStackTrace();
           }
         }
-      } else if ("orphans".equals(args.get(0)) && args.size() == 2) {
-        try{
+      } else if ("orphans".equals(args.get(0)) && args.size() == 2 && StringUtils.isNotBlank(args.get(1))) {
+        try {
           Filter filter = new Filter(new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID));
           RemoveOrphansAction removeOrphansAction = new RemoveOrphansAction();
           removeOrphansAction.setNewParent(model.retrieveAIP(args.get(1)));
           getActionOrchestrator().runActionFromIndex(AIP.class, filter, removeOrphansAction);
-        }catch(ModelServiceException mse){
+        } catch (ModelServiceException mse) {
           mse.printStackTrace();
         }
-        
+
       } else if ("fixity".equals(args.get(0))) {
         Plugin<AIP> fixityAction = new FixityAction();
         getActionOrchestrator().runActionOnAllAIPs(fixityAction);
