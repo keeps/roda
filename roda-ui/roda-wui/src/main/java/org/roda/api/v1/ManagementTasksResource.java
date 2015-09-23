@@ -1,5 +1,7 @@
 package org.roda.api.v1;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -25,7 +27,7 @@ import pt.gov.dgarq.roda.core.data.v2.RodaUser;
 @Path(ManagementTasksResource.ENDPOINT)
 public class ManagementTasksResource {
   public static final String ENDPOINT = "/v1/management_tasks";
-  private static final TaskList TASKS = new TaskList("index/reindex");
+  private static final TaskList TASKS = new TaskList("index/reindex", "index/orphans");
 
   @Context
   private HttpServletRequest request;
@@ -39,7 +41,7 @@ public class ManagementTasksResource {
   @POST
   @Path("/{sub_resource}/{task_id}")
   public Response executeTask(final @PathParam("sub_resource") String sub_resource,
-    final @PathParam("task_id") String task_id) {
+    final @PathParam("task_id") String task_id, @QueryParam("params") List<String> params) {
     String authorization = request.getHeader("Authorization");
     try {
 
@@ -52,7 +54,7 @@ public class ManagementTasksResource {
           "User \"" + user.getId() + "\" doesn't have permission the execute the requested task!")).build();
       }
 
-      return execute(sub_resource, task_id);
+      return execute(sub_resource, task_id, params);
 
     } catch (AuthorizationDeniedException e) {
       if (authorization == null) {
@@ -66,7 +68,7 @@ public class ManagementTasksResource {
     }
   }
 
-  private Response execute(final String sub_resource, final String task_id) {
+  private Response execute(final String sub_resource, final String task_id, List<String> params) {
     if (!TASKS.getTasks().contains(sub_resource + "/" + task_id)) {
       return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR,
         "No task was found in the sub-resource \"" + sub_resource + "\" with the id \"" + task_id + "\"")).build();
@@ -74,7 +76,15 @@ public class ManagementTasksResource {
       ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
       if ("index".equals(sub_resource)) {
         if ("reindex".equals(task_id)) {
-          RodaCoreFactory.reindexAips();
+          if (params.isEmpty()) {
+            RodaCoreFactory.runReindexAipsAction();
+          } else {
+            RodaCoreFactory.runReindexAipsAction(params);
+          }
+        } else if ("orphans".equals(task_id)) {
+          if (!params.isEmpty()) {
+            RodaCoreFactory.runRemoveOrphansAction(params.get(0));
+          }
         }
       }
       return Response.ok().entity(response).build();

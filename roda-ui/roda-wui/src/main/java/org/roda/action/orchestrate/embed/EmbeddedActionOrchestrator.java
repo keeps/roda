@@ -127,6 +127,41 @@ public class EmbeddedActionOrchestrator implements ActionOrchestrator {
   }
 
   @Override
+  public void runActionOnAIPs(Plugin<AIP> action, List<String> ids) {
+    try {
+      action.beforeExecute(index, model, storage);
+      Iterator<String> iter = ids.iterator();
+      String aipId;
+
+      List<AIP> block = new ArrayList<AIP>();
+      while (iter.hasNext()) {
+        if (block.size() == BLOCK_SIZE) {
+          submitAction(block, action);
+          block = new ArrayList<AIP>();
+        }
+
+        aipId = iter.next();
+        block.add(model.retrieveAIP(aipId));
+      }
+
+      if (!block.isEmpty()) {
+        submitAction(block, action);
+      }
+
+      finishedSubmit();
+      action.afterExecute(index, model, storage);
+
+    } catch (ModelServiceException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (PluginException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+
+  }
+
+  @Override
   public void runActionOnAllAIPs(Plugin<AIP> action) {
     try {
       action.beforeExecute(index, model, storage);

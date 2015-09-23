@@ -22,6 +22,7 @@ import pt.gov.dgarq.roda.core.data.Report;
 public class ReindexAction implements Plugin<AIP> {
 
   private final Logger logger = Logger.getLogger(getClass());
+  private boolean clearIndexes = true;
 
   @Override
   public void init() throws PluginException {
@@ -63,6 +64,14 @@ public class ReindexAction implements Plugin<AIP> {
     // no params
   }
 
+  public boolean isClearIndexes() {
+    return clearIndexes;
+  }
+
+  public void setClearIndexes(boolean clearIndexes) {
+    this.clearIndexes = clearIndexes;
+  }
+
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
@@ -77,12 +86,16 @@ public class ReindexAction implements Plugin<AIP> {
 
   @Override
   public Report beforeExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    logger.debug("Clearing indexes");
-    try {
-      index.clearIndex(RodaConstants.INDEX_AIP);
-      index.clearIndex(RodaConstants.INDEX_SDO);
-    } catch (IndexServiceException e) {
-      throw new PluginException("Error clearing index", e);
+    if (clearIndexes) {
+      logger.debug("Clearing indexes");
+      try {
+        index.clearIndex(RodaConstants.INDEX_AIP);
+        index.clearIndex(RodaConstants.INDEX_SDO);
+      } catch (IndexServiceException e) {
+        throw new PluginException("Error clearing index", e);
+      }
+    } else {
+      logger.debug("Skipping clear indexes");
     }
 
     return null;

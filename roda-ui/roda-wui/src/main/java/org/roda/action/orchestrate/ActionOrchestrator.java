@@ -1,6 +1,7 @@
 package org.roda.action.orchestrate;
 
 import java.io.Serializable;
+import java.util.List;
 
 import org.roda.model.AIP;
 import org.roda.model.File;
@@ -12,14 +13,16 @@ public interface ActionOrchestrator {
 
   public <T extends Serializable> void runActionFromIndex(Class<T> classToActOn, Filter filter, Plugin<T> action);
 
+  public void runActionOnAIPs(Plugin<AIP> action, List<String> ids);
+
   public void runActionOnAllAIPs(Plugin<AIP> action);
 
   public void runActionOnAllRepresentations(Plugin<Representation> action);
 
   public void runActionOnAllFiles(Plugin<File> action);
-  
+
   public void setup();
-  
+
   public void shutdown();
 
 }

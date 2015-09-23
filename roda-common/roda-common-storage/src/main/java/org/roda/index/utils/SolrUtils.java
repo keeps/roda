@@ -496,7 +496,7 @@ public class SolrUtils {
   private static List<String> objectToListString(Object object) {
     List<String> ret;
     if (object == null) {
-      ret = null;
+      ret = new ArrayList<String>();
     } else if (object instanceof String) {
       List<String> l = new ArrayList<String>();
       l.add((String) object);
@@ -509,7 +509,7 @@ public class SolrUtils {
       }
     } else {
       LOGGER.error("Could not convert Solr object to List<String>" + object.getClass().getName());
-      ret = null;
+      ret = new ArrayList<String>();
     }
     return ret;
   }

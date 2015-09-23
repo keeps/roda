@@ -107,6 +107,48 @@ public class AkkaEmbeddedActionOrchestrator implements ActionOrchestrator {
   }
 
   @Override
+  public void runActionOnAIPs(Plugin<AIP> action, List<String> ids) {
+    try {
+      int multiplier = 0;
+      logger.info("Executing beforeExecute");
+      action.beforeExecute(index, model, storage);
+      Iterator<String> iter = ids.iterator();
+      List<Future<Object>> futures = new ArrayList<Future<Object>>();
+      String aipId;
+
+      List<AIP> block = new ArrayList<AIP>();
+      while (iter.hasNext()) {
+        if (block.size() == BLOCK_SIZE) {
+          futures.add(Patterns.ask(actionRouter, new ActionMessage<AIP>(block, action),
+            new Timeout(Duration.create(TIMEOUT, TIMEOUT_UNIT))));
+          block = new ArrayList<AIP>();
+          multiplier++;
+        }
+
+        aipId = iter.next();
+        block.add(model.retrieveAIP(aipId));
+
+      }
+
+      if (!block.isEmpty()) {
+        futures.add(Patterns.ask(actionRouter, new ActionMessage<AIP>(block, action),
+          new Timeout(Duration.create(TIMEOUT, TIMEOUT_UNIT))));
+        multiplier++;
+      }
+
+      final Future<Iterable<Object>> sequenceResult = Futures.sequence(futures, actionSystem.dispatcher());
+      Await.result(sequenceResult, Duration.create(multiplier * TIMEOUT, TIMEOUT_UNIT));
+
+      action.afterExecute(index, model, storage);
+
+    } catch (Exception e) {
+      // FIXME catch proper exception
+      e.printStackTrace();
+    }
+    logger.info("End of method");
+  }
+
+  @Override
   public void runActionOnAllAIPs(Plugin<AIP> action) {
     try {
       int multiplier = 0;

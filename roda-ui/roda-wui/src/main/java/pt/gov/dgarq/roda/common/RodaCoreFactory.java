@@ -300,14 +300,51 @@ public class RodaCoreFactory {
 
   }
 
-  public static void reindexAips() {
+  /*
+   * Command-line accessible functionalities
+   */
+  public static void runReindexAipsAction() {
     Plugin<AIP> reindexAction = new ReindexAction();
     getActionOrchestrator().runActionOnAllAIPs(reindexAction);
   }
 
-  /*
-   * Command-line accessible functionalities
-   */
+  public static void runReindexAipsAction(List<String> aipIds) {
+    Plugin<AIP> reindexAction = new ReindexAction();
+    ((ReindexAction) reindexAction).setClearIndexes(false);
+    getActionOrchestrator().runActionOnAIPs(reindexAction, aipIds);
+  }
+
+  public static void runRemoveOrphansAction(String parentId) {
+    try {
+      Filter filter = new Filter(new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID));
+      RemoveOrphansAction removeOrphansAction = new RemoveOrphansAction();
+      removeOrphansAction.setNewParent(model.retrieveAIP(parentId));
+      getActionOrchestrator().runActionFromIndex(AIP.class, filter, removeOrphansAction);
+    } catch (ModelServiceException e) {
+      e.printStackTrace();
+    }
+  }
+
+  private static void runFixityAction() {
+    Plugin<AIP> fixityAction = new FixityAction();
+    getActionOrchestrator().runActionOnAllAIPs(fixityAction);
+  }
+
+  private static void runSolrQuery(List<String> args) {
+    String collection = args.get(2);
+    String solrQueryString = args.get(3);
+    try {
+      QueryResponse executeSolrQuery = SolrUtils.executeSolrQuery(solr, collection, solrQueryString);
+      SolrDocumentList results = executeSolrQuery.getResults();
+      System.out.println("Size: " + results.getNumFound() + "; Returned: " + results.size());
+      for (SolrDocument solrDocument : results) {
+        System.out.println(">" + solrDocument);
+      }
+    } catch (SolrServerException | IOException e) {
+      e.printStackTrace();
+    }
+  }
+
   private static void printMainUsage() {
     System.err.println("Syntax:");
     System.err.println("java -jar x.jar index reindex");
@@ -333,40 +370,19 @@ public class RodaCoreFactory {
         if ("list".equals(args.get(1)) && ("users".equals(args.get(2)) || "groups".equals(args.get(2)))) {
           Filter filter = new Filter(
             new SimpleFilterParameter(RodaConstants.MEMBERS_IS_USER, "users".equals(args.get(2)) ? "true" : "false"));
-          Sorter sorter = null;
-          Sublist sublist = new Sublist(0, 10000);
-          Facets facets = null;
-          printIndexMembers(args, filter, sorter, sublist, facets);
+          printIndexMembers(args, filter, null, new Sublist(0, 10000), null);
         } else if ("reindex".equals(args.get(1)) && args.size() == 2) {
-          reindexAips();
+          runReindexAipsAction();
+        } else if ("reindex".equals(args.get(1)) && args.size() >= 3) {
+          runReindexAipsAction(args.subList(2, args.size()));
         } else if ("query".equals(args.get(1)) && args.size() == 4 && StringUtils.isNotBlank(args.get(2))
           && StringUtils.isNotBlank(args.get(3))) {
-          String collection = args.get(2);
-          String solrQueryString = args.get(3);
-          try {
-            QueryResponse executeSolrQuery = SolrUtils.executeSolrQuery(solr, collection, solrQueryString);
-            SolrDocumentList results = executeSolrQuery.getResults();
-            System.out.println("Size: " + results.getNumFound() + "; Returned: " + results.size());
-            for (SolrDocument solrDocument : results) {
-              System.out.println(">" + solrDocument);
-            }
-          } catch (SolrServerException | IOException e) {
-            e.printStackTrace();
-          }
+          runSolrQuery(args);
         }
       } else if ("orphans".equals(args.get(0)) && args.size() == 2 && StringUtils.isNotBlank(args.get(1))) {
-        try {
-          Filter filter = new Filter(new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID));
-          RemoveOrphansAction removeOrphansAction = new RemoveOrphansAction();
-          removeOrphansAction.setNewParent(model.retrieveAIP(args.get(1)));
-          getActionOrchestrator().runActionFromIndex(AIP.class, filter, removeOrphansAction);
-        } catch (ModelServiceException mse) {
-          mse.printStackTrace();
-        }
-
+        runRemoveOrphansAction(args.get(1));
       } else if ("fixity".equals(args.get(0))) {
-        Plugin<AIP> fixityAction = new FixityAction();
-        getActionOrchestrator().runActionOnAllAIPs(fixityAction);
+        runFixityAction();
       } else {
         printMainUsage();
       }
