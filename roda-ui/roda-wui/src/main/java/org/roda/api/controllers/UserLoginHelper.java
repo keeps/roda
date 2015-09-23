@@ -14,14 +14,16 @@ import pt.gov.dgarq.roda.wui.common.client.GenericException;
 public class UserLoginHelper {
   private static final Logger LOGGER = Logger.getLogger(UserLoginHelper.class);
 
-  public static RodaUser login(String username, String password, HttpServletRequest request) throws GenericException, AuthenticationDeniedException {
+  public static RodaUser login(String username, String password, HttpServletRequest request)
+    throws GenericException, AuthenticationDeniedException {
     try {
       RodaUser user = UserUtility.getLdapUtility().getAuthenticatedUser(username, password);
+      user.setIpAddress(request.getRemoteAddr());
       UserUtility.setUser(request, new RodaSimpleUser(user.getId(), user.getName(), user.getEmail(), user.isGuest()));
       return user;
     } catch (ServiceException e) {
       throw new GenericException(e.getMessage());
-    } 
+    }
   }
 
 }

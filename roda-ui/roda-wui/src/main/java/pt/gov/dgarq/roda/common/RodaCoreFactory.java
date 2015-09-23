@@ -56,6 +56,7 @@ import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.RODAMember;
 import pt.gov.dgarq.roda.core.data.v2.SIPReport;
 import pt.gov.dgarq.roda.core.data.v2.SIPStateTransition;
+import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.core.data.v2.User;
 
 public class RodaCoreFactory {
@@ -319,7 +320,7 @@ public class RodaCoreFactory {
       Filter filter = new Filter(new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID));
       RemoveOrphansAction removeOrphansAction = new RemoveOrphansAction();
       removeOrphansAction.setNewParent(model.retrieveAIP(parentId));
-      getActionOrchestrator().runActionFromIndex(AIP.class, filter, removeOrphansAction);
+      getActionOrchestrator().runActionFromIndex(SimpleDescriptionObject.class, filter, removeOrphansAction);
     } catch (ModelServiceException e) {
       e.printStackTrace();
     }

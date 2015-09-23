@@ -37,18 +37,17 @@ public class RodaMemberList extends AsyncTableCell<RODAMember> {
   private final TextColumn<RODAMember> groupsColumn;
 
   public RodaMemberList() {
-    this(null, null);
+    this(null, null, null);
   }
 
-  public RodaMemberList(Filter filter, Facets facets) {
-    super(filter, facets, "MEMBERS");
+  public RodaMemberList(Filter filter, Sorter sorter, Facets facets) {
+    super(filter, sorter, facets, "MEMBERS");
 
     activeColumn = new Column<RODAMember, SafeHtml>(new SafeHtmlCell()) {
       @Override
       public SafeHtml getValue(RODAMember member) {
-        return SafeHtmlUtils
-          .fromSafeConstant(member != null ? (member.isActive() ? "<i class='fa fa-check-circle'></i>"
-            : "<i class='fa fa-ban'></i>") : "");
+        return SafeHtmlUtils.fromSafeConstant(member != null
+          ? (member.isActive() ? "<i class='fa fa-check-circle'></i>" : "<i class='fa fa-ban'></i>") : "");
 
       }
     };
@@ -56,8 +55,8 @@ public class RodaMemberList extends AsyncTableCell<RODAMember> {
     typeColumn = new Column<RODAMember, SafeHtml>(new SafeHtmlCell()) {
       @Override
       public SafeHtml getValue(RODAMember member) {
-        return SafeHtmlUtils.fromSafeConstant(member != null ? (member.isUser() ? "<i class='fa fa-user'></i>"
-          : "<i class='fa fa-users'></i>") : "");
+        return SafeHtmlUtils.fromSafeConstant(
+          member != null ? (member.isUser() ? "<i class='fa fa-user'></i>" : "<i class='fa fa-users'></i>") : "");
 
       }
     };
@@ -116,7 +115,8 @@ public class RodaMemberList extends AsyncTableCell<RODAMember> {
     Filter filter = getFilter();
 
     // calculate sorter
-    Sorter sorter = new Sorter();
+    Sorter defaultSorter = getSorter();
+    Sorter sorter = defaultSorter != null ? defaultSorter : new Sorter();
     for (int i = 0; i < columnSortList.size(); i++) {
       ColumnSortInfo columnSortInfo = columnSortList.get(i);
       String sortParameterKey;

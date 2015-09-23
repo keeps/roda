@@ -762,9 +762,9 @@ public class SolrUtils {
     final Date dateInitial = objectToDate(doc.get(RodaConstants.SDO_DATE_INITIAL));
     final Date dateFinal = objectToDate(doc.get(RodaConstants.SDO_DATE_FINAL));
 
-    final String level = levels != null ? levels.get(0) : null;
-    final String title = titles != null ? titles.get(0) : null;
-    final String description = descriptions != null ? descriptions.get(0) : null;
+    final String level = levels.isEmpty() ? null : levels.get(0);
+    final String title = titles.isEmpty() ? null : titles.get(0);
+    final String description = descriptions.isEmpty() ? null : descriptions.get(0);
     final int childrenCount = 0;
 
     RODAObjectPermissions permissions = getPermissions(doc);
@@ -1077,7 +1077,7 @@ public class SolrUtils {
     entry.setDatetime(datetime);
     entry.setDuration(duration);
     entry.setId(id);
-    entry.setParameters(ModelUtils.getLogEntryParameters(parameters==null?"":parameters));
+    entry.setParameters(ModelUtils.getLogEntryParameters(parameters == null ? "" : parameters));
     entry.setRelatedObjectID(relatedObjectId);
     entry.setUsername(username);
 
@@ -1092,7 +1092,7 @@ public class SolrUtils {
     doc.addField(RodaConstants.LOG_DATETIME, logEntry.getDatetime());
     doc.addField(RodaConstants.LOG_DURATION, logEntry.getDuration());
     doc.addField(RodaConstants.LOG_ID, logEntry.getId());
-    doc.addField(RodaConstants.LOG_PARAMETERS,ModelUtils.getJsonLogEntryParameters(logEntry.getParameters()));
+    doc.addField(RodaConstants.LOG_PARAMETERS, ModelUtils.getJsonLogEntryParameters(logEntry.getParameters()));
     doc.addField(RodaConstants.LOG_RELATED_OBJECT_ID, logEntry.getRelatedObjectID());
     doc.addField(RodaConstants.LOG_USERNAME, logEntry.getUsername());
     return doc;
@@ -1209,14 +1209,10 @@ public class SolrUtils {
     final String name = objectToString(doc.get(RodaConstants.MEMBERS_NAME));
     final Set<String> groups = new HashSet<String>();
     List<String> possibleGroups = objectToListString(doc.get(RodaConstants.MEMBERS_GROUPS_ALL));
-    if (possibleGroups != null) {
-      groups.addAll(possibleGroups);
-    }
+    groups.addAll(possibleGroups);
     final Set<String> roles = new HashSet<String>();
     List<String> possibleRoles = objectToListString(doc.get(RodaConstants.MEMBERS_ROLES_ALL));
-    if (possibleRoles != null) {
-      roles.addAll(possibleRoles);
-    }
+    roles.addAll(possibleRoles);
     if (isUser) {
       RodaUser user = new RodaUser();
       user.setId(id);

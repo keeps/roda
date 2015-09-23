@@ -18,6 +18,8 @@ import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
 import pt.gov.dgarq.roda.core.data.adapter.facet.SimpleFacetParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
+import pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter;
+import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.v2.RODAMember;
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
@@ -91,10 +93,11 @@ public class MemberManagement extends Composite {
 
   public MemberManagement() {
     Filter filter = null;
+    Sorter sorter = new Sorter(new SortParameter(RodaConstants.MEMBERS_NAME, false));
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.MEMBERS_IS_ACTIVE),
       new SimpleFacetParameter(RodaConstants.MEMBERS_IS_USER),
       new SimpleFacetParameter(RodaConstants.MEMBERS_GROUPS_ALL));
-    list = new RodaMemberList(filter, facets);
+    list = new RodaMemberList(filter, sorter, facets);
     facetIsActive = new FlowPanel();
     facetIsUser = new FlowPanel();
     facetGroups = new FlowPanel();

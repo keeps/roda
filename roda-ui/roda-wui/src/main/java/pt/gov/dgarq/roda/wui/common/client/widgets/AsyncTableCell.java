@@ -22,6 +22,7 @@ import com.google.gwt.view.client.SingleSelectionModel;
 
 import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
+import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.widgets.wcag.AccessibleCellTable;
@@ -39,15 +40,17 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel i
   private final CellTable<T> display;
 
   private Filter filter;
+  private Sorter sorter;
+
   private Facets facets;
 
   private final ClientLogger logger = new ClientLogger(getClass().getName());
 
   public AsyncTableCell() {
-    this(null, null, null);
+    this(null, null, null, null);
   }
 
-  public AsyncTableCell(Filter filter, Facets facets, String summary) {
+  public AsyncTableCell(Filter filter, Sorter sorter, Facets facets, String summary) {
     super();
 
     if (summary == null) {
@@ -55,6 +58,7 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel i
     }
 
     this.filter = filter;
+    this.sorter = sorter;
     this.facets = facets;
 
     this.dataProvider = new AsyncDataProvider<T>() {
@@ -144,6 +148,15 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel i
 
   public void setFilter(Filter filter) {
     this.filter = filter;
+    refresh();
+  }
+  
+  public Sorter getSorter() {
+    return sorter;
+  }
+
+  public void setSorter(Sorter sorter) {
+    this.sorter = sorter;
     refresh();
   }
 

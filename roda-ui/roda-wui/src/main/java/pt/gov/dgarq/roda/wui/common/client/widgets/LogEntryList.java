@@ -11,7 +11,6 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.view.client.ProvidesKey;
@@ -44,11 +43,11 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
   private final TextColumn<LogEntry> addressColumn;
 
   public LogEntryList() {
-    this(null, null);
+    this(null, null, null);
   }
 
-  public LogEntryList(Filter filter, Facets facets) {
-    super(filter, facets, "LOGS");
+  public LogEntryList(Filter filter, Sorter sorter, Facets facets) {
+    super(filter, sorter, facets, "LOGS");
 
     dateColumn = new Column<LogEntry, Date>(new DateCell(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_MEDIUM))) {
       @Override
@@ -151,7 +150,8 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
     Filter filter = getFilter();
 
     // calculate sorter
-    Sorter sorter = new Sorter();
+    Sorter defaultSorter = getSorter();
+    Sorter sorter = defaultSorter != null ? defaultSorter : new Sorter();
     for (int i = 0; i < columnSortList.size(); i++) {
       ColumnSortInfo columnSortInfo = columnSortList.get(i);
       String sortParameterKey;

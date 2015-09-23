@@ -42,11 +42,11 @@ public class SIPReportList extends AsyncTableCell<SIPReport> {
   private final TextColumn<SIPReport> producerColumn;
 
   public SIPReportList() {
-    this(null, null);
+    this(null, null, null);
   }
 
-  public SIPReportList(Filter filter, Facets facets) {
-    super(filter, facets, "SIP");
+  public SIPReportList(Filter filter, Sorter sorter, Facets facets) {
+    super(filter, sorter, facets, "SIP");
 
     // idColumn = new TextColumn<SIPReport>() {
     //

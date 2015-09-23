@@ -39,6 +39,7 @@ import pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.LikeFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.OneOfManyFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
+import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.v2.RodaUser;
 import pt.gov.dgarq.roda.core.data.v2.SIPReport;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
@@ -171,7 +172,7 @@ public class IngestList extends Composite {
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.SIP_REPORT_STATE),
       new SimpleFacetParameter(RodaConstants.SIP_REPORT_USERNAME));
 
-    sipList = new SIPReportList(filter, facets);
+    sipList = new SIPReportList(filter, new Sorter(), facets);
     producerFacets = new FlowPanel();
     stateFacets = new FlowPanel();
     Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();

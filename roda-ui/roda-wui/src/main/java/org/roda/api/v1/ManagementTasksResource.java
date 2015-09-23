@@ -1,5 +1,6 @@
 package org.roda.api.v1;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,11 +22,12 @@ import org.roda.api.v1.utils.ApiUtils;
 import org.roda.common.UserUtility;
 
 import pt.gov.dgarq.roda.common.RodaCoreFactory;
+import pt.gov.dgarq.roda.common.RodaCoreService;
 import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
 import pt.gov.dgarq.roda.core.data.v2.RodaUser;
 
 @Path(ManagementTasksResource.ENDPOINT)
-public class ManagementTasksResource {
+public class ManagementTasksResource extends RodaCoreService {
   public static final String ENDPOINT = "/v1/management_tasks";
   private static final TaskList TASKS = new TaskList("index/reindex", "index/orphans");
 
@@ -43,6 +45,7 @@ public class ManagementTasksResource {
   public Response executeTask(final @PathParam("sub_resource") String sub_resource,
     final @PathParam("task_id") String task_id, @QueryParam("params") List<String> params) {
     String authorization = request.getHeader("Authorization");
+    Date startDate = new Date();
     try {
 
       // get user & check permissions
@@ -54,7 +57,7 @@ public class ManagementTasksResource {
           "User \"" + user.getId() + "\" doesn't have permission the execute the requested task!")).build();
       }
 
-      return execute(sub_resource, task_id, params);
+      return execute(user, startDate, sub_resource, task_id, params);
 
     } catch (AuthorizationDeniedException e) {
       if (authorization == null) {
@@ -68,7 +71,8 @@ public class ManagementTasksResource {
     }
   }
 
-  private Response execute(final String sub_resource, final String task_id, List<String> params) {
+  private Response execute(RodaUser user, Date startDate, final String sub_resource, final String task_id,
+    List<String> params) {
     if (!TASKS.getTasks().contains(sub_resource + "/" + task_id)) {
       return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR,
         "No task was found in the sub-resource \"" + sub_resource + "\" with the id \"" + task_id + "\"")).build();
@@ -78,12 +82,21 @@ public class ManagementTasksResource {
         if ("reindex".equals(task_id)) {
           if (params.isEmpty()) {
             RodaCoreFactory.runReindexAipsAction();
+            // register action
+            long duration = new Date().getTime() - startDate.getTime();
+            registerAction(user, "ManagementTasks", "reindex", null, duration);
           } else {
             RodaCoreFactory.runReindexAipsAction(params);
+            // register action
+            long duration = new Date().getTime() - startDate.getTime();
+            registerAction(user, "ManagementTasks", "reindex", null, duration, "params", params);
           }
         } else if ("orphans".equals(task_id)) {
           if (!params.isEmpty()) {
             RodaCoreFactory.runRemoveOrphansAction(params.get(0));
+            // register action
+            long duration = new Date().getTime() - startDate.getTime();
+            registerAction(user, "ManagementTasks", "orphans", null, duration, "params", params);
           }
         }
       }

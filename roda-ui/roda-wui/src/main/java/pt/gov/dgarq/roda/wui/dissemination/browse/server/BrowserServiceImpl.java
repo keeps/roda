@@ -104,7 +104,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     } catch (RODAException e) {
       throw e;
     } catch (Throwable e) {
-      LOGGER.error(e);
+      LOGGER.error("Unexpected error", e);
       throw new GenericException(e.getMessage());
     }
   }

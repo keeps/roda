@@ -15,6 +15,7 @@ public class RestUtils {
 
   private static final String ATTR_ACCEPT_FORMAT = "acceptFormat";
   private static final String ATTR_ACCEPT_FORMAT_BIN = "bin";
+  private static final String ATTR_ACCEPT_FORMAT_XML = "xml";
 
   public static SafeUri createRepresentationDownloadUri(String aipId, String repId) {
 
@@ -43,13 +44,13 @@ public class RestUtils {
 
   public static SafeUri createDescriptiveMetadataDownloadUri(String aipId, String descId) {
 
-    // api/v1/aips/{aip_id}/descriptive_metadata/{descId}?acceptFormat=bin
+    // api/v1/aips/{aip_id}/descriptive_metadata/{descId}?acceptFormat=xml
     StringBuilder b = new StringBuilder();
     // base uri
     b.append(REST_V1_AIPS).append(UriUtils.encode(aipId)).append(SEP).append(DESCRIPTIVE_METADATA).append(SEP)
       .append(descId);
     // accept format attribute
-    b.append(QUERY_START).append(ATTR_ACCEPT_FORMAT).append(ATTR_ASSIGN_SYMBOL).append(ATTR_ACCEPT_FORMAT_BIN);
+    b.append(QUERY_START).append(ATTR_ACCEPT_FORMAT).append(ATTR_ASSIGN_SYMBOL).append(ATTR_ACCEPT_FORMAT_XML);
 
     return UriUtils.fromSafeConstant(b.toString());
   }

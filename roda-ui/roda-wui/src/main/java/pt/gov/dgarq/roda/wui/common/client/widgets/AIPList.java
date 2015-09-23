@@ -41,11 +41,11 @@ public class AIPList extends AsyncTableCell<SimpleDescriptionObject> {
   private final Column<SimpleDescriptionObject, Date> dateFinalColumn;
 
   public AIPList() {
-    this(null, null);
+    this(null, null, null);
   }
 
-  public AIPList(Filter filter, Facets facets) {
-    super(filter, facets, "AIPS");
+  public AIPList(Filter filter, Sorter sorter, Facets facets) {
+    super(filter, sorter, facets, "AIPS");
 
     levelColumn = new Column<SimpleDescriptionObject, SafeHtml>(new SafeHtmlCell()) {
       @Override
@@ -128,7 +128,8 @@ public class AIPList extends AsyncTableCell<SimpleDescriptionObject> {
       callback.onSuccess(null);
     } else {
       // calculate sorter
-      Sorter sorter = new Sorter();
+      Sorter defaultSorter = getSorter();
+      Sorter sorter = defaultSorter != null ? defaultSorter : new Sorter();
       for (int i = 0; i < columnSortList.size(); i++) {
         ColumnSortInfo columnSortInfo = columnSortList.get(i);
         String sortParameterKey;

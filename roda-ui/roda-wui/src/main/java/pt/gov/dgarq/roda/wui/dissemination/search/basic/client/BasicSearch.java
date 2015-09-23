@@ -36,6 +36,8 @@ import pt.gov.dgarq.roda.core.data.adapter.facet.SimpleFacetParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.BasicSearchFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.DateIntervalFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
+import pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter;
+import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
@@ -123,9 +125,10 @@ public class BasicSearch extends Composite {
 
   private BasicSearch() {
     Filter filter = DEFAULT_FILTER;
+    Sorter sorter = new Sorter(new SortParameter(RodaConstants.SDO_DATE_INITIAL, true));
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.SDO_LEVEL),
       new SimpleFacetParameter(RodaConstants.AIP_HAS_REPRESENTATIONS));
-    searchResultPanel = new AIPList(filter, facets);
+    searchResultPanel = new AIPList(filter, sorter, facets);
     facetDescriptionLevels = new FlowPanel();
     facetHasRepresentations = new FlowPanel();
 
