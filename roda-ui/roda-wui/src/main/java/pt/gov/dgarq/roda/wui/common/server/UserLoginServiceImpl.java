@@ -1,16 +1,21 @@
 package pt.gov.dgarq.roda.wui.common.server;
 
+import java.util.Date;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
+import org.roda.api.controllers.UserLogin;
 import org.roda.common.ServiceException;
 import org.roda.common.UserUtility;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import pt.gov.dgarq.roda.common.RodaCoreFactory;
+import pt.gov.dgarq.roda.common.RodaCoreService;
 import pt.gov.dgarq.roda.core.common.AuthenticationDeniedException;
 import pt.gov.dgarq.roda.core.common.RODAException;
+import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.RodaSimpleUser;
 import pt.gov.dgarq.roda.core.data.v2.RodaUser;
 import pt.gov.dgarq.roda.wui.common.client.GenericException;
@@ -39,15 +44,7 @@ public class UserLoginServiceImpl extends RemoteServiceServlet implements UserLo
   }
 
   public RodaUser login(String username, String password) throws AuthenticationDeniedException, GenericException {
-    // FIXME log action
-    try {
-      RodaUser user = UserUtility.getLdapUtility().getAuthenticatedUser(username, password);
-      UserUtility.setUser(this.getThreadLocalRequest(),
-        new RodaSimpleUser(user.getId(), user.getName(), user.getEmail(), user.isGuest()));
-      return user;
-    } catch (ServiceException e) {
-      throw new GenericException(e.getMessage());
-    }
+    return UserLogin.login(username, password, this.getThreadLocalRequest());
   }
 
   public Map<String, String> getRodaProperties() {
