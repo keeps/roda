@@ -862,7 +862,7 @@ public class ModelService extends ModelObservable {
           Resource preservationObject = preservationIterator.next();
           Binary preservationBinary = storage.getBinary(preservationObject.getStoragePath());
           lc.xmlns.premisV2.Representation r = ModelUtils.getPreservationRepresentationObject(preservationBinary);
-          if (r!= null) {
+          if (r != null) {
             rpos.add(convertResourceToRepresentationPreservationObject(aipId, resource.getStoragePath().getName(),
               preservationObject.getStoragePath().getName(), preservationBinary));
           }
@@ -1098,18 +1098,19 @@ public class ModelService extends ModelObservable {
             preservationFileId);
           Binary preservationBinary = storage.getBinary(binaryPath);
 
-          lc.xmlns.premisV2.Representation representation = ModelUtils.getPreservationRepresentationObject(preservationBinary);
-          if (representation!=null) {
+          lc.xmlns.premisV2.Representation representation = ModelUtils
+            .getPreservationRepresentationObject(preservationBinary);
+          if (representation != null) {
             preservationRepresentationObjectFileIds.add(preservationFileId);
           } else {
             EventComplexType event = ModelUtils.getPreservationEvent(preservationBinary);
-            if(event!=null){
+            if (event != null) {
               preservationEventFileIds.add(preservationFileId);
-            }else{
+            } else {
               lc.xmlns.premisV2.File file = ModelUtils.getPreservationFileObject(preservationBinary);
-              if(file!=null){
+              if (file != null) {
                 preservationFileObjectFileIds.add(preservationFileId);
-              }else{
+              } else {
                 LOGGER.warn(
                   "The binary {} is neither a PreservationRepresentationObject or PreservationEvent or PreservationFileObject...Moving on...",
                   binaryPath.asString());

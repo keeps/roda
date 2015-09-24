@@ -370,8 +370,8 @@ public class AipsResource {
     @ApiParam(value = "The ID of the existing representation", required = true) @PathParam("representation_id") String representationId,
     @FormDataParam("file") InputStream inputStream, @FormDataParam("file") FormDataContentDisposition fileDetail)
       throws NotFoundException {
-    return DELEGATE.postAipRepresentationPreservationMetadataFile(request, aipId, representationId,
-      inputStream, fileDetail);
+    return DELEGATE.postAipRepresentationPreservationMetadataFile(request, aipId, representationId, inputStream,
+      fileDetail);
   }
 
   @PUT
@@ -385,8 +385,8 @@ public class AipsResource {
     @ApiParam(value = "The ID of the existing representation", required = true) @PathParam("representation_id") String representationId,
     @FormDataParam("file") InputStream inputStream, @FormDataParam("file") FormDataContentDisposition fileDetail)
       throws NotFoundException {
-    return DELEGATE.putAipRepresentationPreservationMetadataFile(request, aipId, representationId,
-      inputStream, fileDetail);
+    return DELEGATE.putAipRepresentationPreservationMetadataFile(request, aipId, representationId, inputStream,
+      fileDetail);
   }
 
   @DELETE

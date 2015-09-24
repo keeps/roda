@@ -56,7 +56,6 @@ import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationState;
-import pt.gov.dgarq.roda.core.data.v2.RodaUser;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.disseminators.common.tools.ZipEntryInfo;
 import pt.gov.dgarq.roda.disseminators.common.tools.ZipTools;
@@ -634,7 +633,7 @@ public class BrowserHelper {
       } else if (e.getCode() == StorageServiceException.FORBIDDEN) {
         throw new GenericException("You do not have permission to access AIP: " + aipId);
       } else {
-        throw new GenericException("Error creating new item: " + e.getMessage());
+        throw new GenericException("Error removing descriptive metadata: " + e.getMessage());
       }
     }
   }
@@ -650,7 +649,7 @@ public class BrowserHelper {
       } else if (e.getCode() == StorageServiceException.FORBIDDEN) {
         throw new GenericException("You do not have permission to access AIP: " + aipId);
       } else {
-        throw new GenericException("Error creating new item: " + e.getMessage());
+        throw new GenericException("Error retrieving metadata file: " + e.getMessage());
       }
     }
   }
@@ -706,6 +705,75 @@ public class BrowserHelper {
 
     return new Pair<String, StreamingOutput>(filename, stream);
 
+  }
+
+  public static void removeRepresentation(String aipId, String representationId) throws GenericException {
+    try {
+      ModelService model = RodaCoreFactory.getModelService();
+      model.deleteRepresentation(aipId, representationId);
+    } catch (ModelServiceException e) {
+      if (e.getCode() == StorageServiceException.NOT_FOUND) {
+        throw new GenericException("AIP not found: " + aipId);
+      } else if (e.getCode() == StorageServiceException.FORBIDDEN) {
+        throw new GenericException("You do not have permission to access AIP: " + aipId);
+      } else {
+        throw new GenericException(
+          "Error removing representation " + representationId + " from AIP " + aipId + ": " + e.getMessage());
+      }
+    }
+
+  }
+
+  public static void removeRepresentationFile(String aipId, String representationId, String fileId)
+    throws GenericException {
+    try {
+      ModelService model = RodaCoreFactory.getModelService();
+      model.deleteFile(aipId, representationId, fileId);
+    } catch (ModelServiceException e) {
+      if (e.getCode() == StorageServiceException.NOT_FOUND) {
+        throw new GenericException("AIP not found: " + aipId);
+      } else if (e.getCode() == StorageServiceException.FORBIDDEN) {
+        throw new GenericException("You do not have permission to access AIP: " + aipId);
+      } else {
+        throw new GenericException("Error removing file " + fileId + " from representation " + representationId
+          + " of AIP " + aipId + ": " + e.getMessage());
+      }
+    }
+
+  }
+
+  public static StreamResponse getAipRepresentationFile(String aipId, String representationId, String fileId,
+    String acceptFormat) throws GenericException {
+    try {
+      final String filename;
+      final String mediaType;
+      final StreamingOutput stream;
+      StreamResponse ret = null;
+  
+      StorageService storage = RodaCoreFactory.getStorageService();
+      Binary representationFileBinary = storage
+        .getBinary(ModelUtils.getRepresentationFilePath(aipId, representationId, fileId));
+      filename = representationFileBinary.getStoragePath().getName();
+      mediaType = MediaType.WILDCARD;
+      stream = new StreamingOutput() {
+        @Override
+        public void write(OutputStream os) throws IOException, WebApplicationException {
+          IOUtils.copy(representationFileBinary.getContent().createInputStream(), os);
+        }
+      };
+      ret = new StreamResponse(filename, mediaType, stream);
+  
+      return ret;
+    } catch (StorageServiceException e) {
+      if (e.getCode() == StorageServiceException.NOT_FOUND) {
+        throw new GenericException("File not found: " + aipId+"/"+representationId+"/"+fileId);
+      } else if (e.getCode() == StorageServiceException.FORBIDDEN) {
+        throw new GenericException("You do not have permission to access AIP: " + aipId);
+      } else {
+        throw new GenericException("Error getting representation file " + fileId + " from representation " + representationId
+          + " of AIP " + aipId + ": " + e.getMessage());
+      }
+    }
   }
 
 }

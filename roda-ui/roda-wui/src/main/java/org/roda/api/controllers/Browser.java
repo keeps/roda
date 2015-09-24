@@ -521,4 +521,69 @@ public class Browser extends RodaCoreService {
     return dm;
   }
 
+  public static void removeRepresentation(RodaUser user, String itemId, String representationId)
+    throws AuthorizationDeniedException, GenericException {
+    Date start = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, "administration.metadata_editor");
+    SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(itemId);
+
+    // TODO remove permission skip for admin
+    if (!user.getName().equals("admin")) {
+      UserUtility.checkObjectModifyPermissions(user, sdo);
+    }
+
+    // delegate
+    BrowserHelper.removeRepresentation(itemId, representationId);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, "Browser", "removeRepresentation", sdo.getId(), duration, "itemId", itemId, "representationId",
+      representationId);
+
+  }
+
+  public static void removeRepresentationFile(RodaUser user, String itemId, String representationId, String fileId)
+    throws AuthorizationDeniedException, GenericException {
+    Date start = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, "administration.metadata_editor");
+    SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(itemId);
+
+    // TODO remove permission skip for admin
+    if (!user.getName().equals("admin")) {
+      UserUtility.checkObjectModifyPermissions(user, sdo);
+    }
+
+    // delegate
+    BrowserHelper.removeRepresentationFile(itemId, representationId, fileId);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, "Browser", "removeRepresentationFile", sdo.getId(), duration, "itemId", itemId,
+      "representationId", representationId, "fileId", fileId);
+  }
+
+  public static StreamResponse getAipRepresentationFile(RodaUser user, String aipId, String representationId,
+    String fileId, String acceptFormat) throws GenericException, AuthorizationDeniedException {
+    Date startDate = new Date();
+
+    // check user permissions
+    SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(aipId);
+    UserUtility.checkObjectModifyPermissions(user, sdo);
+
+    // delegate
+    StreamResponse aipRepresentationFile = BrowserHelper.getAipRepresentationFile(aipId, representationId, fileId,
+      acceptFormat);
+
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, "Browser", "getAipRepresentationFile", aipId, duration, "representationId", representationId,
+      "fileId", fileId);
+
+    return aipRepresentationFile;
+  }
+
 }
