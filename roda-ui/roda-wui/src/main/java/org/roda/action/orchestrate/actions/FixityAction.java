@@ -33,7 +33,6 @@ import pt.gov.dgarq.roda.core.data.Report;
 import pt.gov.dgarq.roda.core.data.v2.AgentPreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.EventPreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.Representation;
-import pt.gov.dgarq.roda.core.metadata.v2.premis.PremisAgentHelper;
 import pt.gov.dgarq.roda.core.metadata.v2.premis.PremisEventHelper;
 import pt.gov.dgarq.roda.core.metadata.v2.premis.PremisMetadataException;
 
@@ -56,7 +55,7 @@ public class FixityAction implements Plugin<AIP> {
 
   @Override
   public String getName() {
-    return "Fixity";
+    return "Fixity check";
   }
 
   @Override
@@ -87,21 +86,6 @@ public class FixityAction implements Plugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
-
-    try {
-      model.getAgentPreservationObject(fixityAgent.getID());
-    } catch (ModelServiceException mse) {
-      try {
-        byte[] serializedPremisEvent = new PremisAgentHelper(fixityAgent).saveToByteArray();
-        Path file = Files.createTempFile("agent", ".xml");
-        Files.copy(new ByteArrayInputStream(serializedPremisEvent), file, StandardCopyOption.REPLACE_EXISTING);
-        Binary resource = (Binary) FSUtils.convertPathToResource(file.getParent(), file);
-        model.createAgentMetadata(fixityAgent.getID(), resource);
-      } catch (Throwable e) {
-        logger.error(e.getMessage(), e);
-        return null;
-      }
-    }
 
     for (AIP aip : list) {
       List<String> representationIds = aip.getRepresentationIds();

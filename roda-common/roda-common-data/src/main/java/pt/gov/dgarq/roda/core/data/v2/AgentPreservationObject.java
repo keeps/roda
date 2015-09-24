@@ -14,16 +14,19 @@ public class AgentPreservationObject extends PreservationObject {
   public static final String PRESERVATION_AGENT_TYPE_MIGRATOR = "software:migrator";
   public static final String PRESERVATION_AGENT_TYPE_DIGITALIZATION = "software:digitalization";
   public static final String PRESERVATION_AGENT_TYPE_FIXITY_CHECK_PLUGIN = "software:plugin:fixity_check";
+  public static final String PRESERVATION_AGENT_TYPE_VIRUS_CHECK_PLUGIN = "software:plugin:virus_check";
   public static final String PRESERVATION_AGENT_TYPE_UNKNOWN_PREFIX = "unknown:";
 
   public static final String[] PRESERVATION_AGENT_TYPES = new String[] {PRESERVATION_AGENT_TYPE_INGEST_TASK,
     PRESERVATION_AGENT_TYPE_MIGRATOR, PRESERVATION_AGENT_TYPE_DIGITALIZATION,
-    PRESERVATION_AGENT_TYPE_FIXITY_CHECK_PLUGIN};
+    PRESERVATION_AGENT_TYPE_FIXITY_CHECK_PLUGIN,PRESERVATION_AGENT_TYPE_VIRUS_CHECK_PLUGIN};
 
   /**
    * Preservation Object type - Agent
    */
   public static final String TYPE = "agent";
+
+  
 
   private String agentType = null;
 

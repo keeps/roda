@@ -28,6 +28,7 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.roda.action.orchestrate.ActionOrchestrator;
 import org.roda.action.orchestrate.Plugin;
+import org.roda.action.orchestrate.actions.AntivirusAction;
 import org.roda.action.orchestrate.actions.FixityAction;
 import org.roda.action.orchestrate.actions.ReindexAction;
 import org.roda.action.orchestrate.actions.RemoveOrphansAction;
@@ -330,6 +331,11 @@ public class RodaCoreFactory {
     Plugin<AIP> fixityAction = new FixityAction();
     getActionOrchestrator().runActionOnAllAIPs(fixityAction);
   }
+  
+  private static void runAntivirusAction() {
+    Plugin<AIP> antivirusAction = new AntivirusAction();
+    getActionOrchestrator().runActionOnAllAIPs(antivirusAction);
+  }
 
   private static void runSolrQuery(List<String> args) {
     String collection = args.get(2);
@@ -352,6 +358,7 @@ public class RodaCoreFactory {
     System.err.println("java -jar x.jar index list users|groups");
     System.err.println("java -jar x.jar orphans [newParentID]");
     System.err.println("java -jar x.jar fixity");
+    System.err.println("java -jar x.jar antivirus");
   }
 
   private static void printIndexMembers(List<String> args, Filter filter, Sorter sorter, Sublist sublist, Facets facets)
@@ -384,6 +391,8 @@ public class RodaCoreFactory {
         runRemoveOrphansAction(args.get(1));
       } else if ("fixity".equals(args.get(0))) {
         runFixityAction();
+      } else if ("antivirus".equals(args.get(0))) {
+        runAntivirusAction();
       } else {
         printMainUsage();
       }
