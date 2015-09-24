@@ -286,15 +286,66 @@ public class AipsResourceImpl {
   }
 
   public Response aipsAipIdDescriptiveMetadataMetadataIdPut(HttpServletRequest request, String aipId, String metadataId,
-    FormDataContentDisposition fileDetail, String metadataType) throws NotFoundException {
-    // do some magic!
-    return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
+    InputStream is, FormDataContentDisposition fileDetail, String metadataType) throws NotFoundException {
+    String authorization = request.getHeader("Authorization");
+    try {
+      // get user
+      RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+      // delegate action to controller
+      Browser.putDescriptiveMetadataFile(user, aipId, metadataId, metadataType, is, fileDetail);
+
+      // FIXME give a better answer
+      return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
+    } catch (StorageServiceException | ModelServiceException e) {
+      if (e.getCode() == ModelServiceException.NOT_FOUND) {
+        throw new NotFoundException(e.getCode(), e.getMessage());
+      } else {
+        return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+      }
+    } catch (AuthorizationDeniedException e) {
+      if (authorization == null) {
+        return Response.status(Status.UNAUTHORIZED)
+          .header(HttpHeaders.WWW_AUTHENTICATE, "Basic realm=\"RODA REST API\"")
+          .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+      } else {
+        return Response.status(Status.UNAUTHORIZED)
+          .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+      }
+    } catch (GenericException e) {
+      return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+    }
   }
 
   public Response aipsAipIdDescriptiveMetadataMetadataIdPost(HttpServletRequest request, String aipId,
-    String metadataId, FormDataContentDisposition fileDetail, String metadataType) throws NotFoundException {
-    // do some magic!
-    return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
+    String metadataId, InputStream is, FormDataContentDisposition fileDetail, String metadataType)
+      throws NotFoundException {
+    String authorization = request.getHeader("Authorization");
+    try {
+      // get user
+      RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+      // delegate action to controller
+      Browser.postDescriptiveMetadataFile(user, aipId, metadataId, metadataType, is, fileDetail);
+
+      // FIXME give a better answer
+      return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
+    } catch (StorageServiceException | ModelServiceException e) {
+      if (e.getCode() == ModelServiceException.NOT_FOUND) {
+        throw new NotFoundException(e.getCode(), e.getMessage());
+      } else {
+        return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+      }
+    } catch (AuthorizationDeniedException e) {
+      if (authorization == null) {
+        return Response.status(Status.UNAUTHORIZED)
+          .header(HttpHeaders.WWW_AUTHENTICATE, "Basic realm=\"RODA REST API\"")
+          .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+      } else {
+        return Response.status(Status.UNAUTHORIZED)
+          .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+      }
+    } catch (GenericException e) {
+      return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+    }
   }
 
   public Response aipsAipIdDescriptiveMetadataMetadataIdDelete(HttpServletRequest request, String aipId,

@@ -586,4 +586,42 @@ public class Browser extends RodaCoreService {
     return aipRepresentationFile;
   }
 
+  public static void putDescriptiveMetadataFile(RodaUser user, String aipId, String metadataId, String metadataType, InputStream is,
+    FormDataContentDisposition fileDetail) throws GenericException, AuthorizationDeniedException, StorageServiceException, ModelServiceException {
+    Date startDate = new Date();
+
+    // check user permissions
+    SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(aipId);
+    UserUtility.checkObjectInsertPermissions(user, sdo);
+
+    // delegate
+    BrowserHelper.createOrUpdateAipDescriptiveMetadataFile(aipId, metadataId, metadataType, is, fileDetail,
+      true);
+
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, "Browser", "putDescriptiveMetadataFile", aipId, duration, "aip", aipId,
+      "metadataId", metadataId);
+    
+  }
+
+  public static void postDescriptiveMetadataFile(RodaUser user, String aipId, String metadataId, String metadataType,
+    InputStream is, FormDataContentDisposition fileDetail) throws GenericException, AuthorizationDeniedException, StorageServiceException, ModelServiceException {
+    Date startDate = new Date();
+
+    // check user permissions
+    SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(aipId);
+    UserUtility.checkObjectInsertPermissions(user, sdo);
+
+    // delegate
+    BrowserHelper.createOrUpdateAipDescriptiveMetadataFile(aipId, metadataId, metadataType, is, fileDetail,
+      true);
+
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, "Browser", "postDescriptiveMetadataFile", aipId, duration, "aip", aipId,
+      "metadataId", metadataId);
+    
+  }
+
 }

@@ -749,7 +749,7 @@ public class BrowserHelper {
       final String mediaType;
       final StreamingOutput stream;
       StreamResponse ret = null;
-  
+
       StorageService storage = RodaCoreFactory.getStorageService();
       Binary representationFileBinary = storage
         .getBinary(ModelUtils.getRepresentationFilePath(aipId, representationId, fileId));
@@ -762,18 +762,47 @@ public class BrowserHelper {
         }
       };
       ret = new StreamResponse(filename, mediaType, stream);
-  
+
       return ret;
     } catch (StorageServiceException e) {
       if (e.getCode() == StorageServiceException.NOT_FOUND) {
-        throw new GenericException("File not found: " + aipId+"/"+representationId+"/"+fileId);
+        throw new GenericException("File not found: " + aipId + "/" + representationId + "/" + fileId);
       } else if (e.getCode() == StorageServiceException.FORBIDDEN) {
         throw new GenericException("You do not have permission to access AIP: " + aipId);
       } else {
-        throw new GenericException("Error getting representation file " + fileId + " from representation " + representationId
-          + " of AIP " + aipId + ": " + e.getMessage());
+        throw new GenericException("Error getting representation file " + fileId + " from representation "
+          + representationId + " of AIP " + aipId + ": " + e.getMessage());
       }
     }
+  }
+
+  public static void createOrUpdateAipDescriptiveMetadataFile(String aipId, String metadataId, String metadataType,
+    InputStream is, FormDataContentDisposition fileDetail, boolean create)
+      throws StorageServiceException, ModelServiceException, GenericException {
+    Path file = null;
+    try {
+      ModelService model = RodaCoreFactory.getModelService();
+      file = Files.createTempFile("descriptive", ".tmp");
+      Files.copy(is, file, StandardCopyOption.REPLACE_EXISTING);
+      Binary resource = (Binary) FSUtils.convertPathToResource(file.getParent(), file);
+      if (create) {
+        model.createDescriptiveMetadata(aipId, metadataId, resource, metadataType);
+      } else {
+        model.updateDescriptiveMetadata(aipId, metadataId, resource, metadataType);
+      }
+    } catch (IOException e) {
+      // FIXME see what better exception should be thrown
+      throw new GenericException("");
+    } finally {
+      if (file != null && Files.exists(file)) {
+        try {
+          Files.delete(file);
+        } catch (IOException e) {
+          LOGGER.warn("Error while deleting temporary file", e);
+        }
+      }
+    }
+
   }
 
 }

@@ -282,7 +282,8 @@ public class AipsResource {
     @FormDataParam("file") InputStream inputStream, @FormDataParam("file") FormDataContentDisposition fileDetail,
     @ApiParam(value = "The type of the metadata file (e.g. eadc2014, dc)", required = true) @FormParam("metadataType") String metadataType)
       throws NotFoundException {
-    return DELEGATE.aipsAipIdDescriptiveMetadataMetadataIdPut(request, aipId, metadataId, fileDetail, metadataType);
+    return DELEGATE.aipsAipIdDescriptiveMetadataMetadataIdPut(request, aipId, metadataId, inputStream, fileDetail,
+      metadataType);
   }
 
   @POST
@@ -297,7 +298,8 @@ public class AipsResource {
     @FormDataParam("file") InputStream inputStream, @FormDataParam("file") FormDataContentDisposition fileDetail,
     @ApiParam(value = "The type of the metadata file (e.g. eadc2014, dc)", required = true) @FormParam("metadataType") String metadataType)
       throws NotFoundException {
-    return DELEGATE.aipsAipIdDescriptiveMetadataMetadataIdPost(request, aipId, metadataId, fileDetail, metadataType);
+    return DELEGATE.aipsAipIdDescriptiveMetadataMetadataIdPost(request, aipId, metadataId, inputStream, fileDetail,
+      metadataType);
   }
 
   @DELETE
