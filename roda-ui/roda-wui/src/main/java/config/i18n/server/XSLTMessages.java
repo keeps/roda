@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 public class XSLTMessages {
-  private static final String BUNDLE_NAME = "config.i18n.server.XSLTMessages"; //$NON-NLS-1$
+  private static final String BUNDLE_NAME = "config.i18n.server.XSLTMessages";
 
   private ResourceBundle resourceBundle;
 
@@ -29,14 +29,15 @@ public class XSLTMessages {
   public String getString(String key) {
     return resourceBundle.getString(key);
   }
-  
-  public Map<String,String> getTranslations(String prefix){
-    Map<String,String> map = new HashMap<String,String>();
+
+  public Map<String, String> getTranslations(String prefix) {
+    Map<String, String> map = new HashMap<String, String>();
     Enumeration<String> keys = resourceBundle.getKeys();
-    String fullPrefix = prefix+".";
-    while(keys.hasMoreElements()){
+    String fullPrefix = prefix + ".";
+    while (keys.hasMoreElements()) {
       String key = keys.nextElement();
-      if(key.startsWith(fullPrefix)){
+      if (key.startsWith(fullPrefix)) {
+        // FIXME
         map.put(key.replaceAll("[^A-Za-z0-9]", ""), resourceBundle.getString(key));
       }
     }

@@ -56,21 +56,21 @@ public final class HTMLUtils {
   public static String descriptiveMetadataToHtml(Binary binary, final Locale locale) throws ModelServiceException {
     Map<String, Object> stylesheetOpt = new HashMap<String, Object>();
     stylesheetOpt.put("title", binary.getStoragePath().getName());
-    XSLTMessages messages = new XSLTMessages(locale);
+    XSLTMessages messages = RodaCoreFactory.getXSLTMessages(locale);
     for (Map.Entry<String, String> entry : messages.getTranslations(binary.getStoragePath().getName()).entrySet()) {
       stylesheetOpt.put(entry.getKey(), entry.getValue());
     }
-    return binaryToHtml(binary, locale, true, null, stylesheetOpt);
+    return binaryToHtml(binary, true, null, stylesheetOpt);
   }
 
   public static String preservationObjectToHtml(Binary binary, final Locale locale) throws ModelServiceException {
     Map<String, Object> stylesheetOpt = new HashMap<String, Object>();
     stylesheetOpt.put("prefix", RodaConstants.INDEX_OTHER_DESCRIPTIVE_DATA_PREFIX);
-    XSLTMessages messages = new XSLTMessages(locale);
+    XSLTMessages messages = RodaCoreFactory.getXSLTMessages(locale);
     for (Map.Entry<String, String> entry : messages.getTranslations("premis").entrySet()) {
       stylesheetOpt.put(entry.getKey(), entry.getValue());
     }
-    return binaryToHtml(binary, locale, false, "premis", stylesheetOpt);
+    return binaryToHtml(binary, false, "premis", stylesheetOpt);
   }
 
   public static String aipPremisToHTML2(AIP aip, ModelService model, StorageService storage, Locale locale)
@@ -200,6 +200,8 @@ public final class HTMLUtils {
       }
     }
 
+    // FIXME is this the right way for comparing dates? by comparing their
+    // strings? I don't think so!
     events.sort(new Comparator<Pair<Binary, EventComplexType>>() {
 
       @Override
@@ -245,12 +247,12 @@ public final class HTMLUtils {
     }
     stylesheetOpt.put("agents", htmlAgents);
 
-    XSLTMessages messages = new XSLTMessages(locale);
+    XSLTMessages messages = RodaCoreFactory.getXSLTMessages(locale);
     for (Map.Entry<String, String> entry : messages.getTranslations("premis").entrySet()) {
       stylesheetOpt.put(entry.getKey(), entry.getValue());
     }
 
-    String html = binaryToHtml(representation, locale, false, "premis", stylesheetOpt);
+    String html = binaryToHtml(representation, false, "premis", stylesheetOpt);
     return html;
   }
 
@@ -280,8 +282,8 @@ public final class HTMLUtils {
     return agentsIDs;
   }
 
-  private static String binaryToHtml(Binary binary, final Locale locale, boolean useFilename,
-    String alternativeFilenameToUse, Map<String, Object> stylesheetOpt) throws ModelServiceException {
+  private static String binaryToHtml(Binary binary, boolean useFilename, String alternativeFilenameToUse,
+    Map<String, Object> stylesheetOpt) throws ModelServiceException {
     String filename;
     if (useFilename) {
       filename = binary.getStoragePath().getName();
@@ -289,12 +291,6 @@ public final class HTMLUtils {
       filename = alternativeFilenameToUse;
     }
     try {
-      Locale properLocale = locale;
-      if (locale == null) {
-        properLocale = new Locale("pt", "PT");
-      }
-      
-      
       InputStream inputStream = binary.getContent().createInputStream();
       Reader reader = new InputStreamReader(inputStream);
 
@@ -325,6 +321,7 @@ public final class HTMLUtils {
     return transformerStream;
   }
 
+  // FIXME this does nothing!!!
   private static List<Pair<Binary, File>> sortFilesByRepresentationOrder(Binary representationBinary,
     List<Pair<Binary, File>> files) {
     return files;

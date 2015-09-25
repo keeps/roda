@@ -387,15 +387,11 @@ public class Browser extends RodaCoreService {
 
     // check user permissions
     UserUtility.checkRoles(user, "administration.metadata_editor");
-
-    // TODO remove permission skip for admin
-    if (!user.getName().equals("admin")) {
-      if (parentId != null) {
-        SimpleDescriptionObject parentSDO = BrowserHelper.getSimpleDescriptionObject(parentId);
-        UserUtility.checkObjectModifyPermissions(user, parentSDO);
-      } else {
-        // TODO check user role to create top-level AIPs
-      }
+    if (parentId != null) {
+      SimpleDescriptionObject parentSDO = BrowserHelper.getSimpleDescriptionObject(parentId);
+      UserUtility.checkObjectModifyPermissions(user, parentSDO);
+    } else {
+      // TODO check user role to create top-level AIPs
     }
 
     // delegate
@@ -414,11 +410,7 @@ public class Browser extends RodaCoreService {
     // check user permissions
     UserUtility.checkRoles(user, "administration.metadata_editor");
     SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(aipId);
-
-    // TODO remove permission skip for admin
-    if (!user.getName().equals("admin")) {
-      UserUtility.checkObjectModifyPermissions(user, sdo);
-    }
+    UserUtility.checkObjectModifyPermissions(user, sdo);
 
     // delegate
     BrowserHelper.removeAIP(aipId);
@@ -436,11 +428,7 @@ public class Browser extends RodaCoreService {
     // check user permissions
     UserUtility.checkRoles(user, "administration.metadata_editor");
     SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(aipId);
-
-    // TODO remove permission skip for admin
-    if (!user.getName().equals("admin")) {
-      UserUtility.checkObjectModifyPermissions(user, sdo);
-    }
+    UserUtility.checkObjectModifyPermissions(user, sdo);
 
     // delegate
     DescriptiveMetadata ret = BrowserHelper.createDescriptiveMetadataFile(aipId, descriptiveMetadataId,
@@ -462,10 +450,7 @@ public class Browser extends RodaCoreService {
     // check user permissions
     UserUtility.checkRoles(user, "administration.metadata_editor");
     SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(aipId);
-    // TODO remove permission skip for admin
-    if (!user.getName().equals("admin")) {
-      UserUtility.checkObjectModifyPermissions(user, sdo);
-    }
+    UserUtility.checkObjectModifyPermissions(user, sdo);
 
     // delegate
     DescriptiveMetadata ret = BrowserHelper.updateDescriptiveMetadataFile(aipId, descriptiveMetadataId,
@@ -486,11 +471,7 @@ public class Browser extends RodaCoreService {
     // check user permissions
     UserUtility.checkRoles(user, "administration.metadata_editor");
     SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(itemId);
-
-    // TODO remove permission skip for admin
-    if (!user.getName().equals("admin")) {
-      UserUtility.checkObjectModifyPermissions(user, sdo);
-    }
+    UserUtility.checkObjectModifyPermissions(user, sdo);
 
     // delegate
     BrowserHelper.removeDescriptiveMetadataFile(itemId, descriptiveMetadataId);
@@ -528,11 +509,7 @@ public class Browser extends RodaCoreService {
     // check user permissions
     UserUtility.checkRoles(user, "administration.metadata_editor");
     SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(itemId);
-
-    // TODO remove permission skip for admin
-    if (!user.getName().equals("admin")) {
-      UserUtility.checkObjectModifyPermissions(user, sdo);
-    }
+    UserUtility.checkObjectModifyPermissions(user, sdo);
 
     // delegate
     BrowserHelper.removeRepresentation(itemId, representationId);
@@ -551,11 +528,7 @@ public class Browser extends RodaCoreService {
     // check user permissions
     UserUtility.checkRoles(user, "administration.metadata_editor");
     SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(itemId);
-
-    // TODO remove permission skip for admin
-    if (!user.getName().equals("admin")) {
-      UserUtility.checkObjectModifyPermissions(user, sdo);
-    }
+    UserUtility.checkObjectModifyPermissions(user, sdo);
 
     // delegate
     BrowserHelper.removeRepresentationFile(itemId, representationId, fileId);
@@ -586,8 +559,9 @@ public class Browser extends RodaCoreService {
     return aipRepresentationFile;
   }
 
-  public static void putDescriptiveMetadataFile(RodaUser user, String aipId, String metadataId, String metadataType, InputStream is,
-    FormDataContentDisposition fileDetail) throws GenericException, AuthorizationDeniedException, StorageServiceException, ModelServiceException {
+  public static void putDescriptiveMetadataFile(RodaUser user, String aipId, String metadataId, String metadataType,
+    InputStream is, FormDataContentDisposition fileDetail)
+      throws GenericException, AuthorizationDeniedException, StorageServiceException, ModelServiceException {
     Date startDate = new Date();
 
     // check user permissions
@@ -595,18 +569,18 @@ public class Browser extends RodaCoreService {
     UserUtility.checkObjectInsertPermissions(user, sdo);
 
     // delegate
-    BrowserHelper.createOrUpdateAipDescriptiveMetadataFile(aipId, metadataId, metadataType, is, fileDetail,
-      true);
+    BrowserHelper.createOrUpdateAipDescriptiveMetadataFile(aipId, metadataId, metadataType, is, fileDetail, true);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, "Browser", "putDescriptiveMetadataFile", aipId, duration, "aip", aipId,
-      "metadataId", metadataId);
-    
+    registerAction(user, "Browser", "putDescriptiveMetadataFile", aipId, duration, "aip", aipId, "metadataId",
+      metadataId);
+
   }
 
   public static void postDescriptiveMetadataFile(RodaUser user, String aipId, String metadataId, String metadataType,
-    InputStream is, FormDataContentDisposition fileDetail) throws GenericException, AuthorizationDeniedException, StorageServiceException, ModelServiceException {
+    InputStream is, FormDataContentDisposition fileDetail)
+      throws GenericException, AuthorizationDeniedException, StorageServiceException, ModelServiceException {
     Date startDate = new Date();
 
     // check user permissions
@@ -614,14 +588,13 @@ public class Browser extends RodaCoreService {
     UserUtility.checkObjectInsertPermissions(user, sdo);
 
     // delegate
-    BrowserHelper.createOrUpdateAipDescriptiveMetadataFile(aipId, metadataId, metadataType, is, fileDetail,
-      true);
+    BrowserHelper.createOrUpdateAipDescriptiveMetadataFile(aipId, metadataId, metadataType, is, fileDetail, true);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, "Browser", "postDescriptiveMetadataFile", aipId, duration, "aip", aipId,
-      "metadataId", metadataId);
-    
+    registerAction(user, "Browser", "postDescriptiveMetadataFile", aipId, duration, "aip", aipId, "metadataId",
+      metadataId);
+
   }
 
 }

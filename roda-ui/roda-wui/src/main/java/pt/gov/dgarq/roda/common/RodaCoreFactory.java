@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -45,6 +46,7 @@ import org.roda.storage.StorageService;
 import org.roda.storage.StorageServiceException;
 import org.roda.storage.fs.FileStorageService;
 
+import config.i18n.server.XSLTMessages;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
 import pt.gov.dgarq.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
@@ -82,6 +84,7 @@ public class RodaCoreFactory {
 
   private static Configuration rodaConfiguration = null;
   private static Map<String, String> loginProperties = null;
+  private static Map<Locale, XSLTMessages> xsltMessages = new HashMap<Locale, XSLTMessages>();
 
   // FIXME read this from configuration file or environment
   public static boolean DEVELOPMENT = true;
@@ -302,6 +305,15 @@ public class RodaCoreFactory {
 
   }
 
+  public static XSLTMessages getXSLTMessages(Locale locale) {
+    XSLTMessages messages = xsltMessages.get(locale);
+    if (messages == null) {
+      messages = new XSLTMessages(locale);
+      xsltMessages.put(locale, messages);
+    }
+    return messages;
+  }
+
   /*
    * Command-line accessible functionalities
    */
@@ -331,7 +343,7 @@ public class RodaCoreFactory {
     Plugin<AIP> fixityAction = new FixityAction();
     getActionOrchestrator().runActionOnAllAIPs(fixityAction);
   }
-  
+
   private static void runAntivirusAction() {
     Plugin<AIP> antivirusAction = new AntivirusAction();
     getActionOrchestrator().runActionOnAllAIPs(antivirusAction);
