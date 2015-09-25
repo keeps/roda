@@ -3,6 +3,7 @@
  */
 package pt.gov.dgarq.roda.wui.dissemination.search.client;
 
+import pt.gov.dgarq.roda.common.RodaCoreFactory;
 import pt.gov.dgarq.roda.core.common.LoginException;
 import pt.gov.dgarq.roda.core.common.RODAClientException;
 import pt.gov.dgarq.roda.core.common.RODAException;
@@ -11,6 +12,13 @@ import pt.gov.dgarq.roda.core.data.SearchParameter;
 import pt.gov.dgarq.roda.core.data.SearchResult;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
@@ -74,5 +82,9 @@ public interface SearchService extends RemoteService {
    */
   public SearchResult advancedSearch(SearchParameter[] searchParameters, int hitPageStart, int hitPageSize,
     int snippetsMax, int fieldMaxLength) throws RODAException;
+
+  
+  
+  public List<SearchField> getSearchFields() throws IOException;
 
 }

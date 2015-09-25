@@ -32,7 +32,7 @@
 									<g:TextBox addStyleNames="form-textbox" ui:field="advancedSearchInputTitle" />
 								</g:FlowPanel>
 								<g:FlowPanel addStyleNames="searchAdvancedField">
-									<g:ListBox addStyleNames="searchAdvancedFieldLabel">
+									<g:ListBox ui:field="searchFieldSelector" addStyleNames="searchAdvancedFieldLabel">
 										<g:item>Scope and content</g:item>
 										<g:item>Producer</g:item>
 										<g:item>Author</g:item>

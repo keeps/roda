@@ -17,11 +17,13 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.datepicker.client.DateBox;
@@ -46,6 +48,8 @@ import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
 import pt.gov.dgarq.roda.wui.common.client.widgets.AIPList;
 import pt.gov.dgarq.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.Browse;
+import pt.gov.dgarq.roda.wui.dissemination.search.client.SearchField;
+import pt.gov.dgarq.roda.wui.dissemination.search.client.SearchService;
 
 /**
  * @author Luis Faria
@@ -123,6 +127,9 @@ public class BasicSearch extends Composite {
   @UiField
   DateBox inputDateFinal;
 
+  @UiField
+  ListBox searchFieldSelector;
+
   private BasicSearch() {
     Filter filter = DEFAULT_FILTER;
     Sorter sorter = new Sorter(new SortParameter(RodaConstants.SDO_DATE_INITIAL, true));
@@ -136,6 +143,8 @@ public class BasicSearch extends Composite {
     facetPanels.put(RodaConstants.SDO_LEVEL, facetDescriptionLevels);
     facetPanels.put(RodaConstants.AIP_HAS_REPRESENTATIONS, facetHasRepresentations);
     FacetUtils.bindFacets(searchResultPanel, facetPanels);
+
+    
 
     // searchInputBox.getElement().setId(Document.get().createUniqueId());
     initWidget(uiBinder.createAndBindUi(this));
@@ -190,6 +199,23 @@ public class BasicSearch extends Composite {
     inputDateFinal.getDatePicker().setYearArrowsVisible(true);
     inputDateFinal.setFireNullValues(true);
     inputDateFinal.addValueChangeHandler(valueChangeHandler);
+    
+    SearchService.Util.getInstance().getSearchFields(new AsyncCallback<List<SearchField>>() {
+      @Override
+      public void onFailure(Throwable caught) {
+        // TODO Auto-generated method stub
+
+      }
+
+      @Override
+      public void onSuccess(List<SearchField> result) {
+        searchFieldSelector.clear();
+        for (SearchField searchField : result) {
+          searchFieldSelector.addItem(searchField.getLabels().get("pt_PT"), searchField.getField());
+        }
+      }
+
+    });
 
   }
 

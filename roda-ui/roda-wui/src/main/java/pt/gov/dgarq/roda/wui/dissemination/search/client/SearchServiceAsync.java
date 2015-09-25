@@ -8,6 +8,9 @@ import pt.gov.dgarq.roda.core.data.SearchResult;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 
+import java.io.IOException;
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
@@ -43,5 +46,7 @@ public interface SearchServiceAsync {
    */
   public void advancedSearch(SearchParameter[] searchParameters, int hitPageStart, int hitPageSize, int snippetsMax,
     int fieldMaxLength, AsyncCallback<SearchResult> callback);
+  
+  public void getSearchFields(AsyncCallback<List<SearchField>> callback);
 
 }
