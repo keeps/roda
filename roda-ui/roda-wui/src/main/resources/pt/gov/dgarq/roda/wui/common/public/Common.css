@@ -114,6 +114,17 @@ pre>code {
 	margin-bottom: 5px;
 }
 
+.form-listbox {
+	color: #58595b;
+	background-color: white;
+	padding: 5px;
+	border: 2px solid #ccc;
+	border-radius: 1px;
+	/*height: 1em;*/
+	box-sizing: border-box;
+	margin-bottom: 5px;
+}
+
 .form-textbox-small {
 	width: auto;
 }

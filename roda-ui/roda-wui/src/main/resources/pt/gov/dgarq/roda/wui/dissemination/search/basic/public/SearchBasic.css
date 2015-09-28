@@ -74,18 +74,23 @@
 	margin-top: 10px;
 }
 
-.searchAdvancedDisclosure a {
-	text-decoration: underline;
-}
-
 .searchAdvancedPanel {
 	padding: 20px !important;
 	min-height: auto;
 	background-color: #e6e7e8;
+	margin-bottom: 20px;
+}
+
+.search-field-label {
+	display: inline;
+}
+.search-field-remove {
+	font-size: 1.2rem;
+    margin-left: 5px;
 }
 
 .searchAdvancedField {
-	margin-bottom: 15px;
+	
 }
 
 .searchAdvancedFieldInputDateLabel {

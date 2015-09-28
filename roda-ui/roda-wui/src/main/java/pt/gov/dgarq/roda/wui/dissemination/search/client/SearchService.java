@@ -12,6 +12,7 @@ import pt.gov.dgarq.roda.core.data.SearchParameter;
 import pt.gov.dgarq.roda.core.data.SearchResult;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
+import pt.gov.dgarq.roda.wui.common.client.GenericException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -83,8 +84,6 @@ public interface SearchService extends RemoteService {
   public SearchResult advancedSearch(SearchParameter[] searchParameters, int hitPageStart, int hitPageSize,
     int snippetsMax, int fieldMaxLength) throws RODAException;
 
-  
-  
-  public List<SearchField> getSearchFields() throws IOException;
+  public List<SearchField> getSearchFields(String locale) throws GenericException;
 
 }

@@ -8,7 +8,9 @@
 	xmlns:d="urn:import:com.google.gwt.user.datepicker.client">
 
 	<ui:style>
-	
+	.addbutton {
+		margin-left: 10px;
+	}
 	</ui:style>
 
 	<g:FlowPanel styleName="search" addStyleNames="wrapper skip_padding">
@@ -17,7 +19,7 @@
 				<g:HTML>
 					<h1>Search</h1>
 				</g:HTML>
-				<g:FlowPanel  styleName="searchPanel">
+				<g:FlowPanel styleName="searchPanel">
 					<g:FlowPanel styleName="searchPanelLeft">
 						<g:TextBox ui:field="searchInputBox" addStyleNames="searchBox" />
 						<!-- <g:Hyperlink addStyleNames="searchInputAdvancedLink" -->
@@ -27,19 +29,20 @@
 							ui:field="advancedSearchDisclosure">
 							<g:header>More search options</g:header>
 							<g:FlowPanel addStyleNames="searchAdvancedPanel">
-								<g:FlowPanel addStyleNames="searchAdvancedField">
-									<g:Label addStyleNames="form-label" ui:field="advancedSearchInputTitleLabel">Title</g:Label>
-									<g:TextBox addStyleNames="form-textbox" ui:field="advancedSearchInputTitle" />
-								</g:FlowPanel>
-								<g:FlowPanel addStyleNames="searchAdvancedField">
-									<g:ListBox ui:field="searchFieldSelector" addStyleNames="searchAdvancedFieldLabel">
+								<!-- <g:FlowPanel addStyleNames="searchAdvancedField"> <g:Label addStyleNames="form-label" 
+									ui:field="advancedSearchInputTitleLabel">Title</g:Label> <g:TextBox addStyleNames="form-textbox" 
+									ui:field="advancedSearchInputTitle" /> </g:FlowPanel> -->
+								<g:FlowPanel ui:field="advancedSearchFieldsPanel" />
+								<g:FlowPanel styleName="searchAdvancedField">
+									<g:ListBox styleName="form-listbox" ui:field="searchAdvancedFieldOptions">
 										<g:item>Scope and content</g:item>
 										<g:item>Producer</g:item>
 										<g:item>Author</g:item>
 										<g:item>Physical location</g:item>
 										<g:item>Arrangement</g:item>
 									</g:ListBox>
-									<g:TextBox addStyleNames="searchAdvancedFieldInput fieldTextBox" />
+									<g:Button styleName="btn btn-plus {style.addbutton}"
+										ui:field="searchAdvancedFieldOptionsAdd">Add search field</g:Button>
 								</g:FlowPanel>
 							</g:FlowPanel>
 						</g:DisclosurePanel>

@@ -15,10 +15,13 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.Window;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -111,10 +114,13 @@ public class BasicSearch extends Composite {
   DisclosurePanel advancedSearchDisclosure;
 
   @UiField
-  TextBox advancedSearchInputTitle;
+  FlowPanel advancedSearchFieldsPanel;
 
   @UiField
-  Label advancedSearchInputTitleLabel;
+  ListBox searchAdvancedFieldOptions;
+
+  @UiField
+  Button searchAdvancedFieldOptionsAdd;
 
   // FILTERS
   @UiField(provided = true)
@@ -127,8 +133,7 @@ public class BasicSearch extends Composite {
   @UiField
   DateBox inputDateFinal;
 
-  @UiField
-  ListBox searchFieldSelector;
+  private Map<String, SearchField> searchFields;
 
   private BasicSearch() {
     Filter filter = DEFAULT_FILTER;
@@ -144,14 +149,9 @@ public class BasicSearch extends Composite {
     facetPanels.put(RodaConstants.AIP_HAS_REPRESENTATIONS, facetHasRepresentations);
     FacetUtils.bindFacets(searchResultPanel, facetPanels);
 
-    
+    searchFields = new HashMap<String, SearchField>();
 
-    // searchInputBox.getElement().setId(Document.get().createUniqueId());
     initWidget(uiBinder.createAndBindUi(this));
-    // searchInputLabel.setHTML("<label class='searchLabel'
-    // for='"+searchInputBox.getElement().getId()+"'>"+constants.basicSearchInputLabel()+"</label>");
-
-    // searchInputButton.setText(constants.basicSearchButtonLabel());
 
     searchResultPanel.getSelectionModel().addSelectionChangeHandler(new Handler() {
 
@@ -199,23 +199,25 @@ public class BasicSearch extends Composite {
     inputDateFinal.getDatePicker().setYearArrowsVisible(true);
     inputDateFinal.setFireNullValues(true);
     inputDateFinal.addValueChangeHandler(valueChangeHandler);
-    
-    SearchService.Util.getInstance().getSearchFields(new AsyncCallback<List<SearchField>>() {
-      @Override
-      public void onFailure(Throwable caught) {
-        // TODO Auto-generated method stub
 
-      }
-
-      @Override
-      public void onSuccess(List<SearchField> result) {
-        searchFieldSelector.clear();
-        for (SearchField searchField : result) {
-          searchFieldSelector.addItem(searchField.getLabels().get("pt_PT"), searchField.getField());
+    SearchService.Util.getInstance().getSearchFields(LocaleInfo.getCurrentLocale().getLocaleName(),
+      new AsyncCallback<List<SearchField>>() {
+        @Override
+        public void onFailure(Throwable caught) {
+          GWT.log("Error getting search fields", caught);
         }
-      }
 
-    });
+        @Override
+        public void onSuccess(List<SearchField> searchFields) {
+          BasicSearch.this.searchFields.clear();
+          searchAdvancedFieldOptions.clear();
+          for (SearchField searchField : searchFields) {
+            searchAdvancedFieldOptions.addItem(searchField.getLabel(), searchField.getField());
+            BasicSearch.this.searchFields.put(searchField.getField(), searchField);
+          }
+        }
+
+      });
 
   }
 
@@ -252,6 +254,43 @@ public class BasicSearch extends Composite {
       Tools.newHistory(RESOLVER);
       callback.onSuccess(null);
     }
+  }
+
+  @UiHandler("searchAdvancedFieldOptionsAdd")
+  void handleSearchAdvancedFieldAdd(ClickEvent e) {
+    String selectedValue = searchAdvancedFieldOptions.getSelectedValue();
+
+    SearchField searchField = searchFields.get(selectedValue);
+    addSearchFieldPanel(searchField);
+
+  }
+
+  private void addSearchFieldPanel(SearchField searchField) {
+    final FlowPanel panel = new FlowPanel();
+    Label label = new Label(searchField.getLabel());
+    Anchor remove = new Anchor("remove");
+    TextBox input = new TextBox();
+
+    panel.add(label);
+    panel.add(remove);
+    panel.add(input);
+
+    label.addStyleName("form-label");
+    label.addStyleName("search-field-label");
+    remove.addStyleName("search-field-remove");
+    input.addStyleName("form-textbox");
+
+    advancedSearchFieldsPanel.add(panel);
+    // TODO remove from listbox
+    remove.addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        GWT.log("clicked!");
+        advancedSearchFieldsPanel.remove(panel);
+      }
+    });
+
   }
 
 }

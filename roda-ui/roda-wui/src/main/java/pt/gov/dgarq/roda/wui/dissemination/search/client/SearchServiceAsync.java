@@ -47,6 +47,6 @@ public interface SearchServiceAsync {
   public void advancedSearch(SearchParameter[] searchParameters, int hitPageStart, int hitPageSize, int snippetsMax,
     int fieldMaxLength, AsyncCallback<SearchResult> callback);
   
-  public void getSearchFields(AsyncCallback<List<SearchField>> callback);
+  void getSearchFields(String locale, AsyncCallback<List<SearchField>> callback);
 
 }
