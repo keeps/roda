@@ -44,8 +44,8 @@ public class AIPList extends AsyncTableCell<SimpleDescriptionObject> {
     this(null, null, null);
   }
 
-  public AIPList(Filter filter, Sorter sorter, Facets facets) {
-    super(filter, sorter, facets, "AIPS");
+  public AIPList(Filter filter, Facets facets, String summary) {
+    super(filter, facets, summary);
 
     levelColumn = new Column<SimpleDescriptionObject, SafeHtml>(new SafeHtmlCell()) {
       @Override
@@ -110,6 +110,9 @@ public class AIPList extends AsyncTableCell<SimpleDescriptionObject> {
     getDisplay().setEmptyTableWidget(emptyInfo);
     getDisplay().setColumnWidth(titleColumn, "100%");
 
+    // define default sorting
+    getDisplay().getColumnSortList().push(new ColumnSortInfo(dateInitialColumn, false));
+
     dateInitialColumn.setCellStyleNames("nowrap");
     dateFinalColumn.setCellStyleNames("nowrap");
 
@@ -128,8 +131,7 @@ public class AIPList extends AsyncTableCell<SimpleDescriptionObject> {
       callback.onSuccess(null);
     } else {
       // calculate sorter
-      Sorter defaultSorter = getSorter();
-      Sorter sorter = defaultSorter != null ? defaultSorter : new Sorter();
+      Sorter sorter = new Sorter();
       for (int i = 0; i < columnSortList.size(); i++) {
         ColumnSortInfo columnSortInfo = columnSortList.get(i);
         String sortParameterKey;

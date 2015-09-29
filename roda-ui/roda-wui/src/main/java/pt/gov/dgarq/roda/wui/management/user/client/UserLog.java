@@ -28,8 +28,6 @@ import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
 import pt.gov.dgarq.roda.core.data.adapter.facet.SimpleFacetParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.DateRangeFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter;
-import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
@@ -116,10 +114,9 @@ public class UserLog extends Composite {
    */
   public UserLog() {
     Filter filter = null;
-    Sorter sorter = new Sorter(new SortParameter(RodaConstants.LOG_DATETIME, true));
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.LOG_ACTION_COMPONENT),
       new SimpleFacetParameter(RodaConstants.LOG_ACTION_METHOD), new SimpleFacetParameter(RodaConstants.LOG_USERNAME));
-    logList = new LogEntryList(filter, sorter, facets);
+    logList = new LogEntryList(filter,facets, "Logs");
     facetComponents = new FlowPanel();
     facetMethods = new FlowPanel();
     facetUsers = new FlowPanel();

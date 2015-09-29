@@ -46,8 +46,8 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
     this(null, null, null);
   }
 
-  public LogEntryList(Filter filter, Sorter sorter, Facets facets) {
-    super(filter, sorter, facets, "LOGS");
+  public LogEntryList(Filter filter, Facets facets, String summary) {
+    super(filter, facets, summary);
 
     dateColumn = new Column<LogEntry, Date>(new DateCell(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_MEDIUM))) {
       @Override
@@ -137,6 +137,8 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
     Label emptyInfo = new Label("No items to display");
     getDisplay().setEmptyTableWidget(emptyInfo);
 
+    getDisplay().getColumnSortList().push(new ColumnSortInfo(dateColumn, false));
+
     addStyleName("my-collections-table");
     emptyInfo.addStyleName("my-collections-empty-info");
     relatedObjectColumn.setCellStyleNames("my-collections-table-cell-link");
@@ -150,8 +152,7 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
     Filter filter = getFilter();
 
     // calculate sorter
-    Sorter defaultSorter = getSorter();
-    Sorter sorter = defaultSorter != null ? defaultSorter : new Sorter();
+    Sorter sorter = new Sorter();
     for (int i = 0; i < columnSortList.size(); i++) {
       ColumnSortInfo columnSortInfo = columnSortList.get(i);
       String sortParameterKey;

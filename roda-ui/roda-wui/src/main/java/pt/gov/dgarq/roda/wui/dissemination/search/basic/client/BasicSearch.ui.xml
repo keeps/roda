@@ -11,6 +11,10 @@
 	.addbutton {
 		margin-left: 10px;
 	}
+	.searchbutton {
+		float: right;
+		margin-top: 5px;
+	}
 	</ui:style>
 
 	<g:FlowPanel styleName="search" addStyleNames="wrapper skip_padding">
@@ -26,14 +30,14 @@
 						<!-- targetHistoryToken="dissemination.search.advanced">More search 
 							options</g:Hyperlink> -->
 						<g:DisclosurePanel addStyleNames="searchAdvancedDisclosure"
-							ui:field="advancedSearchDisclosure">
+							ui:field="searchAdvancedDisclosure">
 							<g:header>More search options</g:header>
 							<g:FlowPanel addStyleNames="searchAdvancedPanel">
 								<!-- <g:FlowPanel addStyleNames="searchAdvancedField"> <g:Label addStyleNames="form-label" 
 									ui:field="advancedSearchInputTitleLabel">Title</g:Label> <g:TextBox addStyleNames="form-textbox" 
 									ui:field="advancedSearchInputTitle" /> </g:FlowPanel> -->
-								<g:FlowPanel ui:field="advancedSearchFieldsPanel" />
-								<g:FlowPanel styleName="searchAdvancedField">
+								<g:FlowPanel ui:field="searchAdvancedFieldsPanel" styleName="searchAdvancedFieldsPanel empty"/>
+								<g:FlowPanel styleName="searchAdvancedFieldAdd">
 									<g:ListBox styleName="form-listbox" ui:field="searchAdvancedFieldOptions">
 										<g:item>Scope and content</g:item>
 										<g:item>Producer</g:item>
@@ -43,6 +47,8 @@
 									</g:ListBox>
 									<g:Button styleName="btn btn-plus {style.addbutton}"
 										ui:field="searchAdvancedFieldOptionsAdd">Add search field</g:Button>
+										<g:Button styleName="btn btn-search {style.searchbutton}"
+										ui:field="searchAdvancedGo" enabled="false">Search</g:Button>
 								</g:FlowPanel>
 							</g:FlowPanel>
 						</g:DisclosurePanel>

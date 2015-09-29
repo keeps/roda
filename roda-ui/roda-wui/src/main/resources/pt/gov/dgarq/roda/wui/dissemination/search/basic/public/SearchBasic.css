@@ -87,10 +87,19 @@
 .search-field-remove {
 	font-size: 1.2rem;
     margin-left: 5px;
+    float: right;
 }
 
-.searchAdvancedField {
-	
+.searchAdvancedFieldsPanel + .searchAdvancedFieldAdd {
+	margin-top: 10px;
+}
+
+.searchAdvancedFieldsPanel.empty + .searchAdvancedFieldAdd {
+	margin-top: 0;
+}
+
+.searchAdvancedFieldAdd .form-listbox {
+	margin-bottom: 0;
 }
 
 .searchAdvancedFieldInputDateLabel {

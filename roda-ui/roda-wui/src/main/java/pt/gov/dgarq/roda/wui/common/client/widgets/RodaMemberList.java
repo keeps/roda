@@ -40,8 +40,8 @@ public class RodaMemberList extends AsyncTableCell<RODAMember> {
     this(null, null, null);
   }
 
-  public RodaMemberList(Filter filter, Sorter sorter, Facets facets) {
-    super(filter, sorter, facets, "MEMBERS");
+  public RodaMemberList(Filter filter, Facets facets, String summary) {
+    super(filter, facets, summary);
 
     activeColumn = new Column<RODAMember, SafeHtml>(new SafeHtmlCell()) {
       @Override
@@ -115,8 +115,7 @@ public class RodaMemberList extends AsyncTableCell<RODAMember> {
     Filter filter = getFilter();
 
     // calculate sorter
-    Sorter defaultSorter = getSorter();
-    Sorter sorter = defaultSorter != null ? defaultSorter : new Sorter();
+    Sorter sorter = new Sorter();
     for (int i = 0; i < columnSortList.size(); i++) {
       ColumnSortInfo columnSortInfo = columnSortList.get(i);
       String sortParameterKey;

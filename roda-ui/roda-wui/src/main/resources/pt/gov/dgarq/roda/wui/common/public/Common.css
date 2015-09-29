@@ -243,6 +243,10 @@ pre>code {
 	content: "\f00b";
 }
 
+.btn-search:after {
+	content: "\f002";
+}
+
 .nowrap {
 	white-space: nowrap;
 }

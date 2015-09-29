@@ -3,11 +3,13 @@
  */
 package pt.gov.dgarq.roda.wui.dissemination.search.basic.client;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -34,15 +36,13 @@ import com.google.gwt.user.datepicker.client.DateBox.DefaultFormat;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 
-import config.i18n.client.SearchConstants;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
 import pt.gov.dgarq.roda.core.data.adapter.facet.SimpleFacetParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.BasicSearchFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.DateIntervalFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter;
-import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
+import pt.gov.dgarq.roda.core.data.adapter.filter.FilterParameter;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
@@ -98,7 +98,8 @@ public class BasicSearch extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  private SearchConstants constants = (SearchConstants) GWT.create(SearchConstants.class);
+  // private SearchConstants constants = (SearchConstants)
+  // GWT.create(SearchConstants.class);
 
   @UiField
   TextBox searchInputBox;
@@ -111,16 +112,19 @@ public class BasicSearch extends Composite {
 
   // ADVANCED SEARCH
   @UiField
-  DisclosurePanel advancedSearchDisclosure;
+  DisclosurePanel searchAdvancedDisclosure;
 
   @UiField
-  FlowPanel advancedSearchFieldsPanel;
+  FlowPanel searchAdvancedFieldsPanel;
 
   @UiField
   ListBox searchAdvancedFieldOptions;
 
   @UiField
   Button searchAdvancedFieldOptionsAdd;
+
+  @UiField
+  Button searchAdvancedGo;
 
   // FILTERS
   @UiField(provided = true)
@@ -133,14 +137,15 @@ public class BasicSearch extends Composite {
   @UiField
   DateBox inputDateFinal;
 
-  private Map<String, SearchField> searchFields;
+  private final Map<String, SearchField> searchFields = new HashMap<String, SearchField>();
+  private final Map<String, TextBox> searchFieldTextBoxes = new HashMap<String, TextBox>();
 
   private BasicSearch() {
     Filter filter = DEFAULT_FILTER;
-    Sorter sorter = new Sorter(new SortParameter(RodaConstants.SDO_DATE_INITIAL, true));
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.SDO_LEVEL),
       new SimpleFacetParameter(RodaConstants.AIP_HAS_REPRESENTATIONS));
-    searchResultPanel = new AIPList(filter, sorter, facets);
+    // TODO externalise strings
+    searchResultPanel = new AIPList(filter, facets,"Search results");
     facetDescriptionLevels = new FlowPanel();
     facetHasRepresentations = new FlowPanel();
 
@@ -148,8 +153,6 @@ public class BasicSearch extends Composite {
     facetPanels.put(RodaConstants.SDO_LEVEL, facetDescriptionLevels);
     facetPanels.put(RodaConstants.AIP_HAS_REPRESENTATIONS, facetHasRepresentations);
     FacetUtils.bindFacets(searchResultPanel, facetPanels);
-
-    searchFields = new HashMap<String, SearchField>();
 
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -168,7 +171,7 @@ public class BasicSearch extends Composite {
 
       @Override
       public void onValueChange(ValueChangeEvent<String> event) {
-        update();
+        doSearch();
       }
     });
 
@@ -176,7 +179,7 @@ public class BasicSearch extends Composite {
 
       @Override
       public void onClick(ClickEvent event) {
-        update();
+        doSearch();
       }
     });
 
@@ -235,14 +238,32 @@ public class BasicSearch extends Composite {
     Tools.newHistory(Browse.RESOLVER, id);
   }
 
-  public void update() {
-    String query = searchInputBox.getText();
-
-    if ("".equals(query)) {
-      searchResultPanel.setFilter(DEFAULT_FILTER);
-    } else {
-      searchResultPanel.setFilter(new Filter(new BasicSearchFilterParameter(RodaConstants.SDO__ALL, query)));
+  public void doSearch() {
+    List<FilterParameter> parameters = new ArrayList<FilterParameter>();
+    
+    // basic query
+    String basicQuery = searchInputBox.getText();
+    if (!"".equals(basicQuery)) {
+      parameters.add(new BasicSearchFilterParameter(RodaConstants.SDO__ALL, basicQuery));
     }
+    
+    for (Entry<String, TextBox> entry : searchFieldTextBoxes.entrySet()) {
+      String field = entry.getKey();
+      String text = entry.getValue().getText();
+      
+      if(!"".equals(text)) {
+        parameters.add(new BasicSearchFilterParameter(field, text));
+      }
+    }
+    
+    
+    Filter filter;
+    if(parameters.size()==0) {
+      filter = DEFAULT_FILTER;
+    } else {
+      filter = new Filter(parameters);
+    }
+    searchResultPanel.setFilter(filter);
 
   }
 
@@ -265,7 +286,12 @@ public class BasicSearch extends Composite {
 
   }
 
-  private void addSearchFieldPanel(SearchField searchField) {
+  @UiHandler("searchAdvancedGo")
+  void handleSearchAdvancedGo(ClickEvent e) {
+    doSearch();
+  }
+
+  private void addSearchFieldPanel(final SearchField searchField) {
     final FlowPanel panel = new FlowPanel();
     Label label = new Label(searchField.getLabel());
     Anchor remove = new Anchor("remove");
@@ -280,14 +306,29 @@ public class BasicSearch extends Composite {
     remove.addStyleName("search-field-remove");
     input.addStyleName("form-textbox");
 
-    advancedSearchFieldsPanel.add(panel);
-    // TODO remove from listbox
+    searchAdvancedFieldsPanel.add(panel);
+    searchFieldTextBoxes.put(searchField.getField(), input);
+    searchAdvancedFieldsPanel.removeStyleName("empty");
+    searchAdvancedGo.setEnabled(true);
+    
     remove.addClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent event) {
-        GWT.log("clicked!");
-        advancedSearchFieldsPanel.remove(panel);
+        searchAdvancedFieldsPanel.remove(panel);
+        searchFieldTextBoxes.remove(searchField.getField());
+        if (searchAdvancedFieldsPanel.getWidgetCount() == 0) {
+          searchAdvancedFieldsPanel.addStyleName("empty");
+          searchAdvancedGo.setEnabled(false);
+        }
+      }
+    });
+    
+    input.addValueChangeHandler(new ValueChangeHandler<String>() {
+
+      @Override
+      public void onValueChange(ValueChangeEvent<String> event) {
+        doSearch();
       }
     });
 
