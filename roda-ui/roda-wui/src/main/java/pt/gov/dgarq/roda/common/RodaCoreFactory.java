@@ -270,6 +270,7 @@ public class RodaCoreFactory {
     Path config = RodaCoreFactory.getConfigPath().resolve(configurationFile);
     PropertiesConfiguration propertiesConfiguration = new PropertiesConfiguration();
     propertiesConfiguration.setDelimiterParsingDisabled(true);
+    propertiesConfiguration.setEncoding("UTF-8");
 
     if (Files.exists(config)) {
       propertiesConfiguration.load(config.toFile());

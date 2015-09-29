@@ -1,10 +1,9 @@
 package pt.gov.dgarq.roda.wui.dissemination.search.server;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
+import org.apache.commons.configuration.Configuration;
 import org.apache.log4j.Logger;
 import org.roda.index.IndexService;
 import org.roda.index.IndexServiceException;
@@ -91,32 +90,28 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
     return null;
   }
 
+  // FIXME see if there is a best way to deal with "hierarchical" keys
   public List<SearchField> getSearchFields(String localeString) throws GenericException {
-    try {
-      Properties searchFieldsProperties = new Properties();
-      searchFieldsProperties.load(RodaCoreFactory.getConfigurationFile("roda-wui.properties"));
-      List<SearchField> searchFields = new ArrayList<SearchField>();
-      String fieldsNamesString = searchFieldsProperties.getProperty("search.fields");
-      if (fieldsNamesString != null) {
-        String[] fields = fieldsNamesString.split(",");
-        for (String field : fields) {
-          SearchField searchField = new SearchField();
-          String fieldName = searchFieldsProperties.getProperty("search.fields." + field + ".field");
-          String fieldType = searchFieldsProperties.getProperty("search.fields." + field + ".type");
-          String fieldLabel = searchFieldsProperties.getProperty("search.fields." + field + ".label." + localeString);
+    Configuration searchFieldsProperties = RodaCoreFactory.getRodaConfiguration();
+    List<SearchField> searchFields = new ArrayList<SearchField>();
+    String fieldsNamesString = (String) searchFieldsProperties.getProperty("search.fields");
+    if (fieldsNamesString != null) {
+      String[] fields = fieldsNamesString.split(",");
+      for (String field : fields) {
+        SearchField searchField = new SearchField();
+        String fieldName = (String) searchFieldsProperties.getProperty("search.fields." + field + ".field");
+        String fieldType = (String) searchFieldsProperties.getProperty("search.fields." + field + ".type");
+        String fieldLabel = (String) searchFieldsProperties
+          .getProperty("search.fields." + field + ".label." + localeString);
 
-          searchField.setField(fieldName);
-          searchField.setType(fieldType);
-          searchField.setLabel(fieldLabel);
+        searchField.setField(fieldName);
+        searchField.setType(fieldType);
+        searchField.setLabel(fieldLabel);
 
-          searchFields.add(searchField);
-        }
+        searchFields.add(searchField);
       }
-      return searchFields;
-    } catch (IOException e) {
-      logger.error("Error getting search f", e);
-      throw new GenericException(e.getMessage());
     }
+    return searchFields;
   }
 
 }

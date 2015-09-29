@@ -31,4 +31,10 @@ public class SearchField implements Serializable {
   public void setType(String type) {
     this.type = type;
   }
+
+  @Override
+  public String toString() {
+    return "SearchField [field=" + field + ", label=" + label + ", type=" + type + "]";
+  }
+
 }

@@ -447,8 +447,8 @@ public class SolrUtils {
     boolean prefixWithANDOperatorIfBuilderNotEmpty) {
     appendANDOperator(ret, prefixWithANDOperatorIfBuilderNotEmpty);
 
-    ret.append("(").append(key).append(": ").append(appendDoubleQuotes ? "\"" : "").append(value)
-      .append(appendDoubleQuotes ? "\"" : "").append(")");
+    ret.append("(").append(key).append(": ").append(appendDoubleQuotes ? "\"" : "")
+      .append(value.replaceAll("(\")", "\\\\$1")).append(appendDoubleQuotes ? "\"" : "").append(")");
   }
 
   private static void appendBasicSearch(StringBuilder ret, String key, String value, String operator,
@@ -456,7 +456,7 @@ public class SolrUtils {
     if (StringUtils.isBlank(value)) {
       appendExactMatch(ret, key, "*", false, prefixWithANDOperatorIfBuilderNotEmpty);
     } else if (value.matches("^\".+\"$")) {
-      appendExactMatch(ret, key, value, false, prefixWithANDOperatorIfBuilderNotEmpty);
+      appendExactMatch(ret, key, value.substring(1, value.length() - 1), true, prefixWithANDOperatorIfBuilderNotEmpty);
     } else {
       appendWhiteSpaceTokenizedString(ret, key, value, operator);
     }
@@ -472,7 +472,11 @@ public class SolrUtils {
       if (i != 0 && operator != null) {
         ret.append(" " + operator + " ");
       }
-      ret.append(key).append(": ").append(escapeSolrSpecialChars(split[i]));
+      if (split[i].matches("(AND|OR|NOT)")) {
+        ret.append(key).append(": \"").append(split[i]).append("\"");
+      } else {
+        ret.append(key).append(": (").append(escapeSolrSpecialChars(split[i])).append(")");
+      }
     }
     ret.append(")");
   }
@@ -490,7 +494,7 @@ public class SolrUtils {
    */
   // FIXME perhaps && and || are not being properly escaped: see how to do it
   public static String escapeSolrSpecialChars(String string) {
-    return string.replaceAll("([+&|!(){}\\[\\]\\^\\\\~?:])", "\\\\$1");
+    return string.replaceAll("([+&|!(){}\\[\\]\\^\\\\~?:\"])", "\\\\$1");
   }
 
   private static List<String> objectToListString(Object object) {
