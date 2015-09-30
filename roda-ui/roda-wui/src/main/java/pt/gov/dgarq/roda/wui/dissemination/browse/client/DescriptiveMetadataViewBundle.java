@@ -7,18 +7,16 @@ public class DescriptiveMetadataViewBundle implements Serializable {
   private static final long serialVersionUID = 515251862250083594L;
 
   private String id;
-  private String html;
-  private Long sizeInBytes;
+  private String label;
 
   public DescriptiveMetadataViewBundle() {
     super();
   }
 
-  public DescriptiveMetadataViewBundle(String id, String html, Long sizeInBytes) {
+  public DescriptiveMetadataViewBundle(String id, String label) {
     super();
     this.id = id;
-    this.html = html;
-    this.sizeInBytes = sizeInBytes;
+    this.label = label;
   }
 
   public String getId() {
@@ -29,20 +27,11 @@ public class DescriptiveMetadataViewBundle implements Serializable {
     this.id = id;
   }
 
-  public String getHtml() {
-    return html;
+  public String getLabel() {
+    return label;
   }
 
-  public void setHtml(String html) {
-    this.html = html;
+  public void setLabel(String label) {
+    this.label = label;
   }
-
-  public Long getSizeInBytes() {
-    return sizeInBytes;
-  }
-
-  public void setSizeInBytes(Long sizeInBytes) {
-    this.sizeInBytes = sizeInBytes;
-  }
-
 }

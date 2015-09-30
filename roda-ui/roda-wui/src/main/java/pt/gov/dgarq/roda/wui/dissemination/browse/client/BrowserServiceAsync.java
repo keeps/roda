@@ -30,8 +30,6 @@ public interface BrowserServiceAsync {
 
   void getItemBundle(String aipId, String localeString, AsyncCallback<BrowseItemBundle> callback);
 
-  void getPreservationMetadataHTML(String aipId, String localeString, AsyncCallback<String> callback);
-
   void getDescriptiveMetadataEditBundle(String aipId, String descId,
     AsyncCallback<DescriptiveMetadataEditBundle> callback);
 

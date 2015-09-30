@@ -86,14 +86,6 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public String getPreservationMetadataHTML(String aipId, String localeString)
-    throws AuthorizationDeniedException, GenericException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
-    Locale locale = ServerTools.parseLocale(localeString);
-    return Browser.getPreservationMetadataHTML(user, aipId, locale);
-  }
-
-  @Override
   public IndexResult<SimpleDescriptionObject> findDescriptiveMetadata(Filter filter, Sorter sorter, Sublist sublist,
     Facets facets, String localeString) throws RODAException {
     try {

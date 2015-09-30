@@ -73,9 +73,6 @@ public interface BrowserService extends RemoteService {
     Facets facets, String locale) throws RODAException;
 
   public BrowseItemBundle getItemBundle(String aipId, String localeString) throws AuthorizationDeniedException, GenericException;
-  
-  public String getPreservationMetadataHTML(String aipId, String localeString)
-    throws AuthorizationDeniedException, GenericException;
 
   public DescriptiveMetadataEditBundle getDescriptiveMetadataEditBundle(String aipId, String descId)
     throws AuthorizationDeniedException, GenericException;

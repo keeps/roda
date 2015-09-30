@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Locale;
 
 import javax.ws.rs.core.StreamingOutput;
+import javax.xml.transform.TransformerException;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.roda.api.v1.utils.StreamResponse;
@@ -78,7 +79,7 @@ public class Browser extends RodaCoreService {
   }
 
   public static String getPreservationMetadataHTML(RodaUser user, String aipId, Locale locale)
-    throws GenericException, AuthorizationDeniedException {
+    throws GenericException, AuthorizationDeniedException, TransformerException {
     Date startDate = new Date();
 
     // check user permissions
@@ -210,8 +211,8 @@ public class Browser extends RodaCoreService {
   }
 
   public static StreamResponse getAipDescritiveMetadata(RodaUser user, String aipId, String metadataId,
-    String acceptFormat, String language)
-      throws AuthorizationDeniedException, GenericException, ModelServiceException, StorageServiceException {
+    String acceptFormat, String language) throws AuthorizationDeniedException, GenericException, ModelServiceException,
+      StorageServiceException, TransformerException {
     Date startDate = new Date();
 
     // check user permissions
@@ -252,8 +253,9 @@ public class Browser extends RodaCoreService {
   }
 
   public static Pair<String, StreamingOutput> getAipRepresentationPreservationMetadata(RodaUser user, String aipId,
-    String representationId, String startAgent, String limitAgent, String startEvent, String limitEvent, String startFile, String limitFile, String acceptFormat, String language)
-      throws AuthorizationDeniedException, GenericException, ModelServiceException, StorageServiceException {
+    String representationId, String startAgent, String limitAgent, String startEvent, String limitEvent,
+    String startFile, String limitFile, String acceptFormat, String language) throws AuthorizationDeniedException,
+      GenericException, ModelServiceException, StorageServiceException, TransformerException {
     Date startDate = new Date();
 
     // check user permissions
@@ -262,12 +264,14 @@ public class Browser extends RodaCoreService {
 
     // delegate
     Pair<String, StreamingOutput> aipRepresentationPreservationMetadata = BrowserHelper
-      .getAipRepresentationPreservationMetadata(aipId, representationId, startAgent, limitAgent, startEvent, limitEvent, startFile, limitFile, acceptFormat,language);
+      .getAipRepresentationPreservationMetadata(aipId, representationId, startAgent, limitAgent, startEvent, limitEvent,
+        startFile, limitFile, acceptFormat, language);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, "Browser", "getAipRepresentationPreservationMetadata", aipId, duration, "aip", aipId, "startAgent",
-      startAgent, "limitAgent", limitAgent, "startEvent",startEvent,"limitEvent",limitEvent,"startFile",startFile,"limitFile",limitFile);
+    registerAction(user, "Browser", "getAipRepresentationPreservationMetadata", aipId, duration, "aip", aipId,
+      "startAgent", startAgent, "limitAgent", limitAgent, "startEvent", startEvent, "limitEvent", limitEvent,
+      "startFile", startFile, "limitFile", limitFile);
 
     return aipRepresentationPreservationMetadata;
 

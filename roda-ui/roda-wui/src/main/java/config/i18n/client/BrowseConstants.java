@@ -11,6 +11,7 @@ import com.google.gwt.i18n.client.ConstantsWithLookup;
  * @author Vladislav Korecký <vladislav_korecky@gordic.cz>
  */
 public interface BrowseConstants extends Constants, ConstantsWithLookup {
+ 
 
   @DefaultStringValue("Fond")
   public String addFond();

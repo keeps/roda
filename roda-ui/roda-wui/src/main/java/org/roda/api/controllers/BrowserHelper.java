@@ -20,6 +20,7 @@ import java.util.Set;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.StreamingOutput;
+import javax.xml.transform.TransformerException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -127,16 +128,10 @@ public class BrowserHelper {
     List<DescriptiveMetadataViewBundle> descriptiveMetadataList = new ArrayList<DescriptiveMetadataViewBundle>();
     try {
       for (DescriptiveMetadata descriptiveMetadata : listDescriptiveMetadataBinaries) {
-        Binary binary = RodaCoreFactory.getStorageService().getBinary(descriptiveMetadata.getStoragePath());
-        String html = "";
-        try {
-          html = HTMLUtils.descriptiveMetadataToHtml(binary, locale);
-        } catch (ModelServiceException e) {
-          html = "<div class=\"descriptiveMetadata indexError\"><div class='title'>" + descriptiveMetadata.getId()
-            + "</div></div>";
-        }
-        descriptiveMetadataList
-          .add(new DescriptiveMetadataViewBundle(descriptiveMetadata.getId(), html, binary.getSizeInBytes()));
+        DescriptiveMetadataViewBundle bundle = new DescriptiveMetadataViewBundle();
+        bundle.setId(descriptiveMetadata.getId());
+        bundle.setLabel(descriptiveMetadata.getId());
+        descriptiveMetadataList.add(bundle);
       }
     } finally {
       try {
@@ -156,7 +151,8 @@ public class BrowserHelper {
     return HTMLUtils.getPreservationMetadataBundle(aipId, model, storage);
   }
 
-  public static String getPreservationMetadataHTML(String aipId, final Locale locale) throws GenericException {
+  public static String getPreservationMetadataHTML(String aipId, final Locale locale)
+    throws GenericException, TransformerException {
     ModelService model = RodaCoreFactory.getModelService();
     StorageService storage = RodaCoreFactory.getStorageService();
     try {
@@ -317,7 +313,7 @@ public class BrowserHelper {
   }
 
   public static StreamResponse getAipDescritiveMetadata(String aipId, String metadataId, String acceptFormat,
-    String language) throws ModelServiceException, StorageServiceException, GenericException {
+    String language) throws ModelServiceException, StorageServiceException, GenericException, TransformerException {
 
     final String filename;
     final String mediaType;
@@ -420,7 +416,7 @@ public class BrowserHelper {
   public static Pair<String, StreamingOutput> getAipRepresentationPreservationMetadata(String aipId,
     String representationId, String startAgent, String limitAgent, String startEvent, String limitEvent,
     String startFile, String limitFile, String acceptFormat, String language)
-      throws ModelServiceException, StorageServiceException, GenericException {
+      throws ModelServiceException, StorageServiceException, GenericException, TransformerException {
     StorageService storage = RodaCoreFactory.getStorageService();
     ModelService model = RodaCoreFactory.getModelService();
     if (acceptFormat == null || acceptFormat.equalsIgnoreCase("bin")) {

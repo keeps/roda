@@ -8,6 +8,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.StreamingOutput;
+import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
@@ -253,6 +254,7 @@ public class AipsResourceImpl {
     String acceptFormat, String language) throws NotFoundException {
     String authorization = request.getHeader("Authorization");
     try {
+      // TODO ensure accept format is one of the valid options
       if (acceptFormat != null) { // && acceptFormat.equalsIgnoreCase("bin")) {
         // get user
         RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
@@ -282,6 +284,16 @@ public class AipsResourceImpl {
       }
     } catch (GenericException e) {
       return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+    } catch (TransformerException e) {
+      String message;
+
+      if (e.getCause() != null) {
+        message = e.getCause().getMessage();
+      } else {
+        message = e.getMessage();
+      }
+
+      return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, message)).build();
     }
   }
 
@@ -405,17 +417,19 @@ public class AipsResourceImpl {
   }
 
   public Response getAipRepresentationPreservationMetadata(HttpServletRequest request, String aipId,
-    String representationId, String startAgent, String limitAgent, String startEvent, String limitEvent, String startFile, String limitFile, String acceptFormat, String language) throws NotFoundException {
+    String representationId, String startAgent, String limitAgent, String startEvent, String limitEvent,
+    String startFile, String limitFile, String acceptFormat, String language) throws NotFoundException {
     String authorization = request.getHeader("Authorization");
-    LOGGER.error("STARTEVENT: "+startEvent);
-    LOGGER.error("LIMITEVENT: "+limitEvent);
+    LOGGER.error("STARTEVENT: " + startEvent);
+    LOGGER.error("LIMITEVENT: " + limitEvent);
     try {
       if (acceptFormat != null && (acceptFormat.equalsIgnoreCase("bin") || acceptFormat.equalsIgnoreCase("html"))) {
         // get user
         RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
         // delegate action to controller
         Pair<String, StreamingOutput> aipRepresentationPreservationMetadata = Browser
-          .getAipRepresentationPreservationMetadata(user, aipId, representationId, startAgent, limitAgent, startEvent,limitEvent,startFile,limitFile,acceptFormat,language);
+          .getAipRepresentationPreservationMetadata(user, aipId, representationId, startAgent, limitAgent, startEvent,
+            limitEvent, startFile, limitFile, acceptFormat, language);
         return Response.ok(aipRepresentationPreservationMetadata.getSecond(), MediaType.APPLICATION_OCTET_STREAM)
           .header("content-disposition", "attachment; filename = " + aipRepresentationPreservationMetadata.getFirst())
           .build();
@@ -440,6 +454,16 @@ public class AipsResourceImpl {
       }
     } catch (GenericException e) {
       return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+    } catch (TransformerException e) {
+      String message;
+
+      if (e.getCause() != null) {
+        message = e.getCause().getMessage();
+      } else {
+        message = e.getMessage();
+      }
+
+      return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, message)).build();
     }
   }
 

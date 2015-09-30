@@ -50,6 +50,48 @@
 
 .browseItemMetadata {
 	padding: 20px 0;
+	width: 100%;
+}
+
+.browseItemMetadata.gwt-TabPanel {
+	margin: 10px 0 0 0;
+}
+
+.browseItemMetadata .gwt-TabPanelBottom {
+	background-color: white;
+	padding: 5px 10px;
+}
+
+.browseItemMetadata  .gwt-TabBarRest {
+	border-bottom: 1px solid rgba(167, 169, 172, 0.5);
+}
+
+.browseItemMetadata .gwt-TabBarItem {
+	background-color: white;
+	border-bottom: 1px solid rgba(167, 169, 172, 0.5);
+	margin: 0;
+	padding: 5px 10px;
+	cursor: pointer;
+	cursor: hand;
+}
+
+.browseItemMetadata .gwt-TabBarItem .gwt-Label {
+	color: #a7a9ac;
+	font-weight: normal;
+	font-size: 1.3rem;
+}
+
+.browseItemMetadata .gwt-TabBarItem-selected {
+	margin: 0;
+	background-color: rgba(167, 169, 172, 0.1);;
+	border-top: none;
+	border-left: none;
+	border-right: none;	
+}
+
+.browseItemMetadata .gwt-TabBarItem-selected .gwt-Label {
+	font-weight: normal;
+	color: inherit;
 }
 
 .descriptiveMetadata {
@@ -57,24 +99,11 @@
 }
 
 .descriptiveMetadata .title, .preservationMetadata .title {
+	display: none;
 	color: #a7a9ac;
 	border-bottom: 1px solid rgba(167, 169, 172, 0.5);
 	padding-bottom: 5px;
 	margin-bottom: 10px;
-}
-
-.descriptiveMetadata.indexError .title {
-	color: #D20707;
-	border-color: #D20707;
-}
-
-.descriptiveMetadata.indexError .title:after {
-	content: '\f071';
-	font-family: FontAwesome;
-	padding-left: 5px;
-	text-rendering: auto;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
 }
 
 .descriptiveMetadataLink {
@@ -275,26 +304,46 @@
 	padding-top: 5px;
 }
 
-/* Tables
+.metadataContent .error {
+	color: #D20707;
+    font-size: 1.2rem;
+}
+
+.metadataContent .error:before {
+	content: '\f071';
+	font-family: FontAwesome;
+	padding-left: 5px;
+	text-rendering: auto;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	margin-right: 5px;
+}
+
+.metadataContent .error pre>code {
+	color: black;
+}
+
+/* Tables for metadata content
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
-.browseItemMetadata thead td {
+.metadataContent thead td {
 	font-weight: 500;
 }
 
-.browseItemMetadata th, .browseItemMetadata td {
+.metadataContent th, .metadataContent td {
 	/*padding: 12px 15px;*/
 	padding: 7px 10px;
 	text-align: left;
 	border-bottom: 1px solid #E1E1E1;
 }
 
-.browseItemMetadata th:first-child, .browseItemMetadata td:first-child {
+.metadataContent th:first-child, .metadataContent td:first-child {
 	padding-left: 0;
 }
 
-.browseItemMetadata th:last-child, .browseItemMetadata td:last-child {
+.metadataContent th:last-child, .metadataContent td:last-child {
 	padding-right: 0;
 }
+
 
 .content>.field {
 	display: block;

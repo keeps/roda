@@ -11,6 +11,17 @@ import com.google.gwt.safehtml.shared.SafeHtml;
  * 
  */
 public interface BrowseMessages extends Messages {
+  
+  /*********************************************************/
+  /******************* NEW MESSAGES ***********************/
+  /*********************************************************/
+  
+  @DefaultMessage("Error transforming metadata into HTML")
+  SafeHtml descriptiveMetadataTranformToHTMLError();
+  
+  /*********************************************************/
+  /*********************************************************/
+  /*********************************************************/
 
   // Tree
   @DefaultMessage("See {0}-{1}")

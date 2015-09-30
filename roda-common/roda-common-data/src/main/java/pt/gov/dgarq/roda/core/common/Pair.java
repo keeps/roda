@@ -1,6 +1,11 @@
 package pt.gov.dgarq.roda.core.common;
 
 public class Pair<K, V> {
+
+  public static <K, V> Pair<K, V> create(K key, V value) {
+    return new Pair<K, V>(key, value);
+  }
+
   private K fst;
   private V snd;
 
@@ -25,12 +30,6 @@ public class Pair<K, V> {
     this.snd = value;
   }
 
-  @Override
-  protected Object clone() throws CloneNotSupportedException {
-    return new Pair<K, V>(this.fst, this.snd);
-  }
-
-  @Override
   public boolean equals(Object obj) {
     boolean res = true;
     if (obj != this) {

@@ -4,7 +4,6 @@
 	exclude-result-prefixes="dc">
 	<xsl:output method="xml" indent="yes" encoding="UTF-8"
 		omit-xml-declaration="yes" />
-	<xsl:param name="dcxmldublincore" />
 	<xsl:param name="dcxmltitle" />
 	<xsl:param name="dcxmldescription" />
 	<xsl:param name="dcxmlcontributor" />
@@ -25,9 +24,6 @@
 
 	<xsl:template match="/">
 		<div class="descriptiveMetadata">
-			<div class='title'>
-				<xsl:value-of select="$dcxmldublincore" />
-			</div>
 			<xsl:apply-templates />
 		</div>
 	</xsl:template>

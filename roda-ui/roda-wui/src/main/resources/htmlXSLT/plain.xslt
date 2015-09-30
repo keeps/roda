@@ -1,14 +1,12 @@
 <xsl:stylesheet version="2.0"
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 	<xsl:output method="xml" indent="yes" omit-xml-declaration="yes" />
-	<xsl:param name="title" />
 	<xsl:strip-space elements="*" />
 
 	<xsl:template match="text()" />
 
 	<xsl:template match="/">
 		<div class="descriptiveMetadata">
-			<div class='title'><xsl:value-of select="$title"/></div>
 			<xsl:apply-templates />
 		</div>
 	</xsl:template>

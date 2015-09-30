@@ -5,7 +5,6 @@
 	<xsl:output method="xml" indent="yes" encoding="UTF-8"
 		omit-xml-declaration="yes" />
 
-	<xsl:param name="eadcxmlead" />
 	<xsl:param name="eadcxmltitle" />
 	<xsl:param name="eadcxmllevel" />
 	<xsl:param name="eadcxmlinitialdate" />
@@ -40,9 +39,6 @@
 	<xsl:param name="eadcxmlbibliography" />
 	<xsl:template match="/">
 		<div class="descriptiveMetadata">
-			<div class='title'>
-				<xsl:value-of select="$eadcxmlead" />
-			</div>
 			<xsl:apply-templates />
 		</div>
 	</xsl:template>

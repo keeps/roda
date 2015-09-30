@@ -55,9 +55,9 @@ public final class HTMLUtils {
 
   }
 
-  public static String descriptiveMetadataToHtml(Binary binary, final Locale locale) throws ModelServiceException {
+  public static String descriptiveMetadataToHtml(Binary binary, final Locale locale) 
+  throws ModelServiceException, TransformerException {
     Map<String, Object> stylesheetOpt = new HashMap<String, Object>();
-    stylesheetOpt.put("title", binary.getStoragePath().getName());
     XSLTMessages messages = RodaCoreFactory.getXSLTMessages(locale);
     for (Map.Entry<String, String> entry : messages.getTranslations(binary.getStoragePath().getName()).entrySet()) {
       stylesheetOpt.put(entry.getKey(), entry.getValue());
@@ -65,7 +65,8 @@ public final class HTMLUtils {
     return binaryToHtml(binary, true, null, stylesheetOpt);
   }
 
-  public static String preservationObjectToHtml(Binary binary, final Locale locale) throws ModelServiceException {
+  public static String preservationObjectToHtml(Binary binary, final Locale locale)
+    throws ModelServiceException, TransformerException {
     Map<String, Object> stylesheetOpt = new HashMap<String, Object>();
     stylesheetOpt.put("prefix", RodaConstants.INDEX_OTHER_DESCRIPTIVE_DATA_PREFIX);
     XSLTMessages messages = RodaCoreFactory.getXSLTMessages(locale);
@@ -116,7 +117,7 @@ public final class HTMLUtils {
   }
 
   public static String getPreservationMetadataHTML(String aipId, ModelService model, StorageService storage,
-    Locale locale) throws ModelServiceException, StorageServiceException {
+    Locale locale) throws ModelServiceException, StorageServiceException, TransformerException {
     AIP aip = model.retrieveAIP(aipId);
     StringBuffer s = new StringBuffer();
     s.append("<span class='preservationMetadata'><div class='title'>PREMIS</div>");
@@ -177,7 +178,7 @@ public final class HTMLUtils {
 
   public static String getRepresentationPreservationMetadataHtml(
     ClosableIterable<PreservationMetadata> preservationMetadata, StorageService storage, final Locale locale)
-      throws ModelServiceException, StorageServiceException {
+      throws ModelServiceException, StorageServiceException, TransformerException {
     return getRepresentationPreservationMetadataHtml(preservationMetadata, storage, locale, "0", "100", "0", "100", "0",
       "100");
   }
@@ -185,7 +186,7 @@ public final class HTMLUtils {
   public static String getRepresentationPreservationMetadataHtml(
     ClosableIterable<PreservationMetadata> preservationMetadata, StorageService storage, final Locale locale,
     String startAgent, String limitAgent, String startEvent, String limitEvent, String startFile, String limitFile)
-      throws ModelServiceException, StorageServiceException {
+      throws ModelServiceException, StorageServiceException, TransformerException {
 
     Map<String, Object> stylesheetOpt = new HashMap<String, Object>();
     stylesheetOpt.put("prefix", RodaConstants.INDEX_OTHER_DESCRIPTIVE_DATA_PREFIX);
@@ -320,29 +321,41 @@ public final class HTMLUtils {
   }
 
   private static String binaryToHtml(Binary binary, boolean useFilename, String alternativeFilenameToUse,
-    Map<String, Object> stylesheetOpt) throws ModelServiceException {
+    Map<String, Object> stylesheetOpt) throws TransformerException, ModelServiceException {
     String filename;
     if (useFilename) {
       filename = binary.getStoragePath().getName();
     } else {
       filename = alternativeFilenameToUse;
     }
+
+    InputStream inputStream = null;
+    Reader reader = null;
+    CharArrayWriter transformerResult;
     try {
-      InputStream inputStream = binary.getContent().createInputStream();
-      Reader reader = new InputStreamReader(inputStream);
+      inputStream = binary.getContent().createInputStream();
+      reader = new InputStreamReader(inputStream);
 
       InputStream transformerStream = getStylesheetInputStream("htmlXSLT", filename);
       // TODO support the use of scripts for non-xml transformers
       Reader xsltReader = new InputStreamReader(transformerStream);
-      CharArrayWriter transformerResult = new CharArrayWriter();
+      transformerResult = new CharArrayWriter();
       RodaUtils.applyStylesheet(xsltReader, reader, stylesheetOpt, transformerResult);
-      reader.close();
-      return transformerResult.toString();
-    } catch (TransformerException | IOException e) {
-      LOGGER.error("Error transforming binary file into HTML (filename=" + filename + ")", e);
-      throw new ModelServiceException("Error transforming binary file into HTML (filename=" + filename + ")",
-        ModelServiceException.INTERNAL_SERVER_ERROR, e);
+    } catch (IOException e) {
+      throw new ModelServiceException("Error transforming binary to HTML", ModelServiceException.INTERNAL_SERVER_ERROR,
+        e);
+    } finally {
+      if (reader != null) {
+        try {
+          reader.close();
+        } catch (IOException e) {
+          LOGGER.warn("Could not close input stream, possible leak", e);
+        }
+      }
     }
+
+    return transformerResult.toString();
+
   }
 
   private static InputStream getStylesheetInputStream(String xsltFolder, String filename) {

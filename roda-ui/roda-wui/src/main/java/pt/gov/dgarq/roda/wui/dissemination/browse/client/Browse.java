@@ -10,10 +10,17 @@ import java.util.List;
 import java.util.Set;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.RequestException;
+import com.google.gwt.http.client.Response;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.i18n.client.LocaleInfo;
@@ -35,10 +42,13 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 
+import config.i18n.client.BrowseMessages;
+import pt.gov.dgarq.roda.core.common.Pair;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
@@ -52,12 +62,11 @@ import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
 import pt.gov.dgarq.roda.wui.common.client.tools.DescriptionLevelUtils;
-import pt.gov.dgarq.roda.wui.common.client.tools.JavascriptUtils;
+import pt.gov.dgarq.roda.wui.common.client.tools.RestErrorOverlayType;
 import pt.gov.dgarq.roda.wui.common.client.tools.RestUtils;
 import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
 import pt.gov.dgarq.roda.wui.common.client.widgets.AIPList;
 import pt.gov.dgarq.roda.wui.common.client.widgets.MessagePopup;
-import pt.gov.dgarq.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 import pt.gov.dgarq.roda.wui.main.client.BreadcrumbItem;
 import pt.gov.dgarq.roda.wui.main.client.BreadcrumbPanel;
 
@@ -67,9 +76,7 @@ import pt.gov.dgarq.roda.wui.main.client.BreadcrumbPanel;
  */
 public class Browse extends Composite {
 
-  private static final String ICON_METADATA_SELECTED = "<i class='fa fa-dot-circle-o'></i>";
-
-  private static final String ICON_METADATA_DESELECTED = "<i class='fa fa-circle-o'></i>";
+  private static final String TOP_ICON = "<i class='fa fa-circle-o'></i>";
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
@@ -125,8 +132,7 @@ public class Browse extends Composite {
   // private static BrowseConstants constants = (BrowseConstants)
   // GWT.create(BrowseConstants.class);
 
-  // private static BrowseMessages messages = (BrowseMessages)
-  // GWT.create(BrowseMessages.class);
+  private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
   //
   // private static BrowseImageBundle browseImageBundle = (BrowseImageBundle)
   // GWT.create(BrowseImageBundle.class);
@@ -150,7 +156,7 @@ public class Browse extends Composite {
   Label itemDates;
 
   @UiField
-  HTML itemMetadata;
+  TabPanel itemMetadata;
 
   @UiField
   Label fondsPanelTitle;
@@ -159,16 +165,10 @@ public class Browse extends Composite {
   AIPList fondsPanel;
 
   @UiField
-  FlowPanel sidebarMetadata;
-
-  @UiField
   FlowPanel sidebarData;
 
   @UiField
   FlowPanel downloadList;
-
-  @UiField
-  FlowPanel viewersList;
 
   @UiField
   Button createItem;
@@ -186,10 +186,6 @@ public class Browse extends Composite {
   Button remove;
 
   private boolean viewingTop;
-
-  private HTML preservationMetadataIcon;
-
-  private HTML descriptiveMetadataIcon;
 
   private Browse() {
     viewingTop = true;
@@ -294,7 +290,8 @@ public class Browse extends Composite {
     itemTitle.setText(id);
     itemDates.setText("");
 
-    itemMetadata.setHTML(SafeHtmlUtils.fromSafeConstant(caught.getMessage()));
+    itemMetadata.clear();
+    itemMetadata.add(new HTML(SafeHtmlUtils.fromSafeConstant(caught.getMessage())));
     itemMetadata.setVisible(true);
 
     viewingTop = false;
@@ -302,7 +299,6 @@ public class Browse extends Composite {
     fondsPanel.setVisible(false);
 
     downloadList.clear();
-    sidebarMetadata.setVisible(false);
     sidebarData.setVisible(false);
 
     // Set button visibility
@@ -329,9 +325,81 @@ public class Browse extends Composite {
       itemTitle.removeStyleName("browseTitle-allCollections");
       itemDates.setText(getDatesText(sdo));
 
-      SafeHtml html = getDescriptiveMetadataPanelHTML(sdo.getId(), descMetadata);
-      itemMetadata.setHTML(html);
-      itemMetadata.setVisible(true);
+      itemMetadata.clear();
+      final List<Pair<String, HTML>> descriptiveMetadataContainers = new ArrayList<Pair<String, HTML>>();
+      for (DescriptiveMetadataViewBundle bundle : descMetadata) {
+        String title = bundle.getLabel();
+        HTML container = new HTML();
+        container.addStyleName("metadataContent");
+        itemMetadata.add(container, title);
+        descriptiveMetadataContainers.add(Pair.create(bundle.getId(), container));
+      }
+
+      itemMetadata.addSelectionHandler(new SelectionHandler<Integer>() {
+
+        @Override
+        public void onSelection(SelectionEvent<Integer> event) {
+          if (event.getSelectedItem() < descriptiveMetadataContainers.size()) {
+            Pair<String, HTML> pair = descriptiveMetadataContainers.get(event.getSelectedItem());
+            String descId = pair.getFirst();
+            final HTML html = pair.getSecond();
+            if (html.getText().length() == 0) {
+              getDescriptiveMetadataHTML(descId, new AsyncCallback<SafeHtml>() {
+
+                @Override
+                public void onFailure(Throwable caught) {
+                  MessagePopup.showError("Error loading descriptive metadata");
+                }
+
+                @Override
+                public void onSuccess(SafeHtml result) {
+                  html.setHTML(result);
+                }
+              });
+            }
+          }
+        }
+
+      });
+
+      if (!preservationMetadata.getRepresentationsMetadata().isEmpty()) {
+        final HTML premisContainer = new HTML();
+        final int premisTabIndex = itemMetadata.getWidgetCount();
+        itemMetadata.add(premisContainer, "PREMIS");
+        itemMetadata.addSelectionHandler(new SelectionHandler<Integer>() {
+
+          @Override
+          public void onSelection(SelectionEvent<Integer> event) {
+            if (event.getSelectedItem() == premisTabIndex && premisContainer.getText().length() == 0) {
+              // TODO load PREMIS via REST API
+              // getPreservationMetadataHTML(new AsyncCallback<SafeHtml>() {
+              //
+              // @Override
+              // public void onFailure(Throwable caught) {
+              // premisContainer.setHTML(SafeHtmlUtils.fromString(caught.getMessage()));
+              // }
+              //
+              // @Override
+              // public void onSuccess(SafeHtml result) {
+              // premisContainer.setHTML(result);
+              // JavascriptUtils.runHighlighter();
+              // JavascriptUtils.slideToggle(".toggle-next");
+              // JavascriptUtils.smoothScroll();
+              // }
+              // });
+            }
+          }
+        });
+        premisContainer.addStyleName("preservationMetadata");
+        premisContainer.addStyleName("metadataContent");
+      }
+
+      if (!descMetadata.isEmpty() || !preservationMetadata.getRepresentationsMetadata().isEmpty()) {
+        itemMetadata.setVisible(true);
+        itemMetadata.selectTab(0);
+      } else {
+        itemMetadata.setVisible(false);
+      }
 
       viewingTop = false;
       fondsPanelTitle.setVisible(true);
@@ -339,22 +407,11 @@ public class Browse extends Composite {
       fondsPanel.setFilter(filter);
 
       downloadList.clear();
-      viewersList.clear();
       sidebarData.setVisible(representations.size() > 0);
 
       for (Representation rep : representations) {
         downloadList.add(createRepresentationDownloadPanel(rep));
       }
-
-      if (!descMetadata.isEmpty()) {
-        viewersList.add(createDescriptiveMetadataDownloadPanel(sdo.getId(), descMetadata, html));
-      }
-
-     /* if (preservationMetadata.getNumberOfFiles() > 0) {
-        viewersList.add(createPreservationMetadataDownloadPanel(sdo.getId(), preservationMetadata));
-      }*/
-
-     /* sidebarMetadata.setVisible(!descMetadata.isEmpty() || preservationMetadata.getNumberOfFiles() > 0);*/
 
       // Set button visibility
       createItem.setVisible(true);
@@ -370,24 +427,23 @@ public class Browse extends Composite {
 
   protected void viewAction() {
     aipId = null;
-    HTMLPanel topIcon = new HTMLPanel(SafeHtmlUtils.fromSafeConstant(ICON_METADATA_DESELECTED));
+    HTMLPanel topIcon = new HTMLPanel(SafeHtmlUtils.fromSafeConstant(TOP_ICON));
     topIcon.addStyleName("browseItemIcon-all");
     itemIcon.setWidget(topIcon);
 
-    breadcrumb.updatePath(Arrays
-      .asList(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(ICON_METADATA_DESELECTED), RESOLVER.getHistoryPath())));
+    breadcrumb.updatePath(
+      Arrays.asList(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(TOP_ICON), RESOLVER.getHistoryPath())));
     breadcrumb.setVisible(false);
     itemTitle.setText("All collections");
     itemTitle.addStyleName("browseTitle-allCollections");
     itemDates.setText("");
-    itemMetadata.setText("");
+    itemMetadata.clear();
     itemMetadata.setVisible(false);
     viewingTop = true;
     fondsPanelTitle.setVisible(false);
     fondsPanel.setFilter(COLLECTIONS_FILTER);
 
     sidebarData.setVisible(false);
-    sidebarMetadata.setVisible(false);
     downloadList.clear();
 
     // Set button visibility
@@ -401,7 +457,7 @@ public class Browse extends Composite {
   private List<BreadcrumbItem> getBreadcrumbsFromAncestors(List<SimpleDescriptionObject> sdoAncestors,
     SimpleDescriptionObject sdo) {
     List<BreadcrumbItem> ret = new ArrayList<>();
-    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(ICON_METADATA_DESELECTED), RESOLVER.getHistoryPath()));
+    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(TOP_ICON), RESOLVER.getHistoryPath()));
     for (SimpleDescriptionObject ancestor : sdoAncestors) {
       SafeHtml breadcrumbLabel = getBreadcrumbLabel(ancestor);
       BreadcrumbItem ancestorBreadcrumb = new BreadcrumbItem(breadcrumbLabel,
@@ -470,135 +526,71 @@ public class Browse extends Composite {
     return NumberFormat.getFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
   }
 
-  private Widget createDescriptiveMetadataDownloadPanel(String aipId, List<DescriptiveMetadataViewBundle> descMetadata,
-    final SafeHtml html) {
-    AccessibleFocusPanel downloadPanel = new AccessibleFocusPanel();
-    FlowPanel layout = new FlowPanel();
-    descriptiveMetadataIcon = new HTML(SafeHtmlUtils.fromSafeConstant(ICON_METADATA_SELECTED));
-    FlowPanel labelsPanel = new FlowPanel();
+  private void getDescriptiveMetadataHTML(final String descId, final AsyncCallback<SafeHtml> callback) {
+    String uri = RestUtils.createDescriptiveMetadataHTMLUri(aipId, descId);
+    RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, uri);
+    try {
+      requestBuilder.sendRequest(null, new RequestCallback() {
 
-    int files = descMetadata.size();
-    long sizeInBytes = 0;
-    for (DescriptiveMetadataViewBundle desc : descMetadata) {
-      sizeInBytes += desc.getSizeInBytes();
-    }
+        @Override
+        public void onResponseReceived(Request request, Response response) {
+          if (200 == response.getStatusCode()) {
+            String html = response.getText();
 
-    Label label = new Label("Descriptive metadata");
-    Label subLabel = new Label(files + " files, " + readableFileSize(sizeInBytes));
-
-    labelsPanel.add(label);
-    labelsPanel.add(subLabel);
-    layout.add(descriptiveMetadataIcon);
-    layout.add(labelsPanel);
-    downloadPanel.setWidget(layout);
-
-    downloadPanel.addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        itemMetadata.setHTML(html);
-        descriptiveMetadataIcon.setHTML(SafeHtmlUtils.fromSafeConstant(ICON_METADATA_SELECTED));
-        preservationMetadataIcon.setHTML(SafeHtmlUtils.fromSafeConstant(ICON_METADATA_DESELECTED));
-      }
-    });
-
-    downloadPanel.addStyleName("browseDownload clickable");
-    descriptiveMetadataIcon.addStyleName("browseDownloadIcon");
-    labelsPanel.addStyleName("browseDownloadLabels");
-    label.addStyleName("browseDownloadLabel");
-    subLabel.addStyleName("browseDownloadSublabel");
-    return downloadPanel;
-  }
-
-  private Widget createPreservationMetadataDownloadPanel(String aipId,
-    PreservationMetadataBundle preservationMetadata) {
-    AccessibleFocusPanel downloadPanel = new AccessibleFocusPanel();
-    FlowPanel layout = new FlowPanel();
-    preservationMetadataIcon = new HTML(SafeHtmlUtils.fromSafeConstant(ICON_METADATA_DESELECTED));
-    FlowPanel labelsPanel = new FlowPanel();
-
-    //final int files = preservationMetadata.getNumberOfFiles();
-   // final long sizeInBytes = preservationMetadata.getSizeInBytes();
-
-    // TODO externalize strings
-    Label label = new Label("Preservation metadata");
-    //Label subLabel = new Label(files + " files, " + readableFileSize(sizeInBytes));
-
-    labelsPanel.add(label);
-    //labelsPanel.add(subLabel);
-    layout.add(preservationMetadataIcon);
-    layout.add(labelsPanel);
-    downloadPanel.setWidget(layout);
-
-    downloadPanel.addStyleName("browseDownload clickable");
-
-    downloadPanel.addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        showPreservationMetadata();
-      }
-    });
-
-    preservationMetadataIcon.addStyleName("browseDownloadIcon");
-    labelsPanel.addStyleName("browseDownloadLabels");
-    label.addStyleName("browseDownloadLabel");
-    // subLabel.addStyleName("browseDownloadSublabel");
-    return downloadPanel;
-  }
-
-  private void showPreservationMetadata() {
-    getPreservationMetadataHTML(new AsyncCallback<SafeHtml>() {
-
-      @Override
-      public void onFailure(Throwable caught) {
-        MessagePopup.showError("Error getting preservation metadata");
-      }
-
-      @Override
-      public void onSuccess(SafeHtml html) {
-        itemMetadata.setHTML(html);
-        preservationMetadataIcon.setHTML(SafeHtmlUtils.fromSafeConstant(ICON_METADATA_SELECTED));
-        descriptiveMetadataIcon.setHTML(SafeHtmlUtils.fromSafeConstant(ICON_METADATA_DESELECTED));
-        JavascriptUtils.runHighlighter();
-        JavascriptUtils.slideToggle(".toggle-next");
-        JavascriptUtils.smoothScroll();
-      }
-    });
-
-  }
-
-  private SafeHtml preservationMetadataHTML = null;
-
-  private void getPreservationMetadataHTML(final AsyncCallback<SafeHtml> callback) {
-    if (preservationMetadataHTML != null) {
-      callback.onSuccess(preservationMetadataHTML);
-    } else {
-      BrowserService.Util.getInstance().getPreservationMetadataHTML(aipId,
-        LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<String>() {
-
-          @Override
-          public void onFailure(Throwable caught) {
-            callback.onFailure(caught);
-          }
-
-          @Override
-          public void onSuccess(String html) {
+            SafeHtmlBuilder b = new SafeHtmlBuilder();
             // Download link
-            SafeHtmlBuilder builder = new SafeHtmlBuilder();
-            SafeUri downloadUri = RestUtils.createPreservationMetadataDownloadUri(aipId);
+            SafeUri downloadUri = RestUtils.createDescriptiveMetadataDownloadUri(aipId, descId);
             String downloadLinkHtml = "<a href='" + downloadUri.asString()
               + "' class='descriptiveMetadataLink'>download</a>";
-            builder.append(SafeHtmlUtils.fromSafeConstant(downloadLinkHtml));
+            b.append(SafeHtmlUtils.fromSafeConstant(downloadLinkHtml));
 
-            // Content
-            builder.append(SafeHtmlUtils.fromTrustedString(html));
+            // Edit link
+            String editLink = Tools.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId, descId);
+            String editLinkHtml = "<a href='" + editLink + "' class='descriptiveMetadataLink'>edit</a>";
+            b.append(SafeHtmlUtils.fromSafeConstant(editLinkHtml));
 
-            preservationMetadataHTML = builder.toSafeHtml();
-            callback.onSuccess(preservationMetadataHTML);
+            b.append(SafeHtmlUtils.fromTrustedString(html));
+            SafeHtml safeHtml = b.toSafeHtml();
+
+            callback.onSuccess(safeHtml);
+          } else {
+            String text = response.getText();
+            String message;
+            try {
+              RestErrorOverlayType error = (RestErrorOverlayType) JsonUtils.safeEval(text);
+              message = error.getMessage();
+            } catch (IllegalArgumentException e) {
+              message = text;
+            }
+
+            SafeHtmlBuilder b = new SafeHtmlBuilder();
+
+            // Edit link
+            String editLink = Tools.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId, descId);
+            String editLinkHtml = "<a href='" + editLink + "' class='descriptiveMetadataLink'>edit</a>";
+            b.append(SafeHtmlUtils.fromSafeConstant(editLinkHtml));
+
+            // error message
+            b.append(SafeHtmlUtils.fromSafeConstant("<span class='error'>"));
+            b.append(messages.descriptiveMetadataTranformToHTMLError());
+            b.append(SafeHtmlUtils.fromSafeConstant("<pre><code>"));
+            b.append(SafeHtmlUtils.fromString(message));
+            b.append(SafeHtmlUtils.fromSafeConstant("</core></pre>"));
+            b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
+
+            callback.onSuccess(b.toSafeHtml());
           }
-        });
+        }
+
+        @Override
+        public void onError(Request request, Throwable exception) {
+          callback.onFailure(exception);
+        }
+      });
+    } catch (RequestException e) {
+      callback.onFailure(e);
     }
+
   }
 
   private String getDatesText(SimpleDescriptionObject sdo) {
@@ -619,26 +611,6 @@ public class Browse extends Composite {
     }
 
     return ret;
-  }
-
-  private SafeHtml getDescriptiveMetadataPanelHTML(String aipId,
-    List<DescriptiveMetadataViewBundle> descriptiveMetadata) {
-    SafeHtmlBuilder builder = new SafeHtmlBuilder();
-    for (DescriptiveMetadataViewBundle bundle : descriptiveMetadata) {
-      // Download link
-      SafeUri downloadUri = RestUtils.createDescriptiveMetadataDownloadUri(aipId, bundle.getId());
-      String downloadLinkHtml = "<a href='" + downloadUri.asString() + "' class='descriptiveMetadataLink'>download</a>";
-      builder.append(SafeHtmlUtils.fromSafeConstant(downloadLinkHtml));
-
-      // Edit link
-      String editLink = Tools.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId, bundle.getId());
-      String editLinkHtml = "<a href='" + editLink + "' class='descriptiveMetadataLink'>edit</a>";
-      builder.append(SafeHtmlUtils.fromSafeConstant(editLinkHtml));
-
-      // Content
-      builder.append(SafeHtmlUtils.fromTrustedString(bundle.getHtml()));
-    }
-    return builder.toSafeHtml();
   }
 
   private boolean updateHistory(String id) {
