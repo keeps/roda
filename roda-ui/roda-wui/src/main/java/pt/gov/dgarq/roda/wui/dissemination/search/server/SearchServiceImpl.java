@@ -3,7 +3,6 @@ package pt.gov.dgarq.roda.wui.dissemination.search.server;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.configuration.Configuration;
 import org.apache.log4j.Logger;
 import org.roda.index.IndexService;
 import org.roda.index.IndexServiceException;
@@ -92,17 +91,16 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 
   // FIXME see if there is a best way to deal with "hierarchical" keys
   public List<SearchField> getSearchFields(String localeString) throws GenericException {
-    Configuration searchFieldsProperties = RodaCoreFactory.getRodaConfiguration();
     List<SearchField> searchFields = new ArrayList<SearchField>();
-    String fieldsNamesString = (String) searchFieldsProperties.getProperty("search.fields");
+    String fieldsNamesString = RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields");
     if (fieldsNamesString != null) {
       String[] fields = fieldsNamesString.split(",");
       for (String field : fields) {
         SearchField searchField = new SearchField();
-        String fieldName = (String) searchFieldsProperties.getProperty("search.fields." + field + ".field");
-        String fieldType = (String) searchFieldsProperties.getProperty("search.fields." + field + ".type");
-        String fieldLabel = (String) searchFieldsProperties
-          .getProperty("search.fields." + field + ".label." + localeString);
+        String fieldName = RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "field");
+        String fieldType = RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "type");
+        String fieldLabel = RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "label",
+          localeString);
 
         searchField.setField(fieldName);
         searchField.setType(fieldType);

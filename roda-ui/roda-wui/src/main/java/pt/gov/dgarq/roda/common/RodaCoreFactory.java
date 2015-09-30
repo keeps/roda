@@ -9,13 +9,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.UUID;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
@@ -35,6 +33,8 @@ import org.roda.action.orchestrate.actions.ReindexAction;
 import org.roda.action.orchestrate.actions.RemoveOrphansAction;
 import org.roda.action.orchestrate.embed.AkkaEmbeddedActionOrchestrator;
 import org.roda.common.ApacheDS;
+import org.roda.common.LdapUtility;
+import org.roda.common.RodaUtils;
 import org.roda.common.UserUtility;
 import org.roda.index.IndexService;
 import org.roda.index.IndexServiceException;
@@ -57,13 +57,14 @@ import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
 import pt.gov.dgarq.roda.core.data.v2.Group;
 import pt.gov.dgarq.roda.core.data.v2.IndexResult;
 import pt.gov.dgarq.roda.core.data.v2.RODAMember;
-import pt.gov.dgarq.roda.core.data.v2.SIPReport;
-import pt.gov.dgarq.roda.core.data.v2.SIPStateTransition;
 import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.core.data.v2.User;
 
 public class RodaCoreFactory {
   private static final Logger LOGGER = Logger.getLogger(RodaCoreFactory.class);
+
+  private static final String LDAP_DEFAULT_HOST = "localhost";
+  private static final int LDAP_DEFAULT_PORT = 10389;
 
   private static boolean instantiated = false;
 
@@ -156,6 +157,12 @@ public class RodaCoreFactory {
 
   }
 
+  public static void reloadRodaConfigurationsAfterFileChange() {
+    processLoginRelatedProperties();
+    xsltMessages = new HashMap<Locale, XSLTMessages>();
+    LOGGER.debug("Reloaded roda configurations after file change!");
+  }
+
   public static void shutdown() throws IOException {
     if (instantiated) {
       solr.close();
@@ -171,10 +178,24 @@ public class RodaCoreFactory {
     try {
       Configuration rodaConfig = RodaCoreFactory.getRodaConfiguration();
 
+      String ldapHost = rodaConfig.getString("ldap.host", LDAP_DEFAULT_HOST);
+      int ldapPort = rodaConfig.getInt("ldap.port", LDAP_DEFAULT_PORT);
+      String ldapPeopleDN = rodaConfig.getString("ldap.peopleDN");
+      String ldapGroupsDN = rodaConfig.getString("ldap.groupsDN");
+      String ldapRolesDN = rodaConfig.getString("ldap.rolesDN");
+      String ldapAdminDN = rodaConfig.getString("ldap.adminDN");
+      String ldapAdminPassword = rodaConfig.getString("ldap.adminPassword");
+      String ldapPasswordDigestAlgorithm = rodaConfig.getString("ldap.passwordDigestAlgorithm");
+      List<String> ldapProtectedUsers = RodaUtils.copyList(rodaConfig.getList("ldap.protectedUsers"));
+      List<String> ldapProtectedGroups = RodaUtils.copyList(rodaConfig.getList("ldap.protectedGroups"));
+
+      LdapUtility ldapUtility = new LdapUtility(ldapHost, ldapPort, ldapPeopleDN, ldapGroupsDN, ldapRolesDN,
+        ldapAdminDN, ldapAdminPassword, ldapPasswordDigestAlgorithm, ldapProtectedUsers, ldapProtectedGroups);
+
       if (!Files.exists(rodaApacheDsDataDirectory)) {
         Files.createDirectories(rodaApacheDsDataDirectory);
-        ldap.initDirectoryService(rodaApacheDsConfigDirectory, rodaApacheDsDataDirectory);
-        ldap.startServer(rodaConfig);
+        ldap.initDirectoryService(rodaApacheDsConfigDirectory, rodaApacheDsDataDirectory, ldapAdminPassword);
+        ldap.startServer(ldapUtility, ldapPort);
         for (User user : UserUtility.getLdapUtility().getUsers(new Filter())) {
           LOGGER.debug("User to be indexed: " + user);
           RodaCoreFactory.getModelService().addUser(user, false, true);
@@ -185,7 +206,7 @@ public class RodaCoreFactory {
         }
       } else {
         ldap.instantiateDirectoryService(rodaApacheDsDataDirectory);
-        ldap.startServer(rodaConfig);
+        ldap.startServer(ldapUtility, ldapPort);
       }
 
     } catch (Exception e) {
@@ -238,14 +259,6 @@ public class RodaCoreFactory {
     }
   }
 
-  // FIXME this should not be here! remove it
-  public static void populateSipReport() throws ModelServiceException {
-    for (int i = 0; i < 100; i++) {
-      model.addSipReport(new SIPReport(UUID.randomUUID().toString(), "admin", "SIP_" + (i + 1) + ".sip", "authorized",
-        new SIPStateTransition[] {}, false, 0.1f * (i % 10), "AIP_" + i, "AIP_" + i, new Date(), true));
-    }
-  }
-
   public static InputStream getConfigurationFile(String relativePath) {
     InputStream ret;
     Path staticConfig = getConfigPath().resolve(relativePath);
@@ -269,11 +282,14 @@ public class RodaCoreFactory {
   public static Configuration getConfiguration(String configurationFile) throws ConfigurationException {
     Path config = RodaCoreFactory.getConfigPath().resolve(configurationFile);
     PropertiesConfiguration propertiesConfiguration = new PropertiesConfiguration();
+    RodaCorePropertiesReloadStrategy rodaCorePropertiesReloadStrategy = new RodaCorePropertiesReloadStrategy();
+    rodaCorePropertiesReloadStrategy.setRefreshDelay(5000);
     propertiesConfiguration.setDelimiterParsingDisabled(true);
     propertiesConfiguration.setEncoding("UTF-8");
 
     if (Files.exists(config)) {
       propertiesConfiguration.load(config.toFile());
+      propertiesConfiguration.setReloadingStrategy(rodaCorePropertiesReloadStrategy);
       LOGGER.debug("Loading configuration " + config);
     } else {
       propertiesConfiguration = null;
@@ -285,6 +301,18 @@ public class RodaCoreFactory {
 
   public static Configuration getRodaConfiguration() {
     return rodaConfiguration;
+  }
+
+  public static String getRodaConfigurationAsString(String... keyParts) {
+    StringBuilder sb = new StringBuilder();
+    for (String part : keyParts) {
+      if (sb.length() != 0) {
+        sb.append('.');
+      }
+      sb.append(part);
+    }
+
+    return rodaConfiguration.getString(sb.toString());
   }
 
   public static Map<String, String> getLoginRelatedProperties() {
@@ -299,7 +327,7 @@ public class RodaCoreFactory {
     while (keys.hasNext()) {
       String key = String.class.cast(keys.next());
       String value = configuration.getString(key, "");
-      if (key.startsWith("menu.") || key.startsWith("role.") || key.equals("roda.in.installer.url")) {
+      if (key.startsWith("ui.menu.") || key.startsWith("ui.role.")) {
         loginProperties.put(key, value);
       }
     }

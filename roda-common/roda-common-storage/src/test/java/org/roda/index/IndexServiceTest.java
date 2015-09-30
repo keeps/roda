@@ -28,6 +28,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.roda.CorporaConstants;
 import org.roda.common.ApacheDS;
+import org.roda.common.LdapUtility;
 import org.roda.common.RodaUtils;
 import org.roda.common.UserUtility;
 import org.roda.model.AIP;
@@ -121,8 +122,19 @@ public class IndexServiceTest {
     apacheDS = new ApacheDS();
     Files.createDirectories(basePath.resolve("ldapData"));
     Path ldapConfigs = Paths.get(IndexServiceTest.class.getResource("/ldap/config/").toURI());
-    apacheDS.initDirectoryService(ldapConfigs, basePath.resolve("ldapData"));
-    apacheDS.startServer(rodaConfig);
+    String ldapHost = rodaConfig.getString("ldap.host", "localhost");
+    int ldapPort = rodaConfig.getInt("ldap.port", 10389);
+    String ldapPeopleDN = rodaConfig.getString("ldap.peopleDN");
+    String ldapGroupsDN = rodaConfig.getString("ldap.groupsDN");
+    String ldapRolesDN = rodaConfig.getString("ldap.rolesDN");
+    String ldapAdminDN = rodaConfig.getString("ldap.adminDN");
+    String ldapAdminPassword = rodaConfig.getString("ldap.adminPassword");
+    String ldapPasswordDigestAlgorithm = rodaConfig.getString("ldap.passwordDigestAlgorithm");
+    List<String> ldapProtectedUsers = RodaUtils.copyList(rodaConfig.getList("ldap.protectedUsers"));
+    List<String> ldapProtectedGroups = RodaUtils.copyList(rodaConfig.getList("ldap.protectedGroups"));
+    apacheDS.initDirectoryService(ldapConfigs, basePath.resolve("ldapData"), ldapAdminPassword);
+    apacheDS.startServer(new LdapUtility(ldapHost, ldapPort, ldapPeopleDN, ldapGroupsDN, ldapRolesDN, ldapAdminDN,
+      ldapAdminPassword, ldapPasswordDigestAlgorithm, ldapProtectedUsers, ldapProtectedGroups), 10389);
     for (User user : UserUtility.getLdapUtility().getUsers(new Filter())) {
       model.addUser(user, false, true);
     }
@@ -135,17 +147,17 @@ public class IndexServiceTest {
 
   private static Configuration setAndRetrieveRodaProperties() {
     Configuration rodaConfig = new BaseConfiguration();
-    rodaConfig.addProperty("ldapHost", "localhost");
-    rodaConfig.addProperty("ldapPort", "10389");
-    rodaConfig.addProperty("ldapPeopleDN", "ou=users\\,dc=roda\\,dc=org");
-    rodaConfig.addProperty("ldapGroupsDN", "ou=groups\\,dc=roda\\,dc=org");
-    rodaConfig.addProperty("ldapRolesDN", "ou=roles\\,dc=roda\\,dc=org");
-    rodaConfig.addProperty("ldapAdminDN", "uid=admin\\,ou=system");
-    rodaConfig.addProperty("ldapAdminPassword", "secret");
-    rodaConfig.addProperty("ldapPasswordDigestAlgorithm", "MD5");
-    rodaConfig.addProperty("ldapProtectedUsers",
+    rodaConfig.addProperty("ldap.host", "localhost");
+    rodaConfig.addProperty("ldap.port", "10389");
+    rodaConfig.addProperty("ldap.peopleDN", "ou=users\\,dc=roda\\,dc=org");
+    rodaConfig.addProperty("ldap.groupsDN", "ou=groups\\,dc=roda\\,dc=org");
+    rodaConfig.addProperty("ldap.rolesDN", "ou=roles\\,dc=roda\\,dc=org");
+    rodaConfig.addProperty("ldap.adminDN", "uid=admin\\,ou=system");
+    rodaConfig.addProperty("ldap.adminPassword", "secret");
+    rodaConfig.addProperty("ldap.passwordDigestAlgorithm", "MD5");
+    rodaConfig.addProperty("ldap.protectedUsers",
       Arrays.asList("admin", "guest", "roda-ingest-task", "roda-wui", "roda-disseminator"));
-    rodaConfig.addProperty("ldapProtectedGroups",
+    rodaConfig.addProperty("ldap.protectedGroups",
       Arrays.asList("administrators", "archivists", "producers", "users", "guests"));
     return rodaConfig;
   }
@@ -158,8 +170,8 @@ public class IndexServiceTest {
   }
 
   @Test
-  public void testAIPIndexCreateDelete() throws ModelServiceException, StorageServiceException, IndexServiceException,
-    ParseException {
+  public void testAIPIndexCreateDelete()
+    throws ModelServiceException, StorageServiceException, IndexServiceException, ParseException {
     // generate AIP ID
     final String aipId = UUID.randomUUID().toString();
 
@@ -234,8 +246,9 @@ public class IndexServiceTest {
     Filter filterType = new Filter();
     filterType.add(new SimpleFilterParameter(RodaConstants.SEPM_TYPE, CorporaConstants.INGESTION));
     assertThat(index.count(SimpleEventPreservationMetadata.class, filterType), Matchers.equalTo(1L));
-    assertThat(index.find(SimpleEventPreservationMetadata.class, filterType, null, new Sublist(0, 10), null)
-      .getTotalCount(), Matchers.equalTo(1L));
+    assertThat(
+      index.find(SimpleEventPreservationMetadata.class, filterType, null, new Sublist(0, 10), null).getTotalCount(),
+      Matchers.equalTo(1L));
 
     SimpleRepresentationFilePreservationMetadata srfpm = index.retrieve(
       SimpleRepresentationFilePreservationMetadata.class, aipId, CorporaConstants.REPRESENTATION_1_ID,
@@ -282,8 +295,8 @@ public class IndexServiceTest {
   }
 
   @Test
-  public void testAIPIndexCreateDelete2() throws ModelServiceException, StorageServiceException, IndexServiceException,
-    ParseException {
+  public void testAIPIndexCreateDelete2()
+    throws ModelServiceException, StorageServiceException, IndexServiceException, ParseException {
     final String aipId = UUID.randomUUID().toString();
 
     model.createAIP(aipId, corporaService,
@@ -376,15 +389,13 @@ public class IndexServiceTest {
 
     SimpleDescriptionObject sdo = index.retrieve(SimpleDescriptionObject.class, CorporaConstants.OTHER_AIP_ID);
     List<SimpleDescriptionObject> ancestors = index.getAncestors(sdo);
-    assertThat(
-      ancestors,
-      Matchers.hasItem(Matchers.<SimpleDescriptionObject> hasProperty("id",
-        Matchers.equalTo(CorporaConstants.SOURCE_AIP_ID))));
+    assertThat(ancestors, Matchers
+      .hasItem(Matchers.<SimpleDescriptionObject> hasProperty("id", Matchers.equalTo(CorporaConstants.SOURCE_AIP_ID))));
   }
 
   @Test
-  public void testGetElementWithoutParentId() throws ModelServiceException, StorageServiceException,
-    IndexServiceException {
+  public void testGetElementWithoutParentId()
+    throws ModelServiceException, StorageServiceException, IndexServiceException {
     // generate AIP ID
     final String aipId = UUID.randomUUID().toString();
 
@@ -572,8 +583,8 @@ public class IndexServiceTest {
   }
 
   @Test
-  public void testReindexAIP() throws ModelServiceException, StorageServiceException, IndexServiceException,
-    ParseException {
+  public void testReindexAIP()
+    throws ModelServiceException, StorageServiceException, IndexServiceException, ParseException {
     for (int i = 0; i < 10; i++) {
       final String aipId = UUID.randomUUID().toString();
       model.createAIP(aipId, corporaService,

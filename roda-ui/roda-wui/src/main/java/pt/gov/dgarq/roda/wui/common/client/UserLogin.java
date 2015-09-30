@@ -279,7 +279,7 @@ public class UserLogin {
    */
   public void checkRole(final HistoryResolver res, final AsyncCallback<Boolean> callback) {
     String historyKey = Tools.join(res.getHistoryPath(), ".");
-    String propertyName = "menu." + historyKey + ".role";
+    String propertyName = "ui.menu." + historyKey + ".role";
     UserLogin.getRodaProperty(propertyName, new AsyncCallback<String>() {
 
       public void onFailure(Throwable caught) {

@@ -171,7 +171,7 @@ public class PermissionsPanel extends FlowPanel implements SourcesChangeEvents {
       public void onSuccess(Map<String, String> rodaProperties) {
         logger.debug("Creating permissions list");
         for (String key : rodaProperties.keySet()) {
-          if (key.startsWith("role.")) {
+          if (key.startsWith("ui.role.")) {
             String role = (String) rodaProperties.get(key);
             String description;
             try {

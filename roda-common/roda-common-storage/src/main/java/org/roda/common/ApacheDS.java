@@ -8,7 +8,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.configuration.Configuration;
 import org.apache.directory.api.ldap.model.entry.DefaultEntry;
 import org.apache.directory.api.ldap.model.entry.Entry;
 import org.apache.directory.api.ldap.model.exception.LdapException;
@@ -40,8 +39,7 @@ import org.apache.log4j.Logger;
 // FIXME this should be moved to a more meaningful maven module
 public class ApacheDS {
   private static final Logger LOGGER = Logger.getLogger(ApacheDS.class);
-  private static final String DEFAULT_HOST = "localhost";
-  private static final int DEFAULT_PORT = 10389;
+
   private static final String INSTANCE_NAME = "RODA";
   private static final String BASE_DN = "dc=roda,dc=org";
 
@@ -144,10 +142,13 @@ public class ApacheDS {
    *
    * @param dataDirectory
    *          the directory to be used for storing the data
+   * @param adminPassword
+   *          the admin password to be set in the first time the server is
+   *          started
    * @throws Exception
    *           if there were some problems while initializing the system
    */
-  public void initDirectoryService(Path configDirectory, Path dataDirectory) throws Exception {
+  public void initDirectoryService(Path configDirectory, Path dataDirectory, String adminPassword) throws Exception {
     // Initialize the LDAP service
     JdbmPartition rodaPartition = instantiateDirectoryService(dataDirectory);
 
@@ -166,12 +167,11 @@ public class ApacheDS {
       modifyRequestImpl.replace("m-disabled", "FALSE");
       service.getAdminSession().modify(modifyRequestImpl);
 
-      // FIXME remove comment & also change value in roda-wui.properties
       // change apacheds admin password
-      // modifyRequestImpl = new ModifyRequestImpl();
-      // modifyRequestImpl.setName(new Dn("uid=admin,ou=system"));
-      // modifyRequestImpl.replace("userPassword", "roda");
-      // service.getAdminSession().modify(modifyRequestImpl);
+      modifyRequestImpl = new ModifyRequestImpl();
+      modifyRequestImpl.setName(new Dn("uid=admin,ou=system"));
+      modifyRequestImpl.replace("userPassword", adminPassword);
+      service.getAdminSession().modify(modifyRequestImpl);
 
       applyLdif(configDirectory.resolve("users.ldif").toFile());
       applyLdif(configDirectory.resolve("groups.ldif").toFile());
@@ -239,23 +239,7 @@ public class ApacheDS {
    *
    * @throws Exception
    */
-  public void startServer(Configuration rodaConfig) throws Exception {
-
-    String ldapHost = rodaConfig.getString("ldapHost", DEFAULT_HOST);
-    int ldapPort = rodaConfig.getInt("ldapPort", DEFAULT_PORT);
-
-    String ldapPeopleDN = rodaConfig.getString("ldapPeopleDN");
-    String ldapGroupsDN = rodaConfig.getString("ldapGroupsDN");
-    String ldapRolesDN = rodaConfig.getString("ldapRolesDN");
-    String ldapAdminDN = rodaConfig.getString("ldapAdminDN");
-    String ldapAdminPassword = rodaConfig.getString("ldapAdminPassword");
-    String ldapPasswordDigestAlgorithm = rodaConfig.getString("ldapPasswordDigestAlgorithm");
-    List<String> ldapProtectedUsers = RodaUtils.copyList(rodaConfig.getList("ldapProtectedUsers"));
-    List<String> ldapProtectedGroups = RodaUtils.copyList(rodaConfig.getList("ldapProtectedGroups"));
-
-    LdapUtility ldapUtility = new LdapUtility(ldapHost, ldapPort, ldapPeopleDN, ldapGroupsDN, ldapRolesDN, ldapAdminDN,
-      ldapAdminPassword, ldapPasswordDigestAlgorithm, ldapProtectedUsers, ldapProtectedGroups);
-
+  public void startServer(LdapUtility ldapUtility, int ldapPort) throws Exception {
     UserUtility.setLdapUtility(ldapUtility);
 
     server = new LdapServer();
