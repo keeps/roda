@@ -6,6 +6,7 @@ import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
+import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
@@ -34,12 +35,12 @@ public class SIPReportList extends AsyncTableCell<SIPReport> {
 
   private final ClientLogger logger = new ClientLogger(getClass().getName());
 
-  // private final TextColumn<SIPReport> idColumn;
-  private final TextColumn<SIPReport> originalFilenameColumn;
-  private final Column<SIPReport, Date> submissionDateColumn;
-  private final TextColumn<SIPReport> currentStateColumn;
-  private final TextColumn<SIPReport> percentageColumn;
-  private final TextColumn<SIPReport> producerColumn;
+  // private TextColumn<SIPReport> idColumn;
+  private TextColumn<SIPReport> originalFilenameColumn;
+  private Column<SIPReport, Date> submissionDateColumn;
+  private TextColumn<SIPReport> currentStateColumn;
+  private TextColumn<SIPReport> percentageColumn;
+  private TextColumn<SIPReport> producerColumn;
 
   public SIPReportList() {
     this(null, null, null);
@@ -47,7 +48,10 @@ public class SIPReportList extends AsyncTableCell<SIPReport> {
 
   public SIPReportList(Filter filter, Facets facets, String summary) {
     super(filter, facets, summary);
+  }
 
+  @Override
+  protected void configureDisplay(CellTable<SIPReport> display) {
     // idColumn = new TextColumn<SIPReport>() {
     //
     // @Override
@@ -101,17 +105,17 @@ public class SIPReportList extends AsyncTableCell<SIPReport> {
     producerColumn.setSortable(true);
 
     // TODO externalize strings into constants
-    // getDisplay().addColumn(idColumn, "Id");
-    getDisplay().addColumn(originalFilenameColumn, constants.headerFilename());
-    getDisplay().addColumn(submissionDateColumn, constants.headerStartDate());
-    getDisplay().addColumn(currentStateColumn, constants.headerState());
-    getDisplay().addColumn(percentageColumn, constants.headerPercentage());
-    getDisplay().addColumn(producerColumn, constants.headerProducer());
+    // display.addColumn(idColumn, "Id");
+    display.addColumn(originalFilenameColumn, constants.headerFilename());
+    display.addColumn(submissionDateColumn, constants.headerStartDate());
+    display.addColumn(currentStateColumn, constants.headerState());
+    display.addColumn(percentageColumn, constants.headerPercentage());
+    display.addColumn(producerColumn, constants.headerProducer());
 
-    // getDisplay().setAutoHeaderRefreshDisabled(true);
+    // display.setAutoHeaderRefreshDisabled(true);
     Label emptyInfo = new Label("No items to display");
-    getDisplay().setEmptyTableWidget(emptyInfo);
-    getDisplay().setColumnWidth(originalFilenameColumn, "100%");
+    display.setEmptyTableWidget(emptyInfo);
+    display.setColumnWidth(originalFilenameColumn, "100%");
 
     addStyleName("my-list-SIPReport");
     emptyInfo.addStyleName("my-list-SIPReport-empty-info");
@@ -122,7 +126,6 @@ public class SIPReportList extends AsyncTableCell<SIPReport> {
     currentStateColumn.setCellStyleNames("nowrap my-collections-table-cell-alignright");
     percentageColumn.setCellStyleNames("nowrap my-collections-table-cell-alignright");
     producerColumn.setCellStyleNames("nowrap my-collections-table-cell-alignright");
-
   }
 
   @Override

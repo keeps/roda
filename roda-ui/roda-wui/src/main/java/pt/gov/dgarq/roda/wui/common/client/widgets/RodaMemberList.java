@@ -4,6 +4,7 @@ import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
@@ -30,11 +31,11 @@ public class RodaMemberList extends AsyncTableCell<RODAMember> {
 
   private final ClientLogger logger = new ClientLogger(getClass().getName());
 
-  private final Column<RODAMember, SafeHtml> activeColumn;
-  private final Column<RODAMember, SafeHtml> typeColumn;
-  private final TextColumn<RODAMember> idColumn;
-  private final TextColumn<RODAMember> nameColumn;
-  private final TextColumn<RODAMember> groupsColumn;
+  private Column<RODAMember, SafeHtml> activeColumn;
+  private Column<RODAMember, SafeHtml> typeColumn;
+  private TextColumn<RODAMember> idColumn;
+  private TextColumn<RODAMember> nameColumn;
+  private TextColumn<RODAMember> groupsColumn;
 
   public RodaMemberList() {
     this(null, null, null);
@@ -42,7 +43,10 @@ public class RodaMemberList extends AsyncTableCell<RODAMember> {
 
   public RodaMemberList(Filter filter, Facets facets, String summary) {
     super(filter, facets, summary);
+  }
 
+  @Override
+  protected void configureDisplay(CellTable<RODAMember> display) {
     activeColumn = new Column<RODAMember, SafeHtml>(new SafeHtmlCell()) {
       @Override
       public SafeHtml getValue(RODAMember member) {
@@ -89,23 +93,22 @@ public class RodaMemberList extends AsyncTableCell<RODAMember> {
     nameColumn.setSortable(true);
 
     // TODO externalize strings into constants
-    getDisplay().addColumn(activeColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-check-circle'></i>"));
-    getDisplay().addColumn(typeColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-user'></i>"));
-    getDisplay().addColumn(idColumn, "Identifier");
-    getDisplay().addColumn(nameColumn, "Name");
-    getDisplay().addColumn(groupsColumn, "Groups");
+    display.addColumn(activeColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-check-circle'></i>"));
+    display.addColumn(typeColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-user'></i>"));
+    display.addColumn(idColumn, "Identifier");
+    display.addColumn(nameColumn, "Name");
+    display.addColumn(groupsColumn, "Groups");
 
-    // getDisplay().setAutoHeaderRefreshDisabled(true);
+    // display.setAutoHeaderRefreshDisabled(true);
     Label emptyInfo = new Label("No items to display");
-    getDisplay().setEmptyTableWidget(emptyInfo);
-    // getDisplay().setColumnWidth(nameColumn, "100%");
+    display.setEmptyTableWidget(emptyInfo);
+    // display.setColumnWidth(nameColumn, "100%");
 
-    getDisplay().setColumnWidth(activeColumn, "15px");
-    getDisplay().setColumnWidth(typeColumn, "15px");
+    display.setColumnWidth(activeColumn, "15px");
+    display.setColumnWidth(typeColumn, "15px");
 
     addStyleName("my-list-rodamember");
     emptyInfo.addStyleName("my-list-rodamember-empty-info");
-
   }
 
   @Override

@@ -7,6 +7,7 @@ import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
+import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
@@ -34,13 +35,13 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
 
   private final ClientLogger logger = new ClientLogger(getClass().getName());
 
-  private final Column<LogEntry, Date> dateColumn;
-  private final TextColumn<LogEntry> actionComponentColumn;
-  private final TextColumn<LogEntry> actionMethodColumn;
-  private final Column<LogEntry, String> relatedObjectColumn;
-  private final TextColumn<LogEntry> usernameColumn;
-  private final TextColumn<LogEntry> durationColumn;
-  private final TextColumn<LogEntry> addressColumn;
+  private Column<LogEntry, Date> dateColumn;
+  private TextColumn<LogEntry> actionComponentColumn;
+  private TextColumn<LogEntry> actionMethodColumn;
+  private Column<LogEntry, String> relatedObjectColumn;
+  private TextColumn<LogEntry> usernameColumn;
+  private TextColumn<LogEntry> durationColumn;
+  private TextColumn<LogEntry> addressColumn;
 
   public LogEntryList() {
     this(null, null, null);
@@ -48,7 +49,10 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
 
   public LogEntryList(Filter filter, Facets facets, String summary) {
     super(filter, facets, summary);
+  }
 
+  @Override
+  protected void configureDisplay(CellTable<LogEntry> display) {
     dateColumn = new Column<LogEntry, Date>(new DateCell(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_MEDIUM))) {
       @Override
       public Date getValue(LogEntry logEntry) {
@@ -125,24 +129,24 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
 
     // TODO externalize strings into constants
 
-    // getDisplay().addColumn(idColumn, "Id");
-    getDisplay().addColumn(dateColumn, "Date and time");
-    getDisplay().addColumn(actionComponentColumn, "Component");
-    getDisplay().addColumn(actionMethodColumn, "Method");
-    getDisplay().addColumn(relatedObjectColumn, "Related object");
-    getDisplay().addColumn(usernameColumn, "User");
-    getDisplay().addColumn(durationColumn, "Duration");
-    getDisplay().addColumn(addressColumn, "Address");
+    // display.addColumn(idColumn, "Id");
+    display.addColumn(dateColumn, "Date and time");
+    display.addColumn(actionComponentColumn, "Component");
+    display.addColumn(actionMethodColumn, "Method");
+    display.addColumn(relatedObjectColumn, "Related object");
+    display.addColumn(usernameColumn, "User");
+    display.addColumn(durationColumn, "Duration");
+    display.addColumn(addressColumn, "Address");
 
     Label emptyInfo = new Label("No items to display");
-    getDisplay().setEmptyTableWidget(emptyInfo);
+    display.setEmptyTableWidget(emptyInfo);
 
-    getDisplay().getColumnSortList().push(new ColumnSortInfo(dateColumn, false));
+    // default sorting
+    display.getColumnSortList().push(new ColumnSortInfo(dateColumn, false));
 
     addStyleName("my-collections-table");
     emptyInfo.addStyleName("my-collections-empty-info");
     relatedObjectColumn.setCellStyleNames("my-collections-table-cell-link");
-
   }
 
   @Override

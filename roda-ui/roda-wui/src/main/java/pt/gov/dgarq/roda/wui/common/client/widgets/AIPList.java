@@ -4,10 +4,12 @@ import java.util.Date;
 
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.SafeHtmlCell;
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
@@ -34,11 +36,11 @@ public class AIPList extends AsyncTableCell<SimpleDescriptionObject> {
 
   private final ClientLogger logger = new ClientLogger(getClass().getName());
 
-  private final Column<SimpleDescriptionObject, SafeHtml> levelColumn;
-  // private final TextColumn<SimpleDescriptionObject> idColumn;
-  private final TextColumn<SimpleDescriptionObject> titleColumn;
-  private final Column<SimpleDescriptionObject, Date> dateInitialColumn;
-  private final Column<SimpleDescriptionObject, Date> dateFinalColumn;
+  private Column<SimpleDescriptionObject, SafeHtml> levelColumn;
+  // private TextColumn<SimpleDescriptionObject> idColumn;
+  private TextColumn<SimpleDescriptionObject> titleColumn;
+  private Column<SimpleDescriptionObject, Date> dateInitialColumn;
+  private Column<SimpleDescriptionObject, Date> dateFinalColumn;
 
   public AIPList() {
     this(null, null, null);
@@ -46,7 +48,10 @@ public class AIPList extends AsyncTableCell<SimpleDescriptionObject> {
 
   public AIPList(Filter filter, Facets facets, String summary) {
     super(filter, facets, summary);
-
+  }
+  
+  @Override
+  protected void configureDisplay(CellTable<SimpleDescriptionObject> display) {
     levelColumn = new Column<SimpleDescriptionObject, SafeHtml>(new SafeHtmlCell()) {
       @Override
       public SafeHtml getValue(SimpleDescriptionObject sdo) {
@@ -99,32 +104,33 @@ public class AIPList extends AsyncTableCell<SimpleDescriptionObject> {
     dateInitialColumn.setSortable(true);
 
     // TODO externalize strings into constants
-    getDisplay().addColumn(levelColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-tag'></i>"));
-    // getDisplay().addColumn(idColumn, "Id");
-    getDisplay().addColumn(titleColumn, "Title");
-    getDisplay().addColumn(dateInitialColumn, "Date initial");
-    getDisplay().addColumn(dateFinalColumn, "Date final");
-    getDisplay().setColumnWidth(levelColumn, "35px");
-    // getDisplay().setAutoHeaderRefreshDisabled(true);
+    display.addColumn(levelColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-tag'></i>"));
+    // display.addColumn(idColumn, "Id");
+    display.addColumn(titleColumn, "Title");
+    display.addColumn(dateInitialColumn, "Date initial");
+    display.addColumn(dateFinalColumn, "Date final");
+    display.setColumnWidth(levelColumn, "35px");
+    // display.setAutoHeaderRefreshDisabled(true);
     Label emptyInfo = new Label("No items to display");
-    getDisplay().setEmptyTableWidget(emptyInfo);
-    getDisplay().setColumnWidth(titleColumn, "100%");
+    display.setEmptyTableWidget(emptyInfo);
+    display.setColumnWidth(titleColumn, "100%");
 
     // define default sorting
-    getDisplay().getColumnSortList().push(new ColumnSortInfo(dateInitialColumn, false));
+    GWT.log("Defining default sorting");
+    display.getColumnSortList().push(new ColumnSortInfo(dateInitialColumn, false));
 
     dateInitialColumn.setCellStyleNames("nowrap");
     dateFinalColumn.setCellStyleNames("nowrap");
 
     addStyleName("my-collections-table");
     emptyInfo.addStyleName("my-collections-empty-info");
-
   }
 
   @Override
   protected void getData(int start, int length, ColumnSortList columnSortList,
     AsyncCallback<IndexResult<SimpleDescriptionObject>> callback) {
 
+    GWT.log("Getting data");
     Filter filter = getFilter();
     if (filter == null) {
       // search not yet ready, deliver empty result
@@ -180,5 +186,6 @@ public class AIPList extends AsyncTableCell<SimpleDescriptionObject> {
   protected int getInitialPageSize() {
     return PAGE_SIZE;
   }
+
 
 }

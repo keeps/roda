@@ -57,7 +57,8 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
 
     this.filter = filter;
     this.facets = facets;
-
+    
+    GWT.log("Creating data provider");
     this.dataProvider = new AsyncDataProvider<T>() {
 
       @Override
@@ -95,8 +96,11 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
     };
     display = new AccessibleCellTable<>(getInitialPageSize(),
       (MyCellTableResources) GWT.create(MyCellTableResources.class), getKeyProvider(), summary);
-
+    
+    configureDisplay(display);
+    
     dataProvider.addDataDisplay(display);
+    
     resultsPager = new AccessibleSimplePager(AccessibleSimplePager.TextLocation.RIGHT, false, true);
     resultsPager.setDisplay(display);
 
@@ -119,6 +123,8 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
     display.addStyleName("my-asyncdatagrid-display");
 
   }
+  
+  protected abstract void configureDisplay(CellTable<T> display);
 
   protected abstract int getInitialPageSize();
 
@@ -127,16 +133,16 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
   protected abstract void getData(int start, int length, ColumnSortList columnSortList,
     AsyncCallback<IndexResult<T>> callback);
 
-  protected CellTable<T> getDisplay() {
-    return display;
-  }
+  // protected CellTable<T> getDisplay() {
+  // return display;
+  // }
 
   public SingleSelectionModel<T> getSelectionModel() {
     return selectionModel;
   }
 
   public void refresh() {
-    getDisplay().setVisibleRangeAndClearData(new Range(0, getInitialPageSize()), true);
+    display.setVisibleRangeAndClearData(new Range(0, getInitialPageSize()), true);
     getSelectionModel().clear();
   }
 
