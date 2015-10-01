@@ -16,6 +16,14 @@
 	background-color: #90c0dd !important;
 }
 
+.cellTableKeyboardSelectedRow {
+	background: none;
+}
+
+.cellTableKeyboardSelectedCell {
+	border: none;
+}
+
 .cellTableSelectedRowCell {
 	border: 2px solid #90c0dd !important;
 }

@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.MissingResourceException;
 import java.util.Set;
 
 import javax.ws.rs.WebApplicationException;
@@ -43,6 +44,7 @@ import org.roda.storage.StorageService;
 import org.roda.storage.StorageServiceException;
 import org.roda.storage.fs.FSUtils;
 
+import config.i18n.server.XSLTMessages;
 import pt.gov.dgarq.roda.common.HTMLUtils;
 import pt.gov.dgarq.roda.common.RodaCoreFactory;
 import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
@@ -130,7 +132,12 @@ public class BrowserHelper {
       for (DescriptiveMetadata descriptiveMetadata : listDescriptiveMetadataBinaries) {
         DescriptiveMetadataViewBundle bundle = new DescriptiveMetadataViewBundle();
         bundle.setId(descriptiveMetadata.getId());
-        bundle.setLabel(descriptiveMetadata.getId());
+        XSLTMessages messages = RodaCoreFactory.getXSLTMessages(locale);
+        try {
+          bundle.setLabel(messages.getString(descriptiveMetadata.getId()));
+        } catch (MissingResourceException e) {
+          bundle.setLabel(descriptiveMetadata.getId());
+        }
         descriptiveMetadataList.add(bundle);
       }
     } finally {
