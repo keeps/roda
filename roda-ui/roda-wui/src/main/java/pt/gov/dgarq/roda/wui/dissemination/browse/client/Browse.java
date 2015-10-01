@@ -48,6 +48,7 @@ import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 
 import config.i18n.client.BrowseMessages;
+import pt.gov.dgarq.roda.core.common.NotFoundException;
 import pt.gov.dgarq.roda.core.common.Pair;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
@@ -62,6 +63,7 @@ import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
 import pt.gov.dgarq.roda.wui.common.client.tools.DescriptionLevelUtils;
+import pt.gov.dgarq.roda.wui.common.client.tools.JavascriptUtils;
 import pt.gov.dgarq.roda.wui.common.client.tools.RestErrorOverlayType;
 import pt.gov.dgarq.roda.wui.common.client.tools.RestUtils;
 import pt.gov.dgarq.roda.wui.common.client.tools.Tools;
@@ -268,7 +270,6 @@ public class Browse extends Composite {
 
           @Override
           public void onFailure(Throwable caught) {
-            logger.error("Could not view id=" + id, caught);
             showError(id, caught);
           }
 
@@ -291,7 +292,20 @@ public class Browse extends Composite {
     itemDates.setText("");
 
     itemMetadata.clear();
-    itemMetadata.add(new HTML(SafeHtmlUtils.fromSafeConstant(caught.getMessage())));
+    SafeHtml title;
+    SafeHtml message;
+    if (caught instanceof NotFoundException) {
+      title = messages.notFoundErrorTitle();
+      message = messages.notFoundErrorMessage(aipId);
+    } else {
+      title = messages.genericErrorTitle();
+      message = messages.genericErrorMessage(caught.getMessage());
+    }
+
+    HTML messageHTML = new HTML(message);
+    messageHTML.addStyleName("error");
+    itemMetadata.add(messageHTML, title.asString(), true);
+    itemMetadata.selectTab(0);
     itemMetadata.setVisible(true);
 
     viewingTop = false;
@@ -306,14 +320,14 @@ public class Browse extends Composite {
     createDescriptiveMetadata.setVisible(false);
     moveItem.setVisible(false);
     editPermissions.setVisible(false);
-    remove.setVisible(true);
+    remove.setVisible(false);
   }
 
   protected void viewAction(BrowseItemBundle itemBundle) {
     if (itemBundle != null) {
       SimpleDescriptionObject sdo = itemBundle.getSdo();
       List<DescriptiveMetadataViewBundle> descMetadata = itemBundle.getDescriptiveMetadata();
-      PreservationMetadataBundle preservationMetadata = itemBundle.getPreservationMetadata();
+      final PreservationMetadataBundle preservationMetadata = itemBundle.getPreservationMetadata();
       List<Representation> representations = itemBundle.getRepresentations();
 
       breadcrumb.updatePath(getBreadcrumbsFromAncestors(itemBundle.getSdoAncestors(), sdo));
@@ -344,7 +358,7 @@ public class Browse extends Composite {
             String descId = pair.getFirst();
             final HTML html = pair.getSecond();
             if (html.getText().length() == 0) {
-              getDescriptiveMetadataHTML(descId, new AsyncCallback<SafeHtml>() {
+              getDescriptiveMetadataHTML(aipId, descId, new AsyncCallback<SafeHtml>() {
 
                 @Override
                 public void onFailure(Throwable caught) {
@@ -363,30 +377,43 @@ public class Browse extends Composite {
       });
 
       if (!preservationMetadata.getRepresentationsMetadata().isEmpty()) {
-        final HTML premisContainer = new HTML();
+        final FlowPanel premisContainer = new FlowPanel();
         final int premisTabIndex = itemMetadata.getWidgetCount();
+        // FIXME externalise strings
         itemMetadata.add(premisContainer, "PREMIS");
+
+        // Download link
+        SafeUri downloadUri = RestUtils.createPreservationMetadataDownloadUri(aipId);
+        String downloadLinkHtml = "<a href='" + downloadUri.asString()
+          + "' class='descriptiveMetadataLink'>download</a>";
+        HTML downloadLinkWidget = new HTML(SafeHtmlUtils.fromSafeConstant(downloadLinkHtml));
+        premisContainer.add(downloadLinkWidget);
+
         itemMetadata.addSelectionHandler(new SelectionHandler<Integer>() {
 
           @Override
           public void onSelection(SelectionEvent<Integer> event) {
-            if (event.getSelectedItem() == premisTabIndex && premisContainer.getText().length() == 0) {
-              // TODO load PREMIS via REST API
-              // getPreservationMetadataHTML(new AsyncCallback<SafeHtml>() {
-              //
-              // @Override
-              // public void onFailure(Throwable caught) {
-              // premisContainer.setHTML(SafeHtmlUtils.fromString(caught.getMessage()));
-              // }
-              //
-              // @Override
-              // public void onSuccess(SafeHtml result) {
-              // premisContainer.setHTML(result);
-              // JavascriptUtils.runHighlighter();
-              // JavascriptUtils.slideToggle(".toggle-next");
-              // JavascriptUtils.smoothScroll();
-              // }
-              // });
+            if (event.getSelectedItem() == premisTabIndex && premisContainer.getWidgetCount() <= 1) {
+              for (RepresentationPreservationMetadataBundle bundle : preservationMetadata
+                .getRepresentationsMetadata()) {
+                String repId = bundle.getRepresentationID();
+                getPreservationMetadataHTML(aipId, repId, new AsyncCallback<SafeHtml>() {
+
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    MessagePopup.showError("Error loading preservation metadata");
+                  }
+
+                  @Override
+                  public void onSuccess(SafeHtml result) {
+                    HTML html = new HTML(result);
+                    premisContainer.add(html);
+                    JavascriptUtils.runHighlighter(html.getElement());
+                    JavascriptUtils.slideToggle(html.getElement(), ".toggle-next");
+                    JavascriptUtils.smoothScroll(html.getElement());
+                  }
+                });
+              }
             }
           }
         });
@@ -526,7 +553,8 @@ public class Browse extends Composite {
     return NumberFormat.getFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
   }
 
-  private void getDescriptiveMetadataHTML(final String descId, final AsyncCallback<SafeHtml> callback) {
+  private void getDescriptiveMetadataHTML(final String aipId, final String descId,
+    final AsyncCallback<SafeHtml> callback) {
     String uri = RestUtils.createDescriptiveMetadataHTMLUri(aipId, descId);
     RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, uri);
     try {
@@ -590,7 +618,64 @@ public class Browse extends Composite {
     } catch (RequestException e) {
       callback.onFailure(e);
     }
+  }
 
+  private void getPreservationMetadataHTML(final String aipId, final String repId,
+    final AsyncCallback<SafeHtml> callback) {
+    String uri = RestUtils.createPreservationMetadataHTMLUri(aipId, repId, 0, 10, 0, 10, 0, 10);
+    RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, uri);
+    try {
+      requestBuilder.sendRequest(null, new RequestCallback() {
+
+        @Override
+        public void onResponseReceived(Request request, Response response) {
+          if (200 == response.getStatusCode()) {
+            String html = response.getText();
+
+            SafeHtmlBuilder b = new SafeHtmlBuilder();
+            // Download link
+            // SafeUri downloadUri =
+            // RestUtils.createDescriptiveMetadataDownloadUri(aipId, descId);
+            // String downloadLinkHtml = "<a href='" + downloadUri.asString()
+            // + "' class='descriptiveMetadataLink'>download</a>";
+            // b.append(SafeHtmlUtils.fromSafeConstant(downloadLinkHtml));
+
+            b.append(SafeHtmlUtils.fromTrustedString(html));
+            SafeHtml safeHtml = b.toSafeHtml();
+
+            callback.onSuccess(safeHtml);
+          } else {
+            String text = response.getText();
+            String message;
+            try {
+              RestErrorOverlayType error = (RestErrorOverlayType) JsonUtils.safeEval(text);
+              message = error.getMessage();
+            } catch (IllegalArgumentException e) {
+              message = text;
+            }
+
+            SafeHtmlBuilder b = new SafeHtmlBuilder();
+
+            // error message
+            b.append(SafeHtmlUtils.fromSafeConstant("<span class='error'>"));
+            b.append(messages.preservationMetadataTranformToHTMLError());
+            b.append(SafeHtmlUtils.fromSafeConstant("<pre><code>"));
+            b.append(SafeHtmlUtils.fromString(message));
+            b.append(SafeHtmlUtils.fromSafeConstant("</core></pre>"));
+            b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
+
+            callback.onSuccess(b.toSafeHtml());
+          }
+        }
+
+        @Override
+        public void onError(Request request, Throwable exception) {
+          callback.onFailure(exception);
+        }
+      });
+    } catch (RequestException e) {
+      callback.onFailure(e);
+    }
   }
 
   private String getDatesText(SimpleDescriptionObject sdo) {

@@ -14,7 +14,6 @@ import org.apache.log4j.Logger;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.roda.api.controllers.Browser;
 import org.roda.api.v1.utils.ApiResponseMessage;
-import org.roda.api.v1.utils.NotFoundException;
 import org.roda.api.v1.utils.StreamResponse;
 import org.roda.common.UserUtility;
 import org.roda.model.ModelServiceException;
@@ -22,6 +21,7 @@ import org.roda.storage.StorageServiceException;
 
 import pt.gov.dgarq.roda.common.RodaCoreFactory;
 import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
+import pt.gov.dgarq.roda.core.common.NotFoundException;
 import pt.gov.dgarq.roda.core.common.Pair;
 import pt.gov.dgarq.roda.core.data.v2.RodaUser;
 import pt.gov.dgarq.roda.wui.common.client.GenericException;
@@ -30,27 +30,27 @@ import pt.gov.dgarq.roda.wui.common.client.GenericException;
 public class AipsResourceImpl {
   private static final Logger LOGGER = Logger.getLogger(AipsResourceImpl.class);
 
-  public Response aipsGet(HttpServletRequest request, String start, String limit) throws NotFoundException {
+  public Response aipsGet(HttpServletRequest request, String start, String limit) {
     // do some magic!
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic2!")).build();
   }
 
-  public Response aipsAipIdGet(HttpServletRequest request, String aipId, String acceptFormat) throws NotFoundException {
+  public Response aipsAipIdGet(HttpServletRequest request, String aipId, String acceptFormat) {
     // do some magic!
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 
-  public Response aipsAipIdPut(HttpServletRequest request, String aipId, String filepath) throws NotFoundException {
+  public Response aipsAipIdPut(HttpServletRequest request, String aipId, String filepath) {
     // do some magic!
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 
-  public Response aipsAipIdPost(HttpServletRequest request, String aipId, String filepath) throws NotFoundException {
+  public Response aipsAipIdPost(HttpServletRequest request, String aipId, String filepath) {
     // do some magic!
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 
-  public Response aipsAipIdDelete(HttpServletRequest request, String aipId) throws NotFoundException {
+  public Response aipsAipIdDelete(HttpServletRequest request, String aipId) {
     String authorization = request.getHeader("Authorization");
     try {
       // get user
@@ -71,17 +71,19 @@ public class AipsResourceImpl {
       }
     } catch (GenericException e) {
       return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+    } catch (NotFoundException e) {
+      return Response.status(Status.NOT_FOUND).entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage()))
+        .build();
     }
   }
 
-  public Response aipsAipIdDataGet(HttpServletRequest request, String aipId, String start, String limit)
-    throws NotFoundException {
+  public Response aipsAipIdDataGet(HttpServletRequest request, String aipId, String start, String limit) {
     // do some magic!
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 
   public Response getAipRepresentation(HttpServletRequest request, String aipId, String representationId,
-    String acceptFormat) throws NotFoundException {
+    String acceptFormat) {
     String authorization = request.getHeader("Authorization");
     try {
       if (acceptFormat != null && acceptFormat.equalsIgnoreCase("bin")) {
@@ -95,12 +97,6 @@ public class AipsResourceImpl {
         return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Not yet implemented"))
           .build();
       }
-    } catch (StorageServiceException | ModelServiceException e) {
-      if (e.getCode() == ModelServiceException.NOT_FOUND) {
-        throw new NotFoundException(e.getCode(), e.getMessage());
-      } else {
-        return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
-      }
     } catch (AuthorizationDeniedException e) {
       if (authorization == null) {
         return Response.status(Status.UNAUTHORIZED)
@@ -112,23 +108,26 @@ public class AipsResourceImpl {
       }
     } catch (GenericException e) {
       return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+    } catch (NotFoundException e) {
+      return Response.status(Status.NOT_FOUND).entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage()))
+        .build();
     }
   }
 
   public Response aipsAipIdDataRepresentationIdPut(HttpServletRequest request, String aipId, String representationId,
-    String filepath) throws NotFoundException {
+    String filepath) {
     // do some magic!
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 
   public Response aipsAipIdDataRepresentationIdPost(HttpServletRequest request, String aipId, String representationId,
-    String filepath) throws NotFoundException {
+    String filepath) {
     // do some magic!
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 
-  public Response aipsAipIdDataRepresentationIdDelete(HttpServletRequest request, String aipId, String representationId)
-    throws NotFoundException {
+  public Response aipsAipIdDataRepresentationIdDelete(HttpServletRequest request, String aipId,
+    String representationId) {
     String authorization = request.getHeader("Authorization");
     try {
       // get user
@@ -149,11 +148,14 @@ public class AipsResourceImpl {
       }
     } catch (GenericException e) {
       return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+    } catch (NotFoundException e) {
+      return Response.status(Status.NOT_FOUND).entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage()))
+        .build();
     }
   }
 
   public Response aipsAipIdDataRepresentationIdFileIdGet(HttpServletRequest request, String aipId,
-    String representationId, String fileId, String acceptFormat) throws NotFoundException {
+    String representationId, String fileId, String acceptFormat) {
     String authorization = request.getHeader("Authorization");
     try {
       // get user
@@ -174,23 +176,26 @@ public class AipsResourceImpl {
       }
     } catch (GenericException e) {
       return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+    } catch (NotFoundException e) {
+      return Response.status(Status.NOT_FOUND).entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage()))
+        .build();
     }
   }
 
   public Response aipsAipIdDataRepresentationIdFileIdPut(HttpServletRequest request, String aipId,
-    String representationId, String fileId, String filepath) throws NotFoundException {
+    String representationId, String fileId, String filepath) {
     // do some magic!
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 
   public Response aipsAipIdDataRepresentationIdFileIdPost(HttpServletRequest request, String aipId,
-    String representationId, String fileId, String filepath) throws NotFoundException {
+    String representationId, String fileId, String filepath) {
     // do some magic!
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 
   public Response aipsAipIdDataRepresentationIdFileIdDelete(HttpServletRequest request, String aipId,
-    String representationId, String fileId) throws NotFoundException {
+    String representationId, String fileId) {
     String authorization = request.getHeader("Authorization");
     try {
       // get user
@@ -211,11 +216,14 @@ public class AipsResourceImpl {
       }
     } catch (GenericException e) {
       return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+    } catch (NotFoundException e) {
+      return Response.status(Status.NOT_FOUND).entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage()))
+        .build();
     }
   }
 
   public Response listAipDescriptiveMetadata(HttpServletRequest request, String aipId, String start, String limit,
-    String acceptFormat) throws NotFoundException {
+    String acceptFormat) {
     String authorization = request.getHeader("Authorization");
     try {
       if (acceptFormat != null && acceptFormat.equalsIgnoreCase("bin")) {
@@ -229,12 +237,6 @@ public class AipsResourceImpl {
         return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Not yet implemented"))
           .build();
       }
-    } catch (StorageServiceException | ModelServiceException e) {
-      if (e.getCode() == ModelServiceException.NOT_FOUND) {
-        throw new NotFoundException(e.getCode(), e.getMessage());
-      } else {
-        return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
-      }
     } catch (AuthorizationDeniedException e) {
       if (authorization == null) {
         return Response.status(Status.UNAUTHORIZED)
@@ -246,12 +248,15 @@ public class AipsResourceImpl {
       }
     } catch (GenericException e) {
       return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+    } catch (NotFoundException e) {
+      return Response.status(Status.NOT_FOUND).entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage()))
+        .build();
     }
 
   }
 
   public Response getAipDescriptiveMetadata(HttpServletRequest request, String aipId, String metadataId,
-    String acceptFormat, String language) throws NotFoundException {
+    String acceptFormat, String language) {
     String authorization = request.getHeader("Authorization");
     try {
       // TODO ensure accept format is one of the valid options
@@ -266,12 +271,6 @@ public class AipsResourceImpl {
       } else {
         return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Not yet implemented"))
           .build();
-      }
-    } catch (StorageServiceException | ModelServiceException e) {
-      if (e.getCode() == ModelServiceException.NOT_FOUND) {
-        throw new NotFoundException(e.getCode(), e.getMessage());
-      } else {
-        return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
       }
     } catch (AuthorizationDeniedException e) {
       if (authorization == null) {
@@ -294,11 +293,14 @@ public class AipsResourceImpl {
       }
 
       return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, message)).build();
+    } catch (NotFoundException e) {
+      return Response.status(Status.NOT_FOUND).entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage()))
+        .build();
     }
   }
 
   public Response aipsAipIdDescriptiveMetadataMetadataIdPut(HttpServletRequest request, String aipId, String metadataId,
-    InputStream is, FormDataContentDisposition fileDetail, String metadataType) throws NotFoundException {
+    InputStream is, FormDataContentDisposition fileDetail, String metadataType) {
     String authorization = request.getHeader("Authorization");
     try {
       // get user
@@ -308,12 +310,6 @@ public class AipsResourceImpl {
 
       // FIXME give a better answer
       return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
-    } catch (StorageServiceException | ModelServiceException e) {
-      if (e.getCode() == ModelServiceException.NOT_FOUND) {
-        throw new NotFoundException(e.getCode(), e.getMessage());
-      } else {
-        return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
-      }
     } catch (AuthorizationDeniedException e) {
       if (authorization == null) {
         return Response.status(Status.UNAUTHORIZED)
@@ -325,12 +321,14 @@ public class AipsResourceImpl {
       }
     } catch (GenericException e) {
       return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+    } catch (NotFoundException e) {
+      return Response.status(Status.NOT_FOUND).entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage()))
+        .build();
     }
   }
 
   public Response aipsAipIdDescriptiveMetadataMetadataIdPost(HttpServletRequest request, String aipId,
-    String metadataId, InputStream is, FormDataContentDisposition fileDetail, String metadataType)
-      throws NotFoundException {
+    String metadataId, InputStream is, FormDataContentDisposition fileDetail, String metadataType) {
     String authorization = request.getHeader("Authorization");
     try {
       // get user
@@ -340,12 +338,6 @@ public class AipsResourceImpl {
 
       // FIXME give a better answer
       return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
-    } catch (StorageServiceException | ModelServiceException e) {
-      if (e.getCode() == ModelServiceException.NOT_FOUND) {
-        throw new NotFoundException(e.getCode(), e.getMessage());
-      } else {
-        return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
-      }
     } catch (AuthorizationDeniedException e) {
       if (authorization == null) {
         return Response.status(Status.UNAUTHORIZED)
@@ -357,11 +349,14 @@ public class AipsResourceImpl {
       }
     } catch (GenericException e) {
       return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+    } catch (NotFoundException e) {
+      return Response.status(Status.NOT_FOUND).entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage()))
+        .build();
     }
   }
 
   public Response aipsAipIdDescriptiveMetadataMetadataIdDelete(HttpServletRequest request, String aipId,
-    String metadataId) throws NotFoundException {
+    String metadataId) {
     String authorization = request.getHeader("Authorization");
     try {
       // get user
@@ -382,11 +377,14 @@ public class AipsResourceImpl {
       }
     } catch (GenericException e) {
       return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+    } catch (NotFoundException e) {
+      return Response.status(Status.NOT_FOUND).entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage()))
+        .build();
     }
   }
 
   public Response listAipPreservationMetadata(HttpServletRequest request, String aipId, String start, String limit,
-    String acceptFormat) throws NotFoundException {
+    String acceptFormat) {
     String authorization = request.getHeader("Authorization");
     try {
       // get user
@@ -396,12 +394,6 @@ public class AipsResourceImpl {
         start, limit);
       return Response.ok(aipPreservationMetadataList.getSecond(), MediaType.APPLICATION_OCTET_STREAM)
         .header("content-disposition", "attachment; filename = " + aipPreservationMetadataList.getFirst()).build();
-    } catch (StorageServiceException | ModelServiceException e) {
-      if (e.getCode() == ModelServiceException.NOT_FOUND) {
-        throw new NotFoundException(e.getCode(), e.getMessage());
-      } else {
-        return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
-      }
     } catch (AuthorizationDeniedException e) {
       if (authorization == null) {
         return Response.status(Status.UNAUTHORIZED)
@@ -413,12 +405,15 @@ public class AipsResourceImpl {
       }
     } catch (GenericException e) {
       return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+    } catch (NotFoundException e) {
+      return Response.status(Status.NOT_FOUND).entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage()))
+        .build();
     }
   }
 
   public Response getAipRepresentationPreservationMetadata(HttpServletRequest request, String aipId,
     String representationId, String startAgent, String limitAgent, String startEvent, String limitEvent,
-    String startFile, String limitFile, String acceptFormat, String language) throws NotFoundException {
+    String startFile, String limitFile, String acceptFormat, String language) {
     String authorization = request.getHeader("Authorization");
     LOGGER.error("STARTEVENT: " + startEvent);
     LOGGER.error("LIMITEVENT: " + limitEvent);
@@ -436,12 +431,6 @@ public class AipsResourceImpl {
       } else {
         return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Not yet implemented"))
           .build();
-      }
-    } catch (StorageServiceException | ModelServiceException e) {
-      if (e.getCode() == ModelServiceException.NOT_FOUND) {
-        throw new NotFoundException(e.getCode(), e.getMessage());
-      } else {
-        return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
       }
     } catch (AuthorizationDeniedException e) {
       if (authorization == null) {
@@ -464,11 +453,14 @@ public class AipsResourceImpl {
       }
 
       return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, message)).build();
+    } catch (NotFoundException e) {
+      return Response.status(Status.NOT_FOUND).entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage()))
+        .build();
     }
   }
 
   public Response getAipRepresentationPreservationMetadataFile(HttpServletRequest request, String aipId,
-    String representationId, String fileId) throws NotFoundException {
+    String representationId, String fileId) {
     String authorization = request.getHeader("Authorization");
     try {
 
@@ -481,12 +473,6 @@ public class AipsResourceImpl {
       return Response.ok(aipRepresentationPreservationMetadataFile.getSecond(), MediaType.APPLICATION_OCTET_STREAM)
         .header("content-disposition", "attachment; filename = " + aipRepresentationPreservationMetadataFile.getFirst())
         .build();
-    } catch (StorageServiceException e) {
-      if (e.getCode() == ModelServiceException.NOT_FOUND) {
-        throw new NotFoundException(e.getCode(), e.getMessage());
-      } else {
-        return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
-      }
     } catch (AuthorizationDeniedException e) {
       if (authorization == null) {
         return Response.status(Status.UNAUTHORIZED)
@@ -498,11 +484,14 @@ public class AipsResourceImpl {
       }
     } catch (GenericException e) {
       return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+    } catch (NotFoundException e) {
+      return Response.status(Status.NOT_FOUND).entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage()))
+        .build();
     }
   }
 
   public Response postAipRepresentationPreservationMetadataFile(HttpServletRequest request, String aipId,
-    String representationId, InputStream is, FormDataContentDisposition fileDetail) throws NotFoundException {
+    String representationId, InputStream is, FormDataContentDisposition fileDetail) {
     String authorization = request.getHeader("Authorization");
     try {
       // get user
@@ -512,12 +501,6 @@ public class AipsResourceImpl {
 
       // FIXME give a better answer
       return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
-    } catch (StorageServiceException | ModelServiceException e) {
-      if (e.getCode() == ModelServiceException.NOT_FOUND) {
-        throw new NotFoundException(e.getCode(), e.getMessage());
-      } else {
-        return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
-      }
     } catch (AuthorizationDeniedException e) {
       if (authorization == null) {
         return Response.status(Status.UNAUTHORIZED)
@@ -529,11 +512,14 @@ public class AipsResourceImpl {
       }
     } catch (GenericException e) {
       return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+    } catch (NotFoundException e) {
+      return Response.status(Status.NOT_FOUND).entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage()))
+        .build();
     }
   }
 
   public Response putAipRepresentationPreservationMetadataFile(HttpServletRequest request, String aipId,
-    String representationId, InputStream is, FormDataContentDisposition fileDetail) throws NotFoundException {
+    String representationId, InputStream is, FormDataContentDisposition fileDetail) {
     String authorization = request.getHeader("Authorization");
     try {
       // get user
@@ -543,12 +529,6 @@ public class AipsResourceImpl {
 
       // FIXME give a better answer
       return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
-    } catch (StorageServiceException | ModelServiceException e) {
-      if (e.getCode() == ModelServiceException.NOT_FOUND) {
-        throw new NotFoundException(e.getCode(), e.getMessage());
-      } else {
-        return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
-      }
     } catch (AuthorizationDeniedException e) {
       if (authorization == null) {
         return Response.status(Status.UNAUTHORIZED)
@@ -560,11 +540,14 @@ public class AipsResourceImpl {
       }
     } catch (GenericException e) {
       return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+    } catch (NotFoundException e) {
+      return Response.status(Status.NOT_FOUND).entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage()))
+        .build();
     }
   }
 
   public Response aipsAipIdPreservationMetadataRepresentationIdFileIdDelete(HttpServletRequest request, String aipId,
-    String representationId, String fileId) throws NotFoundException {
+    String representationId, String fileId) {
     String authorization = request.getHeader("Authorization");
     try {
       // get user
@@ -574,12 +557,6 @@ public class AipsResourceImpl {
 
       // FIXME give a better answer
       return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
-    } catch (ModelServiceException e) {
-      if (e.getCode() == ModelServiceException.NOT_FOUND) {
-        throw new NotFoundException(e.getCode(), e.getMessage());
-      } else {
-        return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
-      }
     } catch (AuthorizationDeniedException e) {
       if (authorization == null) {
         return Response.status(Status.UNAUTHORIZED)
@@ -591,6 +568,9 @@ public class AipsResourceImpl {
       }
     } catch (GenericException e) {
       return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+    } catch (NotFoundException e) {
+      return Response.status(Status.NOT_FOUND).entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage()))
+        .build();
     }
   }
 

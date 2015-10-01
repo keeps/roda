@@ -5,6 +5,7 @@ package config.i18n.client;
 
 import com.google.gwt.i18n.client.Messages;
 import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.user.client.ui.IsWidget;
 
 /**
  * @author Luis Faria
@@ -16,8 +17,26 @@ public interface BrowseMessages extends Messages {
   /******************* NEW MESSAGES ***********************/
   /*********************************************************/
   
-  @DefaultMessage("Error transforming metadata into HTML")
+  @DefaultMessage("Error in line {0}, column {1}: {2}")
+  SafeHtml metadataParseError(int line, int column, String message);
+
+  @DefaultMessage("Error")
+  SafeHtml notFoundErrorTitle();
+  
+  @DefaultMessage("Item with id {0} could not be found.")
+  SafeHtml notFoundErrorMessage(String id);
+
+  @DefaultMessage("Error")
+  SafeHtml genericErrorTitle();
+
+  @DefaultMessage("An unexpected error occurred when retrieving item. <pre><code>{0}</code></pre>")
+  SafeHtml genericErrorMessage(String message);
+  
+  @DefaultMessage("Error transforming descriptive metadata into HTML")
   SafeHtml descriptiveMetadataTranformToHTMLError();
+  
+  @DefaultMessage("Error transforming preservation metadata into HTML")
+  SafeHtml preservationMetadataTranformToHTMLError();
   
   /*********************************************************/
   /*********************************************************/
@@ -78,7 +97,8 @@ public interface BrowseMessages extends Messages {
   public String preservationRepTooltip(int numberOfFiles, long sizeOfFiles);
   
   
-  @DefaultMessage("Error in line {0}, column {1}: {2}")
-  SafeHtml metadataParseError(int line, int column, String message);
+
+
+  
 
 }

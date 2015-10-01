@@ -26,6 +26,7 @@ import config.i18n.server.BrowserServiceMessages;
 import pt.gov.dgarq.roda.common.I18nUtility;
 import pt.gov.dgarq.roda.common.RodaCoreFactory;
 import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
+import pt.gov.dgarq.roda.core.common.NotFoundException;
 import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.data.DescriptionObject;
 import pt.gov.dgarq.roda.core.data.EventPreservationObject;
@@ -72,7 +73,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   @Override
   public BrowseItemBundle getItemBundle(String aipId, String localeString)
-    throws AuthorizationDeniedException, GenericException {
+    throws AuthorizationDeniedException, GenericException, NotFoundException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     Locale locale = ServerTools.parseLocale(localeString);
     return Browser.getItemBundle(user, aipId, locale);
@@ -118,27 +119,27 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   @Override
   public SimpleDescriptionObject moveInHierarchy(String aipId, String parentId)
-    throws AuthorizationDeniedException, GenericException {
+    throws AuthorizationDeniedException, GenericException, NotFoundException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     return Browser.moveInHierarchy(user, aipId, parentId);
   }
 
   @Override
-  public String createAIP(String parentId) throws AuthorizationDeniedException, GenericException{
+  public String createAIP(String parentId) throws AuthorizationDeniedException, GenericException, NotFoundException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     return Browser.createAIP(user, parentId).getId();
 
   }
-  
+
   @Override
-  public void removeAIP(String aipId) throws AuthorizationDeniedException, GenericException {
+  public void removeAIP(String aipId) throws AuthorizationDeniedException, GenericException, NotFoundException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     Browser.removeAIP(user, aipId);
   }
 
   @Override
   public void createDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle bundle)
-    throws AuthorizationDeniedException, GenericException, MetadataParseException {
+    throws AuthorizationDeniedException, GenericException, MetadataParseException, NotFoundException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
 
     String descriptiveMetadataId = bundle.getId();
@@ -163,7 +164,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   @Override
   public void updateDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle bundle)
-    throws AuthorizationDeniedException, GenericException, MetadataParseException {
+    throws AuthorizationDeniedException, GenericException, MetadataParseException, NotFoundException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     String descriptiveMetadataId = bundle.getId();
     String descriptiveMetadataType = bundle.getType();

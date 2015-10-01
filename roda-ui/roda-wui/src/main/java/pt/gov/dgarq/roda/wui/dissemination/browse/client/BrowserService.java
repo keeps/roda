@@ -10,6 +10,7 @@ import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 
 import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
+import pt.gov.dgarq.roda.core.common.NotFoundException;
 import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.data.DescriptionObject;
 import pt.gov.dgarq.roda.core.data.RepresentationPreservationObject;
@@ -72,7 +73,8 @@ public interface BrowserService extends RemoteService {
   public IndexResult<SimpleDescriptionObject> findDescriptiveMetadata(Filter filter, Sorter sorter, Sublist sublist,
     Facets facets, String locale) throws RODAException;
 
-  public BrowseItemBundle getItemBundle(String aipId, String localeString) throws AuthorizationDeniedException, GenericException;
+  public BrowseItemBundle getItemBundle(String aipId, String localeString)
+    throws AuthorizationDeniedException, GenericException, NotFoundException;
 
   public DescriptiveMetadataEditBundle getDescriptiveMetadataEditBundle(String aipId, String descId)
     throws AuthorizationDeniedException, GenericException;
@@ -203,19 +205,17 @@ public interface BrowserService extends RemoteService {
 
   public SimpleDescriptionObject moveInHierarchy(String aipId, String parentId) throws RODAException;
 
-  public String createAIP(String parentId) throws AuthorizationDeniedException, GenericException;
-  public void removeAIP(String aipId) throws AuthorizationDeniedException, GenericException;
+  public String createAIP(String parentId) throws AuthorizationDeniedException, GenericException, NotFoundException;
+
+  public void removeAIP(String aipId) throws AuthorizationDeniedException, GenericException, NotFoundException;
 
   public void removeDescriptiveMetadataFile(String itemId, String descriptiveMetadataId) throws RODAException;
 
   public void updateDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle bundle)
-    throws AuthorizationDeniedException, GenericException, MetadataParseException;
+    throws AuthorizationDeniedException, GenericException, MetadataParseException, NotFoundException;
 
   public void createDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle newBundle)
-    throws AuthorizationDeniedException, GenericException, MetadataParseException;
-
-  
-
+    throws AuthorizationDeniedException, GenericException, MetadataParseException, NotFoundException;
 
   // public DescriptiveMetadata retrieveMetadataFile(String itemId, String
   // descriptiveMetadataId) throws RODAException;

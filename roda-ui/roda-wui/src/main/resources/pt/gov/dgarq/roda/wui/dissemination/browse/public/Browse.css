@@ -304,24 +304,6 @@
 	padding-top: 5px;
 }
 
-.metadataContent .error {
-	color: #D20707;
-    font-size: 1.2rem;
-}
-
-.metadataContent .error:before {
-	content: '\f071';
-	font-family: FontAwesome;
-	padding-left: 5px;
-	text-rendering: auto;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
-	margin-right: 5px;
-}
-
-.metadataContent .error pre>code {
-	color: black;
-}
 
 /* Tables for metadata content
 –––––––––––––––––––––––––––––––––––––––––––––––––– */

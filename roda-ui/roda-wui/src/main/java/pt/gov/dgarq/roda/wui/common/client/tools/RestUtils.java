@@ -70,7 +70,8 @@ public class RestUtils {
     b.append(QUERY_START).append(ATTR_ACCEPT_FORMAT).append(ATTR_ASSIGN_SYMBOL).append(ATTR_ACCEPT_FORMAT_HTML);
 
     // locale
-    b.append(QUERY_SEP).append(ATTR_LANG).append(ATTR_ASSIGN_SYMBOL).append(LocaleInfo.getCurrentLocale().getLocaleName());
+    b.append(QUERY_SEP).append(ATTR_LANG).append(ATTR_ASSIGN_SYMBOL)
+      .append(LocaleInfo.getCurrentLocale().getLocaleName());
 
     return b.toString();
   }
@@ -85,6 +86,31 @@ public class RestUtils {
     b.append(QUERY_START).append(ATTR_ACCEPT_FORMAT).append(ATTR_ASSIGN_SYMBOL).append(ATTR_ACCEPT_FORMAT_BIN);
 
     return UriUtils.fromSafeConstant(b.toString());
+  }
+
+  public static String createPreservationMetadataHTMLUri(String aipId, String repId, int startAgent, int limitAgent,
+    int startEvent, int limitEvent, int startFile, int limitFile) {
+    // api/v1/aips/{aip_id}/descriptive_metadata/{descId}?acceptFormat=xml
+    StringBuilder b = new StringBuilder();
+    // base uri
+    b.append(REST_V1_AIPS).append(UriUtils.encode(aipId)).append(SEP).append(PRESERVATION_METADATA).append(SEP)
+      .append(repId);
+    // accept format attribute
+    b.append(QUERY_START).append(ATTR_ACCEPT_FORMAT).append(ATTR_ASSIGN_SYMBOL).append(ATTR_ACCEPT_FORMAT_HTML);
+
+    // start and limits
+    b.append(QUERY_SEP).append("startAgent").append(ATTR_ASSIGN_SYMBOL).append(startAgent);
+    b.append(QUERY_SEP).append("limitAgent").append(ATTR_ASSIGN_SYMBOL).append(limitAgent);
+    b.append(QUERY_SEP).append("startEvent").append(ATTR_ASSIGN_SYMBOL).append(startEvent);
+    b.append(QUERY_SEP).append("limitEvent").append(ATTR_ASSIGN_SYMBOL).append(limitEvent);
+    b.append(QUERY_SEP).append("startFile").append(ATTR_ASSIGN_SYMBOL).append(startFile);
+    b.append(QUERY_SEP).append("limitFile").append(ATTR_ASSIGN_SYMBOL).append(limitFile);
+    
+    // locale
+    b.append(QUERY_SEP).append(ATTR_LANG).append(ATTR_ASSIGN_SYMBOL)
+      .append(LocaleInfo.getCurrentLocale().getLocaleName());
+
+    return b.toString();
   }
 
 }

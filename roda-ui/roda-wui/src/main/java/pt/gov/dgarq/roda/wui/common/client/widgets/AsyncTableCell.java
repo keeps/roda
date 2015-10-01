@@ -10,6 +10,7 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.ColumnSortEvent.AsyncHandler;
 import com.google.gwt.user.cellview.client.ColumnSortList;
+import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy.KeyboardSelectionPolicy;
 import com.google.gwt.user.cellview.client.PageSizePager;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -94,8 +95,9 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
         });
       }
     };
-    display = new AccessibleCellTable<>(getInitialPageSize(),
+    display = new AccessibleCellTable<T>(getInitialPageSize(),
       (MyCellTableResources) GWT.create(MyCellTableResources.class), getKeyProvider(), summary);
+    display.setKeyboardSelectionPolicy(KeyboardSelectionPolicy.DISABLED);
     
     configureDisplay(display);
     

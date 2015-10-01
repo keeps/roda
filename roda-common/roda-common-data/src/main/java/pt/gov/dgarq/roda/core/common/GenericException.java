@@ -1,9 +1,8 @@
+package pt.gov.dgarq.roda.core.common;
+
 /**
  * 
  */
-package pt.gov.dgarq.roda.wui.common.client;
-
-import pt.gov.dgarq.roda.core.common.RODAException;
 
 /**
  * @author Luis Faria
@@ -11,7 +10,7 @@ import pt.gov.dgarq.roda.core.common.RODAException;
  */
 public class GenericException extends RODAException {
 
-  private static final long serialVersionUID = 1541272912846000235L;
+  private static final long serialVersionUID = -2093798996190248576L;
 
   public GenericException() {
     super();
