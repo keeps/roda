@@ -4,6 +4,8 @@ import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.lang.StringUtils;
 
+import pt.gov.dgarq.roda.core.common.Pair;
+
 /**
  * API Utils
  * 
@@ -41,6 +43,33 @@ public class ApiUtils {
     }
 
     return mediaType;
+  }
+
+  /**
+   * Returns valid start (pair first elem) and limit (pair second elem) paging
+   * parameters defaulting to start = 0 and limit = 100 if none or invalid
+   * values are provided.
+   */
+  public static Pair<Integer, Integer> processPagingParams(String start, String limit) {
+    Integer startInteger, limitInteger;
+    try {
+      startInteger = Integer.parseInt(start);
+      if (startInteger < 0) {
+        startInteger = 0;
+      }
+    } catch (NumberFormatException e) {
+      startInteger = 0;
+    }
+    try {
+      limitInteger = Integer.parseInt(limit);
+      if (limitInteger < 0) {
+        limitInteger = 100;
+      }
+    } catch (NumberFormatException e) {
+      limitInteger = 100;
+    }
+
+    return new Pair<Integer, Integer>(startInteger, limitInteger);
   }
 
 }

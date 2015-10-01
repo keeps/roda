@@ -24,6 +24,7 @@ import javax.ws.rs.core.StreamingOutput;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.roda.api.v1.utils.ApiUtils;
 import org.roda.api.v1.utils.StreamResponse;
 import org.roda.common.ValidationUtils;
 import org.roda.index.IndexServiceException;
@@ -291,7 +292,7 @@ public class BrowserHelper {
       ModelService model = RodaCoreFactory.getModelService();
       StorageService storage = RodaCoreFactory.getStorageService();
       ClosableIterable<DescriptiveMetadata> metadata = model.listDescriptiveMetadataBinaries(aipId);
-      Pair<Integer, Integer> pagingParams = processPagingParams(start, limit);
+      Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
       int startInt = pagingParams.getFirst();
       int limitInt = pagingParams.getSecond();
       int counter = 0;
@@ -364,9 +365,8 @@ public class BrowserHelper {
     try {
       ModelService model = RodaCoreFactory.getModelService();
       StorageService storage = RodaCoreFactory.getStorageService();
-      // FIXME leak
       representations = model.listRepresentations(aipId);
-      Pair<Integer, Integer> pagingParams = processPagingParams(start, limit);
+      Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
       int startInt = pagingParams.getFirst();
       int limitInt = pagingParams.getSecond();
       int counter = 0;
@@ -418,46 +418,50 @@ public class BrowserHelper {
   }
 
   public static Pair<String, StreamingOutput> getAipRepresentationPreservationMetadata(String aipId,
-    String representationId, String startAgent, String limitAgent, String startEvent, String limitEvent, String startFile, String limitFile, String acceptFormat, String language)
+    String representationId, String startAgent, String limitAgent, String startEvent, String limitEvent,
+    String startFile, String limitFile, String acceptFormat, String language)
       throws ModelServiceException, StorageServiceException, GenericException {
     StorageService storage = RodaCoreFactory.getStorageService();
     ModelService model = RodaCoreFactory.getModelService();
     if (acceptFormat == null || acceptFormat.equalsIgnoreCase("bin")) {
       ClosableIterable<PreservationMetadata> preservationFiles = null;
       try {
-       
-        Pair<Integer, Integer> pagingParamsAgent = processPagingParams(startAgent, limitAgent);
+
+        Pair<Integer, Integer> pagingParamsAgent = ApiUtils.processPagingParams(startAgent, limitAgent);
         int counterAgent = 0;
-        Pair<Integer, Integer> pagingParamsEvent = processPagingParams(startEvent, limitEvent);
+        Pair<Integer, Integer> pagingParamsEvent = ApiUtils.processPagingParams(startEvent, limitEvent);
         int counterEvent = 0;
-        Pair<Integer, Integer> pagingParamsFile = processPagingParams(startFile, limitFile);
-        int counterFile=0;
+        Pair<Integer, Integer> pagingParamsFile = ApiUtils.processPagingParams(startFile, limitFile);
+        int counterFile = 0;
         List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
         preservationFiles = model.listPreservationMetadataBinaries(aipId, representationId);
         for (PreservationMetadata preservationFile : preservationFiles) {
           boolean add = false;
-          LOGGER.debug("TYPE:"+preservationFile.getType());
-          LOGGER.debug("COUNTEREVENT: "+counterEvent);
-          LOGGER.debug("LIMIT: "+pagingParamsEvent.getSecond());
-          
-          if(preservationFile.getType().equalsIgnoreCase("agent")){
-            if (counterAgent >= pagingParamsAgent.getFirst() && (counterAgent <= pagingParamsAgent.getSecond() || pagingParamsAgent.getSecond() == -1)) {
-              add=true;
+          LOGGER.debug("TYPE:" + preservationFile.getType());
+          LOGGER.debug("COUNTEREVENT: " + counterEvent);
+          LOGGER.debug("LIMIT: " + pagingParamsEvent.getSecond());
+
+          if (preservationFile.getType().equalsIgnoreCase("agent")) {
+            if (counterAgent >= pagingParamsAgent.getFirst()
+              && (counterAgent <= pagingParamsAgent.getSecond() || pagingParamsAgent.getSecond() == -1)) {
+              add = true;
             }
             counterAgent++;
-          }else if(preservationFile.getType().equalsIgnoreCase("event")){
-            if (counterEvent >= pagingParamsEvent.getFirst() && (counterEvent <= pagingParamsEvent.getSecond() || pagingParamsEvent.getSecond() == -1)) {
-              add=true;
+          } else if (preservationFile.getType().equalsIgnoreCase("event")) {
+            if (counterEvent >= pagingParamsEvent.getFirst()
+              && (counterEvent <= pagingParamsEvent.getSecond() || pagingParamsEvent.getSecond() == -1)) {
+              add = true;
             }
             counterEvent++;
-          }else if(preservationFile.getType().equalsIgnoreCase("file")){
-            if (counterFile >= pagingParamsFile.getFirst() && (counterFile <= pagingParamsFile.getSecond() || pagingParamsFile.getSecond() == -1)) {
-              add=true;
+          } else if (preservationFile.getType().equalsIgnoreCase("file")) {
+            if (counterFile >= pagingParamsFile.getFirst()
+              && (counterFile <= pagingParamsFile.getSecond() || pagingParamsFile.getSecond() == -1)) {
+              add = true;
             }
             counterFile++;
           }
-          
-          if(add){
+
+          if (add) {
             Binary binary = storage.getBinary(preservationFile.getStoragePath());
             ZipEntryInfo info = new ZipEntryInfo(preservationFile.getStoragePath().getName(),
               binary.getContent().createInputStream());
@@ -479,29 +483,41 @@ public class BrowserHelper {
           }
         }
       }
-    }else if(acceptFormat.equalsIgnoreCase("html")){
-      String filename = aipId + "_" + representationId+ ".html";
-      String mediaType = MediaType.TEXT_HTML;
-      ClosableIterable<PreservationMetadata> preservationMetadata = model
-        .listPreservationMetadataBinaries(aipId, representationId);
-      
-      String html = HTMLUtils.getRepresentationPreservationMetadataHtml(preservationMetadata, storage, ServerTools.parseLocale(language), startAgent, limitAgent, startEvent, limitEvent, startFile, limitFile);
+    } else if (acceptFormat.equalsIgnoreCase("html")) {
+      ClosableIterable<PreservationMetadata> preservationMetadata = null;
+      try {
+        String filename = aipId + "_" + representationId + ".html";
+        // FIXME
+        String mediaType = MediaType.TEXT_HTML;
+        preservationMetadata = model.listPreservationMetadataBinaries(aipId, representationId);
 
-      StreamingOutput stream = new StreamingOutput() {
-        @Override
-        public void write(OutputStream os) throws IOException, WebApplicationException {
-          PrintStream printStream = new PrintStream(os);
-          printStream.print(html);
-          printStream.close();
+        String html = HTMLUtils.getRepresentationPreservationMetadataHtml(preservationMetadata, storage,
+          ServerTools.parseLocale(language), startAgent, limitAgent, startEvent, limitEvent, startFile, limitFile);
+
+        StreamingOutput stream = new StreamingOutput() {
+          @Override
+          public void write(OutputStream os) throws IOException, WebApplicationException {
+            PrintStream printStream = new PrintStream(os);
+            printStream.print(html);
+            printStream.close();
+          }
+        };
+        return new Pair<String, StreamingOutput>(filename, stream);
+      } finally {
+        if (preservationMetadata != null) {
+          try {
+            preservationMetadata.close();
+          } catch (IOException e) {
+            // FIXME see what better exception should be thrown
+            throw new GenericException("");
+          }
         }
-      };
-      return new Pair<String, StreamingOutput>(filename, stream);
-    }else{
+      }
+
+    } else {
       return null;
     }
-    
 
-    
   }
 
   public static Pair<String, StreamingOutput> getAipRepresentationPreservationMetadataFile(String aipId,
@@ -697,33 +713,6 @@ public class BrowserHelper {
         throw new GenericException("Error retrieving metadata file: " + e.getMessage());
       }
     }
-  }
-
-  /**
-   * Returns valid start (pair first elem) and limit (pair second elem) paging
-   * parameters defaulting to start = 0 and limit = 100 if none or invalid
-   * values are provided.
-   */
-  private static Pair<Integer, Integer> processPagingParams(String start, String limit) {
-    Integer startInteger, limitInteger;
-    try {
-      startInteger = Integer.parseInt(start);
-      if (startInteger < 0) {
-        startInteger = 0;
-      }
-    } catch (NumberFormatException e) {
-      startInteger = 0;
-    }
-    try {
-      limitInteger = Integer.parseInt(limit);
-      if (limitInteger < 0) {
-        limitInteger = 100;
-      }
-    } catch (NumberFormatException e) {
-      limitInteger = 100;
-    }
-
-    return new Pair<Integer, Integer>(startInteger, limitInteger);
   }
 
   private static Pair<String, StreamingOutput> createZipReturnPair(List<ZipEntryInfo> zipEntries, String zipName) {

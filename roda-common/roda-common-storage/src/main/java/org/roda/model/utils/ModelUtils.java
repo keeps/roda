@@ -611,21 +611,21 @@ public final class ModelUtils {
     return ids;
   }
 
-  public static String getPreservationType(Binary b) {
+  public static String getPreservationType(Binary binary) {
     String type="";
-    EventComplexType event = ModelUtils.getPreservationEvent(b);
+    EventComplexType event = ModelUtils.getPreservationEvent(binary);
     if (event != null) {
       type="event";
     } else {
-      lc.xmlns.premisV2.File file = ModelUtils.getPreservationFileObject(b);
+      lc.xmlns.premisV2.File file = ModelUtils.getPreservationFileObject(binary);
       if (file != null) {
         type="file";
       } else {
-        AgentComplexType agent = ModelUtils.getPreservationAgentObject(b);
+        AgentComplexType agent = ModelUtils.getPreservationAgentObject(binary);
         if (agent != null) {
           type="agent";
         }else{
-          Representation representation = ModelUtils.getPreservationRepresentationObject(b);
+          Representation representation = ModelUtils.getPreservationRepresentationObject(binary);
           if(representation!=null){
             type="representation";
           }else{

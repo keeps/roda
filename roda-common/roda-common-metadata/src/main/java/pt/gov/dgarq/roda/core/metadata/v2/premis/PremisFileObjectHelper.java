@@ -9,9 +9,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.apache.xmlbeans.XmlException;
+import org.apache.xmlbeans.XmlObject;
+import org.w3c.util.DateParser;
+
 import lc.xmlns.premisV2.ContentLocationComplexType;
 import lc.xmlns.premisV2.CreatingApplicationComplexType;
-import lc.xmlns.premisV2.EventDocument;
 import lc.xmlns.premisV2.ExtensionComplexType;
 import lc.xmlns.premisV2.File;
 import lc.xmlns.premisV2.FixityComplexType;
@@ -26,12 +31,6 @@ import lc.xmlns.premisV2.PreservationLevelComplexType;
 import lc.xmlns.premisV2.StorageComplexType;
 import pt.gov.dgarq.roda.core.data.v2.Fixity;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationFilePreservationObject;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.apache.xmlbeans.XmlException;
-import org.apache.xmlbeans.XmlObject;
-import org.w3c.util.DateParser;
 
 /**
  * @author Rui Castro
