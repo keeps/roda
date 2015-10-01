@@ -13,8 +13,6 @@
 	<packaging>war</packaging>
 	<profiles>
 		<profile>
-			<!-- XXX this profile does not deploy all the services (e.g. REST will 
-				no be deployed) -->
 			<id>default</id>
 			<activation>
 				<activeByDefault>true</activeByDefault>
@@ -70,95 +68,6 @@
 								</goals>
 							</execution>
 						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>wui</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>gwt-maven-plugin</artifactId>
-						<configuration>
-							<runTarget>pt.gov.dgarq.roda.wui.main.Main/Main.html</runTarget>
-							<buildOutputDirectory>target/classes</buildOutputDirectory>
-						</configuration>
-						<executions>
-							<execution>
-								<id>compile-gwt</id>
-								<phase>prepare-package</phase>
-								<goals>
-									<goal>compile</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-war-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>default-war</id>
-								<phase>package</phase>
-								<goals>
-									<goal>war</goal>
-								</goals>
-								<configuration>
-									<webResources>
-										<resource>
-											<directory>${basedir}/src/main/WEB-INF/all/</directory>
-											<includes>
-												<include>web.xml</include>
-											</includes>
-											<targetPath>WEB-INF</targetPath>
-										</resource>
-									</webResources>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>dev-rest</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-war-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>default-war</id>
-								<phase>prepare-package</phase>
-								<goals>
-									<goal>war</goal>
-								</goals>
-								<configuration>
-									<webResources>
-										<resource>
-											<directory>${basedir}/src/main/WEB-INF/all/</directory>
-											<includes>
-												<include>web.xml</include>
-											</includes>
-											<targetPath>WEB-INF</targetPath>
-										</resource>
-									</webResources>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>org.mortbay.jetty</groupId>
-						<artifactId>maven-jetty-plugin</artifactId>
-						<version>6.1.26</version>
-						<configuration>
-							<scanIntervalSeconds>5</scanIntervalSeconds>
-							<contextPath>/</contextPath>
-							<webXml>${basedir}/src/main/WEB-INF/all/web.xml</webXml>
-						</configuration>
 					</plugin>
 				</plugins>
 			</build>

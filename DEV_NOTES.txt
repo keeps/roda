@@ -1,5 +1,3 @@
-REST Development
+Known problems
 ----------------
-* CD      : cd RODA_SOURCE_DIR
-* Compile : mvn clean install -pl roda-ui/roda-wui/ -am -Pdev-rest -Dmaven.test.skip
-* Run     : mvn jetty:run -pl roda-ui/roda-wui/ -Pdev-rest -Droda.home=RODA_INSTALL_DIR
+* Problems may araise when using GWT Dev Mode and having in the classpath a different jetty version

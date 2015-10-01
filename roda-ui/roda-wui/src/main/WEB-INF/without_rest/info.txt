@@ -1,1 +1,0 @@
-THIS SHOULD BE EQUAL TO THE ONE AVAILABLE AT src/main/webapp/WEB-INF/web.xml

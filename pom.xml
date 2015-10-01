@@ -26,31 +26,9 @@
 			<url>http://artifactory.keep.pt/keep</url>
 		</repository>
 		<repository>
-			<id>duraspace-third-party</id>
-			<name>DuraSpace Repository (third party)</name>
-			<url>http://m2.duraspace.org/content/repositories/thirdparty</url>
-		</repository>
-		<repository>
-			<id>duraspace-central</id>
-			<name>DuraSpace Repository (central)</name>
-			<url>http://m2.duraspace.org/content/repositories/central</url>
-		</repository>
-		<repository>
-			<id>duraspace-releases</id>
-			<name>DuraSpace Repository (releases)</name>
-			<url>http://m2.duraspace.org/content/repositories/releases</url>
-		</repository>
-		<repository>
 			<id>com.springsource.repository.bundles.external</id>
 			<name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
 			<url>http://repository.springsource.com/maven/bundles/external</url>
-		</repository>
-		<repository>
-			<!-- FIXME this repository should be removed as it isn't probably being 
-				used -->
-			<id>gwt</id>
-			<name>gwt</name>
-			<url>http://gwt-maven-rewraps.googlecode.com/git/</url>
 		</repository>
 		<repository>
 			<id>google-snapshots</id>
@@ -144,57 +122,19 @@
 				<module>roda-common/roda-common-utils</module>
 				<module>roda-common/roda-common-storage</module>
 				<module>roda-ui/roda-wui</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>wui-with-cas</id>
+			<modules>
+				<module>roda-common/roda-common-data</module>
+				<module>roda-common/roda-common-metadata</module>
+				<module>roda-common/roda-common-utils</module>
+				<module>roda-common/roda-common-storage</module>
+				<module>roda-ui/roda-wui</module>
 				<module>roda-cas</module>
 			</modules>
 		</profile>
-		<!-- <profile> -->
-		<!-- <id>all-but-ui</id> -->
-		<!-- <modules> -->
-		<!-- <module>roda-common</module> -->
-		<!-- <module>roda-core</module> -->
-		<!-- <module>roda-client</module> -->
-		<!-- <module>roda-handle</module> -->
-		<!-- <module>roda-migrator</module> -->
-		<!-- <module>roda-cas</module> -->
-		<!-- </modules> -->
-		<!-- </profile> -->
-		<!-- <profile> -->
-		<!-- <id>all-but-wui</id> -->
-		<!-- <modules> -->
-		<!-- <module>roda-common/roda-common-data</module> -->
-		<!-- <module>roda-common/roda-common-storage</module> -->
-		<!-- <module>roda-common/roda-common-servlet-security</module> -->
-		<!-- </modules> -->
-		<!-- </profile> -->
-		<!-- <profile> -->
-		<!-- <id>plugins</id> -->
-		<!-- <modules> -->
-		<!-- <module>roda-common</module> -->
-		<!-- <module>roda-core/roda-plugins</module> -->
-		<!-- <module>roda-core/roda-core-plugins</module> -->
-		<!-- <module>roda-core/fedora-client-utility</module> -->
-		<!-- <module>roda-client</module> -->
-		<!-- <module>roda-migrator</module> -->
-		<!-- </modules> -->
-		<!-- </profile> -->
-		<!-- <profile> -->
-		<!-- <id>core</id> -->
-		<!-- <modules> -->
-		<!-- <module>roda-common</module> -->
-		<!-- <module>roda-client</module> -->
-		<!-- <module>roda-core</module> -->
-		<!-- <module>roda-migrator/roda-migrator-client</module> -->
-		<!-- <module>roda-cas</module> -->
-		<!-- </modules> -->
-		<!-- </profile> -->
-		<!-- <profile> -->
-		<!-- <id>handle</id> -->
-		<!-- <modules> -->
-		<!-- <module>roda-handle</module> -->
-		<!-- <module>roda-common</module> -->
-		<!-- <module>roda-client</module> -->
-		<!-- </modules> -->
-		<!-- </profile> -->
 		<profile>
 			<id>wui</id>
 			<modules>
