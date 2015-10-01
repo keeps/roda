@@ -13,6 +13,10 @@ public final class RodaConstants {
     YEAR, MONTH, DAY, HOUR, MINUTE, SECOND, MILLISECOND
   }
 
+  public static final String I18N_BINARY_TO_HTML_PREFIX = "binaryToHtml.";
+  public static final String I18N_UI_SEARCH_FACETS_PREFIX = "ui.search.facets.";
+  public static final String I18N_UI_USER_ADMINISTRATION_FACETS_PREFIX = "ui.user_administration.facets.";
+
   /*
    * INDEX NAMES
    */

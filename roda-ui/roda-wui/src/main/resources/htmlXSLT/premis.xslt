@@ -10,26 +10,26 @@
 	<xsl:param name="events" />
 	<xsl:param name="files" />
 	<xsl:param name="agents" />
-	<xsl:param name="premisrepresentation" />
-	<xsl:param name="premispreservationlevel" />
-	<xsl:param name="premissince" />
-	<xsl:param name="premisderivedfrom" />
-	<xsl:param name="premissize" />
-	<xsl:param name="premisformat" />
-	<xsl:param name="premiscompositionlevel" />
-	<xsl:param name="premiscreatingapplicationname" />
-	<xsl:param name="premiscreatingapplicationversion" />
-	<xsl:param name="premisdetailedcharacteristics" />
-	<xsl:param name="premisfiles" />
-	<xsl:param name="premisevents" />
-	<xsl:param name="premisagents" />
-	<xsl:param name="premisdetails" />
-	<xsl:param name="premisresult" />
-	<xsl:param name="premisresultnote" />
-	<xsl:param name="premisresultextension" />
-	<xsl:param name="premisrelatedagents" />
-	<xsl:param name="premisrelatedobjects" />
-	<xsl:param name="premisthroughevent" />
+	<xsl:param name="binaryToHtml.premis.representation" />
+	<xsl:param name="binaryToHtml.premis.preservationlevel" />
+	<xsl:param name="binaryToHtml.premis.since" />
+	<xsl:param name="binaryToHtml.premis.derivedfrom" />
+	<xsl:param name="binaryToHtml.premis.size" />
+	<xsl:param name="binaryToHtml.premis.format" />
+	<xsl:param name="binaryToHtml.premis.compositionlevel" />
+	<xsl:param name="binaryToHtml.premis.creatingapplicationname" />
+	<xsl:param name="binaryToHtml.premis.creatingapplicationversion" />
+	<xsl:param name="binaryToHtml.premis.detailedcharacteristics" />
+	<xsl:param name="binaryToHtml.premis.files" />
+	<xsl:param name="binaryToHtml.premis.events" />
+	<xsl:param name="binaryToHtml.premis.agents" />
+	<xsl:param name="binaryToHtml.premis.details" />
+	<xsl:param name="binaryToHtml.premis.result" />
+	<xsl:param name="binaryToHtml.premis.resultnote" />
+	<xsl:param name="binaryToHtml.premis.resultextension" />
+	<xsl:param name="binaryToHtml.premis.relatedagents" />
+	<xsl:param name="binaryToHtml.premis.relatedobjects" />
+	<xsl:param name="binaryToHtml.premis.throughevent" />
 	<xsl:template match="/">
 		<xsl:apply-templates />
 	</xsl:template>
@@ -74,7 +74,7 @@
 				<xsl:attribute name="id"><xsl:value-of
 					select="normalize-space(prem:objectIdentifier[1]/prem:objectIdentifierValue/text())" /></xsl:attribute>
 				<span class="header">
-					<xsl:value-of select="$premisrepresentation" />
+					<xsl:value-of select="$binaryToHtml.premis.representation" />
 					<xsl:if test="prem:objectIdentifier">
 						<span class="identifiers">
 							<xsl:for-each select="prem:objectIdentifier">
@@ -95,11 +95,11 @@
 				<xsl:if test="prem:preservationLevel">
 					<xsl:for-each select="prem:preservationLevel">
 						<span class="preservationLevel">
-							<xsl:value-of select="$premispreservationlevel" />
+							<xsl:value-of select="$binaryToHtml.premis.preservationlevel" />
 							<xsl:text> </xsl:text>
 							<xsl:value-of select="prem:preservationLevelValue/text()" />
 							<xsl:text> </xsl:text>
-							<xsl:value-of select="$premissince" />
+							<xsl:value-of select="$binaryToHtml.premis.since" />
 							<xsl:text> </xsl:text>
 							<xsl:value-of select="prem:preservationLevelDateAssigned/text()" />
 						</span>
@@ -109,7 +109,7 @@
 					<xsl:for-each select="prem:relationship">
 						<xsl:if test="prem:relationshipType/text()='derivation'">
 							<span class="derivation">
-								<xsl:value-of select="$premisderivedfrom" /><xsl:text> </xsl:text>
+								<xsl:value-of select="$binaryToHtml.premis.derivedfrom" /><xsl:text> </xsl:text>
 								<a>
 									<xsl:attribute name="href">#<xsl:value-of
 										select="prem:relatedObjectIdentification/prem:relatedObjectIdentifierValue/text()" /></xsl:attribute>
@@ -118,7 +118,7 @@
 										select="prem:relatedObjectIdentification/prem:relatedObjectIdentifierValue/text()" />
 								</a>
 								<xsl:text> </xsl:text>
-								<xsl:value-of select="$premisthroughevent" />
+								<xsl:value-of select="$binaryToHtml.premis.throughevent" />
 								<xsl:text> </xsl:text>
 								<a>
 									<xsl:attribute name="href">#<xsl:value-of
@@ -162,7 +162,7 @@
 					<xsl:if test="prem:objectCharacteristics/prem:size">
 						<span class="field size">
 							<span class="field-label">
-								<xsl:value-of select="$premissize" />
+								<xsl:value-of select="$binaryToHtml.premis.size" />
 							</span>
 							<span class="field-value">
 								<xsl:value-of select="prem:objectCharacteristics/prem:size/text()" />
@@ -172,7 +172,7 @@
 					<xsl:if test="prem:objectCharacteristics/prem:format">
 						<span class="field format">
 							<span class="field-label">
-								<xsl:value-of select="$premisformat" />
+								<xsl:value-of select="$binaryToHtml.premis.format" />
 							</span>
 							<span class="field-value">
 								<xsl:if
@@ -234,7 +234,7 @@
 					<xsl:if test="prem:objectCharacteristics/prem:compositionLevel">
 						<span class="field compositionLevel">
 							<span class="field-label">
-								<xsl:value-of select="$premiscompositionlevel" />
+								<xsl:value-of select="$binaryToHtml.premis.compositionlevel" />
 							</span>
 							<span class="field-value">
 								<xsl:value-of
@@ -248,7 +248,7 @@
 							test="prem:objectCharacteristics/prem:creatingApplication/prem:creatingApplicationName">
 							<span class="field creatingApplicationName">
 								<span class="field-label">
-									<xsl:value-of select="$premiscreatingapplicationname" />
+									<xsl:value-of select="$binaryToHtml.premis.creatingapplicationname" />
 								</span>
 								<span class="field-value">
 									<xsl:value-of
@@ -260,7 +260,7 @@
 							test="prem:objectCharacteristics/prem:creatingApplication/prem:creatingApplicationVersion">
 							<span class="field creatingApplicationVersion">
 								<span class="field-label">
-									<xsl:value-of select="$premiscreatingapplicationversion" />
+									<xsl:value-of select="$binaryToHtml.premis.creatingapplicationversion" />
 								</span>
 								<span class="field-value">
 									<xsl:value-of
@@ -292,7 +292,7 @@
 						test="prem:objectCharacteristics/prem:objectCharacteristicsExtension">
 						<span class="field objectCharacteristicsExtension">
 							<span class="field-label">
-								<xsl:value-of select="$premisdetailedcharacteristics" />
+								<xsl:value-of select="$binaryToHtml.premis.detailedcharacteristics" />
 							</span>
 							<span class="field-value">
 								<pre>
@@ -316,7 +316,7 @@
 		<xsl:if test="prem:relationship">
 			<span class="section files">
 				<span class="sectionTitle">
-					<xsl:value-of select="$premisfiles" />
+					<xsl:value-of select="$binaryToHtml.premis.files" />
 				</span>
 				<span class="sectionContent">
 					<xsl:for-each select="$files">
@@ -328,7 +328,7 @@
 			<xsl:if test="count($events) gt 0">
 				<span class="section events">
 					<span class="sectionTitle">
-						<xsl:value-of select="$premisevents" />
+						<xsl:value-of select="$binaryToHtml.premis.events" />
 					</span>
 					<span class="sectionContent">
 						<xsl:for-each select="$events">
@@ -341,7 +341,7 @@
 			<xsl:if test="count($agents) gt 0">
 				<span class="section agents">
 					<span class="sectionTitle">
-						<xsl:value-of select="$premisagents" />
+						<xsl:value-of select="$binaryToHtml.premis.agents" />
 					</span>
 					<span class="sectionContent">
 						<xsl:for-each select="$agents">
@@ -387,7 +387,7 @@
 				<xsl:if test="prem:eventDetail">
 					<span class="field eventDetail">
 						<span class="field-label">
-							<xsl:value-of select="$premisdetails" />
+							<xsl:value-of select="$binaryToHtml.premis.details" />
 						</span>
 						<span class="field-value">
 							<xsl:value-of select="prem:eventDetail/text()" />
@@ -397,7 +397,7 @@
 				<xsl:if test="prem:eventOutcomeInformation/prem:eventOutcome">
 					<span class="field eventOutcome">
 						<span class="field-label">
-							<xsl:value-of select="$premisresult" />
+							<xsl:value-of select="$binaryToHtml.premis.result" />
 						</span>
 						<span class="field-value">
 							<xsl:value-of
@@ -409,7 +409,7 @@
 					test="prem:eventOutcomeInformation/prem:eventOutcomeDetail/prem:eventOutcomeDetailNote">
 					<span class="field eventOutcome">
 						<span class="field-label">
-							<xsl:value-of select="$premisresultnote" />
+							<xsl:value-of select="$binaryToHtml.premis.resultnote" />
 						</span>
 						<span class="field-value">
 							<xsl:value-of
@@ -421,7 +421,7 @@
 					test="prem:eventOutcomeInformation/prem:eventOutcomeDetail/prem:eventOutcomeDetailExtension">
 					<span class="field eventOutcome">
 						<span class="field-label">
-							<xsl:value-of select="$premisresultextension" />
+							<xsl:value-of select="$binaryToHtml.premis.resultextension" />
 						</span>
 						<span class="field-value">
 							<pre>
@@ -436,7 +436,7 @@
 				<xsl:if test="prem:linkingAgentIdentifier">
 					<span class="field linkingAgents">
 						<span class="field-label">
-							<xsl:value-of select="$premisrelatedagents" />
+							<xsl:value-of select="$binaryToHtml.premis.relatedagents" />
 						</span>
 						<span class="field-value">
 							<xsl:for-each select="prem:linkingAgentIdentifier">
@@ -462,7 +462,7 @@
 				<xsl:if test="prem:linkingObjectIdentifier">
 					<span class="field linkingObjects">
 						<span class="field-label">
-							<xsl:value-of select="$premisrelatedobjects" />
+							<xsl:value-of select="$binaryToHtml.premis.relatedobjects" />
 						</span>
 						<span class="field-value">
 							<xsl:for-each select="prem:linkingObjectIdentifier">

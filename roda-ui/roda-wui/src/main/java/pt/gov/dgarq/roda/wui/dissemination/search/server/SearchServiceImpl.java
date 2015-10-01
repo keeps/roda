@@ -2,6 +2,7 @@ package pt.gov.dgarq.roda.wui.dissemination.search.server;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.log4j.Logger;
 import org.roda.index.IndexService;
@@ -9,6 +10,7 @@ import org.roda.index.IndexServiceException;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
+import config.i18n.server.Messages;
 import pt.gov.dgarq.roda.common.RodaCoreFactory;
 import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
@@ -94,17 +96,17 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
     List<SearchField> searchFields = new ArrayList<SearchField>();
     String fieldsNamesString = RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields");
     if (fieldsNamesString != null) {
+      Messages messages = RodaCoreFactory.getI18NMessages(new Locale(localeString));
       String[] fields = fieldsNamesString.split(",");
       for (String field : fields) {
         SearchField searchField = new SearchField();
         String fieldName = RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "field");
         String fieldType = RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "type");
-        String fieldLabel = RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "label",
-          localeString);
+        String fieldLabelI18N = RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "i18n");
 
         searchField.setField(fieldName);
         searchField.setType(fieldType);
-        searchField.setLabel(fieldLabel);
+        searchField.setLabel(messages.getTranslation(fieldLabelI18N));
 
         searchFields.add(searchField);
       }

@@ -44,7 +44,7 @@ import org.roda.storage.StorageService;
 import org.roda.storage.StorageServiceException;
 import org.roda.storage.fs.FSUtils;
 
-import config.i18n.server.XSLTMessages;
+import config.i18n.server.Messages;
 import pt.gov.dgarq.roda.common.HTMLUtils;
 import pt.gov.dgarq.roda.common.RodaCoreFactory;
 import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
@@ -130,12 +130,12 @@ public class BrowserHelper {
 
     List<DescriptiveMetadataViewBundle> descriptiveMetadataList = new ArrayList<DescriptiveMetadataViewBundle>();
     try {
+      Messages messages = RodaCoreFactory.getI18NMessages(locale);
       for (DescriptiveMetadata descriptiveMetadata : listDescriptiveMetadataBinaries) {
         DescriptiveMetadataViewBundle bundle = new DescriptiveMetadataViewBundle();
         bundle.setId(descriptiveMetadata.getId());
-        XSLTMessages messages = RodaCoreFactory.getXSLTMessages(locale);
         try {
-          bundle.setLabel(messages.getString(descriptiveMetadata.getId()));
+          bundle.setLabel(messages.getTranslation(descriptiveMetadata.getId()));
         } catch (MissingResourceException e) {
           bundle.setLabel(descriptiveMetadata.getId());
         }

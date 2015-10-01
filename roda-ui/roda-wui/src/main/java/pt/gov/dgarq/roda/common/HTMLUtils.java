@@ -30,7 +30,7 @@ import org.roda.storage.ClosableIterable;
 import org.roda.storage.StorageService;
 import org.roda.storage.StorageServiceException;
 
-import config.i18n.server.XSLTMessages;
+import config.i18n.server.Messages;
 import lc.xmlns.premisV2.AgentComplexType;
 import lc.xmlns.premisV2.EventComplexType;
 import lc.xmlns.premisV2.File;
@@ -55,24 +55,18 @@ public final class HTMLUtils {
 
   }
 
-  public static String descriptiveMetadataToHtml(Binary binary, final Locale locale) 
-  throws ModelServiceException, TransformerException {
-    Map<String, Object> stylesheetOpt = new HashMap<String, Object>();
-    XSLTMessages messages = RodaCoreFactory.getXSLTMessages(locale);
-    for (Map.Entry<String, String> entry : messages.getTranslations(binary.getStoragePath().getName()).entrySet()) {
-      stylesheetOpt.put(entry.getKey(), entry.getValue());
-    }
-    return binaryToHtml(binary, true, null, stylesheetOpt);
+  public static String descriptiveMetadataToHtml(Binary binary, final Locale locale)
+    throws ModelServiceException, TransformerException {
+    Messages messages = RodaCoreFactory.getI18NMessages(locale);
+    return binaryToHtml(binary, true, null, messages
+      .getTranslations(RodaConstants.I18N_BINARY_TO_HTML_PREFIX + binary.getStoragePath().getName(), Object.class));
   }
 
   public static String preservationObjectToHtml(Binary binary, final Locale locale)
     throws ModelServiceException, TransformerException {
-    Map<String, Object> stylesheetOpt = new HashMap<String, Object>();
-    stylesheetOpt.put("prefix", RodaConstants.INDEX_OTHER_DESCRIPTIVE_DATA_PREFIX);
-    XSLTMessages messages = RodaCoreFactory.getXSLTMessages(locale);
-    for (Map.Entry<String, String> entry : messages.getTranslations("premis").entrySet()) {
-      stylesheetOpt.put(entry.getKey(), entry.getValue());
-    }
+    Messages messages = RodaCoreFactory.getI18NMessages(locale);
+    Map<String, Object> stylesheetOpt = messages
+      .getTranslations(RodaConstants.I18N_BINARY_TO_HTML_PREFIX + binary.getStoragePath().getName(), Object.class);
     return binaryToHtml(binary, false, "premis", stylesheetOpt);
   }
 
@@ -189,7 +183,6 @@ public final class HTMLUtils {
       throws ModelServiceException, StorageServiceException, TransformerException {
 
     Map<String, Object> stylesheetOpt = new HashMap<String, Object>();
-    stylesheetOpt.put("prefix", RodaConstants.INDEX_OTHER_DESCRIPTIVE_DATA_PREFIX);
 
     Pair<Integer, Integer> pagingParamsAgent = ApiUtils.processPagingParams(startAgent, limitAgent);
     int counterAgent = 0;
@@ -285,10 +278,8 @@ public final class HTMLUtils {
     }
     stylesheetOpt.put("agents", htmlAgents);
 
-    XSLTMessages messages = RodaCoreFactory.getXSLTMessages(locale);
-    for (Map.Entry<String, String> entry : messages.getTranslations("premis").entrySet()) {
-      stylesheetOpt.put(entry.getKey(), entry.getValue());
-    }
+    Messages messages = RodaCoreFactory.getI18NMessages(locale);
+    stylesheetOpt.putAll(messages.getTranslations(RodaConstants.I18N_BINARY_TO_HTML_PREFIX + "premis", Object.class));
 
     String html = binaryToHtml(representation, false, "premis", stylesheetOpt);
     return html;

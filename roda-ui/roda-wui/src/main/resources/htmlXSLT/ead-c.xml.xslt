@@ -5,38 +5,38 @@
 	<xsl:output method="xml" indent="yes" encoding="UTF-8"
 		omit-xml-declaration="yes" />
 
-	<xsl:param name="eadcxmltitle" />
-	<xsl:param name="eadcxmllevel" />
-	<xsl:param name="eadcxmlinitialdate" />
-	<xsl:param name="eadcxmlfinaldate" />
-	<xsl:param name="eadcxmlrepositorycode" />
-	<xsl:param name="eadcxmlreference" />
-	<xsl:param name="eadcxmlacquisitionnumber" />
-	<xsl:param name="eadcxmlorigination" />
-	<xsl:param name="eadcxmlacquisitiondate" />
-	<xsl:param name="eadcxmlmaterialspecification" />
-	<xsl:param name="eadcxmlphysicaldescription" />
-	<xsl:param name="eadcxmldateofinitialphysicaldescription" />
-	<xsl:param name="eadcxmldateoffinalphysicaldescription" />
-	<xsl:param name="eadcxmldimensions" />
-	<xsl:param name="eadcxmlfacetorappearance" />
-	<xsl:param name="eadcxmlextent" />
-	<xsl:param name="eadcxmllanguages" />
-	<xsl:param name="eadcxmlquote" />
-	<xsl:param name="eadcxmladministrativeandbiographicalhistory" />
-	<xsl:param name="eadcxmlcustodialhistory" />
-	<xsl:param name="eadcxmlacquisitioninformation" />
-	<xsl:param name="eadcxmldescription" />
-	<xsl:param name="eadcxmlorganizationandordering" />
-	<xsl:param name="eadcxmlappraisal" />
-	<xsl:param name="eadcxmlaccruals" />
-	<xsl:param name="eadcxmlphysicalcharacteristicsandtechnicalrequirements" />
-	<xsl:param name="eadcxmlaccessrestrictions" />
-	<xsl:param name="eadcxmlreproductionrestrictions" />
-	<xsl:param name="eadcxmlrelatedmaterials" />
-	<xsl:param name="eadcxmlotherfindaids" />
-	<xsl:param name="eadcxmlnotes" />
-	<xsl:param name="eadcxmlbibliography" />
+	<xsl:param name="binaryToHtml.ead-c.xml.title" />
+	<xsl:param name="binaryToHtml.ead-c.xml.level" />
+	<xsl:param name="binaryToHtml.ead-c.xml.initialdate" />
+	<xsl:param name="binaryToHtml.ead-c.xml.finaldate" />
+	<xsl:param name="binaryToHtml.ead-c.xml.repositorycode" />
+	<xsl:param name="binaryToHtml.ead-c.xml.reference" />
+	<xsl:param name="binaryToHtml.ead-c.xml.acquisitionnumber" />
+	<xsl:param name="binaryToHtml.ead-c.xml.origination" />
+	<xsl:param name="binaryToHtml.ead-c.xml.acquisitiondate" />
+	<xsl:param name="binaryToHtml.ead-c.xml.materialspecification" />
+	<xsl:param name="binaryToHtml.ead-c.xml.physicaldescription" />
+	<xsl:param name="binaryToHtml.ead-c.xml.dateofinitialphysicaldescription" />
+	<xsl:param name="binaryToHtml.ead-c.xml.dateoffinalphysicaldescription" />
+	<xsl:param name="binaryToHtml.ead-c.xml.dimensions" />
+	<xsl:param name="binaryToHtml.ead-c.xml.facetorappearance" />
+	<xsl:param name="binaryToHtml.ead-c.xml.extent" />
+	<xsl:param name="binaryToHtml.ead-c.xml.languages" />
+	<xsl:param name="binaryToHtml.ead-c.xml.quote" />
+	<xsl:param name="binaryToHtml.ead-c.xml.administrativeandbiographicalhistory" />
+	<xsl:param name="binaryToHtml.ead-c.xml.custodialhistory" />
+	<xsl:param name="binaryToHtml.ead-c.xml.acquisitioninformation" />
+	<xsl:param name="binaryToHtml.ead-c.xml.description" />
+	<xsl:param name="binaryToHtml.ead-c.xml.organizationandordering" />
+	<xsl:param name="binaryToHtml.ead-c.xml.appraisal" />
+	<xsl:param name="binaryToHtml.ead-c.xml.accruals" />
+	<xsl:param name="binaryToHtml.ead-c.xml.physicalcharacteristicsandtechnicalrequirements" />
+	<xsl:param name="binaryToHtml.ead-c.xml.accessrestrictions" />
+	<xsl:param name="binaryToHtml.ead-c.xml.reproductionrestrictions" />
+	<xsl:param name="binaryToHtml.ead-c.xml.relatedmaterials" />
+	<xsl:param name="binaryToHtml.ead-c.xml.otherfindaids" />
+	<xsl:param name="binaryToHtml.ead-c.xml.notes" />
+	<xsl:param name="binaryToHtml.ead-c.xml.bibliography" />
 	<xsl:template match="/">
 		<div class="descriptiveMetadata">
 			<xsl:apply-templates />
@@ -48,7 +48,7 @@
 		<xsl:if test="eadc:did/eadc:unittitle/text()">
 			<div class="descriptiveMetadata-field">
 				<div class="descriptiveMetadata-field-key">
-					<xsl:value-of select="$eadcxmltitle" />
+					<xsl:value-of select="$binaryToHtml.ead-c.xml.title"/>
 				</div>
 				<div class="descriptiveMetadata-field-value">
 					<xsl:value-of select="eadc:did/eadc:unittitle/text()" />
@@ -58,7 +58,7 @@
 		<xsl:if test="@level">
 			<div class="descriptiveMetadata-field">
 				<div class="descriptiveMetadata-field-key">
-					<xsl:value-of select="$eadcxmllevel" />
+					<xsl:value-of select="$binaryToHtml.ead-c.xml.level" />
 				</div>
 				<div class="descriptiveMetadata-field-value">
 					<xsl:value-of select="@level" />
@@ -71,7 +71,7 @@
 				<xsl:when test="contains(eadc:did/eadc:unitdate/@normal, '/')">
 					<div class="descriptiveMetadata-field">
 						<div class="descriptiveMetadata-field-key">
-							<xsl:value-of select="$eadcxmlinitialdate" />
+							<xsl:value-of select="$binaryToHtml.ead-c.xml.initialdate" />
 						</div>
 						<div class="descriptiveMetadata-field-value">
 							<span class="value">
@@ -82,7 +82,7 @@
 					</div>
 					<div class="descriptiveMetadata-field">
 						<div class="descriptiveMetadata-field-key">
-							<xsl:value-of select="$eadcxmlfinaldate" />
+							<xsl:value-of select="$binaryToHtml.ead-c.xml.finaldate" />
 						</div>
 						<div class="descriptiveMetadata-field-value">
 							<span class="value">
@@ -95,7 +95,7 @@
 				<xsl:otherwise>
 					<div class="descriptiveMetadata-field">
 						<div class="descriptiveMetadata-field-key">
-							<xsl:value-of select="$eadcxmlinitialdate" />
+							<xsl:value-of select="$binaryToHtml.ead-c.xml.initialdate" />
 						</div>
 						<div class="descriptiveMetadata-field-value">
 							<span class="value">
@@ -110,7 +110,7 @@
 		<xsl:if test="eadc:did/eadc:unitid/@repositorycode">
 			<div class="descriptiveMetadata-field">
 				<div class="descriptiveMetadata-field-key">
-					<xsl:value-of select="$eadcxmlrepositorycode" />
+					<xsl:value-of select="$binaryToHtml.ead-c.xml.repositorycode" />
 				</div>
 				<div class="descriptiveMetadata-field-value">
 					<xsl:value-of select="eadc:did/eadc:unitid/@repositorycode" />
@@ -120,7 +120,7 @@
 		<xsl:if test="eadc:did/eadc:unitid/text()">
 			<div class="descriptiveMetadata-field">
 				<div class="descriptiveMetadata-field-key">
-					<xsl:value-of select="$eadcxmlreference" />
+					<xsl:value-of select="$binaryToHtml.ead-c.xml.reference" />
 				</div>
 				<div class="descriptiveMetadata-field-value">
 					<xsl:value-of select="eadc:did/eadc:unitid/text()" />
@@ -130,7 +130,7 @@
 		<xsl:if test="eadc:did/eadc:origination/text()">
 			<div class="descriptiveMetadata-field">
 				<div class="descriptiveMetadata-field-key">
-					<xsl:value-of select="$eadcxmlorigination" />
+					<xsl:value-of select="$binaryToHtml.ead-c.xml.origination" />
 				</div>
 				<div class="descriptiveMetadata-field-value">
 					<xsl:value-of select="eadc:did/eadc:origination/text()" />
@@ -140,7 +140,7 @@
 		<xsl:if test="eadc:acqinfo/eadc:num/text()">
 			<div class="descriptiveMetadata-field">
 				<div class="descriptiveMetadata-field-key">
-					<xsl:value-of select="$eadcxmlacquisitionnumber" />
+					<xsl:value-of select="$binaryToHtml.ead-c.xml.acquisitionnumber" />
 				</div>
 				<div class="descriptiveMetadata-field-value">
 					<xsl:value-of select="eadc:acqinfo/eadc:num/text()" />
@@ -150,7 +150,7 @@
 		<xsl:if test="eadc:acqinfo/eadc:date/text()">
 			<div class="descriptiveMetadata-field">
 				<div class="descriptiveMetadata-field-key">
-					<xsl:value-of select="$eadcxmlacquisitiondate" />
+					<xsl:value-of select="$binaryToHtml.ead-c.xml.acquisitiondate" />
 				</div>
 				<div class="descriptiveMetadata-field-value">
 					<xsl:value-of select="eadc:acqinfo/eadc:date/text()" />
@@ -160,7 +160,7 @@
 		<xsl:if test="eadc:did/eadc:materialspec/text()">
 			<div class="descriptiveMetadata-field">
 				<div class="descriptiveMetadata-field-key">
-					<xsl:value-of select="$eadcxmlmaterialspecification" />
+					<xsl:value-of select="$binaryToHtml.ead-c.xml.materialspecification" />
 				</div>
 				<div class="descriptiveMetadata-field-value">
 					<xsl:value-of select="eadc:did/eadc:materialspec/text()" />
@@ -170,7 +170,7 @@
 		<xsl:if test="eadc:did/eadc:physdesc/eadc:p/text()">
 			<div class="descriptiveMetadata-field">
 				<div class="descriptiveMetadata-field-key">
-					<xsl:value-of select="$eadcxmlphysicaldescription" />
+					<xsl:value-of select="$binaryToHtml.ead-c.xml.physicaldescription" />
 				</div>
 				<div class="descriptiveMetadata-field-value">
 					<span class="value">
@@ -190,7 +190,7 @@
 				<xsl:when test="contains(eadc:did/eadc:physdesc/eadc:date/@normal, '/')">
 					<div class="descriptiveMetadata-field">
 						<div class="descriptiveMetadata-field-key">
-							<xsl:value-of select="$eadcxmldateofinitialphysicaldescription" />
+							<xsl:value-of select="$binaryToHtml.ead-c.xml.dateofinitialphysicaldescription" />
 						</div>
 						<div class="descriptiveMetadata-field-value">
 							<span class="value">
@@ -201,7 +201,7 @@
 					</div>
 					<div class="descriptiveMetadata-field">
 						<div class="descriptiveMetadata-field-key">
-							<xsl:value-of select="$eadcxmldateoffinalphysicaldescription" />
+							<xsl:value-of select="$binaryToHtml.ead-c.xml.dateoffinalphysicaldescription" />
 						</div>
 						<div class="descriptiveMetadata-field-value">
 							<span class="value">
@@ -214,7 +214,7 @@
 				<xsl:otherwise>
 					<div class="descriptiveMetadata-field">
 						<div class="descriptiveMetadata-field-key">
-							<xsl:value-of select="$eadcxmldateofinitialphysicaldescription" />
+							<xsl:value-of select="$binaryToHtml.ead-c.xml.dateofinitialphysicaldescription" />
 						</div>
 						<div class="descriptiveMetadata-field-value">
 							<span class="value">
@@ -228,7 +228,7 @@
 		<xsl:if test="eadc:did/eadc:physdesc/eadc:dimensions/text()">
 			<div class="descriptiveMetadata-field">
 				<div class="descriptiveMetadata-field-key">
-					<xsl:value-of select="$eadcxmldimensions" />
+					<xsl:value-of select="$binaryToHtml.ead-c.xml.dimensions" />
 				</div>
 				<div class="descriptiveMetadata-field-value">
 					<span class="value">
@@ -245,7 +245,7 @@
 		<xsl:if test="eadc:did/eadc:physdesc/eadc:physfacet/text()">
 			<div class="descriptiveMetadata-field">
 				<div class="descriptiveMetadata-field-key">
-					<xsl:value-of select="$eadcxmlfacetorappearance" />
+					<xsl:value-of select="$binaryToHtml.ead-c.xml.facetorappearance" />
 				</div>
 				<div class="descriptiveMetadata-field-value">
 					<span class="value">
@@ -262,7 +262,7 @@
 		<xsl:if test="eadc:did/eadc:physdesc/eadc:extent/text()">
 			<div class="descriptiveMetadata-field">
 				<div class="descriptiveMetadata-field-key">
-					<xsl:value-of select="$eadcxmlextent" />
+					<xsl:value-of select="$binaryToHtml.ead-c.xml.extent" />
 				</div>
 				<div class="descriptiveMetadata-field-value">
 					<span class="value">
@@ -279,7 +279,7 @@
 		<xsl:if test="eadc:did/eadc:langmaterial">
 			<div class="descriptiveMetadata-field">
 				<div class="descriptiveMetadata-field-key">
-					<xsl:value-of select="$eadcxmllanguages" />
+					<xsl:value-of select="$binaryToHtml.ead-c.xml.languages" />
 				</div>
 				<xsl:for-each select="eadc:did/eadc:langmaterial/eadc:language">
 					<div class="descriptiveMetadata-field-value">
@@ -291,7 +291,7 @@
 		<xsl:if test="eadc:prefercite/eadc:p/text()">
 			<div class="descriptiveMetadata-field">
 				<div class="descriptiveMetadata-field-key">
-					<xsl:value-of select="$eadcxmlquote" />
+					<xsl:value-of select="$binaryToHtml.ead-c.xml.quote" />
 				</div>
 				<div class="descriptiveMetadata-field-value">
 					<xsl:value-of select="eadc:prefercite/eadc:p/text()" />
@@ -301,7 +301,7 @@
 		<xsl:if test="eadc:bioghist/eadc:p/text()">
 			<div class="descriptiveMetadata-field">
 				<div class="descriptiveMetadata-field-key">
-					<xsl:value-of select="$eadcxmladministrativeandbiographicalhistory" />
+					<xsl:value-of select="$binaryToHtml.ead-c.xml.administrativeandbiographicalhistory" />
 				</div>
 				<div class="descriptiveMetadata-field-value">
 					<xsl:value-of select="eadc:bioghist/eadc:p/text()" />
@@ -311,7 +311,7 @@
 		<xsl:if test="eadc:bioghist/eadc:chronlist">
 			<div class="descriptiveMetadata-field">
 				<div class="descriptiveMetadata-field-key">
-					<xsl:value-of select="$eadcxmladministrativeandbiographicalhistory" />
+					<xsl:value-of select="$binaryToHtml.ead-c.xml.administrativeandbiographicalhistory" />
 				</div>
 				<div class="descriptiveMetadata-field-value">
 					<xsl:for-each select="eadc:bioghist/eadc:chronlist/eadc:chronitem">
@@ -350,7 +350,7 @@
 		<xsl:if test="eadc:custodhist/eadc:p/text()">
 			<div class="descriptiveMetadata-field">
 				<div class="descriptiveMetadata-field-key">
-					<xsl:value-of select="$eadcxmlcustodialhistory" />
+					<xsl:value-of select="$binaryToHtml.ead-c.xml.custodialhistory" />
 				</div>
 				<div class="descriptiveMetadata-field-value">
 					<xsl:value-of select="eadc:custodhist/eadc:p/text()" />
@@ -360,7 +360,7 @@
 		<xsl:if test="eadc:acqinfo/eadc:p/text()">
 			<div class="descriptiveMetadata-field">
 				<div class="descriptiveMetadata-field-key">
-					<xsl:value-of select="$eadcxmlacquisitioninformation" />
+					<xsl:value-of select="$binaryToHtml.ead-c.xml.acquisitioninformation" />
 				</div>
 				<div class="descriptiveMetadata-field-value">
 					<xsl:value-of select="eadc:acqinfo/eadc:p/text()" />
@@ -370,7 +370,7 @@
 		<xsl:if test="eadc:scopecontent/eadc:p/text()">
 			<div class="descriptiveMetadata-field">
 				<div class="descriptiveMetadata-field-key">
-					<xsl:value-of select="$eadcxmldescription" />
+					<xsl:value-of select="$binaryToHtml.ead-c.xml.description" />
 				</div>
 				<div class="descriptiveMetadata-field-value">
 					<xsl:value-of select="eadc:scopecontent/eadc:p/text()" />
@@ -380,7 +380,7 @@
 		<xsl:if test="eadc:arrangement/eadc:p/text()">
 			<div class="descriptiveMetadata-field">
 				<div class="descriptiveMetadata-field-key">
-					<xsl:value-of select="$eadcxmlorganizationandordering" />
+					<xsl:value-of select="$binaryToHtml.ead-c.xml.organizationandordering" />
 				</div>
 				<div class="descriptiveMetadata-field-value">
 					<xsl:value-of select="eadc:arrangement/eadc:p/text()" />
@@ -390,7 +390,7 @@
 		<xsl:if test="eadc:arrangement/eadc:table">
 			<div class="descriptiveMetadata-field">
 				<div class="descriptiveMetadata-field-key">
-					<xsl:value-of select="$eadcxmlorganizationandordering" />
+					<xsl:value-of select="$binaryToHtml.ead-c.xml.organizationandordering" />
 				</div>
 				<xsl:variable name="output">
 					<table>
@@ -427,7 +427,7 @@
 		<xsl:if test="eadc:appraisal/eadc:p/text()">
 			<div class="descriptiveMetadata-field">
 				<div class="descriptiveMetadata-field-key">
-					<xsl:value-of select="$eadcxmlappraisal" />
+					<xsl:value-of select="$binaryToHtml.ead-c.xml.appraisal" />
 				</div>
 				<div class="descriptiveMetadata-field-value">
 					<xsl:value-of select="eadc:appraisal/eadc:p/text()" />
@@ -437,7 +437,7 @@
 		<xsl:if test="eadc:accruals/eadc:p/text()">
 			<div class="descriptiveMetadata-field">
 				<div class="descriptiveMetadata-field-key">
-					<xsl:value-of select="$eadcxmlaccruals" />
+					<xsl:value-of select="$binaryToHtml.ead-c.xml.accruals" />
 				</div>
 				<div class="descriptiveMetadata-field-value">
 					<xsl:value-of select="eadc:accruals/eadc:p/text()" />
@@ -448,7 +448,7 @@
 			<div class="descriptiveMetadata-field">
 				<div class="descriptiveMetadata-field-key">
 					<xsl:value-of
-						select="$eadcxmlphysicalcharacteristicsandtechnicalrequirements" />
+						select="$binaryToHtml.ead-c.xml.physicalcharacteristicsandtechnicalrequirements" />
 				</div>
 				<div class="descriptiveMetadata-field-value">
 					<xsl:value-of select="eadc:phystech/eadc:p/text()" />
@@ -458,7 +458,7 @@
 		<xsl:if test="eadc:accessrestrict/eadc:p/text()">
 			<div class="descriptiveMetadata-field">
 				<div class="descriptiveMetadata-field-key">
-					<xsl:value-of select="$eadcxmlaccessrestrictions" />
+					<xsl:value-of select="$binaryToHtml.ead-c.xml.accessrestrictions" />
 				</div>
 				<div class="descriptiveMetadata-field-value">
 					<xsl:value-of select="eadc:accessrestrict/eadc:p/text()" />
@@ -468,7 +468,7 @@
 		<xsl:if test="eadc:userrestrict/eadc:p/text()">
 			<div class="descriptiveMetadata-field">
 				<div class="descriptiveMetadata-field-key">
-					<xsl:value-of select="$eadcxmlreproductionrestrictions" />
+					<xsl:value-of select="$binaryToHtml.ead-c.xml.reproductionrestrictions" />
 				</div>
 				<div class="descriptiveMetadata-field-value">
 					<xsl:value-of select="eadc:userrestrict/eadc:p/text()" />
@@ -478,7 +478,7 @@
 		<xsl:if test="eadc:relatedmaterial/eadc:p/text()">
 			<div class="descriptiveMetadata-field">
 				<div class="descriptiveMetadata-field-key">
-					<xsl:value-of select="$eadcxmlrelatedmaterials" />
+					<xsl:value-of select="$binaryToHtml.ead-c.xml.relatedmaterials" />
 				</div>
 				<div class="descriptiveMetadata-field-value">
 					<xsl:value-of select="eadc:relatedmaterial/eadc:p/text()" />
@@ -488,7 +488,7 @@
 		<xsl:if test="eadc:otherfindingaid/eadc:p/text()">
 			<div class="descriptiveMetadata-field">
 				<div class="descriptiveMetadata-field-key">
-					<xsl:value-of select="$eadcxmlotherfindaids" />
+					<xsl:value-of select="$binaryToHtml.ead-c.xml.otherfindaids" />
 				</div>
 				<div class="descriptiveMetadata-field-value">
 					<xsl:value-of select="eadc:otherfindingaid/eadc:p/text()" />
@@ -498,7 +498,7 @@
 		<xsl:if test="eadc:note/eadc:p/text()">
 			<div class="descriptiveMetadata-field">
 				<div class="descriptiveMetadata-field-key">
-					<xsl:value-of select="$eadcxmlnotes" />
+					<xsl:value-of select="$binaryToHtml.ead-c.xml.notes" />
 				</div>
 				<div class="descriptiveMetadata-field-value">
 					<xsl:value-of select="eadc:note/eadc:p/text()" />
@@ -508,7 +508,7 @@
 		<xsl:if test="eadc:bibliography/eadc:p/text()">
 			<div class="descriptiveMetadata-field">
 				<div class="descriptiveMetadata-field-key">
-					<xsl:value-of select="$eadcxmlbibliography" />
+					<xsl:value-of select="$binaryToHtml.ead-c.xml.bibliography" />
 				</div>
 				<div class="descriptiveMetadata-field-value">
 					<xsl:value-of select="eadc:bibliography/eadc:p/text()" />

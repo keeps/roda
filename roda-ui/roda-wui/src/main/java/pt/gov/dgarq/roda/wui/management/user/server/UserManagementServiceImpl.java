@@ -70,7 +70,7 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
     String localeString) throws AuthorizationDeniedException, GenericException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     IndexResult<RODAMember> result = UserManagement.findMembers(user, filter, sorter, sublist, facets);
-    return I18nUtility.translate(result, localeString);
+    return I18nUtility.translate(result, RODAMember.class, localeString);
   }
 
   @Override

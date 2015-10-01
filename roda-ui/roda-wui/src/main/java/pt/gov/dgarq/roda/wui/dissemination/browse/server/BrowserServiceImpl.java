@@ -93,7 +93,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
       RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
       IndexResult<SimpleDescriptionObject> result = Browser.findDescriptiveMetadata(user, filter, sorter, sublist,
         facets);
-      return I18nUtility.translate(result, localeString);
+      return I18nUtility.translate(result, SimpleDescriptionObject.class, localeString);
     } catch (RODAException e) {
       throw e;
     } catch (Throwable e) {

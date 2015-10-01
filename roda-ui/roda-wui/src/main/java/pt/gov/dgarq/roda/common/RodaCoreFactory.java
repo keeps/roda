@@ -46,7 +46,7 @@ import org.roda.storage.StorageService;
 import org.roda.storage.StorageServiceException;
 import org.roda.storage.fs.FileStorageService;
 
-import config.i18n.server.XSLTMessages;
+import config.i18n.server.Messages;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
 import pt.gov.dgarq.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
@@ -85,7 +85,7 @@ public class RodaCoreFactory {
 
   private static Configuration rodaConfiguration = null;
   private static Map<String, String> loginProperties = null;
-  private static Map<Locale, XSLTMessages> xsltMessages = new HashMap<Locale, XSLTMessages>();
+  private static Map<Locale, Messages> i18nMessages = new HashMap<Locale, Messages>();
 
   // FIXME read this from configuration file or environment
   public static boolean DEVELOPMENT = true;
@@ -159,8 +159,14 @@ public class RodaCoreFactory {
 
   public static void reloadRodaConfigurationsAfterFileChange() {
     processLoginRelatedProperties();
-    xsltMessages = new HashMap<Locale, XSLTMessages>();
-    LOGGER.debug("Reloaded roda configurations after file change!");
+    i18nMessages.clear();
+    LOGGER.info("Reloaded roda configurations after file change!");
+  }
+
+  private static void checkForChangesInI18N() {
+    // i18n is cached and that cache is re-done when changes occur to
+    // roda-wui.properties (for convinience)
+    getRodaConfiguration().getString("");
   }
 
   public static void shutdown() throws IOException {
@@ -334,11 +340,12 @@ public class RodaCoreFactory {
 
   }
 
-  public static XSLTMessages getXSLTMessages(Locale locale) {
-    XSLTMessages messages = xsltMessages.get(locale);
+  public static Messages getI18NMessages(Locale locale) {
+    checkForChangesInI18N();
+    Messages messages = i18nMessages.get(locale);
     if (messages == null) {
-      messages = new XSLTMessages(locale);
-      xsltMessages.put(locale, messages);
+      messages = new Messages(locale, getConfigPath().resolve("i18n"));
+      i18nMessages.put(locale, messages);
     }
     return messages;
   }
