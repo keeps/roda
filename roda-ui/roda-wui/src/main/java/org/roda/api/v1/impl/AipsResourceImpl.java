@@ -405,15 +405,17 @@ public class AipsResourceImpl {
   }
 
   public Response getAipRepresentationPreservationMetadata(HttpServletRequest request, String aipId,
-    String representationId, String start, String limit, String acceptFormat) throws NotFoundException {
+    String representationId, String startAgent, String limitAgent, String startEvent, String limitEvent, String startFile, String limitFile, String acceptFormat, String language) throws NotFoundException {
     String authorization = request.getHeader("Authorization");
+    LOGGER.error("STARTEVENT: "+startEvent);
+    LOGGER.error("LIMITEVENT: "+limitEvent);
     try {
-      if (acceptFormat != null && acceptFormat.equalsIgnoreCase("bin")) {
+      if (acceptFormat != null && (acceptFormat.equalsIgnoreCase("bin") || acceptFormat.equalsIgnoreCase("html"))) {
         // get user
         RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
         // delegate action to controller
         Pair<String, StreamingOutput> aipRepresentationPreservationMetadata = Browser
-          .getAipRepresentationPreservationMetadata(user, aipId, representationId, start, limit);
+          .getAipRepresentationPreservationMetadata(user, aipId, representationId, startAgent, limitAgent, startEvent,limitEvent,startFile,limitFile,acceptFormat,language);
         return Response.ok(aipRepresentationPreservationMetadata.getSecond(), MediaType.APPLICATION_OCTET_STREAM)
           .header("content-disposition", "attachment; filename = " + aipRepresentationPreservationMetadata.getFirst())
           .build();

@@ -25,6 +25,7 @@ import org.roda.model.FileFormat;
 import org.roda.model.ModelServiceException;
 import org.roda.storage.Binary;
 import org.roda.storage.ClosableIterable;
+import org.roda.storage.DefaultBinary;
 import org.roda.storage.DefaultStoragePath;
 import org.roda.storage.Resource;
 import org.roda.storage.StoragePath;
@@ -608,6 +609,33 @@ public final class ModelUtils {
       // TODO
     }
     return ids;
+  }
+
+  public static String getPreservationType(Binary b) {
+    String type="";
+    EventComplexType event = ModelUtils.getPreservationEvent(b);
+    if (event != null) {
+      type="event";
+    } else {
+      lc.xmlns.premisV2.File file = ModelUtils.getPreservationFileObject(b);
+      if (file != null) {
+        type="file";
+      } else {
+        AgentComplexType agent = ModelUtils.getPreservationAgentObject(b);
+        if (agent != null) {
+          type="agent";
+        }else{
+          Representation representation = ModelUtils.getPreservationRepresentationObject(b);
+          if(representation!=null){
+            type="representation";
+          }else{
+            type="unknown";
+          }
+        }
+      }
+    }
+    return type;
+    
   };
 
 

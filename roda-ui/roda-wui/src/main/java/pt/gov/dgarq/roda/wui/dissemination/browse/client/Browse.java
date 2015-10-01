@@ -350,11 +350,11 @@ public class Browse extends Composite {
         viewersList.add(createDescriptiveMetadataDownloadPanel(sdo.getId(), descMetadata, html));
       }
 
-      if (preservationMetadata.getNumberOfFiles() > 0) {
+     /* if (preservationMetadata.getNumberOfFiles() > 0) {
         viewersList.add(createPreservationMetadataDownloadPanel(sdo.getId(), preservationMetadata));
-      }
+      }*/
 
-      sidebarMetadata.setVisible(!descMetadata.isEmpty() || preservationMetadata.getNumberOfFiles() > 0);
+     /* sidebarMetadata.setVisible(!descMetadata.isEmpty() || preservationMetadata.getNumberOfFiles() > 0);*/
 
       // Set button visibility
       createItem.setVisible(true);
@@ -517,15 +517,15 @@ public class Browse extends Composite {
     preservationMetadataIcon = new HTML(SafeHtmlUtils.fromSafeConstant(ICON_METADATA_DESELECTED));
     FlowPanel labelsPanel = new FlowPanel();
 
-    final int files = preservationMetadata.getNumberOfFiles();
-    final long sizeInBytes = preservationMetadata.getSizeInBytes();
+    //final int files = preservationMetadata.getNumberOfFiles();
+   // final long sizeInBytes = preservationMetadata.getSizeInBytes();
 
     // TODO externalize strings
     Label label = new Label("Preservation metadata");
-    Label subLabel = new Label(files + " files, " + readableFileSize(sizeInBytes));
+    //Label subLabel = new Label(files + " files, " + readableFileSize(sizeInBytes));
 
     labelsPanel.add(label);
-    labelsPanel.add(subLabel);
+    //labelsPanel.add(subLabel);
     layout.add(preservationMetadataIcon);
     layout.add(labelsPanel);
     downloadPanel.setWidget(layout);
@@ -543,7 +543,7 @@ public class Browse extends Composite {
     preservationMetadataIcon.addStyleName("browseDownloadIcon");
     labelsPanel.addStyleName("browseDownloadLabels");
     label.addStyleName("browseDownloadLabel");
-    subLabel.addStyleName("browseDownloadSublabel");
+    // subLabel.addStyleName("browseDownloadSublabel");
     return downloadPanel;
   }
 

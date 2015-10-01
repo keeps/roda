@@ -37,6 +37,7 @@ import lc.xmlns.premisV2.Representation;
 import pt.gov.dgarq.roda.core.common.Pair;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.wui.dissemination.browse.client.PreservationMetadataBundle;
+import pt.gov.dgarq.roda.wui.dissemination.browse.client.RepresentationPreservationMetadataBundle;
 
 /**
  * HTML related utility class
@@ -84,8 +85,7 @@ public final class HTMLUtils {
   public static PreservationMetadataBundle getPreservationMetadataBundle(String aipId, ModelService model,
     StorageService storage) throws ModelServiceException, StorageServiceException {
     AIP aip = model.retrieveAIP(aipId);
-    long totalSizeInBytes = 0L;
-    int numberOfFiles = 0;
+    List<RepresentationPreservationMetadataBundle> representations = new ArrayList<RepresentationPreservationMetadataBundle>();
     if (aip.getRepresentationIds() != null && aip.getRepresentationIds().size() > 0) {
       /*
        * agentsID = new TreeSet<String>(); for (String representationId :
@@ -98,10 +98,10 @@ public final class HTMLUtils {
         ClosableIterable<PreservationMetadata> preservationMetadata = model
           .listPreservationMetadataBinaries(aip.getId(), representationId);
         try {
-          PreservationMetadataBundle representationPreservationMetadataBundle = getRepresentationPreservationMetadataBundle(
+          RepresentationPreservationMetadataBundle representationPreservationMetadataBundle = getRepresentationPreservationMetadataBundle(representationId,
             preservationMetadata, storage);
-          totalSizeInBytes += representationPreservationMetadataBundle.getSizeInBytes();
-          numberOfFiles += representationPreservationMetadataBundle.getNumberOfFiles();
+          representations.add(representationPreservationMetadataBundle);
+          
         } finally {
           try {
             preservationMetadata.close();
@@ -111,7 +111,7 @@ public final class HTMLUtils {
         }
       }
     }
-    return new PreservationMetadataBundle(totalSizeInBytes, numberOfFiles);
+    return new PreservationMetadataBundle(representations);
   }
 
   public static String getPreservationMetadataHTML(String aipId, ModelService model, StorageService storage,
@@ -148,30 +148,52 @@ public final class HTMLUtils {
     return s.toString();
   }
 
-  private static PreservationMetadataBundle getRepresentationPreservationMetadataBundle(
+  private static RepresentationPreservationMetadataBundle getRepresentationPreservationMetadataBundle(String representationID,
     ClosableIterable<PreservationMetadata> preservationMetadata, StorageService storage)
       throws ModelServiceException, StorageServiceException {
-    long totalSizeInBytes = 0L;
-    int numberOfFiles = 0;
-
+    RepresentationPreservationMetadataBundle representationBundle = new RepresentationPreservationMetadataBundle();
+    List<String> agentIds = new ArrayList<String>();
+    List<String> eventIds = new ArrayList<String>();
+    List<String> fileIds = new ArrayList<String>();
     Iterator<PreservationMetadata> iterator = preservationMetadata.iterator();
     while (iterator.hasNext()) {
       PreservationMetadata pm = iterator.next();
-      Binary b = storage.getBinary(pm.getStoragePath());
-      totalSizeInBytes += b.getSizeInBytes();
-      numberOfFiles++;
-
+      String type = pm.getType();
+      if(type.equalsIgnoreCase("event")){
+        eventIds.add(pm.getId());
+      }else if(type.equalsIgnoreCase("agent")){
+        agentIds.add(pm.getId());
+      }else if(type.equalsIgnoreCase("file")){
+        fileIds.add(pm.getId());
+      }
     }
-    return new PreservationMetadataBundle(totalSizeInBytes, numberOfFiles);
+    representationBundle.setAgentIds(agentIds);
+    representationBundle.setEventIds(eventIds);
+    representationBundle.setFileIds(fileIds);
+    representationBundle.setRepresentationID(representationID);
+    return representationBundle;
   }
-
-  private static String getRepresentationPreservationMetadataHtml(
+  
+  public static String getRepresentationPreservationMetadataHtml(
     ClosableIterable<PreservationMetadata> preservationMetadata, StorageService storage, final Locale locale)
+      throws ModelServiceException, StorageServiceException {
+    return getRepresentationPreservationMetadataHtml(preservationMetadata,storage,locale,"0","100","0","100","0","100");
+  }
+  public static String getRepresentationPreservationMetadataHtml(
+    ClosableIterable<PreservationMetadata> preservationMetadata, StorageService storage, final Locale locale,String startAgent, String limitAgent, String startEvent, String limitEvent, String startFile, String limitFile)
       throws ModelServiceException, StorageServiceException {
 
     Map<String, Object> stylesheetOpt = new HashMap<String, Object>();
     stylesheetOpt.put("prefix", RodaConstants.INDEX_OTHER_DESCRIPTIVE_DATA_PREFIX);
 
+    
+    Pair<Integer, Integer> pagingParamsAgent = processPagingParams(startAgent, limitAgent);
+    int counterAgent = 0;
+    Pair<Integer, Integer> pagingParamsEvent = processPagingParams(startEvent, limitEvent);
+    int counterEvent = 0;
+    Pair<Integer, Integer> pagingParamsFile = processPagingParams(startFile, limitFile);
+    int counterFile = 0;
+    
     List<Pair<Binary, EventComplexType>> events = new ArrayList<Pair<Binary, EventComplexType>>();
     List<Pair<Binary, File>> files = new ArrayList<Pair<Binary, File>>();
     List<Pair<Binary, AgentComplexType>> agents = new ArrayList<Pair<Binary, AgentComplexType>>();
@@ -180,25 +202,35 @@ public final class HTMLUtils {
     Iterator<PreservationMetadata> iterator = preservationMetadata.iterator();
     while (iterator.hasNext()) {
       PreservationMetadata pm = iterator.next();
-      Binary b = storage.getBinary(pm.getStoragePath());
-
-      EventComplexType event = ModelUtils.getPreservationEvent(b);
-      if (event != null) {
-        events.add(new Pair<Binary, EventComplexType>(b, event));
-      } else {
-        File file = ModelUtils.getPreservationFileObject(b);
-        if (file != null) {
-          files.add(new Pair<Binary, File>(b, file));
-        } else {
+      if(pm.getType().equalsIgnoreCase("agent")){
+        counterAgent++;
+        if (counterAgent >= pagingParamsAgent.getFirst() && (counterAgent <= pagingParamsAgent.getSecond() || pagingParamsAgent.getSecond() == -1)) {
+          Binary b = storage.getBinary(pm.getStoragePath());
           AgentComplexType agent = ModelUtils.getPreservationAgentObject(b);
-          if (agent != null) {
-            agents.add(new Pair<Binary, AgentComplexType>(b, agent));
-          } else {
-            representation = b;
-          }
+          agents.add(new Pair<Binary, AgentComplexType>(b, agent));
         }
+        
+      }else if(pm.getType().equalsIgnoreCase("event")){
+        counterEvent++;
+        if (counterEvent >= pagingParamsEvent.getFirst() && (counterEvent <= pagingParamsEvent.getSecond() || pagingParamsEvent.getSecond() == -1)) {
+          Binary b = storage.getBinary(pm.getStoragePath());
+          EventComplexType event = ModelUtils.getPreservationEvent(b);
+          events.add(new Pair<Binary, EventComplexType>(b, event));
+        }
+        
+      }else if(pm.getType().equalsIgnoreCase("file")){
+        counterFile++;
+        if (counterFile >= pagingParamsFile.getFirst() && (counterFile <= pagingParamsFile.getSecond() || pagingParamsFile.getSecond() == -1)) {
+          Binary b = storage.getBinary(pm.getStoragePath());
+          File file = ModelUtils.getPreservationFileObject(b);
+          files.add(new Pair<Binary, File>(b, file));
+        }
+        
+      }else{
+        representation = storage.getBinary(pm.getStoragePath());
       }
     }
+      
 
     // FIXME is this the right way for comparing dates? by comparing their
     // strings? I don't think so!
@@ -325,5 +357,27 @@ public final class HTMLUtils {
   private static List<Pair<Binary, File>> sortFilesByRepresentationOrder(Binary representationBinary,
     List<Pair<Binary, File>> files) {
     return files;
+  }
+  
+  private static Pair<Integer, Integer> processPagingParams(String start, String limit) {
+    Integer startInteger, limitInteger;
+    try {
+      startInteger = Integer.parseInt(start);
+      if (startInteger < 0) {
+        startInteger = 0;
+      }
+    } catch (NumberFormatException e) {
+      startInteger = 0;
+    }
+    try {
+      limitInteger = Integer.parseInt(limit);
+      if (limitInteger < 0) {
+        limitInteger = 100;
+      }
+    } catch (NumberFormatException e) {
+      limitInteger = 100;
+    }
+
+    return new Pair<Integer, Integer>(startInteger, limitInteger);
   }
 }

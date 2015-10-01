@@ -77,7 +77,6 @@ public class PremisAgentHelper {
       }
 
     } catch (XmlException e) {
-      logger.debug("Error parsing PREMIS - " + e.getMessage(), e);
       throw new PremisMetadataException("Error parsing PREMIS - " + e.getMessage(), e);
     }
   }

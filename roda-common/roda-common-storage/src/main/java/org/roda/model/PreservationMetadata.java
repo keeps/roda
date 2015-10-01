@@ -8,13 +8,15 @@ public class PreservationMetadata {
   private final String aipId;
   private final String representationID;
   private final StoragePath storagePath;
+  private final String type;
 
-  public PreservationMetadata(String id, String aipId, String representationId, StoragePath storagePath) {
+  public PreservationMetadata(String id, String aipId, String representationId, StoragePath storagePath, String type) {
     super();
     this.id = id;
     this.aipId = aipId;
     this.representationID = representationId;
     this.storagePath = storagePath;
+    this.type = type;
   }
 
   /**
@@ -36,6 +38,10 @@ public class PreservationMetadata {
    */
   public StoragePath getStoragePath() {
     return storagePath;
+  }
+
+  public String getType() {
+    return type;
   }
 
   @Override

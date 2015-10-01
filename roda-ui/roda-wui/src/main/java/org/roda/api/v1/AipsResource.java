@@ -340,11 +340,16 @@ public class AipsResource {
     @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam("aip_id") String aipId,
     @ApiParam(value = "The ID of the existing representation", required = true) @PathParam("representation_id") String representationId,
     @ApiParam(value = "Choose format in which to get the metadata", allowableValues = "json, xml, html", defaultValue = "json") @QueryParam("acceptFormat") String acceptFormat,
-    @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam("start") String start,
-    @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam("limit") String limit)
+    @ApiParam(value = "Index of the agent element to return", defaultValue = "0") @QueryParam("startAgent") String startAgent,
+    @ApiParam(value = "Maximum number of agents to return", defaultValue = "100") @QueryParam("limitAgent") String limitAgent,
+    @ApiParam(value = "Index of the first event to return", defaultValue = "0") @QueryParam("startEvent") String startEvent,
+    @ApiParam(value = "Maximum number of events to return", defaultValue = "100") @QueryParam("limitEvent") String limitEvent,
+    @ApiParam(value = "Index of the first file to return", defaultValue = "0") @QueryParam("startFile") String startFile,
+    @ApiParam(value = "Maximum number of files to return", defaultValue = "100") @QueryParam("limitFile") String limitFile,
+    @ApiParam(value = "The language for the HTML output", allowableValues = "pt_PT, en_US", defaultValue = "pt_PT") @DefaultValue("pt_PT") @QueryParam("lang") String language)
       throws NotFoundException {
-    return DELEGATE.getAipRepresentationPreservationMetadata(request, aipId, representationId, start, limit,
-      acceptFormat);
+    return DELEGATE.getAipRepresentationPreservationMetadata(request, aipId, representationId, startAgent, limitAgent,
+      startEvent, limitEvent, startFile, limitFile, acceptFormat,language);
   }
 
   @GET
