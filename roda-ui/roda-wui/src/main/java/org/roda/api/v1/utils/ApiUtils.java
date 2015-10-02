@@ -46,7 +46,7 @@ public class ApiUtils {
   }
 
   /**
-   * Returns valid start (pair first elem) and limit (pair second elem) paging
+   * Returns valid start (pair first element) and limit (pair second element) paging
    * parameters defaulting to start = 0 and limit = 100 if none or invalid
    * values are provided.
    */

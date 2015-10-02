@@ -4,10 +4,8 @@ import java.io.InputStream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.StreamingOutput;
 import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
@@ -16,13 +14,11 @@ import org.roda.api.controllers.Browser;
 import org.roda.api.v1.utils.ApiResponseMessage;
 import org.roda.api.v1.utils.StreamResponse;
 import org.roda.common.UserUtility;
-import org.roda.model.ModelServiceException;
-import org.roda.storage.StorageServiceException;
 
 import pt.gov.dgarq.roda.common.RodaCoreFactory;
 import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
 import pt.gov.dgarq.roda.core.common.NotFoundException;
-import pt.gov.dgarq.roda.core.common.Pair;
+import pt.gov.dgarq.roda.core.common.NotImplementedException;
 import pt.gov.dgarq.roda.core.data.v2.RodaUser;
 import pt.gov.dgarq.roda.wui.common.client.GenericException;
 
@@ -32,7 +28,7 @@ public class AipsResourceImpl {
 
   public Response aipsGet(HttpServletRequest request, String start, String limit) {
     // do some magic!
-    return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic2!")).build();
+    return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 
   public Response aipsAipIdGet(HttpServletRequest request, String aipId, String acceptFormat) {
@@ -51,7 +47,6 @@ public class AipsResourceImpl {
   }
 
   public Response aipsAipIdDelete(HttpServletRequest request, String aipId) {
-    String authorization = request.getHeader("Authorization");
     try {
       // get user
       RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
@@ -61,14 +56,8 @@ public class AipsResourceImpl {
       // FIXME give a better answer
       return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
     } catch (AuthorizationDeniedException e) {
-      if (authorization == null) {
-        return Response.status(Status.UNAUTHORIZED)
-          .header(HttpHeaders.WWW_AUTHENTICATE, "Basic realm=\"RODA REST API\"")
-          .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
-      } else {
-        return Response.status(Status.UNAUTHORIZED)
-          .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
-      }
+      return Response.status(Status.UNAUTHORIZED)
+        .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
     } catch (GenericException e) {
       return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
     } catch (NotFoundException e) {
@@ -84,28 +73,21 @@ public class AipsResourceImpl {
 
   public Response getAipRepresentation(HttpServletRequest request, String aipId, String representationId,
     String acceptFormat) {
-    String authorization = request.getHeader("Authorization");
     try {
-      if (acceptFormat != null && acceptFormat.equalsIgnoreCase("bin")) {
-        // get user
-        RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
-        // delegate action to controller
-        Pair<String, StreamingOutput> aipRepresentation = Browser.getAipRepresentation(user, aipId, representationId);
-        return Response.ok(aipRepresentation.getSecond(), MediaType.APPLICATION_OCTET_STREAM)
-          .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename = " + aipRepresentation.getFirst()).build();
-      } else {
-        return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Not yet implemented"))
-          .build();
-      }
+      // get user
+      RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+      // delegate action to controller
+      StreamResponse aipRepresentation = Browser.getAipRepresentation(user, aipId, representationId, acceptFormat);
+
+      return Response.ok(aipRepresentation.getStream(), aipRepresentation.getMediaType())
+        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename = " + aipRepresentation.getFilename()).build();
+
     } catch (AuthorizationDeniedException e) {
-      if (authorization == null) {
-        return Response.status(Status.UNAUTHORIZED)
-          .header(HttpHeaders.WWW_AUTHENTICATE, "Basic realm=\"RODA REST API\"")
-          .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
-      } else {
-        return Response.status(Status.UNAUTHORIZED)
-          .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
-      }
+      return Response.status(Status.UNAUTHORIZED)
+        .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+    } catch (NotImplementedException e) {
+      return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Not yet implemented"))
+        .build();
     } catch (GenericException e) {
       return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
     } catch (NotFoundException e) {
@@ -128,7 +110,6 @@ public class AipsResourceImpl {
 
   public Response aipsAipIdDataRepresentationIdDelete(HttpServletRequest request, String aipId,
     String representationId) {
-    String authorization = request.getHeader("Authorization");
     try {
       // get user
       RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
@@ -138,14 +119,8 @@ public class AipsResourceImpl {
       // FIXME give a better answer
       return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
     } catch (AuthorizationDeniedException e) {
-      if (authorization == null) {
-        return Response.status(Status.UNAUTHORIZED)
-          .header(HttpHeaders.WWW_AUTHENTICATE, "Basic realm=\"RODA REST API\"")
-          .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
-      } else {
-        return Response.status(Status.UNAUTHORIZED)
-          .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
-      }
+      return Response.status(Status.UNAUTHORIZED)
+        .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
     } catch (GenericException e) {
       return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
     } catch (NotFoundException e) {
@@ -156,24 +131,22 @@ public class AipsResourceImpl {
 
   public Response aipsAipIdDataRepresentationIdFileIdGet(HttpServletRequest request, String aipId,
     String representationId, String fileId, String acceptFormat) {
-    String authorization = request.getHeader("Authorization");
     try {
       // get user
       RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
       // delegate action to controller
       StreamResponse aipRepresentationFile = Browser.getAipRepresentationFile(user, aipId, representationId, fileId,
         acceptFormat);
+
       return Response.ok(aipRepresentationFile.getStream(), aipRepresentationFile.getMediaType())
         .header("content-disposition", "attachment; filename = " + aipRepresentationFile.getFilename()).build();
+
     } catch (AuthorizationDeniedException e) {
-      if (authorization == null) {
-        return Response.status(Status.UNAUTHORIZED)
-          .header(HttpHeaders.WWW_AUTHENTICATE, "Basic realm=\"RODA REST API\"")
-          .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
-      } else {
-        return Response.status(Status.UNAUTHORIZED)
-          .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
-      }
+      return Response.status(Status.UNAUTHORIZED)
+        .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+    } catch (NotImplementedException e) {
+      return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Not yet implemented"))
+        .build();
     } catch (GenericException e) {
       return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
     } catch (NotFoundException e) {
@@ -196,7 +169,6 @@ public class AipsResourceImpl {
 
   public Response aipsAipIdDataRepresentationIdFileIdDelete(HttpServletRequest request, String aipId,
     String representationId, String fileId) {
-    String authorization = request.getHeader("Authorization");
     try {
       // get user
       RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
@@ -206,14 +178,8 @@ public class AipsResourceImpl {
       // FIXME give a better answer
       return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
     } catch (AuthorizationDeniedException e) {
-      if (authorization == null) {
-        return Response.status(Status.UNAUTHORIZED)
-          .header(HttpHeaders.WWW_AUTHENTICATE, "Basic realm=\"RODA REST API\"")
-          .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
-      } else {
-        return Response.status(Status.UNAUTHORIZED)
-          .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
-      }
+      return Response.status(Status.UNAUTHORIZED)
+        .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
     } catch (GenericException e) {
       return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
     } catch (NotFoundException e) {
@@ -224,28 +190,21 @@ public class AipsResourceImpl {
 
   public Response listAipDescriptiveMetadata(HttpServletRequest request, String aipId, String start, String limit,
     String acceptFormat) {
-    String authorization = request.getHeader("Authorization");
     try {
-      if (acceptFormat != null && acceptFormat.equalsIgnoreCase("bin")) {
-        // get user
-        RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
-        // delegate action to controller
-        Pair<String, StreamingOutput> aipRepresentation = Browser.listAipDescriptiveMetadata(user, aipId, start, limit);
-        return Response.ok(aipRepresentation.getSecond(), MediaType.APPLICATION_OCTET_STREAM)
-          .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename = " + aipRepresentation.getFirst()).build();
-      } else {
-        return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Not yet implemented"))
-          .build();
-      }
+      // get user
+      RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+      // delegate action to controller
+      StreamResponse aipRepresentation = Browser.listAipDescriptiveMetadata(user, aipId, start, limit, acceptFormat);
+
+      return Response.ok(aipRepresentation.getStream(), aipRepresentation.getMediaType())
+        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename = " + aipRepresentation.getFilename()).build();
+
     } catch (AuthorizationDeniedException e) {
-      if (authorization == null) {
-        return Response.status(Status.UNAUTHORIZED)
-          .header(HttpHeaders.WWW_AUTHENTICATE, "Basic realm=\"RODA REST API\"")
-          .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
-      } else {
-        return Response.status(Status.UNAUTHORIZED)
-          .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
-      }
+      return Response.status(Status.UNAUTHORIZED)
+        .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+    } catch (NotImplementedException e) {
+      return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Not yet implemented"))
+        .build();
     } catch (GenericException e) {
       return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
     } catch (NotFoundException e) {
@@ -257,30 +216,22 @@ public class AipsResourceImpl {
 
   public Response getAipDescriptiveMetadata(HttpServletRequest request, String aipId, String metadataId,
     String acceptFormat, String language) {
-    String authorization = request.getHeader("Authorization");
     try {
-      // TODO ensure accept format is one of the valid options
-      if (acceptFormat != null) { // && acceptFormat.equalsIgnoreCase("bin")) {
-        // get user
-        RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
-        // delegate action to controller
-        StreamResponse aipDescriptiveMetadata = Browser.getAipDescritiveMetadata(user, aipId, metadataId, acceptFormat,
-          language);
-        return Response.ok(aipDescriptiveMetadata.getStream(), aipDescriptiveMetadata.getMediaType())
-          .header("content-disposition", "attachment; filename = " + aipDescriptiveMetadata.getFilename()).build();
-      } else {
-        return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Not yet implemented"))
-          .build();
-      }
+      // get user
+      RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+      // delegate action to controller
+      StreamResponse aipDescriptiveMetadata = Browser.getAipDescritiveMetadata(user, aipId, metadataId, acceptFormat,
+        language);
+
+      return Response.ok(aipDescriptiveMetadata.getStream(), aipDescriptiveMetadata.getMediaType())
+        .header("content-disposition", "attachment; filename = " + aipDescriptiveMetadata.getFilename()).build();
+
     } catch (AuthorizationDeniedException e) {
-      if (authorization == null) {
-        return Response.status(Status.UNAUTHORIZED)
-          .header(HttpHeaders.WWW_AUTHENTICATE, "Basic realm=\"RODA REST API\"")
-          .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
-      } else {
-        return Response.status(Status.UNAUTHORIZED)
-          .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
-      }
+      return Response.status(Status.UNAUTHORIZED)
+        .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+    } catch (NotImplementedException e) {
+      return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Not yet implemented"))
+        .build();
     } catch (GenericException e) {
       return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
     } catch (TransformerException e) {
@@ -301,7 +252,6 @@ public class AipsResourceImpl {
 
   public Response aipsAipIdDescriptiveMetadataMetadataIdPut(HttpServletRequest request, String aipId, String metadataId,
     InputStream is, FormDataContentDisposition fileDetail, String metadataType) {
-    String authorization = request.getHeader("Authorization");
     try {
       // get user
       RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
@@ -311,14 +261,8 @@ public class AipsResourceImpl {
       // FIXME give a better answer
       return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
     } catch (AuthorizationDeniedException e) {
-      if (authorization == null) {
-        return Response.status(Status.UNAUTHORIZED)
-          .header(HttpHeaders.WWW_AUTHENTICATE, "Basic realm=\"RODA REST API\"")
-          .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
-      } else {
-        return Response.status(Status.UNAUTHORIZED)
-          .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
-      }
+      return Response.status(Status.UNAUTHORIZED)
+        .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
     } catch (GenericException e) {
       return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
     } catch (NotFoundException e) {
@@ -329,7 +273,6 @@ public class AipsResourceImpl {
 
   public Response aipsAipIdDescriptiveMetadataMetadataIdPost(HttpServletRequest request, String aipId,
     String metadataId, InputStream is, FormDataContentDisposition fileDetail, String metadataType) {
-    String authorization = request.getHeader("Authorization");
     try {
       // get user
       RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
@@ -339,14 +282,8 @@ public class AipsResourceImpl {
       // FIXME give a better answer
       return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
     } catch (AuthorizationDeniedException e) {
-      if (authorization == null) {
-        return Response.status(Status.UNAUTHORIZED)
-          .header(HttpHeaders.WWW_AUTHENTICATE, "Basic realm=\"RODA REST API\"")
-          .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
-      } else {
-        return Response.status(Status.UNAUTHORIZED)
-          .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
-      }
+      return Response.status(Status.UNAUTHORIZED)
+        .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
     } catch (GenericException e) {
       return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
     } catch (NotFoundException e) {
@@ -357,7 +294,6 @@ public class AipsResourceImpl {
 
   public Response aipsAipIdDescriptiveMetadataMetadataIdDelete(HttpServletRequest request, String aipId,
     String metadataId) {
-    String authorization = request.getHeader("Authorization");
     try {
       // get user
       RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
@@ -367,14 +303,8 @@ public class AipsResourceImpl {
       // FIXME give a better answer
       return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
     } catch (AuthorizationDeniedException e) {
-      if (authorization == null) {
-        return Response.status(Status.UNAUTHORIZED)
-          .header(HttpHeaders.WWW_AUTHENTICATE, "Basic realm=\"RODA REST API\"")
-          .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
-      } else {
-        return Response.status(Status.UNAUTHORIZED)
-          .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
-      }
+      return Response.status(Status.UNAUTHORIZED)
+        .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
     } catch (GenericException e) {
       return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
     } catch (NotFoundException e) {
@@ -385,24 +315,22 @@ public class AipsResourceImpl {
 
   public Response listAipPreservationMetadata(HttpServletRequest request, String aipId, String start, String limit,
     String acceptFormat) {
-    String authorization = request.getHeader("Authorization");
     try {
       // get user
       RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
       // delegate action to controller
-      Pair<String, StreamingOutput> aipPreservationMetadataList = Browser.listAipPreservationMetadata(user, aipId,
-        start, limit);
-      return Response.ok(aipPreservationMetadataList.getSecond(), MediaType.APPLICATION_OCTET_STREAM)
-        .header("content-disposition", "attachment; filename = " + aipPreservationMetadataList.getFirst()).build();
+      StreamResponse aipPreservationMetadataList = Browser.listAipPreservationMetadata(user, aipId, start, limit,
+        acceptFormat);
+
+      return Response.ok(aipPreservationMetadataList.getStream(), aipPreservationMetadataList.getMediaType())
+        .header("content-disposition", "attachment; filename = " + aipPreservationMetadataList.getFilename()).build();
+
     } catch (AuthorizationDeniedException e) {
-      if (authorization == null) {
-        return Response.status(Status.UNAUTHORIZED)
-          .header(HttpHeaders.WWW_AUTHENTICATE, "Basic realm=\"RODA REST API\"")
-          .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
-      } else {
-        return Response.status(Status.UNAUTHORIZED)
-          .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
-      }
+      return Response.status(Status.UNAUTHORIZED)
+        .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+    } catch (NotImplementedException e) {
+      return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Not yet implemented"))
+        .build();
     } catch (GenericException e) {
       return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
     } catch (NotFoundException e) {
@@ -414,31 +342,25 @@ public class AipsResourceImpl {
   public Response getAipRepresentationPreservationMetadata(HttpServletRequest request, String aipId,
     String representationId, String startAgent, String limitAgent, String startEvent, String limitEvent,
     String startFile, String limitFile, String acceptFormat, String language) {
-    String authorization = request.getHeader("Authorization");
     try {
-      if (acceptFormat != null && (acceptFormat.equalsIgnoreCase("bin") || acceptFormat.equalsIgnoreCase("html"))) {
-        // get user
-        RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
-        // delegate action to controller
-        Pair<String, StreamingOutput> aipRepresentationPreservationMetadata = Browser
-          .getAipRepresentationPreservationMetadata(user, aipId, representationId, startAgent, limitAgent, startEvent,
-            limitEvent, startFile, limitFile, acceptFormat, language);
-        return Response.ok(aipRepresentationPreservationMetadata.getSecond(), MediaType.APPLICATION_OCTET_STREAM)
-          .header("content-disposition", "attachment; filename = " + aipRepresentationPreservationMetadata.getFirst())
-          .build();
-      } else {
-        return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Not yet implemented"))
-          .build();
-      }
+      // get user
+      RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+      // delegate action to controller
+      StreamResponse aipRepresentationPreservationMetadata = Browser.getAipRepresentationPreservationMetadata(user,
+        aipId, representationId, startAgent, limitAgent, startEvent, limitEvent, startFile, limitFile, acceptFormat,
+        language);
+
+      return Response
+        .ok(aipRepresentationPreservationMetadata.getStream(), aipRepresentationPreservationMetadata.getMediaType())
+        .header("content-disposition", "attachment; filename = " + aipRepresentationPreservationMetadata.getFilename())
+        .build();
+
     } catch (AuthorizationDeniedException e) {
-      if (authorization == null) {
-        return Response.status(Status.UNAUTHORIZED)
-          .header(HttpHeaders.WWW_AUTHENTICATE, "Basic realm=\"RODA REST API\"")
-          .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
-      } else {
-        return Response.status(Status.UNAUTHORIZED)
-          .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
-      }
+      return Response.status(Status.UNAUTHORIZED)
+        .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+    } catch (NotImplementedException e) {
+      return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Not yet implemented"))
+        .build();
     } catch (GenericException e) {
       return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
     } catch (TransformerException e) {
@@ -459,27 +381,22 @@ public class AipsResourceImpl {
 
   public Response getAipRepresentationPreservationMetadataFile(HttpServletRequest request, String aipId,
     String representationId, String fileId) {
-    String authorization = request.getHeader("Authorization");
     try {
-
       // get user
       RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
       // delegate action to controller
-      Pair<String, StreamingOutput> aipRepresentationPreservationMetadataFile = Browser
+      StreamResponse aipRepresentationPreservationMetadataFile = Browser
         .getAipRepresentationPreservationMetadataFile(user, aipId, representationId, fileId);
 
-      return Response.ok(aipRepresentationPreservationMetadataFile.getSecond(), MediaType.APPLICATION_OCTET_STREAM)
-        .header("content-disposition", "attachment; filename = " + aipRepresentationPreservationMetadataFile.getFirst())
+      return Response
+        .ok(aipRepresentationPreservationMetadataFile.getStream(),
+          aipRepresentationPreservationMetadataFile.getMediaType())
+        .header("content-disposition",
+          "attachment; filename = " + aipRepresentationPreservationMetadataFile.getFilename())
         .build();
     } catch (AuthorizationDeniedException e) {
-      if (authorization == null) {
-        return Response.status(Status.UNAUTHORIZED)
-          .header(HttpHeaders.WWW_AUTHENTICATE, "Basic realm=\"RODA REST API\"")
-          .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
-      } else {
-        return Response.status(Status.UNAUTHORIZED)
-          .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
-      }
+      return Response.status(Status.UNAUTHORIZED)
+        .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
     } catch (GenericException e) {
       return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
     } catch (NotFoundException e) {
@@ -490,7 +407,6 @@ public class AipsResourceImpl {
 
   public Response postAipRepresentationPreservationMetadataFile(HttpServletRequest request, String aipId,
     String representationId, InputStream is, FormDataContentDisposition fileDetail) {
-    String authorization = request.getHeader("Authorization");
     try {
       // get user
       RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
@@ -500,14 +416,8 @@ public class AipsResourceImpl {
       // FIXME give a better answer
       return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
     } catch (AuthorizationDeniedException e) {
-      if (authorization == null) {
-        return Response.status(Status.UNAUTHORIZED)
-          .header(HttpHeaders.WWW_AUTHENTICATE, "Basic realm=\"RODA REST API\"")
-          .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
-      } else {
-        return Response.status(Status.UNAUTHORIZED)
-          .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
-      }
+      return Response.status(Status.UNAUTHORIZED)
+        .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
     } catch (GenericException e) {
       return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
     } catch (NotFoundException e) {
@@ -518,7 +428,6 @@ public class AipsResourceImpl {
 
   public Response putAipRepresentationPreservationMetadataFile(HttpServletRequest request, String aipId,
     String representationId, InputStream is, FormDataContentDisposition fileDetail) {
-    String authorization = request.getHeader("Authorization");
     try {
       // get user
       RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
@@ -528,14 +437,8 @@ public class AipsResourceImpl {
       // FIXME give a better answer
       return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
     } catch (AuthorizationDeniedException e) {
-      if (authorization == null) {
-        return Response.status(Status.UNAUTHORIZED)
-          .header(HttpHeaders.WWW_AUTHENTICATE, "Basic realm=\"RODA REST API\"")
-          .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
-      } else {
-        return Response.status(Status.UNAUTHORIZED)
-          .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
-      }
+      return Response.status(Status.UNAUTHORIZED)
+        .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
     } catch (GenericException e) {
       return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
     } catch (NotFoundException e) {
@@ -546,7 +449,6 @@ public class AipsResourceImpl {
 
   public Response aipsAipIdPreservationMetadataRepresentationIdFileIdDelete(HttpServletRequest request, String aipId,
     String representationId, String fileId) {
-    String authorization = request.getHeader("Authorization");
     try {
       // get user
       RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
@@ -556,14 +458,8 @@ public class AipsResourceImpl {
       // FIXME give a better answer
       return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
     } catch (AuthorizationDeniedException e) {
-      if (authorization == null) {
-        return Response.status(Status.UNAUTHORIZED)
-          .header(HttpHeaders.WWW_AUTHENTICATE, "Basic realm=\"RODA REST API\"")
-          .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
-      } else {
-        return Response.status(Status.UNAUTHORIZED)
-          .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
-      }
+      return Response.status(Status.UNAUTHORIZED)
+        .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
     } catch (GenericException e) {
       return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
     } catch (NotFoundException e) {

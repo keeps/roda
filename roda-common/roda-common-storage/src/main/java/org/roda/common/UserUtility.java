@@ -45,6 +45,7 @@ public class UserUtility {
     LDAP_UTILITY = ldapUtility;
   }
 
+  // FIXME this method should be more auth scheme agnostic (basic auth vs. cas)
   public static RodaUser getApiUser(HttpServletRequest request, IndexService indexService)
     throws AuthorizationDeniedException {
 

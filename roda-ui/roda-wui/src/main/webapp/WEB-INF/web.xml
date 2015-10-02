@@ -102,6 +102,25 @@
 		<url-pattern>/api/*</url-pattern>
 	</servlet-mapping>
 
+	<filter>
+		<filter-name>rest_api_auth_filter</filter-name>
+		<filter-class>org.roda.api.v1.utils.ApiAuthFilter</filter-class>
+		<init-param>
+			<description>Realm to be used</description>
+			<param-name>realm</param-name>
+			<param-value>RODA REST API</param-value>
+		</init-param>
+		<init-param>
+			<description>comma separated list of relative paths to exclude in filter logic</description>
+			<param-name>exclusions</param-name>
+			<param-value>/swagger.json</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>rest_api_auth_filter</filter-name>
+		<url-pattern>/api/*</url-pattern>
+	</filter-mapping>
+
 
 	<servlet>
 		<servlet-name>ClientLogger</servlet-name>
