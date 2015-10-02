@@ -28,8 +28,6 @@ import pt.gov.dgarq.roda.wui.management.client.Management;
 public class MemberManagement extends Composite {
   private static final String EDIT_GROUP_HISTORY_TOKEN = "edit_group";
 
-  private static final String EDIT_USER_HISTORY_TOKEN = "edit_user";
-
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
@@ -113,8 +111,8 @@ public class MemberManagement extends Composite {
       public void onSelectionChange(SelectionChangeEvent event) {
         RODAMember selected = list.getSelectionModel().getSelectedObject();
         if (selected != null) {
-          Tools.newHistory(RESOLVER, (selected.isUser() ? EDIT_USER_HISTORY_TOKEN : EDIT_GROUP_HISTORY_TOKEN),
-            selected.getId());
+          Tools.newHistory(RESOLVER,
+            (selected.isUser() ? EditUser.RESOLVER.getHistoryToken() : EDIT_GROUP_HISTORY_TOKEN), selected.getId());
         }
       }
     });
@@ -125,7 +123,7 @@ public class MemberManagement extends Composite {
       // TODO ?list.refresh();
       callback.onSuccess(this);
     } else if (historyTokens.size() == 2) {
-      if (historyTokens.get(0).equals(EDIT_USER_HISTORY_TOKEN)) {
+      if (historyTokens.get(0).equals(EditUser.RESOLVER.getHistoryToken())) {
         EditUser.RESOLVER.resolve(Tools.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals(EDIT_GROUP_HISTORY_TOKEN)) {
         // TODO EditGroup.RESOLVER.resolve(Tools.tail(historyTokens), callback);

@@ -50,6 +50,18 @@ public class UserManagementHelper {
 
   }
 
+  public static LogEntry retrieveLogEntry(String logEntryId) throws GenericException {
+    LogEntry ret;
+    try {
+      ret = RodaCoreFactory.getIndexService().retrieve(LogEntry.class, logEntryId);
+    } catch (IndexServiceException e) {
+      LOGGER.error("Error getting log entries", e);
+      throw new GenericException("Error getting log entry " + e.getMessage());
+    }
+
+    return ret;
+  }
+
   protected static Long countMembers(Filter filter) throws GenericException {
     Long count;
     try {

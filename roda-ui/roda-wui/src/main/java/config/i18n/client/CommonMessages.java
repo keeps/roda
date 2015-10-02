@@ -35,4 +35,11 @@ public interface CommonMessages extends Messages {
   @DefaultMessage("The print list has {1} elements, which exceeds the maximum of {0} elements. You can add more filters to reduce the number of elements to print. Want to print the first {0} of the list?")
   String reportPrintMaxSize(int maxReportSize, int total);
 
+  /***********************************************/
+  /****************   NEW   **********************/
+  /***********************************************/
+  
+  @DefaultMessage("{0}: {1}")
+  String logParameter(String name, String value);
+
 }

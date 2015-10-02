@@ -165,6 +165,8 @@ public interface UserManagementService extends RemoteService {
 
   public IndexResult<LogEntry> findLogEntries(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
     throws AuthorizationDeniedException, GenericException;
+  
+  public LogEntry retrieveLogEntry(String logEntryId) throws AuthorizationDeniedException, GenericException;
 
   /**
    * Register a new user
@@ -254,5 +256,6 @@ public interface UserManagementService extends RemoteService {
    * @throws PrintReportException
    */
   public void setUserLogReportInfo(ContentAdapter adapter, String localeString) throws PrintReportException;
+
 
 }

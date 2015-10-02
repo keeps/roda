@@ -242,6 +242,13 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     return UserManagement.findLogEntries(user, filter, sorter, sublist, facets);
   }
+  
+  @Override
+  public LogEntry retrieveLogEntry(String logEntryId)
+    throws AuthorizationDeniedException, GenericException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    return UserManagement.retrieveLogEntry(user, logEntryId);
+  }
 
   @Override
   public boolean register(User user, String password, String captcha) throws RODAException {

@@ -121,6 +121,8 @@ public interface UserManagementServiceAsync {
   public void findLogEntries(Filter filter, Sorter sorter, Sublist sublist, Facets facets,
     AsyncCallback<IndexResult<LogEntry>> callback);
 
+  void retrieveLogEntry(String logEntryId, AsyncCallback<LogEntry> callback);
+
   /**
    * Register a new user
    * 

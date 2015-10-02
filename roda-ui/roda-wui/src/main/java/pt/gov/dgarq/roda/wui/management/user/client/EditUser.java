@@ -64,11 +64,11 @@ public class EditUser extends Composite {
     }
 
     public List<String> getHistoryPath() {
-      return Tools.concat(Management.RESOLVER.getHistoryPath(), getHistoryToken());
+      return Tools.concat(MemberManagement.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     public String getHistoryToken() {
-      return "user";
+      return "edit_user";
     }
   };
 

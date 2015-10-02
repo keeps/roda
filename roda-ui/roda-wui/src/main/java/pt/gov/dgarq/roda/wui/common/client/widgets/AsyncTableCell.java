@@ -2,11 +2,12 @@ package pt.gov.dgarq.roda.wui.common.client.widgets;
 
 import java.io.Serializable;
 
-import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.ColumnSortEvent.AsyncHandler;
 import com.google.gwt.user.cellview.client.ColumnSortList;
@@ -15,6 +16,7 @@ import com.google.gwt.user.cellview.client.PageSizePager;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.view.client.AsyncDataProvider;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.ProvidesKey;
@@ -49,7 +51,7 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
     this(null, null, null);
   }
 
-  public AsyncTableCell(Filter filter,Facets facets, String summary) {
+  public AsyncTableCell(Filter filter, Facets facets, String summary) {
     super();
 
     if (summary == null) {
@@ -58,7 +60,7 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
 
     this.filter = filter;
     this.facets = facets;
-    
+
     GWT.log("Creating data provider");
     this.dataProvider = new AsyncDataProvider<T>() {
 
@@ -98,11 +100,14 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
     display = new AccessibleCellTable<T>(getInitialPageSize(),
       (MyCellTableResources) GWT.create(MyCellTableResources.class), getKeyProvider(), summary);
     display.setKeyboardSelectionPolicy(KeyboardSelectionPolicy.DISABLED);
+    display.setLoadingIndicator(new HTML(SafeHtmlUtils.fromSafeConstant(
+      "<div class='spinner'><div class='double-bounce1'></div><div class='double-bounce2'></div></div>")));
     
+
     configureDisplay(display);
-    
+
     dataProvider.addDataDisplay(display);
-    
+
     resultsPager = new AccessibleSimplePager(AccessibleSimplePager.TextLocation.RIGHT, false, true);
     resultsPager.setDisplay(display);
 
@@ -125,7 +130,7 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
     display.addStyleName("my-asyncdatagrid-display");
 
   }
-  
+
   protected abstract void configureDisplay(CellTable<T> display);
 
   protected abstract int getInitialPageSize();

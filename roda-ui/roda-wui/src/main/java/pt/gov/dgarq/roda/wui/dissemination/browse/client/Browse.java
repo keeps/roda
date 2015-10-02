@@ -21,10 +21,7 @@ import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.i18n.client.LocaleInfo;
-import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -63,6 +60,7 @@ import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
 import pt.gov.dgarq.roda.wui.common.client.tools.DescriptionLevelUtils;
+import pt.gov.dgarq.roda.wui.common.client.tools.Humanize;
 import pt.gov.dgarq.roda.wui.common.client.tools.JavascriptUtils;
 import pt.gov.dgarq.roda.wui.common.client.tools.RestErrorOverlayType;
 import pt.gov.dgarq.roda.wui.common.client.tools.RestUtils;
@@ -126,22 +124,11 @@ public class Browse extends Composite {
     return instance;
   }
 
-  // private static CommonConstants constants = (CommonConstants)
-  // GWT.create(CommonConstants.class);
-
   private static Filter COLLECTIONS_FILTER = new Filter(new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID));
 
-  // private static BrowseConstants constants = (BrowseConstants)
-  // GWT.create(BrowseConstants.class);
-
   private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
-  //
-  // private static BrowseImageBundle browseImageBundle = (BrowseImageBundle)
-  // GWT.create(BrowseImageBundle.class);
 
   private ClientLogger logger = new ClientLogger(getClass().getName());
-
-  // private SimplePanel viewPanelContainer;
 
   private String aipId;
 
@@ -217,12 +204,11 @@ public class Browse extends Composite {
   }
 
   protected void onPermissionsUpdate(RodaUser user) {
+    // FIXME
     if (user.hasRole(RodaConstants.REPOSITORY_PERMISSIONS_METADATA_EDITOR)) {
       createItem.setVisible(true);
-      // refresh.setVisible(true);
     } else {
       createItem.setVisible(false);
-      // refresh.setVisible(false);
     }
   }
 
@@ -362,7 +348,7 @@ public class Browse extends Composite {
 
                 @Override
                 public void onFailure(Throwable caught) {
-                  MessagePopup.showError("Error loading descriptive metadata");
+                  MessagePopup.showError(messages.errorLoadingDescriptiveMetadata(caught.getMessage()));
                 }
 
                 @Override
@@ -379,14 +365,17 @@ public class Browse extends Composite {
       if (!preservationMetadata.getRepresentationsMetadata().isEmpty()) {
         final FlowPanel premisContainer = new FlowPanel();
         final int premisTabIndex = itemMetadata.getWidgetCount();
-        // FIXME externalise strings
-        itemMetadata.add(premisContainer, "PREMIS");
+        itemMetadata.add(premisContainer, messages.premisTitle());
 
         // Download link
         SafeUri downloadUri = RestUtils.createPreservationMetadataDownloadUri(aipId);
-        String downloadLinkHtml = "<a href='" + downloadUri.asString()
-          + "' class='descriptiveMetadataLink'>download</a>";
-        HTML downloadLinkWidget = new HTML(SafeHtmlUtils.fromSafeConstant(downloadLinkHtml));
+        SafeHtmlBuilder b = new SafeHtmlBuilder();
+        b.append(SafeHtmlUtils.fromSafeConstant("<a href='"))
+          .append(SafeHtmlUtils.fromTrustedString(downloadUri.asString()))
+          .append(SafeHtmlUtils.fromSafeConstant("' class='descriptiveMetadataLink'>"));
+        b.append(messages.download());
+        b.append(SafeHtmlUtils.fromSafeConstant("</a>"));
+        HTML downloadLinkWidget = new HTML(b.toSafeHtml());
         premisContainer.add(downloadLinkWidget);
 
         itemMetadata.addSelectionHandler(new SelectionHandler<Integer>() {
@@ -401,7 +390,7 @@ public class Browse extends Composite {
 
                   @Override
                   public void onFailure(Throwable caught) {
-                    MessagePopup.showError("Error loading preservation metadata");
+                    MessagePopup.showError(messages.errorLoadingPreservationMetadata(caught.getMessage()));
                   }
 
                   @Override
@@ -461,7 +450,7 @@ public class Browse extends Composite {
     breadcrumb.updatePath(
       Arrays.asList(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(TOP_ICON), RESOLVER.getHistoryPath())));
     breadcrumb.setVisible(false);
-    itemTitle.setText("All collections");
+    itemTitle.setText(messages.allCollectionsTitle());
     itemTitle.addStyleName("browseTitle-allCollections");
     itemDates.setText("");
     itemMetadata.clear();
@@ -512,19 +501,20 @@ public class Browse extends Composite {
     SafeHtml labelText;
     Set<RepresentationState> statuses = rep.getStatuses();
     if (statuses.containsAll(Arrays.asList(RepresentationState.ORIGINAL, RepresentationState.NORMALIZED))) {
-      labelText = SafeHtmlUtils.fromString("Original and normalized document");
+      labelText = messages.downloadTitleOriginalAndNormalized();
     } else if (statuses.contains(RepresentationState.ORIGINAL)) {
-      labelText = SafeHtmlUtils.fromString("Original document");
+      labelText = messages.downloadTitleOriginal();
     } else if (statuses.contains(RepresentationState.NORMALIZED)) {
-      labelText = SafeHtmlUtils.fromString("Normalized document");
+      labelText = messages.downloadTitleNormalized();
     } else {
-      labelText = SafeHtmlUtils.fromString("Document");
+      labelText = messages.downloadTitleDefault();
     }
 
     FlowPanel labelsPanel = new FlowPanel();
 
     Anchor label = new Anchor(labelText, RestUtils.createRepresentationDownloadUri(rep.getAipId(), rep.getId()));
-    Label subLabel = new Label(rep.getFileIds().size() + " files, " + readableFileSize(rep.getSizeInBytes()));
+    Label subLabel = new Label(
+      messages.downloadRepresentationInfo(rep.getFileIds().size(), Humanize.readableFileSize(rep.getSizeInBytes())));
 
     labelsPanel.add(label);
     labelsPanel.add(subLabel);
@@ -537,20 +527,6 @@ public class Browse extends Composite {
     label.addStyleName("browseDownloadLabel");
     subLabel.addStyleName("browseDownloadSublabel");
     return downloadPanel;
-  }
-
-  /**
-   * TODO move this to Utils
-   * 
-   * @param size
-   * @return
-   */
-  public static String readableFileSize(long size) {
-    if (size <= 0)
-      return "0 B";
-    final String[] units = new String[] {"B", "KB", "MB", "GB", "TB"};
-    int digitGroups = (int) (Math.log10(size) / Math.log10(1024));
-    return NumberFormat.getFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
   }
 
   private void getDescriptiveMetadataHTML(final String aipId, final String descId,
@@ -631,17 +607,7 @@ public class Browse extends Composite {
         public void onResponseReceived(Request request, Response response) {
           if (200 == response.getStatusCode()) {
             String html = response.getText();
-
-            SafeHtmlBuilder b = new SafeHtmlBuilder();
-            // Download link
-            // SafeUri downloadUri =
-            // RestUtils.createDescriptiveMetadataDownloadUri(aipId, descId);
-            // String downloadLinkHtml = "<a href='" + downloadUri.asString()
-            // + "' class='descriptiveMetadataLink'>download</a>";
-            // b.append(SafeHtmlUtils.fromSafeConstant(downloadLinkHtml));
-
-            b.append(SafeHtmlUtils.fromTrustedString(html));
-            SafeHtml safeHtml = b.toSafeHtml();
+            SafeHtml safeHtml =SafeHtmlUtils.fromTrustedString(html);
 
             callback.onSuccess(safeHtml);
           } else {
@@ -680,19 +646,18 @@ public class Browse extends Composite {
 
   private String getDatesText(SimpleDescriptionObject sdo) {
     String ret;
-    DateTimeFormat formatter = DateTimeFormat.getFormat(PredefinedFormat.DATE_MEDIUM);
 
     Date dateInitial = sdo.getDateInitial();
     Date dateFinal = sdo.getDateFinal();
 
     if (dateInitial == null && dateFinal == null) {
-      ret = "";
+      ret = messages.titleDatesEmpty();
     } else if (dateInitial != null && dateFinal == null) {
-      ret = "From " + formatter.format(sdo.getDateInitial());
+      ret = messages.titleDatesNoFinal(dateInitial);
     } else if (dateInitial == null && dateFinal != null) {
-      ret = "Up to " + formatter.format(sdo.getDateFinal());
+      ret = messages.titleDatesNoInitial(dateFinal);
     } else {
-      ret = formatter.format(sdo.getDateInitial()) + " to " + formatter.format(sdo.getDateFinal());
+      ret = messages.titleDates(dateInitial, dateFinal);
     }
 
     return ret;

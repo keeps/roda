@@ -3,43 +3,20 @@
  */
 package config.i18n.client;
 
+import java.util.Date;
+
 import com.google.gwt.i18n.client.Messages;
 import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 
 /**
  * @author Luis Faria
  * 
  */
 public interface BrowseMessages extends Messages {
-  
-  /*********************************************************/
-  /******************* NEW MESSAGES ***********************/
-  /*********************************************************/
-  
-  @DefaultMessage("Error in line {0}, column {1}: {2}")
-  SafeHtml metadataParseError(int line, int column, String message);
 
-  @DefaultMessage("Error")
-  SafeHtml notFoundErrorTitle();
-  
-  @DefaultMessage("Item with id {0} could not be found.")
-  SafeHtml notFoundErrorMessage(String id);
-
-  @DefaultMessage("Error")
-  SafeHtml genericErrorTitle();
-
-  @DefaultMessage("An unexpected error occurred when retrieving item. <pre><code>{0}</code></pre>")
-  SafeHtml genericErrorMessage(String message);
-  
-  @DefaultMessage("Error transforming descriptive metadata into HTML")
-  SafeHtml descriptiveMetadataTranformToHTMLError();
-  
-  @DefaultMessage("Error transforming preservation metadata into HTML")
-  SafeHtml preservationMetadataTranformToHTMLError();
-  
   /*********************************************************/
-  /*********************************************************/
+  /******************* OLD MESSAGES ***********************/
   /*********************************************************/
 
   // Tree
@@ -95,10 +72,76 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("{0} files, {1} bytes")
   public String preservationRepTooltip(int numberOfFiles, long sizeOfFiles);
-  
-  
 
+  /*********************************************************/
 
+  /******************* NEW MESSAGES ***********************/
+  /*********************************************************/
+
+  @DefaultMessage("Error in line {0}, column {1}: {2}")
+  SafeHtml metadataParseError(int line, int column, String message);
+
+  @DefaultMessage("Error")
+  SafeHtml notFoundErrorTitle();
+
+  @DefaultMessage("Item with id {0} could not be found.")
+  SafeHtml notFoundErrorMessage(String id);
+
+  @DefaultMessage("Error")
+  SafeHtml genericErrorTitle();
+
+  @DefaultMessage("An unexpected error occurred when retrieving item. <pre><code>{0}</code></pre>")
+  SafeHtml genericErrorMessage(String message);
+
+  @DefaultMessage("Error transforming descriptive metadata into HTML")
+  SafeHtml descriptiveMetadataTranformToHTMLError();
+
+  @DefaultMessage("Error transforming preservation metadata into HTML")
+  SafeHtml preservationMetadataTranformToHTMLError();
+
+  @DefaultMessage("All collections")
+  String allCollectionsTitle();
+
+  @DefaultMessage("Error loading descriptive metadata: {0}")
+  String errorLoadingDescriptiveMetadata(String message);
+
+  @DefaultMessage("Error loading preservation metadata: {0}")
+  String errorLoadingPreservationMetadata(String message);
+
+  @DefaultMessage("download")
+  SafeHtml download();
+
+  @DefaultMessage("PREMIS")
+  String premisTitle();
+
+  @DefaultMessage("{0,number} files, {1}")
+  @AlternateMessage({"one", "One file, {1}"})
+  String downloadRepresentationInfo(@PluralCount int numberOfFiles, String readableFileSize);
+
+  @DefaultMessage("Original and normalized document")
+  SafeHtml downloadTitleOriginalAndNormalized();
+
+  @DefaultMessage("Original document")
+  SafeHtml downloadTitleOriginal();
+
+  @DefaultMessage("Normalized document")
+  SafeHtml downloadTitleNormalized();
+
+  @DefaultMessage("Document")
+  SafeHtml downloadTitleDefault();
+
+  @DefaultMessage("")
+  String titleDatesEmpty();
+
+  @DefaultMessage("From {0,localdatetime,predef:DATE_MEDIUM}")
+  String titleDatesNoFinal(Date dateInitial);
+
+  @DefaultMessage("Up to {0,localdatetime,predef:DATE_MEDIUM}")
+  String titleDatesNoInitial(Date dateFinal);
+
+  @DefaultMessage("From {0,localdatetime,predef:DATE_MEDIUM} to {1,localdatetime,predef:DATE_MEDIUM}")
+  String titleDates(Date dateInitial, Date dateFinal);
+  
   
 
 }

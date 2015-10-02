@@ -20,6 +20,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.datepicker.client.DateBox;
 import com.google.gwt.user.datepicker.client.DateBox.DefaultFormat;
+import com.google.gwt.view.client.SelectionChangeEvent;
 
 import config.i18n.client.UserManagementConstants;
 import config.i18n.client.UserManagementMessages;
@@ -28,6 +29,7 @@ import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
 import pt.gov.dgarq.roda.core.data.adapter.facet.SimpleFacetParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.DateRangeFilterParameter;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
+import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.wui.common.client.ClientLogger;
 import pt.gov.dgarq.roda.wui.common.client.HistoryResolver;
 import pt.gov.dgarq.roda.wui.common.client.UserLogin;
@@ -116,7 +118,7 @@ public class UserLog extends Composite {
     Filter filter = null;
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.LOG_ACTION_COMPONENT),
       new SimpleFacetParameter(RodaConstants.LOG_ACTION_METHOD), new SimpleFacetParameter(RodaConstants.LOG_USERNAME));
-    logList = new LogEntryList(filter,facets, "Logs");
+    logList = new LogEntryList(filter, facets, "Logs");
     facetComponents = new FlowPanel();
     facetMethods = new FlowPanel();
     facetUsers = new FlowPanel();
@@ -126,6 +128,17 @@ public class UserLog extends Composite {
     facetPanels.put(RodaConstants.LOG_ACTION_METHOD, facetMethods);
     facetPanels.put(RodaConstants.LOG_USERNAME, facetUsers);
     FacetUtils.bindFacets(logList, facetPanels);
+
+    logList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
+
+      @Override
+      public void onSelectionChange(SelectionChangeEvent event) {
+        LogEntry selected = logList.getSelectionModel().getSelectedObject();
+        if (selected != null) {
+          Tools.newHistory(LogEntryPanel.RESOLVER, selected.getId());
+        }
+      }
+    });
 
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -165,6 +178,8 @@ public class UserLog extends Composite {
     if (historyTokens.size() == 0) {
       logList.refresh();
       callback.onSuccess(this);
+    } else if (historyTokens.size() > 1 && LogEntryPanel.RESOLVER.getHistoryToken().equals(historyTokens.get(0))) {
+      LogEntryPanel.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else {
       Tools.newHistory(RESOLVER);
       callback.onSuccess(null);
