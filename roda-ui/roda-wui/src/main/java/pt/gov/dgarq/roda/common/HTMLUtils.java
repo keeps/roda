@@ -20,6 +20,8 @@ import java.util.TreeSet;
 import javax.xml.transform.TransformerException;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.roda.common.RodaUtils;
 import org.roda.index.utils.SolrUtils;
@@ -182,23 +184,24 @@ public final class HTMLUtils {
     String limitFile) throws ModelServiceException, StorageServiceException {
     String html = "";
     try {
-      Path p =  Paths.get("temp");
-      LOGGER.error("PATH: "+p.toString());
+      
+      String tempFolder = RandomStringUtils.randomAlphabetic(10);
+      String tempFolder2 = RandomStringUtils.randomAlphabetic(10);
+      Path p =  Paths.get(tempFolder);
       StorageService tempStorage = new FileStorageService(p);
-      tempStorage.copy(storage, preservationPath, DefaultStoragePath.parse("temp2"));
+      tempStorage.copy(storage, preservationPath, DefaultStoragePath.parse(tempFolder2));
 
       String xml = "<files>";
-      ClosableIterable<Resource> resources = tempStorage.listResourcesUnderContainer(DefaultStoragePath.parse("temp2"));
+      ClosableIterable<Resource> resources = tempStorage.listResourcesUnderContainer(DefaultStoragePath.parse(tempFolder2));
       Iterator<Resource> it = resources.iterator();
       while (it.hasNext()) {
         Resource r = it.next();
         
-        xml += "<file>temp/" + r.getStoragePath().asString() + "</file>";
+        xml += "<file>"+tempFolder+"/" + r.getStoragePath().asString() + "</file>";
       }
       xml += "</files>";
-      LOGGER.error("XML: "+xml);
       resources.close();
-      Path xmlFile = Paths.get("temp","temp2","list.xml");
+      Path xmlFile = Paths.get(tempFolder,tempFolder2,"list.xml");
       java.io.File f = xmlFile.toFile();
       FileUtils.write(f, xml);
 
@@ -210,11 +213,8 @@ public final class HTMLUtils {
       parameters.put("fromFile", startFile);
       parameters.put("maxFiles", limitFile);
       
-      LOGGER.error("!!!!!!!!!!!! LOCALE: "+locale);
       Messages messages = RodaCoreFactory.getI18NMessages(locale); 
-      LOGGER.error("!!!!!!!!!!!!!!SIZE: "+messages.getTranslations("premis",String.class).size());
-      for(Map.Entry<String, String> entry : messages.getTranslations("premis",String.class).entrySet()) {
-        LOGGER.error(entry.getKey()+" - "+entry.getValue());
+      for(Map.Entry<String, String> entry : messages.getTranslations("binaryToHtml.premis",String.class).entrySet()) {
         parameters.put(entry.getKey(), entry.getValue()); 
        }
       

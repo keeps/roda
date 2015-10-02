@@ -415,8 +415,6 @@ public class AipsResourceImpl {
     String representationId, String startAgent, String limitAgent, String startEvent, String limitEvent,
     String startFile, String limitFile, String acceptFormat, String language) {
     String authorization = request.getHeader("Authorization");
-    LOGGER.error("STARTEVENT: " + startEvent);
-    LOGGER.error("LIMITEVENT: " + limitEvent);
     try {
       if (acceptFormat != null && (acceptFormat.equalsIgnoreCase("bin") || acceptFormat.equalsIgnoreCase("html"))) {
         // get user
