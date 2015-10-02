@@ -161,18 +161,6 @@ public class BrowserHelper {
     return HTMLUtils.getPreservationMetadataBundle(aipId, model, storage);
   }
 
-  public static String getPreservationMetadataHTML(String aipId, final Locale locale)
-    throws GenericException, TransformerException {
-    ModelService model = RodaCoreFactory.getModelService();
-    StorageService storage = RodaCoreFactory.getStorageService();
-    try {
-      return HTMLUtils.getPreservationMetadataHTML(aipId, model, storage, locale);
-    } catch (ModelServiceException | StorageServiceException e) {
-      LOGGER.error("Could not get preservation metadata HTML", e);
-      throw new GenericException("Could not get preservation metadata HTML: " + e.getMessage());
-    }
-  }
-
   public static DescriptiveMetadataEditBundle getDescriptiveMetadataEditBundle(String aipId,
     String descriptiveMetadataId) throws GenericException {
     DescriptiveMetadataEditBundle ret;
@@ -505,11 +493,10 @@ public class BrowserHelper {
 
     StorageService storage = RodaCoreFactory.getStorageService();
     ModelService model = RodaCoreFactory.getModelService();
-    ClosableIterable<PreservationMetadata> preservationFiles = null;
     StreamResponse response = null;
 
     if (RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
-
+      ClosableIterable<PreservationMetadata> preservationFiles = null;
       try {
         Pair<Integer, Integer> pagingParamsAgent = ApiUtils.processPagingParams(startAgent, limitAgent);
         int counterAgent = 0;
@@ -521,9 +508,6 @@ public class BrowserHelper {
         preservationFiles = model.listPreservationMetadataBinaries(aipId, representationId);
         for (PreservationMetadata preservationFile : preservationFiles) {
           boolean add = false;
-          LOGGER.debug("TYPE:" + preservationFile.getType());
-          LOGGER.debug("COUNTEREVENT: " + counterEvent);
-          LOGGER.debug("LIMIT: " + pagingParamsEvent.getSecond());
 
           if (preservationFile.getType().equalsIgnoreCase("agent")) {
             if (counterAgent >= pagingParamsAgent.getFirst()
@@ -570,10 +554,11 @@ public class BrowserHelper {
     } else if (RodaConstants.API_ATTR_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
       try {
         String filename = aipId + "_" + representationId + ".html";
-        preservationFiles = model.listPreservationMetadataBinaries(aipId, representationId);
 
-        String html = HTMLUtils.getRepresentationPreservationMetadataHtml(preservationFiles, storage,
-          ServerTools.parseLocale(language), startAgent, limitAgent, startEvent, limitEvent, startFile, limitFile);
+        String html = HTMLUtils.getRepresentationPreservationMetadataHtml(
+          ModelUtils.getPreservationPath(aipId, representationId), storage, ServerTools.parseLocale(language),
+          ApiUtils.processPagingParams(startAgent, limitAgent), ApiUtils.processPagingParams(startEvent, limitEvent),
+          ApiUtils.processPagingParams(startFile, limitFile));
 
         StreamingOutput stream = new StreamingOutput() {
           @Override
@@ -588,15 +573,6 @@ public class BrowserHelper {
       } catch (ModelServiceException | StorageServiceException e) {
         // FIXME
         throw new GenericException(e.getMessage());
-      } finally {
-        if (preservationFiles != null) {
-          try {
-            preservationFiles.close();
-          } catch (IOException e) {
-            // FIXME see what better exception should be thrown
-            throw new GenericException(e.getMessage());
-          }
-        }
       }
     }
 

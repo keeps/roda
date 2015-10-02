@@ -8,7 +8,6 @@ import java.util.Locale;
 import javax.xml.transform.TransformerException;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
-import org.roda.api.v1.utils.ApiUtils;
 import org.roda.api.v1.utils.StreamResponse;
 import org.roda.common.UserUtility;
 import org.roda.model.AIP;
@@ -75,23 +74,6 @@ public class Browser extends RodaCoreService {
       descId);
 
     return bundle;
-  }
-
-  public static String getPreservationMetadataHTML(RodaUser user, String aipId, Locale locale)
-    throws GenericException, AuthorizationDeniedException, TransformerException {
-    Date startDate = new Date();
-
-    // check user permissions
-    UserUtility.checkRoles(user, "browse");
-
-    // delegate
-    String html = BrowserHelper.getPreservationMetadataHTML(aipId, locale, ApiUtils.processPagingParams(null, null), ApiUtils.processPagingParams(null, null), ApiUtils.processPagingParams(null, null));
-
-    // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, "Browser", "getPreservationMetadataHTML", aipId, duration, "aipId", aipId);
-
-    return html;
   }
 
   public static IndexResult<SimpleDescriptionObject> findDescriptiveMetadata(RodaUser user, Filter filter,
