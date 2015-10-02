@@ -503,9 +503,8 @@ public class BrowserHelper {
         String filename = aipId + "_" + representationId + ".html";
         // FIXME
         String mediaType = MediaType.TEXT_HTML;
-        preservationMetadata = model.listPreservationMetadataBinaries(aipId, representationId);
 
-        String html = HTMLUtils.getRepresentationPreservationMetadataHtml(preservationMetadata, storage,
+        String html = HTMLUtils.getRepresentationPreservationMetadataHtml(ModelUtils.getPreservationPath(aipId, representationId), storage,
           ServerTools.parseLocale(language), startAgent, limitAgent, startEvent, limitEvent, startFile, limitFile);
 
         StreamingOutput stream = new StreamingOutput() {
