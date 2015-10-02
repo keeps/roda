@@ -16,6 +16,20 @@ public final class RodaConstants {
   public static final String I18N_BINARY_TO_HTML_PREFIX = "binaryToHtml.";
   public static final String I18N_UI_SEARCH_FACETS_PREFIX = "ui.search.facets.";
   public static final String I18N_UI_USER_ADMINISTRATION_FACETS_PREFIX = "ui.user_administration.facets.";
+  
+  public static final String API_SEP = "/";
+  public static final String API_REST_V1_AIPS = "api/v1/aips/";
+  public static final String API_DATA = "data";
+  public static final String API_DESCRIPTIVE_METADATA = "descriptive_metadata";
+  public static final String API_PRESERVATION_METADATA = "preservation_metadata";
+  public static final String API_QUERY_START = "?";
+  public static final String API_ATTR_ASSIGN_SYMBOL = "=";
+  public static final String API_QUERY_SEP = "&";
+  public static final String API_ATTR_ACCEPT_FORMAT = "acceptFormat";
+  public static final String API_ATTR_ACCEPT_FORMAT_BIN = "bin";
+  public static final String API_ATTR_ACCEPT_FORMAT_XML = "xml";
+  public static final String API_ATTR_ACCEPT_FORMAT_HTML = "html";
+  public static final String API_ATTR_LANG = "lang";
 
   /*
    * INDEX NAMES

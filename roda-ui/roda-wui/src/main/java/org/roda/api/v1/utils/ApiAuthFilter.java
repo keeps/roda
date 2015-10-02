@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.HttpHeaders;
 
 import org.apache.commons.lang3.StringUtils;
+import org.roda.common.UserUtility;
 
 public class ApiAuthFilter implements Filter {
   private List<String> exclusions = new ArrayList<String>();
@@ -46,7 +47,9 @@ public class ApiAuthFilter implements Filter {
 
       String authorization = httpServletRequest.getHeader("Authorization");
 
-      if (authorization == null) {
+      // FIXME this method should be more auth scheme agnostic (basic auth vs.
+      // cas)
+      if (authorization == null || httpServletRequest.getSession().getAttribute(UserUtility.RODA_USER) == null) {
         httpServletResponse.setHeader(HttpHeaders.WWW_AUTHENTICATE, "Basic realm=\"" + realm + "\"");
         httpServletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED);
         return;

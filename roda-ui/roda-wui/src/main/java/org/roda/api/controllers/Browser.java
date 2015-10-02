@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import javax.ws.rs.core.StreamingOutput;
 import javax.xml.transform.TransformerException;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
@@ -20,7 +19,7 @@ import org.roda.storage.Binary;
 import pt.gov.dgarq.roda.common.RodaCoreService;
 import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
 import pt.gov.dgarq.roda.core.common.NotFoundException;
-import pt.gov.dgarq.roda.core.common.Pair;
+import pt.gov.dgarq.roda.core.common.NotImplementedException;
 import pt.gov.dgarq.roda.core.common.RODAException;
 import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
 import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
@@ -170,16 +169,20 @@ public class Browser extends RodaCoreService {
    * ---------------- REST related methods - start -----------------------------
    * ---------------------------------------------------------------------------
    */
-  public static Pair<String, StreamingOutput> getAipRepresentation(RodaUser user, String aipId, String representationId)
-    throws AuthorizationDeniedException, GenericException, NotFoundException {
+  public static StreamResponse getAipRepresentation(RodaUser user, String aipId, String representationId,
+    String acceptFormat)
+      throws AuthorizationDeniedException, GenericException, NotFoundException, NotImplementedException {
     Date startDate = new Date();
+
+    // validate input
+    BrowserHelper.validateGetAipRepresentationParams(acceptFormat);
 
     // check user permissions
     SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(aipId);
     UserUtility.checkObjectReadPermissions(user, sdo);
 
     // delegate
-    Pair<String, StreamingOutput> aipRepresentation = BrowserHelper.getAipRepresentation(aipId, representationId);
+    StreamResponse aipRepresentation = BrowserHelper.getAipRepresentation(aipId, representationId, acceptFormat);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
@@ -189,17 +192,20 @@ public class Browser extends RodaCoreService {
     return aipRepresentation;
   }
 
-  public static Pair<String, StreamingOutput> listAipDescriptiveMetadata(RodaUser user, String aipId, String start,
-    String limit) throws AuthorizationDeniedException, GenericException, NotFoundException {
+  public static StreamResponse listAipDescriptiveMetadata(RodaUser user, String aipId, String start, String limit,
+    String acceptFormat)
+      throws AuthorizationDeniedException, GenericException, NotFoundException, NotImplementedException {
     Date startDate = new Date();
+
+    // validate input
+    BrowserHelper.validateListAipDescriptiveMetadataParams(acceptFormat);
 
     // check user permissions
     SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(aipId);
     UserUtility.checkObjectReadPermissions(user, sdo);
 
     // delegate
-    Pair<String, StreamingOutput> aipDescriptiveMetadataList = BrowserHelper.listAipDescriptiveMetadata(aipId, start,
-      limit);
+    StreamResponse aipDescriptiveMetadataList = BrowserHelper.listAipDescriptiveMetadata(aipId, start, limit);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
@@ -210,9 +216,12 @@ public class Browser extends RodaCoreService {
   }
 
   public static StreamResponse getAipDescritiveMetadata(RodaUser user, String aipId, String metadataId,
-    String acceptFormat, String language)
-      throws AuthorizationDeniedException, GenericException, TransformerException, NotFoundException {
+    String acceptFormat, String language) throws AuthorizationDeniedException, GenericException, TransformerException,
+      NotFoundException, NotImplementedException {
     Date startDate = new Date();
+
+    // validate input
+    BrowserHelper.validateGetAipDescritiveMetadataParams(acceptFormat);
 
     // check user permissions
     SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(aipId);
@@ -230,17 +239,20 @@ public class Browser extends RodaCoreService {
 
   }
 
-  public static Pair<String, StreamingOutput> listAipPreservationMetadata(RodaUser user, String aipId, String start,
-    String limit) throws AuthorizationDeniedException, GenericException, NotFoundException {
+  public static StreamResponse listAipPreservationMetadata(RodaUser user, String aipId, String start, String limit,
+    String acceptFormat)
+      throws AuthorizationDeniedException, GenericException, NotFoundException, NotImplementedException {
     Date startDate = new Date();
+
+    // validate input
+    BrowserHelper.validateListAipPreservationMetadataParams(acceptFormat);
 
     // check user permissions
     SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(aipId);
     UserUtility.checkObjectReadPermissions(user, sdo);
 
     // delegate
-    Pair<String, StreamingOutput> aipPreservationMetadataList = BrowserHelper.aipsAipIdPreservationMetadataGet(aipId,
-      start, limit);
+    StreamResponse aipPreservationMetadataList = BrowserHelper.aipsAipIdPreservationMetadataGet(aipId, start, limit);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
@@ -250,20 +262,22 @@ public class Browser extends RodaCoreService {
     return aipPreservationMetadataList;
   }
 
-  public static Pair<String, StreamingOutput> getAipRepresentationPreservationMetadata(RodaUser user, String aipId,
+  public static StreamResponse getAipRepresentationPreservationMetadata(RodaUser user, String aipId,
     String representationId, String startAgent, String limitAgent, String startEvent, String limitEvent,
-    String startFile, String limitFile, String acceptFormat, String language)
-      throws AuthorizationDeniedException, GenericException, TransformerException, NotFoundException {
+    String startFile, String limitFile, String acceptFormat, String language) throws AuthorizationDeniedException,
+      GenericException, TransformerException, NotFoundException, NotImplementedException {
     Date startDate = new Date();
+
+    // validate input
+    BrowserHelper.validateGetAipRepresentationPreservationMetadataParams(acceptFormat, language);
 
     // check user permissions
     SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(aipId);
     UserUtility.checkObjectReadPermissions(user, sdo);
 
     // delegate
-    Pair<String, StreamingOutput> aipRepresentationPreservationMetadata = BrowserHelper
-      .getAipRepresentationPreservationMetadata(aipId, representationId, startAgent, limitAgent, startEvent, limitEvent,
-        startFile, limitFile, acceptFormat, language);
+    StreamResponse aipRepresentationPreservationMetadata = BrowserHelper.getAipRepresentationPreservationMetadata(aipId,
+      representationId, startAgent, limitAgent, startEvent, limitEvent, startFile, limitFile, acceptFormat, language);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
@@ -275,7 +289,7 @@ public class Browser extends RodaCoreService {
 
   }
 
-  public static Pair<String, StreamingOutput> getAipRepresentationPreservationMetadataFile(RodaUser user, String aipId,
+  public static StreamResponse getAipRepresentationPreservationMetadataFile(RodaUser user, String aipId,
     String representationId, String fileId) throws AuthorizationDeniedException, GenericException, NotFoundException {
     Date startDate = new Date();
 
@@ -284,7 +298,7 @@ public class Browser extends RodaCoreService {
     UserUtility.checkObjectReadPermissions(user, sdo);
 
     // delegate
-    Pair<String, StreamingOutput> aipRepresentationPreservationMetadataFile = BrowserHelper
+    StreamResponse aipRepresentationPreservationMetadataFile = BrowserHelper
       .getAipRepresentationPreservationMetadataFile(aipId, representationId, fileId);
 
     // register action
@@ -337,8 +351,7 @@ public class Browser extends RodaCoreService {
   }
 
   public static void aipsAipIdPreservationMetadataRepresentationIdFileIdDelete(RodaUser user, String aipId,
-    String representationId, String fileId)
-      throws AuthorizationDeniedException, GenericException, NotFoundException {
+    String representationId, String fileId) throws AuthorizationDeniedException, GenericException, NotFoundException {
     Date startDate = new Date();
 
     // check user permissions
@@ -543,8 +556,12 @@ public class Browser extends RodaCoreService {
   }
 
   public static StreamResponse getAipRepresentationFile(RodaUser user, String aipId, String representationId,
-    String fileId, String acceptFormat) throws GenericException, AuthorizationDeniedException, NotFoundException {
+    String fileId, String acceptFormat)
+      throws GenericException, AuthorizationDeniedException, NotFoundException, NotImplementedException {
     Date startDate = new Date();
+
+    // validate input
+    BrowserHelper.validateGetAipRepresentationFileParams(acceptFormat);
 
     // check user permissions
     SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(aipId);

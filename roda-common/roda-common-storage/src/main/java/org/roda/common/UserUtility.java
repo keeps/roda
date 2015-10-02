@@ -28,7 +28,7 @@ import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 
 public class UserUtility {
   private static final Logger LOGGER = Logger.getLogger(UserUtility.class);
-  private static final String RODA_USER = "RODA_USER";
+  public static final String RODA_USER = "RODA_USER";
 
   private static LdapUtility LDAP_UTILITY;
 

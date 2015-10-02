@@ -1,10 +1,6 @@
 package pt.gov.dgarq.roda.core.common;
 
 /**
- * 
- */
-
-/**
  * @author Luis Faria
  * 
  */

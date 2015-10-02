@@ -24,6 +24,7 @@ import javax.ws.rs.core.StreamingOutput;
 import javax.xml.transform.TransformerException;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.roda.api.v1.utils.ApiUtils;
@@ -49,6 +50,7 @@ import pt.gov.dgarq.roda.common.HTMLUtils;
 import pt.gov.dgarq.roda.common.RodaCoreFactory;
 import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
 import pt.gov.dgarq.roda.core.common.NotFoundException;
+import pt.gov.dgarq.roda.core.common.NotImplementedException;
 import pt.gov.dgarq.roda.core.common.Pair;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
@@ -159,14 +161,12 @@ public class BrowserHelper {
     return HTMLUtils.getPreservationMetadataBundle(aipId, model, storage);
   }
 
-  public static String getPreservationMetadataHTML(String aipId, final Locale locale,
-    Pair<Integer, Integer> pagingParametersAgents, Pair<Integer, Integer> pagingParametersEvents,
-    Pair<Integer, Integer> pagingParametersFile) throws GenericException, TransformerException {
+  public static String getPreservationMetadataHTML(String aipId, final Locale locale)
+    throws GenericException, TransformerException {
     ModelService model = RodaCoreFactory.getModelService();
     StorageService storage = RodaCoreFactory.getStorageService();
     try {
-      return HTMLUtils.getPreservationMetadataHTML(aipId, model, storage, locale, pagingParametersAgents,
-        pagingParametersEvents, pagingParametersFile);
+      return HTMLUtils.getPreservationMetadataHTML(aipId, model, storage, locale);
     } catch (ModelServiceException | StorageServiceException e) {
       LOGGER.error("Could not get preservation metadata HTML", e);
       throw new GenericException("Could not get preservation metadata HTML: " + e.getMessage());
@@ -258,6 +258,14 @@ public class BrowserHelper {
     return count;
   }
 
+  public static void validateGetAipRepresentationFileParams(String acceptFormat) throws NotImplementedException {
+    if (RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
+      return;
+    }
+
+    throw new NotImplementedException();
+  }
+
   protected static SimpleDescriptionObject getSimpleDescriptionObject(String aipId)
     throws GenericException, NotFoundException {
     try {
@@ -271,7 +279,15 @@ public class BrowserHelper {
     }
   }
 
-  protected static Pair<String, StreamingOutput> getAipRepresentation(String aipId, String representationId)
+  protected static void validateGetAipRepresentationParams(String acceptFormat) throws NotImplementedException {
+    if (RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
+      return;
+    }
+
+    throw new NotImplementedException();
+  }
+
+  protected static StreamResponse getAipRepresentation(String aipId, String representationId, String acceptFormat)
     throws GenericException {
     try {
       ModelService model = RodaCoreFactory.getModelService();
@@ -287,7 +303,7 @@ public class BrowserHelper {
         zipEntries.add(info);
       }
 
-      return createZipReturnPair(zipEntries, aipId + "_" + representationId);
+      return createZipStreamResponse(zipEntries, aipId + "_" + representationId);
 
     } catch (IOException | ModelServiceException | StorageServiceException e) {
       // FIXME see what better exception should be thrown
@@ -296,7 +312,15 @@ public class BrowserHelper {
 
   }
 
-  protected static Pair<String, StreamingOutput> listAipDescriptiveMetadata(String aipId, String start, String limit)
+  protected static void validateListAipDescriptiveMetadataParams(String acceptFormat) throws NotImplementedException {
+    if (RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
+      return;
+    }
+
+    throw new NotImplementedException();
+  }
+
+  protected static StreamResponse listAipDescriptiveMetadata(String aipId, String start, String limit)
     throws GenericException {
     try {
       ModelService model = RodaCoreFactory.getModelService();
@@ -318,12 +342,21 @@ public class BrowserHelper {
         counter++;
       }
 
-      return createZipReturnPair(zipEntries, aipId);
+      return createZipStreamResponse(zipEntries, aipId);
 
     } catch (IOException | ModelServiceException | StorageServiceException e) {
       // FIXME see what better exception should be thrown
       throw new GenericException(e.getMessage());
     }
+  }
+
+  protected static void validateGetAipDescritiveMetadataParams(String acceptFormat) throws NotImplementedException {
+    if (RodaConstants.API_ATTR_ACCEPT_FORMAT_XML.equals(acceptFormat)
+      || RodaConstants.API_ATTR_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
+      return;
+    }
+
+    throw new NotImplementedException();
   }
 
   public static StreamResponse getAipDescritiveMetadata(String aipId, String metadataId, String acceptFormat,
@@ -339,7 +372,7 @@ public class BrowserHelper {
     try {
       descriptiveMetadataBinary = model.retrieveDescriptiveMetadataBinary(aipId, metadataId);
 
-      if (acceptFormat == null || acceptFormat.equalsIgnoreCase("xml")) {
+      if (RodaConstants.API_ATTR_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
         filename = descriptiveMetadataBinary.getStoragePath().getName();
         mediaType = MediaType.TEXT_XML;
         stream = new StreamingOutput() {
@@ -349,7 +382,8 @@ public class BrowserHelper {
           }
         };
         ret = new StreamResponse(filename, mediaType, stream);
-      } else if (acceptFormat.equalsIgnoreCase("html")) {
+
+      } else if (RodaConstants.API_ATTR_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
         filename = descriptiveMetadataBinary.getStoragePath().getName() + ".html";
         mediaType = MediaType.TEXT_HTML;
         String htmlDescriptive = HTMLUtils.descriptiveMetadataToHtml(descriptiveMetadataBinary,
@@ -362,8 +396,8 @@ public class BrowserHelper {
             printStream.close();
           }
         };
-
         ret = new StreamResponse(filename, mediaType, stream);
+
       }
     } catch (ModelServiceException e) {
       new GenericException(e.getMessage());
@@ -372,7 +406,15 @@ public class BrowserHelper {
     return ret;
   }
 
-  public static Pair<String, StreamingOutput> aipsAipIdPreservationMetadataGet(String aipId, String start, String limit)
+  protected static void validateListAipPreservationMetadataParams(String acceptFormat) throws NotImplementedException {
+    if (RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
+      return;
+    }
+
+    throw new NotImplementedException();
+  }
+
+  public static StreamResponse aipsAipIdPreservationMetadataGet(String aipId, String start, String limit)
     throws GenericException {
 
     ClosableIterable<Representation> representations = null;
@@ -404,7 +446,7 @@ public class BrowserHelper {
         }
       }
 
-      return createZipReturnPair(zipEntries, aipId);
+      return createZipStreamResponse(zipEntries, aipId);
 
     } catch (IOException | ModelServiceException | StorageServiceException e) {
       // FIXME see what better exception should be thrown
@@ -433,16 +475,42 @@ public class BrowserHelper {
 
   }
 
-  public static Pair<String, StreamingOutput> getAipRepresentationPreservationMetadata(String aipId,
-    String representationId, String startAgent, String limitAgent, String startEvent, String limitEvent,
-    String startFile, String limitFile, String acceptFormat, String language)
-      throws GenericException, TransformerException {
+  protected static void validateGetAipRepresentationPreservationMetadataParams(String acceptFormat, String language)
+    throws NotImplementedException {
+    boolean valid = false;
+    if (RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN.equals(acceptFormat)
+      || RodaConstants.API_ATTR_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
+      valid = true;
+    }
+
+    // FIXME validate language? what exception should be thrown?
+    if (StringUtils.isNotBlank(language)) {
+      valid = valid && true;
+    }
+
+    if (!valid) {
+      throw new NotImplementedException();
+    }
+
+  }
+
+  // FIXME 100 lines of method
+  // FIXME 100 lines of method
+  // FIXME 100 lines of method
+  // FIXME 100 lines of method
+  // FIXME 100 lines of method
+  public static StreamResponse getAipRepresentationPreservationMetadata(String aipId, String representationId,
+    String startAgent, String limitAgent, String startEvent, String limitEvent, String startFile, String limitFile,
+    String acceptFormat, String language) throws GenericException, TransformerException {
+
     StorageService storage = RodaCoreFactory.getStorageService();
     ModelService model = RodaCoreFactory.getModelService();
-    if (acceptFormat == null || acceptFormat.equalsIgnoreCase("bin")) {
-      ClosableIterable<PreservationMetadata> preservationFiles = null;
-      try {
+    ClosableIterable<PreservationMetadata> preservationFiles = null;
+    StreamResponse response = null;
 
+    if (RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
+
+      try {
         Pair<Integer, Integer> pagingParamsAgent = ApiUtils.processPagingParams(startAgent, limitAgent);
         int counterAgent = 0;
         Pair<Integer, Integer> pagingParamsEvent = ApiUtils.processPagingParams(startEvent, limitEvent);
@@ -484,8 +552,8 @@ public class BrowserHelper {
             zipEntries.add(info);
           }
         }
+        response = createZipStreamResponse(zipEntries, aipId + "_" + representationId);
 
-        return createZipReturnPair(zipEntries, aipId + "_" + representationId);
       } catch (IOException | ModelServiceException | StorageServiceException e) {
         // FIXME see what better exception should be thrown
         throw new GenericException("");
@@ -499,17 +567,13 @@ public class BrowserHelper {
           }
         }
       }
-    } else if (acceptFormat.equalsIgnoreCase("html")) {
-      ClosableIterable<PreservationMetadata> preservationMetadata = null;
+    } else if (RodaConstants.API_ATTR_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
       try {
         String filename = aipId + "_" + representationId + ".html";
-        // FIXME
-        String mediaType = MediaType.TEXT_HTML;
+        preservationFiles = model.listPreservationMetadataBinaries(aipId, representationId);
 
-        String html = HTMLUtils.getRepresentationPreservationMetadataHtml(
-          ModelUtils.getPreservationPath(aipId, representationId), storage, ServerTools.parseLocale(language),
-          ApiUtils.processPagingParams(startAgent, limitAgent), ApiUtils.processPagingParams(startEvent, limitEvent),
-          ApiUtils.processPagingParams(startFile, limitFile));
+        String html = HTMLUtils.getRepresentationPreservationMetadataHtml(preservationFiles, storage,
+          ServerTools.parseLocale(language), startAgent, limitAgent, startEvent, limitEvent, startFile, limitFile);
 
         StreamingOutput stream = new StreamingOutput() {
           @Override
@@ -519,29 +583,29 @@ public class BrowserHelper {
             printStream.close();
           }
         };
-        return new Pair<String, StreamingOutput>(filename, stream);
+        response = new StreamResponse(filename, MediaType.TEXT_HTML, stream);
+
       } catch (ModelServiceException | StorageServiceException e) {
         // FIXME
         throw new GenericException(e.getMessage());
       } finally {
-        if (preservationMetadata != null) {
+        if (preservationFiles != null) {
           try {
-            preservationMetadata.close();
+            preservationFiles.close();
           } catch (IOException e) {
             // FIXME see what better exception should be thrown
             throw new GenericException(e.getMessage());
           }
         }
       }
-
-    } else {
-      return null;
     }
+
+    return response;
 
   }
 
-  public static Pair<String, StreamingOutput> getAipRepresentationPreservationMetadataFile(String aipId,
-    String representationId, String fileId) throws NotFoundException, GenericException {
+  public static StreamResponse getAipRepresentationPreservationMetadataFile(String aipId, String representationId,
+    String fileId) throws NotFoundException, GenericException {
 
     StorageService storage = RodaCoreFactory.getStorageService();
     Binary binary;
@@ -556,7 +620,7 @@ public class BrowserHelper {
         }
       };
 
-      return new Pair<String, StreamingOutput>(filename, stream);
+      return new StreamResponse(filename, MediaType.APPLICATION_OCTET_STREAM, stream);
     } catch (StorageServiceException e) {
       if (e.getCode() == StorageServiceException.NOT_FOUND) {
         throw new NotFoundException();
@@ -752,7 +816,7 @@ public class BrowserHelper {
     }
   }
 
-  private static Pair<String, StreamingOutput> createZipReturnPair(List<ZipEntryInfo> zipEntries, String zipName) {
+  private static StreamResponse createZipStreamResponse(List<ZipEntryInfo> zipEntries, String zipName) {
     final String filename;
     final StreamingOutput stream;
     if (zipEntries.size() == 1) {
@@ -774,7 +838,7 @@ public class BrowserHelper {
       filename = zipName + ".zip";
     }
 
-    return new Pair<String, StreamingOutput>(filename, stream);
+    return new StreamResponse(filename, MediaType.APPLICATION_OCTET_STREAM, stream);
 
   }
 
@@ -819,7 +883,6 @@ public class BrowserHelper {
       final String filename;
       final String mediaType;
       final StreamingOutput stream;
-      StreamResponse ret = null;
 
       StorageService storage = RodaCoreFactory.getStorageService();
       Binary representationFileBinary = storage
@@ -832,9 +895,9 @@ public class BrowserHelper {
           IOUtils.copy(representationFileBinary.getContent().createInputStream(), os);
         }
       };
-      ret = new StreamResponse(filename, mediaType, stream);
 
-      return ret;
+      return new StreamResponse(filename, mediaType, stream);
+
     } catch (StorageServiceException e) {
       if (e.getCode() == StorageServiceException.NOT_FOUND) {
         throw new GenericException("File not found: " + aipId + "/" + representationId + "/" + fileId);
