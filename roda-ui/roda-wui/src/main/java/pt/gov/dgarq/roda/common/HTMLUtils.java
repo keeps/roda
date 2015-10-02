@@ -120,7 +120,7 @@ public final class HTMLUtils {
   }
 
   public static String getPreservationMetadataHTML(String aipId, ModelService model, StorageService storage,
-    Locale locale) throws ModelServiceException, StorageServiceException, TransformerException {
+    Locale locale, Pair<Integer, Integer> pagingParametersAgents, Pair<Integer, Integer> pagingParametersEvents, Pair<Integer, Integer> pagingParametersFile) throws ModelServiceException, StorageServiceException, TransformerException {
     AIP aip = model.retrieveAIP(aipId);
     StringBuffer s = new StringBuffer();
     s.append("<span class='preservationMetadata'><div class='title'>PREMIS</div>");
@@ -135,7 +135,7 @@ public final class HTMLUtils {
       for (String representationId : aip.getRepresentationIds()) {
         try {
           String html = getRepresentationPreservationMetadataHtml(
-            ModelUtils.getPreservationPath(aipId, representationId), storage, locale);
+            ModelUtils.getPreservationPath(aipId, representationId), storage, locale,pagingParametersAgents,pagingParametersEvents,pagingParametersFile);
           s.append(html);
         } finally {
 
@@ -174,14 +174,9 @@ public final class HTMLUtils {
     return representationBundle;
   }
 
-  public static String getRepresentationPreservationMetadataHtml(StoragePath path, StorageService storage,
-    final Locale locale) throws ModelServiceException, StorageServiceException {
-    return getRepresentationPreservationMetadataHtml(path, storage, locale, "0", "100", "0", "100", "0", "100");
-  }
 
   public static String getRepresentationPreservationMetadataHtml(StoragePath preservationPath, StorageService storage,
-    final Locale locale, String startAgent, String limitAgent, String startEvent, String limitEvent, String startFile,
-    String limitFile) throws ModelServiceException, StorageServiceException {
+    final Locale locale, Pair<Integer,Integer> pagingParametersAgents, Pair<Integer,Integer> pagingParametersEvents, Pair<Integer,Integer> pagingParametersFiles) throws ModelServiceException, StorageServiceException {
     String html = "";
     try {
       
@@ -199,6 +194,7 @@ public final class HTMLUtils {
         
         xml += "<file>"+tempFolder+"/" + r.getStoragePath().asString() + "</file>";
       }
+      resources.close();
       xml += "</files>";
       resources.close();
       Path xmlFile = Paths.get(tempFolder,tempFolder2,"list.xml");
@@ -206,12 +202,12 @@ public final class HTMLUtils {
       FileUtils.write(f, xml);
 
       Map<String,Object> parameters = new HashMap<String,Object>();
-      parameters.put("fromEvent", startEvent);
-      parameters.put("maxEvents", limitEvent);
-      parameters.put("startAgent", startAgent);
-      parameters.put("maxAgents", limitAgent);
-      parameters.put("fromFile", startFile);
-      parameters.put("maxFiles", limitFile);
+      parameters.put("fromEvent", pagingParametersEvents.getFirst().toString());
+      parameters.put("maxEvents", pagingParametersEvents.getSecond().toString());
+      parameters.put("startAgent", pagingParametersAgents.getFirst().toString());
+      parameters.put("maxAgents", pagingParametersAgents.getSecond().toString());
+      parameters.put("fromFile", pagingParametersFiles.getFirst().toString());
+      parameters.put("maxFiles", pagingParametersFiles.getSecond().toString());
       
       Messages messages = RodaCoreFactory.getI18NMessages(locale); 
       for(Map.Entry<String, String> entry : messages.getTranslations("binaryToHtml.premis",String.class).entrySet()) {

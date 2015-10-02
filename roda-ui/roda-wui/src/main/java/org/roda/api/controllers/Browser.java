@@ -9,6 +9,7 @@ import javax.ws.rs.core.StreamingOutput;
 import javax.xml.transform.TransformerException;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.roda.api.v1.utils.ApiUtils;
 import org.roda.api.v1.utils.StreamResponse;
 import org.roda.common.UserUtility;
 import org.roda.model.AIP;
@@ -85,7 +86,7 @@ public class Browser extends RodaCoreService {
     UserUtility.checkRoles(user, "browse");
 
     // delegate
-    String html = BrowserHelper.getPreservationMetadataHTML(aipId, locale);
+    String html = BrowserHelper.getPreservationMetadataHTML(aipId, locale, ApiUtils.processPagingParams(null, null), ApiUtils.processPagingParams(null, null), ApiUtils.processPagingParams(null, null));
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();

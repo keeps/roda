@@ -159,12 +159,14 @@ public class BrowserHelper {
     return HTMLUtils.getPreservationMetadataBundle(aipId, model, storage);
   }
 
-  public static String getPreservationMetadataHTML(String aipId, final Locale locale)
-    throws GenericException, TransformerException {
+  public static String getPreservationMetadataHTML(String aipId, final Locale locale,
+    Pair<Integer, Integer> pagingParametersAgents, Pair<Integer, Integer> pagingParametersEvents,
+    Pair<Integer, Integer> pagingParametersFile) throws GenericException, TransformerException {
     ModelService model = RodaCoreFactory.getModelService();
     StorageService storage = RodaCoreFactory.getStorageService();
     try {
-      return HTMLUtils.getPreservationMetadataHTML(aipId, model, storage, locale);
+      return HTMLUtils.getPreservationMetadataHTML(aipId, model, storage, locale, pagingParametersAgents,
+        pagingParametersEvents, pagingParametersFile);
     } catch (ModelServiceException | StorageServiceException e) {
       LOGGER.error("Could not get preservation metadata HTML", e);
       throw new GenericException("Could not get preservation metadata HTML: " + e.getMessage());
@@ -504,8 +506,10 @@ public class BrowserHelper {
         // FIXME
         String mediaType = MediaType.TEXT_HTML;
 
-        String html = HTMLUtils.getRepresentationPreservationMetadataHtml(ModelUtils.getPreservationPath(aipId, representationId), storage,
-          ServerTools.parseLocale(language), startAgent, limitAgent, startEvent, limitEvent, startFile, limitFile);
+        String html = HTMLUtils.getRepresentationPreservationMetadataHtml(
+          ModelUtils.getPreservationPath(aipId, representationId), storage, ServerTools.parseLocale(language),
+          ApiUtils.processPagingParams(startAgent, limitAgent), ApiUtils.processPagingParams(startEvent, limitEvent),
+          ApiUtils.processPagingParams(startFile, limitFile));
 
         StreamingOutput stream = new StreamingOutput() {
           @Override
