@@ -27,7 +27,8 @@
 			</field>
 		</xsl:if>
 		<xsl:if test="eadc:did/eadc:unitdate/@normal">
-			<xsl:analyze-string regex="^(\d{{4}}-\d{{2}}-\d{{2}})?/(\d{{4}}-\d{{2}}-\d{{2}})?$"
+			<!-- 2015-01-01/2015-01-01 -->
+			<xsl:analyze-string regex="^(\d{{4}}-\d{{2}}-\d{{2}})?/?(\d{{4}}-\d{{2}}-\d{{2}})?$"
 				select="eadc:did/eadc:unitdate/@normal">
 				<xsl:matching-substring>
 					<xsl:variable name="dateInitial">
@@ -44,7 +45,8 @@
 					</xsl:if>
 				</xsl:matching-substring>
 			</xsl:analyze-string>
-			<xsl:analyze-string regex="^(\d{{4}})?/(\d{{4}}-\d{{2}}-\d{{2}})?$"
+			<!-- 2015/2015-01-01 -->
+			<xsl:analyze-string regex="^(\d{{4}})?/?(\d{{4}}-\d{{2}}-\d{{2}})?$"
 				select="eadc:did/eadc:unitdate/@normal">
 				<xsl:matching-substring>
 					<xsl:variable name="dateInitial">
@@ -61,7 +63,8 @@
 					</xsl:if>
 				</xsl:matching-substring>
 			</xsl:analyze-string>
-			<xsl:analyze-string regex="^(\d{{4}}-\d{{2}}-\d{{2}})?/(\d{{4}})?$"
+			<!-- 2015-01-01/2015 -->
+			<xsl:analyze-string regex="^(\d{{4}}-\d{{2}}-\d{{2}})?/?(\d{{4}})?$"
 				select="eadc:did/eadc:unitdate/@normal">
 				<xsl:matching-substring>
 					<xsl:variable name="dateInitial">
@@ -78,7 +81,8 @@
 					</xsl:if>
 				</xsl:matching-substring>
 			</xsl:analyze-string>
-			<xsl:analyze-string regex="^(\d{{4}})?/(\d{{4}})?$"
+			<!-- 2015/2015 -->
+			<xsl:analyze-string regex="^(\d{{4}})?/?(\d{{4}})?$"
 				select="eadc:did/eadc:unitdate/@normal">
 				<xsl:matching-substring>
 					<xsl:variable name="dateInitial">
@@ -92,6 +96,42 @@
 					</xsl:if>
 					<xsl:if test="not(normalize-space($dateFinal)='')">
 						<field name="dateFinal"><xsl:value-of select="$dateFinal" />-01-01T00:00:00Z</field>
+					</xsl:if>
+				</xsl:matching-substring>
+			</xsl:analyze-string>
+			<!-- 20150101/20150101 -->
+			<xsl:analyze-string regex="^(\d{{4}}\d{{2}}\d{{2}})?/?(\d{{4}}\d{{2}}\d{{2}})?$"
+				select="eadc:did/eadc:unitdate/@normal">
+				<xsl:matching-substring>
+					<xsl:variable name="dateInitial">
+						<xsl:value-of select="regex-group(1)" />
+					</xsl:variable>
+					<xsl:variable name="dateFinal">
+						<xsl:value-of select="regex-group(2)" />
+					</xsl:variable>
+					<xsl:if test="not(normalize-space($dateInitial)='')">
+						<field name="dateInitial"><xsl:value-of select="$dateInitial" />T00:00:00Z</field>
+					</xsl:if>
+					<xsl:if test="not(normalize-space($dateFinal)='')">
+						<field name="dateFinal"><xsl:value-of select="$dateFinal" />T00:00:00Z</field>
+					</xsl:if>
+				</xsl:matching-substring>
+			</xsl:analyze-string>
+			<!-- 201501/201501 -->
+			<xsl:analyze-string regex="^(\d{{4}}\d{{2}})?/?(\d{{4}}\d{{2}})?$"
+				select="eadc:did/eadc:unitdate/@normal">
+				<xsl:matching-substring>
+					<xsl:variable name="dateInitial">
+						<xsl:value-of select="regex-group(1)" />
+					</xsl:variable>
+					<xsl:variable name="dateFinal">
+						<xsl:value-of select="regex-group(2)" />
+					</xsl:variable>
+					<xsl:if test="not(normalize-space($dateInitial)='')">
+						<field name="dateInitial"><xsl:value-of select="$dateInitial" />-01T00:00:00Z</field>
+					</xsl:if>
+					<xsl:if test="not(normalize-space($dateFinal)='')">
+						<field name="dateFinal"><xsl:value-of select="$dateFinal" />-01T00:00:00Z</field>
 					</xsl:if>
 				</xsl:matching-substring>
 			</xsl:analyze-string>

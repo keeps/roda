@@ -37,6 +37,7 @@
 	<xsl:param name="binaryToHtml.ead-c.xml.otherfindaids" />
 	<xsl:param name="binaryToHtml.ead-c.xml.notes" />
 	<xsl:param name="binaryToHtml.ead-c.xml.bibliography" />
+	<xsl:param name="binaryToHtml.ead-c.xml.unitdate" />
 	<xsl:template match="/">
 		<div class="descriptiveMetadata">
 			<xsl:apply-templates />
@@ -66,6 +67,18 @@
 			</div>
 		</xsl:if>
 		<!-- HANDLE DATE BETTER??? -->
+		<xsl:if test="eadc:did/eadc:unitdate/text()">
+			<div class="descriptiveMetadata-field">
+				<div class="descriptiveMetadata-field-key">
+					<xsl:value-of select="$binaryToHtml.ead-c.xml.unitdate" />
+				</div>
+				<div class="descriptiveMetadata-field-value">
+					<span class="value">
+						<xsl:value-of select="eadc:did/eadc:unitdate/text()" />
+					</span>
+				</div>
+			</div>
+		</xsl:if>
 		<xsl:if test="eadc:did/eadc:unitdate/@normal">
 			<xsl:choose>
 				<xsl:when test="contains(eadc:did/eadc:unitdate/@normal, '/')">
