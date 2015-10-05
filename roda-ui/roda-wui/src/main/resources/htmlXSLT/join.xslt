@@ -43,6 +43,9 @@
         <xsl:apply-templates select="document(.)" mode="agent" />
       </xsl:for-each>
     </xsl:variable>
+    
+    
+    
     <xsl:variable name="agents2">
       <xsl:for-each select="$agents/span">
       	<xsl:if test="((position()-1) &gt;= $fromAgent) and (position() &lt;= ($fromAgent+$maxAgents))">
@@ -53,6 +56,7 @@
     
     <xsl:variable name="events">
       <xsl:for-each select="$filenames">
+      <xsl:sort select="document(.)/prem:event/prem:eventDateTime"/>
         <xsl:apply-templates select="document(.)" mode="event" />
       </xsl:for-each>
     </xsl:variable>
@@ -583,6 +587,9 @@
 
     <xsl:template match="prem:agent" mode="event"/>
     <xsl:template match="prem:object" mode="event"/>
+    
+    
+    
     <xsl:template match="*" mode="escape">
         <!-- Begin opening tag -->
         <xsl:text>&lt;</xsl:text>
