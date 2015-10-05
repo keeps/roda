@@ -118,6 +118,8 @@ public class RodaUtils {
         transformer.setParameter(parameter.getKey(), (String)parameter.getValue());
       }else if(parameter.getValue() instanceof List<?>){
         transformer.setParameter(parameter.getKey(), (List<String>)parameter.getValue());
+      }else if(parameter.getValue() instanceof Integer){
+        transformer.setParameter(parameter.getKey(), Integer.class.cast(parameter.getValue()));
       }
     }
     Source text = new StreamSource(fileReader);

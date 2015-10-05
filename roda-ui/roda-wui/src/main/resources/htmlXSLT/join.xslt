@@ -1,16 +1,17 @@
 <?xml version="1.0"?>
 <xsl:stylesheet version="2.0"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" 
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:prem="info:lc/xmlns/premis-v2"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
 	<xsl:output method="html" indent="yes"/>
 
-	<xsl:param name="fromEvent" />
-	<xsl:param name="maxEvents" />
-	<xsl:param name="fromAgent" />
-	<xsl:param name="maxAgents" />
-	<xsl:param name="fromFile" />
-	<xsl:param name="maxFiles" />
+	<xsl:param as="xs:integer" name="fromEvent" />
+	<xsl:param as="xs:integer" name="maxEvents" />
+	<xsl:param as="xs:integer" name="fromAgent" />
+	<xsl:param as="xs:integer" name="maxAgents" />
+	<xsl:param as="xs:integer" name="fromFile" />
+	<xsl:param as="xs:integer" name="maxFiles" />
 
     <xsl:param name="binaryToHtml.premis.representation" />
     <xsl:param name="binaryToHtml.premis.preservationlevel" />
@@ -42,14 +43,38 @@
         <xsl:apply-templates select="document(.)" mode="agent" />
       </xsl:for-each>
     </xsl:variable>
+    <xsl:variable name="agents2">
+      <xsl:for-each select="$agents/span">
+      	<xsl:if test="position() &gt; $fromAgent and position() &lt;= $maxAgents">
+        	<xsl:copy-of select="." />
+        </xsl:if>
+      </xsl:for-each>
+    </xsl:variable>
+    
     <xsl:variable name="events">
       <xsl:for-each select="$filenames">
         <xsl:apply-templates select="document(.)" mode="event" />
       </xsl:for-each>
     </xsl:variable>
+    <xsl:variable name="events2">
+      <xsl:for-each select="$events/span">
+      	<xsl:if test="position() &gt; $fromEvent and position() &lt;= $maxEvents">
+        	<xsl:copy-of select="." />
+        </xsl:if>
+      </xsl:for-each>
+    </xsl:variable>
+    
+    
     <xsl:variable name="files">
       <xsl:for-each select="$filenames">
         <xsl:apply-templates select="document(.)" mode="file" />
+      </xsl:for-each>
+    </xsl:variable>
+    <xsl:variable name="files2">
+      <xsl:for-each select="$files/span">
+      	<xsl:if test="position() &gt; $fromFile and position() &lt;= $maxFiles">
+        	<xsl:copy-of select="." />
+        </xsl:if>
       </xsl:for-each>
     </xsl:variable>
     
@@ -184,7 +209,7 @@
                     <xsl:value-of select="$binaryToHtml.premis.files" />
                 </span>
                 <span class="sectionContent">
-                    <xsl:copy-of select="$files"/>
+                    <xsl:copy-of select="$files2"/>
                 </span>
             </span>
                 <span class="section events">
@@ -192,7 +217,7 @@
                         <xsl:value-of select="$binaryToHtml.premis.events" />
                     </span>
                     <span class="sectionContent">
-                        <xsl:copy-of select="$events"/>
+                        <xsl:copy-of select="$events2"/>
                     </span>
                 </span>
                 <span class="section agents">
@@ -200,7 +225,7 @@
                         <xsl:value-of select="$binaryToHtml.premis.agents" />
                     </span>
                     <span class="sectionContent">
-                        <xsl:copy-of select="$agents"/>
+                        <xsl:copy-of select="$agents2"/>
                     </span>
                 </span>
         </xsl:if>
