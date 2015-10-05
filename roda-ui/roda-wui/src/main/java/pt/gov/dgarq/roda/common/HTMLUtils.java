@@ -176,6 +176,7 @@ public final class HTMLUtils {
       java.io.File f = xmlFile.toFile();
       FileUtils.write(f, xml);
 
+<<<<<<< HEAD
       Map<String, Object> parameters = new HashMap<String, Object>();
       parameters.put("fromEvent", pagingParametersEvents.getFirst().toString());
       parameters.put("maxEvents", pagingParametersEvents.getSecond().toString());
@@ -192,6 +193,23 @@ public final class HTMLUtils {
       html = binaryToHtml(new FileInputStream(f), "join", parameters);
       FSUtils.deletePath(p);
 
+=======
+      Map<String,Object> parameters = new HashMap<String,Object>();
+      parameters.put("fromEvent", pagingParametersEvents.getFirst());
+      parameters.put("maxEvents", pagingParametersEvents.getSecond());
+      parameters.put("startAgent", pagingParametersAgents.getFirst());
+      parameters.put("maxAgents", pagingParametersAgents.getSecond());
+      parameters.put("fromFile", pagingParametersFiles.getFirst());
+      parameters.put("maxFiles", pagingParametersFiles.getSecond());
+      
+      Messages messages = RodaCoreFactory.getI18NMessages(locale); 
+      for(Map.Entry<String, String> entry : messages.getTranslations("binaryToHtml.premis",String.class).entrySet()) {
+        parameters.put(entry.getKey(), entry.getValue()); 
+       }
+      
+      html = inputstreamToHtml(new FileInputStream(f), "join", parameters);
+      FSUtils.deletePath(p);
+>>>>>>> Updated HTMLUtils
     } catch (Exception e) {
       LOGGER.error(e.getMessage(), e);
     }
