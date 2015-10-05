@@ -49,7 +49,7 @@ public class ApiAuthFilter implements Filter {
 
       // FIXME this method should be more auth scheme agnostic (basic auth vs.
       // cas)
-      if (authorization == null || httpServletRequest.getSession().getAttribute(UserUtility.RODA_USER) == null) {
+      if (authorization == null && httpServletRequest.getSession().getAttribute(UserUtility.RODA_USER) == null) {
         httpServletResponse.setHeader(HttpHeaders.WWW_AUTHENTICATE, "Basic realm=\"" + realm + "\"");
         httpServletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED);
         return;

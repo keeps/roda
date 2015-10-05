@@ -189,7 +189,7 @@ public final class HTMLUtils {
         parameters.put(entry.getKey(), entry.getValue());
       }
 
-      html = inputstreamToHtml(new FileInputStream(f), "join", parameters);
+      html = binaryToHtml(new FileInputStream(f), "join", parameters);
       FSUtils.deletePath(p);
 
     } catch (Exception e) {
@@ -208,7 +208,7 @@ public final class HTMLUtils {
     }
 
     try {
-      return inputstreamToHtml(binary.getContent().createInputStream(), filename, stylesheetOpt);
+      return binaryToHtml(binary.getContent().createInputStream(), filename, stylesheetOpt);
     } catch (IOException e) {
       throw new ModelServiceException("Error transforming binary file into HTML (filename=" + filename + ")",
         ModelServiceException.INTERNAL_SERVER_ERROR, e);
@@ -216,7 +216,7 @@ public final class HTMLUtils {
 
   }
 
-  private static String inputstreamToHtml(InputStream is, String filename, Map<String, Object> stylesheetOpt)
+  private static String binaryToHtml(InputStream is, String filename, Map<String, Object> stylesheetOpt)
     throws ModelServiceException {
     try {
       Reader reader = new InputStreamReader(is);
