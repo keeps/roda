@@ -22,11 +22,13 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.testng.log4testng.Logger;
 import org.yaml.snakeyaml.Yaml;
 
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 
 public class RodaUtils {
+  private static final Logger LOGGER = Logger.getLogger(RodaUtils.class);
 
   /** Private empty constructor */
   private RodaUtils() {
@@ -102,24 +104,26 @@ public class RodaUtils {
     return properties;
   }
 
-  public static void applyStylesheet(Reader xsltReader, Reader fileReader, Writer result) throws IOException,
-    TransformerException {
+  public static void applyStylesheet(Reader xsltReader, Reader fileReader, Writer result)
+    throws IOException, TransformerException {
     applyStylesheet(xsltReader, fileReader, new HashMap<String, Object>(), result);
   }
 
-  public static void applyStylesheet(Reader xsltReader, Reader fileReader, Map<String, Object> parameters, Writer result)
-    throws IOException, TransformerException {
+  public static void applyStylesheet(Reader xsltReader, Reader fileReader, Map<String, Object> parameters,
+    Writer result) throws IOException, TransformerException {
 
     TransformerFactory factory = new net.sf.saxon.TransformerFactoryImpl();
     Source xsltSource = new StreamSource(xsltReader);
     Transformer transformer = factory.newTransformer(xsltSource);
     for (Entry<String, Object> parameter : parameters.entrySet()) {
-      if(parameter.getValue() instanceof String){
-        transformer.setParameter(parameter.getKey(), (String)parameter.getValue());
-      }else if(parameter.getValue() instanceof List<?>){
-        transformer.setParameter(parameter.getKey(), (List<String>)parameter.getValue());
-      }else if(parameter.getValue() instanceof Integer){
+      if (parameter.getValue() instanceof String) {
+        transformer.setParameter(parameter.getKey(), (String) parameter.getValue());
+      } else if (parameter.getValue() instanceof List<?>) {
+        transformer.setParameter(parameter.getKey(), (List<String>) parameter.getValue());
+      } else if (parameter.getValue() instanceof Integer) {
         transformer.setParameter(parameter.getKey(), Integer.class.cast(parameter.getValue()));
+      } else {
+        LOGGER.error("Unknown object class for passing by to xslt: " + parameter.getValue().getClass());
       }
     }
     Source text = new StreamSource(fileReader);
