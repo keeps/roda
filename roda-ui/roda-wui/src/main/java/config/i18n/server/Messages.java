@@ -3,8 +3,10 @@ package config.i18n.server;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -20,7 +22,6 @@ public class Messages {
   private static final String MESSAGES_BUNDLE = "Messages";
   private ResourceBundle resourceBundle;
 
-  // TODO add fallback to classpath???
   public Messages(Locale locale, Path folder) {
     this.resourceBundle = ResourceBundle.getBundle(MESSAGES_BUNDLE, locale, new FolderBasedUTF8Control(folder));
   }
@@ -72,19 +73,21 @@ public class Messages {
       ResourceBundle bundle = null;
 
       InputStreamReader reader = null;
-      FileInputStream fis = null;
+      InputStream is = null;
       try {
         File file = folder.resolve(bundleName).toFile();
 
         // Also checks for existance
-        if (file.isFile()) {
-          fis = new FileInputStream(file);
-          reader = new InputStreamReader(fis, Charset.forName("UTF-8"));
-          bundle = new PropertyResourceBundle(reader);
+        if (Files.exists(folder.resolve(bundleName))) {
+          is = new FileInputStream(file);
+        } else {
+          is = this.getClass().getResourceAsStream(bundleName);
         }
+        reader = new InputStreamReader(is, Charset.forName("UTF-8"));
+        bundle = new PropertyResourceBundle(reader);
       } finally {
         IOUtils.closeQuietly(reader);
-        IOUtils.closeQuietly(fis);
+        IOUtils.closeQuietly(is);
       }
       return bundle;
     }
