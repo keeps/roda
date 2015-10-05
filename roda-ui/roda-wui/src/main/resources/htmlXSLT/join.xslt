@@ -48,7 +48,7 @@
     
     <xsl:variable name="agents2">
       <xsl:for-each select="$agents/span">
-      	<xsl:if test="((position()-1) &gt;= $fromAgent) and (position() &lt;= ($fromAgent+$maxAgents))">
+      	<xsl:if test="((position()-1) &gt;= $fromAgent) and (($maxAgents=0) or (position() &lt;= ($fromAgent+$maxAgents)))">
         	<xsl:copy-of select="." />
         </xsl:if>
       </xsl:for-each>
@@ -62,7 +62,7 @@
     </xsl:variable>
     <xsl:variable name="events2">
       <xsl:for-each select="$events/span">
-      	<xsl:if test="((position()-1) &gt;= $fromEvent) and (position() &lt;= ($fromEvent+$maxEvents))">
+      	<xsl:if test="((position()-1) &gt;= $fromEvent) and (($maxEvents=0) or (position() &lt;= ($fromEvent+$maxEvents)))">
         	<xsl:copy-of select="." />
         </xsl:if>
       </xsl:for-each>
@@ -76,7 +76,7 @@
     </xsl:variable>
     <xsl:variable name="files2">
       <xsl:for-each select="$files/span">
-      	<xsl:if test="((position()-1) &gt;= $fromFile) and (position() &lt;= ($fromFile+$maxFiles))">
+      	<xsl:if test="((position()-1) &gt;= $fromFile) and (($maxFiles=0) or (position() &lt;= ($fromFile+$maxFiles)))">
         	<xsl:copy-of select="." />
         </xsl:if>
       </xsl:for-each>
