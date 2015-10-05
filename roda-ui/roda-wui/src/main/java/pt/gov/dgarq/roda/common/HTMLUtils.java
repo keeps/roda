@@ -197,7 +197,7 @@ public final class HTMLUtils {
       Map<String,Object> parameters = new HashMap<String,Object>();
       parameters.put("fromEvent", pagingParametersEvents.getFirst());
       parameters.put("maxEvents", pagingParametersEvents.getSecond());
-      parameters.put("startAgent", pagingParametersAgents.getFirst());
+      parameters.put("fromAgent", pagingParametersAgents.getFirst());
       parameters.put("maxAgents", pagingParametersAgents.getSecond());
       parameters.put("fromFile", pagingParametersFiles.getFirst());
       parameters.put("maxFiles", pagingParametersFiles.getSecond());

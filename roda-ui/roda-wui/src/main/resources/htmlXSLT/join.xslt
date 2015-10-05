@@ -211,6 +211,11 @@
                 <span class="sectionContent">
                     <xsl:copy-of select="$files2"/>
                 </span>
+                <span class="pagination">
+                    	<span class="fromFile"><xsl:value-of select="$fromFile" /></span>
+                    	<span class="maxFiles"><xsl:value-of select="$maxFiles" /></span>
+                    	<span class="totalFiles"><xsl:value-of select="count($files/span)" /></span>
+                    </span>
             </span>
                 <span class="section events">
                     <span class="sectionTitle">
@@ -219,6 +224,11 @@
                     <span class="sectionContent">
                         <xsl:copy-of select="$events2"/>
                     </span>
+                    <span class="pagination">
+                    	<span class="fromEvent"><xsl:value-of select="$fromEvent" /></span>
+                    	<span class="maxEvents"><xsl:value-of select="$maxEvents" /></span>
+                    	<span class="totalEvents"><xsl:value-of select="count($events/span)" /></span>
+                    </span>
                 </span>
                 <span class="section agents">
                     <span class="sectionTitle">
@@ -226,6 +236,11 @@
                     </span>
                     <span class="sectionContent">
                         <xsl:copy-of select="$agents2"/>
+                    </span>
+                    <span class="pagination">
+                    	<span class="fromAgent"><xsl:value-of select="$fromAgent" /></span>
+                    	<span class="maxAgents"><xsl:value-of select="$maxAgents" /></span>
+                    	<span class="totalAgents"><xsl:value-of select="count($agents/span)" /></span>
                     </span>
                 </span>
         </xsl:if>
