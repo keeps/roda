@@ -43,7 +43,6 @@ import org.w3c.util.DateParser;
 import org.w3c.util.InvalidDateException;
 
 import jersey.repackaged.com.google.common.collect.Sets;
-import lc.xmlns.premisV2.AgentComplexType;
 import lc.xmlns.premisV2.EventComplexType;
 import lc.xmlns.premisV2.EventOutcomeDetailComplexType;
 import lc.xmlns.premisV2.EventOutcomeInformationComplexType;
@@ -237,8 +236,8 @@ public class ModelService extends ModelObservable {
    * @return
    * @throws ModelServiceException
    */
-  public AIP createAIP(String aipId, StorageService sourceStorage, StoragePath sourcePath, boolean notify)
-    throws ModelServiceException {
+  public AIP createAIP(String aipId, StorageService sourceStorage, StoragePath sourcePath, boolean notify,
+    Path configBasePath) throws ModelServiceException {
     // TODO verify structure of source AIP and copy it to the storage
     // XXX possible optimization would be to allow move between storage
     // TODO support asReference
@@ -246,7 +245,7 @@ public class ModelService extends ModelObservable {
     AIP aip;
     try {
       Directory sourceDirectory = sourceStorage.getDirectory(sourcePath);
-      if (isAIPvalid(sourceModelService, sourceDirectory, FAIL_IF_NO_DESCRIPTIVE_METADATA_SCHEMA)) {
+      if (isAIPvalid(sourceModelService, sourceDirectory, FAIL_IF_NO_DESCRIPTIVE_METADATA_SCHEMA, configBasePath)) {
 
         storage.copy(sourceStorage, sourcePath, ModelUtils.getAIPpath(aipId));
         Directory newDirectory = storage.getDirectory(ModelUtils.getAIPpath(aipId));
@@ -294,20 +293,20 @@ public class ModelService extends ModelObservable {
     return aip;
   }
 
-  public AIP createAIP(String aipId, StorageService sourceStorage, StoragePath sourcePath)
+  public AIP createAIP(String aipId, StorageService sourceStorage, StoragePath sourcePath, Path configBasePath)
     throws ModelServiceException {
-    return createAIP(aipId, sourceStorage, sourcePath, true);
+    return createAIP(aipId, sourceStorage, sourcePath, true, configBasePath);
   }
 
   // TODO support asReference
-  public AIP updateAIP(String aipId, StorageService sourceStorage, StoragePath sourcePath)
+  public AIP updateAIP(String aipId, StorageService sourceStorage, StoragePath sourcePath, Path configBasePath)
     throws ModelServiceException {
     // TODO verify structure of source AIP and update it in the storage
     ModelService sourceModelService = new ModelService(sourceStorage);
     AIP aip;
     try {
       Directory sourceDirectory = sourceStorage.getDirectory(sourcePath);
-      if (isAIPvalid(sourceModelService, sourceDirectory, FAIL_IF_NO_DESCRIPTIVE_METADATA_SCHEMA)) {
+      if (isAIPvalid(sourceModelService, sourceDirectory, FAIL_IF_NO_DESCRIPTIVE_METADATA_SCHEMA, configBasePath)) {
         StoragePath aipPath = ModelUtils.getAIPpath(aipId);
 
         // FIXME is this the best way?
@@ -969,13 +968,14 @@ public class ModelService extends ModelObservable {
     }
   }
 
-  private boolean isAIPvalid(ModelService model, Directory directory, boolean failIfNoDescriptiveMetadataSchema) {
+  private boolean isAIPvalid(ModelService model, Directory directory, boolean failIfNoDescriptiveMetadataSchema,
+    Path configBasePath) {
     boolean valid = true;
 
     try {
       // validate metadata (against schemas)
       valid = ValidationUtils.isAIPDescriptiveMetadataValid(model, directory.getStoragePath().getName(),
-        failIfNoDescriptiveMetadataSchema);
+        failIfNoDescriptiveMetadataSchema, configBasePath);
 
       // FIXME validate others aspects
 

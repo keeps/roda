@@ -132,7 +132,7 @@ public class RodaCoreFactory {
         // start embedded solr
         solr = new EmbeddedSolrServer(solrHome, "test");
 
-        index = new IndexService(solr, model);
+        index = new IndexService(solr, model, configPath);
 
       } catch (StorageServiceException e) {
         LOGGER.error(e);

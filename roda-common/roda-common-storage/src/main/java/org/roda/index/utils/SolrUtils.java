@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Serializable;
+import java.nio.file.Path;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -158,7 +159,8 @@ public class SolrUtils {
 
   }
 
-  public static SolrInputDocument getDescriptiveMetataFields(Binary binary) throws IndexServiceException {
+  public static SolrInputDocument getDescriptiveMetataFields(Binary binary, Path configBasePath)
+    throws IndexServiceException {
     SolrInputDocument doc;
     InputStream inputStream;
     String xsltFilename = null;
@@ -168,17 +170,14 @@ public class SolrUtils {
       Reader descMetadataReader = new InputStreamReader(inputStream);
       xsltFilename = binary.getStoragePath().getName() + ".xslt";
 
-      ClassLoader classLoader = SolrUtils.class.getClassLoader();
-      InputStream transformerStream = classLoader.getResourceAsStream(xsltFilename);
-
+      InputStream transformerStream = RodaUtils.getResourceInputStream(configBasePath,
+        "crosswalks/ingest/" + xsltFilename, "Ingesting");
       if (transformerStream == null) {
-        // use default
-        xsltFilename = "plain.xslt";
-        transformerStream = classLoader.getResourceAsStream(xsltFilename);
+        transformerStream = RodaUtils.getResourceInputStream(configBasePath, "crosswalks/ingest/" + "plain.xslt",
+          "Ingesting");
       }
 
       // TODO support the use of scripts for non-xml transformers
-
       Reader xsltReader = new InputStreamReader(transformerStream);
       CharArrayWriter transformerResult = new CharArrayWriter();
       Map<String, Object> stylesheetOpt = new HashMap<String, Object>();
@@ -778,7 +777,7 @@ public class SolrUtils {
 
   }
 
-  public static SolrInputDocument aipToSolrInputDocumentAsSDO(AIP aip, ModelService model)
+  public static SolrInputDocument aipToSolrInputDocumentAsSDO(AIP aip, ModelService model, Path configBasePath)
     throws ModelServiceException, StorageServiceException, IndexServiceException {
     final SolrInputDocument ret = new SolrInputDocument();
     final String aipId = aip.getId();
@@ -799,7 +798,7 @@ public class SolrUtils {
       StoragePath storagePath = metadata.getStoragePath();
       Binary binary = model.getStorage().getBinary(storagePath);
       try {
-        SolrInputDocument fields = getDescriptiveMetataFields(binary);
+        SolrInputDocument fields = getDescriptiveMetataFields(binary, configBasePath);
         for (SolrInputField field : fields) {
           ret.addField(field.getName(), field.getValue(), field.getBoost());
         }

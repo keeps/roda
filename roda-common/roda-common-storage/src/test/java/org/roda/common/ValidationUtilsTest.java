@@ -92,10 +92,10 @@ public class ValidationUtilsTest {
     throws ModelServiceException, StorageServiceException, IndexServiceException, ValidationException {
     final String aipId = UUID.randomUUID().toString();
     final AIP aip = model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), null);
     final DescriptiveMetadata descMetadata = model.retrieveDescriptiveMetadata(aipId,
       CorporaConstants.DESCRIPTIVE_METADATA_ID);
-    assertEquals(ValidationUtils.isDescriptiveMetadataValid(model, descMetadata, true), true);
+    assertEquals(ValidationUtils.isDescriptiveMetadataValid(model, descMetadata, true, null), true);
   }
 
   @Test
@@ -104,10 +104,10 @@ public class ValidationUtilsTest {
     // buggy aip have acqinfo2 instead of acqinfo in ead-c.xml
     final String aipId = UUID.randomUUID().toString();
     final AIP aip = model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_BUGGY_ID));
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_BUGGY_ID), null);
     final DescriptiveMetadata descMetadata = model.retrieveDescriptiveMetadata(aipId,
       CorporaConstants.DESCRIPTIVE_METADATA_ID);
-    assertEquals(ValidationUtils.isDescriptiveMetadataValid(model, descMetadata, true), false);
+    assertEquals(ValidationUtils.isDescriptiveMetadataValid(model, descMetadata, true, null), false);
   }
 
   @Test
@@ -115,8 +115,8 @@ public class ValidationUtilsTest {
     throws ModelServiceException, StorageServiceException, IndexServiceException, ValidationException {
     final String aipId = UUID.randomUUID().toString();
     final AIP aip = model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
-    assertEquals(ValidationUtils.isAIPDescriptiveMetadataValid(model, aip.getId(), true), true);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), null);
+    assertEquals(ValidationUtils.isAIPDescriptiveMetadataValid(model, aip.getId(), true, null), true);
   }
 
   @Test
@@ -125,7 +125,7 @@ public class ValidationUtilsTest {
     // buggy aip have acqinfo2 instead of acqinfo in ead-c.xml
     final String aipId = UUID.randomUUID().toString();
     final AIP aip = model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_BUGGY_ID));
-    assertEquals(ValidationUtils.isAIPDescriptiveMetadataValid(model, aip.getId(), true), false);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_BUGGY_ID), null);
+    assertEquals(ValidationUtils.isAIPDescriptiveMetadataValid(model, aip.getId(), true, null), false);
   }
 }

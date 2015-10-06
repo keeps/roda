@@ -21,7 +21,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.log4j.Logger;
 import org.roda.common.RodaUtils;
-import org.roda.index.utils.SolrUtils;
 import org.roda.model.AIP;
 import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
@@ -58,19 +57,19 @@ public final class HTMLUtils {
 
   }
 
-  public static String descriptiveMetadataToHtml(Binary binary, final Locale locale)
+  public static String descriptiveMetadataToHtml(Binary binary, final Locale locale, Path configBasePath)
     throws ModelServiceException, TransformerException {
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
-    return binaryToHtml(binary, true, null, messages
-      .getTranslations(RodaConstants.I18N_BINARY_TO_HTML_PREFIX + binary.getStoragePath().getName(), Object.class));
+    return binaryToHtml(binary, true, null, messages.getTranslations(
+      RodaConstants.I18N_BINARY_TO_HTML_PREFIX + binary.getStoragePath().getName(), Object.class), configBasePath);
   }
 
-  public static String preservationObjectToHtml(Binary binary, final Locale locale)
+  public static String preservationObjectToHtml(Binary binary, final Locale locale, Path configBasePath)
     throws ModelServiceException, TransformerException {
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
     Map<String, Object> stylesheetOpt = messages
       .getTranslations(RodaConstants.I18N_BINARY_TO_HTML_PREFIX + binary.getStoragePath().getName(), Object.class);
-    return binaryToHtml(binary, false, "premis", stylesheetOpt);
+    return binaryToHtml(binary, false, "premis", stylesheetOpt, configBasePath);
   }
 
   public static PreservationMetadataBundle getPreservationMetadataBundle(String aipId, ModelService model,
@@ -100,7 +99,7 @@ public final class HTMLUtils {
 
   public static String getPreservationMetadataHTML(String aipId, ModelService model, StorageService storage,
     Locale locale, Pair<Integer, Integer> pagingParametersAgents, Pair<Integer, Integer> pagingParametersEvents,
-    Pair<Integer, Integer> pagingParametersFile)
+    Pair<Integer, Integer> pagingParametersFile, Path configBasePath)
       throws ModelServiceException, StorageServiceException, TransformerException {
     AIP aip = model.retrieveAIP(aipId);
     StringBuilder s = new StringBuilder();
@@ -110,7 +109,7 @@ public final class HTMLUtils {
         try {
           String html = getRepresentationPreservationMetadataHtml(
             ModelUtils.getPreservationPath(aipId, representationId), storage, locale, pagingParametersAgents,
-            pagingParametersEvents, pagingParametersFile);
+            pagingParametersEvents, pagingParametersFile, configBasePath);
           s.append(html);
         } finally {
 
@@ -151,7 +150,8 @@ public final class HTMLUtils {
 
   public static String getRepresentationPreservationMetadataHtml(StoragePath preservationPath, StorageService storage,
     final Locale locale, Pair<Integer, Integer> pagingParametersAgents, Pair<Integer, Integer> pagingParametersEvents,
-    Pair<Integer, Integer> pagingParametersFiles) throws ModelServiceException, StorageServiceException {
+    Pair<Integer, Integer> pagingParametersFiles, Path configBasePath)
+      throws ModelServiceException, StorageServiceException {
     String html = "";
     try {
 
@@ -189,7 +189,7 @@ public final class HTMLUtils {
         parameters.put(entry.getKey(), entry.getValue());
       }
 
-      html = binaryToHtml(new FileInputStream(f), "join", parameters);
+      html = binaryToHtml(new FileInputStream(f), "join", parameters, configBasePath);
       FSUtils.deletePath(p);
 
     } catch (Exception e) {
@@ -199,7 +199,7 @@ public final class HTMLUtils {
   }
 
   private static String binaryToHtml(Binary binary, boolean useFilename, String alternativeFilenameToUse,
-    Map<String, Object> stylesheetOpt) throws TransformerException, ModelServiceException {
+    Map<String, Object> stylesheetOpt, Path configBasePath) throws TransformerException, ModelServiceException {
     String filename;
     if (useFilename) {
       filename = binary.getStoragePath().getName();
@@ -208,7 +208,7 @@ public final class HTMLUtils {
     }
 
     try {
-      return binaryToHtml(binary.getContent().createInputStream(), filename, stylesheetOpt);
+      return binaryToHtml(binary.getContent().createInputStream(), filename, stylesheetOpt, configBasePath);
     } catch (IOException e) {
       throw new ModelServiceException("Error transforming binary file into HTML (filename=" + filename + ")",
         ModelServiceException.INTERNAL_SERVER_ERROR, e);
@@ -216,12 +216,12 @@ public final class HTMLUtils {
 
   }
 
-  private static String binaryToHtml(InputStream is, String filename, Map<String, Object> stylesheetOpt)
-    throws ModelServiceException {
+  private static String binaryToHtml(InputStream is, String filename, Map<String, Object> stylesheetOpt,
+    Path configBasePath) throws ModelServiceException {
     try {
       Reader reader = new InputStreamReader(is);
 
-      InputStream transformerStream = getStylesheetInputStream("htmlXSLT", filename);
+      InputStream transformerStream = getStylesheetInputStream("crosswalks/dissemination/html", filename, configBasePath);
       // TODO support the use of scripts for non-xml transformers
       Reader xsltReader = new InputStreamReader(transformerStream);
       CharArrayWriter transformerResult = new CharArrayWriter();
@@ -235,16 +235,12 @@ public final class HTMLUtils {
     }
   }
 
-  private static InputStream getStylesheetInputStream(String xsltFolder, String filename) {
-    // FIXME this should be loaded from config folder (to be dynamic)
-    ClassLoader classLoader = SolrUtils.class.getClassLoader();
-    InputStream transformerStream = classLoader.getResourceAsStream(xsltFolder + "/" + filename + ".xslt");
+  private static InputStream getStylesheetInputStream(String xsltFolder, String filename, Path configBasePath) {
+    InputStream transformerStream = RodaUtils.getResourceInputStream(configBasePath,
+      xsltFolder + "/" + filename + ".xslt", "Transforming");
     if (transformerStream == null) {
-      LOGGER.warn("Didn't found proper stylesheet for dealing with file \"" + filename + "\". Using " + xsltFolder
-        + "/plain.xslt");
-      transformerStream = classLoader.getResourceAsStream(xsltFolder + "/plain.xslt");
+      transformerStream = RodaUtils.getResourceInputStream(configBasePath, xsltFolder + "/plain.xslt", "Transforming");
     }
-
     return transformerStream;
   }
 }

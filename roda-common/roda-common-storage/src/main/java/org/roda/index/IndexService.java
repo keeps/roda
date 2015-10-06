@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -38,13 +39,15 @@ public class IndexService {
   private final SolrClient index;
   private final ModelService model;
   private final IndexModelObserver observer;
+  private final Path configBasePath;
 
-  public IndexService(SolrClient index, ModelService model) {
+  public IndexService(SolrClient index, ModelService model, Path configBasePath) {
     super();
     this.index = index;
     this.model = model;
+    this.configBasePath = configBasePath;
 
-    observer = new IndexModelObserver(index, model);
+    observer = new IndexModelObserver(index, model, configBasePath);
     model.addModelObserver(observer);
   }
 

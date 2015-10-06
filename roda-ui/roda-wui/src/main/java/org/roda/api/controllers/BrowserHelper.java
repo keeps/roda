@@ -375,7 +375,7 @@ public class BrowserHelper {
         filename = descriptiveMetadataBinary.getStoragePath().getName() + ".html";
         mediaType = MediaType.TEXT_HTML;
         String htmlDescriptive = HTMLUtils.descriptiveMetadataToHtml(descriptiveMetadataBinary,
-          ServerTools.parseLocale(language));
+          ServerTools.parseLocale(language), RodaCoreFactory.getConfigPath());
         stream = new StreamingOutput() {
           @Override
           public void write(OutputStream os) throws IOException, WebApplicationException {
@@ -558,7 +558,7 @@ public class BrowserHelper {
         String html = HTMLUtils.getRepresentationPreservationMetadataHtml(
           ModelUtils.getPreservationPath(aipId, representationId), storage, ServerTools.parseLocale(language),
           ApiUtils.processPagingParams(startAgent, limitAgent), ApiUtils.processPagingParams(startEvent, limitEvent),
-          ApiUtils.processPagingParams(startFile, limitFile));
+          ApiUtils.processPagingParams(startFile, limitFile), RodaCoreFactory.getConfigPath());
 
         StreamingOutput stream = new StreamingOutput() {
           @Override
@@ -663,7 +663,7 @@ public class BrowserHelper {
         metadata.put(RodaConstants.STORAGE_META_PARENT_ID, new HashSet<String>(Arrays.asList(parentId)));
       }
       storage.updateMetadata(aipPath, metadata, true);
-      model.updateAIP(aipId, storage, aipPath);
+      model.updateAIP(aipId, storage, aipPath, RodaCoreFactory.getConfigPath());
 
       return RodaCoreFactory.getIndexService().retrieve(SimpleDescriptionObject.class, aipId);
     } catch (ModelServiceException | IndexServiceException | StorageServiceException e) {
@@ -718,7 +718,8 @@ public class BrowserHelper {
     String descriptiveMetadataType, Binary descriptiveMetadataIdBinary)
       throws GenericException, ValidationException, AuthorizationDeniedException {
 
-    ValidationUtils.validateDescriptiveBinary(descriptiveMetadataIdBinary, descriptiveMetadataId, false);
+    ValidationUtils.validateDescriptiveBinary(descriptiveMetadataIdBinary, descriptiveMetadataId, false,
+      RodaCoreFactory.getConfigPath());
 
     DescriptiveMetadata ret;
     try {
@@ -743,7 +744,8 @@ public class BrowserHelper {
     String descriptiveMetadataType, Binary descriptiveMetadataIdBinary)
       throws GenericException, AuthorizationDeniedException, ValidationException {
 
-    ValidationUtils.validateDescriptiveBinary(descriptiveMetadataIdBinary, descriptiveMetadataId, false);
+    ValidationUtils.validateDescriptiveBinary(descriptiveMetadataIdBinary, descriptiveMetadataId, false,
+      RodaCoreFactory.getConfigPath());
 
     try {
       ModelService model = RodaCoreFactory.getModelService();

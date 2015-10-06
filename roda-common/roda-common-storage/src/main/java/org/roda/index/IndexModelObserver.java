@@ -1,6 +1,7 @@
 package org.roda.index;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
@@ -40,16 +41,18 @@ public class IndexModelObserver implements ModelObserver {
 
   private final SolrClient index;
   private final ModelService model;
+  private final Path configBasePath;
 
-  public IndexModelObserver(SolrClient index, ModelService model) {
+  public IndexModelObserver(SolrClient index, ModelService model, Path configBasePath) {
     super();
     this.index = index;
     this.model = model;
+    this.configBasePath = configBasePath;
   }
 
   @Override
   public void aipCreated(final AIP aip) {
-    indexAIPandSDO(aip);
+    indexAIPandSDO(aip, configBasePath);
     indexRepresentations(aip);
     indexPreservationFileObjects(aip);
     indexPreservationsEvents(aip);
@@ -57,7 +60,7 @@ public class IndexModelObserver implements ModelObserver {
 
   private void indexPreservationsEvents(final AIP aip) {
     final Map<String, List<String>> preservationEventsIds = aip.getPreservationsEventsIds();
-    if(preservationEventsIds!=null){
+    if (preservationEventsIds != null) {
       for (Map.Entry<String, List<String>> representationPreservationMap : preservationEventsIds.entrySet()) {
         try {
           for (String fileId : representationPreservationMap.getValue()) {
@@ -81,7 +84,7 @@ public class IndexModelObserver implements ModelObserver {
 
   private void indexPreservationFileObjects(final AIP aip) {
     final Map<String, List<String>> preservationFileObjectsIds = aip.getPreservationFileObjectsIds();
-    if(preservationFileObjectsIds!=null){
+    if (preservationFileObjectsIds != null) {
       for (Map.Entry<String, List<String>> eventPreservationMap : preservationFileObjectsIds.entrySet()) {
         try {
           for (String fileId : eventPreservationMap.getValue()) {
@@ -122,10 +125,10 @@ public class IndexModelObserver implements ModelObserver {
     }
   }
 
-  private void indexAIPandSDO(final AIP aip) {
+  private void indexAIPandSDO(final AIP aip, Path configBasePath) {
     try {
       SolrInputDocument aipDoc = SolrUtils.aipToSolrInputDocument(aip);
-      SolrInputDocument sdoDoc = SolrUtils.aipToSolrInputDocumentAsSDO(aip, model);
+      SolrInputDocument sdoDoc = SolrUtils.aipToSolrInputDocumentAsSDO(aip, model, configBasePath);
       index.add(RodaConstants.INDEX_AIP, aipDoc);
       index.commit(RodaConstants.INDEX_AIP);
       LOGGER.trace("Adding SDO: " + sdoDoc);
@@ -368,12 +371,12 @@ public class IndexModelObserver implements ModelObserver {
   public void agentMetadataUpdated(AgentMetadata agentMetadata) {
     agentMetadataDeleted(agentMetadata.getId());
     agentMetadataCreated(agentMetadata);
-    
+
   }
 
   @Override
   public void agentMetadataDeleted(String agentMetadataId) {
-    //TODO: handle deleting
-    
+    // TODO: handle deleting
+
   }
 }

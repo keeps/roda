@@ -4,8 +4,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -34,6 +37,25 @@ public class RodaUtils {
   /** Private empty constructor */
   private RodaUtils() {
 
+  }
+
+  public static InputStream getResourceInputStream(Path configBasePath, String resourceRelativePath,
+    String logActionText) {
+    InputStream inputStream = null;
+    try {
+      if (configBasePath != null && Files.exists(configBasePath.resolve(resourceRelativePath))) {
+        inputStream = Files.newInputStream(configBasePath.resolve(resourceRelativePath));
+        LOGGER.info(logActionText + " using file " + configBasePath.resolve(resourceRelativePath));
+      }
+    } catch (IOException e) {
+      // do nothing
+    }
+    if (inputStream == null) {
+      ClassLoader classLoader = ValidationUtils.class.getClassLoader();
+      inputStream = classLoader.getResourceAsStream(resourceRelativePath);
+      LOGGER.info(logActionText + " using resource from classpath " + resourceRelativePath);
+    }
+    return inputStream;
   }
 
   public static String dateToString(Date date) {
