@@ -161,10 +161,10 @@ public final class FSYamlMetadataUtils {
     try {
       // ensure parent exists
       Path parent = properties.getParent();
-      if(!Files.exists(parent)) {
+      if (!Files.exists(parent)) {
         Files.createDirectories(parent);
       }
-      
+
       // write file
       bufferedWriter = Files.newBufferedWriter(properties, Charset.defaultCharset(), StandardOpenOption.CREATE,
         StandardOpenOption.TRUNCATE_EXISTING);
@@ -191,21 +191,6 @@ public final class FSYamlMetadataUtils {
     Map<String, Set<String>> metadata = new HashMap<String, Set<String>>(oldMetadata);
 
     metadata.putAll(newMetadata);
-
-    return metadata;
-  }
-
-  private static Map<String, Set<String>> mergeMetadata(Map<String, Set<String>> oldMetadata,
-    Map<String, Set<String>> newMetadata) {
-    Map<String, Set<String>> metadata = new HashMap<String, Set<String>>(oldMetadata);
-
-    for (Entry<String, Set<String>> entry : newMetadata.entrySet()) {
-      if (metadata.containsKey(entry.getKey())) {
-        metadata.get(entry.getKey()).addAll(entry.getValue());
-      } else {
-        metadata.put(entry.getKey(), entry.getValue());
-      }
-    }
 
     return metadata;
   }

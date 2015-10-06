@@ -310,10 +310,11 @@ public class BrowserHelper {
 
   protected static StreamResponse listAipDescriptiveMetadata(String aipId, String start, String limit)
     throws GenericException {
+    ClosableIterable<DescriptiveMetadata> metadata = null;
     try {
       ModelService model = RodaCoreFactory.getModelService();
       StorageService storage = RodaCoreFactory.getStorageService();
-      ClosableIterable<DescriptiveMetadata> metadata = model.listDescriptiveMetadataBinaries(aipId);
+      metadata = model.listDescriptiveMetadataBinaries(aipId);
       Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
       int startInt = pagingParams.getFirst();
       int limitInt = pagingParams.getSecond();
@@ -335,6 +336,14 @@ public class BrowserHelper {
     } catch (IOException | ModelServiceException | StorageServiceException e) {
       // FIXME see what better exception should be thrown
       throw new GenericException(e.getMessage());
+    } finally {
+      try {
+        if (metadata != null) {
+          metadata.close();
+        }
+      } catch (IOException e) {
+        LOGGER.error("Error while while freeing up resources", e);
+      }
     }
   }
 

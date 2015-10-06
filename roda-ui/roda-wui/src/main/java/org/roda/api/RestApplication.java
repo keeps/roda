@@ -17,7 +17,7 @@ public class RestApplication extends ResourceConfig {
     register(MoxyXmlFeature.class);
     register(MultiPartFeature.class);
 
-    // https://github.com/swagger-api/swagger-core/wiki/Java-JAXRS-Quickstart
+    // https://github.com/swagger-api/swagger-core/wiki/Swagger-Core-Jersey-2.X-Project-Setup-1.5
     register(ApiListingResource.class);
     register(SwaggerSerializers.class);
     BeanConfig beanConfig = new BeanConfig();

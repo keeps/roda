@@ -162,7 +162,7 @@ public class RodaCoreFactory {
 
   private static void checkForChangesInI18N() {
     // i18n is cached and that cache is re-done when changes occur to
-    // roda-wui.properties (for convinience)
+    // roda-wui.properties (for convenience)
     getRodaConfiguration().getString("");
   }
 

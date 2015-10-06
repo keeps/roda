@@ -82,7 +82,7 @@ public class Messages {
       try {
         File file = folder.resolve(bundleName).toFile();
 
-        // Also checks for existance
+        // Also checks for file existence
         if (Files.exists(folder.resolve(bundleName))) {
           is = new FileInputStream(file);
         } else {

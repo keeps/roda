@@ -164,20 +164,20 @@ public final class HTMLUtils {
       StorageService tempStorage = new FileStorageService(p);
       tempStorage.copy(storage, preservationPath, DefaultStoragePath.parse(tempFolder2));
 
-      String xml = "<files>";
+      StringBuilder xml = new StringBuilder("<files>");
       ClosableIterable<Resource> resources = tempStorage
         .listResourcesUnderContainer(DefaultStoragePath.parse(tempFolder2));
       Iterator<Resource> it = resources.iterator();
       while (it.hasNext()) {
         Resource r = it.next();
 
-        xml += "<file>" + tempFolder + "/" + r.getStoragePath().asString() + "</file>";
+        xml.append("<file>").append(tempFolder).append("/").append(r.getStoragePath().asString()).append("</file>");
       }
       resources.close();
-      xml += "</files>";
+      xml.append("</files>");
       Path xmlFile = Paths.get(tempFolder, tempFolder2, "list.xml");
       java.io.File f = xmlFile.toFile();
-      FileUtils.write(f, xml);
+      FileUtils.write(f, xml.toString());
 
       Map<String, Object> parameters = new HashMap<String, Object>();
       parameters.put("fromEvent", pagingParametersEvents.getFirst());
@@ -187,12 +187,9 @@ public final class HTMLUtils {
       parameters.put("fromFile", pagingParametersFiles.getFirst());
       parameters.put("maxFiles", pagingParametersFiles.getSecond());
 
-      Messages messages = RodaCoreFactory.getI18NMessages(locale);
-      for (Map.Entry<String, String> entry : messages
-        .getTranslations(RodaConstants.I18N_CROSSWALKS_DISSEMINATION_HTML_PREFIX + "premis", String.class, true)
-        .entrySet()) {
-        parameters.put(entry.getKey(), entry.getValue());
-      }
+      Messages i18nMessages = RodaCoreFactory.getI18NMessages(locale);
+      parameters.putAll(i18nMessages.getTranslations(RodaConstants.I18N_CROSSWALKS_DISSEMINATION_HTML_PREFIX + "premis",
+        String.class, true));
 
       html = binaryToHtml(new FileInputStream(f), "join", parameters, configBasePath);
       FSUtils.deletePath(p);

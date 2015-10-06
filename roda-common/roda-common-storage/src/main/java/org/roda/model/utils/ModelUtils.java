@@ -16,7 +16,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
@@ -25,7 +24,6 @@ import org.roda.model.FileFormat;
 import org.roda.model.ModelServiceException;
 import org.roda.storage.Binary;
 import org.roda.storage.ClosableIterable;
-import org.roda.storage.DefaultBinary;
 import org.roda.storage.DefaultStoragePath;
 import org.roda.storage.Resource;
 import org.roda.storage.StoragePath;
@@ -42,7 +40,6 @@ import lc.xmlns.premisV2.File;
 import lc.xmlns.premisV2.LinkingAgentIdentifierComplexType;
 import lc.xmlns.premisV2.Representation;
 import pt.gov.dgarq.roda.core.common.RodaConstants;
-import pt.gov.dgarq.roda.core.data.v2.EventPreservationObject;
 import pt.gov.dgarq.roda.core.data.v2.LogEntry;
 import pt.gov.dgarq.roda.core.data.v2.LogEntryParameter;
 import pt.gov.dgarq.roda.core.data.v2.RepresentationState;
@@ -256,31 +253,6 @@ public final class ModelUtils {
     return ids;
   }
 
-  // /**
-  // * Returns a list of ids from the children of a certain resources
-  // *
-  // * @param storage
-  // * the storage service containing the parent resource
-  // * @param path
-  // * the storage paths for the parent resources
-  // * @throws StorageActionException
-  // */
-  // public static List<String> getIds(StorageService storage,
-  // List<StoragePath> paths) throws StorageActionException {
-  // List<String> ids = new ArrayList<String>();
-  // for (StoragePath path : paths) {
-  // Iterator<Resource> it =
-  // storage.listResourcesUnderDirectory(path).iterator();
-  // while (it.hasNext()) {
-  // Resource next = it.next();
-  // StoragePath storagePath = next.getStoragePath();
-  // ids.add(storagePath.getName());
-  // }
-  // }
-  // return ids;
-  //
-  // }
-
   /**
    * Returns a list of ids from the children of a certain resources, starting
    * with the prefix defined
@@ -304,29 +276,6 @@ public final class ModelUtils {
     return ids;
 
   }
-
-  // /**
-  // * Returns a list of storagepath from the children of a certain resource
-  // *
-  // * @param storage
-  // * the storage service containing the parent resource
-  // * @param path
-  // * the storage path for the parent resource
-  // */
-  // public static List<StoragePath> getStoragePaths(StorageService storage,
-  // StoragePath path)
-  // throws StorageActionException {
-  // List<StoragePath> paths = new ArrayList<StoragePath>();
-  // Iterator<Resource> it =
-  // storage.listResourcesUnderDirectory(path).iterator();
-  // while (it.hasNext()) {
-  // Resource next = it.next();
-  // StoragePath storagePath = next.getStoragePath();
-  // paths.add(storagePath);
-  // }
-  //
-  // return paths;
-  // }
 
   public static StoragePath getAIPcontainerPath() throws StorageServiceException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP);
@@ -418,7 +367,7 @@ public final class ModelUtils {
       binaryInputStream = preservationBinary.getContent().createInputStream();
       event = PremisEventHelper.newInstance(binaryInputStream).getEvent();
     } catch (PremisMetadataException | IOException | ClassCastException e) {
-      event=null;
+      event = null;
     } finally {
       if (binaryInputStream != null) {
         try {
@@ -471,7 +420,6 @@ public final class ModelUtils {
     return agent;
   }
 
-
   // FIXME finish to implement this for deleting the 3 methods above
   // (isPreservation*)
   public static PREMIS_TYPE getPremisType(Binary preservationBinary) {
@@ -519,7 +467,7 @@ public final class ModelUtils {
         e);
     }
   }
-  
+
   public static String getJsonLogEntryParameters(List<LogEntryParameter> parameters) {
     String ret = "";
     try {
@@ -537,13 +485,14 @@ public final class ModelUtils {
     try {
       JsonFactory factory = new JsonFactory();
       ObjectMapper mapper = new ObjectMapper(factory);
-      ret = mapper.readValue(json, new TypeReference<List<LogEntryParameter>>(){});
+      ret = mapper.readValue(json, new TypeReference<List<LogEntryParameter>>() {
+      });
     } catch (IOException e) {
       LOGGER.error("Error transforming json string to log entry parameters", e);
     }
     return ret;
   }
-  
+
   public static String getJsonLogEntry(LogEntry entry) {
     String ret = null;
     try {
@@ -612,31 +561,30 @@ public final class ModelUtils {
   }
 
   public static String getPreservationType(Binary binary) {
-    String type="";
+    String type = "";
     EventComplexType event = ModelUtils.getPreservationEvent(binary);
     if (event != null) {
-      type="event";
+      type = "event";
     } else {
       lc.xmlns.premisV2.File file = ModelUtils.getPreservationFileObject(binary);
       if (file != null) {
-        type="file";
+        type = "file";
       } else {
         AgentComplexType agent = ModelUtils.getPreservationAgentObject(binary);
         if (agent != null) {
-          type="agent";
-        }else{
+          type = "agent";
+        } else {
           Representation representation = ModelUtils.getPreservationRepresentationObject(binary);
-          if(representation!=null){
-            type="representation";
-          }else{
-            type="unknown";
+          if (representation != null) {
+            type = "representation";
+          } else {
+            type = "unknown";
           }
         }
       }
     }
     return type;
-    
-  };
 
+  };
 
 }

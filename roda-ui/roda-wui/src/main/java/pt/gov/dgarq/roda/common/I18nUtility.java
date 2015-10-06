@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.Locale;
 import java.util.MissingResourceException;
 
+import org.apache.log4j.Logger;
+
 import pt.gov.dgarq.roda.core.common.RodaConstants;
 import pt.gov.dgarq.roda.core.data.v2.FacetFieldResult;
 import pt.gov.dgarq.roda.core.data.v2.FacetValue;
@@ -13,6 +15,12 @@ import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 import pt.gov.dgarq.roda.wui.common.server.ServerTools;
 
 public class I18nUtility {
+  private static final Logger LOGGER = Logger.getLogger(I18nUtility.class);
+
+  /** Private empty constructor */
+  private I18nUtility() {
+
+  }
 
   public static <T extends Serializable> IndexResult<T> translate(IndexResult<T> input, Class<T> resultClass,
     String localeString) {
@@ -58,8 +66,8 @@ public class I18nUtility {
     } else if (resultClass.equals(RODAMember.class)) {
       prefix = RodaConstants.I18N_UI_USER_ADMINISTRATION_FACETS_PREFIX;
     } else {
-      // FIXME
       prefix = "";
+      LOGGER.error("Error while trying to get i18n prefix for " + resultClass);
     }
     return prefix;
   }
