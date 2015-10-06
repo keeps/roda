@@ -108,7 +108,7 @@ public class IndexServiceTest {
     // start embedded solr
     final EmbeddedSolrServer solr = new EmbeddedSolrServer(solrHome, "test");
 
-    index = new IndexService(solr, model);
+    index = new IndexService(solr, model, null);
 
     URL corporaURL = IndexServiceTest.class.getResource("/corpora");
     corporaPath = Paths.get(corporaURL.toURI());

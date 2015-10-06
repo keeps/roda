@@ -60,15 +60,18 @@ public final class HTMLUtils {
   public static String descriptiveMetadataToHtml(Binary binary, final Locale locale, Path configBasePath)
     throws ModelServiceException, TransformerException {
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
-    return binaryToHtml(binary, true, null, messages.getTranslations(
-      RodaConstants.I18N_BINARY_TO_HTML_PREFIX + binary.getStoragePath().getName(), Object.class), configBasePath);
+    return binaryToHtml(binary, true, null,
+      messages.getTranslations(
+        RodaConstants.I18N_CROSSWALKS_DISSEMINATION_HTML_PREFIX + binary.getStoragePath().getName(), Object.class,
+        true),
+      configBasePath);
   }
 
   public static String preservationObjectToHtml(Binary binary, final Locale locale, Path configBasePath)
     throws ModelServiceException, TransformerException {
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
-    Map<String, Object> stylesheetOpt = messages
-      .getTranslations(RodaConstants.I18N_BINARY_TO_HTML_PREFIX + binary.getStoragePath().getName(), Object.class);
+    Map<String, Object> stylesheetOpt = messages.getTranslations(
+      RodaConstants.I18N_CROSSWALKS_DISSEMINATION_HTML_PREFIX + binary.getStoragePath().getName(), Object.class, true);
     return binaryToHtml(binary, false, "premis", stylesheetOpt, configBasePath);
   }
 
@@ -185,7 +188,9 @@ public final class HTMLUtils {
       parameters.put("maxFiles", pagingParametersFiles.getSecond());
 
       Messages messages = RodaCoreFactory.getI18NMessages(locale);
-      for (Map.Entry<String, String> entry : messages.getTranslations("binaryToHtml.premis", String.class).entrySet()) {
+      for (Map.Entry<String, String> entry : messages
+        .getTranslations(RodaConstants.I18N_CROSSWALKS_DISSEMINATION_HTML_PREFIX + "premis", String.class, true)
+        .entrySet()) {
         parameters.put(entry.getKey(), entry.getValue());
       }
 
@@ -221,7 +226,8 @@ public final class HTMLUtils {
     try {
       Reader reader = new InputStreamReader(is);
 
-      InputStream transformerStream = getStylesheetInputStream("crosswalks/dissemination/html", filename, configBasePath);
+      InputStream transformerStream = getStylesheetInputStream(RodaConstants.CROSSWALKS_DISSEMINATION_HTML_PATH,
+        filename, configBasePath);
       // TODO support the use of scripts for non-xml transformers
       Reader xsltReader = new InputStreamReader(transformerStream);
       CharArrayWriter transformerResult = new CharArrayWriter();

@@ -47,7 +47,7 @@ public class IndexService {
     this.model = model;
     this.configBasePath = configBasePath;
 
-    observer = new IndexModelObserver(index, model, configBasePath);
+    observer = new IndexModelObserver(this.index, this.model, this.configBasePath);
     model.addModelObserver(observer);
   }
 

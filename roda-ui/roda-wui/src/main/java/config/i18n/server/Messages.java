@@ -36,14 +36,19 @@ public class Messages {
     return resourceBundle.getString(key);
   }
 
-  public <T> Map<String, T> getTranslations(String prefix, Class<T> valueClass) {
+  /**
+   * 
+   * prefix will be replaced by "i18n." for simplicity purposes
+   */
+  public <T> Map<String, T> getTranslations(String prefix, Class<T> valueClass, boolean replacePrefixFromKey) {
     Map<String, T> map = new HashMap<String, T>();
     Enumeration<String> keys = resourceBundle.getKeys();
     String fullPrefix = prefix + ".";
     while (keys.hasMoreElements()) {
       String key = keys.nextElement();
       if (key.startsWith(fullPrefix)) {
-        map.put(key, valueClass.cast(resourceBundle.getString(key)));
+        map.put(replacePrefixFromKey ? key.replaceFirst(fullPrefix, "i18n.") : key,
+          valueClass.cast(resourceBundle.getString(key)));
       }
     }
     return map;

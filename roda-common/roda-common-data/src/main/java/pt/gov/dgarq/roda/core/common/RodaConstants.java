@@ -13,10 +13,11 @@ public final class RodaConstants {
     YEAR, MONTH, DAY, HOUR, MINUTE, SECOND, MILLISECOND
   }
 
-  public static final String I18N_BINARY_TO_HTML_PREFIX = "binaryToHtml.";
+  public static final String CROSSWALKS_DISSEMINATION_HTML_PATH = "crosswalks/dissemination/html";
+  public static final String I18N_CROSSWALKS_DISSEMINATION_HTML_PREFIX = "crosswalks.dissemination.html.";
   public static final String I18N_UI_SEARCH_FACETS_PREFIX = "ui.search.facets.";
   public static final String I18N_UI_USER_ADMINISTRATION_FACETS_PREFIX = "ui.user_administration.facets.";
-  
+
   public static final String API_SEP = "/";
   public static final String API_REST_V1_AIPS = "api/v1/aips/";
   public static final String API_DATA = "data";

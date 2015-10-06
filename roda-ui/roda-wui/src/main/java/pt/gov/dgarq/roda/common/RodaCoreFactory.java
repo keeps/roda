@@ -87,9 +87,6 @@ public class RodaCoreFactory {
   private static Map<String, String> loginProperties = null;
   private static Map<Locale, Messages> i18nMessages = new HashMap<Locale, Messages>();
 
-  // FIXME read this from configuration file or environment
-  public static boolean DEVELOPMENT = true;
-
   public static void instantiate() {
     if (!instantiated) {
       try {
