@@ -23,7 +23,7 @@ public class AipsResourceTest extends JerseyTest {
   public void testAipsGet() {
     final String textOutput = target(AipsResource.ENDPOINT).request().get(String.class);
     assertEquals(
-      "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><apiResponseMessage><message>magic2!</message><type>ok</type></apiResponseMessage>",
+      "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><apiResponseMessage><message>magic!</message><type>ok</type></apiResponseMessage>",
       textOutput);
   }
 }

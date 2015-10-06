@@ -8,12 +8,13 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.xml.transform.TransformerException;
 
-import org.apache.log4j.Logger;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.roda.api.controllers.Browser;
 import org.roda.api.v1.utils.ApiResponseMessage;
 import org.roda.api.v1.utils.StreamResponse;
 import org.roda.common.UserUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import pt.gov.dgarq.roda.common.RodaCoreFactory;
 import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
@@ -24,7 +25,7 @@ import pt.gov.dgarq.roda.wui.common.client.GenericException;
 
 @javax.annotation.Generated(value = "class io.swagger.codegen.languages.JaxRSServerCodegen", date = "2015-09-03T11:38:49.275+01:00")
 public class AipsResourceImpl {
-  private static final Logger LOGGER = Logger.getLogger(AipsResourceImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AipsResourceImpl.class);
 
   public Response aipsGet(HttpServletRequest request, String start, String limit) {
     // do some magic!
