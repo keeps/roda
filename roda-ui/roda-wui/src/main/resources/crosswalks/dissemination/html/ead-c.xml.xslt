@@ -81,41 +81,220 @@
 		</xsl:if>
 		<xsl:if test="eadc:did/eadc:unitdate/@normal">
 			<xsl:choose>
-				<xsl:when test="contains(eadc:did/eadc:unitdate/@normal, '/')">
-					<div class="descriptiveMetadata-field">
-						<div class="descriptiveMetadata-field-key">
-							<xsl:value-of select="$binaryToHtml.ead-c.xml.initialdate" />
-						</div>
-						<div class="descriptiveMetadata-field-value">
-							<span class="value">
-								<xsl:value-of
-									select="substring-before(eadc:did/eadc:unitdate/@normal, '/')" />
-							</span>
-						</div>
-					</div>
-					<div class="descriptiveMetadata-field">
-						<div class="descriptiveMetadata-field-key">
-							<xsl:value-of select="$binaryToHtml.ead-c.xml.finaldate" />
-						</div>
-						<div class="descriptiveMetadata-field-value">
-							<span class="value">
-								<xsl:value-of
-									select="substring-after(eadc:did/eadc:unitdate/@normal, '/')" />
-							</span>
-						</div>
-					</div>
+				<xsl:when test="contains(eadc:did/eadc:unitdate/@normal, '/')">	<!-- initial/final -->
+					<xsl:analyze-string regex="^(\d{{4}}-\d{{2}}-\d{{2}})$" select="normalize-space(substring-before(eadc:did/eadc:unitdate/@normal, '/'))">
+						<xsl:matching-substring>
+							<div class="descriptiveMetadata-field">
+								<div class="descriptiveMetadata-field-key">
+									<xsl:value-of select="$binaryToHtml.ead-c.xml.initialdate" />
+								</div>
+								<div class="descriptiveMetadata-field-value">
+									<span class="value">
+										<xsl:value-of select="regex-group(1)" />
+									</span>
+								</div>
+							</div>
+						</xsl:matching-substring>
+					</xsl:analyze-string>
+					<xsl:analyze-string regex="^(\d{{4}}-\d{{2}})$" select="normalize-space(substring-before(eadc:did/eadc:unitdate/@normal, '/'))">
+						<xsl:matching-substring>
+							<div class="descriptiveMetadata-field">
+								<div class="descriptiveMetadata-field-key">
+									<xsl:value-of select="$binaryToHtml.ead-c.xml.initialdate" />
+								</div>
+								<div class="descriptiveMetadata-field-value">
+									<span class="value">
+										<xsl:value-of select="regex-group(1)" />-01
+									</span>
+								</div>
+							</div>
+						</xsl:matching-substring>
+					</xsl:analyze-string>
+					<xsl:analyze-string regex="^(\d{{4}})$" select="normalize-space(substring-before(eadc:did/eadc:unitdate/@normal, '/'))">
+						<xsl:matching-substring>
+							<div class="descriptiveMetadata-field">
+								<div class="descriptiveMetadata-field-key">
+									<xsl:value-of select="$binaryToHtml.ead-c.xml.initialdate" />
+								</div>
+								<div class="descriptiveMetadata-field-value">
+									<span class="value">
+										<xsl:value-of select="regex-group(1)" />-01-01
+									</span>
+								</div>
+							</div>
+						</xsl:matching-substring>
+					</xsl:analyze-string>
+					<xsl:analyze-string regex="^(\d{{4}})(\d{{2}})(\d{{2}})$" select="normalize-space(substring-before(eadc:did/eadc:unitdate/@normal, '/'))">
+						<xsl:matching-substring>
+							<div class="descriptiveMetadata-field">
+								<div class="descriptiveMetadata-field-key">
+									<xsl:value-of select="$binaryToHtml.ead-c.xml.initialdate" />
+								</div>
+								<div class="descriptiveMetadata-field-value">
+									<span class="value">
+										<xsl:value-of select="regex-group(1)" />-<xsl:value-of select="regex-group(2)" />-<xsl:value-of select="regex-group(3)" />
+									</span>
+								</div>
+							</div>
+						</xsl:matching-substring>
+					</xsl:analyze-string>
+					<xsl:analyze-string regex="^(\d{{4}})(\d{{2}})$" select="normalize-space(substring-before(eadc:did/eadc:unitdate/@normal, '/'))">
+						<xsl:matching-substring>
+							<div class="descriptiveMetadata-field">
+								<div class="descriptiveMetadata-field-key">
+									<xsl:value-of select="$binaryToHtml.ead-c.xml.initialdate" />
+								</div>
+								<div class="descriptiveMetadata-field-value">
+									<span class="value">
+										<xsl:value-of select="regex-group(1)" />-<xsl:value-of select="regex-group(2)" />-01
+									</span>
+								</div>
+							</div>
+						</xsl:matching-substring>
+					</xsl:analyze-string>
+				
+					<xsl:analyze-string regex="^(\d{{4}}-\d{{2}}-\d{{2}})$" select="normalize-space(substring-after(eadc:did/eadc:unitdate/@normal, '/'))">
+						<xsl:matching-substring>
+							<div class="descriptiveMetadata-field">
+								<div class="descriptiveMetadata-field-key">
+									<xsl:value-of select="$binaryToHtml.ead-c.xml.finaldate" />
+								</div>
+								<div class="descriptiveMetadata-field-value">
+									<span class="value">
+										<xsl:value-of select="regex-group(1)" />
+									</span>
+								</div>
+							</div>
+						</xsl:matching-substring>
+					</xsl:analyze-string>
+					<xsl:analyze-string regex="^(\d{{4}}-\d{{2}})$" select="normalize-space(substring-after(eadc:did/eadc:unitdate/@normal, '/'))">
+						<xsl:matching-substring>
+							<div class="descriptiveMetadata-field">
+								<div class="descriptiveMetadata-field-key">
+									<xsl:value-of select="$binaryToHtml.ead-c.xml.finaldate" />
+								</div>
+								<div class="descriptiveMetadata-field-value">
+									<span class="value">
+										<xsl:value-of select="regex-group(1)" />-01
+									</span>
+								</div>
+							</div>
+						</xsl:matching-substring>
+					</xsl:analyze-string>
+					<xsl:analyze-string regex="^(\d{{4}})$" select="normalize-space(substring-after(eadc:did/eadc:unitdate/@normal, '/'))">
+						<xsl:matching-substring>
+							<div class="descriptiveMetadata-field">
+								<div class="descriptiveMetadata-field-key">
+									<xsl:value-of select="$binaryToHtml.ead-c.xml.finaldate" />
+								</div>
+								<div class="descriptiveMetadata-field-value">
+									<span class="value">
+										<xsl:value-of select="regex-group(1)" />-01-01
+									</span>
+								</div>
+							</div>
+						</xsl:matching-substring>
+					</xsl:analyze-string>
+					<xsl:analyze-string regex="^(\d{{4}})(\d{{2}})(\d{{2}})$" select="normalize-space(substring-after(eadc:did/eadc:unitdate/@normal, '/'))">
+						<xsl:matching-substring>
+							<div class="descriptiveMetadata-field">
+								<div class="descriptiveMetadata-field-key">
+									<xsl:value-of select="$binaryToHtml.ead-c.xml.finaldate" />
+								</div>
+								<div class="descriptiveMetadata-field-value">
+									<span class="value">
+										<xsl:value-of select="regex-group(1)" />-<xsl:value-of select="regex-group(2)" />-<xsl:value-of select="regex-group(3)" />
+									</span>
+								</div>
+							</div>
+						</xsl:matching-substring>
+					</xsl:analyze-string>
+					<xsl:analyze-string regex="^(\d{{4}})(\d{{2}})$" select="normalize-space(substring-after(eadc:did/eadc:unitdate/@normal, '/'))">
+						<xsl:matching-substring>
+							<div class="descriptiveMetadata-field">
+								<div class="descriptiveMetadata-field-key">
+									<xsl:value-of select="$binaryToHtml.ead-c.xml.finaldate" />
+								</div>
+								<div class="descriptiveMetadata-field-value">
+									<span class="value">
+										<xsl:value-of select="regex-group(1)" />-<xsl:value-of select="regex-group(2)" />-01
+									</span>
+								</div>
+							</div>
+						</xsl:matching-substring>
+					</xsl:analyze-string>
 				</xsl:when>
 				<xsl:otherwise>
-					<div class="descriptiveMetadata-field">
-						<div class="descriptiveMetadata-field-key">
-							<xsl:value-of select="$binaryToHtml.ead-c.xml.initialdate" />
-						</div>
-						<div class="descriptiveMetadata-field-value">
-							<span class="value">
-								<xsl:value-of select="eadc:did/eadc:unitdate/@normal" />
-							</span>
-						</div>
-					</div>
+					<xsl:analyze-string regex="^(\d{{4}}-\d{{2}}-\d{{2}})$" select="normalize-space(eadc:did/eadc:unitdate/@normal)">
+						<xsl:matching-substring>
+							<div class="descriptiveMetadata-field">
+								<div class="descriptiveMetadata-field-key">
+									<xsl:value-of select="$binaryToHtml.ead-c.xml.initialdate" />
+								</div>
+								<div class="descriptiveMetadata-field-value">
+									<span class="value">
+										<xsl:value-of select="regex-group(1)" />
+									</span>
+								</div>
+							</div>
+						</xsl:matching-substring>
+					</xsl:analyze-string>
+					<xsl:analyze-string regex="^(\d{{4}}-\d{{2}})$" select="normalize-space(eadc:did/eadc:unitdate/@normal)">
+						<xsl:matching-substring>
+							<div class="descriptiveMetadata-field">
+								<div class="descriptiveMetadata-field-key">
+									<xsl:value-of select="$binaryToHtml.ead-c.xml.initialdate" />
+								</div>
+								<div class="descriptiveMetadata-field-value">
+									<span class="value">
+										<xsl:value-of select="regex-group(1)" />-01
+									</span>
+								</div>
+							</div>
+						</xsl:matching-substring>
+					</xsl:analyze-string>
+					<xsl:analyze-string regex="^(\d{{4}})$" select="normalize-space(eadc:did/eadc:unitdate/@normal)">
+						<xsl:matching-substring>
+							<div class="descriptiveMetadata-field">
+								<div class="descriptiveMetadata-field-key">
+									<xsl:value-of select="$binaryToHtml.ead-c.xml.initialdate" />
+								</div>
+								<div class="descriptiveMetadata-field-value">
+									<span class="value">
+										<xsl:value-of select="regex-group(1)" />-01-01
+									</span>
+								</div>
+							</div>
+						</xsl:matching-substring>
+					</xsl:analyze-string>
+					<xsl:analyze-string regex="^(\d{{4}})(\d{{2}})(\d{{2}})$" select="normalize-space(eadc:did/eadc:unitdate/@normal)">
+						<xsl:matching-substring>
+							<div class="descriptiveMetadata-field">
+								<div class="descriptiveMetadata-field-key">
+									<xsl:value-of select="$binaryToHtml.ead-c.xml.initialdate" />
+								</div>
+								<div class="descriptiveMetadata-field-value">
+									<span class="value">
+										<xsl:value-of select="regex-group(1)" />-<xsl:value-of select="regex-group(2)" />-<xsl:value-of select="regex-group(3)" />
+									</span>
+								</div>
+							</div>
+						</xsl:matching-substring>
+					</xsl:analyze-string>
+					<xsl:analyze-string regex="^(\d{{4}})(\d{{2}})$" select="normalize-space(eadc:did/eadc:unitdate/@normal)">
+						<xsl:matching-substring>
+							<div class="descriptiveMetadata-field">
+								<div class="descriptiveMetadata-field-key">
+									<xsl:value-of select="$binaryToHtml.ead-c.xml.initialdate" />
+								</div>
+								<div class="descriptiveMetadata-field-value">
+									<span class="value">
+										<xsl:value-of select="regex-group(1)" />-<xsl:value-of select="regex-group(2)" />-01
+									</span>
+								</div>
+							</div>
+						</xsl:matching-substring>
+					</xsl:analyze-string>
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:if>
