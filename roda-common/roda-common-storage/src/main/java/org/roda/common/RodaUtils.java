@@ -45,7 +45,7 @@ public class RodaUtils {
     try {
       if (configBasePath != null && Files.exists(configBasePath.resolve(resourceRelativePath))) {
         inputStream = Files.newInputStream(configBasePath.resolve(resourceRelativePath));
-        LOGGER.info(logActionText + " using file " + configBasePath.resolve(resourceRelativePath));
+        LOGGER.trace(logActionText + " using file " + configBasePath.resolve(resourceRelativePath));
       }
     } catch (IOException e) {
       // do nothing
@@ -53,7 +53,7 @@ public class RodaUtils {
     if (inputStream == null) {
       ClassLoader classLoader = ValidationUtils.class.getClassLoader();
       inputStream = classLoader.getResourceAsStream(resourceRelativePath);
-      LOGGER.info(logActionText + " using resource from classpath " + resourceRelativePath);
+      LOGGER.trace(logActionText + " using resource from classpath " + resourceRelativePath);
     }
     return inputStream;
   }
