@@ -223,35 +223,7 @@ public class SolrUtils {
       ret.append("*:*");
     } else {
       for (FilterParameter parameter : filter.getParameters()) {
-        if (parameter instanceof SimpleFilterParameter) {
-          SimpleFilterParameter simplePar = (SimpleFilterParameter) parameter;
-          appendExactMatch(ret, simplePar.getName(), simplePar.getValue(), true, true);
-        } else if (parameter instanceof OneOfManyFilterParameter) {
-          OneOfManyFilterParameter param = (OneOfManyFilterParameter) parameter;
-          appendValuesUsingOROperator(ret, param.getName(), param.getValues());
-        } else if (parameter instanceof BasicSearchFilterParameter) {
-          BasicSearchFilterParameter param = (BasicSearchFilterParameter) parameter;
-          appendBasicSearch(ret, param.getName(), param.getValue(), "AND", true);
-        } else if (parameter instanceof EmptyKeyFilterParameter) {
-          EmptyKeyFilterParameter param = (EmptyKeyFilterParameter) parameter;
-          appendANDOperator(ret, true);
-          ret.append("(*:* NOT " + param.getName() + ":*)");
-        } else if (parameter instanceof DateRangeFilterParameter) {
-          DateRangeFilterParameter param = (DateRangeFilterParameter) parameter;
-          appendRange(ret, param.getName(), Date.class, param.getFromValue(), String.class,
-            processToDate(param.getToValue(), param.getGranularity(), false));
-        } else if (parameter instanceof DateIntervalFilterParameter) {
-          DateIntervalFilterParameter param = (DateIntervalFilterParameter) parameter;
-          appendRangeInterval(ret, param.getFromName(), param.getToName(), param.getFromValue(), param.getToValue(),
-            param.getGranularity());
-        } else if (parameter instanceof LongRangeFilterParameter) {
-          LongRangeFilterParameter param = (LongRangeFilterParameter) parameter;
-          appendRange(ret, param.getName(), Long.class, param.getFromValue(), Long.class, param.getToValue());
-        } else {
-          LOGGER.error("Unsupported filter parameter class: " + parameter.getClass().getName());
-          throw new IndexServiceException("Unsupported filter parameter class: " + parameter.getClass().getName(),
-            IndexServiceException.BAD_REQUEST);
-        }
+        parseFilterParameter(ret, parameter);
       }
 
       if (ret.length() == 0) {
@@ -261,6 +233,38 @@ public class SolrUtils {
 
     LOGGER.debug("Converting filter {} to query {}", filter, ret);
     return ret.toString();
+  }
+
+  private static void parseFilterParameter(StringBuilder ret, FilterParameter parameter) throws IndexServiceException {
+    if (parameter instanceof SimpleFilterParameter) {
+      SimpleFilterParameter simplePar = (SimpleFilterParameter) parameter;
+      appendExactMatch(ret, simplePar.getName(), simplePar.getValue(), true, true);
+    } else if (parameter instanceof OneOfManyFilterParameter) {
+      OneOfManyFilterParameter param = (OneOfManyFilterParameter) parameter;
+      appendValuesUsingOROperator(ret, param.getName(), param.getValues());
+    } else if (parameter instanceof BasicSearchFilterParameter) {
+      BasicSearchFilterParameter param = (BasicSearchFilterParameter) parameter;
+      appendBasicSearch(ret, param.getName(), param.getValue(), "AND", true);
+    } else if (parameter instanceof EmptyKeyFilterParameter) {
+      EmptyKeyFilterParameter param = (EmptyKeyFilterParameter) parameter;
+      appendANDOperator(ret, true);
+      ret.append("(*:* NOT " + param.getName() + ":*)");
+    } else if (parameter instanceof DateRangeFilterParameter) {
+      DateRangeFilterParameter param = (DateRangeFilterParameter) parameter;
+      appendRange(ret, param.getName(), Date.class, param.getFromValue(), String.class,
+        processToDate(param.getToValue(), param.getGranularity(), false));
+    } else if (parameter instanceof DateIntervalFilterParameter) {
+      DateIntervalFilterParameter param = (DateIntervalFilterParameter) parameter;
+      appendRangeInterval(ret, param.getFromName(), param.getToName(), param.getFromValue(), param.getToValue(),
+        param.getGranularity());
+    } else if (parameter instanceof LongRangeFilterParameter) {
+      LongRangeFilterParameter param = (LongRangeFilterParameter) parameter;
+      appendRange(ret, param.getName(), Long.class, param.getFromValue(), Long.class, param.getToValue());
+    } else {
+      LOGGER.error("Unsupported filter parameter class: " + parameter.getClass().getName());
+      throw new IndexServiceException("Unsupported filter parameter class: " + parameter.getClass().getName(),
+        IndexServiceException.BAD_REQUEST);
+    }
   }
 
   private static String processFromDate(Date fromValue) {
@@ -461,7 +465,6 @@ public class SolrUtils {
     }
   }
 
-  // FIXME escape values for Solr special chars
   private static void appendWhiteSpaceTokenizedString(StringBuilder ret, String key, String value, String operator) {
     appendANDOperator(ret, true);
 
@@ -723,14 +726,15 @@ public class SolrUtils {
     final List<String> representationIds = objectToListString(doc.get(RodaConstants.AIP_REPRESENTATION_ID));
 
     RODAObjectPermissions permissions = getPermissions(doc);
-    /*
-     * final List<String> preservationObjectsIds =
-     * objectToListString(doc.get(RodaConstants.AIP_PRESERVATION_OBJECTS_ID) );
-     * final List<String> preservationEventsIds =
-     * objectToListString(doc.get(RodaConstants.AIP_PRESERVATION_EVENTS_ID)) ;
-     */
+
+    // FIXME this information is not being recorded. passing by empty
+    // collections for easier processing
+    final Map<String, List<String>> preservationRepresentationObjectsIds = new HashMap<String, List<String>>();
+    final Map<String, List<String>> preservationEventsIds = new HashMap<String, List<String>>();
+    final Map<String, List<String>> preservationFileObjectsIds = new HashMap<String, List<String>>();
+
     return new AIP(id, parentId, active, dateCreated, dateModified, permissions, descriptiveMetadataFileIds,
-      representationIds, null, null, null);
+      representationIds, preservationRepresentationObjectsIds, preservationEventsIds, preservationFileObjectsIds);
   }
 
   public static SolrInputDocument aipToSolrInputDocument(AIP aip) {
@@ -749,7 +753,6 @@ public class SolrUtils {
     return ret;
   }
 
-  // FIXME rename this
   public static SimpleDescriptionObject solrDocumentToSDO(SolrDocument doc) {
     final String id = objectToString(doc.get(RodaConstants.AIP_ID));
     final String label = id;
@@ -1253,27 +1256,6 @@ public class SolrUtils {
     return doc;
   }
 
-  // private static User solrDocumentToUser(SolrDocument doc) {
-  // final String id = objectToString(doc.get(RodaConstants.MEMBERS_ID));
-  // final boolean isActive =
-  // objectToBoolean(doc.get(RodaConstants.MEMBERS_IS_ACTIVE));
-  // final boolean isUser =
-  // objectToBoolean(doc.get(RodaConstants.MEMBERS_IS_USER));
-  // final String name = objectToString(doc.get(RodaConstants.MEMBERS_NAME));
-  // final Set<String> groups = new
-  // HashSet<String>(objectToListString(doc.get(RodaConstants.MEMBERS_GROUPS_ALL)));
-  // final Set<String> roles = new
-  // HashSet<String>(objectToListString(doc.get(RodaConstants.MEMBERS_ROLES_ALL)));
-  // User user = new User();
-  // user.setId(id);
-  // user.setActive(isActive);
-  // user.setAllGroups(groups);
-  // user.setAllRoles(roles);
-  // user.setActive(isActive);
-  // user.setName(name);
-  // return user;
-  // }
-
   public static SolrInputDocument groupToSolrDocument(Group group) {
     SolrInputDocument doc = new SolrInputDocument();
     doc.addField(RodaConstants.MEMBERS_ID, group.getId());
@@ -1309,24 +1291,4 @@ public class SolrUtils {
     LOGGER.debug("executeSolrQuery: " + query);
     return index.query(collection, query);
   }
-
-  // private static Group solrDocumentToGroup(SolrDocument doc) {
-  // final String id = objectToString(doc.get(RodaConstants.MEMBERS_ID));
-  // final boolean isActive =
-  // objectToBoolean(doc.get(RodaConstants.MEMBERS_IS_ACTIVE));
-  // final boolean isUser =
-  // objectToBoolean(doc.get(RodaConstants.MEMBERS_IS_USER));
-  // final String name = objectToString(doc.get(RodaConstants.MEMBERS_NAME));
-  // final Set<String> groups = new
-  // HashSet<String>(objectToListString(doc.get(RodaConstants.MEMBERS_GROUPS_ALL)));
-  // final Set<String> roles = new
-  // HashSet<String>(objectToListString(doc.get(RodaConstants.MEMBERS_ROLES_ALL)));
-  // Group group = new Group();
-  // group.setActive(isActive);
-  // group.setAllGroups(groups);
-  // group.setAllRoles(roles);
-  // group.setActive(isActive);
-  // group.setName(name);
-  // return group;
-  // }
 }

@@ -3,6 +3,11 @@ package org.roda.index;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * @deprecated 20151007 hsilva: this class is not being used, at least it seems
+ *             so. it will be removed soon.
+ */
+@Deprecated
 public class SimpleDescriptiveMetadata {
 
   private String aipID;

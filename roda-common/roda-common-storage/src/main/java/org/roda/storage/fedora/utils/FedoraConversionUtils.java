@@ -20,8 +20,8 @@ import org.roda.storage.DefaultContainer;
 import org.roda.storage.DefaultDirectory;
 import org.roda.storage.DefaultStoragePath;
 import org.roda.storage.Directory;
-import org.roda.storage.StorageServiceException;
 import org.roda.storage.StoragePath;
+import org.roda.storage.StorageServiceException;
 import org.roda.storage.fedora.FedoraContentPayload;
 import org.roda.storage.fedora.FedoraStorageService;
 
@@ -34,12 +34,12 @@ import com.hp.hpl.jena.graph.Triple;
  * 
  * @author Sébastien Leroux <sleroux@keep.pt>
  * @author Hélder Silva <hsilva@keep.pt>
- * */
+ */
 public final class FedoraConversionUtils {
 
   /**
    * Private empty constructor
-   * */
+   */
   private FedoraConversionUtils() {
 
   }
@@ -51,7 +51,7 @@ public final class FedoraConversionUtils {
    *          the payload to be converted
    * @param mimetype
    *          the mimetype of the payload
-   * */
+   */
   public static FedoraContent contentPayloadToFedoraContent(ContentPayload payload, String mimetype)
     throws StorageServiceException {
     try {
@@ -68,7 +68,7 @@ public final class FedoraConversionUtils {
    * 
    * @param payload
    *          the payload to be converted
-   * */
+   */
   public static FedoraContent contentPayloadToFedoraContent(ContentPayload payload) throws StorageServiceException {
     return contentPayloadToFedoraContent(payload, "application/octet-stream");
   }
@@ -96,7 +96,7 @@ public final class FedoraConversionUtils {
    * 
    * @param datastream
    *          the Fedora datastream to be converted
-   * */
+   */
   public static Binary fedoraDatastreamToBinary(FedoraDatastream datastream) throws StorageServiceException {
     try {
       Map<String, Set<String>> properties = tripleIteratorToMap(datastream.getProperties());
@@ -127,14 +127,13 @@ public final class FedoraConversionUtils {
    * 
    * @param object
    *          the Fedora object to be converted
-   * */
+   */
   public static Directory fedoraObjectToDirectory(String fedoraRepositoryURL, FedoraObject object)
     throws StorageServiceException {
     try {
       Map<String, Set<String>> metadata = tripleIteratorToMap(fedoraRepositoryURL, object.getProperties(),
         NodeFactory.createURI(object.getPath()));
-      Directory d = new DefaultDirectory(getStoragePath(object), metadata);
-      return d;
+      return new DefaultDirectory(getStoragePath(object), metadata);
     } catch (FedoraException e) {
       throw new StorageServiceException("Error while converting a Fedora object into a Directory",
         StorageServiceException.INTERNAL_SERVER_ERROR, e);
@@ -147,7 +146,7 @@ public final class FedoraConversionUtils {
    * 
    * @param iterator
    *          triple iterator to be converted
-   * */
+   */
   public static Map<String, Set<String>> tripleIteratorToMap(Iterator<Triple> iterator) {
     Map<String, Set<String>> map = new HashMap<String, Set<String>>();
     while (iterator.hasNext()) {
@@ -179,7 +178,7 @@ public final class FedoraConversionUtils {
    *          triple iterator to be converted
    * @param subject
    *          subject by which the triples should be filtered
-   * */
+   */
   public static Map<String, Set<String>> tripleIteratorToMap(String fedoraRepositoryURL, Iterator<Triple> iterator,
     Node subject) {
     Map<String, Set<String>> map = new HashMap<String, Set<String>>();
@@ -208,7 +207,7 @@ public final class FedoraConversionUtils {
    * 
    * @param object
    *          Fedora object to be converted
-   * */
+   */
   public static Container fedoraObjectToContainer(FedoraObject object) throws StorageServiceException {
     try {
       return new DefaultContainer(getStoragePath(object), tripleIteratorToMap(object.getProperties()));

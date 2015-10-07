@@ -60,19 +60,17 @@ public class IndexModelObserver implements ModelObserver {
 
   private void indexPreservationsEvents(final AIP aip) {
     final Map<String, List<String>> preservationEventsIds = aip.getPreservationsEventsIds();
-    if (preservationEventsIds != null) {
-      for (Map.Entry<String, List<String>> representationPreservationMap : preservationEventsIds.entrySet()) {
-        try {
-          for (String fileId : representationPreservationMap.getValue()) {
-            EventPreservationObject premisEvent = model.retrieveEventPreservationObject(aip.getId(),
-              representationPreservationMap.getKey(), fileId);
-            String id = SolrUtils.getId(aip.getId(), representationPreservationMap.getKey(), fileId);
-            SolrInputDocument premisEventDocument = SolrUtils.eventPreservationObjectToSolrDocument(id, premisEvent);
-            index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisEventDocument);
-          }
-        } catch (SolrServerException | IOException | ModelServiceException e) {
-          LOGGER.error("Could not index premis event", e);
+    for (Map.Entry<String, List<String>> representationPreservationMap : preservationEventsIds.entrySet()) {
+      try {
+        for (String fileId : representationPreservationMap.getValue()) {
+          EventPreservationObject premisEvent = model.retrieveEventPreservationObject(aip.getId(),
+            representationPreservationMap.getKey(), fileId);
+          String id = SolrUtils.getId(aip.getId(), representationPreservationMap.getKey(), fileId);
+          SolrInputDocument premisEventDocument = SolrUtils.eventPreservationObjectToSolrDocument(id, premisEvent);
+          index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisEventDocument);
         }
+      } catch (SolrServerException | IOException | ModelServiceException e) {
+        LOGGER.error("Could not index premis event", e);
       }
       try {
         index.commit(RodaConstants.INDEX_PRESERVATION_EVENTS);
@@ -84,20 +82,18 @@ public class IndexModelObserver implements ModelObserver {
 
   private void indexPreservationFileObjects(final AIP aip) {
     final Map<String, List<String>> preservationFileObjectsIds = aip.getPreservationFileObjectsIds();
-    if (preservationFileObjectsIds != null) {
-      for (Map.Entry<String, List<String>> eventPreservationMap : preservationFileObjectsIds.entrySet()) {
-        try {
-          for (String fileId : eventPreservationMap.getValue()) {
-            RepresentationFilePreservationObject premisObject = model.retrieveRepresentationFileObject(aip.getId(),
-              eventPreservationMap.getKey(), fileId);
-            String id = SolrUtils.getId(aip.getId(), eventPreservationMap.getKey(), fileId);
-            SolrInputDocument premisObjectDocument = SolrUtils.representationFilePreservationObjectToSolrDocument(id,
-              premisObject);
-            index.add(RodaConstants.INDEX_PRESERVATION_OBJECTS, premisObjectDocument);
-          }
-        } catch (SolrServerException | IOException | ModelServiceException e) {
-          LOGGER.error("Could not index premis object", e);
+    for (Map.Entry<String, List<String>> eventPreservationMap : preservationFileObjectsIds.entrySet()) {
+      try {
+        for (String fileId : eventPreservationMap.getValue()) {
+          RepresentationFilePreservationObject premisObject = model.retrieveRepresentationFileObject(aip.getId(),
+            eventPreservationMap.getKey(), fileId);
+          String id = SolrUtils.getId(aip.getId(), eventPreservationMap.getKey(), fileId);
+          SolrInputDocument premisObjectDocument = SolrUtils.representationFilePreservationObjectToSolrDocument(id,
+            premisObject);
+          index.add(RodaConstants.INDEX_PRESERVATION_OBJECTS, premisObjectDocument);
         }
+      } catch (SolrServerException | IOException | ModelServiceException e) {
+        LOGGER.error("Could not index premis object", e);
       }
       try {
         index.commit(RodaConstants.INDEX_PRESERVATION_OBJECTS);
@@ -220,7 +216,7 @@ public class IndexModelObserver implements ModelObserver {
       index.deleteById(RodaConstants.INDEX_REPRESENTATIONS, SolrUtils.getId(aipId, representationId));
       index.commit(RodaConstants.INDEX_REPRESENTATIONS);
     } catch (SolrServerException | IOException e) {
-      LOGGER.error("Error deleting representation (aipId=" + aipId + "; representationId=" + representationId + ")");
+      LOGGER.error("Error deleting representation (aipId=" + aipId + "; representationId=" + representationId + ")", e);
     }
   }
 
@@ -276,7 +272,7 @@ public class IndexModelObserver implements ModelObserver {
       index.deleteById(RodaConstants.INDEX_SIP_REPORT, sipReportId);
       index.commit(RodaConstants.INDEX_REPRESENTATIONS);
     } catch (SolrServerException | IOException e) {
-      LOGGER.error("Error deleting SIP report (id=" + sipReportId + ")");
+      LOGGER.error("Error deleting SIP report (id=" + sipReportId + ")", e);
     }
   }
 
@@ -303,7 +299,7 @@ public class IndexModelObserver implements ModelObserver {
       index.deleteById(RodaConstants.INDEX_MEMBERS, userID);
       index.commit(RodaConstants.INDEX_MEMBERS);
     } catch (SolrServerException | IOException e) {
-      LOGGER.error("Error deleting User (id=" + userID + ")");
+      LOGGER.error("Error deleting User (id=" + userID + ")", e);
     }
   }
 
@@ -330,7 +326,7 @@ public class IndexModelObserver implements ModelObserver {
       index.deleteById(RodaConstants.INDEX_MEMBERS, groupID);
       index.commit(RodaConstants.INDEX_MEMBERS);
     } catch (SolrServerException | IOException e) {
-      LOGGER.error("Error deleting Group (id=" + groupID + ")");
+      LOGGER.error("Error deleting Group (id=" + groupID + ")", e);
     }
   }
 

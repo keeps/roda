@@ -61,8 +61,9 @@ public class Messages {
       this.folder = folder;
     }
 
-    // ASK NOT TO CACHE
+    @Override
     public long getTimeToLive(String baseName, Locale locale) {
+      // ask not to cache
       return TTL_DONT_CACHE;
     }
 
@@ -70,7 +71,7 @@ public class Messages {
     public ResourceBundle newBundle(String baseName, Locale locale, String format, ClassLoader loader, boolean reload)
       throws IllegalAccessException, InstantiationException, IOException {
 
-      if (!format.equals("java.properties")) {
+      if (!"java.properties".equals(format)) {
         return null;
       }
 

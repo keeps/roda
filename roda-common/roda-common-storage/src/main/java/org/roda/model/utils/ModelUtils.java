@@ -6,7 +6,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -103,7 +102,7 @@ public final class ModelUtils {
   public static <T> T getAs(Map<String, Set<String>> metadata, String key, Class<T> type) throws ModelServiceException {
     T ret;
     Set<String> set = metadata.get(key);
-    if (set == null || set.size() == 0) {
+    if (set == null || set.isEmpty()) {
       ret = null;
     } else if (set.size() == 1) {
       String value = set.iterator().next();
@@ -199,7 +198,7 @@ public final class ModelUtils {
   public static String getString(Map<String, Set<String>> metadata, String key) throws ModelServiceException {
     String ret;
     Set<String> set = metadata.get(key);
-    if (set == null || set.size() == 0) {
+    if (set == null || set.isEmpty()) {
       ret = null;
     } else if (set.size() == 1) {
       ret = set.iterator().next();
@@ -253,29 +252,30 @@ public final class ModelUtils {
     return ids;
   }
 
-  /**
-   * Returns a list of ids from the children of a certain resources, starting
-   * with the prefix defined
-   * 
-   * @param storage
-   *          the storage service containing the parent resource
-   * @param path
-   *          the storage paths for the parent resources
-   * @param prefix
-   *          the prefix of the children
-   * @throws StorageServiceException
-   */
-  public static List<String> getIds(StorageService storage, List<StoragePath> paths, String prefix)
-    throws StorageServiceException {
-    List<String> ids = new ArrayList<String>();
-    for (StoragePath path : paths) {
-      if (path.getName().startsWith(prefix)) {
-        ids.add(path.getName());
-      }
-    }
-    return ids;
-
-  }
+  // /**
+  // * Returns a list of ids from the children of a certain resources, starting
+  // * with the prefix defined
+  // *
+  // * @param storage
+  // * the storage service containing the parent resource
+  // * @param path
+  // * the storage paths for the parent resources
+  // * @param prefix
+  // * the prefix of the children
+  // * @throws StorageServiceException
+  // */
+  // public static List<String> getIds(StorageService storage, List<StoragePath>
+  // paths, String prefix)
+  // throws StorageServiceException {
+  // List<String> ids = new ArrayList<String>();
+  // for (StoragePath path : paths) {
+  // if (path.getName().startsWith(prefix)) {
+  // ids.add(path.getName());
+  // }
+  // }
+  // return ids;
+  //
+  // }
 
   public static StoragePath getAIPcontainerPath() throws StorageServiceException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP);
@@ -420,28 +420,6 @@ public final class ModelUtils {
     return agent;
   }
 
-  // FIXME finish to implement this for deleting the 3 methods above
-  // (isPreservation*)
-  public static PREMIS_TYPE getPremisType(Binary preservationBinary) {
-    PREMIS_TYPE ret = PREMIS_TYPE.UNKNOWN;
-    InputStream binaryInputStream = null;
-    try {
-      binaryInputStream = preservationBinary.getContent().createInputStream();
-      PremisFileObjectHelper.newInstance(binaryInputStream);
-    } catch (PremisMetadataException | IOException | ClassCastException e) {
-
-    } finally {
-      if (binaryInputStream != null) {
-        try {
-          binaryInputStream.close();
-        } catch (IOException e1) {
-          LOGGER.warn("Cannot close file inputstream", e1);
-        }
-      }
-    }
-    return ret;
-  }
-
   public static StoragePath getPreservationAgentPath(String agentID) throws StorageServiceException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_PRESERVATION,
       RodaConstants.STORAGE_DIRECTORY_AGENTS, agentID);
@@ -451,12 +429,14 @@ public final class ModelUtils {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG, logFile);
   }
 
-  @Deprecated
-  public static StoragePath getLogPath(Date d) throws StorageServiceException {
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-    String logFile = sdf.format(d) + ".log";
-    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG, logFile);
-  }
+  // @Deprecated
+  // public static StoragePath getLogPath(Date d) throws StorageServiceException
+  // {
+  // SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+  // String logFile = sdf.format(d) + ".log";
+  // return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG,
+  // logFile);
+  // }
 
   public static void writeLogEntryToFile(LogEntry logEntry, Path logFile) throws ModelServiceException {
     try {
@@ -522,8 +502,8 @@ public final class ModelUtils {
       JsonFactory factory = new JsonFactory();
       ObjectMapper mapper = new ObjectMapper(factory);
       return mapper.writeValueAsString(sipState);
-    } catch (IOException ioe) {
-
+    } catch (IOException e) {
+      LOGGER.error("Error transforming sip state to json string", e);
     }
     return null;
   }
@@ -533,8 +513,8 @@ public final class ModelUtils {
       JsonFactory factory = new JsonFactory();
       ObjectMapper mapper = new ObjectMapper(factory);
       return mapper.readValue(json, SIPReport.class);
-    } catch (IOException ioe) {
-
+    } catch (IOException e) {
+      LOGGER.error("Error transforming json string to sip state", e);
     }
     return null;
   }
@@ -543,19 +523,22 @@ public final class ModelUtils {
     throws ModelServiceException {
     List<String> ids = new ArrayList<String>();
     if (c.equals(File.class)) {
-      //
+      // TODO
+      LOGGER.error("Not implemented!");
     } else if (c.equals(EventComplexType.class)) {
       EventComplexType event = getPreservationEvent(b);
       List<LinkingAgentIdentifierComplexType> identifiers = event.getLinkingAgentIdentifierList();
-      if (identifiers != null && identifiers.size() > 0) {
+      if (identifiers != null) {
         for (LinkingAgentIdentifierComplexType laict : identifiers) {
           ids.add(laict.getLinkingAgentIdentifierValue());
         }
       }
     } else if (c.equals(Representation.class)) {
       // TODO
+      LOGGER.error("Not implemented!");
     } else {
       // TODO
+      LOGGER.error("Not implemented!");
     }
     return ids;
   }

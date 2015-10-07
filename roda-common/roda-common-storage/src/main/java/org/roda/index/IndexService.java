@@ -90,23 +90,22 @@ public class IndexService {
     return SolrUtils.retrieve(index, returnClass, ids);
   }
 
-  // FIXME perhaps transform sysout into logger logging
   public void reindexAIPs() throws IndexServiceException {
     ClosableIterable<AIP> aips = null;
     try {
-      System.out.println(new Date().getTime() + " > Listing AIPs");
+      LOGGER.info(new Date().getTime() + " > Listing AIPs");
       aips = model.listAIPs();
       for (AIP aip : aips) {
         if (aip != null) {
-          System.out.println(new Date().getTime() + " > Reindexing AIP " + aip.getId());
+          LOGGER.info(new Date().getTime() + " > Reindexing AIP " + aip.getId());
           reindexAIP(aip);
         } else {
-          System.err.println(new Date().getTime() + " > An error occurred. See log for more details.");
+          LOGGER.error(new Date().getTime() + " > An error occurred. See log for more details.");
         }
       }
-      System.out.println(new Date().getTime() + " > Optimizing indexes");
+      LOGGER.info(new Date().getTime() + " > Optimizing indexes");
       optimizeAIPs();
-      System.out.println(new Date().getTime() + " > Done");
+      LOGGER.info(new Date().getTime() + " > Done");
     } catch (ModelServiceException e) {
       throw new IndexServiceException("Error while reindexing AIPs", IndexServiceException.INTERNAL_SERVER_ERROR, e);
     } finally {
