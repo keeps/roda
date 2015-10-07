@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<name>roda-common-metadata</name>
 	<artifactId>roda-common-metadata</artifactId>
@@ -118,10 +119,10 @@
 			<groupId>commons-lang</groupId>
 			<artifactId>commons-lang</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>commons-configuration</groupId>
-			<artifactId>commons-configuration</artifactId>
-		</dependency>
+		<!-- <dependency> -->
+		<!-- <groupId>commons-configuration</groupId> -->
+		<!-- <artifactId>commons-configuration</artifactId> -->
+		<!-- </dependency> -->
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
@@ -130,18 +131,18 @@
 			<groupId>org.apache.xmlbeans</groupId>
 			<artifactId>xmlbeans</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.apache.xmlbeans</groupId>
-			<artifactId>xmlbeans-xpath</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>net.sf.saxon</groupId>
-			<artifactId>saxon</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>net.sf.saxon</groupId>
-			<artifactId>saxon-dom</artifactId>
-		</dependency>
+		<!-- <dependency> -->
+		<!-- <groupId>org.apache.xmlbeans</groupId> -->
+		<!-- <artifactId>xmlbeans-xpath</artifactId> -->
+		<!-- </dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>net.sf.saxon</groupId> -->
+		<!-- <artifactId>saxon</artifactId> -->
+		<!-- </dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>net.sf.saxon</groupId> -->
+		<!-- <artifactId>saxon-dom</artifactId> -->
+		<!-- </dependency> -->
 		<dependency>
 			<groupId>org.roda-project</groupId>
 			<artifactId>roda-common-utils</artifactId>

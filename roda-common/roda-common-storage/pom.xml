@@ -47,13 +47,14 @@
 			<artifactId>snakeyaml</artifactId>
 		</dependency>
 
-		<dependency>
-			<groupId>commons-logging</groupId>
-			<artifactId>commons-logging</artifactId>
-		</dependency>
+		<!-- <dependency> -->
+		<!-- <groupId>commons-logging</groupId> -->
+		<!-- <artifactId>commons-logging</artifactId> -->
+		<!-- </dependency> -->
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -131,6 +132,11 @@
 		</dependency>
 
 
+		<dependency>
+			<groupId>commons-configuration</groupId>
+			<artifactId>commons-configuration</artifactId>
+			<scope>test</scope>
+		</dependency>
 		<!-- FEDORA TESTING GEAR -->
 		<dependency>
 			<groupId>org.springframework</groupId>
