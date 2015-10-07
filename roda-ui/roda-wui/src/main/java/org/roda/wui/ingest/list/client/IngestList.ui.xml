@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+	xmlns:i="urn:import:config.i18n.client" xmlns:m="urn:import:org.roda.wui.main.client"
+	xmlns:common="urn:import:org.roda.wui.common.client.widgets"
+	xmlns:d="urn:import:com.google.gwt.user.datepicker.client">
+
+	<ui:style>
+	.other-producer-label {
+		margin-left: 5px;
+		font-weight: 200;
+		margin-bottom: 2px;
+	}
+	
+	.other-producer-input {
+		margin-left: 5px;
+		padding: 4px;
+	}
+	</ui:style>
+
+	<g:FlowPanel styleName="wui-ingest-list" addStyleNames="wrapper skip_padding">
+		<g:FlowPanel addStyleNames="row full_width skip_padding">
+			<g:FlowPanel addStyleNames="col_10 content">
+				<g:Label styleName="h1">Ingest status</g:Label>
+				<common:SIPReportList addStyleNames="searchResults"
+					ui:field="sipList" />
+			</g:FlowPanel>
+			<g:FlowPanel addStyleNames="col_2 last sidebar">
+				<g:FlowPanel>
+					<g:Label addStyleNames="h4">
+						<ui:msg>Filters</ui:msg>
+					</g:Label>
+					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+						<g:Label addStyleNames="h5 sidebar-facet-title">
+							<ui:msg>State</ui:msg>
+						</g:Label>
+						<g:FlowPanel ui:field="stateFacets" />
+					</g:FlowPanel>
+					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+						<g:Label addStyleNames="h5 sidebar-facet-title">
+							<ui:msg>Producers</ui:msg>
+						</g:Label>
+						<g:FlowPanel ui:field="producerFacets" />
+					</g:FlowPanel>
+					<!-- <g:Label addStyleNames="{style.other-producer-label}">Other producer:</g:Label> 
+						<g:TextBox addStyleNames="fieldTextBox {style.other-producer-input}" /> -->
+					<g:Label addStyleNames="h5 sidebar-facet-title">
+						<ui:msg>From date</ui:msg>
+					</g:Label>
+					<d:DateBox addStyleNames="sidebar-facet-input fieldTextBox"
+						ui:field="inputDateInitial" />
+					<g:Label addStyleNames="h5 sidebar-facet-title">
+						<ui:msg>To date</ui:msg>
+					</g:Label>
+					<d:DateBox addStyleNames="sidebar-facet-input fieldTextBox"
+						ui:field="inputDateFinal" />
+				</g:FlowPanel>
+				<g:FlowPanel>
+					<g:Label addStyleNames="h4">
+						<ui:msg>Actions</ui:msg>
+					</g:Label>
+					<g:Button addStyleNames="btn btn-th-list" ui:field="report">Report</g:Button>
+					<g:Button addStyleNames="btn btn-play" ui:field="view">View</g:Button>
+					<g:Button addStyleNames="btn btn-check" ui:field="accept">Accept</g:Button>
+					<g:Button addStyleNames="btn btn-ban" ui:field="reject">Reject</g:Button>
+				</g:FlowPanel>
+			</g:FlowPanel>
+		</g:FlowPanel>
+	</g:FlowPanel>
+</ui:UiBinder>

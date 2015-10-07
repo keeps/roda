@@ -14,6 +14,12 @@ import org.apache.log4j.Logger;
 import org.roda.action.orchestrate.ActionOrchestrator;
 import org.roda.action.orchestrate.Plugin;
 import org.roda.action.orchestrate.PluginException;
+import org.roda.common.RodaCoreFactory;
+import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.sort.Sorter;
+import org.roda.core.data.adapter.sublist.Sublist;
+import org.roda.core.data.v2.IndexResult;
+import org.roda.core.data.v2.Representation;
 import org.roda.index.IndexService;
 import org.roda.index.IndexServiceException;
 import org.roda.model.AIP;
@@ -24,13 +30,6 @@ import org.roda.storage.ClosableIterable;
 import org.roda.storage.StorageService;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-
-import pt.gov.dgarq.roda.common.RodaCoreFactory;
-import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
-import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
-import pt.gov.dgarq.roda.core.data.v2.IndexResult;
-import pt.gov.dgarq.roda.core.data.v2.Representation;
 
 public class EmbeddedActionOrchestrator implements ActionOrchestrator {
 

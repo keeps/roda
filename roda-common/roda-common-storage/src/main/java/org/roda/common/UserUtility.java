@@ -10,21 +10,20 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
+import org.roda.core.common.AuthenticationDeniedException;
+import org.roda.core.common.AuthorizationDeniedException;
+import org.roda.core.common.Pair;
+import org.roda.core.common.RodaConstants;
+import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.filter.SimpleFilterParameter;
+import org.roda.core.data.adapter.sublist.Sublist;
+import org.roda.core.data.v2.IndexResult;
+import org.roda.core.data.v2.RODAMember;
+import org.roda.core.data.v2.RodaSimpleUser;
+import org.roda.core.data.v2.RodaUser;
+import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.index.IndexService;
 import org.roda.index.IndexServiceException;
-
-import pt.gov.dgarq.roda.core.common.AuthenticationDeniedException;
-import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
-import pt.gov.dgarq.roda.core.common.Pair;
-import pt.gov.dgarq.roda.core.common.RodaConstants;
-import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
-import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
-import pt.gov.dgarq.roda.core.data.v2.IndexResult;
-import pt.gov.dgarq.roda.core.data.v2.RODAMember;
-import pt.gov.dgarq.roda.core.data.v2.RodaSimpleUser;
-import pt.gov.dgarq.roda.core.data.v2.RodaUser;
-import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 
 public class UserUtility {
   private static final Logger LOGGER = Logger.getLogger(UserUtility.class);

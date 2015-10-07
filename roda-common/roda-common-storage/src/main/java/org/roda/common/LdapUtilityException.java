@@ -3,7 +3,7 @@
  */
 package org.roda.common;
 
-import pt.gov.dgarq.roda.core.common.RODAException;
+import org.roda.core.common.RODAException;
 
 /**
  * @author Rui Castro

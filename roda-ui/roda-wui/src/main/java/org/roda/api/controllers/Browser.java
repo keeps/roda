@@ -9,27 +9,26 @@ import javax.xml.transform.TransformerException;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.roda.api.v1.utils.StreamResponse;
+import org.roda.common.RodaCoreService;
 import org.roda.common.UserUtility;
+import org.roda.core.common.AuthorizationDeniedException;
+import org.roda.core.common.NotFoundException;
+import org.roda.core.common.NotImplementedException;
+import org.roda.core.common.RODAException;
+import org.roda.core.data.adapter.facet.Facets;
+import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.sort.Sorter;
+import org.roda.core.data.adapter.sublist.Sublist;
+import org.roda.core.data.v2.IndexResult;
+import org.roda.core.data.v2.RodaUser;
+import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.model.AIP;
 import org.roda.model.DescriptiveMetadata;
 import org.roda.model.ValidationException;
 import org.roda.storage.Binary;
-
-import pt.gov.dgarq.roda.common.RodaCoreService;
-import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
-import pt.gov.dgarq.roda.core.common.NotFoundException;
-import pt.gov.dgarq.roda.core.common.NotImplementedException;
-import pt.gov.dgarq.roda.core.common.RODAException;
-import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
-import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
-import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
-import pt.gov.dgarq.roda.core.data.v2.IndexResult;
-import pt.gov.dgarq.roda.core.data.v2.RodaUser;
-import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
-import pt.gov.dgarq.roda.wui.common.client.GenericException;
-import pt.gov.dgarq.roda.wui.dissemination.browse.client.BrowseItemBundle;
-import pt.gov.dgarq.roda.wui.dissemination.browse.client.DescriptiveMetadataEditBundle;
+import org.roda.wui.common.client.GenericException;
+import org.roda.wui.dissemination.browse.client.BrowseItemBundle;
+import org.roda.wui.dissemination.browse.client.DescriptiveMetadataEditBundle;
 
 /**
  * FIXME 1) verify all checkObject*Permissions (because now also a permission

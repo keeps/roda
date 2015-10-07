@@ -14,6 +14,9 @@ import org.roda.action.orchestrate.PluginException;
 import org.roda.action.orchestrate.actions.antivirus.AVGAntiVirus;
 import org.roda.action.orchestrate.actions.antivirus.AntiVirus;
 import org.roda.action.orchestrate.actions.antivirus.VirusCheckResult;
+import org.roda.core.common.InvalidParameterException;
+import org.roda.core.data.PluginParameter;
+import org.roda.core.data.Report;
 import org.roda.index.IndexService;
 import org.roda.model.AIP;
 import org.roda.model.ModelService;
@@ -22,10 +25,6 @@ import org.roda.storage.StoragePath;
 import org.roda.storage.StorageService;
 import org.roda.storage.StorageServiceException;
 import org.roda.storage.fs.FileStorageService;
-
-import pt.gov.dgarq.roda.core.common.InvalidParameterException;
-import pt.gov.dgarq.roda.core.data.PluginParameter;
-import pt.gov.dgarq.roda.core.data.Report;
 
 public class AntivirusAction implements Plugin<AIP> {
   private final Logger logger = Logger.getLogger(getClass());

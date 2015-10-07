@@ -3,22 +3,21 @@ package org.roda.api.controllers;
 import java.util.Date;
 import java.util.List;
 
+import org.roda.common.RodaCoreService;
 import org.roda.common.UserUtility;
-
-import pt.gov.dgarq.roda.common.RodaCoreService;
-import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
-import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
-import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
-import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
-import pt.gov.dgarq.roda.core.data.v2.Group;
-import pt.gov.dgarq.roda.core.data.v2.IndexResult;
-import pt.gov.dgarq.roda.core.data.v2.LogEntry;
-import pt.gov.dgarq.roda.core.data.v2.RODAMember;
-import pt.gov.dgarq.roda.core.data.v2.RodaGroup;
-import pt.gov.dgarq.roda.core.data.v2.RodaUser;
-import pt.gov.dgarq.roda.core.data.v2.User;
-import pt.gov.dgarq.roda.wui.common.client.GenericException;
+import org.roda.core.common.AuthorizationDeniedException;
+import org.roda.core.data.adapter.facet.Facets;
+import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.sort.Sorter;
+import org.roda.core.data.adapter.sublist.Sublist;
+import org.roda.core.data.v2.Group;
+import org.roda.core.data.v2.IndexResult;
+import org.roda.core.data.v2.LogEntry;
+import org.roda.core.data.v2.RODAMember;
+import org.roda.core.data.v2.RodaGroup;
+import org.roda.core.data.v2.RodaUser;
+import org.roda.core.data.v2.User;
+import org.roda.wui.common.client.GenericException;
 
 public class UserManagement extends RodaCoreService {
 

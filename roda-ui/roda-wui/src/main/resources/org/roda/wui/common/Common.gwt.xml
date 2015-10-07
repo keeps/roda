@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<module>
+  <!-- Inherit the core Web Toolkit stuff. -->
+  <inherits name="com.google.gwt.user.User"/>
+  <inherits name="com.google.gwt.i18n.I18N"/>
+  <!-- Inherit data model -->
+  <inherits name="org.roda.core.Core"/>
+  <!-- Inherit translation -->
+  <inherits name="config.i18n.I18N"/>
+  <!-- Inherit sub modules -->
+  <inherits name="org.roda.wui.common.captcha.Captcha"/>
+  <inherits name="org.roda.wui.common.fileupload.FileUpload"/>
+  <!-- Inherit the necessary libraries -->
+  <inherits name="org.gwtwidgets.WidgetLibrary"/>
+  <!-- Specify the cascade stylesheet -->
+  <stylesheet src="Common.css"/>
+
+</module>

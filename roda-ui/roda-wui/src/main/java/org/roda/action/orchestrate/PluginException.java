@@ -1,8 +1,8 @@
 package org.roda.action.orchestrate;
 
-import pt.gov.dgarq.roda.core.common.RODAException;
-import pt.gov.dgarq.roda.core.data.Report;
-import pt.gov.dgarq.roda.core.data.ReportItem;
+import org.roda.core.common.RODAException;
+import org.roda.core.data.Report;
+import org.roda.core.data.ReportItem;
 
 /**
  * Thrown to indicate that some went wrong inside a {@link Plugin}.

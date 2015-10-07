@@ -8,6 +8,14 @@ import java.util.Map;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
+import org.roda.core.common.RodaConstants;
+import org.roda.core.data.v2.EventPreservationObject;
+import org.roda.core.data.v2.Group;
+import org.roda.core.data.v2.LogEntry;
+import org.roda.core.data.v2.Representation;
+import org.roda.core.data.v2.RepresentationFilePreservationObject;
+import org.roda.core.data.v2.SIPReport;
+import org.roda.core.data.v2.User;
 import org.roda.index.utils.SolrUtils;
 import org.roda.model.AIP;
 import org.roda.model.AgentMetadata;
@@ -20,15 +28,6 @@ import org.roda.model.PreservationMetadata;
 import org.roda.storage.StorageServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import pt.gov.dgarq.roda.core.common.RodaConstants;
-import pt.gov.dgarq.roda.core.data.v2.EventPreservationObject;
-import pt.gov.dgarq.roda.core.data.v2.Group;
-import pt.gov.dgarq.roda.core.data.v2.LogEntry;
-import pt.gov.dgarq.roda.core.data.v2.Representation;
-import pt.gov.dgarq.roda.core.data.v2.RepresentationFilePreservationObject;
-import pt.gov.dgarq.roda.core.data.v2.SIPReport;
-import pt.gov.dgarq.roda.core.data.v2.User;
 
 /**
  * 

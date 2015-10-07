@@ -7,8 +7,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 
 import org.apache.log4j.Logger;
-
-import pt.gov.dgarq.roda.common.RodaCoreFactory;
+import org.roda.common.RodaCoreFactory;
 
 public class RodaWuiServlet extends HttpServlet {
   private static final Logger LOGGER = Logger.getLogger(ServletContextListener.class);

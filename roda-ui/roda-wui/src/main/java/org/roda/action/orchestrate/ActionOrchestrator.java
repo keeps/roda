@@ -3,11 +3,10 @@ package org.roda.action.orchestrate;
 import java.io.Serializable;
 import java.util.List;
 
+import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.v2.Representation;
 import org.roda.model.AIP;
 import org.roda.model.File;
-
-import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import pt.gov.dgarq.roda.core.data.v2.Representation;
 
 public interface ActionOrchestrator {
 

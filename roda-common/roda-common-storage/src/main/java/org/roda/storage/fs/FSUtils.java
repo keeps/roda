@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.lang3.mutable.MutableLong;
+import org.roda.core.common.RodaConstants;
 import org.roda.storage.ClosableIterable;
 import org.roda.storage.Container;
 import org.roda.storage.ContentPayload;
@@ -39,7 +40,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jersey.repackaged.com.google.common.collect.Sets;
-import pt.gov.dgarq.roda.core.common.RodaConstants;
 
 /**
  * File System related utility class

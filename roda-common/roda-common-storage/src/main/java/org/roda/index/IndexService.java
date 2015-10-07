@@ -12,6 +12,14 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.roda.core.common.RodaConstants;
+import org.roda.core.data.adapter.facet.Facets;
+import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.sort.Sorter;
+import org.roda.core.data.adapter.sublist.Sublist;
+import org.roda.core.data.v2.IndexResult;
+import org.roda.core.data.v2.LogEntry;
+import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.index.utils.SolrUtils;
 import org.roda.model.AIP;
 import org.roda.model.ModelService;
@@ -22,15 +30,6 @@ import org.roda.storage.ClosableIterable;
 import org.roda.storage.DefaultStoragePath;
 import org.roda.storage.Resource;
 import org.roda.storage.StorageServiceException;
-
-import pt.gov.dgarq.roda.core.common.RodaConstants;
-import pt.gov.dgarq.roda.core.data.adapter.facet.Facets;
-import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
-import pt.gov.dgarq.roda.core.data.adapter.sublist.Sublist;
-import pt.gov.dgarq.roda.core.data.v2.IndexResult;
-import pt.gov.dgarq.roda.core.data.v2.LogEntry;
-import pt.gov.dgarq.roda.core.data.v2.SimpleDescriptionObject;
 
 public class IndexService {
 

@@ -1,0 +1,92 @@
+package org.roda.common;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+
+import org.apache.log4j.Logger;
+import org.roda.core.data.v2.LogEntry;
+import org.roda.core.data.v2.LogEntryParameter;
+import org.roda.core.data.v2.RodaUser;
+import org.roda.model.ModelServiceException;
+
+public abstract class RodaCoreService {
+  private static final Logger LOGGER = Logger.getLogger(RodaCoreService.class);
+
+  protected static void registerAction(RodaUser user, String actionComponent, String actionMethod, String aipId,
+    long duration, Object... parameters) {
+
+    LogEntry logEntry = createLogEntry(user, actionComponent, actionMethod, aipId, duration, parameters);
+    registerAction(logEntry);
+  }
+
+  // public static void registerAction(CASUserPrincipal user, String
+  // actionComponent, String actionMethod,
+  // String aipId, long duration, List<LogEntryParameter> parameters) {
+  //
+  // LogEntry logEntry = createLogEntry(user, actionComponent, actionMethod,
+  // aipId, duration, parameters);
+  // registerAction(logEntry);
+  //
+  // }
+
+  // FIXME perhaps this should be removed
+  private static void registerAction(RodaUser user, String actionComponent, String actionMethod, String aipId,
+    long duration, List<LogEntryParameter> parameters) {
+
+    LogEntry logEntry = createLogEntry(user, actionComponent, actionMethod, aipId, duration, parameters);
+    registerAction(logEntry);
+
+  }
+
+  protected static void registerAction(LogEntry logEntry) {
+    try {
+      RodaCoreFactory.getModelService().addLogEntry(logEntry, RodaCoreFactory.getLogPath());
+    } catch (ModelServiceException e) {
+      LOGGER.error("Error registering action '" + logEntry.getActionComponent() + "'", e);
+    }
+  }
+
+  private static LogEntry createLogEntry(RodaUser user, String actionComponent, String actionMethod, String aipId,
+    long duration, Object... parameters) {
+    LogEntry logEntry = null;
+    List<LogEntryParameter> logParameters = new ArrayList<LogEntryParameter>();
+    if (parameters != null) {
+      if ((parameters.length % 2) != 0) {
+
+        LOGGER.warn("registerAction(" + actionComponent + "/" + actionMethod
+          + ",...) failed because parameters array must have pairs of elements (even length)");
+      } else {
+        for (int i = 0; i < parameters.length; i += 2) {
+          Object key = parameters[i];
+          Object value = parameters[i + 1];
+          logParameters.add(
+            new LogEntryParameter(key != null ? key.toString() : "null", value != null ? value.toString() : "null"));
+        }
+
+      }
+      logEntry = createLogEntry(user, actionComponent, actionMethod, aipId, duration, logParameters);
+    }
+    return logEntry;
+  }
+
+  private static LogEntry createLogEntry(RodaUser user, String actionComponent, String actionMethod, String aipId,
+    long duration, List<LogEntryParameter> parameters) {
+
+    LOGGER.debug("Logging user action: " + user);
+
+    LogEntry logEntry = new LogEntry();
+    logEntry.setId(UUID.randomUUID().toString());
+    logEntry.setAddress(user.getIpAddress());
+    logEntry.setUsername(user.getName());
+    logEntry.setActionComponent(actionComponent);
+    logEntry.setActionMethod(actionMethod);
+    logEntry.setParameters(parameters);
+    logEntry.setDuration(duration);
+    logEntry.setDatetime(new Date());
+    logEntry.setRelatedObjectID(aipId);
+
+    return logEntry;
+  }
+}

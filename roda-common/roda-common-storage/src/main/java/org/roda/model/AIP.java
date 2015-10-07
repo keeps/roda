@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import pt.gov.dgarq.roda.core.data.v2.RODAObjectPermissions;
+import org.roda.core.data.v2.RODAObjectPermissions;
 
 public class AIP implements Serializable {
 

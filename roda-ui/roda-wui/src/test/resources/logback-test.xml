@@ -9,7 +9,6 @@
 	</appender>
 	
 	<logger name="org.roda" level="debug"/>
-	<logger name="pt.gov.dgarq.roda" level="debug"/>
 	<logger name="org.apache.solr" level="warn"/>
 
 	<root level="warn">

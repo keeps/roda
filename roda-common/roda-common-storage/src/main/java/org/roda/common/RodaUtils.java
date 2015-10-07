@@ -25,11 +25,10 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.roda.core.common.RodaConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
-
-import pt.gov.dgarq.roda.core.common.RodaConstants;
 
 public class RodaUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(RodaUtils.class);

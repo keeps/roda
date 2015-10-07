@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<name>RODA - Repositório de Objetos Digitais Autênticos</name>
 	<url>http://roda.keep.pt/</url>
-	<groupId>pt.gov.dgarq.roda</groupId>
+	<groupId>org.roda-project</groupId>
 	<artifactId>roda</artifactId>
 	<version>2.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
@@ -629,23 +629,23 @@
 				<version>1.0.0</version>
 			</dependency>
 			<dependency>
-				<groupId>pt.gov.dgarq.roda</groupId>
+				<groupId>org.roda-project</groupId>
 				<artifactId>roda-common-data</artifactId>
 				<classifier>sources</classifier>
 				<version>2.0.0-SNAPSHOT</version>
 			</dependency>
 			<dependency>
-				<groupId>pt.gov.dgarq.roda</groupId>
+				<groupId>org.roda-project</groupId>
 				<artifactId>roda-common-data</artifactId>
 				<version>2.0.0-SNAPSHOT</version>
 			</dependency>
 			<dependency>
-				<groupId>pt.gov.dgarq.roda</groupId>
+				<groupId>org.roda-project</groupId>
 				<artifactId>roda-common-metadata</artifactId>
 				<version>2.0.0-SNAPSHOT</version>
 			</dependency>
 			<dependency>
-				<groupId>pt.gov.dgarq.roda</groupId>
+				<groupId>org.roda-project</groupId>
 				<artifactId>roda-common-utils</artifactId>
 				<version>2.0.0-SNAPSHOT</version>
 			</dependency>

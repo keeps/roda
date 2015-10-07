@@ -32,6 +32,15 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.roda.CorporaConstants;
 import org.roda.common.RodaUtils;
+import org.roda.core.data.v2.AgentPreservationObject;
+import org.roda.core.data.v2.EventPreservationObject;
+import org.roda.core.data.v2.LogEntry;
+import org.roda.core.data.v2.LogEntryParameter;
+import org.roda.core.data.v2.Representation;
+import org.roda.core.data.v2.RepresentationFilePreservationObject;
+import org.roda.core.data.v2.RepresentationPreservationObject;
+import org.roda.core.data.v2.SIPReport;
+import org.roda.core.data.v2.SIPStateTransition;
 import org.roda.model.utils.ModelUtils;
 import org.roda.storage.Binary;
 import org.roda.storage.DefaultStoragePath;
@@ -43,16 +52,6 @@ import org.roda.storage.fs.FSUtils;
 import org.roda.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import pt.gov.dgarq.roda.core.data.v2.AgentPreservationObject;
-import pt.gov.dgarq.roda.core.data.v2.EventPreservationObject;
-import pt.gov.dgarq.roda.core.data.v2.LogEntry;
-import pt.gov.dgarq.roda.core.data.v2.LogEntryParameter;
-import pt.gov.dgarq.roda.core.data.v2.Representation;
-import pt.gov.dgarq.roda.core.data.v2.RepresentationFilePreservationObject;
-import pt.gov.dgarq.roda.core.data.v2.RepresentationPreservationObject;
-import pt.gov.dgarq.roda.core.data.v2.SIPReport;
-import pt.gov.dgarq.roda.core.data.v2.SIPStateTransition;
 
 /**
  * Unit tests for ModelService

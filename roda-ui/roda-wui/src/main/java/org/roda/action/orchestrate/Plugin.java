@@ -4,13 +4,12 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import org.roda.core.common.InvalidParameterException;
+import org.roda.core.data.PluginParameter;
+import org.roda.core.data.Report;
 import org.roda.index.IndexService;
 import org.roda.model.ModelService;
 import org.roda.storage.StorageService;
-
-import pt.gov.dgarq.roda.core.common.InvalidParameterException;
-import pt.gov.dgarq.roda.core.data.PluginParameter;
-import pt.gov.dgarq.roda.core.data.Report;
 
 /**
  * This interface should be implemented by any class that want to be a RODA

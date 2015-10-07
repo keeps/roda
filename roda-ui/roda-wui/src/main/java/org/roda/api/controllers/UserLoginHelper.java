@@ -5,11 +5,10 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.roda.common.ServiceException;
 import org.roda.common.UserUtility;
-
-import pt.gov.dgarq.roda.core.common.AuthenticationDeniedException;
-import pt.gov.dgarq.roda.core.data.v2.RodaSimpleUser;
-import pt.gov.dgarq.roda.core.data.v2.RodaUser;
-import pt.gov.dgarq.roda.wui.common.client.GenericException;
+import org.roda.core.common.AuthenticationDeniedException;
+import org.roda.core.data.v2.RodaSimpleUser;
+import org.roda.core.data.v2.RodaUser;
+import org.roda.wui.common.client.GenericException;
 
 public class UserLoginHelper {
   private static final Logger LOGGER = Logger.getLogger(UserLoginHelper.class);

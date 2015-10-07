@@ -8,7 +8,7 @@
 		</layout>
 	</appender>
 
-	<logger name="pt.gov.dgarq.roda.util" additivity="false">
+	<logger name="org.roda.util" additivity="false">
 		<level value="TRACE" />
 		<appender-ref ref="STDOUT" />
 	</logger>

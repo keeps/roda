@@ -9,7 +9,6 @@
 	</appender>
 	
 	<logger name="org.roda" level="debug"/>
-	<logger name="pt.gov.dgarq.roda" level="debug"/>
 
 	<root level="warn">
 		<appender-ref ref="STDOUT" />

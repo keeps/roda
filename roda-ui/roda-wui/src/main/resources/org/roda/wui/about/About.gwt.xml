@@ -1,0 +1,11 @@
+<module>
+
+	<!-- Inherit the core Web Toolkit stuff.                  -->
+	<inherits name='com.google.gwt.user.User'/>
+
+	<!-- Inherit the other RODA modules                  -->
+	<inherits name="org.roda.wui.common.Common" />
+	
+	<!-- Specify the cascade stylesheet to use -->
+	<stylesheet src="style/About.css"/>
+</module>

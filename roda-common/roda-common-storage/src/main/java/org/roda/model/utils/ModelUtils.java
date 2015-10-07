@@ -19,6 +19,16 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.roda.common.RodaUtils;
+import org.roda.core.common.RodaConstants;
+import org.roda.core.data.v2.LogEntry;
+import org.roda.core.data.v2.LogEntryParameter;
+import org.roda.core.data.v2.RepresentationState;
+import org.roda.core.data.v2.SIPReport;
+import org.roda.core.metadata.v2.premis.PremisAgentHelper;
+import org.roda.core.metadata.v2.premis.PremisEventHelper;
+import org.roda.core.metadata.v2.premis.PremisFileObjectHelper;
+import org.roda.core.metadata.v2.premis.PremisMetadataException;
+import org.roda.core.metadata.v2.premis.PremisRepresentationObjectHelper;
 import org.roda.model.FileFormat;
 import org.roda.model.ModelServiceException;
 import org.roda.storage.Binary;
@@ -38,16 +48,6 @@ import lc.xmlns.premisV2.EventComplexType;
 import lc.xmlns.premisV2.File;
 import lc.xmlns.premisV2.LinkingAgentIdentifierComplexType;
 import lc.xmlns.premisV2.Representation;
-import pt.gov.dgarq.roda.core.common.RodaConstants;
-import pt.gov.dgarq.roda.core.data.v2.LogEntry;
-import pt.gov.dgarq.roda.core.data.v2.LogEntryParameter;
-import pt.gov.dgarq.roda.core.data.v2.RepresentationState;
-import pt.gov.dgarq.roda.core.data.v2.SIPReport;
-import pt.gov.dgarq.roda.core.metadata.v2.premis.PremisAgentHelper;
-import pt.gov.dgarq.roda.core.metadata.v2.premis.PremisEventHelper;
-import pt.gov.dgarq.roda.core.metadata.v2.premis.PremisFileObjectHelper;
-import pt.gov.dgarq.roda.core.metadata.v2.premis.PremisMetadataException;
-import pt.gov.dgarq.roda.core.metadata.v2.premis.PremisRepresentationObjectHelper;
 
 /**
  * Model related utility class

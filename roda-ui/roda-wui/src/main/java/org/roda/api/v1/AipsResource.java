@@ -21,6 +21,8 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.roda.api.v1.impl.AipsResourceImpl;
 import org.roda.api.v1.utils.NotFoundException;
+import org.roda.core.data.v2.Representation;
+import org.roda.core.data.v2.SimpleEventPreservationMetadata;
 import org.roda.model.AIP;
 import org.roda.model.DescriptiveMetadata;
 
@@ -29,8 +31,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import pt.gov.dgarq.roda.core.data.v2.Representation;
-import pt.gov.dgarq.roda.core.data.v2.SimpleEventPreservationMetadata;
 
 @Path(AipsResource.ENDPOINT)
 @Api(value = AipsResource.SWAGGER_ENDPOINT)

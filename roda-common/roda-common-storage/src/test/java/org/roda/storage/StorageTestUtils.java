@@ -14,8 +14,7 @@ import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.RandomStringUtils;
-
-import pt.gov.dgarq.roda.core.common.RodaConstants;
+import org.roda.core.common.RodaConstants;
 
 public class StorageTestUtils {
 

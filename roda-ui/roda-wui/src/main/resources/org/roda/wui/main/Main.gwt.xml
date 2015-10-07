@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "-//Google Inc.//DTD Google Web Toolkit 2.7.0//EN"
+  "http://gwtproject.org/doctype/2.7.0/gwt-module.dtd">
+<module>
+
+	<!-- Inherit the core Web Toolkit stuff. -->
+	<inherits name='com.google.gwt.user.User' />
+	<inherits name="com.google.gwt.http.HTTP" />
+	<inherits name="com.google.gwt.logging.Logging"/>
+
+	<extend-property name="locale" values="pt_PT" />
+
+	<!-- Inherit required libraries -->
+	<inherits name="com.bytebybyte.gwt.fontawesome.FontAwesomeLib" />
+	<!-- Libraries to remove -->
+	<inherits name='com.netthreads.gwt.simile.timeline.Timeline' />
+
+	<!-- Inherit sub-projects -->
+	<inherits name="org.roda.wui.common.Common" />
+	<inherits name="org.roda.wui.home.Home" />
+	<inherits name="org.roda.wui.about.About" />
+	<inherits name="org.roda.wui.dissemination.Dissemination" />
+	<inherits name="org.roda.wui.management.Management" />
+	<inherits name="org.roda.wui.ingest.Ingest" />
+
+	<!-- <inherits name='com.google.gwt.user.theme.standard.Standard' /> -->
+	<!-- <inherits name="com.google.gwt.user.theme.chrome.Chrome" /> -->
+	<!-- <inherits name="com.google.gwt.user.theme.dark.Dark" /> -->
+
+	<!-- Specify the app entry point class. -->
+	<entry-point class='org.roda.wui.main.client.Main' />
+
+	<!-- Specify the cascade stylesheet to use -->
+	<stylesheet src="Main.css" />
+	<set-configuration-property name='xsiframe.failIfScriptTag'
+		value='FALSE' />
+</module>

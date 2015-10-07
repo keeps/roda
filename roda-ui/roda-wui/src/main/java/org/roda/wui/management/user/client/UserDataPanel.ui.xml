@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+	xmlns:i="urn:import:config.i18n.client" xmlns:m="urn:import:org.roda.wui.main.client"
+	xmlns:common="urn:import:org.roda.wui.common.client.widgets"
+	xmlns:d="urn:import:com.google.gwt.user.datepicker.client" xmlns:u="urn:import:org.roda.wui.management.user.client">
+
+	<ui:with field='constants' type='config.i18n.client.UserManagementConstants' />
+	<ui:with field='messages' type='config.i18n.client.UserManagementMessages' />
+
+	<ui:style>
+	.postalAddress {
+		min-height: 84px;
+	}
+	
+	.section {
+		margin-top: 20px;
+	}
+	</ui:style>
+
+	<g:FlowPanel styleName="wui-user-data" addStyleNames="wrapper skip_padding">
+		<g:FlowPanel addStyleNames="row full_width no_padding">
+			<g:FlowPanel addStyleNames="col_6">
+				<g:Label addStyleNames="form-label">
+					<ui:text from='{constants.username}' />
+				</g:Label>
+				<g:TextBox ui:field="username" addStyleNames="form-textbox" />
+			</g:FlowPanel>
+			<g:FlowPanel addStyleNames="col_6 last">
+				<g:Label addStyleNames="form-label">
+					<ui:text from='{constants.password}' />
+				</g:Label>
+				<u:PasswordPanel ui:field="password" />
+			</g:FlowPanel>
+		</g:FlowPanel>
+		<g:FlowPanel addStyleNames="row full_width no_padding">
+			<g:FlowPanel addStyleNames="col_6">
+				<g:Label addStyleNames="form-label">
+					<ui:text from='{constants.fullname}' />
+				</g:Label>
+				<g:TextBox ui:field="fullname" addStyleNames="form-textbox" />
+				<g:Label addStyleNames="form-label">
+					<ui:text from="{constants.jobFunction}" />
+				</g:Label>
+				<g:ListBox ui:field="businessCategory" addStyleNames="form-textbox" />
+				<g:Label addStyleNames="form-label">
+					<ui:text from="{constants.idTypeAndNumber}" />
+				</g:Label>
+				<g:ListBox ui:field="idType" addStyleNames="form-textbox form-textbox-small" />
+				<g:TextBox ui:field="idNumber" addStyleNames="form-textbox form-textbox-small" />
+				<g:Label addStyleNames="form-label">
+					<ui:text from="{constants.idDateAndLocality}" />
+				</g:Label>
+				<d:DateBox ui:field="idDate" addStyleNames="form-textbox form-textbox-small" />
+				<g:TextBox ui:field="idLocality" addStyleNames="form-textbox form-textbox-small" />
+				<g:Label addStyleNames="form-label">
+					<ui:text from="{constants.nationality}" />
+				</g:Label>
+				<g:SuggestBox ui:field="nationality" addStyleNames="form-textbox" />
+				<g:Label addStyleNames="form-label">
+					<ui:text from="{constants.nif}" />
+				</g:Label>
+				<g:TextBox ui:field="nif" addStyleNames="form-textbox" />
+				<g:Label styleName="wui-user-data-note">
+					<ui:text from="{constants.userDataNote}" />
+				</g:Label>
+			</g:FlowPanel>
+			<g:FlowPanel addStyleNames="col_6 last">
+				<g:Label addStyleNames="form-label">
+					<ui:text from='{constants.email}' />
+				</g:Label>
+				<g:TextBox ui:field="email" addStyleNames="form-textbox" />
+				<g:Label addStyleNames="form-label">
+					<ui:text from='{constants.address}' />
+				</g:Label>
+				<g:TextArea ui:field="postalAddress" addStyleNames="form-textbox {style.postalAddress}" />
+				<g:Label addStyleNames="form-label">
+					<ui:text from='{constants.postalCodeAndLocality}' />
+				</g:Label>
+				<g:TextBox ui:field="postalCode" addStyleNames="form-textbox form-textbox-small" />
+				<g:TextBox ui:field="locality" addStyleNames="form-textbox form-textbox-small" />
+				<g:Label addStyleNames="form-label">
+					<ui:text from="{constants.country}" />
+				</g:Label>
+				<g:SuggestBox ui:field="country" addStyleNames="form-textbox" />
+				<g:Label addStyleNames="form-label">
+					<ui:text from='{constants.phonenumber}' />
+				</g:Label>
+				<g:TextBox ui:field="phoneNumber" addStyleNames="form-textbox" />
+				<g:Label addStyleNames="form-label">
+					<ui:text from='{constants.fax}' />
+				</g:Label>
+				<g:TextBox ui:field="fax" addStyleNames="form-textbox" />
+			</g:FlowPanel>
+		</g:FlowPanel>
+		<g:FlowPanel addStyleNames="row full_width no_padding">
+			<g:FlowPanel addStyleNames="col_12">
+				<g:Label styleName="h4">Groups</g:Label>
+				<u:GroupSelect ui:field="groupSelect" />
+			</g:FlowPanel>
+		</g:FlowPanel>
+		<g:FlowPanel addStyleNames="row full_width no_padding {style.section}">
+			<g:FlowPanel addStyleNames="col_12">
+				<g:Label styleName="h4">Permissions</g:Label>
+				<u:PermissionsPanel ui:field="permissionsPanel" />
+			</g:FlowPanel>
+		</g:FlowPanel>
+
+	</g:FlowPanel>
+</ui:UiBinder>

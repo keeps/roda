@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import pt.gov.dgarq.roda.core.data.v2.RepresentationState;
+import org.roda.core.data.v2.RepresentationState;
 
 /**
  * 

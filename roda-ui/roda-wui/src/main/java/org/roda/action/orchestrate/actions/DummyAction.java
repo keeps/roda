@@ -8,14 +8,13 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.roda.action.orchestrate.Plugin;
 import org.roda.action.orchestrate.PluginException;
+import org.roda.core.common.InvalidParameterException;
+import org.roda.core.data.PluginParameter;
+import org.roda.core.data.Report;
 import org.roda.index.IndexService;
 import org.roda.model.AIP;
 import org.roda.model.ModelService;
 import org.roda.storage.StorageService;
-
-import pt.gov.dgarq.roda.core.common.InvalidParameterException;
-import pt.gov.dgarq.roda.core.data.PluginParameter;
-import pt.gov.dgarq.roda.core.data.Report;
 
 public class DummyAction implements Plugin<AIP> {
 

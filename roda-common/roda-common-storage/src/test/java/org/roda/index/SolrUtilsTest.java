@@ -20,28 +20,27 @@ import org.hamcrest.Matchers;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.roda.CorporaConstants;
+import org.roda.core.common.RodaConstants;
+import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
+import org.roda.core.data.adapter.filter.ClassificationSchemeFilterParameter;
+import org.roda.core.data.adapter.filter.DateIntervalFilterParameter;
+import org.roda.core.data.adapter.filter.DateRangeFilterParameter;
+import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
+import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.filter.LikeFilterParameter;
+import org.roda.core.data.adapter.filter.LongRangeFilterParameter;
+import org.roda.core.data.adapter.filter.OneOfManyFilterParameter;
+import org.roda.core.data.adapter.filter.ProducerFilterParameter;
+import org.roda.core.data.adapter.filter.RegexFilterParameter;
+import org.roda.core.data.adapter.filter.SimpleFilterParameter;
+import org.roda.core.data.adapter.sort.SortParameter;
+import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.index.utils.SolrUtils;
 import org.roda.storage.Binary;
 import org.roda.storage.DefaultStoragePath;
 import org.roda.storage.StorageService;
 import org.roda.storage.StorageServiceException;
 import org.roda.storage.fs.FileStorageService;
-
-import pt.gov.dgarq.roda.core.common.RodaConstants;
-import pt.gov.dgarq.roda.core.data.adapter.filter.BasicSearchFilterParameter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.ClassificationSchemeFilterParameter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.DateIntervalFilterParameter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.DateRangeFilterParameter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.LikeFilterParameter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.LongRangeFilterParameter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.OneOfManyFilterParameter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.ProducerFilterParameter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.RegexFilterParameter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.SimpleFilterParameter;
-import pt.gov.dgarq.roda.core.data.adapter.sort.SortParameter;
-import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
 
 public class SolrUtilsTest {
 

@@ -1,10 +1,10 @@
 package org.roda.model;
 
-import pt.gov.dgarq.roda.core.data.v2.Group;
-import pt.gov.dgarq.roda.core.data.v2.LogEntry;
-import pt.gov.dgarq.roda.core.data.v2.Representation;
-import pt.gov.dgarq.roda.core.data.v2.SIPReport;
-import pt.gov.dgarq.roda.core.data.v2.User;
+import org.roda.core.data.v2.Group;
+import org.roda.core.data.v2.LogEntry;
+import org.roda.core.data.v2.Representation;
+import org.roda.core.data.v2.SIPReport;
+import org.roda.core.data.v2.User;
 
 public interface ModelObserver {
 

@@ -19,8 +19,7 @@ import org.apache.commons.io.IOUtils;
 import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Test;
-
-import pt.gov.dgarq.roda.core.common.RodaConstants;
+import org.roda.core.common.RodaConstants;
 
 /**
  * 

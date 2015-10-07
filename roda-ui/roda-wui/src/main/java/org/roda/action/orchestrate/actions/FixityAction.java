@@ -16,6 +16,15 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.roda.action.orchestrate.Plugin;
 import org.roda.action.orchestrate.PluginException;
+import org.roda.core.common.InvalidParameterException;
+import org.roda.core.common.RodaConstants;
+import org.roda.core.data.PluginParameter;
+import org.roda.core.data.Report;
+import org.roda.core.data.v2.AgentPreservationObject;
+import org.roda.core.data.v2.EventPreservationObject;
+import org.roda.core.data.v2.Representation;
+import org.roda.core.metadata.v2.premis.PremisEventHelper;
+import org.roda.core.metadata.v2.premis.PremisMetadataException;
 import org.roda.index.IndexService;
 import org.roda.model.AIP;
 import org.roda.model.File;
@@ -25,16 +34,6 @@ import org.roda.storage.Binary;
 import org.roda.storage.StorageService;
 import org.roda.storage.StorageServiceException;
 import org.roda.storage.fs.FSUtils;
-
-import pt.gov.dgarq.roda.core.common.InvalidParameterException;
-import pt.gov.dgarq.roda.core.common.RodaConstants;
-import pt.gov.dgarq.roda.core.data.PluginParameter;
-import pt.gov.dgarq.roda.core.data.Report;
-import pt.gov.dgarq.roda.core.data.v2.AgentPreservationObject;
-import pt.gov.dgarq.roda.core.data.v2.EventPreservationObject;
-import pt.gov.dgarq.roda.core.data.v2.Representation;
-import pt.gov.dgarq.roda.core.metadata.v2.premis.PremisEventHelper;
-import pt.gov.dgarq.roda.core.metadata.v2.premis.PremisMetadataException;
 
 public class FixityAction implements Plugin<AIP> {
   private AgentPreservationObject fixityAgent;

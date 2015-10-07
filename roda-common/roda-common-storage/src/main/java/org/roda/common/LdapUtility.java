@@ -32,24 +32,23 @@ import javax.naming.ldap.LdapName;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.roda.core.common.AuthenticationDeniedException;
+import org.roda.core.common.EmailAlreadyExistsException;
+import org.roda.core.common.GroupAlreadyExistsException;
+import org.roda.core.common.IllegalOperationException;
+import org.roda.core.common.InvalidTokenException;
+import org.roda.core.common.NoSuchGroupException;
+import org.roda.core.common.NoSuchUserException;
+import org.roda.core.common.UserAlreadyExistsException;
+import org.roda.core.data.adapter.ContentAdapter;
+import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.sort.Sorter;
+import org.roda.core.data.v2.Group;
+import org.roda.core.data.v2.RodaUser;
+import org.roda.core.data.v2.User;
+import org.roda.util.PasswordHandler;
 import org.w3c.util.DateParser;
 import org.w3c.util.InvalidDateException;
-
-import pt.gov.dgarq.roda.core.common.AuthenticationDeniedException;
-import pt.gov.dgarq.roda.core.common.EmailAlreadyExistsException;
-import pt.gov.dgarq.roda.core.common.GroupAlreadyExistsException;
-import pt.gov.dgarq.roda.core.common.IllegalOperationException;
-import pt.gov.dgarq.roda.core.common.InvalidTokenException;
-import pt.gov.dgarq.roda.core.common.NoSuchGroupException;
-import pt.gov.dgarq.roda.core.common.NoSuchUserException;
-import pt.gov.dgarq.roda.core.common.UserAlreadyExistsException;
-import pt.gov.dgarq.roda.core.data.adapter.ContentAdapter;
-import pt.gov.dgarq.roda.core.data.adapter.filter.Filter;
-import pt.gov.dgarq.roda.core.data.adapter.sort.Sorter;
-import pt.gov.dgarq.roda.core.data.v2.Group;
-import pt.gov.dgarq.roda.core.data.v2.RodaUser;
-import pt.gov.dgarq.roda.core.data.v2.User;
-import pt.gov.dgarq.roda.util.PasswordHandler;
 
 /**
  * @author Rui Castro
@@ -2015,7 +2014,7 @@ public class LdapUtility {
 
   /**
    * Returns a role CN (Common Name) from it's DN (Distinguished Name). Ex: for
-   * <i>DN=cn=administrator,ou=roles,dc=roda,dc=dgarq,dc=gov,dc=pt</i> returns
+   * <i>DN=cn=administrator,ou=roles,dc=roda,dc=org</i> returns
    * <i>administrator</i>.
    * 
    * @param roleDN
@@ -2577,7 +2576,7 @@ public class LdapUtility {
 
   /**
    * Returns a user UID (Unique ID) from it's DN (Distinguished Name). Ex: for
-   * <i>DN=uid=rcastro,ou=people,dc=roda,dc=dgarq,dc=gov,dc=pt</i> returns
+   * <i>DN=uid=xpto,ou=people,dc=roda,dc=org</i> returns
    * <i>rcastro</i>.
    * 
    * @param roleDN
@@ -2594,7 +2593,7 @@ public class LdapUtility {
 
   /**
    * Returns a group CN (Common Name) from it's DN (Distinguished Name). Ex: for
-   * <i>DN=cn=administrators,ou=groups,dc=roda,dc=dgarq,dc=gov,dc=pt</i> returns
+   * <i>DN=cn=administrators,ou=groups,dc=roda,dc=org</i> returns
    * <i>administrators</i>.
    * 
    * @param roleDN

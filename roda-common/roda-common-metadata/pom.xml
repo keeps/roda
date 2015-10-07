@@ -4,7 +4,7 @@
 	<name>roda-common-metadata</name>
 	<artifactId>roda-common-metadata</artifactId>
 	<parent>
-		<groupId>pt.gov.dgarq.roda</groupId>
+		<groupId>org.roda-project</groupId>
 		<artifactId>roda-common</artifactId>
 		<version>2.0.0-SNAPSHOT</version>
 	</parent>
@@ -94,7 +94,7 @@
 	</profiles>
 	<dependencies>
 		<dependency>
-			<groupId>pt.gov.dgarq.roda</groupId>
+			<groupId>org.roda-project</groupId>
 			<artifactId>roda-common-data</artifactId>
 		</dependency>
 
@@ -143,7 +143,7 @@
 			<artifactId>saxon-dom</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>pt.gov.dgarq.roda</groupId>
+			<groupId>org.roda-project</groupId>
 			<artifactId>roda-common-utils</artifactId>
 		</dependency>
 	</dependencies>

@@ -4,12 +4,11 @@ import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.roda.common.RodaCoreService;
 import org.roda.common.UserUtility;
-
-import pt.gov.dgarq.roda.common.RodaCoreService;
-import pt.gov.dgarq.roda.core.common.AuthenticationDeniedException;
-import pt.gov.dgarq.roda.core.data.v2.RodaUser;
-import pt.gov.dgarq.roda.wui.common.client.GenericException;
+import org.roda.core.common.AuthenticationDeniedException;
+import org.roda.core.data.v2.RodaUser;
+import org.roda.wui.common.client.GenericException;
 
 public class UserLogin extends RodaCoreService {
 

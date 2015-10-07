@@ -3,8 +3,7 @@ package org.roda.api.v1.utils;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.lang.StringUtils;
-
-import pt.gov.dgarq.roda.core.common.Pair;
+import org.roda.core.common.Pair;
 
 /**
  * API Utils

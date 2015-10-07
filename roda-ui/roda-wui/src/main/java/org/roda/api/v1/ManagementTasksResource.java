@@ -19,12 +19,11 @@ import javax.ws.rs.core.Response.Status;
 import org.roda.api.v1.entities.TaskList;
 import org.roda.api.v1.utils.ApiResponseMessage;
 import org.roda.api.v1.utils.ApiUtils;
+import org.roda.common.RodaCoreFactory;
+import org.roda.common.RodaCoreService;
 import org.roda.common.UserUtility;
-
-import pt.gov.dgarq.roda.common.RodaCoreFactory;
-import pt.gov.dgarq.roda.common.RodaCoreService;
-import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
-import pt.gov.dgarq.roda.core.data.v2.RodaUser;
+import org.roda.core.common.AuthorizationDeniedException;
+import org.roda.core.data.v2.RodaUser;
 
 @Path(ManagementTasksResource.ENDPOINT)
 public class ManagementTasksResource extends RodaCoreService {

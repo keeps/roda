@@ -12,16 +12,15 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.roda.api.controllers.Browser;
 import org.roda.api.v1.utils.ApiResponseMessage;
 import org.roda.api.v1.utils.StreamResponse;
+import org.roda.common.RodaCoreFactory;
 import org.roda.common.UserUtility;
+import org.roda.core.common.AuthorizationDeniedException;
+import org.roda.core.common.NotFoundException;
+import org.roda.core.common.NotImplementedException;
+import org.roda.core.data.v2.RodaUser;
+import org.roda.wui.common.client.GenericException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import pt.gov.dgarq.roda.common.RodaCoreFactory;
-import pt.gov.dgarq.roda.core.common.AuthorizationDeniedException;
-import pt.gov.dgarq.roda.core.common.NotFoundException;
-import pt.gov.dgarq.roda.core.common.NotImplementedException;
-import pt.gov.dgarq.roda.core.data.v2.RodaUser;
-import pt.gov.dgarq.roda.wui.common.client.GenericException;
 
 @javax.annotation.Generated(value = "class io.swagger.codegen.languages.JaxRSServerCodegen", date = "2015-09-03T11:38:49.275+01:00")
 public class AipsResourceImpl {
