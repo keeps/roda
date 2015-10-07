@@ -195,7 +195,7 @@ public class SolrUtilsTest {
       filter.add(new BasicSearchFilterParameter(RodaConstants.SDO__ALL, fondsOrSeries));
       stringFilter = SolrUtils.parseFilter(filter);
       assertNotNull(stringFilter);
-      assertEquals(String.format("(%s: %s AND %s: %s)", RodaConstants.SDO__ALL, fonds, RodaConstants.SDO__ALL, series),
+      assertEquals(String.format("(%s: (%s) AND %s: (%s))", RodaConstants.SDO__ALL, fonds, RodaConstants.SDO__ALL, series),
         stringFilter);
     } catch (IndexServiceException e) {
       fail("An exception was not expected!");

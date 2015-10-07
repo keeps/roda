@@ -11,18 +11,8 @@
 	<packaging>pom</packaging>
 	<modules>
 		<module>roda-common-utils</module>
-		<module>roda-common-certification</module>
-		<module>roda-common-format-utility</module>
-		<module>roda-common-content-adapter</module>
-		<module>roda-common-convert-db</module>
 		<module>roda-common-data</module>
-		<module>roda-common-db</module>
-		<module>roda-common-ingest</module>
 		<module>roda-common-metadata</module>
-		<module>roda-common-migrator</module>
-		<module>roda-common-plugins</module>
-		<module>roda-common-servlet-security</module>
-		<module>roda-common-sip-utility</module>
 		<module>roda-common-storage</module>
 	</modules>
 </project>

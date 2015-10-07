@@ -78,7 +78,7 @@ public class CorporaConstants {
   public static final String METS_XML = "METS.xml";
   public static final String SOFTWARE_INGEST_TASK = "software:ingest_task";
   public static final String INGEST_CREATE_AIP = "Ingest/Create AIP/1.0";
-  public static final String AGENT_RODA_8_PREMIS_XML = "agent_roda_8.premis.xml";
+  public static final String AGENT_RODA_8_PREMIS_XML = "roda_8.premis.xml";
   public static final String HTML_EVENT_PRESERVATION_OBJECT = "eventPreservationObject";
   public static final String HTML_AIPID = "aipID";
   public static final String HTML_VALUE = "value";

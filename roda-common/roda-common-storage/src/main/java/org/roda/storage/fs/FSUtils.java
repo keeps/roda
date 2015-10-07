@@ -375,8 +375,12 @@ public final class FSUtils {
         Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
           @Override
           public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-            size.add(attrs.size());
-            return FileVisitResult.CONTINUE;
+            if (!Files.isHidden(file) && !file.toAbsolutePath().toString().contains(".properties")) {
+              size.add(attrs.size());
+              return FileVisitResult.CONTINUE;
+            } else {
+              return FileVisitResult.SKIP_SUBTREE;
+            }
           }
         });
 

@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
-<langpack>
-	<str id="base.package" txt="RODA-in"/>
-	<str id="base.package.description" txt="The essential package so RODA-in can be executed"/>
-
-	<str id="docs.package" txt="Documentation"/>
-	<str id="docs.package.description" txt="RODA-in documentation"/>
-<langpack>

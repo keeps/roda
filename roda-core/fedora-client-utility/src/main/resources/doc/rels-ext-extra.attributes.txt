@@ -1,9 +1,0 @@
-
-Producer of a fonds:
-******************************************************************************************************
-<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:roda="http://roda.dgarq.gov.pt/#">
-  <rdf:Description rdf:about="info:fedora/roda:1">
-    <roda:producer rdf:resource="roda:user:mferreira"/>
-  </rdf:Description>
-</rdf:RDF>
-******************************************************************************************************

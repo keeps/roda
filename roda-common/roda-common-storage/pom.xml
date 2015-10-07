@@ -17,7 +17,8 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
 					<includes>
-						<!-- e.g. -DrunSuite=AllTests.class -->
+						<!-- DEFAULT: e.g. -DrunSuite=AllTests.class -->
+						<!-- DO NOT RUN ANY: e.g. -DrunSuite -->
 						<include>**/${runSuite}</include>
 					</includes>
 				</configuration>
@@ -27,6 +28,7 @@
 	<properties>
 		<!-- XXX fedora tests really need jersey 2.12 -->
 		<jersey.version>2.12</jersey.version>
+		<runSuite>AllTests.class</runSuite>
 	</properties>
 	<dependencies>
 		<dependency>

@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<simpleviewerGallery maxImageWidth="960" maxImageHeight="720"
-	textColor="0xFFFFFF" frameColor="0xffffff" frameWidth="10"
-	stagePadding="40" thumbnailColumns="6" thumbnailRows="1"
-	navPosition="bottom" title="@TITLE" enableRightClickOpen="true"
-	backgroundImagePath="" imagePath="@IMAGEPATH" thumbPath="@THUMBPATH">
-	
-@IMAGES
-</simpleviewerGallery>

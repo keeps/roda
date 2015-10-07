@@ -11,8 +11,6 @@
 	</parent>
 	<packaging>pom</packaging>
 	<modules>
-		<module>roda-in</module>
-		<module>roda-in-installer</module>
 		<module>roda-wui</module>
 	</modules>
 </project>
