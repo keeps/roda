@@ -3,12 +3,9 @@
  */
 package org.roda.wui.ingest.submit.client;
 
-import org.roda.core.common.RodaConstants;
 import org.roda.core.data.adapter.filter.Filter;
-import org.roda.core.data.adapter.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.wui.common.client.ClientLogger;
-import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.widgets.SelectableAIPList;
 import org.roda.wui.common.fileupload.client.FileUploadPanel;
 import org.roda.wui.dissemination.client.DescriptiveMetadataPanel;
@@ -250,8 +247,8 @@ public class CreateSIP {
   }
 
   private void updateOptionalMetadataToggle() {
-    descriptiveMetadataOptionalToggle.setText(descriptiveMetadata.isOptionalVisible() ? constants
-      .createHideOptionalMetadata() : constants.createShowOptionalMetadata());
+    descriptiveMetadataOptionalToggle.setText(descriptiveMetadata.isOptionalVisible()
+      ? constants.createHideOptionalMetadata() : constants.createShowOptionalMetadata());
   }
 
   /**

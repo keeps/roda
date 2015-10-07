@@ -87,16 +87,16 @@ public class IngestSubmit {
         String newHistoryToken;
         switch (event.getSelectedItem()) {
           case 0:
-            newHistoryToken = RESOLVER.getHistoryPath() + ".create";
+            newHistoryToken = "create";
             break;
           case 1:
           default:
-            newHistoryToken = RESOLVER.getHistoryPath() + ".upload";
+            newHistoryToken = "upload";
             break;
         }
 
         if (!History.getToken().equals(newHistoryToken)) {
-          History.newItem(newHistoryToken);
+          Tools.newHistory(RESOLVER, newHistoryToken);
         }
       }
     });
