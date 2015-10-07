@@ -1,4 +1,4 @@
-package org.roda.action.orchestrate.actions.antivirus;
+package org.roda.action.antivirus.utils;
 
 import java.nio.file.Path;
 

@@ -1,4 +1,4 @@
-package org.roda.action.orchestrate.actions;
+package org.roda.action.antivirus;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -9,11 +9,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.roda.action.antivirus.utils.AVGAntiVirus;
+import org.roda.action.antivirus.utils.AntiVirus;
+import org.roda.action.antivirus.utils.VirusCheckResult;
 import org.roda.action.orchestrate.Plugin;
 import org.roda.action.orchestrate.PluginException;
-import org.roda.action.orchestrate.actions.antivirus.AVGAntiVirus;
-import org.roda.action.orchestrate.actions.antivirus.AntiVirus;
-import org.roda.action.orchestrate.actions.antivirus.VirusCheckResult;
 import org.roda.core.common.InvalidParameterException;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
@@ -111,8 +111,8 @@ public class AntivirusAction implements Plugin<AIP> {
         VirusCheckResult virusCheckResult = null;
         try {
           virusCheckResult = getAntiVirus().checkForVirus(p);
-          logger.debug("AIP "+aip.getId()+" is clean: "+virusCheckResult.isClean());
-          logger.debug("AIP "+aip.getId()+" virus check report: "+virusCheckResult.getReport());
+          logger.debug("AIP " + aip.getId() + " is clean: " + virusCheckResult.isClean());
+          logger.debug("AIP " + aip.getId() + " virus check report: " + virusCheckResult.getReport());
         } catch (RuntimeException e) {
           logger.debug("Exception running virus check on AIP " + aip.getId() //$NON-NLS-1$
             + " - " + e.getMessage(), e); //$NON-NLS-1$
@@ -120,14 +120,14 @@ public class AntivirusAction implements Plugin<AIP> {
             + " - " + e.getMessage(), e); //$NON-NLS-1$
         }
       } catch (StorageServiceException e) {
-        logger.error("Error processing AIP "+aip.getId(),e);
-      } catch (IOException e){
-        logger.error("Error creating temp folder for AIP "+aip.getId(),e);
+        logger.error("Error processing AIP " + aip.getId(), e);
+      } catch (IOException e) {
+        logger.error("Error creating temp folder for AIP " + aip.getId(), e);
       } finally {
         try {
           storage.deleteResource(ModelUtils.getAIPpath(aip.getId()));
         } catch (StorageServiceException e) {
-          logger.error("Error removing temp storage",e);
+          logger.error("Error removing temp storage", e);
         }
       }
     }

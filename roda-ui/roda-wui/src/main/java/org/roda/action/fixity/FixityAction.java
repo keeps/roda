@@ -1,4 +1,4 @@
-package org.roda.action.orchestrate.actions;
+package org.roda.action.fixity;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

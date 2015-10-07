@@ -1,6 +1,7 @@
 package org.roda.action.orchestrate.embed;
 
 import java.io.Serializable;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -321,6 +322,45 @@ public class AkkaEmbeddedActionOrchestrator implements ActionOrchestrator {
     public void setAction(Plugin<? extends T> action) {
       this.action = action;
     }
+
+  }
+
+  @Override
+  public void runActionOnFiles(Plugin<String> action, List<Path> paths) {
+    try {
+      int multiplier = 0;
+      logger.info("Executing beforeExecute");
+      action.beforeExecute(index, model, storage);
+      List<Future<Object>> futures = new ArrayList<Future<Object>>();
+
+      List<String> block = new ArrayList<String>();
+      for (Path path : paths) {
+        if (block.size() == BLOCK_SIZE) {
+          futures.add(Patterns.ask(actionRouter, new ActionMessage<String>(block, action),
+            new Timeout(Duration.create(TIMEOUT, TIMEOUT_UNIT))));
+          block = new ArrayList<String>();
+          multiplier++;
+        }
+
+        block.add(path.toString());
+      }
+
+      if (!block.isEmpty()) {
+        futures.add(Patterns.ask(actionRouter, new ActionMessage<String>(block, action),
+          new Timeout(Duration.create(TIMEOUT, TIMEOUT_UNIT))));
+        multiplier++;
+      }
+
+      final Future<Iterable<Object>> sequenceResult = Futures.sequence(futures, actionSystem.dispatcher());
+      Await.result(sequenceResult, Duration.create(multiplier * TIMEOUT, TIMEOUT_UNIT));
+
+      action.afterExecute(index, model, storage);
+
+    } catch (Exception e) {
+      // FIXME catch proper exception
+      e.printStackTrace();
+    }
+    logger.info("End of method");
 
   }
 

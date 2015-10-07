@@ -1,4 +1,4 @@
-package org.roda.action.orchestrate.actions.antivirus;
+package org.roda.action.antivirus.utils;
 
 /**
  * This class contains the result of a virus check.

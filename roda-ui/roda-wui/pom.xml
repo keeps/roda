@@ -267,11 +267,13 @@
 		<dependency>
 			<groupId>com.typesafe.akka</groupId>
 			<artifactId>akka-actor_2.11</artifactId>
-			<version>2.3.14</version>
 		</dependency>
 		<!-- Akka related dependencies - end -->
 
-
+		<dependency>
+			<groupId>gov.loc</groupId>
+			<artifactId>bagit</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
 		<pluginManagement>

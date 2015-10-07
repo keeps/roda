@@ -2,6 +2,7 @@ package org.roda.action.orchestrate.embed;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -297,6 +298,34 @@ public class EmbeddedActionOrchestrator implements ActionOrchestrator {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
+  }
+
+  @Override
+  public void runActionOnFiles(Plugin<String> action, List<Path> paths) {
+    try {
+      action.beforeExecute(index, model, storage);
+
+      List<String> block = new ArrayList<String>();
+      for (Path path : paths) {
+        if (block.size() == BLOCK_SIZE) {
+          submitAction(block, action);
+          block = new ArrayList<String>();
+        }
+        block.add(path.toString());
+      }
+
+      if (!block.isEmpty()) {
+        submitAction(block, action);
+      }
+
+      finishedSubmit();
+      action.afterExecute(index, model, storage);
+
+    } catch (PluginException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+
   }
 
 }

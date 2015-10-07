@@ -1,6 +1,7 @@
 package org.roda.action.orchestrate;
 
 import java.io.Serializable;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.roda.core.data.adapter.filter.Filter;
@@ -23,5 +24,7 @@ public interface ActionOrchestrator {
   public void setup();
 
   public void shutdown();
+
+  public void runActionOnFiles(Plugin<String> action, List<Path> paths);
 
 }

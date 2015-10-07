@@ -333,6 +333,12 @@ public final class ModelUtils {
 
   }
 
+  public static StoragePath getPreservationPath(String aipId) throws StorageServiceException {
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
+      RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION);
+
+  }
+
   public static StoragePath getPreservationFilePath(String aipId, String representationID, String fileID)
     throws StorageServiceException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
