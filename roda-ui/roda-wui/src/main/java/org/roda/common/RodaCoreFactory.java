@@ -27,6 +27,8 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.roda.action.antivirus.AntivirusAction;
 import org.roda.action.fixity.FixityAction;
+import org.roda.action.ingest.fastCharacterization.FastCharacterizationAction;
+import org.roda.action.ingest.premisSkeleton.PremisSkeletonAction;
 import org.roda.action.orchestrate.ActionOrchestrator;
 import org.roda.action.orchestrate.Plugin;
 import org.roda.action.orchestrate.actions.ReindexAction;
@@ -377,7 +379,17 @@ public class RodaCoreFactory {
     Plugin<AIP> antivirusAction = new AntivirusAction();
     getActionOrchestrator().runActionOnAllAIPs(antivirusAction);
   }
+  
+  private static void runFastCharacterizationAction() {
+    Plugin<AIP> fastCharacterizationAction = new FastCharacterizationAction();
+    getActionOrchestrator().runActionOnAllAIPs(fastCharacterizationAction);
+  }
 
+  private static void runPremisSkeletonAction() {
+    Plugin<AIP> premisSkeletonAction = new PremisSkeletonAction();
+    getActionOrchestrator().runActionOnAllAIPs(premisSkeletonAction);
+  }
+  
   private static void runSolrQuery(List<String> args) {
     String collection = args.get(2);
     String solrQueryString = args.get(3);
@@ -400,6 +412,8 @@ public class RodaCoreFactory {
     System.err.println("java -jar x.jar orphans [newParentID]");
     System.err.println("java -jar x.jar fixity");
     System.err.println("java -jar x.jar antivirus");
+    System.err.println("java -jar x.jar premisskeleton");
+    System.err.println("java -jar x.jar fastcharacterization");
   }
 
   private static void printIndexMembers(List<String> args, Filter filter, Sorter sorter, Sublist sublist, Facets facets)
@@ -434,6 +448,10 @@ public class RodaCoreFactory {
         runFixityAction();
       } else if ("antivirus".equals(args.get(0))) {
         runAntivirusAction();
+      } else if("premisskeleton".equals(args.get(0))){
+        runPremisSkeletonAction();
+      }else if ("fastcharacterization".equals(args.get(0))) {
+        runFastCharacterizationAction();
       } else {
         printMainUsage();
       }

@@ -1568,10 +1568,9 @@ public class ModelService extends ModelObservable {
     try {
       StoragePath binaryPath = ModelUtils.getPreservationFilePath(aipId, representationID, preservationMetadataId);
       boolean asReference = false;
-      Map<String, Set<String>> binaryMetadata = binary.getMetadata();
-      Binary binaryCreated = storage.createBinary(binaryPath, binaryMetadata, binary.getContent(), asReference);
+      Binary updatedBinary = storage.updateBinaryContent(binaryPath,binary.getContent(),asReference,true);
       preservationMetadataBinary = new PreservationMetadata(preservationMetadataId, aipId, representationID, binaryPath,
-        ModelUtils.getPreservationType(binaryCreated));
+        ModelUtils.getPreservationType(updatedBinary));
       notifyPreservationMetadataCreated(preservationMetadataBinary);
     } catch (StorageServiceException e) {
       throw new ModelServiceException("Error creating preservation metadata binary in storage",

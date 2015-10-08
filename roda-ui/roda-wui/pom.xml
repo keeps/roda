@@ -274,6 +274,10 @@
 			<groupId>gov.loc</groupId>
 			<artifactId>bagit</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>uk.gov.nationalarchives</groupId>
+			<artifactId>droid-command-line</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
 		<pluginManagement>
