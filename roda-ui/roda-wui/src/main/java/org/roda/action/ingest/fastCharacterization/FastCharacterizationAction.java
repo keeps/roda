@@ -62,7 +62,7 @@ public class FastCharacterizationAction implements Plugin<AIP> {
 
   @Override
   public String getDescription() {
-    return "Create the premis files with the basic information (format and puid)";
+    return "Create the premis files with the format identification";
   }
 
   @Override
