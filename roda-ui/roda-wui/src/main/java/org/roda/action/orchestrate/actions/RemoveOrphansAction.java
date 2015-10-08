@@ -26,7 +26,7 @@ import org.roda.storage.StorageService;
 import org.roda.storage.StorageServiceException;
 
 public class RemoveOrphansAction implements Plugin<SimpleDescriptionObject> {
-  private final Logger logger = Logger.getLogger(getClass());
+  private static final Logger LOGGER = Logger.getLogger(RemoveOrphansAction.class);
   private AIP newParent;
 
   @Override
@@ -83,24 +83,24 @@ public class RemoveOrphansAction implements Plugin<SimpleDescriptionObject> {
 
     for (SimpleDescriptionObject sdo : list) {
       try {
-        logger.debug("Processing AIP " + sdo.getId());
+        LOGGER.debug("Processing AIP " + sdo.getId());
         if (sdo.getLevel() == null || !sdo.getLevel().trim().equalsIgnoreCase("fonds")) {
           AIP aip = model.retrieveAIP(sdo.getId());
           StoragePath aiPpath = ModelUtils.getAIPpath(aip.getId());
 
-          logger.debug("  Moving orphan " + sdo.getId() + " to under " + newParent.getId());
-          Map<String, Set<String>> SimpleDescriptionObjectMetadata = storage.getMetadata(aiPpath);
-          SimpleDescriptionObjectMetadata.put(RodaConstants.STORAGE_META_PARENT_ID,
+          LOGGER.debug("  Moving orphan " + sdo.getId() + " to under " + newParent.getId());
+          Map<String, Set<String>> simpleDescriptionObjectMetadata = storage.getMetadata(aiPpath);
+          simpleDescriptionObjectMetadata.put(RodaConstants.STORAGE_META_PARENT_ID,
             new HashSet<String>(Arrays.asList(newParent.getId())));
-          storage.updateMetadata(aiPpath, SimpleDescriptionObjectMetadata, true);
+          storage.updateMetadata(aiPpath, simpleDescriptionObjectMetadata, true);
           aip.setParentId(newParent.getId());
           index.reindexAIP(aip);
         } else {
-          logger.debug("  AIP doesn't need to be moved... Level: " + sdo.getLevel());
+          LOGGER.debug("  AIP doesn't need to be moved... Level: " + sdo.getLevel());
         }
       } catch (StorageServiceException | ModelServiceException e) {
-        logger.error("Error processing SimpleDescriptionObject " + sdo.getId() + " (RemoveOrphansAction)");
-        logger.error(e.getMessage(), e);
+        LOGGER.error("Error processing SimpleDescriptionObject " + sdo.getId() + " (RemoveOrphansAction)");
+        LOGGER.error(e.getMessage(), e);
       }
     }
     return null;
@@ -114,7 +114,7 @@ public class RemoveOrphansAction implements Plugin<SimpleDescriptionObject> {
 
   @Override
   public Report afterExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    logger.debug("End");
+    LOGGER.debug("End");
     return null;
   }
 

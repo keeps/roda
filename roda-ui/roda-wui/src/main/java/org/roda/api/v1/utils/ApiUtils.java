@@ -1,6 +1,9 @@
 package org.roda.api.v1.utils;
 
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.xml.transform.TransformerException;
 
 import org.apache.commons.lang.StringUtils;
 import org.roda.core.common.Pair;
@@ -45,9 +48,9 @@ public class ApiUtils {
   }
 
   /**
-   * Returns valid start (pair first element) and limit (pair second element) paging
-   * parameters defaulting to start = 0 and limit = 100 if none or invalid
-   * values are provided.
+   * Returns valid start (pair first element) and limit (pair second element)
+   * paging parameters defaulting to start = 0 and limit = 100 if none or
+   * invalid values are provided.
    */
   public static Pair<Integer, Integer> processPagingParams(String start, String limit) {
     Integer startInteger, limitInteger;
@@ -69,6 +72,23 @@ public class ApiUtils {
     }
 
     return new Pair<Integer, Integer>(startInteger, limitInteger);
+  }
+
+  public static Response okResponse(StreamResponse streamResponse) {
+    return Response.ok(streamResponse.getStream(), streamResponse.getMediaType())
+      .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename = " + streamResponse.getFilename()).build();
+  }
+
+  public static Response errorResponse(TransformerException e) {
+    String message;
+
+    if (e.getCause() != null) {
+      message = e.getCause().getMessage();
+    } else {
+      message = e.getMessage();
+    }
+
+    return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, message)).build();
   }
 
 }

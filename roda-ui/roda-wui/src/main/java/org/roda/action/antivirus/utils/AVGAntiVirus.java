@@ -14,57 +14,57 @@ import org.apache.log4j.Logger;
  */
 public class AVGAntiVirus implements AntiVirus {
 
-  static final private Logger logger = Logger.getLogger(AVGAntiVirus.class);
+  private static final Logger LOGGER = Logger.getLogger(AVGAntiVirus.class);
 
   /**
    * no errors
    */
-  static final private int NO_ERRORS = 0;
+  private static final int NO_ERRORS = 0;
 
   /**
    * the test was interrupted by the user
    */
-  static final private int INTERRUPTED_BY_USER = 1;
+  private static final int INTERRUPTED_BY_USER = 1;
 
   /**
    * an error occurred during the test (e.g. "cannot open file" event)
    */
-  static final private int ERROR_OCCURED_DURING_TEST = 2;
+  private static final int ERROR_OCCURED_DURING_TEST = 2;
 
   /**
    * file system changes detected
    */
-  static final private int FS_CHANGES_DETECTED = 3;
+  private static final int FS_CHANGES_DETECTED = 3;
 
   /**
    * a suspect object was found by heuristic analysis
    */
-  static final private int SUSPECT_OBJECT_FOUND_BY_HEURISTIC_ANALYSIS = 4;
+  private static final int SUSPECT_OBJECT_FOUND_BY_HEURISTIC_ANALYSIS = 4;
 
   /**
    * a virus was found by heuristic analysis
    */
-  static final private int VIRUS_FOUND_BY_HEURISTIC_ANALYSIS = 5;
+  private static final int VIRUS_FOUND_BY_HEURISTIC_ANALYSIS = 5;
 
   /**
    * a particular virus was found
    */
-  static final private int PARTICULAR_VIRUS_FOUND = 6;
+  private static final int PARTICULAR_VIRUS_FOUND = 6;
 
   /**
    * an active virus was found in memory
    */
-  static final private int ACTIVE_VIRUS_FOUND_IN_MEMORY = 7;
+  private static final int ACTIVE_VIRUS_FOUND_IN_MEMORY = 7;
 
   /**
    * corruption of some of the AVG Free for Linux command line components
    */
-  static final private int CORRUPTION_OF_SOME_AVG_COMPONENTS = 8;
+  private static final int CORRUPTION_OF_SOME_AVG_COMPONENTS = 8;
 
   /**
    * an archive contains password protected files
    */
-  static final private int ARCHIVE_CONTAINS_PASSWD_PROTECTED_FILES = 10;
+  private static final int ARCHIVE_CONTAINS_PASSWD_PROTECTED_FILES = 10;
 
   /**
    * Performs a virus check on the specified path.
@@ -84,7 +84,7 @@ public class AVGAntiVirus implements AntiVirus {
 
     try {
 
-      logger.debug("Executing virus scan in " + path.toString());
+      LOGGER.debug("Executing virus scan in " + path.toString());
 
       ProcessBuilder processBuilder = new ProcessBuilder("/usr/bin/avgscan", "-repok", "-arc", path.toString());
       processBuilder.redirectErrorStream();
@@ -119,14 +119,14 @@ public class AVGAntiVirus implements AntiVirus {
           break;
       }
 
-      logger.debug("Virus checker exit value: " + exitValue);
-      logger.debug("Virus checker output:\n" + outputWriter.toString());
+      LOGGER.debug("Virus checker exit value: " + exitValue);
+      LOGGER.debug("Virus checker output:\n" + outputWriter.toString());
 
     } catch (IOException e) {
-      logger.debug("Error executing virus scan command - " + e.getMessage(), e);
+      LOGGER.debug("Error executing virus scan command - " + e.getMessage(), e);
       throw new RuntimeException("Error executing virus scan command - " + e.getMessage(), e);
     } catch (InterruptedException e) {
-      logger.debug("Error executing virus scan command - " + e.getMessage(), e);
+      LOGGER.debug("Error executing virus scan command - " + e.getMessage(), e);
       throw new RuntimeException("Error executing virus scan command - " + e.getMessage(), e);
     }
 

@@ -24,7 +24,7 @@ import org.roda.storage.StorageService;
 import org.roda.storage.StorageServiceException;
 
 public class BagitToAIPAction implements Plugin<String> {
-  private final Logger logger = Logger.getLogger(getClass());
+  private static final Logger LOGGER = Logger.getLogger(BagitToAIPAction.class);
 
   @Override
   public void init() throws PluginException {
@@ -70,13 +70,13 @@ public class BagitToAIPAction implements Plugin<String> {
     throws PluginException {
     for (String bagitStringPath : list) {
       Path bagitPath = Paths.get(bagitStringPath);
-      logger.debug("Converting " + bagitPath + " to AIP");
+      LOGGER.debug("Converting " + bagitPath + " to AIP");
       try {
         AIP aip = BagitUtils.bagitToAip(bagitPath, model);
       } catch (ModelServiceException | StorageServiceException | IOException e) {
-        logger.error("Error converting " + bagitPath + " to AIP: " + e.getMessage(), e);
+        LOGGER.error("Error converting " + bagitPath + " to AIP: " + e.getMessage(), e);
       } catch (BagitNotValidException e) {
-        logger.error("Bagit file " + bagitPath + " is not valid...");
+        LOGGER.error("Bagit file " + bagitPath + " is not valid...");
         e.printStackTrace();
       }
     }

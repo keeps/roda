@@ -20,7 +20,7 @@ import org.roda.storage.StorageService;
 
 public class ReindexAction implements Plugin<AIP> {
 
-  private final Logger logger = Logger.getLogger(getClass());
+  private static final Logger LOGGER = Logger.getLogger(ReindexAction.class);
   private boolean clearIndexes = true;
 
   @Override
@@ -76,7 +76,7 @@ public class ReindexAction implements Plugin<AIP> {
     throws PluginException {
 
     for (AIP aip : list) {
-      logger.debug("Reindexing AIP " + aip.getId());
+      LOGGER.debug("Reindexing AIP " + aip.getId());
       index.reindexAIP(aip);
     }
 
@@ -86,7 +86,7 @@ public class ReindexAction implements Plugin<AIP> {
   @Override
   public Report beforeExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
     if (clearIndexes) {
-      logger.debug("Clearing indexes");
+      LOGGER.debug("Clearing indexes");
       try {
         index.clearIndex(RodaConstants.INDEX_AIP);
         index.clearIndex(RodaConstants.INDEX_SDO);
@@ -94,7 +94,7 @@ public class ReindexAction implements Plugin<AIP> {
         throw new PluginException("Error clearing index", e);
       }
     } else {
-      logger.debug("Skipping clear indexes");
+      LOGGER.debug("Skipping clear indexes");
     }
 
     return null;
@@ -102,7 +102,7 @@ public class ReindexAction implements Plugin<AIP> {
 
   @Override
   public Report afterExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    logger.debug("Optimizing indexes");
+    LOGGER.debug("Optimizing indexes");
     try {
       index.optimizeIndex(RodaConstants.INDEX_AIP);
       index.optimizeIndex(RodaConstants.INDEX_SDO);

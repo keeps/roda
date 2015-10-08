@@ -20,7 +20,7 @@ import javax.ws.rs.core.Response;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.roda.api.v1.impl.AipsResourceImpl;
-import org.roda.api.v1.utils.NotFoundException;
+import org.roda.core.common.RODAException;
 import org.roda.core.data.v2.Representation;
 import org.roda.core.data.v2.SimpleEventPreservationMetadata;
 import org.roda.model.AIP;
@@ -52,7 +52,7 @@ public class AipsResource {
   public Response aipsGet(
     @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam("start") String start,
     @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam("limit") String limit)
-      throws NotFoundException {
+      throws RODAException {
     return DELEGATE.aipsGet(request, start, limit);
   }
 
@@ -66,7 +66,7 @@ public class AipsResource {
   public Response aipsAipIdGet(
     @ApiParam(value = "The ID of the AIP to retrieve.", required = true) @PathParam("aip_id") String aipId,
     @ApiParam(value = "Choose format in which to get the AIP", allowableValues = "json, zip", defaultValue = "json") @QueryParam("acceptFormat") String acceptFormat)
-      throws NotFoundException {
+      throws RODAException {
     return DELEGATE.aipsAipIdGet(request, aipId, acceptFormat);
   }
 
@@ -79,7 +79,7 @@ public class AipsResource {
   public Response aipsAipIdPut(
     @ApiParam(value = "The ID of the existing AIP to update", required = true) @PathParam("aip_id") String aipId,
     @ApiParam(value = "The path to the directory in the shared file system where the AIP should be provided.", required = true) @FormParam("filepath") String filepath)
-      throws NotFoundException {
+      throws RODAException {
     return DELEGATE.aipsAipIdPut(request, aipId, filepath);
   }
 
@@ -92,7 +92,7 @@ public class AipsResource {
   public Response aipsAipIdPost(
     @ApiParam(value = "The requested ID of the new AIP", required = true) @PathParam("aip_id") String aipId,
     @ApiParam(value = "The path to the directory in the shared file system where the AIP should be provided.", required = true) @FormParam("filepath") String filepath)
-      throws NotFoundException {
+      throws RODAException {
     return DELEGATE.aipsAipIdPost(request, aipId, filepath);
   }
 
@@ -104,7 +104,7 @@ public class AipsResource {
 
   public Response aipsAipIdDelete(
     @ApiParam(value = "The ID of the AIP to delete.", required = true) @PathParam("aip_id") String aipId)
-      throws NotFoundException {
+      throws RODAException {
     return DELEGATE.aipsAipIdDelete(request, aipId);
   }
 
@@ -119,7 +119,7 @@ public class AipsResource {
     @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam("aip_id") String aipId,
     @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam("start") String start,
     @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam("limit") String limit)
-      throws NotFoundException {
+      throws RODAException {
     return DELEGATE.aipsAipIdDataGet(request, aipId, start, limit);
   }
 
@@ -134,7 +134,7 @@ public class AipsResource {
     @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam("aip_id") String aipId,
     @ApiParam(value = "The ID of the existing representation", required = true) @PathParam("representation_id") String representationId,
     @ApiParam(value = "Choose format in which to get the representation", allowableValues = "json, bin") @QueryParam("acceptFormat") String acceptFormat)
-      throws NotFoundException {
+      throws RODAException {
     return DELEGATE.getAipRepresentation(request, aipId, representationId, acceptFormat);
   }
 
@@ -148,7 +148,7 @@ public class AipsResource {
     @ApiParam(value = "The ID of the AIP where to update the representation", required = true) @PathParam("aip_id") String aipId,
     @ApiParam(value = "The ID of the existing representation to update", required = true) @PathParam("representation_id") String representationId,
     @ApiParam(value = "The path to the directory in the shared file system where the representation should be provided.", required = true) @FormParam("filepath") String filepath)
-      throws NotFoundException {
+      throws RODAException {
     return DELEGATE.aipsAipIdDataRepresentationIdPut(request, aipId, representationId, filepath);
   }
 
@@ -162,7 +162,7 @@ public class AipsResource {
     @ApiParam(value = "The ID of the AIP where to create the representation", required = true) @PathParam("aip_id") String aipId,
     @ApiParam(value = "The requested ID for the new representation", required = true) @PathParam("representation_id") String representationId,
     @ApiParam(value = "The path to the directory in the shared file system where the representation should be provided.", required = true) @FormParam("filepath") String filepath)
-      throws NotFoundException {
+      throws RODAException {
     return DELEGATE.aipsAipIdDataRepresentationIdPost(request, aipId, representationId, filepath);
   }
 
@@ -175,7 +175,7 @@ public class AipsResource {
   public Response aipsAipIdDataRepresentationIdDelete(
     @ApiParam(value = "The ID of the AIP where the representation is.", required = true) @PathParam("aip_id") String aipId,
     @ApiParam(value = "The ID of the existing representation to delete", required = true) @PathParam("representation_id") String representationId)
-      throws NotFoundException {
+      throws RODAException {
     return DELEGATE.aipsAipIdDataRepresentationIdDelete(request, aipId, representationId);
   }
 
@@ -191,7 +191,7 @@ public class AipsResource {
     @ApiParam(value = "The ID of the existing representation", required = true) @PathParam("representation_id") String representationId,
     @ApiParam(value = "The ID of the existing file", required = true) @PathParam("file_id") String fileId,
     @ApiParam(value = "Choose format in which to get the file", allowableValues = "json, bin") @QueryParam("acceptFormat") String acceptFormat)
-      throws NotFoundException {
+      throws RODAException {
     return DELEGATE.aipsAipIdDataRepresentationIdFileIdGet(request, aipId, representationId, fileId, acceptFormat);
   }
 
@@ -206,7 +206,7 @@ public class AipsResource {
     @ApiParam(value = "The ID of the existing representation", required = true) @PathParam("representation_id") String representationId,
     @ApiParam(value = "The ID of the existing file", required = true) @PathParam("file_id") String fileId,
     @ApiParam(value = "The path to the file in the shared file system where the file should be provided.", required = true) @FormParam("filepath") String filepath)
-      throws NotFoundException {
+      throws RODAException {
     return DELEGATE.aipsAipIdDataRepresentationIdFileIdPut(request, aipId, representationId, fileId, filepath);
   }
 
@@ -221,7 +221,7 @@ public class AipsResource {
     @ApiParam(value = "The requested ID for the new representation", required = true) @PathParam("representation_id") String representationId,
     @ApiParam(value = "The requested ID of the new file", required = true) @PathParam("file_id") String fileId,
     @ApiParam(value = "The path to the directory in the shared file system where the representation should be provided.", required = true) @FormParam("filepath") String filepath)
-      throws NotFoundException {
+      throws RODAException {
     return DELEGATE.aipsAipIdDataRepresentationIdFileIdPost(request, aipId, representationId, fileId, filepath);
   }
 
@@ -235,7 +235,7 @@ public class AipsResource {
     @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam("aip_id") String aipId,
     @ApiParam(value = "The ID of the existing representation", required = true) @PathParam("representation_id") String representationId,
     @ApiParam(value = "The ID of the existing file", required = true) @PathParam("file_id") String fileId)
-      throws NotFoundException {
+      throws RODAException {
     return DELEGATE.aipsAipIdDataRepresentationIdFileIdDelete(request, aipId, representationId, fileId);
   }
 
@@ -251,7 +251,7 @@ public class AipsResource {
     @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam("start") String start,
     @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam("limit") String limit,
     @ApiParam(value = "Choose format in which to get the representation", allowableValues = "json, bin") @QueryParam("acceptFormat") String acceptFormat)
-      throws NotFoundException {
+      throws RODAException {
     return DELEGATE.listAipDescriptiveMetadata(request, aipId, start, limit, acceptFormat);
   }
 
@@ -266,7 +266,7 @@ public class AipsResource {
     @ApiParam(value = "The ID of the existing metadata file to retrieve", required = true) @PathParam("metadata_id") String metadataId,
     @ApiParam(value = "Choose format in which to get the metadata", allowableValues = "xml, html", defaultValue = "xml") @QueryParam("acceptFormat") String acceptFormat,
     @ApiParam(value = "The language for the HTML output", allowableValues = "pt_PT, en_US", defaultValue = "pt_PT") @DefaultValue("pt_PT") @QueryParam("lang") String language)
-      throws NotFoundException {
+      throws RODAException {
     return DELEGATE.getAipDescriptiveMetadata(request, aipId, metadataId, acceptFormat, language);
   }
 
@@ -281,7 +281,7 @@ public class AipsResource {
     @ApiParam(value = "The ID of the existing metadata file to update", required = true) @PathParam("metadata_id") String metadataId,
     @FormDataParam("file") InputStream inputStream, @FormDataParam("file") FormDataContentDisposition fileDetail,
     @ApiParam(value = "The type of the metadata file (e.g. eadc2014, dc)", required = true) @FormParam("metadataType") String metadataType)
-      throws NotFoundException {
+      throws RODAException {
     return DELEGATE.aipsAipIdDescriptiveMetadataMetadataIdPut(request, aipId, metadataId, inputStream, fileDetail,
       metadataType);
   }
@@ -297,7 +297,7 @@ public class AipsResource {
     @ApiParam(value = "The suggested ID metadata file to create", required = true) @PathParam("metadata_id") String metadataId,
     @FormDataParam("file") InputStream inputStream, @FormDataParam("file") FormDataContentDisposition fileDetail,
     @ApiParam(value = "The type of the metadata file (e.g. eadc2014, dc)", required = true) @FormParam("metadataType") String metadataType)
-      throws NotFoundException {
+      throws RODAException {
     return DELEGATE.aipsAipIdDescriptiveMetadataMetadataIdPost(request, aipId, metadataId, inputStream, fileDetail,
       metadataType);
   }
@@ -311,7 +311,7 @@ public class AipsResource {
   public Response aipsAipIdDescriptiveMetadataMetadataIdDelete(
     @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam("aip_id") String aipId,
     @ApiParam(value = "The ID of the existing metadata file to delete", required = true) @PathParam("metadata_id") String metadataId)
-      throws NotFoundException {
+      throws RODAException {
     return DELEGATE.aipsAipIdDescriptiveMetadataMetadataIdDelete(request, aipId, metadataId);
   }
 
@@ -326,7 +326,7 @@ public class AipsResource {
     @ApiParam(value = "Choose format in which to get the metadata", allowableValues = "json, xml, html", defaultValue = "json") @QueryParam("acceptFormat") String acceptFormat,
     @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam("start") String start,
     @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam("limit") String limit)
-      throws NotFoundException {
+      throws RODAException {
     return DELEGATE.listAipPreservationMetadata(request, aipId, start, limit, acceptFormat);
   }
 
@@ -347,9 +347,9 @@ public class AipsResource {
     @ApiParam(value = "Index of the first file to return", defaultValue = "0") @QueryParam("startFile") String startFile,
     @ApiParam(value = "Maximum number of files to return", defaultValue = "100") @QueryParam("limitFile") String limitFile,
     @ApiParam(value = "The language for the HTML output", allowableValues = "pt_PT, en_US", defaultValue = "pt_PT") @DefaultValue("pt_PT") @QueryParam("lang") String language)
-      throws NotFoundException {
+      throws RODAException {
     return DELEGATE.getAipRepresentationPreservationMetadata(request, aipId, representationId, startAgent, limitAgent,
-      startEvent, limitEvent, startFile, limitFile, acceptFormat,language);
+      startEvent, limitEvent, startFile, limitFile, acceptFormat, language);
   }
 
   @GET
@@ -362,7 +362,7 @@ public class AipsResource {
     @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam("aip_id") String aipId,
     @ApiParam(value = "The ID of the existing representation", required = true) @PathParam("representation_id") String representationId,
     @ApiParam(value = "The ID of the existing file", required = true) @PathParam("file_id") String fileId)
-      throws NotFoundException {
+      throws RODAException {
     return DELEGATE.getAipRepresentationPreservationMetadataFile(request, aipId, representationId, fileId);
   }
 
@@ -376,7 +376,7 @@ public class AipsResource {
     @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam("aip_id") String aipId,
     @ApiParam(value = "The ID of the existing representation", required = true) @PathParam("representation_id") String representationId,
     @FormDataParam("file") InputStream inputStream, @FormDataParam("file") FormDataContentDisposition fileDetail)
-      throws NotFoundException {
+      throws RODAException {
     return DELEGATE.postAipRepresentationPreservationMetadataFile(request, aipId, representationId, inputStream,
       fileDetail);
   }
@@ -391,7 +391,7 @@ public class AipsResource {
     @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam("aip_id") String aipId,
     @ApiParam(value = "The ID of the existing representation", required = true) @PathParam("representation_id") String representationId,
     @FormDataParam("file") InputStream inputStream, @FormDataParam("file") FormDataContentDisposition fileDetail)
-      throws NotFoundException {
+      throws RODAException {
     return DELEGATE.putAipRepresentationPreservationMetadataFile(request, aipId, representationId, inputStream,
       fileDetail);
   }
@@ -406,7 +406,7 @@ public class AipsResource {
     @ApiParam(value = "The ID of the existing representation", required = true) @PathParam("representation_id") String representationId,
     @ApiParam(value = "The ID of the existing file", required = true) @PathParam("file_id") String fileId,
     @ApiParam(value = "Choose format in which to get the metadata", allowableValues = "json, xml, html", defaultValue = "json") @QueryParam("acceptFormat") String acceptFormat)
-      throws NotFoundException {
+      throws RODAException {
     return DELEGATE.aipsAipIdPreservationMetadataRepresentationIdFileIdDelete(request, aipId, representationId, fileId);
   }
 }

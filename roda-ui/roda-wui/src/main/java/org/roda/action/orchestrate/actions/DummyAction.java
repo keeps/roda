@@ -18,7 +18,7 @@ import org.roda.storage.StorageService;
 
 public class DummyAction implements Plugin<AIP> {
 
-  private final Logger logger = Logger.getLogger(getClass());
+  private static final Logger LOGGER = Logger.getLogger(DummyAction.class);
 
   @Override
   public void init() throws PluginException {
@@ -65,7 +65,7 @@ public class DummyAction implements Plugin<AIP> {
     throws PluginException {
 
     for (AIP aip : list) {
-      logger.debug("AIP " + aip.getId());
+      LOGGER.debug("AIP " + aip.getId());
     }
 
     return null;

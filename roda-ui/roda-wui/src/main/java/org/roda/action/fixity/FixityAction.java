@@ -37,7 +37,7 @@ import org.roda.storage.fs.FSUtils;
 
 public class FixityAction implements Plugin<AIP> {
   private AgentPreservationObject fixityAgent;
-  private final Logger logger = Logger.getLogger(getClass());
+  private static final Logger LOGGER = Logger.getLogger(FixityAction.class);
 
   @Override
   public void init() throws PluginException {
@@ -90,7 +90,7 @@ public class FixityAction implements Plugin<AIP> {
       List<String> representationIds = aip.getRepresentationIds();
       if (representationIds != null && representationIds.size() > 0) {
         for (String representationID : representationIds) {
-          logger.debug("Checking fixity for files in representation " + representationID + " of AIP " + aip.getId());
+          LOGGER.debug("Checking fixity for files in representation " + representationID + " of AIP " + aip.getId());
           EventPreservationObject epo = new EventPreservationObject();
           epo.setDatetime(new Date());
           epo.setEventType(EventPreservationObject.PRESERVATION_EVENT_TYPE_FIXITY_CHECK);
@@ -103,7 +103,7 @@ public class FixityAction implements Plugin<AIP> {
             List<String> koFileIDS = new ArrayList<String>();
             if (fileIDs != null && fileIDs.size() > 0) {
               for (String fileID : fileIDs) {
-                logger.debug("Checking fixity for " + fileID);
+                LOGGER.debug("Checking fixity for " + fileID);
                 File f = model.retrieveFile(aip.getId(), representationID, fileID);
                 Binary b = storage.getBinary(f.getStoragePath());
                 Path p = Files.createTempFile("temp", "");
@@ -117,7 +117,7 @@ public class FixityAction implements Plugin<AIP> {
                 }
               }
               if (okFileIDS.size() < fileIDs.size()) {
-                logger.debug("Fixity error for representation " + representationID + " of AIP " + aip.getId());
+                LOGGER.debug("Fixity error for representation " + representationID + " of AIP " + aip.getId());
                 epo.setOutcome("error");
                 epo.setOutcomeDetailNote("Reason");
                 StringBuilder sb = new StringBuilder();
@@ -130,7 +130,7 @@ public class FixityAction implements Plugin<AIP> {
                 epo.setOutcomeDetailExtension(sb.toString());
                 notifyUserOfFixityCheckError(representationID, okFileIDS, koFileIDS, epo);
               } else {
-                logger.debug("Fixity OK for representation " + representationID + " of AIP " + aip.getId());
+                LOGGER.debug("Fixity OK for representation " + representationID + " of AIP " + aip.getId());
                 epo.setOutcome("success");
                 epo.setOutcomeDetailNote(fileIDs.size() + " files checked successfully");
                 epo.setOutcomeDetailExtension(fileIDs.toString());
@@ -138,7 +138,7 @@ public class FixityAction implements Plugin<AIP> {
               }
             }
           } catch (ModelServiceException | IOException | StorageServiceException e) {
-            logger.error("Error processing Representation " + representationID + " - " + e.getMessage(), e);
+            LOGGER.error("Error processing Representation " + representationID + " - " + e.getMessage(), e);
             epo.setOutcome("undetermined");
             epo.setOutcomeDetailNote("Reason");
             epo.setOutcomeDetailExtension("<p>" + e.getMessage() + "</p>");
@@ -156,13 +156,13 @@ public class FixityAction implements Plugin<AIP> {
             Binary resource = (Binary) FSUtils.convertPathToResource(file.getParent(), file);
             model.createPreservationMetadata(aip.getId(), representationID, name, resource);
           } catch (ModelServiceException e) {
-            logger.error(e.getMessage(), e);
+            LOGGER.error(e.getMessage(), e);
           } catch (PremisMetadataException e) {
-            logger.error(e.getMessage(), e);
+            LOGGER.error(e.getMessage(), e);
           } catch (IOException e) {
-            logger.error(e.getMessage(), e);
+            LOGGER.error(e.getMessage(), e);
           } catch (StorageServiceException e) {
-            logger.error(e.getMessage(), e);
+            LOGGER.error(e.getMessage(), e);
           }
 
         }

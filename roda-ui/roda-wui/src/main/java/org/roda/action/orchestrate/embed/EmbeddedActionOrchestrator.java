@@ -40,7 +40,7 @@ public class EmbeddedActionOrchestrator implements ActionOrchestrator {
   private static final int TIMEOUT = 1;
   private static final TimeUnit TIMEOUT_UNIT = TimeUnit.HOURS;
 
-  private final Logger logger = Logger.getLogger(getClass());
+  private static final Logger LOGGER = Logger.getLogger(EmbeddedActionOrchestrator.class);
 
   private final IndexService index;
   private final ModelService model;
@@ -56,7 +56,7 @@ public class EmbeddedActionOrchestrator implements ActionOrchestrator {
     final ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("plugin-%d").setDaemon(true).build();
     int threads = Runtime.getRuntime().availableProcessors() + 1;
     executorService = Executors.newFixedThreadPool(threads, threadFactory);
-    logger.debug("Running embedded action orchestrator on a " + threads + " thread pool");
+    LOGGER.debug("Running embedded action orchestrator on a " + threads + " thread pool");
 
   }
 

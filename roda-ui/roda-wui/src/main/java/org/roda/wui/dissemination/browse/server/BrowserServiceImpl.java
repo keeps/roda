@@ -142,7 +142,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     throws AuthorizationDeniedException, GenericException, MetadataParseException, NotFoundException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
 
-    String descriptiveMetadataId = bundle.getId();
+    String metadataId = bundle.getId();
     String descriptiveMetadataType = bundle.getType();
 
     StoragePath storagePath = null;
@@ -155,7 +155,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
       contentDigest);
 
     try {
-      Browser.createDescriptiveMetadataFile(user, aipId, descriptiveMetadataId, descriptiveMetadataType,
+      Browser.createDescriptiveMetadataFile(user, aipId, metadataId, descriptiveMetadataType,
         descriptiveMetadataIdBinary);
     } catch (ValidationException e) {
       throw convertValidationException(e);
@@ -166,8 +166,8 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   public void updateDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle bundle)
     throws AuthorizationDeniedException, GenericException, MetadataParseException, NotFoundException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
-    String descriptiveMetadataId = bundle.getId();
-    String descriptiveMetadataType = bundle.getType();
+    String metadataId = bundle.getId();
+    String metadataType = bundle.getType();
 
     StoragePath storagePath = null;
     Map<String, Set<String>> metadata = new HashMap<>();
@@ -175,12 +175,12 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     Long sizeInBytes = Long.valueOf(bundle.getXml().getBytes().length);
     boolean reference = false;
     Map<String, String> contentDigest = new HashMap<>();
-    Binary descriptiveMetadataIdBinary = new DefaultBinary(storagePath, metadata, payload, sizeInBytes, reference,
+    Binary metadataBinary = new DefaultBinary(storagePath, metadata, payload, sizeInBytes, reference,
       contentDigest);
 
     try {
-      Browser.updateDescriptiveMetadataFile(user, aipId, descriptiveMetadataId, descriptiveMetadataType,
-        descriptiveMetadataIdBinary);
+      Browser.updateDescriptiveMetadataFile(user, aipId, metadataId, metadataType,
+        metadataBinary);
     } catch (ValidationException e) {
       throw convertValidationException(e);
     }

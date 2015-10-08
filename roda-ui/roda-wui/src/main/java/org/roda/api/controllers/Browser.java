@@ -36,6 +36,22 @@ import org.roda.wui.dissemination.browse.client.DescriptiveMetadataEditBundle;
  */
 public class Browser extends RodaCoreService {
 
+  private static final String AIP_ID_PARAM = "aipId";
+  private static final String METADATA_ID_PARAM = "metadataId";
+  private static final String REPRESENTATION_ID_PARAM = "representationId";
+  private static final String FILE_ID_PARAM = "fileId";
+
+  private static final String SDO_PARAM = "sdo";
+  private static final String FILTER_PARAM = "filter";
+  private static final String SORTER_PARAM = "sorter";
+  private static final String SUBLIST_PARAM = "sublist";
+  private static final String LIMIT_PARAM = "limit";
+  private static final String START_PARAM = "start";
+
+  private static final String BROWSER_COMPONENT = "Browser";
+  private static final String ADMINISTRATION_METADATA_EDITOR_ROLE = "administration.metadata_editor";
+  private static final String BROWSE_ROLE = "browse";
+
   private Browser() {
     super();
   }
@@ -45,32 +61,32 @@ public class Browser extends RodaCoreService {
     Date startDate = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, "browse");
+    UserUtility.checkRoles(user, BROWSE_ROLE);
 
     // delegate
     BrowseItemBundle itemBundle = BrowserHelper.getItemBundle(aipId, locale);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, "Browser", "getItemBundle", aipId, duration, "aipId", aipId);
+    registerAction(user, BROWSER_COMPONENT, "getItemBundle", aipId, duration, AIP_ID_PARAM, aipId);
 
     return itemBundle;
   }
 
   public static DescriptiveMetadataEditBundle getDescriptiveMetadataEditBundle(RodaUser user, String aipId,
-    String descId) throws AuthorizationDeniedException, GenericException {
+    String metadataId) throws AuthorizationDeniedException, GenericException {
     Date startDate = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, "browse");
+    UserUtility.checkRoles(user, BROWSE_ROLE);
 
     // delegate
-    DescriptiveMetadataEditBundle bundle = BrowserHelper.getDescriptiveMetadataEditBundle(aipId, descId);
+    DescriptiveMetadataEditBundle bundle = BrowserHelper.getDescriptiveMetadataEditBundle(aipId, metadataId);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, "Browser", "getDescriptiveMetadataEditBundle", aipId, duration, "aipId", aipId, "descId",
-      descId);
+    registerAction(user, BROWSER_COMPONENT, "getDescriptiveMetadataEditBundle", aipId, duration, AIP_ID_PARAM, aipId,
+      METADATA_ID_PARAM, metadataId);
 
     return bundle;
   }
@@ -80,7 +96,7 @@ public class Browser extends RodaCoreService {
     Date startDate = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, "browse");
+    UserUtility.checkRoles(user, BROWSE_ROLE);
 
     // delegate
     IndexResult<SimpleDescriptionObject> descriptiveMetadata = BrowserHelper.findDescriptiveMetadata(filter, sorter,
@@ -88,8 +104,8 @@ public class Browser extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, "Browser", "findDescriptiveMetadata", null, duration, "filter", filter.toString(), "sorter",
-      sorter.toString(), "sublist", sublist.toString());
+    registerAction(user, BROWSER_COMPONENT, "findDescriptiveMetadata", null, duration, FILTER_PARAM, filter.toString(),
+      SORTER_PARAM, sorter.toString(), SUBLIST_PARAM, sublist.toString());
 
     return descriptiveMetadata;
   }
@@ -99,14 +115,15 @@ public class Browser extends RodaCoreService {
     Date startDate = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, "browse");
+    UserUtility.checkRoles(user, BROWSE_ROLE);
 
     // delegate
     Long count = BrowserHelper.countDescriptiveMetadata(filter);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, "Browser", "countDescriptiveMetadata", null, duration, "filter", filter.toString());
+    registerAction(user, BROWSER_COMPONENT, "countDescriptiveMetadata", null, duration, FILTER_PARAM,
+      filter.toString());
 
     return count;
   }
@@ -116,14 +133,14 @@ public class Browser extends RodaCoreService {
     Date startDate = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, "browse");
+    UserUtility.checkRoles(user, BROWSE_ROLE);
 
     // delegate
     SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(aipId);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, "Browser", "getSimpleDescriptionObject", aipId, duration, "aipId", aipId);
+    registerAction(user, BROWSER_COMPONENT, "getSimpleDescriptionObject", aipId, duration, AIP_ID_PARAM, aipId);
 
     return sdo;
   }
@@ -133,14 +150,14 @@ public class Browser extends RodaCoreService {
     Date startDate = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, "browse");
+    UserUtility.checkRoles(user, BROWSE_ROLE);
 
     // delegate
     List<SimpleDescriptionObject> ancestors = BrowserHelper.getAncestors(sdo);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, "Browser", "getAncestors", sdo.getId(), duration, "sdo", sdo.toString());
+    registerAction(user, BROWSER_COMPONENT, "getAncestors", sdo.getId(), duration, SDO_PARAM, sdo.toString());
 
     return ancestors;
   }
@@ -167,8 +184,8 @@ public class Browser extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, "Browser", "getAipRepresentation", aipId, duration, "aip", aipId, "representationId",
-      representationId);
+    registerAction(user, BROWSER_COMPONENT, "getAipRepresentation", aipId, duration, AIP_ID_PARAM, aipId,
+      REPRESENTATION_ID_PARAM, representationId);
 
     return aipRepresentation;
   }
@@ -190,8 +207,8 @@ public class Browser extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, "Browser", "listAipDescriptiveMetadata", aipId, duration, "aip", aipId, "start", start,
-      "limit", limit);
+    registerAction(user, BROWSER_COMPONENT, "listAipDescriptiveMetadata", aipId, duration, AIP_ID_PARAM, aipId,
+      START_PARAM, start, LIMIT_PARAM, limit);
 
     return aipDescriptiveMetadataList;
   }
@@ -214,7 +231,7 @@ public class Browser extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, "Browser", "getAipDescritiveMetadata", aipId, duration, "metadataId", metadataId);
+    registerAction(user, BROWSER_COMPONENT, "getAipDescritiveMetadata", aipId, duration, METADATA_ID_PARAM, metadataId);
 
     return aipDescritiveMetadata;
 
@@ -237,8 +254,8 @@ public class Browser extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, "Browser", "listAipPreservationMetadata", aipId, duration, "aip", aipId, "start", start,
-      "limit", limit);
+    registerAction(user, BROWSER_COMPONENT, "listAipPreservationMetadata", aipId, duration, AIP_ID_PARAM, aipId,
+      START_PARAM, start, LIMIT_PARAM, limit);
 
     return aipPreservationMetadataList;
   }
@@ -262,8 +279,8 @@ public class Browser extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, "Browser", "getAipRepresentationPreservationMetadata", aipId, duration, "aip", aipId,
-      "startAgent", startAgent, "limitAgent", limitAgent, "startEvent", startEvent, "limitEvent", limitEvent,
+    registerAction(user, BROWSER_COMPONENT, "getAipRepresentationPreservationMetadata", aipId, duration, AIP_ID_PARAM,
+      aipId, "startAgent", startAgent, "limitAgent", limitAgent, "startEvent", startEvent, "limitEvent", limitEvent,
       "startFile", startFile, "limitFile", limitFile);
 
     return aipRepresentationPreservationMetadata;
@@ -284,8 +301,8 @@ public class Browser extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, "Browser", "getAipRepresentationPreservationMetadataFile", aipId, duration, "aip", aipId,
-      "representationId", representationId, "fileId", fileId);
+    registerAction(user, BROWSER_COMPONENT, "getAipRepresentationPreservationMetadataFile", aipId, duration,
+      AIP_ID_PARAM, aipId, REPRESENTATION_ID_PARAM, representationId, FILE_ID_PARAM, fileId);
 
     return aipRepresentationPreservationMetadataFile;
   }
@@ -306,8 +323,8 @@ public class Browser extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, "Browser", "postAipRepresentationPreservationMetadataFile", aipId, duration, "aip", aipId,
-      "representationId", representationId);
+    registerAction(user, BROWSER_COMPONENT, "postAipRepresentationPreservationMetadataFile", aipId, duration,
+      AIP_ID_PARAM, aipId, REPRESENTATION_ID_PARAM, representationId);
 
   }
 
@@ -326,8 +343,8 @@ public class Browser extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, "Browser", "aipsAipIdPreservationMetadataRepresentationIdFileIdPut", aipId, duration, "aip",
-      aipId, "representationId", representationId);
+    registerAction(user, BROWSER_COMPONENT, "aipsAipIdPreservationMetadataRepresentationIdFileIdPut", aipId, duration,
+      AIP_ID_PARAM, aipId, REPRESENTATION_ID_PARAM, representationId);
 
   }
 
@@ -344,8 +361,8 @@ public class Browser extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, "Browser", "aipsAipIdPreservationMetadataRepresentationIdFileIdDelete", aipId, duration, "aip",
-      aipId, "representationId", representationId, "fileId", fileId);
+    registerAction(user, BROWSER_COMPONENT, "aipsAipIdPreservationMetadataRepresentationIdFileIdDelete", aipId,
+      duration, AIP_ID_PARAM, aipId, REPRESENTATION_ID_PARAM, representationId, FILE_ID_PARAM, fileId);
 
   }
 
@@ -360,7 +377,7 @@ public class Browser extends RodaCoreService {
     Date startDate = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, "administration.metadata_editor");
+    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
     SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(aipId);
     UserUtility.checkObjectModifyPermissions(user, sdo);
     sdo = BrowserHelper.getSimpleDescriptionObject(parentId);
@@ -371,7 +388,8 @@ public class Browser extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, "Browser", "moveInHierarchy", sdo.getId(), duration, "aip", aipId, "toParent", parentId);
+    registerAction(user, BROWSER_COMPONENT, "moveInHierarchy", sdo.getId(), duration, AIP_ID_PARAM, aipId, "toParent",
+      parentId);
 
     return sdo;
 
@@ -382,7 +400,7 @@ public class Browser extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, "administration.metadata_editor");
+    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
     if (parentId != null) {
       SimpleDescriptionObject parentSDO = BrowserHelper.getSimpleDescriptionObject(parentId);
       UserUtility.checkObjectModifyPermissions(user, parentSDO);
@@ -395,7 +413,7 @@ public class Browser extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "Browser", "createAIP", aip.getId(), duration, "parentId", parentId);
+    registerAction(user, BROWSER_COMPONENT, "createAIP", aip.getId(), duration, "parentId", parentId);
 
     return aip;
   }
@@ -405,7 +423,7 @@ public class Browser extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, "administration.metadata_editor");
+    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
     SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(aipId);
     UserUtility.checkObjectModifyPermissions(user, sdo);
 
@@ -414,126 +432,126 @@ public class Browser extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "Browser", "removeAIP", aipId, duration);
+    registerAction(user, BROWSER_COMPONENT, "removeAIP", aipId, duration);
   }
 
-  public static DescriptiveMetadata createDescriptiveMetadataFile(RodaUser user, String aipId,
-    String descriptiveMetadataId, String descriptiveMetadataType, Binary descriptiveMetadataIdBinary)
+  public static DescriptiveMetadata createDescriptiveMetadataFile(RodaUser user, String aipId, String metadataId,
+    String metadataType, Binary metadataBinary)
       throws AuthorizationDeniedException, GenericException, ValidationException, NotFoundException {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, "administration.metadata_editor");
+    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
     SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(aipId);
     UserUtility.checkObjectModifyPermissions(user, sdo);
 
     // delegate
-    DescriptiveMetadata ret = BrowserHelper.createDescriptiveMetadataFile(aipId, descriptiveMetadataId,
-      descriptiveMetadataType, descriptiveMetadataIdBinary);
+    DescriptiveMetadata ret = BrowserHelper.createDescriptiveMetadataFile(aipId, metadataId, metadataType,
+      metadataBinary);
 
     // register action
     long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "Browser", "createDescriptiveMetadataFile", sdo.getId(), duration, "aipId", aipId,
-      "descriptiveMetadataId", descriptiveMetadataId);
+    registerAction(user, BROWSER_COMPONENT, "createDescriptiveMetadataFile", sdo.getId(), duration, AIP_ID_PARAM, aipId,
+      METADATA_ID_PARAM, metadataId);
 
     return ret;
   }
 
-  public static DescriptiveMetadata updateDescriptiveMetadataFile(RodaUser user, String aipId,
-    String descriptiveMetadataId, String descriptiveMetadataType, Binary descriptiveMetadataIdBinary)
+  public static DescriptiveMetadata updateDescriptiveMetadataFile(RodaUser user, String aipId, String metadataId,
+    String metadataType, Binary metadataBinary)
       throws AuthorizationDeniedException, GenericException, ValidationException, NotFoundException {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, "administration.metadata_editor");
+    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
     SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(aipId);
     UserUtility.checkObjectModifyPermissions(user, sdo);
 
     // delegate
-    DescriptiveMetadata ret = BrowserHelper.updateDescriptiveMetadataFile(aipId, descriptiveMetadataId,
-      descriptiveMetadataType, descriptiveMetadataIdBinary);
+    DescriptiveMetadata ret = BrowserHelper.updateDescriptiveMetadataFile(aipId, metadataId, metadataType,
+      metadataBinary);
 
     // register action
     long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "Browser", "editDescriptiveMetadataFile", aipId, duration, "aipId", aipId,
-      "descriptiveMetadataId", descriptiveMetadataId);
+    registerAction(user, BROWSER_COMPONENT, "editDescriptiveMetadataFile", aipId, duration, AIP_ID_PARAM, aipId,
+      METADATA_ID_PARAM, metadataId);
 
     return ret;
   }
 
-  public static void removeDescriptiveMetadataFile(RodaUser user, String itemId, String descriptiveMetadataId)
+  public static void removeDescriptiveMetadataFile(RodaUser user, String aipId, String metadataId)
     throws AuthorizationDeniedException, GenericException, NotFoundException {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, "administration.metadata_editor");
-    SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(itemId);
+    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+    SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(aipId);
     UserUtility.checkObjectModifyPermissions(user, sdo);
 
     // delegate
-    BrowserHelper.removeDescriptiveMetadataFile(itemId, descriptiveMetadataId);
+    BrowserHelper.removeDescriptiveMetadataFile(aipId, metadataId);
 
     // register action
     long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "Browser", "removeMetadataFile", sdo.getId(), duration, "itemId", itemId,
-      "descriptiveMetadataId", descriptiveMetadataId);
+    registerAction(user, BROWSER_COMPONENT, "removeMetadataFile", sdo.getId(), duration, AIP_ID_PARAM, aipId,
+      METADATA_ID_PARAM, metadataId);
   }
 
-  public static DescriptiveMetadata retrieveMetadataFile(RodaUser user, String itemId, String descriptiveMetadataId)
+  public static DescriptiveMetadata retrieveMetadataFile(RodaUser user, String aipId, String metadataId)
     throws AuthorizationDeniedException, GenericException, NotFoundException {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, "administration.metadata_editor");
-    SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(itemId);
+    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+    SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(aipId);
     UserUtility.checkObjectModifyPermissions(user, sdo);
 
     // delegate
-    DescriptiveMetadata dm = BrowserHelper.retrieveMetadataFile(itemId, descriptiveMetadataId);
+    DescriptiveMetadata dm = BrowserHelper.retrieveMetadataFile(aipId, metadataId);
 
     // register action
     long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "Browser", "retrieveMetadataFile", itemId, duration, "itemId", itemId, "descriptiveMetadataId",
-      descriptiveMetadataId);
+    registerAction(user, BROWSER_COMPONENT, "retrieveMetadataFile", aipId, duration, AIP_ID_PARAM, aipId,
+      METADATA_ID_PARAM, metadataId);
 
     return dm;
   }
 
-  public static void removeRepresentation(RodaUser user, String itemId, String representationId)
+  public static void removeRepresentation(RodaUser user, String aipId, String representationId)
     throws AuthorizationDeniedException, GenericException, NotFoundException {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, "administration.metadata_editor");
-    SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(itemId);
+    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+    SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(aipId);
     UserUtility.checkObjectModifyPermissions(user, sdo);
 
     // delegate
-    BrowserHelper.removeRepresentation(itemId, representationId);
+    BrowserHelper.removeRepresentation(aipId, representationId);
 
     // register action
     long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "Browser", "removeRepresentation", sdo.getId(), duration, "itemId", itemId, "representationId",
-      representationId);
+    registerAction(user, BROWSER_COMPONENT, "removeRepresentation", sdo.getId(), duration, AIP_ID_PARAM, aipId,
+      REPRESENTATION_ID_PARAM, representationId);
 
   }
 
-  public static void removeRepresentationFile(RodaUser user, String itemId, String representationId, String fileId)
+  public static void removeRepresentationFile(RodaUser user, String aipId, String representationId, String fileId)
     throws AuthorizationDeniedException, GenericException, NotFoundException {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, "administration.metadata_editor");
-    SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(itemId);
+    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+    SimpleDescriptionObject sdo = BrowserHelper.getSimpleDescriptionObject(aipId);
     UserUtility.checkObjectModifyPermissions(user, sdo);
 
     // delegate
-    BrowserHelper.removeRepresentationFile(itemId, representationId, fileId);
+    BrowserHelper.removeRepresentationFile(aipId, representationId, fileId);
 
     // register action
     long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "Browser", "removeRepresentationFile", sdo.getId(), duration, "itemId", itemId,
-      "representationId", representationId, "fileId", fileId);
+    registerAction(user, BROWSER_COMPONENT, "removeRepresentationFile", sdo.getId(), duration, AIP_ID_PARAM, aipId,
+      REPRESENTATION_ID_PARAM, representationId, FILE_ID_PARAM, fileId);
   }
 
   public static StreamResponse getAipRepresentationFile(RodaUser user, String aipId, String representationId,
@@ -554,8 +572,8 @@ public class Browser extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, "Browser", "getAipRepresentationFile", aipId, duration, "representationId", representationId,
-      "fileId", fileId);
+    registerAction(user, BROWSER_COMPONENT, "getAipRepresentationFile", aipId, duration, REPRESENTATION_ID_PARAM,
+      representationId, FILE_ID_PARAM, fileId);
 
     return aipRepresentationFile;
   }
@@ -574,8 +592,8 @@ public class Browser extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, "Browser", "putDescriptiveMetadataFile", aipId, duration, "aip", aipId, "metadataId",
-      metadataId);
+    registerAction(user, BROWSER_COMPONENT, "putDescriptiveMetadataFile", aipId, duration, AIP_ID_PARAM, aipId,
+      METADATA_ID_PARAM, metadataId);
 
   }
 
@@ -593,8 +611,8 @@ public class Browser extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, "Browser", "postDescriptiveMetadataFile", aipId, duration, "aip", aipId, "metadataId",
-      metadataId);
+    registerAction(user, BROWSER_COMPONENT, "postDescriptiveMetadataFile", aipId, duration, AIP_ID_PARAM, aipId,
+      METADATA_ID_PARAM, metadataId);
 
   }
 

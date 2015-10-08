@@ -27,8 +27,8 @@ import org.roda.storage.StorageServiceException;
 import org.roda.storage.fs.FileStorageService;
 
 public class AntivirusAction implements Plugin<AIP> {
-  private final Logger logger = Logger.getLogger(getClass());
-  String antiVirusClassName;
+  private static final Logger LOGGER = Logger.getLogger(AntivirusAction.class);
+  private String antiVirusClassName;
   private AntiVirus antiVirus = null;
 
   @Override
@@ -37,19 +37,19 @@ public class AntivirusAction implements Plugin<AIP> {
       if (parameter.getName().equalsIgnoreCase("antivirusClassName")) {
         try {
           antiVirusClassName = parameter.getValue();
-          logger.info("Loading antivirus class " + antiVirusClassName); //$NON-NLS-1$
+          LOGGER.info("Loading antivirus class " + antiVirusClassName); //$NON-NLS-1$
           setAntiVirus((AntiVirus) Class.forName(antiVirusClassName).newInstance());
-          logger.info("Using antivirus " + getAntiVirus().getClass().getName());
+          LOGGER.info("Using antivirus " + getAntiVirus().getClass().getName());
         } catch (ClassNotFoundException e) {
-          logger.warn("Antivirus class " + antiVirusClassName //$NON-NLS-1$
+          LOGGER.warn("Antivirus class " + antiVirusClassName //$NON-NLS-1$
             + " not found - " + e.getMessage()); //$NON-NLS-1$
         } catch (InstantiationException e) {
           // not possible to create a new instance of the class
-          logger.warn("Antivirus class " + antiVirusClassName //$NON-NLS-1$
+          LOGGER.warn("Antivirus class " + antiVirusClassName //$NON-NLS-1$
             + " instantiation exception - " + e.getMessage()); //$NON-NLS-1$
         } catch (IllegalAccessException e) {
           // not possible to create a new instance of the class
-          logger.warn("Antivirus class " + antiVirusClassName //$NON-NLS-1$
+          LOGGER.warn("Antivirus class " + antiVirusClassName //$NON-NLS-1$
             + " illegal access exception - " + e.getMessage()); //$NON-NLS-1$
         }
       }
@@ -57,11 +57,11 @@ public class AntivirusAction implements Plugin<AIP> {
 
     if (getAntiVirus() == null) {
       setAntiVirus(new AVGAntiVirus());
-      logger.info("Using default antivirus " //$NON-NLS-1$
+      LOGGER.info("Using default antivirus " //$NON-NLS-1$
         + getAntiVirus().getClass().getName());
     }
 
-    logger.info("init OK"); //$NON-NLS-1$
+    LOGGER.info("init OK"); //$NON-NLS-1$
   }
 
   @Override
@@ -111,23 +111,23 @@ public class AntivirusAction implements Plugin<AIP> {
         VirusCheckResult virusCheckResult = null;
         try {
           virusCheckResult = getAntiVirus().checkForVirus(p);
-          logger.debug("AIP " + aip.getId() + " is clean: " + virusCheckResult.isClean());
-          logger.debug("AIP " + aip.getId() + " virus check report: " + virusCheckResult.getReport());
+          LOGGER.debug("AIP " + aip.getId() + " is clean: " + virusCheckResult.isClean());
+          LOGGER.debug("AIP " + aip.getId() + " virus check report: " + virusCheckResult.getReport());
         } catch (RuntimeException e) {
-          logger.debug("Exception running virus check on AIP " + aip.getId() //$NON-NLS-1$
+          LOGGER.debug("Exception running virus check on AIP " + aip.getId() //$NON-NLS-1$
             + " - " + e.getMessage(), e); //$NON-NLS-1$
           throw new PluginException("Exception running virus check on AIP " + aip.getId() //$NON-NLS-1$
             + " - " + e.getMessage(), e); //$NON-NLS-1$
         }
       } catch (StorageServiceException e) {
-        logger.error("Error processing AIP " + aip.getId(), e);
+        LOGGER.error("Error processing AIP " + aip.getId(), e);
       } catch (IOException e) {
-        logger.error("Error creating temp folder for AIP " + aip.getId(), e);
+        LOGGER.error("Error creating temp folder for AIP " + aip.getId(), e);
       } finally {
         try {
           storage.deleteResource(ModelUtils.getAIPpath(aip.getId()));
         } catch (StorageServiceException e) {
-          logger.error("Error removing temp storage", e);
+          LOGGER.error("Error removing temp storage", e);
         }
       }
     }

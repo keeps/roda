@@ -3,7 +3,6 @@ package org.roda.action.ingest.bagit.utils;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -103,8 +102,7 @@ public class BagitUtils {
     return data;
   }
 
-  private static void generateMetadataFile(Path metadataFile, BagInfoTxt bagInfoTxt)
-    throws UnsupportedEncodingException, IOException {
+  private static void generateMetadataFile(Path metadataFile, BagInfoTxt bagInfoTxt) throws IOException {
     StringWriter sw = new StringWriter();
     sw.append("<metadata>");
     for (Map.Entry<String, String> entry : bagInfoTxt.entrySet()) {
