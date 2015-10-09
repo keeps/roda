@@ -534,6 +534,7 @@ public class Browse extends Composite {
     final AsyncCallback<SafeHtml> callback) {
     String uri = RestUtils.createDescriptiveMetadataHTMLUri(aipId, descId);
     RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, uri);
+    requestBuilder.setHeader("Authorization", "Custom");
     try {
       requestBuilder.sendRequest(null, new RequestCallback() {
 
@@ -601,6 +602,7 @@ public class Browse extends Composite {
     final AsyncCallback<SafeHtml> callback) {
     String uri = RestUtils.createPreservationMetadataHTMLUri(aipId, repId, 0, 10, 0, 10, 0, 10);
     RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, uri);
+    requestBuilder.setHeader("Authorization", "Custom");
     try {
       requestBuilder.sendRequest(null, new RequestCallback() {
 

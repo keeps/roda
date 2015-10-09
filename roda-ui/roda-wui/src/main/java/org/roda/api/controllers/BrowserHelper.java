@@ -137,7 +137,8 @@ public class BrowserHelper {
         DescriptiveMetadataViewBundle bundle = new DescriptiveMetadataViewBundle();
         bundle.setId(descriptiveMetadata.getId());
         try {
-          bundle.setLabel(messages.getTranslation(descriptiveMetadata.getId()));
+          bundle.setLabel(messages
+            .getTranslation(RodaConstants.I18N_CROSSWALKS_DISSEMINATION_HTML_PREFIX + descriptiveMetadata.getId()));
         } catch (MissingResourceException e) {
           bundle.setLabel(descriptiveMetadata.getId());
         }
