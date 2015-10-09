@@ -1,22 +1,5 @@
 package org.roda.core.metadata.mets;
 
-import gov.loc.mets.AmdSecType;
-import gov.loc.mets.DivType;
-import gov.loc.mets.DivType.Fptr;
-import gov.loc.mets.FileType;
-import gov.loc.mets.FileType.CHECKSUMTYPE;
-import gov.loc.mets.FileType.FLocat;
-import gov.loc.mets.MdSecType;
-import gov.loc.mets.MdSecType.MdRef;
-import gov.loc.mets.MdSecType.MdRef.LOCTYPE;
-import gov.loc.mets.MdSecType.MdRef.MDTYPE;
-import gov.loc.mets.MetsDocument;
-import gov.loc.mets.MetsType.FileSec;
-import gov.loc.mets.MetsType.FileSec.FileGrp;
-import gov.loc.mets.MetsType.MetsHdr;
-import gov.loc.mets.MetsType.MetsHdr.Agent;
-import gov.loc.mets.StructMapType;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -36,15 +19,32 @@ import org.apache.xmlbeans.XmlError;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
-import org.roda.core.data.AgentPreservationObject;
-import org.roda.core.data.EventPreservationObject;
 import org.roda.core.data.RepresentationFile;
 import org.roda.core.data.RepresentationObject;
-import org.roda.core.data.RepresentationPreservationObject;
-import org.roda.core.data.preservation.RepresentationFilePreservationObject;
+import org.roda.core.data.v2.AgentPreservationObject;
+import org.roda.core.data.v2.EventPreservationObject;
+import org.roda.core.data.v2.RepresentationFilePreservationObject;
+import org.roda.core.data.v2.RepresentationPreservationObject;
 import org.roda.core.metadata.premis.PremisMetadataException;
 import org.roda.util.FileUtility;
 import org.roda.util.StringUtility;
+
+import gov.loc.mets.AmdSecType;
+import gov.loc.mets.DivType;
+import gov.loc.mets.DivType.Fptr;
+import gov.loc.mets.FileType;
+import gov.loc.mets.FileType.CHECKSUMTYPE;
+import gov.loc.mets.FileType.FLocat;
+import gov.loc.mets.MdSecType;
+import gov.loc.mets.MdSecType.MdRef;
+import gov.loc.mets.MdSecType.MdRef.LOCTYPE;
+import gov.loc.mets.MdSecType.MdRef.MDTYPE;
+import gov.loc.mets.MetsDocument;
+import gov.loc.mets.MetsType.FileSec;
+import gov.loc.mets.MetsType.FileSec.FileGrp;
+import gov.loc.mets.MetsType.MetsHdr;
+import gov.loc.mets.MetsType.MetsHdr.Agent;
+import gov.loc.mets.StructMapType;
 
 /**
  * Helper class to read and write a SIP METS file.
@@ -76,8 +76,8 @@ public class SIPMetsHelper extends MetsHelper {
    * @throws MetsMetadataException
    *           if the METS XML document is invalid.
    */
-  public static SIPMetsHelper newInstance(File metsFile) throws MetsMetadataException, FileNotFoundException,
-    IOException {
+  public static SIPMetsHelper newInstance(File metsFile)
+    throws MetsMetadataException, FileNotFoundException, IOException {
     FileInputStream metsInputStream = new FileInputStream(metsFile);
     SIPMetsHelper instance = newInstance(metsInputStream);
     metsInputStream.close();
@@ -602,8 +602,9 @@ public class SIPMetsHelper extends MetsHelper {
    *          the {@link MdSecType} ID.
    * 
    * @return a {@link of the representation.} of a PREMIS file with the
-   *         representation preservation object or
-   *         <code>null<code> if the representation doesn't exist or if it doesn't have preservation metadata.
+   *         representation preservation object or <code>null<code> if the
+   *         representation doesn't exist or if it doesn't have preservation
+   *         metadata.
    */
   public MdSecType getRepresentationPreservationObjectMdSec(String rpoMdSecID) {
     return getDigiprovMD(rpoMdSecID);
@@ -748,7 +749,7 @@ public class SIPMetsHelper extends MetsHelper {
   public MdSecType addRepresentationPreservationObject(RepresentationPreservationObject rpo, File rpoFile,
     RepresentationObject ro) throws MetsMetadataException {
 
-    String rpoMdSecID = "PREMIS-" + rpo.getID();
+    String rpoMdSecID = "PREMIS-" + rpo.getId();
 
     AmdSecType objectsAmdSec = getAmdSec(AMDSEC_ID_OBJECT);
     if (objectsAmdSec == null) {
@@ -781,7 +782,7 @@ public class SIPMetsHelper extends MetsHelper {
     newMdRef.setHref(rpoFile.getParentFile().getName() + File.separator + rpoFile.getName());
 
     if (ro == null) {
-      logger.debug("RPO " + rpo.getID() + " doesn't have a representation div");
+      logger.debug("RPO " + rpo.getId() + " doesn't have a representation div");
     } else {
 
       DivType representationDiv = getRepresentationDiv(ro.getId());
@@ -813,7 +814,7 @@ public class SIPMetsHelper extends MetsHelper {
   public MdSecType addRepresentationFilePreservationObject(RepresentationPreservationObject rpo,
     RepresentationFilePreservationObject rfpo, File rfpoFile) {
 
-    String rpoMdSecID = "PREMIS-" + rpo.getID();
+    String rpoMdSecID = "PREMIS-" + rpo.getId();
     String rfpoMdSecID = rpoMdSecID + "-" + rfpo.getID();
 
     AmdSecType objectsAmdSec = getAmdSec(AMDSEC_ID_OBJECT);
@@ -859,8 +860,10 @@ public class SIPMetsHelper extends MetsHelper {
   public MdSecType addEventPreservationObject(RepresentationPreservationObject rpo, EventPreservationObject epo,
     File epoFile) {
 
-    String rpoMdSecID = "PREMIS-" + rpo.getID();
-    String epoMdSecID = "PREMIS-" + epo.getID();
+    String rpoMdSecID = "PREMIS-" + rpo.getId();
+    // FIXME
+    // String epoMdSecID = "PREMIS-" + epo.getID();
+    String epoMdSecID = "PREMIS-";
     String apoMdSecID = "PREMIS-" + epo.getAgentID();
 
     AmdSecType eventsAmdSec = getAmdSec(AMDSEC_ID_EVENT);
@@ -903,12 +906,13 @@ public class SIPMetsHelper extends MetsHelper {
    * 
    * @throws PremisMetadataException
    */
-  public MdSecType addAgentPreservationObject(AgentPreservationObject apo, File apoFile) throws PremisMetadataException {
+  public MdSecType addAgentPreservationObject(AgentPreservationObject apo, File apoFile)
+    throws PremisMetadataException {
 
-    String apoMdSecID = "PREMIS-" + apo.getID();
+    String apoMdSecID = "PREMIS-" + apo.getId();
 
     if (getAgentMdSec(apoMdSecID) != null) {
-      throw new PremisMetadataException("Agent with ID " + apo.getID() //$NON-NLS-1$
+      throw new PremisMetadataException("Agent with ID " + apo.getId() //$NON-NLS-1$
         + " already exists"); //$NON-NLS-1$
     }
 
@@ -1013,7 +1017,8 @@ public class SIPMetsHelper extends MetsHelper {
 
     DivType div = representationsDiv.addNewDiv();
     div.setID(rObject.getLabel());
-    div.setTYPE(rObject.getContentModel());
+    // FIXME
+    // div.setTYPE(rObject.getContentModel());
     div.setDMDID(Arrays.asList(new String[] {dmdSec.getID()}));
     div.setLabel(StringUtility.join(rObject.getStatuses(), ",")); //$NON-NLS-1$
 

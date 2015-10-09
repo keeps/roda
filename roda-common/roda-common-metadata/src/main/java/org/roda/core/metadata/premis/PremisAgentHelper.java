@@ -7,17 +7,17 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import lc.xmlns.premisV2.AgentComplexType;
-import lc.xmlns.premisV2.AgentDocument;
-import lc.xmlns.premisV2.AgentIdentifierComplexType;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
-import org.roda.core.data.AgentPreservationObject;
-import org.roda.core.data.RODAObject;
+import org.roda.core.data.v2.AgentPreservationObject;
+import org.roda.core.data.v2.RODAObject;
 import org.roda.core.metadata.MetadataException;
 import org.roda.core.metadata.MetadataHelperUtility;
+
+import lc.xmlns.premisV2.AgentComplexType;
+import lc.xmlns.premisV2.AgentDocument;
+import lc.xmlns.premisV2.AgentIdentifierComplexType;
 
 /**
  * @author Rui Castro
@@ -44,8 +44,8 @@ public class PremisAgentHelper {
    * @throws PremisMetadataException
    *           if the PREMIS XML document is invalid.
    */
-  public static PremisAgentHelper newInstance(File premisFile) throws PremisMetadataException, FileNotFoundException,
-    IOException {
+  public static PremisAgentHelper newInstance(File premisFile)
+    throws PremisMetadataException, FileNotFoundException, IOException {
     FileInputStream premisInputStream = new FileInputStream(premisFile);
     PremisAgentHelper instance = newInstance(premisInputStream);
     premisInputStream.close();
@@ -67,8 +67,8 @@ public class PremisAgentHelper {
    * @throws PremisMetadataException
    *           if the PREMIS XML document is invalid.
    */
-  public static PremisAgentHelper newInstance(InputStream premisInputStream) throws PremisMetadataException,
-    IOException {
+  public static PremisAgentHelper newInstance(InputStream premisInputStream)
+    throws PremisMetadataException, IOException {
 
     try {
 
@@ -153,7 +153,7 @@ public class PremisAgentHelper {
     if (getAgent().getAgentIdentifierList() != null && getAgent().getAgentIdentifierList().size() > 0) {
 
       AgentIdentifierComplexType eventIdentifier = getAgent().getAgentIdentifierArray(0);
-      pObject.setID(eventIdentifier.getAgentIdentifierValue());
+      pObject.setId(eventIdentifier.getAgentIdentifierValue());
 
     } else {
       logger.warn("PREMIS Agent doesn't have an ID");
@@ -186,12 +186,12 @@ public class PremisAgentHelper {
     AgentPreservationObject agent = getAgentPreservationObject();
 
     // Copy the values from the RODAObject
-    agent.setPid(agentObject.getPid());
-    agent.setLabel(agentObject.getLabel());
-    agent.setContentModel(agentObject.getContentModel());
-    agent.setLastModifiedDate(agentObject.getLastModifiedDate());
-    agent.setCreatedDate(agentObject.getCreatedDate());
-    agent.setState(agentObject.getState());
+    // agent.setPid(agentObject.getPid());
+    // agent.setLabel(agentObject.getLabel());
+    // agent.setContentModel(agentObject.getContentModel());
+    // agent.setLastModifiedDate(agentObject.getLastModifiedDate());
+    // agent.setCreatedDate(agentObject.getCreatedDate());
+    // agent.setState(agentObject.getState());
 
     return agent;
   }
@@ -212,7 +212,7 @@ public class PremisAgentHelper {
     // <agentIdentifier>
     AgentIdentifierComplexType agentIdentifier = getAgent().addNewAgentIdentifier();
     agentIdentifier.setAgentIdentifierType(PremisHelper.premisIdentifierTypePID);
-    agentIdentifier.setAgentIdentifierValue(agentPObject.getID());
+    agentIdentifier.setAgentIdentifierValue(agentPObject.getId());
 
     // <agentName>
     if (!StringUtils.isBlank(agentPObject.getAgentName())) {

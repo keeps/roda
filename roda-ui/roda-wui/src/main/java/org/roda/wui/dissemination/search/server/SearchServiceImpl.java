@@ -92,6 +92,7 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
   }
 
   // FIXME see if there is a best way to deal with "hierarchical" keys
+  // FIXME deal with non-configured/badly-configured keys
   public List<SearchField> getSearchFields(String localeString) throws GenericException {
     List<SearchField> searchFields = new ArrayList<SearchField>();
     String fieldsNamesString = RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields");

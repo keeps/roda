@@ -3,8 +3,6 @@ package org.roda.core.data.v2;
 import java.util.Arrays;
 import java.util.Date;
 
-import org.roda.core.data.RODAMember;
-
 /**
  * This is a user of RODA.
  * 

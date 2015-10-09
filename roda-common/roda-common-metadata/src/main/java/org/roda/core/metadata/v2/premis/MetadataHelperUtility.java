@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlError;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
+import org.roda.core.metadata.MetadataException;
 
 /**
  * This is an utility class for metadata helpers.
@@ -77,8 +78,8 @@ public class MetadataHelperUtility {
    *           if {@link FileOutputStream} associated with the {@link File}
    *           couldn't be closed.
    */
-  public static void saveToFile(XmlObject xmlObject, File file) throws MetadataException, FileNotFoundException,
-    IOException {
+  public static void saveToFile(XmlObject xmlObject, File file)
+    throws MetadataException, FileNotFoundException, IOException {
 
     FileOutputStream fileOutputStream = new FileOutputStream(file);
     saveToOutputStream(xmlObject, fileOutputStream, true);

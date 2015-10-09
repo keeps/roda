@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.roda.core.common.WrongCModelException;
+import org.roda.core.data.v2.RODAObject;
 
 /**
  * This is a {@link RepresentationObject}. It contains the information about a
@@ -196,28 +196,31 @@ public class RepresentationObject extends SimpleRepresentationObject {
 
     int partFilesCount = (getPartFiles() != null) ? getPartFiles().length : 0;
 
-    return "RepresentationObject( " + super.toString() + ", rootFile=" + getRootFile() + ", partFiles="
-      + partFilesCount + " )";
+    return "RepresentationObject( " + super.toString() + ", rootFile=" + getRootFile() + ", partFiles=" + partFilesCount
+      + " )";
   }
 
   /**
    * @see RODAObject#setContentModel(String)
    */
   public void setContentModel(String contentModel) {
-    super.setContentModel(contentModel);
-
-    String[] names = getContentModel().split(":");
-    if (names.length < 3) {
-      throw new IllegalArgumentException(contentModel + " is not a valid contentModel for a representation");
-    } else {
-      if (!names[1].equalsIgnoreCase("r")) {
-        throw new WrongCModelException("contentModel should start with 'roda:r' (" + contentModel + ")");
-      } else {
-        // it's already set, by super.setCModel(contentModel)
-        // check that the type is supported
-
-      }
-    }
+    // FIXME
+    // super.setContentModel(contentModel);
+    //
+    // String[] names = getContentModel().split(":");
+    // if (names.length < 3) {
+    // throw new IllegalArgumentException(contentModel + " is not a valid
+    // contentModel for a representation");
+    // } else {
+    // if (!names[1].equalsIgnoreCase("r")) {
+    // throw new WrongCModelException("contentModel should start with 'roda:r'
+    // (" + contentModel + ")");
+    // } else {
+    // // it's already set, by super.setCModel(contentModel)
+    // // check that the type is supported
+    //
+    // }
+    // }
   }
 
   /**

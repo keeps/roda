@@ -104,7 +104,6 @@ public class SimpleDescriptionObject extends RODAObject {
   /**
    * @see RODAObject#toString()
    */
-  // @Override
   @Override
   public String toString() {
     return "SimpleDescriptionObject(" + super.toString() + ", " + "level=" + getLevel() + ", id=" + getId() + ", title="

@@ -9,9 +9,16 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.apache.xmlbeans.XmlException;
+import org.apache.xmlbeans.XmlObject;
+import org.roda.core.data.v2.Fixity;
+import org.roda.core.data.v2.RepresentationFilePreservationObject;
+import org.w3c.util.DateParser;
+
 import lc.xmlns.premisV2.ContentLocationComplexType;
 import lc.xmlns.premisV2.CreatingApplicationComplexType;
-import lc.xmlns.premisV2.EventDocument;
 import lc.xmlns.premisV2.ExtensionComplexType;
 import lc.xmlns.premisV2.File;
 import lc.xmlns.premisV2.FixityComplexType;
@@ -24,14 +31,6 @@ import lc.xmlns.premisV2.ObjectIdentifierComplexType;
 import lc.xmlns.premisV2.OriginalNameComplexType;
 import lc.xmlns.premisV2.PreservationLevelComplexType;
 import lc.xmlns.premisV2.StorageComplexType;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.apache.xmlbeans.XmlException;
-import org.apache.xmlbeans.XmlObject;
-import org.roda.core.data.preservation.Fixity;
-import org.roda.core.data.preservation.RepresentationFilePreservationObject;
-import org.w3c.util.DateParser;
 
 /**
  * @author Rui Castro
@@ -56,8 +55,8 @@ public class PremisFileObjectHelper extends PremisObjectHelper {
    * @throws PremisMetadataException
    *           if the PREMIS XML document is invalid.
    */
-  public static PremisFileObjectHelper newInstance(java.io.File premisFile) throws PremisMetadataException,
-    FileNotFoundException, IOException {
+  public static PremisFileObjectHelper newInstance(java.io.File premisFile)
+    throws PremisMetadataException, FileNotFoundException, IOException {
     FileInputStream premisInputStream = new FileInputStream(premisFile);
     PremisFileObjectHelper instance = newInstance(premisInputStream);
     premisInputStream.close();
@@ -79,8 +78,8 @@ public class PremisFileObjectHelper extends PremisObjectHelper {
    * @throws PremisMetadataException
    *           if the PREMIS XML document is invalid.
    */
-  public static PremisFileObjectHelper newInstance(InputStream premisInputStream) throws PremisMetadataException,
-    IOException {
+  public static PremisFileObjectHelper newInstance(InputStream premisInputStream)
+    throws PremisMetadataException, IOException {
 
     try {
 
@@ -260,11 +259,12 @@ public class PremisFileObjectHelper extends PremisObjectHelper {
       List<Fixity> fixities = new ArrayList<Fixity>();
 
       for (FixityComplexType fixity : characteristics.getFixityList()) {
-        fixities.add(new Fixity(fixity.getMessageDigestAlgorithm(), fixity.getMessageDigest(), fixity
-          .getMessageDigestOriginator()));
+        fixities.add(new Fixity(fixity.getMessageDigestAlgorithm(), fixity.getMessageDigest(),
+          fixity.getMessageDigestOriginator()));
       }
 
-      pObject.setFixities(fixities.toArray(new Fixity[fixities.size()]));
+      // FIXME
+      // pObject.setFixities(fixities.toArray(new Fixity[fixities.size()]));
     }
 
     // <size>
@@ -290,7 +290,8 @@ public class PremisFileObjectHelper extends PremisObjectHelper {
     }
 
     // <creatingApplication>
-    if (characteristics.getCreatingApplicationList() != null && characteristics.getCreatingApplicationList().size() > 0) {
+    if (characteristics.getCreatingApplicationList() != null
+      && characteristics.getCreatingApplicationList().size() > 0) {
 
       CreatingApplicationComplexType creatingApplication = characteristics.getCreatingApplicationArray(0);
 
@@ -317,20 +318,22 @@ public class PremisFileObjectHelper extends PremisObjectHelper {
     objectCharacteristics.setCompositionLevel(BigInteger.valueOf(filePObject.getCompositionLevel()));
 
     // <fixity>
-    if (filePObject.getFixities() != null) {
-
-      for (Fixity fixity : filePObject.getFixities()) {
-
-        FixityComplexType fixityComplexType = objectCharacteristics.addNewFixity();
-
-        fixityComplexType.setMessageDigestAlgorithm(fixity.getMessageDigestAlgorithm());
-        fixityComplexType.setMessageDigest(fixity.getMessageDigest());
-
-        if (!StringUtils.isBlank(fixity.getMessageDigestOriginator())) {
-          fixityComplexType.setMessageDigestOriginator(fixity.getMessageDigestOriginator());
-        }
-      }
-    }
+    // FIXME
+    // if (filePObject.getFixities() != null) {
+    //
+    // for (Fixity fixity : filePObject.getFixities()) {
+    //
+    // FixityComplexType fixityComplexType =
+    // objectCharacteristics.addNewFixity();
+    //
+    // fixityComplexType.setMessageDigestAlgorithm(fixity.getMessageDigestAlgorithm());
+    // fixityComplexType.setMessageDigest(fixity.getMessageDigest());
+    //
+    // if (!StringUtils.isBlank(fixity.getMessageDigestOriginator())) {
+    // fixityComplexType.setMessageDigestOriginator(fixity.getMessageDigestOriginator());
+    // }
+    // }
+    // }
 
     // <size>
     objectCharacteristics.setSize(filePObject.getSize());

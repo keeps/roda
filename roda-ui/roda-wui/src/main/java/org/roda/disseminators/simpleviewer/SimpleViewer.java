@@ -27,8 +27,8 @@ import org.roda.disseminators.common.cache.CacheController;
 public class SimpleViewer extends HttpServlet implements Servlet {
 
   /**
-	 * 
-	 */
+   * 
+   */
   private static final long serialVersionUID = 1L;
 
   /**
@@ -208,9 +208,10 @@ public class SimpleViewer extends HttpServlet implements Servlet {
 
     logger.debug("Sending index of " + rep);
 
-    InputStream indexTemplate = SimpleViewer.class.getClassLoader().getResourceAsStream(
-      "/org/roda/disseminators/simpleviewer/index.html");
-    String galleryURL = cacheURL + rep.getPid() + "/" + DISSEMINATOR_NAME + "/F0.xml";
+    InputStream indexTemplate = SimpleViewer.class.getClassLoader()
+      .getResourceAsStream("/org/roda/disseminators/simpleviewer/index.html");
+    // String galleryURL = cacheURL + rep.getPid() + "/" + DISSEMINATOR_NAME +
+    // "/F0.xml";
     String index = new String(StreamUtils.getBytes(indexTemplate));
 
     // String title;

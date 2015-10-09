@@ -146,7 +146,9 @@ public class DescriptionElement implements SourcesChangeEvents {
   }
 
   private EadCValue getValue() {
-    return object.getValue(element);
+    // FIXME
+    // return object.getValue(element);
+    return null;
   }
 
   private void setValue(EadCValue value) {
@@ -232,7 +234,7 @@ public class DescriptionElement implements SourcesChangeEvents {
     } else if (mode.equals(EditMode.ARRANGEMENT_TABLE)) {
       ret = new ArrangementTableEditor();
     } else if (mode.equals(EditMode.LEVEL)) {
-      ret = new ElementLevelEditor(object.getPid());
+      ret = new ElementLevelEditor(object.getId());
     } else if (mode.equals(EditMode.NOTES)) {
       ret = new NotesEditor();
     } else if (mode.equals(EditMode.PHYSDESC_GENREFORM)) {
@@ -322,8 +324,8 @@ public class DescriptionElement implements SourcesChangeEvents {
         ret = languagesLayout;
       } else if (value instanceof PhysdescElement) {
         PhysdescElement physdescElement = (PhysdescElement) value;
-        Label physdescElementWidget = new Label(physdescElement.getValue() + " "
-          + (physdescElement.getUnit() != null ? physdescElement.getUnit() : ""));
+        Label physdescElementWidget = new Label(
+          physdescElement.getValue() + " " + (physdescElement.getUnit() != null ? physdescElement.getUnit() : ""));
         ret = physdescElementWidget;
       } else if (value instanceof PhysdescGenreform) {
         ret = PhysDescGenreformEditor.getReadonlyWidget(value);

@@ -41,10 +41,10 @@ public class Fixity implements Serializable {
     setMessageDigestOriginator(messageDigestOriginator);
   }
 
-  @Override
-  protected Object clone() {
-    return new Fixity(this);
-  }
+  // @Override
+  // protected Object clone() {
+  // return new Fixity(this);
+  // }
 
   /**
    * @param obj
@@ -59,8 +59,8 @@ public class Fixity implements Serializable {
     if (obj != null && obj instanceof Fixity) {
       Fixity other = (Fixity) obj;
 
-      return (getMessageDigestAlgorithm() == other.getMessageDigestAlgorithm() || getMessageDigestAlgorithm().equals(
-        other.getMessageDigestAlgorithm()))
+      return (getMessageDigestAlgorithm() == other.getMessageDigestAlgorithm()
+        || getMessageDigestAlgorithm().equals(other.getMessageDigestAlgorithm()))
         && (getMessageDigest() == other.getMessageDigest() || getMessageDigest().equals(getMessageDigest()));
     } else {
       return false;

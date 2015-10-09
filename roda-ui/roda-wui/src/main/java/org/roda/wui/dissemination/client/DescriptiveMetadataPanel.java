@@ -122,7 +122,7 @@ public class DescriptiveMetadataPanel extends Composite implements SourcesChange
 
   public DescriptiveMetadataPanel(DescriptionObject descObj, boolean valuesAsHtml) {
     super();
-    this.pid = descObj.getPid();
+    this.pid = descObj.getId();
     this.descObj = descObj;
     this.valuesAsHtml = valuesAsHtml;
     layout = new VerticalPanel();
@@ -160,7 +160,7 @@ public class DescriptiveMetadataPanel extends Composite implements SourcesChange
 
         public void onSuccess(DescriptionObject obj) {
           descObj = obj;
-          descObj.setLevel(DescriptionLevelUtils.REPRESENTATION_DESCRIPTION_LEVELS.get(0));
+          descObj.setLevel(DescriptionLevelUtils.REPRESENTATION_DESCRIPTION_LEVELS.get(0).getLevel());
           postInit();
           callback.onSuccess(descObj);
         }
@@ -251,32 +251,44 @@ public class DescriptiveMetadataPanel extends Composite implements SourcesChange
 
   private DescriptionGroupPanel createIdentificationGroup() {
     DescriptionGroupPanel group = new DescriptionGroupPanel(constants.identificationGroupLabel(), descObj);
-    id = new DescriptionElement(descObj, DescriptionObject.ID, constants.reference(), true, valuesAsHtml);
-    DescriptionElement completeReference = new DescriptionElement(descObj, DescriptionObject.COMPLETE_REFERENCE,
-      constants.completeReference(), false, valuesAsHtml);
-
-    DescriptionElement handle = new DescriptionElement(descObj, DescriptionObject.HANDLE_URL, constants.handle(),
-      false, valuesAsHtml);
-
-    title = new DescriptionElement(descObj, DescriptionObject.TITLE, constants.title(), true, valuesAsHtml);
-
-    abstractNote = new DescriptionElement(descObj, DescriptionObject.ABSTRACT, constants.abstractNote(), false,
-      valuesAsHtml);
-
-    level = new DescriptionElement(descObj, DescriptionObject.LEVEL, constants.level(), true, valuesAsHtml);
-
-    dateInitial = new DescriptionElement(descObj, DescriptionObject.DATE_INITIAL, constants.dateInitial(), true,
-      valuesAsHtml);
-    dateFinal = new DescriptionElement(descObj, DescriptionObject.DATE_FINAL, constants.dateFinal(), true, valuesAsHtml);
-
-    DescriptionElement countryCode = new DescriptionElement(descObj, DescriptionObject.COUNTRYCODE,
-      constants.countryCode(), true, valuesAsHtml);
-
-    DescriptionElement repositoryCode = new DescriptionElement(descObj, DescriptionObject.REPOSITORYCODE,
-      constants.repositoryCode(), true, valuesAsHtml);
-
-    DescriptionElement origination = new DescriptionElement(descObj, DescriptionObject.ORIGINATION,
-      constants.origination(), true, valuesAsHtml);
+    // id = new DescriptionElement(descObj, DescriptionObject.ID,
+    // constants.reference(), true, valuesAsHtml);
+    // DescriptionElement completeReference = new DescriptionElement(descObj,
+    // DescriptionObject.COMPLETE_REFERENCE,
+    // constants.completeReference(), false, valuesAsHtml);
+    //
+    // DescriptionElement handle = new DescriptionElement(descObj,
+    // DescriptionObject.HANDLE_URL, constants.handle(), false,
+    // valuesAsHtml);
+    //
+    // title = new DescriptionElement(descObj, DescriptionObject.TITLE,
+    // constants.title(), true, valuesAsHtml);
+    //
+    // abstractNote = new DescriptionElement(descObj,
+    // DescriptionObject.ABSTRACT, constants.abstractNote(), false,
+    // valuesAsHtml);
+    //
+    // level = new DescriptionElement(descObj, DescriptionObject.LEVEL,
+    // constants.level(), true, valuesAsHtml);
+    //
+    // dateInitial = new DescriptionElement(descObj,
+    // DescriptionObject.DATE_INITIAL, constants.dateInitial(), true,
+    // valuesAsHtml);
+    // dateFinal = new DescriptionElement(descObj, DescriptionObject.DATE_FINAL,
+    // constants.dateFinal(), true,
+    // valuesAsHtml);
+    //
+    // DescriptionElement countryCode = new DescriptionElement(descObj,
+    // DescriptionObject.COUNTRYCODE,
+    // constants.countryCode(), true, valuesAsHtml);
+    //
+    // DescriptionElement repositoryCode = new DescriptionElement(descObj,
+    // DescriptionObject.REPOSITORYCODE,
+    // constants.repositoryCode(), true, valuesAsHtml);
+    //
+    // DescriptionElement origination = new DescriptionElement(descObj,
+    // DescriptionObject.ORIGINATION,
+    // constants.origination(), true, valuesAsHtml);
 
     // DescriptionElement acqInfoNum = new DescriptionElement(descObj,
     // DescriptionObject.ACQINFO_NUM, constants.acqInfoNum(), false,
@@ -322,9 +334,9 @@ public class DescriptiveMetadataPanel extends Composite implements SourcesChange
     level.addEditMode(DescriptionElement.EditMode.LEVEL);
     dateInitial.addEditMode(DescriptionElement.EditMode.DATE);
     dateFinal.addEditMode(DescriptionElement.EditMode.DATE);
-    countryCode.addEditMode(DescriptionElement.EditMode.COUNTRYCODE);
-    repositoryCode.addEditMode(DescriptionElement.EditMode.TEXT_LINE);
-    origination.addEditMode(DescriptionElement.EditMode.TEXT_LINE);
+    // countryCode.addEditMode(DescriptionElement.EditMode.COUNTRYCODE);
+    // repositoryCode.addEditMode(DescriptionElement.EditMode.TEXT_LINE);
+    // origination.addEditMode(DescriptionElement.EditMode.TEXT_LINE);
     materialSpec.addEditMode(DescriptionElement.EditMode.MATERIAL_SPECS);
     physDescGenreform.addEditMode(DescriptionElement.EditMode.PHYSDESC_GENREFORM);
     physDesc.addEditMode(DescriptionElement.EditMode.TEXT_AREA);
@@ -337,16 +349,16 @@ public class DescriptiveMetadataPanel extends Composite implements SourcesChange
     prefercite.addEditMode(DescriptionElement.EditMode.TEXT_LINE);
 
     group.addElement(id);
-    group.addElement(completeReference);
-    group.addElement(handle);
-    group.addElement(title);
-    group.addElement(abstractNote);
-    group.addElement(level);
-    group.addElement(dateInitial);
-    group.addElement(dateFinal);
-    group.addElement(countryCode);
-    group.addElement(repositoryCode);
-    group.addElement(origination);
+    // group.addElement(completeReference);
+    // group.addElement(handle);
+    // group.addElement(title);
+    // group.addElement(abstractNote);
+    // group.addElement(level);
+    // group.addElement(dateInitial);
+    // group.addElement(dateFinal);
+    // group.addElement(countryCode);
+    // group.addElement(repositoryCode);
+    // group.addElement(origination);
     // group.addElement(acqInfoNum);
     // group.addElement(acqInfoDate);
     group.addElement(materialSpec);
@@ -531,8 +543,8 @@ public class DescriptiveMetadataPanel extends Composite implements SourcesChange
   private DescriptionGroupPanel createProcessInfoGroup() {
     DescriptionGroupPanel group = new DescriptionGroupPanel(constants.processInfoGroupLabel(), descObj);
 
-    DescriptionElement redaction = new DescriptionElement(descObj, DescriptionObject.PROCESSINFO,
-      constants.redaction(), false, valuesAsHtml);
+    DescriptionElement redaction = new DescriptionElement(descObj, DescriptionObject.PROCESSINFO, constants.redaction(),
+      false, valuesAsHtml);
 
     redaction.addEditMode(DescriptionElement.EditMode.PROCESS_INFO);
 

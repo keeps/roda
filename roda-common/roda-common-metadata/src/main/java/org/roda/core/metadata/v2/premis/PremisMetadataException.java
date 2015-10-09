@@ -1,5 +1,7 @@
 package org.roda.core.metadata.v2.premis;
 
+import org.roda.core.metadata.MetadataException;
+
 /**
  * Throw to indicate that an error related to PREMIS metadata.
  * 

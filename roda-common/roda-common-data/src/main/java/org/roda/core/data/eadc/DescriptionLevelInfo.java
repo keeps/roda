@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.roda.core.common.InvalidDescriptionLevel;
-import org.roda.core.data.SimpleDescriptionObject;
+import org.roda.core.data.v2.SimpleDescriptionObject;
 
 /**
  * This is information about the description level of a
@@ -52,7 +52,7 @@ public class DescriptionLevelInfo implements EadCValue, Serializable {
    * If the level {@link String} for some reason a special word in some context
    * (e.g. the word "class" it's exclusive for the Java language and therefore
    * one can't use it as an assessor keyword)
-   * */
+   */
   public String getLevelSanitized() {
     if (level.equals("class")) {
       return "class_";

@@ -2,10 +2,7 @@ package org.roda.core.metadata.premis;
 
 import java.util.Date;
 
-import org.roda.core.data.EventPreservationObject;
-import org.roda.core.data.RODAObject;
-import org.roda.core.metadata.premis.PremisEventHelper;
-import org.roda.core.metadata.premis.PremisMetadataException;
+import org.roda.core.data.v2.EventPreservationObject;
 
 public class PremisEventTest {
 
@@ -14,10 +11,11 @@ public class PremisEventTest {
    */
   public static void main(String[] args) {
 
-    EventPreservationObject eventPO = new EventPreservationObject(null, "roda:x", "roda:p:event", new Date(),
-      new Date(), RODAObject.STATE_ACTIVE);
+    EventPreservationObject eventPO = new EventPreservationObject();
+    // null, "roda:x", "roda:p:event", new Date(),
+    // new Date(), RODAObject.STATE_ACTIVE);
 
-    eventPO.setID("roda:ev");
+    eventPO.setId("roda:ev");
     eventPO.setEventType(EventPreservationObject.PRESERVATION_EVENT_TYPE_INGESTION);
     eventPO.setAgentID("roda:p:agent:007");
     eventPO.setAgentRole(EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_INGEST_TASK);

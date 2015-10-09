@@ -2,6 +2,9 @@ package org.roda.core.data;
 
 import java.util.Date;
 
+import org.roda.core.data.v2.PreservationObject;
+import org.roda.core.data.v2.RODAObject;
+
 /**
  * @author Rui Castro
  */
@@ -29,7 +32,8 @@ public class SimpleRepresentationPreservationObject extends PreservationObject {
    * @param ID
    */
   public SimpleRepresentationPreservationObject(RODAObject rObject, String ID) {
-    super(rObject, ID);
+    // FIXME
+    // super(rObject, ID);
     setType(TYPE);
   }
 
@@ -39,7 +43,8 @@ public class SimpleRepresentationPreservationObject extends PreservationObject {
    * @param simpleRPO
    */
   public SimpleRepresentationPreservationObject(SimpleRepresentationPreservationObject simpleRPO) {
-    super(simpleRPO);
+    // FIXME
+    // super(simpleRPO);
     setType(TYPE);
     setRepresentationObjectPID(simpleRPO.getRepresentationObjectPID());
   }
@@ -58,7 +63,8 @@ public class SimpleRepresentationPreservationObject extends PreservationObject {
    */
   public SimpleRepresentationPreservationObject(String pid, String label, String model, Date lastModifiedDate,
     Date createdDate, String state, String id) {
-    super(pid, label, model, lastModifiedDate, createdDate, state, id);
+    // FIXME
+    // super(pid, label, model, lastModifiedDate, createdDate, state, id);
     setType(TYPE);
   }
 
@@ -80,7 +86,7 @@ public class SimpleRepresentationPreservationObject extends PreservationObject {
    * @param ID
    */
   public void setID(String ID) {
-    super.setID(ID);
+    super.setId(ID);
     setLabel(ID);
   }
 

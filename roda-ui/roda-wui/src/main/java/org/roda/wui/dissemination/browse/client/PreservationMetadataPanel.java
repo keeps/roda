@@ -6,7 +6,7 @@ package org.roda.wui.dissemination.browse.client;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.roda.core.data.SimpleDescriptionObject;
+import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.widgets.LoadingPopup;
 import org.roda.wui.common.client.widgets.MessagePopup;
@@ -15,7 +15,6 @@ import org.roda.wui.dissemination.browse.client.TimelineInfo.Phase;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.Composite;
@@ -118,7 +117,7 @@ public class PreservationMetadataPanel extends Composite {
             timelineRender.setTimeUnit(DateTime.DAY(), DateTime.MONTH());
           } else if (unit.equals(TIME_UNIT_MONTH)) {
             timelineRender.setTimeUnit(DateTime.MONTH(), DateTime.YEAR());
-          } else /* unit == TIME_UNIT_YEAR */{
+          } else /* unit == TIME_UNIT_YEAR */ {
             timelineRender.setTimeUnit(DateTime.YEAR(), DateTime.DECADE());
           }
           update();
@@ -126,7 +125,7 @@ public class PreservationMetadataPanel extends Composite {
 
       });
 
-      BrowserService.Util.getInstance().getPreservationsInfo(sdo.getPid(), new AsyncCallback<List<PreservationInfo>>() {
+      BrowserService.Util.getInstance().getPreservationsInfo(sdo.getId(), new AsyncCallback<List<PreservationInfo>>() {
 
         public void onFailure(Throwable caught) {
           logger.error("Error getting representations info", caught);

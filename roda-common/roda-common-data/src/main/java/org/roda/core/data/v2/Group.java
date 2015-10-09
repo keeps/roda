@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.roda.core.data.RODAMember;
-
 /**
  * This is a group in RODA.
  * 

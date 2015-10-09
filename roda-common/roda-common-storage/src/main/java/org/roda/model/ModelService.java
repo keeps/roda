@@ -948,7 +948,7 @@ public class ModelService extends ModelObservable {
         apo.setAgentType(pah.getAgent().getAgentType());
         apo.setFileID(agentID);
         apo
-          .setID((pah.getAgent().getAgentIdentifierList() != null && pah.getAgent().getAgentIdentifierList().size() > 0)
+          .setId((pah.getAgent().getAgentIdentifierList() != null && pah.getAgent().getAgentIdentifierList().size() > 0)
             ? pah.getAgent().getAgentIdentifierList().get(0).getAgentIdentifierValue() : "");
         apo.setType(""); // TODO: ??????????
         return apo;

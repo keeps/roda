@@ -23,7 +23,6 @@ import org.roda.core.common.RODAException;
 import org.roda.core.common.UserManagementException;
 import org.roda.core.data.DescriptionObject;
 import org.roda.core.data.Producers;
-import org.roda.core.data.RODAObjectPermissions;
 import org.roda.core.data.RODAObjectUserPermissions;
 import org.roda.core.data.eadc.ArrangementTable;
 import org.roda.core.data.eadc.ArrangementTableGroup;
@@ -37,6 +36,7 @@ import org.roda.core.data.eadc.PhysdescElement;
 import org.roda.core.data.eadc.Text;
 import org.roda.core.data.v2.Group;
 import org.roda.core.data.v2.RODAMember;
+import org.roda.core.data.v2.RODAObjectPermissions;
 import org.roda.core.data.v2.User;
 import org.roda.wui.management.editor.client.EditorService;
 import org.roda.wui.management.editor.client.ObjectPermissions;
@@ -93,14 +93,16 @@ public class EditorServiceImpl extends RemoteServiceServlet implements EditorSer
     }
   }
 
-  private static final Set<String> skipEncodingElements = new HashSet<String>(Arrays.asList(new String[] {
-    DescriptionObject.COMPLETE_REFERENCE, DescriptionObject.HANDLE_URL}));
+  private static final Set<String> skipEncodingElements = new HashSet<String>(
+    Arrays.asList(new String[] {DescriptionObject.COMPLETE_REFERENCE, DescriptionObject.HANDLE_URL}));
 
   private void safeEncode(DescriptionObject object, String element) {
     logger.warn("Safe encoding " + element);
     if (!skipEncodingElements.contains(element)) {
 
-      EadCValue value = object.getValue(element);
+      // FIXME
+      // EadCValue value = object.getValue(element);
+      EadCValue value = null;
       if (value instanceof Text) {
         Text text = (Text) value;
         text.setText(safeEncode(text.getText()));
@@ -184,8 +186,9 @@ public class EditorServiceImpl extends RemoteServiceServlet implements EditorSer
     }
 
     DescriptionObject child = DEFAULT_DESCRIPTION_OBJECT;
-    child.setLevel(newLevel);
-    child.setParentPID(parentPID);
+    // FIXME
+    // child.setLevel(newLevel);
+    // child.setParentPID(parentPID);
 
     // try {
     // Editor editorService =
@@ -276,16 +279,18 @@ public class EditorServiceImpl extends RemoteServiceServlet implements EditorSer
 
   static {
     // Country code
-    controlledVoc.put(DescriptionObject.COUNTRYCODE, new String[] {"PT", "BR", "UK", "USA", "IT", "SP", "CZ"});
-    defaultValue.put(DescriptionObject.COUNTRYCODE, "PT");
+    // FIXME
+    // controlledVoc.put(DescriptionObject.COUNTRYCODE, new String[] {"PT",
+    // "BR", "UK", "USA", "IT", "SP", "CZ"});
+    // defaultValue.put(DescriptionObject.COUNTRYCODE, "PT");
 
     // Languages
     controlledVoc.put(DescriptionObject.LANGMATERIAL_LANGUAGES, new String[] {"pt", "en", "cz"});
     defaultValue.put(DescriptionObject.LANGMATERIAL_LANGUAGES, "pt");
 
     // Dimensions units
-    controlledVoc.put(DescriptionObject.PHYSDESC_DIMENSIONS + "_unit", new String[] {null, "m x m", "cm x cm",
-      "mm x mm", "m", "cm", "mm"});
+    controlledVoc.put(DescriptionObject.PHYSDESC_DIMENSIONS + "_unit",
+      new String[] {null, "m x m", "cm x cm", "mm x mm", "m", "cm", "mm"});
     defaultValue.put(DescriptionObject.PHYSDESC_DIMENSIONS + "_unit", null);
 
     // PhysFacet units
@@ -306,8 +311,8 @@ public class EditorServiceImpl extends RemoteServiceServlet implements EditorSer
     return (String) defaultValue.get(field);
   }
 
-  private List<RODAMember> translateProducers(Producers producers) throws LoginException, RODAClientException,
-    UserManagementException, RemoteException {
+  private List<RODAMember> translateProducers(Producers producers)
+    throws LoginException, RODAClientException, UserManagementException, RemoteException {
     List<RODAMember> producerList = new ArrayList<RODAMember>();
     // UserBrowser userBrowser =
     // RodaClientFactory.getRodaClient(this.getThreadLocalRequest().getSession())

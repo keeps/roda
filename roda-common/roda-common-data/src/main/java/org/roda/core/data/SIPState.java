@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Date;
 
 import org.roda.core.common.IllegalOperationException;
+import org.roda.core.data.v2.SIPStateTransition;
 
 /**
  * This is the state of a SIP (Submission Information Package).
@@ -21,6 +22,7 @@ public class SIPState implements Serializable, Comparable<SIPState> {
   private Date datetime = null;
   private boolean processing = false;
 
+  // FIXME replace by list
   private SIPStateTransition[] stateTransitions = null;
 
   private boolean complete = false;
@@ -42,9 +44,9 @@ public class SIPState implements Serializable, Comparable<SIPState> {
    *          the {@link SIPState} to clone.
    */
   public SIPState(SIPState sip) {
-    this(sip.getId(), sip.getUsername(), sip.getOriginalFilename(), sip.getState(), sip.getStateTransitions(), sip
-      .isComplete(), sip.getCompletePercentage(), sip.getIngestedPID(), sip.getParentPID(), sip.getDatetime(), sip
-      .isProcessing());
+    this(sip.getId(), sip.getUsername(), sip.getOriginalFilename(), sip.getState(), sip.getStateTransitions(),
+      sip.isComplete(), sip.getCompletePercentage(), sip.getIngestedPID(), sip.getParentPID(), sip.getDatetime(),
+      sip.isProcessing());
   }
 
   /**
@@ -121,7 +123,8 @@ public class SIPState implements Serializable, Comparable<SIPState> {
    * @param sip
    *          the other version of this {@link SIPState}.
    * 
-   * @return <code>true<code> if the {@link SIPState}s differ in their states, <code>false<code> if nothing has changed in the {@link SIPState}.
+   * @return <code>true<code> if the {@link SIPState}s differ in their states,
+   *         <code>false<code> if nothing has changed in the {@link SIPState}.
    * 
    * @throws IllegalOperationException
    *           if argument {@link SIPState} is not the same as this.

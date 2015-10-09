@@ -9,6 +9,19 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.apache.xmlbeans.XmlException;
+import org.apache.xmlbeans.XmlObject;
+import org.roda.core.data.SimpleEventPreservationObject;
+import org.roda.core.data.v2.EventPreservationObject;
+import org.roda.core.data.v2.RODAObject;
+import org.roda.core.metadata.MetadataException;
+import org.roda.core.metadata.MetadataHelperUtility;
+import org.roda.util.XmlEncodeUtility;
+import org.w3c.util.DateParser;
+import org.w3c.util.InvalidDateException;
+
 import lc.xmlns.premisV2.EventComplexType;
 import lc.xmlns.premisV2.EventDocument;
 import lc.xmlns.premisV2.EventIdentifierComplexType;
@@ -17,19 +30,6 @@ import lc.xmlns.premisV2.EventOutcomeInformationComplexType;
 import lc.xmlns.premisV2.ExtensionComplexType;
 import lc.xmlns.premisV2.LinkingAgentIdentifierComplexType;
 import lc.xmlns.premisV2.LinkingObjectIdentifierComplexType;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.apache.xmlbeans.XmlException;
-import org.apache.xmlbeans.XmlObject;
-import org.roda.core.data.EventPreservationObject;
-import org.roda.core.data.RODAObject;
-import org.roda.core.data.SimpleEventPreservationObject;
-import org.roda.core.metadata.MetadataException;
-import org.roda.core.metadata.MetadataHelperUtility;
-import org.roda.util.XmlEncodeUtility;
-import org.w3c.util.DateParser;
-import org.w3c.util.InvalidDateException;
 
 /**
  * @author Rui Castro
@@ -56,8 +56,8 @@ public class PremisEventHelper {
    * @throws PremisMetadataException
    *           if the PREMIS XML document is invalid.
    */
-  public static PremisEventHelper newInstance(File premisFile) throws PremisMetadataException, FileNotFoundException,
-    IOException {
+  public static PremisEventHelper newInstance(File premisFile)
+    throws PremisMetadataException, FileNotFoundException, IOException {
     FileInputStream premisInputStream = new FileInputStream(premisFile);
     PremisEventHelper instance = newInstance(premisInputStream);
     premisInputStream.close();
@@ -79,8 +79,8 @@ public class PremisEventHelper {
    * @throws PremisMetadataException
    *           if the PREMIS XML document is invalid.
    */
-  public static PremisEventHelper newInstance(InputStream premisInputStream) throws PremisMetadataException,
-    IOException {
+  public static PremisEventHelper newInstance(InputStream premisInputStream)
+    throws PremisMetadataException, IOException {
 
     try {
 
@@ -167,14 +167,15 @@ public class PremisEventHelper {
     EventPreservationObject event = getEventPreservationObject();
 
     // Copy the values from the RODAObject
-    event.setPid(simpleEPO.getPid());
-    event.setLabel(simpleEPO.getLabel());
-    event.setContentModel(simpleEPO.getContentModel());
-    event.setLastModifiedDate(simpleEPO.getLastModifiedDate());
-    event.setCreatedDate(simpleEPO.getCreatedDate());
-    event.setState(simpleEPO.getState());
-    event.setAgentPID(simpleEPO.getAgentPID());
-    event.setTargetPID(simpleEPO.getTargetPID());
+    // FIXME
+    // event.setPid(simpleEPO.getPid());
+    // event.setLabel(simpleEPO.getLabel());
+    // event.setContentModel(simpleEPO.getContentModel());
+    // event.setLastModifiedDate(simpleEPO.getLastModifiedDate());
+    // event.setCreatedDate(simpleEPO.getCreatedDate());
+    // event.setState(simpleEPO.getState());
+    // event.setAgentPID(simpleEPO.getAgentPID());
+    // event.setTargetPID(simpleEPO.getTargetPID());
 
     return event;
   }
@@ -194,7 +195,8 @@ public class PremisEventHelper {
     // <eventIdentifier>
     EventIdentifierComplexType eventIdentifier = getEvent().getEventIdentifier();
     if (eventIdentifier != null) {
-      pObject.setID(eventIdentifier.getEventIdentifierValue());
+      // FIXME
+      // pObject.setID(eventIdentifier.getEventIdentifierValue());
     } else {
       logger.warn("PREMIS Event doesn't have an ID");
     }
@@ -293,7 +295,8 @@ public class PremisEventHelper {
     // <eventIdentifier>
     EventIdentifierComplexType eventIdentifier = getEvent().addNewEventIdentifier();
     eventIdentifier.setEventIdentifierType(PremisHelper.premisIdentifierTypePID);
-    eventIdentifier.setEventIdentifierValue(eventPObject.getID());
+    // FIXME
+    // eventIdentifier.setEventIdentifierValue(eventPObject.getID());
 
     // <eventType>
     getEvent().setEventType(eventPObject.getEventType());

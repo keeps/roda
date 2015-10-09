@@ -7,14 +7,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import lc.xmlns.premisV2.AgentComplexType;
-import lc.xmlns.premisV2.AgentDocument;
-import lc.xmlns.premisV2.AgentIdentifierComplexType;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
 import org.roda.core.data.v2.AgentPreservationObject;
+import org.roda.core.metadata.MetadataException;
+
+import lc.xmlns.premisV2.AgentComplexType;
+import lc.xmlns.premisV2.AgentDocument;
+import lc.xmlns.premisV2.AgentIdentifierComplexType;
 
 /**
  * @author Rui Castro
@@ -149,7 +150,7 @@ public class PremisAgentHelper {
     if (getAgent().getAgentIdentifierList() != null && getAgent().getAgentIdentifierList().size() > 0) {
 
       AgentIdentifierComplexType eventIdentifier = getAgent().getAgentIdentifierArray(0);
-      pObject.setID(eventIdentifier.getAgentIdentifierValue());
+      pObject.setId(eventIdentifier.getAgentIdentifierValue());
 
     } else {
       logger.warn("PREMIS Agent doesn't have an ID");
@@ -209,7 +210,7 @@ public class PremisAgentHelper {
     // <agentIdentifier>
     AgentIdentifierComplexType agentIdentifier = getAgent().addNewAgentIdentifier();
     agentIdentifier.setAgentIdentifierType(PremisHelper.premisIdentifierTypePID);
-    agentIdentifier.setAgentIdentifierValue(agentPObject.getID());
+    agentIdentifier.setAgentIdentifierValue(agentPObject.getId());
 
     // <agentName>
     if (!StringUtils.isBlank(agentPObject.getAgentName())) {

@@ -3,7 +3,7 @@ package org.roda.core.data.eadc;
 import java.io.Serializable;
 
 import org.roda.core.common.InvalidDescriptionLevel;
-import org.roda.core.data.SimpleDescriptionObject;
+import org.roda.core.data.v2.SimpleDescriptionObject;
 
 /**
  * This is the description level of a {@link SimpleDescriptionObject}.
@@ -115,7 +115,7 @@ public class DescriptionLevel implements EadCValue, Comparable<DescriptionLevel>
    * If the level {@link String} for some reason a special word in some context
    * (e.g. the word "class" it's exclusive for the Java language and therefore
    * one can't use it as an assessor keyword)
-   * */
+   */
   public String getLevelSanitized() {
     if (level.equals("class")) {
       return "class_";

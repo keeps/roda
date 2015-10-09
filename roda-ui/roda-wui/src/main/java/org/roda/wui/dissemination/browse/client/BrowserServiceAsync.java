@@ -7,12 +7,12 @@ import java.util.List;
 
 import org.roda.core.common.RODAException;
 import org.roda.core.data.DescriptionObject;
-import org.roda.core.data.RepresentationPreservationObject;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.v2.IndexResult;
+import org.roda.core.data.v2.RepresentationPreservationObject;
 import org.roda.core.data.v2.SimpleDescriptionObject;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;

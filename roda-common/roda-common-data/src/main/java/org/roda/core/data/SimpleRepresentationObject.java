@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.roda.core.common.WrongCModelException;
+import org.roda.core.data.v2.RODAObject;
 
 /**
  * This is a {@link SimpleRepresentationObject}. It contains basic information
@@ -51,7 +51,8 @@ public class SimpleRepresentationObject extends RODAObject {
    * Constructs an empty {@link SimpleRepresentationObject}.
    */
   public SimpleRepresentationObject() {
-    setType(UNKNOWN);
+    // FIXME
+    // setType(UNKNOWN);
   }
 
   /**
@@ -73,8 +74,11 @@ public class SimpleRepresentationObject extends RODAObject {
    * @param descriptionObjectPID
    */
   public SimpleRepresentationObject(RODAObject rObject, String[] statuses, String descriptionObjectPID) {
-    this(rObject.getPid(), rObject.getLabel(), rObject.getContentModel(), rObject.getLastModifiedDate(), rObject
-      .getCreatedDate(), rObject.getState(), statuses, descriptionObjectPID);
+    // FIXME
+    // this(rObject.getId(), rObject.getLabel(), rObject.getContentModel(),
+    // rObject.getLastModifiedDate(),
+    // rObject.getCreatedDate(), rObject.getState(), statuses,
+    // descriptionObjectPID);
   }
 
   /**
@@ -92,9 +96,10 @@ public class SimpleRepresentationObject extends RODAObject {
    */
   public SimpleRepresentationObject(String pid, String id, String type, String subType, Date lastModifiedDate,
     Date createdDate, String state, String[] statuses, String descriptionObjectPID) {
-    super(pid, id, "roda:r", lastModifiedDate, createdDate, state);
-    setType(type);
-    setSubType(subType);
+    // FIXME
+    // super(pid, id, "roda:r", lastModifiedDate, createdDate, state);
+    // setType(type);
+    // setSubType(subType);
     setStatuses(statuses);
     setDescriptionObjectPID(descriptionObjectPID);
   }
@@ -111,9 +116,10 @@ public class SimpleRepresentationObject extends RODAObject {
    * @param statuses
    * @param descriptionObjectPID
    */
-  public SimpleRepresentationObject(String pid, String id, String contentModel, Date lastModifiedDate,
-    Date createdDate, String state, String[] statuses, String descriptionObjectPID) {
-    super(pid, id, contentModel, lastModifiedDate, createdDate, state);
+  public SimpleRepresentationObject(String pid, String id, String contentModel, Date lastModifiedDate, Date createdDate,
+    String state, String[] statuses, String descriptionObjectPID) {
+    // FIXME
+    // super(pid, id, contentModel, lastModifiedDate, createdDate, state);
     setStatuses(statuses);
     setDescriptionObjectPID(descriptionObjectPID);
   }
@@ -127,24 +133,27 @@ public class SimpleRepresentationObject extends RODAObject {
       + ", descriptionObjectPID=" + getDescriptionObjectPID() + " )";
   }
 
-  /**
-   * @see RODAObject#setContentModel(String)
-   */
-  public void setContentModel(String contentModel) {
-    super.setContentModel(contentModel);
-
-    String[] names = getContentModel().split(":");
-    if (names.length < 3) {
-      throw new IllegalArgumentException(contentModel + " is not a valid contentModel for a representation");
-    } else {
-      if (!names[1].equalsIgnoreCase("r")) {
-        throw new WrongCModelException("contentModel should start with 'roda:r' (" + contentModel + ")");
-      } else {
-        // it's already set, by super.setCModel(contentModel)
-        // check that the type is supported
-      }
-    }
-  }
+  // FIXME
+  // /**
+  // * @see RODAObject#setContentModel(String)
+  // */
+  // public void setContentModel(String contentModel) {
+  // super.setContentModel(contentModel);
+  //
+  // String[] names = getContentModel().split(":");
+  // if (names.length < 3) {
+  // throw new IllegalArgumentException(contentModel + " is not a valid
+  // contentModel for a representation");
+  // } else {
+  // if (!names[1].equalsIgnoreCase("r")) {
+  // throw new WrongCModelException("contentModel should start with 'roda:r' ("
+  // + contentModel + ")");
+  // } else {
+  // // it's already set, by super.setCModel(contentModel)
+  // // check that the type is supported
+  // }
+  // }
+  // }
 
   /**
    * @return the id
@@ -161,66 +170,67 @@ public class SimpleRepresentationObject extends RODAObject {
     setLabel(id);
   }
 
-  /**
-   * @return the type
-   */
-  public String getType() {
-    String type = null;
-    if (getContentModel() != null) {
-      type = getContentModel().split(":")[2].toLowerCase();
-    }
-    return type;
-  }
-
-  /**
-   * @param type
-   *          the type to set
-   */
-  public void setType(String type) {
-
-    type = type != null ? type.toLowerCase() : "";
-
-    if (getSubType() != null) {
-      setContentModel("roda:r:" + type + ":" + getSubType());
-    } else {
-      setContentModel("roda:r:" + type);
-    }
-  }
-
-  /**
-   * @return the type
-   */
-  public String getSubType() {
-
-    String subType = null;
-
-    if (getContentModel() != null) {
-
-      String[] split = getContentModel().split(":");
-
-      if (split.length > 3) {
-        subType = split[3].length() > 0 ? split[3].toLowerCase() : null;
-
-      }
-    }
-
-    return subType;
-  }
-
-  /**
-   * @param subType
-   *          the type to set
-   */
-  public void setSubType(String subType) {
-
-    String type = getType() != null ? getType() : "";
-
-    if (subType != null) {
-      setContentModel("roda:r:" + type + ":" + subType.toLowerCase());
-    } else {
-      setContentModel("roda:r:" + type);
-    }
-  }
+  // FIXME
+  // /**
+  // * @return the type
+  // */
+  // public String getType() {
+  // String type = null;
+  // if (getContentModel() != null) {
+  // type = getContentModel().split(":")[2].toLowerCase();
+  // }
+  // return type;
+  // }
+  //
+  // /**
+  // * @param type
+  // * the type to set
+  // */
+  // public void setType(String type) {
+  //
+  // type = type != null ? type.toLowerCase() : "";
+  //
+  // if (getSubType() != null) {
+  // setContentModel("roda:r:" + type + ":" + getSubType());
+  // } else {
+  // setContentModel("roda:r:" + type);
+  // }
+  // }
+  //
+  // /**
+  // * @return the type
+  // */
+  // public String getSubType() {
+  //
+  // String subType = null;
+  //
+  // if (getContentModel() != null) {
+  //
+  // String[] split = getContentModel().split(":");
+  //
+  // if (split.length > 3) {
+  // subType = split[3].length() > 0 ? split[3].toLowerCase() : null;
+  //
+  // }
+  // }
+  //
+  // return subType;
+  // }
+  //
+  // /**
+  // * @param subType
+  // * the type to set
+  // */
+  // public void setSubType(String subType) {
+  //
+  // String type = getType() != null ? getType() : "";
+  //
+  // if (subType != null) {
+  // setContentModel("roda:r:" + type + ":" + subType.toLowerCase());
+  // } else {
+  // setContentModel("roda:r:" + type);
+  // }
+  // }
 
   /**
    * @return the statuses

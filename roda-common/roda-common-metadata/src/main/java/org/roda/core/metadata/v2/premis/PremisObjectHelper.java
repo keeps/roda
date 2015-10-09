@@ -4,9 +4,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import lc.xmlns.premisV2.ObjectDocument;
-
 import org.apache.log4j.Logger;
+import org.roda.core.metadata.MetadataException;
+
+import lc.xmlns.premisV2.ObjectDocument;
 
 /**
  * Base class for all PREMIS Object helpers: Representation, File and Bitstream

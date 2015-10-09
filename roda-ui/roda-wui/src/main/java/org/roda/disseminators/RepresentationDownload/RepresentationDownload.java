@@ -20,14 +20,13 @@ import org.roda.core.common.LoginException;
 import org.roda.core.common.RODAClientException;
 import org.roda.core.data.RepresentationObject;
 import org.roda.disseminators.common.RepresentationHelper;
-import org.roda.disseminators.common.tools.ZipTools;
 
 /**
  * Servlet implementation class for Servlet: RepresentationDownload
  * 
  * @web.servlet name="RepresentationDownload"
- *              display-name="RepresentationDownload"
- *              description="Download the Representation"
+ *              display-name="RepresentationDownload" description=
+ *              "Download the Representation"
  * 
  * @web.servlet-mapping url-pattern="/RepresentationDownload"
  * 
@@ -35,8 +34,8 @@ import org.roda.disseminators.common.tools.ZipTools;
 public class RepresentationDownload extends javax.servlet.http.HttpServlet implements javax.servlet.Servlet {
 
   /**
-	 * 
-	 */
+   * 
+   */
   private static final long serialVersionUID = 1L;
 
   // private static final Set<String> ALWAYS_ZIP = new HashSet<String>(Arrays
@@ -130,10 +129,11 @@ public class RepresentationDownload extends javax.servlet.http.HttpServlet imple
     }
   }
 
-  private void sendIcon(HttpSession session, RepresentationObject rep, HttpServletResponse response) throws IOException {
+  private void sendIcon(HttpSession session, RepresentationObject rep, HttpServletResponse response)
+    throws IOException {
     String basePath = "/org/roda/disseminators/RepresentationDownload/icons/";
-    InputStream defaultIcon = RepresentationDownload.class.getClassLoader().getResourceAsStream(
-      basePath + "default.png");
+    InputStream defaultIcon = RepresentationDownload.class.getClassLoader()
+      .getResourceAsStream(basePath + "default.png");
 
     // Set headers
     response.setContentType("image/png");
@@ -147,10 +147,13 @@ public class RepresentationDownload extends javax.servlet.http.HttpServlet imple
     // Send representation icon
     if (rep == null) {
       FileHelper.copy(defaultIcon, response.getOutputStream());
-    } else if (rep.getPartFiles().length > 0 || ALWAYS_ZIP.contains(rep.getType())) {
-      InputStream zipIcon = RepresentationDownload.class.getClassLoader().getResourceAsStream(
-        basePath + "application_zip.png");
-      FileHelper.copy(zipIcon, response.getOutputStream());
+      // FIXME
+      // } else if (rep.getPartFiles().length > 0 ||
+      // ALWAYS_ZIP.contains(rep.getType())) {
+      // InputStream zipIcon =
+      // RepresentationDownload.class.getClassLoader().getResourceAsStream(
+      // basePath + "application_zip.png");
+      // FileHelper.copy(zipIcon, response.getOutputStream());
     } else {
       String mimetype = rep.getRootFile().getMimetype();
       mimetype = mimetype.replace('/', '_');
@@ -167,24 +170,29 @@ public class RepresentationDownload extends javax.servlet.http.HttpServlet imple
 
   private void sendRepresentation(HttpServletRequest request, RepresentationObject rep, HttpServletResponse response)
     throws LoginException, HttpException, IOException, RODAClientException {
-    if ((rep.getPartFiles() == null || rep.getPartFiles().length == 0) && !ALWAYS_ZIP.contains(rep.getType())) {
-      logger.debug("Forwarding file to client");
-      getRepresentationHelper().forwardMethod(getRepresentationHelper().getRootMethod(request, rep), response);
-      // RodaClientFactory.log(DisseminationInfo.DOWNLOAD_DISSEMINATOR_ID,
-      // false, rep.getPid(), request);
-    } else {
-      response.setContentType("application/zip");
-      response.setHeader("Content-Disposition", "attachment; filename=" + rep.getLabel() + ".zip");
-      try {
-        ZipTools.sendZippedRepresentation(request, rep, response.getOutputStream());
-
-        // RodaClientFactory.log(
-        // DisseminationInfo.DOWNLOAD_DISSEMINATOR_ID, true, rep
-        // .getPid(), request);
-      } catch (IOException e) {
-        logger.info("User canceled download");
-      }
-    }
+    // FIXME
+    // if ((rep.getPartFiles() == null || rep.getPartFiles().length == 0) &&
+    // !ALWAYS_ZIP.contains(rep.getType())) {
+    // logger.debug("Forwarding file to client");
+    // getRepresentationHelper().forwardMethod(getRepresentationHelper().getRootMethod(request,
+    // rep), response);
+    // // RodaClientFactory.log(DisseminationInfo.DOWNLOAD_DISSEMINATOR_ID,
+    // // false, rep.getPid(), request);
+    // } else {
+    // response.setContentType("application/zip");
+    // response.setHeader("Content-Disposition", "attachment; filename=" +
+    // rep.getLabel() + ".zip");
+    // try {
+    // ZipTools.sendZippedRepresentation(request, rep,
+    // response.getOutputStream());
+    //
+    // // RodaClientFactory.log(
+    // // DisseminationInfo.DOWNLOAD_DISSEMINATOR_ID, true, rep
+    // // .getPid(), request);
+    // } catch (IOException e) {
+    // logger.info("User canceled download");
+    // }
+    // }
   }
 
 }

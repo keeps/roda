@@ -6,7 +6,7 @@ package org.roda.wui.dissemination.browse.client;
 import java.io.Serializable;
 import java.util.List;
 
-import org.roda.core.data.SimpleDescriptionObject;
+import org.roda.core.data.v2.SimpleDescriptionObject;
 
 /**
  * @author Luis Faria

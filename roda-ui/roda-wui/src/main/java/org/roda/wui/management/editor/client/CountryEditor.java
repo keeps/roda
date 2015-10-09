@@ -3,7 +3,6 @@
  */
 package org.roda.wui.management.editor.client;
 
-import org.roda.core.data.DescriptionObject;
 import org.roda.core.data.eadc.EadCValue;
 import org.roda.core.data.eadc.Text;
 
@@ -20,7 +19,9 @@ public class CountryEditor implements MetadataElementEditor {
   private final ControlledVocabularyEditor editor;
 
   public CountryEditor() {
-    editor = new ControlledVocabularyEditor(DescriptionObject.COUNTRYCODE);
+    // FIXME
+    // editor = new ControlledVocabularyEditor(DescriptionObject.COUNTRYCODE);
+    editor = new ControlledVocabularyEditor("");
     editor.getWidget().addStyleName("wui-editor-country");
   }
 

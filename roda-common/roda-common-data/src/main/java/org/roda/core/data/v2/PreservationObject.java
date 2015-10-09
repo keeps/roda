@@ -9,11 +9,6 @@ import java.util.Date;
  * @author Rui Castro
  */
 public abstract class PreservationObject {
-  private static final long serialVersionUID = -1666581836175629839L;
-
-  private String ID = null;
-  private String type;
-  private String fileID;
 
   /**
    * Inactive state
@@ -45,6 +40,10 @@ public abstract class PreservationObject {
 
   private String state = null;
 
+  private String type;
+
+  private String fileID;
+
   /**
    * Constructs an empty {@link PreservationObject}.
    */
@@ -67,13 +66,12 @@ public abstract class PreservationObject {
    * @param ID
    *          the identifier of the preservation object
    */
-  public PreservationObject(String id, String label, Date lastModifiedDate, Date createdDate, String state, String ID) {
+  public PreservationObject(String id, String label, Date lastModifiedDate, Date createdDate, String state) {
     this.id = id;
     this.label = label;
     this.lastModifiedDate = lastModifiedDate;
     this.createdDate = createdDate;
     this.state = state;
-    this.ID = ID;
   }
 
   /**
@@ -82,25 +80,7 @@ public abstract class PreservationObject {
   @Override
   public String toString() {
     return "PreservationObject( " + super.toString() + ", type=" //$NON-NLS-1$ //$NON-NLS-2$
-      + getType() + ", ID=" + getID() + " )"; //$NON-NLS-1$//$NON-NLS-2$
-  }
-
-  /**
-   * Gets the identifier of this {@link PreservationObject}.
-   * 
-   * @return a {@link String}
-   */
-  public String getID() {
-    return this.ID;
-  }
-
-  /**
-   * Sets the identifier of this {@link PreservationObject}.
-   * 
-   * @param ID
-   */
-  public void setID(String ID) {
-    this.ID = ID;
+      + getType() + ", ID=" + getId() + " )"; //$NON-NLS-1$//$NON-NLS-2$
   }
 
   public String getType() {
@@ -119,43 +99,43 @@ public abstract class PreservationObject {
     this.fileID = fileID;
   }
 
-  protected String getId() {
+  public String getId() {
     return id;
   }
 
-  protected void setId(String id) {
+  public void setId(String id) {
     this.id = id;
   }
 
-  protected String getLabel() {
+  public String getLabel() {
     return label;
   }
 
-  protected void setLabel(String label) {
+  public void setLabel(String label) {
     this.label = label;
   }
 
-  protected Date getLastModifiedDate() {
+  public Date getLastModifiedDate() {
     return lastModifiedDate;
   }
 
-  protected void setLastModifiedDate(Date lastModifiedDate) {
+  public void setLastModifiedDate(Date lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
 
-  protected Date getCreatedDate() {
+  public Date getCreatedDate() {
     return createdDate;
   }
 
-  protected void setCreatedDate(Date createdDate) {
+  public void setCreatedDate(Date createdDate) {
     this.createdDate = createdDate;
   }
 
-  protected String getState() {
+  public String getState() {
     return state;
   }
 
-  protected void setState(String state) {
+  public void setState(String state) {
     this.state = state;
   }
 

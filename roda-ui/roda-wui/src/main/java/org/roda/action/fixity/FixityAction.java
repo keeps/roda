@@ -44,7 +44,7 @@ public class FixityAction implements Plugin<AIP> {
     fixityAgent = new AgentPreservationObject();
     fixityAgent.setAgentName(getName() + "/" + getVersion()); //$NON-NLS-1$
     fixityAgent.setAgentType(AgentPreservationObject.PRESERVATION_AGENT_TYPE_FIXITY_CHECK_PLUGIN);
-    fixityAgent.setID("fixityCheck");
+    fixityAgent.setId("fixityCheck");
   }
 
   @Override
@@ -148,7 +148,7 @@ public class FixityAction implements Plugin<AIP> {
             DateFormat format = new SimpleDateFormat("yyyy-MM-dd_hh:mm:ss.SSS");
             String name = "fixityCheck_" + format.format(new Date()) + ".premis.xml";
             epo.setId(name);
-            epo.setAgentID(fixityAgent.getID());
+            epo.setAgentID(fixityAgent.getId());
             epo.setObjectIDs(new String[] {"?????"});
             byte[] serializedPremisEvent = new PremisEventHelper(epo).saveToByteArray();
             Path file = Files.createTempFile("preservation", ".xml");

@@ -25,7 +25,8 @@ import org.roda.core.data.eadc.PhysdescGenreform;
 import org.roda.core.data.eadc.ProcessInfo;
 import org.roda.core.data.eadc.Relatedmaterial;
 import org.roda.core.data.eadc.Relatedmaterials;
-import org.roda.core.data.eadc.Text;
+import org.roda.core.data.v2.RODAObject;
+import org.roda.core.data.v2.SimpleDescriptionObject;
 
 /**
  * This is a Description Object (DO). It contains all the descriptive metadata
@@ -94,7 +95,8 @@ public class DescriptionObject extends SimpleDescriptionObject {
    */
   public static String[] getAllElements() {
     List<String> list = new ArrayList<String>();
-    list.addAll(Arrays.asList(SimpleDescriptionObject.getAllElements()));
+    // FIXME
+    // list.addAll(Arrays.asList(SimpleDescriptionObject.getAllElements()));
     list.addAll(Arrays.asList(ELEMENTS));
     return (String[]) list.toArray(new String[list.size()]);
   }
@@ -205,8 +207,10 @@ public class DescriptionObject extends SimpleDescriptionObject {
     String state, String completeReference, DescriptionLevel level, String countryCode, String repositoryCode,
     String id, String title, String dateInitial, String dateFinal, String description, String parentPID,
     int subElementsCount) throws InvalidDescriptionLevel {
-    super(pid, label, contentModel, lastModifiedDate, createdDate, state, level, countryCode, repositoryCode, id,
-      title, dateInitial, dateFinal, description, parentPID, subElementsCount);
+    // FIXME
+    // super(pid, label, contentModel, lastModifiedDate, createdDate, state,
+    // level, countryCode, repositoryCode, id, title,
+    // dateInitial, dateFinal, description, parentPID, subElementsCount);
   }
 
   /**
@@ -230,9 +234,12 @@ public class DescriptionObject extends SimpleDescriptionObject {
   public DescriptionObject(RODAObject object, String completeReference, DescriptionLevel level, String countryCode,
     String repositoryCode, String id, String unitTitle, String dateInitial, String dateFinal, String description,
     String parentPID, int subElementsCount) throws InvalidDescriptionLevel {
-    this(object.getPid(), object.getLabel(), object.getContentModel(), object.getLastModifiedDate(), object
-      .getCreatedDate(), object.getState(), completeReference, level, countryCode, repositoryCode, id, unitTitle,
-      dateInitial, dateFinal, description, parentPID, subElementsCount);
+    // FIXME
+    // this(object.getPid(), object.getLabel(), object.getContentModel(),
+    // object.getLastModifiedDate(),
+    // object.getCreatedDate(), object.getState(), completeReference, level,
+    // countryCode, repositoryCode, id, unitTitle,
+    // dateInitial, dateFinal, description, parentPID, subElementsCount);
   }
 
   /**
@@ -242,10 +249,15 @@ public class DescriptionObject extends SimpleDescriptionObject {
    *          a SimpleDescriptionObject.
    */
   public DescriptionObject(SimpleDescriptionObject object) {
-    this(object.getPid(), object.getLabel(), object.getContentModel(), object.getLastModifiedDate(), object
-      .getCreatedDate(), object.getState(), null, object.getLevel(), object.getCountryCode(), object
-      .getRepositoryCode(), object.getId(), object.getTitle(), object.getDateInitial(), object.getDateFinal(), object
-      .getDescription(), object.getParentPID(), object.getSubElementsCount());
+    // FIXME
+    // this(object.getPid(), object.getLabel(), object.getContentModel(),
+    // object.getLastModifiedDate(),
+    // object.getCreatedDate(), object.getState(), null, object.getLevel(),
+    // object.getCountryCode(),
+    // object.getRepositoryCode(), object.getId(), object.getTitle(),
+    // object.getDateInitial(), object.getDateFinal(),
+    // object.getDescription(), object.getParentPID(),
+    // object.getSubElementsCount());
   }
 
   /**
@@ -255,10 +267,15 @@ public class DescriptionObject extends SimpleDescriptionObject {
    *          a Description Object.
    */
   public DescriptionObject(DescriptionObject object) {
-    this(object.getPid(), object.getLabel(), object.getContentModel(), object.getLastModifiedDate(), object
-      .getCreatedDate(), object.getState(), object.getCompleteReference(), object.getLevel(), object.getCountryCode(),
-      object.getRepositoryCode(), object.getId(), object.getTitle(), object.getDateInitial(), object.getDateFinal(),
-      object.getDescription(), object.getParentPID(), object.getSubElementsCount());
+    // FIXME
+    // this(object.getPid(), object.getLabel(), object.getContentModel(),
+    // object.getLastModifiedDate(),
+    // object.getCreatedDate(), object.getState(),
+    // object.getCompleteReference(), object.getLevel(),
+    // object.getCountryCode(), object.getRepositoryCode(), object.getId(),
+    // object.getTitle(), object.getDateInitial(),
+    // object.getDateFinal(), object.getDescription(), object.getParentPID(),
+    // object.getSubElementsCount());
 
     // setPid(pid);
     // setLabel(label);
@@ -322,102 +339,103 @@ public class DescriptionObject extends SimpleDescriptionObject {
       + getHandleURL() + " )";
   }
 
-  /**
-   * @see SimpleDescriptionObject#getValue(String)
-   */
-  public EadCValue getValue(String element) throws IllegalArgumentException {
-
-    EadCValue value = null;
-
-    try {
-
-      value = super.getValue(element);
-
-    } catch (IllegalArgumentException e) {
-
-      if (PHYSDESC.equals(element)) {
-        value = getTextOrNull(getPhysdesc());
-      } else if (PHYSDESC_DIMENSIONS.equals(element)) {
-        value = getPhysdescDimensions();
-      } else if (PHYSDESC_PHYSFACET.equals(element)) {
-        value = getPhysdescPhysfacet();
-      } else if (PHYSDESC_DATE_INITIAL.equals(element)) {
-        value = getTextOrNull(getPhysdescDateInitial());
-      } else if (PHYSDESC_DATE_FINAL.equals(element)) {
-        value = getTextOrNull(getPhysdescDateFinal());
-      } else if (PHYSDESC_EXTENT.equals(element)) {
-        value = getPhysdescExtent();
-      } else if (ORIGINATION.equals(element)) {
-        value = getTextOrNull(getOrigination());
-      } else if (BIOGHIST.equals(element)) {
-        value = getTextOrNull(getBioghist());
-      } else if (BIOGHIST_CHRONLIST.equals(element)) {
-        value = getBioghistChronlist();
-      } else if (CUSTODHIST.equals(element)) {
-        value = getTextOrNull(getCustodhist());
-      } else if (ACQINFO.equals(element)) {
-        value = getAcqinfos();
-      } else if (SCOPECONTENT.equals(element)) {
-        value = getTextOrNull(getScopecontent());
-      } else if (APPRAISAL.equals(element)) {
-        value = getTextOrNull(getAppraisal());
-      } else if (ACCRUALS.equals(element)) {
-        value = getTextOrNull(getAccruals());
-      } else if (ARRANGEMENT.equals(element)) {
-        if (getArrangement() != null) {
-          value = new Text(getArrangement());
-        } else if (getArrangementTable() != null) {
-          value = getArrangementTable();
-        } else {
-          value = null;
-        }
-        // } else if (ARRANGEMENT_TABLE.equals(element)) {
-      } else if (ACCESSRESTRICT.equals(element)) {
-        value = getTextOrNull(getAccessrestrict());
-      } else if (USERESTRICT.equals(element)) {
-        value = getTextOrNull(getUserestrict());
-      } else if (LANGMATERIAL_LANGUAGES.equals(element)) {
-        value = getLangmaterialLanguages();
-      } else if (PHYSTECH.equals(element)) {
-        value = getTextOrNull(getPhystech());
-      } else if (MATERIALSPEC.equals(element)) {
-        value = getMaterialspecs();
-      } else if (OTHERFINDAID.equals(element)) {
-        value = getTextOrNull(getOtherfindaid());
-      } else if (RELATEDMATERIAL.equals(element)) {
-        value = getRelatedmaterials();
-      } else if (BIBLIOGRAPHY.equals(element)) {
-        value = getTextOrNull(getBibliography());
-      } else if (NOTE.equals(element)) {
-        value = getNotes();
-      } else if (PREFERCITE.equals(element)) {
-        value = getTextOrNull(getPrefercite());
-      } else if (COMPLETE_REFERENCE.equals(element)) {
-        value = getTextOrNull(getCompleteReference());
-      } else if (HANDLE_URL.equals(element)) {
-        value = getTextOrNull(getHandleURL());
-      } else if (ABSTRACT.equals(element)) {
-        value = getTextOrNull(getAbstract());
-      } else if (ODD.equals(element)) {
-        value = getTextOrNull(getOdd());
-      } else if (CONTROLACCESS.equals(element)) {
-        value = getControlaccesses();
-      } else if (PHYSDESC_GENREFORM.equals(element)) {
-        value = getPhysdescGenreform();
-      } else if (PROCESSINFO.equals(element)) {
-        value = getProcessinfo();
-      } else if (INDEX.equals(element)) {
-        value = getIndex();
-      } else {
-
-        // no value named 'element'
-        throw new IllegalArgumentException("Unknown element named " + element);
-      }
-
-    }
-
-    return value;
-  }
+  // FIXME
+  // /**
+  // * @see SimpleDescriptionObject#getValue(String)
+  // */
+  // public EadCValue getValue(String element) throws IllegalArgumentException {
+  //
+  // EadCValue value = null;
+  //
+  // try {
+  //
+  // value = super.getValue(element);
+  //
+  // } catch (IllegalArgumentException e) {
+  //
+  // if (PHYSDESC.equals(element)) {
+  // value = getTextOrNull(getPhysdesc());
+  // } else if (PHYSDESC_DIMENSIONS.equals(element)) {
+  // value = getPhysdescDimensions();
+  // } else if (PHYSDESC_PHYSFACET.equals(element)) {
+  // value = getPhysdescPhysfacet();
+  // } else if (PHYSDESC_DATE_INITIAL.equals(element)) {
+  // value = getTextOrNull(getPhysdescDateInitial());
+  // } else if (PHYSDESC_DATE_FINAL.equals(element)) {
+  // value = getTextOrNull(getPhysdescDateFinal());
+  // } else if (PHYSDESC_EXTENT.equals(element)) {
+  // value = getPhysdescExtent();
+  // } else if (ORIGINATION.equals(element)) {
+  // value = getTextOrNull(getOrigination());
+  // } else if (BIOGHIST.equals(element)) {
+  // value = getTextOrNull(getBioghist());
+  // } else if (BIOGHIST_CHRONLIST.equals(element)) {
+  // value = getBioghistChronlist();
+  // } else if (CUSTODHIST.equals(element)) {
+  // value = getTextOrNull(getCustodhist());
+  // } else if (ACQINFO.equals(element)) {
+  // value = getAcqinfos();
+  // } else if (SCOPECONTENT.equals(element)) {
+  // value = getTextOrNull(getScopecontent());
+  // } else if (APPRAISAL.equals(element)) {
+  // value = getTextOrNull(getAppraisal());
+  // } else if (ACCRUALS.equals(element)) {
+  // value = getTextOrNull(getAccruals());
+  // } else if (ARRANGEMENT.equals(element)) {
+  // if (getArrangement() != null) {
+  // value = new Text(getArrangement());
+  // } else if (getArrangementTable() != null) {
+  // value = getArrangementTable();
+  // } else {
+  // value = null;
+  // }
+  // // } else if (ARRANGEMENT_TABLE.equals(element)) {
+  // } else if (ACCESSRESTRICT.equals(element)) {
+  // value = getTextOrNull(getAccessrestrict());
+  // } else if (USERESTRICT.equals(element)) {
+  // value = getTextOrNull(getUserestrict());
+  // } else if (LANGMATERIAL_LANGUAGES.equals(element)) {
+  // value = getLangmaterialLanguages();
+  // } else if (PHYSTECH.equals(element)) {
+  // value = getTextOrNull(getPhystech());
+  // } else if (MATERIALSPEC.equals(element)) {
+  // value = getMaterialspecs();
+  // } else if (OTHERFINDAID.equals(element)) {
+  // value = getTextOrNull(getOtherfindaid());
+  // } else if (RELATEDMATERIAL.equals(element)) {
+  // value = getRelatedmaterials();
+  // } else if (BIBLIOGRAPHY.equals(element)) {
+  // value = getTextOrNull(getBibliography());
+  // } else if (NOTE.equals(element)) {
+  // value = getNotes();
+  // } else if (PREFERCITE.equals(element)) {
+  // value = getTextOrNull(getPrefercite());
+  // } else if (COMPLETE_REFERENCE.equals(element)) {
+  // value = getTextOrNull(getCompleteReference());
+  // } else if (HANDLE_URL.equals(element)) {
+  // value = getTextOrNull(getHandleURL());
+  // } else if (ABSTRACT.equals(element)) {
+  // value = getTextOrNull(getAbstract());
+  // } else if (ODD.equals(element)) {
+  // value = getTextOrNull(getOdd());
+  // } else if (CONTROLACCESS.equals(element)) {
+  // value = getControlaccesses();
+  // } else if (PHYSDESC_GENREFORM.equals(element)) {
+  // value = getPhysdescGenreform();
+  // } else if (PROCESSINFO.equals(element)) {
+  // value = getProcessinfo();
+  // } else if (INDEX.equals(element)) {
+  // value = getIndex();
+  // } else {
+  //
+  // // no value named 'element'
+  // throw new IllegalArgumentException("Unknown element named " + element);
+  // }
+  //
+  // }
+  //
+  // return value;
+  // }
 
   // public String[] getAssignedElements() {
   // return null;
@@ -428,96 +446,98 @@ public class DescriptionObject extends SimpleDescriptionObject {
    */
   public void setValue(String element, EadCValue value) throws IllegalArgumentException {
 
-    try {
-
-      super.setValue(element, value);
-
-    } catch (IllegalArgumentException e) {
-      // SimpleDescriptionObject doesn't have this element
-
-      // if (COMPLETE_REFERENCE.equals(element)) {
-      // setCompleteReference(checkEadCText(element, value));
-      // } else
-      // if (HANDLE_URL.equals(element)) {
-      // setHandleURL(checkEadCText(element, value));
-      // } else
-
-      if (PHYSDESC.equals(element)) {
-        setPhysdesc(checkEadCText(element, value));
-      } else if (PHYSDESC_DIMENSIONS.equals(element)) {
-        setPhysdescDimensions(checkEadCPhysdescElement(element, value));
-      } else if (PHYSDESC_PHYSFACET.equals(element)) {
-        setPhysdescPhysfacet(checkEadCPhysdescElement(element, value));
-      } else if (PHYSDESC_DATE_INITIAL.equals(element)) {
-        setDateInitial(checkEadCText(element, value));
-      } else if (PHYSDESC_DATE_FINAL.equals(element)) {
-        setDateFinal(checkEadCText(element, value));
-      } else if (PHYSDESC_EXTENT.equals(element)) {
-        setPhysdescExtent(checkEadCPhysdescElement(element, value));
-      } else if (ORIGINATION.equals(element)) {
-        setOrigination(checkEadCText(element, value));
-      } else if (BIOGHIST.equals(element)) {
-        setBioghist(checkEadCText(element, value));
-      } else if (BIOGHIST_CHRONLIST.equals(element)) {
-        setBioghistChronlist(checkEadCBioghistChronlist(element, value));
-      } else if (CUSTODHIST.equals(element)) {
-        setCustodhist(checkEadCText(element, value));
-      } else if (ACQINFO.equals(element)) {
-        setAcqinfos(checkEadCAcqinfos(element, value));
-      } else if (SCOPECONTENT.equals(element)) {
-        setScopecontent(checkEadCText(element, value));
-      } else if (APPRAISAL.equals(element)) {
-        setAppraisal(checkEadCText(element, value));
-      } else if (ACCRUALS.equals(element)) {
-        setAccruals(checkEadCText(element, value));
-      } else if (ARRANGEMENT.equals(element)) {
-        if (value instanceof Text) {
-          setArrangement(value.toString());
-        } else if (value instanceof ArrangementTable) {
-          setArrangementTable((ArrangementTable) value);
-        } else {
-          throw new IllegalArgumentException("illegal value for element " + element + ". Value of type " + Text.class
-            + " or " + ArrangementTable.class + " was expected.");
-        }
-        // } else if (ARRANGEMENT_TABLE.equals(element)) {
-      } else if (ACCESSRESTRICT.equals(element)) {
-        setAccessrestrict(checkEadCText(element, value));
-      } else if (USERESTRICT.equals(element)) {
-        setUserestrict(checkEadCText(element, value));
-      } else if (LANGMATERIAL_LANGUAGES.equals(element)) {
-        setLangmaterialLanguages(checkEadCLangmaterialLanguages(element, value));
-      } else if (PHYSTECH.equals(element)) {
-        setPhystech(checkEadCText(element, value));
-      } else if (MATERIALSPEC.equals(element)) {
-        setMaterialspecs(checkEadCMaterialspecs(element, value));
-      } else if (OTHERFINDAID.equals(element)) {
-        setOtherfindaid(checkEadCText(element, value));
-      } else if (RELATEDMATERIAL.equals(element)) {
-        setRelatedmaterials(checkEadCRelatedmaterials(element, value));
-      } else if (BIBLIOGRAPHY.equals(element)) {
-        setBibliography(checkEadCText(element, value));
-      } else if (NOTE.equals(element)) {
-        setNotes(checkEadCNotes(element, value));
-      } else if (PREFERCITE.equals(element)) {
-        setPrefercite(checkEadCText(element, value));
-      } else if (ABSTRACT.equals(element)) {
-        setAbstract(checkEadCText(element, value));
-      } else if (ODD.equals(element)) {
-        setOdd(checkEadCText(element, value));
-      } else if (CONTROLACCESS.equals(element)) {
-        setControlaccesses(checkEadCControlaccessesElement(element, value));
-      } else if (PHYSDESC_GENREFORM.equals(element)) {
-        setPhysdescGenreform(checkEadCPhysdescGenreform(element, value));
-      } else if (PROCESSINFO.equals(element)) {
-        setProcessinfo(checkEadCProcessinfo(element, value));
-      } else if (INDEX.equals(element)) {
-        setIndex(checkEadCIndex(element, value));
-      } else {
-        // no value named 'element'
-        throw new IllegalArgumentException("Unknown element named " + element);
-      }
-
-    }
+    // FIXME
+    // try {
+    //
+    // super.setValue(element, value);
+    //
+    // } catch (IllegalArgumentException e) {
+    // // SimpleDescriptionObject doesn't have this element
+    //
+    // // if (COMPLETE_REFERENCE.equals(element)) {
+    // // setCompleteReference(checkEadCText(element, value));
+    // // } else
+    // // if (HANDLE_URL.equals(element)) {
+    // // setHandleURL(checkEadCText(element, value));
+    // // } else
+    //
+    // if (PHYSDESC.equals(element)) {
+    // setPhysdesc(checkEadCText(element, value));
+    // } else if (PHYSDESC_DIMENSIONS.equals(element)) {
+    // setPhysdescDimensions(checkEadCPhysdescElement(element, value));
+    // } else if (PHYSDESC_PHYSFACET.equals(element)) {
+    // setPhysdescPhysfacet(checkEadCPhysdescElement(element, value));
+    // } else if (PHYSDESC_DATE_INITIAL.equals(element)) {
+    // setDateInitial(checkEadCText(element, value));
+    // } else if (PHYSDESC_DATE_FINAL.equals(element)) {
+    // setDateFinal(checkEadCText(element, value));
+    // } else if (PHYSDESC_EXTENT.equals(element)) {
+    // setPhysdescExtent(checkEadCPhysdescElement(element, value));
+    // } else if (ORIGINATION.equals(element)) {
+    // setOrigination(checkEadCText(element, value));
+    // } else if (BIOGHIST.equals(element)) {
+    // setBioghist(checkEadCText(element, value));
+    // } else if (BIOGHIST_CHRONLIST.equals(element)) {
+    // setBioghistChronlist(checkEadCBioghistChronlist(element, value));
+    // } else if (CUSTODHIST.equals(element)) {
+    // setCustodhist(checkEadCText(element, value));
+    // } else if (ACQINFO.equals(element)) {
+    // setAcqinfos(checkEadCAcqinfos(element, value));
+    // } else if (SCOPECONTENT.equals(element)) {
+    // setScopecontent(checkEadCText(element, value));
+    // } else if (APPRAISAL.equals(element)) {
+    // setAppraisal(checkEadCText(element, value));
+    // } else if (ACCRUALS.equals(element)) {
+    // setAccruals(checkEadCText(element, value));
+    // } else if (ARRANGEMENT.equals(element)) {
+    // if (value instanceof Text) {
+    // setArrangement(value.toString());
+    // } else if (value instanceof ArrangementTable) {
+    // setArrangementTable((ArrangementTable) value);
+    // } else {
+    // throw new IllegalArgumentException("illegal value for element " + element
+    // + ". Value of type " + Text.class
+    // + " or " + ArrangementTable.class + " was expected.");
+    // }
+    // // } else if (ARRANGEMENT_TABLE.equals(element)) {
+    // } else if (ACCESSRESTRICT.equals(element)) {
+    // setAccessrestrict(checkEadCText(element, value));
+    // } else if (USERESTRICT.equals(element)) {
+    // setUserestrict(checkEadCText(element, value));
+    // } else if (LANGMATERIAL_LANGUAGES.equals(element)) {
+    // setLangmaterialLanguages(checkEadCLangmaterialLanguages(element, value));
+    // } else if (PHYSTECH.equals(element)) {
+    // setPhystech(checkEadCText(element, value));
+    // } else if (MATERIALSPEC.equals(element)) {
+    // setMaterialspecs(checkEadCMaterialspecs(element, value));
+    // } else if (OTHERFINDAID.equals(element)) {
+    // setOtherfindaid(checkEadCText(element, value));
+    // } else if (RELATEDMATERIAL.equals(element)) {
+    // setRelatedmaterials(checkEadCRelatedmaterials(element, value));
+    // } else if (BIBLIOGRAPHY.equals(element)) {
+    // setBibliography(checkEadCText(element, value));
+    // } else if (NOTE.equals(element)) {
+    // setNotes(checkEadCNotes(element, value));
+    // } else if (PREFERCITE.equals(element)) {
+    // setPrefercite(checkEadCText(element, value));
+    // } else if (ABSTRACT.equals(element)) {
+    // setAbstract(checkEadCText(element, value));
+    // } else if (ODD.equals(element)) {
+    // setOdd(checkEadCText(element, value));
+    // } else if (CONTROLACCESS.equals(element)) {
+    // setControlaccesses(checkEadCControlaccessesElement(element, value));
+    // } else if (PHYSDESC_GENREFORM.equals(element)) {
+    // setPhysdescGenreform(checkEadCPhysdescGenreform(element, value));
+    // } else if (PROCESSINFO.equals(element)) {
+    // setProcessinfo(checkEadCProcessinfo(element, value));
+    // } else if (INDEX.equals(element)) {
+    // setIndex(checkEadCIndex(element, value));
+    // } else {
+    // // no value named 'element'
+    // throw new IllegalArgumentException("Unknown element named " + element);
+    // }
+    //
+    // }
   }
 
   private Index checkEadCIndex(String element, EadCValue value) {
@@ -526,8 +546,8 @@ public class DescriptionObject extends SimpleDescriptionObject {
     } else if (value instanceof Index) {
       return (Index) value;
     } else {
-      throw new IllegalArgumentException("illegal value for element " + element + ". Value of type " + Index.class
-        + " or null was expected.");
+      throw new IllegalArgumentException(
+        "illegal value for element " + element + ". Value of type " + Index.class + " or null was expected.");
     }
   }
 
@@ -537,8 +557,8 @@ public class DescriptionObject extends SimpleDescriptionObject {
     } else if (value instanceof Acqinfos) {
       return (Acqinfos) value;
     } else {
-      throw new IllegalArgumentException("illegal value for element " + element + ". Value of type " + Acqinfos.class
-        + " or null was expected.");
+      throw new IllegalArgumentException(
+        "illegal value for element " + element + ". Value of type " + Acqinfos.class + " or null was expected.");
     }
   }
 
@@ -548,8 +568,8 @@ public class DescriptionObject extends SimpleDescriptionObject {
     } else if (value instanceof Materialspecs) {
       return (Materialspecs) value;
     } else {
-      throw new IllegalArgumentException("illegal value for element " + element + ". Value of type "
-        + Materialspecs.class + " or null was expected.");
+      throw new IllegalArgumentException(
+        "illegal value for element " + element + ". Value of type " + Materialspecs.class + " or null was expected.");
     }
   }
 
@@ -559,8 +579,8 @@ public class DescriptionObject extends SimpleDescriptionObject {
     } else if (value instanceof Notes) {
       return (Notes) value;
     } else {
-      throw new IllegalArgumentException("illegal value for element " + element + ". Value of type " + Notes.class
-        + " or null was expected.");
+      throw new IllegalArgumentException(
+        "illegal value for element " + element + ". Value of type " + Notes.class + " or null was expected.");
     }
   }
 
@@ -581,8 +601,8 @@ public class DescriptionObject extends SimpleDescriptionObject {
     } else if (value instanceof ProcessInfo) {
       return (ProcessInfo) value;
     } else {
-      throw new IllegalArgumentException("illegal value for element " + element + ". Value of type "
-        + ProcessInfo.class + " or null was expected.");
+      throw new IllegalArgumentException(
+        "illegal value for element " + element + ". Value of type " + ProcessInfo.class + " or null was expected.");
     }
   }
 
@@ -616,8 +636,8 @@ public class DescriptionObject extends SimpleDescriptionObject {
     } else if (value instanceof PhysdescElement) {
       return (PhysdescElement) value;
     } else {
-      throw new IllegalArgumentException("illegal value for element " + element + ". Value of type "
-        + PhysdescElement.class + " or null was expected.");
+      throw new IllegalArgumentException(
+        "illegal value for element " + element + ". Value of type " + PhysdescElement.class + " or null was expected.");
     }
   }
 
@@ -633,14 +653,15 @@ public class DescriptionObject extends SimpleDescriptionObject {
     }
   }
 
-  protected Materialspecs checkEadCMaterialSpecElement(String element, EadCValue value) throws IllegalArgumentException {
+  protected Materialspecs checkEadCMaterialSpecElement(String element, EadCValue value)
+    throws IllegalArgumentException {
     if (value == null) {
       return null;
     } else if (value instanceof Materialspecs) {
       return (Materialspecs) value;
     } else {
-      throw new IllegalArgumentException("illegal value for element " + element + ". Value of type "
-        + Materialspecs.class + " or null was expected.");
+      throw new IllegalArgumentException(
+        "illegal value for element " + element + ". Value of type " + Materialspecs.class + " or null was expected.");
     }
   }
 
@@ -651,8 +672,8 @@ public class DescriptionObject extends SimpleDescriptionObject {
     } else if (value instanceof ControlAccesses) {
       return (ControlAccesses) value;
     } else {
-      throw new IllegalArgumentException("illegal value for element " + element + ". Value of type "
-        + ControlAccesses.class + " or null was expected.");
+      throw new IllegalArgumentException(
+        "illegal value for element " + element + ". Value of type " + ControlAccesses.class + " or null was expected.");
     }
   }
 
@@ -1087,7 +1108,7 @@ public class DescriptionObject extends SimpleDescriptionObject {
   /**
    * @deprecated from now on, several materialspec may exist and therefore this
    *             method doesn't make sense
-   * */
+   */
   @Deprecated
   public void setMaterialspec(String materialspec) {
     if (materialspecs == null || materialspecs.getMaterialspecs() == null) {
@@ -1107,7 +1128,7 @@ public class DescriptionObject extends SimpleDescriptionObject {
   /**
    * @deprecated from now on, several relatedmaterial may exist and therefore
    *             this method doesn't make sense
-   * */
+   */
   @Deprecated
   public void setRelatedmaterial(String relatedmaterial) {
     if (relatedmaterials == null || relatedmaterials.getRelatedmaterials() == null) {
@@ -1127,7 +1148,7 @@ public class DescriptionObject extends SimpleDescriptionObject {
   /**
    * @deprecated from now on, several note may exist and therefore this method
    *             doesn't make sense
-   * */
+   */
   @Deprecated
   public void setNote(String note) {
     addNote(note);
@@ -1151,10 +1172,11 @@ public class DescriptionObject extends SimpleDescriptionObject {
   /**
    * @deprecated from now on, several note may exist and therefore this method
    *             doesn't make sense
-   * */
+   */
   @Deprecated
   public String getNote() {
-    if (notes != null && notes.getNotes() != null && notes.getNotes()[0] != null && notes.getNotes()[0].getP() != null) {
+    if (notes != null && notes.getNotes() != null && notes.getNotes()[0] != null
+      && notes.getNotes()[0].getP() != null) {
       return notes.getNotes()[0].getP().getText();
     }
     return null;
@@ -1171,7 +1193,7 @@ public class DescriptionObject extends SimpleDescriptionObject {
   /**
    * @deprecated from now on, several acqinfo may exist and therefore this
    *             method doesn't make sense
-   * */
+   */
   @Deprecated
   public void setAcqinfo(String acqinfo) {
     if (acqinfos == null || acqinfos.getAcqinfos() == null) {
@@ -1195,11 +1217,12 @@ public class DescriptionObject extends SimpleDescriptionObject {
   /**
    * @deprecated from now on, several acqinfo may exist and therefore this
    *             method doesn't make sense
-   * */
+   */
   @Deprecated
   public void setAcqinfoDate(String acqinfoDate) {
     if (acqinfos == null || acqinfos.getAcqinfos() == null) {
-      acqinfos = new Acqinfos(new Acqinfo[] {new Acqinfo(new P(null, null, acqinfoDate, null, null, null, null), null)});
+      acqinfos = new Acqinfos(
+        new Acqinfo[] {new Acqinfo(new P(null, null, acqinfoDate, null, null, null, null), null)});
     } else {
       Acqinfo firstAcqinfo = acqinfos.getAcqinfos()[0];
       firstAcqinfo.getP().setDate(acqinfoDate);
@@ -1209,7 +1232,7 @@ public class DescriptionObject extends SimpleDescriptionObject {
   /**
    * @deprecated from now on, several acqinfo may exist and therefore this
    *             method doesn't make sense
-   * */
+   */
   @Deprecated
   public void setAcqinfoNum(String acqinfoNum) {
     if (acqinfos == null || acqinfos.getAcqinfos() == null) {

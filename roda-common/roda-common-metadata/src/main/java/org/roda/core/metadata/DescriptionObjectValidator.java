@@ -30,9 +30,8 @@ public class DescriptionObjectValidator {
         Messages.getString("DescriptionObjectValidator.DESCRIPTION_LEVEL_IS_EMPTY")); //$NON-NLS-1$
     }
     if (!DescriptionLevelManager.getDescriptionLevels().contains(dObject.getLevel())) {
-      throw new InvalidDescriptionObjectException(String.format(
-        Messages.getString("DescriptionObjectValidator.DESCRIPTION_LEVEL_X_IS_NOT_VALID"), dObject.getLevel() //$NON-NLS-1$
-          .getLevel()));
+      throw new InvalidDescriptionObjectException(String
+        .format(Messages.getString("DescriptionObjectValidator.DESCRIPTION_LEVEL_X_IS_NOT_VALID"), dObject.getLevel()));
     }
 
     // Validate ID
@@ -40,17 +39,20 @@ public class DescriptionObjectValidator {
       throw new InvalidDescriptionObjectException(Messages.getString("DescriptionObjectValidator.ID_IS_EMPTY")); //$NON-NLS-1$
     }
 
-    // Validate COUNTRY_CODE
-    if (StringUtils.isBlank(dObject.getCountryCode())) {
-      throw new InvalidDescriptionObjectException(
-        Messages.getString("DescriptionObjectValidator.COUNTRY_CODE_IS_EMPTY")); //$NON-NLS-1$
-    }
-
-    // Validate REPOSITORY_CODE
-    if (StringUtils.isBlank(dObject.getRepositoryCode())) {
-      throw new InvalidDescriptionObjectException(
-        Messages.getString("DescriptionObjectValidator.REPOSITORY_CORE_IS_EMPTY")); //$NON-NLS-1$
-    }
+    // FIXME
+    // // Validate COUNTRY_CODE
+    // if (StringUtils.isBlank(dObject.getCountryCode())) {
+    // throw new InvalidDescriptionObjectException(
+    // Messages.getString("DescriptionObjectValidator.COUNTRY_CODE_IS_EMPTY"));
+    // //$NON-NLS-1$
+    // }
+    //
+    // // Validate REPOSITORY_CODE
+    // if (StringUtils.isBlank(dObject.getRepositoryCode())) {
+    // throw new InvalidDescriptionObjectException(
+    // Messages.getString("DescriptionObjectValidator.REPOSITORY_CORE_IS_EMPTY"));
+    // //$NON-NLS-1$
+    // }
 
     // Validate title
     if (StringUtils.isBlank(dObject.getTitle())) {
@@ -59,7 +61,8 @@ public class DescriptionObjectValidator {
 
     // Validate title
     if (StringUtils.isBlank(dObject.getOrigination())) {
-      throw new InvalidDescriptionObjectException(Messages.getString("DescriptionObjectValidator.ORIGINATION_IS_EMPTY")); //$NON-NLS-1$
+      throw new InvalidDescriptionObjectException(
+        Messages.getString("DescriptionObjectValidator.ORIGINATION_IS_EMPTY")); //$NON-NLS-1$
     }
 
     // Validate scope & content
@@ -71,25 +74,28 @@ public class DescriptionObjectValidator {
     Date dateInitial = null;
     Date dateFinal = null;
 
-    if (!StringUtils.isBlank(dObject.getDateInitial())) {
-      try {
-        dateInitial = DateParser.parse(dObject.getDateInitial());
-      } catch (InvalidDateException e) {
-        throw new InvalidDescriptionObjectException(
-          Messages.getString("DescriptionObjectValidator.INITIAL_DATE_IS_INVALID"),//$NON-NLS-1$
-          e);
-      }
-    }
-
-    if (!StringUtils.isBlank(dObject.getDateFinal())) {
-      try {
-        dateFinal = DateParser.parse(dObject.getDateFinal());
-      } catch (InvalidDateException e) {
-        throw new InvalidDescriptionObjectException(
-          Messages.getString("DescriptionObjectValidator.FINAL_DATE_IS_INVALID"), //$NON-NLS-1$
-          e);
-      }
-    }
+    // FIXME
+    // if (!StringUtils.isBlank(dObject.getDateInitial())) {
+    // try {
+    // dateInitial = DateParser.parse(dObject.getDateInitial());
+    // } catch (InvalidDateException e) {
+    // throw new InvalidDescriptionObjectException(
+    // Messages.getString("DescriptionObjectValidator.INITIAL_DATE_IS_INVALID"),
+    // //$NON-NLS-1$
+    // e);
+    // }
+    // }
+    //
+    // if (!StringUtils.isBlank(dObject.getDateFinal())) {
+    // try {
+    // dateFinal = DateParser.parse(dObject.getDateFinal());
+    // } catch (InvalidDateException e) {
+    // throw new InvalidDescriptionObjectException(
+    // Messages.getString("DescriptionObjectValidator.FINAL_DATE_IS_INVALID"),
+    // //$NON-NLS-1$
+    // e);
+    // }
+    // }
 
     if (dateInitial != null && dateFinal != null) {
 

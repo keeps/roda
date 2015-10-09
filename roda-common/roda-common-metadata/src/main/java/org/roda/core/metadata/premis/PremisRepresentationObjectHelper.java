@@ -10,6 +10,15 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.apache.xmlbeans.XmlException;
+import org.roda.core.data.SimpleRepresentationPreservationObject;
+import org.roda.core.data.v2.RODAObject;
+import org.roda.core.data.v2.RepresentationFilePreservationObject;
+import org.roda.core.data.v2.RepresentationPreservationObject;
+import org.w3c.util.DateParser;
+
 import lc.xmlns.premisV2.LinkingEventIdentifierComplexType;
 import lc.xmlns.premisV2.LinkingIntellectualEntityIdentifierComplexType;
 import lc.xmlns.premisV2.ObjectDocument;
@@ -19,15 +28,6 @@ import lc.xmlns.premisV2.RelatedEventIdentificationComplexType;
 import lc.xmlns.premisV2.RelatedObjectIdentificationComplexType;
 import lc.xmlns.premisV2.RelationshipComplexType;
 import lc.xmlns.premisV2.Representation;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.apache.xmlbeans.XmlException;
-import org.roda.core.data.RODAObject;
-import org.roda.core.data.RepresentationPreservationObject;
-import org.roda.core.data.SimpleRepresentationPreservationObject;
-import org.roda.core.data.preservation.RepresentationFilePreservationObject;
-import org.w3c.util.DateParser;
 
 /**
  * @author Rui Castro
@@ -53,8 +53,8 @@ public class PremisRepresentationObjectHelper extends PremisObjectHelper {
    * @throws PremisMetadataException
    *           if the PREMIS XML document is invalid.
    */
-  public static PremisRepresentationObjectHelper newInstance(File premisFile) throws PremisMetadataException,
-    FileNotFoundException, IOException {
+  public static PremisRepresentationObjectHelper newInstance(File premisFile)
+    throws PremisMetadataException, FileNotFoundException, IOException {
     FileInputStream premisInputStream = new FileInputStream(premisFile);
     PremisRepresentationObjectHelper instance = newInstance(premisInputStream);
     premisInputStream.close();
@@ -189,13 +189,15 @@ public class PremisRepresentationObjectHelper extends PremisObjectHelper {
     RepresentationPreservationObject representationPO = getRepresentationPreservationObject();
 
     // Copy the values from the SimpleRepresentationPreservationObject
-    representationPO.setPid(simpleRPO.getPid());
+    representationPO.setId(simpleRPO.getId());
     representationPO.setLabel(simpleRPO.getLabel());
-    representationPO.setContentModel(simpleRPO.getContentModel());
+    // FIXME
+    // representationPO.setContentModel(simpleRPO.getContentModel());
     representationPO.setLastModifiedDate(simpleRPO.getLastModifiedDate());
     representationPO.setCreatedDate(simpleRPO.getCreatedDate());
     representationPO.setState(simpleRPO.getState());
-    representationPO.setRepresentationObjectPID(simpleRPO.getRepresentationObjectPID());
+    // FIXME
+    // representationPO.setRepresentationObjectPID(simpleRPO.getRepresentationObjectPID());
 
     return representationPO;
   }
@@ -220,19 +222,22 @@ public class PremisRepresentationObjectHelper extends PremisObjectHelper {
       for (ObjectIdentifierComplexType objectIdentifier : objectIdentifierList) {
 
         if (PremisHelper.premisIdentifierTypePID.equals(objectIdentifier.getObjectIdentifierType())) {
-          pObject.setID(objectIdentifier.getObjectIdentifierValue());
+          pObject.setId(objectIdentifier.getObjectIdentifierValue());
         }
 
-        if (PremisHelper.premisIdentifierTypeContentModel.equals(objectIdentifier.getObjectIdentifierType())) {
-          pObject.setRepresentationContentModel(objectIdentifier.getObjectIdentifierValue());
-        }
+        // FIXME
+        // if
+        // (PremisHelper.premisIdentifierTypeContentModel.equals(objectIdentifier.getObjectIdentifierType()))
+        // {
+        // pObject.setRepresentationContentModel(objectIdentifier.getObjectIdentifierValue());
+        // }
 
       }
 
       // If we don't have an ID, it's because the <ObjectIdentifierType>
       // is unknown. Let's use the first value as ID.
-      if (pObject.getID() == null) {
-        pObject.setID(objectIdentifierList.get(0).getObjectIdentifierValue());
+      if (pObject.getId() == null) {
+        pObject.setId(objectIdentifierList.get(0).getObjectIdentifierValue());
       }
 
     } else {
@@ -290,8 +295,8 @@ public class PremisRepresentationObjectHelper extends PremisObjectHelper {
 
               RelatedObjectIdentificationComplexType relatedObjectIdentification = relationship
                 .getRelatedObjectIdentificationArray(0);
-              pObject.setDerivedFromRepresentationObjectID(relatedObjectIdentification
-                .getRelatedObjectIdentifierValue());
+              pObject
+                .setDerivedFromRepresentationObjectID(relatedObjectIdentification.getRelatedObjectIdentifierValue());
             }
 
             if (relationship.getRelatedEventIdentificationList() != null
@@ -345,14 +350,16 @@ public class PremisRepresentationObjectHelper extends PremisObjectHelper {
     // <objectIdentifier>
     ObjectIdentifierComplexType objectIdentifier = getRepresentation().addNewObjectIdentifier();
     objectIdentifier.setObjectIdentifierType(PremisHelper.premisIdentifierTypePID);
-    objectIdentifier.setObjectIdentifierValue(rpo.getID());
+    objectIdentifier.setObjectIdentifierValue(rpo.getId());
 
     // <objectIdentifier>
-    if (rpo.getRepresentationContentModel() != null) {
-      ObjectIdentifierComplexType objectCModelIdentifier = getRepresentation().addNewObjectIdentifier();
-      objectCModelIdentifier.setObjectIdentifierType(PremisHelper.premisIdentifierTypeContentModel);
-      objectCModelIdentifier.setObjectIdentifierValue(rpo.getRepresentationContentModel());
-    }
+    // FIXME
+    // if (rpo.getRepresentationContentModel() != null) {
+    // ObjectIdentifierComplexType objectCModelIdentifier =
+    // getRepresentation().addNewObjectIdentifier();
+    // objectCModelIdentifier.setObjectIdentifierType(PremisHelper.premisIdentifierTypeContentModel);
+    // objectCModelIdentifier.setObjectIdentifierValue(rpo.getRepresentationContentModel());
+    // }
 
     // <preservationLevel>
     PreservationLevelComplexType preservationLevel = getRepresentation().addNewPreservationLevel();
@@ -368,8 +375,8 @@ public class PremisRepresentationObjectHelper extends PremisObjectHelper {
         premisRelationshipTypeStructural, premisRelationshipSubTypeHasRoot);
 
       // <relationship><relatedObjectIdentification>
-      addNewRelatedObject(relationshipHasRoot, PremisHelper.premisIdentifierTypeDatastreamID,
-        rpo.getRootFile().getID(), 0);
+      addNewRelatedObject(relationshipHasRoot, PremisHelper.premisIdentifierTypeDatastreamID, rpo.getRootFile().getID(),
+        0);
     }
 
     if (rpo.getPartFiles() != null && rpo.getPartFiles().length > 0) {

@@ -9,14 +9,12 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlCursor.TokenType;
+import org.apache.xmlbeans.XmlException;
 import org.roda.core.common.InvalidDescriptionLevel;
 import org.roda.core.data.DescriptionObject;
-import org.roda.core.data.RODAObject;
-import org.roda.core.data.SimpleDescriptionObject;
 import org.roda.core.data.eadc.Acqinfos;
 import org.roda.core.data.eadc.Archref;
 import org.roda.core.data.eadc.Archrefs;
@@ -43,9 +41,10 @@ import org.roda.core.data.eadc.PhysdescGenreform;
 import org.roda.core.data.eadc.ProcessInfo;
 import org.roda.core.data.eadc.Relatedmaterial;
 import org.roda.core.data.eadc.Relatedmaterials;
+import org.roda.core.data.v2.RODAObject;
+import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.core.metadata.MetadataException;
 import org.roda.core.metadata.MetadataHelperUtility;
-import org.apache.xmlbeans.XmlException;
 
 import pt.gov.dgarq.roda.x2014.eadcSchema.Acqinfo;
 import pt.gov.dgarq.roda.x2014.eadcSchema.AcqinfoP;
@@ -76,10 +75,8 @@ import pt.gov.dgarq.roda.x2014.eadcSchema.Table;
 import pt.gov.dgarq.roda.x2014.eadcSchema.Tbody;
 import pt.gov.dgarq.roda.x2014.eadcSchema.Tgroup;
 import pt.gov.dgarq.roda.x2014.eadcSchema.Thead;
-import pt.gov.dgarq.roda.x2014.eadcSchema.Unitdate;
 import pt.gov.dgarq.roda.x2014.eadcSchema.Unitid;
 import pt.gov.dgarq.roda.x2014.eadcSchema.UnitidWithOptionalAttributes;
-import pt.gov.dgarq.roda.x2014.eadcSchema.Unittitle;
 
 /**
  * This is an helper class for manipulating a EAD-C XML document. It provides
@@ -234,107 +231,114 @@ public class EadCHelper {
 
     SimpleDescriptionObject sdo = new SimpleDescriptionObject(rodaObject);
 
-    sdo.setParentPID(parentPID);
-    sdo.setSubElementsCount(subElementsCount);
-
-    // SimpleDescriptionObject must have this fields
-    // @level,
-    // did/unitid/@repositorycode,
-    // did/unitid,
-    // did/unittitle,
-    // did/unitdate.
-
-    // @level
-    sdo.setLevel(new DescriptionLevel(c.getLevel().toString()));
-
-    Did did = c.getDid();
-    if (did != null) {
-
-      // FIXME fully support several unitid occurrences
-      // did/unitid/@repositorycode
-      Unitid unitid = null;
-      if (did.getUnitidList().size() > 0 && did.getUnitidList().get(0) != null) {
-        unitid = did.getUnitidList().get(0);
-
-        if (StringUtils.isNotBlank(unitid.getRepositorycode())) {
-
-          String repositoryCode = unitid.getRepositorycode();
-
-          int indexOfDivider = repositoryCode.indexOf("-");
-          if (indexOfDivider >= 0) {
-
-            sdo.setCountryCode(repositoryCode.substring(0, indexOfDivider));
-            if (indexOfDivider + 1 < repositoryCode.length()) {
-              sdo.setRepositoryCode(repositoryCode.substring(indexOfDivider + 1));
-            }
-
-          } else {
-            logger.warn("Invalid countryRepositoryCode '" + unitid.getRepositorycode() + "'");
-          }
-        }
-
-        // did/unitid
-        sdo.setId(unitid.getStringValue());
-
-      }
-
-      // FIXME fully support several unittitle occurrences
-      Unittitle unittitle = null;
-      if (did.getUnittitleList().size() > 0 && did.getUnittitleList().get(0) != null) {
-        unittitle = did.getUnittitleList().get(0);
-        // did/unittitle
-        sdo.setTitle(unittitle.getStringValue());
-      }
-
-      // FIXME fully support several unitdate occurrences
-      // did/unitdate
-      Unitdate unitdate = null;
-      if (did.getUnitdateList().size() > 0 && did.getUnitdateList().get(0) != null) {
-        unitdate = did.getUnitdateList().get(0);
-
-        String normalDate = unitdate.getNormal();
-        if (normalDate != null) {
-          String[] dates = normalDate.split("/");
-          if (dates.length > 0) {
-            // dateInitial
-            sdo.setDateInitial(dates[0]);
-            if (dates.length > 1) {
-              // dateFinal
-              sdo.setDateFinal(dates[1]);
-            } else {
-              // dateFinal is equal to dateInitial
-              sdo.setDateFinal(dates[0]);
-            }
-          }
-        }
-      }
-    }
-
-    String description = null;
-
-    // FIXME fully support several scopecontent occurrences
-    // scopecontent/p
-    if (c.getScopecontentList().size() > 0 && c.getScopecontentList().get(0) != null) {
-      description = c.getScopecontentList().get(0).getP();
-    }
-
-    // FIXME fully support several bioghist occurrences
-    // bioghist
-    Bioghist bioghist = null;
-    if (c.getBioghistList().size() > 0 && c.getBioghistList().get(0) != null) {
-      bioghist = c.getBioghistList().get(0);
-      // bioghist/p
-      if (bioghist.getP() != null && bioghist.getP().length() > 0) {
-
-        if (description != null) {
-          description += "\n\n" + bioghist.getP();
-        } else {
-          description = bioghist.getP();
-        }
-      }
-    } // End of bioghist
-
-    sdo.setDescription(description);
+    // FIXME
+    // sdo.setParentPID(parentPID);
+    // sdo.setSubElementsCount(subElementsCount);
+    //
+    // // SimpleDescriptionObject must have this fields
+    // // @level,
+    // // did/unitid/@repositorycode,
+    // // did/unitid,
+    // // did/unittitle,
+    // // did/unitdate.
+    //
+    // // @level
+    // sdo.setLevel(new DescriptionLevel(c.getLevel().toString()));
+    //
+    // Did did = c.getDid();
+    // if (did != null) {
+    //
+    // // FIXME fully support several unitid occurrences
+    // // did/unitid/@repositorycode
+    // Unitid unitid = null;
+    // if (did.getUnitidList().size() > 0 && did.getUnitidList().get(0) != null)
+    // {
+    // unitid = did.getUnitidList().get(0);
+    //
+    // if (StringUtils.isNotBlank(unitid.getRepositorycode())) {
+    //
+    // String repositoryCode = unitid.getRepositorycode();
+    //
+    // int indexOfDivider = repositoryCode.indexOf("-");
+    // if (indexOfDivider >= 0) {
+    //
+    // sdo.setCountryCode(repositoryCode.substring(0, indexOfDivider));
+    // if (indexOfDivider + 1 < repositoryCode.length()) {
+    // sdo.setRepositoryCode(repositoryCode.substring(indexOfDivider + 1));
+    // }
+    //
+    // } else {
+    // logger.warn("Invalid countryRepositoryCode '" +
+    // unitid.getRepositorycode() + "'");
+    // }
+    // }
+    //
+    // // did/unitid
+    // sdo.setId(unitid.getStringValue());
+    //
+    // }
+    //
+    // // FIXME fully support several unittitle occurrences
+    // Unittitle unittitle = null;
+    // if (did.getUnittitleList().size() > 0 && did.getUnittitleList().get(0) !=
+    // null) {
+    // unittitle = did.getUnittitleList().get(0);
+    // // did/unittitle
+    // sdo.setTitle(unittitle.getStringValue());
+    // }
+    //
+    // // FIXME fully support several unitdate occurrences
+    // // did/unitdate
+    // Unitdate unitdate = null;
+    // if (did.getUnitdateList().size() > 0 && did.getUnitdateList().get(0) !=
+    // null) {
+    // unitdate = did.getUnitdateList().get(0);
+    //
+    // String normalDate = unitdate.getNormal();
+    // if (normalDate != null) {
+    // String[] dates = normalDate.split("/");
+    // if (dates.length > 0) {
+    // // dateInitial
+    // sdo.setDateInitial(dates[0]);
+    // if (dates.length > 1) {
+    // // dateFinal
+    // sdo.setDateFinal(dates[1]);
+    // } else {
+    // // dateFinal is equal to dateInitial
+    // sdo.setDateFinal(dates[0]);
+    // }
+    // }
+    // }
+    // }
+    // }
+    //
+    // String description = null;
+    //
+    // // FIXME fully support several scopecontent occurrences
+    // // scopecontent/p
+    // if (c.getScopecontentList().size() > 0 && c.getScopecontentList().get(0)
+    // != null) {
+    // description = c.getScopecontentList().get(0).getP();
+    // }
+    //
+    // // FIXME fully support several bioghist occurrences
+    // // bioghist
+    // Bioghist bioghist = null;
+    // if (c.getBioghistList().size() > 0 && c.getBioghistList().get(0) != null)
+    // {
+    // bioghist = c.getBioghistList().get(0);
+    // // bioghist/p
+    // if (bioghist.getP() != null && bioghist.getP().length() > 0) {
+    //
+    // if (description != null) {
+    // description += "\n\n" + bioghist.getP();
+    // } else {
+    // description = bioghist.getP();
+    // }
+    // }
+    // } // End of bioghist
+    //
+    // sdo.setDescription(description);
 
     return sdo;
   }
@@ -578,8 +582,7 @@ public class EadCHelper {
             ProcessinfoPArchref eadArchref = eadP.getArchrefList().get(0);
             Archref archref = new Archref();
             List<UnitidWithOptionalAttributes> eadUnitidList = eadArchref.getUnitidList();
-            org.roda.core.data.eadc.Unitid[] unitids = new org.roda.core.data.eadc.Unitid[eadUnitidList
-              .size()];
+            org.roda.core.data.eadc.Unitid[] unitids = new org.roda.core.data.eadc.Unitid[eadUnitidList.size()];
 
             // processinfo/p/archref/unitid
             for (int j = 0; j < eadUnitidList.size(); j++) {
@@ -713,8 +716,7 @@ public class EadCHelper {
 
     // acqinfo
     if (c.getAcqinfoList().size() > 0) {
-      org.roda.core.data.eadc.Acqinfo[] acqinfos = new org.roda.core.data.eadc.Acqinfo[c
-        .getAcqinfoList().size()];
+      org.roda.core.data.eadc.Acqinfo[] acqinfos = new org.roda.core.data.eadc.Acqinfo[c.getAcqinfoList().size()];
 
       for (int i = 0; i < c.getAcqinfoList().size(); i++) {
         Acqinfo eadAcqinfo = c.getAcqinfoList().get(i);
@@ -844,8 +846,7 @@ public class EadCHelper {
           // relatedmaterial/archref/unitid
           if (eadArchref.getUnitidList().size() > 0) {
             List<UnitidWithOptionalAttributes> eadUnitidList = eadArchref.getUnitidList();
-            org.roda.core.data.eadc.Unitid[] unitids = new org.roda.core.data.eadc.Unitid[eadUnitidList
-              .size()];
+            org.roda.core.data.eadc.Unitid[] unitids = new org.roda.core.data.eadc.Unitid[eadUnitidList.size()];
 
             for (int j = 0; j < eadUnitidList.size(); j++) {
               UnitidWithOptionalAttributes eadUnitid = eadUnitidList.get(j);
@@ -964,529 +965,564 @@ public class EadCHelper {
     setEadC(C.Factory.newInstance());
     C c = getEadC();
 
-    // @otherlevel
-    c.setLevel(Enum.forString(dObject.getLevel().getLevel()));
-
-    Did did = c.addNewDid();
-
-    // did/unitid
-    Unitid unitid = did.addNewUnitid();
-    unitid.setStringValue(dObject.getId());
-
-    // did/unitid/@repositorycode
-    String countryRepositoryCode = "";
-    if (!StringUtils.isBlank(dObject.getCountryCode())) {
-      countryRepositoryCode += dObject.getCountryCode();
-    }
-    countryRepositoryCode += "-";
-    if (!StringUtils.isBlank(dObject.getRepositoryCode())) {
-      countryRepositoryCode += dObject.getRepositoryCode();
-    }
-    unitid.setRepositorycode(countryRepositoryCode);
-
-    // did/unittitle
-    did.addNewUnittitle().setStringValue(dObject.getTitle());
-    // if (dObject.getTitle() != null) {
-    // did.setUnittitle(dObject.getTitle());
+    // FIXME
+    // // @otherlevel
+    // c.setLevel(Enum.forString(dObject.getLevel().getLevel()));
+    //
+    // Did did = c.addNewDid();
+    //
+    // // did/unitid
+    // Unitid unitid = did.addNewUnitid();
+    // unitid.setStringValue(dObject.getId());
+    //
+    // // did/unitid/@repositorycode
+    // String countryRepositoryCode = "";
+    // if (!StringUtils.isBlank(dObject.getCountryCode())) {
+    // countryRepositoryCode += dObject.getCountryCode();
     // }
-
-    // did/unitdate
-    String joinDates2 = joinDates(dObject.getDateInitial(), dObject.getDateFinal());
-    if (joinDates2 != null) {
-      did.addNewUnitdate().setNormal(joinDates2);
-    }
-
-    // did/abstract
-    if (dObject.getAbstract() != null) {
-      did.addNewAbstract().setStringValue(dObject.getAbstract());
-    }
-
-    // did/physdesc
-    Physdesc physdesc = did.addNewPhysdesc();
-
-    // did/physdesc/p
-    if (dObject.getPhysdesc() != null) {
-      physdesc.setP(dObject.getPhysdesc());
-    }
-
-    // did/physdesc/dimensions
-    if (dObject.getPhysdescDimensions() != null) {
-      Dimensions dimensions = physdesc.addNewDimensions();
-
-      // did/physdesc/dimensions/text()
-      dimensions.setStringValue(dObject.getPhysdescDimensions().getValue());
-
-      // did/physdesc/dimensions/@unit
-      if (dObject.getPhysdescDimensions().getUnit() != null) {
-
-        dimensions.setUnit(dObject.getPhysdescDimensions().getUnit());
-      }
-
-    }
-
-    // did/physdesc/physfacet
-    if (dObject.getPhysdescPhysfacet() != null) {
-      Physfacet physfacet = physdesc.addNewPhysfacet();
-
-      // did/physdesc/physfacet/text()
-      physfacet.setStringValue(dObject.getPhysdescPhysfacet().getValue());
-
-      // did/physdesc/physfacet/@unit
-      if (dObject.getPhysdescPhysfacet().getUnit() != null) {
-        physfacet.setUnit(dObject.getPhysdescPhysfacet().getUnit());
-      }
-
-    }
-
-    // did/physdesc/date
-    String joinDates = joinDates(dObject.getPhysdescDateInitial(), dObject.getPhysdescDateFinal());
-    if (joinDates != null) {
-      physdesc.addNewDate().setNormal(joinDates);
-    }
-
-    // did/physdesc/extent
-    if (dObject.getPhysdescExtent() != null) {
-      Extent extent = physdesc.addNewExtent();
-
-      // did/physdesc/extent/text()
-      extent.setStringValue(dObject.getPhysdescExtent().getValue());
-
-      // did/physdesc/extent/@unit
-      if (dObject.getPhysdescExtent().getUnit() != null) {
-        extent.setUnit(dObject.getPhysdescExtent().getUnit());
-      }
-    }
-
-    // did/physdesc/genreform
-    if (dObject.getPhysdescGenreform() != null) {
-      Genreform genreform = physdesc.addNewGenreform();
-
-      // did/physdesc/genreform/@authfilenumber
-      if (dObject.getPhysdescGenreform().getAttributeAuthfilenumber() != null) {
-        genreform.setAuthfilenumber(dObject.getPhysdescGenreform().getAttributeAuthfilenumber());
-      }
-
-      // did/physdesc/genreform/@normal
-      if (dObject.getPhysdescGenreform().getAttributeNormal() != null) {
-        genreform.setNormal(dObject.getPhysdescGenreform().getAttributeNormal());
-      }
-
-      // did/physdesc/genreform/@source
-      if (dObject.getPhysdescGenreform().getAttributeSource() != null) {
-        genreform.setSource(dObject.getPhysdescGenreform().getAttributeSource());
-      }
-
-      // did/physdesc/genreform/text()
-      genreform.setStringValue(dObject.getPhysdescGenreform().getText());
-    }
-
-    // did/materialspec
-    if (dObject.getMaterialspecs() != null && dObject.getMaterialspecs().getMaterialspecs() != null) {
-
-      for (org.roda.core.data.eadc.Materialspec materialspec : dObject.getMaterialspecs().getMaterialspecs()) {
-        Materialspec newMaterialspec = did.addNewMaterialspec();
-
-        // did/materialspec/@label
-        if (materialspec.getAttributeLabel() != null) {
-          newMaterialspec.setLabel(materialspec.getAttributeLabel());
-        }
-
-        // did/materialspec/text()
-        newMaterialspec.setStringValue(materialspec.getText());
-      }
-
-    }
-
-    // did/origination
-    if (dObject.getOrigination() != null) {
-      did.addNewOrigination().setStringValue(dObject.getOrigination());
-    }
-
-    // did/langmaterial
-    if (dObject.getLangmaterialLanguages() != null
-      && dObject.getLangmaterialLanguages().getLangmaterialLanguages() != null
-      && dObject.getLangmaterialLanguages().getLangmaterialLanguages().length > 0) {
-
-      Langmaterial langmaterial = did.addNewLangmaterial();
-
-      for (String language : dObject.getLangmaterialLanguages().getLangmaterialLanguages()) {
-        langmaterial.addNewLanguage().setStringValue(language);
-      }
-
-    }
-    // End of did
-
-    // processinfo
-    ProcessInfo processinfo = dObject.getProcessinfo();
-    if (processinfo != null) {
-      Processinfo newProcessinfo = c.addNewProcessinfo();
-
-      // processinfo/@altrender
-      newProcessinfo.addNewAltrender().setStringValue(processinfo.getAttributeAltrender());
-
-      // processinfo/note
-      if (processinfo.getNote() != null) {
-        pt.gov.dgarq.roda.x2014.eadcSchema.Note newNote = newProcessinfo.addNewNote();
-
-        // processinfo/note/@altrender
-        if (processinfo.getNote().getAttributeAltrender() != null) {
-          newNote.addNewAltrender().setStringValue(processinfo.getNote().getAttributeAltrender());
-        }
-
-        // processinfo/note/p/text()
-        if (processinfo.getNote().getP() != null) {
-          newNote.setP(processinfo.getNote().getP().getText());
-        }
-      }
-
-      // processinfo/p
-      if (processinfo.getpList() != null && processinfo.getpList().length > 0) {
-        for (P p : processinfo.getpList()) {
-          ProcessinfoP newP = newProcessinfo.addNewP();
-
-          // processinfo/p/@altrender
-          if (p.getAttributeAltrender() != null) {
-            newP.addNewAltrender().setStringValue(p.getAttributeAltrender());
-          }
-
-          // processinfo/p/note
-          if (p.getNotes() != null && p.getNotes().getNotes() != null && p.getNotes().getNotes().length > 0) {
-
-            for (Note note : p.getNotes().getNotes()) {
-              pt.gov.dgarq.roda.x2014.eadcSchema.Note newNote = newP.addNewNote();
-
-              // processinfo/p/note/@altrender
-              if (note.getAttributeAltrender() != null) {
-                newNote.addNewAltrender().setStringValue(note.getAttributeAltrender());
-              }
-
-              // processinfo/p/note/p/text()
-              if (note.getP() != null) {
-                newNote.setP(note.getP().getText());
-              }
-            }
-          }
-
-          // processinfo/p/archref
-          if (p.getArchrefs() != null && p.getArchrefs().getArchrefs() != null
-            && p.getArchrefs().getArchrefs().length > 0) {
-            for (Archref archref : p.getArchrefs().getArchrefs()) {
-              ProcessinfoPArchref newArchref = newP.addNewArchref();
-
-              // processinfo/p/archref/unitid
-              if (archref.getUnitids() != null && archref.getUnitids().length > 0) {
-                for (org.roda.core.data.eadc.Unitid id : archref.getUnitids()) {
-                  UnitidWithOptionalAttributes newUnitid = newArchref.addNewUnitid();
-
-                  // processinfo/p/archref/unitid/@altrender
-                  if (id.getAttributeAltrender() != null) {
-                    newUnitid.addNewAltrender().setStringValue(id.getAttributeAltrender());
-                  }
-
-                  // processinfo/p/archref/unitid/text()
-                  newUnitid.setStringValue(id.getText());
-                }
-              }
-
-              // processinfo/p/archref/note
-              if (archref.getNote() != null) {
-                pt.gov.dgarq.roda.x2014.eadcSchema.Note newNote = newArchref.addNewNote();
-
-                // processinfo/p/archref/note/@altrender
-                if (archref.getNote().getAttributeAltrender() != null) {
-                  newNote.addNewAltrender().setStringValue(archref.getNote().getAttributeAltrender());
-                }
-
-                // processinfo/p/archref/note/p/text()
-                if (archref.getNote().getP() != null) {
-                  newNote.setP(archref.getNote().getP().getText());
-                }
-              }
-            }
-          }
-
-        }
-      }
-    }
-
-    // controlaccess
-    ControlAccesses dObjectControlaccesses = dObject.getControlaccesses();
-    if (dObjectControlaccesses != null && dObjectControlaccesses.getControlaccesses() != null) {
-      for (ControlAccess dObjectControlaccess : dObjectControlaccesses.getControlaccesses()) {
-        Controlaccess eadControlaccess = c.addNewControlaccess();
-        if (dObjectControlaccess.getAttributeEncodinganalog() != null) {
-          eadControlaccess.setEncodinganalog(dObjectControlaccess.getAttributeEncodinganalog());
-        }
-        if (dObjectControlaccess.getFunction() != null) {
-          eadControlaccess.setFunctionArray(new String[] {dObjectControlaccess.getFunction()});
-        }
-        if (dObjectControlaccess.getHead() != null) {
-          eadControlaccess.setHeadArray(new String[] {dObjectControlaccess.getHead()});
-        }
-        if (dObjectControlaccess.getSubject() != null) {
-          eadControlaccess.setSubjectArray(new String[] {dObjectControlaccess.getSubject()});
-        }
-        if (dObjectControlaccess.getP() != null) {
-          eadControlaccess.addP(dObjectControlaccess.getP());
-        }
-      }
-    }
-
-    // odd
-    if (dObject.getOdd() != null) {
-      c.addNewOdd().setStringValue(dObject.getOdd());
-    }
-
-    // bioghist
-    if (dObject.getBioghist() != null || dObject.getBioghistChronlist() != null) {
-
-      Bioghist bioghist = c.addNewBioghist();
-
-      // bioghist/p
-      if (dObject.getBioghist() != null) {
-        bioghist.setP(dObject.getBioghist());
-      }
-
-      // bioghist/chronlist
-      if (dObject.getBioghistChronlist() != null && dObject.getBioghistChronlist().getBioghistChronitems() != null
-        && dObject.getBioghistChronlist().getBioghistChronitems().length > 0) {
-
-        Chronlist chronlist = bioghist.addNewChronlist();
-
-        for (BioghistChronitem item : dObject.getBioghistChronlist().getBioghistChronitems()) {
-
-          Chronitem chronitem = chronlist.addNewChronitem();
-          chronitem.addNewDate().setNormal(joinDates(item.getDateInitial(), item.getDateFinal()));
-          chronitem.setEvent(item.getEvent());
-        }
-      } // End of bioghist/chronlist
-
-    } // End of bioghist
-
-    // custodhist/p
-    if (dObject.getCustodhist() != null) {
-      c.addNewCustodhist().setP(dObject.getCustodhist());
-    }
-
-    // acqinfo
-    if (dObject.getAcqinfos() != null && dObject.getAcqinfos().getAcqinfos() != null) {
-
-      for (org.roda.core.data.eadc.Acqinfo acqinfo : dObject.getAcqinfos().getAcqinfos()) {
-        Acqinfo newAcqinfo = c.addNewAcqinfo();
-
-        // acqinfo/@altrender
-        if (acqinfo.getAttributeAltrender() != null) {
-          newAcqinfo.addNewAltrender().setStringValue(acqinfo.getAttributeAltrender());
-        }
-
-        // acqinfo/p
-        if (acqinfo.getP() != null) {
-          P p = acqinfo.getP();
-          AcqinfoP newP = newAcqinfo.addNewP();
-
-          // INFO must be the first one to be added because we use cursor to add
-          // the pcdata (mixed=true)
-          // acqinfo/p/text()
-          if (p.getText() != null) {
-            XmlCursor newCursor = newP.newCursor();
-            newCursor.toLastAttribute();
-            newCursor.setTextValue(p.getText());
-            newCursor.dispose();
-          }
-
-          // acqinfo/p/date
-          if (p.getDate() != null) {
-            newP.addNewDate().setNormal(p.getDate());
-          }
-
-          // acqinfo/p/num
-          if (p.getNum() != null) {
-            newP.setNum(p.getNum());
-          }
-
-          // acqinfo/p/corpname
-          if (p.getCorpname() != null) {
-            newP.setCorpname(p.getCorpname());
-          }
-        }
-      }
-    }
-
-    // scopecontent/p
-    if (dObject.getScopecontent() != null) {
-      c.addNewScopecontent().setP(dObject.getScopecontent());
-    }
-
-    // appraisal/p
-    if (dObject.getAppraisal() != null) {
-      c.addNewAppraisal().setP(dObject.getAppraisal());
-    }
-
-    // accruals/p
-    if (dObject.getAccruals() != null) {
-      c.addNewAccruals().setP(dObject.getAccruals());
-    }
-
-    // arrangement
-    if (dObject.getArrangement() != null || dObject.getArrangementTable() != null) {
-
-      Arrangement arrangement = c.addNewArrangement();
-
-      // arrangement/p
-      if (dObject.getArrangement() != null) {
-        arrangement.setP(dObject.getArrangement());
-      }
-
-      // arrangement/table
-      if (dObject.getArrangementTable() != null && dObject.getArrangementTable().getArrangementTableGroups() != null
-        && dObject.getArrangementTable().getArrangementTableGroups().length > 0) {
-
-        Table table = arrangement.addNewTable();
-
-        for (ArrangementTableGroup group : dObject.getArrangementTable().getArrangementTableGroups()) {
-
-          Tgroup tgroup = table.addNewTgroup();
-          tgroup.setCols(new BigInteger(new Integer(group.getColumns()).toString()));
-
-          if (group.getHead() != null) {
-
-            Thead thead = tgroup.addNewThead();
-
-            for (ArrangementTableRow atrow : group.getHead().getRows()) {
-
-              Row row = thead.addNewRow();
-              for (String entry : atrow.getEntries()) {
-                row.addNewEntry().setStringValue(entry);
-              }
-
-            }
-          }
-
-          if (group.getBody() != null) {
-            Tbody tbody = tgroup.addNewTbody();
-            for (ArrangementTableRow atrow : group.getBody().getRows()) {
-
-              Row row = tbody.addNewRow();
-              for (String entry : atrow.getEntries()) {
-                row.addNewEntry().setStringValue(entry);
-              }
-
-            }
-
-          }
-        }
-      } // End of arrangement/table
-
-    } // End of arrangement
-
-    // accessrestrict/p
-    if (dObject.getAccessrestrict() != null) {
-      c.addNewAccessrestrict().setP(dObject.getAccessrestrict());
-    }
-
-    // userestrict/p
-    if (dObject.getUserestrict() != null) {
-      c.addNewUserestrict().setP(dObject.getUserestrict());
-    }
-
-    // phystech/p
-    if (dObject.getPhystech() != null) {
-      c.addNewPhystech().setP(dObject.getPhystech());
-    }
-
-    // otherfindaid/p
-    if (dObject.getOtherfindaid() != null) {
-      c.addNewOtherfindaid().setP(dObject.getOtherfindaid());
-    }
-
-    // relatedmaterial
-    if (dObject.getRelatedmaterials() != null && dObject.getRelatedmaterials().getRelatedmaterials() != null) {
-      for (Relatedmaterial relatedmaterial : dObject.getRelatedmaterials().getRelatedmaterials()) {
-        pt.gov.dgarq.roda.x2014.eadcSchema.Relatedmaterial newRelatedmaterial = c.addNewRelatedmaterial();
-
-        // relatedmaterial/p
-        if (relatedmaterial.getP() != null && relatedmaterial.getP().getText() != null) {
-          newRelatedmaterial.setP(relatedmaterial.getP().getText());
-        }
-
-        // relatedmaterial/archref
-        if (relatedmaterial.getArchref() != null) {
-          Archref archref = relatedmaterial.getArchref();
-          pt.gov.dgarq.roda.x2014.eadcSchema.Archref newArchref = newRelatedmaterial.addNewArchref();
-
-          // relatedmaterial/archref/unitid
-          if (archref.getUnitids() != null && archref.getUnitids().length > 0) {
-            for (org.roda.core.data.eadc.Unitid id : archref.getUnitids()) {
-              UnitidWithOptionalAttributes newUnitid = newArchref.addNewUnitid();
-
-              // relatedmaterial/archref/unitid/@altrender
-              if (id.getAttributeAltrender() != null) {
-                newUnitid.addNewAltrender().setStringValue(id.getAttributeAltrender());
-              }
-
-              // relatedmaterial/archref/unitid/text()
-              newUnitid.setStringValue(id.getText());
-            }
-          }
-        }
-      }
-    }
-
-    // bibliography/p
-    if (dObject.getBibliography() != null) {
-      c.addNewBibliography().setP(dObject.getBibliography());
-    }
-
-    // note
-    if (dObject.getNotes() != null && dObject.getNotes().getNotes() != null) {
-      for (Note note : dObject.getNotes().getNotes()) {
-        pt.gov.dgarq.roda.x2014.eadcSchema.Note newNote = c.addNewNote();
-
-        // note/@label
-        if (note.getAttributeLabel() != null) {
-          newNote.addNewLabel().setStringValue(note.getAttributeLabel());
-        }
-
-        // note/@altrender
-        if (note.getAttributeAltrender() != null) {
-          newNote.addNewAltrender().setStringValue(note.getAttributeAltrender());
-        }
-
-        // note/p
-        if (note.getP() != null && note.getP().getText() != null) {
-          newNote.setP(note.getP().getText());
-        }
-
-        // note/list
-        if (note.getList() != null && note.getList().getItems() != null) {
-          pt.gov.dgarq.roda.x2014.eadcSchema.List newList = newNote.addNewList();
-
-          // note/list/item
-          for (String item : note.getList().getItems()) {
-            newList.addNewItem().setStringValue(item);
-          }
-        }
-      }
-    }
-
-    // index
-    if (dObject.getIndex() != null && dObject.getIndex().getIndexes() != null) {
-      pt.gov.dgarq.roda.x2014.eadcSchema.Index newIndex = c.addNewIndex();
-
-      // index/indexentry
-      for (Indexentry indexentry : dObject.getIndex().getIndexes()) {
-
-        // index/indexentry/subject
-        if (indexentry.getSubject() != null) {
-          newIndex.addNewIndexentry().addNewSubject().setStringValue(indexentry.getSubject());
-        }
-      }
-    }
-
-    // prefercite/p
-    if (dObject.getPrefercite() != null) {
-      c.addNewPrefercite().setP(dObject.getPrefercite());
-    }
+    // countryRepositoryCode += "-";
+    // if (!StringUtils.isBlank(dObject.getRepositoryCode())) {
+    // countryRepositoryCode += dObject.getRepositoryCode();
+    // }
+    // unitid.setRepositorycode(countryRepositoryCode);
+    //
+    // // did/unittitle
+    // did.addNewUnittitle().setStringValue(dObject.getTitle());
+    // // if (dObject.getTitle() != null) {
+    // // did.setUnittitle(dObject.getTitle());
+    // // }
+    //
+    // // did/unitdate
+    // String joinDates2 = joinDates(dObject.getDateInitial(),
+    // dObject.getDateFinal());
+    // if (joinDates2 != null) {
+    // did.addNewUnitdate().setNormal(joinDates2);
+    // }
+    //
+    // // did/abstract
+    // if (dObject.getAbstract() != null) {
+    // did.addNewAbstract().setStringValue(dObject.getAbstract());
+    // }
+    //
+    // // did/physdesc
+    // Physdesc physdesc = did.addNewPhysdesc();
+    //
+    // // did/physdesc/p
+    // if (dObject.getPhysdesc() != null) {
+    // physdesc.setP(dObject.getPhysdesc());
+    // }
+    //
+    // // did/physdesc/dimensions
+    // if (dObject.getPhysdescDimensions() != null) {
+    // Dimensions dimensions = physdesc.addNewDimensions();
+    //
+    // // did/physdesc/dimensions/text()
+    // dimensions.setStringValue(dObject.getPhysdescDimensions().getValue());
+    //
+    // // did/physdesc/dimensions/@unit
+    // if (dObject.getPhysdescDimensions().getUnit() != null) {
+    //
+    // dimensions.setUnit(dObject.getPhysdescDimensions().getUnit());
+    // }
+    //
+    // }
+    //
+    // // did/physdesc/physfacet
+    // if (dObject.getPhysdescPhysfacet() != null) {
+    // Physfacet physfacet = physdesc.addNewPhysfacet();
+    //
+    // // did/physdesc/physfacet/text()
+    // physfacet.setStringValue(dObject.getPhysdescPhysfacet().getValue());
+    //
+    // // did/physdesc/physfacet/@unit
+    // if (dObject.getPhysdescPhysfacet().getUnit() != null) {
+    // physfacet.setUnit(dObject.getPhysdescPhysfacet().getUnit());
+    // }
+    //
+    // }
+    //
+    // // did/physdesc/date
+    // String joinDates = joinDates(dObject.getPhysdescDateInitial(),
+    // dObject.getPhysdescDateFinal());
+    // if (joinDates != null) {
+    // physdesc.addNewDate().setNormal(joinDates);
+    // }
+    //
+    // // did/physdesc/extent
+    // if (dObject.getPhysdescExtent() != null) {
+    // Extent extent = physdesc.addNewExtent();
+    //
+    // // did/physdesc/extent/text()
+    // extent.setStringValue(dObject.getPhysdescExtent().getValue());
+    //
+    // // did/physdesc/extent/@unit
+    // if (dObject.getPhysdescExtent().getUnit() != null) {
+    // extent.setUnit(dObject.getPhysdescExtent().getUnit());
+    // }
+    // }
+    //
+    // // did/physdesc/genreform
+    // if (dObject.getPhysdescGenreform() != null) {
+    // Genreform genreform = physdesc.addNewGenreform();
+    //
+    // // did/physdesc/genreform/@authfilenumber
+    // if (dObject.getPhysdescGenreform().getAttributeAuthfilenumber() != null)
+    // {
+    // genreform.setAuthfilenumber(dObject.getPhysdescGenreform().getAttributeAuthfilenumber());
+    // }
+    //
+    // // did/physdesc/genreform/@normal
+    // if (dObject.getPhysdescGenreform().getAttributeNormal() != null) {
+    // genreform.setNormal(dObject.getPhysdescGenreform().getAttributeNormal());
+    // }
+    //
+    // // did/physdesc/genreform/@source
+    // if (dObject.getPhysdescGenreform().getAttributeSource() != null) {
+    // genreform.setSource(dObject.getPhysdescGenreform().getAttributeSource());
+    // }
+    //
+    // // did/physdesc/genreform/text()
+    // genreform.setStringValue(dObject.getPhysdescGenreform().getText());
+    // }
+    //
+    // // did/materialspec
+    // if (dObject.getMaterialspecs() != null &&
+    // dObject.getMaterialspecs().getMaterialspecs() != null) {
+    //
+    // for (org.roda.core.data.eadc.Materialspec materialspec :
+    // dObject.getMaterialspecs().getMaterialspecs()) {
+    // Materialspec newMaterialspec = did.addNewMaterialspec();
+    //
+    // // did/materialspec/@label
+    // if (materialspec.getAttributeLabel() != null) {
+    // newMaterialspec.setLabel(materialspec.getAttributeLabel());
+    // }
+    //
+    // // did/materialspec/text()
+    // newMaterialspec.setStringValue(materialspec.getText());
+    // }
+    //
+    // }
+    //
+    // // did/origination
+    // if (dObject.getOrigination() != null) {
+    // did.addNewOrigination().setStringValue(dObject.getOrigination());
+    // }
+    //
+    // // did/langmaterial
+    // if (dObject.getLangmaterialLanguages() != null
+    // && dObject.getLangmaterialLanguages().getLangmaterialLanguages() != null
+    // && dObject.getLangmaterialLanguages().getLangmaterialLanguages().length >
+    // 0) {
+    //
+    // Langmaterial langmaterial = did.addNewLangmaterial();
+    //
+    // for (String language :
+    // dObject.getLangmaterialLanguages().getLangmaterialLanguages()) {
+    // langmaterial.addNewLanguage().setStringValue(language);
+    // }
+    //
+    // }
+    // // End of did
+    //
+    // // processinfo
+    // ProcessInfo processinfo = dObject.getProcessinfo();
+    // if (processinfo != null) {
+    // Processinfo newProcessinfo = c.addNewProcessinfo();
+    //
+    // // processinfo/@altrender
+    // newProcessinfo.addNewAltrender().setStringValue(processinfo.getAttributeAltrender());
+    //
+    // // processinfo/note
+    // if (processinfo.getNote() != null) {
+    // pt.gov.dgarq.roda.x2014.eadcSchema.Note newNote =
+    // newProcessinfo.addNewNote();
+    //
+    // // processinfo/note/@altrender
+    // if (processinfo.getNote().getAttributeAltrender() != null) {
+    // newNote.addNewAltrender().setStringValue(processinfo.getNote().getAttributeAltrender());
+    // }
+    //
+    // // processinfo/note/p/text()
+    // if (processinfo.getNote().getP() != null) {
+    // newNote.setP(processinfo.getNote().getP().getText());
+    // }
+    // }
+    //
+    // // processinfo/p
+    // if (processinfo.getpList() != null && processinfo.getpList().length > 0)
+    // {
+    // for (P p : processinfo.getpList()) {
+    // ProcessinfoP newP = newProcessinfo.addNewP();
+    //
+    // // processinfo/p/@altrender
+    // if (p.getAttributeAltrender() != null) {
+    // newP.addNewAltrender().setStringValue(p.getAttributeAltrender());
+    // }
+    //
+    // // processinfo/p/note
+    // if (p.getNotes() != null && p.getNotes().getNotes() != null &&
+    // p.getNotes().getNotes().length > 0) {
+    //
+    // for (Note note : p.getNotes().getNotes()) {
+    // pt.gov.dgarq.roda.x2014.eadcSchema.Note newNote = newP.addNewNote();
+    //
+    // // processinfo/p/note/@altrender
+    // if (note.getAttributeAltrender() != null) {
+    // newNote.addNewAltrender().setStringValue(note.getAttributeAltrender());
+    // }
+    //
+    // // processinfo/p/note/p/text()
+    // if (note.getP() != null) {
+    // newNote.setP(note.getP().getText());
+    // }
+    // }
+    // }
+    //
+    // // processinfo/p/archref
+    // if (p.getArchrefs() != null && p.getArchrefs().getArchrefs() != null
+    // && p.getArchrefs().getArchrefs().length > 0) {
+    // for (Archref archref : p.getArchrefs().getArchrefs()) {
+    // ProcessinfoPArchref newArchref = newP.addNewArchref();
+    //
+    // // processinfo/p/archref/unitid
+    // if (archref.getUnitids() != null && archref.getUnitids().length > 0) {
+    // for (org.roda.core.data.eadc.Unitid id : archref.getUnitids()) {
+    // UnitidWithOptionalAttributes newUnitid = newArchref.addNewUnitid();
+    //
+    // // processinfo/p/archref/unitid/@altrender
+    // if (id.getAttributeAltrender() != null) {
+    // newUnitid.addNewAltrender().setStringValue(id.getAttributeAltrender());
+    // }
+    //
+    // // processinfo/p/archref/unitid/text()
+    // newUnitid.setStringValue(id.getText());
+    // }
+    // }
+    //
+    // // processinfo/p/archref/note
+    // if (archref.getNote() != null) {
+    // pt.gov.dgarq.roda.x2014.eadcSchema.Note newNote =
+    // newArchref.addNewNote();
+    //
+    // // processinfo/p/archref/note/@altrender
+    // if (archref.getNote().getAttributeAltrender() != null) {
+    // newNote.addNewAltrender().setStringValue(archref.getNote().getAttributeAltrender());
+    // }
+    //
+    // // processinfo/p/archref/note/p/text()
+    // if (archref.getNote().getP() != null) {
+    // newNote.setP(archref.getNote().getP().getText());
+    // }
+    // }
+    // }
+    // }
+    //
+    // }
+    // }
+    // }
+    //
+    // // controlaccess
+    // ControlAccesses dObjectControlaccesses = dObject.getControlaccesses();
+    // if (dObjectControlaccesses != null &&
+    // dObjectControlaccesses.getControlaccesses() != null) {
+    // for (ControlAccess dObjectControlaccess :
+    // dObjectControlaccesses.getControlaccesses()) {
+    // Controlaccess eadControlaccess = c.addNewControlaccess();
+    // if (dObjectControlaccess.getAttributeEncodinganalog() != null) {
+    // eadControlaccess.setEncodinganalog(dObjectControlaccess.getAttributeEncodinganalog());
+    // }
+    // if (dObjectControlaccess.getFunction() != null) {
+    // eadControlaccess.setFunctionArray(new String[]
+    // {dObjectControlaccess.getFunction()});
+    // }
+    // if (dObjectControlaccess.getHead() != null) {
+    // eadControlaccess.setHeadArray(new String[]
+    // {dObjectControlaccess.getHead()});
+    // }
+    // if (dObjectControlaccess.getSubject() != null) {
+    // eadControlaccess.setSubjectArray(new String[]
+    // {dObjectControlaccess.getSubject()});
+    // }
+    // if (dObjectControlaccess.getP() != null) {
+    // eadControlaccess.addP(dObjectControlaccess.getP());
+    // }
+    // }
+    // }
+    //
+    // // odd
+    // if (dObject.getOdd() != null) {
+    // c.addNewOdd().setStringValue(dObject.getOdd());
+    // }
+    //
+    // // bioghist
+    // if (dObject.getBioghist() != null || dObject.getBioghistChronlist() !=
+    // null) {
+    //
+    // Bioghist bioghist = c.addNewBioghist();
+    //
+    // // bioghist/p
+    // if (dObject.getBioghist() != null) {
+    // bioghist.setP(dObject.getBioghist());
+    // }
+    //
+    // // bioghist/chronlist
+    // if (dObject.getBioghistChronlist() != null &&
+    // dObject.getBioghistChronlist().getBioghistChronitems() != null
+    // && dObject.getBioghistChronlist().getBioghistChronitems().length > 0) {
+    //
+    // Chronlist chronlist = bioghist.addNewChronlist();
+    //
+    // for (BioghistChronitem item :
+    // dObject.getBioghistChronlist().getBioghistChronitems()) {
+    //
+    // Chronitem chronitem = chronlist.addNewChronitem();
+    // chronitem.addNewDate().setNormal(joinDates(item.getDateInitial(),
+    // item.getDateFinal()));
+    // chronitem.setEvent(item.getEvent());
+    // }
+    // } // End of bioghist/chronlist
+    //
+    // } // End of bioghist
+    //
+    // // custodhist/p
+    // if (dObject.getCustodhist() != null) {
+    // c.addNewCustodhist().setP(dObject.getCustodhist());
+    // }
+    //
+    // // acqinfo
+    // if (dObject.getAcqinfos() != null && dObject.getAcqinfos().getAcqinfos()
+    // != null) {
+    //
+    // for (org.roda.core.data.eadc.Acqinfo acqinfo :
+    // dObject.getAcqinfos().getAcqinfos()) {
+    // Acqinfo newAcqinfo = c.addNewAcqinfo();
+    //
+    // // acqinfo/@altrender
+    // if (acqinfo.getAttributeAltrender() != null) {
+    // newAcqinfo.addNewAltrender().setStringValue(acqinfo.getAttributeAltrender());
+    // }
+    //
+    // // acqinfo/p
+    // if (acqinfo.getP() != null) {
+    // P p = acqinfo.getP();
+    // AcqinfoP newP = newAcqinfo.addNewP();
+    //
+    // // INFO must be the first one to be added because we use cursor to add
+    // // the pcdata (mixed=true)
+    // // acqinfo/p/text()
+    // if (p.getText() != null) {
+    // XmlCursor newCursor = newP.newCursor();
+    // newCursor.toLastAttribute();
+    // newCursor.setTextValue(p.getText());
+    // newCursor.dispose();
+    // }
+    //
+    // // acqinfo/p/date
+    // if (p.getDate() != null) {
+    // newP.addNewDate().setNormal(p.getDate());
+    // }
+    //
+    // // acqinfo/p/num
+    // if (p.getNum() != null) {
+    // newP.setNum(p.getNum());
+    // }
+    //
+    // // acqinfo/p/corpname
+    // if (p.getCorpname() != null) {
+    // newP.setCorpname(p.getCorpname());
+    // }
+    // }
+    // }
+    // }
+    //
+    // // scopecontent/p
+    // if (dObject.getScopecontent() != null) {
+    // c.addNewScopecontent().setP(dObject.getScopecontent());
+    // }
+    //
+    // // appraisal/p
+    // if (dObject.getAppraisal() != null) {
+    // c.addNewAppraisal().setP(dObject.getAppraisal());
+    // }
+    //
+    // // accruals/p
+    // if (dObject.getAccruals() != null) {
+    // c.addNewAccruals().setP(dObject.getAccruals());
+    // }
+    //
+    // // arrangement
+    // if (dObject.getArrangement() != null || dObject.getArrangementTable() !=
+    // null) {
+    //
+    // Arrangement arrangement = c.addNewArrangement();
+    //
+    // // arrangement/p
+    // if (dObject.getArrangement() != null) {
+    // arrangement.setP(dObject.getArrangement());
+    // }
+    //
+    // // arrangement/table
+    // if (dObject.getArrangementTable() != null &&
+    // dObject.getArrangementTable().getArrangementTableGroups() != null
+    // && dObject.getArrangementTable().getArrangementTableGroups().length > 0)
+    // {
+    //
+    // Table table = arrangement.addNewTable();
+    //
+    // for (ArrangementTableGroup group :
+    // dObject.getArrangementTable().getArrangementTableGroups()) {
+    //
+    // Tgroup tgroup = table.addNewTgroup();
+    // tgroup.setCols(new BigInteger(new
+    // Integer(group.getColumns()).toString()));
+    //
+    // if (group.getHead() != null) {
+    //
+    // Thead thead = tgroup.addNewThead();
+    //
+    // for (ArrangementTableRow atrow : group.getHead().getRows()) {
+    //
+    // Row row = thead.addNewRow();
+    // for (String entry : atrow.getEntries()) {
+    // row.addNewEntry().setStringValue(entry);
+    // }
+    //
+    // }
+    // }
+    //
+    // if (group.getBody() != null) {
+    // Tbody tbody = tgroup.addNewTbody();
+    // for (ArrangementTableRow atrow : group.getBody().getRows()) {
+    //
+    // Row row = tbody.addNewRow();
+    // for (String entry : atrow.getEntries()) {
+    // row.addNewEntry().setStringValue(entry);
+    // }
+    //
+    // }
+    //
+    // }
+    // }
+    // } // End of arrangement/table
+    //
+    // } // End of arrangement
+    //
+    // // accessrestrict/p
+    // if (dObject.getAccessrestrict() != null) {
+    // c.addNewAccessrestrict().setP(dObject.getAccessrestrict());
+    // }
+    //
+    // // userestrict/p
+    // if (dObject.getUserestrict() != null) {
+    // c.addNewUserestrict().setP(dObject.getUserestrict());
+    // }
+    //
+    // // phystech/p
+    // if (dObject.getPhystech() != null) {
+    // c.addNewPhystech().setP(dObject.getPhystech());
+    // }
+    //
+    // // otherfindaid/p
+    // if (dObject.getOtherfindaid() != null) {
+    // c.addNewOtherfindaid().setP(dObject.getOtherfindaid());
+    // }
+    //
+    // // relatedmaterial
+    // if (dObject.getRelatedmaterials() != null &&
+    // dObject.getRelatedmaterials().getRelatedmaterials() != null) {
+    // for (Relatedmaterial relatedmaterial :
+    // dObject.getRelatedmaterials().getRelatedmaterials()) {
+    // pt.gov.dgarq.roda.x2014.eadcSchema.Relatedmaterial newRelatedmaterial =
+    // c.addNewRelatedmaterial();
+    //
+    // // relatedmaterial/p
+    // if (relatedmaterial.getP() != null && relatedmaterial.getP().getText() !=
+    // null) {
+    // newRelatedmaterial.setP(relatedmaterial.getP().getText());
+    // }
+    //
+    // // relatedmaterial/archref
+    // if (relatedmaterial.getArchref() != null) {
+    // Archref archref = relatedmaterial.getArchref();
+    // pt.gov.dgarq.roda.x2014.eadcSchema.Archref newArchref =
+    // newRelatedmaterial.addNewArchref();
+    //
+    // // relatedmaterial/archref/unitid
+    // if (archref.getUnitids() != null && archref.getUnitids().length > 0) {
+    // for (org.roda.core.data.eadc.Unitid id : archref.getUnitids()) {
+    // UnitidWithOptionalAttributes newUnitid = newArchref.addNewUnitid();
+    //
+    // // relatedmaterial/archref/unitid/@altrender
+    // if (id.getAttributeAltrender() != null) {
+    // newUnitid.addNewAltrender().setStringValue(id.getAttributeAltrender());
+    // }
+    //
+    // // relatedmaterial/archref/unitid/text()
+    // newUnitid.setStringValue(id.getText());
+    // }
+    // }
+    // }
+    // }
+    // }
+    //
+    // // bibliography/p
+    // if (dObject.getBibliography() != null) {
+    // c.addNewBibliography().setP(dObject.getBibliography());
+    // }
+    //
+    // // note
+    // if (dObject.getNotes() != null && dObject.getNotes().getNotes() != null)
+    // {
+    // for (Note note : dObject.getNotes().getNotes()) {
+    // pt.gov.dgarq.roda.x2014.eadcSchema.Note newNote = c.addNewNote();
+    //
+    // // note/@label
+    // if (note.getAttributeLabel() != null) {
+    // newNote.addNewLabel().setStringValue(note.getAttributeLabel());
+    // }
+    //
+    // // note/@altrender
+    // if (note.getAttributeAltrender() != null) {
+    // newNote.addNewAltrender().setStringValue(note.getAttributeAltrender());
+    // }
+    //
+    // // note/p
+    // if (note.getP() != null && note.getP().getText() != null) {
+    // newNote.setP(note.getP().getText());
+    // }
+    //
+    // // note/list
+    // if (note.getList() != null && note.getList().getItems() != null) {
+    // pt.gov.dgarq.roda.x2014.eadcSchema.List newList = newNote.addNewList();
+    //
+    // // note/list/item
+    // for (String item : note.getList().getItems()) {
+    // newList.addNewItem().setStringValue(item);
+    // }
+    // }
+    // }
+    // }
+    //
+    // // index
+    // if (dObject.getIndex() != null && dObject.getIndex().getIndexes() !=
+    // null) {
+    // pt.gov.dgarq.roda.x2014.eadcSchema.Index newIndex = c.addNewIndex();
+    //
+    // // index/indexentry
+    // for (Indexentry indexentry : dObject.getIndex().getIndexes()) {
+    //
+    // // index/indexentry/subject
+    // if (indexentry.getSubject() != null) {
+    // newIndex.addNewIndexentry().addNewSubject().setStringValue(indexentry.getSubject());
+    // }
+    // }
+    // }
+    //
+    // // prefercite/p
+    // if (dObject.getPrefercite() != null) {
+    // c.addNewPrefercite().setP(dObject.getPrefercite());
+    // }
 
   }
 
@@ -1502,8 +1538,8 @@ public class EadCHelper {
    * @param origination
    * @param scopecontent
    */
-  public void setMinimalDescriptionObject(DescriptionLevel dLevel, String countrycode, String repositorycode,
-    String id, String title, String origination, String scopecontent) {
+  public void setMinimalDescriptionObject(DescriptionLevel dLevel, String countrycode, String repositorycode, String id,
+    String title, String origination, String scopecontent) {
 
     // Replaces the current EAD-C with a new empty <eadc>
     setEadC(C.Factory.newInstance());

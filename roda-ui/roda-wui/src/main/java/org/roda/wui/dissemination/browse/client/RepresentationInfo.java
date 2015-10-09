@@ -85,7 +85,7 @@ public class RepresentationInfo implements Serializable {
   public RepresentationInfo(RepresentationObject repObj, List<DisseminationInfo> disseminations, String format,
     int numberOfFiles, long sizeOfFiles) {
     Set<String> status = new HashSet<String>(Arrays.asList(repObj.getStatuses()));
-    roPID = repObj.getPid();
+    roPID = repObj.getId();
     normalized = status.contains(RepresentationObject.STATUS_NORMALIZED);
     original = status.contains(RepresentationObject.STATUS_ORIGINAL);
     this.disseminations = disseminations;

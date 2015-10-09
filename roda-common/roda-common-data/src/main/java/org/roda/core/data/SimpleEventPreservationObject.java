@@ -2,6 +2,9 @@ package org.roda.core.data;
 
 import java.util.Date;
 
+import org.roda.core.data.v2.PreservationObject;
+import org.roda.core.data.v2.RODAObject;
+
 /**
  * This is an event preservation object
  * 
@@ -9,7 +12,6 @@ import java.util.Date;
  * 
  */
 public class SimpleEventPreservationObject extends PreservationObject {
-  private static final long serialVersionUID = 8323346811022527722L;
 
   /**
    * Preservation Object type - Event
@@ -32,7 +34,8 @@ public class SimpleEventPreservationObject extends PreservationObject {
    * @param rObject
    */
   public SimpleEventPreservationObject(RODAObject rObject) {
-    super(rObject, rObject.getPid());
+    // FIXME
+    // super(rObject, rObject.getPid());
     setType(TYPE);
   }
 
@@ -40,8 +43,10 @@ public class SimpleEventPreservationObject extends PreservationObject {
    * @param epo
    */
   public SimpleEventPreservationObject(SimpleEventPreservationObject epo) {
-    this(epo.getPid(), epo.getLabel(), epo.getContentModel(), epo.getLastModifiedDate(), epo.getCreatedDate(), epo
-      .getState(), epo.getID());
+    // FIXME
+    // this(epo.getPid(), epo.getLabel(), epo.getContentModel(),
+    // epo.getLastModifiedDate(), epo.getCreatedDate(),
+    // epo.getState(), epo.getID());
   }
 
   /**
@@ -55,7 +60,8 @@ public class SimpleEventPreservationObject extends PreservationObject {
    */
   public SimpleEventPreservationObject(String pid, String label, String model, Date lastModifiedDate, Date createdDate,
     String state, String ID) {
-    super(pid, label, model, lastModifiedDate, createdDate, state, ID);
+    // FIXME
+    // super(pid, label, model, lastModifiedDate, createdDate, state, ID);
     setType(TYPE);
   }
 

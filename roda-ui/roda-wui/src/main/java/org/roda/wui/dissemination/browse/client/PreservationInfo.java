@@ -5,8 +5,8 @@ package org.roda.wui.dissemination.browse.client;
 
 import java.io.Serializable;
 
-import org.roda.core.data.RepresentationPreservationObject;
-import org.roda.core.data.preservation.RepresentationFilePreservationObject;
+import org.roda.core.data.v2.RepresentationFilePreservationObject;
+import org.roda.core.data.v2.RepresentationPreservationObject;
 
 /**
  * @author Luis Faria
@@ -73,32 +73,33 @@ public class PreservationInfo implements Serializable {
    *          whereas the associated representation is the original one
    */
   public PreservationInfo(RepresentationPreservationObject rpo, boolean normalized, boolean original) {
-    rpoPID = rpo.getPid();
-    this.normalized = normalized;
-    this.original = original;
-
-    String cModel = rpo.getRepresentationContentModel();
-    if (cModel != null) {
-      String[] split = cModel.split(":");
-      this.label = split.length >= 4 ? split[3] : rpo.getID();
-    } else {
-      this.label = rpo.getID();
-    }
-
-    if (rpo.getRootFile() != null) {
-      this.sizeOfFiles = rpo.getRootFile().getSize();
-    } else {
-      this.sizeOfFiles = 0;
-    }
-
-    this.numberOfFiles = 1;
-    if (rpo.getPartFiles() != null) {
-      this.numberOfFiles += rpo.getPartFiles().length;
-
-      for (RepresentationFilePreservationObject file : rpo.getPartFiles()) {
-        this.sizeOfFiles += file.getSize();
-      }
-    }
+    // FIXME
+    // rpoPID = rpo.getPid();
+    // this.normalized = normalized;
+    // this.original = original;
+    //
+    // String cModel = rpo.getRepresentationContentModel();
+    // if (cModel != null) {
+    // String[] split = cModel.split(":");
+    // this.label = split.length >= 4 ? split[3] : rpo.getID();
+    // } else {
+    // this.label = rpo.getID();
+    // }
+    //
+    // if (rpo.getRootFile() != null) {
+    // this.sizeOfFiles = rpo.getRootFile().getSize();
+    // } else {
+    // this.sizeOfFiles = 0;
+    // }
+    //
+    // this.numberOfFiles = 1;
+    // if (rpo.getPartFiles() != null) {
+    // this.numberOfFiles += rpo.getPartFiles().length;
+    //
+    // for (RepresentationFilePreservationObject file : rpo.getPartFiles()) {
+    // this.sizeOfFiles += file.getSize();
+    // }
+    // }
   }
 
   /**

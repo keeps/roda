@@ -190,22 +190,24 @@ public class MediaPlayer extends javax.servlet.http.HttpServlet implements javax
     response.setContentType("text/html");
     OutputStream out = response.getOutputStream();
 
-    InputStream indexTemplate = SimpleViewer.class.getClassLoader().getResourceAsStream(
-      "/org/roda/disseminators/mediaplayer/index.html");
+    InputStream indexTemplate = SimpleViewer.class.getClassLoader()
+      .getResourceAsStream("/org/roda/disseminators/mediaplayer/index.html");
 
     String filename = null;
-    if (rep.getType().equals(RepresentationObject.VIDEO)) {
-      filename = "F0.flv";
-
-    } else if (rep.getType().equals(RepresentationObject.AUDIO)) {
-      filename = "F0.mp3";
-
-    } else {
-      logger.error("Unsuported representation type: " + rep.getContentModel());
-      // throw new UnsupportedContentModel("" + rep.getContentModel());
-    }
-
-    String mediaURL = cacheURL + rep.getPid() + "/" + DISSEMINATOR_NAME + "/" + filename;
+    // FIXME
+    // if (rep.getType().equals(RepresentationObject.VIDEO)) {
+    // filename = "F0.flv";
+    //
+    // } else if (rep.getType().equals(RepresentationObject.AUDIO)) {
+    // filename = "F0.mp3";
+    //
+    // } else {
+    // logger.error("Unsuported representation type: " + rep.getContentModel());
+    // // throw new UnsupportedContentModel("" + rep.getContentModel());
+    // }
+    //
+    // String mediaURL = cacheURL + rep.getPid() + "/" + DISSEMINATOR_NAME + "/"
+    // + filename;
 
     String index = new String(StreamUtils.getBytes(indexTemplate));
 
