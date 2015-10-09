@@ -89,15 +89,15 @@ public class FullTextAction implements Plugin<AIP> {
             for (String fileID : representation.getFileIds()) {
               File file = model.retrieveFile(aip.getId(), representationID, fileID);
               Binary binary = storage.getBinary(file.getStoragePath());
-              
+
               Metadata metadata = new Metadata();
               ContentHandler handler = new ToXMLContentHandler();
               parser.parse(binary.getContent().createInputStream(), handler, metadata, new ParseContext());
               String content = handler.toString();
               Path p = Files.createTempFile("tika", ".xml");
               Files.write(p, content.getBytes());
-              Binary resource = (Binary) FSUtils.convertPathToResource(p.getParent(),p);
-              model.createOtherMetadata(aip.getId(), file.getStoragePath().getName()+".xml", "tika", resource);
+              Binary resource = (Binary) FSUtils.convertPathToResource(p.getParent(), p);
+              model.createOtherMetadata(aip.getId(), file.getStoragePath().getName() + ".xml", "tika", resource);
             }
           }
         } catch (ModelServiceException mse) {

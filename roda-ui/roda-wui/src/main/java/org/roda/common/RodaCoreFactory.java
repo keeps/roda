@@ -284,18 +284,23 @@ public class RodaCoreFactory {
   public static Configuration getConfiguration(String configurationFile) throws ConfigurationException {
     Path config = RodaCoreFactory.getConfigPath().resolve(configurationFile);
     PropertiesConfiguration propertiesConfiguration = new PropertiesConfiguration();
-    RodaCorePropertiesReloadStrategy rodaCorePropertiesReloadStrategy = new RodaCorePropertiesReloadStrategy();
-    rodaCorePropertiesReloadStrategy.setRefreshDelay(5000);
     propertiesConfiguration.setDelimiterParsingDisabled(true);
     propertiesConfiguration.setEncoding("UTF-8");
 
     if (Files.exists(config)) {
+      LOGGER.debug("Loading configuration from file " + config);
       propertiesConfiguration.load(config.toFile());
+      RodaCorePropertiesReloadStrategy rodaCorePropertiesReloadStrategy = new RodaCorePropertiesReloadStrategy();
+      rodaCorePropertiesReloadStrategy.setRefreshDelay(5000);
       propertiesConfiguration.setReloadingStrategy(rodaCorePropertiesReloadStrategy);
-      LOGGER.debug("Loading configuration " + config);
     } else {
-      propertiesConfiguration = null;
-      LOGGER.error("Configuration " + configurationFile + " doesn't exist");
+      InputStream inputStream = RodaCoreFactory.class.getResourceAsStream(configurationFile);
+      if (inputStream != null) {
+        LOGGER.debug("Loading configuration from classpath " + configurationFile);
+        propertiesConfiguration.load(inputStream);
+      } else {
+        LOGGER.error("Configuration " + configurationFile + " doesn't exist");
+      }
     }
 
     return propertiesConfiguration;
@@ -380,12 +385,12 @@ public class RodaCoreFactory {
     Plugin<AIP> antivirusAction = new AntivirusAction();
     getActionOrchestrator().runActionOnAllAIPs(antivirusAction);
   }
-  
+
   private static void runFastCharacterizationAction() {
     Plugin<AIP> fastCharacterizationAction = new FastCharacterizationAction();
     getActionOrchestrator().runActionOnAllAIPs(fastCharacterizationAction);
   }
-  
+
   private static void runFulltextAction() {
     Plugin<AIP> fulltextAction = new FullTextAction();
     getActionOrchestrator().runActionOnAllAIPs(fulltextAction);
@@ -395,7 +400,7 @@ public class RodaCoreFactory {
     Plugin<AIP> premisSkeletonAction = new PremisSkeletonAction();
     getActionOrchestrator().runActionOnAllAIPs(premisSkeletonAction);
   }
-  
+
   private static void runSolrQuery(List<String> args) {
     String collection = args.get(2);
     String solrQueryString = args.get(3);
@@ -455,7 +460,7 @@ public class RodaCoreFactory {
         runFixityAction();
       } else if ("antivirus".equals(args.get(0))) {
         runAntivirusAction();
-      } else if("premisskeleton".equals(args.get(0))){
+      } else if ("premisskeleton".equals(args.get(0))) {
         runPremisSkeletonAction();
       } else if ("fastcharacterization".equals(args.get(0))) {
         runFastCharacterizationAction();

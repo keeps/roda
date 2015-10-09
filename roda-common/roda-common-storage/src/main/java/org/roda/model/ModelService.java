@@ -1568,7 +1568,7 @@ public class ModelService extends ModelObservable {
     try {
       StoragePath binaryPath = ModelUtils.getPreservationFilePath(aipId, representationID, preservationMetadataId);
       boolean asReference = false;
-      Binary updatedBinary = storage.updateBinaryContent(binaryPath,binary.getContent(),asReference,true);
+      Binary updatedBinary = storage.updateBinaryContent(binaryPath, binary.getContent(), asReference, true);
       preservationMetadataBinary = new PreservationMetadata(preservationMetadataId, aipId, representationID, binaryPath,
         ModelUtils.getPreservationType(updatedBinary));
       notifyPreservationMetadataCreated(preservationMetadataBinary);
@@ -1856,16 +1856,17 @@ public class ModelService extends ModelObservable {
     }
   }
 
-  public OtherMetadata createOtherMetadata(String aipID, String fileName, String type, Binary binary) throws ModelServiceException {
+  public OtherMetadata createOtherMetadata(String aipID, String fileName, String type, Binary binary)
+    throws ModelServiceException {
     OtherMetadata otherMetadataBinary = null;
     try {
-      StoragePath binaryPath = ModelUtils.getOtherMetadataPath(aipID, fileName,type);
+      StoragePath binaryPath = ModelUtils.getOtherMetadataPath(aipID, fileName, type);
       boolean asReference = false;
       boolean createIfNotExists = true;
       Map<String, Set<String>> binaryMetadata = binary.getMetadata();
       storage.updateBinaryContent(binaryPath, binary.getContent(), asReference, createIfNotExists);
       storage.updateMetadata(binaryPath, binaryMetadata, true);
-      otherMetadataBinary = new OtherMetadata(type,binaryPath);
+      otherMetadataBinary = new OtherMetadata(type, binaryPath);
       notifyOtherMetadataCreated(otherMetadataBinary);
     } catch (StorageServiceException e) {
       throw new ModelServiceException("Error creating other metadata binary in storage",
@@ -1873,6 +1874,6 @@ public class ModelService extends ModelObservable {
     }
 
     return otherMetadataBinary;
-    
+
   }
 }
