@@ -294,7 +294,7 @@ public class RodaCoreFactory {
       rodaCorePropertiesReloadStrategy.setRefreshDelay(5000);
       propertiesConfiguration.setReloadingStrategy(rodaCorePropertiesReloadStrategy);
     } else {
-      InputStream inputStream = RodaCoreFactory.class.getResourceAsStream(configurationFile);
+      InputStream inputStream = RodaCoreFactory.class.getResourceAsStream("/config/" + configurationFile);
       if (inputStream != null) {
         LOGGER.debug("Loading configuration from classpath " + configurationFile);
         propertiesConfiguration.load(inputStream);
