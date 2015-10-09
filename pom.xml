@@ -887,6 +887,11 @@
 				<artifactId>bagit</artifactId>
 				<version>4.9.0</version>
 			</dependency>
+			<dependency>
+				<groupId>org.apache.tika</groupId>
+				<artifactId>tika-app</artifactId>
+				<version>1.10</version>
+			</dependency>
 			<!-- Akka related dependencies - start -->
 			<dependency>
 				<groupId>com.typesafe.akka</groupId>

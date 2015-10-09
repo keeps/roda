@@ -278,6 +278,10 @@
 			<groupId>uk.gov.nationalarchives</groupId>
 			<artifactId>droid-command-line</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.tika</groupId>
+			<artifactId>tika-app</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
 		<pluginManagement>

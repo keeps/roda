@@ -182,4 +182,10 @@ public abstract class ModelObservable {
       observer.agentMetadataDeleted(agentMetadataBinaryId);
     }
   }
+  
+  protected void notifyOtherMetadataCreated(OtherMetadata otherMetadataBinary){
+    for (ModelObserver observer : observers) {
+      observer.otherMetadataCreated(otherMetadataBinary);
+    }
+  }
 }

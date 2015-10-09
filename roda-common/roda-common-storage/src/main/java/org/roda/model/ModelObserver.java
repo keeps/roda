@@ -64,4 +64,6 @@ public interface ModelObserver {
 
   public void agentMetadataDeleted(String agentMetadataBinaryId);
 
+  public void otherMetadataCreated(OtherMetadata otherMetadataBinary);
+
 }

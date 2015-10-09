@@ -24,6 +24,7 @@ import org.roda.model.File;
 import org.roda.model.ModelObserver;
 import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
+import org.roda.model.OtherMetadata;
 import org.roda.model.PreservationMetadata;
 import org.roda.storage.StorageServiceException;
 import org.slf4j.Logger;
@@ -373,5 +374,11 @@ public class IndexModelObserver implements ModelObserver {
   public void agentMetadataDeleted(String agentMetadataId) {
     // TODO: handle deleting
 
+  }
+
+  @Override
+  public void otherMetadataCreated(OtherMetadata otherMetadataBinary) {
+    // HANDLE INDEXING...
+    
   }
 }

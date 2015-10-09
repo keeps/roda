@@ -1,4 +1,4 @@
-package org.roda.action.ingest.fastCharacterization;
+package org.roda.action.ingest.deepCharacterization;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.roda.action.ingest.deepCharacterization.utils.CharacterizationUtils;
 import org.roda.action.ingest.fastCharacterization.utils.DroidException;
 import org.roda.action.ingest.fastCharacterization.utils.DroidUtils;
 import org.roda.action.orchestrate.Plugin;
@@ -41,13 +42,11 @@ import org.roda.storage.fs.FSUtils;
 import org.roda.storage.fs.FileStorageService;
 
 
-public class FastCharacterizationAction implements Plugin<AIP> {
+public class DeepCharacterizationAction implements Plugin<AIP> {
   private final Logger logger = Logger.getLogger(getClass());
-  Path signaturePath;
   
   @Override
   public void init() throws PluginException {
-    signaturePath = Paths.get("/home/sleroux/roda/config/DROID_SignatureFile_V82.xml");
   }
 
   @Override
@@ -57,12 +56,12 @@ public class FastCharacterizationAction implements Plugin<AIP> {
 
   @Override
   public String getName() {
-    return "Fast characterization action";
+    return "Deep characterization action";
   }
 
   @Override
   public String getDescription() {
-    return "Update the premis files with the format identification";
+    return "Update the premis files with the object characterization";
   }
 
   @Override
@@ -89,10 +88,9 @@ public class FastCharacterizationAction implements Plugin<AIP> {
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
     try{
-      DroidUtils droidUtils = DroidUtils.getInstance(signaturePath);
       Path temp = Files.createTempDirectory("temp");
         for(AIP aip : list){
-          logger.debug("Creating basic premis for AIP "+aip.getId());
+          logger.debug("Deep characterization for AIP "+aip.getId());
           try{
             for(String representationID : aip.getRepresentationIds()){
               Representation representation = model.retrieveRepresentation(aip.getId(), representationID);
@@ -100,13 +98,10 @@ public class FastCharacterizationAction implements Plugin<AIP> {
                 String fileName = fileID+".premis.xml";
                 File file = model.retrieveFile(aip.getId(), representationID, fileID);
                 Binary binary = storage.getBinary(file.getStoragePath());
-                Path pathFile = Paths.get(temp.toString(), file.getStoragePath().getName());
-                Files.copy(binary.getContent().createInputStream(), pathFile, StandardCopyOption.REPLACE_EXISTING);
-                FileFormat format = droidUtils.execute(pathFile);
                 
                 RepresentationFilePreservationObject premisObject = PremisUtils.getPremisFile(storage,aip.getId(),representationID,fileName);
-                premisObject = PremisUtils.addFormatToPremis(premisObject, format);
-                
+                premisObject = CharacterizationUtils.deepCharacterization(premisObject, file, binary, getParameterValues());
+                                                
                 Path premis = Files.createTempFile(file.getId(), ".premis.xml");
                 PremisFileObjectHelper helper = new PremisFileObjectHelper(premisObject);
                 helper.saveToFile(premis.toFile());
@@ -117,16 +112,12 @@ public class FastCharacterizationAction implements Plugin<AIP> {
             logger.error("Error processing AIP "+aip.getId()+": "+mse.getMessage(),mse);
           } catch (StorageServiceException sse) {
             logger.error("Error processing AIP "+aip.getId()+": "+sse.getMessage(),sse);
-          } catch (DroidException de) {
-            logger.error("Error processing AIP "+aip.getId()+": "+de.getMessage(),de);
           } catch (PremisMetadataException pme) {
             logger.error("Error processing AIP "+aip.getId()+": "+pme.getMessage(),pme);
           }
         }
     }catch(IOException ioe){
       logger.error("Error executing FastCharacterizationAction: "+ioe.getMessage(),ioe);
-    } catch (DroidException de) {
-      logger.error("Error executing FastCharacterizationAction: "+de.getMessage(),de);
     }
     return null;
   }

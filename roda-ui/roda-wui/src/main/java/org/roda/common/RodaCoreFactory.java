@@ -28,6 +28,7 @@ import org.apache.solr.common.SolrDocumentList;
 import org.roda.action.antivirus.AntivirusAction;
 import org.roda.action.fixity.FixityAction;
 import org.roda.action.ingest.fastCharacterization.FastCharacterizationAction;
+import org.roda.action.ingest.fulltext.FullTextAction;
 import org.roda.action.ingest.premisSkeleton.PremisSkeletonAction;
 import org.roda.action.orchestrate.ActionOrchestrator;
 import org.roda.action.orchestrate.Plugin;
@@ -384,6 +385,11 @@ public class RodaCoreFactory {
     Plugin<AIP> fastCharacterizationAction = new FastCharacterizationAction();
     getActionOrchestrator().runActionOnAllAIPs(fastCharacterizationAction);
   }
+  
+  private static void runFulltextAction() {
+    Plugin<AIP> fulltextAction = new FullTextAction();
+    getActionOrchestrator().runActionOnAllAIPs(fulltextAction);
+  }
 
   private static void runPremisSkeletonAction() {
     Plugin<AIP> premisSkeletonAction = new PremisSkeletonAction();
@@ -414,6 +420,7 @@ public class RodaCoreFactory {
     System.err.println("java -jar x.jar antivirus");
     System.err.println("java -jar x.jar premisskeleton");
     System.err.println("java -jar x.jar fastcharacterization");
+    System.err.println("java -jar x.jar fulltext");
   }
 
   private static void printIndexMembers(List<String> args, Filter filter, Sorter sorter, Sublist sublist, Facets facets)
@@ -450,8 +457,10 @@ public class RodaCoreFactory {
         runAntivirusAction();
       } else if("premisskeleton".equals(args.get(0))){
         runPremisSkeletonAction();
-      }else if ("fastcharacterization".equals(args.get(0))) {
+      } else if ("fastcharacterization".equals(args.get(0))) {
         runFastCharacterizationAction();
+      } else if ("fulltext".equals(args.get(0))) {
+        runFulltextAction();
       } else {
         printMainUsage();
       }

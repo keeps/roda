@@ -1855,4 +1855,24 @@ public class ModelService extends ModelObservable {
       notifyGroupDeleted(id);
     }
   }
+
+  public OtherMetadata createOtherMetadata(String aipID, String fileName, String type, Binary binary) throws ModelServiceException {
+    OtherMetadata otherMetadataBinary = null;
+    try {
+      StoragePath binaryPath = ModelUtils.getOtherMetadataPath(aipID, fileName,type);
+      boolean asReference = false;
+      boolean createIfNotExists = true;
+      Map<String, Set<String>> binaryMetadata = binary.getMetadata();
+      storage.updateBinaryContent(binaryPath, binary.getContent(), asReference, createIfNotExists);
+      storage.updateMetadata(binaryPath, binaryMetadata, true);
+      otherMetadataBinary = new OtherMetadata(type,binaryPath);
+      notifyOtherMetadataCreated(otherMetadataBinary);
+    } catch (StorageServiceException e) {
+      throw new ModelServiceException("Error creating other metadata binary in storage",
+        ModelServiceException.INTERNAL_SERVER_ERROR, e);
+    }
+
+    return otherMetadataBinary;
+    
+  }
 }

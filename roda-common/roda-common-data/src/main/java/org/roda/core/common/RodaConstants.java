@@ -72,6 +72,7 @@ public final class RodaConstants {
   public static final String STORAGE_DIRECTORY_REPRESENTATION_PREFIX = "representation_";
   public static final String STORAGE_DIRECTORY_DATA = "data";
   public static final String STORAGE_DIRECTORY_AGENTS = "agents";
+  public static final String STORAGE_DIRECTORY_OTHER = "other";
 
   /*
    * STORAGE METADATA
@@ -280,5 +281,4 @@ public final class RodaConstants {
   public static final String MEMBERS_IS_USER = "isUser";
   public static final String MEMBERS_GROUPS_ALL = "groupsAll";
   public static final String MEMBERS_ROLES_ALL = "rolesAll";
-
 }

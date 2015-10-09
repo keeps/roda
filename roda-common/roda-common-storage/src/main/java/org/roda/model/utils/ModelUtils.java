@@ -574,6 +574,12 @@ public final class ModelUtils {
     }
     return type;
 
-  };
+  }
+
+  public static StoragePath getOtherMetadataPath(String aipID, String fileName, String type) throws StorageServiceException {
+      return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipID,
+        RodaConstants.STORAGE_DIRECTORY_METADATA,RodaConstants.STORAGE_DIRECTORY_OTHER,type, fileName);
+
+  }
 
 }
