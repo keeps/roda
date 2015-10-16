@@ -56,6 +56,7 @@ public class IndexModelObserver implements ModelObserver {
     indexRepresentations(aip);
     indexPreservationFileObjects(aip);
     indexPreservationsEvents(aip);
+    indexOtherMetadata(aip);
   }
 
   private void indexPreservationsEvents(final AIP aip) {
@@ -78,6 +79,10 @@ public class IndexModelObserver implements ModelObserver {
         LOGGER.error("Could not commit indexed representations", e);
       }
     }
+  }
+  
+  private void indexOtherMetadata(final AIP aip) {
+    //TODO...
   }
 
   private void indexPreservationFileObjects(final AIP aip) {
@@ -378,7 +383,12 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void otherMetadataCreated(OtherMetadata otherMetadataBinary) {
-    // HANDLE INDEXING...
+    /// re-index whole AIP
+    try {
+      aipUpdated(model.retrieveAIP(otherMetadataBinary.getAipId()));
+    } catch (ModelServiceException e) {
+      LOGGER.error("Error when other metadata created on retrieving the full AIP", e);
+    }
     
   }
 }

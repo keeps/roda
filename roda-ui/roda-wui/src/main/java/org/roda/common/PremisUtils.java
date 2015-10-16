@@ -23,7 +23,7 @@ import org.roda.util.FileUtility;
 public class PremisUtils {
   private final static Logger logger = Logger.getLogger(PremisUtils.class);
 
-  private static Fixity calculateFixity(Binary binary, String digestAlgorithm, String originator) throws IOException, NoSuchAlgorithmException {
+  public static Fixity calculateFixity(Binary binary, String digestAlgorithm, String originator) throws IOException, NoSuchAlgorithmException {
     InputStream dsInputStream = binary.getContent().createInputStream();
     Fixity fixity = new Fixity(digestAlgorithm, FileUtility.calculateChecksumInHex(dsInputStream, digestAlgorithm),
       originator);

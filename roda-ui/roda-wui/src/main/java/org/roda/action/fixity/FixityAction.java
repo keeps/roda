@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -16,13 +17,15 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.roda.action.orchestrate.Plugin;
 import org.roda.action.orchestrate.PluginException;
+import org.roda.common.PremisUtils;
 import org.roda.core.common.InvalidParameterException;
-import org.roda.core.common.RodaConstants;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
 import org.roda.core.data.v2.AgentPreservationObject;
 import org.roda.core.data.v2.EventPreservationObject;
+import org.roda.core.data.v2.Fixity;
 import org.roda.core.data.v2.Representation;
+import org.roda.core.data.v2.RepresentationFilePreservationObject;
 import org.roda.core.metadata.v2.premis.PremisEventHelper;
 import org.roda.core.metadata.v2.premis.PremisMetadataException;
 import org.roda.index.IndexService;
@@ -104,17 +107,36 @@ public class FixityAction implements Plugin<AIP> {
             if (fileIDs != null && fileIDs.size() > 0) {
               for (String fileID : fileIDs) {
                 LOGGER.debug("Checking fixity for " + fileID);
-                File f = model.retrieveFile(aip.getId(), representationID, fileID);
-                Binary b = storage.getBinary(f.getStoragePath());
-                Path p = Files.createTempFile("temp", "");
-                b.getContent().writeToPath(p);
-                String currentSHA1 = FSUtils.computeContentDigestSHA1(p);
-                String originalSHA1 = b.getContentDigest().get(RodaConstants.STORAGE_META_DIGEST_SHA1);
-                if (currentSHA1.trim().equalsIgnoreCase(originalSHA1.trim())) {
-                  okFileIDS.add(fileID);
-                } else {
-                  koFileIDS.add(fileID);
+                File currentFile = model.retrieveFile(aip.getId(), representationID, fileID);
+                Binary currentFileBinary = storage.getBinary(currentFile.getStoragePath());
+                Path currentPath = Files.createTempFile("temp", "");
+                currentFileBinary.getContent().writeToPath(currentPath);
+
+                RepresentationFilePreservationObject rfpo = model.retrieveRepresentationFileObject(aip.getId(),
+                  representationID, fileID);
+                if (rfpo.getFixities() != null) {
+                  boolean fixityOK = true;
+                  for (Fixity f : rfpo.getFixities()) {
+                    try {
+                      Fixity currentFixity = PremisUtils.calculateFixity(currentFileBinary,
+                        f.getMessageDigestAlgorithm(), "FixityCheck action");
+                      if (!f.getMessageDigest().trim().equalsIgnoreCase(currentFixity.getMessageDigest().trim())) {
+                        fixityOK = false;
+                        break;
+                      }
+                    } catch (NoSuchAlgorithmException nsae) {
+                      fixityOK = false;
+                      break;
+                    }
+                  }
+                  if (fixityOK) {
+                    okFileIDS.add(fileID);
+                  } else {
+                    koFileIDS.add(fileID);
+                  }
+
                 }
+
               }
               if (okFileIDS.size() < fileIDs.size()) {
                 LOGGER.debug("Fixity error for representation " + representationID + " of AIP " + aip.getId());

@@ -1866,7 +1866,7 @@ public class ModelService extends ModelObservable {
       Map<String, Set<String>> binaryMetadata = binary.getMetadata();
       storage.updateBinaryContent(binaryPath, binary.getContent(), asReference, createIfNotExists);
       storage.updateMetadata(binaryPath, binaryMetadata, true);
-      otherMetadataBinary = new OtherMetadata(type, binaryPath);
+      otherMetadataBinary = new OtherMetadata(aipID+"_"+type+"_"+fileName,aipID,type,binaryPath);
       notifyOtherMetadataCreated(otherMetadataBinary);
     } catch (StorageServiceException e) {
       throw new ModelServiceException("Error creating other metadata binary in storage",

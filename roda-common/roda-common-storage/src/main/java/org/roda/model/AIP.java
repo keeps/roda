@@ -24,6 +24,9 @@ public class AIP implements Serializable {
   private Map<String, List<String>> preservationEventsIds;
   // key representationID , value fileID
   private Map<String, List<String>> preservationFileObjectsIds;
+  // key->type, value->fileID
+  private Map<String, List<String>> otherMetadataIds;
+  
   private RODAObjectPermissions permissions;
 
   public AIP() {
@@ -159,6 +162,13 @@ public class AIP implements Serializable {
    */
   public Map<String, List<String>> getPreservationsEventsIds() {
     return preservationEventsIds;
+  }
+  
+  /**
+   * @return the otherMetadataIds
+   */
+  public Map<String, List<String>> getOtherMetadata() {
+    return otherMetadataIds;
   }
 
   @Override
