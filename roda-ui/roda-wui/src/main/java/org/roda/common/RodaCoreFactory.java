@@ -14,6 +14,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
@@ -27,6 +29,7 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.roda.action.antivirus.AntivirusAction;
 import org.roda.action.fixity.FixityAction;
+import org.roda.action.ingest.bagit.BagitToAIPAction;
 import org.roda.action.ingest.fastCharacterization.FastCharacterizationAction;
 import org.roda.action.ingest.fulltext.FullTextAction;
 import org.roda.action.ingest.premisSkeleton.PremisSkeletonAction;
@@ -397,6 +400,19 @@ public class RodaCoreFactory {
     getActionOrchestrator().runActionOnAllAIPs(fulltextAction);
   }
 
+  private static void runBagitAction() {
+    try{
+      Path bagitFolder = RodaCoreFactory.getDataPath().resolve("bagit");
+      Plugin<String> bagitAction = new BagitToAIPAction();
+      Stream<Path> bagits = Files.list(bagitFolder);
+      List<Path> bagitsList = bagits.collect(Collectors.toList());
+      getActionOrchestrator().runActionOnFiles(bagitAction, bagitsList);
+    }catch(IOException e){
+      LOGGER.error("Error running bagit action: "+e.getMessage(),e);
+    }
+
+  }
+  
   private static void runPremisSkeletonAction() {
     Plugin<AIP> premisSkeletonAction = new PremisSkeletonAction();
     getActionOrchestrator().runActionOnAllAIPs(premisSkeletonAction);
@@ -467,6 +483,8 @@ public class RodaCoreFactory {
         runFastCharacterizationAction();
       } else if ("fulltext".equals(args.get(0))) {
         runFulltextAction();
+      } else if ("bagit".equals(args.get(0))) {
+        runBagitAction();
       } else {
         printMainUsage();
       }
