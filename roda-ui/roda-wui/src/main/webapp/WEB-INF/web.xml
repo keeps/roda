@@ -125,10 +125,10 @@
 	<servlet>
 		<servlet-name>ClientLogger</servlet-name>
 		<servlet-class>org.roda.wui.common.server.ClientLoggerImpl</servlet-class>
-		<init-param>
-			<param-name>log4j-init-file</param-name>
-			<param-value>WEB-INF/classes/config/log4j.xml</param-value>
-		</init-param>
+		<!-- <init-param> -->
+		<!-- <param-name>log4j-init-file</param-name> -->
+		<!-- <param-value>WEB-INF/classes/config/log4j.xml</param-value> -->
+		<!-- </init-param> -->
 		<load-on-startup>2</load-on-startup>
 	</servlet>
 	<servlet>

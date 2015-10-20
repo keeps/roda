@@ -7,6 +7,7 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 import org.roda.common.RodaCoreFactory;
 import org.roda.core.data.eadc.DescriptionLevelManager;
+import org.roda.util.FileUtility;
 import org.roda.wui.main.client.DescriptionLevelInfoPack;
 import org.roda.wui.main.client.DescriptionLevelService;
 
@@ -21,7 +22,8 @@ public class DescriptionLevelServiceImpl extends RemoteServiceServlet implements
   static {
     try {
       Properties descriptionLevels = new Properties();
-      descriptionLevels.load(RodaCoreFactory.getConfigurationFile("roda-description-levels-hierarchy.properties"));
+      descriptionLevels.load(FileUtility.getConfigurationFile(RodaCoreFactory.getConfigPath(),
+        "roda-description-levels-hierarchy.properties"));
 
       new DescriptionLevelManager(descriptionLevels);
     } catch (IOException ex) {

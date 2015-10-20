@@ -38,6 +38,7 @@ import org.roda.core.data.v2.Group;
 import org.roda.core.data.v2.RODAMember;
 import org.roda.core.data.v2.RODAObjectPermissions;
 import org.roda.core.data.v2.User;
+import org.roda.util.FileUtility;
 import org.roda.wui.management.editor.client.EditorService;
 import org.roda.wui.management.editor.client.ObjectPermissions;
 
@@ -59,7 +60,8 @@ public class EditorServiceImpl extends RemoteServiceServlet implements EditorSer
   static {
 
     Properties elementDefaults = new Properties();
-    InputStream relsStream = RodaCoreFactory.getConfigurationFile("roda-element-defaults.properties");
+    InputStream relsStream = FileUtility.getConfigurationFile(RodaCoreFactory.getConfigPath(),
+      "roda-element-defaults.properties");
     try {
       elementDefaults.load(relsStream);
       for (Entry<Object, Object> entry : elementDefaults.entrySet()) {

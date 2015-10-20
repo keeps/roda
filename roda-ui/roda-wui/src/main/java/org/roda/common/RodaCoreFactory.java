@@ -1,13 +1,12 @@
 package org.roda.common;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -21,7 +20,9 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.apache.log4j.xml.DOMConfigurator;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -70,6 +71,7 @@ public class RodaCoreFactory {
 
   private static boolean instantiated = false;
 
+  private static Path rodaHomePath;
   private static Path storagePath;
   private static Path indexPath;
   private static Path dataPath;
@@ -92,27 +94,25 @@ public class RodaCoreFactory {
   public static void instantiate() {
     if (!instantiated) {
       try {
-        String RODA_HOME;
-        if (System.getProperty("roda.home") != null) {
-          RODA_HOME = System.getProperty("roda.home");
-        } else if (System.getenv("RODA_HOME") != null) {
-          RODA_HOME = System.getenv("RODA_HOME");
-        } else {
-          RODA_HOME = null;
-        }
+        // determine RODA HOME
+        rodaHomePath = determineRodaHomePath();
 
-        dataPath = Paths.get(RODA_HOME, "data");
+        // instantiate essential directories
+        configPath = rodaHomePath.resolve("config");
+        dataPath = rodaHomePath.resolve("data");
         logPath = dataPath.resolve("log");
-        configPath = Paths.get(RODA_HOME, "config");
-
         storagePath = dataPath.resolve("storage");
         indexPath = dataPath.resolve("index");
 
+        // make sure all essential directories exist
+        ensureAllEssentialDirectoriesExist();
+
+        // instantiate model related objects
         storage = new FileStorageService(storagePath);
         model = new ModelService(storage);
 
-        // Configure Solr
-        Path solrHome = Paths.get(RODA_HOME, "config", "index");
+        // configure Solr (first try RODA HOME and then fallback to classpath)
+        Path solrHome = configPath.resolve("index");
         if (!Files.exists(solrHome)) {
           solrHome = Paths.get(RodaCoreFactory.class.getResource("/index/").toURI());
         }
@@ -132,6 +132,7 @@ public class RodaCoreFactory {
         // start embedded solr
         solr = new EmbeddedSolrServer(solrHome, "test");
 
+        // instantiate index related object
         index = new IndexService(solr, model, configPath);
 
       } catch (StorageServiceException e) {
@@ -155,6 +156,57 @@ public class RodaCoreFactory {
       instantiated = true;
     }
 
+  }
+
+  private static Path determineRodaHomePath() {
+    Path rodaHomePath;
+    if (System.getProperty("roda.home") != null) {
+      rodaHomePath = Paths.get(System.getProperty("roda.home"));
+    } else if (System.getenv("RODA_HOME") != null) {
+      rodaHomePath = Paths.get(System.getenv("RODA_HOME"));
+    } else {
+      // last attempt (using user home and hidden directory called .roda)
+      String userHome = System.getProperty("user.home");
+      rodaHomePath = Paths.get(userHome, ".roda");
+      if (!Files.exists(rodaHomePath)) {
+        try {
+          Files.createDirectories(rodaHomePath);
+        } catch (IOException e) {
+          throw new RuntimeException("Unable to create RODA HOME " + rodaHomePath + ". Aborting...", e);
+        }
+      }
+
+      // set roda.home in order to correctly configure log4j even if no property
+      // has been defined
+      System.setProperty("roda.home", rodaHomePath.toString());
+      LogManager.resetConfiguration();
+      DOMConfigurator.configure(RodaCoreFactory.class.getResource("/log4j.xml"));
+    }
+    return rodaHomePath;
+  }
+
+  public static void ensureAllEssentialDirectoriesExist() {
+    List<Path> essentialDirectories = new ArrayList<Path>();
+    essentialDirectories.add(configPath);
+    essentialDirectories.add(configPath.resolve("ldap"));
+    essentialDirectories.add(configPath.resolve("schemas"));
+    essentialDirectories.add(configPath.resolve("crosswalks"));
+    essentialDirectories.add(configPath.resolve("crosswalks").resolve("ingest"));
+    essentialDirectories.add(configPath.resolve("crosswalks").resolve("dissemination"));
+    essentialDirectories.add(configPath.resolve("crosswalks").resolve("dissemination").resolve("html"));
+    essentialDirectories.add(rodaHomePath.resolve("log"));
+    essentialDirectories.add(dataPath);
+    essentialDirectories.add(logPath);
+    essentialDirectories.add(storagePath);
+    essentialDirectories.add(indexPath);
+
+    for (Path path : essentialDirectories) {
+      try {
+        Files.createDirectories(path);
+      } catch (IOException e) {
+        throw new RuntimeException("Unable to create " + path + ". Aborting...", e);
+      }
+    }
   }
 
   public static void reloadRodaConfigurationsAfterFileChange() {
@@ -245,6 +297,10 @@ public class RodaCoreFactory {
     return actionOrchestrator;
   }
 
+  public static Path getRodaHomePath() {
+    return rodaHomePath;
+  }
+
   public static Path getConfigPath() {
     return configPath;
   }
@@ -263,26 +319,6 @@ public class RodaCoreFactory {
     } catch (IOException e) {
       LOGGER.error(e);
     }
-  }
-
-  public static InputStream getConfigurationFile(String relativePath) {
-    InputStream ret;
-    Path staticConfig = getConfigPath().resolve(relativePath);
-
-    if (Files.exists(staticConfig)) {
-      try {
-        ret = new FileInputStream(staticConfig.toFile());
-        LOGGER.info("Using static configuration");
-      } catch (FileNotFoundException e) {
-        LOGGER.warn("Couldn't find static configuration file - " + staticConfig);
-        LOGGER.info("Using internal configuration");
-        ret = RodaCoreFactory.class.getResourceAsStream("/config/" + relativePath);
-      }
-    } else {
-      LOGGER.info("Using internal configuration");
-      ret = RodaCoreFactory.class.getResourceAsStream("/config/" + relativePath);
-    }
-    return ret;
   }
 
   public static Configuration getConfiguration(String configurationFile) throws ConfigurationException {
@@ -401,18 +437,19 @@ public class RodaCoreFactory {
   }
 
   private static void runBagitAction() {
-    try{
+    try {
       Path bagitFolder = RodaCoreFactory.getDataPath().resolve("bagit");
       Plugin<String> bagitAction = new BagitToAIPAction();
       Stream<Path> bagits = Files.list(bagitFolder);
       List<Path> bagitsList = bagits.collect(Collectors.toList());
+      bagits.close();
       getActionOrchestrator().runActionOnFiles(bagitAction, bagitsList);
-    }catch(IOException e){
-      LOGGER.error("Error running bagit action: "+e.getMessage(),e);
+    } catch (IOException e) {
+      LOGGER.error("Error running bagit action: " + e.getMessage(), e);
     }
 
   }
-  
+
   private static void runPremisSkeletonAction() {
     Plugin<AIP> premisSkeletonAction = new PremisSkeletonAction();
     getActionOrchestrator().runActionOnAllAIPs(premisSkeletonAction);

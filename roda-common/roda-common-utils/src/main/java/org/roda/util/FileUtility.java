@@ -2,8 +2,11 @@ package org.roda.util;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -15,11 +18,32 @@ import org.apache.log4j.Logger;
 
 /**
  * @author Rui Castro
+ * @author Hélder Silva <hsilva@keep.pt>
  * 
  */
 public class FileUtility {
 
-  static final private Logger logger = Logger.getLogger(FileUtility.class);
+  private static final Logger LOGGER = Logger.getLogger(FileUtility.class);
+
+  public static InputStream getConfigurationFile(Path configPath, String relativePath) {
+    InputStream ret;
+    Path staticConfig = configPath.resolve(relativePath);
+
+    if (Files.exists(staticConfig)) {
+      try {
+        ret = new FileInputStream(staticConfig.toFile());
+        LOGGER.info("Using static configuration");
+      } catch (FileNotFoundException e) {
+        LOGGER.warn("Couldn't find static configuration file - " + staticConfig);
+        LOGGER.info("Using internal configuration");
+        ret = FileUtility.class.getResourceAsStream("/config/" + relativePath);
+      }
+    } else {
+      LOGGER.info("Using internal configuration");
+      ret = FileUtility.class.getResourceAsStream("/config/" + relativePath);
+    }
+    return ret;
+  }
 
   /**
    * Copy <code>sourceFile</code> to <code>destinationFile</code>.
@@ -55,7 +79,7 @@ public class FileUtility {
         copyFile(file, new File(destinationDir, file.getName()));
         filesCopied++;
       } catch (IOException e) {
-        logger.error("Error copying file " + file + " to " + new File(destinationDir, file.getName()), e);
+        LOGGER.error("Error copying file " + file + " to " + new File(destinationDir, file.getName()), e);
       }
     }
 
@@ -72,8 +96,8 @@ public class FileUtility {
    * @throws NoSuchAlgorithmException
    * @throws IOException
    */
-  public static String calculateChecksumInHex(File file, String digestAlgorithm) throws NoSuchAlgorithmException,
-    IOException {
+  public static String calculateChecksumInHex(File file, String digestAlgorithm)
+    throws NoSuchAlgorithmException, IOException {
     FileInputStream fis = new FileInputStream(file);
     String checksumInHex = calculateChecksumInHex(fis, digestAlgorithm);
     fis.close();
@@ -88,8 +112,8 @@ public class FileUtility {
    * @throws NoSuchAlgorithmException
    * @throws IOException
    */
-  public static String calculateChecksumInHex(InputStream is, String digestAlgorithm) throws NoSuchAlgorithmException,
-    IOException {
+  public static String calculateChecksumInHex(InputStream is, String digestAlgorithm)
+    throws NoSuchAlgorithmException, IOException {
     return byteArrayToHexString(calculateDigest(is, digestAlgorithm));
   }
 
@@ -101,8 +125,8 @@ public class FileUtility {
    * @throws NoSuchAlgorithmException
    * @throws IOException
    */
-  public static byte[] calculateDigest(InputStream is, String digestAlgorithm) throws NoSuchAlgorithmException,
-    IOException {
+  public static byte[] calculateDigest(InputStream is, String digestAlgorithm)
+    throws NoSuchAlgorithmException, IOException {
 
     MessageDigest digestor = MessageDigest.getInstance(digestAlgorithm);
 
@@ -212,7 +236,7 @@ public class FileUtility {
    * @param file
    * @return file extension if filename has at least one dot ; otherwise an
    *         empty string
-   * */
+   */
   public static String getFileExtension(File file) {
     return getFileExtension(file.getName());
   }
@@ -223,7 +247,7 @@ public class FileUtility {
    * @param file
    * @return file extension if filename has at least one dot ; otherwise an
    *         empty string
-   * */
+   */
   public static String getFileExtension(String file) {
     String res = "";
     int lastIndexOf = file.lastIndexOf('.');

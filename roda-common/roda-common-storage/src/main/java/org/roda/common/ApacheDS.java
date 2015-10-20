@@ -1,8 +1,8 @@
 package org.roda.common;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
@@ -35,6 +35,7 @@ import org.apache.directory.server.ldap.LdapServer;
 import org.apache.directory.server.protocol.shared.transport.TcpTransport;
 import org.apache.directory.server.xdbm.Index;
 import org.apache.log4j.Logger;
+import org.roda.util.FileUtility;
 
 // FIXME this should be moved to a more meaningful maven module
 public class ApacheDS {
@@ -173,9 +174,9 @@ public class ApacheDS {
       modifyRequestImpl.replace("userPassword", adminPassword);
       service.getAdminSession().modify(modifyRequestImpl);
 
-      applyLdif(configDirectory.resolve("users.ldif").toFile());
-      applyLdif(configDirectory.resolve("groups.ldif").toFile());
-      applyLdif(configDirectory.resolve("roles.ldif").toFile());
+      applyLdif(FileUtility.getConfigurationFile(configDirectory, "ldap/users.ldif"));
+      applyLdif(FileUtility.getConfigurationFile(configDirectory, "ldap/groups.ldif"));
+      applyLdif(FileUtility.getConfigurationFile(configDirectory, "ldap/roles.ldif"));
     }
   }
 
@@ -249,8 +250,8 @@ public class ApacheDS {
     server.start();
   }
 
-  private void applyLdif(final File ldifFile) throws LdapException, IOException {
-    LdifReader entries = new LdifReader(new FileInputStream(ldifFile));
+  private void applyLdif(final InputStream ldifFileInputstream) throws LdapException, IOException {
+    LdifReader entries = new LdifReader(ldifFileInputstream);
     for (LdifEntry ldifEntry : entries) {
       DefaultEntry newEntry = new DefaultEntry(service.getSchemaManager(), ldifEntry.getEntry());
       LOGGER.debug("ldif entry: " + newEntry);

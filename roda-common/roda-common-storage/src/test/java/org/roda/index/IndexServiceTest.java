@@ -120,7 +120,7 @@ public class IndexServiceTest {
     // start ApacheDS
     apacheDS = new ApacheDS();
     Files.createDirectories(basePath.resolve("ldapData"));
-    Path ldapConfigs = Paths.get(IndexServiceTest.class.getResource("/ldap/config/").toURI());
+    Path ldapConfigs = Paths.get(IndexServiceTest.class.getResource("/config/ldap/").toURI());
     String ldapHost = rodaConfig.getString("ldap.host", "localhost");
     int ldapPort = rodaConfig.getInt("ldap.port", 10389);
     String ldapPeopleDN = rodaConfig.getString("ldap.peopleDN");

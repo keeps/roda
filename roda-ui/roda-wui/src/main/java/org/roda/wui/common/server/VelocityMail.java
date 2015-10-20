@@ -25,6 +25,7 @@ import org.apache.velocity.context.Context;
 import org.apache.velocity.runtime.RuntimeServices;
 import org.apache.velocity.runtime.log.LogChute;
 import org.roda.common.RodaCoreFactory;
+import org.roda.util.FileUtility;
 
 /**
  * This class is used to execute velocity templates and send the result via
@@ -80,8 +81,8 @@ public class VelocityMail implements LogChute {
   private static VelocityMail defaultInstance;
 
   /**
-	 * 
-	 */
+   * 
+   */
   private static Logger logger = Logger.getLogger(VelocityMail.class);
 
   /**
@@ -123,7 +124,8 @@ public class VelocityMail implements LogChute {
    */
   public static VelocityMail getDefaultInstance() throws Exception {
     if (defaultInstance == null) {
-      InputStream inputStream = RodaCoreFactory.getConfigurationFile("mail/velocity.mail.properties");
+      InputStream inputStream = FileUtility.getConfigurationFile(RodaCoreFactory.getConfigPath(),
+        "mail/velocity.mail.properties");
       ExtendedProperties extendedProperties = new ExtendedProperties();
       extendedProperties.load(inputStream);
       defaultInstance = new VelocityMail(extendedProperties);
@@ -248,7 +250,8 @@ public class VelocityMail implements LogChute {
    * 
    * @throws Exception
    */
-  protected void setMessageContent(Message message, ExtendedProperties configuration, Context context) throws Exception {
+  protected void setMessageContent(Message message, ExtendedProperties configuration, Context context)
+    throws Exception {
     ExtendedProperties content = configuration.subset("message");
     Enumeration<String> keys = content.keys();
 
