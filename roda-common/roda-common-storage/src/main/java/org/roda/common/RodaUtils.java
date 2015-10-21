@@ -50,8 +50,7 @@ public class RodaUtils {
       // do nothing
     }
     if (inputStream == null) {
-      ClassLoader classLoader = ValidationUtils.class.getClassLoader();
-      inputStream = classLoader.getResourceAsStream("/config/" + resourceRelativePath);
+      inputStream = RodaUtils.class.getResourceAsStream("/config/" + resourceRelativePath);
       LOGGER.trace(logActionText + " using resource from classpath " + resourceRelativePath);
     }
     return inputStream;
