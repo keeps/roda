@@ -51,6 +51,14 @@
 			<name>SnakeYAML repository</name>
 			<url>http://oss.sonatype.org/content/groups/public/</url>
 		</repository>
+		<repository>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<id>opf-dev-mvn</id>
+			<name>opf-dev</name>
+			<url>http://artifactory.opf-labs.org/artifactory/opf-dev</url>
+		</repository>
 	</repositories>
 	<ciManagement>
 		<system>Jenkins</system>
@@ -891,6 +899,16 @@
 				<groupId>org.apache.tika</groupId>
 				<artifactId>tika-app</artifactId>
 				<version>1.10</version>
+			</dependency>
+			<dependency>
+				<groupId>org.openpreservation.jhove</groupId>
+				<artifactId>jhove-core</artifactId>
+				<version>1.12.28</version>
+			</dependency>
+			<dependency>
+				<groupId>org.openpreservation.jhove</groupId>
+				<artifactId>jhove-modules</artifactId>
+				<version>1.12.28</version>
 			</dependency>
 			<!-- Akka related dependencies - start -->
 			<dependency>

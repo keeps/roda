@@ -278,6 +278,14 @@
 			<groupId>uk.gov.nationalarchives</groupId>
 			<artifactId>droid-command-line</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.openpreservation.jhove</groupId>
+			<artifactId>jhove-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.openpreservation.jhove</groupId>
+			<artifactId>jhove-modules</artifactId>
+		</dependency>
 		<!-- <dependency> -->
 		<!-- <groupId>org.apache.tika</groupId> -->
 		<!-- <artifactId>tika-app</artifactId> -->
