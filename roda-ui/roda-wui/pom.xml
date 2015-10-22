@@ -286,6 +286,18 @@
 			<groupId>org.openpreservation.jhove</groupId>
 			<artifactId>jhove-modules</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>edu.harvard.hul.ois</groupId>
+			<artifactId>fits</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jdom</groupId>
+			<artifactId>jdom</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>edu.harvard.hul.ois</groupId>
+			<artifactId>ots-schemas</artifactId>
+		</dependency>
 		<!-- <dependency> -->
 		<!-- <groupId>org.apache.tika</groupId> -->
 		<!-- <artifactId>tika-app</artifactId> -->

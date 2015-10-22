@@ -910,6 +910,21 @@
 				<artifactId>jhove-modules</artifactId>
 				<version>1.12.28</version>
 			</dependency>
+			<dependency>
+				<groupId>edu.harvard.hul.ois</groupId>
+				<artifactId>fits</artifactId>
+				<version>0.8.10</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jdom</groupId>
+				<artifactId>jdom</artifactId>
+				<version>1.1</version>
+			</dependency>
+			<dependency>
+				<groupId>edu.harvard.hul.ois</groupId>
+				<artifactId>ots-schemas</artifactId>
+				<version>0.11</version>
+			</dependency>
 			<!-- Akka related dependencies - start -->
 			<dependency>
 				<groupId>com.typesafe.akka</groupId>

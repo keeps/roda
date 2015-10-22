@@ -1,4 +1,4 @@
-package org.roda.action.ingest.deepCharacterization.JHOVE;
+package org.roda.action.ingest.deepCharacterization.FITS;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.roda.action.ingest.deepCharacterization.JHOVE.utils.JHOVEUtils;
+import org.roda.action.ingest.deepCharacterization.FITS.utils.FITSUtils;
 import org.roda.action.orchestrate.Plugin;
 import org.roda.action.orchestrate.PluginException;
 import org.roda.common.PremisUtils;
@@ -30,7 +30,7 @@ import org.roda.storage.StorageService;
 import org.roda.storage.StorageServiceException;
 import org.roda.storage.fs.FSUtils;
 
-public class JHOVEAction implements Plugin<AIP> {
+public class FITSAction implements Plugin<AIP> {
   private final Logger logger = Logger.getLogger(getClass());
 
   @Override
@@ -89,7 +89,7 @@ public class JHOVEAction implements Plugin<AIP> {
               RepresentationFilePreservationObject premisObject = PremisUtils.getPremisFile(storage, aip.getId(),
                 representationID, fileName);
               try {
-                premisObject = JHOVEUtils.deepCharacterization(premisObject, file, binary, getParameterValues());
+                premisObject = FITSUtils.deepCharacterization(premisObject, file, binary, getParameterValues());
               } catch (Exception e) {
                 logger.error(e.getMessage(), e);
               }

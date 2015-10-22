@@ -31,6 +31,7 @@ import org.apache.solr.common.SolrDocumentList;
 import org.roda.action.antivirus.AntivirusAction;
 import org.roda.action.fixity.FixityAction;
 import org.roda.action.ingest.bagit.BagitToAIPAction;
+import org.roda.action.ingest.deepCharacterization.FITS.FITSAction;
 import org.roda.action.ingest.deepCharacterization.JHOVE.JHOVEAction;
 import org.roda.action.ingest.fastCharacterization.FastCharacterizationAction;
 import org.roda.action.ingest.fulltext.FullTextAction;
@@ -442,6 +443,11 @@ public class RodaCoreFactory {
     getActionOrchestrator().runActionOnAllAIPs(jhoveAction);
   }
 
+  private static void runFitsAction() {
+    Plugin<AIP> fitsAction = new FITSAction();
+    getActionOrchestrator().runActionOnAllAIPs(fitsAction);
+  }
+
   private static void runBagitAction() {
     try {
       Path bagitFolder = RodaCoreFactory.getDataPath().resolve("bagit");
@@ -487,6 +493,7 @@ public class RodaCoreFactory {
     System.err.println("java -jar x.jar fastcharacterization");
     System.err.println("java -jar x.jar fulltext");
     System.err.println("java -jar x.jar jhove");
+    System.err.println("java -jar x.jar fits");
   }
 
   private static void printIndexMembers(List<String> args, Filter filter, Sorter sorter, Sublist sublist, Facets facets)
@@ -530,6 +537,8 @@ public class RodaCoreFactory {
         runFulltextAction();
       } else if ("jhove".equals(args.get(0))) {
         runJhoveAction();
+      } else if ("fits".equals(args.get(0))) {
+        runFitsAction();
       } else if ("bagit".equals(args.get(0))) {
         runBagitAction();
       } else {
