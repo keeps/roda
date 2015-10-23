@@ -298,16 +298,16 @@
 			<groupId>edu.harvard.hul.ois</groupId>
 			<artifactId>ots-schemas</artifactId>
 		</dependency>
-		<!-- <dependency> -->
-		<!-- <groupId>org.apache.tika</groupId> -->
-		<!-- <artifactId>tika-app</artifactId> -->
-		<!-- <exclusions> -->
-		<!-- <exclusion> -->
-		<!-- <groupId></groupId> -->
-		<!-- <artifactId></artifactId> -->
-		<!-- </exclusion> -->
-		<!-- </exclusions> -->
-		<!-- </dependency> -->
+		<dependency>
+		<groupId>org.apache.tika</groupId>
+		<artifactId>tika-app</artifactId>
+		<exclusions>
+		<exclusion>
+		<groupId></groupId>
+		<artifactId></artifactId>
+		</exclusion>
+		</exclusions>
+		</dependency>
 	</dependencies>
 	<build>
 		<pluginManagement>

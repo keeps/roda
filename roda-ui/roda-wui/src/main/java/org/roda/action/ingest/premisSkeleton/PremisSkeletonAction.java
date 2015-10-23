@@ -81,8 +81,10 @@ public class PremisSkeletonAction implements Plugin<AIP> {
     try {
       Path temp = Files.createTempDirectory("temp");
       for (AIP aip : list) {
+        logger.debug("Processing AIP " + aip.getId());
         try {
           for (String representationID : aip.getRepresentationIds()) {
+            logger.debug("Processing representation " + representationID + " from AIP " + aip.getId());
             RepresentationPreservationObject pObject = new RepresentationPreservationObject();
             pObject.setAipId(aip.getId());
             pObject.setId(representationID);
@@ -90,6 +92,7 @@ public class PremisSkeletonAction implements Plugin<AIP> {
             Representation representation = model.retrieveRepresentation(aip.getId(), representationID);
             List<RepresentationFilePreservationObject> pObjectPartFiles = new ArrayList<RepresentationFilePreservationObject>();
             for (String fileID : representation.getFileIds()) {
+              logger.debug("Processing file " + fileID + " from " + representationID + " of AIP " + aip.getId());
               File file = model.retrieveFile(aip.getId(), representationID, fileID);
               Binary binary = storage.getBinary(file.getStoragePath());
               Path pathFile = Paths.get(temp.toString(), file.getStoragePath().getName());
@@ -106,14 +109,16 @@ public class PremisSkeletonAction implements Plugin<AIP> {
               } else {
                 pObjectPartFiles.add(premisObject);
               }
+              premis.toFile().delete();
             }
             pObject.setPartFiles(
               pObjectPartFiles.toArray(new RepresentationFilePreservationObject[pObjectPartFiles.size()]));
             Path premisRepresentation = Files.createTempFile("representation", ".premis.xml");
             PremisRepresentationObjectHelper helper = new PremisRepresentationObjectHelper(pObject);
             helper.saveToFile(premisRepresentation.toFile());
-            model.createPreservationMetadata(aip.getId(), representationID,"representation.premis.xml",
+            model.createPreservationMetadata(aip.getId(), representationID, "representation.premis.xml",
               (Binary) FSUtils.convertPathToResource(premisRepresentation.getParent(), premisRepresentation));
+            premisRepresentation.toFile().delete();
           }
         } catch (ModelServiceException mse) {
           logger.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage(), mse);

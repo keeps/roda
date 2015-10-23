@@ -77,11 +77,14 @@ public class FITSAction implements Plugin<AIP> {
     throws PluginException {
     try {
       for (AIP aip : list) {
-        logger.debug("Deep characterization for AIP " + aip.getId());
+        logger.debug("Processing AIP " + aip.getId());
         try {
           for (String representationID : aip.getRepresentationIds()) {
+            logger.debug("Processing representation " + representationID + " of AIP " + aip.getId());
             Representation representation = model.retrieveRepresentation(aip.getId(), representationID);
             for (String fileID : representation.getFileIds()) {
+              logger.debug(
+                "Processing file " + fileID + " of representation " + representationID + " from AIP " + aip.getId());
               String fileName = fileID + ".premis.xml";
               File file = model.retrieveFile(aip.getId(), representationID, fileID);
               Binary binary = storage.getBinary(file.getStoragePath());
@@ -99,7 +102,7 @@ public class FITSAction implements Plugin<AIP> {
               helper.saveToFile(premis.toFile());
               model.updatePreservationMetadata(aip.getId(), representationID, fileName,
                 (Binary) FSUtils.convertPathToResource(premis.getParent(), premis));
-
+              premis.toFile().delete();
             }
           }
         } catch (ModelServiceException mse) {

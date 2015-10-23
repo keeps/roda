@@ -77,11 +77,13 @@ public class JHOVEAction implements Plugin<AIP> {
     throws PluginException {
     try {
       for (AIP aip : list) {
-        logger.debug("Deep characterization for AIP " + aip.getId());
+        logger.debug("Processing AIP " + aip.getId());
         try {
           for (String representationID : aip.getRepresentationIds()) {
+            logger.debug("Processing representation " + representationID + " from AIP " + aip.getId());
             Representation representation = model.retrieveRepresentation(aip.getId(), representationID);
             for (String fileID : representation.getFileIds()) {
+              logger.debug("Processing file " + fileID + " from " + representationID + " of AIP " + aip.getId());
               String fileName = fileID + ".premis.xml";
               File file = model.retrieveFile(aip.getId(), representationID, fileID);
               Binary binary = storage.getBinary(file.getStoragePath());

@@ -8,28 +8,28 @@ public class OtherMetadata {
   private final String type;
   private final StoragePath storagePath;
 
-  public OtherMetadata(String id,String aipId,String type, StoragePath storagePath) {
+  public OtherMetadata(String id, String aipId, String type, StoragePath storagePath) {
     super();
     this.id = id;
     this.aipId = aipId;
     this.type = type;
     this.storagePath = storagePath;
   }
-  
+
   /**
    * @return the id
    */
   public String getId() {
     return id;
   }
-  
+
   /**
    * @return the aipId
    */
   public String getAipId() {
-    return id;
+    return aipId;
   }
-  
+
   /**
    * @return the type
    */
@@ -46,8 +46,7 @@ public class OtherMetadata {
 
   @Override
   public String toString() {
-    return "DescriptiveMetadata [type=" + type + ", storagePath=" + storagePath
-      + "]";
+    return "DescriptiveMetadata [type=" + type + ", storagePath=" + storagePath + "]";
   }
 
   @Override

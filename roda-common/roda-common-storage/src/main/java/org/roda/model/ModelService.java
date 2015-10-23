@@ -21,6 +21,7 @@ import javax.xml.bind.Marshaller;
 
 import org.roda.common.LdapUtilityException;
 import org.roda.common.RodaUtils;
+import org.roda.common.ServiceException;
 import org.roda.common.UserUtility;
 import org.roda.common.ValidationUtils;
 import org.roda.core.common.EmailAlreadyExistsException;
@@ -1856,9 +1857,39 @@ public class ModelService extends ModelObservable {
     }
   }
 
-  public OtherMetadata createOtherMetadata(String aipID, String fileName, String type, Binary binary)
-    throws ModelServiceException {
+  public OtherMetadata createOtherMetadata(String aipID, String representationId, String fileName, String type,
+    Binary binary) throws ModelServiceException {
     OtherMetadata otherMetadataBinary = null;
+
+    try {
+      StoragePath otherMetadataPath = ModelUtils.getOtherMetadataDirectory(aipID, fileName, type);
+      storage.createDirectory(otherMetadataPath, new HashMap<String, Set<String>>());
+    } catch (StorageServiceException e) {
+      if (e.getCode() != ServiceException.ALREADY_EXISTS) {
+        throw new ModelServiceException("Error creating other metadata directory in storage",
+          ModelServiceException.INTERNAL_SERVER_ERROR, e);
+      }
+    }
+    try {
+      StoragePath otherMetadataPath = ModelUtils.getTikaMetadataDirectory(aipID, fileName, type);
+      storage.createDirectory(otherMetadataPath, new HashMap<String, Set<String>>());
+    } catch (StorageServiceException e) {
+      if (e.getCode() != ServiceException.ALREADY_EXISTS) {
+        throw new ModelServiceException("Error creating tika metadata directory in storage",
+          ModelServiceException.INTERNAL_SERVER_ERROR, e);
+      }
+    }
+    try {
+      StoragePath otherMetadataPath = ModelUtils.getTikaRepresentationMetadataDirectory(aipID, representationId,
+        fileName, type);
+      storage.createDirectory(otherMetadataPath, new HashMap<String, Set<String>>());
+    } catch (StorageServiceException e) {
+      if (e.getCode() != ServiceException.ALREADY_EXISTS) {
+        throw new ModelServiceException("Error creating tika metadata directory in storage",
+          ModelServiceException.INTERNAL_SERVER_ERROR, e);
+      }
+    }
+
     try {
       StoragePath binaryPath = ModelUtils.getOtherMetadataPath(aipID, fileName, type);
       boolean asReference = false;
@@ -1866,7 +1897,8 @@ public class ModelService extends ModelObservable {
       Map<String, Set<String>> binaryMetadata = binary.getMetadata();
       storage.updateBinaryContent(binaryPath, binary.getContent(), asReference, createIfNotExists);
       storage.updateMetadata(binaryPath, binaryMetadata, true);
-      otherMetadataBinary = new OtherMetadata(aipID+"_"+type+"_"+fileName,aipID,type,binaryPath);
+      otherMetadataBinary = new OtherMetadata(type + "_" + aipID + "_" + representationId + "_" + fileName, aipID, type,
+        binaryPath);
       notifyOtherMetadataCreated(otherMetadataBinary);
     } catch (StorageServiceException e) {
       throw new ModelServiceException("Error creating other metadata binary in storage",
