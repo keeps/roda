@@ -15,6 +15,7 @@ import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.Parser;
 import org.apache.tika.sax.ToXMLContentHandler;
+import org.roda.action.ingest.fulltext.utils.TikaUtils;
 import org.roda.action.orchestrate.Plugin;
 import org.roda.action.orchestrate.PluginException;
 import org.roda.core.common.InvalidParameterException;
@@ -35,11 +36,11 @@ import org.xml.sax.SAXException;
 
 public class FullTextAction implements Plugin<AIP> {
   private final Logger logger = Logger.getLogger(getClass());
-  private Parser parser;
+  
 
   @Override
   public void init() throws PluginException {
-    parser = new AutoDetectParser();
+    // do nothing
   }
 
   @Override
@@ -93,13 +94,9 @@ public class FullTextAction implements Plugin<AIP> {
               File file = model.retrieveFile(aip.getId(), representationID, fileID);
               Binary binary = storage.getBinary(file.getStoragePath());
 
-              Metadata metadata = new Metadata();
-              ContentHandler handler = new ToXMLContentHandler();
-              parser.parse(binary.getContent().createInputStream(), handler, metadata, new ParseContext());
-              String content = handler.toString();
-              Path p = Files.createTempFile("tika", ".xml");
-              Files.write(p, content.getBytes());
-              Binary resource = (Binary) FSUtils.convertPathToResource(p.getParent(), p);
+              Path tikaResult = TikaUtils.extractMetadata(binary.getContent().createInputStream());
+              
+              Binary resource = (Binary) FSUtils.convertPathToResource(tikaResult.getParent(), tikaResult);
               model.createOtherMetadata(aip.getId(), representationID, file.getStoragePath().getName() + ".xml", "tika",
                 resource);
             }
