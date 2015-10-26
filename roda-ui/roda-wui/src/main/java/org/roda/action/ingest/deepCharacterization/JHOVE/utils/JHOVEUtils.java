@@ -1,16 +1,19 @@
 package org.roda.action.ingest.deepCharacterization.JHOVE.utils;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.util.Calendar;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 import org.roda.common.RodaCoreFactory;
 import org.roda.core.data.v2.RepresentationFilePreservationObject;
 import org.roda.storage.Binary;
 import org.roda.util.FileUtility;
-
-import com.hp.hpl.jena.util.FileUtils;
+import org.roda.util.StreamUtility;
 
 import edu.harvard.hul.ois.jhove.App;
 import edu.harvard.hul.ois.jhove.JhoveBase;
@@ -18,27 +21,61 @@ import edu.harvard.hul.ois.jhove.Module;
 import edu.harvard.hul.ois.jhove.OutputHandler;
 
 public class JHOVEUtils {
+  private final static Logger logger = Logger.getLogger(JHOVEUtils.class);
 
-  public static String runJHOVE(File f) throws Exception {
-    App app = App.newAppWithName("Jhove");
-    String saxClass = JhoveBase.getSaxClassFromProperties();
-    JhoveBase je = new JhoveBase();
-    je.setLogLevel("SEVERE");
+  public static String runJHOVE(File targetFile) throws Exception {
+
+    if (targetFile == null || !targetFile.isFile() || !targetFile.exists()) {
+      logger.warn("target file '" + targetFile + "' cannot be found.");
+      throw new FileNotFoundException("target file '" + targetFile + "' cannot be found.");
+    }
+
+    Calendar calendar = Calendar.getInstance();
+
+    App app = new App(JHOVEUtils.class.getSimpleName(), "1.0",
+      new int[] {calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)},
+      "Format Identification Utility", "");
+    JhoveBase jhoveBase = new JhoveBase();
+
     File configFile = File.createTempFile("jhove", "conf");
     FileOutputStream fos = new FileOutputStream(configFile);
     String jhoveConfigPath = RodaCoreFactory.getRodaConfigurationAsString("tools", "jhove", "config");
     IOUtils.copy(FileUtility.getConfigurationFile(RodaCoreFactory.getConfigPath(), jhoveConfigPath), fos);
     fos.close();
-    je.init(configFile.getAbsolutePath(), saxClass);
-    Module module = je.getModule(null);
-    OutputHandler about = je.getHandler(null);
-    OutputHandler handler = je.getHandler(null);
+    // System.setProperty("edu.harvard.hul.ois.jhove.saxClass", );
 
-    String files[];
-    files = new String[] {f.getAbsolutePath()};
-    File jhoveOutput = File.createTempFile("jhove", ".txt");
-    je.dispatch(app, module, about, handler, jhoveOutput.getAbsolutePath(), files);
-    return "<jhove>" + FileUtils.readWholeFileAsUTF8(jhoveOutput.getAbsolutePath()) + "</jhove>";
+    jhoveBase.init(configFile.getAbsolutePath(), null);
+
+    File outputFile = File.createTempFile("jhove", "output");
+    logger.debug("JHOVE output file " + outputFile);
+
+    Module module = jhoveBase.getModule(null);
+    OutputHandler aboutHandler = jhoveBase.getHandler(null);
+    OutputHandler xmlHandler = jhoveBase.getHandler("XML");
+
+    logger.debug("Calling JHOVE dispatch(...) on file " + targetFile);
+
+    jhoveBase.dispatch(app, module, aboutHandler, xmlHandler, outputFile.getAbsolutePath(),
+      new String[] {targetFile.getAbsolutePath()});
+
+    logger.debug("JHOVE dispatch(...) finished processing the file");
+
+    FileInputStream outputFileInputStream = new FileInputStream(outputFile);
+
+    String output = StreamUtility.inputStreamToString(outputFileInputStream);
+
+    logger.debug("JHOVE output read to string of size " + output.length());
+
+    outputFileInputStream.close();
+    configFile.delete();
+    outputFile.delete();
+
+    // logger.debug("Fixing MIX namespace in JHOVE output");
+    // output = fixMixNamespaceInJhoveOutput(output);
+    // logger.debug("JHOVE output fixed. Returning...");
+
+    return output;
+
   }
 
   public static RepresentationFilePreservationObject deepCharacterization(

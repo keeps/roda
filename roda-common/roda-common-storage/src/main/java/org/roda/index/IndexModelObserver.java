@@ -26,6 +26,10 @@ import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
 import org.roda.model.OtherMetadata;
 import org.roda.model.PreservationMetadata;
+import org.roda.model.utils.ModelUtils;
+import org.roda.storage.Binary;
+import org.roda.storage.DefaultStoragePath;
+import org.roda.storage.StoragePath;
 import org.roda.storage.StorageServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,12 +100,22 @@ public class IndexModelObserver implements ModelObserver {
           SolrInputDocument premisObjectDocument = SolrUtils.representationFilePreservationObjectToSolrDocument(id,
             premisObject);
           index.add(RodaConstants.INDEX_PRESERVATION_OBJECTS, premisObjectDocument);
+          
+          StoragePath storagePath = ModelUtils.getPreservationFilePath(premisObject.getAipId(), premisObject.getRepresentationId(), premisObject.getFileId());
+          Binary binary = model.getStorage().getBinary(storagePath);
+          SolrInputDocument objectCharacteristics = SolrUtils.getObjectCharacteristicsFields(id,binary, configBasePath);
+          index.add(RodaConstants.INDEX_CHARACTERIZATION, objectCharacteristics);
         }
-      } catch (SolrServerException | IOException | ModelServiceException e) {
+      } catch (SolrServerException | IOException | ModelServiceException | StorageServiceException | IndexServiceException e) {
         LOGGER.error("Could not index premis object", e);
       }
       try {
         index.commit(RodaConstants.INDEX_PRESERVATION_OBJECTS);
+      } catch (SolrServerException | IOException e) {
+        LOGGER.error("Could not commit indexed representations", e);
+      }
+      try {
+        index.commit(RodaConstants.INDEX_CHARACTERIZATION);
       } catch (SolrServerException | IOException e) {
         LOGGER.error("Could not commit indexed representations", e);
       }

@@ -20,7 +20,6 @@ import javax.xml.transform.TransformerException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.log4j.Logger;
-import org.roda.common.RodaUtils;
 import org.roda.core.common.Pair;
 import org.roda.core.common.RodaConstants;
 import org.roda.model.AIP;
@@ -188,8 +187,9 @@ public final class HTMLUtils {
       parameters.put("maxFiles", pagingParametersFiles.getSecond());
 
       Messages i18nMessages = RodaCoreFactory.getI18NMessages(locale);
-      parameters.putAll(i18nMessages.getTranslations(RodaConstants.I18N_CROSSWALKS_DISSEMINATION_HTML_PREFIX + "premis",
-        String.class, true));
+      Map<String, String> translations = i18nMessages
+        .getTranslations(RodaConstants.I18N_CROSSWALKS_DISSEMINATION_HTML_PREFIX + "premis", String.class, true);
+      parameters.putAll(translations);
 
       html = binaryToHtml(new FileInputStream(f), "join", parameters, configBasePath);
       FSUtils.deletePath(p);
