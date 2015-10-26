@@ -3,6 +3,7 @@ package org.roda.action.ingest.deepCharacterization.FITS.utils;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,7 +15,6 @@ import org.apache.log4j.Logger;
 import org.jdom.JDOMException;
 import org.jdom.output.XMLOutputter;
 import org.roda.common.RodaCoreFactory;
-import org.roda.core.data.v2.RepresentationFilePreservationObject;
 import org.roda.storage.Binary;
 import org.roda.util.CommandException;
 import org.roda.util.CommandUtility;
@@ -25,14 +25,17 @@ import edu.harvard.hul.ois.fits.exceptions.FitsException;
 public class FITSUtils {
   static final private Logger logger = Logger.getLogger(FITSUtils.class);
 
-  public static String inspect(File f) throws FitsException {
+  public static Path inspect(File f) throws FitsException {
     try {
       List<String> command = getCommand();
       command.add(f.getAbsolutePath());
       String fitsOutput = CommandUtility.execute(command);
       fitsOutput = fitsOutput.substring(fitsOutput.indexOf("<?xml"));
       FitsOutput output = new FitsOutput(fitsOutput);
-      return new XMLOutputter().outputString(output.getFitsXml());
+      Path p = Files.createTempFile("fits", ".xml");
+
+      new XMLOutputter().output(output.getFitsXml(), new FileOutputStream(p.toFile()));
+      return p;
     } catch (CommandException e) {
       throw new FitsException("Error while executing FITS command");
     } catch (JDOMException e) {
@@ -51,23 +54,22 @@ public class FITSUtils {
     String osName = System.getProperty("os.name");
     List<String> command;
     if (osName.startsWith("Windows")) {
-      command = new ArrayList<String>(Arrays.asList(FITS_DIRECTORY.getAbsolutePath() + File.separator + "fits.bat", "-i"));
+      command = new ArrayList<String>(
+        Arrays.asList(FITS_DIRECTORY.getAbsolutePath() + File.separator + "fits.bat", "-i"));
     } else {
-      command = new ArrayList<String>(Arrays.asList(FITS_DIRECTORY.getAbsolutePath() + File.separator + "fits.sh", "-i"));
+      command = new ArrayList<String>(
+        Arrays.asList(FITS_DIRECTORY.getAbsolutePath() + File.separator + "fits.sh", "-i"));
     }
     return command;
   }
 
-  public static RepresentationFilePreservationObject deepCharacterization(
-    RepresentationFilePreservationObject premisObject, org.roda.model.File file, Binary binary,
-    Map<String, String> parameterValues) throws IOException, FitsException {
+  public static Path runFits(org.roda.model.File file, Binary binary, Map<String, String> parameterValues)
+    throws IOException, FitsException {
     java.io.File f = File.createTempFile("temp", ".temp");
     FileOutputStream fos = new FileOutputStream(f);
     IOUtils.copy(binary.getContent().createInputStream(), fos);
     fos.close();
-    String fitsOutput = inspect(f);
-    premisObject.setObjectCharacteristicsExtension(fitsOutput);
-    return premisObject;
+    return inspect(f);
   }
 
 }

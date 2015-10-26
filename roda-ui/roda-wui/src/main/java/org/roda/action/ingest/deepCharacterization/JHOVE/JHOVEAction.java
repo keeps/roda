@@ -1,7 +1,5 @@
 package org.roda.action.ingest.deepCharacterization.JHOVE;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,14 +10,10 @@ import org.apache.log4j.Logger;
 import org.roda.action.ingest.deepCharacterization.JHOVE.utils.JHOVEUtils;
 import org.roda.action.orchestrate.Plugin;
 import org.roda.action.orchestrate.PluginException;
-import org.roda.common.PremisUtils;
 import org.roda.core.common.InvalidParameterException;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
 import org.roda.core.data.v2.Representation;
-import org.roda.core.data.v2.RepresentationFilePreservationObject;
-import org.roda.core.metadata.v2.premis.PremisFileObjectHelper;
-import org.roda.core.metadata.v2.premis.PremisMetadataException;
 import org.roda.index.IndexService;
 import org.roda.model.AIP;
 import org.roda.model.File;
@@ -75,46 +69,32 @@ public class JHOVEAction implements Plugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
-    try {
-      for (AIP aip : list) {
-        LOGGER.debug("Processing AIP " + aip.getId());
-        try {
-          for (String representationID : aip.getRepresentationIds()) {
-            LOGGER.debug("Processing representation " + representationID + " from AIP " + aip.getId());
-            Representation representation = model.retrieveRepresentation(aip.getId(), representationID);
-            for (String fileID : representation.getFileIds()) {
-              LOGGER.debug("Processing file " + fileID + " from " + representationID + " of AIP " + aip.getId());
-              String fileName = fileID + ".premis.xml";
-              File file = model.retrieveFile(aip.getId(), representationID, fileID);
-              Binary binary = storage.getBinary(file.getStoragePath());
+    for (AIP aip : list) {
+      LOGGER.debug("Processing AIP " + aip.getId());
+      try {
+        for (String representationID : aip.getRepresentationIds()) {
+          LOGGER.debug("Processing representation " + representationID + " from AIP " + aip.getId());
+          Representation representation = model.retrieveRepresentation(aip.getId(), representationID);
+          for (String fileID : representation.getFileIds()) {
+            LOGGER.debug("Processing file " + fileID + " from " + representationID + " of AIP " + aip.getId());
+            File file = model.retrieveFile(aip.getId(), representationID, fileID);
+            Binary binary = storage.getBinary(file.getStoragePath());
 
-              RepresentationFilePreservationObject premisObject = PremisUtils.getPremisFile(storage, aip.getId(),
-                representationID, fileName);
-              try {
-                premisObject = JHOVEUtils.deepCharacterization(premisObject, file, binary, getParameterValues());
-              } catch (Exception e) {
-                LOGGER.error(e.getMessage(), e);
-              }
-
-              // FIXME temp file that doesn't get deleted afterwards
-              Path premis = Files.createTempFile(file.getId(), ".premis.xml");
-              PremisFileObjectHelper helper = new PremisFileObjectHelper(premisObject);
-              helper.saveToFile(premis.toFile());
-              model.updatePreservationMetadata(aip.getId(), representationID, fileName,
-                (Binary) FSUtils.convertPathToResource(premis.getParent(), premis));
-
-            }
+            Path jhoveResults = JHOVEUtils.runJhove(file, binary, getParameterValues());
+            Binary resource = (Binary) FSUtils.convertPathToResource(jhoveResults.getParent(), jhoveResults);
+            model.createOtherMetadata(aip.getId(), representationID, file.getStoragePath().getName() + ".xml", "JHOVE",
+              resource);
+            jhoveResults.toFile().delete();
           }
-        } catch (ModelServiceException mse) {
-          LOGGER.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage());
-        } catch (StorageServiceException sse) {
-          LOGGER.error("Error processing AIP " + aip.getId() + ": " + sse.getMessage());
-        } catch (PremisMetadataException pme) {
-          LOGGER.error("Error processing AIP " + aip.getId() + ": " + pme.getMessage());
         }
+      } catch (ModelServiceException mse) {
+        LOGGER.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage());
+      } catch (StorageServiceException sse) {
+        LOGGER.error("Error processing AIP " + aip.getId() + ": " + sse.getMessage());
+      } catch (Exception e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
       }
-    } catch (IOException ioe) {
-      LOGGER.error("Error executing FastCharacterizationAction: " + ioe.getMessage(), ioe);
     }
     return null;
   }

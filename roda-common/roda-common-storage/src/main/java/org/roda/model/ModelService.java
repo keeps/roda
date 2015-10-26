@@ -1871,7 +1871,7 @@ public class ModelService extends ModelObservable {
       }
     }
     try {
-      StoragePath otherMetadataPath = ModelUtils.getTikaMetadataDirectory(aipID, fileName, type);
+      StoragePath otherMetadataPath = ModelUtils.getToolMetadataDirectory(aipID, fileName, type);
       storage.createDirectory(otherMetadataPath, new HashMap<String, Set<String>>());
     } catch (StorageServiceException e) {
       if (e.getCode() != ServiceException.ALREADY_EXISTS) {
@@ -1880,7 +1880,7 @@ public class ModelService extends ModelObservable {
       }
     }
     try {
-      StoragePath otherMetadataPath = ModelUtils.getTikaRepresentationMetadataDirectory(aipID, representationId,
+      StoragePath otherMetadataPath = ModelUtils.getToolRepresentationMetadataDirectory(aipID, representationId,
         fileName, type);
       storage.createDirectory(otherMetadataPath, new HashMap<String, Set<String>>());
     } catch (StorageServiceException e) {
@@ -1891,7 +1891,7 @@ public class ModelService extends ModelObservable {
     }
 
     try {
-      StoragePath binaryPath = ModelUtils.getOtherMetadataPath(aipID, fileName, type);
+      StoragePath binaryPath = ModelUtils.getToolMetadataPath(aipID, representationId, fileName, type);
       boolean asReference = false;
       boolean createIfNotExists = true;
       Map<String, Set<String>> binaryMetadata = binary.getMetadata();

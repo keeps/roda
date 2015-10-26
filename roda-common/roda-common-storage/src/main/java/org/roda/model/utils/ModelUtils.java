@@ -576,29 +576,29 @@ public final class ModelUtils {
 
   }
 
-  public static StoragePath getOtherMetadataPath(String aipID, String fileName, String type)
-    throws StorageServiceException {
-    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipID,
-      RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_OTHER, type, fileName);
-
-  }
-
   public static StoragePath getOtherMetadataDirectory(String aipID, String fileName, String type)
     throws StorageServiceException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipID,
       RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_OTHER);
   }
 
-  public static StoragePath getTikaMetadataDirectory(String aipID, String fileName, String type)
+  public static StoragePath getToolMetadataDirectory(String aipID, String fileName, String type)
     throws StorageServiceException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipID,
       RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_OTHER, type);
   }
 
-  public static StoragePath getTikaRepresentationMetadataDirectory(String aipID, String representationId,
+  public static StoragePath getToolRepresentationMetadataDirectory(String aipID, String representationId,
     String fileName, String type) throws StorageServiceException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipID,
       RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_OTHER, type, representationId);
   }
 
+  public static StoragePath getToolMetadataPath(String aipID, String representationId, String fileName, String type)
+    throws StorageServiceException {
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipID,
+      RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_OTHER, type, representationId,
+      fileName);
+
+  }
 }

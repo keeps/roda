@@ -1,7 +1,6 @@
 package org.roda.action.ingest.deepCharacterization.FITS;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,14 +11,10 @@ import org.apache.log4j.Logger;
 import org.roda.action.ingest.deepCharacterization.FITS.utils.FITSUtils;
 import org.roda.action.orchestrate.Plugin;
 import org.roda.action.orchestrate.PluginException;
-import org.roda.common.PremisUtils;
 import org.roda.core.common.InvalidParameterException;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
 import org.roda.core.data.v2.Representation;
-import org.roda.core.data.v2.RepresentationFilePreservationObject;
-import org.roda.core.metadata.v2.premis.PremisFileObjectHelper;
-import org.roda.core.metadata.v2.premis.PremisMetadataException;
 import org.roda.index.IndexService;
 import org.roda.model.AIP;
 import org.roda.model.File;
@@ -29,6 +24,8 @@ import org.roda.storage.Binary;
 import org.roda.storage.StorageService;
 import org.roda.storage.StorageServiceException;
 import org.roda.storage.fs.FSUtils;
+
+import edu.harvard.hul.ois.fits.exceptions.FitsException;
 
 public class FITSAction implements Plugin<AIP> {
   private static final Logger LOGGER = Logger.getLogger(FITSAction.class);
@@ -85,32 +82,23 @@ public class FITSAction implements Plugin<AIP> {
             for (String fileID : representation.getFileIds()) {
               LOGGER.debug(
                 "Processing file " + fileID + " of representation " + representationID + " from AIP " + aip.getId());
-              String fileName = fileID + ".premis.xml";
               File file = model.retrieveFile(aip.getId(), representationID, fileID);
               Binary binary = storage.getBinary(file.getStoragePath());
 
-              RepresentationFilePreservationObject premisObject = PremisUtils.getPremisFile(storage, aip.getId(),
-                representationID, fileName);
-              try {
-                premisObject = FITSUtils.deepCharacterization(premisObject, file, binary, getParameterValues());
-              } catch (Exception e) {
-                LOGGER.error(e.getMessage(), e);
-              }
+              Path fitsResult = FITSUtils.runFits(file, binary, getParameterValues());
+              Binary resource = (Binary) FSUtils.convertPathToResource(fitsResult.getParent(), fitsResult);
+              model.createOtherMetadata(aip.getId(), representationID, file.getStoragePath().getName() + ".xml", "FITS",
+                resource);
+              fitsResult.toFile().delete();
 
-              Path premis = Files.createTempFile(file.getId(), ".premis.xml");
-              PremisFileObjectHelper helper = new PremisFileObjectHelper(premisObject);
-              helper.saveToFile(premis.toFile());
-              model.updatePreservationMetadata(aip.getId(), representationID, fileName,
-                (Binary) FSUtils.convertPathToResource(premis.getParent(), premis));
-              premis.toFile().delete();
             }
           }
         } catch (ModelServiceException mse) {
           LOGGER.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage());
         } catch (StorageServiceException sse) {
           LOGGER.error("Error processing AIP " + aip.getId() + ": " + sse.getMessage());
-        } catch (PremisMetadataException pme) {
-          LOGGER.error("Error processing AIP " + aip.getId() + ": " + pme.getMessage());
+        } catch (FitsException fe) {
+          LOGGER.error("Error processing AIP " + aip.getId() + ": " + fe.getMessage());
         }
       }
     } catch (IOException ioe) {
