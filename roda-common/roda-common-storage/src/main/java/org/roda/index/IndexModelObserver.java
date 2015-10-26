@@ -28,7 +28,6 @@ import org.roda.model.OtherMetadata;
 import org.roda.model.PreservationMetadata;
 import org.roda.model.utils.ModelUtils;
 import org.roda.storage.Binary;
-import org.roda.storage.DefaultStoragePath;
 import org.roda.storage.StoragePath;
 import org.roda.storage.StorageServiceException;
 import org.slf4j.Logger;
@@ -84,9 +83,9 @@ public class IndexModelObserver implements ModelObserver {
       }
     }
   }
-  
+
   private void indexOtherMetadata(final AIP aip) {
-    //TODO...
+    // TODO...
   }
 
   private void indexPreservationFileObjects(final AIP aip) {
@@ -100,13 +99,16 @@ public class IndexModelObserver implements ModelObserver {
           SolrInputDocument premisObjectDocument = SolrUtils.representationFilePreservationObjectToSolrDocument(id,
             premisObject);
           index.add(RodaConstants.INDEX_PRESERVATION_OBJECTS, premisObjectDocument);
-          
-          StoragePath storagePath = ModelUtils.getPreservationFilePath(premisObject.getAipId(), premisObject.getRepresentationId(), premisObject.getFileId());
+
+          StoragePath storagePath = ModelUtils.getPreservationFilePath(premisObject.getAipId(),
+            premisObject.getRepresentationId(), premisObject.getFileId());
           Binary binary = model.getStorage().getBinary(storagePath);
-          SolrInputDocument objectCharacteristics = SolrUtils.getObjectCharacteristicsFields(id,binary, configBasePath);
+          SolrInputDocument objectCharacteristics = SolrUtils.getObjectCharacteristicsFields(id, binary,
+            configBasePath);
           index.add(RodaConstants.INDEX_CHARACTERIZATION, objectCharacteristics);
         }
-      } catch (SolrServerException | IOException | ModelServiceException | StorageServiceException | IndexServiceException e) {
+      } catch (SolrServerException | IOException | ModelServiceException | StorageServiceException
+        | IndexServiceException e) {
         LOGGER.error("Could not index premis object", e);
       }
       try {
@@ -403,6 +405,6 @@ public class IndexModelObserver implements ModelObserver {
     } catch (ModelServiceException e) {
       LOGGER.error("Error when other metadata created on retrieving the full AIP", e);
     }
-    
+
   }
 }

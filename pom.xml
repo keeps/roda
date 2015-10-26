@@ -56,7 +56,7 @@
 				<enabled>false</enabled>
 			</snapshots>
 			<id>opf-dev-mvn</id>
-			<name>opf-dev</name>
+			<name>opf-dev (jhove)</name>
 			<url>http://artifactory.opf-labs.org/artifactory/opf-dev</url>
 		</repository>
 	</repositories>
@@ -65,6 +65,7 @@
 		<url>http://ci.keep.pt</url>
 	</ciManagement>
 	<developers>
+		<!-- FIXME update this section -->
 		<developer>
 			<id>rcastro</id>
 			<name>Rui Castro</name>
@@ -91,6 +92,7 @@
 		</developer>
 	</developers>
 	<contributors>
+		<!-- FIXME update this section -->
 		<contributor>
 			<name>Vladislav Korecký</name>
 			<email>vladislav_korecky@gordic.cz</email>

@@ -1291,6 +1291,7 @@ public class SolrUtils {
     return index.query(collection, query);
   }
 
+  // FIXME lots of duplicated code from SolrUtils.getDescriptiveMetataFields
   public static SolrInputDocument getObjectCharacteristicsFields(String id, Binary binary, Path configBasePath) throws IndexServiceException {
     SolrInputDocument doc;
     InputStream inputStream;

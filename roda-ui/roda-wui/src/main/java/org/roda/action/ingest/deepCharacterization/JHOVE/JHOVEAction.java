@@ -31,7 +31,7 @@ import org.roda.storage.StorageServiceException;
 import org.roda.storage.fs.FSUtils;
 
 public class JHOVEAction implements Plugin<AIP> {
-  private final Logger logger = Logger.getLogger(getClass());
+  private static final Logger LOGGER = Logger.getLogger(JHOVEAction.class);
 
   @Override
   public void init() throws PluginException {
@@ -77,13 +77,13 @@ public class JHOVEAction implements Plugin<AIP> {
     throws PluginException {
     try {
       for (AIP aip : list) {
-        logger.debug("Processing AIP " + aip.getId());
+        LOGGER.debug("Processing AIP " + aip.getId());
         try {
           for (String representationID : aip.getRepresentationIds()) {
-            logger.debug("Processing representation " + representationID + " from AIP " + aip.getId());
+            LOGGER.debug("Processing representation " + representationID + " from AIP " + aip.getId());
             Representation representation = model.retrieveRepresentation(aip.getId(), representationID);
             for (String fileID : representation.getFileIds()) {
-              logger.debug("Processing file " + fileID + " from " + representationID + " of AIP " + aip.getId());
+              LOGGER.debug("Processing file " + fileID + " from " + representationID + " of AIP " + aip.getId());
               String fileName = fileID + ".premis.xml";
               File file = model.retrieveFile(aip.getId(), representationID, fileID);
               Binary binary = storage.getBinary(file.getStoragePath());
@@ -93,9 +93,10 @@ public class JHOVEAction implements Plugin<AIP> {
               try {
                 premisObject = JHOVEUtils.deepCharacterization(premisObject, file, binary, getParameterValues());
               } catch (Exception e) {
-                logger.error(e.getMessage(), e);
+                LOGGER.error(e.getMessage(), e);
               }
 
+              // FIXME temp file that doesn't get deleted afterwards
               Path premis = Files.createTempFile(file.getId(), ".premis.xml");
               PremisFileObjectHelper helper = new PremisFileObjectHelper(premisObject);
               helper.saveToFile(premis.toFile());
@@ -105,15 +106,15 @@ public class JHOVEAction implements Plugin<AIP> {
             }
           }
         } catch (ModelServiceException mse) {
-          logger.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage());
+          LOGGER.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage());
         } catch (StorageServiceException sse) {
-          logger.error("Error processing AIP " + aip.getId() + ": " + sse.getMessage());
+          LOGGER.error("Error processing AIP " + aip.getId() + ": " + sse.getMessage());
         } catch (PremisMetadataException pme) {
-          logger.error("Error processing AIP " + aip.getId() + ": " + pme.getMessage());
+          LOGGER.error("Error processing AIP " + aip.getId() + ": " + pme.getMessage());
         }
       }
     } catch (IOException ioe) {
-      logger.error("Error executing FastCharacterizationAction: " + ioe.getMessage(), ioe);
+      LOGGER.error("Error executing FastCharacterizationAction: " + ioe.getMessage(), ioe);
     }
     return null;
   }

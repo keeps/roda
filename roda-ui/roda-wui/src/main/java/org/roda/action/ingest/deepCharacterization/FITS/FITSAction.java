@@ -31,7 +31,7 @@ import org.roda.storage.StorageServiceException;
 import org.roda.storage.fs.FSUtils;
 
 public class FITSAction implements Plugin<AIP> {
-  private final Logger logger = Logger.getLogger(getClass());
+  private static final Logger LOGGER = Logger.getLogger(FITSAction.class);
 
   @Override
   public void init() throws PluginException {
@@ -77,13 +77,13 @@ public class FITSAction implements Plugin<AIP> {
     throws PluginException {
     try {
       for (AIP aip : list) {
-        logger.debug("Processing AIP " + aip.getId());
+        LOGGER.debug("Processing AIP " + aip.getId());
         try {
           for (String representationID : aip.getRepresentationIds()) {
-            logger.debug("Processing representation " + representationID + " of AIP " + aip.getId());
+            LOGGER.debug("Processing representation " + representationID + " of AIP " + aip.getId());
             Representation representation = model.retrieveRepresentation(aip.getId(), representationID);
             for (String fileID : representation.getFileIds()) {
-              logger.debug(
+              LOGGER.debug(
                 "Processing file " + fileID + " of representation " + representationID + " from AIP " + aip.getId());
               String fileName = fileID + ".premis.xml";
               File file = model.retrieveFile(aip.getId(), representationID, fileID);
@@ -94,7 +94,7 @@ public class FITSAction implements Plugin<AIP> {
               try {
                 premisObject = FITSUtils.deepCharacterization(premisObject, file, binary, getParameterValues());
               } catch (Exception e) {
-                logger.error(e.getMessage(), e);
+                LOGGER.error(e.getMessage(), e);
               }
 
               Path premis = Files.createTempFile(file.getId(), ".premis.xml");
@@ -106,15 +106,15 @@ public class FITSAction implements Plugin<AIP> {
             }
           }
         } catch (ModelServiceException mse) {
-          logger.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage());
+          LOGGER.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage());
         } catch (StorageServiceException sse) {
-          logger.error("Error processing AIP " + aip.getId() + ": " + sse.getMessage());
+          LOGGER.error("Error processing AIP " + aip.getId() + ": " + sse.getMessage());
         } catch (PremisMetadataException pme) {
-          logger.error("Error processing AIP " + aip.getId() + ": " + pme.getMessage());
+          LOGGER.error("Error processing AIP " + aip.getId() + ": " + pme.getMessage());
         }
       }
     } catch (IOException ioe) {
-      logger.error("Error executing FastCharacterizationAction: " + ioe.getMessage(), ioe);
+      LOGGER.error("Error executing FastCharacterizationAction: " + ioe.getMessage(), ioe);
     }
     return null;
   }

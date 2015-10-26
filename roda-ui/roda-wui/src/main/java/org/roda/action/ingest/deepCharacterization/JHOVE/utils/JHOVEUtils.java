@@ -21,12 +21,12 @@ import edu.harvard.hul.ois.jhove.Module;
 import edu.harvard.hul.ois.jhove.OutputHandler;
 
 public class JHOVEUtils {
-  private final static Logger logger = Logger.getLogger(JHOVEUtils.class);
+  private static final Logger LOGGER = Logger.getLogger(JHOVEUtils.class);
 
   public static String runJHOVE(File targetFile) throws Exception {
 
     if (targetFile == null || !targetFile.isFile() || !targetFile.exists()) {
-      logger.warn("target file '" + targetFile + "' cannot be found.");
+      LOGGER.warn("target file '" + targetFile + "' cannot be found.");
       throw new FileNotFoundException("target file '" + targetFile + "' cannot be found.");
     }
 
@@ -37,6 +37,7 @@ public class JHOVEUtils {
       "Format Identification Utility", "");
     JhoveBase jhoveBase = new JhoveBase();
 
+    // FIXME why do we have to create a copy of jhove config file??? can this be optimized???
     File configFile = File.createTempFile("jhove", "conf");
     FileOutputStream fos = new FileOutputStream(configFile);
     String jhoveConfigPath = RodaCoreFactory.getRodaConfigurationAsString("tools", "jhove", "config");
@@ -47,24 +48,24 @@ public class JHOVEUtils {
     jhoveBase.init(configFile.getAbsolutePath(), null);
 
     File outputFile = File.createTempFile("jhove", "output");
-    logger.debug("JHOVE output file " + outputFile);
+    LOGGER.debug("JHOVE output file " + outputFile);
 
     Module module = jhoveBase.getModule(null);
     OutputHandler aboutHandler = jhoveBase.getHandler(null);
     OutputHandler xmlHandler = jhoveBase.getHandler("XML");
 
-    logger.debug("Calling JHOVE dispatch(...) on file " + targetFile);
+    LOGGER.debug("Calling JHOVE dispatch(...) on file " + targetFile);
 
     jhoveBase.dispatch(app, module, aboutHandler, xmlHandler, outputFile.getAbsolutePath(),
       new String[] {targetFile.getAbsolutePath()});
 
-    logger.debug("JHOVE dispatch(...) finished processing the file");
+    LOGGER.debug("JHOVE dispatch(...) finished processing the file");
 
     FileInputStream outputFileInputStream = new FileInputStream(outputFile);
 
     String output = StreamUtility.inputStreamToString(outputFileInputStream);
 
-    logger.debug("JHOVE output read to string of size " + output.length());
+    LOGGER.debug("JHOVE output read to string of size " + output.length());
 
     outputFileInputStream.close();
     configFile.delete();
@@ -81,6 +82,7 @@ public class JHOVEUtils {
   public static RepresentationFilePreservationObject deepCharacterization(
     RepresentationFilePreservationObject premisObject, org.roda.model.File file, Binary binary,
     Map<String, String> parameterValues) throws Exception {
+    // FIXME temp file that doesn't get deleted afterwards
     java.io.File f = File.createTempFile("temp", ".temp");
     FileOutputStream fos = new FileOutputStream(f);
     IOUtils.copy(binary.getContent().createInputStream(), fos);

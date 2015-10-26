@@ -19,6 +19,7 @@ public class TikaUtils {
     Parser parser = new AutoDetectParser();
     Metadata metadata = new Metadata();
     ContentHandler handler = new ToXMLContentHandler();
+    // FIXME does "is" gets closed???
     parser.parse(is, handler, metadata, new ParseContext());
     String content = handler.toString();
     Path p = Files.createTempFile("tika", ".xml");

@@ -1,7 +1,6 @@
 package org.roda.action.ingest.fulltext;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,11 +9,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.apache.tika.exception.TikaException;
-import org.apache.tika.metadata.Metadata;
-import org.apache.tika.parser.AutoDetectParser;
-import org.apache.tika.parser.ParseContext;
-import org.apache.tika.parser.Parser;
-import org.apache.tika.sax.ToXMLContentHandler;
 import org.roda.action.ingest.fulltext.utils.TikaUtils;
 import org.roda.action.orchestrate.Plugin;
 import org.roda.action.orchestrate.PluginException;
@@ -31,12 +25,10 @@ import org.roda.storage.Binary;
 import org.roda.storage.StorageService;
 import org.roda.storage.StorageServiceException;
 import org.roda.storage.fs.FSUtils;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 public class FullTextAction implements Plugin<AIP> {
   private final Logger logger = Logger.getLogger(getClass());
-  
 
   @Override
   public void init() throws PluginException {
@@ -94,8 +86,9 @@ public class FullTextAction implements Plugin<AIP> {
               File file = model.retrieveFile(aip.getId(), representationID, fileID);
               Binary binary = storage.getBinary(file.getStoragePath());
 
+              // FIXME file that doesn't get deleted afterwards
               Path tikaResult = TikaUtils.extractMetadata(binary.getContent().createInputStream());
-              
+
               Binary resource = (Binary) FSUtils.convertPathToResource(tikaResult.getParent(), tikaResult);
               model.createOtherMetadata(aip.getId(), representationID, file.getStoragePath().getName() + ".xml", "tika",
                 resource);
