@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<name>RODA - Repositório de Objetos Digitais Autênticos</name>
 	<url>http://roda.keep.pt/</url>
@@ -112,7 +111,6 @@
 		<jersey.version>2.21</jersey.version>
 		<swagger.version>1.5.3</swagger.version>
 		<jackson.version>2.6.1</jackson.version>
-
 		<fcrepo.version>4.3.0</fcrepo.version>
 		<spring.version>4.1.1.RELEASE</spring.version>
 		<grizzly.version>2.3.16</grizzly.version>
@@ -155,7 +153,6 @@
 				<module>roda-ui/roda-wui</module>
 			</modules>
 		</profile>
-
 		<!-- <profile> -->
 		<!-- <id>create-installer</id> -->
 		<!-- <modules> -->
@@ -187,6 +184,26 @@
 				<version>0.5.2</version>
 				<configuration>
 					<configFile>${session.executionRootDirectory}/code-style/eclipse_formatter.xml</configFile>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.mycila</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<version>2.11</version>
+				<configuration>
+					<!--<header>com/mycila/maven/plugin/license/templates/LGPL-3.txt</header>-->
+					<header>LICENSE_HEADER.txt</header>
+					<keywords>
+						<keyword>license</keyword>
+						<keyword>copyright</keyword>
+					</keywords>
+					<properties>
+						<!--<project.name>RODA - Repositório de Objetos Digitais Autênticos</project.name>-->
+						<project.license.url>https://github.com/keeps/roda</project.license.url>
+					</properties>
+					<includes>
+						<include>**/*.java</include>
+					</includes>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -288,7 +305,7 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore />
+										<ignore/>
 									</action>
 								</pluginExecution>
 							</pluginExecutions>
@@ -626,7 +643,6 @@
 				<artifactId>ead-c.2014</artifactId>
 				<version>1.0.0</version>
 			</dependency>
-
 			<!-- RODA own modules dependencies - start -->
 			<dependency>
 				<groupId>pt.gov.dgarq.roda</groupId>
