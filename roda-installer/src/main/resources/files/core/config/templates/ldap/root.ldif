@@ -1,8 +1,0 @@
-version: 1
-
-dn: dc=roda,dc=org
-objectClass: organization
-objectClass: dcObject
-objectClass: top
-dc: roda
-o: RODA

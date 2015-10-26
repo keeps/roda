@@ -1,9 +1,0 @@
-dn: uid=demo-admin,LDAP_USERS_DN
-changetype: delete
-
-dn: uid=demo-prod,LDAP_USERS_DN
-changetype: delete
-
-dn: uid=demo-arq,LDAP_USERS_DN
-changetype: delete
-
