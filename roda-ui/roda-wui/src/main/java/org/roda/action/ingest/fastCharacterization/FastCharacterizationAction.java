@@ -16,6 +16,7 @@ import org.roda.action.ingest.fastCharacterization.utils.DroidUtils;
 import org.roda.action.orchestrate.Plugin;
 import org.roda.action.orchestrate.PluginException;
 import org.roda.common.PremisUtils;
+import org.roda.common.RodaCoreFactory;
 import org.roda.core.common.InvalidParameterException;
 import org.roda.core.data.FileFormat;
 import org.roda.core.data.PluginParameter;
@@ -36,11 +37,9 @@ import org.roda.storage.fs.FSUtils;
 
 public class FastCharacterizationAction implements Plugin<AIP> {
   private final Logger logger = Logger.getLogger(getClass());
-  Path signaturePath;
 
   @Override
   public void init() throws PluginException {
-    signaturePath = Paths.get("/home/sleroux/roda/config/DROID_SignatureFile_V82.xml");
   }
 
   @Override
@@ -82,6 +81,9 @@ public class FastCharacterizationAction implements Plugin<AIP> {
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
     try {
+      Path rodaHome = RodaCoreFactory.getRodaHomePath();
+      Path signaturePath = rodaHome
+        .resolve(RodaCoreFactory.getRodaConfigurationAsString("tools", "droid", "signatureFile"));
       DroidUtils droidUtils = DroidUtils.getInstance(signaturePath);
       Path temp = Files.createTempDirectory("temp");
       for (AIP aip : list) {
