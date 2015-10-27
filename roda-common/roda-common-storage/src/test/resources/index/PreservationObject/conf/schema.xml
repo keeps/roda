@@ -105,17 +105,7 @@
      installations. See the <uniqueKey> declaration below where <uniqueKey> is set to "id".
    -->   
    <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 
-   <field name="dateCreated" type="tdate" indexed="true" stored="true" required="false" multiValued="false" /> 
-   <field name="dateModified" type="tdate" indexed="true" stored="true" required="false" multiValued="false" /> 
-   <field name="label" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
-   <field name="representationObjectId" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
-   <field name="state" type="string" indexed="true" stored="true" required="false" multiValued="false" />
-   <field name="type" type="string" indexed="true" stored="true" required="false" multiValued="false" />
-   <field name="aipId" type="string" indexed="true" stored="true" required="false" multiValued="false" />
-   <field name="hash" type="string" indexed="true" stored="true" required="false" multiValued="false" />
-   <field name="mimetype" type="string" indexed="true" stored="true" required="false" multiValued="false" />
-   <field name="pronomId" type="string" indexed="true" stored="true" required="false" multiValued="false" />
-   <field name="size" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="aipId" type="string" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="representationId" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 
    <field name="fileId" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 
    

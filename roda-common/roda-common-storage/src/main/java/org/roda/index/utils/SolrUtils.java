@@ -68,6 +68,7 @@ import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sort.SortParameter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
+import org.roda.core.data.v2.AgentPreservationObject;
 import org.roda.core.data.v2.EventPreservationObject;
 import org.roda.core.data.v2.FacetFieldResult;
 import org.roda.core.data.v2.Group;
@@ -78,16 +79,12 @@ import org.roda.core.data.v2.RODAObject;
 import org.roda.core.data.v2.RODAObjectPermissions;
 import org.roda.core.data.v2.Representation;
 import org.roda.core.data.v2.RepresentationFilePreservationObject;
-import org.roda.core.data.v2.RepresentationPreservationObject;
 import org.roda.core.data.v2.RepresentationState;
 import org.roda.core.data.v2.RodaGroup;
 import org.roda.core.data.v2.RodaUser;
 import org.roda.core.data.v2.SIPReport;
 import org.roda.core.data.v2.SIPStateTransition;
 import org.roda.core.data.v2.SimpleDescriptionObject;
-import org.roda.core.data.v2.SimpleEventPreservationMetadata;
-import org.roda.core.data.v2.SimpleRepresentationFilePreservationMetadata;
-import org.roda.core.data.v2.SimpleRepresentationPreservationMetadata;
 import org.roda.core.data.v2.User;
 import org.roda.index.IndexServiceException;
 import org.roda.model.AIP;
@@ -621,9 +618,9 @@ public class SolrUtils {
       indexName = RodaConstants.INDEX_SDO;
     } else if (resultClass.equals(Representation.class)) {
       indexName = RodaConstants.INDEX_REPRESENTATIONS;
-    } else if (resultClass.equals(SimpleRepresentationFilePreservationMetadata.class)) {
+    } else if (resultClass.equals(RepresentationFilePreservationObject.class)) {
       indexName = RodaConstants.INDEX_PRESERVATION_OBJECTS;
-    } else if (resultClass.equals(SimpleEventPreservationMetadata.class)) {
+    } else if (resultClass.equals(EventPreservationObject.class)) {
       indexName = RodaConstants.INDEX_PRESERVATION_EVENTS;
     } else if (resultClass.equals(LogEntry.class)) {
       indexName = RodaConstants.INDEX_ACTION_LOG;
@@ -652,10 +649,6 @@ public class SolrUtils {
       ret = resultClass.cast(solrDocumentToSDO(doc));
     } else if (resultClass.equals(Representation.class)) {
       ret = resultClass.cast(solrDocumentToRepresentation(doc));
-    } else if (resultClass.equals(SimpleRepresentationFilePreservationMetadata.class)) {
-      ret = resultClass.cast(solrDocumentToSimpleRepresentationFileMetadata(doc));
-    } else if (resultClass.equals(SimpleEventPreservationMetadata.class)) {
-      ret = resultClass.cast(solrDocumentToSimpleEventPreservationMetadata(doc));
     } else if (resultClass.equals(LogEntry.class)) {
       ret = resultClass.cast(solrDocumentToLogEntry(doc));
     } else if (resultClass.equals(SIPReport.class)) {
@@ -663,6 +656,12 @@ public class SolrUtils {
     } else
       if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class) || resultClass.equals(Group.class)) {
       ret = resultClass.cast(solrDocumentToRodaMember(doc));
+    } else if (resultClass.equals(RepresentationFilePreservationObject.class)) {
+      ret = resultClass.cast(solrDocumentToRepresentationFilePreservationObject(doc));
+    } else if (resultClass.equals(EventPreservationObject.class)) {
+      ret = resultClass.cast(solrDocumentToEventPreservationObject(doc));
+    } else if (resultClass.equals(AgentPreservationObject.class)) {
+      ret = resultClass.cast(solrDocumentToAgentPreservationObject(doc));
     } else {
       throw new IndexServiceException("Cannot find class index name: " + resultClass.getName(),
         IndexServiceException.INTERNAL_SERVER_ERROR);
@@ -910,168 +909,6 @@ public class SolrUtils {
     return doc;
   }
 
-  public static SimpleEventPreservationMetadata solrDocumentToSimpleEventPreservationMetadata(SolrDocument doc) {
-    final String agentID = objectToString(doc.get(RodaConstants.SEPM_AGENT_ID));
-    final Date dateCreated = objectToDate(doc.get(RodaConstants.SEPM_CREATED_DATE));
-    final String id = objectToString(doc.get(RodaConstants.SEPM_ID));
-    final String label = objectToString(doc.get(RodaConstants.SEPM_LABEL));
-    final Date modifiedDate = objectToDate(doc.get(RodaConstants.SEPM_LAST_MODIFIED_DATE));
-    final String state = objectToString(doc.get(RodaConstants.SEPM_STATE));
-    final String targetID = objectToString(doc.get(RodaConstants.SEPM_TARGET_ID));
-    final String type = objectToString(doc.get(RodaConstants.SEPM_TYPE));
-    final String aipID = objectToString(doc.get(RodaConstants.SEPM_AIP_ID));
-    final String representationID = objectToString(doc.get(RodaConstants.SEPM_REPRESENTATION_ID));
-    final String fileID = objectToString(doc.get(RodaConstants.SEPM_FILE_ID));
-    final Date date = objectToDate(doc.get(RodaConstants.SEPM_DATETIME));
-    final String name = objectToString(doc.get(RodaConstants.SEPM_NAME));
-    final String description = objectToString(doc.get(RodaConstants.SEPM_DESCRIPTION));
-    final String outcomeResult = objectToString(doc.get(RodaConstants.SEPM_OUTCOME_RESULT));
-    final String outcomeDetails = objectToString(doc.get(RodaConstants.SEPM_OUTCOME_DETAILS));
-
-    SimpleEventPreservationMetadata sepm = new SimpleEventPreservationMetadata();
-    sepm.setId(id);
-    sepm.setAgentID(agentID);
-    sepm.setAipId(aipID);
-    sepm.setRepresentationId(representationID);
-    sepm.setFileId(fileID);
-    sepm.setCreatedDate(dateCreated);
-    sepm.setDate(date);
-    sepm.setDescription(description);
-    sepm.setLabel(label);
-    sepm.setLastModifiedDate(modifiedDate);
-    sepm.setName(name);
-    sepm.setOutcomeDetails(outcomeDetails);
-    sepm.setOutcomeResult(outcomeResult);
-    sepm.setState(state);
-    sepm.setTargetID(targetID);
-    sepm.setType(type);
-    return sepm;
-  }
-
-  public static SimpleRepresentationPreservationMetadata solrDocumentToSimpleRepresentationPreservationMetadata(
-    SolrDocument doc) {
-    final Date dateCreated = objectToDate(doc.get(RodaConstants.SRPM_CREATED_DATE));
-    final String id = objectToString(doc.get(RodaConstants.SRPM_ID));
-    final String label = objectToString(doc.get(RodaConstants.SRPM_LABEL));
-    final Date modifiedDate = objectToDate(doc.get(RodaConstants.SRPM_LAST_MODIFIED_DATE));
-    final String representationObjectId = objectToString(doc.get(RodaConstants.SRPM_REPRESENTATION_OBJECT_ID));
-    final String type = objectToString(doc.get(RodaConstants.SRPM_TYPE));
-    final String state = objectToString(doc.get(RodaConstants.SRPM_STATE));
-    final String model = objectToString(doc.get(RodaConstants.SRPM_MODEL));
-    final String aipID = objectToString(doc.get(RodaConstants.SRPM_AIP_ID));
-    final String representationID = objectToString(doc.get(RodaConstants.SRPM_REPRESENTATION_ID));
-    final String fileID = objectToString(doc.get(RodaConstants.SRPM_FILE_ID));
-
-    SimpleRepresentationPreservationMetadata srpm = new SimpleRepresentationPreservationMetadata();
-    srpm.setCreatedDate(dateCreated);
-    srpm.setId(id);
-    srpm.setLabel(label);
-    srpm.setLastModifiedDate(modifiedDate);
-    srpm.setModel(model);
-    srpm.setRepresentationObjectID(representationObjectId);
-    srpm.setState(state);
-    srpm.setType(type);
-    srpm.setAipId(aipID);
-    srpm.setRepresentationId(representationID);
-    srpm.setFileId(fileID);
-
-    return srpm;
-  }
-
-  public static SimpleRepresentationFilePreservationMetadata solrDocumentToSimpleRepresentationFileMetadata(
-    SolrDocument doc) {
-    final Date dateCreated = objectToDate(doc.get(RodaConstants.SRFM_CREATED_DATE));
-    final String id = objectToString(doc.get(RodaConstants.SRFM_ID));
-    final String label = objectToString(doc.get(RodaConstants.SRFM_LABEL));
-    final Date modifiedDate = objectToDate(doc.get(RodaConstants.SRFM_LAST_MODIFIED_DATE));
-    final String representationObjectId = objectToString(doc.get(RodaConstants.SRFM_REPRESENTATION_OBJECT_ID));
-    final String type = objectToString(doc.get(RodaConstants.SRFM_TYPE));
-    final String state = objectToString(doc.get(RodaConstants.SRFM_STATE));
-    final String hash = objectToString(doc.get(RodaConstants.SRFM_HASH));
-    final String mimetype = objectToString(doc.get(RodaConstants.SRFM_MIMETYPE));
-    final String pronomID = objectToString(doc.get(RodaConstants.SRFM_PRONOM_ID));
-    final long size = objectToLong(doc.get(RodaConstants.SRFM_SIZE));
-    final String aipID = objectToString(doc.get(RodaConstants.SRFM_AIP_ID));
-    final String representationID = objectToString(doc.get(RodaConstants.SRFM_REPRESENTATION_ID));
-    final String fileID = objectToString(doc.get(RodaConstants.SRFM_FILE_ID));
-    SimpleRepresentationFilePreservationMetadata srpm = new SimpleRepresentationFilePreservationMetadata();
-    srpm.setCreatedDate(dateCreated);
-    srpm.setFileId(id);
-    srpm.setHash(hash);
-    srpm.setId(id);
-    srpm.setLabel(label);
-    srpm.setLastModifiedDate(modifiedDate);
-    srpm.setMimetype(mimetype);
-    srpm.setPronomId(pronomID);
-    srpm.setRepresentationObjectId(representationObjectId);
-    srpm.setSize(size);
-    srpm.setState(state);
-    srpm.setType(type);
-    srpm.setAipId(aipID);
-    srpm.setRepresentationId(representationID);
-    srpm.setFileId(fileID);
-    return srpm;
-  }
-
-  public static SolrInputDocument representationPreservationObjectToSolrDocument(String id,
-    RepresentationPreservationObject premisObject) {
-    SolrInputDocument doc = new SolrInputDocument();
-    doc.addField(RodaConstants.SRPM_CREATED_DATE, premisObject.getCreatedDate());
-    doc.addField(RodaConstants.SRPM_ID, id);
-    doc.addField(RodaConstants.SRPM_LABEL, premisObject.getLabel());
-    doc.addField(RodaConstants.SRPM_LAST_MODIFIED_DATE, premisObject.getLastModifiedDate());
-    doc.addField(RodaConstants.SRPM_REPRESENTATION_OBJECT_ID, premisObject.getRepresentationObjectID());
-    doc.addField(RodaConstants.SRPM_STATE, premisObject.getState());
-    doc.addField(RodaConstants.SRPM_TYPE, premisObject.getType());
-    doc.addField(RodaConstants.SRPM_MODEL, premisObject.getModel());
-    doc.addField(RodaConstants.SRPM_AIP_ID, premisObject.getAipId());
-    doc.addField(RodaConstants.SRPM_REPRESENTATION_ID, premisObject.getRepresentationId());
-    doc.addField(RodaConstants.SRPM_FILE_ID, premisObject.getFileId());
-    return doc;
-  }
-
-  public static SolrInputDocument eventPreservationObjectToSolrDocument(String id,
-    EventPreservationObject premisEvent) {
-    SolrInputDocument doc = new SolrInputDocument();
-    doc.addField(RodaConstants.SEPM_AGENT_ID, premisEvent.getAgentID());
-    doc.addField(RodaConstants.SEPM_CREATED_DATE, premisEvent.getCreatedDate());
-    doc.addField(RodaConstants.SEPM_ID, id);
-    doc.addField(RodaConstants.SEPM_LABEL, premisEvent.getLabel());
-    doc.addField(RodaConstants.SEPM_LAST_MODIFIED_DATE, premisEvent.getLastModifiedDate());
-    doc.addField(RodaConstants.SEPM_STATE, premisEvent.getState());
-    doc.addField(RodaConstants.SEPM_TARGET_ID, premisEvent.getTargetID());
-    doc.addField(RodaConstants.SEPM_TYPE, premisEvent.getType());
-    doc.addField(RodaConstants.SEPM_DATETIME, premisEvent.getDatetime());
-    doc.addField(RodaConstants.SEPM_NAME, premisEvent.getLabel());
-    doc.addField(RodaConstants.SEPM_DESCRIPTION, premisEvent.getEventDetail());
-    doc.addField(RodaConstants.SEPM_OUTCOME_RESULT, premisEvent.getOutcome());
-    doc.addField(RodaConstants.SEPM_OUTCOME_DETAILS, premisEvent.getOutcomeDetailNote());
-    doc.addField(RodaConstants.SEPM_AIP_ID, premisEvent.getAipId());
-    doc.addField(RodaConstants.SEPM_REPRESENTATION_ID, premisEvent.getRepresentationId());
-    doc.addField(RodaConstants.SEPM_FILE_ID, premisEvent.getFileId());
-    return doc;
-  }
-
-  public static SolrInputDocument representationFilePreservationObjectToSolrDocument(String id,
-    RepresentationFilePreservationObject representationFile) {
-    SolrInputDocument doc = new SolrInputDocument();
-    doc.addField(RodaConstants.SRFM_CREATED_DATE, representationFile.getCreatedDate());
-    doc.addField(RodaConstants.SRFM_HASH, representationFile.getHash());
-    doc.addField(RodaConstants.SRFM_ID, id);
-    doc.addField(RodaConstants.SRFM_LABEL, representationFile.getLabel());
-    doc.addField(RodaConstants.SRFM_LAST_MODIFIED_DATE, representationFile.getLastModifiedDate());
-    doc.addField(RodaConstants.SRFM_MIMETYPE, representationFile.getFormatDesignationName());
-    doc.addField(RodaConstants.SRFM_PRONOM_ID, representationFile.getPronomId());
-    doc.addField(RodaConstants.SRFM_REPRESENTATION_OBJECT_ID, representationFile.getRepresentationObjectId());
-    doc.addField(RodaConstants.SRFM_SIZE, representationFile.getSize());
-    doc.addField(RodaConstants.SRFM_STATE, representationFile.getState());
-    doc.addField(RodaConstants.SRFM_TYPE, representationFile.getType());
-    doc.addField(RodaConstants.SRFM_AIP_ID, representationFile.getAipId());
-    doc.addField(RodaConstants.SRFM_REPRESENTATION_ID, representationFile.getRepresentationId());
-    doc.addField(RodaConstants.SRFM_FILE_ID, representationFile.getFileId());
-    return doc;
-  }
-
   private static LogEntry solrDocumentToLogEntry(SolrDocument doc) {
     final String actionComponent = objectToString(doc.get(RodaConstants.LOG_ACTION_COMPONENT));
     final String actionMethod = objectToString(doc.get(RodaConstants.LOG_ACTION_METHOD));
@@ -1298,8 +1135,8 @@ public class SolrUtils {
     return index.query(collection, query);
   }
 
-  // FIXME lots of duplicated code from SolrUtils.getDescriptiveMetataFields
-  public static SolrInputDocument getObjectCharacteristicsFields(String id, Binary binary, Path configBasePath) throws IndexServiceException {
+  public static SolrInputDocument premisToSolr(String aipID, String representationID, String fileID, Binary binary,
+    Path configBasePath) throws IndexServiceException {
     SolrInputDocument doc;
     InputStream inputStream;
     try {
@@ -1308,8 +1145,7 @@ public class SolrUtils {
       Reader descMetadataReader = new InputStreamReader(inputStream);
 
       InputStream transformerStream = RodaUtils.getResourceInputStream(configBasePath,
-        "crosswalks/ingest/other/characterization.xslt", "Ingesting");
-
+        "crosswalks/ingest/other/premis.xslt", "Ingesting");
       // TODO support the use of scripts for non-xml transformers
       Reader xsltReader = new InputStreamReader(transformerStream);
       CharArrayWriter transformerResult = new CharArrayWriter();
@@ -1318,7 +1154,7 @@ public class SolrUtils {
       descMetadataReader.close();
 
       XMLLoader loader = new XMLLoader();
-      LOGGER.trace("Transformed desc. metadata:\n" + transformerResult);
+      LOGGER.trace("Transformed premis metadata:\n" + transformerResult);
       CharArrayReader transformationResult = new CharArrayReader(transformerResult.toCharArray());
       XMLStreamReader parser = XMLInputFactory.newInstance().createXMLStreamReader(transformationResult);
 
@@ -1341,13 +1177,45 @@ public class SolrUtils {
       transformationResult.close();
 
     } catch (IOException | TransformerException | XMLStreamException | FactoryConfigurationError e) {
-      throw new IndexServiceException(
-        "Could not process descriptive metadata binary " + binary.getStoragePath() + " using xslt characterization.xslt",
-        IndexServiceException.INTERNAL_SERVER_ERROR, e);
+      throw new IndexServiceException("Could not process descriptive metadata binary " + binary.getStoragePath()
+        + " using xslt " + "crosswalks/ingest/other/premis.xslt", IndexServiceException.INTERNAL_SERVER_ERROR, e);
     }
-    
-    
-    doc.addField("id", id);
+    String id = SolrUtils.getId(aipID, representationID, fileID);
+    doc.setField("id", id);
+    doc.setField("aipId", aipID);
+    doc.setField("representationId", representationID);
+    doc.setField("fileId", fileID);
     return doc;
+  }
+
+  private static EventPreservationObject solrDocumentToEventPreservationObject(SolrDocument doc) {
+    EventPreservationObject epo = new EventPreservationObject();
+    String teste = "";
+    for (String s : doc.getFieldNames()) {
+      teste += (s + " - " + doc.getFieldValue(s) + "\n");
+    }
+    epo.setModel(teste);
+    return epo;
+  }
+
+  private static RepresentationFilePreservationObject solrDocumentToRepresentationFilePreservationObject(
+    SolrDocument doc) {
+    RepresentationFilePreservationObject rfpo = new RepresentationFilePreservationObject();
+    String teste = "";
+    for (String s : doc.getFieldNames()) {
+      teste += (s + " - " + doc.getFieldValue(s) + "\n");
+    }
+    rfpo.setModel(teste);
+    return rfpo;
+  }
+
+  private static AgentPreservationObject solrDocumentToAgentPreservationObject(SolrDocument doc) {
+    AgentPreservationObject apo = new AgentPreservationObject();
+    String teste = "";
+    for (String s : doc.getFieldNames()) {
+      teste += (s + " - " + doc.getFieldValue(s) + "\n");
+    }
+    apo.setModel(teste);
+    return apo;
   }
 }

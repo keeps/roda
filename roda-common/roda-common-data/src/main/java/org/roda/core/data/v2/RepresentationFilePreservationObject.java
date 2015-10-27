@@ -9,13 +9,14 @@ package org.roda.core.data.v2;
 
 import java.io.Serializable;
 
+import org.roda.core.data.RepresentationFile;
+
 /**
  * This is a Preservation Object for a {@link RepresentationFile}.
  * 
  * @author Rui Castro
  */
-public class RepresentationFilePreservationObject extends SimpleRepresentationFilePreservationMetadata implements
-  Serializable {
+public class RepresentationFilePreservationObject extends PreservationObject implements Serializable {
   private static final long serialVersionUID = 3984141759920127217L;
   /**
    * Full preservation level, from file integrity, file format management, to
@@ -58,11 +59,15 @@ public class RepresentationFilePreservationObject extends SimpleRepresentationFi
 
   private String objectCharacteristicsExtension = null;
 
-  /*
-   * Storage
-   */
   private String contentLocationType = null;
   private String contentLocationValue = null;
+
+  private String pronomId;
+  private String mimetype;
+  private long size;
+  private String hash;
+
+  private String representationObjectId;
 
   /**
    * Constructs a new {@link RepresentationFilePreservationObject}.
@@ -73,32 +78,25 @@ public class RepresentationFilePreservationObject extends SimpleRepresentationFi
   }
 
   /**
-   * Constructs a new {@link RepresentationFilePreservationObject} from a
-   * {@link SimpleRepresentationFilePreservationMetadata}.
-   */
-  public RepresentationFilePreservationObject(SimpleRepresentationFilePreservationMetadata simple) {
-    super(simple);
-    this.compositionLevel = -1;
-  }
-
-  /**
    * Constructs a new {@link RepresentationFilePreservationObject} cloning an
    * existing {@link RepresentationFilePreservationObject}.
    * 
    * @param filePO
    */
   public RepresentationFilePreservationObject(RepresentationFilePreservationObject filePO) {
-    this(filePO.getID(), filePO.getPreservationLevel(), filePO.getCompositionLevel(), filePO.getFixities(), filePO
-      .getSize(), filePO.getFormatDesignationName(), filePO.getFormatDesignationVersion(), filePO
-      .getFormatRegistryName(), filePO.getFormatRegistryKey(), filePO.getFormatRegistryRole(), filePO
-      .getCreatingApplicationName(), filePO.getCreatingApplicationVersion(), filePO.getDateCreatedByApplication(),
-      filePO.getOriginalName(), filePO.getObjectCharacteristicsExtension(), filePO.getContentLocationType(), filePO
-        .getContentLocationValue());
+    this(filePO.getID(), filePO.getPreservationLevel(), filePO.getCompositionLevel(), filePO.getFixities(),
+      filePO.getSize(), filePO.getFormatDesignationName(), filePO.getFormatDesignationVersion(),
+      filePO.getFormatRegistryName(), filePO.getFormatRegistryKey(), filePO.getFormatRegistryRole(),
+      filePO.getCreatingApplicationName(), filePO.getCreatingApplicationVersion(), filePO.getDateCreatedByApplication(),
+      filePO.getOriginalName(), filePO.getObjectCharacteristicsExtension(), filePO.getContentLocationType(),
+      filePO.getContentLocationValue());
   }
 
   /**
    * Constructs a new {@link RepresentationFilePreservationObject} with the
-   * given parameters.
+   * given parameters. private String fileId; private String
+   * representationObjectId; private String pronomId; private String mimetype;
+   * private long size; private String hash;
    * 
    * @param id
    *          the identifier of the preservation object
@@ -175,10 +173,11 @@ public class RepresentationFilePreservationObject extends SimpleRepresentationFi
    */
   @Override
   public String toString() {
-    return "RepresentationFilePreservationObject(ID=" + getID() + ", size=" + getSize() + ", formatDesignationName="
-      + getFormatDesignationName() + ", formatDesignationVersion=" + getFormatDesignationVersion()
-      + ", formatRegistryName=" + getFormatRegistryName() + ", formatRegistryKey=" + getFormatRegistryKey()
-      + ", formatRegistryRole=" + getFormatRegistryRole() + ", originalName=" + getOriginalName() + ")";
+    return "RepresentationFilePreservationObject(Model=" + getModel() + ", ID=" + getID() + ", size=" + getSize()
+      + ", formatDesignationName=" + getFormatDesignationName() + ", formatDesignationVersion="
+      + getFormatDesignationVersion() + ", formatRegistryName=" + getFormatRegistryName() + ", formatRegistryKey="
+      + getFormatRegistryKey() + ", formatRegistryRole=" + getFormatRegistryRole() + ", originalName="
+      + getOriginalName() + ")";
   }
 
   /**
@@ -430,4 +429,45 @@ public class RepresentationFilePreservationObject extends SimpleRepresentationFi
   public void setContentLocationValue(String contentLocationValue) {
     this.contentLocationValue = contentLocationValue;
   }
+
+  public String getPronomId() {
+    return pronomId;
+  }
+
+  public void setPronomId(String pronomId) {
+    this.pronomId = pronomId;
+  }
+
+  public String getMimetype() {
+    return mimetype;
+  }
+
+  public void setMimetype(String mimetype) {
+    this.mimetype = mimetype;
+  }
+
+  public long getSize() {
+    return size;
+  }
+
+  public void setSize(long size) {
+    this.size = size;
+  }
+
+  public String getHash() {
+    return hash;
+  }
+
+  public void setHash(String hash) {
+    this.hash = hash;
+  }
+
+  public String getRepresentationObjectId() {
+    return representationObjectId;
+  }
+
+  public void setRepresentationObjectId(String representationObjectId) {
+    this.representationObjectId = representationObjectId;
+  }
+
 }

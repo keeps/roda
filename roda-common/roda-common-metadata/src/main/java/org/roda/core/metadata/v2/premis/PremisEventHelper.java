@@ -21,8 +21,6 @@ import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.roda.core.data.v2.EventPreservationObject;
-import org.roda.core.data.v2.RODAObject;
-import org.roda.core.data.v2.SimpleEventPreservationMetadata;
 import org.roda.core.metadata.MetadataException;
 import org.roda.util.XmlEncodeUtility;
 import org.w3c.util.DateParser;
@@ -152,32 +150,6 @@ public class PremisEventHelper {
    */
   public EventComplexType getEvent() {
     return getEventDocument().getEvent();
-  }
-
-  /**
-   * Returns the information about a {@link EventPreservationObject} from a
-   * PREMIS XML file and copy the values from the given {@link RODAObject}.
-   * 
-   * @param simpleEPO
-   *          the {@link SimpleEventPreservationMetadata} of the
-   *          {@link EventPreservationObject}.
-   * 
-   * @return a {@link EventPreservationObject}.
-   * 
-   * @throws PremisMetadataException
-   */
-  public EventPreservationObject getEventPreservationObject(SimpleEventPreservationMetadata simpleEPO)
-    throws PremisMetadataException {
-    EventPreservationObject event = getEventPreservationObject();
-    event.setId(simpleEPO.getFileId());
-    event.setLabel(simpleEPO.getLabel());
-    event.setLastModifiedDate(simpleEPO.getLastModifiedDate());
-    event.setCreatedDate(simpleEPO.getCreatedDate());
-    event.setState(simpleEPO.getState());
-    event.setAgentID(simpleEPO.getAgentID());
-    event.setTargetID(simpleEPO.getTargetID());
-
-    return event;
   }
 
   /**

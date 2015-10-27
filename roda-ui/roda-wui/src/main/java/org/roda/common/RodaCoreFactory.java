@@ -55,9 +55,11 @@ import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
+import org.roda.core.data.v2.EventPreservationObject;
 import org.roda.core.data.v2.Group;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.RODAMember;
+import org.roda.core.data.v2.RepresentationFilePreservationObject;
 import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.core.data.v2.User;
 import org.roda.index.IndexService;
@@ -136,7 +138,6 @@ public class RodaCoreFactory {
         System.setProperty("solr.data.dir.sipreport", indexPath.resolve("sipreport").toString());
         System.setProperty("solr.data.dir.members", indexPath.resolve("members").toString());
         System.setProperty("solr.data.dir.othermetadata", indexPath.resolve("othermetadata").toString());
-        System.setProperty("solr.data.dir.characterization", indexPath.resolve("characterization").toString());
         // FIXME added missing cores
 
         // start embedded solr
@@ -513,6 +514,26 @@ public class RodaCoreFactory {
     }
   }
 
+  private static void printPreservationEvents(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
+    throws IndexServiceException {
+    index.find(EventPreservationObject.class, filter, sorter, sublist, facets);
+    IndexResult<EventPreservationObject> events = index.find(EventPreservationObject.class, filter, sorter, sublist,
+      facets);
+    for (EventPreservationObject event : events.getResults()) {
+      System.out.println("\t" + event);
+    }
+  }
+
+  private static void printPreservationFiles(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
+    throws IndexServiceException {
+    index.find(RepresentationFilePreservationObject.class, filter, sorter, sublist, facets);
+    IndexResult<RepresentationFilePreservationObject> files = index.find(RepresentationFilePreservationObject.class,
+      filter, sorter, sublist, facets);
+    for (RepresentationFilePreservationObject file : files.getResults()) {
+      System.out.println("\t" + file);
+    }
+  }
+
   public static void main(String[] argsArray) throws IndexServiceException {
 
     List<String> args = Arrays.asList(argsArray);
@@ -549,6 +570,12 @@ public class RodaCoreFactory {
         runFitsAction();
       } else if ("bagit".equals(args.get(0))) {
         runBagitAction();
+      } else if ("events".equals(args.get(0))) {
+        Filter filter = null;
+        printPreservationEvents(filter, null, new Sublist(0, 10000), null);
+      } else if ("files".equals(args.get(0))) {
+        Filter filter = null;
+        printPreservationFiles(filter, null, new Sublist(0, 10000), null);
       } else {
         printMainUsage();
       }

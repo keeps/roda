@@ -51,6 +51,12 @@ public abstract class PreservationObject {
 
   private String fileID;
 
+  private String representationID;
+
+  private String aipID;
+
+  private String model;
+
   /**
    * Constructs an empty {@link PreservationObject}.
    */
@@ -144,6 +150,30 @@ public abstract class PreservationObject {
 
   public void setState(String state) {
     this.state = state;
+  }
+
+  public String getRepresentationID() {
+    return representationID;
+  }
+
+  public void setRepresentationID(String representationID) {
+    this.representationID = representationID;
+  }
+
+  public String getAipID() {
+    return aipID;
+  }
+
+  public void setAipID(String aipID) {
+    this.aipID = aipID;
+  }
+
+  public String getModel() {
+    return model;
+  }
+
+  public void setModel(String model) {
+    this.model = model;
   }
 
 }

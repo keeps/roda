@@ -1270,9 +1270,9 @@ public class ModelService extends ModelObservable {
         PremisFileObjectHelper pfoh = PremisFileObjectHelper.newInstance(resource.getContent().createInputStream());
 
         RepresentationFilePreservationObject rfpo = new RepresentationFilePreservationObject();
-        rfpo.setAipId(aipId);
-        rfpo.setRepresentationId(representationId);
-        rfpo.setFileId(fileId);
+        rfpo.setAipID(aipId);
+        rfpo.setRepresentationID(representationId);
+        rfpo.setFileID(fileId);
         rfpo.setCompositionLevel(pfoh.getRepresentationFilePreservationObject().getCompositionLevel());
         rfpo.setContentLocationType(pfoh.getRepresentationFilePreservationObject().getContentLocationType());
         rfpo.setContentLocationValue(pfoh.getRepresentationFilePreservationObject().getContentLocationValue());
@@ -1281,7 +1281,6 @@ public class ModelService extends ModelObservable {
         rfpo.setCreatingApplicationVersion(
           pfoh.getRepresentationFilePreservationObject().getCreatingApplicationVersion());
         rfpo.setDateCreatedByApplication(pfoh.getRepresentationFilePreservationObject().getDateCreatedByApplication());
-        rfpo.setFileId(fileId);
         rfpo.setFixities(pfoh.getRepresentationFilePreservationObject().getFixities());
         rfpo.setFormatDesignationName(pfoh.getRepresentationFilePreservationObject().getFormatDesignationName());
         rfpo.setFormatDesignationVersion(pfoh.getRepresentationFilePreservationObject().getFormatDesignationVersion());
@@ -1304,7 +1303,7 @@ public class ModelService extends ModelObservable {
         rfpo.setSize(pfoh.getRepresentationFilePreservationObject().getSize());
         rfpo.setState(pfoh.getRepresentationFilePreservationObject().getState());
         rfpo.setType(pfoh.getRepresentationFilePreservationObject().getType());
-        rfpo.setRepresentationId(representationId);
+        rfpo.setRepresentationID(representationId);
         return rfpo;
 
       } catch (PremisMetadataException e) {
@@ -1345,9 +1344,9 @@ public class ModelService extends ModelObservable {
         PremisRepresentationObjectHelper proh = PremisRepresentationObjectHelper
           .newInstance(resource.getContent().createInputStream());
         RepresentationPreservationObject rpo = new RepresentationPreservationObject();
-        rpo.setAipId(aipId);
-        rpo.setRepresentationId(representationId);
-        rpo.setFileId(fileId);
+        rpo.setAipID(aipId);
+        rpo.setRepresentationID(representationId);
+        rpo.setFileID(fileId);
         rpo.setCreatedDate(proh.getRepresentationPreservationObject().getCreatedDate());
         rpo.setDerivationEventID(proh.getRepresentationPreservationObject().getDerivationEventID());
         rpo.setDerivedFromRepresentationObjectID(
@@ -1414,9 +1413,9 @@ public class ModelService extends ModelObservable {
 
         // TODO premisevent to EventPreservationObject
         EventPreservationObject epo = new EventPreservationObject();
-        epo.setAipId(aipId);
-        epo.setRepresentationId(representationId);
-        epo.setFileId(fileId);
+        epo.setAipID(aipId);
+        epo.setRepresentationID(representationId);
+        epo.setFileID(fileId);
         epo.setLastModifiedDate(dateModified);
         epo.setCreatedDate(dateCreated);
         epo.setAgentID((peh.getEvent().getLinkingAgentIdentifierList() != null
@@ -1434,7 +1433,7 @@ public class ModelService extends ModelObservable {
         epo.setDescription(""); // TODO: ????
         epo.setEventDetail(peh.getEvent().getEventDetail());
         epo.setEventType(peh.getEvent().getEventType());
-        epo.setFileId(fileId);
+        epo.setFileID(fileId);
         epo.setId(fileId);
         epo.setLabel(""); // TODO: ???
         epo.setModel(""); // TODO: ???

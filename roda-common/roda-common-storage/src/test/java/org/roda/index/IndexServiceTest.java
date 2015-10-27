@@ -53,8 +53,6 @@ import org.roda.core.data.v2.Representation;
 import org.roda.core.data.v2.SIPReport;
 import org.roda.core.data.v2.SIPStateTransition;
 import org.roda.core.data.v2.SimpleDescriptionObject;
-import org.roda.core.data.v2.SimpleEventPreservationMetadata;
-import org.roda.core.data.v2.SimpleRepresentationFilePreservationMetadata;
 import org.roda.core.data.v2.User;
 import org.roda.model.AIP;
 import org.roda.model.ModelService;
@@ -246,23 +244,6 @@ public class IndexServiceTest {
 
     assertThat(sro_IDs, Matchers.contains(aip.getRepresentationIds().toArray()));
 
-    SimpleEventPreservationMetadata sepm = index.retrieve(SimpleEventPreservationMetadata.class, aipId,
-      CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.EVENT_RODA_398_PREMIS_XML);
-    assertEquals(sepm.getType(), CorporaConstants.INGESTION);
-    Filter filterType = new Filter();
-    filterType.add(new SimpleFilterParameter(RodaConstants.SEPM_TYPE, CorporaConstants.INGESTION));
-    assertThat(index.count(SimpleEventPreservationMetadata.class, filterType), Matchers.equalTo(1L));
-    assertThat(
-      index.find(SimpleEventPreservationMetadata.class, filterType, null, new Sublist(0, 10), null).getTotalCount(),
-      Matchers.equalTo(1L));
-
-    SimpleRepresentationFilePreservationMetadata srfpm = index.retrieve(
-      SimpleRepresentationFilePreservationMetadata.class, aipId, CorporaConstants.REPRESENTATION_1_ID,
-      CorporaConstants.F0_PREMIS_XML);
-    assertEquals(srfpm.getAipId(), aipId);
-    Filter filterAIPID = new Filter();
-    filterAIPID.add(new SimpleFilterParameter(RodaConstants.SRFM_AIP_ID, aipId));
-    assertThat(index.count(SimpleRepresentationFilePreservationMetadata.class, filterAIPID), Matchers.equalTo(4L));
     /*
      * filterMimetype.add(new SimpleFilterParameter(RodaConstants.SRFM_MIMETYPE,
      * CorporaConstants.TEXT_XML));

@@ -628,7 +628,7 @@ public class ModelServiceTest {
     Iterator<RepresentationPreservationObject> it = representationPreservationObject.iterator();
     while (it.hasNext()) {
       RepresentationPreservationObject rpo = it.next();
-      fileIDs.add(rpo.getFileId());
+      fileIDs.add(rpo.getFileID());
     }
     assertThat(fileIDs,
       containsInAnyOrder(CorporaConstants.REPRESENTATION_PREMIS_XML, CorporaConstants.REPRESENTATION_PREMIS_XML));

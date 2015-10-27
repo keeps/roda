@@ -16,11 +16,13 @@ import java.util.Date;
  * 
  * @author Rui Castro
  */
-public class RepresentationPreservationObject extends SimpleRepresentationPreservationMetadata {
+public class RepresentationPreservationObject extends PreservationObject {
   public static final String PRESERVATION_LEVEL_FULL = "full";
   public static final String PRESERVATION_LEVEL_BITLEVEL = "bitlevel";
 
   private String preservationLevel = null;
+
+  private String representationObjectID;
 
   /**
    * The representation "entry point" file.
@@ -60,34 +62,6 @@ public class RepresentationPreservationObject extends SimpleRepresentationPreser
   }
 
   /**
-   * Constructs a new {@link RepresentationPreservationObject} from a
-   * {@link SimpleRepresentationPreservationMetadata}.
-   * 
-   * @param rpo
-   *          the {@link SimpleRepresentationPreservationMetadata}
-   */
-  public RepresentationPreservationObject(SimpleRepresentationPreservationMetadata simple) {
-    super(simple);
-  }
-
-  /**
-   * Constructs a new {@link RepresentationPreservationObject} cloning an
-   * existing {@link RepresentationPreservationObject}.
-   * 
-   * @param rpo
-   *          the {@link RepresentationPreservationObject} to clone.
-   */
-  public RepresentationPreservationObject(RepresentationPreservationObject rpo) {
-    super(rpo);
-    setPreservationLevel(rpo.getPreservationLevel());
-    setRootFile(rpo.getRootFile());
-    setPartFiles(rpo.getPartFiles());
-    setDerivedFromRepresentationObjectID(rpo.getDerivedFromRepresentationObjectID());
-    setDerivationEventID(rpo.getDerivationEventID());
-    setPreservationEventIDs(rpo.getPreservationEventIDs());
-  }
-
-  /**
    * @param id
    * @param label
    * @param model
@@ -101,7 +75,6 @@ public class RepresentationPreservationObject extends SimpleRepresentationPreser
     super();
     setId(id);
     setLabel(label);
-    setModel(model);
     setLastModifiedDate(lastModifiedDate);
     setCreatedDate(createdDate);
     setState(state);
@@ -219,4 +192,13 @@ public class RepresentationPreservationObject extends SimpleRepresentationPreser
   public void setPreservationEventIDs(String[] preservationEventIDs) {
     this.preservationEventIDs = preservationEventIDs;
   }
+
+  public String getRepresentationObjectID() {
+    return representationObjectID;
+  }
+
+  public void setRepresentationObjectID(String representationObjectID) {
+    this.representationObjectID = representationObjectID;
+  }
+
 }

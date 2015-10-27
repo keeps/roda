@@ -20,8 +20,6 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
-import org.roda.core.data.SimpleRepresentationPreservationObject;
-import org.roda.core.data.v2.RODAObject;
 import org.roda.core.data.v2.RepresentationFilePreservationObject;
 import org.roda.core.data.v2.RepresentationPreservationObject;
 import org.w3c.util.DateParser;
@@ -175,38 +173,6 @@ public class PremisRepresentationObjectHelper extends PremisObjectHelper {
     }
 
     return entityIdentifierValue;
-  }
-
-  /**
-   * Returns the information about a {@link RepresentationPreservationObject}
-   * from a PREMIS XML file and copy the values from the given
-   * {@link RODAObject}.
-   * 
-   * @param simpleRPO
-   *          the {@link RODAObject} of the
-   *          {@link RepresentationPreservationObject}.
-   * 
-   * @return a {@link RepresentationPreservationObject}.
-   * 
-   * @throws PremisMetadataException
-   */
-  public RepresentationPreservationObject getRepresentationPreservationObject(
-    SimpleRepresentationPreservationObject simpleRPO) throws PremisMetadataException {
-
-    RepresentationPreservationObject representationPO = getRepresentationPreservationObject();
-
-    // Copy the values from the SimpleRepresentationPreservationObject
-    representationPO.setId(simpleRPO.getId());
-    representationPO.setLabel(simpleRPO.getLabel());
-    // FIXME
-    // representationPO.setContentModel(simpleRPO.getContentModel());
-    representationPO.setLastModifiedDate(simpleRPO.getLastModifiedDate());
-    representationPO.setCreatedDate(simpleRPO.getCreatedDate());
-    representationPO.setState(simpleRPO.getState());
-    // FIXME
-    // representationPO.setRepresentationObjectPID(simpleRPO.getRepresentationObjectPID());
-
-    return representationPO;
   }
 
   /**

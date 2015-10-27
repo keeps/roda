@@ -19,6 +19,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.roda.common.RodaUtils;
 import org.roda.core.common.RodaConstants;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
@@ -182,6 +183,13 @@ public class IndexService {
 
   public void deleteAllActionLog() throws IndexServiceException {
     clearIndex(RodaConstants.INDEX_ACTION_LOG);
+  }
+
+  public void deleteActionLog(Date from) throws SolrServerException, IOException {
+    String query = RodaConstants.LOG_DATETIME + "<" + RodaUtils.dateToString(from);
+    index.deleteByQuery(RodaConstants.INDEX_ACTION_LOG, query);
+    index.commit(RodaConstants.INDEX_ACTION_LOG);
+
   }
 
   public void clearIndex(String indexName) throws IndexServiceException {

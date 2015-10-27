@@ -16,11 +16,9 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
 import org.roda.core.common.RodaConstants;
-import org.roda.core.data.v2.EventPreservationObject;
 import org.roda.core.data.v2.Group;
 import org.roda.core.data.v2.LogEntry;
 import org.roda.core.data.v2.Representation;
-import org.roda.core.data.v2.RepresentationFilePreservationObject;
 import org.roda.core.data.v2.SIPReport;
 import org.roda.core.data.v2.User;
 import org.roda.index.utils.SolrUtils;
@@ -64,23 +62,25 @@ public class IndexModelObserver implements ModelObserver {
   public void aipCreated(final AIP aip) {
     indexAIPandSDO(aip, configBasePath);
     indexRepresentations(aip);
-    indexPreservationFileObjects(aip);
-    indexPreservationsEvents(aip);
+    indexPreservationFileObjects(aip, configBasePath);
+    indexPreservationsEvents(aip, configBasePath);
     indexOtherMetadata(aip);
   }
 
-  private void indexPreservationsEvents(final AIP aip) {
+  private void indexPreservationsEvents(final AIP aip, Path configBasePath) {
     final Map<String, List<String>> preservationEventsIds = aip.getPreservationsEventsIds();
     for (Map.Entry<String, List<String>> representationPreservationMap : preservationEventsIds.entrySet()) {
       try {
         for (String fileId : representationPreservationMap.getValue()) {
-          EventPreservationObject premisEvent = model.retrieveEventPreservationObject(aip.getId(),
-            representationPreservationMap.getKey(), fileId);
-          String id = SolrUtils.getId(aip.getId(), representationPreservationMap.getKey(), fileId);
-          SolrInputDocument premisEventDocument = SolrUtils.eventPreservationObjectToSolrDocument(id, premisEvent);
+          StoragePath filePath = ModelUtils.getPreservationFilePath(aip.getId(), representationPreservationMap.getKey(),
+            fileId);
+          Binary binary = model.getStorage().getBinary(filePath);
+
+          SolrInputDocument premisEventDocument = SolrUtils.premisToSolr(aip.getId(),
+            representationPreservationMap.getKey(), fileId, binary, configBasePath);
           index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisEventDocument);
         }
-      } catch (SolrServerException | IOException | ModelServiceException e) {
+      } catch (SolrServerException | IOException | StorageServiceException | IndexServiceException e) {
         LOGGER.error("Could not index premis event", e);
       }
       try {
@@ -95,27 +95,19 @@ public class IndexModelObserver implements ModelObserver {
     // TODO...
   }
 
-  private void indexPreservationFileObjects(final AIP aip) {
+  private void indexPreservationFileObjects(final AIP aip, Path configBasePath) {
     final Map<String, List<String>> preservationFileObjectsIds = aip.getPreservationFileObjectsIds();
     for (Map.Entry<String, List<String>> eventPreservationMap : preservationFileObjectsIds.entrySet()) {
       try {
         for (String fileId : eventPreservationMap.getValue()) {
-          RepresentationFilePreservationObject premisObject = model.retrieveRepresentationFileObject(aip.getId(),
-            eventPreservationMap.getKey(), fileId);
-          String id = SolrUtils.getId(aip.getId(), eventPreservationMap.getKey(), fileId);
-          SolrInputDocument premisObjectDocument = SolrUtils.representationFilePreservationObjectToSolrDocument(id,
-            premisObject);
-          index.add(RodaConstants.INDEX_PRESERVATION_OBJECTS, premisObjectDocument);
 
-          StoragePath storagePath = ModelUtils.getPreservationFilePath(premisObject.getAipId(),
-            premisObject.getRepresentationId(), premisObject.getFileId());
-          Binary binary = model.getStorage().getBinary(storagePath);
-          SolrInputDocument objectCharacteristics = SolrUtils.getObjectCharacteristicsFields(id, binary,
-            configBasePath);
-          index.add(RodaConstants.INDEX_CHARACTERIZATION, objectCharacteristics);
+          StoragePath filePath = ModelUtils.getPreservationFilePath(aip.getId(), eventPreservationMap.getKey(), fileId);
+          Binary binary = model.getStorage().getBinary(filePath);
+          SolrInputDocument premisFileDocument = SolrUtils.premisToSolr(aip.getId(), eventPreservationMap.getKey(),
+            fileId, binary, configBasePath);
+          index.add(RodaConstants.INDEX_PRESERVATION_OBJECTS, premisFileDocument);
         }
-      } catch (SolrServerException | IOException | ModelServiceException | StorageServiceException
-        | IndexServiceException e) {
+      } catch (SolrServerException | IOException | StorageServiceException | IndexServiceException e) {
         LOGGER.error("Could not index premis object", e);
       }
       try {

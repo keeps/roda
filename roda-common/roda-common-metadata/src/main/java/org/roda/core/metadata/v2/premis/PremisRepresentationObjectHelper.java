@@ -17,6 +17,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.apache.xmlbeans.XmlException;
+import org.roda.core.data.v2.RepresentationFilePreservationObject;
+import org.roda.core.data.v2.RepresentationPreservationObject;
+import org.w3c.util.DateParser;
+
 import lc.xmlns.premisV2.LinkingEventIdentifierComplexType;
 import lc.xmlns.premisV2.LinkingIntellectualEntityIdentifierComplexType;
 import lc.xmlns.premisV2.ObjectDocument;
@@ -26,14 +33,6 @@ import lc.xmlns.premisV2.RelatedEventIdentificationComplexType;
 import lc.xmlns.premisV2.RelatedObjectIdentificationComplexType;
 import lc.xmlns.premisV2.RelationshipComplexType;
 import lc.xmlns.premisV2.Representation;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.apache.xmlbeans.XmlException;
-import org.roda.core.data.v2.RepresentationFilePreservationObject;
-import org.roda.core.data.v2.RepresentationPreservationObject;
-import org.roda.core.data.v2.SimpleRepresentationPreservationMetadata;
-import org.w3c.util.DateParser;
 
 /**
  * @author Rui Castro
@@ -59,8 +58,8 @@ public class PremisRepresentationObjectHelper extends PremisObjectHelper {
    * @throws PremisMetadataException
    *           if the PREMIS XML document is invalid.
    */
-  public static PremisRepresentationObjectHelper newInstance(File premisFile) throws PremisMetadataException,
-    FileNotFoundException, IOException {
+  public static PremisRepresentationObjectHelper newInstance(File premisFile)
+    throws PremisMetadataException, FileNotFoundException, IOException {
     FileInputStream premisInputStream = new FileInputStream(premisFile);
     PremisRepresentationObjectHelper instance = newInstance(premisInputStream);
     premisInputStream.close();
@@ -177,35 +176,6 @@ public class PremisRepresentationObjectHelper extends PremisObjectHelper {
 
   /**
    * Returns the information about a {@link RepresentationPreservationObject}
-   * from a PREMIS XML file and copy the values from the given
-   * {@link RODAObject}.
-   * 
-   * @param simpleRPO
-   *          the {@link RODAObject} of the
-   *          {@link RepresentationPreservationObject}.
-   * 
-   * @return a {@link RepresentationPreservationObject}.
-   * 
-   * @throws PremisMetadataException
-   */
-  public RepresentationPreservationObject getRepresentationPreservationObject(
-    SimpleRepresentationPreservationMetadata simpleRPO) throws PremisMetadataException {
-
-    RepresentationPreservationObject representationPO = getRepresentationPreservationObject();
-
-    // Copy the values from the SimpleRepresentationPreservationObject
-    representationPO.setId(simpleRPO.getId());
-    representationPO.setLabel(simpleRPO.getLabel());
-    representationPO.setLastModifiedDate(simpleRPO.getLastModifiedDate());
-    representationPO.setCreatedDate(simpleRPO.getCreatedDate());
-    representationPO.setState(simpleRPO.getState());
-    representationPO.setRepresentationObjectID(simpleRPO.getRepresentationObjectID());
-
-    return representationPO;
-  }
-
-  /**
-   * Returns the information about a {@link RepresentationPreservationObject}
    * from a PREMIS XML file.
    * 
    * @return a {@link RepresentationPreservationObject}.
@@ -289,8 +259,8 @@ public class PremisRepresentationObjectHelper extends PremisObjectHelper {
 
               RelatedObjectIdentificationComplexType relatedObjectIdentification = relationship
                 .getRelatedObjectIdentificationArray(0);
-              pObject.setDerivedFromRepresentationObjectID(relatedObjectIdentification
-                .getRelatedObjectIdentifierValue());
+              pObject
+                .setDerivedFromRepresentationObjectID(relatedObjectIdentification.getRelatedObjectIdentifierValue());
             }
 
             if (relationship.getRelatedEventIdentificationList() != null
@@ -360,8 +330,8 @@ public class PremisRepresentationObjectHelper extends PremisObjectHelper {
         premisRelationshipTypeStructural, premisRelationshipSubTypeHasRoot);
 
       // <relationship><relatedObjectIdentification>
-      addNewRelatedObject(relationshipHasRoot, PremisHelper.premisIdentifierTypeDatastreamID,
-        rpo.getRootFile().getID(), 0);
+      addNewRelatedObject(relationshipHasRoot, PremisHelper.premisIdentifierTypeDatastreamID, rpo.getRootFile().getID(),
+        0);
     }
 
     if (rpo.getPartFiles() != null && rpo.getPartFiles().length > 0) {

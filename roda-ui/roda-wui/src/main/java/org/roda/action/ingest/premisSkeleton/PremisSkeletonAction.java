@@ -93,7 +93,6 @@ public class PremisSkeletonAction implements Plugin<AIP> {
           for (String representationID : aip.getRepresentationIds()) {
             logger.debug("Processing representation " + representationID + " from AIP " + aip.getId());
             RepresentationPreservationObject pObject = new RepresentationPreservationObject();
-            pObject.setAipId(aip.getId());
             pObject.setId(representationID);
             pObject.setPreservationLevel("");
             Representation representation = model.retrieveRepresentation(aip.getId(), representationID);

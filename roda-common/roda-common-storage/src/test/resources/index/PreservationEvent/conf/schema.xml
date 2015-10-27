@@ -104,21 +104,9 @@
      required, it is highly recommended. A <uniqueKey> is present in almost all Solr 
      installations. See the <uniqueKey> declaration below where <uniqueKey> is set to "id".
    -->   
-	
-   <field name="agentId" type="string" indexed="true" stored="true" required="true" multiValued="false" />
-   <field name="dateCreated" type="tdate" indexed="true" stored="true" required="false" multiValued="false" /> 
-   <field name="dateModified" type="tdate" indexed="true" stored="true" required="false" multiValued="false" /> 
-   <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 
-   <field name="label" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 
-   <field name="state" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 
-   <field name="targetId" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 
-   <field name="type" type="string" indexed="true" stored="true" required="true" multiValued="false" />    
+
+   <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" />   
    <field name="aipId" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 
-   <field name="datetime" type="tdate" indexed="true" stored="true" required="true" multiValued="false" /> 
-   <field name="name" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 
-   <field name="description" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 
-   <field name="outcomeResult" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 
-   <field name="outcomeDetails" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 
    <field name="representationId" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 
    <field name="fileId" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 
    <!-- Dynamic field definitions allow using convention over configuration

@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -15,9 +16,16 @@ import java.util.Date;
  * @author Rui Castro
  * 
  */
-public class EventPreservationObject extends SimpleEventPreservationMetadata {
+public class EventPreservationObject extends PreservationObject implements Serializable {
+  private Date date;
+  private String name;
+  private String description;
+  private String outcomeResult;
+  private String outcomeDetails;
+  private String targetID;
   private static final long serialVersionUID = 1555211337883930542L;
-
+  private String targetPID = null;
+  private String agentPID = null;
   public static final String PRESERVATION_EVENT_TYPE_INGESTION = "ingestion";
   public static final String PRESERVATION_EVENT_TYPE_FIXITY_CHECK = "fixity check";
   public static final String PRESERVATION_EVENT_TYPE_MIGRATION = "migration";
@@ -50,28 +58,6 @@ public class EventPreservationObject extends SimpleEventPreservationMetadata {
    */
   public EventPreservationObject() {
     super();
-  }
-
-  /**
-   * @param event
-   */
-  public EventPreservationObject(SimpleEventPreservationMetadata event) {
-    super(event);
-  }
-
-  /**
-   * @param event
-   */
-  public EventPreservationObject(EventPreservationObject event) {
-    super(event);
-    setDatetime(event.getDatetime());
-    setEventType(event.getEventType());
-    setEventDetail(event.getEventDetail());
-    setOutcome(event.getOutcome());
-    setOutcomeDetailNote(event.getOutcomeDetailNote());
-    setOutcomeDetailExtension(event.getOutcomeDetailExtension());
-    setAgentRole(event.getAgentRole());
-    setObjectIDs(event.getObjectIDs());
   }
 
   /**
@@ -183,7 +169,6 @@ public class EventPreservationObject extends SimpleEventPreservationMetadata {
   /**
    * @return the agentID
    */
-  @Override
   public String getAgentID() {
     return agentID;
   }
@@ -192,7 +177,6 @@ public class EventPreservationObject extends SimpleEventPreservationMetadata {
    * @param agentID
    *          the agentID to set
    */
-  @Override
   public void setAgentID(String agentID) {
     this.agentID = agentID;
   }
@@ -225,6 +209,70 @@ public class EventPreservationObject extends SimpleEventPreservationMetadata {
    */
   public void setObjectIDs(String[] objectIDs) {
     this.objectIDs = objectIDs;
+  }
+
+  public Date getDate() {
+    return date;
+  }
+
+  public void setDate(Date date) {
+    this.date = date;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public String getOutcomeResult() {
+    return outcomeResult;
+  }
+
+  public void setOutcomeResult(String outcomeResult) {
+    this.outcomeResult = outcomeResult;
+  }
+
+  public String getOutcomeDetails() {
+    return outcomeDetails;
+  }
+
+  public void setOutcomeDetails(String outcomeDetails) {
+    this.outcomeDetails = outcomeDetails;
+  }
+
+  public String getTargetID() {
+    return targetID;
+  }
+
+  public void setTargetID(String targetID) {
+    this.targetID = targetID;
+  }
+
+  public String getTargetPID() {
+    return targetPID;
+  }
+
+  public void setTargetPID(String targetPID) {
+    this.targetPID = targetPID;
+  }
+
+  public String getAgentPID() {
+    return agentPID;
+  }
+
+  public void setAgentPID(String agentPID) {
+    this.agentPID = agentPID;
   }
 
 }
