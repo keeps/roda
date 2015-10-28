@@ -126,7 +126,7 @@ public class RodaCoreFactory {
         // configure Solr (first try RODA HOME and then fallback to classpath)
         Path solrHome = configPath.resolve("index");
         if (!Files.exists(solrHome)) {
-          solrHome = Paths.get(RodaCoreFactory.class.getResource("/index/").toURI());
+          solrHome = Paths.get(RodaCoreFactory.class.getResource("/config/index/").toURI());
         }
 
         System.setProperty("solr.data.dir", indexPath.toString());
@@ -214,8 +214,11 @@ public class RodaCoreFactory {
 
     for (Path path : essentialDirectories) {
       try {
-        Files.createDirectories(path);
+        if (!Files.exists(path)) {
+          Files.createDirectories(path);
+        }
       } catch (IOException e) {
+        LOGGER.error("Unable to create " + path + ". Aborting...", e);
         throw new RuntimeException("Unable to create " + path + ". Aborting...", e);
       }
     }
@@ -470,7 +473,7 @@ public class RodaCoreFactory {
       LOGGER.error("Error running bagit action: " + e.getMessage(), e);
     }
   }
-  
+
   private static void runCharacterizationAction() {
     Plugin<AIP> characterizationAction = new CharacterizationAction();
     getActionOrchestrator().runActionOnAllAIPs(characterizationAction);
