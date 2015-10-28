@@ -20,9 +20,11 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
 import org.apache.log4j.Logger;
+import org.roda.core.data.v2.Representation;
 import org.roda.model.DescriptiveMetadata;
 import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
+import org.roda.model.PreservationMetadata;
 import org.roda.model.ValidationException;
 import org.roda.storage.Binary;
 import org.roda.storage.ClosableIterable;
@@ -66,6 +68,44 @@ public class ValidationUtils {
     }
     return valid;
   }
+  
+  /**
+   * Validates all preservation metadata files contained in the AIP
+   * 
+   * @throws ValidationException
+   */
+  public static boolean isAIPPreservationMetadataValid(ModelService model, String aipId, boolean failIfNoSchema,
+    Path configBasePath) throws ModelServiceException {
+    boolean valid = true;
+    ClosableIterable<Representation> representations = model.listRepresentations(aipId);
+    try{
+      for(Representation representation : representations){
+        ClosableIterable<PreservationMetadata> preservationMetadataBinaries = model.listPreservationMetadataBinaries(aipId,representation.getId());
+        try {
+          for (PreservationMetadata preservationMetadata : preservationMetadataBinaries) {
+            if (!isPreservationMetadataValid(model, preservationMetadata, failIfNoSchema, configBasePath)) {
+              valid = false;
+              break;
+            }
+          }
+        } finally {
+          try {
+            preservationMetadataBinaries.close();
+          } catch (IOException e) {
+            LOGGER.error("Error while while freeing up resources", e);
+          }
+        }
+      }
+    } finally {
+      try {
+        representations.close();
+      } catch (IOException e) {
+        LOGGER.error("Error while while freeing up resources", e);
+      }
+    }
+    
+    return valid;
+  }
 
   /**
    * Validates descriptive medatada (e.g. against its schema, but other
@@ -81,6 +121,31 @@ public class ValidationUtils {
       StoragePath storagePath = metadata.getStoragePath();
       Binary binary = model.getStorage().getBinary(storagePath);
       validateDescriptiveBinary(binary, binary.getStoragePath().getName(), failIfNoSchema, configBasePath);
+      ret = true;
+    } catch (StorageServiceException e) {
+      throw new ModelServiceException("Error validating descriptive metadata " + metadata.getStoragePath().asString(),
+        ModelServiceException.INTERNAL_SERVER_ERROR, e);
+    } catch (ValidationException e) {
+      ret = false;
+    }
+
+    return ret;
+  }
+  
+  /**
+   * Validates preservation medatada (e.g. against its schema, but other
+   * strategies may be used)
+   * 
+   * @param failIfNoSchema
+   * @throws ValidationException
+   */
+  public static boolean isPreservationMetadataValid(ModelService model, PreservationMetadata metadata,
+    boolean failIfNoSchema, Path configBasePath) throws ModelServiceException {
+    boolean ret;
+    try {
+      StoragePath storagePath = metadata.getStoragePath();
+      Binary binary = model.getStorage().getBinary(storagePath);
+      validatePreservationBinary(binary, configBasePath);
       ret = true;
     } catch (StorageServiceException e) {
       throw new ModelServiceException("Error validating descriptive metadata " + metadata.getStoragePath().asString(),
@@ -135,6 +200,46 @@ public class ValidationUtils {
 
   }
 
+  /**
+   * Validates preservation medatada (e.g. against its schema, but other
+   * strategies may be used)
+   * 
+   * @param descriptiveMetadataId
+   * 
+   * @param failIfNoSchema
+   * @throws ValidationException
+   */
+  public static void validatePreservationBinary(Binary binary, Path configBasePath) throws ValidationException {
+    try {
+      InputStream inputStream = binary.getContent().createInputStream();
+      InputStream schemaStream = RodaUtils.getResourceInputStream(configBasePath,
+        "schemas/premis-v2-0.xsd", "Validating");
+      if (schemaStream != null) {
+        Source xmlFile = new StreamSource(inputStream);
+        SchemaFactory schemaFactory = SchemaFactory.newInstance(W3C_XML_SCHEMA_NS_URI);
+        Schema schema = schemaFactory.newSchema(new StreamSource(schemaStream));
+        Validator validator = schema.newValidator();
+        RodaErrorHandler errorHandler = new RodaErrorHandler();
+        validator.setErrorHandler(errorHandler);
+        try {
+          validator.validate(xmlFile);
+          List<SAXParseException> errors = errorHandler.getErrors();
+          if (errors.size() > 0) {
+            throw new ValidationException("Error validating preservation binary ", errorHandler.getErrors());
+          }
+        } catch (SAXException e) {
+          LOGGER.debug("Error validating preservation binary " + binary.getStoragePath().asString(), e);
+          throw new ValidationException("Error validating preservation binary ", errorHandler.getErrors());
+        }
+      } else {
+          throw new ValidationException("No schema to validate " +  binary.getStoragePath().asString());
+      }
+    } catch (SAXException | IOException e) {
+      throw new ValidationException("Error validating preservation binary: " + e.getMessage());
+    }
+
+  }
+  
   private static class RodaErrorHandler extends DefaultHandler {
     List<SAXParseException> errors;
 
