@@ -300,13 +300,27 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.tika</groupId>
-			<artifactId>tika-app</artifactId>
+			<artifactId>tika-parsers</artifactId>
 			<exclusions>
 				<exclusion>
 					<groupId></groupId>
 					<artifactId></artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tika</groupId>
+			<artifactId>tika-core</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId></groupId>
+					<artifactId></artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-compress</artifactId>
 		</dependency>
 	</dependencies>
 	<build>
