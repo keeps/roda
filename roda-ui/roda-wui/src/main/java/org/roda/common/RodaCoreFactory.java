@@ -36,6 +36,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.roda.action.antivirus.AntivirusAction;
+import org.roda.action.characterization.CharacterizationAction;
 import org.roda.action.fixity.FixityAction;
 import org.roda.action.ingest.bagit.BagitToAIPAction;
 import org.roda.action.ingest.deepCharacterization.FITS.FITSAction;
@@ -468,7 +469,11 @@ public class RodaCoreFactory {
     } catch (IOException e) {
       LOGGER.error("Error running bagit action: " + e.getMessage(), e);
     }
-
+  }
+  
+  private static void runCharacterizationAction() {
+    Plugin<AIP> characterizationAction = new CharacterizationAction();
+    getActionOrchestrator().runActionOnAllAIPs(characterizationAction);
   }
 
   private static void runPremisSkeletonAction() {
@@ -503,6 +508,7 @@ public class RodaCoreFactory {
     System.err.println("java -jar x.jar fulltext");
     System.err.println("java -jar x.jar jhove");
     System.err.println("java -jar x.jar fits");
+    System.err.println("java -jar x.jar characterization");
   }
 
   private static void printIndexMembers(List<String> args, Filter filter, Sorter sorter, Sublist sublist, Facets facets)
@@ -576,6 +582,8 @@ public class RodaCoreFactory {
       } else if ("files".equals(args.get(0))) {
         Filter filter = null;
         printPreservationFiles(filter, null, new Sublist(0, 10000), null);
+      } else if ("characterization".equals(args.get(0))) {
+        runCharacterizationAction();
       } else {
         printMainUsage();
       }

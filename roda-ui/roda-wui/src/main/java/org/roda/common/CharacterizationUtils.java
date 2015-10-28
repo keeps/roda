@@ -1,33 +1,57 @@
 package org.roda.common;
 
+import java.io.CharArrayReader;
+import java.io.CharArrayWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.xml.parsers.FactoryConfigurationError;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.transform.TransformerException;
+
+import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.handler.loader.XMLLoader;
+import org.roda.index.IndexServiceException;
+import org.roda.storage.Binary;
+
 public class CharacterizationUtils {
-  /*
-  public static SolrInputDocument getObjectCharacteristicsFields(String aipID, String representationID, String fileID, Binary binary, Path configBasePath)
-    throws IndexServiceException {
-    SolrInputDocument doc;
+
+  // TODO improve XSL Result to Map (currently using solr utils class)
+  public static Map<String, String> getObjectCharacteristicsFields(String aipID, String representationID, String fileID,
+    Binary binary, Path configBasePath) throws IndexServiceException {
     InputStream inputStream;
+    SolrInputDocument doc = null;
     try {
       inputStream = binary.getContent().createInputStream();
 
-      Reader descMetadataReader = new InputStreamReader(inputStream);
+      Reader premisReader = new InputStreamReader(inputStream);
 
+      /*InputStream transformerStream = RodaUtils.getResourceInputStream(configBasePath,
+        "crosswalks/ingest/other/characterization.xslt", "Ingesting");*/
       InputStream transformerStream = RodaUtils.getResourceInputStream(configBasePath,
-        "crosswalks/ingest/other/characterization.xslt", "Ingesting");
-
+        "crosswalks/extraction/premis.xslt", "Characterization");
+      
       // TODO support the use of scripts for non-xml transformers
       Reader xsltReader = new InputStreamReader(transformerStream);
       CharArrayWriter transformerResult = new CharArrayWriter();
       Map<String, Object> stylesheetOpt = new HashMap<String, Object>();
-      RodaUtils.applyStylesheet(xsltReader, descMetadataReader, stylesheetOpt, transformerResult);
-      descMetadataReader.close();
+      RodaUtils.applyStylesheet(xsltReader, premisReader, stylesheetOpt, transformerResult);
+      premisReader.close();
 
       XMLLoader loader = new XMLLoader();
-      LOGGER.trace("Transformed desc. metadata:\n" + transformerResult);
       CharArrayReader transformationResult = new CharArrayReader(transformerResult.toCharArray());
       XMLStreamReader parser = XMLInputFactory.newInstance().createXMLStreamReader(transformationResult);
 
       boolean parsing = true;
-      doc = null;
+
       while (parsing) {
         int event = parser.next();
 
@@ -45,11 +69,13 @@ public class CharacterizationUtils {
       transformationResult.close();
 
     } catch (IOException | TransformerException | XMLStreamException | FactoryConfigurationError e) {
-      throw new IndexServiceException("Could not process descriptive metadata binary " + binary.getStoragePath()
+      throw new IndexServiceException("Could not process preservation metadata binary " + binary.getStoragePath()
         + " using xslt characterization.xslt", IndexServiceException.INTERNAL_SERVER_ERROR, e);
     }
-    String id = SolrUtils.getId(aipID, representationID, fileID);
-    doc.addField("id", id);
-    return doc;
-  }*/
+    Map<String, String> characteristics = new HashMap<String, String>();
+    for (String s : doc.getFieldNames()) {
+      characteristics.put(s, doc.getFieldValue(s).toString());
+    }
+    return characteristics;
+  }
 }

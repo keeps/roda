@@ -115,11 +115,6 @@ public class IndexModelObserver implements ModelObserver {
       } catch (SolrServerException | IOException e) {
         LOGGER.error("Could not commit indexed representations", e);
       }
-      try {
-        index.commit(RodaConstants.INDEX_CHARACTERIZATION);
-      } catch (SolrServerException | IOException e) {
-        LOGGER.error("Could not commit indexed representations", e);
-      }
     }
   }
 
