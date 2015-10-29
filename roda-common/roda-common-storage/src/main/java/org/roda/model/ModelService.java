@@ -1648,19 +1648,26 @@ public class ModelService extends ModelObservable {
 
   // TODO verify
   public PreservationMetadata updatePreservationMetadata(String aipId, String representationId,
-    String preservationMetadataId, Binary binary) throws ModelServiceException {
+    String preservationMetadataId, Binary binary, boolean payloadOnly) throws ModelServiceException {
     PreservationMetadata preservationMetadataBinary;
+    
     try {
       String type = ModelUtils.getPreservationType(binary);
       StoragePath binaryPath = ModelUtils.getPreservationFilePath(aipId, representationId, preservationMetadataId);
-      boolean asReference = false;
-      boolean createIfNotExists = false;
-      storage.updateBinaryContent(binaryPath, binary.getContent(), asReference, createIfNotExists);
-
-      Map<String, Set<String>> binaryMetadata = binary.getMetadata();
-      storage.updateMetadata(binaryPath, binaryMetadata, true);
-      preservationMetadataBinary = new PreservationMetadata(preservationMetadataId, aipId, representationId, binaryPath,
-        type);
+      if(payloadOnly){
+        storage.updateBinaryContent(binaryPath, binary.getContent(), false, true);
+        preservationMetadataBinary = new PreservationMetadata(preservationMetadataId, aipId, representationId, binaryPath,
+          type);
+      }else{
+        
+        boolean asReference = false;
+        boolean createIfNotExists = false;
+        storage.updateBinaryContent(binaryPath, binary.getContent(), asReference, createIfNotExists);
+        Map<String, Set<String>> binaryMetadata = binary.getMetadata();
+        storage.updateMetadata(binaryPath, binaryMetadata, true);
+        preservationMetadataBinary = new PreservationMetadata(preservationMetadataId, aipId, representationId, binaryPath,
+          type);
+      }
       notifyPreservationMetadataUpdated(preservationMetadataBinary);
     } catch (StorageServiceException e) {
       throw new ModelServiceException("Error updating preservation metadata binary in the storage",

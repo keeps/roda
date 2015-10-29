@@ -634,7 +634,7 @@ public class BrowserHelper {
       if (create) {
         model.createPreservationMetadata(aipId, representationId, fileDetail.getFileName(), resource);
       } else {
-        model.updatePreservationMetadata(aipId, representationId, fileDetail.getFileName(), resource);
+        model.updatePreservationMetadata(aipId, representationId, fileDetail.getFileName(), resource,false);
       }
     } catch (IOException | StorageServiceException | ModelServiceException e) {
       // FIXME see what better exception should be thrown

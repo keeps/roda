@@ -1,0 +1,944 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns="http://roda.dgarq.gov.pt/2008/EADCSchema" elementFormDefault="qualified"
+    targetNamespace="http://roda.dgarq.gov.pt/2008/EADCSchema">
+
+    <!-- 
+        EAD-C 2008 W3C Schema
+        Version: 200802 Release
+        Date: 20080222
+        
+        Publisher: Direcção Geral de Arquivos
+        
+        Funding: Repositório de Objectos Digitais Autênticos 
+        
+        *** Comments, questions, and error reports should be sent to the RODA project team, 
+        throught http://roda.dgarq.gov.pt/ ***
+        
+        Authors :
+        
+        (RODA Team)
+        Cecília Henriques (Direcção Geral de Arquivos)
+        Francisdo Barbedo (Direcção Geral de Arquivos)
+        Glória Santos (Direcção Geral de Arquivos)
+        José Carlos Ramalho (Universidade do Minho)
+        Luís Corujo (Direcção Geral de Arquivos)
+        Luís Faria (Direcção Geral de Arquivos)
+        Miguel Ferreira (Universidade do Minho)
+        Rui Castro (Direcção Geral de Arquivos)
+        
+        This schema is based on EAD W3C Schema (http://www.loc.gov/ead/ead.xsd).
+        
+        Defines a <c> element, compatible with EAD <c>, but with only the essential elements to
+        serve RODA's purposes.
+        
+    -->
+
+    <xs:element name="ead-c" type="c"/>
+
+    <xs:simpleType name="av.level">
+        <xs:restriction base="xs:token">
+            <xs:enumeration value="fonds"/>
+            <xs:enumeration value="subfonds"/>
+            <xs:enumeration value="class"/>
+            <xs:enumeration value="subclass"/>
+            <xs:enumeration value="series"/>
+            <xs:enumeration value="subseries"/>
+            <xs:enumeration value="file"/>
+            <xs:enumeration value="item"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="data.repositorycode">
+        <xs:restriction base="xs:token">
+            <xs:pattern
+                value="((AF|AX|AL|DZ|AS|AD|AO|AI|AQ|AG|AR|AM|AW|AU|AT|AZ|BS|BH|BD|BB|BY|BE|BZ|BJ|BM|BT|BO|BA|BW|BV|BR|IO|BN|BG|BF|BI|KH|CM|CA|CV|KY|CF|TD|CL|CN|CX|CC|CO|KM|CG|CD|CK|CR|CI|HR|CU|CY|CZ|DK|DJ|DM|DO|EC|EG|SV|GQ|ER|EE|ET|FK|FO|FJ|FI|FR|GF|PF|TF|GA|GM|GE|DE|GH|GI|GR|GL|GD|GP|GU|GT|GN|GW|GY|HT|HM|VA|HN|HK|HU|IS|IN|ID|IR|IQ|IE|IL|IT|JM|JP|JO|KZ|KE|KI|KP|KR|KW|KG|LA|LV|LB|LS|LR|LY|LI|LT|LU|MO|MK|MG|MW|MY|MV|ML|MT|MH|MQ|MR|MU|YT|MX|FM|MD|MC|MN|MS|MA|MZ|MM|NA|NR|NP|NL|AN|NC|NZ|NI|NE|NG|NU|NF|MP|NO|OM|PK|PW|PS|PA|PG|PY|PE|PH|PN|PL|PT|PR|QA|RE|RO|RU|RW|SH|KN|LC|PM|VC|WS|SM|ST|SA|SN|CS|SC|SL|SG|SK|SI|SB|SO|ZA|GS|ES|LK|SD|SR|SJ|SZ|SE|CH|SY|TW|TJ|TZ|TH|TL|TG|TK|TO|TT|TN|TR|TM|TC|TV|UG|UA|AE|GB|US|UM|UY|UZ|VU|VE|VN|VG|VI|WF|EH|YE|ZM|ZW)|([a-zA-Z]{1})|([a-zA-Z]{3,4}))(-[a-zA-Z0-9:/\-]{1,11})"
+            />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="notEmtpyToken">
+        <xs:restriction base="xs:token">
+            <xs:minLength value="1"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="notEmtpyString">
+        <xs:restriction base="xs:string">
+            <xs:whiteSpace value="collapse"/>
+            <xs:minLength value="1"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="c">
+        <xs:all>
+            <xs:element name="did" type="did" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="scopecontent" type="scopecontent" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="accessrestrict" type="accessrestrict" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="accruals" type="accruals" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="acqinfo" type="acqinfo" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="appraisal" type="appraisal" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="arrangement" type="arrangement" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="bibliography" type="bibliography" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="bioghist" type="bioghist" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="custodhist" type="custodhist" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="otherfindaid" type="otherfindaid" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="phystech" type="phystech" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="prefercite" type="prefercite" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="relatedmaterial" type="relatedmaterial" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="userestrict" type="userestrict" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="note" type="note" minOccurs="0" maxOccurs="1"/>
+        </xs:all>
+        <xs:attribute name="level" type="av.level" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="did">
+        <xs:all>
+            <xs:element name="unitid" type="unitid" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="unittitle" type="notEmtpyString" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="unitdate" type="unitdate" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="physdesc" type="physdesc" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="origination" type="notEmtpyString" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="langmaterial" type="langmaterial" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="materialspec" type="notEmtpyString" minOccurs="0" maxOccurs="1"/>
+        </xs:all>
+    </xs:complexType>
+
+    <xs:complexType name="langmaterial">
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="language" type="language"/>
+        </xs:choice>
+    </xs:complexType>
+
+    <xs:complexType name="language">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attributeGroup ref="am.langcode"/>
+                <xs:attribute name="scriptcode">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:token">
+                            <xs:enumeration value="Arab"/>
+                            <xs:enumeration value="Armn"/>
+                            <xs:enumeration value="Bali"/>
+                            <xs:enumeration value="Batk"/>
+                            <xs:enumeration value="Beng"/>
+                            <xs:enumeration value="Blis"/>
+                            <xs:enumeration value="Bopo"/>
+                            <xs:enumeration value="Brah"/>
+                            <xs:enumeration value="Brai"/>
+                            <xs:enumeration value="Bugi"/>
+                            <xs:enumeration value="Buhd"/>
+                            <xs:enumeration value="Cans"/>
+                            <xs:enumeration value="Cham"/>
+                            <xs:enumeration value="Cher"/>
+                            <xs:enumeration value="Cirt"/>
+                            <xs:enumeration value="Copt"/>
+                            <xs:enumeration value="Cprt"/>
+                            <xs:enumeration value="Cyrl"/>
+                            <xs:enumeration value="Cyrs"/>
+                            <xs:enumeration value="Deva"/>
+                            <xs:enumeration value="Dsrt"/>
+                            <xs:enumeration value="Egyd"/>
+                            <xs:enumeration value="Egyh"/>
+                            <xs:enumeration value="Egyp"/>
+                            <xs:enumeration value="Ethi"/>
+                            <xs:enumeration value="Geok"/>
+                            <xs:enumeration value="Geor"/>
+                            <xs:enumeration value="Glag"/>
+                            <xs:enumeration value="Goth"/>
+                            <xs:enumeration value="Grek"/>
+                            <xs:enumeration value="Gujr"/>
+                            <xs:enumeration value="Guru"/>
+                            <xs:enumeration value="Hang"/>
+                            <xs:enumeration value="Hani"/>
+                            <xs:enumeration value="Hano"/>
+                            <xs:enumeration value="Hans"/>
+                            <xs:enumeration value="Hant"/>
+                            <xs:enumeration value="Hebr"/>
+                            <xs:enumeration value="Hira"/>
+                            <xs:enumeration value="Hmng"/>
+                            <xs:enumeration value="Hrkt"/>
+                            <xs:enumeration value="Hung"/>
+                            <xs:enumeration value="Inds"/>
+                            <xs:enumeration value="Ital"/>
+                            <xs:enumeration value="Java"/>
+                            <xs:enumeration value="Kali"/>
+                            <xs:enumeration value="Kana"/>
+                            <xs:enumeration value="Khar"/>
+                            <xs:enumeration value="Khmr"/>
+                            <xs:enumeration value="Knda"/>
+                            <xs:enumeration value="Laoo"/>
+                            <xs:enumeration value="Latf"/>
+                            <xs:enumeration value="Latg"/>
+                            <xs:enumeration value="Latn"/>
+                            <xs:enumeration value="Lepc"/>
+                            <xs:enumeration value="Limb"/>
+                            <xs:enumeration value="Lina"/>
+                            <xs:enumeration value="Linb"/>
+                            <xs:enumeration value="Mand"/>
+                            <xs:enumeration value="Maya"/>
+                            <xs:enumeration value="Mero"/>
+                            <xs:enumeration value="Mlym"/>
+                            <xs:enumeration value="Mong"/>
+                            <xs:enumeration value="Mymr"/>
+                            <xs:enumeration value="Nkoo"/>
+                            <xs:enumeration value="Ogam"/>
+                            <xs:enumeration value="Orkh"/>
+                            <xs:enumeration value="Orya"/>
+                            <xs:enumeration value="Osma"/>
+                            <xs:enumeration value="Perm"/>
+                            <xs:enumeration value="Phag"/>
+                            <xs:enumeration value="Phnx"/>
+                            <xs:enumeration value="Plrd"/>
+                            <xs:enumeration value="Qaaa"/>
+                            <xs:enumeration value="Qabx"/>
+                            <xs:enumeration value="Roro"/>
+                            <xs:enumeration value="Runr"/>
+                            <xs:enumeration value="Sara"/>
+                            <xs:enumeration value="Shaw"/>
+                            <xs:enumeration value="Sinh"/>
+                            <xs:enumeration value="Sylo"/>
+                            <xs:enumeration value="Syrc"/>
+                            <xs:enumeration value="Syre"/>
+                            <xs:enumeration value="Syrj"/>
+                            <xs:enumeration value="Syrn"/>
+                            <xs:enumeration value="Tagb"/>
+                            <xs:enumeration value="Tale"/>
+                            <xs:enumeration value="Talu"/>
+                            <xs:enumeration value="Taml"/>
+                            <xs:enumeration value="Telu"/>
+                            <xs:enumeration value="Teng"/>
+                            <xs:enumeration value="Tfng"/>
+                            <xs:enumeration value="Tglg"/>
+                            <xs:enumeration value="Thaa"/>
+                            <xs:enumeration value="Thai"/>
+                            <xs:enumeration value="Tibt"/>
+                            <xs:enumeration value="Ugar"/>
+                            <xs:enumeration value="Vaii"/>
+                            <xs:enumeration value="Visp"/>
+                            <xs:enumeration value="Xpeo"/>
+                            <xs:enumeration value="Xsux"/>
+                            <xs:enumeration value="Yiii"/>
+                            <xs:enumeration value="Zxxx"/>
+                            <xs:enumeration value="Zyyy"/>
+                            <xs:enumeration value="Zzzz"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:attribute>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:complexType name="unitid">
+        <xs:simpleContent>
+            <xs:extension base="notEmtpyToken">
+                <xs:attribute name="repositorycode" type="data.repositorycode" use="required"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:complexType name="unitdate">
+        <xs:attributeGroup ref="am.date.normal"/>
+    </xs:complexType>
+
+    <xs:complexType name="physdesc">
+        <xs:all>
+            <xs:element name="dimensions" type="dimensions" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="physfacet" type="physfacet" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="extent" type="extent" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="date" type="date" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="p" type="xs:string" minOccurs="0" maxOccurs="1"/>
+        </xs:all>
+    </xs:complexType>
+
+    <xs:complexType name="date">
+        <xs:attributeGroup ref="am.date.normal"/>
+    </xs:complexType>
+
+    <xs:complexType name="dimensions">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="unit" type="notEmtpyToken"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:complexType name="physfacet">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="unit" type="notEmtpyToken"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:complexType name="extent">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="unit" type="notEmtpyToken"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:complexType name="accessrestrict">
+        <xs:sequence>
+            <xs:element name="p" type="xs:string" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="accruals">
+        <xs:sequence>
+            <xs:element name="p" type="xs:string" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="acqinfo">
+        <xs:sequence>
+            <xs:element name="p" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="date" type="date" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="num" type="xs:string" minOccurs="0" maxOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="appraisal">
+        <xs:sequence>
+            <xs:element name="p" type="xs:string" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="arrangement">
+        <xs:choice>
+            <xs:element name="table" type="table" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="p" type="xs:string" minOccurs="0" maxOccurs="1"/>
+        </xs:choice>
+    </xs:complexType>
+
+    <xs:complexType name="bioghist">
+        <xs:all>
+            <xs:element name="chronlist" type="chronlist" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="p" type="xs:string" minOccurs="0" maxOccurs="1"/>
+        </xs:all>
+    </xs:complexType>
+
+    <xs:complexType name="chronlist">
+        <xs:sequence>
+            <xs:element name="chronitem" type="chronitem" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="chronitem">
+        <xs:sequence>
+            <xs:element name="date" type="date"/>
+            <xs:element name="event" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="custodhist">
+        <xs:sequence>
+            <xs:element name="p" type="xs:string" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="prefercite">
+        <xs:sequence>
+            <xs:element name="p" type="xs:string" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+
+
+    <xs:complexType name="phystech">
+        <xs:sequence>
+            <xs:element name="p" type="xs:string" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="relatedmaterial">
+        <xs:sequence>
+            <xs:element name="p" type="xs:string" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="scopecontent">
+        <xs:sequence>
+            <xs:element name="p" type="notEmtpyString" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="userestrict">
+        <xs:sequence>
+            <xs:element name="p" type="xs:string" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="note">
+        <xs:sequence>
+            <xs:element name="p" type="xs:string" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="bibliography">
+        <xs:sequence>
+            <xs:element name="p" type="xs:string" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="table">
+        <xs:sequence>
+            <xs:element name="tgroup" type="tgroup" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="tgroup">
+        <xs:sequence>
+            <xs:element name="thead" type="thead" minOccurs="0"/>
+            <xs:element name="tbody" type="tbody"/>
+        </xs:sequence>
+        <xs:attribute name="cols" use="required" type="xs:nonNegativeInteger"/>
+    </xs:complexType>
+
+    <xs:complexType name="thead">
+        <xs:sequence>
+            <xs:element name="row" type="row" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="tbody">
+        <xs:sequence>
+            <xs:element name="row" type="row" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="row">
+        <xs:sequence>
+            <xs:element name="entry" type="xs:string" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="otherfindaid">
+        <xs:sequence>
+            <xs:element name="p" type="xs:string" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:attributeGroup name="am.date.normal">
+        <xs:attribute name="normal" use="required">
+            <xs:simpleType>
+                <xs:restriction base="xs:token">
+                    <xs:pattern
+                        value="(\-?(0|1|2)([0-9]{3})(((01|02|03|04|05|06|07|08|09|10|11|12)((0[1-9])|((1|2)[0-9])|(3[0-1])))|\-((01|02|03|04|05|06|07|08|09|10|11|12)(\-((0[1-9])|((1|2)[0-9])|(3[0-1])))?))?)(/\-?(0|1|2)([0-9]{3})(((01|02|03|04|05|06|07|08|09|10|11|12)((0[1-9])|((1|2)[0-9])|(3[0-1])))|\-((01|02|03|04|05|06|07|08|09|10|11|12)(\-((0[1-9])|((1|2)[0-9])|(3[0-1])))?))?)?"
+                    />
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+    </xs:attributeGroup>
+
+    <xs:attributeGroup name="am.langcode">
+        <xs:attribute name="langcode">
+            <xs:simpleType>
+                <xs:restriction base="xs:token">
+                    <xs:enumeration value="aar"/>
+                    <xs:enumeration value="abk"/>
+                    <xs:enumeration value="ace"/>
+                    <xs:enumeration value="ach"/>
+                    <xs:enumeration value="ada"/>
+                    <xs:enumeration value="ady"/>
+                    <xs:enumeration value="afa"/>
+                    <xs:enumeration value="afh"/>
+                    <xs:enumeration value="afr"/>
+                    <xs:enumeration value="aka"/>
+                    <xs:enumeration value="akk"/>
+                    <xs:enumeration value="alb"/>
+                    <xs:enumeration value="ale"/>
+                    <xs:enumeration value="alg"/>
+                    <xs:enumeration value="amh"/>
+                    <xs:enumeration value="ang"/>
+                    <xs:enumeration value="apa"/>
+                    <xs:enumeration value="ara"/>
+                    <xs:enumeration value="arc"/>
+                    <xs:enumeration value="arg"/>
+                    <xs:enumeration value="arm"/>
+                    <xs:enumeration value="arn"/>
+                    <xs:enumeration value="arp"/>
+                    <xs:enumeration value="art"/>
+                    <xs:enumeration value="arw"/>
+                    <xs:enumeration value="asm"/>
+                    <xs:enumeration value="ast"/>
+                    <xs:enumeration value="ath"/>
+                    <xs:enumeration value="aus"/>
+                    <xs:enumeration value="ava"/>
+                    <xs:enumeration value="ave"/>
+                    <xs:enumeration value="awa"/>
+                    <xs:enumeration value="aym"/>
+                    <xs:enumeration value="aze"/>
+                    <xs:enumeration value="bad"/>
+                    <xs:enumeration value="bai"/>
+                    <xs:enumeration value="bak"/>
+                    <xs:enumeration value="bal"/>
+                    <xs:enumeration value="bam"/>
+                    <xs:enumeration value="ban"/>
+                    <xs:enumeration value="baq"/>
+                    <xs:enumeration value="bas"/>
+                    <xs:enumeration value="bat"/>
+                    <xs:enumeration value="bej"/>
+                    <xs:enumeration value="bel"/>
+                    <xs:enumeration value="bem"/>
+                    <xs:enumeration value="ben"/>
+                    <xs:enumeration value="ber"/>
+                    <xs:enumeration value="bho"/>
+                    <xs:enumeration value="bih"/>
+                    <xs:enumeration value="bik"/>
+                    <xs:enumeration value="bin"/>
+                    <xs:enumeration value="bis"/>
+                    <xs:enumeration value="bla"/>
+                    <xs:enumeration value="bnt"/>
+                    <xs:enumeration value="bod"/>
+                    <xs:enumeration value="bos"/>
+                    <xs:enumeration value="bra"/>
+                    <xs:enumeration value="bre"/>
+                    <xs:enumeration value="btk"/>
+                    <xs:enumeration value="bua"/>
+                    <xs:enumeration value="bug"/>
+                    <xs:enumeration value="bul"/>
+                    <xs:enumeration value="bur"/>
+                    <xs:enumeration value="bur"/>
+                    <xs:enumeration value="byn"/>
+                    <xs:enumeration value="cad"/>
+                    <xs:enumeration value="cai"/>
+                    <xs:enumeration value="car"/>
+                    <xs:enumeration value="cat"/>
+                    <xs:enumeration value="cau"/>
+                    <xs:enumeration value="ceb"/>
+                    <xs:enumeration value="cel"/>
+                    <xs:enumeration value="ces"/>
+                    <xs:enumeration value="cha"/>
+                    <xs:enumeration value="chb"/>
+                    <xs:enumeration value="che"/>
+                    <xs:enumeration value="chg"/>
+                    <xs:enumeration value="chi"/>
+                    <xs:enumeration value="chk"/>
+                    <xs:enumeration value="chm"/>
+                    <xs:enumeration value="chn"/>
+                    <xs:enumeration value="cho"/>
+                    <xs:enumeration value="chp"/>
+                    <xs:enumeration value="chr"/>
+                    <xs:enumeration value="chu"/>
+                    <xs:enumeration value="chv"/>
+                    <xs:enumeration value="chy"/>
+                    <xs:enumeration value="cmc"/>
+                    <xs:enumeration value="cop"/>
+                    <xs:enumeration value="cor"/>
+                    <xs:enumeration value="cos"/>
+                    <xs:enumeration value="cpe"/>
+                    <xs:enumeration value="cpf"/>
+                    <xs:enumeration value="cpp"/>
+                    <xs:enumeration value="cre"/>
+                    <xs:enumeration value="crh"/>
+                    <xs:enumeration value="crp"/>
+                    <xs:enumeration value="csb"/>
+                    <xs:enumeration value="cus"/>
+                    <xs:enumeration value="cym"/>
+                    <xs:enumeration value="cze"/>
+                    <xs:enumeration value="cze"/>
+                    <xs:enumeration value="dak"/>
+                    <xs:enumeration value="dan"/>
+                    <xs:enumeration value="dar"/>
+                    <xs:enumeration value="day"/>
+                    <xs:enumeration value="del"/>
+                    <xs:enumeration value="den"/>
+                    <xs:enumeration value="deu"/>
+                    <xs:enumeration value="dgr"/>
+                    <xs:enumeration value="din"/>
+                    <xs:enumeration value="div"/>
+                    <xs:enumeration value="doi"/>
+                    <xs:enumeration value="dra"/>
+                    <xs:enumeration value="dsb"/>
+                    <xs:enumeration value="dua"/>
+                    <xs:enumeration value="dum"/>
+                    <xs:enumeration value="dut"/>
+                    <xs:enumeration value="dut"/>
+                    <xs:enumeration value="dyu"/>
+                    <xs:enumeration value="dzo"/>
+                    <xs:enumeration value="efi"/>
+                    <xs:enumeration value="egy"/>
+                    <xs:enumeration value="eka"/>
+                    <xs:enumeration value="ell"/>
+                    <xs:enumeration value="elx"/>
+                    <xs:enumeration value="eng"/>
+                    <xs:enumeration value="enm"/>
+                    <xs:enumeration value="epo"/>
+                    <xs:enumeration value="est"/>
+                    <xs:enumeration value="eus"/>
+                    <xs:enumeration value="eus"/>
+                    <xs:enumeration value="ewe"/>
+                    <xs:enumeration value="ewo"/>
+                    <xs:enumeration value="fan"/>
+                    <xs:enumeration value="fao"/>
+                    <xs:enumeration value="fas"/>
+                    <xs:enumeration value="fat"/>
+                    <xs:enumeration value="fij"/>
+                    <xs:enumeration value="fil"/>
+                    <xs:enumeration value="fin"/>
+                    <xs:enumeration value="fiu"/>
+                    <xs:enumeration value="fon"/>
+                    <xs:enumeration value="fra"/>
+                    <xs:enumeration value="fre"/>
+                    <xs:enumeration value="frm"/>
+                    <xs:enumeration value="fro"/>
+                    <xs:enumeration value="fry"/>
+                    <xs:enumeration value="ful"/>
+                    <xs:enumeration value="fur"/>
+                    <xs:enumeration value="gaa"/>
+                    <xs:enumeration value="gay"/>
+                    <xs:enumeration value="gba"/>
+                    <xs:enumeration value="gem"/>
+                    <xs:enumeration value="geo"/>
+                    <xs:enumeration value="ger"/>
+                    <xs:enumeration value="gez"/>
+                    <xs:enumeration value="gil"/>
+                    <xs:enumeration value="gla"/>
+                    <xs:enumeration value="gle"/>
+                    <xs:enumeration value="glg"/>
+                    <xs:enumeration value="glv"/>
+                    <xs:enumeration value="gmh"/>
+                    <xs:enumeration value="goh"/>
+                    <xs:enumeration value="gon"/>
+                    <xs:enumeration value="gor"/>
+                    <xs:enumeration value="got"/>
+                    <xs:enumeration value="grb"/>
+                    <xs:enumeration value="grc"/>
+                    <xs:enumeration value="gre"/>
+                    <xs:enumeration value="gre"/>
+                    <xs:enumeration value="grn"/>
+                    <xs:enumeration value="guj"/>
+                    <xs:enumeration value="gwi"/>
+                    <xs:enumeration value="hai"/>
+                    <xs:enumeration value="hat"/>
+                    <xs:enumeration value="hau"/>
+                    <xs:enumeration value="haw"/>
+                    <xs:enumeration value="heb"/>
+                    <xs:enumeration value="her"/>
+                    <xs:enumeration value="hil"/>
+                    <xs:enumeration value="him"/>
+                    <xs:enumeration value="hin"/>
+                    <xs:enumeration value="hit"/>
+                    <xs:enumeration value="hmn"/>
+                    <xs:enumeration value="hmo"/>
+                    <xs:enumeration value="hrv"/>
+                    <xs:enumeration value="hsb"/>
+                    <xs:enumeration value="hun"/>
+                    <xs:enumeration value="hup"/>
+                    <xs:enumeration value="hye"/>
+                    <xs:enumeration value="iba"/>
+                    <xs:enumeration value="ibo"/>
+                    <xs:enumeration value="ice"/>
+                    <xs:enumeration value="ice"/>
+                    <xs:enumeration value="ido"/>
+                    <xs:enumeration value="iii"/>
+                    <xs:enumeration value="ijo"/>
+                    <xs:enumeration value="iku"/>
+                    <xs:enumeration value="ile"/>
+                    <xs:enumeration value="ilo"/>
+                    <xs:enumeration value="ina"/>
+                    <xs:enumeration value="inc"/>
+                    <xs:enumeration value="ind"/>
+                    <xs:enumeration value="ine"/>
+                    <xs:enumeration value="inh"/>
+                    <xs:enumeration value="ipk"/>
+                    <xs:enumeration value="ira"/>
+                    <xs:enumeration value="iro"/>
+                    <xs:enumeration value="isl"/>
+                    <xs:enumeration value="ita"/>
+                    <xs:enumeration value="jav"/>
+                    <xs:enumeration value="jbo"/>
+                    <xs:enumeration value="jpn"/>
+                    <xs:enumeration value="jpr"/>
+                    <xs:enumeration value="jrb"/>
+                    <xs:enumeration value="kaa"/>
+                    <xs:enumeration value="kab"/>
+                    <xs:enumeration value="kac"/>
+                    <xs:enumeration value="kal"/>
+                    <xs:enumeration value="kam"/>
+                    <xs:enumeration value="kan"/>
+                    <xs:enumeration value="kar"/>
+                    <xs:enumeration value="kas"/>
+                    <xs:enumeration value="kat"/>
+                    <xs:enumeration value="kau"/>
+                    <xs:enumeration value="kaw"/>
+                    <xs:enumeration value="kaz"/>
+                    <xs:enumeration value="kbd"/>
+                    <xs:enumeration value="kha"/>
+                    <xs:enumeration value="khi"/>
+                    <xs:enumeration value="khm"/>
+                    <xs:enumeration value="kho"/>
+                    <xs:enumeration value="kik"/>
+                    <xs:enumeration value="kin"/>
+                    <xs:enumeration value="kir"/>
+                    <xs:enumeration value="kmb"/>
+                    <xs:enumeration value="kok"/>
+                    <xs:enumeration value="kom"/>
+                    <xs:enumeration value="kon"/>
+                    <xs:enumeration value="kor"/>
+                    <xs:enumeration value="kos"/>
+                    <xs:enumeration value="kpe"/>
+                    <xs:enumeration value="krc"/>
+                    <xs:enumeration value="kro"/>
+                    <xs:enumeration value="kru"/>
+                    <xs:enumeration value="kua"/>
+                    <xs:enumeration value="kum"/>
+                    <xs:enumeration value="kur"/>
+                    <xs:enumeration value="kut"/>
+                    <xs:enumeration value="lad"/>
+                    <xs:enumeration value="lah"/>
+                    <xs:enumeration value="lam"/>
+                    <xs:enumeration value="lao"/>
+                    <xs:enumeration value="lat"/>
+                    <xs:enumeration value="lav"/>
+                    <xs:enumeration value="lez"/>
+                    <xs:enumeration value="lim"/>
+                    <xs:enumeration value="lin"/>
+                    <xs:enumeration value="lit"/>
+                    <xs:enumeration value="lol"/>
+                    <xs:enumeration value="loz"/>
+                    <xs:enumeration value="ltz"/>
+                    <xs:enumeration value="lua"/>
+                    <xs:enumeration value="lub"/>
+                    <xs:enumeration value="lug"/>
+                    <xs:enumeration value="lui"/>
+                    <xs:enumeration value="lun"/>
+                    <xs:enumeration value="luo"/>
+                    <xs:enumeration value="lus"/>
+                    <xs:enumeration value="mac"/>
+                    <xs:enumeration value="mad"/>
+                    <xs:enumeration value="mag"/>
+                    <xs:enumeration value="mah"/>
+                    <xs:enumeration value="mai"/>
+                    <xs:enumeration value="mak"/>
+                    <xs:enumeration value="mal"/>
+                    <xs:enumeration value="man"/>
+                    <xs:enumeration value="mao"/>
+                    <xs:enumeration value="mao"/>
+                    <xs:enumeration value="map"/>
+                    <xs:enumeration value="mar"/>
+                    <xs:enumeration value="mas"/>
+                    <xs:enumeration value="may"/>
+                    <xs:enumeration value="mdf"/>
+                    <xs:enumeration value="mdr"/>
+                    <xs:enumeration value="men"/>
+                    <xs:enumeration value="mga"/>
+                    <xs:enumeration value="mic"/>
+                    <xs:enumeration value="min"/>
+                    <xs:enumeration value="mis"/>
+                    <xs:enumeration value="mkd"/>
+                    <xs:enumeration value="mkh"/>
+                    <xs:enumeration value="mlg"/>
+                    <xs:enumeration value="mlt"/>
+                    <xs:enumeration value="mnc"/>
+                    <xs:enumeration value="mni"/>
+                    <xs:enumeration value="mno"/>
+                    <xs:enumeration value="moh"/>
+                    <xs:enumeration value="mol"/>
+                    <xs:enumeration value="mon"/>
+                    <xs:enumeration value="mos"/>
+                    <xs:enumeration value="mri"/>
+                    <xs:enumeration value="msa"/>
+                    <xs:enumeration value="mul"/>
+                    <xs:enumeration value="mun"/>
+                    <xs:enumeration value="mus"/>
+                    <xs:enumeration value="mwl"/>
+                    <xs:enumeration value="mwr"/>
+                    <xs:enumeration value="mya"/>
+                    <xs:enumeration value="myn"/>
+                    <xs:enumeration value="myv"/>
+                    <xs:enumeration value="nah"/>
+                    <xs:enumeration value="nai"/>
+                    <xs:enumeration value="nap"/>
+                    <xs:enumeration value="nau"/>
+                    <xs:enumeration value="nav"/>
+                    <xs:enumeration value="nbl"/>
+                    <xs:enumeration value="nde"/>
+                    <xs:enumeration value="ndo"/>
+                    <xs:enumeration value="nds"/>
+                    <xs:enumeration value="nep"/>
+                    <xs:enumeration value="new"/>
+                    <xs:enumeration value="nia"/>
+                    <xs:enumeration value="nic"/>
+                    <xs:enumeration value="niu"/>
+                    <xs:enumeration value="nld"/>
+                    <xs:enumeration value="nno"/>
+                    <xs:enumeration value="nob"/>
+                    <xs:enumeration value="nog"/>
+                    <xs:enumeration value="non"/>
+                    <xs:enumeration value="nor"/>
+                    <xs:enumeration value="nso"/>
+                    <xs:enumeration value="nub"/>
+                    <xs:enumeration value="nwc"/>
+                    <xs:enumeration value="nya"/>
+                    <xs:enumeration value="nym"/>
+                    <xs:enumeration value="nyn"/>
+                    <xs:enumeration value="nyo"/>
+                    <xs:enumeration value="nzi"/>
+                    <xs:enumeration value="oci"/>
+                    <xs:enumeration value="oji"/>
+                    <xs:enumeration value="ori"/>
+                    <xs:enumeration value="orm"/>
+                    <xs:enumeration value="osa"/>
+                    <xs:enumeration value="oss"/>
+                    <xs:enumeration value="ota"/>
+                    <xs:enumeration value="oto"/>
+                    <xs:enumeration value="paa"/>
+                    <xs:enumeration value="pag"/>
+                    <xs:enumeration value="pal"/>
+                    <xs:enumeration value="pam"/>
+                    <xs:enumeration value="pan"/>
+                    <xs:enumeration value="pap"/>
+                    <xs:enumeration value="pau"/>
+                    <xs:enumeration value="peo"/>
+                    <xs:enumeration value="per"/>
+                    <xs:enumeration value="phi"/>
+                    <xs:enumeration value="phn"/>
+                    <xs:enumeration value="pli"/>
+                    <xs:enumeration value="pol"/>
+                    <xs:enumeration value="pon"/>
+                    <xs:enumeration value="por"/>
+                    <xs:enumeration value="pra"/>
+                    <xs:enumeration value="pro"/>
+                    <xs:enumeration value="pus"/>
+                    <xs:enumeration value="que"/>
+                    <xs:enumeration value="raj"/>
+                    <xs:enumeration value="rap"/>
+                    <xs:enumeration value="rar"/>
+                    <xs:enumeration value="roa"/>
+                    <xs:enumeration value="roh"/>
+                    <xs:enumeration value="rom"/>
+                    <xs:enumeration value="ron"/>
+                    <xs:enumeration value="rum"/>
+                    <xs:enumeration value="run"/>
+                    <xs:enumeration value="rus"/>
+                    <xs:enumeration value="sad"/>
+                    <xs:enumeration value="sag"/>
+                    <xs:enumeration value="sah"/>
+                    <xs:enumeration value="sai"/>
+                    <xs:enumeration value="sal"/>
+                    <xs:enumeration value="sam"/>
+                    <xs:enumeration value="san"/>
+                    <xs:enumeration value="sas"/>
+                    <xs:enumeration value="sat"/>
+                    <xs:enumeration value="scc"/>
+                    <xs:enumeration value="scn"/>
+                    <xs:enumeration value="sco"/>
+                    <xs:enumeration value="scr"/>
+                    <xs:enumeration value="sel"/>
+                    <xs:enumeration value="sem"/>
+                    <xs:enumeration value="sga"/>
+                    <xs:enumeration value="sgn"/>
+                    <xs:enumeration value="shn"/>
+                    <xs:enumeration value="sid"/>
+                    <xs:enumeration value="sin"/>
+                    <xs:enumeration value="sio"/>
+                    <xs:enumeration value="sit"/>
+                    <xs:enumeration value="sla"/>
+                    <xs:enumeration value="slk"/>
+                    <xs:enumeration value="slo"/>
+                    <xs:enumeration value="slv"/>
+                    <xs:enumeration value="sma"/>
+                    <xs:enumeration value="sme"/>
+                    <xs:enumeration value="smi"/>
+                    <xs:enumeration value="smj"/>
+                    <xs:enumeration value="smn"/>
+                    <xs:enumeration value="smo"/>
+                    <xs:enumeration value="sms"/>
+                    <xs:enumeration value="sna"/>
+                    <xs:enumeration value="snd"/>
+                    <xs:enumeration value="snk"/>
+                    <xs:enumeration value="sog"/>
+                    <xs:enumeration value="som"/>
+                    <xs:enumeration value="son"/>
+                    <xs:enumeration value="sot"/>
+                    <xs:enumeration value="spa"/>
+                    <xs:enumeration value="sqi"/>
+                    <xs:enumeration value="srd"/>
+                    <xs:enumeration value="srp"/>
+                    <xs:enumeration value="srr"/>
+                    <xs:enumeration value="ssa"/>
+                    <xs:enumeration value="ssw"/>
+                    <xs:enumeration value="suk"/>
+                    <xs:enumeration value="sun"/>
+                    <xs:enumeration value="sus"/>
+                    <xs:enumeration value="sux"/>
+                    <xs:enumeration value="swa"/>
+                    <xs:enumeration value="swe"/>
+                    <xs:enumeration value="syr"/>
+                    <xs:enumeration value="tah"/>
+                    <xs:enumeration value="tai"/>
+                    <xs:enumeration value="tam"/>
+                    <xs:enumeration value="tat"/>
+                    <xs:enumeration value="tel"/>
+                    <xs:enumeration value="tem"/>
+                    <xs:enumeration value="ter"/>
+                    <xs:enumeration value="tet"/>
+                    <xs:enumeration value="tgk"/>
+                    <xs:enumeration value="tgl"/>
+                    <xs:enumeration value="tha"/>
+                    <xs:enumeration value="tib"/>
+                    <xs:enumeration value="tib"/>
+                    <xs:enumeration value="tig"/>
+                    <xs:enumeration value="tir"/>
+                    <xs:enumeration value="tiv"/>
+                    <xs:enumeration value="tkl"/>
+                    <xs:enumeration value="tlh"/>
+                    <xs:enumeration value="tli"/>
+                    <xs:enumeration value="tmh"/>
+                    <xs:enumeration value="tog"/>
+                    <xs:enumeration value="ton"/>
+                    <xs:enumeration value="tpi"/>
+                    <xs:enumeration value="tsi"/>
+                    <xs:enumeration value="tsn"/>
+                    <xs:enumeration value="tso"/>
+                    <xs:enumeration value="tuk"/>
+                    <xs:enumeration value="tum"/>
+                    <xs:enumeration value="tup"/>
+                    <xs:enumeration value="tur"/>
+                    <xs:enumeration value="tut"/>
+                    <xs:enumeration value="tvl"/>
+                    <xs:enumeration value="twi"/>
+                    <xs:enumeration value="tyv"/>
+                    <xs:enumeration value="udm"/>
+                    <xs:enumeration value="uga"/>
+                    <xs:enumeration value="uig"/>
+                    <xs:enumeration value="ukr"/>
+                    <xs:enumeration value="umb"/>
+                    <xs:enumeration value="und"/>
+                    <xs:enumeration value="urd"/>
+                    <xs:enumeration value="uzb"/>
+                    <xs:enumeration value="vai"/>
+                    <xs:enumeration value="ven"/>
+                    <xs:enumeration value="vie"/>
+                    <xs:enumeration value="vol"/>
+                    <xs:enumeration value="vot"/>
+                    <xs:enumeration value="wak"/>
+                    <xs:enumeration value="wal"/>
+                    <xs:enumeration value="war"/>
+                    <xs:enumeration value="was"/>
+                    <xs:enumeration value="wel"/>
+                    <xs:enumeration value="wen"/>
+                    <xs:enumeration value="wln"/>
+                    <xs:enumeration value="wol"/>
+                    <xs:enumeration value="xal"/>
+                    <xs:enumeration value="xho"/>
+                    <xs:enumeration value="yao"/>
+                    <xs:enumeration value="yap"/>
+                    <xs:enumeration value="yid"/>
+                    <xs:enumeration value="yor"/>
+                    <xs:enumeration value="ypk"/>
+                    <xs:enumeration value="zap"/>
+                    <xs:enumeration value="zen"/>
+                    <xs:enumeration value="zha"/>
+                    <xs:enumeration value="zho"/>
+                    <xs:enumeration value="znd"/>
+                    <xs:enumeration value="zul"/>
+                    <xs:enumeration value="zun"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+    </xs:attributeGroup>
+
+</xs:schema>

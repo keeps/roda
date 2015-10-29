@@ -49,6 +49,8 @@ import org.roda.action.orchestrate.Plugin;
 import org.roda.action.orchestrate.actions.ReindexAction;
 import org.roda.action.orchestrate.actions.RemoveOrphansAction;
 import org.roda.action.orchestrate.embed.AkkaEmbeddedActionOrchestrator;
+import org.roda.action.utils.premis.V2ToV3PremisAction;
+import org.roda.action.validation.AIPValidationAction;
 import org.roda.core.common.RodaConstants;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
@@ -484,6 +486,16 @@ public class RodaCoreFactory {
     getActionOrchestrator().runActionOnAllAIPs(premisSkeletonAction);
   }
 
+  
+  private static void runPremisUpdateAction() {
+    Plugin<AIP> premisUpdateAction = new V2ToV3PremisAction();
+    getActionOrchestrator().runActionOnAllAIPs(premisUpdateAction);
+  }
+  
+  private static void runValidationAction() {
+    Plugin<AIP> validationAction = new AIPValidationAction();
+    getActionOrchestrator().runActionOnAllAIPs(validationAction);
+  }
   private static void runSolrQuery(List<String> args) {
     String collection = args.get(2);
     String solrQueryString = args.get(3);
@@ -512,6 +524,8 @@ public class RodaCoreFactory {
     System.err.println("java -jar x.jar jhove");
     System.err.println("java -jar x.jar fits");
     System.err.println("java -jar x.jar characterization");
+    System.err.println("java -jar x.jar updatePremis");
+    System.err.println("java -jar x.jar validation");
   }
 
   private static void printIndexMembers(List<String> args, Filter filter, Sorter sorter, Sublist sublist, Facets facets)
@@ -587,6 +601,10 @@ public class RodaCoreFactory {
         printPreservationFiles(filter, null, new Sublist(0, 10000), null);
       } else if ("characterization".equals(args.get(0))) {
         runCharacterizationAction();
+      } else if ("updatePremis".equals(args.get(0))){
+        runPremisUpdateAction();
+      } else if("validation".equals(args.get(0))){
+        runValidationAction();
       } else {
         printMainUsage();
       }
