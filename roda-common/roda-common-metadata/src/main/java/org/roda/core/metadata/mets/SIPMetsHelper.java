@@ -32,7 +32,7 @@ import org.roda.core.data.v2.AgentPreservationObject;
 import org.roda.core.data.v2.EventPreservationObject;
 import org.roda.core.data.v2.RepresentationFilePreservationObject;
 import org.roda.core.data.v2.RepresentationPreservationObject;
-import org.roda.core.metadata.premis.PremisMetadataException;
+import org.roda.core.metadata.v2.premis.PremisMetadataException;
 import org.roda.util.FileUtility;
 import org.roda.util.StringUtility;
 

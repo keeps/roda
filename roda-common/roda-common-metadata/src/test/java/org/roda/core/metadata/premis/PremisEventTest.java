@@ -10,6 +10,8 @@ package org.roda.core.metadata.premis;
 import java.util.Date;
 
 import org.roda.core.data.v2.EventPreservationObject;
+import org.roda.core.metadata.v2.premis.PremisEventHelper;
+import org.roda.core.metadata.v2.premis.PremisMetadataException;
 
 public class PremisEventTest {
 

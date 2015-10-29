@@ -20,7 +20,7 @@ import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlError;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
-import org.roda.core.metadata.premis.PremisMetadataException;
+import org.roda.core.metadata.v2.premis.PremisMetadataException;
 
 /**
  * This is an utility class for metadata helpers.

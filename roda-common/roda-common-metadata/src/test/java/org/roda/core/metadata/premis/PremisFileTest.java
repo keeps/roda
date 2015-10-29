@@ -7,9 +7,8 @@
  */
 package org.roda.core.metadata.premis;
 
-import org.roda.core.metadata.premis.PremisFileObjectHelper;
-import org.roda.core.metadata.premis.PremisMetadataException;
-import org.roda.core.metadata.premis.PremisRepresentationObjectHelper;
+import org.roda.core.metadata.v2.premis.PremisFileObjectHelper;
+import org.roda.core.metadata.v2.premis.PremisMetadataException;
 
 /**
  * Test class for {@link PremisRepresentationObjectHelper}.
