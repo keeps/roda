@@ -1267,6 +1267,7 @@ public class ModelService extends ModelObservable {
           active = false;
         }
 
+        // FIXME check if inputstream gets closed
         PremisFileObjectHelper pfoh = PremisFileObjectHelper.newInstance(resource.getContent().createInputStream());
 
         RepresentationFilePreservationObject rfpo = new RepresentationFilePreservationObject();
@@ -1288,7 +1289,6 @@ public class ModelService extends ModelObservable {
         rfpo.setFormatRegistryName(pfoh.getRepresentationFilePreservationObject().getFormatRegistryName());
         rfpo.setFormatRegistryRole(pfoh.getRepresentationFilePreservationObject().getFormatRegistryRole());
         rfpo.setHash(pfoh.getRepresentationFilePreservationObject().getHash());
-        rfpo.setID(pfoh.getRepresentationFilePreservationObject().getID());
         rfpo.setId(pfoh.getRepresentationFilePreservationObject().getId());
         rfpo.setLabel(pfoh.getRepresentationFilePreservationObject().getLabel());
         rfpo.setLastModifiedDate(pfoh.getRepresentationFilePreservationObject().getLastModifiedDate());
@@ -1341,6 +1341,7 @@ public class ModelService extends ModelObservable {
           active = false;
         }
 
+        // FIXME check if inputstream gets closed
         PremisRepresentationObjectHelper proh = PremisRepresentationObjectHelper
           .newInstance(resource.getContent().createInputStream());
         RepresentationPreservationObject rpo = new RepresentationPreservationObject();
@@ -1433,7 +1434,6 @@ public class ModelService extends ModelObservable {
         epo.setDescription(""); // TODO: ????
         epo.setEventDetail(peh.getEvent().getEventDetail());
         epo.setEventType(peh.getEvent().getEventType());
-        epo.setFileID(fileId);
         epo.setId(fileId);
         epo.setLabel(""); // TODO: ???
         epo.setModel(""); // TODO: ???

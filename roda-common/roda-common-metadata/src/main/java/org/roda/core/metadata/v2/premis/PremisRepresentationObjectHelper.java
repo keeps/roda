@@ -228,7 +228,7 @@ public class PremisRepresentationObjectHelper extends PremisObjectHelper {
               .getRelatedObjectIdentificationArray(0);
 
             RepresentationFilePreservationObject rootFile = new RepresentationFilePreservationObject();
-            rootFile.setID(relatedObjectIdentification.getRelatedObjectIdentifierValue());
+            rootFile.setId(relatedObjectIdentification.getRelatedObjectIdentifierValue());
 
             pObject.setRootFile(rootFile);
 
@@ -239,7 +239,7 @@ public class PremisRepresentationObjectHelper extends PremisObjectHelper {
 
               RepresentationFilePreservationObject partFile = new RepresentationFilePreservationObject();
 
-              partFile.setID(partObjectIdentification.getRelatedObjectIdentifierValue());
+              partFile.setId(partObjectIdentification.getRelatedObjectIdentifierValue());
 
               partFiles.add(partObjectIdentification.getRelatedObjectSequence().intValue() - 1, partFile);
             }
@@ -330,7 +330,7 @@ public class PremisRepresentationObjectHelper extends PremisObjectHelper {
         premisRelationshipTypeStructural, premisRelationshipSubTypeHasRoot);
 
       // <relationship><relatedObjectIdentification>
-      addNewRelatedObject(relationshipHasRoot, PremisHelper.premisIdentifierTypeDatastreamID, rpo.getRootFile().getID(),
+      addNewRelatedObject(relationshipHasRoot, PremisHelper.premisIdentifierTypeDatastreamID, rpo.getRootFile().getId(),
         0);
     }
 
@@ -345,7 +345,7 @@ public class PremisRepresentationObjectHelper extends PremisObjectHelper {
         RepresentationFilePreservationObject rFilePObject = rpo.getPartFiles()[index];
 
         // <relationship><relatedObjectIdentification>
-        addNewRelatedObject(relationshipHasPart, PremisHelper.premisIdentifierTypeDatastreamID, rFilePObject.getID(),
+        addNewRelatedObject(relationshipHasPart, PremisHelper.premisIdentifierTypeDatastreamID, rFilePObject.getId(),
           index + 1);
       }
 

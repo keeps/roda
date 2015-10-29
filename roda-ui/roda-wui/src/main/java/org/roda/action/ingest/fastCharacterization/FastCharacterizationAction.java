@@ -88,8 +88,8 @@ public class FastCharacterizationAction implements Plugin<AIP> {
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
     try {
-      Path rodaHome = RodaCoreFactory.getRodaHomePath();
-      Path signaturePath = rodaHome
+      Path rodaConfigPath = RodaCoreFactory.getConfigPath();
+      Path signaturePath = rodaConfigPath
         .resolve(RodaCoreFactory.getRodaConfigurationAsString("tools", "droid", "signatureFile"));
       DroidUtils droidUtils = DroidUtils.getInstance(signaturePath);
       Path temp = Files.createTempDirectory("temp");

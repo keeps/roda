@@ -822,7 +822,7 @@ public class SIPMetsHelper extends MetsHelper {
     RepresentationFilePreservationObject rfpo, File rfpoFile) {
 
     String rpoMdSecID = "PREMIS-" + rpo.getId();
-    String rfpoMdSecID = rpoMdSecID + "-" + rfpo.getID();
+    String rfpoMdSecID = rpoMdSecID + "-" + rfpo.getId();
 
     AmdSecType objectsAmdSec = getAmdSec(AMDSEC_ID_OBJECT);
     if (objectsAmdSec == null) {

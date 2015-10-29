@@ -96,7 +96,7 @@ public class FITSAction implements Plugin<AIP> {
               Binary resource = (Binary) FSUtils.convertPathToResource(fitsResult.getParent(), fitsResult);
               model.createOtherMetadata(aip.getId(), representationID, file.getStoragePath().getName() + ".xml", "FITS",
                 resource);
-              fitsResult.toFile().delete();
+              FSUtils.deletePath(fitsResult);
 
             }
           }

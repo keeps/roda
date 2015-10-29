@@ -172,7 +172,7 @@ public class PremisFileObjectHelper extends PremisObjectHelper {
     // <objectIdentifier>
     List<ObjectIdentifierComplexType> objectIdentifierList = getFile().getObjectIdentifierList();
     if (objectIdentifierList != null && objectIdentifierList.size() > 0) {
-      pObject.setID(getFile().getObjectIdentifierArray(0).getObjectIdentifierValue());
+      pObject.setId(getFile().getObjectIdentifierArray(0).getObjectIdentifierValue());
     } else {
       logger.warn("PREMIS File doesn't have an ID");
     }
@@ -223,7 +223,7 @@ public class PremisFileObjectHelper extends PremisObjectHelper {
     // <objectIdentifier>
     ObjectIdentifierComplexType objectIdentifier = getFile().addNewObjectIdentifier();
     objectIdentifier.setObjectIdentifierType(PremisHelper.premisIdentifierTypeDatastreamID);
-    objectIdentifier.setObjectIdentifierValue(filePObject.getID());
+    objectIdentifier.setObjectIdentifierValue(filePObject.getId());
 
     // <preservationLevel>
     PreservationLevelComplexType preservationLevel = getFile().addNewPreservationLevel();

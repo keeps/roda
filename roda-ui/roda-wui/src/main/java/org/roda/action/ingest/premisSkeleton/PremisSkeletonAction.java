@@ -115,7 +115,7 @@ public class PremisSkeletonAction implements Plugin<AIP> {
               } else {
                 pObjectPartFiles.add(premisObject);
               }
-              premis.toFile().delete();
+              FSUtils.deletePath(premis);
             }
             pObject.setPartFiles(
               pObjectPartFiles.toArray(new RepresentationFilePreservationObject[pObjectPartFiles.size()]));
@@ -124,7 +124,7 @@ public class PremisSkeletonAction implements Plugin<AIP> {
             helper.saveToFile(premisRepresentation.toFile());
             model.createPreservationMetadata(aip.getId(), representationID, "representation.premis.xml",
               (Binary) FSUtils.convertPathToResource(premisRepresentation.getParent(), premisRepresentation));
-            premisRepresentation.toFile().delete();
+            FSUtils.deletePath(premisRepresentation);
           }
         } catch (ModelServiceException mse) {
           logger.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage(), mse);

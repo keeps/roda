@@ -30,21 +30,20 @@ public class DroidUtils {
   private Path signature;
   private int maxBytesToScan = -1;
   private BinarySignatureIdentifier binarySignatureIdentifier;
-  
-  
+
   private static DroidUtils instance;
-  
-  public static DroidUtils getInstance(Path signaturePath) throws DroidException{
-    if(instance==null){
+
+  public static DroidUtils getInstance(Path signaturePath) throws DroidException {
+    if (instance == null) {
       instance = new DroidUtils(signaturePath);
     }
     return instance;
   }
-  
-  private DroidUtils(Path signaturePath) throws DroidException{
+
+  private DroidUtils(Path signaturePath) throws DroidException {
     this.signature = signaturePath;
     binarySignatureIdentifier = new BinarySignatureIdentifier();
-    logger.debug("SIGNATURE: "+signature.toAbsolutePath().toString());
+    logger.debug("SIGNATURE: " + signature.toAbsolutePath().toString());
     binarySignatureIdentifier.setSignatureFile(signature.toAbsolutePath().toString());
     try {
       binarySignatureIdentifier.init();

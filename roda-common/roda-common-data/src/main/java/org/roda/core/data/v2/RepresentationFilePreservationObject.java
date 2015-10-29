@@ -29,12 +29,6 @@ public class RepresentationFilePreservationObject extends PreservationObject imp
    */
   public static final String PRESERVATION_LEVEL_BITLEVEL = "bitlevel";
 
-  /**
-   * The identifier of the preservation object. This field cannot be
-   * <code>null</code>.
-   */
-  private String ID = null;
-
   private String preservationLevel = null;
 
   /*
@@ -84,7 +78,7 @@ public class RepresentationFilePreservationObject extends PreservationObject imp
    * @param filePO
    */
   public RepresentationFilePreservationObject(RepresentationFilePreservationObject filePO) {
-    this(filePO.getID(), filePO.getPreservationLevel(), filePO.getCompositionLevel(), filePO.getFixities(),
+    this(filePO.getId(), filePO.getPreservationLevel(), filePO.getCompositionLevel(), filePO.getFixities(),
       filePO.getSize(), filePO.getFormatDesignationName(), filePO.getFormatDesignationVersion(),
       filePO.getFormatRegistryName(), filePO.getFormatRegistryKey(), filePO.getFormatRegistryRole(),
       filePO.getCreatingApplicationName(), filePO.getCreatingApplicationVersion(), filePO.getDateCreatedByApplication(),
@@ -123,7 +117,7 @@ public class RepresentationFilePreservationObject extends PreservationObject imp
     String creatingApplicationVersion, String dateCreatedByApplication, String originalName,
     String objectCharacteristicsExtension, String contentLocationType, String contentLocationValue) {
 
-    setID(id);
+    setId(id);
     setPreservationLevel(preservationLevel);
 
     setCompositionLevel(compositionLevel);
@@ -160,7 +154,7 @@ public class RepresentationFilePreservationObject extends PreservationObject imp
     if (obj != null && obj instanceof RepresentationFilePreservationObject) {
       RepresentationFilePreservationObject other = (RepresentationFilePreservationObject) obj;
 
-      return getID() == other.getID() || getID().equals(other.getID());
+      return getId() == other.getId() || getId().equals(other.getId());
 
     } else {
       return false;
@@ -173,36 +167,11 @@ public class RepresentationFilePreservationObject extends PreservationObject imp
    */
   @Override
   public String toString() {
-    return "RepresentationFilePreservationObject(Model=" + getModel() + ", ID=" + getID() + ", size=" + getSize()
+    return "RepresentationFilePreservationObject(Model=" + getModel() + ", Id=" + getId() + ", size=" + getSize()
       + ", formatDesignationName=" + getFormatDesignationName() + ", formatDesignationVersion="
       + getFormatDesignationVersion() + ", formatRegistryName=" + getFormatRegistryName() + ", formatRegistryKey="
       + getFormatRegistryKey() + ", formatRegistryRole=" + getFormatRegistryRole() + ", originalName="
       + getOriginalName() + ")";
-  }
-
-  /**
-   * The identifier of the preservation object.
-   * 
-   * @return the identifier of the preservation object as a {@link String}.
-   */
-  public String getID() {
-    return ID;
-  }
-
-  /**
-   * Sets the identifier of the preservation object.
-   * 
-   * @param id
-   *          the identifier to set.
-   * @throws NullPointerException
-   *           if ID is <code>null</code>.
-   */
-  public void setID(String id) {
-    if (id == null) {
-      throw new NullPointerException("ID cannot be null");
-    } else {
-      ID = id;
-    }
   }
 
   /**

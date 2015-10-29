@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE file at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/keeps/roda
+ */
 package org.roda.common;
 
 import java.io.CharArrayReader;
@@ -34,11 +41,15 @@ public class CharacterizationUtils {
 
       Reader premisReader = new InputStreamReader(inputStream);
 
-      /*InputStream transformerStream = RodaUtils.getResourceInputStream(configBasePath,
-        "crosswalks/ingest/other/characterization.xslt", "Ingesting");*/
+      // FIXME delete the following comment
+      /*
+       * InputStream transformerStream =
+       * RodaUtils.getResourceInputStream(configBasePath,
+       * "crosswalks/ingest/other/characterization.xslt", "Ingesting");
+       */
       InputStream transformerStream = RodaUtils.getResourceInputStream(configBasePath,
         "crosswalks/extraction/premis.xslt", "Characterization");
-      
+
       // TODO support the use of scripts for non-xml transformers
       Reader xsltReader = new InputStreamReader(transformerStream);
       CharArrayWriter transformerResult = new CharArrayWriter();

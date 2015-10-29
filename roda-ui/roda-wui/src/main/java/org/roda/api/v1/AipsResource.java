@@ -23,13 +23,21 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.xml.transform.TransformerException;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
+import org.roda.api.controllers.Browser;
 import org.roda.api.v1.impl.AipsResourceImpl;
+import org.roda.api.v1.utils.ApiResponseMessage;
+import org.roda.api.v1.utils.ApiUtils;
+import org.roda.api.v1.utils.StreamResponse;
+import org.roda.common.RodaCoreFactory;
+import org.roda.common.UserUtility;
 import org.roda.core.common.RODAException;
 import org.roda.core.data.v2.EventPreservationObject;
 import org.roda.core.data.v2.Representation;
+import org.roda.core.data.v2.RodaUser;
 import org.roda.model.AIP;
 import org.roda.model.DescriptiveMetadata;
 
@@ -60,7 +68,8 @@ public class AipsResource {
     @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam("start") String start,
     @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam("limit") String limit)
       throws RODAException {
-    return DELEGATE.aipsGet(request, start, limit);
+    // TODO
+    return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 
   @GET
@@ -74,7 +83,8 @@ public class AipsResource {
     @ApiParam(value = "The ID of the AIP to retrieve.", required = true) @PathParam("aip_id") String aipId,
     @ApiParam(value = "Choose format in which to get the AIP", allowableValues = "json, zip", defaultValue = "json") @QueryParam("acceptFormat") String acceptFormat)
       throws RODAException {
-    return DELEGATE.aipsAipIdGet(request, aipId, acceptFormat);
+    // TODO
+    return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 
   @PUT
@@ -87,7 +97,8 @@ public class AipsResource {
     @ApiParam(value = "The ID of the existing AIP to update", required = true) @PathParam("aip_id") String aipId,
     @ApiParam(value = "The path to the directory in the shared file system where the AIP should be provided.", required = true) @FormParam("filepath") String filepath)
       throws RODAException {
-    return DELEGATE.aipsAipIdPut(request, aipId, filepath);
+    // TODO
+    return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 
   @POST
@@ -100,7 +111,8 @@ public class AipsResource {
     @ApiParam(value = "The requested ID of the new AIP", required = true) @PathParam("aip_id") String aipId,
     @ApiParam(value = "The path to the directory in the shared file system where the AIP should be provided.", required = true) @FormParam("filepath") String filepath)
       throws RODAException {
-    return DELEGATE.aipsAipIdPost(request, aipId, filepath);
+    // TODO
+    return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 
   @DELETE
@@ -112,7 +124,13 @@ public class AipsResource {
   public Response aipsAipIdDelete(
     @ApiParam(value = "The ID of the AIP to delete.", required = true) @PathParam("aip_id") String aipId)
       throws RODAException {
-    return DELEGATE.aipsAipIdDelete(request, aipId);
+    // get user
+    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    // delegate action to controller
+    Browser.removeAIP(user, aipId);
+
+    // FIXME give a better answer
+    return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 
   @GET
@@ -127,7 +145,8 @@ public class AipsResource {
     @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam("start") String start,
     @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam("limit") String limit)
       throws RODAException {
-    return DELEGATE.aipsAipIdDataGet(request, aipId, start, limit);
+    // TODO
+    return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 
   @GET
@@ -142,7 +161,12 @@ public class AipsResource {
     @ApiParam(value = "The ID of the existing representation", required = true) @PathParam("representation_id") String representationId,
     @ApiParam(value = "Choose format in which to get the representation", allowableValues = "json, bin") @QueryParam("acceptFormat") String acceptFormat)
       throws RODAException {
-    return DELEGATE.getAipRepresentation(request, aipId, representationId, acceptFormat);
+    // get user
+    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    // delegate action to controller
+    StreamResponse aipRepresentation = Browser.getAipRepresentation(user, aipId, representationId, acceptFormat);
+
+    return ApiUtils.okResponse(aipRepresentation);
   }
 
   @PUT
@@ -156,7 +180,8 @@ public class AipsResource {
     @ApiParam(value = "The ID of the existing representation to update", required = true) @PathParam("representation_id") String representationId,
     @ApiParam(value = "The path to the directory in the shared file system where the representation should be provided.", required = true) @FormParam("filepath") String filepath)
       throws RODAException {
-    return DELEGATE.aipsAipIdDataRepresentationIdPut(request, aipId, representationId, filepath);
+    // TODO
+    return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 
   @POST
@@ -170,7 +195,8 @@ public class AipsResource {
     @ApiParam(value = "The requested ID for the new representation", required = true) @PathParam("representation_id") String representationId,
     @ApiParam(value = "The path to the directory in the shared file system where the representation should be provided.", required = true) @FormParam("filepath") String filepath)
       throws RODAException {
-    return DELEGATE.aipsAipIdDataRepresentationIdPost(request, aipId, representationId, filepath);
+    // TODO
+    return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 
   @DELETE
@@ -183,7 +209,13 @@ public class AipsResource {
     @ApiParam(value = "The ID of the AIP where the representation is.", required = true) @PathParam("aip_id") String aipId,
     @ApiParam(value = "The ID of the existing representation to delete", required = true) @PathParam("representation_id") String representationId)
       throws RODAException {
-    return DELEGATE.aipsAipIdDataRepresentationIdDelete(request, aipId, representationId);
+    // get user
+    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    // delegate action to controller
+    Browser.removeRepresentation(user, aipId, representationId);
+
+    // FIXME give a better answer
+    return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 
   @GET
@@ -199,7 +231,13 @@ public class AipsResource {
     @ApiParam(value = "The ID of the existing file", required = true) @PathParam("file_id") String fileId,
     @ApiParam(value = "Choose format in which to get the file", allowableValues = "json, bin") @QueryParam("acceptFormat") String acceptFormat)
       throws RODAException {
-    return DELEGATE.aipsAipIdDataRepresentationIdFileIdGet(request, aipId, representationId, fileId, acceptFormat);
+    // get user
+    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    // delegate action to controller
+    StreamResponse aipRepresentationFile = Browser.getAipRepresentationFile(user, aipId, representationId, fileId,
+      acceptFormat);
+
+    return ApiUtils.okResponse(aipRepresentationFile);
   }
 
   @PUT
@@ -214,7 +252,8 @@ public class AipsResource {
     @ApiParam(value = "The ID of the existing file", required = true) @PathParam("file_id") String fileId,
     @ApiParam(value = "The path to the file in the shared file system where the file should be provided.", required = true) @FormParam("filepath") String filepath)
       throws RODAException {
-    return DELEGATE.aipsAipIdDataRepresentationIdFileIdPut(request, aipId, representationId, fileId, filepath);
+    // TODO
+    return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 
   @POST
@@ -229,7 +268,8 @@ public class AipsResource {
     @ApiParam(value = "The requested ID of the new file", required = true) @PathParam("file_id") String fileId,
     @ApiParam(value = "The path to the directory in the shared file system where the representation should be provided.", required = true) @FormParam("filepath") String filepath)
       throws RODAException {
-    return DELEGATE.aipsAipIdDataRepresentationIdFileIdPost(request, aipId, representationId, fileId, filepath);
+    // TODO
+    return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 
   @DELETE
@@ -243,7 +283,13 @@ public class AipsResource {
     @ApiParam(value = "The ID of the existing representation", required = true) @PathParam("representation_id") String representationId,
     @ApiParam(value = "The ID of the existing file", required = true) @PathParam("file_id") String fileId)
       throws RODAException {
-    return DELEGATE.aipsAipIdDataRepresentationIdFileIdDelete(request, aipId, representationId, fileId);
+    // get user
+    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    // delegate action to controller
+    Browser.removeRepresentationFile(user, aipId, representationId, fileId);
+
+    // FIXME give a better answer
+    return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 
   @GET
@@ -259,7 +305,12 @@ public class AipsResource {
     @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam("limit") String limit,
     @ApiParam(value = "Choose format in which to get the representation", allowableValues = "json, bin") @QueryParam("acceptFormat") String acceptFormat)
       throws RODAException {
-    return DELEGATE.listAipDescriptiveMetadata(request, aipId, start, limit, acceptFormat);
+    // get user
+    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    // delegate action to controller
+    StreamResponse aipRepresentation = Browser.listAipDescriptiveMetadata(user, aipId, start, limit, acceptFormat);
+
+    return ApiUtils.okResponse(aipRepresentation);
   }
 
   @GET
@@ -274,7 +325,18 @@ public class AipsResource {
     @ApiParam(value = "Choose format in which to get the metadata", allowableValues = "xml, html", defaultValue = "xml") @QueryParam("acceptFormat") String acceptFormat,
     @ApiParam(value = "The language for the HTML output", allowableValues = "pt_PT, en_US", defaultValue = "pt_PT") @DefaultValue("pt_PT") @QueryParam("lang") String language)
       throws RODAException {
-    return DELEGATE.getAipDescriptiveMetadata(request, aipId, metadataId, acceptFormat, language);
+    try {
+      // get user
+      RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+      // delegate action to controller
+      StreamResponse aipDescriptiveMetadata = Browser.getAipDescritiveMetadata(user, aipId, metadataId, acceptFormat,
+        language);
+
+      return ApiUtils.okResponse(aipDescriptiveMetadata);
+
+    } catch (TransformerException e) {
+      return ApiUtils.errorResponse(e);
+    }
   }
 
   @PUT
@@ -289,8 +351,13 @@ public class AipsResource {
     @FormDataParam("file") InputStream inputStream, @FormDataParam("file") FormDataContentDisposition fileDetail,
     @ApiParam(value = "The type of the metadata file (e.g. eadc2014, dc)", required = true) @FormParam("metadataType") String metadataType)
       throws RODAException {
-    return DELEGATE.aipsAipIdDescriptiveMetadataMetadataIdPut(request, aipId, metadataId, inputStream, fileDetail,
-      metadataType);
+    // get user
+    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    // delegate action to controller
+    Browser.putDescriptiveMetadataFile(user, aipId, metadataId, metadataType, inputStream, fileDetail);
+
+    // FIXME give a better answer
+    return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 
   @POST
@@ -305,8 +372,13 @@ public class AipsResource {
     @FormDataParam("file") InputStream inputStream, @FormDataParam("file") FormDataContentDisposition fileDetail,
     @ApiParam(value = "The type of the metadata file (e.g. eadc2014, dc)", required = true) @FormParam("metadataType") String metadataType)
       throws RODAException {
-    return DELEGATE.aipsAipIdDescriptiveMetadataMetadataIdPost(request, aipId, metadataId, inputStream, fileDetail,
-      metadataType);
+    // get user
+    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    // delegate action to controller
+    Browser.postDescriptiveMetadataFile(user, aipId, metadataId, metadataType, inputStream, fileDetail);
+
+    // FIXME give a better answer
+    return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 
   @DELETE
@@ -319,7 +391,13 @@ public class AipsResource {
     @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam("aip_id") String aipId,
     @ApiParam(value = "The ID of the existing metadata file to delete", required = true) @PathParam("metadata_id") String metadataId)
       throws RODAException {
-    return DELEGATE.aipsAipIdDescriptiveMetadataMetadataIdDelete(request, aipId, metadataId);
+    // get user
+    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    // delegate action to controller
+    Browser.removeDescriptiveMetadataFile(user, aipId, metadataId);
+
+    // FIXME give a better answer
+    return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 
   @GET
@@ -334,7 +412,13 @@ public class AipsResource {
     @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam("start") String start,
     @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam("limit") String limit)
       throws RODAException {
-    return DELEGATE.listAipPreservationMetadata(request, aipId, start, limit, acceptFormat);
+    // get user
+    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    // delegate action to controller
+    StreamResponse aipPreservationMetadataList = Browser.listAipPreservationMetadata(user, aipId, start, limit,
+      acceptFormat);
+
+    return ApiUtils.okResponse(aipPreservationMetadataList);
   }
 
   @GET
@@ -355,8 +439,19 @@ public class AipsResource {
     @ApiParam(value = "Maximum number of files to return", defaultValue = "100") @QueryParam("limitFile") String limitFile,
     @ApiParam(value = "The language for the HTML output", allowableValues = "pt_PT, en_US", defaultValue = "pt_PT") @DefaultValue("pt_PT") @QueryParam("lang") String language)
       throws RODAException {
-    return DELEGATE.getAipRepresentationPreservationMetadata(request, aipId, representationId, startAgent, limitAgent,
-      startEvent, limitEvent, startFile, limitFile, acceptFormat, language);
+    try {
+      // get user
+      RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+      // delegate action to controller
+      StreamResponse aipRepresentationPreservationMetadata = Browser.getAipRepresentationPreservationMetadata(user,
+        aipId, representationId, startAgent, limitAgent, startEvent, limitEvent, startFile, limitFile, acceptFormat,
+        language);
+
+      return ApiUtils.okResponse(aipRepresentationPreservationMetadata);
+
+    } catch (TransformerException e) {
+      return ApiUtils.errorResponse(e);
+    }
   }
 
   @GET
@@ -370,7 +465,13 @@ public class AipsResource {
     @ApiParam(value = "The ID of the existing representation", required = true) @PathParam("representation_id") String representationId,
     @ApiParam(value = "The ID of the existing file", required = true) @PathParam("file_id") String fileId)
       throws RODAException {
-    return DELEGATE.getAipRepresentationPreservationMetadataFile(request, aipId, representationId, fileId);
+    // get user
+    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    // delegate action to controller
+    StreamResponse aipRepresentationPreservationMetadataFile = Browser
+      .getAipRepresentationPreservationMetadataFile(user, aipId, representationId, fileId);
+
+    return ApiUtils.okResponse(aipRepresentationPreservationMetadataFile);
   }
 
   @POST
@@ -384,8 +485,13 @@ public class AipsResource {
     @ApiParam(value = "The ID of the existing representation", required = true) @PathParam("representation_id") String representationId,
     @FormDataParam("file") InputStream inputStream, @FormDataParam("file") FormDataContentDisposition fileDetail)
       throws RODAException {
-    return DELEGATE.postAipRepresentationPreservationMetadataFile(request, aipId, representationId, inputStream,
-      fileDetail);
+    // get user
+    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    // delegate action to controller
+    Browser.postAipRepresentationPreservationMetadataFile(user, aipId, representationId, inputStream, fileDetail);
+
+    // FIXME give a better answer
+    return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 
   @PUT
@@ -399,8 +505,13 @@ public class AipsResource {
     @ApiParam(value = "The ID of the existing representation", required = true) @PathParam("representation_id") String representationId,
     @FormDataParam("file") InputStream inputStream, @FormDataParam("file") FormDataContentDisposition fileDetail)
       throws RODAException {
-    return DELEGATE.putAipRepresentationPreservationMetadataFile(request, aipId, representationId, inputStream,
-      fileDetail);
+    // get user
+    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    // delegate action to controller
+    Browser.putAipRepresentationPreservationMetadataFile(user, aipId, representationId, inputStream, fileDetail);
+
+    // FIXME give a better answer
+    return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 
   @DELETE
@@ -414,6 +525,12 @@ public class AipsResource {
     @ApiParam(value = "The ID of the existing file", required = true) @PathParam("file_id") String fileId,
     @ApiParam(value = "Choose format in which to get the metadata", allowableValues = "json, xml, html", defaultValue = "json") @QueryParam("acceptFormat") String acceptFormat)
       throws RODAException {
-    return DELEGATE.aipsAipIdPreservationMetadataRepresentationIdFileIdDelete(request, aipId, representationId, fileId);
+    // get user
+    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    // delegate action to controller
+    Browser.aipsAipIdPreservationMetadataRepresentationIdFileIdDelete(user, aipId, representationId, fileId);
+
+    // FIXME give a better answer
+    return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 }

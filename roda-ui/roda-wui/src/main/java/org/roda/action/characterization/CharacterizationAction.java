@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE file at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/keeps/roda
+ */
 package org.roda.action.characterization;
 
 import java.util.ArrayList;
@@ -69,7 +76,7 @@ public class CharacterizationAction implements Plugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
-    Map<String,Map<String,Integer>> total = new HashMap<String,Map<String,Integer>>();
+    Map<String, Map<String, Integer>> total = new HashMap<String, Map<String, Integer>>();
     for (AIP aip : list) {
       Map<String, List<String>> premisFiles = aip.getPreservationFileObjectsIds();
       for (Map.Entry<String, List<String>> entry : premisFiles.entrySet()) {
@@ -80,33 +87,35 @@ public class CharacterizationAction implements Plugin<AIP> {
             Binary binary = storage.getBinary(filePath);
             Map<String, String> characteristics = CharacterizationUtils.getObjectCharacteristicsFields(aip.getId(),
               representationID, fileID, binary, RodaCoreFactory.getConfigPath());
-            total = join(total,characteristics);
+            total = join(total, characteristics);
           } catch (StorageServiceException | IndexServiceException mse) {
             LOGGER.error("Error processing :" + aip.getId() + "/" + representationID + "/" + fileID);
           }
         }
       }
     }
-    for(Map.Entry<String, Map<String,Integer>> entry : total.entrySet()){
-      System.out.println("Property: "+entry.getKey());
-      for(Map.Entry<String, Integer> entry2 : entry.getValue().entrySet()){
-        System.out.println(entry2.getKey()+" - "+entry2.getValue());
+    // FIXME delete the following for cycle
+    for (Map.Entry<String, Map<String, Integer>> entry : total.entrySet()) {
+      System.out.println("Property: " + entry.getKey());
+      for (Map.Entry<String, Integer> entry2 : entry.getValue().entrySet()) {
+        System.out.println(entry2.getKey() + " - " + entry2.getValue());
       }
     }
     return null;
   }
 
-  private Map<String, Map<String, Integer>> join(Map<String, Map<String, Integer>> total, Map<String, String> characteristics) {
-    for(Map.Entry<String, String> entry : characteristics.entrySet()){
-      if(total.containsKey(entry.getKey())){
-        Map<String,Integer> c = total.get(entry.getKey());
-        if(c.containsKey(entry.getValue())){
-          c.put(entry.getValue(), c.get(entry.getValue())+1);
-        }else{
+  private Map<String, Map<String, Integer>> join(Map<String, Map<String, Integer>> total,
+    Map<String, String> characteristics) {
+    for (Map.Entry<String, String> entry : characteristics.entrySet()) {
+      if (total.containsKey(entry.getKey())) {
+        Map<String, Integer> c = total.get(entry.getKey());
+        if (c.containsKey(entry.getValue())) {
+          c.put(entry.getValue(), c.get(entry.getValue()) + 1);
+        } else {
           c.put(entry.getValue(), 1);
         }
-      }else{
-        Map<String,Integer> c = new HashMap<String,Integer>();
+      } else {
+        Map<String, Integer> c = new HashMap<String, Integer>();
         c.put(entry.getValue(), 1);
         total.put(entry.getKey(), c);
       }

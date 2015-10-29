@@ -68,7 +68,7 @@ public class ValidationUtils {
     }
     return valid;
   }
-  
+
   /**
    * Validates all preservation metadata files contained in the AIP
    * 
@@ -78,9 +78,10 @@ public class ValidationUtils {
     Path configBasePath) throws ModelServiceException {
     boolean valid = true;
     ClosableIterable<Representation> representations = model.listRepresentations(aipId);
-    try{
-      for(Representation representation : representations){
-        ClosableIterable<PreservationMetadata> preservationMetadataBinaries = model.listPreservationMetadataBinaries(aipId,representation.getId());
+    try {
+      for (Representation representation : representations) {
+        ClosableIterable<PreservationMetadata> preservationMetadataBinaries = model
+          .listPreservationMetadataBinaries(aipId, representation.getId());
         try {
           for (PreservationMetadata preservationMetadata : preservationMetadataBinaries) {
             if (!isPreservationMetadataValid(model, preservationMetadata, failIfNoSchema, configBasePath)) {
@@ -103,7 +104,7 @@ public class ValidationUtils {
         LOGGER.error("Error while while freeing up resources", e);
       }
     }
-    
+
     return valid;
   }
 
@@ -131,7 +132,7 @@ public class ValidationUtils {
 
     return ret;
   }
-  
+
   /**
    * Validates preservation medatada (e.g. against its schema, but other
    * strategies may be used)
@@ -173,6 +174,7 @@ public class ValidationUtils {
       InputStream schemaStream = RodaUtils.getResourceInputStream(configBasePath,
         "schemas/" + descriptiveMetadataId + ".xsd", "Validating");
       if (schemaStream != null) {
+        // FIXME is inputstream closed???
         Source xmlFile = new StreamSource(inputStream);
         SchemaFactory schemaFactory = SchemaFactory.newInstance(W3C_XML_SCHEMA_NS_URI);
         Schema schema = schemaFactory.newSchema(new StreamSource(schemaStream));
@@ -212,8 +214,8 @@ public class ValidationUtils {
   public static void validatePreservationBinary(Binary binary, Path configBasePath) throws ValidationException {
     try {
       InputStream inputStream = binary.getContent().createInputStream();
-      InputStream schemaStream = RodaUtils.getResourceInputStream(configBasePath,
-        "schemas/premis-v2-0.xsd", "Validating");
+      InputStream schemaStream = RodaUtils.getResourceInputStream(configBasePath, "schemas/premis-v2-0.xsd",
+        "Validating");
       if (schemaStream != null) {
         Source xmlFile = new StreamSource(inputStream);
         SchemaFactory schemaFactory = SchemaFactory.newInstance(W3C_XML_SCHEMA_NS_URI);
@@ -232,14 +234,14 @@ public class ValidationUtils {
           throw new ValidationException("Error validating preservation binary ", errorHandler.getErrors());
         }
       } else {
-          throw new ValidationException("No schema to validate " +  binary.getStoragePath().asString());
+        throw new ValidationException("No schema to validate " + binary.getStoragePath().asString());
       }
     } catch (SAXException | IOException e) {
       throw new ValidationException("Error validating preservation binary: " + e.getMessage());
     }
 
   }
-  
+
   private static class RodaErrorHandler extends DefaultHandler {
     List<SAXParseException> errors;
 

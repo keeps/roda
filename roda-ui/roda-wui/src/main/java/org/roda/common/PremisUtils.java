@@ -40,7 +40,7 @@ public class PremisUtils {
 
   public static RepresentationFilePreservationObject createPremisFromFile(File file, Binary binaryFile, String originator) throws IOException, PremisMetadataException{
     RepresentationFilePreservationObject pObjectFile = new RepresentationFilePreservationObject();
-    pObjectFile.setID(file.getId());
+    pObjectFile.setId(file.getId());
     pObjectFile.setPreservationLevel(RepresentationFilePreservationObject.PRESERVATION_LEVEL_FULL);
     pObjectFile.setCompositionLevel(0);
     try {
