@@ -155,6 +155,15 @@
 				<module>roda-ui/roda-wui</module>
 			</modules>
 		</profile>
+		<profile>
+			<id>common</id>
+			<modules>
+				<module>roda-common/roda-common-data</module>
+				<module>roda-common/roda-common-metadata</module>
+				<module>roda-common/roda-common-utils</module>
+				<module>roda-common/roda-common-storage</module>
+			</modules>
+		</profile>
 		<!-- <profile> -->
 		<!-- <id>create-installer</id> -->
 		<!-- <modules> -->
@@ -948,17 +957,6 @@
 				<version>0.8.10</version>
 			</dependency>
 			<!-- Actions related dependencies - end -->
-			
-			<dependency>
-				<groupId>org.jdom</groupId>
-				<artifactId>jdom</artifactId>
-				<version>1.1</version>
-			</dependency>
-			<dependency>
-				<groupId>edu.harvard.hul.ois</groupId>
-				<artifactId>ots-schemas</artifactId>
-				<version>0.11</version>
-			</dependency>
 			
 			<!-- Akka related dependencies - start -->
 			<dependency>

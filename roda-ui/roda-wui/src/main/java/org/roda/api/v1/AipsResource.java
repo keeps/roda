@@ -28,7 +28,6 @@ import javax.xml.transform.TransformerException;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.roda.api.controllers.Browser;
-import org.roda.api.v1.impl.AipsResourceImpl;
 import org.roda.api.v1.utils.ApiResponseMessage;
 import org.roda.api.v1.utils.ApiUtils;
 import org.roda.api.v1.utils.StreamResponse;
@@ -53,8 +52,6 @@ import io.swagger.annotations.ApiResponses;
 public class AipsResource {
   public static final String ENDPOINT = "/v1/aips";
   public static final String SWAGGER_ENDPOINT = "v1 aips";
-
-  private static final AipsResourceImpl DELEGATE = new AipsResourceImpl();
 
   @Context
   private HttpServletRequest request;

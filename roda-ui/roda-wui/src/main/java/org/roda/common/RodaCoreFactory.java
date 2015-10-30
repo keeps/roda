@@ -128,6 +128,8 @@ public class RodaCoreFactory {
         // configure Solr (first try RODA HOME and then fallback to classpath)
         Path solrHome = configPath.resolve("index");
         if (!Files.exists(solrHome)) {
+          // FIXME perhaps these files should be copied from classpath to
+          // install dir ir they cannot be used from classpath
           solrHome = Paths.get(RodaCoreFactory.class.getResource("/config/index/").toURI());
         }
 
@@ -486,16 +488,16 @@ public class RodaCoreFactory {
     getActionOrchestrator().runActionOnAllAIPs(premisSkeletonAction);
   }
 
-  
   private static void runPremisUpdateAction() {
     Plugin<AIP> premisUpdateAction = new V2ToV3PremisAction();
     getActionOrchestrator().runActionOnAllAIPs(premisUpdateAction);
   }
-  
+
   private static void runValidationAction() {
     Plugin<AIP> validationAction = new AIPValidationAction();
     getActionOrchestrator().runActionOnAllAIPs(validationAction);
   }
+
   private static void runSolrQuery(List<String> args) {
     String collection = args.get(2);
     String solrQueryString = args.get(3);
@@ -601,9 +603,9 @@ public class RodaCoreFactory {
         printPreservationFiles(filter, null, new Sublist(0, 10000), null);
       } else if ("characterization".equals(args.get(0))) {
         runCharacterizationAction();
-      } else if ("updatePremis".equals(args.get(0))){
+      } else if ("updatePremis".equals(args.get(0))) {
         runPremisUpdateAction();
-      } else if("validation".equals(args.get(0))){
+      } else if ("validation".equals(args.get(0))) {
         runValidationAction();
       } else {
         printMainUsage();

@@ -15,7 +15,6 @@ import javax.xml.transform.TransformerException;
 import org.apache.log4j.Logger;
 import org.roda.action.orchestrate.Plugin;
 import org.roda.action.orchestrate.PluginException;
-import org.roda.common.CommonUtils;
 import org.roda.common.PremisUtils;
 import org.roda.common.RodaCoreFactory;
 import org.roda.core.common.InvalidParameterException;
@@ -30,7 +29,9 @@ import org.roda.storage.Binary;
 import org.roda.storage.ClosableIterable;
 import org.roda.storage.StorageService;
 import org.roda.storage.StorageServiceException;
+import org.roda.storage.fs.FSUtils;
 import org.xml.sax.SAXException;
+
 // TODO IMPROVE...
 public class V2ToV3PremisAction implements Plugin<AIP> {
   private final Logger logger = Logger.getLogger(getClass());
@@ -98,7 +99,7 @@ public class V2ToV3PremisAction implements Plugin<AIP> {
                   Path pathFile = Paths.get(temp.toString(), pm.getStoragePath().getName());
                   Files.copy(binary.getContent().createInputStream(), pathFile, StandardCopyOption.REPLACE_EXISTING);
                   binary = PremisUtils.updatePremisToV3IfNeeded(binary, configPath);
-                   model.updatePreservationMetadata(aip.getId(),representationID, pm.getId(), binary,true);
+                  model.updatePreservationMetadata(aip.getId(), representationID, pm.getId(), binary, true);
                 } catch (StorageServiceException sse) {
                   logger.error(
                     "Error processing premis metadata " + pm.getStoragePath().asString() + ": " + sse.getMessage(),
@@ -128,8 +129,8 @@ public class V2ToV3PremisAction implements Plugin<AIP> {
 
     } finally {
       try {
-        CommonUtils.deleteNonEmptyFolder(temp);
-      } catch (IOException e) {
+        FSUtils.deletePath(temp);
+      } catch (StorageServiceException e) {
         logger.error("Error removing temp files: " + e.getMessage(), e);
       }
     }

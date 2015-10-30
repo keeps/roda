@@ -274,10 +274,20 @@
 			<groupId>gov.loc</groupId>
 			<artifactId>bagit</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>uk.gov.nationalarchives</groupId>
-			<artifactId>droid-command-line</artifactId>
-		</dependency>
+		<!-- <dependency> -->
+		<!-- <groupId>uk.gov.nationalarchives</groupId> -->
+		<!-- <artifactId>droid-command-line</artifactId> -->
+		<!-- <exclusions> -->
+		<!-- <exclusion> -->
+		<!-- <artifactId>bcprov-jdk14</artifactId> -->
+		<!-- <groupId>bouncycastle</groupId> -->
+		<!-- </exclusion> -->
+		<!-- <exclusion> -->
+		<!-- <artifactId>bcmail-jdk14</artifactId> -->
+		<!-- <groupId>bouncycastle</groupId> -->
+		<!-- </exclusion> -->
+		<!-- </exclusions> -->
+		<!-- </dependency> -->
 		<dependency>
 			<groupId>org.openpreservation.jhove</groupId>
 			<artifactId>jhove-core</artifactId>
