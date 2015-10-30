@@ -114,7 +114,7 @@ public class BagitUtils {
     StringWriter sw = new StringWriter();
     sw.append("<metadata>");
     for (Map.Entry<String, String> entry : bagInfoTxt.entrySet()) {
-      sw.append("<field name='" + entry.getKey() + "'>" + StringEscapeUtils.escapeXml(entry.getValue())  + "</field>");
+      sw.append("<field name='" + entry.getKey() + "'>" + StringEscapeUtils.escapeXml(entry.getValue()) + "</field>");
     }
     sw.append("</metadata>");
     Files.write(metadataFile, sw.toString().getBytes("UTF-8"));

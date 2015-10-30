@@ -13,6 +13,7 @@ public final class RodaConstants {
    * Misc
    */
   public final static String ISO8601 = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+  public static final String SOLRDATEFORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
   public final static String SHA1 = "SHA-1";
   public final static String MD5 = "MD5";
 
@@ -289,5 +290,5 @@ public final class RodaConstants {
   public static final String MEMBERS_IS_USER = "isUser";
   public static final String MEMBERS_GROUPS_ALL = "groupsAll";
   public static final String MEMBERS_ROLES_ALL = "rolesAll";
-  
+
 }

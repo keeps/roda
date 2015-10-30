@@ -49,6 +49,7 @@ import org.roda.action.orchestrate.Plugin;
 import org.roda.action.orchestrate.actions.ReindexAction;
 import org.roda.action.orchestrate.actions.RemoveOrphansAction;
 import org.roda.action.orchestrate.embed.AkkaEmbeddedActionOrchestrator;
+import org.roda.action.utils.logCleaner.LogCleanerAction;
 import org.roda.action.utils.premis.V2ToV3PremisAction;
 import org.roda.action.validation.AIPValidationAction;
 import org.roda.core.common.RodaConstants;
@@ -498,6 +499,11 @@ public class RodaCoreFactory {
     getActionOrchestrator().runActionOnAllAIPs(validationAction);
   }
 
+  private static void runLogCleanAction() {
+    Plugin<AIP> logCleanAction = new LogCleanerAction();
+    getActionOrchestrator().runActionOnAllAIPs(logCleanAction);
+  }
+
   private static void runSolrQuery(List<String> args) {
     String collection = args.get(2);
     String solrQueryString = args.get(3);
@@ -528,6 +534,7 @@ public class RodaCoreFactory {
     System.err.println("java -jar x.jar characterization");
     System.err.println("java -jar x.jar updatePremis");
     System.err.println("java -jar x.jar validation");
+    System.err.println("java -jar x.jar logClean");
   }
 
   private static void printIndexMembers(List<String> args, Filter filter, Sorter sorter, Sublist sublist, Facets facets)
@@ -607,6 +614,8 @@ public class RodaCoreFactory {
         runPremisUpdateAction();
       } else if ("validation".equals(args.get(0))) {
         runValidationAction();
+      } else if ("logClean".equals(args.get(0))) {
+        runLogCleanAction();
       } else {
         printMainUsage();
       }

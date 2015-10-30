@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.nio.file.Path;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -19,7 +20,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.roda.common.RodaUtils;
 import org.roda.core.common.RodaConstants;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
@@ -185,8 +185,10 @@ public class IndexService {
     clearIndex(RodaConstants.INDEX_ACTION_LOG);
   }
 
-  public void deleteActionLog(Date from) throws SolrServerException, IOException {
-    String query = RodaConstants.LOG_DATETIME + "<" + RodaUtils.dateToString(from);
+  public void deleteActionLog(Date until) throws SolrServerException, IOException {
+    SimpleDateFormat iso8601DateFormat = new SimpleDateFormat(RodaConstants.SOLRDATEFORMAT);
+    String dateString = iso8601DateFormat.format(until);
+    String query = RodaConstants.LOG_DATETIME + ":[* TO " + dateString + "]";
     index.deleteByQuery(RodaConstants.INDEX_ACTION_LOG, query);
     index.commit(RodaConstants.INDEX_ACTION_LOG);
 
