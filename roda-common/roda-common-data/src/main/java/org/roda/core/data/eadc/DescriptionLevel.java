@@ -30,7 +30,7 @@ public class DescriptionLevel implements EadCValue, Comparable<DescriptionLevel>
    */
   // FIXME this should be removed in order to have a fully programmable
   // description levels system
-  public final static DescriptionLevel FONDS = new DescriptionLevel("fonds");
+  public static final DescriptionLevel FONDS = new DescriptionLevel("fonds");
 
   /**
    * Constructs an empty (<strong>invalid</strong>) {@link DescriptionLevel}.

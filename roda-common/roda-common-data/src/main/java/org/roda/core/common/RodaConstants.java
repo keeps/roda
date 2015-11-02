@@ -12,10 +12,10 @@ public final class RodaConstants {
   /*
    * Misc
    */
-  public final static String ISO8601 = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+  public static final String ISO8601 = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
   public static final String SOLRDATEFORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
-  public final static String SHA1 = "SHA-1";
-  public final static String MD5 = "MD5";
+  public static final String SHA1 = "SHA-1";
+  public static final String MD5 = "MD5";
 
   public enum DateGranularity {
     YEAR, MONTH, DAY, HOUR, MINUTE, SECOND, MILLISECOND

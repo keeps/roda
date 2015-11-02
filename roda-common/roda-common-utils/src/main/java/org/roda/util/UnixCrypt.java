@@ -493,7 +493,7 @@ public class UnixCrypt extends Object {
    *          The password as entered by the user (or otherwise aquired).
    * @return <B>true</B> if the password should be considered correct.
    */
-  public final static boolean matches(String encryptedPassword, String enteredPassword) {
+  public static final boolean matches(String encryptedPassword, String enteredPassword) {
     String salt = encryptedPassword.substring(0, 3);
     String newCrypt = crypt(salt, enteredPassword);
 

@@ -30,22 +30,22 @@ public class DefaultSearchParameter extends SearchParameter {
   /**
    * At least one word must appear
    */
-  public final static int MATCH_AT_LEAST_ONE_WORD = 0;
+  public static final int MATCH_AT_LEAST_ONE_WORD = 0;
 
   /**
    * The exact phrase must appear
    */
-  public final static int MATCH_EXACT_PHRASE = 1;
+  public static final int MATCH_EXACT_PHRASE = 1;
 
   /**
    * Any of the words should not appear
    */
-  public final static int MATCH_WITHOUT_WORDS = 2;
+  public static final int MATCH_WITHOUT_WORDS = 2;
 
   /**
    * All words must appear
    */
-  public final static int MATCH_ALL_WORDS = 3;
+  public static final int MATCH_ALL_WORDS = 3;
 
   private int constraint = MATCH_AT_LEAST_ONE_WORD;
   private List<String> fields = new ArrayList<String>();
