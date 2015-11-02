@@ -24,7 +24,10 @@ import org.roda.storage.StorageService;
  * 
  * @author Rui Castro
  * @author Luis Faria<lfaria@keep.p>
+ * 
+ * @deprecated use {@link org.roda.plugins.Plugin} instead
  */
+@Deprecated
 public interface Plugin<T extends Serializable> {
 
   /**

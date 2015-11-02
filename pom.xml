@@ -131,6 +131,7 @@
 				<module>roda-common/roda-common-metadata</module>
 				<module>roda-common/roda-common-utils</module>
 				<module>roda-common/roda-common-storage</module>
+				<module>roda-core/roda-plugins</module>
 				<module>roda-ui/roda-wui</module>
 			</modules>
 		</profile>

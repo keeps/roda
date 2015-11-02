@@ -97,8 +97,8 @@ public class ClassLoaderUtility {
    * @throws IllegalAccessException
    * @throws InstantiationException
    */
-  public static Object createObject(String className) throws ClassNotFoundException, InstantiationException,
-    IllegalAccessException {
+  public static Object createObject(String className)
+    throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 
     if (StringUtils.isBlank(className)) {
       throw new IllegalArgumentException("className cannot be null");
@@ -125,8 +125,8 @@ public class ClassLoaderUtility {
    * @throws IllegalAccessException
    * @throws InstantiationException
    */
-  public static Object createObject(URL[] urls, String className) throws ClassNotFoundException,
-    InstantiationException, IllegalAccessException {
+  public static Object createObject(URL[] urls, String className)
+    throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 
     if (StringUtils.isBlank(className)) {
       throw new IllegalArgumentException("className cannot be null");
@@ -155,8 +155,8 @@ public class ClassLoaderUtility {
    * @throws IllegalAccessException
    * @throws InstantiationException
    */
-  public static Object createObject(String filePath, String className) throws ClassNotFoundException,
-    InstantiationException, IllegalAccessException, IOException {
+  public static Object createObject(String filePath, String className)
+    throws ClassNotFoundException, InstantiationException, IllegalAccessException, IOException {
 
     if (StringUtils.isBlank(className)) {
       throw new IllegalArgumentException("className cannot be null");

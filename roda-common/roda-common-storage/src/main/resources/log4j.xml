@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "http://logging.apache.org/log4j/docs/api/org/apache/log4j/xml/log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+
+	<appender name="STDOUT" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%p %d (%c{1}) %m%n" />
+		</layout>
+	</appender>
+
+	<appender name="FILEOUT" class="org.apache.log4j.RollingFileAppender">
+		<param name="File" value="${roda.home}/log/roda-wui.log" />
+		<param name="MaxFileSize" value="26MB" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%p %d (%c{1}) %m%n" />
+		</layout>
+	</appender>
+
+	<logger name="org.roda.wui" additivity="false">
+		<!--
+			Client-side logging must be set in
+			org.roda.wui.common.client.GWTLogger and is also influenced
+			by this logger level
+		-->
+		<level value="INFO" />
+		<appender-ref ref="FILEOUT" />
+	</logger>
+	
+	<logger name="org.roda.wui.common.server" additivity="false">
+      <level value="DEBUG" />
+      <appender-ref ref="FILEOUT" />
+   </logger>
+   
+	<logger name="org.roda.wui.common" additivity="false">
+      <level value="DEBUG" />
+      <appender-ref ref="FILEOUT" />
+   </logger>
+
+   <logger name="org.roda.wui.filter" additivity="false">
+      <level value="DEBUG" />
+      <appender-ref ref="FILEOUT" />
+   </logger>
+
+	<logger name="org.roda.ingest" additivity="false">
+		<level value="INFO" />
+		<appender-ref ref="FILEOUT" />
+	</logger>
+
+	<logger name="org.roda.disseminators" additivity="false">
+		<level value="INFO" />
+		<appender-ref ref="FILEOUT" />
+		<!--
+			Comment next line when exporting to tomcat to avoid overflooding
+			catalina.out
+		-->
+		<!--<appender-ref ref="STDOUT" />-->
+	</logger>
+
+	<logger name="org.roda.plugins" additivity="false">
+		<level value="DEBUG" />
+		<appender-ref ref="FILEOUT" />
+	</logger>
+
+	<logger name="org.roda" additivity="false">
+		<level value="DEBUG" />
+		<appender-ref ref="FILEOUT" />
+	</logger>
+	
+	<root>
+		<level value="WARN" />
+		<appender-ref ref="FILEOUT" />
+	</root>
+
+</log4j:configuration>

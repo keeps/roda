@@ -126,9 +126,10 @@ public class PremisUtils {
     return premisV2;
   }
 
-  public static Binary updatePremisToV3IfNeeded(Binary binary, Path configBasePath) throws IOException, SAXException, StorageServiceException, TransformerException {
+  public static Binary updatePremisToV3IfNeeded(Binary binary, Path configBasePath)
+    throws IOException, SAXException, StorageServiceException, TransformerException {
     if (isPremisV2(binary, configBasePath)) {
-      logger.debug("Binary "+binary.getStoragePath().asString()+" is Premis V2... Needs updated...");
+      logger.debug("Binary " + binary.getStoragePath().asString() + " is Premis V2... Needs updated...");
       return updatePremis(binary, configBasePath);
     } else {
       return binary;
@@ -136,7 +137,8 @@ public class PremisUtils {
 
   }
 
-  private static Binary updatePremis(Binary binary, Path configBasePath) throws IOException, TransformerException, StorageServiceException {
+  private static Binary updatePremis(Binary binary, Path configBasePath)
+    throws IOException, TransformerException, StorageServiceException {
     InputStream transformerStream = null;
     InputStream bais = null;
 

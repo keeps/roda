@@ -74,6 +74,7 @@ public class LogCleanerAction implements Plugin<AIP> {
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
     Calendar cal = Calendar.getInstance();
+    // FIXME this value (6) should be a parameter
     cal.add(Calendar.MONTH, -6);
     Date until = cal.getTime();
     try {

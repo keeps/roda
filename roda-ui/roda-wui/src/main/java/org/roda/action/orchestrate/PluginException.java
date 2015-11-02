@@ -15,7 +15,9 @@ import org.roda.core.data.ReportItem;
  * Thrown to indicate that some went wrong inside a {@link Plugin}.
  * 
  * @author Rui Castro
+ * @deprecated use {@link org.roda.plugins.PluginException} instead
  */
+@Deprecated
 public class PluginException extends RODAException {
   private static final long serialVersionUID = -4913064017146606623L;
 

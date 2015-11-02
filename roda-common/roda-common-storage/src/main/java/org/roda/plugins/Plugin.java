@@ -54,7 +54,7 @@ public interface Plugin<T extends Serializable> {
    * @return a <code>String</code> with the version number for this
    *         {@link Plugin}.
    */
-  public Float getVersion();
+  public String getVersion();
 
   /**
    * Returns description of this {@link Plugin}.

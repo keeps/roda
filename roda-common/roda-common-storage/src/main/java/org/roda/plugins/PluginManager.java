@@ -7,6 +7,7 @@ import java.net.URLClassLoader;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Date;
@@ -21,7 +22,6 @@ import java.util.jar.Manifest;
 
 import org.apache.log4j.Logger;
 import org.roda.core.data.PluginInfo;
-import org.roda.core.data.PluginParameter;
 import org.roda.util.ClassLoaderUtility;
 
 /**
@@ -53,8 +53,8 @@ public class PluginManager {
    * 
    * @throws PluginManagerException
    */
-  public synchronized static PluginManager getDefaultPluginManager(Path rodaHomePath, Path rodaConfigPath,
-    Path rodaPluginsPath) throws PluginManagerException {
+  public synchronized static PluginManager getDefaultPluginManager(Path rodaConfigPath, Path rodaPluginsPath)
+    throws PluginManagerException {
     if (defaultPluginManager == null) {
       RODA_CONFIG_PATH = rodaConfigPath;
       RODA_PLUGINS_PATH = rodaPluginsPath;
@@ -68,8 +68,8 @@ public class PluginManager {
    * 
    * @return a {@link List} of {@link Plugin}s.
    */
-  public List<Plugin> getPlugins() {
-    List<Plugin> plugins = new ArrayList<Plugin>();
+  public List<Plugin<?>> getPlugins() {
+    List<Plugin<?>> plugins = new ArrayList<Plugin<?>>();
 
     for (JarPlugin jarPlugin : this.jarPluginCache.values()) {
       if (jarPlugin.plugin != null) {
@@ -87,7 +87,7 @@ public class PluginManager {
   public List<PluginInfo> getPluginsInfo() {
     List<PluginInfo> pluginsInfo = new ArrayList<PluginInfo>();
 
-    for (Plugin plugin : getPlugins()) {
+    for (Plugin<?> plugin : getPlugins()) {
       pluginsInfo.add(getPluginInfo(plugin));
     }
 
@@ -120,7 +120,7 @@ public class PluginManager {
    * @return {@link PluginInfo} or <code>null</code>.
    */
   public PluginInfo getPluginInfo(String pluginID) {
-    Plugin plugin = getPlugin(pluginID);
+    Plugin<?> plugin = getPlugin(pluginID);
     if (plugin != null) {
       return getPluginInfo(plugin);
     } else {
@@ -161,9 +161,8 @@ public class PluginManager {
   }
 
   private <T extends Serializable> PluginInfo getPluginInfo(Plugin<T> plugin) {
-    List<PluginParameter> parameters = plugin.getParameters();
     return new PluginInfo(plugin.getClass().getName(), plugin.getName(), plugin.getVersion(), plugin.getDescription(),
-      parameters.toArray(new PluginParameter[parameters.size()]));
+      plugin.getParameters());
   }
 
   private void loadPlugins() {
@@ -192,7 +191,7 @@ public class PluginManager {
 
           logger.debug(jarFile.getFileName() + " is not loaded or modification dates differ. Inspecting Jar...");
 
-          Plugin plugin = loadPlugin(jarFile, jarURLs);
+          Plugin<?> plugin = loadPlugin(jarFile, jarURLs);
 
           try {
             if (plugin != null) {
@@ -225,10 +224,10 @@ public class PluginManager {
 
   }
 
-  private Plugin loadPlugin(Path jarFile, List<URL> jarURLs) {
+  private Plugin<?> loadPlugin(Path jarFile, List<URL> jarURLs) {
 
     JarFile jar = null;
-    Plugin plugin = null;
+    Plugin<?> plugin = null;
 
     try {
 
@@ -255,7 +254,7 @@ public class PluginManager {
 
           if (Plugin.class.isAssignableFrom(object.getClass())) {
 
-            plugin = (Plugin) object;
+            plugin = (Plugin<?>) object;
 
           } else {
             logger.error(pluginClassName + " is not a valid Plugin");
@@ -287,7 +286,7 @@ public class PluginManager {
     return plugin;
   }
 
-  class SearchPluginsTask extends TimerTask {
+  protected class SearchPluginsTask extends TimerTask {
 
     public void run() {
 
@@ -299,24 +298,44 @@ public class PluginManager {
 
       for (Path jarFile : jarPluginCache.keySet()) {
 
-        Plugin plugin = jarPluginCache.get(jarFile).plugin;
+        Plugin<?> plugin = jarPluginCache.get(jarFile).plugin;
 
         if (plugin != null) {
           logger.debug("- " + jarFile.getFileName());
-          logger.debug("--- " + plugin.getName() + "-" + plugin.getVersion());
+          logger.debug("--- " + plugin.getName() + " - " + plugin.getVersion() + " - " + plugin.getDescription());
         }
       }
     }
   }
 
-  class JarPlugin {
+  protected class JarPlugin {
 
-    Plugin plugin = null;
-    long lastModified = 0;
+    private Plugin<?> plugin = null;
+    private long lastModified = 0;
 
-    JarPlugin(Plugin plugin, long lastModified) {
+    JarPlugin(Plugin<?> plugin, long lastModified) {
       this.plugin = plugin;
       this.lastModified = lastModified;
+    }
+  }
+
+  // FIXME delete this
+  public static void main(String[] args) {
+    Path rodaHomePath = Paths.get("/home/hsilva/.roda/");
+    Path rodaConfigPath = rodaHomePath.resolve("config");
+    Path rodaPluginsPath = rodaConfigPath.resolve("plugins");
+    try {
+      PluginManager defaultPluginManager = PluginManager.getDefaultPluginManager(rodaConfigPath, rodaPluginsPath);
+      Thread.sleep(3 * 1000);
+      Plugin<?> plugin = defaultPluginManager.getPlugin("org.roda.action.fixity.FixityAction");
+      plugin.execute(null, null, null, null);
+      Thread.sleep(60 * 1000);
+    } catch (PluginManagerException e) {
+      e.printStackTrace();
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    } catch (PluginException e) {
+      e.printStackTrace();
     }
   }
 

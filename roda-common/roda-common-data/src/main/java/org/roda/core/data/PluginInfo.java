@@ -9,7 +9,6 @@ package org.roda.core.data;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -27,7 +26,7 @@ public class PluginInfo implements Serializable {
 
   private String name = null;
 
-  private float version = 0f;
+  private String version = null;
 
   private String description = null;
 
@@ -46,8 +45,8 @@ public class PluginInfo implements Serializable {
    *          the {@link PluginInfo} to clone.
    */
   public PluginInfo(PluginInfo pluginInfo) {
-    this(pluginInfo.getId(), pluginInfo.getName(), pluginInfo.getVersion(), pluginInfo.getDescription(), pluginInfo
-      .getParameters());
+    this(pluginInfo.getId(), pluginInfo.getName(), pluginInfo.getVersion(), pluginInfo.getDescription(),
+      pluginInfo.getParameters());
   }
 
   /**
@@ -59,7 +58,7 @@ public class PluginInfo implements Serializable {
    * @param description
    * @param parameters
    */
-  public PluginInfo(String id, String name, float version, String description, PluginParameter[] parameters) {
+  public PluginInfo(String id, String name, String version, String description, List<PluginParameter> parameters) {
     setId(id);
     setName(name);
     setVersion(version);
@@ -83,12 +82,6 @@ public class PluginInfo implements Serializable {
    * @see Object#toString()
    */
   public String toString() {
-
-    List<PluginParameter> parameters = null;
-
-    if (getParameters() != null) {
-      parameters = Arrays.asList(getParameters());
-    }
 
     return "PluginInfo(" + "id=" + getId() + ", name=" + getName() + ", version=" + getVersion() + ", description="
       + getDescription() + ", parameters=" + parameters + ")";
@@ -127,7 +120,7 @@ public class PluginInfo implements Serializable {
   /**
    * @return the version
    */
-  public float getVersion() {
+  public String getVersion() {
     return version;
   }
 
@@ -135,7 +128,7 @@ public class PluginInfo implements Serializable {
    * @param version
    *          the version to set
    */
-  public void setVersion(float version) {
+  public void setVersion(String version) {
     this.version = version;
   }
 
@@ -157,18 +150,18 @@ public class PluginInfo implements Serializable {
   /**
    * @return the parameters
    */
-  public PluginParameter[] getParameters() {
-    return parameters.toArray(new PluginParameter[parameters.size()]);
+  public List<PluginParameter> getParameters() {
+    return parameters;
   }
 
   /**
    * @param parameters
    *          the parameters to set
    */
-  public void setParameters(PluginParameter[] parameters) {
+  public void setParameters(List<PluginParameter> parameters) {
     this.parameters.clear();
     if (parameters != null) {
-      this.parameters.addAll(Arrays.asList(parameters));
+      this.parameters.addAll(parameters);
     }
   }
 

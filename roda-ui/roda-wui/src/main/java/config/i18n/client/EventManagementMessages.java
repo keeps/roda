@@ -78,6 +78,6 @@ public interface EventManagementMessages extends Messages {
 
   /* Plugin Panel */
   @DefaultMessage("{0} (version {1})")
-  public String pluginLabel(String pluginName, float pluginVersion);
+  public String pluginLabel(String pluginName, String pluginVersion);
 
 }
