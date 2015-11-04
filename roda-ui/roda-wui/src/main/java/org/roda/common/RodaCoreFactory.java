@@ -42,6 +42,8 @@ import org.roda.action.ingest.bagit.BagitToAIPAction;
 import org.roda.action.ingest.deepCharacterization.FITS.FITSAction;
 import org.roda.action.ingest.deepCharacterization.JHOVE.JHOVEAction;
 import org.roda.action.ingest.fastCharacterization.FastCharacterizationAction;
+import org.roda.action.ingest.fastCharacterization.ExifTool.ExifToolAction;
+import org.roda.action.ingest.fastCharacterization.MediaInfo.MediaInfoAction;
 import org.roda.action.ingest.fulltext.FullTextAction;
 import org.roda.action.ingest.premisSkeleton.PremisSkeletonAction;
 import org.roda.action.orchestrate.ActionOrchestrator;
@@ -503,6 +505,16 @@ public class RodaCoreFactory {
     Plugin<AIP> logCleanAction = new LogCleanerAction();
     getActionOrchestrator().runActionOnAllAIPs(logCleanAction);
   }
+  
+  private static void runExifToolAction() {
+    Plugin<AIP> exifToolAction = new ExifToolAction();
+    getActionOrchestrator().runActionOnAllAIPs(exifToolAction);
+  }
+  
+  private static void runMediaInfoAction() {
+    Plugin<AIP> mediaInfoAction = new MediaInfoAction();
+    getActionOrchestrator().runActionOnAllAIPs(mediaInfoAction);
+  }
 
   private static void runSolrQuery(List<String> args) {
     String collection = args.get(2);
@@ -535,6 +547,8 @@ public class RodaCoreFactory {
     System.err.println("java -jar x.jar updatePremis");
     System.err.println("java -jar x.jar validation");
     System.err.println("java -jar x.jar logClean");
+    System.err.println("java -jar x.jar exifTool");
+    System.err.println("java -jar x.jar mediaInfo");
   }
 
   private static void printIndexMembers(List<String> args, Filter filter, Sorter sorter, Sublist sublist, Facets facets)
@@ -616,6 +630,10 @@ public class RodaCoreFactory {
         runValidationAction();
       } else if ("logClean".equals(args.get(0))) {
         runLogCleanAction();
+      } else if ("exifTool".equals(args.get(0))) {
+        runExifToolAction();
+      } else if ("mediaInfo".equals(args.get(0))) {
+        runMediaInfoAction();
       } else {
         printMainUsage();
       }

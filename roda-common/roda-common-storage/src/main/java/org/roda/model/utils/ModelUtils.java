@@ -595,8 +595,8 @@ public final class ModelUtils {
       RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_OTHER, type);
   }
 
-  public static StoragePath getToolRepresentationMetadataDirectory(String aipID, String representationId,
-    String fileName, String type) throws StorageServiceException {
+  public static StoragePath getToolRepresentationMetadataDirectory(String aipID, String representationId, String type)
+    throws StorageServiceException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipID,
       RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_OTHER, type, representationId);
   }

@@ -393,12 +393,10 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void otherMetadataCreated(OtherMetadata otherMetadataBinary) {
-    /// re-index whole AIP
     try {
-      aipUpdated(model.retrieveAIP(otherMetadataBinary.getAipId()));
+      indexOtherMetadata(model.retrieveAIP(otherMetadataBinary.getAipId()));
     } catch (ModelServiceException e) {
       LOGGER.error("Error when other metadata created on retrieving the full AIP", e);
     }
-
   }
 }

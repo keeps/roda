@@ -206,7 +206,7 @@ public class PluginPanel {
 
   protected void updateParameters() {
     pluginParameters.clear();
-    PluginParameter[] parameters = selectedPlugin.getParameters();
+    List<PluginParameter> parameters = selectedPlugin.getParameters();
     int row = 0;
     for (final PluginParameter parameter : parameters) {
       if (!parameter.isReadonly()) {

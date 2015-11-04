@@ -1650,23 +1650,23 @@ public class ModelService extends ModelObservable {
   public PreservationMetadata updatePreservationMetadata(String aipId, String representationId,
     String preservationMetadataId, Binary binary, boolean payloadOnly) throws ModelServiceException {
     PreservationMetadata preservationMetadataBinary;
-    
+
     try {
       String type = ModelUtils.getPreservationType(binary);
       StoragePath binaryPath = ModelUtils.getPreservationFilePath(aipId, representationId, preservationMetadataId);
-      if(payloadOnly){
+      if (payloadOnly) {
         storage.updateBinaryContent(binaryPath, binary.getContent(), false, true);
-        preservationMetadataBinary = new PreservationMetadata(preservationMetadataId, aipId, representationId, binaryPath,
-          type);
-      }else{
-        
+        preservationMetadataBinary = new PreservationMetadata(preservationMetadataId, aipId, representationId,
+          binaryPath, type);
+      } else {
+
         boolean asReference = false;
         boolean createIfNotExists = false;
         storage.updateBinaryContent(binaryPath, binary.getContent(), asReference, createIfNotExists);
         Map<String, Set<String>> binaryMetadata = binary.getMetadata();
         storage.updateMetadata(binaryPath, binaryMetadata, true);
-        preservationMetadataBinary = new PreservationMetadata(preservationMetadataId, aipId, representationId, binaryPath,
-          type);
+        preservationMetadataBinary = new PreservationMetadata(preservationMetadataId, aipId, representationId,
+          binaryPath, type);
       }
       notifyPreservationMetadataUpdated(preservationMetadataBinary);
     } catch (StorageServiceException e) {
@@ -1873,51 +1873,55 @@ public class ModelService extends ModelObservable {
   public OtherMetadata createOtherMetadata(String aipID, String representationId, String fileName, String type,
     Binary binary) throws ModelServiceException {
     OtherMetadata otherMetadataBinary = null;
-
     try {
-      StoragePath otherMetadataPath = ModelUtils.getOtherMetadataDirectory(aipID, fileName, type);
-      storage.createDirectory(otherMetadataPath, new HashMap<String, Set<String>>());
-    } catch (StorageServiceException e) {
-      if (e.getCode() != ServiceException.ALREADY_EXISTS) {
-        throw new ModelServiceException("Error creating other metadata directory in storage",
-          ModelServiceException.INTERNAL_SERVER_ERROR, e);
+      StoragePath otherMetadataPath = ModelUtils.getToolRepresentationMetadataDirectory(aipID, representationId, type);
+      storage.getDirectory(otherMetadataPath);
+      LOGGER.debug("Tool directory already exists...");
+    } catch (StorageServiceException sse) {
+      if (sse.getCode() == StorageServiceException.NOT_FOUND) {
+        LOGGER.debug("Tool directory doesn't exist... Creating...");
+        try {
+          StoragePath otherMetadataPath = ModelUtils.getOtherMetadataDirectory(aipID, fileName, type);
+          storage.createDirectory(otherMetadataPath, new HashMap<String, Set<String>>());
+        } catch (StorageServiceException e) {
+          if (e.getCode() != ServiceException.ALREADY_EXISTS) {
+            throw new ModelServiceException("Error creating other metadata directory in storage",
+              ModelServiceException.INTERNAL_SERVER_ERROR, e);
+          }
+        }
+        try {
+          StoragePath otherMetadataPath = ModelUtils.getToolMetadataDirectory(aipID, fileName, type);
+          storage.createDirectory(otherMetadataPath, new HashMap<String, Set<String>>());
+        } catch (StorageServiceException e) {
+          if (e.getCode() != ServiceException.ALREADY_EXISTS) {
+            throw new ModelServiceException("Error creating tika metadata directory in storage",
+              ModelServiceException.INTERNAL_SERVER_ERROR, e);
+          }
+        }
+        try {
+          StoragePath otherMetadataPath = ModelUtils.getToolRepresentationMetadataDirectory(aipID, representationId,
+            type);
+          storage.createDirectory(otherMetadataPath, new HashMap<String, Set<String>>());
+        } catch (StorageServiceException e) {
+          if (e.getCode() != ServiceException.ALREADY_EXISTS) {
+            throw new ModelServiceException("Error creating tika metadata directory in storage",
+              ModelServiceException.INTERNAL_SERVER_ERROR, e);
+          }
+        }
       }
     }
-    try {
-      StoragePath otherMetadataPath = ModelUtils.getToolMetadataDirectory(aipID, fileName, type);
-      storage.createDirectory(otherMetadataPath, new HashMap<String, Set<String>>());
-    } catch (StorageServiceException e) {
-      if (e.getCode() != ServiceException.ALREADY_EXISTS) {
-        throw new ModelServiceException("Error creating tika metadata directory in storage",
-          ModelServiceException.INTERNAL_SERVER_ERROR, e);
-      }
-    }
-    try {
-      StoragePath otherMetadataPath = ModelUtils.getToolRepresentationMetadataDirectory(aipID, representationId,
-        fileName, type);
-      storage.createDirectory(otherMetadataPath, new HashMap<String, Set<String>>());
-    } catch (StorageServiceException e) {
-      if (e.getCode() != ServiceException.ALREADY_EXISTS) {
-        throw new ModelServiceException("Error creating tika metadata directory in storage",
-          ModelServiceException.INTERNAL_SERVER_ERROR, e);
-      }
-    }
-
     try {
       StoragePath binaryPath = ModelUtils.getToolMetadataPath(aipID, representationId, fileName, type);
       boolean asReference = false;
       boolean createIfNotExists = true;
-      Map<String, Set<String>> binaryMetadata = binary.getMetadata();
       storage.updateBinaryContent(binaryPath, binary.getContent(), asReference, createIfNotExists);
-      storage.updateMetadata(binaryPath, binaryMetadata, true);
       otherMetadataBinary = new OtherMetadata(type + "_" + aipID + "_" + representationId + "_" + fileName, aipID, type,
         binaryPath);
       notifyOtherMetadataCreated(otherMetadataBinary);
-    } catch (StorageServiceException e) {
+    } catch (StorageServiceException e){
       throw new ModelServiceException("Error creating other metadata binary in storage",
         ModelServiceException.INTERNAL_SERVER_ERROR, e);
     }
-
     return otherMetadataBinary;
 
   }
