@@ -45,6 +45,7 @@ import org.roda.action.ingest.fastCharacterization.FastCharacterizationAction;
 import org.roda.action.ingest.fastCharacterization.ExifTool.ExifToolAction;
 import org.roda.action.ingest.fastCharacterization.FFProbe.FFProbeAction;
 import org.roda.action.ingest.fastCharacterization.MediaInfo.MediaInfoAction;
+import org.roda.action.ingest.fastCharacterization.jpylyzer.JpylyzerAction;
 import org.roda.action.ingest.fulltext.FullTextAction;
 import org.roda.action.ingest.premisSkeleton.PremisSkeletonAction;
 import org.roda.action.orchestrate.ActionOrchestrator;
@@ -522,6 +523,11 @@ public class RodaCoreFactory {
     getActionOrchestrator().runActionOnAllAIPs(ffProbeAction);
   }
 
+  private static void runJpylyzerAction() {
+    Plugin<AIP> jpylyzerAction = new JpylyzerAction();
+    getActionOrchestrator().runActionOnAllAIPs(jpylyzerAction);
+  }
+
   private static void runSolrQuery(List<String> args) {
     String collection = args.get(2);
     String solrQueryString = args.get(3);
@@ -556,6 +562,7 @@ public class RodaCoreFactory {
     System.err.println("java -jar x.jar exifTool");
     System.err.println("java -jar x.jar mediaInfo");
     System.err.println("java -jar x.jar ffprobe");
+    System.err.println("java -jar x.jar jpylyzer");
   }
 
   private static void printIndexMembers(List<String> args, Filter filter, Sorter sorter, Sublist sublist, Facets facets)
@@ -643,6 +650,8 @@ public class RodaCoreFactory {
         runMediaInfoAction();
       } else if ("ffprobe".equals(args.get(0))) {
         runFFProbeAction();
+      } else if ("jpylyzer".equals(args.get(0))) {
+        runJpylyzerAction();
       } else {
         printMainUsage();
       }
