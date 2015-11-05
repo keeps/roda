@@ -130,14 +130,14 @@ public class PremisUtils {
     throws IOException, SAXException, StorageServiceException, TransformerException {
     if (isPremisV2(binary, configBasePath)) {
       logger.debug("Binary " + binary.getStoragePath().asString() + " is Premis V2... Needs updated...");
-      return updatePremis(binary, configBasePath);
+      return updatePremisV2toV3(binary, configBasePath);
     } else {
       return binary;
     }
 
   }
 
-  private static Binary updatePremis(Binary binary, Path configBasePath)
+  private static Binary updatePremisV2toV3(Binary binary, Path configBasePath)
     throws IOException, TransformerException, StorageServiceException {
     InputStream transformerStream = null;
     InputStream bais = null;
@@ -176,6 +176,13 @@ public class PremisUtils {
         }
       }
     }
+  }
+
+  public static RepresentationFilePreservationObject updatePremisFile(RepresentationFilePreservationObject premisFile,
+    String toolName, Binary toolOutput) {
+    // TODO Update RepresentationFilePreservationObject with tool output
+
+    return premisFile;
   }
 
   private static class RodaErrorHandler extends DefaultHandler {

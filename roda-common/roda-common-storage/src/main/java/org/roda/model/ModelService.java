@@ -1881,7 +1881,7 @@ public class ModelService extends ModelObservable {
       if (sse.getCode() == StorageServiceException.NOT_FOUND) {
         LOGGER.debug("Tool directory doesn't exist... Creating...");
         try {
-          StoragePath otherMetadataPath = ModelUtils.getOtherMetadataDirectory(aipID, fileName, type);
+          StoragePath otherMetadataPath = ModelUtils.getOtherMetadataDirectory(aipID);
           storage.createDirectory(otherMetadataPath, new HashMap<String, Set<String>>());
         } catch (StorageServiceException e) {
           if (e.getCode() != ServiceException.ALREADY_EXISTS) {
@@ -1890,7 +1890,7 @@ public class ModelService extends ModelObservable {
           }
         }
         try {
-          StoragePath otherMetadataPath = ModelUtils.getToolMetadataDirectory(aipID, fileName, type);
+          StoragePath otherMetadataPath = ModelUtils.getToolMetadataDirectory(aipID, type);
           storage.createDirectory(otherMetadataPath, new HashMap<String, Set<String>>());
         } catch (StorageServiceException e) {
           if (e.getCode() != ServiceException.ALREADY_EXISTS) {
@@ -1918,7 +1918,7 @@ public class ModelService extends ModelObservable {
       otherMetadataBinary = new OtherMetadata(type + "_" + aipID + "_" + representationId + "_" + fileName, aipID, type,
         binaryPath);
       notifyOtherMetadataCreated(otherMetadataBinary);
-    } catch (StorageServiceException e){
+    } catch (StorageServiceException e) {
       throw new ModelServiceException("Error creating other metadata binary in storage",
         ModelServiceException.INTERNAL_SERVER_ERROR, e);
     }

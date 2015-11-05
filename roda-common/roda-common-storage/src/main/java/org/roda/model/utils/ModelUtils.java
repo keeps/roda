@@ -583,14 +583,12 @@ public final class ModelUtils {
 
   }
 
-  public static StoragePath getOtherMetadataDirectory(String aipID, String fileName, String type)
-    throws StorageServiceException {
+  public static StoragePath getOtherMetadataDirectory(String aipID) throws StorageServiceException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipID,
       RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_OTHER);
   }
 
-  public static StoragePath getToolMetadataDirectory(String aipID, String fileName, String type)
-    throws StorageServiceException {
+  public static StoragePath getToolMetadataDirectory(String aipID, String type) throws StorageServiceException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipID,
       RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_OTHER, type);
   }

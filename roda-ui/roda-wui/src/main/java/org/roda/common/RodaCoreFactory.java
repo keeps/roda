@@ -39,15 +39,16 @@ import org.roda.action.antivirus.AntivirusAction;
 import org.roda.action.characterization.CharacterizationAction;
 import org.roda.action.fixity.FixityAction;
 import org.roda.action.ingest.bagit.BagitToAIPAction;
-import org.roda.action.ingest.deepCharacterization.FITS.FITSAction;
-import org.roda.action.ingest.deepCharacterization.JHOVE.JHOVEAction;
-import org.roda.action.ingest.fastCharacterization.FastCharacterizationAction;
-import org.roda.action.ingest.fastCharacterization.ExifTool.ExifToolAction;
-import org.roda.action.ingest.fastCharacterization.FFProbe.FFProbeAction;
-import org.roda.action.ingest.fastCharacterization.MediaInfo.MediaInfoAction;
-import org.roda.action.ingest.fastCharacterization.jpylyzer.JpylyzerAction;
+import org.roda.action.ingest.characterization.Droid.DroidAction;
+import org.roda.action.ingest.characterization.ExifTool.ExifToolAction;
+import org.roda.action.ingest.characterization.FFProbe.FFProbeAction;
+import org.roda.action.ingest.characterization.FITS.FITSAction;
+import org.roda.action.ingest.characterization.JHOVE.JHOVEAction;
+import org.roda.action.ingest.characterization.MediaInfo.MediaInfoAction;
+import org.roda.action.ingest.characterization.jpylyzer.JpylyzerAction;
 import org.roda.action.ingest.fulltext.FullTextAction;
-import org.roda.action.ingest.premisSkeleton.PremisSkeletonAction;
+import org.roda.action.ingest.premis.PremisUpdateFromToolsAction.PremisUpdateFromToolsAction;
+import org.roda.action.ingest.premis.skeleton.PremisSkeletonAction;
 import org.roda.action.orchestrate.ActionOrchestrator;
 import org.roda.action.orchestrate.Plugin;
 import org.roda.action.orchestrate.actions.ReindexAction;
@@ -450,9 +451,9 @@ public class RodaCoreFactory {
     getActionOrchestrator().runActionOnAllAIPs(antivirusAction);
   }
 
-  private static void runFastCharacterizationAction() {
-    Plugin<AIP> fastCharacterizationAction = new FastCharacterizationAction();
-    getActionOrchestrator().runActionOnAllAIPs(fastCharacterizationAction);
+  private static void runDroidAction() {
+    Plugin<AIP> droidAction = new DroidAction();
+    getActionOrchestrator().runActionOnAllAIPs(droidAction);
   }
 
   private static void runFulltextAction() {
@@ -493,7 +494,7 @@ public class RodaCoreFactory {
     getActionOrchestrator().runActionOnAllAIPs(premisSkeletonAction);
   }
 
-  private static void runPremisUpdateAction() {
+  private static void runPremisV2toV3Action() {
     Plugin<AIP> premisUpdateAction = new V2ToV3PremisAction();
     getActionOrchestrator().runActionOnAllAIPs(premisUpdateAction);
   }
@@ -528,6 +529,11 @@ public class RodaCoreFactory {
     getActionOrchestrator().runActionOnAllAIPs(jpylyzerAction);
   }
 
+  private static void runPremisUpdateAction() {
+    Plugin<AIP> jpylyzerAction = new PremisUpdateFromToolsAction();
+    getActionOrchestrator().runActionOnAllAIPs(jpylyzerAction);
+  }
+
   private static void runSolrQuery(List<String> args) {
     String collection = args.get(2);
     String solrQueryString = args.get(3);
@@ -551,18 +557,19 @@ public class RodaCoreFactory {
     System.err.println("java -jar x.jar fixity");
     System.err.println("java -jar x.jar antivirus");
     System.err.println("java -jar x.jar premisskeleton");
-    System.err.println("java -jar x.jar fastcharacterization");
+    System.err.println("java -jar x.jar droid");
     System.err.println("java -jar x.jar fulltext");
     System.err.println("java -jar x.jar jhove");
     System.err.println("java -jar x.jar fits");
     System.err.println("java -jar x.jar characterization");
-    System.err.println("java -jar x.jar updatePremis");
+    System.err.println("java -jar x.jar v2tov3");
     System.err.println("java -jar x.jar validation");
     System.err.println("java -jar x.jar logClean");
     System.err.println("java -jar x.jar exifTool");
     System.err.println("java -jar x.jar mediaInfo");
     System.err.println("java -jar x.jar ffprobe");
     System.err.println("java -jar x.jar jpylyzer");
+    System.err.println("java -jar x.jar premisupdate");
   }
 
   private static void printIndexMembers(List<String> args, Filter filter, Sorter sorter, Sublist sublist, Facets facets)
@@ -620,8 +627,8 @@ public class RodaCoreFactory {
         runAntivirusAction();
       } else if ("premisskeleton".equals(args.get(0))) {
         runPremisSkeletonAction();
-      } else if ("fastcharacterization".equals(args.get(0))) {
-        runFastCharacterizationAction();
+      } else if ("droid".equals(args.get(0))) {
+        runDroidAction();
       } else if ("fulltext".equals(args.get(0))) {
         runFulltextAction();
       } else if ("jhove".equals(args.get(0))) {
@@ -638,8 +645,8 @@ public class RodaCoreFactory {
         printPreservationFiles(filter, null, new Sublist(0, 10000), null);
       } else if ("characterization".equals(args.get(0))) {
         runCharacterizationAction();
-      } else if ("updatePremis".equals(args.get(0))) {
-        runPremisUpdateAction();
+      } else if ("v2tov3".equals(args.get(0))) {
+        runPremisV2toV3Action();
       } else if ("validation".equals(args.get(0))) {
         runValidationAction();
       } else if ("logClean".equals(args.get(0))) {
@@ -652,6 +659,8 @@ public class RodaCoreFactory {
         runFFProbeAction();
       } else if ("jpylyzer".equals(args.get(0))) {
         runJpylyzerAction();
+      } else if ("premisupdate".equals(args.get(0))) {
+        runPremisUpdateAction();
       } else {
         printMainUsage();
       }
