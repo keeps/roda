@@ -8,6 +8,7 @@
 package org.roda.action.ingest.deepCharacterization.FITS;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,13 +25,15 @@ import org.roda.core.data.Report;
 import org.roda.core.data.v2.Representation;
 import org.roda.index.IndexService;
 import org.roda.model.AIP;
-import org.roda.model.File;
 import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
+import org.roda.model.utils.ModelUtils;
 import org.roda.storage.Binary;
+import org.roda.storage.StoragePath;
 import org.roda.storage.StorageService;
 import org.roda.storage.StorageServiceException;
 import org.roda.storage.fs.FSUtils;
+import org.roda.storage.fs.FileStorageService;
 
 import edu.harvard.hul.ois.fits.exceptions.FitsException;
 
@@ -85,27 +88,48 @@ public class FITSAction implements Plugin<AIP> {
         try {
           for (String representationID : aip.getRepresentationIds()) {
             LOGGER.debug("Processing representation " + representationID + " of AIP " + aip.getId());
+
+            /*
+             * Representation representation =
+             * model.retrieveRepresentation(aip.getId(), representationID); for
+             * (String fileID : representation.getFileIds()) { LOGGER.debug(
+             * "Processing file " + fileID + " of representation " +
+             * representationID + " from AIP " + aip.getId()); File file =
+             * model.retrieveFile(aip.getId(), representationID, fileID); Binary
+             * binary = storage.getBinary(file.getStoragePath());
+             * 
+             * Path fitsResult = FITSUtils.runFits(file, binary,
+             * getParameterValues()); Binary resource = (Binary)
+             * FSUtils.convertPathToResource(fitsResult.getParent(),
+             * fitsResult); model.createOtherMetadata(aip.getId(),
+             * representationID, file.getStoragePath().getName() + ".xml",
+             * "FITS", resource); FSUtils.deletePath(fitsResult);
+             * 
+             * }
+             */
+            Path data = Files.createTempDirectory("data");
+            Path output = Files.createTempDirectory("output");
+            StorageService tempStorage = new FileStorageService(data);
+            StoragePath representationPath = ModelUtils.getRepresentationPath(aip.getId(), representationID);
+            tempStorage.copy(storage, representationPath, representationPath);
+            FITSUtils.runFITSOnPath(data.resolve(representationPath.asString()), output);
             Representation representation = model.retrieveRepresentation(aip.getId(), representationID);
             for (String fileID : representation.getFileIds()) {
-              LOGGER.debug(
-                "Processing file " + fileID + " of representation " + representationID + " from AIP " + aip.getId());
-              File file = model.retrieveFile(aip.getId(), representationID, fileID);
-              Binary binary = storage.getBinary(file.getStoragePath());
-
-              Path fitsResult = FITSUtils.runFits(file, binary, getParameterValues());
-              Binary resource = (Binary) FSUtils.convertPathToResource(fitsResult.getParent(), fitsResult);
-              model.createOtherMetadata(aip.getId(), representationID, file.getStoragePath().getName() + ".xml", "FITS",
-                resource);
-              FSUtils.deletePath(fitsResult);
-
+              Path p = output.resolve(fileID + ".fits.xml");
+              Binary resource = (Binary) FSUtils.convertPathToResource(p.getParent(), p);
+              LOGGER.debug("Creating other metadata (AIP: " + aip.getId() + ", REPRESENTATION: " + representationID
+                + ", FILE: " + fileID + ")");
+              model.createOtherMetadata(aip.getId(), representationID, fileID + ".xml", "FITS", resource);
             }
+            FSUtils.deletePath(data);
+            FSUtils.deletePath(output);
           }
-        } catch (ModelServiceException mse) {
-          LOGGER.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage());
         } catch (StorageServiceException sse) {
           LOGGER.error("Error processing AIP " + aip.getId() + ": " + sse.getMessage());
         } catch (FitsException fe) {
           LOGGER.error("Error processing AIP " + aip.getId() + ": " + fe.getMessage());
+        } catch (ModelServiceException mse) {
+          LOGGER.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage());
         }
       }
     } catch (IOException ioe) {

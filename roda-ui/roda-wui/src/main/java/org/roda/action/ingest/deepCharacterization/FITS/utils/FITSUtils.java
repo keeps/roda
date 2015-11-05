@@ -79,4 +79,32 @@ public class FITSUtils {
     return inspect(f);
   }
 
+  private static List<String> getBatchCommand(Path sourceDirectory, Path outputDirectory) {
+    Path rodaHome = RodaCoreFactory.getRodaHomePath();
+    Path fitsHome = rodaHome.resolve(RodaCoreFactory.getRodaConfigurationAsString("tools", "fits", "home"));
+
+    File FITS_DIRECTORY = fitsHome.toFile();
+
+    String osName = System.getProperty("os.name");
+    List<String> command;
+    if (osName.startsWith("Windows")) {
+      command = new ArrayList<String>(Arrays.asList(FITS_DIRECTORY.getAbsolutePath() + File.separator + "fits.bat",
+        "-o", outputDirectory.toFile().getAbsolutePath(), "-i"));
+    } else {
+      command = new ArrayList<String>(Arrays.asList(FITS_DIRECTORY.getAbsolutePath() + File.separator + "fits.sh", "-o",
+        outputDirectory.toFile().getAbsolutePath(), "-i"));
+    }
+    command.add(sourceDirectory.toFile().getAbsolutePath());
+    return command;
+  }
+
+  public static String runFITSOnPath(Path sourceDirectory, Path outputDirectory) throws FitsException {
+    try {
+      List<String> command = getBatchCommand(sourceDirectory, outputDirectory);
+      String fitsOutput = CommandUtility.execute(command);
+      return fitsOutput;
+    } catch (CommandException e) {
+      throw new FitsException("Error while executing FITS command");
+    }
+  }
 }

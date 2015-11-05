@@ -43,6 +43,7 @@ import org.roda.action.ingest.deepCharacterization.FITS.FITSAction;
 import org.roda.action.ingest.deepCharacterization.JHOVE.JHOVEAction;
 import org.roda.action.ingest.fastCharacterization.FastCharacterizationAction;
 import org.roda.action.ingest.fastCharacterization.ExifTool.ExifToolAction;
+import org.roda.action.ingest.fastCharacterization.FFProbe.FFProbeAction;
 import org.roda.action.ingest.fastCharacterization.MediaInfo.MediaInfoAction;
 import org.roda.action.ingest.fulltext.FullTextAction;
 import org.roda.action.ingest.premisSkeleton.PremisSkeletonAction;
@@ -505,15 +506,20 @@ public class RodaCoreFactory {
     Plugin<AIP> logCleanAction = new LogCleanerAction();
     getActionOrchestrator().runActionOnAllAIPs(logCleanAction);
   }
-  
+
   private static void runExifToolAction() {
     Plugin<AIP> exifToolAction = new ExifToolAction();
     getActionOrchestrator().runActionOnAllAIPs(exifToolAction);
   }
-  
+
   private static void runMediaInfoAction() {
     Plugin<AIP> mediaInfoAction = new MediaInfoAction();
     getActionOrchestrator().runActionOnAllAIPs(mediaInfoAction);
+  }
+
+  private static void runFFProbeAction() {
+    Plugin<AIP> ffProbeAction = new FFProbeAction();
+    getActionOrchestrator().runActionOnAllAIPs(ffProbeAction);
   }
 
   private static void runSolrQuery(List<String> args) {
@@ -549,6 +555,7 @@ public class RodaCoreFactory {
     System.err.println("java -jar x.jar logClean");
     System.err.println("java -jar x.jar exifTool");
     System.err.println("java -jar x.jar mediaInfo");
+    System.err.println("java -jar x.jar ffprobe");
   }
 
   private static void printIndexMembers(List<String> args, Filter filter, Sorter sorter, Sublist sublist, Facets facets)
@@ -634,6 +641,8 @@ public class RodaCoreFactory {
         runExifToolAction();
       } else if ("mediaInfo".equals(args.get(0))) {
         runMediaInfoAction();
+      } else if ("ffprobe".equals(args.get(0))) {
+        runFFProbeAction();
       } else {
         printMainUsage();
       }

@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.action.ingest.fastCharacterization.MediaInfo;
+package org.roda.action.ingest.fastCharacterization.FFProbe;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -32,32 +32,30 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.apache.log4j.Logger;
-import org.roda.action.ingest.fastCharacterization.MediaInfo.utils.MediaInfoUtils;
+import org.roda.action.ingest.fastCharacterization.FFProbe.utils.FFProbeUtils;
 import org.roda.action.orchestrate.Plugin;
 import org.roda.action.orchestrate.PluginException;
 import org.roda.core.common.InvalidParameterException;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
+import org.roda.core.data.v2.Representation;
 import org.roda.index.IndexService;
 import org.roda.model.AIP;
+import org.roda.model.File;
 import org.roda.model.ModelService;
 import org.roda.model.ModelServiceException;
-import org.roda.model.utils.ModelUtils;
 import org.roda.storage.Binary;
-import org.roda.storage.StoragePath;
 import org.roda.storage.StorageService;
 import org.roda.storage.StorageServiceException;
 import org.roda.storage.fs.FSUtils;
-import org.roda.storage.fs.FileStorageService;
-import org.roda.util.CommandException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-public class MediaInfoAction implements Plugin<AIP> {
-  private static final Logger LOGGER = Logger.getLogger(MediaInfoAction.class);
+public class FFProbeAction implements Plugin<AIP> {
+  private static final Logger LOGGER = Logger.getLogger(FFProbeAction.class);
 
   @Override
   public void init() throws PluginException {
@@ -70,12 +68,12 @@ public class MediaInfoAction implements Plugin<AIP> {
 
   @Override
   public String getName() {
-    return "MediaInfo characterization action";
+    return "FFProbe characterization action";
   }
 
   @Override
   public String getDescription() {
-    return "Generates the MediaInfo output for each file in the AIP";
+    return "Generates the FFProbe output for each file in the AIP";
   }
 
   @Override
@@ -106,37 +104,27 @@ public class MediaInfoAction implements Plugin<AIP> {
       try {
         for (String representationID : aip.getRepresentationIds()) {
           LOGGER.debug("Processing representation " + representationID + " from AIP " + aip.getId());
-          Path data = Files.createTempDirectory("data");
-          StorageService tempStorage = new FileStorageService(data);
-          StoragePath representationPath = ModelUtils.getRepresentationPath(aip.getId(), representationID);
-          tempStorage.copy(storage, representationPath, representationPath);
-          String mediaInfoOutput = MediaInfoUtils.runMediaInfoOnPath(data.resolve(representationPath.asString()));
 
-          Map<String, Path> mediaInfoParsed = parseMediaInfoOutput(mediaInfoOutput);
-          for (Map.Entry<String, Path> entry : mediaInfoParsed.entrySet()) {
-            Binary resource = (Binary) FSUtils.convertPathToResource(entry.getValue().getParent(), entry.getValue());
-            LOGGER.debug("Creating other metadata (AIP: " + aip.getId() + ", REPRESENTATION: " + representationID
-              + ", FILE: " + entry.getValue().toFile().getName() + ")");
-            model.createOtherMetadata(aip.getId(), representationID, entry.getKey() + ".xml", "MediaInfo", resource);
+          Representation representation = model.retrieveRepresentation(aip.getId(), representationID);
+          for (String fileID : representation.getFileIds()) {
+            LOGGER.debug("Processing file " + fileID + " from " + representationID + " of AIP " + aip.getId());
+            File file = model.retrieveFile(aip.getId(), representationID, fileID);
+            Binary binary = storage.getBinary(file.getStoragePath());
+
+            Path ffProbeResults = FFProbeUtils.runFFProbe(file, binary, getParameterValues());
+            Binary resource = (Binary) FSUtils.convertPathToResource(ffProbeResults.getParent(), ffProbeResults);
+            model.createOtherMetadata(aip.getId(), representationID, file.getStoragePath().getName() + ".xml",
+              "FFProbe", resource);
+            ffProbeResults.toFile().delete();
           }
-          FSUtils.deletePath(data);
+
         }
       } catch (StorageServiceException sse) {
         LOGGER.error("Error processing AIP " + aip.getId() + ": " + sse.getMessage());
       } catch (IOException ioe) {
         LOGGER.error("Error processing AIP " + aip.getId() + ": " + ioe.getMessage());
-      } catch (CommandException ce) {
+      } catch (PluginException ce) {
         LOGGER.error("Error processing AIP " + aip.getId() + ": " + ce.getMessage());
-      } catch (XPathExpressionException xpee) {
-        LOGGER.error("Error processing AIP " + aip.getId() + ": " + xpee.getMessage());
-      } catch (ParserConfigurationException pce) {
-        LOGGER.error("Error processing AIP " + aip.getId() + ": " + pce.getMessage());
-      } catch (SAXException se) {
-        LOGGER.error("Error processing AIP " + aip.getId() + ": " + se.getMessage());
-      } catch (TransformerFactoryConfigurationError tfce) {
-        LOGGER.error("Error processing AIP " + aip.getId() + ": " + tfce.getMessage());
-      } catch (TransformerException te) {
-        LOGGER.error("Error processing AIP " + aip.getId() + ": " + te.getMessage());
       } catch (ModelServiceException mse) {
         LOGGER.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage());
       }
