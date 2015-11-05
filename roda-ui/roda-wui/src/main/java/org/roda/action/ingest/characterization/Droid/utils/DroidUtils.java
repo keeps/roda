@@ -7,87 +7,52 @@
  */
 package org.roda.action.ingest.characterization.Droid.utils;
 
+import java.io.File;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.roda.common.RodaCoreFactory;
+import org.roda.util.CommandException;
+import org.roda.util.CommandUtility;
+
+import edu.harvard.hul.ois.fits.exceptions.FitsException;
 
 public class DroidUtils {
-  private final Logger logger = Logger.getLogger(getClass());
-  private Path signature;
-  private int maxBytesToScan = -1;
-  // private BinarySignatureIdentifier binarySignatureIdentifier;
-  //
-  // private static DroidUtils instance;
-  //
-  // public static DroidUtils getInstance(Path signaturePath) throws
-  // DroidException {
-  // if (instance == null) {
-  // instance = new DroidUtils(signaturePath);
-  // }
-  // return instance;
-  // }
-  //
-  // private DroidUtils(Path signaturePath) throws DroidException {
-  // this.signature = signaturePath;
-  // binarySignatureIdentifier = new BinarySignatureIdentifier();
-  // logger.debug("SIGNATURE: " + signature.toAbsolutePath().toString());
-  // binarySignatureIdentifier.setSignatureFile(signature.toAbsolutePath().toString());
-  // try {
-  // binarySignatureIdentifier.init();
-  // } catch (SignatureParseException e) {
-  // throw new DroidException("Can't parse signature file");
-  // }
-  // binarySignatureIdentifier.setMaxBytesToScan(maxBytesToScan);
-  // }
-  //
-  // public FileFormat execute(Path pathToIdentify) throws DroidException,
-  // IOException {
-  // FileFormat fileFormat = null;
-  //
-  // String fileName = pathToIdentify.toFile().getCanonicalPath();
-  // URI uri = pathToIdentify.toUri();
-  // RequestMetaData metaData = new RequestMetaData(Files.size(pathToIdentify),
-  // Files.getLastModifiedTime(pathToIdentify).toMillis(), fileName);
-  // RequestIdentifier identifier = new RequestIdentifier(uri);
-  // identifier.setParentId(1L);
-  //
-  // InputStream in = null;
-  // IdentificationRequest request = new
-  // FileSystemIdentificationRequest(metaData, identifier);
-  // try {
-  // in = Files.newInputStream(pathToIdentify);
-  // request.open(in);
-  // IdentificationResultCollection results =
-  // binarySignatureIdentifier.matchBinarySignatures(request);
-  //
-  // // Remove format duplicates, format with lower priority is removed
-  // binarySignatureIdentifier.removeLowerPriorityHits(results);
-  //
-  // if (results.getResults().size() < 1)
-  // throw new DroidException("Unknown format.");
-  // else if (results.getResults().size() > 1) {
-  // StringBuilder strBuilder = new StringBuilder();
-  // for (IdentificationResult result : results.getResults())
-  // strBuilder.append(result.getPuid());
-  // strBuilder.append(", ");
-  // throw new DroidException(String
-  // .format("More then one format detected, unknown format. Detected PRONOM
-  // PUIDs: %s", strBuilder.toString()));
-  // } else {
-  // // One format detected
-  // // TODO: check that all fileFormat data are fill properly
-  // IdentificationResult result = results.getResults().get(0);
-  // fileFormat = new FileFormat();
-  // fileFormat.setName(result.getMimeType());
-  // fileFormat.setMimetype(result.getMimeType());
-  // fileFormat.setPuid(result.getPuid());
-  // fileFormat.setVersion(result.getVersion());
-  // }
-  // } finally {
-  // if (in != null) {
-  // in.close();
-  // }
-  // }
-  // return fileFormat;
-  // }
+  static final private Logger logger = Logger.getLogger(DroidUtils.class);
+
+  private static List<String> getBatchCommand(Path sourceDirectory) {
+    Path rodaHome = RodaCoreFactory.getRodaHomePath();
+    Path droidHome = rodaHome.resolve(RodaCoreFactory.getRodaConfigurationAsString("tools", "droid", "home"));
+    Path signature = rodaHome.resolve(RodaCoreFactory.getRodaConfigurationAsString("tools", "droid", "signatureFile"));
+    Path containerSignature = rodaHome
+      .resolve(RodaCoreFactory.getRodaConfigurationAsString("tools", "droid", "containerSignatureFile"));
+
+    File DROID_DIRECTORY = droidHome.toFile();
+
+    String osName = System.getProperty("os.name");
+    List<String> command;
+    if (osName.startsWith("Windows")) {
+      command = new ArrayList<String>(Arrays.asList(DROID_DIRECTORY.getAbsolutePath() + File.separator + "droid.bat",
+        "-Ns", signature.toFile().getAbsolutePath(), "-Nc", containerSignature.toFile().getAbsolutePath(), "-q", "-Nr",
+        sourceDirectory.toFile().getAbsolutePath()));
+    } else {
+      command = new ArrayList<String>(Arrays.asList(DROID_DIRECTORY.getAbsolutePath() + File.separator + "droid.sh",
+        "-Ns", signature.toFile().getAbsolutePath(), "-Nc", containerSignature.toFile().getAbsolutePath(), "-q", "-Nr",
+        sourceDirectory.toFile().getAbsolutePath()));
+    }
+    return command;
+  }
+
+  public static String runDROIDOnPath(Path sourceDirectory) throws FitsException {
+    try {
+      List<String> command = getBatchCommand(sourceDirectory);
+      String droidOutput = CommandUtility.execute(command);
+      return droidOutput;
+    } catch (CommandException e) {
+      throw new FitsException("Error while executing DROID command");
+    }
+  }
 }

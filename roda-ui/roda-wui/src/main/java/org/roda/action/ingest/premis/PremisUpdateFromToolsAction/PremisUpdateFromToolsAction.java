@@ -32,6 +32,7 @@ import org.roda.storage.Directory;
 import org.roda.storage.Resource;
 import org.roda.storage.StorageService;
 
+//TODO tool order/preference, parse tool output and update Premis (PremisUtils.updatePremisFile(...) )
 public class PremisUpdateFromToolsAction implements Plugin<AIP> {
   private final Logger logger = Logger.getLogger(getClass());
 
