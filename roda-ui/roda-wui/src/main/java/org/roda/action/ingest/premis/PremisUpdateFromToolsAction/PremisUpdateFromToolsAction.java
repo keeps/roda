@@ -7,6 +7,8 @@
  */
 package org.roda.action.ingest.premis.PremisUpdateFromToolsAction;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -22,6 +24,7 @@ import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
 import org.roda.core.data.v2.Representation;
 import org.roda.core.data.v2.RepresentationFilePreservationObject;
+import org.roda.core.metadata.v2.premis.PremisFileObjectHelper;
 import org.roda.index.IndexService;
 import org.roda.model.AIP;
 import org.roda.model.ModelService;
@@ -31,6 +34,7 @@ import org.roda.storage.ClosableIterable;
 import org.roda.storage.Directory;
 import org.roda.storage.Resource;
 import org.roda.storage.StorageService;
+import org.roda.storage.fs.FSUtils;
 
 //TODO tool order/preference, parse tool output and update Premis (PremisUtils.updatePremisFile(...) )
 public class PremisUpdateFromToolsAction implements Plugin<AIP> {
@@ -93,11 +97,14 @@ public class PremisUpdateFromToolsAction implements Plugin<AIP> {
               for (String fileID : representation.getFileIds()) {
                 RepresentationFilePreservationObject premisFile = model.retrieveRepresentationFileObject(aip.getId(),
                   representationID, fileID);
-
                 Binary toolOutput = storage.getBinary(ModelUtils.getToolMetadataPath(aip.getId(), representationID,
                   fileID + ".xml", r.getStoragePath().getName()));
                 premisFile = PremisUtils.updatePremisFile(premisFile, r.getStoragePath().getName(), toolOutput);
-
+                Path premis = Files.createTempFile(fileID, ".premis.xml");
+                PremisFileObjectHelper helper = new PremisFileObjectHelper(premisFile);
+                helper.saveToFile(premis.toFile());
+                model.updatePreservationMetadata(aip.getId(), representationID, fileID + ".premis.xml",
+                  (Binary) FSUtils.convertPathToResource(premis.getParent(), premis), true);
               }
             }
           }

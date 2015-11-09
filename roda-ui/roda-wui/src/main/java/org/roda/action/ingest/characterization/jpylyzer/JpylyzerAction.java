@@ -101,33 +101,34 @@ public class JpylyzerAction implements Plugin<AIP> {
     throws PluginException {
     for (AIP aip : list) {
       LOGGER.debug("Processing AIP " + aip.getId());
-      try {
-        for (String representationID : aip.getRepresentationIds()) {
-          LOGGER.debug("Processing representation " + representationID + " from AIP " + aip.getId());
-
+      for (String representationID : aip.getRepresentationIds()) {
+        LOGGER.debug("Processing representation " + representationID + " from AIP " + aip.getId());
+        try {
           Representation representation = model.retrieveRepresentation(aip.getId(), representationID);
           for (String fileID : representation.getFileIds()) {
-            LOGGER.debug("Processing file " + fileID + " from " + representationID + " of AIP " + aip.getId());
-            File file = model.retrieveFile(aip.getId(), representationID, fileID);
-            Binary binary = storage.getBinary(file.getStoragePath());
+            try {
+              LOGGER.debug("Processing file " + fileID + " from " + representationID + " of AIP " + aip.getId());
+              File file = model.retrieveFile(aip.getId(), representationID, fileID);
+              Binary binary = storage.getBinary(file.getStoragePath());
 
-            Path ffProbeResults = FFProbeUtils.runFFProbe(file, binary, getParameterValues());
-            Binary resource = (Binary) FSUtils.convertPathToResource(ffProbeResults.getParent(), ffProbeResults);
-            model.createOtherMetadata(aip.getId(), representationID, file.getStoragePath().getName() + ".xml",
-              "jpylyzer", resource);
-            ffProbeResults.toFile().delete();
+              Path ffProbeResults = FFProbeUtils.runFFProbe(file, binary, getParameterValues());
+              Binary resource = (Binary) FSUtils.convertPathToResource(ffProbeResults.getParent(), ffProbeResults);
+              model.createOtherMetadata(aip.getId(), representationID, file.getStoragePath().getName() + ".xml",
+                "jpylyzer", resource);
+              ffProbeResults.toFile().delete();
+            } catch (StorageServiceException sse) {
+              LOGGER.error("Error processing AIP " + aip.getId() + ": " + sse.getMessage());
+            } catch (IOException ioe) {
+              LOGGER.error("Error processing AIP " + aip.getId() + ": " + ioe.getMessage());
+            } catch (PluginException ce) {
+              LOGGER.error("Error processing AIP " + aip.getId() + ": " + ce.getMessage());
+            }
           }
-
+        } catch (ModelServiceException mse) {
+          LOGGER.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage());
         }
-      } catch (StorageServiceException sse) {
-        LOGGER.error("Error processing AIP " + aip.getId() + ": " + sse.getMessage());
-      } catch (IOException ioe) {
-        LOGGER.error("Error processing AIP " + aip.getId() + ": " + ioe.getMessage());
-      } catch (PluginException ce) {
-        LOGGER.error("Error processing AIP " + aip.getId() + ": " + ce.getMessage());
-      } catch (ModelServiceException mse) {
-        LOGGER.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage());
       }
+
     }
     return null;
   }

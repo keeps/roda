@@ -7,7 +7,6 @@
  */
 package org.roda.action.ingest.bagit;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -16,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.roda.action.ingest.bagit.utils.BagitNotValidException;
 import org.roda.action.ingest.bagit.utils.BagitUtils;
 import org.roda.action.orchestrate.Plugin;
 import org.roda.action.orchestrate.PluginException;
@@ -26,9 +24,7 @@ import org.roda.core.data.Report;
 import org.roda.index.IndexService;
 import org.roda.model.AIP;
 import org.roda.model.ModelService;
-import org.roda.model.ModelServiceException;
 import org.roda.storage.StorageService;
-import org.roda.storage.StorageServiceException;
 
 public class BagitToAIPAction implements Plugin<String> {
   private static final Logger LOGGER = Logger.getLogger(BagitToAIPAction.class);
@@ -80,11 +76,9 @@ public class BagitToAIPAction implements Plugin<String> {
       LOGGER.debug("Converting " + bagitPath + " to AIP");
       try {
         AIP aip = BagitUtils.bagitToAip(bagitPath, model);
-      } catch (ModelServiceException | StorageServiceException | IOException e) {
+        Thread.sleep(1000);
+      } catch (Throwable e) {
         LOGGER.error("Error converting " + bagitPath + " to AIP: " + e.getMessage(), e);
-      } catch (BagitNotValidException e) {
-        LOGGER.error("Bagit file " + bagitPath + " is not valid...");
-        e.printStackTrace();
       }
     }
     return null;

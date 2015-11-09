@@ -101,10 +101,9 @@ public class FFProbeAction implements Plugin<AIP> {
     throws PluginException {
     for (AIP aip : list) {
       LOGGER.debug("Processing AIP " + aip.getId());
-      try {
-        for (String representationID : aip.getRepresentationIds()) {
-          LOGGER.debug("Processing representation " + representationID + " from AIP " + aip.getId());
-
+      for (String representationID : aip.getRepresentationIds()) {
+        LOGGER.debug("Processing representation " + representationID + " from AIP " + aip.getId());
+        try {
           Representation representation = model.retrieveRepresentation(aip.getId(), representationID);
           for (String fileID : representation.getFileIds()) {
             LOGGER.debug("Processing file " + fileID + " from " + representationID + " of AIP " + aip.getId());
@@ -117,17 +116,18 @@ public class FFProbeAction implements Plugin<AIP> {
               "FFProbe", resource);
             ffProbeResults.toFile().delete();
           }
-
+        } catch (StorageServiceException sse) {
+          LOGGER.error("Error processing AIP " + aip.getId() + ": " + sse.getMessage());
+        } catch (IOException ioe) {
+          LOGGER.error("Error processing AIP " + aip.getId() + ": " + ioe.getMessage());
+        } catch (PluginException ce) {
+          LOGGER.error("Error processing AIP " + aip.getId() + ": " + ce.getMessage());
+        } catch (ModelServiceException mse) {
+          LOGGER.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage());
         }
-      } catch (StorageServiceException sse) {
-        LOGGER.error("Error processing AIP " + aip.getId() + ": " + sse.getMessage());
-      } catch (IOException ioe) {
-        LOGGER.error("Error processing AIP " + aip.getId() + ": " + ioe.getMessage());
-      } catch (PluginException ce) {
-        LOGGER.error("Error processing AIP " + aip.getId() + ": " + ce.getMessage());
-      } catch (ModelServiceException mse) {
-        LOGGER.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage());
+
       }
+
     }
     return null;
   }

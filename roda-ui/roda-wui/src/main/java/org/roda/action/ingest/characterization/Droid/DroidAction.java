@@ -82,65 +82,64 @@ public class DroidAction implements Plugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
-    try {
-      for (AIP aip : list) {
-        LOGGER.debug("Processing AIP " + aip.getId());
+
+    for (AIP aip : list) {
+      LOGGER.debug("Processing AIP " + aip.getId());
+      for (String representationID : aip.getRepresentationIds()) {
+        LOGGER.debug("Processing representation " + representationID + " of AIP " + aip.getId());
         try {
-          for (String representationID : aip.getRepresentationIds()) {
-            LOGGER.debug("Processing representation " + representationID + " of AIP " + aip.getId());
+          /*
+           * Representation representation =
+           * model.retrieveRepresentation(aip.getId(), representationID); for
+           * (String fileID : representation.getFileIds()) { LOGGER.debug(
+           * "Processing file " + fileID + " of representation " +
+           * representationID + " from AIP " + aip.getId()); File file =
+           * model.retrieveFile(aip.getId(), representationID, fileID); Binary
+           * binary = storage.getBinary(file.getStoragePath());
+           * 
+           * Path fitsResult = FITSUtils.runFits(file, binary,
+           * getParameterValues()); Binary resource = (Binary)
+           * FSUtils.convertPathToResource(fitsResult.getParent(), fitsResult);
+           * model.createOtherMetadata(aip.getId(), representationID,
+           * file.getStoragePath().getName() + ".xml", "FITS", resource);
+           * FSUtils.deletePath(fitsResult);
+           * 
+           * }
+           */
+          Path data = Files.createTempDirectory("data");
+          StorageService tempStorage = new FileStorageService(data);
+          StoragePath representationPath = ModelUtils.getRepresentationPath(aip.getId(), representationID);
+          tempStorage.copy(storage, representationPath, representationPath);
+          String droidOutput = DroidUtils.runDROIDOnPath(data.resolve(representationPath.asString()));
+          LOGGER.debug("DROID OUTPUT: " + droidOutput);
 
-            /*
-             * Representation representation =
-             * model.retrieveRepresentation(aip.getId(), representationID); for
-             * (String fileID : representation.getFileIds()) { LOGGER.debug(
-             * "Processing file " + fileID + " of representation " +
-             * representationID + " from AIP " + aip.getId()); File file =
-             * model.retrieveFile(aip.getId(), representationID, fileID); Binary
-             * binary = storage.getBinary(file.getStoragePath());
-             * 
-             * Path fitsResult = FITSUtils.runFits(file, binary,
-             * getParameterValues()); Binary resource = (Binary)
-             * FSUtils.convertPathToResource(fitsResult.getParent(),
-             * fitsResult); model.createOtherMetadata(aip.getId(),
-             * representationID, file.getStoragePath().getName() + ".xml",
-             * "FITS", resource); FSUtils.deletePath(fitsResult);
-             * 
-             * }
-             */
-            Path data = Files.createTempDirectory("data");
-            StorageService tempStorage = new FileStorageService(data);
-            StoragePath representationPath = ModelUtils.getRepresentationPath(aip.getId(), representationID);
-            tempStorage.copy(storage, representationPath, representationPath);
-            String droidOutput = DroidUtils.runDROIDOnPath(data.resolve(representationPath.asString()));
-            LOGGER.debug("DROID OUTPUT: " + droidOutput);
-
-            for (String outputLine : droidOutput.split("\n")) {
-              int splitterPosition = outputLine.lastIndexOf(",");
-              String filename = outputLine.substring(0, splitterPosition);
-              filename = filename.substring(filename.lastIndexOf(File.separatorChar) + 1);
-              String format = outputLine.substring(splitterPosition + 1);
-              LOGGER.error("FILE: " + filename);
-              LOGGER.error("FORMAT: " + format);
-              String xmlOutput = "<droid>" + format + "</droid>";
-              Path p = Files.createTempFile("temp", ".temp");
-              Files.write(p, xmlOutput.getBytes());
-              Binary resource = (Binary) FSUtils.convertPathToResource(p.getParent(), p);
-              LOGGER.debug("Creating other metadata (AIP: " + aip.getId() + ", REPRESENTATION: " + representationID
-                + ", FILE: " + filename + ")");
-              model.createOtherMetadata(aip.getId(), representationID, filename + ".xml", "DROID", resource);
-            }
-            FSUtils.deletePath(data);
+          for (String outputLine : droidOutput.split("\n")) {
+            int splitterPosition = outputLine.lastIndexOf(",");
+            String filename = outputLine.substring(0, splitterPosition);
+            filename = filename.substring(filename.lastIndexOf(File.separatorChar) + 1);
+            String format = outputLine.substring(splitterPosition + 1);
+            LOGGER.error("FILE: " + filename);
+            LOGGER.error("FORMAT: " + format);
+            String xmlOutput = "<droid>" + format + "</droid>";
+            Path p = Files.createTempFile("temp", ".temp");
+            Files.write(p, xmlOutput.getBytes());
+            Binary resource = (Binary) FSUtils.convertPathToResource(p.getParent(), p);
+            LOGGER.debug("Creating other metadata (AIP: " + aip.getId() + ", REPRESENTATION: " + representationID
+              + ", FILE: " + filename + ")");
+            model.createOtherMetadata(aip.getId(), representationID, filename + ".xml", "DROID", resource);
           }
+          FSUtils.deletePath(data);
         } catch (StorageServiceException sse) {
           LOGGER.error("Error processing AIP " + aip.getId() + ": " + sse.getMessage());
         } catch (FitsException fe) {
           LOGGER.error("Error processing AIP " + aip.getId() + ": " + fe.getMessage());
         } catch (ModelServiceException mse) {
           LOGGER.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage());
+        } catch (IOException ioe) {
+          LOGGER.error("Error processing AIP " + aip.getId() + ": " + ioe.getMessage());
         }
       }
-    } catch (IOException ioe) {
-      LOGGER.error("Error executing DroidAction: " + ioe.getMessage(), ioe);
+
     }
     return null;
   }

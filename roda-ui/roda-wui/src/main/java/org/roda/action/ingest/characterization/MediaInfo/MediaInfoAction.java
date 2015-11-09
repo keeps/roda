@@ -103,9 +103,10 @@ public class MediaInfoAction implements Plugin<AIP> {
     throws PluginException {
     for (AIP aip : list) {
       LOGGER.debug("Processing AIP " + aip.getId());
-      try {
-        for (String representationID : aip.getRepresentationIds()) {
-          LOGGER.debug("Processing representation " + representationID + " from AIP " + aip.getId());
+
+      for (String representationID : aip.getRepresentationIds()) {
+        LOGGER.debug("Processing representation " + representationID + " from AIP " + aip.getId());
+        try {
           Path data = Files.createTempDirectory("data");
           StorageService tempStorage = new FileStorageService(data);
           StoragePath representationPath = ModelUtils.getRepresentationPath(aip.getId(), representationID);
@@ -120,26 +121,27 @@ public class MediaInfoAction implements Plugin<AIP> {
             model.createOtherMetadata(aip.getId(), representationID, entry.getKey() + ".xml", "MediaInfo", resource);
           }
           FSUtils.deletePath(data);
+        } catch (StorageServiceException sse) {
+          LOGGER.error("Error processing AIP " + aip.getId() + ": " + sse.getMessage());
+        } catch (IOException ioe) {
+          LOGGER.error("Error processing AIP " + aip.getId() + ": " + ioe.getMessage());
+        } catch (CommandException ce) {
+          LOGGER.error("Error processing AIP " + aip.getId() + ": " + ce.getMessage());
+        } catch (XPathExpressionException xpee) {
+          LOGGER.error("Error processing AIP " + aip.getId() + ": " + xpee.getMessage());
+        } catch (ParserConfigurationException pce) {
+          LOGGER.error("Error processing AIP " + aip.getId() + ": " + pce.getMessage());
+        } catch (SAXException se) {
+          LOGGER.error("Error processing AIP " + aip.getId() + ": " + se.getMessage());
+        } catch (TransformerFactoryConfigurationError tfce) {
+          LOGGER.error("Error processing AIP " + aip.getId() + ": " + tfce.getMessage());
+        } catch (TransformerException te) {
+          LOGGER.error("Error processing AIP " + aip.getId() + ": " + te.getMessage());
+        } catch (ModelServiceException mse) {
+          LOGGER.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage());
         }
-      } catch (StorageServiceException sse) {
-        LOGGER.error("Error processing AIP " + aip.getId() + ": " + sse.getMessage());
-      } catch (IOException ioe) {
-        LOGGER.error("Error processing AIP " + aip.getId() + ": " + ioe.getMessage());
-      } catch (CommandException ce) {
-        LOGGER.error("Error processing AIP " + aip.getId() + ": " + ce.getMessage());
-      } catch (XPathExpressionException xpee) {
-        LOGGER.error("Error processing AIP " + aip.getId() + ": " + xpee.getMessage());
-      } catch (ParserConfigurationException pce) {
-        LOGGER.error("Error processing AIP " + aip.getId() + ": " + pce.getMessage());
-      } catch (SAXException se) {
-        LOGGER.error("Error processing AIP " + aip.getId() + ": " + se.getMessage());
-      } catch (TransformerFactoryConfigurationError tfce) {
-        LOGGER.error("Error processing AIP " + aip.getId() + ": " + tfce.getMessage());
-      } catch (TransformerException te) {
-        LOGGER.error("Error processing AIP " + aip.getId() + ": " + te.getMessage());
-      } catch (ModelServiceException mse) {
-        LOGGER.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage());
       }
+
     }
     return null;
   }

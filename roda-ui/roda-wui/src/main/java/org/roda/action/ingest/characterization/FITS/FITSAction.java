@@ -82,59 +82,58 @@ public class FITSAction implements Plugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
-    try {
-      for (AIP aip : list) {
-        LOGGER.debug("Processing AIP " + aip.getId());
+    for (AIP aip : list) {
+      LOGGER.debug("Processing AIP " + aip.getId());
+      for (String representationID : aip.getRepresentationIds()) {
+        LOGGER.debug("Processing representation " + representationID + " of AIP " + aip.getId());
         try {
-          for (String representationID : aip.getRepresentationIds()) {
-            LOGGER.debug("Processing representation " + representationID + " of AIP " + aip.getId());
-
-            /*
-             * Representation representation =
-             * model.retrieveRepresentation(aip.getId(), representationID); for
-             * (String fileID : representation.getFileIds()) { LOGGER.debug(
-             * "Processing file " + fileID + " of representation " +
-             * representationID + " from AIP " + aip.getId()); File file =
-             * model.retrieveFile(aip.getId(), representationID, fileID); Binary
-             * binary = storage.getBinary(file.getStoragePath());
-             * 
-             * Path fitsResult = FITSUtils.runFits(file, binary,
-             * getParameterValues()); Binary resource = (Binary)
-             * FSUtils.convertPathToResource(fitsResult.getParent(),
-             * fitsResult); model.createOtherMetadata(aip.getId(),
-             * representationID, file.getStoragePath().getName() + ".xml",
-             * "FITS", resource); FSUtils.deletePath(fitsResult);
-             * 
-             * }
-             */
-            Path data = Files.createTempDirectory("data");
-            Path output = Files.createTempDirectory("output");
-            StorageService tempStorage = new FileStorageService(data);
-            StoragePath representationPath = ModelUtils.getRepresentationPath(aip.getId(), representationID);
-            tempStorage.copy(storage, representationPath, representationPath);
-            FITSUtils.runFITSOnPath(data.resolve(representationPath.asString()), output);
-            Representation representation = model.retrieveRepresentation(aip.getId(), representationID);
-            for (String fileID : representation.getFileIds()) {
-              Path p = output.resolve(fileID + ".fits.xml");
-              Binary resource = (Binary) FSUtils.convertPathToResource(p.getParent(), p);
-              LOGGER.debug("Creating other metadata (AIP: " + aip.getId() + ", REPRESENTATION: " + representationID
-                + ", FILE: " + fileID + ")");
-              model.createOtherMetadata(aip.getId(), representationID, fileID + ".xml", "FITS", resource);
-            }
-            FSUtils.deletePath(data);
-            FSUtils.deletePath(output);
+          /*
+           * Representation representation =
+           * model.retrieveRepresentation(aip.getId(), representationID); for
+           * (String fileID : representation.getFileIds()) { LOGGER.debug(
+           * "Processing file " + fileID + " of representation " +
+           * representationID + " from AIP " + aip.getId()); File file =
+           * model.retrieveFile(aip.getId(), representationID, fileID); Binary
+           * binary = storage.getBinary(file.getStoragePath());
+           * 
+           * Path fitsResult = FITSUtils.runFits(file, binary,
+           * getParameterValues()); Binary resource = (Binary)
+           * FSUtils.convertPathToResource(fitsResult.getParent(), fitsResult);
+           * model.createOtherMetadata(aip.getId(), representationID,
+           * file.getStoragePath().getName() + ".xml", "FITS", resource);
+           * FSUtils.deletePath(fitsResult);
+           * 
+           * }
+           */
+          Path data = Files.createTempDirectory("data");
+          Path output = Files.createTempDirectory("output");
+          StorageService tempStorage = new FileStorageService(data);
+          StoragePath representationPath = ModelUtils.getRepresentationPath(aip.getId(), representationID);
+          tempStorage.copy(storage, representationPath, representationPath);
+          FITSUtils.runFITSOnPath(data.resolve(representationPath.asString()), output);
+          Representation representation = model.retrieveRepresentation(aip.getId(), representationID);
+          for (String fileID : representation.getFileIds()) {
+            Path p = output.resolve(fileID + ".fits.xml");
+            Binary resource = (Binary) FSUtils.convertPathToResource(p.getParent(), p);
+            LOGGER.debug("Creating other metadata (AIP: " + aip.getId() + ", REPRESENTATION: " + representationID
+              + ", FILE: " + fileID + ")");
+            model.createOtherMetadata(aip.getId(), representationID, fileID + ".xml", "FITS", resource);
           }
+          FSUtils.deletePath(data);
+          FSUtils.deletePath(output);
         } catch (StorageServiceException sse) {
           LOGGER.error("Error processing AIP " + aip.getId() + ": " + sse.getMessage());
         } catch (FitsException fe) {
           LOGGER.error("Error processing AIP " + aip.getId() + ": " + fe.getMessage());
         } catch (ModelServiceException mse) {
           LOGGER.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage());
+        } catch (IOException ioe) {
+          LOGGER.error("Error processing AIP " + aip.getId() + ": " + ioe.getMessage());
         }
       }
-    } catch (IOException ioe) {
-      LOGGER.error("Error executing FastCharacterizationAction: " + ioe.getMessage(), ioe);
+
     }
+
     return null;
   }
 
