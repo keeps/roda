@@ -13,6 +13,5 @@
 		<module>roda-common-utils</module>
 		<module>roda-common-data</module>
 		<module>roda-common-metadata</module>
-		<module>roda-common-storage</module>
 	</modules>
 </project>

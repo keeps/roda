@@ -10,8 +10,8 @@ package org.roda.core.metadata;
 import java.util.Date;
 
 import org.apache.commons.lang.StringUtils;
-import org.roda.core.common.InvalidDescriptionObjectException;
 import org.roda.core.data.DescriptionObject;
+import org.roda.core.data.common.InvalidDescriptionObjectException;
 import org.roda.core.data.eadc.DescriptionLevelManager;
 import org.w3c.util.DateParser;
 import org.w3c.util.InvalidDateException;

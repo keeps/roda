@@ -10,10 +10,10 @@ package org.roda.wui.common.client.widgets;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.roda.core.common.RodaConstants;
 import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.wui.client.common.AIPList;
 import org.roda.wui.client.main.BreadcrumbItem;

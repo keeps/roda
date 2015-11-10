@@ -9,7 +9,7 @@ package org.roda.core.data.adapter.filter;
 
 import java.util.Date;
 
-import org.roda.core.common.RodaConstants.DateGranularity;
+import org.roda.core.data.common.RodaConstants.DateGranularity;
 
 /**
  * @author Luis Faria <lfaria@keep.pt>

@@ -10,7 +10,7 @@
  */
 package org.roda.wui.common.fileupload.client;
 
-import org.roda.core.common.RODAException;
+import org.roda.core.data.common.RODAException;
 import org.roda.wui.common.client.GenericException;
 
 /**

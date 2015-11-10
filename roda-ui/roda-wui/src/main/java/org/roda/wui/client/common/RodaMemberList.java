@@ -7,12 +7,12 @@
  */
 package org.roda.wui.client.common;
 
-import org.roda.core.common.RodaConstants;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.SortParameter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.RODAMember;
 import org.roda.wui.common.client.ClientLogger;

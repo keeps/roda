@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.roda.util.TempDir;
+import org.roda.core.util.TempDir;
 
 /**
  * Servlet implementation class AIPDownload

@@ -11,7 +11,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.roda.core.common.InvalidDescriptionLevel;
+import org.roda.core.data.common.InvalidDescriptionLevel;
 import org.roda.core.data.v2.SimpleDescriptionObject;
 
 /**

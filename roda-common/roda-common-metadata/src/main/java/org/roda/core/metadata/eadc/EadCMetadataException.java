@@ -7,7 +7,7 @@
  */
 package org.roda.core.metadata.eadc;
 
-import org.roda.core.common.RODAException;
+import org.roda.core.data.common.RODAException;
 
 /**
  * @author Rui Castro

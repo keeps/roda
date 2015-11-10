@@ -12,8 +12,8 @@ package org.roda.wui.management.user.client;
 
 import java.util.List;
 
-import org.roda.core.common.EmailAlreadyExistsException;
-import org.roda.core.common.NoSuchUserException;
+import org.roda.core.data.common.EmailAlreadyExistsException;
+import org.roda.core.data.common.NoSuchUserException;
 import org.roda.core.data.v2.User;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.HistoryResolver;

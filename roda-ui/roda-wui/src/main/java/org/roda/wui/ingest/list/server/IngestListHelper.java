@@ -8,14 +8,14 @@
 package org.roda.wui.ingest.list.server;
 
 import org.apache.log4j.Logger;
-import org.roda.common.RodaCoreFactory;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.SIPReport;
-import org.roda.index.IndexServiceException;
+import org.roda.core.index.IndexServiceException;
 import org.roda.wui.common.client.GenericException;
 
 public class IngestListHelper {

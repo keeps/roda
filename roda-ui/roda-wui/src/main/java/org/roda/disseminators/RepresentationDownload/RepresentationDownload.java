@@ -23,9 +23,9 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.transaction.util.FileHelper;
 import org.apache.log4j.Logger;
-import org.roda.core.common.LoginException;
-import org.roda.core.common.RODAClientException;
 import org.roda.core.data.RepresentationObject;
+import org.roda.core.data.common.LoginException;
+import org.roda.core.data.common.RODAClientException;
 import org.roda.disseminators.common.RepresentationHelper;
 
 /**

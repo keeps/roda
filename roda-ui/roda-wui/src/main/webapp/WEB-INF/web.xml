@@ -7,7 +7,7 @@
 
 	<servlet>
 		<servlet-name>RodaWuiServlet</servlet-name>
-		<servlet-class>org.roda.servlets.RodaWuiServlet</servlet-class>
+		<servlet-class>org.roda.wui.servlets.RodaWuiServlet</servlet-class>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 
@@ -92,7 +92,7 @@
 		<servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
 		<init-param>
 			<param-name>javax.ws.rs.Application</param-name>
-			<param-value>org.roda.api.RestApplication</param-value>
+			<param-value>org.roda.wui.api.RestApplication</param-value>
 		</init-param>
 		<load-on-startup>2</load-on-startup>
 	</servlet>
@@ -104,7 +104,7 @@
 
 	<filter>
 		<filter-name>rest_api_auth_filter</filter-name>
-		<filter-class>org.roda.api.v1.utils.ApiAuthFilter</filter-class>
+		<filter-class>org.roda.wui.api.v1.utils.ApiAuthFilter</filter-class>
 		<init-param>
 			<description>Realm to be used</description>
 			<param-name>realm</param-name>

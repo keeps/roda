@@ -20,9 +20,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
-import org.roda.core.common.LoginException;
-import org.roda.core.common.RODAClientException;
 import org.roda.core.data.RepresentationObject;
+import org.roda.core.data.common.LoginException;
+import org.roda.core.data.common.RODAClientException;
 import org.roda.disseminators.common.RepresentationHelper;
 
 /**

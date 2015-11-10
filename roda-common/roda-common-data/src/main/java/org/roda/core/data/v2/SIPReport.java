@@ -16,7 +16,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.roda.core.common.IllegalOperationException;
+import org.roda.core.data.common.IllegalOperationException;
 
 /**
  * This is the state of a SIP (Submission Information Package).

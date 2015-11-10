@@ -13,8 +13,8 @@ package org.roda.wui.management.user.client;
 import java.util.Arrays;
 import java.util.List;
 
-import org.roda.core.common.InvalidTokenException;
-import org.roda.core.common.NoSuchUserException;
+import org.roda.core.data.common.InvalidTokenException;
+import org.roda.core.data.common.NoSuchUserException;
 import org.roda.core.data.v2.RodaUser;
 import org.roda.wui.client.about.About;
 import org.roda.wui.client.common.UserLogin;

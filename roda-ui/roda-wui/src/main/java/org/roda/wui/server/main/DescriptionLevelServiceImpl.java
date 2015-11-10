@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
-import org.roda.common.RodaCoreFactory;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.eadc.DescriptionLevelManager;
-import org.roda.util.FileUtility;
+import org.roda.core.util.FileUtility;
 import org.roda.wui.client.main.DescriptionLevelInfoPack;
 import org.roda.wui.client.main.DescriptionLevelService;
 

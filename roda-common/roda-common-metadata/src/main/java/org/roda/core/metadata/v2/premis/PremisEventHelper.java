@@ -22,7 +22,7 @@ import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.roda.core.data.v2.EventPreservationObject;
 import org.roda.core.metadata.MetadataException;
-import org.roda.util.XmlEncodeUtility;
+import org.roda.core.util.XmlEncodeUtility;
 import org.w3c.util.DateParser;
 import org.w3c.util.InvalidDateException;
 

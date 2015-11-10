@@ -12,8 +12,8 @@ package org.roda.wui.ingest.list.client;
 
 import java.util.MissingResourceException;
 
-import org.roda.core.common.IllegalOperationException;
 import org.roda.core.data.SIPState;
+import org.roda.core.data.common.IllegalOperationException;
 import org.roda.core.data.v2.SIPStateTransition;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.Tools;

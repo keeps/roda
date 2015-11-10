@@ -21,16 +21,16 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.jasig.cas.client.util.CommonUtils;
-import org.roda.common.RodaCoreFactory;
-import org.roda.common.UserUtility;
-import org.roda.core.common.RodaConstants;
+import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.UserUtility;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.RODAMember;
 import org.roda.core.data.v2.RodaSimpleUser;
 import org.roda.core.data.v2.RodaUser;
 import org.roda.core.data.v2.User;
-import org.roda.index.IndexServiceException;
-import org.roda.model.ModelServiceException;
+import org.roda.core.index.IndexServiceException;
+import org.roda.core.model.ModelServiceException;
 
 /**
  * Servlet Filter implementation class RolesSetterFilter

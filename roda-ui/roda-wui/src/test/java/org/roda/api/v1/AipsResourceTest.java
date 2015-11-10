@@ -15,6 +15,7 @@ import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.Test;
+import org.roda.wui.api.v1.AipsResource;
 
 public class AipsResourceTest extends JerseyTest {
 

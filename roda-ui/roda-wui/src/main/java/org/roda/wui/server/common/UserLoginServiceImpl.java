@@ -7,21 +7,17 @@
  */
 package org.roda.wui.server.common;
 
-import java.util.Date;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import org.apache.log4j.Logger;
-import org.roda.api.controllers.UserLogin;
-import org.roda.common.RodaCoreFactory;
-import org.roda.common.RodaCoreService;
-import org.roda.common.ServiceException;
-import org.roda.common.UserUtility;
-import org.roda.core.common.AuthenticationDeniedException;
-import org.roda.core.common.RODAException;
-import org.roda.core.data.v2.LogEntry;
-import org.roda.core.data.v2.RodaSimpleUser;
+import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.UserUtility;
+import org.roda.core.data.common.AuthenticationDeniedException;
+import org.roda.core.data.common.RODAException;
 import org.roda.core.data.v2.RodaUser;
+import org.roda.wui.api.controllers.UserLogin;
 import org.roda.wui.client.common.UserLoginService;
 import org.roda.wui.common.client.GenericException;
 
@@ -37,6 +33,8 @@ public class UserLoginServiceImpl extends RemoteServiceServlet implements UserLo
 
   private static final long serialVersionUID = -6898933466651262033L;
   private static final String LOG_ACTION_WUI_LOGIN = "RODAWUI.login";
+  private static final String WUI_LOGIN_CACHE = "WUI_LOGIN_CACHE";
+  private static final List<String> WUI_LOGIN_CACHE_PREFIXES = Arrays.asList("ui.menu." ,"ui.role.");
   private static Logger logger = Logger.getLogger(UserLoginServiceImpl.class);
 
   public static UserLoginServiceImpl getInstance() {
@@ -54,7 +52,7 @@ public class UserLoginServiceImpl extends RemoteServiceServlet implements UserLo
   }
 
   public Map<String, String> getRodaProperties() {
-    return RodaCoreFactory.getLoginRelatedProperties();
+    return RodaCoreFactory.getPropertiesFromCache(WUI_LOGIN_CACHE, WUI_LOGIN_CACHE_PREFIXES);
 
   }
 

@@ -11,7 +11,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Date;
 
-import org.roda.core.common.IllegalOperationException;
+import org.roda.core.data.common.IllegalOperationException;
 import org.roda.core.data.v2.SIPStateTransition;
 
 /**

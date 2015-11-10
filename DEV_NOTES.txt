@@ -1,3 +1,9 @@
 Known problems
 ----------------
 * Problems may araise when using GWT Dev Mode and having in the classpath a different jetty version
+
+Misc
+----------------
+* Executing worker (compiled with -Proda-core-jar):
+	1) java -Droda.node.type=worker -jar roda-core/roda-core/target/roda-core-2.0.0-SNAPSHOT-jar-with-dependencies.jar 
+	2) java -cp roda-core/roda-core/target/roda-core-2.0.0-SNAPSHOT-jar-with-dependencies.jar -Droda.node.type=worker org.roda.core.RodaCoreFactory

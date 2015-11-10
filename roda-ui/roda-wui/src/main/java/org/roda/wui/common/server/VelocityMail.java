@@ -31,8 +31,8 @@ import org.apache.velocity.app.Velocity;
 import org.apache.velocity.context.Context;
 import org.apache.velocity.runtime.RuntimeServices;
 import org.apache.velocity.runtime.log.LogChute;
-import org.roda.common.RodaCoreFactory;
-import org.roda.util.FileUtility;
+import org.roda.core.RodaCoreFactory;
+import org.roda.core.util.FileUtility;
 
 /**
  * This class is used to execute velocity templates and send the result via

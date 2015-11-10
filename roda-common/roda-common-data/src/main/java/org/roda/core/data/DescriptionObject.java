@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.roda.core.common.InvalidDescriptionLevel;
+import org.roda.core.data.common.InvalidDescriptionLevel;
 import org.roda.core.data.eadc.Acqinfo;
 import org.roda.core.data.eadc.Acqinfos;
 import org.roda.core.data.eadc.ArrangementTable;

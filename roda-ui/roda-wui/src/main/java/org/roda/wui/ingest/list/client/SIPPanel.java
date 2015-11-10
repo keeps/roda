@@ -9,10 +9,10 @@ package org.roda.wui.ingest.list.client;
 
 import java.util.MissingResourceException;
 
-import org.roda.core.common.IllegalOperationException;
-import org.roda.core.common.NoSuchRODAObjectException;
 import org.roda.core.data.DescriptionObject;
 import org.roda.core.data.SIPState;
+import org.roda.core.data.common.IllegalOperationException;
+import org.roda.core.data.common.NoSuchRODAObjectException;
 import org.roda.core.data.v2.RodaUser;
 import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.core.data.v2.User;

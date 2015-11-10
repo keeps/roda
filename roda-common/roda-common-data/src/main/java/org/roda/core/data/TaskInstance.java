@@ -11,7 +11,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Date;
 
-import org.roda.core.common.InvalidTaskStateException;
+import org.roda.core.data.common.InvalidTaskStateException;
 
 /**
  * This is an instance of a {@link Task}.

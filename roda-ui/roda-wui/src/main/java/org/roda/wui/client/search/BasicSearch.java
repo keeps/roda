@@ -18,13 +18,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.roda.core.common.RodaConstants;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.facet.SimpleFacetParameter;
 import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
 import org.roda.core.data.adapter.filter.DateIntervalFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.FilterParameter;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;

@@ -46,7 +46,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.roda-project</groupId>
-			<artifactId>roda-common-storage</artifactId>
+			<artifactId>roda-core</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>log4j</groupId>

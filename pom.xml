@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<name>RODA - Repositório de Objetos Digitais Autênticos</name>
 	<url>http://roda.keep.pt/</url>
@@ -118,6 +117,7 @@
 		<jena.version>2.12.1</jena.version>
 		<solr.version>5.3.1</solr.version>
 		<tika.version>1.11</tika.version>
+		<akka.version>2.4.0</akka.version>
 		<roda_community_url>http://roda-community.org</roda_community_url>
 	</properties>
 	<profiles>
@@ -130,7 +130,7 @@
 				<module>roda-common/roda-common-data</module>
 				<module>roda-common/roda-common-metadata</module>
 				<module>roda-common/roda-common-utils</module>
-				<module>roda-common/roda-common-storage</module>
+				<module>roda-core/roda-core</module>
 				<module>roda-core/roda-plugins</module>
 				<module>roda-ui/roda-wui</module>
 			</modules>
@@ -141,7 +141,7 @@
 				<module>roda-common/roda-common-data</module>
 				<module>roda-common/roda-common-metadata</module>
 				<module>roda-common/roda-common-utils</module>
-				<module>roda-common/roda-common-storage</module>
+				<module>roda-core/roda-core</module>
 				<module>roda-ui/roda-wui</module>
 				<module>roda-cas</module>
 			</modules>
@@ -152,7 +152,7 @@
 				<module>roda-common/roda-common-data</module>
 				<module>roda-common/roda-common-metadata</module>
 				<module>roda-common/roda-common-utils</module>
-				<module>roda-common/roda-common-storage</module>
+				<module>roda-core/roda-core</module>
 				<module>roda-ui/roda-wui</module>
 			</modules>
 		</profile>
@@ -162,7 +162,7 @@
 				<module>roda-common/roda-common-data</module>
 				<module>roda-common/roda-common-metadata</module>
 				<module>roda-common/roda-common-utils</module>
-				<module>roda-common/roda-common-storage</module>
+				<module>roda-core/roda-core</module>
 			</modules>
 		</profile>
 		<!-- <profile> -->
@@ -301,6 +301,11 @@
 					<version>2.3.3</version>
 				</plugin>
 				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-shade-plugin</artifactId>
+					<version>2.4.2</version>
+				</plugin>
+				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>
 					<version>1.0.0</version>
@@ -317,7 +322,7 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore />
+										<ignore/>
 									</action>
 								</pluginExecution>
 							</pluginExecutions>
@@ -655,7 +660,6 @@
 				<artifactId>ead-c.2014</artifactId>
 				<version>1.0.0</version>
 			</dependency>
-
 			<!-- RODA own modules dependencies - start -->
 			<dependency>
 				<groupId>pt.gov.dgarq.roda</groupId>
@@ -690,11 +694,10 @@
 			</dependency>
 			<dependency>
 				<groupId>org.roda-project</groupId>
-				<artifactId>roda-common-storage</artifactId>
+				<artifactId>roda-core</artifactId>
 				<version>2.0.0-SNAPSHOT</version>
 			</dependency>
 			<!-- RODA own modules dependencies - end -->
-
 			<dependency>
 				<groupId>stax</groupId>
 				<artifactId>stax-api</artifactId>
@@ -776,7 +779,6 @@
 				<artifactId>xml-apis</artifactId>
 				<version>1.4.01</version>
 			</dependency>
-
 			<!-- CAS related dependencies - start -->
 			<dependency>
 				<groupId>org.jasig.cas</groupId>
@@ -802,7 +804,6 @@
 				</exclusions>
 			</dependency>
 			<!-- CAS related dependencies - end -->
-
 			<dependency>
 				<groupId>org.yaml</groupId>
 				<artifactId>snakeyaml</artifactId>
@@ -863,7 +864,6 @@
 				<version>1.6.2</version>
 				<scope>test</scope>
 			</dependency>
-
 			<!-- REST API related dependencies - start -->
 			<dependency>
 				<groupId>org.glassfish.jersey</groupId>
@@ -920,7 +920,6 @@
 				<version>${swagger.version}</version>
 			</dependency>
 			<!-- REST API related dependencies - end -->
-
 			<!-- Actions related dependencies - start -->
 			<dependency>
 				<groupId>gov.loc</groupId>
@@ -958,12 +957,46 @@
 				<version>0.8.10</version>
 			</dependency>
 			<!-- Actions related dependencies - end -->
-			
 			<!-- Akka related dependencies - start -->
 			<dependency>
 				<groupId>com.typesafe.akka</groupId>
 				<artifactId>akka-actor_2.11</artifactId>
-				<version>2.3.14</version>
+				<version>${akka.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.typesafe.akka</groupId>
+				<artifactId>akka-cluster_2.11</artifactId>
+				<version>${akka.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.typesafe.akka</groupId>
+				<artifactId>akka-cluster-tools_2.11</artifactId>
+				<version>${akka.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.typesafe.akka</groupId>
+				<artifactId>akka-contrib_2.11</artifactId>
+				<version>${akka.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.typesafe.akka</groupId>
+				<artifactId>akka-testkit_2.11</artifactId>
+				<version>${akka.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.typesafe.akka</groupId>
+				<artifactId>akka-persistence_2.11</artifactId>
+				<version>${akka.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.fusesource.leveldbjni</groupId>
+				<artifactId>leveldbjni-all</artifactId>
+				<version>1.8</version>
+			</dependency>
+			<dependency>
+				<groupId>org.iq80.leveldb</groupId>
+				<artifactId>leveldb</artifactId>
+				<version>0.7</version>
 			</dependency>
 			<!-- Akka related dependencies - end -->
 		</dependencies>

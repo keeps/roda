@@ -12,7 +12,7 @@ package org.roda.wui.client.common;
 
 import java.util.Map;
 
-import org.roda.core.common.RODAException;
+import org.roda.core.data.common.RODAException;
 import org.roda.core.data.v2.RodaUser;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;

@@ -12,10 +12,10 @@ package org.roda.wui.ingest.submit.client;
 
 import java.io.IOException;
 
-import org.roda.core.common.AuthorizationDeniedException;
-import org.roda.core.common.LoginException;
-import org.roda.core.common.RODAClientException;
 import org.roda.core.data.DescriptionObject;
+import org.roda.core.data.common.AuthorizationDeniedException;
+import org.roda.core.data.common.LoginException;
+import org.roda.core.data.common.RODAClientException;
 import org.roda.wui.common.client.GenericException;
 
 import com.google.gwt.core.client.GWT;

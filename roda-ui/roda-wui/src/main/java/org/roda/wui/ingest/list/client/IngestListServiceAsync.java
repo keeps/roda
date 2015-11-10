@@ -12,12 +12,12 @@ package org.roda.wui.ingest.list.client;
 
 import java.util.Map;
 
-import org.roda.core.common.RODAException;
 import org.roda.core.data.adapter.ContentAdapter;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
+import org.roda.core.data.common.RODAException;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.SIPReport;
 import org.roda.wui.common.client.PrintReportException;

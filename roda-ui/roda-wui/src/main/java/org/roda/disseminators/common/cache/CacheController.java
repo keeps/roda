@@ -18,11 +18,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.roda.core.common.BrowserException;
-import org.roda.core.common.LoginException;
-import org.roda.core.common.NoSuchRODAObjectException;
-import org.roda.core.common.RODAClientException;
 import org.roda.core.data.RepresentationObject;
+import org.roda.core.data.common.BrowserException;
+import org.roda.core.data.common.LoginException;
+import org.roda.core.data.common.NoSuchRODAObjectException;
+import org.roda.core.data.common.RODAClientException;
 
 /**
  * Cache controlling common code

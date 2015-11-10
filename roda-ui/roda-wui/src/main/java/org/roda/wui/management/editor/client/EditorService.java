@@ -13,17 +13,17 @@ package org.roda.wui.management.editor.client;
 import java.util.List;
 import java.util.Map;
 
-import org.roda.core.common.BrowserException;
-import org.roda.core.common.EditorException;
-import org.roda.core.common.IllegalOperationException;
-import org.roda.core.common.InvalidDescriptionObjectException;
-import org.roda.core.common.LoginException;
-import org.roda.core.common.NoSuchRODAObjectException;
-import org.roda.core.common.RODAClientException;
-import org.roda.core.common.RODAException;
-import org.roda.core.common.UserManagementException;
 import org.roda.core.data.DescriptionObject;
 import org.roda.core.data.RODAObjectUserPermissions;
+import org.roda.core.data.common.BrowserException;
+import org.roda.core.data.common.EditorException;
+import org.roda.core.data.common.IllegalOperationException;
+import org.roda.core.data.common.InvalidDescriptionObjectException;
+import org.roda.core.data.common.LoginException;
+import org.roda.core.data.common.NoSuchRODAObjectException;
+import org.roda.core.data.common.RODAClientException;
+import org.roda.core.data.common.RODAException;
+import org.roda.core.data.common.UserManagementException;
 import org.roda.core.data.eadc.DescriptionLevel;
 import org.roda.core.data.v2.RODAMember;
 

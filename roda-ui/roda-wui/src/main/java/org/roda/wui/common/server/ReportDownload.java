@@ -39,11 +39,11 @@ import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.MimeConstants;
 import org.apache.fop.servlet.ServletContextURIResolver;
 import org.apache.log4j.Logger;
-import org.roda.core.common.LoginException;
-import org.roda.core.common.NoSuchReportException;
-import org.roda.core.common.RODAClientException;
-import org.roda.core.common.ReportException;
 import org.roda.core.data.adapter.ContentAdapter;
+import org.roda.core.data.common.LoginException;
+import org.roda.core.data.common.NoSuchReportException;
+import org.roda.core.data.common.RODAClientException;
+import org.roda.core.data.common.ReportException;
 import org.roda.wui.common.client.PrintReportException;
 
 /**

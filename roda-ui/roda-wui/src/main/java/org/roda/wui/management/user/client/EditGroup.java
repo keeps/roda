@@ -12,7 +12,7 @@ package org.roda.wui.management.user.client;
 
 import java.util.Set;
 
-import org.roda.core.common.NoSuchGroupException;
+import org.roda.core.data.common.NoSuchGroupException;
 import org.roda.core.data.v2.Group;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.widgets.WUIButton;

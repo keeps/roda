@@ -16,12 +16,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.roda.core.common.NotFoundException;
-import org.roda.core.common.Pair;
-import org.roda.core.common.RodaConstants;
 import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
+import org.roda.core.data.common.NotFoundException;
+import org.roda.core.data.common.Pair;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.Representation;
 import org.roda.core.data.v2.RepresentationState;

@@ -10,7 +10,7 @@
  */
 package org.roda.wui.common.client;
 
-import org.roda.core.common.RODAException;
+import org.roda.core.data.common.RODAException;
 
 /**
  * @author Luis Faria

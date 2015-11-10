@@ -160,7 +160,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.roda-project</groupId>
-			<artifactId>roda-common-storage</artifactId>
+			<artifactId>roda-core</artifactId>
 			<exclusions>
 				<exclusion>
 					<artifactId>asm</artifactId>
@@ -263,59 +263,6 @@
 		</dependency>
 		<!-- REST API related dependencies - end -->
 
-		<!-- Akka related dependencies - start -->
-		<dependency>
-			<groupId>com.typesafe.akka</groupId>
-			<artifactId>akka-actor_2.11</artifactId>
-		</dependency>
-		<!-- Akka related dependencies - end -->
-
-		<dependency>
-			<groupId>gov.loc</groupId>
-			<artifactId>bagit</artifactId>
-		</dependency>
-		<!-- <dependency> -->
-		<!-- <groupId>uk.gov.nationalarchives</groupId> -->
-		<!-- <artifactId>droid-command-line</artifactId> -->
-		<!-- <exclusions> -->
-		<!-- <exclusion> -->
-		<!-- <artifactId>bcprov-jdk14</artifactId> -->
-		<!-- <groupId>bouncycastle</groupId> -->
-		<!-- </exclusion> -->
-		<!-- <exclusion> -->
-		<!-- <artifactId>bcmail-jdk14</artifactId> -->
-		<!-- <groupId>bouncycastle</groupId> -->
-		<!-- </exclusion> -->
-		<!-- </exclusions> -->
-		<!-- </dependency> -->
-		<dependency>
-			<groupId>org.openpreservation.jhove</groupId>
-			<artifactId>jhove-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.openpreservation.jhove</groupId>
-			<artifactId>jhove-modules</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>edu.harvard.hul.ois</groupId>
-			<artifactId>fits</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.jdom</groupId>
-			<artifactId>jdom</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>edu.harvard.hul.ois</groupId>
-			<artifactId>ots-schemas</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.tika</groupId>
-			<artifactId>tika-parsers</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.tika</groupId>
-			<artifactId>tika-core</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-compress</artifactId>

@@ -8,8 +8,8 @@
 package org.roda.wui.common.server;
 
 import org.apache.log4j.Logger;
-import org.roda.core.common.RODAException;
 import org.roda.core.data.Report;
+import org.roda.core.data.common.RODAException;
 import org.roda.wui.common.client.ReportService;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;

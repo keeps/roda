@@ -11,7 +11,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Date;
 
-import org.roda.core.common.InvalidStateException;
+import org.roda.core.data.common.InvalidStateException;
 
 /**
  * This is a RODA Object. A RODA Object is a Fedora Object that has a ID and a

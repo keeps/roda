@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-import org.roda.core.common.RodaConstants;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.facet.SimpleFacetParameter;
 import org.roda.core.data.adapter.filter.DateRangeFilterParameter;
@@ -26,6 +25,7 @@ import org.roda.core.data.adapter.filter.FilterParameter;
 import org.roda.core.data.adapter.filter.LikeFilterParameter;
 import org.roda.core.data.adapter.filter.OneOfManyFilterParameter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.RodaUser;
 import org.roda.core.data.v2.SIPReport;
 import org.roda.wui.client.common.SIPReportList;

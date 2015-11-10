@@ -74,7 +74,7 @@ public class About {
   private void init() {
     if (!initialized) {
       initialized = true;
-      layout = new HTMLWidgetWrapper("Home.html");
+      layout = new HTMLWidgetWrapper("About.html");
       layout.addStyleName("wui-home");
     }
   }

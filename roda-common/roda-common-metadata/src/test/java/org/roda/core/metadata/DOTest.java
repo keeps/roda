@@ -9,8 +9,8 @@ package org.roda.core.metadata;
 
 import java.io.File;
 
-import org.roda.core.common.InvalidDescriptionObjectException;
 import org.roda.core.data.DescriptionObject;
+import org.roda.core.data.common.InvalidDescriptionObjectException;
 import org.roda.core.metadata.eadc.EadCHelper;
 
 /**

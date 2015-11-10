@@ -7,7 +7,7 @@
  */
 package org.roda.wui.common.client.tools;
 
-import org.roda.core.common.RodaConstants;
+import org.roda.core.data.common.RodaConstants;
 
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeUri;

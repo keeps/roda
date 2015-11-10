@@ -7,8 +7,8 @@
  */
 package org.roda.util;
 
-import org.roda.util.CommandException;
-import org.roda.util.CommandUtility;
+import org.roda.core.util.CommandException;
+import org.roda.core.util.CommandUtility;
 
 /**
  * @author Rui Castro

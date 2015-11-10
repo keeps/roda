@@ -25,7 +25,7 @@ import org.apache.commons.fileupload.ProgressListener;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.log4j.Logger;
-import org.roda.util.TempDir;
+import org.roda.core.util.TempDir;
 import org.roda.wui.common.fileupload.client.FileUploadPanel;
 
 /**

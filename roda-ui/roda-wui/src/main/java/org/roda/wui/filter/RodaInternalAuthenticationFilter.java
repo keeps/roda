@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.roda.common.UserUtility;
+import org.roda.core.common.UserUtility;
 import org.roda.wui.common.client.tools.Tools;
 
 /**

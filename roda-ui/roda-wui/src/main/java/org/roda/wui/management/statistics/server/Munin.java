@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.roda.common.RodaCoreFactory;
+import org.roda.core.RodaCoreFactory;
 
 /**
  * Servlet implementation class Munin

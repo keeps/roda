@@ -9,7 +9,7 @@ package org.roda.core.data.eadc;
 
 import java.io.Serializable;
 
-import org.roda.core.common.InvalidDescriptionLevel;
+import org.roda.core.data.common.InvalidDescriptionLevel;
 import org.roda.core.data.v2.SimpleDescriptionObject;
 
 /**

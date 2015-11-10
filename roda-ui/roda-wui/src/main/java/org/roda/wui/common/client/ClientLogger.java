@@ -10,7 +10,7 @@ package org.roda.wui.common.client;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.roda.core.common.AuthorizationDeniedException;
+import org.roda.core.data.common.AuthorizationDeniedException;
 import org.roda.wui.client.main.CasForwardDialog;
 import org.roda.wui.common.client.widgets.MessagePopup;
 

@@ -13,10 +13,10 @@ package org.roda.wui.management.statistics.client;
 import java.util.Date;
 import java.util.List;
 
-import org.roda.core.common.RODAException;
 import org.roda.core.data.StatisticData;
 import org.roda.core.data.adapter.ContentAdapter;
 import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.common.RODAException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 

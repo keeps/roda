@@ -8,7 +8,7 @@
 package org.roda.wui.server.main;
 
 import org.apache.log4j.Logger;
-import org.roda.common.RodaCoreFactory;
+import org.roda.core.RodaCoreFactory;
 import org.roda.wui.client.main.GAnalyticsService;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;

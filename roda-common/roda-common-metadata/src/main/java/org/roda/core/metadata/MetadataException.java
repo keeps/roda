@@ -7,7 +7,7 @@
  */
 package org.roda.core.metadata;
 
-import org.roda.core.common.RODAException;
+import org.roda.core.data.common.RODAException;
 
 /**
  * Thrown to indicate that an error related with RODA Metadata as occurred.

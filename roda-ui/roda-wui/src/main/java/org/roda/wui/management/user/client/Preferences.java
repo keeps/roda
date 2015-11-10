@@ -13,7 +13,7 @@ package org.roda.wui.management.user.client;
 import java.util.Arrays;
 import java.util.List;
 
-import org.roda.core.common.EmailAlreadyExistsException;
+import org.roda.core.data.common.EmailAlreadyExistsException;
 import org.roda.core.data.v2.RodaUser;
 import org.roda.core.data.v2.User;
 import org.roda.wui.client.common.UserLogin;
