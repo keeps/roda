@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.roda.common.UserUtility;
+import org.roda.wui.common.client.tools.Tools;
 
 /**
  * @author Hélder Silva <hsilva@keep.pt>
@@ -61,7 +62,7 @@ public class RodaInternalAuthenticationFilter implements Filter {
       String redirect = "/#login";
 
       if (serviceFrag != null) {
-        redirect += "." + serviceFrag;
+        redirect += Tools.HISTORY_SEP + serviceFrag;
       }
 
       httpResponse.sendRedirect(redirect);

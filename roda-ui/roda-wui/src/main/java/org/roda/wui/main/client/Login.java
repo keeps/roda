@@ -123,7 +123,7 @@ public class Login extends Composite {
     username.setText("");
     password.setText("");
     error.setText("");
-    service = Tools.join(historyTokens, ".");
+    service = Tools.join(historyTokens, Tools.HISTORY_SEP);
     callback.onSuccess(this);
   }
 

@@ -285,7 +285,7 @@ public class UserLogin {
    * @param callback
    */
   public void checkRole(final HistoryResolver res, final AsyncCallback<Boolean> callback) {
-    String historyKey = Tools.join(res.getHistoryPath(), ".");
+    String historyKey = Tools.join(res.getHistoryPath(), Tools.HISTORY_PERMISSION_SEP);
     String propertyName = "ui.menu." + historyKey + ".role";
     UserLogin.getRodaProperty(propertyName, new AsyncCallback<String>() {
 

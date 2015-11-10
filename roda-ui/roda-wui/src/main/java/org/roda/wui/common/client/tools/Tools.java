@@ -30,36 +30,22 @@ import com.google.gwt.user.client.ui.ListBox;
  */
 public class Tools {
 
-  /**
-   * Remove the first item from the string array
-   * 
-   * @param array
-   * @return a copy of the array without the first item
-   */
-  public static String[] tail(String[] array) {
-    String[] tail = new String[array.length - 1];
-    for (int i = 1; i < array.length; i++) {
-      tail[i - 1] = array[i];
-    }
-    return tail;
-  }
+  public static final String HISTORY_SEP = "/";
+
+  public static final String HISTORY_SEP_REGEX = "/";
+
+  public static final String HISTORY_SEP_ESCAPE = "%2F";
+
+  public static final String HISTORY_PERMISSION_SEP = ".";
+
+  public static final DateTimeFormat DATE_FORMAT = DateTimeFormat.getFormat("yyyy-MM-dd");
+
+  public static final DateTimeFormat DATE_TIME_FORMAT = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss");
+
+  public static final DateTimeFormat DATE_TIME_MS_FORMAT = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
   public static <T> List<T> tail(List<T> list) {
     return list.subList(1, list.size());
-  }
-
-  /**
-   * Remove last item from the string array
-   * 
-   * @param array
-   * @return a copy of the array without the last item
-   */
-  public static String[] removeLast(String[] array) {
-    String[] ret = new String[array.length - 1];
-    for (int i = 0; i < array.length - 1; i++) {
-      ret[i] = array[i];
-    }
-    return ret;
   }
 
   public static <T> List<T> removeLast(List<T> list) {
@@ -75,10 +61,10 @@ public class Tools {
    */
   public static List<String> splitHistory(String history) {
     List<String> historyPath;
-    if (history.indexOf('.') == -1) {
+    if (history.indexOf(HISTORY_SEP) == -1) {
       historyPath = Arrays.asList(history);
     } else {
-      historyPath = Arrays.asList(history.split("\\."));
+      historyPath = Arrays.asList(history.split(HISTORY_SEP_REGEX));
     }
     return historyPath;
   }
@@ -89,7 +75,7 @@ public class Tools {
       hash = hash.substring(1);
     }
 
-    List<String> splitted = Arrays.asList(hash.split("\\."));
+    List<String> splitted = Arrays.asList(hash.split(HISTORY_SEP_REGEX));
     List<String> tokens = new ArrayList<String>();
     for (String item : splitted) {
       tokens.add(URL.decode(item));
@@ -104,10 +90,10 @@ public class Tools {
       if (first) {
         first = false;
       } else {
-        builder.append(".");
+        builder.append(HISTORY_SEP);
       }
 
-      String encodedToken = URL.encode(token).replaceAll("\\.", "%2E");
+      String encodedToken = URL.encode(token).replaceAll(HISTORY_SEP_REGEX, HISTORY_SEP_ESCAPE);
       builder.append(encodedToken);
     }
 
@@ -214,20 +200,14 @@ public class Tools {
     NumberFormat millisFormat = NumberFormat.getFormat("000");
 
     if (showMillis) {
-      ret = numberFormat.format(hours) + ":" + numberFormat.format(minutes) + ":" + numberFormat.format(seconds) + "."
-        + millisFormat.format(millis);
+      ret = numberFormat.format(hours) + ":" + numberFormat.format(minutes) + ":" + numberFormat.format(seconds)
+        + HISTORY_SEP + millisFormat.format(millis);
     } else {
       ret = numberFormat.format(hours) + ":" + numberFormat.format(minutes) + ":" + numberFormat.format(seconds);
     }
 
     return ret;
   }
-
-  public static final DateTimeFormat DATE_FORMAT = DateTimeFormat.getFormat("yyyy-MM-dd");
-
-  public static final DateTimeFormat DATE_TIME_FORMAT = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss");
-
-  public static final DateTimeFormat DATE_TIME_MS_FORMAT = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
   public static String formatDate(Date date) {
     return DATE_FORMAT.format(date);
