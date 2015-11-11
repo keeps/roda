@@ -60,6 +60,7 @@ public final class RodaConstants {
   public static final String INDEX_SIP_REPORT = "SIPReport";
   public static final String INDEX_MEMBERS = "Members";
   public static final String INDEX_CHARACTERIZATION = "Characterization";
+  public static final String INDEX_SIP = "SIP";
 
   /*
    * STORAGE CONTAINERS
@@ -291,4 +292,12 @@ public final class RodaConstants {
   public static final String MEMBERS_GROUPS_ALL = "groupsAll";
   public static final String MEMBERS_ROLES_ALL = "rolesAll";
 
+  public static final String SIPMONITOR_ID = "id";
+  public static final String SIPMONITOR_FULLPATH = "fullPath";
+  public static final String SIPMONITOR_PARENTPATH = "parentPath";
+  public static final String SIPMONITOR_RELATIVEPATH = "relativePath";
+  public static final String SIPMONITOR_DATE = "date";
+  public static final String SIPMONITOR_ISFILE = "isFile";
+  public static final String SIPMONITOR_NAME = "name";
+  public static final String SIPMONITOR_SIZE = "size";
 }

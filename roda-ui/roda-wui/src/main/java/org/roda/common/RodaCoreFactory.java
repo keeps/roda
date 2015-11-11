@@ -57,6 +57,9 @@ import org.roda.action.orchestrate.embed.AkkaEmbeddedActionOrchestrator;
 import org.roda.action.utils.logCleaner.LogCleanerAction;
 import org.roda.action.utils.premis.V2ToV3PremisAction;
 import org.roda.action.validation.AIPValidationAction;
+import org.roda.common.monitor.FolderMonitorNIO;
+import org.roda.common.monitor.FolderObservable;
+import org.roda.common.monitor.FolderObserver;
 import org.roda.core.common.RodaConstants;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
@@ -71,6 +74,7 @@ import org.roda.core.data.v2.RODAMember;
 import org.roda.core.data.v2.RepresentationFilePreservationObject;
 import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.core.data.v2.User;
+import org.roda.index.IndexFolderObserver;
 import org.roda.index.IndexService;
 import org.roda.index.IndexServiceException;
 import org.roda.index.utils.SolrUtils;
@@ -104,6 +108,10 @@ public class RodaCoreFactory {
   private static ActionOrchestrator actionOrchestrator;
 
   private static ApacheDS ldap;
+
+  private static FolderObservable sipFolderMonitor;
+  private static FolderObserver sipFolderObserver;
+
   private static Path rodaApacheDsConfigDirectory = null;
   private static Path rodaApacheDsDataDirectory = null;
 
@@ -149,6 +157,7 @@ public class RodaCoreFactory {
         System.setProperty("solr.data.dir.sipreport", indexPath.resolve("sipreport").toString());
         System.setProperty("solr.data.dir.members", indexPath.resolve("members").toString());
         System.setProperty("solr.data.dir.othermetadata", indexPath.resolve("othermetadata").toString());
+        System.setProperty("solr.data.dir.sip", indexPath.resolve("sip").toString());
         // FIXME added missing cores
 
         // start embedded solr
@@ -174,6 +183,12 @@ public class RodaCoreFactory {
       }
 
       startApacheDS();
+
+      try {
+        startSIPFolderMonitor();
+      } catch (Exception e) {
+        LOGGER.error("Error starting SIP Monitor: " + e.getMessage());
+      }
 
       instantiated = true;
     }
@@ -296,6 +311,16 @@ public class RodaCoreFactory {
       LOGGER.error("Error starting up embedded ApacheDS", e);
     }
 
+  }
+
+  public static void startSIPFolderMonitor() throws Exception {
+    Configuration rodaConfig = RodaCoreFactory.getRodaConfiguration();
+    String SIPFolderPath = rodaConfig.getString("sip.folder");
+    int SIPTimeout = rodaConfig.getInt("sip.timeout");
+    Path sipFolderPath = dataPath.resolve(SIPFolderPath);
+    sipFolderMonitor = new FolderMonitorNIO(sipFolderPath, SIPTimeout);
+    sipFolderObserver = new IndexFolderObserver(solr);
+    sipFolderMonitor.addFolderObserver(sipFolderObserver);
   }
 
   public static void stopApacheDS() {

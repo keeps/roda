@@ -29,6 +29,7 @@ import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.RodaUser;
 import org.roda.core.data.v2.SimpleDescriptionObject;
+import org.roda.core.data.v2.TransferredResource;
 import org.roda.model.AIP;
 import org.roda.model.DescriptiveMetadata;
 import org.roda.model.ValidationException;
@@ -57,7 +58,13 @@ public class Browser extends RodaCoreService {
 
   private static final String BROWSER_COMPONENT = "Browser";
   private static final String ADMINISTRATION_METADATA_EDITOR_ROLE = "administration.metadata_editor";
+  private static final String INGEST_LIST = "ingest.list";
+
   private static final String BROWSE_ROLE = "browse";
+
+  private static final Object TRANSFERRED_PARENTID = "parentId";
+  private static final Object TRANSFERRED_NUMBER_OF_RECORDS = "numberOfRecords";
+  private static final Object TRANSFERRED_FROM = "from";
 
   private Browser() {
     super();
@@ -621,6 +628,26 @@ public class Browser extends RodaCoreService {
     registerAction(user, BROWSER_COMPONENT, "postDescriptiveMetadataFile", aipId, duration, AIP_ID_PARAM, aipId,
       METADATA_ID_PARAM, metadataId);
 
+  }
+
+  public static IndexResult<TransferredResource> getTransferredResources(RodaUser user, String parentID, int from,
+    int numberOfRecords) throws GenericException {
+    Date startDate = new Date();
+
+    // check user permissions
+    // TODO
+    // UserUtility.checkRoles(user, INGEST_LIST);
+
+    // delegate
+    IndexResult<TransferredResource> resources = BrowserHelper.getTransferredResources(user, parentID, from,
+      numberOfRecords);
+
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, BROWSER_COMPONENT, "getTransferredResources", "", duration, TRANSFERRED_PARENTID, parentID,
+      TRANSFERRED_FROM, from, TRANSFERRED_NUMBER_OF_RECORDS);
+
+    return resources;
   }
 
 }

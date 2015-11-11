@@ -45,6 +45,7 @@ import org.roda.core.common.NotImplementedException;
 import org.roda.core.common.Pair;
 import org.roda.core.common.RodaConstants;
 import org.roda.core.data.adapter.facet.Facets;
+import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sort.SortParameter;
@@ -53,9 +54,12 @@ import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.Representation;
 import org.roda.core.data.v2.RepresentationState;
+import org.roda.core.data.v2.RodaUser;
 import org.roda.core.data.v2.SimpleDescriptionObject;
+import org.roda.core.data.v2.TransferredResource;
 import org.roda.disseminators.common.tools.ZipEntryInfo;
 import org.roda.disseminators.common.tools.ZipTools;
+import org.roda.index.IndexService;
 import org.roda.index.IndexServiceException;
 import org.roda.model.AIP;
 import org.roda.model.DescriptiveMetadata;
@@ -933,6 +937,28 @@ public class BrowserHelper {
       }
     }
 
+  }
+
+  public static IndexResult<TransferredResource> getTransferredResources(RodaUser user, String parentID, int startIndex,
+    int limit) throws GenericException {
+    IndexResult<TransferredResource> result = null;
+    IndexService indexService = RodaCoreFactory.getIndexService();
+
+    try {
+      Sublist sublist = new Sublist(startIndex, limit);
+      Facets facets = null;
+      Filter f = null;
+      if (parentID == null) {
+        f = new Filter(new EmptyKeyFilterParameter(RodaConstants.SIPMONITOR_PARENTPATH));
+      } else {
+        f = new Filter(new SimpleFilterParameter(RodaConstants.SIPMONITOR_PARENTPATH, parentID));
+      }
+      result = indexService.find(TransferredResource.class, f, null, sublist, facets);
+      return result;
+    } catch (IndexServiceException e) {
+      LOGGER.error("Error getting transferred resources");
+      throw new GenericException("Error getting transferred resources: " + e.getMessage());
+    }
   }
 
 }

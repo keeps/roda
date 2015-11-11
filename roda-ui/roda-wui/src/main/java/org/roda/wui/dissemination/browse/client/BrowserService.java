@@ -23,6 +23,7 @@ import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.RepresentationPreservationObject;
 import org.roda.core.data.v2.SimpleDescriptionObject;
+import org.roda.core.data.v2.TransferredResource;
 import org.roda.wui.common.client.GenericException;
 
 import com.google.gwt.core.client.GWT;
@@ -223,6 +224,9 @@ public interface BrowserService extends RemoteService {
 
   public void createDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle newBundle)
     throws AuthorizationDeniedException, GenericException, MetadataParseException, NotFoundException;
+
+  public IndexResult<TransferredResource> getTransferredResources(String parentID, int from, int numberOfRecords)
+    throws AuthorizationDeniedException, GenericException;
 
   // public DescriptiveMetadata retrieveMetadataFile(String itemId, String
   // descriptiveMetadataId) throws RODAException;

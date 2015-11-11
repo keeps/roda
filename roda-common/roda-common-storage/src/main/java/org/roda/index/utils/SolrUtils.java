@@ -85,6 +85,7 @@ import org.roda.core.data.v2.RodaUser;
 import org.roda.core.data.v2.SIPReport;
 import org.roda.core.data.v2.SIPStateTransition;
 import org.roda.core.data.v2.SimpleDescriptionObject;
+import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.data.v2.User;
 import org.roda.index.IndexServiceException;
 import org.roda.model.AIP;
@@ -634,6 +635,8 @@ public class SolrUtils {
       indexName = RodaConstants.INDEX_MEMBERS;
     } else if (resultClass.equals(RODAMember.class)) {
       indexName = RodaConstants.INDEX_MEMBERS;
+    } else if (resultClass.equals(TransferredResource.class)) {
+      indexName = RodaConstants.INDEX_SIP;
     } else {
       throw new IndexServiceException("Cannot find class index name: " + resultClass.getName(),
         IndexServiceException.INTERNAL_SERVER_ERROR);
@@ -662,6 +665,8 @@ public class SolrUtils {
       ret = resultClass.cast(solrDocumentToEventPreservationObject(doc));
     } else if (resultClass.equals(AgentPreservationObject.class)) {
       ret = resultClass.cast(solrDocumentToAgentPreservationObject(doc));
+    } else if (resultClass.equals(TransferredResource.class)) {
+      ret = resultClass.cast(solrDocumentToTransferredResource(doc));
     } else {
       throw new IndexServiceException("Cannot find class index name: " + resultClass.getName(),
         IndexServiceException.INTERNAL_SERVER_ERROR);
@@ -1217,5 +1222,30 @@ public class SolrUtils {
     }
     apo.setModel(teste);
     return apo;
+  }
+
+  private static TransferredResource solrDocumentToTransferredResource(SolrDocument doc) {
+    TransferredResource tr = new TransferredResource();
+    String id = objectToString(doc.get(RodaConstants.SIPMONITOR_ID));
+    String fullPath = objectToString(doc.get(RodaConstants.SIPMONITOR_FULLPATH));
+    String parentPath = null;
+    if (doc.containsKey(RodaConstants.SIPMONITOR_PARENTPATH)) {
+      parentPath = objectToString(doc.get(RodaConstants.SIPMONITOR_PARENTPATH));
+    }
+    String relativePath = objectToString(doc.get(RodaConstants.SIPMONITOR_RELATIVEPATH));
+    Date date = objectToDate(doc.get(RodaConstants.SIPMONITOR_DATE));
+    boolean isFile = objectToBoolean(doc.get(RodaConstants.SIPMONITOR_ISFILE));
+    long size = objectToLong(doc.get(RodaConstants.SIPMONITOR_SIZE));
+    String name = objectToString(doc.get(RodaConstants.SIPMONITOR_NAME));
+
+    tr.setCreationDate(date);
+    tr.setFullPath(fullPath);
+    tr.setId(id);
+    tr.setName(name);
+    tr.setRelativePath(relativePath);
+    tr.setSize(size);
+    tr.setParentPath(parentPath);
+    tr.setFile(isFile);
+    return tr;
   }
 }

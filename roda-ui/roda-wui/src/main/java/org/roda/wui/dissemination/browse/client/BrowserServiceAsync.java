@@ -21,6 +21,7 @@ import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.RepresentationPreservationObject;
 import org.roda.core.data.v2.SimpleDescriptionObject;
+import org.roda.core.data.v2.TransferredResource;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -181,5 +182,8 @@ public interface BrowserServiceAsync {
   // public void retrieveMetadataFile(String itemId, String
   // descriptiveMetadataId,
   // AsyncCallback<DescriptiveMetadata> callback);
+
+  void getTransferredResources(String parentID, int from, int numberOfRecords,
+    AsyncCallback<IndexResult<TransferredResource>> callback);
 
 }

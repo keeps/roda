@@ -35,6 +35,7 @@ import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.RepresentationPreservationObject;
 import org.roda.core.data.v2.RodaUser;
 import org.roda.core.data.v2.SimpleDescriptionObject;
+import org.roda.core.data.v2.TransferredResource;
 import org.roda.model.ValidationException;
 import org.roda.storage.Binary;
 import org.roda.storage.DefaultBinary;
@@ -182,12 +183,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     Long sizeInBytes = Long.valueOf(bundle.getXml().getBytes().length);
     boolean reference = false;
     Map<String, String> contentDigest = new HashMap<>();
-    Binary metadataBinary = new DefaultBinary(storagePath, metadata, payload, sizeInBytes, reference,
-      contentDigest);
+    Binary metadataBinary = new DefaultBinary(storagePath, metadata, payload, sizeInBytes, reference, contentDigest);
 
     try {
-      Browser.updateDescriptiveMetadataFile(user, aipId, metadataId, metadataType,
-        metadataBinary);
+      Browser.updateDescriptiveMetadataFile(user, aipId, metadataId, metadataType, metadataBinary);
     } catch (ValidationException e) {
       throw convertValidationException(e);
     }
@@ -512,6 +511,13 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   protected String escapeXML(String xml) {
     return StringEscapeUtils.escapeXml(xml);
+  }
+
+  @Override
+  public IndexResult<TransferredResource> getTransferredResources(String parentID, int from, int numberOfRecords)
+    throws AuthorizationDeniedException, GenericException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    return Browser.getTransferredResources(user, parentID, from, numberOfRecords);
   }
 
 }
