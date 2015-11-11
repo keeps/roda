@@ -31,7 +31,7 @@ public class IndexFolderObserver implements FolderObserver {
       SolrInputDocument pathDocument = SolrUtils.transferredResourceToSolrDocument(basePath, createdPath);
       if (!createdPath.toFile().isDirectory()) {
         if (createdPath.getParent().compareTo(basePath) != 0) {
-          SolrUtils.updateSizeRecursive(index, relativePath.getParent(), Files.size(createdPath));
+          SolrUtils.updateSizeRecursive(index, relativePath, Files.size(createdPath));
         }
       }
       index.add(RodaConstants.INDEX_SIP, pathDocument);
@@ -41,19 +41,34 @@ public class IndexFolderObserver implements FolderObserver {
     try {
       index.commit(RodaConstants.INDEX_SIP);
     } catch (SolrServerException | IOException e) {
-      LOGGER.error("Could not commit indexed path to SIPMonitor index", e);
+      LOGGER.error("Could not commitbasePath, pathCreated indexed path to SIPMonitor index", e);
     }
   }
 
   @Override
   public void pathModified(Path basePath, Path createdPath) {
-    pathAdded(basePath, createdPath);
+    try {
+      Path relativePath = basePath.relativize(createdPath);
+      if (createdPath.getParent().compareTo(basePath) != 0) {
+        SolrUtils.updateSizeRecursive(index, relativePath.getParent(), -Files.size(createdPath));
+      }
+      pathAdded(basePath, createdPath);
+    } catch (IOException | SolrServerException e) {
+      LOGGER.error("Error modifying path to SIPMonitorIndex");
+    }
   }
 
   @Override
   public void pathDeleted(Path basePath, Path createdPath) {
     LOGGER.debug("PATH DELETED: " + createdPath);
-
+    try {
+      Path relativePath = basePath.relativize(createdPath);
+      if (createdPath.getParent().compareTo(basePath) != 0) {
+        SolrUtils.updateSizeRecursive(index, relativePath.getParent(), -Files.size(createdPath));
+      }
+      index.deleteById(relativePath.toString());
+    } catch (IOException | SolrServerException e) {
+      LOGGER.error("Error deleting path to SIPMonitorIndex");
+    }
   }
-
 }
