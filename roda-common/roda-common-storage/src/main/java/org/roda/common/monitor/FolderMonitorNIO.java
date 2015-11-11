@@ -16,7 +16,9 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -118,6 +120,7 @@ public class FolderMonitorNIO extends FolderObservable {
             notifyPathModified(basePath, child);
           } else if (kind == ENTRY_DELETE) {
             notifyPathDeleted(basePath, child);
+            removeKey(child.toAbsolutePath());
           }
         }
         boolean valid = key.reset();
@@ -129,6 +132,22 @@ public class FolderMonitorNIO extends FolderObservable {
         }
       }
     }
-  }
 
+    private void removeKey(Path p) {
+      List<WatchKey> keysToRemove = new ArrayList<WatchKey>();
+      for (Map.Entry<WatchKey, Path> entry : keys.entrySet()) {
+        if(entry.getValue().toString().equalsIgnoreCase(p.toString())){
+          keysToRemove.add(entry.getKey());
+        }
+        if(entry.getValue().startsWith(p)){
+          keysToRemove.add(entry.getKey());
+        }
+      }
+      if(keysToRemove.size()>0){
+        for(WatchKey key : keysToRemove){
+          keys.remove(key);
+        }
+      }
+    }
+  }
 }
