@@ -14,7 +14,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Serializable;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -1247,5 +1249,51 @@ public class SolrUtils {
     tr.setParentPath(parentPath);
     tr.setFile(isFile);
     return tr;
+  }
+
+  public static SolrInputDocument transferredResourceToSolrDocument(Path basePath, Path createdPath)
+    throws IOException {
+    SolrInputDocument sip = new SolrInputDocument();
+    Path relativePath = basePath.relativize(createdPath);
+    sip.addField(RodaConstants.SIPMONITOR_ID, relativePath.toString());
+    sip.addField(RodaConstants.SIPMONITOR_FULLPATH, createdPath.toString());
+    if (createdPath.getParent().compareTo(basePath) != 0) {
+      sip.addField(RodaConstants.SIPMONITOR_PARENTPATH, relativePath.getParent().toString());
+    }
+    sip.addField(RodaConstants.SIPMONITOR_RELATIVEPATH, relativePath.toString());
+    sip.addField(RodaConstants.SIPMONITOR_DATE, new Date());
+    if (createdPath.toFile().isDirectory()) {
+      sip.addField(RodaConstants.SIPMONITOR_ISFILE, false);
+      sip.addField(RodaConstants.SIPMONITOR_SIZE, 0L);
+    } else {
+      sip.addField(RodaConstants.SIPMONITOR_ISFILE, true);
+      long fileSize = Files.size(createdPath);
+      sip.addField(RodaConstants.SIPMONITOR_SIZE, fileSize);
+    }
+
+    sip.addField(RodaConstants.SIPMONITOR_NAME, relativePath.getFileName().toString());
+
+    return sip;
+  }
+
+  public static void updateSizeRecursive(SolrClient index, Path p, long size) throws SolrServerException, IOException {
+    SolrDocument sd = index.getById(RodaConstants.INDEX_SIP, p.toString());
+    SolrInputDocument sid = new SolrInputDocument();
+    for (String s : sd.getFieldNames()) {
+      if (s.equalsIgnoreCase(RodaConstants.SIPMONITOR_SIZE)) {
+        long currentSize = objectToLong(sd.get(s));
+        currentSize += size;
+        sid.addField(s, currentSize);
+      } else {
+        sid.addField(s, sd.get(s));
+      }
+    }
+    index.add(RodaConstants.INDEX_SIP, sid);
+    index.commit(RodaConstants.INDEX_SIP);
+
+    if (sd.get(RodaConstants.SIPMONITOR_PARENTPATH) != null) {
+      updateSizeRecursive(index, Paths.get(objectToString(sd.get(RodaConstants.SIPMONITOR_PARENTPATH))), size);
+    }
+
   }
 }
