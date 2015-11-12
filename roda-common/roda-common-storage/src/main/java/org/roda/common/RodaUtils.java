@@ -14,8 +14,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -24,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -157,4 +161,25 @@ public class RodaUtils {
     Source text = new StreamSource(fileReader);
     transformer.transform(text, new StreamResult(result));
   }
+
+  public static long getSizePath(Path startPath) throws IOException {
+    final AtomicLong size = new AtomicLong(0);
+
+    Files.walkFileTree(startPath, new SimpleFileVisitor<Path>() {
+      @Override
+      public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+        size.addAndGet(attrs.size());
+        return FileVisitResult.CONTINUE;
+      }
+
+      @Override
+      public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+        // Skip folders that can't be traversed
+        return FileVisitResult.CONTINUE;
+      }
+    });
+
+    return size.get();
+  }
+
 }
