@@ -318,7 +318,9 @@ public class RodaCoreFactory {
     String SIPFolderPath = rodaConfig.getString("sip.folder");
     int SIPTimeout = rodaConfig.getInt("sip.timeout");
     Path sipFolderPath = dataPath.resolve(SIPFolderPath);
+
     sipFolderMonitor = new FolderMonitorNIO(sipFolderPath, SIPTimeout);
+    // sipFolderMonitor = new FolderMonitor(sipFolderPath, SIPTimeout);
     sipFolderObserver = new IndexFolderObserver(solr);
     sipFolderMonitor.addFolderObserver(sipFolderObserver);
   }

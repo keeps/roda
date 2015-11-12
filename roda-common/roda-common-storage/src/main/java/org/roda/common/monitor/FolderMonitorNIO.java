@@ -136,15 +136,15 @@ public class FolderMonitorNIO extends FolderObservable {
     private void removeKey(Path p) {
       List<WatchKey> keysToRemove = new ArrayList<WatchKey>();
       for (Map.Entry<WatchKey, Path> entry : keys.entrySet()) {
-        if(entry.getValue().toString().equalsIgnoreCase(p.toString())){
+        if (entry.getValue().toString().equalsIgnoreCase(p.toString())) {
           keysToRemove.add(entry.getKey());
         }
-        if(entry.getValue().startsWith(p)){
+        if (entry.getValue().startsWith(p)) {
           keysToRemove.add(entry.getKey());
         }
       }
-      if(keysToRemove.size()>0){
-        for(WatchKey key : keysToRemove){
+      if (keysToRemove.size() > 0) {
+        for (WatchKey key : keysToRemove) {
           keys.remove(key);
         }
       }

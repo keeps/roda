@@ -16,7 +16,6 @@ import java.io.Reader;
 import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -1276,24 +1275,22 @@ public class SolrUtils {
     return sip;
   }
 
-  public static void updateSizeRecursive(SolrClient index, Path p, long size) throws SolrServerException, IOException {
-    SolrDocument sd = index.getById(RodaConstants.INDEX_SIP, p.toString());
-    SolrInputDocument sid = new SolrInputDocument();
-    for (String s : sd.getFieldNames()) {
-      if (s.equalsIgnoreCase(RodaConstants.SIPMONITOR_SIZE)) {
-        long currentSize = objectToLong(sd.get(s));
-        currentSize += size;
-        sid.addField(s, currentSize);
-      } else {
-        sid.addField(s, sd.get(s));
-      }
-    }
-    index.add(RodaConstants.INDEX_SIP, sid);
-    index.commit(RodaConstants.INDEX_SIP);
-
-    if (sd.get(RodaConstants.SIPMONITOR_PARENTPATH) != null) {
-      updateSizeRecursive(index, Paths.get(objectToString(sd.get(RodaConstants.SIPMONITOR_PARENTPATH))), size);
-    }
-
-  }
+  /*
+   * public static void updateSizeRecursive(SolrClient index, Path p, long size)
+   * throws SolrServerException, IOException { LOGGER.debug(
+   * "UpdateSizeRecursive: "+p.toString()); SolrDocument sd =
+   * index.getById(RodaConstants.INDEX_SIP, p.toString()); SolrInputDocument sid
+   * = new SolrInputDocument(); for (String s : sd.getFieldNames()) { if
+   * (s.equalsIgnoreCase(RodaConstants.SIPMONITOR_SIZE)) { long currentSize =
+   * objectToLong(sd.get(s)); currentSize += size; sid.addField(s, currentSize);
+   * } else { sid.addField(s, sd.get(s)); } } index.add(RodaConstants.INDEX_SIP,
+   * sid); index.commit(RodaConstants.INDEX_SIP);
+   * 
+   * if (sd.get(RodaConstants.SIPMONITOR_PARENTPATH) != null) {
+   * updateSizeRecursive(index,
+   * Paths.get(objectToString(sd.get(RodaConstants.SIPMONITOR_PARENTPATH))),
+   * size); }
+   * 
+   * }
+   */
 }
