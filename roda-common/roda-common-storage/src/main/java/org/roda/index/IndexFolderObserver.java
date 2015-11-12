@@ -29,7 +29,6 @@ public class IndexFolderObserver implements FolderObserver {
 
   public void pathAddedSimple(Path basePath, Path createdPath, boolean addParents) throws IOException {
     try {
-      Path relativePath = basePath.relativize(createdPath);
       SolrInputDocument pathDocument = SolrUtils.transferredResourceToSolrDocument(basePath, createdPath);
       index.add(RodaConstants.INDEX_SIP, pathDocument);
       if (addParents) {
@@ -47,7 +46,6 @@ public class IndexFolderObserver implements FolderObserver {
   @Override
   public void pathAdded(Path basePath, Path createdPath) {
     try {
-      Path relativePath = basePath.relativize(createdPath);
       SolrInputDocument pathDocument = SolrUtils.transferredResourceToSolrDocument(basePath, createdPath);
       Path parentPath = createdPath.getParent();
       while (!Files.isSameFile(basePath, parentPath)) {
@@ -80,19 +78,14 @@ public class IndexFolderObserver implements FolderObserver {
         });
       }
       index.add(RodaConstants.INDEX_SIP, pathDocument);
-    } catch (IOException | SolrServerException e) {
-      LOGGER.error("Error adding path to SIPMonitorIndex");
-    }
-    try {
       index.commit(RodaConstants.INDEX_SIP);
-    } catch (SolrServerException | IOException e) {
-      LOGGER.error("Could not commitbasePath, pathCreated indexed path to SIPMonitor index: " + e.getMessage(), e);
+    } catch (IOException | SolrServerException e) {
+      LOGGER.error("Error adding path to SIPMonitorIndex: "+e.getMessage(),e);
     }
   }
 
   @Override
   public void pathModified(Path basePath, Path createdPath) {
-    pathAdded(basePath, createdPath);
   }
 
   @Override
