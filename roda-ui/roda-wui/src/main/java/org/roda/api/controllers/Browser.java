@@ -34,9 +34,9 @@ import org.roda.model.AIP;
 import org.roda.model.DescriptiveMetadata;
 import org.roda.model.ValidationException;
 import org.roda.storage.Binary;
+import org.roda.wui.client.browse.BrowseItemBundle;
+import org.roda.wui.client.browse.DescriptiveMetadataEditBundle;
 import org.roda.wui.common.client.GenericException;
-import org.roda.wui.dissemination.browse.client.BrowseItemBundle;
-import org.roda.wui.dissemination.browse.client.DescriptiveMetadataEditBundle;
 
 /**
  * FIXME 1) verify all checkObject*Permissions (because now also a permission
@@ -59,6 +59,7 @@ public class Browser extends RodaCoreService {
   private static final String BROWSER_COMPONENT = "Browser";
   private static final String ADMINISTRATION_METADATA_EDITOR_ROLE = "administration.metadata_editor";
   private static final String INGEST_LIST = "ingest.list";
+  private static final String INGEST_TRANSFER = "ingest.transfer";
 
   private static final String BROWSE_ROLE = "browse";
 
@@ -118,8 +119,8 @@ public class Browser extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "findDescriptiveMetadata", null, duration, FILTER_PARAM, filter.toString(),
-      SORTER_PARAM, sorter.toString(), SUBLIST_PARAM, sublist.toString());
+    registerAction(user, BROWSER_COMPONENT, "findDescriptiveMetadata", null, duration, FILTER_PARAM, filter,
+      SORTER_PARAM, sorter, SUBLIST_PARAM, sublist);
 
     return descriptiveMetadata;
   }
@@ -630,22 +631,24 @@ public class Browser extends RodaCoreService {
 
   }
 
-  public static IndexResult<TransferredResource> getTransferredResources(RodaUser user, String parentID, int from,
-    int numberOfRecords) throws GenericException {
+  public static IndexResult<TransferredResource> findTransferredResources(RodaUser user, Filter filter, Sorter sorter,
+    Sublist sublist, Facets facets) throws GenericException, AuthorizationDeniedException {
     Date startDate = new Date();
 
     // check user permissions
-    // TODO
-    // UserUtility.checkRoles(user, INGEST_LIST);
+    UserUtility.checkRoles(user, INGEST_TRANSFER);
+
+    // TODO if not admin, add to filter a constraint for the resource to belong
+    // to this user
 
     // delegate
-    IndexResult<TransferredResource> resources = BrowserHelper.getTransferredResources(user, parentID, from,
-      numberOfRecords);
+    IndexResult<TransferredResource> resources = BrowserHelper.findTransferredResources(filter, sorter, sublist,
+      facets);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "getTransferredResources", "", duration, TRANSFERRED_PARENTID, parentID,
-      TRANSFERRED_FROM, from, TRANSFERRED_NUMBER_OF_RECORDS);
+    registerAction(user, BROWSER_COMPONENT, "findTransferredResources", null, duration, FILTER_PARAM, filter,
+      SORTER_PARAM, sorter, SUBLIST_PARAM, sublist);
 
     return resources;
   }

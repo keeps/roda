@@ -16,13 +16,13 @@ import java.util.List;
 import org.roda.core.common.InvalidTokenException;
 import org.roda.core.common.NoSuchUserException;
 import org.roda.core.data.v2.RodaUser;
+import org.roda.wui.client.about.About;
+import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.BadHistoryTokenException;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.UserLogin;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.WUIButton;
-import org.roda.wui.home.client.Home;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.History;
@@ -127,7 +127,7 @@ public class ResetPassword implements HistoryResolver {
 
             public void onSuccess(Void result) {
               Window.alert(constants.resetPasswordSuccess());
-              Tools.newHistory(Home.RESOLVER);
+              Tools.newHistory(About.RESOLVER);
             }
 
           });

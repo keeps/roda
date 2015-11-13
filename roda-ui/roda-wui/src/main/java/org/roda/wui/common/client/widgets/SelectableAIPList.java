@@ -15,8 +15,8 @@ import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.SimpleDescriptionObject;
-import org.roda.wui.main.client.BreadcrumbItem;
-import org.roda.wui.main.client.BreadcrumbPanel;
+import org.roda.wui.client.main.BreadcrumbItem;
+import org.roda.wui.client.main.BreadcrumbPanel;
 
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;

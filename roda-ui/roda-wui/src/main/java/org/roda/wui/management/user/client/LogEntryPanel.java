@@ -14,8 +14,8 @@ import java.util.List;
 
 import org.roda.core.data.v2.LogEntry;
 import org.roda.core.data.v2.LogEntryParameter;
+import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.UserLogin;
 import org.roda.wui.common.client.tools.Tools;
 
 import com.google.gwt.core.client.GWT;

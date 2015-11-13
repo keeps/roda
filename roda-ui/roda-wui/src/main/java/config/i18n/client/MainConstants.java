@@ -9,6 +9,7 @@ package config.i18n.client;
 
 import com.google.gwt.i18n.client.Constants;
 import com.google.gwt.i18n.client.ConstantsWithLookup;
+import com.google.gwt.safehtml.shared.SafeHtml;
 
 /**
  * @author Luis Faria Interface to represent the constants contained in resource
@@ -18,9 +19,6 @@ public interface MainConstants extends Constants, ConstantsWithLookup {
 
   // Content titles
 
-  @Key("title.home")
-  @DefaultStringValue("Home")
-  public String title_home();
 
   @Key("title.help.supportsoftware")
   @DefaultStringValue("Support Software")
@@ -149,6 +147,10 @@ public interface MainConstants extends Constants, ConstantsWithLookup {
   @Key("title.ingest.preIngest")
   @DefaultStringValue("Pre-ingest")
   public String title_ingest_pre();
+  
+  @Key("title.ingest.transfer")
+  @DefaultStringValue("Transfer")
+  public String title_ingest_transfer();
 
   @Key("title.ingest.submit")
   @DefaultStringValue("Submit")
@@ -222,5 +224,7 @@ public interface MainConstants extends Constants, ConstantsWithLookup {
 
   @DefaultStringValue("You need to be authenticated to access this page. Do you want to authenticate?")
   public String casForwardWarning();
+
+
 
 }

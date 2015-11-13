@@ -18,10 +18,10 @@ import org.roda.core.data.v2.Group;
 import org.roda.core.data.v2.RODAMember;
 import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.core.data.v2.User;
+import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.widgets.LoadingPopup;
 import org.roda.wui.common.client.widgets.WUIButton;
-import org.roda.wui.ingest.client.Ingest;
 import org.roda.wui.management.user.client.GroupMiniPanel;
 import org.roda.wui.management.user.client.UserMiniPanel;
 

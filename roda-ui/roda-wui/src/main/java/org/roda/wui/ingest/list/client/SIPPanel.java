@@ -16,6 +16,7 @@ import org.roda.core.data.SIPState;
 import org.roda.core.data.v2.RodaUser;
 import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.core.data.v2.User;
+import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.SuccessListener;
 import org.roda.wui.common.client.images.CommonImageBundle;
@@ -23,7 +24,6 @@ import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.ElementPanel;
 import org.roda.wui.common.client.widgets.UserInfoPanel;
 import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
-import org.roda.wui.dissemination.browse.client.BrowserService;
 import org.roda.wui.ingest.list.client.SelectDescriptionObjectWindow.SelectDescriptionObjectListener;
 import org.roda.wui.management.user.client.UserManagementService;
 

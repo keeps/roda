@@ -23,7 +23,7 @@
 						<groupId>org.codehaus.mojo</groupId>
 						<artifactId>gwt-maven-plugin</artifactId>
 						<configuration>
-							<runTarget>org.roda.wui.main.Main/Main.html</runTarget>
+							<runTarget>org.roda.wui.RodaWUI/Main.html</runTarget>
 							<buildOutputDirectory>target/classes</buildOutputDirectory>
 						</configuration>
 						<executions>
@@ -51,7 +51,7 @@
 									<includes>
 										<include>gwt-unitCache/**</include>
 										<include>webapp/org.roda.disseminators.common.loading.Loading/**</include>
-										<include>webapp/org.roda.wui.main.Main/**</include>
+										<include>webapp/org.roda.wui.RodaWUI/**</include>
 										<include>webapp/WEB-INF/deploy/**</include>
 										<include>webapp/WEB-INF/classes/**</include>
 									</includes>

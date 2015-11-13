@@ -15,14 +15,14 @@ import java.util.List;
 
 import org.roda.core.common.NoSuchUserException;
 import org.roda.core.data.v2.RodaUser;
+import org.roda.wui.client.about.About;
+import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.captcha.client.AbstractImageCaptcha;
 import org.roda.wui.common.captcha.client.DefaultImageCaptcha;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.UserLogin;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.WUIButton;
-import org.roda.wui.home.client.Home;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.History;
@@ -113,7 +113,7 @@ public class RecoverLoginRequest implements HistoryResolver {
             public void onSuccess(Boolean captchaSuccess) {
               if (captchaSuccess.booleanValue()) {
                 Window.alert(constants.recoverLoginSuccess());
-                Tools.newHistory(Home.RESOLVER);
+                Tools.newHistory(About.RESOLVER);
               } else {
                 Window.alert(constants.recoverLoginCaptchaFailed());
                 captcha.refresh();

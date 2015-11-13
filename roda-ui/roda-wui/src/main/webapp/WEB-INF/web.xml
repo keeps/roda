@@ -149,12 +149,12 @@
 	<servlet>
 		<servlet-name>GAnalyticsService</servlet-name>
 		<servlet-class>
-			org.roda.wui.main.server.GAnalyticsServiceImpl</servlet-class>
+			org.roda.wui.server.main.GAnalyticsServiceImpl</servlet-class>
 	</servlet>
 	<servlet>
 		<servlet-name>DescriptionLevelService</servlet-name>
 		<servlet-class>
-			org.roda.wui.main.server.DescriptionLevelServiceImpl</servlet-class>
+			org.roda.wui.server.main.DescriptionLevelServiceImpl</servlet-class>
 	</servlet>
 	<servlet>
 		<servlet-name>UserManagementService</servlet-name>
@@ -164,17 +164,12 @@
 	<servlet>
 		<servlet-name>UserLoginService</servlet-name>
 		<servlet-class>
-			org.roda.wui.common.server.UserLoginServiceImpl</servlet-class>
+			org.roda.wui.server.common.UserLoginServiceImpl</servlet-class>
 	</servlet>
 	<servlet>
 		<servlet-name>BrowserService</servlet-name>
 		<servlet-class>
-			org.roda.wui.dissemination.browse.server.BrowserServiceImpl</servlet-class>
-	</servlet>
-	<servlet>
-		<servlet-name>SearchService</servlet-name>
-		<servlet-class>
-			org.roda.wui.dissemination.search.server.SearchServiceImpl</servlet-class>
+			org.roda.wui.server.browse.BrowserServiceImpl</servlet-class>
 	</servlet>
 	<servlet>
 		<servlet-name>EditorService</servlet-name>
@@ -239,87 +234,83 @@
 
 	<servlet-mapping>
 		<servlet-name>ClientLogger</servlet-name>
-		<url-pattern>/org.roda.wui.main.Main/wuilogger</url-pattern>
+		<url-pattern>/org.roda.wui.RodaWUI/wuilogger</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>ImageCaptchaService</servlet-name>
-		<url-pattern>/org.roda.wui.main.Main/jcaptcha</url-pattern>
+		<url-pattern>/org.roda.wui.RodaWUI/jcaptcha</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>CaptchaService</servlet-name>
-		<url-pattern>/org.roda.wui.main.Main/captchaservice</url-pattern>
+		<url-pattern>/org.roda.wui.RodaWUI/captchaservice</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>GAnalyticsService</servlet-name>
-		<url-pattern>/org.roda.wui.main.Main/gaservice</url-pattern>
+		<url-pattern>/org.roda.wui.RodaWUI/gaservice</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>DescriptionLevelService</servlet-name>
-		<url-pattern>/org.roda.wui.main.Main/descriptionlevel</url-pattern>
+		<url-pattern>/org.roda.wui.RodaWUI/descriptionlevel</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>FileDownload</servlet-name>
-		<url-pattern>/org.roda.wui.main.Main/wuidownload</url-pattern>
+		<url-pattern>/org.roda.wui.RodaWUI/wuidownload</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>UserManagementService</servlet-name>
-		<url-pattern>/org.roda.wui.main.Main/UserManagementService</url-pattern>
+		<url-pattern>/org.roda.wui.RodaWUI/UserManagementService</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>UserLoginService</servlet-name>
-		<url-pattern>/org.roda.wui.main.Main/userlogin</url-pattern>
+		<url-pattern>/org.roda.wui.RodaWUI/userlogin</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>BrowserService</servlet-name>
-		<url-pattern>/org.roda.wui.main.Main/browserservice</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>SearchService</servlet-name>
-		<url-pattern>/org.roda.wui.main.Main/searchservice</url-pattern>
+		<url-pattern>/org.roda.wui.RodaWUI/browserservice</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>EditorService</servlet-name>
-		<url-pattern>/org.roda.wui.main.Main/editorservice</url-pattern>
+		<url-pattern>/org.roda.wui.RodaWUI/editorservice</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>IngestListService</servlet-name>
-		<url-pattern>/org.roda.wui.main.Main/ingestlist</url-pattern>
+		<url-pattern>/org.roda.wui.RodaWUI/ingestlist</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>FileUpload</servlet-name>
-		<url-pattern>/org.roda.wui.main.Main/fileUpload</url-pattern>
+		<url-pattern>/org.roda.wui.RodaWUI/fileUpload</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>IngestSubmitService</servlet-name>
-		<url-pattern>/org.roda.wui.main.Main/ingestsubmitservice</url-pattern>
+		<url-pattern>/org.roda.wui.RodaWUI/ingestsubmitservice</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>EventManagementService</servlet-name>
-		<url-pattern>/org.roda.wui.main.Main/eventmanagementservice</url-pattern>
+		<url-pattern>/org.roda.wui.RodaWUI/eventmanagementservice</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>ReportService</servlet-name>
-		<url-pattern>/org.roda.wui.main.Main/reportservice</url-pattern>
+		<url-pattern>/org.roda.wui.RodaWUI/reportservice</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>ReportDownload</servlet-name>
-		<url-pattern>/org.roda.wui.main.Main/ReportDownload</url-pattern>
+		<url-pattern>/org.roda.wui.RodaWUI/ReportDownload</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>StatisticsService</servlet-name>
-		<url-pattern>/org.roda.wui.main.Main/StatisticsService</url-pattern>
+		<url-pattern>/org.roda.wui.RodaWUI/StatisticsService</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>MetadataDownload</servlet-name>
-		<url-pattern>/org.roda.wui.main.Main/MetadataDownload</url-pattern>
+		<url-pattern>/org.roda.wui.RodaWUI/MetadataDownload</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>AIPDownload</servlet-name>
-		<url-pattern>/org.roda.wui.main.Main/AIPDownload</url-pattern>
+		<url-pattern>/org.roda.wui.RodaWUI/AIPDownload</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>DIPDownload</servlet-name>
-		<url-pattern>/org.roda.wui.main.Main/DIPDownload</url-pattern>
+		<url-pattern>/org.roda.wui.RodaWUI/DIPDownload</url-pattern>
 	</servlet-mapping>
 
 
@@ -452,7 +443,7 @@
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>Munin</servlet-name>
-		<url-pattern>/org.roda.wui.main.Main/Munin/*</url-pattern>
+		<url-pattern>/org.roda.wui.RodaWUI/Munin/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>GwtCacheServer</servlet-name>
@@ -468,7 +459,7 @@
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>FileUploadProgress</servlet-name>
-		<url-pattern>/org.roda.wui.main.Main/fileuploadprogress</url-pattern>
+		<url-pattern>/org.roda.wui.RodaWUI/fileuploadprogress</url-pattern>
 	</servlet-mapping>
 
 	<!-- Welcome file -->

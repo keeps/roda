@@ -10,12 +10,12 @@
  */
 package org.roda.wui.ingest.submit.client;
 
+import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.WUIButton;
 import org.roda.wui.common.fileupload.client.FileNameConstraints;
 import org.roda.wui.common.fileupload.client.FileUploadPanel;
-import org.roda.wui.ingest.client.Ingest;
 import org.roda.wui.ingest.list.client.IngestList;
 
 import com.google.gwt.core.client.GWT;

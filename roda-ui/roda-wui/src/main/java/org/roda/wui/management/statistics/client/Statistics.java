@@ -13,8 +13,8 @@ package org.roda.wui.management.statistics.client;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.UserLogin;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.management.client.Management;
 

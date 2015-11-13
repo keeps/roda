@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+	xmlns:i="urn:import:config.i18n.client" xmlns:m="urn:import:org.roda.wui.main.client"
+	xmlns:common="urn:import:org.roda.wui.common.client.widgets" xmlns:d="urn:import:com.google.gwt.user.datepicker.client">
+
+	<ui:style>
+	
+	</ui:style>
+
+	<g:FlowPanel styleName="wui-ingest-transfer" addStyleNames="wrapper skip_padding">
+		<g:FlowPanel addStyleNames="row full_width skip_padding">
+			<g:FlowPanel addStyleNames="col_10 content">
+				<g:Label styleName="h1">Ingest transfer</g:Label>
+				<common:TransferredResourceList
+					addStyleNames="transferredResourceList" ui:field="transferredResourceList" />
+			</g:FlowPanel>
+			<g:FlowPanel addStyleNames="col_2 last sidebar">
+				<g:FlowPanel>
+					<g:Label addStyleNames="h4">
+						<ui:msg>Download</ui:msg>
+					</g:Label>
+				</g:FlowPanel>
+				<g:FlowPanel>
+					<g:Label addStyleNames="h4">
+						<ui:msg>Actions</ui:msg>
+					</g:Label>
+					<g:Button addStyleNames="btn btn-play" ui:field="report">Start
+						ingest</g:Button>
+					<g:Button addStyleNames="btn btn-plus" ui:field="view">Create
+						folder</g:Button>
+					<g:Button addStyleNames="btn btn-upload" ui:field="accept">Upload
+						files</g:Button>
+					<g:Button addStyleNames="btn btn-ban" ui:field="reject">Remove</g:Button>
+				</g:FlowPanel>
+			</g:FlowPanel>
+		</g:FlowPanel>
+	</g:FlowPanel>
+</ui:UiBinder>

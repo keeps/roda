@@ -12,11 +12,11 @@ package org.roda.wui.ingest.submit.client;
 
 import java.util.List;
 
+import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.common.client.BadHistoryTokenException;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.UserLogin;
 import org.roda.wui.common.client.tools.Tools;
-import org.roda.wui.ingest.client.Ingest;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.SelectionEvent;

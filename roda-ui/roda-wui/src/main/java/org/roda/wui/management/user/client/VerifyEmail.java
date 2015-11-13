@@ -16,11 +16,11 @@ import java.util.List;
 import org.roda.core.common.EmailAlreadyExistsException;
 import org.roda.core.common.NoSuchRODAObjectException;
 import org.roda.core.common.NoSuchUserException;
+import org.roda.wui.client.about.About;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.WUIButton;
-import org.roda.wui.home.client.Home;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.History;
@@ -122,7 +122,7 @@ public class VerifyEmail implements HistoryResolver {
             public void onSuccess(Boolean verified) {
               if (verified.booleanValue()) {
                 Window.alert(constants.verifyEmailSuccess());
-                Tools.newHistory(Home.RESOLVER);
+                Tools.newHistory(About.RESOLVER);
               } else {
                 Window.alert(constants.verifyEmailWrongToken());
                 tokenInputBox.setFocus(true);

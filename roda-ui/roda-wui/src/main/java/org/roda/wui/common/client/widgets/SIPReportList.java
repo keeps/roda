@@ -35,6 +35,11 @@ import com.google.gwt.view.client.ProvidesKey;
 
 import config.i18n.client.IngestListConstants;
 
+/**
+ * 
+ * @author Luis Faria <lfaria@keep.pt>
+ *
+ */
 public class SIPReportList extends AsyncTableCell<SIPReport> {
 
   private static final int PAGE_SIZE = 20;

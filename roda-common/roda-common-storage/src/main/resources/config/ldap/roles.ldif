@@ -158,3 +158,15 @@ cn: ingest.insert_files
 roleOccupant: uid=roda-ingest-task,ou=users,dc=roda,dc=org
 roleOccupant: uid=roda-preservation-task,ou=users,dc=roda,dc=org
 
+dn: cn=ingest.transfer,ou=roles,dc=roda,dc=org
+objectClass: top
+objectClass: organizationalRole
+cn: ingest.transfer
+roleOccupant: cn=administrators,ou=groups,dc=roda,dc=org
+
+dn: cn=ingest.list,ou=roles,dc=roda,dc=org
+objectClass: top
+objectClass: organizationalRole
+cn: ingest.transfer
+roleOccupant: cn=administrators,ou=groups,dc=roda,dc=org
+

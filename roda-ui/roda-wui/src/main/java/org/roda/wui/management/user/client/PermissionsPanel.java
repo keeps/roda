@@ -19,8 +19,8 @@ import java.util.MissingResourceException;
 import java.util.Set;
 import java.util.Vector;
 
+import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.ClientLogger;
-import org.roda.wui.common.client.UserLogin;
 import org.roda.wui.common.client.widgets.LoadingPopup;
 
 import com.google.gwt.core.client.GWT;

@@ -45,7 +45,6 @@ import org.roda.core.common.NotImplementedException;
 import org.roda.core.common.Pair;
 import org.roda.core.common.RodaConstants;
 import org.roda.core.data.adapter.facet.Facets;
-import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sort.SortParameter;
@@ -54,12 +53,10 @@ import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.Representation;
 import org.roda.core.data.v2.RepresentationState;
-import org.roda.core.data.v2.RodaUser;
 import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.disseminators.common.tools.ZipEntryInfo;
 import org.roda.disseminators.common.tools.ZipTools;
-import org.roda.index.IndexService;
 import org.roda.index.IndexServiceException;
 import org.roda.model.AIP;
 import org.roda.model.DescriptiveMetadata;
@@ -74,12 +71,12 @@ import org.roda.storage.StoragePath;
 import org.roda.storage.StorageService;
 import org.roda.storage.StorageServiceException;
 import org.roda.storage.fs.FSUtils;
+import org.roda.wui.client.browse.BrowseItemBundle;
+import org.roda.wui.client.browse.DescriptiveMetadataEditBundle;
+import org.roda.wui.client.browse.DescriptiveMetadataViewBundle;
+import org.roda.wui.client.browse.PreservationMetadataBundle;
 import org.roda.wui.common.client.GenericException;
 import org.roda.wui.common.server.ServerTools;
-import org.roda.wui.dissemination.browse.client.BrowseItemBundle;
-import org.roda.wui.dissemination.browse.client.DescriptiveMetadataEditBundle;
-import org.roda.wui.dissemination.browse.client.DescriptiveMetadataViewBundle;
-import org.roda.wui.dissemination.browse.client.PreservationMetadataBundle;
 
 import config.i18n.server.Messages;
 
@@ -939,26 +936,20 @@ public class BrowserHelper {
 
   }
 
-  public static IndexResult<TransferredResource> getTransferredResources(RodaUser user, String parentID, int startIndex,
-    int limit) throws GenericException {
-    IndexResult<TransferredResource> result = null;
-    IndexService indexService = RodaCoreFactory.getIndexService();
-
+  public static IndexResult<TransferredResource> findTransferredResources(Filter filter, Sorter sorter,
+    Sublist sublist, Facets facets) throws GenericException {
+    
+    IndexResult<TransferredResource> ret;
     try {
-      Sublist sublist = new Sublist(startIndex, limit);
-      Facets facets = null;
-      Filter f = null;
-      if (parentID == null) {
-        f = new Filter(new EmptyKeyFilterParameter(RodaConstants.SIPMONITOR_PARENTPATH));
-      } else {
-        f = new Filter(new SimpleFilterParameter(RodaConstants.SIPMONITOR_PARENTPATH, parentID));
-      }
-      result = indexService.find(TransferredResource.class, f, null, sublist, facets);
-      return result;
+      ret = RodaCoreFactory.getIndexService().find(TransferredResource.class, filter, sorter, sublist, facets);
+      LOGGER.debug(String.format("findTransferredResources(%1$s,%2$s,%3$s)=%4$s", filter, sorter, sublist, ret));
     } catch (IndexServiceException e) {
-      LOGGER.error("Error getting transferred resources");
+      LOGGER.error("Error getting transferred resources", e);
       throw new GenericException("Error getting transferred resources: " + e.getMessage());
     }
+
+    return ret;
+    
   }
 
 }

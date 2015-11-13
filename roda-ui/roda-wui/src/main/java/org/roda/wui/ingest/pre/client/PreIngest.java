@@ -14,11 +14,11 @@ import java.util.List;
 
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.ProducerFilterParameter;
+import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.UserLogin;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
-import org.roda.wui.ingest.client.Ingest;
 
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;

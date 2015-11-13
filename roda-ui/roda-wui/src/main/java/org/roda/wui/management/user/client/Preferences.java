@@ -16,9 +16,9 @@ import java.util.List;
 import org.roda.core.common.EmailAlreadyExistsException;
 import org.roda.core.data.v2.RodaUser;
 import org.roda.core.data.v2.User;
+import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.UserLogin;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.WUIButton;
 

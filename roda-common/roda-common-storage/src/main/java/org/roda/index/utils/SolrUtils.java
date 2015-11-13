@@ -1227,17 +1227,17 @@ public class SolrUtils {
 
   private static TransferredResource solrDocumentToTransferredResource(SolrDocument doc) {
     TransferredResource tr = new TransferredResource();
-    String id = objectToString(doc.get(RodaConstants.SIPMONITOR_ID));
-    String fullPath = objectToString(doc.get(RodaConstants.SIPMONITOR_FULLPATH));
+    String id = objectToString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_ID));
+    String fullPath = objectToString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_FULLPATH));
     String parentPath = null;
-    if (doc.containsKey(RodaConstants.SIPMONITOR_PARENTPATH)) {
-      parentPath = objectToString(doc.get(RodaConstants.SIPMONITOR_PARENTPATH));
+    if (doc.containsKey(RodaConstants.TRANSFERRED_RESOURCE_PARENTPATH)) {
+      parentPath = objectToString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_PARENTPATH));
     }
-    String relativePath = objectToString(doc.get(RodaConstants.SIPMONITOR_RELATIVEPATH));
-    Date date = objectToDate(doc.get(RodaConstants.SIPMONITOR_DATE));
-    boolean isFile = objectToBoolean(doc.get(RodaConstants.SIPMONITOR_ISFILE));
-    long size = objectToLong(doc.get(RodaConstants.SIPMONITOR_SIZE));
-    String name = objectToString(doc.get(RodaConstants.SIPMONITOR_NAME));
+    String relativePath = objectToString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_RELATIVEPATH));
+    Date date = objectToDate(doc.get(RodaConstants.TRANSFERRED_RESOURCE_DATE));
+    boolean isFile = objectToBoolean(doc.get(RodaConstants.TRANSFERRED_RESOURCE_ISFILE));
+    long size = objectToLong(doc.get(RodaConstants.TRANSFERRED_RESOURCE_SIZE));
+    String name = objectToString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_NAME));
 
     tr.setCreationDate(date);
     tr.setFullPath(fullPath);
@@ -1254,23 +1254,23 @@ public class SolrUtils {
     throws IOException {
     SolrInputDocument sip = new SolrInputDocument();
     Path relativePath = basePath.relativize(createdPath);
-    sip.addField(RodaConstants.SIPMONITOR_ID, relativePath.toString());
-    sip.addField(RodaConstants.SIPMONITOR_FULLPATH, createdPath.toString());
+    sip.addField(RodaConstants.TRANSFERRED_RESOURCE_ID, relativePath.toString());
+    sip.addField(RodaConstants.TRANSFERRED_RESOURCE_FULLPATH, createdPath.toString());
     if (createdPath.getParent().compareTo(basePath) != 0) {
-      sip.addField(RodaConstants.SIPMONITOR_PARENTPATH, relativePath.getParent().toString());
+      sip.addField(RodaConstants.TRANSFERRED_RESOURCE_PARENTPATH, relativePath.getParent().toString());
     }
-    sip.addField(RodaConstants.SIPMONITOR_RELATIVEPATH, relativePath.toString());
-    sip.addField(RodaConstants.SIPMONITOR_DATE, new Date());
+    sip.addField(RodaConstants.TRANSFERRED_RESOURCE_RELATIVEPATH, relativePath.toString());
+    sip.addField(RodaConstants.TRANSFERRED_RESOURCE_DATE, new Date());
     if (createdPath.toFile().isDirectory()) {
-      sip.addField(RodaConstants.SIPMONITOR_ISFILE, false);
-      sip.addField(RodaConstants.SIPMONITOR_SIZE, 0L);
+      sip.addField(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, false);
+      sip.addField(RodaConstants.TRANSFERRED_RESOURCE_SIZE, 0L);
     } else {
-      sip.addField(RodaConstants.SIPMONITOR_ISFILE, true);
+      sip.addField(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, true);
       long fileSize = Files.size(createdPath);
-      sip.addField(RodaConstants.SIPMONITOR_SIZE, fileSize);
+      sip.addField(RodaConstants.TRANSFERRED_RESOURCE_SIZE, fileSize);
     }
 
-    sip.addField(RodaConstants.SIPMONITOR_NAME, relativePath.getFileName().toString());
+    sip.addField(RodaConstants.TRANSFERRED_RESOURCE_NAME, relativePath.getFileName().toString());
 
     return sip;
   }

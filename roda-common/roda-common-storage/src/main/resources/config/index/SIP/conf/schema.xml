@@ -108,7 +108,7 @@
    <field name="fullPath" type="string" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="parentPath" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="relativePath" type="string" indexed="true" stored="true" required="true" multiValued="false" />
-   <field name="date" type="string" indexed="true" stored="true" required="true" multiValued="false" />
+   <field name="date" type="date" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="isFile" type="boolean" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="name" type="string" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="size" type="long" indexed="true" stored="true" required="true" multiValued="false" />

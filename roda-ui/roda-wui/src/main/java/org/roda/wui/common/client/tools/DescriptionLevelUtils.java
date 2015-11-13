@@ -11,9 +11,9 @@ import java.util.List;
 
 import org.roda.core.data.eadc.DescriptionLevel;
 import org.roda.core.data.eadc.DescriptionLevelInfo;
+import org.roda.wui.client.main.DescriptionLevelInfoPack;
+import org.roda.wui.client.main.DescriptionLevelServiceAsync;
 import org.roda.wui.common.client.ClientLogger;
-import org.roda.wui.main.client.DescriptionLevelInfoPack;
-import org.roda.wui.main.client.DescriptionLevelServiceAsync;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -23,6 +23,7 @@ import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Image;
 
 import config.i18n.client.CommonConstants;
+import config.i18n.client.DisseminationConstants;
 
 public class DescriptionLevelUtils {
 
@@ -142,6 +143,25 @@ public class DescriptionLevelUtils {
       ret = "description-level description-level-" + levelInfo.getCategory().getCategory();
     } else {
       ret = "description-level";
+    }
+    return ret;
+  }
+  
+  // TODO merge constants
+  private static DisseminationConstants disseminationConstants = (DisseminationConstants) GWT.create(DisseminationConstants.class);
+  
+  /**
+   * Get translation of each descriptive level
+   * 
+   * @param level
+   * @return the translation string
+   */
+  public static String getElementLevelTranslation(DescriptionLevel level) {
+    String ret;
+    if (DescriptionLevelUtils.DESCRIPTION_LEVELS.contains(level)) {
+      ret = disseminationConstants.getString(level.getLevelSanitized());
+    } else {
+      ret = null;
     }
     return ret;
   }

@@ -17,9 +17,9 @@ import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.LogEntry;
+import org.roda.wui.client.browse.Browse;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.Tools;
-import org.roda.wui.dissemination.browse.client.Browse;
 import org.roda.wui.management.user.client.UserManagementService;
 
 import com.google.gwt.cell.client.ClickableTextCell;

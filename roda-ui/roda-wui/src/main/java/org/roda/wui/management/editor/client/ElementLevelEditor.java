@@ -17,7 +17,6 @@ import org.roda.core.data.eadc.DescriptionLevel;
 import org.roda.core.data.eadc.EadCValue;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
-import org.roda.wui.dissemination.client.Dissemination;
 
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -67,7 +66,7 @@ public class ElementLevelEditor implements MetadataElementEditor {
   private void init(DescriptionLevel[] possibleLevels) {
 
     for (int i = 0; i < possibleLevels.length; i++) {
-      layout.addItem(Dissemination.getInstance().getElementLevelTranslation(possibleLevels[i]),
+      layout.addItem(DescriptionLevelUtils.getElementLevelTranslation(possibleLevels[i]),
         possibleLevels[i].getLevel());
     }
     initialized = true;

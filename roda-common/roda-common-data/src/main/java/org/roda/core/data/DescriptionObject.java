@@ -96,6 +96,13 @@ public class DescriptionObject extends SimpleDescriptionObject {
     ACQINFO, SCOPECONTENT, APPRAISAL, ACCRUALS, ARRANGEMENT, ACCESSRESTRICT, USERESTRICT, LANGMATERIAL_LANGUAGES,
     PHYSTECH, MATERIALSPEC, OTHERFINDAID, RELATEDMATERIAL, BIBLIOGRAPHY, NOTE, PREFERCITE, COMPLETE_REFERENCE,
     HANDLE_URL, ABSTRACT, ODD, CONTROLACCESS, PHYSDESC_GENREFORM, PROCESSINFO, INDEX};
+  public static final String ID = null;
+  public static final String TITLE = null;
+  public static final String LEVEL = null;
+  public static final String DATE_INITIAL = null;
+  public static final String DATE_FINAL = null;
+  public static final String COUNTRYCODE = null;
+  public static final String REPOSITORYCODE = null;
 
   /**
    * @return all elements

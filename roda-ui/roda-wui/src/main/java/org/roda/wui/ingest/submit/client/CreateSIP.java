@@ -12,11 +12,11 @@ package org.roda.wui.ingest.submit.client;
 
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.v2.SimpleDescriptionObject;
+import org.roda.wui.client.common.DescriptiveMetadataPanel;
+import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.widgets.SelectableAIPList;
 import org.roda.wui.common.fileupload.client.FileUploadPanel;
-import org.roda.wui.dissemination.client.DescriptiveMetadataPanel;
-import org.roda.wui.ingest.client.Ingest;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;

@@ -292,12 +292,12 @@ public final class RodaConstants {
   public static final String MEMBERS_GROUPS_ALL = "groupsAll";
   public static final String MEMBERS_ROLES_ALL = "rolesAll";
 
-  public static final String SIPMONITOR_ID = "id";
-  public static final String SIPMONITOR_FULLPATH = "fullPath";
-  public static final String SIPMONITOR_PARENTPATH = "parentPath";
-  public static final String SIPMONITOR_RELATIVEPATH = "relativePath";
-  public static final String SIPMONITOR_DATE = "date";
-  public static final String SIPMONITOR_ISFILE = "isFile";
-  public static final String SIPMONITOR_NAME = "name";
-  public static final String SIPMONITOR_SIZE = "size";
+  public static final String TRANSFERRED_RESOURCE_ID = "id";
+  public static final String TRANSFERRED_RESOURCE_FULLPATH = "fullPath";
+  public static final String TRANSFERRED_RESOURCE_PARENTPATH = "parentPath";
+  public static final String TRANSFERRED_RESOURCE_RELATIVEPATH = "relativePath";
+  public static final String TRANSFERRED_RESOURCE_DATE = "date";
+  public static final String TRANSFERRED_RESOURCE_ISFILE = "isFile";
+  public static final String TRANSFERRED_RESOURCE_NAME = "name";
+  public static final String TRANSFERRED_RESOURCE_SIZE = "size";
 }

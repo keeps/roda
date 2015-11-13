@@ -43,8 +43,8 @@ import org.roda.storage.StorageService;
 import org.roda.storage.StorageServiceException;
 import org.roda.storage.fs.FSUtils;
 import org.roda.storage.fs.FileStorageService;
-import org.roda.wui.dissemination.browse.client.PreservationMetadataBundle;
-import org.roda.wui.dissemination.browse.client.RepresentationPreservationMetadataBundle;
+import org.roda.wui.client.browse.PreservationMetadataBundle;
+import org.roda.wui.client.browse.RepresentationPreservationMetadataBundle;
 
 import config.i18n.server.Messages;
 
