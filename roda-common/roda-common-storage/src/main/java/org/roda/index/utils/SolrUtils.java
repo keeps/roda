@@ -657,8 +657,8 @@ public class SolrUtils {
       ret = resultClass.cast(solrDocumentToLogEntry(doc));
     } else if (resultClass.equals(SIPReport.class)) {
       ret = resultClass.cast(solrDocumentToSipState(doc));
-    } else
-      if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class) || resultClass.equals(Group.class)) {
+    } else if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class)
+      || resultClass.equals(Group.class)) {
       ret = resultClass.cast(solrDocumentToRodaMember(doc));
     } else if (resultClass.equals(RepresentationFilePreservationObject.class)) {
       ret = resultClass.cast(solrDocumentToRepresentationFilePreservationObject(doc));
@@ -1239,7 +1239,7 @@ public class SolrUtils {
     long size = objectToLong(doc.get(RodaConstants.TRANSFERRED_RESOURCE_SIZE));
     String name = objectToString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_NAME));
     String owner = objectToString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_OWNER));
-    
+
     tr.setCreationDate(date);
     tr.setFullPath(fullPath);
     tr.setId(id);
@@ -1252,20 +1252,22 @@ public class SolrUtils {
     return tr;
   }
 
-  public static SolrInputDocument transferredResourceToSolrDocument(Path basePath, Path createdPath)
+  public static SolrInputDocument transferredResourceToSolrDocument(Path basePath, Path createdPath, Path relativePath)
     throws IOException {
     SolrInputDocument sip = new SolrInputDocument();
-    Path relativePath = basePath.relativize(createdPath);
+
     sip.addField(RodaConstants.TRANSFERRED_RESOURCE_ID, relativePath.toString());
     sip.addField(RodaConstants.TRANSFERRED_RESOURCE_FULLPATH, createdPath.toString());
     if (createdPath.getParent().compareTo(basePath) != 0) {
       Path parentPath = relativePath.getParent();
-      sip.addField(RodaConstants.TRANSFERRED_RESOURCE_PARENTPATH, parentPath.subpath(1,parentPath.getNameCount()).toString());
+      if (parentPath.getNameCount() > 1) {
+        sip.addField(RodaConstants.TRANSFERRED_RESOURCE_PARENTPATH,
+          parentPath.subpath(1, parentPath.getNameCount()).toString());
+      }
     }
-    if(relativePath.getNameCount()>1){
-      sip.addField(RodaConstants.TRANSFERRED_RESOURCE_RELATIVEPATH, relativePath.subpath(1,relativePath.getNameCount()).toString());
-    }else{
-      sip.addField(RodaConstants.TRANSFERRED_RESOURCE_RELATIVEPATH, "");  
+    if (relativePath.getNameCount() > 1) {
+      sip.addField(RodaConstants.TRANSFERRED_RESOURCE_RELATIVEPATH,
+        relativePath.subpath(1, relativePath.getNameCount()).toString());
     }
     sip.addField(RodaConstants.TRANSFERRED_RESOURCE_DATE, new Date());
     if (createdPath.toFile().isDirectory()) {

@@ -29,7 +29,8 @@ public class IndexFolderObserver implements FolderObserver {
 
   public void pathAddedSimple(Path basePath, Path createdPath, boolean addParents) throws IOException {
     try {
-      SolrInputDocument pathDocument = SolrUtils.transferredResourceToSolrDocument(basePath, createdPath);
+      Path relativePath = basePath.relativize(createdPath);
+      SolrInputDocument pathDocument = SolrUtils.transferredResourceToSolrDocument(basePath, createdPath, relativePath);
       index.add(RodaConstants.INDEX_SIP, pathDocument);
       if (addParents) {
         Path parentPath = createdPath.getParent();
@@ -46,41 +47,47 @@ public class IndexFolderObserver implements FolderObserver {
   @Override
   public void pathAdded(Path basePath, Path createdPath) {
     try {
-      SolrInputDocument pathDocument = SolrUtils.transferredResourceToSolrDocument(basePath, createdPath);
-      Path parentPath = createdPath.getParent();
-      while (!Files.isSameFile(basePath, parentPath)) {
-        pathAddedSimple(basePath, parentPath, false);
-        parentPath = parentPath.getParent();
+      Path relativePath = basePath.relativize(createdPath);
+
+      if (relativePath.getNameCount() > 1) {
+        SolrInputDocument pathDocument = SolrUtils.transferredResourceToSolrDocument(basePath, createdPath,
+          relativePath);
+        Path parentPath = createdPath.getParent();
+        while (!Files.isSameFile(basePath, parentPath)) {
+          pathAddedSimple(basePath, parentPath, false);
+          parentPath = parentPath.getParent();
+        }
+
+        if (createdPath.toFile().isDirectory()) {
+          Files.walkFileTree(createdPath, new FileVisitor<Path>() {
+            @Override
+            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+              return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+              pathAddedSimple(basePath, file, true);
+              return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+              return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+              return FileVisitResult.CONTINUE;
+            }
+          });
+        }
+
+        index.add(RodaConstants.INDEX_SIP, pathDocument);
+        index.commit(RodaConstants.INDEX_SIP);
       }
-
-      if (createdPath.toFile().isDirectory()) {
-        Files.walkFileTree(createdPath, new FileVisitor<Path>() {
-          @Override
-          public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-            return FileVisitResult.CONTINUE;
-          }
-
-          @Override
-          public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-            pathAddedSimple(basePath, file, true);
-            return FileVisitResult.CONTINUE;
-          }
-
-          @Override
-          public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-            return FileVisitResult.CONTINUE;
-          }
-
-          @Override
-          public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-            return FileVisitResult.CONTINUE;
-          }
-        });
-      }
-      index.add(RodaConstants.INDEX_SIP, pathDocument);
-      index.commit(RodaConstants.INDEX_SIP);
     } catch (IOException | SolrServerException e) {
-      LOGGER.error("Error adding path to SIPMonitorIndex: "+e.getMessage(),e);
+      LOGGER.error("Error adding path to SIPMonitorIndex: " + e.getMessage(), e);
     }
   }
 
