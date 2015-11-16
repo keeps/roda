@@ -321,7 +321,7 @@ public class RodaCoreFactory {
 
     sipFolderMonitor = new FolderMonitorNIO(sipFolderPath, SIPTimeout);
     // sipFolderMonitor = new FolderMonitor(sipFolderPath, SIPTimeout);
-    sipFolderObserver = new IndexFolderObserver(solr);
+    sipFolderObserver = new IndexFolderObserver(solr, sipFolderPath);
     sipFolderMonitor.addFolderObserver(sipFolderObserver);
   }
 

@@ -22,9 +22,42 @@ public class IndexFolderObserver implements FolderObserver {
 
   private final SolrClient index;
 
-  public IndexFolderObserver(SolrClient index) {
+  public IndexFolderObserver(SolrClient index, Path basePath) throws SolrServerException, IOException {
     super();
     this.index = index;
+    clearIndex();
+    indexPath(basePath);
+  }
+
+  private void indexPath(Path basePath) throws SolrServerException, IOException {
+    Files.walkFileTree(basePath, new FileVisitor<Path>() {
+      @Override
+      public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+        return FileVisitResult.CONTINUE;
+      }
+
+      @Override
+      public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+        pathAdded(basePath, file);
+        return FileVisitResult.CONTINUE;
+      }
+
+      @Override
+      public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+        return FileVisitResult.CONTINUE;
+      }
+
+      @Override
+      public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+        return FileVisitResult.CONTINUE;
+      }
+    });
+  }
+
+  private void clearIndex() throws SolrServerException, IOException {
+    index.deleteByQuery(RodaConstants.INDEX_SIP, "*:*");
+    index.commit(RodaConstants.INDEX_SIP);
+
   }
 
   public void pathAddedSimple(Path basePath, Path createdPath, boolean addParents) throws IOException {
@@ -43,14 +76,14 @@ public class IndexFolderObserver implements FolderObserver {
       }
     } catch (SolrServerException | IOException e) {
       LOGGER.error("Could not commitbasePath, pathCreated indexed path to SIPMonitor index: " + e.getMessage(), e);
-    } catch(Throwable t){
-      LOGGER.error("ERROR: "+t.getMessage(),t);
+    } catch (Throwable t) {
+      LOGGER.error("ERROR: " + t.getMessage(), t);
     }
   }
 
   @Override
   public void pathAdded(Path basePath, Path createdPath) {
-    LOGGER.debug("ADDED: "+createdPath);
+    LOGGER.debug("ADDED: " + createdPath);
     try {
       Path relativePath = basePath.relativize(createdPath);
 
@@ -92,31 +125,31 @@ public class IndexFolderObserver implements FolderObserver {
       }
     } catch (IOException | SolrServerException e) {
       LOGGER.error("Error adding path to SIPMonitorIndex: " + e.getMessage(), e);
-    } catch(Throwable t){
-      LOGGER.error("ERROR: "+t.getMessage(),t);
+    } catch (Throwable t) {
+      LOGGER.error("ERROR: " + t.getMessage(), t);
     }
   }
 
   @Override
   public void pathModified(Path basePath, Path modifiedPath) {
-    LOGGER.debug("MODIFIED: "+modifiedPath);
+    LOGGER.debug("MODIFIED: " + modifiedPath);
     pathAdded(basePath, modifiedPath);
   }
 
   @Override
   public void pathDeleted(Path basePath, Path deletedPath) {
-    LOGGER.debug("DELETED: "+deletedPath);
+    LOGGER.debug("DELETED: " + deletedPath);
     try {
       Path relativePath = basePath.relativize(deletedPath);
       if (relativePath.getNameCount() > 1) {
-        index.deleteById(RodaConstants.INDEX_SIP, relativePath.toString().replaceAll("\\s+",""));
-        index.deleteByQuery(RodaConstants.INDEX_SIP, "id:" + relativePath.toString().replaceAll("\\s+","") + "*");
+        index.deleteById(RodaConstants.INDEX_SIP, relativePath.toString().replaceAll("\\s+", ""));
+        index.deleteByQuery(RodaConstants.INDEX_SIP, "id:" + relativePath.toString().replaceAll("\\s+", "") + "*");
         index.commit(RodaConstants.INDEX_SIP);
       }
     } catch (IOException | SolrServerException e) {
       LOGGER.error("Error deleting path to SIPMonitorIndex: " + e.getMessage(), e);
-    } catch(Throwable t){
-      LOGGER.error("ERROR: "+t.getMessage(),t);
+    } catch (Throwable t) {
+      LOGGER.error("ERROR: " + t.getMessage(), t);
     }
   }
 }
