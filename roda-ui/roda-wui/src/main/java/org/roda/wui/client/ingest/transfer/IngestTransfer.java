@@ -139,7 +139,8 @@ public class IngestTransfer extends Composite {
   protected void view(TransferredResource r) {
 
     Filter filter = new Filter(
-      new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENTPATH, r.getRelativePath()));
+      new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENTPATH, r.getRelativePath()),
+      new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_OWNER, r.getOwner()));
     transferredResourceList.setFilter(filter);
 
     breadcrumb.updatePath(getBreadcrumbs(r));
