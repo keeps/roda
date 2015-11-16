@@ -22,7 +22,7 @@ public abstract class FolderObservable {
 
   protected void notifyPathCreated(Path basePath, Path pathCreated) {
     for (FolderObserver observer : observers) {
-      observer.pathAdded(basePath, pathCreated);
+      observer.pathAdded(basePath, pathCreated,true);
     }
   }
 
@@ -34,7 +34,7 @@ public abstract class FolderObservable {
 
   protected void notifyPathModified(Path basePath, Path pathCreated) {
     for (FolderObserver observer : observers) {
-      observer.pathModified(basePath, pathCreated);
+      observer.pathModified(basePath, pathCreated,true);
     }
   }
 

@@ -57,6 +57,7 @@ import org.roda.action.orchestrate.embed.AkkaEmbeddedActionOrchestrator;
 import org.roda.action.utils.logCleaner.LogCleanerAction;
 import org.roda.action.utils.premis.V2ToV3PremisAction;
 import org.roda.action.validation.AIPValidationAction;
+import org.roda.common.monitor.FolderMonitor;
 import org.roda.common.monitor.FolderMonitorNIO;
 import org.roda.common.monitor.FolderObservable;
 import org.roda.common.monitor.FolderObserver;
@@ -319,8 +320,8 @@ public class RodaCoreFactory {
     int SIPTimeout = rodaConfig.getInt("sip.timeout");
     Path sipFolderPath = dataPath.resolve(SIPFolderPath);
 
-    sipFolderMonitor = new FolderMonitorNIO(sipFolderPath, SIPTimeout);
-    // sipFolderMonitor = new FolderMonitor(sipFolderPath, SIPTimeout);
+    //sipFolderMonitor = new FolderMonitorNIO(sipFolderPath, SIPTimeout);
+     sipFolderMonitor = new FolderMonitor(sipFolderPath, SIPTimeout);
     sipFolderObserver = new IndexFolderObserver(solr, sipFolderPath);
     sipFolderMonitor.addFolderObserver(sipFolderObserver);
   }
