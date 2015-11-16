@@ -1259,9 +1259,10 @@ public class SolrUtils {
     sip.addField(RodaConstants.TRANSFERRED_RESOURCE_ID, relativePath.toString());
     sip.addField(RodaConstants.TRANSFERRED_RESOURCE_FULLPATH, createdPath.toString());
     if (createdPath.getParent().compareTo(basePath) != 0) {
-      sip.addField(RodaConstants.TRANSFERRED_RESOURCE_PARENTPATH, relativePath.getParent().toString());
+      Path parentPath = relativePath.getParent();
+      sip.addField(RodaConstants.TRANSFERRED_RESOURCE_PARENTPATH, parentPath.subpath(1,parentPath.getNameCount()).toString());
     }
-    sip.addField(RodaConstants.TRANSFERRED_RESOURCE_RELATIVEPATH, relativePath.toString());
+    sip.addField(RodaConstants.TRANSFERRED_RESOURCE_RELATIVEPATH, relativePath.subpath(1,relativePath.getNameCount()).toString());
     sip.addField(RodaConstants.TRANSFERRED_RESOURCE_DATE, new Date());
     if (createdPath.toFile().isDirectory()) {
       sip.addField(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, false);
