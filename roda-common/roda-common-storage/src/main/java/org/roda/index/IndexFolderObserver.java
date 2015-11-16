@@ -30,13 +30,15 @@ public class IndexFolderObserver implements FolderObserver {
   public void pathAddedSimple(Path basePath, Path createdPath, boolean addParents) throws IOException {
     try {
       Path relativePath = basePath.relativize(createdPath);
-      SolrInputDocument pathDocument = SolrUtils.transferredResourceToSolrDocument(basePath, createdPath, relativePath);
-      index.add(RodaConstants.INDEX_SIP, pathDocument);
-      if (addParents) {
-        Path parentPath = createdPath.getParent();
-        while (!Files.isSameFile(basePath, parentPath)) {
-          pathAddedSimple(basePath, parentPath, false);
-          parentPath = parentPath.getParent();
+      if (relativePath.getNameCount() > 1) {
+        SolrInputDocument pathDocument = SolrUtils.transferredResourceToSolrDocument(createdPath, relativePath);
+        index.add(RodaConstants.INDEX_SIP, pathDocument);
+        if (addParents) {
+          Path parentPath = createdPath.getParent();
+          while (!Files.isSameFile(basePath, parentPath)) {
+            pathAddedSimple(basePath, parentPath, false);
+            parentPath = parentPath.getParent();
+          }
         }
       }
     } catch (SolrServerException | IOException e) {
@@ -50,8 +52,7 @@ public class IndexFolderObserver implements FolderObserver {
       Path relativePath = basePath.relativize(createdPath);
 
       if (relativePath.getNameCount() > 1) {
-        SolrInputDocument pathDocument = SolrUtils.transferredResourceToSolrDocument(basePath, createdPath,
-          relativePath);
+        SolrInputDocument pathDocument = SolrUtils.transferredResourceToSolrDocument(createdPath, relativePath);
         Path parentPath = createdPath.getParent();
         while (!Files.isSameFile(basePath, parentPath)) {
           pathAddedSimple(basePath, parentPath, false);
@@ -99,9 +100,12 @@ public class IndexFolderObserver implements FolderObserver {
   public void pathDeleted(Path basePath, Path deletedPath) {
     try {
       Path relativePath = basePath.relativize(deletedPath);
-      index.deleteById(RodaConstants.INDEX_SIP, relativePath.toString());
-      index.deleteByQuery(RodaConstants.INDEX_SIP, "id:" + relativePath + "*");
-      index.commit(RodaConstants.INDEX_SIP);
+      LOGGER.debug("DELETING: "+deletedPath);
+      if (relativePath.getNameCount() > 1) {
+        index.deleteById(RodaConstants.INDEX_SIP, relativePath.toString());
+        index.deleteByQuery(RodaConstants.INDEX_SIP, "id:" + relativePath + "*");
+        index.commit(RodaConstants.INDEX_SIP);
+      }
     } catch (IOException | SolrServerException e) {
       LOGGER.error("Error deleting path to SIPMonitorIndex: " + e.getMessage(), e);
     }

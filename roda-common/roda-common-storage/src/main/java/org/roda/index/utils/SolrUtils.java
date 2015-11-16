@@ -1252,23 +1252,27 @@ public class SolrUtils {
     return tr;
   }
 
-  public static SolrInputDocument transferredResourceToSolrDocument(Path basePath, Path createdPath, Path relativePath)
+  public static SolrInputDocument transferredResourceToSolrDocument(Path createdPath, Path relativePath)
     throws IOException {
     SolrInputDocument sip = new SolrInputDocument();
+    
+    
+    
+    
 
     sip.addField(RodaConstants.TRANSFERRED_RESOURCE_ID, relativePath.toString());
     sip.addField(RodaConstants.TRANSFERRED_RESOURCE_FULLPATH, createdPath.toString());
-    if (createdPath.getParent().compareTo(basePath) != 0) {
-      Path parentPath = relativePath.getParent();
-      if (parentPath.getNameCount() > 1) {
-        sip.addField(RodaConstants.TRANSFERRED_RESOURCE_PARENTPATH,
-          parentPath.subpath(1, parentPath.getNameCount()).toString());
-      }
+    
+    Path parentPath = relativePath.getParent();
+    if (parentPath.getNameCount() > 1) {
+      sip.addField(RodaConstants.TRANSFERRED_RESOURCE_PARENTPATH,
+        parentPath.subpath(1, parentPath.getNameCount()).toString());
     }
     if (relativePath.getNameCount() > 1) {
       sip.addField(RodaConstants.TRANSFERRED_RESOURCE_RELATIVEPATH,
         relativePath.subpath(1, relativePath.getNameCount()).toString());
     }
+    
     sip.addField(RodaConstants.TRANSFERRED_RESOURCE_DATE, new Date());
     if (createdPath.toFile().isDirectory()) {
       sip.addField(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, false);
