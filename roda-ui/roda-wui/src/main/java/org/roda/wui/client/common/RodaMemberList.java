@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.wui.common.client.widgets;
+package org.roda.wui.client.common;
 
 import org.roda.core.common.RodaConstants;
 import org.roda.core.data.adapter.facet.Facets;
@@ -17,6 +17,7 @@ import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.RODAMember;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.StringUtility;
+import org.roda.wui.common.client.widgets.AsyncTableCell;
 import org.roda.wui.management.user.client.UserManagementService;
 
 import com.google.gwt.cell.client.SafeHtmlCell;

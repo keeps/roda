@@ -16,11 +16,11 @@ import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.facet.SimpleFacetParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.v2.RODAMember;
+import org.roda.wui.client.common.RodaMemberList;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.Tools;
-import org.roda.wui.common.client.widgets.RodaMemberList;
 import org.roda.wui.management.client.Management;
 
 import com.google.gwt.core.client.GWT;

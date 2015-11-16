@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.wui.common.client.widgets;
+package org.roda.wui.client.common;
 
 import java.util.Date;
 
@@ -18,6 +18,7 @@ import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.SIPReport;
 import org.roda.wui.common.client.ClientLogger;
+import org.roda.wui.common.client.widgets.AsyncTableCell;
 import org.roda.wui.ingest.list.client.IngestListService;
 
 import com.google.gwt.cell.client.DateCell;

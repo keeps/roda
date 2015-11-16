@@ -27,6 +27,7 @@ import org.roda.core.data.v2.Representation;
 import org.roda.core.data.v2.RepresentationState;
 import org.roda.core.data.v2.RodaUser;
 import org.roda.core.data.v2.SimpleDescriptionObject;
+import org.roda.wui.client.common.AIPList;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
@@ -38,7 +39,6 @@ import org.roda.wui.common.client.tools.JavascriptUtils;
 import org.roda.wui.common.client.tools.RestErrorOverlayType;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.Tools;
-import org.roda.wui.common.client.widgets.AIPList;
 import org.roda.wui.common.client.widgets.MessagePopup;
 
 import com.google.gwt.core.client.GWT;
@@ -140,7 +140,7 @@ public class Browse extends Composite {
 
   private String aipId;
 
-  @UiField(provided = true)
+  @UiField
   BreadcrumbPanel breadcrumb;
 
   @UiField
@@ -186,7 +186,6 @@ public class Browse extends Composite {
 
   private Browse() {
     viewingTop = true;
-    breadcrumb = new BreadcrumbPanel();
     fondsPanel = new AIPList();
     initWidget(uiBinder.createAndBindUi(this));
 

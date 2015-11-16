@@ -28,11 +28,11 @@ import org.roda.core.data.adapter.filter.FilterParameter;
 import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.AIPList;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.Tools;
-import org.roda.wui.common.client.widgets.AIPList;
 import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 
 import com.google.gwt.core.client.GWT;

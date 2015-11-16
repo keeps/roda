@@ -28,13 +28,13 @@ import org.roda.core.data.adapter.filter.OneOfManyFilterParameter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.RodaUser;
 import org.roda.core.data.v2.SIPReport;
+import org.roda.wui.client.common.SIPReportList;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.Tools;
-import org.roda.wui.common.client.widgets.SIPReportList;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;

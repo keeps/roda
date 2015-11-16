@@ -10,6 +10,7 @@
  */
 package org.roda.wui.client.ingest.transfer;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,15 +22,19 @@ import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.TransferredResource;
+import org.roda.wui.client.common.TransferredResourceList;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.ingest.Ingest;
+import org.roda.wui.client.main.BreadcrumbItem;
+import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.Tools;
-import org.roda.wui.common.client.widgets.TransferredResourceList;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -82,6 +87,8 @@ public class IngestTransfer extends Composite {
     return instance;
   }
 
+  private static final String TOP_ICON = "<i class='fa fa-circle-o'></i>";
+
   interface MyUiBinder extends UiBinder<Widget, IngestTransfer> {
   }
 
@@ -90,6 +97,9 @@ public class IngestTransfer extends Composite {
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
   private boolean init = true;
+
+  @UiField
+  BreadcrumbPanel breadcrumb;
 
   @UiField(provided = true)
   TransferredResourceList transferredResourceList;
@@ -126,11 +136,33 @@ public class IngestTransfer extends Composite {
   }
 
   protected void view(TransferredResource r) {
+
     Filter filter = new Filter(
       new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENTPATH, r.getRelativePath()));
-    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.SDO_LEVEL),
-      new SimpleFacetParameter(RodaConstants.AIP_HAS_REPRESENTATIONS));
     transferredResourceList.setFilter(filter);
+
+    breadcrumb.updatePath(getBreadcrumbs(r));
+    breadcrumb.setVisible(r != null);
+
+  }
+
+  private List<BreadcrumbItem> getBreadcrumbs(TransferredResource r) {
+    List<BreadcrumbItem> ret = new ArrayList<BreadcrumbItem>();
+
+    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(TOP_ICON), RESOLVER.getHistoryPath()));
+    if (r != null) {
+      List<String> path = new ArrayList<String>();
+      path.addAll(RESOLVER.getHistoryPath());
+
+      String[] parts = r.getId().split("/");
+      for (String part : parts) {
+        SafeHtml breadcrumbLabel = SafeHtmlUtils.fromString(part);
+        path.add(part);
+        ret.add(new BreadcrumbItem(breadcrumbLabel, path));
+      }
+    }
+
+    return ret;
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {

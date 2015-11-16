@@ -2,9 +2,8 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
-	xmlns:i="urn:import:config.i18n.client" xmlns:m="urn:import:org.roda.wui.main.client"
-	xmlns:common="urn:import:org.roda.wui.common.client.widgets"
-	xmlns:d="urn:import:com.google.gwt.user.datepicker.client" xmlns:u="urn:import:org.roda.wui.management.user.client">
+	xmlns:i="urn:import:config.i18n.client" xmlns:d="urn:import:com.google.gwt.user.datepicker.client"
+	xmlns:u="urn:import:org.roda.wui.management.user.client">
 
 	<ui:with field='constants' type='config.i18n.client.UserManagementConstants' />
 	<ui:with field='messages' type='config.i18n.client.UserManagementMessages' />
@@ -13,7 +12,8 @@
 	
 	</ui:style>
 
-	<g:FlowPanel styleName="wui-browse-edit-metadata" addStyleNames="wrapper skip_padding">
+	<g:FlowPanel styleName="wui-browse-edit-metadata"
+		addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
 				<g:Label styleName="h1">Create descriptive metadata</g:Label>

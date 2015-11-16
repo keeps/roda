@@ -2,8 +2,7 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
-	xmlns:i="urn:import:config.i18n.client" xmlns:m="urn:import:org.roda.wui.main.client"
-	xmlns:common="urn:import:org.roda.wui.common.client.widgets"
+	xmlns:i="urn:import:config.i18n.client" xmlns:common="urn:import:org.roda.wui.client.common"
 	xmlns:wcag="urn:import:org.roda.wui.common.client.widgets.wcag"
 	xmlns:d="urn:import:com.google.gwt.user.datepicker.client">
 
@@ -11,6 +10,7 @@
 	.addbutton {
 		margin-left: 10px;
 	}
+	
 	.searchbutton {
 		float: right;
 		margin-top: 5px;
@@ -36,7 +36,8 @@
 								<!-- <g:FlowPanel addStyleNames="searchAdvancedField"> <g:Label addStyleNames="form-label" 
 									ui:field="advancedSearchInputTitleLabel">Title</g:Label> <g:TextBox addStyleNames="form-textbox" 
 									ui:field="advancedSearchInputTitle" /> </g:FlowPanel> -->
-								<g:FlowPanel ui:field="searchAdvancedFieldsPanel" styleName="searchAdvancedFieldsPanel empty"/>
+								<g:FlowPanel ui:field="searchAdvancedFieldsPanel"
+									styleName="searchAdvancedFieldsPanel empty" />
 								<g:FlowPanel styleName="searchAdvancedFieldAdd">
 									<g:ListBox styleName="form-listbox" ui:field="searchAdvancedFieldOptions">
 										<g:item>Scope and content</g:item>
@@ -47,7 +48,7 @@
 									</g:ListBox>
 									<g:Button styleName="btn btn-plus {style.addbutton}"
 										ui:field="searchAdvancedFieldOptionsAdd">Add search field</g:Button>
-										<g:Button styleName="btn btn-search {style.searchbutton}"
+									<g:Button styleName="btn btn-search {style.searchbutton}"
 										ui:field="searchAdvancedGo" enabled="false">Search</g:Button>
 								</g:FlowPanel>
 							</g:FlowPanel>
