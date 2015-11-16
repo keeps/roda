@@ -43,6 +43,8 @@ public class IndexFolderObserver implements FolderObserver {
       }
     } catch (SolrServerException | IOException e) {
       LOGGER.error("Could not commitbasePath, pathCreated indexed path to SIPMonitor index: " + e.getMessage(), e);
+    } catch(Throwable t){
+      LOGGER.error("ERROR: "+t.getMessage(),t);
     }
   }
 
@@ -89,11 +91,14 @@ public class IndexFolderObserver implements FolderObserver {
       }
     } catch (IOException | SolrServerException e) {
       LOGGER.error("Error adding path to SIPMonitorIndex: " + e.getMessage(), e);
+    } catch(Throwable t){
+      LOGGER.error("ERROR: "+t.getMessage(),t);
     }
   }
 
   @Override
   public void pathModified(Path basePath, Path createdPath) {
+    pathAdded(basePath, createdPath);
   }
 
   @Override
@@ -107,6 +112,8 @@ public class IndexFolderObserver implements FolderObserver {
       }
     } catch (IOException | SolrServerException e) {
       LOGGER.error("Error deleting path to SIPMonitorIndex: " + e.getMessage(), e);
+    } catch(Throwable t){
+      LOGGER.error("ERROR: "+t.getMessage(),t);
     }
   }
 }

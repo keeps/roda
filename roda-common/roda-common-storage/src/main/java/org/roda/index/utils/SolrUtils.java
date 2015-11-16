@@ -1234,13 +1234,20 @@ public class SolrUtils {
       parentPath = objectToString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_PARENTPATH));
     }
     String relativePath = objectToString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_RELATIVEPATH));
-    Date date = objectToDate(doc.get(RodaConstants.TRANSFERRED_RESOURCE_DATE));
+    
+    Date d = new Date();
+    try{
+      d = objectToDate(doc.get(RodaConstants.TRANSFERRED_RESOURCE_DATE));
+    }catch(Exception e){
+      LOGGER.error("ERROR PARSING DATE: "+e.getMessage());
+    }
+   
     boolean isFile = objectToBoolean(doc.get(RodaConstants.TRANSFERRED_RESOURCE_ISFILE));
     long size = objectToLong(doc.get(RodaConstants.TRANSFERRED_RESOURCE_SIZE));
     String name = objectToString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_NAME));
     String owner = objectToString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_OWNER));
 
-    tr.setCreationDate(date);
+    tr.setCreationDate(d);
     tr.setFullPath(fullPath);
     tr.setId(id);
     tr.setName(name);
@@ -1256,10 +1263,6 @@ public class SolrUtils {
     throws IOException {
     SolrInputDocument sip = new SolrInputDocument();
     
-    
-    
-    
-
     sip.addField(RodaConstants.TRANSFERRED_RESOURCE_ID, relativePath.toString().replaceAll("\\s+",""));
     sip.addField(RodaConstants.TRANSFERRED_RESOURCE_FULLPATH, createdPath.toString());
     
