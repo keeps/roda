@@ -46,8 +46,8 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
-@Path(TransferredResource.ENDPOINT)
-@Api(value = TransferredResource.SWAGGER_ENDPOINT)
+@Path(AipsResource.ENDPOINT)
+@Api(value = AipsResource.SWAGGER_ENDPOINT)
 public class AipsResource {
   public static final String ENDPOINT = "/v1/aips";
   public static final String SWAGGER_ENDPOINT = "v1 aips";
