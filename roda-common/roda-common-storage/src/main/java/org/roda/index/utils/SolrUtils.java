@@ -1260,7 +1260,7 @@ public class SolrUtils {
     
     
 
-    sip.addField(RodaConstants.TRANSFERRED_RESOURCE_ID, relativePath.toString());
+    sip.addField(RodaConstants.TRANSFERRED_RESOURCE_ID, relativePath.toString().replaceAll("\\s+",""));
     sip.addField(RodaConstants.TRANSFERRED_RESOURCE_FULLPATH, createdPath.toString());
     
     Path parentPath = relativePath.getParent();

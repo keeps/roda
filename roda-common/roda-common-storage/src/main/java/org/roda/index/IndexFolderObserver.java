@@ -100,10 +100,9 @@ public class IndexFolderObserver implements FolderObserver {
   public void pathDeleted(Path basePath, Path deletedPath) {
     try {
       Path relativePath = basePath.relativize(deletedPath);
-      LOGGER.debug("DELETING: "+deletedPath);
       if (relativePath.getNameCount() > 1) {
-        index.deleteById(RodaConstants.INDEX_SIP, relativePath.toString());
-        index.deleteByQuery(RodaConstants.INDEX_SIP, "id:" + relativePath + "*");
+        index.deleteById(RodaConstants.INDEX_SIP, relativePath.toString().replaceAll("\\s+",""));
+        index.deleteByQuery(RodaConstants.INDEX_SIP, "id:" + relativePath.toString().replaceAll("\\s+","") + "*");
         index.commit(RodaConstants.INDEX_SIP);
       }
     } catch (IOException | SolrServerException e) {
