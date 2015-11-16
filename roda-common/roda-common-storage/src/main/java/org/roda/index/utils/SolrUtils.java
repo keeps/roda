@@ -1262,7 +1262,11 @@ public class SolrUtils {
       Path parentPath = relativePath.getParent();
       sip.addField(RodaConstants.TRANSFERRED_RESOURCE_PARENTPATH, parentPath.subpath(1,parentPath.getNameCount()).toString());
     }
-    sip.addField(RodaConstants.TRANSFERRED_RESOURCE_RELATIVEPATH, relativePath.subpath(1,relativePath.getNameCount()).toString());
+    if(relativePath.getNameCount()>1){
+      sip.addField(RodaConstants.TRANSFERRED_RESOURCE_RELATIVEPATH, relativePath.subpath(1,relativePath.getNameCount()).toString());
+    }else{
+      sip.addField(RodaConstants.TRANSFERRED_RESOURCE_RELATIVEPATH, "");  
+    }
     sip.addField(RodaConstants.TRANSFERRED_RESOURCE_DATE, new Date());
     if (createdPath.toFile().isDirectory()) {
       sip.addField(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, false);
