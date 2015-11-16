@@ -33,8 +33,8 @@ import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.Humanize;
+import org.roda.wui.common.client.tools.JavascriptUtils;
 import org.roda.wui.common.client.tools.Tools;
-import org.roda.wui.common.client.widgets.MessagePopup;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -190,6 +190,11 @@ public class IngestTransfer extends Composite {
       }
     });
 
+  }
+
+  @Override
+  protected void onLoad() {
+    JavascriptUtils.runMiniUploadForm();
   }
 
   protected void view(TransferredResource r) {

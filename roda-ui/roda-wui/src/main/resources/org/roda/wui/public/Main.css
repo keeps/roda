@@ -553,3 +553,1212 @@
 }
 
 /* @end */
+
+
+
+/*******************************************************************/
+/*******************************************************************/
+/*******************     BROWSER      ******************************/
+/*******************************************************************/
+/*******************************************************************/
+
+
+/* Browser v2*/
+.browseTitle {
+	margin-bottom: 10px !important;
+}
+
+.browseTitle-allCollections {
+	line-height: 4rem;
+}
+
+.browseBreadcrumb {
+	margin-bottom: 20px;
+}
+
+.browseItemPanel {
+	
+}
+
+.browseItemPanelText {
+	display: inline-block;
+}
+
+.browseItemIcon {
+	display: inline-block;
+	width: 50px;
+}
+
+.browseItemIcon-all {
+	display: inline-block;
+	font-size: 4rem;
+	line-height: 4rem;
+}
+
+.browseItemIcon-other {
+	display: inline-block;
+	font-size: 4rem;
+	line-height: 4rem;
+}
+
+.browseItemText {
+	display: inline;
+	margin-bottom: 0 !important;
+}
+
+.browseItemDates {
+	color: #a7a9ac;
+	font-size: 1.2rem;
+}
+
+.browseItemMetadata {
+	padding: 20px 0;
+	width: 100%;
+}
+
+.browseItemMetadata.gwt-TabPanel {
+	margin: 10px 0 0 0;
+}
+
+.browseItemMetadata .gwt-TabPanelBottom {
+	background-color: white;
+	padding: 5px 10px;
+}
+
+.browseItemMetadata  .gwt-TabBarRest {
+	border-bottom: 1px solid rgba(167, 169, 172, 0.5);
+}
+
+.browseItemMetadata .gwt-TabBarItem {
+	background-color: white;
+	border-bottom: 1px solid rgba(167, 169, 172, 0.5);
+	margin: 0;
+	padding: 5px 10px;
+	cursor: pointer;
+	cursor: hand;
+}
+
+.browseItemMetadata .gwt-TabBarItem .gwt-Label {
+	color: #a7a9ac;
+	font-weight: normal;
+	font-size: 1.3rem;
+}
+
+.browseItemMetadata .gwt-TabBarItem-selected {
+	margin: 0;
+	background-color: rgba(167, 169, 172, 0.1);;
+	border-top: none;
+	border-left: none;
+	border-right: none;	
+}
+
+.browseItemMetadata .gwt-TabBarItem-selected .gwt-Label {
+	font-weight: normal;
+	color: inherit;
+}
+
+.descriptiveMetadata {
+	font-size: 1.3rem;
+}
+
+.descriptiveMetadata .title, .preservationMetadata .title {
+	display: none;
+	color: #a7a9ac;
+	border-bottom: 1px solid rgba(167, 169, 172, 0.5);
+	padding-bottom: 5px;
+	margin-bottom: 10px;
+}
+
+.descriptiveMetadataLink {
+	float: right;
+	font-size: 1.3rem;
+	margin-right: 1px;
+	margin-left: 5px;
+}
+
+.descriptiveMetadataLink+.descriptiveMetadataLink:after {
+	content: '·';
+	margin-left: 5px;
+}
+
+.descriptiveMetadata-field {
+	margin-bottom: 10px;
+}
+
+.descriptiveMetadata-field-key {
+	font-weight: 300;
+	color: #999;
+}
+
+.descriptiveMetadata-field-value {
+	
+}
+
+.browseDownload {
+	margin-bottom: 10px;
+}
+
+.browseDownloadIcon {
+	float: left;
+	font-size: 20px;
+	line-height: 30px;
+	margin-right: 7px;
+}
+
+.browseDownloadLabels {
+	line-height: 1.2;
+}
+
+.browseDownloadLabel {
+	color: #089de3;
+	font-size: 1.2rem;
+	cursor: pointer;
+}
+
+.browseDownloadSublabel {
+	font-size: 1rem;
+	margin-left: 25px;
+}
+
+.metadata-edit-area {
+	height: 300px;
+	max-width: 100%;
+}
+
+.metadata-edit-errors {
+	color: #D20707;
+	font-size: 1.2rem;
+}
+
+.metadata-edit-errors .error {
+	margin-bottom: 5px;
+	display: block;
+}
+
+/* --------------------------------------------------
+
+  ****************** PREMIS ************************
+
+  –––––––––––––––––––––––––––––––––––––––––––––––––– */
+.toggle-next {
+	cursor: pointer;
+}
+
+.representation .header {
+	font-size: 2rem;
+	display: block;
+}
+
+.representation .header:before {
+	content: '\f1b3';
+	font-family: 'FontAwesome';
+	text-rendering: auto;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	margin-right: 5px;
+}
+
+.representation .header .identifiers {
+	font-size: 1.5rem;
+}
+
+.header .field {
+	display: inline;
+	font-size: 1rem;
+	background-color: #eee;
+	padding: 4px;
+	border-radius: 3px;
+	margin: 0 2px;
+}
+
+.header>.field .field-label:after {
+	content: ':';
+}
+
+.header .identifierType {
+	display: none;	
+}
+
+.header .identifierType:after {
+	content: ':';
+}
+
+.representation .header .identifiers {
+	font-size: 1.5rem;
+}
+
+.representation .preservationLevel, .derivation {
+	color: #888;
+	display: block;
+	margin-left: 3.2rem;
+	font-size: 1.1rem;
+}
+
+.section {
+	display: block;
+	margin-left: 3.2rem;
+}
+
+.sectionTitle {
+	display: block;
+	font-size: 1.8rem;
+	margin-top: 1rem;
+}
+
+.sectionContent {
+	display: block;
+}
+
+.file, .event {
+	margin-bottom: 0.1rem;
+	display: block;
+}
+
+.file .header {
+	display: block;
+	font-size: 1.4rem;
+	display: block;
+}
+
+.file .header:before {
+	content: '\f1b2';
+	font-family: 'FontAwesome';
+	text-rendering: auto;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	margin-right: 5px;
+}
+
+.file .header .identifiers {
+	
+}
+
+.file .subheader {
+	display: block;
+	color: #888;
+	font-size: 1.2rem;
+	margin-left: 7px;
+	border-left: 1px solid #ccc;
+	padding-left: 13px;
+}
+
+.file .subheader .size:after {
+	content: ' B,';
+}
+
+.formatRegistry:before {
+	content: '(';
+}
+
+.formatRegistry:after {
+	content: ')';
+}
+
+.formatRegistryName:after {
+	content: ':';
+}
+
+.browseItemMetadata .content {
+	/*display: block;*/
+	display: none; /* for toggle */
+	margin-left: 7px;
+	border-left: 1px solid #eee;
+	padding-left: 13px;
+	padding-top: 5px;
+}
+
+
+/* Tables for metadata content
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+.metadataContent thead td {
+	font-weight: 500;
+}
+
+.metadataContent th, .metadataContent td {
+	/*padding: 12px 15px;*/
+	padding: 7px 10px;
+	text-align: left;
+	border-bottom: 1px solid #E1E1E1;
+}
+
+.metadataContent th:first-child, .metadataContent td:first-child {
+	padding-left: 0;
+}
+
+.metadataContent th:last-child, .metadataContent td:last-child {
+	padding-right: 0;
+}
+
+
+.content>.field {
+	display: block;
+	line-height: 1.6rem;
+	margin-bottom: 0.5rem;
+}
+
+.content>.field .field-label {
+	font-weight: bold;
+	font-size: 1.2rem;
+}
+
+.content>.field .field-label:after {
+	content: ':';
+}
+
+.content>.field .field-value {
+	font-size: 1.2rem;
+}
+
+.browseItemMetadata code {
+	max-height: 300px;
+}
+
+.event .header {
+	display: block;
+	font-size: 1.4rem;
+}
+
+.event .header:before {
+	content: '\f017';
+	font-family: 'FontAwesome';
+	text-rendering: auto;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+.event .header .identifier {
+
+}
+
+.event .subheader {
+	display: block;
+	color: #888;
+	font-size: 1.2rem;
+	margin-left: 2rem;
+}
+
+.event .linkingAgent .type, .event .linkingObject .type {
+	display: none;
+}
+
+.event .linkingAgent .value:before, .event .linkingObject .value:before
+	{
+	content: '(';
+}
+
+.event .linkingAgent .value:after, .event .linkingObject .value:after {
+	content: ')';
+}
+
+.agent .header {
+	font-size: 1.6rem;
+	display: block;
+}
+
+.agent .header:before {
+	content: '\f007';
+	font-family: 'FontAwesome';
+}
+
+.agent .subheader {
+	display: block;
+	color: #888;
+	font-size: 1.2rem;
+	margin-left: 2rem;
+}
+
+/** Browser**/
+.wui-browse {
+	width: 865px;
+}
+
+.wui-browse .browse-header {
+	width: 100%;
+	margin-bottom: 2px;
+}
+
+.wui-browse .browse-total {
+	font-size: 11px;
+	color: #58595b;
+	white-space: nowrap;
+	margin-top: 2px;
+}
+
+.wui-browse .browse-createFonds {
+	margin-left: 5px;
+	cursor: pointer;
+	cursor: hand;
+	width: 80px;
+}
+
+.wui-browse .browse-refresh {
+	margin-left: 5px;
+	cursor: pointer;
+	cursor: hand;
+}
+
+.wui-browse .view-toggle {
+	width: 16px;
+	cursor: pointer;
+	cursor: hand;
+}
+
+.wui-browse-split {
+	width: 865px;
+	height: 440px;
+}
+
+.wui-browse-split .hsplitter {
+	display: table;
+	width: 10px;
+}
+
+.wui-browse-split-hidden {
+	
+}
+
+.wui-browse-split-hidden .hsplitter {
+	display: none;
+	width: 0px;
+}
+
+.viewPanel-container {
+	width: 99%;
+}
+
+.wui-view-panel {
+	width: 100%;
+}
+
+.viewPanel-tabs {
+	width: 100%;
+	margin: 0;
+}
+
+.viewPanel-bottom {
+	width: 100%;
+}
+
+.viewPanel-tabs .gwt-TabBar {
+	background-color: #e6e7e8;
+	border: 0;
+}
+
+.viewPanel-tabs .gwt-TabPanelBottom {
+	height: 400px;
+	padding: 0;
+}
+
+.viewPanel-description-layout {
+	width: 100%;
+}
+
+.viewPanel-description-scroll {
+	width: 100%;
+	height: 390px;
+}
+
+.viewPanel-action {
+	margin: 5px;
+}
+
+.viewPanel-edit {
+	width: 80px;
+	margin: 5px;
+}
+
+.viewPanel-save {
+	width: 80px;
+	margin: 5px;
+}
+
+.viewPanel-createChild {
+	width: 90px;
+	margin: 5px;
+}
+
+.viewPanel-clone {
+	width: 90px;
+	margin: 5px;
+}
+
+.viewPanel-move {
+	width: 80px;
+	margin: 5px;
+}
+
+.viewPanel-remove {
+	width: 80px;
+	margin: 5px;
+}
+
+.viewPanel-close {
+	width: 80px;
+	margin: 5px;
+}
+
+.viewPanel-optionalFieldsToggle {
+	position: absolute;
+	top: 5px;
+	right: 5px;
+	color: white;
+	text-decoration: underline;
+	cursor: pointer;
+	cursor: hand;
+}
+
+.wui-view-window  .viewPanel-tabs .gwt-TabBar {
+	background-color: #999;
+}
+
+.wui-view-window .viewPanel-tabs .gwt-TabPanelBottom {
+	/*height: 574px;*/
+	
+}
+
+/** Item Popup **/
+.itemPopup-focus {
+	
+}
+
+.itemPopup-layout {
+	width: 350px;
+	border: 1px solid #414042;
+	background-color: #f1f699;
+}
+
+.itemPopup .header {
+	width: 100%;
+	padding: 1px 2px;
+	background-color: #414042;
+	color: #e6e7e8;
+}
+
+.itemPopup-scroll {
+	max-height: 200px;
+	height: expression(document.body.clientHeight > 200 ? "200px" : "auto");
+}
+
+.itemPopup .description {
+	max-width: 350px;
+	padding: 1px 2px;
+	width: expression(document.body.clientWidth > 350 ? "350px" : "auto");
+	color: #414042;
+	font-size: 11px;
+}
+
+/* @group Collection Tree */
+.collection-tree {
+	width: 100%;
+}
+
+.collection-tree  TABLE {
+	width: 100%;
+	border-spacing: 0px;
+}
+
+.collection-tree .gwt-TreeItem .treeitem-layout {
+	border: 0;
+	padding: 0;
+	margin: 0;
+}
+
+.collection-tree .gwt-TreeItem-selected .treeitem-layout {
+	border: 1px solid #6a9bae;
+}
+
+.TreeItemPanel {
+	border: 0;
+	cursor: pointer;
+	cursor: hand;
+	vertical-align: middle;
+	white-space: nowrap;
+	display: inline;
+	width: 100%;
+}
+
+.TreeItemPanel .treeitem-layout {
+	height: 20px;
+}
+
+.TreeItem-dummy {
+	width: auto;
+	font-size: 11px;
+	color: #58595b;
+}
+
+.TreeItem-dummy table {
+	width: auto;
+}
+
+.TreeItem-dummy .gwt-TreeItem {
+	width: auto;
+}
+
+.TreeItemPanel .treeitem-icon {
+	margin: auto;
+}
+
+.TreeItemPanel .treeitem-label {
+	font-size: 11px;
+	color: #58595b;
+	margin-left: 3px;
+	width: 100%;
+	height: 20px;
+	vertical-align: middle;
+	overflow: hidden;
+}
+
+.TreeItemPanel .treeitem-info-title {
+	font-size: 11px;
+	color: #58595b;
+	width: 480px;
+	background-color: #d7d8d9;
+	overflow: hidden;
+	padding-left: 2px;
+	padding-right: 2px;
+	height: 20px;
+	vertical-align: middle;
+}
+
+.TreeItemPanel .treeitem-info-data {
+	text-align: center;
+	font-size: 11px;
+	color: #58595b;
+	margin-left: 2px;
+	width: 90px;
+	background-color: #d7d8d9;
+	height: 20px;
+	vertical-align: middle;
+	white-space: nowrap;
+}
+
+.TreeItemPanel:hover {
+	color: #000;
+	cursor: pointer;
+	cursor: hand;
+}
+
+.TreeItemPanel .itemWaitingImage {
+	position: absolute;
+	left: 0px;
+}
+
+.jumpitem {
+	width: auto;
+}
+
+.jumpitem table {
+	width: auto;
+}
+
+.jumpitem .gwt-TreeItem {
+	width: auto;
+}
+
+.jumpitem-next {
+	
+}
+
+.jumpitem-previous {
+	
+}
+
+.jumpitem-layout {
+	width: auto;
+}
+
+.jumpitem-text {
+	font-size: 11px;
+	color: #58595b;
+	cursor: pointer;
+	cursor: hand;
+}
+
+.jumpitem-icon {
+	cursor: pointer;
+	cursor: hand;
+}
+
+.BrowseTree .sliderPanel {
+	width: 20px;
+	height: 200px;
+}
+
+.BrowseTree .slider {
+	width: 20px;
+	height: 200px;
+}
+
+.BrowseTree .slider .handle {
+	width: 18px;
+	height: 18px;
+	/*	background-image: url("images/slider_handle.png");*/
+}
+
+.BrowseTree .slider .background {
+	width: 20px;
+	height: 200px;
+	border: 1px solid black;
+	/*	background-image: url("images/slider_background.png");*/
+}
+
+/* @end */
+
+/* @group Elements Vertical Scroll Panel */
+.elementVerticalScrollPanel {
+	width: 100%;
+}
+
+.elementVerticalScrollPanel .scrollAutoLoader {
+	width: 100%;
+	height: 440px;
+	overflow-y: scroll !important;
+}
+
+.elementVerticalScrollPanel .layout {
+	width: 99%;
+}
+
+.elementVerticalScrollPanel .wui-list-header {
+	width: 100%;
+}
+
+.elementVerticalScrollPanel .wui-list-header * {
+	color: white;
+}
+
+.elementVerticalScrollPanel .element-header-id {
+	/*width: 100%;*/
+	white-space: nowrap;
+	padding: 0px 3px;
+	margin: 1px;
+	background-color: #58595b;
+	color: white;
+}
+
+.elementVerticalScrollPanel .element-header-title {
+	width: 480px;
+	white-space: nowrap;
+	padding: 0px 3px;
+	margin: 1px;
+	background-color: #58595b;
+	color: white;
+}
+
+.elementVerticalScrollPanel .element-header-date-initial {
+	width: 84px;
+	white-space: nowrap;
+	padding: 0px 3px;
+	margin: 1px;
+	background-color: #58595b;
+	color: white;
+}
+
+.elementVerticalScrollPanel .element-header-date-final {
+	width: 92px;
+	white-space: nowrap;
+	padding: 0px 3px;
+	margin: 1px 17px 1px 1px;
+	background-color: #58595b;
+	color: white;
+}
+
+.elementVerticalScrollPanel-noInfo .element-header-title {
+	display: none;
+}
+
+.elementVerticalScrollPanel-noInfo .element-header-date-initial {
+	display: none;
+}
+
+.elementVerticalScrollPanel-noInfo .element-header-date-final {
+	display: none;
+}
+
+/* @end */ /* @end */ /** Element Path Panel **/
+.wui-elementPath {
+	vertical-align: middle;
+}
+
+.wui-elementPath .elementPathItem-layout {
+	margin-left: 10px;
+	cursor: pointer;
+	cursor: hand;
+}
+
+.wui-elementPath .elementPathItem-layout .elementPathItem-icon {
+	
+}
+
+.wui-elementPath .elementPathItem-layout .elementPathItem-id {
+	font-family: Verdana, Lucida, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	color: #58595b;
+	margin-left: 3px;
+	vertical-align: middle;
+}
+
+.wui-elementPath .elementPathItem-final-layout .elementPathItem-id {
+	font-weight: bold;
+}
+
+.wui-elementPath .separator {
+	margin-left: 10px;
+}
+
+/** Arrangement table **/
+.wui-browse-arrangementTable { /*	background-color: white;*/
+	
+}
+
+.wui-browse-arrangementTable .header-cell {
+	background-color: #58595b;
+	text-align: center;
+}
+
+.wui-browse-arrangementTable .body-cell {
+	vertical-align: top;
+}
+
+.wui-browse-arrangementTable .body-row {
+	background-color: #e6e7e8;
+}
+
+.wui-browse-arrangementTable .body-row:hover {
+	background-color: white;
+}
+
+.wui-browse-arrangementTable .header-widget {
+	color: #e6e7e8;
+	white-space: nowrap;
+	margin: 1px 2px;
+}
+
+.wui-browse-arrangementTable .body-widget {
+	
+}
+
+/** Disseminations Panel **/
+.wui-browse-representations {
+	width: 97%;
+	height: auto;
+}
+
+.wui-browse-representations-title {
+	margin: 5px;
+}
+
+.wui-browse-representations-disseminations {
+	width: 100%;
+	height: auto;
+}
+
+.wui-browse-representations .representation {
+	width: 100%;
+	padding: 10px;
+}
+
+.wui-browse-representations .representation-disseminations {
+	width: 100%;
+}
+
+.wui-browse-representations .dissemination {
+	float: left;
+	width: 180px;
+	margin: 5px;
+	cursor: pointer;
+	cursor: hand;
+}
+
+.wui-browse-representations .dissemination:hover {
+	background-color: white;
+}
+
+.wui-browse-representations .dissemination-layout {
+	width: 100%;
+}
+
+.wui-browse-representations .dissemination-description {
+	font-size: 11px;
+}
+
+.wui-browse-representations .dissemination-icon {
+	
+}
+
+.wui-browse-representations .dissemination-original-label {
+	color: red;
+}
+
+/** Preservation Metadata Panel **/
+.wui-metadata-preservation {
+	width: 100%;
+}
+
+.wui-metadata-preservation .wui-metadata-preservation-header {
+	width: 100%;
+}
+
+.wui-metadata-preservation-header-reps {
+	
+}
+
+.wui-metadata-preservation .preservation-rep-layout {
+	vertical-align: middle;
+	margin: 1px;
+}
+
+.wui-metadata-preservation .preservation-rep-icon {
+	
+}
+
+.wui-metadata-preservation .preservation-rep-label {
+	font-size: 10px;
+}
+
+.wui-metadata-preservation-header-timeUnit {
+	
+}
+
+.wui-metadata-preservation .wui-metadata-preservation-timeline {
+	width: 100%;
+	margin: 5px 2px;
+}
+
+.wui-metadata-preservation .wui-metadata-preservation-timeline * {
+	font-size: 11px;
+}
+
+.wui-metadata-preservation .wui-metadata-preservation-timeline .timeline-copyright
+	{
+	display: none;
+}
+
+
+/************************************************/
+/*********   INGEST                 *************/
+/************************************************/
+.wui-ingest-transfer .wui-breadcrumbPanel {
+	position: relative;
+	top: -20px;
+}
+
+/*----------------------------
+    The file upload form
+-----------------------------*/
+
+
+#upload{
+      width:100%;
+      margin:20px auto;
+}
+
+#drop{
+    padding: 40px 50px;
+    text-align: center;
+    text-transform: uppercase;
+    font-size: 16px;
+    font-weight: bold;
+    color: #7f858a;
+    border: 5px dashed #e6e7e9;
+    border-radius: 20px;
+}
+
+#drop a{
+    background-color:#007a96;
+    padding:12px 26px;
+    color:#fff;
+    font-size:1.2rem;
+    border-radius:2px;
+    cursor:pointer;
+    display:block;
+    margin:10px auto 0;
+    max-width: 100px;
+    line-height:1;
+}
+
+#drop a:hover{
+    background-color:#0986a3;
+}
+
+#drop input{
+    display:none;
+}
+
+#upload ul{
+    list-style:none;
+}
+
+#upload ul li{
+    padding: 10px;
+    height: 52px;
+    position: relative;
+}
+
+#upload ul li input{
+    display: none;
+}
+
+#upload ul li p{
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 1.2rem;
+    font-weight: 500;
+    position: absolute;
+    top: 15px;
+    left: 100px;
+}
+
+#upload ul li i{
+    font-weight: normal;
+    font-style: normal;
+    color: #7f7f7f;
+    display: block;
+    font-size: 1.1rem;
+}
+
+#upload ul li canvas{
+    top: 15px;
+    left: 32px;
+    position: absolute;
+}
+
+#upload ul li span{
+    width: 15px;
+    height: 12px;
+    background: url('../img/icons.png') no-repeat;
+    position: absolute;
+    top: 34px;
+    right: 33px;
+    cursor:pointer;
+}
+
+#upload ul li.working span{
+    height: 16px;
+    background-position: 0 -12px;
+}
+
+#upload ul li.error p{
+    color:red;
+}
+
+
+/************************************************/
+/*********   SEARCH                 *************/
+/************************************************/
+
+.search {
+	
+}
+
+.search .searchLabel {
+	margin-bottom: 5px;
+}
+
+.search .searchInput {
+	display: flex;
+}
+
+.searchPanel {
+	margin-right: 55px;
+}
+
+.searchPanelLeft {
+	float: left;
+    width: 100%;
+}
+
+.search .searchBox {
+	box-sizing: border-box;
+	width: 100%;
+	height: 4rem;
+	line-height: 4rem;
+	font-size: 2rem;
+	border: 3px solid #ccc;
+	border-radius: 2px;
+	padding: 0 1rem;
+}
+
+.searchButton {
+	cursor: pointer;
+	cursor: hand;
+	position: relative;
+    top: -6px;
+    float: right;
+    width: 55px;
+    margin-right: -55px;
+}
+
+.searchButton-html {
+	font-size: 20px;
+}
+
+.searchButton .fa-stack-2x {
+	color: #089de3;
+}
+
+.searchButton .fa-stack-1x {
+	color: white;
+}
+
+.search .searchResults {
+	margin-top: 20px;
+	clear: both;
+}
+
+.search  .searchApplyFilters {
+	margin: 10px 0;
+	width: 100%;
+}
+
+.search  .searchAdvancedSearch {
+	margin: 10px 0;
+	width: 100%;
+}
+
+.searchAdvancedDisclosure {
+	width: 100%;
+	margin-top: 10px;
+}
+
+.searchAdvancedPanel {
+	padding: 20px !important;
+	min-height: auto;
+	background-color: #e6e7e8;
+	margin-bottom: 20px;
+}
+
+.search-field-label {
+	display: inline;
+}
+.search-field-remove {
+	font-size: 1.2rem;
+    margin-left: 5px;
+    float: right;
+}
+
+.searchAdvancedFieldsPanel + .searchAdvancedFieldAdd {
+	margin-top: 10px;
+}
+
+.searchAdvancedFieldsPanel.empty + .searchAdvancedFieldAdd {
+	margin-top: 0;
+}
+
+.searchAdvancedFieldAdd .form-listbox {
+	margin-bottom: 0;
+}
+
+.searchAdvancedFieldInputDateLabel {
+	display: inline-block;
+}
+
+.searchAdvancedFieldInputDateInput {
+	width: 8em;
+	text-align: center;
+	margin: 0 5px;
+}
+

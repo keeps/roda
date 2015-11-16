@@ -46,9 +46,8 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
-@Path(AipsResource.ENDPOINT)
-@Api(value = AipsResource.SWAGGER_ENDPOINT)
-@javax.annotation.Generated(value = "class io.swagger.codegen.languages.JaxRSServerCodegen", date = "2015-09-03T11:38:49.275+01:00")
+@Path(TransferredResource.ENDPOINT)
+@Api(value = TransferredResource.SWAGGER_ENDPOINT)
 public class AipsResource {
   public static final String ENDPOINT = "/v1/aips";
   public static final String SWAGGER_ENDPOINT = "v1 aips";

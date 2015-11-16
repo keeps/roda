@@ -24,6 +24,21 @@
 				</g:FlowPanel>
 				<common:TransferredResourceList
 					addStyleNames="transferredResourceList" ui:field="transferredResourceList" />
+				<g:HTML>
+					<form id="upload" method="post" action="api/v1/transferred/new" enctype="multipart/form-data">
+						<div id="drop">
+							Drop Here
+
+							<a>Browse</a>
+							<input type="file" name="upl" multiple="true" />
+						</div>
+
+						<ul>
+							<!-- The file uploads will be shown here -->
+						</ul>
+
+					</form>
+				</g:HTML>
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel ui:field="filtersPanel">
