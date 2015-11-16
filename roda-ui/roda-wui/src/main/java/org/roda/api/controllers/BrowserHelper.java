@@ -936,9 +936,9 @@ public class BrowserHelper {
 
   }
 
-  public static IndexResult<TransferredResource> findTransferredResources(Filter filter, Sorter sorter,
-    Sublist sublist, Facets facets) throws GenericException {
-    
+  public static IndexResult<TransferredResource> findTransferredResources(Filter filter, Sorter sorter, Sublist sublist,
+    Facets facets) throws GenericException {
+
     IndexResult<TransferredResource> ret;
     try {
       ret = RodaCoreFactory.getIndexService().find(TransferredResource.class, filter, sorter, sublist, facets);
@@ -949,7 +949,16 @@ public class BrowserHelper {
     }
 
     return ret;
-    
+
+  }
+
+  public static TransferredResource retrieveTransferredResource(String transferredResourceId) throws GenericException {
+    try {
+      return RodaCoreFactory.getIndexService().retrieve(TransferredResource.class, transferredResourceId);
+    } catch (IndexServiceException e) {
+      LOGGER.error("Error getting transferred resource", e);
+      throw new GenericException("Error getting transferred resource: " + e.getMessage());
+    }
   }
 
 }

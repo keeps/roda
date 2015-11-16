@@ -11,6 +11,7 @@
 package org.roda.wui.client.ingest.transfer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,12 +23,12 @@ import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.TransferredResource;
+import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.TransferredResourceList;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
-import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.Tools;
@@ -89,14 +90,15 @@ public class IngestTransfer extends Composite {
 
   private static final String TOP_ICON = "<i class='fa fa-circle-o'></i>";
 
+  private static final Filter DEFAULT_FILTER = new Filter(
+    new EmptyKeyFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENTPATH));
+
   interface MyUiBinder extends UiBinder<Widget, IngestTransfer> {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  private ClientLogger logger = new ClientLogger(getClass().getName());
-
-  private boolean init = true;
+  // private ClientLogger logger = new ClientLogger(getClass().getName());
 
   @UiField
   BreadcrumbPanel breadcrumb;
@@ -109,13 +111,10 @@ public class IngestTransfer extends Composite {
   FlowPanel facetOwner;
 
   private IngestTransfer() {
-
-    Filter filter = new Filter(new EmptyKeyFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENTPATH));
-
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.TRANSFERRED_RESOURCE_OWNER));
 
     // TODO externalise strings
-    transferredResourceList = new TransferredResourceList(filter, facets, "Transferred resources list");
+    transferredResourceList = new TransferredResourceList(DEFAULT_FILTER, facets, "Transferred resources list");
 
     facetOwner = new FlowPanel();
     Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
@@ -129,7 +128,9 @@ public class IngestTransfer extends Composite {
       @Override
       public void onSelectionChange(SelectionChangeEvent event) {
         TransferredResource r = transferredResourceList.getSelectionModel().getSelectedObject();
-        view(r);
+        if (r != null) {
+          Tools.newHistory(RESOLVER, getPathFromTransferredResourceId(r.getId()));
+        }
       }
     });
 
@@ -142,8 +143,12 @@ public class IngestTransfer extends Composite {
     transferredResourceList.setFilter(filter);
 
     breadcrumb.updatePath(getBreadcrumbs(r));
-    breadcrumb.setVisible(r != null);
+    breadcrumb.setVisible(true);
+  }
 
+  protected void view() {
+    transferredResourceList.setFilter(DEFAULT_FILTER);
+    breadcrumb.setVisible(false);
   }
 
   private List<BreadcrumbItem> getBreadcrumbs(TransferredResource r) {
@@ -151,13 +156,14 @@ public class IngestTransfer extends Composite {
 
     ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(TOP_ICON), RESOLVER.getHistoryPath()));
     if (r != null) {
-      List<String> path = new ArrayList<String>();
-      path.addAll(RESOLVER.getHistoryPath());
+      List<String> pathBuilder = new ArrayList<String>();
+      pathBuilder.addAll(RESOLVER.getHistoryPath());
 
       String[] parts = r.getId().split("/");
       for (String part : parts) {
         SafeHtml breadcrumbLabel = SafeHtmlUtils.fromString(part);
-        path.add(part);
+        pathBuilder.add(part);
+        List<String> path = new ArrayList<>(pathBuilder);
         ret.add(new BreadcrumbItem(breadcrumbLabel, path));
       }
     }
@@ -165,19 +171,50 @@ public class IngestTransfer extends Composite {
     return ret;
   }
 
-  public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
+  public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
+    GWT.log("tokens: " + historyTokens);
     if (historyTokens.size() == 0) {
-      if (init) {
-        init = false;
-      } else {
-        transferredResourceList.refresh();
-      }
-
+      view();
       callback.onSuccess(this);
     } else {
-      Tools.newHistory(RESOLVER);
-      callback.onSuccess(null);
+      String transferredResourceId = getTransferredResourceIdFromPath(historyTokens);
+      if (transferredResourceId != null) {
+        BrowserService.Util.getInstance().retrieveTransferredResource(transferredResourceId,
+          new AsyncCallback<TransferredResource>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+              callback.onFailure(caught);
+            }
+
+            @Override
+            public void onSuccess(TransferredResource r) {
+              view(r);
+              callback.onSuccess(IngestTransfer.this);
+            }
+          });
+      } else {
+        view();
+        callback.onSuccess(this);
+      }
+
     }
+
+  }
+
+  private String getTransferredResourceIdFromPath(List<String> historyTokens) {
+    String ret;
+    if (historyTokens.size() > 1) {
+      ret = Tools.join(historyTokens, "/");
+    } else {
+      ret = null;
+    }
+
+    return ret;
+  }
+
+  private List<String> getPathFromTransferredResourceId(String transferredResourceId) {
+    return Arrays.asList(transferredResourceId.split("/"));
   }
 
   protected void updateVisibles() {

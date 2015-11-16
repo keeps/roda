@@ -72,7 +72,7 @@ public interface BrowserServiceAsync {
    * @throws RODAException
    */
   public void getAncestors(SimpleDescriptionObject sdo, AsyncCallback<List<SimpleDescriptionObject>> callback);
-  
+
   void getSearchFields(String locale, AsyncCallback<List<SearchField>> callback);
 
   /**
@@ -189,6 +189,6 @@ public interface BrowserServiceAsync {
   void findTransferredResources(Filter filter, Sorter sorter, Sublist sublist, Facets facets,
     AsyncCallback<IndexResult<TransferredResource>> callback);
 
-
+  void retrieveTransferredResource(String transferredResourceId, AsyncCallback<TransferredResource> callback);
 
 }

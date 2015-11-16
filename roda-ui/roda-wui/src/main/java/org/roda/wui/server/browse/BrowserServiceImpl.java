@@ -547,4 +547,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     return Browser.findTransferredResources(user, filter, sorter, sublist, facets);
   }
 
+  @Override
+  public TransferredResource retrieveTransferredResource(String transferredResourceId)
+    throws AuthorizationDeniedException, GenericException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    return Browser.retrieveTransferredResource(user, transferredResourceId);
+  }
+
 }

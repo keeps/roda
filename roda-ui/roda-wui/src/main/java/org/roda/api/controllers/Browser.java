@@ -63,9 +63,7 @@ public class Browser extends RodaCoreService {
 
   private static final String BROWSE_ROLE = "browse";
 
-  private static final Object TRANSFERRED_PARENTID = "parentId";
-  private static final Object TRANSFERRED_NUMBER_OF_RECORDS = "numberOfRecords";
-  private static final Object TRANSFERRED_FROM = "from";
+  private static final String TRANSFERRED_RESOURCE_ID_PARAM = "transferredResourceId";
 
   private Browser() {
     super();
@@ -651,6 +649,26 @@ public class Browser extends RodaCoreService {
       SORTER_PARAM, sorter, SUBLIST_PARAM, sublist);
 
     return resources;
+  }
+
+  public static TransferredResource retrieveTransferredResource(RodaUser user, String transferredResourceId)
+    throws GenericException, AuthorizationDeniedException {
+    Date startDate = new Date();
+    // check user permissions
+    UserUtility.checkRoles(user, INGEST_TRANSFER);
+
+    // TODO if not admin, add to filter a constraint for the resource to belong
+    // to this user
+
+    // delegate
+    TransferredResource resource = BrowserHelper.retrieveTransferredResource(transferredResourceId);
+
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, BROWSER_COMPONENT, "retrieveTransferredResource", null, duration,
+      TRANSFERRED_RESOURCE_ID_PARAM, transferredResourceId);
+
+    return resource;
   }
 
 }

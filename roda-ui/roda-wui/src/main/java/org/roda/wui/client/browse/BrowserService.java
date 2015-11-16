@@ -118,10 +118,8 @@ public interface BrowserService extends RemoteService {
    * @throws RODAException
    */
   public List<SimpleDescriptionObject> getAncestors(SimpleDescriptionObject sdo) throws RODAException;
-  
-  
-  public List<SearchField> getSearchFields(String locale) throws GenericException;
 
+  public List<SearchField> getSearchFields(String locale) throws GenericException;
 
   /**
    * Get the index of a collection
@@ -230,9 +228,11 @@ public interface BrowserService extends RemoteService {
   public void createDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle newBundle)
     throws AuthorizationDeniedException, GenericException, MetadataParseException, NotFoundException;
 
-
   IndexResult<TransferredResource> findTransferredResources(Filter filter, Sorter sorter, Sublist sublist,
     Facets facets) throws AuthorizationDeniedException, GenericException;
+
+  TransferredResource retrieveTransferredResource(String transferredResourceId)
+    throws AuthorizationDeniedException, GenericException;
 
   // public DescriptiveMetadata retrieveMetadataFile(String itemId, String
   // descriptiveMetadataId) throws RODAException;
