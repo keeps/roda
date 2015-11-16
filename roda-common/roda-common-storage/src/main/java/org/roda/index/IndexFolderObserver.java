@@ -50,6 +50,7 @@ public class IndexFolderObserver implements FolderObserver {
 
   @Override
   public void pathAdded(Path basePath, Path createdPath) {
+    LOGGER.debug("ADDED: "+createdPath);
     try {
       Path relativePath = basePath.relativize(createdPath);
 
@@ -97,12 +98,14 @@ public class IndexFolderObserver implements FolderObserver {
   }
 
   @Override
-  public void pathModified(Path basePath, Path createdPath) {
-    pathAdded(basePath, createdPath);
+  public void pathModified(Path basePath, Path modifiedPath) {
+    LOGGER.debug("MODIFIED: "+modifiedPath);
+    pathAdded(basePath, modifiedPath);
   }
 
   @Override
   public void pathDeleted(Path basePath, Path deletedPath) {
+    LOGGER.debug("DELETED: "+deletedPath);
     try {
       Path relativePath = basePath.relativize(deletedPath);
       if (relativePath.getNameCount() > 1) {
