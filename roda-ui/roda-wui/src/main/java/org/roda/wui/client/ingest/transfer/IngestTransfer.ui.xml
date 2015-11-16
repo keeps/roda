@@ -19,8 +19,14 @@
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel>
 					<g:Label addStyleNames="h4">
-						<ui:msg>Download</ui:msg>
+						<ui:msg>Filter</ui:msg>
 					</g:Label>
+					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+						<g:Label addStyleNames="h5 sidebar-facet-title">
+							<ui:msg>Producers</ui:msg>
+						</g:Label>
+						<g:FlowPanel ui:field="facetOwner" />
+					</g:FlowPanel>
 				</g:FlowPanel>
 				<g:FlowPanel>
 					<g:Label addStyleNames="h4">

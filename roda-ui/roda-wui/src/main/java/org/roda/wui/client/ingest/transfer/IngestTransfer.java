@@ -10,10 +10,13 @@
  */
 package org.roda.wui.client.ingest.transfer;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.roda.core.common.RodaConstants;
 import org.roda.core.data.adapter.facet.Facets;
+import org.roda.core.data.adapter.facet.SimpleFacetParameter;
 import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
@@ -22,6 +25,7 @@ import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.TransferredResourceList;
 
@@ -30,6 +34,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SelectionChangeEvent.Handler;
@@ -86,20 +91,29 @@ public class IngestTransfer extends Composite {
 
   private boolean init = true;
 
-  @UiField(provided=true)
+  @UiField(provided = true)
   TransferredResourceList transferredResourceList;
+
+  // FILTERS
+  @UiField(provided = true)
+  FlowPanel facetOwner;
 
   private IngestTransfer() {
 
     Filter filter = new Filter(new EmptyKeyFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENTPATH));
 
-    Facets facets = null;
-    
+    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.TRANSFERRED_RESOURCE_OWNER));
+
     // TODO externalise strings
     transferredResourceList = new TransferredResourceList(filter, facets, "Transferred resources list");
 
+    facetOwner = new FlowPanel();
+    Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
+    facetPanels.put(RodaConstants.TRANSFERRED_RESOURCE_OWNER, facetOwner);
+    FacetUtils.bindFacets(transferredResourceList, facetPanels);
+
     initWidget(uiBinder.createAndBindUi(this));
-    
+
     transferredResourceList.getSelectionModel().addSelectionChangeHandler(new Handler() {
 
       @Override
@@ -112,7 +126,10 @@ public class IngestTransfer extends Composite {
   }
 
   protected void view(TransferredResource r) {
-    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENTPATH, r.getRelativePath()));
+    Filter filter = new Filter(
+      new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENTPATH, r.getRelativePath()));
+    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.SDO_LEVEL),
+      new SimpleFacetParameter(RodaConstants.AIP_HAS_REPRESENTATIONS));
     transferredResourceList.setFilter(filter);
   }
 

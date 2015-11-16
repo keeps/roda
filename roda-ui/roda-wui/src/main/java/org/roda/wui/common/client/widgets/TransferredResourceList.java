@@ -51,10 +51,11 @@ public class TransferredResourceList extends AsyncTableCell<TransferredResource>
   private final ClientLogger logger = new ClientLogger(getClass().getName());
 
   private Column<TransferredResource, SafeHtml> isFileColumn;
-  private TextColumn<TransferredResource> idColumn;
+  // private TextColumn<TransferredResource> idColumn;
   private TextColumn<TransferredResource> nameColumn;
   private TextColumn<TransferredResource> sizeColumn;
   private Column<TransferredResource, Date> creationDateColumn;
+  private TextColumn<TransferredResource> ownerColumn;
 
   public TransferredResourceList() {
     this(null, null, null);
@@ -83,13 +84,13 @@ public class TransferredResourceList extends AsyncTableCell<TransferredResource>
       }
     };
 
-    idColumn = new TextColumn<TransferredResource>() {
-
-      @Override
-      public String getValue(TransferredResource r) {
-        return r != null ? r.getId() : null;
-      }
-    };
+    // idColumn = new TextColumn<TransferredResource>() {
+    //
+    // @Override
+    // public String getValue(TransferredResource r) {
+    // return r != null ? r.getId() : null;
+    // }
+    // };
 
     nameColumn = new TextColumn<TransferredResource>() {
 
@@ -115,18 +116,28 @@ public class TransferredResourceList extends AsyncTableCell<TransferredResource>
       }
     };
 
+    ownerColumn = new TextColumn<TransferredResource>() {
+
+      @Override
+      public String getValue(TransferredResource r) {
+        return r != null ? r.getOwner() : null;
+      }
+    };
+
     isFileColumn.setSortable(true);
-    idColumn.setSortable(true);
+    // idColumn.setSortable(true);
     nameColumn.setSortable(true);
     sizeColumn.setSortable(true);
     creationDateColumn.setSortable(true);
+    ownerColumn.setSortable(true);
 
     // TODO externalize strings into constants
     display.addColumn(isFileColumn);
-    display.addColumn(idColumn, "Id");
+    // display.addColumn(idColumn, "Id");
     display.addColumn(nameColumn, "Name");
     display.addColumn(sizeColumn, "Size");
     display.addColumn(creationDateColumn, "Date created");
+    display.addColumn(ownerColumn, "Producer");
 
     // display.setAutoHeaderRefreshDisabled(true);
     Label emptyInfo = new Label("No items to display");
@@ -136,9 +147,10 @@ public class TransferredResourceList extends AsyncTableCell<TransferredResource>
     addStyleName("my-list-transferredResource");
     emptyInfo.addStyleName("my-list-transferredResource-empty-info");
 
-    idColumn.setCellStyleNames("nowrap");
+    // idColumn.setCellStyleNames("nowrap");
     sizeColumn.setCellStyleNames("nowrap my-collections-table-cell-alignright");
     creationDateColumn.setCellStyleNames("nowrap my-collections-table-cell-alignright");
+    ownerColumn.setCellStyleNames("nowrap");
   }
 
   @Override
@@ -152,9 +164,10 @@ public class TransferredResourceList extends AsyncTableCell<TransferredResource>
     for (int i = 0; i < columnSortList.size(); i++) {
       ColumnSortInfo columnSortInfo = columnSortList.get(i);
       String sortParameterKey;
-      if (columnSortInfo.getColumn().equals(idColumn)) {
-        sortParameterKey = RodaConstants.TRANSFERRED_RESOURCE_ID;
-      } else if (columnSortInfo.getColumn().equals(isFileColumn)) {
+      // if (columnSortInfo.getColumn().equals(idColumn)) {
+      // sortParameterKey = RodaConstants.TRANSFERRED_RESOURCE_ID;
+      // } else
+      if (columnSortInfo.getColumn().equals(isFileColumn)) {
         sortParameterKey = RodaConstants.TRANSFERRED_RESOURCE_ISFILE;
       } else if (columnSortInfo.getColumn().equals(nameColumn)) {
         sortParameterKey = RodaConstants.TRANSFERRED_RESOURCE_NAME;
@@ -162,6 +175,8 @@ public class TransferredResourceList extends AsyncTableCell<TransferredResource>
         sortParameterKey = RodaConstants.TRANSFERRED_RESOURCE_SIZE;
       } else if (columnSortInfo.getColumn().equals(creationDateColumn)) {
         sortParameterKey = RodaConstants.TRANSFERRED_RESOURCE_DATE;
+      } else if (columnSortInfo.getColumn().equals(ownerColumn)) {
+        sortParameterKey = RodaConstants.TRANSFERRED_RESOURCE_OWNER;
       } else {
         sortParameterKey = null;
       }
