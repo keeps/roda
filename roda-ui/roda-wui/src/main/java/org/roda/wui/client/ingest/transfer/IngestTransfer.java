@@ -22,6 +22,7 @@ import org.roda.core.data.adapter.facet.SimpleFacetParameter;
 import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.TransferredResourceList;
@@ -31,25 +32,39 @@ import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
+import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.widgets.MessagePopup;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SelectionChangeEvent.Handler;
+
+import config.i18n.client.BrowseMessages;
 
 /**
  * @author Luis Faria <lfaria@keep.pt>
  * 
  */
 public class IngestTransfer extends Composite {
+
+  private static final String TRANSFERRED_RESOURCE_ID_SEPARATOR = "/";
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
@@ -89,6 +104,8 @@ public class IngestTransfer extends Composite {
   }
 
   private static final String TOP_ICON = "<i class='fa fa-circle-o'></i>";
+  private static final SafeHtml FOLDER_ICON = SafeHtmlUtils.fromSafeConstant("<i class='fa fa-folder-o'></i>");
+  private static final SafeHtml FILE_ICON = SafeHtmlUtils.fromSafeConstant("<i class='fa fa-file-o'></i>");
 
   private static final Filter DEFAULT_FILTER = new Filter(
     new EmptyKeyFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENTPATH));
@@ -100,15 +117,44 @@ public class IngestTransfer extends Composite {
 
   // private ClientLogger logger = new ClientLogger(getClass().getName());
 
+  private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
+
+  private TransferredResource resource;
+
   @UiField
   BreadcrumbPanel breadcrumb;
 
   @UiField(provided = true)
   TransferredResourceList transferredResourceList;
 
+  @UiField
+  SimplePanel itemIcon;
+
+  @UiField
+  Label itemTitle;
+
+  @UiField
+  Label itemDates;
+
   // FILTERS
+  @UiField
+  FlowPanel filtersPanel;
+
   @UiField(provided = true)
   FlowPanel facetOwner;
+
+  // BUTTONS
+  @UiField
+  Button startIngest;
+
+  @UiField
+  Button createFolder;
+
+  @UiField
+  Button uploadFiles;
+
+  @UiField
+  Button remove;
 
   private IngestTransfer() {
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.TRANSFERRED_RESOURCE_OWNER));
@@ -134,9 +180,28 @@ public class IngestTransfer extends Composite {
       }
     });
 
+    transferredResourceList.addValueChangeHandler(new ValueChangeHandler<IndexResult<TransferredResource>>() {
+
+      @Override
+      public void onValueChange(ValueChangeEvent<IndexResult<TransferredResource>> event) {
+        boolean visible = event.getValue().getTotalCount() > 0;
+        transferredResourceList.setVisible(visible);
+        filtersPanel.setVisible(visible);
+      }
+    });
+
   }
 
   protected void view(TransferredResource r) {
+    resource = r;
+
+    HTML itemIconHtmlPanel = new HTML(r.isFile() ? FILE_ICON : FOLDER_ICON);
+    itemIconHtmlPanel.addStyleName("browseItemIcon-other");
+
+    itemIcon.setWidget(itemIconHtmlPanel);
+    itemTitle.setText(r.getName());
+    itemDates.setText(
+      messages.ingestTransferItemInfo(r.getCreationDate(), Humanize.readableFileSize(r.getSize()), r.getOwner()));
 
     Filter filter = new Filter(
       new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENTPATH, r.getRelativePath()),
@@ -145,11 +210,24 @@ public class IngestTransfer extends Composite {
 
     breadcrumb.updatePath(getBreadcrumbs(r));
     breadcrumb.setVisible(true);
+
+    updateVisibles();
   }
 
   protected void view() {
+    resource = null;
+
+    HTML itemIconHtmlPanel = new HTML(TOP_ICON);
+    itemIconHtmlPanel.addStyleName("browseItemIcon-all");
+
+    itemIcon.setWidget(itemIconHtmlPanel);
+    itemTitle.setText("All transferred packages");
+    itemDates.setText("");
+
     transferredResourceList.setFilter(DEFAULT_FILTER);
     breadcrumb.setVisible(false);
+
+    updateVisibles();
   }
 
   private List<BreadcrumbItem> getBreadcrumbs(TransferredResource r) {
@@ -160,7 +238,7 @@ public class IngestTransfer extends Composite {
       List<String> pathBuilder = new ArrayList<String>();
       pathBuilder.addAll(RESOLVER.getHistoryPath());
 
-      String[] parts = r.getId().split("/");
+      String[] parts = r.getId().split(TRANSFERRED_RESOURCE_ID_SEPARATOR);
       for (String part : parts) {
         SafeHtml breadcrumbLabel = SafeHtmlUtils.fromString(part);
         pathBuilder.add(part);
@@ -173,7 +251,6 @@ public class IngestTransfer extends Composite {
   }
 
   public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-    GWT.log("tokens: " + historyTokens);
     if (historyTokens.size() == 0) {
       view();
       callback.onSuccess(this);
@@ -206,7 +283,7 @@ public class IngestTransfer extends Composite {
   private String getTransferredResourceIdFromPath(List<String> historyTokens) {
     String ret;
     if (historyTokens.size() > 1) {
-      ret = Tools.join(historyTokens, "/");
+      ret = Tools.join(historyTokens, TRANSFERRED_RESOURCE_ID_SEPARATOR);
     } else {
       ret = null;
     }
@@ -215,10 +292,37 @@ public class IngestTransfer extends Composite {
   }
 
   private List<String> getPathFromTransferredResourceId(String transferredResourceId) {
-    return Arrays.asList(transferredResourceId.split("/"));
+    return Arrays.asList(transferredResourceId.split(TRANSFERRED_RESOURCE_ID_SEPARATOR));
   }
 
   protected void updateVisibles() {
+    startIngest.setVisible(resource != null);
+    createFolder.setVisible(resource == null || !resource.isFile());
+    uploadFiles.setVisible(resource != null && !resource.isFile());
+    remove.setVisible(resource != null);
+  }
 
+  @UiHandler("startIngest")
+  void buttonStartIngestHandler(ClickEvent e) {
+    if (resource != null) {
+      // TODO remove resource
+    }
+  }
+
+  @UiHandler("createFolder")
+  void buttonCreateFolderHandler(ClickEvent e) {
+    // TODO create folder
+  }
+
+  @UiHandler("uploadFiles")
+  void buttonUploadFilesHandler(ClickEvent e) {
+    // TODO uploadFiles
+  }
+
+  @UiHandler("remove")
+  void buttonRemoveHandler(ClickEvent e) {
+    if (resource != null) {
+      // TODO remove resource
+    }
   }
 }

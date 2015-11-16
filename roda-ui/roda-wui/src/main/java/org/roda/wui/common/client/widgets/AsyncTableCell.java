@@ -68,7 +68,6 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
     this.filter = filter;
     this.facets = facets;
 
-    GWT.log("Creating data provider");
     this.dataProvider = new AsyncDataProvider<T>() {
 
       @Override

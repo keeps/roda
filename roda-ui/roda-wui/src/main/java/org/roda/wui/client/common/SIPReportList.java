@@ -180,8 +180,6 @@ public class SIPReportList extends AsyncTableCell<SIPReport> {
     // define sublist
     Sublist sublist = new Sublist(start, length);
 
-    GWT.log("Requesting ingest getSIPs");
-
     IngestListService.Util.getInstance().findSipReports(filter, sorter, sublist, getFacets(), callback);
 
   }

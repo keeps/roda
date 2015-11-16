@@ -147,6 +147,9 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("From {0,localdatetime,predef:DATE_MEDIUM} to {1,localdatetime,predef:DATE_MEDIUM}")
   String titleDates(Date dateInitial, Date dateFinal);
+
+  @DefaultMessage("Created at {0,localdatetime,predef:DATE_TIME_MEDIUM}, with {1}, from {2}")
+  public String ingestTransferItemInfo(Date creationDate, String readableFileSize, String owner);
   
   
 

@@ -971,3 +971,12 @@
 	{
 	display: none;
 }
+
+
+/************************************************/
+/*********   INGEST                 *************/
+/************************************************/
+.wui-ingest-transfer .wui-breadcrumbPanel {
+	position: relative;
+	top: -20px;
+}

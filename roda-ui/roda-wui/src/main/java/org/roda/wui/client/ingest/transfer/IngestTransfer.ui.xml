@@ -14,11 +14,19 @@
 			<g:FlowPanel addStyleNames="col_10 content">
 				<g:Label styleName="h1">Ingest transfer</g:Label>
 				<m:BreadcrumbPanel ui:field="breadcrumb" />
+				<g:FlowPanel styleName="browseItemPanel">
+					<g:SimplePanel styleName="browseItemIcon" ui:field="itemIcon" />
+					<g:FlowPanel styleName="browseItemPanelText">
+						<g:Label styleName="h4" addStyleNames="browseItemText"
+							ui:field="itemTitle" />
+						<g:Label addStyleNames="browseItemDates" ui:field="itemDates" />
+					</g:FlowPanel>
+				</g:FlowPanel>
 				<common:TransferredResourceList
 					addStyleNames="transferredResourceList" ui:field="transferredResourceList" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
-				<g:FlowPanel>
+				<g:FlowPanel ui:field="filtersPanel">
 					<g:Label addStyleNames="h4">
 						<ui:msg>Filters</ui:msg>
 					</g:Label>
@@ -33,13 +41,13 @@
 					<g:Label addStyleNames="h4">
 						<ui:msg>Actions</ui:msg>
 					</g:Label>
-					<g:Button addStyleNames="btn btn-play" ui:field="report">Start
+					<g:Button addStyleNames="btn btn-play" ui:field="startIngest">Start
 						ingest</g:Button>
-					<g:Button addStyleNames="btn btn-plus" ui:field="view">Create
+					<g:Button addStyleNames="btn btn-plus" ui:field="createFolder">Create
 						folder</g:Button>
-					<g:Button addStyleNames="btn btn-upload" ui:field="accept">Upload
+					<g:Button addStyleNames="btn btn-upload" ui:field="uploadFiles">Upload
 						files</g:Button>
-					<g:Button addStyleNames="btn btn-ban" ui:field="reject">Remove</g:Button>
+					<g:Button addStyleNames="btn btn-ban" ui:field="remove">Remove</g:Button>
 				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>

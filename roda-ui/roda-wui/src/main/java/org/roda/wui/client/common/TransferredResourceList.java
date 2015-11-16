@@ -192,8 +192,6 @@ public class TransferredResourceList extends AsyncTableCell<TransferredResource>
     // define sublist
     Sublist sublist = new Sublist(start, length);
 
-    GWT.log("Requesting ingest getSIPs");
-
     BrowserService.Util.getInstance().findTransferredResources(filter, sorter, sublist, getFacets(), callback);
 
   }
