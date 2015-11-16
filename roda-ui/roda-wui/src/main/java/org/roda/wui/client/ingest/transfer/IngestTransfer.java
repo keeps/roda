@@ -14,8 +14,10 @@ import java.util.List;
 
 import org.roda.core.common.RodaConstants;
 import org.roda.core.data.adapter.facet.Facets;
-import org.roda.core.data.adapter.facet.SimpleFacetParameter;
+import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.TransferredResource;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.common.client.ClientLogger;
@@ -29,6 +31,8 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.SelectionChangeEvent;
+import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 
 /**
  * @author Luis Faria <lfaria@keep.pt>
@@ -87,7 +91,7 @@ public class IngestTransfer extends Composite {
 
   private IngestTransfer() {
 
-    Filter filter = null;
+    Filter filter = new Filter(new EmptyKeyFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENTPATH));
 
     Facets facets = null;
     
@@ -95,7 +99,21 @@ public class IngestTransfer extends Composite {
     transferredResourceList = new TransferredResourceList(filter, facets, "Transferred resources list");
 
     initWidget(uiBinder.createAndBindUi(this));
+    
+    transferredResourceList.getSelectionModel().addSelectionChangeHandler(new Handler() {
 
+      @Override
+      public void onSelectionChange(SelectionChangeEvent event) {
+        TransferredResource r = transferredResourceList.getSelectionModel().getSelectedObject();
+        view(r);
+      }
+    });
+
+  }
+
+  protected void view(TransferredResource r) {
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENTPATH, r.getRelativePath()));
+    transferredResourceList.setFilter(filter);
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
@@ -103,7 +121,7 @@ public class IngestTransfer extends Composite {
       if (init) {
         init = false;
       } else {
-        // sipList.refresh();
+        transferredResourceList.refresh();
       }
 
       callback.onSuccess(this);
