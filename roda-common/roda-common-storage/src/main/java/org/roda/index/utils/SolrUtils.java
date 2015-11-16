@@ -1238,7 +1238,8 @@ public class SolrUtils {
     boolean isFile = objectToBoolean(doc.get(RodaConstants.TRANSFERRED_RESOURCE_ISFILE));
     long size = objectToLong(doc.get(RodaConstants.TRANSFERRED_RESOURCE_SIZE));
     String name = objectToString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_NAME));
-
+    String owner = objectToString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_OWNER));
+    
     tr.setCreationDate(date);
     tr.setFullPath(fullPath);
     tr.setId(id);
@@ -1247,6 +1248,7 @@ public class SolrUtils {
     tr.setSize(size);
     tr.setParentPath(parentPath);
     tr.setFile(isFile);
+    tr.setOwner(owner);
     return tr;
   }
 
@@ -1271,7 +1273,7 @@ public class SolrUtils {
     }
 
     sip.addField(RodaConstants.TRANSFERRED_RESOURCE_NAME, relativePath.getFileName().toString());
-
+    sip.addField(RodaConstants.TRANSFERRED_RESOURCE_OWNER, relativePath.subpath(0, 1).toString());
     return sip;
   }
 

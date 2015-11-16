@@ -7,6 +7,7 @@ public class TransferredResource implements Serializable {
   /**
    * 
    */
+  
   private static final long serialVersionUID = 1L;
   private String id;
   private String fullPath;
@@ -16,6 +17,16 @@ public class TransferredResource implements Serializable {
   private Date creationDate;
   private String name;
   private boolean file;
+  private String owner;
+
+  
+  public String getOwner() {
+    return owner;
+  }
+
+  public void setOwner(String owner) {
+    this.owner = owner;
+  }
 
   public boolean isFile() {
     return file;
