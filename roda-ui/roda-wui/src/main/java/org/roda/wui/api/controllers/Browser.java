@@ -65,6 +65,10 @@ public class Browser extends RodaCoreService {
 
   private static final String TRANSFERRED_RESOURCE_ID_PARAM = "transferredResourceId";
 
+  private static final String PARENT_PARAM = "parent";
+  private static final String FOLDERNAME_PARAM = "folderName";
+  private static final String PARENT_PATH = "path";
+
   private Browser() {
     super();
   }
@@ -669,6 +673,42 @@ public class Browser extends RodaCoreService {
       TRANSFERRED_RESOURCE_ID_PARAM, transferredResourceId);
 
     return resource;
+  }
+
+  public static void createTransferredResourcesFolder(RodaUser user, String parent, String folderName)
+    throws AuthorizationDeniedException, GenericException {
+    Date startDate = new Date();
+    // check user permissions
+    UserUtility.checkRoles(user, INGEST_TRANSFER);
+
+    // TODO if not admin, add to filter a constraint for the resource to belong
+    // to this user
+
+    // delegate
+    BrowserHelper.createTransferredResourcesFolder(parent, folderName);
+
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, BROWSER_COMPONENT, "createTransferredResourcesFolder", null, duration, PARENT_PARAM, parent,
+      FOLDERNAME_PARAM, folderName);
+  }
+
+  public static void removeTransferredResource(RodaUser user, String path)
+    throws AuthorizationDeniedException, GenericException {
+    Date startDate = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, INGEST_TRANSFER);
+
+    // TODO if not admin, add to filter a constraint for the resource to belong
+    // to this user
+
+    // delegate
+    BrowserHelper.removeTransferredResource(path);
+
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, BROWSER_COMPONENT, "removeTransferredResource", null, duration, PARENT_PATH, path);
   }
 
 }

@@ -42,7 +42,6 @@ import org.roda.core.common.Messages;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.common.UserUtility;
 import org.roda.core.common.monitor.FolderMonitor;
-import org.roda.core.common.monitor.FolderObservable;
 import org.roda.core.common.monitor.FolderObserver;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
@@ -132,7 +131,7 @@ public class RodaCoreFactory {
 
   private static ApacheDS ldap;
 
-  private static FolderObservable sipFolderMonitor;
+  private static FolderMonitor sipFolderMonitor;
   private static FolderObserver sipFolderObserver;
 
   private static Path rodaApacheDsConfigDirectory = null;
@@ -250,13 +249,13 @@ public class RodaCoreFactory {
       }
 
       startApacheDS();
-      
+
       try {
         startSIPFolderMonitor();
       } catch (Exception e) {
         LOGGER.error("Error starting SIP Monitor: " + e.getMessage());
       }
-      
+
     } else if (nodeType == NODE_TYPE_ENUM.WORKER) {
       akkaDistributedPluginWorker = new AkkaDistributedPluginWorker(getSystemProperty(CLUSTER_HOSTNAME, "localhost"),
         getSystemProperty(CLUSTER_PORT, "2551"), getSystemProperty(NODE_HOSTNAME, "localhost"),
@@ -391,8 +390,8 @@ public class RodaCoreFactory {
     int SIPTimeout = rodaConfig.getInt("sip.timeout");
     Path sipFolderPath = dataPath.resolve(SIPFolderPath);
 
-    //sipFolderMonitor = new FolderMonitorNIO(sipFolderPath, SIPTimeout);
-     sipFolderMonitor = new FolderMonitor(sipFolderPath, SIPTimeout);
+    // sipFolderMonitor = new FolderMonitorNIO(sipFolderPath, SIPTimeout);
+    sipFolderMonitor = new FolderMonitor(sipFolderPath, SIPTimeout);
     sipFolderObserver = new IndexFolderObserver(solr, sipFolderPath);
     sipFolderMonitor.addFolderObserver(sipFolderObserver);
   }
@@ -423,6 +422,10 @@ public class RodaCoreFactory {
 
   public static AkkaDistributedPluginOrchestrator getAkkaDistributedPluginOrchestrator() {
     return akkaDistributedPluginOrchestrator;
+  }
+
+  public static FolderMonitor getFolderMonitor() {
+    return sipFolderMonitor;
   }
 
   public static NODE_TYPE_ENUM getNodeType() {

@@ -191,4 +191,7 @@ public interface BrowserServiceAsync {
 
   void retrieveTransferredResource(String transferredResourceId, AsyncCallback<TransferredResource> callback);
 
+  void createTransferredResourcesFolder(String parent, String folderName, AsyncCallback<Void> callback);
+
+  void removeTransferredResource(String path, AsyncCallback<Void> callback);
 }

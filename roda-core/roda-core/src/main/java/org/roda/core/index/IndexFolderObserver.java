@@ -38,7 +38,7 @@ public class IndexFolderObserver implements FolderObserver {
 
       @Override
       public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-        pathAdded(basePath, file,true);
+        pathAdded(basePath, file, true);
         return FileVisitResult.CONTINUE;
       }
 
@@ -62,6 +62,7 @@ public class IndexFolderObserver implements FolderObserver {
 
   @Override
   public void pathAdded(Path basePath, Path createdPath, boolean addChildren) {
+    LOGGER.debug("ADD: " + createdPath.toString());
     try {
       Path relativePath = basePath.relativize(createdPath);
       if (relativePath.getNameCount() > 1) {
@@ -96,8 +97,7 @@ public class IndexFolderObserver implements FolderObserver {
             }
           });
         }
-        
-        
+
         index.add(RodaConstants.INDEX_SIP, pathDocument);
         index.commit(RodaConstants.INDEX_SIP);
       }
@@ -110,11 +110,13 @@ public class IndexFolderObserver implements FolderObserver {
 
   @Override
   public void pathModified(Path basePath, Path modifiedPath, boolean modifyChildren) {
-    pathAdded(basePath, modifiedPath,modifyChildren);
+    LOGGER.debug("MODIFY: " + modifiedPath.toString());
+    pathAdded(basePath, modifiedPath, modifyChildren);
   }
 
   @Override
   public void pathDeleted(Path basePath, Path deletedPath) {
+    LOGGER.debug("DELETE: " + deletedPath.toString());
     try {
       Path relativePath = basePath.relativize(deletedPath);
       if (relativePath.getNameCount() > 1) {

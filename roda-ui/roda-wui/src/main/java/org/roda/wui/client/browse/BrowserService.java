@@ -234,6 +234,11 @@ public interface BrowserService extends RemoteService {
   TransferredResource retrieveTransferredResource(String transferredResourceId)
     throws AuthorizationDeniedException, GenericException;
 
+  public void createTransferredResourcesFolder(String parent, String folderName)
+    throws AuthorizationDeniedException, GenericException;
+
+  public void removeTransferredResource(String path) throws AuthorizationDeniedException, GenericException;
+
   // public DescriptiveMetadata retrieveMetadataFile(String itemId, String
   // descriptiveMetadataId) throws RODAException;
 

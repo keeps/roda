@@ -14,6 +14,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -957,6 +958,24 @@ public class BrowserHelper {
     } catch (IndexServiceException e) {
       LOGGER.error("Error getting transferred resource", e);
       throw new GenericException("Error getting transferred resource: " + e.getMessage());
+    }
+  }
+
+  public static void createTransferredResourcesFolder(String parent, String folderName) throws GenericException {
+    try {
+      RodaCoreFactory.getFolderMonitor().createFolder(Paths.get(parent), folderName);
+    } catch (IOException e) {
+      LOGGER.error("Error creating transferred resource folder", e);
+      throw new GenericException("Error creating transferred resource folder: " + e.getMessage());
+    }
+  }
+
+  public static void removeTransferredResource(String path) throws GenericException {
+    try {
+      RodaCoreFactory.getFolderMonitor().removeFolder(Paths.get(path));
+    } catch (IOException e) {
+      LOGGER.error("Error removing transferred resource", e);
+      throw new GenericException("Error removing transferred resource: " + e.getMessage());
     }
   }
 

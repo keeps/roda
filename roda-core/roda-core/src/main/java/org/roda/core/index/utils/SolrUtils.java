@@ -657,8 +657,8 @@ public class SolrUtils {
       ret = resultClass.cast(solrDocumentToLogEntry(doc));
     } else if (resultClass.equals(SIPReport.class)) {
       ret = resultClass.cast(solrDocumentToSipState(doc));
-    } else if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class)
-      || resultClass.equals(Group.class)) {
+    } else
+      if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class) || resultClass.equals(Group.class)) {
       ret = resultClass.cast(solrDocumentToRodaMember(doc));
     } else if (resultClass.equals(RepresentationFilePreservationObject.class)) {
       ret = resultClass.cast(solrDocumentToRepresentationFilePreservationObject(doc));
@@ -1234,14 +1234,14 @@ public class SolrUtils {
       parentPath = objectToString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_PARENTPATH));
     }
     String relativePath = objectToString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_RELATIVEPATH));
-    
+
     Date d = new Date();
-    try{
+    try {
       d = objectToDate(doc.get(RodaConstants.TRANSFERRED_RESOURCE_DATE));
-    }catch(Exception e){
-      LOGGER.error("ERROR PARSING DATE: "+e.getMessage());
+    } catch (Exception e) {
+      LOGGER.error("ERROR PARSING DATE: " + e.getMessage());
     }
-   
+
     boolean isFile = objectToBoolean(doc.get(RodaConstants.TRANSFERRED_RESOURCE_ISFILE));
     long size = objectToLong(doc.get(RodaConstants.TRANSFERRED_RESOURCE_SIZE));
     String name = objectToString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_NAME));
@@ -1262,10 +1262,10 @@ public class SolrUtils {
   public static SolrInputDocument transferredResourceToSolrDocument(Path createdPath, Path relativePath)
     throws IOException {
     SolrInputDocument sip = new SolrInputDocument();
-    
-    sip.addField(RodaConstants.TRANSFERRED_RESOURCE_ID, relativePath.toString().replaceAll("\\s+",""));
+
+    sip.addField(RodaConstants.TRANSFERRED_RESOURCE_ID, relativePath.toString().replaceAll("\\s+", ""));
     sip.addField(RodaConstants.TRANSFERRED_RESOURCE_FULLPATH, createdPath.toString());
-    
+
     Path parentPath = relativePath.getParent();
     if (parentPath.getNameCount() > 1) {
       sip.addField(RodaConstants.TRANSFERRED_RESOURCE_PARENTPATH,
@@ -1275,7 +1275,7 @@ public class SolrUtils {
       sip.addField(RodaConstants.TRANSFERRED_RESOURCE_RELATIVEPATH,
         relativePath.subpath(1, relativePath.getNameCount()).toString());
     }
-    
+
     sip.addField(RodaConstants.TRANSFERRED_RESOURCE_DATE, new Date());
     if (createdPath.toFile().isDirectory()) {
       sip.addField(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, false);

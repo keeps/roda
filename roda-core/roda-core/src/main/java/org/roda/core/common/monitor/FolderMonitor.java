@@ -1,6 +1,8 @@
 package org.roda.core.common.monitor;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.apache.commons.io.monitor.FileAlterationListener;
@@ -21,6 +23,15 @@ public class FolderMonitor extends FolderObservable {
     this.basePath = p;
     this.timeout = timeout;
     startWatch();
+  }
+
+  public void createFolder(Path parent, String folderName) throws IOException {
+    Files.createDirectory(basePath.resolve(parent).resolve(folderName));
+  }
+
+  public void removeFolder(Path path) throws IOException {
+    Files.delete(basePath.resolve(path));
+
   }
 
   private void startWatch() throws Exception {

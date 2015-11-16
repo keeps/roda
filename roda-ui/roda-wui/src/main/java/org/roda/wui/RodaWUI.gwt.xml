@@ -4,8 +4,8 @@
 	<!-- Inherit the core Web Toolkit stuff. -->
 	<inherits name='com.google.gwt.user.User' />
 	<inherits name="com.google.gwt.http.HTTP" />
-	<inherits name="com.google.gwt.logging.Logging"/>
-	<source path="client"/>
+	<inherits name="com.google.gwt.logging.Logging" />
+	<source path="client" />
 
 	<extend-property name="locale" values="pt_PT" />
 
@@ -24,9 +24,7 @@
 
 	<!-- Specify the app entry point class. -->
 	<entry-point class='org.roda.wui.client.main.Main' />
-	
 	<stylesheet src="Main.css" />
-	
 	<set-configuration-property name='xsiframe.failIfScriptTag'
 		value='FALSE' />
 </module>
