@@ -33,8 +33,6 @@ import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.Humanize;
-import org.roda.wui.common.client.tools.JavascriptUtils;
-import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.Tools;
 
 import com.google.gwt.core.client.GWT;
@@ -157,9 +155,6 @@ public class IngestTransfer extends Composite {
   @UiField
   Button remove;
 
-  @UiField
-  HTML uploadForm;
-
   private IngestTransfer() {
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.TRANSFERRED_RESOURCE_OWNER));
 
@@ -196,39 +191,6 @@ public class IngestTransfer extends Composite {
 
   }
 
-  @Override
-  protected void onLoad() {
-    JavascriptUtils.runMiniUploadForm();
-  }
-
-  private String getUploadUrl() {
-    String ret;
-
-    if (resource != null && !resource.isFile()) {
-      String id = resource.getId();
-      ret = RestUtils.createTransferredResourceUploadUri(id);
-    } else {
-      ret = null;
-    }
-
-    return ret;
-  }
-
-  private void updateUploadForm() {
-    String uploadUrl = getUploadUrl();
-
-    if (uploadUrl != null) {
-      SafeHtml html = SafeHtmlUtils.fromSafeConstant("<form id='upload' method='post' action='" + getUploadUrl()
-        + "' enctype='multipart/form-data'>" + "<div id='drop'>" + "Drop files or folders here" + "<a>" + "Browse"
-        + "</a>" + "<input type='file' name='upl' multiple='true' />" + "</div>" + "</form>");
-
-      uploadForm.setHTML(html);
-      JavascriptUtils.runMiniUploadForm();
-    } else {
-      uploadForm.setHTML(SafeHtmlUtils.EMPTY_SAFE_HTML);
-    }
-  }
-
   protected void view(TransferredResource r) {
     resource = r;
 
@@ -248,7 +210,6 @@ public class IngestTransfer extends Composite {
     breadcrumb.updatePath(getBreadcrumbs(r));
     breadcrumb.setVisible(true);
 
-    updateUploadForm();
     updateVisibles();
   }
 
@@ -265,7 +226,6 @@ public class IngestTransfer extends Composite {
     transferredResourceList.setFilter(DEFAULT_FILTER);
     breadcrumb.setVisible(false);
 
-    updateUploadForm();
     updateVisibles();
   }
 
@@ -293,6 +253,9 @@ public class IngestTransfer extends Composite {
     if (historyTokens.size() == 0) {
       view();
       callback.onSuccess(this);
+    } else if (historyTokens.size() > 1
+      && historyTokens.get(0).equals(IngestTransferUpload.RESOLVER.getHistoryToken())) {
+      IngestTransferUpload.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else {
       String transferredResourceId = getTransferredResourceIdFromPath(historyTokens);
       if (transferredResourceId != null) {
@@ -319,7 +282,7 @@ public class IngestTransfer extends Composite {
 
   }
 
-  private String getTransferredResourceIdFromPath(List<String> historyTokens) {
+  public static String getTransferredResourceIdFromPath(List<String> historyTokens) {
     String ret;
     if (historyTokens.size() > 1) {
       ret = Tools.join(historyTokens, TRANSFERRED_RESOURCE_ID_SEPARATOR);
@@ -330,7 +293,7 @@ public class IngestTransfer extends Composite {
     return ret;
   }
 
-  private List<String> getPathFromTransferredResourceId(String transferredResourceId) {
+  public static List<String> getPathFromTransferredResourceId(String transferredResourceId) {
     return Arrays.asList(transferredResourceId.split(TRANSFERRED_RESOURCE_ID_SEPARATOR));
   }
 
@@ -355,7 +318,7 @@ public class IngestTransfer extends Composite {
 
   @UiHandler("uploadFiles")
   void buttonUploadFilesHandler(ClickEvent e) {
-    // TODO uploadFiles
+    Tools.newHistory(IngestTransferUpload.RESOLVER, getPathFromTransferredResourceId(resource.getId()));
   }
 
   @UiHandler("remove")

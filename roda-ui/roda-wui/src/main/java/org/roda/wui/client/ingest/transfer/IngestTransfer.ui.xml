@@ -24,7 +24,6 @@
 				</g:FlowPanel>
 				<common:TransferredResourceList
 					addStyleNames="transferredResourceList" ui:field="transferredResourceList" />
-				<g:HTML ui:field="uploadForm"/>
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel ui:field="filtersPanel">
@@ -50,11 +49,6 @@
 						files</g:Button>
 					<g:Button addStyleNames="btn btn-ban" ui:field="remove">Remove</g:Button>
 				</g:FlowPanel>
-				<g:HTML>
-					<ul id="upload-list">
-						<!-- The file uploads will be shown here -->
-					</ul>
-				</g:HTML>
 			</g:FlowPanel>
 		</g:FlowPanel>
 	</g:FlowPanel>

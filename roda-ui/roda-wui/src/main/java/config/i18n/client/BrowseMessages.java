@@ -154,7 +154,7 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("Drop files or folders here")
   String ingestTransferUploadDropHere();
 
-  @DefaultMessage("Browse")
-  String ingestTransferUploadBrowse();
+  @DefaultMessage("Choose files...")
+  String ingestTransferUploadBrowseFiles();
 
 }

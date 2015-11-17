@@ -1600,15 +1600,15 @@
 }
 
 #upload-list li p{
-    width: 90%;
+    width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     font-weight: 500;
     position: absolute;
     top: 10px;
-    left: 22px;
+    left: 60px;
 }
 
 #upload-list li i{
@@ -1616,12 +1616,12 @@
     font-style: normal;
     color: #7f7f7f;
     display: block;
-    font-size: 1rem;
+    font-size: 1.1rem;
 }
 
 #upload-list li canvas{
     top: 15px;
-    left: -15px;
+    left: 20px;
     position: absolute;
 }
 
@@ -1631,7 +1631,7 @@
     background: url('images/icons.png') no-repeat;
     position: absolute;
     top: 20px;
-    right: -20px;
+    right: 20px;
     cursor:pointer;
 }
 
