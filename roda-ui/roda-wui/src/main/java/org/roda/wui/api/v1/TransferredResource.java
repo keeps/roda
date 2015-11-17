@@ -7,11 +7,15 @@
  */
 package org.roda.wui.api.v1;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
@@ -36,11 +40,21 @@ public class TransferredResource {
   @POST
   @Path("/new")
   public Response uploadFiles(@FormDataParam("upl") InputStream inputStream,
-    @FormDataParam("upl") FormDataContentDisposition fileDetail) throws RODAException {
+    @FormDataParam("upl") FormDataContentDisposition fileDetail, @QueryParam("parentId") String parentId)
+      throws RODAException {
     // get user
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
     // delegate action to controller
     // do nothing
+
+    try {
+      java.nio.file.Path file = Files.createTempFile("roda", ".tmp");
+      Files.copy(inputStream, file, StandardCopyOption.REPLACE_EXISTING);
+      System.out.println("Uploaded file " + fileDetail + " with size: " + Files.size(file) + " into " + parentId);
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
 
     // FIXME give a better answer
     return Response.ok().entity("{'status':'success'}").build();

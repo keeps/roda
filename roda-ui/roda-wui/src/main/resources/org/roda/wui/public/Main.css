@@ -1586,63 +1586,62 @@
     display:none;
 }
 
-#upload ul{
+#upload-list{
     list-style:none;
 }
 
-#upload ul li{
-    padding: 10px;
+#upload-list li{
     height: 52px;
     position: relative;
 }
 
-#upload ul li input{
+#upload-list li input{
     display: none;
 }
 
-#upload ul li p{
-    width: 100%;
+#upload-list li p{
+    width: 90%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     font-size: 1.2rem;
     font-weight: 500;
     position: absolute;
-    top: 15px;
-    left: 100px;
+    top: 10px;
+    left: 22px;
 }
 
-#upload ul li i{
+#upload-list li i{
     font-weight: normal;
     font-style: normal;
     color: #7f7f7f;
     display: block;
-    font-size: 1.1rem;
+    font-size: 1rem;
 }
 
-#upload ul li canvas{
+#upload-list li canvas{
     top: 15px;
-    left: 32px;
+    left: -15px;
     position: absolute;
 }
 
-#upload ul li span{
+#upload-list li span{
     width: 15px;
     height: 12px;
     background: url('images/icons.png') no-repeat;
     position: absolute;
-    top: 34px;
-    right: 33px;
+    top: 20px;
+    right: -20px;
     cursor:pointer;
 }
 
-#upload ul li.working span{
+#upload-list li.working span{
     height: 16px;
     background-position: 0 -12px;
 }
 
-#upload ul li.error p{
-    color:red;
+#upload-list li.error p{
+    color: #D20707;
 }
 
 

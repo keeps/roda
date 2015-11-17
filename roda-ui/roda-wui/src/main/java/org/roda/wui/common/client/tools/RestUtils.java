@@ -121,4 +121,14 @@ public class RestUtils {
     return b.toString();
   }
 
+  public static String createTransferredResourceUploadUri(String parentId) {
+    // api/v1/transferred/{parentId}
+    StringBuilder b = new StringBuilder();
+    // base uri
+    b.append(RodaConstants.API_REST_V1_TRANSFERRED).append("new").append(RodaConstants.API_QUERY_START)
+      .append("parentId").append(RodaConstants.API_ATTR_ASSIGN_SYMBOL).append(parentId);
+
+    return b.toString();
+  }
+
 }

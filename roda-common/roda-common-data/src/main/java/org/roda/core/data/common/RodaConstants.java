@@ -28,6 +28,7 @@ public final class RodaConstants {
 
   public static final String API_SEP = "/";
   public static final String API_REST_V1_AIPS = "api/v1/aips/";
+  public static final String API_REST_V1_TRANSFERRED = "api/v1/transferred/";
   public static final String API_DATA = "data";
   public static final String API_DESCRIPTIVE_METADATA = "descriptive_metadata";
   public static final String API_PRESERVATION_METADATA = "preservation_metadata";

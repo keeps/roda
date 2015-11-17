@@ -81,7 +81,7 @@ public class JavascriptUtils {
     $wnd.console.log("running mini upload form");
     $wnd.jQuery(function(){
 
-    var ul = $wnd.jQuery('#upload ul');
+    var ul = $wnd.jQuery('#upload-list');
 
     $wnd.jQuery('#drop a').click(function(){
         // Simulate a click on the file input button
@@ -99,7 +99,7 @@ public class JavascriptUtils {
         // either via the browse button, or via drag/drop:
         add: function (e, data) {
 
-            var tpl = $wnd.jQuery('<li class="working"><input type="text" value="0" data-width="35" data-height="35"'+
+            var tpl = $wnd.jQuery('<li class="working"><input type="text" value="0" data-width="30" data-height="30"'+
                 ' data-fgColor="#089de3" data-readOnly="1" data-bgColor="#3e4043" /><p></p><span></span></li>');
 
             // Append the file name and file size

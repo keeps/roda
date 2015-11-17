@@ -34,6 +34,7 @@ import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.JavascriptUtils;
+import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.Tools;
 
 import com.google.gwt.core.client.GWT;
@@ -156,6 +157,9 @@ public class IngestTransfer extends Composite {
   @UiField
   Button remove;
 
+  @UiField
+  HTML uploadForm;
+
   private IngestTransfer() {
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.TRANSFERRED_RESOURCE_OWNER));
 
@@ -197,6 +201,34 @@ public class IngestTransfer extends Composite {
     JavascriptUtils.runMiniUploadForm();
   }
 
+  private String getUploadUrl() {
+    String ret;
+
+    if (resource != null && !resource.isFile()) {
+      String id = resource.getId();
+      ret = RestUtils.createTransferredResourceUploadUri(id);
+    } else {
+      ret = null;
+    }
+
+    return ret;
+  }
+
+  private void updateUploadForm() {
+    String uploadUrl = getUploadUrl();
+
+    if (uploadUrl != null) {
+      SafeHtml html = SafeHtmlUtils.fromSafeConstant("<form id='upload' method='post' action='" + getUploadUrl()
+        + "' enctype='multipart/form-data'>" + "<div id='drop'>" + "Drop files or folders here" + "<a>" + "Browse"
+        + "</a>" + "<input type='file' name='upl' multiple='true' />" + "</div>" + "</form>");
+
+      uploadForm.setHTML(html);
+      JavascriptUtils.runMiniUploadForm();
+    } else {
+      uploadForm.setHTML(SafeHtmlUtils.EMPTY_SAFE_HTML);
+    }
+  }
+
   protected void view(TransferredResource r) {
     resource = r;
 
@@ -216,6 +248,7 @@ public class IngestTransfer extends Composite {
     breadcrumb.updatePath(getBreadcrumbs(r));
     breadcrumb.setVisible(true);
 
+    updateUploadForm();
     updateVisibles();
   }
 
@@ -232,6 +265,7 @@ public class IngestTransfer extends Composite {
     transferredResourceList.setFilter(DEFAULT_FILTER);
     breadcrumb.setVisible(false);
 
+    updateUploadForm();
     updateVisibles();
   }
 

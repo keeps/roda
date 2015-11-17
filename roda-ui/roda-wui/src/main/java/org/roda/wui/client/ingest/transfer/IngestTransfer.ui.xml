@@ -9,6 +9,9 @@
 	
 	</ui:style>
 
+	<ui:with type="org.roda.wui.client.ingest.transfer.IngestTransfer"
+		field="vars" />
+
 	<g:FlowPanel styleName="wui-ingest-transfer" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
@@ -24,21 +27,7 @@
 				</g:FlowPanel>
 				<common:TransferredResourceList
 					addStyleNames="transferredResourceList" ui:field="transferredResourceList" />
-				<g:HTML>
-					<form id="upload" method="post" action="api/v1/transferred/new" enctype="multipart/form-data">
-						<div id="drop">
-							Drop files or folders here
-
-							<a>Browse</a>
-							<input type="file" name="upl" multiple="true" />
-						</div>
-
-						<ul>
-							<!-- The file uploads will be shown here -->
-						</ul>
-
-					</form>
-				</g:HTML>
+				<g:HTML ui:field="uploadForm"/>
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel ui:field="filtersPanel">
@@ -64,6 +53,11 @@
 						files</g:Button>
 					<g:Button addStyleNames="btn btn-ban" ui:field="remove">Remove</g:Button>
 				</g:FlowPanel>
+				<g:HTML>
+					<ul id="upload-list">
+						<!-- The file uploads will be shown here -->
+					</ul>
+				</g:HTML>
 			</g:FlowPanel>
 		</g:FlowPanel>
 	</g:FlowPanel>
