@@ -27,7 +27,7 @@
 				<g:HTML>
 					<form id="upload" method="post" action="api/v1/transferred/new" enctype="multipart/form-data">
 						<div id="drop">
-							Drop Here
+							Drop files or folders here
 
 							<a>Browse</a>
 							<input type="file" name="upl" multiple="true" />

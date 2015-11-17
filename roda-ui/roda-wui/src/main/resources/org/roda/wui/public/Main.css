@@ -1566,20 +1566,20 @@
 }
 
 #drop a{
-    background-color:#007a96;
-    padding:12px 26px;
-    color:#fff;
-    font-size:1.2rem;
-    border-radius:2px;
-    cursor:pointer;
-    display:block;
-    margin:10px auto 0;
+    background-color: #089de3;
+    padding: 10px 20px;
+    color: #fff;
+    font-size: 1.2rem;
+    border-radius: 30px;
+    cursor: pointer;
+    display: block;
+    margin: 10px auto 0;
     max-width: 100px;
-    line-height:1;
+    line-height: 1;
 }
 
 #drop a:hover{
-    background-color:#0986a3;
+    background-color:#3998d0;
 }
 
 #drop input{
