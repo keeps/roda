@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -979,10 +980,12 @@ public class BrowserHelper {
     }
   }
 
-  public static void createTransferredResourceFile(String path, String fileName, InputStream inputStream) throws GenericException {
+  public static void createTransferredResourceFile(String path, String fileName, InputStream inputStream) throws GenericException, FileAlreadyExistsException {
     try {
       LOGGER.debug("createTransferredResourceFile(path="+path+",name="+fileName+")");
       RodaCoreFactory.getFolderMonitor().createFile(path,fileName,inputStream);
+    } catch (FileAlreadyExistsException e) {
+      throw e;
     } catch (IOException e) {
       LOGGER.error("Error removing transferred resource", e);
       throw new GenericException("Error creating transferred resource file: " + e.getMessage());

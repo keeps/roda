@@ -45,7 +45,7 @@ public class IndexFolderObserver implements FolderObserver {
 
       @Override
       public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-        pathAdded(basePath, file, true);
+        pathAdded(basePath, file, true,false);
         return FileVisitResult.CONTINUE;
       }
 
@@ -59,6 +59,7 @@ public class IndexFolderObserver implements FolderObserver {
         return FileVisitResult.CONTINUE;
       }
     });
+    index.commit(RodaConstants.INDEX_SIP);
   }
 
   private void clearIndex() throws SolrServerException, IOException {
@@ -67,8 +68,7 @@ public class IndexFolderObserver implements FolderObserver {
 
   }
 
-  @Override
-  public void pathAdded(Path basePath, Path createdPath, boolean addChildren) {
+  public void pathAdded(Path basePath, Path createdPath, boolean addChildren, boolean commit) {
     LOGGER.debug("ADD: " + createdPath.toString());
     try {
       Path relativePath = basePath.relativize(createdPath);
@@ -76,7 +76,7 @@ public class IndexFolderObserver implements FolderObserver {
         SolrInputDocument pathDocument = SolrUtils.transferredResourceToSolrDocument(createdPath, relativePath);
         Path parentPath = createdPath.getParent();
         while (!Files.isSameFile(basePath, parentPath)) {
-          pathAdded(basePath, parentPath, false);
+          pathAdded(basePath, parentPath, false,false);
           parentPath = parentPath.getParent();
         }
 
@@ -89,7 +89,7 @@ public class IndexFolderObserver implements FolderObserver {
 
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-              pathAdded(basePath, file, true);
+              pathAdded(basePath, file, true,false);
               return FileVisitResult.CONTINUE;
             }
 
@@ -104,15 +104,21 @@ public class IndexFolderObserver implements FolderObserver {
             }
           });
         }
-
         index.add(RodaConstants.INDEX_SIP, pathDocument);
-        index.commit(RodaConstants.INDEX_SIP);
+        if(commit){
+          index.commit(RodaConstants.INDEX_SIP);
+        }
       }
     } catch (IOException | SolrServerException e) {
       LOGGER.error("Error adding path to SIPMonitorIndex: " + e.getMessage(), e);
     } catch (Throwable t) {
       LOGGER.error("ERROR: " + t.getMessage(), t);
     }
+  }
+  
+  @Override
+  public void pathAdded(Path basePath, Path createdPath, boolean addChildren) {
+    pathAdded(basePath, createdPath, addChildren,true);
   }
 
   @Override

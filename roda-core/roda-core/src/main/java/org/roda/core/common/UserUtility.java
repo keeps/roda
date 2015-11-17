@@ -8,6 +8,7 @@
 package org.roda.core.common;
 
 import java.nio.charset.Charset;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
@@ -289,4 +290,16 @@ public class UserUtility {
     return noCommonElement;
   }
 
+  public static void checkPathAccess(RodaUser user, String path) throws AuthorizationDeniedException{
+    //FIXME ...
+    if ("admin".equalsIgnoreCase(user.getId())) {
+      return;
+    }else{
+      if(Paths.get(path).getName(0).toString().equalsIgnoreCase(user.getName())){
+        return;
+      }else{
+        throw new AuthorizationDeniedException("The user '" + user.getId() + "' does not have permissions to access " + path+" !");
+      }
+    }
+  }
 }

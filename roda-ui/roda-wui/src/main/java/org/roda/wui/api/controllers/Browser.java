@@ -8,6 +8,7 @@
 package org.roda.wui.api.controllers;
 
 import java.io.InputStream;
+import java.nio.file.FileAlreadyExistsException;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -683,8 +684,7 @@ public class Browser extends RodaCoreService {
     // check user permissions
     UserUtility.checkRoles(user, INGEST_TRANSFER);
 
-    // TODO if not admin, add to filter a constraint for the resource to belong
-    // to this user
+    UserUtility.checkPathAccess(user,parent);
 
     // delegate
     BrowserHelper.createTransferredResourcesFolder(parent, folderName);
@@ -702,8 +702,7 @@ public class Browser extends RodaCoreService {
     // check user permissions
     UserUtility.checkRoles(user, INGEST_TRANSFER);
 
-    // TODO if not admin, add to filter a constraint for the resource to belong
-    // to this user
+    UserUtility.checkPathAccess(user,path);
 
     // delegate
     BrowserHelper.removeTransferredResource(path);
@@ -714,14 +713,13 @@ public class Browser extends RodaCoreService {
   }
 
   public static void createTransferredResourceFile(RodaUser user, String path, String fileName,
-    InputStream inputStream) throws AuthorizationDeniedException, GenericException {
+    InputStream inputStream) throws AuthorizationDeniedException, GenericException, FileAlreadyExistsException {
     Date startDate = new Date();
 
     // check user permissions
     UserUtility.checkRoles(user, INGEST_TRANSFER);
 
-    // TODO if not admin, add to filter a constraint for the resource to belong
-    // to this user
+    UserUtility.checkPathAccess(user,path);
 
     // delegate
     BrowserHelper.createTransferredResourceFile(path,fileName,inputStream);

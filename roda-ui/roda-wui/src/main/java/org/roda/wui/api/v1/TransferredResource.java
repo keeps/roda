@@ -7,18 +7,17 @@
  */
 package org.roda.wui.api.v1;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.FileAlreadyExistsException;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -41,17 +40,38 @@ public class TransferredResource {
   private HttpServletRequest request;
 
   @POST
-  //@Path("/new/{path: [a-zA-Z0-9_/]+}")
-  @Path("/new")
-  public Response uploadFiles(@ApiParam(value = "The id of the parent", required = true) @QueryParam("parentId") String parentId, @FormDataParam("upl") InputStream inputStream,
-    @FormDataParam("upl") FormDataContentDisposition fileDetail) throws RODAException {
+  @Path("/")
+  public Response createResource(
+    @ApiParam(value = "The id of the parent", required = true) @QueryParam("parentId") String parentId,
+    @ApiParam(value = "The name of the directory to create", required = false) @QueryParam("name") String name,
+    @FormDataParam("upl") InputStream inputStream, @FormDataParam("upl") FormDataContentDisposition fileDetail)
+      throws RODAException {
     // get user
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
     // delegate action to controller
-    Browser.createTransferredResourceFile(user,parentId,fileDetail.getFileName(), inputStream);
-    
+    if(name==null){
+      try{
+        Browser.createTransferredResourceFile(user, parentId, fileDetail.getFileName(), inputStream);
+      }catch(FileAlreadyExistsException e){
+        return Response.status(Status.CONFLICT).entity("{'status':'error'}").build();
+      }
+    }else{
+      Browser.createTransferredResourcesFolder(user, parentId, name);
+    }
     // FIXME give a better answer
     return Response.ok().entity("{'status':'success'}").build();
   }
 
+  @DELETE
+  @Path("/")
+  public Response deleteResource(
+    @ApiParam(value = "The id of the resource", required = true) @QueryParam("path") String path)
+      throws RODAException {
+    // get user
+    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    // delegate action to controller
+    Browser.removeTransferredResource(user, path);
+    // FIXME give a better answer
+    return Response.ok().entity("{'status':'success'}").build();
+  }
 }
