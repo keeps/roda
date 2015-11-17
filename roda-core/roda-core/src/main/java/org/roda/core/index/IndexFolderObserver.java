@@ -1,4 +1,4 @@
-package org.roda.index;
+package org.roda.core.index;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -10,9 +10,9 @@ import java.nio.file.attribute.BasicFileAttributes;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
-import org.roda.common.monitor.FolderObserver;
-import org.roda.core.common.RodaConstants;
-import org.roda.index.utils.SolrUtils;
+import org.roda.core.common.monitor.FolderObserver;
+import org.roda.core.data.common.RodaConstants;
+import org.roda.core.index.utils.SolrUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

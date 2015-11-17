@@ -41,6 +41,9 @@ import org.roda.core.common.LdapUtility;
 import org.roda.core.common.Messages;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.common.UserUtility;
+import org.roda.core.common.monitor.FolderMonitor;
+import org.roda.core.common.monitor.FolderObservable;
+import org.roda.core.common.monitor.FolderObserver;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
@@ -55,6 +58,7 @@ import org.roda.core.data.v2.RODAMember;
 import org.roda.core.data.v2.RepresentationFilePreservationObject;
 import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.core.data.v2.User;
+import org.roda.core.index.IndexFolderObserver;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.IndexServiceException;
 import org.roda.core.index.utils.SolrUtils;
@@ -127,6 +131,10 @@ public class RodaCoreFactory {
   private static boolean FEATURE_AKKA_ENABLED = false;
 
   private static ApacheDS ldap;
+
+  private static FolderObservable sipFolderMonitor;
+  private static FolderObserver sipFolderObserver;
+
   private static Path rodaApacheDsConfigDirectory = null;
   private static Path rodaApacheDsDataDirectory = null;
 
@@ -217,10 +225,11 @@ public class RodaCoreFactory {
       System.setProperty("solr.data.dir.representations", indexPath.resolve("representation").toString());
       System.setProperty("solr.data.dir.preservationevent", indexPath.resolve("preservationevent").toString());
       System.setProperty("solr.data.dir.preservationobject", indexPath.resolve("preservationobject").toString());
-      System.setProperty("solr.data.dir.Pluginlog", indexPath.resolve("Pluginlog").toString());
+      System.setProperty("solr.data.dir.actionlog", indexPath.resolve("actionlog").toString());
       System.setProperty("solr.data.dir.sipreport", indexPath.resolve("sipreport").toString());
       System.setProperty("solr.data.dir.members", indexPath.resolve("members").toString());
       System.setProperty("solr.data.dir.othermetadata", indexPath.resolve("othermetadata").toString());
+      System.setProperty("solr.data.dir.sip", indexPath.resolve("sip").toString());
       // FIXME added missing cores
 
       // start embedded solr
@@ -241,6 +250,13 @@ public class RodaCoreFactory {
       }
 
       startApacheDS();
+      
+      try {
+        startSIPFolderMonitor();
+      } catch (Exception e) {
+        LOGGER.error("Error starting SIP Monitor: " + e.getMessage());
+      }
+      
     } else if (nodeType == NODE_TYPE_ENUM.WORKER) {
       akkaDistributedPluginWorker = new AkkaDistributedPluginWorker(getSystemProperty(CLUSTER_HOSTNAME, "localhost"),
         getSystemProperty(CLUSTER_PORT, "2551"), getSystemProperty(NODE_HOSTNAME, "localhost"),
@@ -367,6 +383,18 @@ public class RodaCoreFactory {
       LOGGER.error("Error starting up embedded ApacheDS", e);
     }
 
+  }
+
+  public static void startSIPFolderMonitor() throws Exception {
+    Configuration rodaConfig = RodaCoreFactory.getRodaConfiguration();
+    String SIPFolderPath = rodaConfig.getString("sip.folder");
+    int SIPTimeout = rodaConfig.getInt("sip.timeout");
+    Path sipFolderPath = dataPath.resolve(SIPFolderPath);
+
+    //sipFolderMonitor = new FolderMonitorNIO(sipFolderPath, SIPTimeout);
+     sipFolderMonitor = new FolderMonitor(sipFolderPath, SIPTimeout);
+    sipFolderObserver = new IndexFolderObserver(solr, sipFolderPath);
+    sipFolderMonitor.addFolderObserver(sipFolderObserver);
   }
 
   public static void stopApacheDS() {

@@ -1,4 +1,4 @@
-package org.roda.common.monitor;
+package org.roda.core.common.monitor;
 
 import java.io.File;
 import java.nio.file.Path;
