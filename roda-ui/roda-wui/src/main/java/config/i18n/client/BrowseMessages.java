@@ -150,7 +150,11 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("Created at {0,localdatetime,predef:DATE_TIME_MEDIUM}, with {1}, from {2}")
   public String ingestTransferItemInfo(Date creationDate, String readableFileSize, String owner);
-  
-  
+
+  @DefaultMessage("Drop files or folders here")
+  String ingestTransferUploadDropHere();
+
+  @DefaultMessage("Browse")
+  String ingestTransferUploadBrowse();
 
 }

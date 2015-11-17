@@ -104,9 +104,9 @@ public class IngestTransfer extends Composite {
     return instance;
   }
 
-  private static final String TOP_ICON = "<i class='fa fa-circle-o'></i>";
-  private static final SafeHtml FOLDER_ICON = SafeHtmlUtils.fromSafeConstant("<i class='fa fa-folder-o'></i>");
-  private static final SafeHtml FILE_ICON = SafeHtmlUtils.fromSafeConstant("<i class='fa fa-file-o'></i>");
+  public static final String TOP_ICON = "<i class='fa fa-circle-o'></i>";
+  public static final SafeHtml FOLDER_ICON = SafeHtmlUtils.fromSafeConstant("<i class='fa fa-folder-o'></i>");
+  public static final SafeHtml FILE_ICON = SafeHtmlUtils.fromSafeConstant("<i class='fa fa-file-o'></i>");
 
   private static final Filter DEFAULT_FILTER = new Filter(
     new EmptyKeyFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENTPATH));
