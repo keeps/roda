@@ -684,7 +684,7 @@ public class Browser extends RodaCoreService {
     // check user permissions
     UserUtility.checkRoles(user, INGEST_TRANSFER);
 
-    UserUtility.checkPathAccess(user,parent);
+    UserUtility.checkPathAccess(user, parent);
 
     // delegate
     BrowserHelper.createTransferredResourcesFolder(parent, folderName);
@@ -702,7 +702,7 @@ public class Browser extends RodaCoreService {
     // check user permissions
     UserUtility.checkRoles(user, INGEST_TRANSFER);
 
-    UserUtility.checkPathAccess(user,path);
+    UserUtility.checkPathAccess(user, path);
 
     // delegate
     BrowserHelper.removeTransferredResource(path);
@@ -712,22 +712,23 @@ public class Browser extends RodaCoreService {
     registerAction(user, BROWSER_COMPONENT, "removeTransferredResource", null, duration, PATH_PARAM, path);
   }
 
-  public static void createTransferredResourceFile(RodaUser user, String path, String fileName,
-    InputStream inputStream) throws AuthorizationDeniedException, GenericException, FileAlreadyExistsException {
+  public static void createTransferredResourceFile(RodaUser user, String path, String fileName, InputStream inputStream)
+    throws AuthorizationDeniedException, GenericException, FileAlreadyExistsException {
     Date startDate = new Date();
 
     // check user permissions
     UserUtility.checkRoles(user, INGEST_TRANSFER);
 
-    UserUtility.checkPathAccess(user,path);
+    UserUtility.checkPathAccess(user, path);
 
     // delegate
-    BrowserHelper.createTransferredResourceFile(path,fileName,inputStream);
+    BrowserHelper.createTransferredResourceFile(path, fileName, inputStream);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "createTransferredResourceFile", null, duration, PATH_PARAM, path, FILENAME_PARAM, fileName);
-    
+    registerAction(user, BROWSER_COMPONENT, "createTransferredResourceFile", null, duration, PATH_PARAM, path,
+      FILENAME_PARAM, fileName);
+
   }
 
 }

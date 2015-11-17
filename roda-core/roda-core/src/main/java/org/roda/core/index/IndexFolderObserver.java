@@ -45,16 +45,33 @@ public class IndexFolderObserver implements FolderObserver {
 
   }
 
-  public void pathAdded(Path basePath, Path createdPath, boolean addChildren, boolean commit) {
+  public void pathAdded(Path basePath, Path createdPath, boolean addChildren, boolean addParent, boolean commit) {
     LOGGER.debug("ADD: " + createdPath.toString());
+    LOGGER.debug("ADDCHILDREN: " + addChildren);
+    LOGGER.debug("ADDPARENT: " + addParent);
     try {
       Path relativePath = basePath.relativize(createdPath);
       if (relativePath.getNameCount() > 1) {
         SolrInputDocument pathDocument = SolrUtils.transferredResourceToSolrDocument(createdPath, relativePath);
-        Path parentPath = createdPath.getParent();
-        while (!Files.isSameFile(basePath, parentPath)) {
-          pathAdded(basePath, parentPath, false, false);
-          parentPath = parentPath.getParent();
+        if (addParent) {
+          Path parentPath = createdPath.getParent();
+          while (!Files.isSameFile(basePath, parentPath)) {
+            pathAdded(basePath, parentPath, false, false, false);
+            /*
+             * if(!Files.isDirectory(createdPath)){
+             * index.commit(RodaConstants.INDEX_SIP); Path relativeParentPath =
+             * basePath.relativize(parentPath);
+             * 
+             * SolrDocument sd = index.getById(RodaConstants.INDEX_SIP,
+             * relativeParentPath.toString().replaceAll("\\s+", ""));
+             * if(sd==null){ LOGGER.error("SD NULL"); }else{ LOGGER.error(
+             * "SD NOT NULL"); SolrInputDocument sid =
+             * SolrUtils.addSize(sd,Files.size(createdPath));
+             * index.add(RodaConstants.INDEX_SIP,sid);
+             * index.commit(RodaConstants.INDEX_SIP); } }
+             */
+            parentPath = parentPath.getParent();
+          }
         }
 
         if (createdPath.toFile().isDirectory() && addChildren) {
@@ -66,7 +83,7 @@ public class IndexFolderObserver implements FolderObserver {
 
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-              pathAdded(basePath, file, true, false);
+              pathAdded(basePath, file, false, false, false);
               return FileVisitResult.CONTINUE;
             }
 
@@ -94,14 +111,15 @@ public class IndexFolderObserver implements FolderObserver {
   }
 
   @Override
-  public void pathAdded(Path basePath, Path createdPath, boolean addChildren) {
-    pathAdded(basePath, createdPath, addChildren, true);
+  public void pathAdded(Path basePath, Path createdPath, boolean addChildren, boolean addParent) {
+    LOGGER.debug("!!!!!!!!!!!!! " + createdPath.toString());
+    pathAdded(basePath, createdPath, addChildren, addParent, true);
   }
 
   @Override
-  public void pathModified(Path basePath, Path modifiedPath, boolean modifyChildren) {
+  public void pathModified(Path basePath, Path modifiedPath) {
     LOGGER.debug("MODIFY: " + modifiedPath.toString());
-    pathAdded(basePath, modifiedPath, modifyChildren);
+    pathAdded(basePath, modifiedPath, true, false, true);
   }
 
   @Override
@@ -139,7 +157,7 @@ public class IndexFolderObserver implements FolderObserver {
 
           @Override
           public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-            pathAdded(basePath, file, true, false);
+            pathAdded(basePath, file, true, true);
             return FileVisitResult.CONTINUE;
           }
 

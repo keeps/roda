@@ -14,8 +14,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Serializable;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLInputFactory;
@@ -1279,7 +1283,7 @@ public class SolrUtils {
     sip.addField(RodaConstants.TRANSFERRED_RESOURCE_DATE, new Date());
     if (createdPath.toFile().isDirectory()) {
       sip.addField(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, false);
-      sip.addField(RodaConstants.TRANSFERRED_RESOURCE_SIZE, 0L);
+      sip.addField(RodaConstants.TRANSFERRED_RESOURCE_SIZE, getSizePath(createdPath));
     } else {
       sip.addField(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, true);
       long fileSize = Files.size(createdPath);
@@ -1289,6 +1293,26 @@ public class SolrUtils {
     sip.addField(RodaConstants.TRANSFERRED_RESOURCE_NAME, relativePath.getFileName().toString());
     sip.addField(RodaConstants.TRANSFERRED_RESOURCE_OWNER, relativePath.subpath(0, 1).toString());
     return sip;
+  }
+
+  public static SolrInputDocument addSize(SolrDocument sd, long size) {
+    LOGGER.debug("Adding " + size + " TO " + sd.get("id"));
+    SolrInputDocument sid = new SolrInputDocument();
+    for (String s : sd.getFieldNames()) {
+      LOGGER.debug("FIELD NAME: " + s);
+      if (s.equalsIgnoreCase(RodaConstants.TRANSFERRED_RESOURCE_SIZE)) {
+        LOGGER.debug("BEFORE PARSE: " + sd.getFieldValue(s));
+        long currentSize = objectToLong(sd.getFieldValue(s));
+        LOGGER.debug("CURRENT SIZE: " + currentSize);
+        currentSize += size;
+        LOGGER.debug("UPDATED SIZE: " + currentSize);
+        sid.addField(s, currentSize);
+      } else {
+        sid.addField(s, sd.get(s));
+      }
+    }
+    // TODO Auto-generated method stub
+    return sid;
   }
 
   /*
@@ -1309,4 +1333,21 @@ public class SolrUtils {
    * 
    * }
    */
+  public static long getSizePath(Path startPath) throws IOException {
+    final AtomicLong size = new AtomicLong(0);
+    Files.walkFileTree(startPath, new SimpleFileVisitor<Path>() {
+      @Override
+      public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+        size.addAndGet(attrs.size());
+        return FileVisitResult.CONTINUE;
+      }
+
+      @Override
+      public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+        // Skip folders that can't be traversed
+        return FileVisitResult.CONTINUE;
+      }
+    });
+    return size.get();
+  }
 }

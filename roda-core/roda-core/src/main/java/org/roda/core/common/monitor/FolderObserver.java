@@ -10,9 +10,9 @@ package org.roda.core.common.monitor;
 import java.nio.file.Path;
 
 public interface FolderObserver {
-  public void pathAdded(Path basePath, Path createdPath, boolean addChildren);
+  public void pathAdded(Path basePath, Path createdPath, boolean addChildren, boolean addParent);
 
-  public void pathModified(Path basePath, Path createdPath, boolean modifyChildren);
+  public void pathModified(Path basePath, Path createdPath);
 
   public void pathDeleted(Path basePath, Path createdPath);
 }

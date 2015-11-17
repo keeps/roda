@@ -10,7 +10,6 @@ package org.roda.core.common.monitor;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.CopyOption;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -43,14 +42,16 @@ public class FolderMonitor extends FolderObservable {
     Files.delete(basePath.resolve(path));
   }
 
-  public void createFile(String path, String fileName, InputStream inputStream) throws IOException,FileAlreadyExistsException  {
-    LOGGER.error("BASEPATH: "+basePath);
-    LOGGER.error("PATH: "+path);
+  public void createFile(String path, String fileName, InputStream inputStream)
+    throws IOException, FileAlreadyExistsException {
+    LOGGER.error("BASEPATH: " + basePath);
+    LOGGER.error("PATH: " + path);
     Path parent = basePath.resolve(path);
     Files.createDirectories(parent);
     Path file = parent.resolve(fileName);
     Files.copy(inputStream, file);
   }
+
   private void startWatch() throws Exception {
     LOGGER.debug("STARTING WATCH ON FOLDER: " + basePath.toString());
     FileAlterationObserver observer = new FileAlterationObserver(basePath.toFile());

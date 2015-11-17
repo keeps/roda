@@ -49,13 +49,13 @@ public class TransferredResource {
     // get user
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
     // delegate action to controller
-    if(name==null){
-      try{
+    if (name == null) {
+      try {
         Browser.createTransferredResourceFile(user, parentId, fileDetail.getFileName(), inputStream);
-      }catch(FileAlreadyExistsException e){
+      } catch (FileAlreadyExistsException e) {
         return Response.status(Status.CONFLICT).entity("{'status':'error'}").build();
       }
-    }else{
+    } else {
       Browser.createTransferredResourcesFolder(user, parentId, name);
     }
     // FIXME give a better answer
@@ -65,8 +65,7 @@ public class TransferredResource {
   @DELETE
   @Path("/")
   public Response deleteResource(
-    @ApiParam(value = "The id of the resource", required = true) @QueryParam("path") String path)
-      throws RODAException {
+    @ApiParam(value = "The id of the resource", required = true) @QueryParam("path") String path) throws RODAException {
     // get user
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
     // delegate action to controller

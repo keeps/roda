@@ -980,17 +980,18 @@ public class BrowserHelper {
     }
   }
 
-  public static void createTransferredResourceFile(String path, String fileName, InputStream inputStream) throws GenericException, FileAlreadyExistsException {
+  public static void createTransferredResourceFile(String path, String fileName, InputStream inputStream)
+    throws GenericException, FileAlreadyExistsException {
     try {
-      LOGGER.debug("createTransferredResourceFile(path="+path+",name="+fileName+")");
-      RodaCoreFactory.getFolderMonitor().createFile(path,fileName,inputStream);
+      LOGGER.debug("createTransferredResourceFile(path=" + path + ",name=" + fileName + ")");
+      RodaCoreFactory.getFolderMonitor().createFile(path, fileName, inputStream);
     } catch (FileAlreadyExistsException e) {
       throw e;
     } catch (IOException e) {
       LOGGER.error("Error removing transferred resource", e);
       throw new GenericException("Error creating transferred resource file: " + e.getMessage());
     }
-    
+
   }
 
 }
