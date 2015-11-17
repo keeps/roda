@@ -42,6 +42,8 @@ public class FolderMonitor extends FolderObservable {
   }
 
   public void createFile(String path, String fileName, InputStream inputStream) throws IOException {
+    LOGGER.error("BASEPATH: "+basePath);
+    LOGGER.error("PATH: "+path);
     Path parent = basePath.resolve(path);
     Files.createDirectories(parent);
     Path file = parent.resolve(fileName);

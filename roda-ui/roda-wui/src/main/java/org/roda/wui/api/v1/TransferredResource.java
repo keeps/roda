@@ -15,11 +15,8 @@ import java.nio.file.StandardCopyOption;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-<<<<<<< HEAD
-import javax.ws.rs.QueryParam;
-=======
 import javax.ws.rs.PathParam;
->>>>>>> WIP: Transferred resource REST API
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
@@ -46,7 +43,7 @@ public class TransferredResource {
   @POST
   //@Path("/new/{path: [a-zA-Z0-9_/]+}")
   @Path("/new")
-  public Response uploadFiles(@ApiParam(value = "The id of the parent", required = true) @PathParam("parentId") String parentId, @FormDataParam("upl") InputStream inputStream,
+  public Response uploadFiles(@ApiParam(value = "The id of the parent", required = true) @QueryParam("parentId") String parentId, @FormDataParam("upl") InputStream inputStream,
     @FormDataParam("upl") FormDataContentDisposition fileDetail) throws RODAException {
     // get user
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
