@@ -91,9 +91,6 @@ public class JavascriptUtils {
 
     // Initialize the jQuery File Upload plugin
     $wnd.jQuery('#upload').fileupload({
-        // for IE compatibility
-        dataType: "json",
-
         // This element will accept file drag/drop uploading
         dropZone: $wnd.jQuery('#drop'),
 
@@ -148,6 +145,7 @@ public class JavascriptUtils {
         fail:function(e, data){
             // Something has gone wrong!
             data.context.addClass('error');
+            $wnd.console.log("data"+data+" error thrown: "+data.errorThrown);
         }
 
     });
