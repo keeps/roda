@@ -136,17 +136,6 @@
 		<servlet-class>org.roda.wui.common.server.FileDownload</servlet-class>
 	</servlet>
 	<servlet>
-		<servlet-name>ImageCaptchaService</servlet-name>
-		<servlet-class>
-			org.roda.wui.common.captcha.server.ImageCaptchaServlet</servlet-class>
-		<load-on-startup>2</load-on-startup>
-	</servlet>
-	<servlet>
-		<servlet-name>CaptchaService</servlet-name>
-		<servlet-class>
-			org.roda.wui.common.captcha.server.CaptchaServiceImpl</servlet-class>
-	</servlet>
-	<servlet>
 		<servlet-name>GAnalyticsService</servlet-name>
 		<servlet-class>
 			org.roda.wui.server.main.GAnalyticsServiceImpl</servlet-class>
@@ -235,14 +224,6 @@
 	<servlet-mapping>
 		<servlet-name>ClientLogger</servlet-name>
 		<url-pattern>/org.roda.wui.RodaWUI/wuilogger</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>ImageCaptchaService</servlet-name>
-		<url-pattern>/org.roda.wui.RodaWUI/jcaptcha</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>CaptchaService</servlet-name>
-		<url-pattern>/org.roda.wui.RodaWUI/captchaservice</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>GAnalyticsService</servlet-name>

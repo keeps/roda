@@ -18,8 +18,6 @@ import org.roda.core.data.common.UserAlreadyExistsException;
 import org.roda.core.data.v2.RodaUser;
 import org.roda.core.data.v2.User;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.common.captcha.client.AbstractImageCaptcha;
-import org.roda.wui.common.captcha.client.DefaultImageCaptcha;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
@@ -28,7 +26,6 @@ import org.roda.wui.common.client.widgets.WUIButton;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.ClickListener;
@@ -75,7 +72,7 @@ public class Register implements HistoryResolver {
 
   private Label captchaTitle;
 
-  private AbstractImageCaptcha captcha;
+  // private AbstractImageCaptcha captcha;
 
   private WUIButton submit;
 
@@ -92,39 +89,41 @@ public class Register implements HistoryResolver {
       userdata = new UserDataPanel(false, false);
       disclaimer = new Label(constants.registerDisclaimer());
       captchaTitle = new Label(constants.registerCaptchaTitle());
-      captcha = new DefaultImageCaptcha();
+      // captcha = new DefaultImageCaptcha();
       submit = new WUIButton(constants.registerSubmit(), WUIButton.Left.ROUND, WUIButton.Right.ARROW_FORWARD);
 
       submit.addClickListener(new ClickListener() {
 
         public void onClick(Widget sender) {
           if (userdata.isValid()) {
-            UserManagementService.Util.getInstance().register(userdata.getValue(), userdata.getPassword(),
-              captcha.getResponse(), new AsyncCallback<Boolean>() {
-
-              public void onFailure(Throwable caught) {
-                if (caught instanceof UserAlreadyExistsException) {
-                  Window.alert(constants.registerUserExists());
-                } else if (caught instanceof EmailAlreadyExistsException) {
-                  Window.alert(constants.registerEmailAlreadyExists());
-                } else {
-                  logger.error("Error while registering", caught);
-                }
-                captcha.refresh();
-              }
-
-              public void onSuccess(Boolean passed) {
-                if (passed.booleanValue()) {
-                  Window.alert(constants.registerSuccess());
-                  Tools.newHistory(VerifyEmail.getInstance(), userdata.getValue().getName());
-                } else {
-                  Window.alert(constants.registerWrongCaptcha());
-                  captcha.refresh();
-                }
-
-              }
-
-            });
+            // UserManagementService.Util.getInstance().register(userdata.getValue(),
+            // userdata.getPassword(),
+            // captcha.getResponse(), new AsyncCallback<Boolean>() {
+            //
+            // public void onFailure(Throwable caught) {
+            // if (caught instanceof UserAlreadyExistsException) {
+            // Window.alert(constants.registerUserExists());
+            // } else if (caught instanceof EmailAlreadyExistsException) {
+            // Window.alert(constants.registerEmailAlreadyExists());
+            // } else {
+            // logger.error("Error while registering", caught);
+            // }
+            // captcha.refresh();
+            // }
+            //
+            // public void onSuccess(Boolean passed) {
+            // if (passed.booleanValue()) {
+            // Window.alert(constants.registerSuccess());
+            // Tools.newHistory(VerifyEmail.getInstance(),
+            // userdata.getValue().getName());
+            // } else {
+            // Window.alert(constants.registerWrongCaptcha());
+            // captcha.refresh();
+            // }
+            //
+            // }
+            //
+            // });
           }
         }
 
@@ -144,7 +143,7 @@ public class Register implements HistoryResolver {
       layout.add(userdata);
       layout.add(disclaimer);
       layout.add(captchaTitle);
-      layout.add(captcha.getWidget());
+      // layout.add(captcha.getWidget());
       layout.add(submit);
 
       layout.addStyleName("wui-register");
@@ -152,7 +151,7 @@ public class Register implements HistoryResolver {
       userdata.addStyleName("register-userdata");
       disclaimer.addStyleName("register-disclaimer");
       captchaTitle.addStyleName("register-title");
-      captcha.getWidget().addStyleName("register-captcha");
+      // captcha.getWidget().addStyleName("register-captcha");
       submit.addStyleName("register-submit");
     }
   }
@@ -160,8 +159,7 @@ public class Register implements HistoryResolver {
   /*
    * (non-Javadoc)
    * 
-   * @see
-   * org.roda.office.common.client.HistoryResolver#getHistoryPath()
+   * @see org.roda.office.common.client.HistoryResolver#getHistoryPath()
    */
   public List<String> getHistoryPath() {
     return Arrays.asList(getHistoryToken());
@@ -170,8 +168,7 @@ public class Register implements HistoryResolver {
   /*
    * (non-Javadoc)
    * 
-   * @see
-   * org.roda.office.common.client.HistoryResolver#getHistoryToken()
+   * @see org.roda.office.common.client.HistoryResolver#getHistoryToken()
    */
   public String getHistoryToken() {
     return "register";
@@ -180,7 +177,7 @@ public class Register implements HistoryResolver {
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 0) {
       if (initialized) {
-        captcha.refresh();
+        // captcha.refresh();
         userdata.clear();
       }
       init();

@@ -17,15 +17,12 @@ import org.roda.core.data.common.NoSuchUserException;
 import org.roda.core.data.v2.RodaUser;
 import org.roda.wui.client.about.About;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.common.captcha.client.AbstractImageCaptcha;
-import org.roda.wui.common.captcha.client.DefaultImageCaptcha;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.WUIButton;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.ClickListener;
@@ -75,7 +72,7 @@ public class RecoverLoginRequest implements HistoryResolver {
 
   private Label captchaLabel;
 
-  private AbstractImageCaptcha captcha;
+  // private AbstractImageCaptcha captcha;
 
   private WUIButton submit;
 
@@ -93,34 +90,34 @@ public class RecoverLoginRequest implements HistoryResolver {
       usernameOrEmailLayout.add(usernameOrEmailLabel);
       usernameOrEmailLayout.add(usernameOrEmailBox);
       captchaLabel = new Label(constants.recoverLoginCaptchaTitle());
-      captcha = new DefaultImageCaptcha();
+      // captcha = new DefaultImageCaptcha();
       submit = new WUIButton(constants.recoverLoginSubmit(), WUIButton.Left.ROUND, WUIButton.Right.ARROW_FORWARD);
 
       submit.addClickListener(new ClickListener() {
 
         public void onClick(Widget sender) {
-          UserManagementService.Util.getInstance().requestPassordReset(usernameOrEmailBox.getText(),
-            captcha.getResponse(), new AsyncCallback<Boolean>() {
-
-            public void onFailure(Throwable caught) {
-              if (caught instanceof NoSuchUserException) {
-                Window.alert(constants.recoverLoginNoSuchUser());
-              } else {
-                logger.error("Error requesting password reset", caught);
-              }
-            }
-
-            public void onSuccess(Boolean captchaSuccess) {
-              if (captchaSuccess.booleanValue()) {
-                Window.alert(constants.recoverLoginSuccess());
-                Tools.newHistory(About.RESOLVER);
-              } else {
-                Window.alert(constants.recoverLoginCaptchaFailed());
-                captcha.refresh();
-              }
-            }
-
-          });
+          // UserManagementService.Util.getInstance().requestPassordReset(usernameOrEmailBox.getText(),
+          // captcha.getResponse(), new AsyncCallback<Boolean>() {
+          //
+          // public void onFailure(Throwable caught) {
+          // if (caught instanceof NoSuchUserException) {
+          // Window.alert(constants.recoverLoginNoSuchUser());
+          // } else {
+          // logger.error("Error requesting password reset", caught);
+          // }
+          // }
+          //
+          // public void onSuccess(Boolean captchaSuccess) {
+          // if (captchaSuccess.booleanValue()) {
+          // Window.alert(constants.recoverLoginSuccess());
+          // Tools.newHistory(About.RESOLVER);
+          // } else {
+          // Window.alert(constants.recoverLoginCaptchaFailed());
+          // captcha.refresh();
+          // }
+          // }
+          //
+          // });
         }
 
       });
@@ -144,7 +141,7 @@ public class RecoverLoginRequest implements HistoryResolver {
 
       layout.add(usernameOrEmailLayout);
       layout.add(captchaLabel);
-      layout.add(captcha.getWidget());
+      // layout.add(captcha.getWidget());
       layout.add(submit);
 
       layout.addStyleName("wui-recoverLogin");
@@ -154,7 +151,7 @@ public class RecoverLoginRequest implements HistoryResolver {
       captchaLabel.addStyleName("captcha-title");
       submit.addStyleName("submit");
     } else {
-      captcha.refresh();
+      // captcha.refresh();
     }
   }
 

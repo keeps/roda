@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.api.v1;
+package org.roda.wui.api.v1;
 
 import static org.junit.Assert.assertEquals;
 

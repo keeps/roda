@@ -93,10 +93,6 @@
 			<artifactId>fop</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.octo.captcha</groupId>
-			<artifactId>jcaptcha-all</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>com.rednels</groupId>
 			<artifactId>ofcgwt</artifactId>
 		</dependency>
@@ -261,6 +257,7 @@
 			<groupId>io.swagger</groupId>
 			<artifactId>swagger-jersey2-jaxrs</artifactId>
 		</dependency>
+
 		<!-- REST API related dependencies - end -->
 
 		<dependency>
