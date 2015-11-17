@@ -253,7 +253,7 @@ public class RodaCoreFactory {
       try {
         startSIPFolderMonitor();
       } catch (Exception e) {
-        LOGGER.error("Error starting SIP Monitor: " + e.getMessage());
+        LOGGER.error("Error starting SIP Monitor: " + e.getMessage(),e);
       }
 
     } else if (nodeType == NODE_TYPE_ENUM.WORKER) {
