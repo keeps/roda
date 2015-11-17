@@ -979,4 +979,15 @@ public class BrowserHelper {
     }
   }
 
+  public static void createTransferredResourceFile(String path, String fileName, InputStream inputStream) throws GenericException {
+    try {
+      LOGGER.debug("createTransferredResourceFile(path="+path+",name="+fileName+")");
+      RodaCoreFactory.getFolderMonitor().createFile(path,fileName,inputStream);
+    } catch (IOException e) {
+      LOGGER.error("Error removing transferred resource", e);
+      throw new GenericException("Error creating transferred resource file: " + e.getMessage());
+    }
+    
+  }
+
 }

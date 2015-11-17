@@ -15,7 +15,11 @@ import java.nio.file.StandardCopyOption;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+<<<<<<< HEAD
 import javax.ws.rs.QueryParam;
+=======
+import javax.ws.rs.PathParam;
+>>>>>>> WIP: Transferred resource REST API
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
@@ -25,8 +29,10 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RODAException;
 import org.roda.core.data.v2.RodaUser;
+import org.roda.wui.api.controllers.Browser;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiParam;
 
 @Path(TransferredResource.ENDPOINT)
 @Api(value = TransferredResource.SWAGGER_ENDPOINT)
@@ -38,24 +44,15 @@ public class TransferredResource {
   private HttpServletRequest request;
 
   @POST
+  //@Path("/new/{path: [a-zA-Z0-9_/]+}")
   @Path("/new")
-  public Response uploadFiles(@FormDataParam("upl") InputStream inputStream,
-    @FormDataParam("upl") FormDataContentDisposition fileDetail, @QueryParam("parentId") String parentId)
-      throws RODAException {
+  public Response uploadFiles(@ApiParam(value = "The id of the parent", required = true) @PathParam("parentId") String parentId, @FormDataParam("upl") InputStream inputStream,
+    @FormDataParam("upl") FormDataContentDisposition fileDetail) throws RODAException {
     // get user
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
     // delegate action to controller
-    // do nothing
-
-    try {
-      java.nio.file.Path file = Files.createTempFile("roda", ".tmp");
-      Files.copy(inputStream, file, StandardCopyOption.REPLACE_EXISTING);
-      System.out.println("Uploaded file " + fileDetail + " with size: " + Files.size(file) + " into " + parentId);
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-
+    Browser.createTransferredResourceFile(user,parentId,fileDetail.getFileName(), inputStream);
+    
     // FIXME give a better answer
     return Response.ok().entity("{'status':'success'}").build();
   }
