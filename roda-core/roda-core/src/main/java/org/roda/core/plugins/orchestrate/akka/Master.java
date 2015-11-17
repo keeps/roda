@@ -41,7 +41,7 @@ import scala.concurrent.duration.FiniteDuration;
 
 public class Master extends UntypedPersistentActor {
 
-  public static String ResultsTopic = "results";
+  public static final String RESULTS_TOPIC = "results";
 
   public static Props props(FiniteDuration workTimeout) {
     return Props.create(Master.class, workTimeout);
@@ -305,7 +305,7 @@ public class Master extends UntypedPersistentActor {
         persist(new WorkState.WorkCompleted(workId,((WorkIsDone) cmd).result), new Procedure<WorkState.WorkCompleted>() {
           public void apply(WorkCompleted event) throws Exception {
             workState = workState.updated(event);
-            mediator.tell(new DistributedPubSubMediator.Publish(ResultsTopic, new WorkResult(event.workId,event.result)), getSelf());
+            mediator.tell(new DistributedPubSubMediator.Publish(RESULTS_TOPIC, new WorkResult(event.workId,event.result)), getSelf());
             getSender().tell(new Ack(event.workId), getSelf());
           }
         });

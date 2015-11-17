@@ -21,6 +21,7 @@ import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.Representation;
+import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.AIP;
 import org.roda.core.model.File;
@@ -333,27 +334,27 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public void runPluginOnFiles(Plugin<String> plugin, List<Path> paths) {
+  public void runPluginOnTransferredResources(Plugin<TransferredResource> plugin, List<TransferredResource> resources) {
     try {
       int multiplier = 0;
       logger.info("Executing beforeExecute");
       plugin.beforeExecute(index, model, storage);
       List<Future<Object>> futures = new ArrayList<Future<Object>>();
 
-      List<String> block = new ArrayList<String>();
-      for (Path path : paths) {
+      List<TransferredResource> block = new ArrayList<TransferredResource>();
+      for (TransferredResource resource : resources) {
         if (block.size() == BLOCK_SIZE) {
-          futures.add(Patterns.ask(workersRouter, new PluginMessage<String>(block, plugin),
+          futures.add(Patterns.ask(workersRouter, new PluginMessage<TransferredResource>(block, plugin),
             new Timeout(Duration.create(TIMEOUT, TIMEOUT_UNIT))));
-          block = new ArrayList<String>();
+          block = new ArrayList<TransferredResource>();
           multiplier++;
         }
 
-        block.add(path.toString());
+        block.add(resource);
       }
 
       if (!block.isEmpty()) {
-        futures.add(Patterns.ask(workersRouter, new PluginMessage<String>(block, plugin),
+        futures.add(Patterns.ask(workersRouter, new PluginMessage<TransferredResource>(block, plugin),
           new Timeout(Duration.create(TIMEOUT, TIMEOUT_UNIT))));
         multiplier++;
       }

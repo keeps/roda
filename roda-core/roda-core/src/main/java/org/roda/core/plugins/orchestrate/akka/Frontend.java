@@ -25,18 +25,13 @@ import scala.concurrent.Future;
 
 public class Frontend extends UntypedActor {
 
-
-  ActorRef masterProxy = getContext().actorOf(
-      ClusterSingletonProxy.props(
-          "/user/master",
-          ClusterSingletonProxySettings.create(getContext().system()).withRole("backend")),
-      "masterProxy");
+  private ActorRef masterProxy = getContext().actorOf(ClusterSingletonProxy.props("/user/master",
+    ClusterSingletonProxySettings.create(getContext().system()).withRole("backend")), "masterProxy");
 
   public void onReceive(Object message) {
 
     Timeout timeout = new Timeout(5, TimeUnit.SECONDS);
     Future<Object> f = ask(masterProxy, message, timeout);
-
 
     final ExecutionContext ec = getContext().system().dispatcher();
 
@@ -59,7 +54,8 @@ public class Frontend extends UntypedActor {
   }
 
   public static final class Ok implements Serializable {
-    private Ok() {}
+    private Ok() {
+    }
 
     private static final Ok instance = new Ok();
 
@@ -74,7 +70,8 @@ public class Frontend extends UntypedActor {
   }
 
   public static final class NotOk implements Serializable {
-    private NotOk() {}
+    private NotOk() {
+    }
 
     private static final NotOk instance = new NotOk();
 

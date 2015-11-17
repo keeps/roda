@@ -23,6 +23,8 @@ public class WorkExecutor extends UntypedActor {
       String result = n + " * " + n + " = " + n2;
       log.info("Produced result {}", result);
       getSender().tell(new Worker.WorkComplete(result), getSelf());
+    }else if(message instanceof Object){
+      // TODO
     }
   }
 }

@@ -61,9 +61,8 @@ public class Worker extends UntypedActor {
   public Worker(ActorRef clusterClient, Props workExecutorProps, FiniteDuration registerInterval) {
     this.clusterClient = clusterClient;
     this.workExecutor = getContext().watch(getContext().actorOf(workExecutorProps, "exec"));
-    this.registerTask = getContext().system().scheduler().schedule(Duration.Zero(), registerInterval,
-        clusterClient, new SendToAll("/user/master/singleton", new RegisterWorker(workerId)),
-        getContext().dispatcher(), getSelf());
+    this.registerTask = getContext().system().scheduler().schedule(Duration.Zero(), registerInterval, clusterClient,
+      new SendToAll("/user/master/singleton", new RegisterWorker(workerId)), getContext().dispatcher(), getSelf());
   }
 
   private String workId() {
@@ -75,26 +74,24 @@ public class Worker extends UntypedActor {
 
   @Override
   public SupervisorStrategy supervisorStrategy() {
-    return new OneForOneStrategy(-1, Duration.Inf(),
-      new Function<Throwable, Directive>() {
-        @Override
-        public Directive apply(Throwable t) {
-          if (t instanceof ActorInitializationException)
-            return stop();
-          else if (t instanceof DeathPactException)
-            return stop();
-          else if (t instanceof Exception) {
-            if (currentWorkId != null)
-              sendToMaster(new WorkFailed(workerId, workId()));
-            getContext().become(idle);
-            return restart();
+    return new OneForOneStrategy(-1, Duration.Inf(), new Function<Throwable, Directive>() {
+      @Override
+      public Directive apply(Throwable t) {
+        if (t instanceof ActorInitializationException) {
+          return stop();
+        } else if (t instanceof DeathPactException) {
+          return stop();
+        } else if (t instanceof Exception) {
+          if (currentWorkId != null) {
+            sendToMaster(new WorkFailed(workerId, workId()));
           }
-          else {
-            return escalate();
-          }
+          getContext().become(idle);
+          return restart();
+        } else {
+          return escalate();
         }
       }
-    );
+    });
   }
 
   @Override
@@ -108,16 +105,17 @@ public class Worker extends UntypedActor {
 
   private final Procedure<Object> idle = new Procedure<Object>() {
     public void apply(Object message) {
-      if (message instanceof MasterWorkerProtocol.WorkIsReady)
+      if (message instanceof MasterWorkerProtocol.WorkIsReady) {
         sendToMaster(new MasterWorkerProtocol.WorkerRequestsWork(workerId));
-      else if (message instanceof Work) {
+      } else if (message instanceof Work) {
         Work work = (Work) message;
         log.info("Got work: {}", work.job);
         currentWorkId = work.workId;
         workExecutor.tell(work.job, getSelf());
         getContext().become(working);
+      } else {
+        unhandled(message);
       }
-      else unhandled(message);
     }
   };
 
@@ -129,11 +127,9 @@ public class Worker extends UntypedActor {
         sendToMaster(new WorkIsDone(workerId, workId(), result));
         getContext().setReceiveTimeout(Duration.create(5, "seconds"));
         getContext().become(waitForWorkIsDoneAck(result));
-      }
-      else if (message instanceof Work) {
+      } else if (message instanceof Work) {
         log.info("Yikes. Master told me to do work, while I'm working.");
-      }
-      else {
+      } else {
         unhandled(message);
       }
     }
@@ -146,12 +142,10 @@ public class Worker extends UntypedActor {
           sendToMaster(new WorkerRequestsWork(workerId));
           getContext().setReceiveTimeout(Duration.Undefined());
           getContext().become(idle);
-        }
-        else if (message instanceof ReceiveTimeout) {
+        } else if (message instanceof ReceiveTimeout) {
           log.info("No ack from master, retrying (" + workerId + " -> " + workId() + ")");
           sendToMaster(new WorkIsDone(workerId, workId(), result));
-        }
-        else {
+        } else {
           unhandled(message);
         }
       }
@@ -166,11 +160,9 @@ public class Worker extends UntypedActor {
   public void unhandled(Object message) {
     if (message instanceof Terminated && ((Terminated) message).getActor().equals(workExecutor)) {
       getContext().stop(getSelf());
-    }
-    else if (message instanceof WorkIsReady) {
+    } else if (message instanceof WorkIsReady) {
       // do nothing
-    }
-    else {
+    } else {
       super.unhandled(message);
     }
   }
@@ -179,7 +171,7 @@ public class Worker extends UntypedActor {
     clusterClient.tell(new SendToAll("/user/master/singleton", msg), getSelf());
   }
 
-  public static final class WorkComplete  implements Serializable {
+  public static final class WorkComplete implements Serializable {
     public final Object result;
 
     public WorkComplete(Object result) {
@@ -188,9 +180,7 @@ public class Worker extends UntypedActor {
 
     @Override
     public String toString() {
-      return "WorkComplete{" +
-          "result=" + result +
-          '}';
+      return "WorkComplete{" + "result=" + result + '}';
     }
   }
 }

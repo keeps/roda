@@ -70,7 +70,6 @@ public final class WorkState {
 
     workInProgress = tmp_workInProgress;
     acceptedWorkIds = new HashSet<String>(workState.acceptedWorkIds);
-    ;
     doneWorkIds = new HashSet<String>(workState.doneWorkIds);
     pendingWork = tmp_pendingWork;
   }
@@ -84,7 +83,6 @@ public final class WorkState {
     acceptedWorkIds = new HashSet<String>(workState.acceptedWorkIds);
     doneWorkIds = tmp_doneWorkIds;
     pendingWork = new ConcurrentLinkedDeque<Work>(workState.pendingWork);
-    ;
   }
 
   public WorkState(WorkState workState, WorkerFailed workerFailed) {
@@ -107,12 +105,6 @@ public final class WorkState {
     acceptedWorkIds = new HashSet<String>(workState.acceptedWorkIds);
     doneWorkIds = new HashSet<String>(workState.doneWorkIds);
     pendingWork = tmp_pendingWork;
-  }
-
-  public void test() {
-    for (Work work : pendingWork) {
-      System.out.println(work.job);
-    }
   }
 
   public String toString() {

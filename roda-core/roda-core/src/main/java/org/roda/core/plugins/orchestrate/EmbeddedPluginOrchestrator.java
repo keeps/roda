@@ -25,6 +25,7 @@ import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.Representation;
+import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.IndexServiceException;
 import org.roda.core.model.AIP;
@@ -308,17 +309,17 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public void runPluginOnFiles(Plugin<String> plugin, List<Path> paths) {
+  public void runPluginOnTransferredResources(Plugin<TransferredResource> plugin, List<TransferredResource> resources) {
     try {
       plugin.beforeExecute(index, model, storage);
 
-      List<String> block = new ArrayList<String>();
-      for (Path path : paths) {
+      List<TransferredResource> block = new ArrayList<TransferredResource>();
+      for (TransferredResource resource : resources) {
         if (block.size() == BLOCK_SIZE) {
           submitPlugin(block, plugin);
-          block = new ArrayList<String>();
+          block = new ArrayList<TransferredResource>();
         }
-        block.add(path.toString());
+        block.add(resource);
       }
 
       if (!block.isEmpty()) {

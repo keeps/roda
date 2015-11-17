@@ -23,7 +23,7 @@ public class WorkResultConsumer extends UntypedActor {
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
 
   {
-    mediator.tell(new DistributedPubSubMediator.Subscribe(Master.ResultsTopic, getSelf()), getSelf());
+    mediator.tell(new DistributedPubSubMediator.Subscribe(Master.RESULTS_TOPIC, getSelf()), getSelf());
   }
 
   @Override

@@ -8,11 +8,11 @@
 package org.roda.core.plugins;
 
 import java.io.Serializable;
-import java.nio.file.Path;
 import java.util.List;
 
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.v2.Representation;
+import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.model.AIP;
 import org.roda.core.model.File;
 
@@ -32,6 +32,6 @@ public interface PluginOrchestrator {
 
   public void shutdown();
 
-  public void runPluginOnFiles(Plugin<String> plugin, List<Path> paths);
+  public void runPluginOnTransferredResources(Plugin<TransferredResource> plugin, List<TransferredResource> paths);
 
 }

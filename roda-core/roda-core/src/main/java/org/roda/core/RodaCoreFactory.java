@@ -23,8 +23,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
@@ -75,6 +73,7 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginOrchestrator;
 import org.roda.core.plugins.orchestrate.AkkaDistributedPluginOrchestrator;
 import org.roda.core.plugins.orchestrate.AkkaDistributedPluginWorker;
+import org.roda.core.plugins.orchestrate.AkkaEmbeddedPluginOrchestrator;
 import org.roda.core.plugins.plugins.antivirus.AntivirusPlugin;
 import org.roda.core.plugins.plugins.base.AIPValidationPlugin;
 import org.roda.core.plugins.plugins.base.CharacterizationPlugin;
@@ -211,6 +210,7 @@ public class RodaCoreFactory {
     ensureAllEssentialDirectoriesExist();
 
     // instantiate model related objects
+    // FIXME the type of storage that should be used should be configurable
     storage = new FileStorageService(storagePath);
     model = new ModelService(storage);
   }
@@ -249,10 +249,12 @@ public class RodaCoreFactory {
   private static void instantiatePluginsRelatedObjects(NODE_TYPE_ENUM nodeType) {
     if (nodeType == NODE_TYPE_ENUM.MASTER) {
       if (FEATURE_AKKA_ENABLED) {
-        // PluginOrchestrator = new EmbeddedActionOrchestrator();
-        // pluginOrchestrator = new AkkaEmbeddedPluginOrchestrator();
+
         akkaDistributedPluginOrchestrator = new AkkaDistributedPluginOrchestrator(
           getSystemProperty(NODE_HOSTNAME, "localhost"), getSystemProperty(NODE_PORT, "2551"));
+      } else {
+        // pluginOrchestrator = new EmbeddedActionOrchestrator();
+        pluginOrchestrator = new AkkaEmbeddedPluginOrchestrator();
       }
 
       startApacheDS();
@@ -648,16 +650,14 @@ public class RodaCoreFactory {
   }
 
   private static void runBagitPlugin() {
-    try {
-      Path bagitFolder = RodaCoreFactory.getDataPath().resolve("bagit");
-      Plugin<String> bagitPlugin = new BagitToAIPPlugin();
-      Stream<Path> bagits = Files.list(bagitFolder);
-      List<Path> bagitsList = bagits.collect(Collectors.toList());
-      bagits.close();
-      getPluginOrchestrator().runPluginOnFiles(bagitPlugin, bagitsList);
-    } catch (IOException e) {
-      LOGGER.error("Error running bagit Plugin: " + e.getMessage(), e);
-    }
+    // Path bagitFolder = RodaCoreFactory.getDataPath().resolve("bagit");
+    Plugin<TransferredResource> bagitPlugin = new BagitToAIPPlugin();
+    // FIXME collect proper list of transferred resources
+    List<TransferredResource> bagitsList = new ArrayList<TransferredResource>();
+    // Stream<Path> bagits = Files.list(bagitFolder);
+    // List<Path> bagitsList = bagits.collect(Collectors.toList());
+    // bagits.close();
+    getPluginOrchestrator().runPluginOnTransferredResources(bagitPlugin, bagitsList);
   }
 
   private static void runCharacterizationPlugin() {
