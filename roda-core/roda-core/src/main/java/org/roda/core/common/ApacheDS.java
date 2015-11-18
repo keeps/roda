@@ -41,12 +41,13 @@ import org.apache.directory.server.core.partition.ldif.LdifPartition;
 import org.apache.directory.server.ldap.LdapServer;
 import org.apache.directory.server.protocol.shared.transport.TcpTransport;
 import org.apache.directory.server.xdbm.Index;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.util.FileUtility;
 
 // FIXME this should be moved to a more meaningful maven module
 public class ApacheDS {
-  private static final Logger LOGGER = Logger.getLogger(ApacheDS.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ApacheDS.class);
 
   private static final String INSTANCE_NAME = "RODA";
   private static final String BASE_DN = "dc=roda,dc=org";

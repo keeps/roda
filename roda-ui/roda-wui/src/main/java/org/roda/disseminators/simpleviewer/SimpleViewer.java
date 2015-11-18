@@ -19,7 +19,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.log4j.lf5.util.StreamUtils;
 import org.roda.core.data.RepresentationObject;
 import org.roda.core.data.common.BrowserException;
@@ -43,7 +44,7 @@ public class SimpleViewer extends HttpServlet implements Servlet {
    */
   public static final String DISSEMINATOR_NAME = "SimpleViewer";
 
-  private Logger logger = Logger.getLogger(SimpleViewer.class);
+  private Logger logger = LoggerFactory.getLogger(SimpleViewer.class);
 
   // private final MigratorClient migratorClient;
   private final String migratorUrl;

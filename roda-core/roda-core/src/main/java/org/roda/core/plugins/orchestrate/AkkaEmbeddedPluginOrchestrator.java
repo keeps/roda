@@ -14,7 +14,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
@@ -45,7 +46,7 @@ import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
 
 public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
-  private final Logger logger = Logger.getLogger(getClass());
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   private static final int BLOCK_SIZE = 100;
   private static final Sorter SORTER = null;

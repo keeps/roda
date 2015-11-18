@@ -21,7 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.common.PremisUtils;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
@@ -47,7 +48,7 @@ import org.roda.core.storage.fs.FSUtils;
 
 public class FixityPlugin implements Plugin<AIP> {
   private AgentPreservationObject fixityAgent;
-  private static final Logger LOGGER = Logger.getLogger(FixityPlugin.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(FixityPlugin.class);
 
   @Override
   public void init() throws PluginException {

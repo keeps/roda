@@ -31,7 +31,8 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
 import org.roda.core.data.common.InvalidParameterException;
@@ -56,7 +57,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 public class MediaInfoPlugin implements Plugin<AIP> {
-  private static final Logger LOGGER = Logger.getLogger(MediaInfoPlugin.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(MediaInfoPlugin.class);
 
   @Override
   public void init() throws PluginException {

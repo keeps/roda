@@ -7,7 +7,8 @@
  */
 package org.roda.wui.server.main;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.RodaCoreFactory;
 import org.roda.wui.client.main.GAnalyticsService;
 
@@ -19,7 +20,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 public class GAnalyticsServiceImpl extends RemoteServiceServlet implements GAnalyticsService {
 
   private static final long serialVersionUID = -3032914449117878609L;
-  private static final Logger logger = Logger.getLogger(GAnalyticsServiceImpl.class);
+  private static final Logger logger = LoggerFactory.getLogger(GAnalyticsServiceImpl.class);
   private static String GANALYTICS_ACCOUNT_CODE = null;
 
   public GAnalyticsServiceImpl() {

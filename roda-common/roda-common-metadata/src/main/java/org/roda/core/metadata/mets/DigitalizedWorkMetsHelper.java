@@ -21,7 +21,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.w3c.dom.Node;
@@ -31,7 +32,7 @@ import org.w3c.dom.Node;
  * @author Rui Castro
  */
 public class DigitalizedWorkMetsHelper extends MetsHelper {
-  private static final Logger logger = Logger.getLogger(DigitalizedWorkMetsHelper.class);
+  private static final Logger logger = LoggerFactory.getLogger(DigitalizedWorkMetsHelper.class);
 
   /**
    * Creates a new instance of a {@link DigitalizedWorkMetsHelper} for the METS

@@ -29,7 +29,8 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.data.FileFormat;
 import org.roda.core.data.v2.Fixity;
 import org.roda.core.data.v2.RepresentationFilePreservationObject;
@@ -47,7 +48,7 @@ import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
 public class PremisUtils {
-  private final static Logger logger = Logger.getLogger(PremisUtils.class);
+  private final static Logger logger = LoggerFactory.getLogger(PremisUtils.class);
   private static final String W3C_XML_SCHEMA_NS_URI = "http://www.w3.org/2001/XMLSchema";
 
   public static Fixity calculateFixity(Binary binary, String digestAlgorithm, String originator)

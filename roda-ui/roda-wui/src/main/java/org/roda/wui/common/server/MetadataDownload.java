@@ -14,7 +14,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Servlet implementation class MetadataDownload
@@ -41,7 +42,7 @@ public class MetadataDownload extends HttpServlet {
    */
   public static String TYPE_EAD = "EAD";
 
-  private static final Logger logger = Logger.getLogger(MetadataDownload.class);
+  private static final Logger logger = LoggerFactory.getLogger(MetadataDownload.class);
 
   public static String TYPE_OTHER_DESCRIPTIVE_METADATA = "OTHER";
 

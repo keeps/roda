@@ -13,7 +13,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.data.StatisticData;
 import org.roda.wui.management.statistics.client.Segmentation;
 import org.roda.wui.management.statistics.client.StatisticFunction;
@@ -27,7 +28,7 @@ import org.roda.wui.management.statistics.client.StatisticsPanel;
  */
 public class StatisticsHelper {
 
-  private static final Logger logger = Logger.getLogger(StatisticsHelper.class);
+  private static final Logger logger = LoggerFactory.getLogger(StatisticsHelper.class);
 
   /**
    * Apply statistic functions

@@ -17,7 +17,8 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sublist.Sublist;
@@ -34,7 +35,7 @@ import org.roda.core.index.IndexService;
 import org.roda.core.index.IndexServiceException;
 
 public class UserUtility {
-  private static final Logger LOGGER = Logger.getLogger(UserUtility.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(UserUtility.class);
   public static final String RODA_USER = "RODA_USER";
 
   private static LdapUtility LDAP_UTILITY;

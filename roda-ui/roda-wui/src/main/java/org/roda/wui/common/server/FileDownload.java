@@ -19,7 +19,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.transaction.util.FileHelper;
 import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
@@ -34,7 +35,7 @@ public class FileDownload extends RemoteServiceServlet {
 	 * 
 	 */
   private static final long serialVersionUID = -4513191839372139634L;
-  Logger logger = Logger.getLogger(FileDownload.class);
+  Logger logger = LoggerFactory.getLogger(FileDownload.class);
 
   protected void doGet(HttpServletRequest request, HttpServletResponse response) {
     URL rodaServices;

@@ -11,13 +11,14 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Rui Castro
  */
 public class TempDir {
-  private static final Logger logger = Logger.getLogger(TempDir.class);
+  private static final Logger logger = LoggerFactory.getLogger(TempDir.class);
 
   private static DirDeleter deleterThread = null;
 

@@ -7,7 +7,8 @@
  */
 package org.roda.core.plugins.orchestrate.akka;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.orchestrate.AkkaEmbeddedPluginOrchestrator.PluginMessage;
@@ -16,7 +17,7 @@ import org.roda.core.storage.StorageService;
 import akka.actor.UntypedActor;
 
 public class AkkaWorkerActor extends UntypedActor {
-  private final Logger logger = Logger.getLogger(getClass());
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   private final IndexService index;
   private final ModelService model;

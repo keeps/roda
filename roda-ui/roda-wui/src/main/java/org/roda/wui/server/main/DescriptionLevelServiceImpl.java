@@ -11,7 +11,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.eadc.DescriptionLevelManager;
 import org.roda.core.util.FileUtility;
@@ -24,7 +25,7 @@ public class DescriptionLevelServiceImpl extends RemoteServiceServlet implements
 
   private static final long serialVersionUID = 1133363430147430537L;
 
-  private static final Logger logger = Logger.getLogger(DescriptionLevelServiceImpl.class);
+  private static final Logger logger = LoggerFactory.getLogger(DescriptionLevelServiceImpl.class);
 
   static {
     try {
@@ -34,7 +35,7 @@ public class DescriptionLevelServiceImpl extends RemoteServiceServlet implements
 
       new DescriptionLevelManager(descriptionLevels);
     } catch (IOException ex) {
-      logger.error(ex);
+      logger.error("Error loading description levels", ex);
     } catch (IllegalArgumentException e) {
       logger.error("Error loading description levels", e);
     }

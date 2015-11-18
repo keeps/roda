@@ -11,7 +11,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.AuthenticationDeniedException;
@@ -35,7 +36,7 @@ public class UserLoginServiceImpl extends RemoteServiceServlet implements UserLo
   private static final String LOG_ACTION_WUI_LOGIN = "RODAWUI.login";
   private static final String WUI_LOGIN_CACHE = "WUI_LOGIN_CACHE";
   private static final List<String> WUI_LOGIN_CACHE_PREFIXES = Arrays.asList("ui.menu." ,"ui.role.");
-  private static Logger logger = Logger.getLogger(UserLoginServiceImpl.class);
+  private static Logger logger = LoggerFactory.getLogger(UserLoginServiceImpl.class);
 
   public static UserLoginServiceImpl getInstance() {
     return new UserLoginServiceImpl();

@@ -8,7 +8,8 @@
 package org.roda.wui.common.server;
 
 import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.wui.common.client.ClientLoggerService;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -34,72 +35,72 @@ public class ClientLoggerImpl extends RemoteServiceServlet implements ClientLogg
   }
 
   public void debug(String classname, String object) {
-    Logger logger = Logger.getLogger(classname);
+    Logger logger = LoggerFactory.getLogger(classname);
     logger.debug(getUserInfo() + object);
   }
 
   public void debug(String classname, String object, Throwable error) {
-    Logger logger = Logger.getLogger(classname);
+    Logger logger = LoggerFactory.getLogger(classname);
     logger.debug(getUserInfo() + object, error);
   }
 
   public void error(String classname, String object) {
-    Logger logger = Logger.getLogger(classname);
+    Logger logger = LoggerFactory.getLogger(classname);
     logger.error(getUserInfo() + object);
     sendError(classname, object, null);
 
   }
 
   public void error(String classname, String object, Throwable error) {
-    Logger logger = Logger.getLogger(classname);
+    Logger logger = LoggerFactory.getLogger(classname);
     logger.error(getUserInfo() + object, error);
     sendError(classname, object, error);
   }
 
   public void fatal(String classname, String object) {
-    Logger logger = Logger.getLogger(classname);
-    logger.fatal(getUserInfo() + object);
+    Logger logger = LoggerFactory.getLogger(classname);
+    logger.error(getUserInfo() + object);
     sendError(classname, object, null);
   }
 
   public void fatal(String classname, String object, Throwable error) {
-    Logger logger = Logger.getLogger(classname);
-    logger.fatal(getUserInfo() + object, error);
+    Logger logger = LoggerFactory.getLogger(classname);
+    logger.error(getUserInfo() + object, error);
     sendError(classname, object, error);
   }
 
   public void info(String classname, String object) {
-    Logger logger = Logger.getLogger(classname);
+    Logger logger = LoggerFactory.getLogger(classname);
     logger.info(getUserInfo() + object);
   }
 
   public void info(String classname, String object, Throwable error) {
-    Logger logger = Logger.getLogger(classname);
+    Logger logger = LoggerFactory.getLogger(classname);
     logger.info(getUserInfo() + object, error);
   }
 
   public void trace(String classname, String object) {
-    Logger logger = Logger.getLogger(classname);
+    Logger logger = LoggerFactory.getLogger(classname);
     logger.trace(getUserInfo() + object);
   }
 
   public void trace(String classname, String object, Throwable error) {
-    Logger logger = Logger.getLogger(classname);
+    Logger logger = LoggerFactory.getLogger(classname);
     logger.trace(getUserInfo() + object, error);
   }
 
   public void warn(String classname, String object) {
-    Logger logger = Logger.getLogger(classname);
+    Logger logger = LoggerFactory.getLogger(classname);
     logger.warn(getUserInfo() + object);
   }
 
   public void warn(String classname, String object, Throwable error) {
-    Logger logger = Logger.getLogger(classname);
+    Logger logger = LoggerFactory.getLogger(classname);
     logger.warn(getUserInfo() + object, error);
   }
 
   public void pagehit(String pagename) {
-    Logger logger = Logger.getLogger(ClientLoggerImpl.class);
+    Logger logger = LoggerFactory.getLogger(ClientLoggerImpl.class);
     // try {
     // RODAClient rodaClient = RodaClientFactory.getRodaWuiClient();
     // String username = RodaClientFactory.getRodaClient(
@@ -146,7 +147,7 @@ public class ClientLoggerImpl extends RemoteServiceServlet implements ClientLogg
    *          the error throwable
    */
   public void sendError(String classname, String message, Throwable error) {
-    Logger logger = Logger.getLogger(ClientLoggerImpl.class);
+    Logger logger = LoggerFactory.getLogger(ClientLoggerImpl.class);
 
     // try {
     // RODAClient rodaClient = RodaClientFactory.getRodaWuiClient();

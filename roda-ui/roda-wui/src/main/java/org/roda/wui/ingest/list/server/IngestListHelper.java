@@ -7,7 +7,8 @@
  */
 package org.roda.wui.ingest.list.server;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
@@ -19,7 +20,7 @@ import org.roda.core.index.IndexServiceException;
 import org.roda.wui.common.client.GenericException;
 
 public class IngestListHelper {
-  private static final Logger LOGGER = Logger.getLogger(IngestListHelper.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(IngestListHelper.class);
 
   static Long countSipReports(Filter filter) throws GenericException {
     Long count;

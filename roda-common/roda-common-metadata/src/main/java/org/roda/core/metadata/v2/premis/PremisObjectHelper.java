@@ -11,7 +11,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.metadata.MetadataException;
 
 import lc.xmlns.premisV2.ObjectDocument;
@@ -24,7 +25,7 @@ import lc.xmlns.premisV2.ObjectDocument;
  */
 public abstract class PremisObjectHelper {
 
-  private static final Logger logger = Logger.getLogger(PremisObjectHelper.class);
+  private static final Logger logger = LoggerFactory.getLogger(PremisObjectHelper.class);
 
   // TODO these constants should go into a configuration file
   protected static final String premisRelationshipTypeStructural = "structural";

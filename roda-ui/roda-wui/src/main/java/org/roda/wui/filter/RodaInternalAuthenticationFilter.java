@@ -19,7 +19,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.common.UserUtility;
 import org.roda.wui.common.client.tools.Tools;
 
@@ -27,7 +28,7 @@ import org.roda.wui.common.client.tools.Tools;
  * @author Hélder Silva <hsilva@keep.pt>
  */
 public class RodaInternalAuthenticationFilter implements Filter {
-  private static final Logger LOGGER = Logger.getLogger(RodaInternalAuthenticationFilter.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(RodaInternalAuthenticationFilter.class);
 
   @Override
   public void init(FilterConfig arg0) throws ServletException {

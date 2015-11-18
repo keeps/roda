@@ -15,7 +15,8 @@ import java.util.Calendar;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.storage.Binary;
 import org.roda.core.util.FileUtility;
@@ -26,7 +27,7 @@ import edu.harvard.hul.ois.jhove.Module;
 import edu.harvard.hul.ois.jhove.OutputHandler;
 
 public class JHOVEPluginUtils {
-  private static final Logger LOGGER = Logger.getLogger(JHOVEPluginUtils.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(JHOVEPluginUtils.class);
 
   public static Path inspect(File targetFile) throws Exception {
 

@@ -7,7 +7,8 @@
  */
 package org.roda.wui.common.server;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.data.Report;
 import org.roda.core.data.common.RODAException;
 import org.roda.wui.common.client.ReportService;
@@ -27,7 +28,7 @@ public class ReportServiceImpl extends RemoteServiceServlet implements ReportSer
 	 */
   private static final long serialVersionUID = 1L;
 
-  private static final Logger logger = Logger.getLogger(ReportServiceImpl.class);
+  private static final Logger logger = LoggerFactory.getLogger(ReportServiceImpl.class);
 
   /**
    * Create a report service implementation

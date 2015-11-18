@@ -12,7 +12,8 @@ import java.io.IOException;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.data.DescriptionObject;
 import org.roda.core.data.common.AuthorizationDeniedException;
 import org.roda.core.data.common.LoginException;
@@ -35,7 +36,7 @@ public class IngestSubmitServiceImpl extends RemoteServiceServlet implements Ing
 	 */
   private static final long serialVersionUID = 1L;
 
-  private static Logger logger = Logger.getLogger(IngestSubmitServiceImpl.class);
+  private static Logger logger = LoggerFactory.getLogger(IngestSubmitServiceImpl.class);
 
   protected static String getFileName(String fileItemName) {
     String ret;

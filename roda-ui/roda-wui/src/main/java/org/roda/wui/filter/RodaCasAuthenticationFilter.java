@@ -19,7 +19,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.jasig.cas.client.util.CommonUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
@@ -36,7 +37,7 @@ import org.roda.core.model.ModelServiceException;
  * Servlet Filter implementation class RolesSetterFilter
  */
 public class RodaCasAuthenticationFilter implements Filter {
-  private static final Logger logger = Logger.getLogger(RodaCasAuthenticationFilter.class);
+  private static final Logger logger = LoggerFactory.getLogger(RodaCasAuthenticationFilter.class);
 
   private FilterConfig config;
   protected String casLogoutURL = null;

@@ -34,7 +34,8 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
@@ -84,7 +85,7 @@ import org.roda.wui.common.server.ServerTools;
 public class BrowserHelper {
   private static final int BUNDLE_MAX_REPRESENTATION_COUNT = 2;
   private static final int BUNDLE_MAX_ADDED_ORIGINAL_REPRESENTATION_COUNT = 1;
-  private static final Logger LOGGER = Logger.getLogger(BrowserHelper.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(BrowserHelper.class);
 
   protected static BrowseItemBundle getItemBundle(String aipId, Locale locale)
     throws GenericException, NotFoundException {

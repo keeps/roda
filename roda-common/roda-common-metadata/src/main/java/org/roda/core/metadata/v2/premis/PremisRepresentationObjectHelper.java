@@ -18,7 +18,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.xmlbeans.XmlException;
 import org.roda.core.data.v2.RepresentationFilePreservationObject;
 import org.roda.core.data.v2.RepresentationPreservationObject;
@@ -39,7 +40,7 @@ import lc.xmlns.premisV2.Representation;
  */
 public class PremisRepresentationObjectHelper extends PremisObjectHelper {
 
-  private static final Logger logger = Logger.getLogger(PremisRepresentationObjectHelper.class);
+  private static final Logger logger = LoggerFactory.getLogger(PremisRepresentationObjectHelper.class);
 
   /**
    * Creates a new instance of a {@link PremisRepresentationObjectHelper} for

@@ -16,7 +16,8 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.xmlbeans.XmlError;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
@@ -28,7 +29,7 @@ import org.roda.core.metadata.v2.premis.PremisMetadataException;
  * @author Rui Castro
  */
 public class MetadataHelperUtility {
-  private static final Logger logger = Logger.getLogger(MetadataHelperUtility.class);
+  private static final Logger logger = LoggerFactory.getLogger(MetadataHelperUtility.class);
 
   /**
    * Saves the current XML object to a byte array.
@@ -85,8 +86,8 @@ public class MetadataHelperUtility {
    *           if {@link FileOutputStream} associated with the {@link File}
    *           couldn't be closed.
    */
-  public static void saveToFile(XmlObject xmlObject, File file) throws MetadataException, FileNotFoundException,
-    IOException {
+  public static void saveToFile(XmlObject xmlObject, File file)
+    throws MetadataException, FileNotFoundException, IOException {
 
     FileOutputStream fileOutputStream = new FileOutputStream(file);
     saveToOutputStream(xmlObject, fileOutputStream, true);

@@ -21,7 +21,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.transaction.util.FileHelper;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Rui Castro
@@ -30,7 +31,7 @@ import org.apache.log4j.Logger;
  */
 public class FileUtility {
 
-  private static final Logger LOGGER = Logger.getLogger(FileUtility.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(FileUtility.class);
 
   public static InputStream getConfigurationFile(Path configPath, String relativePath) {
     InputStream ret;

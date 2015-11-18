@@ -9,7 +9,8 @@ package org.roda.wui.api.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.common.ServiceException;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.AuthenticationDeniedException;
@@ -18,7 +19,7 @@ import org.roda.core.data.v2.RodaUser;
 import org.roda.wui.common.client.GenericException;
 
 public class UserLoginHelper {
-  private static final Logger LOGGER = Logger.getLogger(UserLoginHelper.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(UserLoginHelper.class);
 
   public static RodaUser login(String username, String password, HttpServletRequest request)
     throws GenericException, AuthenticationDeniedException {

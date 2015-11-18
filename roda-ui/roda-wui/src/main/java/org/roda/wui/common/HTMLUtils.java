@@ -26,7 +26,8 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.RandomStringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
 import org.roda.core.common.RodaUtils;
@@ -57,7 +58,7 @@ import org.roda.wui.client.browse.RepresentationPreservationMetadataBundle;
  * @author Sébastien Leroux <sleroux@keep.pt>
  */
 public final class HTMLUtils {
-  private static final Logger LOGGER = Logger.getLogger(HTMLUtils.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(HTMLUtils.class);
 
   /** Private empty constructor */
   private HTMLUtils() {

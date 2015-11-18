@@ -18,7 +18,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.jdom.JDOMException;
 import org.jdom.output.XMLOutputter;
 import org.roda.core.RodaCoreFactory;
@@ -31,7 +32,7 @@ import edu.harvard.hul.ois.fits.FitsOutput;
 import edu.harvard.hul.ois.fits.exceptions.FitsException;
 
 public class FITSPluginUtils {
-  static final private Logger logger = Logger.getLogger(FITSPluginUtils.class);
+  static final private Logger logger = LoggerFactory.getLogger(FITSPluginUtils.class);
 
   public static Path inspect(File f) throws FitsException {
     try {

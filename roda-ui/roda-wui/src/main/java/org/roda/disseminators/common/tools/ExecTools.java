@@ -13,7 +13,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.log4j.lf5.util.StreamUtils;
 
 /**
@@ -23,7 +24,7 @@ import org.apache.log4j.lf5.util.StreamUtils;
  * 
  */
 public class ExecTools {
-  private static final Logger logger = Logger.getLogger(ExecTools.class);
+  private static final Logger logger = LoggerFactory.getLogger(ExecTools.class);
   private static final int DEFAULT_NICENESS = -5;
 
   /**

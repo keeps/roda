@@ -119,30 +119,14 @@
 			<groupId>commons-lang</groupId>
 			<artifactId>commons-lang</artifactId>
 		</dependency>
-		<!-- <dependency> -->
-		<!-- <groupId>commons-configuration</groupId> -->
-		<!-- <artifactId>commons-configuration</artifactId> -->
-		<!-- </dependency> -->
 		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.xmlbeans</groupId>
 			<artifactId>xmlbeans</artifactId>
 		</dependency>
-		<!-- <dependency> -->
-		<!-- <groupId>org.apache.xmlbeans</groupId> -->
-		<!-- <artifactId>xmlbeans-xpath</artifactId> -->
-		<!-- </dependency> -->
-		<!-- <dependency> -->
-		<!-- <groupId>net.sf.saxon</groupId> -->
-		<!-- <artifactId>saxon</artifactId> -->
-		<!-- </dependency> -->
-		<!-- <dependency> -->
-		<!-- <groupId>net.sf.saxon</groupId> -->
-		<!-- <artifactId>saxon-dom</artifactId> -->
-		<!-- </dependency> -->
 		<dependency>
 			<groupId>org.roda-project</groupId>
 			<artifactId>roda-common-utils</artifactId>

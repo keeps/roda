@@ -12,7 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
@@ -31,7 +32,7 @@ import org.roda.core.storage.StorageServiceException;
 
 // FIXME check if this is really needed
 public class CharacterizationPlugin implements Plugin<AIP> {
-  private static final Logger LOGGER = Logger.getLogger(CharacterizationPlugin.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(CharacterizationPlugin.class);
 
   @Override
   public void init() throws PluginException {

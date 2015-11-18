@@ -42,6 +42,43 @@ public final class RodaConstants {
   public static final String API_ATTR_LANG = "lang";
 
   /*
+   * Core (storage, index, orchestrator, etc.)
+   */
+  public enum StorageType {
+    FILESYSTEM, FEDORA4
+  }
+
+  public static final String DEFAULT_STORAGE_TYPE = "filesystem";
+
+  public enum SolrType {
+    EMBEDDED, HTTP
+  }
+
+  public static final String DEFAULT_SOLR_TYPE = "embedded";
+
+  public enum NodeType {
+    MASTER, WORKER
+  }
+
+  public static final String DEFAULT_NODE_TYPE = "master";
+
+  public enum OrchestratorType {
+    EMBEDDED, AKKA, AKKA_DISTRIBUTED
+  }
+
+  public static final String DEFAULT_ORCHESTRATOR_TYPE = "embedded";
+
+  public static final String CORE_LDAP_DEFAULT_HOST = "localhost";
+  public static final int CORE_LDAP_DEFAULT_PORT = 10389;
+
+  // RODA Core properties (provided with -D in the command-line)
+  public static final String CORE_NODE_TYPE = "roda.node.type";
+  public static final String CORE_CLUSTER_HOSTNAME = "roda.cluster.hostname";
+  public static final String CORE_CLUSTER_PORT = "roda.cluster.port";
+  public static final String CORE_NODE_HOSTNAME = "roda.node.hostname";
+  public static final String CORE_NODE_PORT = "roda.node.port";
+
+  /*
    * INDEX NAMES
    */
   public static final String INDEX_AIP = "AIP";

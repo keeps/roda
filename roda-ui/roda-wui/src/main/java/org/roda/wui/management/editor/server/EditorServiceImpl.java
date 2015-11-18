@@ -21,7 +21,8 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.DescriptionObject;
 import org.roda.core.data.Producers;
@@ -60,7 +61,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 public class EditorServiceImpl extends RemoteServiceServlet implements EditorService {
   private static final long serialVersionUID = 1L;
 
-  private static final Logger logger = Logger.getLogger(EditorService.class);
+  private static final Logger logger = LoggerFactory.getLogger(EditorService.class);
 
   private static final DescriptionObject DEFAULT_DESCRIPTION_OBJECT = new DescriptionObject();
 
@@ -156,7 +157,7 @@ public class EditorServiceImpl extends RemoteServiceServlet implements EditorSer
       char ch = s.charAt(i);
       if (ch < 0x20 && ch != 0x9 && ch != 0xD && ch != 0xA) {
         // ignore control characters
-        logger.fatal("Ignoring character " + (int) ch);
+        logger.error("Ignoring character " + (int) ch);
       } else {
         ret.append(ch);
       }

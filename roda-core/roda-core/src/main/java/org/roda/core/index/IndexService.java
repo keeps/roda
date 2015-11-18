@@ -17,7 +17,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.roda.core.data.adapter.facet.Facets;
@@ -41,7 +42,7 @@ import org.roda.core.storage.StorageServiceException;
 
 public class IndexService {
 
-  private static final Logger LOGGER = Logger.getLogger(IndexService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(IndexService.class);
 
   private final SolrClient index;
   private final ModelService model;

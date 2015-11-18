@@ -25,7 +25,8 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
@@ -39,7 +40,7 @@ import org.roda.core.metadata.MetadataHelperUtility;
  * @author Rui Castro
  */
 public class MetsHelper {
-  private static final Logger logger = Logger.getLogger(MetsHelper.class);
+  private static final Logger logger = LoggerFactory.getLogger(MetsHelper.class);
 
   private final MetsDocument metsDocument;
 

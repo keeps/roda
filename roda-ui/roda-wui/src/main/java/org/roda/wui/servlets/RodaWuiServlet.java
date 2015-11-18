@@ -14,11 +14,12 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 
 import org.apache.commons.configuration.ConfigurationException;
-import org.apache.log4j.Logger;
 import org.roda.core.RodaCoreFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RodaWuiServlet extends HttpServlet {
-  private static final Logger LOGGER = Logger.getLogger(ServletContextListener.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ServletContextListener.class);
   private static final long serialVersionUID = 1523530268219980563L;
 
   @Override
@@ -29,6 +30,9 @@ public class RodaWuiServlet extends HttpServlet {
     } catch (ConfigurationException e) {
       LOGGER.error("Error while loading roda-wui properties", e);
     }
+
+    RodaCoreFactory.addLogger("logback_wui.xml");
+
     LOGGER.info("Init: ok...");
   }
 

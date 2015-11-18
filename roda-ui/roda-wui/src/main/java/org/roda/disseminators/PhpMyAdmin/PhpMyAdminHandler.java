@@ -14,7 +14,7 @@ package org.roda.disseminators.PhpMyAdmin;
 public class PhpMyAdminHandler { // extends Handler {
 // private static final long serialVersionUID = 5323073072589613225L;
 //
-// private Logger logger = Logger.getLogger(PhpMyAdminHandler.class);
+// private Logger logger = LoggerFactory.getLogger(PhpMyAdminHandler.class);
 //
 // private static final Pattern QUERY_DB_PATTERN = Pattern
 // .compile("^db\\=([^(\\&)]*)");

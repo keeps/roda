@@ -19,7 +19,8 @@ import java.util.Map;
 
 import javax.xml.transform.TransformerException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.PremisUtils;
 import org.roda.core.data.PluginParameter;
@@ -41,7 +42,7 @@ import org.xml.sax.SAXException;
 
 // TODO IMPROVE...
 public class V2ToV3PremisPlugin implements Plugin<AIP> {
-  private final Logger logger = Logger.getLogger(getClass());
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Override
   public void init() throws PluginException {

@@ -9,7 +9,8 @@ package org.roda.wui.api.controllers;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.LdapUtilityException;
 import org.roda.core.common.UserUtility;
@@ -28,7 +29,7 @@ import org.roda.core.index.IndexServiceException;
 import org.roda.wui.common.client.GenericException;
 
 public class UserManagementHelper {
-  private static final Logger LOGGER = Logger.getLogger(UserManagementHelper.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(UserManagementHelper.class);
 
   protected static Long countLogEntries(Filter filter) throws GenericException {
     Long count;

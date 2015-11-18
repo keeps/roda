@@ -18,7 +18,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Servlet implementation class GwtCacheServer
@@ -26,7 +27,7 @@ import org.apache.log4j.Logger;
 public class GwtCacheServer extends HttpServlet {
   private static final long serialVersionUID = 1L;
 
-  private static final Logger logger = Logger.getLogger(GwtCacheServer.class);
+  private static final Logger logger = LoggerFactory.getLogger(GwtCacheServer.class);
 
   /**
    * @see HttpServlet#HttpServlet()

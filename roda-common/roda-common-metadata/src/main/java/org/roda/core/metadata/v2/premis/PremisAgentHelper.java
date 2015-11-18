@@ -15,7 +15,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.xmlbeans.XmlException;
 import org.roda.core.data.v2.AgentPreservationObject;
 import org.roda.core.metadata.MetadataException;
@@ -29,7 +30,7 @@ import lc.xmlns.premisV2.AgentIdentifierComplexType;
  */
 public class PremisAgentHelper {
 
-  private static final Logger logger = Logger.getLogger(PremisAgentHelper.class);
+  private static final Logger logger = LoggerFactory.getLogger(PremisAgentHelper.class);
 
   private final AgentDocument agentDocument;
 

@@ -38,7 +38,8 @@ import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.MimeConstants;
 import org.apache.fop.servlet.ServletContextURIResolver;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.data.adapter.ContentAdapter;
 import org.roda.core.data.common.LoginException;
 import org.roda.core.data.common.NoSuchReportException;
@@ -52,7 +53,7 @@ import org.roda.wui.common.client.PrintReportException;
  */
 public class ReportDownload extends javax.servlet.http.HttpServlet implements javax.servlet.Servlet {
   static final long serialVersionUID = 1L;
-  private static final Logger logger = Logger.getLogger(ReportDownload.class);
+  private static final Logger logger = LoggerFactory.getLogger(ReportDownload.class);
   private static ReportDownload instance = null;
 
   /**

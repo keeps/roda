@@ -14,7 +14,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.RodaCoreFactory;
 
 /**
@@ -23,7 +24,7 @@ import org.roda.core.RodaCoreFactory;
 public class Munin extends HttpServlet {
   private static final long serialVersionUID = 1L;
 
-  private Logger logger = Logger.getLogger(Munin.class);
+  private Logger logger = LoggerFactory.getLogger(Munin.class);
 
   private String role;
   private String munin_dir;

@@ -13,14 +13,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.util.CommandException;
 import org.roda.core.util.CommandUtility;
 
 public class DroidPluginUtils {
-  static final private Logger logger = Logger.getLogger(DroidPluginUtils.class);
+  static final private Logger logger = LoggerFactory.getLogger(DroidPluginUtils.class);
 
   private static List<String> getBatchCommand(Path sourceDirectory) {
     Path rodaHome = RodaCoreFactory.getRodaHomePath();

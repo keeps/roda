@@ -20,7 +20,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.model.AIP;
 import org.roda.core.model.ModelService;
@@ -40,7 +41,7 @@ import gov.loc.repository.bagit.BagInfoTxt;
 import gov.loc.repository.bagit.utilities.SimpleResult;
 
 public class BagitToAIPPluginUtils {
-  private static final Logger LOGGER = Logger.getLogger(BagitToAIPPluginUtils.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(BagitToAIPPluginUtils.class);
 
   public static AIP bagitToAip(Path bagitPath, ModelService model)
     throws BagitNotValidException, IOException, StorageServiceException, ModelServiceException {

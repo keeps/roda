@@ -25,7 +25,8 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
 import org.apache.commons.collections.ExtendedProperties;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.velocity.Template;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.context.Context;
@@ -90,7 +91,7 @@ public class VelocityMail implements LogChute {
   /**
    * 
    */
-  private static Logger logger = Logger.getLogger(VelocityMail.class);
+  private static Logger logger = LoggerFactory.getLogger(VelocityMail.class);
 
   /**
    * The configuration for Velocity Mail

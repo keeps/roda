@@ -15,7 +15,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.util.TempDir;
 
 /**
@@ -38,7 +39,7 @@ public class AIPDownload extends HttpServlet {
    * Servlet EAD type parameter value
    */
   public static String TYPE_EAD = "EAD";
-  private static final Logger logger = Logger.getLogger(AIPDownload.class);
+  private static final Logger logger = LoggerFactory.getLogger(AIPDownload.class);
 
   /**
    * @see HttpServlet#HttpServlet()

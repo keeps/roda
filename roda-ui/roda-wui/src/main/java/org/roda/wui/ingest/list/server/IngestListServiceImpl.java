@@ -13,7 +13,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.SIPState;
@@ -51,7 +52,7 @@ public class IngestListServiceImpl extends RemoteServiceServlet implements Inges
 	 */
   private static final long serialVersionUID = 1L;
 
-  private static final Logger LOGGER = Logger.getLogger(IngestListServiceImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(IngestListServiceImpl.class);
 
   public IngestListServiceImpl() {
     super();

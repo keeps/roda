@@ -12,7 +12,8 @@ import java.io.StringWriter;
 import java.nio.file.Path;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This is the AVG anti-virus.
@@ -21,7 +22,7 @@ import org.apache.log4j.Logger;
  */
 public class AVGAntiVirus implements AntiVirus {
 
-  private static final Logger LOGGER = Logger.getLogger(AVGAntiVirus.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AVGAntiVirus.class);
 
   /**
    * no errors

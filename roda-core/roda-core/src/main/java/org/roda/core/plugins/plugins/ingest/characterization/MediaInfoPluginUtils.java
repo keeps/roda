@@ -14,13 +14,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.util.CommandException;
 import org.roda.core.util.CommandUtility;
 
 public class MediaInfoPluginUtils {
-  static final private Logger logger = Logger.getLogger(MediaInfoPluginUtils.class);
+  static final private Logger logger = LoggerFactory.getLogger(MediaInfoPluginUtils.class);
 
   private static List<String> getBatchCommand(Path sourceDirectory) {
     Path rodaHome = RodaCoreFactory.getRodaHomePath();

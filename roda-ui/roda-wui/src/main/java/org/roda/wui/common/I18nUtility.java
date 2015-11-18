@@ -11,7 +11,8 @@ import java.io.Serializable;
 import java.util.Locale;
 import java.util.MissingResourceException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.FacetFieldResult;
@@ -22,7 +23,7 @@ import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.wui.common.server.ServerTools;
 
 public class I18nUtility {
-  private static final Logger LOGGER = Logger.getLogger(I18nUtility.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(I18nUtility.class);
 
   /** Private empty constructor */
   private I18nUtility() {

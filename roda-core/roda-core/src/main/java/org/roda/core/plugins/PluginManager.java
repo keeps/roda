@@ -27,7 +27,8 @@ import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.data.PluginInfo;
 import org.roda.core.util.ClassLoaderUtility;
 
@@ -38,7 +39,7 @@ import org.roda.core.util.ClassLoaderUtility;
  * @author Rui Castro
  */
 public class PluginManager {
-  private static Logger logger = Logger.getLogger(PluginManager.class);
+  private static Logger logger = LoggerFactory.getLogger(PluginManager.class);
 
   private static Path RODA_CONFIG_PATH = null;
   private static Path RODA_PLUGINS_PATH = null;

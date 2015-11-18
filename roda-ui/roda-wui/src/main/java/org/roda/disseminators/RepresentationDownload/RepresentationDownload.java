@@ -22,7 +22,8 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.transaction.util.FileHelper;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.data.RepresentationObject;
 import org.roda.core.data.common.LoginException;
 import org.roda.core.data.common.RODAClientException;
@@ -50,7 +51,7 @@ public class RepresentationDownload extends javax.servlet.http.HttpServlet imple
   // "roda.disseminators.representationdownload.alwayszip").split(" ")));
   private static final Set<String> ALWAYS_ZIP = new HashSet<String>();
 
-  private Logger logger = Logger.getLogger(RepresentationDownload.class);
+  private Logger logger = LoggerFactory.getLogger(RepresentationDownload.class);
   private RepresentationHelper representationHelper = null;
 
   /**

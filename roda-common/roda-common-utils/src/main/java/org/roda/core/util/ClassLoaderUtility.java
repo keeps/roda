@@ -14,7 +14,8 @@ import java.net.URL;
 import java.net.URLClassLoader;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Rui Castro
@@ -22,7 +23,7 @@ import org.apache.log4j.Logger;
 public class ClassLoaderUtility {
 
   // Log object
-  private static Logger logger = Logger.getLogger(ClassLoaderUtility.class);
+  private static Logger logger = LoggerFactory.getLogger(ClassLoaderUtility.class);
 
   // Parameters
   private static final Class[] parameters = new Class[] {URL.class};

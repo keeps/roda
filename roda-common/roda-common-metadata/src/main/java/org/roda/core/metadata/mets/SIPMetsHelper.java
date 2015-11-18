@@ -21,7 +21,8 @@ import java.util.Map;
 import java.util.Random;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.xmlbeans.XmlError;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
@@ -59,7 +60,7 @@ import gov.loc.mets.StructMapType;
  * @author Rui Castro
  */
 public class SIPMetsHelper extends MetsHelper {
-  private static final Logger logger = Logger.getLogger(SIPMetsHelper.class);
+  private static final Logger logger = LoggerFactory.getLogger(SIPMetsHelper.class);
 
   private static final String AMDSEC_ID_OBJECT = "OBJECT";
   private static final String AMDSEC_ID_EVENT = "EVENT";

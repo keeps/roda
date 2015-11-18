@@ -14,7 +14,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.disseminators.RepresentationDownload.RepresentationDownload;
 import org.roda.disseminators.common.RepresentationHelper;
 
@@ -24,7 +25,7 @@ import org.roda.disseminators.common.RepresentationHelper;
 public class Signature extends HttpServlet {
   private static final long serialVersionUID = 1L;
 
-  private Logger logger = Logger.getLogger(RepresentationDownload.class);
+  private Logger logger = LoggerFactory.getLogger(RepresentationDownload.class);
   // private SignatureUtility signatureUtility = null;
   private RepresentationHelper representationHelper = null;
 

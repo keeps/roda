@@ -22,7 +22,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.transaction.util.FileHelper;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.log4j.lf5.util.StreamUtils;
 import org.roda.core.data.RepresentationObject;
 import org.roda.core.data.common.BrowserException;
@@ -47,7 +48,7 @@ public class FlashPageFlipPaid extends javax.servlet.http.HttpServlet implements
    */
   public static final String DISSEMINATOR_NAME = "FlashPageFlip";
 
-  private Logger logger = Logger.getLogger(FlashPageFlipPaid.class);
+  private Logger logger = LoggerFactory.getLogger(FlashPageFlipPaid.class);
 
   private final Map<String, String> resources;
 

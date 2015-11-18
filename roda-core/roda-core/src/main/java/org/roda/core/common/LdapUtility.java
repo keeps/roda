@@ -38,7 +38,8 @@ import javax.naming.directory.SearchResult;
 import javax.naming.ldap.LdapName;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.data.adapter.ContentAdapter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
@@ -65,7 +66,7 @@ import org.w3c.util.InvalidDateException;
 // more meaningful
 public class LdapUtility {
 
-  private static final Logger LOGGER = Logger.getLogger(LdapUtility.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(LdapUtility.class);
 
   private static final String AUTHENTICATION_SIMPLE = "simple";
   private static final String SHADOW_INACTIVE = "shadowInactive";

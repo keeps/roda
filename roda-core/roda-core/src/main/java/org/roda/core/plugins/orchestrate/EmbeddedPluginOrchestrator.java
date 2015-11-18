@@ -18,7 +18,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
@@ -48,7 +49,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   private static final int TIMEOUT = 1;
   private static final TimeUnit TIMEOUT_UNIT = TimeUnit.HOURS;
 
-  private static final Logger LOGGER = Logger.getLogger(EmbeddedPluginOrchestrator.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(EmbeddedPluginOrchestrator.class);
 
   private final IndexService index;
   private final ModelService model;

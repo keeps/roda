@@ -24,7 +24,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.LogEntry;
@@ -62,7 +63,7 @@ import lc.xmlns.premisV2.Representation;
  * @author Hélder Silva <hsilva@keep.pt>
  */
 public final class ModelUtils {
-  private static final Logger LOGGER = Logger.getLogger(ModelUtils.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ModelUtils.class);
 
   public enum PREMIS_TYPE {
     OBJECT, EVENT, AGENT, UNKNOWN

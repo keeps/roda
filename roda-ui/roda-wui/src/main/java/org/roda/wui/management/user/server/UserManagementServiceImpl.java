@@ -11,7 +11,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.LdapUtilityException;
 import org.roda.core.common.UserUtility;
@@ -56,7 +57,7 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
    */
   private static final long serialVersionUID = 1L;
 
-  private final Logger logger = Logger.getLogger(this.getClass().getName());
+  private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
   /**
    * User Management Service implementation constructor

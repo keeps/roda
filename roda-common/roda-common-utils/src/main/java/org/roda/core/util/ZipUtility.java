@@ -29,7 +29,8 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Rui Castro
@@ -37,7 +38,7 @@ import org.apache.log4j.Logger;
  */
 public class ZipUtility {
 
-  final private static Logger logger = Logger.getLogger(ZipUtility.class);
+  final private static Logger logger = LoggerFactory.getLogger(ZipUtility.class);
   final private static int BUFFER_SIZE = 1024;
 
   /**

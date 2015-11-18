@@ -18,7 +18,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.Binary;
@@ -26,7 +27,7 @@ import org.roda.core.util.CommandException;
 import org.roda.core.util.CommandUtility;
 
 public class FFProbePluginUtils {
-  static final private Logger logger = Logger.getLogger(FFProbePluginUtils.class);
+  static final private Logger logger = LoggerFactory.getLogger(FFProbePluginUtils.class);
 
   public static Path inspect(File f) throws PluginException {
     try {

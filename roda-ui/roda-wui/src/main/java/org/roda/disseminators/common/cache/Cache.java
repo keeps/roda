@@ -19,7 +19,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.data.common.BrowserException;
 import org.roda.core.data.common.LoginException;
 import org.roda.core.data.common.NoSuchRODAObjectException;
@@ -48,7 +49,7 @@ public class Cache extends HttpServlet implements Servlet {
     return cacheDir;
   }
 
-  private static final Logger logger = Logger.getLogger(Cache.class);
+  private static final Logger logger = LoggerFactory.getLogger(Cache.class);
 
   /**
    * Cache constructor

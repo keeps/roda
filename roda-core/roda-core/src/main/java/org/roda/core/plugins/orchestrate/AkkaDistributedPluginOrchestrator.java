@@ -9,7 +9,8 @@ package org.roda.core.plugins.orchestrate;
 
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.orchestrate.akka.Frontend;
@@ -46,7 +47,7 @@ import scala.concurrent.duration.FiniteDuration;
  * > https://github.com/typesafehub/activator-akka-distributed-workers-java 
  * */
 public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin {
-  private final Logger logger = Logger.getLogger(getClass());
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   private final IndexService index;
   private final ModelService model;

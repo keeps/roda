@@ -16,7 +16,8 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
 import org.roda.core.common.UserUtility;
@@ -71,7 +72,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   private static final long serialVersionUID = 1L;
   static final String FONDLIST_PAGESIZE = "10";
-  private static final Logger LOGGER = Logger.getLogger(BrowserServiceImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(BrowserServiceImpl.class);
 
   /**
    * Create a new BrowserService Implementation instance

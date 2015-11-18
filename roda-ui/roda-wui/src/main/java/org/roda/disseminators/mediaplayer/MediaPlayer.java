@@ -17,7 +17,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.log4j.lf5.util.StreamUtils;
 import org.roda.core.data.RepresentationObject;
 import org.roda.core.data.common.BrowserException;
@@ -38,7 +39,7 @@ public class MediaPlayer extends javax.servlet.http.HttpServlet implements javax
 
   static final String DISSEMINATOR_NAME = "MediaPlayer";
 
-  private Logger logger = Logger.getLogger(MediaPlayer.class);
+  private Logger logger = LoggerFactory.getLogger(MediaPlayer.class);
 
   private final CacheController cacheController;
   // private RepresentationHelper representationHelper = null;

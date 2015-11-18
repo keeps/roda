@@ -15,7 +15,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.common.PremisUtils;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
@@ -38,7 +39,7 @@ import org.roda.core.storage.fs.FSUtils;
 
 //TODO tool order/preference, parse tool output and update Premis (PremisUtils.updatePremisFile(...) )
 public class PremisUpdateFromToolsPlugin implements Plugin<AIP> {
-  private final Logger logger = Logger.getLogger(getClass());
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Override
   public void init() throws PluginException {

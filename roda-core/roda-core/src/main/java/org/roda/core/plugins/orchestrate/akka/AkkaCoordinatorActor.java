@@ -7,12 +7,13 @@
  */
 package org.roda.core.plugins.orchestrate.akka;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import akka.actor.UntypedActor;
 
 public class AkkaCoordinatorActor extends UntypedActor {
-  private final Logger logger = Logger.getLogger(getClass());
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   public AkkaCoordinatorActor() {
 

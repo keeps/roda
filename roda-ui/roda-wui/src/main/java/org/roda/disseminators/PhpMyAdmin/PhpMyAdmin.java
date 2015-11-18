@@ -15,7 +15,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Servlet implementation class for Servlet: PhpMyAdmin
@@ -47,7 +48,7 @@ public class PhpMyAdmin extends javax.servlet.http.HttpServlet implements javax.
 
   private static final String PROPERTY_URL = "roda.disseminators.phpmyadmin.url";
 
-  private Logger logger = Logger.getLogger(PhpMyAdmin.class);
+  private Logger logger = LoggerFactory.getLogger(PhpMyAdmin.class);
 
   private final String mysqlHost;
 

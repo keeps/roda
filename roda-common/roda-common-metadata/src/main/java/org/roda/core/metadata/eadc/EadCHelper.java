@@ -16,7 +16,8 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlCursor.TokenType;
 import org.apache.xmlbeans.XmlException;
@@ -94,7 +95,7 @@ import pt.gov.dgarq.roda.x2014.eadcSchema.UnitidWithOptionalAttributes;
  * @author Rui Castro
  */
 public class EadCHelper {
-  static final private Logger logger = Logger.getLogger(EadCHelper.class);
+  static final private Logger logger = LoggerFactory.getLogger(EadCHelper.class);
 
   private final EadCDocument eadcDocument;
 

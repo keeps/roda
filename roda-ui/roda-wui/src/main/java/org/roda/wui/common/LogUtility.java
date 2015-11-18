@@ -9,7 +9,8 @@ package org.roda.wui.common;
 
 import java.util.Arrays;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.LoggerException;
 import org.roda.core.data.v2.LogEntry;
@@ -21,7 +22,7 @@ import org.roda.core.model.ModelServiceException;
 // FIXME remove this RodaCoreService from roda-wui already provides these functionalities 
 @Deprecated
 public class LogUtility {
-  private static final Logger logger = Logger.getLogger(LogUtility.class);
+  private static final Logger logger = LoggerFactory.getLogger(LogUtility.class);
 
   public static void registerAction(RodaSimpleUser user, String action, String[] parameters, String description,
     long duration) {

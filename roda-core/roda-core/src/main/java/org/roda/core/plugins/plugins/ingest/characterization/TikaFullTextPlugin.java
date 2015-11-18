@@ -14,7 +14,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.tika.exception.TikaException;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
@@ -34,7 +35,7 @@ import org.roda.core.storage.fs.FSUtils;
 import org.xml.sax.SAXException;
 
 public class TikaFullTextPlugin implements Plugin<AIP> {
-  private final Logger logger = Logger.getLogger(getClass());
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Override
   public void init() throws PluginException {

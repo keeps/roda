@@ -12,7 +12,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.v2.LogEntry;
 import org.roda.core.data.v2.LogEntryParameter;
@@ -20,7 +21,7 @@ import org.roda.core.data.v2.RodaUser;
 import org.roda.core.model.ModelServiceException;
 
 public abstract class RodaCoreService {
-  private static final Logger LOGGER = Logger.getLogger(RodaCoreService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(RodaCoreService.class);
 
   protected static void registerAction(RodaUser user, String actionComponent, String actionMethod, String aipId,
     long duration, Object... parameters) {

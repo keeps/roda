@@ -24,7 +24,8 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.ProgressListener;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.util.TempDir;
 import org.roda.wui.common.fileupload.client.FileUploadPanel;
 
@@ -48,7 +49,7 @@ public class FileUpload extends HttpServlet {
    */
   public static final String UPLOADED_PROGRESS_ATTRIBUTE = "FileUpload_Progress";
 
-  private static Logger logger = Logger.getLogger(FileUpload.class);
+  private static Logger logger = LoggerFactory.getLogger(FileUpload.class);
 
   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 

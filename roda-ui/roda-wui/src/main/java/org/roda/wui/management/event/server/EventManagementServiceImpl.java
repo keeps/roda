@@ -13,7 +13,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.data.PluginInfo;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Task;
@@ -43,7 +44,7 @@ public class EventManagementServiceImpl extends RemoteServiceServlet implements 
 	 */
   private static final long serialVersionUID = 1L;
 
-  private final Logger logger = Logger.getLogger(this.getClass().getName());
+  private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
   public int getTaskCount(Filter filter) throws RODAException {
     return getTaskCount(getThreadLocalRequest().getSession(), filter);

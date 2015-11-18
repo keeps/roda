@@ -24,7 +24,8 @@ import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.data.RepresentationFile;
 import org.roda.core.data.RepresentationObject;
 import org.roda.core.data.common.LoginException;
@@ -36,7 +37,7 @@ import org.roda.core.data.common.RODAClientException;
  */
 public class RepresentationHelper {
 
-  private static Logger logger = Logger.getLogger(RepresentationHelper.class);
+  private static Logger logger = LoggerFactory.getLogger(RepresentationHelper.class);
 
   private final HttpClient client;
 

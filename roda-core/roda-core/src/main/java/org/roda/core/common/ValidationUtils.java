@@ -19,7 +19,8 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.data.v2.Representation;
 import org.roda.core.model.DescriptiveMetadata;
 import org.roda.core.model.ModelService;
@@ -35,7 +36,7 @@ import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
 public class ValidationUtils {
-  private static final Logger LOGGER = Logger.getLogger(ValidationUtils.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ValidationUtils.class);
   private static final String W3C_XML_SCHEMA_NS_URI = "http://www.w3.org/2001/XMLSchema";
 
   /** Private empty constructor */

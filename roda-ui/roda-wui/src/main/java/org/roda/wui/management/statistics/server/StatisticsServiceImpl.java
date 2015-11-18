@@ -18,7 +18,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.data.StatisticData;
 import org.roda.core.data.adapter.ContentAdapter;
 import org.roda.core.data.adapter.filter.DateRangeFilterParameter;
@@ -46,7 +47,7 @@ import config.i18n.server.StatisticsListReportMessages;
 public class StatisticsServiceImpl extends RemoteServiceServlet implements StatisticsService {
 
   private static final long serialVersionUID = 5532120366373431284L;
-  private static final Logger logger = Logger.getLogger(StatisticsServiceImpl.class);
+  private static final Logger logger = LoggerFactory.getLogger(StatisticsServiceImpl.class);
 
   private final StatisticsHelper helper = new StatisticsHelper();
 

@@ -14,7 +14,8 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * System command utility.
@@ -23,7 +24,7 @@ import org.apache.log4j.Logger;
  * @author Luis Faria
  */
 public class CommandUtility {
-  private static final Logger logger = Logger.getLogger(CommandUtility.class);
+  private static final Logger logger = LoggerFactory.getLogger(CommandUtility.class);
 
   /**
    * Execute the given command line.
@@ -120,7 +121,7 @@ public class CommandUtility {
 }
 
 class CaptureOutputThread extends Thread {
-  private static final Logger logger = Logger.getLogger(CaptureOutputThread.class);
+  private static final Logger logger = LoggerFactory.getLogger(CaptureOutputThread.class);
 
   InputStream is;
   String output;

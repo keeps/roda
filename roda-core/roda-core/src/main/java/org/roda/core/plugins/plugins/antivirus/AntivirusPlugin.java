@@ -15,7 +15,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
 import org.roda.core.data.common.InvalidParameterException;
@@ -31,7 +32,7 @@ import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.fs.FileStorageService;
 
 public class AntivirusPlugin implements Plugin<AIP> {
-  private static final Logger LOGGER = Logger.getLogger(AntivirusPlugin.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AntivirusPlugin.class);
   private String antiVirusClassName;
   private AntiVirus antiVirus = null;
 

@@ -26,7 +26,7 @@ import javax.xml.transform.stream.StreamSource;
  */
 public class XsltUtility {
 
-  // final private static Logger logger = Logger.getLogger(XsltUtility.class);
+  // final private static Logger logger = LoggerFactory.getLogger(XsltUtility.class);
 
   /**
    * Apply the XSLT transformation (<code>xsltStream</code>) to the xml given (

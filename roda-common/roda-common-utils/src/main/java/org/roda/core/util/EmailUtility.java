@@ -20,7 +20,8 @@ import javax.mail.internet.MimeMultipart;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Based in an article by Sudhir Ancha
@@ -29,7 +30,7 @@ import org.apache.log4j.Logger;
  * @author Rui Castro
  */
 public class EmailUtility {
-  private static final Logger logger = Logger.getLogger(EmailUtility.class);
+  private static final Logger logger = LoggerFactory.getLogger(EmailUtility.class);
 
   private String smtpHost = null;
 
