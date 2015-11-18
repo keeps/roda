@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
@@ -54,13 +55,12 @@ public class IndexFolderObserver implements FolderObserver {
     try {
       Path relativePath = basePath.relativize(createdPath);
       if (relativePath.getNameCount() > 1) {
-        List<SolrInputDocument> parents = new ArrayList<SolrInputDocument>();
         SolrInputDocument pathDocument = SolrUtils.transferredResourceToSolrDocument(createdPath, relativePath);
+        
+        List<SolrInputDocument> parents = new ArrayList<SolrInputDocument>();
         Path parentPath = createdPath.getParent();
-
         // add parents to parents arrayList
         while (!Files.isSameFile(basePath, parentPath)) {
-          LOGGER.debug("PARENT: " + parentPath);
           Path relativeParentPath = basePath.relativize(parentPath);
           if (relativeParentPath.getNameCount() > 1) {
             SolrInputDocument sidParent = SolrUtils.transferredResourceToSolrDocument(parentPath,
@@ -98,11 +98,29 @@ public class IndexFolderObserver implements FolderObserver {
 
   @Override
   public void pathModified(Path basePath, Path modifiedPath) {
-    if (!Files.isDirectory(modifiedPath)) {
-      pathDeleted(basePath, modifiedPath);
-      pathAdded(basePath, modifiedPath);
-    } else {
-      LOGGER.debug("TO IMPLEMENT... UPDATE FOLDER NAME...");
+    LOGGER.debug("MODIFY: " + modifiedPath.toString());
+    Path relativePath = basePath.relativize(modifiedPath);
+    if (relativePath.getNameCount() > 1) {
+      try {
+        SolrDocument current = index.getById(RodaConstants.INDEX_SIP, relativePath.toString().replaceAll("\\s+", ""));
+        long sizeToRemove = SolrUtils.objectToLong(current.getFieldValue(RodaConstants.TRANSFERRED_RESOURCE_SIZE));
+
+        Path parentPath = modifiedPath.getParent();
+        while (!Files.isSameFile(basePath, parentPath)) {
+          Path relativeParentPath = basePath.relativize(parentPath);
+          if (relativeParentPath.getNameCount() > 1) {
+            SolrDocument p = index.getById(RodaConstants.INDEX_SIP,
+              relativeParentPath.toString().replaceAll("\\s+", ""));
+            p.setField(RodaConstants.TRANSFERRED_RESOURCE_SIZE,
+              SolrUtils.objectToLong(p.getFieldValue(RodaConstants.TRANSFERRED_RESOURCE_SIZE)) - sizeToRemove);
+            index.add(RodaConstants.INDEX_SIP, ClientUtils.toSolrInputDocument(p));
+          }
+          parentPath = parentPath.getParent();
+        }
+        index.commit(RodaConstants.INDEX_SIP);
+      } catch (Exception e) {
+        LOGGER.error(e.getMessage(), e);
+      }
     }
 
   }
@@ -114,18 +132,23 @@ public class IndexFolderObserver implements FolderObserver {
     try {
       SolrDocument current = index.getById(RodaConstants.INDEX_SIP, relativePath.toString().replaceAll("\\s+", ""));
       long sizeToRemove = SolrUtils.objectToLong(current.getFieldValue(RodaConstants.TRANSFERRED_RESOURCE_SIZE));
-      LOGGER.debug("TO REMOVE: " + sizeToRemove);
+
       Path parentPath = deletedPath.getParent();
-      while (!Files.isSameFile(basePath, parentPath)) {
-        LOGGER.debug("PARENT: " + parentPath);
-        Path relativeParentPath = basePath.relativize(parentPath);
-        if (relativeParentPath.getNameCount() > 1) {
-          SolrDocument p = index.getById(RodaConstants.INDEX_SIP, relativeParentPath.toString().replaceAll("\\s+", ""));
-          p.setField(RodaConstants.TRANSFERRED_RESOURCE_SIZE,
-            SolrUtils.objectToLong(p.getFieldValue(RodaConstants.TRANSFERRED_RESOURCE_SIZE)) - sizeToRemove);
-          index.add(RodaConstants.INDEX_SIP, ClientUtils.toSolrInputDocument(p));
+
+      try {
+        while (!Files.isSameFile(basePath, parentPath)) {
+          Path relativeParentPath = basePath.relativize(parentPath);
+          if (relativeParentPath.getNameCount() > 1) {
+            SolrDocument p = index.getById(RodaConstants.INDEX_SIP,
+              relativeParentPath.toString().replaceAll("\\s+", ""));
+            p.setField(RodaConstants.TRANSFERRED_RESOURCE_SIZE,
+              SolrUtils.objectToLong(p.getFieldValue(RodaConstants.TRANSFERRED_RESOURCE_SIZE)) - sizeToRemove);
+            index.add(RodaConstants.INDEX_SIP, ClientUtils.toSolrInputDocument(p));
+          }
+          parentPath = parentPath.getParent();
         }
-        parentPath = parentPath.getParent();
+      } catch (NoSuchFileException nsfe) {
+        // Exception occurs when modifying a resource... but no problem...
       }
       if (relativePath.getNameCount() > 1) {
         index.deleteById(RodaConstants.INDEX_SIP, relativePath.toString().replaceAll("\\s+", ""));
