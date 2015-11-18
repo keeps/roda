@@ -47,6 +47,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.FacetField.Count;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
@@ -529,7 +530,7 @@ public class SolrUtils {
     return ret;
   }
 
-  private static Long objectToLong(Object object) {
+  public static Long objectToLong(Object object) {
     Long ret;
     if (object instanceof Long) {
       ret = (Long) object;
@@ -1283,7 +1284,7 @@ public class SolrUtils {
     sip.addField(RodaConstants.TRANSFERRED_RESOURCE_DATE, new Date());
     if (createdPath.toFile().isDirectory()) {
       sip.addField(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, false);
-      sip.addField(RodaConstants.TRANSFERRED_RESOURCE_SIZE, getSizePath(createdPath));
+      sip.addField(RodaConstants.TRANSFERRED_RESOURCE_SIZE, 0L);
     } else {
       sip.addField(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, true);
       long fileSize = Files.size(createdPath);
@@ -1297,21 +1298,23 @@ public class SolrUtils {
 
   public static SolrInputDocument addSize(SolrDocument sd, long size) {
     LOGGER.debug("Adding " + size + " TO " + sd.get("id"));
-    SolrInputDocument sid = new SolrInputDocument();
+    LOGGER.debug("------------------------------");
+    LOGGER.debug("IN: ");
     for (String s : sd.getFieldNames()) {
-      LOGGER.debug("FIELD NAME: " + s);
-      if (s.equalsIgnoreCase(RodaConstants.TRANSFERRED_RESOURCE_SIZE)) {
-        LOGGER.debug("BEFORE PARSE: " + sd.getFieldValue(s));
-        long currentSize = objectToLong(sd.getFieldValue(s));
-        LOGGER.debug("CURRENT SIZE: " + currentSize);
-        currentSize += size;
-        LOGGER.debug("UPDATED SIZE: " + currentSize);
-        sid.addField(s, currentSize);
-      } else {
-        sid.addField(s, sd.get(s));
-      }
+      LOGGER.debug(s + " - " + sd.getFieldValue(s));
     }
-    // TODO Auto-generated method stub
+    LOGGER.debug("------------------------------");
+    SolrInputDocument sid = ClientUtils.toSolrInputDocument(sd);
+    long currentSize = objectToLong(sid.getField(RodaConstants.TRANSFERRED_RESOURCE_SIZE).getValue());
+    currentSize = currentSize + size;
+    sid.setField(RodaConstants.TRANSFERRED_RESOURCE_SIZE, currentSize);
+    sid.removeField("_version_");
+    LOGGER.debug("------------------------------");
+    LOGGER.debug("OUT: ");
+    for (String s : sid.getFieldNames()) {
+      LOGGER.debug(s + " - " + sid.getFieldValue(s));
+    }
+    LOGGER.debug("------------------------------");
     return sid;
   }
 
