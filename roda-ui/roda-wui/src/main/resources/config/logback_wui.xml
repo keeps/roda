@@ -1,38 +1,34 @@
 <included>
-  <appender name="WUI_FILEOUT" class="ch.qos.logback.core.FileAppender">
+	<appender name="WUI_FILEOUT" class="ch.qos.logback.core.FileAppender">
 		<file>${roda.home}/log/roda-wui.log</file>
 		<encoder>
-			<pattern>%d [%thread] %-5level %logger{36} - %msg%n
-			</pattern>
+			<pattern>%d [%thread] %-5level %logger{36} - %msg%n</pattern>
 		</encoder>
 	</appender>
-	
+
 	<logger name="org.roda.wui" additivity="false">
-		<!--
-			Client-side logging must be set in
-			org.roda.wui.common.client.GWTLogger and is also influenced
-			by this logger level
-		-->
+		<!-- Client-side logging must be set in org.roda.wui.common.client.GWTLogger 
+			and is also influenced by this logger level -->
 		<level value="INFO" />
 		<appender-ref ref="WUI_FILEOUT" />
 	</logger>
-	
+
 	<logger name="org.roda.wui.common.server" additivity="false">
-      <level value="DEBUG" />
-      <appender-ref ref="WUI_FILEOUT" />
-   </logger>
-   
+		<level value="DEBUG" />
+		<appender-ref ref="WUI_FILEOUT" />
+	</logger>
+
 	<logger name="org.roda.wui.common" additivity="false">
-      <level value="DEBUG" />
-      <appender-ref ref="WUI_FILEOUT" />
-   </logger>
+		<level value="DEBUG" />
+		<appender-ref ref="WUI_FILEOUT" />
+	</logger>
 
-   <logger name="org.roda.wui.filter" additivity="false">
-      <level value="DEBUG" />
-      <appender-ref ref="WUI_FILEOUT" />
-   </logger>
+	<logger name="org.roda.wui.filter" additivity="false">
+		<level value="DEBUG" />
+		<appender-ref ref="WUI_FILEOUT" />
+	</logger>
 
-	<logger name="org.roda.ingest" additivity="false">
+	<logger name="org.roda.wui.ingest" additivity="false">
 		<level value="INFO" />
 		<appender-ref ref="WUI_FILEOUT" />
 	</logger>

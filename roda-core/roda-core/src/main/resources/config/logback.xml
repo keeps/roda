@@ -4,29 +4,25 @@
 	<include optional="true" url="${roda.logback.include}" />
 
 	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-		<!-- encoders are assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder 
-			by default -->
 		<encoder>
-			<pattern>%d [%thread] %-5level %logger{36} - %msg%n
-			</pattern>
+			<pattern>%d [%thread] %-5level %logger{36} - %msg%n</pattern>
 		</encoder>
 	</appender>
 
 	<appender name="CORE_FILEOUT" class="ch.qos.logback.core.FileAppender">
 		<file>${roda.home}/log/roda-core.log</file>
 		<encoder>
-			<pattern>%d [%thread] %-5level %logger{36} - %msg%n
-			</pattern>
+			<pattern>%d [%thread] %-5level %logger{36} - %msg%n</pattern>
 		</encoder>
 	</appender>
 
-	<logger name="org.roda.core" additivity="false">
-		<level value="INFO" />
+	<logger name="org.roda.core.plugins" additivity="false">
+		<level value="DEBUG" />
 		<appender-ref ref="CORE_FILEOUT" />
 	</logger>
 
-	<logger name="org.roda.core.plugins" additivity="false">
-		<level value="DEBUG" />
+	<logger name="org.roda.core" additivity="false">
+		<level value="INFO" />
 		<appender-ref ref="CORE_FILEOUT" />
 	</logger>
 
@@ -35,12 +31,7 @@
 		<appender-ref ref="CORE_FILEOUT" />
 	</logger>
 
-	<root>
-		<level value="WARN" />
-		<appender-ref ref="CORE_FILEOUT" />
-	</root>
-
 	<root level="warn">
-		<appender-ref ref="STDOUT" />
+		<appender-ref ref="CORE_FILEOUT" />
 	</root>
 </configuration>
