@@ -8,12 +8,20 @@
 package org.roda.wui.api.v1;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import org.roda.wui.api.v1.entities.Job;
+import org.roda.wui.api.v1.entities.Jobs;
+import org.roda.wui.api.v1.utils.ApiUtils;
 
 import io.swagger.annotations.Api;
 /*
@@ -53,24 +61,31 @@ public class JobsResource {
   private HttpServletRequest request;
 
   @GET
-  public Response listJobs() {
-    return null;
+  public Response listJobs(@QueryParam("acceptFormat") String acceptFormat) {
+    String mediaType = ApiUtils.getMediaType(acceptFormat, request.getHeader("Accept"));
+    Jobs jobs = new Jobs();
+    jobs.getJobs().add(new Job("xtpo"));
+    jobs.getJobs().add(new Job("zjas"));
+    return Response.ok(jobs, mediaType).build();
   }
 
   @GET
   @Path("/{jobId}")
-  public Response getJob(@PathParam("jobId") String jobId) {
-    return null;
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+  public Response getJob(@PathParam("jobId") String jobId, @QueryParam("acceptFormat") String acceptFormat) {
+    String mediaType = ApiUtils.getMediaType(acceptFormat, request.getHeader("Accept"));
+
+    Job job = new Job();
+    job.setId(jobId);
+
+    return Response.ok(job, mediaType).build();
   }
 
   @POST
-  public Response createJobWithoutId() {
-    return null;
-  }
-
-  @POST
-  @Path("/{jobId}")
-  public Response createJob(@PathParam("jobId") String jobId) {
-    return null;
+  @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+  public Response createJob(Job job, @QueryParam("acceptFormat") String acceptFormat) {
+    String mediaType = ApiUtils.getMediaType(acceptFormat, request.getHeader("Accept"));
+    return Response.ok(job, mediaType).build();
   }
 }

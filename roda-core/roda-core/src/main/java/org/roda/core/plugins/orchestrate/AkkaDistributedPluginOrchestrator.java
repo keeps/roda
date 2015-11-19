@@ -67,7 +67,7 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin {
     Config conf = ConfigFactory.parseString("akka.cluster.roles=[" + role + "]")
       .withFallback(ConfigFactory.parseString("akka.cluster.seed-nodes=[\"akka.tcp://" + systemPath + "\"]"))
       .withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.hostname=" + hostname))
-      .withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.port=" + port)).withFallback(ConfigFactory.load());
+      .withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.port=" + port)).withFallback(ConfigFactory.load("config/orchestrator/application"));
 
     clusterSystem = ActorSystem.create(systemName, conf);
 

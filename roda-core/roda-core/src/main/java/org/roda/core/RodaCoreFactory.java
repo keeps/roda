@@ -127,7 +127,7 @@ public class RodaCoreFactory {
   private static PluginOrchestrator pluginOrchestrator;
   private static AkkaDistributedPluginOrchestrator akkaDistributedPluginOrchestrator;
   private static AkkaDistributedPluginWorker akkaDistributedPluginWorker;
-  private static boolean FEATURE_AKKA_ENABLED = true;
+  private static boolean FEATURE_AKKA_ENABLED = false;
 
   // ApacheDS related objects
   private static ApacheDS ldap;

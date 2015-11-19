@@ -40,7 +40,7 @@ public class AkkaDistributedPluginWorker extends AkkaDistributedPlugin {
       .withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.port=" + port))
       .withFallback(ConfigFactory.parseString(
         "akka.cluster.client.initial-contacts=[\"akka.tcp://" + clusterSystemPath + "/system/receptionist\"]"))
-      .withFallback(ConfigFactory.load("worker"));
+      .withFallback(ConfigFactory.load("config/orchestrator/worker"));
 
     workerSystem = ActorSystem.create("WorkerSystem", conf);
 
