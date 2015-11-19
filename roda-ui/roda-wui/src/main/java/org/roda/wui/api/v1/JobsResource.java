@@ -7,6 +7,9 @@
  */
 package org.roda.wui.api.v1;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -19,9 +22,16 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.v2.TransferredResource;
+import org.roda.core.plugins.Plugin;
+import org.roda.wui.api.controllers.BrowserHelper;
 import org.roda.wui.api.v1.entities.Job;
 import org.roda.wui.api.v1.entities.Jobs;
 import org.roda.wui.api.v1.utils.ApiUtils;
+import org.roda.wui.common.client.GenericException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.swagger.annotations.Api;
 /*
@@ -57,6 +67,8 @@ public class JobsResource {
   public static final String ENDPOINT = "/v1/jobs";
   public static final String SWAGGER_ENDPOINT = "v1 jobs";
 
+  private static Logger LOGGER = LoggerFactory.getLogger(JobsResource.class);
+
   @Context
   private HttpServletRequest request;
 
@@ -81,11 +93,51 @@ public class JobsResource {
     return Response.ok(job, mediaType).build();
   }
 
+  /**
+   * {"id":"20151119_ingest_PT-KEEPS-CC-3-29","plugin":
+   * "org.roda.core.plugins.plugins.ingest.BagitToAIPPlugin","resourceType":
+   * "bagit","orchestratorMethod":"runPluginOnTransferredResources","objectType"
+   * :"org.roda.core.data.v2.TransferredResource","pluginParameters":null,
+   * "objectIds":["PT-KEEPS-CC-3-29.zip"]} curl -H
+   * "Content-Type: application/json" -X POST -d 'JSON' -u admin:roda
+   * http://192.168.2.56:8888/api/v1/jobs?acceptFormat=json
+   */
   @POST
   @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   public Response createJob(Job job, @QueryParam("acceptFormat") String acceptFormat) {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request.getHeader("Accept"));
+
+    if (isJobvalid(job)) {
+      if ("runPluginOnTransferredResources".equalsIgnoreCase(job.getOrchestratorMethod())) {
+        RodaCoreFactory.getPluginOrchestrator().runPluginOnTransferredResources(
+          (Plugin<TransferredResource>) RodaCoreFactory.getPluginManager().getPlugin(job.getPlugin()),
+          getTransferredResourcesFromObjectIds(job.getObjectIds()));
+      } else {
+
+      }
+    } else {
+      // TODO return error response
+    }
+
     return Response.ok(job, mediaType).build();
+  }
+
+  private List<TransferredResource> getTransferredResourcesFromObjectIds(List<String> objectIds) {
+    List<TransferredResource> res = new ArrayList<TransferredResource>();
+    for (String objectId : objectIds) {
+      try {
+        res.add(BrowserHelper.retrieveTransferredResource(objectId));
+      } catch (GenericException e) {
+        LOGGER.error("Error retrieving transferred resource {}", objectId, e);
+      }
+    }
+    LOGGER.info(">>" + res);
+    return res;
+  }
+
+  private boolean isJobvalid(Job job) {
+    // FIXME
+    return true;
   }
 }

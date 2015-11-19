@@ -21,16 +21,19 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.reflections.Reflections;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.PluginInfo;
 import org.roda.core.util.ClassLoaderUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This is the RODA plugin manager. It is responsible for loading {@link Plugin}
@@ -48,6 +51,7 @@ public class PluginManager {
 
   private Timer loadPluginsTimer = null;
   private Map<Path, JarPlugin> jarPluginCache = new HashMap<Path, JarPlugin>();
+  private Map<String, Plugin<?>> internalPluginChache = new HashMap<String, Plugin<?>>();
 
   /**
    * The default Plugin Manager instance.
@@ -84,6 +88,9 @@ public class PluginManager {
         plugins.add(jarPlugin.plugin);
       }
     }
+
+    plugins.addAll(internalPluginChache.values());
+
     return plugins;
   }
 
@@ -114,9 +121,20 @@ public class PluginManager {
    */
   public Plugin<?> getPlugin(String pluginID) {
     Plugin<?> plugin = null;
-    for (JarPlugin jarPlugin : this.jarPluginCache.values()) {
-      if (jarPlugin.plugin != null && jarPlugin.plugin.getClass().getName().equals(pluginID)) {
-        plugin = jarPlugin.plugin;
+
+    if (internalPluginChache.get(pluginID) != null) {
+      plugin = internalPluginChache.get(pluginID);
+    }
+
+    boolean internalPluginTakesPrecedence = RodaCoreFactory.getRodaConfiguration()
+      .getBoolean("core.plugins.internal.take_precedence_over_external");
+    if (plugin == null || !internalPluginTakesPrecedence) {
+
+      for (JarPlugin jarPlugin : this.jarPluginCache.values()) {
+        if (jarPlugin.plugin != null && jarPlugin.plugin.getClass().getName().equals(pluginID)) {
+          plugin = jarPlugin.plugin;
+          break;
+        }
       }
     }
     return plugin;
@@ -162,8 +180,9 @@ public class PluginManager {
   private PluginManager() throws PluginManagerException {
     logger.debug("Starting plugin scanner timer...");
 
+    int timeInSeconds = RodaCoreFactory.getRodaConfiguration().getInt("core.plugins.external.scheduler.interval");
     this.loadPluginsTimer = new Timer("Plugin scanner timer", true);
-    this.loadPluginsTimer.schedule(new SearchPluginsTask(), new Date(), 30 * 1000);
+    this.loadPluginsTimer.schedule(new SearchPluginsTask(), new Date(), timeInSeconds * 1000);
 
     logger.info(getClass().getSimpleName() + " init OK");
   }
@@ -174,6 +193,15 @@ public class PluginManager {
   }
 
   private void loadPlugins() {
+    // load internal RODA plugins
+    loadInternalPlugins();
+
+    // load "external" RODA plugins, i.e., those available in the plugins folder
+    loadExternalPlugins();
+
+  }
+
+  private void loadExternalPlugins() {
     try {
       List<Path> jarFiles = new ArrayList<>();
       List<URL> jarURLs = new ArrayList<>();
@@ -229,7 +257,24 @@ public class PluginManager {
     } catch (IOException e) {
       // FIXME
     }
+  }
 
+  private void loadInternalPlugins() {
+    Reflections reflections = new Reflections(
+      RodaCoreFactory.getRodaConfigurationAsString("core", "plugins", "internal", "package"));
+    Set<Class<? extends Plugin>> plugins = reflections.getSubTypesOf(Plugin.class);
+    for (Class<? extends Plugin> plugin : plugins) {
+
+      Plugin<?> p;
+      try {
+        p = (Plugin<?>) ClassLoaderUtility.createObject(plugin.getCanonicalName());
+        p.init();
+        internalPluginChache.put(plugin.getName(), p);
+      } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | PluginException e) {
+        logger.error("Unable to instantiate plugin '{}'", plugin.getCanonicalName());
+      }
+
+    }
   }
 
   private Plugin<?> loadPlugin(Path jarFile, List<URL> jarURLs) {

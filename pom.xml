@@ -990,6 +990,11 @@
 				<version>0.7</version>
 			</dependency>
 			<!-- Akka related dependencies - end -->
+			<dependency>
+				<groupId>org.reflections</groupId>
+				<artifactId>reflections</artifactId>
+				<version>0.9.10</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 	<reporting>

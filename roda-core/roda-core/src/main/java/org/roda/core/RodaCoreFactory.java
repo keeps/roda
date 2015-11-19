@@ -71,6 +71,8 @@ import org.roda.core.model.AIP;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.ModelServiceException;
 import org.roda.core.plugins.Plugin;
+import org.roda.core.plugins.PluginManager;
+import org.roda.core.plugins.PluginManagerException;
 import org.roda.core.plugins.PluginOrchestrator;
 import org.roda.core.plugins.orchestrate.AkkaDistributedPluginOrchestrator;
 import org.roda.core.plugins.orchestrate.AkkaDistributedPluginWorker;
@@ -123,6 +125,7 @@ public class RodaCoreFactory {
   private static SolrClient solr;
 
   // Orchestrator related objects
+  private static PluginManager pluginManager;
   // FIXME we should have only "one" orchestrator
   private static PluginOrchestrator pluginOrchestrator;
   private static AkkaDistributedPluginOrchestrator akkaDistributedPluginOrchestrator;
@@ -187,7 +190,13 @@ public class RodaCoreFactory {
         LOGGER.error("Error instantiating solr/index model", e);
       }
 
-      instantiatePluginsRelatedObjects(nodeType);
+      try {
+        pluginManager = PluginManager.getDefaultPluginManager(getConfigPath(), getPluginsPath());
+      } catch (PluginManagerException e) {
+        LOGGER.error("Error instantiating PluginManager", e);
+      }
+
+      instantiateNodeSpecificObjects(nodeType);
 
       instantiated = true;
     }
@@ -234,7 +243,7 @@ public class RodaCoreFactory {
     }
   }
 
-  private static void instantiatePluginsRelatedObjects(NodeType nodeType) {
+  private static void instantiateNodeSpecificObjects(NodeType nodeType) {
     if (nodeType == NodeType.MASTER) {
       if (FEATURE_AKKA_ENABLED) {
 
@@ -333,13 +342,14 @@ public class RodaCoreFactory {
   public static void ensureAllEssentialDirectoriesExist() {
     List<Path> essentialDirectories = new ArrayList<Path>();
     essentialDirectories.add(configPath);
-    essentialDirectories.add(configPath.resolve("i18n"));
-    essentialDirectories.add(configPath.resolve("ldap"));
-    essentialDirectories.add(configPath.resolve("schemas"));
     essentialDirectories.add(configPath.resolve("crosswalks"));
     essentialDirectories.add(configPath.resolve("crosswalks").resolve("ingest"));
     essentialDirectories.add(configPath.resolve("crosswalks").resolve("dissemination"));
     essentialDirectories.add(configPath.resolve("crosswalks").resolve("dissemination").resolve("html"));
+    essentialDirectories.add(configPath.resolve("i18n"));
+    essentialDirectories.add(configPath.resolve("ldap"));
+    essentialDirectories.add(configPath.resolve("plugins"));
+    essentialDirectories.add(configPath.resolve("schemas"));
     essentialDirectories.add(rodaHomePath.resolve("log"));
     essentialDirectories.add(dataPath);
     essentialDirectories.add(logPath);
@@ -474,6 +484,10 @@ public class RodaCoreFactory {
     return index;
   }
 
+  public static PluginManager getPluginManager() {
+    return pluginManager;
+  }
+
   public static PluginOrchestrator getPluginOrchestrator() {
     return pluginOrchestrator;
   }
@@ -504,6 +518,10 @@ public class RodaCoreFactory {
 
   public static Path getLogPath() {
     return logPath;
+  }
+
+  public static Path getPluginsPath() {
+    return configPath.resolve("plugins");
   }
 
   public static void closeSolrServer() {

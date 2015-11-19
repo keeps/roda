@@ -16,6 +16,11 @@
 		</encoder>
 	</appender>
 
+	<logger name="org.roda.core.plugins.PluginManager" additivity="false">
+		<level value="INFO" />
+		<appender-ref ref="CORE_FILEOUT" />
+	</logger>
+
 	<logger name="org.roda.core.plugins" additivity="false">
 		<level value="DEBUG" />
 		<appender-ref ref="CORE_FILEOUT" />
