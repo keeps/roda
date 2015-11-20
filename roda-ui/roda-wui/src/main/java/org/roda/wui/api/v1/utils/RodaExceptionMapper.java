@@ -21,8 +21,18 @@ import org.roda.wui.common.client.GenericException;
 @Provider
 public class RodaExceptionMapper implements ExceptionMapper<RODAException> {
 
+  // XXX while using jetty (e.g. gwt-devmode), this injection causes error during
+  // initialization
+  // @Context
+  // private HttpServletRequest request;
+
   @Override
   public Response toResponse(RODAException e) {
+
+    // String mediaType =
+    // ApiUtils.getMediaType(request.getParameter("acceptFormat"),
+    // request.getHeader("Accept"));
+
     Response response;
     if (e instanceof AuthorizationDeniedException) {
       response = Response.status(Status.UNAUTHORIZED)
@@ -37,6 +47,9 @@ public class RodaExceptionMapper implements ExceptionMapper<RODAException> {
       response = Response.status(Status.NOT_FOUND)
         .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
     } else {
+      // response = Response.serverError().type(mediaType)
+      // .entity(new ApiResponseMessage(ApiResponseMessage.ERROR,
+      // e.getMessage())).build();
       response = Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage()))
         .build();
     }

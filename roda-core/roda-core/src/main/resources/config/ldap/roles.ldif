@@ -170,3 +170,8 @@ objectClass: organizationalRole
 cn: ingest.list
 roleOccupant: cn=administrators,ou=groups,dc=roda,dc=org
 
+dn: cn=ingest.submit,ou=roles,dc=roda,dc=org
+objectClass: top
+objectClass: organizationalRole
+cn: ingest.submit
+roleOccupant: cn=administrators,ou=groups,dc=roda,dc=org

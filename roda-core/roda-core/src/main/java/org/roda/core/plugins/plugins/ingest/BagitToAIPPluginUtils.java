@@ -20,8 +20,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.model.AIP;
 import org.roda.core.model.ModelService;
@@ -31,6 +29,8 @@ import org.roda.core.storage.Binary;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.fs.FSUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Sets;
 

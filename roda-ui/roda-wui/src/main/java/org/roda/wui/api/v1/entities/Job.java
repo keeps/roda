@@ -1,9 +1,12 @@
 package org.roda.wui.api.v1.entities;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -37,14 +40,30 @@ public class Job implements Serializable {
   private String orchestratorMethod;
   // list of object ids to act upon
   private List<String> objectIds;
-  // object full class (e.g. org.roda.core.model.AIP, etc.)
-  private String objectType;
+  // // object full class (e.g. org.roda.core.model.AIP, etc.)
+  // private String objectType;
 
   public Job() {
     super();
+    id = UUID.randomUUID().toString();
     start = new Date();
     end = null;
     completionStatus = 0;
+    objectIds = new ArrayList<String>();
+    pluginParameters = new HashMap<String, String>();
+  }
+
+  public Job(Job job) {
+    super();
+    this.id = job.getId();
+    this.start = job.getStart();
+    this.end = job.getEnd();
+    this.completionStatus = job.getCompletionStatus();
+    this.plugin = job.getPlugin();
+    this.pluginParameters = new HashMap<String, String>(job.getPluginParameters());
+    this.resourceType = job.getResourceType();
+    this.orchestratorMethod = job.getOrchestratorMethod();
+    this.objectIds = new ArrayList<String>(job.getObjectIds());
   }
 
   public Job(String id) {
@@ -127,19 +146,11 @@ public class Job implements Serializable {
     this.objectIds = objectIds;
   }
 
-  public String getObjectType() {
-    return objectType;
-  }
-
-  public void setObjectType(String objectType) {
-    this.objectType = objectType;
-  }
-
   @Override
   public String toString() {
     return "Job [id=" + id + ", start=" + start + ", end=" + end + ", completionStatus=" + completionStatus
       + ", plugin=" + plugin + ", pluginParameters=" + pluginParameters + ", resourceType=" + resourceType
-      + ", orchestratorMethod=" + orchestratorMethod + ", objectIds=" + objectIds + ", objectType=" + objectType + "]";
+      + ", orchestratorMethod=" + orchestratorMethod + ", objectIds=" + objectIds + "]";
   }
 
 }

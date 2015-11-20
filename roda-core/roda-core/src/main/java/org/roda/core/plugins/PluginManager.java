@@ -52,6 +52,7 @@ public class PluginManager {
   private Timer loadPluginsTimer = null;
   private Map<Path, JarPlugin> jarPluginCache = new HashMap<Path, JarPlugin>();
   private Map<String, Plugin<?>> internalPluginChache = new HashMap<String, Plugin<?>>();
+  private boolean internalPluginStarted = false;
 
   /**
    * The default Plugin Manager instance.
@@ -194,7 +195,9 @@ public class PluginManager {
 
   private void loadPlugins() {
     // load internal RODA plugins
-    loadInternalPlugins();
+    if (!internalPluginStarted) {
+      loadInternalPlugins();
+    }
 
     // load "external" RODA plugins, i.e., those available in the plugins folder
     loadExternalPlugins();
@@ -275,6 +278,7 @@ public class PluginManager {
       }
 
     }
+    internalPluginStarted = true;
   }
 
   private Plugin<?> loadPlugin(Path jarFile, List<URL> jarURLs) {
