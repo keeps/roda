@@ -41,11 +41,14 @@ import org.roda.core.common.LdapUtility;
 import org.roda.core.common.Messages;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.common.UserUtility;
-import org.roda.core.common.monitor.FolderMonitor;
+import org.roda.core.common.monitor.FolderMonitorNIO;
+import org.roda.core.common.monitor.FolderObservable;
 import org.roda.core.common.monitor.FolderObserver;
 import org.roda.core.data.adapter.facet.Facets;
+import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
 import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.filter.FilterParameter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
@@ -56,6 +59,7 @@ import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.RODAMember;
 import org.roda.core.data.v2.RepresentationFilePreservationObject;
 import org.roda.core.data.v2.SimpleDescriptionObject;
+import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.data.v2.User;
 import org.roda.core.index.IndexFolderObserver;
 import org.roda.core.index.IndexService;
@@ -131,7 +135,7 @@ public class RodaCoreFactory {
 
   private static ApacheDS ldap;
 
-  private static FolderMonitor sipFolderMonitor;
+  private static FolderObservable sipFolderMonitor;
   private static FolderObserver sipFolderObserver;
 
   private static Path rodaApacheDsConfigDirectory = null;
@@ -389,10 +393,10 @@ public class RodaCoreFactory {
     String SIPFolderPath = rodaConfig.getString("sip.folder");
     int SIPTimeout = rodaConfig.getInt("sip.timeout");
     Path sipFolderPath = dataPath.resolve(SIPFolderPath);
-
-    // sipFolderMonitor = new FolderMonitorNIO(sipFolderPath, SIPTimeout);
-    sipFolderMonitor = new FolderMonitor(sipFolderPath, SIPTimeout);
     sipFolderObserver = new IndexFolderObserver(solr, sipFolderPath);
+    sipFolderMonitor = new FolderMonitorNIO(sipFolderPath, SIPTimeout, solr,true,null,sipFolderObserver);
+    // sipFolderMonitor = new FolderMonitor(sipFolderPath, SIPTimeout);
+    
     sipFolderMonitor.addFolderObserver(sipFolderObserver);
   }
 
@@ -424,7 +428,7 @@ public class RodaCoreFactory {
     return akkaDistributedPluginOrchestrator;
   }
 
-  public static FolderMonitor getFolderMonitor() {
+  public static FolderObservable getFolderMonitor() {
     return sipFolderMonitor;
   }
 
@@ -691,7 +695,7 @@ public class RodaCoreFactory {
   private static void printMainUsage() {
     System.err.println("Syntax:");
     System.err.println("java -jar x.jar index reindex");
-    System.err.println("java -jar x.jar index list users|groups");
+    System.err.println("java -jar x.jar index list users|groups|sips");
     System.err.println("java -jar x.jar orphans [newParentID]");
     System.err.println("java -jar x.jar fixity");
     System.err.println("java -jar x.jar antivirus");
@@ -720,6 +724,23 @@ public class RodaCoreFactory {
     }
   }
 
+  private static void printCountSips(Sorter sorter, Sublist sublist, Facets facets) throws IndexServiceException {
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, "true"));
+    long countFiles = index.count(TransferredResource.class, filter);
+    filter = new Filter(new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, "false"));
+    long countDirectories = index.count(TransferredResource.class, filter);
+    Filter f1 = new Filter();
+    FilterParameter p1 = new EmptyKeyFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENTPATH);
+    FilterParameter p2 = new BasicSearchFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ISFILE,"false");
+    f1.add(p1);
+    f1.add(p2);
+    long countSIP = index.count(TransferredResource.class, f1);
+    
+    System.out.println("Total number of directories: "+countDirectories);
+    System.out.println("Total number of files: "+countFiles);
+    System.out.println("Total number of SIPs: "+countSIP);
+  }
+
   private static void printPreservationEvents(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
     throws IndexServiceException {
     index.find(EventPreservationObject.class, filter, sorter, sublist, facets);
@@ -746,6 +767,8 @@ public class RodaCoreFactory {
         Filter filter = new Filter(
           new SimpleFilterParameter(RodaConstants.MEMBERS_IS_USER, "users".equals(args.get(2)) ? "true" : "false"));
         printIndexMembers(args, filter, null, new Sublist(0, 10000), null);
+      } else if ("list".equals(args.get(1)) && ("sips".equals(args.get(2)))) {
+        printCountSips(null, new Sublist(0, 10000), null);
       } else if ("reindex".equals(args.get(1)) && args.size() == 2) {
         runReindexAipsPlugin();
       } else if ("reindex".equals(args.get(1)) && args.size() >= 3) {

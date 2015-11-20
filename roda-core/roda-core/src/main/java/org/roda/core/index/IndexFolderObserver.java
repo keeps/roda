@@ -8,6 +8,7 @@
 package org.roda.core.index;
 
 import java.io.IOException;
+import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
 import java.nio.file.Files;
@@ -15,6 +16,8 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.EnumSet;
 import java.util.List;
 
 import org.apache.solr.client.solrj.SolrClient;
@@ -34,29 +37,32 @@ public class IndexFolderObserver implements FolderObserver {
 
   private final SolrClient index;
 
-  private ReindexSipRunnable t;
+  private ReindexSipRunnable reindexThread;
+
+  private Path basePath;
 
   public IndexFolderObserver(SolrClient index, Path basePath) throws SolrServerException, IOException {
     super();
     this.index = index;
-    clearIndex();
-    t = new ReindexSipRunnable(basePath);
-    t.run();
+    this.basePath = basePath;
   }
 
-  private void clearIndex() throws SolrServerException, IOException {
-    index.deleteByQuery(RodaConstants.INDEX_SIP, "*:*");
-    index.commit(RodaConstants.INDEX_SIP);
-
+  public void reindex(Path base, Date from) {
+    reindexThread = new ReindexSipRunnable(base, from);
+    reindexThread.run();
   }
 
   public void pathAdded(Path basePath, Path createdPath) {
+    pathAdded(basePath, createdPath, true);
+  }
+
+  public void pathAdded(Path basePath, Path createdPath, boolean commit) {
     LOGGER.debug("ADD " + createdPath.toString());
     try {
       Path relativePath = basePath.relativize(createdPath);
       if (relativePath.getNameCount() > 1) {
         SolrInputDocument pathDocument = SolrUtils.transferredResourceToSolrDocument(createdPath, relativePath);
-        
+
         List<SolrInputDocument> parents = new ArrayList<SolrInputDocument>();
         Path parentPath = createdPath.getParent();
         // add parents to parents arrayList
@@ -87,7 +93,9 @@ public class IndexFolderObserver implements FolderObserver {
             }
           }
         }
-        index.commit(RodaConstants.INDEX_SIP);
+        if (commit) {
+          index.commit(RodaConstants.INDEX_SIP);
+        }
       }
     } catch (IOException | SolrServerException e) {
       LOGGER.error("Error adding path to SIPMonitorIndex: " + e.getMessage(), e);
@@ -103,19 +111,23 @@ public class IndexFolderObserver implements FolderObserver {
     if (relativePath.getNameCount() > 1) {
       try {
         SolrDocument current = index.getById(RodaConstants.INDEX_SIP, relativePath.toString().replaceAll("\\s+", ""));
-        long sizeToRemove = SolrUtils.objectToLong(current.getFieldValue(RodaConstants.TRANSFERRED_RESOURCE_SIZE));
-
-        Path parentPath = modifiedPath.getParent();
-        while (!Files.isSameFile(basePath, parentPath)) {
-          Path relativeParentPath = basePath.relativize(parentPath);
-          if (relativeParentPath.getNameCount() > 1) {
-            SolrDocument p = index.getById(RodaConstants.INDEX_SIP,
-              relativeParentPath.toString().replaceAll("\\s+", ""));
-            p.setField(RodaConstants.TRANSFERRED_RESOURCE_SIZE,
-              SolrUtils.objectToLong(p.getFieldValue(RodaConstants.TRANSFERRED_RESOURCE_SIZE)) - sizeToRemove);
-            index.add(RodaConstants.INDEX_SIP, ClientUtils.toSolrInputDocument(p));
+        if(current==null){
+          pathAdded(basePath, modifiedPath);
+        }else{
+          long sizeToRemove = SolrUtils.objectToLong(current.getFieldValue(RodaConstants.TRANSFERRED_RESOURCE_SIZE));
+  
+          Path parentPath = modifiedPath.getParent();
+          while (!Files.isSameFile(basePath, parentPath)) {
+            Path relativeParentPath = basePath.relativize(parentPath);
+            if (relativeParentPath.getNameCount() > 1) {
+              SolrDocument p = index.getById(RodaConstants.INDEX_SIP,
+                relativeParentPath.toString().replaceAll("\\s+", ""));
+              p.setField(RodaConstants.TRANSFERRED_RESOURCE_SIZE,
+                SolrUtils.objectToLong(p.getFieldValue(RodaConstants.TRANSFERRED_RESOURCE_SIZE)) - sizeToRemove);
+              index.add(RodaConstants.INDEX_SIP, ClientUtils.toSolrInputDocument(p));
+            }
+            parentPath = parentPath.getParent();
           }
-          parentPath = parentPath.getParent();
         }
         index.commit(RodaConstants.INDEX_SIP);
       } catch (Exception e) {
@@ -164,15 +176,21 @@ public class IndexFolderObserver implements FolderObserver {
 
   public class ReindexSipRunnable implements Runnable {
     private Path basePath;
+    private long counter;
+    private Date from;
 
-    public ReindexSipRunnable(Path basePath) {
+    public ReindexSipRunnable(Path basePath, Date from) {
       this.basePath = basePath;
+      this.counter = 0;
+      this.from = from;
     }
 
     public void run() {
-      LOGGER.debug("Start indexing SIPs");
+      long start = System.currentTimeMillis();
+      LOGGER.debug("Start indexing SIPs: " + basePath.toString());
       try {
-        Files.walkFileTree(basePath, new FileVisitor<Path>() {
+        EnumSet<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
+        Files.walkFileTree(basePath, opts, 100, new FileVisitor<Path>() {
           @Override
           public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
             return FileVisitResult.CONTINUE;
@@ -180,7 +198,20 @@ public class IndexFolderObserver implements FolderObserver {
 
           @Override
           public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-            pathAdded(basePath, file);
+            Date modifiedDate = new Date(attrs.lastModifiedTime().toMillis());
+            if (from == null || from.before(modifiedDate)) {
+              pathAdded(basePath, file, false);
+              counter++;
+              if (counter >= 1000) {
+                try {
+                  LOGGER.debug("Commiting...");
+                  index.commit(RodaConstants.INDEX_SIP);
+                  counter = 0;
+                } catch (IOException | SolrServerException e) {
+                  LOGGER.error(e.getMessage(), e);
+                }
+              }
+            }
             return FileVisitResult.CONTINUE;
           }
 
@@ -196,6 +227,7 @@ public class IndexFolderObserver implements FolderObserver {
         });
         index.commit(RodaConstants.INDEX_SIP);
         LOGGER.debug("End indexing SIPs");
+        LOGGER.debug("TIME: " + ((System.currentTimeMillis() - start) / 1000) + " segundos");
       } catch (IOException | SolrServerException e) {
         LOGGER.error("ERROR REINDEXING SIPS");
       }

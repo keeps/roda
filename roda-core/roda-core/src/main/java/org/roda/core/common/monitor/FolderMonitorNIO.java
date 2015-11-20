@@ -15,7 +15,9 @@ import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 
 import java.io.IOException;
 import java.nio.file.FileSystems;
+import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
+import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
@@ -23,30 +25,42 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
+import java.util.Date;
+import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
+import org.roda.core.data.common.RodaConstants;
+import org.roda.core.index.IndexFolderObserver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class FolderMonitorNIO extends FolderObservable {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(FolderMonitor.class);
+  FolderObserver observer;
+  private static final Logger LOGGER = LoggerFactory.getLogger(FolderMonitorNIO.class);
   Path basePath;
   int timeout;
   Thread th;
+  boolean index;
+  Date from;
+  SolrClient solr;
 
-  public FolderMonitorNIO(Path p, int timeout) throws Exception {
+  public FolderMonitorNIO(Path p, int timeout, EmbeddedSolrServer solr, boolean index, Date from, FolderObserver observer) throws Exception {
     this.basePath = p;
     this.timeout = timeout;
+    this.index = index;
+    this.from = from;
+    this.solr = solr;
+    this.observer = observer;
     startWatch();
   }
 
   private void startWatch() throws Exception {
     LOGGER.debug("STARTING WATCH (NIO) ON FOLDER: " + basePath.toString());
-    WatchDir watchDir = new WatchDir(basePath, true);
+    WatchDir watchDir = new WatchDir(basePath, true, solr, index, from,observer);
     th = new Thread(watchDir, "FolderWatcher");
     th.start();
     LOGGER.debug("WATCH (NIO) ON FOLDER " + basePath.toString() + " STARTED");
@@ -56,6 +70,16 @@ public class FolderMonitorNIO extends FolderObservable {
     private final WatchService watcher;
     private final Map<WatchKey, Path> keys;
     private final boolean recursive;
+    private final SolrClient solr;
+    private long counter;
+    private final Path watched;
+    private final FolderObserver folderObserver;
+
+    private void clearIndex() throws SolrServerException, IOException {
+      LOGGER.debug("clearIndex()");
+      solr.deleteByQuery(RodaConstants.INDEX_SIP, "*:*");
+      solr.commit(RodaConstants.INDEX_SIP);
+    }
 
     @SuppressWarnings("unchecked")
     <T> WatchEvent<T> cast(WatchEvent<?> event) {
@@ -64,33 +88,104 @@ public class FolderMonitorNIO extends FolderObservable {
 
     @Override
     public void run() {
+      long startTime = System.currentTimeMillis();
+      try {
+        if (index && from == null) {
+          clearIndex();
+        }
+        if (recursive) {
+          registerAll(watched, index, from);
+        } else {
+          register(watched, index, from);
+        }
+      } catch (SolrServerException | IOException e) {
+        LOGGER.error("Error initialing watch thread: " + e.getMessage(), e);
+      }
+      LOGGER.debug("STARTUP ENDED...");
+      LOGGER.debug("TIME ELAPSED: "+((System.currentTimeMillis()-startTime)/1000)+" segundos");
       processEvents();
     }
 
-    private void register(Path dir) throws IOException {
-      WatchKey key = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
-      keys.put(key, dir);
+    private void register(Path directoryPath, boolean index, Date from) throws IOException {
+      LOGGER.debug("Register: "+directoryPath);
+      WatchKey key = directoryPath.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
+      keys.put(key, directoryPath);
+      if (index) {
+        if (from == null || from.before(new Date(Files.getLastModifiedTime(directoryPath).toMillis()))) {
+          LOGGER.debug("Adding "+basePath+" TO INDEX");
+          observer.pathAdded(basePath, directoryPath, false);
+          counter++;
+          if (counter >= 1000) {
+            try {
+              LOGGER.debug("Commiting SIPS");
+              solr.commit(RodaConstants.INDEX_SIP);
+            } catch (SolrServerException | IOException e) {
+              LOGGER.error("Error commiting SIPS: " + e.getMessage(), e);
+            }
+            counter = 0;
+          }
+        }
+        Files.walkFileTree(directoryPath, new FileVisitor<Path>() {
+          @Override
+          public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+            return FileVisitResult.CONTINUE;
+          }
+
+          @Override
+          public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+            return FileVisitResult.CONTINUE;
+          }
+
+          @Override
+          public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+            if (!Files.isDirectory(file)) {
+              if (from == null || from.before(new Date(Files.getLastModifiedTime(file).toMillis()))) {
+                LOGGER.debug("Adding "+basePath+" TO INDEX");
+                observer.pathAdded(basePath, file, false);
+                counter++;
+                if (counter >= 1000) {
+                  try {
+                    LOGGER.debug("Commiting SIPS");
+                    solr.commit(RodaConstants.INDEX_SIP);
+                  } catch (SolrServerException | IOException e) {
+                    LOGGER.error("Error commiting SIPS: " + e.getMessage(), e);
+                  }
+                  counter = 0;
+                }
+              }
+            }
+            return FileVisitResult.CONTINUE;
+          }
+
+          @Override
+          public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+            return FileVisitResult.CONTINUE;
+          }
+        });
+
+      }
     }
 
-    private void registerAll(final Path start) throws IOException {
-      Files.walkFileTree(start, new SimpleFileVisitor<Path>() {
+    private void registerAll(final Path start, boolean index, Date from) throws IOException {
+      LOGGER.debug("RegisterAll("+start+","+index+","+from+")");
+      EnumSet<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
+      Files.walkFileTree(start, opts, 100, new SimpleFileVisitor<Path>() {
         @Override
         public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-          register(dir);
+          register(dir, index, from);
           return FileVisitResult.CONTINUE;
         }
       });
     }
 
-    WatchDir(Path dir, boolean recursive) throws IOException {
+    WatchDir(Path dir, boolean recursive, SolrClient solr, boolean index, Date from, FolderObserver observer) throws IOException {
       this.watcher = FileSystems.getDefault().newWatchService();
       this.keys = new HashMap<WatchKey, Path>();
       this.recursive = recursive;
-      if (recursive) {
-        registerAll(dir);
-      } else {
-        register(dir);
-      }
+      this.solr = solr;
+      this.counter = 0;
+      this.watched = dir;
+      this.folderObserver = observer;
     }
 
     void processEvents() {
@@ -116,7 +211,7 @@ public class FolderMonitorNIO extends FolderObservable {
           if (recursive && (kind == ENTRY_CREATE)) {
             try {
               if (Files.isDirectory(child, NOFOLLOW_LINKS)) {
-                registerAll(child);
+                registerAll(child, false, null);
               }
             } catch (IOException x) {
             }
@@ -127,7 +222,7 @@ public class FolderMonitorNIO extends FolderObservable {
             notifyPathModified(basePath, child);
           } else if (kind == ENTRY_DELETE) {
             notifyPathDeleted(basePath, child);
-            removeKey(child.toAbsolutePath());
+            // removeKey(child.toAbsolutePath());
           }
         }
         boolean valid = key.reset();
@@ -139,22 +234,14 @@ public class FolderMonitorNIO extends FolderObservable {
         }
       }
     }
-
-    private void removeKey(Path p) {
-      List<WatchKey> keysToRemove = new ArrayList<WatchKey>();
-      for (Map.Entry<WatchKey, Path> entry : keys.entrySet()) {
-        if (entry.getValue().toString().equalsIgnoreCase(p.toString())) {
-          keysToRemove.add(entry.getKey());
-        }
-        if (entry.getValue().startsWith(p)) {
-          keysToRemove.add(entry.getKey());
-        }
-      }
-      if (keysToRemove.size() > 0) {
-        for (WatchKey key : keysToRemove) {
-          keys.remove(key);
-        }
-      }
-    }
+    /*
+     * private void removeKey(Path p) { List<WatchKey> keysToRemove = new
+     * ArrayList<WatchKey>(); for (Map.Entry<WatchKey, Path> entry :
+     * keys.entrySet()) { if
+     * (entry.getValue().toString().equalsIgnoreCase(p.toString())) {
+     * keysToRemove.add(entry.getKey()); } if (entry.getValue().startsWith(p)) {
+     * keysToRemove.add(entry.getKey()); } } if (keysToRemove.size() > 0) { for
+     * (WatchKey key : keysToRemove) { keys.remove(key); } } }
+     */
   }
 }

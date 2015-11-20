@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 public class FolderMonitor extends FolderObservable {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FolderMonitor.class);
-  Path basePath;
+  
   FileAlterationMonitor monitor;
   int timeout;
 
