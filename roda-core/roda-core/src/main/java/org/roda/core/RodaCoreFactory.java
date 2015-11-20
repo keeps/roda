@@ -13,8 +13,11 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -393,11 +396,41 @@ public class RodaCoreFactory {
     String SIPFolderPath = rodaConfig.getString("sip.folder");
     int SIPTimeout = rodaConfig.getInt("sip.timeout");
     Path sipFolderPath = dataPath.resolve(SIPFolderPath);
+    Date d = getFolderMonitorDate(sipFolderPath);
     sipFolderObserver = new IndexFolderObserver(solr, sipFolderPath);
-    sipFolderMonitor = new FolderMonitorNIO(sipFolderPath, SIPTimeout, solr,true,null,sipFolderObserver);
+    sipFolderMonitor = new FolderMonitorNIO(sipFolderPath, SIPTimeout, solr, true, d, sipFolderObserver);
     // sipFolderMonitor = new FolderMonitor(sipFolderPath, SIPTimeout);
-    
+
     sipFolderMonitor.addFolderObserver(sipFolderObserver);
+  }
+
+  public static Date getFolderMonitorDate(Path sipFolderPath) {
+    Date d = null;
+    try {
+      Path dateFile = sipFolderPath.resolve(".date");
+      if (Files.exists(dateFile)) {
+        String date = new String(Files.readAllBytes(dateFile));
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        d = df.parse(date);
+      }
+    } catch (IOException | ParseException e) {
+      LOGGER.error("Error getting last monitoring date: " + e.getMessage(), e);
+    }
+    return d;
+  }
+
+  public static void setFolderMonitorDate(Path sipFolderPath, Date d) {
+    try {
+      Path dateFile = sipFolderPath.resolve(".date");
+      if (!Files.exists(dateFile)) {
+        Files.createFile(dateFile);
+      }
+      SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+      String date = df.format(d);
+      Files.write(dateFile, date.getBytes());
+    } catch (IOException e) {
+      LOGGER.error("Error setting last monitoring date: " + e.getMessage(), e);
+    }
   }
 
   public static void stopApacheDS() {
@@ -731,14 +764,14 @@ public class RodaCoreFactory {
     long countDirectories = index.count(TransferredResource.class, filter);
     Filter f1 = new Filter();
     FilterParameter p1 = new EmptyKeyFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENTPATH);
-    FilterParameter p2 = new BasicSearchFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ISFILE,"false");
+    FilterParameter p2 = new BasicSearchFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, "false");
     f1.add(p1);
     f1.add(p2);
     long countSIP = index.count(TransferredResource.class, f1);
-    
-    System.out.println("Total number of directories: "+countDirectories);
-    System.out.println("Total number of files: "+countFiles);
-    System.out.println("Total number of SIPs: "+countSIP);
+
+    System.out.println("Total number of directories: " + countDirectories);
+    System.out.println("Total number of files: " + countFiles);
+    System.out.println("Total number of SIPs: " + countSIP);
   }
 
   private static void printPreservationEvents(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
