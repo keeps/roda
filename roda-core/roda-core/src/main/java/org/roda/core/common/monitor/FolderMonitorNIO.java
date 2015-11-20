@@ -33,24 +33,24 @@ import java.util.Map;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class FolderMonitorNIO extends FolderObservable {
-  FolderObserver observer;
   private static final Logger LOGGER = LoggerFactory.getLogger(FolderMonitorNIO.class);
-  Path basePath;
-  int timeout;
-  Thread th;
-  boolean index;
-  Date from;
-  SolrClient solr;
 
-  public FolderMonitorNIO(Path p, int timeout, EmbeddedSolrServer solr, boolean index, Date from,
-    FolderObserver observer) throws Exception {
+  private FolderObserver observer;
+  private Path basePath;
+  private int timeout;
+  private Thread th;
+  private boolean index;
+  private Date from;
+  private SolrClient solr;
+
+  public FolderMonitorNIO(Path p, int timeout, SolrClient solr, boolean index, Date from, FolderObserver observer)
+    throws Exception {
     this.basePath = p;
     this.timeout = timeout;
     this.index = index;
