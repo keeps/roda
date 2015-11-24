@@ -1761,3 +1761,32 @@
 	margin: 0 5px;
 }
 
+/**********************************************
+				COMMON
+************************************************/
+.gwt-DialogBox {
+	background-color: white;
+}
+
+.gwt-DialogBox .Caption {
+	padding: 5px 10px;
+	background-color: #089de3;
+	color: white;
+	font-weight: 500;
+}
+
+.wui-dialog-confirm {
+	
+}
+
+.wui-dialog-confirm-layout {
+	padding: 10px;
+}
+
+.wui-dialog-confirm-message {
+	margin-bottom: 10px;
+}
+
+.wui-dialog-confirm-ok {
+	float: right;
+}

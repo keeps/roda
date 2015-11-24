@@ -16,6 +16,8 @@
 		margin-top: 5px;
 	}
 	</ui:style>
+	
+	<ui:with field='messages' type='config.i18n.client.BrowseMessages' />
 
 	<g:FlowPanel styleName="search" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
@@ -70,7 +72,7 @@
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel styleName="sidebar-group" ui:field="sidebarGroupDownloads">
 					<g:Label addStyleNames="h4">
-						<ui:msg>Filters</ui:msg>
+						<ui:text from='{messages.sidebarFiltersTitle}' />
 					</g:Label>
 					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
 						<g:Label addStyleNames="h5 sidebar-facet-title">

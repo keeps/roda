@@ -10,6 +10,8 @@
 		position: absolute;
 	}
 	</ui:style>
+	
+	<ui:with field='messages' type='config.i18n.client.BrowseMessages' />
 
 	<g:FlowPanel styleName="browse" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
@@ -44,7 +46,7 @@
 				</g:FlowPanel>
 				<g:FlowPanel>
 					<g:Label addStyleNames="h4">
-						<ui:msg description="Browser actions">Actions</ui:msg>
+						<ui:text from='{messages.sidebarActionsTitle}' />
 					</g:Label>
 					<g:Button addStyleNames="btn btn-plus" ui:field="createItem">
 						<ui:msg>New sub-item</ui:msg>

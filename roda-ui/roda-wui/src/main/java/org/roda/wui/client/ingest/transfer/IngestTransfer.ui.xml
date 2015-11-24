@@ -9,6 +9,8 @@
 	
 	</ui:style>
 
+	<ui:with field='messages' type='config.i18n.client.BrowseMessages' />
+
 	<g:FlowPanel styleName="wui-ingest-transfer" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
@@ -28,28 +30,31 @@
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel ui:field="filtersPanel">
 					<g:Label addStyleNames="h4">
-						<ui:msg>Filters</ui:msg>
+						<ui:text from='{messages.sidebarFiltersTitle}' />
 					</g:Label>
 					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
 						<g:Label addStyleNames="h5 sidebar-facet-title">
-							<ui:msg>Producers</ui:msg>
+							<ui:text from='{messages.ingestTransferFilterProducers}' />
 						</g:Label>
 						<g:FlowPanel ui:field="facetOwner" />
 					</g:FlowPanel>
 				</g:FlowPanel>
 				<g:FlowPanel>
 					<g:Label addStyleNames="h4">
-						<ui:msg>Actions</ui:msg>
+						<ui:text from='{messages.sidebarActionsTitle}' />
 					</g:Label>
-					<g:Button addStyleNames="btn btn-upload" ui:field="uploadFiles">Upload
-						files</g:Button>
-					<g:Button addStyleNames="btn btn-plus" ui:field="createFolder">Create
-						sub-folder</g:Button>
-					<g:Button addStyleNames="btn btn-ban" ui:field="remove"
-						enabled="false">Remove</g:Button>
-					<g:Button addStyleNames="btn btn-play" ui:field="startIngest"
-						enabled="false">Start
-						ingest</g:Button>
+					<g:Button addStyleNames="btn btn-upload" ui:field="uploadFiles">
+						<ui:text from='{messages.ingestTransferButtonUploadFiles}' />
+					</g:Button>
+					<g:Button addStyleNames="btn btn-plus" ui:field="createFolder">
+						<ui:text from='{messages.ingestTransferButtonCreateFolder}' />
+					</g:Button>
+					<g:Button addStyleNames="btn btn-ban" ui:field="remove">
+						<ui:text from='{messages.ingestTransferButtonRemoveWholeFolder}' />
+					</g:Button>
+					<g:Button addStyleNames="btn btn-play" ui:field="startIngest">
+						<ui:text from='{messages.ingestTransferButtonIngestWholeFolder}' />
+					</g:Button>
 				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>

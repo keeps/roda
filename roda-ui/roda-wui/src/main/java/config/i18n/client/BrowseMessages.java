@@ -83,6 +83,12 @@ public interface BrowseMessages extends Messages {
 
   /******************* NEW MESSAGES ***********************/
   /*********************************************************/
+  
+  @DefaultMessage("Filters")
+  String sidebarFiltersTitle();
+
+  @DefaultMessage("Actions")
+  String sidebarActionsTitle();
 
   @DefaultMessage("Error in line {0}, column {1}: {2}")
   SafeHtml metadataParseError(int line, int column, String message);
@@ -156,5 +162,48 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("Choose files...")
   String ingestTransferUploadBrowseFiles();
+
+  @DefaultMessage("Confirm remove folder")
+  String ingestTransferRemoveFolderConfirmDialogTitle();
+
+  @DefaultMessage("Are you sure you want to remove the whole folder \"{0}\"?")
+  String ingestTransferRemoveFolderConfirmDialogMessage(String folderName);
+
+  @DefaultMessage("Are you sure you want to remove the the selected {0} files and folders?")
+  String ingestTransferRemoveSelectedConfirmDialogMessage(int size);
+
+  @DefaultMessage("No")
+  String ingestTransferRemoveFolderConfirmDialogCancel();
+
+  @DefaultMessage("Yes")
+  String ingestTransferRemoveFolderConfirmDialogOk();
+
+  @DefaultMessage("Removed items")
+  String ingestTransferRemoveSuccessTitle();
+
+  @DefaultMessage("Successuly removed {0} items")
+  String ingestTransferRemoveSuccessMessage(int size);
+
+  @DefaultMessage("Upload files")
+  String ingestTransferButtonUploadFiles();
+
+  @DefaultMessage("Create sub-folder")
+  String ingestTransferButtonCreateFolder();
+
+  @DefaultMessage("Remove folder")
+  String ingestTransferButtonRemoveWholeFolder();
+
+  @DefaultMessage("Remove selected")
+  String ingestTransferButtonRemoveSelectedItems();
+
+  @DefaultMessage("Ingest folder")
+  String ingestTransferButtonIngestWholeFolder();
+
+  @DefaultMessage("Ingest selected")
+  String ingestTransferButtonIngestSelectedItems();
+
+  @DefaultMessage("Producers")
+  String ingestTransferFilterProducers();
+
 
 }

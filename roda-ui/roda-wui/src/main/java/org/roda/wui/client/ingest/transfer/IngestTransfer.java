@@ -26,6 +26,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.ConfirmDialog;
 import org.roda.wui.client.common.TransferredResourceList;
 import org.roda.wui.client.common.TransferredResourceList.CheckboxSelectionListener;
 import org.roda.wui.client.common.UserLogin;
@@ -199,8 +200,10 @@ public class IngestTransfer extends Composite {
 
       @Override
       public void onSelectionChange(Set<TransferredResource> selected) {
-        remove.setEnabled(!selected.isEmpty());
-        startIngest.setEnabled(!selected.isEmpty());
+        remove.setText(selected.isEmpty() ? messages.ingestTransferButtonRemoveWholeFolder()
+          : messages.ingestTransferButtonRemoveSelectedItems());
+        startIngest.setText(selected.isEmpty() ? messages.ingestTransferButtonIngestWholeFolder()
+          : messages.ingestTransferButtonIngestSelectedItems());
       }
     });
 
@@ -334,33 +337,82 @@ public class IngestTransfer extends Composite {
     Set<TransferredResource> selected = transferredResourceList.getSelected();
 
     if (selected.isEmpty()) {
+      // Remove the whole folder
 
       if (resource != null) {
-        // TODO remove resource
+        ConfirmDialog.showConfirmDialog(messages.ingestTransferRemoveFolderConfirmDialogTitle(),
+          messages.ingestTransferRemoveFolderConfirmDialogMessage(resource.getName()),
+          messages.ingestTransferRemoveFolderConfirmDialogCancel(),
+          messages.ingestTransferRemoveFolderConfirmDialogOk(), new AsyncCallback<Boolean>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+              MessagePopup.showError(caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(Boolean confirmed) {
+              if (confirmed) {
+                BrowserService.Util.getInstance().removeTransferredResources(Arrays.asList(resource.getId()),
+                  new AsyncCallback<Void>() {
+
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    MessagePopup.showError("Error removing", caught.getMessage());
+                  }
+
+                  @Override
+                  public void onSuccess(Void result) {
+                    MessagePopup.showInfo(messages.ingestTransferRemoveSuccessTitle(),
+                      messages.ingestTransferRemoveSuccessMessage(1));
+                    // TODO jump to ancestor
+                  }
+                });
+              }
+            }
+          });
       }
       // else do nothing
 
     } else {
-      // TODO remove all selected resources
+      // Remove all selected resources
+
       final List<String> idsToRemove = new ArrayList<>();
       for (TransferredResource r : selected) {
         idsToRemove.add(r.getId());
       }
 
-      BrowserService.Util.getInstance().removeTransferredResources(idsToRemove, new AsyncCallback<Void>() {
+      ConfirmDialog.showConfirmDialog(messages.ingestTransferRemoveFolderConfirmDialogTitle(),
+        messages.ingestTransferRemoveSelectedConfirmDialogMessage(selected.size()),
+        messages.ingestTransferRemoveFolderConfirmDialogCancel(), messages.ingestTransferRemoveFolderConfirmDialogOk(),
+        new AsyncCallback<Boolean>() {
 
-        @Override
-        public void onFailure(Throwable caught) {
-          MessagePopup.showError("Error removing", caught.getMessage());
-          transferredResourceList.refresh();
-        }
+          @Override
+          public void onFailure(Throwable caught) {
+            MessagePopup.showError(caught.getMessage());
+          }
 
-        @Override
-        public void onSuccess(Void result) {
-          MessagePopup.showInfo("Removed sucessful", "Removed " + idsToRemove.size() + " items");
-          transferredResourceList.refresh();
-        }
-      });
+          @Override
+          public void onSuccess(Boolean confirmed) {
+            if (confirmed) {
+              BrowserService.Util.getInstance().removeTransferredResources(idsToRemove, new AsyncCallback<Void>() {
+
+                @Override
+                public void onFailure(Throwable caught) {
+                  MessagePopup.showError("Error", caught.getMessage());
+                  transferredResourceList.refresh();
+                }
+
+                @Override
+                public void onSuccess(Void result) {
+                  MessagePopup.showInfo(messages.ingestTransferRemoveSuccessTitle(),
+                    messages.ingestTransferRemoveSuccessMessage(idsToRemove.size()));
+                  transferredResourceList.refresh();
+                }
+              });
+            }
+          }
+        });
     }
 
   }
