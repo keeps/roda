@@ -7,8 +7,6 @@
  */
 package org.roda.wui.api.v1;
 
-import java.util.Arrays;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -56,17 +54,18 @@ public class JobsResource {
     return Response.ok(jobs, mediaType).build();
   }
 
-  // TODO this is WIP
   @GET
   @Path("/{jobId}")
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @ApiOperation(value = "Get Job", notes = "Gets a particular Job.", response = Job.class)
-  public Response getJob(@PathParam("jobId") String jobId, @QueryParam("acceptFormat") String acceptFormat) {
+  public Response getJob(@PathParam("jobId") String jobId, @QueryParam("acceptFormat") String acceptFormat)
+    throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request.getHeader("Accept"));
 
-    Job job = new Job();
-    job.setId(jobId);
-    job.setObjectIds(Arrays.asList("objectId1", "objectId2"));
+    // get user
+    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    // delegate action to controller
+    Job job = org.roda.wui.api.controllers.Jobs.getJob(user, jobId);
 
     return Response.ok(job, mediaType).build();
   }

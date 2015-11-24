@@ -531,6 +531,24 @@ public class SolrUtils {
     return ret;
   }
 
+  public static Integer objectToInteger(Object object) {
+    Integer ret;
+    if (object instanceof Integer) {
+      ret = (Integer) object;
+    } else if (object instanceof String) {
+      try {
+        ret = Integer.parseInt((String) object);
+      } catch (NumberFormatException e) {
+        LOGGER.error("Could not convert Solr object to integer", e);
+        ret = null;
+      }
+    } else {
+      LOGGER.error("Could not convert Solr object to integer" + object.getClass().getName());
+      ret = null;
+    }
+    return ret;
+  }
+
   public static Long objectToLong(Object object) {
     Long ret;
     if (object instanceof Long) {
@@ -644,6 +662,8 @@ public class SolrUtils {
       indexName = RodaConstants.INDEX_MEMBERS;
     } else if (resultClass.equals(TransferredResource.class)) {
       indexName = RodaConstants.INDEX_SIP;
+    } else if (resultClass.equals(Job.class)) {
+      indexName = RodaConstants.INDEX_JOB;
     } else {
       throw new IndexServiceException("Cannot find class index name: " + resultClass.getName(),
         IndexServiceException.INTERNAL_SERVER_ERROR);
@@ -674,6 +694,8 @@ public class SolrUtils {
       ret = resultClass.cast(solrDocumentToAgentPreservationObject(doc));
     } else if (resultClass.equals(TransferredResource.class)) {
       ret = resultClass.cast(solrDocumentToTransferredResource(doc));
+    } else if (resultClass.equals(Job.class)) {
+      ret = resultClass.cast(solrDocumentToJob(doc));
     } else {
       throw new IndexServiceException("Cannot find class index name: " + resultClass.getName(),
         IndexServiceException.INTERNAL_SERVER_ERROR);
@@ -1310,7 +1332,34 @@ public class SolrUtils {
   }
 
   public static SolrInputDocument jobToSolrDocument(Job job) {
-    // TODO Auto-generated method stub
-    return null;
+    SolrInputDocument doc = new SolrInputDocument();
+
+    doc.addField(RodaConstants.JOB_ID, job.getId());
+    doc.addField(RodaConstants.JOB_USERNAME, job.getUsername());
+    doc.addField(RodaConstants.JOB_START, job.getStart());
+    doc.addField(RodaConstants.JOB_END, job.getEnd());
+    doc.addField(RodaConstants.JOB_COMPLETION_STATUS, job.getCompletionStatus());
+    doc.addField(RodaConstants.JOB_PLUGIN, job.getPlugin());
+    doc.addField(RodaConstants.JOB_RESOURCE_TYPE, job.getResourceType());
+    doc.addField(RodaConstants.JOB_ORCHESTRATOR_METHOD, job.getOrchestratorMethod());
+    doc.addField(RodaConstants.JOB_OBJECT_IDS, job.getObjectIds());
+
+    return doc;
+  }
+
+  public static Job solrDocumentToJob(SolrDocument doc) {
+    Job job = new Job();
+
+    job.setId(objectToString(doc.get(RodaConstants.JOB_ID)));
+    job.setUsername(objectToString(doc.get(RodaConstants.JOB_USERNAME)));
+    job.setStart(objectToDate(doc.get(RodaConstants.JOB_START)));
+    job.setEnd(objectToDate(doc.get(RodaConstants.JOB_END)));
+    job.setCompletionStatus(objectToInteger(doc.get(RodaConstants.JOB_COMPLETION_STATUS)));
+    job.setPlugin(objectToString(doc.get(RodaConstants.JOB_PLUGIN)));
+    job.setResourceType(objectToString(doc.get(RodaConstants.JOB_RESOURCE_TYPE)));
+    job.setOrchestratorMethod(objectToString(doc.get(RodaConstants.JOB_ORCHESTRATOR_METHOD)));
+    job.setObjectIds(objectToListString(doc.get(RodaConstants.JOB_OBJECT_IDS)));
+
+    return job;
   }
 }

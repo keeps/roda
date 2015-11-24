@@ -16,6 +16,7 @@ import org.roda.core.data.common.NotFoundException;
 import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.RodaUser;
 import org.roda.core.data.v2.TransferredResource;
+import org.roda.core.index.IndexServiceException;
 import org.roda.core.plugins.Plugin;
 import org.roda.wui.api.exceptions.ApiException;
 import org.roda.wui.api.exceptions.RequestNotValidException;
@@ -41,9 +42,9 @@ public class JobsHelper {
 
   }
 
-  protected static Job createJob(RodaUser user, Job job) throws NotFoundException {
+  protected static Job createJob(RodaUser user, Job job) {
     Job updatedJob = new Job(job);
-    job.setUser(user.getId());
+    updatedJob.setUsername(user.getName());
 
     // serialize job to file & index it
     RodaCoreFactory.getModelService().addJob(updatedJob, RodaCoreFactory.getLogPath());
@@ -57,8 +58,19 @@ public class JobsHelper {
     return updatedJob;
   }
 
-  private static List<TransferredResource> getTransferredResourcesFromObjectIds(RodaUser user, List<String> objectIds)
-    throws NotFoundException {
+  public static Job getJob(String jobId) throws NotFoundException, GenericException {
+    try {
+      return RodaCoreFactory.getIndexService().retrieve(Job.class, jobId);
+    } catch (IndexServiceException e) {
+      if (e.getCode() == IndexServiceException.NOT_FOUND) {
+        throw new NotFoundException("Job with id '" + jobId + "' was not found.");
+      } else {
+        throw new GenericException("Error getting Job with id '" + jobId + "'.");
+      }
+    }
+  }
+
+  private static List<TransferredResource> getTransferredResourcesFromObjectIds(RodaUser user, List<String> objectIds) {
     List<TransferredResource> res = new ArrayList<TransferredResource>();
     for (String objectId : objectIds) {
       try {

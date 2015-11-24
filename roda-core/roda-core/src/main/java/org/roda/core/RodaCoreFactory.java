@@ -206,9 +206,13 @@ public class RodaCoreFactory {
     ensureAllEssentialDirectoriesExist();
 
     // instantiate model related objects
-    // FIXME the type of storage that should be used should be configurable
-    storage = new FileStorageService(storagePath);
+    storage = instantiateStorageService();
     model = new ModelService(storage);
+  }
+
+  private static StorageService instantiateStorageService() throws StorageServiceException {
+    // FIXME the type of storage to be used should be configurable
+    return new FileStorageService(storagePath);
   }
 
   private static void instantiateSolrAndIndexService(NodeType nodeType) throws URISyntaxException {
@@ -232,14 +236,20 @@ public class RodaCoreFactory {
       System.setProperty("solr.data.dir.members", indexPath.resolve("members").toString());
       System.setProperty("solr.data.dir.othermetadata", indexPath.resolve("othermetadata").toString());
       System.setProperty("solr.data.dir.sip", indexPath.resolve("sip").toString());
+      System.setProperty("solr.data.dir.job", indexPath.resolve("job").toString());
       // FIXME added missing cores
 
-      // start embedded solr
-      solr = new EmbeddedSolrServer(solrHome, "test");
+      // start solr
+      solr = instantiateSolr(solrHome);
 
       // instantiate index related object
       index = new IndexService(solr, model, configPath);
     }
+  }
+
+  private static SolrClient instantiateSolr(Path solrHome) {
+    // FIXME the type of solr to be used should be configurable
+    return new EmbeddedSolrServer(solrHome, "test");
   }
 
   private static void instantiateNodeSpecificObjects(NodeType nodeType) {

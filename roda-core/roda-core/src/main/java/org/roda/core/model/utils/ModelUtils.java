@@ -24,8 +24,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.LogEntry;
@@ -46,6 +44,8 @@ import org.roda.core.storage.Resource;
 import org.roda.core.storage.StoragePath;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StorageServiceException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -454,12 +454,34 @@ public final class ModelUtils {
 
   public static void writeLogEntryToFile(LogEntry logEntry, Path logFile) throws ModelServiceException {
     try {
-      String entryJSON = ModelUtils.getJsonLogEntry(logEntry) + "\n";
+      String entryJSON = ModelUtils.getJsonFromObject(logEntry) + "\n";
       Files.write(logFile, entryJSON.getBytes(), StandardOpenOption.APPEND);
     } catch (IOException e) {
       throw new ModelServiceException("Error writing log entry to file", ModelServiceException.INTERNAL_SERVER_ERROR,
         e);
     }
+  }
+
+  public static void writeObjectToFile(Object object, Path file) throws ModelServiceException {
+    try {
+      String json = ModelUtils.getJsonFromObject(object) + "\n";
+      Files.write(file, json.getBytes(), StandardOpenOption.APPEND);
+    } catch (IOException e) {
+      throw new ModelServiceException("Error writing object, as json, to file",
+        ModelServiceException.INTERNAL_SERVER_ERROR, e);
+    }
+  }
+
+  public static String getJsonFromObject(Object object) {
+    String ret = null;
+    try {
+      JsonFactory factory = new JsonFactory();
+      ObjectMapper mapper = new ObjectMapper(factory);
+      ret = mapper.writeValueAsString(object);
+    } catch (IOException e) {
+      LOGGER.error("Error transforming object '" + object + "' to json string", e);
+    }
+    return ret;
   }
 
   public static String getJsonLogEntryParameters(List<LogEntryParameter> parameters) {
@@ -487,18 +509,6 @@ public final class ModelUtils {
     return ret;
   }
 
-  public static String getJsonLogEntry(LogEntry entry) {
-    String ret = null;
-    try {
-      JsonFactory factory = new JsonFactory();
-      ObjectMapper mapper = new ObjectMapper(factory);
-      ret = mapper.writeValueAsString(entry);
-    } catch (IOException e) {
-      LOGGER.error("Error transforming log entry to json string", e);
-    }
-    return ret;
-  }
-
   public static LogEntry getLogEntry(String json) {
     LogEntry ret = null;
     try {
@@ -509,17 +519,6 @@ public final class ModelUtils {
       LOGGER.error("Error transforming json string to log entry", e);
     }
     return ret;
-  }
-
-  public static String getJsonSipState(SIPReport sipState) {
-    try {
-      JsonFactory factory = new JsonFactory();
-      ObjectMapper mapper = new ObjectMapper(factory);
-      return mapper.writeValueAsString(sipState);
-    } catch (IOException e) {
-      LOGGER.error("Error transforming sip state to json string", e);
-    }
-    return null;
   }
 
   public static SIPReport getSipState(String json) {

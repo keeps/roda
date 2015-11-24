@@ -1927,8 +1927,11 @@ public class ModelService extends ModelObservable {
 
   }
 
-  public void addJob(Job updatedJob, Path jobsDirectory) {
-    // TODO Auto-generated method stub
-    
+  public void addJob(Job job, Path jobsDirectory) {
+    // create job in storage
+    // TODO
+
+    // index it
+    notifyJobCreated(job);
   }
 }

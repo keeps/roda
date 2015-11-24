@@ -262,7 +262,8 @@ public class BrowserHelper {
   public static void validateGetAipRepresentationFileParams(String acceptFormat) throws RequestNotValidException {
     if (!RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
       throw new RequestNotValidException(ApiException.INVALID_PARAMETER_VALUE,
-        "Invalid acceptFormat value. Expected values: " + Arrays.asList(RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN));
+        "Invalid '" + RodaConstants.API_ATTR_ACCEPT_FORMAT + "' value. Expected values: "
+          + Arrays.asList(RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN));
     }
   }
 
@@ -282,7 +283,8 @@ public class BrowserHelper {
   protected static void validateGetAipRepresentationParams(String acceptFormat) throws RequestNotValidException {
     if (!RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
       throw new RequestNotValidException(ApiException.INVALID_PARAMETER_VALUE,
-        "Invalid acceptFormat value. Expected values: " + Arrays.asList(RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN));
+        "Invalid '" + RodaConstants.API_ATTR_ACCEPT_FORMAT + "' value. Expected values: "
+          + Arrays.asList(RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN));
     }
   }
 
@@ -314,7 +316,8 @@ public class BrowserHelper {
   protected static void validateListAipDescriptiveMetadataParams(String acceptFormat) throws RequestNotValidException {
     if (!RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
       throw new RequestNotValidException(ApiException.INVALID_PARAMETER_VALUE,
-        "Invalid acceptFormat value. Expected values: " + Arrays.asList(RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN));
+        "Invalid '" + RodaConstants.API_ATTR_ACCEPT_FORMAT + "' value. Expected values: "
+          + Arrays.asList(RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN));
     }
   }
 
@@ -361,7 +364,7 @@ public class BrowserHelper {
     if (!RodaConstants.API_ATTR_ACCEPT_FORMAT_XML.equals(acceptFormat)
       && !RodaConstants.API_ATTR_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
       throw new RequestNotValidException(ApiException.INVALID_PARAMETER_VALUE,
-        "Invalid acceptFormat value. Expected values: "
+        "Invalid '" + RodaConstants.API_ATTR_ACCEPT_FORMAT + "' value. Expected values: "
           + Arrays.asList(RodaConstants.API_ATTR_ACCEPT_FORMAT_XML, RodaConstants.API_ATTR_ACCEPT_FORMAT_HTML));
     }
   }
@@ -422,7 +425,8 @@ public class BrowserHelper {
   protected static void validateListAipPreservationMetadataParams(String acceptFormat) throws RequestNotValidException {
     if (!RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
       throw new RequestNotValidException(ApiException.INVALID_PARAMETER_VALUE,
-        "Invalid acceptFormat value. Expected values: " + Arrays.asList(RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN));
+        "Invalid '" + RodaConstants.API_ATTR_ACCEPT_FORMAT + "' value. Expected values: "
+          + Arrays.asList(RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN));
     }
 
   }
@@ -487,15 +491,15 @@ public class BrowserHelper {
     throws RequestNotValidException {
     if (!RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN.equals(acceptFormat)
       && !RodaConstants.API_ATTR_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
-
       throw new RequestNotValidException(ApiException.INVALID_PARAMETER_VALUE,
-        "Invalid acceptFormat value. Expected values: "
+        "Invalid '" + RodaConstants.API_ATTR_ACCEPT_FORMAT + "' value. Expected values: "
           + Arrays.asList(RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN, RodaConstants.API_ATTR_ACCEPT_FORMAT_HTML));
     }
 
     // FIXME validate language? what exception should be thrown?
     if (!StringUtils.isNotBlank(language)) {
-      throw new RequestNotValidException(ApiException.EMPTY_PARAMETER, "Language parameter must have a value");
+      throw new RequestNotValidException(ApiException.EMPTY_PARAMETER,
+        "Parameter '" + RodaConstants.API_ATTR_LANG + "' must have a value");
     }
 
   }

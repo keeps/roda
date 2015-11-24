@@ -207,4 +207,10 @@ public abstract class ModelObservable {
       observer.jobUpdated(job);
     }
   }
+
+  protected void notifyJobDeleted(String jobId) {
+    for (ModelObserver observer : observers) {
+      observer.jobDeleted(jobId);
+    }
+  }
 }

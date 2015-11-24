@@ -31,7 +31,7 @@ public class Job implements Serializable {
   // job identifier
   private String id;
   // job creator
-  private String user;
+  private String username;
   // job start date
   private Date start;
   // job end date
@@ -68,7 +68,7 @@ public class Job implements Serializable {
   public Job(Job job) {
     super();
     this.id = job.getId();
-    this.user = job.getUser();
+    this.username = job.getUsername();
     this.start = job.getStart();
     this.end = job.getEnd();
     this.completionStatus = job.getCompletionStatus();
@@ -92,12 +92,12 @@ public class Job implements Serializable {
     this.id = id;
   }
 
-  public String getUser() {
-    return user;
+  public String getUsername() {
+    return username;
   }
 
-  public void setUser(String user) {
-    this.user = user;
+  public void setUsername(String username) {
+    this.username = username;
   }
 
   public Date getStart() {
@@ -169,7 +169,7 @@ public class Job implements Serializable {
 
   @Override
   public String toString() {
-    return "Job [id=" + id + ", user=" + user + ", start=" + start + ", end=" + end + ", completionStatus="
+    return "Job [id=" + id + ", username=" + username + ", start=" + start + ", end=" + end + ", completionStatus="
       + completionStatus + ", plugin=" + plugin + ", pluginParameters=" + pluginParameters + ", resourceType="
       + resourceType + ", orchestratorMethod=" + orchestratorMethod + ", objectIds=" + objectIds + "]";
   }

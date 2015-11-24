@@ -357,7 +357,13 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void jobUpdated(Job job) {
-    // TODO Auto-generated method stub
+    jobDeleted(job.getId());
+    jobCreated(job);
+  }
+
+  @Override
+  public void jobDeleted(String jobId) {
+    deleteDocumentFromIndex(RodaConstants.INDEX_JOB, jobId, "Error deleting Job (id=" + jobId + ")");
 
   }
 

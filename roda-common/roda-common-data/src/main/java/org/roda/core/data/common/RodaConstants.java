@@ -341,4 +341,15 @@ public final class RodaConstants {
   public static final String TRANSFERRED_RESOURCE_SIZE = "size";
   public static final String TRANSFERRED_RESOURCE_OWNER = "owner";
   public static final String TRANSFERRED_RESOURCE_ANCESTORS = "ancestors";
+
+  public static final String JOB_ID = "id";
+  public static final String JOB_USERNAME = "username";
+  public static final String JOB_START = "start";
+  public static final String JOB_END = "end";
+  public static final String JOB_COMPLETION_STATUS = "completionStatus";
+  public static final String JOB_PLUGIN = "plugin";
+  public static final String JOB_PLUGIN_PARAMETERS = "pluginParameters";
+  public static final String JOB_RESOURCE_TYPE = "resourceType";
+  public static final String JOB_ORCHESTRATOR_METHOD = "orchestratorMethod";
+  public static final String JOB_OBJECT_IDS = "objectIds";
 }

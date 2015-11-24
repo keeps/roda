@@ -78,4 +78,6 @@ public interface ModelObserver {
 
   public void jobUpdated(Job job);
 
+  public void jobDeleted(String jobId);
+
 }

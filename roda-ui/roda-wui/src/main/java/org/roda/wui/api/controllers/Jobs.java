@@ -16,6 +16,7 @@ import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.RodaUser;
 import org.roda.wui.api.exceptions.RequestNotValidException;
 import org.roda.wui.common.RodaCoreService;
+import org.roda.wui.common.client.GenericException;
 
 /**
  * FIXME 1) verify all checkObject*Permissions (because now also a permission
@@ -53,6 +54,22 @@ public class Jobs extends RodaCoreService {
     registerAction(user, JOBS_COMPONENT, "createJob", null, duration, "job", updatedJob);
 
     return updatedJob;
+  }
+
+  public static Job getJob(RodaUser user, String jobId) throws NotFoundException, GenericException {
+    Date startDate = new Date();
+
+    // check user permissions
+    // TODO ???
+
+    // delegate
+    Job job = JobsHelper.getJob(jobId);
+
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, JOBS_COMPONENT, "getJob", null, duration, "job_id", job.getId());
+
+    return job;
   }
 
   /*
