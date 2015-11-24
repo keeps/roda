@@ -246,6 +246,11 @@ pre>code {
 	content: "\f019";
 }
 
+.btn-upload:after {
+	/* fa-upload */
+	content: "\f093";
+}
+
 .btn-times-circle:after {
 	content: "\f057";
 }

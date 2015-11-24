@@ -40,20 +40,20 @@ public interface BrowserService extends RemoteService {
   /**
    * Service location
    */
-  public static final String SERVICE_URI = "browserservice";
+   static final String SERVICE_URI = "browserservice";
 
   /**
    * Utilities
    *
    */
-  public static class Util {
+   public static class Util {
 
     /**
      * Get singleton instance
      *
      * @return the instance
      */
-    public static BrowserServiceAsync getInstance() {
+     public static BrowserServiceAsync getInstance() {
 
       BrowserServiceAsync instance = (BrowserServiceAsync) GWT.create(BrowserService.class);
       ServiceDefTarget target = (ServiceDefTarget) instance;
@@ -70,7 +70,7 @@ public interface BrowserService extends RemoteService {
    * @return the number of simple descriptive metadata that fit the filter
    * @throws RODAException
    */
-  public Long countDescriptiveMetadata(Filter filter) throws RODAException;
+   Long countDescriptiveMetadata(Filter filter) throws RODAException;
 
   /**
    * Get imple descriptive metadata
@@ -79,13 +79,13 @@ public interface BrowserService extends RemoteService {
    * @return
    * @throws RODAException
    */
-  public IndexResult<SimpleDescriptionObject> findDescriptiveMetadata(Filter filter, Sorter sorter, Sublist sublist,
+   IndexResult<SimpleDescriptionObject> findDescriptiveMetadata(Filter filter, Sorter sorter, Sublist sublist,
     Facets facets, String locale) throws RODAException;
 
-  public BrowseItemBundle getItemBundle(String aipId, String localeString)
+   BrowseItemBundle getItemBundle(String aipId, String localeString)
     throws AuthorizationDeniedException, GenericException, NotFoundException;
 
-  public DescriptiveMetadataEditBundle getDescriptiveMetadataEditBundle(String aipId, String descId)
+   DescriptiveMetadataEditBundle getDescriptiveMetadataEditBundle(String aipId, String descId)
     throws AuthorizationDeniedException, GenericException;
 
   /**
@@ -96,7 +96,7 @@ public interface BrowserService extends RemoteService {
    * @return {@link SimpleDescriptionObject}
    * @throws RODAException
    */
-  public SimpleDescriptionObject getSimpleDescriptionObject(String pid) throws RODAException;
+   SimpleDescriptionObject getSimpleDescriptionObject(String pid) throws RODAException;
 
   /**
    * Get description object
@@ -106,7 +106,7 @@ public interface BrowserService extends RemoteService {
    * @return {@link DescriptionObject}
    * @throws RODAException
    */
-  public DescriptionObject getDescriptionObject(String pid) throws RODAException;
+   DescriptionObject getDescriptionObject(String pid) throws RODAException;
 
   /**
    * Get the pid of all ancestors of the node.
@@ -117,9 +117,9 @@ public interface BrowserService extends RemoteService {
    *         ends in the node itself
    * @throws RODAException
    */
-  public List<SimpleDescriptionObject> getAncestors(SimpleDescriptionObject sdo) throws RODAException;
+   List<SimpleDescriptionObject> getAncestors(SimpleDescriptionObject sdo) throws RODAException;
 
-  public List<SearchField> getSearchFields(String locale) throws GenericException;
+   List<SearchField> getSearchFields(String locale) throws GenericException;
 
   /**
    * Get the index of a collection
@@ -131,7 +131,7 @@ public interface BrowserService extends RemoteService {
    * @return the index of the collection
    * @throws RODAException
    */
-  // public Integer getCollectionIndex(String collectionPID, Filter filter,
+  //  Integer getCollectionIndex(String collectionPID, Filter filter,
   // Sorter sorter) throws RODAException;
 
   /**
@@ -146,7 +146,7 @@ public interface BrowserService extends RemoteService {
    * @return the item index
    * @throws RODAException
    */
-  // public Integer getItemIndex(String parentPID, String childPID, Filter
+  //  Integer getItemIndex(String parentPID, String childPID, Filter
   // filter, Sorter sorter) throws RODAException;
 
   /**
@@ -163,7 +163,7 @@ public interface BrowserService extends RemoteService {
    * @return the sub elements list
    * @throws RODAException
    */
-  // public SimpleDescriptionObject[] getSubElements(String pid, String
+  //  SimpleDescriptionObject[] getSubElements(String pid, String
   // focusOnChild, int count, Filter filter,
   // Sorter sorter) throws RODAException;
 
@@ -175,7 +175,7 @@ public interface BrowserService extends RemoteService {
    * @return the list of representation informations
    * @throws RODAException
    */
-  public List<RepresentationInfo> getRepresentationsInfo(String doPID) throws RODAException;
+   List<RepresentationInfo> getRepresentationsInfo(String doPID) throws RODAException;
 
   /**
    * Get the Representation Preservation Objects associated with a Descriptive
@@ -186,7 +186,7 @@ public interface BrowserService extends RemoteService {
    * @return The list of associated Representation Preservation Objects
    * @throws RODAException
    */
-  public List<RepresentationPreservationObject> getDOPreservationObjects(String doPID) throws RODAException;
+   List<RepresentationPreservationObject> getDOPreservationObjects(String doPID) throws RODAException;
 
   /**
    * Get the preservation information
@@ -196,7 +196,7 @@ public interface BrowserService extends RemoteService {
    * @return A list of preservations information
    * @throws RODAException
    */
-  public List<PreservationInfo> getPreservationsInfo(String doPID) throws RODAException;
+   List<PreservationInfo> getPreservationsInfo(String doPID) throws RODAException;
 
   /**
    * Get preservation timeline info
@@ -211,21 +211,21 @@ public interface BrowserService extends RemoteService {
    * @return {@link TimelineInfo}
    * @throws RODAException
    */
-  public TimelineInfo getPreservationTimeline(List<String> repPIDs, List<String> icons, List<String> colors,
+   TimelineInfo getPreservationTimeline(List<String> repPIDs, List<String> icons, List<String> colors,
     String locale) throws RODAException;
 
-  public SimpleDescriptionObject moveInHierarchy(String aipId, String parentId) throws RODAException;
+   SimpleDescriptionObject moveInHierarchy(String aipId, String parentId) throws RODAException;
 
-  public String createAIP(String parentId) throws AuthorizationDeniedException, GenericException, NotFoundException;
+   String createAIP(String parentId) throws AuthorizationDeniedException, GenericException, NotFoundException;
 
-  public void removeAIP(String aipId) throws AuthorizationDeniedException, GenericException, NotFoundException;
+   void removeAIP(String aipId) throws AuthorizationDeniedException, GenericException, NotFoundException;
 
-  public void removeDescriptiveMetadataFile(String itemId, String descriptiveMetadataId) throws RODAException;
+   void removeDescriptiveMetadataFile(String itemId, String descriptiveMetadataId) throws RODAException;
 
-  public void updateDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle bundle)
+   void updateDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle bundle)
     throws AuthorizationDeniedException, GenericException, MetadataParseException, NotFoundException;
 
-  public void createDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle newBundle)
+   void createDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle newBundle)
     throws AuthorizationDeniedException, GenericException, MetadataParseException, NotFoundException;
 
   IndexResult<TransferredResource> findTransferredResources(Filter filter, Sorter sorter, Sublist sublist,
@@ -234,12 +234,9 @@ public interface BrowserService extends RemoteService {
   TransferredResource retrieveTransferredResource(String transferredResourceId)
     throws AuthorizationDeniedException, GenericException;
 
-  public void createTransferredResourcesFolder(String parent, String folderName)
+   void createTransferredResourcesFolder(String parent, String folderName)
     throws AuthorizationDeniedException, GenericException;
 
-  public void removeTransferredResource(String path) throws AuthorizationDeniedException, GenericException;
-
-  // public DescriptiveMetadata retrieveMetadataFile(String itemId, String
-  // descriptiveMetadataId) throws RODAException;
+  void removeTransferredResources(List<String> ids) throws AuthorizationDeniedException, GenericException;
 
 }

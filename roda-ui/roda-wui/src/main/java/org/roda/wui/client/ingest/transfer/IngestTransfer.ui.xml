@@ -41,13 +41,15 @@
 					<g:Label addStyleNames="h4">
 						<ui:msg>Actions</ui:msg>
 					</g:Label>
-					<g:Button addStyleNames="btn btn-play" ui:field="startIngest">Start
-						ingest</g:Button>
-					<g:Button addStyleNames="btn btn-plus" ui:field="createFolder">Create
-						folder</g:Button>
 					<g:Button addStyleNames="btn btn-upload" ui:field="uploadFiles">Upload
 						files</g:Button>
-					<g:Button addStyleNames="btn btn-ban" ui:field="remove">Remove</g:Button>
+					<g:Button addStyleNames="btn btn-plus" ui:field="createFolder">Create
+						sub-folder</g:Button>
+					<g:Button addStyleNames="btn btn-ban" ui:field="remove"
+						enabled="false">Remove</g:Button>
+					<g:Button addStyleNames="btn btn-play" ui:field="startIngest"
+						enabled="false">Start
+						ingest</g:Button>
 				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>

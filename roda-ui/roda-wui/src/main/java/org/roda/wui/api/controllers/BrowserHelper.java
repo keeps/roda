@@ -968,9 +968,12 @@ public class BrowserHelper {
     }
   }
 
-  public static void removeTransferredResource(String path) throws GenericException {
+  public static void removeTransferredResources(List<String> ids) throws GenericException {
     try {
-      RodaCoreFactory.getFolderMonitor().removeFolder(Paths.get(path));
+      for (String id : ids) {
+        LOGGER.info("Removing transferred resource: " + id);
+        RodaCoreFactory.getFolderMonitor().remove(Paths.get(id));
+      }
     } catch (IOException e) {
       LOGGER.error("Error removing transferred resource", e);
       throw new GenericException("Error removing transferred resource: " + e.getMessage());

@@ -9,6 +9,7 @@ package org.roda.wui.api.v1;
 
 import java.io.InputStream;
 import java.nio.file.FileAlreadyExistsException;
+import java.util.Arrays;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
@@ -69,7 +70,8 @@ public class TransferredResource {
     // get user
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
     // delegate action to controller
-    Browser.removeTransferredResource(user, path);
+    // TODO support remove multiple resources in one go
+    Browser.removeTransferredResources(user, Arrays.asList(path));
     // FIXME give a better answer
     return Response.ok().entity("{'status':'success'}").build();
   }

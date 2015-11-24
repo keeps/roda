@@ -30,17 +30,22 @@ public class FacetUtils {
 
   public static <T extends Serializable> void bindFacets(final AsyncTableCell<T> list,
     final Map<String, FlowPanel> facetPanels) {
+    bindFacets(list, facetPanels, false);
+  }
+
+  public static <T extends Serializable> void bindFacets(final AsyncTableCell<T> list,
+    final Map<String, FlowPanel> facetPanels, final boolean hideDisabled) {
     list.addValueChangeHandler(new ValueChangeHandler<IndexResult<T>>() {
 
       @Override
       public void onValueChange(ValueChangeEvent<IndexResult<T>> event) {
-        FacetUtils.updateFacetPanels(list, facetPanels, event.getValue().getFacetResults());
+        FacetUtils.updateFacetPanels(list, facetPanels, event.getValue().getFacetResults(), hideDisabled);
       }
     });
   }
 
   private static <T extends Serializable> void updateFacetPanels(final AsyncTableCell<T> list,
-    final Map<String, FlowPanel> facetPanels, final List<FacetFieldResult> facetResults) {
+    final Map<String, FlowPanel> facetPanels, final List<FacetFieldResult> facetResults, final boolean hideDisabled) {
 
     for (FacetFieldResult facetResult : facetResults) {
       final String facetField = facetResult.getField();
@@ -66,7 +71,12 @@ public class FacetUtils {
 
           CheckBox facetValuePanel = new CheckBox(checkboxLabel.toString());
           facetValuePanel.addStyleName("sidebar-facet-label");
-          facetValuePanel.setEnabled(count > 0 || facetResult.getSelectedValues().size() > 0);
+
+          boolean enabled = count > 0 || facetResult.getSelectedValues().size() > 0;
+          facetValuePanel.setEnabled(enabled);
+          if (hideDisabled) {
+            facetValuePanel.setVisible(enabled);
+          }
           facetPanel.add(facetValuePanel);
 
           facetValuePanel.setValue(selected);

@@ -103,4 +103,13 @@ public class TransferredResource implements Serializable {
     this.parentPath = parentPath;
   }
 
+  @Override
+  public String toString() {
+    return "TransferredResource [id=" + id + ", fullPath=" + fullPath + ", relativePath=" + relativePath
+      + ", parentPath=" + parentPath + ", size=" + size + ", creationDate=" + creationDate + ", name=" + name
+      + ", file=" + file + ", owner=" + owner + "]";
+  }
+  
+  
+
 }

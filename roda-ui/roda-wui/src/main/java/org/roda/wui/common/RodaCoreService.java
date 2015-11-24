@@ -64,8 +64,6 @@ public abstract class RodaCoreService {
   private static LogEntry createLogEntry(RodaUser user, String actionComponent, String actionMethod, String aipId,
     long duration, List<LogEntryParameter> parameters) {
 
-    LOGGER.debug("Logging user action: " + user);
-
     LogEntry logEntry = new LogEntry();
     logEntry.setId(UUID.randomUUID().toString());
     logEntry.setAddress(user.getIpAddress());

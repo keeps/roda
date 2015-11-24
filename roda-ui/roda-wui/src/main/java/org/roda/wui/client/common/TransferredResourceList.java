@@ -7,7 +7,11 @@
  */
 package org.roda.wui.client.common;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
@@ -22,8 +26,11 @@ import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.widgets.AsyncTableCell;
 
+import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.DateCell;
+import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.SafeHtmlCell;
+import com.google.gwt.cell.client.ValueUpdater;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -31,9 +38,12 @@ import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
+import com.google.gwt.user.cellview.client.Header;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.view.client.CellPreviewEvent;
+import com.google.gwt.view.client.DefaultSelectionEventManager;
 import com.google.gwt.view.client.ProvidesKey;
 
 /**
@@ -49,6 +59,10 @@ public class TransferredResourceList extends AsyncTableCell<TransferredResource>
   // GWT.create(IngestListConstants.class);
 
   private final ClientLogger logger = new ClientLogger(getClass().getName());
+
+  private Column<TransferredResource, Boolean> selectColumn;
+  private final Set<TransferredResource> selected = new HashSet<TransferredResource>();
+  private final List<CheckboxSelectionListener> listeners = new ArrayList<TransferredResourceList.CheckboxSelectionListener>();
 
   private Column<TransferredResource, SafeHtml> isFileColumn;
   // private TextColumn<TransferredResource> idColumn;
@@ -66,7 +80,29 @@ public class TransferredResourceList extends AsyncTableCell<TransferredResource>
   }
 
   @Override
-  protected void configureDisplay(CellTable<TransferredResource> display) {
+  protected void configureDisplay(final CellTable<TransferredResource> display) {
+
+    selectColumn = new Column<TransferredResource, Boolean>(new CheckboxCell(true, false)) {
+      @Override
+      public Boolean getValue(TransferredResource resource) {
+        return getSelected().contains(resource);
+      }
+    };
+
+    selectColumn.setFieldUpdater(new FieldUpdater<TransferredResource, Boolean>() {
+      @Override
+      public void update(int index, TransferredResource resource, Boolean isSelected) {
+        if (isSelected) {
+          getSelected().add(resource);
+        } else {
+          getSelected().remove(resource);
+        }
+
+        // update header
+        display.redrawHeaders();
+        fireOnCheckboxSelectionChanged();
+      }
+    });
 
     isFileColumn = new Column<TransferredResource, SafeHtml>(new SafeHtmlCell()) {
       @Override
@@ -131,8 +167,43 @@ public class TransferredResourceList extends AsyncTableCell<TransferredResource>
     creationDateColumn.setSortable(true);
     ownerColumn.setSortable(true);
 
+    Header<Boolean> selectHeader = new Header<Boolean>(new CheckboxCell(true, true)) {
+
+      @Override
+      public Boolean getValue() {
+        Boolean ret;
+
+        if (selected.isEmpty()) {
+          ret = false;
+        } else if (selected.containsAll(getVisibleItems())) {
+          ret = true;
+        } else {
+          // some are selected
+          ret = false;
+        }
+
+        return ret;
+      }
+    };
+
+    selectHeader.setUpdater(new ValueUpdater<Boolean>() {
+
+      @Override
+      public void update(Boolean value) {
+        if (value) {
+          selected.addAll(getVisibleItems());
+
+        } else {
+          selected.clear();
+        }
+        redraw();
+        fireOnCheckboxSelectionChanged();
+      }
+    });
+
     // TODO externalize strings into constants
-    display.addColumn(isFileColumn);
+    display.addColumn(selectColumn, selectHeader);
+    display.addColumn(isFileColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-files-o'></i>"));
     // display.addColumn(idColumn, "Id");
     display.addColumn(nameColumn, "Name");
     display.addColumn(sizeColumn, "Size");
@@ -209,6 +280,42 @@ public class TransferredResourceList extends AsyncTableCell<TransferredResource>
   @Override
   protected int getInitialPageSize() {
     return PAGE_SIZE;
+  }
+
+  public Set<TransferredResource> getSelected() {
+    return selected;
+  }
+
+  public void setSelected(Set<TransferredResource> newSelected) {
+    selected.clear();
+    selected.addAll(newSelected);
+    redraw();
+    fireOnCheckboxSelectionChanged();
+  }
+
+  @Override
+  protected CellPreviewEvent.Handler<TransferredResource> getSelectionEventManager() {
+    return DefaultSelectionEventManager.<TransferredResource> createBlacklistManager(0);
+  }
+
+  // LISTENER
+
+  public interface CheckboxSelectionListener {
+    public void onSelectionChange(Set<TransferredResource> selected);
+  }
+
+  public void addCheckboxSelectionListener(CheckboxSelectionListener listener) {
+    listeners.add(listener);
+  }
+
+  public void removeCheckboxSelectionListener(CheckboxSelectionListener listener) {
+    listeners.remove(listener);
+  }
+
+  public void fireOnCheckboxSelectionChanged() {
+    for (CheckboxSelectionListener listener : listeners) {
+      listener.onSelectionChange(getSelected());
+    }
   }
 
 }

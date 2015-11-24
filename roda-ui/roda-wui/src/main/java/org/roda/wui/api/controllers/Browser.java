@@ -9,6 +9,7 @@ package org.roda.wui.api.controllers;
 
 import java.io.InputStream;
 import java.nio.file.FileAlreadyExistsException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -684,7 +685,7 @@ public class Browser extends RodaCoreService {
     // check user permissions
     UserUtility.checkRoles(user, INGEST_TRANSFER);
 
-    UserUtility.checkPathAccess(user, parent);
+    UserUtility.checkTransferredResourceAccess(user, Arrays.asList(parent));
 
     // delegate
     BrowserHelper.createTransferredResourcesFolder(parent, folderName);
@@ -695,21 +696,21 @@ public class Browser extends RodaCoreService {
       FOLDERNAME_PARAM, folderName);
   }
 
-  public static void removeTransferredResource(RodaUser user, String path)
+  public static void removeTransferredResources(RodaUser user, List<String> ids)
     throws AuthorizationDeniedException, GenericException {
     Date startDate = new Date();
 
     // check user permissions
     UserUtility.checkRoles(user, INGEST_TRANSFER);
 
-    UserUtility.checkPathAccess(user, path);
+    UserUtility.checkTransferredResourceAccess(user, ids);
 
     // delegate
-    BrowserHelper.removeTransferredResource(path);
+    BrowserHelper.removeTransferredResources(ids);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "removeTransferredResource", null, duration, PATH_PARAM, path);
+    registerAction(user, BROWSER_COMPONENT, "removeTransferredResources", null, duration, PATH_PARAM, ids);
   }
 
   public static void createTransferredResourceFile(RodaUser user, String path, String fileName, InputStream inputStream)
@@ -719,7 +720,7 @@ public class Browser extends RodaCoreService {
     // check user permissions
     UserUtility.checkRoles(user, INGEST_TRANSFER);
 
-    UserUtility.checkPathAccess(user, path);
+    UserUtility.checkTransferredResourceAccess(user, Arrays.asList(path));
 
     // delegate
     BrowserHelper.createTransferredResourceFile(path, fileName, inputStream);

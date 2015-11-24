@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.facet.SimpleFacetParameter;
@@ -26,6 +27,7 @@ import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.TransferredResourceList;
+import org.roda.wui.client.common.TransferredResourceList.CheckboxSelectionListener;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.client.main.BreadcrumbItem;
@@ -34,6 +36,7 @@ import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.widgets.MessagePopup;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -144,16 +147,16 @@ public class IngestTransfer extends Composite {
 
   // BUTTONS
   @UiField
-  Button startIngest;
+  Button uploadFiles;
 
   @UiField
   Button createFolder;
 
   @UiField
-  Button uploadFiles;
+  Button remove;
 
   @UiField
-  Button remove;
+  Button startIngest;
 
   private IngestTransfer() {
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.TRANSFERRED_RESOURCE_OWNER));
@@ -164,7 +167,7 @@ public class IngestTransfer extends Composite {
     facetOwner = new FlowPanel();
     Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
     facetPanels.put(RodaConstants.TRANSFERRED_RESOURCE_OWNER, facetOwner);
-    FacetUtils.bindFacets(transferredResourceList, facetPanels);
+    FacetUtils.bindFacets(transferredResourceList, facetPanels, true);
 
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -173,8 +176,11 @@ public class IngestTransfer extends Composite {
       @Override
       public void onSelectionChange(SelectionChangeEvent event) {
         TransferredResource r = transferredResourceList.getSelectionModel().getSelectedObject();
-        if (r != null) {
+        if (r != null && !r.isFile()) {
           Tools.newHistory(RESOLVER, getPathFromTransferredResourceId(r.getId()));
+        } else if (r != null && r.isFile()) {
+          // disable selection
+          transferredResourceList.getSelectionModel().clear();
         }
       }
     });
@@ -186,6 +192,15 @@ public class IngestTransfer extends Composite {
         boolean visible = event.getValue().getTotalCount() > 0;
         transferredResourceList.setVisible(visible);
         filtersPanel.setVisible(visible);
+      }
+    });
+
+    transferredResourceList.addCheckboxSelectionListener(new CheckboxSelectionListener() {
+
+      @Override
+      public void onSelectionChange(Set<TransferredResource> selected) {
+        remove.setEnabled(!selected.isEmpty());
+        startIngest.setEnabled(!selected.isEmpty());
       }
     });
 
@@ -304,11 +319,9 @@ public class IngestTransfer extends Composite {
     remove.setVisible(resource != null);
   }
 
-  @UiHandler("startIngest")
-  void buttonStartIngestHandler(ClickEvent e) {
-    if (resource != null) {
-      // TODO remove resource
-    }
+  @UiHandler("uploadFiles")
+  void buttonUploadFilesHandler(ClickEvent e) {
+    Tools.newHistory(IngestTransferUpload.RESOLVER, getPathFromTransferredResourceId(resource.getId()));
   }
 
   @UiHandler("createFolder")
@@ -316,15 +329,47 @@ public class IngestTransfer extends Composite {
     // TODO create folder
   }
 
-  @UiHandler("uploadFiles")
-  void buttonUploadFilesHandler(ClickEvent e) {
-    Tools.newHistory(IngestTransferUpload.RESOLVER, getPathFromTransferredResourceId(resource.getId()));
-  }
-
   @UiHandler("remove")
   void buttonRemoveHandler(ClickEvent e) {
+    Set<TransferredResource> selected = transferredResourceList.getSelected();
+
+    if (selected.isEmpty()) {
+
+      if (resource != null) {
+        // TODO remove resource
+      }
+      // else do nothing
+
+    } else {
+      // TODO remove all selected resources
+      final List<String> idsToRemove = new ArrayList<>();
+      for (TransferredResource r : selected) {
+        idsToRemove.add(r.getId());
+      }
+
+      BrowserService.Util.getInstance().removeTransferredResources(idsToRemove, new AsyncCallback<Void>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          MessagePopup.showError("Error removing", caught.getMessage());
+          transferredResourceList.refresh();
+        }
+
+        @Override
+        public void onSuccess(Void result) {
+          MessagePopup.showInfo("Removed sucessful", "Removed " + idsToRemove.size() + " items");
+          transferredResourceList.refresh();
+        }
+      });
+    }
+
+  }
+
+  @UiHandler("startIngest")
+  void buttonStartIngestHandler(ClickEvent e) {
     if (resource != null) {
       // TODO remove resource
     }
   }
+
 }

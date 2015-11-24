@@ -193,5 +193,5 @@ public interface BrowserServiceAsync {
 
   void createTransferredResourcesFolder(String parent, String folderName, AsyncCallback<Void> callback);
 
-  void removeTransferredResource(String path, AsyncCallback<Void> callback);
+  void removeTransferredResources(List<String> ids, AsyncCallback<Void> callback);
 }

@@ -17,7 +17,7 @@ import java.util.List;
 
 public abstract class FolderObservable {
   private final List<FolderObserver> observers;
-  Path basePath;
+  private Path basePath;
   public FolderObservable() {
     super();
     this.observers = new ArrayList<FolderObserver>();
@@ -53,7 +53,7 @@ public abstract class FolderObservable {
     Files.createDirectory(basePath.resolve(parent).resolve(folderName));
   }
 
-  public void removeFolder(Path path) throws IOException {
+  public void remove(Path path) throws IOException {
     Files.delete(basePath.resolve(path));
   }
 

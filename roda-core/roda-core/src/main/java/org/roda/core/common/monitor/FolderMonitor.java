@@ -38,7 +38,7 @@ public class FolderMonitor extends FolderObservable {
     Files.createDirectory(basePath.resolve(parent).resolve(folderName));
   }
 
-  public void removeFolder(Path path) throws IOException {
+  public void remove(Path path) throws IOException {
     Files.delete(basePath.resolve(path));
   }
 

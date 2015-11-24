@@ -289,17 +289,18 @@ public class UserUtility {
     return noCommonElement;
   }
 
-  public static void checkPathAccess(RodaUser user, String path) throws AuthorizationDeniedException {
-    // FIXME ...
+  public static void checkTransferredResourceAccess(RodaUser user, List<String> ids) throws AuthorizationDeniedException {
+    // FIXME administrator workaround
     if ("admin".equalsIgnoreCase(user.getId())) {
       return;
     } else {
-      if (Paths.get(path).getName(0).toString().equalsIgnoreCase(user.getName())) {
-        return;
-      } else {
-        throw new AuthorizationDeniedException(
-          "The user '" + user.getId() + "' does not have permissions to access " + path + " !");
+      for (String id : ids) {
+        if (!Paths.get(id).getName(0).toString().equalsIgnoreCase(user.getName())) {
+          throw new AuthorizationDeniedException(
+            "The user '" + user.getId() + "' does not have permissions to access to transferred resource " + id + " !");
+        }
       }
     }
   }
+
 }

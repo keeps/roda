@@ -8,6 +8,7 @@
 package org.roda.wui.common.client.widgets;
 
 import java.io.Serializable;
+import java.util.List;
 
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
@@ -32,6 +33,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.view.client.AsyncDataProvider;
+import com.google.gwt.view.client.CellPreviewEvent;
+import com.google.gwt.view.client.CellPreviewEvent.Handler;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.ProvidesKey;
 import com.google.gwt.view.client.Range;
@@ -108,7 +111,6 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
     display.setKeyboardSelectionPolicy(KeyboardSelectionPolicy.DISABLED);
     display.setLoadingIndicator(new HTML(SafeHtmlUtils.fromSafeConstant(
       "<div class='spinner'><div class='double-bounce1'></div><div class='double-bounce2'></div></div>")));
-    
 
     configureDisplay(display);
 
@@ -125,7 +127,14 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
     add(pageSizePager);
 
     selectionModel = new SingleSelectionModel<>(getKeyProvider());
-    display.setSelectionModel(selectionModel);
+    
+    Handler<T> selectionEventManager = getSelectionEventManager();
+    if(selectionEventManager != null) {
+      display.setSelectionModel(selectionModel, selectionEventManager);
+    } else {
+      display.setSelectionModel(selectionModel);
+    }
+
 
     columnSortHandler = new AsyncHandler(display);
     display.addColumnSortHandler(columnSortHandler);
@@ -146,9 +155,10 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
   protected abstract void getData(int start, int length, ColumnSortList columnSortList,
     AsyncCallback<IndexResult<T>> callback);
 
-  // protected CellTable<T> getDisplay() {
-  // return display;
-  // }
+  protected CellPreviewEvent.Handler<T> getSelectionEventManager() {
+    // none by default
+    return null;
+  }
 
   public SingleSelectionModel<T> getSelectionModel() {
     return selectionModel;
@@ -180,6 +190,14 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
   public void setFacets(Facets facets) {
     this.facets = facets;
     refresh();
+  }
+
+  public List<T> getVisibleItems() {
+    return display.getVisibleItems();
+  }
+
+  public void redraw() {
+    display.redraw();
   }
 
 }
