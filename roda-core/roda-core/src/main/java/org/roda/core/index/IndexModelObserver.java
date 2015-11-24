@@ -17,6 +17,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.Group;
+import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.LogEntry;
 import org.roda.core.data.v2.Representation;
 import org.roda.core.data.v2.SIPReport;
@@ -161,15 +162,11 @@ public class IndexModelObserver implements ModelObserver {
   // TODO Handle exceptions
   @Override
   public void aipDeleted(String aipId) {
-    try {
-      index.deleteById(RodaConstants.INDEX_AIP, aipId);
-      index.commit(RodaConstants.INDEX_AIP);
+    deleteDocumentFromIndex(RodaConstants.INDEX_AIP, aipId,
+      "Error deleting AIP (from " + RodaConstants.INDEX_AIP + ")");
 
-      index.deleteById(RodaConstants.INDEX_SDO, aipId);
-      index.commit(RodaConstants.INDEX_SDO);
-    } catch (SolrServerException | IOException e) {
-      LOGGER.error("Could not delete AIP from index", e);
-    }
+    deleteDocumentFromIndex(RodaConstants.INDEX_SDO, aipId,
+      "Error deleting AIP (from " + RodaConstants.INDEX_SDO + ")");
 
     // TODO delete included representations, descriptive metadata and other
   }
@@ -208,15 +205,8 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void representationCreated(Representation representation) {
-
-    SolrInputDocument representationDocument = SolrUtils.representationToSolrDocument(representation);
-    try {
-      index.add(RodaConstants.INDEX_REPRESENTATIONS, representationDocument);
-      index.commit(RodaConstants.INDEX_REPRESENTATIONS);
-    } catch (SolrServerException | IOException e) {
-      LOGGER.error("Could not index created representation", e);
-    }
-
+    addDocumentToIndex(RodaConstants.INDEX_REPRESENTATIONS, SolrUtils.representationToSolrDocument(representation),
+      "Error creating Representation");
   }
 
   @Override
@@ -227,12 +217,8 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void representationDeleted(String aipId, String representationId) {
-    try {
-      index.deleteById(RodaConstants.INDEX_REPRESENTATIONS, SolrUtils.getId(aipId, representationId));
-      index.commit(RodaConstants.INDEX_REPRESENTATIONS);
-    } catch (SolrServerException | IOException e) {
-      LOGGER.error("Error deleting representation (aipId=" + aipId + "; representationId=" + representationId + ")", e);
-    }
+    deleteDocumentFromIndex(RodaConstants.INDEX_REPRESENTATIONS, SolrUtils.getId(aipId, representationId),
+      "Error deleting Representation (aipId=" + aipId + "; representationId=" + representationId + ")");
   }
 
   @Override
@@ -255,24 +241,14 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void logEntryCreated(LogEntry entry) {
-    SolrInputDocument logEntryDocument = SolrUtils.logEntryToSolrDocument(entry);
-    try {
-      index.add(RodaConstants.INDEX_ACTION_LOG, logEntryDocument);
-      index.commit(RodaConstants.INDEX_ACTION_LOG);
-    } catch (SolrServerException | IOException e) {
-      LOGGER.error("Could not index LogEntry: " + e.getMessage(), e);
-    }
+    addDocumentToIndex(RodaConstants.INDEX_ACTION_LOG, SolrUtils.logEntryToSolrDocument(entry),
+      "Error creating Log entry");
   }
 
   @Override
   public void sipReportCreated(SIPReport sipReport) {
-    SolrInputDocument sipReportDocument = SolrUtils.sipReportToSolrDocument(sipReport);
-    try {
-      index.add(RodaConstants.INDEX_SIP_REPORT, sipReportDocument);
-      index.commit(RodaConstants.INDEX_SIP_REPORT);
-    } catch (SolrServerException | IOException e) {
-      LOGGER.error("Could not index SIPState: " + e.getMessage(), e);
-    }
+    addDocumentToIndex(RodaConstants.INDEX_SIP_REPORT, SolrUtils.sipReportToSolrDocument(sipReport),
+      "Error creating SIP report");
   }
 
   @Override
@@ -283,23 +259,13 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void sipReportDeleted(String sipReportId) {
-    try {
-      index.deleteById(RodaConstants.INDEX_SIP_REPORT, sipReportId);
-      index.commit(RodaConstants.INDEX_REPRESENTATIONS);
-    } catch (SolrServerException | IOException e) {
-      LOGGER.error("Error deleting SIP report (id=" + sipReportId + ")", e);
-    }
+    deleteDocumentFromIndex(RodaConstants.INDEX_SIP_REPORT, sipReportId,
+      "Error deleting SIP report (id=" + sipReportId + ")");
   }
 
   @Override
   public void userCreated(User user) {
-    SolrInputDocument userDocument = SolrUtils.rodaMemberToSolrDocument(user);
-    try {
-      index.add(RodaConstants.INDEX_MEMBERS, userDocument);
-      index.commit(RodaConstants.INDEX_MEMBERS);
-    } catch (SolrServerException | IOException e) {
-      LOGGER.error("Could not index User ", e);
-    }
+    addDocumentToIndex(RodaConstants.INDEX_MEMBERS, SolrUtils.rodaMemberToSolrDocument(user), "Error creating User");
   }
 
   @Override
@@ -310,23 +276,12 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void userDeleted(String userID) {
-    try {
-      index.deleteById(RodaConstants.INDEX_MEMBERS, userID);
-      index.commit(RodaConstants.INDEX_MEMBERS);
-    } catch (SolrServerException | IOException e) {
-      LOGGER.error("Error deleting User (id=" + userID + ")", e);
-    }
+    deleteDocumentFromIndex(RodaConstants.INDEX_MEMBERS, userID, "Error deleting User (id=" + userID + ")");
   }
 
   @Override
   public void groupCreated(Group group) {
-    SolrInputDocument groupDocument = SolrUtils.rodaMemberToSolrDocument(group);
-    try {
-      index.add(RodaConstants.INDEX_MEMBERS, groupDocument);
-      index.commit(RodaConstants.INDEX_MEMBERS);
-    } catch (SolrServerException | IOException e) {
-      LOGGER.error("Could not index Group ", e);
-    }
+    addDocumentToIndex(RodaConstants.INDEX_MEMBERS, SolrUtils.rodaMemberToSolrDocument(group), "Error creating Group");
   }
 
   @Override
@@ -337,12 +292,7 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void groupDeleted(String groupID) {
-    try {
-      index.deleteById(RodaConstants.INDEX_MEMBERS, groupID);
-      index.commit(RodaConstants.INDEX_MEMBERS);
-    } catch (SolrServerException | IOException e) {
-      LOGGER.error("Error deleting Group (id=" + groupID + ")", e);
-    }
+    deleteDocumentFromIndex(RodaConstants.INDEX_MEMBERS, groupID, "Error deleting Group (id=" + groupID + ")");
   }
 
   @Override
@@ -397,6 +347,35 @@ public class IndexModelObserver implements ModelObserver {
       indexOtherMetadata(model.retrieveAIP(otherMetadataBinary.getAipId()));
     } catch (ModelServiceException e) {
       LOGGER.error("Error when other metadata created on retrieving the full AIP", e);
+    }
+  }
+
+  @Override
+  public void jobCreated(Job job) {
+    addDocumentToIndex(RodaConstants.INDEX_JOB, SolrUtils.jobToSolrDocument(job), "Error creating Job");
+  }
+
+  @Override
+  public void jobUpdated(Job job) {
+    // TODO Auto-generated method stub
+
+  }
+
+  private void addDocumentToIndex(String indexName, SolrInputDocument document, String errorLogMessage) {
+    try {
+      index.add(indexName, document);
+      index.commit(indexName);
+    } catch (SolrServerException | IOException e) {
+      LOGGER.error(errorLogMessage, e);
+    }
+  }
+
+  private void deleteDocumentFromIndex(String indexName, String documentId, String errorLogMessage) {
+    try {
+      index.deleteById(indexName, documentId);
+      index.commit(indexName);
+    } catch (SolrServerException | IOException e) {
+      LOGGER.error(errorLogMessage, e);
     }
   }
 }

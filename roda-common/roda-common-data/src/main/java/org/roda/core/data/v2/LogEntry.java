@@ -8,8 +8,6 @@
 package org.roda.core.data.v2;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -20,98 +18,152 @@ import java.util.List;
 public class LogEntry implements Serializable {
   private static final long serialVersionUID = -178083792639806983L;
 
-  public static final String[] ACCEPT_SIP_ACTIONS = new String[] {"AcceptSIP.acceptSIP"};
-
-  public static final String[] BROWSER_ACTIONS = new String[] {"Browser.getRODAObject", "Browser.getRODAObjectCount",
-    "Browser.getRODAObjects", "Browser.getSimpleDescriptionObject", "Browser.getSimpleDescriptionObjectCount",
-    "Browser.getSimpleDescriptionObjects", "Browser.getSimpleDescriptionObjectIndex", "Browser.getDescriptionObject",
-    "Browser.getDOPIDs", "Browser.getDOAncestorPIDs", "Browser.getDORepresentations",
-    "Browser.getDOOriginalRepresentation", "Browser.getDONormalizedRepresentation", "Browser.getDOPreservationObjects",
-    "Browser.getSimpleRepresentationObject", "Browser.getSimpleRepresentationObjectCount",
-    "Browser.getSimpleRepresentationObjects", "Browser.getRepresentationObject", "Browser.getRepresentationFile",
-    "Browser.getROPreservationObject", "Browser.getSimpleRepresentationPreservationObject",
-    "Browser.getSimpleRepresentationPreservationObjectCount", "Browser.getSimpleRepresentationPreservationObjects",
-    "Browser.getRepresentationPreservationObject", "Browser.getSimpleEventPreservationObject",
-    "Browser.getSimpleEventPreservationObjectCount", "Browser.getSimpleEventPreservationObjects",
-    "Browser.getEventPreservationObject", "Browser.getPreservationEvents", "Browser.getAgentPreservationObject",
-    "Browser.getRODAObjectPermissions", "Browser.getRODAObjectUserPermissions", "Browser.hasModifyPermission",
-    "Browser.hasRemovePermission", "Browser.hasGrantPermission", "Browser.getProducers",};
-
-  public static final String[] EDITOR_ACTIONS = new String[] {"Editor.createDescriptionObject",
-    "Editor.modifyDescriptionObject", "Editor.removeDescriptionObject", "Editor.getDOPossibleLevels",
-    "Editor.setRODAObjectPermissions", "Editor.setProducers",};
-
-  public static final String[] FILE_ACCESS_SERVLET_ACTIONS = new String[] {"FileAccessServlet.GET"};
-
-  public static final String[] FILE_UPLOAD_SERVLET_ACTIONS = new String[] {"FileUploadServlet.POST"};
-
-  public static final String[] INGEST_ACTIONS = new String[] {"Ingest.createDetachedDescriptionObject",
-    "Ingest.createDescriptionObject", "Ingest.removeDescriptionObject", "Ingest.createRepresentationObject",
-    "Ingest.setDONormalizedRepresentation", "Ingest.registerIngestEvent", "Ingest.registerEvent",
-    "Ingest.registerDerivationEvent", "Ingest.removeObjects",};
-
-  public static final String[] INGEST_MONITOR_ACTIONS = new String[] {"IngestMonitor.getSIPsCount",
-    "IngestMonitor.getSIPs", "IngestMonitor.getPossibleStates",};
-
-  public static final String[] LOGGER_ACTIONS = new String[] {"Logger.addLogEntry",};
-
-  public static final String[] LOGIN_ACTIONS = new String[] {"Login.getAuthenticatedUser", "Login.getGuestUser",
-    "Login.getGuestCredentials",};
-
-  public static final String[] PLUGINS_ACTIONS = new String[] {"Plugins.getPluginsInfo",};
-
-  public static final String[] REPORTS_ACTIONS = new String[] {"Reports.getReport", "Reports.getReportsCount",
-    "Reports.getReports",};
-
-  public static final String[] SCHEDULER_ACTIONS = new String[] {"Scheduler.getTasks", "Scheduler.getTaskCount",
-    "Scheduler.getTask", "Scheduler.addTask", "Scheduler.modifyTask", "Scheduler.removeTask",
-    "Scheduler.getTaskInstance", "Scheduler.getTaskInstances", "Scheduler.getTaskInstanceCount",};
-
-  public static final String[] SEARCH_ACTIONS = new String[] {"Search.basicSearch", "Search.advancedSearch",};
-
-  public static final String[] SIP_UPLOAD_SERVLET_ACTIONS = new String[] {"SIPUploadServlet.POST"};
-
-  public static final String[] STATISTICS_ACTIONS = new String[] {"Statistics.insertStatisticData",
-    "Statistics.insertStatisticDataList",};
-
-  public static final String[] STATISTICS_MONITOR_ACTIONS = new String[] {"StatisticsMonitor.getStatisticDataCount",
-    "StatisticsMonitor.getStatisticData",};
-
-  public static final String[] USER_BROWSER_ACTIONS = new String[] {"UserBrowser.getGroupCount",
-    "UserBrowser.getGroup", "UserBrowser.getGroups", "UserBrowser.getUsersInGroup", "UserBrowser.getUserCount",
-    "UserBrowser.getUser", "UserBrowser.getUsers", "UserBrowser.getUserNames", "UserBrowser.getRoles",
-    "UserBrowser.getGroupDirectRoles", "UserBrowser.getUserDirectRoles",};
-
-  public static final String[] USER_EDITOR_ACTIONS = new String[] {"UserEditor.modifyUser",};
-
-  public static final String[] USER_MANAGEMENT_ACTIONS = new String[] {"UserManagement.addGroup",
-    "UserManagement.modifyGroup", "UserManagement.removeGroup", "UserManagement.addUser", "UserManagement.modifyUser",
-    "UserManagement.removeUser", "UserManagement.setUserPassword",};
-
-  public static final String[] USER_REGISTRATION_ACTIONS = new String[] {"UserRegistration.registerUser",
-    "UserRegistration.getUnconfirmedUser", "UserRegistration.modifyUnconfirmedEmail",
-    "UserRegistration.confirmUserEmail", "UserRegistration.requestPasswordReset", "UserRegistration.resetUserPassword",};
-
-  public static final String[] RODAWUI_ACTIONS = new String[] {"RODAWUI.pageHit", "RODAWUI.error", "RODAWUI.login"};
-
-  public static final String[] DISSEMINATOR_ACTIONS = new String[] {"disseminator.hit.RepresentationDownload",
-    "disseminator.miss.RepresentationDownload", "disseminator.hit.SimpleViewer", "disseminator.miss.SimpleViewer",
-    "disseminator.hit.FlashPageFlip", "disseminator.miss.FlashPageFlip", "disseminator.hit.PhpMyAdmin",
-    "disseminator.miss.PhpMyAdmin", "disseminator.hit.MediaPlayer", "disseminator.miss.MediaPlayer"};
-
-  public static final String[] ACTIONS = join(ACCEPT_SIP_ACTIONS, BROWSER_ACTIONS, EDITOR_ACTIONS,
-    FILE_ACCESS_SERVLET_ACTIONS, FILE_UPLOAD_SERVLET_ACTIONS, INGEST_ACTIONS, INGEST_MONITOR_ACTIONS, LOGGER_ACTIONS,
-    LOGIN_ACTIONS, PLUGINS_ACTIONS, REPORTS_ACTIONS, SCHEDULER_ACTIONS, SEARCH_ACTIONS, SIP_UPLOAD_SERVLET_ACTIONS,
-    STATISTICS_ACTIONS, STATISTICS_MONITOR_ACTIONS, USER_BROWSER_ACTIONS, USER_EDITOR_ACTIONS, USER_MANAGEMENT_ACTIONS,
-    USER_REGISTRATION_ACTIONS, RODAWUI_ACTIONS, DISSEMINATOR_ACTIONS);
-
-  private static String[] join(String[]... lists) {
-    List<String> elements = new ArrayList<String>();
-    for (String[] list : lists) {
-      Collections.addAll(elements, list);
-    }
-    return elements.toArray(new String[elements.size()]);
-  }
+  // public static final String[] ACCEPT_SIP_ACTIONS = new String[]
+  // {"AcceptSIP.acceptSIP"};
+  //
+  // public static final String[] BROWSER_ACTIONS = new String[]
+  // {"Browser.getRODAObject", "Browser.getRODAObjectCount",
+  // "Browser.getRODAObjects", "Browser.getSimpleDescriptionObject",
+  // "Browser.getSimpleDescriptionObjectCount",
+  // "Browser.getSimpleDescriptionObjects",
+  // "Browser.getSimpleDescriptionObjectIndex", "Browser.getDescriptionObject",
+  // "Browser.getDOPIDs", "Browser.getDOAncestorPIDs",
+  // "Browser.getDORepresentations",
+  // "Browser.getDOOriginalRepresentation",
+  // "Browser.getDONormalizedRepresentation",
+  // "Browser.getDOPreservationObjects",
+  // "Browser.getSimpleRepresentationObject",
+  // "Browser.getSimpleRepresentationObjectCount",
+  // "Browser.getSimpleRepresentationObjects",
+  // "Browser.getRepresentationObject", "Browser.getRepresentationFile",
+  // "Browser.getROPreservationObject",
+  // "Browser.getSimpleRepresentationPreservationObject",
+  // "Browser.getSimpleRepresentationPreservationObjectCount",
+  // "Browser.getSimpleRepresentationPreservationObjects",
+  // "Browser.getRepresentationPreservationObject",
+  // "Browser.getSimpleEventPreservationObject",
+  // "Browser.getSimpleEventPreservationObjectCount",
+  // "Browser.getSimpleEventPreservationObjects",
+  // "Browser.getEventPreservationObject", "Browser.getPreservationEvents",
+  // "Browser.getAgentPreservationObject",
+  // "Browser.getRODAObjectPermissions", "Browser.getRODAObjectUserPermissions",
+  // "Browser.hasModifyPermission",
+  // "Browser.hasRemovePermission", "Browser.hasGrantPermission",
+  // "Browser.getProducers",};
+  //
+  // public static final String[] EDITOR_ACTIONS = new String[]
+  // {"Editor.createDescriptionObject",
+  // "Editor.modifyDescriptionObject", "Editor.removeDescriptionObject",
+  // "Editor.getDOPossibleLevels",
+  // "Editor.setRODAObjectPermissions", "Editor.setProducers",};
+  //
+  // public static final String[] FILE_ACCESS_SERVLET_ACTIONS = new String[]
+  // {"FileAccessServlet.GET"};
+  //
+  // public static final String[] FILE_UPLOAD_SERVLET_ACTIONS = new String[]
+  // {"FileUploadServlet.POST"};
+  //
+  // public static final String[] INGEST_ACTIONS = new String[]
+  // {"Ingest.createDetachedDescriptionObject",
+  // "Ingest.createDescriptionObject", "Ingest.removeDescriptionObject",
+  // "Ingest.createRepresentationObject",
+  // "Ingest.setDONormalizedRepresentation", "Ingest.registerIngestEvent",
+  // "Ingest.registerEvent",
+  // "Ingest.registerDerivationEvent", "Ingest.removeObjects",};
+  //
+  // public static final String[] INGEST_MONITOR_ACTIONS = new String[]
+  // {"IngestMonitor.getSIPsCount",
+  // "IngestMonitor.getSIPs", "IngestMonitor.getPossibleStates",};
+  //
+  // public static final String[] LOGGER_ACTIONS = new String[]
+  // {"Logger.addLogEntry",};
+  //
+  // public static final String[] LOGIN_ACTIONS = new String[]
+  // {"Login.getAuthenticatedUser", "Login.getGuestUser",
+  // "Login.getGuestCredentials",};
+  //
+  // public static final String[] PLUGINS_ACTIONS = new String[]
+  // {"Plugins.getPluginsInfo",};
+  //
+  // public static final String[] REPORTS_ACTIONS = new String[]
+  // {"Reports.getReport", "Reports.getReportsCount",
+  // "Reports.getReports",};
+  //
+  // public static final String[] SCHEDULER_ACTIONS = new String[]
+  // {"Scheduler.getTasks", "Scheduler.getTaskCount",
+  // "Scheduler.getTask", "Scheduler.addTask", "Scheduler.modifyTask",
+  // "Scheduler.removeTask",
+  // "Scheduler.getTaskInstance", "Scheduler.getTaskInstances",
+  // "Scheduler.getTaskInstanceCount",};
+  //
+  // public static final String[] SEARCH_ACTIONS = new String[]
+  // {"Search.basicSearch", "Search.advancedSearch",};
+  //
+  // public static final String[] SIP_UPLOAD_SERVLET_ACTIONS = new String[]
+  // {"SIPUploadServlet.POST"};
+  //
+  // public static final String[] STATISTICS_ACTIONS = new String[]
+  // {"Statistics.insertStatisticData",
+  // "Statistics.insertStatisticDataList",};
+  //
+  // public static final String[] STATISTICS_MONITOR_ACTIONS = new String[]
+  // {"StatisticsMonitor.getStatisticDataCount",
+  // "StatisticsMonitor.getStatisticData",};
+  //
+  // public static final String[] USER_BROWSER_ACTIONS = new String[]
+  // {"UserBrowser.getGroupCount",
+  // "UserBrowser.getGroup", "UserBrowser.getGroups",
+  // "UserBrowser.getUsersInGroup", "UserBrowser.getUserCount",
+  // "UserBrowser.getUser", "UserBrowser.getUsers", "UserBrowser.getUserNames",
+  // "UserBrowser.getRoles",
+  // "UserBrowser.getGroupDirectRoles", "UserBrowser.getUserDirectRoles",};
+  //
+  // public static final String[] USER_EDITOR_ACTIONS = new String[]
+  // {"UserEditor.modifyUser",};
+  //
+  // public static final String[] USER_MANAGEMENT_ACTIONS = new String[]
+  // {"UserManagement.addGroup",
+  // "UserManagement.modifyGroup", "UserManagement.removeGroup",
+  // "UserManagement.addUser", "UserManagement.modifyUser",
+  // "UserManagement.removeUser", "UserManagement.setUserPassword",};
+  //
+  // public static final String[] USER_REGISTRATION_ACTIONS = new String[]
+  // {"UserRegistration.registerUser",
+  // "UserRegistration.getUnconfirmedUser",
+  // "UserRegistration.modifyUnconfirmedEmail",
+  // "UserRegistration.confirmUserEmail",
+  // "UserRegistration.requestPasswordReset",
+  // "UserRegistration.resetUserPassword",};
+  //
+  // public static final String[] RODAWUI_ACTIONS = new String[]
+  // {"RODAWUI.pageHit", "RODAWUI.error", "RODAWUI.login"};
+  //
+  // public static final String[] DISSEMINATOR_ACTIONS = new String[]
+  // {"disseminator.hit.RepresentationDownload",
+  // "disseminator.miss.RepresentationDownload",
+  // "disseminator.hit.SimpleViewer", "disseminator.miss.SimpleViewer",
+  // "disseminator.hit.FlashPageFlip", "disseminator.miss.FlashPageFlip",
+  // "disseminator.hit.PhpMyAdmin",
+  // "disseminator.miss.PhpMyAdmin", "disseminator.hit.MediaPlayer",
+  // "disseminator.miss.MediaPlayer"};
+  //
+  // public static final String[] ACTIONS = join(ACCEPT_SIP_ACTIONS,
+  // BROWSER_ACTIONS, EDITOR_ACTIONS,
+  // FILE_ACCESS_SERVLET_ACTIONS, FILE_UPLOAD_SERVLET_ACTIONS, INGEST_ACTIONS,
+  // INGEST_MONITOR_ACTIONS, LOGGER_ACTIONS,
+  // LOGIN_ACTIONS, PLUGINS_ACTIONS, REPORTS_ACTIONS, SCHEDULER_ACTIONS,
+  // SEARCH_ACTIONS, SIP_UPLOAD_SERVLET_ACTIONS,
+  // STATISTICS_ACTIONS, STATISTICS_MONITOR_ACTIONS, USER_BROWSER_ACTIONS,
+  // USER_EDITOR_ACTIONS, USER_MANAGEMENT_ACTIONS,
+  // USER_REGISTRATION_ACTIONS, RODAWUI_ACTIONS, DISSEMINATOR_ACTIONS);
+  //
+  // private static String[] join(String[]... lists) {
+  // List<String> elements = new ArrayList<String>();
+  // for (String[] list : lists) {
+  // Collections.addAll(elements, list);
+  // }
+  // return elements.toArray(new String[elements.size()]);
+  // }
 
   private String id;
   private String address;
@@ -137,9 +189,9 @@ public class LogEntry implements Serializable {
    *          the {@link LogEntry} to clone.
    */
   public LogEntry(LogEntry logEntry) {
-    this(logEntry.getId(), logEntry.getAddress(), logEntry.getDatetime(), logEntry.getUsername(), logEntry
-      .getActionComponent(), logEntry.getActionMethod(), logEntry.getParameters(), logEntry.getRelatedObjectID(),
-      logEntry.getDuration());
+    this(logEntry.getId(), logEntry.getAddress(), logEntry.getDatetime(), logEntry.getUsername(),
+      logEntry.getActionComponent(), logEntry.getActionMethod(), logEntry.getParameters(),
+      logEntry.getRelatedObjectID(), logEntry.getDuration());
   }
 
   /**

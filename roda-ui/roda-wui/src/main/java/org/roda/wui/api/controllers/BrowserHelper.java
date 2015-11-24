@@ -34,8 +34,6 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
@@ -48,7 +46,6 @@ import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.AuthorizationDeniedException;
 import org.roda.core.data.common.NotFoundException;
-import org.roda.core.data.common.NotImplementedException;
 import org.roda.core.data.common.Pair;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IndexResult;
@@ -72,6 +69,8 @@ import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.disseminators.common.tools.ZipEntryInfo;
 import org.roda.disseminators.common.tools.ZipTools;
+import org.roda.wui.api.exceptions.ApiException;
+import org.roda.wui.api.exceptions.RequestNotValidException;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.api.v1.utils.StreamResponse;
 import org.roda.wui.client.browse.BrowseItemBundle;
@@ -81,6 +80,8 @@ import org.roda.wui.client.browse.PreservationMetadataBundle;
 import org.roda.wui.common.HTMLUtils;
 import org.roda.wui.common.client.GenericException;
 import org.roda.wui.common.server.ServerTools;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BrowserHelper {
   private static final int BUNDLE_MAX_REPRESENTATION_COUNT = 2;
@@ -257,12 +258,11 @@ public class BrowserHelper {
     return count;
   }
 
-  public static void validateGetAipRepresentationFileParams(String acceptFormat) throws NotImplementedException {
-    if (RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
-      return;
+  public static void validateGetAipRepresentationFileParams(String acceptFormat) throws RequestNotValidException {
+    if (!RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
+      throw new RequestNotValidException(ApiException.INVALID_PARAMETER_VALUE,
+        "Invalid acceptFormat value. Expected values: " + Arrays.asList(RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN));
     }
-
-    throw new NotImplementedException();
   }
 
   protected static SimpleDescriptionObject getSimpleDescriptionObject(String aipId)
@@ -278,12 +278,11 @@ public class BrowserHelper {
     }
   }
 
-  protected static void validateGetAipRepresentationParams(String acceptFormat) throws NotImplementedException {
-    if (RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
-      return;
+  protected static void validateGetAipRepresentationParams(String acceptFormat) throws RequestNotValidException {
+    if (!RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
+      throw new RequestNotValidException(ApiException.INVALID_PARAMETER_VALUE,
+        "Invalid acceptFormat value. Expected values: " + Arrays.asList(RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN));
     }
-
-    throw new NotImplementedException();
   }
 
   protected static StreamResponse getAipRepresentation(String aipId, String representationId, String acceptFormat)
@@ -311,12 +310,11 @@ public class BrowserHelper {
 
   }
 
-  protected static void validateListAipDescriptiveMetadataParams(String acceptFormat) throws NotImplementedException {
-    if (RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
-      return;
+  protected static void validateListAipDescriptiveMetadataParams(String acceptFormat) throws RequestNotValidException {
+    if (!RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
+      throw new RequestNotValidException(ApiException.INVALID_PARAMETER_VALUE,
+        "Invalid acceptFormat value. Expected values: " + Arrays.asList(RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN));
     }
-
-    throw new NotImplementedException();
   }
 
   protected static StreamResponse listAipDescriptiveMetadata(String aipId, String start, String limit)
@@ -358,13 +356,13 @@ public class BrowserHelper {
     }
   }
 
-  protected static void validateGetAipDescritiveMetadataParams(String acceptFormat) throws NotImplementedException {
-    if (RodaConstants.API_ATTR_ACCEPT_FORMAT_XML.equals(acceptFormat)
-      || RodaConstants.API_ATTR_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
-      return;
+  protected static void validateGetAipDescritiveMetadataParams(String acceptFormat) throws RequestNotValidException {
+    if (!RodaConstants.API_ATTR_ACCEPT_FORMAT_XML.equals(acceptFormat)
+      && !RodaConstants.API_ATTR_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
+      throw new RequestNotValidException(ApiException.INVALID_PARAMETER_VALUE,
+        "Invalid acceptFormat value. Expected values: "
+          + Arrays.asList(RodaConstants.API_ATTR_ACCEPT_FORMAT_XML, RodaConstants.API_ATTR_ACCEPT_FORMAT_HTML));
     }
-
-    throw new NotImplementedException();
   }
 
   public static StreamResponse getAipDescritiveMetadata(String aipId, String metadataId, String acceptFormat,
@@ -420,12 +418,12 @@ public class BrowserHelper {
     return ret;
   }
 
-  protected static void validateListAipPreservationMetadataParams(String acceptFormat) throws NotImplementedException {
-    if (RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
-      return;
+  protected static void validateListAipPreservationMetadataParams(String acceptFormat) throws RequestNotValidException {
+    if (!RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
+      throw new RequestNotValidException(ApiException.INVALID_PARAMETER_VALUE,
+        "Invalid acceptFormat value. Expected values: " + Arrays.asList(RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN));
     }
 
-    throw new NotImplementedException();
   }
 
   public static StreamResponse aipsAipIdPreservationMetadataGet(String aipId, String start, String limit)
@@ -485,20 +483,18 @@ public class BrowserHelper {
   }
 
   protected static void validateGetAipRepresentationPreservationMetadataParams(String acceptFormat, String language)
-    throws NotImplementedException {
-    boolean valid = false;
-    if (RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN.equals(acceptFormat)
-      || RodaConstants.API_ATTR_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
-      valid = true;
+    throws RequestNotValidException {
+    if (!RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN.equals(acceptFormat)
+      && !RodaConstants.API_ATTR_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
+
+      throw new RequestNotValidException(ApiException.INVALID_PARAMETER_VALUE,
+        "Invalid acceptFormat value. Expected values: "
+          + Arrays.asList(RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN, RodaConstants.API_ATTR_ACCEPT_FORMAT_HTML));
     }
 
     // FIXME validate language? what exception should be thrown?
-    if (StringUtils.isNotBlank(language)) {
-      valid = valid && true;
-    }
-
-    if (!valid) {
-      throw new NotImplementedException();
+    if (!StringUtils.isNotBlank(language)) {
+      throw new RequestNotValidException(ApiException.EMPTY_PARAMETER, "Language parameter must have a value");
     }
 
   }

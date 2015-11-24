@@ -79,6 +79,7 @@ import org.roda.core.data.v2.EventPreservationObject;
 import org.roda.core.data.v2.FacetFieldResult;
 import org.roda.core.data.v2.Group;
 import org.roda.core.data.v2.IndexResult;
+import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.LogEntry;
 import org.roda.core.data.v2.RODAMember;
 import org.roda.core.data.v2.RODAObject;
@@ -1352,5 +1353,10 @@ public class SolrUtils {
       }
     });
     return size.get();
+  }
+
+  public static SolrInputDocument jobToSolrDocument(Job job) {
+    // TODO Auto-generated method stub
+    return null;
   }
 }

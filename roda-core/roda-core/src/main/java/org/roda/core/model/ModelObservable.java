@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.roda.core.data.v2.Group;
+import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.LogEntry;
 import org.roda.core.data.v2.Representation;
 import org.roda.core.data.v2.SIPReport;
@@ -170,8 +171,7 @@ public abstract class ModelObservable {
       observer.preservationMetadataDeleted(aipId, representationId, preservationMetadataBinaryId);
     }
   }
-  
-  
+
   protected void notifyAgentMetadataCreated(AgentMetadata agentMetadataBinary) {
     for (ModelObserver observer : observers) {
       observer.agentMetadataCreated(agentMetadataBinary);
@@ -189,10 +189,22 @@ public abstract class ModelObservable {
       observer.agentMetadataDeleted(agentMetadataBinaryId);
     }
   }
-  
-  protected void notifyOtherMetadataCreated(OtherMetadata otherMetadataBinary){
+
+  protected void notifyOtherMetadataCreated(OtherMetadata otherMetadataBinary) {
     for (ModelObserver observer : observers) {
       observer.otherMetadataCreated(otherMetadataBinary);
+    }
+  }
+
+  protected void notifyJobCreated(Job job) {
+    for (ModelObserver observer : observers) {
+      observer.jobCreated(job);
+    }
+  }
+
+  protected void notifyJobUpdated(Job job) {
+    for (ModelObserver observer : observers) {
+      observer.jobUpdated(job);
     }
   }
 }

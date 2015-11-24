@@ -519,6 +519,10 @@ public class RodaCoreFactory {
   public static Path getLogPath() {
     return logPath;
   }
+  
+  public static Path getJobsPath() {
+    return dataPath.resolve("jobs");
+  }
 
   public static Path getPluginsPath() {
     return configPath.resolve("plugins");

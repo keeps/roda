@@ -23,7 +23,6 @@ import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.AuthorizationDeniedException;
 import org.roda.core.data.common.NotFoundException;
-import org.roda.core.data.common.NotImplementedException;
 import org.roda.core.data.common.RODAException;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.RodaUser;
@@ -33,6 +32,7 @@ import org.roda.core.model.AIP;
 import org.roda.core.model.DescriptiveMetadata;
 import org.roda.core.model.ValidationException;
 import org.roda.core.storage.Binary;
+import org.roda.wui.api.exceptions.RequestNotValidException;
 import org.roda.wui.api.v1.utils.StreamResponse;
 import org.roda.wui.client.browse.BrowseItemBundle;
 import org.roda.wui.client.browse.DescriptiveMetadataEditBundle;
@@ -189,7 +189,7 @@ public class Browser extends RodaCoreService {
    */
   public static StreamResponse getAipRepresentation(RodaUser user, String aipId, String representationId,
     String acceptFormat)
-      throws AuthorizationDeniedException, GenericException, NotFoundException, NotImplementedException {
+      throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     Date startDate = new Date();
 
     // validate input
@@ -212,7 +212,7 @@ public class Browser extends RodaCoreService {
 
   public static StreamResponse listAipDescriptiveMetadata(RodaUser user, String aipId, String start, String limit,
     String acceptFormat)
-      throws AuthorizationDeniedException, GenericException, NotFoundException, NotImplementedException {
+      throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     Date startDate = new Date();
 
     // validate input
@@ -235,7 +235,7 @@ public class Browser extends RodaCoreService {
 
   public static StreamResponse getAipDescritiveMetadata(RodaUser user, String aipId, String metadataId,
     String acceptFormat, String language) throws AuthorizationDeniedException, GenericException, TransformerException,
-      NotFoundException, NotImplementedException {
+      NotFoundException, RequestNotValidException {
     Date startDate = new Date();
 
     // validate input
@@ -259,7 +259,7 @@ public class Browser extends RodaCoreService {
 
   public static StreamResponse listAipPreservationMetadata(RodaUser user, String aipId, String start, String limit,
     String acceptFormat)
-      throws AuthorizationDeniedException, GenericException, NotFoundException, NotImplementedException {
+      throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     Date startDate = new Date();
 
     // validate input
@@ -283,7 +283,7 @@ public class Browser extends RodaCoreService {
   public static StreamResponse getAipRepresentationPreservationMetadata(RodaUser user, String aipId,
     String representationId, String startAgent, String limitAgent, String startEvent, String limitEvent,
     String startFile, String limitFile, String acceptFormat, String language) throws AuthorizationDeniedException,
-      GenericException, TransformerException, NotFoundException, NotImplementedException {
+      GenericException, TransformerException, NotFoundException, RequestNotValidException {
     Date startDate = new Date();
 
     // validate input
@@ -576,7 +576,7 @@ public class Browser extends RodaCoreService {
 
   public static StreamResponse getAipRepresentationFile(RodaUser user, String aipId, String representationId,
     String fileId, String acceptFormat)
-      throws GenericException, AuthorizationDeniedException, NotFoundException, NotImplementedException {
+      throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException {
     Date startDate = new Date();
 
     // validate input

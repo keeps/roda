@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.wui.api.v1.utils;
+package org.roda.wui.api.exceptions;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -16,12 +16,14 @@ import org.roda.core.data.common.AuthorizationDeniedException;
 import org.roda.core.data.common.NotFoundException;
 import org.roda.core.data.common.NotImplementedException;
 import org.roda.core.data.common.RODAException;
+import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.common.client.GenericException;
 
 @Provider
 public class RodaExceptionMapper implements ExceptionMapper<RODAException> {
 
-  // XXX while using jetty (e.g. gwt-devmode), this injection causes error during
+  // XXX while using jetty (e.g. gwt-devmode), this injection causes error
+  // during
   // initialization
   // @Context
   // private HttpServletRequest request;
@@ -40,6 +42,9 @@ public class RodaExceptionMapper implements ExceptionMapper<RODAException> {
     } else if (e instanceof NotImplementedException) {
       response = Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Not yet implemented"))
         .build();
+    } else if (e instanceof RequestNotValidException) {
+      response = Response.status(Status.BAD_REQUEST)
+        .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
     } else if (e instanceof GenericException) {
       response = Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage()))
         .build();

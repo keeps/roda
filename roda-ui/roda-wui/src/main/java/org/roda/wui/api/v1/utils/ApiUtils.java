@@ -7,6 +7,10 @@
  */
 package org.roda.wui.api.v1.utils;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -14,10 +18,13 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.commons.lang.StringUtils;
 import org.roda.core.data.common.Pair;
+import org.roda.core.data.common.RODAException;
+import org.roda.wui.common.client.GenericException;
 
 /**
  * API Utils
  * 
+ * @author Hélder Silva <hsilva@keep.pt>
  */
 public class ApiUtils {
 
@@ -96,6 +103,14 @@ public class ApiUtils {
     }
 
     return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, message)).build();
+  }
+
+  public static URI getUriFromRequest(HttpServletRequest request) throws RODAException {
+    try {
+      return new URI(request.getRequestURI());
+    } catch (URISyntaxException e) {
+      throw new GenericException("Error creating URI from String: " + e.getMessage());
+    }
   }
 
 }

@@ -11,12 +11,10 @@ import java.util.Date;
 
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.AuthorizationDeniedException;
-import org.roda.core.data.common.NotFoundException;
-import org.roda.core.data.common.NotImplementedException;
+import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.RodaUser;
-import org.roda.wui.api.v1.entities.Job;
+import org.roda.wui.api.exceptions.RequestNotValidException;
 import org.roda.wui.common.RodaCoreService;
-import org.roda.wui.common.client.GenericException;
 
 /**
  * FIXME 1) verify all checkObject*Permissions (because now also a permission
@@ -25,7 +23,7 @@ import org.roda.wui.common.client.GenericException;
 public class Jobs extends RodaCoreService {
 
   private static final String JOBS_COMPONENT = "Jobs";
-  private static final String INGEST_SUBMIT = "ingest.submit";
+  private static final String INGEST_SUBMIT_ROLE = "ingest.submit";
 
   private Jobs() {
     super();
@@ -36,15 +34,14 @@ public class Jobs extends RodaCoreService {
    * ---------------- REST related methods - start -----------------------------
    * ---------------------------------------------------------------------------
    */
-  public static Job createJob(RodaUser user, Job job)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, NotImplementedException {
+  public static Job createJob(RodaUser user, Job job) throws AuthorizationDeniedException, RequestNotValidException {
     Date startDate = new Date();
 
     // validate input
     JobsHelper.validateCreateJob(job);
 
     // check user permissions
-    UserUtility.checkRoles(user, INGEST_SUBMIT);
+    UserUtility.checkRoles(user, INGEST_SUBMIT_ROLE);
 
     // delegate
     Job updatedJob = JobsHelper.createJob(user, job);

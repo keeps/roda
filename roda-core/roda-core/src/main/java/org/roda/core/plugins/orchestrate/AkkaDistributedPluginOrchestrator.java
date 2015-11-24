@@ -7,15 +7,24 @@
  */
 package org.roda.core.plugins.orchestrate;
 
+import java.io.Serializable;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.v2.Representation;
+import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.index.IndexService;
+import org.roda.core.model.AIP;
+import org.roda.core.model.File;
 import org.roda.core.model.ModelService;
+import org.roda.core.plugins.Plugin;
+import org.roda.core.plugins.PluginOrchestrator;
 import org.roda.core.plugins.orchestrate.akka.Frontend;
 import org.roda.core.plugins.orchestrate.akka.Master;
 import org.roda.core.storage.StorageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
@@ -46,7 +55,7 @@ import scala.concurrent.duration.FiniteDuration;
  * > http://www.typesafe.com/activator/template/akka-distributed-workers
  * > https://github.com/typesafehub/activator-akka-distributed-workers-java 
  * */
-public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin {
+public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin implements PluginOrchestrator {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
   private final IndexService index;
@@ -67,7 +76,8 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin {
     Config conf = ConfigFactory.parseString("akka.cluster.roles=[" + role + "]")
       .withFallback(ConfigFactory.parseString("akka.cluster.seed-nodes=[\"akka.tcp://" + systemPath + "\"]"))
       .withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.hostname=" + hostname))
-      .withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.port=" + port)).withFallback(ConfigFactory.load("config/orchestrator/application"));
+      .withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.port=" + port))
+      .withFallback(ConfigFactory.load("config/orchestrator/application"));
 
     clusterSystem = ActorSystem.create(systemName, conf);
 
@@ -81,7 +91,7 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin {
   }
 
   private static void startupSharedJournal(final ActorSystem system, boolean startStore, final ActorPath path) {
-    // Start the shared journal one one node (don't crash this SPOF)
+    // Start the shared journal on one node (don't crash this SPOF)
     // This will not be needed with a distributed journal
     if (startStore) {
       system.actorOf(Props.create(SharedLeveldbStore.class), "store");
@@ -120,6 +130,46 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin {
 
   public ActorRef getFrontend() {
     return frontend;
+  }
+
+  @Override
+  public <T extends Serializable> void runPluginFromIndex(Class<T> classToActOn, Filter filter, Plugin<T> plugin) {
+
+  }
+
+  @Override
+  public void runPluginOnAIPs(Plugin<AIP> plugin, List<String> ids) {
+
+  }
+
+  @Override
+  public void runPluginOnAllAIPs(Plugin<AIP> plugin) {
+
+  }
+
+  @Override
+  public void runPluginOnAllRepresentations(Plugin<Representation> plugin) {
+
+  }
+
+  @Override
+  public void runPluginOnAllFiles(Plugin<File> plugin) {
+
+  }
+
+  @Override
+  public void setup() {
+
+  }
+
+  @Override
+  public void shutdown() {
+
+  }
+
+  @Override
+  public void runPluginOnTransferredResources(Plugin<TransferredResource> plugin, List<TransferredResource> paths) {
+
   }
 
 }

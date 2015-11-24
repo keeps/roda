@@ -41,6 +41,7 @@ import org.roda.core.data.common.UserAlreadyExistsException;
 import org.roda.core.data.v2.AgentPreservationObject;
 import org.roda.core.data.v2.EventPreservationObject;
 import org.roda.core.data.v2.Group;
+import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.LogEntry;
 import org.roda.core.data.v2.RODAObjectPermissions;
 import org.roda.core.data.v2.Representation;
@@ -1924,5 +1925,10 @@ public class ModelService extends ModelObservable {
     }
     return otherMetadataBinary;
 
+  }
+
+  public void addJob(Job updatedJob, Path jobsDirectory) {
+    // TODO Auto-generated method stub
+    
   }
 }

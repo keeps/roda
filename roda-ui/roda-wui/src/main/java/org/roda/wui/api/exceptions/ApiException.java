@@ -5,11 +5,16 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.wui.api.v1.utils;
+package org.roda.wui.api.exceptions;
 
-@javax.annotation.Generated(value = "class io.swagger.codegen.languages.JaxRSServerCodegen", date = "2015-09-03T11:38:49.275+01:00")
-public class ApiException extends Exception {
+import org.roda.core.data.common.RODAException;
+
+public class ApiException extends RODAException {
   private static final long serialVersionUID = 4667937307148805083L;
+
+  public static final int INVALID_PARAMETER_VALUE = 1;
+  public static final int EMPTY_PARAMETER = 2;
+
   private int code;
 
   public ApiException(int code, String msg) {

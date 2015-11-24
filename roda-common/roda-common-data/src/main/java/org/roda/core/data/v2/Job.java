@@ -1,4 +1,11 @@
-package org.roda.wui.api.v1.entities;
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE file at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/keeps/roda
+ */
+package org.roda.core.data.v2;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -13,16 +20,21 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+/**
+ * @author Hélder Silva <hsilva@keep.pt>
+ */
 @XmlRootElement(name = "job")
 @JsonInclude(JsonInclude.Include.ALWAYS)
 public class Job implements Serializable {
   private static final long serialVersionUID = 615993757726175203L;
 
-  // work identifier
+  // job identifier
   private String id;
-  // work start date
+  // job creator
+  private String user;
+  // job start date
   private Date start;
-  // work end date
+  // job end date
   private Date end;
   // 0-100 scale completion status
   private int completionStatus;
@@ -56,6 +68,7 @@ public class Job implements Serializable {
   public Job(Job job) {
     super();
     this.id = job.getId();
+    this.user = job.getUser();
     this.start = job.getStart();
     this.end = job.getEnd();
     this.completionStatus = job.getCompletionStatus();
@@ -77,6 +90,14 @@ public class Job implements Serializable {
 
   public void setId(String id) {
     this.id = id;
+  }
+
+  public String getUser() {
+    return user;
+  }
+
+  public void setUser(String user) {
+    this.user = user;
   }
 
   public Date getStart() {
@@ -148,9 +169,9 @@ public class Job implements Serializable {
 
   @Override
   public String toString() {
-    return "Job [id=" + id + ", start=" + start + ", end=" + end + ", completionStatus=" + completionStatus
-      + ", plugin=" + plugin + ", pluginParameters=" + pluginParameters + ", resourceType=" + resourceType
-      + ", orchestratorMethod=" + orchestratorMethod + ", objectIds=" + objectIds + "]";
+    return "Job [id=" + id + ", user=" + user + ", start=" + start + ", end=" + end + ", completionStatus="
+      + completionStatus + ", plugin=" + plugin + ", pluginParameters=" + pluginParameters + ", resourceType="
+      + resourceType + ", orchestratorMethod=" + orchestratorMethod + ", objectIds=" + objectIds + "]";
   }
 
 }

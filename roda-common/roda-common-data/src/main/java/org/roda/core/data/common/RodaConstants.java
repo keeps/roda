@@ -99,6 +99,7 @@ public final class RodaConstants {
   public static final String INDEX_MEMBERS = "Members";
   public static final String INDEX_CHARACTERIZATION = "Characterization";
   public static final String INDEX_SIP = "SIP";
+  public static final String INDEX_JOB = "JOB";
 
   /*
    * STORAGE CONTAINERS

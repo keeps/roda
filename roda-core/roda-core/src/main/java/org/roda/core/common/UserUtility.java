@@ -17,8 +17,6 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sublist.Sublist;
@@ -33,6 +31,8 @@ import org.roda.core.data.v2.RodaUser;
 import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.IndexServiceException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class UserUtility {
   private static final Logger LOGGER = LoggerFactory.getLogger(UserUtility.class);
@@ -63,9 +63,7 @@ public class UserUtility {
       try {
         user = UserUtility.getLdapUtility().getAuthenticatedUser(credentials.getFirst(), credentials.getSecond());
         user.setIpAddress(request.getRemoteAddr());
-      } catch (AuthenticationDeniedException e) {
-        throw new AuthorizationDeniedException("Unable to authenticate user!");
-      } catch (ServiceException e) {
+      } catch (AuthenticationDeniedException | ServiceException e) {
         throw new AuthorizationDeniedException("Unable to authenticate user!");
       }
     } else {
@@ -291,15 +289,16 @@ public class UserUtility {
     return noCommonElement;
   }
 
-  public static void checkPathAccess(RodaUser user, String path) throws AuthorizationDeniedException{
-    //FIXME ...
+  public static void checkPathAccess(RodaUser user, String path) throws AuthorizationDeniedException {
+    // FIXME ...
     if ("admin".equalsIgnoreCase(user.getId())) {
       return;
-    }else{
-      if(Paths.get(path).getName(0).toString().equalsIgnoreCase(user.getName())){
+    } else {
+      if (Paths.get(path).getName(0).toString().equalsIgnoreCase(user.getName())) {
         return;
-      }else{
-        throw new AuthorizationDeniedException("The user '" + user.getId() + "' does not have permissions to access " + path+" !");
+      } else {
+        throw new AuthorizationDeniedException(
+          "The user '" + user.getId() + "' does not have permissions to access " + path + " !");
       }
     }
   }

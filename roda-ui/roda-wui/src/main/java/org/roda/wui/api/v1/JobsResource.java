@@ -24,40 +24,15 @@ import javax.ws.rs.core.Response;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RODAException;
+import org.roda.core.data.v2.Job;
+import org.roda.core.data.v2.Jobs;
 import org.roda.core.data.v2.RodaUser;
-import org.roda.wui.api.v1.entities.Job;
-import org.roda.wui.api.v1.entities.Jobs;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.swagger.annotations.Api;
-/*
-JOB OBJECT (Serializable)
-###########################
-- ID (auto-generated or provided during creation)
-- START_DATETIME (auto-generated)
-- END_DATETIME (auto-generated)
-- STATUS (auto-generated)
-
-- PLUGIN (provided during creation, qualified name string)
-- PLUGIN_PARAMS (provided during creation, map<string,string>)
-
-- RESOURCES_TYPE (transferred resources type, i.e., bagit, etc.)
-
-- LIST<T> ???
-- T (provided during creation, qualified name string)
-- ORCHESTRATOR_METHOD
-
-WORKFLOW
-###########################
-
-1) REST API POST to create a new job
-2) The newly created job is sent to orchestrator (embedded or distributed)
-3) If the orchestrator can execute the job, then return Ok to REST API, NotOk otherwise
-4)
-
- * */
+import io.swagger.annotations.ApiOperation;
 
 @Path(JobsResource.ENDPOINT)
 @Api(value = JobsResource.SWAGGER_ENDPOINT)
@@ -72,6 +47,7 @@ public class JobsResource {
 
   // TODO this is WIP
   @GET
+  @ApiOperation(value = "List Jobs", notes = "Gets a list of Jobs.", response = Job.class, responseContainer = "List")
   public Response listJobs(@QueryParam("acceptFormat") String acceptFormat) {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request.getHeader("Accept"));
     Jobs jobs = new Jobs();
@@ -84,6 +60,7 @@ public class JobsResource {
   @GET
   @Path("/{jobId}")
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+  @ApiOperation(value = "Get Job", notes = "Gets a particular Job.", response = Job.class)
   public Response getJob(@PathParam("jobId") String jobId, @QueryParam("acceptFormat") String acceptFormat) {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request.getHeader("Accept"));
 
@@ -97,6 +74,7 @@ public class JobsResource {
   @POST
   @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+  @ApiOperation(value = "Creates a new Job", notes = "Creates a new Job.", response = Job.class)
   public Response createJob(Job job, @QueryParam("acceptFormat") String acceptFormat) throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request.getHeader("Accept"));
 
@@ -106,7 +84,7 @@ public class JobsResource {
     // TODO run in a separate thread to be able to return right away
     Job updatedJob = org.roda.wui.api.controllers.Jobs.createJob(user, job);
 
-    return Response.ok(updatedJob, mediaType).build();
+    return Response.created(ApiUtils.getUriFromRequest(request)).entity(updatedJob).type(mediaType).build();
   }
 
 }

@@ -1,4 +1,11 @@
-package org.roda.wui.api.v1.entities;
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE file at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/keeps/roda
+ */
+package org.roda.core.data.v2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +16,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * @author Hélder Silva <hsilva@keep.pt>
+ */
 @XmlRootElement(name = "jobs")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Jobs {

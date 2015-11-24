@@ -8,6 +8,7 @@
 package org.roda.core.model;
 
 import org.roda.core.data.v2.Group;
+import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.LogEntry;
 import org.roda.core.data.v2.Representation;
 import org.roda.core.data.v2.SIPReport;
@@ -64,7 +65,7 @@ public interface ModelObserver {
   public void preservationMetadataUpdated(PreservationMetadata preservationMetadataBinary);
 
   public void preservationMetadataDeleted(String aipId, String representationId, String preservationMetadataBinaryId);
-  
+
   public void agentMetadataCreated(AgentMetadata agentMetadataBinary);
 
   public void agentMetadataUpdated(AgentMetadata agentMetadataBinary);
@@ -72,5 +73,9 @@ public interface ModelObserver {
   public void agentMetadataDeleted(String agentMetadataBinaryId);
 
   public void otherMetadataCreated(OtherMetadata otherMetadataBinary);
+
+  public void jobCreated(Job job);
+
+  public void jobUpdated(Job job);
 
 }

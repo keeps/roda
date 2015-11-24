@@ -12,11 +12,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.data.common.NotImplementedException;
+import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.RodaUser;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.plugins.Plugin;
-import org.roda.wui.api.v1.entities.Job;
+import org.roda.wui.api.exceptions.ApiException;
+import org.roda.wui.api.exceptions.RequestNotValidException;
 import org.roda.wui.common.client.GenericException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,22 +28,24 @@ public class JobsHelper {
   private static final List<String> ORCHESTRATOR_METHODS = Arrays.asList("runPluginOnTransferredResources");
   private static final List<String> RESOURCE_TYPES = Arrays.asList("bagit");
 
-  protected static void validateCreateJob(Job job) throws NotImplementedException {
-    boolean valid = false;
-    if (ORCHESTRATOR_METHODS.contains(job.getOrchestratorMethod())) {
-      valid = true;
+  protected static void validateCreateJob(Job job) throws RequestNotValidException {
+    if (!ORCHESTRATOR_METHODS.contains(job.getOrchestratorMethod())) {
+      throw new RequestNotValidException(ApiException.INVALID_PARAMETER_VALUE,
+        "Invalid orchestrator method '" + job.getOrchestratorMethod() + "'");
     }
-    if (RESOURCE_TYPES.contains(job.getResourceType())) {
-      valid = valid && true;
+    if (!RESOURCE_TYPES.contains(job.getResourceType())) {
+      throw new RequestNotValidException(ApiException.INVALID_PARAMETER_VALUE,
+        "Invalid resource type '" + job.getResourceType() + "'");
     }
 
-    if (!valid) {
-      throw new NotImplementedException();
-    }
   }
 
   protected static Job createJob(RodaUser user, Job job) {
     Job updatedJob = new Job(job);
+    job.setUser(user.getId());
+    
+    // serialize job to file & index it
+    RodaCoreFactory.getModelService().addJob(updatedJob, RodaCoreFactory.getLogPath());
 
     // send job to the orchestrator and return right away
     if ("runPluginOnTransferredResources".equalsIgnoreCase(job.getOrchestratorMethod())) {

@@ -68,6 +68,7 @@ public class BagitToAIPPluginUtils {
     Path tempFolder = Files.createTempDirectory("temp");
     if (bag.getPayload() != null) {
       for (BagFile bagFile : bag.getPayload()) {
+        // FIXME this is being done because we don't support folders in a representation
         String fileName = bagFile.getFilepath().replace("/", "_");
         File f = new File(tempFolder.toFile(), fileName);
         Files.copy(bagFile.newInputStream(), f.toPath(), StandardCopyOption.REPLACE_EXISTING);
