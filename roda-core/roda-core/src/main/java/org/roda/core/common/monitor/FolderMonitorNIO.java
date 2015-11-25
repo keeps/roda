@@ -147,6 +147,11 @@ public class FolderMonitorNIO {
         } else {
           register(watched, index, from);
         }
+        try {
+          solr.commit(RodaConstants.INDEX_SIP);
+        } catch (SolrServerException | IOException e) {
+           LOGGER.error("Error commiting SIPS: " + e.getMessage(), e);
+        }
 
         if (index) {
           RodaCoreFactory.setFolderMonitorDate(watched, new Date());
