@@ -275,22 +275,10 @@ public class FolderMonitorNIO {
             } catch (IOException x) {
             }
           }
-          if (kind == ENTRY_CREATE) {
-            LOGGER.debug("CREATED: "+child.toString());
-            NotifierThread nt = new NotifierThread(observers, basePath, child, true, false, false);
-            executor.execute(nt);
-          } else if (kind == ENTRY_MODIFY) {
-            LOGGER.debug("MODIFIED: "+child.toString());
-            NotifierThread nt = new NotifierThread(observers, basePath, child, true, false, false);
-            executor.execute(nt);
-          } else if (kind == ENTRY_DELETE) {
-            LOGGER.debug("DELETE: "+child.toString());
-            NotifierThread nt = new NotifierThread(observers, basePath, child, true, false, false);
-            executor.execute(nt);
-          } else if(kind== OVERFLOW){
-            LOGGER.debug("OVERFLOW");
-            
-          }
+          NotifierThread nt = new NotifierThread(observers, basePath, child, kind);
+          executor.execute(nt);
+          
+         
         }
         boolean valid = key.reset();
         if (!valid) {
@@ -316,25 +304,21 @@ public class FolderMonitorNIO {
     List<FolderObserver> observers;
     Path basePath;
     Path updatedPath;
-    boolean create;
-    boolean modify;
-    boolean delete;
-    public NotifierThread(List<FolderObserver> observers, Path basePath, Path updatedPath, boolean create, boolean modify, boolean delete){
+    WatchEvent.Kind<?> kind;
+    public NotifierThread(List<FolderObserver> observers, Path basePath, Path updatedPath, WatchEvent.Kind<?> kind){
         this.observers = observers;
         this.basePath = basePath;
         this.updatedPath = updatedPath;
-        this.create = create;
-        this.modify = modify;
-        this.delete = delete;
+        this.kind = kind;
     }
 
     @Override
     public void run() {
-      if (create) {
+      if (kind == ENTRY_CREATE) {
         notifyPathCreated(basePath, updatedPath);
-      } else if (modify) {
+      } else if (kind == ENTRY_MODIFY) {
         notifyPathModified(basePath, updatedPath);
-      } else if (delete) {
+      } else if (kind == ENTRY_DELETE) {
         notifyPathDeleted(basePath, updatedPath);
       }
     }
