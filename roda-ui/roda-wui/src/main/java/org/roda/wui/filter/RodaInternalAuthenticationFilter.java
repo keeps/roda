@@ -8,8 +8,6 @@
 package org.roda.wui.filter;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URLEncoder;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -20,13 +18,10 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.sun.tools.internal.ws.processor.generator.ServiceGenerator;
-
 import org.roda.core.common.UserUtility;
 import org.roda.wui.common.client.tools.Tools;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Hélder Silva <hsilva@keep.pt>
@@ -50,25 +45,19 @@ public class RodaInternalAuthenticationFilter implements Filter {
     String url = httpRequest.getRequestURL().toString();
     String requestURI = httpRequest.getRequestURI();
     String service = httpRequest.getParameter("service");
+    String hash = httpRequest.getParameter("hash");
 
     LOGGER.debug("URL: " + url);
     LOGGER.debug("Request URI: " + requestURI);
     LOGGER.debug("Service: " + service);
-
-    String serviceFrag = null;
-    try {
-      serviceFrag = URLEncoder.encode(URI.create(service).getFragment(), "UTF-8").replaceAll("%2F", "/");
-      LOGGER.debug("Frag: " + serviceFrag);
-    } catch (IllegalArgumentException e) {
-      LOGGER.warn("Bad format for service parameter", e);
-    }
+    LOGGER.debug("hash: " + hash);
 
     if (requestURI.equals("/login")) {
       // FIXME add this to configuration
       String redirect = "/#login";
 
-      if (serviceFrag != null) {
-        redirect += Tools.HISTORY_SEP + serviceFrag;
+      if (hash != null) {
+        redirect += Tools.HISTORY_SEP + hash;
       }
 
       httpResponse.sendRedirect(redirect);

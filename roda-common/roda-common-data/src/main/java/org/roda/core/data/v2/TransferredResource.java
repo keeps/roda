@@ -96,12 +96,12 @@ public class TransferredResource implements Serializable {
     return serialVersionUID;
   }
 
-  public String getParentPath() {
+  public String getParentId() {
     return parentPath;
   }
 
-  public void setParentPath(String parentPath) {
-    this.parentPath = parentPath;
+  public void setParentId(String parentId) {
+    this.parentPath = parentId;
   }
 
   

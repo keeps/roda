@@ -92,8 +92,13 @@ public class FolderMonitorNIO {
     observers.remove(observer);
   }
 
-  public void createFolder(Path parent, String folderName) throws IOException {
-    Files.createDirectory(basePath.resolve(parent).resolve(folderName));
+  public String createFolder(Path parent, String folderName) throws IOException {
+    Path createdPath = Files.createDirectories(basePath.resolve(parent).resolve(folderName));
+    for (FolderObserver observer : observers) {
+      observer.pathAdded(basePath, createdPath, true);
+    }
+    String id = basePath.relativize(createdPath).toString();
+    return id;
   }
 
   public void remove(Path path) throws IOException, NotFoundException {
@@ -108,14 +113,14 @@ public class FolderMonitorNIO {
       throw new IOException(sse.getMessage(), sse);
     }
   }
-  
+
   public void removeSync(List<String> ids) throws NotFoundException, IOException {
-    for(String s : ids){
-      try{
+    for (String s : ids) {
+      try {
         Path relative = Paths.get(s);
         Path fullPath = basePath.resolve(relative);
         if (Files.exists(fullPath)) {
-          
+
           for (FolderObserver observer : observers) {
             observer.pathDeleted(basePath, fullPath);
           }
@@ -127,7 +132,7 @@ public class FolderMonitorNIO {
         throw new IOException(sse.getMessage(), sse);
       }
     }
-    
+
   }
 
   public void createFile(String path, String fileName, InputStream inputStream)
@@ -172,7 +177,7 @@ public class FolderMonitorNIO {
         try {
           solr.commit(RodaConstants.INDEX_SIP);
         } catch (SolrServerException | IOException e) {
-           LOGGER.error("Error commiting SIPS: " + e.getMessage(), e);
+          LOGGER.error("Error commiting SIPS: " + e.getMessage(), e);
         }
 
         if (index) {
@@ -299,8 +304,7 @@ public class FolderMonitorNIO {
           }
           NotifierThread nt = new NotifierThread(observers, basePath, child, kind);
           executor.execute(nt);
-          
-         
+
         }
         boolean valid = key.reset();
         if (!valid) {
@@ -321,17 +325,18 @@ public class FolderMonitorNIO {
      * (WatchKey key : keysToRemove) { keys.remove(key); } } }
      */
   }
-  
+
   class NotifierThread implements Runnable {
     List<FolderObserver> observers;
     Path basePath;
     Path updatedPath;
     WatchEvent.Kind<?> kind;
-    public NotifierThread(List<FolderObserver> observers, Path basePath, Path updatedPath, WatchEvent.Kind<?> kind){
-        this.observers = observers;
-        this.basePath = basePath;
-        this.updatedPath = updatedPath;
-        this.kind = kind;
+
+    public NotifierThread(List<FolderObserver> observers, Path basePath, Path updatedPath, WatchEvent.Kind<?> kind) {
+      this.observers = observers;
+      this.basePath = basePath;
+      this.updatedPath = updatedPath;
+      this.kind = kind;
     }
 
     @Override
@@ -344,7 +349,7 @@ public class FolderMonitorNIO {
         notifyPathDeleted(basePath, updatedPath);
       }
     }
-    
+
     protected void notifyPathCreated(Path basePath, Path pathCreated) {
       for (FolderObserver observer : observers) {
         observer.pathAdded(basePath, pathCreated, true);
@@ -362,7 +367,6 @@ public class FolderMonitorNIO {
         observer.pathModified(basePath, pathCreated);
       }
     }
-}
+  }
 
-  
 }

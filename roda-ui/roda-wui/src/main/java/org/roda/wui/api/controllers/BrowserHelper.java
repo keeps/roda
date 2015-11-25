@@ -962,9 +962,9 @@ public class BrowserHelper {
     }
   }
 
-  public static void createTransferredResourcesFolder(String parent, String folderName) throws GenericException {
+  public static String createTransferredResourcesFolder(String parent, String folderName) throws GenericException {
     try {
-      RodaCoreFactory.getFolderMonitor().createFolder(Paths.get(parent), folderName);
+      return  RodaCoreFactory.getFolderMonitor().createFolder(Paths.get(parent), folderName);
     } catch (IOException e) {
       LOGGER.error("Error creating transferred resource folder", e);
       throw new GenericException("Error creating transferred resource folder: " + e.getMessage());

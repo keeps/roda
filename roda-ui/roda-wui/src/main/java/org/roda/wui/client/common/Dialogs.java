@@ -2,6 +2,11 @@ package org.roda.wui.client.common;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.event.dom.client.KeyPressEvent;
+import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.regexp.shared.RegExp;
@@ -52,10 +57,10 @@ public class Dialogs {
     });
 
     dialogBox.addStyleName("wui-dialog-confirm");
-    layout.addStyleName("wui-dialog-confirm-layout");
-    messageLabel.addStyleName("wui-dialog-confirm-message");
-    cancelButton.addStyleName("wui-dialog-confirm-cancel btn btn-ban");
-    confirmButton.addStyleName("wui-dialog-confirm-ok btn btn-play");
+    layout.addStyleName("wui-dialog-layout");
+    messageLabel.addStyleName("wui-dialog-message");
+    cancelButton.addStyleName("btn btn-ban");
+    confirmButton.addStyleName("pull-right btn btn-play");
 
     dialogBox.center();
     dialogBox.show();
@@ -88,9 +93,9 @@ public class Dialogs {
     });
 
     dialogBox.addStyleName("wui-dialog-information");
-    layout.addStyleName("wui-dialog-information-layout");
-    messageLabel.addStyleName("wui-dialog-information-message");
-    continueButton.addStyleName("wui-dialog-information-ok btn btn-play");
+    layout.addStyleName("wui-dialog-layout");
+    messageLabel.addStyleName("wui-dialog-message");
+    continueButton.addStyleName("btn btn-play");
 
     dialogBox.center();
     dialogBox.show();
@@ -134,31 +139,56 @@ public class Dialogs {
         callback.onSuccess(inputBox.getText());
       }
     });
-    
+
     inputBox.addValueChangeHandler(new ValueChangeHandler<String>() {
-      
+
       @Override
       public void onValueChange(ValueChangeEvent<String> event) {
         boolean isValid = validator.test(inputBox.getText());
-        confirmButton.setEnabled(isValid);
-        if(isValid) {
+        if (isValid) {
           inputBox.addStyleName("error");
         } else {
           inputBox.removeStyleName("error");
         }
       }
     });
-    
+
+    inputBox.addKeyPressHandler(new KeyPressHandler() {
+
+      @Override
+      public void onKeyPress(KeyPressEvent event) {
+        boolean isValid = validator.test(inputBox.getText());
+        confirmButton.setEnabled(isValid);
+      }
+    });
+
+    inputBox.addKeyDownHandler(new KeyDownHandler() {
+
+      @Override
+      public void onKeyDown(KeyDownEvent event) {
+        if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+          boolean isValid = validator.test(inputBox.getText());
+          if (isValid) {
+            dialogBox.hide();
+            callback.onSuccess(inputBox.getText());
+          }
+        }
+      }
+
+    });
+
     confirmButton.setEnabled(validator.test(inputBox.getText()));
 
-    dialogBox.addStyleName("wui-dialog-confirm");
-    layout.addStyleName("wui-dialog-confirm-layout");
-    messageLabel.addStyleName("wui-dialog-confirm-message");
-    cancelButton.addStyleName("wui-dialog-confirm-cancel btn btn-ban");
-    confirmButton.addStyleName("wui-dialog-confirm-ok btn btn-play");
+    dialogBox.addStyleName("wui-dialog-prompt");
+    layout.addStyleName("wui-dialog-layout");
+    messageLabel.addStyleName("wui-dialog-message");
+    inputBox.addStyleName("form-textbox wui-dialog-message");
+    cancelButton.addStyleName("btn btn-ban");
+    confirmButton.addStyleName("pull-right btn btn-play");
 
     dialogBox.center();
     dialogBox.show();
+    inputBox.setFocus(true);
   }
 
 }

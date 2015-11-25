@@ -214,4 +214,16 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("Continue")
   String ingestTransferNotFoundDialogButton();
 
+  @DefaultMessage("New folder name")
+  String ingestTransferCreateFolderTitle();
+
+  @DefaultMessage("Please select a name for your new folder")
+  String ingestTransferCreateFolderMessage();
+
+  @DefaultMessage("Cancel")
+  String dialogCancel();
+
+  @DefaultMessage("OK")
+  String dialogOk();
+
 }

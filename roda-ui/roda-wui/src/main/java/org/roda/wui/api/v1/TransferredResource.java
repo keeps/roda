@@ -27,6 +27,8 @@ import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RODAException;
 import org.roda.core.data.v2.RodaUser;
 import org.roda.wui.api.controllers.Browser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
@@ -36,6 +38,8 @@ import io.swagger.annotations.ApiParam;
 public class TransferredResource {
   public static final String ENDPOINT = "/v1/transferred";
   public static final String SWAGGER_ENDPOINT = "v1 transferred";
+
+  private Logger logger = LoggerFactory.getLogger(getClass());
 
   @Context
   private HttpServletRequest request;

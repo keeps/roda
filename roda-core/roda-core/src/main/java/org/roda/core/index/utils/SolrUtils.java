@@ -1238,9 +1238,9 @@ public class SolrUtils {
     TransferredResource tr = new TransferredResource();
     String id = objectToString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_ID));
     String fullPath = objectToString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_FULLPATH));
-    String parentPath = null;
-    if (doc.containsKey(RodaConstants.TRANSFERRED_RESOURCE_PARENTPATH)) {
-      parentPath = objectToString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_PARENTPATH));
+    String parentId = null;
+    if (doc.containsKey(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID)) {
+      parentId = objectToString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID));
     }
     String relativePath = objectToString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_RELATIVEPATH));
 
@@ -1264,7 +1264,7 @@ public class SolrUtils {
     tr.setName(name);
     tr.setRelativePath(relativePath);
     tr.setSize(size);
-    tr.setParentPath(parentPath);
+    tr.setParentId(parentId);
     tr.setFile(isFile);
     tr.setOwner(owner);
     tr.setAncestorsPaths(ancestorsPath);
@@ -1278,12 +1278,8 @@ public class SolrUtils {
 
     sip.addField(RodaConstants.TRANSFERRED_RESOURCE_ID, relativePath.toString());
     sip.addField(RodaConstants.TRANSFERRED_RESOURCE_FULLPATH, createdPath.toString());
-
-    Path parentPath = relativePath.getParent();
-    if (parentPath.getNameCount() > 1) {
-      sip.addField(RodaConstants.TRANSFERRED_RESOURCE_PARENTPATH,
-        parentPath.subpath(1, parentPath.getNameCount()).toString());
-    }
+    sip.addField(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID, relativePath.getParent());
+    
     if (relativePath.getNameCount() > 1) {
       sip.addField(RodaConstants.TRANSFERRED_RESOURCE_RELATIVEPATH,
         relativePath.subpath(1, relativePath.getNameCount()).toString());

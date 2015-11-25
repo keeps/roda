@@ -78,7 +78,7 @@
 		required="true" multiValued="false" />
 	<field name="fullPath" type="string" indexed="true" stored="true"
 		required="true" multiValued="false" />
-	<field name="parentPath" type="string" indexed="true" stored="true"
+	<field name="parentId" type="string" indexed="true" stored="true"
 		required="false" multiValued="false" />
 	<field name="ancestors" type="string" indexed="true" stored="true"
 		required="false" multiValued="true" />

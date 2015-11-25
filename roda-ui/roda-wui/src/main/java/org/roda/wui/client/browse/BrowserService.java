@@ -1,4 +1,5 @@
 /**
+
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
@@ -234,7 +235,7 @@ public interface BrowserService extends RemoteService {
   TransferredResource retrieveTransferredResource(String transferredResourceId)
     throws AuthorizationDeniedException, GenericException, NotFoundException;
 
-  void createTransferredResourcesFolder(String parent, String folderName)
+  String createTransferredResourcesFolder(String parent, String folderName)
     throws AuthorizationDeniedException, GenericException;
 
   void removeTransferredResources(List<String> ids)

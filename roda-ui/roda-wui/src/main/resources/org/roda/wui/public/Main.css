@@ -1779,14 +1779,14 @@
 	
 }
 
-.wui-dialog-confirm-layout,.wui-dialog-information-layout {
+.wui-dialog-layout {
 	padding: 10px;
 }
 
-.wui-dialog-confirm-message,.wui-dialog-information-message {
+.wui-dialog-message {
 	margin-bottom: 10px;
 }
 
-.wui-dialog-confirm-ok {
+.pull-right {
 	float: right;
 }

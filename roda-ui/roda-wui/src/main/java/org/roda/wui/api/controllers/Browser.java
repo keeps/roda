@@ -680,21 +680,27 @@ public class Browser extends RodaCoreService {
     return resource;
   }
 
-  public static void createTransferredResourcesFolder(RodaUser user, String parent, String folderName)
+  public static String createTransferredResourcesFolder(RodaUser user, String parent, String folderName)
     throws AuthorizationDeniedException, GenericException {
     Date startDate = new Date();
     // check user permissions
     UserUtility.checkRoles(user, INGEST_TRANSFER);
 
     UserUtility.checkTransferredResourceAccess(user, Arrays.asList(parent));
+    
+    // fix parent
+    if(parent == null) {
+      parent = user.getName();
+    }
 
     // delegate
-    BrowserHelper.createTransferredResourcesFolder(parent, folderName);
+    String id = BrowserHelper.createTransferredResourcesFolder(parent, folderName);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
     registerAction(user, BROWSER_COMPONENT, "createTransferredResourcesFolder", null, duration, PARENT_PARAM, parent,
       FOLDERNAME_PARAM, folderName);
+    return id;
   }
 
   public static void removeTransferredResources(RodaUser user, List<String> ids)
@@ -735,13 +741,15 @@ public class Browser extends RodaCoreService {
 
   public static StreamResponse getClassificationPlan(RodaUser user, String type) {
     Date startDate = new Date();
-    
+
     // delegate
-    //StreamResponse classificationPlan = BrowserHelper.getClassificationPlan(type);
+    // StreamResponse classificationPlan =
+    // BrowserHelper.getClassificationPlan(type);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "getClassificationPlan", null, duration, CLASSIFICATION_PLAN_TYPE_PARAMETER, type);
+    registerAction(user, BROWSER_COMPONENT, "getClassificationPlan", null, duration, CLASSIFICATION_PLAN_TYPE_PARAMETER,
+      type);
 
     return null;
   }

@@ -26,6 +26,7 @@ import org.roda.wui.common.client.tools.CachedAsynRequest;
 import org.roda.wui.common.client.tools.Tools;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.safehtml.shared.UriUtils;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -139,7 +140,12 @@ public class UserLogin {
    */
   public void login() {
     String currentURL = Window.Location.getHref().replaceAll("#", "%23");
-    Window.open("/login?service=" + currentURL, "_self", "");
+    String hash = Window.Location.getHash();
+    if(hash.length()>0) {
+      hash = hash.substring(1);
+      hash = UriUtils.encode(hash);
+    }
+    Window.open("/login?service=" + currentURL + "&hash=" + hash, "_self", "");
   }
 
   public void login(String username, String password, final AsyncCallback<RodaUser> callback) {

@@ -44,6 +44,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -112,7 +113,7 @@ public class IngestTransfer extends Composite {
   public static final SafeHtml FILE_ICON = SafeHtmlUtils.fromSafeConstant("<i class='fa fa-file-o'></i>");
 
   private static final Filter DEFAULT_FILTER = new Filter(
-    new EmptyKeyFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENTPATH));
+    new EmptyKeyFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID));
 
   interface MyUiBinder extends UiBinder<Widget, IngestTransfer> {
   }
@@ -222,7 +223,7 @@ public class IngestTransfer extends Composite {
       messages.ingestTransferItemInfo(r.getCreationDate(), Humanize.readableFileSize(r.getSize()), r.getOwner()));
 
     Filter filter = new Filter(
-      new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENTPATH, r.getRelativePath()),
+      new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID, r.getRelativePath()),
       new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_OWNER, r.getOwner()));
     transferredResourceList.setFilter(filter);
 
@@ -350,7 +351,32 @@ public class IngestTransfer extends Composite {
 
   @UiHandler("createFolder")
   void buttonCreateFolderHandler(ClickEvent e) {
-    // TODO create folder
+    Dialogs.showPromptDialog(messages.ingestTransferCreateFolderTitle(), messages.ingestTransferCreateFolderMessage(),
+      RegExp.compile(".+"), messages.dialogCancel(), messages.dialogOk(), new AsyncCallback<String>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          // do nothing
+        }
+
+        @Override
+        public void onSuccess(String folderName) {
+          String parent = resource != null ? resource.getId() : null;
+          BrowserService.Util.getInstance().createTransferredResourcesFolder(parent, folderName,
+            new AsyncCallback<String>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+              MessagePopup.showError(caught.getClass().getSimpleName(), caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(String newResourceId) {
+              Tools.newHistory(RESOLVER, getPathFromTransferredResourceId(newResourceId));
+            }
+          });
+        }
+      });
   }
 
   @UiHandler("remove")
@@ -386,7 +412,7 @@ public class IngestTransfer extends Composite {
                   public void onSuccess(Void result) {
                     MessagePopup.showInfo(messages.ingestTransferRemoveSuccessTitle(),
                       messages.ingestTransferRemoveSuccessMessage(1));
-                    // TODO jump to ancestor
+                    Tools.newHistory(RESOLVER, getPathFromTransferredResourceId(resource.getParentId()));
                   }
                 });
               }
@@ -441,7 +467,7 @@ public class IngestTransfer extends Composite {
   @UiHandler("startIngest")
   void buttonStartIngestHandler(ClickEvent e) {
     if (resource != null) {
-      // TODO remove resource
+      // TODO start ingest
     }
   }
 
