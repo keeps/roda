@@ -115,10 +115,11 @@ public class FolderMonitorNIO {
         Path relative = Paths.get(s);
         Path fullPath = basePath.resolve(relative);
         if (Files.exists(fullPath)) {
-          FSUtils.deletePath(fullPath);
+          
           for (FolderObserver observer : observers) {
             observer.pathDeleted(basePath, fullPath);
           }
+          FSUtils.deletePath(fullPath);
         } else {
           throw new NotFoundException("Path does not exist: " + fullPath);
         }
