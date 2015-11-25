@@ -34,6 +34,8 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.solr.client.solrj.SolrClient;
@@ -47,7 +49,7 @@ import org.slf4j.LoggerFactory;
 
 public class FolderMonitorNIO {
   private static final Logger LOGGER = LoggerFactory.getLogger(FolderMonitorNIO.class);
-
+  ExecutorService executor;
   private FolderObserver observer;
   private final List<FolderObserver> observers;
   private Path basePath;
@@ -59,6 +61,7 @@ public class FolderMonitorNIO {
 
   public FolderMonitorNIO(Path p, int timeout, SolrClient solr, boolean index, Date from, FolderObserver observer)
     throws Exception {
+    executor = Executors.newSingleThreadExecutor();
     this.observers = new ArrayList<FolderObserver>();
     this.basePath = p;
     this.timeout = timeout;
@@ -87,23 +90,7 @@ public class FolderMonitorNIO {
     observers.remove(observer);
   }
 
-  protected void notifyPathCreated(Path basePath, Path pathCreated) {
-    for (FolderObserver observer : observers) {
-      observer.pathAdded(basePath, pathCreated, true);
-    }
-  }
-
-  protected void notifyPathDeleted(Path basePath, Path pathCreated) {
-    for (FolderObserver observer : observers) {
-      observer.pathDeleted(basePath, pathCreated);
-    }
-  }
-
-  protected void notifyPathModified(Path basePath, Path pathCreated) {
-    for (FolderObserver observer : observers) {
-      observer.pathModified(basePath, pathCreated);
-    }
-  }
+  
 
   public void createFolder(Path parent, String folderName) throws IOException {
     Files.createDirectory(basePath.resolve(parent).resolve(folderName));
@@ -111,7 +98,10 @@ public class FolderMonitorNIO {
 
   public void remove(Path path) throws IOException {
     try{
-      FSUtils.deletePath(path);
+      Path fullPath = basePath.resolve(path);
+      if(Files.exists(fullPath)){
+        FSUtils.deletePath(path);
+      }
     }catch(StorageServiceException sse){
       throw new IOException(sse.getMessage(),sse);
     }
@@ -171,7 +161,7 @@ public class FolderMonitorNIO {
 
     private void register(Path directoryPath, boolean index, Date from) throws IOException {
       LOGGER.debug("Register: " + directoryPath);
-      WatchKey key = directoryPath.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
+      WatchKey key = directoryPath.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY, OVERFLOW);
       keys.put(key, directoryPath);
       if (index) {
         if (from == null || from.before(new Date(Files.getLastModifiedTime(directoryPath).toMillis()))) {
@@ -283,40 +273,19 @@ public class FolderMonitorNIO {
           }
           if (kind == ENTRY_CREATE) {
             LOGGER.error("CREATED: "+child.toString());
-            notifyPathCreated(basePath, child);
-            if(Files.isDirectory(child)){
-              try{
-                Files.walkFileTree(child, new FileVisitor<Path>() {
-                  @Override
-                  public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                    return FileVisitResult.CONTINUE;
-                  }
-  
-                  @Override
-                  public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-                    return FileVisitResult.CONTINUE;
-                  }
-  
-                  @Override
-                  public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                    notifyPathCreated(basePath, file);
-                    return FileVisitResult.CONTINUE;
-                  }
-  
-                  @Override
-                  public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-                    return FileVisitResult.CONTINUE;
-                  }
-                });
-              }catch(IOException e){
-                LOGGER.error(e.getMessage(),e);
-              }
-            }
+            NotifierThread nt = new NotifierThread(observers, basePath, child, true, false, false);
+            executor.execute(nt);
           } else if (kind == ENTRY_MODIFY) {
-            notifyPathModified(basePath, child);
+            LOGGER.error("MODIFIED: "+child.toString());
+            NotifierThread nt = new NotifierThread(observers, basePath, child, true, false, false);
+            executor.execute(nt);
           } else if (kind == ENTRY_DELETE) {
-            notifyPathDeleted(basePath, child);
-            // removeKey(child.toAbsolutePath());
+            LOGGER.error("DELETE: "+child.toString());
+            NotifierThread nt = new NotifierThread(observers, basePath, child, true, false, false);
+            executor.execute(nt);
+          } else if(kind== OVERFLOW){
+            LOGGER.error("OVERFLOW");
+            
           }
         }
         boolean valid = key.reset();
@@ -338,4 +307,51 @@ public class FolderMonitorNIO {
      * (WatchKey key : keysToRemove) { keys.remove(key); } } }
      */
   }
+  
+  class NotifierThread implements Runnable {
+    List<FolderObserver> observers;
+    Path basePath;
+    Path updatedPath;
+    boolean create;
+    boolean modify;
+    boolean delete;
+    public NotifierThread(List<FolderObserver> observers, Path basePath, Path updatedPath, boolean create, boolean modify, boolean delete){
+        this.observers = observers;
+        this.basePath = basePath;
+        this.updatedPath = updatedPath;
+        this.create = create;
+        this.modify = modify;
+        this.delete = delete;
+    }
+
+    @Override
+    public void run() {
+      if (create) {
+        notifyPathCreated(basePath, updatedPath);
+      } else if (modify) {
+        notifyPathModified(basePath, updatedPath);
+      } else if (delete) {
+        LOGGER.error("DELETE: "+updatedPath.toString());
+        notifyPathDeleted(basePath, updatedPath);
+      }
+    }
+    
+    protected void notifyPathCreated(Path basePath, Path pathCreated) {
+      for (FolderObserver observer : observers) {
+        observer.pathAdded(basePath, pathCreated, true);
+      }
+    }
+
+    protected void notifyPathDeleted(Path basePath, Path pathCreated) {
+      for (FolderObserver observer : observers) {
+        observer.pathDeleted(basePath, pathCreated);
+      }
+    }
+
+    protected void notifyPathModified(Path basePath, Path pathCreated) {
+      for (FolderObserver observer : observers) {
+        observer.pathModified(basePath, pathCreated);
+      }
+    }
+}
 }
