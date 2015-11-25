@@ -11,6 +11,7 @@ import java.util.Date;
 
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.AuthorizationDeniedException;
+import org.roda.core.data.common.NotFoundException;
 import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.RodaUser;
 import org.roda.wui.api.exceptions.RequestNotValidException;
@@ -34,7 +35,8 @@ public class Jobs extends RodaCoreService {
    * ---------------- REST related methods - start -----------------------------
    * ---------------------------------------------------------------------------
    */
-  public static Job createJob(RodaUser user, Job job) throws AuthorizationDeniedException, RequestNotValidException {
+  public static Job createJob(RodaUser user, Job job)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException {
     Date startDate = new Date();
 
     // validate input

@@ -22,11 +22,12 @@ import org.roda.core.data.adapter.facet.SimpleFacetParameter;
 import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
+import org.roda.core.data.common.NotFoundException;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.ConfirmDialog;
+import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.TransferredResourceList;
 import org.roda.wui.client.common.TransferredResourceList.CheckboxSelectionListener;
 import org.roda.wui.client.common.UserLogin;
@@ -191,7 +192,7 @@ public class IngestTransfer extends Composite {
       @Override
       public void onValueChange(ValueChangeEvent<IndexResult<TransferredResource>> event) {
         boolean visible = event.getValue().getTotalCount() > 0;
-        transferredResourceList.setVisible(visible);
+        // transferredResourceList.setVisible(visible);
         filtersPanel.setVisible(visible);
       }
     });
@@ -282,7 +283,27 @@ public class IngestTransfer extends Composite {
 
             @Override
             public void onFailure(Throwable caught) {
-              callback.onFailure(caught);
+              if (caught instanceof NotFoundException) {
+                Dialogs.showInformationDialog(messages.ingestTransferNotFoundDialogTitle(),
+                  messages.ingestTransferNotFoundDialogMessage(), messages.ingestTransferNotFoundDialogButton(),
+                  new AsyncCallback<Void>() {
+
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    // do nothing
+                  }
+
+                  @Override
+                  public void onSuccess(Void result) {
+                    Tools.newHistory(IngestTransfer.RESOLVER);
+                  }
+                });
+              } else {
+                MessagePopup.showError(caught.getClass().getSimpleName(), caught.getMessage());
+                Tools.newHistory(IngestTransfer.RESOLVER);
+              }
+
+              callback.onSuccess(null);
             }
 
             @Override
@@ -340,7 +361,7 @@ public class IngestTransfer extends Composite {
       // Remove the whole folder
 
       if (resource != null) {
-        ConfirmDialog.showConfirmDialog(messages.ingestTransferRemoveFolderConfirmDialogTitle(),
+        Dialogs.showConfirmDialog(messages.ingestTransferRemoveFolderConfirmDialogTitle(),
           messages.ingestTransferRemoveFolderConfirmDialogMessage(resource.getName()),
           messages.ingestTransferRemoveFolderConfirmDialogCancel(),
           messages.ingestTransferRemoveFolderConfirmDialogOk(), new AsyncCallback<Boolean>() {
@@ -382,7 +403,7 @@ public class IngestTransfer extends Composite {
         idsToRemove.add(r.getId());
       }
 
-      ConfirmDialog.showConfirmDialog(messages.ingestTransferRemoveFolderConfirmDialogTitle(),
+      Dialogs.showConfirmDialog(messages.ingestTransferRemoveFolderConfirmDialogTitle(),
         messages.ingestTransferRemoveSelectedConfirmDialogMessage(selected.size()),
         messages.ingestTransferRemoveFolderConfirmDialogCancel(), messages.ingestTransferRemoveFolderConfirmDialogOk(),
         new AsyncCallback<Boolean>() {

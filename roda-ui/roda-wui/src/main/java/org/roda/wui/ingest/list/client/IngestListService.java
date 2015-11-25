@@ -18,6 +18,7 @@ import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.AuthorizationDeniedException;
+import org.roda.core.data.common.NotFoundException;
 import org.roda.core.data.common.RODAException;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.SIPReport;
@@ -63,7 +64,8 @@ public interface IngestListService extends RemoteService {
   public IndexResult<SIPReport> findSipReports(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
     throws AuthorizationDeniedException, GenericException;
 
-  public SIPReport retrieveSipReport(String sipReportId) throws AuthorizationDeniedException, GenericException;
+  public SIPReport retrieveSipReport(String sipReportId)
+    throws AuthorizationDeniedException, GenericException, NotFoundException;
 
   /**
    * Accept a SIP

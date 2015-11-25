@@ -167,7 +167,7 @@ public class Browser extends RodaCoreService {
   }
 
   public static List<SimpleDescriptionObject> getAncestors(RodaUser user, SimpleDescriptionObject sdo)
-    throws AuthorizationDeniedException, GenericException {
+    throws AuthorizationDeniedException, GenericException, NotFoundException {
     Date startDate = new Date();
 
     // check user permissions
@@ -660,7 +660,7 @@ public class Browser extends RodaCoreService {
   }
 
   public static TransferredResource retrieveTransferredResource(RodaUser user, String transferredResourceId)
-    throws GenericException, AuthorizationDeniedException {
+    throws GenericException, AuthorizationDeniedException, NotFoundException {
     Date startDate = new Date();
     // check user permissions
     UserUtility.checkRoles(user, INGEST_TRANSFER);
@@ -697,7 +697,7 @@ public class Browser extends RodaCoreService {
   }
 
   public static void removeTransferredResources(RodaUser user, List<String> ids)
-    throws AuthorizationDeniedException, GenericException {
+    throws AuthorizationDeniedException, GenericException, NotFoundException {
     Date startDate = new Date();
 
     // check user permissions

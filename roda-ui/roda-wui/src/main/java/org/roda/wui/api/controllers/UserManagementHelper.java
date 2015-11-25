@@ -19,6 +19,7 @@ import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.AuthorizationDeniedException;
+import org.roda.core.data.common.NotFoundException;
 import org.roda.core.data.v2.Group;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.LogEntry;
@@ -57,7 +58,7 @@ public class UserManagementHelper {
 
   }
 
-  public static LogEntry retrieveLogEntry(String logEntryId) throws GenericException {
+  public static LogEntry retrieveLogEntry(String logEntryId) throws GenericException, NotFoundException {
     LogEntry ret;
     try {
       ret = RodaCoreFactory.getIndexService().retrieve(LogEntry.class, logEntryId);
@@ -92,7 +93,7 @@ public class UserManagementHelper {
     return ret;
   }
 
-  protected static RodaUser retrieveRodaUser(String username) throws GenericException {
+  protected static RodaUser retrieveRodaUser(String username) throws GenericException, NotFoundException {
     RodaUser ret;
     try {
       ret = RodaCoreFactory.getIndexService().retrieve(RodaUser.class, username);
@@ -112,7 +113,8 @@ public class UserManagementHelper {
     }
   }
 
-  protected static Group retrieveGroup(String groupname) throws AuthorizationDeniedException, GenericException {
+  protected static Group retrieveGroup(String groupname)
+    throws AuthorizationDeniedException, GenericException, NotFoundException {
     Group ret;
     try {
       ret = RodaCoreFactory.getIndexService().retrieve(Group.class, groupname);

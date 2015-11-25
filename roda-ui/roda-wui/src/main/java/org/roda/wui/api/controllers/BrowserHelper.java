@@ -199,7 +199,8 @@ public class BrowserHelper {
     return ret;
   }
 
-  protected static List<SimpleDescriptionObject> getAncestors(SimpleDescriptionObject sdo) throws GenericException {
+  protected static List<SimpleDescriptionObject> getAncestors(SimpleDescriptionObject sdo)
+    throws GenericException, NotFoundException {
     try {
       return RodaCoreFactory.getIndexService().getAncestors(sdo);
     } catch (IndexServiceException e) {
@@ -664,7 +665,8 @@ public class BrowserHelper {
     }
   }
 
-  public static SimpleDescriptionObject moveInHierarchy(String aipId, String parentId) throws GenericException {
+  public static SimpleDescriptionObject moveInHierarchy(String aipId, String parentId)
+    throws GenericException, NotFoundException {
     try {
       StorageService storage = RodaCoreFactory.getStorageService();
       ModelService model = RodaCoreFactory.getModelService();
@@ -685,7 +687,7 @@ public class BrowserHelper {
       return RodaCoreFactory.getIndexService().retrieve(SimpleDescriptionObject.class, aipId);
     } catch (ModelServiceException | IndexServiceException | StorageServiceException e) {
       if (e.getCode() == StorageServiceException.NOT_FOUND) {
-        throw new GenericException("AIP not found: " + aipId);
+        throw new NotFoundException("AIP not found: " + aipId);
       } else if (e.getCode() == StorageServiceException.FORBIDDEN) {
         throw new GenericException("You do not have permission to access AIP: " + aipId);
       } else {
@@ -950,7 +952,8 @@ public class BrowserHelper {
 
   }
 
-  public static TransferredResource retrieveTransferredResource(String transferredResourceId) throws GenericException {
+  public static TransferredResource retrieveTransferredResource(String transferredResourceId)
+    throws GenericException, NotFoundException {
     try {
       return RodaCoreFactory.getIndexService().retrieve(TransferredResource.class, transferredResourceId);
     } catch (IndexServiceException e) {
@@ -968,7 +971,7 @@ public class BrowserHelper {
     }
   }
 
-  public static void removeTransferredResources(List<String> ids) throws GenericException {
+  public static void removeTransferredResources(List<String> ids) throws GenericException, NotFoundException {
     try {
       for (String id : ids) {
         LOGGER.info("Removing transferred resource: " + id);

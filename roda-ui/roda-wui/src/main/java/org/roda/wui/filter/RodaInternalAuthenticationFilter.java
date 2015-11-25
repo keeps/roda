@@ -9,6 +9,7 @@ package org.roda.wui.filter;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URLEncoder;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -21,6 +22,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.sun.tools.internal.ws.processor.generator.ServiceGenerator;
+
 import org.roda.core.common.UserUtility;
 import org.roda.wui.common.client.tools.Tools;
 
@@ -36,8 +40,8 @@ public class RodaInternalAuthenticationFilter implements Filter {
   }
 
   @Override
-  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
-    ServletException {
+  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+    throws IOException, ServletException {
     LOGGER.debug("executing doFilter");
 
     final HttpServletRequest httpRequest = (HttpServletRequest) request;
@@ -53,7 +57,8 @@ public class RodaInternalAuthenticationFilter implements Filter {
 
     String serviceFrag = null;
     try {
-      serviceFrag = URI.create(service).getFragment();
+      serviceFrag = URLEncoder.encode(URI.create(service).getFragment(), "UTF-8").replaceAll("%2F", "/");
+      LOGGER.debug("Frag: " + serviceFrag);
     } catch (IllegalArgumentException e) {
       LOGGER.warn("Bad format for service parameter", e);
     }

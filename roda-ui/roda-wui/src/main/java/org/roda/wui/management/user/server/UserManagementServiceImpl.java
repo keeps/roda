@@ -24,6 +24,7 @@ import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.AuthorizationDeniedException;
 import org.roda.core.data.common.IllegalOperationException;
+import org.roda.core.data.common.NotFoundException;
 import org.roda.core.data.common.RODAException;
 import org.roda.core.data.v2.Group;
 import org.roda.core.data.v2.IndexResult;
@@ -82,7 +83,7 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public RodaGroup getGroup(String groupname) throws AuthorizationDeniedException, GenericException {
+  public RodaGroup getGroup(String groupname) throws AuthorizationDeniedException, GenericException, NotFoundException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     return UserManagement.retrieveGroup(user, groupname);
   }
@@ -250,10 +251,10 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     return UserManagement.findLogEntries(user, filter, sorter, sublist, facets);
   }
-  
+
   @Override
   public LogEntry retrieveLogEntry(String logEntryId)
-    throws AuthorizationDeniedException, GenericException {
+    throws AuthorizationDeniedException, GenericException, NotFoundException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     return UserManagement.retrieveLogEntry(user, logEntryId);
   }

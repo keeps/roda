@@ -72,6 +72,7 @@ import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sort.SortParameter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
+import org.roda.core.data.common.NotFoundException;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.DateGranularity;
 import org.roda.core.data.v2.AgentPreservationObject;
@@ -663,8 +664,8 @@ public class SolrUtils {
       ret = resultClass.cast(solrDocumentToLogEntry(doc));
     } else if (resultClass.equals(SIPReport.class)) {
       ret = resultClass.cast(solrDocumentToSipState(doc));
-    } else
-      if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class) || resultClass.equals(Group.class)) {
+    } else if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class)
+      || resultClass.equals(Group.class)) {
       ret = resultClass.cast(solrDocumentToRodaMember(doc));
     } else if (resultClass.equals(RepresentationFilePreservationObject.class)) {
       ret = resultClass.cast(solrDocumentToRepresentationFilePreservationObject(doc));
@@ -682,14 +683,16 @@ public class SolrUtils {
 
   }
 
-  public static <T> T retrieve(SolrClient index, Class<T> classToRetrieve, String... ids) throws IndexServiceException {
+  public static <T> T retrieve(SolrClient index, Class<T> classToRetrieve, String... ids)
+    throws IndexServiceException, NotFoundException {
     T ret;
+    String id = SolrUtils.getId(ids);
     try {
       SolrDocument doc = index.getById(getIndexName(classToRetrieve), SolrUtils.getId(ids));
       if (doc != null) {
         ret = solrDocumentTo(classToRetrieve, doc);
       } else {
-        throw new IndexServiceException("Document not found", IndexServiceException.NOT_FOUND);
+        throw new NotFoundException("Could not find document " + id);
       }
     } catch (SolrServerException | IOException e) {
       throw new IndexServiceException("Could not retrieve AIP from index", IndexServiceException.INTERNAL_SERVER_ERROR,
@@ -1252,7 +1255,7 @@ public class SolrUtils {
     long size = objectToLong(doc.get(RodaConstants.TRANSFERRED_RESOURCE_SIZE));
     String name = objectToString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_NAME));
     String owner = objectToString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_OWNER));
-    
+
     List<String> ancestorsPath = objectToListString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_ANCESTORS));
 
     tr.setCreationDate(d);
@@ -1298,10 +1301,9 @@ public class SolrUtils {
 
     sip.addField(RodaConstants.TRANSFERRED_RESOURCE_NAME, relativePath.getFileName().toString());
     sip.addField(RodaConstants.TRANSFERRED_RESOURCE_OWNER, relativePath.subpath(0, 1).toString());
-    
-    
+
     List<String> ancestorsPath = new ArrayList<String>();
-    
+
     Path fullParentPath = createdPath.getParent();
     while (!Files.isSameFile(basePath, fullParentPath)) {
       Path relativeParentPath = basePath.relativize(fullParentPath);
@@ -1311,7 +1313,7 @@ public class SolrUtils {
       fullParentPath = fullParentPath.getParent();
     }
     sip.addField(RodaConstants.TRANSFERRED_RESOURCE_ANCESTORS, ancestorsPath);
-    
+
     return sip;
   }
 

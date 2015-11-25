@@ -41,6 +41,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.common.NotFoundException;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.fs.FSUtils;
@@ -94,14 +95,16 @@ public class FolderMonitorNIO {
     Files.createDirectory(basePath.resolve(parent).resolve(folderName));
   }
 
-  public void remove(Path path) throws IOException {
-    try{
-      Path fullPath = basePath.resolve(path);
-      if(Files.exists(fullPath)){
-        FSUtils.deletePath(fullPath);
+  public void remove(Path path) throws IOException, NotFoundException {
+    try {
+      Path fullpath = basePath.resolve(path);
+      if (Files.exists(fullpath)) {
+        FSUtils.deletePath(fullpath);
+      } else {
+        throw new NotFoundException("Path does not exist: " + fullpath);
       }
-    }catch(StorageServiceException sse){
-      throw new IOException(sse.getMessage(),sse);
+    } catch (StorageServiceException sse) {
+      throw new IOException(sse.getMessage(), sse);
     }
   }
 
@@ -247,8 +250,8 @@ public class FolderMonitorNIO {
       for (;;) {
         WatchKey key;
         try {
-          key = watcher.poll(timeout,TimeUnit.MILLISECONDS);
-         //key = watcher.take();
+          key = watcher.poll(timeout, TimeUnit.MILLISECONDS);
+          // key = watcher.take();
         } catch (InterruptedException x) {
           return;
         }

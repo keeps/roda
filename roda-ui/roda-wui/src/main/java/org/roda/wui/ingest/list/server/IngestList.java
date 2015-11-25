@@ -15,6 +15,7 @@ import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.AuthorizationDeniedException;
+import org.roda.core.data.common.NotFoundException;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.RodaUser;
 import org.roda.core.data.v2.SIPReport;
@@ -29,8 +30,8 @@ public class IngestList extends RodaCoreService {
     super();
   }
 
-  public static Long countSipReports(RodaUser user, Filter filter) throws AuthorizationDeniedException,
-    GenericException {
+  public static Long countSipReports(RodaUser user, Filter filter)
+    throws AuthorizationDeniedException, GenericException {
     Date start = new Date();
 
     // check user permissions
@@ -64,8 +65,8 @@ public class IngestList extends RodaCoreService {
     return ret;
   }
 
-  public static SIPReport retrieveSipReport(RodaUser user, String sipReportId) throws AuthorizationDeniedException,
-    GenericException {
+  public static SIPReport retrieveSipReport(RodaUser user, String sipReportId)
+    throws AuthorizationDeniedException, GenericException, NotFoundException {
     Date start = new Date();
 
     // check user permissions

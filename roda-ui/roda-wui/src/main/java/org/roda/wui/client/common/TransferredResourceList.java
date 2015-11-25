@@ -31,6 +31,8 @@ import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.cell.client.ValueUpdater;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -197,6 +199,15 @@ public class TransferredResourceList extends AsyncTableCell<TransferredResource>
           selected.clear();
         }
         redraw();
+        fireOnCheckboxSelectionChanged();
+      }
+    });
+    
+    addValueChangeHandler(new ValueChangeHandler<IndexResult<TransferredResource>>() {
+
+      @Override
+      public void onValueChange(ValueChangeEvent<IndexResult<TransferredResource>> event) {
+        selected.clear();
         fireOnCheckboxSelectionChanged();
       }
     });

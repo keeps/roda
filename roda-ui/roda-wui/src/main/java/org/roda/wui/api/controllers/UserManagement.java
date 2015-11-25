@@ -16,6 +16,7 @@ import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.AuthorizationDeniedException;
+import org.roda.core.data.common.NotFoundException;
 import org.roda.core.data.v2.Group;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.LogEntry;
@@ -70,7 +71,7 @@ public class UserManagement extends RodaCoreService {
   }
 
   public static LogEntry retrieveLogEntry(RodaUser user, String logEntryId)
-    throws GenericException, AuthorizationDeniedException {
+    throws GenericException, AuthorizationDeniedException, NotFoundException {
     Date start = new Date();
     // check user permissions
     UserUtility.checkRoles(user, ROLE);
@@ -137,7 +138,7 @@ public class UserManagement extends RodaCoreService {
   }
 
   public static RodaUser retrieveRodaUser(RodaUser user, String username)
-    throws AuthorizationDeniedException, GenericException {
+    throws AuthorizationDeniedException, GenericException, NotFoundException {
     Date start = new Date();
 
     // check user permissions
@@ -154,7 +155,7 @@ public class UserManagement extends RodaCoreService {
   }
 
   public static RodaGroup retrieveGroup(RodaUser user, String groupname)
-    throws AuthorizationDeniedException, GenericException {
+    throws AuthorizationDeniedException, GenericException, NotFoundException {
     Date start = new Date();
 
     // check user permissions

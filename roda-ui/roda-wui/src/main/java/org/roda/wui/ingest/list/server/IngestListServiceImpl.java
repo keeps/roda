@@ -24,6 +24,7 @@ import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.AuthorizationDeniedException;
+import org.roda.core.data.common.NotFoundException;
 import org.roda.core.data.common.RODAException;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.RodaUser;
@@ -48,8 +49,8 @@ import config.i18n.server.IngestListReportMessages;
 public class IngestListServiceImpl extends RemoteServiceServlet implements IngestListService {
 
   /**
-	 * 
-	 */
+   * 
+   */
   private static final long serialVersionUID = 1L;
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IngestListServiceImpl.class);
@@ -69,7 +70,8 @@ public class IngestListServiceImpl extends RemoteServiceServlet implements Inges
     return IngestList.findSipReports(user, filter, sorter, sublist, facets);
   }
 
-  public SIPReport retrieveSipReport(String sipReportId) throws AuthorizationDeniedException, GenericException {
+  public SIPReport retrieveSipReport(String sipReportId)
+    throws AuthorizationDeniedException, GenericException, NotFoundException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     return IngestList.retrieveSipReport(user, sipReportId);
   }
@@ -203,7 +205,8 @@ public class IngestListServiceImpl extends RemoteServiceServlet implements Inges
     // }, adapter);
   }
 
-  protected Map<String, String> getElementFields(HttpServletRequest req, SIPState sip, IngestListReportMessages messages) {
+  protected Map<String, String> getElementFields(HttpServletRequest req, SIPState sip,
+    IngestListReportMessages messages) {
     Map<String, String> ret = new LinkedHashMap<String, String>();
     // FIXME
     // ret.put(messages.getString("sip.label.originalFilename"),

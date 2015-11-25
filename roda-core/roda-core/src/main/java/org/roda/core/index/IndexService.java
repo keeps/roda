@@ -25,6 +25,7 @@ import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
+import org.roda.core.data.common.NotFoundException;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.LogEntry;
@@ -59,11 +60,13 @@ public class IndexService {
     model.addModelObserver(observer);
   }
 
-  public SimpleDescriptionObject getParent(SimpleDescriptionObject sdo) throws IndexServiceException {
+  public SimpleDescriptionObject getParent(SimpleDescriptionObject sdo)
+    throws IndexServiceException, NotFoundException {
     return SolrUtils.retrieve(index, SimpleDescriptionObject.class, sdo.getParentID());
   }
 
-  public List<SimpleDescriptionObject> getAncestors(SimpleDescriptionObject sdo) throws IndexServiceException {
+  public List<SimpleDescriptionObject> getAncestors(SimpleDescriptionObject sdo)
+    throws IndexServiceException, NotFoundException {
     List<SimpleDescriptionObject> ancestors = new ArrayList<SimpleDescriptionObject>();
     SimpleDescriptionObject parent = null, actual = sdo;
 
@@ -94,7 +97,8 @@ public class IndexService {
     return SolrUtils.find(index, returnClass, filter, sorter, sublist, facets);
   }
 
-  public <T extends Serializable> T retrieve(Class<T> returnClass, String... ids) throws IndexServiceException {
+  public <T extends Serializable> T retrieve(Class<T> returnClass, String... ids)
+    throws IndexServiceException, NotFoundException {
     return SolrUtils.retrieve(index, returnClass, ids);
   }
 

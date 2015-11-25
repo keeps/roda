@@ -83,7 +83,7 @@ public interface BrowseMessages extends Messages {
 
   /******************* NEW MESSAGES ***********************/
   /*********************************************************/
-  
+
   @DefaultMessage("Filters")
   String sidebarFiltersTitle();
 
@@ -205,5 +205,13 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("Producers")
   String ingestTransferFilterProducers();
 
+  @DefaultMessage("Resource not found")
+  String ingestTransferNotFoundDialogTitle();
+
+  @DefaultMessage("The resource was not found")
+  String ingestTransferNotFoundDialogMessage();
+
+  @DefaultMessage("Continue")
+  String ingestTransferNotFoundDialogButton();
 
 }

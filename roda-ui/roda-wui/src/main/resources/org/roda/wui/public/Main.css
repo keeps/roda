@@ -1775,15 +1775,15 @@
 	font-weight: 500;
 }
 
-.wui-dialog-confirm {
+.wui-dialog-confirm,.wui-dialog-information {
 	
 }
 
-.wui-dialog-confirm-layout {
+.wui-dialog-confirm-layout,.wui-dialog-information-layout {
 	padding: 10px;
 }
 
-.wui-dialog-confirm-message {
+.wui-dialog-confirm-message,.wui-dialog-information-message {
 	margin-bottom: 10px;
 }
 

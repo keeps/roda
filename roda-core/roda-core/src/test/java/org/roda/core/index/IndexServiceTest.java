@@ -42,6 +42,7 @@ import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sublist.Sublist;
+import org.roda.core.data.common.NotFoundException;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.Group;
 import org.roda.core.data.v2.IndexResult;
@@ -177,7 +178,7 @@ public class IndexServiceTest {
 
   @Test
   public void testAIPIndexCreateDelete()
-    throws ModelServiceException, StorageServiceException, IndexServiceException, ParseException {
+    throws ModelServiceException, StorageServiceException, IndexServiceException, ParseException, NotFoundException {
     // generate AIP ID
     final String aipId = UUID.randomUUID().toString();
 
@@ -305,7 +306,8 @@ public class IndexServiceTest {
   }
 
   @Test
-  public void testAIPUpdate() throws ModelServiceException, StorageServiceException, IndexServiceException {
+  public void testAIPUpdate()
+    throws ModelServiceException, StorageServiceException, IndexServiceException, NotFoundException {
     // generate AIP ID
     final String aipId = UUID.randomUUID().toString();
 
@@ -369,7 +371,8 @@ public class IndexServiceTest {
   }
 
   @Test
-  public void testGetAncestors() throws ModelServiceException, StorageServiceException, IndexServiceException {
+  public void testGetAncestors()
+    throws ModelServiceException, StorageServiceException, IndexServiceException, NotFoundException {
     // set up
     model.createAIP(CorporaConstants.SOURCE_AIP_ID, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), null);
