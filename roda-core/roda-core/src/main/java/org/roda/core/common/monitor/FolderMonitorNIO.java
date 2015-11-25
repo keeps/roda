@@ -90,8 +90,6 @@ public class FolderMonitorNIO {
     observers.remove(observer);
   }
 
-  
-
   public void createFolder(Path parent, String folderName) throws IOException {
     Files.createDirectory(basePath.resolve(parent).resolve(folderName));
   }
@@ -100,7 +98,7 @@ public class FolderMonitorNIO {
     try{
       Path fullPath = basePath.resolve(path);
       if(Files.exists(fullPath)){
-        FSUtils.deletePath(path);
+        FSUtils.deletePath(fullPath);
       }
     }catch(StorageServiceException sse){
       throw new IOException(sse.getMessage(),sse);
@@ -122,7 +120,6 @@ public class FolderMonitorNIO {
     private final SolrClient solr;
     private long counter;
     private final Path watched;
-    private final FolderObserver folderObserver;
 
     private void clearIndex() throws SolrServerException, IOException {
       LOGGER.debug("clearIndex()");
@@ -244,7 +241,6 @@ public class FolderMonitorNIO {
       this.solr = solr;
       this.counter = 0;
       this.watched = dir;
-      this.folderObserver = observer;
     }
 
     void processEvents() {
@@ -261,7 +257,7 @@ public class FolderMonitorNIO {
           continue;
         }
         for (WatchEvent<?> event : key.pollEvents()) {
-          WatchEvent.Kind kind = event.kind();
+          WatchEvent.Kind<?> kind = event.kind();
           if (kind == OVERFLOW) {
             continue;
           }
