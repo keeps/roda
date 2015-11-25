@@ -1252,6 +1252,8 @@ public class SolrUtils {
     long size = objectToLong(doc.get(RodaConstants.TRANSFERRED_RESOURCE_SIZE));
     String name = objectToString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_NAME));
     String owner = objectToString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_OWNER));
+    
+    List<String> ancestorsPath = objectToListString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_ANCESTORS));
 
     tr.setCreationDate(d);
     tr.setFullPath(fullPath);
@@ -1262,14 +1264,16 @@ public class SolrUtils {
     tr.setParentPath(parentPath);
     tr.setFile(isFile);
     tr.setOwner(owner);
+    tr.setAncestorsPaths(ancestorsPath);
     return tr;
   }
 
-  public static SolrInputDocument transferredResourceToSolrDocument(Path createdPath, Path relativePath)
+  public static SolrInputDocument transferredResourceToSolrDocument(Path createdPath, Path basePath)
     throws IOException {
+    Path relativePath = basePath.relativize(createdPath);
     SolrInputDocument sip = new SolrInputDocument();
 
-    sip.addField(RodaConstants.TRANSFERRED_RESOURCE_ID, relativePath.toString().replaceAll("\\s+", ""));
+    sip.addField(RodaConstants.TRANSFERRED_RESOURCE_ID, relativePath.toString());
     sip.addField(RodaConstants.TRANSFERRED_RESOURCE_FULLPATH, createdPath.toString());
 
     Path parentPath = relativePath.getParent();
@@ -1294,6 +1298,20 @@ public class SolrUtils {
 
     sip.addField(RodaConstants.TRANSFERRED_RESOURCE_NAME, relativePath.getFileName().toString());
     sip.addField(RodaConstants.TRANSFERRED_RESOURCE_OWNER, relativePath.subpath(0, 1).toString());
+    
+    
+    List<String> ancestorsPath = new ArrayList<String>();
+    
+    Path fullParentPath = createdPath.getParent();
+    while (!Files.isSameFile(basePath, fullParentPath)) {
+      Path relativeParentPath = basePath.relativize(fullParentPath);
+      if (relativeParentPath.getNameCount() > 1) {
+        ancestorsPath.add(relativeParentPath.toString());
+      }
+      fullParentPath = fullParentPath.getParent();
+    }
+    sip.addField(RodaConstants.TRANSFERRED_RESOURCE_ANCESTORS, ancestorsPath);
+    
     return sip;
   }
 

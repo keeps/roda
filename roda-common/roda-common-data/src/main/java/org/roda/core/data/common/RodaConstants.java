@@ -340,4 +340,5 @@ public final class RodaConstants {
   public static final String TRANSFERRED_RESOURCE_NAME = "name";
   public static final String TRANSFERRED_RESOURCE_SIZE = "size";
   public static final String TRANSFERRED_RESOURCE_OWNER = "owner";
+  public static final String TRANSFERRED_RESOURCE_ANCESTORS = "ancestors";
 }

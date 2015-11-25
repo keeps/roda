@@ -80,6 +80,8 @@
 		required="true" multiValued="false" />
 	<field name="parentPath" type="string" indexed="true" stored="true"
 		required="false" multiValued="false" />
+	<field name="ancestors" type="string" indexed="true" stored="true"
+		required="false" multiValued="true" />
 	<field name="relativePath" type="string" indexed="true" stored="true"
 		required="true" multiValued="false" />
 	<field name="date" type="tdate" indexed="true" stored="true"

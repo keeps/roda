@@ -14,6 +14,8 @@ import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
@@ -26,22 +28,28 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.storage.StorageServiceException;
+import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class FolderMonitorNIO extends FolderObservable {
+public class FolderMonitorNIO {
   private static final Logger LOGGER = LoggerFactory.getLogger(FolderMonitorNIO.class);
 
   private FolderObserver observer;
+  private final List<FolderObserver> observers;
   private Path basePath;
   private int timeout;
   private Thread th;
@@ -51,6 +59,7 @@ public class FolderMonitorNIO extends FolderObservable {
 
   public FolderMonitorNIO(Path p, int timeout, SolrClient solr, boolean index, Date from, FolderObserver observer)
     throws Exception {
+    this.observers = new ArrayList<FolderObserver>();
     this.basePath = p;
     this.timeout = timeout;
     this.index = index;
@@ -68,6 +77,52 @@ public class FolderMonitorNIO extends FolderObservable {
     th = new Thread(watchDir, "FolderWatcher");
     th.start();
     LOGGER.debug("WATCH (NIO) ON FOLDER " + basePath.toString() + " STARTED");
+  }
+
+  public void addFolderObserver(FolderObserver observer) {
+    observers.add(observer);
+  }
+
+  public void removeFolderObserver(FolderObserver observer) {
+    observers.remove(observer);
+  }
+
+  protected void notifyPathCreated(Path basePath, Path pathCreated) {
+    for (FolderObserver observer : observers) {
+      observer.pathAdded(basePath, pathCreated, true);
+    }
+  }
+
+  protected void notifyPathDeleted(Path basePath, Path pathCreated) {
+    for (FolderObserver observer : observers) {
+      observer.pathDeleted(basePath, pathCreated);
+    }
+  }
+
+  protected void notifyPathModified(Path basePath, Path pathCreated) {
+    for (FolderObserver observer : observers) {
+      observer.pathModified(basePath, pathCreated);
+    }
+  }
+
+  public void createFolder(Path parent, String folderName) throws IOException {
+    Files.createDirectory(basePath.resolve(parent).resolve(folderName));
+  }
+
+  public void remove(Path path) throws IOException {
+    try{
+      FSUtils.deletePath(path);
+    }catch(StorageServiceException sse){
+      throw new IOException(sse.getMessage(),sse);
+    }
+  }
+
+  public void createFile(String path, String fileName, InputStream inputStream)
+    throws IOException, FileAlreadyExistsException {
+    Path parent = basePath.resolve(path);
+    Files.createDirectories(parent);
+    Path file = parent.resolve(fileName);
+    Files.copy(inputStream, file);
   }
 
   public class WatchDir implements Runnable {
@@ -201,7 +256,8 @@ public class FolderMonitorNIO extends FolderObservable {
       for (;;) {
         WatchKey key;
         try {
-          key = watcher.take();
+          key = watcher.poll(timeout,TimeUnit.MILLISECONDS);
+         //key = watcher.take();
         } catch (InterruptedException x) {
           return;
         }
@@ -226,7 +282,36 @@ public class FolderMonitorNIO extends FolderObservable {
             }
           }
           if (kind == ENTRY_CREATE) {
+            LOGGER.error("CREATED: "+child.toString());
             notifyPathCreated(basePath, child);
+            if(Files.isDirectory(child)){
+              try{
+                Files.walkFileTree(child, new FileVisitor<Path>() {
+                  @Override
+                  public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                    return FileVisitResult.CONTINUE;
+                  }
+  
+                  @Override
+                  public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+                    return FileVisitResult.CONTINUE;
+                  }
+  
+                  @Override
+                  public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    notifyPathCreated(basePath, file);
+                    return FileVisitResult.CONTINUE;
+                  }
+  
+                  @Override
+                  public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+                    return FileVisitResult.CONTINUE;
+                  }
+                });
+              }catch(IOException e){
+                LOGGER.error(e.getMessage(),e);
+              }
+            }
           } else if (kind == ENTRY_MODIFY) {
             notifyPathModified(basePath, child);
           } else if (kind == ENTRY_DELETE) {

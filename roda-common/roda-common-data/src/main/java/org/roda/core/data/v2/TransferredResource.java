@@ -9,6 +9,7 @@ package org.roda.core.data.v2;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 public class TransferredResource implements Serializable {
   /**
@@ -25,7 +26,7 @@ public class TransferredResource implements Serializable {
   private String name;
   private boolean file;
   private String owner;
-
+  private List<String> ancestorsPaths;
   
   public String getOwner() {
     return owner;
@@ -101,6 +102,15 @@ public class TransferredResource implements Serializable {
 
   public void setParentPath(String parentPath) {
     this.parentPath = parentPath;
+  }
+
+  
+  public List<String> getAncestorsPaths() {
+    return ancestorsPaths;
+  }
+
+  public void setAncestorsPaths(List<String> ancestorsPaths) {
+    this.ancestorsPaths = ancestorsPaths;
   }
 
   @Override

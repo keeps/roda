@@ -61,7 +61,7 @@ public class IndexFolderObserver implements FolderObserver {
     try {
       Path relativePath = basePath.relativize(createdPath);
       if (relativePath.getNameCount() > 1) {
-        SolrInputDocument pathDocument = SolrUtils.transferredResourceToSolrDocument(createdPath, relativePath);
+        SolrInputDocument pathDocument = SolrUtils.transferredResourceToSolrDocument(createdPath, basePath);
 
         List<SolrInputDocument> parents = new ArrayList<SolrInputDocument>();
         Path parentPath = createdPath.getParent();
@@ -70,7 +70,7 @@ public class IndexFolderObserver implements FolderObserver {
           Path relativeParentPath = basePath.relativize(parentPath);
           if (relativeParentPath.getNameCount() > 1) {
             SolrInputDocument sidParent = SolrUtils.transferredResourceToSolrDocument(parentPath,
-              basePath.relativize(parentPath));
+              basePath);
             sidParent.setField(RodaConstants.TRANSFERRED_RESOURCE_SIZE,
               pathDocument.getFieldValue(RodaConstants.TRANSFERRED_RESOURCE_SIZE));
             parents.add(sidParent);
@@ -110,7 +110,7 @@ public class IndexFolderObserver implements FolderObserver {
     Path relativePath = basePath.relativize(modifiedPath);
     if (relativePath.getNameCount() > 1) {
       try {
-        SolrDocument current = index.getById(RodaConstants.INDEX_SIP, relativePath.toString().replaceAll("\\s+", ""));
+        SolrDocument current = index.getById(RodaConstants.INDEX_SIP, relativePath.toString());
         if(current==null){
           pathAdded(basePath, modifiedPath);
         }else{
@@ -121,7 +121,7 @@ public class IndexFolderObserver implements FolderObserver {
             Path relativeParentPath = basePath.relativize(parentPath);
             if (relativeParentPath.getNameCount() > 1) {
               SolrDocument p = index.getById(RodaConstants.INDEX_SIP,
-                relativeParentPath.toString().replaceAll("\\s+", ""));
+                relativeParentPath.toString());
               p.setField(RodaConstants.TRANSFERRED_RESOURCE_SIZE,
                 SolrUtils.objectToLong(p.getFieldValue(RodaConstants.TRANSFERRED_RESOURCE_SIZE)) - sizeToRemove);
               index.add(RodaConstants.INDEX_SIP, ClientUtils.toSolrInputDocument(p));
@@ -142,7 +142,7 @@ public class IndexFolderObserver implements FolderObserver {
     LOGGER.debug("DELETE: " + deletedPath.toString());
     Path relativePath = basePath.relativize(deletedPath);
     try {
-      SolrDocument current = index.getById(RodaConstants.INDEX_SIP, relativePath.toString().replaceAll("\\s+", ""));
+      SolrDocument current = index.getById(RodaConstants.INDEX_SIP, relativePath.toString());
       long sizeToRemove = SolrUtils.objectToLong(current.getFieldValue(RodaConstants.TRANSFERRED_RESOURCE_SIZE));
 
       Path parentPath = deletedPath.getParent();
@@ -152,7 +152,7 @@ public class IndexFolderObserver implements FolderObserver {
           Path relativeParentPath = basePath.relativize(parentPath);
           if (relativeParentPath.getNameCount() > 1) {
             SolrDocument p = index.getById(RodaConstants.INDEX_SIP,
-              relativeParentPath.toString().replaceAll("\\s+", ""));
+              relativeParentPath.toString());
             p.setField(RodaConstants.TRANSFERRED_RESOURCE_SIZE,
               SolrUtils.objectToLong(p.getFieldValue(RodaConstants.TRANSFERRED_RESOURCE_SIZE)) - sizeToRemove);
             index.add(RodaConstants.INDEX_SIP, ClientUtils.toSolrInputDocument(p));
@@ -163,8 +163,8 @@ public class IndexFolderObserver implements FolderObserver {
         // Exception occurs when modifying a resource... but no problem...
       }
       if (relativePath.getNameCount() > 1) {
-        index.deleteById(RodaConstants.INDEX_SIP, relativePath.toString().replaceAll("\\s+", ""));
-        index.deleteByQuery(RodaConstants.INDEX_SIP, "id:" + relativePath.toString().replaceAll("\\s+", "") + "*");
+        index.deleteById(RodaConstants.INDEX_SIP, relativePath.toString());
+        index.deleteByQuery(RodaConstants.INDEX_SIP, "ancestors:\"" + relativePath.toString()+"\"");
       }
       index.commit(RodaConstants.INDEX_SIP);
     } catch (IOException | SolrServerException e) {

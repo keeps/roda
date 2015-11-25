@@ -42,8 +42,8 @@ import org.roda.core.common.LdapUtility;
 import org.roda.core.common.Messages;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.common.UserUtility;
+import org.roda.core.common.monitor.FolderMonitorApache;
 import org.roda.core.common.monitor.FolderMonitorNIO;
-import org.roda.core.common.monitor.FolderObservable;
 import org.roda.core.common.monitor.FolderObserver;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
@@ -137,7 +137,7 @@ public class RodaCoreFactory {
   private static Path rodaApacheDsConfigDirectory = null;
   private static Path rodaApacheDsDataDirectory = null;
 
-  private static FolderObservable sipFolderMonitor;
+  private static FolderMonitorNIO sipFolderMonitor;
   private static FolderObserver sipFolderObserver;
 
   // Configuration related objects
@@ -429,7 +429,7 @@ public class RodaCoreFactory {
     Path sipFolderPath = dataPath.resolve(SIPFolderPath);
     Date d = getFolderMonitorDate(sipFolderPath);
     sipFolderObserver = new IndexFolderObserver(solr, sipFolderPath);
-    sipFolderMonitor = new FolderMonitorNIO(sipFolderPath, SIPTimeout, solr, true, d, sipFolderObserver);
+    sipFolderMonitor = new FolderMonitorNIO(sipFolderPath, 10000, solr, true, d, sipFolderObserver);
     // sipFolderMonitor = new FolderMonitor(sipFolderPath, SIPTimeout);
 
     sipFolderMonitor.addFolderObserver(sipFolderObserver);
@@ -496,7 +496,7 @@ public class RodaCoreFactory {
     return akkaDistributedPluginOrchestrator;
   }
 
-  public static FolderObservable getFolderMonitor() {
+  public static FolderMonitorNIO getFolderMonitor() {
     return sipFolderMonitor;
   }
 
@@ -519,7 +519,7 @@ public class RodaCoreFactory {
   public static Path getLogPath() {
     return logPath;
   }
-  
+
   public static Path getJobsPath() {
     return dataPath.resolve("jobs");
   }
