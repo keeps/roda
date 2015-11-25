@@ -22,6 +22,7 @@ import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
@@ -106,6 +107,26 @@ public class FolderMonitorNIO {
     } catch (StorageServiceException sse) {
       throw new IOException(sse.getMessage(), sse);
     }
+  }
+  
+  public void removeSync(List<String> ids) throws NotFoundException, IOException {
+    for(String s : ids){
+      try{
+        Path relative = Paths.get(s);
+        Path fullPath = basePath.resolve(relative);
+        if (Files.exists(fullPath)) {
+          FSUtils.deletePath(fullPath);
+          for (FolderObserver observer : observers) {
+            observer.pathDeleted(basePath, fullPath);
+          }
+        } else {
+          throw new NotFoundException("Path does not exist: " + fullPath);
+        }
+      } catch (StorageServiceException sse) {
+        throw new IOException(sse.getMessage(), sse);
+      }
+    }
+    
   }
 
   public void createFile(String path, String fileName, InputStream inputStream)
@@ -341,4 +362,6 @@ public class FolderMonitorNIO {
       }
     }
 }
+
+  
 }

@@ -20,6 +20,7 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RODAException;
 import org.roda.core.data.v2.RodaUser;
+import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.api.v1.utils.StreamResponse;
 import org.slf4j.Logger;
@@ -52,9 +53,7 @@ public class ClassificationPlansResource {
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
 
     // delegate action to controller
-    // TODO invoke controller, grab stream response object and add it to the
-    // response
-    StreamResponse streamResponse = null;
+    StreamResponse streamResponse = Browser.getClassificationPlan(user, type);
 
     return ApiUtils.okResponse(streamResponse);
   }

@@ -72,6 +72,7 @@ public class Browser extends RodaCoreService {
   private static final String PARENT_PATH = "path";
   private static final String FILENAME_PARAM = "filename";
   private static final String PATH_PARAM = "path";
+  private static final Object CLASSIFICATION_PLAN_TYPE_PARAMETER = "classificationPlanType";
 
   private Browser() {
     super();
@@ -730,6 +731,19 @@ public class Browser extends RodaCoreService {
     registerAction(user, BROWSER_COMPONENT, "createTransferredResourceFile", null, duration, PATH_PARAM, path,
       FILENAME_PARAM, fileName);
 
+  }
+
+  public static StreamResponse getClassificationPlan(RodaUser user, String type) {
+    Date startDate = new Date();
+    
+    // delegate
+    //StreamResponse classificationPlan = BrowserHelper.getClassificationPlan(type);
+
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, BROWSER_COMPONENT, "getClassificationPlan", null, duration, CLASSIFICATION_PLAN_TYPE_PARAMETER, type);
+
+    return null;
   }
 
 }

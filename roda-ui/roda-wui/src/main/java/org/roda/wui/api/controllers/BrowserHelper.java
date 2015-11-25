@@ -973,10 +973,7 @@ public class BrowserHelper {
 
   public static void removeTransferredResources(List<String> ids) throws GenericException, NotFoundException {
     try {
-      for (String id : ids) {
-        LOGGER.info("Removing transferred resource: " + id);
-        RodaCoreFactory.getFolderMonitor().remove(Paths.get(id));
-      }
+      RodaCoreFactory.getFolderMonitor().removeSync(ids);
     } catch (IOException e) {
       LOGGER.error("Error removing transferred resource", e);
       throw new GenericException("Error removing transferred resource: " + e.getMessage());
@@ -995,6 +992,11 @@ public class BrowserHelper {
       throw new GenericException("Error creating transferred resource file: " + e.getMessage());
     }
 
+  }
+
+  public static StreamResponse getClassificationPlan(String type) {
+    // TODO Auto-generated method stub
+    return null;
   }
 
 }
