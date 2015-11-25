@@ -40,14 +40,14 @@ public class FileUtility {
     if (Files.exists(staticConfig)) {
       try {
         ret = new FileInputStream(staticConfig.toFile());
-        LOGGER.info("Using static configuration");
+        LOGGER.debug("Using static configuration");
       } catch (FileNotFoundException e) {
-        LOGGER.warn("Couldn't find static configuration file - " + staticConfig);
-        LOGGER.info("Using internal configuration");
+        LOGGER.debug("Couldn't find static configuration file - " + staticConfig);
+        LOGGER.debug("Using internal configuration");
         ret = FileUtility.class.getResourceAsStream("/config/" + relativePath);
       }
     } else {
-      LOGGER.info("Using internal configuration");
+      LOGGER.debug("Using internal configuration");
       ret = FileUtility.class.getResourceAsStream("/config/" + relativePath);
     }
     return ret;

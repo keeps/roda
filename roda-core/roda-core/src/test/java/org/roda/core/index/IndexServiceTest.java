@@ -55,8 +55,6 @@ import org.roda.core.data.v2.SIPReport;
 import org.roda.core.data.v2.SIPStateTransition;
 import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.core.data.v2.User;
-import org.roda.core.index.IndexService;
-import org.roda.core.index.IndexServiceException;
 import org.roda.core.model.AIP;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.ModelServiceException;
@@ -272,15 +270,21 @@ public class IndexServiceTest {
     try {
       index.retrieve(AIP.class, aipId);
       fail("AIP deleted but yet it was retrieved");
+    } catch (NotFoundException e) {
+      // do nothing as it was the expected exception
     } catch (IndexServiceException e) {
-      assertEquals(IndexServiceException.NOT_FOUND, e.getCode());
+      fail("AIP was deleted and therefore a " + NotFoundException.class.getName()
+        + " should have been thrown instead of a " + IndexServiceException.class.getName());
     }
 
     try {
       index.retrieve(SimpleDescriptionObject.class, aipId);
       fail("AIP was deleted but yet its descriptive metadata was retrieved");
+    } catch (NotFoundException e) {
+      // do nothing as it was the expected exception
     } catch (IndexServiceException e) {
-      assertEquals(IndexServiceException.NOT_FOUND, e.getCode());
+      fail("AIP was deleted and therefore a " + NotFoundException.class.getName()
+        + " should have been thrown instead of a " + IndexServiceException.class.getName());
     }
   }
 

@@ -42,7 +42,7 @@ public class JobsHelper {
 
   }
 
-  protected static Job createJob(RodaUser user, Job job) {
+  protected static Job createJob(RodaUser user, Job job) throws NotFoundException {
     Job updatedJob = new Job(job);
     updatedJob.setUsername(user.getName());
 
@@ -70,7 +70,8 @@ public class JobsHelper {
     }
   }
 
-  private static List<TransferredResource> getTransferredResourcesFromObjectIds(RodaUser user, List<String> objectIds) {
+  private static List<TransferredResource> getTransferredResourcesFromObjectIds(RodaUser user, List<String> objectIds)
+    throws NotFoundException {
     List<TransferredResource> res = new ArrayList<TransferredResource>();
     for (String objectId : objectIds) {
       try {

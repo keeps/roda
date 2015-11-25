@@ -7,6 +7,9 @@
  */
 package org.roda.wui.api.v1;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -21,10 +24,12 @@ import javax.ws.rs.core.Response;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
+import org.roda.core.data.common.InvalidParameterException;
 import org.roda.core.data.common.RODAException;
 import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.Jobs;
 import org.roda.core.data.v2.RodaUser;
+import org.roda.core.plugins.Plugin;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +56,25 @@ public class JobsResource {
     Jobs jobs = new Jobs();
     jobs.getJobs().add(new Job("xtpo"));
     jobs.getJobs().add(new Job("zjas"));
+
+    // TODO this test shows that plugin manager returns always the same instance
+    // of the requested plugin
+    try {
+      String plugin = "org.roda.core.plugins.plugins.base.FixityPlugin";
+      Plugin<?> pluginObject = RodaCoreFactory.getPluginManager().getPlugin(plugin);
+      Map<String, String> parameters = new HashMap<String, String>();
+      parameters.put("aaa", "bbb");
+      parameters.put("ccc", "ddd");
+      pluginObject.setParameterValues(parameters);
+      System.out.println(pluginObject.getParameterValues());
+
+      Plugin<?> pluginObject2 = RodaCoreFactory.getPluginManager().getPlugin(plugin);
+      System.out.println(pluginObject2.getParameterValues());
+
+    } catch (InvalidParameterException e) {
+      System.err.println(e);
+    }
+
     return Response.ok(jobs, mediaType).build();
   }
 
@@ -84,6 +108,12 @@ public class JobsResource {
     Job updatedJob = org.roda.wui.api.controllers.Jobs.createJob(user, job);
 
     return Response.created(ApiUtils.getUriFromRequest(request)).entity(updatedJob).type(mediaType).build();
+  }
+
+  @GET
+  @Path("/{jobId}/report")
+  public Response getJobReport(@PathParam("jobId") String jobId, @QueryParam("acceptFormat") String acceptFormat) {
+    return null;
   }
 
 }

@@ -14,6 +14,7 @@ public class ApiException extends RODAException {
 
   public static final int INVALID_PARAMETER_VALUE = 1;
   public static final int EMPTY_PARAMETER = 2;
+  public static final int RESOURCE_ALREADY_EXISTS = 3;
 
   private int code;
 

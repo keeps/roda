@@ -51,6 +51,9 @@ public class RodaExceptionMapper implements ExceptionMapper<RODAException> {
     } else if (e instanceof NotFoundException) {
       response = Response.status(Status.NOT_FOUND)
         .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+    } else if (e instanceof AlreadyExistsException) {
+      response = Response.status(Status.CONFLICT)
+        .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
     } else {
       // response = Response.serverError().type(mediaType)
       // .entity(new ApiResponseMessage(ApiResponseMessage.ERROR,

@@ -49,6 +49,8 @@ import org.roda.core.storage.fs.FSUtils;
 public class FixityPlugin implements Plugin<AIP> {
   private AgentPreservationObject fixityAgent;
   private static final Logger LOGGER = LoggerFactory.getLogger(FixityPlugin.class);
+  
+  private Map<String, String> parameters;
 
   @Override
   public void init() throws PluginException {
@@ -85,12 +87,12 @@ public class FixityPlugin implements Plugin<AIP> {
 
   @Override
   public Map<String, String> getParameterValues() {
-    return new HashMap<>();
+    return parameters;
   }
 
   @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
-    // no params
+    this.parameters = parameters;
   }
 
   @Override

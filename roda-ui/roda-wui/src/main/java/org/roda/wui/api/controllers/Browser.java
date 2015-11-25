@@ -25,6 +25,7 @@ import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.AuthorizationDeniedException;
 import org.roda.core.data.common.NotFoundException;
 import org.roda.core.data.common.RODAException;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.RodaUser;
 import org.roda.core.data.v2.SimpleDescriptionObject;
@@ -33,6 +34,8 @@ import org.roda.core.model.AIP;
 import org.roda.core.model.DescriptiveMetadata;
 import org.roda.core.model.ValidationException;
 import org.roda.core.storage.Binary;
+import org.roda.wui.api.exceptions.AlreadyExistsException;
+import org.roda.wui.api.exceptions.ApiException;
 import org.roda.wui.api.exceptions.RequestNotValidException;
 import org.roda.wui.api.v1.utils.StreamResponse;
 import org.roda.wui.client.browse.BrowseItemBundle;
@@ -46,23 +49,14 @@ import org.roda.wui.common.client.GenericException;
  */
 public class Browser extends RodaCoreService {
 
-  private static final String AIP_ID_PARAM = "aipId";
-  private static final String METADATA_ID_PARAM = "metadataId";
-  private static final String REPRESENTATION_ID_PARAM = "representationId";
-  private static final String FILE_ID_PARAM = "fileId";
-
   private static final String SDO_PARAM = "sdo";
   private static final String FILTER_PARAM = "filter";
   private static final String SORTER_PARAM = "sorter";
   private static final String SUBLIST_PARAM = "sublist";
-  private static final String LIMIT_PARAM = "limit";
-  private static final String START_PARAM = "start";
 
   private static final String BROWSER_COMPONENT = "Browser";
   private static final String ADMINISTRATION_METADATA_EDITOR_ROLE = "administration.metadata_editor";
-  private static final String INGEST_LIST = "ingest.list";
-  private static final String INGEST_TRANSFER = "ingest.transfer";
-
+  private static final String INGEST_TRANSFER_ROLE = "ingest.transfer";
   private static final String BROWSE_ROLE = "browse";
 
   private static final String TRANSFERRED_RESOURCE_ID_PARAM = "transferredResourceId";
@@ -90,7 +84,8 @@ public class Browser extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "getItemBundle", aipId, duration, AIP_ID_PARAM, aipId);
+    registerAction(user, BROWSER_COMPONENT, "getItemBundle", aipId, duration, RodaConstants.API_PATH_PARAM_AIP_ID,
+      aipId);
 
     return itemBundle;
   }
@@ -107,8 +102,8 @@ public class Browser extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "getDescriptiveMetadataEditBundle", aipId, duration, AIP_ID_PARAM, aipId,
-      METADATA_ID_PARAM, metadataId);
+    registerAction(user, BROWSER_COMPONENT, "getDescriptiveMetadataEditBundle", aipId, duration,
+      RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
 
     return bundle;
   }
@@ -162,7 +157,8 @@ public class Browser extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "getSimpleDescriptionObject", aipId, duration, AIP_ID_PARAM, aipId);
+    registerAction(user, BROWSER_COMPONENT, "getSimpleDescriptionObject", aipId, duration,
+      RodaConstants.API_PATH_PARAM_AIP_ID, aipId);
 
     return sdo;
   }
@@ -206,8 +202,8 @@ public class Browser extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "getAipRepresentation", aipId, duration, AIP_ID_PARAM, aipId,
-      REPRESENTATION_ID_PARAM, representationId);
+    registerAction(user, BROWSER_COMPONENT, "getAipRepresentation", aipId, duration,
+      RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_PATH_PARAM_REPRESENTATION_ID, representationId);
 
     return aipRepresentation;
   }
@@ -229,8 +225,9 @@ public class Browser extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "listAipDescriptiveMetadata", aipId, duration, AIP_ID_PARAM, aipId,
-      START_PARAM, start, LIMIT_PARAM, limit);
+    registerAction(user, BROWSER_COMPONENT, "listAipDescriptiveMetadata", aipId, duration,
+      RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_QUERY_KEY_START, start,
+      RodaConstants.API_QUERY_KEY_LIMIT, limit);
 
     return aipDescriptiveMetadataList;
   }
@@ -253,7 +250,8 @@ public class Browser extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "getAipDescritiveMetadata", aipId, duration, METADATA_ID_PARAM, metadataId);
+    registerAction(user, BROWSER_COMPONENT, "getAipDescritiveMetadata", aipId, duration,
+      RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
 
     return aipDescritiveMetadata;
 
@@ -276,8 +274,9 @@ public class Browser extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "listAipPreservationMetadata", aipId, duration, AIP_ID_PARAM, aipId,
-      START_PARAM, start, LIMIT_PARAM, limit);
+    registerAction(user, BROWSER_COMPONENT, "listAipPreservationMetadata", aipId, duration,
+      RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_QUERY_KEY_START, start,
+      RodaConstants.API_QUERY_KEY_LIMIT, limit);
 
     return aipPreservationMetadataList;
   }
@@ -301,9 +300,9 @@ public class Browser extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "getAipRepresentationPreservationMetadata", aipId, duration, AIP_ID_PARAM,
-      aipId, "startAgent", startAgent, "limitAgent", limitAgent, "startEvent", startEvent, "limitEvent", limitEvent,
-      "startFile", startFile, "limitFile", limitFile);
+    registerAction(user, BROWSER_COMPONENT, "getAipRepresentationPreservationMetadata", aipId, duration,
+      RodaConstants.API_PATH_PARAM_AIP_ID, aipId, "startAgent", startAgent, "limitAgent", limitAgent, "startEvent",
+      startEvent, "limitEvent", limitEvent, "startFile", startFile, "limitFile", limitFile);
 
     return aipRepresentationPreservationMetadata;
 
@@ -324,7 +323,8 @@ public class Browser extends RodaCoreService {
     // register action
     long duration = new Date().getTime() - startDate.getTime();
     registerAction(user, BROWSER_COMPONENT, "getAipRepresentationPreservationMetadataFile", aipId, duration,
-      AIP_ID_PARAM, aipId, REPRESENTATION_ID_PARAM, representationId, FILE_ID_PARAM, fileId);
+      RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_PATH_PARAM_REPRESENTATION_ID, representationId,
+      RodaConstants.API_PATH_PARAM_FILE_ID, fileId);
 
     return aipRepresentationPreservationMetadataFile;
   }
@@ -346,7 +346,7 @@ public class Browser extends RodaCoreService {
     // register action
     long duration = new Date().getTime() - startDate.getTime();
     registerAction(user, BROWSER_COMPONENT, "postAipRepresentationPreservationMetadataFile", aipId, duration,
-      AIP_ID_PARAM, aipId, REPRESENTATION_ID_PARAM, representationId);
+      RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_PATH_PARAM_REPRESENTATION_ID, representationId);
 
   }
 
@@ -366,7 +366,7 @@ public class Browser extends RodaCoreService {
     // register action
     long duration = new Date().getTime() - startDate.getTime();
     registerAction(user, BROWSER_COMPONENT, "aipsAipIdPreservationMetadataRepresentationIdFileIdPut", aipId, duration,
-      AIP_ID_PARAM, aipId, REPRESENTATION_ID_PARAM, representationId);
+      RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_PATH_PARAM_REPRESENTATION_ID, representationId);
 
   }
 
@@ -384,7 +384,8 @@ public class Browser extends RodaCoreService {
     // register action
     long duration = new Date().getTime() - startDate.getTime();
     registerAction(user, BROWSER_COMPONENT, "aipsAipIdPreservationMetadataRepresentationIdFileIdDelete", aipId,
-      duration, AIP_ID_PARAM, aipId, REPRESENTATION_ID_PARAM, representationId, FILE_ID_PARAM, fileId);
+      duration, RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_PATH_PARAM_REPRESENTATION_ID,
+      representationId, RodaConstants.API_PATH_PARAM_FILE_ID, fileId);
 
   }
 
@@ -410,8 +411,8 @@ public class Browser extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "moveInHierarchy", sdo.getId(), duration, AIP_ID_PARAM, aipId, "toParent",
-      parentId);
+    registerAction(user, BROWSER_COMPONENT, "moveInHierarchy", sdo.getId(), duration,
+      RodaConstants.API_PATH_PARAM_AIP_ID, aipId, "toParent", parentId);
 
     return sdo;
 
@@ -473,8 +474,8 @@ public class Browser extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "createDescriptiveMetadataFile", sdo.getId(), duration, AIP_ID_PARAM, aipId,
-      METADATA_ID_PARAM, metadataId);
+    registerAction(user, BROWSER_COMPONENT, "createDescriptiveMetadataFile", sdo.getId(), duration,
+      RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
 
     return ret;
   }
@@ -495,8 +496,8 @@ public class Browser extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "editDescriptiveMetadataFile", aipId, duration, AIP_ID_PARAM, aipId,
-      METADATA_ID_PARAM, metadataId);
+    registerAction(user, BROWSER_COMPONENT, "editDescriptiveMetadataFile", aipId, duration,
+      RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
 
     return ret;
   }
@@ -515,8 +516,8 @@ public class Browser extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "removeMetadataFile", sdo.getId(), duration, AIP_ID_PARAM, aipId,
-      METADATA_ID_PARAM, metadataId);
+    registerAction(user, BROWSER_COMPONENT, "removeMetadataFile", sdo.getId(), duration,
+      RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
   }
 
   public static DescriptiveMetadata retrieveMetadataFile(RodaUser user, String aipId, String metadataId)
@@ -533,8 +534,8 @@ public class Browser extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "retrieveMetadataFile", aipId, duration, AIP_ID_PARAM, aipId,
-      METADATA_ID_PARAM, metadataId);
+    registerAction(user, BROWSER_COMPONENT, "retrieveMetadataFile", aipId, duration,
+      RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
 
     return dm;
   }
@@ -553,8 +554,8 @@ public class Browser extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "removeRepresentation", sdo.getId(), duration, AIP_ID_PARAM, aipId,
-      REPRESENTATION_ID_PARAM, representationId);
+    registerAction(user, BROWSER_COMPONENT, "removeRepresentation", sdo.getId(), duration,
+      RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_PATH_PARAM_REPRESENTATION_ID, representationId);
 
   }
 
@@ -572,8 +573,9 @@ public class Browser extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "removeRepresentationFile", sdo.getId(), duration, AIP_ID_PARAM, aipId,
-      REPRESENTATION_ID_PARAM, representationId, FILE_ID_PARAM, fileId);
+    registerAction(user, BROWSER_COMPONENT, "removeRepresentationFile", sdo.getId(), duration,
+      RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_PATH_PARAM_REPRESENTATION_ID, representationId,
+      RodaConstants.API_PATH_PARAM_FILE_ID, fileId);
   }
 
   public static StreamResponse getAipRepresentationFile(RodaUser user, String aipId, String representationId,
@@ -594,8 +596,8 @@ public class Browser extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "getAipRepresentationFile", aipId, duration, REPRESENTATION_ID_PARAM,
-      representationId, FILE_ID_PARAM, fileId);
+    registerAction(user, BROWSER_COMPONENT, "getAipRepresentationFile", aipId, duration,
+      RodaConstants.API_PATH_PARAM_REPRESENTATION_ID, representationId, RodaConstants.API_PATH_PARAM_FILE_ID, fileId);
 
     return aipRepresentationFile;
   }
@@ -614,8 +616,8 @@ public class Browser extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "putDescriptiveMetadataFile", aipId, duration, AIP_ID_PARAM, aipId,
-      METADATA_ID_PARAM, metadataId);
+    registerAction(user, BROWSER_COMPONENT, "putDescriptiveMetadataFile", aipId, duration,
+      RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
 
   }
 
@@ -633,8 +635,8 @@ public class Browser extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "postDescriptiveMetadataFile", aipId, duration, AIP_ID_PARAM, aipId,
-      METADATA_ID_PARAM, metadataId);
+    registerAction(user, BROWSER_COMPONENT, "postDescriptiveMetadataFile", aipId, duration,
+      RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
 
   }
 
@@ -643,7 +645,7 @@ public class Browser extends RodaCoreService {
     Date startDate = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, INGEST_TRANSFER);
+    UserUtility.checkRoles(user, INGEST_TRANSFER_ROLE);
 
     // TODO if not admin, add to filter a constraint for the resource to belong
     // to this user
@@ -664,7 +666,7 @@ public class Browser extends RodaCoreService {
     throws GenericException, AuthorizationDeniedException, NotFoundException {
     Date startDate = new Date();
     // check user permissions
-    UserUtility.checkRoles(user, INGEST_TRANSFER);
+    UserUtility.checkRoles(user, INGEST_TRANSFER_ROLE);
 
     // TODO if not admin, add to filter a constraint for the resource to belong
     // to this user
@@ -684,7 +686,7 @@ public class Browser extends RodaCoreService {
     throws AuthorizationDeniedException, GenericException {
     Date startDate = new Date();
     // check user permissions
-    UserUtility.checkRoles(user, INGEST_TRANSFER);
+    UserUtility.checkRoles(user, INGEST_TRANSFER_ROLE);
 
     UserUtility.checkTransferredResourceAccess(user, Arrays.asList(parent));
 
@@ -708,7 +710,7 @@ public class Browser extends RodaCoreService {
     Date startDate = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, INGEST_TRANSFER);
+    UserUtility.checkRoles(user, INGEST_TRANSFER_ROLE);
 
     UserUtility.checkTransferredResourceAccess(user, ids);
 
@@ -725,7 +727,7 @@ public class Browser extends RodaCoreService {
     Date startDate = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, INGEST_TRANSFER);
+    UserUtility.checkRoles(user, INGEST_TRANSFER_ROLE);
 
     UserUtility.checkTransferredResourceAccess(user, Arrays.asList(path));
 
@@ -752,6 +754,20 @@ public class Browser extends RodaCoreService {
       type);
 
     return null;
+  }
+
+  public static void createTransferredResource(RodaUser user, String parentId, String fileName, InputStream inputStream,
+    String name) throws AuthorizationDeniedException, GenericException, AlreadyExistsException {
+    if (name == null) {
+      try {
+        Browser.createTransferredResourceFile(user, parentId, fileName, inputStream);
+      } catch (FileAlreadyExistsException e) {
+        throw new AlreadyExistsException(ApiException.RESOURCE_ALREADY_EXISTS,
+          "File '" + fileName + "' already exists.");
+      }
+    } else {
+      Browser.createTransferredResourcesFolder(user, parentId, name);
+    }
   }
 
   public static boolean isTransferFullyInitialized(RodaUser user) {
