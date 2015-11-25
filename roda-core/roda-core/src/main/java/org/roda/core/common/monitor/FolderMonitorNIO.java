@@ -272,19 +272,19 @@ public class FolderMonitorNIO {
             }
           }
           if (kind == ENTRY_CREATE) {
-            LOGGER.error("CREATED: "+child.toString());
+            LOGGER.debug("CREATED: "+child.toString());
             NotifierThread nt = new NotifierThread(observers, basePath, child, true, false, false);
             executor.execute(nt);
           } else if (kind == ENTRY_MODIFY) {
-            LOGGER.error("MODIFIED: "+child.toString());
+            LOGGER.debug("MODIFIED: "+child.toString());
             NotifierThread nt = new NotifierThread(observers, basePath, child, true, false, false);
             executor.execute(nt);
           } else if (kind == ENTRY_DELETE) {
-            LOGGER.error("DELETE: "+child.toString());
+            LOGGER.debug("DELETE: "+child.toString());
             NotifierThread nt = new NotifierThread(observers, basePath, child, true, false, false);
             executor.execute(nt);
           } else if(kind== OVERFLOW){
-            LOGGER.error("OVERFLOW");
+            LOGGER.debug("OVERFLOW");
             
           }
         }
@@ -331,7 +331,6 @@ public class FolderMonitorNIO {
       } else if (modify) {
         notifyPathModified(basePath, updatedPath);
       } else if (delete) {
-        LOGGER.error("DELETE: "+updatedPath.toString());
         notifyPathDeleted(basePath, updatedPath);
       }
     }
