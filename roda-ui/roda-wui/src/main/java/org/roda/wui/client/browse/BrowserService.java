@@ -241,4 +241,5 @@ public interface BrowserService extends RemoteService {
   void removeTransferredResources(List<String> ids)
     throws AuthorizationDeniedException, GenericException, NotFoundException;
 
+  boolean isTransferFullyInitialized() throws AuthorizationDeniedException, GenericException, NotFoundException;
 }

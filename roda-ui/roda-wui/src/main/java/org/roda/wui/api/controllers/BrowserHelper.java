@@ -964,7 +964,7 @@ public class BrowserHelper {
 
   public static String createTransferredResourcesFolder(String parent, String folderName) throws GenericException {
     try {
-      return  RodaCoreFactory.getFolderMonitor().createFolder(Paths.get(parent), folderName);
+      return RodaCoreFactory.getFolderMonitor().createFolder(Paths.get(parent), folderName);
     } catch (IOException e) {
       LOGGER.error("Error creating transferred resource folder", e);
       throw new GenericException("Error creating transferred resource folder: " + e.getMessage());
@@ -997,6 +997,10 @@ public class BrowserHelper {
   public static StreamResponse getClassificationPlan(String type) {
     // TODO Auto-generated method stub
     return null;
+  }
+
+  public static boolean isTransferFullyInitialized() {
+    return RodaCoreFactory.getFolderMonitor().isFullyInitialized();
   }
 
 }

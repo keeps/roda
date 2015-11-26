@@ -16,8 +16,6 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
 import org.roda.core.common.UserUtility;
@@ -55,6 +53,8 @@ import org.roda.wui.client.search.SearchField;
 import org.roda.wui.common.I18nUtility;
 import org.roda.wui.common.client.GenericException;
 import org.roda.wui.common.server.ServerTools;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.util.DateParser;
 import org.xml.sax.SAXParseException;
 
@@ -566,6 +566,12 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     throws AuthorizationDeniedException, GenericException, NotFoundException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     Browser.removeTransferredResources(user, ids);
+  }
+
+  @Override
+  public boolean isTransferFullyInitialized() throws AuthorizationDeniedException, GenericException, NotFoundException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    return Browser.isTransferFullyInitialized(user);
   }
 
 }

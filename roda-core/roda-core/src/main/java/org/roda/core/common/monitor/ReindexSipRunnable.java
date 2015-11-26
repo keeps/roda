@@ -13,6 +13,7 @@ import java.util.EnumSet;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.index.utils.SolrUtils;
@@ -77,6 +78,7 @@ public class ReindexSipRunnable implements Runnable {
       index.commit(RodaConstants.INDEX_SIP);
       LOGGER.debug("End indexing SIPs");
       LOGGER.debug("TIME: " + ((System.currentTimeMillis() - start) / 1000) + " segundos");
+      RodaCoreFactory.setFolderMonitorDate(basePath, new Date());
     } catch (IOException | SolrServerException e) {
       LOGGER.error("ERROR REINDEXING SIPS");
     }
@@ -94,7 +96,7 @@ public class ReindexSipRunnable implements Runnable {
             LOGGER.debug("FULLPATH " + resourceAncestor.getFullPath());
             LOGGER.debug("RELATIVE " + resourceAncestor.getRelativePath());
             LOGGER.debug("PARENT " + resourceAncestor.getParentPath());
-            LOGGER.error("------------------------------------------------");
+            LOGGER.debug("------------------------------------------------");
             index.add(RodaConstants.INDEX_SIP, SolrUtils.transferredResourceToSolrDocument(resourceAncestor));
           } else {
             LOGGER.debug("---------------- NOT ADDED ----------------------");

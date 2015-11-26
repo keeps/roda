@@ -51,6 +51,7 @@ public class FolderMonitorNIO {
   private Thread threadWatch, threadReindex;
   private Date indexDate;
   private SolrClient index;
+  private boolean watchInitialized;
 
   public FolderMonitorNIO(Path p, Date indexDate, SolrClient index) throws Exception {
     executor = Executors.newSingleThreadExecutor();
@@ -58,6 +59,7 @@ public class FolderMonitorNIO {
     this.basePath = p;
     this.indexDate = indexDate;
     this.index = index;
+    this.watchInitialized = false;
     startWatch();
   }
 
@@ -66,9 +68,6 @@ public class FolderMonitorNIO {
     WatchDir watchDir = new WatchDir(basePath, true);
     threadWatch = new Thread(watchDir, "FolderWatcher");
     threadWatch.start();
-    ReindexSipRunnable reindex = new ReindexSipRunnable(basePath, indexDate, index);
-    threadReindex = new Thread(reindex, "ReindexThread");
-    threadReindex.start();
     LOGGER.debug("WATCH (NIO) ON FOLDER " + basePath.toString() + " STARTED");
   }
 
@@ -167,11 +166,32 @@ public class FolderMonitorNIO {
     return tr;
   }
 
+  public boolean isFullyInitialized() {
+    if (watchInitialized) {
+      if (threadReindex != null && !threadReindex.isAlive()) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
+
   class WatchDir implements Runnable {
     private final WatchService watcher;
     private final Map<WatchKey, Path> keys;
     private final boolean recursive;
     private final Path watched;
+    private ReindexSipRunnable reindexRunnable;
+
+    public ReindexSipRunnable getReindexRunnable() {
+      return reindexRunnable;
+    }
+
+    public void setReindexRunnable(ReindexSipRunnable reindexRunnable) {
+      this.reindexRunnable = reindexRunnable;
+    }
 
     @SuppressWarnings("unchecked")
     <T> WatchEvent<T> cast(WatchEvent<?> event) {
@@ -192,6 +212,12 @@ public class FolderMonitorNIO {
       }
       LOGGER
         .debug("TIME ELAPSED (INITIALIZE WATCH): " + ((System.currentTimeMillis() - startTime) / 1000) + " segundos");
+
+      watchInitialized = true;
+      reindexRunnable = new ReindexSipRunnable(basePath, indexDate, index);
+      threadReindex = new Thread(reindexRunnable, "ReindexThread");
+      threadReindex.start();
+
       processEvents();
     }
 
@@ -216,6 +242,7 @@ public class FolderMonitorNIO {
       this.keys = new HashMap<WatchKey, Path>();
       this.recursive = recursive;
       this.watched = dir;
+      this.reindexRunnable = null;
     }
 
     void processEvents() {

@@ -422,6 +422,7 @@ public class RodaCoreFactory {
   }
 
   public static void startSIPFolderMonitor() throws Exception {
+
     Configuration rodaConfig = RodaCoreFactory.getRodaConfiguration();
     String SIPFolderPath = rodaConfig.getString("sip.folder");
     int SIPTimeout = rodaConfig.getInt("sip.timeout");
@@ -430,6 +431,7 @@ public class RodaCoreFactory {
     sipFolderObserver = new IndexFolderObserver(solr, sipFolderPath);
     sipFolderMonitor = new FolderMonitorNIO(sipFolderPath, d, solr);
     sipFolderMonitor.addFolderObserver(sipFolderObserver);
+    LOGGER.debug("ISFULLYINITIALIZED: " + getFolderMonitor().isFullyInitialized());
   }
 
   public static Date getFolderMonitorDate(Path sipFolderPath) {

@@ -273,8 +273,8 @@ public class IngestTransfer extends Composite {
     if (historyTokens.size() == 0) {
       view();
       callback.onSuccess(this);
-    } else if (historyTokens.size() > 1
-      && historyTokens.get(0).equals(IngestTransferUpload.RESOLVER.getHistoryToken())) {
+    } else
+      if (historyTokens.size() > 1 && historyTokens.get(0).equals(IngestTransferUpload.RESOLVER.getHistoryToken())) {
       IngestTransferUpload.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else {
       String transferredResourceId = getTransferredResourceIdFromPath(historyTokens);

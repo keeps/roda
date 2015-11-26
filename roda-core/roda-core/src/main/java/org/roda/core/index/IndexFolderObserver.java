@@ -15,7 +15,6 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.roda.core.common.monitor.FolderMonitorNIO;
 import org.roda.core.common.monitor.FolderObserver;
-import org.roda.core.common.monitor.ReindexSipRunnable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.index.utils.SolrUtils;
@@ -27,8 +26,6 @@ public class IndexFolderObserver implements FolderObserver {
   private static final Logger LOGGER = LoggerFactory.getLogger(IndexFolderObserver.class);
 
   private final SolrClient index;
-
-  private ReindexSipRunnable reindexThread;
 
   private Path basePath;
 
@@ -43,9 +40,7 @@ public class IndexFolderObserver implements FolderObserver {
   }
 
   public void transferredResourceAdded(TransferredResource resource, boolean commit) {
-
     try {
-
       if (resource.getAncestorsPaths() != null && resource.getAncestorsPaths().size() > 0) {
         for (String ancestor : resource.getAncestorsPaths()) {
           TransferredResource resourceAncestor = FolderMonitorNIO
@@ -93,7 +88,7 @@ public class IndexFolderObserver implements FolderObserver {
   @Override
   public void transferredResourceModified(TransferredResource resource) {
     LOGGER.debug("MODIFY: " + resource.toString());
-    // XXXXXXXXXXXXx
+    transferredResourceAdded(resource);
 
   }
 

@@ -687,9 +687,9 @@ public class Browser extends RodaCoreService {
     UserUtility.checkRoles(user, INGEST_TRANSFER);
 
     UserUtility.checkTransferredResourceAccess(user, Arrays.asList(parent));
-    
+
     // fix parent
-    if(parent == null) {
+    if (parent == null) {
       parent = user.getName();
     }
 
@@ -752,6 +752,10 @@ public class Browser extends RodaCoreService {
       type);
 
     return null;
+  }
+
+  public static boolean isTransferFullyInitialized(RodaUser user) {
+    return BrowserHelper.isTransferFullyInitialized();
   }
 
 }
