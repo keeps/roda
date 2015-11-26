@@ -7,17 +7,15 @@
  */
 package org.roda.core.common.monitor;
 
-import java.nio.file.Path;
-import java.util.Date;
+import org.roda.core.data.v2.TransferredResource;
 
 public interface FolderObserver {
-  public void pathAdded(Path basePath, Path createdPath,boolean commit);
-  
-  public void pathAdded(Path basePath, Path createdPath);
+  public void transferredResourceAdded(TransferredResource resource, boolean commit);
 
-  public void pathModified(Path basePath, Path createdPath);
+  public void transferredResourceAdded(TransferredResource resource);
 
-  public void pathDeleted(Path basePath, Path createdPath);
-  
-  public void reindex(Path basePath, Date from);
+  public void transferredResourceModified(TransferredResource resource);
+
+  public void transferredResourceDeleted(TransferredResource resource);
+
 }

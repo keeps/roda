@@ -42,7 +42,6 @@ import org.roda.core.common.LdapUtility;
 import org.roda.core.common.Messages;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.common.UserUtility;
-import org.roda.core.common.monitor.FolderMonitorApache;
 import org.roda.core.common.monitor.FolderMonitorNIO;
 import org.roda.core.common.monitor.FolderObserver;
 import org.roda.core.data.adapter.facet.Facets;
@@ -429,9 +428,7 @@ public class RodaCoreFactory {
     Path sipFolderPath = dataPath.resolve(SIPFolderPath);
     Date d = getFolderMonitorDate(sipFolderPath);
     sipFolderObserver = new IndexFolderObserver(solr, sipFolderPath);
-    sipFolderMonitor = new FolderMonitorNIO(sipFolderPath, 10000, solr, true, d, sipFolderObserver);
-    // sipFolderMonitor = new FolderMonitor(sipFolderPath, SIPTimeout);
-
+    sipFolderMonitor = new FolderMonitorNIO(sipFolderPath, d, solr);
     sipFolderMonitor.addFolderObserver(sipFolderObserver);
   }
 

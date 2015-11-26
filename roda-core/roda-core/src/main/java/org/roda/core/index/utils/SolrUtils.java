@@ -47,7 +47,6 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.FacetField.Count;
 import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
@@ -664,8 +663,8 @@ public class SolrUtils {
       ret = resultClass.cast(solrDocumentToLogEntry(doc));
     } else if (resultClass.equals(SIPReport.class)) {
       ret = resultClass.cast(solrDocumentToSipState(doc));
-    } else if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class)
-      || resultClass.equals(Group.class)) {
+    } else
+      if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class) || resultClass.equals(Group.class)) {
       ret = resultClass.cast(solrDocumentToRodaMember(doc));
     } else if (resultClass.equals(RepresentationFilePreservationObject.class)) {
       ret = resultClass.cast(solrDocumentToRepresentationFilePreservationObject(doc));
@@ -1271,88 +1270,28 @@ public class SolrUtils {
     return tr;
   }
 
-  public static SolrInputDocument transferredResourceToSolrDocument(Path createdPath, Path basePath)
-    throws IOException {
-    Path relativePath = basePath.relativize(createdPath);
+  public static SolrInputDocument transferredResourceToSolrDocument(TransferredResource resource) throws IOException {
     SolrInputDocument sip = new SolrInputDocument();
 
-    sip.addField(RodaConstants.TRANSFERRED_RESOURCE_ID, relativePath.toString());
-    sip.addField(RodaConstants.TRANSFERRED_RESOURCE_FULLPATH, createdPath.toString());
-    sip.addField(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID, relativePath.getParent());
-    
-    if (relativePath.getNameCount() > 1) {
-      sip.addField(RodaConstants.TRANSFERRED_RESOURCE_RELATIVEPATH,
-        relativePath.subpath(1, relativePath.getNameCount()).toString());
+    sip.addField(RodaConstants.TRANSFERRED_RESOURCE_ID, resource.getId());
+    sip.addField(RodaConstants.TRANSFERRED_RESOURCE_FULLPATH, resource.getFullPath());
+    if (resource.getParentId() != null) {
+      sip.addField(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID, resource.getParentId());
     }
-
-    sip.addField(RodaConstants.TRANSFERRED_RESOURCE_DATE, new Date());
-    if (createdPath.toFile().isDirectory()) {
-      sip.addField(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, false);
-      sip.addField(RodaConstants.TRANSFERRED_RESOURCE_SIZE, 0L);
-    } else {
-      sip.addField(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, true);
-      long fileSize = Files.size(createdPath);
-      sip.addField(RodaConstants.TRANSFERRED_RESOURCE_SIZE, fileSize);
+    if (resource.getRelativePath() != null) {
+      sip.addField(RodaConstants.TRANSFERRED_RESOURCE_RELATIVEPATH, resource.getRelativePath());
     }
-
-    sip.addField(RodaConstants.TRANSFERRED_RESOURCE_NAME, relativePath.getFileName().toString());
-    sip.addField(RodaConstants.TRANSFERRED_RESOURCE_OWNER, relativePath.subpath(0, 1).toString());
-
-    List<String> ancestorsPath = new ArrayList<String>();
-
-    Path fullParentPath = createdPath.getParent();
-    while (!Files.isSameFile(basePath, fullParentPath)) {
-      Path relativeParentPath = basePath.relativize(fullParentPath);
-      if (relativeParentPath.getNameCount() > 1) {
-        ancestorsPath.add(relativeParentPath.toString());
-      }
-      fullParentPath = fullParentPath.getParent();
+    sip.addField(RodaConstants.TRANSFERRED_RESOURCE_DATE, resource.getCreationDate());
+    sip.addField(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, resource.isFile());
+    sip.addField(RodaConstants.TRANSFERRED_RESOURCE_SIZE, resource.getSize());
+    sip.addField(RodaConstants.TRANSFERRED_RESOURCE_NAME, resource.getName());
+    sip.addField(RodaConstants.TRANSFERRED_RESOURCE_OWNER, resource.getOwner());
+    if (resource.getAncestorsPaths() != null && resource.getAncestorsPaths().size() > 0) {
+      sip.addField(RodaConstants.TRANSFERRED_RESOURCE_ANCESTORS, resource.getAncestorsPaths());
     }
-    sip.addField(RodaConstants.TRANSFERRED_RESOURCE_ANCESTORS, ancestorsPath);
-
     return sip;
   }
 
-  public static SolrInputDocument addSize(SolrDocument sd, long size) {
-    LOGGER.debug("Adding " + size + " TO " + sd.get("id"));
-    LOGGER.debug("------------------------------");
-    LOGGER.debug("IN: ");
-    for (String s : sd.getFieldNames()) {
-      LOGGER.debug(s + " - " + sd.getFieldValue(s));
-    }
-    LOGGER.debug("------------------------------");
-    SolrInputDocument sid = ClientUtils.toSolrInputDocument(sd);
-    long currentSize = objectToLong(sid.getField(RodaConstants.TRANSFERRED_RESOURCE_SIZE).getValue());
-    currentSize = currentSize + size;
-    sid.setField(RodaConstants.TRANSFERRED_RESOURCE_SIZE, currentSize);
-    sid.removeField("_version_");
-    LOGGER.debug("------------------------------");
-    LOGGER.debug("OUT: ");
-    for (String s : sid.getFieldNames()) {
-      LOGGER.debug(s + " - " + sid.getFieldValue(s));
-    }
-    LOGGER.debug("------------------------------");
-    return sid;
-  }
-
-  /*
-   * public static void updateSizeRecursive(SolrClient index, Path p, long size)
-   * throws SolrServerException, IOException { LOGGER.debug(
-   * "UpdateSizeRecursive: "+p.toString()); SolrDocument sd =
-   * index.getById(RodaConstants.INDEX_SIP, p.toString()); SolrInputDocument sid
-   * = new SolrInputDocument(); for (String s : sd.getFieldNames()) { if
-   * (s.equalsIgnoreCase(RodaConstants.SIPMONITOR_SIZE)) { long currentSize =
-   * objectToLong(sd.get(s)); currentSize += size; sid.addField(s, currentSize);
-   * } else { sid.addField(s, sd.get(s)); } } index.add(RodaConstants.INDEX_SIP,
-   * sid); index.commit(RodaConstants.INDEX_SIP);
-   * 
-   * if (sd.get(RodaConstants.SIPMONITOR_PARENTPATH) != null) {
-   * updateSizeRecursive(index,
-   * Paths.get(objectToString(sd.get(RodaConstants.SIPMONITOR_PARENTPATH))),
-   * size); }
-   * 
-   * }
-   */
   public static long getSizePath(Path startPath) throws IOException {
     final AtomicLong size = new AtomicLong(0);
     Files.walkFileTree(startPath, new SimpleFileVisitor<Path>() {
@@ -1364,7 +1303,6 @@ public class SolrUtils {
 
       @Override
       public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-        // Skip folders that can't be traversed
         return FileVisitResult.CONTINUE;
       }
     });
