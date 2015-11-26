@@ -12,8 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.ValidationUtils;
 import org.roda.core.data.PluginParameter;
@@ -26,6 +24,8 @@ import org.roda.core.model.ModelServiceException;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.StorageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AIPValidationPlugin implements Plugin<AIP> {
   private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -104,6 +104,11 @@ public class AIPValidationPlugin implements Plugin<AIP> {
   public Report afterExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
 
     return null;
+  }
+
+  @Override
+  public Plugin<AIP> cloneMe() {
+    return new AIPValidationPlugin();
   }
 
 }

@@ -24,8 +24,8 @@ public class RestUtils {
       .append(RodaConstants.API_DATA).append(RodaConstants.API_SEP).append(UriUtils.encode(repId))
       .append(RodaConstants.API_SEP);
     // accept format attribute
-    b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_ATTR_ACCEPT_FORMAT)
-      .append(RodaConstants.API_ATTR_ASSIGN_SYMBOL).append(RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN);
+    b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT)
+      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN);
 
     return UriUtils.fromSafeConstant(b.toString());
   }
@@ -38,8 +38,8 @@ public class RestUtils {
     b.append(RodaConstants.API_REST_V1_AIPS).append(UriUtils.encode(aipId)).append(RodaConstants.API_SEP)
       .append(RodaConstants.API_DESCRIPTIVE_METADATA).append(RodaConstants.API_SEP);
     // accept format attribute
-    b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_ATTR_ACCEPT_FORMAT)
-      .append(RodaConstants.API_ATTR_ASSIGN_SYMBOL).append(RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN);
+    b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT)
+      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN);
 
     return UriUtils.fromSafeConstant(b.toString());
   }
@@ -52,8 +52,8 @@ public class RestUtils {
     b.append(RodaConstants.API_REST_V1_AIPS).append(UriUtils.encode(aipId)).append(RodaConstants.API_SEP)
       .append(RodaConstants.API_DESCRIPTIVE_METADATA).append(RodaConstants.API_SEP).append(descId);
     // accept format attribute
-    b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_ATTR_ACCEPT_FORMAT)
-      .append(RodaConstants.API_ATTR_ASSIGN_SYMBOL).append(RodaConstants.API_ATTR_ACCEPT_FORMAT_XML);
+    b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT)
+      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML);
 
     return UriUtils.fromSafeConstant(b.toString());
   }
@@ -65,12 +65,12 @@ public class RestUtils {
     b.append(RodaConstants.API_REST_V1_AIPS).append(UriUtils.encode(aipId)).append(RodaConstants.API_SEP)
       .append(RodaConstants.API_DESCRIPTIVE_METADATA).append(RodaConstants.API_SEP).append(descId);
     // accept format attribute
-    b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_ATTR_ACCEPT_FORMAT)
-      .append(RodaConstants.API_ATTR_ASSIGN_SYMBOL).append(RodaConstants.API_ATTR_ACCEPT_FORMAT_HTML);
+    b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT)
+      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML);
 
     // locale
-    b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_ATTR_LANG)
-      .append(RodaConstants.API_ATTR_ASSIGN_SYMBOL).append(LocaleInfo.getCurrentLocale().getLocaleName());
+    b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_KEY_LANG)
+      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(LocaleInfo.getCurrentLocale().getLocaleName());
 
     return b.toString();
   }
@@ -83,8 +83,8 @@ public class RestUtils {
     b.append(RodaConstants.API_REST_V1_AIPS).append(UriUtils.encode(aipId)).append(RodaConstants.API_SEP)
       .append(RodaConstants.API_PRESERVATION_METADATA).append(RodaConstants.API_SEP);
     // accept format attribute
-    b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_ATTR_ACCEPT_FORMAT)
-      .append(RodaConstants.API_ATTR_ASSIGN_SYMBOL).append(RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN);
+    b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT)
+      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN);
 
     return UriUtils.fromSafeConstant(b.toString());
   }
@@ -97,26 +97,26 @@ public class RestUtils {
     b.append(RodaConstants.API_REST_V1_AIPS).append(UriUtils.encode(aipId)).append(RodaConstants.API_SEP)
       .append(RodaConstants.API_PRESERVATION_METADATA).append(RodaConstants.API_SEP).append(repId);
     // accept format attribute
-    b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_ATTR_ACCEPT_FORMAT)
-      .append(RodaConstants.API_ATTR_ASSIGN_SYMBOL).append(RodaConstants.API_ATTR_ACCEPT_FORMAT_HTML);
+    b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT)
+      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML);
 
     // start and limits
-    b.append(RodaConstants.API_QUERY_SEP).append("startAgent").append(RodaConstants.API_ATTR_ASSIGN_SYMBOL)
+    b.append(RodaConstants.API_QUERY_SEP).append("startAgent").append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
       .append(startAgent);
-    b.append(RodaConstants.API_QUERY_SEP).append("limitAgent").append(RodaConstants.API_ATTR_ASSIGN_SYMBOL)
+    b.append(RodaConstants.API_QUERY_SEP).append("limitAgent").append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
       .append(limitAgent);
-    b.append(RodaConstants.API_QUERY_SEP).append("startEvent").append(RodaConstants.API_ATTR_ASSIGN_SYMBOL)
+    b.append(RodaConstants.API_QUERY_SEP).append("startEvent").append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
       .append(startEvent);
-    b.append(RodaConstants.API_QUERY_SEP).append("limitEvent").append(RodaConstants.API_ATTR_ASSIGN_SYMBOL)
+    b.append(RodaConstants.API_QUERY_SEP).append("limitEvent").append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
       .append(limitEvent);
-    b.append(RodaConstants.API_QUERY_SEP).append("startFile").append(RodaConstants.API_ATTR_ASSIGN_SYMBOL)
+    b.append(RodaConstants.API_QUERY_SEP).append("startFile").append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
       .append(startFile);
-    b.append(RodaConstants.API_QUERY_SEP).append("limitFile").append(RodaConstants.API_ATTR_ASSIGN_SYMBOL)
+    b.append(RodaConstants.API_QUERY_SEP).append("limitFile").append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
       .append(limitFile);
 
     // locale
-    b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_ATTR_LANG)
-      .append(RodaConstants.API_ATTR_ASSIGN_SYMBOL).append(LocaleInfo.getCurrentLocale().getLocaleName());
+    b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_KEY_LANG)
+      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(LocaleInfo.getCurrentLocale().getLocaleName());
 
     return b.toString();
   }
@@ -126,7 +126,7 @@ public class RestUtils {
     StringBuilder b = new StringBuilder();
     // base uri
     b.append(RodaConstants.API_REST_V1_TRANSFERRED).append(RodaConstants.API_QUERY_START)
-      .append("parentId").append(RodaConstants.API_ATTR_ASSIGN_SYMBOL).append(parentId);
+      .append("parentId").append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(parentId);
 
     return b.toString();
   }

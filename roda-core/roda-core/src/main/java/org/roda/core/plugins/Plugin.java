@@ -103,4 +103,6 @@ public interface Plugin<T extends Serializable> {
   public Report beforeExecute(IndexService index, ModelService model, StorageService storage) throws PluginException;
 
   public Report afterExecute(IndexService index, ModelService model, StorageService storage) throws PluginException;
+
+  public Plugin<T> cloneMe();
 }

@@ -15,8 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
 import org.roda.core.data.common.InvalidParameterException;
@@ -32,6 +30,8 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.StoragePath;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StorageServiceException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RemoveOrphansPlugin implements Plugin<SimpleDescriptionObject> {
   private static final Logger LOGGER = LoggerFactory.getLogger(RemoveOrphansPlugin.class);
@@ -124,6 +124,11 @@ public class RemoveOrphansPlugin implements Plugin<SimpleDescriptionObject> {
   public Report afterExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
     LOGGER.debug("End");
     return null;
+  }
+
+  @Override
+  public Plugin<SimpleDescriptionObject> cloneMe() {
+    return new RemoveOrphansPlugin();
   }
 
 }

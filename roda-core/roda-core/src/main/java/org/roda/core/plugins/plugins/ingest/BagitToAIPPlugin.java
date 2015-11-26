@@ -96,4 +96,9 @@ public class BagitToAIPPlugin implements Plugin<TransferredResource> {
     return null;
   }
 
+  @Override
+  public Plugin<TransferredResource> cloneMe() {
+    return new BagitToAIPPlugin();
+  }
+
 }

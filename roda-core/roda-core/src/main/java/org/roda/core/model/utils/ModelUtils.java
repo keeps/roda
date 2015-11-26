@@ -472,6 +472,19 @@ public final class ModelUtils {
     }
   }
 
+  public static Map<String, String> getMapFromJson(String json) {
+    Map<String, String> ret = new HashMap<String, String>();
+    try {
+      JsonFactory factory = new JsonFactory();
+      ObjectMapper mapper = new ObjectMapper(factory);
+      ret = mapper.readValue(json, new TypeReference<Map<String, String>>() {
+      });
+    } catch (IOException e) {
+      LOGGER.error("Error transforming json string to log entry parameters", e);
+    }
+    return ret;
+  }
+
   public static String getJsonFromObject(Object object) {
     String ret = null;
     try {

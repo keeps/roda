@@ -168,4 +168,10 @@ public class AntivirusPlugin implements Plugin<AIP> {
     this.antiVirus = antiVirus;
   }
 
+  @Override
+  public Plugin<AIP> cloneMe() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
 }

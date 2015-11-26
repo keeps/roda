@@ -19,8 +19,6 @@ import java.util.Map;
 
 import javax.xml.transform.TransformerException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.PremisUtils;
 import org.roda.core.data.PluginParameter;
@@ -38,6 +36,8 @@ import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.fs.FSUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 // TODO IMPROVE...
@@ -155,6 +155,11 @@ public class V2ToV3PremisPlugin implements Plugin<AIP> {
   public Report afterExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
 
     return null;
+  }
+
+  @Override
+  public Plugin<AIP> cloneMe() {
+    return new V2ToV3PremisPlugin();
   }
 
 }

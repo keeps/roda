@@ -44,4 +44,8 @@ public class Jobs {
     this.jobs = jobs;
   }
 
+  public void addJob(Job job) {
+    this.jobs.add(job);
+  }
+
 }

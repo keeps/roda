@@ -124,7 +124,7 @@ public class PluginManager {
     Plugin<?> plugin = null;
 
     if (internalPluginChache.get(pluginID) != null) {
-      plugin = internalPluginChache.get(pluginID);
+      plugin = internalPluginChache.get(pluginID).cloneMe();
     }
 
     boolean internalPluginTakesPrecedence = RodaCoreFactory.getRodaConfiguration()
@@ -133,7 +133,7 @@ public class PluginManager {
 
       for (JarPlugin jarPlugin : this.jarPluginCache.values()) {
         if (jarPlugin.plugin != null && jarPlugin.plugin.getClass().getName().equals(pluginID)) {
-          plugin = jarPlugin.plugin;
+          plugin = jarPlugin.plugin.cloneMe();
           break;
         }
       }

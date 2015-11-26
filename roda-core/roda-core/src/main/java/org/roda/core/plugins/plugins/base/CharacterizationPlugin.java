@@ -12,8 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
@@ -29,6 +27,8 @@ import org.roda.core.storage.Binary;
 import org.roda.core.storage.StoragePath;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StorageServiceException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // FIXME check if this is really needed
 public class CharacterizationPlugin implements Plugin<AIP> {
@@ -86,8 +86,8 @@ public class CharacterizationPlugin implements Plugin<AIP> {
           try {
             StoragePath filePath = ModelUtils.getPreservationFilePath(aip.getId(), representationID, fileID);
             Binary binary = storage.getBinary(filePath);
-            Map<String, String> characteristics = CharacterizationPluginUtils.getObjectCharacteristicsFields(aip.getId(),
-              representationID, fileID, binary, RodaCoreFactory.getConfigPath());
+            Map<String, String> characteristics = CharacterizationPluginUtils.getObjectCharacteristicsFields(
+              aip.getId(), representationID, fileID, binary, RodaCoreFactory.getConfigPath());
             total = join(total, characteristics);
           } catch (StorageServiceException | IndexServiceException mse) {
             LOGGER.error("Error processing :" + aip.getId() + "/" + representationID + "/" + fileID);
@@ -134,6 +134,11 @@ public class CharacterizationPlugin implements Plugin<AIP> {
   public Report afterExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
 
     return null;
+  }
+
+  @Override
+  public Plugin<AIP> cloneMe() {
+    return new CharacterizationPlugin();
   }
 
 }

@@ -13,8 +13,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
@@ -25,6 +23,8 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.StorageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LogCleanerPlugin implements Plugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(LogCleanerPlugin.class);
@@ -103,6 +103,11 @@ public class LogCleanerPlugin implements Plugin<AIP> {
   public Report afterExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
     // TODO Auto-generated method stub
     return null;
+  }
+
+  @Override
+  public Plugin<AIP> cloneMe() {
+    return new LogCleanerPlugin();
   }
 
 }

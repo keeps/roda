@@ -260,10 +260,10 @@ public class BrowserHelper {
   }
 
   public static void validateGetAipRepresentationFileParams(String acceptFormat) throws RequestNotValidException {
-    if (!RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
+    if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
       throw new RequestNotValidException(ApiException.INVALID_PARAMETER_VALUE,
-        "Invalid '" + RodaConstants.API_ATTR_ACCEPT_FORMAT + "' value. Expected values: "
-          + Arrays.asList(RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN));
+        "Invalid '" + RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT + "' value. Expected values: "
+          + Arrays.asList(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN));
     }
   }
 
@@ -281,10 +281,10 @@ public class BrowserHelper {
   }
 
   protected static void validateGetAipRepresentationParams(String acceptFormat) throws RequestNotValidException {
-    if (!RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
+    if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
       throw new RequestNotValidException(ApiException.INVALID_PARAMETER_VALUE,
-        "Invalid '" + RodaConstants.API_ATTR_ACCEPT_FORMAT + "' value. Expected values: "
-          + Arrays.asList(RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN));
+        "Invalid '" + RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT + "' value. Expected values: "
+          + Arrays.asList(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN));
     }
   }
 
@@ -314,10 +314,10 @@ public class BrowserHelper {
   }
 
   protected static void validateListAipDescriptiveMetadataParams(String acceptFormat) throws RequestNotValidException {
-    if (!RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
+    if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
       throw new RequestNotValidException(ApiException.INVALID_PARAMETER_VALUE,
-        "Invalid '" + RodaConstants.API_ATTR_ACCEPT_FORMAT + "' value. Expected values: "
-          + Arrays.asList(RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN));
+        "Invalid '" + RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT + "' value. Expected values: "
+          + Arrays.asList(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN));
     }
   }
 
@@ -361,11 +361,11 @@ public class BrowserHelper {
   }
 
   protected static void validateGetAipDescritiveMetadataParams(String acceptFormat) throws RequestNotValidException {
-    if (!RodaConstants.API_ATTR_ACCEPT_FORMAT_XML.equals(acceptFormat)
-      && !RodaConstants.API_ATTR_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
+    if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)
+      && !RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
       throw new RequestNotValidException(ApiException.INVALID_PARAMETER_VALUE,
-        "Invalid '" + RodaConstants.API_ATTR_ACCEPT_FORMAT + "' value. Expected values: "
-          + Arrays.asList(RodaConstants.API_ATTR_ACCEPT_FORMAT_XML, RodaConstants.API_ATTR_ACCEPT_FORMAT_HTML));
+        "Invalid '" + RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT + "' value. Expected values: "
+          + Arrays.asList(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML, RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML));
     }
   }
 
@@ -382,7 +382,7 @@ public class BrowserHelper {
     try {
       descriptiveMetadataBinary = model.retrieveDescriptiveMetadataBinary(aipId, metadataId);
 
-      if (RodaConstants.API_ATTR_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
+      if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
         filename = descriptiveMetadataBinary.getStoragePath().getName();
         mediaType = MediaType.TEXT_XML;
         stream = new StreamingOutput() {
@@ -393,7 +393,7 @@ public class BrowserHelper {
         };
         ret = new StreamResponse(filename, mediaType, stream);
 
-      } else if (RodaConstants.API_ATTR_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
+      } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
         filename = descriptiveMetadataBinary.getStoragePath().getName() + ".html";
         mediaType = MediaType.TEXT_HTML;
         String htmlDescriptive = HTMLUtils.descriptiveMetadataToHtml(descriptiveMetadataBinary,
@@ -423,10 +423,10 @@ public class BrowserHelper {
   }
 
   protected static void validateListAipPreservationMetadataParams(String acceptFormat) throws RequestNotValidException {
-    if (!RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
+    if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
       throw new RequestNotValidException(ApiException.INVALID_PARAMETER_VALUE,
-        "Invalid '" + RodaConstants.API_ATTR_ACCEPT_FORMAT + "' value. Expected values: "
-          + Arrays.asList(RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN));
+        "Invalid '" + RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT + "' value. Expected values: "
+          + Arrays.asList(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN));
     }
 
   }
@@ -489,17 +489,17 @@ public class BrowserHelper {
 
   protected static void validateGetAipRepresentationPreservationMetadataParams(String acceptFormat, String language)
     throws RequestNotValidException {
-    if (!RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN.equals(acceptFormat)
-      && !RodaConstants.API_ATTR_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
+    if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)
+      && !RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
       throw new RequestNotValidException(ApiException.INVALID_PARAMETER_VALUE,
-        "Invalid '" + RodaConstants.API_ATTR_ACCEPT_FORMAT + "' value. Expected values: "
-          + Arrays.asList(RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN, RodaConstants.API_ATTR_ACCEPT_FORMAT_HTML));
+        "Invalid '" + RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT + "' value. Expected values: "
+          + Arrays.asList(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN, RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML));
     }
 
     // FIXME validate language? what exception should be thrown?
     if (!StringUtils.isNotBlank(language)) {
       throw new RequestNotValidException(ApiException.EMPTY_PARAMETER,
-        "Parameter '" + RodaConstants.API_ATTR_LANG + "' must have a value");
+        "Parameter '" + RodaConstants.API_QUERY_KEY_LANG + "' must have a value");
     }
 
   }
@@ -517,7 +517,7 @@ public class BrowserHelper {
     ModelService model = RodaCoreFactory.getModelService();
     StreamResponse response = null;
 
-    if (RodaConstants.API_ATTR_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
+    if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
       ClosableIterable<PreservationMetadata> preservationFiles = null;
       try {
         Pair<Integer, Integer> pagingParamsAgent = ApiUtils.processPagingParams(startAgent, limitAgent);
@@ -573,7 +573,7 @@ public class BrowserHelper {
           }
         }
       }
-    } else if (RodaConstants.API_ATTR_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
+    } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
       try {
         String filename = aipId + "_" + representationId + ".html";
 

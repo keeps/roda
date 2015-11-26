@@ -14,8 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.apache.tika.exception.TikaException;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
@@ -32,6 +30,8 @@ import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.fs.FSUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 public class TikaFullTextPlugin implements Plugin<AIP> {
@@ -127,6 +127,11 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
   public Report afterExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
 
     return null;
+  }
+
+  @Override
+  public Plugin<AIP> cloneMe() {
+    return new TikaFullTextPlugin();
   }
 
 }

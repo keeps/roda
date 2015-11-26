@@ -20,14 +20,13 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.AuthorizationDeniedException;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.RodaUser;
 import org.roda.core.plugins.orchestrate.akka.Master.Work;
 import org.roda.wui.api.v1.entities.TaskList;
@@ -51,39 +50,28 @@ public class ManagementTasksResource extends RodaCoreService {
 
   @GET
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-  public Response listTasks(@QueryParam("acceptFormat") String acceptFormat) {
+  public Response listTasks(@QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat) {
     return Response.ok(TASKS, ApiUtils.getMediaType(acceptFormat, request.getHeader("Accept"))).build();
   }
 
   @POST
   @Path("/{sub_resource}/{task_id}")
   public Response executeTask(final @PathParam("sub_resource") String sub_resource,
-    final @PathParam("task_id") String task_id, @QueryParam("params") List<String> params) {
-    String authorization = request.getHeader("Authorization");
+    final @PathParam("task_id") String task_id, @QueryParam("params") List<String> params)
+      throws AuthorizationDeniedException {
     Date startDate = new Date();
-    try {
 
-      // get user & check permissions
-      RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
-      // FIXME see if this is the proper way to ensure that the user can execute
-      // this task
-      if (!user.getAllGroups().contains("administrators")) {
-        return Response.status(Status.UNAUTHORIZED).entity(new ApiResponseMessage(ApiResponseMessage.ERROR,
-          "User \"" + user.getId() + "\" doesn't have permission the execute the requested task!")).build();
-      }
-
-      return execute(user, startDate, sub_resource, task_id, params);
-
-    } catch (AuthorizationDeniedException e) {
-      if (authorization == null) {
-        return Response.status(Status.UNAUTHORIZED)
-          .header(HttpHeaders.WWW_AUTHENTICATE, "Basic realm=\"RODA REST API\"")
-          .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
-      } else {
-        return Response.status(Status.UNAUTHORIZED)
-          .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
-      }
+    // get user & check permissions
+    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    // FIXME see if this is the proper way to ensure that the user can execute
+    // this task
+    if (!user.getAllGroups().contains("administrators")) {
+      throw new AuthorizationDeniedException(
+        "User \"" + user.getId() + "\" doesn't have permission the execute the requested task!");
     }
+
+    return execute(user, startDate, sub_resource, task_id, params);
+
   }
 
   private Response execute(RodaUser user, Date startDate, final String sub_resource, final String task_id,

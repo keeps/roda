@@ -30,6 +30,7 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RODAException;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.EventPreservationObject;
 import org.roda.core.data.v2.Representation;
 import org.roda.core.data.v2.RodaUser;
@@ -61,8 +62,8 @@ public class AipsResource {
     @ApiResponse(code = 200, message = "Successful response", response = AIP.class, responseContainer = "List")})
 
   public Response aipsGet(
-    @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam("start") String start,
-    @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam("limit") String limit)
+    @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam(RodaConstants.API_QUERY_KEY_START) String start,
+    @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam(RodaConstants.API_QUERY_KEY_LIMIT) String limit)
       throws RODAException {
     // TODO
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
@@ -76,8 +77,8 @@ public class AipsResource {
     @ApiResponse(code = 404, message = "Not found", response = AIP.class)})
 
   public Response aipsAipIdGet(
-    @ApiParam(value = "The ID of the AIP to retrieve.", required = true) @PathParam("aip_id") String aipId,
-    @ApiParam(value = "Choose format in which to get the AIP", allowableValues = "json, zip", defaultValue = "json") @QueryParam("acceptFormat") String acceptFormat)
+    @ApiParam(value = "The ID of the AIP to retrieve.", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
+    @ApiParam(value = "Choose format in which to get the AIP", allowableValues = "json, zip", defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
       throws RODAException {
     // TODO
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
@@ -90,7 +91,7 @@ public class AipsResource {
     @ApiResponse(code = 404, message = "Not found", response = AIP.class)})
 
   public Response aipsAipIdPut(
-    @ApiParam(value = "The ID of the existing AIP to update", required = true) @PathParam("aip_id") String aipId,
+    @ApiParam(value = "The ID of the existing AIP to update", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
     @ApiParam(value = "The path to the directory in the shared file system where the AIP should be provided.", required = true) @FormParam("filepath") String filepath)
       throws RODAException {
     // TODO
@@ -104,7 +105,7 @@ public class AipsResource {
     @ApiResponse(code = 409, message = "Already exists", response = AIP.class)})
 
   public Response aipsAipIdPost(
-    @ApiParam(value = "The requested ID of the new AIP", required = true) @PathParam("aip_id") String aipId,
+    @ApiParam(value = "The requested ID of the new AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
     @ApiParam(value = "The path to the directory in the shared file system where the AIP should be provided.", required = true) @FormParam("filepath") String filepath)
       throws RODAException {
     // TODO
@@ -118,7 +119,7 @@ public class AipsResource {
     @ApiResponse(code = 404, message = "Not found", response = Void.class)})
 
   public Response aipsAipIdDelete(
-    @ApiParam(value = "The ID of the AIP to delete.", required = true) @PathParam("aip_id") String aipId)
+    @ApiParam(value = "The ID of the AIP to delete.", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId)
       throws RODAException {
     // get user
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
@@ -137,9 +138,9 @@ public class AipsResource {
     @ApiResponse(code = 404, message = "AIP not found", response = Representation.class, responseContainer = "List")})
 
   public Response aipsAipIdDataGet(
-    @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam("aip_id") String aipId,
-    @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam("start") String start,
-    @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam("limit") String limit)
+    @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
+    @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam(RodaConstants.API_QUERY_KEY_START) String start,
+    @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam(RodaConstants.API_QUERY_KEY_LIMIT) String limit)
       throws RODAException {
     // TODO
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
@@ -153,9 +154,9 @@ public class AipsResource {
     @ApiResponse(code = 404, message = "Not found", response = Representation.class)})
 
   public Response getAipRepresentation(
-    @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam("aip_id") String aipId,
-    @ApiParam(value = "The ID of the existing representation", required = true) @PathParam("representation_id") String representationId,
-    @ApiParam(value = "Choose format in which to get the representation", allowableValues = "json, bin") @QueryParam("acceptFormat") String acceptFormat)
+    @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
+    @ApiParam(value = "The ID of the existing representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
+    @ApiParam(value = "Choose format in which to get the representation", allowableValues = "json, bin") @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
       throws RODAException {
     // get user
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
@@ -172,8 +173,8 @@ public class AipsResource {
     @ApiResponse(code = 404, message = "Not found", response = Representation.class)})
 
   public Response aipsAipIdDataRepresentationIdPut(
-    @ApiParam(value = "The ID of the AIP where to update the representation", required = true) @PathParam("aip_id") String aipId,
-    @ApiParam(value = "The ID of the existing representation to update", required = true) @PathParam("representation_id") String representationId,
+    @ApiParam(value = "The ID of the AIP where to update the representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
+    @ApiParam(value = "The ID of the existing representation to update", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
     @ApiParam(value = "The path to the directory in the shared file system where the representation should be provided.", required = true) @FormParam("filepath") String filepath)
       throws RODAException {
     // TODO
@@ -187,8 +188,8 @@ public class AipsResource {
     @ApiResponse(code = 409, message = "Already exists", response = Representation.class)})
 
   public Response aipsAipIdDataRepresentationIdPost(
-    @ApiParam(value = "The ID of the AIP where to create the representation", required = true) @PathParam("aip_id") String aipId,
-    @ApiParam(value = "The requested ID for the new representation", required = true) @PathParam("representation_id") String representationId,
+    @ApiParam(value = "The ID of the AIP where to create the representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
+    @ApiParam(value = "The requested ID for the new representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
     @ApiParam(value = "The path to the directory in the shared file system where the representation should be provided.", required = true) @FormParam("filepath") String filepath)
       throws RODAException {
     // TODO
@@ -202,8 +203,8 @@ public class AipsResource {
     @ApiResponse(code = 404, message = "Not found", response = Void.class)})
 
   public Response aipsAipIdDataRepresentationIdDelete(
-    @ApiParam(value = "The ID of the AIP where the representation is.", required = true) @PathParam("aip_id") String aipId,
-    @ApiParam(value = "The ID of the existing representation to delete", required = true) @PathParam("representation_id") String representationId)
+    @ApiParam(value = "The ID of the AIP where the representation is.", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
+    @ApiParam(value = "The ID of the existing representation to delete", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId)
       throws RODAException {
     // get user
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
@@ -222,10 +223,10 @@ public class AipsResource {
     @ApiResponse(code = 404, message = "Not found", response = File.class)})
 
   public Response aipsAipIdDataRepresentationIdFileIdGet(
-    @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam("aip_id") String aipId,
-    @ApiParam(value = "The ID of the existing representation", required = true) @PathParam("representation_id") String representationId,
-    @ApiParam(value = "The ID of the existing file", required = true) @PathParam("file_id") String fileId,
-    @ApiParam(value = "Choose format in which to get the file", allowableValues = "json, bin") @QueryParam("acceptFormat") String acceptFormat)
+    @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
+    @ApiParam(value = "The ID of the existing representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
+    @ApiParam(value = "The ID of the existing file", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_ID) String fileId,
+    @ApiParam(value = "Choose format in which to get the file", allowableValues = "json, bin") @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
       throws RODAException {
     // get user
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
@@ -243,9 +244,9 @@ public class AipsResource {
     @ApiResponse(code = 404, message = "Not found", response = File.class)})
 
   public Response aipsAipIdDataRepresentationIdFileIdPut(
-    @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam("aip_id") String aipId,
-    @ApiParam(value = "The ID of the existing representation", required = true) @PathParam("representation_id") String representationId,
-    @ApiParam(value = "The ID of the existing file", required = true) @PathParam("file_id") String fileId,
+    @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
+    @ApiParam(value = "The ID of the existing representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
+    @ApiParam(value = "The ID of the existing file", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_ID) String fileId,
     @ApiParam(value = "The path to the file in the shared file system where the file should be provided.", required = true) @FormParam("filepath") String filepath)
       throws RODAException {
     // TODO
@@ -259,9 +260,9 @@ public class AipsResource {
     @ApiResponse(code = 409, message = "Already exists", response = File.class)})
 
   public Response aipsAipIdDataRepresentationIdFileIdPost(
-    @ApiParam(value = "The ID of the AIP where to create the representation", required = true) @PathParam("aip_id") String aipId,
-    @ApiParam(value = "The requested ID for the new representation", required = true) @PathParam("representation_id") String representationId,
-    @ApiParam(value = "The requested ID of the new file", required = true) @PathParam("file_id") String fileId,
+    @ApiParam(value = "The ID of the AIP where to create the representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
+    @ApiParam(value = "The requested ID for the new representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
+    @ApiParam(value = "The requested ID of the new file", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_ID) String fileId,
     @ApiParam(value = "The path to the directory in the shared file system where the representation should be provided.", required = true) @FormParam("filepath") String filepath)
       throws RODAException {
     // TODO
@@ -275,9 +276,9 @@ public class AipsResource {
     @ApiResponse(code = 404, message = "Not found", response = Void.class)})
 
   public Response aipsAipIdDataRepresentationIdFileIdDelete(
-    @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam("aip_id") String aipId,
-    @ApiParam(value = "The ID of the existing representation", required = true) @PathParam("representation_id") String representationId,
-    @ApiParam(value = "The ID of the existing file", required = true) @PathParam("file_id") String fileId)
+    @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
+    @ApiParam(value = "The ID of the existing representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
+    @ApiParam(value = "The ID of the existing file", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_ID) String fileId)
       throws RODAException {
     // get user
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
@@ -296,10 +297,10 @@ public class AipsResource {
     @ApiResponse(code = 404, message = "AIP not found", response = DescriptiveMetadata.class, responseContainer = "List")})
 
   public Response aipsAipIdDescriptiveMetadataGet(
-    @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam("aip_id") String aipId,
-    @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam("start") String start,
-    @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam("limit") String limit,
-    @ApiParam(value = "Choose format in which to get the representation", allowableValues = "json, bin") @QueryParam("acceptFormat") String acceptFormat)
+    @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
+    @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam(RodaConstants.API_QUERY_KEY_START) String start,
+    @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam(RodaConstants.API_QUERY_KEY_LIMIT) String limit,
+    @ApiParam(value = "Choose format in which to get the representation", allowableValues = "json, bin") @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
       throws RODAException {
     // get user
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
@@ -316,10 +317,10 @@ public class AipsResource {
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = DescriptiveMetadata.class)})
 
   public Response aipsAipIdDescriptiveMetadataMetadataIdGet(
-    @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam("aip_id") String aipId,
-    @ApiParam(value = "The ID of the existing metadata file to retrieve", required = true) @PathParam("metadata_id") String metadataId,
-    @ApiParam(value = "Choose format in which to get the metadata", allowableValues = "xml, html", defaultValue = "xml") @QueryParam("acceptFormat") String acceptFormat,
-    @ApiParam(value = "The language for the HTML output", allowableValues = "pt_PT, en_US", defaultValue = "pt_PT") @DefaultValue("pt_PT") @QueryParam("lang") String language)
+    @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
+    @ApiParam(value = "The ID of the existing metadata file to retrieve", required = true) @PathParam(RodaConstants.API_PATH_PARAM_METADATA_ID) String metadataId,
+    @ApiParam(value = "Choose format in which to get the metadata", allowableValues = "xml, html", defaultValue = "xml") @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
+    @ApiParam(value = "The language for the HTML output", allowableValues = "pt_PT, en_US", defaultValue = RodaConstants.API_QUERY_VALUE_LANG_DEFAULT) @DefaultValue(RodaConstants.API_QUERY_VALUE_LANG_DEFAULT) @QueryParam(RodaConstants.API_QUERY_KEY_LANG) String language)
       throws RODAException {
     try {
       // get user
@@ -342,8 +343,8 @@ public class AipsResource {
     @ApiResponse(code = 404, message = "Not found", response = DescriptiveMetadata.class)})
 
   public Response aipsAipIdDescriptiveMetadataMetadataIdPut(
-    @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam("aip_id") String aipId,
-    @ApiParam(value = "The ID of the existing metadata file to update", required = true) @PathParam("metadata_id") String metadataId,
+    @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
+    @ApiParam(value = "The ID of the existing metadata file to update", required = true) @PathParam(RodaConstants.API_PATH_PARAM_METADATA_ID) String metadataId,
     @FormDataParam("file") InputStream inputStream, @FormDataParam("file") FormDataContentDisposition fileDetail,
     @ApiParam(value = "The type of the metadata file (e.g. eadc2014, dc)", required = true) @FormParam("metadataType") String metadataType)
       throws RODAException {
@@ -363,8 +364,8 @@ public class AipsResource {
     @ApiResponse(code = 409, message = "Already exists", response = DescriptiveMetadata.class)})
 
   public Response aipsAipIdDescriptiveMetadataMetadataIdPost(
-    @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam("aip_id") String aipId,
-    @ApiParam(value = "The suggested ID metadata file to create", required = true) @PathParam("metadata_id") String metadataId,
+    @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
+    @ApiParam(value = "The suggested ID metadata file to create", required = true) @PathParam(RodaConstants.API_PATH_PARAM_METADATA_ID) String metadataId,
     @FormDataParam("file") InputStream inputStream, @FormDataParam("file") FormDataContentDisposition fileDetail,
     @ApiParam(value = "The type of the metadata file (e.g. eadc2014, dc)", required = true) @FormParam("metadataType") String metadataType)
       throws RODAException {
@@ -384,8 +385,8 @@ public class AipsResource {
     @ApiResponse(code = 404, message = "Not found", response = Void.class)})
 
   public Response aipsAipIdDescriptiveMetadataMetadataIdDelete(
-    @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam("aip_id") String aipId,
-    @ApiParam(value = "The ID of the existing metadata file to delete", required = true) @PathParam("metadata_id") String metadataId)
+    @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
+    @ApiParam(value = "The ID of the existing metadata file to delete", required = true) @PathParam(RodaConstants.API_PATH_PARAM_METADATA_ID) String metadataId)
       throws RODAException {
     // get user
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
@@ -403,10 +404,10 @@ public class AipsResource {
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = EventPreservationObject.class)})
 
   public Response aipsAipIdPreservationMetadataGet(
-    @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam("aip_id") String aipId,
-    @ApiParam(value = "Choose format in which to get the metadata", allowableValues = "json, xml, html", defaultValue = "json") @QueryParam("acceptFormat") String acceptFormat,
-    @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam("start") String start,
-    @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam("limit") String limit)
+    @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
+    @ApiParam(value = "Choose format in which to get the metadata", allowableValues = "json, xml, html", defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
+    @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam(RodaConstants.API_QUERY_KEY_START) String start,
+    @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam(RodaConstants.API_QUERY_KEY_LIMIT) String limit)
       throws RODAException {
     // get user
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
@@ -424,16 +425,16 @@ public class AipsResource {
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = EventPreservationObject.class)})
 
   public Response aipsAipIdPreservationMetadataRepresentationIdGet(
-    @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam("aip_id") String aipId,
-    @ApiParam(value = "The ID of the existing representation", required = true) @PathParam("representation_id") String representationId,
-    @ApiParam(value = "Choose format in which to get the metadata", allowableValues = "json, xml, html", defaultValue = "json") @QueryParam("acceptFormat") String acceptFormat,
+    @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
+    @ApiParam(value = "The ID of the existing representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
+    @ApiParam(value = "Choose format in which to get the metadata", allowableValues = "json, xml, html", defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
     @ApiParam(value = "Index of the agent element to return", defaultValue = "0") @QueryParam("startAgent") String startAgent,
     @ApiParam(value = "Maximum number of agents to return", defaultValue = "100") @QueryParam("limitAgent") String limitAgent,
     @ApiParam(value = "Index of the first event to return", defaultValue = "0") @QueryParam("startEvent") String startEvent,
     @ApiParam(value = "Maximum number of events to return", defaultValue = "100") @QueryParam("limitEvent") String limitEvent,
     @ApiParam(value = "Index of the first file to return", defaultValue = "0") @QueryParam("startFile") String startFile,
     @ApiParam(value = "Maximum number of files to return", defaultValue = "100") @QueryParam("limitFile") String limitFile,
-    @ApiParam(value = "The language for the HTML output", allowableValues = "pt_PT, en_US", defaultValue = "pt_PT") @DefaultValue("pt_PT") @QueryParam("lang") String language)
+    @ApiParam(value = "The language for the HTML output", allowableValues = "pt_PT, en_US", defaultValue = RodaConstants.API_QUERY_VALUE_LANG_DEFAULT) @DefaultValue(RodaConstants.API_QUERY_VALUE_LANG_DEFAULT) @QueryParam(RodaConstants.API_QUERY_KEY_LANG) String language)
       throws RODAException {
     try {
       // get user
@@ -457,9 +458,9 @@ public class AipsResource {
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = EventPreservationObject.class)})
 
   public Response aipsAipIdPreservationMetadataRepresentationIdFileIdGet(
-    @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam("aip_id") String aipId,
-    @ApiParam(value = "The ID of the existing representation", required = true) @PathParam("representation_id") String representationId,
-    @ApiParam(value = "The ID of the existing file", required = true) @PathParam("file_id") String fileId)
+    @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
+    @ApiParam(value = "The ID of the existing representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
+    @ApiParam(value = "The ID of the existing file", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_ID) String fileId)
       throws RODAException {
     // get user
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
@@ -477,8 +478,8 @@ public class AipsResource {
     @ApiResponse(code = 404, message = "Not found", response = DescriptiveMetadata.class)})
 
   public Response aipsAipIdPreservationMetadataRepresentationIdFileIdPost(
-    @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam("aip_id") String aipId,
-    @ApiParam(value = "The ID of the existing representation", required = true) @PathParam("representation_id") String representationId,
+    @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
+    @ApiParam(value = "The ID of the existing representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
     @FormDataParam("file") InputStream inputStream, @FormDataParam("file") FormDataContentDisposition fileDetail)
       throws RODAException {
     // get user
@@ -497,8 +498,8 @@ public class AipsResource {
     @ApiResponse(code = 404, message = "Not found", response = DescriptiveMetadata.class)})
 
   public Response aipsAipIdPreservationMetadataRepresentationIdFileIdPut(
-    @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam("aip_id") String aipId,
-    @ApiParam(value = "The ID of the existing representation", required = true) @PathParam("representation_id") String representationId,
+    @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
+    @ApiParam(value = "The ID of the existing representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
     @FormDataParam("file") InputStream inputStream, @FormDataParam("file") FormDataContentDisposition fileDetail)
       throws RODAException {
     // get user
@@ -516,10 +517,10 @@ public class AipsResource {
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = EventPreservationObject.class)})
 
   public Response aipsAipIdPreservationMetadataRepresentationIdFileIdDelete(
-    @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam("aip_id") String aipId,
-    @ApiParam(value = "The ID of the existing representation", required = true) @PathParam("representation_id") String representationId,
-    @ApiParam(value = "The ID of the existing file", required = true) @PathParam("file_id") String fileId,
-    @ApiParam(value = "Choose format in which to get the metadata", allowableValues = "json, xml, html", defaultValue = "json") @QueryParam("acceptFormat") String acceptFormat)
+    @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
+    @ApiParam(value = "The ID of the existing representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
+    @ApiParam(value = "The ID of the existing file", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_ID) String fileId,
+    @ApiParam(value = "Choose format in which to get the metadata", allowableValues = "json, xml, html", defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
       throws RODAException {
     // get user
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());

@@ -18,6 +18,10 @@ import java.util.UUID;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.roda.core.data.common.RodaConstants.JOB_STATE;
+import org.roda.core.data.common.RodaConstants.PLUGIN_TYPE;
+import org.roda.core.data.common.RodaConstants.RESOURCE_TYPE;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
@@ -33,19 +37,23 @@ public class Job implements Serializable {
   // job creator
   private String username;
   // job start date
-  private Date start;
+  private Date startDate;
   // job end date
-  private Date end;
-  // 0-100 scale completion status
-  private int completionStatus;
+  private Date endDate;
+  // job state
+  private JOB_STATE state;
+  // 0-100 scale completion percentage
+  private int completionPercentage;
 
   // plugin full class (e.g. org.roda.core.plugins.plugins.base.FixityPlugin)
   private String plugin;
   // plugin parameters
   private Map<String, String> pluginParameters;
+  // plugin type (e.g. ingest, maintenance, misc, etc.)
+  private PLUGIN_TYPE pluginType;
 
   // resource type (e.g. bagit, e-ark sip, etc.)
-  private String resourceType;
+  private RESOURCE_TYPE resourceType;
 
   // type of method that orchestrator should execute (e.g.
   // runPluginOnTransferredResources, runPluginOnAIPs, etc.)
@@ -58,9 +66,10 @@ public class Job implements Serializable {
   public Job() {
     super();
     id = UUID.randomUUID().toString();
-    start = new Date();
-    end = null;
-    completionStatus = 0;
+    startDate = new Date();
+    endDate = null;
+    completionPercentage = 0;
+
     objectIds = new ArrayList<String>();
     pluginParameters = new HashMap<String, String>();
   }
@@ -69,11 +78,12 @@ public class Job implements Serializable {
     super();
     this.id = job.getId();
     this.username = job.getUsername();
-    this.start = job.getStart();
-    this.end = job.getEnd();
-    this.completionStatus = job.getCompletionStatus();
+    this.startDate = job.getStartDate();
+    this.endDate = job.getEndDate();
+    this.completionPercentage = job.getCompletionPercentage();
     this.plugin = job.getPlugin();
     this.pluginParameters = new HashMap<String, String>(job.getPluginParameters());
+    this.pluginType = job.getPluginType();
     this.resourceType = job.getResourceType();
     this.orchestratorMethod = job.getOrchestratorMethod();
     this.objectIds = new ArrayList<String>(job.getObjectIds());
@@ -88,49 +98,55 @@ public class Job implements Serializable {
     return id;
   }
 
-  public void setId(String id) {
+  public Job setId(String id) {
     this.id = id;
+    return this;
   }
 
   public String getUsername() {
     return username;
   }
 
-  public void setUsername(String username) {
+  public Job setUsername(String username) {
     this.username = username;
+    return this;
   }
 
-  public Date getStart() {
-    return start;
+  public Date getStartDate() {
+    return startDate;
   }
 
-  public void setStart(Date start) {
-    this.start = start;
+  public Job setStartDate(Date startDate) {
+    this.startDate = startDate;
+    return this;
   }
 
   @XmlElement(nillable = true)
-  public Date getEnd() {
-    return end;
+  public Date getEndDate() {
+    return endDate;
   }
 
-  public void setEnd(Date end) {
-    this.end = end;
+  public Job setEndDate(Date endDate) {
+    this.endDate = endDate;
+    return this;
   }
 
-  public int getCompletionStatus() {
-    return completionStatus;
+  public int getCompletionPercentage() {
+    return completionPercentage;
   }
 
-  public void setCompletionStatus(int completionStatus) {
-    this.completionStatus = completionStatus;
+  public Job setCompletionPercentage(int completionPercentage) {
+    this.completionPercentage = completionPercentage;
+    return this;
   }
 
   public String getPlugin() {
     return plugin;
   }
 
-  public void setPlugin(String plugin) {
+  public Job setPlugin(String plugin) {
     this.plugin = plugin;
+    return this;
   }
 
   @XmlElement(nillable = true)
@@ -138,24 +154,18 @@ public class Job implements Serializable {
     return pluginParameters;
   }
 
-  public void setPluginParameters(Map<String, String> pluginParameters) {
+  public Job setPluginParameters(Map<String, String> pluginParameters) {
     this.pluginParameters = pluginParameters;
-  }
-
-  public String getResourceType() {
-    return resourceType;
-  }
-
-  public void setResourceType(String resourceType) {
-    this.resourceType = resourceType;
+    return this;
   }
 
   public String getOrchestratorMethod() {
     return orchestratorMethod;
   }
 
-  public void setOrchestratorMethod(String orchestratorMethod) {
+  public Job setOrchestratorMethod(String orchestratorMethod) {
     this.orchestratorMethod = orchestratorMethod;
+    return this;
   }
 
   @XmlElement(nillable = true)
@@ -163,15 +173,35 @@ public class Job implements Serializable {
     return objectIds;
   }
 
-  public void setObjectIds(List<String> objectIds) {
+  public Job setObjectIds(List<String> objectIds) {
     this.objectIds = objectIds;
+    return this;
+  }
+
+  public PLUGIN_TYPE getPluginType() {
+    return pluginType;
+  }
+
+  public Job setPluginType(PLUGIN_TYPE pluginType) {
+    this.pluginType = pluginType;
+    return this;
+  }
+
+  public RESOURCE_TYPE getResourceType() {
+    return resourceType;
+  }
+
+  public Job setResourceType(RESOURCE_TYPE resourceType) {
+    this.resourceType = resourceType;
+    return this;
   }
 
   @Override
   public String toString() {
-    return "Job [id=" + id + ", username=" + username + ", start=" + start + ", end=" + end + ", completionStatus="
-      + completionStatus + ", plugin=" + plugin + ", pluginParameters=" + pluginParameters + ", resourceType="
-      + resourceType + ", orchestratorMethod=" + orchestratorMethod + ", objectIds=" + objectIds + "]";
+    return "Job [id=" + id + ", username=" + username + ", startDate=" + startDate + ", endDate=" + endDate + ", state="
+      + state + ", completionPercentage=" + completionPercentage + ", plugin=" + plugin + ", pluginParameters="
+      + pluginParameters + ", pluginType=" + pluginType + ", resourceType=" + resourceType + ", orchestratorMethod="
+      + orchestratorMethod + ", objectIds=" + objectIds + "]";
   }
 
 }

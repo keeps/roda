@@ -7,9 +7,6 @@
  */
 package org.roda.wui.api.v1;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -24,18 +21,18 @@ import javax.ws.rs.core.Response;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
-import org.roda.core.data.common.InvalidParameterException;
 import org.roda.core.data.common.RODAException;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.Jobs;
 import org.roda.core.data.v2.RodaUser;
-import org.roda.core.plugins.Plugin;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
 @Path(JobsResource.ENDPOINT)
 @Api(value = JobsResource.SWAGGER_ENDPOINT)
@@ -51,29 +48,18 @@ public class JobsResource {
   // TODO this is WIP
   @GET
   @ApiOperation(value = "List Jobs", notes = "Gets a list of Jobs.", response = Job.class, responseContainer = "List")
-  public Response listJobs(@QueryParam("acceptFormat") String acceptFormat) {
+  public Response listJobs(@QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
+    @QueryParam("job_type") String jobType,
+    @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam(RodaConstants.API_QUERY_KEY_START) String start,
+    @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam(RodaConstants.API_QUERY_KEY_START) String limit)
+      throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request.getHeader("Accept"));
-    Jobs jobs = new Jobs();
-    jobs.getJobs().add(new Job("xtpo"));
-    jobs.getJobs().add(new Job("zjas"));
 
-    // TODO this test shows that plugin manager returns always the same instance
-    // of the requested plugin
-    try {
-      String plugin = "org.roda.core.plugins.plugins.base.FixityPlugin";
-      Plugin<?> pluginObject = RodaCoreFactory.getPluginManager().getPlugin(plugin);
-      Map<String, String> parameters = new HashMap<String, String>();
-      parameters.put("aaa", "bbb");
-      parameters.put("ccc", "ddd");
-      pluginObject.setParameterValues(parameters);
-      System.out.println(pluginObject.getParameterValues());
+    // get user
+    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
 
-      Plugin<?> pluginObject2 = RodaCoreFactory.getPluginManager().getPlugin(plugin);
-      System.out.println(pluginObject2.getParameterValues());
-
-    } catch (InvalidParameterException e) {
-      System.err.println(e);
-    }
+    // delegate action to controller
+    Jobs jobs = org.roda.wui.api.controllers.Jobs.listJobs(user, start, limit);
 
     return Response.ok(jobs, mediaType).build();
   }
@@ -82,8 +68,8 @@ public class JobsResource {
   @Path("/{jobId}")
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @ApiOperation(value = "Get Job", notes = "Gets a particular Job.", response = Job.class)
-  public Response getJob(@PathParam("jobId") String jobId, @QueryParam("acceptFormat") String acceptFormat)
-    throws RODAException {
+  public Response getJob(@PathParam("jobId") String jobId,
+    @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat) throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request.getHeader("Accept"));
 
     // get user
@@ -98,7 +84,8 @@ public class JobsResource {
   @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @ApiOperation(value = "Creates a new Job", notes = "Creates a new Job.", response = Job.class)
-  public Response createJob(Job job, @QueryParam("acceptFormat") String acceptFormat) throws RODAException {
+  public Response createJob(Job job, @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
+    throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request.getHeader("Accept"));
 
     // get user
@@ -112,7 +99,8 @@ public class JobsResource {
 
   @GET
   @Path("/{jobId}/report")
-  public Response getJobReport(@PathParam("jobId") String jobId, @QueryParam("acceptFormat") String acceptFormat) {
+  public Response getJobReport(@PathParam("jobId") String jobId,
+    @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat) {
     return null;
   }
 

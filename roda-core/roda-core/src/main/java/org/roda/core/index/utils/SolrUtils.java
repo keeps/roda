@@ -47,6 +47,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.FacetField.Count;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
@@ -74,6 +75,8 @@ import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.NotFoundException;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.DateGranularity;
+import org.roda.core.data.common.RodaConstants.PLUGIN_TYPE;
+import org.roda.core.data.common.RodaConstants.RESOURCE_TYPE;
 import org.roda.core.data.v2.AgentPreservationObject;
 import org.roda.core.data.v2.EventPreservationObject;
 import org.roda.core.data.v2.FacetFieldResult;
@@ -683,8 +686,8 @@ public class SolrUtils {
       ret = resultClass.cast(solrDocumentToLogEntry(doc));
     } else if (resultClass.equals(SIPReport.class)) {
       ret = resultClass.cast(solrDocumentToSipState(doc));
-    } else
-      if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class) || resultClass.equals(Group.class)) {
+    } else if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class)
+      || resultClass.equals(Group.class)) {
       ret = resultClass.cast(solrDocumentToRodaMember(doc));
     } else if (resultClass.equals(RepresentationFilePreservationObject.class)) {
       ret = resultClass.cast(solrDocumentToRepresentationFilePreservationObject(doc));
@@ -1336,10 +1339,12 @@ public class SolrUtils {
 
     doc.addField(RodaConstants.JOB_ID, job.getId());
     doc.addField(RodaConstants.JOB_USERNAME, job.getUsername());
-    doc.addField(RodaConstants.JOB_START, job.getStart());
-    doc.addField(RodaConstants.JOB_END, job.getEnd());
-    doc.addField(RodaConstants.JOB_COMPLETION_STATUS, job.getCompletionStatus());
+    doc.addField(RodaConstants.JOB_START_DATE, job.getStartDate());
+    doc.addField(RodaConstants.JOB_END_DATE, job.getEndDate());
+    doc.addField(RodaConstants.JOB_COMPLETION_PERCENTAGE, job.getCompletionPercentage());
     doc.addField(RodaConstants.JOB_PLUGIN, job.getPlugin());
+    doc.addField(RodaConstants.JOB_PLUGIN_PARAMETERS, ModelUtils.getJsonFromObject(job.getPluginParameters()));
+    doc.addField(RodaConstants.JOB_PLUGIN_TYPE, job.getPluginType());
     doc.addField(RodaConstants.JOB_RESOURCE_TYPE, job.getResourceType());
     doc.addField(RodaConstants.JOB_ORCHESTRATOR_METHOD, job.getOrchestratorMethod());
     doc.addField(RodaConstants.JOB_OBJECT_IDS, job.getObjectIds());
@@ -1352,11 +1357,13 @@ public class SolrUtils {
 
     job.setId(objectToString(doc.get(RodaConstants.JOB_ID)));
     job.setUsername(objectToString(doc.get(RodaConstants.JOB_USERNAME)));
-    job.setStart(objectToDate(doc.get(RodaConstants.JOB_START)));
-    job.setEnd(objectToDate(doc.get(RodaConstants.JOB_END)));
-    job.setCompletionStatus(objectToInteger(doc.get(RodaConstants.JOB_COMPLETION_STATUS)));
+    job.setStartDate(objectToDate(doc.get(RodaConstants.JOB_START_DATE)));
+    job.setEndDate(objectToDate(doc.get(RodaConstants.JOB_END_DATE)));
+    job.setCompletionPercentage(objectToInteger(doc.get(RodaConstants.JOB_COMPLETION_PERCENTAGE)));
     job.setPlugin(objectToString(doc.get(RodaConstants.JOB_PLUGIN)));
-    job.setResourceType(objectToString(doc.get(RodaConstants.JOB_RESOURCE_TYPE)));
+    job.setPluginParameters(ModelUtils.getMapFromJson(objectToString(doc.get(RodaConstants.JOB_PLUGIN_PARAMETERS))));
+    job.setPluginType(PLUGIN_TYPE.valueOf(objectToString(doc.get(RodaConstants.JOB_PLUGIN_TYPE))));
+    job.setResourceType(RESOURCE_TYPE.valueOf(objectToString(doc.get(RodaConstants.JOB_RESOURCE_TYPE))));
     job.setOrchestratorMethod(objectToString(doc.get(RodaConstants.JOB_ORCHESTRATOR_METHOD)));
     job.setObjectIds(objectToListString(doc.get(RodaConstants.JOB_OBJECT_IDS)));
 

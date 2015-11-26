@@ -12,6 +12,7 @@ import java.util.Date;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.AuthorizationDeniedException;
 import org.roda.core.data.common.NotFoundException;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.RodaUser;
 import org.roda.wui.api.exceptions.RequestNotValidException;
@@ -70,6 +71,23 @@ public class Jobs extends RodaCoreService {
     registerAction(user, JOBS_COMPONENT, "getJob", null, duration, "job_id", job.getId());
 
     return job;
+  }
+
+  public static org.roda.core.data.v2.Jobs listJobs(RodaUser user, String start, String limit) {
+    Date startDate = new Date();
+
+    // check user permissions
+    // TODO ???
+
+    // delegate
+    org.roda.core.data.v2.Jobs jobs = JobsHelper.listJobs(start, limit);
+
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, JOBS_COMPONENT, "listJobs", null, duration, RodaConstants.API_QUERY_KEY_START, start,
+      RodaConstants.API_QUERY_KEY_LIMIT, limit);
+
+    return jobs;
   }
 
   /*

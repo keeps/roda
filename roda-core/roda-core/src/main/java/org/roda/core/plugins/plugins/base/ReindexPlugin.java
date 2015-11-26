@@ -12,8 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
 import org.roda.core.data.common.InvalidParameterException;
@@ -25,6 +23,8 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.StorageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ReindexPlugin implements Plugin<AIP> {
 
@@ -119,6 +119,11 @@ public class ReindexPlugin implements Plugin<AIP> {
     }
 
     return null;
+  }
+
+  @Override
+  public Plugin<AIP> cloneMe() {
+    return new ReindexPlugin();
   }
 
 }

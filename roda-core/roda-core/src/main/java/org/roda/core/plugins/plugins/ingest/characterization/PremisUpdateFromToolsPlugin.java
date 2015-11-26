@@ -15,8 +15,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.roda.core.common.PremisUtils;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
@@ -36,6 +34,8 @@ import org.roda.core.storage.Directory;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 //TODO tool order/preference, parse tool output and update Premis (PremisUtils.updatePremisFile(...) )
 public class PremisUpdateFromToolsPlugin implements Plugin<AIP> {
@@ -128,6 +128,11 @@ public class PremisUpdateFromToolsPlugin implements Plugin<AIP> {
   public Report afterExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
 
     return null;
+  }
+
+  @Override
+  public Plugin<AIP> cloneMe() {
+    return new PremisUpdateFromToolsPlugin();
   }
 
 }

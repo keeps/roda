@@ -26,20 +26,36 @@ public final class RodaConstants {
   public static final String I18N_UI_SEARCH_FACETS_PREFIX = "ui.search.facets.";
   public static final String I18N_UI_USER_ADMINISTRATION_FACETS_PREFIX = "ui.user_administration.facets.";
 
+  /*
+   * API related
+   */
   public static final String API_SEP = "/";
   public static final String API_REST_V1_AIPS = "api/v1/aips/";
   public static final String API_REST_V1_TRANSFERRED = "api/v1/transferred";
+  // sub-resources strings
   public static final String API_DATA = "data";
   public static final String API_DESCRIPTIVE_METADATA = "descriptive_metadata";
   public static final String API_PRESERVATION_METADATA = "preservation_metadata";
+  // "http query string" related strings
   public static final String API_QUERY_START = "?";
-  public static final String API_ATTR_ASSIGN_SYMBOL = "=";
+  public static final String API_QUERY_ASSIGN_SYMBOL = "=";
   public static final String API_QUERY_SEP = "&";
-  public static final String API_ATTR_ACCEPT_FORMAT = "acceptFormat";
-  public static final String API_ATTR_ACCEPT_FORMAT_BIN = "bin";
-  public static final String API_ATTR_ACCEPT_FORMAT_XML = "xml";
-  public static final String API_ATTR_ACCEPT_FORMAT_HTML = "html";
-  public static final String API_ATTR_LANG = "lang";
+  public static final String API_QUERY_KEY_ACCEPT_FORMAT = "acceptFormat";
+  public static final String API_QUERY_VALUE_ACCEPT_FORMAT_BIN = "bin";
+  public static final String API_QUERY_VALUE_ACCEPT_FORMAT_XML = "xml";
+  public static final String API_QUERY_VALUE_ACCEPT_FORMAT_HTML = "html";
+  public static final String API_QUERY_VALUE_ACCEPT_FORMAT_JSON = "json";
+  public static final String API_QUERY_KEY_LANG = "lang";
+  public static final String API_QUERY_VALUE_LANG_DEFAULT = RodaConstants.API_QUERY_VALUE_LANG_PT_PT;
+  public static final String API_QUERY_VALUE_LANG_PT_PT = "pt_PT";
+  public static final String API_QUERY_VALUE_LANG_EN_US = "en_US";
+  public static final String API_QUERY_KEY_START = "start";
+  public static final String API_QUERY_KEY_LIMIT = "limit";
+  // "http path param" related strings
+  public static final String API_PATH_PARAM_AIP_ID = "aip_id";
+  public static final String API_PATH_PARAM_REPRESENTATION_ID = "representation_id";
+  public static final String API_PATH_PARAM_FILE_ID = "file_id";
+  public static final String API_PATH_PARAM_METADATA_ID = "metadata_id";
 
   /*
    * Core (storage, index, orchestrator, etc.)
@@ -48,25 +64,37 @@ public final class RodaConstants {
     FILESYSTEM, FEDORA4
   }
 
-  public static final String DEFAULT_STORAGE_TYPE = "filesystem";
+  public static final StorageType DEFAULT_STORAGE_TYPE = StorageType.FILESYSTEM;
 
   public enum SolrType {
     EMBEDDED, HTTP
   }
 
-  public static final String DEFAULT_SOLR_TYPE = "embedded";
+  public static final SolrType DEFAULT_SOLR_TYPE = SolrType.EMBEDDED;
 
   public enum NodeType {
     MASTER, WORKER
   }
 
-  public static final String DEFAULT_NODE_TYPE = "master";
+  public static final NodeType DEFAULT_NODE_TYPE = NodeType.MASTER;
 
   public enum OrchestratorType {
     EMBEDDED, AKKA, AKKA_DISTRIBUTED
   }
 
-  public static final String DEFAULT_ORCHESTRATOR_TYPE = "embedded";
+  public static final OrchestratorType DEFAULT_ORCHESTRATOR_TYPE = OrchestratorType.EMBEDDED;
+
+  public enum JOB_STATE {
+    CREATED, STARTED, COMPLETED
+  }
+
+  public enum PLUGIN_TYPE {
+    INGEST;
+  }
+
+  public enum RESOURCE_TYPE {
+    BAGIT;
+  }
 
   public static final String CORE_LDAP_DEFAULT_HOST = "localhost";
   public static final int CORE_LDAP_DEFAULT_PORT = 10389;
@@ -344,11 +372,12 @@ public final class RodaConstants {
 
   public static final String JOB_ID = "id";
   public static final String JOB_USERNAME = "username";
-  public static final String JOB_START = "start";
-  public static final String JOB_END = "end";
-  public static final String JOB_COMPLETION_STATUS = "completionStatus";
+  public static final String JOB_START_DATE = "startDate";
+  public static final String JOB_END_DATE = "endDate";
+  public static final String JOB_COMPLETION_PERCENTAGE = "completionPercentage";
   public static final String JOB_PLUGIN = "plugin";
   public static final String JOB_PLUGIN_PARAMETERS = "pluginParameters";
+  public static final String JOB_PLUGIN_TYPE = "pluginType";
   public static final String JOB_RESOURCE_TYPE = "resourceType";
   public static final String JOB_ORCHESTRATOR_METHOD = "orchestratorMethod";
   public static final String JOB_OBJECT_IDS = "objectIds";
