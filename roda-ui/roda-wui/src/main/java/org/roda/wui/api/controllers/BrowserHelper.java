@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.StringWriter;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.ws.rs.WebApplicationException;
@@ -39,6 +41,7 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
 import org.roda.core.common.ValidationUtils;
 import org.roda.core.data.adapter.facet.Facets;
+import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sort.SortParameter;
@@ -48,11 +51,15 @@ import org.roda.core.data.common.AuthorizationDeniedException;
 import org.roda.core.data.common.NotFoundException;
 import org.roda.core.data.common.Pair;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.eadc.DescriptionLevel;
+import org.roda.core.data.eadc.DescriptionLevelManager;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.Representation;
 import org.roda.core.data.v2.RepresentationState;
+import org.roda.core.data.v2.RodaUser;
 import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.core.data.v2.TransferredResource;
+import org.roda.core.index.IndexService;
 import org.roda.core.index.IndexServiceException;
 import org.roda.core.model.AIP;
 import org.roda.core.model.DescriptiveMetadata;
@@ -67,6 +74,7 @@ import org.roda.core.storage.StoragePath;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.fs.FSUtils;
+import org.roda.core.util.FileUtility;
 import org.roda.disseminators.common.tools.ZipEntryInfo;
 import org.roda.disseminators.common.tools.ZipTools;
 import org.roda.wui.api.exceptions.ApiException;
@@ -82,6 +90,11 @@ import org.roda.wui.common.client.GenericException;
 import org.roda.wui.common.server.ServerTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class BrowserHelper {
   private static final int BUNDLE_MAX_REPRESENTATION_COUNT = 2;
@@ -364,8 +377,8 @@ public class BrowserHelper {
     if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)
       && !RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
       throw new RequestNotValidException(ApiException.INVALID_PARAMETER_VALUE,
-        "Invalid '" + RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT + "' value. Expected values: "
-          + Arrays.asList(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML, RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML));
+        "Invalid '" + RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT + "' value. Expected values: " + Arrays
+          .asList(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML, RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML));
     }
   }
 
@@ -492,8 +505,8 @@ public class BrowserHelper {
     if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)
       && !RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
       throw new RequestNotValidException(ApiException.INVALID_PARAMETER_VALUE,
-        "Invalid '" + RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT + "' value. Expected values: "
-          + Arrays.asList(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN, RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML));
+        "Invalid '" + RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT + "' value. Expected values: " + Arrays
+          .asList(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN, RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML));
     }
 
     // FIXME validate language? what exception should be thrown?
@@ -998,9 +1011,46 @@ public class BrowserHelper {
 
   }
 
-  public static StreamResponse getClassificationPlan(String type) {
-    // TODO Auto-generated method stub
-    return null;
+  // TODO Limit access to SDO accessible by user
+  // TODO improve descriptionlevelmanager initialization
+  public static StreamResponse getClassificationPlan(String type, RodaUser user) throws GenericException {
+    try {
+      Properties descriptionLevels = new Properties();
+      descriptionLevels.load(FileUtility.getConfigurationFile(RodaCoreFactory.getConfigPath(),
+        "roda-description-levels-hierarchy.properties"));
+      DescriptionLevelManager dlm = new DescriptionLevelManager(descriptionLevels);
+      List<DescriptionLevel> representationLevels = dlm.getRepresentationsDescriptionLevels();
+      JsonFactory factory = new JsonFactory();
+      ObjectMapper mapper = new ObjectMapper(factory);
+      ObjectNode root = mapper.createObjectNode();
+
+      ArrayNode array = mapper.createArrayNode();
+      Filter COLLECTIONS_FILTER = new Filter(new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID));
+      IndexService index = RodaCoreFactory.getIndexService();
+      long collectionsCount = index.count(SimpleDescriptionObject.class, COLLECTIONS_FILTER);
+      for (int i = 0; i < collectionsCount; i += 100) {
+        IndexResult<SimpleDescriptionObject> collections = index.find(SimpleDescriptionObject.class, COLLECTIONS_FILTER,
+          null, new Sublist(i, 100));
+        for (SimpleDescriptionObject sdo : collections.getResults()) {
+          if (!ModelUtils.isRepresentationLevel(sdo, representationLevels)) {
+            array.add(ModelUtils.sdoToJSON(sdo, index, mapper, representationLevels));
+          }
+        }
+      }
+      root.set("dos", array);
+      StringWriter sw = new StringWriter();
+      mapper.writeValue(sw, root);
+      StreamingOutput stream = new StreamingOutput() {
+        @Override
+        public void write(OutputStream os) throws IOException, WebApplicationException {
+          IOUtils.write(sw.toString().getBytes("UTF-8"), os);
+        }
+      };
+      return new StreamResponse("plan.json", MediaType.APPLICATION_JSON, stream);
+    } catch (IndexServiceException | IOException e) {
+      throw new GenericException("Error creating classification plan: " + e.getMessage());
+    }
+
   }
 
   public static boolean isTransferFullyInitialized() {

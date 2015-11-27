@@ -25,11 +25,19 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.roda.core.common.RodaUtils;
+import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
+import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.eadc.DescriptionLevel;
+import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.LogEntry;
 import org.roda.core.data.v2.LogEntryParameter;
 import org.roda.core.data.v2.RepresentationState;
 import org.roda.core.data.v2.SIPReport;
+import org.roda.core.data.v2.SimpleDescriptionObject;
+import org.roda.core.index.IndexService;
+import org.roda.core.index.IndexServiceException;
 import org.roda.core.metadata.v2.premis.PremisAgentHelper;
 import org.roda.core.metadata.v2.premis.PremisEventHelper;
 import org.roda.core.metadata.v2.premis.PremisFileObjectHelper;
@@ -50,6 +58,8 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import lc.xmlns.premisV2.AgentComplexType;
 import lc.xmlns.premisV2.EventComplexType;
@@ -618,5 +628,50 @@ public final class ModelUtils {
       RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_OTHER, type, representationId,
       fileName);
 
+  }
+
+  public static ObjectNode sdoToJSON(SimpleDescriptionObject sdo, IndexService index, ObjectMapper mapper,
+    List<DescriptionLevel> representationLevels) throws IndexServiceException {
+    ObjectNode node = mapper.createObjectNode();
+    if (sdo.getTitle() != null) {
+      node = node.put("title", sdo.getTitle());
+    }
+    if (sdo.getId() != null) {
+      node = node.put("id", sdo.getId());
+    }
+    if (sdo.getParentID() != null) {
+      node = node.put("parentId", sdo.getParentID());
+    }
+    if (sdo.getLevel() != null) {
+      node = node.put("descriptionlevel", sdo.getLevel());
+    }
+    Filter filter = new Filter(new BasicSearchFilterParameter(RodaConstants.AIP_PARENT_ID, sdo.getId()));
+    long countChildren = index.count(SimpleDescriptionObject.class, filter);
+    ArrayNode childrenArray = mapper.createArrayNode();
+    if (countChildren > 0) {
+      for (int i = 0; i < countChildren; i += 100) {
+        IndexResult<SimpleDescriptionObject> collections = index.find(SimpleDescriptionObject.class, filter, null,
+          new Sublist(i, 100));
+        for (SimpleDescriptionObject children : collections.getResults()) {
+          if (!ModelUtils.isRepresentationLevel(children, representationLevels)) {
+            childrenArray = childrenArray.add(ModelUtils.sdoToJSON(children, index, mapper, representationLevels));
+          }
+        }
+      }
+    }
+    node.set("children", childrenArray);
+    return node;
+  }
+
+  public static boolean isRepresentationLevel(SimpleDescriptionObject sdo,
+    List<DescriptionLevel> representationLevels) {
+    boolean isRepresentationLevel = false;
+    for (DescriptionLevel dl : representationLevels) {
+      if (sdo.getLevel().equalsIgnoreCase(dl.getLevel())) {
+        isRepresentationLevel = true;
+        break;
+      }
+    }
+    return isRepresentationLevel;
   }
 }

@@ -741,19 +741,18 @@ public class Browser extends RodaCoreService {
 
   }
 
-  public static StreamResponse getClassificationPlan(RodaUser user, String type) {
+  public static StreamResponse getClassificationPlan(RodaUser user, String type) throws GenericException {
     Date startDate = new Date();
 
     // delegate
-    // StreamResponse classificationPlan =
-    // BrowserHelper.getClassificationPlan(type);
+    StreamResponse classificationPlan = BrowserHelper.getClassificationPlan(type, user);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
     registerAction(user, BROWSER_COMPONENT, "getClassificationPlan", null, duration, CLASSIFICATION_PLAN_TYPE_PARAMETER,
       type);
 
-    return null;
+    return classificationPlan;
   }
 
   public static void createTransferredResource(RodaUser user, String parentId, String fileName, InputStream inputStream,

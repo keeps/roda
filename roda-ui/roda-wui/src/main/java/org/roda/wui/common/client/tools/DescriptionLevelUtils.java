@@ -146,10 +146,11 @@ public class DescriptionLevelUtils {
     }
     return ret;
   }
-  
+
   // TODO merge constants
-  private static DisseminationConstants disseminationConstants = (DisseminationConstants) GWT.create(DisseminationConstants.class);
-  
+  private static DisseminationConstants disseminationConstants = (DisseminationConstants) GWT
+    .create(DisseminationConstants.class);
+
   /**
    * Get translation of each descriptive level
    * 
@@ -164,6 +165,10 @@ public class DescriptionLevelUtils {
       ret = null;
     }
     return ret;
+  }
+
+  public static List<DescriptionLevel> getRepresentationLevels() {
+    return REPRESENTATION_DESCRIPTION_LEVELS;
   }
 
 }
