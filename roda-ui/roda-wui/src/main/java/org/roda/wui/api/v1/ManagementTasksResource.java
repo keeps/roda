@@ -37,12 +37,15 @@ import org.roda.wui.common.RodaCoreService;
 import akka.actor.ActorRef;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
+import io.swagger.annotations.Api;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
 
+@Api(value = ManagementTasksResource.SWAGGER_ENDPOINT)
 @Path(ManagementTasksResource.ENDPOINT)
 public class ManagementTasksResource extends RodaCoreService {
   public static final String ENDPOINT = "/v1/management_tasks";
+  public static final String SWAGGER_ENDPOINT = "v1 management tasks";
   private static final TaskList TASKS = new TaskList("index/reindex", "index/orphans", "orchestrator/execute");
 
   @Context
