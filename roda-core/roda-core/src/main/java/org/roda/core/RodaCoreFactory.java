@@ -256,6 +256,7 @@ public class RodaCoreFactory {
       System.setProperty("solr.data.dir.othermetadata", indexPath.resolve("othermetadata").toString());
       System.setProperty("solr.data.dir.sip", indexPath.resolve("sip").toString());
       System.setProperty("solr.data.dir.job", indexPath.resolve("job").toString());
+      System.setProperty("solr.data.dir.file", indexPath.resolve("file").toString());
       // FIXME added missing cores
 
       // start solr

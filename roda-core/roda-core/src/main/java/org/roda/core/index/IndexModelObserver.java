@@ -126,6 +126,15 @@ public class IndexModelObserver implements ModelObserver {
         Representation representation = model.retrieveRepresentation(aip.getId(), representationId);
         SolrInputDocument representationDocument = SolrUtils.representationToSolrDocument(representation);
         index.add(RodaConstants.INDEX_REPRESENTATIONS, representationDocument);
+
+        if (representation.getFileIds() != null && representation.getFileIds().size() > 0) {
+          for (String fileId : representation.getFileIds()) {
+            File file = model.retrieveFile(aip.getId(), representationId, fileId);
+            SolrInputDocument fileDocument = SolrUtils.fileToSolrDocument(file);
+            index.add(RodaConstants.INDEX_FILE, fileDocument);
+          }
+        }
+
       } catch (SolrServerException | IOException | ModelServiceException e) {
         LOGGER.error("Could not index representation", e);
       }
@@ -134,6 +143,11 @@ public class IndexModelObserver implements ModelObserver {
       index.commit(RodaConstants.INDEX_REPRESENTATIONS);
     } catch (SolrServerException | IOException e) {
       LOGGER.error("Could not commit indexed representations", e);
+    }
+    try {
+      index.commit(RodaConstants.INDEX_FILE);
+    } catch (SolrServerException | IOException e) {
+      LOGGER.error("Could not commit indexed files", e);
     }
   }
 
@@ -223,19 +237,20 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void fileCreated(File file) {
-    // TODO Auto-generated method stub
-
+    addDocumentToIndex(RodaConstants.INDEX_FILE, SolrUtils.fileToSolrDocument(file), "Error creating File");
   }
 
   @Override
   public void fileUpdated(File file) {
-    // TODO Auto-generated method stub
+    fileDeleted(file.getAipId(), file.getRepresentationId(), file.getId());
+    fileCreated(file);
 
   }
 
   @Override
   public void fileDeleted(String aipId, String representationId, String fileId) {
-    // TODO Auto-generated method stub
+    String id = SolrUtils.getId(aipId, representationId, fileId);
+    deleteDocumentFromIndex(RodaConstants.INDEX_FILE, id, "Error deleting File (id=" + id + ")");
 
   }
 

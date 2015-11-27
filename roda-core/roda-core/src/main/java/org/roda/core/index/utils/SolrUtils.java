@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.xml.stream.FactoryConfigurationError;
@@ -100,10 +101,13 @@ import org.roda.core.data.v2.User;
 import org.roda.core.index.IndexServiceException;
 import org.roda.core.model.AIP;
 import org.roda.core.model.DescriptiveMetadata;
+import org.roda.core.model.File;
+import org.roda.core.model.FileFormat;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.ModelServiceException;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
+import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StoragePath;
 import org.roda.core.storage.StorageServiceException;
 import org.slf4j.Logger;
@@ -667,6 +671,8 @@ public class SolrUtils {
       indexName = RodaConstants.INDEX_SIP;
     } else if (resultClass.equals(Job.class)) {
       indexName = RodaConstants.INDEX_JOB;
+    } else if (resultClass.equals(File.class)) {
+      indexName = RodaConstants.INDEX_FILE;
     } else {
       throw new IndexServiceException("Cannot find class index name: " + resultClass.getName(),
         IndexServiceException.INTERNAL_SERVER_ERROR);
@@ -686,8 +692,8 @@ public class SolrUtils {
       ret = resultClass.cast(solrDocumentToLogEntry(doc));
     } else if (resultClass.equals(SIPReport.class)) {
       ret = resultClass.cast(solrDocumentToSipState(doc));
-    } else if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class)
-      || resultClass.equals(Group.class)) {
+    } else
+      if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class) || resultClass.equals(Group.class)) {
       ret = resultClass.cast(solrDocumentToRodaMember(doc));
     } else if (resultClass.equals(RepresentationFilePreservationObject.class)) {
       ret = resultClass.cast(solrDocumentToRepresentationFilePreservationObject(doc));
@@ -699,6 +705,8 @@ public class SolrUtils {
       ret = resultClass.cast(solrDocumentToTransferredResource(doc));
     } else if (resultClass.equals(Job.class)) {
       ret = resultClass.cast(solrDocumentToJob(doc));
+    } else if (resultClass.equals(File.class)) {
+      ret = resultClass.cast(solrDocumentToFile(doc));
     } else {
       throw new IndexServiceException("Cannot find class index name: " + resultClass.getName(),
         IndexServiceException.INTERNAL_SERVER_ERROR);
@@ -1372,5 +1380,43 @@ public class SolrUtils {
     job.setObjectIds(objectToListString(doc.get(RodaConstants.JOB_OBJECT_IDS)));
 
     return job;
+  }
+
+  public static SolrInputDocument fileToSolrDocument(File file) {
+    SolrInputDocument doc = new SolrInputDocument();
+    doc.addField(RodaConstants.FILE_UUID, UUID.randomUUID().toString());
+    doc.addField(RodaConstants.FILE_ID, getId(file.getAipId(), file.getRepresentationId(), file.getId()));
+    doc.addField(RodaConstants.FILE_AIPID, file.getAipId());
+    doc.addField(RodaConstants.FILE_FORMAT_MIMETYPE, file.getFileFormat().getMimeType());
+    doc.addField(RodaConstants.FILE_FORMAT_VERSION, file.getFileFormat().getVersion());
+    doc.addField(RodaConstants.FILE_FILEID, file.getId());
+    doc.addField(RodaConstants.FILE_REPRESENTATIONID, file.getRepresentationId());
+    doc.addField(RodaConstants.FILE_STORAGE_PATH, file.getStoragePath().asString());
+    doc.addField(RodaConstants.FILE_ISENTRYPOINT, file.isEntryPoint());
+    // FIXME how to index format registries if any
+    doc.addField(RodaConstants.FILE_FILEFORMAT, "");
+    return doc;
+  }
+
+  public static File solrDocumentToFile(SolrDocument doc) {
+    String aipId = objectToString(doc.get(RodaConstants.FILE_AIPID));
+    String fileId = objectToString(doc.get(RodaConstants.FILE_FILEID));
+    boolean entryPoint = objectToBoolean(doc.get(RodaConstants.FILE_ISENTRYPOINT));
+    String mimetype = objectToString(doc.get(RodaConstants.FILE_FORMAT_MIMETYPE));
+    String version = objectToString(doc.get(RodaConstants.FILE_FORMAT_VERSION));
+    String representationId = objectToString(doc.get(RodaConstants.FILE_REPRESENTATIONID));
+
+    // FIXME how to restore format registries
+    //
+    FileFormat fileFormat = new FileFormat(mimetype, version, new HashMap<String, String>());
+
+    StoragePath storagePath = null;
+    try {
+      storagePath = DefaultStoragePath.parse(objectToString(doc.get(RodaConstants.FILE_STORAGE_PATH)));
+    } catch (StorageServiceException sse) {
+      LOGGER.error("Error parsing StoragePath " + objectToString(doc.get(RodaConstants.FILE_STORAGE_PATH)));
+    }
+    File file = new File(fileId, aipId, representationId, entryPoint, fileFormat, storagePath);
+    return file;
   }
 }

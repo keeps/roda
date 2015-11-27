@@ -130,6 +130,7 @@ public final class RodaConstants {
   public static final String INDEX_CHARACTERIZATION = "Characterization";
   public static final String INDEX_SIP = "SIP";
   public static final String INDEX_JOB = "JOB";
+  public static final String INDEX_FILE = "File";
 
   /*
    * STORAGE CONTAINERS
@@ -385,4 +386,15 @@ public final class RodaConstants {
   public static final String JOB_RESOURCE_TYPE = "resourceType";
   public static final String JOB_ORCHESTRATOR_METHOD = "orchestratorMethod";
   public static final String JOB_OBJECT_IDS = "objectIds";
+
+  public static final String FILE_ID = "id";
+  public static final String FILE_AIPID = "aipId";
+  public static final String FILE_FORMAT_MIMETYPE = "formatMimetype";
+  public static final String FILE_FORMAT_VERSION = "formatVersion";
+  public static final String FILE_FILEID = "fileId";
+  public static final String FILE_REPRESENTATIONID = "representationId";
+  public static final String FILE_STORAGE_PATH = "storagePath";
+  public static final String FILE_ISENTRYPOINT = "isEntryPoint";
+  public static final String FILE_FILEFORMAT = "fileFormat";
+  public static final String FILE_UUID = "uuid";
 }

@@ -98,6 +98,10 @@ public class ReindexPlugin implements Plugin<AIP> {
       try {
         index.clearIndex(RodaConstants.INDEX_AIP);
         index.clearIndex(RodaConstants.INDEX_SDO);
+        index.clearIndex(RodaConstants.INDEX_REPRESENTATIONS);
+        index.clearIndex(RodaConstants.INDEX_PRESERVATION_OBJECTS);
+        index.clearIndex(RodaConstants.INDEX_PRESERVATION_EVENTS);
+        index.clearIndex(RodaConstants.INDEX_FILE);
       } catch (IndexServiceException e) {
         throw new PluginException("Error clearing index", e);
       }

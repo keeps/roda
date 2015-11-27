@@ -17,8 +17,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.roda.core.data.adapter.facet.Facets;
@@ -40,6 +38,8 @@ import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageServiceException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class IndexService {
 
@@ -135,6 +135,10 @@ public class IndexService {
     try {
       index.optimize(RodaConstants.INDEX_AIP);
       index.optimize(RodaConstants.INDEX_SDO);
+      index.optimize(RodaConstants.INDEX_FILE);
+      index.optimize(RodaConstants.INDEX_REPRESENTATIONS);
+      index.optimize(RodaConstants.INDEX_PRESERVATION_EVENTS);
+      index.optimize(RodaConstants.INDEX_PRESERVATION_OBJECTS);
     } catch (SolrServerException | IOException e) {
       throw new IndexServiceException("Error while optimizing indexes", IndexServiceException.INTERNAL_SERVER_ERROR, e);
     }

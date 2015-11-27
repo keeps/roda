@@ -690,7 +690,7 @@ public class ModelService extends ModelObservable {
           boolean notify = false;
           File fileUpdated = updateFile(aipId, representationId, file.getStoragePath().getName(), (Binary) file,
             createIfNotExists, notify);
-
+          notifyFileUpdated(fileUpdated);
           fileIDsToUpdate.add(fileUpdated.getStoragePath().getName());
         } else {
           // FIXME log error and continue???
