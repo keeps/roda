@@ -653,7 +653,7 @@ public final class ModelUtils {
         IndexResult<SimpleDescriptionObject> collections = index.find(SimpleDescriptionObject.class, filter, null,
           new Sublist(i, 100));
         for (SimpleDescriptionObject children : collections.getResults()) {
-          if (!ModelUtils.isRepresentationLevel(children, representationLevels)) {
+          if (sdo.getLevel() != null && !ModelUtils.isRepresentationLevel(children, representationLevels)) {
             childrenArray = childrenArray.add(ModelUtils.sdoToJSON(children, index, mapper, representationLevels));
           }
         }
@@ -667,7 +667,7 @@ public final class ModelUtils {
     List<DescriptionLevel> representationLevels) {
     boolean isRepresentationLevel = false;
     for (DescriptionLevel dl : representationLevels) {
-      if (sdo.getLevel().equalsIgnoreCase(dl.getLevel())) {
+      if (dl.getLevel().equalsIgnoreCase(sdo.getLevel())) {
         isRepresentationLevel = true;
         break;
       }

@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
-import java.util.Properties;
 import java.util.Set;
 
 import javax.ws.rs.WebApplicationException;
@@ -74,7 +73,6 @@ import org.roda.core.storage.StoragePath;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.fs.FSUtils;
-import org.roda.core.util.FileUtility;
 import org.roda.disseminators.common.tools.ZipEntryInfo;
 import org.roda.disseminators.common.tools.ZipTools;
 import org.roda.wui.api.exceptions.ApiException;
@@ -1015,10 +1013,8 @@ public class BrowserHelper {
   // TODO improve descriptionlevelmanager initialization
   public static StreamResponse getClassificationPlan(String type, RodaUser user) throws GenericException {
     try {
-      Properties descriptionLevels = new Properties();
-      descriptionLevels.load(FileUtility.getConfigurationFile(RodaCoreFactory.getConfigPath(),
-        "roda-description-levels-hierarchy.properties"));
-      DescriptionLevelManager dlm = new DescriptionLevelManager(descriptionLevels);
+
+      DescriptionLevelManager dlm = RodaCoreFactory.getDescriptionLevelManager();
       List<DescriptionLevel> representationLevels = dlm.getRepresentationsDescriptionLevels();
       JsonFactory factory = new JsonFactory();
       ObjectMapper mapper = new ObjectMapper(factory);

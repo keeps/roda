@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
 
 public class FolderMonitorNIO {
   private static final Logger LOGGER = LoggerFactory.getLogger(FolderMonitorNIO.class);
-  ExecutorService executor;
+  private ExecutorService executor;
   private final List<FolderObserver> observers;
   private Path basePath;
   private Thread threadWatch, threadReindex;
@@ -53,10 +53,10 @@ public class FolderMonitorNIO {
   private SolrClient index;
   private boolean watchInitialized;
 
-  public FolderMonitorNIO(Path p, Date indexDate, SolrClient index) throws Exception {
+  public FolderMonitorNIO(Path basePath, Date indexDate, SolrClient index) throws Exception {
     executor = Executors.newSingleThreadExecutor();
     this.observers = new ArrayList<FolderObserver>();
-    this.basePath = p;
+    this.basePath = basePath;
     this.indexDate = indexDate;
     this.index = index;
     this.watchInitialized = false;

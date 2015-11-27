@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
@@ -54,6 +55,7 @@ import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.NodeType;
+import org.roda.core.data.eadc.DescriptionLevelManager;
 import org.roda.core.data.v2.EventPreservationObject;
 import org.roda.core.data.v2.Group;
 import org.roda.core.data.v2.IndexResult;
@@ -144,6 +146,7 @@ public class RodaCoreFactory {
   private static List<String> configurationFiles = null;
   private static Map<String, Map<String, String>> propertiesCache = null;
   private static Map<Locale, Messages> i18nMessages = new HashMap<Locale, Messages>();
+  private static DescriptionLevelManager descriptionLevelManager = null;
 
   public static void instantiate() {
     if ("master".equalsIgnoreCase(getSystemProperty(RodaConstants.CORE_NODE_TYPE, "master"))) {
@@ -181,6 +184,9 @@ public class RodaCoreFactory {
         propertiesCache = new HashMap<String, Map<String, String>>();
         addConfiguration("roda-core.properties");
 
+        // load description level information
+        loadDescriptionLevelInformation();
+
       } catch (ConfigurationException e) {
         LOGGER.error("Error loading roda properties", e);
       } catch (StorageServiceException e) {
@@ -199,6 +205,19 @@ public class RodaCoreFactory {
 
       instantiated = true;
     }
+  }
+
+  private static void loadDescriptionLevelInformation() {
+    Properties descriptionLevelConfiguration = new Properties();
+    try {
+      descriptionLevelConfiguration
+        .load(getConfigurationFile("roda-description-levels-hierarchy.properties").openStream());
+    } catch (IOException e) {
+      // do nothing and instantiate description level manager from empty
+      // properties object
+    }
+    LOGGER.debug("Description level configurations being loaded: " + descriptionLevelConfiguration);
+    descriptionLevelManager = new DescriptionLevelManager(descriptionLevelConfiguration);
   }
 
   private static void instantiateEssentialDirectoriesAndObjects() throws StorageServiceException {
@@ -437,26 +456,26 @@ public class RodaCoreFactory {
     String SIPFolderPath = rodaConfig.getString("sip.folder");
     int SIPTimeout = rodaConfig.getInt("sip.timeout");
     Path sipFolderPath = dataPath.resolve(SIPFolderPath);
-    Date d = getFolderMonitorDate(sipFolderPath);
+    Date date = getFolderMonitorDate(sipFolderPath);
     sipFolderObserver = new IndexFolderObserver(solr, sipFolderPath);
-    sipFolderMonitor = new FolderMonitorNIO(sipFolderPath, d, solr);
+    sipFolderMonitor = new FolderMonitorNIO(sipFolderPath, date, solr);
     sipFolderMonitor.addFolderObserver(sipFolderObserver);
     LOGGER.debug("ISFULLYINITIALIZED: " + getFolderMonitor().isFullyInitialized());
   }
 
   public static Date getFolderMonitorDate(Path sipFolderPath) {
-    Date d = null;
+    Date folderMonitorDate = null;
     try {
       Path dateFile = sipFolderPath.resolve(".date");
       if (Files.exists(dateFile)) {
-        String date = new String(Files.readAllBytes(dateFile));
+        String dateFromFile = new String(Files.readAllBytes(dateFile));
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-        d = df.parse(date);
+        folderMonitorDate = df.parse(dateFromFile);
       }
     } catch (IOException | ParseException e) {
       LOGGER.error("Error getting last monitoring date: " + e.getMessage(), e);
     }
-    return d;
+    return folderMonitorDate;
   }
 
   public static void setFolderMonitorDate(Path sipFolderPath, Date d) {
@@ -665,6 +684,10 @@ public class RodaCoreFactory {
     // i18n is cached and that cache is re-done when changes occur to
     // roda-*.properties (for convenience)
     getRodaConfiguration().getString("");
+  }
+
+  public static DescriptionLevelManager getDescriptionLevelManager() {
+    return descriptionLevelManager;
   }
 
   /*
