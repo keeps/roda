@@ -19,7 +19,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.roda.core.data.common.RodaConstants.JOB_STATE;
-import org.roda.core.data.common.RodaConstants.PLUGIN_TYPE;
+import org.roda.core.data.common.RodaConstants.JOB_TYPE;
 import org.roda.core.data.common.RodaConstants.RESOURCE_TYPE;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -33,65 +33,62 @@ public class Job implements Serializable {
   private static final long serialVersionUID = 615993757726175203L;
 
   // job identifier
-  private String id;
+  private String id = null;
+  // job name
+  private String name = null;
   // job creator
-  private String username;
+  private String username = null;
   // job start date
-  private Date startDate;
+  private Date startDate = null;
   // job end date
-  private Date endDate;
+  private Date endDate = null;
   // job state
-  private JOB_STATE state;
+  private JOB_STATE state = null;
   // 0-100 scale completion percentage
-  private int completionPercentage;
+  private int completionPercentage = 0;
+  // job type (e.g. ingest, maintenance, misc, etc.)
+  private JOB_TYPE type = null;
 
   // plugin full class (e.g. org.roda.core.plugins.plugins.base.FixityPlugin)
-  private String plugin;
+  private String plugin = null;
   // plugin parameters
-  private Map<String, String> pluginParameters;
-  // plugin type (e.g. ingest, maintenance, misc, etc.)
-  private PLUGIN_TYPE pluginType;
+  private Map<String, String> pluginParameters = new HashMap<String, String>();;
 
   // resource type (e.g. bagit, e-ark sip, etc.)
-  private RESOURCE_TYPE resourceType;
+  private RESOURCE_TYPE resourceType = null;
 
   // type of method that orchestrator should execute (e.g.
   // runPluginOnTransferredResources, runPluginOnAIPs, etc.)
-  private String orchestratorMethod;
+  private String orchestratorMethod = null;
   // list of object ids to act upon
-  private List<String> objectIds;
-  // // object full class (e.g. org.roda.core.model.AIP, etc.)
-  // private String objectType;
+  private List<String> objectIds = new ArrayList<String>();
+
+  // report id
+  private String reportId = null;
 
   public Job() {
     super();
     id = UUID.randomUUID().toString();
+    name = id;
     startDate = new Date();
-    endDate = null;
-    completionPercentage = 0;
-
-    objectIds = new ArrayList<String>();
-    pluginParameters = new HashMap<String, String>();
+    state = JOB_STATE.CREATED;
   }
 
   public Job(Job job) {
     super();
     this.id = job.getId();
+    this.name = job.getName();
     this.username = job.getUsername();
     this.startDate = job.getStartDate();
     this.endDate = job.getEndDate();
+    this.state = job.getState();
     this.completionPercentage = job.getCompletionPercentage();
+    this.type = job.getType();
     this.plugin = job.getPlugin();
     this.pluginParameters = new HashMap<String, String>(job.getPluginParameters());
-    this.pluginType = job.getPluginType();
     this.resourceType = job.getResourceType();
     this.orchestratorMethod = job.getOrchestratorMethod();
     this.objectIds = new ArrayList<String>(job.getObjectIds());
-  }
-
-  public Job(String id) {
-    this();
-    this.id = id;
   }
 
   public String getId() {
@@ -101,6 +98,14 @@ public class Job implements Serializable {
   public Job setId(String id) {
     this.id = id;
     return this;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
   }
 
   public String getUsername() {
@@ -129,6 +134,14 @@ public class Job implements Serializable {
   public Job setEndDate(Date endDate) {
     this.endDate = endDate;
     return this;
+  }
+
+  public JOB_STATE getState() {
+    return state;
+  }
+
+  public void setState(JOB_STATE state) {
+    this.state = state;
   }
 
   public int getCompletionPercentage() {
@@ -178,12 +191,12 @@ public class Job implements Serializable {
     return this;
   }
 
-  public PLUGIN_TYPE getPluginType() {
-    return pluginType;
+  public JOB_TYPE getType() {
+    return type;
   }
 
-  public Job setPluginType(PLUGIN_TYPE pluginType) {
-    this.pluginType = pluginType;
+  public Job setType(JOB_TYPE type) {
+    this.type = type;
     return this;
   }
 
@@ -198,10 +211,10 @@ public class Job implements Serializable {
 
   @Override
   public String toString() {
-    return "Job [id=" + id + ", username=" + username + ", startDate=" + startDate + ", endDate=" + endDate + ", state="
-      + state + ", completionPercentage=" + completionPercentage + ", plugin=" + plugin + ", pluginParameters="
-      + pluginParameters + ", pluginType=" + pluginType + ", resourceType=" + resourceType + ", orchestratorMethod="
-      + orchestratorMethod + ", objectIds=" + objectIds + "]";
+    return "Job [id=" + id + ", name=" + name + ", username=" + username + ", startDate=" + startDate + ", endDate="
+      + endDate + ", state=" + getState() + ", completionPercentage=" + completionPercentage + ", type=" + type
+      + ", plugin=" + plugin + ", pluginParameters=" + pluginParameters + ", resourceType=" + resourceType
+      + ", orchestratorMethod=" + orchestratorMethod + ", objectIds=" + objectIds + ", reportId=" + reportId + "]";
   }
 
 }

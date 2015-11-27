@@ -54,7 +54,7 @@ public class ManagementTasksResource extends RodaCoreService {
   @GET
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   public Response listTasks(@QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat) {
-    return Response.ok(TASKS, ApiUtils.getMediaType(acceptFormat, request.getHeader("Accept"))).build();
+    return Response.ok(TASKS, ApiUtils.getMediaType(acceptFormat, request)).build();
   }
 
   @POST

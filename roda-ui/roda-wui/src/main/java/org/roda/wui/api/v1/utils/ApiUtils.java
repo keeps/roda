@@ -19,6 +19,7 @@ import javax.xml.transform.TransformerException;
 import org.apache.commons.lang.StringUtils;
 import org.roda.core.data.common.Pair;
 import org.roda.core.data.common.RODAException;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.wui.common.client.GenericException;
 
 /**
@@ -27,6 +28,19 @@ import org.roda.wui.common.client.GenericException;
  * @author Hélder Silva <hsilva@keep.pt>
  */
 public class ApiUtils {
+
+  /**
+   * Get media type
+   * 
+   * @param acceptFormat
+   *          String with required format
+   * @param request
+   *          http request
+   * @return media type
+   */
+  public static String getMediaType(String acceptFormat, HttpServletRequest request) {
+    return getMediaType(acceptFormat, request.getHeader(RodaConstants.API_HTTP_HEADER_ACCEPT));
+  }
 
   /**
    * Get media type

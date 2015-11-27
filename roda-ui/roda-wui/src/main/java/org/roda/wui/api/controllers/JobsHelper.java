@@ -15,7 +15,7 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.NotFoundException;
 import org.roda.core.data.common.Pair;
-import org.roda.core.data.common.RodaConstants.PLUGIN_TYPE;
+import org.roda.core.data.common.RodaConstants.JOB_TYPE;
 import org.roda.core.data.common.RodaConstants.RESOURCE_TYPE;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.Job;
@@ -35,7 +35,7 @@ public class JobsHelper {
 
   private static final List<String> ORCHESTRATOR_METHODS = Arrays.asList("runPluginOnTransferredResources");
   private static final List<RESOURCE_TYPE> RESOURCE_TYPES = Arrays.asList(RESOURCE_TYPE.BAGIT);
-  private static final List<PLUGIN_TYPE> PLUGIN_TYPES = Arrays.asList(PLUGIN_TYPE.INGEST);
+  private static final List<JOB_TYPE> JOB_TYPES = Arrays.asList(JOB_TYPE.INGEST);
 
   protected static void validateCreateJob(Job job) throws RequestNotValidException {
     if (!ORCHESTRATOR_METHODS.contains(job.getOrchestratorMethod())) {
@@ -46,9 +46,9 @@ public class JobsHelper {
       throw new RequestNotValidException(ApiException.INVALID_PARAMETER_VALUE,
         "Invalid resource type '" + job.getResourceType() + "'");
     }
-    if (!PLUGIN_TYPES.contains(job.getPluginType())) {
+    if (!JOB_TYPES.contains(job.getType())) {
       throw new RequestNotValidException(ApiException.INVALID_PARAMETER_VALUE,
-        "Invalid plugin type '" + job.getPluginType() + "'");
+        "Invalid plugin type '" + job.getType() + "'");
     }
 
   }

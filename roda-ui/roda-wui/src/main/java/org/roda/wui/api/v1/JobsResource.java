@@ -53,7 +53,7 @@ public class JobsResource {
     @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam(RodaConstants.API_QUERY_KEY_START) String start,
     @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam(RodaConstants.API_QUERY_KEY_START) String limit)
       throws RODAException {
-    String mediaType = ApiUtils.getMediaType(acceptFormat, request.getHeader("Accept"));
+    String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
@@ -70,7 +70,7 @@ public class JobsResource {
   @ApiOperation(value = "Get Job", notes = "Gets a particular Job.", response = Job.class)
   public Response getJob(@PathParam("jobId") String jobId,
     @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat) throws RODAException {
-    String mediaType = ApiUtils.getMediaType(acceptFormat, request.getHeader("Accept"));
+    String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
@@ -86,7 +86,7 @@ public class JobsResource {
   @ApiOperation(value = "Creates a new Job", notes = "Creates a new Job.", response = Job.class)
   public Response createJob(Job job, @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
-    String mediaType = ApiUtils.getMediaType(acceptFormat, request.getHeader("Accept"));
+    String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());

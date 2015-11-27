@@ -104,14 +104,16 @@
      required, it is highly recommended. A <uniqueKey> is present in almost all Solr 
      installations. See the <uniqueKey> declaration below where <uniqueKey> is set to "id".
    -->   
-   <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 
+   <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" />
+   <field name="name" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="username" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="startDate" type="tdate" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="endDate" type="tdate" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="state" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="completionPercentage" type="int" indexed="true" stored="true" required="false" multiValued="false" /> 
+   <field name="type" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="plugin" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="pluginParameters" type="string" indexed="false" stored="true" required="false" multiValued="false" />
-   <field name="pluginType" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="resourceType" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="orchestratorMethod" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="objectIds" type="string" indexed="false" stored="true" required="false" multiValued="true" />
