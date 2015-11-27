@@ -24,26 +24,26 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.net.util.Base64;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.RodaUtils;
-import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
-import org.roda.core.data.adapter.filter.Filter;
-import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.eadc.DescriptionLevel;
-import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.LogEntry;
 import org.roda.core.data.v2.LogEntryParameter;
 import org.roda.core.data.v2.RepresentationState;
 import org.roda.core.data.v2.SIPReport;
 import org.roda.core.data.v2.SimpleDescriptionObject;
-import org.roda.core.index.IndexService;
 import org.roda.core.index.IndexServiceException;
 import org.roda.core.metadata.v2.premis.PremisAgentHelper;
 import org.roda.core.metadata.v2.premis.PremisEventHelper;
 import org.roda.core.metadata.v2.premis.PremisFileObjectHelper;
 import org.roda.core.metadata.v2.premis.PremisMetadataException;
 import org.roda.core.metadata.v2.premis.PremisRepresentationObjectHelper;
+import org.roda.core.model.AIP;
+import org.roda.core.model.DescriptiveMetadata;
 import org.roda.core.model.FileFormat;
+import org.roda.core.model.ModelService;
 import org.roda.core.model.ModelServiceException;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ClosableIterable;
@@ -630,8 +630,12 @@ public final class ModelUtils {
 
   }
 
-  public static ObjectNode sdoToJSON(SimpleDescriptionObject sdo, IndexService index, ObjectMapper mapper,
-    List<DescriptionLevel> representationLevels) throws IndexServiceException {
+  public static ObjectNode sdoToJSON(SimpleDescriptionObject sdo)
+    throws IndexServiceException, ModelServiceException, IOException {
+    JsonFactory factory = new JsonFactory();
+    ObjectMapper mapper = new ObjectMapper(factory);
+    ModelService model = RodaCoreFactory.getModelService();
+
     ObjectNode node = mapper.createObjectNode();
     if (sdo.getTitle() != null) {
       node = node.put("title", sdo.getTitle());
@@ -645,33 +649,30 @@ public final class ModelUtils {
     if (sdo.getLevel() != null) {
       node = node.put("descriptionlevel", sdo.getLevel());
     }
-    Filter filter = new Filter(new BasicSearchFilterParameter(RodaConstants.AIP_PARENT_ID, sdo.getId()));
-    long countChildren = index.count(SimpleDescriptionObject.class, filter);
-    ArrayNode childrenArray = mapper.createArrayNode();
-    if (countChildren > 0) {
-      for (int i = 0; i < countChildren; i += 100) {
-        IndexResult<SimpleDescriptionObject> collections = index.find(SimpleDescriptionObject.class, filter, null,
-          new Sublist(i, 100));
-        for (SimpleDescriptionObject children : collections.getResults()) {
-          if (sdo.getLevel() != null && !ModelUtils.isRepresentationLevel(children, representationLevels)) {
-            childrenArray = childrenArray.add(ModelUtils.sdoToJSON(children, index, mapper, representationLevels));
-          }
-        }
-      }
-    }
-    node.set("children", childrenArray);
-    return node;
-  }
 
-  public static boolean isRepresentationLevel(SimpleDescriptionObject sdo,
-    List<DescriptionLevel> representationLevels) {
-    boolean isRepresentationLevel = false;
-    for (DescriptionLevel dl : representationLevels) {
-      if (dl.getLevel().equalsIgnoreCase(sdo.getLevel())) {
-        isRepresentationLevel = true;
-        break;
+    AIP aip = model.retrieveAIP(sdo.getId());
+    if (aip != null) {
+      List<String> descriptiveMetadaIds = aip.getDescriptiveMetadataIds();
+      if (descriptiveMetadaIds != null && descriptiveMetadaIds.size() > 0) {
+        ArrayNode metadata = mapper.createArrayNode();
+        for (String descriptiveMetadataID : descriptiveMetadaIds) {
+          DescriptiveMetadata dm = model.retrieveDescriptiveMetadata(aip.getId(), descriptiveMetadataID);
+          ObjectNode dmNode = mapper.createObjectNode();
+          if (dm.getId() != null) {
+            dmNode = dmNode.put("id", dm.getId());
+          }
+          if (dm.getType() != null) {
+            dmNode = dmNode.put("type", dm.getType());
+          }
+          Binary b = model.retrieveDescriptiveMetadataBinary(aip.getId(), dm.getId());
+          InputStream is = b.getContent().createInputStream();
+          dmNode = dmNode.put("content", new String(Base64.encodeBase64(IOUtils.toByteArray(is))));
+          dmNode = dmNode.put("contentEncoding", "Base64");
+          metadata = metadata.add(dmNode);
+        }
+        node.set("metadata", metadata);
       }
     }
-    return isRepresentationLevel;
+    return node;
   }
 }

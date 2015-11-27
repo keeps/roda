@@ -33,6 +33,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.StreamingOutput;
 import javax.xml.transform.TransformerException;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Transformer;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
@@ -40,8 +42,8 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
 import org.roda.core.common.ValidationUtils;
 import org.roda.core.data.adapter.facet.Facets;
-import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.filter.OneOfManyFilterParameter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sort.SortParameter;
 import org.roda.core.data.adapter.sort.Sorter;
@@ -51,7 +53,6 @@ import org.roda.core.data.common.NotFoundException;
 import org.roda.core.data.common.Pair;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.eadc.DescriptionLevel;
-import org.roda.core.data.eadc.DescriptionLevelManager;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.Representation;
 import org.roda.core.data.v2.RepresentationState;
@@ -1013,24 +1014,30 @@ public class BrowserHelper {
   // TODO improve descriptionlevelmanager initialization
   public static StreamResponse getClassificationPlan(String type, RodaUser user) throws GenericException {
     try {
-
-      DescriptionLevelManager dlm = RodaCoreFactory.getDescriptionLevelManager();
-      List<DescriptionLevel> representationLevels = dlm.getRepresentationsDescriptionLevels();
       JsonFactory factory = new JsonFactory();
       ObjectMapper mapper = new ObjectMapper(factory);
       ObjectNode root = mapper.createObjectNode();
 
       ArrayNode array = mapper.createArrayNode();
-      Filter COLLECTIONS_FILTER = new Filter(new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID));
+      List<DescriptionLevel> descriptionLevels = RodaCoreFactory.getDescriptionLevelManager()
+        .getAllButRepresentationsDescriptionLevels();
+      List<String> descriptionsLevels = (List<String>) CollectionUtils.collect(descriptionLevels, new Transformer() {
+        @Override
+        public Object transform(Object dl) {
+          return ((DescriptionLevel) dl).getLevel();
+        }
+      });
+
+      Filter allButRepresentationsFilter = new Filter(
+        new OneOfManyFilterParameter(RodaConstants.SDO_LEVEL, descriptionsLevels));
+
       IndexService index = RodaCoreFactory.getIndexService();
-      long collectionsCount = index.count(SimpleDescriptionObject.class, COLLECTIONS_FILTER);
+      long collectionsCount = index.count(SimpleDescriptionObject.class, allButRepresentationsFilter);
       for (int i = 0; i < collectionsCount; i += 100) {
-        IndexResult<SimpleDescriptionObject> collections = index.find(SimpleDescriptionObject.class, COLLECTIONS_FILTER,
-          null, new Sublist(i, 100));
+        IndexResult<SimpleDescriptionObject> collections = index.find(SimpleDescriptionObject.class,
+          allButRepresentationsFilter, null, new Sublist(i, 100));
         for (SimpleDescriptionObject sdo : collections.getResults()) {
-          if (!ModelUtils.isRepresentationLevel(sdo, representationLevels)) {
-            array.add(ModelUtils.sdoToJSON(sdo, index, mapper, representationLevels));
-          }
+          array.add(ModelUtils.sdoToJSON(sdo));
         }
       }
       root.set("dos", array);
@@ -1043,7 +1050,7 @@ public class BrowserHelper {
         }
       };
       return new StreamResponse("plan.json", MediaType.APPLICATION_JSON, stream);
-    } catch (IndexServiceException | IOException e) {
+    } catch (IndexServiceException | IOException | ModelServiceException e) {
       throw new GenericException("Error creating classification plan: " + e.getMessage());
     }
 
