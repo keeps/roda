@@ -1790,3 +1790,12 @@
 .pull-right {
 	float: right;
 }
+
+/**********************************************
+				VIEW REPRESENTATION
+************************************************/
+
+.viewRepresentationTitle {
+	margin-bottom: 10px !important;
+}
+

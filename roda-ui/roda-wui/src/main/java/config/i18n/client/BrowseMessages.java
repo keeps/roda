@@ -226,4 +226,17 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("OK")
   String dialogOk();
 
+  /*** View representation ***/
+  
+  @DefaultMessage("Back")
+  public String backButton();
+
+  @DefaultMessage("Next file")
+  public String viewRepresentationNextFileButton();
+
+  @DefaultMessage("Previous file")
+  public String viewRepresentationPreviousFileButton();
+
+  @DefaultMessage("Download file")
+  public String viewRepresentationDownloadFileButton();
 }
