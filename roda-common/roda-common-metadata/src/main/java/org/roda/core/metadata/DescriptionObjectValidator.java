@@ -13,12 +13,13 @@ import org.apache.commons.lang.StringUtils;
 import org.roda.core.data.DescriptionObject;
 import org.roda.core.data.common.InvalidDescriptionObjectException;
 import org.roda.core.data.eadc.DescriptionLevelManager;
-import org.w3c.util.DateParser;
-import org.w3c.util.InvalidDateException;
 
 /**
  * @author Rui Castro
+ * 
+ * @deprecated this class most certainly is deprecated and should be re-done
  */
+@Deprecated
 public class DescriptionObjectValidator {
 
   /**
@@ -29,14 +30,15 @@ public class DescriptionObjectValidator {
    * 
    * @throws InvalidDescriptionObjectException
    */
-  public static void validateDescriptionObject(DescriptionObject dObject) throws InvalidDescriptionObjectException {
+  public static void validateDescriptionObject(DescriptionObject dObject,
+    DescriptionLevelManager descriptionLevelManager) throws InvalidDescriptionObjectException {
 
     // Validate level
     if (dObject.getLevel() == null) {
       throw new InvalidDescriptionObjectException(
         Messages.getString("DescriptionObjectValidator.DESCRIPTION_LEVEL_IS_EMPTY")); //$NON-NLS-1$
     }
-    if (!DescriptionLevelManager.getDescriptionLevels().contains(dObject.getLevel())) {
+    if (!descriptionLevelManager.getDescriptionLevels().contains(dObject.getLevel())) {
       throw new InvalidDescriptionObjectException(String
         .format(Messages.getString("DescriptionObjectValidator.DESCRIPTION_LEVEL_X_IS_NOT_VALID"), dObject.getLevel()));
     }
@@ -114,7 +116,7 @@ public class DescriptionObjectValidator {
     }
 
     // Validate unit dates
-    if (DescriptionLevelManager.getRepresentationsDescriptionLevels().contains(dObject.getLevel())) {
+    if (descriptionLevelManager.getRepresentationsDescriptionLevels().contains(dObject.getLevel())) {
 
       if (dateInitial == null && dateFinal == null) {
         throw new InvalidDescriptionObjectException(

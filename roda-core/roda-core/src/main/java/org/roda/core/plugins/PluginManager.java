@@ -14,7 +14,6 @@ import java.net.URLClassLoader;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Date;
@@ -373,26 +372,6 @@ public class PluginManager {
     JarPlugin(Plugin<?> plugin, long lastModified) {
       this.plugin = plugin;
       this.lastModified = lastModified;
-    }
-  }
-
-  // FIXME delete this
-  public static void main(String[] args) {
-    Path rodaHomePath = Paths.get("/home/hsilva/.roda/");
-    Path rodaConfigPath = rodaHomePath.resolve("config");
-    Path rodaPluginsPath = rodaConfigPath.resolve("plugins");
-    try {
-      PluginManager defaultPluginManager = PluginManager.getDefaultPluginManager(rodaConfigPath, rodaPluginsPath);
-      Thread.sleep(3 * 1000);
-      Plugin<?> plugin = defaultPluginManager.getPlugin("org.roda.action.fixity.FixityAction");
-      plugin.execute(null, null, null, null);
-      Thread.sleep(60 * 1000);
-    } catch (PluginManagerException e) {
-      e.printStackTrace();
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    } catch (PluginException e) {
-      e.printStackTrace();
     }
   }
 

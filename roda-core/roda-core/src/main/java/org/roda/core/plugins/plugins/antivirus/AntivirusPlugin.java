@@ -11,12 +11,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
 import org.roda.core.data.common.InvalidParameterException;
@@ -30,34 +28,37 @@ import org.roda.core.storage.StoragePath;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.fs.FileStorageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AntivirusPlugin implements Plugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(AntivirusPlugin.class);
+
+  private Map<String, String> parameters;
+
   private String antiVirusClassName;
   private AntiVirus antiVirus = null;
 
   @Override
   public void init() throws PluginException {
-    for (PluginParameter parameter : getParameters()) {
-      if (parameter.getName().equalsIgnoreCase("antivirusClassName")) {
-        try {
-          antiVirusClassName = parameter.getValue();
-          LOGGER.info("Loading antivirus class " + antiVirusClassName); //$NON-NLS-1$
-          setAntiVirus((AntiVirus) Class.forName(antiVirusClassName).newInstance());
-          LOGGER.info("Using antivirus " + getAntiVirus().getClass().getName());
-        } catch (ClassNotFoundException e) {
-          LOGGER.warn("Antivirus class " + antiVirusClassName //$NON-NLS-1$
-            + " not found - " + e.getMessage()); //$NON-NLS-1$
-        } catch (InstantiationException e) {
-          // not possible to create a new instance of the class
-          LOGGER.warn("Antivirus class " + antiVirusClassName //$NON-NLS-1$
-            + " instantiation exception - " + e.getMessage()); //$NON-NLS-1$
-        } catch (IllegalAccessException e) {
-          // not possible to create a new instance of the class
-          LOGGER.warn("Antivirus class " + antiVirusClassName //$NON-NLS-1$
-            + " illegal access exception - " + e.getMessage()); //$NON-NLS-1$
-        }
-      }
+    antiVirusClassName = RodaCoreFactory.getRodaConfiguration().getString(
+      "core.plugins.internal.virus_check.antiVirusClassname", "org.roda.core.plugins.plugins.antivirus.ClamAntiVirus");
+
+    try {
+      LOGGER.info("Loading antivirus class " + antiVirusClassName); //$NON-NLS-1$
+      setAntiVirus((AntiVirus) Class.forName(antiVirusClassName).newInstance());
+      LOGGER.info("Using antivirus " + getAntiVirus().getClass().getName());
+    } catch (ClassNotFoundException e) {
+      LOGGER.warn("Antivirus class " + antiVirusClassName //$NON-NLS-1$
+        + " not found - " + e.getMessage()); //$NON-NLS-1$
+    } catch (InstantiationException e) {
+      // not possible to create a new instance of the class
+      LOGGER.warn("Antivirus class " + antiVirusClassName //$NON-NLS-1$
+        + " instantiation exception - " + e.getMessage()); //$NON-NLS-1$
+    } catch (IllegalAccessException e) {
+      // not possible to create a new instance of the class
+      LOGGER.warn("Antivirus class " + antiVirusClassName //$NON-NLS-1$
+        + " illegal access exception - " + e.getMessage()); //$NON-NLS-1$
     }
 
     if (getAntiVirus() == null) {
@@ -96,12 +97,12 @@ public class AntivirusPlugin implements Plugin<AIP> {
 
   @Override
   public Map<String, String> getParameterValues() {
-    return new HashMap<>();
+    return parameters;
   }
 
   @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
-    // no params
+    this.parameters = parameters;
   }
 
   @Override
@@ -109,13 +110,13 @@ public class AntivirusPlugin implements Plugin<AIP> {
     throws PluginException {
     for (AIP aip : list) {
       try {
-        Path p = Files.createTempDirectory("temp");
-        StorageService tempStorage = new FileStorageService(p);
+        Path tempDirectory = Files.createTempDirectory("temp");
+        StorageService tempStorage = new FileStorageService(tempDirectory);
         StoragePath aipPath = ModelUtils.getAIPpath(aip.getId());
         tempStorage.copy(storage, aipPath, aipPath);
         VirusCheckResult virusCheckResult = null;
         try {
-          virusCheckResult = getAntiVirus().checkForVirus(p);
+          virusCheckResult = getAntiVirus().checkForVirus(tempDirectory);
           LOGGER.debug("AIP " + aip.getId() + " is clean: " + virusCheckResult.isClean());
           LOGGER.debug("AIP " + aip.getId() + " virus check report: " + virusCheckResult.getReport());
         } catch (RuntimeException e) {
@@ -170,8 +171,9 @@ public class AntivirusPlugin implements Plugin<AIP> {
 
   @Override
   public Plugin<AIP> cloneMe() {
-    // TODO Auto-generated method stub
-    return null;
+    AntivirusPlugin antivirusPlugin = new AntivirusPlugin();
+    antivirusPlugin.setAntiVirus(getAntiVirus());
+    return antivirusPlugin;
   }
 
 }

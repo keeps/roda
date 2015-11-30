@@ -7,6 +7,7 @@
  */
 package org.roda.core.plugins.plugins.ingest;
 
-public class BagitNotValidException extends Exception{
+public class BagitNotValidException extends Exception {
+  private static final long serialVersionUID = -6425654163548447394L;
 
 }

@@ -693,8 +693,8 @@ public class SolrUtils {
       ret = resultClass.cast(solrDocumentToLogEntry(doc));
     } else if (resultClass.equals(SIPReport.class)) {
       ret = resultClass.cast(solrDocumentToSipState(doc));
-    } else
-      if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class) || resultClass.equals(Group.class)) {
+    } else if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class)
+      || resultClass.equals(Group.class)) {
       ret = resultClass.cast(solrDocumentToRodaMember(doc));
     } else if (resultClass.equals(RepresentationFilePreservationObject.class)) {
       ret = resultClass.cast(solrDocumentToRepresentationFilePreservationObject(doc));
@@ -1359,6 +1359,7 @@ public class SolrUtils {
     doc.addField(RodaConstants.JOB_RESOURCE_TYPE, job.getResourceType());
     doc.addField(RodaConstants.JOB_ORCHESTRATOR_METHOD, job.getOrchestratorMethod());
     doc.addField(RodaConstants.JOB_OBJECT_IDS, job.getObjectIds());
+    doc.addField(RodaConstants.JOB_OBJECT_IDS_TO_AIP_IDS, ModelUtils.getJsonFromObject(job.getObjectIdsToAipIds()));
 
     return doc;
   }
@@ -1379,6 +1380,8 @@ public class SolrUtils {
     job.setResourceType(RESOURCE_TYPE.valueOf(objectToString(doc.get(RodaConstants.JOB_RESOURCE_TYPE))));
     job.setOrchestratorMethod(objectToString(doc.get(RodaConstants.JOB_ORCHESTRATOR_METHOD)));
     job.setObjectIds(objectToListString(doc.get(RodaConstants.JOB_OBJECT_IDS)));
+    job.setObjectIdsToAipIds(
+      ModelUtils.getMapFromJson(objectToString(doc.get(RodaConstants.JOB_OBJECT_IDS_TO_AIP_IDS))));
 
     return job;
   }

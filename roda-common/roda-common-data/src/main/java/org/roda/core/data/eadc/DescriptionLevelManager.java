@@ -52,7 +52,7 @@ public class DescriptionLevelManager implements Serializable {
    * 
    * @param descriptionLevels
    *          map read from the properties files
-   * */
+   */
   public DescriptionLevelManager(Map<Object, Object> descriptionLevels) {
     loadDescriptionLevelHierarchy(descriptionLevels);
   }
@@ -62,65 +62,65 @@ public class DescriptionLevelManager implements Serializable {
 
   /**
    * Non-cloned version of the list containing description levels
-   * */
-  public static List<String> getLevels() {
+   */
+  public List<String> getLevels() {
     return LEVELS;
   }
 
   /**
    * Non-cloned version of the list containing description levels
-   * */
-  public static List<DescriptionLevel> getDescriptionLevels() {
+   */
+  public List<DescriptionLevel> getDescriptionLevels() {
     return DESCRIPTION_LEVELS;
   }
 
   /**
    * Non-cloned version of the list containing description levels info
-   * */
-  public static List<DescriptionLevelInfo> getDescriptionLevelsInfo() {
+   */
+  public List<DescriptionLevelInfo> getDescriptionLevelsInfo() {
     return DESCRIPTION_LEVELS_INFO;
   }
 
   /**
    * Non-cloned version of the list containing child description levels from
    * specified parentLevel
-   * */
-  public static List<DescriptionLevel> getChildLevels(String parentLevel) {
+   */
+  public List<DescriptionLevel> getChildLevels(String parentLevel) {
     return PARENT_TO_CHILDREN_MAPPING.get(parentLevel);
   }
 
   /**
    * Non-cloned version of the list containing child description levels from
    * specified parentLevel
-   * */
-  public static List<DescriptionLevel> getChildLevels(DescriptionLevel parentLevel) {
+   */
+  public List<DescriptionLevel> getChildLevels(DescriptionLevel parentLevel) {
     return PARENT_TO_CHILDREN_MAPPING.get(parentLevel.getLevel());
   }
 
   /**
    * Non-cloned version of the list containing parent description levels from
    * specified childLevel
-   * */
-  public static List<DescriptionLevel> getParentLevels(String childLevel) {
+   */
+  public List<DescriptionLevel> getParentLevels(String childLevel) {
     return CHILDREN_TO_PARENT_MAPPING.get(childLevel);
   }
 
   /**
    * Non-cloned version of the list containing parent description levels from
    * specified childLevel
-   * */
-  public static List<DescriptionLevel> getParentLevels(DescriptionLevel childLevel) {
+   */
+  public List<DescriptionLevel> getParentLevels(DescriptionLevel childLevel) {
     return CHILDREN_TO_PARENT_MAPPING.get(childLevel.getLevel());
   }
 
   /**
    * Non-cloned version of the list containing root description levels
-   * */
-  public static List<DescriptionLevel> getRootDescriptionLevels() {
+   */
+  public List<DescriptionLevel> getRootDescriptionLevels() {
     return ROOT_DESCRIPTION_LEVELS;
   }
 
-  public static String getFirstRootLevel() {
+  public String getFirstRootLevel() {
     if (ROOT_DESCRIPTION_LEVELS.get(0) != null) {
       return ROOT_DESCRIPTION_LEVELS.get(0).getLevel();
     } else {
@@ -128,40 +128,40 @@ public class DescriptionLevelManager implements Serializable {
     }
   }
 
-  public static DescriptionLevel getFirstRootDescriptionLevel() {
+  public DescriptionLevel getFirstRootDescriptionLevel() {
     return ROOT_DESCRIPTION_LEVELS.get(0);
   }
 
   /**
    * Non-cloned version of the list containing representation description levels
-   * */
-  public static List<DescriptionLevel> getRepresentationsDescriptionLevels() {
+   */
+  public List<DescriptionLevel> getRepresentationsDescriptionLevels() {
     return REPRESENTATION_DESCRIPTION_LEVELS;
   }
 
   /**
    * Non-cloned version of the list containing leaf description levels
-   * */
+   */
   @Deprecated
-  public static List<DescriptionLevel> getLeafDescriptionLevels() {
+  public List<DescriptionLevel> getLeafDescriptionLevels() {
     return LEAF_DESCRIPTION_LEVELS;
   }
 
   @Deprecated
-  public static String getFirstLeafLevel() {
+  public String getFirstLeafLevel() {
     return LEAF_DESCRIPTION_LEVELS.get(0).getLevel();
   }
 
   @Deprecated
-  public static DescriptionLevel getFirstLeafDescriptionLevel() {
+  public DescriptionLevel getFirstLeafDescriptionLevel() {
     return LEAF_DESCRIPTION_LEVELS.get(0);
   }
 
   /**
    * Non-cloned version of the list containing all but representations
    * description levels
-   * */
-  public static List<DescriptionLevel> getAllButRepresentationsDescriptionLevels() {
+   */
+  public List<DescriptionLevel> getAllButRepresentationsDescriptionLevels() {
     return ALL_BUT_REPRESENTATIONS_DESCRIPTION_LEVELS;
   }
 

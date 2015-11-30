@@ -9,10 +9,13 @@ package org.roda.wui.api.controllers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.adapter.sublist.Sublist;
+import org.roda.core.data.common.InvalidParameterException;
 import org.roda.core.data.common.NotFoundException;
 import org.roda.core.data.common.Pair;
 import org.roda.core.data.common.RodaConstants.JOB_TYPE;
@@ -58,12 +61,21 @@ public class JobsHelper {
     updatedJob.setUsername(user.getName());
 
     // serialize job to file & index it
-    RodaCoreFactory.getModelService().addJob(updatedJob, RodaCoreFactory.getLogPath());
+    RodaCoreFactory.getModelService().createJob(updatedJob, null);
 
     // send job to the orchestrator and return right away
     if ("runPluginOnTransferredResources".equalsIgnoreCase(job.getOrchestratorMethod())) {
-      RodaCoreFactory.getPluginOrchestrator().runPluginOnTransferredResources(
-        (Plugin<TransferredResource>) RodaCoreFactory.getPluginManager().getPlugin(updatedJob.getPlugin()),
+      Plugin<TransferredResource> plugin = (Plugin<TransferredResource>) RodaCoreFactory.getPluginManager()
+        .getPlugin(updatedJob.getPlugin());
+      Map<String, String> parameters = new HashMap<String, String>();
+      parameters.put("job.id", updatedJob.getId());
+      try {
+        plugin.setParameterValues(parameters);
+      } catch (InvalidParameterException e) {
+        LOGGER.error("Error setting plug-in parameters", e);
+      }
+
+      RodaCoreFactory.getPluginOrchestrator().runPluginOnTransferredResources(plugin,
         getTransferredResourcesFromObjectIds(user, updatedJob.getObjectIds()));
     }
     return updatedJob;

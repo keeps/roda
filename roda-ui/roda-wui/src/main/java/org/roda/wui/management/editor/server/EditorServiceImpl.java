@@ -21,8 +21,6 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.DescriptionObject;
 import org.roda.core.data.Producers;
@@ -38,7 +36,6 @@ import org.roda.core.data.eadc.ArrangementTableRow;
 import org.roda.core.data.eadc.BioghistChronitem;
 import org.roda.core.data.eadc.BioghistChronlist;
 import org.roda.core.data.eadc.DescriptionLevel;
-import org.roda.core.data.eadc.DescriptionLevelManager;
 import org.roda.core.data.eadc.EadCValue;
 import org.roda.core.data.eadc.PhysdescElement;
 import org.roda.core.data.eadc.Text;
@@ -49,6 +46,8 @@ import org.roda.core.data.v2.User;
 import org.roda.core.util.FileUtility;
 import org.roda.wui.management.editor.client.EditorService;
 import org.roda.wui.management.editor.client.ObjectPermissions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
@@ -189,8 +188,8 @@ public class EditorServiceImpl extends RemoteServiceServlet implements EditorSer
   public String createChild(String parentPID, String parentLevel) throws RODAException {
     String childPid;
     DescriptionLevel newLevel = null;
-    if (DescriptionLevelManager.getChildLevels(parentLevel).size() > 0) {
-      newLevel = new DescriptionLevel(DescriptionLevelManager.getChildLevels(parentLevel).get(0));
+    if (RodaCoreFactory.getDescriptionLevelManager().getChildLevels(parentLevel).size() > 0) {
+      newLevel = new DescriptionLevel(RodaCoreFactory.getDescriptionLevelManager().getChildLevels(parentLevel).get(0));
     } else {
       new InvalidDescriptionLevel("Cannot create child of " + parentLevel);
     }

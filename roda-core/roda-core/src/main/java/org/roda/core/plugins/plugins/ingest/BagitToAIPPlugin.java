@@ -10,15 +10,13 @@ package org.roda.core.plugins.plugins.ingest;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
 import org.roda.core.data.common.InvalidParameterException;
+import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.AIP;
@@ -26,9 +24,13 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.StorageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BagitToAIPPlugin implements Plugin<TransferredResource> {
   private static final Logger LOGGER = LoggerFactory.getLogger(BagitToAIPPlugin.class);
+
+  private Map<String, String> parameters;
 
   @Override
   public void init() throws PluginException {
@@ -61,27 +63,38 @@ public class BagitToAIPPlugin implements Plugin<TransferredResource> {
 
   @Override
   public Map<String, String> getParameterValues() {
-    return new HashMap<>();
+    return parameters;
   }
 
   @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
-    // no params
+    this.parameters = parameters;
   }
 
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<TransferredResource> list)
     throws PluginException {
-    for (TransferredResource bagit : list) {
-      Path bagitPath = Paths.get(bagit.getFullPath());
+
+    String jobId = getJobId();
+    for (TransferredResource transferredResource : list) {
+      Path bagitPath = Paths.get(transferredResource.getFullPath());
       LOGGER.debug("Converting " + bagitPath + " to AIP");
       try {
-        AIP aip = BagitToAIPPluginUtils.bagitToAip(bagitPath, model);
+        AIP aipCreated = BagitToAIPPluginUtils.bagitToAip(bagitPath, model);
+
+        // update job with mapping between transferred resource id e aip id
+        Job job = index.retrieve(Job.class, jobId);
+        job.addObjectIdToAipIdMapping(transferredResource.getId(), aipCreated.getId());
+        model.updateJob(job);
       } catch (Throwable e) {
         LOGGER.error("Error converting " + bagitPath + " to AIP: " + e.getMessage(), e);
       }
     }
     return null;
+  }
+
+  private String getJobId() {
+    return parameters.get("job.id");
   }
 
   @Override

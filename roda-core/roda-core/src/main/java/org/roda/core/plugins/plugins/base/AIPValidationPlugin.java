@@ -8,7 +8,6 @@
 package org.roda.core.plugins.plugins.base;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +28,8 @@ import org.slf4j.LoggerFactory;
 
 public class AIPValidationPlugin implements Plugin<AIP> {
   private final Logger logger = LoggerFactory.getLogger(getClass());
+
+  private Map<String, String> parameters;
 
   @Override
   public void init() throws PluginException {
@@ -57,17 +58,17 @@ public class AIPValidationPlugin implements Plugin<AIP> {
 
   @Override
   public List<PluginParameter> getParameters() {
-    return new ArrayList<>();
+    return new ArrayList<PluginParameter>();
   }
 
   @Override
   public Map<String, String> getParameterValues() {
-    return new HashMap<>();
+    return parameters;
   }
 
   @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
-    // no params
+    this.parameters = parameters;
   }
 
   @Override

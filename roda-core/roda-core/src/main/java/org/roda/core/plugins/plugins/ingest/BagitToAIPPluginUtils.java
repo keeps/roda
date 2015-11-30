@@ -58,7 +58,7 @@ public class BagitToAIPPluginUtils {
     generateMetadataFile(metadataFile, bagInfoTxt);
     Resource descriptiveMetadataResource = FSUtils.convertPathToResource(metadataFile.getParent(), metadataFile);
 
-    aip = model.createAIP(new HashMap<String, Set<String>>());
+    aip = model.createAIP(new HashMap<String, Set<String>>(), false, true);
 
     model.createDescriptiveMetadata(aip.getId(), "metadata.xml", (Binary) descriptiveMetadataResource, "metadata");
 
@@ -68,7 +68,8 @@ public class BagitToAIPPluginUtils {
     Path tempFolder = Files.createTempDirectory("temp");
     if (bag.getPayload() != null) {
       for (BagFile bagFile : bag.getPayload()) {
-        // FIXME this is being done because we don't support folders in a representation
+        // FIXME this is being done because we don't support folders in a
+        // representation
         String fileName = bagFile.getFilepath().replace("/", "_");
         File f = new File(tempFolder.toFile(), fileName);
         Files.copy(bagFile.newInputStream(), f.toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -76,6 +77,7 @@ public class BagitToAIPPluginUtils {
         model.createFile(aip.getId(), representationID, fileName, resource);
       }
     }
+    bag.close();
     FSUtils.deletePath(tempFolder);
     FSUtils.deletePath(metadataFile);
     return model.retrieveAIP(aip.getId());

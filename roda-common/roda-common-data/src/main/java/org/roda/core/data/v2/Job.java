@@ -52,7 +52,7 @@ public class Job implements Serializable {
   // plugin full class (e.g. org.roda.core.plugins.plugins.base.FixityPlugin)
   private String plugin = null;
   // plugin parameters
-  private Map<String, String> pluginParameters = new HashMap<String, String>();;
+  private Map<String, String> pluginParameters = new HashMap<String, String>();
 
   // resource type (e.g. bagit, e-ark sip, etc.)
   private RESOURCE_TYPE resourceType = null;
@@ -62,6 +62,8 @@ public class Job implements Serializable {
   private String orchestratorMethod = null;
   // list of object ids to act upon
   private List<String> objectIds = new ArrayList<String>();
+  // map between object ids and aip ids
+  private Map<String, String> objectIdsToAipIds = new HashMap<String, String>();
 
   // report id
   private String reportId = null;
@@ -89,6 +91,7 @@ public class Job implements Serializable {
     this.resourceType = job.getResourceType();
     this.orchestratorMethod = job.getOrchestratorMethod();
     this.objectIds = new ArrayList<String>(job.getObjectIds());
+    this.objectIdsToAipIds = new HashMap<>(job.getObjectIdsToAipIds());
   }
 
   public String getId() {
@@ -191,6 +194,14 @@ public class Job implements Serializable {
     return this;
   }
 
+  public Map<String, String> getObjectIdsToAipIds() {
+    return objectIdsToAipIds;
+  }
+
+  public void setObjectIdsToAipIds(Map<String, String> objectIdsToAipIds) {
+    this.objectIdsToAipIds = objectIdsToAipIds;
+  }
+
   public JOB_TYPE getType() {
     return type;
   }
@@ -207,6 +218,10 @@ public class Job implements Serializable {
   public Job setResourceType(RESOURCE_TYPE resourceType) {
     this.resourceType = resourceType;
     return this;
+  }
+
+  public void addObjectIdToAipIdMapping(String objectId, String aipId) {
+    getObjectIdsToAipIds().put(objectId, aipId);
   }
 
   @Override

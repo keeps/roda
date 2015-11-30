@@ -281,9 +281,13 @@ public class ModelService extends ModelObservable {
   }
 
   public AIP createAIP(Map<String, Set<String>> metadata, boolean notify) throws ModelServiceException {
+    return createAIP(metadata, true, notify);
+  }
+
+  public AIP createAIP(Map<String, Set<String>> metadata, boolean active, boolean notify) throws ModelServiceException {
 
     // set basic AIP information
-    ModelUtils.setAs(metadata, RodaConstants.STORAGE_META_ACTIVE, Boolean.TRUE);
+    ModelUtils.setAs(metadata, RodaConstants.STORAGE_META_ACTIVE, active);
     ModelUtils.setAs(metadata, RodaConstants.STORAGE_META_DATE_CREATED, new Date());
     ModelUtils.setAs(metadata, RodaConstants.STORAGE_META_DATE_MODIFIED, new Date());
 
@@ -692,7 +696,7 @@ public class ModelService extends ModelObservable {
           boolean notify = false;
           File fileUpdated = updateFile(aipId, representationId, file.getStoragePath().getName(), (Binary) file,
             createIfNotExists, notify);
-          notifyFileUpdated((SimpleFile)fileUpdated);
+          notifyFileUpdated((SimpleFile) fileUpdated);
           fileIDsToUpdate.add(fileUpdated.getStoragePath().getName());
         } else {
           // FIXME log error and continue???
@@ -1929,11 +1933,15 @@ public class ModelService extends ModelObservable {
 
   }
 
-  public void addJob(Job job, Path jobsDirectory) {
+  public void createJob(Job job, Path jobsDirectory) {
     // create job in storage
     // TODO
 
     // index it
     notifyJobCreated(job);
+  }
+
+  public void updateJob(Job job) {
+    notifyJobUpdated(job);
   }
 }
