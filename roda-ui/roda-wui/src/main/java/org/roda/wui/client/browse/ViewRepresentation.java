@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.SimpleFile;
 import org.roda.wui.client.common.FileList;
@@ -112,7 +113,10 @@ public class ViewRepresentation extends Composite {
     this.representationId = representationId;
 
     filesPanel = new FileList();
-    filesPanel.setFilter(new Filter(new SimpleFilterParameter()));
+    Filter f = new Filter();
+    f.add(new SimpleFilterParameter(RodaConstants.FILE_AIPID, aipId));
+    f.add(new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATIONID, representationId));
+    filesPanel.setFilter(f);
 
     initWidget(uiBinder.createAndBindUi(this));
 

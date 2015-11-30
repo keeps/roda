@@ -9,12 +9,16 @@ package org.roda.core.data.v2;
 
 import java.util.Map;
 
-public class FileFormat {
+public class FileFormat extends RODAObject {
+  private static final long serialVersionUID = -6855712550409310949L;
+  private String mimeType;
+  private String version;
+  private Map<String, String> formatRegistries;
 
-  private final String mimeType;
-  private final String version;
-  private final Map<String, String> formatRegistries;
-
+  public FileFormat(){
+    super(null,null);
+  }
+  
   public FileFormat(String mimeType, String version, Map<String, String> formatRegistries) {
     super();
     this.mimeType = mimeType;

@@ -131,6 +131,16 @@ public class IndexModelObserver implements ModelObserver {
         if (representation.getFileIds() != null && representation.getFileIds().size() > 0) {
           for (String fileId : representation.getFileIds()) {
             File file = model.retrieveFile(aip.getId(), representationId, fileId);
+            if(file.getFileFormat()==null){
+              LOGGER.error("FILE FORMAT NULL");
+            }else{
+              if(file.getFileFormat().getMimeType()==null){
+                LOGGER.error("MIME TYPE NULL");
+              }else{
+                LOGGER.error("MIMETYPE: "+file.getFileFormat().getMimeType());
+              }
+            }
+            
             SolrInputDocument fileDocument = SolrUtils.fileToSolrDocument(file);
             index.add(RodaConstants.INDEX_FILE, fileDocument);
           }

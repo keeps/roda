@@ -109,16 +109,16 @@
    <field name="uuid" type="string" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 
    <field name="aipId" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
-   <field name="fileId" type="string" indexed="true" stored="true" required="false" multiValued="true" /> 
-   <field name="formatMimetype" type="string" indexed="true" stored="true" required="false" multiValued="true" />
-   <field name="formatVersion" type="string" indexed="true" stored="true" required="false" multiValued="true" /> 
-   <field name="representationId" type="string" indexed="true" stored="true" required="false" multiValued="true" /> 
-   <!-- <field name="storagePath" type="string" indexed="true" stored="true" required="false" multiValued="true" /> -->
-   <field name="isEntryPoint" type="boolean" indexed="true" stored="true" required="false" multiValued="true" /> 
-   <field name="fileFormat" type="string" indexed="true" stored="true" required="false" multiValued="true" /> 
-   <field name="originalName" type="string" indexed="true" stored="true" required="false" multiValued="true" /> 
-   <field name="size" type="long" indexed="true" stored="true" required="false" multiValued="true" /> 
-   <field name="isFile" type="boolean" indexed="true" stored="true" required="false" multiValued="true" /> 
+   <field name="fileId" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
+   <field name="formatMimetype" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="formatVersion" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
+   <field name="representationId" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
+   <!-- <field name="storagePath" type="string" indexed="true" stored="true" required="false" multiValued="false" /> -->
+   <field name="isEntryPoint" type="boolean" indexed="true" stored="true" required="false" multiValued="false" /> 
+   <field name="fileFormat" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
+   <field name="originalName" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
+   <field name="size" type="long" indexed="true" stored="true" required="false" multiValued="false" /> 
+   <field name="isFile" type="boolean" indexed="true" stored="true" required="false" multiValued="false" /> 
    
    <!-- Dynamic field definitions allow using convention over configuration
        for fields via the specification of patterns to match field names. 

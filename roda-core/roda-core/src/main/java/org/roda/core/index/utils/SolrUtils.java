@@ -1388,8 +1388,8 @@ public class SolrUtils {
     doc.addField(RodaConstants.FILE_UUID, UUID.randomUUID().toString());
     doc.addField(RodaConstants.FILE_ID, getId(file.getAipId(), file.getRepresentationId(), file.getId()));
     doc.addField(RodaConstants.FILE_AIPID, file.getAipId());
-    doc.addField(RodaConstants.FILE_FORMAT_MIMETYPE, file.getFileFormat().getMimeType());
-    doc.addField(RodaConstants.FILE_FORMAT_VERSION, file.getFileFormat().getVersion());
+    doc.addField(RodaConstants.FILE_FORMAT_MIMETYPE, file.getFileFormat().getMimeType()!=null?file.getFileFormat().getMimeType():"");
+    doc.addField(RodaConstants.FILE_FORMAT_VERSION, file.getFileFormat().getVersion()!=null?file.getFileFormat().getVersion():"");
     doc.addField(RodaConstants.FILE_FILEID, file.getId());
     doc.addField(RodaConstants.FILE_REPRESENTATIONID, file.getRepresentationId());
     doc.addField(RodaConstants.FILE_ISENTRYPOINT, file.isEntryPoint());
@@ -1408,6 +1408,7 @@ public class SolrUtils {
     String fileId = objectToString(doc.get(RodaConstants.FILE_FILEID));
     boolean entryPoint = objectToBoolean(doc.get(RodaConstants.FILE_ISENTRYPOINT));
     String mimetype = objectToString(doc.get(RodaConstants.FILE_FORMAT_MIMETYPE));
+    LOGGER.error("solrDocumentToFile "+mimetype);
     String version = objectToString(doc.get(RodaConstants.FILE_FORMAT_VERSION));
     String representationId = objectToString(doc.get(RodaConstants.FILE_REPRESENTATIONID));
     String originalName = objectToString(doc.get(RodaConstants.FILE_ORIGINALNAME));
@@ -1416,14 +1417,7 @@ public class SolrUtils {
     // FIXME how to restore format registries
     //
     FileFormat fileFormat = new FileFormat(mimetype, version, new HashMap<String, String>());
-
-    StoragePath storagePath = null;
-    try {
-      storagePath = DefaultStoragePath.parse(objectToString(doc.get(RodaConstants.FILE_STORAGE_PATH)));
-    } catch (StorageServiceException sse) {
-      LOGGER.error("Error parsing StoragePath " + objectToString(doc.get(RodaConstants.FILE_STORAGE_PATH)));
-    }
-    File file = new File(fileId, aipId, representationId, entryPoint, fileFormat, storagePath,originalName,size,isFile );
+    SimpleFile file = new SimpleFile(fileId, aipId, representationId, entryPoint, fileFormat,originalName,size,isFile );
     return file;
   }
 }

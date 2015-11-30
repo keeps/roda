@@ -75,7 +75,7 @@ public class FileList extends AsyncTableCell<SimpleFile> {
 
       @Override
       public String getValue(SimpleFile file) {
-        return (file.getFileFormat() != null && !file.getFileFormat().getMimeType().isEmpty())
+        return (file.getFileFormat() != null && file.getFileFormat().getMimeType()!=null && !file.getFileFormat().getMimeType().isEmpty())
           ? file.getFileFormat().getMimeType() : "";
       }
     };
@@ -121,17 +121,16 @@ public class FileList extends AsyncTableCell<SimpleFile> {
       callback.onSuccess(null);
     } else {
       // calculate sorter
-      // TODO define sorters
       Sorter sorter = new Sorter();
       for (int i = 0; i < columnSortList.size(); i++) {
         ColumnSortInfo columnSortInfo = columnSortList.get(i);
         String sortParameterKey;
         if (columnSortInfo.getColumn().equals(filenameColumn)) {
-          sortParameterKey = RodaConstants.SDO_TITLE;
+          sortParameterKey = RodaConstants.FILE_ORIGINALNAME;
         } else if (columnSortInfo.getColumn().equals(lengthColumn)) {
-          sortParameterKey = RodaConstants.SDO_DATE_INITIAL;
+          sortParameterKey = RodaConstants.FILE_SIZE;
         } else if (columnSortInfo.getColumn().equals(mimetypeColumn)) {
-          sortParameterKey = RodaConstants.SDO_DATE_FINAL;
+          sortParameterKey = RodaConstants.FILE_FORMAT_MIMETYPE;
         } else {
           sortParameterKey = null;
         }

@@ -7,23 +7,26 @@
  */
 package org.roda.core.data.v2;
 
-import java.io.Serializable;
-
-public class SimpleFile implements Serializable {
+public class SimpleFile extends RODAObject {
 
   private static final long serialVersionUID = 3303019735787641534L;
 
-  private final String id;
-  private final String aipId;
-  private final String representationId;
+  private String id = null;
+  private String aipId = null;
+  private String representationId = null;
 
-  private final boolean entryPoint;
-  private final FileFormat fileFormat;
+  private boolean entryPoint = false;
+  private FileFormat fileFormat = null;
   private String originalName = null;
   private long size = 0;
-  private boolean isFile;
+  private boolean isFile = false;
 
-  public SimpleFile(String id, String aipId, String representationId, boolean entryPoint, FileFormat fileFormat,String originalName, long size, boolean isFile) {
+  public SimpleFile() {
+    super(null, null);
+  }
+
+  public SimpleFile(String id, String aipId, String representationId, boolean entryPoint, FileFormat fileFormat,
+    String originalName, long size, boolean isFile) {
     super();
     this.id = id;
     this.aipId = aipId;
@@ -32,7 +35,7 @@ public class SimpleFile implements Serializable {
     this.fileFormat = fileFormat;
     this.size = size;
     this.originalName = originalName;
-    this.isFile = isFile; 
+    this.isFile = isFile;
   }
 
   public boolean isFile() {
@@ -43,27 +46,21 @@ public class SimpleFile implements Serializable {
     this.isFile = isFile;
   }
 
-
-
   public String getOriginalName() {
     return originalName;
   }
-
 
   public void setOriginalName(String originalName) {
     this.originalName = originalName;
   }
 
-
   public long getSize() {
     return size;
   }
 
-
   public void setSize(long size) {
     this.size = size;
   }
-
 
   /**
    * @return the id
