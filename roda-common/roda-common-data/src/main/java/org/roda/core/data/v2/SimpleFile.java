@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2;
 
+<<<<<<< f08b7e33aeedcf3a45edef5f63dfcbc68e51903c
 public class SimpleFile extends RODAObject {
 
   private static final long serialVersionUID = 3303019735787641534L;
@@ -27,12 +28,29 @@ public class SimpleFile extends RODAObject {
 
   public SimpleFile(String id, String aipId, String representationId, boolean entryPoint, FileFormat fileFormat,
     String originalName, long size, boolean isFile) {
+=======
+import java.io.Serializable;
+
+public class SimpleFile implements Serializable {
+
+  private static final long serialVersionUID = 3303019735787641534L;
+
+  private final String id;
+  private final String aipId;
+  private final String representationId;
+
+  private final boolean entryPoint;
+  private final FileFormat fileFormat;
+
+  public SimpleFile(String id, String aipId, String representationId, boolean entryPoint, FileFormat fileFormat) {
+>>>>>>> WIP - Cleaning of old classes
     super();
     this.id = id;
     this.aipId = aipId;
     this.representationId = representationId;
     this.entryPoint = entryPoint;
     this.fileFormat = fileFormat;
+<<<<<<< f08b7e33aeedcf3a45edef5f63dfcbc68e51903c
     this.size = size;
     this.originalName = originalName;
     this.isFile = isFile;
@@ -60,6 +78,8 @@ public class SimpleFile extends RODAObject {
 
   public void setSize(long size) {
     this.size = size;
+=======
+>>>>>>> WIP - Cleaning of old classes
   }
 
   /**
