@@ -9,34 +9,61 @@ package org.roda.core.data.v2;
 
 import java.io.Serializable;
 
-public class File implements Serializable {
+public class SimpleFile implements Serializable {
 
   private static final long serialVersionUID = 3303019735787641534L;
 
-  private String id = null;
-  private String aipId = null;
-  private String representationId = null;
+  private final String id;
+  private final String aipId;
+  private final String representationId;
 
-  private String filename = null;
-  private String length = null;
+  private final boolean entryPoint;
+  private final FileFormat fileFormat;
+  private String originalName = null;
+  private long size = 0;
+  private boolean isFile;
 
-  private boolean entryPoint = false;
-  private FileFormat fileFormat = null;
-
-  public File() {
-    super();
-  }
-
-  public File(String id, String aipId, String representationId, boolean entryPoint, FileFormat fileFormat) {
+  public SimpleFile(String id, String aipId, String representationId, boolean entryPoint, FileFormat fileFormat,String originalName, long size, boolean isFile) {
     super();
     this.id = id;
     this.aipId = aipId;
     this.representationId = representationId;
     this.entryPoint = entryPoint;
     this.fileFormat = fileFormat;
-    this.setFilename("teste.png");
-    this.setLength("12KB");
+    this.size = size;
+    this.originalName = originalName;
+    this.isFile = isFile; 
   }
+
+  public boolean isFile() {
+    return isFile;
+  }
+
+  public void setFile(boolean isFile) {
+    this.isFile = isFile;
+  }
+
+
+
+  public String getOriginalName() {
+    return originalName;
+  }
+
+
+  public void setOriginalName(String originalName) {
+    this.originalName = originalName;
+  }
+
+
+  public long getSize() {
+    return size;
+  }
+
+
+  public void setSize(long size) {
+    this.size = size;
+  }
+
 
   /**
    * @return the id
@@ -102,7 +129,7 @@ public class File implements Serializable {
     if (getClass() != obj.getClass()) {
       return false;
     }
-    File other = (File) obj;
+    SimpleFile other = (SimpleFile) obj;
     if (aipId == null) {
       if (other.aipId != null) {
         return false;
@@ -135,22 +162,6 @@ public class File implements Serializable {
       return false;
     }
     return true;
-  }
-
-  public String getFilename() {
-    return filename;
-  }
-
-  public void setFilename(String filename) {
-    this.filename = filename;
-  }
-
-  public String getLength() {
-    return length;
-  }
-
-  public void setLength(String length) {
-    this.length = length;
   }
 
 }

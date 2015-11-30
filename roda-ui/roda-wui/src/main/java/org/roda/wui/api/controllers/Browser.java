@@ -29,6 +29,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.RodaUser;
 import org.roda.core.data.v2.SimpleDescriptionObject;
+import org.roda.core.data.v2.SimpleFile;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.model.AIP;
 import org.roda.core.model.DescriptiveMetadata;
@@ -771,6 +772,26 @@ public class Browser extends RodaCoreService {
 
   public static boolean isTransferFullyInitialized(RodaUser user) {
     return BrowserHelper.isTransferFullyInitialized();
+  }
+
+  public static IndexResult<SimpleFile> getFiles(RodaUser user, Filter filter, Sorter sorter, Sublist sublist,
+    Facets facets, String localeString) throws GenericException {
+    Date startDate = new Date();
+
+    //TODO
+    // check user permissions
+    //UserUtility.checkRoles(user, BROWSE_ROLE);
+
+    // delegate
+    IndexResult<SimpleFile> files = BrowserHelper.findFiles(filter, sorter,
+      sublist, facets);
+
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, BROWSER_COMPONENT, "findFiles", null, duration, FILTER_PARAM, filter,
+      SORTER_PARAM, sorter, SUBLIST_PARAM, sublist);
+
+    return files;
   }
 
 }

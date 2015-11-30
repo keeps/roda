@@ -29,12 +29,11 @@ import org.roda.core.data.common.AuthorizationDeniedException;
 import org.roda.core.data.common.NotFoundException;
 import org.roda.core.data.common.RODAException;
 import org.roda.core.data.v2.EventPreservationObject;
-import org.roda.core.data.v2.File;
-import org.roda.core.data.v2.FileFormat;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.RepresentationPreservationObject;
 import org.roda.core.data.v2.RodaUser;
 import org.roda.core.data.v2.SimpleDescriptionObject;
+import org.roda.core.data.v2.SimpleFile;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.model.ValidationException;
 import org.roda.core.storage.Binary;
@@ -115,25 +114,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     }
   }
 
-  public IndexResult<File> getRepresentationFiles(Filter filter, Sorter sorter, Sublist sublist,
-    Facets facets, String localeString) {
-    /* TODO get result from core */  
-    IndexResult<File> result = new IndexResult<File>();
-    
-    result.setOffset(0);
-    result.setLimit(20);
-    result.setTotalCount(25);
-    result.setFacetResults(null);
-    
-    List<File> files = new ArrayList<File>();
-    
-    for (int i = 1; i <= 25; i++) {
-      files.add(new File(Integer.toString(i), "roda:13", "roda:14", false, new FileFormat("image/jpg", "1.0", null)));
-    }
-    
-    result.setResults(files);
-    
-    return result;
+  public IndexResult<SimpleFile> getRepresentationFiles(Filter filter, Sorter sorter, Sublist sublist, Facets facets,
+    String localeString) throws AuthorizationDeniedException, GenericException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    return Browser.getFiles(user, filter, sorter, sublist, facets, localeString);
   }
 
   public Long countDescriptiveMetadata(Filter filter) throws RODAException {

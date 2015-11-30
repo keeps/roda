@@ -21,6 +21,7 @@ import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.LogEntry;
 import org.roda.core.data.v2.Representation;
 import org.roda.core.data.v2.SIPReport;
+import org.roda.core.data.v2.SimpleFile;
 import org.roda.core.data.v2.User;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.AIP;
@@ -236,12 +237,12 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   @Override
-  public void fileCreated(File file) {
+  public void fileCreated(SimpleFile file) {
     addDocumentToIndex(RodaConstants.INDEX_FILE, SolrUtils.fileToSolrDocument(file), "Error creating File");
   }
 
   @Override
-  public void fileUpdated(File file) {
+  public void fileUpdated(SimpleFile file) {
     fileDeleted(file.getAipId(), file.getRepresentationId(), file.getId());
     fileCreated(file);
 

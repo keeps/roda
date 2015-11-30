@@ -58,6 +58,7 @@ import org.roda.core.data.v2.Representation;
 import org.roda.core.data.v2.RepresentationState;
 import org.roda.core.data.v2.RodaUser;
 import org.roda.core.data.v2.SimpleDescriptionObject;
+import org.roda.core.data.v2.SimpleFile;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.IndexServiceException;
@@ -1058,6 +1059,19 @@ public class BrowserHelper {
 
   public static boolean isTransferFullyInitialized() {
     return RodaCoreFactory.getFolderMonitor().isFullyInitialized();
+  }
+
+  public static IndexResult<SimpleFile> findFiles(Filter filter, Sorter sorter, Sublist sublist, Facets facets) throws GenericException {
+    IndexResult<SimpleFile> files;
+    try {
+      files = RodaCoreFactory.getIndexService().find(SimpleFile.class, filter, sorter, sublist, facets);
+      LOGGER.debug(String.format("findFiles(%1$s,%2$s,%3$s)=%4$s", filter, sorter, sublist, files));
+    } catch (IndexServiceException e) {
+      LOGGER.error("Error getting collections", e);
+      throw new GenericException("Error getting collections " + e.getMessage());
+    }
+
+    return files;
   }
 
 }

@@ -7,20 +7,13 @@
  */
 package org.roda.core.data.v2;
 
-import java.io.Serializable;
 import java.util.Map;
 
-public class FileFormat implements Serializable {
+public class FileFormat {
 
-  private static final long serialVersionUID = 1L;
-
-  private String mimeType = null;
-  private String version = null;
-  private Map<String, String> formatRegistries = null;
-
-  public FileFormat() {
-    super();
-  }
+  private final String mimeType;
+  private final String version;
+  private final Map<String, String> formatRegistries;
 
   public FileFormat(String mimeType, String version, Map<String, String> formatRegistries) {
     super();

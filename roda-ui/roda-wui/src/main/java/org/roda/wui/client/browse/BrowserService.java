@@ -21,10 +21,10 @@ import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.AuthorizationDeniedException;
 import org.roda.core.data.common.NotFoundException;
 import org.roda.core.data.common.RODAException;
-import org.roda.core.data.v2.File;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.RepresentationPreservationObject;
 import org.roda.core.data.v2.SimpleDescriptionObject;
+import org.roda.core.data.v2.SimpleFile;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.wui.client.search.SearchField;
 import org.roda.wui.common.client.GenericException;
@@ -244,6 +244,6 @@ public interface BrowserService extends RemoteService {
 
   boolean isTransferFullyInitialized() throws AuthorizationDeniedException, GenericException, NotFoundException;
 
-  IndexResult<File> getRepresentationFiles(Filter filter, Sorter sorter, Sublist sublist, Facets facets,
-    String localeString);
+  IndexResult<SimpleFile> getRepresentationFiles(Filter filter, Sorter sorter, Sublist sublist, Facets facets,
+    String localeString) throws AuthorizationDeniedException, GenericException;
 }

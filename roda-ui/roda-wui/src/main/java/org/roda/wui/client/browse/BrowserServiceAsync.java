@@ -18,10 +18,10 @@ import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RODAException;
-import org.roda.core.data.v2.File;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.RepresentationPreservationObject;
 import org.roda.core.data.v2.SimpleDescriptionObject;
+import org.roda.core.data.v2.SimpleFile;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.wui.client.search.SearchField;
 
@@ -199,5 +199,5 @@ public interface BrowserServiceAsync {
   void isTransferFullyInitialized(AsyncCallback<Boolean> callback);
 
   void getRepresentationFiles(Filter filter, Sorter sorter, Sublist sublist, Facets facets, String localeString,
-    AsyncCallback<IndexResult<File>> callback);
+    AsyncCallback<IndexResult<SimpleFile>> callback);
 }

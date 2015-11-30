@@ -13,8 +13,8 @@ import org.roda.core.data.adapter.sort.SortParameter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.File;
 import org.roda.core.data.v2.IndexResult;
+import org.roda.core.data.v2.SimpleFile;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.widgets.AsyncTableCell;
@@ -33,16 +33,16 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.view.client.ProvidesKey;
 
-public class FileList extends AsyncTableCell<File> {
+public class FileList extends AsyncTableCell<SimpleFile> {
 
   private static final int PAGE_SIZE = 20;
 
   private final ClientLogger logger = new ClientLogger(getClass().getName());
 
-  private Column<File, SafeHtml> iconColumn;
-  private TextColumn<File> filenameColumn;
-  private TextColumn<File> mimetypeColumn;
-  private TextColumn<File> lengthColumn;
+  private Column<SimpleFile, SafeHtml> iconColumn;
+  private TextColumn<SimpleFile> filenameColumn;
+  private TextColumn<SimpleFile> mimetypeColumn;
+  private TextColumn<SimpleFile> lengthColumn;
 
   public FileList() {
     this(null, null, null);
@@ -53,38 +53,38 @@ public class FileList extends AsyncTableCell<File> {
   }
 
   @Override
-  protected void configureDisplay(CellTable<File> display) {
-    iconColumn = new Column<File, SafeHtml>(new SafeHtmlCell()) {
+  protected void configureDisplay(CellTable<SimpleFile> display) {
+    iconColumn = new Column<SimpleFile, SafeHtml>(new SafeHtmlCell()) {
 
       @Override
-      public SafeHtml getValue(File arg0) {
+      public SafeHtml getValue(SimpleFile arg0) {
         // TODO Auto-generated method stub
         return null;
       }
     };
 
-    filenameColumn = new TextColumn<File>() {
+    filenameColumn = new TextColumn<SimpleFile>() {
 
       @Override
-      public String getValue(File file) {
-        return file.getFilename();
+      public String getValue(SimpleFile file) {
+        return file.getOriginalName();
       }
     };
 
-    mimetypeColumn = new TextColumn<File>() {
+    mimetypeColumn = new TextColumn<SimpleFile>() {
 
       @Override
-      public String getValue(File file) {
+      public String getValue(SimpleFile file) {
         return (file.getFileFormat() != null && !file.getFileFormat().getMimeType().isEmpty())
           ? file.getFileFormat().getMimeType() : "";
       }
     };
 
-    lengthColumn = new TextColumn<File>() {
+    lengthColumn = new TextColumn<SimpleFile>() {
 
       @Override
-      public String getValue(File file) {
-        return file.getLength();
+      public String getValue(SimpleFile file) {
+        return "" + file.getSize();
       }
     };
 
@@ -113,7 +113,7 @@ public class FileList extends AsyncTableCell<File> {
 
   @Override
   protected void getData(int start, int length, ColumnSortList columnSortList,
-    AsyncCallback<IndexResult<File>> callback) {
+    AsyncCallback<IndexResult<SimpleFile>> callback) {
     GWT.log("Getting data");
     Filter filter = getFilter();
     if (filter == null) {
@@ -153,11 +153,11 @@ public class FileList extends AsyncTableCell<File> {
   }
 
   @Override
-  protected ProvidesKey<File> getKeyProvider() {
-    return new ProvidesKey<File>() {
+  protected ProvidesKey<SimpleFile> getKeyProvider() {
+    return new ProvidesKey<SimpleFile>() {
 
       @Override
-      public Object getKey(File item) {
+      public Object getKey(SimpleFile item) {
         return item.getId();
       }
     };

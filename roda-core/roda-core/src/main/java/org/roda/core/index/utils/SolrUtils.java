@@ -81,6 +81,7 @@ import org.roda.core.data.common.RodaConstants.RESOURCE_TYPE;
 import org.roda.core.data.v2.AgentPreservationObject;
 import org.roda.core.data.v2.EventPreservationObject;
 import org.roda.core.data.v2.FacetFieldResult;
+import org.roda.core.data.v2.FileFormat;
 import org.roda.core.data.v2.Group;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.Job;
@@ -96,13 +97,13 @@ import org.roda.core.data.v2.RodaUser;
 import org.roda.core.data.v2.SIPReport;
 import org.roda.core.data.v2.SIPStateTransition;
 import org.roda.core.data.v2.SimpleDescriptionObject;
+import org.roda.core.data.v2.SimpleFile;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.data.v2.User;
 import org.roda.core.index.IndexServiceException;
 import org.roda.core.model.AIP;
 import org.roda.core.model.DescriptiveMetadata;
 import org.roda.core.model.File;
-import org.roda.core.model.FileFormat;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.ModelServiceException;
 import org.roda.core.model.utils.ModelUtils;
@@ -671,7 +672,7 @@ public class SolrUtils {
       indexName = RodaConstants.INDEX_SIP;
     } else if (resultClass.equals(Job.class)) {
       indexName = RodaConstants.INDEX_JOB;
-    } else if (resultClass.equals(File.class)) {
+    } else if (resultClass.equals(SimpleFile.class)) {
       indexName = RodaConstants.INDEX_FILE;
     } else {
       throw new IndexServiceException("Cannot find class index name: " + resultClass.getName(),
@@ -705,7 +706,7 @@ public class SolrUtils {
       ret = resultClass.cast(solrDocumentToTransferredResource(doc));
     } else if (resultClass.equals(Job.class)) {
       ret = resultClass.cast(solrDocumentToJob(doc));
-    } else if (resultClass.equals(File.class)) {
+    } else if (resultClass.equals(SimpleFile.class)) {
       ret = resultClass.cast(solrDocumentToFile(doc));
     } else {
       throw new IndexServiceException("Cannot find class index name: " + resultClass.getName(),
@@ -1382,7 +1383,7 @@ public class SolrUtils {
     return job;
   }
 
-  public static SolrInputDocument fileToSolrDocument(File file) {
+  public static SolrInputDocument fileToSolrDocument(SimpleFile file) {
     SolrInputDocument doc = new SolrInputDocument();
     doc.addField(RodaConstants.FILE_UUID, UUID.randomUUID().toString());
     doc.addField(RodaConstants.FILE_ID, getId(file.getAipId(), file.getRepresentationId(), file.getId()));
@@ -1391,14 +1392,13 @@ public class SolrUtils {
     doc.addField(RodaConstants.FILE_FORMAT_VERSION, file.getFileFormat().getVersion());
     doc.addField(RodaConstants.FILE_FILEID, file.getId());
     doc.addField(RodaConstants.FILE_REPRESENTATIONID, file.getRepresentationId());
-    doc.addField(RodaConstants.FILE_STORAGE_PATH, file.getStoragePath().asString());
     doc.addField(RodaConstants.FILE_ISENTRYPOINT, file.isEntryPoint());
     // FIXME how to index format registries if any
     doc.addField(RodaConstants.FILE_FILEFORMAT, "");
     return doc;
   }
 
-  public static File solrDocumentToFile(SolrDocument doc) {
+  public static SimpleFile solrDocumentToFile(SolrDocument doc) {
     String aipId = objectToString(doc.get(RodaConstants.FILE_AIPID));
     String fileId = objectToString(doc.get(RodaConstants.FILE_FILEID));
     boolean entryPoint = objectToBoolean(doc.get(RodaConstants.FILE_ISENTRYPOINT));

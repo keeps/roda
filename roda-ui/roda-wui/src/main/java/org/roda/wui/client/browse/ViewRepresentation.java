@@ -14,8 +14,8 @@ import java.util.List;
 
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
-import org.roda.core.data.v2.File;
 import org.roda.core.data.v2.IndexResult;
+import org.roda.core.data.v2.SimpleFile;
 import org.roda.wui.client.common.FileList;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.HistoryResolver;
@@ -129,15 +129,15 @@ public class ViewRepresentation extends Composite {
 
       @Override
       public void onSelectionChange(SelectionChangeEvent event) {
-        File file = filesPanel.getSelectionModel().getSelectedObject();
+        SimpleFile file = filesPanel.getSelectionModel().getSelectedObject();
 
       }
     });
 
-    filesPanel.addValueChangeHandler(new ValueChangeHandler<IndexResult<File>>() {
+    filesPanel.addValueChangeHandler(new ValueChangeHandler<IndexResult<SimpleFile>>() {
 
       @Override
-      public void onValueChange(ValueChangeEvent<IndexResult<File>> event) {
+      public void onValueChange(ValueChangeEvent<IndexResult<SimpleFile>> event) {
 
       }
     });

@@ -40,6 +40,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.UserAlreadyExistsException;
 import org.roda.core.data.v2.AgentPreservationObject;
 import org.roda.core.data.v2.EventPreservationObject;
+import org.roda.core.data.v2.FileFormat;
 import org.roda.core.data.v2.Group;
 import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.LogEntry;
@@ -49,6 +50,7 @@ import org.roda.core.data.v2.RepresentationFilePreservationObject;
 import org.roda.core.data.v2.RepresentationPreservationObject;
 import org.roda.core.data.v2.RepresentationState;
 import org.roda.core.data.v2.SIPReport;
+import org.roda.core.data.v2.SimpleFile;
 import org.roda.core.data.v2.User;
 import org.roda.core.metadata.v2.premis.PremisAgentHelper;
 import org.roda.core.metadata.v2.premis.PremisEventHelper;
@@ -690,7 +692,7 @@ public class ModelService extends ModelObservable {
           boolean notify = false;
           File fileUpdated = updateFile(aipId, representationId, file.getStoragePath().getName(), (Binary) file,
             createIfNotExists, notify);
-          notifyFileUpdated(fileUpdated);
+          notifyFileUpdated((SimpleFile)fileUpdated);
           fileIDsToUpdate.add(fileUpdated.getStoragePath().getName());
         } else {
           // FIXME log error and continue???
