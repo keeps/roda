@@ -1393,6 +1393,11 @@ public class SolrUtils {
     doc.addField(RodaConstants.FILE_FILEID, file.getId());
     doc.addField(RodaConstants.FILE_REPRESENTATIONID, file.getRepresentationId());
     doc.addField(RodaConstants.FILE_ISENTRYPOINT, file.isEntryPoint());
+    doc.addField(RodaConstants.FILE_ORIGINALNAME, file.getOriginalName());
+    doc.addField(RodaConstants.FILE_SIZE, file.getSize());
+    doc.addField(RodaConstants.FILE_ISFILE, file.isFile());
+    
+    
     // FIXME how to index format registries if any
     doc.addField(RodaConstants.FILE_FILEFORMAT, "");
     return doc;
@@ -1405,7 +1410,9 @@ public class SolrUtils {
     String mimetype = objectToString(doc.get(RodaConstants.FILE_FORMAT_MIMETYPE));
     String version = objectToString(doc.get(RodaConstants.FILE_FORMAT_VERSION));
     String representationId = objectToString(doc.get(RodaConstants.FILE_REPRESENTATIONID));
-
+    String originalName = objectToString(doc.get(RodaConstants.FILE_ORIGINALNAME));
+    long size = objectToLong(doc.get(RodaConstants.FILE_SIZE));
+    boolean isFile = objectToBoolean(doc.get(RodaConstants.FILE_ISFILE));
     // FIXME how to restore format registries
     //
     FileFormat fileFormat = new FileFormat(mimetype, version, new HashMap<String, String>());
@@ -1416,7 +1423,7 @@ public class SolrUtils {
     } catch (StorageServiceException sse) {
       LOGGER.error("Error parsing StoragePath " + objectToString(doc.get(RodaConstants.FILE_STORAGE_PATH)));
     }
-    File file = new File(fileId, aipId, representationId, entryPoint, fileFormat, storagePath);
+    File file = new File(fileId, aipId, representationId, entryPoint, fileFormat, storagePath,originalName,size,isFile );
     return file;
   }
 }

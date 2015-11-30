@@ -113,9 +113,13 @@
    <field name="formatMimetype" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    <field name="formatVersion" type="string" indexed="true" stored="true" required="false" multiValued="true" /> 
    <field name="representationId" type="string" indexed="true" stored="true" required="false" multiValued="true" /> 
-   <field name="storagePath" type="string" indexed="true" stored="true" required="false" multiValued="true" /> 
+   <!-- <field name="storagePath" type="string" indexed="true" stored="true" required="false" multiValued="true" /> -->
    <field name="isEntryPoint" type="boolean" indexed="true" stored="true" required="false" multiValued="true" /> 
    <field name="fileFormat" type="string" indexed="true" stored="true" required="false" multiValued="true" /> 
+   <field name="originalName" type="string" indexed="true" stored="true" required="false" multiValued="true" /> 
+   <field name="size" type="long" indexed="true" stored="true" required="false" multiValued="true" /> 
+   <field name="isFile" type="boolean" indexed="true" stored="true" required="false" multiValued="true" /> 
+   
    <!-- Dynamic field definitions allow using convention over configuration
        for fields via the specification of patterns to match field names. 
        EXAMPLE:  name="*_i" will match any field ending in _i (like myid_i, z_i)

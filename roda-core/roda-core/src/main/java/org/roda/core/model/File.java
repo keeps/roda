@@ -19,8 +19,8 @@ public class File extends SimpleFile implements Serializable {
   private final StoragePath storagePath;
 
   public File(String id, String aipId, String representationId, boolean entryPoint, FileFormat fileFormat,
-    StoragePath storagePath) {
-    super(id,aipId,representationId,entryPoint,fileFormat);
+    StoragePath storagePath, String originalName, long size, boolean isFile) {
+    super(id,aipId,representationId,entryPoint,fileFormat,originalName,size,isFile);
     this.storagePath = storagePath;
   }
 

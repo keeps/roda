@@ -1211,7 +1211,7 @@ public class ModelService extends ModelObservable {
       }
 
       return new File(binaryPath.getName(), ModelUtils.getAIPidFromStoragePath(binaryPath),
-        ModelUtils.getRepresentationIdFromStoragePath(binaryPath), entryPoint, fileFormat, binaryPath);
+        ModelUtils.getRepresentationIdFromStoragePath(binaryPath), entryPoint, fileFormat, binaryPath,binaryPath.getName(),((DefaultBinary) resource).getSizeInBytes(),true);
     } else {
       throw new ModelServiceException(
         "Error while trying to convert something that it isn't a Binary into a representation file",

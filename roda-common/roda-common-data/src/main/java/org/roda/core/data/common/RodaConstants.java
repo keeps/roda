@@ -397,4 +397,7 @@ public final class RodaConstants {
   public static final String FILE_ISENTRYPOINT = "isEntryPoint";
   public static final String FILE_FILEFORMAT = "fileFormat";
   public static final String FILE_UUID = "uuid";
+  public static final String FILE_ORIGINALNAME = "originalName";
+  public static final String FILE_SIZE = "size";
+  public static final String FILE_ISFILE = "isFile";
 }
