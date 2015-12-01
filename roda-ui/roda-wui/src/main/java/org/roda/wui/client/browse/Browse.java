@@ -39,7 +39,7 @@ import org.roda.wui.common.client.tools.JavascriptUtils;
 import org.roda.wui.common.client.tools.RestErrorOverlayType;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.Tools;
-import org.roda.wui.common.client.widgets.MessagePopup;
+import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsonUtils;
@@ -358,7 +358,7 @@ public class Browse extends Composite {
 
                 @Override
                 public void onFailure(Throwable caught) {
-                  MessagePopup.showError(messages.errorLoadingDescriptiveMetadata(caught.getMessage()));
+                  Toast.showError(messages.errorLoadingDescriptiveMetadata(caught.getMessage()));
                 }
 
                 @Override
@@ -400,7 +400,7 @@ public class Browse extends Composite {
 
                   @Override
                   public void onFailure(Throwable caught) {
-                    MessagePopup.showError(messages.errorLoadingPreservationMetadata(caught.getMessage()));
+                    Toast.showError(messages.errorLoadingPreservationMetadata(caught.getMessage()));
                   }
 
                   @Override
@@ -700,7 +700,7 @@ public class Browse extends Composite {
 
       @Override
       public void onFailure(Throwable caught) {
-        MessagePopup.showError("Error creating item");
+        Toast.showError("Error creating item");
       }
 
       @Override
@@ -724,7 +724,7 @@ public class Browse extends Composite {
 
         @Override
         public void onFailure(Throwable caught) {
-          MessagePopup.showError("Error deleteing item");
+          Toast.showError("Error deleteing item");
         }
 
         @Override

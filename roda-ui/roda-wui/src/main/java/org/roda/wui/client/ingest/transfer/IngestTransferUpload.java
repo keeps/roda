@@ -105,6 +105,9 @@ public class IngestTransferUpload extends Composite {
   @UiField
   HTML uploadForm;
 
+  @UiField
+  HTML uploadList;
+
   private TransferredResource resource;
 
   private IngestTransferUpload() {
@@ -157,17 +160,19 @@ public class IngestTransferUpload extends Composite {
     String uploadUrl = getUploadUrl();
 
     if (uploadUrl != null) {
-      SafeHtml html = SafeHtmlUtils.fromSafeConstant(
-        "<form id='upload' method='post' action='" + getUploadUrl() + "' enctype='multipart/form-data'>"
-          + "<div id='drop'>" + messages.ingestTransferUploadDropHere() + "<a>" + messages.ingestTransferUploadBrowseFiles()
-          + "</a>" + "<input type='file' name='upl' multiple='true' />" + "</div>" + "</form>");
+      SafeHtml html = SafeHtmlUtils.fromSafeConstant("<form id='upload' method='post' action='" + getUploadUrl()
+        + "' enctype='multipart/form-data'>" + "<div id='drop'>" + messages.ingestTransferUploadDropHere() + "<a>"
+        + messages.ingestTransferUploadBrowseFiles() + "</a>" + "<input type='file' name='upl' multiple='true' />"
+        + "</div>" + "</form>");
 
       uploadForm.setHTML(html);
+      uploadList.setHTML(SafeHtmlUtils.fromSafeConstant("<ul id='upload-list'></ul>"));
       JavascriptUtils.runMiniUploadForm();
     } else {
       uploadForm.setHTML(SafeHtmlUtils.EMPTY_SAFE_HTML);
     }
   }
+
 
   @UiHandler("done")
   void buttonDoneHandler(ClickEvent e) {

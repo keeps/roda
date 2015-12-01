@@ -9,10 +9,15 @@
 	
 	</ui:style>
 
-	<g:FlowPanel styleName="wui-ingest-transfer-upload" addStyleNames="wrapper skip_padding">
+	<ui:with field='messages' type='config.i18n.client.BrowseMessages' />
+
+	<g:FlowPanel styleName="wui-ingest-transfer-upload"
+		addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
-				<g:Label styleName="h1">Ingest transfer upload</g:Label>
+				<g:Label styleName="h1">
+					<ui:text from='{messages.ingestTransferUploadTitle}' />
+				</g:Label>
 				<g:FlowPanel styleName="browseItemPanel">
 					<g:SimplePanel styleName="browseItemIcon" ui:field="itemIcon" />
 					<g:FlowPanel styleName="browseItemPanelText">
@@ -21,8 +26,8 @@
 						<g:Label addStyleNames="browseItemDates" ui:field="itemDates" />
 					</g:FlowPanel>
 				</g:FlowPanel>
-				<g:HTML ui:field="uploadForm"/>
-				<g:HTML>
+				<g:HTML ui:field="uploadForm" />
+				<g:HTML  ui:field="uploadList">
 					<ul id="upload-list">
 						<!-- The file uploads will be shown here -->
 					</ul>
@@ -31,9 +36,11 @@
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel>
 					<g:Label addStyleNames="h4">
-						<ui:msg>Actions</ui:msg>
+						<ui:text from='{messages.sidebarActionsTitle}' />
 					</g:Label>
-					<g:Button addStyleNames="btn btn-play" ui:field="done">Done</g:Button>
+					<g:Button addStyleNames="btn btn-play" ui:field="done">
+						<ui:text from='{messages.ingestTransferUploadFinishButton}' />
+					</g:Button>
 				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>

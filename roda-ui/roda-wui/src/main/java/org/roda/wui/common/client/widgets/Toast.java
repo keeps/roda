@@ -10,19 +10,16 @@
  */
 package org.roda.wui.common.client.widgets;
 
-import org.roda.wui.common.client.images.CommonImageBundle;
 import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.ClickListener;
-import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PopupPanel;
-import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.CommonConstants;
 
@@ -30,14 +27,16 @@ import config.i18n.client.CommonConstants;
  * @author Luis Faria
  * 
  */
-public class MessagePopup extends PopupPanel {
+public class Toast extends PopupPanel {
+  private static final int PADDING = 10;
+
   private static final int SLOTS_NUMBER = 7;
 
-  private static final MessagePopup[] slots = new MessagePopup[SLOTS_NUMBER];
+  private static final Toast[] slots = new Toast[SLOTS_NUMBER];
 
   private static int currentSlot = 0;
 
-  private static int getNextSlot(MessagePopup next) {
+  private static int getNextSlot(Toast next) {
     if (slots[currentSlot] != null) {
       currentSlot = (currentSlot + 1) % SLOTS_NUMBER;
       if (slots[currentSlot] != null) {
@@ -60,11 +59,7 @@ public class MessagePopup extends PopupPanel {
     ERROR_MESSAGE, INFO
   }
 
-  private Image icon;
-
   private static final CommonConstants constants = (CommonConstants) GWT.create(CommonConstants.class);
-
-  private static CommonImageBundle commonImageBundle = (CommonImageBundle) GWT.create(CommonImageBundle.class);
 
   private final int slotNumber;
 
@@ -72,13 +67,11 @@ public class MessagePopup extends PopupPanel {
 
   private final AccessibleFocusPanel focus;
 
-  private final HorizontalPanel layout;
-
-  private final VerticalPanel messageLayout;
+  private final FlowPanel layout;
 
   private final Label titleLabel;
 
-  private final Label errorMessage;
+  private final Label messageLabel;
 
   private final Timer hideTimer;
 
@@ -89,35 +82,32 @@ public class MessagePopup extends PopupPanel {
    * @param title
    * @param message
    */
-  public MessagePopup(MessagePopupType type, String title, String message) {
+  public Toast(MessagePopupType type, String title, String message) {
     super(false);
     this.type = type;
     slotNumber = getNextSlot(this);
-    layout = new HorizontalPanel();
+    layout = new FlowPanel();
     focus = new AccessibleFocusPanel(layout);
-    messageLayout = new VerticalPanel();
     titleLabel = new Label(title);
-    errorMessage = new Label(message);
+    messageLabel = new Label(message);
 
-    messageLayout.add(titleLabel);
-    messageLayout.add(errorMessage);
     if (type.equals(MessagePopupType.ERROR_MESSAGE)) {
-      icon = commonImageBundle.bigRedCross().createImage();
-      layout.add(icon);
-      icon.addStyleName("error-popup-icon");
+      layout.addStyleName("toast-error");
     } else if (type.equals(MessagePopupType.INFO)) {
-      // TODO add green check icon
+      layout.addStyleName("toast-info");
     }
-    layout.add(messageLayout);
+
+    layout.add(titleLabel);
+    layout.add(messageLabel);
 
     setWidget(focus);
 
-    focus.addClickListener(new ClickListener() {
+    focus.addClickHandler(new ClickHandler() {
 
-      public void onClick(Widget sender) {
+      @Override
+      public void onClick(ClickEvent event) {
         hide();
       }
-
     });
 
     hideTimer = new Timer() {
@@ -126,11 +116,9 @@ public class MessagePopup extends PopupPanel {
       }
     };
 
-    layout.setCellWidth(messageLayout, "100%");
-    layout.addStyleName("wui-error-popup");
-    messageLayout.addStyleName("error-popup-message");
-    titleLabel.addStyleName("error-popup-message-title");
-    errorMessage.addStyleName("error-popup-message-details");
+    layout.addStyleName("wui-toast");
+    titleLabel.addStyleName("toast-title");
+    messageLabel.addStyleName("toast-message");
   }
 
   public void hide() {
@@ -148,11 +136,10 @@ public class MessagePopup extends PopupPanel {
         int slotOffset = 0;
         for (int i = 0; i < slotNumber; i++) {
           if (slots[i] != null) {
-            slotOffset += slots[i].getOffsetHeight() + 5;
+            slotOffset += slots[i].getOffsetHeight() + PADDING;
           }
         }
-        MessagePopup.this.setPopupPosition(Window.getClientWidth() - offsetWidth - 5,
-          Window.getScrollTop() + 5 + slotOffset);
+        Toast.this.setPopupPosition(Window.getClientWidth() - offsetWidth - PADDING, Window.getScrollTop() + PADDING + slotOffset);
       }
 
     });
@@ -167,7 +154,7 @@ public class MessagePopup extends PopupPanel {
    * @param message
    */
   public static void showError(String message) {
-    MessagePopup errorPopup = new MessagePopup(MessagePopupType.ERROR_MESSAGE, constants.alertErrorTitle(), message);
+    Toast errorPopup = new Toast(MessagePopupType.ERROR_MESSAGE, constants.alertErrorTitle(), message);
     errorPopup.start();
   }
 
@@ -178,7 +165,7 @@ public class MessagePopup extends PopupPanel {
    * @param message
    */
   public static void showError(String title, String message) {
-    MessagePopup errorPopup = new MessagePopup(MessagePopupType.ERROR_MESSAGE, title, message);
+    Toast errorPopup = new Toast(MessagePopupType.ERROR_MESSAGE, title, message);
     errorPopup.start();
   }
 
@@ -188,7 +175,7 @@ public class MessagePopup extends PopupPanel {
    * @param message
    */
   public static void showInfo(String title, String message) {
-    MessagePopup errorPopup = new MessagePopup(MessagePopupType.INFO, title, message);
+    Toast errorPopup = new Toast(MessagePopupType.INFO, title, message);
     errorPopup.start();
   }
 

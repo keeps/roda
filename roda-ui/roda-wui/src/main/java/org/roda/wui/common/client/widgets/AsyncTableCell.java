@@ -89,7 +89,7 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
           @Override
           public void onFailure(Throwable caught) {
             logger.error("Error getting data", caught);
-            MessagePopup.showError("Error getting data from server: " + caught.getMessage());
+            Toast.showError("Error getting data from server: " + caught.getMessage());
           }
 
           @Override

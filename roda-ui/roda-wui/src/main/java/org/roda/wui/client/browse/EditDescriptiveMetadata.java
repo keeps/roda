@@ -15,7 +15,7 @@ import java.util.List;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
-import org.roda.wui.common.client.widgets.MessagePopup;
+import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -151,7 +151,7 @@ public class EditDescriptiveMetadata extends Composite {
           updateErrors(e);
         } else {
           // TODO show error
-          MessagePopup.showError(caught.getMessage());
+          Toast.showError(caught.getMessage());
         }
       }
 
@@ -159,7 +159,7 @@ public class EditDescriptiveMetadata extends Composite {
       public void onSuccess(Void result) {
         errors.setText("");
         errors.setVisible(false);
-        MessagePopup.showInfo("Success", "Saved descriptive metadata file");
+        Toast.showInfo("Success", "Saved descriptive metadata file");
         Tools.newHistory(Browse.RESOLVER, aipId);
       }
     });
@@ -185,12 +185,12 @@ public class EditDescriptiveMetadata extends Composite {
       @Override
       public void onFailure(Throwable caught) {
         // TODO show error
-        MessagePopup.showError(caught.getMessage());
+        Toast.showError(caught.getMessage());
       }
 
       @Override
       public void onSuccess(Void result) {
-        MessagePopup.showInfo("Success", "Removed descriptive metadata file");
+        Toast.showInfo("Success", "Removed descriptive metadata file");
         Tools.newHistory(Browse.RESOLVER, aipId);
       }
     });

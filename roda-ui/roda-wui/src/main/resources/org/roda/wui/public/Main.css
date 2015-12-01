@@ -1562,7 +1562,7 @@
     font-weight: bold;
     color: #7f858a;
     border: 5px dashed #e6e7e9;
-    border-radius: 20px;
+    border-radius: 10px;
 }
 
 #drop a{
@@ -1570,7 +1570,7 @@
     padding: 10px 20px;
     color: #fff;
     font-size: 1.2rem;
-    border-radius: 30px;
+    border-radius: 2px;
     cursor: pointer;
     display: block;
     margin: 10px auto 0;

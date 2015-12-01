@@ -30,6 +30,7 @@ import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.SafeHtmlCell;
+import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.cell.client.ValueUpdater;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
@@ -42,6 +43,7 @@ import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.Header;
 import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.cellview.client.TextHeader;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.view.client.CellPreviewEvent;
@@ -202,7 +204,7 @@ public class TransferredResourceList extends AsyncTableCell<TransferredResource>
         fireOnCheckboxSelectionChanged();
       }
     });
-    
+
     addValueChangeHandler(new ValueChangeHandler<IndexResult<TransferredResource>>() {
 
       @Override
@@ -217,7 +219,26 @@ public class TransferredResourceList extends AsyncTableCell<TransferredResource>
     display.addColumn(isFileColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-files-o'></i>"));
     // display.addColumn(idColumn, "Id");
     display.addColumn(nameColumn, "Name");
-    display.addColumn(sizeColumn, "Size");
+
+    Header<String> sizeHeader = new TextHeader("Size");
+
+    Header<String> sizeFooter = new Header<String>(new TextCell()) {
+      @Override
+      public String getValue() {
+        List<TransferredResource> items = display.getVisibleItems();
+        if (items.size() == 0) {
+          return "";
+        } else {
+          long totalSize = 0;
+          for (TransferredResource item : items) {
+            totalSize += item.getSize();
+          }
+          return Humanize.readableFileSize(totalSize);
+        }
+      }
+    };
+
+    display.addColumn(sizeColumn, sizeHeader, sizeFooter);
     display.addColumn(creationDateColumn, "Date created");
     display.addColumn(ownerColumn, "Producer");
 
@@ -230,6 +251,8 @@ public class TransferredResourceList extends AsyncTableCell<TransferredResource>
     emptyInfo.addStyleName("my-list-transferredResource-empty-info");
 
     // idColumn.setCellStyleNames("nowrap");
+    sizeHeader.setHeaderStyleNames("text-align-right");
+    sizeFooter.setHeaderStyleNames("text-align-right");
     sizeColumn.setCellStyleNames("nowrap my-collections-table-cell-alignright");
     creationDateColumn.setCellStyleNames("nowrap my-collections-table-cell-alignright");
     ownerColumn.setCellStyleNames("nowrap");

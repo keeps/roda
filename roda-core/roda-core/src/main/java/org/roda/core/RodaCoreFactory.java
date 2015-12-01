@@ -466,13 +466,12 @@ public class RodaCoreFactory {
 
     Configuration rodaConfig = RodaCoreFactory.getRodaConfiguration();
     String SIPFolderPath = rodaConfig.getString("sip.folder");
-    int SIPTimeout = rodaConfig.getInt("sip.timeout");
     Path sipFolderPath = dataPath.resolve(SIPFolderPath);
     Date date = getFolderMonitorDate(sipFolderPath);
     sipFolderObserver = new IndexFolderObserver(solr, sipFolderPath);
     sipFolderMonitor = new FolderMonitorNIO(sipFolderPath, date, solr);
     sipFolderMonitor.addFolderObserver(sipFolderObserver);
-    LOGGER.debug("ISFULLYINITIALIZED: " + getFolderMonitor().isFullyInitialized());
+    LOGGER.debug("Transfer folder monitor is fully initialized? " + getFolderMonitor().isFullyInitialized());
   }
 
   public static Date getFolderMonitorDate(Path sipFolderPath) {

@@ -153,16 +153,15 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("From {0,localdatetime,predef:DATE_MEDIUM} to {1,localdatetime,predef:DATE_MEDIUM}")
   String titleDates(Date dateInitial, Date dateFinal);
+  
+  /****** INGEST TRANSFER **********/
+  
+  @DefaultMessage("Ingest transfer")
+  String ingestTransferTitle();
 
   @DefaultMessage("Created at {0,localdatetime,predef:DATE_TIME_MEDIUM}, with {1}, from {2}")
-  public String ingestTransferItemInfo(Date creationDate, String readableFileSize, String owner);
-
-  @DefaultMessage("Drop files or folders here")
-  String ingestTransferUploadDropHere();
-
-  @DefaultMessage("Choose files...")
-  String ingestTransferUploadBrowseFiles();
-
+  String ingestTransferItemInfo(Date creationDate, String readableFileSize, String owner);
+  
   @DefaultMessage("Confirm remove folder")
   String ingestTransferRemoveFolderConfirmDialogTitle();
 
@@ -219,6 +218,22 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("Please select a name for your new folder")
   String ingestTransferCreateFolderMessage();
+  
+  /****** INGEST TRANSFER UPLOAD *********/
+  
+  @DefaultMessage("Ingest transfer upload")
+  String ingestTransferUploadTitle();
+
+  @DefaultMessage("Drop files here")
+  String ingestTransferUploadDropHere();
+
+  @DefaultMessage("Choose files...")
+  String ingestTransferUploadBrowseFiles();
+  
+  @DefaultMessage("Done")
+  String ingestTransferUploadFinishButton();
+  
+  /******** DIALOG GENERIC **************/
 
   @DefaultMessage("Cancel")
   String dialogCancel();

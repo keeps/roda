@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 
 import org.roda.core.data.common.AuthorizationDeniedException;
 import org.roda.wui.client.main.CasForwardDialog;
-import org.roda.wui.common.client.widgets.MessagePopup;
+import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.GWT.UncaughtExceptionHandler;
@@ -294,7 +294,7 @@ public class ClientLogger implements IsSerializable {
       ClientLoggerService.Util.getInstance().error(classname, message, errorcallback);
 
       if (SHOW_ERROR_MESSAGES) {
-        MessagePopup.showError(message);
+        Toast.showError(message);
       }
     }
   }
@@ -326,7 +326,7 @@ public class ClientLogger implements IsSerializable {
 
       ClientLoggerService.Util.getInstance().error(classname, message, errorcallback);
       if (SHOW_ERROR_MESSAGES) {
-        MessagePopup.showError(message, error.getMessage()
+        Toast.showError(message, error.getMessage()
           + (error.getCause() != null ? "\nCause: " + error.getCause().getMessage() : ""));
       }
     }
@@ -353,7 +353,7 @@ public class ClientLogger implements IsSerializable {
       logger.log(Level.SEVERE, message);
       ClientLoggerService.Util.getInstance().fatal(classname, message, errorcallback);
       if (SHOW_ERROR_MESSAGES) {
-        MessagePopup.showError(message);
+        Toast.showError(message);
       }
     }
   }
@@ -382,7 +382,7 @@ public class ClientLogger implements IsSerializable {
       ClientLoggerService.Util.getInstance().fatal(classname, message, errorcallback);
 
       if (SHOW_ERROR_MESSAGES) {
-        MessagePopup.showError(message, error.getMessage()
+        Toast.showError(message, error.getMessage()
           + (error.getCause() != null ? "\nCause: " + error.getCause().getMessage() : ""));
       }
     }

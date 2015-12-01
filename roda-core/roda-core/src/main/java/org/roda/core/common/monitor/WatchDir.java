@@ -109,15 +109,7 @@ public class WatchDir implements Runnable {
   }
 
   public boolean isFullyInitialized() {
-    if (watchInitialized) {
-      if (threadReindex != null && !threadReindex.isAlive()) {
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      return false;
-    }
+    return watchInitialized && threadReindex != null && !threadReindex.isAlive();
   }
 
   public void setObservers(List<FolderObserver> obs) {

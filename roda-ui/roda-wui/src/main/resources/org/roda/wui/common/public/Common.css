@@ -166,7 +166,7 @@ pre>code {
 .sidebar .btn {
 	width: 160px;
 	margin-right: 10px;
-	margin-bottom: 5px;
+	margin-bottom: 7px;
 }
 
 
@@ -177,8 +177,8 @@ pre>code {
 }
 
 .btn {
-	border-radius: 15px;
-	padding: 5px 10px;
+	border-radius: 2px;
+	padding: 8px 10px;
 	border: none;
 	background-color: #089de3;
 	color: white;
@@ -273,6 +273,10 @@ pre>code {
 
 .nowrap {
 	white-space: nowrap;
+}
+
+.text-align-right {
+	text-align: right !important;
 }
 
 .my-collections-empty-info {
@@ -1528,31 +1532,29 @@ td.datePickerMonth, td.datePickerYear {
 	font-size: 9pt;
 }
 
-/** Error Popup **/
-.wui-error-popup {
-	width: 350px;
-	padding: 5px;
-	background-color: #58595b;
-	border: 1px solid #999;
+/** Toast **/
+.wui-toast {
+	width: auto;
+  	clear: both;
+	border-radius: 2px;
+	background-color: rgba(50,50,50,0.9);
+	padding: 5px 15px;
+  	font-size: 1.1rem;
+  	font-weight: 300;
+  	color: #fff;
 }
 
-.wui-error-popup .error-popup-icon {
-	margin: 3px;
+.wui-toast.toast-error {
+	background-color: rgba(217,0,0,0.9);
 }
 
-.wui-error-popup .error-popup-message {
+.wui-toast .toast-title {
+	font-size: 1.2rem;
+	font-weight: 600;
+}
+
+.wui-toast .toast-message {
 	
-}
-
-.wui-error-popup .error-popup-message-title {
-	font-size: 10pt;
-	color: white;
-	font-weight: bold;
-}
-
-.wui-error-popup .error-popup-message-details {
-	font-size: 9pt;
-	color: #999;
 }
 
 /** Lazy Vertical List **/
@@ -1579,7 +1581,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .wui-lazy-list-vertical .lazy-list-vertical-total {
-	text-align: right;
+	text-align: right !important;
 }
 
 .wui-lazy-list-vertical .lazy-list-vertical-print {

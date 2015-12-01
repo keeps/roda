@@ -14,7 +14,9 @@
 	<g:FlowPanel styleName="wui-ingest-transfer" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
-				<g:Label styleName="h1">Ingest transfer</g:Label>
+				<g:Label styleName="h1">
+					<ui:text from='{messages.ingestTransferTitle}' />
+				</g:Label>
 				<m:BreadcrumbPanel ui:field="breadcrumb" />
 				<g:FlowPanel styleName="browseItemPanel">
 					<g:SimplePanel styleName="browseItemIcon" ui:field="itemIcon" />

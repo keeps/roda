@@ -18,7 +18,7 @@ import org.roda.wui.client.browse.TimelineInfo.HotZone;
 import org.roda.wui.client.browse.TimelineInfo.Phase;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.widgets.LoadingPopup;
-import org.roda.wui.common.client.widgets.MessagePopup;
+import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
@@ -219,7 +219,7 @@ public class PreservationMetadataPanel extends Composite {
             timelineRender = new PreservationTimeLineRender(timelineInfo, DateTime.YEAR(), DateTime.YEAR());
             update();
           } catch (Throwable e) {
-            MessagePopup.showError(e.getClass().getName() + ": " + e.getMessage());
+            Toast.showError(e.getClass().getName() + ": " + e.getMessage());
             logger.error("Error getting preservation timeline", e);
           } finally {
             loading.hide();

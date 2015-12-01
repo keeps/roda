@@ -38,7 +38,7 @@ import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.Tools;
-import org.roda.wui.common.client.widgets.MessagePopup;
+import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -206,6 +206,7 @@ public class IngestTransfer extends Composite {
           : messages.ingestTransferButtonRemoveSelectedItems());
         startIngest.setText(selected.isEmpty() ? messages.ingestTransferButtonIngestWholeFolder()
           : messages.ingestTransferButtonIngestSelectedItems());
+        updateVisibles();
       }
     });
 
@@ -273,8 +274,8 @@ public class IngestTransfer extends Composite {
     if (historyTokens.size() == 0) {
       view();
       callback.onSuccess(this);
-    } else
-      if (historyTokens.size() > 1 && historyTokens.get(0).equals(IngestTransferUpload.RESOLVER.getHistoryToken())) {
+    } else if (historyTokens.size() > 1
+      && historyTokens.get(0).equals(IngestTransferUpload.RESOLVER.getHistoryToken())) {
       IngestTransferUpload.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else {
       String transferredResourceId = getTransferredResourceIdFromPath(historyTokens);
@@ -300,7 +301,7 @@ public class IngestTransfer extends Composite {
                   }
                 });
               } else {
-                MessagePopup.showError(caught.getClass().getSimpleName(), caught.getMessage());
+                Toast.showError(caught.getClass().getSimpleName(), caught.getMessage());
                 Tools.newHistory(IngestTransfer.RESOLVER);
               }
 
@@ -341,7 +342,7 @@ public class IngestTransfer extends Composite {
     startIngest.setVisible(resource != null);
     createFolder.setVisible(resource == null || !resource.isFile());
     uploadFiles.setVisible(resource != null && !resource.isFile());
-    remove.setVisible(resource != null);
+    remove.setEnabled(resource != null || !transferredResourceList.getSelected().isEmpty());
   }
 
   @UiHandler("uploadFiles")
@@ -367,7 +368,7 @@ public class IngestTransfer extends Composite {
 
             @Override
             public void onFailure(Throwable caught) {
-              MessagePopup.showError(caught.getClass().getSimpleName(), caught.getMessage());
+              Toast.showError(caught.getClass().getSimpleName(), caught.getMessage());
             }
 
             @Override
@@ -394,7 +395,7 @@ public class IngestTransfer extends Composite {
 
             @Override
             public void onFailure(Throwable caught) {
-              MessagePopup.showError(caught.getMessage());
+              Toast.showError(caught.getMessage());
             }
 
             @Override
@@ -405,12 +406,12 @@ public class IngestTransfer extends Composite {
 
                   @Override
                   public void onFailure(Throwable caught) {
-                    MessagePopup.showError("Error removing", caught.getMessage());
+                    Toast.showError("Error removing", caught.getMessage());
                   }
 
                   @Override
                   public void onSuccess(Void result) {
-                    MessagePopup.showInfo(messages.ingestTransferRemoveSuccessTitle(),
+                    Toast.showInfo(messages.ingestTransferRemoveSuccessTitle(),
                       messages.ingestTransferRemoveSuccessMessage(1));
                     Tools.newHistory(RESOLVER, getPathFromTransferredResourceId(resource.getParentId()));
                   }
@@ -436,7 +437,7 @@ public class IngestTransfer extends Composite {
 
           @Override
           public void onFailure(Throwable caught) {
-            MessagePopup.showError(caught.getMessage());
+            Toast.showError(caught.getMessage());
           }
 
           @Override
@@ -446,13 +447,13 @@ public class IngestTransfer extends Composite {
 
                 @Override
                 public void onFailure(Throwable caught) {
-                  MessagePopup.showError("Error", caught.getMessage());
+                  Toast.showError("Error", caught.getMessage());
                   transferredResourceList.refresh();
                 }
 
                 @Override
                 public void onSuccess(Void result) {
-                  MessagePopup.showInfo(messages.ingestTransferRemoveSuccessTitle(),
+                  Toast.showInfo(messages.ingestTransferRemoveSuccessTitle(),
                     messages.ingestTransferRemoveSuccessMessage(idsToRemove.size()));
                   transferredResourceList.refresh();
                 }
@@ -468,6 +469,7 @@ public class IngestTransfer extends Composite {
   void buttonStartIngestHandler(ClickEvent e) {
     if (resource != null) {
       // TODO start ingest
+      Toast.showInfo("Sorry", "Feature not yet implemented");
     }
   }
 

@@ -15,7 +15,7 @@ import java.util.List;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
-import org.roda.wui.common.client.widgets.MessagePopup;
+import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -129,7 +129,7 @@ public class CreateDescriptiveMetadata extends Composite {
           updateErrors(e);
         } else {
           // TODO show error
-          MessagePopup.showError(caught.getMessage());
+          Toast.showError(caught.getMessage());
         }
       }
 
@@ -137,7 +137,7 @@ public class CreateDescriptiveMetadata extends Composite {
       public void onSuccess(Void result) {
         errors.setText("");
         errors.setVisible(false);
-        MessagePopup.showInfo("Success", "Created descriptive metadata file");
+        Toast.showInfo("Success", "Created descriptive metadata file");
         Tools.newHistory(Browse.RESOLVER, aipId);
       }
     });
