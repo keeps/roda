@@ -19,8 +19,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.v2.Representation;
 import org.roda.core.model.DescriptiveMetadata;
 import org.roda.core.model.ModelService;
@@ -31,6 +30,8 @@ import org.roda.core.storage.Binary;
 import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.StoragePath;
 import org.roda.core.storage.StorageServiceException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -172,8 +173,8 @@ public class ValidationUtils {
     Path configBasePath) throws ValidationException {
     try {
       InputStream inputStream = binary.getContent().createInputStream();
-      InputStream schemaStream = RodaUtils.getResourceInputStream(configBasePath,
-        "schemas/" + descriptiveMetadataId + ".xsd", "Validating");
+      InputStream schemaStream = RodaCoreFactory
+        .getConfigurationFileAsStream("schemas/" + descriptiveMetadataId + ".xsd");
       if (schemaStream != null) {
         // FIXME is inputstream closed???
         Source xmlFile = new StreamSource(inputStream);
@@ -215,8 +216,7 @@ public class ValidationUtils {
   public static void validatePreservationBinary(Binary binary, Path configBasePath) throws ValidationException {
     try {
       InputStream inputStream = binary.getContent().createInputStream();
-      InputStream schemaStream = RodaUtils.getResourceInputStream(configBasePath, "schemas/premis-v2-0.xsd",
-        "Validating");
+      InputStream schemaStream = RodaCoreFactory.getConfigurationFileAsStream("schemas/premis-v2-0.xsd");
       if (schemaStream != null) {
         Source xmlFile = new StreamSource(inputStream);
         SchemaFactory schemaFactory = SchemaFactory.newInstance(W3C_XML_SCHEMA_NS_URI);

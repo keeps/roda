@@ -7,14 +7,8 @@ import java.util.Map;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
-import org.roda.core.data.adapter.filter.Filter;
-import org.roda.core.data.adapter.filter.OneOfManyFilterParameter;
-import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.InvalidParameterException;
 import org.roda.core.data.common.NotFoundException;
-import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.IndexResult;
-import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.IndexServiceException;
@@ -22,6 +16,7 @@ import org.roda.core.model.AIP;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.plugins.PluginUtils;
 import org.roda.core.plugins.plugins.antivirus.AntivirusPlugin;
 import org.roda.core.plugins.plugins.base.AIPValidationPlugin;
 import org.roda.core.storage.StorageService;
@@ -103,15 +98,8 @@ public class SimpleIngestPlugin implements Plugin<TransferredResource> {
     }
 
     try {
-      Job job = index.retrieve(Job.class, getJobId());
-      // FIXME this should be a constant and the maximum number of objects sent
-      // to a plugin
-      int maxAips = 200;
-      IndexResult<AIP> aipsFromIndex = index.find(AIP.class,
-        new Filter(
-          new OneOfManyFilterParameter(RodaConstants.AIP_ID, new ArrayList<>(job.getObjectIdsToAipIds().values()))),
-        null, new Sublist(0, maxAips));
-      aips = aipsFromIndex.getResults();
+
+      aips = PluginUtils.getJobAIPs(index, parameters);
 
     } catch (IndexServiceException | NotFoundException e) {
       LOGGER.error("Error getting AIPs from index", e);
@@ -159,10 +147,6 @@ public class SimpleIngestPlugin implements Plugin<TransferredResource> {
   @Override
   public Plugin<TransferredResource> cloneMe() {
     return new SimpleIngestPlugin();
-  }
-
-  private String getJobId() {
-    return parameters.get("job.id");
   }
 
 }

@@ -38,6 +38,7 @@ import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.roda.core.CorporaConstants;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.data.v2.AgentPreservationObject;
 import org.roda.core.data.v2.EventPreservationObject;
@@ -48,12 +49,6 @@ import org.roda.core.data.v2.RepresentationFilePreservationObject;
 import org.roda.core.data.v2.RepresentationPreservationObject;
 import org.roda.core.data.v2.SIPReport;
 import org.roda.core.data.v2.SIPStateTransition;
-import org.roda.core.model.AIP;
-import org.roda.core.model.DescriptiveMetadata;
-import org.roda.core.model.File;
-import org.roda.core.model.ModelService;
-import org.roda.core.model.ModelServiceException;
-import org.roda.core.model.ValidationException;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.DefaultStoragePath;
@@ -103,6 +98,9 @@ public class ModelServiceTest {
     logPath = basePath.resolve("log");
     storage = new FileStorageService(basePath);
     model = new ModelService(storage);
+
+    System.setProperty("roda.home", basePath.toString());
+    RodaCoreFactory.instantiateTest();
   }
 
   @After

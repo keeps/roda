@@ -151,6 +151,8 @@ public class RodaCoreFactory {
   public static void instantiate() {
     if ("master".equalsIgnoreCase(getSystemProperty(RodaConstants.CORE_NODE_TYPE, "master"))) {
       instantiateMaster();
+    } else if ("test".equalsIgnoreCase(getSystemProperty(RodaConstants.CORE_NODE_TYPE, "test"))) {
+      instantiateTest();
     } else {
       instantiateWorker();
     }
@@ -162,6 +164,10 @@ public class RodaCoreFactory {
 
   public static void instantiateWorker() {
     instantiate(NodeType.WORKER);
+  }
+
+  public static void instantiateTest() {
+    instantiate(NodeType.TEST);
   }
 
   private static void instantiate(NodeType nodeType) {
@@ -224,9 +230,11 @@ public class RodaCoreFactory {
     // make sure all essential directories exist
     ensureAllEssentialDirectoriesExist();
 
-    // instantiate model related objects
-    storage = instantiateStorageService();
-    model = new ModelService(storage);
+    if (nodeType != NodeType.TEST) {
+      // instantiate model related objects
+      storage = instantiateStorageService();
+      model = new ModelService(storage);
+    }
   }
 
   private static StorageService instantiateStorageService() throws StorageServiceException {
@@ -298,6 +306,8 @@ public class RodaCoreFactory {
         getSystemProperty(RodaConstants.CORE_CLUSTER_PORT, "2551"),
         getSystemProperty(RodaConstants.CORE_NODE_HOSTNAME, "localhost"),
         getSystemProperty(RodaConstants.CORE_NODE_PORT, "0"));
+    } else if (nodeType == NodeType.TEST) {
+      // do nothing
     } else {
       LOGGER.error("Unknown node type \"" + nodeType + "\"");
       throw new RuntimeException("Unknown node type \"" + nodeType + "\"");
@@ -620,6 +630,24 @@ public class RodaCoreFactory {
     }
 
     return configUri;
+  }
+
+  public static InputStream getConfigurationFileAsStream(String configurationFile) {
+    Path config = RodaCoreFactory.getConfigPath().resolve(configurationFile);
+    InputStream inputStream = null;
+    try {
+      if (Files.exists(config)) {
+        inputStream = Files.newInputStream(config);
+        LOGGER.debug("Loading configuration from file " + config);
+      }
+    } catch (IOException e) {
+      // do nothing
+    }
+    if (inputStream == null) {
+      inputStream = RodaUtils.class.getResourceAsStream("/config/" + configurationFile);
+      LOGGER.debug("Loading configuration from classpath " + configurationFile);
+    }
+    return inputStream;
   }
 
   public static void reloadRodaConfigurationsAfterFileChange() {

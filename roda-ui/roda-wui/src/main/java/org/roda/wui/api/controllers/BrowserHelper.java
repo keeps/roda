@@ -410,7 +410,7 @@ public class BrowserHelper {
         filename = descriptiveMetadataBinary.getStoragePath().getName() + ".html";
         mediaType = MediaType.TEXT_HTML;
         String htmlDescriptive = HTMLUtils.descriptiveMetadataToHtml(descriptiveMetadataBinary,
-          ServerTools.parseLocale(language), RodaCoreFactory.getConfigPath());
+          ServerTools.parseLocale(language));
         stream = new StreamingOutput() {
           @Override
           public void write(OutputStream os) throws IOException, WebApplicationException {
@@ -593,7 +593,7 @@ public class BrowserHelper {
         String html = HTMLUtils.getRepresentationPreservationMetadataHtml(
           ModelUtils.getPreservationPath(aipId, representationId), storage, ServerTools.parseLocale(language),
           ApiUtils.processPagingParams(startAgent, limitAgent), ApiUtils.processPagingParams(startEvent, limitEvent),
-          ApiUtils.processPagingParams(startFile, limitFile), RodaCoreFactory.getConfigPath());
+          ApiUtils.processPagingParams(startFile, limitFile));
 
         StreamingOutput stream = new StreamingOutput() {
           @Override

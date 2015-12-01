@@ -49,24 +49,6 @@ public class RodaUtils {
 
   }
 
-  public static InputStream getResourceInputStream(Path configBasePath, String resourceRelativePath,
-    String logActionText) {
-    InputStream inputStream = null;
-    try {
-      if (configBasePath != null && Files.exists(configBasePath.resolve(resourceRelativePath))) {
-        inputStream = Files.newInputStream(configBasePath.resolve(resourceRelativePath));
-        LOGGER.trace(logActionText + " using file " + configBasePath.resolve(resourceRelativePath));
-      }
-    } catch (IOException e) {
-      // do nothing
-    }
-    if (inputStream == null) {
-      inputStream = RodaUtils.class.getResourceAsStream("/config/" + resourceRelativePath);
-      LOGGER.trace(logActionText + " using resource from classpath " + resourceRelativePath);
-    }
-    return inputStream;
-  }
-
   public static String dateToString(Date date) {
     String ret;
     if (date != null) {
@@ -162,7 +144,7 @@ public class RodaUtils {
     transformer.transform(text, new StreamResult(result));
   }
 
-  public static long getSizePath(Path startPath) throws IOException {
+  public static long getPathSize(Path startPath) throws IOException {
     final AtomicLong size = new AtomicLong(0);
 
     Files.walkFileTree(startPath, new SimpleFileVisitor<Path>() {

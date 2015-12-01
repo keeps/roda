@@ -26,6 +26,7 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.handler.loader.XMLLoader;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.index.IndexServiceException;
 import org.roda.core.storage.Binary;
@@ -48,8 +49,7 @@ public class CharacterizationPluginUtils {
        * RodaUtils.getResourceInputStream(configBasePath,
        * "crosswalks/ingest/other/characterization.xslt", "Ingesting");
        */
-      InputStream transformerStream = RodaUtils.getResourceInputStream(configBasePath,
-        "crosswalks/extraction/premis.xslt", "Characterization");
+      InputStream transformerStream = RodaCoreFactory.getConfigurationFileAsStream("crosswalks/ingest/other/premis.xslt");
 
       // TODO support the use of scripts for non-xml transformers
       Reader xsltReader = new InputStreamReader(transformerStream);

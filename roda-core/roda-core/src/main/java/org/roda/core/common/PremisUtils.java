@@ -29,8 +29,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.FileFormat;
 import org.roda.core.data.v2.Fixity;
 import org.roda.core.data.v2.RepresentationFilePreservationObject;
@@ -43,6 +42,8 @@ import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.FileUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -107,8 +108,7 @@ public class PremisUtils {
   public static boolean isPremisV2(Binary binary, Path configBasePath) throws IOException, SAXException {
     boolean premisV2 = true;
     InputStream inputStream = binary.getContent().createInputStream();
-    InputStream schemaStream = RodaUtils.getResourceInputStream(configBasePath, "schemas/premis-v2-0.xsd",
-      "Validating");
+    InputStream schemaStream = RodaCoreFactory.getConfigurationFileAsStream("schemas/premis-v2-0.xsd");
     Source xmlFile = new StreamSource(inputStream);
     SchemaFactory schemaFactory = SchemaFactory.newInstance(W3C_XML_SCHEMA_NS_URI);
     Schema schema = schemaFactory.newSchema(new StreamSource(schemaStream));
@@ -146,7 +146,7 @@ public class PremisUtils {
     try {
       Map<String, Object> stylesheetOpt = new HashMap<String, Object>();
       Reader reader = new InputStreamReader(binary.getContent().createInputStream());
-      transformerStream = RodaUtils.getResourceInputStream(configBasePath, "stylesheets/v2Tov3.xslt", "Validating");
+      transformerStream = RodaCoreFactory.getConfigurationFileAsStream("crosswalks/migration/v2Tov3.xslt");
       Reader xsltReader = new InputStreamReader(transformerStream);
       CharArrayWriter transformerResult = new CharArrayWriter();
       RodaUtils.applyStylesheet(xsltReader, reader, stylesheetOpt, transformerResult);

@@ -34,6 +34,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.roda.core.CorporaConstants;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.ApacheDS;
 import org.roda.core.common.LdapUtility;
 import org.roda.core.common.RodaUtils;
@@ -93,6 +94,9 @@ public class IndexServiceTest {
     indexPath = Files.createTempDirectory("indexTests");
     storage = new FileStorageService(basePath);
     model = new ModelService(storage);
+    
+    System.setProperty("roda.home", basePath.toString());
+    RodaCoreFactory.instantiateTest();
 
     // Configure Solr
     URL solrConfigURL = IndexServiceTest.class.getResource("/config/index/solr.xml");

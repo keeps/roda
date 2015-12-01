@@ -75,7 +75,7 @@ public final class RodaConstants {
   public static final SolrType DEFAULT_SOLR_TYPE = SolrType.EMBEDDED;
 
   public enum NodeType {
-    MASTER, WORKER
+    MASTER, WORKER, TEST
   }
 
   public static final NodeType DEFAULT_NODE_TYPE = NodeType.MASTER;
@@ -387,6 +387,8 @@ public final class RodaConstants {
   public static final String JOB_ORCHESTRATOR_METHOD = "orchestratorMethod";
   public static final String JOB_OBJECT_IDS = "objectIds";
   public static final String JOB_OBJECT_IDS_TO_AIP_IDS = "objectIdsToAipIds";
+
+  public static final String PLUGIN_PARAMS_JOB_ID = "job.id";
 
   public static final String FILE_ID = "id";
   public static final String FILE_AIPID = "aipId";

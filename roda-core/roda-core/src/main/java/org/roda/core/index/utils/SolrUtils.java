@@ -55,6 +55,7 @@ import org.apache.solr.common.SolrInputField;
 import org.apache.solr.common.params.FacetParams;
 import org.apache.solr.common.util.DateUtil;
 import org.apache.solr.handler.loader.XMLLoader;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.data.adapter.facet.FacetParameter;
 import org.roda.core.data.adapter.facet.Facets;
@@ -189,11 +190,9 @@ public class SolrUtils {
       Reader descMetadataReader = new InputStreamReader(inputStream);
       xsltFilename = binary.getStoragePath().getName() + ".xslt";
 
-      InputStream transformerStream = RodaUtils.getResourceInputStream(configBasePath,
-        "crosswalks/ingest/" + xsltFilename, "Ingesting");
+      InputStream transformerStream = RodaCoreFactory.getConfigurationFileAsStream("crosswalks/ingest/" + xsltFilename);
       if (transformerStream == null) {
-        transformerStream = RodaUtils.getResourceInputStream(configBasePath, "crosswalks/ingest/" + "plain.xslt",
-          "Ingesting");
+        transformerStream = RodaCoreFactory.getConfigurationFileAsStream("crosswalks/ingest/" + "plain.xslt");
       }
 
       // TODO support the use of scripts for non-xml transformers
@@ -1192,8 +1191,8 @@ public class SolrUtils {
 
       Reader descMetadataReader = new InputStreamReader(inputStream);
 
-      InputStream transformerStream = RodaUtils.getResourceInputStream(configBasePath,
-        "crosswalks/ingest/other/premis.xslt", "Ingesting");
+      InputStream transformerStream = RodaCoreFactory
+        .getConfigurationFileAsStream("crosswalks/ingest/other/premis.xslt");
       // TODO support the use of scripts for non-xml transformers
       Reader xsltReader = new InputStreamReader(transformerStream);
       CharArrayWriter transformerResult = new CharArrayWriter();

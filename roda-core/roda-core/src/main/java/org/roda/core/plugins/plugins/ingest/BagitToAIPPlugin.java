@@ -23,6 +23,7 @@ import org.roda.core.model.AIP;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.plugins.PluginUtils;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,7 +76,7 @@ public class BagitToAIPPlugin implements Plugin<TransferredResource> {
   public Report execute(IndexService index, ModelService model, StorageService storage, List<TransferredResource> list)
     throws PluginException {
 
-    String jobId = getJobId();
+    String jobId = PluginUtils.getJobId(parameters);
     for (TransferredResource transferredResource : list) {
       Path bagitPath = Paths.get(transferredResource.getFullPath());
       LOGGER.debug("Converting " + bagitPath + " to AIP");
@@ -91,10 +92,6 @@ public class BagitToAIPPlugin implements Plugin<TransferredResource> {
       }
     }
     return null;
-  }
-
-  private String getJobId() {
-    return parameters.get("job.id");
   }
 
   @Override
