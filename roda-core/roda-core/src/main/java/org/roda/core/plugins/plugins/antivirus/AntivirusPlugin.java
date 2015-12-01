@@ -27,6 +27,7 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.StoragePath;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StorageServiceException;
+import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,29 +46,25 @@ public class AntivirusPlugin implements Plugin<AIP> {
       "core.plugins.internal.virus_check.antiVirusClassname", "org.roda.core.plugins.plugins.antivirus.ClamAntiVirus");
 
     try {
-      LOGGER.info("Loading antivirus class " + antiVirusClassName); //$NON-NLS-1$
+      LOGGER.info("Loading antivirus class " + antiVirusClassName);
       setAntiVirus((AntiVirus) Class.forName(antiVirusClassName).newInstance());
       LOGGER.info("Using antivirus " + getAntiVirus().getClass().getName());
     } catch (ClassNotFoundException e) {
-      LOGGER.warn("Antivirus class " + antiVirusClassName //$NON-NLS-1$
-        + " not found - " + e.getMessage()); //$NON-NLS-1$
+      LOGGER.warn("Antivirus class " + antiVirusClassName + " not found - " + e.getMessage());
     } catch (InstantiationException e) {
       // not possible to create a new instance of the class
-      LOGGER.warn("Antivirus class " + antiVirusClassName //$NON-NLS-1$
-        + " instantiation exception - " + e.getMessage()); //$NON-NLS-1$
+      LOGGER.warn("Antivirus class " + antiVirusClassName + " instantiation exception - " + e.getMessage());
     } catch (IllegalAccessException e) {
       // not possible to create a new instance of the class
-      LOGGER.warn("Antivirus class " + antiVirusClassName //$NON-NLS-1$
-        + " illegal access exception - " + e.getMessage()); //$NON-NLS-1$
+      LOGGER.warn("Antivirus class " + antiVirusClassName + " illegal access exception - " + e.getMessage());
     }
 
     if (getAntiVirus() == null) {
       setAntiVirus(new AVGAntiVirus());
-      LOGGER.info("Using default antivirus " //$NON-NLS-1$
-        + getAntiVirus().getClass().getName());
+      LOGGER.info("Using default antivirus " + getAntiVirus().getClass().getName());
     }
 
-    LOGGER.info("init OK"); //$NON-NLS-1$
+    LOGGER.info("init OK");
   }
 
   @Override
@@ -108,9 +105,10 @@ public class AntivirusPlugin implements Plugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
+    Path tempDirectory = null;
     for (AIP aip : list) {
       try {
-        Path tempDirectory = Files.createTempDirectory("temp");
+        tempDirectory = Files.createTempDirectory("temp");
         StorageService tempStorage = new FileStorageService(tempDirectory);
         StoragePath aipPath = ModelUtils.getAIPpath(aip.getId());
         tempStorage.copy(storage, aipPath, aipPath);
@@ -120,10 +118,8 @@ public class AntivirusPlugin implements Plugin<AIP> {
           LOGGER.debug("AIP " + aip.getId() + " is clean: " + virusCheckResult.isClean());
           LOGGER.debug("AIP " + aip.getId() + " virus check report: " + virusCheckResult.getReport());
         } catch (RuntimeException e) {
-          LOGGER.debug("Exception running virus check on AIP " + aip.getId() //$NON-NLS-1$
-            + " - " + e.getMessage(), e); //$NON-NLS-1$
-          throw new PluginException("Exception running virus check on AIP " + aip.getId() //$NON-NLS-1$
-            + " - " + e.getMessage(), e); //$NON-NLS-1$
+          LOGGER.debug("Exception running virus check on AIP " + aip.getId() + " - " + e.getMessage(), e);
+          throw new PluginException("Exception running virus check on AIP " + aip.getId() + " - " + e.getMessage(), e);
         }
       } catch (StorageServiceException e) {
         LOGGER.error("Error processing AIP " + aip.getId(), e);
@@ -131,7 +127,9 @@ public class AntivirusPlugin implements Plugin<AIP> {
         LOGGER.error("Error creating temp folder for AIP " + aip.getId(), e);
       } finally {
         try {
-          storage.deleteResource(ModelUtils.getAIPpath(aip.getId()));
+          if (tempDirectory != null) {
+            FSUtils.deletePath(tempDirectory);
+          }
         } catch (StorageServiceException e) {
           LOGGER.error("Error removing temp storage", e);
         }

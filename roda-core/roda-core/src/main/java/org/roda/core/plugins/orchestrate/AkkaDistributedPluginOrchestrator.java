@@ -128,7 +128,8 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
     return clusterSystem;
   }
 
-  public ActorRef getFrontend() {
+  @Override
+  public ActorRef getCoordinator() {
     return frontend;
   }
 

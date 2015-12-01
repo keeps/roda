@@ -107,10 +107,11 @@ public class ManagementTasksResource extends RodaCoreService {
         }
       } else if ("orchestrator".equals(sub_resource)) {
         // TODO shouldn't this have its own REST endpoint???
+        // FIXME to be removed
         if ("execute".equals(task_id)) {
           // invoke plugins
 
-          ActorRef frontend = RodaCoreFactory.getAkkaDistributedPluginOrchestrator().getFrontend();
+          ActorRef frontend = RodaCoreFactory.getAkkaDistributedPluginOrchestrator().getCoordinator();
 
           Timeout t = new Timeout(10, TimeUnit.SECONDS);
           Future<Object> fut = Patterns.ask(frontend, new Work(params.get(0) + "-" + UUID.randomUUID().toString(), 1),

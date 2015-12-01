@@ -8,14 +8,11 @@
 package org.roda.core.plugins.orchestrate;
 
 import java.io.Serializable;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
@@ -33,6 +30,8 @@ import org.roda.core.plugins.orchestrate.akka.AkkaCoordinatorActor;
 import org.roda.core.plugins.orchestrate.akka.AkkaWorkerActor;
 import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.StorageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
@@ -85,6 +84,10 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   @Override
   public void shutdown() {
     workersSystem.shutdown();
+  }
+
+  public ActorRef getCoordinator() {
+    return boss;
   }
 
   @Override
@@ -307,28 +310,28 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
   }
 
-  public class PluginMessage<T> {
-    private List<? extends T> list;
-    private Plugin<? extends T> plugin;
+  public class PluginMessage<T extends Serializable> {
+    private List<T> list;
+    private Plugin<T> plugin;
 
-    public PluginMessage(List<? extends T> list, Plugin<? extends T> plugin) {
+    public PluginMessage(List<T> list, Plugin<T> plugin) {
       this.list = list;
       this.plugin = plugin;
     }
 
-    public List<? extends T> getList() {
+    public List<T> getList() {
       return list;
     }
 
-    public void setList(List<? extends T> list) {
+    public void setList(List<T> list) {
       this.list = list;
     }
 
-    public Plugin<? extends T> getPlugin() {
+    public Plugin<T> getPlugin() {
       return plugin;
     }
 
-    public void setPlugin(Plugin<? extends T> plugin) {
+    public void setPlugin(Plugin<T> plugin) {
       this.plugin = plugin;
     }
 

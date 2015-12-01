@@ -7,12 +7,12 @@
  */
 package org.roda.core.plugins.orchestrate.akka;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.orchestrate.AkkaEmbeddedPluginOrchestrator.PluginMessage;
 import org.roda.core.storage.StorageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import akka.actor.UntypedActor;
 
@@ -33,6 +33,8 @@ public class AkkaWorkerActor extends UntypedActor {
   public void onReceive(Object msg) throws Exception {
     if (msg instanceof PluginMessage) {
       PluginMessage message = (PluginMessage) msg;
+      // TODO should be init be done here as well as it is already being done in
+      // the plugin manager???
       message.getPlugin().init();
       try {
         message.getPlugin().execute(index, model, storage, message.getList());

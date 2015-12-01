@@ -16,6 +16,8 @@ import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.model.AIP;
 import org.roda.core.model.File;
 
+import akka.actor.ActorRef;
+
 public interface PluginOrchestrator {
 
   public <T extends Serializable> void runPluginFromIndex(Class<T> classToActOn, Filter filter, Plugin<T> plugin);
@@ -34,4 +36,5 @@ public interface PluginOrchestrator {
 
   public void runPluginOnTransferredResources(Plugin<TransferredResource> plugin, List<TransferredResource> paths);
 
+  public ActorRef getCoordinator();
 }

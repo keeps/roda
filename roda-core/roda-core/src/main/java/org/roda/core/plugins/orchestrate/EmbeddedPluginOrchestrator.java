@@ -9,7 +9,6 @@ package org.roda.core.plugins.orchestrate;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -18,8 +17,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
@@ -38,8 +35,12 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginOrchestrator;
 import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.StorageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
+import akka.actor.ActorRef;
 
 public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
 
@@ -77,6 +78,11 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   @Override
   public void shutdown() {
     // do nothing
+  }
+
+  @Override
+  public ActorRef getCoordinator() {
+    return null;
   }
 
   @Override

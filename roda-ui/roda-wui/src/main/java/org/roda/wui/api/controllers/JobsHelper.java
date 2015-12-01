@@ -9,13 +9,10 @@ package org.roda.wui.api.controllers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.adapter.sublist.Sublist;
-import org.roda.core.data.common.InvalidParameterException;
 import org.roda.core.data.common.NotFoundException;
 import org.roda.core.data.common.Pair;
 import org.roda.core.data.common.RodaConstants.JOB_TYPE;
@@ -25,13 +22,14 @@ import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.RodaUser;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.index.IndexServiceException;
-import org.roda.core.plugins.Plugin;
 import org.roda.wui.api.exceptions.ApiException;
 import org.roda.wui.api.exceptions.RequestNotValidException;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.common.client.GenericException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import akka.pattern.Patterns;
 
 public class JobsHelper {
   private static final Logger LOGGER = LoggerFactory.getLogger(JobsHelper.class);
@@ -63,21 +61,8 @@ public class JobsHelper {
     // serialize job to file & index it
     RodaCoreFactory.getModelService().createJob(updatedJob, null);
 
-    // send job to the orchestrator and return right away
-    if ("runPluginOnTransferredResources".equalsIgnoreCase(job.getOrchestratorMethod())) {
-      Plugin<TransferredResource> plugin = (Plugin<TransferredResource>) RodaCoreFactory.getPluginManager()
-        .getPlugin(updatedJob.getPlugin());
-      Map<String, String> parameters = new HashMap<String, String>();
-      parameters.put("job.id", updatedJob.getId());
-      try {
-        plugin.setParameterValues(parameters);
-      } catch (InvalidParameterException e) {
-        LOGGER.error("Error setting plug-in parameters", e);
-      }
+    Patterns.ask(RodaCoreFactory.getPluginOrchestrator().getCoordinator(), updatedJob, 5);
 
-      RodaCoreFactory.getPluginOrchestrator().runPluginOnTransferredResources(plugin,
-        getTransferredResourcesFromObjectIds(user, updatedJob.getObjectIds()));
-    }
     return updatedJob;
   }
 
@@ -93,12 +78,27 @@ public class JobsHelper {
     }
   }
 
+  // FIXME see if this method is being used
   private static List<TransferredResource> getTransferredResourcesFromObjectIds(RodaUser user, List<String> objectIds)
     throws NotFoundException {
     List<TransferredResource> res = new ArrayList<TransferredResource>();
     for (String objectId : objectIds) {
       try {
         res.add(BrowserHelper.retrieveTransferredResource(user.getId() + "/" + objectId));
+      } catch (GenericException e) {
+        LOGGER.error("Error retrieving transferred resource {}", objectId, e);
+      }
+    }
+    return res;
+  }
+
+  // FIXME see if this method is being used
+  public static List<TransferredResource> getTransferredResourcesFromObjectIds(String username, List<String> objectIds)
+    throws NotFoundException {
+    List<TransferredResource> res = new ArrayList<TransferredResource>();
+    for (String objectId : objectIds) {
+      try {
+        res.add(BrowserHelper.retrieveTransferredResource(username + "/" + objectId));
       } catch (GenericException e) {
         LOGGER.error("Error retrieving transferred resource {}", objectId, e);
       }
@@ -116,7 +116,7 @@ public class JobsHelper {
         new Sublist(new Sublist(pagingParams.getFirst(), pagingParams.getSecond())));
       jobs = getJobsFromIndexResult(find);
     } catch (IndexServiceException e) {
-
+      LOGGER.error("Error retrieving Jobs list", e);
     }
 
     return jobs;
