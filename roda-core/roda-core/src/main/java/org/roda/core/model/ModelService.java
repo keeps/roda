@@ -247,8 +247,8 @@ public class ModelService extends ModelObservable {
    * @return
    * @throws ModelServiceException
    */
-  public AIP createAIP(String aipId, StorageService sourceStorage, StoragePath sourcePath, boolean notify,
-    Path configBasePath) throws ModelServiceException {
+  public AIP createAIP(String aipId, StorageService sourceStorage, StoragePath sourcePath, boolean notify)
+    throws ModelServiceException {
     // TODO verify structure of source AIP and copy it to the storage
     // XXX possible optimization would be to allow move between storage
     // TODO support asReference
@@ -256,7 +256,7 @@ public class ModelService extends ModelObservable {
     AIP aip;
     try {
       Directory sourceDirectory = sourceStorage.getDirectory(sourcePath);
-      if (isAIPvalid(sourceModelService, sourceDirectory, FAIL_IF_NO_DESCRIPTIVE_METADATA_SCHEMA, configBasePath)) {
+      if (isAIPvalid(sourceModelService, sourceDirectory, FAIL_IF_NO_DESCRIPTIVE_METADATA_SCHEMA)) {
 
         storage.copy(sourceStorage, sourcePath, ModelUtils.getAIPpath(aipId));
         Directory newDirectory = storage.getDirectory(ModelUtils.getAIPpath(aipId));
@@ -308,20 +308,20 @@ public class ModelService extends ModelObservable {
     return aip;
   }
 
-  public AIP createAIP(String aipId, StorageService sourceStorage, StoragePath sourcePath, Path configBasePath)
+  public AIP createAIP(String aipId, StorageService sourceStorage, StoragePath sourcePath)
     throws ModelServiceException {
-    return createAIP(aipId, sourceStorage, sourcePath, true, configBasePath);
+    return createAIP(aipId, sourceStorage, sourcePath, true);
   }
 
   // TODO support asReference
-  public AIP updateAIP(String aipId, StorageService sourceStorage, StoragePath sourcePath, Path configBasePath)
+  public AIP updateAIP(String aipId, StorageService sourceStorage, StoragePath sourcePath)
     throws ModelServiceException {
     // TODO verify structure of source AIP and update it in the storage
     ModelService sourceModelService = new ModelService(sourceStorage);
     AIP aip;
     try {
       Directory sourceDirectory = sourceStorage.getDirectory(sourcePath);
-      if (isAIPvalid(sourceModelService, sourceDirectory, FAIL_IF_NO_DESCRIPTIVE_METADATA_SCHEMA, configBasePath)) {
+      if (isAIPvalid(sourceModelService, sourceDirectory, FAIL_IF_NO_DESCRIPTIVE_METADATA_SCHEMA)) {
         StoragePath aipPath = ModelUtils.getAIPpath(aipId);
 
         // FIXME is this the best way?
@@ -983,14 +983,13 @@ public class ModelService extends ModelObservable {
     }
   }
 
-  private boolean isAIPvalid(ModelService model, Directory directory, boolean failIfNoDescriptiveMetadataSchema,
-    Path configBasePath) {
+  private boolean isAIPvalid(ModelService model, Directory directory, boolean failIfNoDescriptiveMetadataSchema) {
     boolean valid = true;
 
     try {
       // validate metadata (against schemas)
       valid = ValidationUtils.isAIPDescriptiveMetadataValid(model, directory.getStoragePath().getName(),
-        failIfNoDescriptiveMetadataSchema, configBasePath);
+        failIfNoDescriptiveMetadataSchema);
 
       // FIXME validate others aspects
 
@@ -1215,7 +1214,8 @@ public class ModelService extends ModelObservable {
       }
 
       return new File(binaryPath.getName(), ModelUtils.getAIPidFromStoragePath(binaryPath),
-        ModelUtils.getRepresentationIdFromStoragePath(binaryPath), entryPoint, fileFormat, binaryPath,binaryPath.getName(),((DefaultBinary) resource).getSizeInBytes(),true);
+        ModelUtils.getRepresentationIdFromStoragePath(binaryPath), entryPoint, fileFormat, binaryPath,
+        binaryPath.getName(), ((DefaultBinary) resource).getSizeInBytes(), true);
     } else {
       throw new ModelServiceException(
         "Error while trying to convert something that it isn't a Binary into a representation file",
@@ -1944,6 +1944,7 @@ public class ModelService extends ModelObservable {
   public void updateJob(Job job) {
     notifyJobUpdated(job);
   }
+
   public void updateFile(File file) {
     notifyFileUpdated(file);
   }

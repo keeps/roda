@@ -21,7 +21,6 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.roda.core.CorporaConstants;
-import org.roda.core.common.ValidationUtils;
 import org.roda.core.index.IndexServiceException;
 import org.roda.core.index.IndexServiceTest;
 import org.roda.core.model.AIP;
@@ -100,10 +99,10 @@ public class ValidationUtilsTest {
     throws ModelServiceException, StorageServiceException, IndexServiceException, ValidationException {
     final String aipId = UUID.randomUUID().toString();
     final AIP aip = model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), null);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
     final DescriptiveMetadata descMetadata = model.retrieveDescriptiveMetadata(aipId,
       CorporaConstants.DESCRIPTIVE_METADATA_ID);
-    assertEquals(ValidationUtils.isDescriptiveMetadataValid(model, descMetadata, true, null), true);
+    assertEquals(ValidationUtils.isDescriptiveMetadataValid(model, descMetadata, true), true);
   }
 
   @Test
@@ -112,10 +111,10 @@ public class ValidationUtilsTest {
     // buggy aip have acqinfo2 instead of acqinfo in ead-c.xml
     final String aipId = UUID.randomUUID().toString();
     final AIP aip = model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_BUGGY_ID), null);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_BUGGY_ID));
     final DescriptiveMetadata descMetadata = model.retrieveDescriptiveMetadata(aipId,
       CorporaConstants.DESCRIPTIVE_METADATA_ID);
-    assertEquals(ValidationUtils.isDescriptiveMetadataValid(model, descMetadata, true, null), false);
+    assertEquals(ValidationUtils.isDescriptiveMetadataValid(model, descMetadata, true), false);
   }
 
   @Test
@@ -123,8 +122,8 @@ public class ValidationUtilsTest {
     throws ModelServiceException, StorageServiceException, IndexServiceException, ValidationException {
     final String aipId = UUID.randomUUID().toString();
     final AIP aip = model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), null);
-    assertEquals(ValidationUtils.isAIPDescriptiveMetadataValid(model, aip.getId(), true, null), true);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
+    assertEquals(ValidationUtils.isAIPDescriptiveMetadataValid(model, aip.getId(), true), true);
   }
 
   @Test
@@ -133,7 +132,7 @@ public class ValidationUtilsTest {
     // buggy aip have acqinfo2 instead of acqinfo in ead-c.xml
     final String aipId = UUID.randomUUID().toString();
     final AIP aip = model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_BUGGY_ID), null);
-    assertEquals(ValidationUtils.isAIPDescriptiveMetadataValid(model, aip.getId(), true, null), false);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_BUGGY_ID));
+    assertEquals(ValidationUtils.isAIPDescriptiveMetadataValid(model, aip.getId(), true), false);
   }
 }

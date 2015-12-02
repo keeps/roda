@@ -60,6 +60,13 @@ public final class RodaConstants {
   public static final String API_HTTP_HEADER_ACCEPT = "Accept";
 
   /*
+   * Controllers related
+   */
+  public static final String CONTROLLER_FILTER_PARAM = "filter";
+  public static final String CONTROLLER_SORTER_PARAM = "sorter";
+  public static final String CONTROLLER_SUBLIST_PARAM = "sublist";
+
+  /*
    * Core (storage, index, orchestrator, etc.)
    */
   public enum StorageType {

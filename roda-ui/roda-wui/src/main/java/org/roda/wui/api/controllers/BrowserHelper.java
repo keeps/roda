@@ -699,7 +699,7 @@ public class BrowserHelper {
         metadata.put(RodaConstants.STORAGE_META_PARENT_ID, new HashSet<String>(Arrays.asList(parentId)));
       }
       storage.updateMetadata(aipPath, metadata, true);
-      model.updateAIP(aipId, storage, aipPath, RodaCoreFactory.getConfigPath());
+      model.updateAIP(aipId, storage, aipPath);
 
       return RodaCoreFactory.getIndexService().retrieve(SimpleDescriptionObject.class, aipId);
     } catch (ModelServiceException | IndexServiceException | StorageServiceException e) {
@@ -755,8 +755,7 @@ public class BrowserHelper {
     String descriptiveMetadataType, Binary descriptiveMetadataIdBinary)
       throws GenericException, ValidationException, AuthorizationDeniedException {
 
-    ValidationUtils.validateDescriptiveBinary(descriptiveMetadataIdBinary, descriptiveMetadataId, false,
-      RodaCoreFactory.getConfigPath());
+    ValidationUtils.validateDescriptiveBinary(descriptiveMetadataIdBinary, descriptiveMetadataId, false);
 
     DescriptiveMetadata ret;
     try {
@@ -781,8 +780,7 @@ public class BrowserHelper {
     String descriptiveMetadataType, Binary descriptiveMetadataIdBinary)
       throws GenericException, AuthorizationDeniedException, ValidationException {
 
-    ValidationUtils.validateDescriptiveBinary(descriptiveMetadataIdBinary, descriptiveMetadataId, false,
-      RodaCoreFactory.getConfigPath());
+    ValidationUtils.validateDescriptiveBinary(descriptiveMetadataIdBinary, descriptiveMetadataId, false);
 
     try {
       ModelService model = RodaCoreFactory.getModelService();
@@ -1061,7 +1059,8 @@ public class BrowserHelper {
     return RodaCoreFactory.getFolderMonitor().isFullyInitialized();
   }
 
-  public static IndexResult<SimpleFile> findFiles(Filter filter, Sorter sorter, Sublist sublist, Facets facets) throws GenericException {
+  public static IndexResult<SimpleFile> findFiles(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
+    throws GenericException {
     IndexResult<SimpleFile> files;
     try {
       files = RodaCoreFactory.getIndexService().find(SimpleFile.class, filter, sorter, sublist, facets);

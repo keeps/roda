@@ -9,7 +9,6 @@ package org.roda.core.common;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,13 +49,13 @@ public class ValidationUtils {
    * 
    * @throws ValidationException
    */
-  public static boolean isAIPDescriptiveMetadataValid(ModelService model, String aipId, boolean failIfNoSchema,
-    Path configBasePath) throws ModelServiceException {
+  public static boolean isAIPDescriptiveMetadataValid(ModelService model, String aipId, boolean failIfNoSchema)
+    throws ModelServiceException {
     boolean valid = true;
     ClosableIterable<DescriptiveMetadata> descriptiveMetadataBinaries = model.listDescriptiveMetadataBinaries(aipId);
     try {
       for (DescriptiveMetadata descriptiveMetadata : descriptiveMetadataBinaries) {
-        if (!isDescriptiveMetadataValid(model, descriptiveMetadata, failIfNoSchema, configBasePath)) {
+        if (!isDescriptiveMetadataValid(model, descriptiveMetadata, failIfNoSchema)) {
           valid = false;
           break;
         }
@@ -76,8 +75,8 @@ public class ValidationUtils {
    * 
    * @throws ValidationException
    */
-  public static boolean isAIPPreservationMetadataValid(ModelService model, String aipId, boolean failIfNoSchema,
-    Path configBasePath) throws ModelServiceException {
+  public static boolean isAIPPreservationMetadataValid(ModelService model, String aipId, boolean failIfNoSchema)
+    throws ModelServiceException {
     boolean valid = true;
     ClosableIterable<Representation> representations = model.listRepresentations(aipId);
     try {
@@ -86,7 +85,7 @@ public class ValidationUtils {
           .listPreservationMetadataBinaries(aipId, representation.getId());
         try {
           for (PreservationMetadata preservationMetadata : preservationMetadataBinaries) {
-            if (!isPreservationMetadataValid(model, preservationMetadata, failIfNoSchema, configBasePath)) {
+            if (!isPreservationMetadataValid(model, preservationMetadata, failIfNoSchema)) {
               valid = false;
               break;
             }
@@ -118,12 +117,12 @@ public class ValidationUtils {
    * @throws ValidationException
    */
   public static boolean isDescriptiveMetadataValid(ModelService model, DescriptiveMetadata metadata,
-    boolean failIfNoSchema, Path configBasePath) throws ModelServiceException {
+    boolean failIfNoSchema) throws ModelServiceException {
     boolean ret;
     try {
       StoragePath storagePath = metadata.getStoragePath();
       Binary binary = model.getStorage().getBinary(storagePath);
-      validateDescriptiveBinary(binary, binary.getStoragePath().getName(), failIfNoSchema, configBasePath);
+      validateDescriptiveBinary(binary, binary.getStoragePath().getName(), failIfNoSchema);
       ret = true;
     } catch (StorageServiceException e) {
       throw new ModelServiceException("Error validating descriptive metadata " + metadata.getStoragePath().asString(),
@@ -143,12 +142,12 @@ public class ValidationUtils {
    * @throws ValidationException
    */
   public static boolean isPreservationMetadataValid(ModelService model, PreservationMetadata metadata,
-    boolean failIfNoSchema, Path configBasePath) throws ModelServiceException {
+    boolean failIfNoSchema) throws ModelServiceException {
     boolean ret;
     try {
       StoragePath storagePath = metadata.getStoragePath();
       Binary binary = model.getStorage().getBinary(storagePath);
-      validatePreservationBinary(binary, configBasePath);
+      validatePreservationBinary(binary);
       ret = true;
     } catch (StorageServiceException e) {
       throw new ModelServiceException("Error validating descriptive metadata " + metadata.getStoragePath().asString(),
@@ -169,8 +168,8 @@ public class ValidationUtils {
    * @param failIfNoSchema
    * @throws ValidationException
    */
-  public static void validateDescriptiveBinary(Binary binary, String descriptiveMetadataId, boolean failIfNoSchema,
-    Path configBasePath) throws ValidationException {
+  public static void validateDescriptiveBinary(Binary binary, String descriptiveMetadataId, boolean failIfNoSchema)
+    throws ValidationException {
     try {
       InputStream inputStream = binary.getContent().createInputStream();
       InputStream schemaStream = RodaCoreFactory
@@ -213,7 +212,7 @@ public class ValidationUtils {
    * @param failIfNoSchema
    * @throws ValidationException
    */
-  public static void validatePreservationBinary(Binary binary, Path configBasePath) throws ValidationException {
+  public static void validatePreservationBinary(Binary binary) throws ValidationException {
     try {
       InputStream inputStream = binary.getContent().createInputStream();
       InputStream schemaStream = RodaCoreFactory.getConfigurationFileAsStream("schemas/premis-v2-0.xsd");

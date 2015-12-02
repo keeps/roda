@@ -116,7 +116,7 @@ public class ModelServiceTest {
 
     // testing AIP
     final AIP aip = model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), null);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 
     assertNotNull(aip);
     assertEquals(aipId, aip.getId());
@@ -249,7 +249,7 @@ public class ModelServiceTest {
     final String aipId = UUID.randomUUID().toString();
 
     model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), null);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 
     model.deleteAIP(aipId);
 
@@ -301,11 +301,11 @@ public class ModelServiceTest {
     final String aip3Id = UUID.randomUUID().toString();
 
     final AIP aip1 = model.createAIP(aip1Id, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), null);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
     final AIP aip2 = model.createAIP(aip2Id, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), null);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
     final AIP aip3 = model.createAIP(aip3Id, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), null);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 
     Iterable<AIP> listAIPs = model.listAIPs();
     assertThat(listAIPs, containsInAnyOrder(aip1, aip2, aip3));
@@ -318,11 +318,11 @@ public class ModelServiceTest {
     final String aipId = UUID.randomUUID().toString();
 
     model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), null);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 
     try {
       model.createAIP(aipId, corporaService,
-        DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), null);
+        DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
       fail("AIP shouldn't have been created and yet it was.");
     } catch (ModelServiceException e) {
       assertEquals(ModelServiceException.ALREADY_EXISTS, e.getCode());
@@ -334,11 +334,11 @@ public class ModelServiceTest {
     // set up
     final String aipId = UUID.randomUUID().toString();
     model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), null);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 
     StoragePath otherAipPath = DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER,
       CorporaConstants.OTHER_AIP_ID);
-    AIP updatedAIP = model.updateAIP(aipId, corporaService, otherAipPath, null);
+    AIP updatedAIP = model.updateAIP(aipId, corporaService, otherAipPath);
 
     // check it is connected
     AIP retrievedAIP = model.retrieveAIP(aipId);
@@ -354,7 +354,7 @@ public class ModelServiceTest {
     // set up
     final String aipId = UUID.randomUUID().toString();
     model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), null);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 
     Iterable<DescriptiveMetadata> list = model.listDescriptiveMetadataBinaries(aipId);
     DescriptiveMetadata descriptiveMetadata1 = model.retrieveDescriptiveMetadata(aipId,
@@ -368,7 +368,7 @@ public class ModelServiceTest {
     // set up
     final String aipId = UUID.randomUUID().toString();
     model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), null);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 
     final String newDescriptiveMetadataId = UUID.randomUUID().toString();
     final Binary binary = corporaService
@@ -395,7 +395,7 @@ public class ModelServiceTest {
     // set up
     final String aipId = UUID.randomUUID().toString();
     model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), null);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 
     final Binary binary = corporaService
       .getBinary(DefaultStoragePath.parse(CorporaConstants.OTHER_DESCRIPTIVE_METADATA_STORAGEPATH));
@@ -420,7 +420,7 @@ public class ModelServiceTest {
     // set up
     final String aipId = UUID.randomUUID().toString();
     model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), null);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 
     model.deleteDescriptiveMetadata(aipId, CorporaConstants.DESCRIPTIVE_METADATA_ID);
 
@@ -438,7 +438,7 @@ public class ModelServiceTest {
     // set up
     final String aipId = UUID.randomUUID().toString();
     model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), null);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 
     final Representation representation1 = model.retrieveRepresentation(aipId, CorporaConstants.REPRESENTATION_1_ID);
     final Representation representation2 = model.retrieveRepresentation(aipId, CorporaConstants.REPRESENTATION_2_ID);
@@ -452,7 +452,7 @@ public class ModelServiceTest {
     // set up
     final String aipId = UUID.randomUUID().toString();
     model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), null);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 
     final String newRepresentationId = UUID.randomUUID().toString();
     final StoragePath corporaRepresentationPath = DefaultStoragePath
@@ -474,7 +474,7 @@ public class ModelServiceTest {
     // set up
     final String aipId = UUID.randomUUID().toString();
     model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), null);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 
     final StoragePath corporaRepresentationPath = DefaultStoragePath
       .parse(CorporaConstants.OTHER_REPRESENTATION_STORAGEPATH);
@@ -495,7 +495,7 @@ public class ModelServiceTest {
     // set up
     final String aipId = UUID.randomUUID().toString();
     model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), null);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 
     model.deleteRepresentation(aipId, CorporaConstants.REPRESENTATION_1_ID);
 
@@ -521,7 +521,7 @@ public class ModelServiceTest {
     // set up
     final String aipId = UUID.randomUUID().toString();
     model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), null);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 
     final String newFileId = UUID.randomUUID().toString();
     final StoragePath corporaFilePath = DefaultStoragePath.parse(CorporaConstants.OTHER_FILE_STORAGEPATH);
@@ -544,7 +544,7 @@ public class ModelServiceTest {
     // set up
     final String aipId = UUID.randomUUID().toString();
     model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), null);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 
     final StoragePath corporaFilePath = DefaultStoragePath.parse(CorporaConstants.OTHER_FILE_STORAGEPATH);
     final Binary binary = corporaService.getBinary(corporaFilePath);
@@ -570,7 +570,7 @@ public class ModelServiceTest {
     // set up
     final String aipId = UUID.randomUUID().toString();
     model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), null);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 
     model.deleteFile(aipId, CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.REPRESENTATION_1_FILE_1_ID);
 
@@ -588,7 +588,7 @@ public class ModelServiceTest {
     // set up
     final String aipId = UUID.randomUUID().toString();
     model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), null);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 
     EventPreservationObject epo = model.retrieveEventPreservationObject(aipId, CorporaConstants.REPRESENTATION_1_ID,
       CorporaConstants.EVENT_RODA_398_PREMIS_XML);
@@ -601,7 +601,7 @@ public class ModelServiceTest {
     // set up
     final String aipId = UUID.randomUUID().toString();
     model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), null);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
     RepresentationFilePreservationObject rfpo = model.retrieveRepresentationFileObject(aipId,
       CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.F0_PREMIS_XML);
     assertEquals(rfpo.getFixities().length, 2);
@@ -613,7 +613,7 @@ public class ModelServiceTest {
     // set up
     final String aipId = UUID.randomUUID().toString();
     model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), null);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
     RepresentationPreservationObject rpo = model.retrieveRepresentationPreservationObject(aipId,
       CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.REPRESENTATION_PREMIS_XML);
     assertEquals(rpo.getPreservationLevel(), CorporaConstants.PRESERVATION_LEVEL_FULL);
@@ -624,7 +624,7 @@ public class ModelServiceTest {
     // set up
     final String aipId = UUID.randomUUID().toString();
     model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), null);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 
     Iterable<RepresentationPreservationObject> representationPreservationObject = model
       .getAipPreservationObjects(aipId);

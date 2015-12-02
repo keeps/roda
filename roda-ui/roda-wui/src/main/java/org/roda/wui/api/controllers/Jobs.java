@@ -10,9 +10,14 @@ package org.roda.wui.api.controllers;
 import java.util.Date;
 
 import org.roda.core.common.UserUtility;
+import org.roda.core.data.adapter.facet.Facets;
+import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.sort.Sorter;
+import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.AuthorizationDeniedException;
 import org.roda.core.data.common.NotFoundException;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.RodaUser;
 import org.roda.wui.api.exceptions.RequestNotValidException;
@@ -64,7 +69,7 @@ public class Jobs extends RodaCoreService {
     // TODO ???
 
     // delegate
-    Job job = JobsHelper.getJob(jobId);
+    Job job = JobsHelper.retrieveJob(jobId);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
@@ -73,21 +78,22 @@ public class Jobs extends RodaCoreService {
     return job;
   }
 
-  public static org.roda.core.data.v2.Jobs listJobs(RodaUser user, String start, String limit) {
+  public static IndexResult<Job> findJobs(RodaUser user, Filter filter, Sorter sorter, Sublist sublist, Facets facets)
+    throws GenericException {
     Date startDate = new Date();
 
     // check user permissions
     // TODO ???
 
     // delegate
-    org.roda.core.data.v2.Jobs jobs = JobsHelper.listJobs(start, limit);
+    IndexResult<Job> findJobs = JobsHelper.findJobs(filter, sorter, sublist, facets);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, JOBS_COMPONENT, "listJobs", null, duration, RodaConstants.API_QUERY_KEY_START, start,
-      RodaConstants.API_QUERY_KEY_LIMIT, limit);
+    registerAction(user, JOBS_COMPONENT, "findJobs", null, duration, RodaConstants.CONTROLLER_FILTER_PARAM, filter,
+      RodaConstants.CONTROLLER_SORTER_PARAM, sorter, RodaConstants.CONTROLLER_SUBLIST_PARAM, sublist);
 
-    return jobs;
+    return findJobs;
   }
 
   /*

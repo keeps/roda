@@ -7,7 +7,6 @@
  */
 package org.roda.core.plugins.plugins.ingest.characterization;
 
-import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -94,10 +93,10 @@ public class FastCharacterizationPlugin implements Plugin<AIP> {
             File file = model.retrieveFile(aip.getId(), representationID, fileID);
             Binary binary = storage.getBinary(file.getStoragePath());
             Path p = Files.createTempFile("temp", ".temp");
-            Files.copy(binary.getContent().createInputStream(), p,  StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(binary.getContent().createInputStream(), p, StandardCopyOption.REPLACE_EXISTING);
             FileFormat ff = file.getFileFormat();
             String mime = Files.probeContentType(p);
-            LOGGER.error("MIME: "+mime);
+            LOGGER.error("MIME: " + mime);
             ff.setMimeType(mime);
             file.setFileFormat(ff);
             Map<String, Set<String>> metadata = storage.getMetadata(file.getStoragePath());
@@ -133,7 +132,7 @@ public class FastCharacterizationPlugin implements Plugin<AIP> {
 
   @Override
   public Plugin<AIP> cloneMe() {
-    return new JHOVEPlugin();
+    return new FastCharacterizationPlugin();
   }
 
 }

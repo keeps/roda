@@ -84,6 +84,18 @@ public class SimpleIngestPlugin implements Plugin<TransferredResource> {
     doVirusCheck(index, model, storage, aips);
     // 3) verify if AIP is well formed
     verifyIfAipIsWellFormed(index, model, storage, aips);
+    // 4) do file format identification
+    doFileFormatIdentification(index, model, storage, aips);
+    // 5) do deep characterization
+    doDeepCharacterization(index, model, storage, aips);
+    // 6) do file format validation
+    doFileFormatValidation(index, model, storage, aips);
+    // 7) do file format normalization
+    doFileFormatNormalization(index, model, storage, aips);
+    // 8) generate dissemination copy
+    generateDisseminationCopy(index, model, storage, aips);
+    // 9) skip manual validation
+    skipManualValidation(index, model, storage, aips);
 
     return null;
   }
@@ -116,27 +128,38 @@ public class SimpleIngestPlugin implements Plugin<TransferredResource> {
   }
 
   private void doVirusCheck(IndexService index, ModelService model, StorageService storage, List<AIP> aips) {
-    String pluginClassName = AntivirusPlugin.class.getName();
-    Plugin<AIP> plugin = (Plugin<AIP>) RodaCoreFactory.getPluginManager().getPlugin(pluginClassName);
-    try {
-      plugin.setParameterValues(getParameterValues());
-      plugin.execute(index, model, storage, aips);
-    } catch (PluginException | InvalidParameterException e) {
-      // FIXME handle failure
-      LOGGER.error("Error executing plug-in", e);
-    }
+    executePlugin(index, model, storage, aips, AntivirusPlugin.class.getName());
   }
 
   private void verifyIfAipIsWellFormed(IndexService index, ModelService model, StorageService storage, List<AIP> aips) {
-    String pluginClassName = AIPValidationPlugin.class.getName();
-    Plugin<AIP> plugin = (Plugin<AIP>) RodaCoreFactory.getPluginManager().getPlugin(pluginClassName);
-    try {
-      plugin.setParameterValues(getParameterValues());
-      plugin.execute(index, model, storage, aips);
-    } catch (PluginException | InvalidParameterException e) {
-      // FIXME handle failure
-      LOGGER.error("Error executing plug-in", e);
-    }
+    executePlugin(index, model, storage, aips, AIPValidationPlugin.class.getName());
+  }
+
+  private void doFileFormatIdentification(IndexService index, ModelService model, StorageService storage,
+    List<AIP> aips) {
+
+  }
+
+  private void doDeepCharacterization(IndexService index, ModelService model, StorageService storage, List<AIP> aips) {
+
+  }
+
+  private void doFileFormatValidation(IndexService index, ModelService model, StorageService storage, List<AIP> aips) {
+
+  }
+
+  private void doFileFormatNormalization(IndexService index, ModelService model, StorageService storage,
+    List<AIP> aips) {
+
+  }
+
+  private void generateDisseminationCopy(IndexService index, ModelService model, StorageService storage,
+    List<AIP> aips) {
+
+  }
+
+  private void skipManualValidation(IndexService index, ModelService model, StorageService storage, List<AIP> aips) {
+    executePlugin(index, model, storage, aips, AIPValidationPlugin.class.getName());
   }
 
   @Override
@@ -154,6 +177,18 @@ public class SimpleIngestPlugin implements Plugin<TransferredResource> {
   @Override
   public Plugin<TransferredResource> cloneMe() {
     return new SimpleIngestPlugin();
+  }
+
+  private void executePlugin(IndexService index, ModelService model, StorageService storage, List<AIP> aips,
+    String pluginClassName) {
+    Plugin<AIP> plugin = (Plugin<AIP>) RodaCoreFactory.getPluginManager().getPlugin(pluginClassName);
+    try {
+      plugin.setParameterValues(getParameterValues());
+      plugin.execute(index, model, storage, aips);
+    } catch (PluginException | InvalidParameterException e) {
+      // FIXME handle failure
+      LOGGER.error("Error executing plug-in", e);
+    }
   }
 
 }

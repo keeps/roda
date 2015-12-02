@@ -51,9 +51,6 @@ import org.roda.wui.common.client.GenericException;
 public class Browser extends RodaCoreService {
 
   private static final String SDO_PARAM = "sdo";
-  private static final String FILTER_PARAM = "filter";
-  private static final String SORTER_PARAM = "sorter";
-  private static final String SUBLIST_PARAM = "sublist";
 
   private static final String BROWSER_COMPONENT = "Browser";
   private static final String ADMINISTRATION_METADATA_EDITOR_ROLE = "administration.metadata_editor";
@@ -122,8 +119,9 @@ public class Browser extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "findDescriptiveMetadata", null, duration, FILTER_PARAM, filter,
-      SORTER_PARAM, sorter, SUBLIST_PARAM, sublist);
+    registerAction(user, BROWSER_COMPONENT, "findDescriptiveMetadata", null, duration,
+      RodaConstants.CONTROLLER_FILTER_PARAM, filter, RodaConstants.CONTROLLER_SORTER_PARAM, sorter,
+      RodaConstants.CONTROLLER_SUBLIST_PARAM, sublist);
 
     return descriptiveMetadata;
   }
@@ -140,8 +138,8 @@ public class Browser extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "countDescriptiveMetadata", null, duration, FILTER_PARAM,
-      filter.toString());
+    registerAction(user, BROWSER_COMPONENT, "countDescriptiveMetadata", null, duration,
+      RodaConstants.CONTROLLER_FILTER_PARAM, filter.toString());
 
     return count;
   }
@@ -657,8 +655,9 @@ public class Browser extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "findTransferredResources", null, duration, FILTER_PARAM, filter,
-      SORTER_PARAM, sorter, SUBLIST_PARAM, sublist);
+    registerAction(user, BROWSER_COMPONENT, "findTransferredResources", null, duration,
+      RodaConstants.CONTROLLER_FILTER_PARAM, filter, RodaConstants.CONTROLLER_SORTER_PARAM, sorter,
+      RodaConstants.CONTROLLER_SUBLIST_PARAM, sublist);
 
     return resources;
   }
@@ -778,18 +777,17 @@ public class Browser extends RodaCoreService {
     Facets facets, String localeString) throws GenericException {
     Date startDate = new Date();
 
-    //TODO
+    // TODO
     // check user permissions
-    //UserUtility.checkRoles(user, BROWSE_ROLE);
+    // UserUtility.checkRoles(user, BROWSE_ROLE);
 
     // delegate
-    IndexResult<SimpleFile> files = BrowserHelper.findFiles(filter, sorter,
-      sublist, facets);
+    IndexResult<SimpleFile> files = BrowserHelper.findFiles(filter, sorter, sublist, facets);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "findFiles", null, duration, FILTER_PARAM, filter,
-      SORTER_PARAM, sorter, SUBLIST_PARAM, sublist);
+    registerAction(user, BROWSER_COMPONENT, "findFiles", null, duration, RodaConstants.CONTROLLER_FILTER_PARAM, filter,
+      RodaConstants.CONTROLLER_SORTER_PARAM, sorter, RodaConstants.CONTROLLER_SUBLIST_PARAM, sublist);
 
     return files;
   }

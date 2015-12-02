@@ -7,24 +7,23 @@
  */
 package org.roda.wui.api.controllers;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.adapter.facet.Facets;
+import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.NotFoundException;
-import org.roda.core.data.common.Pair;
 import org.roda.core.data.common.RodaConstants.JOB_TYPE;
 import org.roda.core.data.common.RodaConstants.RESOURCE_TYPE;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.RodaUser;
-import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.index.IndexServiceException;
 import org.roda.wui.api.exceptions.ApiException;
 import org.roda.wui.api.exceptions.RequestNotValidException;
-import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.common.client.GenericException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,7 +65,7 @@ public class JobsHelper {
     return updatedJob;
   }
 
-  public static Job getJob(String jobId) throws NotFoundException, GenericException {
+  public static Job retrieveJob(String jobId) throws NotFoundException, GenericException {
     try {
       return RodaCoreFactory.getIndexService().retrieve(Job.class, jobId);
     } catch (IndexServiceException e) {
@@ -78,51 +77,17 @@ public class JobsHelper {
     }
   }
 
-  // FIXME see if this method is being used
-  private static List<TransferredResource> getTransferredResourcesFromObjectIds(RodaUser user, List<String> objectIds)
-    throws NotFoundException {
-    List<TransferredResource> res = new ArrayList<TransferredResource>();
-    for (String objectId : objectIds) {
-      try {
-        res.add(BrowserHelper.retrieveTransferredResource(user.getId() + "/" + objectId));
-      } catch (GenericException e) {
-        LOGGER.error("Error retrieving transferred resource {}", objectId, e);
-      }
-    }
-    return res;
-  }
-
-  // FIXME see if this method is being used
-  public static List<TransferredResource> getTransferredResourcesFromObjectIds(String username, List<String> objectIds)
-    throws NotFoundException {
-    List<TransferredResource> res = new ArrayList<TransferredResource>();
-    for (String objectId : objectIds) {
-      try {
-        res.add(BrowserHelper.retrieveTransferredResource(username + "/" + objectId));
-      } catch (GenericException e) {
-        LOGGER.error("Error retrieving transferred resource {}", objectId, e);
-      }
-    }
-    return res;
-  }
-
-  // FIXME do better error handling
-  public static org.roda.core.data.v2.Jobs listJobs(String start, String limit) {
-    org.roda.core.data.v2.Jobs jobs = null;
-    Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
-
+  public static IndexResult<Job> findJobs(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
+    throws GenericException {
     try {
-      IndexResult<Job> find = RodaCoreFactory.getIndexService().find(Job.class, null, null,
-        new Sublist(new Sublist(pagingParams.getFirst(), pagingParams.getSecond())));
-      jobs = getJobsFromIndexResult(find);
+      return RodaCoreFactory.getIndexService().find(Job.class, filter, sorter, sublist);
     } catch (IndexServiceException e) {
-      LOGGER.error("Error retrieving Jobs list", e);
+      LOGGER.error("Error getting jobs", e);
+      throw new GenericException("Error getting jobs: " + e.getMessage());
     }
-
-    return jobs;
   }
 
-  private static org.roda.core.data.v2.Jobs getJobsFromIndexResult(IndexResult<Job> jobsFromIndexResult) {
+  public static org.roda.core.data.v2.Jobs getJobsFromIndexResult(IndexResult<Job> jobsFromIndexResult) {
     org.roda.core.data.v2.Jobs jobs = new org.roda.core.data.v2.Jobs();
 
     for (Job job : jobsFromIndexResult.getResults()) {
