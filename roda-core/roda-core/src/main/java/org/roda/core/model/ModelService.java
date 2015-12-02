@@ -342,6 +342,24 @@ public class ModelService extends ModelObservable {
     return aip;
   }
 
+  public AIP updateAIP(String aipId) throws ModelServiceException {
+    AIP aip;
+    try {
+      StoragePath aipPath = ModelUtils.getAIPpath(aipId);
+      Directory aipDirectory = storage.getDirectory(aipPath);
+      if (isAIPvalid(this, aipDirectory, FAIL_IF_NO_DESCRIPTIVE_METADATA_SCHEMA)) {
+        aip = convertResourceToAIP(aipDirectory);
+        notifyAipUpdated(aip);
+      } else {
+        throw new ModelServiceException("Error while updating AIP", ModelServiceException.INTERNAL_SERVER_ERROR);
+      }
+    } catch (StorageServiceException e) {
+      throw new ModelServiceException("Error creating AIP in storage", ModelServiceException.INTERNAL_SERVER_ERROR, e);
+    }
+
+    return aip;
+  }
+
   public void deleteAIP(String aipId) throws ModelServiceException {
     try {
       StoragePath aipPath = ModelUtils.getAIPpath(aipId);

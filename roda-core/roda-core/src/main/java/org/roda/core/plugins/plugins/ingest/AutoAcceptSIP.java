@@ -4,17 +4,22 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
 import org.roda.core.data.common.InvalidParameterException;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.AIP;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.ModelServiceException;
+import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.storage.StoragePath;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.StorageServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,12 +71,14 @@ public class AutoAcceptSIP implements Plugin<AIP> {
     throws PluginException {
 
     for (AIP aip : list) {
-      // retrieve fresher view of the AIP
       try {
-        AIP retrievedAIP = model.retrieveAIP(aip.getId());
-        
-      } catch (ModelServiceException e) {
-        LOGGER.error("Error retrieving AIP", e);
+        StoragePath aipPath = ModelUtils.getAIPpath(aip.getId());
+        Map<String, Set<String>> aipMetadata = storage.getMetadata(aipPath);
+        ModelUtils.setAs(aipMetadata, RodaConstants.STORAGE_META_ACTIVE, true);
+        storage.updateMetadata(aipPath, aipMetadata, true);
+        model.updateAIP(aip.getId());
+      } catch (ModelServiceException | StorageServiceException e) {
+        LOGGER.error("Error updating AIP metadata attribute active", e);
       }
     }
 

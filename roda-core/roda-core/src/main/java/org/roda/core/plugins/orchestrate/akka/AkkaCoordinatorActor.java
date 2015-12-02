@@ -38,7 +38,7 @@ public class AkkaCoordinatorActor extends UntypedActor {
       if ("runPluginOnTransferredResources".equalsIgnoreCase(job.getOrchestratorMethod())) {
         Plugin<TransferredResource> plugin = (Plugin<TransferredResource>) RodaCoreFactory.getPluginManager()
           .getPlugin(job.getPlugin());
-        Map<String, String> parameters = new HashMap<String, String>();
+        Map<String, String> parameters = new HashMap<String, String>(job.getPluginParameters());
         parameters.put("job.id", job.getId());
         try {
           plugin.setParameterValues(parameters);

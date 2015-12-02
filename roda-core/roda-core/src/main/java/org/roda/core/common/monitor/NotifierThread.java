@@ -19,12 +19,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.WatchEvent;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 
-import org.apache.solr.client.solrj.SolrServerException;
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.TransferredResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,8 +45,8 @@ public class NotifierThread implements Runnable {
 
   @Override
   public void run() {
-    LOGGER.error("RESOURCE: "+updatedPath);
-    LOGGER.error("BASE: "+basePath);
+    LOGGER.debug("RESOURCE: " + updatedPath);
+    LOGGER.debug("BASE: " + basePath);
     TransferredResource resource = FolderMonitorNIO.createTransferredResource(updatedPath, basePath);
     if (kind == ENTRY_CREATE) {
       notifyTransferredResourceCreated(resource);
@@ -58,87 +55,87 @@ public class NotifierThread implements Runnable {
     } else if (kind == ENTRY_DELETE) {
       notifyTransferredResourceDeleted(resource);
       notifyPathDeleted(basePath.relativize(updatedPath));
-      
+
     }
 
-    //handle children
+    // handle children
     if (kind == ENTRY_CREATE) {
-      //add all children if recursive
+      // add all children if recursive
       try {
         if (Files.isDirectory(updatedPath)) {
-          if(recursive){
+          if (recursive) {
             MonitorVariables.getInstance().registerAll(updatedPath);
           }
         }
       } catch (IOException x) {
       }
-      updateChildren(updatedPath,true);
+      updateChildren(updatedPath, true);
     } else if (kind == ENTRY_DELETE) {
-      updateChildren(updatedPath,false);
+      updateChildren(updatedPath, false);
     }
-    
+
   }
 
   private void updateChildren(Path updatedPath, boolean add) {
-    try{
+    try {
       EnumSet<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
       Files.walkFileTree(updatedPath, opts, 100, new FileVisitor<Path>() {
         @Override
         public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
           return FileVisitResult.CONTINUE;
         }
-  
+
         @Override
         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
           TransferredResource resource = FolderMonitorNIO.createTransferredResource(file, basePath);
-          if(add){
+          if (add) {
             notifyTransferredResourceCreated(resource);
-          }else{
+          } else {
             notifyPathDeleted(basePath.relativize(file));
             notifyTransferredResourceDeleted(resource);
           }
           return FileVisitResult.CONTINUE;
         }
-  
+
         @Override
         public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
           return FileVisitResult.CONTINUE;
         }
-  
+
         @Override
         public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
           return FileVisitResult.CONTINUE;
         }
       });
-    }catch(IOException e){
-      LOGGER.error("Error adding children: "+e.getMessage(),e);
+    } catch (IOException e) {
+      LOGGER.error("Error adding children: " + e.getMessage(), e);
     }
-    
+
   }
 
   protected void notifyTransferredResourceCreated(TransferredResource resource) {
-    LOGGER.error("!!!! CREATED: "+resource.getFullPath());
+    LOGGER.debug("!!!! CREATED: " + resource.getFullPath());
     for (FolderObserver observer : observers) {
       observer.transferredResourceAdded(resource, true);
     }
   }
 
   protected void notifyTransferredResourceDeleted(TransferredResource resource) {
-    LOGGER.error("!!!! DELETED: "+resource.getFullPath());
+    LOGGER.debug("!!!! DELETED: " + resource.getFullPath());
     for (FolderObserver observer : observers) {
       observer.transferredResourceDeleted(resource);
     }
   }
 
   protected void notifyTransferredResourceModified(TransferredResource resource) {
-    LOGGER.error("!!!! MODIFIED: "+resource.getFullPath());
+    LOGGER.debug("!!!! MODIFIED: " + resource.getFullPath());
     for (FolderObserver observer : observers) {
       observer.transferredResourceAdded(resource);
     }
   }
-  
+
   protected void notifyPathDeleted(Path deleted) {
-    LOGGER.error("!!!! PATH DELETED: "+deleted);
+    LOGGER.debug("!!!! PATH DELETED: " + deleted);
     for (FolderObserver observer : observers) {
       observer.pathDeleted(deleted);
     }

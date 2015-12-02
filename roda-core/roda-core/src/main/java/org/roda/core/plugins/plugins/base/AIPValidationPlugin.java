@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.ValidationUtils;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;

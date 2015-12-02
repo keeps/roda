@@ -30,10 +30,19 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+// FIXME perhaps this should be renamed into "MultistepIngestPlugin"
 public class SimpleIngestPlugin implements Plugin<TransferredResource> {
   private static final Logger LOGGER = LoggerFactory.getLogger(SimpleIngestPlugin.class);
 
+  public static final PluginParameter PARAMETER_DO_VIRUS_CHECK = new PluginParameter("parameter.do_virus_check",
+    PluginParameter.TYPE_BOOLEAN, "true", true, false,
+    SimpleIngestPlugin.class.getCanonicalName() + ".parameter.do_virus_check");
+  public static final PluginParameter PARAMETER_DO_AUTO_ACCEPT = new PluginParameter("parameter.do_auto_accept",
+    PluginParameter.TYPE_BOOLEAN, "true", true, false,
+    SimpleIngestPlugin.class.getCanonicalName() + ".parameter.do_auto_accept");
+
   private Map<String, String> parameters;
+  private Report report;
 
   @Override
   public void init() throws PluginException {
@@ -62,7 +71,10 @@ public class SimpleIngestPlugin implements Plugin<TransferredResource> {
 
   @Override
   public List<PluginParameter> getParameters() {
-    return new ArrayList<PluginParameter>();
+    ArrayList<PluginParameter> pluginParameters = new ArrayList<PluginParameter>();
+    pluginParameters.add(PARAMETER_DO_VIRUS_CHECK);
+    pluginParameters.add(PARAMETER_DO_AUTO_ACCEPT);
+    return pluginParameters;
   }
 
   @Override
@@ -78,26 +90,36 @@ public class SimpleIngestPlugin implements Plugin<TransferredResource> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<TransferredResource> list)
     throws PluginException {
+    if (report == null) {
+      report = new Report();
+    }
+
     // 1) transform TransferredResource into an AIP
     List<AIP> aips = transformTransferredResourceIntoAnAIP(index, model, storage, list);
     // 2) do virus check
-    doVirusCheck(index, model, storage, aips);
+    if (verifyIfStepShouldBePerformed(PARAMETER_DO_VIRUS_CHECK, "false")) {
+      doVirusCheck(index, model, storage, aips);
+    }
     // 3) verify if AIP is well formed
     verifyIfAipIsWellFormed(index, model, storage, aips);
-    // 4) do file format identification
-    doFileFormatIdentification(index, model, storage, aips);
-    // 5) do deep characterization
-    doDeepCharacterization(index, model, storage, aips);
-    // 6) do file format validation
-    doFileFormatValidation(index, model, storage, aips);
-    // 7) do file format normalization
+    // 4) verify if the user has permissions to ingest SIPS into the specified
+    // fonds
+    verifyProducerAuthorization();
+    // 5) do file format normalization
     doFileFormatNormalization(index, model, storage, aips);
-    // 8) generate dissemination copy
+    // 6) generate dissemination copy
     generateDisseminationCopy(index, model, storage, aips);
-    // 9) skip manual validation
-    skipManualValidation(index, model, storage, aips);
+    // 7) do auto accept
+    if (verifyIfStepShouldBePerformed(PARAMETER_DO_AUTO_ACCEPT, "false")) {
+      doAutoAccept(index, model, storage, aips);
+    }
 
-    return null;
+    return report;
+  }
+
+  private boolean verifyIfStepShouldBePerformed(PluginParameter pluginParameter, String defaultValue) {
+    String paramValue = parameters.getOrDefault(pluginParameter.getName(), defaultValue);
+    return Boolean.parseBoolean(paramValue);
   }
 
   private List<AIP> transformTransferredResourceIntoAnAIP(IndexService index, ModelService model,
@@ -135,6 +157,10 @@ public class SimpleIngestPlugin implements Plugin<TransferredResource> {
     executePlugin(index, model, storage, aips, AIPValidationPlugin.class.getName());
   }
 
+  private void verifyProducerAuthorization() {
+
+  }
+
   private void doFileFormatIdentification(IndexService index, ModelService model, StorageService storage,
     List<AIP> aips) {
 
@@ -158,8 +184,8 @@ public class SimpleIngestPlugin implements Plugin<TransferredResource> {
 
   }
 
-  private void skipManualValidation(IndexService index, ModelService model, StorageService storage, List<AIP> aips) {
-    executePlugin(index, model, storage, aips, AIPValidationPlugin.class.getName());
+  private void doAutoAccept(IndexService index, ModelService model, StorageService storage, List<AIP> aips) {
+    executePlugin(index, model, storage, aips, AutoAcceptSIP.class.getName());
   }
 
   @Override
