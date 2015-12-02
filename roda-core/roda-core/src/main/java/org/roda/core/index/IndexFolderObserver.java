@@ -104,4 +104,17 @@ public class IndexFolderObserver implements FolderObserver {
     }
   }
 
+  @Override
+  public void pathDeleted(Path deleted) {
+    LOGGER.debug("PATH DELETED: " + deleted);
+    try {
+      index.deleteById(RodaConstants.INDEX_SIP, deleted.toString());
+      index.deleteByQuery(RodaConstants.INDEX_SIP, "ancestors:\"" + deleted.toString() + "\"");
+      index.commit(RodaConstants.INDEX_SIP);
+    } catch (SolrServerException | IOException e) {
+      LOGGER.error("ERROR DELETING PATH " + deleted.toString() + " : " + e.getMessage(), e);
+    }
+
+  }
+
 }

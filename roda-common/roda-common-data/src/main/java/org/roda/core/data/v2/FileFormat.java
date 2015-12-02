@@ -98,4 +98,18 @@ public class FileFormat extends RODAObject {
     return true;
   }
 
+  public void setMimeType(String mimeType) {
+    this.mimeType = mimeType;
+  }
+
+  public void setVersion(String version) {
+    this.version = version;
+  }
+
+  public void setFormatRegistries(Map<String, String> formatRegistries) {
+    this.formatRegistries = formatRegistries;
+  }
+  
+  
+
 }

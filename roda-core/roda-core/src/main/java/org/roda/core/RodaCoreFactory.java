@@ -91,6 +91,7 @@ import org.roda.core.plugins.plugins.ingest.characterization.DroidPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.ExifToolPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.FFProbePlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.FITSPlugin;
+import org.roda.core.plugins.plugins.ingest.characterization.FastCharacterizationPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.JHOVEPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.JpylyzerPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.MediaInfoPlugin;
@@ -835,6 +836,11 @@ public class RodaCoreFactory {
     getPluginOrchestrator().runPluginOnAllAIPs(jpylyzerPlugin);
   }
 
+  private static void runFastCharacterizationPlugin() {
+    Plugin<AIP> fastCharacterizationPlugin = new FastCharacterizationPlugin();
+    getPluginOrchestrator().runPluginOnAllAIPs(fastCharacterizationPlugin);
+  }
+  
   private static void runSolrQuery(List<String> args) {
     String collection = args.get(2);
     String solrQueryString = args.get(3);
@@ -871,6 +877,7 @@ public class RodaCoreFactory {
     System.err.println("java -jar x.jar ffprobe");
     System.err.println("java -jar x.jar jpylyzer");
     System.err.println("java -jar x.jar premisupdate");
+    System.err.println("java -jar x.jar fastcharacterization");
   }
 
   private static void printIndexMembers(List<String> args, Filter filter, Sorter sorter, Sublist sublist, Facets facets)
@@ -977,6 +984,8 @@ public class RodaCoreFactory {
       runJpylyzerPlugin();
     } else if ("premisupdate".equals(args.get(0))) {
       runPremisUpdatePlugin();
+    } else if ("fastcharacterization".equals(args.get(0))) {
+      runFastCharacterizationPlugin();
     } else {
       printMainUsage();
     }

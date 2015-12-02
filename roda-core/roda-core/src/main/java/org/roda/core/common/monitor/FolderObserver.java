@@ -7,6 +7,8 @@
  */
 package org.roda.core.common.monitor;
 
+import java.nio.file.Path;
+
 import org.roda.core.data.v2.TransferredResource;
 
 public interface FolderObserver {
@@ -17,5 +19,7 @@ public interface FolderObserver {
   public void transferredResourceModified(TransferredResource resource);
 
   public void transferredResourceDeleted(TransferredResource resource);
+
+  public void pathDeleted(Path deleted);
 
 }

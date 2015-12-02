@@ -1944,4 +1944,7 @@ public class ModelService extends ModelObservable {
   public void updateJob(Job job) {
     notifyJobUpdated(job);
   }
+  public void updateFile(File file) {
+    notifyFileUpdated(file);
+  }
 }

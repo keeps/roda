@@ -7,33 +7,15 @@
  */
 package org.roda.core.common.monitor;
 
-import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
-import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
-import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
-import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.FileSystems;
-import java.nio.file.FileVisitOption;
-import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.WatchEvent;
-import java.nio.file.WatchKey;
-import java.nio.file.WatchService;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.roda.core.data.common.NotFoundException;
@@ -45,27 +27,26 @@ import org.slf4j.LoggerFactory;
 
 public class FolderMonitorNIO {
   private static final Logger LOGGER = LoggerFactory.getLogger(FolderMonitorNIO.class);
-  private ExecutorService executor;
+
   private final List<FolderObserver> observers;
   private Path basePath;
-  private Thread threadWatch, threadReindex;
+  private Thread threadWatch;
   private Date indexDate;
   private SolrClient index;
-  private boolean watchInitialized;
+  private WatchDir watchDir;
 
   public FolderMonitorNIO(Path basePath, Date indexDate, SolrClient index) throws Exception {
-    executor = Executors.newSingleThreadExecutor();
     this.observers = new ArrayList<FolderObserver>();
     this.basePath = basePath;
     this.indexDate = indexDate;
     this.index = index;
-    this.watchInitialized = false;
+
     startWatch();
   }
 
   private void startWatch() throws Exception {
     LOGGER.debug("STARTING WATCH (NIO) ON FOLDER: " + basePath.toString());
-    WatchDir watchDir = new WatchDir(basePath, true);
+    watchDir = new WatchDir(basePath, true, indexDate, index, observers);
     threadWatch = new Thread(watchDir, "FolderWatcher");
     threadWatch.start();
     LOGGER.debug("WATCH (NIO) ON FOLDER " + basePath.toString() + " STARTED");
@@ -73,6 +54,10 @@ public class FolderMonitorNIO {
 
   public void addFolderObserver(FolderObserver observer) {
     observers.add(observer);
+    if (watchDir != null) {
+      watchDir.setObservers(observers);
+    }
+
   }
 
   public void removeFolderObserver(FolderObserver observer) {
@@ -167,124 +152,11 @@ public class FolderMonitorNIO {
   }
 
   public boolean isFullyInitialized() {
-    if (watchInitialized) {
-      if (threadReindex != null && !threadReindex.isAlive()) {
-        return true;
-      } else {
-        return false;
-      }
-    } else {
+    if(watchDir==null){
       return false;
+    }else{
+      return watchDir.isFullyInitialized();
     }
   }
 
-  class WatchDir implements Runnable {
-    private final WatchService watcher;
-    private final Map<WatchKey, Path> keys;
-    private final boolean recursive;
-    private final Path watched;
-    private ReindexSipRunnable reindexRunnable;
-
-    public ReindexSipRunnable getReindexRunnable() {
-      return reindexRunnable;
-    }
-
-    public void setReindexRunnable(ReindexSipRunnable reindexRunnable) {
-      this.reindexRunnable = reindexRunnable;
-    }
-
-    @SuppressWarnings("unchecked")
-    <T> WatchEvent<T> cast(WatchEvent<?> event) {
-      return (WatchEvent<T>) event;
-    }
-
-    @Override
-    public void run() {
-      long startTime = System.currentTimeMillis();
-      try {
-        if (recursive) {
-          registerAll(watched);
-        } else {
-          register(watched);
-        }
-      } catch (IOException e) {
-        LOGGER.error("Error initialing watch thread: " + e.getMessage(), e);
-      }
-      LOGGER
-        .debug("TIME ELAPSED (INITIALIZE WATCH): " + ((System.currentTimeMillis() - startTime) / 1000) + " segundos");
-
-      watchInitialized = true;
-      reindexRunnable = new ReindexSipRunnable(basePath, indexDate, index);
-      threadReindex = new Thread(reindexRunnable, "ReindexThread");
-      threadReindex.start();
-
-      processEvents();
-    }
-
-    private void register(Path directoryPath) throws IOException {
-      WatchKey key = directoryPath.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY, OVERFLOW);
-      keys.put(key, directoryPath);
-    }
-
-    private void registerAll(final Path start) throws IOException {
-      EnumSet<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
-      Files.walkFileTree(start, opts, 100, new SimpleFileVisitor<Path>() {
-        @Override
-        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-          register(dir);
-          return FileVisitResult.CONTINUE;
-        }
-      });
-    }
-
-    public WatchDir(Path dir, boolean recursive) throws IOException {
-      this.watcher = FileSystems.getDefault().newWatchService();
-      this.keys = new HashMap<WatchKey, Path>();
-      this.recursive = recursive;
-      this.watched = dir;
-      this.reindexRunnable = null;
-    }
-
-    void processEvents() {
-      for (;;) {
-        WatchKey key;
-        try {
-          key = watcher.take();
-        } catch (InterruptedException x) {
-          return;
-        }
-        Path dir = keys.get(key);
-        if (dir == null) {
-          continue;
-        }
-        for (WatchEvent<?> event : key.pollEvents()) {
-          WatchEvent.Kind<?> kind = event.kind();
-          if (kind == OVERFLOW) {
-            continue;
-          }
-          WatchEvent<Path> ev = cast(event);
-          Path name = ev.context();
-          Path child = dir.resolve(name);
-          if (recursive && (kind == ENTRY_CREATE)) {
-            try {
-              if (Files.isDirectory(child)) {
-                registerAll(child);
-              }
-            } catch (IOException x) {
-            }
-          }
-          NotifierThread nt = new NotifierThread(observers, basePath, child, kind);
-          executor.execute(nt);
-
-        }
-        boolean valid = key.reset();
-        if (!valid) {
-          keys.remove(key);
-          if (keys.isEmpty()) {
-            break;
-          }
-        }
-      }
-    }
-  }
 }

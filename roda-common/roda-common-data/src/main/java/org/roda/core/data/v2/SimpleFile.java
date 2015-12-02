@@ -161,4 +161,24 @@ public class SimpleFile extends RODAObject {
     return true;
   }
 
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  public void setAipId(String aipId) {
+    this.aipId = aipId;
+  }
+
+  public void setRepresentationId(String representationId) {
+    this.representationId = representationId;
+  }
+
+  public void setEntryPoint(boolean entryPoint) {
+    this.entryPoint = entryPoint;
+  }
+
+  public void setFileFormat(FileFormat fileFormat) {
+    this.fileFormat = fileFormat;
+  }
+
 }

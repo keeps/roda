@@ -44,7 +44,7 @@ public class ReindexSipRunnable implements Runnable {
 
   public void run() {
     long start = System.currentTimeMillis();
-    LOGGER.debug("Start indexing SIPs: " + basePath.toString());
+    LOGGER.error("Start indexing SIPs: " + basePath.toString());
     try {
       EnumSet<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
       Files.walkFileTree(basePath, opts, 100, new FileVisitor<Path>() {
@@ -61,7 +61,7 @@ public class ReindexSipRunnable implements Runnable {
             counter++;
             if (counter >= 1000) {
               try {
-                LOGGER.debug("Commiting...");
+                LOGGER.error("Commiting...");
                 index.commit(RodaConstants.INDEX_SIP);
                 counter = 0;
               } catch (IOException | SolrServerException e) {
@@ -83,8 +83,8 @@ public class ReindexSipRunnable implements Runnable {
         }
       });
       index.commit(RodaConstants.INDEX_SIP);
-      LOGGER.debug("End indexing SIPs");
-      LOGGER.debug("TIME: " + ((System.currentTimeMillis() - start) / 1000) + " segundos");
+      LOGGER.error("End indexing SIPs");
+      LOGGER.error("TIME: " + ((System.currentTimeMillis() - start) / 1000) + " segundos");
       RodaCoreFactory.setFolderMonitorDate(basePath, new Date());
     } catch (IOException | SolrServerException e) {
       LOGGER.error("ERROR REINDEXING SIPS");
@@ -99,34 +99,34 @@ public class ReindexSipRunnable implements Runnable {
           TransferredResource resourceAncestor = FolderMonitorNIO
             .createTransferredResource(basePath.resolve(Paths.get(ancestor)), Paths.get(resource.getBasePath()));
           if (resourceAncestor.isToIndex()) {
-            LOGGER.debug("---------------- ADDED ----------------------");
-            LOGGER.debug("FULLPATH " + resourceAncestor.getFullPath());
-            LOGGER.debug("RELATIVE " + resourceAncestor.getRelativePath());
-            LOGGER.debug("PARENT " + resourceAncestor.getParentPath());
-            LOGGER.debug("------------------------------------------------");
+            LOGGER.error("---------------- ADDED ----------------------");
+            LOGGER.error("FULLPATH " + resourceAncestor.getFullPath());
+            LOGGER.error("RELATIVE " + resourceAncestor.getRelativePath());
+            LOGGER.error("PARENT " + resourceAncestor.getParentPath());
+            LOGGER.error("------------------------------------------------");
             index.add(RodaConstants.INDEX_SIP, SolrUtils.transferredResourceToSolrDocument(resourceAncestor));
           } else {
-            LOGGER.debug("---------------- NOT ADDED ----------------------");
-            LOGGER.debug("FULLPATH " + resourceAncestor.getFullPath());
-            LOGGER.debug("RELATIVE " + resourceAncestor.getRelativePath());
-            LOGGER.debug("PARENT " + resourceAncestor.getParentPath());
-            LOGGER.debug("------------------------------------------------");
+            LOGGER.error("---------------- NOT ADDED ----------------------");
+            LOGGER.error("FULLPATH " + resourceAncestor.getFullPath());
+            LOGGER.error("RELATIVE " + resourceAncestor.getRelativePath());
+            LOGGER.error("PARENT " + resourceAncestor.getParentPath());
+            LOGGER.error("------------------------------------------------");
           }
         }
       }
       if (resource.isToIndex()) {
-        LOGGER.debug("---------------- ADDED ----------------------");
-        LOGGER.debug("FULLPATH " + resource.getFullPath());
-        LOGGER.debug("RELATIVE " + resource.getRelativePath());
-        LOGGER.debug("PARENT " + resource.getParentPath());
-        LOGGER.debug("------------------------------------------------");
+        LOGGER.error("---------------- ADDED ----------------------");
+        LOGGER.error("FULLPATH " + resource.getFullPath());
+        LOGGER.error("RELATIVE " + resource.getRelativePath());
+        LOGGER.error("PARENT " + resource.getParentPath());
+        LOGGER.error("------------------------------------------------");
         index.add(RodaConstants.INDEX_SIP, SolrUtils.transferredResourceToSolrDocument(resource));
       } else {
-        LOGGER.debug("---------------- NOT ADDED ----------------------");
-        LOGGER.debug("FULLPATH " + resource.getFullPath());
-        LOGGER.debug("RELATIVE " + resource.getRelativePath());
-        LOGGER.debug("PARENT " + resource.getParentPath());
-        LOGGER.debug("------------------------------------------------");
+        LOGGER.error("---------------- NOT ADDED ----------------------");
+        LOGGER.error("FULLPATH " + resource.getFullPath());
+        LOGGER.error("RELATIVE " + resource.getRelativePath());
+        LOGGER.error("PARENT " + resource.getParentPath());
+        LOGGER.error("------------------------------------------------");
       }
       if (commit) {
         index.commit(RodaConstants.INDEX_SIP);
