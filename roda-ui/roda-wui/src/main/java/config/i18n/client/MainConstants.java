@@ -45,7 +45,7 @@ public interface MainConstants extends Constants, ConstantsWithLookup {
   public String title_resetpassword();
 
   @Key("title.about")
-  @DefaultStringValue("About")
+  @DefaultStringValue("Welcome")
   public String title_about();
 
   @Key("title.about.services")

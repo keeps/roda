@@ -1535,6 +1535,7 @@ td.datePickerMonth, td.datePickerYear {
 /** Toast **/
 .wui-toast {
 	width: auto;
+	max-width: 300px;
   	clear: both;
 	border-radius: 2px;
 	background-color: rgba(50,50,50,0.9);

@@ -19,6 +19,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.roda.core.common.UserUtility;
+import org.roda.wui.client.about.About;
+import org.roda.wui.client.main.Login;
 import org.roda.wui.common.client.tools.Tools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,8 +55,7 @@ public class RodaInternalAuthenticationFilter implements Filter {
     LOGGER.debug("hash: " + hash);
 
     if (requestURI.equals("/login")) {
-      // FIXME add this to configuration
-      String redirect = "/#login";
+      String redirect = "/#" + Login.RESOLVER.getHistoryToken();
 
       if (hash != null) {
         redirect += Tools.HISTORY_SEP + hash;
@@ -63,7 +64,8 @@ public class RodaInternalAuthenticationFilter implements Filter {
       httpResponse.sendRedirect(redirect);
     } else if (requestURI.equals("/logout")) {
       UserUtility.logout(httpRequest);
-      httpResponse.sendRedirect("/#home");
+      httpResponse.sendRedirect("/#" + About.RESOLVER.getHistoryToken());
+
     } else {
       chain.doFilter(request, response);
     }

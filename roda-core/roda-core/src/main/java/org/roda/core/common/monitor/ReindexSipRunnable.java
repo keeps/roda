@@ -47,28 +47,16 @@ public class ReindexSipRunnable implements Runnable {
     LOGGER.error("Start indexing SIPs: " + basePath.toString());
     try {
       EnumSet<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
-      Files.walkFileTree(basePath, opts, 100, new FileVisitor<Path>() {
+      Files.walkFileTree(basePath, opts, Integer.MAX_VALUE, new FileVisitor<Path>() {
         @Override
         public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+          indexPath(dir, attrs);
           return FileVisitResult.CONTINUE;
         }
 
         @Override
         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-          Date modifiedDate = new Date(attrs.lastModifiedTime().toMillis());
-          if (from == null || from.before(modifiedDate)) {
-            transferredResourceAdded(FolderMonitorNIO.createTransferredResource(file, basePath), false);
-            counter++;
-            if (counter >= 1000) {
-              try {
-                LOGGER.error("Commiting...");
-                index.commit(RodaConstants.INDEX_SIP);
-                counter = 0;
-              } catch (IOException | SolrServerException e) {
-                LOGGER.error(e.getMessage(), e);
-              }
-            }
-          }
+          indexPath(file, attrs);
           return FileVisitResult.CONTINUE;
         }
 
@@ -88,6 +76,23 @@ public class ReindexSipRunnable implements Runnable {
       RodaCoreFactory.setFolderMonitorDate(basePath, new Date());
     } catch (IOException | SolrServerException e) {
       LOGGER.error("ERROR REINDEXING SIPS");
+    }
+  }
+
+  private void indexPath(Path file, BasicFileAttributes attrs) {
+    Date modifiedDate = new Date(attrs.lastModifiedTime().toMillis());
+    if (from == null || from.before(modifiedDate)) {
+      transferredResourceAdded(FolderMonitorNIO.createTransferredResource(file, basePath), false);
+      counter++;
+      if (counter >= 1000) {
+        try {
+          LOGGER.error("Commiting...");
+          index.commit(RodaConstants.INDEX_SIP);
+          counter = 0;
+        } catch (IOException | SolrServerException e) {
+          LOGGER.error(e.getMessage(), e);
+        }
+      }
     }
   }
 

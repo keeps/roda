@@ -144,7 +144,7 @@ public class TransferredResourceList extends AsyncTableCell<TransferredResource>
 
       @Override
       public String getValue(TransferredResource r) {
-        return r != null ? Humanize.readableFileSize(r.getSize()) : null;
+        return r != null && r.isFile() ? Humanize.readableFileSize(r.getSize()) : "";
       }
     };
 
@@ -233,7 +233,7 @@ public class TransferredResourceList extends AsyncTableCell<TransferredResource>
           for (TransferredResource item : items) {
             totalSize += item.getSize();
           }
-          return Humanize.readableFileSize(totalSize);
+          return totalSize > 0 ? Humanize.readableFileSize(totalSize) : "";
         }
       }
     };
