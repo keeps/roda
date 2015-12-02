@@ -19,6 +19,7 @@ import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RODAException;
 import org.roda.core.data.v2.IndexResult;
+import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.RepresentationPreservationObject;
 import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.core.data.v2.SimpleFile;
@@ -200,4 +201,10 @@ public interface BrowserServiceAsync {
 
   void getRepresentationFiles(Filter filter, Sorter sorter, Sublist sublist, Facets facets, String localeString,
     AsyncCallback<IndexResult<SimpleFile>> callback);
+
+  void findJobs(Filter filter, Sorter sorter, Sublist sublist, Facets facets, AsyncCallback<IndexResult<Job>> callback);
+
+  void retrieveJob(String jobId, AsyncCallback<Job> callback);
+
+  void createJob(Job job, AsyncCallback<Job> callback);
 }

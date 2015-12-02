@@ -18,7 +18,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.solr.client.solrj.SolrClient;
-import org.roda.core.data.common.NotFoundException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.fs.FSUtils;

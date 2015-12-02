@@ -5,15 +5,21 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.wui.common.client.widgets;
+package org.roda.wui.client.common.lists;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.sort.SortParameter;
+import org.roda.core.data.adapter.sort.Sorter;
+import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.wui.common.client.ClientLogger;
+import org.roda.wui.common.client.widgets.MyCellTableResources;
+import org.roda.wui.common.client.widgets.Toast;
 import org.roda.wui.common.client.widgets.wcag.AccessibleCellTable;
 import org.roda.wui.common.client.widgets.wcag.AccessibleSimplePager;
 
@@ -24,8 +30,10 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent.AsyncHandler;
 import com.google.gwt.user.cellview.client.ColumnSortList;
+import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy.KeyboardSelectionPolicy;
 import com.google.gwt.user.cellview.client.PageSizePager;
 import com.google.gwt.user.client.Random;
@@ -84,7 +92,7 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
         // Query the data asynchronously.
         final int start = range.getStart();
         int length = range.getLength();
-        getData(start, length, columnSortList, new AsyncCallback<IndexResult<T>>() {
+        getData(new Sublist(start, length), columnSortList, new AsyncCallback<IndexResult<T>>() {
 
           @Override
           public void onFailure(Throwable caught) {
@@ -127,14 +135,13 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
     add(pageSizePager);
 
     selectionModel = new SingleSelectionModel<>(getKeyProvider());
-    
+
     Handler<T> selectionEventManager = getSelectionEventManager();
-    if(selectionEventManager != null) {
+    if (selectionEventManager != null) {
       display.setSelectionModel(selectionModel, selectionEventManager);
     } else {
       display.setSelectionModel(selectionModel);
     }
-
 
     columnSortHandler = new AsyncHandler(display);
     display.addColumnSortHandler(columnSortHandler);
@@ -152,7 +159,7 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
 
   protected abstract ProvidesKey<T> getKeyProvider();
 
-  protected abstract void getData(int start, int length, ColumnSortList columnSortList,
+  protected abstract void getData(Sublist sublist, ColumnSortList columnSortList,
     AsyncCallback<IndexResult<T>> callback);
 
   protected CellPreviewEvent.Handler<T> getSelectionEventManager() {
@@ -198,6 +205,21 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
 
   public void redraw() {
     display.redraw();
+  }
+
+  protected Sorter createSorter(ColumnSortList columnSortList, Map<Column<T, ?>, String> columnSortingKeyMap) {
+    Sorter sorter = new Sorter();
+    for (int i = 0; i < columnSortList.size(); i++) {
+      ColumnSortInfo columnSortInfo = columnSortList.get(i);
+
+      String sortParameterKey = columnSortingKeyMap.get(columnSortInfo.getColumn());
+      if (sortParameterKey != null) {
+        sorter.add(new SortParameter(sortParameterKey, !columnSortInfo.isAscending()));
+      } else {
+        logger.warn("Selecting a sorter that is not mapped");
+      }
+    }
+    return sorter;
   }
 
 }

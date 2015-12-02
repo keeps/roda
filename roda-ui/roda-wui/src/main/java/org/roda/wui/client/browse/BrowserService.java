@@ -15,9 +15,11 @@ import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.AuthorizationDeniedException;
-import org.roda.core.data.common.NotFoundException;
 import org.roda.core.data.common.RODAException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IndexResult;
+import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.RepresentationPreservationObject;
 import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.core.data.v2.SimpleFile;
@@ -242,4 +244,11 @@ public interface BrowserService extends RemoteService {
 
   IndexResult<SimpleFile> getRepresentationFiles(Filter filter, Sorter sorter, Sublist sublist, Facets facets,
     String localeString) throws AuthorizationDeniedException, GenericException;
+
+  IndexResult<Job> findJobs(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
+    throws AuthorizationDeniedException, GenericException;
+
+  Job retrieveJob(String jobId) throws AuthorizationDeniedException, GenericException, NotFoundException;
+
+  Job createJob(Job job) throws AuthorizationDeniedException, NotFoundException, RequestNotValidException;
 }

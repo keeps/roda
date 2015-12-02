@@ -165,7 +165,7 @@ public interface MainConstants extends Constants, ConstantsWithLookup {
   public String title_ingest_submit_create();
 
   @Key("title.ingest.list")
-  @DefaultStringValue("Status")
+  @DefaultStringValue("Process")
   public String title_ingest_list();
 
   @Key("title.ingest.help")

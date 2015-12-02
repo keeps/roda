@@ -49,10 +49,11 @@ import org.roda.core.data.adapter.sort.SortParameter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.AuthorizationDeniedException;
-import org.roda.core.data.common.NotFoundException;
 import org.roda.core.data.common.Pair;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.eadc.DescriptionLevel;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.Representation;
 import org.roda.core.data.v2.RepresentationState;
@@ -78,7 +79,6 @@ import org.roda.core.storage.fs.FSUtils;
 import org.roda.disseminators.common.tools.ZipEntryInfo;
 import org.roda.disseminators.common.tools.ZipTools;
 import org.roda.wui.api.exceptions.ApiException;
-import org.roda.wui.api.exceptions.RequestNotValidException;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.api.v1.utils.StreamResponse;
 import org.roda.wui.client.browse.BrowseItemBundle;
@@ -274,9 +274,8 @@ public class BrowserHelper {
 
   public static void validateGetAipRepresentationFileParams(String acceptFormat) throws RequestNotValidException {
     if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
-      throw new RequestNotValidException(ApiException.INVALID_PARAMETER_VALUE,
-        "Invalid '" + RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT + "' value. Expected values: "
-          + Arrays.asList(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN));
+      throw new RequestNotValidException("Invalid '" + RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT
+        + "' value. Expected values: " + Arrays.asList(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN));
     }
   }
 
@@ -295,9 +294,8 @@ public class BrowserHelper {
 
   protected static void validateGetAipRepresentationParams(String acceptFormat) throws RequestNotValidException {
     if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
-      throw new RequestNotValidException(ApiException.INVALID_PARAMETER_VALUE,
-        "Invalid '" + RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT + "' value. Expected values: "
-          + Arrays.asList(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN));
+      throw new RequestNotValidException("Invalid '" + RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT
+        + "' value. Expected values: " + Arrays.asList(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN));
     }
   }
 
@@ -328,9 +326,8 @@ public class BrowserHelper {
 
   protected static void validateListAipDescriptiveMetadataParams(String acceptFormat) throws RequestNotValidException {
     if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
-      throw new RequestNotValidException(ApiException.INVALID_PARAMETER_VALUE,
-        "Invalid '" + RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT + "' value. Expected values: "
-          + Arrays.asList(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN));
+      throw new RequestNotValidException("Invalid '" + RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT
+        + "' value. Expected values: " + Arrays.asList(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN));
     }
   }
 
@@ -376,7 +373,7 @@ public class BrowserHelper {
   protected static void validateGetAipDescritiveMetadataParams(String acceptFormat) throws RequestNotValidException {
     if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)
       && !RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
-      throw new RequestNotValidException(ApiException.INVALID_PARAMETER_VALUE,
+      throw new RequestNotValidException(
         "Invalid '" + RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT + "' value. Expected values: " + Arrays
           .asList(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML, RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML));
     }
@@ -437,9 +434,8 @@ public class BrowserHelper {
 
   protected static void validateListAipPreservationMetadataParams(String acceptFormat) throws RequestNotValidException {
     if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
-      throw new RequestNotValidException(ApiException.INVALID_PARAMETER_VALUE,
-        "Invalid '" + RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT + "' value. Expected values: "
-          + Arrays.asList(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN));
+      throw new RequestNotValidException("Invalid '" + RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT
+        + "' value. Expected values: " + Arrays.asList(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN));
     }
 
   }
@@ -504,15 +500,14 @@ public class BrowserHelper {
     throws RequestNotValidException {
     if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)
       && !RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
-      throw new RequestNotValidException(ApiException.INVALID_PARAMETER_VALUE,
+      throw new RequestNotValidException(
         "Invalid '" + RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT + "' value. Expected values: " + Arrays
           .asList(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN, RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML));
     }
 
     // FIXME validate language? what exception should be thrown?
     if (!StringUtils.isNotBlank(language)) {
-      throw new RequestNotValidException(ApiException.EMPTY_PARAMETER,
-        "Parameter '" + RodaConstants.API_QUERY_KEY_LANG + "' must have a value");
+      throw new RequestNotValidException("Parameter '" + RodaConstants.API_QUERY_KEY_LANG + "' must have a value");
     }
 
   }

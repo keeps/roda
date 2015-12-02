@@ -5,7 +5,9 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.data.common;
+package org.roda.core.data.exceptions;
+
+import org.roda.core.data.common.RODAException;
 
 /**
  * @author Luis Faria
@@ -23,8 +25,5 @@ public class NotFoundException extends RODAException {
     super(message);
   }
 
-  public NotFoundException(String message, NotFoundException e) {
-    super(message, e);
-  }
 
 }

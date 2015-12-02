@@ -13,14 +13,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-
-import org.roda.core.data.common.RodaConstants.JOB_STATE;
-import org.roda.core.data.common.RodaConstants.JOB_TYPE;
-import org.roda.core.data.common.RodaConstants.RESOURCE_TYPE;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -31,6 +26,18 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.ALWAYS)
 public class Job implements Serializable {
   private static final long serialVersionUID = 615993757726175203L;
+
+  public static enum JOB_STATE {
+    CREATED, STARTED, COMPLETED, FAILED;
+  }
+
+  public static enum JOB_TYPE {
+    INGEST, MISC;
+  }
+
+  public static enum RESOURCE_TYPE {
+    BAGIT;
+  }
 
   // job identifier
   private String id = null;
@@ -70,8 +77,6 @@ public class Job implements Serializable {
 
   public Job() {
     super();
-    id = UUID.randomUUID().toString();
-    name = id;
     startDate = new Date();
     state = JOB_STATE.CREATED;
   }

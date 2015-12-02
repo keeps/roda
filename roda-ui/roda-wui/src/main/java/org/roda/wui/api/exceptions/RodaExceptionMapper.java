@@ -13,9 +13,10 @@ import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 import org.roda.core.data.common.AuthorizationDeniedException;
-import org.roda.core.data.common.NotFoundException;
 import org.roda.core.data.common.NotImplementedException;
 import org.roda.core.data.common.RODAException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.common.client.GenericException;
 

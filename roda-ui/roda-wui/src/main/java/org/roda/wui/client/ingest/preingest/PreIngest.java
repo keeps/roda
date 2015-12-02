@@ -8,7 +8,7 @@
 /**
  * 
  */
-package org.roda.wui.ingest.pre.client;
+package org.roda.wui.client.ingest.preingest;
 
 import java.util.List;
 

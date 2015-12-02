@@ -14,7 +14,7 @@ import java.util.Map;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.InvalidParameterException;
-import org.roda.core.data.common.NotFoundException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.index.IndexServiceException;

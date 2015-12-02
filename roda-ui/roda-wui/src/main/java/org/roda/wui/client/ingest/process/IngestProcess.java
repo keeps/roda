@@ -8,7 +8,7 @@
 /**
  * 
  */
-package org.roda.wui.management.user.client;
+package org.roda.wui.client.ingest.process;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -20,37 +20,38 @@ import org.roda.core.data.adapter.facet.SimpleFacetParameter;
 import org.roda.core.data.adapter.filter.DateRangeFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.LogEntry;
+import org.roda.core.data.v2.Job;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.lists.LogEntryList;
-import org.roda.wui.common.client.ClientLogger;
+import org.roda.wui.client.common.lists.JobList;
+import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.Tools;
-import org.roda.wui.management.client.Management;
+import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.datepicker.client.DateBox;
 import com.google.gwt.user.datepicker.client.DateBox.DefaultFormat;
 import com.google.gwt.view.client.SelectionChangeEvent;
-
-import config.i18n.client.UserManagementConstants;
-import config.i18n.client.UserManagementMessages;
+import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 
 /**
  * @author Luis Faria
  * 
  */
-public class UserLog extends Composite {
+public class IngestProcess extends Composite {
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
@@ -61,43 +62,47 @@ public class UserLog extends Composite {
 
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().checkRoles(new HistoryResolver[] {UserLog.RESOLVER}, false, callback);
+      UserLogin.getInstance().checkRole(this, callback);
     }
 
-    public List<String> getHistoryPath() {
-      return Tools.concat(Management.RESOLVER.getHistoryPath(), getHistoryToken());
-    }
-
+    @Override
     public String getHistoryToken() {
-      return "log";
+      return "process";
+    }
+
+    @Override
+    public List<String> getHistoryPath() {
+      return Tools.concat(Ingest.RESOLVER.getHistoryPath(), getHistoryToken());
     }
   };
 
-  private static UserLog instance = null;
+  private static IngestProcess instance = null;
 
   /**
    * Get the singleton instance
    * 
    * @return the instance
    */
-  public static UserLog getInstance() {
+  public static IngestProcess getInstance() {
     if (instance == null) {
-      instance = new UserLog();
+      instance = new IngestProcess();
     }
     return instance;
   }
 
-  interface MyUiBinder extends UiBinder<Widget, UserLog> {
+  interface MyUiBinder extends UiBinder<Widget, IngestProcess> {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  private static UserManagementConstants constants = (UserManagementConstants) GWT
-    .create(UserManagementConstants.class);
+  @UiField(provided = true)
+  JobList jobList;
 
-  private static UserManagementMessages messages = (UserManagementMessages) GWT.create(UserManagementMessages.class);
+  @UiField(provided = true)
+  FlowPanel stateFacets;
 
-  private ClientLogger logger = new ClientLogger(getClass().getName());
+  @UiField(provided = true)
+  FlowPanel producerFacets;
 
   @UiField
   DateBox inputDateInitial;
@@ -105,48 +110,26 @@ public class UserLog extends Composite {
   @UiField
   DateBox inputDateFinal;
 
-  @UiField(provided = true)
-  LogEntryList logList;
+  @UiField
+  Button newJob;
+  @UiField
+  Button removeFinished;
 
-  @UiField(provided = true)
-  FlowPanel facetComponents;
+  private IngestProcess() {
 
-  @UiField(provided = true)
-  FlowPanel facetMethods;
-
-  @UiField(provided = true)
-  FlowPanel facetUsers;
-
-  /**
-   * Create a new user log
-   * 
-   * @param user
-   */
-  public UserLog() {
     Filter filter = null;
-    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.LOG_ACTION_COMPONENT),
-      new SimpleFacetParameter(RodaConstants.LOG_ACTION_METHOD), new SimpleFacetParameter(RodaConstants.LOG_USERNAME));
-    logList = new LogEntryList(filter, facets, "Logs");
-    facetComponents = new FlowPanel();
-    facetMethods = new FlowPanel();
-    facetUsers = new FlowPanel();
 
+    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.SIP_REPORT_STATE),
+      new SimpleFacetParameter(RodaConstants.SIP_REPORT_USERNAME));
+
+    // TODO externalise strings
+    jobList = new JobList(filter, facets, "Ingest job list");
+    producerFacets = new FlowPanel();
+    stateFacets = new FlowPanel();
     Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
-    facetPanels.put(RodaConstants.LOG_ACTION_COMPONENT, facetComponents);
-    facetPanels.put(RodaConstants.LOG_ACTION_METHOD, facetMethods);
-    facetPanels.put(RodaConstants.LOG_USERNAME, facetUsers);
-    FacetUtils.bindFacets(logList, facetPanels);
-
-    logList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
-
-      @Override
-      public void onSelectionChange(SelectionChangeEvent event) {
-        LogEntry selected = logList.getSelectionModel().getSelectedObject();
-        if (selected != null) {
-          Tools.newHistory(LogEntryPanel.RESOLVER, selected.getId());
-        }
-      }
-    });
+    facetPanels.put(RodaConstants.JOB_STATE, stateFacets);
+    facetPanels.put(RodaConstants.JOB_USERNAME, producerFacets);
+    FacetUtils.bindFacets(jobList, facetPanels);
 
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -170,24 +153,45 @@ public class UserLog extends Composite {
     inputDateFinal.setFireNullValues(true);
     inputDateFinal.addValueChangeHandler(valueChangeHandler);
 
+    jobList.getSelectionModel().addSelectionChangeHandler(new Handler() {
+
+      @Override
+      public void onSelectionChange(SelectionChangeEvent event) {
+        updateVisibles(jobList.getSelectionModel().getSelectedObject());
+      }
+    });
+
+  }
+
+  protected void updateVisibles(Job selected) {
+
   }
 
   private void updateDateFilter() {
     Date dateInitial = inputDateInitial.getDatePicker().getValue();
     Date dateFinal = inputDateFinal.getDatePicker().getValue();
 
-    DateRangeFilterParameter filterParameter = new DateRangeFilterParameter(RodaConstants.LOG_DATETIME, dateInitial,
+    DateRangeFilterParameter filterParameter = new DateRangeFilterParameter(RodaConstants.JOB_START_DATE, dateInitial,
       dateFinal, RodaConstants.DateGranularity.DAY);
 
-    logList.setFilter(new Filter(filterParameter));
+    jobList.setFilter(new Filter(filterParameter));
+  }
+
+  @UiHandler("newJob")
+  void handleNewJobAction(ClickEvent e) {
+    Toast.showInfo("Sorry", "Feature not yet implemented");
+  }
+
+  @UiHandler("removeFinished")
+  void handleViewAction(ClickEvent e) {
+    Toast.showInfo("Sorry", "Feature not yet implemented");
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 0) {
-      logList.refresh();
+      jobList.refresh();
+
       callback.onSuccess(this);
-    } else if (historyTokens.size() > 1 && LogEntryPanel.RESOLVER.getHistoryToken().equals(historyTokens.get(0))) {
-      LogEntryPanel.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else {
       Tools.newHistory(RESOLVER);
       callback.onSuccess(null);

@@ -5,9 +5,11 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.wui.client.common;
+package org.roda.wui.client.common.lists;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
@@ -16,9 +18,9 @@ import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IndexResult;
+import org.roda.core.data.v2.RODAMember;
 import org.roda.core.data.v2.SIPReport;
 import org.roda.wui.common.client.ClientLogger;
-import org.roda.wui.common.client.widgets.AsyncTableCell;
 import org.roda.wui.ingest.list.client.IngestListService;
 
 import com.google.gwt.cell.client.DateCell;
@@ -143,42 +145,19 @@ public class SIPReportList extends AsyncTableCell<SIPReport> {
   }
 
   @Override
-  protected void getData(int start, int length, ColumnSortList columnSortList,
+  protected void getData(Sublist sublist, ColumnSortList columnSortList,
     AsyncCallback<IndexResult<SIPReport>> callback) {
 
     Filter filter = getFilter();
 
-    // calculate sorter
-    Sorter sorter = new Sorter();
-    for (int i = 0; i < columnSortList.size(); i++) {
-      ColumnSortInfo columnSortInfo = columnSortList.get(i);
-      String sortParameterKey;
-      // if (columnSortInfo.getColumn().equals(idColumn)) {
-      // sortParameterKey = RodaConstants.SIP_REPORT_ID;
-      // } else
-      if (columnSortInfo.getColumn().equals(originalFilenameColumn)) {
-        sortParameterKey = RodaConstants.SIP_REPORT_ORIGINAL_FILENAME;
-      } else if (columnSortInfo.getColumn().equals(submissionDateColumn)) {
-        sortParameterKey = RodaConstants.SIP_REPORT_DATETIME;
-      } else if (columnSortInfo.getColumn().equals(currentStateColumn)) {
-        sortParameterKey = RodaConstants.SIP_REPORT_STATE;
-      } else if (columnSortInfo.getColumn().equals(percentageColumn)) {
-        sortParameterKey = RodaConstants.SIP_REPORT_COMPLETE_PERCENTAGE;
-      } else if (columnSortInfo.getColumn().equals(producerColumn)) {
-        sortParameterKey = RodaConstants.SIP_REPORT_USERNAME;
-      } else {
-        sortParameterKey = null;
-      }
+    Map<Column<SIPReport, ?>, String> columnSortingKeyMap = new HashMap<Column<SIPReport, ?>, String>();
+    columnSortingKeyMap.put(originalFilenameColumn, RodaConstants.SIP_REPORT_ORIGINAL_FILENAME);
+    columnSortingKeyMap.put(submissionDateColumn, RodaConstants.SIP_REPORT_DATETIME);
+    columnSortingKeyMap.put(currentStateColumn, RodaConstants.SIP_REPORT_STATE);
+    columnSortingKeyMap.put(percentageColumn, RodaConstants.SIP_REPORT_COMPLETE_PERCENTAGE);
+    columnSortingKeyMap.put(producerColumn, RodaConstants.SIP_REPORT_USERNAME);
 
-      if (sortParameterKey != null) {
-        sorter.add(new SortParameter(sortParameterKey, !columnSortInfo.isAscending()));
-      } else {
-        logger.warn("Selecting a sorter that is not mapped");
-      }
-    }
-
-    // define sublist
-    Sublist sublist = new Sublist(start, length);
+    Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
     IngestListService.Util.getInstance().findSipReports(filter, sorter, sublist, getFacets(), callback);
 

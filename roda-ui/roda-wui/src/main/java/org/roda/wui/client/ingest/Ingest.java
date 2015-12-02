@@ -13,15 +13,14 @@ import java.util.List;
 import org.roda.core.data.v2.RodaUser;
 import org.roda.core.data.v2.User;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.ingest.preingest.PreIngest;
+import org.roda.wui.client.ingest.process.IngestProcess;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.common.client.BadHistoryTokenException;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
-import org.roda.wui.ingest.list.client.IngestList;
-import org.roda.wui.ingest.pre.client.PreIngest;
-import org.roda.wui.ingest.submit.client.IngestSubmit;
 
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -44,7 +43,7 @@ public class Ingest {
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
       UserLogin.getInstance().checkRoles(
-        new HistoryResolver[] {PreIngest.RESOLVER, IngestSubmit.RESOLVER, IngestList.RESOLVER}, false, callback);
+        new HistoryResolver[] {PreIngest.RESOLVER, IngestTransfer.RESOLVER, IngestProcess.RESOLVER}, false, callback);
     }
 
     public List<String> getHistoryPath() {
@@ -105,10 +104,8 @@ public class Ingest {
         PreIngest.getInstance().resolve(Tools.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals(IngestTransfer.RESOLVER.getHistoryToken())) {
         IngestTransfer.getInstance().resolve(Tools.tail(historyTokens), callback);
-      } else if (historyTokens.get(0).equals(IngestSubmit.RESOLVER.getHistoryToken())) {
-        IngestSubmit.getInstance().resolve(Tools.tail(historyTokens), callback);
-      } else if (historyTokens.get(0).equals(IngestList.RESOLVER.getHistoryToken())) {
-        IngestList.getInstance().resolve(Tools.tail(historyTokens), callback);
+      } else if (historyTokens.get(0).equals(IngestProcess.RESOLVER.getHistoryToken())) {
+        IngestProcess.getInstance().resolve(Tools.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals("help")) {
         callback.onSuccess(getHelp());
       } else {

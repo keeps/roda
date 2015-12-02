@@ -14,7 +14,7 @@ import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
-import org.roda.core.data.common.NotFoundException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.SIPReport;
 import org.roda.core.index.IndexServiceException;

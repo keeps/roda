@@ -26,10 +26,12 @@ import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.AuthorizationDeniedException;
-import org.roda.core.data.common.NotFoundException;
 import org.roda.core.data.common.RODAException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.EventPreservationObject;
 import org.roda.core.data.v2.IndexResult;
+import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.RepresentationPreservationObject;
 import org.roda.core.data.v2.RodaUser;
 import org.roda.core.data.v2.SimpleDescriptionObject;
@@ -41,6 +43,7 @@ import org.roda.core.storage.DefaultBinary;
 import org.roda.core.storage.StoragePath;
 import org.roda.core.storage.StringContentPayload;
 import org.roda.wui.api.controllers.Browser;
+import org.roda.wui.api.controllers.Jobs;
 import org.roda.wui.client.browse.BrowseItemBundle;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.DescriptiveMetadataEditBundle;
@@ -579,6 +582,25 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   public boolean isTransferFullyInitialized() throws AuthorizationDeniedException, GenericException, NotFoundException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     return Browser.isTransferFullyInitialized(user);
+  }
+
+  @Override
+  public IndexResult<Job> findJobs(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
+    throws AuthorizationDeniedException, GenericException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    return Jobs.findJobs(user, filter, sorter, sublist, facets);
+  }
+
+  @Override
+  public Job retrieveJob(String jobId) throws AuthorizationDeniedException, GenericException, NotFoundException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    return Jobs.getJob(user, jobId);
+  }
+
+  @Override
+  public Job createJob(Job job) throws RequestNotValidException, AuthorizationDeniedException, NotFoundException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    return Jobs.createJob(user, job);
   }
 
 }

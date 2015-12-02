@@ -5,12 +5,14 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.wui.client.common;
+package org.roda.wui.client.common.lists;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.roda.core.data.adapter.facet.Facets;
@@ -20,11 +22,11 @@ import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IndexResult;
+import org.roda.core.data.v2.SIPReport;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.Humanize;
-import org.roda.wui.common.client.widgets.AsyncTableCell;
 
 import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.DateCell;
@@ -259,42 +261,19 @@ public class TransferredResourceList extends AsyncTableCell<TransferredResource>
   }
 
   @Override
-  protected void getData(int start, int length, ColumnSortList columnSortList,
+  protected void getData(Sublist sublist, ColumnSortList columnSortList,
     AsyncCallback<IndexResult<TransferredResource>> callback) {
 
     Filter filter = getFilter();
 
-    // calculate sorter
-    Sorter sorter = new Sorter();
-    for (int i = 0; i < columnSortList.size(); i++) {
-      ColumnSortInfo columnSortInfo = columnSortList.get(i);
-      String sortParameterKey;
-      // if (columnSortInfo.getColumn().equals(idColumn)) {
-      // sortParameterKey = RodaConstants.TRANSFERRED_RESOURCE_ID;
-      // } else
-      if (columnSortInfo.getColumn().equals(isFileColumn)) {
-        sortParameterKey = RodaConstants.TRANSFERRED_RESOURCE_ISFILE;
-      } else if (columnSortInfo.getColumn().equals(nameColumn)) {
-        sortParameterKey = RodaConstants.TRANSFERRED_RESOURCE_NAME;
-      } else if (columnSortInfo.getColumn().equals(sizeColumn)) {
-        sortParameterKey = RodaConstants.TRANSFERRED_RESOURCE_SIZE;
-      } else if (columnSortInfo.getColumn().equals(creationDateColumn)) {
-        sortParameterKey = RodaConstants.TRANSFERRED_RESOURCE_DATE;
-      } else if (columnSortInfo.getColumn().equals(ownerColumn)) {
-        sortParameterKey = RodaConstants.TRANSFERRED_RESOURCE_OWNER;
-      } else {
-        sortParameterKey = null;
-      }
+    Map<Column<TransferredResource, ?>, String> columnSortingKeyMap = new HashMap<Column<TransferredResource, ?>, String>();
+    columnSortingKeyMap.put(isFileColumn, RodaConstants.TRANSFERRED_RESOURCE_ISFILE);
+    columnSortingKeyMap.put(nameColumn, RodaConstants.TRANSFERRED_RESOURCE_NAME);
+    columnSortingKeyMap.put(sizeColumn, RodaConstants.TRANSFERRED_RESOURCE_SIZE);
+    columnSortingKeyMap.put(creationDateColumn, RodaConstants.TRANSFERRED_RESOURCE_DATE);
+    columnSortingKeyMap.put(ownerColumn, RodaConstants.TRANSFERRED_RESOURCE_OWNER);
 
-      if (sortParameterKey != null) {
-        sorter.add(new SortParameter(sortParameterKey, !columnSortInfo.isAscending()));
-      } else {
-        logger.warn("Selecting a sorter that is not mapped");
-      }
-    }
-
-    // define sublist
-    Sublist sublist = new Sublist(start, length);
+    Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
     BrowserService.Util.getInstance().findTransferredResources(filter, sorter, sublist, getFacets(), callback);
 

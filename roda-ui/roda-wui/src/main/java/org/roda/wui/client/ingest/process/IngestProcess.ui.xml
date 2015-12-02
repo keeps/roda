@@ -3,7 +3,7 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:i="urn:import:config.i18n.client" xmlns:d="urn:import:com.google.gwt.user.datepicker.client"
-	xmlns:common="urn:import:org.roda.wui.client.common">
+	xmlns:lists="urn:import:org.roda.wui.client.common.lists">
 
 	<ui:style>
 	.other-producer-label {
@@ -21,9 +21,8 @@
 	<g:FlowPanel styleName="wui-ingest-list" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
-				<g:Label styleName="h1">Ingest status</g:Label>
-				<common:SIPReportList addStyleNames="searchResults"
-					ui:field="sipList" />
+				<g:Label styleName="h1">Ingest process</g:Label>
+				<lists:JobList ui:field="jobList" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel>
@@ -59,10 +58,10 @@
 					<g:Label addStyleNames="h4">
 						<ui:msg>Actions</ui:msg>
 					</g:Label>
-					<g:Button addStyleNames="btn btn-th-list" ui:field="report">Report</g:Button>
-					<g:Button addStyleNames="btn btn-play" ui:field="view">View</g:Button>
-					<g:Button addStyleNames="btn btn-check" ui:field="accept">Accept</g:Button>
-					<g:Button addStyleNames="btn btn-ban" ui:field="reject">Reject</g:Button>
+					<g:Button addStyleNames="btn btn-plus" ui:field="newJob">Start new
+						process</g:Button>
+					<g:Button addStyleNames="btn btn-ban" ui:field="removeFinished">Remove
+						finished</g:Button>
 				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>

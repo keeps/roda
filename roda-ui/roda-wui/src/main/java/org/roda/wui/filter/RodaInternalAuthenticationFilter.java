@@ -20,7 +20,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.roda.core.common.UserUtility;
 import org.roda.wui.client.about.About;
-import org.roda.wui.client.main.Login;
 import org.roda.wui.common.client.tools.Tools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +54,7 @@ public class RodaInternalAuthenticationFilter implements Filter {
     LOGGER.debug("hash: " + hash);
 
     if (requestURI.equals("/login")) {
-      String redirect = "/#" + Login.RESOLVER.getHistoryToken();
+      String redirect = "/#login";
 
       if (hash != null) {
         redirect += Tools.HISTORY_SEP + hash;

@@ -15,7 +15,7 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
 import org.roda.core.data.common.InvalidParameterException;
-import org.roda.core.data.common.NotFoundException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.IndexServiceException;

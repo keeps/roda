@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.wui.client.common;
+package org.roda.wui.client.common.lists;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -5,12 +5,19 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.wui.api.exceptions;
+package org.roda.core.data.exceptions;
 
-public class RequestNotValidException extends ApiException {
+import org.roda.core.data.common.RODAException;
+
+public class RequestNotValidException extends RODAException {
   private static final long serialVersionUID = -8801039779198172428L;
 
-  public RequestNotValidException(int code, String msg) {
-    super(code, msg);
+  public RequestNotValidException() {
+    super();
   }
+
+  public RequestNotValidException(String msg) {
+    super(msg);
+  }
+
 }

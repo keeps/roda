@@ -17,17 +17,15 @@ import org.roda.wui.client.about.About;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.ingest.Ingest;
+import org.roda.wui.client.ingest.preingest.PreIngest;
+import org.roda.wui.client.ingest.process.IngestProcess;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.client.search.BasicSearch;
 import org.roda.wui.common.client.ClientLogger;
+import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.LoginStatusListener;
 import org.roda.wui.common.client.tools.Tools;
-import org.roda.wui.ingest.list.client.IngestList;
-import org.roda.wui.ingest.pre.client.PreIngest;
-import org.roda.wui.ingest.submit.client.IngestSubmit;
 import org.roda.wui.management.client.Management;
-import org.roda.wui.management.event.client.EventManagement;
-import org.roda.wui.management.statistics.client.Statistics;
 import org.roda.wui.management.user.client.MemberManagement;
 import org.roda.wui.management.user.client.Preferences;
 import org.roda.wui.management.user.client.Register;
@@ -77,7 +75,6 @@ public class Menu extends Composite {
   private final MenuBar ingestMenu;
   private MenuItem ingest_pre;
   private MenuItem ingest_transfer;
-  private MenuItem ingest_submit;
   private MenuItem ingest_list;
 
   private final MenuBar administrationMenu;
@@ -104,11 +101,10 @@ public class Menu extends Composite {
 
     ingestMenu = new MenuBar(true);
     ingest_pre = ingestMenu.addItem(constants.title_ingest_pre(), createCommand(PreIngest.RESOLVER.getHistoryPath()));
-    ingest_transfer = ingestMenu.addItem(constants.title_ingest_transfer(), createCommand(IngestTransfer.RESOLVER.getHistoryPath()));
-    ingest_submit = ingestMenu.addItem(constants.title_ingest_submit(),
-      createCommand(IngestSubmit.RESOLVER.getHistoryPath()));
+    ingest_transfer = ingestMenu.addItem(constants.title_ingest_transfer(),
+      createCommand(IngestTransfer.RESOLVER.getHistoryPath()));
     ingest_list = ingestMenu.addItem(constants.title_ingest_list(),
-      createCommand(IngestList.RESOLVER.getHistoryPath()));
+      createCommand(IngestProcess.RESOLVER.getHistoryPath()));
     // ingestMenu.addItem(constants.title_ingest_help(),
     // createCommand(Ingest.RESOLVER.getHistoryPath() + ".help"));
 
@@ -189,165 +185,27 @@ public class Menu extends Composite {
     // TODO make creating sync (not async)
 
     // Home
-    About.RESOLVER.isCurrentUserPermitted(new AsyncCallback<Boolean>() {
-
-      public void onFailure(Throwable caught) {
-        logger.error("Error getting roles", caught);
-      }
-
-      public void onSuccess(Boolean permitted) {
-        if (permitted) {
-          insertIntoLeftMenu(about, 0);
-        }
-      }
-
-    });
+    updateResolverTopItemVisibility(About.RESOLVER, about, 0);
 
     // Dissemination
-    Browse.RESOLVER.isCurrentUserPermitted(new AsyncCallback<Boolean>() {
-
-      public void onFailure(Throwable caught) {
-        logger.error("Error getting browse permissions", caught);
-
-      }
-
-      public void onSuccess(Boolean asRole) {
-        if (asRole) {
-          insertIntoLeftMenu(dissemination_browse, 1);
-        }
-      }
-
-    });
-
-    BasicSearch.RESOLVER.isCurrentUserPermitted(new AsyncCallback<Boolean>() {
-
-      public void onFailure(Throwable caught) {
-        logger.error("Error getting basic search role", caught);
-      }
-
-      public void onSuccess(Boolean asRole) {
-        if (asRole) {
-          insertIntoLeftMenu(dissemination_searchBasic, 2);
-        }
-      }
-
-    });
+    updateResolverTopItemVisibility(Browse.RESOLVER, dissemination_browse, 1);
+    updateResolverTopItemVisibility(BasicSearch.RESOLVER, dissemination_searchBasic, 2);
 
     // Ingest
-    PreIngest.RESOLVER.isCurrentUserPermitted(new AsyncCallback<Boolean>() {
-
-      public void onFailure(Throwable caught) {
-        logger.error("Error getting browse role", caught);
-      }
-
-      public void onSuccess(Boolean asRole) {
-        ingest_pre.setVisible(asRole);
-      }
-
-    });
-
-    IngestSubmit.RESOLVER.isCurrentUserPermitted(new AsyncCallback<Boolean>() {
-
-      public void onFailure(Throwable caught) {
-        logger.error("Error getting browse role", caught);
-      }
-
-      public void onSuccess(Boolean asRole) {
-        ingest_submit.setVisible(asRole);
-      }
-
-    });
-
-    IngestList.RESOLVER.isCurrentUserPermitted(new AsyncCallback<Boolean>() {
-
-      public void onFailure(Throwable caught) {
-        logger.error("Error getting browse role", caught);
-      }
-
-      public void onSuccess(Boolean asRole) {
-        ingest_list.setVisible(asRole);
-      }
-
-    });
-
-    Ingest.RESOLVER.isCurrentUserPermitted(new AsyncCallback<Boolean>() {
-
-      public void onFailure(Throwable caught) {
-        logger.error("Error getting roles", caught);
-      }
-
-      public void onSuccess(Boolean asRole) {
-        if (asRole) {
-          insertIntoLeftMenu(new MenuItem(constants.title_ingest(), ingestMenu), 3);
-        }
-      }
-
-    });
+    updateResolverSubItemVisibility(PreIngest.RESOLVER, ingest_pre);
+    updateResolverSubItemVisibility(IngestTransfer.RESOLVER, ingest_transfer);
+    updateResolverSubItemVisibility(IngestProcess.RESOLVER, ingest_list);
+    updateResolverTopItemVisibility(Ingest.RESOLVER, new MenuItem(constants.title_ingest(), ingestMenu), 3);
 
     // Administration
-
-    MemberManagement.RESOLVER.isCurrentUserPermitted(new AsyncCallback<Boolean>() {
-
-      public void onFailure(Throwable caught) {
-        logger.error("Error getting browse role", caught);
-      }
-
-      public void onSuccess(Boolean asRole) {
-        administration_user.setVisible(asRole);
-      }
-
-    });
-
-    EventManagement.getInstance().isCurrentUserPermitted(new AsyncCallback<Boolean>() {
-
-      public void onFailure(Throwable caught) {
-        logger.error("Error getting advanced search role", caught);
-      }
-
-      public void onSuccess(Boolean asRole) {
-        // administration_event.setVisible(asRole);
-      }
-
-    });
-
-    Statistics.getInstance().isCurrentUserPermitted(new AsyncCallback<Boolean>() {
-
-      public void onFailure(Throwable caught) {
-        logger.error("Error getting advanced search role", caught);
-      }
-
-      public void onSuccess(Boolean asRole) {
-        // administration_statistics.setVisible(asRole);
-      }
-
-    });
-
-    UserLog.RESOLVER.isCurrentUserPermitted(new AsyncCallback<Boolean>() {
-
-      public void onFailure(Throwable caught) {
-        logger.error("Error getting advanced search role", caught);
-      }
-
-      public void onSuccess(Boolean asRole) {
-        administration_log.setVisible(asRole);
-      }
-
-    });
-
-    Management.RESOLVER.isCurrentUserPermitted(new AsyncCallback<Boolean>() {
-
-      public void onFailure(Throwable caught) {
-        logger.error("Error getting roles", caught);
-      }
-
-      public void onSuccess(Boolean asRole) {
-        if (asRole) {
-          insertIntoLeftMenu(new MenuItem(constants.title_administration(), administrationMenu), 4);
-
-        }
-      }
-
-    });
+    updateResolverSubItemVisibility(MemberManagement.RESOLVER, administration_user);
+    // updateResolverSubItemVisibility(EventManagement.RESOLVER,
+    // administration_event);
+    // updateResolverSubItemVisibility(Statistics.RESOLVER,
+    // administration_statistics);
+    updateResolverSubItemVisibility(UserLog.RESOLVER, administration_log);
+    updateResolverTopItemVisibility(Management.RESOLVER,
+      new MenuItem(constants.title_administration(), administrationMenu), 4);
 
     // User
     if (user.isGuest()) {
@@ -357,6 +215,36 @@ public class Menu extends Composite {
       rightMenu.addItem(user.getName(), userMenu);
     }
 
+  }
+
+  private void updateResolverTopItemVisibility(final HistoryResolver resolver, final MenuItem item, final int index) {
+    resolver.isCurrentUserPermitted(new AsyncCallback<Boolean>() {
+
+      public void onFailure(Throwable caught) {
+        logger.error("Error getting role", caught);
+      }
+
+      public void onSuccess(Boolean asRole) {
+        if (asRole) {
+          insertIntoLeftMenu(item, index);
+
+        }
+      }
+    });
+  }
+
+  private void updateResolverSubItemVisibility(final HistoryResolver resolver, final MenuItem item) {
+    resolver.isCurrentUserPermitted(new AsyncCallback<Boolean>() {
+
+      public void onFailure(Throwable caught) {
+        logger.error("Error getting role", caught);
+      }
+
+      public void onSuccess(Boolean asRole) {
+        item.setVisible(asRole);
+      }
+
+    });
   }
 
   private int leftMenuItemCount = 0;

@@ -5,11 +5,13 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.wui.client.common;
+package org.roda.wui.client.common.lists;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
-import org.roda.core.data.adapter.sort.SortParameter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
@@ -17,7 +19,6 @@ import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.SimpleFile;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.common.client.ClientLogger;
-import org.roda.wui.common.client.widgets.AsyncTableCell;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.shared.GWT;
@@ -75,8 +76,8 @@ public class FileList extends AsyncTableCell<SimpleFile> {
 
       @Override
       public String getValue(SimpleFile file) {
-        return (file.getFileFormat() != null && file.getFileFormat().getMimeType()!=null && !file.getFileFormat().getMimeType().isEmpty())
-          ? file.getFileFormat().getMimeType() : "";
+        return (file.getFileFormat() != null && file.getFileFormat().getMimeType() != null
+          && !file.getFileFormat().getMimeType().isEmpty()) ? file.getFileFormat().getMimeType() : "";
       }
     };
 
@@ -112,7 +113,7 @@ public class FileList extends AsyncTableCell<SimpleFile> {
   }
 
   @Override
-  protected void getData(int start, int length, ColumnSortList columnSortList,
+  protected void getData(Sublist sublist, ColumnSortList columnSortList,
     AsyncCallback<IndexResult<SimpleFile>> callback) {
     GWT.log("Getting data");
     Filter filter = getFilter();
@@ -120,30 +121,13 @@ public class FileList extends AsyncTableCell<SimpleFile> {
       // search not yet ready, deliver empty result
       callback.onSuccess(null);
     } else {
-      // calculate sorter
-      Sorter sorter = new Sorter();
-      for (int i = 0; i < columnSortList.size(); i++) {
-        ColumnSortInfo columnSortInfo = columnSortList.get(i);
-        String sortParameterKey;
-        if (columnSortInfo.getColumn().equals(filenameColumn)) {
-          sortParameterKey = RodaConstants.FILE_ORIGINALNAME;
-        } else if (columnSortInfo.getColumn().equals(lengthColumn)) {
-          sortParameterKey = RodaConstants.FILE_SIZE;
-        } else if (columnSortInfo.getColumn().equals(mimetypeColumn)) {
-          sortParameterKey = RodaConstants.FILE_FORMAT_MIMETYPE;
-        } else {
-          sortParameterKey = null;
-        }
 
-        if (sortParameterKey != null) {
-          sorter.add(new SortParameter(sortParameterKey, !columnSortInfo.isAscending()));
-        } else {
-          logger.warn("Selecting a sorter that is not mapped");
-        }
-      }
+      Map<Column<SimpleFile, ?>, String> columnSortingKeyMap = new HashMap<Column<SimpleFile, ?>, String>();
+      columnSortingKeyMap.put(filenameColumn, RodaConstants.FILE_ORIGINALNAME);
+      columnSortingKeyMap.put(lengthColumn, RodaConstants.FILE_SIZE);
+      columnSortingKeyMap.put(mimetypeColumn, RodaConstants.FILE_FORMAT_MIMETYPE);
 
-      // define sublist
-      Sublist sublist = new Sublist(start, length);
+      Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
       // TODO correct method
       BrowserService.Util.getInstance().getRepresentationFiles(filter, sorter, sublist, getFacets(),

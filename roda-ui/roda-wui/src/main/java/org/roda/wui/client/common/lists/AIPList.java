@@ -5,9 +5,11 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.wui.client.common;
+package org.roda.wui.client.common.lists;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
@@ -16,11 +18,11 @@ import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IndexResult;
+import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
-import org.roda.wui.common.client.widgets.AsyncTableCell;
 
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.SafeHtmlCell;
@@ -57,7 +59,7 @@ public class AIPList extends AsyncTableCell<SimpleDescriptionObject> {
   public AIPList(Filter filter, Facets facets, String summary) {
     super(filter, facets, summary);
   }
-  
+
   @Override
   protected void configureDisplay(CellTable<SimpleDescriptionObject> display) {
     levelColumn = new Column<SimpleDescriptionObject, SafeHtml>(new SafeHtmlCell()) {
@@ -135,43 +137,22 @@ public class AIPList extends AsyncTableCell<SimpleDescriptionObject> {
   }
 
   @Override
-  protected void getData(int start, int length, ColumnSortList columnSortList,
+  protected void getData(Sublist sublist, ColumnSortList columnSortList,
     AsyncCallback<IndexResult<SimpleDescriptionObject>> callback) {
 
-    GWT.log("Getting data");
     Filter filter = getFilter();
     if (filter == null) {
       // search not yet ready, deliver empty result
       callback.onSuccess(null);
     } else {
-      // calculate sorter
-      Sorter sorter = new Sorter();
-      for (int i = 0; i < columnSortList.size(); i++) {
-        ColumnSortInfo columnSortInfo = columnSortList.get(i);
-        String sortParameterKey;
-        if (columnSortInfo.getColumn().equals(levelColumn)) {
-          sortParameterKey = RodaConstants.SDO_LEVEL;
-          // } else if (columnSortInfo.getColumn().equals(idColumn)) {
-          // sortParameterKey = RodaConstants.AIP_ID;
-        } else if (columnSortInfo.getColumn().equals(titleColumn)) {
-          sortParameterKey = RodaConstants.SDO_TITLE;
-        } else if (columnSortInfo.getColumn().equals(dateInitialColumn)) {
-          sortParameterKey = RodaConstants.SDO_DATE_INITIAL;
-        } else if (columnSortInfo.getColumn().equals(dateFinalColumn)) {
-          sortParameterKey = RodaConstants.SDO_DATE_FINAL;
-        } else {
-          sortParameterKey = null;
-        }
 
-        if (sortParameterKey != null) {
-          sorter.add(new SortParameter(sortParameterKey, !columnSortInfo.isAscending()));
-        } else {
-          logger.warn("Selecting a sorter that is not mapped");
-        }
-      }
+      Map<Column<SimpleDescriptionObject, ?>, String> columnSortingKeyMap = new HashMap<Column<SimpleDescriptionObject, ?>, String>();
+      columnSortingKeyMap.put(levelColumn, RodaConstants.SDO_LEVEL);
+      columnSortingKeyMap.put(titleColumn, RodaConstants.SDO_TITLE);
+      columnSortingKeyMap.put(dateInitialColumn, RodaConstants.SDO_DATE_INITIAL);
+      columnSortingKeyMap.put(dateFinalColumn, RodaConstants.SDO_DATE_FINAL);
 
-      // define sublist
-      Sublist sublist = new Sublist(start, length);
+      Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
       BrowserService.Util.getInstance().findDescriptiveMetadata(filter, sorter, sublist, getFacets(),
         LocaleInfo.getCurrentLocale().getLocaleName(), callback);
@@ -194,6 +175,5 @@ public class AIPList extends AsyncTableCell<SimpleDescriptionObject> {
   protected int getInitialPageSize() {
     return PAGE_SIZE;
   }
-
 
 }

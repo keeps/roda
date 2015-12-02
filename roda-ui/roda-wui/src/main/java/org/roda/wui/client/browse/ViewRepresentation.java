@@ -17,8 +17,8 @@ import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.SimpleFile;
-import org.roda.wui.client.common.FileList;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.lists.FileList;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
 

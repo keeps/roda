@@ -176,11 +176,6 @@
 			org.roda.wui.common.fileupload.server.FileUpload</servlet-class>
 	</servlet>
 	<servlet>
-		<servlet-name>IngestSubmitService</servlet-name>
-		<servlet-class>
-			org.roda.wui.ingest.submit.server.IngestSubmitServiceImpl</servlet-class>
-	</servlet>
-	<servlet>
 		<servlet-name>EventManagementService</servlet-name>
 		<servlet-class>
 			org.roda.wui.management.event.server.EventManagementServiceImpl</servlet-class>
@@ -260,10 +255,6 @@
 	<servlet-mapping>
 		<servlet-name>FileUpload</servlet-name>
 		<url-pattern>/org.roda.wui.RodaWUI/fileUpload</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>IngestSubmitService</servlet-name>
-		<url-pattern>/org.roda.wui.RodaWUI/ingestsubmitservice</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>EventManagementService</servlet-name>

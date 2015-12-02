@@ -93,18 +93,6 @@ public final class RodaConstants {
 
   public static final OrchestratorType DEFAULT_ORCHESTRATOR_TYPE = OrchestratorType.EMBEDDED;
 
-  public enum JOB_STATE {
-    CREATED, STARTED, COMPLETED, FAILED
-  }
-
-  public enum JOB_TYPE {
-    INGEST, MISC;
-  }
-
-  public enum RESOURCE_TYPE {
-    BAGIT;
-  }
-
   public static final String CORE_LDAP_DEFAULT_HOST = "localhost";
   public static final int CORE_LDAP_DEFAULT_PORT = 10389;
 

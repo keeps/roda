@@ -5,7 +5,10 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.wui.client.common;
+package org.roda.wui.client.common.lists;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
@@ -14,10 +17,10 @@ import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IndexResult;
+import org.roda.core.data.v2.LogEntry;
 import org.roda.core.data.v2.RODAMember;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.StringUtility;
-import org.roda.wui.common.client.widgets.AsyncTableCell;
 import org.roda.wui.management.user.client.UserManagementService;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
@@ -120,38 +123,18 @@ public class RodaMemberList extends AsyncTableCell<RODAMember> {
   }
 
   @Override
-  protected void getData(int start, int length, ColumnSortList columnSortList,
+  protected void getData(Sublist sublist, ColumnSortList columnSortList,
     AsyncCallback<IndexResult<RODAMember>> callback) {
 
     Filter filter = getFilter();
 
-    // calculate sorter
-    Sorter sorter = new Sorter();
-    for (int i = 0; i < columnSortList.size(); i++) {
-      ColumnSortInfo columnSortInfo = columnSortList.get(i);
-      String sortParameterKey;
+    Map<Column<RODAMember, ?>, String> columnSortingKeyMap = new HashMap<Column<RODAMember, ?>, String>();
+    columnSortingKeyMap.put(activeColumn, RodaConstants.MEMBERS_IS_ACTIVE);
+    columnSortingKeyMap.put(typeColumn, RodaConstants.MEMBERS_IS_USER);
+    columnSortingKeyMap.put(idColumn, RodaConstants.MEMBERS_ID);
+    columnSortingKeyMap.put(nameColumn, RodaConstants.MEMBERS_NAME);
 
-      if (columnSortInfo.getColumn().equals(activeColumn)) {
-        sortParameterKey = RodaConstants.MEMBERS_IS_ACTIVE;
-      } else if (columnSortInfo.getColumn().equals(typeColumn)) {
-        sortParameterKey = RodaConstants.MEMBERS_IS_USER;
-      } else if (columnSortInfo.getColumn().equals(idColumn)) {
-        sortParameterKey = RodaConstants.MEMBERS_ID;
-      } else if (columnSortInfo.getColumn().equals(nameColumn)) {
-        sortParameterKey = RodaConstants.MEMBERS_NAME;
-      } else {
-        sortParameterKey = null;
-      }
-
-      if (sortParameterKey != null) {
-        sorter.add(new SortParameter(sortParameterKey, !columnSortInfo.isAscending()));
-      } else {
-        logger.warn("Selecting a sorter that is not mapped");
-      }
-    }
-
-    // define sublist
-    Sublist sublist = new Sublist(start, length);
+    Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
     UserManagementService.Util.getInstance().findMembers(filter, sorter, sublist, getFacets(),
       LocaleInfo.getCurrentLocale().getLocaleName(), callback);

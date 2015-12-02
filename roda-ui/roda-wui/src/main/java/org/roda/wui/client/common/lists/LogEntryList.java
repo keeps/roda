@@ -5,22 +5,23 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.wui.client.common;
+package org.roda.wui.client.common.lists;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
-import org.roda.core.data.adapter.sort.SortParameter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.LogEntry;
+import org.roda.core.data.v2.TransferredResource;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.Tools;
-import org.roda.wui.common.client.widgets.AsyncTableCell;
 import org.roda.wui.management.user.client.UserManagementService;
 
 import com.google.gwt.cell.client.ClickableTextCell;
@@ -35,6 +36,8 @@ import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.view.client.CellPreviewEvent;
+import com.google.gwt.view.client.DefaultSelectionEventManager;
 import com.google.gwt.view.client.ProvidesKey;
 
 public class LogEntryList extends AsyncTableCell<LogEntry> {
@@ -158,41 +161,20 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
   }
 
   @Override
-  protected void getData(int start, int length, ColumnSortList columnSortList,
+  protected void getData(Sublist sublist, ColumnSortList columnSortList,
     AsyncCallback<IndexResult<LogEntry>> callback) {
 
     Filter filter = getFilter();
 
-    // calculate sorter
-    Sorter sorter = new Sorter();
-    for (int i = 0; i < columnSortList.size(); i++) {
-      ColumnSortInfo columnSortInfo = columnSortList.get(i);
-      String sortParameterKey;
-      if (columnSortInfo.getColumn().equals(dateColumn)) {
-        sortParameterKey = RodaConstants.LOG_DATETIME;
-      } else if (columnSortInfo.getColumn().equals(actionComponentColumn)) {
-        sortParameterKey = RodaConstants.LOG_ACTION_COMPONENT;
-      } else if (columnSortInfo.getColumn().equals(actionMethodColumn)) {
-        sortParameterKey = RodaConstants.LOG_ACTION_METHOD;
-      } else if (columnSortInfo.getColumn().equals(usernameColumn)) {
-        sortParameterKey = RodaConstants.LOG_USERNAME;
-      } else if (columnSortInfo.getColumn().equals(durationColumn)) {
-        sortParameterKey = RodaConstants.LOG_DURATION;
-      } else if (columnSortInfo.getColumn().equals(addressColumn)) {
-        sortParameterKey = RodaConstants.LOG_ADDRESS;
-      } else {
-        sortParameterKey = null;
-      }
+    Map<Column<LogEntry, ?>, String> columnSortingKeyMap = new HashMap<Column<LogEntry, ?>, String>();
+    columnSortingKeyMap.put(dateColumn, RodaConstants.LOG_DATETIME);
+    columnSortingKeyMap.put(actionComponentColumn, RodaConstants.LOG_ACTION_COMPONENT);
+    columnSortingKeyMap.put(actionMethodColumn, RodaConstants.LOG_ACTION_METHOD);
+    columnSortingKeyMap.put(usernameColumn, RodaConstants.LOG_USERNAME);
+    columnSortingKeyMap.put(durationColumn, RodaConstants.LOG_DURATION);
+    columnSortingKeyMap.put(addressColumn, RodaConstants.LOG_ADDRESS);
 
-      if (sortParameterKey != null) {
-        sorter.add(new SortParameter(sortParameterKey, !columnSortInfo.isAscending()));
-      } else {
-        logger.warn("Selecting a sorter that is not mapped");
-      }
-    }
-
-    // define sublist
-    Sublist sublist = new Sublist(start, length);
+    Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
     UserManagementService.Util.getInstance().findLogEntries(filter, sorter, sublist, getFacets(), callback);
 
@@ -212,6 +194,11 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
   @Override
   protected int getInitialPageSize() {
     return PAGE_SIZE;
+  }
+  
+  @Override
+  protected CellPreviewEvent.Handler<LogEntry> getSelectionEventManager() {
+    return DefaultSelectionEventManager.<LogEntry> createBlacklistManager(3);
   }
 
 }
