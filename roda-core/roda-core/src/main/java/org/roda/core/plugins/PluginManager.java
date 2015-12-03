@@ -287,7 +287,7 @@ public class PluginManager {
   }
 
   private <T extends Serializable> void addPluginToPluginTypeMapping(Plugin<T> plugin) {
-    PluginInfo pluginInfo = getPluginInfo(plugin.getName());
+    PluginInfo pluginInfo = getPluginInfo(plugin.getClass().getCanonicalName());
     PluginType pluginType = plugin.getType();
     if (pluginInfoPerType.get(pluginType) == null) {
       List<PluginInfo> list = new ArrayList<>();
