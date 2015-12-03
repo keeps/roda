@@ -66,6 +66,10 @@ public class Browser extends RodaCoreService {
   private static final String PATH_PARAM = "path";
   private static final Object CLASSIFICATION_PLAN_TYPE_PARAMETER = "classificationPlanType";
 
+  private static final Object SUCCESS_PARAM = "success";
+
+  private static final Object ERROR_PARAM = "error";
+
   private Browser() {
     super();
   }
@@ -696,13 +700,20 @@ public class Browser extends RodaCoreService {
     }
 
     // delegate
-    String id = BrowserHelper.createTransferredResourcesFolder(parent, folderName);
+    try {
+      String id = BrowserHelper.createTransferredResourcesFolder(parent, folderName);
 
-    // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "createTransferredResourcesFolder", null, duration, PARENT_PARAM, parent,
-      FOLDERNAME_PARAM, folderName);
-    return id;
+      // register action
+      long duration = new Date().getTime() - startDate.getTime();
+      registerAction(user, BROWSER_COMPONENT, "createTransferredResourcesFolder", null, duration, PARENT_PARAM, parent,
+        FOLDERNAME_PARAM, folderName, SUCCESS_PARAM, true);
+      return id;
+    } catch (GenericException e) {
+      long duration = new Date().getTime() - startDate.getTime();
+      registerAction(user, BROWSER_COMPONENT, "createTransferredResourcesFolder", null, duration, PARENT_PARAM, parent,
+        FOLDERNAME_PARAM, folderName, SUCCESS_PARAM, false, ERROR_PARAM,e.getMessage());
+      throw e;
+    }
   }
 
   public static void removeTransferredResources(RodaUser user, List<String> ids)
@@ -732,12 +743,19 @@ public class Browser extends RodaCoreService {
     UserUtility.checkTransferredResourceAccess(user, Arrays.asList(path));
 
     // delegate
-    BrowserHelper.createTransferredResourceFile(path, fileName, inputStream);
+    try {
+      BrowserHelper.createTransferredResourceFile(path, fileName, inputStream);
 
-    // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "createTransferredResourceFile", null, duration, PATH_PARAM, path,
-      FILENAME_PARAM, fileName);
+      // register action
+      long duration = new Date().getTime() - startDate.getTime();
+      registerAction(user, BROWSER_COMPONENT, "createTransferredResourceFile", null, duration, PATH_PARAM, path,
+        FILENAME_PARAM, fileName, SUCCESS_PARAM, true);
+    } catch (GenericException e) {
+      long duration = new Date().getTime() - startDate.getTime();
+      registerAction(user, BROWSER_COMPONENT, "createTransferredResourceFile", null, duration, PATH_PARAM, path,
+        FILENAME_PARAM, fileName, SUCCESS_PARAM, false, ERROR_PARAM,e.getMessage());
+      throw e;
+    }
 
   }
 
