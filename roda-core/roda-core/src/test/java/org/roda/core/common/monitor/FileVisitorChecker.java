@@ -6,7 +6,7 @@ import java.nio.file.FileVisitor;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 
-import org.roda.core.data.common.NotFoundException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.IndexServiceException;
