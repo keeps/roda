@@ -1799,3 +1799,33 @@
 	margin-bottom: 10px !important;
 }
 
+
+/**********************************************
+				INGEST PROCESS NEW
+************************************************/
+
+.wui-transferredResourceList {
+	color: #999;
+	font-size: 1.2rem;
+}
+
+.wui-transferredResourceList ul {
+    margin-left: 10px;
+    overflow: auto;
+    max-height: 300px;
+    width: 100%;
+}
+.wui-transferredResourceList ul li {
+   	overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+    width: 30%;
+    margin-right: 3%;
+}
+
+.wui-transferredResourceList ul li i {
+	margin-right: 10px;
+	display: inline;
+}
+

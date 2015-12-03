@@ -24,6 +24,7 @@ import org.roda.core.data.v2.Job;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.JobList;
 import org.roda.wui.client.ingest.Ingest;
+import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.Tools;
@@ -179,7 +180,7 @@ public class IngestProcess extends Composite {
 
   @UiHandler("newJob")
   void handleNewJobAction(ClickEvent e) {
-    Toast.showInfo("Sorry", "Feature not yet implemented");
+    Tools.newHistory(IngestTransfer.RESOLVER);
   }
 
   @UiHandler("removeFinished")
@@ -190,8 +191,9 @@ public class IngestProcess extends Composite {
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 0) {
       jobList.refresh();
-
       callback.onSuccess(this);
+    } else if (historyTokens.size() == 1 && historyTokens.get(0).equals(CreateJob.RESOLVER.getHistoryToken())) {
+      CreateJob.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else {
       Tools.newHistory(RESOLVER);
       callback.onSuccess(null);

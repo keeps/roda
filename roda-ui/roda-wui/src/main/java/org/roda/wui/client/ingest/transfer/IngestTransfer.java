@@ -13,10 +13,10 @@ package org.roda.wui.client.ingest.transfer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.facet.SimpleFacetParameter;
 import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
@@ -32,6 +32,7 @@ import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.TransferredResourceList;
 import org.roda.wui.client.common.lists.TransferredResourceList.CheckboxSelectionListener;
 import org.roda.wui.client.ingest.Ingest;
+import org.roda.wui.client.ingest.process.CreateJob;
 import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.common.client.HistoryResolver;
@@ -467,10 +468,16 @@ public class IngestTransfer extends Composite {
 
   @UiHandler("startIngest")
   void buttonStartIngestHandler(ClickEvent e) {
-    if (resource != null) {
-      // TODO start ingest
-      Toast.showInfo("Sorry", "Feature not yet implemented");
+    Tools.newHistory(CreateJob.RESOLVER);
+  }
+  
+  public Set<TransferredResource> getSelected() {
+    Set<TransferredResource> selected = transferredResourceList.getSelected();
+    if(selected.isEmpty() && resource != null) {
+      selected = new HashSet<>(Arrays.asList(resource));
     }
+    
+    return selected;
   }
 
 }

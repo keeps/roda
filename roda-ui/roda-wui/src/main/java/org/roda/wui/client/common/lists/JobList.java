@@ -45,11 +45,12 @@ public class JobList extends AsyncTableCell<Job> {
 
   // private TextColumn<SIPReport> idColumn;
   private TextColumn<Job> nameColumn;
+  private TextColumn<Job> usernameColumn;
   private Column<Job, Date> startDateColumn;
   private Column<Job, Date> endDateColumn;
   private TextColumn<Job> statusColumn;
   private TextColumn<Job> percentageColumn;
-  private TextColumn<Job> usernameColumn;
+  
 
   public JobList() {
     this(null, null, null);
@@ -67,6 +68,14 @@ public class JobList extends AsyncTableCell<Job> {
       @Override
       public String getValue(Job job) {
         return job != null ? job.getName() : null;
+      }
+    };
+    
+    usernameColumn = new TextColumn<Job>() {
+
+      @Override
+      public String getValue(Job job) {
+        return job != null ? job.getUsername() : null;
       }
     };
 
@@ -100,28 +109,23 @@ public class JobList extends AsyncTableCell<Job> {
       }
     };
 
-    usernameColumn = new TextColumn<Job>() {
-
-      @Override
-      public String getValue(Job job) {
-        return job != null ? job.getUsername() : null;
-      }
-    };
+    
 
     nameColumn.setSortable(true);
+    usernameColumn.setSortable(true);
     startDateColumn.setSortable(true);
     endDateColumn.setSortable(true);
     statusColumn.setSortable(true);
     percentageColumn.setSortable(true);
-    usernameColumn.setSortable(true);
 
     // TODO externalize strings into constants
     display.addColumn(nameColumn, "Name");
+    display.addColumn(usernameColumn, "Creator");
     display.addColumn(startDateColumn, "Start date");
     display.addColumn(endDateColumn, "End date");
     display.addColumn(statusColumn, "Status");
     display.addColumn(percentageColumn, "% done");
-    display.addColumn(usernameColumn, "Creator");
+    
 
     Label emptyInfo = new Label("No items to display");
     display.setEmptyTableWidget(emptyInfo);

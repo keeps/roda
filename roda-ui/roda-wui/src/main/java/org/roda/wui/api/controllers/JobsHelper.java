@@ -70,6 +70,10 @@ public class JobsHelper {
 
   protected static Job createJob(RodaUser user, Job job) throws NotFoundException {
     Job updatedJob = new Job(job);
+
+    if (updatedJob.getId() == null) {
+      updatedJob.setId(UUID.randomUUID().toString());
+    }
     updatedJob.setUsername(user.getName());
 
     // serialize job to file & index it

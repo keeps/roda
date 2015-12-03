@@ -84,8 +84,17 @@ public interface BrowseMessages extends Messages {
   /******************* NEW MESSAGES ***********************/
   /*********************************************************/
 
+  
+  /******* SIDEBAR ******************************************/
   @DefaultMessage("Filters")
   String sidebarFiltersTitle();
+  
+  @DefaultMessage("From date")
+  String sidebarFilterFromDate();
+  
+  @DefaultMessage("To date")
+  String sidebarFilterToDate();
+  
 
   @DefaultMessage("Actions")
   String sidebarActionsTitle();
@@ -254,4 +263,9 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("Download file")
   public String viewRepresentationDownloadFileButton();
+
+  
+  /************* Ingest process new ****************/
+  @DefaultMessage("Ingest process {0,localdatetime,predef:DATE_TIME_MEDIUM}")
+  public String ingestProcessNewDefaultName(Date date);
 }

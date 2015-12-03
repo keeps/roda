@@ -18,6 +18,8 @@
 	}
 	</ui:style>
 
+	<ui:with field='messages' type='config.i18n.client.BrowseMessages' />
+
 	<g:FlowPanel styleName="wui-ingest-list" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
@@ -27,36 +29,36 @@
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel>
 					<g:Label addStyleNames="h4">
-						<ui:msg>Filters</ui:msg>
+						<ui:text from='{messages.sidebarFiltersTitle}' />
 					</g:Label>
 					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
 						<g:Label addStyleNames="h5 sidebar-facet-title">
-							<ui:msg>State</ui:msg>
+							State
 						</g:Label>
 						<g:FlowPanel ui:field="stateFacets" />
 					</g:FlowPanel>
 					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
 						<g:Label addStyleNames="h5 sidebar-facet-title">
-							<ui:msg>Producers</ui:msg>
+							Producers
 						</g:Label>
 						<g:FlowPanel ui:field="producerFacets" />
 					</g:FlowPanel>
 					<!-- <g:Label addStyleNames="{style.other-producer-label}">Other producer:</g:Label> 
 						<g:TextBox addStyleNames="fieldTextBox {style.other-producer-input}" /> -->
 					<g:Label addStyleNames="h5 sidebar-facet-title">
-						<ui:msg>From date</ui:msg>
+						<ui:text from='{messages.sidebarFilterFromDate}' />
 					</g:Label>
 					<d:DateBox addStyleNames="sidebar-facet-input fieldTextBox"
 						ui:field="inputDateInitial" />
 					<g:Label addStyleNames="h5 sidebar-facet-title">
-						<ui:msg>To date</ui:msg>
+						<ui:text from='{messages.sidebarFilterToDate}' />
 					</g:Label>
 					<d:DateBox addStyleNames="sidebar-facet-input fieldTextBox"
 						ui:field="inputDateFinal" />
 				</g:FlowPanel>
 				<g:FlowPanel>
 					<g:Label addStyleNames="h4">
-						<ui:msg>Actions</ui:msg>
+						<ui:text from='{messages.sidebarActionsTitle}' />
 					</g:Label>
 					<g:Button addStyleNames="btn btn-plus" ui:field="newJob">Start new
 						process</g:Button>

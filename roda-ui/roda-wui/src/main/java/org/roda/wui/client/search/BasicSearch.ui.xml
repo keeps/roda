@@ -16,7 +16,7 @@
 		margin-top: 5px;
 	}
 	</ui:style>
-	
+
 	<ui:with field='messages' type='config.i18n.client.BrowseMessages' />
 
 	<g:FlowPanel styleName="search" addStyleNames="wrapper skip_padding">
@@ -66,33 +66,32 @@
 						</g:HTML>
 					</wcag:AccessibleFocusPanel>
 				</g:FlowPanel>
-				<lists:AIPList addStyleNames="searchResults"
-					ui:field="searchResultPanel" />
+				<lists:AIPList addStyleNames="searchResults" ui:field="searchResultPanel" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel styleName="sidebar-group" ui:field="sidebarGroupDownloads">
 					<g:Label addStyleNames="h4">
-						<ui:text from='{messages.sidebarFiltersTitle}' />
+						<ui:text from='{messages.sidebarActionsTitle}' />
 					</g:Label>
 					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
 						<g:Label addStyleNames="h5 sidebar-facet-title">
-							<ui:msg>Description levels</ui:msg>
+							Description levels
 						</g:Label>
 						<g:FlowPanel ui:field="facetDescriptionLevels" />
 					</g:FlowPanel>
 					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
 						<g:Label addStyleNames="h5 sidebar-facet-title">
-							<ui:msg>Representations</ui:msg>
+							Representations
 						</g:Label>
 						<g:FlowPanel ui:field="facetHasRepresentations" />
 					</g:FlowPanel>
 					<g:Label addStyleNames="h5 sidebar-facet-title">
-						<ui:msg>From date</ui:msg>
+						<ui:text from='{messages.sidebarFilterFromDate}' />
 					</g:Label>
 					<d:DateBox addStyleNames="sidebar-facet-input fieldTextBox"
 						ui:field="inputDateInitial" />
 					<g:Label addStyleNames="h5 sidebar-facet-title">
-						<ui:msg>To date</ui:msg>
+						<ui:text from='{messages.sidebarFilterToDate}' />
 					</g:Label>
 					<d:DateBox addStyleNames="sidebar-facet-input fieldTextBox"
 						ui:field="inputDateFinal" />
