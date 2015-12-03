@@ -114,28 +114,28 @@ public class NotifierThread implements Runnable {
   }
 
   protected void notifyTransferredResourceCreated(TransferredResource resource) {
-    LOGGER.debug("!!!! CREATED: " + resource.getFullPath());
+    LOGGER.debug("CREATED: " + resource.getFullPath());
     for (FolderObserver observer : observers) {
       observer.transferredResourceAdded(resource, true);
     }
   }
 
   protected void notifyTransferredResourceDeleted(TransferredResource resource) {
-    LOGGER.debug("!!!! DELETED: " + resource.getFullPath());
+    LOGGER.debug("DELETED: " + resource.getFullPath());
     for (FolderObserver observer : observers) {
       observer.transferredResourceDeleted(resource);
     }
   }
 
   protected void notifyTransferredResourceModified(TransferredResource resource) {
-    LOGGER.debug("!!!! MODIFIED: " + resource.getFullPath());
+    LOGGER.debug("MODIFIED: " + resource.getFullPath());
     for (FolderObserver observer : observers) {
       observer.transferredResourceAdded(resource);
     }
   }
 
   protected void notifyPathDeleted(Path deleted) {
-    LOGGER.debug("!!!! PATH DELETED: " + deleted);
+    LOGGER.debug("DELETED: " + deleted);
     for (FolderObserver observer : observers) {
       observer.pathDeleted(deleted);
     }

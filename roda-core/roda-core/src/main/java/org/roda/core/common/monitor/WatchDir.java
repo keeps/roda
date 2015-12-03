@@ -67,9 +67,11 @@ public class WatchDir implements Runnable {
     LOGGER.debug("TIME ELAPSED (INITIALIZE WATCH): " + ((System.currentTimeMillis() - startTime) / 1000) + " segundos");
 
     watchInitialized = true;
-    reindexRunnable = new ReindexSipRunnable(watched, indexDate, index);
-    threadReindex = new Thread(reindexRunnable, "ReindexThread");
-    threadReindex.start();
+    if(index!=null){
+      reindexRunnable = new ReindexSipRunnable(watched, indexDate, index);
+      threadReindex = new Thread(reindexRunnable, "ReindexThread");
+      threadReindex.start();
+    }
 
     processEvents();
   }

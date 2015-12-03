@@ -36,7 +36,7 @@ public class MonitorVariables {
       LOGGER.error("Error initializing watcher: "+watcher);
     }
   }
-  public static MonitorVariables getInstance(){
+  public static synchronized MonitorVariables getInstance(){
     if(instance==null){
        instance = new MonitorVariables();
       }
@@ -57,7 +57,7 @@ public class MonitorVariables {
 
   public void registerAll(final Path start) throws IOException {
     EnumSet<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
-    Files.walkFileTree(start, opts, 100, new SimpleFileVisitor<Path>() {
+    Files.walkFileTree(start, opts, Integer.MAX_VALUE, new SimpleFileVisitor<Path>() {
       @Override
       public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
         register(dir);
