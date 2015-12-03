@@ -45,6 +45,7 @@ public class NotifierThread implements Runnable {
 
   @Override
   public void run() {
+    MonitorVariables.getInstance().getTaskBlocker().acquire();
     LOGGER.debug("RESOURCE: " + updatedPath);
     LOGGER.debug("BASE: " + basePath);
     TransferredResource resource = FolderMonitorNIO.createTransferredResource(updatedPath, basePath);
@@ -73,7 +74,7 @@ public class NotifierThread implements Runnable {
     } else if (kind == ENTRY_DELETE) {
       updateChildren(updatedPath, false);
     }
-
+    MonitorVariables.getInstance().getTaskBlocker().release();
   }
 
   private void updateChildren(Path updatedPath, boolean add) {

@@ -18,6 +18,8 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,30 +28,51 @@ public class MonitorVariables {
   private static final Logger LOGGER = LoggerFactory.getLogger(MonitorVariables.class);
   private WatchService watcher;
   private Map<WatchKey, Path> keys;
-  
+  private TaskBlocker taskBlocker;
+
   private static MonitorVariables instance = null;
-  public MonitorVariables(){
-    try{
+
+  public MonitorVariables() {
+    try {
       this.watcher = FileSystems.getDefault().newWatchService();
       this.keys = new HashMap<WatchKey, Path>();
-    }catch(IOException e){
-      LOGGER.error("Error initializing watcher: "+watcher);
+      this.taskBlocker = new TaskBlocker() {
+        final Lock lock = new ReentrantLock();
+
+        @Override
+        public void acquire() {
+          lock.lock();
+        }
+
+        @Override
+        public void release() {
+          lock.unlock();
+        }
+      };
+    } catch (IOException e) {
+      LOGGER.error("Error initializing watcher: " + watcher);
     }
   }
-  public static synchronized MonitorVariables getInstance(){
-    if(instance==null){
-       instance = new MonitorVariables();
-      }
-      return instance;
+
+  public TaskBlocker getTaskBlocker() {
+    return taskBlocker;
   }
-  
-  
+
+  public static synchronized MonitorVariables getInstance() {
+    if (instance == null) {
+      instance = new MonitorVariables();
+    }
+    return instance;
+  }
+
   public WatchService getWatcher() {
     return watcher;
   }
+
   public Map<WatchKey, Path> getKeys() {
     return keys;
   }
+
   public void register(Path directoryPath) throws IOException {
     WatchKey key = directoryPath.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY, OVERFLOW);
     keys.put(key, directoryPath);

@@ -18,6 +18,7 @@ import java.util.UUID;
 import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.FileUtils;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -156,29 +157,65 @@ public class MonitorIndexTest {
   @Test
   public void testRenameOwner() {
     try {
-      Path basePath = Files.createTempDirectory("sips");
-      IndexFolderObserver ifo = new IndexFolderObserver(solr, basePath);
-      WatchDir watch = new WatchDir(basePath, true, null, null, Arrays.asList(ifo));
+      Path sips = Files.createTempDirectory("sips");
+      IndexFolderObserver ifo = new IndexFolderObserver(solr, sips);
+      WatchDir watch = new WatchDir(sips, true, null, null, Arrays.asList(ifo));
       Thread threadWatch = new Thread(watch, "FolderWatcher");
       threadWatch.start();
-      Thread.sleep(2000);
-      populate(basePath);
-      Thread.sleep(60000);
-      File[] children = basePath.toFile().listFiles();
+      Thread.sleep(1000);
+      populate(sips);
+      Thread.sleep(1000);
+      MonitorVariables.getInstance().getTaskBlocker().acquire();
+      File[] children = sips.toFile().listFiles();
       for (File f : children) {
         File parent = f.getParentFile();
         File newFolder = new File(parent, UUID.randomUUID().toString());
         if (f.isDirectory()) { // rename all owners
-          System.out.println("Moving " + f + " TO " + newFolder);
           FileUtils.moveDirectory(f, newFolder);
         }
       }
-      Thread.sleep(20000);
+      MonitorVariables.getInstance().getTaskBlocker().release();
+      Thread.sleep(1000);
+      MonitorVariables.getInstance().getTaskBlocker().acquire();
       EnumSet<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
-      FileVisitorChecker fvc = new FileVisitorChecker(basePath, index);
-      Files.walkFileTree(basePath, opts, Integer.MAX_VALUE, fvc);
+      FileVisitorChecker fvc = new FileVisitorChecker(sips, index);
+      Files.walkFileTree(sips, opts, Integer.MAX_VALUE, fvc);
+      MonitorVariables.getInstance().getTaskBlocker().release();
       assertTrue(fvc.isOk());
-    } catch (Throwable e) {
+    } catch (InterruptedException | IOException | SolrServerException e) {
+      e.printStackTrace();
+    }
+  }
+
+  @Test
+  public void testCopyFolder() {
+    try {
+      Path sips = Files.createTempDirectory("sips");
+      IndexFolderObserver ifo = new IndexFolderObserver(solr, sips);
+      WatchDir watch = new WatchDir(sips, true, null, null, Arrays.asList(ifo));
+      Thread threadWatch = new Thread(watch, "FolderWatcher");
+      threadWatch.start();
+      Thread.sleep(1000);
+      populate(sips);
+      Thread.sleep(1000);
+      MonitorVariables.getInstance().getTaskBlocker().acquire();
+      File[] children = sips.toFile().listFiles();
+      for (File f : children) {
+        File parent = f.getParentFile();
+        File newFolder = new File(parent, UUID.randomUUID().toString());
+        if (f.isDirectory()) {
+          FileUtils.copyDirectory(f, newFolder);
+        }
+      }
+      MonitorVariables.getInstance().getTaskBlocker().release();
+      Thread.sleep(1000);
+      MonitorVariables.getInstance().getTaskBlocker().acquire();
+      EnumSet<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
+      FileVisitorChecker fvc = new FileVisitorChecker(sips, index);
+      Files.walkFileTree(sips, opts, Integer.MAX_VALUE, fvc);
+      MonitorVariables.getInstance().getTaskBlocker().release();
+      assertTrue(fvc.isOk());
+    } catch (InterruptedException | IOException | SolrServerException e) {
       e.printStackTrace();
     }
   }
@@ -186,27 +223,31 @@ public class MonitorIndexTest {
   @Test
   public void testAddEmptyFolder() {
     try {
-      Path basePath = Files.createTempDirectory("sips");
-      IndexFolderObserver ifo = new IndexFolderObserver(solr, basePath);
-      WatchDir watch = new WatchDir(basePath, true, null, null, Arrays.asList(ifo));
+      Path sips = Files.createTempDirectory("sips");
+      IndexFolderObserver ifo = new IndexFolderObserver(solr, sips);
+      WatchDir watch = new WatchDir(sips, true, null, null, Arrays.asList(ifo));
       Thread threadWatch = new Thread(watch, "FolderWatcher");
       threadWatch.start();
-      Thread.sleep(2000);
-      populate(basePath);
-      Thread.sleep(60000);
-      File[] children = basePath.toFile().listFiles();
+      Thread.sleep(1000);
+      populate(sips);
+      Thread.sleep(1000);
+      MonitorVariables.getInstance().getTaskBlocker().acquire();
+      File[] children = sips.toFile().listFiles();
       for (File f : children) {
-        if (f.isDirectory()) { // rename all owners
+        if (f.isDirectory()) {
           File emptyFolder = new File(f, UUID.randomUUID().toString());
-          System.out.println("Creating empty folder: " + emptyFolder.getAbsolutePath() + " - " + emptyFolder.mkdir());
+          emptyFolder.mkdir();
         }
       }
-      Thread.sleep(20000);
+      MonitorVariables.getInstance().getTaskBlocker().release();
+      Thread.sleep(1000);
+      MonitorVariables.getInstance().getTaskBlocker().acquire();
       EnumSet<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
-      FileVisitorChecker fvc = new FileVisitorChecker(basePath, index);
-      Files.walkFileTree(basePath, opts, Integer.MAX_VALUE, fvc);
+      FileVisitorChecker fvc = new FileVisitorChecker(sips, index);
+      Files.walkFileTree(sips, opts, Integer.MAX_VALUE, fvc);
+      MonitorVariables.getInstance().getTaskBlocker().release();
       assertTrue(fvc.isOk());
-    } catch (Throwable e) {
+    } catch (InterruptedException | IOException | SolrServerException e) {
       e.printStackTrace();
     }
   }
@@ -214,20 +255,22 @@ public class MonitorIndexTest {
   @Test
   public void testBase() {
     try {
-      Path basePath = Files.createTempDirectory("sips");
-      IndexFolderObserver ifo = new IndexFolderObserver(solr, basePath);
-      WatchDir watch = new WatchDir(basePath, true, null, null, Arrays.asList(ifo));
+      Path sips = Files.createTempDirectory("sips");
+      IndexFolderObserver ifo = new IndexFolderObserver(solr, sips);
+      WatchDir watch = new WatchDir(sips, true, null, null, Arrays.asList(ifo));
       Thread threadWatch = new Thread(watch, "FolderWatcher");
       threadWatch.start();
       Thread.sleep(1000);
-      populate(basePath);
-      Thread.sleep(60000);
+      populate(sips);
+      Thread.sleep(1000);
+      MonitorVariables.getInstance().getTaskBlocker().acquire();
 
       EnumSet<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
-      FileVisitorChecker fvc = new FileVisitorChecker(basePath, index);
-      Files.walkFileTree(basePath, opts, Integer.MAX_VALUE, fvc);
+      FileVisitorChecker fvc = new FileVisitorChecker(sips, index);
+      Files.walkFileTree(sips, opts, Integer.MAX_VALUE, fvc);
+      MonitorVariables.getInstance().getTaskBlocker().release();
       assertTrue(fvc.isOk());
-    } catch (Throwable t) {
+    } catch (InterruptedException | IOException | SolrServerException t) {
       t.printStackTrace();
     }
   }
@@ -246,16 +289,20 @@ public class MonitorIndexTest {
     for (int i = 0; i < numberOfItemsByLevel; i++) {
       Path p = null;
       if (i % 2 == 0) {
-        p = Files.createFile(path.resolve(UUID.randomUUID().toString() + ".txt"));
-        Files.write(p, "NUNCAMAISACABA".getBytes());
+        if (currentLevel > 1) {
+          p = Files.createFile(path.resolve(UUID.randomUUID().toString() + ".txt"));
+          Files.write(p, "NUNCAMAISACABA".getBytes());
+        }
       } else {
         p = Files.createDirectory(path.resolve(UUID.randomUUID().toString()));
         if (currentLevel <= numberOfLevels) {
           populate(p, numberOfItemsByLevel, numberOfLevels, currentLevel, randomno);
         } else {
-          for (int j = 0; j < numberOfItemsByLevel; j++) {
-            Path temp = Files.createFile(p.resolve(UUID.randomUUID().toString() + ".txt"));
-            Files.write(temp, "NUNCAMAISACABA".getBytes());
+          if (currentLevel > 1) {
+            for (int j = 0; j < numberOfItemsByLevel; j++) {
+              Path temp = Files.createFile(p.resolve(UUID.randomUUID().toString() + ".txt"));
+              Files.write(temp, "NUNCAMAISACABA".getBytes());
+            }
           }
         }
       }

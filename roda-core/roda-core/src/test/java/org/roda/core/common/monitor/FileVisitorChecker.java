@@ -27,15 +27,12 @@ public class FileVisitorChecker implements FileVisitor<Path> {
     if (basePath.relativize(dir).getNameCount() > 1) {
       try {
         index.retrieve(TransferredResource.class, basePath.relativize(dir).toString());
-        return FileVisitResult.CONTINUE;
       } catch (NotFoundException | IndexServiceException nfe) {
         System.out.println(nfe.getMessage());
         this.ok = false;
-        return FileVisitResult.TERMINATE;
       }
-    } else {
-      return FileVisitResult.CONTINUE;
     }
+    return FileVisitResult.CONTINUE;
   }
 
   @Override
@@ -48,15 +45,12 @@ public class FileVisitorChecker implements FileVisitor<Path> {
     if (basePath.relativize(file).getNameCount() > 1) {
       try {
         index.retrieve(TransferredResource.class, basePath.relativize(file).toString());
-        return FileVisitResult.CONTINUE;
       } catch (NotFoundException | IndexServiceException nfe) {
         System.out.println(nfe.getMessage());
         this.ok = false;
-        return FileVisitResult.TERMINATE;
       }
-    } else {
-      return FileVisitResult.CONTINUE;
     }
+    return FileVisitResult.CONTINUE;
   }
 
   @Override

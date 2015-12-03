@@ -37,6 +37,7 @@ public class WatchDir implements Runnable {
     this.index = index;
     this.observers = observers;
     this.executor = Executors.newSingleThreadExecutor();
+
   }
 
   public ReindexSipRunnable getReindexRunnable() {
@@ -47,7 +48,7 @@ public class WatchDir implements Runnable {
     this.reindexRunnable = reindexRunnable;
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("unchegetInstancecked")
   <T> WatchEvent<T> cast(WatchEvent<?> event) {
     return (WatchEvent<T>) event;
   }
@@ -67,7 +68,7 @@ public class WatchDir implements Runnable {
     LOGGER.debug("TIME ELAPSED (INITIALIZE WATCH): " + ((System.currentTimeMillis() - startTime) / 1000) + " segundos");
 
     watchInitialized = true;
-    if(index!=null){
+    if (index != null) {
       reindexRunnable = new ReindexSipRunnable(watched, indexDate, index);
       threadReindex = new Thread(reindexRunnable, "ReindexThread");
       threadReindex.start();
@@ -96,6 +97,7 @@ public class WatchDir implements Runnable {
         WatchEvent<Path> ev = cast(event);
         Path name = ev.context();
         Path child = dir.resolve(name);
+
         NotifierThread nt = new NotifierThread(observers, watched, child, kind, recursive);
         executor.execute(nt);
 
