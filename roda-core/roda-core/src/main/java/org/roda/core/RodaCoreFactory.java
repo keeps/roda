@@ -346,7 +346,9 @@ public class RodaCoreFactory {
     indexPath = dataPath.resolve("index");
 
     // configure logback
-    configureLogback();
+    if (nodeType != NodeType.TEST) {
+      configureLogback();
+    }
 
     return rodaHomePath;
   }
@@ -839,7 +841,7 @@ public class RodaCoreFactory {
     Plugin<AIP> fastCharacterizationPlugin = new FastCharacterizationPlugin();
     getPluginOrchestrator().runPluginOnAllAIPs(fastCharacterizationPlugin);
   }
-  
+
   private static void runSolrQuery(List<String> args) {
     String collection = args.get(2);
     String solrQueryString = args.get(3);

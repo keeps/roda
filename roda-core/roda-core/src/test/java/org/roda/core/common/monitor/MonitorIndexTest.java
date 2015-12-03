@@ -43,6 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class MonitorIndexTest {
+  private static final Logger LOGGER = LoggerFactory.getLogger(ModelServiceTest.class);
 
   private static Path basePath;
   private static Path indexPath;
@@ -55,8 +56,6 @@ public class MonitorIndexTest {
   private static StorageService corporaService;
 
   private static ApacheDS apacheDS;
-
-  private static final Logger logger = LoggerFactory.getLogger(ModelServiceTest.class);
 
   private static EmbeddedSolrServer solr;
 
@@ -127,7 +126,7 @@ public class MonitorIndexTest {
       model.addGroup(group, false, true);
     }
 
-    logger.debug("Running model test under storage: " + basePath);
+    LOGGER.debug("Running model test under storage: " + basePath);
   }
 
   private static Configuration setAndRetrieveRodaProperties() {
@@ -183,7 +182,7 @@ public class MonitorIndexTest {
       MonitorVariables.getInstance().getTaskBlocker().release();
       assertTrue(fvc.isOk());
     } catch (InterruptedException | IOException | SolrServerException e) {
-      e.printStackTrace();
+      LOGGER.error("Error in testRenameOwner", e);
     }
   }
 
@@ -216,7 +215,7 @@ public class MonitorIndexTest {
       MonitorVariables.getInstance().getTaskBlocker().release();
       assertTrue(fvc.isOk());
     } catch (InterruptedException | IOException | SolrServerException e) {
-      e.printStackTrace();
+      LOGGER.error("Error in testCopyFolder", e);
     }
   }
 
@@ -248,7 +247,7 @@ public class MonitorIndexTest {
       MonitorVariables.getInstance().getTaskBlocker().release();
       assertTrue(fvc.isOk());
     } catch (InterruptedException | IOException | SolrServerException e) {
-      e.printStackTrace();
+      LOGGER.error("Error in testAddEmptyFolder", e);
     }
   }
 
@@ -270,8 +269,8 @@ public class MonitorIndexTest {
       Files.walkFileTree(sips, opts, Integer.MAX_VALUE, fvc);
       MonitorVariables.getInstance().getTaskBlocker().release();
       assertTrue(fvc.isOk());
-    } catch (InterruptedException | IOException | SolrServerException t) {
-      t.printStackTrace();
+    } catch (InterruptedException | IOException | SolrServerException e) {
+      LOGGER.error("Error in testAddEmptyFolder", e);
     }
   }
 

@@ -44,7 +44,7 @@ public class ReindexSipRunnable implements Runnable {
 
   public void run() {
     long start = System.currentTimeMillis();
-    LOGGER.debug("Start indexing SIPs: " + basePath.toString());
+    LOGGER.info("Start indexing SIPs: " + basePath.toString());
     try {
       EnumSet<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
       Files.walkFileTree(basePath, opts, Integer.MAX_VALUE, new FileVisitor<Path>() {
@@ -71,11 +71,11 @@ public class ReindexSipRunnable implements Runnable {
         }
       });
       index.commit(RodaConstants.INDEX_SIP);
-      LOGGER.debug("End indexing SIPs");
-      LOGGER.debug("TIME: " + ((System.currentTimeMillis() - start) / 1000) + " segundos");
+      LOGGER.info("End indexing SIPs");
+      LOGGER.info("Time elapsed: " + ((System.currentTimeMillis() - start) / 1000) + " seconds");
       RodaCoreFactory.setFolderMonitorDate(basePath, new Date());
     } catch (IOException | SolrServerException e) {
-      LOGGER.error("ERROR REINDEXING SIPS");
+      LOGGER.error("Error reindexing SIPs", e);
     }
   }
 
@@ -137,9 +137,7 @@ public class ReindexSipRunnable implements Runnable {
         index.commit(RodaConstants.INDEX_SIP);
       }
     } catch (IOException | SolrServerException e) {
-      LOGGER.error("Error adding path to SIPMonitorIndex: " + e.getMessage(), e);
-    } catch (Throwable t) {
-      LOGGER.error("ERROR: " + t.getMessage(), t);
+      LOGGER.error("Error adding path to SIPMonitorIndex", e);
     }
   }
 }

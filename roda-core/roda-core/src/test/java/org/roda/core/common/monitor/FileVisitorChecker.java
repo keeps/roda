@@ -10,11 +10,15 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.IndexServiceException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FileVisitorChecker implements FileVisitor<Path> {
-  IndexService index;
-  Path basePath;
-  boolean ok;
+  private static final Logger LOGGER = LoggerFactory.getLogger(FileVisitorChecker.class);
+
+  private IndexService index;
+  private Path basePath;
+  private boolean ok;
 
   public FileVisitorChecker(Path basePath, IndexService index) {
     this.index = index;
@@ -28,7 +32,7 @@ public class FileVisitorChecker implements FileVisitor<Path> {
       try {
         index.retrieve(TransferredResource.class, basePath.relativize(dir).toString());
       } catch (NotFoundException | IndexServiceException nfe) {
-        System.out.println(nfe.getMessage());
+        LOGGER.error("Error", e);
         this.ok = false;
       }
     }
@@ -46,7 +50,7 @@ public class FileVisitorChecker implements FileVisitor<Path> {
       try {
         index.retrieve(TransferredResource.class, basePath.relativize(file).toString());
       } catch (NotFoundException | IndexServiceException nfe) {
-        System.out.println(nfe.getMessage());
+        LOGGER.error("Error", e);
         this.ok = false;
       }
     }

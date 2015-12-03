@@ -3,48 +3,47 @@ package org.roda.core.common.monitor;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.roda.core.data.v2.TransferredResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DummyObserver implements FolderObserver {
-  HashSet<String> files;
-  HashSet<String> directories;
+  private static final Logger LOGGER = LoggerFactory.getLogger(DummyObserver.class);
+
+  private Set<String> files;
+  private Set<String> directories;
 
   public DummyObserver() throws IOException {
     files = new HashSet<String>();
     directories = new HashSet<String>();
   }
 
-  public HashSet<String> getFiles() {
+  public Set<String> getFiles() {
     return files;
   }
 
-  public void setFiles(HashSet<String> files) {
+  public void setFiles(Set<String> files) {
     this.files = files;
   }
 
-  public HashSet<String> getDirectories() {
+  public Set<String> getDirectories() {
     return directories;
   }
 
-  public void setDirectories(HashSet<String> directories) {
+  public void setDirectories(Set<String> directories) {
     this.directories = directories;
   }
 
   @Override
   public void transferredResourceAdded(TransferredResource resource, boolean commit) {
-    System.out.println("CREATED: " + resource.getFullPath());
-    if (resource.isFile()) {
-      files.add(resource.getFullPath());
-    } else {
-      directories.add(resource.getFullPath());
-    }
-
+    transferredResourceAdded(resource);
   }
 
   @Override
   public void transferredResourceAdded(TransferredResource resource) {
-    System.out.println("CREATED: " + resource.getFullPath());
+    LOGGER.info("CREATED: " + resource.getFullPath());
     if (resource.isFile()) {
       files.add(resource.getFullPath());
     } else {
@@ -54,20 +53,17 @@ public class DummyObserver implements FolderObserver {
 
   @Override
   public void transferredResourceModified(TransferredResource resource) {
-    System.out.println("TR MODIFIED: " + resource.getRelativePath());
-
+    LOGGER.info("TR MODIFIED: " + resource.getRelativePath());
   }
 
   @Override
   public void transferredResourceDeleted(TransferredResource resource) {
-    System.out.println("TR DELETED: " + resource.getRelativePath());
-
+    LOGGER.info("TR DELETED: " + resource.getRelativePath());
   }
 
   @Override
   public void pathDeleted(Path deleted) {
-    System.out.println("PATH DELETED: " + deleted.toString());
-
+    LOGGER.info("PATH DELETED: " + deleted.toString());
   }
 
 }

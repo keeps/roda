@@ -9,6 +9,7 @@ package org.roda.wui.api.controllers;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.adapter.facet.Facets;
@@ -47,6 +48,13 @@ public class JobsHelper {
       throw new RequestNotValidException("Invalid plugin type '" + job.getType() + "'");
     }
 
+    // the following checks are not impeditive for job creation
+    if (org.apache.commons.lang3.StringUtils.isBlank(job.getId())) {
+      job.setId(UUID.randomUUID().toString());
+    }
+    if (org.apache.commons.lang3.StringUtils.isBlank(job.getName())) {
+      job.setName(job.getId());
+    }
   }
 
   protected static Job createJob(RodaUser user, Job job) throws NotFoundException {

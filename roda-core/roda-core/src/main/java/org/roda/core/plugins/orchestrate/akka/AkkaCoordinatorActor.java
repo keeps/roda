@@ -47,17 +47,17 @@ public class AkkaCoordinatorActor extends UntypedActor {
         }
 
         RodaCoreFactory.getPluginOrchestrator().runPluginOnTransferredResources(plugin,
-          getTransferredResourcesFromObjectIds(job.getUsername(), job.getObjectIds()));
+          getTransferredResourcesFromObjectIds(job.getObjectIds()));
       }
     }
   }
 
-  public List<TransferredResource> getTransferredResourcesFromObjectIds(String username, List<String> objectIds)
+  public List<TransferredResource> getTransferredResourcesFromObjectIds(List<String> objectIds)
     throws NotFoundException {
     List<TransferredResource> res = new ArrayList<TransferredResource>();
     for (String objectId : objectIds) {
       try {
-        res.add(RodaCoreFactory.getIndexService().retrieve(TransferredResource.class, username + "/" + objectId));
+        res.add(RodaCoreFactory.getIndexService().retrieve(TransferredResource.class, objectId));
       } catch (IndexServiceException e) {
         LOGGER.error("Error retrieving TransferredResource", e);
       }
