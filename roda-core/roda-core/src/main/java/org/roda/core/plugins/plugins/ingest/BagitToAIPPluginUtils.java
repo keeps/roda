@@ -63,7 +63,7 @@ public class BagitToAIPPluginUtils {
     model.createDescriptiveMetadata(aip.getId(), "metadata.xml", (Binary) descriptiveMetadataResource, "metadata");
 
     String representationID = "representation";
-    createDirectories(model, aip.getId(), representationID);
+    IngestUtils.createDirectories(model, aip.getId(), representationID);
 
     Path tempFolder = Files.createTempDirectory("temp");
     if (bag.getPayload() != null) {
@@ -82,36 +82,6 @@ public class BagitToAIPPluginUtils {
     FSUtils.deletePath(metadataFile);
     return model.retrieveAIP(aip.getId());
 
-  }
-
-  private static void createDirectories(ModelService model, String aipId, String representationID)
-    throws StorageServiceException {
-    model.getStorage().createDirectory(ModelUtils.getRepresentationsPath(aipId), new HashMap<String, Set<String>>());
-    model.getStorage().createDirectory(ModelUtils.getRepresentationPath(aipId, representationID),
-      getRepresentationMetadata(representationID));
-    model.getStorage().createDirectory(ModelUtils.getPreservationPath(aipId), new HashMap<String, Set<String>>());
-    model.getStorage().createDirectory(ModelUtils.getPreservationPath(aipId, representationID),
-      new HashMap<String, Set<String>>());
-  }
-
-  private static Map<String, Set<String>> getRepresentationMetadata(String representationId) {
-    SimpleDateFormat iso8601DateFormat = new SimpleDateFormat(RodaConstants.ISO8601);
-    String dateString = iso8601DateFormat.format(new Date());
-    Map<String, Set<String>> data = new HashMap<String, Set<String>>();
-    data.put("active", Sets.newHashSet("true"));
-    data.put("date.created", Sets.newHashSet(dateString));
-    data.put("date.modified", Sets.newHashSet(dateString));
-    data.put("representation.type", Sets.newHashSet(""));
-    data.put("representation.content.model", Sets.newHashSet(""));
-    data.put("representation.dObject.pid", Sets.newHashSet(""));
-    data.put("representation.id", Sets.newHashSet(representationId));
-    data.put("representation.label", Sets.newHashSet(""));
-    data.put("representation.pid", Sets.newHashSet(""));
-    data.put("representation.state", Sets.newHashSet(""));
-    data.put("representation.subtype", Sets.newHashSet(""));
-    data.put("representation.type", Sets.newHashSet(""));
-    data.put("representation.statuses", Sets.newHashSet("original"));
-    return data;
   }
 
   private static void generateMetadataFile(Path metadataFile, BagInfoTxt bagInfoTxt) throws IOException {
