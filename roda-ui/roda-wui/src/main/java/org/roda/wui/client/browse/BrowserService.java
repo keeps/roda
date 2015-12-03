@@ -10,6 +10,7 @@ package org.roda.wui.client.browse;
 import java.util.List;
 
 import org.roda.core.data.DescriptionObject;
+import org.roda.core.data.PluginInfo;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
@@ -20,6 +21,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.Job;
+import org.roda.core.data.v2.PluginType;
 import org.roda.core.data.v2.RepresentationPreservationObject;
 import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.core.data.v2.SimpleFile;
@@ -251,4 +253,6 @@ public interface BrowserService extends RemoteService {
   Job retrieveJob(String jobId) throws AuthorizationDeniedException, GenericException, NotFoundException;
 
   Job createJob(Job job) throws AuthorizationDeniedException, NotFoundException, RequestNotValidException;
+
+  List<PluginInfo> getPluginsInfo(PluginType type);
 }

@@ -253,19 +253,22 @@ public interface BrowseMessages extends Messages {
   /*** View representation ***/
   
   @DefaultMessage("Back")
-  public String backButton();
+  String backButton();
 
   @DefaultMessage("Next file")
-  public String viewRepresentationNextFileButton();
+  String viewRepresentationNextFileButton();
 
   @DefaultMessage("Previous file")
-  public String viewRepresentationPreviousFileButton();
+  String viewRepresentationPreviousFileButton();
 
   @DefaultMessage("Download file")
-  public String viewRepresentationDownloadFileButton();
+  String viewRepresentationDownloadFileButton();
 
   
   /************* Ingest process new ****************/
-  @DefaultMessage("Ingest process {0,localdatetime,predef:DATE_TIME_MEDIUM}")
-  public String ingestProcessNewDefaultName(Date date);
+  @DefaultMessage("Job {0,localdatetime,predef:DATE_TIME_SHORT}")
+  String ingestProcessNewDefaultName(Date date);
+
+  @DefaultMessage("{0} ({1})")
+  String pluginLabel(String name, String version);
 }

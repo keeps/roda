@@ -12,11 +12,14 @@ package org.roda.wui.client.ingest.process;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import org.roda.core.data.PluginInfo;
 import org.roda.core.data.v2.Job;
-import org.roda.core.data.v2.Job.JOB_TYPE;
+import org.roda.core.data.v2.PluginType;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
@@ -26,6 +29,8 @@ import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -35,7 +40,10 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -99,16 +107,51 @@ public class CreateJob extends Composite {
   HTML objectList;
 
   @UiField
+  ListBox ingestWorkflowList;
+
+  @UiField
+  FlowPanel ingestWorkflowOptions;
+
+  @UiField
   Button buttonCreate;
 
   @UiField
   Button buttonCancel;
+
+  private List<PluginInfo> ingestPlugins = null;
+  private PluginInfo selectedPlugin = null;
 
   public CreateJob(Set<TransferredResource> selected) {
     this.selected = selected;
     initWidget(uiBinder.createAndBindUi(this));
     updateObjectList();
     name.setText(messages.ingestProcessNewDefaultName(new Date()));
+
+    BrowserService.Util.getInstance().getPluginsInfo(PluginType.INGEST, new AsyncCallback<List<PluginInfo>>() {
+
+      @Override
+      public void onFailure(Throwable caught) {
+        Toast.showError("Error", caught.getMessage());
+      }
+
+      @Override
+      public void onSuccess(List<PluginInfo> ingestPlugins) {
+        CreateJob.this.ingestPlugins = ingestPlugins;
+        configurePlugins(ingestPlugins);
+      }
+    });
+
+    ingestWorkflowList.addChangeHandler(new ChangeHandler() {
+
+      @Override
+      public void onChange(ChangeEvent event) {
+        String selectedPluginId = ingestWorkflowList.getSelectedValue();
+        if (selectedPluginId != null) {
+          CreateJob.this.selectedPlugin = lookupPlugin(selectedPluginId);
+        }
+        updateWorkflowOptions();
+      }
+    });
 
   }
 
@@ -129,22 +172,62 @@ public class CreateJob extends Composite {
 
   }
 
+  protected void configurePlugins(List<PluginInfo> ingestPlugins) {
+    for (PluginInfo pluginInfo : ingestPlugins) {
+      if (pluginInfo != null) {
+        ingestWorkflowList.addItem(messages.pluginLabel(pluginInfo.getName(), pluginInfo.getVersion()),
+          pluginInfo.getId());
+      } else {
+        GWT.log("Got a null plugin");
+      }
+    }
+    ingestWorkflowList.setSelectedIndex(0);
+  }
+
+  protected void updateWorkflowOptions() {
+    ingestWorkflowOptions.clear();
+    if (selectedPlugin == null) {
+      // TODO set fall-back message
+    } else {
+      selectedPlugin.getDescription();
+      Label description = new Label(selectedPlugin.getDescription());
+      ingestWorkflowOptions.add(description);
+    }
+  }
+
+  private PluginInfo lookupPlugin(String selectedPluginId) {
+    PluginInfo p = null;
+    if (ingestPlugins != null) {
+      for (PluginInfo pluginInfo : ingestPlugins) {
+        if (pluginInfo.getId().equals(selectedPluginId)) {
+          p = pluginInfo;
+          break;
+        }
+      }
+    }
+    return p;
+  }
+
   @UiHandler("buttonCreate")
   void buttonCreateHandler(ClickEvent e) {
     String jobName = this.name.getText();
     // TODO test if name is valid
     Job job = new Job();
     job.setName(jobName);
-    // TODO get plugin from list
-    job.setPlugin("org.roda.core.plugins.plugins.ingest.SimpleIngestPlugin");
-    job.setResourceType(Job.RESOURCE_TYPE.BAGIT);
-    job.setOrchestratorMethod("runPluginOnTransferredResources");
-    job.setType(JOB_TYPE.INGEST);
+
     List<String> objectIds = new ArrayList<String>();
     for (TransferredResource r : selected) {
       objectIds.add(r.getId());
     }
     job.setObjectIds(objectIds);
+    job.setOrchestratorMethod("runPluginOnTransferredResources");
+
+    // TODO get plugin from list
+    job.setPlugin("org.roda.core.plugins.plugins.ingest.SimpleIngestPlugin");
+    Map<String, String> pluginParameters = new HashMap<String, String>();
+    pluginParameters.put("parameter.sip_to_aip_class", "org.roda.core.plugins.plugins.ingest.BagitToAIPPlugin");
+    pluginParameters.put("parameter.do_virus_check", "false");
+    job.setPluginParameters(pluginParameters);
 
     BrowserService.Util.getInstance().createJob(job, new AsyncCallback<Job>() {
 

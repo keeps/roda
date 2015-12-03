@@ -25,7 +25,7 @@
 				<g:Label addStyleNames="form-label">
 					Ingest workflow
 				</g:Label>
-				<g:ListBox addStyleNames="form-listbox" ui:field="ingestWorkflow" />
+				<g:ListBox addStyleNames="form-listbox" ui:field="ingestWorkflowList" />
 				<g:FlowPanel ui:field="ingestWorkflowOptions" />
 			</g:FlowPanel>
 

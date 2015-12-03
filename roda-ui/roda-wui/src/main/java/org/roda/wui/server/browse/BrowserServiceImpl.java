@@ -20,6 +20,7 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.DescriptionObject;
+import org.roda.core.data.PluginInfo;
 import org.roda.core.data.RepresentationObject;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
@@ -32,6 +33,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.EventPreservationObject;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.Job;
+import org.roda.core.data.v2.PluginType;
 import org.roda.core.data.v2.RepresentationPreservationObject;
 import org.roda.core.data.v2.RodaUser;
 import org.roda.core.data.v2.SimpleDescriptionObject;
@@ -601,6 +603,12 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   public Job createJob(Job job) throws RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     return Jobs.createJob(user, job);
+  }
+  
+  @Override
+  public List<PluginInfo> getPluginsInfo(PluginType type) {
+    // TODO check permissions
+    return RodaCoreFactory.getPluginManager().getPluginsInfo(type);
   }
 
 }

@@ -13,6 +13,7 @@ package org.roda.wui.client.browse;
 import java.util.List;
 
 import org.roda.core.data.DescriptionObject;
+import org.roda.core.data.PluginInfo;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
@@ -20,6 +21,7 @@ import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RODAException;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.Job;
+import org.roda.core.data.v2.PluginType;
 import org.roda.core.data.v2.RepresentationPreservationObject;
 import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.core.data.v2.SimpleFile;
@@ -207,4 +209,6 @@ public interface BrowserServiceAsync {
   void retrieveJob(String jobId, AsyncCallback<Job> callback);
 
   void createJob(Job job, AsyncCallback<Job> callback);
+
+  void getPluginsInfo(PluginType type, AsyncCallback<List<PluginInfo>> callback);
 }
