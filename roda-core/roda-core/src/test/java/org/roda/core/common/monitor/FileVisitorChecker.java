@@ -31,7 +31,7 @@ public class FileVisitorChecker implements FileVisitor<Path> {
     if (basePath.relativize(dir).getNameCount() > 1) {
       try {
         index.retrieve(TransferredResource.class, basePath.relativize(dir).toString());
-      } catch (NotFoundException | IndexServiceException nfe) {
+      } catch (NotFoundException | IndexServiceException e) {
         LOGGER.error("Error", e);
         this.ok = false;
       }
@@ -49,7 +49,7 @@ public class FileVisitorChecker implements FileVisitor<Path> {
     if (basePath.relativize(file).getNameCount() > 1) {
       try {
         index.retrieve(TransferredResource.class, basePath.relativize(file).toString());
-      } catch (NotFoundException | IndexServiceException nfe) {
+      } catch (NotFoundException | IndexServiceException e) {
         LOGGER.error("Error", e);
         this.ok = false;
       }

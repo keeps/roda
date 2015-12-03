@@ -110,11 +110,10 @@
    <field name="startDate" type="tdate" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="endDate" type="tdate" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="state" type="string" indexed="true" stored="true" required="false" multiValued="false" />
-   <field name="completionPercentage" type="int" indexed="true" stored="true" required="false" multiValued="false" /> 
-   <field name="type" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="completionPercentage" type="int" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="plugin" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="pluginType" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="pluginParameters" type="string" indexed="false" stored="true" required="false" multiValued="false" />
-   <field name="resourceType" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="orchestratorMethod" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="objectIds" type="string" indexed="false" stored="true" required="false" multiValued="true" />
    <field name="objectIdsToAipIds" type="string" indexed="false" stored="true" required="false" multiValued="false" />

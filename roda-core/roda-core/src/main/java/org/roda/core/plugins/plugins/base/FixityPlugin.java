@@ -27,6 +27,7 @@ import org.roda.core.data.common.InvalidParameterException;
 import org.roda.core.data.v2.AgentPreservationObject;
 import org.roda.core.data.v2.EventPreservationObject;
 import org.roda.core.data.v2.Fixity;
+import org.roda.core.data.v2.PluginType;
 import org.roda.core.data.v2.Representation;
 import org.roda.core.data.v2.RepresentationFilePreservationObject;
 import org.roda.core.index.IndexService;
@@ -238,4 +239,13 @@ public class FixityPlugin implements Plugin<AIP> {
     return new FixityPlugin();
   }
 
+  @Override
+  public PluginType getType() {
+    return PluginType.AIP_TO_AIP;
+  }
+
+  @Override
+  public boolean areParameterValuesValid() {
+    return true;
+  }
 }

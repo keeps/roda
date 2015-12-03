@@ -30,6 +30,7 @@ import java.util.jar.Manifest;
 import org.reflections.Reflections;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.PluginInfo;
+import org.roda.core.data.v2.PluginType;
 import org.roda.core.util.ClassLoaderUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +52,8 @@ public class PluginManager {
   private Timer loadPluginsTimer = null;
   private Map<Path, JarPlugin> jarPluginCache = new HashMap<Path, JarPlugin>();
   private Map<String, Plugin<?>> internalPluginChache = new HashMap<String, Plugin<?>>();
+  private Map<String, Plugin<?>> externalPluginChache = new HashMap<String, Plugin<?>>();
+  private Map<PluginType, List<PluginInfo>> pluginInfoPerType = new HashMap<PluginType, List<PluginInfo>>();
   private boolean internalPluginStarted = false;
 
   /**
@@ -83,13 +86,9 @@ public class PluginManager {
   public List<Plugin<?>> getPlugins() {
     List<Plugin<?>> plugins = new ArrayList<Plugin<?>>();
 
-    for (JarPlugin jarPlugin : this.jarPluginCache.values()) {
-      if (jarPlugin.plugin != null) {
-        plugins.add(jarPlugin.plugin);
-      }
-    }
-
     plugins.addAll(internalPluginChache.values());
+
+    plugins.addAll(externalPluginChache.values());
 
     return plugins;
   }
@@ -107,6 +106,10 @@ public class PluginManager {
     }
 
     return pluginsInfo;
+  }
+
+  public List<PluginInfo> getPluginsInfo(PluginType pluginType) {
+    return pluginInfoPerType.get(pluginType);
   }
 
   /**
@@ -189,7 +192,7 @@ public class PluginManager {
 
   private <T extends Serializable> PluginInfo getPluginInfo(Plugin<T> plugin) {
     return new PluginInfo(plugin.getClass().getName(), plugin.getName(), plugin.getVersion(), plugin.getDescription(),
-      plugin.getParameters());
+      plugin.getType(), plugin.getParameters());
   }
 
   private void loadPlugins() {
@@ -235,6 +238,8 @@ public class PluginManager {
             if (plugin != null) {
 
               plugin.init();
+              externalPluginChache.put(plugin.getName(), plugin);
+              addPluginToPluginTypeMapping(plugin);
               logger.debug("Plugin started " + plugin.getName() + " (version " + plugin.getVersion() + ")");
 
             } else {
@@ -261,7 +266,7 @@ public class PluginManager {
     }
   }
 
-  private void loadInternalPlugins() {
+  private <T extends Serializable> void loadInternalPlugins() {
     Reflections reflections = new Reflections(
       RodaCoreFactory.getRodaConfigurationAsString("core", "plugins", "internal", "package"));
     Set<Class<? extends Plugin>> plugins = reflections.getSubTypesOf(Plugin.class);
@@ -272,12 +277,26 @@ public class PluginManager {
         p = (Plugin<?>) ClassLoaderUtility.createObject(plugin.getCanonicalName());
         p.init();
         internalPluginChache.put(plugin.getName(), p);
+        addPluginToPluginTypeMapping(p);
       } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | PluginException e) {
         logger.error("Unable to instantiate plugin '{}'", plugin.getCanonicalName());
       }
 
     }
     internalPluginStarted = true;
+  }
+
+  private <T extends Serializable> void addPluginToPluginTypeMapping(Plugin<T> plugin) {
+    PluginInfo pluginInfo = getPluginInfo(plugin.getName());
+    PluginType pluginType = plugin.getType();
+    if (pluginInfoPerType.get(pluginType) == null) {
+      List<PluginInfo> list = new ArrayList<>();
+      list.add(pluginInfo);
+      pluginInfoPerType.put(pluginType, list);
+    } else if (!pluginInfoPerType.get(pluginType).contains(plugin)) {
+      pluginInfoPerType.get(pluginType).add(pluginInfo);
+    }
+
   }
 
   private Plugin<?> loadPlugin(Path jarFile, List<URL> jarURLs) {

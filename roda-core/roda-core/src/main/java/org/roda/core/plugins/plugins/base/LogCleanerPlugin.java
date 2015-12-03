@@ -17,6 +17,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
 import org.roda.core.data.common.InvalidParameterException;
+import org.roda.core.data.v2.PluginType;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.AIP;
 import org.roda.core.model.ModelService;
@@ -26,6 +27,7 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+// FIXME this shouldn't be of the type AIP!!!
 public class LogCleanerPlugin implements Plugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(LogCleanerPlugin.class);
 
@@ -108,6 +110,16 @@ public class LogCleanerPlugin implements Plugin<AIP> {
   @Override
   public Plugin<AIP> cloneMe() {
     return new LogCleanerPlugin();
+  }
+
+  @Override
+  public PluginType getType() {
+    return PluginType.MISC;
+  }
+
+  @Override
+  public boolean areParameterValuesValid() {
+    return true;
   }
 
 }

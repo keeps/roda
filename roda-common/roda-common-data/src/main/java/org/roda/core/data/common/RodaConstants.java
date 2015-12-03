@@ -375,8 +375,8 @@ public final class RodaConstants {
   public static final String JOB_END_DATE = "endDate";
   public static final String JOB_STATE = "state";
   public static final String JOB_COMPLETION_PERCENTAGE = "completionPercentage";
-  public static final String JOB_TYPE = "type";
   public static final String JOB_PLUGIN = "plugin";
+  public static final String JOB_PLUGIN_TYPE = "pluginType";
   public static final String JOB_PLUGIN_PARAMETERS = "pluginParameters";
   public static final String JOB_RESOURCE_TYPE = "resourceType";
   public static final String JOB_ORCHESTRATOR_METHOD = "orchestratorMethod";

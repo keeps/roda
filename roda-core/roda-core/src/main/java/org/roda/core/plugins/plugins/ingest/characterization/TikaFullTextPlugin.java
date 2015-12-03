@@ -18,6 +18,7 @@ import org.apache.tika.exception.TikaException;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
 import org.roda.core.data.common.InvalidParameterException;
+import org.roda.core.data.v2.PluginType;
 import org.roda.core.data.v2.Representation;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.AIP;
@@ -132,6 +133,16 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
   @Override
   public Plugin<AIP> cloneMe() {
     return new TikaFullTextPlugin();
+  }
+
+  @Override
+  public PluginType getType() {
+    return PluginType.AIP_TO_AIP;
+  }
+
+  @Override
+  public boolean areParameterValuesValid() {
+    return true;
   }
 
 }

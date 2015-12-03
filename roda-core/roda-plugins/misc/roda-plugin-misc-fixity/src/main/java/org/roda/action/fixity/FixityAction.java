@@ -28,6 +28,7 @@ import org.roda.core.data.Report;
 import org.roda.core.data.v2.AgentPreservationObject;
 import org.roda.core.data.v2.EventPreservationObject;
 import org.roda.core.data.v2.Fixity;
+import org.roda.core.data.v2.PluginType;
 import org.roda.core.data.v2.Representation;
 import org.roda.core.data.v2.RepresentationFilePreservationObject;
 import org.roda.core.index.IndexService;
@@ -235,6 +236,16 @@ public class FixityAction implements Plugin<AIP> {
   @Override
   public Plugin<AIP> cloneMe() {
     return new FixityAction();
+  }
+
+  @Override
+  public PluginType getType() {
+    return PluginType.MISC;
+  }
+
+  @Override
+  public boolean areParameterValuesValid() {
+    return true;
   }
 
 }

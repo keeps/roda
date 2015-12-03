@@ -31,14 +31,6 @@ public class Job implements Serializable {
     CREATED, STARTED, COMPLETED, FAILED;
   }
 
-  public static enum JOB_TYPE {
-    INGEST, MISC;
-  }
-
-  public static enum RESOURCE_TYPE {
-    BAGIT;
-  }
-
   // job identifier
   private String id = null;
   // job name
@@ -53,16 +45,13 @@ public class Job implements Serializable {
   private JOB_STATE state = null;
   // 0-100 scale completion percentage
   private int completionPercentage = 0;
-  // job type (e.g. ingest, maintenance, misc, etc.)
-  private JOB_TYPE type = null;
 
   // plugin full class (e.g. org.roda.core.plugins.plugins.base.FixityPlugin)
   private String plugin = null;
+  // plugin type (e.g. ingest, maintenance, misc, etc.)
+  private PluginType pluginType = null;
   // plugin parameters
   private Map<String, String> pluginParameters = new HashMap<String, String>();
-
-  // resource type (e.g. bagit, e-ark sip, etc.)
-  private RESOURCE_TYPE resourceType = null;
 
   // type of method that orchestrator should execute (e.g.
   // runPluginOnTransferredResources, runPluginOnAIPs, etc.)
@@ -90,10 +79,9 @@ public class Job implements Serializable {
     this.endDate = job.getEndDate();
     this.state = job.getState();
     this.completionPercentage = job.getCompletionPercentage();
-    this.type = job.getType();
+    this.pluginType = job.getPluginType();
     this.plugin = job.getPlugin();
     this.pluginParameters = new HashMap<String, String>(job.getPluginParameters());
-    this.resourceType = job.getResourceType();
     this.orchestratorMethod = job.getOrchestratorMethod();
     this.objectIds = new ArrayList<String>(job.getObjectIds());
     this.objectIdsToAipIds = new HashMap<>(job.getObjectIdsToAipIds());
@@ -207,21 +195,12 @@ public class Job implements Serializable {
     this.objectIdsToAipIds = objectIdsToAipIds;
   }
 
-  public JOB_TYPE getType() {
-    return type;
+  public PluginType getPluginType() {
+    return pluginType;
   }
 
-  public Job setType(JOB_TYPE type) {
-    this.type = type;
-    return this;
-  }
-
-  public RESOURCE_TYPE getResourceType() {
-    return resourceType;
-  }
-
-  public Job setResourceType(RESOURCE_TYPE resourceType) {
-    this.resourceType = resourceType;
+  public Job setPluginType(PluginType pluginType) {
+    this.pluginType = pluginType;
     return this;
   }
 
@@ -232,9 +211,9 @@ public class Job implements Serializable {
   @Override
   public String toString() {
     return "Job [id=" + id + ", name=" + name + ", username=" + username + ", startDate=" + startDate + ", endDate="
-      + endDate + ", state=" + getState() + ", completionPercentage=" + completionPercentage + ", type=" + type
-      + ", plugin=" + plugin + ", pluginParameters=" + pluginParameters + ", resourceType=" + resourceType
-      + ", orchestratorMethod=" + orchestratorMethod + ", objectIds=" + objectIds + ", reportId=" + reportId + "]";
+      + endDate + ", state=" + state + ", completionPercentage=" + completionPercentage + ", plugin=" + plugin
+      + ", pluginType=" + pluginType + ", pluginParameters=" + pluginParameters + ", orchestratorMethod="
+      + orchestratorMethod + ", objectIds=" + objectIds + ", reportId=" + reportId + "]";
   }
 
 }

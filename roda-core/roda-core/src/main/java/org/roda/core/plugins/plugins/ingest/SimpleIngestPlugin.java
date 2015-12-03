@@ -11,11 +11,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
 import org.roda.core.data.common.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.v2.PluginType;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.IndexServiceException;
@@ -34,6 +36,9 @@ import org.slf4j.LoggerFactory;
 public class SimpleIngestPlugin implements Plugin<TransferredResource> {
   private static final Logger LOGGER = LoggerFactory.getLogger(SimpleIngestPlugin.class);
 
+  public static final PluginParameter PARAMETER_SIP_TO_AIP_CLASS = new PluginParameter("parameter.sip_to_aip_class",
+    PluginParameter.TYPE_SIP_TO_AIP, "", true, false,
+    SimpleIngestPlugin.class.getCanonicalName() + ".parameter.sip_to_aip_class");
   public static final PluginParameter PARAMETER_DO_VIRUS_CHECK = new PluginParameter("parameter.do_virus_check",
     PluginParameter.TYPE_BOOLEAN, "true", true, false,
     SimpleIngestPlugin.class.getCanonicalName() + ".parameter.do_virus_check");
@@ -72,6 +77,7 @@ public class SimpleIngestPlugin implements Plugin<TransferredResource> {
   @Override
   public List<PluginParameter> getParameters() {
     ArrayList<PluginParameter> pluginParameters = new ArrayList<PluginParameter>();
+    pluginParameters.add(PARAMETER_SIP_TO_AIP_CLASS);
     pluginParameters.add(PARAMETER_DO_VIRUS_CHECK);
     pluginParameters.add(PARAMETER_DO_AUTO_ACCEPT);
     return pluginParameters;
@@ -125,9 +131,10 @@ public class SimpleIngestPlugin implements Plugin<TransferredResource> {
   private List<AIP> transformTransferredResourceIntoAnAIP(IndexService index, ModelService model,
     StorageService storage, List<TransferredResource> transferredResources) {
     List<AIP> aips = new ArrayList<AIP>();
-    // TODO the type of transferred resource should be obtained via plugin
-    // parameters
-    String pluginClassName = BagitToAIPPlugin.class.getName();
+
+    // String pluginClassName = BagitToAIPPlugin.class.getName();
+    String pluginClassName = parameters.getOrDefault(PARAMETER_SIP_TO_AIP_CLASS.getName(), "");
+
     Plugin<TransferredResource> plugin = (Plugin<TransferredResource>) RodaCoreFactory.getPluginManager()
       .getPlugin(pluginClassName);
     try {
@@ -217,4 +224,24 @@ public class SimpleIngestPlugin implements Plugin<TransferredResource> {
     }
   }
 
+  @Override
+  public PluginType getType() {
+    return PluginType.INGEST;
+  }
+
+  @Override
+  public boolean areParameterValuesValid() {
+    boolean areValid = true;
+    String sipToAipClass = parameters.getOrDefault(PARAMETER_SIP_TO_AIP_CLASS.getName(), "");
+    if (StringUtils.isNotBlank(sipToAipClass)) {
+      Plugin<?> plugin = RodaCoreFactory.getPluginManager().getPlugin(sipToAipClass);
+      if (plugin == null || plugin.getType() != PluginType.SIP_TO_AIP) {
+        areValid = areValid && false;
+      }
+    } else {
+      areValid = areValid && false;
+    }
+
+    return areValid;
+  }
 }

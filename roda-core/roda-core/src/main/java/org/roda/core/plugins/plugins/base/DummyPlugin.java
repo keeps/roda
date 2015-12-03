@@ -15,6 +15,7 @@ import java.util.Map;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
 import org.roda.core.data.common.InvalidParameterException;
+import org.roda.core.data.v2.PluginType;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.AIP;
 import org.roda.core.model.ModelService;
@@ -92,6 +93,16 @@ public class DummyPlugin implements Plugin<AIP> {
   @Override
   public Plugin<AIP> cloneMe() {
     return new DummyPlugin();
+  }
+
+  @Override
+  public PluginType getType() {
+    return PluginType.AIP_TO_AIP;
+  }
+
+  @Override
+  public boolean areParameterValuesValid() {
+    return true;
   }
 
 }

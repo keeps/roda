@@ -16,14 +16,14 @@ import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
+import org.roda.core.data.common.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.Job;
-import org.roda.core.data.v2.Job.JOB_TYPE;
-import org.roda.core.data.v2.Job.RESOURCE_TYPE;
 import org.roda.core.data.v2.RodaUser;
 import org.roda.core.index.IndexServiceException;
+import org.roda.core.plugins.Plugin;
 import org.roda.wui.common.client.GenericException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,19 +34,13 @@ public class JobsHelper {
   private static final Logger LOGGER = LoggerFactory.getLogger(JobsHelper.class);
 
   private static final List<String> ORCHESTRATOR_METHODS = Arrays.asList("runPluginOnTransferredResources");
-  private static final List<RESOURCE_TYPE> RESOURCE_TYPES = Arrays.asList(RESOURCE_TYPE.BAGIT);
-  private static final List<JOB_TYPE> JOB_TYPES = Arrays.asList(JOB_TYPE.INGEST);
 
   protected static void validateCreateJob(Job job) throws RequestNotValidException {
     if (!ORCHESTRATOR_METHODS.contains(job.getOrchestratorMethod())) {
       throw new RequestNotValidException("Invalid orchestrator method '" + job.getOrchestratorMethod() + "'");
     }
-    if (!RESOURCE_TYPES.contains(job.getResourceType())) {
-      throw new RequestNotValidException("Invalid resource type '" + job.getResourceType() + "'");
-    }
-    if (!JOB_TYPES.contains(job.getType())) {
-      throw new RequestNotValidException("Invalid plugin type '" + job.getType() + "'");
-    }
+
+    validateJobPluginInfo(job);
 
     // the following checks are not impeditive for job creation
     if (org.apache.commons.lang3.StringUtils.isBlank(job.getId())) {
@@ -54,6 +48,23 @@ public class JobsHelper {
     }
     if (org.apache.commons.lang3.StringUtils.isBlank(job.getName())) {
       job.setName(job.getId());
+    }
+  }
+
+  private static void validateJobPluginInfo(Job job) throws RequestNotValidException {
+    Plugin<?> plugin = RodaCoreFactory.getPluginManager().getPlugin(job.getPlugin());
+    if (plugin != null) {
+      try {
+        plugin.setParameterValues(job.getPluginParameters());
+        if (!plugin.areParameterValuesValid()) {
+          throw new RequestNotValidException("Invalid plugin parameters");
+        }
+        job.setPluginType(plugin.getType());
+      } catch (InvalidParameterException e) {
+        throw new RequestNotValidException("Invalid plugin parameters");
+      }
+    } else {
+      throw new RequestNotValidException("No plugin was found with the id '" + job.getPlugin() + "'");
     }
   }
 

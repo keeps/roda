@@ -34,6 +34,12 @@ public class PluginParameter implements Serializable {
   public static final String TYPE_BOOLEAN = "boolean";
 
   /**
+   * String which will translated into the canonical class name of sip to aip
+   * plugin
+   */
+  public static final String TYPE_SIP_TO_AIP = "sip_to_aip";
+
+  /**
    * Datetime
    */
   // public static final String TYPE_DATETIME = "datetime";
@@ -62,7 +68,8 @@ public class PluginParameter implements Serializable {
    * @param readonly
    * @param description
    */
-  public PluginParameter(String name, String type, String value, boolean mandatory, boolean readonly, String description) {
+  public PluginParameter(String name, String type, String value, boolean mandatory, boolean readonly,
+    String description) {
     setName(name);
     setType(type);
     setValue(value);
@@ -102,8 +109,8 @@ public class PluginParameter implements Serializable {
    *          the {@link PluginParameter} to clone.
    */
   public PluginParameter(PluginParameter parameter) {
-    this(parameter.getName(), parameter.getType(), parameter.getValue(), parameter.getPossibleValues(), parameter
-      .isMandatory(), parameter.isReadonly(), parameter.getDescription());
+    this(parameter.getName(), parameter.getType(), parameter.getValue(), parameter.getPossibleValues(),
+      parameter.isMandatory(), parameter.isReadonly(), parameter.getDescription());
   }
 
   /**

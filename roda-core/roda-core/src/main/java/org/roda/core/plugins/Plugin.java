@@ -14,6 +14,7 @@ import java.util.Map;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
 import org.roda.core.data.common.InvalidParameterException;
+import org.roda.core.data.v2.PluginType;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.storage.StorageService;
@@ -106,5 +107,9 @@ public interface Plugin<T extends Serializable> {
 
   // public Report getCurrentReport();
 
+  public PluginType getType();
+
   public Plugin<T> cloneMe();
+
+  public boolean areParameterValuesValid();
 }

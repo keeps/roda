@@ -11,6 +11,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.roda.core.data.v2.PluginType;
+
 /**
  * This class contains information about a plugin.
  * 
@@ -30,6 +32,8 @@ public class PluginInfo implements Serializable {
 
   private String description = null;
 
+  private PluginType type = PluginType.MISC;
+
   private List<PluginParameter> parameters = new ArrayList<PluginParameter>();
 
   /**
@@ -46,7 +50,7 @@ public class PluginInfo implements Serializable {
    */
   public PluginInfo(PluginInfo pluginInfo) {
     this(pluginInfo.getId(), pluginInfo.getName(), pluginInfo.getVersion(), pluginInfo.getDescription(),
-      pluginInfo.getParameters());
+      pluginInfo.getType(), pluginInfo.getParameters());
   }
 
   /**
@@ -58,11 +62,13 @@ public class PluginInfo implements Serializable {
    * @param description
    * @param parameters
    */
-  public PluginInfo(String id, String name, String version, String description, List<PluginParameter> parameters) {
+  public PluginInfo(String id, String name, String version, String description, PluginType type,
+    List<PluginParameter> parameters) {
     setId(id);
     setName(name);
     setVersion(version);
     setDescription(description);
+    setType(type);
     setParameters(parameters);
   }
 
@@ -81,10 +87,10 @@ public class PluginInfo implements Serializable {
   /**
    * @see Object#toString()
    */
+  @Override
   public String toString() {
-
-    return "PluginInfo(" + "id=" + getId() + ", name=" + getName() + ", version=" + getVersion() + ", description="
-      + getDescription() + ", parameters=" + parameters + ")";
+    return "PluginInfo [id=" + id + ", name=" + name + ", version=" + version + ", description=" + description
+      + ", type=" + type + ", parameters=" + parameters + "]";
   }
 
   /**
@@ -145,6 +151,14 @@ public class PluginInfo implements Serializable {
    */
   public void setDescription(String description) {
     this.description = description;
+  }
+
+  public PluginType getType() {
+    return type;
+  }
+
+  public void setType(PluginType type) {
+    this.type = type;
   }
 
   /**

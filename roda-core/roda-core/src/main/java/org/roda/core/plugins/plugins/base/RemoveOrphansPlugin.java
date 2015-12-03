@@ -19,6 +19,7 @@ import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
 import org.roda.core.data.common.InvalidParameterException;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.PluginType;
 import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.AIP;
@@ -129,6 +130,16 @@ public class RemoveOrphansPlugin implements Plugin<SimpleDescriptionObject> {
   @Override
   public Plugin<SimpleDescriptionObject> cloneMe() {
     return new RemoveOrphansPlugin();
+  }
+
+  @Override
+  public PluginType getType() {
+    return PluginType.MISC;
+  }
+
+  @Override
+  public boolean areParameterValuesValid() {
+    return true;
   }
 
 }

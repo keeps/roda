@@ -84,9 +84,8 @@ import org.roda.core.data.v2.Group;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.Job.JOB_STATE;
-import org.roda.core.data.v2.Job.JOB_TYPE;
-import org.roda.core.data.v2.Job.RESOURCE_TYPE;
 import org.roda.core.data.v2.LogEntry;
+import org.roda.core.data.v2.PluginType;
 import org.roda.core.data.v2.RODAMember;
 import org.roda.core.data.v2.RODAObject;
 import org.roda.core.data.v2.RODAObjectPermissions;
@@ -1350,10 +1349,9 @@ public class SolrUtils {
     doc.addField(RodaConstants.JOB_END_DATE, job.getEndDate());
     doc.addField(RodaConstants.JOB_STATE, job.getState());
     doc.addField(RodaConstants.JOB_COMPLETION_PERCENTAGE, job.getCompletionPercentage());
-    doc.addField(RodaConstants.JOB_TYPE, job.getType());
+    doc.addField(RodaConstants.JOB_PLUGIN_TYPE, job.getPluginType());
     doc.addField(RodaConstants.JOB_PLUGIN, job.getPlugin());
     doc.addField(RodaConstants.JOB_PLUGIN_PARAMETERS, ModelUtils.getJsonFromObject(job.getPluginParameters()));
-    doc.addField(RodaConstants.JOB_RESOURCE_TYPE, job.getResourceType());
     doc.addField(RodaConstants.JOB_ORCHESTRATOR_METHOD, job.getOrchestratorMethod());
     doc.addField(RodaConstants.JOB_OBJECT_IDS, job.getObjectIds());
     doc.addField(RodaConstants.JOB_OBJECT_IDS_TO_AIP_IDS, ModelUtils.getJsonFromObject(job.getObjectIdsToAipIds()));
@@ -1371,10 +1369,9 @@ public class SolrUtils {
     job.setEndDate(objectToDate(doc.get(RodaConstants.JOB_END_DATE)));
     job.setState(JOB_STATE.valueOf(objectToString(doc.get(RodaConstants.JOB_STATE))));
     job.setCompletionPercentage(objectToInteger(doc.get(RodaConstants.JOB_COMPLETION_PERCENTAGE)));
-    job.setType(JOB_TYPE.valueOf(objectToString(doc.get(RodaConstants.JOB_TYPE))));
+    job.setPluginType(PluginType.valueOf(objectToString(doc.get(RodaConstants.JOB_PLUGIN_TYPE))));
     job.setPlugin(objectToString(doc.get(RodaConstants.JOB_PLUGIN)));
     job.setPluginParameters(ModelUtils.getMapFromJson(objectToString(doc.get(RodaConstants.JOB_PLUGIN_PARAMETERS))));
-    job.setResourceType(RESOURCE_TYPE.valueOf(objectToString(doc.get(RodaConstants.JOB_RESOURCE_TYPE))));
     job.setOrchestratorMethod(objectToString(doc.get(RodaConstants.JOB_ORCHESTRATOR_METHOD)));
     job.setObjectIds(objectToListString(doc.get(RodaConstants.JOB_OBJECT_IDS)));
     job.setObjectIdsToAipIds(
@@ -1388,16 +1385,17 @@ public class SolrUtils {
     doc.addField(RodaConstants.FILE_UUID, UUID.randomUUID().toString());
     doc.addField(RodaConstants.FILE_ID, getId(file.getAipId(), file.getRepresentationId(), file.getId()));
     doc.addField(RodaConstants.FILE_AIPID, file.getAipId());
-    doc.addField(RodaConstants.FILE_FORMAT_MIMETYPE, file.getFileFormat().getMimeType()!=null?file.getFileFormat().getMimeType():"");
-    doc.addField(RodaConstants.FILE_FORMAT_VERSION, file.getFileFormat().getVersion()!=null?file.getFileFormat().getVersion():"");
+    doc.addField(RodaConstants.FILE_FORMAT_MIMETYPE,
+      file.getFileFormat().getMimeType() != null ? file.getFileFormat().getMimeType() : "");
+    doc.addField(RodaConstants.FILE_FORMAT_VERSION,
+      file.getFileFormat().getVersion() != null ? file.getFileFormat().getVersion() : "");
     doc.addField(RodaConstants.FILE_FILEID, file.getId());
     doc.addField(RodaConstants.FILE_REPRESENTATIONID, file.getRepresentationId());
     doc.addField(RodaConstants.FILE_ISENTRYPOINT, file.isEntryPoint());
     doc.addField(RodaConstants.FILE_ORIGINALNAME, file.getOriginalName());
     doc.addField(RodaConstants.FILE_SIZE, file.getSize());
     doc.addField(RodaConstants.FILE_ISFILE, file.isFile());
-    
-    
+
     // FIXME how to index format registries if any
     doc.addField(RodaConstants.FILE_FILEFORMAT, "");
     return doc;
@@ -1408,7 +1406,7 @@ public class SolrUtils {
     String fileId = objectToString(doc.get(RodaConstants.FILE_FILEID));
     boolean entryPoint = objectToBoolean(doc.get(RodaConstants.FILE_ISENTRYPOINT));
     String mimetype = objectToString(doc.get(RodaConstants.FILE_FORMAT_MIMETYPE));
-    LOGGER.error("solrDocumentToFile "+mimetype);
+    LOGGER.error("solrDocumentToFile " + mimetype);
     String version = objectToString(doc.get(RodaConstants.FILE_FORMAT_VERSION));
     String representationId = objectToString(doc.get(RodaConstants.FILE_REPRESENTATIONID));
     String originalName = objectToString(doc.get(RodaConstants.FILE_ORIGINALNAME));
@@ -1417,7 +1415,8 @@ public class SolrUtils {
     // FIXME how to restore format registries
     //
     FileFormat fileFormat = new FileFormat(mimetype, version, new HashMap<String, String>());
-    SimpleFile file = new SimpleFile(fileId, aipId, representationId, entryPoint, fileFormat,originalName,size,isFile );
+    SimpleFile file = new SimpleFile(fileId, aipId, representationId, entryPoint, fileFormat, originalName, size,
+      isFile);
     return file;
   }
 }
