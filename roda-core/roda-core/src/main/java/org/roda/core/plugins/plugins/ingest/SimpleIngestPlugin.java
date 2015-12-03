@@ -14,6 +14,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.PluginParameter;
+import org.roda.core.data.PluginParameter.PluginParameterType;
 import org.roda.core.data.Report;
 import org.roda.core.data.common.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -37,13 +38,13 @@ public class SimpleIngestPlugin implements Plugin<TransferredResource> {
   private static final Logger LOGGER = LoggerFactory.getLogger(SimpleIngestPlugin.class);
 
   public static final PluginParameter PARAMETER_SIP_TO_AIP_CLASS = new PluginParameter("parameter.sip_to_aip_class",
-    PluginParameter.TYPE_SIP_TO_AIP, "", true, false,
+    PluginParameterType.PLUGIN_SIP_TO_AIP, "", true, false,
     SimpleIngestPlugin.class.getCanonicalName() + ".parameter.sip_to_aip_class");
   public static final PluginParameter PARAMETER_DO_VIRUS_CHECK = new PluginParameter("parameter.do_virus_check",
-    PluginParameter.TYPE_BOOLEAN, "true", true, false,
+    PluginParameterType.BOOLEAN, "true", true, false,
     SimpleIngestPlugin.class.getCanonicalName() + ".parameter.do_virus_check");
   public static final PluginParameter PARAMETER_DO_AUTO_ACCEPT = new PluginParameter("parameter.do_auto_accept",
-    PluginParameter.TYPE_BOOLEAN, "true", true, false,
+    PluginParameterType.BOOLEAN, "true", true, false,
     SimpleIngestPlugin.class.getCanonicalName() + ".parameter.do_auto_accept");
 
   private Map<String, String> parameters;

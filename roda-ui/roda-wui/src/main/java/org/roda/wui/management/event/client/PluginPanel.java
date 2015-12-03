@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.roda.core.data.PluginInfo;
 import org.roda.core.data.PluginParameter;
+import org.roda.core.data.PluginParameter.PluginParameterType;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.Tools;
 
@@ -213,7 +214,7 @@ public class PluginPanel {
         Label name = new Label(parameter.getDescription() + (parameter.isMandatory() ? "*:" : ":"));
         Widget value = null;
 
-        if (parameter.getType().equals(PluginParameter.TYPE_STRING) && parameter.getPossibleValues().length > 0) {
+        if (parameter.getType().equals(PluginParameterType.STRING) && parameter.getPossibleValues().length > 0) {
           final ListBox listbox = new ListBox();
           listbox.setVisibleItemCount(1);
           for (String possibleValue : parameter.getPossibleValues()) {
@@ -232,7 +233,7 @@ public class PluginPanel {
 
           value = listbox;
 
-        } else if (parameter.getType().equals(PluginParameter.TYPE_STRING)) {
+        } else if (parameter.getType().equals(PluginParameterType.STRING)) {
           final TextBox textBox = new TextBox();
 
           textBox.setText(parameter.getValue());
@@ -247,7 +248,7 @@ public class PluginPanel {
 
           value = textBox;
 
-        } else if (parameter.getType().equals(PluginParameter.TYPE_PASSWORD)) {
+        } else if (parameter.getType().equals(PluginParameterType.PASSWORD)) {
           final PasswordTextBox passwordBox = new PasswordTextBox();
 
           passwordBox.setText(parameter.getValue());
@@ -262,7 +263,7 @@ public class PluginPanel {
 
           value = passwordBox;
 
-        } else if (parameter.getType().equals(PluginParameter.TYPE_BOOLEAN)) {
+        } else if (parameter.getType().equals(PluginParameterType.BOOLEAN)) {
           final CheckBox checkbox = new CheckBox();
 
           checkbox.setChecked(Boolean.parseBoolean(parameter.getValue()));

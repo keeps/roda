@@ -144,6 +144,18 @@ pre>code {
 	margin-bottom: 5px;
 }
 
+.form-checkbox {
+	display: block;
+	color: #58595b;
+	margin-bottom: 5px;
+}
+
+.form-help {
+	font-size: 1rem;
+	font-weight: 100;
+	color: #999;
+}
+
 .form-textbox-small {
 	width: auto;
 }

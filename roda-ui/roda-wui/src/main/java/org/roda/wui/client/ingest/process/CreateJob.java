@@ -18,6 +18,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.roda.core.data.PluginInfo;
+import org.roda.core.data.PluginParameter;
+import org.roda.core.data.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.PluginType;
 import org.roda.core.data.v2.TransferredResource;
@@ -39,11 +41,13 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -140,12 +144,13 @@ public class CreateJob extends Composite {
         configurePlugins(ingestPlugins);
       }
     });
-
+    
     ingestWorkflowList.addChangeHandler(new ChangeHandler() {
 
       @Override
       public void onChange(ChangeEvent event) {
         String selectedPluginId = ingestWorkflowList.getSelectedValue();
+        GWT.log("ingest workflow changed");
         if (selectedPluginId != null) {
           CreateJob.this.selectedPlugin = lookupPlugin(selectedPluginId);
         }
@@ -182,6 +187,8 @@ public class CreateJob extends Composite {
       }
     }
     ingestWorkflowList.setSelectedIndex(0);
+    selectedPlugin = ingestPlugins.get(0);
+    updateWorkflowOptions();
   }
 
   protected void updateWorkflowOptions() {
@@ -192,6 +199,51 @@ public class CreateJob extends Composite {
       selectedPlugin.getDescription();
       Label description = new Label(selectedPlugin.getDescription());
       ingestWorkflowOptions.add(description);
+      description.addStyleName("form-help");
+
+      for (PluginParameter parameter : selectedPlugin.getParameters()) {
+        if (PluginParameterType.BOOLEAN.equals(parameter.getType())) {
+          CheckBox checkBox = new CheckBox(parameter.getName());
+          
+          ingestWorkflowOptions.add(checkBox);
+          
+          checkBox.addStyleName("form-checkbox");
+          
+        } else if (PluginParameterType.STRING.equals(parameter.getType())) {
+          Label parameterName = new Label(parameter.getName());
+          TextBox parameterBox = new TextBox();
+          
+          ingestWorkflowOptions.add(parameterName);
+          ingestWorkflowOptions.add(parameterBox);
+          
+          parameterName.addStyleName("form-label");
+          parameterBox.addStyleName("form-textbox");
+
+        } else if (PluginParameterType.PASSWORD.equals(parameter.getType())) {
+          Label parameterName = new Label(parameter.getName());
+          PasswordTextBox parameterBox = new PasswordTextBox();
+          
+          ingestWorkflowOptions.add(parameterName);
+          ingestWorkflowOptions.add(parameterBox);
+          
+          parameterName.addStyleName("form-label");
+          parameterBox.addStyleName("form-textbox");
+
+        } else if (PluginParameterType.PLUGIN_SIP_TO_AIP.equals(parameter.getType())) {
+          Label parameterName = new Label(parameter.getName());
+          ListBox pluginList = new ListBox();
+          
+          ingestWorkflowOptions.add(parameterName);
+          ingestWorkflowOptions.add(pluginList);
+          
+          parameterName.addStyleName("form-label");
+          pluginList.addStyleName("form-listbox");
+        } else {
+          // TODO send error
+        }
+
+      }
+
     }
   }
 

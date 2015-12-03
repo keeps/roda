@@ -14,30 +14,33 @@ import java.util.List;
 
 /**
  * @author Rui Castro
+ * @author Luis Faria <lfaria@keep.pt>
  */
 public class PluginParameter implements Serializable {
   private static final long serialVersionUID = -431821437136556726L;
 
-  /**
-   * Normal string
-   */
-  public static final String TYPE_STRING = "string";
+  public enum PluginParameterType {
+    /**
+     * Normal string
+     */
+    STRING,
 
-  /**
-   * Password type parameter, should not be echoed
-   */
-  public static final String TYPE_PASSWORD = "password";
+    /**
+     * Password type parameter, should not be echoed
+     */
+    PASSWORD,
 
-  /**
-   * Boolean
-   */
-  public static final String TYPE_BOOLEAN = "boolean";
+    /**
+     * Checkbox
+     */
+    BOOLEAN,
 
-  /**
-   * String which will translated into the canonical class name of sip to aip
-   * plugin
-   */
-  public static final String TYPE_SIP_TO_AIP = "sip_to_aip";
+    /**
+     * String which will translated into the canonical class name of sip to aip
+     * plugin
+     */
+    PLUGIN_SIP_TO_AIP;
+  }
 
   /**
    * Datetime
@@ -45,7 +48,7 @@ public class PluginParameter implements Serializable {
   // public static final String TYPE_DATETIME = "datetime";
 
   private String name = null;
-  private String type = null;
+  private PluginParameterType type = null;
   private String value = null;
   private List<String> possibleValues = new ArrayList<String>();
   private boolean mandatory = true;
@@ -68,7 +71,7 @@ public class PluginParameter implements Serializable {
    * @param readonly
    * @param description
    */
-  public PluginParameter(String name, String type, String value, boolean mandatory, boolean readonly,
+  public PluginParameter(String name, PluginParameterType type, String value, boolean mandatory, boolean readonly,
     String description) {
     setName(name);
     setType(type);
@@ -90,8 +93,8 @@ public class PluginParameter implements Serializable {
    * @param readonly
    * @param description
    */
-  public PluginParameter(String name, String type, String value, String[] possibleValues, boolean mandatory,
-    boolean readonly, String description) {
+  public PluginParameter(String name, PluginParameterType type, String value, String[] possibleValues,
+    boolean mandatory, boolean readonly, String description) {
     setName(name);
     setType(type);
     setValue(value);
@@ -162,7 +165,7 @@ public class PluginParameter implements Serializable {
   /**
    * @return the type
    */
-  public String getType() {
+  public PluginParameterType getType() {
     return type;
   }
 
@@ -170,7 +173,7 @@ public class PluginParameter implements Serializable {
    * @param type
    *          the type to set
    */
-  public void setType(String type) {
+  public void setType(PluginParameterType type) {
     this.type = type;
   }
 
