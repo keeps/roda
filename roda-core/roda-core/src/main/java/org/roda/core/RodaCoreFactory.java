@@ -844,36 +844,36 @@ public class RodaCoreFactory {
     Plugin<AIP> fastCharacterizationPlugin = new FastCharacterizationPlugin();
     getPluginOrchestrator().runPluginOnAllAIPs(fastCharacterizationPlugin);
   }
-  
+
   private static void runEARKPlugin() {
-    try{
+    try {
       EARKSIPToAIPPlugin eark = new EARKSIPToAIPPlugin();
-      eark.setParameterValues(new HashMap<String,String>());
+      eark.setParameterValues(new HashMap<String, String>());
       List<TransferredResource> transferredResourceList = new ArrayList<TransferredResource>();
       TransferredResource tr = new TransferredResource();
-      tr.setFullPath("/home/sleroux/Fonts");
+      tr.setFullPath("/home/sleroux/EARKSIP");
       transferredResourceList.add(tr);
       getPluginOrchestrator().runPluginOnTransferredResources(eark, transferredResourceList);
-    }catch(InvalidParameterException ipe){
-      LOGGER.error(ipe.getMessage(),ipe);
+    } catch (InvalidParameterException ipe) {
+      LOGGER.error(ipe.getMessage(), ipe);
     }
   }
-  
+
   private static void runTransferredResourceToAIPPlugin() {
-    try{
+    try {
       TransferredResourceToAIPPlugin converter = new TransferredResourceToAIPPlugin();
-      converter.setParameterValues(new HashMap<String,String>());
+      converter.setParameterValues(new HashMap<String, String>());
       List<TransferredResource> transferredResourceList = new ArrayList<TransferredResource>();
-      //TransferredResource tr = new TransferredResource();
-      //tr.setFullPath("/home/sleroux/Fonts");
-      //tr.setName("Fonts");
-      //transferredResourceList.add(tr);
+      // TransferredResource tr = new TransferredResource();
+      // tr.setFullPath("/home/sleroux/Fonts");
+      // tr.setName("Fonts");
+      // transferredResourceList.add(tr);
       getPluginOrchestrator().runPluginOnTransferredResources(converter, transferredResourceList);
-    }catch(InvalidParameterException ipe){
-      LOGGER.error(ipe.getMessage(),ipe);
+    } catch (InvalidParameterException ipe) {
+      LOGGER.error(ipe.getMessage(), ipe);
     }
   }
-  
+
   private static void runSolrQuery(List<String> args) {
     String collection = args.get(2);
     String solrQueryString = args.get(3);

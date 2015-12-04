@@ -23,14 +23,40 @@ import com.google.common.collect.Sets;
 public class IngestUtils {
   public static void createDirectories(ModelService model, String aipId, String representationID)
     throws StorageServiceException {
-    model.getStorage().createDirectory(ModelUtils.getRepresentationsPath(aipId), new HashMap<String, Set<String>>());
-    model.getStorage().createDirectory(ModelUtils.getRepresentationPath(aipId, representationID),
-      getRepresentationMetadata(representationID));
-    model.getStorage().createDirectory(ModelUtils.getMetadataPath(aipId), new HashMap<String, Set<String>>());
-    model.getStorage().createDirectory(ModelUtils.getDescriptiveMetadataPath(aipId), new HashMap<String, Set<String>>());
-    model.getStorage().createDirectory(ModelUtils.getPreservationPath(aipId), new HashMap<String, Set<String>>());
-    model.getStorage().createDirectory(ModelUtils.getPreservationPath(aipId, representationID),
-      new HashMap<String, Set<String>>());
+    try {
+      model.getStorage().createDirectory(ModelUtils.getRepresentationsPath(aipId), new HashMap<String, Set<String>>());
+    } catch (StorageServiceException sse) {
+
+    }
+    try {
+      model.getStorage().createDirectory(ModelUtils.getRepresentationPath(aipId, representationID),
+        getRepresentationMetadata(representationID));
+    } catch (StorageServiceException sse) {
+
+    }
+    try {
+      model.getStorage().createDirectory(ModelUtils.getMetadataPath(aipId), new HashMap<String, Set<String>>());
+    } catch (StorageServiceException sse) {
+
+    }
+    try {
+      model.getStorage().createDirectory(ModelUtils.getDescriptiveMetadataPath(aipId),
+        new HashMap<String, Set<String>>());
+    } catch (StorageServiceException sse) {
+
+    }
+    try {
+      model.getStorage().createDirectory(ModelUtils.getPreservationPath(aipId), new HashMap<String, Set<String>>());
+    } catch (StorageServiceException sse) {
+
+    }
+    try {
+      model.getStorage().createDirectory(ModelUtils.getPreservationPath(aipId, representationID),
+        new HashMap<String, Set<String>>());
+    } catch (StorageServiceException sse) {
+
+    }
+
   }
 
   private static Map<String, Set<String>> getRepresentationMetadata(String representationId) {
