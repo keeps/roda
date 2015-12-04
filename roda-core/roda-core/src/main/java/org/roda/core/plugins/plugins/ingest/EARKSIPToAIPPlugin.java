@@ -16,6 +16,7 @@ import java.util.Map;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
 import org.roda.core.data.common.InvalidParameterException;
+import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.PluginType;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.index.IndexService;
@@ -78,18 +79,15 @@ public class EARKSIPToAIPPlugin implements Plugin<TransferredResource> {
 
     String jobId = PluginUtils.getJobId(parameters);
     for (TransferredResource transferredResource : list) {
-      Path bagitPath = Paths.get(transferredResource.getFullPath());
-      LOGGER.error("Converting " + bagitPath + " to AIP");
+      Path earkSIPPath = Paths.get(transferredResource.getFullPath());
+      LOGGER.error("Converting " + earkSIPPath + " to AIP");
       try {
-        AIP aipCreated = EARKSIPToAIPPluginUtils.earkSIPToAip(bagitPath, model, storage);
-
-        // update job with mapping between transferred resource id e aip id
-        // Job job = index.retrieve(Job.class, jobId);
-        // job.addObjectIdToAipIdMapping(transferredResource.getId(),
-        // aipCreated.getId());
-        // model.updateJob(job);
+        AIP aipCreated = EARKSIPToAIPPluginUtils.earkSIPToAip(earkSIPPath, model, storage);
+        Job job = index.retrieve(Job.class, jobId);
+        job.addObjectIdToAipIdMapping(transferredResource.getId(), aipCreated.getId());
+        model.updateJob(job);
       } catch (Throwable e) {
-        LOGGER.error("Error converting " + bagitPath + " to AIP: " + e.getMessage(), e);
+        LOGGER.error("Error converting " + earkSIPPath + " to AIP: " + e.getMessage(), e);
       }
     }
     return null;
