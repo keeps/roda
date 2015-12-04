@@ -864,10 +864,10 @@ public class RodaCoreFactory {
       TransferredResourceToAIPPlugin converter = new TransferredResourceToAIPPlugin();
       converter.setParameterValues(new HashMap<String,String>());
       List<TransferredResource> transferredResourceList = new ArrayList<TransferredResource>();
-      TransferredResource tr = new TransferredResource();
-      tr.setFullPath("/home/sleroux/Fonts");
-      tr.setName("Fonts");
-      transferredResourceList.add(tr);
+      //TransferredResource tr = new TransferredResource();
+      //tr.setFullPath("/home/sleroux/Fonts");
+      //tr.setName("Fonts");
+      //transferredResourceList.add(tr);
       getPluginOrchestrator().runPluginOnTransferredResources(converter, transferredResourceList);
     }catch(InvalidParameterException ipe){
       LOGGER.error(ipe.getMessage(),ipe);
