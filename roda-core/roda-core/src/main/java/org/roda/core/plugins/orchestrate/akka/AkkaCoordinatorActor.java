@@ -14,8 +14,10 @@ import java.util.Map;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.InvalidParameterException;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.Job;
+import org.roda.core.data.v2.Job.ORCHESTRATOR_METHOD;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.index.IndexServiceException;
 import org.roda.core.plugins.Plugin;
@@ -35,11 +37,11 @@ public class AkkaCoordinatorActor extends UntypedActor {
   public void onReceive(Object msg) throws Exception {
     if (msg instanceof Job) {
       Job job = (Job) msg;
-      if ("runPluginOnTransferredResources".equalsIgnoreCase(job.getOrchestratorMethod())) {
+      if (ORCHESTRATOR_METHOD.ON_TRANSFERRED_RESOURCES == job.getOrchestratorMethod()) {
         Plugin<TransferredResource> plugin = (Plugin<TransferredResource>) RodaCoreFactory.getPluginManager()
           .getPlugin(job.getPlugin());
         Map<String, String> parameters = new HashMap<String, String>(job.getPluginParameters());
-        parameters.put("job.id", job.getId());
+        parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, job.getId());
         try {
           plugin.setParameterValues(parameters);
         } catch (InvalidParameterException e) {

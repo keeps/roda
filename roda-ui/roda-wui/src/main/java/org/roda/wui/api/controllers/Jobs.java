@@ -47,13 +47,13 @@ public class Jobs extends RodaCoreService {
     Date startDate = new Date();
 
     // validate input
-    JobsHelper.validateCreateJob(job);
+    JobsHelper.validateAndSetCreateJobInformation(user, job);
 
     // check user permissions
     UserUtility.checkRoles(user, INGEST_SUBMIT_ROLE);
 
     // delegate
-    Job updatedJob = JobsHelper.createJob(user, job);
+    Job updatedJob = JobsHelper.createJob(job);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();

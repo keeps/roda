@@ -31,6 +31,10 @@ public class Job implements Serializable {
     CREATED, STARTED, COMPLETED, FAILED;
   }
 
+  public static enum ORCHESTRATOR_METHOD {
+    ON_TRANSFERRED_RESOURCES;
+  }
+
   // job identifier
   private String id = null;
   // job name
@@ -55,7 +59,7 @@ public class Job implements Serializable {
 
   // type of method that orchestrator should execute (e.g.
   // runPluginOnTransferredResources, runPluginOnAIPs, etc.)
-  private String orchestratorMethod = null;
+  private ORCHESTRATOR_METHOD orchestratorMethod = null;
   // list of object ids to act upon
   private List<String> objectIds = new ArrayList<String>();
   // map between object ids and aip ids
@@ -168,11 +172,11 @@ public class Job implements Serializable {
     return this;
   }
 
-  public String getOrchestratorMethod() {
+  public ORCHESTRATOR_METHOD getOrchestratorMethod() {
     return orchestratorMethod;
   }
 
-  public Job setOrchestratorMethod(String orchestratorMethod) {
+  public Job setOrchestratorMethod(ORCHESTRATOR_METHOD orchestratorMethod) {
     this.orchestratorMethod = orchestratorMethod;
     return this;
   }

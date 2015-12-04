@@ -20,6 +20,7 @@ import java.util.Set;
 import org.roda.core.data.PluginInfo;
 import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.TransferredResource;
+import org.roda.core.data.v2.Job.ORCHESTRATOR_METHOD;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
@@ -237,7 +238,7 @@ public class CreateJob extends Composite {
       objectIds.add(r.getId());
     }
     job.setObjectIds(objectIds);
-    job.setOrchestratorMethod("runPluginOnTransferredResources");
+    job.setOrchestratorMethod(ORCHESTRATOR_METHOD.ON_TRANSFERRED_RESOURCES);
 
     job.setPlugin(selectedIngestPlugin.getId());
     job.setPluginParameters(ingestWorkflowOptions.getValue());

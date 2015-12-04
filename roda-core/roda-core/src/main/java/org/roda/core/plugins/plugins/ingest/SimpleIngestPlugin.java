@@ -38,14 +38,12 @@ public class SimpleIngestPlugin implements Plugin<TransferredResource> {
   private static final Logger LOGGER = LoggerFactory.getLogger(SimpleIngestPlugin.class);
 
   public static final PluginParameter PARAMETER_SIP_TO_AIP_CLASS = new PluginParameter("parameter.sip_to_aip_class",
-    PluginParameterType.PLUGIN_SIP_TO_AIP, "", true, false,
-    SimpleIngestPlugin.class.getCanonicalName() + ".parameter.sip_to_aip_class");
+    "SIP to AIP transformer", PluginParameterType.PLUGIN_SIP_TO_AIP, "", true, false,
+    "Canonical name of the class that will be used to transform the SIP into an AIP.");
   public static final PluginParameter PARAMETER_DO_VIRUS_CHECK = new PluginParameter("parameter.do_virus_check",
-    PluginParameterType.BOOLEAN, "true", true, false,
-    SimpleIngestPlugin.class.getCanonicalName() + ".parameter.do_virus_check");
+    "Virus check", PluginParameterType.BOOLEAN, "true", true, false, "Verifies if an SIP is free of virus.");
   public static final PluginParameter PARAMETER_DO_AUTO_ACCEPT = new PluginParameter("parameter.do_auto_accept",
-    PluginParameterType.BOOLEAN, "true", true, false,
-    SimpleIngestPlugin.class.getCanonicalName() + ".parameter.do_auto_accept");
+    "Auto accept SIP", PluginParameterType.BOOLEAN, "true", true, false, "Automatically accept SIPs.");
 
   private Map<String, String> parameters;
   private Report report;
@@ -67,7 +65,7 @@ public class SimpleIngestPlugin implements Plugin<TransferredResource> {
 
   @Override
   public String getVersion() {
-    return "1.0.0";
+    return "1.0";
   }
 
   @Override
@@ -125,7 +123,7 @@ public class SimpleIngestPlugin implements Plugin<TransferredResource> {
   }
 
   private boolean verifyIfStepShouldBePerformed(PluginParameter pluginParameter, String defaultValue) {
-    String paramValue = parameters.getOrDefault(pluginParameter.getName(), defaultValue);
+    String paramValue = parameters.getOrDefault(pluginParameter.getId(), defaultValue);
     return Boolean.parseBoolean(paramValue);
   }
 
@@ -133,8 +131,7 @@ public class SimpleIngestPlugin implements Plugin<TransferredResource> {
     StorageService storage, List<TransferredResource> transferredResources) {
     List<AIP> aips = new ArrayList<AIP>();
 
-    // String pluginClassName = BagitToAIPPlugin.class.getName();
-    String pluginClassName = parameters.getOrDefault(PARAMETER_SIP_TO_AIP_CLASS.getName(), "");
+    String pluginClassName = parameters.getOrDefault(PARAMETER_SIP_TO_AIP_CLASS.getId(), "");
 
     Plugin<TransferredResource> plugin = (Plugin<TransferredResource>) RodaCoreFactory.getPluginManager()
       .getPlugin(pluginClassName);
@@ -166,19 +163,6 @@ public class SimpleIngestPlugin implements Plugin<TransferredResource> {
   }
 
   private void verifyProducerAuthorization() {
-
-  }
-
-  private void doFileFormatIdentification(IndexService index, ModelService model, StorageService storage,
-    List<AIP> aips) {
-
-  }
-
-  private void doDeepCharacterization(IndexService index, ModelService model, StorageService storage, List<AIP> aips) {
-
-  }
-
-  private void doFileFormatValidation(IndexService index, ModelService model, StorageService storage, List<AIP> aips) {
 
   }
 
@@ -233,7 +217,7 @@ public class SimpleIngestPlugin implements Plugin<TransferredResource> {
   @Override
   public boolean areParameterValuesValid() {
     boolean areValid = true;
-    String sipToAipClass = parameters.getOrDefault(PARAMETER_SIP_TO_AIP_CLASS.getName(), "");
+    String sipToAipClass = parameters.getOrDefault(PARAMETER_SIP_TO_AIP_CLASS.getId(), "");
     if (StringUtils.isNotBlank(sipToAipClass)) {
       Plugin<?> plugin = RodaCoreFactory.getPluginManager().getPlugin(sipToAipClass);
       if (plugin == null || plugin.getType() != PluginType.SIP_TO_AIP) {

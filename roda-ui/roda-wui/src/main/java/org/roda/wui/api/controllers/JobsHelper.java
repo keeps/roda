@@ -21,6 +21,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.Job;
+import org.roda.core.data.v2.Job.ORCHESTRATOR_METHOD;
 import org.roda.core.data.v2.RodaUser;
 import org.roda.core.index.IndexServiceException;
 import org.roda.core.plugins.Plugin;
@@ -33,25 +34,27 @@ import akka.pattern.Patterns;
 public class JobsHelper {
   private static final Logger LOGGER = LoggerFactory.getLogger(JobsHelper.class);
 
-  private static final List<String> ORCHESTRATOR_METHODS = Arrays.asList("runPluginOnTransferredResources");
+  private static final List<ORCHESTRATOR_METHOD> ORCHESTRATOR_METHODS = Arrays
+    .asList(ORCHESTRATOR_METHOD.ON_TRANSFERRED_RESOURCES);
 
-  protected static void validateCreateJob(Job job) throws RequestNotValidException {
+  protected static void validateAndSetCreateJobInformation(RodaUser user, Job job) throws RequestNotValidException {
     if (!ORCHESTRATOR_METHODS.contains(job.getOrchestratorMethod())) {
       throw new RequestNotValidException("Invalid orchestrator method '" + job.getOrchestratorMethod() + "'");
     }
 
-    validateJobPluginInfo(job);
+    validateJobPluginInformation(job);
 
-    // the following checks are not impeditive for job creation
+    // set "missing" information whenever it is not impeditive for job creation
     if (org.apache.commons.lang3.StringUtils.isBlank(job.getId())) {
       job.setId(UUID.randomUUID().toString());
     }
     if (org.apache.commons.lang3.StringUtils.isBlank(job.getName())) {
       job.setName(job.getId());
     }
+    job.setUsername(user.getName());
   }
 
-  private static void validateJobPluginInfo(Job job) throws RequestNotValidException {
+  private static void validateJobPluginInformation(Job job) throws RequestNotValidException {
     Plugin<?> plugin = RodaCoreFactory.getPluginManager().getPlugin(job.getPlugin());
     if (plugin != null) {
       try {
@@ -68,9 +71,8 @@ public class JobsHelper {
     }
   }
 
-  protected static Job createJob(RodaUser user, Job job) throws NotFoundException {
+  protected static Job createJob(Job job) throws NotFoundException {
     Job updatedJob = new Job(job);
-    updatedJob.setUsername(user.getName());
 
     // serialize job to file & index it
     RodaCoreFactory.getModelService().createJob(updatedJob, null);

@@ -214,7 +214,7 @@ public class PluginPanel {
         Label name = new Label(parameter.getDescription() + (parameter.isMandatory() ? "*:" : ":"));
         Widget value = null;
 
-        if (parameter.getType().equals(PluginParameterType.STRING) && parameter.getPossibleValues().length > 0) {
+        if (parameter.getType().equals(PluginParameterType.STRING) && parameter.getPossibleValues().size() > 0) {
           final ListBox listbox = new ListBox();
           listbox.setVisibleItemCount(1);
           for (String possibleValue : parameter.getPossibleValues()) {
@@ -226,7 +226,7 @@ public class PluginPanel {
           listbox.addChangeListener(new ChangeListener() {
 
             public void onChange(Widget sender) {
-              parameter.setValue(listbox.getValue(listbox.getSelectedIndex()));
+              parameter.setDefaultValue(listbox.getValue(listbox.getSelectedIndex()));
             }
 
           });
@@ -241,7 +241,7 @@ public class PluginPanel {
           textBox.addChangeListener(new ChangeListener() {
 
             public void onChange(Widget sender) {
-              parameter.setValue(textBox.getText());
+              parameter.setDefaultValue(textBox.getText());
             }
 
           });
@@ -256,7 +256,7 @@ public class PluginPanel {
           passwordBox.addChangeListener(new ChangeListener() {
 
             public void onChange(Widget sender) {
-              parameter.setValue(passwordBox.getText());
+              parameter.setDefaultValue(passwordBox.getText());
             }
 
           });
@@ -271,7 +271,7 @@ public class PluginPanel {
           checkbox.addClickListener(new ClickListener() {
 
             public void onClick(Widget sender) {
-              parameter.setValue(Boolean.toString(checkbox.isChecked()));
+              parameter.setDefaultValue(Boolean.toString(checkbox.isChecked()));
 
             }
 

@@ -9,7 +9,6 @@ package org.roda.core.data;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -36,8 +35,8 @@ public class PluginParameter implements Serializable {
     BOOLEAN,
 
     /**
-     * String which will translated into the canonical class name of sip to aip
-     * plugin
+     * String which will be translated into the canonical class name of sip to
+     * aip plugin
      */
     PLUGIN_SIP_TO_AIP;
   }
@@ -47,9 +46,10 @@ public class PluginParameter implements Serializable {
    */
   // public static final String TYPE_DATETIME = "datetime";
 
+  private String id = null;
   private String name = null;
   private PluginParameterType type = null;
-  private String value = null;
+  private String defaultValue = null;
   private List<String> possibleValues = new ArrayList<String>();
   private boolean mandatory = true;
   private boolean readonly = false;
@@ -64,18 +64,20 @@ public class PluginParameter implements Serializable {
   /**
    * Constructs a new {@link PluginParameter} with the given parameters.
    * 
+   * @param id
    * @param name
    * @param type
-   * @param value
+   * @param defaultValue
    * @param mandatory
    * @param readonly
    * @param description
    */
-  public PluginParameter(String name, PluginParameterType type, String value, boolean mandatory, boolean readonly,
-    String description) {
+  public PluginParameter(String id, String name, PluginParameterType type, String defaultValue, boolean mandatory,
+    boolean readonly, String description) {
+    setId(id);
     setName(name);
     setType(type);
-    setValue(value);
+    setDefaultValue(defaultValue);
     // setPossibleValues(); no possible values, value is free text
     setMandatory(mandatory);
     setReadonly(readonly);
@@ -85,6 +87,7 @@ public class PluginParameter implements Serializable {
   /**
    * Constructs a new {@link PluginParameter} with the given parameters.
    * 
+   * @param id
    * @param name
    * @param type
    * @param value
@@ -93,11 +96,12 @@ public class PluginParameter implements Serializable {
    * @param readonly
    * @param description
    */
-  public PluginParameter(String name, PluginParameterType type, String value, String[] possibleValues,
+  public PluginParameter(String id, String name, PluginParameterType type, String value, List<String> possibleValues,
     boolean mandatory, boolean readonly, String description) {
+    setId(id);
     setName(name);
     setType(type);
-    setValue(value);
+    setDefaultValue(value);
     setPossibleValues(possibleValues);
     setMandatory(mandatory);
     setReadonly(readonly);
@@ -112,17 +116,18 @@ public class PluginParameter implements Serializable {
    *          the {@link PluginParameter} to clone.
    */
   public PluginParameter(PluginParameter parameter) {
-    this(parameter.getName(), parameter.getType(), parameter.getValue(), parameter.getPossibleValues(),
-      parameter.isMandatory(), parameter.isReadonly(), parameter.getDescription());
+    this(parameter.getId(), parameter.getName(), parameter.getType(), parameter.getValue(),
+      parameter.getPossibleValues(), parameter.isMandatory(), parameter.isReadonly(), parameter.getDescription());
   }
 
   /**
    * @see Object#toString()
    */
+  @Override
   public String toString() {
-    return "Parameter(type=" + getType() + ", name=" + getName() + ", value=" + getValue() + ", possibleValues="
-      + Arrays.toString(getPossibleValues()) + ", mandatory=" + isMandatory() + ", readonly=" + isReadonly()
-      + ", description=" + getDescription() + ")";
+    return "PluginParameter [id=" + id + ", name=" + name + ", type=" + type + ", value=" + defaultValue
+      + ", possibleValues=" + possibleValues + ", mandatory=" + mandatory + ", readonly=" + readonly + ", description="
+      + description + "]";
   }
 
   /**
@@ -136,6 +141,7 @@ public class PluginParameter implements Serializable {
       PluginParameter other = (PluginParameter) obj;
 
       equal = getName() == other.getName() || getName().equals(other.getName());
+      equal &= getId() == other.getId() || getId().equals(other.getId());
       equal &= getType() == other.getType() || getType().equals(other.getType());
       equal &= getValue() == other.getValue() || getValue().equals(other.getValue());
       equal &= possibleValues.equals(other.possibleValues);
@@ -145,6 +151,14 @@ public class PluginParameter implements Serializable {
     }
 
     return equal;
+  }
+
+  public String getId() {
+    return id;
+  }
+
+  public void setId(String id) {
+    this.id = id;
   }
 
   /**
@@ -181,32 +195,32 @@ public class PluginParameter implements Serializable {
    * @return the value
    */
   public String getValue() {
-    return value;
+    return defaultValue;
   }
 
   /**
    * @param value
    *          the value to set
    */
-  public void setValue(String value) {
-    this.value = value;
+  public void setDefaultValue(String defaultValue) {
+    this.defaultValue = defaultValue;
   }
 
   /**
    * @return the possibleValues
    */
-  public String[] getPossibleValues() {
-    return possibleValues.toArray(new String[possibleValues.size()]);
+  public List<String> getPossibleValues() {
+    return possibleValues;
   }
 
   /**
    * @param possibleValues
    *          the possibleValues to set
    */
-  public void setPossibleValues(String[] possibleValues) {
+  public void setPossibleValues(List<String> possibleValues) {
     this.possibleValues.clear();
     if (possibleValues != null) {
-      this.possibleValues.addAll(Arrays.asList(possibleValues));
+      this.possibleValues.addAll(possibleValues);
     }
   }
 

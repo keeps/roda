@@ -84,6 +84,7 @@ import org.roda.core.data.v2.Group;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.Job.JOB_STATE;
+import org.roda.core.data.v2.Job.ORCHESTRATOR_METHOD;
 import org.roda.core.data.v2.LogEntry;
 import org.roda.core.data.v2.PluginType;
 import org.roda.core.data.v2.RODAMember;
@@ -1372,7 +1373,8 @@ public class SolrUtils {
     job.setPluginType(PluginType.valueOf(objectToString(doc.get(RodaConstants.JOB_PLUGIN_TYPE))));
     job.setPlugin(objectToString(doc.get(RodaConstants.JOB_PLUGIN)));
     job.setPluginParameters(ModelUtils.getMapFromJson(objectToString(doc.get(RodaConstants.JOB_PLUGIN_PARAMETERS))));
-    job.setOrchestratorMethod(objectToString(doc.get(RodaConstants.JOB_ORCHESTRATOR_METHOD)));
+    job.setOrchestratorMethod(
+      ORCHESTRATOR_METHOD.valueOf(objectToString(doc.get(RodaConstants.JOB_ORCHESTRATOR_METHOD))));
     job.setObjectIds(objectToListString(doc.get(RodaConstants.JOB_OBJECT_IDS)));
     job.setObjectIdsToAipIds(
       ModelUtils.getMapFromJson(objectToString(doc.get(RodaConstants.JOB_OBJECT_IDS_TO_AIP_IDS))));
