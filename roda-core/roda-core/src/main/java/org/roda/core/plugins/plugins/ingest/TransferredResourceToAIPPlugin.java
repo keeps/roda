@@ -26,6 +26,7 @@ import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
 import org.roda.core.data.common.InvalidParameterException;
 import org.roda.core.data.v2.Job;
+import org.roda.core.data.v2.PluginType;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.AIP;
@@ -158,6 +159,16 @@ public class TransferredResourceToAIPPlugin implements Plugin<TransferredResourc
   @Override
   public Plugin<TransferredResource> cloneMe() {
     return new TransferredResourceToAIPPlugin();
+  }
+
+  @Override
+  public PluginType getType() {
+    return PluginType.SIP_TO_AIP;
+  }
+
+  @Override
+  public boolean areParameterValuesValid() {
+    return true;
   }
 
 }
