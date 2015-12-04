@@ -995,6 +995,14 @@
 				<artifactId>reflections</artifactId>
 				<version>0.9.10</version>
 			</dependency>
+			
+			
+			<!-- LOCAL INSTALL -->
+			<dependency>
+				<groupId>org.roda-project</groupId>
+				<artifactId>commons-ip</artifactId>
+				<version>1.0.0-SNAPSHOT</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 	<reporting>

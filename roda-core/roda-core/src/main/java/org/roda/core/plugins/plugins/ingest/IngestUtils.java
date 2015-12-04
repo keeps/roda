@@ -19,6 +19,8 @@ public class IngestUtils {
     model.getStorage().createDirectory(ModelUtils.getRepresentationsPath(aipId), new HashMap<String, Set<String>>());
     model.getStorage().createDirectory(ModelUtils.getRepresentationPath(aipId, representationID),
       getRepresentationMetadata(representationID));
+    model.getStorage().createDirectory(ModelUtils.getMetadataPath(aipId), new HashMap<String, Set<String>>());
+    model.getStorage().createDirectory(ModelUtils.getDescriptiveMetadataPath(aipId), new HashMap<String, Set<String>>());
     model.getStorage().createDirectory(ModelUtils.getPreservationPath(aipId), new HashMap<String, Set<String>>());
     model.getStorage().createDirectory(ModelUtils.getPreservationPath(aipId, representationID),
       new HashMap<String, Set<String>>());

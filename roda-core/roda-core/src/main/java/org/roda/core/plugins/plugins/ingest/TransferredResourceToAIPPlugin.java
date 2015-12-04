@@ -8,6 +8,7 @@
 package org.roda.core.plugins.plugins.ingest;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
 import org.roda.core.data.common.InvalidParameterException;
@@ -99,6 +101,12 @@ public class TransferredResourceToAIPPlugin implements Plugin<TransferredResourc
         final String aipID = aip.getId();
         String representationID = "representation";
         IngestUtils.createDirectories(model, aip.getId(), representationID);
+        
+        Path metadataFile = Files.createTempFile("metadata", ".xml");
+        StringWriter sw = new StringWriter();
+        sw.append("<metadata>");
+        sw.append("<field name='title'>" + StringEscapeUtils.escapeXml(transferredResource.getName()) + "</field>");
+
         if(transferredResource.isFile()){
           Binary fileBinary = (Binary) FSUtils.convertPathToResource(transferredResourcePath.getParent(), transferredResourcePath);
           model.createFile(aip.getId(), representationID, transferredResource.getName(), fileBinary);
@@ -113,8 +121,10 @@ public class TransferredResourceToAIPPlugin implements Plugin<TransferredResourc
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
               try{
+                Path relativePath = transferredResourcePath.relativize(file);
+                sw.append("<field name='dc.relation'>" + StringEscapeUtils.escapeXml(relativePath.toString().replace('/', '_')) + "</field>");
                 Binary fileBinary = (Binary) FSUtils.convertPathToResource(file.getParent(), file);
-                model.createFile(aipID, representationID, transferredResource.getName(), fileBinary);
+                model.createFile(aipID, representationID,relativePath.toString().replace('/', '_') , fileBinary);
               }catch(StorageServiceException | ModelServiceException sse){
                 
               }
@@ -132,10 +142,15 @@ public class TransferredResourceToAIPPlugin implements Plugin<TransferredResourc
             }
           });
         }
+        sw.append("</metadata>");
+        Files.write(metadataFile, sw.toString().getBytes("UTF-8"));
+        Binary metadataBinary = (Binary) FSUtils.convertPathToResource(metadataFile.getParent(), metadataFile);
+        model.createDescriptiveMetadata(aip.getId(), "metadata.xml", metadataBinary, "metadata");
+        
         aip = model.retrieveAIP(aip.getId());
-        Job job = index.retrieve(Job.class, jobId);
-        job.addObjectIdToAipIdMapping(transferredResource.getId(), aip.getId());
-        model.updateJob(job);
+        //Job job = index.retrieve(Job.class, jobId);
+        //job.addObjectIdToAipIdMapping(transferredResource.getId(), aip.getId());
+       // model.updateJob(job);
       } catch (Throwable e) {
         LOGGER.error("Error converting " + transferredResource.getId() + " to AIP: " + e.getMessage(), e);
       }

@@ -53,6 +53,7 @@ import org.roda.core.data.adapter.filter.FilterParameter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
+import org.roda.core.data.common.InvalidParameterException;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.NodeType;
 import org.roda.core.data.eadc.DescriptionLevelManager;
@@ -87,6 +88,8 @@ import org.roda.core.plugins.plugins.base.ReindexPlugin;
 import org.roda.core.plugins.plugins.base.RemoveOrphansPlugin;
 import org.roda.core.plugins.plugins.base.V2ToV3PremisPlugin;
 import org.roda.core.plugins.plugins.ingest.BagitToAIPPlugin;
+import org.roda.core.plugins.plugins.ingest.EARKSIPToAIPPlugin;
+import org.roda.core.plugins.plugins.ingest.TransferredResourceToAIPPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.DroidPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.ExifToolPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.FFProbePlugin;
@@ -841,7 +844,36 @@ public class RodaCoreFactory {
     Plugin<AIP> fastCharacterizationPlugin = new FastCharacterizationPlugin();
     getPluginOrchestrator().runPluginOnAllAIPs(fastCharacterizationPlugin);
   }
-
+  
+  private static void runEARKPlugin() {
+    try{
+      EARKSIPToAIPPlugin eark = new EARKSIPToAIPPlugin();
+      eark.setParameterValues(new HashMap<String,String>());
+      List<TransferredResource> transferredResourceList = new ArrayList<TransferredResource>();
+      TransferredResource tr = new TransferredResource();
+      tr.setFullPath("/home/sleroux/Fonts");
+      transferredResourceList.add(tr);
+      getPluginOrchestrator().runPluginOnTransferredResources(eark, transferredResourceList);
+    }catch(InvalidParameterException ipe){
+      LOGGER.error(ipe.getMessage(),ipe);
+    }
+  }
+  
+  private static void runTransferredResourceToAIPPlugin() {
+    try{
+      TransferredResourceToAIPPlugin converter = new TransferredResourceToAIPPlugin();
+      converter.setParameterValues(new HashMap<String,String>());
+      List<TransferredResource> transferredResourceList = new ArrayList<TransferredResource>();
+      TransferredResource tr = new TransferredResource();
+      tr.setFullPath("/home/sleroux/Fonts");
+      tr.setName("Fonts");
+      transferredResourceList.add(tr);
+      getPluginOrchestrator().runPluginOnTransferredResources(converter, transferredResourceList);
+    }catch(InvalidParameterException ipe){
+      LOGGER.error(ipe.getMessage(),ipe);
+    }
+  }
+  
   private static void runSolrQuery(List<String> args) {
     String collection = args.get(2);
     String solrQueryString = args.get(3);
@@ -879,6 +911,7 @@ public class RodaCoreFactory {
     System.err.println("java -jar x.jar jpylyzer");
     System.err.println("java -jar x.jar premisupdate");
     System.err.println("java -jar x.jar fastcharacterization");
+    System.err.println("java -jar x.jar eark");
   }
 
   private static void printIndexMembers(List<String> args, Filter filter, Sorter sorter, Sublist sublist, Facets facets)
@@ -987,6 +1020,10 @@ public class RodaCoreFactory {
       runPremisUpdatePlugin();
     } else if ("fastcharacterization".equals(args.get(0))) {
       runFastCharacterizationPlugin();
+    } else if ("eark".equals(args.get(0))) {
+      runEARKPlugin();
+    } else if ("transferredResource".equals(args.get(0))) {
+      runTransferredResourceToAIPPlugin();
     } else {
       printMainUsage();
     }

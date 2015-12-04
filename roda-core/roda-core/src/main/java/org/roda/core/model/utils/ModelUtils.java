@@ -303,6 +303,11 @@ public final class ModelUtils {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId);
   }
 
+  public static StoragePath getMetadataPath(String aipId) throws StorageServiceException {
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
+      RodaConstants.STORAGE_DIRECTORY_METADATA);
+  }
+  
   public static StoragePath getDescriptiveMetadataPath(String aipId) throws StorageServiceException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
       RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_DESCRIPTIVE);
@@ -675,4 +680,6 @@ public final class ModelUtils {
     }
     return node;
   }
+
+  
 }
