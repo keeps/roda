@@ -18,10 +18,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.roda.core.data.PluginInfo;
-import org.roda.core.data.PluginParameter;
-import org.roda.core.data.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.Job;
-import org.roda.core.data.v2.PluginType;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
@@ -41,13 +38,10 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -64,13 +58,26 @@ public class CreateJob extends Composite {
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 0) {
-        Set<TransferredResource> selected = IngestTransfer.getInstance().getSelected();
+        final Set<TransferredResource> selected = IngestTransfer.getInstance().getSelected();
         if (selected.isEmpty()) {
           Tools.newHistory(IngestTransfer.RESOLVER);
           callback.onSuccess(null);
         } else {
-          CreateJob create = new CreateJob(selected);
-          callback.onSuccess(create);
+          BrowserService.Util.getInstance().getCreateIngestProcessBundle(new AsyncCallback<CreateIngestJobBundle>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+              callback.onFailure(caught);
+            }
+
+            @Override
+            public void onSuccess(CreateIngestJobBundle bundle) {
+
+              CreateJob create = new CreateJob(selected, bundle.getIngestPlugins(), bundle.getSipToAipPlugins());
+              callback.onSuccess(create);
+            }
+          });
+
         }
       } else {
         Tools.newHistory(CreateJob.RESOLVER);
@@ -103,6 +110,7 @@ public class CreateJob extends Composite {
   // private ClientLogger logger = new ClientLogger(getClass().getName());
 
   private final Set<TransferredResource> selected;
+  private final List<PluginInfo> ingestPlugins;
 
   @UiField
   TextBox name;
@@ -114,7 +122,10 @@ public class CreateJob extends Composite {
   ListBox ingestWorkflowList;
 
   @UiField
-  FlowPanel ingestWorkflowOptions;
+  Label ingestWorkflowListDescription;
+
+  @UiField
+  PluginOptionsPanel ingestWorkflowOptions;
 
   @UiField
   Button buttonCreate;
@@ -122,29 +133,21 @@ public class CreateJob extends Composite {
   @UiField
   Button buttonCancel;
 
-  private List<PluginInfo> ingestPlugins = null;
-  private PluginInfo selectedPlugin = null;
+  private PluginInfo selectedIngestPlugin = null;
 
-  public CreateJob(Set<TransferredResource> selected) {
+  public CreateJob(Set<TransferredResource> selected, List<PluginInfo> ingestPlugins,
+    List<PluginInfo> sipToAipPlugins) {
     this.selected = selected;
+    this.ingestPlugins = ingestPlugins;
+
     initWidget(uiBinder.createAndBindUi(this));
-    updateObjectList();
+
     name.setText(messages.ingestProcessNewDefaultName(new Date()));
-
-    BrowserService.Util.getInstance().getPluginsInfo(PluginType.INGEST, new AsyncCallback<List<PluginInfo>>() {
-
-      @Override
-      public void onFailure(Throwable caught) {
-        Toast.showError("Error", caught.getMessage());
-      }
-
-      @Override
-      public void onSuccess(List<PluginInfo> ingestPlugins) {
-        CreateJob.this.ingestPlugins = ingestPlugins;
-        configurePlugins(ingestPlugins);
-      }
-    });
+    ingestWorkflowOptions.setSipToAipPlugins(sipToAipPlugins);
     
+    updateObjectList();
+    configureIngestPlugins();
+
     ingestWorkflowList.addChangeHandler(new ChangeHandler() {
 
       @Override
@@ -152,12 +155,11 @@ public class CreateJob extends Composite {
         String selectedPluginId = ingestWorkflowList.getSelectedValue();
         GWT.log("ingest workflow changed");
         if (selectedPluginId != null) {
-          CreateJob.this.selectedPlugin = lookupPlugin(selectedPluginId);
+          CreateJob.this.selectedIngestPlugin = lookupIngestPlugin(selectedPluginId);
         }
         updateWorkflowOptions();
       }
     });
-
   }
 
   private void updateObjectList() {
@@ -177,7 +179,7 @@ public class CreateJob extends Composite {
 
   }
 
-  protected void configurePlugins(List<PluginInfo> ingestPlugins) {
+  protected void configureIngestPlugins() {
     for (PluginInfo pluginInfo : ingestPlugins) {
       if (pluginInfo != null) {
         ingestWorkflowList.addItem(messages.pluginLabel(pluginInfo.getName(), pluginInfo.getVersion()),
@@ -187,67 +189,30 @@ public class CreateJob extends Composite {
       }
     }
     ingestWorkflowList.setSelectedIndex(0);
-    selectedPlugin = ingestPlugins.get(0);
+    selectedIngestPlugin = ingestPlugins.get(0);
     updateWorkflowOptions();
   }
 
   protected void updateWorkflowOptions() {
-    ingestWorkflowOptions.clear();
-    if (selectedPlugin == null) {
-      // TODO set fall-back message
+    if (selectedIngestPlugin == null) {
+      ingestWorkflowListDescription.setText("");
+      ingestWorkflowListDescription.setVisible(false);
+      ingestWorkflowOptions.setPluginInfo(null);
     } else {
-      selectedPlugin.getDescription();
-      Label description = new Label(selectedPlugin.getDescription());
-      ingestWorkflowOptions.add(description);
-      description.addStyleName("form-help");
-
-      for (PluginParameter parameter : selectedPlugin.getParameters()) {
-        if (PluginParameterType.BOOLEAN.equals(parameter.getType())) {
-          CheckBox checkBox = new CheckBox(parameter.getName());
-          
-          ingestWorkflowOptions.add(checkBox);
-          
-          checkBox.addStyleName("form-checkbox");
-          
-        } else if (PluginParameterType.STRING.equals(parameter.getType())) {
-          Label parameterName = new Label(parameter.getName());
-          TextBox parameterBox = new TextBox();
-          
-          ingestWorkflowOptions.add(parameterName);
-          ingestWorkflowOptions.add(parameterBox);
-          
-          parameterName.addStyleName("form-label");
-          parameterBox.addStyleName("form-textbox");
-
-        } else if (PluginParameterType.PASSWORD.equals(parameter.getType())) {
-          Label parameterName = new Label(parameter.getName());
-          PasswordTextBox parameterBox = new PasswordTextBox();
-          
-          ingestWorkflowOptions.add(parameterName);
-          ingestWorkflowOptions.add(parameterBox);
-          
-          parameterName.addStyleName("form-label");
-          parameterBox.addStyleName("form-textbox");
-
-        } else if (PluginParameterType.PLUGIN_SIP_TO_AIP.equals(parameter.getType())) {
-          Label parameterName = new Label(parameter.getName());
-          ListBox pluginList = new ListBox();
-          
-          ingestWorkflowOptions.add(parameterName);
-          ingestWorkflowOptions.add(pluginList);
-          
-          parameterName.addStyleName("form-label");
-          pluginList.addStyleName("form-listbox");
-        } else {
-          // TODO send error
-        }
-
+      String description = selectedIngestPlugin.getDescription();
+      if (description != null && description.length() > 0) {
+        ingestWorkflowListDescription.setText(description);
+        ingestWorkflowListDescription.setVisible(true);
+      } else {
+        ingestWorkflowListDescription.setVisible(false);
       }
+
+      ingestWorkflowOptions.setPluginInfo(selectedIngestPlugin);
 
     }
   }
 
-  private PluginInfo lookupPlugin(String selectedPluginId) {
+  private PluginInfo lookupIngestPlugin(String selectedPluginId) {
     PluginInfo p = null;
     if (ingestPlugins != null) {
       for (PluginInfo pluginInfo : ingestPlugins) {
@@ -274,12 +239,8 @@ public class CreateJob extends Composite {
     job.setObjectIds(objectIds);
     job.setOrchestratorMethod("runPluginOnTransferredResources");
 
-    // TODO get plugin from list
-    job.setPlugin("org.roda.core.plugins.plugins.ingest.SimpleIngestPlugin");
-    Map<String, String> pluginParameters = new HashMap<String, String>();
-    pluginParameters.put("parameter.sip_to_aip_class", "org.roda.core.plugins.plugins.ingest.BagitToAIPPlugin");
-    pluginParameters.put("parameter.do_virus_check", "false");
-    job.setPluginParameters(pluginParameters);
+    job.setPlugin(selectedIngestPlugin.getId());
+    job.setPluginParameters(ingestWorkflowOptions.getValue());
 
     BrowserService.Util.getInstance().createJob(job, new AsyncCallback<Job>() {
 

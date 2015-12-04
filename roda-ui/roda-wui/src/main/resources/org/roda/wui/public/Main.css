@@ -1829,3 +1829,9 @@
 	display: inline;
 }
 
+.wui-plugin-options {
+    background-color: #eee;
+    padding: 10px 20px;
+    border-radius: 2px;
+}
+

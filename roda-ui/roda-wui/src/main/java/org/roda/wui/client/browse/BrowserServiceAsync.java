@@ -26,6 +26,7 @@ import org.roda.core.data.v2.RepresentationPreservationObject;
 import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.core.data.v2.SimpleFile;
 import org.roda.core.data.v2.TransferredResource;
+import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
 import org.roda.wui.client.search.SearchField;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -211,4 +212,6 @@ public interface BrowserServiceAsync {
   void createJob(Job job, AsyncCallback<Job> callback);
 
   void getPluginsInfo(PluginType type, AsyncCallback<List<PluginInfo>> callback);
+
+  void getCreateIngestProcessBundle(AsyncCallback<CreateIngestJobBundle> callback);
 }

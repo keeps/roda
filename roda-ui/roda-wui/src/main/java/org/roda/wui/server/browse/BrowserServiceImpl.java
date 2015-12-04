@@ -55,6 +55,7 @@ import org.roda.wui.client.browse.ParseError;
 import org.roda.wui.client.browse.PreservationInfo;
 import org.roda.wui.client.browse.RepresentationInfo;
 import org.roda.wui.client.browse.TimelineInfo;
+import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
 import org.roda.wui.client.search.SearchField;
 import org.roda.wui.common.I18nUtility;
 import org.roda.wui.common.client.GenericException;
@@ -604,11 +605,20 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     return Jobs.createJob(user, job);
   }
-  
+
   @Override
   public List<PluginInfo> getPluginsInfo(PluginType type) {
     // TODO check permissions
     return RodaCoreFactory.getPluginManager().getPluginsInfo(type);
+  }
+
+  @Override
+  public CreateIngestJobBundle getCreateIngestProcessBundle() {
+    // TODO check permissions
+    CreateIngestJobBundle bundle = new CreateIngestJobBundle();
+    bundle.setIngestPlugins(RodaCoreFactory.getPluginManager().getPluginsInfo(PluginType.INGEST));
+    bundle.setSipToAipPlugins(RodaCoreFactory.getPluginManager().getPluginsInfo(PluginType.SIP_TO_AIP));
+    return bundle;
   }
 
 }

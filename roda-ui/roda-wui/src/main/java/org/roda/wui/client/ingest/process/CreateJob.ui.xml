@@ -3,7 +3,7 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:i="urn:import:config.i18n.client" xmlns:d="urn:import:com.google.gwt.user.datepicker.client"
-	xmlns:u="urn:import:org.roda.wui.management.user.client">
+	xmlns:u="urn:import:org.roda.wui.management.user.client" xmlns:p="urn:import:org.roda.wui.client.ingest.process">
 
 	<ui:style>
 	
@@ -26,7 +26,8 @@
 					Ingest workflow
 				</g:Label>
 				<g:ListBox addStyleNames="form-listbox" ui:field="ingestWorkflowList" />
-				<g:FlowPanel ui:field="ingestWorkflowOptions" />
+				<g:Label addStyleNames="form-help"  ui:field="ingestWorkflowListDescription"/>
+				<p:PluginOptionsPanel  addStyleNames="wui-plugin-options" ui:field="ingestWorkflowOptions"/>
 			</g:FlowPanel>
 
 			<g:FlowPanel addStyleNames="col_2 last sidebar">

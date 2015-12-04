@@ -146,14 +146,36 @@ pre>code {
 
 .form-checkbox {
 	display: block;
-	color: #58595b;
+	/* color: #58595b; */
+	margin-bottom: 5px;
+}
+
+.form-radiogroup {
+	margin-left: 10px;
+	margin-bottom: 10px;
+	
+}
+
+.form-radiobutton {
+	display: block;
+	/* color: #58595b; */
 	margin-bottom: 5px;
 }
 
 .form-help {
 	font-size: 1rem;
-	font-weight: 100;
+	font-weight: 400;
 	color: #999;
+	position: relative;
+    top: -5px;
+}
+
+.form-radiobutton + .form-help {
+    margin-left: 20px;
+}
+
+.form-checkbox + .form-help {
+    margin-left: 20px;
 }
 
 .form-textbox-small {
