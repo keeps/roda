@@ -221,7 +221,7 @@ public class PluginPanel {
             listbox.addItem(possibleValue);
           }
 
-          Tools.setSelectedValue(listbox, parameter.getValue());
+          Tools.setSelectedValue(listbox, parameter.getDefaultValue());
 
           listbox.addChangeListener(new ChangeListener() {
 
@@ -236,7 +236,7 @@ public class PluginPanel {
         } else if (parameter.getType().equals(PluginParameterType.STRING)) {
           final TextBox textBox = new TextBox();
 
-          textBox.setText(parameter.getValue());
+          textBox.setText(parameter.getDefaultValue());
 
           textBox.addChangeListener(new ChangeListener() {
 
@@ -251,7 +251,7 @@ public class PluginPanel {
         } else if (parameter.getType().equals(PluginParameterType.PASSWORD)) {
           final PasswordTextBox passwordBox = new PasswordTextBox();
 
-          passwordBox.setText(parameter.getValue());
+          passwordBox.setText(parameter.getDefaultValue());
 
           passwordBox.addChangeListener(new ChangeListener() {
 
@@ -266,7 +266,7 @@ public class PluginPanel {
         } else if (parameter.getType().equals(PluginParameterType.BOOLEAN)) {
           final CheckBox checkbox = new CheckBox();
 
-          checkbox.setChecked(Boolean.parseBoolean(parameter.getValue()));
+          checkbox.setChecked(Boolean.parseBoolean(parameter.getDefaultValue()));
 
           checkbox.addClickListener(new ClickListener() {
 
@@ -312,7 +312,7 @@ public class PluginPanel {
   public boolean isValid() {
     boolean valid = true;
     for (PluginParameter parameter : selectedPlugin.getParameters()) {
-      if (parameter.isMandatory() && (parameter.getValue() == null || parameter.getValue().length() == 0)) {
+      if (parameter.isMandatory() && (parameter.getDefaultValue() == null || parameter.getDefaultValue().length() == 0)) {
         valid = false;
         break;
       }

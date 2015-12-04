@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<name>RODA - Repositório de Objetos Digitais Autênticos</name>
 	<url>http://roda.keep.pt/</url>
@@ -20,6 +19,18 @@
 		<maven>2.2.1</maven>
 	</prerequisites>
 	<repositories>
+		<repository>
+			<id>temporary_dependencies_repository</id>
+			<name>temporary_dependencies_repository</name>
+			<releases>
+				<enabled>true</enabled>
+				<checksumPolicy>ignore</checksumPolicy>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<url>file://${project.basedir}/repository/</url>
+		</repository>
 		<repository>
 			<id>KEEPS-Artifacts</id>
 			<name>KEEP Artifacts-releases (fits, etc.)</name>
@@ -323,7 +334,7 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore />
+										<ignore/>
 									</action>
 								</pluginExecution>
 							</pluginExecutions>
@@ -995,8 +1006,6 @@
 				<artifactId>reflections</artifactId>
 				<version>0.9.10</version>
 			</dependency>
-			
-			
 			<!-- LOCAL INSTALL -->
 			<dependency>
 				<groupId>org.roda-project</groupId>

@@ -54,10 +54,10 @@ public class BagitToAIPPluginUtils {
 
     aip = model.createAIP(new HashMap<String, Set<String>>(), false, true);
 
-    model.createDescriptiveMetadata(aip.getId(), "metadata.xml", (Binary) descriptiveMetadataResource, "metadata");
-
     String representationID = "representation";
     IngestUtils.createDirectories(model, aip.getId(), representationID);
+    
+    model.createDescriptiveMetadata(aip.getId(), "metadata.xml", (Binary) descriptiveMetadataResource, "metadata");
 
     Path tempFolder = Files.createTempDirectory("temp");
     if (bag.getPayload() != null) {

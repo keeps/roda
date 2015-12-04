@@ -52,8 +52,8 @@ public class PluginOptionsPanel extends Composite {
     Map<String, String> ret = new HashMap<String, String>();
 
     for (PluginParameterPanel panel : panels) {
-      String key = panel.getParameter().getName();
-      String value = panel.getParameter().getValue();
+      String key = panel.getParameter().getId();
+      String value = panel.getValue();
       if (value != null) {
         ret.put(key, value);
       }

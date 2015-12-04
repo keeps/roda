@@ -311,7 +311,7 @@ public class EventManagementServiceImpl extends RemoteServiceServlet implements 
     for (PluginParameter parameter : task.getPluginInfo().getParameters()) {
       if (!parameter.getName().equals("password")) {
         ret.put(String.format(messages.getString("task.label.plugin.parameter"), parameter.getName()),
-          parameter.getValue());
+          parameter.getDefaultValue());
       }
     }
 
@@ -397,7 +397,7 @@ public class EventManagementServiceImpl extends RemoteServiceServlet implements 
     for (PluginParameter parameter : instance.getPluginInfo().getParameters()) {
       if (!parameter.getName().equals("password")) {
         ret.put(String.format(messages.getString("instance.label.plugin.parameter"), parameter.getName()),
-          parameter.getValue());
+          parameter.getDefaultValue());
       }
     }
 

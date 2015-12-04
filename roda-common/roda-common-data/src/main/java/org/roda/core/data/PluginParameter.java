@@ -116,7 +116,7 @@ public class PluginParameter implements Serializable {
    *          the {@link PluginParameter} to clone.
    */
   public PluginParameter(PluginParameter parameter) {
-    this(parameter.getId(), parameter.getName(), parameter.getType(), parameter.getValue(),
+    this(parameter.getId(), parameter.getName(), parameter.getType(), parameter.getDefaultValue(),
       parameter.getPossibleValues(), parameter.isMandatory(), parameter.isReadonly(), parameter.getDescription());
   }
 
@@ -143,7 +143,7 @@ public class PluginParameter implements Serializable {
       equal = getName() == other.getName() || getName().equals(other.getName());
       equal &= getId() == other.getId() || getId().equals(other.getId());
       equal &= getType() == other.getType() || getType().equals(other.getType());
-      equal &= getValue() == other.getValue() || getValue().equals(other.getValue());
+      equal &= getDefaultValue() == other.getDefaultValue() || getDefaultValue().equals(other.getDefaultValue());
       equal &= possibleValues.equals(other.possibleValues);
 
     } else {
@@ -194,7 +194,7 @@ public class PluginParameter implements Serializable {
   /**
    * @return the value
    */
-  public String getValue() {
+  public String getDefaultValue() {
     return defaultValue;
   }
 
