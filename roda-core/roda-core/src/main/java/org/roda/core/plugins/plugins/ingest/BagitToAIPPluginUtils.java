@@ -37,7 +37,7 @@ import gov.loc.repository.bagit.utilities.SimpleResult;
 public class BagitToAIPPluginUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(BagitToAIPPluginUtils.class);
 
-  public static AIP bagitToAip(Path bagitPath, ModelService model)
+  public static AIP bagitToAip(Path bagitPath, ModelService model, String metadataFilename)
     throws BagitNotValidException, IOException, StorageServiceException, ModelServiceException {
     AIP aip = null;
     BagFactory bagFactory = new BagFactory();
@@ -56,8 +56,8 @@ public class BagitToAIPPluginUtils {
 
     String representationID = "representation";
     IngestUtils.createDirectories(model, aip.getId(), representationID);
-    
-    model.createDescriptiveMetadata(aip.getId(), "metadata.xml", (Binary) descriptiveMetadataResource, "metadata");
+
+    model.createDescriptiveMetadata(aip.getId(), metadataFilename, (Binary) descriptiveMetadataResource, "metadata");
 
     Path tempFolder = Files.createTempDirectory("temp");
     if (bag.getPayload() != null) {

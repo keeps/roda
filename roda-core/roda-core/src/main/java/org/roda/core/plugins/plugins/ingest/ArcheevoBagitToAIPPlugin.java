@@ -29,8 +29,8 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class BagitToAIPPlugin implements Plugin<TransferredResource> {
-  private static final Logger LOGGER = LoggerFactory.getLogger(BagitToAIPPlugin.class);
+public class ArcheevoBagitToAIPPlugin implements Plugin<TransferredResource> {
+  private static final Logger LOGGER = LoggerFactory.getLogger(ArcheevoBagitToAIPPlugin.class);
 
   private Map<String, String> parameters;
 
@@ -45,12 +45,12 @@ public class BagitToAIPPlugin implements Plugin<TransferredResource> {
 
   @Override
   public String getName() {
-    return "Bagit to AIP";
+    return "Archeevo Bagit to AIP";
   }
 
   @Override
   public String getDescription() {
-    return "Converts a Bagit zip file to an AIP";
+    return "Converts an Archeevo Bagit zip file to an AIP";
   }
 
   @Override
@@ -82,7 +82,7 @@ public class BagitToAIPPlugin implements Plugin<TransferredResource> {
       Path bagitPath = Paths.get(transferredResource.getFullPath());
       LOGGER.debug("Converting " + bagitPath + " to AIP");
       try {
-        AIP aipCreated = BagitToAIPPluginUtils.bagitToAip(bagitPath, model, "metadata.xml");
+        AIP aipCreated = BagitToAIPPluginUtils.bagitToAip(bagitPath, model, "metadata_archeevo.xml");
 
         // update job with mapping between transferred resource id e aip id
         Job job = index.retrieve(Job.class, jobId);
@@ -109,7 +109,7 @@ public class BagitToAIPPlugin implements Plugin<TransferredResource> {
 
   @Override
   public Plugin<TransferredResource> cloneMe() {
-    return new BagitToAIPPlugin();
+    return new ArcheevoBagitToAIPPlugin();
   }
 
   @Override
