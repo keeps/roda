@@ -132,12 +132,12 @@ public class IndexModelObserver implements ModelObserver {
           for (String fileId : representation.getFileIds()) {
             File file = model.retrieveFile(aip.getId(), representationId, fileId);
             if(file.getFileFormat()==null){
-              LOGGER.error("FILE FORMAT NULL");
+              LOGGER.debug("FILE FORMAT NULL");
             }else{
               if(file.getFileFormat().getMimeType()==null){
-                LOGGER.error("MIME TYPE NULL");
+                LOGGER.debug("MIME TYPE NULL");
               }else{
-                LOGGER.error("MIMETYPE: "+file.getFileFormat().getMimeType());
+                LOGGER.debug("MIMETYPE: "+file.getFileFormat().getMimeType());
               }
             }
             

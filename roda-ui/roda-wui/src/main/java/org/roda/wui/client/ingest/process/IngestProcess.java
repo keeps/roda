@@ -158,13 +158,12 @@ public class IngestProcess extends Composite {
 
       @Override
       public void onSelectionChange(SelectionChangeEvent event) {
-        updateVisibles(jobList.getSelectionModel().getSelectedObject());
+        Job job = jobList.getSelectionModel().getSelectedObject();
+        if (job != null) {
+          Tools.newHistory(ShowJob.RESOLVER, job.getId());
+        }
       }
     });
-
-  }
-
-  protected void updateVisibles(Job selected) {
 
   }
 
@@ -194,6 +193,8 @@ public class IngestProcess extends Composite {
       callback.onSuccess(this);
     } else if (historyTokens.size() == 1 && historyTokens.get(0).equals(CreateJob.RESOLVER.getHistoryToken())) {
       CreateJob.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+    } else if (historyTokens.size() == 2 && historyTokens.get(0).equals(ShowJob.RESOLVER.getHistoryToken())) {
+      ShowJob.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else {
       Tools.newHistory(RESOLVER);
       callback.onSuccess(null);

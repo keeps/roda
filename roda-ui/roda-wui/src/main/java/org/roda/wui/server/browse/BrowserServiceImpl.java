@@ -21,6 +21,8 @@ import org.roda.core.common.Messages;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.DescriptionObject;
 import org.roda.core.data.PluginInfo;
+import org.roda.core.data.PluginParameter;
+import org.roda.core.data.PluginParameter.PluginParameterType;
 import org.roda.core.data.RepresentationObject;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
@@ -56,6 +58,7 @@ import org.roda.wui.client.browse.PreservationInfo;
 import org.roda.wui.client.browse.RepresentationInfo;
 import org.roda.wui.client.browse.TimelineInfo;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
+import org.roda.wui.client.ingest.process.JobBundle;
 import org.roda.wui.client.search.SearchField;
 import org.roda.wui.common.I18nUtility;
 import org.roda.wui.common.client.GenericException;
@@ -598,6 +601,32 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   public Job retrieveJob(String jobId) throws AuthorizationDeniedException, GenericException, NotFoundException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     return Jobs.getJob(user, jobId);
+  }
+
+  @Override
+  public JobBundle retrieveJobBundle(String jobId)
+    throws AuthorizationDeniedException, GenericException, NotFoundException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    Job job = Jobs.getJob(user, jobId);
+    List<PluginInfo> pluginsInfo = new ArrayList<>();
+
+    PluginInfo basePlugin = RodaCoreFactory.getPluginManager().getPluginInfo(job.getPlugin());
+    pluginsInfo.add(basePlugin);
+
+    for (PluginParameter parameter : basePlugin.getParameters()) {
+      if (PluginParameterType.PLUGIN_SIP_TO_AIP.equals(parameter.getType())) {
+        String pluginId = job.getPluginParameters().get(parameter.getId());
+        if(pluginId !=  null) {
+          PluginInfo refPlugin = RodaCoreFactory.getPluginManager().getPluginInfo(pluginId);
+          pluginsInfo.add(refPlugin);
+        }
+      }
+    }
+
+    JobBundle bundle = new JobBundle();
+    bundle.setJob(job);
+    bundle.setPluginsInfo(pluginsInfo);
+    return bundle;
   }
 
   @Override

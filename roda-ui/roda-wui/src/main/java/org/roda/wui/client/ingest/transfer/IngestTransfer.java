@@ -25,6 +25,7 @@ import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.IndexResult;
+import org.roda.core.data.v2.RodaUser;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.Dialogs;
@@ -340,15 +341,31 @@ public class IngestTransfer extends Composite {
   }
 
   protected void updateVisibles() {
-    startIngest.setVisible(resource != null);
-    createFolder.setVisible(resource == null || !resource.isFile());
-    uploadFiles.setVisible(resource != null && !resource.isFile());
+    uploadFiles.setEnabled(resource == null || !resource.isFile());
+    createFolder.setEnabled(resource == null || !resource.isFile());
     remove.setEnabled(resource != null || !transferredResourceList.getSelected().isEmpty());
+    startIngest.setEnabled(resource != null || !transferredResourceList.getSelected().isEmpty());
   }
 
   @UiHandler("uploadFiles")
   void buttonUploadFilesHandler(ClickEvent e) {
-    Tools.newHistory(IngestTransferUpload.RESOLVER, getPathFromTransferredResourceId(resource.getId()));
+    if (resource != null) {
+      Tools.newHistory(IngestTransferUpload.RESOLVER, getPathFromTransferredResourceId(resource.getId()));
+    } else {
+      UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<RodaUser>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          Toast.showError("Error", caught.getMessage());
+        }
+
+        @Override
+        public void onSuccess(RodaUser user) {
+          Tools.newHistory(IngestTransferUpload.RESOLVER, user.getName());
+        }
+      });
+
+    }
   }
 
   @UiHandler("createFolder")
@@ -470,13 +487,13 @@ public class IngestTransfer extends Composite {
   void buttonStartIngestHandler(ClickEvent e) {
     Tools.newHistory(CreateJob.RESOLVER);
   }
-  
+
   public Set<TransferredResource> getSelected() {
     Set<TransferredResource> selected = transferredResourceList.getSelected();
-    if(selected.isEmpty() && resource != null) {
+    if (selected.isEmpty() && resource != null) {
       selected = new HashSet<>(Arrays.asList(resource));
     }
-    
+
     return selected;
   }
 

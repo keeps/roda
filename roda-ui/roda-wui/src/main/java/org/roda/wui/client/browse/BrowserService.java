@@ -27,6 +27,7 @@ import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.core.data.v2.SimpleFile;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
+import org.roda.wui.client.ingest.process.JobBundle;
 import org.roda.wui.client.search.SearchField;
 import org.roda.wui.common.client.GenericException;
 
@@ -258,4 +259,6 @@ public interface BrowserService extends RemoteService {
   List<PluginInfo> getPluginsInfo(PluginType type);
 
   CreateIngestJobBundle getCreateIngestProcessBundle();
+
+  JobBundle retrieveJobBundle(String jobId) throws AuthorizationDeniedException, GenericException, NotFoundException;
 }

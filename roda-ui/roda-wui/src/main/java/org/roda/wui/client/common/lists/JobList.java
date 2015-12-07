@@ -18,10 +18,12 @@ import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.Job;
+import org.roda.core.data.v2.Job.JOB_STATE;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.common.client.ClientLogger;
 
 import com.google.gwt.cell.client.DateCell;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.cellview.client.CellTable;
@@ -31,6 +33,8 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.view.client.ProvidesKey;
+
+import config.i18n.client.BrowseMessages;
 
 /**
  * 
@@ -42,15 +46,13 @@ public class JobList extends AsyncTableCell<Job> {
   private static final int PAGE_SIZE = 20;
 
   private final ClientLogger logger = new ClientLogger(getClass().getName());
+  private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   // private TextColumn<SIPReport> idColumn;
   private TextColumn<Job> nameColumn;
   private TextColumn<Job> usernameColumn;
   private Column<Job, Date> startDateColumn;
-  private Column<Job, Date> endDateColumn;
   private TextColumn<Job> statusColumn;
-  private TextColumn<Job> percentageColumn;
-  
 
   public JobList() {
     this(null, null, null);
@@ -70,7 +72,7 @@ public class JobList extends AsyncTableCell<Job> {
         return job != null ? job.getName() : null;
       }
     };
-    
+
     usernameColumn = new TextColumn<Job>() {
 
       @Override
@@ -86,55 +88,48 @@ public class JobList extends AsyncTableCell<Job> {
       }
     };
 
-    endDateColumn = new Column<Job, Date>(new DateCell(DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss.SSS"))) {
-      @Override
-      public Date getValue(Job job) {
-        return job != null ? job.getEndDate() : null;
-      }
-    };
-
     statusColumn = new TextColumn<Job>() {
 
       @Override
       public String getValue(Job job) {
-        return job != null ? job.getState().toString() : null;
+        String ret = null;
+        if (job != null) {
+          JOB_STATE state = job.getState();
+          if (JOB_STATE.COMPLETED.equals(state) || JOB_STATE.FAILED.equals(state)) {
+            // TODO different message for failure?
+            ret = messages.showJobStatusCompleted(job.getEndDate());
+          } else if (JOB_STATE.CREATED.equals(state)) {
+            ret = messages.showJobStatusCreated();
+          } else if (JOB_STATE.STARTED.equals(state)) {
+            ret = messages.showJobStatusStarted(job.getCompletionPercentage());
+          } else {
+            ret = state.toString();
+          }
+
+        }
+
+        return ret;
       }
     };
 
-    percentageColumn = new TextColumn<Job>() {
-
-      @Override
-      public String getValue(Job job) {
-        return job != null ? NumberFormat.getPercentFormat().format(job.getCompletionPercentage() / 100.0) : null;
-      }
-    };
-
-    
 
     nameColumn.setSortable(true);
     usernameColumn.setSortable(true);
     startDateColumn.setSortable(true);
-    endDateColumn.setSortable(true);
     statusColumn.setSortable(true);
-    percentageColumn.setSortable(true);
 
     // TODO externalize strings into constants
     display.addColumn(nameColumn, "Name");
     display.addColumn(usernameColumn, "Creator");
     display.addColumn(startDateColumn, "Start date");
-    display.addColumn(endDateColumn, "End date");
     display.addColumn(statusColumn, "Status");
-    display.addColumn(percentageColumn, "% done");
-    
 
     Label emptyInfo = new Label("No items to display");
     display.setEmptyTableWidget(emptyInfo);
     display.setColumnWidth(nameColumn, "100%");
 
     startDateColumn.setCellStyleNames("nowrap text-align-right");
-    endDateColumn.setCellStyleNames("nowrap text-align-right");
     statusColumn.setCellStyleNames("nowrap");
-    percentageColumn.setCellStyleNames("nowrap text-align-right");
     usernameColumn.setCellStyleNames("nowrap");
   }
 
@@ -146,9 +141,7 @@ public class JobList extends AsyncTableCell<Job> {
     Map<Column<Job, ?>, String> columnSortingKeyMap = new HashMap<Column<Job, ?>, String>();
     columnSortingKeyMap.put(nameColumn, RodaConstants.JOB_NAME);
     columnSortingKeyMap.put(startDateColumn, RodaConstants.JOB_START_DATE);
-    columnSortingKeyMap.put(endDateColumn, RodaConstants.JOB_END_DATE);
-    columnSortingKeyMap.put(statusColumn, RodaConstants.JOB_STATE);
-    columnSortingKeyMap.put(percentageColumn, RodaConstants.JOB_COMPLETION_PERCENTAGE);
+    columnSortingKeyMap.put(statusColumn, RodaConstants.JOB_COMPLETION_PERCENTAGE);
     columnSortingKeyMap.put(usernameColumn, RodaConstants.JOB_USERNAME);
 
     Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);

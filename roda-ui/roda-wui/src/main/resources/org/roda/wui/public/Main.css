@@ -1805,7 +1805,6 @@
 ************************************************/
 
 .wui-transferredResourceList {
-	color: #999;
 	font-size: 1.2rem;
 }
 
@@ -1833,5 +1832,6 @@
     background-color: #eee;
     padding: 10px 20px;
     border-radius: 2px;
+    margin-bottom: 10px;
 }
 

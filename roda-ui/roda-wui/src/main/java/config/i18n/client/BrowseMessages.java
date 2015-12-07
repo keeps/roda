@@ -271,4 +271,20 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("{0} ({1})")
   String pluginLabel(String name, String version);
+
+  /************* Ingest process show ****************/
+  @DefaultMessage("Waiting to start")
+  String showJobStatusCreated();
+  
+  @DefaultMessage("Processing ({0}%)")
+  String showJobStatusStarted(int completionPercentage);
+  
+  @DefaultMessage("Completed at {0,localdatetime,predef:DATE_TIME_MEDIUM}")
+  String showJobStatusCompleted(Date endDate);
+
+  
+
+  
+  
+  
 }
