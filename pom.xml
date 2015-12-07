@@ -29,7 +29,7 @@
 			<snapshots>
 				<enabled>true</enabled>
 			</snapshots>
-			<url>file://${project.basedir}/repository/</url>
+			<url>file://${roda.temporary.repository}/repository/</url>
 		</repository>
 		<repository>
 			<id>KEEPS-Artifacts</id>
@@ -116,6 +116,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<build.date>${maven.build.timestamp}</build.date>
 		<maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
+		<roda.temporary.repository>${user.dir}</roda.temporary.repository>
 		<java_version>1.8</java_version>
 		<gwt_version>2.7.0</gwt_version>
 		<cas.version>4.0.4</cas.version>
