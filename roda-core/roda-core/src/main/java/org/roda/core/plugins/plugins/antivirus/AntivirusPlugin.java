@@ -109,6 +109,7 @@ public class AntivirusPlugin implements Plugin<AIP> {
     Path tempDirectory = null;
     for (AIP aip : list) {
       try {
+        LOGGER.debug("Checking if AIP " + aip.getId() + " is clean of virus");
         tempDirectory = Files.createTempDirectory("temp");
         StorageService tempStorage = new FileStorageService(tempDirectory);
         StoragePath aipPath = ModelUtils.getAIPpath(aip.getId());
@@ -116,11 +117,11 @@ public class AntivirusPlugin implements Plugin<AIP> {
         VirusCheckResult virusCheckResult = null;
         try {
           virusCheckResult = getAntiVirus().checkForVirus(tempDirectory);
-          LOGGER.debug("AIP " + aip.getId() + " is clean: " + virusCheckResult.isClean());
-          LOGGER.debug("AIP " + aip.getId() + " virus check report: " + virusCheckResult.getReport());
+          LOGGER.debug("Done with checking if AIP " + aip.getId() + " has virus. Is clean of virus: "
+            + virusCheckResult.isClean() + ". Virus check report: " + virusCheckResult.getReport());
         } catch (RuntimeException e) {
-          LOGGER.debug("Exception running virus check on AIP " + aip.getId() + " - " + e.getMessage(), e);
-          throw new PluginException("Exception running virus check on AIP " + aip.getId() + " - " + e.getMessage(), e);
+          LOGGER.debug("Exception running virus check on AIP " + aip.getId(), e);
+          throw new PluginException("Exception running virus check on AIP " + aip.getId(), e);
         }
       } catch (StorageServiceException e) {
         LOGGER.error("Error processing AIP " + aip.getId(), e);

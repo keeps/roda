@@ -137,7 +137,7 @@ public class ShowJob extends Composite {
     DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_FULL);
     dateStarted.setText(dateTimeFormat.format(job.getStartDate()));
     JOB_STATE state = job.getState();
-    if (JOB_STATE.COMPLETED.equals(state) || JOB_STATE.FAILED.equals(state)) {
+    if (JOB_STATE.COMPLETED.equals(state) || JOB_STATE.FAILED_DURING_CREATION.equals(state)) {
       // TODO different message for failure?
       status.setText(messages.showJobStatusCompleted(job.getEndDate()));
     } else if (JOB_STATE.CREATED.equals(state)) {

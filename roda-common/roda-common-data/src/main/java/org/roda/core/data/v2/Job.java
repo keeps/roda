@@ -17,6 +17,8 @@ import java.util.Map;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.roda.core.data.Report;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
@@ -28,7 +30,7 @@ public class Job implements Serializable {
   private static final long serialVersionUID = 615993757726175203L;
 
   public static enum JOB_STATE {
-    CREATED, STARTED, COMPLETED, FAILED;
+    CREATED, STARTED, COMPLETED, FAILED_DURING_CREATION;
   }
 
   public static enum ORCHESTRATOR_METHOD {
@@ -63,7 +65,7 @@ public class Job implements Serializable {
   // list of object ids to act upon
   private List<String> objectIds = new ArrayList<String>();
   // map between object ids and aip ids
-  private Map<String, String> objectIdsToAipIds = new HashMap<String, String>();
+  private Map<String, Report> objectIdsToAipReport = new HashMap<String, Report>();
 
   // report id
   private String reportId = null;
@@ -88,7 +90,7 @@ public class Job implements Serializable {
     this.pluginParameters = new HashMap<String, String>(job.getPluginParameters());
     this.orchestratorMethod = job.getOrchestratorMethod();
     this.objectIds = new ArrayList<String>(job.getObjectIds());
-    this.objectIdsToAipIds = new HashMap<>(job.getObjectIdsToAipIds());
+    this.objectIdsToAipReport = new HashMap<>(job.getObjectIdsToAipIds());
   }
 
   public String getId() {
@@ -191,12 +193,12 @@ public class Job implements Serializable {
     return this;
   }
 
-  public Map<String, String> getObjectIdsToAipIds() {
-    return objectIdsToAipIds;
+  public Map<String, Report> getObjectIdsToAipIds() {
+    return objectIdsToAipReport;
   }
 
-  public void setObjectIdsToAipIds(Map<String, String> objectIdsToAipIds) {
-    this.objectIdsToAipIds = objectIdsToAipIds;
+  public void setObjectIdsToAipIds(Map<String, Report> objectIdsToAipIds) {
+    this.objectIdsToAipReport = objectIdsToAipIds;
   }
 
   public PluginType getPluginType() {
@@ -209,7 +211,8 @@ public class Job implements Serializable {
   }
 
   public void addObjectIdToAipIdMapping(String objectId, String aipId) {
-    getObjectIdsToAipIds().put(objectId, aipId);
+    // FIXME
+    // getObjectIdsToAipIds().put(objectId, aipId);
   }
 
   @Override

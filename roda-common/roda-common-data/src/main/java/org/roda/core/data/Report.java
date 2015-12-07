@@ -9,7 +9,6 @@ package org.roda.core.data;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -56,7 +55,7 @@ public class Report implements Serializable {
    * @param attributes
    * @param items
    */
-  public Report(String id, String type, String title, Attribute[] attributes, ReportItem[] items) {
+  public Report(String id, String type, String title, List<Attribute> attributes, List<ReportItem> items) {
     setId(id);
     setType(type);
     setTitle(title);
@@ -132,43 +131,45 @@ public class Report implements Serializable {
   /**
    * @return the attributes
    */
-  public Attribute[] getAttributes() {
-    return attributes.toArray(new Attribute[attributes.size()]);
+  public List<Attribute> getAttributes() {
+    return attributes;
   }
 
   /**
    * @param attributes
    *          the attributes to set
    */
-  public void setAttributes(Attribute[] attributes) {
+  public void setAttributes(List<Attribute> attributes) {
     this.attributes.clear();
     if (attributes != null) {
-      this.attributes.addAll(Arrays.asList(attributes));
+      this.attributes.addAll(attributes);
     }
   }
 
   /**
    * @param attribute
+   * @return 
    */
-  public void addAttribute(Attribute attribute) {
+  public Report addAttribute(Attribute attribute) {
     this.attributes.add(attribute);
+    return this;
   }
 
   /**
    * @return the items
    */
-  public ReportItem[] getItems() {
-    return items.toArray(new ReportItem[items.size()]);
+  public List<ReportItem> getItems() {
+    return items;
   }
 
   /**
    * @param items
    *          the items to set
    */
-  public void setItems(ReportItem[] items) {
+  public void setItems(List<ReportItem> items) {
     this.items.clear();
     if (items != null) {
-      this.items.addAll(Arrays.asList(items));
+      this.items.addAll(items);
     }
   }
 

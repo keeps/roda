@@ -76,6 +76,8 @@ public class JobsHelper {
 
     // serialize job to file & index it
     RodaCoreFactory.getModelService().createJob(updatedJob, null);
+    
+    // FIXME should we verify if the job was created with success???
 
     Patterns.ask(RodaCoreFactory.getPluginOrchestrator().getCoordinator(), updatedJob, 5);
 

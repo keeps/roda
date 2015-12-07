@@ -226,7 +226,7 @@ public class RodaCoreFactory {
       // do nothing and instantiate description level manager from empty
       // properties object
     }
-    LOGGER.debug("Description level configurations being loaded: " + descriptionLevelConfiguration);
+    LOGGER.trace("Description level configurations being loaded: " + descriptionLevelConfiguration);
     descriptionLevelManager = new DescriptionLevelManager(descriptionLevelConfiguration);
   }
 
@@ -485,7 +485,7 @@ public class RodaCoreFactory {
       Path dateFile = sipFolderPath.resolve(".date");
       if (Files.exists(dateFile)) {
         String dateFromFile = new String(Files.readAllBytes(dateFile));
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        SimpleDateFormat df = new SimpleDateFormat(RodaConstants.SOLRDATEFORMAT);
         folderMonitorDate = df.parse(dateFromFile);
       }
     } catch (IOException | ParseException e) {
@@ -500,7 +500,7 @@ public class RodaCoreFactory {
       if (!Files.exists(dateFile)) {
         Files.createFile(dateFile);
       }
-      SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+      SimpleDateFormat df = new SimpleDateFormat(RodaConstants.SOLRDATEFORMAT);
       String date = df.format(d);
       Files.write(dateFile, date.getBytes());
     } catch (IOException e) {

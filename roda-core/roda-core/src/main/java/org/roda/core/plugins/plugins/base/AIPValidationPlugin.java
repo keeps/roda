@@ -27,7 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class AIPValidationPlugin implements Plugin<AIP> {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+  private static final Logger LOGGER = LoggerFactory.getLogger(AIPValidationPlugin.class);
 
   private Map<String, String> parameters;
 
@@ -77,17 +77,19 @@ public class AIPValidationPlugin implements Plugin<AIP> {
     List<String> validAIP = new ArrayList<String>();
     List<String> invalidAIP = new ArrayList<String>();
     for (AIP aip : list) {
-      logger.debug("Processing AIP " + aip.getId());
       try {
+        LOGGER.debug("Validating AIP " + aip.getId());
         boolean descriptiveValid = ValidationUtils.isAIPDescriptiveMetadataValid(model, aip.getId(), true);
         boolean preservationValid = ValidationUtils.isAIPPreservationMetadataValid(model, aip.getId(), true);
         if (descriptiveValid && preservationValid) {
           validAIP.add(aip.getId());
+          LOGGER.debug("Done with validating AIP " + aip.getId() + ": valid!");
         } else {
           invalidAIP.add(aip.getId());
+          LOGGER.debug("Done with validating AIP " + aip.getId() + ": invalid!");
         }
       } catch (ModelServiceException mse) {
-        logger.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage(), mse);
+        LOGGER.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage(), mse);
       }
     }
     return null;
@@ -114,7 +116,7 @@ public class AIPValidationPlugin implements Plugin<AIP> {
   public PluginType getType() {
     return PluginType.AIP_TO_AIP;
   }
-  
+
   @Override
   public boolean areParameterValuesValid() {
     return true;

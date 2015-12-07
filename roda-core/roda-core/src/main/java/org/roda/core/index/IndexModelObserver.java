@@ -128,19 +128,19 @@ public class IndexModelObserver implements ModelObserver {
         SolrInputDocument representationDocument = SolrUtils.representationToSolrDocument(representation);
         index.add(RodaConstants.INDEX_REPRESENTATIONS, representationDocument);
 
-        if (representation.getFileIds() != null && representation.getFileIds().size() > 0) {
+        if (representation.getFileIds() != null && !representation.getFileIds().isEmpty()) {
           for (String fileId : representation.getFileIds()) {
             File file = model.retrieveFile(aip.getId(), representationId, fileId);
-            if(file.getFileFormat()==null){
-              LOGGER.debug("FILE FORMAT NULL");
-            }else{
-              if(file.getFileFormat().getMimeType()==null){
-                LOGGER.debug("MIME TYPE NULL");
-              }else{
-                LOGGER.debug("MIMETYPE: "+file.getFileFormat().getMimeType());
+            if (file.getFileFormat() == null) {
+              LOGGER.trace("FILE FORMAT NULL");
+            } else {
+              if (file.getFileFormat().getMimeType() == null) {
+                LOGGER.trace("MIME TYPE NULL");
+              } else {
+                LOGGER.trace("MIMETYPE: " + file.getFileFormat().getMimeType());
               }
             }
-            
+
             SolrInputDocument fileDocument = SolrUtils.fileToSolrDocument(file);
             index.add(RodaConstants.INDEX_FILE, fileDocument);
           }

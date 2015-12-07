@@ -248,21 +248,6 @@ public class PluginPanel {
 
           value = textBox;
 
-        } else if (parameter.getType().equals(PluginParameterType.PASSWORD)) {
-          final PasswordTextBox passwordBox = new PasswordTextBox();
-
-          passwordBox.setText(parameter.getDefaultValue());
-
-          passwordBox.addChangeListener(new ChangeListener() {
-
-            public void onChange(Widget sender) {
-              parameter.setDefaultValue(passwordBox.getText());
-            }
-
-          });
-
-          value = passwordBox;
-
         } else if (parameter.getType().equals(PluginParameterType.BOOLEAN)) {
           final CheckBox checkbox = new CheckBox();
 

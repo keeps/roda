@@ -127,7 +127,7 @@ public class AipsResource {
     Browser.removeAIP(user, aipId);
 
     // FIXME give a better answer
-    return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
+    return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "Done!")).build();
   }
 
   @GET

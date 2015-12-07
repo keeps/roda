@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE file at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/keeps/roda
+ */
 package org.roda.wui.client.ingest.process;
 
 import java.util.List;
@@ -13,7 +20,6 @@ import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.TextBox;
 
@@ -46,8 +52,6 @@ public class PluginParameterPanel extends Composite {
       createBooleanLayout();
     } else if (PluginParameterType.STRING.equals(parameter.getType())) {
       createStringLayout();
-    } else if (PluginParameterType.PASSWORD.equals(parameter.getType())) {
-      createPasswordLayout();
     } else if (PluginParameterType.PLUGIN_SIP_TO_AIP.equals(parameter.getType())) {
       createPluginSipToAipLayout();
     } else {
@@ -94,27 +98,6 @@ public class PluginParameterPanel extends Composite {
 
     radioGroup.addStyleName("form-radiogroup");
     parameterName.addStyleName("form-label");
-  }
-
-  private void createPasswordLayout() {
-    Label parameterName = new Label(parameter.getName());
-    PasswordTextBox parameterBox = new PasswordTextBox();
-
-    layout.add(parameterName);
-    layout.add(parameterBox);
-    addHelp();
-
-    parameterName.addStyleName("form-label");
-    parameterBox.addStyleName("form-textbox");
-
-    // binding change
-    parameterBox.addValueChangeHandler(new ValueChangeHandler<String>() {
-
-      @Override
-      public void onValueChange(ValueChangeEvent<String> event) {
-        value = event.getValue();
-      }
-    });
   }
 
   private void createStringLayout() {

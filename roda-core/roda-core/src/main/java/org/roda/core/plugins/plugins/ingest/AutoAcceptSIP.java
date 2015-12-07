@@ -80,13 +80,15 @@ public class AutoAcceptSIP implements Plugin<AIP> {
 
     for (AIP aip : list) {
       try {
+        LOGGER.debug("Auto accepting AIP " + aip.getId());
         StoragePath aipPath = ModelUtils.getAIPpath(aip.getId());
         Map<String, Set<String>> aipMetadata = storage.getMetadata(aipPath);
         ModelUtils.setAs(aipMetadata, RodaConstants.STORAGE_META_ACTIVE, true);
         storage.updateMetadata(aipPath, aipMetadata, true);
         model.updateAIP(aip.getId());
+        LOGGER.debug("Done with auto accepting AIP " + aip.getId());
       } catch (ModelServiceException | StorageServiceException e) {
-        LOGGER.error("Error updating AIP metadata attribute active", e);
+        LOGGER.error("Error updating AIP (metadata attribute active=true)", e);
       }
     }
 

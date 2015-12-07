@@ -93,7 +93,7 @@ public class TransferredResourceToAIPPlugin implements Plugin<TransferredResourc
   public Report execute(IndexService index, ModelService model, StorageService storage, List<TransferredResource> list)
     throws PluginException {
 
-    String jobId = PluginUtils.getJobId(parameters);
+    // String jobId = PluginUtils.getJobId(parameters);
     for (TransferredResource transferredResource : list) {
       try {
         Path transferredResourcePath = Paths.get(transferredResource.getFullPath());
@@ -101,16 +101,17 @@ public class TransferredResourceToAIPPlugin implements Plugin<TransferredResourc
         final String aipID = aip.getId();
         String representationID = "representation";
         IngestUtils.createDirectories(model, aip.getId(), representationID);
-        
+
         Path metadataFile = Files.createTempFile("metadata", ".xml");
         StringWriter sw = new StringWriter();
         sw.append("<metadata>");
         sw.append("<field name='title'>" + StringEscapeUtils.escapeXml(transferredResource.getName()) + "</field>");
 
-        if(transferredResource.isFile()){
-          Binary fileBinary = (Binary) FSUtils.convertPathToResource(transferredResourcePath.getParent(), transferredResourcePath);
+        if (transferredResource.isFile()) {
+          Binary fileBinary = (Binary) FSUtils.convertPathToResource(transferredResourcePath.getParent(),
+            transferredResourcePath);
           model.createFile(aip.getId(), representationID, transferredResource.getName(), fileBinary);
-        }else{
+        } else {
           EnumSet<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
           Files.walkFileTree(transferredResourcePath, opts, Integer.MAX_VALUE, new FileVisitor<Path>() {
             @Override
@@ -120,13 +121,14 @@ public class TransferredResourceToAIPPlugin implements Plugin<TransferredResourc
 
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-              try{
+              try {
                 Path relativePath = transferredResourcePath.relativize(file);
-                sw.append("<field name='dc.relation'>" + StringEscapeUtils.escapeXml(relativePath.toString().replace('/', '_')) + "</field>");
+                sw.append("<field name='dc.relation'>"
+                  + StringEscapeUtils.escapeXml(relativePath.toString().replace('/', '_')) + "</field>");
                 Binary fileBinary = (Binary) FSUtils.convertPathToResource(file.getParent(), file);
-                model.createFile(aipID, representationID,relativePath.toString().replace('/', '_') , fileBinary);
-              }catch(StorageServiceException | ModelServiceException sse){
-                
+                model.createFile(aipID, representationID, relativePath.toString().replace('/', '_'), fileBinary);
+              } catch (StorageServiceException | ModelServiceException sse) {
+
               }
               return FileVisitResult.CONTINUE;
             }
@@ -146,11 +148,12 @@ public class TransferredResourceToAIPPlugin implements Plugin<TransferredResourc
         Files.write(metadataFile, sw.toString().getBytes("UTF-8"));
         Binary metadataBinary = (Binary) FSUtils.convertPathToResource(metadataFile.getParent(), metadataFile);
         model.createDescriptiveMetadata(aip.getId(), "metadata.xml", metadataBinary, "metadata");
-        
+
         aip = model.retrieveAIP(aip.getId());
-        //Job job = index.retrieve(Job.class, jobId);
-        //job.addObjectIdToAipIdMapping(transferredResource.getId(), aip.getId());
-       // model.updateJob(job);
+        // Job job = index.retrieve(Job.class, jobId);
+        // job.addObjectIdToAipIdMapping(transferredResource.getId(),
+        // aip.getId());
+        // model.updateJob(job);
       } catch (Throwable e) {
         LOGGER.error("Error converting " + transferredResource.getId() + " to AIP: " + e.getMessage(), e);
       }

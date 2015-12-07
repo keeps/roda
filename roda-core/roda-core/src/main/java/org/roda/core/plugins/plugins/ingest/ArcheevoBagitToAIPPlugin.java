@@ -77,17 +77,18 @@ public class ArcheevoBagitToAIPPlugin implements Plugin<TransferredResource> {
   public Report execute(IndexService index, ModelService model, StorageService storage, List<TransferredResource> list)
     throws PluginException {
 
-    String jobId = PluginUtils.getJobId(parameters);
+    // String jobId = PluginUtils.getJobId(parameters);
     for (TransferredResource transferredResource : list) {
       Path bagitPath = Paths.get(transferredResource.getFullPath());
       LOGGER.debug("Converting " + bagitPath + " to AIP");
       try {
         AIP aipCreated = BagitToAIPPluginUtils.bagitToAip(bagitPath, model, "metadata_archeevo.xml");
 
-        // update job with mapping between transferred resource id e aip id
-        Job job = index.retrieve(Job.class, jobId);
-        job.addObjectIdToAipIdMapping(transferredResource.getId(), aipCreated.getId());
-        model.updateJob(job);
+        // // update job with mapping between transferred resource id e aip id
+        // Job job = index.retrieve(Job.class, jobId);
+        // job.addObjectIdToAipIdMapping(transferredResource.getId(),
+        // aipCreated.getId());
+        // model.updateJob(job);
       } catch (Throwable e) {
         LOGGER.error("Error converting " + bagitPath + " to AIP: " + e.getMessage(), e);
       }

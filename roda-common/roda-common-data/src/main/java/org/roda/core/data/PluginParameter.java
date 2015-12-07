@@ -27,7 +27,7 @@ public class PluginParameter implements Serializable {
     /**
      * Password type parameter, should not be echoed
      */
-    PASSWORD,
+    // PASSWORD,
 
     /**
      * Checkbox

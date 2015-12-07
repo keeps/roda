@@ -21,6 +21,8 @@ public class ReportItem implements Serializable {
   private static final long serialVersionUID = 2691735201123316994L;
 
   private String title = null;
+  // FIXME see if this is really necessary
+  private String itemId = null;
   private List<Attribute> attributes = new ArrayList<Attribute>();
 
   /**
@@ -36,7 +38,14 @@ public class ReportItem implements Serializable {
    *          the title
    */
   public ReportItem(String title) {
-    this(title, null);
+    this();
+    this.title = title;
+  }
+
+  public ReportItem(String title, String itemId) {
+    this();
+    this.title = title;
+    this.itemId = itemId;
   }
 
   /**
@@ -55,7 +64,7 @@ public class ReportItem implements Serializable {
    * @param title
    * @param attributes
    */
-  public ReportItem(String title, Attribute[] attributes) {
+  public ReportItem(String title, List<Attribute> attributes) {
     setTitle(title);
     setAttributes(attributes);
   }
@@ -63,8 +72,9 @@ public class ReportItem implements Serializable {
   /**
    * @see Object#toString()
    */
+  @Override
   public String toString() {
-    return "ReportItem(title=" + getTitle() + ", attributes=" + attributes + ")";
+    return "ReportItem [title=" + title + ", itemId=" + itemId + ", attributes=" + attributes + "]";
   }
 
   /**
@@ -82,29 +92,39 @@ public class ReportItem implements Serializable {
     this.title = title;
   }
 
+  public String getItemId() {
+    return itemId;
+  }
+
+  public void setItemId(String itemId) {
+    this.itemId = itemId;
+  }
+
   /**
    * @return the attributes
    */
-  public Attribute[] getAttributes() {
-    return attributes.toArray(new Attribute[attributes.size()]);
+  public List<Attribute> getAttributes() {
+    return attributes;
   }
 
   /**
    * @param attributes
    *          the attributes to set
    */
-  public void setAttributes(Attribute[] attributes) {
+  public void setAttributes(List<Attribute> attributes) {
     this.attributes.clear();
     if (attributes != null) {
-      this.attributes.addAll(Arrays.asList(attributes));
+      this.attributes.addAll(attributes);
     }
   }
 
   /**
    * @param attribute
+   * @return
    */
-  public void addAttribute(Attribute attribute) {
+  public ReportItem addAttribute(Attribute attribute) {
     this.attributes.add(attribute);
+    return this;
   }
 
   /**

@@ -1376,8 +1376,9 @@ public class SolrUtils {
     job.setOrchestratorMethod(
       ORCHESTRATOR_METHOD.valueOf(objectToString(doc.get(RodaConstants.JOB_ORCHESTRATOR_METHOD))));
     job.setObjectIds(objectToListString(doc.get(RodaConstants.JOB_OBJECT_IDS)));
-    job.setObjectIdsToAipIds(
-      ModelUtils.getMapFromJson(objectToString(doc.get(RodaConstants.JOB_OBJECT_IDS_TO_AIP_IDS))));
+    // FIXME
+    // job.setObjectIdsToAipIds(
+    // ModelUtils.getMapFromJson(objectToString(doc.get(RodaConstants.JOB_OBJECT_IDS_TO_AIP_IDS))));
 
     return job;
   }

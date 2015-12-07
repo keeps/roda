@@ -15,8 +15,8 @@ import java.util.Map;
 
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
+import org.roda.core.data.ReportItem;
 import org.roda.core.data.common.InvalidParameterException;
-import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.PluginType;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.index.IndexService;
@@ -76,23 +76,28 @@ public class BagitToAIPPlugin implements Plugin<TransferredResource> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<TransferredResource> list)
     throws PluginException {
+    Report report = PluginUtils.instantiatePluginReport(getName(), getVersion());
 
-    String jobId = PluginUtils.getJobId(parameters);
     for (TransferredResource transferredResource : list) {
       Path bagitPath = Paths.get(transferredResource.getFullPath());
-      LOGGER.debug("Converting " + bagitPath + " to AIP");
       try {
+        LOGGER.debug("Converting " + bagitPath + " to AIP");
         AIP aipCreated = BagitToAIPPluginUtils.bagitToAip(bagitPath, model, "metadata.xml");
 
-        // update job with mapping between transferred resource id e aip id
-        Job job = index.retrieve(Job.class, jobId);
-        job.addObjectIdToAipIdMapping(transferredResource.getId(), aipCreated.getId());
-        model.updateJob(job);
+        ReportItem reportItem = new ReportItem("SIP to AIP from " + transferredResource.getId());
+        reportItem.setItemId(aipCreated.getId());
+        report.addItem(reportItem);
+
+        LOGGER.debug("Done with converting " + bagitPath + " to AIP " + aipCreated.getId());
       } catch (Throwable e) {
-        LOGGER.error("Error converting " + bagitPath + " to AIP: " + e.getMessage(), e);
+        ReportItem reportItem = new ReportItem("SIP to AIP from " + transferredResource.getId());
+        reportItem.setItemId(null);
+        report.addItem(reportItem);
+        LOGGER.error("Error converting " + bagitPath + " to AIP", e);
       }
     }
-    return null;
+
+    return report;
   }
 
   @Override

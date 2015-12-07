@@ -77,15 +77,16 @@ public class EARKSIPToAIPPlugin implements Plugin<TransferredResource> {
   public Report execute(IndexService index, ModelService model, StorageService storage, List<TransferredResource> list)
     throws PluginException {
 
-    String jobId = PluginUtils.getJobId(parameters);
+    // String jobId = PluginUtils.getJobId(parameters);
     for (TransferredResource transferredResource : list) {
       Path earkSIPPath = Paths.get(transferredResource.getFullPath());
       LOGGER.error("Converting " + earkSIPPath + " to AIP");
       try {
         AIP aipCreated = EARKSIPToAIPPluginUtils.earkSIPToAip(earkSIPPath, model, storage);
-        Job job = index.retrieve(Job.class, jobId);
-        job.addObjectIdToAipIdMapping(transferredResource.getId(), aipCreated.getId());
-        model.updateJob(job);
+        // Job job = index.retrieve(Job.class, jobId);
+        // job.addObjectIdToAipIdMapping(transferredResource.getId(),
+        // aipCreated.getId());
+        // model.updateJob(job);
       } catch (Throwable e) {
         LOGGER.error("Error converting " + earkSIPPath + " to AIP: " + e.getMessage(), e);
       }

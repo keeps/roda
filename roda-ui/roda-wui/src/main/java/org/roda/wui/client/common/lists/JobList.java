@@ -95,7 +95,7 @@ public class JobList extends AsyncTableCell<Job> {
         String ret = null;
         if (job != null) {
           JOB_STATE state = job.getState();
-          if (JOB_STATE.COMPLETED.equals(state) || JOB_STATE.FAILED.equals(state)) {
+          if (JOB_STATE.COMPLETED.equals(state) || JOB_STATE.FAILED_DURING_CREATION.equals(state)) {
             // TODO different message for failure?
             ret = messages.showJobStatusCompleted(job.getEndDate());
           } else if (JOB_STATE.CREATED.equals(state)) {
