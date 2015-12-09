@@ -368,6 +368,12 @@ public final class ModelUtils {
       RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, representationID, fileID);
 
   }
+  public static StoragePath getPreservationFilePath(String aipId, String fileID)
+    throws StorageServiceException {
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
+      RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, fileID);
+
+  }
 
   public static Representation getPreservationRepresentationObject(Binary preservationBinary) {
     Representation representation = null;

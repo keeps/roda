@@ -1261,7 +1261,7 @@ public class ModelService extends ModelObservable {
     String fileId) throws ModelServiceException {
     RepresentationFilePreservationObject representationPreservationObject = null;
     try {
-      StoragePath filePath = ModelUtils.getPreservationFilePath(aipId, representationId, fileId);
+      StoragePath filePath = ModelUtils.getPreservationFilePath(aipId, representationId, fileId+".premis.xml");
       Binary binary = storage.getBinary(filePath);
       representationPreservationObject = convertResourceToRepresentationFilePreservationObject(aipId, representationId,
         fileId, binary);
@@ -1602,6 +1602,24 @@ public class ModelService extends ModelObservable {
       boolean asReference = false;
       Binary updatedBinary = storage.updateBinaryContent(binaryPath, binary.getContent(), asReference, true);
       preservationMetadataBinary = new PreservationMetadata(preservationMetadataId, aipId, representationID, binaryPath,
+        ModelUtils.getPreservationType(updatedBinary));
+      notifyPreservationMetadataCreated(preservationMetadataBinary);
+    } catch (StorageServiceException e) {
+      throw new ModelServiceException("Error creating preservation metadata binary in storage",
+        ModelServiceException.INTERNAL_SERVER_ERROR, e);
+    }
+    return preservationMetadataBinary;
+  }
+
+  // TODO verify
+  public PreservationMetadata createPreservationMetadata(String aipId, String preservationMetadataId, Binary binary)
+    throws ModelServiceException {
+    PreservationMetadata preservationMetadataBinary;
+    try {
+      StoragePath binaryPath = ModelUtils.getPreservationFilePath(aipId, preservationMetadataId);
+      boolean asReference = false;
+      Binary updatedBinary = storage.updateBinaryContent(binaryPath, binary.getContent(), asReference, true);
+      preservationMetadataBinary = new PreservationMetadata(preservationMetadataId, aipId, null, binaryPath,
         ModelUtils.getPreservationType(updatedBinary));
       notifyPreservationMetadataCreated(preservationMetadataBinary);
     } catch (StorageServiceException e) {

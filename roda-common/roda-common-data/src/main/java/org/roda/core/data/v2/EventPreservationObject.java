@@ -31,11 +31,13 @@ public class EventPreservationObject extends PreservationObject implements Seria
   public static final String PRESERVATION_EVENT_TYPE_MIGRATION = "migration";
   public static final String PRESERVATION_EVENT_TYPE_DIGITALIZATION = "digitalization";
   public static final String PRESERVATION_EVENT_TYPE_NORMALIZATION = "normalization";
+  public static final String PRESERVATION_EVENT_TYPE_ANTIVIRUS_CHECK = "virus check";
 
   public static final String PRESERVATION_EVENT_AGENT_ROLE_INGEST_TASK = "ingest task";
   public static final String PRESERVATION_EVENT_AGENT_ROLE_PRESERVATION_TASK = "preservation task";
 
   public static final String PRESERVATION_EVENT_OBJECT_ROLE_TARGET = "target";
+  
 
   // ID is already set in PreservationObject
   // getType() is already set in PreservationObject

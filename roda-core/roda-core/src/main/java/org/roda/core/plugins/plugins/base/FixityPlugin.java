@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.roda.core.common.PremisUtils;
 import org.roda.core.data.PluginParameter;
@@ -178,10 +179,10 @@ public class FixityPlugin implements Plugin<AIP> {
           }
           try {
             DateFormat format = new SimpleDateFormat("yyyy-MM-dd_hh:mm:ss.SSS");
-            String name = "fixityCheck_" + format.format(new Date()) + ".premis.xml";
+            String name = UUID.randomUUID().toString();  //"fixityCheck_" + format.format(new Date()) + ".premis.xml";
             epo.setId(name);
             epo.setAgentID(fixityAgent.getId());
-            epo.setObjectIDs(new String[] {"?????"});
+            epo.setObjectIDs(new String[] {representationID});
             byte[] serializedPremisEvent = new PremisEventHelper(epo).saveToByteArray();
             Path file = Files.createTempFile("preservation", ".xml");
             Files.copy(new ByteArrayInputStream(serializedPremisEvent), file, StandardCopyOption.REPLACE_EXISTING);

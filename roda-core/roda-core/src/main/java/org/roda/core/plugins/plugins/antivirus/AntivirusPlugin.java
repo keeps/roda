@@ -7,24 +7,35 @@
  */
 package org.roda.core.plugins.plugins.antivirus;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
 import org.roda.core.data.common.InvalidParameterException;
+import org.roda.core.data.v2.EventPreservationObject;
 import org.roda.core.data.v2.PluginType;
 import org.roda.core.index.IndexService;
+import org.roda.core.metadata.v2.premis.PremisEventHelper;
+import org.roda.core.metadata.v2.premis.PremisMetadataException;
 import org.roda.core.model.AIP;
 import org.roda.core.model.ModelService;
+import org.roda.core.model.ModelServiceException;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.storage.Binary;
 import org.roda.core.storage.StoragePath;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StorageServiceException;
@@ -32,6 +43,8 @@ import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.googlecode.mp4parser.h264.model.VUIParameters;
 
 public class AntivirusPlugin implements Plugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(AntivirusPlugin.class);
@@ -119,10 +132,14 @@ public class AntivirusPlugin implements Plugin<AIP> {
           virusCheckResult = getAntiVirus().checkForVirus(tempDirectory);
           LOGGER.debug("Done with checking if AIP " + aip.getId() + " has virus. Is clean of virus: "
             + virusCheckResult.isClean() + ". Virus check report: " + virusCheckResult.getReport());
+          createEvent(virusCheckResult,aip,model);
         } catch (RuntimeException e) {
           LOGGER.debug("Exception running virus check on AIP " + aip.getId(), e);
           throw new PluginException("Exception running virus check on AIP " + aip.getId(), e);
-        }
+        } catch (PremisMetadataException | IOException | StorageServiceException | ModelServiceException e){
+           LOGGER.debug("Exception creating premis event for virus check on AIP " + aip.getId(), e);
+           throw new PluginException("Exception creating premis event for virus check on AIP " + aip.getId(), e);
+         }
       } catch (StorageServiceException e) {
         LOGGER.error("Error processing AIP " + aip.getId(), e);
       } catch (IOException e) {
@@ -139,6 +156,53 @@ public class AntivirusPlugin implements Plugin<AIP> {
     }
 
     return null;
+  }
+
+  private void createEvent(VirusCheckResult virusCheckResult, AIP aip, ModelService model) throws PremisMetadataException, IOException, StorageServiceException, ModelServiceException {
+    
+    for(String representationID : aip.getRepresentationIds()){
+      DateFormat format = new SimpleDateFormat("yyyy-MM-dd_hh:mm:ss.SSS");
+      EventPreservationObject epo = new EventPreservationObject();
+      epo.setDatetime(new Date());
+      epo.setEventType(EventPreservationObject.PRESERVATION_EVENT_TYPE_ANTIVIRUS_CHECK);
+      epo.setEventDetail("All the files from the SIP were verified against an antivirus.");
+      epo.setAgentRole(EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_INGEST_TASK);
+      String name = UUID.randomUUID().toString(); //"virusCheck_" + format.format(new Date()) + ".premis.xml";
+      epo.setId(name);
+      epo.setAgentID("AGENT ID");
+      epo.setObjectIDs(new String[] {representationID});
+      epo.setOutcome(virusCheckResult.isClean()?"success":"error");
+      epo.setOutcomeDetailNote("Report");
+      epo.setOutcomeDetailExtension(virusCheckResult.getReport());
+      byte[] serializedPremisEvent = new PremisEventHelper(epo).saveToByteArray();
+      Path file = Files.createTempFile("preservation", ".xml");
+      Files.copy(new ByteArrayInputStream(serializedPremisEvent), file, StandardCopyOption.REPLACE_EXISTING);
+      Binary resource = (Binary) FSUtils.convertPathToResource(file.getParent(), file);
+      model.createPreservationMetadata(aip.getId(), representationID, name, resource);
+    }
+    
+    
+    //TODO agent
+    /*
+    DateFormat format = new SimpleDateFormat("yyyy-MM-dd_hh:mm:ss.SSS");
+    EventPreservationObject epo = new EventPreservationObject();
+    epo.setDatetime(new Date());
+    epo.setEventType(EventPreservationObject.PRESERVATION_EVENT_TYPE_ANTIVIRUS_CHECK);
+    epo.setEventDetail("All the files from the SIP were verified against an antivirus.");
+    epo.setAgentRole(EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_INGEST_TASK);
+    String name = UUID.randomUUID().toString();
+    epo.setId(name);
+    epo.setAgentID("AGENT ID");
+    epo.setObjectIDs(aip.getRepresentationIds().toArray(new String[aip.getRepresentationIds().size()]));
+    epo.setOutcome(virusCheckResult.isClean()?"success":"error");
+    epo.setOutcomeDetailNote("Report");
+    epo.setOutcomeDetailExtension(virusCheckResult.getReport());
+    byte[] serializedPremisEvent = new PremisEventHelper(epo).saveToByteArray();
+    Path file = Files.createTempFile("preservation", ".xml");
+    Files.copy(new ByteArrayInputStream(serializedPremisEvent), file, StandardCopyOption.REPLACE_EXISTING);
+    Binary resource = (Binary) FSUtils.convertPathToResource(file.getParent(), file);
+    model.createPreservationMetadata(aip.getId(), name, resource);
+    */
   }
 
   @Override
