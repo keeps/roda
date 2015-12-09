@@ -25,7 +25,7 @@ import org.roda.wui.common.client.ClientLogger;
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.i18n.client.NumberFormat;
+import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortList;
@@ -45,10 +45,9 @@ public class JobList extends AsyncTableCell<Job> {
 
   private static final int PAGE_SIZE = 20;
 
-  private final ClientLogger logger = new ClientLogger(getClass().getName());
+  // private final ClientLogger logger = new ClientLogger(getClass().getName());
   private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
-  // private TextColumn<SIPReport> idColumn;
   private TextColumn<Job> nameColumn;
   private TextColumn<Job> usernameColumn;
   private Column<Job, Date> startDateColumn;
@@ -81,7 +80,7 @@ public class JobList extends AsyncTableCell<Job> {
       }
     };
 
-    startDateColumn = new Column<Job, Date>(new DateCell(DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss.SSS"))) {
+    startDateColumn = new Column<Job, Date>(new DateCell(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_MEDIUM))) {
       @Override
       public Date getValue(Job job) {
         return job != null ? job.getStartDate() : null;
@@ -95,9 +94,10 @@ public class JobList extends AsyncTableCell<Job> {
         String ret = null;
         if (job != null) {
           JOB_STATE state = job.getState();
-          if (JOB_STATE.COMPLETED.equals(state) || JOB_STATE.FAILED_DURING_CREATION.equals(state)) {
-            // TODO different message for failure?
+          if (JOB_STATE.COMPLETED.equals(state)) {
             ret = messages.showJobStatusCompleted(job.getEndDate());
+          } else if (JOB_STATE.FAILED_DURING_CREATION.equals(state)) {
+            ret = messages.showJobStatusFailedDuringCreation(job.getEndDate());
           } else if (JOB_STATE.CREATED.equals(state)) {
             ret = messages.showJobStatusCreated();
           } else if (JOB_STATE.STARTED.equals(state)) {
@@ -105,13 +105,11 @@ public class JobList extends AsyncTableCell<Job> {
           } else {
             ret = state.toString();
           }
-
         }
 
         return ret;
       }
     };
-
 
     nameColumn.setSortable(true);
     usernameColumn.setSortable(true);
@@ -128,7 +126,7 @@ public class JobList extends AsyncTableCell<Job> {
     display.setEmptyTableWidget(emptyInfo);
     display.setColumnWidth(nameColumn, "100%");
 
-    startDateColumn.setCellStyleNames("nowrap text-align-right");
+    startDateColumn.setCellStyleNames("nowrap");
     statusColumn.setCellStyleNames("nowrap");
     usernameColumn.setCellStyleNames("nowrap");
   }

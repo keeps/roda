@@ -281,6 +281,9 @@ public interface BrowseMessages extends Messages {
   
   @DefaultMessage("Completed at {0,localdatetime,predef:DATE_TIME_MEDIUM}")
   String showJobStatusCompleted(Date endDate);
+  
+  @DefaultMessage("Failed at {0,localdatetime,predef:DATE_TIME_MEDIUM}")
+  String showJobStatusFailedDuringCreation(Date endDate);
 
   
 

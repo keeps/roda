@@ -12,17 +12,16 @@ package org.roda.wui.client.ingest.process;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.roda.core.data.PluginInfo;
 import org.roda.core.data.v2.Job;
-import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.data.v2.Job.ORCHESTRATOR_METHOD;
+import org.roda.core.data.v2.TransferredResource;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.utils.PluginUtils;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
@@ -145,7 +144,7 @@ public class CreateJob extends Composite {
 
     name.setText(messages.ingestProcessNewDefaultName(new Date()));
     ingestWorkflowOptions.setSipToAipPlugins(sipToAipPlugins);
-    
+
     updateObjectList();
     configureIngestPlugins();
 
@@ -167,12 +166,14 @@ public class CreateJob extends Composite {
     SafeHtmlBuilder b = new SafeHtmlBuilder();
     b.append(SafeHtmlUtils.fromSafeConstant("<ul>"));
 
-    for (TransferredResource transferredResource : selected) {
-      b.append(SafeHtmlUtils.fromSafeConstant("<li>"));
-      b.append(SafeHtmlUtils.fromSafeConstant(
-        transferredResource.isFile() ? "<i class='fa fa-file-o'></i>" : "<i class='fa fa-folder-o'></i>"));
-      b.append(SafeHtmlUtils.fromString(transferredResource.getName()));
-      b.append(SafeHtmlUtils.fromSafeConstant("</li>"));
+    if (selected != null) {
+      for (TransferredResource transferredResource : selected) {
+        b.append(SafeHtmlUtils.fromSafeConstant("<li>"));
+        b.append(SafeHtmlUtils.fromSafeConstant(
+          transferredResource.isFile() ? "<i class='fa fa-file-o'></i>" : "<i class='fa fa-folder-o'></i>"));
+        b.append(SafeHtmlUtils.fromString(transferredResource.getName()));
+        b.append(SafeHtmlUtils.fromSafeConstant("</li>"));
+      }
     }
 
     b.append(SafeHtmlUtils.fromSafeConstant("</ul>"));
@@ -181,17 +182,21 @@ public class CreateJob extends Composite {
   }
 
   protected void configureIngestPlugins() {
-    for (PluginInfo pluginInfo : ingestPlugins) {
-      if (pluginInfo != null) {
-        ingestWorkflowList.addItem(messages.pluginLabel(pluginInfo.getName(), pluginInfo.getVersion()),
-          pluginInfo.getId());
-      } else {
-        GWT.log("Got a null plugin");
+    if (ingestPlugins != null) {
+      PluginUtils.sortByName(ingestPlugins);
+      for (PluginInfo pluginInfo : ingestPlugins) {
+        if (pluginInfo != null) {
+          ingestWorkflowList.addItem(messages.pluginLabel(pluginInfo.getName(), pluginInfo.getVersion()),
+            pluginInfo.getId());
+        } else {
+          GWT.log("Got a null plugin");
+        }
       }
+
+      ingestWorkflowList.setSelectedIndex(0);
+      selectedIngestPlugin = ingestPlugins.get(0);
+      updateWorkflowOptions();
     }
-    ingestWorkflowList.setSelectedIndex(0);
-    selectedIngestPlugin = ingestPlugins.get(0);
-    updateWorkflowOptions();
   }
 
   protected void updateWorkflowOptions() {
@@ -234,8 +239,10 @@ public class CreateJob extends Composite {
     job.setName(jobName);
 
     List<String> objectIds = new ArrayList<String>();
-    for (TransferredResource r : selected) {
-      objectIds.add(r.getId());
+    if (selected != null) {
+      for (TransferredResource r : selected) {
+        objectIds.add(r.getId());
+      }
     }
     job.setObjectIds(objectIds);
     job.setOrchestratorMethod(ORCHESTRATOR_METHOD.ON_TRANSFERRED_RESOURCES);

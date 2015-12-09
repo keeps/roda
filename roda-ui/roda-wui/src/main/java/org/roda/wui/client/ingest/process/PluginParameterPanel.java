@@ -12,6 +12,7 @@ import java.util.List;
 import org.roda.core.data.PluginInfo;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.PluginParameter.PluginParameterType;
+import org.roda.wui.client.common.utils.PluginUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -67,6 +68,8 @@ public class PluginParameterPanel extends Composite {
     addHelp();
 
     FlowPanel radioGroup = new FlowPanel();
+    
+    PluginUtils.sortByName(sipToAipPlugins);
 
     for (final PluginInfo pluginInfo : sipToAipPlugins) {
       if (pluginInfo != null) {

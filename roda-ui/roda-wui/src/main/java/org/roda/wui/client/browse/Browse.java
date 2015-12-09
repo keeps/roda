@@ -205,7 +205,7 @@ public class Browse extends Composite {
       @Override
       public void onValueChange(ValueChangeEvent<IndexResult<SimpleDescriptionObject>> event) {
         fondsPanelTitle.setVisible(!viewingTop && event.getValue().getTotalCount() > 0);
-        fondsPanel.setVisible(event.getValue().getTotalCount() > 0);
+        fondsPanel.setVisible(viewingTop || event.getValue().getTotalCount() > 0);
       }
     });
   }
@@ -453,6 +453,7 @@ public class Browse extends Composite {
 
   protected void viewAction() {
     aipId = null;
+    viewingTop = true;
     HTMLPanel topIcon = new HTMLPanel(SafeHtmlUtils.fromSafeConstant(TOP_ICON));
     topIcon.addStyleName("browseItemIcon-all");
     itemIcon.setWidget(topIcon);
@@ -465,7 +466,6 @@ public class Browse extends Composite {
     itemDates.setText("");
     itemMetadata.clear();
     itemMetadata.setVisible(false);
-    viewingTop = true;
     fondsPanelTitle.setVisible(false);
     fondsPanel.setFilter(COLLECTIONS_FILTER);
 

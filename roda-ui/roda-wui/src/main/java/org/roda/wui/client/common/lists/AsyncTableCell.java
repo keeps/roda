@@ -19,7 +19,6 @@ import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.widgets.MyCellTableResources;
-import org.roda.wui.common.client.widgets.Toast;
 import org.roda.wui.common.client.widgets.wcag.AccessibleCellTable;
 import org.roda.wui.common.client.widgets.wcag.AccessibleSimplePager;
 
@@ -37,13 +36,12 @@ import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy.KeyboardSelectionPolicy;
 import com.google.gwt.user.cellview.client.PageSizePager;
 import com.google.gwt.user.client.Random;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.view.client.AsyncDataProvider;
 import com.google.gwt.view.client.CellPreviewEvent;
 import com.google.gwt.view.client.CellPreviewEvent.Handler;
-import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.ProvidesKey;
 import com.google.gwt.view.client.Range;
 import com.google.gwt.view.client.SingleSelectionModel;
@@ -51,7 +49,7 @@ import com.google.gwt.view.client.SingleSelectionModel;
 public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
   implements HasValueChangeHandlers<IndexResult<T>> {
 
-  private final AsyncDataProvider<T> dataProvider;
+  private final MyAsyncDataProvider<T> dataProvider;
   private final SingleSelectionModel<T> selectionModel;
   private final AsyncHandler columnSortHandler;
 
@@ -79,41 +77,6 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
     this.filter = filter;
     this.facets = facets;
 
-    this.dataProvider = new AsyncDataProvider<T>() {
-
-      @Override
-      protected void onRangeChanged(HasData<T> display) {
-        // Get the new range.
-        final Range range = display.getVisibleRange();
-
-        // Get sorting
-        ColumnSortList columnSortList = AsyncTableCell.this.display.getColumnSortList();
-
-        // Query the data asynchronously.
-        final int start = range.getStart();
-        int length = range.getLength();
-        getData(new Sublist(start, length), columnSortList, new AsyncCallback<IndexResult<T>>() {
-
-          @Override
-          public void onFailure(Throwable caught) {
-            logger.error("Error getting data", caught);
-            Toast.showError("Error getting data from server: " + caught.getMessage());
-          }
-
-          @Override
-          public void onSuccess(IndexResult<T> result) {
-            if (result != null) {
-              int rowCount = (int) result.getTotalCount();
-              updateRowData((int) result.getOffset(), result.getResults());
-              updateRowCount(rowCount, true);
-              ValueChangeEvent.fire(AsyncTableCell.this, result);
-            } else {
-              // search not yet ready, deliver empty result
-            }
-          }
-        });
-      }
-    };
     display = new AccessibleCellTable<T>(getInitialPageSize(),
       (MyCellTableResources) GWT.create(MyCellTableResources.class), getKeyProvider(), summary);
     display.setKeyboardSelectionPolicy(KeyboardSelectionPolicy.DISABLED);
@@ -121,6 +84,20 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
       "<div class='spinner'><div class='double-bounce1'></div><div class='double-bounce2'></div></div>")));
 
     configureDisplay(display);
+
+    this.dataProvider = new MyAsyncDataProvider<T>(display, new IndexResultDataProvider<T>() {
+
+      @Override
+      public void getData(Sublist sublist, ColumnSortList columnSortList, AsyncCallback<IndexResult<T>> callback) {
+        AsyncTableCell.this.getData(sublist, columnSortList, callback);
+      }
+    }) {
+
+      @Override
+      protected void fireChangeEvent(IndexResult<T> result) {
+        ValueChangeEvent.fire(AsyncTableCell.this, result);
+      }
+    };
 
     dataProvider.addDataDisplay(display);
 
@@ -176,6 +153,33 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
     getSelectionModel().clear();
   }
 
+  public void update() {
+    dataProvider.update();
+  }
+
+  private Timer autoUpdateTimer = null;
+
+  public void autoUpdate(int periodMillis) {
+    if (autoUpdateTimer != null) {
+      autoUpdateTimer.cancel();
+    }
+
+    autoUpdateTimer = new Timer() {
+
+      @Override
+      public void run() {
+        update();
+      }
+    };
+
+    autoUpdateTimer.scheduleRepeating(periodMillis);
+
+  }
+
+  public void redraw() {
+    display.redraw();
+  }
+
   public Filter getFilter() {
     return filter;
   }
@@ -201,10 +205,6 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
 
   public List<T> getVisibleItems() {
     return display.getVisibleItems();
-  }
-
-  public void redraw() {
-    display.redraw();
   }
 
   protected Sorter createSorter(ColumnSortList columnSortList, Map<Column<T, ?>, String> columnSortingKeyMap) {
