@@ -20,6 +20,7 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -233,11 +234,12 @@ public class SolrUtils {
   }
 
   private static SolrInputDocument validateDescriptiveMetadataFields(SolrInputDocument doc) {
+    SimpleDateFormat df = new SimpleDateFormat(RodaConstants.SOLRDATEFORMAT);
     if(doc.get(RodaConstants.SDO_DATE_INITIAL)!=null){
       Object value = doc.get(RodaConstants.SDO_DATE_INITIAL).getValue();
       if(value instanceof String){
         try{
-          Date d = RodaUtils.parseDate((String) value);
+          Date d = df.parse((String) value);
           doc.setField(RodaConstants.SDO_DATE_INITIAL, d);
         }catch(ParseException pe){
           doc.remove(RodaConstants.SDO_DATE_INITIAL);
@@ -249,7 +251,7 @@ public class SolrUtils {
       Object value = doc.get(RodaConstants.SDO_DATE_FINAL).getValue();
       if(value instanceof String){
         try{
-          Date d = RodaUtils.parseDate((String) value);
+          Date d = df.parse((String) value);
           doc.setField(RodaConstants.SDO_DATE_FINAL, d);
         }catch(ParseException pe){
           doc.remove(RodaConstants.SDO_DATE_FINAL);
