@@ -12,14 +12,19 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.FileVisitOption;
+import java.nio.file.FileVisitResult;
+import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -850,11 +855,33 @@ public class RodaCoreFactory {
       EARKSIPToAIPPlugin eark = new EARKSIPToAIPPlugin();
       eark.setParameterValues(new HashMap<String, String>());
       List<TransferredResource> transferredResourceList = new ArrayList<TransferredResource>();
-      TransferredResource tr = new TransferredResource();
-      tr.setFullPath("/home/sleroux/EARKSIP");
-      transferredResourceList.add(tr);
+      EnumSet<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
+      Files.walkFileTree(Paths.get("/home/sleroux/earksip"), opts, Integer.MAX_VALUE, new FileVisitor<Path>() {
+        @Override
+        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+          return FileVisitResult.CONTINUE;
+        }
+
+        @Override
+        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+          TransferredResource tr = new TransferredResource();
+          tr.setFullPath(file.toAbsolutePath().toString());
+          transferredResourceList.add(tr);
+          return FileVisitResult.CONTINUE;
+        }
+
+        @Override
+        public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+          return FileVisitResult.CONTINUE;
+        }
+
+        @Override
+        public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+          return FileVisitResult.CONTINUE;
+        }
+      });
       getPluginOrchestrator().runPluginOnTransferredResources(eark, transferredResourceList);
-    } catch (InvalidParameterException ipe) {
+    } catch (InvalidParameterException | IOException ipe) {
       LOGGER.error(ipe.getMessage(), ipe);
     }
   }

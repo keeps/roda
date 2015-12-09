@@ -229,6 +229,34 @@ public class SolrUtils {
         "Could not process descriptive metadata binary " + binary.getStoragePath() + " using xslt " + xsltFilename,
         IndexServiceException.INTERNAL_SERVER_ERROR, e);
     }
+    return validateDescriptiveMetadataFields(doc);
+  }
+
+  private static SolrInputDocument validateDescriptiveMetadataFields(SolrInputDocument doc) {
+    if(doc.get(RodaConstants.SDO_DATE_INITIAL)!=null){
+      Object value = doc.get(RodaConstants.SDO_DATE_INITIAL).getValue();
+      if(value instanceof String){
+        try{
+          Date d = RodaUtils.parseDate((String) value);
+          doc.setField(RodaConstants.SDO_DATE_INITIAL, d);
+        }catch(ParseException pe){
+          doc.remove(RodaConstants.SDO_DATE_INITIAL);
+          doc.setField(RodaConstants.SDO_DATE_INITIAL+"_txt", value);
+        }
+      }
+    }
+    if(doc.get(RodaConstants.SDO_DATE_FINAL)!=null){
+      Object value = doc.get(RodaConstants.SDO_DATE_FINAL).getValue();
+      if(value instanceof String){
+        try{
+          Date d = RodaUtils.parseDate((String) value);
+          doc.setField(RodaConstants.SDO_DATE_FINAL, d);
+        }catch(ParseException pe){
+          doc.remove(RodaConstants.SDO_DATE_FINAL);
+          doc.setField(RodaConstants.SDO_DATE_FINAL+"_txt", value);
+        }
+      }
+    }
     return doc;
   }
 

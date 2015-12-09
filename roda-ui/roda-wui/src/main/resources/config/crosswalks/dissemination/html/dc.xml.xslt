@@ -17,8 +17,8 @@
 	<xsl:param name="i18n.relation" />
 	<xsl:param name="i18n.rights" />
 	<xsl:param name="i18n.source" />
-	<xsl:param name="i18n.rights" />
-	<xsl:param name="i18n.source" />
+	<xsl:param name="i18n.subject" />
+	<xsl:param name="i18n.type" />
 
 
 
