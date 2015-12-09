@@ -19,6 +19,7 @@ import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.SimpleFile;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.common.client.ClientLogger;
+import org.roda.wui.common.client.tools.Humanize;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.shared.GWT;
@@ -85,7 +86,7 @@ public class FileList extends AsyncTableCell<SimpleFile> {
 
       @Override
       public String getValue(SimpleFile file) {
-        return "" + file.getSize();
+        return Humanize.readableFileSize(file.getSize());
       }
     };
 
@@ -96,9 +97,9 @@ public class FileList extends AsyncTableCell<SimpleFile> {
 
     // TODO externalize strings into constants
     display.addColumn(iconColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-tag'></i>"));
-    display.addColumn(filenameColumn, "Filename");
-    display.addColumn(mimetypeColumn, "Mimetype");
-    display.addColumn(lengthColumn, "Length");
+    display.addColumn(filenameColumn, "Name");
+    //display.addColumn(mimetypeColumn, "Mimetype");
+    //display.addColumn(lengthColumn, "Length");
     display.setColumnWidth(iconColumn, "35px");
     Label emptyInfo = new Label("No items to display");
     display.setEmptyTableWidget(emptyInfo);

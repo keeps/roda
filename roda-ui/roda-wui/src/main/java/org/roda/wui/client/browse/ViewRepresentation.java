@@ -19,19 +19,28 @@ import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.SimpleFile;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.FileList;
+import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.Tools;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.logical.shared.ResizeEvent;
+import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.media.client.Audio;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SelectionChangeEvent.Handler;
@@ -51,8 +60,9 @@ public class ViewRepresentation extends Composite {
       if (historyTokens.size() > 1) {
         final String aipId = historyTokens.get(0);
         final String representationId = historyTokens.get(1);
+        // final String fileId = historyTokens.get(2);
 
-        ViewRepresentation view = new ViewRepresentation(aipId, representationId);
+        ViewRepresentation view = new ViewRepresentation(aipId, representationId, null);
         callback.onSuccess(view);
       } else {
         Tools.newHistory(Browse.RESOLVER);
@@ -79,13 +89,26 @@ public class ViewRepresentation extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
+  private ClientLogger logger = new ClientLogger(getClass().getName());
+
   private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   private String aipId;
   private String representationId;
+  private String fileId;
+
+  static final int WINDOW_WIDTH = 950;
+
+  private boolean uniqueFile = false;
+
+  @UiField
+  HorizontalPanel previewPanel;
 
   @UiField(provided = true)
   FileList filesPanel;
+
+  @UiField
+  FlowPanel filePreview;
 
   @UiField
   Button back;
@@ -104,13 +127,15 @@ public class ViewRepresentation extends Composite {
    * 
    * @param descriptiveMetadataId
    * @param aipId
+   * @param fileId
    * 
    * @param user
    *          the user to edit
    */
-  public ViewRepresentation(String aipId, String representationId) {
+  public ViewRepresentation(String aipId, String representationId, String fileId) {
     this.aipId = aipId;
     this.representationId = representationId;
+    this.fileId = fileId;
 
     filesPanel = new FileList();
     Filter f = new Filter();
@@ -133,8 +158,13 @@ public class ViewRepresentation extends Composite {
 
       @Override
       public void onSelectionChange(SelectionChangeEvent event) {
-        SimpleFile file = filesPanel.getSelectionModel().getSelectedObject();
-
+        // SimpleFile file = filesPanel.getSelectionModel().getSelectedObject();
+        if (Window.getClientWidth() < WINDOW_WIDTH) {
+          logger.debug("new history");
+        } else {
+          logger.debug("refresh file preview");
+          filePreview();
+        }
       }
     });
 
@@ -145,10 +175,85 @@ public class ViewRepresentation extends Composite {
 
       }
     });
+
+    filesPanel.addStyleName("viewRepresentationFilesPanel");
+    filePreview.addStyleName("viewRepresentationFilePreview");
+    previewPanel.setCellWidth(filePreview, "100%");
+
+    panelsControl();
+    filePreview();
   }
 
   @UiHandler("back")
   void buttonBackHandler(ClickEvent e) {
     Tools.newHistory(Browse.RESOLVER, aipId);
+  }
+
+  private void panelsControl() {
+    if (!uniqueFile) {
+      if (Window.getClientWidth() < WINDOW_WIDTH) {
+        filesPanel.addStyleName("fullWidth");
+        previewPanel.setCellWidth(filePreview, "0px");
+        filePreview.setVisible(false);
+      } else {
+        filesPanel.removeStyleName("fullWidth");
+        previewPanel.setCellWidth(filePreview, "100%");
+        filePreview.setVisible(true);
+      }
+
+      Window.addResizeHandler(new ResizeHandler() {
+
+        @Override
+        public void onResize(ResizeEvent event) {
+          if (Window.getClientWidth() < WINDOW_WIDTH) {
+            filesPanel.addStyleName("fullWidth");
+            previewPanel.setCellWidth(filePreview, "0px");
+            filePreview.setVisible(false);
+          } else {
+            filesPanel.removeStyleName("fullWidth");
+            previewPanel.setCellWidth(filePreview, "100%");
+            filePreview.setVisible(true);
+          }
+        }
+      });
+    } else {
+      filesPanel.setVisible(false);
+    }
+  }
+
+  private void filePreview() {
+    filePreview.clear();
+
+    SimpleFile file = filesPanel.getSelectionModel().getSelectedObject();
+    if (file != null && file.getOriginalName() != null) {
+
+      /* IMAGE */
+      if (file.getOriginalName().contains(".png") || file.getOriginalName().contains(".jpg")) {
+        Image image = new Image(RestUtils.createRepresentationFileDownloadUri(aipId, representationId, file.getId()));
+        filePreview.add(image);
+        image.setWidth("100%");
+      } else if (file.getOriginalName().contains(".pdf")) {
+
+      } else if (file.getOriginalName().contains(".xml")) {
+
+      } else if (file.getOriginalName().contains(".webm")) {
+      } else if (file.getOriginalName().contains(".mp3")) {
+        Audio audioPlayer = Audio.createIfSupported();
+        if (audioPlayer != null) {
+          audioPlayer.addSource(
+            RestUtils.createRepresentationFileDownloadUri(aipId, representationId, file.getId()).asString(),
+            "audio/mpeg");
+          audioPlayer.setControls(true);
+          filePreview.add(audioPlayer);
+          audioPlayer.setWidth("100%");
+          audioPlayer.setHeight("100px");
+        } else {
+          // TODO show error preview
+        }
+      }
+
+    } else {
+      // TODO show error preview
+    }
   }
 }

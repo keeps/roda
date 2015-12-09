@@ -8,9 +8,9 @@
 	<ui:with field='messages' type='config.i18n.client.BrowseMessages' />
 
 	<ui:style>
-	.searchlist-title {
+		.searchlist-title {
 		position: absolute;
-	}
+		}
 	</ui:style>
 
 	<g:FlowPanel styleName="viewRepresentation" addStyleNames="wrapper skip_padding">
@@ -19,23 +19,22 @@
 				<g:Label styleName="h1" addStyleNames="viewRepresentationTitle">
 					<ui:msg description="View representation title">View representation</ui:msg>
 				</g:Label>
-				<!--<m:BreadcrumbPanel ui:field="breadcrumb"
-					addStyleNames="browseBreadcrumb" />
-				<g:FlowPanel styleName="browseItemPanel">
-					<g:SimplePanel styleName="browseItemIcon" ui:field="itemIcon" />
-					<g:FlowPanel styleName="browseItemPanelText">
-						<g:Label styleName="h4" addStyleNames="browseItemText"
-							ui:field="itemTitle" />
-						<g:Label addStyleNames="browseItemDates" ui:field="itemDates" />
+				<!--<m:BreadcrumbPanel ui:field="breadcrumb" addStyleNames="browseBreadcrumb" 
+					/> <g:FlowPanel styleName="browseItemPanel"> <g:SimplePanel styleName="browseItemIcon" 
+					ui:field="itemIcon" /> <g:FlowPanel styleName="browseItemPanelText"> <g:Label 
+					styleName="h4" addStyleNames="browseItemText" ui:field="itemTitle" /> <g:Label 
+					addStyleNames="browseItemDates" ui:field="itemDates" /> </g:FlowPanel> </g:FlowPanel> 
+					<g:TabPanel ui:field="itemMetadata" addStyleNames="browseItemMetadata"/> 
+					<g:Label styleName="{style.searchlist-title}" addStyleNames="h4" ui:field="fondsPanelTitle"> 
+					<ui:msg>Items</ui:msg> </g:Label> <common:AIPList ui:field="fondsPanel" /> -->
+				<g:HorizontalPanel ui:field="previewPanel">
+					<lists:FileList ui:field="filesPanel" />
+					<g:FlowPanel ui:field="filePreview">
+						<g:Label>
+							<ui:msg>View representation</ui:msg>
+						</g:Label>
 					</g:FlowPanel>
-				</g:FlowPanel>
-				<g:TabPanel ui:field="itemMetadata" addStyleNames="browseItemMetadata"/>
-				<g:Label styleName="{style.searchlist-title}" addStyleNames="h4"
-					ui:field="fondsPanelTitle">
-					<ui:msg>Items</ui:msg>
-				</g:Label>
-				<common:AIPList ui:field="fondsPanel" />-->
-				<lists:FileList ui:field="filesPanel" />
+				</g:HorizontalPanel>
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel>

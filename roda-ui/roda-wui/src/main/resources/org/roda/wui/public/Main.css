@@ -1799,6 +1799,26 @@
 	margin-bottom: 10px !important;
 }
 
+.filesPreview {
+	width: 100%;
+}
+
+.viewRepresentationFilesPanel {
+	display: inline-block;
+	vertical-align: top;
+	width: 300px;
+}
+
+.viewRepresentationFilesPanel.fullWidth {
+	width: 100%;
+}
+
+.viewRepresentationFilePreview {
+	display: inline-block;
+	vertical-align: top;
+	margin-left: 30px;
+	width: 100%;
+}
 
 /**********************************************
 				INGEST PROCESS NEW
@@ -1834,4 +1854,3 @@
     border-radius: 2px;
     margin-bottom: 10px;
 }
-
