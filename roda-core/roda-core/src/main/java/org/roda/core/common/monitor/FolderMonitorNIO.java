@@ -18,7 +18,9 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.solr.client.solrj.SolrClient;
+import org.roda.core.data.common.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.fs.FSUtils;
@@ -114,6 +116,23 @@ public class FolderMonitorNIO {
     Files.copy(inputStream, file);
   }
 
+  public InputStream retrieveFile(String path) throws NotFoundException, RequestNotValidException, GenericException {
+    InputStream ret;
+    Path p = basePath.resolve(path);
+    if (!Files.exists(p)) {
+      throw new NotFoundException("File not found: " + path);
+    } else if (!Files.isRegularFile(p)) {
+      throw new RequestNotValidException("Requested file is not a regular file: " + path);
+    } else {
+      try {
+        ret = Files.newInputStream(p);
+      } catch (IOException e) {
+        throw new GenericException("Could not create input stream: " + e.getMessage());
+      }
+    }
+    return ret;
+  }
+
   public static TransferredResource createTransferredResource(Path resourcePath, Path basePath) {
     Path relativeToBase = basePath.relativize(resourcePath);
     TransferredResource tr = new TransferredResource();
@@ -152,9 +171,9 @@ public class FolderMonitorNIO {
   }
 
   public boolean isFullyInitialized() {
-    if(watchDir==null){
+    if (watchDir == null) {
       return false;
-    }else{
+    } else {
       return watchDir.isFullyInitialized();
     }
   }

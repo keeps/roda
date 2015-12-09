@@ -39,6 +39,7 @@ import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.Humanize;
+import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -186,6 +187,9 @@ public class IngestTransfer extends Composite {
         } else if (r != null && r.isFile()) {
           // disable selection
           transferredResourceList.getSelectionModel().clear();
+          
+          // TODO download file
+          
         }
       }
     });
