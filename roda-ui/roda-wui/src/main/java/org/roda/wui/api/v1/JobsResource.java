@@ -21,14 +21,19 @@ import javax.ws.rs.core.Response;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
+import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.filter.SimpleFilterParameter;
+import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.Pair;
 import org.roda.core.data.common.RODAException;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.Job;
+import org.roda.core.data.v2.JobReport;
 import org.roda.core.data.v2.Jobs;
 import org.roda.core.data.v2.RodaUser;
+import org.roda.core.index.IndexServiceException;
 import org.roda.wui.api.controllers.JobsHelper;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.slf4j.Logger;
@@ -107,10 +112,30 @@ public class JobsResource {
 
   // FIXME WIP - not working yet
   @GET
-  @Path("/{jobId}/report")
+  @Path("/{jobId}/reports")
   public Response getJobReport(@PathParam("jobId") String jobId,
     @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat) {
-    return null;
+
+    try {
+      Filter filter = new Filter();
+      filter.add(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, jobId));
+      Sorter sorter = null;
+      Sublist sublist = new Sublist();
+      IndexResult<JobReport> find = RodaCoreFactory.getIndexService().find(JobReport.class, filter, sorter, sublist);
+
+      StringBuilder sb = new StringBuilder();
+
+      for (JobReport jobReport : find.getResults()) {
+        sb.append(jobReport.toString());
+        sb.append("\n");
+      }
+
+      return Response.ok(sb.toString(), MediaType.TEXT_HTML).build();
+    } catch (IndexServiceException e) {
+      LOGGER.error("Error getting jobs", e);
+    }
+    return Response.ok("PUM", MediaType.TEXT_HTML).build();
+
   }
 
 }

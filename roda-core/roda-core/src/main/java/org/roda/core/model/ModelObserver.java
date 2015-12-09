@@ -9,6 +9,7 @@ package org.roda.core.model;
 
 import org.roda.core.data.v2.Group;
 import org.roda.core.data.v2.Job;
+import org.roda.core.data.v2.JobReport;
 import org.roda.core.data.v2.LogEntry;
 import org.roda.core.data.v2.Representation;
 import org.roda.core.data.v2.SIPReport;
@@ -80,5 +81,11 @@ public interface ModelObserver {
   public void jobUpdated(Job job);
 
   public void jobDeleted(String jobId);
+
+  public void jobReportCreated(JobReport jobReport);
+
+  public void jobReportUpdated(JobReport jobReport);
+  
+  public void jobReportDeleted(String jobReportId);
 
 }

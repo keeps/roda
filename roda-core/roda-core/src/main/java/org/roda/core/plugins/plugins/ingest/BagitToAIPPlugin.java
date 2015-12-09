@@ -13,10 +13,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.roda.core.data.Attribute;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
 import org.roda.core.data.ReportItem;
 import org.roda.core.data.common.InvalidParameterException;
+import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.JobReport.PluginState;
 import org.roda.core.data.v2.PluginType;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.index.IndexService;
@@ -76,25 +79,34 @@ public class BagitToAIPPlugin implements Plugin<TransferredResource> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<TransferredResource> list)
     throws PluginException {
-    Report report = PluginUtils.instantiatePluginReport(getName(), getVersion());
+    Report report = PluginUtils.createPluginReport(this);
 
+    PluginState state;
     for (TransferredResource transferredResource : list) {
       Path bagitPath = Paths.get(transferredResource.getFullPath());
+
+      ReportItem reportItem = PluginUtils.createPluginReportItem(transferredResource, this);
       try {
         LOGGER.debug("Converting " + bagitPath + " to AIP");
         AIP aipCreated = BagitToAIPPluginUtils.bagitToAip(bagitPath, model, "metadata.xml");
 
-        ReportItem reportItem = new ReportItem("SIP to AIP from " + transferredResource.getId());
         reportItem.setItemId(aipCreated.getId());
-        report.addItem(reportItem);
+        reportItem
+          .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, RodaConstants.REPORT_ATTR_OUTCOME_SUCCESS));
+        state = PluginState.OK;
 
         LOGGER.debug("Done with converting " + bagitPath + " to AIP " + aipCreated.getId());
       } catch (Throwable e) {
-        ReportItem reportItem = new ReportItem("SIP to AIP from " + transferredResource.getId());
         reportItem.setItemId(null);
-        report.addItem(reportItem);
+        reportItem
+          .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, RodaConstants.REPORT_ATTR_OUTCOME_FAILURE))
+          .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
+        state = PluginState.ERROR;
+
         LOGGER.error("Error converting " + bagitPath + " to AIP", e);
       }
+      report.addItem(reportItem);
+      PluginUtils.createJobReport(model, this, reportItem, state, PluginUtils.getJobId(parameters));
     }
 
     return report;

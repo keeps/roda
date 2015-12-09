@@ -12,10 +12,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.data.Attribute;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.PluginParameter.PluginParameterType;
 import org.roda.core.data.Report;
@@ -43,7 +43,6 @@ import org.roda.core.plugins.plugins.base.AIPValidationPlugin;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.util.DateParser;
 
 public class DefaultIngestPlugin implements Plugin<TransferredResource> {
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultIngestPlugin.class);
@@ -64,9 +63,10 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
     "Auto accept SIP", PluginParameterType.BOOLEAN, "false", true, false, "Automatically accept SIPs.");
 
   private Map<String, String> parameters;
-  private int totalSteps = 4;
+  private int totalSteps = 5;
   private int currentCompletionPercentage = 0;
   private int completionPercentageStep = 100 / totalSteps;
+  private Map<String, String> aipIdToObjectId;
 
   @Override
   public void init() throws PluginException {
@@ -128,76 +128,76 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<TransferredResource> resources) throws PluginException {
-    Report report = new Report();
-    report.setType(Report.TYPE_PLUGIN_REPORT);
-    report.setTitle("Report of plugin " + getName());
-    report.addAttribute(new Attribute("Agent name", getName()))
-      .addAttribute(new Attribute("Agent version", getVersion()))
-      .addAttribute(new Attribute("Start datetime", DateParser.getIsoDate(new Date())));
+    Report report = PluginUtils.createPluginReport(this);
     Report pluginReport;
-    
-    // FIXME yet to be used
-    Map<String, Report> reports = new HashMap<>();
 
-    updateJobStatus(index, model, 0);
+    // FIXME
+    Map<String, Report> reports = new HashMap<>();
+    aipIdToObjectId = new HashMap<>();
+
+    updateJobStatus(index, model, null, 0);
 
     // 1) transform TransferredResource into an AIP
     pluginReport = transformTransferredResourceIntoAnAIP(index, model, storage, resources);
-    report = mergeReports(report, pluginReport);
+    reports = mergeReports(reports, pluginReport);
 
     // 1.1) obtain list of AIPs that were successfully transformed from
     // transferred resources
-    List<AIP> aips = getAIPsFromReport(index, report);
+    List<AIP> aips = getAIPsFromReports(index, reports);
 
-    updateJobStatus(index, model);
+    updateJobStatus(index, model, null);
 
     // 2) do virus check
     if (verifyIfStepShouldBePerformed(PARAMETER_DO_VIRUS_CHECK)) {
       pluginReport = doVirusCheck(index, model, storage, aips);
-      report = mergeReports(report, pluginReport);
-      updateJobStatus(index, model);
+      reports = mergeReports(reports, pluginReport);
+      updateJobStatus(index, model, null);
     }
 
     // 3) verify if AIP is well formed
     pluginReport = verifyIfAipIsWellFormed(index, model, storage, aips);
-    report = mergeReports(report, pluginReport);
+    reports = mergeReports(reports, pluginReport);
 
-    updateJobStatus(index, model);
+    updateJobStatus(index, model, null);
 
     // 4) verify if the user has permissions to ingest SIPS into the specified
     // fonds
     pluginReport = verifyProducerAuthorization();
-    report = mergeReports(report, pluginReport);
+    reports = mergeReports(reports, pluginReport);
 
     // 5) do file format normalization
     pluginReport = doFileFormatNormalization(index, model, storage, aips);
-    report = mergeReports(report, pluginReport);
+    reports = mergeReports(reports, pluginReport);
 
     // 6) generate dissemination copy
     pluginReport = generateDisseminationCopy(index, model, storage, aips);
-    report = mergeReports(report, pluginReport);
+    reports = mergeReports(reports, pluginReport);
 
     // 7) do auto accept
     if (verifyIfStepShouldBePerformed(PARAMETER_DO_AUTO_ACCEPT)) {
       pluginReport = doAutoAccept(index, model, storage, aips);
-      report = mergeReports(report, pluginReport);
+      reports = mergeReports(reports, pluginReport);
     }
 
-    updateJobStatus(index, model, 100);
+    updateJobStatus(index, model, null, 100);
 
     return report;
   }
 
-  private void updateJobStatus(IndexService index, ModelService model) {
+  private void updateJobStatus(IndexService index, ModelService model, Map<String, Report> reports) {
     currentCompletionPercentage = currentCompletionPercentage + completionPercentageStep;
-    updateJobStatus(index, model, currentCompletionPercentage);
+    updateJobStatus(index, model, reports, currentCompletionPercentage);
   }
 
-  private void updateJobStatus(IndexService index, ModelService model, int newCompletionPercentage) {
+  private void updateJobStatus(IndexService index, ModelService model, Map<String, Report> reports,
+    int newCompletionPercentage) {
     try {
       LOGGER.debug("New job completionPercentage: " + newCompletionPercentage);
       Job job = PluginUtils.getJobFromIndex(index, parameters);
       job.setCompletionPercentage(newCompletionPercentage);
+      if (reports != null) {
+        job.setObjectIdsToAipIds(reports);
+      }
       if (newCompletionPercentage == 0) {
         job.setState(JOB_STATE.STARTED);
       } else if (newCompletionPercentage == 100) {
@@ -210,31 +210,36 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
     }
   }
 
-  private List<AIP> getAIPsFromReport(IndexService index, Report report) {
+  private List<AIP> getAIPsFromReports(IndexService index, Map<String, Report> reports) {
     List<AIP> aips = new ArrayList<>();
-    List<String> aipIds = getAIPsIdsFromReport(report);
+    List<String> aipIds = getAIPsIdsFromReport(reports);
 
-    int maxAips = 200;
-    IndexResult<AIP> aipsFromIndex;
-    try {
-      aipsFromIndex = index.find(AIP.class, new Filter(new OneOfManyFilterParameter(RodaConstants.AIP_ID, aipIds)),
-        null, new Sublist(0, maxAips));
-      aips = aipsFromIndex.getResults();
-    } catch (IndexServiceException e) {
-      LOGGER.error("Error retrieving AIPs", e);
+    LOGGER.debug("Getting AIPs: {}", aipIds);
+
+    if (!aipIds.isEmpty()) {
+      int maxAips = 200;
+      IndexResult<AIP> aipsFromIndex;
+      try {
+        aipsFromIndex = index.find(AIP.class, new Filter(new OneOfManyFilterParameter(RodaConstants.AIP_ID, aipIds)),
+          null, new Sublist(0, maxAips));
+        aips = aipsFromIndex.getResults();
+      } catch (IndexServiceException e) {
+        LOGGER.error("Error retrieving AIPs", e);
+      }
     }
 
     return aips;
 
   }
 
-  private List<String> getAIPsIdsFromReport(Report report) {
+  private List<String> getAIPsIdsFromReport(Map<String, Report> reports) {
     List<String> aipIds = new ArrayList<>();
-    for (ReportItem reportItem : report.getItems()) {
-      if (StringUtils.isNotBlank(reportItem.getItemId())) {
-        aipIds.add(reportItem.getItemId());
+    for (Entry<String, Report> entry : reports.entrySet()) {
+      if (StringUtils.isNoneBlank(entry.getValue().getItems().get(0).getItemId())) {
+        aipIds.add(entry.getValue().getItems().get(0).getItemId());
       }
     }
+
     return aipIds;
   }
 
@@ -243,14 +248,24 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
     return Boolean.parseBoolean(paramValue);
   }
 
-  private Report mergeReports(Report actual, Report plugin) {
+  private Map<String, Report> mergeReports(Map<String, Report> reports, Report plugin) {
     if (plugin != null) {
+      // LOGGER.debug("MAP: {} PluginReport: {}", aipIdToObjectId, plugin);
       for (ReportItem reportItem : plugin.getItems()) {
-        actual.addItem(reportItem);
+        if (StringUtils.isNotBlank(reportItem.getOtherId())) {
+          aipIdToObjectId.put(reportItem.getItemId(), reportItem.getOtherId());
+          Report report = new Report();
+          report.addItem(reportItem);
+          reports.put(reportItem.getOtherId(), report);
+
+        } else if (StringUtils.isNotBlank(reportItem.getItemId())
+          && aipIdToObjectId.get(reportItem.getItemId()) != null) {
+          reports.get(aipIdToObjectId.get(reportItem.getItemId())).addItem(reportItem);
+        }
       }
     }
 
-    return actual;
+    return reports;
   }
 
   private Report transformTransferredResourceIntoAnAIP(IndexService index, ModelService model, StorageService storage,

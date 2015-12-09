@@ -43,6 +43,7 @@ import org.roda.core.data.v2.EventPreservationObject;
 import org.roda.core.data.v2.FileFormat;
 import org.roda.core.data.v2.Group;
 import org.roda.core.data.v2.Job;
+import org.roda.core.data.v2.JobReport;
 import org.roda.core.data.v2.LogEntry;
 import org.roda.core.data.v2.RODAObjectPermissions;
 import org.roda.core.data.v2.Representation;
@@ -1983,5 +1984,19 @@ public class ModelService extends ModelObservable {
 
   public void updateFile(File file) {
     notifyFileUpdated(file);
+  }
+
+  public void createJobReport(JobReport jobReport) {
+    // create job report in storage
+    // TODO
+
+    // index it
+    notifyJobReportCreated(jobReport);
+  }
+
+  public void updateJobReport(JobReport jobReport) {
+    // update job report in storage
+    // TODO
+    notifyJobReportUpdated(jobReport);
   }
 }

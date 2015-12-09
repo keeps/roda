@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.roda.core.data.v2.Group;
 import org.roda.core.data.v2.Job;
+import org.roda.core.data.v2.JobReport;
 import org.roda.core.data.v2.LogEntry;
 import org.roda.core.data.v2.Representation;
 import org.roda.core.data.v2.SIPReport;
@@ -212,6 +213,24 @@ public abstract class ModelObservable {
   protected void notifyJobDeleted(String jobId) {
     for (ModelObserver observer : observers) {
       observer.jobDeleted(jobId);
+    }
+  }
+
+  protected void notifyJobReportCreated(JobReport jobReport) {
+    for (ModelObserver observer : observers) {
+      observer.jobReportCreated(jobReport);
+    }
+  }
+
+  protected void notifyJobReportUpdated(JobReport jobReport) {
+    for (ModelObserver observer : observers) {
+      observer.jobReportUpdated(jobReport);
+    }
+  }
+
+  protected void notifyJobReportDeleted(String jobReportId) {
+    for (ModelObserver observer : observers) {
+      observer.jobReportDeleted(jobReportId);
     }
   }
 }

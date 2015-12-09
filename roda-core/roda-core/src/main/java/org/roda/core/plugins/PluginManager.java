@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
  * @author Rui Castro
  */
 public class PluginManager {
-  private static Logger logger = LoggerFactory.getLogger(PluginManager.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(PluginManager.class);
 
   private static Path RODA_CONFIG_PATH = null;
   private static Path RODA_PLUGINS_PATH = null;
@@ -181,13 +181,13 @@ public class PluginManager {
    * @throws PluginManagerException
    */
   private PluginManager() throws PluginManagerException {
-    logger.debug("Starting plugin scanner timer...");
+    LOGGER.debug("Starting plugin scanner timer...");
 
     int timeInSeconds = RodaCoreFactory.getRodaConfiguration().getInt("core.plugins.external.scheduler.interval");
     this.loadPluginsTimer = new Timer("Plugin scanner timer", true);
     this.loadPluginsTimer.schedule(new SearchPluginsTask(), new Date(), timeInSeconds * 1000);
 
-    logger.info(getClass().getSimpleName() + " init OK");
+    LOGGER.info(getClass().getSimpleName() + " init OK");
   }
 
   private <T extends Serializable> PluginInfo getPluginInfo(Plugin<T> plugin) {
@@ -224,13 +224,13 @@ public class PluginManager {
           && attrs.lastModifiedTime().toMillis() == jarPluginCache.get(jarFile).lastModified) {
           // The plugin already exists
 
-          logger.debug(jarFile.getFileName() + " is already loaded");
+          LOGGER.debug(jarFile.getFileName() + " is already loaded");
 
         } else {
           // The plugin doesn't exist or the modification date is
           // different. Let's load the Plugin
 
-          logger.debug(jarFile.getFileName() + " is not loaded or modification dates differ. Inspecting Jar...");
+          LOGGER.debug(jarFile.getFileName() + " is not loaded or modification dates differ. Inspecting Jar...");
 
           Plugin<?> plugin = loadPlugin(jarFile, jarURLs);
 
@@ -240,11 +240,11 @@ public class PluginManager {
               plugin.init();
               externalPluginChache.put(plugin.getName(), plugin);
               addPluginToPluginTypeMapping(plugin);
-              logger.debug("Plugin started " + plugin.getName() + " (version " + plugin.getVersion() + ")");
+              LOGGER.debug("Plugin started " + plugin.getName() + " (version " + plugin.getVersion() + ")");
 
             } else {
 
-              logger.trace(jarFile.getFileName() + " is not a Plugin");
+              LOGGER.trace(jarFile.getFileName() + " is not a Plugin");
 
             }
 
@@ -254,9 +254,9 @@ public class PluginManager {
             }
 
           } catch (PluginException e) {
-            logger.error("Plugin failed to initialize", e);
+            LOGGER.error("Plugin failed to initialize", e);
           } catch (Exception e) {
-            logger.error("Plugin failed to initialize", e);
+            LOGGER.error("Plugin failed to initialize", e);
           }
         }
 
@@ -279,7 +279,7 @@ public class PluginManager {
         internalPluginChache.put(plugin.getName(), p);
         addPluginToPluginTypeMapping(p);
       } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | PluginException e) {
-        logger.error("Unable to instantiate plugin '{}'", plugin.getCanonicalName());
+        LOGGER.error("Unable to instantiate plugin '{}'", plugin.getCanonicalName());
       }
 
     }
@@ -311,7 +311,7 @@ public class PluginManager {
       Manifest manifest = jar.getManifest();
 
       if (manifest == null) {
-        logger.trace(jarFile.getFileName() + " doesn't have a MANIFEST file");
+        LOGGER.trace(jarFile.getFileName() + " doesn't have a MANIFEST file");
       } else {
 
         Attributes mainAttributes = manifest.getMainAttributes();
@@ -320,9 +320,9 @@ public class PluginManager {
 
         if (pluginClassName != null) {
 
-          logger.trace(jarFile.getFileName() + " has plugin " + pluginClassName);
+          LOGGER.trace(jarFile.getFileName() + " has plugin " + pluginClassName);
 
-          logger.trace("Adding jar " + jarFile.getFileName() + " to classpath and loading " + pluginClassName
+          LOGGER.trace("Adding jar " + jarFile.getFileName() + " to classpath and loading " + pluginClassName
             + " with ClassLoader " + URLClassLoader.class.getSimpleName());
 
           Object object = ClassLoaderUtility.createObject(jarURLs.toArray(new URL[jarURLs.size()]), pluginClassName);
@@ -332,11 +332,11 @@ public class PluginManager {
             plugin = (Plugin<?>) object;
 
           } else {
-            logger.error(pluginClassName + " is not a valid Plugin");
+            LOGGER.error(pluginClassName + " is not a valid Plugin");
           }
 
         } else {
-          logger.trace(
+          LOGGER.trace(
             jarFile.getFileName() + " MANIFEST file doesn't have a '" + RODA_PLUGIN_MANIFEST_KEY + "' attribute");
         }
 
@@ -344,7 +344,7 @@ public class PluginManager {
 
     } catch (Throwable e) {
 
-      logger.error(jarFile.getFileName() + " error loading plugin - " + e.getMessage(), e);
+      LOGGER.error(jarFile.getFileName() + " error loading plugin - " + e.getMessage(), e);
 
     } finally {
 
@@ -353,7 +353,7 @@ public class PluginManager {
         try {
           jar.close();
         } catch (IOException e) {
-          logger.debug("Error closing jar - " + e.getMessage(), e);
+          LOGGER.debug("Error closing jar - " + e.getMessage(), e);
         }
       }
     }
@@ -365,19 +365,19 @@ public class PluginManager {
 
     public void run() {
 
-      logger.debug("Searching for plugins...");
+      LOGGER.debug("Searching for plugins...");
 
       loadPlugins();
 
-      logger.debug("Search complete - " + jarPluginCache.size() + " jar files");
+      LOGGER.debug("Search complete - " + jarPluginCache.size() + " jar files");
 
       for (Path jarFile : jarPluginCache.keySet()) {
 
         Plugin<?> plugin = jarPluginCache.get(jarFile).plugin;
 
         if (plugin != null) {
-          logger.debug("- " + jarFile.getFileName());
-          logger.debug("--- " + plugin.getName() + " - " + plugin.getVersion() + " - " + plugin.getDescription());
+          LOGGER.debug("- " + jarFile.getFileName());
+          LOGGER.debug("--- " + plugin.getName() + " - " + plugin.getVersion() + " - " + plugin.getDescription());
         }
       }
     }

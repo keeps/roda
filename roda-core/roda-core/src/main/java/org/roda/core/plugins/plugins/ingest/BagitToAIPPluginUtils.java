@@ -44,7 +44,7 @@ public class BagitToAIPPluginUtils {
     Bag bag = bagFactory.createBag(bagitPath.toFile());
     SimpleResult result = bag.verifyPayloadManifests();
     if (!result.isSuccess()) {
-      throw new BagitNotValidException();
+      throw new BagitNotValidException(result.getMessages()+"");
     }
     BagInfoTxt bagInfoTxt = bag.getBagInfoTxt();
 

@@ -268,7 +268,7 @@ public class RodaCoreFactory {
       System.setProperty("solr.data.dir.preservationevent", indexPath.resolve("preservationevent").toString());
       System.setProperty("solr.data.dir.preservationobject", indexPath.resolve("preservationobject").toString());
       System.setProperty("solr.data.dir.actionlog", indexPath.resolve("actionlog").toString());
-      System.setProperty("solr.data.dir.sipreport", indexPath.resolve("sipreport").toString());
+      System.setProperty("solr.data.dir.jobreport", indexPath.resolve("jobreport").toString());
       System.setProperty("solr.data.dir.members", indexPath.resolve("members").toString());
       System.setProperty("solr.data.dir.othermetadata", indexPath.resolve("othermetadata").toString());
       System.setProperty("solr.data.dir.sip", indexPath.resolve("sip").toString());

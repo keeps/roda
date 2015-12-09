@@ -18,6 +18,7 @@ import org.apache.solr.common.SolrInputDocument;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.Group;
 import org.roda.core.data.v2.Job;
+import org.roda.core.data.v2.JobReport;
 import org.roda.core.data.v2.LogEntry;
 import org.roda.core.data.v2.Representation;
 import org.roda.core.data.v2.SIPReport;
@@ -390,7 +391,6 @@ public class IndexModelObserver implements ModelObserver {
   @Override
   public void jobDeleted(String jobId) {
     deleteDocumentFromIndex(RodaConstants.INDEX_JOB, jobId, "Error deleting Job (id=" + jobId + ")");
-
   }
 
   private void addDocumentToIndex(String indexName, SolrInputDocument document, String errorLogMessage) {
@@ -409,5 +409,24 @@ public class IndexModelObserver implements ModelObserver {
     } catch (SolrServerException | IOException e) {
       LOGGER.error(errorLogMessage, e);
     }
+  }
+
+  @Override
+  public void jobReportCreated(JobReport jobReport) {
+    addDocumentToIndex(RodaConstants.INDEX_JOB_REPORT, SolrUtils.jobReportToSolrDocument(jobReport),
+      "Error creating Job Report");
+
+  }
+
+  @Override
+  public void jobReportUpdated(JobReport jobReport) {
+    jobReportDeleted(jobReport.getId());
+    jobReportCreated(jobReport);
+  }
+
+  @Override
+  public void jobReportDeleted(String jobReportId) {
+    deleteDocumentFromIndex(RodaConstants.INDEX_JOB_REPORT, jobReportId,
+      "Error deleting Job Report(id=" + jobReportId + ")");
   }
 }

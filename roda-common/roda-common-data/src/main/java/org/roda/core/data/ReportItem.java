@@ -22,6 +22,7 @@ public class ReportItem implements Serializable {
 
   private String title = null;
   // FIXME see if this is really necessary
+  private String otherId = null;
   private String itemId = null;
   private List<Attribute> attributes = new ArrayList<Attribute>();
 
@@ -74,7 +75,8 @@ public class ReportItem implements Serializable {
    */
   @Override
   public String toString() {
-    return "ReportItem [title=" + title + ", itemId=" + itemId + ", attributes=" + attributes + "]";
+    return "ReportItem [title=" + title + ", otherId=" + otherId + ", itemId=" + itemId + ", attributes=" + attributes
+      + "]";
   }
 
   /**
@@ -90,6 +92,14 @@ public class ReportItem implements Serializable {
    */
   public void setTitle(String title) {
     this.title = title;
+  }
+
+  public String getOtherId() {
+    return otherId;
+  }
+
+  public void setOtherId(String otherId) {
+    this.otherId = otherId;
   }
 
   public String getItemId() {

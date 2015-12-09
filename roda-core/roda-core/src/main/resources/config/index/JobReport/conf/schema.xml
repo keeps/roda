@@ -105,17 +105,14 @@
      installations. See the <uniqueKey> declaration below where <uniqueKey> is set to "id".
    -->   
    <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" />
-   <field name="username" type="string" indexed="true" stored="true" required="true" multiValued="false" />
-   <field name="originalFilename" type="string" indexed="true" stored="true" required="true" multiValued="false" />
-   <field name="state" type="string" indexed="true" stored="true" required="true" multiValued="false" />
-   <field name="datetime" type="tdate" indexed="true" stored="true" required="true" multiValued="false" />
-   <field name="processing" type="boolean" indexed="true" stored="true" required="true" multiValued="false" />
-   <!-- <field name="stateTransitions" type="?????" indexed="true" stored="true" required="true" multiValued="false" /> -->
-   <field name="complete" type="boolean" indexed="true" stored="true" required="true" multiValued="false" />
-   <field name="completePercentage" type="float" indexed="true" stored="true" required="true" multiValued="false" />
-   <field name="parentPID" type="string" indexed="true" stored="true" required="true" multiValued="false" />
-   <field name="ingestedPID" type="string" indexed="true" stored="true" required="true" multiValued="false" />
-   <field name="fileID" type="string" indexed="true" stored="true" required="true" multiValued="false" />
+   <field name="dateCreated" type="tdate" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="dateUpdated" type="tdate" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="jobId" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="aipId" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="objectId" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="lastPluginRan" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="lastPluginRanState" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="report" type="string" indexed="false" stored="true" required="false" multiValued="false" />
    <!-- 
    <field name="transition_datetime" type="tdate" indexed="true" stored="true" required="true" multiValued="false" /> 
    <field name="transition_description" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 

@@ -28,6 +28,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.net.util.Base64;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.RodaUtils;
+import org.roda.core.data.Report;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.FileFormat;
 import org.roda.core.data.v2.LogEntry;
@@ -307,7 +308,7 @@ public final class ModelUtils {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
       RodaConstants.STORAGE_DIRECTORY_METADATA);
   }
-  
+
   public static StoragePath getDescriptiveMetadataPath(String aipId) throws StorageServiceException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
       RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_DESCRIPTIVE);
@@ -518,6 +519,33 @@ public final class ModelUtils {
     return ret;
   }
 
+  @Deprecated
+  public static Map<String, Report> getJobReportsFromJson(String json) {
+    Map<String, Report> ret = new HashMap<String, Report>();
+    try {
+      JsonFactory factory = new JsonFactory();
+      ObjectMapper mapper = new ObjectMapper(factory);
+      ret = mapper.readValue(json, new TypeReference<Map<String, Report>>() {
+      });
+    } catch (IOException e) {
+      LOGGER.error("Error transforming json string to job reports", e);
+    }
+    return ret;
+  }
+
+  public static Report getJobReportFromJson(String json) {
+    Report ret = new Report();
+    try {
+      JsonFactory factory = new JsonFactory();
+      ObjectMapper mapper = new ObjectMapper(factory);
+      ret = mapper.readValue(json, new TypeReference<Report>() {
+      });
+    } catch (IOException e) {
+      LOGGER.error("Error transforming json string to job reports", e);
+    }
+    return ret;
+  }
+
   public static String getJsonLogEntryParameters(List<LogEntryParameter> parameters) {
     String ret = "";
     try {
@@ -687,5 +715,4 @@ public final class ModelUtils {
     return node;
   }
 
-  
 }

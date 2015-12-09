@@ -120,7 +120,9 @@ public final class RodaConstants {
   public static final String INDEX_USER_LOG = "UserLog";
   public static final String INDEX_ACTION_LOG = "ActionLog";
   public static final String INDEX_OTHER_DESCRIPTIVE_DATA_PREFIX = "odd";
+  @Deprecated
   public static final String INDEX_SIP_REPORT = "SIPReport";
+  public static final String INDEX_JOB_REPORT = "JobReport";
   public static final String INDEX_MEMBERS = "Members";
   public static final String INDEX_CHARACTERIZATION = "Characterization";
   public static final String INDEX_SIP = "SIP";
@@ -329,24 +331,43 @@ public final class RodaConstants {
   public static final String LOG_PARAMETERS = "parameters";
   public static final String LOG_FILE_ID = "fileID";
 
+  @Deprecated
   public static final String SIP_REPORT_ORIGINAL_FILENAME = "originalFilename";
+  @Deprecated
   public static final String SIP_REPORT_ID = "id";
+  @Deprecated
   public static final String SIP_REPORT_USERNAME = "username";
+  @Deprecated
   public static final String SIP_REPORT_STATE = "state";
+  @Deprecated
   public static final String SIP_REPORT_DATETIME = "datetime";
+  @Deprecated
   public static final String SIP_REPORT_PROCESSING = "processing";
+  @Deprecated
   public static final String SIP_REPORT_COMPLETE = "complete";
+  @Deprecated
   public static final String SIP_REPORT_INGESTED_PID = "ingestedPID";
+  @Deprecated
   public static final String SIP_REPORT_COMPLETE_PERCENTAGE = "completePercentage";
+  @Deprecated
   public static final String SIP_REPORT_FILE_ID = "fileID";
+  @Deprecated
   public static final String SIP_REPORT_PARENT_PID = "parentPID";
+  @Deprecated
   public static final String SIP_REPORT_TRANSITION_DATETIME = "transition_datetime";
+  @Deprecated
   public static final String SIP_REPORT_TRANSITION_DESCRIPTION = "transition_description";
+  @Deprecated
   public static final String SIP_REPORT_TRANSITION_FROM = "transition_from";
+  @Deprecated
   public static final String SIP_REPORT_TRANSITION_SIPID = "transition_sipID";
+  @Deprecated
   public static final String SIP_REPORT_TRANSITION_TASKID = "transition_taskID";
+  @Deprecated
   public static final String SIP_REPORT_TRANSITION_TO = "transition_to";
+  @Deprecated
   public static final String SIP_REPORT_TRANSITION_SUCCESS = "transition_success";
+  @Deprecated
   public static final String SIP_REPORT_TRANSITION_ID = "id";
 
   // MEMBER: USER or GROUP
@@ -402,5 +423,21 @@ public final class RodaConstants {
   public static final String REPORT_ATTR_AIP_ID = "aip.id";
   public static final String REPORT_ATTR_DATETIME = "datetime";
   public static final String REPORT_ATTR_OUTCOME = "outcome";
+  public static final String REPORT_ATTR_OUTCOME_SUCCESS = "success";
+  public static final String REPORT_ATTR_OUTCOME_FAILURE = "failure";
+  public static final String REPORT_ATTR_OUTCOME_DETAILS = "outcomeDetails";
+
   public static final String REPORT_ATTR_REASON = "reason";
+
+  /* Job Report */
+  public static final String JOB_REPORT_ID = "id";
+  public static final String JOB_REPORT_AIP_ID = "aipId";
+  public static final String JOB_REPORT_OBJECT_ID = "objectId";
+  public static final String JOB_REPORT_JOB_ID = "jobId";
+  public static final String JOB_REPORT_REPORT = "report";
+  public static final String JOB_REPORT_DATE_CREATED = "dateCreated";
+  public static final String JOB_REPORT_DATE_UPDATE = "dateUpdated";
+  public static final String JOB_REPORT_LAST_PLUGIN_RAN = "lastPluginRan";
+  public static final String JOB_REPORT_LAST_PLUGIN_RAN_STATE = "lastPluginRanState";
+
 }
