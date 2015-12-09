@@ -22,6 +22,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.Job.ORCHESTRATOR_METHOD;
+import org.roda.core.data.v2.JobReport;
 import org.roda.core.data.v2.RodaUser;
 import org.roda.core.index.IndexServiceException;
 import org.roda.core.plugins.Plugin;
@@ -76,7 +77,7 @@ public class JobsHelper {
 
     // serialize job to file & index it
     RodaCoreFactory.getModelService().createJob(updatedJob, null);
-    
+
     // FIXME should we verify if the job was created with success???
 
     Patterns.ask(RodaCoreFactory.getPluginOrchestrator().getCoordinator(), updatedJob, 5);
@@ -114,6 +115,16 @@ public class JobsHelper {
     }
 
     return jobs;
+  }
+
+  public static IndexResult<JobReport> findJobReports(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
+    throws GenericException {
+    try {
+      return RodaCoreFactory.getIndexService().find(JobReport.class, filter, sorter, sublist);
+    } catch (IndexServiceException e) {
+      LOGGER.error("Error getting job reports", e);
+      throw new GenericException("Error getting job reports: " + e.getMessage());
+    }
   }
 
 }

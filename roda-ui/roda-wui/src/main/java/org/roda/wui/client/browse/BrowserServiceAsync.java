@@ -21,6 +21,7 @@ import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RODAException;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.Job;
+import org.roda.core.data.v2.JobReport;
 import org.roda.core.data.v2.PluginType;
 import org.roda.core.data.v2.RepresentationPreservationObject;
 import org.roda.core.data.v2.SimpleDescriptionObject;
@@ -217,4 +218,7 @@ public interface BrowserServiceAsync {
   void getCreateIngestProcessBundle(AsyncCallback<CreateIngestJobBundle> callback);
 
   void retrieveJobBundle(String jobId, AsyncCallback<JobBundle> callback);
+
+  void findJobReports(Filter filter, Sorter sorter, Sublist sublist, Facets facets,
+    AsyncCallback<IndexResult<JobReport>> callback);
 }

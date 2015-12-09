@@ -15,10 +15,14 @@ import java.util.List;
 import org.roda.core.data.PluginInfo;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.PluginParameter.PluginParameterType;
+import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.filter.SimpleFilterParameter;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.Job.JOB_STATE;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.lists.JobReportList;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
@@ -120,6 +124,9 @@ public class ShowJob extends Composite {
   @UiField
   FlowPanel pluginOptions;
 
+  @UiField(provided = true)
+  JobReportList jobReports;
+
   @UiField
   HTML objectList;
 
@@ -129,6 +136,9 @@ public class ShowJob extends Composite {
   public ShowJob(Job job, List<PluginInfo> pluginsInfo) {
     this.job = job;
     this.pluginsInfo = pluginsInfo;
+    
+    // TODO get better name for job report list
+    jobReports = new JobReportList(new Filter(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, job.getId())), null, "Job report list");
 
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -216,7 +226,6 @@ public class ShowJob extends Composite {
 
       pluginLabel.addStyleName("label");
       pluginValue.addStyleName("form-radiobutton");
-      
 
       // TODO show SIP_TO_AIP plugin description
     }
@@ -262,8 +271,7 @@ public class ShowJob extends Composite {
 
     return p;
   }
-  
-  
+
   @UiHandler("buttonStop")
   void buttonStopHandler(ClickEvent e) {
     Toast.showInfo("Sorry", "Feature not yet implemented");

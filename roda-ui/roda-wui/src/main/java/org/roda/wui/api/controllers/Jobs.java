@@ -20,6 +20,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.Job;
+import org.roda.core.data.v2.JobReport;
 import org.roda.core.data.v2.RodaUser;
 import org.roda.wui.common.RodaCoreService;
 import org.roda.wui.common.client.GenericException;
@@ -94,6 +95,24 @@ public class Jobs extends RodaCoreService {
       RodaConstants.CONTROLLER_SORTER_PARAM, sorter, RodaConstants.CONTROLLER_SUBLIST_PARAM, sublist);
 
     return findJobs;
+  }
+
+  public static IndexResult<JobReport> findJobReports(RodaUser user, Filter filter, Sorter sorter, Sublist sublist,
+    Facets facets) throws GenericException {
+    Date startDate = new Date();
+
+    // check user permissions
+    // TODO ???
+
+    // delegate
+    IndexResult<JobReport> findJobReports = JobsHelper.findJobReports(filter, sorter, sublist, facets);
+
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, JOBS_COMPONENT, "findJobReports", null, duration, RodaConstants.CONTROLLER_FILTER_PARAM,
+      filter, RodaConstants.CONTROLLER_SORTER_PARAM, sorter, RodaConstants.CONTROLLER_SUBLIST_PARAM, sublist);
+
+    return findJobReports;
   }
 
   /*
