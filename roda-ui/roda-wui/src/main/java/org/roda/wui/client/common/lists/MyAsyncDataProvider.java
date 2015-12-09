@@ -26,6 +26,21 @@ public abstract class MyAsyncDataProvider<T extends Serializable> extends AsyncD
 
   @Override
   protected void onRangeChanged(HasData<T> display) {
+    fetch(display, new AsyncCallback<Void>() {
+
+      @Override
+      public void onFailure(Throwable caught) {
+        Toast.showError("Error getting data from server: [" + caught.getClass().getName() + "] " + caught.getMessage());
+      }
+
+      @Override
+      public void onSuccess(Void result) {
+        // do nothing
+      }
+    });
+  }
+
+  private void fetch(final HasData<T> display, final AsyncCallback<Void> callback) {
     // Get the new range.
     final Range range = display.getVisibleRange();
 
@@ -39,7 +54,7 @@ public abstract class MyAsyncDataProvider<T extends Serializable> extends AsyncD
 
       @Override
       public void onFailure(Throwable caught) {
-        Toast.showError("Error getting data from server: " + caught.getMessage());
+        callback.onFailure(caught);
       }
 
       @Override
@@ -53,14 +68,30 @@ public abstract class MyAsyncDataProvider<T extends Serializable> extends AsyncD
         } else {
           // search not yet ready, deliver empty result
         }
+        callback.onSuccess(null);
       }
     });
   }
-  
+
   protected abstract void fireChangeEvent(IndexResult<T> result);
-  
-  public void update() {
-    onRangeChanged(display);
+
+  public void update(final AsyncCallback<Void> callback) {
+    fetch(display, callback);
   }
-  
+
+  public void update() {
+    update(new AsyncCallback<Void>() {
+
+      @Override
+      public void onFailure(Throwable caught) {
+        Toast.showError("Error getting data from server: [" + caught.getClass().getName() + "] " + caught.getMessage());
+      }
+
+      @Override
+      public void onSuccess(Void result) {
+        // do nothing
+      }
+    });
+  }
+
 }

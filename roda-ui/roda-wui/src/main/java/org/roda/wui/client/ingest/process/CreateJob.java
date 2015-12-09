@@ -16,10 +16,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.roda.core.data.PluginInfo;
+import org.roda.core.data.PluginParameter;
 import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.Job.ORCHESTRATOR_METHOD;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.PluginUtils;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
@@ -250,19 +252,43 @@ public class CreateJob extends Composite {
     job.setPlugin(selectedIngestPlugin.getId());
     job.setPluginParameters(ingestWorkflowOptions.getValue());
 
-    BrowserService.Util.getInstance().createJob(job, new AsyncCallback<Job>() {
+    List<PluginParameter> missingMandatoryParameters = ingestWorkflowOptions.getMissingMandatoryParameters();
+    if (missingMandatoryParameters.isEmpty()) {
+      BrowserService.Util.getInstance().createJob(job, new AsyncCallback<Job>() {
 
-      @Override
-      public void onFailure(Throwable caught) {
-        Toast.showError("Error", caught.getMessage());
+        @Override
+        public void onFailure(Throwable caught) {
+          Toast.showError("Error", caught.getMessage());
+        }
+
+        @Override
+        public void onSuccess(Job result) {
+          Toast.showInfo("Done", "New ingest process created");
+          Tools.newHistory(IngestProcess.RESOLVER);
+        }
+      });
+    } else {
+
+      List<String> missingPluginNames = new ArrayList<>();
+      for (PluginParameter parameter : missingMandatoryParameters) {
+        missingPluginNames.add(parameter.getName());
       }
 
-      @Override
-      public void onSuccess(Job result) {
-        Toast.showInfo("Done", "New ingest process created");
-        Tools.newHistory(IngestProcess.RESOLVER);
-      }
-    });
+      Dialogs.showInformationDialog(messages.ingestProcessNewMissingMandatoryInfoDialogTitle(),
+        messages.ingestProcessNewMissingMandatoryInfoDialogMessage(missingPluginNames), messages.dialogOk(),
+        new AsyncCallback<Void>() {
+
+          @Override
+          public void onFailure(Throwable caught) {
+            Toast.showError(caught.getMessage());
+          }
+
+          @Override
+          public void onSuccess(Void result) {
+            // do nothing
+          }
+        });
+    }
 
   }
 

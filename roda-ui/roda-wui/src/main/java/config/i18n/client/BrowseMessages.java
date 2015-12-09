@@ -11,6 +11,7 @@
 package config.i18n.client;
 
 import java.util.Date;
+import java.util.List;
 
 import com.google.gwt.i18n.client.Messages;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -271,6 +272,12 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("{0} ({1})")
   String pluginLabel(String name, String version);
+  
+  @DefaultMessage("Missing mandatory information")
+  String ingestProcessNewMissingMandatoryInfoDialogTitle();
+  
+  @DefaultMessage("Please fill the following mandatory parameters: {0,list}")
+  String ingestProcessNewMissingMandatoryInfoDialogMessage(List<String> missingPluginNames);
 
   /************* Ingest process show ****************/
   @DefaultMessage("Waiting to start")
@@ -285,9 +292,5 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("Failed at {0,localdatetime,predef:DATE_TIME_MEDIUM}")
   String showJobStatusFailedDuringCreation(Date endDate);
 
-  
 
-  
-  
-  
 }

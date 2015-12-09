@@ -22,7 +22,7 @@ public class PluginOptionsPanel extends Composite {
 
   private PluginInfo pluginInfo = null;
   private List<PluginInfo> sipToAipPlugins = new ArrayList<>();
-  
+
   private final List<PluginParameterPanel> panels;
 
   private final FlowPanel layout;
@@ -67,6 +67,21 @@ public class PluginOptionsPanel extends Composite {
     }
 
     return ret;
+  }
+
+  public List<PluginParameter> getMissingMandatoryParameters() {
+    List<PluginParameter> missing = new ArrayList<>();
+
+    for (PluginParameterPanel panel : panels) {
+      PluginParameter parameter = panel.getParameter();
+      String value = panel.getValue();
+
+      if (parameter.isMandatory() && value == null) {
+        missing.add(parameter);
+      }
+    }
+
+    return missing;
   }
 
   public List<PluginInfo> getSipToAipPlugins() {

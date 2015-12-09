@@ -20,7 +20,6 @@ import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.Job.JOB_STATE;
 import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.common.client.ClientLogger;
 
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.core.client.GWT;
@@ -30,6 +29,7 @@ import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.view.client.ProvidesKey;
@@ -125,6 +125,9 @@ public class JobList extends AsyncTableCell<Job> {
     Label emptyInfo = new Label("No items to display");
     display.setEmptyTableWidget(emptyInfo);
     display.setColumnWidth(nameColumn, "100%");
+
+    // default sorting
+    display.getColumnSortList().push(new ColumnSortInfo(startDateColumn, false));
 
     startDateColumn.setCellStyleNames("nowrap");
     statusColumn.setCellStyleNames("nowrap");

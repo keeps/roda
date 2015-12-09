@@ -158,6 +158,7 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
   }
 
   private Timer autoUpdateTimer = null;
+  private int autoUpdateTimerMillis = 0;
 
   public void autoUpdate(int periodMillis) {
     if (autoUpdateTimer != null) {
@@ -168,12 +169,41 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
 
       @Override
       public void run() {
-        update();
+        dataProvider.update(new AsyncCallback<Void>() {
+
+          @Override
+          public void onFailure(Throwable caught) {
+            // disable auto-update
+            autoUpdateTimer.cancel();
+          }
+
+          @Override
+          public void onSuccess(Void result) {
+            // do nothing
+          }
+        });
       }
     };
 
+    autoUpdateTimerMillis = periodMillis;
     autoUpdateTimer.scheduleRepeating(periodMillis);
 
+  }
+
+  @Override
+  protected void onDetach() {
+    if (autoUpdateTimer != null) {
+      autoUpdateTimer.cancel();
+    }
+    super.onDetach();
+  }
+
+  @Override
+  protected void onLoad() {
+    if (autoUpdateTimer != null && autoUpdateTimerMillis > 0 && !autoUpdateTimer.isRunning()) {
+      autoUpdateTimer.scheduleRepeating(autoUpdateTimerMillis);
+    }
+    super.onLoad();
   }
 
   public void redraw() {

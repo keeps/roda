@@ -13,6 +13,7 @@ import org.roda.core.data.PluginInfo;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.PluginParameter.PluginParameterType;
 import org.roda.wui.client.common.utils.PluginUtils;
+import org.roda.wui.common.client.ClientLogger;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -28,6 +29,7 @@ import config.i18n.client.BrowseMessages;
 
 public class PluginParameterPanel extends Composite {
   private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
+  private ClientLogger logger = new ClientLogger(getClass().getName());
 
   private final PluginParameter parameter;
   private final List<PluginInfo> sipToAipPlugins;
@@ -56,7 +58,8 @@ public class PluginParameterPanel extends Composite {
     } else if (PluginParameterType.PLUGIN_SIP_TO_AIP.equals(parameter.getType())) {
       createPluginSipToAipLayout();
     } else {
-      // TODO log a warning
+      logger
+        .warn("Unsupported plugin parameter type: " + parameter.getType() + ". Reverting to default parameter editor.");
       createStringLayout();
     }
   }
@@ -68,13 +71,19 @@ public class PluginParameterPanel extends Composite {
     addHelp();
 
     FlowPanel radioGroup = new FlowPanel();
-    
+
     PluginUtils.sortByName(sipToAipPlugins);
 
     for (final PluginInfo pluginInfo : sipToAipPlugins) {
       if (pluginInfo != null) {
         RadioButton pRadio = new RadioButton(parameter.getName(),
           messages.pluginLabel(pluginInfo.getName(), pluginInfo.getVersion()));
+
+        if (pluginInfo.getId().equals(parameter.getDefaultValue())) {
+          pRadio.setValue(true);
+          value = pluginInfo.getId();
+        }
+
         Label pHelp = new Label(pluginInfo.getDescription());
 
         radioGroup.add(pRadio);
@@ -106,6 +115,10 @@ public class PluginParameterPanel extends Composite {
   private void createStringLayout() {
     Label parameterName = new Label(parameter.getName());
     TextBox parameterBox = new TextBox();
+    if (parameter.getDefaultValue() != null) {
+      parameterBox.setText(parameter.getDefaultValue());
+      value = parameter.getDefaultValue();
+    }
 
     layout.add(parameterName);
     layout.add(parameterBox);
@@ -126,6 +139,9 @@ public class PluginParameterPanel extends Composite {
 
   private void createBooleanLayout() {
     CheckBox checkBox = new CheckBox(parameter.getName());
+    checkBox.setValue("true".equals(parameter.getDefaultValue()));
+    value = "true".equals(parameter.getDefaultValue()) ? "true" : "false";
+    checkBox.setEnabled(!parameter.isReadonly());
 
     layout.add(checkBox);
     addHelp();
