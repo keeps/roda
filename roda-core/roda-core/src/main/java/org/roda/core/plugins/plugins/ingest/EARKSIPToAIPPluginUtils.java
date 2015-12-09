@@ -72,7 +72,8 @@ public class EARKSIPToAIPPluginUtils {
     if (sip.getDescriptiveMetadata() != null && sip.getDescriptiveMetadata().size() > 0) {
       for (SIPDescriptiveMetadata dm : sip.getDescriptiveMetadata()) {
         Binary fileBinary = (Binary) FSUtils.convertPathToResource(dm.getMetadata().getParent(), dm.getMetadata());
-        model.createDescriptiveMetadata(aip.getId(), dm.getMetadata().getFileName().toString(), fileBinary, "XXX");
+        String type = (dm.getMetadataType()!=null)?dm.getMetadataType().toString():"plain";
+        model.createDescriptiveMetadata(aip.getId(), dm.getMetadata().getFileName().toString(), fileBinary,type);
       }
     }
     /*

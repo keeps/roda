@@ -40,6 +40,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.TransformerException;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -183,16 +184,36 @@ public class SolrUtils {
     SolrInputDocument doc;
     InputStream inputStream;
     String xsltFilename = null;
+    InputStream transformerStream = null;
+
     try {
-      inputStream = binary.getContent().createInputStream();
 
-      Reader descMetadataReader = new InputStreamReader(inputStream);
-      xsltFilename = binary.getStoragePath().getName() + ".xslt";
-
-      InputStream transformerStream = RodaCoreFactory.getConfigurationFileAsStream("crosswalks/ingest/" + xsltFilename);
+      // get xslt from metadata type if defined
+      if (binary.getMetadata() != null) {
+        if (binary.getMetadata().get(RodaConstants.STORAGE_META_TYPE) != null
+          && binary.getMetadata().get(RodaConstants.STORAGE_META_TYPE).size() > 0) {
+          String metadataType = binary.getMetadata().get(RodaConstants.STORAGE_META_TYPE).iterator().next();
+          metadataType = metadataType.toLowerCase();
+          transformerStream = RodaCoreFactory
+            .getConfigurationFileAsStream("crosswalks/ingest/" + metadataType + ".xslt");
+        }
+      }
+      // get xslt from filename
+      if (transformerStream == null) {
+        String filename = FilenameUtils.removeExtension(binary.getStoragePath().getName());
+        if (filename != null) {
+          filename = filename.toLowerCase();
+          transformerStream = RodaCoreFactory.getConfigurationFileAsStream("crosswalks/ingest/" + filename + ".xslt");
+        }
+      }
+      // fallback
       if (transformerStream == null) {
         transformerStream = RodaCoreFactory.getConfigurationFileAsStream("crosswalks/ingest/" + "plain.xslt");
       }
+
+      inputStream = binary.getContent().createInputStream();
+
+      Reader descMetadataReader = new InputStreamReader(inputStream);
 
       // TODO support the use of scripts for non-xml transformers
       Reader xsltReader = new InputStreamReader(transformerStream);
@@ -235,27 +256,27 @@ public class SolrUtils {
 
   private static SolrInputDocument validateDescriptiveMetadataFields(SolrInputDocument doc) {
     SimpleDateFormat df = new SimpleDateFormat(RodaConstants.SOLRDATEFORMAT);
-    if(doc.get(RodaConstants.SDO_DATE_INITIAL)!=null){
+    if (doc.get(RodaConstants.SDO_DATE_INITIAL) != null) {
       Object value = doc.get(RodaConstants.SDO_DATE_INITIAL).getValue();
-      if(value instanceof String){
-        try{
+      if (value instanceof String) {
+        try {
           Date d = df.parse((String) value);
           doc.setField(RodaConstants.SDO_DATE_INITIAL, d);
-        }catch(ParseException pe){
+        } catch (ParseException pe) {
           doc.remove(RodaConstants.SDO_DATE_INITIAL);
-          doc.setField(RodaConstants.SDO_DATE_INITIAL+"_txt", value);
+          doc.setField(RodaConstants.SDO_DATE_INITIAL + "_txt", value);
         }
       }
     }
-    if(doc.get(RodaConstants.SDO_DATE_FINAL)!=null){
+    if (doc.get(RodaConstants.SDO_DATE_FINAL) != null) {
       Object value = doc.get(RodaConstants.SDO_DATE_FINAL).getValue();
-      if(value instanceof String){
-        try{
+      if (value instanceof String) {
+        try {
           Date d = df.parse((String) value);
           doc.setField(RodaConstants.SDO_DATE_FINAL, d);
-        }catch(ParseException pe){
+        } catch (ParseException pe) {
           doc.remove(RodaConstants.SDO_DATE_FINAL);
-          doc.setField(RodaConstants.SDO_DATE_FINAL+"_txt", value);
+          doc.setField(RodaConstants.SDO_DATE_FINAL + "_txt", value);
         }
       }
     }
@@ -720,8 +741,8 @@ public class SolrUtils {
       ret = resultClass.cast(solrDocumentToLogEntry(doc));
     } else if (resultClass.equals(SIPReport.class)) {
       ret = resultClass.cast(solrDocumentToSipState(doc));
-    } else if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class)
-      || resultClass.equals(Group.class)) {
+    } else
+      if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class) || resultClass.equals(Group.class)) {
       ret = resultClass.cast(solrDocumentToRodaMember(doc));
     } else if (resultClass.equals(RepresentationFilePreservationObject.class)) {
       ret = resultClass.cast(solrDocumentToRepresentationFilePreservationObject(doc));

@@ -25,6 +25,7 @@ import java.util.Map;
 import javax.xml.transform.TransformerException;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
@@ -244,6 +245,7 @@ public final class HTMLUtils {
   }
 
   private static InputStream getStylesheetInputStream(String xsltFolder, String filename) {
+    filename = FilenameUtils.removeExtension(filename);
     InputStream transformerStream = RodaCoreFactory.getConfigurationFileAsStream(xsltFolder + "/" + filename + ".xslt");
     if (transformerStream == null) {
       transformerStream = RodaCoreFactory.getConfigurationFileAsStream(xsltFolder + "/plain.xslt");
