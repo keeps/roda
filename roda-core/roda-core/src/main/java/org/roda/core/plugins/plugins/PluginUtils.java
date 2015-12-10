@@ -7,7 +7,13 @@
  */
 package org.roda.core.plugins.plugins;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -20,6 +26,7 @@ import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.v2.EventPreservationObject;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.JobReport;
@@ -27,8 +34,14 @@ import org.roda.core.data.v2.JobReport.PluginState;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.IndexServiceException;
+import org.roda.core.metadata.v2.premis.PremisEventHelper;
+import org.roda.core.metadata.v2.premis.PremisMetadataException;
 import org.roda.core.model.ModelService;
+import org.roda.core.model.ModelServiceException;
 import org.roda.core.plugins.Plugin;
+import org.roda.core.storage.Binary;
+import org.roda.core.storage.StorageServiceException;
+import org.roda.core.storage.fs.FSUtils;
 import org.w3c.util.DateParser;
 
 public final class PluginUtils {
@@ -139,5 +152,33 @@ public final class PluginUtils {
       // FIXME log error
     }
 
+  }
+
+  public static EventPreservationObject createPluginEvent(String aipID, String representationID, ModelService model,
+    String type, String details, String agentRole, String agentID, List<String> objectIDs, String outcome,
+    String detailNote, String detailExtension)
+      throws PremisMetadataException, IOException, StorageServiceException, ModelServiceException {
+    EventPreservationObject epo = new EventPreservationObject();
+    epo.setDatetime(new Date());
+    epo.setEventType(type);
+    epo.setEventDetail(details);
+    epo.setAgentRole(agentRole);
+    String name = UUID.randomUUID().toString();
+    epo.setId(name);
+    epo.setAgentID(agentID);
+    epo.setObjectIDs(objectIDs.toArray(new String[objectIDs.size()]));
+    epo.setOutcome(outcome);
+    epo.setOutcomeDetailNote(detailNote);
+    epo.setOutcomeDetailExtension(detailExtension);
+    byte[] serializedPremisEvent = new PremisEventHelper(epo).saveToByteArray();
+    Path file = Files.createTempFile("preservation", ".xml");
+    Files.copy(new ByteArrayInputStream(serializedPremisEvent), file, StandardCopyOption.REPLACE_EXISTING);
+    Binary resource = (Binary) FSUtils.convertPathToResource(file.getParent(), file);
+    if (representationID == null) { // "AIP Event"
+      model.createPreservationMetadata(aipID, name, resource);
+    } else {    // "Representation Event"
+      model.createPreservationMetadata(aipID, representationID, name, resource);
+    }
+    return epo;
   }
 }

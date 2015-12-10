@@ -7,18 +7,14 @@
  */
 package org.roda.core.plugins.plugins.antivirus;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.Attribute;
@@ -33,7 +29,6 @@ import org.roda.core.data.v2.JobReport.PluginState;
 import org.roda.core.data.v2.PluginType;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.IndexServiceException;
-import org.roda.core.metadata.v2.premis.PremisEventHelper;
 import org.roda.core.metadata.v2.premis.PremisMetadataException;
 import org.roda.core.model.AIP;
 import org.roda.core.model.ModelService;
@@ -42,7 +37,6 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginUtils;
-import org.roda.core.storage.Binary;
 import org.roda.core.storage.StoragePath;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StorageServiceException;
@@ -135,45 +129,44 @@ public class AntivirusPlugin implements Plugin<AIP> {
       reportItem.addAttribute(new Attribute("Agent name", getName()))
         .addAttribute(new Attribute("Agent version", getVersion()))
         .addAttribute(new Attribute("Start datetime", DateParser.getIsoDate(new Date())));
+      VirusCheckResult virusCheckResult = null;
+      Exception exception = null;
       try {
         LOGGER.debug("Checking if AIP " + aip.getId() + " is clean of virus");
         tempDirectory = Files.createTempDirectory("temp");
         StorageService tempStorage = new FileStorageService(tempDirectory);
         StoragePath aipPath = ModelUtils.getAIPpath(aip.getId());
         tempStorage.copy(storage, aipPath, aipPath);
-        VirusCheckResult virusCheckResult = null;
-        try {
-          virusCheckResult = getAntiVirus().checkForVirus(tempDirectory);
-          reportItem
-            .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME,
-              virusCheckResult.isClean() ? RodaConstants.REPORT_ATTR_OUTCOME_SUCCESS
-                : RodaConstants.REPORT_ATTR_OUTCOME_FAILURE))
-            .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, virusCheckResult.getReport()));
-          state = virusCheckResult.isClean() ? PluginState.OK : PluginState.ERROR;
-          LOGGER.debug("Done with checking if AIP " + aip.getId() + " has virus. Is clean of virus: "
-            + virusCheckResult.isClean() + ". Virus check report: " + virusCheckResult.getReport());
-          createEvent(virusCheckResult, aip, model);
-        } catch (RuntimeException e) {
-          reportItem
-            .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, RodaConstants.REPORT_ATTR_OUTCOME_FAILURE))
-            .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
-          LOGGER.debug("Exception running virus check on AIP " + aip.getId(), e);
-          throw new PluginException("Exception running virus check on AIP " + aip.getId(), e);
-        } catch (PremisMetadataException | IOException | StorageServiceException | ModelServiceException e) {
-          LOGGER.debug("Exception creating premis event for virus check on AIP " + aip.getId(), e);
-          throw new PluginException("Exception creating premis event for virus check on AIP " + aip.getId(), e);
-        }
+
+        virusCheckResult = getAntiVirus().checkForVirus(tempDirectory);
+        reportItem
+          .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME,
+            virusCheckResult.isClean() ? RodaConstants.REPORT_ATTR_OUTCOME_SUCCESS
+              : RodaConstants.REPORT_ATTR_OUTCOME_FAILURE))
+          .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, virusCheckResult.getReport()));
+        state = virusCheckResult.isClean() ? PluginState.OK : PluginState.ERROR;
+        LOGGER.debug("Done with checking if AIP " + aip.getId() + " has virus. Is clean of virus: "
+          + virusCheckResult.isClean() + ". Virus check report: " + virusCheckResult.getReport());
+      } catch (RuntimeException e) {
+        reportItem
+          .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, RodaConstants.REPORT_ATTR_OUTCOME_FAILURE))
+          .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
+        state = PluginState.ERROR;
+        exception = e;
+        LOGGER.error("Error processing AIP " + aip.getId(), e);
       } catch (StorageServiceException e) {
         reportItem
           .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, RodaConstants.REPORT_ATTR_OUTCOME_FAILURE))
           .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
         state = PluginState.ERROR;
+        exception = e;
         LOGGER.error("Error processing AIP " + aip.getId(), e);
       } catch (IOException e) {
         reportItem
           .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, RodaConstants.REPORT_ATTR_OUTCOME_FAILURE))
           .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
         state = PluginState.ERROR;
+        exception = e;
         LOGGER.error("Error creating temp folder for AIP " + aip.getId(), e);
       } finally {
         try {
@@ -184,6 +177,8 @@ public class AntivirusPlugin implements Plugin<AIP> {
           LOGGER.error("Error removing temp storage", e);
         }
       }
+
+      createEvent(virusCheckResult, exception, state, aip, model);
       report.addItem(reportItem);
 
       try {
@@ -197,30 +192,22 @@ public class AntivirusPlugin implements Plugin<AIP> {
     return report;
   }
 
-  private void createEvent(VirusCheckResult virusCheckResult, AIP aip, ModelService model)
-    throws PremisMetadataException, IOException, StorageServiceException, ModelServiceException {
+  private void createEvent(VirusCheckResult virusCheckResult, Exception exception, PluginState state, AIP aip,
+    ModelService model) throws PluginException {
 
-    for (String representationID : aip.getRepresentationIds()) {
-      DateFormat format = new SimpleDateFormat("yyyy-MM-dd_hh:mm:ss.SSS");
-      EventPreservationObject epo = new EventPreservationObject();
-      epo.setDatetime(new Date());
-      epo.setEventType(EventPreservationObject.PRESERVATION_EVENT_TYPE_ANTIVIRUS_CHECK);
-      epo.setEventDetail("All the files from the SIP were verified against an antivirus.");
-      epo.setAgentRole(EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_INGEST_TASK);
-      String name = UUID.randomUUID().toString(); // "virusCheck_" +
-                                                  // format.format(new Date()) +
-                                                  // ".premis.xml";
-      epo.setId(name);
-      epo.setAgentID("AGENT ID");
-      epo.setObjectIDs(new String[] {representationID});
-      epo.setOutcome(virusCheckResult.isClean() ? "success" : "error");
-      epo.setOutcomeDetailNote("Report");
-      epo.setOutcomeDetailExtension(virusCheckResult.getReport());
-      byte[] serializedPremisEvent = new PremisEventHelper(epo).saveToByteArray();
-      Path file = Files.createTempFile("preservation", ".xml");
-      Files.copy(new ByteArrayInputStream(serializedPremisEvent), file, StandardCopyOption.REPLACE_EXISTING);
-      Binary resource = (Binary) FSUtils.convertPathToResource(file.getParent(), file);
-      model.createPreservationMetadata(aip.getId(), representationID, name, resource);
+    try {
+      boolean success = (virusCheckResult != null) && virusCheckResult.isClean();
+
+      for (String representationID : aip.getRepresentationIds()) {
+        PluginUtils.createPluginEvent(aip.getId(), representationID, model,
+          EventPreservationObject.PRESERVATION_EVENT_TYPE_ANTIVIRUS_CHECK,
+          "All the files from the SIP were verified against an antivirus.",
+          EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_INGEST_TASK, "AGENT ID",
+          Arrays.asList(representationID), success ? "success" : "error", success ? "Report" : "Error",
+          success ? virusCheckResult.getReport() : exception.getMessage());
+      }
+    } catch (PremisMetadataException | IOException | StorageServiceException | ModelServiceException e) {
+      throw new PluginException(e.getMessage(), e);
     }
 
     // TODO agent
