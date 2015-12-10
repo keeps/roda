@@ -12,6 +12,7 @@ import java.io.StringWriter;
 import java.nio.file.Path;
 
 import org.apache.commons.io.IOUtils;
+import org.roda.core.RodaCoreFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -132,7 +133,9 @@ public class ClamAntiVirus implements AntiVirus {
       LOGGER.debug("Executing virus scan in " + path.toString());
 
       // clamscan -r -i bin/ 2> /dev/null
-      ProcessBuilder processBuilder = new ProcessBuilder("/usr/bin/clamscan", "-ri", path.toString());
+      String clamavBin = RodaCoreFactory.getRodaConfiguration()
+        .getString("core.plugins.internal.virus_check.clamav.bin", "/usr/bin/clamscan");
+      ProcessBuilder processBuilder = new ProcessBuilder(clamavBin, "-ri", path.toString());
 
       // processBuilder.redirectErrorStream();
       Process process = processBuilder.start();

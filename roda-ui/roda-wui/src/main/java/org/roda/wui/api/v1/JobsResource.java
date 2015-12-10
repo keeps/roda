@@ -127,7 +127,7 @@ public class JobsResource {
 
       for (JobReport jobReport : find.getResults()) {
         sb.append(jobReport.toString());
-        sb.append("\n");
+        sb.append("<br/>");
       }
 
       return Response.ok(sb.toString(), MediaType.TEXT_HTML).build();

@@ -40,6 +40,7 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginUtils;
 import org.roda.core.plugins.plugins.antivirus.AntivirusPlugin;
 import org.roda.core.plugins.plugins.base.AIPValidationPlugin;
+import org.roda.core.plugins.plugins.ingest.characterization.PremisSkeletonPlugin;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,8 +49,11 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultIngestPlugin.class);
 
   public static final PluginParameter PARAMETER_SIP_TO_AIP_CLASS = new PluginParameter("parameter.sip_to_aip_class",
-    "SIP to AIP transformer", PluginParameterType.PLUGIN_SIP_TO_AIP, "", true, false,
-    "Canonical name of the class that will be used to transform the SIP into an AIP.");
+    "SIP format", PluginParameterType.PLUGIN_SIP_TO_AIP, "", true, false,
+    "Known format of SIP to be ingest into the repository.");
+  public static final PluginParameter PARAMETER_CREATE_PREMIS_SKELETON = new PluginParameter(
+    "parameter.create.premis.skeleton", "Create PREMIS skeleton", PluginParameterType.BOOLEAN, "true", true, true,
+    "Create PREMIS related files with the basic information.");
   public static final PluginParameter PARAMETER_DO_VIRUS_CHECK = new PluginParameter("parameter.do_virus_check",
     "Virus check", PluginParameterType.BOOLEAN, "false", true, false, "Verifies if an SIP is free of virus.");
   public static final PluginParameter PARAMETER_DO_SIP_SYNTAX_CHECK = new PluginParameter(
@@ -63,7 +67,7 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
     "Auto accept SIP", PluginParameterType.BOOLEAN, "false", true, false, "Automatically accept SIPs.");
 
   private Map<String, String> parameters;
-  private int totalSteps = 5;
+  private int totalSteps = 6;
   private int currentCompletionPercentage = 0;
   private int completionPercentageStep = 100 / totalSteps;
   private Map<String, String> aipIdToObjectId;
@@ -90,13 +94,14 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
 
   @Override
   public String getDescription() {
-    return "Performs all the tasks needed to ingest an SIP into an AIP";
+    return "Performs all the tasks needed to ingest an SIP into the repository and therefore creating an AIP";
   }
 
   @Override
   public List<PluginParameter> getParameters() {
     ArrayList<PluginParameter> pluginParameters = new ArrayList<PluginParameter>();
     pluginParameters.add(PARAMETER_SIP_TO_AIP_CLASS);
+    pluginParameters.add(PARAMETER_CREATE_PREMIS_SKELETON);
     pluginParameters.add(PARAMETER_DO_VIRUS_CHECK);
     pluginParameters.add(PARAMETER_DO_SIP_SYNTAX_CHECK);
     pluginParameters.add(PARAMETER_DO_PRODUCER_AUTHORIZATION_CHECK);
@@ -115,16 +120,6 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
     completionPercentageStep = calculateCompletionPercentageStep();
   }
 
-  private int calculateCompletionPercentageStep() {
-    int effectiveTotalSteps = totalSteps;
-    for (PluginParameter pluginParameter : getParameters()) {
-      if (pluginParameter.getType() == PluginParameterType.BOOLEAN && !verifyIfStepShouldBePerformed(pluginParameter)) {
-        effectiveTotalSteps--;
-      }
-    }
-    return 100 / effectiveTotalSteps;
-  }
-
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<TransferredResource> resources) throws PluginException {
@@ -135,75 +130,86 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
     Map<String, Report> reports = new HashMap<>();
     aipIdToObjectId = new HashMap<>();
 
-    updateJobStatus(index, model, null, 0);
+    updateJobStatus(index, model, 0);
 
     // 1) transform TransferredResource into an AIP
-    pluginReport = transformTransferredResourceIntoAnAIP(index, model, storage, resources);
-    reports = mergeReports(reports, pluginReport);
-
     // 1.1) obtain list of AIPs that were successfully transformed from
     // transferred resources
+    pluginReport = transformTransferredResourceIntoAnAIP(index, model, storage, resources);
+    reports = mergeReports(reports, pluginReport);
     List<AIP> aips = getAIPsFromReports(index, reports);
+    updateJobStatus(index, model);
 
-    updateJobStatus(index, model, null);
+    // 2) create premis skeleton
+    pluginReport = createPremisSkeleton(index, model, storage, aips);
+    reports = mergeReports(reports, pluginReport);
+    updateJobStatus(index, model);
 
-    // 2) do virus check
+    // 3) do virus check
     if (verifyIfStepShouldBePerformed(PARAMETER_DO_VIRUS_CHECK)) {
       pluginReport = doVirusCheck(index, model, storage, aips);
       reports = mergeReports(reports, pluginReport);
-      updateJobStatus(index, model, null);
+      updateJobStatus(index, model);
     }
 
-    // 3) verify if AIP is well formed
+    // 4) verify if AIP is well formed
     pluginReport = verifyIfAipIsWellFormed(index, model, storage, aips);
     reports = mergeReports(reports, pluginReport);
+    updateJobStatus(index, model);
 
-    updateJobStatus(index, model, null);
-
-    // 4) verify if the user has permissions to ingest SIPS into the specified
+    // 5) verify if the user has permissions to ingest SIPS into the specified
     // fonds
-    pluginReport = verifyProducerAuthorization();
+    pluginReport = verifyProducerAuthorization(index, model, storage, aips);
     reports = mergeReports(reports, pluginReport);
+    updateJobStatus(index, model);
 
-    // 5) do file format normalization
-    pluginReport = doFileFormatNormalization(index, model, storage, aips);
-    reports = mergeReports(reports, pluginReport);
+    // 6) do file format normalization
+    // pluginReport = doFileFormatNormalization(index, model, storage, aips);
+    // reports = mergeReports(reports, pluginReport);
 
-    // 6) generate dissemination copy
-    pluginReport = generateDisseminationCopy(index, model, storage, aips);
-    reports = mergeReports(reports, pluginReport);
+    // 7) generate dissemination copy
+    // pluginReport = generateDisseminationCopy(index, model, storage, aips);
+    // reports = mergeReports(reports, pluginReport);
 
-    // 7) do auto accept
+    // 8) do auto accept
     if (verifyIfStepShouldBePerformed(PARAMETER_DO_AUTO_ACCEPT)) {
       pluginReport = doAutoAccept(index, model, storage, aips);
       reports = mergeReports(reports, pluginReport);
     }
 
-    updateJobStatus(index, model, null, 100);
+    updateJobStatus(index, model, 100);
 
     return report;
   }
 
-  private void updateJobStatus(IndexService index, ModelService model, Map<String, Report> reports) {
-    currentCompletionPercentage = currentCompletionPercentage + completionPercentageStep;
-    updateJobStatus(index, model, reports, currentCompletionPercentage);
+  private int calculateCompletionPercentageStep() {
+    int effectiveTotalSteps = totalSteps;
+    for (PluginParameter pluginParameter : getParameters()) {
+      if (pluginParameter.getType() == PluginParameterType.BOOLEAN && !verifyIfStepShouldBePerformed(pluginParameter)) {
+        effectiveTotalSteps--;
+      }
+    }
+    return 100 / effectiveTotalSteps;
   }
 
-  private void updateJobStatus(IndexService index, ModelService model, Map<String, Report> reports,
-    int newCompletionPercentage) {
+  private void updateJobStatus(IndexService index, ModelService model) {
+    currentCompletionPercentage = currentCompletionPercentage + completionPercentageStep;
+    updateJobStatus(index, model, currentCompletionPercentage);
+  }
+
+  private void updateJobStatus(IndexService index, ModelService model, int newCompletionPercentage) {
     try {
       LOGGER.debug("New job completionPercentage: " + newCompletionPercentage);
       Job job = PluginUtils.getJobFromIndex(index, parameters);
       job.setCompletionPercentage(newCompletionPercentage);
-      if (reports != null) {
-        job.setObjectIdsToAipIds(reports);
-      }
+
       if (newCompletionPercentage == 0) {
         job.setState(JOB_STATE.STARTED);
       } else if (newCompletionPercentage == 100) {
         job.setState(JOB_STATE.COMPLETED);
         job.setEndDate(new Date());
       }
+
       model.updateJob(job);
     } catch (IndexServiceException | NotFoundException e) {
       LOGGER.error("Unable to get Job from index", e);
@@ -250,7 +256,6 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
 
   private Map<String, Report> mergeReports(Map<String, Report> reports, Report plugin) {
     if (plugin != null) {
-      // LOGGER.debug("MAP: {} PluginReport: {}", aipIdToObjectId, plugin);
       for (ReportItem reportItem : plugin.getItems()) {
         if (StringUtils.isNotBlank(reportItem.getOtherId())) {
           aipIdToObjectId.put(reportItem.getItemId(), reportItem.getOtherId());
@@ -288,6 +293,10 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
     return report;
   }
 
+  private Report createPremisSkeleton(IndexService index, ModelService model, StorageService storage, List<AIP> aips) {
+    return executePlugin(index, model, storage, aips, PremisSkeletonPlugin.class.getName());
+  }
+
   private Report doVirusCheck(IndexService index, ModelService model, StorageService storage, List<AIP> aips) {
     return executePlugin(index, model, storage, aips, AntivirusPlugin.class.getName());
   }
@@ -297,8 +306,9 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
     return executePlugin(index, model, storage, aips, AIPValidationPlugin.class.getName());
   }
 
-  private Report verifyProducerAuthorization() {
-    return null;
+  private Report verifyProducerAuthorization(IndexService index, ModelService model, StorageService storage,
+    List<AIP> aips) {
+    return executePlugin(index, model, storage, aips, VerifyProducerAuthorizationPlugin.class.getName());
   }
 
   private Report doFileFormatNormalization(IndexService index, ModelService model, StorageService storage,
@@ -312,7 +322,7 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
   }
 
   private Report doAutoAccept(IndexService index, ModelService model, StorageService storage, List<AIP> aips) {
-    return executePlugin(index, model, storage, aips, AutoAcceptSIP.class.getName());
+    return executePlugin(index, model, storage, aips, AutoAcceptSIPPlugin.class.getName());
   }
 
   @Override

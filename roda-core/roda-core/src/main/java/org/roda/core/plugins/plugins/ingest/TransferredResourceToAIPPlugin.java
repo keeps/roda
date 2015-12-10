@@ -24,24 +24,26 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.roda.core.data.Attribute;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
+import org.roda.core.data.ReportItem;
 import org.roda.core.data.common.InvalidParameterException;
-import org.roda.core.data.v2.Job;
+import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.JobReport.PluginState;
 import org.roda.core.data.v2.PluginType;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.AIP;
-import org.roda.core.model.File;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.ModelServiceException;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginUtils;
+import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.fs.FSUtils;
-import org.roda.core.storage.Binary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,12 +63,12 @@ public class TransferredResourceToAIPPlugin implements Plugin<TransferredResourc
 
   @Override
   public String getName() {
-    return "TransferredResource to AIP";
+    return "Uploaded file/directory";
   }
 
   @Override
   public String getDescription() {
-    return "Converts a TransferredResource to an AIP";
+    return "Understands a file/directory as an SIP";
   }
 
   @Override
@@ -92,9 +94,12 @@ public class TransferredResourceToAIPPlugin implements Plugin<TransferredResourc
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<TransferredResource> list)
     throws PluginException {
+    Report report = PluginUtils.createPluginReport(this);
+    PluginState state;
 
-    // String jobId = PluginUtils.getJobId(parameters);
     for (TransferredResource transferredResource : list) {
+      ReportItem reportItem = PluginUtils.createPluginReportItem(transferredResource, this);
+
       try {
         Path transferredResourcePath = Paths.get(transferredResource.getFullPath());
         AIP aip = model.createAIP(new HashMap<String, Set<String>>(), false, true);
@@ -150,16 +155,24 @@ public class TransferredResourceToAIPPlugin implements Plugin<TransferredResourc
         model.createDescriptiveMetadata(aip.getId(), "metadata.xml", metadataBinary, "metadata");
 
         aip = model.retrieveAIP(aip.getId());
-        // Job job = index.retrieve(Job.class, jobId);
-        // job.addObjectIdToAipIdMapping(transferredResource.getId(),
-        // aip.getId());
-        // model.updateJob(job);
+
+        state = PluginState.OK;
+        reportItem.setItemId(aip.getId());
+        reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
       } catch (Throwable e) {
-        LOGGER.error("Error converting " + transferredResource.getId() + " to AIP: " + e.getMessage(), e);
+        LOGGER.error("Error converting " + transferredResource.getId() + " to AIP", e);
+        state = PluginState.ERROR;
+        reportItem.setItemId(null);
+        reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()))
+          .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS,
+            "Error converting " + transferredResource.getId() + " to AIP: " + e.getMessage()));
       }
 
+      report.addItem(reportItem);
+      PluginUtils.createJobReport(model, this, reportItem, state, PluginUtils.getJobId(parameters));
+
     }
-    return null;
+    return report;
   }
 
   @Override

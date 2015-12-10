@@ -13,19 +13,24 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.roda.core.common.PremisUtils;
+import org.roda.core.data.Attribute;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
+import org.roda.core.data.ReportItem;
 import org.roda.core.data.common.InvalidParameterException;
+import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.v2.JobReport.PluginState;
 import org.roda.core.data.v2.PluginType;
 import org.roda.core.data.v2.Representation;
 import org.roda.core.data.v2.RepresentationFilePreservationObject;
 import org.roda.core.data.v2.RepresentationPreservationObject;
 import org.roda.core.index.IndexService;
+import org.roda.core.index.IndexServiceException;
 import org.roda.core.metadata.v2.premis.PremisFileObjectHelper;
 import org.roda.core.metadata.v2.premis.PremisMetadataException;
 import org.roda.core.metadata.v2.premis.PremisRepresentationObjectHelper;
@@ -35,6 +40,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.model.ModelServiceException;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.plugins.PluginUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StorageServiceException;
@@ -43,7 +49,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PremisSkeletonPlugin implements Plugin<AIP> {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+  private static final Logger LOGGER = LoggerFactory.getLogger(PremisSkeletonPlugin.class);
+
+  private Map<String, String> parameters;
 
   @Override
   public void init() throws PluginException {
@@ -56,12 +64,12 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
 
   @Override
   public String getName() {
-    return "Premis skeleton action";
+    return "PREMIS skeleton action";
   }
 
   @Override
   public String getDescription() {
-    return "Create the premis related files with the basic information";
+    return "Create PREMIS related files with the basic information";
   }
 
   @Override
@@ -76,31 +84,37 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
 
   @Override
   public Map<String, String> getParameterValues() {
-    return new HashMap<>();
+    return parameters;
   }
 
   @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
-    // no params
+    this.parameters = parameters;
   }
 
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
+    Report report = PluginUtils.createPluginReport(this);
+    PluginState state;
+
     try {
       Path temp = Files.createTempDirectory("temp");
       for (AIP aip : list) {
-        logger.debug("Processing AIP " + aip.getId());
+        LOGGER.debug("Processing AIP " + aip.getId());
+        ReportItem reportItem = PluginUtils.createPluginReportItem(this,
+          "Creating base premis related directories/files for " + aip.getId(), aip.getId(), null);
+
         try {
           for (String representationID : aip.getRepresentationIds()) {
-            logger.debug("Processing representation " + representationID + " from AIP " + aip.getId());
+            LOGGER.debug("Processing representation " + representationID + " from AIP " + aip.getId());
             RepresentationPreservationObject pObject = new RepresentationPreservationObject();
             pObject.setId(representationID);
             pObject.setPreservationLevel("");
             Representation representation = model.retrieveRepresentation(aip.getId(), representationID);
             List<RepresentationFilePreservationObject> pObjectPartFiles = new ArrayList<RepresentationFilePreservationObject>();
             for (String fileID : representation.getFileIds()) {
-              logger.debug("Processing file " + fileID + " from " + representationID + " of AIP " + aip.getId());
+              LOGGER.debug("Processing file " + fileID + " from " + representationID + " of AIP " + aip.getId());
               File file = model.retrieveFile(aip.getId(), representationID, fileID);
               Binary binary = storage.getBinary(file.getStoragePath());
               Path pathFile = Paths.get(temp.toString(), file.getStoragePath().getName());
@@ -128,18 +142,30 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
               (Binary) FSUtils.convertPathToResource(premisRepresentation.getParent(), premisRepresentation));
             FSUtils.deletePath(premisRepresentation);
           }
-        } catch (ModelServiceException mse) {
-          logger.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage(), mse);
-        } catch (StorageServiceException sse) {
-          logger.error("Error processing AIP " + aip.getId() + ": " + sse.getMessage(), sse);
-        } catch (PremisMetadataException pme) {
-          logger.error("Error processing AIP " + aip.getId() + ": " + pme.getMessage(), pme);
+
+          state = PluginState.OK;
+          reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
+        } catch (ModelServiceException | StorageServiceException | PremisMetadataException e) {
+          LOGGER.error("Error processing AIP " + aip.getId(), e);
+
+          state = PluginState.ERROR;
+          reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()))
+            .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS,
+              "Error processing AIP " + aip.getId() + ": " + e.getMessage()));
+        }
+
+        report.addItem(reportItem);
+        try {
+          PluginUtils.updateJobReport(model, index, this, reportItem, state, PluginUtils.getJobId(parameters),
+            aip.getId());
+        } catch (IndexServiceException | NotFoundException e) {
+          LOGGER.error("", e);
         }
       }
     } catch (IOException ioe) {
-      logger.error("Error executing FastCharacterizationAction: " + ioe.getMessage(), ioe);
+      LOGGER.error("Error executing FastCharacterizationAction: " + ioe.getMessage(), ioe);
     }
-    return null;
+    return report;
   }
 
   @Override

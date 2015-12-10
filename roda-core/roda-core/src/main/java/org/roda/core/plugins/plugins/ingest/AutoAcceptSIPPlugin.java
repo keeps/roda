@@ -7,11 +7,10 @@
  */
 package org.roda.core.plugins.plugins.ingest;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.roda.core.data.Attribute;
 import org.roda.core.data.PluginParameter;
@@ -19,26 +18,32 @@ import org.roda.core.data.Report;
 import org.roda.core.data.ReportItem;
 import org.roda.core.data.common.InvalidParameterException;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.JobReport.PluginState;
 import org.roda.core.data.v2.PluginType;
-import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.index.IndexService;
+import org.roda.core.index.IndexServiceException;
 import org.roda.core.model.AIP;
 import org.roda.core.model.ModelService;
+import org.roda.core.model.ModelServiceException;
+import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginUtils;
+import org.roda.core.storage.StoragePath;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.StorageServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class BagitToAIPPlugin implements Plugin<TransferredResource> {
-  private static final Logger LOGGER = LoggerFactory.getLogger(BagitToAIPPlugin.class);
+public class AutoAcceptSIPPlugin implements Plugin<AIP> {
+  private static final Logger LOGGER = LoggerFactory.getLogger(AutoAcceptSIPPlugin.class);
 
   private Map<String, String> parameters;
 
   @Override
   public void init() throws PluginException {
+    // do nothing
   }
 
   @Override
@@ -48,17 +53,17 @@ public class BagitToAIPPlugin implements Plugin<TransferredResource> {
 
   @Override
   public String getName() {
-    return "Bagit";
-  }
-
-  @Override
-  public String getDescription() {
-    return "Generic bagit zip file";
+    return "Auto accept SIP";
   }
 
   @Override
   public String getVersion() {
     return "1.0";
+  }
+
+  @Override
+  public String getDescription() {
+    return "Automatically accepts SIPs ingested without manual validation";
   }
 
   @Override
@@ -77,34 +82,43 @@ public class BagitToAIPPlugin implements Plugin<TransferredResource> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage, List<TransferredResource> list)
+  public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
     Report report = PluginUtils.createPluginReport(this);
     PluginState state;
-    
-    for (TransferredResource transferredResource : list) {
-      Path bagitPath = Paths.get(transferredResource.getFullPath());
 
-      ReportItem reportItem = PluginUtils.createPluginReportItem(transferredResource, this);
+    for (AIP aip : list) {
+      ReportItem reportItem = PluginUtils.createPluginReportItem(this, "Auto accept AIP " + aip.getId(), aip.getId(),
+        null);
+
       try {
-        LOGGER.debug("Converting " + bagitPath + " to AIP");
-        AIP aipCreated = BagitToAIPPluginUtils.bagitToAip(bagitPath, model, "metadata.xml");
+        LOGGER.debug("Auto accepting AIP " + aip.getId());
+        StoragePath aipPath = ModelUtils.getAIPpath(aip.getId());
+        Map<String, Set<String>> aipMetadata = storage.getMetadata(aipPath);
+        ModelUtils.setAs(aipMetadata, RodaConstants.STORAGE_META_ACTIVE, true);
+        storage.updateMetadata(aipPath, aipMetadata, true);
+        model.updateAIP(aip.getId());
 
         state = PluginState.OK;
-        reportItem.setItemId(aipCreated.getId());
+        reportItem.setItemId(aip.getId());
         reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
+        LOGGER.debug("Done with auto accepting AIP " + aip.getId());
+      } catch (ModelServiceException | StorageServiceException e) {
+        LOGGER.error("Error updating AIP (metadata attribute active=true)", e);
 
-        LOGGER.debug("Done with converting " + bagitPath + " to AIP " + aipCreated.getId());
-      } catch (Throwable e) {
         state = PluginState.ERROR;
-        reportItem.setItemId(null);
         reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()))
-          .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
-
-        LOGGER.error("Error converting " + bagitPath + " to AIP", e);
+          .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS,
+            "Error updating AIP (metadata attribute active=true): " + e.getMessage()));
       }
+      
       report.addItem(reportItem);
-      PluginUtils.createJobReport(model, this, reportItem, state, PluginUtils.getJobId(parameters));
+      try {
+        PluginUtils.updateJobReport(model, index, this, reportItem, state, PluginUtils.getJobId(parameters),
+          aip.getId());
+      } catch (IndexServiceException | NotFoundException e) {
+        LOGGER.error("", e);
+      }
     }
 
     return report;
@@ -112,24 +126,24 @@ public class BagitToAIPPlugin implements Plugin<TransferredResource> {
 
   @Override
   public Report beforeExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-
+    // do nothing
     return null;
   }
 
   @Override
   public Report afterExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-
+    // do nothing
     return null;
   }
 
   @Override
-  public Plugin<TransferredResource> cloneMe() {
-    return new BagitToAIPPlugin();
+  public Plugin<AIP> cloneMe() {
+    return new AutoAcceptSIPPlugin();
   }
 
   @Override
   public PluginType getType() {
-    return PluginType.SIP_TO_AIP;
+    return PluginType.AIP_TO_AIP;
   }
 
   @Override

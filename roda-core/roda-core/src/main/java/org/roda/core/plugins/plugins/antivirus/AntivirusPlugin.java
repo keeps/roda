@@ -12,7 +12,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -44,7 +43,6 @@ import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.util.DateParser;
 
 public class AntivirusPlugin implements Plugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(AntivirusPlugin.class);
@@ -124,11 +122,9 @@ public class AntivirusPlugin implements Plugin<AIP> {
     PluginState state;
 
     for (AIP aip : list) {
-      ReportItem reportItem = new ReportItem("Checking " + aip.getId() + " for virus");
-      reportItem.setItemId(aip.getId());
-      reportItem.addAttribute(new Attribute("Agent name", getName()))
-        .addAttribute(new Attribute("Agent version", getVersion()))
-        .addAttribute(new Attribute("Start datetime", DateParser.getIsoDate(new Date())));
+      ReportItem reportItem = PluginUtils.createPluginReportItem(this, "Checking " + aip.getId() + " for virus",
+        aip.getId(), null);
+
       VirusCheckResult virusCheckResult = null;
       Exception exception = null;
       try {
@@ -139,33 +135,30 @@ public class AntivirusPlugin implements Plugin<AIP> {
         tempStorage.copy(storage, aipPath, aipPath);
 
         virusCheckResult = getAntiVirus().checkForVirus(tempDirectory);
-        reportItem
-          .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME,
-            virusCheckResult.isClean() ? RodaConstants.REPORT_ATTR_OUTCOME_SUCCESS
-              : RodaConstants.REPORT_ATTR_OUTCOME_FAILURE))
-          .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, virusCheckResult.getReport()));
         state = virusCheckResult.isClean() ? PluginState.OK : PluginState.ERROR;
+        reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()))
+          .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, virusCheckResult.getReport()));
         LOGGER.debug("Done with checking if AIP " + aip.getId() + " has virus. Is clean of virus: "
           + virusCheckResult.isClean() + ". Virus check report: " + virusCheckResult.getReport());
       } catch (RuntimeException e) {
-        reportItem
-          .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, RodaConstants.REPORT_ATTR_OUTCOME_FAILURE))
-          .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
         state = PluginState.ERROR;
+        reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()))
+          .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
+
         exception = e;
         LOGGER.error("Error processing AIP " + aip.getId(), e);
       } catch (StorageServiceException e) {
-        reportItem
-          .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, RodaConstants.REPORT_ATTR_OUTCOME_FAILURE))
-          .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
         state = PluginState.ERROR;
+        reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()))
+          .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
+
         exception = e;
         LOGGER.error("Error processing AIP " + aip.getId(), e);
       } catch (IOException e) {
-        reportItem
-          .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, RodaConstants.REPORT_ATTR_OUTCOME_FAILURE))
-          .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
         state = PluginState.ERROR;
+        reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()))
+          .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
+
         exception = e;
         LOGGER.error("Error creating temp folder for AIP " + aip.getId(), e);
       } finally {

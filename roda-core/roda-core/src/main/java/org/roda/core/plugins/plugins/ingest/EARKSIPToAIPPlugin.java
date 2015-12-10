@@ -48,12 +48,12 @@ public class EARKSIPToAIPPlugin implements Plugin<TransferredResource> {
 
   @Override
   public String getName() {
-    return "EARK SIP to AIP";
+    return "E-ARK";
   }
 
   @Override
   public String getDescription() {
-    return "Converts a EARK SIP zip file to an AIP";
+    return "E-ARK SIP in zip file";
   }
 
   @Override
@@ -80,8 +80,8 @@ public class EARKSIPToAIPPlugin implements Plugin<TransferredResource> {
   public Report execute(IndexService index, ModelService model, StorageService storage, List<TransferredResource> list)
     throws PluginException {
     Report report = PluginUtils.createPluginReport(this);
-
     PluginState state;
+    
     for (TransferredResource transferredResource : list) {
       Path earkSIPPath = Paths.get(transferredResource.getFullPath());
 
@@ -90,18 +90,16 @@ public class EARKSIPToAIPPlugin implements Plugin<TransferredResource> {
         LOGGER.debug("Converting " + earkSIPPath + " to AIP");
         AIP aipCreated = EARKSIPToAIPPluginUtils.earkSIPToAip(earkSIPPath, model, storage);
 
-        reportItem.setItemId(aipCreated.getId());
-        reportItem
-          .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, RodaConstants.REPORT_ATTR_OUTCOME_SUCCESS));
         state = PluginState.OK;
+        reportItem.setItemId(aipCreated.getId());
+        reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
 
         LOGGER.debug("Done with converting " + earkSIPPath + " to AIP " + aipCreated.getId());
       } catch (Throwable e) {
-        reportItem.setItemId(null);
-        reportItem
-          .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, RodaConstants.REPORT_ATTR_OUTCOME_FAILURE))
-          .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
         state = PluginState.ERROR;
+        reportItem.setItemId(null);
+        reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()))
+          .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
 
         LOGGER.error("Error converting " + earkSIPPath + " to AIP", e);
       }

@@ -867,6 +867,10 @@
 	padding-top: 5px;
 }
 
+.pagination{
+	display: none;
+}
+
 
 /* Tables for metadata content
 –––––––––––––––––––––––––––––––––––––––––––––––––– */

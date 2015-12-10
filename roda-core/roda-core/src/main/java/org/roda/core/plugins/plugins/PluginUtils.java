@@ -62,8 +62,18 @@ public final class PluginUtils {
   }
 
   public static ReportItem createPluginReportItem(TransferredResource transferredResource, Plugin plugin) {
-    ReportItem reportItem = new ReportItem("SIP to AIP from " + transferredResource.getId());
-    reportItem.setOtherId(transferredResource.getId());
+    return createPluginReportItem(plugin, "SIP to AIP from " + transferredResource.getId(), null,
+      transferredResource.getId());
+  }
+
+  public static ReportItem createPluginReportItem(Plugin plugin, String title, String itemId, String otherId) {
+    ReportItem reportItem = new ReportItem(title);
+    if (itemId != null) {
+      reportItem.setItemId(itemId);
+    }
+    if (otherId != null) {
+      reportItem.setOtherId(otherId);
+    }
     reportItem.addAttribute(new Attribute("Agent name", plugin.getName()))
       .addAttribute(new Attribute("Agent version", plugin.getVersion()))
       .addAttribute(new Attribute("Start datetime", DateParser.getIsoDate(new Date())));

@@ -16,7 +16,6 @@ import java.util.Map;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
 import org.roda.core.data.common.InvalidParameterException;
-import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.PluginType;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.index.IndexService;
@@ -24,7 +23,6 @@ import org.roda.core.model.AIP;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.plugins.PluginUtils;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,7 +113,10 @@ public class ArcheevoBagitToAIPPlugin implements Plugin<TransferredResource> {
 
   @Override
   public PluginType getType() {
-    return PluginType.SIP_TO_AIP;
+    // FIXME
+    // return PluginType.SIP_TO_AIP;
+    return PluginType.MISC;
+
   }
 
   @Override

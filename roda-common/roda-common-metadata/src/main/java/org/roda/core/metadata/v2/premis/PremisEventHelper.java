@@ -296,7 +296,7 @@ public class PremisEventHelper {
       ExtensionComplexType eventOutcomeDetailExtension = eventOutcomeDetail.addNewEventOutcomeDetailExtension();
 
       try {
-
+        // FIXME
         XmlObject xmlPObject = XmlObject.Factory.parse("<p xmlns=\"http://www.w3.org/1999/xhtml\">"
           + XmlEncodeUtility.encode(eventPObject.getOutcomeDetailExtension()) + "</p>");
 
