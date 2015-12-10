@@ -17,6 +17,12 @@
 					<xsl:value-of select="." />
 				</field>
 	        </xsl:when>
+	        <xsl:when test="@name='parent'">
+				<field>
+					<xsl:attribute name="name">parentId</xsl:attribute>
+					<xsl:value-of select="." />
+				</field>
+	        </xsl:when>
         	<xsl:otherwise>
           		<field>
 					<xsl:attribute name="name"><xsl:value-of select="@name" /><xsl:text>_txt</xsl:text></xsl:attribute>
