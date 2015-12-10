@@ -623,6 +623,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
         }
       }
     }
+    
+    // adding all AIP to AIP plugins for job report list
+    List<PluginInfo> aipToAipPlugins = RodaCoreFactory.getPluginManager().getPluginsInfo(PluginType.AIP_TO_AIP);
+    pluginsInfo.addAll(aipToAipPlugins);
+    
 
     JobBundle bundle = new JobBundle();
     bundle.setJob(job);

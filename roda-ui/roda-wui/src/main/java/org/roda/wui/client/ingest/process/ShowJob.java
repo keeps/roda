@@ -10,7 +10,9 @@
  */
 package org.roda.wui.client.ingest.process;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.roda.core.data.PluginInfo;
 import org.roda.core.data.PluginParameter;
@@ -18,21 +20,24 @@ import org.roda.core.data.PluginParameter.PluginParameterType;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.Job.JOB_STATE;
+import org.roda.core.data.v2.JobReport;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.JobReportList;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.JavascriptUtils;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -41,7 +46,6 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.Widget;
@@ -69,7 +73,12 @@ public class ShowJob extends Composite {
 
           @Override
           public void onSuccess(JobBundle jobBundle) {
-            ShowJob showJob = new ShowJob(jobBundle.getJob(), jobBundle.getPluginsInfo());
+            Map<String, PluginInfo> pluginsInfo = new HashMap<String, PluginInfo>();
+            for (PluginInfo pluginInfo : jobBundle.getPluginsInfo()) {
+              pluginsInfo.put(pluginInfo.getId(), pluginInfo);
+            }
+
+            ShowJob showJob = new ShowJob(jobBundle.getJob(), pluginsInfo);
             callback.onSuccess(showJob);
           }
         });
@@ -104,7 +113,7 @@ public class ShowJob extends Composite {
   // private ClientLogger logger = new ClientLogger(getClass().getName());
 
   private final Job job;
-  private final List<PluginInfo> pluginsInfo;
+  private final Map<String, PluginInfo> pluginsInfo;
 
   @UiField
   Label name;
@@ -128,17 +137,15 @@ public class ShowJob extends Composite {
   JobReportList jobReports;
 
   @UiField
-  HTML objectList;
-
-  @UiField
   Button buttonBack;
 
-  public ShowJob(Job job, List<PluginInfo> pluginsInfo) {
+  public ShowJob(Job job, Map<String, PluginInfo> pluginsInfo) {
     this.job = job;
     this.pluginsInfo = pluginsInfo;
-    
+
     // TODO get better name for job report list
-    jobReports = new JobReportList(new Filter(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, job.getId())), null, "Job report list");
+    jobReports = new JobReportList(new Filter(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, job.getId())),
+      null, "Job report list", pluginsInfo);
 
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -158,9 +165,10 @@ public class ShowJob extends Composite {
       status.setText(state.toString());
     }
 
-    updateObjectList();
+    // TODO update this panel too
+    jobReports.autoUpdate(10000);
 
-    PluginInfo pluginInfo = lookupPlugin(job.getPlugin());
+    PluginInfo pluginInfo = pluginsInfo.get(job.getPlugin());
     plugin.setText(messages.pluginLabel(pluginInfo.getName(), pluginInfo.getVersion()));
 
     for (PluginParameter parameter : pluginInfo.getParameters()) {
@@ -209,7 +217,7 @@ public class ShowJob extends Composite {
     String value = job.getPluginParameters().get(parameter.getId());
     if (value != null && value.length() > 0) {
       Label pluginLabel = new Label(parameter.getName());
-      PluginInfo sipToAipPlugin = lookupPlugin(value);
+      PluginInfo sipToAipPlugin = pluginsInfo.get(value);
       // Label pluginValue = new
       // Label(messages.pluginLabel(sipToAipPlugin.getName(),
       // sipToAipPlugin.getVersion()));
@@ -239,37 +247,6 @@ public class ShowJob extends Composite {
 
       pHelp.addStyleName("form-help");
     }
-  }
-
-  private void updateObjectList() {
-    // TODO show list with SIP status
-
-    SafeHtmlBuilder b = new SafeHtmlBuilder();
-    b.append(SafeHtmlUtils.fromSafeConstant("<ul>"));
-
-    for (String objId : job.getObjectIds()) {
-      b.append(SafeHtmlUtils.fromSafeConstant("<li>"));
-      b.append(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-file-o'></i>"));
-      b.append(SafeHtmlUtils.fromString(objId));
-      b.append(SafeHtmlUtils.fromSafeConstant("</li>"));
-    }
-
-    b.append(SafeHtmlUtils.fromSafeConstant("</ul>"));
-    objectList.setHTML(b.toSafeHtml());
-
-  }
-
-  private PluginInfo lookupPlugin(String pluginId) {
-    PluginInfo p = null;
-
-    for (PluginInfo pluginInfo : pluginsInfo) {
-      if (pluginInfo.getId().equals(pluginId)) {
-        p = pluginInfo;
-        break;
-      }
-    }
-
-    return p;
   }
 
   @UiHandler("buttonStop")

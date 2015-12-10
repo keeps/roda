@@ -18,7 +18,6 @@ import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.LogEntry;
-import org.roda.core.data.v2.TransferredResource;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.Tools;

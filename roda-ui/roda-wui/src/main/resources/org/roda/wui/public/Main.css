@@ -1854,3 +1854,14 @@
     border-radius: 2px;
     margin-bottom: 10px;
 }
+
+/****** INGEST PROCESS VIEW ***************/
+
+.job-report-object-input i, .job-report-object-output i {
+	font-size: 1.4rem;
+	margin-right: 5px;
+}
+
+.row_error {
+	background-color: #EFBBBB !important;
+}

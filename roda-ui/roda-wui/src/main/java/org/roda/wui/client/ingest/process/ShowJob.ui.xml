@@ -7,7 +7,10 @@
 	xmlns:lists="urn:import:org.roda.wui.client.common.lists">
 
 	<ui:style>
-	
+	.reportTitle {
+		margin-bottom: -25px;
+		margin-top: 20px;
+	}
 	</ui:style>
 
 	<g:FlowPanel styleName="wui-ingest-new" addStyleNames="wrapper skip_padding">
@@ -37,11 +40,9 @@
 				<g:FlowPanel addStyleNames="wui-plugin-options"
 					ui:field="pluginOptions" />
 
-				<g:Label addStyleNames="label">
-					Selected submission information
-					packages (SIP)
+				<g:Label addStyleNames="h3 {style.reportTitle}">
+					Reports
 				</g:Label>
-				<g:HTML addStyleNames="wui-transferredResourceList" ui:field="objectList" />
 				<lists:JobReportList ui:field="jobReports" />
 			</g:FlowPanel>
 
