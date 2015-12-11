@@ -39,6 +39,7 @@ public class FileList extends AsyncTableCell<SimpleFile> {
 
   private static final int PAGE_SIZE = 20;
 
+  @SuppressWarnings("unused")
   private final ClientLogger logger = new ClientLogger(getClass().getName());
 
   private Column<SimpleFile, SafeHtml> iconColumn;
@@ -59,9 +60,12 @@ public class FileList extends AsyncTableCell<SimpleFile> {
     iconColumn = new Column<SimpleFile, SafeHtml>(new SafeHtmlCell()) {
 
       @Override
-      public SafeHtml getValue(SimpleFile arg0) {
-        // TODO Auto-generated method stub
-        return null;
+      public SafeHtml getValue(SimpleFile file) {
+        if (file.isFile()) {
+          return SafeHtmlUtils.fromSafeConstant("<i class='fa fa-file-o'></i>");
+        } else {
+          return SafeHtmlUtils.fromSafeConstant("<i class='fa fa-folder-o'></i>");
+        }
       }
     };
 
@@ -96,10 +100,10 @@ public class FileList extends AsyncTableCell<SimpleFile> {
     lengthColumn.setSortable(true);
 
     // TODO externalize strings into constants
-    display.addColumn(iconColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-tag'></i>"));
+    display.addColumn(iconColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-files-o'></i>"));
     display.addColumn(filenameColumn, "Name");
-    //display.addColumn(mimetypeColumn, "Mimetype");
-    //display.addColumn(lengthColumn, "Length");
+    // display.addColumn(mimetypeColumn, "Mimetype");
+    // display.addColumn(lengthColumn, "Length");
     display.setColumnWidth(iconColumn, "35px");
     Label emptyInfo = new Label("No items to display");
     display.setEmptyTableWidget(emptyInfo);
@@ -130,7 +134,6 @@ public class FileList extends AsyncTableCell<SimpleFile> {
 
       Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
-      // TODO correct method
       BrowserService.Util.getInstance().getRepresentationFiles(filter, sorter, sublist, getFacets(),
         LocaleInfo.getCurrentLocale().getLocaleName(), callback);
     }

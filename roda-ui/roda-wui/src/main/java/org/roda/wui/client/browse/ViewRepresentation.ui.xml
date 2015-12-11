@@ -19,8 +19,9 @@
 				<g:Label styleName="h1" addStyleNames="viewRepresentationTitle">
 					<ui:msg description="View representation title">View representation</ui:msg>
 				</g:Label>
-				<!--<m:BreadcrumbPanel ui:field="breadcrumb" addStyleNames="browseBreadcrumb" 
-					/> <g:FlowPanel styleName="browseItemPanel"> <g:SimplePanel styleName="browseItemIcon" 
+				<m:BreadcrumbPanel ui:field="breadcrumb"
+					addStyleNames="browseBreadcrumb" />
+				<!--<g:FlowPanel styleName="browseItemPanel"> <g:SimplePanel styleName="browseItemIcon" 
 					ui:field="itemIcon" /> <g:FlowPanel styleName="browseItemPanelText"> <g:Label 
 					styleName="h4" addStyleNames="browseItemText" ui:field="itemTitle" /> <g:Label 
 					addStyleNames="browseItemDates" ui:field="itemDates" /> </g:FlowPanel> </g:FlowPanel> 
@@ -30,9 +31,6 @@
 				<g:HorizontalPanel ui:field="previewPanel">
 					<lists:FileList ui:field="filesPanel" />
 					<g:FlowPanel ui:field="filePreview">
-						<g:Label>
-							<ui:msg>View representation</ui:msg>
-						</g:Label>
 					</g:FlowPanel>
 				</g:HorizontalPanel>
 			</g:FlowPanel>
@@ -50,7 +48,7 @@
 					<g:Button addStyleNames="btn btn-previous-file" ui:field="previousFile">
 						<ui:msg>Previous file</ui:msg>
 					</g:Button>
-					<g:Button addStyleNames="btn btn-download-file" ui:field="downloadFile">
+					<g:Button addStyleNames="btn btn-download" ui:field="downloadFile">
 						<ui:msg>Download file</ui:msg>
 					</g:Button>
 				</g:FlowPanel>

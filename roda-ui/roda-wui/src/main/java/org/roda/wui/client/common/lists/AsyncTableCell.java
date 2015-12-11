@@ -114,9 +114,13 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
     selectionModel = new SingleSelectionModel<>(getKeyProvider());
 
     Handler<T> selectionEventManager = getSelectionEventManager();
-    if (selectionEventManager != null) {
+    if (selectionEventManager != null)
+
+    {
       display.setSelectionModel(selectionModel, selectionEventManager);
-    } else {
+    } else
+
+    {
       display.setSelectionModel(selectionModel);
     }
 
@@ -252,4 +256,34 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
     return sorter;
   }
 
+  public void nextItemSelection() {
+    if (getSelectionModel().getSelectedObject() != null) {
+      T selectedItem = getSelectionModel().getSelectedObject();
+
+      if (getVisibleItems().indexOf(selectedItem) == (resultsPager.getPageSize() - 1)) {
+        if (resultsPager.hasNextPage()) {
+          resultsPager.nextPage();
+          //getSelectionModel().setSelected(getVisibleItems().get(getVisibleItems().indexOf(selectedItem) + 1), true);
+        }
+      } else {
+        getSelectionModel().setSelected(getVisibleItems().get(getVisibleItems().indexOf(selectedItem) + 1), true);
+      }
+    }
+  }
+
+  public void previousItemSelection() {
+    if (getSelectionModel().getSelectedObject() != null) {
+      T selectedItem = getSelectionModel().getSelectedObject();
+
+      if (getVisibleItems().indexOf(selectedItem) == 0) {
+        if (resultsPager.hasPreviousPage()) {
+          resultsPager.previousPage();
+          //getSelectionModel().setSelected(getVisibleItems().get(getVisibleItems().indexOf(selectedItem) - 1), true);
+        }
+      } else {
+        getSelectionModel().setSelected(getVisibleItems().get(getVisibleItems().indexOf(selectedItem) - 1), true);
+      }
+    }
+
+  }
 }

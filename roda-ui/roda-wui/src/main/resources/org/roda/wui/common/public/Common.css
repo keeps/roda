@@ -310,6 +310,18 @@ pre>code {
 	content: "\f002";
 }
 
+.btn-back:after {
+	content: "\f060";
+}
+
+.btn-next-file:after {
+	content: "\f0a9";
+}
+
+.btn-previous-file:after {
+	content: "\f0a8";
+}
+
 .nowrap {
 	white-space: nowrap;
 }
