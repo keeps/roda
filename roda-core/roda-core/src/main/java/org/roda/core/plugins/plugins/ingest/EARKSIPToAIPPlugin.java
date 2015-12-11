@@ -94,16 +94,21 @@ public class EARKSIPToAIPPlugin implements Plugin<TransferredResource> {
         SIP sip = migrator.parse(earkSIPPath);
 
         AIP aipCreated = EARKSIPToAIPPluginUtils.earkSIPToAip(sip, earkSIPPath, model, storage);
+        
+        state = PluginState.OK;
+        reportItem.setItemId(aipCreated.getId());
+        reportItem = reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
+        
+        
         if (sip.getParentID() != null) {
           if (aipCreated.getParentId() == null) {
             LOGGER.error("PARENT NOT FOUND!");
-            // TODO handle parent not found...
+            reportItem = reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, "Parent not found"));
+            
           }
         }
 
-        state = PluginState.OK;
-        reportItem.setItemId(aipCreated.getId());
-        reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
+       
 
         LOGGER.debug("Done with converting " + earkSIPPath + " to AIP " + aipCreated.getId());
       } catch (Throwable e) {
