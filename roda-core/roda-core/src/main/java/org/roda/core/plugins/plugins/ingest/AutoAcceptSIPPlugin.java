@@ -7,7 +7,9 @@
  */
 package org.roda.core.plugins.plugins.ingest;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -19,10 +21,12 @@ import org.roda.core.data.ReportItem;
 import org.roda.core.data.common.InvalidParameterException;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.v2.EventPreservationObject;
 import org.roda.core.data.v2.JobReport.PluginState;
 import org.roda.core.data.v2.PluginType;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.IndexServiceException;
+import org.roda.core.metadata.v2.premis.PremisMetadataException;
 import org.roda.core.model.AIP;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.ModelServiceException;
@@ -90,7 +94,7 @@ public class AutoAcceptSIPPlugin implements Plugin<AIP> {
     for (AIP aip : list) {
       ReportItem reportItem = PluginUtils.createPluginReportItem(this, "Auto accept AIP " + aip.getId(), aip.getId(),
         null);
-
+      String outcomeDetail = "";
       try {
         LOGGER.debug("Auto accepting AIP " + aip.getId());
         StoragePath aipPath = ModelUtils.getAIPpath(aip.getId());
@@ -98,20 +102,19 @@ public class AutoAcceptSIPPlugin implements Plugin<AIP> {
         ModelUtils.setAs(aipMetadata, RodaConstants.STORAGE_META_ACTIVE, true);
         storage.updateMetadata(aipPath, aipMetadata, true);
         model.updateAIP(aip.getId());
-
         state = PluginState.OK;
         reportItem.setItemId(aip.getId());
         reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
         LOGGER.debug("Done with auto accepting AIP " + aip.getId());
       } catch (ModelServiceException | StorageServiceException e) {
         LOGGER.error("Error updating AIP (metadata attribute active=true)", e);
-
+        outcomeDetail = "Error updating AIP (metadata attribute active=true): " + e.getMessage();
         state = PluginState.ERROR;
         reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()))
-          .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS,
-            "Error updating AIP (metadata attribute active=true): " + e.getMessage()));
+          .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, outcomeDetail));
       }
-      
+
+      createEvent(outcomeDetail, state, aip, model);
       report.addItem(reportItem);
       try {
         PluginUtils.updateJobReport(model, index, this, reportItem, state, PluginUtils.getJobId(parameters),
@@ -122,6 +125,47 @@ public class AutoAcceptSIPPlugin implements Plugin<AIP> {
     }
 
     return report;
+  }
+
+  private void createEvent(String outcomeDetail, PluginState state, AIP aip, ModelService model)
+    throws PluginException {
+
+    try {
+      boolean success = (state == PluginState.OK);
+
+      for (String representationID : aip.getRepresentationIds()) {
+        PluginUtils.createPluginEvent(aip.getId(), representationID, model,
+          EventPreservationObject.PRESERVATION_EVENT_TYPE_INGESTION, "The SIP was successfully accepted.",
+          EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_INGEST_TASK, "AGENT ID",
+          Arrays.asList(representationID), success ? "success" : "error", success ? "" : "Error",
+          outcomeDetail);
+      }
+    } catch (PremisMetadataException | IOException | StorageServiceException | ModelServiceException e) {
+      throw new PluginException(e.getMessage(), e);
+    }
+
+    // TODO agent
+    /*
+     * DateFormat format = new SimpleDateFormat("yyyy-MM-dd_hh:mm:ss.SSS");
+     * EventPreservationObject epo = new EventPreservationObject();
+     * epo.setDatetime(new Date()); epo.setEventType(EventPreservationObject.
+     * PRESERVATION_EVENT_TYPE_ANTIVIRUS_CHECK); epo.setEventDetail(
+     * "All the files from the SIP were verified against an antivirus.");
+     * epo.setAgentRole(EventPreservationObject.
+     * PRESERVATION_EVENT_AGENT_ROLE_INGEST_TASK); String name =
+     * UUID.randomUUID().toString(); epo.setId(name); epo.setAgentID("AGENT ID"
+     * ); epo.setObjectIDs(aip.getRepresentationIds().toArray(new
+     * String[aip.getRepresentationIds().size()]));
+     * epo.setOutcome(virusCheckResult.isClean()?"success":"error");
+     * epo.setOutcomeDetailNote("Report");
+     * epo.setOutcomeDetailExtension(virusCheckResult.getReport()); byte[]
+     * serializedPremisEvent = new PremisEventHelper(epo).saveToByteArray();
+     * Path file = Files.createTempFile("preservation", ".xml"); Files.copy(new
+     * ByteArrayInputStream(serializedPremisEvent), file,
+     * StandardCopyOption.REPLACE_EXISTING); Binary resource = (Binary)
+     * FSUtils.convertPathToResource(file.getParent(), file);
+     * model.createPreservationMetadata(aip.getId(), name, resource);
+     */
   }
 
   @Override
