@@ -773,6 +773,7 @@
 
 .header>.field .field-label:after {
 	content: ':';
+	margin-right:5px;
 }
 
 .header .identifierType {
@@ -907,6 +908,7 @@
 
 .content>.field .field-label:after {
 	content: ':';
+	margin-right:5px;
 }
 
 .content>.field .field-value {
@@ -928,6 +930,7 @@
 	text-rendering: auto;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
+	margin-right:5px;
 }
 
 .event .header .identifier {
@@ -1868,4 +1871,12 @@
 
 .row_error {
 	background-color: #EFBBBB !important;
+}
+
+.metadataContent .pagination{
+	display:none;
+}
+
+.metadataContent .agents{
+	display:none;
 }
