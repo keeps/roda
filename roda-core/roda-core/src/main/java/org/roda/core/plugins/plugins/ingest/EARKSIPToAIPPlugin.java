@@ -29,6 +29,8 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginUtils;
 import org.roda.core.storage.StorageService;
+import org.roda_project.commons_ip.model.SIP;
+import org.roda_project.commons_ip.parse.impl.eark.EARKParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,14 +83,23 @@ public class EARKSIPToAIPPlugin implements Plugin<TransferredResource> {
     throws PluginException {
     Report report = PluginUtils.createPluginReport(this);
     PluginState state;
-    
+
     for (TransferredResource transferredResource : list) {
       Path earkSIPPath = Paths.get(transferredResource.getFullPath());
 
       ReportItem reportItem = PluginUtils.createPluginReportItem(transferredResource, this);
       try {
         LOGGER.debug("Converting " + earkSIPPath + " to AIP");
-        AIP aipCreated = EARKSIPToAIPPluginUtils.earkSIPToAip(earkSIPPath, model, storage);
+        EARKParser migrator = new EARKParser();
+        SIP sip = migrator.parse(earkSIPPath);
+
+        AIP aipCreated = EARKSIPToAIPPluginUtils.earkSIPToAip(sip, earkSIPPath, model, storage);
+        if (sip.getParentID() != null) {
+          if (aipCreated.getParentId() == null) {
+            LOGGER.error("PARENT NOT FOUND!");
+            // TODO handle parent not found...
+          }
+        }
 
         state = PluginState.OK;
         reportItem.setItemId(aipCreated.getId());

@@ -13,11 +13,14 @@ import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.model.AIP;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.ModelServiceException;
@@ -29,30 +32,32 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import gov.loc.repository.bagit.Bag;
-import gov.loc.repository.bagit.BagFactory;
 import gov.loc.repository.bagit.BagFile;
 import gov.loc.repository.bagit.BagInfoTxt;
-import gov.loc.repository.bagit.utilities.SimpleResult;
 
 public class BagitToAIPPluginUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(BagitToAIPPluginUtils.class);
 
-  public static AIP bagitToAip(Path bagitPath, ModelService model, String metadataFilename)
+  public static AIP bagitToAip(Bag bag, Path bagitPath, ModelService model, String metadataFilename)
     throws BagitNotValidException, IOException, StorageServiceException, ModelServiceException {
     AIP aip = null;
-    BagFactory bagFactory = new BagFactory();
-    Bag bag = bagFactory.createBag(bagitPath.toFile());
-    SimpleResult result = bag.verifyPayloadManifests();
-    if (!result.isSuccess()) {
-      throw new BagitNotValidException(result.getMessages() + "");
-    }
-    BagInfoTxt bagInfoTxt = bag.getBagInfoTxt();
 
+    BagInfoTxt bagInfoTxt = bag.getBagInfoTxt();
     Path metadataFile = Files.createTempFile("metadata", ".xml");
     generateMetadataFile(metadataFile, bagInfoTxt);
     Resource descriptiveMetadataResource = FSUtils.convertPathToResource(metadataFile.getParent(), metadataFile);
 
-    aip = model.createAIP(new HashMap<String, Set<String>>(), false, true);
+    Map<String, Set<String>> metadata = new HashMap<String, Set<String>>();
+    if (bag.getBagInfoTxt().get("parent") != null) {
+      try {
+        model.retrieveAIP(bag.getBagInfoTxt().get("parent"));
+        metadata.put(RodaConstants.STORAGE_META_PARENT_ID,
+          new HashSet<String>(Arrays.asList(bag.getBagInfoTxt().get("parent"))));
+      } catch (ModelServiceException mse) {
+      }
+    }
+
+    aip = model.createAIP(metadata, false, true);
 
     String representationID = "representation";
     IngestUtils.createDirectories(model, aip.getId(), representationID);
@@ -82,7 +87,9 @@ public class BagitToAIPPluginUtils {
     StringWriter sw = new StringWriter();
     sw.append("<metadata>");
     for (Map.Entry<String, String> entry : bagInfoTxt.entrySet()) {
-      sw.append("<field name='" + entry.getKey() + "'>" + StringEscapeUtils.escapeXml(entry.getValue()) + "</field>");
+      if (!entry.getKey().equalsIgnoreCase("parent")) {
+        sw.append("<field name='" + entry.getKey() + "'>" + StringEscapeUtils.escapeXml(entry.getValue()) + "</field>");
+      }
     }
     sw.append("</metadata>");
     Files.write(metadataFile, sw.toString().getBytes("UTF-8"));

@@ -32,6 +32,11 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import gov.loc.repository.bagit.Bag;
+import gov.loc.repository.bagit.BagFactory;
+import gov.loc.repository.bagit.BagInfoTxt;
+import gov.loc.repository.bagit.utilities.SimpleResult;
+
 public class BagitToAIPPlugin implements Plugin<TransferredResource> {
   private static final Logger LOGGER = LoggerFactory.getLogger(BagitToAIPPlugin.class);
 
@@ -81,14 +86,29 @@ public class BagitToAIPPlugin implements Plugin<TransferredResource> {
     throws PluginException {
     Report report = PluginUtils.createPluginReport(this);
     PluginState state;
-    
+
     for (TransferredResource transferredResource : list) {
       Path bagitPath = Paths.get(transferredResource.getFullPath());
 
       ReportItem reportItem = PluginUtils.createPluginReportItem(transferredResource, this);
       try {
         LOGGER.debug("Converting " + bagitPath + " to AIP");
-        AIP aipCreated = BagitToAIPPluginUtils.bagitToAip(bagitPath, model, "metadata.xml");
+        BagFactory bagFactory = new BagFactory();
+        Bag bag = bagFactory.createBag(bagitPath.toFile());
+        SimpleResult result = bag.verifyPayloadManifests();
+        if (!result.isSuccess()) {
+          throw new BagitNotValidException(result.getMessages() + "");
+        }
+        BagInfoTxt bagInfoTxt = bag.getBagInfoTxt();
+        String parent = bagInfoTxt.get("parent");
+
+        AIP aipCreated = BagitToAIPPluginUtils.bagitToAip(bag, bagitPath, model, "metadata.xml");
+        if (parent != null) {
+          if (aipCreated.getParentId() == null) {
+            LOGGER.error("PARENT NOT FOUND!");
+            // TODO handle parent not found...
+          }
+        }
 
         state = PluginState.OK;
         reportItem.setItemId(aipCreated.getId());

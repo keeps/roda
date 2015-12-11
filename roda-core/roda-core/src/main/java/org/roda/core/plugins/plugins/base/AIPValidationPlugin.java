@@ -94,32 +94,31 @@ public class AIPValidationPlugin implements Plugin<AIP> {
           invalidAIP.add(aip.getId());
           LOGGER.debug("Done with validating AIP " + aip.getId() + ": invalid!");
         }
-        createEvent(aip,model,descriptiveValid,preservationValid);
+        createEvent(aip, model, descriptiveValid, preservationValid);
       } catch (ModelServiceException mse) {
         LOGGER.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage(), mse);
       }
     }
     return null;
   }
-  
-  //TODO EVENT MUST BE "AIP EVENT" INSTEAD OF "REPRESENTATION EVENT"
-  //TODO AGENT ID...
-  private void createEvent(AIP aip, ModelService model, boolean descriptiveValid, boolean preservationValid) throws PluginException {
+
+  // TODO EVENT MUST BE "AIP EVENT" INSTEAD OF "REPRESENTATION EVENT"
+  // TODO AGENT ID...
+  private void createEvent(AIP aip, ModelService model, boolean descriptiveValid, boolean preservationValid)
+    throws PluginException {
     try {
       boolean success = descriptiveValid && preservationValid;
 
       for (String representationID : aip.getRepresentationIds()) {
         PluginUtils.createPluginEvent(aip.getId(), representationID, model,
-          EventPreservationObject.PRESERVATION_EVENT_TYPE_FORMAT_VALIDATION,
-          "The AIP format was validated.",
+          EventPreservationObject.PRESERVATION_EVENT_TYPE_FORMAT_VALIDATION, "The AIP format was validated.",
           EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_INGEST_TASK, "AGENT ID",
-          Arrays.asList(representationID), success ? "success" : "error", "Report",
-          "");
+          Arrays.asList(representationID), success ? "success" : "error", "Report", "");
       }
     } catch (PremisMetadataException | IOException | StorageServiceException | ModelServiceException e) {
       throw new PluginException(e.getMessage(), e);
     }
-    
+
   }
 
   @Override
