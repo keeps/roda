@@ -264,7 +264,15 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("Download file")
   String viewRepresentationDownloadFileButton();
+  
+  @DefaultMessage("Please select a file from the list on left panel")
+  String viewRepresentationEmptyPreview();
 
+  @DefaultMessage("An error occurred while trying to view the file")
+  String viewRepresentationErrorPreview();
+  
+  @DefaultMessage("File preview not supported")
+  String viewRepresentationNotSupportedPreview();
   
   /************* Ingest process new ****************/
   @DefaultMessage("Job {0,localdatetime,predef:DATE_TIME_SHORT}")

@@ -226,14 +226,13 @@ public class Browse extends Composite {
     } else if (historyTokens.size() == 1) {
       viewAction(historyTokens.get(0));
       callback.onSuccess(this);
-    } else
-      if (historyTokens.size() > 1 && historyTokens.get(0).equals(EditDescriptiveMetadata.RESOLVER.getHistoryToken())) {
+    } else if (historyTokens.size() > 1
+      && historyTokens.get(0).equals(EditDescriptiveMetadata.RESOLVER.getHistoryToken())) {
       EditDescriptiveMetadata.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else if (historyTokens.size() > 1
       && historyTokens.get(0).equals(CreateDescriptiveMetadata.RESOLVER.getHistoryToken())) {
       CreateDescriptiveMetadata.RESOLVER.resolve(Tools.tail(historyTokens), callback);
-    } else if (historyTokens.size() > 1
-      && historyTokens.get(0).equals(ViewRepresentation.RESOLVER.getHistoryToken())) {
+    } else if (historyTokens.size() > 1 && historyTokens.get(0).equals(ViewRepresentation.RESOLVER.getHistoryToken())) {
       ViewRepresentation.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else {
       Tools.newHistory(RESOLVER);
@@ -522,7 +521,10 @@ public class Browse extends Composite {
 
     FlowPanel labelsPanel = new FlowPanel();
 
-    Anchor label = new Anchor(labelText, RestUtils.createRepresentationDownloadUri(rep.getAipId(), rep.getId()));
+    // Anchor label = new Anchor(labelText,
+    // RestUtils.createRepresentationDownloadUri(rep.getAipId(), rep.getId()));
+    Anchor label = new Anchor(labelText,
+      Tools.createHistoryHashLink(ViewRepresentation.RESOLVER, rep.getAipId(), rep.getId()));
     Label subLabel = new Label(
       messages.downloadRepresentationInfo(rep.getFileIds().size(), Humanize.readableFileSize(rep.getSizeInBytes())));
 
@@ -619,7 +621,7 @@ public class Browse extends Composite {
         public void onResponseReceived(Request request, Response response) {
           if (200 == response.getStatusCode()) {
             String html = response.getText();
-            SafeHtml safeHtml =SafeHtmlUtils.fromTrustedString(html);
+            SafeHtml safeHtml = SafeHtmlUtils.fromTrustedString(html);
 
             callback.onSuccess(safeHtml);
           } else {

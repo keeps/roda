@@ -7,6 +7,9 @@
  */
 package org.roda.core.data.v2;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class SimpleFile extends RODAObject {
 
   private static final long serialVersionUID = 3303019735787641534L;
@@ -179,6 +182,11 @@ public class SimpleFile extends RODAObject {
 
   public void setFileFormat(FileFormat fileFormat) {
     this.fileFormat = fileFormat;
+  }
+
+  /* TODO get correct path */
+  public List<String> getPath() {
+    return Arrays.asList(aipId, representationId, id);
   }
 
 }

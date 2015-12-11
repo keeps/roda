@@ -259,6 +259,8 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
   public void nextItemSelection() {
     if (getSelectionModel().getSelectedObject() != null) {
       T selectedItem = getSelectionModel().getSelectedObject();
+      
+      logger.debug("" + (getVisibleItems().indexOf(selectedItem) + 1));
 
       if (getVisibleItems().indexOf(selectedItem) == (resultsPager.getPageSize() - 1)) {
         if (resultsPager.hasNextPage()) {
@@ -284,6 +286,5 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
         getSelectionModel().setSelected(getVisibleItems().get(getVisibleItems().indexOf(selectedItem) - 1), true);
       }
     }
-
   }
 }

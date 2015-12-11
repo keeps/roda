@@ -326,18 +326,18 @@
 	color: #a7a9ac;
 }
 
+.main .wui-breadcrumbPanel .breadcrumb .fa,
 .main .wui-breadcrumbPanel .breadcrumb .description-level {
 	margin: 0 3px;
     color: #a7a9ac;
 }
-
-
 
 .main .wui-breadcrumbPanel .breadcrumb-last {
 	color: #404142;
 	text-decoration: none;
 }
 
+.main .wui-breadcrumbPanel .breadcrumb-last .fa,
 .main .wui-breadcrumbPanel .breadcrumb-last .description-level {
 	color: #404142;
 }
@@ -1810,7 +1810,7 @@
 	margin-bottom: 10px !important;
 }
 
-.filesPreview {
+.viewRepresentationPreviewPanel {
 	width: 100%;
 }
 
@@ -1822,16 +1822,17 @@
 	display: inline-block;
 	vertical-align: top;
 	width: 300px;
+	margin-right: 30px;
 }
 
 .viewRepresentationFilesPanel.fullWidth {
 	width: 100%;
+	margin-right: 0px;
 }
 
 .viewRepresentationFilePreview {
 	display: inline-block;
 	vertical-align: top;
-	margin-left: 30px;
 	width: 100%;
 	text-align: center;
 }
@@ -1882,6 +1883,8 @@
 .viewRepresentationNotSupportedPreview .fa-5 {
     font-size: 10em;
 }
+
+.viewRepresentation 
 
 /**********************************************
 				INGEST PROCESS NEW

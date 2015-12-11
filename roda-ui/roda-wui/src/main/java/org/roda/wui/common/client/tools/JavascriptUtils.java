@@ -190,6 +190,7 @@ public class JavascriptUtils {
 });
   }-*/; 
   
-  
-
+  public static native void updateURLWithoutReloading(String newUrl) /*-{
+    $wnd.history.pushState(newUrl, "", newUrl);
+  }-*/;
 }
