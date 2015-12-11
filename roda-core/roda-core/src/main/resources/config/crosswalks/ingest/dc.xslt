@@ -97,5 +97,6 @@
 				<xsl:value-of select="dc:type/text()" />
 			</field>
 		</xsl:if>
+		<field name="level">item</field>
 	</xsl:template>
 </xsl:stylesheet>
