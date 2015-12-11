@@ -49,7 +49,7 @@ import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
 public class PremisUtils {
-  private final static Logger logger = LoggerFactory.getLogger(PremisUtils.class);
+  private final static Logger LOGGER = LoggerFactory.getLogger(PremisUtils.class);
   private static final String W3C_XML_SCHEMA_NS_URI = "http://www.w3.org/2001/XMLSchema";
 
   public static Fixity calculateFixity(Binary binary, String digestAlgorithm, String originator)
@@ -68,15 +68,17 @@ public class PremisUtils {
     pObjectFile.setPreservationLevel(RepresentationFilePreservationObject.PRESERVATION_LEVEL_FULL);
     pObjectFile.setCompositionLevel(0);
     try {
-      Fixity[] fixities = new Fixity[2];
+      // Fixity[] fixities = new Fixity[2];
+      // fixities[0] = calculateFixity(binaryFile, "MD5", originator);
+      // fixities[1] = calculateFixity(binaryFile, "SHA-1", originator);
+      Fixity[] fixities = new Fixity[1];
       fixities[0] = calculateFixity(binaryFile, "MD5", originator);
-      fixities[1] = calculateFixity(binaryFile, "SHA-1", originator);
       pObjectFile.setFixities(fixities);
     } catch (NoSuchAlgorithmException e) {
-      logger.error("Error calculating datastream checksum - " + e.getMessage(), e);
+      LOGGER.error("Error calculating datastream checksum - " + e.getMessage(), e);
       throw new PremisMetadataException("Error calculating datastream checksum - " + e.getMessage(), e);
     } catch (IOException e) {
-      logger.error("Error calculating datastream checksum - " + e.getMessage(), e);
+      LOGGER.error("Error calculating datastream checksum - " + e.getMessage(), e);
       throw new PremisMetadataException("Error calculating datastream checksum - " + e.getMessage(), e);
     }
 
@@ -130,7 +132,7 @@ public class PremisUtils {
   public static Binary updatePremisToV3IfNeeded(Binary binary, Path configBasePath)
     throws IOException, SAXException, StorageServiceException, TransformerException {
     if (isPremisV2(binary, configBasePath)) {
-      logger.debug("Binary " + binary.getStoragePath().asString() + " is Premis V2... Needs updated...");
+      LOGGER.debug("Binary " + binary.getStoragePath().asString() + " is Premis V2... Needs updated...");
       return updatePremisV2toV3(binary, configBasePath);
     } else {
       return binary;

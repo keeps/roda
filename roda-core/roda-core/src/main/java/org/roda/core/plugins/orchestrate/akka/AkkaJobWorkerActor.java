@@ -26,10 +26,10 @@ import org.slf4j.LoggerFactory;
 
 import akka.actor.UntypedActor;
 
-public class AkkaCoordinatorActor extends UntypedActor {
-  private static final Logger LOGGER = LoggerFactory.getLogger(AkkaCoordinatorActor.class);
+public class AkkaJobWorkerActor extends UntypedActor {
+  private static final Logger LOGGER = LoggerFactory.getLogger(AkkaJobWorkerActor.class);
 
-  public AkkaCoordinatorActor() {
+  public AkkaJobWorkerActor() {
 
   }
 

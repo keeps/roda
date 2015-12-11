@@ -11,7 +11,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
-import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -48,15 +47,13 @@ public class IndexService {
   private final SolrClient index;
   private final ModelService model;
   private final IndexModelObserver observer;
-  private final Path configBasePath;
 
-  public IndexService(SolrClient index, ModelService model, Path configBasePath) {
+  public IndexService(SolrClient index, ModelService model) {
     super();
     this.index = index;
     this.model = model;
-    this.configBasePath = configBasePath;
 
-    observer = new IndexModelObserver(this.index, this.model, this.configBasePath);
+    observer = new IndexModelObserver(this.index, this.model);
     model.addModelObserver(observer);
   }
 

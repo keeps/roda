@@ -99,7 +99,7 @@ public class MonitorIndexTest {
     // start embedded solr
     solr = new EmbeddedSolrServer(solrHome, "test");
 
-    index = new IndexService(solr, model, null);
+    index = new IndexService(solr, model);
 
     URL corporaURL = IndexServiceTest.class.getResource("/corpora");
     corporaPath = Paths.get(corporaURL.toURI());

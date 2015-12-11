@@ -40,6 +40,10 @@ public class PreservationMetadata {
     return aipId;
   }
 
+  public String getRepresentationID() {
+    return representationID;
+  }
+
   /**
    * @return the storagePath
    */
@@ -53,7 +57,8 @@ public class PreservationMetadata {
 
   @Override
   public String toString() {
-    return "PreservationMetadata [id=" + id + ", aipId=" + aipId + ", storagePath=" + storagePath + "]";
+    return "PreservationMetadata [id=" + id + ", aipId=" + aipId + ", representationID=" + representationID
+      + ", storagePath=" + storagePath + ", type=" + type + "]";
   }
 
   @Override
@@ -61,7 +66,7 @@ public class PreservationMetadata {
     final int prime = 31;
     int result = 1;
     result = prime * result + ((aipId == null) ? 0 : aipId.hashCode());
-    result = prime * result + ((representationID == null) ? 0 : representationID.hashCode());
+    result = prime * result + ((getRepresentationID() == null) ? 0 : getRepresentationID().hashCode());
     result = prime * result + ((id == null) ? 0 : id.hashCode());
     result = prime * result + ((storagePath == null) ? 0 : storagePath.hashCode());
     return result;
@@ -86,11 +91,11 @@ public class PreservationMetadata {
     } else if (!aipId.equals(other.aipId)) {
       return false;
     }
-    if (representationID == null) {
-      if (other.representationID != null) {
+    if (getRepresentationID() == null) {
+      if (other.getRepresentationID() != null) {
         return false;
       }
-    } else if (!representationID.equals(other.representationID)) {
+    } else if (!getRepresentationID().equals(other.getRepresentationID())) {
       return false;
     }
     if (id == null) {

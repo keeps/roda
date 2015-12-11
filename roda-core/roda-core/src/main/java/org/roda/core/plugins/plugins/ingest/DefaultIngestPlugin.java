@@ -51,11 +51,11 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
   public static final PluginParameter PARAMETER_SIP_TO_AIP_CLASS = new PluginParameter("parameter.sip_to_aip_class",
     "SIP format", PluginParameterType.PLUGIN_SIP_TO_AIP, "", true, false,
     "Known format of SIP to be ingest into the repository.");
-  public static final PluginParameter PARAMETER_CREATE_PREMIS_SKELETON = new PluginParameter(
-    "parameter.create.premis.skeleton", "Create PREMIS skeleton", PluginParameterType.BOOLEAN, "true", true, true,
-    "Create PREMIS related files with the basic information.");
   public static final PluginParameter PARAMETER_DO_VIRUS_CHECK = new PluginParameter("parameter.do_virus_check",
     "Virus check", PluginParameterType.BOOLEAN, "false", true, false, "Verifies if an SIP is free of virus.");
+  public static final PluginParameter PARAMETER_CREATE_PREMIS_SKELETON = new PluginParameter(
+    "parameter.create.premis.skeleton", "Create basic PREMIS information", PluginParameterType.BOOLEAN, "true", true,
+    true, "Create basic PREMIS information (e.g. PREMIS object for each representation file, etc.).");
   public static final PluginParameter PARAMETER_DO_SIP_SYNTAX_CHECK = new PluginParameter(
     "parameter.do_sip_syntax_check", "SIP syntax check", PluginParameterType.BOOLEAN, "true", true, true,
     "Check SIP coherence. Verifies the validity and completeness of a SIP.");
@@ -101,8 +101,8 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
   public List<PluginParameter> getParameters() {
     ArrayList<PluginParameter> pluginParameters = new ArrayList<PluginParameter>();
     pluginParameters.add(PARAMETER_SIP_TO_AIP_CLASS);
-    pluginParameters.add(PARAMETER_CREATE_PREMIS_SKELETON);
     pluginParameters.add(PARAMETER_DO_VIRUS_CHECK);
+    pluginParameters.add(PARAMETER_CREATE_PREMIS_SKELETON);
     pluginParameters.add(PARAMETER_DO_SIP_SYNTAX_CHECK);
     pluginParameters.add(PARAMETER_DO_PRODUCER_AUTHORIZATION_CHECK);
     pluginParameters.add(PARAMETER_DO_AUTO_ACCEPT);
@@ -140,17 +140,17 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
     List<AIP> aips = getAIPsFromReports(index, reports);
     updateJobStatus(index, model);
 
-    // 2) create premis skeleton
-    pluginReport = createPremisSkeleton(index, model, storage, aips);
-    reports = mergeReports(reports, pluginReport);
-    updateJobStatus(index, model);
-
-    // 3) do virus check
+    // 2) do virus check
     if (verifyIfStepShouldBePerformed(PARAMETER_DO_VIRUS_CHECK)) {
       pluginReport = doVirusCheck(index, model, storage, aips);
       reports = mergeReports(reports, pluginReport);
       updateJobStatus(index, model);
     }
+
+    // 3) create premis skeleton
+    pluginReport = createPremisSkeleton(index, model, storage, aips);
+    reports = mergeReports(reports, pluginReport);
+    updateJobStatus(index, model);
 
     // 4) verify if AIP is well formed
     pluginReport = verifyIfAipIsWellFormed(index, model, storage, aips);

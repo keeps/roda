@@ -114,7 +114,7 @@ public class VerifyProducerAuthorizationPlugin implements Plugin<AIP> {
 
   @Override
   public Plugin<AIP> cloneMe() {
-    return new AutoAcceptSIPPlugin();
+    return new VerifyProducerAuthorizationPlugin();
   }
 
   @Override

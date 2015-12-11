@@ -52,25 +52,23 @@ public class IndexModelObserver implements ModelObserver {
 
   private final SolrClient index;
   private final ModelService model;
-  private final Path configBasePath;
 
-  public IndexModelObserver(SolrClient index, ModelService model, Path configBasePath) {
+  public IndexModelObserver(SolrClient index, ModelService model) {
     super();
     this.index = index;
     this.model = model;
-    this.configBasePath = configBasePath;
   }
 
   @Override
   public void aipCreated(final AIP aip) {
-    indexAIPandSDO(aip, configBasePath);
+    indexAIPandSDO(aip);
     indexRepresentations(aip);
-    indexPreservationFileObjects(aip, configBasePath);
-    indexPreservationsEvents(aip, configBasePath);
+    indexPreservationFileObjects(aip);
+    indexPreservationsEvents(aip);
     indexOtherMetadata(aip);
   }
 
-  private void indexPreservationsEvents(final AIP aip, Path configBasePath) {
+  private void indexPreservationsEvents(final AIP aip) {
     final Map<String, List<String>> preservationEventsIds = aip.getPreservationsEventsIds();
     for (Map.Entry<String, List<String>> representationPreservationMap : preservationEventsIds.entrySet()) {
       try {
@@ -80,7 +78,7 @@ public class IndexModelObserver implements ModelObserver {
           Binary binary = model.getStorage().getBinary(filePath);
 
           SolrInputDocument premisEventDocument = SolrUtils.premisToSolr(aip.getId(),
-            representationPreservationMap.getKey(), fileId, binary, configBasePath);
+            representationPreservationMap.getKey(), fileId, binary);
           index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisEventDocument);
         }
       } catch (SolrServerException | IOException | StorageServiceException | IndexServiceException e) {
@@ -98,7 +96,7 @@ public class IndexModelObserver implements ModelObserver {
     // TODO...
   }
 
-  private void indexPreservationFileObjects(final AIP aip, Path configBasePath) {
+  private void indexPreservationFileObjects(final AIP aip) {
     final Map<String, List<String>> preservationFileObjectsIds = aip.getPreservationFileObjectsIds();
     for (Map.Entry<String, List<String>> eventPreservationMap : preservationFileObjectsIds.entrySet()) {
       try {
@@ -107,7 +105,7 @@ public class IndexModelObserver implements ModelObserver {
           StoragePath filePath = ModelUtils.getPreservationFilePath(aip.getId(), eventPreservationMap.getKey(), fileId);
           Binary binary = model.getStorage().getBinary(filePath);
           SolrInputDocument premisFileDocument = SolrUtils.premisToSolr(aip.getId(), eventPreservationMap.getKey(),
-            fileId, binary, configBasePath);
+            fileId, binary);
           index.add(RodaConstants.INDEX_PRESERVATION_OBJECTS, premisFileDocument);
         }
       } catch (SolrServerException | IOException | StorageServiceException | IndexServiceException e) {
@@ -163,10 +161,10 @@ public class IndexModelObserver implements ModelObserver {
     }
   }
 
-  private void indexAIPandSDO(final AIP aip, Path configBasePath) {
+  private void indexAIPandSDO(final AIP aip) {
     try {
       SolrInputDocument aipDoc = SolrUtils.aipToSolrInputDocument(aip);
-      SolrInputDocument sdoDoc = SolrUtils.aipToSolrInputDocumentAsSDO(aip, model, configBasePath);
+      SolrInputDocument sdoDoc = SolrUtils.aipToSolrInputDocumentAsSDO(aip, model);
       index.add(RodaConstants.INDEX_AIP, aipDoc);
       index.commit(RodaConstants.INDEX_AIP);
       LOGGER.trace("Adding SDO: " + sdoDoc);
@@ -325,8 +323,25 @@ public class IndexModelObserver implements ModelObserver {
   @Override
   public void preservationMetadataCreated(PreservationMetadata preservationMetadata) {
     try {
-      aipUpdated(model.retrieveAIP(preservationMetadata.getAipId()));
-    } catch (ModelServiceException e) {
+      AIP aip = model.retrieveAIP(preservationMetadata.getAipId());
+      indexAIPandSDO(aip);
+
+      Binary binary = model.getStorage().getBinary(preservationMetadata.getStoragePath());
+      SolrInputDocument premisFileDocument = SolrUtils.premisToSolr(preservationMetadata.getAipId(),
+        preservationMetadata.getRepresentationID(), preservationMetadata.getId(), binary);
+
+      String type = preservationMetadata.getType();
+      if (type.equalsIgnoreCase("event")) {
+        index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisFileDocument);
+      } else if (type.equalsIgnoreCase("agent")) {
+        index.add(RodaConstants.INDEX_PRESERVATION_AGENTS, premisFileDocument);
+      } else if (type.equalsIgnoreCase("file")) {
+        index.add(RodaConstants.INDEX_PRESERVATION_OBJECTS, premisFileDocument);
+      }
+
+      // aipUpdated(model.retrieveAIP(preservationMetadata.getAipId()));
+    } catch (StorageServiceException | ModelServiceException | IndexServiceException | IOException
+      | SolrServerException e) {
       LOGGER.error("Error when preservation metadata created on retrieving the full AIP", e);
     }
 

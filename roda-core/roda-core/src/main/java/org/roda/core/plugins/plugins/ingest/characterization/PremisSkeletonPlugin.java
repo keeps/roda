@@ -64,12 +64,12 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
 
   @Override
   public String getName() {
-    return "PREMIS skeleton action";
+    return "PREMIS basic information";
   }
 
   @Override
   public String getDescription() {
-    return "Create PREMIS related files with the basic information";
+    return "Create basic PREMIS information";
   }
 
   @Override
@@ -107,40 +107,7 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
 
         try {
           for (String representationID : aip.getRepresentationIds()) {
-            LOGGER.debug("Processing representation " + representationID + " from AIP " + aip.getId());
-            RepresentationPreservationObject pObject = new RepresentationPreservationObject();
-            pObject.setId(representationID);
-            pObject.setPreservationLevel("");
-            Representation representation = model.retrieveRepresentation(aip.getId(), representationID);
-            List<RepresentationFilePreservationObject> pObjectPartFiles = new ArrayList<RepresentationFilePreservationObject>();
-            for (String fileID : representation.getFileIds()) {
-              LOGGER.debug("Processing file " + fileID + " from " + representationID + " of AIP " + aip.getId());
-              File file = model.retrieveFile(aip.getId(), representationID, fileID);
-              Binary binary = storage.getBinary(file.getStoragePath());
-              Path pathFile = Paths.get(temp.toString(), file.getStoragePath().getName());
-              Files.copy(binary.getContent().createInputStream(), pathFile, StandardCopyOption.REPLACE_EXISTING);
-              RepresentationFilePreservationObject premisObject = PremisUtils.createPremisFromFile(file, binary,
-                "PremisSkeletonAction");
-              Path premis = Files.createTempFile(file.getId(), ".premis.xml");
-              PremisFileObjectHelper helper = new PremisFileObjectHelper(premisObject);
-              helper.saveToFile(premis.toFile());
-              model.createPreservationMetadata(aip.getId(), representationID, file.getId() + ".premis.xml",
-                (Binary) FSUtils.convertPathToResource(premis.getParent(), premis));
-              if (pObject.getRootFile() == null) {
-                pObject.setRootFile(premisObject);
-              } else {
-                pObjectPartFiles.add(premisObject);
-              }
-              FSUtils.deletePath(premis);
-            }
-            pObject.setPartFiles(
-              pObjectPartFiles.toArray(new RepresentationFilePreservationObject[pObjectPartFiles.size()]));
-            Path premisRepresentation = Files.createTempFile("representation", ".premis.xml");
-            PremisRepresentationObjectHelper helper = new PremisRepresentationObjectHelper(pObject);
-            helper.saveToFile(premisRepresentation.toFile());
-            model.createPreservationMetadata(aip.getId(), representationID, "representation.premis.xml",
-              (Binary) FSUtils.convertPathToResource(premisRepresentation.getParent(), premisRepresentation));
-            FSUtils.deletePath(premisRepresentation);
+            createPremisForRepresentation(model, storage, temp, aip, representationID);
           }
 
           state = PluginState.OK;
@@ -166,6 +133,67 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
       LOGGER.error("Error executing FastCharacterizationAction: " + ioe.getMessage(), ioe);
     }
     return report;
+  }
+
+  private void createPremisForRepresentation(ModelService model, StorageService storage, Path temp, AIP aip,
+    String representationID)
+      throws ModelServiceException, StorageServiceException, IOException, PremisMetadataException {
+    LOGGER.debug("Processing representation " + representationID + " from AIP " + aip.getId());
+
+    RepresentationPreservationObject pObject = new RepresentationPreservationObject();
+    pObject.setId(representationID);
+    pObject.setPreservationLevel("");
+
+    List<RepresentationFilePreservationObject> pObjectPartFiles = new ArrayList<RepresentationFilePreservationObject>();
+    Representation representation = model.retrieveRepresentation(aip.getId(), representationID);
+    for (String fileID : representation.getFileIds()) {
+      pObjectPartFiles = createPremisForRepresentationFile(model, storage, temp, aip, representationID, pObject,
+        pObjectPartFiles, fileID);
+    }
+
+    createPremisObjectForRepresentation(model, aip, representationID, pObject, pObjectPartFiles);
+  }
+
+  private void createPremisObjectForRepresentation(ModelService model, AIP aip, String representationID,
+    RepresentationPreservationObject pObject, List<RepresentationFilePreservationObject> pObjectPartFiles)
+      throws IOException, PremisMetadataException, ModelServiceException, StorageServiceException {
+    pObject.setPartFiles(pObjectPartFiles.toArray(new RepresentationFilePreservationObject[pObjectPartFiles.size()]));
+
+    Path premisRepresentation = Files.createTempFile("representation", ".premis.xml");
+    PremisRepresentationObjectHelper helper = new PremisRepresentationObjectHelper(pObject);
+    helper.saveToFile(premisRepresentation.toFile());
+    model.createPreservationMetadata(aip.getId(), representationID, "representation.premis.xml",
+      (Binary) FSUtils.convertPathToResource(premisRepresentation.getParent(), premisRepresentation));
+
+    FSUtils.deletePath(premisRepresentation);
+  }
+
+  private List<RepresentationFilePreservationObject> createPremisForRepresentationFile(ModelService model,
+    StorageService storage, Path temp, AIP aip, String representationID, RepresentationPreservationObject pObject,
+    List<RepresentationFilePreservationObject> pObjectPartFiles, String fileID)
+      throws ModelServiceException, StorageServiceException, IOException, PremisMetadataException {
+    LOGGER.debug("Processing file " + fileID + " from " + representationID + " of AIP " + aip.getId());
+
+    File file = model.retrieveFile(aip.getId(), representationID, fileID);
+    Binary binary = storage.getBinary(file.getStoragePath());
+    Path pathFile = Paths.get(temp.toString(), file.getStoragePath().getName());
+    Files.copy(binary.getContent().createInputStream(), pathFile, StandardCopyOption.REPLACE_EXISTING);
+
+    RepresentationFilePreservationObject premisObject = PremisUtils.createPremisFromFile(file, binary,
+      "PremisSkeletonAction");
+    Path premis = Files.createTempFile(file.getId(), ".premis.xml");
+    PremisFileObjectHelper helper = new PremisFileObjectHelper(premisObject);
+    helper.saveToFile(premis.toFile());
+    model.createPreservationMetadata(aip.getId(), representationID, file.getId() + ".premis.xml",
+      (Binary) FSUtils.convertPathToResource(premis.getParent(), premis));
+    if (pObject.getRootFile() == null) {
+      pObject.setRootFile(premisObject);
+    } else {
+      pObjectPartFiles.add(premisObject);
+    }
+    FSUtils.deletePath(premis);
+
+    return pObjectPartFiles;
   }
 
   @Override

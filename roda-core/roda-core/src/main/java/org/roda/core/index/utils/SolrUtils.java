@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.xml.stream.FactoryConfigurationError;
@@ -181,8 +180,7 @@ public class SolrUtils {
 
   }
 
-  public static SolrInputDocument getDescriptiveMetataFields(Binary binary, Path configBasePath)
-    throws IndexServiceException {
+  public static SolrInputDocument getDescriptiveMetataFields(Binary binary) throws IndexServiceException {
     SolrInputDocument doc;
     InputStream inputStream;
     String xsltFilename = null;
@@ -887,7 +885,7 @@ public class SolrUtils {
 
   }
 
-  public static SolrInputDocument aipToSolrInputDocumentAsSDO(AIP aip, ModelService model, Path configBasePath)
+  public static SolrInputDocument aipToSolrInputDocumentAsSDO(AIP aip, ModelService model)
     throws ModelServiceException, StorageServiceException, IndexServiceException {
     final SolrInputDocument ret = new SolrInputDocument();
     final String aipId = aip.getId();
@@ -908,7 +906,7 @@ public class SolrUtils {
       StoragePath storagePath = metadata.getStoragePath();
       Binary binary = model.getStorage().getBinary(storagePath);
       try {
-        SolrInputDocument fields = getDescriptiveMetataFields(binary, configBasePath);
+        SolrInputDocument fields = getDescriptiveMetataFields(binary);
         for (SolrInputField field : fields) {
           ret.addField(field.getName(), field.getValue(), field.getBoost());
         }
@@ -1237,8 +1235,8 @@ public class SolrUtils {
     return index.query(collection, query);
   }
 
-  public static SolrInputDocument premisToSolr(String aipID, String representationID, String fileID, Binary binary,
-    Path configBasePath) throws IndexServiceException {
+  public static SolrInputDocument premisToSolr(String aipID, String representationID, String fileID, Binary binary)
+    throws IndexServiceException {
     SolrInputDocument doc;
     InputStream inputStream;
     try {
@@ -1441,7 +1439,7 @@ public class SolrUtils {
 
   public static SolrInputDocument fileToSolrDocument(SimpleFile file) {
     SolrInputDocument doc = new SolrInputDocument();
-    doc.addField(RodaConstants.FILE_UUID, UUID.randomUUID().toString());
+    doc.addField(RodaConstants.FILE_UUID, getId(file.getAipId(), file.getRepresentationId(), file.getId()));
     doc.addField(RodaConstants.FILE_ID, getId(file.getAipId(), file.getRepresentationId(), file.getId()));
     doc.addField(RodaConstants.FILE_AIPID, file.getAipId());
     doc.addField(RodaConstants.FILE_FORMAT_MIMETYPE,

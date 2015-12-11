@@ -26,7 +26,7 @@ import org.roda.core.model.File;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginOrchestrator;
-import org.roda.core.plugins.orchestrate.akka.AkkaCoordinatorActor;
+import org.roda.core.plugins.orchestrate.akka.AkkaJobWorkerActor;
 import org.roda.core.plugins.orchestrate.akka.AkkaWorkerActor;
 import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.StorageService;
@@ -58,7 +58,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
   private ActorSystem workersSystem;
   private ActorRef workersRouter;
-  private ActorRef boss;
+  private ActorRef jobWorkersRouter;
+  // private ActorRef boss;
   private int numberOfWorkers;
 
   public AkkaEmbeddedPluginOrchestrator() {
@@ -69,11 +70,12 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     numberOfWorkers = Runtime.getRuntime().availableProcessors() + 1;
     workersSystem = ActorSystem.create("WorkersSystem");
 
-    // FIXME not in use: see if this actor is really needed
-    boss = workersSystem.actorOf(Props.create(AkkaCoordinatorActor.class), "boss");
     Props roundRobinPoolProps = new RoundRobinPool(numberOfWorkers)
       .props(Props.create(AkkaWorkerActor.class, storage, model, index));
     workersRouter = workersSystem.actorOf(roundRobinPoolProps, "WorkersRouter");
+
+    Props roundRobinPoolProps2 = new RoundRobinPool(numberOfWorkers).props(Props.create(AkkaJobWorkerActor.class));
+    jobWorkersRouter = workersSystem.actorOf(roundRobinPoolProps2, "JobWorkersRouter");
   }
 
   @Override
@@ -87,7 +89,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   public ActorRef getCoordinator() {
-    return boss;
+    return jobWorkersRouter;
   }
 
   @Override

@@ -868,8 +868,12 @@
 	padding-top: 5px;
 }
 
-.pagination{
-	display: none;
+.metadataContent .pagination{
+	display:none;
+}
+
+.metadataContent .agents{
+	display:none;
 }
 
 
@@ -1923,12 +1927,4 @@
 
 .row_error {
 	background-color: #EFBBBB !important;
-}
-
-.metadataContent .pagination{
-	display:none;
-}
-
-.metadataContent .agents{
-	display:none;
 }

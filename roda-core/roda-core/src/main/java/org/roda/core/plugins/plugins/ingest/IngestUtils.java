@@ -17,44 +17,48 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.StorageServiceException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Sets;
 
 public class IngestUtils {
+  private static final Logger LOGGER = LoggerFactory.getLogger(IngestUtils.class);
+
   public static void createDirectories(ModelService model, String aipId, String representationID)
     throws StorageServiceException {
     try {
       model.getStorage().createDirectory(ModelUtils.getRepresentationsPath(aipId), new HashMap<String, Set<String>>());
     } catch (StorageServiceException sse) {
-
+      LOGGER.error("", sse);
     }
     try {
       model.getStorage().createDirectory(ModelUtils.getRepresentationPath(aipId, representationID),
         getRepresentationMetadata(representationID));
     } catch (StorageServiceException sse) {
-
+      LOGGER.error("", sse);
     }
     try {
       model.getStorage().createDirectory(ModelUtils.getMetadataPath(aipId), new HashMap<String, Set<String>>());
     } catch (StorageServiceException sse) {
-
+      LOGGER.error("", sse);
     }
     try {
       model.getStorage().createDirectory(ModelUtils.getDescriptiveMetadataPath(aipId),
         new HashMap<String, Set<String>>());
     } catch (StorageServiceException sse) {
-
+      LOGGER.error("", sse);
     }
     try {
       model.getStorage().createDirectory(ModelUtils.getPreservationPath(aipId), new HashMap<String, Set<String>>());
     } catch (StorageServiceException sse) {
-
+      LOGGER.error("", sse);
     }
     try {
       model.getStorage().createDirectory(ModelUtils.getPreservationPath(aipId, representationID),
         new HashMap<String, Set<String>>());
     } catch (StorageServiceException sse) {
-
+      LOGGER.error("", sse);
     }
 
   }
