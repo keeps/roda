@@ -7,3 +7,4 @@ src/main/webapp/org.roda.wui.main.Main/
 /target/
 /build/
 .gwt/
+.externalToolBuilders/
