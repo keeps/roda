@@ -7,7 +7,9 @@
  */
 package org.roda.core.plugins.plugins.base;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -15,14 +17,18 @@ import org.roda.core.common.ValidationUtils;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
 import org.roda.core.data.common.InvalidParameterException;
+import org.roda.core.data.v2.EventPreservationObject;
 import org.roda.core.data.v2.PluginType;
 import org.roda.core.index.IndexService;
+import org.roda.core.metadata.v2.premis.PremisMetadataException;
 import org.roda.core.model.AIP;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.ModelServiceException;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.plugins.PluginUtils;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.StorageServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,11 +94,32 @@ public class AIPValidationPlugin implements Plugin<AIP> {
           invalidAIP.add(aip.getId());
           LOGGER.debug("Done with validating AIP " + aip.getId() + ": invalid!");
         }
+        createEvent(aip,model,descriptiveValid,preservationValid);
       } catch (ModelServiceException mse) {
         LOGGER.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage(), mse);
       }
     }
     return null;
+  }
+  
+  //TODO EVENT MUST BE "AIP EVENT" INSTEAD OF "REPRESENTATION EVENT"
+  //TODO AGENT ID...
+  private void createEvent(AIP aip, ModelService model, boolean descriptiveValid, boolean preservationValid) throws PluginException {
+    try {
+      boolean success = descriptiveValid && preservationValid;
+
+      for (String representationID : aip.getRepresentationIds()) {
+        PluginUtils.createPluginEvent(aip.getId(), representationID, model,
+          EventPreservationObject.PRESERVATION_EVENT_TYPE_FORMAT_VALIDATION,
+          "The AIP format was validated.",
+          EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_INGEST_TASK, "AGENT ID",
+          Arrays.asList(representationID), success ? "success" : "error", "Report",
+          "");
+      }
+    } catch (PremisMetadataException | IOException | StorageServiceException | ModelServiceException e) {
+      throw new PluginException(e.getMessage(), e);
+    }
+    
   }
 
   @Override
