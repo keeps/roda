@@ -27,6 +27,11 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import gov.loc.repository.bagit.Bag;
+import gov.loc.repository.bagit.BagFactory;
+import gov.loc.repository.bagit.BagInfoTxt;
+import gov.loc.repository.bagit.utilities.SimpleResult;
+
 public class ArcheevoBagitToAIPPlugin implements Plugin<TransferredResource> {
   private static final Logger LOGGER = LoggerFactory.getLogger(ArcheevoBagitToAIPPlugin.class);
 
@@ -80,8 +85,22 @@ public class ArcheevoBagitToAIPPlugin implements Plugin<TransferredResource> {
       Path bagitPath = Paths.get(transferredResource.getFullPath());
       LOGGER.debug("Converting " + bagitPath + " to AIP");
       try {
-        AIP aipCreated = BagitToAIPPluginUtils.bagitToAip(bagitPath, model, "metadata_archeevo.xml");
-
+        BagFactory bagFactory = new BagFactory();
+        Bag bag = bagFactory.createBag(bagitPath.toFile());
+        SimpleResult result = bag.verifyPayloadManifests();
+        if (!result.isSuccess()) {
+          throw new BagitNotValidException(result.getMessages() + "");
+        }
+        BagInfoTxt bagInfoTxt = bag.getBagInfoTxt();
+        String parent = bagInfoTxt.get("parent");
+        
+        AIP aipCreated = BagitToAIPPluginUtils.bagitToAip(bag, bagitPath, model, "metadata_archeevo.xml");
+        if (parent != null) {
+          if (aipCreated.getParentId() == null) {
+            LOGGER.error("PARENT NOT FOUND!");
+            // TODO handle parent not found...
+          }
+        }
         // // update job with mapping between transferred resource id e aip id
         // Job job = index.retrieve(Job.class, jobId);
         // job.addObjectIdToAipIdMapping(transferredResource.getId(),
