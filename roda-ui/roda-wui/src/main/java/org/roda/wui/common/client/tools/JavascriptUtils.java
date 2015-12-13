@@ -176,20 +176,6 @@ public class JavascriptUtils {
 });
   }-*/;
   
-  public static native void dotdotdotPath(JavaScriptObject parent) /*-{
-    $wnd.jQuery(parent).find('.pathname').each(function() {
-        var path = $wnd.jQuery(this).html().split( '/' );
-        if ( path.length > 1 ) {
-                var name = path.pop();
-                $wnd.jQuery(this).html( path.join( '/' ) + '<span class="filename">/' + name + '</span>' );
-                $wnd.jQuery(this).dotdotdot({
-                        after: 'span.filename',
-                        wrap: 'letter'
-                });                                             
-        }
-});
-  }-*/; 
-  
   public static native void updateURLWithoutReloading(String newUrl) /*-{
     $wnd.history.pushState(newUrl, "", newUrl);
   }-*/;

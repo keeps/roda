@@ -5,3 +5,4 @@ target/
 roda-installer/*.zip
 roda-installer/roda-installer_v*
 *~
+**/.DS_Store
