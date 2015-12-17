@@ -18,6 +18,7 @@ import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -27,10 +28,13 @@ import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
@@ -43,6 +47,11 @@ import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.reflections.Reflections;
+import org.reflections.scanners.ResourcesScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
+import org.reflections.util.FilterBuilder;
 import org.roda.core.common.ApacheDS;
 import org.roda.core.common.LdapUtility;
 import org.roda.core.common.Messages;
@@ -133,6 +142,7 @@ public class RodaCoreFactory {
   private static ModelService model;
   private static IndexService index;
   private static SolrClient solr;
+  private static boolean FEATURE_OVERRIDE_INDEX_CONFIGS = true;
 
   // Orchestrator related objects
   private static PluginManager pluginManager;
@@ -140,7 +150,7 @@ public class RodaCoreFactory {
   private static PluginOrchestrator pluginOrchestrator;
   private static AkkaDistributedPluginOrchestrator akkaDistributedPluginOrchestrator;
   private static AkkaDistributedPluginWorker akkaDistributedPluginWorker;
-  private static boolean FEATURE_AKKA_ENABLED = false;
+  private static boolean FEATURE_DISTRIBUTED_AKKA = false;
 
   // ApacheDS related objects
   private static ApacheDS ldap;
@@ -191,7 +201,7 @@ public class RodaCoreFactory {
         instantiateEssentialDirectoriesAndObjects();
 
         // instantiate solr and index service
-        instantiateSolrAndIndexService(nodeType);
+        instantiateSolrAndIndexService();
 
         // load core configurations
         rodaConfiguration = new CompositeConfiguration();
@@ -251,14 +261,11 @@ public class RodaCoreFactory {
     return new FileStorageService(storagePath);
   }
 
-  private static void instantiateSolrAndIndexService(NodeType nodeType) throws URISyntaxException {
+  private static void instantiateSolrAndIndexService() throws URISyntaxException {
     if (nodeType == NodeType.MASTER) {
-      // configure Solr (first try RODA HOME and then fallback to classpath)
       Path solrHome = configPath.resolve("index");
-      if (!Files.exists(solrHome)) {
-        // FIXME perhaps these files should be copied from classpath to
-        // install dir ir they cannot be used from classpath
-        solrHome = Paths.get(RodaCoreFactory.class.getResource("/config/index/").toURI());
+      if (!Files.exists(solrHome) || FEATURE_OVERRIDE_INDEX_CONFIGS) {
+        copyIndexConfigsFromClasspathToRodaHome();
       }
 
       System.setProperty("solr.data.dir", indexPath.toString());
@@ -274,13 +281,38 @@ public class RodaCoreFactory {
       System.setProperty("solr.data.dir.sip", indexPath.resolve("sip").toString());
       System.setProperty("solr.data.dir.job", indexPath.resolve("job").toString());
       System.setProperty("solr.data.dir.file", indexPath.resolve("file").toString());
-      // FIXME added missing cores
 
-      // start solr
+      // instantiate & start solr
       solr = instantiateSolr(solrHome);
 
       // instantiate index related object
       index = new IndexService(solr, model);
+    }
+  }
+
+  private static void copyIndexConfigsFromClasspathToRodaHome() {
+    List<ClassLoader> classLoadersList = new LinkedList<ClassLoader>();
+    classLoadersList.add(ClasspathHelper.contextClassLoader());
+    // classLoadersList.add(ClasspathHelper.staticClassLoader());
+
+    Set<String> resources = new Reflections(
+      new ConfigurationBuilder().filterInputsBy(new FilterBuilder().include(FilterBuilder.prefix("config/index/")))
+        .setScanners(new ResourcesScanner())
+        .setUrls(ClasspathHelper.forClassLoader(classLoadersList.toArray(new ClassLoader[0]))))
+          .getResources(Pattern.compile(".*"));
+
+    for (String resource : resources) {
+      InputStream originStream = RodaCoreFactory.class.getClassLoader().getResourceAsStream(resource);
+      Path destinyPath = rodaHomePath.resolve(resource);
+      try {
+        // create all parent directories
+        Files.createDirectories(destinyPath.getParent());
+        // copy file
+        Files.copy(originStream, destinyPath, StandardCopyOption.REPLACE_EXISTING);
+      } catch (IOException e) {
+        LOGGER.error("Error copying file from classpath: {} to {} (reason: {})", originStream, destinyPath,
+          e.getMessage());
+      }
     }
   }
 
@@ -291,7 +323,7 @@ public class RodaCoreFactory {
 
   private static void instantiateNodeSpecificObjects(NodeType nodeType) {
     if (nodeType == NodeType.MASTER) {
-      if (FEATURE_AKKA_ENABLED) {
+      if (FEATURE_DISTRIBUTED_AKKA) {
 
         akkaDistributedPluginOrchestrator = new AkkaDistributedPluginOrchestrator(
           getSystemProperty(RodaConstants.CORE_NODE_HOSTNAME, "localhost"),
@@ -421,6 +453,10 @@ public class RodaCoreFactory {
   public static void shutdown() throws IOException {
     if (instantiated) {
       solr.close();
+      pluginManager.shutdown();
+      pluginOrchestrator.shutdown();
+      sipFolderMonitor.stopWatch();
+
       if (nodeType == NodeType.MASTER) {
         stopApacheDS();
       }

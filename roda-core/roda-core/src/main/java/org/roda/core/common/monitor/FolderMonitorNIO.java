@@ -54,6 +54,10 @@ public class FolderMonitorNIO {
     LOGGER.debug("WATCH (NIO) ON FOLDER " + basePath.toString() + " STARTED");
   }
 
+  public void stopWatch(){
+    threadWatch.interrupt();
+  }
+
   public void addFolderObserver(FolderObserver observer) {
     observers.add(observer);
     if (watchDir != null) {
@@ -171,11 +175,7 @@ public class FolderMonitorNIO {
   }
 
   public boolean isFullyInitialized() {
-    if (watchDir == null) {
-      return false;
-    } else {
-      return watchDir.isFullyInitialized();
-    }
+    return watchDir != null && watchDir.isFullyInitialized();
   }
 
 }
