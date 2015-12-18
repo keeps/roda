@@ -63,6 +63,8 @@ public class EventPreservationObject extends PreservationObject implements Seria
 
   public static final String PRESERVATION_EVENT_AGENT_ROLE_INGEST_TASK = "ingest task";
   public static final String PRESERVATION_EVENT_AGENT_ROLE_PRESERVATION_TASK = "preservation task";
+  public static final String PRESERVATION_EVENT_AGENT_ROLE_VALIDATION_TASK = "validation task";
+  public static final String PRESERVATION_EVENT_AGENT_ROLE_EXECUTING_PROGRAM_TASK = "executing program task";
 
   public static final String PRESERVATION_EVENT_OBJECT_ROLE_TARGET = "target";
 

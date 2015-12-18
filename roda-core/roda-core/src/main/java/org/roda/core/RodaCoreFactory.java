@@ -124,6 +124,8 @@ import org.roda.core.plugins.plugins.ingest.characterization.MediaInfoPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.PremisSkeletonPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.SiegfriedPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.TikaFullTextPlugin;
+import org.roda.core.plugins.plugins.ingest.migration.PDFtoPDFAPlugin;
+import org.roda.core.plugins.plugins.ingest.validation.VeraPDFPlugin;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fedora.FedoraStorageService;
 import org.roda.core.storage.fs.FileStorageService;
@@ -938,6 +940,35 @@ public class RodaCoreFactory {
     getPluginOrchestrator().runPluginOnAllAIPs(fulltextPlugin);
   }
 
+  private static void runVeraPDFPlugin(String profile, String hasFeatures, String maxKbytes,
+    String hasPartialSuccessOnOutcome) {
+    try {
+      Plugin<AIP> veraPDFPlugin = new VeraPDFPlugin();
+      Map<String, String> params = new HashMap<String, String>();
+      params.put("profile", profile);
+      params.put("hasFeatures", hasFeatures);
+      params.put("maxKbytes", maxKbytes);
+      params.put("hasPartialSuccessOnOutcome", hasPartialSuccessOnOutcome);
+      veraPDFPlugin.setParameterValues(params);
+      getPluginOrchestrator().runPluginOnAllAIPs(veraPDFPlugin);
+    } catch (InvalidParameterException ipe) {
+      LOGGER.error(ipe.getMessage(), ipe);
+    }
+  }
+
+  private static void runPDFtoPDFAPlugin(String maxKbytes, String hasPartialSuccessOnOutcome) {
+    try {
+      Plugin<AIP> plugin = new PDFtoPDFAPlugin();
+      Map<String, String> params = new HashMap<String, String>();
+      params.put("maxKbytes", maxKbytes);
+      params.put("hasPartialSuccessOnOutcome", hasPartialSuccessOnOutcome);
+      plugin.setParameterValues(params);
+      getPluginOrchestrator().runPluginOnAllAIPs(plugin);
+    } catch (InvalidParameterException ipe) {
+      LOGGER.error(ipe.getMessage(), ipe);
+    }
+  }
+
   private static void runJhovePlugin() {
     Plugin<AIP> jhovePlugin = new JHOVEPlugin();
     getPluginOrchestrator().runPluginOnAllAIPs(jhovePlugin);
@@ -1109,6 +1140,8 @@ public class RodaCoreFactory {
     System.err.println("java -jar x.jar fastcharacterization");
     System.err.println("java -jar x.jar eark");
     System.err.println("java -jar x.jar siegfried");
+    System.err.println("java -jar x.jar verapdf");
+    System.err.println("java -jar x.jar pdftopdfa");
   }
 
   private static void printIndexMembers(List<String> args, Filter filter, Sorter sorter, Sublist sublist, Facets facets)
@@ -1211,6 +1244,10 @@ public class RodaCoreFactory {
       runDroidPlugin();
     } else if ("fulltext".equals(args.get(0))) {
       runFulltextPlugin();
+    } else if ("verapdf".equals(args.get(0))) {
+      runVeraPDFPlugin(args.get(1), args.get(2), args.get(3), args.get(4));
+    } else if ("pdftopdfa".equals(args.get(0))) {
+      runPDFtoPDFAPlugin(args.get(1), args.get(2));
     } else if ("jhove".equals(args.get(0))) {
       runJhovePlugin();
     } else if ("fits".equals(args.get(0))) {

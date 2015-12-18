@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>org.verapdf</groupId>
+  <artifactId>gui</artifactId>
+  <versioning>
+    <release>0.8.0</release>
+    <versions>
+      <version>0.8.0</version>
+    </versions>
+    <lastUpdated>20160121110557</lastUpdated>
+  </versioning>
+</metadata>

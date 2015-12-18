@@ -40,6 +40,8 @@ import org.roda.core.plugins.plugins.base.AIPValidationPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.PremisSkeletonPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.SiegfriedPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.TikaFullTextPlugin;
+import org.roda.core.plugins.plugins.ingest.migration.PDFtoPDFAPlugin;
+import org.roda.core.plugins.plugins.ingest.validation.VeraPDFPlugin;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +54,13 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
     "Known format of SIP to be ingest into the repository.");
   public static final PluginParameter PARAMETER_DO_VIRUS_CHECK = new PluginParameter("parameter.do_virus_check",
     "Virus check", PluginParameterType.BOOLEAN, "true", true, false, "Verifies if an SIP is free of virus.");
+  public static final PluginParameter PARAMETER_DO_PDFTOPDFA_CONVERSION = new PluginParameter(
+    "parameter.do_pdftopdfa_conversion", "Convert PDF to valid PDF/A", PluginParameterType.BOOLEAN, "false", true,
+    false, "Converts PDF files into veraPDF valid PDF/A files.");
+
+  public static final PluginParameter PARAMETER_DO_VERAPDF_CHECK = new PluginParameter("parameter.do_verapdf_check",
+    "VeraPDF check", PluginParameterType.BOOLEAN, "false", true, false,
+    "Verifies if PDF files sent are veraPDF valid PDF/A files.");
   public static final PluginParameter PARAMETER_CREATE_PREMIS_SKELETON = new PluginParameter(
     "parameter.create.premis.skeleton", "Create basic PREMIS information", PluginParameterType.BOOLEAN, "true", true,
     true, "Create basic PREMIS information (e.g. PREMIS object for each representation file, etc.).");
@@ -151,6 +160,30 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
     // 2) do virus check
     if (PluginHelper.verifyIfStepShouldBePerformed(parameters, PARAMETER_DO_VIRUS_CHECK)) {
       pluginReport = doVirusCheck(index, model, storage, aips);
+      reports = mergeReports(reports, pluginReport);
+      currentCompletionPercentage = PluginHelper.updateJobStatus(index, model, currentCompletionPercentage,
+        completionPercentageStep, parameters);
+    }
+
+    // 2.1) do pdftopdfa conversion
+    if (PluginHelper.verifyIfStepShouldBePerformed(parameters, PARAMETER_DO_PDFTOPDFA_CONVERSION)) {
+      Map<String, String> params = new HashMap<String, String>();
+      params.put("maxKbytes", "20000");
+      params.put("hasPartialSuccessOnOutcome", "True");
+      pluginReport = doPDFtoPDFAConversion(index, model, storage, aips, params);
+      reports = mergeReports(reports, pluginReport);
+      currentCompletionPercentage = PluginHelper.updateJobStatus(index, model, currentCompletionPercentage,
+        completionPercentageStep, parameters);
+    }
+
+    // 2.2) do verapdf check
+    if (PluginHelper.verifyIfStepShouldBePerformed(parameters, PARAMETER_DO_VERAPDF_CHECK)) {
+      Map<String, String> params = new HashMap<String, String>();
+      params.put("profile", "1b");
+      params.put("hasFeatures", "False");
+      params.put("maxKbytes", "20000");
+      params.put("hasPartialSuccessOnOutcome", "True");
+      pluginReport = doVeraPDFCheck(index, model, storage, aips, params);
       reports = mergeReports(reports, pluginReport);
       currentCompletionPercentage = PluginHelper.updateJobStatus(index, model, currentCompletionPercentage,
         completionPercentageStep, parameters);
@@ -293,6 +326,16 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
     return executePlugin(index, model, storage, aips, AntivirusPlugin.class.getName());
   }
 
+  private Report doPDFtoPDFAConversion(IndexService index, ModelService model, StorageService storage, List<AIP> aips,
+    Map<String, String> params) {
+    return executePlugin(index, model, storage, aips, PDFtoPDFAPlugin.class.getName(), params);
+  }
+
+  private Report doVeraPDFCheck(IndexService index, ModelService model, StorageService storage, List<AIP> aips,
+    Map<String, String> params) {
+    return executePlugin(index, model, storage, aips, VeraPDFPlugin.class.getName(), params);
+  }
+
   private Report verifyIfAipIsWellFormed(IndexService index, ModelService model, StorageService storage,
     List<AIP> aips) {
     return executePlugin(index, model, storage, aips, AIPValidationPlugin.class.getName());
@@ -336,11 +379,20 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
 
   private Report executePlugin(IndexService index, ModelService model, StorageService storage, List<AIP> aips,
     String pluginClassName) {
+    return executePlugin(index, model, storage, aips, pluginClassName, null);
+  }
+
+  private Report executePlugin(IndexService index, ModelService model, StorageService storage, List<AIP> aips,
+    String pluginClassName, Map<String, String> params) {
     Report report = null;
     Plugin<AIP> plugin = (Plugin<AIP>) RodaCoreFactory.getPluginManager().getPlugin(pluginClassName);
+    Map<String, String> mergedParams = new HashMap<String, String>(getParameterValues());
+    if (params != null) {
+      mergedParams.putAll(params);
+    }
 
     try {
-      plugin.setParameterValues(getParameterValues());
+      plugin.setParameterValues(mergedParams);
       report = plugin.execute(index, model, storage, aips);
     } catch (PluginException | InvalidParameterException e) {
       // FIXME handle failure

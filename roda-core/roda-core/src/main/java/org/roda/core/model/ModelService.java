@@ -972,6 +972,20 @@ public class ModelService extends ModelObservable {
     return aip;
   }
 
+  // TODO to improve...
+  public boolean hasAgentPreservationObject(String agentID) {
+    boolean hasAgent = false;
+    try {
+      StoragePath sp = ModelUtils.getPreservationAgentPath(agentID);
+      Binary b = storage.getBinary(sp);
+      if (b != null && b.getSizeInBytes() > 0)
+        hasAgent = true;
+    } catch (AuthorizationDeniedException | NotFoundException | RequestNotValidException | GenericException e) {
+      hasAgent = false;
+    }
+    return hasAgent;
+  }
+
   private RODAObjectPermissions getPermissions(Map<String, Set<String>> metadata) {
     RODAObjectPermissions permissions = new RODAObjectPermissions();
 

@@ -138,7 +138,7 @@ public class FolderMonitorNIO {
     Path relativeToBase = basePath.relativize(resourcePath);
     TransferredResource tr = new TransferredResource();
     try {
-      BasicFileAttributes attr = Files.readAttributes(basePath, BasicFileAttributes.class);
+      BasicFileAttributes attr = Files.readAttributes(resourcePath, BasicFileAttributes.class);
       Date d = new Date(attr.creationTime().toMillis());
       tr.setCreationDate(d);
     } catch (IOException e) {

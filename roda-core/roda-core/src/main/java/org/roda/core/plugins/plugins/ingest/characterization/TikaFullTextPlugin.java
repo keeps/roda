@@ -166,7 +166,7 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
         state = PluginState.FAILURE;
         reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()))
           .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS,
-            "Error running SIEGFRIED " + aip.getId() + ": " + e.getMessage()));
+            "Error running Tika " + aip.getId() + ": " + e.getMessage()));
       }
 
       report.addItem(reportItem);
