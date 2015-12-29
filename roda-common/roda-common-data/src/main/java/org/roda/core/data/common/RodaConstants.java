@@ -439,5 +439,11 @@ public final class RodaConstants {
   public static final String JOB_REPORT_DATE_UPDATE = "dateUpdated";
   public static final String JOB_REPORT_LAST_PLUGIN_RAN = "lastPluginRan";
   public static final String JOB_REPORT_LAST_PLUGIN_RAN_STATE = "lastPluginRanState";
+  
+  /* View representation */
+  public static final String VIEW_REPRESENTATION_DESCRIPTION_LEVEL = "description-level-representation";
+  public static final String VIEW_REPRESENTATION_REPRESENTATION = "representation";
+  public static final String VIEW_REPRESENTATION_FOLDER = "folder";
+  public static final String VIEW_REPRESENTATION_FILE = "file";
 
 }

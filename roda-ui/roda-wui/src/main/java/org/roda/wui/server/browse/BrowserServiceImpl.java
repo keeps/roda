@@ -9,11 +9,14 @@ package org.roda.wui.server.browse;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.roda.core.RodaCoreFactory;
@@ -662,4 +665,20 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     return Jobs.findJobReports(user, filter, sorter, sublist, facets);
   }
 
+  public void getViewerProperties() {
+    Configuration configurationFile;
+    try {
+      configurationFile = RodaCoreFactory.getConfiguration("roda-wui.properties");
+      LOGGER.error("HERE");
+      Iterator<String> itr = configurationFile.getKeys("viewer");
+      while(itr.hasNext()) {
+         Object element = itr.next();
+         LOGGER.error("Unexpected error " + element);
+      }
+    } catch (ConfigurationException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+   
+  }
 }

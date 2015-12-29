@@ -3,6 +3,7 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:i="urn:import:config.i18n.client" xmlns:m="urn:import:org.roda.wui.client.main"
+	xmlns:wcag="urn:import:org.roda.wui.common.client.widgets.wcag"
 	xmlns:lists="urn:import:org.roda.wui.client.common.lists">
 
 	<ui:with field='messages' type='config.i18n.client.BrowseMessages' />
@@ -22,7 +23,24 @@
 				<m:BreadcrumbPanel ui:field="breadcrumb"
 					addStyleNames="browseBreadcrumb" />
 				<g:HorizontalPanel ui:field="previewPanel">
-					<lists:FileList ui:field="filesPanel" />
+					<g:FlowPanel ui:field="filesPanel">
+						<g:FlowPanel styleName="searchPanel">
+							<g:FlowPanel styleName="searchPanelLeft">
+								<g:TextBox ui:field="searchInputBox" addStyleNames="searchBox" />
+							</g:FlowPanel>
+							<wcag:AccessibleFocusPanel styleName="searchButton"
+								ui:field="searchInputButton">
+								<g:HTML addStyleNames="searchButton-html">
+									<span class="fa-stack fa-lg">
+										<i class="fa fa-circle fa-stack-2x"></i>
+										<i class="fa fa-search fa-stack-1x"></i>
+									</span>
+								</g:HTML>
+							</wcag:AccessibleFocusPanel>
+						</g:FlowPanel>
+						<lists:FileList ui:field="filesList" />
+					</g:FlowPanel>
+
 					<g:FlowPanel ui:field="filePreview">
 					</g:FlowPanel>
 				</g:HorizontalPanel>

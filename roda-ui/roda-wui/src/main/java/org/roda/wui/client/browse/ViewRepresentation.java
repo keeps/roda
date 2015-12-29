@@ -16,7 +16,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.httpclient.HttpStatus;
+import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.filter.FilterParameter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
@@ -35,11 +37,15 @@ import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.JavascriptUtils;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ResizeEvent;
 import com.google.gwt.event.logical.shared.ResizeHandler;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -64,6 +70,7 @@ import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SelectionChangeEvent.Handler;
@@ -111,6 +118,7 @@ public class ViewRepresentation extends Composite {
                     if (result.getResults().size() == 1) {
                       SimpleFile simpleFile = result.getResults().get(0);
                       ViewRepresentation view;
+                      /* TODO unique file control */
                       if (simpleFile.isFile()) {
                         view = new ViewRepresentation(aipId, itemBundle, representationId, fileId, simpleFile);
                       } else {
@@ -176,7 +184,7 @@ public class ViewRepresentation extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  // @SuppressWarnings("unused")
+  @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
   private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
@@ -186,7 +194,8 @@ public class ViewRepresentation extends Composite {
   private String representationId;
   @SuppressWarnings("unused")
   private String fileId;
-  private SimpleFile simpleFile = null;
+  private SimpleFile file = null;
+  private Filter defaultFilter;
 
   static final int WINDOW_WIDTH = 1200;
 
@@ -196,8 +205,17 @@ public class ViewRepresentation extends Composite {
   @UiField
   HorizontalPanel previewPanel;
 
+  @UiField
+  FlowPanel filesPanel;
+
+  @UiField
+  TextBox searchInputBox;
+
+  @UiField
+  AccessibleFocusPanel searchInputButton;
+
   @UiField(provided = true)
-  FileList filesPanel;
+  FileList filesList;
 
   @UiField
   FlowPanel filePreview;
@@ -246,26 +264,29 @@ public class ViewRepresentation extends Composite {
    * @param itemBundle
    * @param representationId
    * @param fileId
-   * @param simpleFile
+   * @param file
    * 
    */
   public ViewRepresentation(String aipId, BrowseItemBundle itemBundle, String representationId, String fileId,
-    SimpleFile simpleFile) {
+    SimpleFile file) {
     this.aipId = aipId;
     this.itemBundle = itemBundle;
     this.representationId = representationId;
     this.fileId = fileId;
-    this.simpleFile = simpleFile;
+    this.file = file;
 
-    Filter filter = new Filter();
-    filter.add(new SimpleFilterParameter(RodaConstants.FILE_AIPID, aipId));
-    filter.add(new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATIONID, representationId));
-    /* TODO add fileId as a filter */
-    filesPanel = new FileList(filter, null, null);
+    defaultFilter = new Filter();
+    defaultFilter.add(new SimpleFilterParameter(RodaConstants.FILE_AIPID, aipId));
+    defaultFilter.add(new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATIONID, representationId));
+    // if (fileId != null) {
+    // filter.add(new SimpleFilterParameter(RodaConstants.FILE_FILEID, fileId));
+    // }
+    /* TODO add fileId as a filter, should be parentId */
+    filesList = new FileList(defaultFilter, null, null);
 
     initWidget(uiBinder.createAndBindUi(this));
 
-    breadcrumb.updatePath(getBreadcrumbs(itemBundle, simpleFile));
+    breadcrumb.updatePath(getBreadcrumbs(itemBundle, file));
     breadcrumb.setVisible(true);
 
     back.setText(messages.backButton());
@@ -275,11 +296,11 @@ public class ViewRepresentation extends Composite {
 
     downloadFile.setEnabled(false);
 
-    /* TODO Controll next and previous file button */
+    /* TODO Control next and previous file button */
     nextFile.setVisible(false);
     previousFile.setVisible(false);
 
-    filesPanel.getSelectionModel().addSelectionChangeHandler(new Handler() {
+    filesList.getSelectionModel().addSelectionChangeHandler(new Handler() {
 
       @Override
       public void onSelectionChange(SelectionChangeEvent event) {
@@ -290,6 +311,15 @@ public class ViewRepresentation extends Composite {
           filePreview();
         }
       }
+    });
+
+    filesList.addValueChangeHandler(new ValueChangeHandler<IndexResult<SimpleFile>>() {
+
+      @Override
+      public void onValueChange(ValueChangeEvent<IndexResult<SimpleFile>> event) {
+        /* TODO unique file control */
+      }
+    
     });
 
     previewPanel.addStyleName("viewRepresentationPreviewPanel");
@@ -309,17 +339,31 @@ public class ViewRepresentation extends Composite {
 
     filePreview();
 
+    this.searchInputBox.addValueChangeHandler(new ValueChangeHandler<String>() {
+
+      @Override
+      public void onValueChange(ValueChangeEvent<String> event) {
+        doSearch();
+      }
+    });
+
+    this.searchInputButton.addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        doSearch();
+      }
+    });
   }
 
   private void changeURL() {
     String url = Window.Location.createUrlBuilder().buildString();
     String viewUrl = url.substring(url.indexOf("view/"));
-    logger.debug(viewUrl);
     if (viewUrl.split("/").length == 3) {
-      url = url.replace(viewUrl, viewUrl + "/" + filesPanel.getSelectionModel().getSelectedObject().getId());
+      url = url.replace(viewUrl, viewUrl + "/" + filesList.getSelectionModel().getSelectedObject().getId());
     } else {
       url = url.replace(viewUrl, viewUrl.substring(0, viewUrl.lastIndexOf("/")) + "/"
-        + filesPanel.getSelectionModel().getSelectedObject().getId());
+        + filesList.getSelectionModel().getSelectedObject().getId());
     }
     JavascriptUtils.updateURLWithoutReloading(url);
   }
@@ -330,22 +374,28 @@ public class ViewRepresentation extends Composite {
     List<Representation> representations = itemBundle.getRepresentations();
     Representation rep = selectRepresentation(representations, representationId);
 
-    ret.add(new BreadcrumbItem(
-      getBreadcrumbLabel((sdo.getTitle() != null) ? sdo.getTitle() : sdo.getId(), "description-level-representation"),
-      Tools.concat(Browse.RESOLVER.getHistoryPath(), aipId)));
-    ret.add(new BreadcrumbItem(getBreadcrumbLabel(representationType(rep), "representation"),
-      Tools.concat(ViewRepresentation.RESOLVER.getHistoryPath(), aipId, representationId)));
+    ret
+      .add(
+        new BreadcrumbItem(
+          getBreadcrumbLabel((sdo.getTitle() != null) ? sdo.getTitle() : sdo.getId(),
+            RodaConstants.VIEW_REPRESENTATION_DESCRIPTION_LEVEL),
+          Tools.concat(Browse.RESOLVER.getHistoryPath(), aipId)));
+    ret.add(
+      new BreadcrumbItem(getBreadcrumbLabel(representationType(rep), RodaConstants.VIEW_REPRESENTATION_REPRESENTATION),
+        Tools.concat(ViewRepresentation.RESOLVER.getHistoryPath(), aipId, representationId)));
 
     if (simpleFile != null) {
       for (String folder : simpleFile.getPath()) {
         if (!(folder.equals(aipId) || folder.equals(representationId) || folder.equals(simpleFile.getId())
           || folder.isEmpty())) {
-          ret.add(new BreadcrumbItem(getBreadcrumbLabel(folder, "folder"),
+          ret.add(new BreadcrumbItem(getBreadcrumbLabel(folder, RodaConstants.VIEW_REPRESENTATION_FOLDER),
             Tools.concat(ViewRepresentation.RESOLVER.getHistoryPath(), aipId, representationId, folder)));
         }
       }
 
-      ret.add(new BreadcrumbItem(getBreadcrumbLabel(simpleFile.getOriginalName(), "file"),
+      ret.add(new BreadcrumbItem(
+        simpleFile.isFile() ? getBreadcrumbLabel(simpleFile.getOriginalName(), RodaConstants.VIEW_REPRESENTATION_FILE)
+          : getBreadcrumbLabel(simpleFile.getOriginalName(), RodaConstants.VIEW_REPRESENTATION_FOLDER),
         Tools.concat(ViewRepresentation.RESOLVER.getHistoryPath(), aipId, representationId, simpleFile.getId())));
     }
 
@@ -387,11 +437,11 @@ public class ViewRepresentation extends Composite {
 
   private SafeHtml getElementLevelIconSafeHtml(String level) {
     SafeHtml icon;
-    if (level.equals("description-level-representation")) {
+    if (level.equals(RodaConstants.VIEW_REPRESENTATION_DESCRIPTION_LEVEL)) {
       icon = SafeHtmlUtils.fromSafeConstant("<i class='description-level description-level-representational'></i>");
-    } else if (level.equals("representation")) {
+    } else if (level.equals(RodaConstants.VIEW_REPRESENTATION_REPRESENTATION)) {
       icon = SafeHtmlUtils.fromSafeConstant("<i class='fa fa-files-o'></i>");
-    } else if (level.equals("folder")) {
+    } else if (level.equals(RodaConstants.VIEW_REPRESENTATION_FOLDER)) {
       icon = SafeHtmlUtils.fromSafeConstant("<i class='fa fa-folder-o'></i>");
     } else {
       icon = SafeHtmlUtils.fromSafeConstant("<i class='fa fa-file-o'></i>");
@@ -406,30 +456,30 @@ public class ViewRepresentation extends Composite {
 
   @UiHandler("nextFile")
   void buttonNextFileHandler(ClickEvent e) {
-    filesPanel.nextItemSelection();
+    filesList.nextItemSelection();
   }
 
   @UiHandler("previousFile")
   void buttonPreviousFileHandler(ClickEvent e) {
-    filesPanel.previousItemSelection();
+    filesList.previousItemSelection();
   }
 
   @UiHandler("downloadFile")
   void buttonDownloadFileHandler(ClickEvent e) {
     SafeUri downloadUri = null;
-    if (simpleFile != null) {
-      downloadUri = RestUtils.createRepresentationFileDownloadUri(aipId, representationId, simpleFile.getId());
-    } else if (filesPanel.getSelectionModel().getSelectedObject() != null) {
+    if (file != null) {
+      downloadUri = RestUtils.createRepresentationFileDownloadUri(aipId, representationId, file.getId());
+    } else if (filesList.getSelectionModel().getSelectedObject() != null) {
       downloadUri = RestUtils.createRepresentationFileDownloadUri(aipId, representationId,
-        filesPanel.getSelectionModel().getSelectedObject().getId());
+        filesList.getSelectionModel().getSelectedObject().getId());
     }
     if (downloadUri != null) {
       Window.Location.assign(downloadUri.asString());
     }
   }
-
+  
   private void panelsControl() {
-    if (simpleFile == null) {
+    if (file == null) {
       if (Window.getClientWidth() < WINDOW_WIDTH) {
         hideFilePreview();
       } else {
@@ -437,18 +487,18 @@ public class ViewRepresentation extends Composite {
       }
     } else {
       if (Window.getClientWidth() < WINDOW_WIDTH) {
-        hideFilesList();
+        hideFilesPanel();
       } else {
-        showFilesList();
+        showFilesPanel();
       }
     }
   }
 
-  private void hideFilesList() {
+  private void hideFilesPanel() {
     filesPanel.setVisible(false);
   }
 
-  private void showFilesList() {
+  private void showFilesPanel() {
     filesPanel.setVisible(true);
   }
 
@@ -466,33 +516,51 @@ public class ViewRepresentation extends Composite {
 
   private void view() {
     Tools.newHistory(Browse.RESOLVER, ViewRepresentation.RESOLVER.getHistoryToken(), aipId, representationId,
-      filesPanel.getSelectionModel().getSelectedObject().getId());
+      filesList.getSelectionModel().getSelectedObject().getId());
   }
 
   private void filePreview() {
     filePreview.clear();
 
-    simpleFile = (filesPanel.getSelectionModel().getSelectedObject() != null)
-      ? filesPanel.getSelectionModel().getSelectedObject() : simpleFile;
-    if (simpleFile != null && simpleFile.getOriginalName() != null) {
-      breadcrumb.updatePath(getBreadcrumbs(itemBundle, simpleFile));
+    file = (filesList.getSelectionModel().getSelectedObject() != null)
+      ? filesList.getSelectionModel().getSelectedObject() : file;
+
+    if (file != null && file.getOriginalName() != null) {
+      breadcrumb.updatePath(getBreadcrumbs(itemBundle, file));
       downloadFile.setEnabled(true);
 
-      if (simpleFile.getOriginalName().toLowerCase().contains(".png")
-        || simpleFile.getOriginalName().toLowerCase().contains(".jpg")) {
-        imagePreview(simpleFile);
-      } else if (simpleFile.getOriginalName().toLowerCase().contains(".pdf")) {
-        pdfPreview(simpleFile);
-      } else if (simpleFile.getOriginalName().toLowerCase().contains(".xml")) {
-        textPreview(simpleFile);
-      } else if (simpleFile.getOriginalName().toLowerCase().contains(".mp3")) {
-        audioPreview(simpleFile);
-      } else if (simpleFile.getOriginalName().toLowerCase().contains(".mp4")) {
-        videoPreview(simpleFile);
+      /* TODO mimetypes */
+      // BrowserService.Util.getInstance().getViewerProperties(new
+      // AsyncCallback<Void>() {
+      //
+      // @Override
+      // public void onSuccess(Void result) {
+      // 
+      //
+      // }
+      //
+      // @Override
+      // public void onFailure(Throwable caught) {
+      // 
+      //
+      // }
+      // });
+
+      if (file.getOriginalName().toLowerCase().contains(".png")
+        || file.getOriginalName().toLowerCase().contains(".jpg")) {
+        imagePreview(file);
+      } else if (file.getOriginalName().toLowerCase().contains(".pdf")) {
+        pdfPreview(file);
+      } else if (file.getOriginalName().toLowerCase().contains(".xml")) {
+        textPreview(file);
+      } else if (file.getOriginalName().toLowerCase().contains(".mp3")) {
+        audioPreview(file);
+      } else if (file.getOriginalName().toLowerCase().contains(".mp4")) {
+        videoPreview(file);
       } else {
         notSupportedPreview();
       }
-    } else if (simpleFile == null) {
+    } else if (file == null) {
       emptyPreview();
     } else {
       errorPreview();
@@ -570,9 +638,7 @@ public class ViewRepresentation extends Composite {
             frame.add(html);
 
             filePreview.add(frame);
-
             frame.setStyleName("viewRepresentationTextFilePreview");
-
             JavascriptUtils.runHighlighter(html.getElement());
             JavascriptUtils.slideToggle(html.getElement(), ".toggle-next");
             JavascriptUtils.smoothScroll(html.getElement());
@@ -619,5 +685,19 @@ public class ViewRepresentation extends Composite {
 
   private String encode(String string) {
     return string.replace("?", "%3F").replace("=", "%3D");
+  }
+
+  public void doSearch() {
+    List<FilterParameter> parameters = new ArrayList<FilterParameter>();
+
+    String basicQuery = searchInputBox.getText();
+    if (!"".equals(basicQuery)) {
+      parameters.add(new BasicSearchFilterParameter(RodaConstants.SRO_FILE_IDS, basicQuery));
+    }
+
+    Filter filter = new Filter(defaultFilter);
+    filter.add(parameters);
+
+    filesList.setFilter(filter);
   }
 }
