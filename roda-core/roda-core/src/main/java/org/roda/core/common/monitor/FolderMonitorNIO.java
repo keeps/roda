@@ -47,15 +47,16 @@ public class FolderMonitorNIO {
   }
 
   private void startWatch() throws Exception {
-    LOGGER.debug("STARTING WATCH (NIO) ON FOLDER: " + basePath.toString());
+    LOGGER.debug("Starting watch (NIO) on folder: {}", basePath);
     watchDir = new WatchDir(basePath, true, indexDate, index, observers);
     threadWatch = new Thread(watchDir, "FolderWatcher");
     threadWatch.start();
-    LOGGER.debug("WATCH (NIO) ON FOLDER " + basePath.toString() + " STARTED");
+    LOGGER.debug("Watch (NIO) on folder {} started", basePath);
   }
 
-  public void stopWatch(){
+  public void stopWatch() {
     threadWatch.interrupt();
+    watchDir.stop();
   }
 
   public void addFolderObserver(FolderObserver observer) {
@@ -87,8 +88,8 @@ public class FolderMonitorNIO {
       } else {
         throw new NotFoundException("Path does not exist: " + fullpath);
       }
-    } catch (StorageServiceException sse) {
-      throw new IOException(sse.getMessage(), sse);
+    } catch (StorageServiceException e) {
+      throw new IOException(e.getMessage(), e);
     }
   }
 
@@ -105,8 +106,8 @@ public class FolderMonitorNIO {
         } else {
           throw new NotFoundException("Path does not exist: " + fullPath);
         }
-      } catch (StorageServiceException sse) {
-        throw new IOException(sse.getMessage(), sse);
+      } catch (StorageServiceException e) {
+        throw new IOException(e.getMessage(), e);
       }
     }
 

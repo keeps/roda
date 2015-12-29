@@ -373,7 +373,8 @@ public class RodaCoreFactory {
         }
       }
 
-      // set roda.home in order to correctly configure log4j even if no property
+      // set roda.home in order to correctly configure logging even if no
+      // property
       // has been defined
       System.setProperty("roda.home", rodaHomePath.toString());
     }
