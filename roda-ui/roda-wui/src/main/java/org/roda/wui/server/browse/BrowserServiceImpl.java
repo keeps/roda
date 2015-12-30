@@ -8,15 +8,13 @@
 package org.roda.wui.server.browse;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.roda.core.RodaCoreFactory;
@@ -61,6 +59,7 @@ import org.roda.wui.client.browse.ParseError;
 import org.roda.wui.client.browse.PreservationInfo;
 import org.roda.wui.client.browse.RepresentationInfo;
 import org.roda.wui.client.browse.TimelineInfo;
+import org.roda.wui.client.browse.Viewer;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
 import org.roda.wui.client.ingest.process.JobBundle;
 import org.roda.wui.client.search.SearchField;
@@ -620,17 +619,16 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     for (PluginParameter parameter : basePlugin.getParameters()) {
       if (PluginParameterType.PLUGIN_SIP_TO_AIP.equals(parameter.getType())) {
         String pluginId = job.getPluginParameters().get(parameter.getId());
-        if(pluginId !=  null) {
+        if (pluginId != null) {
           PluginInfo refPlugin = RodaCoreFactory.getPluginManager().getPluginInfo(pluginId);
           pluginsInfo.add(refPlugin);
         }
       }
     }
-    
+
     // adding all AIP to AIP plugins for job report list
     List<PluginInfo> aipToAipPlugins = RodaCoreFactory.getPluginManager().getPluginsInfo(PluginType.AIP_TO_AIP);
     pluginsInfo.addAll(aipToAipPlugins);
-    
 
     JobBundle bundle = new JobBundle();
     bundle.setJob(job);
@@ -660,25 +658,32 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public IndexResult<JobReport> findJobReports(Filter filter, Sorter sorter, Sublist sublist, Facets facets) throws GenericException {
+  public IndexResult<JobReport> findJobReports(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
+    throws GenericException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     return Jobs.findJobReports(user, filter, sorter, sublist, facets);
   }
 
-  public void getViewerProperties() {
-    Configuration configurationFile;
-    try {
-      configurationFile = RodaCoreFactory.getConfiguration("roda-wui.properties");
-      LOGGER.error("HERE");
-      Iterator<String> itr = configurationFile.getKeys("viewer");
-      while(itr.hasNext()) {
-         Object element = itr.next();
-         LOGGER.error("Unexpected error " + element);
+  public List<Viewer> getViewersProperties() {
+    List<Viewer> viewers = new ArrayList<Viewer>();
+    String viewersString = RodaCoreFactory.getRodaConfigurationAsString("ui", "viewers");
+    if (viewersString != null) {
+      String[] viewersSupported = viewersString.split(",");
+      for (String type : viewersSupported) {
+        Viewer viewer = new Viewer();
+
+        String fieldPronoms = RodaCoreFactory.getRodaConfigurationAsString("ui", "viewers", type, "pronoms");
+        String fieldMimetypes = RodaCoreFactory.getRodaConfigurationAsString("ui", "viewers", type, "mimetypes");
+        String fieldExtensions = RodaCoreFactory.getRodaConfigurationAsString("ui", "viewers", type, "extensions");
+
+        viewer.setType(type);
+        viewer.setPronoms(Arrays.asList(fieldPronoms.split(",")));
+        viewer.setMimetypes(Arrays.asList(fieldMimetypes.split(",")));
+        viewer.setExtensions(Arrays.asList(fieldExtensions.split(",")));
+
+        viewers.add(viewer);
       }
-    } catch (ConfigurationException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
     }
-   
+    return viewers;
   }
 }

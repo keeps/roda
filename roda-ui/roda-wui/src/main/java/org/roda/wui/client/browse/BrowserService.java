@@ -9,7 +9,6 @@ package org.roda.wui.client.browse;
 
 import java.util.List;
 
-import org.apache.commons.configuration.ConfigurationException;
 import org.roda.core.data.DescriptionObject;
 import org.roda.core.data.PluginInfo;
 import org.roda.core.data.adapter.facet.Facets;
@@ -267,5 +266,5 @@ public interface BrowserService extends RemoteService {
   IndexResult<JobReport> findJobReports(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
     throws GenericException;
 
-  void getViewerProperties() throws GenericException;
+  List<Viewer> getViewersProperties() throws GenericException;
 }

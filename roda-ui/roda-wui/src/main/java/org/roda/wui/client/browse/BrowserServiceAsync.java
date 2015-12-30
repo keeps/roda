@@ -222,5 +222,5 @@ public interface BrowserServiceAsync {
   void findJobReports(Filter filter, Sorter sorter, Sublist sublist, Facets facets,
     AsyncCallback<IndexResult<JobReport>> callback);
 
-  void getViewerProperties(AsyncCallback<Void> callback);
+  void getViewersProperties(AsyncCallback<List<Viewer>> callback);
 }
