@@ -76,7 +76,7 @@ public final class RodaConstants {
   public static final StorageType DEFAULT_STORAGE_TYPE = StorageType.FILESYSTEM;
 
   public enum SolrType {
-    EMBEDDED, HTTP
+    EMBEDDED, HTTP, HTTP_CLOUD
   }
 
   public static final SolrType DEFAULT_SOLR_TYPE = SolrType.EMBEDDED;

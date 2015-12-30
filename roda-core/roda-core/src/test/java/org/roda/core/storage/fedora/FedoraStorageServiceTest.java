@@ -35,7 +35,6 @@ import org.roda.core.storage.RandomMockContentPayload;
 import org.roda.core.storage.StoragePath;
 import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.StorageTestUtils;
-import org.roda.core.storage.fedora.FedoraStorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +47,7 @@ public class FedoraStorageServiceTest extends AbstractStorageServiceTest<FedoraS
 
   static final String PROTOCOL = "http";
   static final String HOSTNAME = "localhost";
-  static final int SERVER_PORT = getOpenDoor(9999);
+  static final int SERVER_PORT = determineOpenDoorAndSetFedoraProperty(9999);
   static final String serverAddress = PROTOCOL + "://" + HOSTNAME + ":" + SERVER_PORT + "/";
 
   final Logger logger = LoggerFactory.getLogger(FedoraStorageServiceTest.class);
@@ -60,7 +59,7 @@ public class FedoraStorageServiceTest extends AbstractStorageServiceTest<FedoraS
     FSUtils.deletePath(Paths.get("fcrepo4-data"));
   }
 
-  public static int getOpenDoor(int defaultDoor) {
+  public static int determineOpenDoorAndSetFedoraProperty(int defaultDoor) {
     int openDoor = defaultDoor;
     try {
       ServerSocket s = new ServerSocket(0);

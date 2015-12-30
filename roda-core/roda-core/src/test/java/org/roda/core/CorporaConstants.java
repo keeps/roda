@@ -72,7 +72,7 @@ public class CorporaConstants {
   public static final String SOURCE_DESC_METADATA_CONTAINER = "DescriptiveMetadata";
   public static final String STRANGE_DESC_METADATA_FILE = "strange.xml";
 
-  public static final String F0_PREMIS_XML = "F0.premis.xml";
+  public static final String F0_PREMIS_XML = "F0";
   public static final String TEXT_XML = "text/xml";
   public static final String EVENT_RODA_398_PREMIS_XML = "event_roda_398.premis.xml";
   public static final String INGESTION = "ingestion";

@@ -44,6 +44,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
+import org.apache.solr.client.solrj.impl.CloudSolrClient;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -70,6 +72,8 @@ import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.InvalidParameterException;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.NodeType;
+import org.roda.core.data.common.RodaConstants.SolrType;
+import org.roda.core.data.common.RodaConstants.StorageType;
 import org.roda.core.data.eadc.DescriptionLevelManager;
 import org.roda.core.data.v2.EventPreservationObject;
 import org.roda.core.data.v2.Group;
@@ -117,6 +121,7 @@ import org.roda.core.plugins.plugins.ingest.characterization.PremisUpdateFromToo
 import org.roda.core.plugins.plugins.ingest.characterization.TikaFullTextPlugin;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StorageServiceException;
+import org.roda.core.storage.fedora.FedoraStorageService;
 import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -197,11 +202,8 @@ public class RodaCoreFactory {
         // determine RODA HOME
         rodaHomePath = determineRodaHomePath();
 
-        // instantiate essential directories and objects
-        instantiateEssentialDirectoriesAndObjects();
-
-        // instantiate solr and index service
-        instantiateSolrAndIndexService();
+        // instantiate essential directories
+        instantiateEssentialDirectories();
 
         // load core configurations
         rodaConfiguration = new CompositeConfiguration();
@@ -209,8 +211,21 @@ public class RodaCoreFactory {
         propertiesCache = new HashMap<String, Map<String, String>>();
         addConfiguration("roda-core.properties");
 
+        // instantiate storage and model service
+        instantiateStorageAndModel();
+
+        // instantiate solr and index service
+        instantiateSolrAndIndexService();
+
         // load description level information
         loadDescriptionLevelInformation();
+
+        // instantiate plugin manager
+        instantiatePluginManager();
+
+        instantiateNodeSpecificObjects(nodeType);
+
+        instantiated = true;
 
       } catch (ConfigurationException e) {
         LOGGER.error("Error loading roda properties", e);
@@ -220,15 +235,14 @@ public class RodaCoreFactory {
         LOGGER.error("Error instantiating solr/index model", e);
       }
 
-      try {
-        pluginManager = PluginManager.getDefaultPluginManager(getConfigPath(), getPluginsPath());
-      } catch (PluginManagerException e) {
-        LOGGER.error("Error instantiating PluginManager", e);
-      }
+    }
+  }
 
-      instantiateNodeSpecificObjects(nodeType);
-
-      instantiated = true;
+  private static void instantiatePluginManager() {
+    try {
+      pluginManager = PluginManager.getDefaultPluginManager(getConfigPath(), getPluginsPath());
+    } catch (PluginManagerException e) {
+      LOGGER.error("Error instantiating PluginManager", e);
     }
   }
 
@@ -241,24 +255,42 @@ public class RodaCoreFactory {
       // do nothing and instantiate description level manager from empty
       // properties object
     }
-    LOGGER.trace("Description level configurations being loaded: " + descriptionLevelConfiguration);
+    LOGGER.trace("Description level configurations being loaded: {}", descriptionLevelConfiguration);
     descriptionLevelManager = new DescriptionLevelManager(descriptionLevelConfiguration);
   }
 
-  private static void instantiateEssentialDirectoriesAndObjects() throws StorageServiceException {
+  private static void instantiateEssentialDirectories() throws StorageServiceException {
     // make sure all essential directories exist
     ensureAllEssentialDirectoriesExist();
+  }
 
+  private static void instantiateStorageAndModel() throws StorageServiceException {
     if (nodeType != NodeType.TEST) {
       // instantiate model related objects
-      storage = instantiateStorageService();
+      storage = instantiateStorage();
       model = new ModelService(storage);
     }
   }
 
-  private static StorageService instantiateStorageService() throws StorageServiceException {
-    // FIXME the type of storage to be used should be configurable
-    return new FileStorageService(storagePath);
+  private static StorageService instantiateStorage() throws StorageServiceException {
+    StorageType storageType = StorageType
+      .valueOf(getRodaConfiguration().getString("core.storage.type", RodaConstants.DEFAULT_STORAGE_TYPE.toString()));
+
+    if (storageType == RodaConstants.StorageType.FEDORA4) {
+      String url = getRodaConfiguration().getString("core.storage.fedora4.url", "http://localhost:8983/solr/");
+      String username = getRodaConfiguration().getString("core.storage.fedora4.username", "");
+      String password = getRodaConfiguration().getString("core.storage.fedora4.password", "");
+
+      if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)) {
+        return new FedoraStorageService(url, username, password);
+      } else {
+        return new FedoraStorageService(url);
+      }
+
+    } else {
+      // default to Filesystem
+      return new FileStorageService(storagePath);
+    }
   }
 
   private static void instantiateSolrAndIndexService() throws URISyntaxException {
@@ -282,7 +314,7 @@ public class RodaCoreFactory {
       System.setProperty("solr.data.dir.job", indexPath.resolve("job").toString());
       System.setProperty("solr.data.dir.file", indexPath.resolve("file").toString());
 
-      // instantiate & start solr
+      // instantiate solr
       solr = instantiateSolr(solrHome);
 
       // instantiate index related object
@@ -317,8 +349,20 @@ public class RodaCoreFactory {
   }
 
   private static SolrClient instantiateSolr(Path solrHome) {
-    // FIXME the type of solr to be used should be configurable
-    return new EmbeddedSolrServer(solrHome, "test");
+    SolrType solrType = SolrType
+      .valueOf(getRodaConfiguration().getString("core.solr.type", RodaConstants.DEFAULT_SOLR_TYPE.toString()));
+
+    if (solrType == RodaConstants.SolrType.HTTP) {
+      String solrBaseUrl = getRodaConfiguration().getString("core.solr.http.url", "http://localhost:8983/solr/");
+      return new HttpSolrClient(solrBaseUrl);
+    } else if (solrType == RodaConstants.SolrType.HTTP_CLOUD) {
+      String solrCloudZooKeeperUrls = getRodaConfiguration().getString("core.solr.http_cloud.urls",
+        "zkServerA:2181,zkServerB:2181,zkServerC:2181/solr");
+      return new CloudSolrClient(solrCloudZooKeeperUrls);
+    } else {
+      // default to Embedded
+      return new EmbeddedSolrServer(solrHome, "test");
+    }
   }
 
   private static void instantiateNodeSpecificObjects(NodeType nodeType) {
