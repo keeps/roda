@@ -300,5 +300,12 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("Failed at {0,localdatetime,predef:DATE_TIME_MEDIUM}")
   String showJobStatusFailedDuringCreation(Date endDate);
 
+  /************* Browse ****************/
+  @DefaultMessage("Confirm remove items")
+  String browseRemoveConfirmDialogTitle();
+
+  @DefaultMessage("Are you sure you want the selected items, including all their nested items?")
+  String browseRemoveConfirmDialogMessage();
+
 
 }

@@ -27,6 +27,7 @@ import org.roda.core.data.v2.Representation;
 import org.roda.core.data.v2.RepresentationState;
 import org.roda.core.data.v2.RodaUser;
 import org.roda.core.data.v2.SimpleDescriptionObject;
+import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.main.BreadcrumbItem;
@@ -319,7 +320,10 @@ public class Browse extends Composite {
   }
 
   protected void viewAction(BrowseItemBundle itemBundle) {
-    if (itemBundle != null) {
+    if (itemBundle != null && itemBundle.getDescriptiveMetadata().size() == 0) {
+      Toast.showInfo("Need metadata", "Please fill up the descriptive metadata");
+      Tools.newHistory(RESOLVER, CreateDescriptiveMetadata.RESOLVER.getHistoryToken(), aipId);
+    } else if (itemBundle != null) {
       SimpleDescriptionObject sdo = itemBundle.getSdo();
       List<DescriptiveMetadataViewBundle> descMetadata = itemBundle.getDescriptiveMetadata();
       final PreservationMetadataBundle preservationMetadata = itemBundle.getPreservationMetadata();
@@ -722,18 +726,33 @@ public class Browse extends Composite {
   @UiHandler("remove")
   void buttonRemoveHandler(ClickEvent e) {
     if (aipId != null) {
-      BrowserService.Util.getInstance().removeAIP(aipId, new AsyncCallback<Void>() {
+      Dialogs.showConfirmDialog(messages.browseRemoveConfirmDialogTitle(), messages.browseRemoveConfirmDialogMessage(),
+        messages.dialogCancel(), messages.dialogOk(), new AsyncCallback<Boolean>() {
 
-        @Override
-        public void onFailure(Throwable caught) {
-          Toast.showError("Error deleteing item");
-        }
+          @Override
+          public void onFailure(Throwable caught) {
+            // nothing to do
+          }
 
-        @Override
-        public void onSuccess(Void result) {
-          Tools.newHistory(RESOLVER);
-        }
-      });
+          @Override
+          public void onSuccess(Boolean confirmed) {
+            if (confirmed) {
+              BrowserService.Util.getInstance().removeAIP(aipId, new AsyncCallback<Void>() {
+
+                @Override
+                public void onFailure(Throwable caught) {
+                  Toast.showError("Error deleteing item");
+                }
+
+                @Override
+                public void onSuccess(Void result) {
+                  Tools.newHistory(RESOLVER);
+                }
+              });
+            }
+          }
+        });
+
     }
   }
 

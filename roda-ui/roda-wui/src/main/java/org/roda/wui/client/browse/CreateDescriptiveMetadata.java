@@ -74,7 +74,7 @@ public class CreateDescriptiveMetadata extends Composite {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-  
+
   private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   private final String aipId;
@@ -118,29 +118,34 @@ public class CreateDescriptiveMetadata extends Composite {
     String typeText = type.getText();
     String xmlText = xml.getText();
 
-    DescriptiveMetadataEditBundle newBundle = new DescriptiveMetadataEditBundle(idText, typeText, xmlText);
+    if (idText.length() > 0 && typeText.length() > 0) {
 
-    BrowserService.Util.getInstance().createDescriptiveMetadataFile(aipId, newBundle, new AsyncCallback<Void>() {
+      DescriptiveMetadataEditBundle newBundle = new DescriptiveMetadataEditBundle(idText, typeText, xmlText);
 
-      @Override
-      public void onFailure(Throwable caught) {
-        if (caught instanceof MetadataParseException) {
-          MetadataParseException e = (MetadataParseException) caught;
-          updateErrors(e);
-        } else {
-          // TODO show error
-          Toast.showError(caught.getMessage());
+      BrowserService.Util.getInstance().createDescriptiveMetadataFile(aipId, newBundle, new AsyncCallback<Void>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          if (caught instanceof MetadataParseException) {
+            MetadataParseException e = (MetadataParseException) caught;
+            updateErrors(e);
+          } else {
+            // TODO show error
+            Toast.showError(caught.getMessage());
+          }
         }
-      }
 
-      @Override
-      public void onSuccess(Void result) {
-        errors.setText("");
-        errors.setVisible(false);
-        Toast.showInfo("Success", "Created descriptive metadata file");
-        Tools.newHistory(Browse.RESOLVER, aipId);
-      }
-    });
+        @Override
+        public void onSuccess(Void result) {
+          errors.setText("");
+          errors.setVisible(false);
+          Toast.showInfo("Success", "Created descriptive metadata file");
+          Tools.newHistory(Browse.RESOLVER, aipId);
+        }
+      });
+    } else {
+      Toast.showError("Please fill the mandatory fields");
+    }
 
   }
 

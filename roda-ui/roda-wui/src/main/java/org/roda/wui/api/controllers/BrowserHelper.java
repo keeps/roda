@@ -78,7 +78,6 @@ import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.disseminators.common.tools.ZipEntryInfo;
 import org.roda.disseminators.common.tools.ZipTools;
-import org.roda.wui.api.exceptions.ApiException;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.api.v1.utils.StreamResponse;
 import org.roda.wui.client.browse.BrowseItemBundle;
