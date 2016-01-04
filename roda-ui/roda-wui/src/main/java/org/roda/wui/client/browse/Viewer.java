@@ -52,8 +52,7 @@ public class Viewer implements Serializable {
 
   @Override
   public String toString() {
-    return "Viewer [type=" + type + ", pronoms=" + String.join(",", pronoms) + ", mimetypes="
-      + String.join(",", mimetypes) + ", extensions=" + String.join(",", extensions) + "]";
+    return "Viewer [type=" + type + ", pronoms=" + pronoms + ", mimetypes=" + mimetypes + ", extensions=" + extensions
+      + "]";
   }
-
 }

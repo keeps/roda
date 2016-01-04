@@ -118,7 +118,6 @@ public class ViewRepresentation extends Composite {
                     if (result.getResults().size() == 1) {
                       SimpleFile simpleFile = result.getResults().get(0);
                       ViewRepresentation view;
-                      /* TODO unique file control */
                       if (simpleFile.isFile()) {
                         view = new ViewRepresentation(aipId, itemBundle, representationId, fileId, simpleFile);
                       } else {
@@ -194,8 +193,12 @@ public class ViewRepresentation extends Composite {
   private String representationId;
   @SuppressWarnings("unused")
   private String fileId;
-  private SimpleFile file = null;
+  private SimpleFile file;
   private Filter defaultFilter;
+
+  private boolean singleFileMode = false;
+  private boolean showNextFile = false;
+  private boolean showPreviousFile = false;
 
   static final int WINDOW_WIDTH = 1200;
 
@@ -296,20 +299,20 @@ public class ViewRepresentation extends Composite {
 
     downloadFile.setEnabled(false);
 
-    /* TODO Control next and previous file button */
-    nextFile.setVisible(false);
-    previousFile.setVisible(false);
-
     filesList.getSelectionModel().addSelectionChangeHandler(new Handler() {
 
       @Override
       public void onSelectionChange(SelectionChangeEvent event) {
-        if (Window.getClientWidth() < WINDOW_WIDTH) {
-          view();
-        } else {
-          changeURL();
-          filePreview();
-        }
+        // if (Window.getClientWidth() < WINDOW_WIDTH) {
+        // view();
+        // } else {
+        // changeURL();
+        // filePreview();
+        // panelsControl();
+        // }
+        changeURL();
+        filePreview();
+        panelsControl();
       }
     });
 
@@ -317,9 +320,28 @@ public class ViewRepresentation extends Composite {
 
       @Override
       public void onValueChange(ValueChangeEvent<IndexResult<SimpleFile>> event) {
-        /* TODO unique file control */
+        if (showNextFile) {
+          filesList.nextItemSelection();
+          showNextFile = false;
+        } else if (showPreviousFile) {
+          filesList.previousItemSelection();
+          showPreviousFile = false;
+        } else {
+          List<SimpleFile> results = event.getValue().getResults();
+
+          if (results.size() == 1 && results.get(0).isFile()
+            && (ViewRepresentation.this.file == null || results.get(0).equals(ViewRepresentation.this.file))) {
+            singleFileMode = true;
+            filesList.nextItemSelection();
+          }
+
+          if (ViewRepresentation.this.file == null && results.size() >= 1 && results.get(0).isFile()
+            && Window.getClientWidth() > WINDOW_WIDTH) {
+            filesList.nextItemSelection();
+          }
+        }
       }
-    
+
     });
 
     previewPanel.addStyleName("viewRepresentationPreviewPanel");
@@ -456,12 +478,22 @@ public class ViewRepresentation extends Composite {
 
   @UiHandler("nextFile")
   void buttonNextFileHandler(ClickEvent e) {
-    filesList.nextItemSelection();
+    if (filesList.nextPageOnNextFile()) {
+      filesList.nextPage();
+      showNextFile = true;
+    } else {
+      filesList.nextItemSelection();
+    }
   }
 
   @UiHandler("previousFile")
   void buttonPreviousFileHandler(ClickEvent e) {
-    filesList.previousItemSelection();
+    if (filesList.previousPageOnPreviousFile()) {
+      filesList.prevousPage();
+      showPreviousFile = true;
+    } else {
+      filesList.previousItemSelection();
+    }
   }
 
   @UiHandler("downloadFile")
@@ -477,43 +509,54 @@ public class ViewRepresentation extends Composite {
       Window.Location.assign(downloadUri.asString());
     }
   }
-  
+
   private void panelsControl() {
     if (file == null) {
+      showFilesPanel();
       if (Window.getClientWidth() < WINDOW_WIDTH) {
         hideFilePreview();
       } else {
         showFilePreview();
       }
     } else {
-      if (Window.getClientWidth() < WINDOW_WIDTH) {
-        hideFilesPanel();
+      showFilePreview();
+      if (!singleFileMode) {
+        if (Window.getClientWidth() < WINDOW_WIDTH) {
+          hideFilesPanel();
+        } else {
+          showFilesPanel();
+        }
       } else {
-        showFilesPanel();
+        hideFilesPanel();
       }
     }
-  }
-
-  private void hideFilesPanel() {
-    filesPanel.setVisible(false);
   }
 
   private void showFilesPanel() {
     filesPanel.setVisible(true);
   }
 
+  private void hideFilesPanel() {
+    filesPanel.setVisible(false);
+  }
+
   private void showFilePreview() {
     filesPanel.removeStyleName("fullWidth");
     previewPanel.setCellWidth(filePreview, "100%");
     filePreview.setVisible(true);
+    nextFile.setVisible(true);
+    previousFile.setVisible(true);
   }
 
   private void hideFilePreview() {
     filesPanel.addStyleName("fullWidth");
     previewPanel.setCellWidth(filePreview, "0px");
     filePreview.setVisible(false);
+    nextFile.setVisible(false);
+    previousFile.setVisible(false);
   }
 
+  @SuppressWarnings("unused")
   private void view() {
     Tools.newHistory(Browse.RESOLVER, ViewRepresentation.RESOLVER.getHistoryToken(), aipId, representationId,
       filesList.getSelectionModel().getSelectedObject().getId());
@@ -535,13 +578,13 @@ public class ViewRepresentation extends Composite {
       //
       // @Override
       // public void onSuccess(Void result) {
-      // 
+      //
       //
       // }
       //
       // @Override
       // public void onFailure(Throwable caught) {
-      // 
+      //
       //
       // }
       // });

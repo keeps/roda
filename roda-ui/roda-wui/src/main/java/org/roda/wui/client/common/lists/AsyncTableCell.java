@@ -259,32 +259,60 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
   public void nextItemSelection() {
     if (getSelectionModel().getSelectedObject() != null) {
       T selectedItem = getSelectionModel().getSelectedObject();
-      
-      logger.debug("" + (getVisibleItems().indexOf(selectedItem) + 1));
+      int selectedIndex = getVisibleItems().indexOf(selectedItem);
 
-      if (getVisibleItems().indexOf(selectedItem) == (resultsPager.getPageSize() - 1)) {
-        if (resultsPager.hasNextPage()) {
-          resultsPager.nextPage();
-          //getSelectionModel().setSelected(getVisibleItems().get(getVisibleItems().indexOf(selectedItem) + 1), true);
-        }
+      if (selectedIndex == -1) {
+        getSelectionModel().setSelected(getVisibleItems().get(0), true);
       } else {
-        getSelectionModel().setSelected(getVisibleItems().get(getVisibleItems().indexOf(selectedItem) + 1), true);
+        getSelectionModel().setSelected(getVisibleItems().get(selectedIndex + 1), true);
       }
+    } else {
+      getSelectionModel().setSelected(getVisibleItems().get(0), true);
     }
   }
 
   public void previousItemSelection() {
     if (getSelectionModel().getSelectedObject() != null) {
       T selectedItem = getSelectionModel().getSelectedObject();
+      int selectedIndex = getVisibleItems().indexOf(selectedItem);
 
-      if (getVisibleItems().indexOf(selectedItem) == 0) {
-        if (resultsPager.hasPreviousPage()) {
-          resultsPager.previousPage();
-          //getSelectionModel().setSelected(getVisibleItems().get(getVisibleItems().indexOf(selectedItem) - 1), true);
-        }
+      if (selectedIndex == -1) {
+        getSelectionModel().setSelected(getVisibleItems().get(getVisibleItems().size() - 1), true);
       } else {
-        getSelectionModel().setSelected(getVisibleItems().get(getVisibleItems().indexOf(selectedItem) - 1), true);
+        getSelectionModel().setSelected(getVisibleItems().get(selectedIndex - 1), true);
+      }
+    } else {
+      getSelectionModel().setSelected(getVisibleItems().get(0), true);
+    }
+  }
+
+  public boolean nextPageOnNextFile() {
+    boolean nextPage = false;
+    if (getSelectionModel().getSelectedObject() != null) {
+      T selectedItem = getSelectionModel().getSelectedObject();
+      if (getVisibleItems().indexOf(selectedItem) == (resultsPager.getPageSize() - 1) && resultsPager.hasNextPage()) {
+        nextPage = true;
       }
     }
+    return nextPage;
+  }
+
+  public boolean previousPageOnPreviousFile() {
+    boolean previousPage = false;
+    if (getSelectionModel().getSelectedObject() != null) {
+      T selectedItem = getSelectionModel().getSelectedObject();
+      if (getVisibleItems().indexOf(selectedItem) == 0 && resultsPager.hasPreviousPage()) {
+        previousPage = true;
+      }
+    }
+    return previousPage;
+  }
+
+  public void nextPage() {
+    resultsPager.nextPage();
+  }
+
+  public void prevousPage() {
+    resultsPager.previousPage();
   }
 }

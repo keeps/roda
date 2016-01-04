@@ -39,7 +39,6 @@ public class FileList extends AsyncTableCell<SimpleFile> {
 
   private static final int PAGE_SIZE = 20;
 
-  @SuppressWarnings("unused")
   private final ClientLogger logger = new ClientLogger(getClass().getName());
 
   private Column<SimpleFile, SafeHtml> iconColumn;
@@ -61,11 +60,16 @@ public class FileList extends AsyncTableCell<SimpleFile> {
 
       @Override
       public SafeHtml getValue(SimpleFile file) {
-        if (file.isFile()) {
-          return SafeHtmlUtils.fromSafeConstant("<i class='fa fa-file-o'></i>");
+        if (file != null) {
+          if (file.isFile()) {
+            return SafeHtmlUtils.fromSafeConstant("<i class='fa fa-file-o'></i>");
+          } else {
+            return SafeHtmlUtils.fromSafeConstant("<i class='fa fa-folder-o'></i>");
+          }
         } else {
-          return SafeHtmlUtils.fromSafeConstant("<i class='fa fa-folder-o'></i>");
+          logger.error("Trying to display a NULL item");
         }
+        return null;
       }
     };
 
@@ -73,7 +77,7 @@ public class FileList extends AsyncTableCell<SimpleFile> {
 
       @Override
       public String getValue(SimpleFile file) {
-        return file.getOriginalName();
+        return (file != null) ? file.getOriginalName() : null;
       }
     };
 
@@ -81,7 +85,7 @@ public class FileList extends AsyncTableCell<SimpleFile> {
 
       @Override
       public String getValue(SimpleFile file) {
-        return (file.getFileFormat() != null && file.getFileFormat().getMimeType() != null
+        return (file != null && file.getFileFormat() != null && file.getFileFormat().getMimeType() != null
           && !file.getFileFormat().getMimeType().isEmpty()) ? file.getFileFormat().getMimeType() : "";
       }
     };
@@ -90,7 +94,7 @@ public class FileList extends AsyncTableCell<SimpleFile> {
 
       @Override
       public String getValue(SimpleFile file) {
-        return Humanize.readableFileSize(file.getSize());
+        return (file != null) ? Humanize.readableFileSize(file.getSize()) : null;
       }
     };
 
