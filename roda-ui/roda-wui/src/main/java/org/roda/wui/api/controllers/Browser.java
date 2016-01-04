@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.xml.transform.TransformerException;
 
@@ -808,6 +809,19 @@ public class Browser extends RodaCoreService {
       RodaConstants.CONTROLLER_SORTER_PARAM, sorter, RodaConstants.CONTROLLER_SUBLIST_PARAM, sublist);
 
     return files;
+  }
+
+  public static Map<String, String> getSupportedMetadata(RodaUser user, Locale locale) throws AuthorizationDeniedException, GenericException {
+    Date startDate = new Date();
+
+    // delegate
+    Map<String,String> supportedMetadata =  BrowserHelper.getSupportedMetadata(locale);
+
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, BROWSER_COMPONENT, "getSupportedMetadata", null, duration,
+      RodaConstants.LOCALE,locale);
+    return supportedMetadata;
   }
 
 }

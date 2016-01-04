@@ -692,4 +692,12 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     }
     return viewers;
   }
+  
+  @Override
+  public Map<String, String> getSupportedMetadata(String localeString)
+    throws AuthorizationDeniedException, GenericException {
+      RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+      Locale locale = ServerTools.parseLocale(localeString);
+      return Browser.getSupportedMetadata(user,locale);
+  }
 }

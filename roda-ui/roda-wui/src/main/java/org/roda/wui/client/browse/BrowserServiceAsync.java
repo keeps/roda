@@ -11,6 +11,7 @@
 package org.roda.wui.client.browse;
 
 import java.util.List;
+import java.util.Map;
 
 import org.roda.core.data.DescriptionObject;
 import org.roda.core.data.PluginInfo;
@@ -18,7 +19,9 @@ import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
+import org.roda.core.data.common.AuthorizationDeniedException;
 import org.roda.core.data.common.RODAException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.JobReport;
@@ -30,6 +33,7 @@ import org.roda.core.data.v2.TransferredResource;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
 import org.roda.wui.client.ingest.process.JobBundle;
 import org.roda.wui.client.search.SearchField;
+import org.roda.wui.common.client.GenericException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -223,4 +227,6 @@ public interface BrowserServiceAsync {
     AsyncCallback<IndexResult<JobReport>> callback);
 
   void getViewersProperties(AsyncCallback<List<Viewer>> callback);
+  
+  void getSupportedMetadata(String locale, AsyncCallback<Map<String,String>> callback);
 }

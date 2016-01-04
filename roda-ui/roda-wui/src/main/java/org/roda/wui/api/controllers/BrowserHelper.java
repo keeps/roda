@@ -1067,4 +1067,22 @@ public class BrowserHelper {
     return files;
   }
 
+  public static Map<String, String> getSupportedMetadata(Locale locale) throws GenericException {
+    try{
+      Messages messages = RodaCoreFactory.getI18NMessages(locale);
+      Map<String,String> supportedMetadata = new HashMap<String,String>();
+      List<String> fileNames = RodaCoreFactory.getFilenamesInsideConfigFolder("crosswalks/ingest/");
+      if(fileNames!=null && fileNames.size()>0){
+        for(String fileName : fileNames){
+          String label = messages.getTranslation(RodaConstants.I18N_CROSSWALKS_DISSEMINATION_HTML_PREFIX + fileName);
+          supportedMetadata.put(fileName, label);
+        }
+      }
+      return supportedMetadata;
+    }catch(IOException e){
+      LOGGER.error("Error getting supported metadata", e);
+      throw new GenericException("Error getting supported metadata" + e.getMessage());
+    }
+  }
+
 }

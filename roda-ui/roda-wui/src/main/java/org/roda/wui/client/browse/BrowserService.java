@@ -8,6 +8,7 @@
 package org.roda.wui.client.browse;
 
 import java.util.List;
+import java.util.Map;
 
 import org.roda.core.data.DescriptionObject;
 import org.roda.core.data.PluginInfo;
@@ -267,4 +268,6 @@ public interface BrowserService extends RemoteService {
     throws GenericException;
 
   List<Viewer> getViewersProperties() throws GenericException;
+  
+  Map<String,String> getSupportedMetadata(String locale) throws AuthorizationDeniedException, GenericException;
 }

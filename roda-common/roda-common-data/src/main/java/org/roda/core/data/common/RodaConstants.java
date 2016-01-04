@@ -429,6 +429,8 @@ public final class RodaConstants {
 
   public static final String REPORT_ATTR_REASON = "reason";
 
+  public static final String LOCALE = "locale";
+
   /* Job Report */
   public static final String JOB_REPORT_ID = "id";
   public static final String JOB_REPORT_AIP_ID = "aipId";

@@ -12,12 +12,14 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.ParseException;
@@ -117,8 +119,8 @@ import org.roda.core.plugins.plugins.ingest.characterization.JHOVEPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.JpylyzerPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.MediaInfoPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.PremisSkeletonPlugin;
-import org.roda.core.plugins.plugins.ingest.characterization.PremisUpdateFromToolsPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.TikaFullTextPlugin;
+import org.roda.core.plugins.plugins.ingest.characterization.ToolOutputProcessorPlugin;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.fedora.FedoraStorageService;
@@ -762,6 +764,21 @@ public class RodaCoreFactory {
 
     return rodaConfiguration.getString(sb.toString());
   }
+  
+  public static List<String> getFilenamesInsideConfigFolder(String folder) throws IOException {
+   List<String> fileNames = new ArrayList<String>();
+    Path configPath = RodaCoreFactory.getConfigPath().resolve(folder);
+    Files.walkFileTree(configPath, new SimpleFileVisitor<Path>() { 
+        @Override
+        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
+            throws IOException
+        {
+          fileNames.add(file.getFileName().toString());
+            return FileVisitResult.CONTINUE;
+        }
+    });
+    return fileNames;
+  }
 
   public static Map<String, String> getPropertiesFromCache(String cacheName, List<String> prefixesToCache) {
     if (propertiesCache.get(cacheName) == null) {
@@ -922,7 +939,7 @@ public class RodaCoreFactory {
   }
 
   private static void runPremisUpdatePlugin() {
-    Plugin<AIP> jpylyzerPlugin = new PremisUpdateFromToolsPlugin();
+    Plugin<AIP> jpylyzerPlugin = new ToolOutputProcessorPlugin();
     getPluginOrchestrator().runPluginOnAllAIPs(jpylyzerPlugin);
   }
 
