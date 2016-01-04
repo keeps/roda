@@ -82,7 +82,7 @@ public final class FedoraConversionUtils {
 
   private static StoragePath getStoragePath(FedoraDatastream ds) throws StorageServiceException {
     try {
-      return DefaultStoragePath.parse(ds.getPath().substring(0, ds.getPath().lastIndexOf("/")));
+      return DefaultStoragePath.parse(ds.getPath());
     } catch (FedoraException e) {
       throw new StorageServiceException("Error while getting the storage path from a particular Fedora datastream",
         StorageServiceException.INTERNAL_SERVER_ERROR, e);

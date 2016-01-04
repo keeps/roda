@@ -21,21 +21,22 @@ import org.roda.core.storage.fedora.FedoraStorageService;
  * @author Sébastien Leroux <sleroux@keep.pt>
  * @author Hélder Silva <hsilva@keep.pt>
  * @author Luis Faria <lfaria@keep.pt>
- * */
+ */
 public final class FedoraUtils {
 
   /**
    * Private empty constructor
-   * */
+   */
   private FedoraUtils() {
 
   }
 
   /**
    * Creates a {@code String} version of a {@code StoragePath} for Fedora
-   * */
+   */
   public static String createFedoraPath(StoragePath storagePath) {
-    return storagePath.asString();
+    // XXX white spaces must be URL Encoded
+    return storagePath.asString().replaceAll(" ", "%20");
   }
 
   /**
@@ -49,7 +50,7 @@ public final class FedoraUtils {
    *          predicate without the prefix (added automatically)
    * @param literal
    *          literal to be used
-   * */
+   */
   public static String createSparqlUpdateQuery(String action, String subject, String predicate, String literal) {
     return "PREFIX " + FedoraStorageService.RODA_PREFIX + ": <" + FedoraStorageService.RODA_NAMESPACE + "> " + action
       + " { " + subject + " " + FedoraStorageService.RODA_PREFIX + ":" + predicate + " '" + literal + "' . }";
@@ -66,7 +67,7 @@ public final class FedoraUtils {
    *          the metadata to be added
    * @param metadataToDelete
    *          the metadata to be deleted.
-   * */
+   */
   public static String createSparqlUpdateQuery(Map<String, Set<String>> metadataToAdd,
     Map<String, Set<String>> metadataToDelete) {
 

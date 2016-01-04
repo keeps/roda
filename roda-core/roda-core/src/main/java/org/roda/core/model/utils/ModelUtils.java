@@ -249,7 +249,9 @@ public final class ModelUtils {
         Resource next = it.next();
         if (next != null) {
           StoragePath storagePath = next.getStoragePath();
-          ids.add(storagePath.getName());
+          if (!path.asString().equalsIgnoreCase(storagePath.asString())) {
+            ids.add(storagePath.getName());
+          }
         } else {
           LOGGER.error("Error while getting IDs for path " + path.asString());
         }
@@ -369,8 +371,8 @@ public final class ModelUtils {
       RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, representationID, fileID);
 
   }
-  public static StoragePath getPreservationFilePath(String aipId, String fileID)
-    throws StorageServiceException {
+
+  public static StoragePath getPreservationFilePath(String aipId, String fileID) throws StorageServiceException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
       RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, fileID);
 

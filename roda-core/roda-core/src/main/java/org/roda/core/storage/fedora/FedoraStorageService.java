@@ -9,6 +9,7 @@ package org.roda.core.storage.fedora;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -206,7 +207,8 @@ public class FedoraStorageService implements StorageService {
       StoragePath storagePath = DefaultStoragePath.parse(parentStoragePath, UUID.randomUUID().toString());
       do {
         try {
-          // XXX may want to change create object to native Fedora method that creates a random object
+          // XXX may want to change create object to native Fedora method that
+          // creates a random object
           directory = fedoraRepository.createObject(FedoraUtils.createFedoraPath(storagePath));
         } catch (AlreadyExistsException e) {
           directory = null;
@@ -291,7 +293,8 @@ public class FedoraStorageService implements StorageService {
         StoragePath storagePath = DefaultStoragePath.parse(parentStoragePath, UUID.randomUUID().toString());
         do {
           try {
-            // XXX may want to change create object to native Fedora method that creates a random datastream
+            // XXX may want to change create object to native Fedora method that
+            // creates a random datastream
             binary = fedoraRepository.createDatastream(FedoraUtils.createFedoraPath(storagePath),
               FedoraConversionUtils.contentPayloadToFedoraContent(payload));
           } catch (AlreadyExistsException e) {
@@ -469,7 +472,11 @@ public class FedoraStorageService implements StorageService {
           Map<String, Set<String>> old = FedoraConversionUtils.tripleIteratorToMap(fo.getProperties());
 
           return updateMetadata(fo, old, metadata, replaceAll);
-        } catch (FedoraException fe) {
+        } catch (NullPointerException | FedoraException fe) {
+          // XXX NullPointerException was added because Fedora 4.4 doesn't
+          // behave well with asking for an object (which is a Datastream) to
+          // obtain its metadata and it doesn't have any (because one need to
+          // explicitly ask for /fcr:metadata)
           try {
             FedoraDatastream fds = fedoraRepository.getDatastream(fedoraPath);
             Map<String, Set<String>> old = FedoraConversionUtils.tripleIteratorToMap(fds.getProperties());

@@ -1203,6 +1203,10 @@ public class ModelService extends ModelObservable {
       List<String> fileIds = ModelUtils.getChildIds(storage, resource.getStoragePath(), true);
       Long sizeInBytes = ModelUtils.getLong(directoryMetadata, RodaConstants.STORAGE_META_SIZE_IN_BYTES);
 
+      if (sizeInBytes == null) {
+        sizeInBytes = 0L;
+      }
+
       if (active == null) {
         // when not stated, considering active=false
         active = false;
@@ -1262,7 +1266,7 @@ public class ModelService extends ModelObservable {
     String fileId) throws ModelServiceException {
     RepresentationFilePreservationObject representationPreservationObject = null;
     try {
-      StoragePath filePath = ModelUtils.getPreservationFilePath(aipId, representationId, fileId+".premis.xml");
+      StoragePath filePath = ModelUtils.getPreservationFilePath(aipId, representationId, fileId + ".premis.xml");
       Binary binary = storage.getBinary(filePath);
       representationPreservationObject = convertResourceToRepresentationFilePreservationObject(aipId, representationId,
         fileId, binary);
