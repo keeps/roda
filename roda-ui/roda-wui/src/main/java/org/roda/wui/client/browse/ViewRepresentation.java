@@ -87,6 +87,35 @@ public class ViewRepresentation extends Composite {
 
     @Override
     public void resolve(final List<String> historyTokens, final AsyncCallback<Widget> callback) {
+      BrowserService.Util.getInstance().getViewersProperties(new AsyncCallback<List<Viewer>>() {
+
+        @Override
+        public void onSuccess(List<Viewer> viewers) {
+          load(viewers, historyTokens, callback);
+        }
+
+        @Override
+        public void onFailure(Throwable caught) {
+          errorRedirect(callback);
+        }
+      });
+    }
+
+    @Override
+    public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
+      UserLogin.getInstance().checkRoles(new HistoryResolver[] {Browse.RESOLVER}, false, callback);
+    }
+
+    public List<String> getHistoryPath() {
+      return Tools.concat(Browse.RESOLVER.getHistoryPath(), getHistoryToken());
+    }
+
+    public String getHistoryToken() {
+      return "view";
+    }
+
+    private void load(final List<Viewer> viewers, final List<String> historyTokens,
+      final AsyncCallback<Widget> callback) {
       if (historyTokens.size() > 1) {
         final String aipId = historyTokens.get(0);
         final String representationId = historyTokens.get(1);
@@ -119,9 +148,9 @@ public class ViewRepresentation extends Composite {
                       SimpleFile simpleFile = result.getResults().get(0);
                       ViewRepresentation view;
                       if (simpleFile.isFile()) {
-                        view = new ViewRepresentation(aipId, itemBundle, representationId, fileId, simpleFile);
+                        view = new ViewRepresentation(viewers, aipId, itemBundle, representationId, fileId, simpleFile);
                       } else {
-                        view = new ViewRepresentation(aipId, itemBundle, representationId, fileId);
+                        view = new ViewRepresentation(viewers, aipId, itemBundle, representationId, fileId);
                       }
                       callback.onSuccess(view);
                     } else {
@@ -136,7 +165,7 @@ public class ViewRepresentation extends Composite {
                 });
 
               } else {
-                ViewRepresentation view = new ViewRepresentation(aipId, itemBundle, representationId);
+                ViewRepresentation view = new ViewRepresentation(viewers, aipId, itemBundle, representationId);
                 callback.onSuccess(view);
               }
             } else {
@@ -147,19 +176,6 @@ public class ViewRepresentation extends Composite {
       } else {
         errorRedirect(callback);
       }
-    }
-
-    @Override
-    public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().checkRoles(new HistoryResolver[] {Browse.RESOLVER}, false, callback);
-    }
-
-    public List<String> getHistoryPath() {
-      return Tools.concat(Browse.RESOLVER.getHistoryPath(), getHistoryToken());
-    }
-
-    public String getHistoryToken() {
-      return "view";
     }
 
     private boolean verifyRepresentation(List<Representation> representations, String representationId) {
@@ -188,6 +204,8 @@ public class ViewRepresentation extends Composite {
 
   private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
+  @SuppressWarnings("unused")
+  private List<Viewer> viewers;
   private String aipId;
   private BrowseItemBundle itemBundle;
   private String representationId;
@@ -238,31 +256,35 @@ public class ViewRepresentation extends Composite {
   /**
    * Create a new panel to view a representation
    * 
+   * @param viewers
    * @param aipId
    * @param itemBundle
    * @param representationId
    * 
    */
-  public ViewRepresentation(String aipId, BrowseItemBundle itemBundle, String representationId) {
-    this(aipId, itemBundle, representationId, null, null);
+  public ViewRepresentation(List<Viewer> viewers, String aipId, BrowseItemBundle itemBundle, String representationId) {
+    this(viewers, aipId, itemBundle, representationId, null, null);
   }
 
   /**
    * Create a new panel to view a representation
    * 
+   * @param viewers
    * @param aipId
    * @param itemBundle
    * @param representationId
    * @param fileId
    * 
    */
-  public ViewRepresentation(String aipId, BrowseItemBundle itemBundle, String representationId, String fileId) {
-    this(aipId, itemBundle, representationId, fileId, null);
+  public ViewRepresentation(List<Viewer> viewers, String aipId, BrowseItemBundle itemBundle, String representationId,
+    String fileId) {
+    this(viewers, aipId, itemBundle, representationId, fileId, null);
   }
 
   /**
    * Create a new panel to view a representation
    * 
+   * @param viewers
    * @param aipId
    * @param itemBundle
    * @param representationId
@@ -270,8 +292,9 @@ public class ViewRepresentation extends Composite {
    * @param file
    * 
    */
-  public ViewRepresentation(String aipId, BrowseItemBundle itemBundle, String representationId, String fileId,
-    SimpleFile file) {
+  public ViewRepresentation(List<Viewer> viewers, String aipId, BrowseItemBundle itemBundle, String representationId,
+    String fileId, SimpleFile file) {
+    this.viewers = viewers;
     this.aipId = aipId;
     this.itemBundle = itemBundle;
     this.representationId = representationId;
@@ -573,22 +596,6 @@ public class ViewRepresentation extends Composite {
       downloadFile.setEnabled(true);
 
       /* TODO mimetypes */
-      // BrowserService.Util.getInstance().getViewerProperties(new
-      // AsyncCallback<Void>() {
-      //
-      // @Override
-      // public void onSuccess(Void result) {
-      //
-      //
-      // }
-      //
-      // @Override
-      // public void onFailure(Throwable caught) {
-      //
-      //
-      // }
-      // });
-
       if (file.getOriginalName().toLowerCase().contains(".png")
         || file.getOriginalName().toLowerCase().contains(".jpg")) {
         imagePreview(file);

@@ -677,9 +677,15 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
         String fieldExtensions = RodaCoreFactory.getRodaConfigurationAsString("ui", "viewers", type, "extensions");
 
         viewer.setType(type);
-        viewer.setPronoms(Arrays.asList(fieldPronoms.split(",")));
-        viewer.setMimetypes(Arrays.asList(fieldMimetypes.split(",")));
-        viewer.setExtensions(Arrays.asList(fieldExtensions.split(",")));
+        if (fieldPronoms != null && !fieldPronoms.isEmpty()) {
+          viewer.setPronoms(Arrays.asList(fieldPronoms.split(",")));
+        }
+        if (fieldMimetypes != null && !fieldMimetypes.isEmpty()) {
+          viewer.setMimetypes(Arrays.asList(fieldMimetypes.split(",")));
+        }
+        if (fieldExtensions != null && !fieldExtensions.isEmpty()) {
+          viewer.setExtensions(Arrays.asList(fieldExtensions.split(",")));
+        }
 
         viewers.add(viewer);
       }
