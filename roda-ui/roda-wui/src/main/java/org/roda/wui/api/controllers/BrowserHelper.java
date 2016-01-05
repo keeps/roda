@@ -160,8 +160,8 @@ public class BrowserHelper {
         DescriptiveMetadataViewBundle bundle = new DescriptiveMetadataViewBundle();
         bundle.setId(descriptiveMetadata.getId());
         try {
-          bundle.setLabel(messages
-            .getTranslation(RodaConstants.I18N_CROSSWALKS_DISSEMINATION_HTML_PREFIX + descriptiveMetadata.getId()));
+          bundle.setLabel(messages.getTranslation(
+            RodaConstants.I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX + descriptiveMetadata.getType()));
         } catch (MissingResourceException e) {
           bundle.setLabel(descriptiveMetadata.getId());
         }
@@ -1068,21 +1068,20 @@ public class BrowserHelper {
   }
 
   public static Map<String, String> getSupportedMetadata(Locale locale) throws GenericException {
-    try{
-      Messages messages = RodaCoreFactory.getI18NMessages(locale);
-      Map<String,String> supportedMetadata = new HashMap<String,String>();
-      List<String> fileNames = RodaCoreFactory.getFilenamesInsideConfigFolder("crosswalks/ingest/");
-      if(fileNames!=null && fileNames.size()>0){
-        for(String fileName : fileNames){
-          String label = messages.getTranslation(RodaConstants.I18N_CROSSWALKS_DISSEMINATION_HTML_PREFIX + fileName);
-          supportedMetadata.put(fileName, label);
-        }
+    Messages messages = RodaCoreFactory.getI18NMessages(locale);
+    String[] types = RodaCoreFactory.getRodaConfiguration().getString("ui.browser.metadata.descriptive.types")
+      .split(", ?");
+
+    Map<String, String> supportedMetadata = new HashMap<String, String>();
+
+    if (types != null) {
+      for (String type : types) {
+        String label = messages.getTranslation(RodaConstants.I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX + type,
+          type);
+        supportedMetadata.put(type, label);
       }
-      return supportedMetadata;
-    }catch(IOException e){
-      LOGGER.error("Error getting supported metadata", e);
-      throw new GenericException("Error getting supported metadata" + e.getMessage());
     }
+    return supportedMetadata;
   }
 
 }

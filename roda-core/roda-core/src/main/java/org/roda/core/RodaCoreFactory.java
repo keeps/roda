@@ -12,7 +12,6 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
@@ -29,6 +28,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -764,19 +764,37 @@ public class RodaCoreFactory {
 
     return rodaConfiguration.getString(sb.toString());
   }
-  
-  public static List<String> getFilenamesInsideConfigFolder(String folder) throws IOException {
-   List<String> fileNames = new ArrayList<String>();
+
+  public static Set<String> getFilenamesInsideConfigFolder(String folder) throws IOException {
+
+    Set<String> fileNames = new HashSet<>();
+
+    // get from external config
+    Set<String> externalFileNames = new HashSet<String>();
     Path configPath = RodaCoreFactory.getConfigPath().resolve(folder);
-    Files.walkFileTree(configPath, new SimpleFileVisitor<Path>() { 
-        @Override
-        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
-            throws IOException
-        {
-          fileNames.add(file.getFileName().toString());
-            return FileVisitResult.CONTINUE;
-        }
+    Files.walkFileTree(configPath, new SimpleFileVisitor<Path>() {
+      @Override
+      public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+        externalFileNames.add(file.getFileName().toString());
+        return FileVisitResult.CONTINUE;
+      }
     });
+
+    fileNames.addAll(externalFileNames);
+
+    // get from internal config
+    List<ClassLoader> classLoadersList = new LinkedList<ClassLoader>();
+    classLoadersList.add(ClasspathHelper.contextClassLoader());
+    Set<String> internalFilesPath = new Reflections(
+      new ConfigurationBuilder().filterInputsBy(new FilterBuilder().include(FilterBuilder.prefix("config/" + folder)))
+        .setScanners(new ResourcesScanner())
+        .setUrls(ClasspathHelper.forClassLoader(classLoadersList.toArray(new ClassLoader[0]))))
+          .getResources(Pattern.compile(".*"));
+
+    for (String internalFilePath : internalFilesPath) {
+      fileNames.add(Paths.get(internalFilePath).getFileName().toString());
+    }
+
     return fileNames;
   }
 

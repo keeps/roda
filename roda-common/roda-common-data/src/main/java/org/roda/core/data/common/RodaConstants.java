@@ -22,6 +22,7 @@ public final class RodaConstants {
   }
 
   public static final String CROSSWALKS_DISSEMINATION_HTML_PATH = "crosswalks/dissemination/html";
+  public static final String I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX = "ui.browse.metadata.descriptive.type.";
   public static final String I18N_CROSSWALKS_DISSEMINATION_HTML_PREFIX = "crosswalks.dissemination.html.";
   public static final String I18N_UI_SEARCH_FACETS_PREFIX = "ui.search.facets.";
   public static final String I18N_UI_USER_ADMINISTRATION_FACETS_PREFIX = "ui.user_administration.facets.";

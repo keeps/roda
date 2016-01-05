@@ -24,7 +24,7 @@
 				<g:Label addStyleNames="form-label">
 					Type
 				</g:Label>
-				<g:TextBox ui:field="type" addStyleNames="form-textbox" />
+				<g:ListBox ui:field="type" addStyleNames="form-listbox" />
 				<g:Label addStyleNames="form-label">
 					Content
 				</g:Label>

@@ -11,6 +11,7 @@
 package org.roda.wui.client.browse;
 
 import java.util.List;
+import java.util.Map;
 
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.HistoryResolver;
@@ -18,7 +19,10 @@ import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -28,6 +32,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -85,7 +90,7 @@ public class CreateDescriptiveMetadata extends Composite {
   TextBox id;
 
   @UiField
-  TextBox type;
+  ListBox type;
 
   @UiField
   TextArea xml;
@@ -110,15 +115,51 @@ public class CreateDescriptiveMetadata extends Composite {
 
     initWidget(uiBinder.createAndBindUi(this));
 
+    type.addChangeHandler(new ChangeHandler() {
+
+      @Override
+      public void onChange(ChangeEvent event) {
+        String value = type.getSelectedValue();
+        if (value != null && value.length() > 0) {
+          id.setText(value + ".xml");
+        } else if (value != null) {
+          id.setText("");
+        }
+      }
+    });
+
+    BrowserService.Util.getInstance().getSupportedMetadata(LocaleInfo.getCurrentLocale().getLocaleName(),
+      new AsyncCallback<Map<String, String>>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          Toast.showError(caught.getClass().getName(), caught.getMessage());
+        }
+
+        @Override
+        public void onSuccess(Map<String, String> metadataTypes) {
+          // TODO sort by alphabetic order of value
+
+          for (Map.Entry<String, String> entry : metadataTypes.entrySet()) {
+            type.addItem(entry.getValue(), entry.getKey());
+          }
+
+          type.addItem("Other", "");
+
+          type.setSelectedIndex(type.getItemCount() - 1);
+
+        }
+      });
+
   }
 
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
     String idText = id.getText();
-    String typeText = type.getText();
+    String typeText = type.getSelectedValue();
     String xmlText = xml.getText();
 
-    if (idText.length() > 0 && typeText.length() > 0) {
+    if (idText.length() > 0) {
 
       DescriptiveMetadataEditBundle newBundle = new DescriptiveMetadataEditBundle(idText, typeText, xmlText);
 

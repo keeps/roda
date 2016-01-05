@@ -39,7 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 //TODO tool order/preference, parse tool output and update Premis (PremisUtils.updatePremisFile(...) )
-public class PremisUpdateFromToolsPlugin implements Plugin<AIP> {
+public class ToolOutputProcessorPlugin implements Plugin<AIP> {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Override
@@ -133,7 +133,7 @@ public class PremisUpdateFromToolsPlugin implements Plugin<AIP> {
 
   @Override
   public Plugin<AIP> cloneMe() {
-    return new PremisUpdateFromToolsPlugin();
+    return new ToolOutputProcessorPlugin();
   }
 
   @Override

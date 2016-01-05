@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ead:ead xmlns:ead="urn:isbn:1-931666-22-9" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="urn:isbn:1-931666-22-9 ../schemas/ead.xsd http://www.w3.org/1999/xlink ../schemas/xlink.xsd">
+    <ead:eadheader>
+        <ead:eadid> </ead:eadid>
+        <ead:filedesc>
+            <ead:titlestmt>
+                <ead:titleproper encodinganalog="Title"> </ead:titleproper>
+            </ead:titlestmt>
+        </ead:filedesc>
+        <ead:profiledesc>
+            <ead:creation>
+                <ead:date normal=" "> </ead:date>
+            </ead:creation>
+            <ead:langusage>
+                <ead:language encodinganalog="Language" langcode="eng">English</ead:language>
+            </ead:langusage>
+        </ead:profiledesc>
+    </ead:eadheader>
+    <ead:archdesc level=" ">
+        <ead:did>
+            <ead:unitid repositorycode=" "> </ead:unitid>
+            <ead:unittitle> </ead:unittitle>
+            <ead:unitdate normal=" "> </ead:unitdate>
+        </ead:did>
+    </ead:archdesc>
+</ead:ead>

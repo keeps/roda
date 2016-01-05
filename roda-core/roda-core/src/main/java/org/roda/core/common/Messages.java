@@ -19,6 +19,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.MissingResourceException;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 import java.util.ResourceBundle.Control;
@@ -41,6 +42,16 @@ public class Messages {
    */
   public String getTranslation(String key) {
     return resourceBundle.getString(key);
+  }
+
+  public String getTranslation(String key, String fallback) {
+    String ret;
+    try {
+      ret = getTranslation(key);
+    } catch (MissingResourceException e) {
+      ret = fallback;
+    }
+    return ret;
   }
 
   /**
@@ -106,4 +117,5 @@ public class Messages {
       return bundle;
     }
   }
+
 }
