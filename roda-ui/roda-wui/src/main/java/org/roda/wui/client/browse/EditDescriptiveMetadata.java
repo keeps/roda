@@ -11,6 +11,7 @@
 package org.roda.wui.client.browse;
 
 import java.util.List;
+import java.util.Map;
 
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.HistoryResolver;
@@ -19,6 +20,7 @@ import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -28,6 +30,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -98,7 +101,7 @@ public class EditDescriptiveMetadata extends Composite {
   TextBox id;
 
   @UiField
-  TextBox type;
+  ListBox type;
 
   @UiField
   TextArea xml;
@@ -121,23 +124,58 @@ public class EditDescriptiveMetadata extends Composite {
    * @param user
    *          the user to edit
    */
-  public EditDescriptiveMetadata(String aipId, DescriptiveMetadataEditBundle bundle) {
+  public EditDescriptiveMetadata(final String aipId, final DescriptiveMetadataEditBundle bundle) {
     this.aipId = aipId;
     this.bundle = bundle;
 
     initWidget(uiBinder.createAndBindUi(this));
 
     id.setText(bundle.getId());
-    type.setText(bundle.getType());
     xml.setText(bundle.getXml());
 
     id.setEnabled(false);
+
+    BrowserService.Util.getInstance().getSupportedMetadata(LocaleInfo.getCurrentLocale().getLocaleName(),
+      new AsyncCallback<Map<String, String>>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          Toast.showError(caught.getClass().getName(), caught.getMessage());
+        }
+
+        @Override
+        public void onSuccess(Map<String, String> metadataTypes) {
+          // TODO sort by alphabetic order of value
+          int selected = -1;
+          int index = 0;
+          for (Map.Entry<String, String> entry : metadataTypes.entrySet()) {
+            type.addItem(entry.getValue(), entry.getKey());
+            if (entry.getKey().equals(bundle.getType())) {
+              selected = index;
+            }
+
+            index++;
+          }
+
+          if (selected >= 0) {
+            type.addItem("Other", "");
+            type.setSelectedIndex(selected);
+          } else if ("".equals(bundle.getType())) {
+            type.addItem("Other", "");
+            type.setSelectedIndex(type.getItemCount() - 1);
+          } else {
+            type.addItem("Other (" + bundle.getType() + ")", bundle.getType());
+            type.addItem("Other", "");
+            type.setSelectedIndex(type.getItemCount() - 2);
+          }
+        }
+      });
 
   }
 
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
-    String typeText = type.getText();
+    String typeText = type.getSelectedValue();
     String xmlText = xml.getText();
 
     DescriptiveMetadataEditBundle updatedBundle = new DescriptiveMetadataEditBundle(bundle.getId(), typeText, xmlText);

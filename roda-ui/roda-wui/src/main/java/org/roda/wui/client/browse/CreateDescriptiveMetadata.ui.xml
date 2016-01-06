@@ -18,13 +18,13 @@
 			<g:FlowPanel addStyleNames="col_10 content">
 				<g:Label styleName="h1">Create descriptive metadata</g:Label>
 				<g:Label addStyleNames="form-label">
-					Identifier
-				</g:Label>
-				<g:TextBox ui:field="id" addStyleNames="form-textbox" />
-				<g:Label addStyleNames="form-label">
 					Type
 				</g:Label>
 				<g:ListBox ui:field="type" addStyleNames="form-listbox" />
+				<g:Label addStyleNames="form-label">
+					File name
+				</g:Label>
+				<g:TextBox ui:field="id" addStyleNames="form-textbox" />
 				<g:Label addStyleNames="form-label">
 					Content
 				</g:Label>

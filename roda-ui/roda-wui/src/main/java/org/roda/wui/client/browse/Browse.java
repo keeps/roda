@@ -487,11 +487,13 @@ public class Browse extends Composite {
     SimpleDescriptionObject sdo) {
     List<BreadcrumbItem> ret = new ArrayList<>();
     ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(TOP_ICON), RESOLVER.getHistoryPath()));
-    for (SimpleDescriptionObject ancestor : sdoAncestors) {
-      SafeHtml breadcrumbLabel = getBreadcrumbLabel(ancestor);
-      BreadcrumbItem ancestorBreadcrumb = new BreadcrumbItem(breadcrumbLabel,
-        getViewItemHistoryToken(ancestor.getId()));
-      ret.add(1, ancestorBreadcrumb);
+    if (sdoAncestors != null) {
+      for (SimpleDescriptionObject ancestor : sdoAncestors) {
+        SafeHtml breadcrumbLabel = getBreadcrumbLabel(ancestor);
+        BreadcrumbItem ancestorBreadcrumb = new BreadcrumbItem(breadcrumbLabel,
+          getViewItemHistoryToken(ancestor.getId()));
+        ret.add(1, ancestorBreadcrumb);
+      }
     }
 
     ret.add(new BreadcrumbItem(getBreadcrumbLabel(sdo), getViewItemHistoryToken(sdo.getId())));

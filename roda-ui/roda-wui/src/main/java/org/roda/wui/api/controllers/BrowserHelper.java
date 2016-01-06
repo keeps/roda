@@ -109,7 +109,11 @@ public class BrowserHelper {
       itemBundle.setSdo(sdo);
 
       // set sdo ancestors
-      itemBundle.setSdoAncestors(getAncestors(sdo));
+      try {
+        itemBundle.setSdoAncestors(getAncestors(sdo));
+      } catch (NotFoundException e) {
+        LOGGER.warn("Found an item with invalid ancestors: " + aipId, e);
+      }
 
       // set descriptive metadata
       List<DescriptiveMetadataViewBundle> descriptiveMetadataList = getDescriptiveMetadataBundles(aipId, locale);
@@ -404,9 +408,10 @@ public class BrowserHelper {
 
       } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
         filename = descriptiveMetadataBinary.getStoragePath().getName() + ".html";
+        DescriptiveMetadata descriptiveMetadata = model.retrieveDescriptiveMetadata(aipId, metadataId);
         mediaType = MediaType.TEXT_HTML;
         String htmlDescriptive = HTMLUtils.descriptiveMetadataToHtml(descriptiveMetadataBinary,
-          ServerTools.parseLocale(language));
+          descriptiveMetadata.getType(), ServerTools.parseLocale(language));
         stream = new StreamingOutput() {
           @Override
           public void write(OutputStream os) throws IOException, WebApplicationException {

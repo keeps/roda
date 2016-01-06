@@ -167,7 +167,8 @@ public class IndexModelObserver implements ModelObserver {
       SolrInputDocument sdoDoc = SolrUtils.aipToSolrInputDocumentAsSDO(aip, model);
       index.add(RodaConstants.INDEX_AIP, aipDoc);
       index.commit(RodaConstants.INDEX_AIP);
-      LOGGER.trace("Adding SDO: " + sdoDoc);
+      LOGGER.info("Adding AIP: " + aipDoc);
+      LOGGER.info("Adding SDO: " + sdoDoc);
       index.add(RodaConstants.INDEX_SDO, sdoDoc);
       index.commit(RodaConstants.INDEX_SDO);
     } catch (SolrServerException | IOException | ModelServiceException | StorageServiceException
