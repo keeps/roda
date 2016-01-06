@@ -885,7 +885,7 @@ public class SolrUtils {
 
   }
 
-  public static SolrInputDocument aipToSolrInputDocumentAsSDO(AIP aip, ModelService model)
+  public static SolrInputDocument aipToSolrInputDocumentAsSDO(AIP aip, ModelService model, boolean safemode)
     throws ModelServiceException, StorageServiceException, IndexServiceException {
     final SolrInputDocument ret = new SolrInputDocument();
     final String aipId = aip.getId();
@@ -901,20 +901,23 @@ public class SolrUtils {
     ret.addField(RodaConstants.AIP_REPRESENTATION_ID, aip.getRepresentationIds());
     ret.addField(RodaConstants.AIP_HAS_REPRESENTATIONS, !aip.getRepresentationIds().isEmpty());
 
-    for (String descId : aip.getDescriptiveMetadataIds()) {
-      DescriptiveMetadata metadata = model.retrieveDescriptiveMetadata(aipId, descId);
-      StoragePath storagePath = metadata.getStoragePath();
-      Binary binary = model.getStorage().getBinary(storagePath);
-      try {
-        SolrInputDocument fields = getDescriptiveMetataFields(binary);
-        for (SolrInputField field : fields) {
-          ret.addField(field.getName(), field.getValue(), field.getBoost());
+    if (!safemode) {
+
+      for (String descId : aip.getDescriptiveMetadataIds()) {
+        DescriptiveMetadata metadata = model.retrieveDescriptiveMetadata(aipId, descId);
+        StoragePath storagePath = metadata.getStoragePath();
+        Binary binary = model.getStorage().getBinary(storagePath);
+        try {
+          SolrInputDocument fields = getDescriptiveMetataFields(binary);
+          for (SolrInputField field : fields) {
+            ret.addField(field.getName(), field.getValue(), field.getBoost());
+          }
+        } catch (IndexServiceException ise) {
+          // TODO index the index errors for later processing
+          LOGGER.warn("Error processing descriptive metadata " + descId + " from AIP " + aipId);
+        } catch (Throwable e) {
+          LOGGER.error("Error processing descriptive metadata " + descId + " from AIP " + aipId, e);
         }
-      } catch (IndexServiceException ise) {
-        // TODO index the index errors for later processing
-        LOGGER.warn("Error processing descriptive metadata " + descId + " from AIP " + aipId);
-      } catch (Throwable e) {
-        LOGGER.error("Error processing descriptive metadata " + descId + " from AIP " + aipId, e);
       }
     }
 

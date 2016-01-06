@@ -8,12 +8,12 @@
 package org.roda.core.index;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.common.SolrException;
 import org.apache.solr.common.SolrInputDocument;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.Group;
@@ -162,18 +162,28 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   private void indexAIPandSDO(final AIP aip) {
+    indexAIPandSDO(aip, false);
+  }
+
+  private void indexAIPandSDO(final AIP aip, boolean safemode) {
     try {
       SolrInputDocument aipDoc = SolrUtils.aipToSolrInputDocument(aip);
-      SolrInputDocument sdoDoc = SolrUtils.aipToSolrInputDocumentAsSDO(aip, model);
+      SolrInputDocument sdoDoc = SolrUtils.aipToSolrInputDocumentAsSDO(aip, model, safemode);
       index.add(RodaConstants.INDEX_AIP, aipDoc);
       index.commit(RodaConstants.INDEX_AIP);
-      LOGGER.info("Adding AIP: " + aipDoc);
-      LOGGER.info("Adding SDO: " + sdoDoc);
+      LOGGER.debug("Adding AIP: " + aipDoc);
+      LOGGER.debug("Adding SDO: " + sdoDoc);
       index.add(RodaConstants.INDEX_SDO, sdoDoc);
       index.commit(RodaConstants.INDEX_SDO);
-    } catch (SolrServerException | IOException | ModelServiceException | StorageServiceException
+    } catch (SolrException | SolrServerException | IOException | ModelServiceException | StorageServiceException
       | IndexServiceException e) {
-      LOGGER.error("Could not index created AIP", e);
+      if (!safemode) {
+        LOGGER.error("Error indexing AIP, trying safe mode", e);
+        indexAIPandSDO(aip, true);
+      } else {
+        LOGGER.error("Could not index created AIP", e);
+      }
+
     }
   }
 

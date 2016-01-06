@@ -37,6 +37,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.solr.common.SolrException;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
@@ -754,7 +755,7 @@ public class BrowserHelper {
     String descriptiveMetadataType, Binary descriptiveMetadataIdBinary)
       throws GenericException, ValidationException, AuthorizationDeniedException {
 
-    ValidationUtils.validateDescriptiveBinary(descriptiveMetadataIdBinary, descriptiveMetadataId, false);
+    ValidationUtils.validateDescriptiveBinary(descriptiveMetadataIdBinary, descriptiveMetadataType, false);
 
     DescriptiveMetadata ret;
     try {
@@ -779,7 +780,7 @@ public class BrowserHelper {
     String descriptiveMetadataType, Binary descriptiveMetadataIdBinary)
       throws GenericException, AuthorizationDeniedException, ValidationException {
 
-    ValidationUtils.validateDescriptiveBinary(descriptiveMetadataIdBinary, descriptiveMetadataId, false);
+    ValidationUtils.validateDescriptiveBinary(descriptiveMetadataIdBinary, descriptiveMetadataType, false);
 
     try {
       ModelService model = RodaCoreFactory.getModelService();
@@ -793,6 +794,8 @@ public class BrowserHelper {
       } else {
         throw new GenericException("Error creating new item: " + e.getMessage());
       }
+    } catch (SolrException e) {
+      throw new ValidationException(e.getMessage());
     }
 
   }

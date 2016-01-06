@@ -122,7 +122,7 @@ public class ValidationUtils {
     try {
       StoragePath storagePath = metadata.getStoragePath();
       Binary binary = model.getStorage().getBinary(storagePath);
-      validateDescriptiveBinary(binary, binary.getStoragePath().getName(), failIfNoSchema);
+      validateDescriptiveBinary(binary, metadata.getType(), failIfNoSchema);
       ret = true;
     } catch (StorageServiceException e) {
       throw new ModelServiceException("Error validating descriptive metadata " + metadata.getStoragePath().asString(),
@@ -163,17 +163,17 @@ public class ValidationUtils {
    * Validates descriptive medatada (e.g. against its schema, but other
    * strategies may be used)
    * 
-   * @param descriptiveMetadataId
+   * @param descriptiveMetadataType
    * 
    * @param failIfNoSchema
    * @throws ValidationException
    */
-  public static void validateDescriptiveBinary(Binary binary, String descriptiveMetadataId, boolean failIfNoSchema)
+  public static void validateDescriptiveBinary(Binary binary, String descriptiveMetadataType, boolean failIfNoSchema)
     throws ValidationException {
     try {
       InputStream inputStream = binary.getContent().createInputStream();
       InputStream schemaStream = RodaCoreFactory
-        .getConfigurationFileAsStream("schemas/" + descriptiveMetadataId + ".xsd");
+        .getConfigurationFileAsStream("schemas/" + descriptiveMetadataType + ".xsd");
       if (schemaStream != null) {
         // FIXME is inputstream closed???
         Source xmlFile = new StreamSource(inputStream);
@@ -189,12 +189,12 @@ public class ValidationUtils {
             throw new ValidationException("Error validating descriptive binary ", errorHandler.getErrors());
           }
         } catch (SAXException e) {
-          LOGGER.debug("Error validating descriptive binary " + descriptiveMetadataId, e);
+          LOGGER.debug("Error validating descriptive binary " + descriptiveMetadataType, e);
           throw new ValidationException("Error validating descriptive binary ", errorHandler.getErrors());
         }
       } else {
         if (failIfNoSchema) {
-          throw new ValidationException("No schema to validate " + descriptiveMetadataId);
+          throw new ValidationException("No schema to validate " + descriptiveMetadataType);
         }
       }
     } catch (SAXException | IOException e) {
