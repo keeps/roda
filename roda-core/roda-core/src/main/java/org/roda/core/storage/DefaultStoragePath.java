@@ -11,19 +11,21 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.roda.core.data.exceptions.RequestNotValidException;
+
 public class DefaultStoragePath implements StoragePath {
 
   private final String path;
 
-  public static DefaultStoragePath parse(String path) throws StorageServiceException {
+  public static DefaultStoragePath parse(String path) throws RequestNotValidException {
     if (isValid(path)) {
       return new DefaultStoragePath(sanitizePath(path));
     } else {
-      throw new StorageServiceException("The path \"" + path + "\" is not valid", StorageServiceException.BAD_REQUEST);
+      throw new RequestNotValidException("The path \"" + path + "\" is not valid");
     }
   }
 
-  public static DefaultStoragePath parse(String... pathPartials) throws StorageServiceException {
+  public static DefaultStoragePath parse(String... pathPartials) throws RequestNotValidException {
     StringBuilder builder = new StringBuilder();
     boolean empty = true;
     for (String pathPartial : pathPartials) {
@@ -38,10 +40,9 @@ public class DefaultStoragePath implements StoragePath {
     return parse(builder.toString());
   }
 
-  public static DefaultStoragePath parse(StoragePath base, String resourceName) throws StorageServiceException {
+  public static DefaultStoragePath parse(StoragePath base, String resourceName) throws RequestNotValidException {
     if (resourceName.contains(SEPARATOR_REGEX)) {
-      throw new StorageServiceException("The resource name is not valid: " + resourceName,
-        StorageServiceException.BAD_REQUEST);
+      throw new RequestNotValidException("The resource name is not valid: " + resourceName);
     } else {
       return parse(base.asString() + SEPARATOR + resourceName);
     }

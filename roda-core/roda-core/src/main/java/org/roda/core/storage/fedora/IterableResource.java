@@ -17,11 +17,13 @@ import org.fcrepo.client.FedoraObject;
 import org.fcrepo.client.FedoraRepository;
 import org.fcrepo.client.FedoraResource;
 import org.fcrepo.client.ForbiddenException;
-import org.fcrepo.client.NotFoundException;
+import org.roda.core.data.exceptions.ActionForbiddenException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StoragePath;
-import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.fedora.utils.FedoraConversionUtils;
 import org.roda.core.storage.fedora.utils.FedoraUtils;
 
@@ -31,23 +33,24 @@ import org.roda.core.storage.fedora.utils.FedoraUtils;
  * 
  * @author Sébastien Leroux <sleroux@keep.pt>
  * @author Hélder Silva <hsilva@keep.pt>
- * */
+ */
 public class IterableResource implements ClosableIterable<Resource> {
   private FedoraRepository repository;
   private Iterator<FedoraResource> fedoraResources;
 
-  public IterableResource(FedoraRepository repository, StoragePath storagePath) throws StorageServiceException {
+  public IterableResource(FedoraRepository repository, StoragePath storagePath)
+    throws ActionForbiddenException, RequestNotValidException, NotFoundException, GenericException {
     this.repository = repository;
     try {
       fedoraResources = repository.getObject(FedoraUtils.createFedoraPath(storagePath)).getChildren(null).iterator();
     } catch (ForbiddenException e) {
-      throw new StorageServiceException(e.getMessage(), StorageServiceException.FORBIDDEN, e);
+      throw new ActionForbiddenException("Could not iterate through resource", e);
     } catch (BadRequestException e) {
-      throw new StorageServiceException(e.getMessage(), StorageServiceException.BAD_REQUEST, e);
-    } catch (NotFoundException e) {
-      throw new StorageServiceException(e.getMessage(), StorageServiceException.NOT_FOUND, e);
+      throw new RequestNotValidException("Could not iterate through resource", e);
+    } catch (org.fcrepo.client.NotFoundException e) {
+      throw new NotFoundException("Could not iterate through resource", e);
     } catch (FedoraException e) {
-      throw new StorageServiceException(e.getMessage(), StorageServiceException.BAD_REQUEST, e);
+      throw new GenericException("Could not iterate through resource", e);
     }
   }
 
@@ -81,7 +84,7 @@ public class IterableResource implements ClosableIterable<Resource> {
         } else {
           return FedoraConversionUtils.fedoraObjectToDirectory(repository.getRepositoryUrl(), (FedoraObject) resource);
         }
-      } catch (StorageServiceException e) {
+      } catch (GenericException | RequestNotValidException e) {
         return null;
       }
     }

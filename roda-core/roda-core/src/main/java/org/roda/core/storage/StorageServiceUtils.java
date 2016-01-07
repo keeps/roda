@@ -9,16 +9,23 @@ package org.roda.core.storage;
 
 import java.util.Iterator;
 
+import org.roda.core.data.exceptions.ActionForbiddenException;
+import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
+
 /**
  * Storage Service related and independent utility class
  * 
  * @author Hélder Silva <hsilva@keep.pt>
- * */
+ * @author Luis Faria <lfaria@keep.pt>
+ */
 public final class StorageServiceUtils {
 
   /**
    * Private empty constructor
-   * */
+   */
   private StorageServiceUtils() {
 
   }
@@ -37,10 +44,15 @@ public final class StorageServiceUtils {
    *          destination storage path
    * @param rootEntity
    *          class of the root entity
-   * */
+   * @throws AlreadyExistsException
+   * @throws NotFoundException
+   * @throws RequestNotValidException
+   * @throws GenericException
+   * @throws ActionForbiddenException
+   */
   public static void moveBetweenStorageServices(StorageService fromService, StoragePath fromStoragePath,
-    StorageService toService, StoragePath toStoragePath, Class<? extends Entity> rootEntity)
-    throws StorageServiceException {
+    StorageService toService, StoragePath toStoragePath, Class<? extends Entity> rootEntity) throws GenericException,
+      RequestNotValidException, NotFoundException, AlreadyExistsException, ActionForbiddenException {
     copyOrMoveBetweenStorageServices(fromService, fromStoragePath, toService, toStoragePath, rootEntity, false);
   }
 
@@ -58,16 +70,22 @@ public final class StorageServiceUtils {
    *          destination storage path
    * @param rootEntity
    *          class of the root entity
-   * */
+   * @throws AlreadyExistsException
+   * @throws NotFoundException
+   * @throws RequestNotValidException
+   * @throws GenericException
+   * @throws ActionForbiddenException
+   */
   public static void copyBetweenStorageServices(StorageService fromService, StoragePath fromStoragePath,
-    StorageService toService, StoragePath toStoragePath, Class<? extends Entity> rootEntity)
-    throws StorageServiceException {
+    StorageService toService, StoragePath toStoragePath, Class<? extends Entity> rootEntity) throws GenericException,
+      RequestNotValidException, NotFoundException, AlreadyExistsException, ActionForbiddenException {
     copyOrMoveBetweenStorageServices(fromService, fromStoragePath, toService, toStoragePath, rootEntity, true);
   }
 
   private static void copyOrMoveBetweenStorageServices(StorageService fromService, StoragePath fromStoragePath,
     StorageService toService, StoragePath toStoragePath, Class<? extends Entity> rootEntity, boolean copy)
-    throws StorageServiceException {
+      throws GenericException, RequestNotValidException, NotFoundException, AlreadyExistsException,
+      ActionForbiddenException {
     if (Container.class.isAssignableFrom(rootEntity)) {
       Container container = fromService.getContainer(fromStoragePath);
       toService.createContainer(toStoragePath, container.getMetadata());
@@ -97,9 +115,10 @@ public final class StorageServiceUtils {
     }
   }
 
-  private static void iterateAndCopyOrMoveResourcesRecursivelly(StorageService fromService,
-    StoragePath fromStoragePath, StorageService toService, StoragePath toStoragePath,
-    Iterator<Resource> childResourcesIterator, boolean copy) throws StorageServiceException {
+  private static void iterateAndCopyOrMoveResourcesRecursivelly(StorageService fromService, StoragePath fromStoragePath,
+    StorageService toService, StoragePath toStoragePath, Iterator<Resource> childResourcesIterator, boolean copy)
+      throws RequestNotValidException, AlreadyExistsException, GenericException, NotFoundException,
+      ActionForbiddenException {
     while (childResourcesIterator.hasNext()) {
       Resource child = childResourcesIterator.next();
       if (copy) {
@@ -113,7 +132,7 @@ public final class StorageServiceUtils {
   }
 
   private static StoragePath extractToStoragePathChild(StoragePath fromStoragePath, StoragePath fromStoragePathChild,
-    StoragePath toStoragePath) throws StorageServiceException {
+    StoragePath toStoragePath) throws RequestNotValidException {
     String path = fromStoragePathChild.asString();
     path = path.replaceFirst(fromStoragePath.asString(), toStoragePath.asString());
 

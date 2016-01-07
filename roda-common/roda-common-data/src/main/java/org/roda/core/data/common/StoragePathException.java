@@ -7,6 +7,8 @@
  */
 package org.roda.core.data.common;
 
+import org.roda.core.data.exceptions.GenericException;
+
 public class StoragePathException extends RODAException {
 
   private static final long serialVersionUID = -3242810946238751526L;

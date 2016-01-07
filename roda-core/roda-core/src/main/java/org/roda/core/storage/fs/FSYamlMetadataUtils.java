@@ -29,7 +29,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.roda.core.common.RodaUtils;
-import org.roda.core.storage.StorageServiceException;
+import org.roda.core.data.exceptions.GenericException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
@@ -124,16 +124,17 @@ public final class FSYamlMetadataUtils {
    *          indicates that metadata already available in the file will be
    *          updated to the new values (by replacing the old values with the
    *          new ones)
+   * @throws GenericException
    */
   public static Map<String, Set<String>> writeMetadata(Path path, Map<String, Set<String>> metadata, boolean replaceAll)
-    throws StorageServiceException {
+    throws GenericException {
     Path properties = getPropertiesPath(path);
     return writeMetadataToPath(properties, metadata, replaceAll);
   }
 
   @SuppressWarnings("unchecked")
   private static Map<String, Set<String>> writeMetadataToPath(Path properties, Map<String, Set<String>> newMetadata,
-    boolean replaceAll) throws StorageServiceException {
+    boolean replaceAll) throws GenericException {
     Yaml yaml = new Yaml();
     Map<String, Set<String>> metadata;
     if (replaceAll) {
@@ -149,8 +150,7 @@ public final class FSYamlMetadataUtils {
             oldMetadata = (Map<String, Set<String>>) o;
           }
         } catch (IOException e) {
-          throw new StorageServiceException("Could not load from properties file " + properties,
-            StorageServiceException.INTERNAL_SERVER_ERROR, e);
+          throw new GenericException("Could not load from properties file " + properties, e);
         } finally {
           if (bufferedReader != null) {
             try {
@@ -179,8 +179,7 @@ public final class FSYamlMetadataUtils {
       return metadata;
 
     } catch (IOException e) {
-      throw new StorageServiceException("Could not write properties back to file " + properties,
-        StorageServiceException.INTERNAL_SERVER_ERROR, e);
+      throw new GenericException("Could not write properties back to file " + properties, e);
     } finally {
       if (bufferedWriter != null) {
         try {
@@ -207,14 +206,15 @@ public final class FSYamlMetadataUtils {
    * 
    * @param file
    *          file where the metadata is written
+   * @throws GenericException
    */
-  public static Map<String, Set<String>> readMetadata(Path path) throws StorageServiceException {
+  public static Map<String, Set<String>> readMetadata(Path path) throws GenericException {
     Path properties = getPropertiesPath(path);
     return readMetadataFromPath(properties);
   }
 
   @SuppressWarnings({"unchecked", "rawtypes"})
-  private static Map<String, Set<String>> readMetadataFromPath(Path properties) throws StorageServiceException {
+  private static Map<String, Set<String>> readMetadataFromPath(Path properties) throws GenericException {
     Yaml yaml = new Yaml();
     Map<String, Set<String>> metadata;
     if (Files.exists(properties)) {
@@ -256,15 +256,10 @@ public final class FSYamlMetadataUtils {
             }
           }
         } else {
-          throw new StorageServiceException("Could not serialize properties to a map on " + properties,
-            StorageServiceException.INTERNAL_SERVER_ERROR);
+          throw new GenericException("Could not serialize properties to a map on " + properties);
         }
-      } catch (IOException e) {
-        throw new StorageServiceException("Could not load from properties file " + properties,
-          StorageServiceException.INTERNAL_SERVER_ERROR, e);
-      } catch (ScannerException e) {
-        throw new StorageServiceException("Could not load from properties file " + properties,
-          StorageServiceException.INTERNAL_SERVER_ERROR, e);
+      } catch (IOException | ScannerException e) {
+        throw new GenericException("Could not load from properties file " + properties, e);
       } finally {
         if (bufferedReader != null) {
           try {
@@ -280,7 +275,7 @@ public final class FSYamlMetadataUtils {
     return metadata;
   }
 
-  public static void copyMetadata(Path source, Path target, boolean replaceExisting) throws StorageServiceException {
+  public static void copyMetadata(Path source, Path target, boolean replaceExisting) throws GenericException {
     Path sourceProperties = getPropertiesPath(source);
     Path targetProperties = getPropertiesPath(target);
     try {
@@ -288,11 +283,11 @@ public final class FSYamlMetadataUtils {
         : new CopyOption[] {};
       Files.copy(sourceProperties, targetProperties, copyOptions);
     } catch (IOException e) {
-      throw new StorageServiceException("Could not copy metadata", StorageServiceException.INTERNAL_SERVER_ERROR, e);
+      throw new GenericException("Could not copy metadata", e);
     }
   }
 
-  public static void moveMetadata(Path source, Path target, boolean replaceExisting) throws StorageServiceException {
+  public static void moveMetadata(Path source, Path target, boolean replaceExisting) throws GenericException {
     Path sourceProperties = getPropertiesPath(source);
     Path targetProperties = getPropertiesPath(target);
     try {
@@ -300,16 +295,16 @@ public final class FSYamlMetadataUtils {
         : new CopyOption[] {};
       Files.move(sourceProperties, targetProperties, copyOptions);
     } catch (IOException e) {
-      throw new StorageServiceException("Could not copy metadata", StorageServiceException.INTERNAL_SERVER_ERROR, e);
+      throw new GenericException("Could not copy metadata", e);
     }
   }
 
-  public static void deleteMetadata(Path path) throws StorageServiceException {
+  public static void deleteMetadata(Path path) throws GenericException {
     Path properties = getPropertiesPath(path);
     try {
       Files.deleteIfExists(properties);
     } catch (IOException e) {
-      throw new StorageServiceException("Could not delete metadata", StorageServiceException.INTERNAL_SERVER_ERROR, e);
+      throw new GenericException("Could not delete metadata", e);
     }
   }
 

@@ -19,6 +19,8 @@ import org.fcrepo.client.FedoraContent;
 import org.fcrepo.client.FedoraDatastream;
 import org.fcrepo.client.FedoraException;
 import org.fcrepo.client.FedoraObject;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.Container;
 import org.roda.core.storage.ContentPayload;
@@ -28,7 +30,6 @@ import org.roda.core.storage.DefaultDirectory;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.Directory;
 import org.roda.core.storage.StoragePath;
-import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.fedora.FedoraContentPayload;
 import org.roda.core.storage.fedora.FedoraStorageService;
 
@@ -58,14 +59,14 @@ public final class FedoraConversionUtils {
    *          the payload to be converted
    * @param mimetype
    *          the mimetype of the payload
+   * @throws GenericException
    */
   public static FedoraContent contentPayloadToFedoraContent(ContentPayload payload, String mimetype)
-    throws StorageServiceException {
+    throws GenericException {
     try {
       return new FedoraContent().setContent(payload.createInputStream()).setContentType(mimetype);
     } catch (IOException e) {
-      throw new StorageServiceException("Error while converting content payload into fedora content",
-        StorageServiceException.INTERNAL_SERVER_ERROR, e);
+      throw new GenericException("Error while converting content payload into fedora content", e);
     }
   }
 
@@ -76,25 +77,23 @@ public final class FedoraConversionUtils {
    * @param payload
    *          the payload to be converted
    */
-  public static FedoraContent contentPayloadToFedoraContent(ContentPayload payload) throws StorageServiceException {
+  public static FedoraContent contentPayloadToFedoraContent(ContentPayload payload) throws GenericException {
     return contentPayloadToFedoraContent(payload, "application/octet-stream");
   }
 
-  private static StoragePath getStoragePath(FedoraDatastream ds) throws StorageServiceException {
+  private static StoragePath getStoragePath(FedoraDatastream ds) throws GenericException, RequestNotValidException {
     try {
       return DefaultStoragePath.parse(ds.getPath());
     } catch (FedoraException e) {
-      throw new StorageServiceException("Error while getting the storage path from a particular Fedora datastream",
-        StorageServiceException.INTERNAL_SERVER_ERROR, e);
+      throw new GenericException("Error while getting the storage path from a particular Fedora datastream", e);
     }
   }
 
-  private static StoragePath getStoragePath(FedoraObject obj) throws StorageServiceException {
+  private static StoragePath getStoragePath(FedoraObject obj) throws GenericException, RequestNotValidException {
     try {
       return DefaultStoragePath.parse(obj.getPath());
     } catch (FedoraException e) {
-      throw new StorageServiceException("Error while getting the storage path from a particular Fedora object",
-        StorageServiceException.INTERNAL_SERVER_ERROR, e);
+      throw new GenericException("Error while getting the storage path from a particular Fedora object", e);
     }
   }
 
@@ -103,8 +102,10 @@ public final class FedoraConversionUtils {
    * 
    * @param datastream
    *          the Fedora datastream to be converted
+   * @throws RequestNotValidException
    */
-  public static Binary fedoraDatastreamToBinary(FedoraDatastream datastream) throws StorageServiceException {
+  public static Binary fedoraDatastreamToBinary(FedoraDatastream datastream)
+    throws GenericException, RequestNotValidException {
     try {
       Map<String, Set<String>> properties = tripleIteratorToMap(datastream.getProperties());
       ContentPayload cp = new FedoraContentPayload(datastream);
@@ -113,8 +114,7 @@ public final class FedoraConversionUtils {
       return new DefaultBinary(getStoragePath(datastream), properties, cp, sizeInBytes, false,
         extractContentDigest(contentDigest));
     } catch (FedoraException e) {
-      throw new StorageServiceException("Error while converting a Fedora datastream into a Binary",
-        StorageServiceException.INTERNAL_SERVER_ERROR, e);
+      throw new GenericException("Error while converting a Fedora datastream into a Binary", e);
     }
   }
 
@@ -134,16 +134,16 @@ public final class FedoraConversionUtils {
    * 
    * @param object
    *          the Fedora object to be converted
+   * @throws RequestNotValidException
    */
   public static Directory fedoraObjectToDirectory(String fedoraRepositoryURL, FedoraObject object)
-    throws StorageServiceException {
+    throws GenericException, RequestNotValidException {
     try {
       Map<String, Set<String>> metadata = tripleIteratorToMap(fedoraRepositoryURL, object.getProperties(),
         NodeFactory.createURI(object.getPath()));
       return new DefaultDirectory(getStoragePath(object), metadata);
     } catch (FedoraException e) {
-      throw new StorageServiceException("Error while converting a Fedora object into a Directory",
-        StorageServiceException.INTERNAL_SERVER_ERROR, e);
+      throw new GenericException("Error while converting a Fedora object into a Directory", e);
     }
 
   }
@@ -214,14 +214,15 @@ public final class FedoraConversionUtils {
    * 
    * @param object
    *          Fedora object to be converted
+   * @throws RequestNotValidException
    */
-  public static Container fedoraObjectToContainer(FedoraObject object) throws StorageServiceException {
+  public static Container fedoraObjectToContainer(FedoraObject object)
+    throws GenericException, RequestNotValidException {
     try {
       return new DefaultContainer(getStoragePath(object), tripleIteratorToMap(object.getProperties()));
     } catch (FedoraException e) {
 
-      throw new StorageServiceException("Error while converting a Fedora object into a Container",
-        StorageServiceException.INTERNAL_SERVER_ERROR, e);
+      throw new GenericException("Error while converting a Fedora object into a Container", e);
     }
   }
 }

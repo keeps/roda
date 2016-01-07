@@ -16,7 +16,10 @@ import org.fcrepo.client.FedoraObject;
 import org.fcrepo.client.FedoraRepository;
 import org.fcrepo.client.FedoraResource;
 import org.fcrepo.client.ForbiddenException;
-import org.fcrepo.client.NotFoundException;
+import org.roda.core.data.exceptions.ActionForbiddenException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.Container;
 import org.roda.core.storage.StorageServiceException;
@@ -28,21 +31,22 @@ import org.roda.core.storage.fedora.utils.FedoraConversionUtils;
  * 
  * @author Sébastien Leroux <sleroux@keep.pt>
  * @author Hélder Silva <hsilva@keep.pt>
- * */
+ */
 public class IterableContainer implements ClosableIterable<Container> {
   private Iterator<FedoraResource> fedoraResources;
 
-  public IterableContainer(FedoraRepository repository) throws StorageServiceException {
+  public IterableContainer(FedoraRepository repository)
+    throws ActionForbiddenException, RequestNotValidException, NotFoundException, GenericException {
     try {
       fedoraResources = repository.getObject("").getChildren(null).iterator();
     } catch (ForbiddenException e) {
-      throw new StorageServiceException(e.getMessage(), StorageServiceException.FORBIDDEN, e);
+      throw new ActionForbiddenException("Error iterating though containers", e);
     } catch (BadRequestException e) {
-      throw new StorageServiceException(e.getMessage(), StorageServiceException.BAD_REQUEST, e);
-    } catch (NotFoundException e) {
-      throw new StorageServiceException(e.getMessage(), StorageServiceException.NOT_FOUND, e);
+      throw new RequestNotValidException("Error iterating though containers", e);
+    } catch (org.fcrepo.client.NotFoundException e) {
+      throw new NotFoundException("Error iterating though containers", e);
     } catch (FedoraException e) {
-      throw new StorageServiceException(e.getMessage(), StorageServiceException.BAD_REQUEST, e);
+      throw new GenericException("Error iterating though containers", e);
     }
   }
 
@@ -72,7 +76,7 @@ public class IterableContainer implements ClosableIterable<Container> {
       try {
         FedoraResource resource = fedoraResources.next();
         return FedoraConversionUtils.fedoraObjectToContainer((FedoraObject) resource);
-      } catch (StorageServiceException e) {
+      } catch (GenericException | RequestNotValidException e) {
         return null;
       }
     }

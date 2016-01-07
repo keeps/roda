@@ -11,23 +11,27 @@ package org.roda.core.data.exceptions;
  * @author Luis Faria <lfaria@keep.pt>
  * 
  */
-public class NotFoundException extends Exception {
-  private static final long serialVersionUID = -1656013708463576500L;
+public class ActionForbiddenException extends Exception {
 
-  public NotFoundException() {
+  private static final long serialVersionUID = -6744205569453461540L;
+
+  public ActionForbiddenException() {
     super();
   }
 
-  public NotFoundException(String message) {
+  public ActionForbiddenException(String message) {
     super(message);
   }
 
-  public NotFoundException(String message, Throwable cause) {
+  public ActionForbiddenException(String message, Throwable cause) {
     super(message, cause);
   }
 
-  public NotFoundException(Throwable cause) {
+  public ActionForbiddenException(Throwable cause) {
     super(cause);
   }
+  
+  
+
 
 }

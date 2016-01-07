@@ -30,13 +30,16 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.data.Report;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.ActionForbiddenException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.FileFormat;
 import org.roda.core.data.v2.LogEntry;
 import org.roda.core.data.v2.LogEntryParameter;
 import org.roda.core.data.v2.RepresentationState;
 import org.roda.core.data.v2.SIPReport;
 import org.roda.core.data.v2.SimpleDescriptionObject;
-import org.roda.core.index.IndexServiceException;
 import org.roda.core.metadata.v2.premis.PremisAgentHelper;
 import org.roda.core.metadata.v2.premis.PremisEventHelper;
 import org.roda.core.metadata.v2.premis.PremisFileObjectHelper;
@@ -45,14 +48,12 @@ import org.roda.core.metadata.v2.premis.PremisRepresentationObjectHelper;
 import org.roda.core.model.AIP;
 import org.roda.core.model.DescriptiveMetadata;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.ModelServiceException;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StoragePath;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.StorageServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,9 +93,9 @@ public final class ModelUtils {
    * 
    * @param metadata
    *          metadata
-   * @throws ModelServiceException
+   * @throws GenericException
    */
-  public static FileFormat getFileFormat(Map<String, Set<String>> metadata) throws ModelServiceException {
+  public static FileFormat getFileFormat(Map<String, Set<String>> metadata) throws GenericException {
     String mimetype = getString(metadata, RodaConstants.STORAGE_META_FORMAT_MIME);
     String version = getString(metadata, RodaConstants.STORAGE_META_FORMAT_VERSION);
     // FIXME how to load format registries if any
@@ -118,7 +119,7 @@ public final class ModelUtils {
     return statuses;
   }
 
-  public static <T> T getAs(Map<String, Set<String>> metadata, String key, Class<T> type) throws ModelServiceException {
+  public static <T> T getAs(Map<String, Set<String>> metadata, String key, Class<T> type) throws GenericException {
     T ret;
     Set<String> set = metadata.get(key);
     if (set == null || set.isEmpty()) {
@@ -129,27 +130,24 @@ public final class ModelUtils {
         try {
           ret = type.cast(RodaUtils.parseDate(set.iterator().next()));
         } catch (ParseException e) {
-          throw new ModelServiceException("Could not parse date: " + value, ModelServiceException.INTERNAL_SERVER_ERROR,
-            e);
+          throw new GenericException("Could not parse date: " + value, e);
         }
       } else if (type.equals(Boolean.class)) {
         ret = type.cast(Boolean.valueOf(value));
       } else if (type.equals(Long.class)) {
         ret = type.cast(Long.valueOf(value));
       } else {
-        throw new ModelServiceException(
-          "Could not parse date because metadata field has not a single value class is not supported" + type,
-          ModelServiceException.INTERNAL_SERVER_ERROR);
+        throw new GenericException(
+          "Could not parse date because metadata field has not a single value class is not supported" + type);
       }
     } else {
-      throw new ModelServiceException("Could not parse date because metadata field has not a single value, set=" + set,
-        ModelServiceException.INTERNAL_SERVER_ERROR);
+      throw new GenericException("Could not parse date because metadata field has not a single value, set=" + set);
     }
 
     return ret;
   }
 
-  public static <T> void setAs(Map<String, Set<String>> metadata, String key, T value) throws ModelServiceException {
+  public static <T> void setAs(Map<String, Set<String>> metadata, String key, T value) throws GenericException {
     if (value instanceof Date) {
       Date dateValue = (Date) value;
       metadata.put(key, new HashSet<>(Arrays.asList(RodaUtils.dateToString(dateValue))));
@@ -160,9 +158,8 @@ public final class ModelUtils {
       Long longValue = (Long) value;
       metadata.put(key, new HashSet<>(Arrays.asList(longValue.toString())));
     } else {
-      throw new ModelServiceException(
-        "Could not set data because value class is not supported" + value.getClass().getName(),
-        ModelServiceException.INTERNAL_SERVER_ERROR);
+      throw new GenericException(
+        "Could not set data because value class is not supported" + value.getClass().getName());
     }
   }
 
@@ -173,9 +170,9 @@ public final class ModelUtils {
    *          metadata
    * @param key
    *          metadata key
-   * @throws ModelServiceException
+   * @throws GenericException
    */
-  public static Date getDate(Map<String, Set<String>> metadata, String key) throws ModelServiceException {
+  public static Date getDate(Map<String, Set<String>> metadata, String key) throws GenericException {
     return getAs(metadata, key, Date.class);
   }
 
@@ -186,9 +183,9 @@ public final class ModelUtils {
    *          metadata
    * @param key
    *          metadata key
-   * @throws ModelServiceException
+   * @throws GenericException
    */
-  public static Boolean getBoolean(Map<String, Set<String>> metadata, String key) throws ModelServiceException {
+  public static Boolean getBoolean(Map<String, Set<String>> metadata, String key) throws GenericException {
     return getAs(metadata, key, Boolean.class);
   }
 
@@ -199,9 +196,9 @@ public final class ModelUtils {
    *          metadata
    * @param key
    *          metadata key
-   * @throws ModelServiceException
+   * @throws GenericException
    */
-  public static Long getLong(Map<String, Set<String>> metadata, String key) throws ModelServiceException {
+  public static Long getLong(Map<String, Set<String>> metadata, String key) throws GenericException {
     return getAs(metadata, key, Long.class);
   }
 
@@ -214,7 +211,7 @@ public final class ModelUtils {
    *          metadata key
    * @throws ModelServiceException
    */
-  public static String getString(Map<String, Set<String>> metadata, String key) throws ModelServiceException {
+  public static String getString(Map<String, Set<String>> metadata, String key) throws GenericException {
     String ret;
     Set<String> set = metadata.get(key);
     if (set == null || set.isEmpty()) {
@@ -222,8 +219,7 @@ public final class ModelUtils {
     } else if (set.size() == 1) {
       ret = set.iterator().next();
     } else {
-      throw new ModelServiceException("Could not parse date because metadata field has multiple values, set=" + set,
-        ModelServiceException.INTERNAL_SERVER_ERROR);
+      throw new GenericException("Could not parse date because metadata field has multiple values, set=" + set);
     }
 
     return ret;
@@ -236,10 +232,13 @@ public final class ModelUtils {
    *          the storage service containing the parent resource
    * @param path
    *          the storage path for the parent resource
-   * @throws ModelServiceException
+   * @throws NotFoundException
+   * @throws GenericException
+   * @throws RequestNotValidException
+   * @throws ActionForbiddenException
    */
   public static List<String> getChildIds(StorageService storage, StoragePath path, boolean failIfParentDoesNotExist)
-    throws ModelServiceException {
+    throws NotFoundException, GenericException, ActionForbiddenException, RequestNotValidException {
     List<String> ids = new ArrayList<String>();
     ClosableIterable<Resource> iterable = null;
     try {
@@ -256,9 +255,9 @@ public final class ModelUtils {
           LOGGER.error("Error while getting IDs for path " + path.asString());
         }
       }
-    } catch (StorageServiceException e) {
-      if (e.getCode() != StorageServiceException.NOT_FOUND || failIfParentDoesNotExist) {
-        throw new ModelServiceException("Could not get ids", e.getCode(), e);
+    } catch (NotFoundException e) {
+      if (failIfParentDoesNotExist) {
+        throw e;
       }
     }
 
@@ -298,43 +297,43 @@ public final class ModelUtils {
   //
   // }
 
-  public static StoragePath getAIPcontainerPath() throws StorageServiceException {
+  public static StoragePath getAIPcontainerPath() throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP);
   }
 
-  public static StoragePath getAIPpath(String aipId) throws StorageServiceException {
+  public static StoragePath getAIPpath(String aipId) throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId);
   }
 
-  public static StoragePath getMetadataPath(String aipId) throws StorageServiceException {
+  public static StoragePath getMetadataPath(String aipId) throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
       RodaConstants.STORAGE_DIRECTORY_METADATA);
   }
 
-  public static StoragePath getDescriptiveMetadataPath(String aipId) throws StorageServiceException {
+  public static StoragePath getDescriptiveMetadataPath(String aipId) throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
       RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_DESCRIPTIVE);
   }
 
   public static StoragePath getDescriptiveMetadataPath(String aipId, String descriptiveMetadataBinaryId)
-    throws StorageServiceException {
+    throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
       RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_DESCRIPTIVE,
       descriptiveMetadataBinaryId);
   }
 
-  public static StoragePath getRepresentationsPath(String aipId) throws StorageServiceException {
+  public static StoragePath getRepresentationsPath(String aipId) throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId, RodaConstants.STORAGE_DIRECTORY_DATA);
   }
 
   public static StoragePath getRepresentationPath(String aipId, String representationId)
-    throws StorageServiceException {
+    throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId, RodaConstants.STORAGE_DIRECTORY_DATA,
       representationId);
   }
 
   public static StoragePath getRepresentationFilePath(String aipId, String representationId, String fileId)
-    throws StorageServiceException {
+    throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId, RodaConstants.STORAGE_DIRECTORY_DATA,
       representationId, fileId);
   }
@@ -343,36 +342,35 @@ public final class ModelUtils {
     return path.getDirectoryPath().get(0);
   }
 
-  public static String getRepresentationIdFromStoragePath(StoragePath path) throws ModelServiceException {
+  public static String getRepresentationIdFromStoragePath(StoragePath path) throws GenericException {
     if (path.getDirectoryPath().size() >= 3) {
       return path.getDirectoryPath().get(2);
     } else {
-      throw new ModelServiceException(
-        "Error while trying to obtain representation id from storage path (length is not 3 or above)",
-        ModelServiceException.INTERNAL_SERVER_ERROR);
+      throw new GenericException(
+        "Error while trying to obtain representation id from storage path (length is not 3 or above)");
     }
   }
 
-  public static StoragePath getPreservationPath(String aipId, String representationID) throws StorageServiceException {
+  public static StoragePath getPreservationPath(String aipId, String representationID) throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
       RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, representationID);
 
   }
 
-  public static StoragePath getPreservationPath(String aipId) throws StorageServiceException {
+  public static StoragePath getPreservationPath(String aipId) throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
       RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION);
 
   }
 
   public static StoragePath getPreservationFilePath(String aipId, String representationID, String fileID)
-    throws StorageServiceException {
+    throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
       RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, representationID, fileID);
 
   }
 
-  public static StoragePath getPreservationFilePath(String aipId, String fileID) throws StorageServiceException {
+  public static StoragePath getPreservationFilePath(String aipId, String fileID) throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
       RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, fileID);
 
@@ -458,12 +456,12 @@ public final class ModelUtils {
     return agent;
   }
 
-  public static StoragePath getPreservationAgentPath(String agentID) throws StorageServiceException {
+  public static StoragePath getPreservationAgentPath(String agentID) throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_PRESERVATION,
       RodaConstants.STORAGE_DIRECTORY_AGENTS, agentID);
   }
 
-  public static StoragePath getLogPath(String logFile) throws StorageServiceException {
+  public static StoragePath getLogPath(String logFile) throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG, logFile);
   }
 
@@ -476,23 +474,21 @@ public final class ModelUtils {
   // logFile);
   // }
 
-  public static void writeLogEntryToFile(LogEntry logEntry, Path logFile) throws ModelServiceException {
+  public static void writeLogEntryToFile(LogEntry logEntry, Path logFile) throws GenericException {
     try {
       String entryJSON = ModelUtils.getJsonFromObject(logEntry) + "\n";
       Files.write(logFile, entryJSON.getBytes(), StandardOpenOption.APPEND);
     } catch (IOException e) {
-      throw new ModelServiceException("Error writing log entry to file", ModelServiceException.INTERNAL_SERVER_ERROR,
-        e);
+      throw new GenericException("Error writing log entry to file", e);
     }
   }
 
-  public static void writeObjectToFile(Object object, Path file) throws ModelServiceException {
+  public static void writeObjectToFile(Object object, Path file) throws GenericException {
     try {
       String json = ModelUtils.getJsonFromObject(object) + "\n";
       Files.write(file, json.getBytes(), StandardOpenOption.APPEND);
     } catch (IOException e) {
-      throw new ModelServiceException("Error writing object, as json, to file",
-        ModelServiceException.INTERNAL_SERVER_ERROR, e);
+      throw new GenericException("Error writing object, as json, to file", e);
     }
   }
 
@@ -596,8 +592,7 @@ public final class ModelUtils {
     return null;
   }
 
-  public static <T> List<String> extractAgentIdsFromPreservationBinary(Binary b, Class<T> c)
-    throws ModelServiceException {
+  public static <T> List<String> extractAgentIdsFromPreservationBinary(Binary b, Class<T> c) {
     List<String> ids = new ArrayList<String>();
     if (c.equals(File.class)) {
       // TODO
@@ -647,24 +642,24 @@ public final class ModelUtils {
 
   }
 
-  public static StoragePath getOtherMetadataDirectory(String aipID) throws StorageServiceException {
+  public static StoragePath getOtherMetadataDirectory(String aipID) throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipID,
       RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_OTHER);
   }
 
-  public static StoragePath getToolMetadataDirectory(String aipID, String type) throws StorageServiceException {
+  public static StoragePath getToolMetadataDirectory(String aipID, String type) throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipID,
       RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_OTHER, type);
   }
 
   public static StoragePath getToolRepresentationMetadataDirectory(String aipID, String representationId, String type)
-    throws StorageServiceException {
+    throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipID,
       RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_OTHER, type, representationId);
   }
 
   public static StoragePath getToolMetadataPath(String aipID, String representationId, String fileName, String type)
-    throws StorageServiceException {
+    throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipID,
       RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_OTHER, type, representationId,
       fileName);
@@ -672,7 +667,7 @@ public final class ModelUtils {
   }
 
   public static ObjectNode sdoToJSON(SimpleDescriptionObject sdo)
-    throws IndexServiceException, ModelServiceException, IOException {
+    throws IOException, RequestNotValidException, NotFoundException, GenericException {
     JsonFactory factory = new JsonFactory();
     ObjectMapper mapper = new ObjectMapper(factory);
     ModelService model = RodaCoreFactory.getModelService();

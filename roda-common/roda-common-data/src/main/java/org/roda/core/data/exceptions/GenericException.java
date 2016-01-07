@@ -5,17 +5,13 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.data.common;
+package org.roda.core.data.exceptions;
 
 /**
+ * @author Luis Faria <lfaria@keep.pt>
  * 
  */
-
-/**
- * @author Luis Faria
- * 
- */
-public class GenericException extends RODAException {
+public class GenericException extends Exception {
 
   private static final long serialVersionUID = -2093798996190248576L;
 
@@ -27,8 +23,12 @@ public class GenericException extends RODAException {
     super(message);
   }
 
-  public GenericException(String message, GenericException e) {
-    super(message, e);
+  public GenericException(String message, Throwable cause) {
+    super(message, cause);
+  }
+
+  public GenericException(Throwable cause) {
+    super(cause);
   }
 
 }

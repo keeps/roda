@@ -146,6 +146,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     return Browser.getAncestors(user, sdo);
   }
+  
+  public Long countDescriptiveMetadataBinaries(String aipId) {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    return Browser.countDescriptiveMetadataBinaries(user, aipId);
+  }
 
   // FIXME see if there is a best way to deal with "hierarchical" keys
   // FIXME deal with non-configured/badly-configured keys

@@ -18,7 +18,6 @@ import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.NoSuchFileException;
-import java.nio.file.NotDirectoryException;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
@@ -34,6 +33,10 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.mutable.MutableLong;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.Container;
 import org.roda.core.storage.ContentPayload;
@@ -76,23 +79,23 @@ public final class FSUtils {
    * @param replaceExisting
    *          true if the target directory/file should be replaced if it already
    *          exists; false otherwise
+   * @throws AlreadyExistsException
+   * @throws GenericException
    * 
    */
   public static void move(final Path sourcePath, final Path targetPath, boolean replaceExisting)
-    throws StorageServiceException {
+    throws AlreadyExistsException, GenericException {
 
     // check if we can replace existing
     if (!replaceExisting && Files.exists(targetPath)) {
-      throw new StorageServiceException("Cannot copy because target path already exists: " + targetPath,
-        StorageServiceException.ALREADY_EXISTS);
+      throw new AlreadyExistsException("Cannot copy because target path already exists: " + targetPath);
     }
 
     // ensure parent directory exists or can be created
     try {
       Files.createDirectories(targetPath.getParent());
     } catch (IOException e) {
-      throw new StorageServiceException("Error while creating target directory parent folder",
-        StorageServiceException.INTERNAL_SERVER_ERROR, e);
+      throw new GenericException("Error while creating target directory parent folder", e);
     }
 
     CopyOption[] copyOptions = replaceExisting ? new CopyOption[] {StandardCopyOption.REPLACE_EXISTING}
@@ -102,16 +105,14 @@ public final class FSUtils {
       try {
         Files.move(sourcePath, targetPath, copyOptions);
       } catch (IOException e) {
-        throw new StorageServiceException("Error while moving directory from one path to another",
-          StorageServiceException.INTERNAL_SERVER_ERROR, e);
+        throw new GenericException("Error while moving directory from one path to another", e);
       }
     } else {
       try {
         Files.move(sourcePath, targetPath, copyOptions);
         FSYamlMetadataUtils.moveMetadata(sourcePath, targetPath, replaceExisting);
       } catch (IOException e) {
-        throw new StorageServiceException("Error while copying one file into another",
-          StorageServiceException.INTERNAL_SERVER_ERROR, e);
+        throw new GenericException("Error while copying one file into another", e);
       }
     }
 
@@ -127,22 +128,22 @@ public final class FSUtils {
    * @param replaceExisting
    *          true if the target directory/file should be replaced if it already
    *          exists; false otherwise
+   * @throws AlreadyExistsException
+   * @throws GenericException
    */
   public static void copy(final Path sourcePath, final Path targetPath, boolean replaceExisting)
-    throws StorageServiceException {
+    throws AlreadyExistsException, GenericException {
 
     // check if we can replace existing
     if (!replaceExisting && Files.exists(targetPath)) {
-      throw new StorageServiceException("Cannot copy because target path already exists: " + targetPath,
-        StorageServiceException.ALREADY_EXISTS);
+      throw new AlreadyExistsException("Cannot copy because target path already exists: " + targetPath);
     }
 
     // ensure parent directory exists or can be created
     try {
       Files.createDirectories(targetPath.getParent());
     } catch (IOException e) {
-      throw new StorageServiceException("Error while creating target directory parent folder",
-        StorageServiceException.INTERNAL_SERVER_ERROR, e);
+      throw new GenericException("Error while creating target directory parent folder", e);
     }
 
     if (Files.isDirectory(sourcePath)) {
@@ -161,8 +162,7 @@ public final class FSUtils {
           }
         });
       } catch (IOException e) {
-        throw new StorageServiceException("Error while copying one directory into another",
-          StorageServiceException.INTERNAL_SERVER_ERROR, e);
+        throw new GenericException("Error while copying one directory into another", e);
       }
     } else {
       try {
@@ -172,8 +172,7 @@ public final class FSUtils {
         Files.copy(sourcePath, targetPath, copyOptions);
         FSYamlMetadataUtils.copyMetadata(sourcePath, targetPath, replaceExisting);
       } catch (IOException e) {
-        throw new StorageServiceException("Error while copying one file into another",
-          StorageServiceException.INTERNAL_SERVER_ERROR, e);
+        throw new GenericException("Error while copying one file into another", e);
       }
 
     }
@@ -188,8 +187,10 @@ public final class FSUtils {
    *          directory, if not empty, everything in it will be deleted as well.
    *          in case of a file, if metadata associated to it exists, it will be
    *          deleted as well.
+   * @throws NotFoundException
+   * @throws GenericException
    */
-  public static void deletePath(Path path) throws StorageServiceException {
+  public static void deletePath(Path path) throws NotFoundException, GenericException {
     if (path == null) {
       return;
     }
@@ -202,7 +203,7 @@ public final class FSUtils {
         FSYamlMetadataUtils.deleteMetadata(path);
       }
     } catch (NoSuchFileException e) {
-      throw new StorageServiceException("Could not delete path", StorageServiceException.NOT_FOUND, e);
+      throw new NotFoundException("Could not delete path", e);
     } catch (DirectoryNotEmptyException e) {
       try {
         Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
@@ -220,10 +221,10 @@ public final class FSUtils {
 
         });
       } catch (IOException e1) {
-        throw new StorageServiceException("Could not delete entity", StorageServiceException.INTERNAL_SERVER_ERROR, e1);
+        throw new GenericException("Could not delete entity", e1);
       }
     } catch (IOException e) {
-      throw new StorageServiceException("Could not delete entity", StorageServiceException.INTERNAL_SERVER_ERROR, e);
+      throw new GenericException("Could not delete entity", e);
     }
   }
 
@@ -247,9 +248,11 @@ public final class FSUtils {
    *          base path
    * @param path
    *          relative path to base path
+   * @throws NotFoundException
+   * @throws GenericException
    */
   public static ClosableIterable<Resource> listPath(final Path basePath, final Path path)
-    throws StorageServiceException {
+    throws NotFoundException, GenericException {
     ClosableIterable<Resource> resourceIterable;
     try {
       final DirectoryStream<Path> directoryStream = Files.newDirectoryStream(path, FSYamlMetadataUtils.PATH_FILTER);
@@ -271,7 +274,7 @@ public final class FSUtils {
               Resource ret;
               try {
                 ret = convertPathToResource(basePath, next);
-              } catch (StorageServiceException | NoSuchElementException e) {
+              } catch (GenericException | NotFoundException | RequestNotValidException e) {
                 LOGGER.error("Error while list path " + basePath + " while parsing resource " + next, e);
                 ret = null;
               }
@@ -289,14 +292,35 @@ public final class FSUtils {
       };
 
     } catch (NoSuchFileException e) {
-      throw new StorageServiceException("Could not list contents of entity because it doesn't exist: " + path,
-        StorageServiceException.NOT_FOUND, e);
+      throw new NotFoundException("Could not list contents of entity because it doesn't exist: " + path, e);
     } catch (IOException e) {
-      throw new StorageServiceException("Could not list contents of entity at: " + path,
-        StorageServiceException.INTERNAL_SERVER_ERROR, e);
+      throw new GenericException("Could not list contents of entity at: " + path, e);
     }
 
     return resourceIterable;
+  }
+
+  public static Long countPath(Path basePath, Path directoryPath) throws NotFoundException, GenericException {
+    Long count = 0L;
+    try {
+      final DirectoryStream<Path> directoryStream = Files.newDirectoryStream(directoryPath,
+        FSYamlMetadataUtils.PATH_FILTER);
+
+      final Iterator<Path> pathIterator = directoryStream.iterator();
+      while (pathIterator.hasNext()) {
+        count++;
+        pathIterator.next();
+      }
+
+      directoryStream.close();
+
+    } catch (NoSuchFileException e) {
+      throw new NotFoundException("Could not list contents of entity because it doesn't exist: " + directoryPath);
+    } catch (IOException e) {
+      throw new GenericException("Could not list contents of entity at: " + directoryPath, e);
+    }
+
+    return count;
   }
 
   /**
@@ -304,8 +328,9 @@ public final class FSUtils {
    * 
    * @param basePath
    *          base path
+   * @throws GenericException
    */
-  public static ClosableIterable<Container> listContainers(final Path basePath) throws StorageServiceException {
+  public static ClosableIterable<Container> listContainers(final Path basePath) throws GenericException {
     ClosableIterable<Container> containerIterable;
     try {
       final DirectoryStream<Path> directoryStream = Files.newDirectoryStream(basePath, FSYamlMetadataUtils.PATH_FILTER);
@@ -327,7 +352,7 @@ public final class FSUtils {
               Container ret;
               try {
                 ret = convertPathToContainer(basePath, next);
-              } catch (StorageServiceException | NoSuchElementException e) {
+              } catch (NoSuchElementException | GenericException | RequestNotValidException e) {
                 LOGGER.error("Error while listing containers, while parsing resource " + next, e);
                 ret = null;
               }
@@ -345,8 +370,7 @@ public final class FSUtils {
       };
 
     } catch (IOException e) {
-      throw new StorageServiceException("Could not list contents of entity at: " + basePath,
-        StorageServiceException.INTERNAL_SERVER_ERROR, e);
+      throw new GenericException("Could not list contents of entity at: " + basePath, e);
     }
 
     return containerIterable;
@@ -359,14 +383,18 @@ public final class FSUtils {
    *          base path
    * @param path
    *          relative path to base path
+   * @throws RequestNotValidException
+   * @throws NotFoundException
+   * @throws GenericException
    */
-  public static Resource convertPathToResource(Path basePath, Path path) throws StorageServiceException {
+  public static Resource convertPathToResource(Path basePath, Path path)
+    throws RequestNotValidException, NotFoundException, GenericException {
     Resource resource;
 
     // TODO support binary reference
 
     if (!Files.exists(path)) {
-      throw new StorageServiceException("Cannot find file or directory at " + path, StorageServiceException.NOT_FOUND);
+      throw new NotFoundException("Cannot find file or directory at " + path);
     }
 
     // storage path
@@ -395,7 +423,7 @@ public final class FSUtils {
         metadata.put(RodaConstants.STORAGE_META_SIZE_IN_BYTES, Sets.newHashSet(Long.toString(size.longValue())));
         resource = new DefaultDirectory(storagePath, metadata);
       } catch (IOException e) {
-        throw new StorageServiceException("Could not get file size", StorageServiceException.INTERNAL_SERVER_ERROR, e);
+        throw new GenericException("Could not get file size", e);
       }
     } else {
       ContentPayload content = new FSPathContentPayload(path);
@@ -405,7 +433,7 @@ public final class FSUtils {
         Map<String, String> contentDigest = FSUtils.obtainContentDigest(metadata);
         resource = new DefaultBinary(storagePath, metadata, content, sizeInBytes, false, contentDigest);
       } catch (IOException e) {
-        throw new StorageServiceException("Could not get file size", StorageServiceException.INTERNAL_SERVER_ERROR, e);
+        throw new GenericException("Could not get file size", e);
       }
     }
     return resource;
@@ -432,8 +460,11 @@ public final class FSUtils {
    *          base path
    * @param path
    *          relative path to base path
+   * @throws GenericException
+   * @throws RequestNotValidException
    */
-  public static Container convertPathToContainer(Path basePath, Path path) throws StorageServiceException {
+  public static Container convertPathToContainer(Path basePath, Path path)
+    throws GenericException, RequestNotValidException {
     Container resource;
 
     // storage path
@@ -447,7 +478,7 @@ public final class FSUtils {
     if (Files.isDirectory(path)) {
       resource = new DefaultContainer(storagePath, metadata);
     } else {
-      throw new StorageServiceException("A file is not a container!", StorageServiceException.INTERNAL_SERVER_ERROR);
+      throw new GenericException("A file is not a container!");
     }
     return resource;
   }
@@ -458,8 +489,9 @@ public final class FSUtils {
    * 
    * @param path
    *          file which digest will be computed
+   * @throws GenericException
    */
-  public static String computeContentDigestMD5(Path path) throws StorageServiceException {
+  public static String computeContentDigestMD5(Path path) throws GenericException {
     return computeContentDigest(path, RodaConstants.MD5);
   }
 
@@ -469,12 +501,13 @@ public final class FSUtils {
    * 
    * @param path
    *          file which digest will be computed
+   * @throws GenericException
    */
-  public static String computeContentDigestSHA1(Path path) throws StorageServiceException {
+  public static String computeContentDigestSHA1(Path path) throws GenericException {
     return computeContentDigest(path, RodaConstants.SHA1);
   }
 
-  private static String computeContentDigest(Path path, String algorithm) throws StorageServiceException {
+  private static String computeContentDigest(Path path, String algorithm) throws GenericException {
     FileChannel fc = null;
     try {
       final int bufferSize = 1073741824;
@@ -504,8 +537,7 @@ public final class FSUtils {
       return hexString.toString();
 
     } catch (NoSuchAlgorithmException | IOException e) {
-      throw new StorageServiceException("Cannot compute content digest for " + path + " using algorithm " + algorithm,
-        StorageServiceException.INTERNAL_SERVER_ERROR);
+      throw new GenericException("Cannot compute content digest for " + path + " using algorithm " + algorithm);
     } finally {
       if (fc != null) {
         try {
@@ -522,8 +554,9 @@ public final class FSUtils {
    * 
    * @param path
    *          file which digests will be computed
+   * @throws GenericException
    */
-  public static Map<String, String> generateContentDigest(Path path) throws StorageServiceException {
+  public static Map<String, String> generateContentDigest(Path path) throws GenericException {
     Map<String, String> digest = new HashMap<String, String>(1);
 
     String pathDigest = computeContentDigestSHA1(path);

@@ -183,6 +183,22 @@ public class Browser extends RodaCoreService {
 
     return ancestors;
   }
+  
+  public static Long countDescriptiveMetadataBinaries(RodaUser user, String aipId) {
+    Date startDate = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, BROWSE_ROLE);
+
+    // delegate
+    Long count = BrowserHelper.countDescriptiveMetadataBinaries(aipId);
+
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, BROWSER_COMPONENT, "getAncestors", sdo.getId(), duration, SDO_PARAM, sdo.toString());
+
+    return count;
+  }
 
   /*
    * ---------------------------------------------------------------------------
@@ -823,5 +839,7 @@ public class Browser extends RodaCoreService {
       RodaConstants.LOCALE,locale);
     return supportedMetadata;
   }
+
+
 
 }

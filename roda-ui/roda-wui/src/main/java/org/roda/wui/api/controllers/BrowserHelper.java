@@ -239,6 +239,13 @@ public class BrowserHelper {
 
     return sdos;
   }
+  
+
+  public static Long countDescriptiveMetadataBinaries(String aipId) {
+    return RodaCoreFactory.getModelService()
+      .listDescriptiveMetadataBinaries(aipId);
+    return RodaCoreFactory.getModelService().countDescriptiveMetadataBinaries(aipId);
+  }
 
   private static IndexResult<Representation> findRepresentations(String aipId, Sorter sorter, Sublist sublist)
     throws GenericException {
@@ -1091,5 +1098,6 @@ public class BrowserHelper {
     }
     return supportedMetadata;
   }
+
 
 }

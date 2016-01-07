@@ -18,11 +18,10 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.solr.client.solrj.SolrClient;
-import org.roda.core.data.common.GenericException;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.TransferredResource;
-import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,34 +79,28 @@ public class FolderMonitorNIO {
     return tr.getId();
   }
 
-  public void remove(Path path) throws IOException, NotFoundException {
-    try {
-      Path fullpath = basePath.resolve(path);
-      if (Files.exists(fullpath)) {
-        FSUtils.deletePath(fullpath);
-      } else {
-        throw new NotFoundException("Path does not exist: " + fullpath);
-      }
-    } catch (StorageServiceException e) {
-      throw new IOException(e.getMessage(), e);
+  public void remove(Path path) throws NotFoundException, GenericException {
+
+    Path fullpath = basePath.resolve(path);
+    if (Files.exists(fullpath)) {
+      FSUtils.deletePath(fullpath);
+    } else {
+      throw new NotFoundException("Path does not exist: " + fullpath);
     }
+
   }
 
-  public void removeSync(List<String> ids) throws NotFoundException, IOException {
+  public void removeSync(List<String> ids) throws NotFoundException, GenericException {
     for (String s : ids) {
-      try {
-        Path relative = Paths.get(s);
-        Path fullPath = basePath.resolve(relative);
-        if (Files.exists(fullPath)) {
-          for (FolderObserver observer : observers) {
-            observer.transferredResourceDeleted(createTransferredResource(fullPath, basePath));
-          }
-          FSUtils.deletePath(fullPath);
-        } else {
-          throw new NotFoundException("Path does not exist: " + fullPath);
+      Path relative = Paths.get(s);
+      Path fullPath = basePath.resolve(relative);
+      if (Files.exists(fullPath)) {
+        for (FolderObserver observer : observers) {
+          observer.transferredResourceDeleted(createTransferredResource(fullPath, basePath));
         }
-      } catch (StorageServiceException e) {
-        throw new IOException(e.getMessage(), e);
+        FSUtils.deletePath(fullPath);
+      } else {
+        throw new NotFoundException("Path does not exist: " + fullPath);
       }
     }
 

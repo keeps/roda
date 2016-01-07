@@ -19,16 +19,18 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.exceptions.ActionForbiddenException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.Representation;
 import org.roda.core.model.DescriptiveMetadata;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.ModelServiceException;
 import org.roda.core.model.PreservationMetadata;
 import org.roda.core.model.ValidationException;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.StoragePath;
-import org.roda.core.storage.StorageServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -47,10 +49,15 @@ public class ValidationUtils {
   /**
    * Validates all descriptive metadata files contained in the AIP
    * 
+   * @throws ActionForbiddenException
+   * @throws NotFoundException
+   * @throws RequestNotValidException
+   * @throws GenericException
+   * 
    * @throws ValidationException
    */
   public static boolean isAIPDescriptiveMetadataValid(ModelService model, String aipId, boolean failIfNoSchema)
-    throws ModelServiceException {
+    throws GenericException, RequestNotValidException, NotFoundException, ActionForbiddenException {
     boolean valid = true;
     ClosableIterable<DescriptiveMetadata> descriptiveMetadataBinaries = model.listDescriptiveMetadataBinaries(aipId);
     try {
@@ -73,10 +80,15 @@ public class ValidationUtils {
   /**
    * Validates all preservation metadata files contained in the AIP
    * 
+   * @throws RequestNotValidException
+   * @throws GenericException
+   * @throws NotFoundException
+   * @throws ActionForbiddenException
+   * 
    * @throws ValidationException
    */
   public static boolean isAIPPreservationMetadataValid(ModelService model, String aipId, boolean failIfNoSchema)
-    throws ModelServiceException {
+    throws NotFoundException, GenericException, RequestNotValidException, ActionForbiddenException {
     boolean valid = true;
     ClosableIterable<Representation> representations = model.listRepresentations(aipId);
     try {
@@ -114,19 +126,21 @@ public class ValidationUtils {
    * strategies may be used)
    * 
    * @param failIfNoSchema
+   * @throws ActionForbiddenException
+   * @throws NotFoundException
+   * @throws RequestNotValidException
+   * @throws GenericException
    * @throws ValidationException
    */
   public static boolean isDescriptiveMetadataValid(ModelService model, DescriptiveMetadata metadata,
-    boolean failIfNoSchema) throws ModelServiceException {
+    boolean failIfNoSchema)
+      throws GenericException, RequestNotValidException, NotFoundException, ActionForbiddenException {
     boolean ret;
     try {
       StoragePath storagePath = metadata.getStoragePath();
       Binary binary = model.getStorage().getBinary(storagePath);
       validateDescriptiveBinary(binary, metadata.getType(), failIfNoSchema);
       ret = true;
-    } catch (StorageServiceException e) {
-      throw new ModelServiceException("Error validating descriptive metadata " + metadata.getStoragePath().asString(),
-        ModelServiceException.INTERNAL_SERVER_ERROR, e);
     } catch (ValidationException e) {
       ret = false;
     }
@@ -139,19 +153,21 @@ public class ValidationUtils {
    * strategies may be used)
    * 
    * @param failIfNoSchema
+   * @throws ActionForbiddenException
+   * @throws NotFoundException
+   * @throws RequestNotValidException
+   * @throws GenericException
    * @throws ValidationException
    */
   public static boolean isPreservationMetadataValid(ModelService model, PreservationMetadata metadata,
-    boolean failIfNoSchema) throws ModelServiceException {
+    boolean failIfNoSchema)
+      throws GenericException, RequestNotValidException, NotFoundException, ActionForbiddenException {
     boolean ret;
     try {
       StoragePath storagePath = metadata.getStoragePath();
       Binary binary = model.getStorage().getBinary(storagePath);
       validatePreservationBinary(binary);
       ret = true;
-    } catch (StorageServiceException e) {
-      throw new ModelServiceException("Error validating descriptive metadata " + metadata.getStoragePath().asString(),
-        ModelServiceException.INTERNAL_SERVER_ERROR, e);
     } catch (ValidationException e) {
       ret = false;
     }

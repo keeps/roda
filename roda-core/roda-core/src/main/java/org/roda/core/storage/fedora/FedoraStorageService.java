@@ -14,7 +14,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 
-import org.fcrepo.client.AlreadyExistsException;
 import org.fcrepo.client.BadRequestException;
 import org.fcrepo.client.FedoraDatastream;
 import org.fcrepo.client.FedoraException;
@@ -22,8 +21,12 @@ import org.fcrepo.client.FedoraObject;
 import org.fcrepo.client.FedoraRepository;
 import org.fcrepo.client.FedoraResource;
 import org.fcrepo.client.ForbiddenException;
-import org.fcrepo.client.NotFoundException;
 import org.fcrepo.client.impl.FedoraRepositoryImpl;
+import org.roda.core.data.exceptions.ActionForbiddenException;
+import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.Container;
@@ -36,7 +39,6 @@ import org.roda.core.storage.Entity;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StoragePath;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.StorageServiceUtils;
 import org.roda.core.storage.fedora.utils.FedoraConversionUtils;
 import org.roda.core.storage.fedora.utils.FedoraUtils;
@@ -111,95 +113,109 @@ public class FedoraStorageService implements StorageService {
   }
 
   @Override
-  public ClosableIterable<Container> listContainers() throws StorageServiceException {
+  public ClosableIterable<Container> listContainers()
+    throws ActionForbiddenException, RequestNotValidException, NotFoundException, GenericException {
     return new IterableContainer(fedoraRepository);
   }
 
   @Override
   public Container createContainer(StoragePath storagePath, Map<String, Set<String>> metadata)
-    throws StorageServiceException {
+    throws ActionForbiddenException, AlreadyExistsException, RequestNotValidException, GenericException {
 
     try {
       FedoraObject container = fedoraRepository.createObject(FedoraUtils.createFedoraPath(storagePath));
       addMetadataToResource(container, metadata);
       return new DefaultContainer(storagePath, metadata);
     } catch (ForbiddenException e) {
-      throw new StorageServiceException(e.getMessage(), StorageServiceException.FORBIDDEN, e);
-    } catch (AlreadyExistsException e) {
-      throw new StorageServiceException(e.getMessage(), StorageServiceException.ALREADY_EXISTS, e);
+      throw new ActionForbiddenException("Could not create container", e);
+    } catch (org.fcrepo.client.AlreadyExistsException e) {
+      throw new AlreadyExistsException("Could not create container", e);
     } catch (FedoraException e) {
-      throw new StorageServiceException(e.getMessage(), StorageServiceException.BAD_REQUEST, e);
+      throw new GenericException("Could not create container", e);
     }
-
   }
 
   @Override
-  public Container getContainer(StoragePath storagePath) throws StorageServiceException {
+  public Container getContainer(StoragePath storagePath)
+    throws RequestNotValidException, ActionForbiddenException, NotFoundException, GenericException {
 
     if (!storagePath.isFromAContainer()) {
-      throw new StorageServiceException("The storage path provided isn't from a container: " + storagePath,
-        StorageServiceException.BAD_REQUEST);
+      throw new RequestNotValidException("The storage path provided isn't from a container: " + storagePath);
     }
 
     try {
       return FedoraConversionUtils
         .fedoraObjectToContainer(fedoraRepository.getObject(FedoraUtils.createFedoraPath(storagePath)));
     } catch (ForbiddenException e) {
-      throw new StorageServiceException(e.getMessage(), StorageServiceException.FORBIDDEN, e);
+      throw new ActionForbiddenException("Could not get container", e);
     } catch (BadRequestException e) {
-      throw new StorageServiceException(e.getMessage(), StorageServiceException.BAD_REQUEST, e);
-    } catch (NotFoundException e) {
-      throw new StorageServiceException(e.getMessage(), StorageServiceException.NOT_FOUND, e);
+      throw new RequestNotValidException("Could not get container", e);
+    } catch (org.fcrepo.client.NotFoundException e) {
+      throw new NotFoundException("Could not get container", e);
     } catch (FedoraException e) {
-      throw new StorageServiceException(e.getMessage(), StorageServiceException.BAD_REQUEST, e);
+      throw new GenericException("Could not get container", e);
     }
-
   }
 
   @Override
-  public void deleteContainer(StoragePath storagePath) throws StorageServiceException {
+  public void deleteContainer(StoragePath storagePath)
+    throws ActionForbiddenException, NotFoundException, GenericException {
     try {
       fedoraRepository.getObject(FedoraUtils.createFedoraPath(storagePath)).forceDelete();
     } catch (ForbiddenException e) {
-      throw new StorageServiceException(e.getMessage(), StorageServiceException.FORBIDDEN, e);
-    } catch (NotFoundException e) {
-      throw new StorageServiceException(e.getMessage(), StorageServiceException.NOT_FOUND, e);
-    } catch (AlreadyExistsException e) {
-      throw new StorageServiceException(e.getMessage(), StorageServiceException.ALREADY_EXISTS, e);
+      throw new ActionForbiddenException("Could not delete container", e);
+    } catch (org.fcrepo.client.NotFoundException e) {
+      throw new NotFoundException("Could not delete container", e);
     } catch (FedoraException e) {
-      throw new StorageServiceException(e.getMessage(), StorageServiceException.BAD_REQUEST, e);
+      throw new GenericException("Could not get container", e);
     }
   }
 
   @Override
   public ClosableIterable<Resource> listResourcesUnderContainer(StoragePath storagePath)
-    throws StorageServiceException {
+    throws ActionForbiddenException, RequestNotValidException, NotFoundException, GenericException {
     return new IterableResource(fedoraRepository, storagePath);
   }
 
   @Override
+  public Long countResourcesUnderContainer(StoragePath storagePath)
+    throws ActionForbiddenException, RequestNotValidException, NotFoundException, GenericException {
+    try {
+      Collection<FedoraResource> children = fedoraRepository.getObject(FedoraUtils.createFedoraPath(storagePath))
+        .getChildren(null);
+      return Long.valueOf(children.size());
+    } catch (ForbiddenException e) {
+      throw new ActionForbiddenException("Could not count resource under directory", e);
+    } catch (BadRequestException e) {
+      throw new RequestNotValidException("Could not count resource under directory", e);
+    } catch (org.fcrepo.client.NotFoundException e) {
+      throw new NotFoundException("Could not count resource under directory", e);
+    } catch (FedoraException e) {
+      throw new GenericException("Could not count resource under directory", e);
+    }
+  }
+
+  @Override
   public Directory createDirectory(StoragePath storagePath, Map<String, Set<String>> metadata)
-    throws StorageServiceException {
+    throws ActionForbiddenException, AlreadyExistsException, GenericException {
     try {
       FedoraObject directory = fedoraRepository.createObject(FedoraUtils.createFedoraPath(storagePath));
 
       addMetadataToResource(directory, metadata);
       return new DefaultDirectory(storagePath, metadata);
     } catch (ForbiddenException e) {
-      throw new StorageServiceException(e.getMessage(), StorageServiceException.FORBIDDEN, e);
-    } catch (NotFoundException e) {
-      throw new StorageServiceException(e.getMessage(), StorageServiceException.NOT_FOUND, e);
-    } catch (AlreadyExistsException e) {
-      throw new StorageServiceException(e.getMessage(), StorageServiceException.ALREADY_EXISTS, e);
+      throw new ActionForbiddenException("Could not create directory", e);
+    } catch (org.fcrepo.client.AlreadyExistsException e) {
+      throw new AlreadyExistsException("Could not create directory", e);
     } catch (FedoraException e) {
-      throw new StorageServiceException(e.getMessage(), StorageServiceException.BAD_REQUEST, e);
+      throw new GenericException("Could not create directory", e);
     }
 
   }
 
   @Override
   public Directory createRandomDirectory(StoragePath parentStoragePath, Map<String, Set<String>> metadata)
-    throws StorageServiceException {
+    throws ActionForbiddenException, RequestNotValidException, NotFoundException, GenericException {
 
     FedoraObject directory;
     try {
@@ -209,7 +225,7 @@ public class FedoraStorageService implements StorageService {
           // XXX may want to change create object to native Fedora method that
           // creates a random object
           directory = fedoraRepository.createObject(FedoraUtils.createFedoraPath(storagePath));
-        } catch (AlreadyExistsException e) {
+        } catch (org.fcrepo.client.AlreadyExistsException e) {
           directory = null;
           LOGGER.warn("Got a colision when creating random directory", e);
         }
@@ -217,47 +233,65 @@ public class FedoraStorageService implements StorageService {
       addMetadataToResource(directory, metadata);
       return new DefaultDirectory(storagePath, metadata);
     } catch (ForbiddenException e) {
-      throw new StorageServiceException(e.getMessage(), StorageServiceException.FORBIDDEN, e);
-    } catch (NotFoundException e) {
-      throw new StorageServiceException(e.getMessage(), StorageServiceException.NOT_FOUND, e);
+      throw new ActionForbiddenException("Error creating random directory under " + parentStoragePath, e);
+    } catch (org.fcrepo.client.NotFoundException e) {
+      throw new NotFoundException("Error creating random directory under " + parentStoragePath, e);
     } catch (FedoraException e) {
-      throw new StorageServiceException(e.getMessage(), StorageServiceException.BAD_REQUEST, e);
+      throw new GenericException("Error creating random directory under " + parentStoragePath, e);
     }
   }
 
   @Override
-  public Directory getDirectory(StoragePath storagePath) throws StorageServiceException {
+  public Directory getDirectory(StoragePath storagePath)
+    throws RequestNotValidException, GenericException, ActionForbiddenException, NotFoundException {
     if (storagePath.isFromAContainer()) {
-      throw new StorageServiceException("Invalid storage path for a directory: " + storagePath,
-        StorageServiceException.BAD_REQUEST);
+      throw new RequestNotValidException("Invalid storage path for a directory: " + storagePath);
     }
     try {
       FedoraObject object = fedoraRepository.getObject(FedoraUtils.createFedoraPath(storagePath));
       return FedoraConversionUtils.fedoraObjectToDirectory(fedoraRepository.getRepositoryUrl(), object);
     } catch (ForbiddenException e) {
-      throw new StorageServiceException(e.getMessage(), StorageServiceException.FORBIDDEN, e);
+      throw new ActionForbiddenException("Error getting directory " + storagePath, e);
     } catch (BadRequestException e) {
-      throw new StorageServiceException(e.getMessage(), StorageServiceException.BAD_REQUEST, e);
-    } catch (NotFoundException e) {
-      throw new StorageServiceException(e.getMessage(), StorageServiceException.NOT_FOUND, e);
+      throw new RequestNotValidException("Error getting directory " + storagePath, e);
+    } catch (org.fcrepo.client.NotFoundException e) {
+      throw new NotFoundException("Error getting directory " + storagePath, e);
     } catch (FedoraException e) {
-      throw new StorageServiceException(e.getMessage(), StorageServiceException.BAD_REQUEST, e);
+      throw new GenericException("Error getting directory " + storagePath, e);
     }
   }
 
   @Override
   public ClosableIterable<Resource> listResourcesUnderDirectory(StoragePath storagePath)
-    throws StorageServiceException {
+    throws ActionForbiddenException, RequestNotValidException, NotFoundException, GenericException {
     return new IterableResource(fedoraRepository, storagePath);
   }
 
   @Override
+  public Long countResourcesUnderDirectory(StoragePath storagePath)
+    throws NotFoundException, GenericException, ActionForbiddenException, RequestNotValidException {
+    try {
+      Collection<FedoraResource> children = fedoraRepository.getObject(FedoraUtils.createFedoraPath(storagePath))
+        .getChildren(null);
+      return Long.valueOf(children.size());
+    } catch (ForbiddenException e) {
+      throw new ActionForbiddenException("Could not count resource under directory", e);
+    } catch (BadRequestException e) {
+      throw new RequestNotValidException("Could not count resource under directory", e);
+    } catch (org.fcrepo.client.NotFoundException e) {
+      throw new NotFoundException("Could not count resource under directory", e);
+    } catch (FedoraException e) {
+      throw new GenericException("Could not count resource under directory", e);
+    }
+  }
+
+  @Override
   public Binary createBinary(StoragePath storagePath, Map<String, Set<String>> metadata, ContentPayload payload,
-    boolean asReference) throws StorageServiceException {
+    boolean asReference) throws GenericException, RequestNotValidException, ActionForbiddenException,
+      AlreadyExistsException, NotFoundException {
     if (asReference) {
       // TODO method to create binary as reference.
-      throw new StorageServiceException("Creating binary as reference not yet supported",
-        StorageServiceException.NOT_IMPLEMENTED);
+      throw new GenericException("Creating binary as reference not yet supported");
     } else {
       try {
         FedoraDatastream binary = fedoraRepository.createDatastream(FedoraUtils.createFedoraPath(storagePath),
@@ -267,13 +301,13 @@ public class FedoraStorageService implements StorageService {
 
         return FedoraConversionUtils.fedoraDatastreamToBinary(binary);
       } catch (ForbiddenException e) {
-        throw new StorageServiceException(e.getMessage(), StorageServiceException.FORBIDDEN, e);
-      } catch (AlreadyExistsException e) {
-        throw new StorageServiceException(e.getMessage(), StorageServiceException.ALREADY_EXISTS, e);
-      } catch (NotFoundException e) {
-        throw new StorageServiceException(e.getMessage(), StorageServiceException.NOT_FOUND, e);
+        throw new ActionForbiddenException("Error creating binary", e);
+      } catch (org.fcrepo.client.AlreadyExistsException e) {
+        throw new AlreadyExistsException("Error creating binary", e);
+      } catch (org.fcrepo.client.NotFoundException e) {
+        throw new NotFoundException("Error creating binary", e);
       } catch (FedoraException e) {
-        throw new StorageServiceException(e.getMessage(), StorageServiceException.BAD_REQUEST, e);
+        throw new GenericException("Error creating binary", e);
       }
     }
 
@@ -281,11 +315,11 @@ public class FedoraStorageService implements StorageService {
 
   @Override
   public Binary createRandomBinary(StoragePath parentStoragePath, Map<String, Set<String>> metadata,
-    ContentPayload payload, boolean asReference) throws StorageServiceException {
+    ContentPayload payload, boolean asReference)
+      throws GenericException, RequestNotValidException, ActionForbiddenException, NotFoundException {
     if (asReference) {
       // TODO method to create binary as reference.
-      throw new StorageServiceException("Creating binary as reference not yet supported",
-        StorageServiceException.NOT_IMPLEMENTED);
+      throw new GenericException("Creating binary as reference not yet supported");
     } else {
       try {
         FedoraDatastream binary;
@@ -296,7 +330,7 @@ public class FedoraStorageService implements StorageService {
             // creates a random datastream
             binary = fedoraRepository.createDatastream(FedoraUtils.createFedoraPath(storagePath),
               FedoraConversionUtils.contentPayloadToFedoraContent(payload));
-          } catch (AlreadyExistsException e) {
+          } catch (org.fcrepo.client.AlreadyExistsException e) {
             binary = null;
             LOGGER.warn("Got a colision when creating random bianry", e);
           }
@@ -305,22 +339,22 @@ public class FedoraStorageService implements StorageService {
 
         return FedoraConversionUtils.fedoraDatastreamToBinary(binary);
       } catch (ForbiddenException e) {
-        throw new StorageServiceException(e.getMessage(), StorageServiceException.FORBIDDEN, e);
-      } catch (NotFoundException e) {
-        throw new StorageServiceException(e.getMessage(), StorageServiceException.NOT_FOUND, e);
+        throw new ActionForbiddenException(e.getMessage(), e);
+      } catch (org.fcrepo.client.NotFoundException e) {
+        throw new NotFoundException(e.getMessage(), e);
       } catch (FedoraException e) {
-        throw new StorageServiceException(e.getMessage(), StorageServiceException.BAD_REQUEST, e);
+        throw new GenericException(e.getMessage(), e);
       }
     }
   }
 
   @Override
   public Binary updateBinaryContent(StoragePath storagePath, ContentPayload payload, boolean asReference,
-    boolean createIfNotExists) throws StorageServiceException {
+    boolean createIfNotExists)
+      throws GenericException, ActionForbiddenException, RequestNotValidException, NotFoundException {
     if (asReference) {
       // TODO method to update binary as reference.
-      throw new StorageServiceException("Updating binary as reference not yet supported",
-        StorageServiceException.INTERNAL_SERVER_ERROR);
+      throw new GenericException("Updating binary as reference not yet supported");
     } else {
       try {
         FedoraDatastream datastream = fedoraRepository.getDatastream(FedoraUtils.createFedoraPath(storagePath));
@@ -329,41 +363,43 @@ public class FedoraStorageService implements StorageService {
 
         return FedoraConversionUtils.fedoraDatastreamToBinary(datastream);
       } catch (ForbiddenException e) {
-        throw new StorageServiceException(e.getMessage(), StorageServiceException.FORBIDDEN, e);
-      } catch (AlreadyExistsException e) {
-        throw new StorageServiceException(e.getMessage(), StorageServiceException.ALREADY_EXISTS, e);
-      } catch (NotFoundException e) {
+        throw new ActionForbiddenException("Error updating binary content", e);
+      } catch (org.fcrepo.client.NotFoundException e) {
         if (createIfNotExists) {
-          return createBinary(storagePath, new HashMap<String, Set<String>>(), payload, asReference);
+          try {
+            return createBinary(storagePath, new HashMap<String, Set<String>>(), payload, asReference);
+          } catch (AlreadyExistsException e1) {
+            throw new GenericException("Error updating binary content", e1);
+          }
         } else {
-          throw new StorageServiceException(e.getMessage(), StorageServiceException.NOT_FOUND, e);
+          throw new NotFoundException("Error updating binary content", e);
         }
       } catch (FedoraException e) {
-        throw new StorageServiceException(e.getMessage(), StorageServiceException.BAD_REQUEST, e);
+        throw new GenericException("Error updating binary content", e);
       }
 
     }
   }
 
   @Override
-  public Binary getBinary(StoragePath storagePath) throws StorageServiceException {
+  public Binary getBinary(StoragePath storagePath)
+    throws RequestNotValidException, GenericException, NotFoundException, ActionForbiddenException {
     try {
       FedoraDatastream ds = fedoraRepository.getDatastream(FedoraUtils.createFedoraPath(storagePath));
 
       if (!isDatastream(ds)) {
-        throw new StorageServiceException("The resource obtained as being a datastream isn't really a datastream",
-          StorageServiceException.BAD_REQUEST);
+        throw new RequestNotValidException("The resource obtained as being a datastream isn't really a datastream");
       }
 
       return FedoraConversionUtils.fedoraDatastreamToBinary(ds);
     } catch (ForbiddenException e) {
-      throw new StorageServiceException(e.getMessage(), StorageServiceException.FORBIDDEN, e);
+      throw new ActionForbiddenException(e.getMessage(), e);
     } catch (BadRequestException e) {
-      throw new StorageServiceException(e.getMessage(), StorageServiceException.BAD_REQUEST, e);
-    } catch (NotFoundException e) {
-      throw new StorageServiceException(e.getMessage(), StorageServiceException.NOT_FOUND, e);
+      throw new RequestNotValidException(e.getMessage(), e);
+    } catch (org.fcrepo.client.NotFoundException e) {
+      throw new NotFoundException(e.getMessage(), e);
     } catch (FedoraException e) {
-      throw new StorageServiceException(e.getMessage(), StorageServiceException.BAD_REQUEST, e);
+      throw new GenericException(e.getMessage(), e);
     }
   }
 
@@ -373,7 +409,8 @@ public class FedoraStorageService implements StorageService {
   }
 
   @Override
-  public void deleteResource(StoragePath storagePath) throws StorageServiceException {
+  public void deleteResource(StoragePath storagePath)
+    throws NotFoundException, ActionForbiddenException, GenericException {
     String fedoraPath = FedoraUtils.createFedoraPath(storagePath);
     try {
       if (fedoraRepository.exists(fedoraPath)) {
@@ -398,33 +435,32 @@ public class FedoraStorageService implements StorageService {
           }
         }
       } else {
-        throw new StorageServiceException("The resource identified by the path \"" + storagePath + "\" was not found",
-          StorageServiceException.NOT_FOUND);
+        throw new NotFoundException("The resource identified by the path \"" + storagePath + "\" was not found");
       }
-    } catch (StorageServiceException e) {
-      throw e;
     } catch (ForbiddenException e) {
-      throw new StorageServiceException(e.getMessage(), StorageServiceException.FORBIDDEN);
+      throw new ActionForbiddenException("Error deleting resource: " + storagePath, e);
+    } catch (org.fcrepo.client.NotFoundException e) {
+      throw new NotFoundException(e.getMessage(), e);
     } catch (FedoraException e) {
-      throw new StorageServiceException(e.getMessage(), StorageServiceException.BAD_REQUEST);
+      throw new GenericException("Error deleting resource: " + storagePath, e);
     }
 
   }
 
   @Override
-  public Map<String, Set<String>> getMetadata(StoragePath storagePath) throws StorageServiceException {
+  public Map<String, Set<String>> getMetadata(StoragePath storagePath)
+    throws ActionForbiddenException, RequestNotValidException, NotFoundException, GenericException {
     String fedoraPath = FedoraUtils.createFedoraPath(storagePath);
     boolean exist = false;
     try {
       exist = fedoraRepository.exists(fedoraPath);
     } catch (ForbiddenException e) {
-      throw new StorageServiceException(e.getMessage(), StorageServiceException.FORBIDDEN, e);
+      throw new ActionForbiddenException(e.getMessage(), e);
     } catch (FedoraException e) {
-      throw new StorageServiceException(e.getMessage(), StorageServiceException.BAD_REQUEST, e);
+      throw new RequestNotValidException(e.getMessage(), e);
     }
     if (!exist) {
-      throw new StorageServiceException("The resource identified by the path \"" + storagePath + "\" was not found",
-        StorageServiceException.NOT_FOUND);
+      throw new NotFoundException("The resource identified by the path \"" + storagePath + "\" was not found");
     } else {
       try {
         FedoraObject fo = fedoraRepository.getObject(fedoraPath);
@@ -434,13 +470,13 @@ public class FedoraStorageService implements StorageService {
           FedoraDatastream fds = fedoraRepository.getDatastream(fedoraPath);
           return FedoraConversionUtils.tripleIteratorToMap(fds.getProperties());
         } catch (ForbiddenException e) {
-          throw new StorageServiceException(e.getMessage(), StorageServiceException.FORBIDDEN);
+          throw new ActionForbiddenException("Error getting metadata", e);
         } catch (BadRequestException e) {
-          throw new StorageServiceException(e.getMessage(), StorageServiceException.BAD_REQUEST);
-        } catch (NotFoundException e) {
-          throw new StorageServiceException(e.getMessage(), StorageServiceException.NOT_FOUND);
+          throw new RequestNotValidException("Error getting metadata", e);
+        } catch (org.fcrepo.client.NotFoundException e) {
+          throw new NotFoundException("Error getting metadata", e);
         } catch (FedoraException e) {
-          throw new StorageServiceException(e.getMessage(), StorageServiceException.BAD_REQUEST);
+          throw new GenericException("Error getting metadata", e);
         }
       }
     }
@@ -449,7 +485,7 @@ public class FedoraStorageService implements StorageService {
 
   @Override
   public Map<String, Set<String>> updateMetadata(StoragePath storagePath, Map<String, Set<String>> metadata,
-    boolean replaceAll) throws StorageServiceException {
+    boolean replaceAll) throws RequestNotValidException, ActionForbiddenException, NotFoundException, GenericException {
 
     if (metadata != null) {
       String fedoraPath = FedoraUtils.createFedoraPath(storagePath);
@@ -457,13 +493,12 @@ public class FedoraStorageService implements StorageService {
       try {
         exist = fedoraRepository.exists(fedoraPath);
       } catch (ForbiddenException e) {
-        throw new StorageServiceException(e.getMessage(), StorageServiceException.FORBIDDEN, e);
+        throw new ActionForbiddenException("Error updating metadata", e);
       } catch (FedoraException e) {
-        throw new StorageServiceException(e.getMessage(), StorageServiceException.BAD_REQUEST, e);
+        throw new GenericException("Error updating metadata", e);
       }
       if (!exist) {
-        throw new StorageServiceException("The resource identified by the path \"" + storagePath + "\" was not found",
-          StorageServiceException.NOT_FOUND);
+        throw new NotFoundException("The resource identified by the path \"" + storagePath + "\" was not found");
       } else {
         try {
           FedoraObject fo = fedoraRepository.getObject(fedoraPath);
@@ -477,18 +512,18 @@ public class FedoraStorageService implements StorageService {
             Map<String, Set<String>> old = FedoraConversionUtils.tripleIteratorToMap(fds.getProperties());
             return updateMetadata(fds, old, metadata, replaceAll);
           } catch (ForbiddenException e) {
-            throw new StorageServiceException(e.getMessage(), StorageServiceException.FORBIDDEN);
+            throw new ActionForbiddenException("Error updating metadata", e);
           } catch (BadRequestException e) {
-            throw new StorageServiceException(e.getMessage(), StorageServiceException.BAD_REQUEST);
-          } catch (NotFoundException e) {
-            throw new StorageServiceException(e.getMessage(), StorageServiceException.NOT_FOUND);
+            throw new RequestNotValidException("Error updating metadata", e);
+          } catch (org.fcrepo.client.NotFoundException e) {
+            throw new NotFoundException("Error updating metadata", e);
           } catch (FedoraException e) {
-            throw new StorageServiceException(e.getMessage(), StorageServiceException.BAD_REQUEST);
+            throw new GenericException("Error updating metadata", e);
           }
         }
       }
     } else {
-      throw new StorageServiceException("Cannot update metadata to null", StorageServiceException.BAD_REQUEST);
+      throw new RequestNotValidException("Cannot update metadata to null");
     }
 
   }
@@ -529,7 +564,8 @@ public class FedoraStorageService implements StorageService {
 
   @Override
   public void copy(StorageService fromService, StoragePath fromStoragePath, StoragePath toStoragePath)
-    throws StorageServiceException {
+    throws GenericException, RequestNotValidException, ActionForbiddenException, NotFoundException,
+    AlreadyExistsException {
 
     Class<? extends Entity> rootEntity = fromService.getEntity(fromStoragePath);
 
@@ -543,7 +579,8 @@ public class FedoraStorageService implements StorageService {
   }
 
   private void copyInsideFedora(StoragePath fromStoragePath, StoragePath toStoragePath,
-    Class<? extends Entity> rootEntity) throws StorageServiceException {
+    Class<? extends Entity> rootEntity)
+      throws ActionForbiddenException, RequestNotValidException, NotFoundException, GenericException {
     try {
       if (rootEntity.equals(Container.class) || rootEntity.equals(Directory.class)) {
         FedoraObject object = fedoraRepository.getObject(FedoraUtils.createFedoraPath(fromStoragePath));
@@ -556,23 +593,20 @@ public class FedoraStorageService implements StorageService {
       }
 
     } catch (ForbiddenException e) {
-      throw new StorageServiceException("Error while copying from one storage path to another",
-        StorageServiceException.FORBIDDEN, e);
+      throw new ActionForbiddenException("Error while copying from one storage path to another", e);
     } catch (BadRequestException e) {
-      throw new StorageServiceException("Error while copying from one storage path to another",
-        StorageServiceException.BAD_REQUEST, e);
-    } catch (NotFoundException e) {
-      throw new StorageServiceException("Error while copying from one storage path to another",
-        StorageServiceException.NOT_FOUND, e);
+      throw new RequestNotValidException("Error while copying from one storage path to another", e);
+    } catch (org.fcrepo.client.NotFoundException e) {
+      throw new NotFoundException("Error while copying from one storage path to another", e);
     } catch (FedoraException e) {
-      throw new StorageServiceException("Error while copying from one storage path to another",
-        StorageServiceException.BAD_REQUEST, e);
+      throw new GenericException("Error while copying from one storage path to another", e);
     }
   }
 
   @Override
   public void move(StorageService fromService, StoragePath fromStoragePath, StoragePath toStoragePath)
-    throws StorageServiceException {
+    throws GenericException, ActionForbiddenException, RequestNotValidException, NotFoundException,
+    AlreadyExistsException {
 
     Class<? extends Entity> rootEntity = fromService.getEntity(fromStoragePath);
 
@@ -585,7 +619,8 @@ public class FedoraStorageService implements StorageService {
   }
 
   private void moveInsideFedora(StoragePath fromStoragePath, StoragePath toStoragePath,
-    Class<? extends Entity> rootEntity) throws StorageServiceException {
+    Class<? extends Entity> rootEntity)
+      throws ActionForbiddenException, RequestNotValidException, NotFoundException, GenericException {
     try {
       if (rootEntity.equals(Container.class) || rootEntity.equals(Directory.class)) {
         FedoraObject object = fedoraRepository.getObject(FedoraUtils.createFedoraPath(fromStoragePath));
@@ -598,29 +633,25 @@ public class FedoraStorageService implements StorageService {
       }
 
     } catch (ForbiddenException e) {
-      throw new StorageServiceException("Error while moving from one storage path to another",
-        StorageServiceException.FORBIDDEN, e);
+      throw new ActionForbiddenException("Error while moving from one storage path to another", e);
     } catch (BadRequestException e) {
-      throw new StorageServiceException("Error while moving from one storage path to another",
-        StorageServiceException.BAD_REQUEST, e);
-    } catch (NotFoundException e) {
-      throw new StorageServiceException("Error while moving from one storage path to another",
-        StorageServiceException.NOT_FOUND, e);
+      throw new RequestNotValidException("Error while moving from one storage path to another", e);
+    } catch (org.fcrepo.client.NotFoundException e) {
+      throw new NotFoundException("Error while moving from one storage path to another", e);
     } catch (FedoraException e) {
-      throw new StorageServiceException("Error while moving from one storage path to another",
-        StorageServiceException.BAD_REQUEST, e);
+      throw new GenericException("Error while moving from one storage path to another", e);
     }
   }
 
   @Override
-  public Class<? extends Entity> getEntity(StoragePath storagePath) throws StorageServiceException {
+  public Class<? extends Entity> getEntity(StoragePath storagePath)
+    throws GenericException, RequestNotValidException, ActionForbiddenException, NotFoundException {
     if (storagePath.isFromAContainer()) {
       if (getContainer(storagePath) != null) {
         return Container.class;
       } else {
-        throw new StorageServiceException(
-          "There is no Container in the storage represented by \"" + storagePath.asString() + "\"",
-          StorageServiceException.INTERNAL_SERVER_ERROR);
+        throw new GenericException(
+          "There is no Container in the storage represented by \"" + storagePath.asString() + "\"");
       }
     } else {
       // it's a directory or binary. but first let's see if that entity
@@ -637,9 +668,8 @@ public class FedoraStorageService implements StorageService {
           return Binary.class;
         }
       } catch (FedoraException e) {
-        throw new StorageServiceException(
-          "There is no Directory or Binary in the storage represented by \"" + storagePath.asString() + "\"",
-          StorageServiceException.INTERNAL_SERVER_ERROR, e);
+        throw new GenericException(
+          "There is no Directory or Binary in the storage represented by \"" + storagePath.asString() + "\"", e);
       }
 
     }

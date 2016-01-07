@@ -13,6 +13,9 @@ package org.roda.wui.client.browse;
 import java.util.List;
 import java.util.Map;
 
+import org.roda.core.data.adapter.filter.SimpleFilterParameter;
+import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
@@ -208,6 +211,9 @@ public class CreateDescriptiveMetadata extends Composite {
   }
 
   private void cancel() {
+    // check if other descriptive metadata is available to avoid infinite loop
+    BrowserService.Util.getInstance().retr
+
     Tools.newHistory(Browse.RESOLVER, aipId);
   }
 

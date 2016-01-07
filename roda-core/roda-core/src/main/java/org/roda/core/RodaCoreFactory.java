@@ -77,6 +77,9 @@ import org.roda.core.data.common.RodaConstants.NodeType;
 import org.roda.core.data.common.RodaConstants.SolrType;
 import org.roda.core.data.common.RodaConstants.StorageType;
 import org.roda.core.data.eadc.DescriptionLevelManager;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.EventPreservationObject;
 import org.roda.core.data.v2.Group;
 import org.roda.core.data.v2.IndexResult;
@@ -91,7 +94,6 @@ import org.roda.core.index.IndexServiceException;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.AIP;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.ModelServiceException;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginManager;
 import org.roda.core.plugins.PluginManagerException;
@@ -865,8 +867,8 @@ public class RodaCoreFactory {
       RemoveOrphansPlugin removeOrphansPlugin = new RemoveOrphansPlugin();
       removeOrphansPlugin.setNewParent(model.retrieveAIP(parentId));
       getPluginOrchestrator().runPluginFromIndex(SimpleDescriptionObject.class, filter, removeOrphansPlugin);
-    } catch (ModelServiceException e) {
-      e.printStackTrace();
+    } catch (RequestNotValidException | NotFoundException | GenericException e) {
+      LOGGER.error("Error running remove orphans plugin", e);
     }
   }
 

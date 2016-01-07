@@ -31,6 +31,10 @@ import javax.xml.validation.Validator;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.FileFormat;
+import org.roda.core.data.exceptions.ActionForbiddenException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.Fixity;
 import org.roda.core.data.v2.RepresentationFilePreservationObject;
 import org.roda.core.metadata.v2.premis.PremisFileObjectHelper;
@@ -39,7 +43,6 @@ import org.roda.core.model.File;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.FileUtility;
 import org.slf4j.Logger;
@@ -100,7 +103,8 @@ public class PremisUtils {
   }
 
   public static RepresentationFilePreservationObject getPremisFile(StorageService storage, String aipID,
-    String representationID, String fileID) throws StorageServiceException, IOException, PremisMetadataException {
+    String representationID, String fileID) throws IOException, PremisMetadataException, GenericException,
+      RequestNotValidException, NotFoundException, ActionForbiddenException {
     Binary binary = storage.getBinary(ModelUtils.getPreservationFilePath(aipID, representationID, fileID));
     Path p = Files.createTempFile("temp", ".premis.xml");
     Files.copy(binary.getContent().createInputStream(), p, StandardCopyOption.REPLACE_EXISTING);
@@ -129,8 +133,8 @@ public class PremisUtils {
     return premisV2;
   }
 
-  public static Binary updatePremisToV3IfNeeded(Binary binary, Path configBasePath)
-    throws IOException, SAXException, StorageServiceException, TransformerException {
+  public static Binary updatePremisToV3IfNeeded(Binary binary, Path configBasePath) throws IOException, SAXException,
+    TransformerException, RequestNotValidException, NotFoundException, GenericException {
     if (isPremisV2(binary, configBasePath)) {
       LOGGER.debug("Binary " + binary.getStoragePath().asString() + " is Premis V2... Needs updated...");
       return updatePremisV2toV3(binary, configBasePath);
@@ -141,7 +145,7 @@ public class PremisUtils {
   }
 
   private static Binary updatePremisV2toV3(Binary binary, Path configBasePath)
-    throws IOException, TransformerException, StorageServiceException {
+    throws IOException, TransformerException, RequestNotValidException, NotFoundException, GenericException {
     InputStream transformerStream = null;
     InputStream bais = null;
 
@@ -160,8 +164,6 @@ public class PremisUtils {
     } catch (IOException e) {
       throw e;
     } catch (TransformerException e) {
-      throw e;
-    } catch (StorageServiceException e) {
       throw e;
     } finally {
       if (transformerStream != null) {
