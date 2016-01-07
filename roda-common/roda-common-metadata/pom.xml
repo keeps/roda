@@ -11,6 +11,34 @@
 	</parent>
 	<profiles>
 		<profile>
+			<id>create-premis-2_2-jar</id>
+			<build>
+				<plugins>
+					<plugin>
+						<!-- http://wiki.apache.org/xmlbeans/XmlBeansFaq#configPackageName -->
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>xmlbeans-maven-plugin</artifactId>
+						<configuration>
+							<outputJar>${project.build.directory}/premis-2.2.jar</outputJar>
+							<sourceSchemas>
+								<sourceSchema>premis.xsd</sourceSchema>
+								<sourceSchema>xlink.xsd</sourceSchema>
+							</sourceSchemas>
+							<javaSource>1.5</javaSource>
+						</configuration>
+						<executions>
+							<execution>
+								<phase>generate-sources</phase>
+								<goals>
+									<goal>xmlbeans</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
 			<id>create-mets-1_9_1-jar</id>
 			<build>
 				<plugins>

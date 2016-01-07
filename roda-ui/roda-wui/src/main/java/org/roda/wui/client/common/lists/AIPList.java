@@ -13,12 +13,10 @@ import java.util.Map;
 
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
-import org.roda.core.data.adapter.sort.SortParameter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IndexResult;
-import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.common.client.ClientLogger;
@@ -148,7 +146,7 @@ public class AIPList extends AsyncTableCell<SimpleDescriptionObject> {
 
       Map<Column<SimpleDescriptionObject, ?>, String> columnSortingKeyMap = new HashMap<Column<SimpleDescriptionObject, ?>, String>();
       columnSortingKeyMap.put(levelColumn, RodaConstants.SDO_LEVEL);
-      columnSortingKeyMap.put(titleColumn, RodaConstants.SDO_TITLE);
+      columnSortingKeyMap.put(titleColumn, RodaConstants.SDO_TITLE_SORT);
       columnSortingKeyMap.put(dateInitialColumn, RodaConstants.SDO_DATE_INITIAL);
       columnSortingKeyMap.put(dateFinalColumn, RodaConstants.SDO_DATE_FINAL);
 

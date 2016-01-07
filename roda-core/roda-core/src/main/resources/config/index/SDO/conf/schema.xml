@@ -117,6 +117,8 @@
 		required="false" multiValued="false" />
 	<field name="title" type="text_general" indexed="true" stored="true"
 		required="false" multiValued="false" />
+	<field name="title_sort" type="string" indexed="true" stored="false"
+		required="false" multiValued="false" />
 	<field name="description" type="text_general" indexed="true"
 		stored="true" required="false" multiValued="true" />
 	<field name="dateInitial" type="tdate" indexed="true" stored="true"
@@ -210,6 +212,7 @@
 		is added to the index. It's used either to index the same field differently, 
 		or to add multiple fields to the same field for easier/faster searching. -->
 
+	<copyField source="title" dest="title_sort" />
 	<copyField source="*" dest="_all" />
 	<!-- <copyField source="title" dest="text"/> <copyField source="body" dest="text"/> -->
 

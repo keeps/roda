@@ -9,7 +9,6 @@ package org.roda.core.storage.fedora;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -472,11 +471,7 @@ public class FedoraStorageService implements StorageService {
           Map<String, Set<String>> old = FedoraConversionUtils.tripleIteratorToMap(fo.getProperties());
 
           return updateMetadata(fo, old, metadata, replaceAll);
-        } catch (NullPointerException | FedoraException fe) {
-          // XXX NullPointerException was added because Fedora 4.4 doesn't
-          // behave well with asking for an object (which is a Datastream) to
-          // obtain its metadata and it doesn't have any (because one need to
-          // explicitly ask for /fcr:metadata)
+        } catch (FedoraException fe) {
           try {
             FedoraDatastream fds = fedoraRepository.getDatastream(fedoraPath);
             Map<String, Set<String>> old = FedoraConversionUtils.tripleIteratorToMap(fds.getProperties());

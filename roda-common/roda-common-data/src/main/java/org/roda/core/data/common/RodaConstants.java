@@ -224,6 +224,7 @@ public final class RodaConstants {
    */
   public static final String SDO_LEVEL = "level";
   public static final String SDO_TITLE = "title";
+  public static final String SDO_TITLE_SORT = "title_sort";
   public static final String SDO_DATE_INITIAL = "dateInitial";
   public static final String SDO_DATE_FINAL = "dateFinal";
   public static final String SDO_CHILDREN_COUNT = "childrenCount";
