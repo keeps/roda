@@ -190,7 +190,7 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("Removed items")
   String ingestTransferRemoveSuccessTitle();
 
-  @DefaultMessage("Successuly removed {0} items")
+  @DefaultMessage("Successfully removed {0} items")
   String ingestTransferRemoveSuccessMessage(int size);
 
   @DefaultMessage("Upload files")
