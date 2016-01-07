@@ -63,9 +63,9 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -218,7 +218,7 @@ public class ViewRepresentation extends Composite {
   private boolean showNextFile = false;
   private boolean showPreviousFile = false;
 
-  static final int WINDOW_WIDTH = 1200;
+  static final int WINDOW_WIDTH = 800;
 
   @UiField
   BreadcrumbPanel breadcrumb;
@@ -239,19 +239,25 @@ public class ViewRepresentation extends Composite {
   FileList filesList;
 
   @UiField
+  FlowPanel filePreviewPanel;
+
+  @UiField
   FlowPanel filePreview;
 
-  @UiField
-  Button back;
+  // @UiField
+  // Button back;
+  //
+  // @UiField
+  // Button nextFile;
+  //
+  // @UiField
+  // Button previousFile;
 
   @UiField
-  Button nextFile;
+  FocusPanel downloadFile;
 
   @UiField
-  Button previousFile;
-
-  @UiField
-  Button downloadFile;
+  FocusPanel infoFile;
 
   /**
    * Create a new panel to view a representation
@@ -315,12 +321,17 @@ public class ViewRepresentation extends Composite {
     breadcrumb.updatePath(getBreadcrumbs(itemBundle, file));
     breadcrumb.setVisible(true);
 
-    back.setText(messages.backButton());
-    nextFile.setText(messages.viewRepresentationNextFileButton());
-    previousFile.setText(messages.viewRepresentationPreviousFileButton());
-    downloadFile.setText(messages.viewRepresentationDownloadFileButton());
+    // back.setText(messages.backButton());
+    // nextFile.setText(messages.viewRepresentationNextFileButton());
+    // previousFile.setText(messages.viewRepresentationPreviousFileButton());
 
-    downloadFile.setEnabled(false);
+    searchInputBox.getElement().setPropertyString("placeholder", messages.viewRepresentationsSearchFiles());
+
+    infoFile.setVisible(false);
+    downloadFile.setVisible(false);
+
+    infoFile.setTitle(messages.viewRepresentationInfoFileButton());
+    downloadFile.setTitle(messages.viewRepresentationDownloadFileButton());
 
     filesList.getSelectionModel().addSelectionChangeHandler(new Handler() {
 
@@ -369,8 +380,9 @@ public class ViewRepresentation extends Composite {
 
     previewPanel.addStyleName("viewRepresentationPreviewPanel");
     filesPanel.addStyleName("viewRepresentationFilesPanel");
+    filePreviewPanel.addStyleName("viewRepresentationFilePreviewPanel");
     filePreview.addStyleName("viewRepresentationFilePreview");
-    previewPanel.setCellWidth(filePreview, "100%");
+    previewPanel.setCellWidth(filePreviewPanel, "100%");
 
     panelsControl();
 
@@ -427,7 +439,7 @@ public class ViewRepresentation extends Composite {
           Tools.concat(Browse.RESOLVER.getHistoryPath(), aipId)));
     ret.add(
       new BreadcrumbItem(getBreadcrumbLabel(representationType(rep), RodaConstants.VIEW_REPRESENTATION_REPRESENTATION),
-        Tools.concat(ViewRepresentation.RESOLVER.getHistoryPath(), aipId, representationId)));
+        Tools.concat(Browse.RESOLVER.getHistoryPath(), aipId, representationId)));
 
     if (simpleFile != null) {
       for (String folder : simpleFile.getPath()) {
@@ -494,30 +506,31 @@ public class ViewRepresentation extends Composite {
     return icon;
   }
 
-  @UiHandler("back")
-  void buttonBackHandler(ClickEvent e) {
-    Tools.newHistory(Tools.concat(ViewRepresentation.RESOLVER.getHistoryPath(), aipId, representationId));
-  }
-
-  @UiHandler("nextFile")
-  void buttonNextFileHandler(ClickEvent e) {
-    if (filesList.nextPageOnNextFile()) {
-      filesList.nextPage();
-      showNextFile = true;
-    } else {
-      filesList.nextItemSelection();
-    }
-  }
-
-  @UiHandler("previousFile")
-  void buttonPreviousFileHandler(ClickEvent e) {
-    if (filesList.previousPageOnPreviousFile()) {
-      filesList.prevousPage();
-      showPreviousFile = true;
-    } else {
-      filesList.previousItemSelection();
-    }
-  }
+  // @UiHandler("back")
+  // void buttonBackHandler(ClickEvent e) {
+  // Tools.newHistory(Tools.concat(ViewRepresentation.RESOLVER.getHistoryPath(),
+  // aipId, representationId));
+  // }
+  //
+  // @UiHandler("nextFile")
+  // void buttonNextFileHandler(ClickEvent e) {
+  // if (filesList.nextPageOnNextFile()) {
+  // filesList.nextPage();
+  // showNextFile = true;
+  // } else {
+  // filesList.nextItemSelection();
+  // }
+  // }
+  //
+  // @UiHandler("previousFile")
+  // void buttonPreviousFileHandler(ClickEvent e) {
+  // if (filesList.previousPageOnPreviousFile()) {
+  // filesList.prevousPage();
+  // showPreviousFile = true;
+  // } else {
+  // filesList.previousItemSelection();
+  // }
+  // }
 
   @UiHandler("downloadFile")
   void buttonDownloadFileHandler(ClickEvent e) {
@@ -531,6 +544,14 @@ public class ViewRepresentation extends Composite {
     if (downloadUri != null) {
       Window.Location.assign(downloadUri.asString());
     }
+  }
+
+  @UiHandler("infoFile")
+  void buttonInfoFileHandler(ClickEvent e) {
+    infoFile.setStyleName(infoFile.getStyleName().contains(" active") ? infoFile.getStyleName().replace(" active", "")
+      : infoFile.getStyleName().concat(" active"));
+
+    JavascriptUtils.showRightHiddenPanel(".infoFilePanel");
   }
 
   private void panelsControl() {
@@ -565,18 +586,18 @@ public class ViewRepresentation extends Composite {
 
   private void showFilePreview() {
     filesPanel.removeStyleName("fullWidth");
-    previewPanel.setCellWidth(filePreview, "100%");
-    filePreview.setVisible(true);
-    nextFile.setVisible(true);
-    previousFile.setVisible(true);
+    previewPanel.setCellWidth(filePreviewPanel, "100%");
+    filePreviewPanel.setVisible(true);
+    // nextFile.setVisible(true);
+    // previousFile.setVisible(true);
   }
 
   private void hideFilePreview() {
     filesPanel.addStyleName("fullWidth");
-    previewPanel.setCellWidth(filePreview, "0px");
-    filePreview.setVisible(false);
-    nextFile.setVisible(false);
-    previousFile.setVisible(false);
+    previewPanel.setCellWidth(filePreviewPanel, "0px");
+    filePreviewPanel.setVisible(false);
+    // nextFile.setVisible(false);
+    // previousFile.setVisible(false);
   }
 
   @SuppressWarnings("unused")
@@ -593,7 +614,8 @@ public class ViewRepresentation extends Composite {
 
     if (file != null && file.getOriginalName() != null) {
       breadcrumb.updatePath(getBreadcrumbs(itemBundle, file));
-      downloadFile.setEnabled(true);
+      downloadFile.setVisible(true);
+      infoFile.setVisible(true);
 
       /* TODO mimetypes */
       if (file.getOriginalName().toLowerCase().contains(".png")
@@ -710,11 +732,18 @@ public class ViewRepresentation extends Composite {
   private void audioPreview(SimpleFile file) {
     Audio audioPlayer = Audio.createIfSupported();
     if (audioPlayer != null) {
+      HTML html = new HTML();
+      SafeHtmlBuilder b = new SafeHtmlBuilder();
+      b.append(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-headphones fa-5'></i>"));
+      html.setHTML(b.toSafeHtml());
+
       audioPlayer.addSource(
         RestUtils.createRepresentationFileDownloadUri(aipId, representationId, file.getId()).asString(), "audio/mpeg");
       audioPlayer.setControls(true);
+      filePreview.add(html);
       filePreview.add(audioPlayer);
       audioPlayer.addStyleName("viewRepresentationAudioFilePreview");
+      html.addStyleName("viewRepresentationAudioFilePreviewHTML");
     } else {
       notSupportedPreview();
     }

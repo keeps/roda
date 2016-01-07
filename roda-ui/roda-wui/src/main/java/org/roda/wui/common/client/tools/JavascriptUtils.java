@@ -179,4 +179,8 @@ public class JavascriptUtils {
   public static native void updateURLWithoutReloading(String newUrl) /*-{
     $wnd.history.pushState(newUrl, "", newUrl);
   }-*/;
+  
+  public static native void showRightHiddenPanel(String panel) /*-{
+    $wnd.jQuery(panel).animate({width:'toggle'},100);  
+  }-*/;
 }

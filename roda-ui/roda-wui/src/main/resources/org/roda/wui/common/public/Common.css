@@ -285,6 +285,14 @@ pre>code {
 	content: "\f019";
 }
 
+.btn-clock:after {
+	content: "\f017";
+}
+
+.btn-info:after {
+	content: "\f05a";
+}
+
 .btn-upload:after {
 	/* fa-upload */
 	content: "\f093";

@@ -36,7 +36,6 @@ import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.Humanize;
-import org.roda.wui.common.client.tools.JavascriptUtils;
 import org.roda.wui.common.client.tools.RestErrorOverlayType;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.Tools;
@@ -169,10 +168,16 @@ public class Browse extends Composite {
   FlowPanel downloadList;
 
   @UiField
-  Button createItem;
+  FlowPanel preservationSidebar;
 
   @UiField
-  Button createDescriptiveMetadata;
+  Button preservationEvents;
+
+  @UiField
+  Button createItem;
+
+  // @UiField
+  // Button createDescriptiveMetadata;
 
   @UiField
   Button moveItem;
@@ -235,6 +240,8 @@ public class Browse extends Composite {
       CreateDescriptiveMetadata.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else if (historyTokens.size() > 1 && historyTokens.get(0).equals(ViewRepresentation.RESOLVER.getHistoryToken())) {
       ViewRepresentation.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+    } else if (historyTokens.size() > 1 && historyTokens.get(0).equals(PreservationEvents.RESOLVER.getHistoryToken())) {
+      PreservationEvents.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else {
       Tools.newHistory(RESOLVER);
       callback.onSuccess(null);
@@ -311,9 +318,11 @@ public class Browse extends Composite {
     downloadList.clear();
     sidebarData.setVisible(false);
 
+    preservationSidebar.setVisible(false);
+
     // Set button visibility
     createItem.setVisible(false);
-    createDescriptiveMetadata.setVisible(false);
+    // createDescriptiveMetadata.setVisible(false);
     moveItem.setVisible(false);
     editPermissions.setVisible(false);
     remove.setVisible(false);
@@ -375,53 +384,77 @@ public class Browse extends Composite {
 
       });
 
-      if (!preservationMetadata.getRepresentationsMetadata().isEmpty()) {
-        final FlowPanel premisContainer = new FlowPanel();
-        final int premisTabIndex = itemMetadata.getWidgetCount();
-        itemMetadata.add(premisContainer, messages.premisTitle());
+//      if (!preservationMetadata.getRepresentationsMetadata().isEmpty()) {
+//        final FlowPanel premisContainer = new FlowPanel();
+//        final int premisTabIndex = itemMetadata.getWidgetCount();
+//        FlowPanel premisTab = new FlowPanel();
+//        premisTab.add(new HTML(SafeHtmlUtils.fromSafeConstant("<i class=\"fa fa-cog\"></i>")));
+//        premisTab.add(new Label(messages.premisTitle()));
+//
+//        itemMetadata.add(premisContainer, premisTab);
+//
+//        // Download link
+//        SafeUri downloadUri = RestUtils.createPreservationMetadataDownloadUri(aipId);
+//        SafeHtmlBuilder b = new SafeHtmlBuilder();
+//        b.append(SafeHtmlUtils.fromSafeConstant("<a href='"))
+//          .append(SafeHtmlUtils.fromTrustedString(downloadUri.asString()))
+//          .append(SafeHtmlUtils.fromSafeConstant("' class='descriptiveMetadataLink'>"));
+//        b.append(messages.download());
+//        b.append(SafeHtmlUtils.fromSafeConstant("</a>"));
+//        HTML downloadLinkWidget = new HTML(b.toSafeHtml());
+//        premisContainer.add(downloadLinkWidget);
+//
+//        itemMetadata.addSelectionHandler(new SelectionHandler<Integer>() {
+//
+//          @Override
+//          public void onSelection(SelectionEvent<Integer> event) {
+//            if (event.getSelectedItem() == premisTabIndex && premisContainer.getWidgetCount() <= 1) {
+//              for (RepresentationPreservationMetadataBundle bundle : preservationMetadata
+//                .getRepresentationsMetadata()) {
+//                String repId = bundle.getRepresentationID();
+//                getPreservationMetadataHTML(aipId, repId, new AsyncCallback<SafeHtml>() {
+//
+//                  @Override
+//                  public void onFailure(Throwable caught) {
+//                    Toast.showError(messages.errorLoadingPreservationMetadata(caught.getMessage()));
+//                  }
+//
+//                  @Override
+//                  public void onSuccess(SafeHtml result) {
+//                    HTML html = new HTML(result);
+//                    premisContainer.add(html);
+//                    JavascriptUtils.runHighlighter(html.getElement());
+//                    JavascriptUtils.slideToggle(html.getElement(), ".toggle-next");
+//                    JavascriptUtils.smoothScroll(html.getElement());
+//                  }
+//                });
+//              }
+//            }
+//          }
+//        });
+//
+//        premisTab.addStyleName("premisTab");
+//        premisContainer.addStyleName("preservationMetadata");
+//        premisContainer.addStyleName("metadataContent");
+//      }
 
-        // Download link
-        SafeUri downloadUri = RestUtils.createPreservationMetadataDownloadUri(aipId);
-        SafeHtmlBuilder b = new SafeHtmlBuilder();
-        b.append(SafeHtmlUtils.fromSafeConstant("<a href='"))
-          .append(SafeHtmlUtils.fromTrustedString(downloadUri.asString()))
-          .append(SafeHtmlUtils.fromSafeConstant("' class='descriptiveMetadataLink'>"));
-        b.append(messages.download());
-        b.append(SafeHtmlUtils.fromSafeConstant("</a>"));
-        HTML downloadLinkWidget = new HTML(b.toSafeHtml());
-        premisContainer.add(downloadLinkWidget);
-
-        itemMetadata.addSelectionHandler(new SelectionHandler<Integer>() {
-
-          @Override
-          public void onSelection(SelectionEvent<Integer> event) {
-            if (event.getSelectedItem() == premisTabIndex && premisContainer.getWidgetCount() <= 1) {
-              for (RepresentationPreservationMetadataBundle bundle : preservationMetadata
-                .getRepresentationsMetadata()) {
-                String repId = bundle.getRepresentationID();
-                getPreservationMetadataHTML(aipId, repId, new AsyncCallback<SafeHtml>() {
-
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    Toast.showError(messages.errorLoadingPreservationMetadata(caught.getMessage()));
-                  }
-
-                  @Override
-                  public void onSuccess(SafeHtml result) {
-                    HTML html = new HTML(result);
-                    premisContainer.add(html);
-                    JavascriptUtils.runHighlighter(html.getElement());
-                    JavascriptUtils.slideToggle(html.getElement(), ".toggle-next");
-                    JavascriptUtils.smoothScroll(html.getElement());
-                  }
-                });
-              }
+      // Tab to add new metadata
+      final int addTabIndex = itemMetadata.getWidgetCount();
+      FlowPanel addTab = new FlowPanel();
+      addTab.add(new HTML(SafeHtmlUtils.fromSafeConstant("<i class=\"fa fa-plus-circle\"></i>")));
+      itemMetadata.add(new Label(), addTab);
+      itemMetadata.addSelectionHandler(new SelectionHandler<Integer>() {
+        @Override
+        public void onSelection(SelectionEvent<Integer> event) {
+          if (event.getSelectedItem() == addTabIndex) {
+            if (aipId != null) {
+              Tools.newHistory(RESOLVER, CreateDescriptiveMetadata.RESOLVER.getHistoryToken(), aipId);
             }
           }
-        });
-        premisContainer.addStyleName("preservationMetadata");
-        premisContainer.addStyleName("metadataContent");
-      }
+        }
+      });
+      addTab.addStyleName("addTab");
+      addTab.getParent().addStyleName("addTabWrapper");
 
       if (!descMetadata.isEmpty() || !preservationMetadata.getRepresentationsMetadata().isEmpty()) {
         itemMetadata.setVisible(true);
@@ -442,9 +475,15 @@ public class Browse extends Composite {
         downloadList.add(createRepresentationDownloadPanel(rep));
       }
 
+      if (!preservationMetadata.getRepresentationsMetadata().isEmpty()) {
+        preservationSidebar.setVisible(true);
+      } else {
+        preservationSidebar.setVisible(false);
+      }
+
       // Set button visibility
       createItem.setVisible(true);
-      createDescriptiveMetadata.setVisible(true);
+      // createDescriptiveMetadata.setVisible(true);
       moveItem.setVisible(true);
       editPermissions.setVisible(true);
       remove.setVisible(true);
@@ -475,9 +514,11 @@ public class Browse extends Composite {
     sidebarData.setVisible(false);
     downloadList.clear();
 
+    preservationSidebar.setVisible(false);
+
     // Set button visibility
     createItem.setVisible(true);
-    createDescriptiveMetadata.setVisible(false);
+    // createDescriptiveMetadata.setVisible(false);
     moveItem.setVisible(false);
     editPermissions.setVisible(false);
     remove.setVisible(false);
@@ -615,54 +656,58 @@ public class Browse extends Composite {
     }
   }
 
-  private void getPreservationMetadataHTML(final String aipId, final String repId,
-    final AsyncCallback<SafeHtml> callback) {
-    String uri = RestUtils.createPreservationMetadataHTMLUri(aipId, repId, 0, 10, 0, 10, 0, 10);
-    RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, uri);
-    requestBuilder.setHeader("Authorization", "Custom");
-    try {
-      requestBuilder.sendRequest(null, new RequestCallback() {
-
-        @Override
-        public void onResponseReceived(Request request, Response response) {
-          if (200 == response.getStatusCode()) {
-            String html = response.getText();
-            SafeHtml safeHtml = SafeHtmlUtils.fromTrustedString(html);
-
-            callback.onSuccess(safeHtml);
-          } else {
-            String text = response.getText();
-            String message;
-            try {
-              RestErrorOverlayType error = (RestErrorOverlayType) JsonUtils.safeEval(text);
-              message = error.getMessage();
-            } catch (IllegalArgumentException e) {
-              message = text;
-            }
-
-            SafeHtmlBuilder b = new SafeHtmlBuilder();
-
-            // error message
-            b.append(SafeHtmlUtils.fromSafeConstant("<span class='error'>"));
-            b.append(messages.preservationMetadataTranformToHTMLError());
-            b.append(SafeHtmlUtils.fromSafeConstant("<pre><code>"));
-            b.append(SafeHtmlUtils.fromString(message));
-            b.append(SafeHtmlUtils.fromSafeConstant("</core></pre>"));
-            b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
-
-            callback.onSuccess(b.toSafeHtml());
-          }
-        }
-
-        @Override
-        public void onError(Request request, Throwable exception) {
-          callback.onFailure(exception);
-        }
-      });
-    } catch (RequestException e) {
-      callback.onFailure(e);
-    }
-  }
+  // private void getPreservationMetadataHTML(final String aipId, final String
+  // repId,
+  // final AsyncCallback<SafeHtml> callback) {
+  // String uri = RestUtils.createPreservationMetadataHTMLUri(aipId, repId, 0,
+  // 10, 0, 10, 0, 10);
+  // RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET,
+  // uri);
+  // requestBuilder.setHeader("Authorization", "Custom");
+  // try {
+  // requestBuilder.sendRequest(null, new RequestCallback() {
+  //
+  // @Override
+  // public void onResponseReceived(Request request, Response response) {
+  // if (200 == response.getStatusCode()) {
+  // String html = response.getText();
+  // SafeHtml safeHtml = SafeHtmlUtils.fromTrustedString(html);
+  //
+  // callback.onSuccess(safeHtml);
+  // } else {
+  // String text = response.getText();
+  // String message;
+  // try {
+  // RestErrorOverlayType error = (RestErrorOverlayType)
+  // JsonUtils.safeEval(text);
+  // message = error.getMessage();
+  // } catch (IllegalArgumentException e) {
+  // message = text;
+  // }
+  //
+  // SafeHtmlBuilder b = new SafeHtmlBuilder();
+  //
+  // // error message
+  // b.append(SafeHtmlUtils.fromSafeConstant("<span class='error'>"));
+  // b.append(messages.preservationMetadataTranformToHTMLError());
+  // b.append(SafeHtmlUtils.fromSafeConstant("<pre><code>"));
+  // b.append(SafeHtmlUtils.fromString(message));
+  // b.append(SafeHtmlUtils.fromSafeConstant("</core></pre>"));
+  // b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
+  //
+  // callback.onSuccess(b.toSafeHtml());
+  // }
+  // }
+  //
+  // @Override
+  // public void onError(Request request, Throwable exception) {
+  // callback.onFailure(exception);
+  // }
+  // });
+  // } catch (RequestException e) {
+  // callback.onFailure(e);
+  // }
+  // }
 
   private String getDatesText(SimpleDescriptionObject sdo) {
     String ret;
@@ -718,12 +763,13 @@ public class Browse extends Composite {
     });
   }
 
-  @UiHandler("createDescriptiveMetadata")
-  void buttonCreateDescriptiveMetadataHandler(ClickEvent e) {
-    if (aipId != null) {
-      Tools.newHistory(RESOLVER, CreateDescriptiveMetadata.RESOLVER.getHistoryToken(), aipId);
-    }
-  }
+  // @UiHandler("createDescriptiveMetadata")
+  // void buttonCreateDescriptiveMetadataHandler(ClickEvent e) {
+  // if (aipId != null) {
+  // Tools.newHistory(RESOLVER,
+  // CreateDescriptiveMetadata.RESOLVER.getHistoryToken(), aipId);
+  // }
+  // }
 
   @UiHandler("remove")
   void buttonRemoveHandler(ClickEvent e) {

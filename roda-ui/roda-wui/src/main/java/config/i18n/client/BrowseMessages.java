@@ -96,9 +96,11 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("To date")
   String sidebarFilterToDate();
   
-
   @DefaultMessage("Actions")
   String sidebarActionsTitle();
+  
+  @DefaultMessage("Preservation")
+  String sidebarPreservationTitle();
 
   @DefaultMessage("Error in line {0}, column {1}: {2}")
   SafeHtml metadataParseError(int line, int column, String message);
@@ -265,6 +267,9 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("Download file")
   String viewRepresentationDownloadFileButton();
   
+  @DefaultMessage("File info")
+  String viewRepresentationInfoFileButton();
+  
   @DefaultMessage("Please select a file from the list on left panel")
   String viewRepresentationEmptyPreview();
 
@@ -273,6 +278,9 @@ public interface BrowseMessages extends Messages {
   
   @DefaultMessage("File preview not supported")
   String viewRepresentationNotSupportedPreview();
+  
+  @DefaultMessage("Search files...")
+  String viewRepresentationsSearchFiles();
   
   /************* Ingest process new ****************/
   @DefaultMessage("Job {0,localdatetime,predef:DATE_TIME_SHORT}")
