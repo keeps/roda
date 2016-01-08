@@ -22,6 +22,11 @@ import org.json.JSONObject;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
 import org.roda.core.data.common.InvalidParameterException;
+import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.FileFormat;
 import org.roda.core.data.v2.PluginType;
 import org.roda.core.index.IndexService;
@@ -34,7 +39,6 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.StoragePath;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
@@ -112,11 +116,9 @@ public class SiegfriedPlugin implements Plugin<AIP> {
             Binary resource = (Binary) FSUtils.convertPathToResource(p.getParent(), p);
             LOGGER.debug("Creating other metadata (AIP: " + aip.getId() + ", REPRESENTATION: " + representationID
               + ", FILE: " + fileName + ")");
-            try {
-              model.createOtherMetadata(aip.getId(), representationID, fileName + ".xml", "Siegfried", resource);
-            } catch (ModelServiceException e1) {
-              e1.printStackTrace();
-            }
+
+            model.createOtherMetadata(aip.getId(), representationID, fileName + ".xml", "Siegfried", resource);
+
             p.toFile().delete();
 
             JSONArray matches = (JSONArray) fileObject.get("matches");
@@ -145,9 +147,8 @@ public class SiegfriedPlugin implements Plugin<AIP> {
                     f.setFileFormat(ff);
                     f.setSize(fileSize);
                     updatedFiles.add(f);
-                  } catch (ModelServiceException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                  } catch (RequestNotValidException | AuthorizationDeniedException e) {
+                    LOGGER.error("Error retrieving file: " + e.getMessage(), e);
                   }
                 }
               }
@@ -155,7 +156,8 @@ public class SiegfriedPlugin implements Plugin<AIP> {
           }
           model.updateFileFormats(updatedFiles);
           FSUtils.deletePath(data);
-        } catch (StorageServiceException | PluginException | IOException | ModelServiceException e) {
+        } catch (PluginException | IOException | ModelServiceException | NotFoundException | GenericException
+          | RequestNotValidException | AuthorizationDeniedException | AlreadyExistsException e) {
           e.printStackTrace();
           LOGGER.error("Error running SIEGFRIED " + aip.getId() + ": " + e.getMessage());
         }
