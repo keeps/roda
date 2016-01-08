@@ -19,7 +19,7 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.data.exceptions.ActionForbiddenException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
@@ -49,7 +49,7 @@ public class ValidationUtils {
   /**
    * Validates all descriptive metadata files contained in the AIP
    * 
-   * @throws ActionForbiddenException
+   * @throws AuthorizationDeniedException
    * @throws NotFoundException
    * @throws RequestNotValidException
    * @throws GenericException
@@ -57,7 +57,7 @@ public class ValidationUtils {
    * @throws ValidationException
    */
   public static boolean isAIPDescriptiveMetadataValid(ModelService model, String aipId, boolean failIfNoSchema)
-    throws GenericException, RequestNotValidException, NotFoundException, ActionForbiddenException {
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     boolean valid = true;
     ClosableIterable<DescriptiveMetadata> descriptiveMetadataBinaries = model.listDescriptiveMetadataBinaries(aipId);
     try {
@@ -83,12 +83,12 @@ public class ValidationUtils {
    * @throws RequestNotValidException
    * @throws GenericException
    * @throws NotFoundException
-   * @throws ActionForbiddenException
+   * @throws AuthorizationDeniedException
    * 
    * @throws ValidationException
    */
   public static boolean isAIPPreservationMetadataValid(ModelService model, String aipId, boolean failIfNoSchema)
-    throws NotFoundException, GenericException, RequestNotValidException, ActionForbiddenException {
+    throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
     boolean valid = true;
     ClosableIterable<Representation> representations = model.listRepresentations(aipId);
     try {
@@ -126,7 +126,7 @@ public class ValidationUtils {
    * strategies may be used)
    * 
    * @param failIfNoSchema
-   * @throws ActionForbiddenException
+   * @throws AuthorizationDeniedException
    * @throws NotFoundException
    * @throws RequestNotValidException
    * @throws GenericException
@@ -134,7 +134,7 @@ public class ValidationUtils {
    */
   public static boolean isDescriptiveMetadataValid(ModelService model, DescriptiveMetadata metadata,
     boolean failIfNoSchema)
-      throws GenericException, RequestNotValidException, NotFoundException, ActionForbiddenException {
+      throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     boolean ret;
     try {
       StoragePath storagePath = metadata.getStoragePath();
@@ -153,7 +153,7 @@ public class ValidationUtils {
    * strategies may be used)
    * 
    * @param failIfNoSchema
-   * @throws ActionForbiddenException
+   * @throws AuthorizationDeniedException
    * @throws NotFoundException
    * @throws RequestNotValidException
    * @throws GenericException
@@ -161,7 +161,7 @@ public class ValidationUtils {
    */
   public static boolean isPreservationMetadataValid(ModelService model, PreservationMetadata metadata,
     boolean failIfNoSchema)
-      throws GenericException, RequestNotValidException, NotFoundException, ActionForbiddenException {
+      throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     boolean ret;
     try {
       StoragePath storagePath = metadata.getStoragePath();

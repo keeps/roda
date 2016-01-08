@@ -22,25 +22,20 @@ import java.util.UUID;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.storage.Binary;
-import org.roda.core.storage.Container;
-import org.roda.core.storage.ContentPayload;
-import org.roda.core.storage.DefaultStoragePath;
-import org.roda.core.storage.Directory;
-import org.roda.core.storage.Entity;
-import org.roda.core.storage.Resource;
-import org.roda.core.storage.StoragePath;
-import org.roda.core.storage.StorageService;
-import org.roda.core.storage.StorageServiceException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 
 public class StorageTestUtils {
 
-  public static StoragePath generateRandomContainerStoragePath() throws StorageServiceException {
+  public static StoragePath generateRandomContainerStoragePath() throws RequestNotValidException {
     return DefaultStoragePath.parse(UUID.randomUUID().toString());
   }
 
   public static StoragePath generateRandomResourceStoragePathUnder(StoragePath basePath)
-    throws StorageServiceException {
+    throws RequestNotValidException {
     return DefaultStoragePath.parse(basePath.asString(), UUID.randomUUID().toString());
   }
 
@@ -58,7 +53,8 @@ public class StorageTestUtils {
     return metadata;
   }
 
-  public static void populate(StorageService storage, StoragePath basepath) throws StorageServiceException {
+  public static void populate(StorageService storage, StoragePath basepath) throws AlreadyExistsException,
+    GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
     // create 3 directories with 3 sub-directories each and 3 binaries under
     // each sub-directory
     int highLevelSize = 3;
@@ -88,13 +84,14 @@ public class StorageTestUtils {
   }
 
   public static void testEntityEqualRecursively(StorageService sourceStorage, StoragePath sourceEntityStoragePath,
-    StorageService targetStorage, StoragePath targetEntityStoragePath) throws StorageServiceException, IOException {
+    StorageService targetStorage, StoragePath targetEntityStoragePath)
+      throws IOException, NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
     testEntityEqualRecursively(sourceStorage, sourceEntityStoragePath, targetStorage, targetEntityStoragePath, false);
   }
 
   public static void testEntityEqualRecursively(StorageService sourceStorage, StoragePath sourceEntityStoragePath,
     StorageService targetStorage, StoragePath targetEntityStoragePath, boolean ignoreDateModified)
-      throws StorageServiceException, IOException {
+      throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException, IOException {
 
     assertEquals(sourceEntityStoragePath.isFromAContainer(), targetEntityStoragePath.isFromAContainer());
 

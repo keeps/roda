@@ -18,19 +18,18 @@ import java.util.Map;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
 import org.roda.core.data.common.InvalidParameterException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.PluginType;
 import org.roda.core.data.v2.Representation;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.AIP;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.ModelServiceException;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.StoragePath;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
@@ -120,14 +119,8 @@ public class FITSPlugin implements Plugin<AIP> {
           }
           FSUtils.deletePath(data);
           FSUtils.deletePath(output);
-        } catch (StorageServiceException sse) {
+        } catch (RODAException | PluginException | IOException sse) {
           LOGGER.error("Error processing AIP " + aip.getId() + ": " + sse.getMessage());
-        } catch (PluginException fe) {
-          LOGGER.error("Error processing AIP " + aip.getId() + ": " + fe.getMessage());
-        } catch (ModelServiceException mse) {
-          LOGGER.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage());
-        } catch (IOException ioe) {
-          LOGGER.error("Error processing AIP " + aip.getId() + ": " + ioe.getMessage());
         }
       }
 

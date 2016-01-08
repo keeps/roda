@@ -20,6 +20,7 @@ import org.roda.core.common.PremisUtils;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
 import org.roda.core.data.common.InvalidParameterException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.AgentPreservationObject;
 import org.roda.core.data.v2.EventPreservationObject;
 import org.roda.core.data.v2.Fixity;
@@ -31,13 +32,11 @@ import org.roda.core.metadata.v2.premis.PremisMetadataException;
 import org.roda.core.model.AIP;
 import org.roda.core.model.File;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.ModelServiceException;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.StorageServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -160,7 +159,7 @@ public class FixityPlugin implements Plugin<AIP> {
                 notifyUserOfFixityCheckSucess(representationID, okFileIDS, koFileIDS, epo);
               }
             }
-          } catch (ModelServiceException | IOException | StorageServiceException | PremisMetadataException e) {
+          } catch (IOException | RODAException | PremisMetadataException e) {
             LOGGER.error("Error processing Representation " + representationID + " - " + e.getMessage(), e);
             EventPreservationObject epo;
             try {
@@ -170,7 +169,7 @@ public class FixityPlugin implements Plugin<AIP> {
                 EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_PRESERVATION_TASK, fixityAgent.getId(),
                 Arrays.asList(representationID), "undetermined", "Reason", "<p>" + e.getMessage() + "</p>");
               notifyUserOfFixityCheckUndetermined(representationID, epo, e.getMessage());
-            } catch (PremisMetadataException | StorageServiceException | ModelServiceException | IOException e1) {
+            } catch (PremisMetadataException | RODAException | IOException e1) {
               LOGGER
                 .error("Error creating premis event for representation " + representationID + " of AIP " + aip.getId());
             }

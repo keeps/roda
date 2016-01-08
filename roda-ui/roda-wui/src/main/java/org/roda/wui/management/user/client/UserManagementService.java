@@ -17,16 +17,23 @@ import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
-import org.roda.core.data.common.AuthorizationDeniedException;
-import org.roda.core.data.common.RODAException;
+import org.roda.core.data.common.EmailAlreadyExistsException;
+import org.roda.core.data.common.GroupAlreadyExistsException;
+import org.roda.core.data.common.IllegalOperationException;
+import org.roda.core.data.common.NoSuchGroupException;
+import org.roda.core.data.common.NoSuchUserException;
+import org.roda.core.data.common.UserAlreadyExistsException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.Group;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.LogEntry;
 import org.roda.core.data.v2.RODAMember;
 import org.roda.core.data.v2.RodaGroup;
 import org.roda.core.data.v2.User;
-import org.roda.wui.common.client.GenericException;
 import org.roda.wui.common.client.PrintReportException;
 
 import com.google.gwt.core.client.GWT;
@@ -63,10 +70,11 @@ public interface UserManagementService extends RemoteService {
     }
   }
 
-  public Long getMemberCount(Filter filter) throws AuthorizationDeniedException, GenericException;
+  public Long getMemberCount(Filter filter)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException;
 
   public IndexResult<RODAMember> findMembers(Filter filter, Sorter sorter, Sublist sublist, Facets facets,
-    String localeString) throws AuthorizationDeniedException, GenericException;
+    String localeString) throws AuthorizationDeniedException, GenericException, RequestNotValidException;
 
   /**
    * Get a group
@@ -99,8 +107,13 @@ public interface UserManagementService extends RemoteService {
    * @param password
    *          the user password
    * @throws RODAException
+   * @throws EmailAlreadyExistsException
+   * @throws UserAlreadyExistsException
+   * @throws NoSuchUserException
+   * @throws IllegalOperationException
    */
-  public void createUser(User user, String password) throws RODAException;
+  public void createUser(User user, String password) throws RODAException, UserAlreadyExistsException,
+    EmailAlreadyExistsException, IllegalOperationException, NoSuchUserException;
 
   /**
    * Modify a user
@@ -122,8 +135,12 @@ public interface UserManagementService extends RemoteService {
    * @param password
    *          the user password if modified, or null if it remains the same
    * @throws RODAException
+   * @throws IllegalOperationException
+   * @throws NoSuchUserException
+   * @throws EmailAlreadyExistsException
    */
-  public void editMyUser(User user, String password) throws RODAException;
+  public void editMyUser(User user, String password)
+    throws RODAException, EmailAlreadyExistsException, NoSuchUserException, IllegalOperationException;
 
   /**
    * Create a group
@@ -131,8 +148,9 @@ public interface UserManagementService extends RemoteService {
    * @param group
    *          the new group
    * @throws RODAException
+   * @throws GroupAlreadyExistsException
    */
-  public void createGroup(Group group) throws RODAException;
+  public void createGroup(Group group) throws RODAException, GroupAlreadyExistsException;
 
   /**
    * Modify a group
@@ -140,8 +158,10 @@ public interface UserManagementService extends RemoteService {
    * @param group
    *          the modified group
    * @throws RODAException
+   * @throws IllegalOperationException
+   * @throws NoSuchGroupException
    */
-  public void editGroup(Group group) throws RODAException;
+  public void editGroup(Group group) throws RODAException, NoSuchGroupException, IllegalOperationException;
 
   /**
    * Try to remove a user, if user cannot be removed it will be deactivated
@@ -150,8 +170,10 @@ public interface UserManagementService extends RemoteService {
    *          the user name
    * @return true if user was removed, false if it was only deactivated
    * @throws RODAException
+   * @throws IllegalOperationException
+   * @throws NoSuchUserException
    */
-  public boolean removeUser(String username) throws RODAException;
+  public boolean removeUser(String username) throws RODAException, NoSuchUserException, IllegalOperationException;
 
   /**
    * Remove a group
@@ -159,8 +181,9 @@ public interface UserManagementService extends RemoteService {
    * @param groupname
    *          the group name
    * @throws RODAException
+   * @throws IllegalOperationException
    */
-  public void removeGroup(String groupname) throws RODAException;
+  public void removeGroup(String groupname) throws RODAException, IllegalOperationException;
 
   /**
    * Get the number log entries
@@ -172,8 +195,8 @@ public interface UserManagementService extends RemoteService {
   public Long getLogEntriesCount(Filter filter) throws RODAException;
 
   public IndexResult<LogEntry> findLogEntries(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
-    throws AuthorizationDeniedException, GenericException;
-  
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException;
+
   public LogEntry retrieveLogEntry(String logEntryId)
     throws AuthorizationDeniedException, GenericException, NotFoundException;
 
@@ -265,6 +288,5 @@ public interface UserManagementService extends RemoteService {
    * @throws PrintReportException
    */
   public void setUserLogReportInfo(ContentAdapter adapter, String localeString) throws PrintReportException;
-
 
 }

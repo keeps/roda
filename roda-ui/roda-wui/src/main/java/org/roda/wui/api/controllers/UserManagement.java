@@ -15,8 +15,10 @@ import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
-import org.roda.core.data.common.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.Group;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.LogEntry;
@@ -25,7 +27,6 @@ import org.roda.core.data.v2.RodaGroup;
 import org.roda.core.data.v2.RodaUser;
 import org.roda.core.data.v2.User;
 import org.roda.wui.common.RodaCoreService;
-import org.roda.wui.common.client.GenericException;
 
 public class UserManagement extends RodaCoreService {
 
@@ -36,7 +37,7 @@ public class UserManagement extends RodaCoreService {
   }
 
   public static Long countLogEntries(RodaUser user, Filter filter)
-    throws AuthorizationDeniedException, GenericException {
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
     Date start = new Date();
 
     // check user permissions
@@ -53,7 +54,7 @@ public class UserManagement extends RodaCoreService {
   }
 
   public static IndexResult<LogEntry> findLogEntries(RodaUser user, Filter filter, Sorter sorter, Sublist sublist,
-    Facets facets) throws AuthorizationDeniedException, GenericException {
+    Facets facets) throws AuthorizationDeniedException, GenericException, RequestNotValidException {
     Date start = new Date();
 
     // check user permissions
@@ -86,7 +87,8 @@ public class UserManagement extends RodaCoreService {
     return ret;
   }
 
-  public static Long countMembers(RodaUser user, Filter filter) throws AuthorizationDeniedException, GenericException {
+  public static Long countMembers(RodaUser user, Filter filter)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
     Date start = new Date();
 
     // check user permissions
@@ -103,7 +105,7 @@ public class UserManagement extends RodaCoreService {
   }
 
   public static IndexResult<RODAMember> findMembers(RodaUser user, Filter filter, Sorter sorter, Sublist sublist,
-    Facets facets) throws AuthorizationDeniedException, GenericException {
+    Facets facets) throws AuthorizationDeniedException, GenericException, RequestNotValidException {
     Date start = new Date();
 
     // check user permissions

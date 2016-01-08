@@ -77,6 +77,7 @@ import org.roda.core.data.common.RodaConstants.NodeType;
 import org.roda.core.data.common.RodaConstants.SolrType;
 import org.roda.core.data.common.RodaConstants.StorageType;
 import org.roda.core.data.eadc.DescriptionLevelManager;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
@@ -90,7 +91,6 @@ import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.data.v2.User;
 import org.roda.core.index.IndexFolderObserver;
 import org.roda.core.index.IndexService;
-import org.roda.core.index.IndexServiceException;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.AIP;
 import org.roda.core.model.ModelService;
@@ -124,7 +124,6 @@ import org.roda.core.plugins.plugins.ingest.characterization.PremisSkeletonPlugi
 import org.roda.core.plugins.plugins.ingest.characterization.TikaFullTextPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.ToolOutputProcessorPlugin;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.fedora.FedoraStorageService;
 import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
@@ -233,10 +232,10 @@ public class RodaCoreFactory {
 
       } catch (ConfigurationException e) {
         LOGGER.error("Error loading roda properties", e);
-      } catch (StorageServiceException e) {
-        LOGGER.error("Error instantiating storage model", e);
       } catch (URISyntaxException e) {
         LOGGER.error("Error instantiating solr/index model", e);
+      } catch (GenericException e) {
+        LOGGER.error("Error instantiating storage model", e);
       }
 
     }
@@ -263,12 +262,12 @@ public class RodaCoreFactory {
     descriptionLevelManager = new DescriptionLevelManager(descriptionLevelConfiguration);
   }
 
-  private static void instantiateEssentialDirectories() throws StorageServiceException {
+  private static void instantiateEssentialDirectories() {
     // make sure all essential directories exist
     ensureAllEssentialDirectoriesExist();
   }
 
-  private static void instantiateStorageAndModel() throws StorageServiceException {
+  private static void instantiateStorageAndModel() throws GenericException {
     if (nodeType != NodeType.TEST) {
       // instantiate model related objects
       storage = instantiateStorage();
@@ -276,7 +275,7 @@ public class RodaCoreFactory {
     }
   }
 
-  private static StorageService instantiateStorage() throws StorageServiceException {
+  private static StorageService instantiateStorage() throws GenericException {
     StorageType storageType = StorageType
       .valueOf(getRodaConfiguration().getString("core.storage.type", RodaConstants.DEFAULT_STORAGE_TYPE.toString()));
 
@@ -867,7 +866,7 @@ public class RodaCoreFactory {
       RemoveOrphansPlugin removeOrphansPlugin = new RemoveOrphansPlugin();
       removeOrphansPlugin.setNewParent(model.retrieveAIP(parentId));
       getPluginOrchestrator().runPluginFromIndex(SimpleDescriptionObject.class, filter, removeOrphansPlugin);
-    } catch (RequestNotValidException | NotFoundException | GenericException e) {
+    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error running remove orphans plugin", e);
     }
   }
@@ -1060,7 +1059,7 @@ public class RodaCoreFactory {
   }
 
   private static void printIndexMembers(List<String> args, Filter filter, Sorter sorter, Sublist sublist, Facets facets)
-    throws IndexServiceException {
+    throws GenericException, RequestNotValidException {
     System.out.println("index list " + args.get(2));
     IndexResult<RODAMember> users = index.find(RODAMember.class, filter, sorter, sublist, facets);
     for (RODAMember rodaMember : users.getResults()) {
@@ -1068,7 +1067,8 @@ public class RodaCoreFactory {
     }
   }
 
-  private static void printCountSips(Sorter sorter, Sublist sublist, Facets facets) throws IndexServiceException {
+  private static void printCountSips(Sorter sorter, Sublist sublist, Facets facets)
+    throws GenericException, RequestNotValidException {
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, "true"));
     long countFiles = index.count(TransferredResource.class, filter);
     filter = new Filter(new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, "false"));
@@ -1086,7 +1086,7 @@ public class RodaCoreFactory {
   }
 
   private static void printPreservationEvents(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
-    throws IndexServiceException {
+    throws GenericException, RequestNotValidException {
     index.find(EventPreservationObject.class, filter, sorter, sublist, facets);
     IndexResult<EventPreservationObject> events = index.find(EventPreservationObject.class, filter, sorter, sublist,
       facets);
@@ -1096,7 +1096,7 @@ public class RodaCoreFactory {
   }
 
   private static void printPreservationFiles(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
-    throws IndexServiceException {
+    throws GenericException, RequestNotValidException {
     index.find(RepresentationFilePreservationObject.class, filter, sorter, sublist, facets);
     IndexResult<RepresentationFilePreservationObject> files = index.find(RepresentationFilePreservationObject.class,
       filter, sorter, sublist, facets);
@@ -1105,7 +1105,7 @@ public class RodaCoreFactory {
     }
   }
 
-  private static void mainMasterTasks(List<String> args) throws IndexServiceException {
+  private static void mainMasterTasks(List<String> args) throws GenericException, RequestNotValidException {
     if ("index".equals(args.get(0))) {
       if ("list".equals(args.get(1)) && ("users".equals(args.get(2)) || "groups".equals(args.get(2)))) {
         Filter filter = new Filter(
@@ -1174,7 +1174,7 @@ public class RodaCoreFactory {
     }
   }
 
-  public static void main(String[] argsArray) throws IndexServiceException, InterruptedException {
+  public static void main(String[] argsArray) throws InterruptedException, GenericException, RequestNotValidException {
     List<String> args = Arrays.asList(argsArray);
 
     instantiate();

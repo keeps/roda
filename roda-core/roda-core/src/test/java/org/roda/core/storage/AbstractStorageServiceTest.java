@@ -27,14 +27,11 @@ import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Test;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.storage.Binary;
-import org.roda.core.storage.Container;
-import org.roda.core.storage.ContentPayload;
-import org.roda.core.storage.Directory;
-import org.roda.core.storage.Resource;
-import org.roda.core.storage.StoragePath;
-import org.roda.core.storage.StorageService;
-import org.roda.core.storage.StorageServiceException;
+import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 
 /**
  * 
@@ -61,10 +58,10 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   public abstract void cleanUp();
 
   @Test
-  public abstract void testClassInstantiation() throws StorageServiceException;
+  public abstract void testClassInstantiation() throws RODAException;
 
   @Test
-  public void testListContainer() throws StorageServiceException {
+  public void testListContainer() throws RODAException {
 
     // 1) empty list of containers
     Iterator<Container> iterator = getStorage().listContainers().iterator();
@@ -92,7 +89,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   }
 
   @Test
-  public void testCreateGetDeleteContainer() throws StorageServiceException {
+  public void testCreateGetDeleteContainer() throws RODAException {
     // 1) create container
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
     final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
@@ -108,8 +105,8 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     try {
       getStorage().createContainer(containerStoragePath, containerMetadata);
       fail("An exception should have been thrown while creating a container that already exists but it didn't happen!");
-    } catch (StorageServiceException e) {
-      assertEquals(StorageServiceException.ALREADY_EXISTS, e.getCode());
+    } catch (AlreadyExistsException e) {
+      // do nothing
     }
 
     // 4) delete container
@@ -119,25 +116,25 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     try {
       getStorage().getContainer(containerStoragePath);
       fail("An exception should have been thrown while getting a container that was deleted but it didn't happened!");
-    } catch (StorageServiceException e) {
-      assertEquals(StorageServiceException.NOT_FOUND, e.getCode());
+    } catch (NotFoundException e) {
+      // do nothing
     }
   }
 
   @Test
-  public void testGetContainerThatDoesntExist() throws StorageServiceException {
+  public void testGetContainerThatDoesntExist() throws RODAException {
     // 1) get container that doesn't exist
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
     try {
       getStorage().getContainer(containerStoragePath);
       fail("An exception should have been thrown while getting a container that doesn't exist but it didn't happened!");
-    } catch (StorageServiceException e) {
-      assertEquals(StorageServiceException.NOT_FOUND, e.getCode());
+    } catch (NotFoundException e) {
+      // do nothing
     }
   }
 
   @Test
-  public void testGetContainerThatIsActuallyADirectory() throws StorageServiceException {
+  public void testGetContainerThatIsActuallyADirectory() throws RODAException {
     // set up
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
     final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
@@ -153,8 +150,8 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
       getStorage().getContainer(directoryStoragePath);
       fail(
         "An exception should have been thrown while getting a container which actually isn't a container but instead a directory but it didn't happened!");
-    } catch (StorageServiceException e) {
-      assertEquals(StorageServiceException.BAD_REQUEST, e.getCode());
+    } catch (RequestNotValidException e) {
+      // do nothing
     }
 
     // cleanup
@@ -162,7 +159,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   }
 
   @Test
-  public void testGetContainerThatIsActuallyABinary() throws StorageServiceException {
+  public void testGetContainerThatIsActuallyABinary() throws RODAException {
     // set up
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
     final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
@@ -178,8 +175,8 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
       getStorage().getContainer(binaryStoragePath);
       fail(
         "An exception should have been thrown while getting a container which actually isn't a container but instead a binary but it didn't happened!");
-    } catch (StorageServiceException e) {
-      assertEquals(StorageServiceException.BAD_REQUEST, e.getCode());
+    } catch (RequestNotValidException e) {
+      // do nothing
     }
 
     // cleanup
@@ -187,7 +184,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   }
 
   @Test
-  public void testDeleteContainerThatDoesntExist() throws StorageServiceException {
+  public void testDeleteContainerThatDoesntExist() throws RODAException {
 
     // create container
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
@@ -202,14 +199,14 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
       getStorage().deleteContainer(containerStoragePath);
       fail(
         "An exception should have been thrown while deleting a container that no longer exists but it didn't happened!");
-    } catch (StorageServiceException e) {
-      assertEquals(StorageServiceException.NOT_FOUND, e.getCode());
+    } catch (NotFoundException e) {
+      // do nothing
     }
 
   }
 
   @Test
-  public void testDeleteNonEmptyContaienr() throws StorageServiceException {
+  public void testDeleteNonEmptyContaienr() throws RODAException {
     // Set up
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
     final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
@@ -225,21 +222,21 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     try {
       getStorage().getContainer(containerStoragePath);
       fail("An exception should have been thrown while getting a container that doesn't exist but it didn't happened!");
-    } catch (StorageServiceException e) {
-      assertEquals(StorageServiceException.NOT_FOUND, e.getCode());
+    } catch (NotFoundException e) {
+      // do nothing
     }
 
     try {
       getStorage().getDirectory(directoryStoragePath);
       fail("An exception should have been thrown while getting a container that doesn't exist but it didn't happened!");
-    } catch (StorageServiceException e) {
-      assertEquals(StorageServiceException.NOT_FOUND, e.getCode());
+    } catch (NotFoundException e) {
+      // do nothing
     }
 
   }
 
   @Test
-  public void testListResourcesUnderContainer() throws StorageServiceException {
+  public void testListResourcesUnderContainer() throws RODAException {
     // create container
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
     final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
@@ -274,7 +271,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   }
 
   @Test
-  public void testCreateGetDeleteDirectory() throws StorageServiceException {
+  public void testCreateGetDeleteDirectory() throws RODAException {
 
     // create container
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
@@ -299,8 +296,8 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
       getStorage().createDirectory(directoryStoragePath, directoryMetadata);
       fail(
         "An exception should have been thrown while creating a directory that already exists but it didn't happened!");
-    } catch (StorageServiceException e) {
-      assertEquals(StorageServiceException.ALREADY_EXISTS, e.getCode());
+    } catch (AlreadyExistsException e) {
+      // do nothing
     }
 
     // 4) delete directory
@@ -310,8 +307,8 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     try {
       getStorage().getDirectory(directoryStoragePath);
       fail("An exception should have been thrown while getting a directory that was deleted but it didn't happened!");
-    } catch (StorageServiceException e) {
-      assertEquals(StorageServiceException.NOT_FOUND, e.getCode());
+    } catch (NotFoundException e) {
+      // do nothing
     }
 
     // cleanup
@@ -319,7 +316,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   }
 
   @Test
-  public void testGetDirectoryThatDoesntExist() throws StorageServiceException {
+  public void testGetDirectoryThatDoesntExist() throws RODAException {
 
     // set up
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
@@ -331,8 +328,8 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     try {
       getStorage().getDirectory(directoryStoragePath);
       fail("An exception should have been thrown while getting a directory that doesn't exist but it didn't happened!");
-    } catch (StorageServiceException e) {
-      assertEquals(StorageServiceException.NOT_FOUND, e.getCode());
+    } catch (NotFoundException e) {
+      // do nothing
     }
 
     // cleanup
@@ -340,7 +337,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   }
 
   @Test
-  public void testGetDirectoryThatIsActuallyABinary() throws StorageServiceException {
+  public void testGetDirectoryThatIsActuallyABinary() throws RODAException {
     // set up
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
     final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
@@ -356,8 +353,8 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
       getStorage().getDirectory(binaryStoragePath);
       fail(
         "An exception should have been thrown while getting a directory which actually isn't a directory but instead a binary but it didn't happened!");
-    } catch (StorageServiceException e) {
-      assertEquals(StorageServiceException.BAD_REQUEST, e.getCode());
+    } catch (RequestNotValidException e) {
+      // do nothing
     }
 
     // cleanup
@@ -365,7 +362,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   }
 
   @Test
-  public void testGetDirectoryThatIsActuallyAContainer() throws StorageServiceException {
+  public void testGetDirectoryThatIsActuallyAContainer() throws RODAException {
     // set up
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
     final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
@@ -376,8 +373,8 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
       getStorage().getDirectory(containerStoragePath);
       fail(
         "An exception should have been thrown while getting a directory which actually isn't a directory but instead a container but it didn't happened!");
-    } catch (StorageServiceException e) {
-      assertEquals(StorageServiceException.BAD_REQUEST, e.getCode());
+    } catch (RequestNotValidException e) {
+      // do nothing
     }
 
     // cleanup
@@ -385,7 +382,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   }
 
   @Test
-  public void testListResourcesUnderDirectory() throws StorageServiceException, IOException {
+  public void testListResourcesUnderDirectory() throws RODAException, IOException {
 
     // create container
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
@@ -451,7 +448,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   }
 
   @Test
-  public void testCreateGetDeleteBinary() throws StorageServiceException, IOException {
+  public void testCreateGetDeleteBinary() throws RODAException, IOException {
 
     // create container
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
@@ -477,8 +474,8 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     try {
       getStorage().createBinary(binaryStoragePath, binaryMetadata, payload, false);
       fail("An exception should have been thrown while creating a binary that already exists but it didn't happened!");
-    } catch (StorageServiceException e) {
-      assertEquals(StorageServiceException.ALREADY_EXISTS, e.getCode());
+    } catch (AlreadyExistsException e) {
+      // do nothing
     }
 
     // 4) delete binary
@@ -488,8 +485,8 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     try {
       getStorage().getBinary(binaryStoragePath);
       fail("An exception should have been thrown while getting a binary that was deleted but it didn't happened!");
-    } catch (StorageServiceException e) {
-      assertEquals(StorageServiceException.NOT_FOUND, e.getCode());
+    } catch (NotFoundException e) {
+      // do nothing
     }
 
     // cleanup
@@ -497,7 +494,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   }
 
   @Test
-  public void testCreateGetDeleteBinaryAsReference() throws StorageServiceException, IOException {
+  public void testCreateGetDeleteBinaryAsReference() throws RODAException, IOException {
 
     // create container
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
@@ -526,8 +523,8 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
         getStorage().createBinary(binaryStoragePath, binaryMetadata, payload, false);
         fail(
           "An exception should have been thrown while creating a binary that already exists but it didn't happened!");
-      } catch (StorageServiceException e) {
-        assertEquals(StorageServiceException.ALREADY_EXISTS, e.getCode());
+      } catch (AlreadyExistsException e) {
+        // do nothing
       }
 
       // 4) delete binary
@@ -537,11 +534,12 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
       try {
         getStorage().getBinary(binaryStoragePath);
         fail("An exception should have been thrown while getting a binary that was deleted but it didn't happened!");
-      } catch (StorageServiceException e) {
-        assertEquals(StorageServiceException.NOT_FOUND, e.getCode());
+      } catch (NotFoundException e) {
+        // do nothing
       }
-    } catch (StorageServiceException e) {
-      assertEquals(StorageServiceException.NOT_IMPLEMENTED, e.getCode());
+    } catch (GenericException e) {
+      // catching not implemented
+      // do nothing
     }
 
     // cleanup
@@ -549,7 +547,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   }
 
   @Test
-  public void testUpdateBinaryContent() throws StorageServiceException, IOException {
+  public void testUpdateBinaryContent() throws RODAException, IOException {
 
     // create container
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
@@ -582,7 +580,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   }
 
   @Test
-  public void testUpdateBinaryThatDoesntExist() throws StorageServiceException, IOException {
+  public void testUpdateBinaryThatDoesntExist() throws RODAException, IOException {
     // create container
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
     final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
@@ -595,8 +593,8 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     try {
       getStorage().updateBinaryContent(binaryStoragePath, payload, asReference, false);
       fail("An exception should have been thrown while updating a binary that doesn't exist but it didn't happened!");
-    } catch (StorageServiceException e) {
-      assertEquals(StorageServiceException.NOT_FOUND, e.getCode());
+    } catch (NotFoundException e) {
+      // do nothing
     }
 
     // update binary content now with createIfNotExists=true
@@ -612,7 +610,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   // TODO test update binary from reference to non-reference
 
   @Test
-  public void testGetBinaryThatDoesntExist() throws StorageServiceException {
+  public void testGetBinaryThatDoesntExist() throws RODAException {
 
     // set up
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
@@ -624,8 +622,8 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     try {
       getStorage().getBinary(binaryStoragePath);
       fail("An exception should have been thrown while getting a binary that doesn't exist but it didn't happened!");
-    } catch (StorageServiceException e) {
-      assertEquals(StorageServiceException.NOT_FOUND, e.getCode());
+    } catch (NotFoundException e) {
+      // do nothing
     }
 
     // cleanup
@@ -633,7 +631,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   }
 
   @Test
-  public void testGetBinaryThatIsActuallyADirectory() throws StorageServiceException {
+  public void testGetBinaryThatIsActuallyADirectory() throws RODAException {
     // set up
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
     final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
@@ -649,8 +647,8 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
       getStorage().getBinary(directoryStoragePath);
       fail(
         "An exception should have been thrown while getting a binary which actually isn't a binary but instead a directory but it didn't happened!");
-    } catch (StorageServiceException e) {
-      assertEquals(StorageServiceException.BAD_REQUEST, e.getCode());
+    } catch (RequestNotValidException e) {
+      // do nothing
     }
 
     // cleanup
@@ -658,7 +656,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   }
 
   @Test
-  public void testGetBinaryThatIsActuallyAContainer() throws StorageServiceException {
+  public void testGetBinaryThatIsActuallyAContainer() throws RODAException {
     // set up
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
     final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
@@ -669,8 +667,8 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
       getStorage().getBinary(containerStoragePath);
       fail(
         "An exception should have been thrown while getting a binary which actually isn't a binary but instead a container but it didn't happened!");
-    } catch (StorageServiceException e) {
-      assertEquals(StorageServiceException.BAD_REQUEST, e.getCode());
+    } catch (RequestNotValidException e) {
+      // do nothing
     }
 
     // cleanup
@@ -678,7 +676,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   }
 
   @Test
-  public void testDeleteNonEmptyDirectory() throws StorageServiceException {
+  public void testDeleteNonEmptyDirectory() throws RODAException {
 
     // Set up
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
@@ -699,8 +697,8 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     try {
       getStorage().getBinary(binaryStoragePath);
       fail("An exception should have been thrown while getting a binary that doesn't exist but it didn't happened!");
-    } catch (StorageServiceException e) {
-      assertEquals(StorageServiceException.NOT_FOUND, e.getCode());
+    } catch (NotFoundException e) {
+      // do nothing
     }
 
     // test specific cleanup
@@ -708,7 +706,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   }
 
   @Test
-  public void testGetMetadataFromContainer() throws StorageServiceException, IOException {
+  public void testGetMetadataFromContainer() throws RODAException, IOException {
     // create container
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
     final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
@@ -724,7 +722,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   }
 
   @Test
-  public void testGetMetadataFromDirectory() throws StorageServiceException {
+  public void testGetMetadataFromDirectory() throws RODAException {
     // create container
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
     final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
@@ -745,7 +743,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   }
 
   @Test
-  public void testGetMetadataFromBinary() throws StorageServiceException {
+  public void testGetMetadataFromBinary() throws RODAException {
     // create container
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
     final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
@@ -769,7 +767,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   // TODO test get metadata from binary using reference
 
   @Test
-  public void testUpdateMetadataFromContainer() throws StorageServiceException, IOException {
+  public void testUpdateMetadataFromContainer() throws RODAException, IOException {
 
     // create container
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
@@ -790,7 +788,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   }
 
   @Test
-  public void testUpdateMetadataFromDirectory() throws StorageServiceException, IOException {
+  public void testUpdateMetadataFromDirectory() throws RODAException, IOException {
 
     // create container
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
@@ -815,7 +813,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   }
 
   @Test
-  public void testUpdateMetadataFromBinary() throws StorageServiceException, IOException {
+  public void testUpdateMetadataFromBinary() throws RODAException, IOException {
 
     // create container
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
@@ -844,7 +842,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   // TODO test update metadata with replaceAll=false
 
   @Test
-  public void testCopyContainerToSameStorage() throws StorageServiceException, IOException {
+  public void testCopyContainerToSameStorage() throws RODAException, IOException {
     // create and populate source container
     final StoragePath sourceContainerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
     final Map<String, Set<String>> sourceContainerMetadata = StorageTestUtils.generateRandomMetadata();
@@ -864,7 +862,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   }
 
   @Test
-  public void testCopyDirectoryToSameStorage() throws StorageServiceException, IOException {
+  public void testCopyDirectoryToSameStorage() throws RODAException, IOException {
     // create container
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
     final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
@@ -890,7 +888,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   }
 
   @Test
-  public void testCopyBinaryToSameStorage() throws StorageServiceException, IOException {
+  public void testCopyBinaryToSameStorage() throws RODAException, IOException {
     // create container
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
     final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
@@ -925,7 +923,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   // TODO test copy from different storage
 
   @Test
-  public void testMoveContainerToSameStorage() throws StorageServiceException, IOException {
+  public void testMoveContainerToSameStorage() throws RODAException, IOException {
     // create and populate source container
     final StoragePath sourceContainerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
     final Map<String, Set<String>> sourceContainerMetadata = StorageTestUtils.generateRandomMetadata();
@@ -951,8 +949,8 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     try {
       getStorage().getContainer(sourceContainerStoragePath);
       fail("An exception should have been thrown while getting a container that was moved but it didn't happened!");
-    } catch (StorageServiceException e) {
-      assertEquals(StorageServiceException.NOT_FOUND, e.getCode());
+    } catch (NotFoundException e) {
+      // do nothing
     }
 
     // cleanup
@@ -961,7 +959,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   }
 
   @Test
-  public void testMoveDirectoryToSameStorage() throws StorageServiceException, IOException {
+  public void testMoveDirectoryToSameStorage() throws RODAException, IOException {
     // create container
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
     final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
@@ -994,8 +992,8 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     try {
       getStorage().getDirectory(sourceDirectoryStoragePath);
       fail("An exception should have been thrown while getting a directory that was moved but it didn't happened!");
-    } catch (StorageServiceException e) {
-      assertEquals(StorageServiceException.NOT_FOUND, e.getCode());
+    } catch (NotFoundException e) {
+      // do nothing
     }
 
     // cleanup
@@ -1003,7 +1001,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   }
 
   @Test
-  public void testMoveBinaryToSameStorage() throws StorageServiceException, IOException {
+  public void testMoveBinaryToSameStorage() throws RODAException, IOException {
     // create container
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
     final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
@@ -1043,8 +1041,8 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     try {
       getStorage().getBinary(sourceBinaryStoragePath);
       fail("An exception should have been thrown while getting a binary that was moved but it didn't happened!");
-    } catch (StorageServiceException e) {
-      assertEquals(StorageServiceException.NOT_FOUND, e.getCode());
+    } catch (NotFoundException e) {
+      // do nothing
     }
 
     // cleanup

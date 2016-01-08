@@ -11,27 +11,23 @@ package org.roda.core.data.exceptions;
  * @author Luis Faria <lfaria@keep.pt>
  * 
  */
-public class ActionForbiddenException extends Exception {
+public class RODAException extends Exception {
+  private static final long serialVersionUID = -1656013708463576500L;
 
-  private static final long serialVersionUID = -6744205569453461540L;
-
-  public ActionForbiddenException() {
+  public RODAException() {
     super();
   }
 
-  public ActionForbiddenException(String message) {
+  public RODAException(String message) {
     super(message);
   }
 
-  public ActionForbiddenException(String message, Throwable cause) {
+  public RODAException(String message, Throwable cause) {
     super(message, cause);
   }
 
-  public ActionForbiddenException(Throwable cause) {
+  public RODAException(Throwable cause) {
     super(cause);
   }
-  
-  
-
 
 }

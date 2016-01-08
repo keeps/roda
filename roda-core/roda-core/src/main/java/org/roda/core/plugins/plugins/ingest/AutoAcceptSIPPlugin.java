@@ -20,12 +20,14 @@ import org.roda.core.data.Report;
 import org.roda.core.data.ReportItem;
 import org.roda.core.data.common.InvalidParameterException;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.EventPreservationObject;
 import org.roda.core.data.v2.JobReport.PluginState;
 import org.roda.core.data.v2.PluginType;
 import org.roda.core.index.IndexService;
-import org.roda.core.index.IndexServiceException;
 import org.roda.core.metadata.v2.premis.PremisMetadataException;
 import org.roda.core.model.AIP;
 import org.roda.core.model.ModelService;
@@ -106,7 +108,7 @@ public class AutoAcceptSIPPlugin implements Plugin<AIP> {
         reportItem.setItemId(aip.getId());
         reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
         LOGGER.debug("Done with auto accepting AIP " + aip.getId());
-      } catch (ModelServiceException | StorageServiceException e) {
+      } catch (RODAException e) {
         LOGGER.error("Error updating AIP (metadata attribute active=true)", e);
         outcomeDetail = "Error updating AIP (metadata attribute active=true): " + e.getMessage();
         state = PluginState.ERROR;
@@ -119,8 +121,8 @@ public class AutoAcceptSIPPlugin implements Plugin<AIP> {
       try {
         PluginUtils.updateJobReport(model, index, this, reportItem, state, PluginUtils.getJobId(parameters),
           aip.getId());
-      } catch (IndexServiceException | NotFoundException e) {
-        LOGGER.error("", e);
+      } catch (NotFoundException | GenericException | RequestNotValidException e) {
+        LOGGER.error("Error updating job report", e);
       }
     }
 
@@ -137,10 +139,9 @@ public class AutoAcceptSIPPlugin implements Plugin<AIP> {
         PluginUtils.createPluginEvent(aip.getId(), representationID, model,
           EventPreservationObject.PRESERVATION_EVENT_TYPE_INGESTION, "The SIP was successfully accepted.",
           EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_INGEST_TASK, "AGENT ID",
-          Arrays.asList(representationID), success ? "success" : "error", success ? "" : "Error",
-          outcomeDetail);
+          Arrays.asList(representationID), success ? "success" : "error", success ? "" : "Error", outcomeDetail);
       }
-    } catch (PremisMetadataException | IOException | StorageServiceException | ModelServiceException e) {
+    } catch (PremisMetadataException | IOException | RODAException e) {
       throw new PluginException(e.getMessage(), e);
     }
 

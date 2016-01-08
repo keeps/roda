@@ -19,6 +19,7 @@ import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
 import org.roda.core.data.common.InvalidParameterException;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.PluginType;
 import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.core.index.IndexService;
@@ -107,7 +108,7 @@ public class RemoveOrphansPlugin implements Plugin<SimpleDescriptionObject> {
         } else {
           LOGGER.debug("  AIP doesn't need to be moved... Level: " + sdo.getLevel());
         }
-      } catch (StorageServiceException | ModelServiceException e) {
+      } catch (RODAException e) {
         LOGGER.error("Error processing SimpleDescriptionObject " + sdo.getId() + " (RemoveOrphansAction)");
         LOGGER.error(e.getMessage(), e);
       }

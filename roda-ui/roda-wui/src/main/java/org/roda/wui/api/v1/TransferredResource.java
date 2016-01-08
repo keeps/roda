@@ -22,7 +22,7 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
-import org.roda.core.data.common.RODAException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.RodaUser;
 import org.roda.wui.api.controllers.Browser;
 import org.slf4j.Logger;

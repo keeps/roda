@@ -30,7 +30,7 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.data.Report;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.ActionForbiddenException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
@@ -235,10 +235,10 @@ public final class ModelUtils {
    * @throws NotFoundException
    * @throws GenericException
    * @throws RequestNotValidException
-   * @throws ActionForbiddenException
+   * @throws AuthorizationDeniedException
    */
   public static List<String> getChildIds(StorageService storage, StoragePath path, boolean failIfParentDoesNotExist)
-    throws NotFoundException, GenericException, ActionForbiddenException, RequestNotValidException {
+    throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
     List<String> ids = new ArrayList<String>();
     ClosableIterable<Resource> iterable = null;
     try {
@@ -667,7 +667,7 @@ public final class ModelUtils {
   }
 
   public static ObjectNode sdoToJSON(SimpleDescriptionObject sdo)
-    throws IOException, RequestNotValidException, NotFoundException, GenericException {
+    throws IOException, RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     JsonFactory factory = new JsonFactory();
     ObjectMapper mapper = new ObjectMapper(factory);
     ModelService model = RodaCoreFactory.getModelService();

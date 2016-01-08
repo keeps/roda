@@ -21,16 +21,17 @@ import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.AuthenticationDeniedException;
-import org.roda.core.data.common.AuthorizationDeniedException;
 import org.roda.core.data.common.Pair;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.RODAMember;
 import org.roda.core.data.v2.RodaSimpleUser;
 import org.roda.core.data.v2.RodaUser;
 import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.core.index.IndexService;
-import org.roda.core.index.IndexServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,7 +112,7 @@ public class UserUtility {
         } else {
           LOGGER.error("The number of users obtained from the index is different from 1");
         }
-      } catch (IndexServiceException e) {
+      } catch (GenericException | RequestNotValidException e) {
         LOGGER.error("Error obtaining user \"" + rsu.getId() + "\" from index", e);
       }
     } else {
@@ -289,7 +290,8 @@ public class UserUtility {
     return noCommonElement;
   }
 
-  public static void checkTransferredResourceAccess(RodaUser user, List<String> ids) throws AuthorizationDeniedException {
+  public static void checkTransferredResourceAccess(RodaUser user, List<String> ids)
+    throws AuthorizationDeniedException {
     // FIXME administrator workaround
     if ("admin".equalsIgnoreCase(user.getId())) {
       return;

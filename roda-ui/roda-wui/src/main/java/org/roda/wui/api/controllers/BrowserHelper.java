@@ -49,10 +49,12 @@ import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sort.SortParameter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
-import org.roda.core.data.common.AuthorizationDeniedException;
 import org.roda.core.data.common.Pair;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.eadc.DescriptionLevel;
+import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IndexResult;
@@ -63,7 +65,6 @@ import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.core.data.v2.SimpleFile;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.index.IndexService;
-import org.roda.core.index.IndexServiceException;
 import org.roda.core.model.AIP;
 import org.roda.core.model.DescriptiveMetadata;
 import org.roda.core.model.ModelService;
@@ -75,7 +76,6 @@ import org.roda.core.storage.Binary;
 import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.StoragePath;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.disseminators.common.tools.ZipEntryInfo;
 import org.roda.disseminators.common.tools.ZipTools;
@@ -86,7 +86,6 @@ import org.roda.wui.client.browse.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.DescriptiveMetadataViewBundle;
 import org.roda.wui.client.browse.PreservationMetadataBundle;
 import org.roda.wui.common.HTMLUtils;
-import org.roda.wui.common.client.GenericException;
 import org.roda.wui.common.server.ServerTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,59 +101,54 @@ public class BrowserHelper {
   private static final Logger LOGGER = LoggerFactory.getLogger(BrowserHelper.class);
 
   protected static BrowseItemBundle getItemBundle(String aipId, Locale locale)
-    throws GenericException, NotFoundException {
+    throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
     BrowseItemBundle itemBundle = new BrowseItemBundle();
+
+    // set sdo
+    SimpleDescriptionObject sdo = getSimpleDescriptionObject(aipId);
+    itemBundle.setSdo(sdo);
+
+    // set sdo ancestors
     try {
-      // set sdo
-      SimpleDescriptionObject sdo = getSimpleDescriptionObject(aipId);
-      itemBundle.setSdo(sdo);
-
-      // set sdo ancestors
-      try {
-        itemBundle.setSdoAncestors(getAncestors(sdo));
-      } catch (NotFoundException e) {
-        LOGGER.warn("Found an item with invalid ancestors: " + aipId, e);
-      }
-
-      // set descriptive metadata
-      List<DescriptiveMetadataViewBundle> descriptiveMetadataList = getDescriptiveMetadataBundles(aipId, locale);
-      itemBundle.setDescriptiveMetadata(descriptiveMetadataList);
-
-      // set preservation metadata
-      PreservationMetadataBundle preservationMetadata = getPreservationMetadataBundle(aipId);
-      itemBundle.setPreservationMetadata(preservationMetadata);
-
-      // set representations
-      // getting the last 2 representations
-      Sorter sorter = new Sorter(new SortParameter(RodaConstants.SRO_DATE_CREATION, true));
-      IndexResult<Representation> findRepresentations = findRepresentations(aipId, sorter,
-        new Sublist(0, BUNDLE_MAX_REPRESENTATION_COUNT));
-      List<Representation> representations = findRepresentations.getResults();
-
-      // if there are more representations ensure one original is there
-      if (findRepresentations.getTotalCount() > findRepresentations.getLimit()) {
-        boolean hasOriginals = findRepresentations.getResults().stream()
-          .anyMatch(x -> x.getStatuses().contains(RepresentationState.ORIGINAL));
-        if (!hasOriginals) {
-          boolean onlyOriginals = true;
-          IndexResult<Representation> findOriginalRepresentations = findRepresentations(aipId, onlyOriginals, sorter,
-            new Sublist(0, BUNDLE_MAX_ADDED_ORIGINAL_REPRESENTATION_COUNT));
-          representations.addAll(findOriginalRepresentations.getResults());
-        }
-      }
-
-      itemBundle.setRepresentations(representations);
-
-    } catch (StorageServiceException | ModelServiceException e) {
-      LOGGER.error("Error getting item bundle", e);
-      throw new GenericException("Error getting item bundle " + e.getMessage());
+      itemBundle.setSdoAncestors(getAncestors(sdo));
+    } catch (NotFoundException e) {
+      LOGGER.warn("Found an item with invalid ancestors: " + aipId, e);
     }
+
+    // set descriptive metadata
+    List<DescriptiveMetadataViewBundle> descriptiveMetadataList = getDescriptiveMetadataBundles(aipId, locale);
+    itemBundle.setDescriptiveMetadata(descriptiveMetadataList);
+
+    // set preservation metadata
+    PreservationMetadataBundle preservationMetadata = getPreservationMetadataBundle(aipId);
+    itemBundle.setPreservationMetadata(preservationMetadata);
+
+    // set representations
+    // getting the last 2 representations
+    Sorter sorter = new Sorter(new SortParameter(RodaConstants.SRO_DATE_CREATION, true));
+    IndexResult<Representation> findRepresentations = findRepresentations(aipId, sorter,
+      new Sublist(0, BUNDLE_MAX_REPRESENTATION_COUNT));
+    List<Representation> representations = findRepresentations.getResults();
+
+    // if there are more representations ensure one original is there
+    if (findRepresentations.getTotalCount() > findRepresentations.getLimit()) {
+      boolean hasOriginals = findRepresentations.getResults().stream()
+        .anyMatch(x -> x.getStatuses().contains(RepresentationState.ORIGINAL));
+      if (!hasOriginals) {
+        boolean onlyOriginals = true;
+        IndexResult<Representation> findOriginalRepresentations = findRepresentations(aipId, onlyOriginals, sorter,
+          new Sublist(0, BUNDLE_MAX_ADDED_ORIGINAL_REPRESENTATION_COUNT));
+        representations.addAll(findOriginalRepresentations.getResults());
+      }
+    }
+
+    itemBundle.setRepresentations(representations);
 
     return itemBundle;
   }
 
   private static List<DescriptiveMetadataViewBundle> getDescriptiveMetadataBundles(String aipId, final Locale locale)
-    throws ModelServiceException, StorageServiceException {
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException {
     ClosableIterable<DescriptiveMetadata> listDescriptiveMetadataBinaries = RodaCoreFactory.getModelService()
       .listDescriptiveMetadataBinaries(aipId);
 
@@ -184,14 +178,15 @@ public class BrowserHelper {
   }
 
   private static PreservationMetadataBundle getPreservationMetadataBundle(String aipId)
-    throws ModelServiceException, StorageServiceException {
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     ModelService model = RodaCoreFactory.getModelService();
     StorageService storage = RodaCoreFactory.getStorageService();
     return HTMLUtils.getPreservationMetadataBundle(aipId, model, storage);
   }
 
   public static DescriptiveMetadataEditBundle getDescriptiveMetadataEditBundle(String aipId,
-    String descriptiveMetadataId) throws GenericException {
+    String descriptiveMetadataId)
+      throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     DescriptiveMetadataEditBundle ret;
     InputStream inputStream = null;
     try {
@@ -201,7 +196,7 @@ public class BrowserHelper {
       inputStream = binary.getContent().createInputStream();
       String xml = IOUtils.toString(inputStream);
       ret = new DescriptiveMetadataEditBundle(descriptiveMetadataId, metadata.getType(), xml);
-    } catch (ModelServiceException | IOException e) {
+    } catch (IOException e) {
       throw new GenericException("Error getting descriptive metadata edit bundle: " + e.getMessage());
     } finally {
       if (inputStream != null) {
@@ -218,42 +213,31 @@ public class BrowserHelper {
 
   protected static List<SimpleDescriptionObject> getAncestors(SimpleDescriptionObject sdo)
     throws GenericException, NotFoundException {
-    try {
-      return RodaCoreFactory.getIndexService().getAncestors(sdo);
-    } catch (IndexServiceException e) {
-      LOGGER.error("Error getting parent", e);
-      throw new GenericException("Error getting parent: " + e.getMessage());
-    }
+    return RodaCoreFactory.getIndexService().getAncestors(sdo);
+
   }
 
   protected static IndexResult<SimpleDescriptionObject> findDescriptiveMetadata(Filter filter, Sorter sorter,
-    Sublist sublist, Facets facets) throws GenericException {
+    Sublist sublist, Facets facets) throws GenericException, RequestNotValidException {
     IndexResult<SimpleDescriptionObject> sdos;
-    try {
-      sdos = RodaCoreFactory.getIndexService().find(SimpleDescriptionObject.class, filter, sorter, sublist, facets);
-      LOGGER.debug(String.format("findDescriptiveMetadata(%1$s,%2$s,%3$s)=%4$s", filter, sorter, sublist, sdos));
-    } catch (IndexServiceException e) {
-      LOGGER.error("Error getting collections", e);
-      throw new GenericException("Error getting collections " + e.getMessage());
-    }
+    sdos = RodaCoreFactory.getIndexService().find(SimpleDescriptionObject.class, filter, sorter, sublist, facets);
+    LOGGER.debug(String.format("findDescriptiveMetadata(%1$s,%2$s,%3$s)=%4$s", filter, sorter, sublist, sdos));
 
     return sdos;
   }
-  
 
-  public static Long countDescriptiveMetadataBinaries(String aipId) {
-    return RodaCoreFactory.getModelService()
-      .listDescriptiveMetadataBinaries(aipId);
+  public static Long countDescriptiveMetadataBinaries(String aipId)
+    throws NotFoundException, RequestNotValidException, AuthorizationDeniedException, GenericException {
     return RodaCoreFactory.getModelService().countDescriptiveMetadataBinaries(aipId);
   }
 
   private static IndexResult<Representation> findRepresentations(String aipId, Sorter sorter, Sublist sublist)
-    throws GenericException {
+    throws GenericException, RequestNotValidException {
     return findRepresentations(aipId, false, sorter, sublist);
   }
 
   private static IndexResult<Representation> findRepresentations(String aipId, boolean onlyOriginals, Sorter sorter,
-    Sublist sublist) throws GenericException {
+    Sublist sublist) throws GenericException, RequestNotValidException {
     IndexResult<Representation> reps;
     Filter filter = new Filter();
     filter.add(new SimpleFilterParameter(RodaConstants.SRO_AIP_ID, aipId));
@@ -261,26 +245,13 @@ public class BrowserHelper {
       filter.add(new SimpleFilterParameter(RodaConstants.SRO_STATUS, RepresentationState.ORIGINAL.toString()));
     }
     Facets facets = null;
-    try {
-      reps = RodaCoreFactory.getIndexService().find(Representation.class, filter, sorter, sublist, facets);
-    } catch (IndexServiceException e) {
-      LOGGER.error("Error getting collections", e);
-      throw new GenericException("Error getting collections " + e.getMessage());
-    }
 
-    return reps;
+    return RodaCoreFactory.getIndexService().find(Representation.class, filter, sorter, sublist, facets);
+
   }
 
-  protected static Long countDescriptiveMetadata(Filter filter) throws GenericException {
-    Long count;
-    try {
-      count = RodaCoreFactory.getIndexService().count(SimpleDescriptionObject.class, filter);
-    } catch (IndexServiceException e) {
-      LOGGER.debug("Error getting sub-elements count", e);
-      throw new GenericException("Error getting sub-elements count " + e.getMessage());
-    }
-
-    return count;
+  protected static Long countDescriptiveMetadata(Filter filter) throws GenericException, RequestNotValidException {
+    return RodaCoreFactory.getIndexService().count(SimpleDescriptionObject.class, filter);
   }
 
   public static void validateGetAipRepresentationFileParams(String acceptFormat) throws RequestNotValidException {
@@ -292,15 +263,7 @@ public class BrowserHelper {
 
   protected static SimpleDescriptionObject getSimpleDescriptionObject(String aipId)
     throws GenericException, NotFoundException {
-    try {
-      return RodaCoreFactory.getIndexService().retrieve(SimpleDescriptionObject.class, aipId);
-    } catch (IndexServiceException e) {
-      if (e.getCode() == IndexServiceException.NOT_FOUND) {
-        throw new NotFoundException("Could not find simple description object: " + aipId);
-      }
-      LOGGER.error("Error getting SDO", e);
-      throw new GenericException("Error getting SDO: " + e.getMessage());
-    }
+    return RodaCoreFactory.getIndexService().retrieve(SimpleDescriptionObject.class, aipId);
   }
 
   protected static void validateGetAipRepresentationParams(String acceptFormat) throws RequestNotValidException {
@@ -311,7 +274,7 @@ public class BrowserHelper {
   }
 
   protected static StreamResponse getAipRepresentation(String aipId, String representationId, String acceptFormat)
-    throws GenericException {
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     try {
       ModelService model = RodaCoreFactory.getModelService();
       StorageService storage = RodaCoreFactory.getStorageService();
@@ -328,9 +291,8 @@ public class BrowserHelper {
 
       return createZipStreamResponse(zipEntries, aipId + "_" + representationId);
 
-    } catch (IOException | ModelServiceException | StorageServiceException e) {
-      // FIXME see what better exception should be thrown
-      throw new GenericException(e.getMessage());
+    } catch (IOException e) {
+      throw new GenericException("Error getting AIP representation", e);
     }
 
   }
@@ -343,7 +305,7 @@ public class BrowserHelper {
   }
 
   protected static StreamResponse listAipDescriptiveMetadata(String aipId, String start, String limit)
-    throws GenericException {
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     ClosableIterable<DescriptiveMetadata> metadata = null;
     try {
       ModelService model = RodaCoreFactory.getModelService();
@@ -367,9 +329,8 @@ public class BrowserHelper {
 
       return createZipStreamResponse(zipEntries, aipId);
 
-    } catch (IOException | ModelServiceException | StorageServiceException e) {
-      // FIXME see what better exception should be thrown
-      throw new GenericException(e.getMessage());
+    } catch (IOException e) {
+      throw new GenericException("Error listing AIP descriptive metadata", e);
     } finally {
       try {
         if (metadata != null) {
@@ -391,7 +352,8 @@ public class BrowserHelper {
   }
 
   public static StreamResponse getAipDescritiveMetadata(String aipId, String metadataId, String acceptFormat,
-    String language) throws GenericException, TransformerException {
+    String language) throws GenericException, TransformerException, RequestNotValidException, NotFoundException,
+      AuthorizationDeniedException {
 
     final String filename;
     final String mediaType;
@@ -453,7 +415,7 @@ public class BrowserHelper {
   }
 
   public static StreamResponse aipsAipIdPreservationMetadataGet(String aipId, String start, String limit)
-    throws GenericException {
+    throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
 
     ClosableIterable<Representation> representations = null;
     ClosableIterable<PreservationMetadata> preservationFiles = null;
@@ -486,9 +448,8 @@ public class BrowserHelper {
 
       return createZipStreamResponse(zipEntries, aipId);
 
-    } catch (IOException | ModelServiceException | StorageServiceException e) {
-      // FIXME see what better exception should be thrown
-      throw new GenericException(e.getMessage());
+    } catch (IOException e) {
+      throw new GenericException("Error getting AIP preservation metadata", e);
     } finally {
       if (representations != null) {
         try {
@@ -531,7 +492,8 @@ public class BrowserHelper {
   // FIXME 100 lines of method
   public static StreamResponse getAipRepresentationPreservationMetadata(String aipId, String representationId,
     String startAgent, String limitAgent, String startEvent, String limitEvent, String startFile, String limitFile,
-    String acceptFormat, String language) throws GenericException, TransformerException {
+    String acceptFormat, String language) throws GenericException, TransformerException, NotFoundException,
+      RequestNotValidException, AuthorizationDeniedException {
 
     StorageService storage = RodaCoreFactory.getStorageService();
     ModelService model = RodaCoreFactory.getModelService();
@@ -580,9 +542,8 @@ public class BrowserHelper {
         }
         response = createZipStreamResponse(zipEntries, aipId + "_" + representationId);
 
-      } catch (IOException | ModelServiceException | StorageServiceException e) {
-        // FIXME see what better exception should be thrown
-        throw new GenericException("");
+      } catch (IOException e) {
+        throw new GenericException("Error getting representation preservation metadata", e);
       } finally {
         if (preservationFiles != null) {
           try {
@@ -594,28 +555,23 @@ public class BrowserHelper {
         }
       }
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
-      try {
-        String filename = aipId + "_" + representationId + ".html";
 
-        String html = HTMLUtils.getRepresentationPreservationMetadataHtml(
-          ModelUtils.getPreservationPath(aipId, representationId), storage, ServerTools.parseLocale(language),
-          ApiUtils.processPagingParams(startAgent, limitAgent), ApiUtils.processPagingParams(startEvent, limitEvent),
-          ApiUtils.processPagingParams(startFile, limitFile));
+      String filename = aipId + "_" + representationId + ".html";
 
-        StreamingOutput stream = new StreamingOutput() {
-          @Override
-          public void write(OutputStream os) throws IOException, WebApplicationException {
-            PrintStream printStream = new PrintStream(os);
-            printStream.print(html);
-            printStream.close();
-          }
-        };
-        response = new StreamResponse(filename, MediaType.TEXT_HTML, stream);
+      String html = HTMLUtils.getRepresentationPreservationMetadataHtml(
+        ModelUtils.getPreservationPath(aipId, representationId), storage, ServerTools.parseLocale(language),
+        ApiUtils.processPagingParams(startAgent, limitAgent), ApiUtils.processPagingParams(startEvent, limitEvent),
+        ApiUtils.processPagingParams(startFile, limitFile));
 
-      } catch (ModelServiceException | StorageServiceException e) {
-        // FIXME
-        throw new GenericException(e.getMessage());
-      }
+      StreamingOutput stream = new StreamingOutput() {
+        @Override
+        public void write(OutputStream os) throws IOException, WebApplicationException {
+          PrintStream printStream = new PrintStream(os);
+          printStream.print(html);
+          printStream.close();
+        }
+      };
+      response = new StreamResponse(filename, MediaType.TEXT_HTML, stream);
     }
 
     return response;
@@ -623,33 +579,28 @@ public class BrowserHelper {
   }
 
   public static StreamResponse getAipRepresentationPreservationMetadataFile(String aipId, String representationId,
-    String fileId) throws NotFoundException, GenericException {
+    String fileId) throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
 
     StorageService storage = RodaCoreFactory.getStorageService();
     Binary binary;
-    try {
-      binary = storage.getBinary(ModelUtils.getPreservationFilePath(aipId, representationId, fileId));
 
-      String filename = binary.getStoragePath().getName();
-      StreamingOutput stream = new StreamingOutput() {
+    binary = storage.getBinary(ModelUtils.getPreservationFilePath(aipId, representationId, fileId));
 
-        public void write(OutputStream os) throws IOException, WebApplicationException {
-          IOUtils.copy(binary.getContent().createInputStream(), os);
-        }
-      };
+    String filename = binary.getStoragePath().getName();
+    StreamingOutput stream = new StreamingOutput() {
 
-      return new StreamResponse(filename, MediaType.APPLICATION_OCTET_STREAM, stream);
-    } catch (StorageServiceException e) {
-      if (e.getCode() == StorageServiceException.NOT_FOUND) {
-        throw new NotFoundException();
-      } else {
-        throw new GenericException();
+      public void write(OutputStream os) throws IOException, WebApplicationException {
+        IOUtils.copy(binary.getContent().createInputStream(), os);
       }
-    }
+    };
+
+    return new StreamResponse(filename, MediaType.APPLICATION_OCTET_STREAM, stream);
+
   }
 
   public static void createOrUpdateAipRepresentationPreservationMetadataFile(String aipId, String representationId,
-    InputStream is, FormDataContentDisposition fileDetail, boolean create) throws GenericException {
+    InputStream is, FormDataContentDisposition fileDetail, boolean create)
+      throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     Path file = null;
     try {
       ModelService model = RodaCoreFactory.getModelService();
@@ -661,9 +612,8 @@ public class BrowserHelper {
       } else {
         model.updatePreservationMetadata(aipId, representationId, fileDetail.getFileName(), resource, false);
       }
-    } catch (IOException | StorageServiceException | ModelServiceException e) {
-      // FIXME see what better exception should be thrown
-      throw new GenericException(e.getMessage());
+    } catch (IOException e) {
+      throw new GenericException("Error creating or updating AIP representation preservation metadata file", e);
     } finally {
       if (file != null && Files.exists(file)) {
         try {
@@ -676,116 +626,68 @@ public class BrowserHelper {
   }
 
   public static void aipsAipIdPreservationMetadataRepresentationIdFileIdDelete(String aipId, String representationId,
-    String fileId) throws NotFoundException, GenericException {
+    String fileId) throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
+    RodaCoreFactory.getModelService().deletePreservationMetadata(aipId, representationId, fileId);
+  }
+
+  public static SimpleDescriptionObject moveInHierarchy(String aipId, String parentId) throws GenericException,
+    NotFoundException, RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
+    StorageService storage = RodaCoreFactory.getStorageService();
     ModelService model = RodaCoreFactory.getModelService();
-    try {
-      model.deletePreservationMetadata(aipId, representationId, fileId);
-    } catch (ModelServiceException e) {
-      if (e.getCode() == ModelServiceException.NOT_FOUND) {
-        throw new NotFoundException(e.getMessage());
-      } else {
-        throw new GenericException(e.getMessage());
-      }
+    StoragePath aipPath = ModelUtils.getAIPpath(aipId);
+    if (parentId == null || parentId.trim().equals("")) {
+      StoragePath parentPath = ModelUtils.getAIPpath(parentId);
+      storage.getDirectory(parentPath);
     }
-  }
-
-  public static SimpleDescriptionObject moveInHierarchy(String aipId, String parentId)
-    throws GenericException, NotFoundException {
-    try {
-      StorageService storage = RodaCoreFactory.getStorageService();
-      ModelService model = RodaCoreFactory.getModelService();
-      StoragePath aipPath = ModelUtils.getAIPpath(aipId);
-      if (parentId == null || parentId.trim().equals("")) {
-        StoragePath parentPath = ModelUtils.getAIPpath(parentId);
-        storage.getDirectory(parentPath);
-      }
-      Map<String, Set<String>> metadata = storage.getMetadata(aipPath);
-      if (parentId == null || parentId.trim().equalsIgnoreCase("")) {
-        metadata.remove(RodaConstants.STORAGE_META_PARENT_ID);
-      } else {
-        metadata.put(RodaConstants.STORAGE_META_PARENT_ID, new HashSet<String>(Arrays.asList(parentId)));
-      }
-      storage.updateMetadata(aipPath, metadata, true);
-      model.updateAIP(aipId, storage, aipPath);
-
-      return RodaCoreFactory.getIndexService().retrieve(SimpleDescriptionObject.class, aipId);
-    } catch (ModelServiceException | IndexServiceException | StorageServiceException e) {
-      if (e.getCode() == StorageServiceException.NOT_FOUND) {
-        throw new NotFoundException("AIP not found: " + aipId);
-      } else if (e.getCode() == StorageServiceException.FORBIDDEN) {
-        throw new GenericException("You do not have permission to access AIP: " + aipId);
-      } else {
-        throw new GenericException("Error moving in hierarchy: " + e.getMessage());
-      }
-
+    Map<String, Set<String>> metadata = storage.getMetadata(aipPath);
+    if (parentId == null || parentId.trim().equalsIgnoreCase("")) {
+      metadata.remove(RodaConstants.STORAGE_META_PARENT_ID);
+    } else {
+      metadata.put(RodaConstants.STORAGE_META_PARENT_ID, new HashSet<String>(Arrays.asList(parentId)));
     }
+    storage.updateMetadata(aipPath, metadata, true);
+    model.updateAIP(aipId, storage, aipPath);
+
+    return RodaCoreFactory.getIndexService().retrieve(SimpleDescriptionObject.class, aipId);
 
   }
 
-  public static AIP createAIP(String parentAipId) throws GenericException, AuthorizationDeniedException {
-    try {
-      ModelService model = RodaCoreFactory.getModelService();
-      // IndexService index = RodaCoreFactory.getIndexService();
+  public static AIP createAIP(String parentAipId) throws GenericException, AuthorizationDeniedException,
+    RequestNotValidException, NotFoundException, AlreadyExistsException {
 
-      Map<String, Set<String>> metadata = new HashMap<String, Set<String>>();
-      if (parentAipId != null) {
-        metadata.put(RodaConstants.STORAGE_META_PARENT_ID, new HashSet<String>(Arrays.asList(parentAipId)));
-      }
+    ModelService model = RodaCoreFactory.getModelService();
+    // IndexService index = RodaCoreFactory.getIndexService();
 
-      AIP aip = model.createAIP(metadata);
-      return aip;
-      // return index.retrieve(SimpleDescriptionObject.class,
-      // aip.getId());
-    } catch (ModelServiceException e) {
-      if (e.getCode() == StorageServiceException.FORBIDDEN) {
-        throw new AuthorizationDeniedException("You do not have permission to create AIPS");
-      } else {
-        throw new GenericException("Error creating new item: " + e.getMessage());
-      }
+    Map<String, Set<String>> metadata = new HashMap<String, Set<String>>();
+    if (parentAipId != null) {
+      metadata.put(RodaConstants.STORAGE_META_PARENT_ID, new HashSet<String>(Arrays.asList(parentAipId)));
     }
+
+    AIP aip = model.createAIP(metadata);
+    return aip;
+    // return index.retrieve(SimpleDescriptionObject.class,
+    // aip.getId());
+
   }
 
-  public static void removeAIP(String aipId) throws AuthorizationDeniedException, GenericException {
-    try {
-      ModelService model = RodaCoreFactory.getModelService();
-      model.deleteAIP(aipId);
-    } catch (ModelServiceException e) {
-      if (e.getCode() == StorageServiceException.FORBIDDEN) {
-        throw new AuthorizationDeniedException("You do not have permission to create AIPS");
-      } else {
-        throw new GenericException("Error creating new item: " + e.getMessage());
-      }
-    }
+  public static void removeAIP(String aipId)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    RodaCoreFactory.getModelService().deleteAIP(aipId);
   }
 
   public static DescriptiveMetadata createDescriptiveMetadataFile(String aipId, String descriptiveMetadataId,
-    String descriptiveMetadataType, Binary descriptiveMetadataIdBinary)
-      throws GenericException, ValidationException, AuthorizationDeniedException {
+    String descriptiveMetadataType, Binary descriptiveMetadataIdBinary) throws GenericException, ValidationException,
+      AuthorizationDeniedException, RequestNotValidException, AlreadyExistsException, NotFoundException {
 
     ValidationUtils.validateDescriptiveBinary(descriptiveMetadataIdBinary, descriptiveMetadataType, false);
 
-    DescriptiveMetadata ret;
-    try {
-      ModelService model = RodaCoreFactory.getModelService();
-      ret = model.createDescriptiveMetadata(aipId, descriptiveMetadataId, descriptiveMetadataIdBinary,
-        descriptiveMetadataType);
-    } catch (ModelServiceException e) {
-      if (e.getCode() == StorageServiceException.NOT_FOUND) {
-        throw new GenericException("AIP not found: " + aipId);
-      } else if (e.getCode() == StorageServiceException.FORBIDDEN) {
-        throw new AuthorizationDeniedException("You do not have permission to access AIP: " + aipId);
-      } else {
-        LOGGER.error("Error creating new item", e);
-        throw new GenericException("Error creating new item: " + e.getMessage());
-      }
-    }
-
-    return ret;
+    return RodaCoreFactory.getModelService().createDescriptiveMetadata(aipId, descriptiveMetadataId,
+      descriptiveMetadataIdBinary, descriptiveMetadataType);
   }
 
   public static DescriptiveMetadata updateDescriptiveMetadataFile(String aipId, String descriptiveMetadataId,
-    String descriptiveMetadataType, Binary descriptiveMetadataIdBinary)
-      throws GenericException, AuthorizationDeniedException, ValidationException {
+    String descriptiveMetadataType, Binary descriptiveMetadataIdBinary) throws GenericException,
+      AuthorizationDeniedException, ValidationException, RequestNotValidException, NotFoundException {
 
     ValidationUtils.validateDescriptiveBinary(descriptiveMetadataIdBinary, descriptiveMetadataType, false);
 
@@ -793,49 +695,20 @@ public class BrowserHelper {
       ModelService model = RodaCoreFactory.getModelService();
       return model.updateDescriptiveMetadata(aipId, descriptiveMetadataId, descriptiveMetadataIdBinary,
         descriptiveMetadataType);
-    } catch (ModelServiceException e) {
-      if (e.getCode() == ModelServiceException.NOT_FOUND) {
-        throw new GenericException("AIP not found: " + aipId);
-      } else if (e.getCode() == ModelServiceException.FORBIDDEN) {
-        throw new AuthorizationDeniedException("You do not have permission to access AIP: " + aipId);
-      } else {
-        throw new GenericException("Error creating new item: " + e.getMessage());
-      }
     } catch (SolrException e) {
+      // TODO check this exception, see if it should be a RODAException
       throw new ValidationException(e.getMessage());
     }
-
   }
 
-  public static void removeDescriptiveMetadataFile(String aipId, String descriptiveMetadataId) throws GenericException {
-    try {
-      ModelService model = RodaCoreFactory.getModelService();
-      model.deleteDescriptiveMetadata(aipId, descriptiveMetadataId);
-    } catch (ModelServiceException e) {
-      if (e.getCode() == StorageServiceException.NOT_FOUND) {
-        throw new GenericException("AIP not found: " + aipId);
-      } else if (e.getCode() == StorageServiceException.FORBIDDEN) {
-        throw new GenericException("You do not have permission to access AIP: " + aipId);
-      } else {
-        throw new GenericException("Error removing descriptive metadata: " + e.getMessage());
-      }
-    }
+  public static void removeDescriptiveMetadataFile(String aipId, String descriptiveMetadataId)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    RodaCoreFactory.getModelService().deleteDescriptiveMetadata(aipId, descriptiveMetadataId);
   }
 
   public static DescriptiveMetadata retrieveMetadataFile(String aipId, String descriptiveMetadataId)
-    throws GenericException {
-    try {
-      ModelService model = RodaCoreFactory.getModelService();
-      return model.retrieveDescriptiveMetadata(aipId, descriptiveMetadataId);
-    } catch (ModelServiceException e) {
-      if (e.getCode() == StorageServiceException.NOT_FOUND) {
-        throw new GenericException("AIP not found: " + aipId);
-      } else if (e.getCode() == StorageServiceException.FORBIDDEN) {
-        throw new GenericException("You do not have permission to access AIP: " + aipId);
-      } else {
-        throw new GenericException("Error retrieving metadata file: " + e.getMessage());
-      }
-    }
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    return RodaCoreFactory.getModelService().retrieveDescriptiveMetadata(aipId, descriptiveMetadataId);
   }
 
   private static StreamResponse createZipStreamResponse(List<ZipEntryInfo> zipEntries, String zipName) {
@@ -864,76 +737,42 @@ public class BrowserHelper {
 
   }
 
-  public static void removeRepresentation(String aipId, String representationId) throws GenericException {
-    try {
-      ModelService model = RodaCoreFactory.getModelService();
-      model.deleteRepresentation(aipId, representationId);
-    } catch (ModelServiceException e) {
-      if (e.getCode() == StorageServiceException.NOT_FOUND) {
-        throw new GenericException("AIP not found: " + aipId);
-      } else if (e.getCode() == StorageServiceException.FORBIDDEN) {
-        throw new GenericException("You do not have permission to access AIP: " + aipId);
-      } else {
-        throw new GenericException(
-          "Error removing representation " + representationId + " from AIP " + aipId + ": " + e.getMessage());
-      }
-    }
-
+  public static void removeRepresentation(String aipId, String representationId)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    RodaCoreFactory.getModelService().deleteRepresentation(aipId, representationId);
   }
 
   public static void removeRepresentationFile(String aipId, String representationId, String fileId)
-    throws GenericException {
-    try {
-      ModelService model = RodaCoreFactory.getModelService();
-      model.deleteFile(aipId, representationId, fileId);
-    } catch (ModelServiceException e) {
-      if (e.getCode() == StorageServiceException.NOT_FOUND) {
-        throw new GenericException("AIP not found: " + aipId);
-      } else if (e.getCode() == StorageServiceException.FORBIDDEN) {
-        throw new GenericException("You do not have permission to access AIP: " + aipId);
-      } else {
-        throw new GenericException("Error removing file " + fileId + " from representation " + representationId
-          + " of AIP " + aipId + ": " + e.getMessage());
-      }
-    }
-
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    RodaCoreFactory.getModelService().deleteFile(aipId, representationId, fileId);
   }
 
   public static StreamResponse getAipRepresentationFile(String aipId, String representationId, String fileId,
-    String acceptFormat) throws GenericException {
-    try {
-      final String filename;
-      final String mediaType;
-      final StreamingOutput stream;
+    String acceptFormat)
+      throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
 
-      StorageService storage = RodaCoreFactory.getStorageService();
-      Binary representationFileBinary = storage
-        .getBinary(ModelUtils.getRepresentationFilePath(aipId, representationId, fileId));
-      filename = representationFileBinary.getStoragePath().getName();
-      mediaType = MediaType.WILDCARD;
-      stream = new StreamingOutput() {
-        @Override
-        public void write(OutputStream os) throws IOException, WebApplicationException {
-          IOUtils.copy(representationFileBinary.getContent().createInputStream(), os);
-        }
-      };
+    final String filename;
+    final String mediaType;
+    final StreamingOutput stream;
 
-      return new StreamResponse(filename, mediaType, stream);
-
-    } catch (StorageServiceException e) {
-      if (e.getCode() == StorageServiceException.NOT_FOUND) {
-        throw new GenericException("File not found: " + aipId + "/" + representationId + "/" + fileId);
-      } else if (e.getCode() == StorageServiceException.FORBIDDEN) {
-        throw new GenericException("You do not have permission to access AIP: " + aipId);
-      } else {
-        throw new GenericException("Error getting representation file " + fileId + " from representation "
-          + representationId + " of AIP " + aipId + ": " + e.getMessage());
+    StorageService storage = RodaCoreFactory.getStorageService();
+    Binary representationFileBinary = storage
+      .getBinary(ModelUtils.getRepresentationFilePath(aipId, representationId, fileId));
+    filename = representationFileBinary.getStoragePath().getName();
+    mediaType = MediaType.WILDCARD;
+    stream = new StreamingOutput() {
+      @Override
+      public void write(OutputStream os) throws IOException, WebApplicationException {
+        IOUtils.copy(representationFileBinary.getContent().createInputStream(), os);
       }
-    }
+    };
+
+    return new StreamResponse(filename, mediaType, stream);
   }
 
   public static void createOrUpdateAipDescriptiveMetadataFile(String aipId, String metadataId, String metadataType,
-    InputStream is, FormDataContentDisposition fileDetail, boolean create) throws GenericException {
+    InputStream is, FormDataContentDisposition fileDetail, boolean create) throws GenericException,
+      RequestNotValidException, NotFoundException, AuthorizationDeniedException, AlreadyExistsException {
     Path file = null;
     try {
       ModelService model = RodaCoreFactory.getModelService();
@@ -945,9 +784,8 @@ public class BrowserHelper {
       } else {
         model.updateDescriptiveMetadata(aipId, metadataId, resource, metadataType);
       }
-    } catch (IOException | StorageServiceException | ModelServiceException e) {
-      // FIXME see what better exception should be thrown
-      throw new GenericException(e.getMessage());
+    } catch (IOException e) {
+      throw new GenericException("Error creating or updating AIP descriptive metadata file", e);
     } finally {
       if (file != null && Files.exists(file)) {
         try {
@@ -961,29 +799,13 @@ public class BrowserHelper {
   }
 
   public static IndexResult<TransferredResource> findTransferredResources(Filter filter, Sorter sorter, Sublist sublist,
-    Facets facets) throws GenericException {
-
-    IndexResult<TransferredResource> ret;
-    try {
-      ret = RodaCoreFactory.getIndexService().find(TransferredResource.class, filter, sorter, sublist, facets);
-      LOGGER.debug(String.format("findTransferredResources(%1$s,%2$s,%3$s)=%4$s", filter, sorter, sublist, ret));
-    } catch (IndexServiceException e) {
-      LOGGER.error("Error getting transferred resources", e);
-      throw new GenericException("Error getting transferred resources: " + e.getMessage());
-    }
-
-    return ret;
-
+    Facets facets) throws GenericException, RequestNotValidException {
+    return RodaCoreFactory.getIndexService().find(TransferredResource.class, filter, sorter, sublist, facets);
   }
 
   public static TransferredResource retrieveTransferredResource(String transferredResourceId)
     throws GenericException, NotFoundException {
-    try {
-      return RodaCoreFactory.getIndexService().retrieve(TransferredResource.class, transferredResourceId);
-    } catch (IndexServiceException e) {
-      LOGGER.error("Error getting transferred resource", e);
-      throw new GenericException("Error getting transferred resource: " + e.getMessage());
-    }
+    return RodaCoreFactory.getIndexService().retrieve(TransferredResource.class, transferredResourceId);
   }
 
   public static String createTransferredResourcesFolder(String parent, String folderName) throws GenericException {
@@ -996,21 +818,16 @@ public class BrowserHelper {
   }
 
   public static void removeTransferredResources(List<String> ids) throws GenericException, NotFoundException {
-    try {
-      RodaCoreFactory.getFolderMonitor().removeSync(ids);
-    } catch (IOException e) {
-      LOGGER.error("Error removing transferred resource", e);
-      throw new GenericException("Error removing transferred resource: " + e.getMessage());
-    }
+    RodaCoreFactory.getFolderMonitor().removeSync(ids);
   }
 
   public static void createTransferredResourceFile(String path, String fileName, InputStream inputStream)
-    throws GenericException, FileAlreadyExistsException {
+    throws GenericException, AlreadyExistsException {
     try {
       LOGGER.debug("createTransferredResourceFile(path=" + path + ",name=" + fileName + ")");
       RodaCoreFactory.getFolderMonitor().createFile(path, fileName, inputStream);
     } catch (FileAlreadyExistsException e) {
-      throw e;
+      throw new AlreadyExistsException("Error creating transferred resource file", e);
     } catch (IOException e) {
       LOGGER.error("Error removing transferred resource", e);
       throw new GenericException("Error creating transferred resource file: " + e.getMessage());
@@ -1020,7 +837,8 @@ public class BrowserHelper {
 
   // TODO Limit access to SDO accessible by user
   // TODO improve descriptionlevelmanager initialization
-  public static StreamResponse getClassificationPlan(String type, RodaUser user) throws GenericException {
+  public static StreamResponse getClassificationPlan(String type, RodaUser user)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     try {
       JsonFactory factory = new JsonFactory();
       ObjectMapper mapper = new ObjectMapper(factory);
@@ -1058,7 +876,7 @@ public class BrowserHelper {
         }
       };
       return new StreamResponse("plan.json", MediaType.APPLICATION_JSON, stream);
-    } catch (IndexServiceException | IOException | ModelServiceException e) {
+    } catch (IOException e) {
       throw new GenericException("Error creating classification plan: " + e.getMessage());
     }
 
@@ -1069,17 +887,8 @@ public class BrowserHelper {
   }
 
   public static IndexResult<SimpleFile> findFiles(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
-    throws GenericException {
-    IndexResult<SimpleFile> files;
-    try {
-      files = RodaCoreFactory.getIndexService().find(SimpleFile.class, filter, sorter, sublist, facets);
-      LOGGER.debug(String.format("findFiles(%1$s,%2$s,%3$s)=%4$s", filter, sorter, sublist, files));
-    } catch (IndexServiceException e) {
-      LOGGER.error("Error getting collections", e);
-      throw new GenericException("Error getting collections " + e.getMessage());
-    }
-
-    return files;
+    throws GenericException, RequestNotValidException {
+    return RodaCoreFactory.getIndexService().find(SimpleFile.class, filter, sorter, sublist, facets);
   }
 
   public static Map<String, String> getSupportedMetadata(Locale locale) throws GenericException {
@@ -1098,6 +907,5 @@ public class BrowserHelper {
     }
     return supportedMetadata;
   }
-
 
 }

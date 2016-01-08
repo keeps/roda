@@ -18,9 +18,9 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.commons.lang.StringUtils;
 import org.roda.core.data.common.Pair;
-import org.roda.core.data.common.RODAException;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.wui.common.client.GenericException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.RODAException;
 
 /**
  * API Utils

@@ -11,7 +11,7 @@ package org.roda.core.data.exceptions;
  * @author Luis Faria <lfaria@keep.pt>
  * 
  */
-public class AlreadyExistsException extends Exception {
+public class AlreadyExistsException extends RODAException {
 
   private static final long serialVersionUID = -6744205569453461540L;
 

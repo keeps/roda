@@ -14,7 +14,7 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.Set;
 
-import org.roda.core.data.exceptions.ActionForbiddenException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -32,7 +32,6 @@ import org.roda.core.storage.Entity;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StoragePath;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.StorageServiceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,25 +48,21 @@ public class FileStorageService implements StorageService {
 
   private final Path basePath;
 
-  public FileStorageService(Path basePath) throws StorageServiceException {
+  public FileStorageService(Path basePath) throws GenericException {
     this.basePath = basePath;
     if (!Files.exists(basePath)) {
       try {
         Files.createDirectories(basePath);
       } catch (IOException e) {
-        throw new StorageServiceException("Could not created base path " + basePath,
-          StorageServiceException.INTERNAL_SERVER_ERROR);
+        throw new GenericException("Could not created base path " + basePath, e);
 
       }
     } else if (!Files.isDirectory(basePath)) {
-      throw new StorageServiceException("Base path is not a directory " + basePath,
-        StorageServiceException.INTERNAL_SERVER_ERROR);
+      throw new GenericException("Base path is not a directory " + basePath);
     } else if (!Files.isReadable(basePath)) {
-      throw new StorageServiceException("Cannot read from base path " + basePath,
-        StorageServiceException.INTERNAL_SERVER_ERROR);
+      throw new GenericException("Cannot read from base path " + basePath);
     } else if (!Files.isWritable(basePath)) {
-      throw new StorageServiceException("Cannot write from base path " + basePath,
-        StorageServiceException.INTERNAL_SERVER_ERROR);
+      throw new GenericException("Cannot write from base path " + basePath);
     } else {
       // do nothing
     }
@@ -365,7 +360,7 @@ public class FileStorageService implements StorageService {
   @Override
   public void copy(StorageService fromService, StoragePath fromStoragePath, StoragePath toStoragePath)
     throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
-    ActionForbiddenException {
+    AuthorizationDeniedException {
     if (fromService instanceof FileStorageService) {
       Path sourcePath = ((FileStorageService) fromService).basePath.resolve(fromStoragePath.asString());
       Path targetPath = basePath.resolve(toStoragePath.asString());
@@ -380,7 +375,7 @@ public class FileStorageService implements StorageService {
   @Override
   public void move(StorageService fromService, StoragePath fromStoragePath, StoragePath toStoragePath)
     throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
-    ActionForbiddenException {
+    AuthorizationDeniedException {
     if (fromService instanceof FileStorageService) {
       Path sourcePath = ((FileStorageService) fromService).basePath.resolve(fromStoragePath.asString());
       Path targetPath = basePath.resolve(toStoragePath.asString());

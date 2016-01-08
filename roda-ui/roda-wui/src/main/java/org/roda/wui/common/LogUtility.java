@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.LoggerException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.LogEntry;
 import org.roda.core.data.v2.LogEntryParameter;
 import org.roda.core.data.v2.RodaSimpleUser;
@@ -28,8 +29,8 @@ public class LogUtility {
     long duration) {
 
     if (parameters != null && (parameters.length % 2) != 0) {
-      logger.warn("registerAction(" + action
-        + ",...) failed because parameters array must have pairs of elements (even length)");
+      logger.warn(
+        "registerAction(" + action + ",...) failed because parameters array must have pairs of elements (even length)");
     } else {
 
       LogEntryParameter[] logParameters = null;
@@ -76,7 +77,7 @@ public class LogUtility {
       try {
         RodaCoreFactory.getModelService().addLogEntry(logEntry, RodaCoreFactory.getLogPath());
 
-      } catch (ModelServiceException e) {
+      } catch (RODAException e) {
         logger.error("registerAction(" + logEntry.getActionMethod() + ",...) failed because of a LoggerException - "
           + e.getMessage(), e);
       }

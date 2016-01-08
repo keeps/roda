@@ -7,7 +7,6 @@
  */
 package org.roda.core.storage.fs;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
@@ -28,16 +27,15 @@ import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.storage.AbstractStorageServiceTest;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.RandomMockContentPayload;
 import org.roda.core.storage.StoragePath;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.StorageTestUtils;
-import org.roda.core.storage.fs.FSUtils;
-import org.roda.core.storage.fs.FSYamlMetadataUtils;
-import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +47,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @see StorageService
  * @see FileStorageService
- * */
+ */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({FSYamlMetadataUtils.class, FSUtils.class})
 public class FileStorageServiceTest extends AbstractStorageServiceTest<FileStorageService> {
@@ -58,20 +56,20 @@ public class FileStorageServiceTest extends AbstractStorageServiceTest<FileStora
   private static FileStorageService storage;
 
   @BeforeClass
-  public static void setUp() throws IOException, StorageServiceException {
+  public static void setUp() throws IOException, GenericException {
     basePathForTests = Files.createTempDirectory("fsTests");
     storage = new FileStorageService(basePathForTests);
   }
 
   @AfterClass
-  public static void tearDown() throws StorageServiceException {
+  public static void tearDown() throws NotFoundException, GenericException {
     FSUtils.deletePath(basePathForTests);
   }
 
   final Logger logger = LoggerFactory.getLogger(FileStorageServiceTest.class);
 
   @Test
-  public void testClassInstantiation() throws StorageServiceException {
+  public void testClassInstantiation() throws RODAException {
 
     try {
       // 1) Directory doesn't exist and is located under a read-only
@@ -83,16 +81,16 @@ public class FileStorageServiceTest extends AbstractStorageServiceTest<FileStora
       Path folderCreationFailurePath = parentDirForFolderCreationFailure.resolve("subfolder");
       try {
         new FileStorageService(folderCreationFailurePath);
-      } catch (StorageServiceException e) {
-        assertEquals(StorageServiceException.INTERNAL_SERVER_ERROR, e.getCode());
+      } catch (GenericException e) {
+        // do nothing
       }
 
       // 2) basePath is a file
       Path fileAsBasePath = Files.createTempFile("xpto", null);
       try {
         new FileStorageService(fileAsBasePath);
-      } catch (StorageServiceException e) {
-        assertEquals(StorageServiceException.INTERNAL_SERVER_ERROR, e.getCode());
+      } catch (GenericException e) {
+        // do nothing
       }
 
       // 3) no read permission on basePath
@@ -100,8 +98,8 @@ public class FileStorageServiceTest extends AbstractStorageServiceTest<FileStora
       directoryWithoutReadPermission.toFile().setReadable(false);
       try {
         new FileStorageService(directoryWithoutReadPermission);
-      } catch (StorageServiceException e) {
-        assertEquals(StorageServiceException.INTERNAL_SERVER_ERROR, e.getCode());
+      } catch (GenericException e) {
+        // do nothing
       }
 
       // 4) no write permission on basePath
@@ -109,8 +107,8 @@ public class FileStorageServiceTest extends AbstractStorageServiceTest<FileStora
       directoryWithoutWritePermission.toFile().setWritable(false);
       try {
         new FileStorageService(directoryWithoutWritePermission);
-      } catch (StorageServiceException e) {
-        assertEquals(StorageServiceException.INTERNAL_SERVER_ERROR, e.getCode());
+      } catch (GenericException e) {
+        // do nothing
       }
 
       // test specific cleanup
@@ -156,7 +154,7 @@ public class FileStorageServiceTest extends AbstractStorageServiceTest<FileStora
   }
 
   @Test
-  public void testCreateContainerWhileIOError() throws IOException, StorageServiceException {
+  public void testCreateContainerWhileIOError() throws IOException, RODAException {
 
     // Force IO error occur while creating some file or folder
     PowerMockito.mockStatic(FSYamlMetadataUtils.class);
@@ -167,22 +165,23 @@ public class FileStorageServiceTest extends AbstractStorageServiceTest<FileStora
     final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
     try {
       storage.createContainer(containerStoragePath, containerMetadata);
-      fail("An exception should have been thrown while creating a container because an IOException occured but it didn't happened!");
-    } catch (StorageServiceException e) {
-      assertEquals(StorageServiceException.INTERNAL_SERVER_ERROR, e.getCode());
+      fail(
+        "An exception should have been thrown while creating a container because an IOException occured but it didn't happened!");
+    } catch (GenericException e) {
+      // do nothing
     }
 
     // check if container was not created
     try {
       getStorage().getContainer(containerStoragePath);
       fail("Container should not have been created, and yet it was.");
-    } catch (StorageServiceException e) {
-      assertEquals(StorageServiceException.NOT_FOUND, e.getCode());
+    } catch (NotFoundException e) {
+      // do nothing
     }
   }
 
   @Test
-  public void testCreateDirectoryWhileIOError() throws IOException, StorageServiceException {
+  public void testCreateDirectoryWhileIOError() throws IOException, RODAException {
 
     // set up
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
@@ -200,24 +199,25 @@ public class FileStorageServiceTest extends AbstractStorageServiceTest<FileStora
 
     try {
       getStorage().createDirectory(directoryStoragePath, directoryMetadata);
-      fail("An exception should have been thrown while creating a container because an IOException occured but it didn't happened!");
-    } catch (StorageServiceException e) {
-      assertEquals(StorageServiceException.INTERNAL_SERVER_ERROR, e.getCode());
+      fail(
+        "An exception should have been thrown while creating a container because an IOException occured but it didn't happened!");
+    } catch (GenericException e) {
+      // do nothing
     }
 
     // check if directory was not created
     try {
       getStorage().getDirectory(directoryStoragePath);
       fail("Directory should not have been created, and yet it was.");
-    } catch (StorageServiceException e) {
-      assertEquals(e.getMessage(), StorageServiceException.NOT_FOUND, e.getCode());
+    } catch (NotFoundException e) {
+      // do nothing
     }
   }
 
   // TODO test get binary while IO Error occurs
 
   @Test
-  public void testCreateBinaryWhileIOError() throws IOException, StorageServiceException {
+  public void testCreateBinaryWhileIOError() throws IOException, RODAException {
 
     // set up
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
@@ -236,17 +236,18 @@ public class FileStorageServiceTest extends AbstractStorageServiceTest<FileStora
     // create binary
     try {
       getStorage().createBinary(binaryStoragePath, binaryMetadata, spyPayload, false);
-      fail("An exception should have been thrown while creating a container because an IOException occured but it didn't happened!");
-    } catch (StorageServiceException e) {
-      assertEquals(StorageServiceException.INTERNAL_SERVER_ERROR, e.getCode());
+      fail(
+        "An exception should have been thrown while creating a container because an IOException occured but it didn't happened!");
+    } catch (GenericException e) {
+      // do nothing
     }
 
     // check if binary was not created
     try {
       getStorage().getBinary(binaryStoragePath);
       fail("Binary should not have been created, and yet it was.");
-    } catch (StorageServiceException e) {
-      assertEquals(StorageServiceException.NOT_FOUND, e.getCode());
+    } catch (NotFoundException e) {
+      // do nothing
     }
   }
 

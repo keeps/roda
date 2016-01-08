@@ -21,15 +21,17 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.Representation;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.index.IndexService;
-import org.roda.core.index.IndexServiceException;
 import org.roda.core.model.AIP;
 import org.roda.core.model.File;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.ModelServiceException;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginOrchestrator;
@@ -102,12 +104,9 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
       finishedSubmit();
       plugin.afterExecute(index, model, storage);
 
-    } catch (IndexServiceException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (PluginException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+    } catch (PluginException | GenericException | RequestNotValidException e) {
+      // TODO this exception handling should be reviewed
+      LOGGER.error("Error running plugin from index", e);
     }
 
   }
@@ -166,12 +165,10 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
       finishedSubmit();
       plugin.afterExecute(index, model, storage);
 
-    } catch (ModelServiceException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (PluginException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+    } catch (PluginException | RequestNotValidException | NotFoundException | GenericException
+      | AuthorizationDeniedException e) {
+      // TODO review this exception handling
+      LOGGER.error("Error running plugin on AIPs: " + ids, e);
     }
 
   }
@@ -202,15 +199,10 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
       finishedSubmit();
       plugin.afterExecute(index, model, storage);
 
-    } catch (ModelServiceException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (PluginException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+    } catch (IOException | PluginException | RequestNotValidException | GenericException | NotFoundException
+      | AuthorizationDeniedException e) {
+      // TODO review this exception handling
+      LOGGER.error("Error running plugin on all AIPs", e);
     }
 
   }
@@ -250,15 +242,10 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
       finishedSubmit();
       plugin.afterExecute(index, model, storage);
 
-    } catch (ModelServiceException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (PluginException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+    } catch (IOException | PluginException | RequestNotValidException | GenericException | NotFoundException
+      | AuthorizationDeniedException e) {
+      // TODO review this exception handling
+      LOGGER.error("Error running plugin on all representations", e);
     }
   }
 
@@ -303,15 +290,10 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
       finishedSubmit();
       plugin.afterExecute(index, model, storage);
 
-    } catch (ModelServiceException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (PluginException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+    } catch (IOException | PluginException | RequestNotValidException | GenericException | NotFoundException
+      | AuthorizationDeniedException e) {
+      // TODO review this exception handling
+      LOGGER.error("Error running plugin on all files", e);
     }
   }
 
@@ -337,8 +319,8 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
       plugin.afterExecute(index, model, storage);
 
     } catch (PluginException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      // TODO review this exception handling
+      LOGGER.error("Error running plugin on transferred resources", e);
     }
 
   }

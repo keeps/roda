@@ -26,14 +26,13 @@ import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.Pair;
-import org.roda.core.data.common.RODAException;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.JobReport;
 import org.roda.core.data.v2.Jobs;
 import org.roda.core.data.v2.RodaUser;
-import org.roda.core.index.IndexServiceException;
 import org.roda.wui.api.controllers.JobsHelper;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.slf4j.Logger;
@@ -131,7 +130,7 @@ public class JobsResource {
       }
 
       return Response.ok(sb.toString(), MediaType.TEXT_HTML).build();
-    } catch (IndexServiceException e) {
+    } catch (RODAException e) {
       LOGGER.error("Error getting jobs", e);
     }
     return Response.ok("PUM", MediaType.TEXT_HTML).build();

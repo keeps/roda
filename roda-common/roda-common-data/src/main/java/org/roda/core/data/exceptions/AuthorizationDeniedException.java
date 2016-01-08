@@ -11,24 +11,27 @@ package org.roda.core.data.exceptions;
  * @author Luis Faria <lfaria@keep.pt>
  * 
  */
-public class GenericException extends RODAException {
+public class AuthorizationDeniedException extends RODAException {
 
-  private static final long serialVersionUID = -2093798996190248576L;
+  private static final long serialVersionUID = -6744205569453461540L;
 
-  public GenericException() {
+  public AuthorizationDeniedException() {
     super();
   }
 
-  public GenericException(String message) {
+  public AuthorizationDeniedException(String message) {
     super(message);
   }
 
-  public GenericException(String message, Throwable cause) {
+  public AuthorizationDeniedException(String message, Throwable cause) {
     super(message, cause);
   }
 
-  public GenericException(Throwable cause) {
+  public AuthorizationDeniedException(Throwable cause) {
     super(cause);
   }
+  
+  
+
 
 }

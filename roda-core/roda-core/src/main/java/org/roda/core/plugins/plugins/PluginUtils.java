@@ -25,7 +25,10 @@ import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.EventPreservationObject;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.Job;
@@ -33,14 +36,11 @@ import org.roda.core.data.v2.JobReport;
 import org.roda.core.data.v2.JobReport.PluginState;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.index.IndexService;
-import org.roda.core.index.IndexServiceException;
 import org.roda.core.metadata.v2.premis.PremisEventHelper;
 import org.roda.core.metadata.v2.premis.PremisMetadataException;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.ModelServiceException;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.storage.Binary;
-import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.fs.FSUtils;
 import org.w3c.util.DateParser;
 
@@ -49,7 +49,7 @@ public final class PluginUtils {
   private PluginUtils() {
   }
 
-  public static Report createPluginReport(Plugin plugin) {
+  public static Report createPluginReport(Plugin<?> plugin) {
     Report report = new Report();
     report.setType(Report.TYPE_PLUGIN_REPORT);
     report.setTitle("Report of plugin " + plugin.getName());
@@ -61,12 +61,12 @@ public final class PluginUtils {
     return report;
   }
 
-  public static ReportItem createPluginReportItem(TransferredResource transferredResource, Plugin plugin) {
+  public static ReportItem createPluginReportItem(TransferredResource transferredResource, Plugin<?> plugin) {
     return createPluginReportItem(plugin, "SIP to AIP from " + transferredResource.getId(), null,
       transferredResource.getId());
   }
 
-  public static ReportItem createPluginReportItem(Plugin plugin, String title, String itemId, String otherId) {
+  public static ReportItem createPluginReportItem(Plugin<?> plugin, String title, String itemId, String otherId) {
     ReportItem reportItem = new ReportItem(title);
     if (itemId != null) {
       reportItem.setItemId(itemId);
@@ -85,7 +85,7 @@ public final class PluginUtils {
   }
 
   public static Job getJobFromIndex(IndexService index, Map<String, String> pluginParameters)
-    throws IndexServiceException, NotFoundException {
+    throws NotFoundException, GenericException {
     return index.retrieve(Job.class, getJobId(pluginParameters));
   }
   //
@@ -118,8 +118,8 @@ public final class PluginUtils {
     model.createJobReport(jobReport);
   }
 
-  public static void createJobReport(ModelService model, Plugin plugin, ReportItem reportItem, PluginState pluginState,
-    String jobId) {
+  public static void createJobReport(ModelService model, Plugin<?> plugin, ReportItem reportItem,
+    PluginState pluginState, String jobId) {
     JobReport jobReport = new JobReport();
     jobReport.setId(UUID.randomUUID().toString());
     jobReport.setJobId(jobId);
@@ -139,8 +139,9 @@ public final class PluginUtils {
 
   }
 
-  public static void updateJobReport(ModelService model, IndexService index, Plugin plugin, ReportItem reportItem,
-    PluginState pluginState, String jobId, String aipId) throws IndexServiceException, NotFoundException {
+  public static void updateJobReport(ModelService model, IndexService index, Plugin<?> plugin, ReportItem reportItem,
+    PluginState pluginState, String jobId, String aipId)
+      throws NotFoundException, GenericException, RequestNotValidException {
 
     Filter filter = new Filter();
     filter.add(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, jobId));
@@ -166,8 +167,8 @@ public final class PluginUtils {
 
   public static EventPreservationObject createPluginEvent(String aipID, String representationID, ModelService model,
     String type, String details, String agentRole, String agentID, List<String> objectIDs, String outcome,
-    String detailNote, String detailExtension)
-      throws PremisMetadataException, IOException, StorageServiceException, ModelServiceException {
+    String detailNote, String detailExtension) throws PremisMetadataException, IOException, RequestNotValidException,
+      NotFoundException, GenericException, AuthorizationDeniedException {
     EventPreservationObject epo = new EventPreservationObject();
     epo.setDatetime(new Date());
     epo.setEventType(type);
@@ -186,7 +187,7 @@ public final class PluginUtils {
     Binary resource = (Binary) FSUtils.convertPathToResource(file.getParent(), file);
     if (representationID == null) { // "AIP Event"
       model.createPreservationMetadata(aipID, name, resource);
-    } else {    // "Representation Event"
+    } else { // "Representation Event"
       model.createPreservationMetadata(aipID, representationID, name, resource);
     }
     return epo;

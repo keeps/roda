@@ -27,6 +27,11 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.AfterClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.storage.AbstractStorageServiceTest;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.Container;
@@ -55,7 +60,7 @@ public class FedoraStorageServiceTest extends AbstractStorageServiceTest<FedoraS
   final FedoraStorageService storage = new FedoraStorageService(serverAddress);
 
   @AfterClass
-  public static void tearDown() throws StorageServiceException {
+  public static void tearDown() throws NotFoundException, GenericException {
     FSUtils.deletePath(Paths.get("fcrepo4-data"));
   }
 
@@ -73,7 +78,7 @@ public class FedoraStorageServiceTest extends AbstractStorageServiceTest<FedoraS
   }
 
   @Override
-  public void testClassInstantiation() throws StorageServiceException {
+  public void testClassInstantiation() {
     final HttpClient client = HttpClientBuilder.create().setMaxConnPerRoute(Integer.MAX_VALUE)
       .setMaxConnTotal(Integer.MAX_VALUE).build();
     final HttpGet request = new HttpGet(serverAddress);
@@ -97,13 +102,13 @@ public class FedoraStorageServiceTest extends AbstractStorageServiceTest<FedoraS
       for (Container container : storage.listContainers()) {
         storage.deleteContainer(container.getStoragePath());
       }
-    } catch (StorageServiceException e) {
+    } catch (RODAException e) {
       logger.error("Error cleaning up", e);
     }
   }
 
   @Test
-  public void testCreateGetDeleteBinary() throws StorageServiceException, IOException {
+  public void testCreateGetDeleteBinary() throws RODAException, IOException {
 
     // create container
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
@@ -132,7 +137,7 @@ public class FedoraStorageServiceTest extends AbstractStorageServiceTest<FedoraS
     try {
       getStorage().createBinary(binaryStoragePath, binaryMetadata, payload, false);
 
-    } catch (StorageServiceException e) {
+    } catch (RODAException e) {
       e.printStackTrace();
       fail(
         "An exception should not have been thrown while creating a binary that already exists because fedora doesn't support it very well but it happened!");
@@ -145,8 +150,8 @@ public class FedoraStorageServiceTest extends AbstractStorageServiceTest<FedoraS
     try {
       getStorage().getBinary(binaryStoragePath);
       fail("An exception should have been thrown while getting a binary that was deleted but it didn't happened!");
-    } catch (StorageServiceException e) {
-      assertEquals(StorageServiceException.NOT_FOUND, e.getCode());
+    } catch (NotFoundException e) {
+      // do nothing
     }
 
     // cleanup

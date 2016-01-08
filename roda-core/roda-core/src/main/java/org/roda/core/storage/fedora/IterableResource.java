@@ -17,7 +17,7 @@ import org.fcrepo.client.FedoraObject;
 import org.fcrepo.client.FedoraRepository;
 import org.fcrepo.client.FedoraResource;
 import org.fcrepo.client.ForbiddenException;
-import org.roda.core.data.exceptions.ActionForbiddenException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
@@ -39,12 +39,12 @@ public class IterableResource implements ClosableIterable<Resource> {
   private Iterator<FedoraResource> fedoraResources;
 
   public IterableResource(FedoraRepository repository, StoragePath storagePath)
-    throws ActionForbiddenException, RequestNotValidException, NotFoundException, GenericException {
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     this.repository = repository;
     try {
       fedoraResources = repository.getObject(FedoraUtils.createFedoraPath(storagePath)).getChildren(null).iterator();
     } catch (ForbiddenException e) {
-      throw new ActionForbiddenException("Could not iterate through resource", e);
+      throw new AuthorizationDeniedException("Could not iterate through resource", e);
     } catch (BadRequestException e) {
       throw new RequestNotValidException("Could not iterate through resource", e);
     } catch (org.fcrepo.client.NotFoundException e) {

@@ -14,8 +14,9 @@ import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
-import org.roda.core.data.common.AuthorizationDeniedException;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IndexResult;
@@ -23,7 +24,6 @@ import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.JobReport;
 import org.roda.core.data.v2.RodaUser;
 import org.roda.wui.common.RodaCoreService;
-import org.roda.wui.common.client.GenericException;
 
 /**
  * FIXME 1) verify all checkObject*Permissions (because now also a permission
@@ -80,7 +80,7 @@ public class Jobs extends RodaCoreService {
   }
 
   public static IndexResult<Job> findJobs(RodaUser user, Filter filter, Sorter sorter, Sublist sublist, Facets facets)
-    throws GenericException {
+    throws GenericException, RequestNotValidException {
     Date startDate = new Date();
 
     // check user permissions
@@ -98,7 +98,7 @@ public class Jobs extends RodaCoreService {
   }
 
   public static IndexResult<JobReport> findJobReports(RodaUser user, Filter filter, Sorter sorter, Sublist sublist,
-    Facets facets) throws GenericException {
+    Facets facets) throws GenericException, RequestNotValidException {
     Date startDate = new Date();
 
     // check user permissions

@@ -13,10 +13,10 @@ import java.nio.file.FileVisitor;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.index.IndexService;
-import org.roda.core.index.IndexServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +38,7 @@ public class FileVisitorChecker implements FileVisitor<Path> {
     if (basePath.relativize(dir).getNameCount() > 1) {
       try {
         index.retrieve(TransferredResource.class, basePath.relativize(dir).toString());
-      } catch (NotFoundException | IndexServiceException e) {
+      } catch (NotFoundException | GenericException e) {
         LOGGER.error("Error", e);
         this.ok = false;
       }
@@ -56,7 +56,7 @@ public class FileVisitorChecker implements FileVisitor<Path> {
     if (basePath.relativize(file).getNameCount() > 1) {
       try {
         index.retrieve(TransferredResource.class, basePath.relativize(file).toString());
-      } catch (NotFoundException | IndexServiceException e) {
+      } catch (NotFoundException | GenericException e) {
         LOGGER.error("Error", e);
         this.ok = false;
       }

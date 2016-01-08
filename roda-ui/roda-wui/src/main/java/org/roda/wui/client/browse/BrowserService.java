@@ -16,8 +16,10 @@ import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
-import org.roda.core.data.common.AuthorizationDeniedException;
 import org.roda.core.data.common.RODAException;
+import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IndexResult;
@@ -31,7 +33,6 @@ import org.roda.core.data.v2.TransferredResource;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
 import org.roda.wui.client.ingest.process.JobBundle;
 import org.roda.wui.client.search.SearchField;
-import org.roda.wui.common.client.GenericException;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
@@ -74,25 +75,30 @@ public interface BrowserService extends RemoteService {
    * @param filter
    *
    * @return the number of simple descriptive metadata that fit the filter
-   * @throws RODAException
+   * @throws RequestNotValidException
+   * @throws GenericException
+   * @throws AuthorizationDeniedException
    */
-  Long countDescriptiveMetadata(Filter filter) throws RODAException;
+  Long countDescriptiveMetadata(Filter filter)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException;
 
   /**
    * Get imple descriptive metadata
    *
    *
    * @return
-   * @throws RODAException
+   * @throws RequestNotValidException
+   * @throws AuthorizationDeniedException
+   * @throws GenericException
    */
   IndexResult<SimpleDescriptionObject> findDescriptiveMetadata(Filter filter, Sorter sorter, Sublist sublist,
-    Facets facets, String locale) throws RODAException;
+    Facets facets, String locale) throws GenericException, AuthorizationDeniedException, RequestNotValidException;
 
   BrowseItemBundle getItemBundle(String aipId, String localeString)
-    throws AuthorizationDeniedException, GenericException, NotFoundException;
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
   DescriptiveMetadataEditBundle getDescriptiveMetadataEditBundle(String aipId, String descId)
-    throws AuthorizationDeniedException, GenericException;
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 
   /**
    * Get simple description object
@@ -100,9 +106,12 @@ public interface BrowserService extends RemoteService {
    * @param pid
    *          the object id
    * @return {@link SimpleDescriptionObject}
-   * @throws RODAException
+   * @throws NotFoundException
+   * @throws GenericException
+   * @throws AuthorizationDeniedException
    */
-  SimpleDescriptionObject getSimpleDescriptionObject(String pid) throws RODAException;
+  SimpleDescriptionObject getSimpleDescriptionObject(String pid)
+    throws AuthorizationDeniedException, GenericException, NotFoundException;
 
   /**
    * Get description object
@@ -121,9 +130,12 @@ public interface BrowserService extends RemoteService {
    *          the pid of the node
    * @return A array that starts in the fonds of witch this node belongs to, and
    *         ends in the node itself
-   * @throws RODAException
+   * @throws NotFoundException
+   * @throws GenericException
+   * @throws AuthorizationDeniedException
    */
-  List<SimpleDescriptionObject> getAncestors(SimpleDescriptionObject sdo) throws RODAException;
+  List<SimpleDescriptionObject> getAncestors(SimpleDescriptionObject sdo)
+    throws AuthorizationDeniedException, GenericException, NotFoundException;
 
   List<SearchField> getSearchFields(String locale) throws GenericException;
 
@@ -220,22 +232,28 @@ public interface BrowserService extends RemoteService {
   TimelineInfo getPreservationTimeline(List<String> repPIDs, List<String> icons, List<String> colors, String locale)
     throws RODAException;
 
-  SimpleDescriptionObject moveInHierarchy(String aipId, String parentId) throws RODAException;
+  SimpleDescriptionObject moveInHierarchy(String aipId, String parentId) throws AuthorizationDeniedException,
+    GenericException, NotFoundException, RequestNotValidException, AlreadyExistsException;
 
-  String createAIP(String parentId) throws AuthorizationDeniedException, GenericException, NotFoundException;
+  String createAIP(String parentId) throws AuthorizationDeniedException, GenericException, NotFoundException,
+    RequestNotValidException, AlreadyExistsException;
 
-  void removeAIP(String aipId) throws AuthorizationDeniedException, GenericException, NotFoundException;
+  void removeAIP(String aipId)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
-  void removeDescriptiveMetadataFile(String itemId, String descriptiveMetadataId) throws RODAException;
+  void removeDescriptiveMetadataFile(String itemId, String descriptiveMetadataId)
+    throws RODAException, AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
   void updateDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle bundle)
-    throws AuthorizationDeniedException, GenericException, MetadataParseException, NotFoundException;
+    throws AuthorizationDeniedException, GenericException, MetadataParseException, NotFoundException,
+    RequestNotValidException;
 
   void createDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle newBundle)
-    throws AuthorizationDeniedException, GenericException, MetadataParseException, NotFoundException;
+    throws AuthorizationDeniedException, GenericException, MetadataParseException, NotFoundException,
+    RequestNotValidException, AlreadyExistsException;
 
   IndexResult<TransferredResource> findTransferredResources(Filter filter, Sorter sorter, Sublist sublist,
-    Facets facets) throws AuthorizationDeniedException, GenericException;
+    Facets facets) throws AuthorizationDeniedException, GenericException, RequestNotValidException;
 
   TransferredResource retrieveTransferredResource(String transferredResourceId)
     throws AuthorizationDeniedException, GenericException, NotFoundException;
@@ -249,10 +267,10 @@ public interface BrowserService extends RemoteService {
   boolean isTransferFullyInitialized() throws AuthorizationDeniedException, GenericException, NotFoundException;
 
   IndexResult<SimpleFile> getRepresentationFiles(Filter filter, Sorter sorter, Sublist sublist, Facets facets,
-    String localeString) throws AuthorizationDeniedException, GenericException;
+    String localeString) throws AuthorizationDeniedException, GenericException, RequestNotValidException;
 
   IndexResult<Job> findJobs(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
-    throws AuthorizationDeniedException, GenericException;
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException;
 
   Job retrieveJob(String jobId) throws AuthorizationDeniedException, GenericException, NotFoundException;
 
@@ -265,9 +283,9 @@ public interface BrowserService extends RemoteService {
   JobBundle retrieveJobBundle(String jobId) throws AuthorizationDeniedException, GenericException, NotFoundException;
 
   IndexResult<JobReport> findJobReports(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
-    throws GenericException;
+    throws GenericException, RequestNotValidException;
 
   List<Viewer> getViewersProperties() throws GenericException;
-  
-  Map<String,String> getSupportedMetadata(String locale) throws AuthorizationDeniedException, GenericException;
+
+  Map<String, String> getSupportedMetadata(String locale) throws AuthorizationDeniedException, GenericException;
 }

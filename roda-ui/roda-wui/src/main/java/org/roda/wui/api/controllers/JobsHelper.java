@@ -17,6 +17,7 @@ import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.InvalidParameterException;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IndexResult;
@@ -24,9 +25,7 @@ import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.Job.ORCHESTRATOR_METHOD;
 import org.roda.core.data.v2.JobReport;
 import org.roda.core.data.v2.RodaUser;
-import org.roda.core.index.IndexServiceException;
 import org.roda.core.plugins.Plugin;
-import org.roda.wui.common.client.GenericException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,25 +85,12 @@ public class JobsHelper {
   }
 
   public static Job retrieveJob(String jobId) throws NotFoundException, GenericException {
-    try {
-      return RodaCoreFactory.getIndexService().retrieve(Job.class, jobId);
-    } catch (IndexServiceException e) {
-      if (e.getCode() == IndexServiceException.NOT_FOUND) {
-        throw new NotFoundException("Job with id '" + jobId + "' was not found.");
-      } else {
-        throw new GenericException("Error getting Job with id '" + jobId + "'.");
-      }
-    }
+    return RodaCoreFactory.getIndexService().retrieve(Job.class, jobId);
   }
 
   public static IndexResult<Job> findJobs(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
-    throws GenericException {
-    try {
-      return RodaCoreFactory.getIndexService().find(Job.class, filter, sorter, sublist);
-    } catch (IndexServiceException e) {
-      LOGGER.error("Error getting jobs", e);
-      throw new GenericException("Error getting jobs: " + e.getMessage());
-    }
+    throws GenericException, RequestNotValidException {
+    return RodaCoreFactory.getIndexService().find(Job.class, filter, sorter, sublist);
   }
 
   public static org.roda.core.data.v2.Jobs getJobsFromIndexResult(IndexResult<Job> jobsFromIndexResult) {
@@ -118,13 +104,8 @@ public class JobsHelper {
   }
 
   public static IndexResult<JobReport> findJobReports(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
-    throws GenericException {
-    try {
-      return RodaCoreFactory.getIndexService().find(JobReport.class, filter, sorter, sublist);
-    } catch (IndexServiceException e) {
-      LOGGER.error("Error getting job reports", e);
-      throw new GenericException("Error getting job reports: " + e.getMessage());
-    }
+    throws GenericException, RequestNotValidException {
+    return RodaCoreFactory.getIndexService().find(JobReport.class, filter, sorter, sublist);
   }
 
 }

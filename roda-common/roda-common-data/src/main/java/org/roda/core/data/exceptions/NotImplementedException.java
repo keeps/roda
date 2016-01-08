@@ -5,7 +5,8 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.data.common;
+package org.roda.core.data.exceptions;
+
 
 /**
  * @author Hélder Silva <hsilva@keep.pt>

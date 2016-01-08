@@ -40,6 +40,10 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.RodaUtils;
+import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.AgentPreservationObject;
 import org.roda.core.data.v2.EventPreservationObject;
 import org.roda.core.data.v2.LogEntry;
@@ -54,7 +58,6 @@ import org.roda.core.storage.Binary;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StoragePath;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.StorageTestUtils;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
@@ -84,7 +87,7 @@ public class ModelServiceTest {
   private static final Logger logger = LoggerFactory.getLogger(ModelServiceTest.class);
 
   @BeforeClass
-  public static void setUp() throws IOException, StorageServiceException, URISyntaxException, ModelServiceException {
+  public static void setUp() throws IOException, URISyntaxException, GenericException {
     URL corporaURL = ModelServiceTest.class.getResource("/corpora");
     corporaPath = Paths.get(corporaURL.toURI());
     corporaService = new FileStorageService(corporaPath);
@@ -93,7 +96,7 @@ public class ModelServiceTest {
   }
 
   @Before
-  public void init() throws IOException, StorageServiceException {
+  public void init() throws IOException, GenericException {
     basePath = Files.createTempDirectory("modelTests");
     logPath = basePath.resolve("log");
     storage = new FileStorageService(basePath);
@@ -104,12 +107,12 @@ public class ModelServiceTest {
   }
 
   @After
-  public void cleanup() throws IOException, StorageServiceException {
+  public void cleanup() throws NotFoundException, GenericException {
     FSUtils.deletePath(basePath);
   }
 
   @Test
-  public void testCreateAIP() throws ModelServiceException, StorageServiceException, ParseException, IOException {
+  public void testCreateAIP() throws RODAException, ParseException, IOException {
 
     // generate AIP ID
     final String aipId = UUID.randomUUID().toString();
@@ -244,7 +247,7 @@ public class ModelServiceTest {
   }
 
   @Test
-  public void testDeleteAIP() throws ModelServiceException, StorageServiceException {
+  public void testDeleteAIP() throws RODAException {
     // generate AIP ID
     final String aipId = UUID.randomUUID().toString();
 
@@ -257,44 +260,44 @@ public class ModelServiceTest {
     try {
       model.retrieveAIP(aipId);
       fail("AIP should have been deleted, but yet was retrieved.");
-    } catch (ModelServiceException e) {
-      assertEquals(ModelServiceException.NOT_FOUND, e.getCode());
+    } catch (NotFoundException e) {
+      // do nothing as it was expected
     }
 
     // check if AIP sub-resources were recursively deleted
     try {
       model.retrieveDescriptiveMetadata(aipId, CorporaConstants.DESCRIPTIVE_METADATA_ID);
       fail("Descriptive metadata binary should have been deleted, but yet was retrieved.");
-    } catch (ModelServiceException e) {
-      assertEquals(ModelServiceException.NOT_FOUND, e.getCode());
+    } catch (NotFoundException e) {
+      // do nothing as it was expected
     }
 
     try {
       model.retrieveRepresentation(aipId, CorporaConstants.REPRESENTATION_1_ID);
       fail("Descriptive metadata binary should have been deleted, but yet was retrieved.");
-    } catch (ModelServiceException e) {
-      assertEquals(ModelServiceException.NOT_FOUND, e.getCode());
+    } catch (NotFoundException e) {
+      // do nothing as it was expected
     }
 
     try {
       model.retrieveRepresentation(aipId, CorporaConstants.REPRESENTATION_2_ID);
       fail("Representation should have been deleted, but yet was retrieved.");
-    } catch (ModelServiceException e) {
-      assertEquals(ModelServiceException.NOT_FOUND, e.getCode());
+    } catch (NotFoundException e) {
+      // do nothing as it was expected
     }
 
     try {
       model.retrieveFile(aipId, CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.REPRESENTATION_1_FILE_1_ID);
       fail("File should have been deleted, but yet was retrieved.");
-    } catch (ModelServiceException e) {
-      assertEquals(ModelServiceException.NOT_FOUND, e.getCode());
+    } catch (NotFoundException e) {
+      // do nothing as it was expected
     }
   }
 
   // TODO test if deleting AIP also deletes all sub-AIPs
 
   @Test
-  public void testListAIPs() throws ModelServiceException, StorageServiceException {
+  public void testListAIPs() throws RODAException {
     // generate AIP ID
     final String aip1Id = UUID.randomUUID().toString();
     final String aip2Id = UUID.randomUUID().toString();
@@ -313,7 +316,7 @@ public class ModelServiceTest {
   }
 
   @Test
-  public void testCreateAIPWithExistingId() throws ModelServiceException, StorageServiceException {
+  public void testCreateAIPWithExistingId() throws RODAException {
     // generate AIP ID
     final String aipId = UUID.randomUUID().toString();
 
@@ -324,13 +327,13 @@ public class ModelServiceTest {
       model.createAIP(aipId, corporaService,
         DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
       fail("AIP shouldn't have been created and yet it was.");
-    } catch (ModelServiceException e) {
-      assertEquals(ModelServiceException.ALREADY_EXISTS, e.getCode());
+    } catch (AlreadyExistsException e) {
+      // do nothing as it was expected
     }
   }
 
   @Test
-  public void testUpdateAIP() throws ModelServiceException, StorageServiceException, IOException {
+  public void testUpdateAIP() throws RODAException, IOException {
     // set up
     final String aipId = UUID.randomUUID().toString();
     model.createAIP(aipId, corporaService,
@@ -350,7 +353,7 @@ public class ModelServiceTest {
   }
 
   @Test
-  public void testListDescriptiveMetadata() throws ModelServiceException, StorageServiceException {
+  public void testListDescriptiveMetadata() throws RODAException {
     // set up
     final String aipId = UUID.randomUUID().toString();
     model.createAIP(aipId, corporaService,
@@ -364,7 +367,7 @@ public class ModelServiceTest {
   }
 
   @Test
-  public void testCreateDescriptiveMetadata() throws StorageServiceException, ModelServiceException, IOException {
+  public void testCreateDescriptiveMetadata() throws RODAException, IOException {
     // set up
     final String aipId = UUID.randomUUID().toString();
     model.createAIP(aipId, corporaService,
@@ -390,8 +393,7 @@ public class ModelServiceTest {
   }
 
   @Test
-  public void testUpdateDescriptiveMetadata()
-    throws StorageServiceException, ModelServiceException, IOException, ValidationException {
+  public void testUpdateDescriptiveMetadata() throws RODAException, IOException, ValidationException {
     // set up
     final String aipId = UUID.randomUUID().toString();
     model.createAIP(aipId, corporaService,
@@ -416,7 +418,7 @@ public class ModelServiceTest {
   }
 
   @Test
-  public void testDeleteDescriptiveMetadata() throws ModelServiceException, StorageServiceException {
+  public void testDeleteDescriptiveMetadata() throws RODAException {
     // set up
     final String aipId = UUID.randomUUID().toString();
     model.createAIP(aipId, corporaService,
@@ -428,13 +430,13 @@ public class ModelServiceTest {
     try {
       model.retrieveDescriptiveMetadata(aipId, CorporaConstants.DESCRIPTIVE_METADATA_ID);
       fail("Descriptive metadata deleted and yet exists.");
-    } catch (ModelServiceException e) {
-      assertEquals(ModelServiceException.NOT_FOUND, e.getCode());
+    } catch (NotFoundException e) {
+      // do nothing as it was expected
     }
   }
 
   @Test
-  public void testListRepresentations() throws ModelServiceException, StorageServiceException {
+  public void testListRepresentations() throws RODAException {
     // set up
     final String aipId = UUID.randomUUID().toString();
     model.createAIP(aipId, corporaService,
@@ -448,7 +450,7 @@ public class ModelServiceTest {
   }
 
   @Test
-  public void testCreateRepresentation() throws ModelServiceException, StorageServiceException, IOException {
+  public void testCreateRepresentation() throws RODAException, IOException {
     // set up
     final String aipId = UUID.randomUUID().toString();
     model.createAIP(aipId, corporaService,
@@ -470,7 +472,7 @@ public class ModelServiceTest {
   }
 
   @Test
-  public void testUpdateRepresentation() throws ModelServiceException, StorageServiceException, IOException {
+  public void testUpdateRepresentation() throws RODAException, IOException {
     // set up
     final String aipId = UUID.randomUUID().toString();
     model.createAIP(aipId, corporaService,
@@ -491,7 +493,7 @@ public class ModelServiceTest {
   }
 
   @Test
-  public void testDeleteRepresentation() throws ModelServiceException, StorageServiceException {
+  public void testDeleteRepresentation() throws RODAException {
     // set up
     final String aipId = UUID.randomUUID().toString();
     model.createAIP(aipId, corporaService,
@@ -503,21 +505,21 @@ public class ModelServiceTest {
     try {
       model.retrieveRepresentation(aipId, CorporaConstants.REPRESENTATION_1_ID);
       fail("Representation deleted and yet exists.");
-    } catch (ModelServiceException e) {
-      assertEquals(ModelServiceException.NOT_FOUND, e.getCode());
+    } catch (NotFoundException e) {
+      // do nothing as it was expected
     }
 
     // check if file under representation was deleted
     try {
       model.retrieveFile(aipId, CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.REPRESENTATION_1_FILE_1_ID);
       fail("Representation deleted and yet one of its files still exist.");
-    } catch (ModelServiceException e) {
-      assertEquals(ModelServiceException.NOT_FOUND, e.getCode());
+    } catch (NotFoundException e) {
+      // do nothing as it was expected
     }
   }
 
   @Test
-  public void testCreateFile() throws ModelServiceException, StorageServiceException, IOException {
+  public void testCreateFile() throws RODAException, IOException {
     // set up
     final String aipId = UUID.randomUUID().toString();
     model.createAIP(aipId, corporaService,
@@ -540,7 +542,7 @@ public class ModelServiceTest {
   }
 
   @Test
-  public void testUpdateFile() throws ModelServiceException, StorageServiceException, IOException {
+  public void testUpdateFile() throws RODAException, IOException {
     // set up
     final String aipId = UUID.randomUUID().toString();
     model.createAIP(aipId, corporaService,
@@ -566,7 +568,7 @@ public class ModelServiceTest {
   }
 
   @Test
-  public void testDeleteFile() throws ModelServiceException, StorageServiceException {
+  public void testDeleteFile() throws RODAException {
     // set up
     final String aipId = UUID.randomUUID().toString();
     model.createAIP(aipId, corporaService,
@@ -578,13 +580,13 @@ public class ModelServiceTest {
     try {
       model.retrieveFile(aipId, CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.REPRESENTATION_1_FILE_1_ID);
       fail("File deleted and yet exists.");
-    } catch (ModelServiceException e) {
-      assertEquals(ModelServiceException.NOT_FOUND, e.getCode());
+    } catch (NotFoundException e) {
+      // do nothing
     }
   }
 
   @Test
-  public void testRetrieveEventPreservationObject() throws ModelServiceException, StorageServiceException {
+  public void testRetrieveEventPreservationObject() throws RODAException {
     // set up
     final String aipId = UUID.randomUUID().toString();
     model.createAIP(aipId, corporaService,
@@ -597,7 +599,7 @@ public class ModelServiceTest {
   }
 
   @Test
-  public void testRepresentationFileObject() throws ModelServiceException, StorageServiceException {
+  public void testRepresentationFileObject() throws RODAException {
     // set up
     final String aipId = UUID.randomUUID().toString();
     model.createAIP(aipId, corporaService,
@@ -609,7 +611,7 @@ public class ModelServiceTest {
   }
 
   @Test
-  public void testRepresentationPreservationObject() throws ModelServiceException, StorageServiceException {
+  public void testRepresentationPreservationObject() throws RODAException {
     // set up
     final String aipId = UUID.randomUUID().toString();
     model.createAIP(aipId, corporaService,
@@ -620,7 +622,7 @@ public class ModelServiceTest {
   }
 
   @Test
-  public void testGetAipPreservationObjects() throws ModelServiceException, StorageServiceException {
+  public void testGetAipPreservationObjects() throws RODAException {
     // set up
     final String aipId = UUID.randomUUID().toString();
     model.createAIP(aipId, corporaService,
@@ -639,7 +641,7 @@ public class ModelServiceTest {
   }
 
   @Test
-  public void getAgentPreservationObject() throws ModelServiceException, StorageServiceException {
+  public void getAgentPreservationObject() throws RODAException {
     // pre-load the preservation container data
     DefaultStoragePath preservationContainerPath = DefaultStoragePath
       .parse(CorporaConstants.SOURCE_PRESERVATION_CONTAINER);
@@ -652,7 +654,7 @@ public class ModelServiceTest {
   }
 
   @Test
-  public void createLogEntry() throws ModelServiceException {
+  public void createLogEntry() throws RODAException {
     // setup
     createLogActionDirectory();
 
@@ -670,7 +672,7 @@ public class ModelServiceTest {
   }
 
   @Test
-  public void createSIPReport() throws ModelServiceException, StorageServiceException {
+  public void createSIPReport() throws RODAException {
     SIPReport state = new SIPReport();
     state.setComplete(true);
     state.setCompletePercentage(99.9F);

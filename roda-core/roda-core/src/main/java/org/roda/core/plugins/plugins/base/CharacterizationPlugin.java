@@ -16,9 +16,9 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
 import org.roda.core.data.common.InvalidParameterException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.PluginType;
 import org.roda.core.index.IndexService;
-import org.roda.core.index.IndexServiceException;
 import org.roda.core.model.AIP;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
@@ -27,7 +27,6 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.StoragePath;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.StorageServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,7 +89,7 @@ public class CharacterizationPlugin implements Plugin<AIP> {
             Map<String, String> characteristics = CharacterizationPluginUtils.getObjectCharacteristicsFields(
               aip.getId(), representationID, fileID, binary, RodaCoreFactory.getConfigPath());
             total = join(total, characteristics);
-          } catch (StorageServiceException | IndexServiceException mse) {
+          } catch (RODAException mse) {
             LOGGER.error("Error processing :" + aip.getId() + "/" + representationID + "/" + fileID);
           }
         }

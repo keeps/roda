@@ -24,18 +24,19 @@ import org.roda.core.common.PremisUtils;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
 import org.roda.core.data.common.InvalidParameterException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.PluginType;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.AIP;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.ModelServiceException;
 import org.roda.core.model.PreservationMetadata;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,16 +110,10 @@ public class V2ToV3PremisPlugin implements Plugin<AIP> {
                   Files.copy(binary.getContent().createInputStream(), pathFile, StandardCopyOption.REPLACE_EXISTING);
                   binary = PremisUtils.updatePremisToV3IfNeeded(binary, configPath);
                   model.updatePreservationMetadata(aip.getId(), representationID, pm.getId(), binary, true);
-                } catch (StorageServiceException sse) {
+                } catch (RODAException | SAXException | TransformerException sse) {
                   logger.error(
                     "Error processing premis metadata " + pm.getStoragePath().asString() + ": " + sse.getMessage(),
                     sse);
-                } catch (SAXException se) {
-                  logger.error(
-                    "Error processing premis metadata " + pm.getStoragePath().asString() + ": " + se.getMessage(), se);
-                } catch (TransformerException te) {
-                  logger.error(
-                    "Error processing premis metadata " + pm.getStoragePath().asString() + ": " + te.getMessage(), te);
                 }
               }
             } finally {
@@ -130,7 +125,7 @@ public class V2ToV3PremisPlugin implements Plugin<AIP> {
             }
 
           }
-        } catch (ModelServiceException mse) {
+        } catch (RODAException mse) {
           logger.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage(), mse);
         }
       }
@@ -139,7 +134,7 @@ public class V2ToV3PremisPlugin implements Plugin<AIP> {
     } finally {
       try {
         FSUtils.deletePath(temp);
-      } catch (StorageServiceException e) {
+      } catch (GenericException | NotFoundException e) {
         logger.error("Error removing temp files: " + e.getMessage(), e);
       }
     }

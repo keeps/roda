@@ -16,6 +16,10 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.SolrInputDocument;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.Group;
 import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.JobReport;
@@ -31,13 +35,11 @@ import org.roda.core.model.DescriptiveMetadata;
 import org.roda.core.model.File;
 import org.roda.core.model.ModelObserver;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.ModelServiceException;
 import org.roda.core.model.OtherMetadata;
 import org.roda.core.model.PreservationMetadata;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.StoragePath;
-import org.roda.core.storage.StorageServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,7 +83,8 @@ public class IndexModelObserver implements ModelObserver {
             representationPreservationMap.getKey(), fileId, binary);
           index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisEventDocument);
         }
-      } catch (SolrServerException | IOException | StorageServiceException | IndexServiceException e) {
+      } catch (SolrServerException | IOException | RequestNotValidException | GenericException | NotFoundException
+        | AuthorizationDeniedException e) {
         LOGGER.error("Could not index premis event", e);
       }
       try {
@@ -108,7 +111,8 @@ public class IndexModelObserver implements ModelObserver {
             fileId, binary);
           index.add(RodaConstants.INDEX_PRESERVATION_OBJECTS, premisFileDocument);
         }
-      } catch (SolrServerException | IOException | StorageServiceException | IndexServiceException e) {
+      } catch (SolrServerException | IOException | RequestNotValidException | GenericException | NotFoundException
+        | AuthorizationDeniedException e) {
         LOGGER.error("Could not index premis object", e);
       }
       try {
@@ -145,7 +149,8 @@ public class IndexModelObserver implements ModelObserver {
           }
         }
 
-      } catch (SolrServerException | IOException | ModelServiceException e) {
+      } catch (SolrServerException | IOException | RequestNotValidException | GenericException | NotFoundException
+        | AuthorizationDeniedException e) {
         LOGGER.error("Could not index representation", e);
       }
     }
@@ -175,8 +180,8 @@ public class IndexModelObserver implements ModelObserver {
       LOGGER.debug("Adding SDO: " + sdoDoc);
       index.add(RodaConstants.INDEX_SDO, sdoDoc);
       index.commit(RodaConstants.INDEX_SDO);
-    } catch (SolrException | SolrServerException | IOException | ModelServiceException | StorageServiceException
-      | IndexServiceException e) {
+    } catch (SolrException | SolrServerException | IOException | RequestNotValidException | GenericException
+      | NotFoundException | AuthorizationDeniedException e) {
       if (!safemode) {
         LOGGER.error("Error indexing AIP, trying safe mode", e);
         indexAIPandSDO(aip, true);
@@ -211,7 +216,7 @@ public class IndexModelObserver implements ModelObserver {
     // re-index whole AIP
     try {
       aipUpdated(model.retrieveAIP(descriptiveMetadata.getAipId()));
-    } catch (ModelServiceException e) {
+    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error when descriptive metadata created on retrieving the full AIP", e);
     }
   }
@@ -221,7 +226,7 @@ public class IndexModelObserver implements ModelObserver {
     // re-index whole AIP
     try {
       aipUpdated(model.retrieveAIP(descriptiveMetadata.getAipId()));
-    } catch (ModelServiceException e) {
+    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error when descriptive metadata created on retrieving the full AIP", e);
     }
 
@@ -232,10 +237,9 @@ public class IndexModelObserver implements ModelObserver {
     // re-index whole AIP
     try {
       aipUpdated(model.retrieveAIP(aipId));
-    } catch (ModelServiceException e) {
+    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error when descriptive metadata created on retrieving the full AIP", e);
     }
-
   }
 
   @Override
@@ -351,18 +355,17 @@ public class IndexModelObserver implements ModelObserver {
       }
 
       // aipUpdated(model.retrieveAIP(preservationMetadata.getAipId()));
-    } catch (StorageServiceException | ModelServiceException | IndexServiceException | IOException
-      | SolrServerException e) {
+    } catch (IOException | SolrServerException | GenericException | RequestNotValidException | NotFoundException
+      | AuthorizationDeniedException e) {
       LOGGER.error("Error when preservation metadata created on retrieving the full AIP", e);
     }
-
   }
 
   @Override
   public void preservationMetadataUpdated(PreservationMetadata preservationMetadata) {
     try {
       aipUpdated(model.retrieveAIP(preservationMetadata.getAipId()));
-    } catch (ModelServiceException e) {
+    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error when preservation metadata updated on retrieving the full AIP", e);
     }
   }
@@ -371,7 +374,7 @@ public class IndexModelObserver implements ModelObserver {
   public void preservationMetadataDeleted(String aipId, String representationId, String preservationMetadataBinaryId) {
     try {
       aipUpdated(model.retrieveAIP(aipId));
-    } catch (ModelServiceException e) {
+    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error when descriptive metadata deleted on retrieving the full AIP", e);
     }
   }
@@ -398,7 +401,7 @@ public class IndexModelObserver implements ModelObserver {
   public void otherMetadataCreated(OtherMetadata otherMetadataBinary) {
     try {
       indexOtherMetadata(model.retrieveAIP(otherMetadataBinary.getAipId()));
-    } catch (ModelServiceException e) {
+    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error when other metadata created on retrieving the full AIP", e);
     }
   }

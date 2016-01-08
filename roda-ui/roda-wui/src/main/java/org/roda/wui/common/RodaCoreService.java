@@ -12,13 +12,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.LogEntry;
 import org.roda.core.data.v2.LogEntryParameter;
 import org.roda.core.data.v2.RodaUser;
-import org.roda.core.model.ModelServiceException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class RodaCoreService {
   private static final Logger LOGGER = LoggerFactory.getLogger(RodaCoreService.class);
@@ -33,7 +33,7 @@ public abstract class RodaCoreService {
   protected static void registerAction(LogEntry logEntry) {
     try {
       RodaCoreFactory.getModelService().addLogEntry(logEntry, RodaCoreFactory.getLogPath());
-    } catch (ModelServiceException e) {
+    } catch (RODAException e) {
       LOGGER.error("Error registering action '" + logEntry.getActionComponent() + "'", e);
     }
   }

@@ -17,12 +17,13 @@ import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
-import org.roda.core.data.common.AuthorizationDeniedException;
-import org.roda.core.data.common.RODAException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.SIPReport;
-import org.roda.wui.common.client.GenericException;
 import org.roda.wui.common.client.PrintReportException;
 
 import com.google.gwt.core.client.GWT;
@@ -59,10 +60,11 @@ public interface IngestListService extends RemoteService {
     }
   }
 
-  public Long countSipReports(Filter filter) throws AuthorizationDeniedException, GenericException;
+  public Long countSipReports(Filter filter)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException;
 
   public IndexResult<SIPReport> findSipReports(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
-    throws AuthorizationDeniedException, GenericException;
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException;
 
   public SIPReport retrieveSipReport(String sipReportId)
     throws AuthorizationDeniedException, GenericException, NotFoundException;

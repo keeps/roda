@@ -10,7 +10,7 @@ package org.roda.core.storage;
 import java.util.Map;
 import java.util.Set;
 
-import org.roda.core.data.exceptions.ActionForbiddenException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -45,10 +45,10 @@ public interface StorageService {
    * @throws GenericException
    * @throws NotFoundException
    * @throws RequestNotValidException
-   * @throws ActionForbiddenException
+   * @throws AuthorizationDeniedException
    */
   public ClosableIterable<Container> listContainers()
-    throws GenericException, ActionForbiddenException, RequestNotValidException, NotFoundException;
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException;
 
   /**
    * Creates a new container with the specified name.
@@ -60,12 +60,12 @@ public interface StorageService {
    * 
    * @throws GenericException
    * @throws AlreadyExistsException
-   * @throws ActionForbiddenException
+   * @throws AuthorizationDeniedException
    * @throws RequestNotValidException
    * 
    */
   public Container createContainer(StoragePath storagePath, Map<String, Set<String>> metadata)
-    throws GenericException, AlreadyExistsException, ActionForbiddenException, RequestNotValidException;
+    throws GenericException, AlreadyExistsException, AuthorizationDeniedException, RequestNotValidException;
 
   /**
    * Get an existing container.
@@ -77,10 +77,10 @@ public interface StorageService {
    * @throws GenericException
    * @throws RequestNotValidException
    * @throws NotFoundException
-   * @throws ActionForbiddenException
+   * @throws AuthorizationDeniedException
    */
   public Container getContainer(StoragePath storagePath)
-    throws GenericException, RequestNotValidException, NotFoundException, ActionForbiddenException;
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException;
 
   /**
    * Delete an existing container.
@@ -90,10 +90,10 @@ public interface StorageService {
    * @return
    * @throws GenericException
    * @throws NotFoundException
-   * @throws ActionForbiddenException
+   * @throws AuthorizationDeniedException
    */
   public void deleteContainer(StoragePath storagePath)
-    throws NotFoundException, GenericException, ActionForbiddenException;
+    throws NotFoundException, GenericException, AuthorizationDeniedException;
 
   /**
    * List all resources directly under this container.
@@ -105,10 +105,10 @@ public interface StorageService {
    * @throws GenericException
    * @throws NotFoundException
    * @throws RequestNotValidException
-   * @throws ActionForbiddenException
+   * @throws AuthorizationDeniedException
    */
   public ClosableIterable<Resource> listResourcesUnderContainer(StoragePath storagePath)
-    throws NotFoundException, GenericException, ActionForbiddenException, RequestNotValidException;
+    throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException;
 
   /**
    * Count all resources directly under this container.
@@ -118,13 +118,13 @@ public interface StorageService {
    * @return
    * 
    * @throws StorageServiceException
-   * @throws ActionForbiddenException
+   * @throws AuthorizationDeniedException
    * @throws GenericException
    * @throws NotFoundException
    * @throws RequestNotValidException
    */
   public Long countResourcesUnderContainer(StoragePath storagePath)
-    throws ActionForbiddenException, RequestNotValidException, NotFoundException, GenericException;
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
 
   /**
    * Creates a new directory with the specified name.
@@ -136,11 +136,11 @@ public interface StorageService {
    * 
    * @throws AlreadyExistsException
    * @throws GenericException
-   * @throws ActionForbiddenException
+   * @throws AuthorizationDeniedException
    * 
    */
   public Directory createDirectory(StoragePath storagePath, Map<String, Set<String>> metadata)
-    throws AlreadyExistsException, GenericException, ActionForbiddenException;
+    throws AlreadyExistsException, GenericException, AuthorizationDeniedException;
 
   /**
    * Creates a new directory with a random name.
@@ -154,12 +154,12 @@ public interface StorageService {
    * @throws GenericException
    * @throws NotFoundException
    * @throws AlreadyExistsException
-   * @throws ActionForbiddenException
+   * @throws AuthorizationDeniedException
    * 
    */
   public Directory createRandomDirectory(StoragePath parentStoragePath, Map<String, Set<String>> metadata)
     throws RequestNotValidException, GenericException, NotFoundException, AlreadyExistsException,
-    ActionForbiddenException;
+    AuthorizationDeniedException;
 
   /**
    * Get an existing directory.
@@ -171,10 +171,10 @@ public interface StorageService {
    * @throws RequestNotValidException
    * @throws GenericException
    * @throws NotFoundException
-   * @throws ActionForbiddenException
+   * @throws AuthorizationDeniedException
    */
   public Directory getDirectory(StoragePath storagePath)
-    throws RequestNotValidException, NotFoundException, GenericException, ActionForbiddenException;
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException;
 
   /**
    * List all resources, container or binaries, directly under this directory.
@@ -186,10 +186,10 @@ public interface StorageService {
    * @throws GenericException
    * @throws NotFoundException
    * @throws RequestNotValidException
-   * @throws ActionForbiddenException
+   * @throws AuthorizationDeniedException
    */
   public ClosableIterable<Resource> listResourcesUnderDirectory(StoragePath storagePath)
-    throws NotFoundException, GenericException, ActionForbiddenException, RequestNotValidException;
+    throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException;
 
   /**
    * Count all resources, container or binaries, directly under this directory.
@@ -200,11 +200,11 @@ public interface StorageService {
    * 
    * @throws GenericException
    * @throws NotFoundException
-   * @throws ActionForbiddenException
+   * @throws AuthorizationDeniedException
    * @throws RequestNotValidException
    */
   public Long countResourcesUnderDirectory(StoragePath storagePath)
-    throws NotFoundException, GenericException, ActionForbiddenException, RequestNotValidException;
+    throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException;
 
   /**
    * Create a binary resource with a defined content.
@@ -222,12 +222,12 @@ public interface StorageService {
    * @throws GenericException
    * @throws AlreadyExistsException
    * @throws RequestNotValidException
-   * @throws ActionForbiddenException
+   * @throws AuthorizationDeniedException
    * @throws NotFoundException
    */
   public Binary createBinary(StoragePath storagePath, Map<String, Set<String>> metadata, ContentPayload payload,
     boolean asReference) throws GenericException, AlreadyExistsException, RequestNotValidException,
-      ActionForbiddenException, NotFoundException;
+      AuthorizationDeniedException, NotFoundException;
 
   /**
    * Create a binary resource with a defined content with a generated id.
@@ -245,12 +245,12 @@ public interface StorageService {
    * @throws StorageServiceException
    * @throws GenericException
    * @throws RequestNotValidException
-   * @throws ActionForbiddenException
+   * @throws AuthorizationDeniedException
    * @throws NotFoundException
    */
   public Binary createRandomBinary(StoragePath parentStoragePath, Map<String, Set<String>> metadata,
     ContentPayload payload, boolean asReference)
-      throws GenericException, RequestNotValidException, ActionForbiddenException, NotFoundException;
+      throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException;
 
   /**
    * Get an existing binary resource.
@@ -260,11 +260,11 @@ public interface StorageService {
    * @return
    * @throws NotFoundException
    * @throws RequestNotValidException
-   * @throws ActionForbiddenException
+   * @throws AuthorizationDeniedException
    * @throws StorageServiceException
    */
   public Binary getBinary(StoragePath storagePath)
-    throws GenericException, RequestNotValidException, NotFoundException, ActionForbiddenException;
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException;
 
   /**
    * Replace existing binary content with given one, not changing any associated
@@ -288,11 +288,11 @@ public interface StorageService {
    * @throws GenericException
    * @throws NotFoundException
    * @throws RequestNotValidException
-   * @throws ActionForbiddenException
+   * @throws AuthorizationDeniedException
    */
   public Binary updateBinaryContent(StoragePath storagePath, ContentPayload payload, boolean asReference,
     boolean createIfNotExists)
-      throws GenericException, NotFoundException, RequestNotValidException, ActionForbiddenException;
+      throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException;
 
   /**
    * Delete an existing resource, being it a container or a binary. If it is a
@@ -302,10 +302,10 @@ public interface StorageService {
    *          storage path that identifies the resource
    * @throws GenericException
    * @throws NotFoundException
-   * @throws ActionForbiddenException
+   * @throws AuthorizationDeniedException
    */
   public void deleteResource(StoragePath storagePath)
-    throws NotFoundException, GenericException, ActionForbiddenException;
+    throws NotFoundException, GenericException, AuthorizationDeniedException;
 
   /**
    * Get metadata associated to a resource.
@@ -314,12 +314,12 @@ public interface StorageService {
    *          storage path that identifies the resource
    * @return
    * @throws GenericException
-   * @throws ActionForbiddenException
+   * @throws AuthorizationDeniedException
    * @throws RequestNotValidException
    * @throws NotFoundException
    */
   public Map<String, Set<String>> getMetadata(StoragePath storagePath)
-    throws GenericException, ActionForbiddenException, RequestNotValidException, NotFoundException;
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException;
 
   /**
    * Update metadata associated with a container.
@@ -333,11 +333,11 @@ public interface StorageService {
    *          with the new ones)
    * @throws GenericException
    * @throws RequestNotValidException
-   * @throws ActionForbiddenException
+   * @throws AuthorizationDeniedException
    * @throws NotFoundException
    */
   public Map<String, Set<String>> updateMetadata(StoragePath storagePath, Map<String, Set<String>> metadata,
-    boolean replaceAll) throws GenericException, RequestNotValidException, ActionForbiddenException, NotFoundException;
+    boolean replaceAll) throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException;
 
   /**
    * Get entity class
@@ -346,11 +346,11 @@ public interface StorageService {
    *          storage path that identifies the resource
    * @throws GenericException
    * @throws NotFoundException
-   * @throws ActionForbiddenException
+   * @throws AuthorizationDeniedException
    * @throws RequestNotValidException
    */
   public Class<? extends Entity> getEntity(StoragePath storagePath)
-    throws GenericException, RequestNotValidException, ActionForbiddenException, NotFoundException;
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException;
 
   /**
    * TODO
@@ -366,12 +366,12 @@ public interface StorageService {
    * @throws AlreadyExistsException
    * @throws NotFoundException
    * @throws RequestNotValidException
-   * @throws ActionForbiddenException
+   * @throws AuthorizationDeniedException
    * @throws StorageServiceException
    */
   public void copy(StorageService fromService, StoragePath fromStoragePath, StoragePath toStoragePath)
     throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
-    ActionForbiddenException;
+    AuthorizationDeniedException;
 
   /**
    * TODO
@@ -387,10 +387,10 @@ public interface StorageService {
    * @throws AlreadyExistsException
    * @throws NotFoundException
    * @throws RequestNotValidException
-   * @throws ActionForbiddenException
+   * @throws AuthorizationDeniedException
    */
   public void move(StorageService fromService, StoragePath fromStoragePath, StoragePath toStoragePath)
     throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
-    ActionForbiddenException;
+    AuthorizationDeniedException;
 
 }

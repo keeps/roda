@@ -19,19 +19,18 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.jasig.cas.client.util.CommonUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.RODAMember;
 import org.roda.core.data.v2.RodaSimpleUser;
 import org.roda.core.data.v2.RodaUser;
 import org.roda.core.data.v2.User;
-import org.roda.core.index.IndexServiceException;
-import org.roda.core.model.ModelServiceException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Servlet Filter implementation class RolesSetterFilter
@@ -75,8 +74,8 @@ public class RodaCasAuthenticationFilter implements Filter {
   /**
    * @see Filter#doFilter(ServletRequest, ServletResponse, FilterChain)
    */
-  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
-    ServletException {
+  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+    throws IOException, ServletException {
     try {
       HttpServletRequest servletRequest = (HttpServletRequest) request;
       HttpServletResponse servletResponse = (HttpServletResponse) response;
@@ -118,7 +117,7 @@ public class RodaCasAuthenticationFilter implements Filter {
     try {
       User user = new User(new RodaUser(userPrincipal));
       RodaCoreFactory.getModelService().addUser(user, true, true);
-    } catch (ModelServiceException e) {
+    } catch (RODAException e) {
       logger.error("Error while creating and indexing user", e);
     }
   }
@@ -138,7 +137,7 @@ public class RodaCasAuthenticationFilter implements Filter {
     try {
       Long count = RodaCoreFactory.getIndexService().count(RODAMember.class, filter);
       exist = (count == 1);
-    } catch (IndexServiceException e) {
+    } catch (RODAException e) {
       exist = false;
     }
 

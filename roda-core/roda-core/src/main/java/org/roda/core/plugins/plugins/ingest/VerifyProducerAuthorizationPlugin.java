@@ -17,11 +17,12 @@ import org.roda.core.data.Report;
 import org.roda.core.data.ReportItem;
 import org.roda.core.data.common.InvalidParameterException;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.JobReport.PluginState;
 import org.roda.core.data.v2.PluginType;
 import org.roda.core.index.IndexService;
-import org.roda.core.index.IndexServiceException;
 import org.roda.core.model.AIP;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
@@ -99,8 +100,8 @@ public class VerifyProducerAuthorizationPlugin implements Plugin<AIP> {
       try {
         PluginUtils.updateJobReport(model, index, this, reportItem, state, PluginUtils.getJobId(parameters),
           aip.getId());
-      } catch (IndexServiceException | NotFoundException e) {
-        LOGGER.error("", e);
+      } catch (NotFoundException | GenericException | RequestNotValidException e) {
+        LOGGER.error("Error updating job report", e);
       }
     }
 

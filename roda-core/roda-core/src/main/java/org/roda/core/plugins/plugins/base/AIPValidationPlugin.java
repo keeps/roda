@@ -17,18 +17,17 @@ import org.roda.core.common.ValidationUtils;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
 import org.roda.core.data.common.InvalidParameterException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.EventPreservationObject;
 import org.roda.core.data.v2.PluginType;
 import org.roda.core.index.IndexService;
 import org.roda.core.metadata.v2.premis.PremisMetadataException;
 import org.roda.core.model.AIP;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.ModelServiceException;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginUtils;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.StorageServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,7 +94,7 @@ public class AIPValidationPlugin implements Plugin<AIP> {
           LOGGER.debug("Done with validating AIP " + aip.getId() + ": invalid!");
         }
         createEvent(aip, model, descriptiveValid, preservationValid);
-      } catch (ModelServiceException mse) {
+      } catch (RODAException mse) {
         LOGGER.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage(), mse);
       }
     }
@@ -115,7 +114,7 @@ public class AIPValidationPlugin implements Plugin<AIP> {
           EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_INGEST_TASK, "AGENT ID",
           Arrays.asList(representationID), success ? "success" : "error", "Report", "");
       }
-    } catch (PremisMetadataException | IOException | StorageServiceException | ModelServiceException e) {
+    } catch (PremisMetadataException | IOException | RODAException e) {
       throw new PluginException(e.getMessage(), e);
     }
 

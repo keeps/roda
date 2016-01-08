@@ -22,23 +22,24 @@ import org.roda.core.data.Report;
 import org.roda.core.data.ReportItem;
 import org.roda.core.data.common.InvalidParameterException;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.EventPreservationObject;
 import org.roda.core.data.v2.JobReport.PluginState;
 import org.roda.core.data.v2.PluginType;
 import org.roda.core.index.IndexService;
-import org.roda.core.index.IndexServiceException;
 import org.roda.core.metadata.v2.premis.PremisMetadataException;
 import org.roda.core.model.AIP;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.ModelServiceException;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginUtils;
 import org.roda.core.storage.StoragePath;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
@@ -140,33 +141,20 @@ public class AntivirusPlugin implements Plugin<AIP> {
           .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, virusCheckResult.getReport()));
         LOGGER.debug("Done with checking if AIP " + aip.getId() + " has virus. Is clean of virus: "
           + virusCheckResult.isClean() + ". Virus check report: " + virusCheckResult.getReport());
-      } catch (RuntimeException e) {
+      } catch (RuntimeException | IOException | RequestNotValidException | AlreadyExistsException | GenericException
+        | NotFoundException | AuthorizationDeniedException e) {
         state = PluginState.ERROR;
         reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()))
           .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
 
         exception = e;
         LOGGER.error("Error processing AIP " + aip.getId(), e);
-      } catch (StorageServiceException e) {
-        state = PluginState.ERROR;
-        reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()))
-          .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
-
-        exception = e;
-        LOGGER.error("Error processing AIP " + aip.getId(), e);
-      } catch (IOException e) {
-        state = PluginState.ERROR;
-        reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()))
-          .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
-
-        exception = e;
-        LOGGER.error("Error creating temp folder for AIP " + aip.getId(), e);
       } finally {
         try {
           if (tempDirectory != null) {
             FSUtils.deletePath(tempDirectory);
           }
-        } catch (StorageServiceException e) {
+        } catch (GenericException | NotFoundException e) {
           LOGGER.error("Error removing temp storage", e);
         }
       }
@@ -177,8 +165,8 @@ public class AntivirusPlugin implements Plugin<AIP> {
       try {
         PluginUtils.updateJobReport(model, index, this, reportItem, state, PluginUtils.getJobId(parameters),
           aip.getId());
-      } catch (IndexServiceException | NotFoundException e) {
-        LOGGER.error("", e);
+      } catch (NotFoundException | GenericException | RequestNotValidException e) {
+        LOGGER.error("Error updating job report", e);
       }
     }
 
@@ -199,8 +187,9 @@ public class AntivirusPlugin implements Plugin<AIP> {
           Arrays.asList(representationID), success ? "success" : "error", success ? "Report" : "Error",
           success ? virusCheckResult.getReport() : exception.getMessage());
       }
-    } catch (PremisMetadataException | IOException | StorageServiceException | ModelServiceException e) {
-      throw new PluginException(e.getMessage(), e);
+    } catch (PremisMetadataException | IOException | RequestNotValidException | NotFoundException | GenericException
+      | AuthorizationDeniedException e) {
+      throw new PluginException("Error while creating the event", e);
     }
 
     // TODO agent

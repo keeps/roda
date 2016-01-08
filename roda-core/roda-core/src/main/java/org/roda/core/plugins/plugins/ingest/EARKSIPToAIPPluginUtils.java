@@ -16,12 +16,16 @@ import java.util.Map;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.model.AIP;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.ModelServiceException;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda_project.commons_ip.model.MigrationException;
 import org.roda_project.commons_ip.model.SIP;
@@ -34,14 +38,16 @@ public class EARKSIPToAIPPluginUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(EARKSIPToAIPPluginUtils.class);
 
   public static AIP earkSIPToAip(SIP sip, Path sipPath, ModelService model, StorageService storage)
-    throws IOException, StorageServiceException, ModelServiceException, MigrationException {
+    throws IOException, MigrationException, RequestNotValidException, NotFoundException, GenericException,
+    AlreadyExistsException, AuthorizationDeniedException {
 
     Map<String, Set<String>> metadata = new HashMap<String, Set<String>>();
     if (sip.getParentID() != null) {
       try {
         model.retrieveAIP(sip.getParentID());
         metadata.put(RodaConstants.STORAGE_META_PARENT_ID, new HashSet<String>(Arrays.asList(sip.getParentID())));
-      } catch (ModelServiceException mse) {
+      } catch (RODAException mse) {
+        LOGGER.warn("Could not retrieve parent AIP");
       }
     }
     AIP aip = model.createAIP(metadata, false, true);

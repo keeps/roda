@@ -23,20 +23,21 @@ import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.LogEntry;
 import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.AIP;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.ModelServiceException;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.Resource;
-import org.roda.core.storage.StorageServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,13 +58,12 @@ public class IndexService {
     model.addModelObserver(observer);
   }
 
-  public SimpleDescriptionObject getParent(SimpleDescriptionObject sdo)
-    throws IndexServiceException, NotFoundException {
+  public SimpleDescriptionObject getParent(SimpleDescriptionObject sdo) throws NotFoundException, GenericException {
     return SolrUtils.retrieve(index, SimpleDescriptionObject.class, sdo.getParentID());
   }
 
   public List<SimpleDescriptionObject> getAncestors(SimpleDescriptionObject sdo)
-    throws IndexServiceException, NotFoundException {
+    throws NotFoundException, GenericException {
     List<SimpleDescriptionObject> ancestors = new ArrayList<SimpleDescriptionObject>();
     SimpleDescriptionObject parent = null, actual = sdo;
 
@@ -78,28 +78,30 @@ public class IndexService {
     return ancestors;
   }
 
-  public <T extends Serializable> Long count(Class<T> returnClass, Filter filter) throws IndexServiceException {
+  public <T extends Serializable> Long count(Class<T> returnClass, Filter filter)
+    throws GenericException, RequestNotValidException {
     return SolrUtils.count(index, returnClass, filter);
   }
 
   public <T extends Serializable> IndexResult<T> find(Class<T> returnClass, Filter filter, Sorter sorter,
-    Sublist sublist) throws IndexServiceException {
+    Sublist sublist) throws GenericException, RequestNotValidException {
     Facets facets = null;
     return SolrUtils.find(index, returnClass, filter, sorter, sublist, facets);
 
   }
 
   public <T extends Serializable> IndexResult<T> find(Class<T> returnClass, Filter filter, Sorter sorter,
-    Sublist sublist, Facets facets) throws IndexServiceException {
+    Sublist sublist, Facets facets) throws GenericException, RequestNotValidException {
     return SolrUtils.find(index, returnClass, filter, sorter, sublist, facets);
   }
 
   public <T extends Serializable> T retrieve(Class<T> returnClass, String... ids)
-    throws IndexServiceException, NotFoundException {
+    throws NotFoundException, GenericException {
     return SolrUtils.retrieve(index, returnClass, ids);
   }
 
-  public void reindexAIPs() throws IndexServiceException {
+  public void reindexAIPs()
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     ClosableIterable<AIP> aips = null;
     try {
       LOGGER.info(new Date().getTime() + " > Listing AIPs");
@@ -115,8 +117,6 @@ public class IndexService {
       LOGGER.info(new Date().getTime() + " > Optimizing indexes");
       optimizeAIPs();
       LOGGER.info(new Date().getTime() + " > Done");
-    } catch (ModelServiceException e) {
-      throw new IndexServiceException("Error while reindexing AIPs", IndexServiceException.INTERNAL_SERVER_ERROR, e);
     } finally {
       try {
         if (aips != null) {
@@ -128,7 +128,7 @@ public class IndexService {
     }
   }
 
-  public void optimizeAIPs() throws IndexServiceException {
+  public void optimizeAIPs() throws GenericException {
     try {
       index.optimize(RodaConstants.INDEX_AIP);
       index.optimize(RodaConstants.INDEX_SDO);
@@ -137,7 +137,7 @@ public class IndexService {
       index.optimize(RodaConstants.INDEX_PRESERVATION_EVENTS);
       index.optimize(RodaConstants.INDEX_PRESERVATION_OBJECTS);
     } catch (SolrServerException | IOException e) {
-      throw new IndexServiceException("Error while optimizing indexes", IndexServiceException.INTERNAL_SERVER_ERROR, e);
+      throw new GenericException("Error while optimizing indexes", e);
     }
   }
 
@@ -145,7 +145,8 @@ public class IndexService {
     observer.aipCreated(aip);
   }
 
-  public void reindexActionLogs() throws IndexServiceException {
+  public void reindexActionLogs()
+    throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
     ClosableIterable<Resource> actionLogs = null;
 
     try {
@@ -158,9 +159,8 @@ public class IndexService {
 
         reindexActionLog(br);
       }
-    } catch (StorageServiceException | IOException e) {
-      throw new IndexServiceException("Error retrieving/processing logs from storage",
-        IndexServiceException.INTERNAL_SERVER_ERROR, e);
+    } catch (IOException e) {
+      throw new GenericException("Error retrieving/processing logs from storage", e);
     } finally {
       if (actionLogs != null) {
         try {
@@ -187,7 +187,7 @@ public class IndexService {
     observer.logEntryCreated(entry);
   }
 
-  public void deleteAllActionLog() throws IndexServiceException {
+  public void deleteAllActionLog() throws GenericException {
     clearIndex(RodaConstants.INDEX_ACTION_LOG);
   }
 
@@ -200,22 +200,21 @@ public class IndexService {
 
   }
 
-  public void clearIndex(String indexName) throws IndexServiceException {
+  public void clearIndex(String indexName) throws GenericException {
     try {
       index.deleteByQuery(indexName, "*:*");
       index.commit(indexName);
     } catch (SolrServerException | IOException e) {
       LOGGER.error("Error cleaning up index " + indexName, e);
-      throw new IndexServiceException("Error cleaning up index " + indexName,
-        IndexServiceException.INTERNAL_SERVER_ERROR, e);
+      throw new GenericException("Error cleaning up index " + indexName, e);
     }
   }
 
-  public void optimizeIndex(String indexName) throws IndexServiceException {
+  public void optimizeIndex(String indexName) throws GenericException {
     try {
       index.optimize(indexName);
     } catch (SolrServerException | IOException e) {
-      throw new IndexServiceException("Error while optimizing indexes", IndexServiceException.INTERNAL_SERVER_ERROR, e);
+      throw new GenericException("Error while optimizing indexes", e);
     }
   }
 

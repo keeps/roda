@@ -76,7 +76,10 @@ import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.DateGranularity;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.AgentPreservationObject;
 import org.roda.core.data.v2.EventPreservationObject;
 import org.roda.core.data.v2.FacetFieldResult;
@@ -104,15 +107,12 @@ import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.core.data.v2.SimpleFile;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.data.v2.User;
-import org.roda.core.index.IndexServiceException;
 import org.roda.core.model.AIP;
 import org.roda.core.model.DescriptiveMetadata;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.ModelServiceException;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.StoragePath;
-import org.roda.core.storage.StorageServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -145,7 +145,7 @@ public class SolrUtils {
   }
 
   public static <T extends Serializable> IndexResult<T> queryResponseToIndexResult(QueryResponse response,
-    Class<T> responseClass, Facets facets) throws IndexServiceException {
+    Class<T> responseClass, Facets facets) throws GenericException {
     final SolrDocumentList docList = response.getResults();
     final List<FacetFieldResult> facetResults = processFacetFields(facets, response.getFacetFields());
     final long offset = docList.getStart();
@@ -180,7 +180,7 @@ public class SolrUtils {
 
   }
 
-  public static SolrInputDocument getDescriptiveMetataFields(Binary binary) throws IndexServiceException {
+  public static SolrInputDocument getDescriptiveMetataFields(Binary binary) throws GenericException {
     SolrInputDocument doc;
     InputStream inputStream;
     String xsltFilename = null;
@@ -247,9 +247,8 @@ public class SolrUtils {
       transformationResult.close();
 
     } catch (IOException | TransformerException | XMLStreamException | FactoryConfigurationError e) {
-      throw new IndexServiceException(
-        "Could not process descriptive metadata binary " + binary.getStoragePath() + " using xslt " + xsltFilename,
-        IndexServiceException.INTERNAL_SERVER_ERROR, e);
+      throw new GenericException(
+        "Could not process descriptive metadata binary " + binary.getStoragePath() + " using xslt " + xsltFilename, e);
     }
     return validateDescriptiveMetadataFields(doc);
   }
@@ -283,7 +282,7 @@ public class SolrUtils {
     return doc;
   }
 
-  public static String parseFilter(Filter filter) throws IndexServiceException {
+  public static String parseFilter(Filter filter) throws RequestNotValidException {
     StringBuilder ret = new StringBuilder();
 
     if (filter == null || filter.getParameters().isEmpty()) {
@@ -302,7 +301,8 @@ public class SolrUtils {
     return ret.toString();
   }
 
-  private static void parseFilterParameter(StringBuilder ret, FilterParameter parameter) throws IndexServiceException {
+  private static void parseFilterParameter(StringBuilder ret, FilterParameter parameter)
+    throws RequestNotValidException {
     if (parameter instanceof SimpleFilterParameter) {
       SimpleFilterParameter simplePar = (SimpleFilterParameter) parameter;
       appendExactMatch(ret, simplePar.getName(), simplePar.getValue(), true, true);
@@ -329,8 +329,7 @@ public class SolrUtils {
       appendRange(ret, param.getName(), Long.class, param.getFromValue(), Long.class, param.getToValue());
     } else {
       LOGGER.error("Unsupported filter parameter class: " + parameter.getClass().getName());
-      throw new IndexServiceException("Unsupported filter parameter class: " + parameter.getClass().getName(),
-        IndexServiceException.BAD_REQUEST);
+      throw new RequestNotValidException("Unsupported filter parameter class: " + parameter.getClass().getName());
     }
   }
 
@@ -444,7 +443,7 @@ public class SolrUtils {
     }
   }
 
-  public static List<SortClause> parseSorter(Sorter sorter) throws IndexServiceException {
+  public static List<SortClause> parseSorter(Sorter sorter) {
     List<SortClause> ret = new ArrayList<SortClause>();
     if (sorter != null) {
       for (SortParameter sortParameter : sorter.getParameters()) {
@@ -454,7 +453,7 @@ public class SolrUtils {
     return ret;
   }
 
-  private static void parseAndConfigureFacets(Facets facets, SolrQuery query) throws IndexServiceException {
+  private static void parseAndConfigureFacets(Facets facets, SolrQuery query) {
     if (facets != null) {
       query.setFacetSort(FacetParams.FACET_SORT_INDEX);
       if (!"".equals(facets.getQuery())) {
@@ -692,7 +691,7 @@ public class SolrUtils {
   }
 
   // TODO: Handle SimpleRepresentationPreservationMetadata
-  private static <T> String getIndexName(Class<T> resultClass) throws IndexServiceException {
+  private static <T> String getIndexName(Class<T> resultClass) throws GenericException {
     String indexName;
     if (resultClass.equals(AIP.class)) {
       indexName = RodaConstants.INDEX_AIP;
@@ -725,13 +724,12 @@ public class SolrUtils {
     } else if (resultClass.equals(SimpleFile.class)) {
       indexName = RodaConstants.INDEX_FILE;
     } else {
-      throw new IndexServiceException("Cannot find class index name: " + resultClass.getName(),
-        IndexServiceException.INTERNAL_SERVER_ERROR);
+      throw new GenericException("Cannot find class index name: " + resultClass.getName());
     }
     return indexName;
   }
 
-  private static <T> T solrDocumentTo(Class<T> resultClass, SolrDocument doc) throws IndexServiceException {
+  private static <T> T solrDocumentTo(Class<T> resultClass, SolrDocument doc) throws GenericException {
     T ret;
     if (resultClass.equals(AIP.class)) {
       ret = resultClass.cast(solrDocumentToAIP(doc));
@@ -761,15 +759,14 @@ public class SolrUtils {
     } else if (resultClass.equals(SimpleFile.class)) {
       ret = resultClass.cast(solrDocumentToFile(doc));
     } else {
-      throw new IndexServiceException("Cannot find class index name: " + resultClass.getName(),
-        IndexServiceException.INTERNAL_SERVER_ERROR);
+      throw new GenericException("Cannot find class index name: " + resultClass.getName());
     }
     return ret;
 
   }
 
   public static <T> T retrieve(SolrClient index, Class<T> classToRetrieve, String... ids)
-    throws IndexServiceException, NotFoundException {
+    throws NotFoundException, GenericException {
     T ret;
     String id = SolrUtils.getId(ids);
     try {
@@ -780,19 +777,18 @@ public class SolrUtils {
         throw new NotFoundException("Could not find document " + id);
       }
     } catch (SolrServerException | IOException e) {
-      throw new IndexServiceException("Could not retrieve AIP from index", IndexServiceException.INTERNAL_SERVER_ERROR,
-        e);
+      throw new GenericException("Could not retrieve AIP from index", e);
     }
     return ret;
   }
 
   public static <T extends Serializable> IndexResult<T> find(SolrClient index, Class<T> classToRetrieve, Filter filter,
-    Sorter sorter, Sublist sublist) throws IndexServiceException {
+    Sorter sorter, Sublist sublist) throws GenericException, RequestNotValidException {
     return find(index, classToRetrieve, filter, sorter, sublist, null);
   }
 
   public static <T extends Serializable> IndexResult<T> find(SolrClient index, Class<T> classToRetrieve, Filter filter,
-    Sorter sorter, Sublist sublist, Facets facets) throws IndexServiceException {
+    Sorter sorter, Sublist sublist, Facets facets) throws GenericException, RequestNotValidException {
     IndexResult<T> ret;
     SolrQuery query = new SolrQuery();
     String queryString = parseFilter(filter);
@@ -808,14 +804,14 @@ public class SolrUtils {
       QueryResponse response = index.query(getIndexName(classToRetrieve), query);
       ret = queryResponseToIndexResult(response, classToRetrieve, facets);
     } catch (SolrServerException | IOException e) {
-      throw new IndexServiceException("Could not query index", IndexServiceException.INTERNAL_SERVER_ERROR, e);
+      throw new GenericException("Could not query index", e);
     }
 
     return ret;
   }
 
   public static <T extends Serializable> Long count(SolrClient index, Class<T> classToRetrieve, Filter filter)
-    throws IndexServiceException {
+    throws GenericException, RequestNotValidException {
     return find(index, classToRetrieve, filter, null, new Sublist(0, 0)).getTotalCount();
   }
 
@@ -886,7 +882,7 @@ public class SolrUtils {
   }
 
   public static SolrInputDocument aipToSolrInputDocumentAsSDO(AIP aip, ModelService model, boolean safemode)
-    throws ModelServiceException, StorageServiceException, IndexServiceException {
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     final SolrInputDocument ret = new SolrInputDocument();
     final String aipId = aip.getId();
 
@@ -912,7 +908,7 @@ public class SolrUtils {
           for (SolrInputField field : fields) {
             ret.addField(field.getName(), field.getValue(), field.getBoost());
           }
-        } catch (IndexServiceException ise) {
+        } catch (GenericException ise) {
           // TODO index the index errors for later processing
           LOGGER.warn("Error processing descriptive metadata " + descId + " from AIP " + aipId);
         } catch (Throwable e) {
@@ -1241,7 +1237,7 @@ public class SolrUtils {
   }
 
   public static SolrInputDocument premisToSolr(String aipID, String representationID, String fileID, Binary binary)
-    throws IndexServiceException {
+    throws GenericException {
     SolrInputDocument doc;
     InputStream inputStream;
     try {
@@ -1282,8 +1278,8 @@ public class SolrUtils {
       transformationResult.close();
 
     } catch (IOException | TransformerException | XMLStreamException | FactoryConfigurationError e) {
-      throw new IndexServiceException("Could not process descriptive metadata binary " + binary.getStoragePath()
-        + " using xslt " + "crosswalks/ingest/other/premis.xslt", IndexServiceException.INTERNAL_SERVER_ERROR, e);
+      throw new GenericException("Could not process descriptive metadata binary " + binary.getStoragePath()
+        + " using xslt " + "crosswalks/ingest/other/premis.xslt", e);
     }
     String id = SolrUtils.getId(aipID, representationID, fileID);
     doc.setField("id", id);

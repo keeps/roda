@@ -42,12 +42,13 @@ import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sort.SortParameter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.index.IndexServiceException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.fs.FileStorageService;
 
 public class SolrUtilsTest {
@@ -55,14 +56,14 @@ public class SolrUtilsTest {
   private static StorageService corporaService;
 
   @BeforeClass
-  public static void setUp() throws StorageServiceException, URISyntaxException {
+  public static void setUp() throws URISyntaxException, GenericException {
     URL corporaURL = IndexServiceTest.class.getResource("/corpora");
     Path corporaPath = Paths.get(corporaURL.toURI());
     corporaService = new FileStorageService(corporaPath);
   }
 
   @Test
-  public void testGetDescriptiveMetataFields() throws StorageServiceException, IndexServiceException {
+  public void testGetDescriptiveMetataFields() throws RODAException {
     final DefaultStoragePath strangeMetadataPath = DefaultStoragePath
       .parse(CorporaConstants.SOURCE_DESC_METADATA_CONTAINER, CorporaConstants.STRANGE_DESC_METADATA_FILE);
     Binary strangeMetadata = corporaService.getBinary(strangeMetadataPath);
@@ -91,7 +92,7 @@ public class SolrUtilsTest {
       stringFilter = SolrUtils.parseFilter(filter);
       assertNotNull(stringFilter);
       assertEquals("*:*", stringFilter);
-    } catch (IndexServiceException e) {
+    } catch (RODAException e) {
       fail("An exception was not expected!");
     }
 
@@ -101,7 +102,7 @@ public class SolrUtilsTest {
       stringFilter = SolrUtils.parseFilter(filter);
       assertNotNull(stringFilter);
       assertEquals("*:*", stringFilter);
-    } catch (IndexServiceException e) {
+    } catch (RODAException e) {
       fail("An exception was not expected!");
     }
 
@@ -112,7 +113,7 @@ public class SolrUtilsTest {
       stringFilter = SolrUtils.parseFilter(filter);
       assertNotNull(stringFilter);
       assertEquals(String.format("(%s: \"%s\")", RodaConstants.SDO__ALL, fonds), stringFilter);
-    } catch (IndexServiceException e) {
+    } catch (RODAException e) {
       fail("An exception was not expected!");
     }
 
@@ -127,7 +128,7 @@ public class SolrUtilsTest {
       assertEquals(
         String.format("(%s: \"%s\") AND (%s: \"%s\")", RodaConstants.SDO__ALL, fonds, RodaConstants.SDO__ALL, series),
         stringFilter);
-    } catch (IndexServiceException e) {
+    } catch (RODAException e) {
       fail("An exception was not expected!");
     }
 
@@ -141,7 +142,7 @@ public class SolrUtilsTest {
       assertEquals(
         String.format("((%s: \"%s\") OR (%s: \"%s\"))", RodaConstants.SDO__ALL, fonds, RodaConstants.SDO__ALL, series),
         stringFilter);
-    } catch (IndexServiceException e) {
+    } catch (RODAException e) {
       fail("An exception was not expected!");
     }
 
@@ -151,8 +152,8 @@ public class SolrUtilsTest {
       filter.add(new ClassificationSchemeFilterParameter());
       stringFilter = SolrUtils.parseFilter(filter);
       fail("An exception should have been thrown but it wasn't!");
-    } catch (IndexServiceException e) {
-      assertEquals(IndexServiceException.BAD_REQUEST, e.getCode());
+    } catch (RequestNotValidException e) {
+      // do nothing as it was expected
     }
 
     // 7) filter with one LikeFilterParameter
@@ -161,8 +162,8 @@ public class SolrUtilsTest {
       filter.add(new LikeFilterParameter());
       stringFilter = SolrUtils.parseFilter(filter);
       fail("An exception should have been thrown but it wasn't!");
-    } catch (IndexServiceException e) {
-      assertEquals(IndexServiceException.BAD_REQUEST, e.getCode());
+    } catch (RequestNotValidException e) {
+      // do nothing as it was expected
     }
 
     // 8) filter with one ProducerFilterParameter
@@ -171,8 +172,8 @@ public class SolrUtilsTest {
       filter.add(new ProducerFilterParameter());
       stringFilter = SolrUtils.parseFilter(filter);
       fail("An exception should have been thrown but it wasn't!");
-    } catch (IndexServiceException e) {
-      assertEquals(IndexServiceException.BAD_REQUEST, e.getCode());
+    } catch (RequestNotValidException e) {
+      // do nothing as it was expected
     }
 
     // 9) filter with one empty DateRangeFilterParameter
@@ -182,8 +183,8 @@ public class SolrUtilsTest {
       stringFilter = SolrUtils.parseFilter(filter);
       assertNotNull(stringFilter);
       assertThat(stringFilter, Matchers.is("*:*"));
-    } catch (IndexServiceException e) {
-      assertEquals(IndexServiceException.BAD_REQUEST, e.getCode());
+    } catch (RequestNotValidException e) {
+      // do nothing as it was expected
     }
 
     // 10) filter with one RegexFilterParameter
@@ -192,8 +193,8 @@ public class SolrUtilsTest {
       filter.add(new RegexFilterParameter());
       stringFilter = SolrUtils.parseFilter(filter);
       fail("An exception should have been thrown but it wasn't!");
-    } catch (IndexServiceException e) {
-      assertEquals(IndexServiceException.BAD_REQUEST, e.getCode());
+    } catch (RequestNotValidException e) {
+      // do nothing as it was expected
     }
 
     // 11) filter with one BasicSearchFilterParameter
@@ -202,9 +203,10 @@ public class SolrUtilsTest {
       filter.add(new BasicSearchFilterParameter(RodaConstants.SDO__ALL, fondsOrSeries));
       stringFilter = SolrUtils.parseFilter(filter);
       assertNotNull(stringFilter);
-      assertEquals(String.format("(%s: (%s) AND %s: (%s))", RodaConstants.SDO__ALL, fonds, RodaConstants.SDO__ALL, series),
+      assertEquals(
+        String.format("(%s: (%s) AND %s: (%s))", RodaConstants.SDO__ALL, fonds, RodaConstants.SDO__ALL, series),
         stringFilter);
-    } catch (IndexServiceException e) {
+    } catch (RODAException e) {
       fail("An exception was not expected!");
     }
 
@@ -215,7 +217,7 @@ public class SolrUtilsTest {
       stringFilter = SolrUtils.parseFilter(filter);
       assertNotNull(stringFilter);
       assertEquals(String.format("(*:* NOT %s:*)", RodaConstants.SDO__ALL), stringFilter);
-    } catch (IndexServiceException e) {
+    } catch (RODAException e) {
       fail("An exception was not expected!");
     }
 
@@ -226,8 +228,8 @@ public class SolrUtilsTest {
       stringFilter = SolrUtils.parseFilter(filter);
       assertNotNull(stringFilter);
       assertThat(stringFilter, Matchers.is("*:*"));
-    } catch (IndexServiceException e) {
-      assertEquals(IndexServiceException.BAD_REQUEST, e.getCode());
+    } catch (RequestNotValidException e) {
+      // do nothing as it was expected
     }
 
     // 13.1) filter with one LongRangeFilterParameter
@@ -237,8 +239,8 @@ public class SolrUtilsTest {
       stringFilter = SolrUtils.parseFilter(filter);
       assertNotNull(stringFilter);
       assertThat(stringFilter, Matchers.is(String.format("(%s:[%s TO %s])", RodaConstants.LOG_DURATION, from, to)));
-    } catch (IndexServiceException e) {
-      assertEquals(IndexServiceException.BAD_REQUEST, e.getCode());
+    } catch (RequestNotValidException e) {
+      // do nothing as it was expected
     }
 
     // 14) filter with one DateIntervalFilterParameter
@@ -248,14 +250,14 @@ public class SolrUtilsTest {
       stringFilter = SolrUtils.parseFilter(filter);
       assertNotNull(stringFilter);
       assertThat(stringFilter, Matchers.is("*:*"));
-    } catch (IndexServiceException e) {
-      assertEquals(IndexServiceException.BAD_REQUEST, e.getCode());
+    } catch (RequestNotValidException e) {
+      // do nothing as it was expected
     }
 
   }
 
   @Test
-  public void testParseSorter() throws IndexServiceException {
+  public void testParseSorter() {
     Sorter sorter = null;
     List<SortClause> sortList = null;
     String field1 = "field1", field2 = "field2";

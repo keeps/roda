@@ -23,27 +23,28 @@ import org.roda.core.data.Report;
 import org.roda.core.data.ReportItem;
 import org.roda.core.data.common.InvalidParameterException;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.JobReport.PluginState;
 import org.roda.core.data.v2.PluginType;
 import org.roda.core.data.v2.Representation;
 import org.roda.core.data.v2.RepresentationFilePreservationObject;
 import org.roda.core.data.v2.RepresentationPreservationObject;
 import org.roda.core.index.IndexService;
-import org.roda.core.index.IndexServiceException;
 import org.roda.core.metadata.v2.premis.PremisFileObjectHelper;
 import org.roda.core.metadata.v2.premis.PremisMetadataException;
 import org.roda.core.metadata.v2.premis.PremisRepresentationObjectHelper;
 import org.roda.core.model.AIP;
 import org.roda.core.model.File;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.ModelServiceException;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,7 +113,7 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
 
           state = PluginState.OK;
           reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
-        } catch (ModelServiceException | StorageServiceException | PremisMetadataException e) {
+        } catch (RODAException | PremisMetadataException e) {
           LOGGER.error("Error processing AIP " + aip.getId(), e);
 
           state = PluginState.ERROR;
@@ -125,8 +126,8 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
         try {
           PluginUtils.updateJobReport(model, index, this, reportItem, state, PluginUtils.getJobId(parameters),
             aip.getId());
-        } catch (IndexServiceException | NotFoundException e) {
-          LOGGER.error("", e);
+        } catch (RODAException e) {
+          LOGGER.error("Error updating job report", e);
         }
       }
     } catch (IOException ioe) {
@@ -136,8 +137,8 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
   }
 
   private void createPremisForRepresentation(ModelService model, StorageService storage, Path temp, AIP aip,
-    String representationID)
-      throws ModelServiceException, StorageServiceException, IOException, PremisMetadataException {
+    String representationID) throws IOException, PremisMetadataException, RequestNotValidException, GenericException,
+      NotFoundException, AuthorizationDeniedException {
     LOGGER.debug("Processing representation " + representationID + " from AIP " + aip.getId());
 
     RepresentationPreservationObject pObject = new RepresentationPreservationObject();
@@ -156,7 +157,8 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
 
   private void createPremisObjectForRepresentation(ModelService model, AIP aip, String representationID,
     RepresentationPreservationObject pObject, List<RepresentationFilePreservationObject> pObjectPartFiles)
-      throws IOException, PremisMetadataException, ModelServiceException, StorageServiceException {
+      throws IOException, PremisMetadataException, RequestNotValidException, GenericException, NotFoundException,
+      AuthorizationDeniedException {
     pObject.setPartFiles(pObjectPartFiles.toArray(new RepresentationFilePreservationObject[pObjectPartFiles.size()]));
 
     Path premisRepresentation = Files.createTempFile("representation", ".premis.xml");
@@ -170,8 +172,8 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
 
   private List<RepresentationFilePreservationObject> createPremisForRepresentationFile(ModelService model,
     StorageService storage, Path temp, AIP aip, String representationID, RepresentationPreservationObject pObject,
-    List<RepresentationFilePreservationObject> pObjectPartFiles, String fileID)
-      throws ModelServiceException, StorageServiceException, IOException, PremisMetadataException {
+    List<RepresentationFilePreservationObject> pObjectPartFiles, String fileID) throws IOException,
+      PremisMetadataException, RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     LOGGER.debug("Processing file " + fileID + " from " + representationID + " of AIP " + aip.getId());
 
     File file = model.retrieveFile(aip.getId(), representationID, fileID);

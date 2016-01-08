@@ -13,8 +13,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.SIPState;
@@ -23,16 +21,19 @@ import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
-import org.roda.core.data.common.AuthorizationDeniedException;
-import org.roda.core.data.common.RODAException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.RodaUser;
 import org.roda.core.data.v2.SIPReport;
-import org.roda.wui.common.client.GenericException;
 import org.roda.wui.common.client.PrintReportException;
 import org.roda.wui.common.server.ServerTools;
 import org.roda.wui.ingest.list.client.IngestListService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
@@ -59,13 +60,14 @@ public class IngestListServiceImpl extends RemoteServiceServlet implements Inges
     super();
   }
 
-  public Long countSipReports(Filter filter) throws AuthorizationDeniedException, GenericException {
+  public Long countSipReports(Filter filter)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     return IngestList.countSipReports(user, filter);
   }
 
   public IndexResult<SIPReport> findSipReports(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
-    throws AuthorizationDeniedException, GenericException {
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     return IngestList.findSipReports(user, filter, sorter, sublist, facets);
   }

@@ -21,17 +21,19 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.roda.core.CorporaConstants;
-import org.roda.core.index.IndexServiceException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.index.IndexServiceTest;
 import org.roda.core.model.AIP;
 import org.roda.core.model.DescriptiveMetadata;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.ModelServiceException;
 import org.roda.core.model.ModelServiceTest;
 import org.roda.core.model.ValidationException;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
@@ -49,7 +51,7 @@ public class ValidationUtilsTest {
   private static final Logger logger = LoggerFactory.getLogger(ModelServiceTest.class);
 
   @BeforeClass
-  public static void setUp() throws IOException, StorageServiceException, URISyntaxException {
+  public static void setUp() throws IOException, URISyntaxException, GenericException {
 
     basePath = Files.createTempDirectory("modelTests");
     indexPath = Files.createTempDirectory("indexTests");
@@ -89,16 +91,16 @@ public class ValidationUtilsTest {
   }
 
   @AfterClass
-  public static void tearDown() throws StorageServiceException {
+  public static void tearDown() throws NotFoundException, GenericException {
     FSUtils.deletePath(basePath);
     FSUtils.deletePath(indexPath);
   }
 
   @Test
-  public void testValidateDescriptiveMetadata()
-    throws ModelServiceException, StorageServiceException, IndexServiceException, ValidationException {
+  public void testValidateDescriptiveMetadata() throws ValidationException, RequestNotValidException, GenericException,
+    AuthorizationDeniedException, AlreadyExistsException, NotFoundException {
     final String aipId = UUID.randomUUID().toString();
-    final AIP aip = model.createAIP(aipId, corporaService,
+    model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
     final DescriptiveMetadata descMetadata = model.retrieveDescriptiveMetadata(aipId,
       CorporaConstants.DESCRIPTIVE_METADATA_ID);
@@ -106,11 +108,11 @@ public class ValidationUtilsTest {
   }
 
   @Test
-  public void testValidateDescriptiveMetadataBuggy()
-    throws ModelServiceException, StorageServiceException, IndexServiceException, ValidationException {
+  public void testValidateDescriptiveMetadataBuggy() throws ValidationException, RequestNotValidException,
+    GenericException, AuthorizationDeniedException, AlreadyExistsException, NotFoundException {
     // buggy aip have acqinfo2 instead of acqinfo in ead-c.xml
     final String aipId = UUID.randomUUID().toString();
-    final AIP aip = model.createAIP(aipId, corporaService,
+    model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_BUGGY_ID));
     final DescriptiveMetadata descMetadata = model.retrieveDescriptiveMetadata(aipId,
       CorporaConstants.DESCRIPTIVE_METADATA_ID);
@@ -118,8 +120,8 @@ public class ValidationUtilsTest {
   }
 
   @Test
-  public void testValidateAIP()
-    throws ModelServiceException, StorageServiceException, IndexServiceException, ValidationException {
+  public void testValidateAIP() throws ValidationException, RequestNotValidException, GenericException,
+    AuthorizationDeniedException, AlreadyExistsException, NotFoundException {
     final String aipId = UUID.randomUUID().toString();
     final AIP aip = model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
@@ -127,8 +129,8 @@ public class ValidationUtilsTest {
   }
 
   @Test
-  public void testValidateAIPBuggy()
-    throws ModelServiceException, StorageServiceException, IndexServiceException, ValidationException {
+  public void testValidateAIPBuggy() throws ValidationException, RequestNotValidException, GenericException,
+    AuthorizationDeniedException, AlreadyExistsException, NotFoundException {
     // buggy aip have acqinfo2 instead of acqinfo in ead-c.xml
     final String aipId = UUID.randomUUID().toString();
     final AIP aip = model.createAIP(aipId, corporaService,

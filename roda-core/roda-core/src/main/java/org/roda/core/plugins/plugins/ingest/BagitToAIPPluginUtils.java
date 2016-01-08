@@ -21,12 +21,16 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.model.AIP;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.ModelServiceException;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.Resource;
-import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +43,8 @@ public class BagitToAIPPluginUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(BagitToAIPPluginUtils.class);
 
   public static AIP bagitToAip(Bag bag, Path bagitPath, ModelService model, String metadataFilename)
-    throws BagitNotValidException, IOException, StorageServiceException, ModelServiceException {
+    throws BagitNotValidException, IOException, RequestNotValidException, NotFoundException, GenericException,
+    AlreadyExistsException, AuthorizationDeniedException {
     AIP aip = null;
 
     BagInfoTxt bagInfoTxt = bag.getBagInfoTxt();
@@ -53,7 +58,8 @@ public class BagitToAIPPluginUtils {
         model.retrieveAIP(bag.getBagInfoTxt().get("parent"));
         metadata.put(RodaConstants.STORAGE_META_PARENT_ID,
           new HashSet<String>(Arrays.asList(bag.getBagInfoTxt().get("parent"))));
-      } catch (ModelServiceException mse) {
+      } catch (RODAException mse) {
+        LOGGER.error("Error retrieving AIP", mse);
       }
     }
 

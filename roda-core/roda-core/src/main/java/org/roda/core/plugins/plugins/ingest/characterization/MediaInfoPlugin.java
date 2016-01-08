@@ -34,18 +34,17 @@ import javax.xml.xpath.XPathFactory;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
 import org.roda.core.data.common.InvalidParameterException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.PluginType;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.AIP;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.ModelServiceException;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.StoragePath;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.roda.core.util.CommandException;
@@ -122,24 +121,10 @@ public class MediaInfoPlugin implements Plugin<AIP> {
             model.createOtherMetadata(aip.getId(), representationID, entry.getKey() + ".xml", "MediaInfo", resource);
           }
           FSUtils.deletePath(data);
-        } catch (StorageServiceException sse) {
+        } catch (RODAException | IOException | CommandException | XPathExpressionException
+          | ParserConfigurationException | SAXException | TransformerFactoryConfigurationError
+          | TransformerException sse) {
           LOGGER.error("Error processing AIP " + aip.getId() + ": " + sse.getMessage());
-        } catch (IOException ioe) {
-          LOGGER.error("Error processing AIP " + aip.getId() + ": " + ioe.getMessage());
-        } catch (CommandException ce) {
-          LOGGER.error("Error processing AIP " + aip.getId() + ": " + ce.getMessage());
-        } catch (XPathExpressionException xpee) {
-          LOGGER.error("Error processing AIP " + aip.getId() + ": " + xpee.getMessage());
-        } catch (ParserConfigurationException pce) {
-          LOGGER.error("Error processing AIP " + aip.getId() + ": " + pce.getMessage());
-        } catch (SAXException se) {
-          LOGGER.error("Error processing AIP " + aip.getId() + ": " + se.getMessage());
-        } catch (TransformerFactoryConfigurationError tfce) {
-          LOGGER.error("Error processing AIP " + aip.getId() + ": " + tfce.getMessage());
-        } catch (TransformerException te) {
-          LOGGER.error("Error processing AIP " + aip.getId() + ": " + te.getMessage());
-        } catch (ModelServiceException mse) {
-          LOGGER.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage());
         }
       }
 
@@ -207,7 +192,7 @@ public class MediaInfoPlugin implements Plugin<AIP> {
   public PluginType getType() {
     return PluginType.AIP_TO_AIP;
   }
-  
+
   @Override
   public boolean areParameterValuesValid() {
     return true;

@@ -15,11 +15,11 @@ import java.util.Map;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.InvalidParameterException;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.Job.ORCHESTRATOR_METHOD;
 import org.roda.core.data.v2.TransferredResource;
-import org.roda.core.index.IndexServiceException;
 import org.roda.core.plugins.Plugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,13 +54,13 @@ public class AkkaJobWorkerActor extends UntypedActor {
     }
   }
 
-  public List<TransferredResource> getTransferredResourcesFromObjectIds(List<String> objectIds)
-    throws NotFoundException {
+  public List<TransferredResource> getTransferredResourcesFromObjectIds(List<String> objectIds) {
     List<TransferredResource> res = new ArrayList<TransferredResource>();
     for (String objectId : objectIds) {
       try {
+        // TODO review error handling logic
         res.add(RodaCoreFactory.getIndexService().retrieve(TransferredResource.class, objectId));
-      } catch (IndexServiceException e) {
+      } catch (GenericException | NotFoundException e) {
         LOGGER.error("Error retrieving TransferredResource", e);
       }
     }

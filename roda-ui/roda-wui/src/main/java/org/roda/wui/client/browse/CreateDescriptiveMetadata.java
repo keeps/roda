@@ -211,9 +211,8 @@ public class CreateDescriptiveMetadata extends Composite {
   }
 
   private void cancel() {
-    // check if other descriptive metadata is available to avoid infinite loop
-    BrowserService.Util.getInstance().retr
-
+    // TODO check if other descriptive metadata is available to avoid infinite loop
+    // BrowserService.Util.getInstance().countDescriptiveMetadata(filter, callback);
     Tools.newHistory(Browse.RESOLVER, aipId);
   }
 

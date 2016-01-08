@@ -44,7 +44,12 @@ import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.Group;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.LogEntry;
@@ -52,18 +57,14 @@ import org.roda.core.data.v2.LogEntryParameter;
 import org.roda.core.data.v2.RODAMember;
 import org.roda.core.data.v2.RODAObject;
 import org.roda.core.data.v2.Representation;
-import org.roda.core.data.v2.SIPReport;
-import org.roda.core.data.v2.SIPStateTransition;
 import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.core.data.v2.User;
 import org.roda.core.model.AIP;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.ModelServiceException;
 import org.roda.core.model.ModelServiceTest;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StoragePath;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
@@ -111,9 +112,16 @@ public class IndexServiceTest {
     System.setProperty("solr.data.dir.aip", indexPath.resolve("aip").toString());
     System.setProperty("solr.data.dir.sdo", indexPath.resolve("sdo").toString());
     System.setProperty("solr.data.dir.representations", indexPath.resolve("representation").toString());
-    System.setProperty("solr.data.dir.preservationobject", indexPath.resolve("preservationobject").toString());
     System.setProperty("solr.data.dir.preservationevent", indexPath.resolve("preservationevent").toString());
+    System.setProperty("solr.data.dir.preservationobject", indexPath.resolve("preservationobject").toString());
     System.setProperty("solr.data.dir.actionlog", indexPath.resolve("actionlog").toString());
+    System.setProperty("solr.data.dir.jobreport", indexPath.resolve("jobreport").toString());
+    System.setProperty("solr.data.dir.members", indexPath.resolve("members").toString());
+    System.setProperty("solr.data.dir.othermetadata", indexPath.resolve("othermetadata").toString());
+    System.setProperty("solr.data.dir.sip", indexPath.resolve("sip").toString());
+    System.setProperty("solr.data.dir.job", indexPath.resolve("job").toString());
+    System.setProperty("solr.data.dir.file", indexPath.resolve("file").toString());
+    
     // start embedded solr
     final EmbeddedSolrServer solr = new EmbeddedSolrServer(solrHome, "test");
 
@@ -179,8 +187,8 @@ public class IndexServiceTest {
   }
 
   @Test
-  public void testAIPIndexCreateDelete()
-    throws ModelServiceException, StorageServiceException, IndexServiceException, ParseException, NotFoundException {
+  public void testAIPIndexCreateDelete() throws ParseException, NotFoundException, RequestNotValidException,
+    GenericException, AuthorizationDeniedException, AlreadyExistsException {
     // generate AIP ID
     final String aipId = UUID.randomUUID().toString();
 
@@ -276,9 +284,9 @@ public class IndexServiceTest {
       fail("AIP deleted but yet it was retrieved");
     } catch (NotFoundException e) {
       // do nothing as it was the expected exception
-    } catch (IndexServiceException e) {
+    } catch (RODAException e) {
       fail("AIP was deleted and therefore a " + NotFoundException.class.getName()
-        + " should have been thrown instead of a " + IndexServiceException.class.getName());
+        + " should have been thrown instead of a " + e.getClass().getName());
     }
 
     try {
@@ -286,15 +294,15 @@ public class IndexServiceTest {
       fail("AIP was deleted but yet its descriptive metadata was retrieved");
     } catch (NotFoundException e) {
       // do nothing as it was the expected exception
-    } catch (IndexServiceException e) {
+    } catch (RODAException e) {
       fail("AIP was deleted and therefore a " + NotFoundException.class.getName()
-        + " should have been thrown instead of a " + IndexServiceException.class.getName());
+        + " should have been thrown instead of a " + e.getClass().getName());
     }
   }
 
   @Test
-  public void testAIPIndexCreateDelete2()
-    throws ModelServiceException, StorageServiceException, IndexServiceException, ParseException {
+  public void testAIPIndexCreateDelete2() throws ParseException, RequestNotValidException, GenericException,
+    AuthorizationDeniedException, AlreadyExistsException, NotFoundException {
     final String aipId = UUID.randomUUID().toString();
 
     model.createAIP(aipId, corporaService,
@@ -314,8 +322,8 @@ public class IndexServiceTest {
   }
 
   @Test
-  public void testAIPUpdate()
-    throws ModelServiceException, StorageServiceException, IndexServiceException, NotFoundException {
+  public void testAIPUpdate() throws NotFoundException, RequestNotValidException, GenericException,
+    AuthorizationDeniedException, AlreadyExistsException {
     // generate AIP ID
     final String aipId = UUID.randomUUID().toString();
 
@@ -334,7 +342,8 @@ public class IndexServiceTest {
   }
 
   @Test
-  public void testListCollections() throws ModelServiceException, StorageServiceException, IndexServiceException {
+  public void testListCollections() throws RequestNotValidException, GenericException, AuthorizationDeniedException,
+    AlreadyExistsException, NotFoundException {
     // set up
     model.createAIP(CorporaConstants.SOURCE_AIP_ID, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
@@ -355,7 +364,8 @@ public class IndexServiceTest {
   }
 
   @Test
-  public void testSubElements() throws ModelServiceException, StorageServiceException, IndexServiceException {
+  public void testSubElements() throws RequestNotValidException, GenericException, AuthorizationDeniedException,
+    AlreadyExistsException, NotFoundException {
     // set up
     model.createAIP(CorporaConstants.SOURCE_AIP_ID, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
@@ -379,8 +389,8 @@ public class IndexServiceTest {
   }
 
   @Test
-  public void testGetAncestors()
-    throws ModelServiceException, StorageServiceException, IndexServiceException, NotFoundException {
+  public void testGetAncestors() throws NotFoundException, RequestNotValidException, GenericException,
+    AuthorizationDeniedException, AlreadyExistsException {
     // set up
     model.createAIP(CorporaConstants.SOURCE_AIP_ID, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
@@ -394,8 +404,8 @@ public class IndexServiceTest {
   }
 
   @Test
-  public void testGetElementWithoutParentId()
-    throws ModelServiceException, StorageServiceException, IndexServiceException {
+  public void testGetElementWithoutParentId() throws RequestNotValidException, GenericException,
+    AuthorizationDeniedException, AlreadyExistsException, NotFoundException {
     // generate AIP ID
     final String aipId = UUID.randomUUID().toString();
 
@@ -417,7 +427,8 @@ public class IndexServiceTest {
   }
 
   @Test
-  public void testGetLogEntriesCount() throws IndexServiceException, ModelServiceException {
+  public void testGetLogEntriesCount()
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     // cleaning up action log entries on index (if any)
     index.deleteAllActionLog();
 
@@ -446,7 +457,8 @@ public class IndexServiceTest {
   }
 
   @Test
-  public void testFindLogEntry() throws IndexServiceException, ModelServiceException {
+  public void testFindLogEntry()
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     LogEntry entry = new LogEntry();
     entry.setActionComponent(RodaConstants.LOG_ACTION_COMPONENT);
     entry.setActionMethod("Method");
@@ -477,7 +489,8 @@ public class IndexServiceTest {
   }
 
   @Test
-  public void testReindexLogEntry() throws StorageServiceException, ModelServiceException, IndexServiceException {
+  public void testReindexLogEntry()
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     Long number = 10L;
 
     for (int i = 0; i < number; i++) {
@@ -509,8 +522,8 @@ public class IndexServiceTest {
   }
 
   @Test
-  public void testReindexAIP()
-    throws ModelServiceException, StorageServiceException, IndexServiceException, ParseException {
+  public void testReindexAIP() throws ParseException, RequestNotValidException, GenericException,
+    AuthorizationDeniedException, AlreadyExistsException, NotFoundException {
     for (int i = 0; i < 10; i++) {
       final String aipId = UUID.randomUUID().toString();
       model.createAIP(aipId, corporaService,
@@ -524,7 +537,7 @@ public class IndexServiceTest {
   }
 
   @Test
-  public void indexMembers() throws IndexServiceException, ModelServiceException {
+  public void indexMembers() throws AlreadyExistsException, GenericException, RequestNotValidException {
     Set<String> groups = new HashSet<String>();
     groups.add("administrators");
     Set<String> roles = new HashSet<String>();

@@ -7,7 +7,12 @@
  */
 package org.roda.core.data.exceptions;
 
-public class RequestNotValidException extends Exception {
+/**
+ * 
+ * @author Luis Faria <lfaria@keep.pt>
+ *
+ */
+public class RequestNotValidException extends RODAException {
   private static final long serialVersionUID = -2066738446256937178L;
 
   public RequestNotValidException() {

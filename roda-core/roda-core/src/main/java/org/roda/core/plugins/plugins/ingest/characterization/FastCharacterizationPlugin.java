@@ -22,6 +22,7 @@ import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
 import org.roda.core.data.common.InvalidParameterException;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.FileFormat;
 import org.roda.core.data.v2.PluginType;
 import org.roda.core.data.v2.Representation;
@@ -29,12 +30,10 @@ import org.roda.core.index.IndexService;
 import org.roda.core.model.AIP;
 import org.roda.core.model.File;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.ModelServiceException;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.StorageServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -107,10 +106,8 @@ public class FastCharacterizationPlugin implements Plugin<AIP> {
             Files.delete(p);
           }
         }
-      } catch (ModelServiceException mse) {
+      } catch (RODAException mse) {
         LOGGER.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage());
-      } catch (StorageServiceException sse) {
-        LOGGER.error("Error processing AIP " + aip.getId() + ": " + sse.getMessage());
       } catch (Exception e) {
         // TODO Auto-generated catch block
         e.printStackTrace();

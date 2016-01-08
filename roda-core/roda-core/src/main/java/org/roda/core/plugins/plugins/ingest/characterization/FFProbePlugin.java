@@ -34,6 +34,7 @@ import javax.xml.xpath.XPathFactory;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
 import org.roda.core.data.common.InvalidParameterException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.PluginType;
 import org.roda.core.data.v2.Representation;
 import org.roda.core.index.IndexService;
@@ -117,14 +118,8 @@ public class FFProbePlugin implements Plugin<AIP> {
               "FFProbe", resource);
             ffProbeResults.toFile().delete();
           }
-        } catch (StorageServiceException sse) {
+        } catch (RODAException | IOException | PluginException sse) {
           LOGGER.error("Error processing AIP " + aip.getId() + ": " + sse.getMessage());
-        } catch (IOException ioe) {
-          LOGGER.error("Error processing AIP " + aip.getId() + ": " + ioe.getMessage());
-        } catch (PluginException ce) {
-          LOGGER.error("Error processing AIP " + aip.getId() + ": " + ce.getMessage());
-        } catch (ModelServiceException mse) {
-          LOGGER.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage());
         }
 
       }

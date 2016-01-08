@@ -31,7 +31,7 @@ import javax.xml.validation.Validator;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.FileFormat;
-import org.roda.core.data.exceptions.ActionForbiddenException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
@@ -104,7 +104,7 @@ public class PremisUtils {
 
   public static RepresentationFilePreservationObject getPremisFile(StorageService storage, String aipID,
     String representationID, String fileID) throws IOException, PremisMetadataException, GenericException,
-      RequestNotValidException, NotFoundException, ActionForbiddenException {
+      RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     Binary binary = storage.getBinary(ModelUtils.getPreservationFilePath(aipID, representationID, fileID));
     Path p = Files.createTempFile("temp", ".premis.xml");
     Files.copy(binary.getContent().createInputStream(), p, StandardCopyOption.REPLACE_EXISTING);

@@ -25,14 +25,15 @@ import org.roda.core.data.adapter.filter.OneOfManyFilterParameter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.InvalidParameterException;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.Job.JOB_STATE;
 import org.roda.core.data.v2.PluginType;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.index.IndexService;
-import org.roda.core.index.IndexServiceException;
 import org.roda.core.model.AIP;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
@@ -211,7 +212,7 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
       }
 
       model.updateJob(job);
-    } catch (IndexServiceException | NotFoundException e) {
+    } catch (NotFoundException | GenericException e) {
       LOGGER.error("Unable to get Job from index", e);
     }
   }
@@ -229,7 +230,7 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
         aipsFromIndex = index.find(AIP.class, new Filter(new OneOfManyFilterParameter(RodaConstants.AIP_ID, aipIds)),
           null, new Sublist(0, maxAips));
         aips = aipsFromIndex.getResults();
-      } catch (IndexServiceException e) {
+      } catch (GenericException | RequestNotValidException e) {
         LOGGER.error("Error retrieving AIPs", e);
       }
     }

@@ -16,9 +16,9 @@ import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
 import org.roda.core.data.common.InvalidParameterException;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.v2.PluginType;
 import org.roda.core.index.IndexService;
-import org.roda.core.index.IndexServiceException;
 import org.roda.core.model.AIP;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
@@ -103,7 +103,7 @@ public class ReindexPlugin implements Plugin<AIP> {
         index.clearIndex(RodaConstants.INDEX_PRESERVATION_OBJECTS);
         index.clearIndex(RodaConstants.INDEX_PRESERVATION_EVENTS);
         index.clearIndex(RodaConstants.INDEX_FILE);
-      } catch (IndexServiceException e) {
+      } catch (GenericException e) {
         throw new PluginException("Error clearing index", e);
       }
     } else {
@@ -119,7 +119,7 @@ public class ReindexPlugin implements Plugin<AIP> {
     try {
       index.optimizeIndex(RodaConstants.INDEX_AIP);
       index.optimizeIndex(RodaConstants.INDEX_SDO);
-    } catch (IndexServiceException e) {
+    } catch (GenericException e) {
       throw new PluginException("Error optimizing index", e);
     }
 

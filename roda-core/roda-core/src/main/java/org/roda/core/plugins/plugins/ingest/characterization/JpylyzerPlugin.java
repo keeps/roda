@@ -34,18 +34,17 @@ import javax.xml.xpath.XPathFactory;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
 import org.roda.core.data.common.InvalidParameterException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.PluginType;
 import org.roda.core.data.v2.Representation;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.AIP;
 import org.roda.core.model.File;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.ModelServiceException;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -117,15 +116,11 @@ public class JpylyzerPlugin implements Plugin<AIP> {
               model.createOtherMetadata(aip.getId(), representationID, file.getStoragePath().getName() + ".xml",
                 "jpylyzer", resource);
               ffProbeResults.toFile().delete();
-            } catch (StorageServiceException sse) {
+            } catch (RODAException | IOException | PluginException sse) {
               LOGGER.error("Error processing AIP " + aip.getId() + ": " + sse.getMessage());
-            } catch (IOException ioe) {
-              LOGGER.error("Error processing AIP " + aip.getId() + ": " + ioe.getMessage());
-            } catch (PluginException ce) {
-              LOGGER.error("Error processing AIP " + aip.getId() + ": " + ce.getMessage());
             }
           }
-        } catch (ModelServiceException mse) {
+        } catch (RODAException mse) {
           LOGGER.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage());
         }
       }
@@ -194,7 +189,7 @@ public class JpylyzerPlugin implements Plugin<AIP> {
   public PluginType getType() {
     return PluginType.AIP_TO_AIP;
   }
-  
+
   @Override
   public boolean areParameterValuesValid() {
     return true;

@@ -11,8 +11,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.LdapUtilityException;
 import org.roda.core.common.UserUtility;
@@ -22,10 +20,17 @@ import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
-import org.roda.core.data.common.AuthorizationDeniedException;
+import org.roda.core.data.common.EmailAlreadyExistsException;
+import org.roda.core.data.common.GroupAlreadyExistsException;
 import org.roda.core.data.common.IllegalOperationException;
-import org.roda.core.data.common.RODAException;
+import org.roda.core.data.common.NoSuchGroupException;
+import org.roda.core.data.common.NoSuchUserException;
+import org.roda.core.data.common.UserAlreadyExistsException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.Group;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.LogEntry;
@@ -33,14 +38,14 @@ import org.roda.core.data.v2.RODAMember;
 import org.roda.core.data.v2.RodaGroup;
 import org.roda.core.data.v2.RodaUser;
 import org.roda.core.data.v2.User;
-import org.roda.core.index.IndexServiceException;
 import org.roda.wui.api.controllers.UserManagement;
 import org.roda.wui.common.I18nUtility;
 import org.roda.wui.common.LogUtility;
-import org.roda.wui.common.client.GenericException;
 import org.roda.wui.common.client.PrintReportException;
 import org.roda.wui.common.server.ServerTools;
 import org.roda.wui.management.user.client.UserManagementService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
@@ -69,14 +74,15 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public Long getMemberCount(Filter filter) throws AuthorizationDeniedException, GenericException {
+  public Long getMemberCount(Filter filter)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     return UserManagement.countMembers(user, filter);
   }
 
   @Override
   public IndexResult<RODAMember> findMembers(Filter filter, Sorter sorter, Sublist sublist, Facets facets,
-    String localeString) throws AuthorizationDeniedException, GenericException {
+    String localeString) throws AuthorizationDeniedException, GenericException, RequestNotValidException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     IndexResult<RODAMember> result = UserManagement.findMembers(user, filter, sorter, sublist, facets);
     return I18nUtility.translate(result, RODAMember.class, localeString);
@@ -101,7 +107,8 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public void createUser(User user, String password) throws RODAException {
+  public void createUser(User user, String password) throws GenericException, UserAlreadyExistsException,
+    EmailAlreadyExistsException, IllegalOperationException, NoSuchUserException {
     try {
       logger.debug("Creating user " + user.getName());
       Date start = new Date();
@@ -111,13 +118,13 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
       LogUtility.registerAction(UserUtility.getClientUser(getThreadLocalRequest().getSession()), "UM.createUser",
         new String[] {"user", user.toString()}, "User %username% called method UM.createUser(" + user + ")", duration);
     } catch (LdapUtilityException e) {
-      throw new RODAException(e.getMessage(), e) {
-      };
+      throw new GenericException("Error creating user", e);
     }
   }
 
   @Override
-  public void editMyUser(User modifiedUser, String password) throws RODAException {
+  public void editMyUser(User modifiedUser, String password)
+    throws EmailAlreadyExistsException, NoSuchUserException, IllegalOperationException, GenericException {
     try {
       Date start = new Date();
       if (modifiedUser.getName().equals(UserUtility.getClientUser(getThreadLocalRequest().getSession()))) {
@@ -134,8 +141,7 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
       }
     } catch (LdapUtilityException e) {
       logger.error("LdapUtility Exception", e);
-      throw new RODAException(e.getMessage(), e) {
-      };
+      throw new GenericException("Error edit my user", e);
     }
 
   }
@@ -161,7 +167,7 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public void createGroup(Group group) throws RODAException {
+  public void createGroup(Group group) throws GenericException, GroupAlreadyExistsException {
     try {
       logger.debug("Creating group " + group.getName());
       Date start = new Date();
@@ -171,14 +177,13 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
         new String[] {"group", result.toString()}, "User %username% called method UM.createGroup(" + result + ")",
         duration);
     } catch (LdapUtilityException e) {
-      throw new RODAException(e.getMessage(), e) {
-      };
+      throw new GenericException("Error creating group", e);
     }
 
   }
 
   @Override
-  public void editGroup(Group group) throws RODAException {
+  public void editGroup(Group group) throws GenericException, NoSuchGroupException, IllegalOperationException {
     try {
       logger.debug("Editing group " + group.getName());
       Date start = new Date();
@@ -188,13 +193,12 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
         new String[] {"group", group.toString()}, "User %username% called method UM.editGroup(" + group + ")",
         duration);
     } catch (LdapUtilityException e) {
-      throw new RODAException(e.getMessage(), e) {
-      };
+      throw new GenericException("Error editting group", e);
     }
   }
 
   @Override
-  public boolean removeUser(String username) throws RODAException {
+  public boolean removeUser(String username) throws RODAException, NoSuchUserException, IllegalOperationException {
     boolean result = false;
     try {
       logger.debug("Removing user " + username);
@@ -214,17 +218,13 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
       LogUtility.registerAction(UserUtility.getClientUser(getThreadLocalRequest().getSession()), "UM.removeUser",
         new String[] {"user", username}, "User %username% called method UM.removeUser(" + username + ")", duration);
     } catch (LdapUtilityException e) {
-      throw new RODAException(e.getMessage(), e) {
-      };
-    } catch (IndexServiceException e) {
-      throw new RODAException(e.getMessage(), e) {
-      };
+      throw new GenericException("Error removing user", e);
     }
     return result;
   }
 
   @Override
-  public void removeGroup(String groupname) throws RODAException {
+  public void removeGroup(String groupname) throws IllegalOperationException, GenericException {
     try {
       Date start = new Date();
       UserUtility.getLdapUtility().removeGroup(groupname);
@@ -234,8 +234,7 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
         "UserManagement.removeGroup", new String[] {"groupname", groupname},
         "User %username% called method UserManagement.removeGroup(" + groupname + ")", duration);
     } catch (LdapUtilityException e) {
-      throw new RODAException(e.getMessage(), e) {
-      };
+      throw new GenericException("Error removing group", e);
     }
   }
 
@@ -247,7 +246,7 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
 
   @Override
   public IndexResult<LogEntry> findLogEntries(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
-    throws AuthorizationDeniedException, GenericException {
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     return UserManagement.findLogEntries(user, filter, sorter, sublist, facets);
   }

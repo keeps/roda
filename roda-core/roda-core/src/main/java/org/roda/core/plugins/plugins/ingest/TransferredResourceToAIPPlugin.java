@@ -30,19 +30,18 @@ import org.roda.core.data.Report;
 import org.roda.core.data.ReportItem;
 import org.roda.core.data.common.InvalidParameterException;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.JobReport.PluginState;
 import org.roda.core.data.v2.PluginType;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.AIP;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.ModelServiceException;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -132,8 +131,8 @@ public class TransferredResourceToAIPPlugin implements Plugin<TransferredResourc
                   + StringEscapeUtils.escapeXml(relativePath.toString().replace('/', '_')) + "</field>");
                 Binary fileBinary = (Binary) FSUtils.convertPathToResource(file.getParent(), file);
                 model.createFile(aipID, representationID, relativePath.toString().replace('/', '_'), fileBinary);
-              } catch (StorageServiceException | ModelServiceException sse) {
-
+              } catch (RODAException sse) {
+                // TODO log or mark nothing to do
               }
               return FileVisitResult.CONTINUE;
             }

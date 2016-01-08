@@ -28,14 +28,14 @@ import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.handler.loader.XMLLoader;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.RodaUtils;
-import org.roda.core.index.IndexServiceException;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.storage.Binary;
 
 public class CharacterizationPluginUtils {
 
   // TODO improve XSL Result to Map (currently using solr utils class)
   public static Map<String, String> getObjectCharacteristicsFields(String aipID, String representationID, String fileID,
-    Binary binary, Path configBasePath) throws IndexServiceException {
+    Binary binary, Path configBasePath) throws GenericException {
     InputStream inputStream;
     SolrInputDocument doc = null;
     try {
@@ -49,7 +49,8 @@ public class CharacterizationPluginUtils {
        * RodaUtils.getResourceInputStream(configBasePath,
        * "crosswalks/ingest/other/characterization.xslt", "Ingesting");
        */
-      InputStream transformerStream = RodaCoreFactory.getConfigurationFileAsStream("crosswalks/ingest/other/premis.xslt");
+      InputStream transformerStream = RodaCoreFactory
+        .getConfigurationFileAsStream("crosswalks/ingest/other/premis.xslt");
 
       // TODO support the use of scripts for non-xml transformers
       Reader xsltReader = new InputStreamReader(transformerStream);
@@ -81,8 +82,8 @@ public class CharacterizationPluginUtils {
       transformationResult.close();
 
     } catch (IOException | TransformerException | XMLStreamException | FactoryConfigurationError e) {
-      throw new IndexServiceException("Could not process preservation metadata binary " + binary.getStoragePath()
-        + " using xslt characterization.xslt", IndexServiceException.INTERNAL_SERVER_ERROR, e);
+      throw new GenericException("Could not process preservation metadata binary " + binary.getStoragePath()
+        + " using xslt characterization.xslt", e);
     }
     Map<String, String> characteristics = new HashMap<String, String>();
     for (String s : doc.getFieldNames()) {

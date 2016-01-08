@@ -19,6 +19,7 @@ import java.util.Map;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
 import org.roda.core.data.common.InvalidParameterException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.PluginType;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.AIP;
@@ -127,14 +128,8 @@ public class ExifToolPlugin implements Plugin<AIP> {
           }
           FSUtils.deletePath(data);
           FSUtils.deletePath(metadata);
-        } catch (StorageServiceException sse) {
+        } catch (RODAException | IOException | CommandException sse) {
           LOGGER.error("Error processing AIP " + aip.getId() + ": " + sse.getMessage());
-        } catch (IOException ioe) {
-          LOGGER.error("Error processing AIP " + aip.getId() + ": " + ioe.getMessage());
-        } catch (CommandException ce) {
-          LOGGER.error("Error processing AIP " + aip.getId() + ": " + ce.getMessage());
-        } catch (ModelServiceException mse) {
-          LOGGER.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage());
         }
       }
     }

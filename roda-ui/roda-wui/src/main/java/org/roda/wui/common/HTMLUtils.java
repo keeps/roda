@@ -33,6 +33,10 @@ import org.roda.core.common.Messages;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.data.common.Pair;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.model.AIP;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.ModelServiceException;
@@ -44,7 +48,6 @@ import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StoragePath;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.roda.wui.client.browse.PreservationMetadataBundle;
@@ -83,7 +86,8 @@ public final class HTMLUtils {
   }
 
   public static PreservationMetadataBundle getPreservationMetadataBundle(String aipId, ModelService model,
-    StorageService storage) throws ModelServiceException, StorageServiceException {
+    StorageService storage)
+      throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     AIP aip = model.retrieveAIP(aipId);
     List<RepresentationPreservationMetadataBundle> representations = new ArrayList<RepresentationPreservationMetadataBundle>();
     if (aip.getRepresentationIds() != null && aip.getRepresentationIds().size() > 0) {
@@ -109,8 +113,8 @@ public final class HTMLUtils {
 
   public static String getPreservationMetadataHTML(String aipId, ModelService model, StorageService storage,
     Locale locale, Pair<Integer, Integer> pagingParametersAgents, Pair<Integer, Integer> pagingParametersEvents,
-    Pair<Integer, Integer> pagingParametersFile)
-      throws ModelServiceException, StorageServiceException, TransformerException {
+    Pair<Integer, Integer> pagingParametersFile) throws TransformerException, RequestNotValidException,
+      NotFoundException, GenericException, AuthorizationDeniedException {
     AIP aip = model.retrieveAIP(aipId);
     StringBuilder s = new StringBuilder();
     s.append("<span class='preservationMetadata'><div class='title'>PREMIS</div>");
@@ -133,8 +137,7 @@ public final class HTMLUtils {
   }
 
   private static RepresentationPreservationMetadataBundle getRepresentationPreservationMetadataBundle(
-    String representationID, ClosableIterable<PreservationMetadata> preservationMetadata, StorageService storage)
-      throws ModelServiceException, StorageServiceException {
+    String representationID, ClosableIterable<PreservationMetadata> preservationMetadata, StorageService storage) {
     RepresentationPreservationMetadataBundle representationBundle = new RepresentationPreservationMetadataBundle();
     List<String> agentIds = new ArrayList<String>();
     List<String> eventIds = new ArrayList<String>();
@@ -160,7 +163,7 @@ public final class HTMLUtils {
 
   public static String getRepresentationPreservationMetadataHtml(StoragePath preservationPath, StorageService storage,
     final Locale locale, Pair<Integer, Integer> pagingParametersAgents, Pair<Integer, Integer> pagingParametersEvents,
-    Pair<Integer, Integer> pagingParametersFiles) throws ModelServiceException, StorageServiceException {
+    Pair<Integer, Integer> pagingParametersFiles) {
     String html = "";
     try {
 
