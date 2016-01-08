@@ -409,6 +409,14 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		<!-- XXX 20160107 this dependency was added when upgrading fedora to version 
+			4.4, otherwise roda unit tests fail -->
+		<dependency>
+			<groupId>org.apache.jena</groupId>
+			<artifactId>jena-base</artifactId>
+			<version>3.0.1</version>
+			<scope>test</scope>
+		</dependency>
 		<!-- / FEDORA TESTING GEAR -->
 		<!-- Akka related dependencies - start -->
 		<dependency>
@@ -487,7 +495,7 @@
 			<groupId>org.reflections</groupId>
 			<artifactId>reflections</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.roda-project</groupId>
 			<artifactId>commons-ip</artifactId>
