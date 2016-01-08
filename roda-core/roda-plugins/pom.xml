@@ -12,6 +12,6 @@
 		<relativePath>../..</relativePath>
 	</parent>
 	<modules>
-		<module>misc/roda-plugin-misc-fixity</module>
+		<!--<module>misc/roda-plugin-misc-fixity</module>-->
 	</modules>
 </project>
