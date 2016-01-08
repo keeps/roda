@@ -183,4 +183,9 @@ public class JavascriptUtils {
   public static native void showRightHiddenPanel(String panel) /*-{
     $wnd.jQuery(panel).animate({width:'toggle'},100);  
   }-*/;
+  
+  
+  public static native void historyGo(int n) /*-{
+    $wnd.history.go(n);
+  }-*/;
 }

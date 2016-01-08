@@ -81,6 +81,8 @@ public interface BrowserServiceAsync {
    */
   public void getAncestors(SimpleDescriptionObject sdo, AsyncCallback<List<SimpleDescriptionObject>> callback);
 
+  void countDescriptiveMetadataBinaries(String aipId, AsyncCallback<Long> callback);
+
   void getSearchFields(String locale, AsyncCallback<List<SearchField>> callback);
 
   /**
@@ -224,6 +226,7 @@ public interface BrowserServiceAsync {
     AsyncCallback<IndexResult<JobReport>> callback);
 
   void getViewersProperties(AsyncCallback<List<Viewer>> callback);
-  
-  void getSupportedMetadata(String locale, AsyncCallback<Map<String,String>> callback);
+
+  void getSupportedMetadata(String locale, AsyncCallback<Map<String, String>> callback);
+
 }

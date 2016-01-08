@@ -137,6 +137,9 @@ public interface BrowserService extends RemoteService {
   List<SimpleDescriptionObject> getAncestors(SimpleDescriptionObject sdo)
     throws AuthorizationDeniedException, GenericException, NotFoundException;
 
+  public Long countDescriptiveMetadataBinaries(String aipId)
+    throws AuthorizationDeniedException, NotFoundException, RequestNotValidException, GenericException;
+
   List<SearchField> getSearchFields(String locale) throws GenericException;
 
   /**

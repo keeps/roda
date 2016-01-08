@@ -13,8 +13,6 @@ package org.roda.wui.client.browse;
 import java.util.List;
 import java.util.Map;
 
-import org.roda.core.data.adapter.filter.SimpleFilterParameter;
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.HistoryResolver;
@@ -48,13 +46,17 @@ import config.i18n.client.BrowseMessages;
  */
 public class CreateDescriptiveMetadata extends Composite {
 
+  public static final String NEW = "new";
+
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      if (historyTokens.size() == 1) {
+      if (historyTokens.size() == 1 || historyTokens.size() == 2) {
         final String aipId = historyTokens.get(0);
-        CreateDescriptiveMetadata create = new CreateDescriptiveMetadata(aipId);
+        boolean isNew = historyTokens.size() == 2 && historyTokens.get(1).equals(NEW);
+
+        CreateDescriptiveMetadata create = new CreateDescriptiveMetadata(aipId, isNew);
         callback.onSuccess(create);
 
       } else {
@@ -87,6 +89,8 @@ public class CreateDescriptiveMetadata extends Composite {
 
   private final String aipId;
 
+  private final boolean isNew;
+
   // private ClientLogger logger = new ClientLogger(getClass().getName());
 
   @UiField
@@ -113,8 +117,9 @@ public class CreateDescriptiveMetadata extends Composite {
    * @param user
    *          the user to edit
    */
-  public CreateDescriptiveMetadata(String aipId) {
+  public CreateDescriptiveMetadata(String aipId, boolean isNew) {
     this.aipId = aipId;
+    this.isNew = isNew;
 
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -158,6 +163,7 @@ public class CreateDescriptiveMetadata extends Composite {
 
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
+    buttonApply.setEnabled(false);
     String idText = id.getText();
     String typeText = type.getSelectedValue();
     String xmlText = xml.getText();
@@ -177,6 +183,7 @@ public class CreateDescriptiveMetadata extends Composite {
             // TODO show error
             Toast.showError(caught.getMessage());
           }
+          buttonApply.setEnabled(true);
         }
 
         @Override
@@ -189,6 +196,7 @@ public class CreateDescriptiveMetadata extends Composite {
       });
     } else {
       Toast.showError("Please fill the mandatory fields");
+      buttonApply.setEnabled(true);
     }
 
   }
@@ -211,9 +219,39 @@ public class CreateDescriptiveMetadata extends Composite {
   }
 
   private void cancel() {
-    // TODO check if other descriptive metadata is available to avoid infinite loop
-    // BrowserService.Util.getInstance().countDescriptiveMetadata(filter, callback);
-    Tools.newHistory(Browse.RESOLVER, aipId);
+    if (isNew) {
+      BrowserService.Util.getInstance().getSimpleDescriptionObject(aipId, new AsyncCallback<SimpleDescriptionObject>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          Toast.showError(caught.getClass().getName(), caught.getMessage());
+        }
+
+        @Override
+        public void onSuccess(SimpleDescriptionObject sdo) {
+          final String parentId = sdo.getParentID();
+          BrowserService.Util.getInstance().removeAIP(aipId, new AsyncCallback<Void>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+              Toast.showError(caught.getClass().getName(), caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(Void result) {
+              if (parentId != null) {
+                Tools.newHistory(Browse.RESOLVER, parentId);
+              } else {
+                Tools.newHistory(Browse.RESOLVER);
+              }
+            }
+          });
+
+        }
+      });
+    } else {
+      Tools.newHistory(Browse.RESOLVER, aipId);
+    }
   }
 
 }

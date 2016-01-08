@@ -154,7 +154,8 @@ public class ModelService extends ModelObservable {
     }
   }
 
-  private void createDirectoryIfNotExists(StoragePath directoryPath) throws GenericException, AuthorizationDeniedException {
+  private void createDirectoryIfNotExists(StoragePath directoryPath)
+    throws GenericException, AuthorizationDeniedException {
     try {
       storage.createDirectory(directoryPath, new HashMap<String, Set<String>>());
     } catch (AlreadyExistsException e) {
@@ -410,8 +411,19 @@ public class ModelService extends ModelObservable {
   }
 
   public Long countDescriptiveMetadataBinaries(String aipId)
-    throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
-    return storage.countResourcesUnderDirectory(ModelUtils.getDescriptiveMetadataPath(aipId));
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
+    try {
+      return storage.countResourcesUnderDirectory(ModelUtils.getDescriptiveMetadataPath(aipId));
+    } catch (NotFoundException e) {
+      try {
+        storage.getDirectory(ModelUtils.getAIPpath(aipId));
+        // AIP is there but metadata directory is not
+        return 0L;
+      } catch (NotFoundException e1) {
+        // AIP is not there, sending exception
+        throw new NotFoundException("Could not find AIP: " + aipId, e1);
+      }
+    }
   }
 
   public Binary retrieveDescriptiveMetadataBinary(String aipId, String descriptiveMetadataId)

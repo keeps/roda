@@ -200,7 +200,7 @@ public class Browse extends Composite {
     viewingTop = true;
     fondsPanel = new AIPList();
     initWidget(uiBinder.createAndBindUi(this));
-    
+
     moveItem.setEnabled(false);
     editPermissions.setEnabled(false);
 
@@ -338,10 +338,7 @@ public class Browse extends Composite {
   }
 
   protected void viewAction(BrowseItemBundle itemBundle) {
-    if (itemBundle != null && itemBundle.getDescriptiveMetadata().size() == 0) {
-      Toast.showInfo("Need metadata", "Please fill up the descriptive metadata");
-      Tools.newHistory(RESOLVER, CreateDescriptiveMetadata.RESOLVER.getHistoryToken(), aipId);
-    } else if (itemBundle != null) {
+    if (itemBundle != null) {
       browseTitle.setVisible(false);
       browseDescription.setVisible(false);
 
@@ -361,6 +358,7 @@ public class Browse extends Composite {
 
       itemMetadata.clear();
       final List<Pair<String, HTML>> descriptiveMetadataContainers = new ArrayList<Pair<String, HTML>>();
+
       for (DescriptiveMetadataViewBundle bundle : descMetadata) {
         String title = bundle.getLabel();
         HTML container = new HTML();
@@ -797,6 +795,7 @@ public class Browse extends Composite {
       @Override
       public void onSuccess(String itemAIPId) {
         view(itemAIPId);
+        Tools.newHistory(CreateDescriptiveMetadata.RESOLVER, itemAIPId, CreateDescriptiveMetadata.NEW);
       }
     });
   }
