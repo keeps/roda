@@ -16,7 +16,7 @@ import java.util.List;
 import org.roda.core.data.common.EmailAlreadyExistsException;
 import org.roda.core.data.common.NoSuchRODAObjectException;
 import org.roda.core.data.common.NoSuchUserException;
-import org.roda.wui.client.about.About;
+import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
@@ -121,7 +121,7 @@ public class VerifyEmail implements HistoryResolver {
             public void onSuccess(Boolean verified) {
               if (verified.booleanValue()) {
                 Window.alert(constants.verifyEmailSuccess());
-                Tools.newHistory(About.RESOLVER);
+                Tools.newHistory(Welcome.RESOLVER);
               } else {
                 Window.alert(constants.verifyEmailWrongToken());
                 tokenInputBox.setFocus(true);

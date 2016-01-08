@@ -15,10 +15,10 @@ import java.util.List;
 import java.util.MissingResourceException;
 import java.util.Set;
 
-import org.roda.wui.client.about.About;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.client.search.BasicSearch;
+import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.BadHistoryTokenException;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
@@ -82,7 +82,7 @@ public class ContentPanel extends SimplePanel {
     // Login
     resolvers.add(Login.RESOLVER);
     // Home
-    resolvers.add(About.RESOLVER);
+    resolvers.add(Welcome.RESOLVER);
     // Browse
     resolvers.add(Browse.RESOLVER);
     // Search
@@ -129,7 +129,7 @@ public class ContentPanel extends SimplePanel {
                   if (caught instanceof BadHistoryTokenException) {
                     Window.alert(messages.pageNotFound(caught.getMessage()));
                     if (currWidget == null) {
-                      Tools.newHistory(About.RESOLVER);
+                      Tools.newHistory(Welcome.RESOLVER);
                     }
                   }
                 }
@@ -154,7 +154,7 @@ public class ContentPanel extends SimplePanel {
     if (!foundit) {
       Window.alert(messages.pageNotFound(historyTokens.get(0)));
       if (currWidget == null) {
-        Tools.newHistory(About.RESOLVER);
+        Tools.newHistory(Welcome.RESOLVER);
       } else {
         Tools.newHistory(currHistoryPath);
       }

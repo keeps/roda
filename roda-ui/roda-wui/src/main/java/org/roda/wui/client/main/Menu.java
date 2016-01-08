@@ -13,7 +13,6 @@ package org.roda.wui.client.main;
 import java.util.List;
 
 import org.roda.core.data.v2.RodaUser;
-import org.roda.wui.client.about.About;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.ingest.Ingest;
@@ -21,6 +20,7 @@ import org.roda.wui.client.ingest.preingest.PreIngest;
 import org.roda.wui.client.ingest.process.IngestProcess;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.client.search.BasicSearch;
+import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.LoginStatusListener;
@@ -28,7 +28,6 @@ import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.management.client.Management;
 import org.roda.wui.management.user.client.MemberManagement;
 import org.roda.wui.management.user.client.Preferences;
-import org.roda.wui.management.user.client.Register;
 import org.roda.wui.management.user.client.UserLog;
 
 import com.google.gwt.core.client.GWT;
@@ -92,7 +91,7 @@ public class Menu extends Composite {
   public Menu() {
     initWidget(uiBinder.createAndBindUi(this));
 
-    about = new MenuItem(constants.title_about(), createCommand(About.RESOLVER.getHistoryPath()));
+    about = new MenuItem(constants.title_about(), createCommand(Welcome.RESOLVER.getHistoryPath()));
 
     dissemination_browse = new MenuItem(constants.title_dissemination_browse(),
       createCommand(Browse.RESOLVER.getHistoryPath()));
@@ -185,7 +184,7 @@ public class Menu extends Composite {
     // TODO make creating sync (not async)
 
     // Home
-    updateResolverTopItemVisibility(About.RESOLVER, about, 0);
+    updateResolverTopItemVisibility(Welcome.RESOLVER, about, 0);
 
     // Dissemination
     updateResolverTopItemVisibility(Browse.RESOLVER, dissemination_browse, 1);
@@ -210,7 +209,8 @@ public class Menu extends Composite {
     // User
     if (user.isGuest()) {
       rightMenu.addItem(constants.loginLogin(), createLoginCommand());
-      rightMenu.addItem(constants.loginRegister(), createCommand(Register.getInstance().getHistoryPath()));
+      // rightMenu.addItem(constants.loginRegister(),
+      // createCommand(Register.getInstance().getHistoryPath()));
     } else {
       rightMenu.addItem(user.getName(), userMenu);
     }

@@ -779,4 +779,10 @@ public class ViewRepresentation extends Composite {
 
     filesList.setFilter(filter);
   }
+
+  public void changeInfoFile() {
+    if (file != null) {
+
+    }
+  }
 }

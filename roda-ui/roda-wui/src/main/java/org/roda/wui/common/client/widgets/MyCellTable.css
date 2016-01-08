@@ -1,5 +1,13 @@
 /* Incremental changes from CellTable.css */ 
 
+.cellTableWidget {
+	border-collapse: initial;
+}
+
+.cellTableHeader {
+	border-bottom: 1px solid rgba(167, 169, 172, 0.5);
+}
+
 .cellTableHeader,.cellTableFooter {
 	white-space: nowrap;
 	font-family: 'Ubuntu', sans-serif;

@@ -12,7 +12,7 @@ package org.roda.wui.client.main;
 
 import java.util.List;
 
-import org.roda.wui.client.about.About;
+import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.Tools;
@@ -129,7 +129,7 @@ public class Main extends Composite implements EntryPoint {
     homeLinkArea.addClickHandler(new ClickHandler() {
 
       public void onClick(ClickEvent event) {
-        Tools.newHistory(About.RESOLVER);
+        Tools.newHistory(Welcome.RESOLVER);
       }
     });
 
@@ -139,8 +139,8 @@ public class Main extends Composite implements EntryPoint {
 
   private void onHistoryChanged(String historyToken) {
     if (historyToken.length() == 0) {
-      contentPanel.update(About.RESOLVER.getHistoryPath());
-      Tools.newHistory(About.RESOLVER);
+      contentPanel.update(Welcome.RESOLVER.getHistoryPath());
+      Tools.newHistory(Welcome.RESOLVER);
     } else {
 
       List<String> currentHistoryPath = Tools.getCurrentHistoryPath();

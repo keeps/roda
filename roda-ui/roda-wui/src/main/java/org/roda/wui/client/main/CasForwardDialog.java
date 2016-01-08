@@ -10,8 +10,8 @@
  */
 package org.roda.wui.client.main;
 
-import org.roda.wui.client.about.About;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.WUIWindow;
@@ -73,7 +73,7 @@ public class CasForwardDialog extends WUIWindow {
       @Override
       public void onClick(ClickEvent arg0) {
         hide();
-        Tools.newHistory(About.RESOLVER);
+        Tools.newHistory(Welcome.RESOLVER);
       }
     });
 

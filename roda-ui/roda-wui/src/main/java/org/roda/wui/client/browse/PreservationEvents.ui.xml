@@ -9,27 +9,24 @@
 	<ui:with field='messages' type='config.i18n.client.UserManagementMessages' />
 
 	<ui:style>
-	
+
 	</ui:style>
 
-	<g:FlowPanel styleName="preservationEvents"
-		addStyleNames="wrapper skip_padding">
+	<g:FlowPanel styleName="preservationEvents" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
-				<g:Label styleName="h1" addStyleNames="browseTitle">
-					<ui:msg description="Browser title">Preservation events</ui:msg>
-				</g:Label>
+				<g:FlowPanel styleName="browseItemPanel">
+					<g:SimplePanel styleName="browseItemIcon" ui:field="itemIcon" />
+					<g:FlowPanel styleName="browseItemPanelText">
+						<g:Label styleName="h1" addStyleNames="browseItemText"
+							ui:field="itemTitle" />
+					</g:FlowPanel>
+					<g:Label addStyleNames="browseItemDates" ui:field="itemDates" />
+				</g:FlowPanel>
 				<m:BreadcrumbPanel ui:field="breadcrumb"
 					addStyleNames="browseBreadcrumb" />
-<!-- 				<g:FlowPanel styleName="browseItemPanel"> -->
-<!-- 					<g:SimplePanel styleName="browseItemIcon" ui:field="itemIcon" /> -->
-<!-- 					<g:FlowPanel styleName="browseItemPanelText"> -->
-<!-- 						<g:Label styleName="h4" addStyleNames="browseItemText" -->
-<!-- 							ui:field="itemTitle" /> -->
-<!-- 						<g:Label addStyleNames="browseItemDates" ui:field="itemDates" /> -->
-<!-- 					</g:FlowPanel> -->
-<!-- 				</g:FlowPanel> -->
-				<g:FlowPanel ui:field="premisContainer" addStyleNames="preservationMetadata metadataContent">
+				<g:FlowPanel ui:field="premisContainer"
+					addStyleNames="preservationMetadata metadataContent">
 				</g:FlowPanel>
 			</g:FlowPanel>
 

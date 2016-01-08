@@ -8,7 +8,7 @@
 /**
  * 
  */
-package org.roda.wui.client.about;
+package org.roda.wui.client.welcome;
 
 import java.util.Arrays;
 import java.util.List;
@@ -24,7 +24,7 @@ import com.google.gwt.user.client.ui.Widget;
  * @author Luis Faria
  * 
  */
-public class About {
+public class Welcome {
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
@@ -40,7 +40,7 @@ public class About {
 
     @Override
     public String getHistoryToken() {
-      return "about";
+      return "welcome";
     }
 
     @Override
@@ -49,16 +49,16 @@ public class About {
     }
   };
 
-  private static About instance = null;
+  private static Welcome instance = null;
 
   /**
    * Get the singleton instance
    * 
    * @return the instance
    */
-  public static About getInstance() {
+  public static Welcome getInstance() {
     if (instance == null) {
-      instance = new About();
+      instance = new Welcome();
     }
     return instance;
   }
@@ -67,14 +67,14 @@ public class About {
 
   private HTMLWidgetWrapper layout;
 
-  private About() {
+  private Welcome() {
     initialized = false;
   }
 
   private void init() {
     if (!initialized) {
       initialized = true;
-      layout = new HTMLWidgetWrapper("About.html");
+      layout = new HTMLWidgetWrapper("Welcome.html");
       layout.addStyleName("wui-home");
     }
   }
@@ -84,7 +84,7 @@ public class About {
       init();
       callback.onSuccess(layout);
     } else {
-      Tools.newHistory(About.RESOLVER);
+      Tools.newHistory(Welcome.RESOLVER);
       callback.onSuccess(null);
     }
   }

@@ -16,8 +16,8 @@ import java.util.List;
 import org.roda.core.data.common.InvalidTokenException;
 import org.roda.core.data.common.NoSuchUserException;
 import org.roda.core.data.v2.RodaUser;
-import org.roda.wui.client.about.About;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.BadHistoryTokenException;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
@@ -127,7 +127,7 @@ public class ResetPassword implements HistoryResolver {
 
             public void onSuccess(Void result) {
               Window.alert(constants.resetPasswordSuccess());
-              Tools.newHistory(About.RESOLVER);
+              Tools.newHistory(Welcome.RESOLVER);
             }
 
           });

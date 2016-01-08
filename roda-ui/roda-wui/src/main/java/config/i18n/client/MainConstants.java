@@ -9,7 +9,6 @@ package config.i18n.client;
 
 import com.google.gwt.i18n.client.Constants;
 import com.google.gwt.i18n.client.ConstantsWithLookup;
-import com.google.gwt.safehtml.shared.SafeHtml;
 
 /**
  * @author Luis Faria Interface to represent the constants contained in resource
@@ -93,7 +92,7 @@ public interface MainConstants extends Constants, ConstantsWithLookup {
   public String title_dissemination_help();
 
   @Key("title.dissemination.browse")
-  @DefaultStringValue("Browse")
+  @DefaultStringValue("Catalogue")
   public String title_dissemination_browse();
 
   @Key("title.administration")

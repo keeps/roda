@@ -43,6 +43,9 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.BrowseMessages;
@@ -53,7 +56,7 @@ import config.i18n.client.BrowseMessages;
  */
 public class PreservationEvents extends Composite {
 
-  private static final String TOP_ICON = "<i class='fa fa-circle-o'></i>";
+  private static final String TOP_ICON = "<span class='roda-logo'></span>";
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
@@ -97,14 +100,14 @@ public class PreservationEvents extends Composite {
   @UiField
   BreadcrumbPanel breadcrumb;
 
-  // @UiField
-  // SimplePanel itemIcon;
-  //
-  // @UiField
-  // Label itemTitle;
-  //
-  // @UiField
-  // Label itemDates;
+  @UiField
+  SimplePanel itemIcon;
+
+  @UiField
+  Label itemTitle;
+
+  @UiField
+  Label itemDates;
 
   @UiField
   FlowPanel premisContainer;
@@ -149,13 +152,12 @@ public class PreservationEvents extends Composite {
     breadcrumb.updatePath(getBreadcrumbsFromAncestors(itemBundle.getSdoAncestors(), sdo));
     breadcrumb.setVisible(true);
 
-    // HTMLPanel itemIconHtmlPanel =
-    // DescriptionLevelUtils.getElementLevelIconHTMLPanel(sdo.getLevel());
-    // itemIconHtmlPanel.addStyleName("browseItemIcon-other");
-    // itemIcon.setWidget(itemIconHtmlPanel);
-    // itemTitle.setText(sdo.getTitle() != null ? sdo.getTitle() : sdo.getId());
-    // itemTitle.removeStyleName("browseTitle-allCollections");
-    // itemDates.setText(getDatesText(sdo));
+    HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getElementLevelIconHTMLPanel(sdo.getLevel());
+    itemIconHtmlPanel.addStyleName("browseItemIcon-other");
+    itemIcon.setWidget(itemIconHtmlPanel);
+    itemTitle.setText(sdo.getTitle() != null ? sdo.getTitle() : sdo.getId());
+    itemTitle.removeStyleName("browseTitle-allCollections");
+    itemDates.setText(getDatesText(sdo));
 
     if (!preservationMetadata.getRepresentationsMetadata().isEmpty()) {
       for (RepresentationPreservationMetadataBundle bundle : preservationMetadata.getRepresentationsMetadata()) {
@@ -207,24 +209,24 @@ public class PreservationEvents extends Composite {
     return breadcrumbLabel;
   }
 
-  // private String getDatesText(SimpleDescriptionObject sdo) {
-  // String ret;
-  //
-  // Date dateInitial = sdo.getDateInitial();
-  // Date dateFinal = sdo.getDateFinal();
-  //
-  // if (dateInitial == null && dateFinal == null) {
-  // ret = messages.titleDatesEmpty();
-  // } else if (dateInitial != null && dateFinal == null) {
-  // ret = messages.titleDatesNoFinal(dateInitial);
-  // } else if (dateInitial == null && dateFinal != null) {
-  // ret = messages.titleDatesNoInitial(dateFinal);
-  // } else {
-  // ret = messages.titleDates(dateInitial, dateFinal);
-  // }
-  //
-  // return ret;
-  // }
+  private String getDatesText(SimpleDescriptionObject sdo) {
+    String ret;
+
+    Date dateInitial = sdo.getDateInitial();
+    Date dateFinal = sdo.getDateFinal();
+
+    if (dateInitial == null && dateFinal == null) {
+      ret = messages.titleDatesEmpty();
+    } else if (dateInitial != null && dateFinal == null) {
+      ret = messages.titleDatesNoFinal(dateInitial);
+    } else if (dateInitial == null && dateFinal != null) {
+      ret = messages.titleDatesNoInitial(dateFinal);
+    } else {
+      ret = messages.titleDates(dateInitial, dateFinal);
+    }
+
+    return ret;
+  }
 
   private void getPreservationMetadataHTML(final String aipId, final String repId,
     final AsyncCallback<SafeHtml> callback) {

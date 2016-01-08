@@ -15,8 +15,8 @@ import java.util.List;
 
 import org.roda.core.data.common.AuthenticationDeniedException;
 import org.roda.core.data.v2.RodaUser;
-import org.roda.wui.client.about.About;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
@@ -173,7 +173,7 @@ public class Login extends Composite {
           if (service != null && service.length() > 0) {
             History.newItem(service);
           } else {
-            Tools.newHistory(About.RESOLVER);
+            Tools.newHistory(Welcome.RESOLVER);
           }
 
         }

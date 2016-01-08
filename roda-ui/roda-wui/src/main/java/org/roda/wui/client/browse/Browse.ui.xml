@@ -6,9 +6,9 @@
 	xmlns:lists="urn:import:org.roda.wui.client.common.lists">
 
 	<ui:style>
-		.searchlist-title {
+	.searchlist-title {
 		position: absolute;
-		}
+	}
 	</ui:style>
 
 	<ui:with field='messages' type='config.i18n.client.BrowseMessages' />
@@ -16,23 +16,36 @@
 	<g:FlowPanel styleName="browse" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
-				<g:Label styleName="h1" addStyleNames="browseTitle">
-					<ui:msg description="Browser title">Browse</ui:msg>
+				<g:Label styleName="h1" addStyleNames="browseTitle"
+					ui:field="browseTitle">
+					<ui:msg description="Browser title">Catalogue</ui:msg>
 				</g:Label>
-				<m:BreadcrumbPanel ui:field="breadcrumb"
-					addStyleNames="browseBreadcrumb" />
+				<g:HTML addStyleNames="page-description" ui:field="browseDescription">
+					<p>
+						Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec laoreet
+						at sapien vel efficitur. Mauris lacinia nisi a luctus lacinia.
+						Donec est est, scelerisque pulvinar eros a, tempus rutrum augue.
+						Integer scelerisque volutpat metus, a congue libero ullamcorper
+						non. Integer gravida viverra mi, sit amet ultrices lacus efficitur
+						sed. Maecenas vitae varius dolor. Curabitur ut ultrices leo.
+						Vivamus sollicitudin orci ut pellentesque maximus. Nam in enim
+						malesuada, vestibulum purus ac, porta risus. Lorem ipsum dolor sit
+						amet, consectetur adipiscing elit.
+					</p>
+				</g:HTML>
 				<g:FlowPanel styleName="browseItemPanel">
 					<g:SimplePanel styleName="browseItemIcon" ui:field="itemIcon" />
 					<g:FlowPanel styleName="browseItemPanelText">
-						<g:Label styleName="h4" addStyleNames="browseItemText"
+						<g:Label styleName="h1" addStyleNames="browseItemText"
 							ui:field="itemTitle" />
-						<g:Label addStyleNames="browseItemDates" ui:field="itemDates" />
 					</g:FlowPanel>
+					<g:Label addStyleNames="browseItemDates" ui:field="itemDates" />
 				</g:FlowPanel>
+				<m:BreadcrumbPanel ui:field="breadcrumb"
+					addStyleNames="browseBreadcrumb" />
 				<g:TabPanel ui:field="itemMetadata" addStyleNames="browseItemMetadata" />
-				<g:Label styleName="{style.searchlist-title}" addStyleNames="h4"
-					ui:field="fondsPanelTitle">
-					<ui:msg>Items</ui:msg>
+				<g:Label addStyleNames="h4 browseSearchListTitle" ui:field="fondsPanelTitle">
+					<ui:msg>Sublevels</ui:msg>
 				</g:Label>
 				<lists:AIPList ui:field="fondsPanel" />
 			</g:FlowPanel>
@@ -45,7 +58,7 @@
 					</g:FlowPanel>
 				</g:FlowPanel>
 				<g:FlowPanel ui:field="preservationSidebar">
-				    <g:Label addStyleNames="h4">
+					<g:Label addStyleNames="h4">
 						<ui:msg>Preservation</ui:msg>
 					</g:Label>
 					<g:Button addStyleNames="btn btn-clock" ui:field="preservationEvents">
@@ -54,22 +67,27 @@
 				</g:FlowPanel>
 				<g:FlowPanel>
 					<g:Label addStyleNames="h4">
-						<ui:text from='{messages.sidebarActionsTitle}' />
+						<ui:msg>Actions</ui:msg>
 					</g:Label>
 					<g:Button addStyleNames="btn btn-plus" ui:field="createItem">
-						<ui:msg>New sub-item</ui:msg>
+						<ui:msg>New sublevel</ui:msg>
 					</g:Button>
-					<g:Button addStyleNames="btn btn-plus" ui:field="createDescriptiveMetadata">
-					<ui:msg>New metadata</ui:msg>
-					</g:Button>
+					<!-- <g:Button addStyleNames="btn btn-plus" ui:field="createDescriptiveMetadata"> -->
+					<!-- <ui:msg>New metadata</ui:msg> -->
+					<!-- </g:Button> -->
 					<g:Button addStyleNames="btn btn-edit" ui:field="moveItem">
 						<ui:msg>Move</ui:msg>
 					</g:Button>
-					<g:Button addStyleNames="btn btn-edit" ui:field="editPermissions">
-						<ui:msg>Edit permissions</ui:msg>
-					</g:Button>
 					<g:Button addStyleNames="btn btn-ban" ui:field="remove">
 						<ui:msg>Remove</ui:msg>
+					</g:Button>
+				</g:FlowPanel>
+				<g:FlowPanel>
+					<g:Label addStyleNames="h4">
+						<ui:msg>Permissions</ui:msg>
+					</g:Label>
+					<g:Button addStyleNames="btn btn-edit" ui:field="editPermissions">
+						<ui:msg>Edit</ui:msg>
 					</g:Button>
 				</g:FlowPanel>
 			</g:FlowPanel>

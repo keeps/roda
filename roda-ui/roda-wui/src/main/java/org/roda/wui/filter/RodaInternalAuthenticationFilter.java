@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.roda.core.common.UserUtility;
-import org.roda.wui.client.about.About;
+import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.tools.Tools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,7 +63,7 @@ public class RodaInternalAuthenticationFilter implements Filter {
       httpResponse.sendRedirect(redirect);
     } else if (requestURI.equals("/logout")) {
       UserUtility.logout(httpRequest);
-      httpResponse.sendRedirect("/#" + About.RESOLVER.getHistoryToken());
+      httpResponse.sendRedirect("/#" + Welcome.RESOLVER.getHistoryToken());
 
     } else {
       chain.doFilter(request, response);

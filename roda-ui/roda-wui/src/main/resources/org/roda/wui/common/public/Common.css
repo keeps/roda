@@ -32,8 +32,8 @@ a {
 }
 
 h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
-	margin-top: 0;
-	margin-bottom: 2rem;
+	margin-top: 2rem;
+	margin-bottom: 1rem;
 	font-weight: 400;
 }
 
@@ -75,7 +75,7 @@ h6, .h6 {
 
 .label {
 	font-weight: 400;
-    color: #999;
+	color: #999;
 }
 
 /* --------------------------------------------------
@@ -121,8 +121,6 @@ pre>code {
 	color: black;
 }
 
-
-
 .form-label {
 	
 }
@@ -131,7 +129,7 @@ pre>code {
 	width: 100%;
 	color: #58595b;
 	padding: 5px;
-	border: 2px solid #ccc;
+	border: 1px solid #ccc;
 	border-radius: 1px;
 	/*height: 1em;*/
 	box-sizing: border-box;
@@ -142,7 +140,7 @@ pre>code {
 	color: #58595b;
 	background-color: white;
 	padding: 5px;
-	border: 2px solid #ccc;
+	border: 1px solid #ccc;
 	border-radius: 1px;
 	/*height: 1em;*/
 	box-sizing: border-box;
@@ -158,7 +156,6 @@ pre>code {
 .form-radiogroup {
 	margin-left: 10px;
 	margin-bottom: 10px;
-	
 }
 
 .form-radiobutton {
@@ -172,15 +169,15 @@ pre>code {
 	font-weight: 400;
 	color: #999;
 	position: relative;
-    top: -5px;
+	top: -5px;
 }
 
-.form-radiobutton + .form-help {
-    margin-left: 20px;
+.form-radiobutton+.form-help {
+	margin-left: 20px;
 }
 
-.form-checkbox + .form-help {
-    margin-left: 20px;
+.form-checkbox+.form-help {
+	margin-left: 20px;
 }
 
 .form-textbox-small {
@@ -208,11 +205,10 @@ pre>code {
 	margin-bottom: 7px;
 }
 
-
-
 .sidebar .h1, .sidebar .h2, .sidebar .h3, .sidebar .h4, .sidebar .h5,
 	.sidebar .h6 {
-	margin-bottom: 0.2rem;
+	margin-bottom: 0.6rem;
+	font-size: 1.8rem;
 }
 
 .btn {
@@ -745,6 +741,7 @@ td.datePickerMonth, td.datePickerYear {
 		
 		
 		
+		
 		 'scale');
 }
 
@@ -753,6 +750,7 @@ td.datePickerMonth, td.datePickerYear {
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src= 'images/button/normal/right_arrow_backward.png', sizingMethod=
+		
 		
 		
 		
@@ -787,6 +785,7 @@ td.datePickerMonth, td.datePickerYear {
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src= 'images/button/normal/right_arrow_forward.png', sizingMethod=
+		
 		
 		
 		
@@ -842,7 +841,7 @@ td.datePickerMonth, td.datePickerYear {
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/normal/right_minus.png', sizingMethod=           
+		   'images/button/normal/right_minus.png', sizingMethod=            
 		              
 		'scale');
 }
@@ -912,7 +911,7 @@ td.datePickerMonth, td.datePickerYear {
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/hover/right_arrow_up.png', sizingMethod=
+		   'images/button/hover/right_arrow_up.png', sizingMethod= 
 		            
 		            
 		'scale');
@@ -1024,7 +1023,7 @@ td.datePickerMonth, td.datePickerYear {
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/pressed/right_check.png', sizingMethod=            
+		   'images/button/pressed/right_check.png', sizingMethod=             
 		             
 		'scale');
 }
@@ -1034,7 +1033,7 @@ td.datePickerMonth, td.datePickerYear {
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/pressed/right_cross.png', sizingMethod=            
+		   'images/button/pressed/right_cross.png', sizingMethod=             
 		             
 		'scale');
 }
@@ -1044,7 +1043,7 @@ td.datePickerMonth, td.datePickerYear {
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/pressed/right_info.png', sizingMethod=           
+		   'images/button/pressed/right_info.png', sizingMethod=            
 		              
 		'scale');
 }
@@ -1054,7 +1053,7 @@ td.datePickerMonth, td.datePickerYear {
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/pressed/right_minus.png', sizingMethod=            
+		   'images/button/pressed/right_minus.png', sizingMethod=             
 		             
 		'scale');
 }
@@ -1064,7 +1063,7 @@ td.datePickerMonth, td.datePickerYear {
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/pressed/right_plus.png', sizingMethod=           
+		   'images/button/pressed/right_plus.png', sizingMethod=            
 		              
 		'scale');
 }
@@ -1136,7 +1135,7 @@ td.datePickerMonth, td.datePickerYear {
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/disabled/right_check.png', sizingMethod=
+		   'images/button/disabled/right_check.png', sizingMethod= 
 		            
 		            
 		'scale');
@@ -1147,7 +1146,7 @@ td.datePickerMonth, td.datePickerYear {
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/disabled/right_cross.png', sizingMethod=
+		   'images/button/disabled/right_cross.png', sizingMethod= 
 		            
 		            
 		'scale');
@@ -1158,7 +1157,7 @@ td.datePickerMonth, td.datePickerYear {
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/disabled/right_info.png', sizingMethod=            
+		   'images/button/disabled/right_info.png', sizingMethod=             
 		             
 		'scale');
 }
@@ -1168,7 +1167,7 @@ td.datePickerMonth, td.datePickerYear {
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/disabled/right_minus.png', sizingMethod=
+		   'images/button/disabled/right_minus.png', sizingMethod= 
 		            
 		            
 		'scale');
@@ -1179,7 +1178,7 @@ td.datePickerMonth, td.datePickerYear {
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/disabled/right_plus.png', sizingMethod=            
+		   'images/button/disabled/right_plus.png', sizingMethod=             
 		             
 		'scale');
 }
@@ -1197,7 +1196,7 @@ td.datePickerMonth, td.datePickerYear {
 	_background-image: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/button/disabled/right_rec.png', sizingMethod=           
+		   'images/button/disabled/right_rec.png', sizingMethod=            
 		              
 		'scale');
 }
@@ -1286,7 +1285,7 @@ td.datePickerMonth, td.datePickerYear {
 	_background: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/shadow/shadow-bottom-left.png', sizingMethod=           
+		   'images/shadow/shadow-bottom-left.png', sizingMethod=            
 		              
 		'scale');
 }
@@ -1307,7 +1306,7 @@ td.datePickerMonth, td.datePickerYear {
 	_background: none;
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
 		    src=   
-		   'images/shadow/shadow-bottom-right.png', sizingMethod=            
+		   'images/shadow/shadow-bottom-right.png', sizingMethod=             
 		             
 		'scale');
 }
@@ -1595,17 +1594,17 @@ td.datePickerMonth, td.datePickerYear {
 .wui-toast {
 	width: auto;
 	max-width: 300px;
-  	clear: both;
+	clear: both;
 	border-radius: 2px;
-	background-color: rgba(50,50,50,0.9);
+	background-color: rgba(50, 50, 50, 0.9);
 	padding: 5px 15px;
-  	font-size: 1.1rem;
-  	font-weight: 300;
-  	color: #fff;
+	font-size: 1.1rem;
+	font-weight: 300;
+	color: #fff;
 }
 
 .wui-toast.toast-error {
-	background-color: rgba(217,0,0,0.9);
+	background-color: rgba(217, 0, 0, 0.9);
 }
 
 .wui-toast .toast-title {
@@ -1776,6 +1775,7 @@ td.datePickerMonth, td.datePickerYear {
 	padding: 40px;
 	font-size: 12px;
 	line-height: 18px;
+	color: #222;
 }
 
 .static-page p {
@@ -1784,18 +1784,17 @@ td.datePickerMonth, td.datePickerYear {
 	line-height: 18px;
 }
 
-.static-page h1 {
+/*.static-page h1 {
 	font-size: 18pt;
 	font-weight: bold;
-	color: #404142;
 	margin-bottom: 20px;
+}*/
+.static-page h2 {
+	font-size: 18pt;
 }
 
-.static-page h2 {
+.static-page h3 {
 	font-size: 14pt;
-	font-weight: bold;
-	color: #404142;
-	margin-bottom: 10px;
 }
 
 .link {

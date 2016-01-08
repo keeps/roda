@@ -131,6 +131,7 @@ public class Tools {
     return createHistoryHashLink(path);
   }
 
+  @SafeVarargs
   public static <T> List<T> concat(List<T> list, T... items) {
     List<T> ret = new ArrayList<>(list);
     for (T item : items) {

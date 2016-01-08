@@ -12,7 +12,6 @@ package org.roda.wui.client.browse;
 
 import java.io.Serializable;
 
-import org.roda.core.data.v2.RepresentationFilePreservationObject;
 import org.roda.core.data.v2.RepresentationPreservationObject;
 
 /**

@@ -13,9 +13,38 @@
 	margin: 40px;
 }
 
+.footer h3 {
+	margin-top: 0;
+}
+
 .footer * {
 	color: white;
+}
+
+.footer p {
 	font-size: 1.2rem;
+	color: rgba(255, 255, 255, 0.8);
+}
+
+.page-description p {
+	margin-bottom: 1em;
+	font-size: 12px;
+	line-height: 18px;
+}
+
+.roda-logo {
+	font-family: 'RODALogo' !important;
+	speak: none;
+	font-style: normal;
+	font-weight: normal;
+	font-variant: normal;
+	text-transform: none;
+	line-height: 1;
+	-webkit-font-smoothing: antialiased;
+}
+
+.roda-logo:before {
+	content: "\e900";
 }
 
 /* @group Banner */
@@ -172,7 +201,7 @@
 
 /* @group Login Dialog */
 .wui-login-dialog {
-
+	
 }
 
 .wui-login-dialog .username-label {
@@ -326,10 +355,10 @@
 	color: #a7a9ac;
 }
 
-.main .wui-breadcrumbPanel .breadcrumb .fa,
-.main .wui-breadcrumbPanel .breadcrumb .description-level {
+.main .wui-breadcrumbPanel .breadcrumb .fa, .main .wui-breadcrumbPanel .breadcrumb .description-level
+	{
 	margin: 0 3px;
-    color: #a7a9ac;
+	color: #a7a9ac;
 }
 
 .main .wui-breadcrumbPanel .breadcrumb-last {
@@ -337,8 +366,8 @@
 	text-decoration: none;
 }
 
-.main .wui-breadcrumbPanel .breadcrumb-last .fa,
-.main .wui-breadcrumbPanel .breadcrumb-last .description-level {
+.main .wui-breadcrumbPanel .breadcrumb-last .fa, .main .wui-breadcrumbPanel .breadcrumb-last .description-level
+	{
 	color: #404142;
 }
 
@@ -554,14 +583,11 @@
 
 /* @end */
 
-
-
 /*******************************************************************/
 /*******************************************************************/
 /*******************     BROWSER      ******************************/
 /*******************************************************************/
 /*******************************************************************/
-
 
 /* Browser v2*/
 .browseTitle {
@@ -570,23 +596,29 @@
 
 .browseTitle-allCollections {
 	line-height: 4rem;
+	font-size: 2.4rem;
 }
 
 .browseBreadcrumb {
+	margin-top: 10px;
 	margin-bottom: 20px;
 }
 
 .browseItemPanel {
-	
+	margin-top: 2em;
+	vertical-align: middle;
 }
 
 .browseItemPanelText {
-	display: inline-block;
+	display: inline;
+	vertical-align: middle;
+	padding-left: 1em;
 }
 
 .browseItemIcon {
-	display: inline-block;
+	display: inline;
 	width: 50px;
+	vertical-align: middle;
 }
 
 .browseItemIcon-all {
@@ -611,13 +643,18 @@
 	font-size: 1.2rem;
 }
 
+.browseSearchListTitle {
+	float: left;
+	margin: 0 0 0 0;
+}
+
 .browseItemMetadata {
 	padding: 20px 0;
 	width: 100%;
 }
 
 .browseItemMetadata.gwt-TabPanel {
-	margin: 10px 0 0 0;
+	margin: 10px 0 10px 0;
 }
 
 .browseItemMetadata.gwt-TabBar {
@@ -661,8 +698,8 @@
 	color: #3998d0;
 }
 
-.browseItemMetadata .gwt-TabBarItem .premisTab,
-.browseItemMetadata .gwt-TabBarItem .addTab {
+.browseItemMetadata .gwt-TabBarItem .premisTab, .browseItemMetadata .gwt-TabBarItem .addTab
+	{
 	font-weight: normal;
 	font-size: 1.3rem;
 	white-space: nowrap;
@@ -711,16 +748,28 @@
 	margin-bottom: 10px;
 }
 
-.descriptiveMetadataLink {
+.descriptiveMetadataLinks {
 	float: right;
-	font-size: 1.3rem;
-	margin-right: 1px;
-	margin-left: 5px;
+	margin-top: -5px;
+	margin-right: -10px;
 }
 
-.descriptiveMetadataLink+.descriptiveMetadataLink:after {
-	content: '·';
-	margin-left: 5px;
+.descriptiveMetadataLink {
+	display: inline-block;
+	font-size: 20px;
+	line-height: 35px;
+	width: 35px;
+	height: 35px;
+	cursor: pointer;
+	cursor: hand;
+	color: white;
+	background-color: #999;
+	text-align: center;
+}
+
+.descriptiveMetadataLink:hover {
+	color: white;
+	background-color: #089de3;
 }
 
 .descriptiveMetadata-field {
@@ -815,11 +864,11 @@
 
 .header>.field .field-label:after {
 	content: ':';
-	margin-right:5px;
+	margin-right: 5px;
 }
 
 .header .identifierType {
-	display: none;	
+	display: none;
 }
 
 .header .identifierType:after {
@@ -910,14 +959,13 @@
 	padding-top: 5px;
 }
 
-.metadataContent .pagination{
-	display:none;
+.metadataContent .pagination {
+	display: none;
 }
 
-.metadataContent .agents{
-	display:none;
+.metadataContent .agents {
+	display: none;
 }
-
 
 /* Tables for metadata content
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
@@ -940,7 +988,6 @@
 	padding-right: 0;
 }
 
-
 .content>.field {
 	display: block;
 	line-height: 1.6rem;
@@ -954,7 +1001,7 @@
 
 .content>.field .field-label:after {
 	content: ':';
-	margin-right:5px;
+	margin-right: 5px;
 }
 
 .content>.field .field-value {
@@ -976,11 +1023,11 @@
 	text-rendering: auto;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
-	margin-right:5px;
+	margin-right: 5px;
 }
 
 .event .header .identifier {
-
+	
 }
 
 .event .subheader {
@@ -1588,7 +1635,6 @@
 	display: none;
 }
 
-
 /************************************************/
 /*********   INGEST                 *************/
 /************************************************/
@@ -1600,108 +1646,104 @@
 /*----------------------------
     The file upload form
 -----------------------------*/
-
-
-#upload{
-      width:100%;
-      margin:20px auto;
+#upload {
+	width: 100%;
+	margin: 20px auto;
 }
 
-#drop{
-    padding: 40px 50px;
-    text-align: center;
-    text-transform: uppercase;
-    font-size: 16px;
-    font-weight: bold;
-    color: #7f858a;
-    border: 5px dashed #e6e7e9;
-    border-radius: 10px;
+#drop {
+	padding: 40px 50px;
+	text-align: center;
+	text-transform: uppercase;
+	font-size: 16px;
+	font-weight: bold;
+	color: #7f858a;
+	border: 5px dashed #e6e7e9;
+	border-radius: 10px;
 }
 
-#drop a{
-    background-color: #089de3;
-    padding: 10px 20px;
-    color: #fff;
-    font-size: 1.2rem;
-    border-radius: 2px;
-    cursor: pointer;
-    display: block;
-    margin: 10px auto 0;
-    max-width: 100px;
-    line-height: 1;
+#drop a {
+	background-color: #089de3;
+	padding: 10px 20px;
+	color: #fff;
+	font-size: 1.2rem;
+	border-radius: 2px;
+	cursor: pointer;
+	display: block;
+	margin: 10px auto 0;
+	max-width: 100px;
+	line-height: 1;
 }
 
-#drop a:hover{
-    background-color:#3998d0;
+#drop a:hover {
+	background-color: #3998d0;
 }
 
-#drop input{
-    display:none;
+#drop input {
+	display: none;
 }
 
-#upload-list{
-    list-style:none;
+#upload-list {
+	list-style: none;
 }
 
-#upload-list li{
-    height: 52px;
-    position: relative;
+#upload-list li {
+	height: 52px;
+	position: relative;
 }
 
-#upload-list li input{
-    display: none;
+#upload-list li input {
+	display: none;
 }
 
-#upload-list li p{
-    width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font-size: 1.3rem;
-    font-weight: 500;
-    position: absolute;
-    top: 10px;
-    left: 60px;
+#upload-list li p {
+	width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	font-size: 1.3rem;
+	font-weight: 500;
+	position: absolute;
+	top: 10px;
+	left: 60px;
 }
 
-#upload-list li i{
-    font-weight: normal;
-    font-style: normal;
-    color: #7f7f7f;
-    display: block;
-    font-size: 1.1rem;
+#upload-list li i {
+	font-weight: normal;
+	font-style: normal;
+	color: #7f7f7f;
+	display: block;
+	font-size: 1.1rem;
 }
 
-#upload-list li canvas{
-    top: 15px;
-    left: 20px;
-    position: absolute;
+#upload-list li canvas {
+	top: 15px;
+	left: 20px;
+	position: absolute;
 }
 
-#upload-list li span{
-    width: 15px;
-    height: 12px;
-    background: url('images/icons.png') no-repeat;
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    cursor:pointer;
+#upload-list li span {
+	width: 15px;
+	height: 12px;
+	background: url('images/icons.png') no-repeat;
+	position: absolute;
+	top: 20px;
+	right: 20px;
+	cursor: pointer;
 }
 
-#upload-list li.working span{
-    height: 16px;
-    background-position: 0 -12px;
+#upload-list li.working span {
+	height: 16px;
+	background-position: 0 -12px;
 }
 
-#upload-list li.error p{
-    color: #D20707;
+#upload-list li.error p {
+	color: #D20707;
 }
-
 
 /************************************************/
 /*********   SEARCH                 *************/
 /************************************************/
-
 .search {
 	
 }
@@ -1720,7 +1762,7 @@
 
 .searchPanelLeft {
 	float: left;
-    width: 100%;
+	width: 100%;
 }
 
 .search .searchBox {
@@ -1738,10 +1780,10 @@
 	cursor: pointer;
 	cursor: hand;
 	position: relative;
-    top: -6px;
-    float: right;
-    width: 55px;
-    margin-right: -55px;
+	top: -6px;
+	float: right;
+	width: 55px;
+	margin-right: -55px;
 }
 
 .searchButton-html {
@@ -1786,17 +1828,18 @@
 .search-field-label {
 	display: inline;
 }
+
 .search-field-remove {
 	font-size: 1.2rem;
-    margin-left: 5px;
-    float: right;
+	margin-left: 5px;
+	float: right;
 }
 
-.searchAdvancedFieldsPanel + .searchAdvancedFieldAdd {
+.searchAdvancedFieldsPanel+.searchAdvancedFieldAdd {
 	margin-top: 10px;
 }
 
-.searchAdvancedFieldsPanel.empty + .searchAdvancedFieldAdd {
+.searchAdvancedFieldsPanel.empty+.searchAdvancedFieldAdd {
 	margin-top: 0;
 }
 
@@ -1828,7 +1871,7 @@
 	font-weight: 500;
 }
 
-.wui-dialog-confirm,.wui-dialog-information {
+.wui-dialog-confirm, .wui-dialog-information {
 	
 }
 
@@ -1847,7 +1890,6 @@
 /**********************************************
 				VIEW REPRESENTATION
 ************************************************/
-
 .viewRepresentationTitle {
 	margin-bottom: 10px !important;
 }
@@ -1895,24 +1937,29 @@
 	display: none;
 }
 
-.viewRepresentation .my-files-table .org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableCell {
+.viewRepresentation .my-files-table .org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableCell
+	{
 	padding-right: 2px;
 }
 
-.viewRepresentation .my-files-table .org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableOddRow {
+.viewRepresentation .my-files-table .org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableOddRow
+	{
 	background: white;
 	border: none;
 }
 
-.viewRepresentation .my-files-table .org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableOddRowCell {
+.viewRepresentation .my-files-table .org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableOddRowCell
+	{
 	border: 2px solid white;
 }
 
-.viewRepresentation .my-files-table .org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableHoveredRow {
+.viewRepresentation .my-files-table .org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableHoveredRow
+	{
 	background: #eee;
 }
 
-.viewRepresentation .my-files-table .org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableHoveredRow .org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableOddRowCell {
+.viewRepresentation .my-files-table .org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableHoveredRow .org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableOddRowCell
+	{
 	border: 2px solid #eee;
 }
 
@@ -1927,32 +1974,36 @@
 	background-color: #eee;
 }
 
-.viewRepresentationFilePreviewPanel .filePreviewToolbar .browseBreadcrumb {
+.viewRepresentationFilePreviewPanel .filePreviewToolbar .viewRepresentationBreadcrumb
+	{
 	padding-top: 5px;
 	margin-left: 40px;
 	float: left;
 }
 
-.viewRepresentationFilePreviewPanel .filePreviewToolbar .filePreviewToolbarIcons {
+.viewRepresentationFilePreviewPanel .filePreviewToolbar .filePreviewToolbarIcons
+	{
 	float: right;
 	margin-right: 0px;
 }
 
-.viewRepresentationFilePreviewPanel .filePreviewToolbar .filePreviewToolbarIcon {
+.viewRepresentationFilePreviewPanel .filePreviewToolbar .filePreviewToolbarIcon
+	{
 	float: right;
-    font-size: 20px;
-    line-height: 35px;
-    width: 35px;
-    height: 35px;
-    cursor: pointer;
-    cursor: hand;
-    color: white;
-    background-color: #999;
-    text-align: center;
+	font-size: 20px;
+	line-height: 35px;
+	width: 35px;
+	height: 35px;
+	cursor: pointer;
+	cursor: hand;
+	color: white;
+	background-color: #999;
+	text-align: center;
 }
 
 .viewRepresentationFilePreviewPanel .filePreviewToolbar .filePreviewToolbarIcon:hover,
-.viewRepresentationFilePreviewPanel .filePreviewToolbar .filePreviewToolbarIcon.active {
+	.viewRepresentationFilePreviewPanel .filePreviewToolbar .filePreviewToolbarIcon.active
+	{
 	color: white;
 	background-color: #089de3;
 }
@@ -1963,6 +2014,7 @@
 	width: 100%;
 	text-align: center;
 	padding-top: 0px !important;
+	margin-top: 20px;
 }
 
 .viewRepresentationImageFilePreview {
@@ -1982,7 +2034,7 @@
 }
 
 .viewRepresentationTextFilePreview code {
-    max-height: 600px;
+	max-height: 600px;
 }
 
 .viewRepresentationAudioFilePreview {
@@ -1995,12 +2047,11 @@
 	height: 600px;
 }
 
-.viewRepresentationEmptyPreview,
-.viewRepresentationErrorPreview,
-.viewRepresentationNotSupportedPreview,
-.viewRepresentationAudioFilePreviewHTML {
-    margin-top: 120px;
-    color: #999;
+.viewRepresentationEmptyPreview, .viewRepresentationErrorPreview,
+	.viewRepresentationNotSupportedPreview,
+	.viewRepresentationAudioFilePreviewHTML {
+	margin-top: 120px;
+	color: #999;
 }
 
 .viewRepresentationEmptyPreview .fa-5 {
@@ -2009,8 +2060,8 @@
 }
 
 .viewRepresentationErrorPreview .fa-5,
-.viewRepresentationNotSupportedPreview .fa-5 {
-    font-size: 10em;
+	.viewRepresentationNotSupportedPreview .fa-5 {
+	font-size: 10em;
 }
 
 .viewRepresentationAudioFilePreviewHTML .fa-5 {
@@ -2033,29 +2084,29 @@
 	padding: 0 3rem;
 	padding-left: 4.7rem;
 	background-color: inherit;
-    border: none;
-    margin-top: 3px;
-    color: white;
+	border: none;
+	margin-top: 3px;
+	color: white;
 }
 
 .viewRepresentation .searchBox::-webkit-input-placeholder,
-.viewRepresentation .searchBox:placeholder-shown {
+	.viewRepresentation .searchBox:placeholder-shown {
 	color: #ddd;
 }
 
 .viewRepresentation .searchPanelLeft {
 	float: left;
-    width: 100%;
+	width: 100%;
 }
 
 .viewRepresentation .searchButton {
 	cursor: pointer;
 	cursor: hand;
 	position: relative;
-    top: -2px;
-    left: 2px;
-    float: left;
-    width: 40px;
+	top: -2px;
+	left: 2px;
+	float: left;
+	width: 40px;
 }
 
 .viewRepresentation .searchButton-html {
@@ -2074,7 +2125,7 @@
 	height: 670px;
 	width: 300px;
 	background: #089de3;
-	display: none;    
+	display: none;
 	color: white;
 	position: absolute;
 	right: 0;
@@ -2083,24 +2134,24 @@
 /**********************************************
 				INGEST PROCESS NEW
 ************************************************/
-
 .wui-transferredResourceList {
 	font-size: 1.2rem;
 }
 
 .wui-transferredResourceList ul {
-    margin-left: 10px;
-    overflow: auto;
-    max-height: 300px;
-    width: 100%;
+	margin-left: 10px;
+	overflow: auto;
+	max-height: 300px;
+	width: 100%;
 }
+
 .wui-transferredResourceList ul li {
-   	overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    display: inline-block;
-    width: 30%;
-    margin-right: 3%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	display: inline-block;
+	width: 30%;
+	margin-right: 3%;
 }
 
 .wui-transferredResourceList ul li i {
@@ -2109,14 +2160,13 @@
 }
 
 .wui-plugin-options {
-    background-color: #eee;
-    padding: 10px 20px;
-    border-radius: 2px;
-    margin-bottom: 10px;
+	background-color: #eee;
+	padding: 10px 20px;
+	border-radius: 2px;
+	margin-bottom: 10px;
 }
 
 /****** INGEST PROCESS VIEW ***************/
-
 .job-report-object-input i, .job-report-object-output i {
 	font-size: 1.4rem;
 	margin-right: 5px;
@@ -2129,11 +2179,35 @@
 /**********************************************
 				PRESERVATION EVENTS
 ************************************************/
-
 .preservationEvents .preservationMetadata .representation .header {
 	margin-top: 20px;
 }
 
 .preservationEvents .preservationMetadata .content {
 	display: none;
+}
+
+/**********************************************
+				LOGIN
+************************************************/
+.login {
+	margin: 40px auto;
+	max-width: 400px;
+	background-color: #eee;
+	padding: 40px;
+}
+
+.login h1 {
+	margin-top: 0px;
+}
+
+.login-button {
+	margin-top: 20px;
+	width: 100px;
+}
+
+.login-error {
+	color: #F53E3E;
+	display: inline;
+	margin-left: 10px;
 }
