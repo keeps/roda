@@ -17,8 +17,11 @@ import java.io.Serializable;
  * information.
  * </p>
  * 
+ * @deprecated use {@link org.roda.core.data.exceptions.RODAException} instead
+ * 
  * @author Rui Castro
  */
+@Deprecated
 public abstract class RODAException extends Exception implements Serializable {
   private static final long serialVersionUID = -6932662689717864495L;
 

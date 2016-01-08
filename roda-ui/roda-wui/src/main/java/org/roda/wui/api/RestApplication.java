@@ -19,7 +19,7 @@ import io.swagger.jaxrs.listing.SwaggerSerializers;
 public class RestApplication extends ResourceConfig {
   private static final String RODA_API_PACKAGE = "org.roda.wui.api";
   private static final String SWAGGER_PACKAGE = "io.swagger.jaxrs.listing";
-  
+
   public RestApplication() {
     super();
     packages(SWAGGER_PACKAGE, RODA_API_PACKAGE);

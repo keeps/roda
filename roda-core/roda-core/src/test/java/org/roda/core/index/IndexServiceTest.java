@@ -18,7 +18,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
@@ -26,26 +25,20 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.apache.commons.configuration.BaseConfiguration;
-import org.apache.commons.configuration.Configuration;
-import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.hamcrest.Matchers;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.ApacheDS;
-import org.roda.core.common.LdapUtility;
 import org.roda.core.common.RodaUtils;
-import org.roda.core.common.UserUtility;
 import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
@@ -57,7 +50,6 @@ import org.roda.core.data.v2.LogEntryParameter;
 import org.roda.core.data.v2.RODAMember;
 import org.roda.core.data.v2.RODAObject;
 import org.roda.core.data.v2.Representation;
-import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.core.data.v2.User;
 import org.roda.core.model.AIP;
 import org.roda.core.model.ModelService;
@@ -73,117 +65,36 @@ import org.slf4j.LoggerFactory;
 public class IndexServiceTest {
 
   private static Path basePath;
-  private static Path indexPath;
   private static Path logPath;
-  private static StorageService storage;
   private static ModelService model;
   private static IndexService index;
 
   private static Path corporaPath;
   private static StorageService corporaService;
 
-  private static ApacheDS apacheDS;
-
   private static final Logger logger = LoggerFactory.getLogger(ModelServiceTest.class);
 
   @BeforeClass
   public static void setUp() throws Exception {
 
-    basePath = Files.createTempDirectory("modelTests");
-    logPath = basePath.resolve("log");
-    Files.createDirectory(logPath);
-    indexPath = Files.createTempDirectory("indexTests");
-    storage = new FileStorageService(basePath);
-    model = new ModelService(storage);
-
+    basePath = Files.createTempDirectory("indexTests");
     System.setProperty("roda.home", basePath.toString());
     RodaCoreFactory.instantiateTest();
-
-    // Configure Solr
-    URL solrConfigURL = IndexServiceTest.class.getResource("/config/index/solr.xml");
-    Path solrConfigPath = Paths.get(solrConfigURL.toURI());
-    Files.copy(solrConfigPath, indexPath.resolve("solr.xml"));
-    Path aipSchema = indexPath.resolve("aip");
-    Files.createDirectories(aipSchema);
-    Files.createFile(aipSchema.resolve("core.properties"));
-
-    Path solrHome = Paths.get(IndexServiceTest.class.getResource("/config/index/").toURI());
-    System.setProperty("solr.data.dir", indexPath.toString());
-    System.setProperty("solr.data.dir.aip", indexPath.resolve("aip").toString());
-    System.setProperty("solr.data.dir.sdo", indexPath.resolve("sdo").toString());
-    System.setProperty("solr.data.dir.representations", indexPath.resolve("representation").toString());
-    System.setProperty("solr.data.dir.preservationevent", indexPath.resolve("preservationevent").toString());
-    System.setProperty("solr.data.dir.preservationobject", indexPath.resolve("preservationobject").toString());
-    System.setProperty("solr.data.dir.actionlog", indexPath.resolve("actionlog").toString());
-    System.setProperty("solr.data.dir.jobreport", indexPath.resolve("jobreport").toString());
-    System.setProperty("solr.data.dir.members", indexPath.resolve("members").toString());
-    System.setProperty("solr.data.dir.othermetadata", indexPath.resolve("othermetadata").toString());
-    System.setProperty("solr.data.dir.sip", indexPath.resolve("sip").toString());
-    System.setProperty("solr.data.dir.job", indexPath.resolve("job").toString());
-    System.setProperty("solr.data.dir.file", indexPath.resolve("file").toString());
-    
-    // start embedded solr
-    final EmbeddedSolrServer solr = new EmbeddedSolrServer(solrHome, "test");
-
-    index = new IndexService(solr, model);
+    logPath = RodaCoreFactory.getLogPath();
+    model = RodaCoreFactory.getModelService();
+    index = RodaCoreFactory.getIndexService();
 
     URL corporaURL = IndexServiceTest.class.getResource("/corpora");
     corporaPath = Paths.get(corporaURL.toURI());
     corporaService = new FileStorageService(corporaPath);
 
-    // set of properties that will most certainly be in a default roda
-    // installation
-    Configuration rodaConfig = setAndRetrieveRodaProperties();
-
-    // start ApacheDS
-    apacheDS = new ApacheDS();
-    Files.createDirectories(basePath.resolve("ldapData"));
-    Path ldapConfigs = Paths.get(IndexServiceTest.class.getResource("/config/ldap/").toURI());
-    String ldapHost = rodaConfig.getString("ldap.host", "localhost");
-    int ldapPort = rodaConfig.getInt("ldap.port", 10389);
-    String ldapPeopleDN = rodaConfig.getString("ldap.peopleDN");
-    String ldapGroupsDN = rodaConfig.getString("ldap.groupsDN");
-    String ldapRolesDN = rodaConfig.getString("ldap.rolesDN");
-    String ldapAdminDN = rodaConfig.getString("ldap.adminDN");
-    String ldapAdminPassword = rodaConfig.getString("ldap.adminPassword");
-    String ldapPasswordDigestAlgorithm = rodaConfig.getString("ldap.passwordDigestAlgorithm");
-    List<String> ldapProtectedUsers = RodaUtils.copyList(rodaConfig.getList("ldap.protectedUsers"));
-    List<String> ldapProtectedGroups = RodaUtils.copyList(rodaConfig.getList("ldap.protectedGroups"));
-    apacheDS.initDirectoryService(ldapConfigs, basePath.resolve("ldapData"), ldapAdminPassword);
-    apacheDS.startServer(new LdapUtility(ldapHost, ldapPort, ldapPeopleDN, ldapGroupsDN, ldapRolesDN, ldapAdminDN,
-      ldapAdminPassword, ldapPasswordDigestAlgorithm, ldapProtectedUsers, ldapProtectedGroups), 10389);
-    for (User user : UserUtility.getLdapUtility().getUsers(new Filter())) {
-      model.addUser(user, false, true);
-    }
-    for (Group group : UserUtility.getLdapUtility().getGroups(new Filter())) {
-      model.addGroup(group, false, true);
-    }
-
-    logger.debug("Running model test under storage: " + basePath);
-  }
-
-  private static Configuration setAndRetrieveRodaProperties() {
-    Configuration rodaConfig = new BaseConfiguration();
-    rodaConfig.addProperty("ldap.host", "localhost");
-    rodaConfig.addProperty("ldap.port", "10389");
-    rodaConfig.addProperty("ldap.peopleDN", "ou=users\\,dc=roda\\,dc=org");
-    rodaConfig.addProperty("ldap.groupsDN", "ou=groups\\,dc=roda\\,dc=org");
-    rodaConfig.addProperty("ldap.rolesDN", "ou=roles\\,dc=roda\\,dc=org");
-    rodaConfig.addProperty("ldap.adminDN", "uid=admin\\,ou=system");
-    rodaConfig.addProperty("ldap.adminPassword", "secret");
-    rodaConfig.addProperty("ldap.passwordDigestAlgorithm", "MD5");
-    rodaConfig.addProperty("ldap.protectedUsers",
-      Arrays.asList("admin", "guest", "roda-ingest-task", "roda-wui", "roda-disseminator"));
-    rodaConfig.addProperty("ldap.protectedGroups",
-      Arrays.asList("administrators", "archivists", "producers", "users", "guests"));
-    return rodaConfig;
+    logger.debug("Running index tests under storage {}", basePath);
   }
 
   @AfterClass
   public static void tearDown() throws Exception {
-    apacheDS.stop();
+    RodaCoreFactory.shutdown();
     FSUtils.deletePath(basePath);
-    FSUtils.deletePath(indexPath);
   }
 
   @Test
@@ -197,47 +108,34 @@ public class IndexServiceTest {
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 
     // Retrieve, count and list AIP
-    final AIP indexedAIP = index.retrieve(AIP.class, aipId);
-    assertEquals(aip, indexedAIP);
+    // FIXME improve the comparison between AIP (from model) and IndexAIP (from
+    // index)
+    final IndexedAIP indexedAip = index.retrieve(IndexedAIP.class, aipId);
+    assertEquals(aip.getId(), indexedAip.getId());
+    assertEquals(aip.isActive(), RODAObject.STATE_ACTIVE.equals(indexedAip.getState()));
+    assertEquals(aip.getParentId(), indexedAip.getParentID());
+    assertEquals(aip.getDateCreated(), indexedAip.getCreatedDate());
+    assertEquals(aip.getDateModified(), indexedAip.getLastModifiedDate());
 
-    final long countAIP = index.count(AIP.class, null);
-    assertEquals(1, countAIP);
+    final IndexResult<IndexedAIP> indexAips = index.find(IndexedAIP.class, null, null, new Sublist(0, 10), null);
+    assertEquals(1, indexAips.getTotalCount());
+    assertEquals(1, indexAips.getLimit());
+    assertEquals(0, indexAips.getOffset());
+    assertEquals(1, indexAips.getResults().size());
 
-    final IndexResult<AIP> aipList = index.find(AIP.class, null, null, new Sublist(0, 10), null);
-    assertEquals(1, aipList.getTotalCount());
-    assertEquals(1, aipList.getLimit());
-    assertEquals(0, aipList.getOffset());
-    assertEquals(1, aipList.getResults().size());
-    assertEquals(aip, aipList.getResults().get(0));
+    final IndexedAIP aipFromList = indexAips.getResults().get(0);
+    assertEquals(aip.getId(), aipFromList.getId());
+    assertEquals(aip.isActive(), RODAObject.STATE_ACTIVE.equals(aipFromList.getState()));
+    assertEquals(aip.getParentId(), aipFromList.getParentID());
+    assertEquals(aip.getDateCreated(), aipFromList.getCreatedDate());
+    assertEquals(aip.getDateModified(), aipFromList.getLastModifiedDate());
 
-    // Retrieve, count and list SDO
-    final SimpleDescriptionObject sdo = index.retrieve(SimpleDescriptionObject.class, aipId);
-    assertEquals(aip.getId(), sdo.getId());
-    assertEquals(aip.isActive(), RODAObject.STATE_ACTIVE.equals(sdo.getState()));
-    assertEquals(aip.getParentId(), sdo.getParentID());
-    assertEquals(aip.getDateCreated(), sdo.getCreatedDate());
-    assertEquals(aip.getDateModified(), sdo.getLastModifiedDate());
-
-    final IndexResult<SimpleDescriptionObject> sdos = index.find(SimpleDescriptionObject.class, null, null,
-      new Sublist(0, 10), null);
-    assertEquals(1, sdos.getTotalCount());
-    assertEquals(1, sdos.getLimit());
-    assertEquals(0, sdos.getOffset());
-    assertEquals(1, sdos.getResults().size());
-
-    final SimpleDescriptionObject sdoFromList = sdos.getResults().get(0);
-    assertEquals(aip.getId(), sdoFromList.getId());
-    assertEquals(aip.isActive(), RODAObject.STATE_ACTIVE.equals(sdoFromList.getState()));
-    assertEquals(aip.getParentId(), sdoFromList.getParentID());
-    assertEquals(aip.getDateCreated(), sdoFromList.getCreatedDate());
-    assertEquals(aip.getDateModified(), sdoFromList.getLastModifiedDate());
-
-    assertEquals(sdo, sdoFromList);
-    assertEquals("fonds", sdo.getLevel());
-    assertEquals("My example", sdo.getTitle());
-    assertEquals("This is a very nice example", sdo.getDescription());
-    assertEquals(RodaUtils.parseDate("0001-01-01T00:00:00.000+0000"), sdo.getDateInitial());
-    assertEquals(RodaUtils.parseDate("0002-01-01T00:00:00.000+0000"), sdo.getDateFinal());
+    assertEquals(indexedAip, aipFromList);
+    assertEquals("fonds", indexedAip.getLevel());
+    assertEquals("My example", indexedAip.getTitle());
+    assertEquals("This is a very nice example", indexedAip.getDescription());
+    assertEquals(RodaUtils.parseDate("0001-01-01T00:00:00.000+0000"), indexedAip.getDateInitial());
+    assertEquals(RodaUtils.parseDate("0002-01-01T00:00:00.000+0000"), indexedAip.getDateFinal());
 
     // Retrieve, count and list SRO
     String rep1Id = aip.getRepresentationIds().get(0);
@@ -280,18 +178,8 @@ public class IndexServiceTest {
      */
     model.deleteAIP(aipId);
     try {
-      index.retrieve(AIP.class, aipId);
+      index.retrieve(IndexedAIP.class, aipId);
       fail("AIP deleted but yet it was retrieved");
-    } catch (NotFoundException e) {
-      // do nothing as it was the expected exception
-    } catch (RODAException e) {
-      fail("AIP was deleted and therefore a " + NotFoundException.class.getName()
-        + " should have been thrown instead of a " + e.getClass().getName());
-    }
-
-    try {
-      index.retrieve(SimpleDescriptionObject.class, aipId);
-      fail("AIP was deleted but yet its descriptive metadata was retrieved");
     } catch (NotFoundException e) {
       // do nothing as it was the expected exception
     } catch (RODAException e) {
@@ -310,13 +198,12 @@ public class IndexServiceTest {
 
     Filter filter = new Filter();
     filter.add(new SimpleFilterParameter(RodaConstants.AIP_ID, aipId));
-    SimpleDescriptionObject sdo = index.find(SimpleDescriptionObject.class, filter, null, new Sublist(0, 10), null)
-      .getResults().get(0);
+    IndexedAIP indexedAip = index.find(IndexedAIP.class, filter, null, new Sublist(0, 10), null).getResults().get(0);
     Calendar calInitial = Calendar.getInstance();
-    calInitial.setTime(sdo.getDateInitial());
+    calInitial.setTime(indexedAip.getDateInitial());
     assertEquals(calInitial.get(Calendar.YEAR), CorporaConstants.YEAR_1213);
     Calendar calFinal = Calendar.getInstance();
-    calFinal.setTime(sdo.getDateFinal());
+    calFinal.setTime(indexedAip.getDateFinal());
     assertEquals(calFinal.get(Calendar.YEAR), CorporaConstants.YEAR_2003);
 
   }
@@ -335,7 +222,8 @@ public class IndexServiceTest {
       CorporaConstants.OTHER_AIP_ID);
     final AIP updatedAIP = model.updateAIP(aipId, corporaService, otherAipPath);
 
-    final AIP indexedAIP = index.retrieve(AIP.class, aipId);
+    final IndexedAIP indexedAIP = index.retrieve(IndexedAIP.class, aipId);
+    // FIXME how to compare AIP (from model) and IndexAIP (from index)
     assertEquals(updatedAIP, indexedAIP);
 
     model.deleteAIP(aipId);
@@ -350,14 +238,14 @@ public class IndexServiceTest {
     model.createAIP(CorporaConstants.OTHER_AIP_ID, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.OTHER_AIP_ID));
 
-    long sdoCount = index.count(SimpleDescriptionObject.class, SimpleDescriptionObject.FONDS_FILTER);
-    assertEquals(1, sdoCount);
+    long aipCount = index.count(IndexedAIP.class, IndexedAIP.FONDS_FILTER);
+    assertEquals(1, aipCount);
 
-    final IndexResult<SimpleDescriptionObject> sdos = index.find(SimpleDescriptionObject.class,
-      SimpleDescriptionObject.FONDS_FILTER, null, new Sublist(0, 10), null);
+    final IndexResult<IndexedAIP> aips = index.find(IndexedAIP.class, IndexedAIP.FONDS_FILTER, null, new Sublist(0, 10),
+      null);
 
-    assertEquals(1, sdos.getLimit());
-    assertEquals(CorporaConstants.SOURCE_AIP_ID, sdos.getResults().get(0).getId());
+    assertEquals(1, aips.getLimit());
+    assertEquals(CorporaConstants.SOURCE_AIP_ID, aips.getResults().get(0).getId());
 
     model.deleteAIP(CorporaConstants.SOURCE_AIP_ID);
     model.deleteAIP(CorporaConstants.OTHER_AIP_ID);
@@ -375,14 +263,13 @@ public class IndexServiceTest {
     Filter filter = new Filter();
     filter.add(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, CorporaConstants.SOURCE_AIP_ID));
 
-    long sdoCount = index.count(SimpleDescriptionObject.class, filter);
-    assertEquals(1, sdoCount);
+    long aipCount = index.count(IndexedAIP.class, filter);
+    assertEquals(1, aipCount);
 
-    final IndexResult<SimpleDescriptionObject> sdos = index.find(SimpleDescriptionObject.class, filter, null,
-      new Sublist(0, 10), null);
+    final IndexResult<IndexedAIP> aips = index.find(IndexedAIP.class, filter, null, new Sublist(0, 10), null);
 
-    assertEquals(1, sdos.getLimit());
-    assertEquals(CorporaConstants.OTHER_AIP_ID, sdos.getResults().get(0).getId());
+    assertEquals(1, aips.getLimit());
+    assertEquals(CorporaConstants.OTHER_AIP_ID, aips.getResults().get(0).getId());
 
     model.deleteAIP(CorporaConstants.SOURCE_AIP_ID);
     model.deleteAIP(CorporaConstants.OTHER_AIP_ID);
@@ -397,10 +284,10 @@ public class IndexServiceTest {
     model.createAIP(CorporaConstants.OTHER_AIP_ID, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.OTHER_AIP_ID));
 
-    SimpleDescriptionObject sdo = index.retrieve(SimpleDescriptionObject.class, CorporaConstants.OTHER_AIP_ID);
-    List<SimpleDescriptionObject> ancestors = index.getAncestors(sdo);
-    assertThat(ancestors, Matchers
-      .hasItem(Matchers.<SimpleDescriptionObject> hasProperty("id", Matchers.equalTo(CorporaConstants.SOURCE_AIP_ID))));
+    IndexedAIP aip = index.retrieve(IndexedAIP.class, CorporaConstants.OTHER_AIP_ID);
+    List<IndexedAIP> ancestors = index.getAncestors(aip);
+    assertThat(ancestors,
+      Matchers.hasItem(Matchers.<IndexedAIP> hasProperty("id", Matchers.equalTo(CorporaConstants.SOURCE_AIP_ID))));
   }
 
   @Test
@@ -414,10 +301,9 @@ public class IndexServiceTest {
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 
     Filter filter = new Filter();
-    filter.add(new SimpleFilterParameter(RodaConstants.SDO_LEVEL, "fonds"));
+    filter.add(new SimpleFilterParameter(RodaConstants.AIP_LEVEL, "fonds"));
     filter.add(new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID));
-    IndexResult<SimpleDescriptionObject> findDescriptiveMetadata = index.find(SimpleDescriptionObject.class, filter,
-      null, new Sublist(), null);
+    IndexResult<IndexedAIP> findDescriptiveMetadata = index.find(IndexedAIP.class, filter, null, new Sublist(), null);
 
     assertNotNull(findDescriptiveMetadata);
     assertThat(findDescriptiveMetadata.getResults(), Matchers.hasSize(1));
@@ -531,7 +417,7 @@ public class IndexServiceTest {
     }
 
     index.reindexAIPs();
-    long count = index.count(AIP.class, new Filter());
+    long count = index.count(IndexedAIP.class, new Filter());
     assertEquals(count, 10L);
 
   }

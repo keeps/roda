@@ -38,7 +38,6 @@ import org.roda.core.data.v2.FileFormat;
 import org.roda.core.data.v2.LogEntry;
 import org.roda.core.data.v2.LogEntryParameter;
 import org.roda.core.data.v2.RepresentationState;
-import org.roda.core.data.v2.SIPReport;
 import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.core.metadata.v2.premis.PremisAgentHelper;
 import org.roda.core.metadata.v2.premis.PremisEventHelper;
@@ -48,6 +47,7 @@ import org.roda.core.metadata.v2.premis.PremisRepresentationObjectHelper;
 import org.roda.core.model.AIP;
 import org.roda.core.model.DescriptiveMetadata;
 import org.roda.core.model.ModelService;
+import org.roda.core.model.ModelServiceException;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.DefaultStoragePath;
@@ -579,17 +579,6 @@ public final class ModelUtils {
       LOGGER.error("Error transforming json string to log entry", e);
     }
     return ret;
-  }
-
-  public static SIPReport getSipState(String json) {
-    try {
-      JsonFactory factory = new JsonFactory();
-      ObjectMapper mapper = new ObjectMapper(factory);
-      return mapper.readValue(json, SIPReport.class);
-    } catch (IOException e) {
-      LOGGER.error("Error transforming json string to sip state", e);
-    }
-    return null;
   }
 
   public static <T> List<String> extractAgentIdsFromPreservationBinary(Binary b, Class<T> c) {

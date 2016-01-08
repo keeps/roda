@@ -101,8 +101,6 @@ import org.roda.core.data.v2.RepresentationFilePreservationObject;
 import org.roda.core.data.v2.RepresentationState;
 import org.roda.core.data.v2.RodaGroup;
 import org.roda.core.data.v2.RodaUser;
-import org.roda.core.data.v2.SIPReport;
-import org.roda.core.data.v2.SIPStateTransition;
 import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.core.data.v2.SimpleFile;
 import org.roda.core.data.v2.TransferredResource;
@@ -698,15 +696,13 @@ public class SolrUtils {
     } else if (resultClass.equals(SimpleDescriptionObject.class)) {
       indexName = RodaConstants.INDEX_SDO;
     } else if (resultClass.equals(Representation.class)) {
-      indexName = RodaConstants.INDEX_REPRESENTATIONS;
+      indexName = RodaConstants.INDEX_REPRESENTATION;
     } else if (resultClass.equals(RepresentationFilePreservationObject.class)) {
       indexName = RodaConstants.INDEX_PRESERVATION_OBJECTS;
     } else if (resultClass.equals(EventPreservationObject.class)) {
       indexName = RodaConstants.INDEX_PRESERVATION_EVENTS;
     } else if (resultClass.equals(LogEntry.class)) {
       indexName = RodaConstants.INDEX_ACTION_LOG;
-    } else if (resultClass.equals(SIPReport.class)) {
-      indexName = RodaConstants.INDEX_SIP_REPORT;
     } else if (resultClass.equals(JobReport.class)) {
       indexName = RodaConstants.INDEX_JOB_REPORT;
     } else if (resultClass.equals(User.class)) {
@@ -718,7 +714,7 @@ public class SolrUtils {
     } else if (resultClass.equals(RODAMember.class)) {
       indexName = RodaConstants.INDEX_MEMBERS;
     } else if (resultClass.equals(TransferredResource.class)) {
-      indexName = RodaConstants.INDEX_SIP;
+      indexName = RodaConstants.INDEX_TRANSFERRED_RESOURCE;
     } else if (resultClass.equals(Job.class)) {
       indexName = RodaConstants.INDEX_JOB;
     } else if (resultClass.equals(SimpleFile.class)) {
@@ -739,8 +735,6 @@ public class SolrUtils {
       ret = resultClass.cast(solrDocumentToRepresentation(doc));
     } else if (resultClass.equals(LogEntry.class)) {
       ret = resultClass.cast(solrDocumentToLogEntry(doc));
-    } else if (resultClass.equals(SIPReport.class)) {
-      ret = resultClass.cast(solrDocumentToSipState(doc));
     } else if (resultClass.equals(JobReport.class)) {
       ret = resultClass.cast(solrDocumentToJobReport(doc));
     } else if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class)
@@ -1048,94 +1042,6 @@ public class SolrUtils {
     return doc;
   }
 
-  private static SIPReport solrDocumentToSipState(SolrDocument doc) {
-    final String id = objectToString(doc.get(RodaConstants.SIP_REPORT_ID));
-    final String username = objectToString(doc.get(RodaConstants.SIP_REPORT_USERNAME));
-    final String originalFilename = objectToString(doc.get(RodaConstants.SIP_REPORT_ORIGINAL_FILENAME));
-    final String state = objectToString(doc.get(RodaConstants.SIP_REPORT_STATE));
-    final Date dateTime = objectToDate(doc.get(RodaConstants.SIP_REPORT_DATETIME));
-    final boolean processing = objectToBoolean(doc.get(RodaConstants.SIP_REPORT_PROCESSING));
-    final boolean complete = objectToBoolean(doc.get(RodaConstants.SIP_REPORT_COMPLETE));
-    final float completePercentage = objectToFloat(doc.get(RodaConstants.SIP_REPORT_COMPLETE_PERCENTAGE));
-    final String parentPID = objectToString(doc.get(RodaConstants.SIP_REPORT_PARENT_PID));
-    final String ingestedPID = objectToString(doc.get(RodaConstants.SIP_REPORT_INGESTED_PID));
-    final String fileID = objectToString(doc.get(RodaConstants.SIP_REPORT_FILE_ID));
-    List<SIPStateTransition> ssts = new ArrayList<SIPStateTransition>();
-    /*
-     * if(doc.getChildDocumentCount()>0){ for(SolrDocument child :
-     * doc.getChildDocuments()){ SIPStateTransition sst = new
-     * SIPStateTransition(); sst.setId(objectToString(child.get(RodaConstants.
-     * SIPSTATE_TRANSITION_ID)));
-     * sst.setDatetime(objectToDate(child.get(RodaConstants.
-     * SIPSTATE_TRANSITION_DATETIME)));
-     * sst.setDescription(objectToString(child.get(RodaConstants.
-     * SIPSTATE_TRANSITION_DESCRIPTION)));
-     * sst.setFromState(objectToString(child.get(RodaConstants.
-     * SIPSTATE_TRANSITION_FROM)));
-     * sst.setSipID(objectToString(child.get(RodaConstants.
-     * SIPSTATE_TRANSITION_SIPID)));
-     * sst.setSuccess(objectToBoolean(child.get(RodaConstants.
-     * SIPSTATE_TRANSITION_SUCCESS)));
-     * sst.setTaskID(objectToString(child.get(RodaConstants.
-     * SIPSTATE_TRANSITION_TASKID)));
-     * sst.setToState(objectToString(child.get(RodaConstants.
-     * SIPSTATE_TRANSITION_TO))); ssts.add(sst); } }
-     */
-
-    SIPReport sipState = new SIPReport();
-    sipState.setId(id);
-    sipState.setUsername(username);
-    sipState.setOriginalFilename(originalFilename);
-    sipState.setState(state);
-    sipState.setDatetime(dateTime);
-    sipState.setProcessing(processing);
-    sipState.setComplete(complete);
-    sipState.setCompletePercentage(completePercentage);
-    sipState.setParentID(parentPID);
-    sipState.setIngestedID(ingestedPID);
-    sipState.setFileID(fileID);
-    sipState.setStateTransitions(ssts.toArray(new SIPStateTransition[ssts.size()]));
-    return sipState;
-  }
-
-  public static SolrInputDocument sipReportToSolrDocument(SIPReport sipState) {
-    SolrInputDocument doc = new SolrInputDocument();
-    doc.addField(RodaConstants.SIP_REPORT_COMPLETE, sipState.isComplete());
-    doc.addField(RodaConstants.SIP_REPORT_COMPLETE_PERCENTAGE, sipState.getCompletePercentage());
-    doc.addField(RodaConstants.SIP_REPORT_DATETIME, sipState.getDatetime());
-    doc.addField(RodaConstants.SIP_REPORT_FILE_ID, sipState.getFileID());
-    doc.addField(RodaConstants.SIP_REPORT_ID, sipState.getId());
-    doc.addField(RodaConstants.SIP_REPORT_INGESTED_PID, sipState.getIngestedID());
-    doc.addField(RodaConstants.SIP_REPORT_ORIGINAL_FILENAME, sipState.getOriginalFilename());
-    doc.addField(RodaConstants.SIP_REPORT_PARENT_PID, sipState.getParentID());
-    doc.addField(RodaConstants.SIP_REPORT_PROCESSING, sipState.isProcessing());
-    doc.addField(RodaConstants.SIP_REPORT_STATE, sipState.getState());
-    doc.addField(RodaConstants.SIP_REPORT_USERNAME, sipState.getUsername());
-    /*
-     * if(sipState.getStateTransitions()!=null &&
-     * sipState.getStateTransitions().length>0){ for(SIPStateTransition sst :
-     * sipState.getStateTransitions()){ SolrInputDocument sstSolrDoc = new
-     * SolrInputDocument();
-     * sstSolrDoc.addField(RodaConstants.SIPSTATE_TRANSITION_DATETIME,
-     * sst.getDatetime());
-     * sstSolrDoc.addField(RodaConstants.SIPSTATE_TRANSITION_DESCRIPTION,
-     * sst.getDescription());
-     * sstSolrDoc.addField(RodaConstants.SIPSTATE_TRANSITION_FROM,
-     * sst.getFromState());
-     * sstSolrDoc.addField(RodaConstants.SIPSTATE_TRANSITION_SIPID,
-     * sst.getSipID());
-     * sstSolrDoc.addField(RodaConstants.SIPSTATE_TRANSITION_SUCCESS,
-     * sst.isSuccess());
-     * sstSolrDoc.addField(RodaConstants.SIPSTATE_TRANSITION_TASKID,
-     * sst.getTaskID());
-     * sstSolrDoc.addField(RodaConstants.SIPSTATE_TRANSITION_TO,
-     * sst.getToState());
-     * sstSolrDoc.addField(RodaConstants.SIPSTATE_TRANSITION_ID, sst.getId());
-     * doc.addChildDocument(sstSolrDoc); } }
-     */
-    return doc;
-  }
-
   public static SolrInputDocument rodaMemberToSolrDocument(RODAMember member) {
     SolrInputDocument doc = new SolrInputDocument();
     doc.addField(RodaConstants.MEMBERS_ID, member.getId());
@@ -1358,25 +1264,25 @@ public class SolrUtils {
   }
 
   public static SolrInputDocument transferredResourceToSolrDocument(TransferredResource resource) throws IOException {
-    SolrInputDocument sip = new SolrInputDocument();
+    SolrInputDocument transferredResource = new SolrInputDocument();
 
-    sip.addField(RodaConstants.TRANSFERRED_RESOURCE_ID, resource.getId());
-    sip.addField(RodaConstants.TRANSFERRED_RESOURCE_FULLPATH, resource.getFullPath());
+    transferredResource.addField(RodaConstants.TRANSFERRED_RESOURCE_ID, resource.getId());
+    transferredResource.addField(RodaConstants.TRANSFERRED_RESOURCE_FULLPATH, resource.getFullPath());
     if (resource.getParentId() != null) {
-      sip.addField(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID, resource.getParentId());
+      transferredResource.addField(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID, resource.getParentId());
     }
     if (resource.getRelativePath() != null) {
-      sip.addField(RodaConstants.TRANSFERRED_RESOURCE_RELATIVEPATH, resource.getRelativePath());
+      transferredResource.addField(RodaConstants.TRANSFERRED_RESOURCE_RELATIVEPATH, resource.getRelativePath());
     }
-    sip.addField(RodaConstants.TRANSFERRED_RESOURCE_DATE, resource.getCreationDate());
-    sip.addField(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, resource.isFile());
-    sip.addField(RodaConstants.TRANSFERRED_RESOURCE_SIZE, resource.getSize());
-    sip.addField(RodaConstants.TRANSFERRED_RESOURCE_NAME, resource.getName());
-    sip.addField(RodaConstants.TRANSFERRED_RESOURCE_OWNER, resource.getOwner());
+    transferredResource.addField(RodaConstants.TRANSFERRED_RESOURCE_DATE, resource.getCreationDate());
+    transferredResource.addField(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, resource.isFile());
+    transferredResource.addField(RodaConstants.TRANSFERRED_RESOURCE_SIZE, resource.getSize());
+    transferredResource.addField(RodaConstants.TRANSFERRED_RESOURCE_NAME, resource.getName());
+    transferredResource.addField(RodaConstants.TRANSFERRED_RESOURCE_OWNER, resource.getOwner());
     if (resource.getAncestorsPaths() != null && resource.getAncestorsPaths().size() > 0) {
-      sip.addField(RodaConstants.TRANSFERRED_RESOURCE_ANCESTORS, resource.getAncestorsPaths());
+      transferredResource.addField(RodaConstants.TRANSFERRED_RESOURCE_ANCESTORS, resource.getAncestorsPaths());
     }
-    return sip;
+    return transferredResource;
   }
 
   public static long getSizePath(Path startPath) throws IOException {

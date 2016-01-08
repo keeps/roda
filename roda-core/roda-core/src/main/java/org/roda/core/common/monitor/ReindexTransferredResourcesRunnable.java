@@ -27,15 +27,15 @@ import org.roda.core.index.utils.SolrUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ReindexSipRunnable implements Runnable {
-  private static final Logger LOGGER = LoggerFactory.getLogger(ReindexSipRunnable.class);
+public class ReindexTransferredResourcesRunnable implements Runnable {
+  private static final Logger LOGGER = LoggerFactory.getLogger(ReindexTransferredResourcesRunnable.class);
 
   private Path basePath;
   private long counter;
   private Date from;
   private SolrClient index;
 
-  public ReindexSipRunnable(Path basePath, Date from, SolrClient index) {
+  public ReindexTransferredResourcesRunnable(Path basePath, Date from, SolrClient index) {
     this.basePath = basePath;
     this.counter = 0;
     this.from = from;
@@ -44,7 +44,7 @@ public class ReindexSipRunnable implements Runnable {
 
   public void run() {
     long start = System.currentTimeMillis();
-    LOGGER.info("Start indexing SIPs: " + basePath.toString());
+    LOGGER.info("Start indexing transferred resources: " + basePath.toString());
     try {
       EnumSet<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
       Files.walkFileTree(basePath, opts, Integer.MAX_VALUE, new FileVisitor<Path>() {
@@ -70,7 +70,7 @@ public class ReindexSipRunnable implements Runnable {
           return FileVisitResult.CONTINUE;
         }
       });
-      index.commit(RodaConstants.INDEX_SIP);
+      index.commit(RodaConstants.INDEX_TRANSFERRED_RESOURCE);
       LOGGER.info("End indexing SIPs");
       LOGGER.info("Time elapsed: " + ((System.currentTimeMillis() - start) / 1000) + " seconds");
       RodaCoreFactory.setFolderMonitorDate(basePath, new Date());
@@ -87,7 +87,7 @@ public class ReindexSipRunnable implements Runnable {
       if (counter >= 1000) {
         try {
           LOGGER.debug("Commiting...");
-          index.commit(RodaConstants.INDEX_SIP);
+          index.commit(RodaConstants.INDEX_TRANSFERRED_RESOURCE);
           counter = 0;
         } catch (IOException | SolrServerException e) {
           LOGGER.error(e.getMessage(), e);
@@ -109,7 +109,7 @@ public class ReindexSipRunnable implements Runnable {
             LOGGER.debug("RELATIVE " + resourceAncestor.getRelativePath());
             LOGGER.debug("PARENT " + resourceAncestor.getParentPath());
             LOGGER.debug("------------------------------------------------");
-            index.add(RodaConstants.INDEX_SIP, SolrUtils.transferredResourceToSolrDocument(resourceAncestor));
+            index.add(RodaConstants.INDEX_TRANSFERRED_RESOURCE, SolrUtils.transferredResourceToSolrDocument(resourceAncestor));
           } else {
             LOGGER.debug("---------------- NOT ADDED ----------------------");
             LOGGER.debug("FULLPATH " + resourceAncestor.getFullPath());
@@ -125,7 +125,7 @@ public class ReindexSipRunnable implements Runnable {
         LOGGER.debug("RELATIVE " + resource.getRelativePath());
         LOGGER.debug("PARENT " + resource.getParentPath());
         LOGGER.debug("------------------------------------------------");
-        index.add(RodaConstants.INDEX_SIP, SolrUtils.transferredResourceToSolrDocument(resource));
+        index.add(RodaConstants.INDEX_TRANSFERRED_RESOURCE, SolrUtils.transferredResourceToSolrDocument(resource));
       } else {
         LOGGER.debug("---------------- NOT ADDED ----------------------");
         LOGGER.debug("FULLPATH " + resource.getFullPath());
@@ -134,7 +134,7 @@ public class ReindexSipRunnable implements Runnable {
         LOGGER.debug("------------------------------------------------");
       }
       if (commit) {
-        index.commit(RodaConstants.INDEX_SIP);
+        index.commit(RodaConstants.INDEX_TRANSFERRED_RESOURCE);
       }
     } catch (IOException | SolrServerException e) {
       LOGGER.error("Error adding path to SIPMonitorIndex", e);

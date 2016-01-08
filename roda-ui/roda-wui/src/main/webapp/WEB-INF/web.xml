@@ -166,11 +166,6 @@
 			org.roda.wui.management.editor.server.EditorServiceImpl</servlet-class>
 	</servlet>
 	<servlet>
-		<servlet-name>IngestListService</servlet-name>
-		<servlet-class>
-			org.roda.wui.ingest.list.server.IngestListServiceImpl</servlet-class>
-	</servlet>
-	<servlet>
 		<servlet-name>FileUpload</servlet-name>
 		<servlet-class>
 			org.roda.wui.common.fileupload.server.FileUpload</servlet-class>
@@ -247,10 +242,6 @@
 	<servlet-mapping>
 		<servlet-name>EditorService</servlet-name>
 		<url-pattern>/org.roda.wui.RodaWUI/editorservice</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>IngestListService</servlet-name>
-		<url-pattern>/org.roda.wui.RodaWUI/ingestlist</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>FileUpload</servlet-name>

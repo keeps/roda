@@ -44,7 +44,7 @@
        replication is in use, this should match the replication
        configuration.
     -->
-  <dataDir>${solr.data.dir.sip:}</dataDir>
+  <dataDir>${solr.data.dir.transferredresource:}</dataDir>
 
 
   <!-- The DirectoryFactory to use for indexes.

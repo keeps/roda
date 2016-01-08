@@ -97,7 +97,7 @@ public class IngestProcess extends Composite {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-  
+
   private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   @UiField(provided = true)
@@ -124,9 +124,8 @@ public class IngestProcess extends Composite {
 
     Filter filter = null;
 
-    @SuppressWarnings("deprecation")
-    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.SIP_REPORT_STATE),
-      new SimpleFacetParameter(RodaConstants.SIP_REPORT_USERNAME));
+    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.JOB_STATE),
+      new SimpleFacetParameter(RodaConstants.JOB_USERNAME));
 
     // TODO externalise strings
     jobList = new JobList(filter, facets, "Ingest job list");
@@ -148,7 +147,7 @@ public class IngestProcess extends Composite {
       }
 
     };
-    
+
     inputDateInitial.getElement().setPropertyString("placeholder", messages.sidebarFilterFromDate());
     inputDateFinal.getElement().setPropertyString("placeholder", messages.sidebarFilterToDatePlaceHolder());
 
@@ -172,7 +171,7 @@ public class IngestProcess extends Composite {
         }
       }
     });
-    
+
     jobList.autoUpdate(10000);
 
   }

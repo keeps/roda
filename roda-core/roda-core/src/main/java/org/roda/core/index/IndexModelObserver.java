@@ -25,7 +25,6 @@ import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.JobReport;
 import org.roda.core.data.v2.LogEntry;
 import org.roda.core.data.v2.Representation;
-import org.roda.core.data.v2.SIPReport;
 import org.roda.core.data.v2.SimpleFile;
 import org.roda.core.data.v2.User;
 import org.roda.core.index.utils.SolrUtils;
@@ -129,7 +128,7 @@ public class IndexModelObserver implements ModelObserver {
       try {
         Representation representation = model.retrieveRepresentation(aip.getId(), representationId);
         SolrInputDocument representationDocument = SolrUtils.representationToSolrDocument(representation);
-        index.add(RodaConstants.INDEX_REPRESENTATIONS, representationDocument);
+        index.add(RodaConstants.INDEX_REPRESENTATION, representationDocument);
 
         if (representation.getFileIds() != null && !representation.getFileIds().isEmpty()) {
           for (String fileId : representation.getFileIds()) {
@@ -155,7 +154,7 @@ public class IndexModelObserver implements ModelObserver {
       }
     }
     try {
-      index.commit(RodaConstants.INDEX_REPRESENTATIONS);
+      index.commit(RodaConstants.INDEX_REPRESENTATION);
     } catch (SolrServerException | IOException e) {
       LOGGER.error("Could not commit indexed representations", e);
     }
@@ -244,7 +243,7 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void representationCreated(Representation representation) {
-    addDocumentToIndex(RodaConstants.INDEX_REPRESENTATIONS, SolrUtils.representationToSolrDocument(representation),
+    addDocumentToIndex(RodaConstants.INDEX_REPRESENTATION, SolrUtils.representationToSolrDocument(representation),
       "Error creating Representation");
   }
 
@@ -256,7 +255,7 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void representationDeleted(String aipId, String representationId) {
-    deleteDocumentFromIndex(RodaConstants.INDEX_REPRESENTATIONS, SolrUtils.getId(aipId, representationId),
+    deleteDocumentFromIndex(RodaConstants.INDEX_REPRESENTATION, SolrUtils.getId(aipId, representationId),
       "Error deleting Representation (aipId=" + aipId + "; representationId=" + representationId + ")");
   }
 
@@ -283,24 +282,6 @@ public class IndexModelObserver implements ModelObserver {
   public void logEntryCreated(LogEntry entry) {
     addDocumentToIndex(RodaConstants.INDEX_ACTION_LOG, SolrUtils.logEntryToSolrDocument(entry),
       "Error creating Log entry");
-  }
-
-  @Override
-  public void sipReportCreated(SIPReport sipReport) {
-    addDocumentToIndex(RodaConstants.INDEX_SIP_REPORT, SolrUtils.sipReportToSolrDocument(sipReport),
-      "Error creating SIP report");
-  }
-
-  @Override
-  public void sipReportUpdated(SIPReport sipReport) {
-    sipReportDeleted(sipReport.getId());
-    sipReportCreated(sipReport);
-  }
-
-  @Override
-  public void sipReportDeleted(String sipReportId) {
-    deleteDocumentFromIndex(RodaConstants.INDEX_SIP_REPORT, sipReportId,
-      "Error deleting SIP report (id=" + sipReportId + ")");
   }
 
   @Override

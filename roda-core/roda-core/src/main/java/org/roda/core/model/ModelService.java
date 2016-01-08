@@ -8,7 +8,6 @@
 package org.roda.core.model;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,10 +21,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-
 import org.roda.core.common.LdapUtilityException;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.common.UserUtility;
@@ -37,8 +32,8 @@ import org.roda.core.data.common.NoSuchGroupException;
 import org.roda.core.data.common.NoSuchUserException;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.UserAlreadyExistsException;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
@@ -54,7 +49,6 @@ import org.roda.core.data.v2.Representation;
 import org.roda.core.data.v2.RepresentationFilePreservationObject;
 import org.roda.core.data.v2.RepresentationPreservationObject;
 import org.roda.core.data.v2.RepresentationState;
-import org.roda.core.data.v2.SIPReport;
 import org.roda.core.data.v2.SimpleFile;
 import org.roda.core.data.v2.User;
 import org.roda.core.metadata.v2.premis.PremisAgentHelper;
@@ -73,7 +67,6 @@ import org.roda.core.storage.EmptyClosableIterable;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StoragePath;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.XMLContentPayload;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -129,7 +122,7 @@ public class ModelService extends ModelObservable {
       createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_AIP);
       createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_PRESERVATION);
       createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_ACTIONLOG);
-      createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_SIP_REPORT);
+      createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_JOB_REPORT);
     } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error while ensuring that all containers exist", e);
     }
@@ -1610,35 +1603,6 @@ public class ModelService extends ModelObservable {
     } catch (IOException e) {
       LOGGER.error("Error listing directory for log files", e);
     }
-  }
-
-  // FIXME refactor this method
-  public void addSipReport(SIPReport sipReport, boolean notify)
-    throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
-
-    StoragePath sipStatePath;
-    try {
-      sipStatePath = DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_SIP_REPORT, sipReport.getId());
-      sipReport.setFileID(sipStatePath.getName());
-
-      StringWriter sw = new StringWriter();
-      JAXBContext jc = JAXBContext.newInstance(SIPReport.class);
-      Marshaller marshaller = jc.createMarshaller();
-      marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
-      marshaller.marshal(sipReport, sw);
-      storage.updateBinaryContent(sipStatePath, new XMLContentPayload(sw.toString()), false, true);
-      if (notify) {
-        notifySipStateCreated(sipReport);
-      }
-    } catch (JAXBException e) {
-      throw new GenericException("Error adding SIP State to storage", e);
-    }
-
-  }
-
-  public void addSipReport(SIPReport sipReport)
-    throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
-    addSipReport(sipReport, true);
   }
 
   public void addUser(User user, boolean useModel, boolean notify) throws AlreadyExistsException, GenericException {

@@ -133,7 +133,7 @@ public class IndexService {
       index.optimize(RodaConstants.INDEX_AIP);
       index.optimize(RodaConstants.INDEX_SDO);
       index.optimize(RodaConstants.INDEX_FILE);
-      index.optimize(RodaConstants.INDEX_REPRESENTATIONS);
+      index.optimize(RodaConstants.INDEX_REPRESENTATION);
       index.optimize(RodaConstants.INDEX_PRESERVATION_EVENTS);
       index.optimize(RodaConstants.INDEX_PRESERVATION_OBJECTS);
     } catch (SolrServerException | IOException e) {

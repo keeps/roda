@@ -12,7 +12,6 @@ import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.JobReport;
 import org.roda.core.data.v2.LogEntry;
 import org.roda.core.data.v2.Representation;
-import org.roda.core.data.v2.SIPReport;
 import org.roda.core.data.v2.SimpleFile;
 import org.roda.core.data.v2.User;
 
@@ -43,12 +42,6 @@ public interface ModelObserver {
   public void fileDeleted(String aipId, String representationId, String fileId);
 
   public void logEntryCreated(LogEntry entry);
-
-  public void sipReportCreated(SIPReport sipReport);
-
-  public void sipReportUpdated(SIPReport sipReport);
-
-  public void sipReportDeleted(String sipReportId);
 
   public void userCreated(User user);
 
@@ -85,7 +78,7 @@ public interface ModelObserver {
   public void jobReportCreated(JobReport jobReport);
 
   public void jobReportUpdated(JobReport jobReport);
-  
+
   public void jobReportDeleted(String jobReportId);
 
 }

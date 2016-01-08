@@ -51,8 +51,6 @@ import org.roda.core.data.v2.LogEntryParameter;
 import org.roda.core.data.v2.Representation;
 import org.roda.core.data.v2.RepresentationFilePreservationObject;
 import org.roda.core.data.v2.RepresentationPreservationObject;
-import org.roda.core.data.v2.SIPReport;
-import org.roda.core.data.v2.SIPStateTransition;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.DefaultStoragePath;
@@ -98,12 +96,11 @@ public class ModelServiceTest {
   @Before
   public void init() throws IOException, GenericException {
     basePath = Files.createTempDirectory("modelTests");
-    logPath = basePath.resolve("log");
-    storage = new FileStorageService(basePath);
-    model = new ModelService(storage);
-
     System.setProperty("roda.home", basePath.toString());
-    RodaCoreFactory.instantiateTest();
+    RodaCoreFactory.instantiateTest(true, true);
+    logPath = RodaCoreFactory.getLogPath();
+    storage = RodaCoreFactory.getStorageService();
+    model = RodaCoreFactory.getModelService();
   }
 
   @After
@@ -645,7 +642,8 @@ public class ModelServiceTest {
     // pre-load the preservation container data
     DefaultStoragePath preservationContainerPath = DefaultStoragePath
       .parse(CorporaConstants.SOURCE_PRESERVATION_CONTAINER);
-    storage.deleteContainer(preservationContainerPath);
+    // 2016-01-11 hsilva commented out (why to delete if it doesn't exist?)
+    // storage.deleteContainer(preservationContainerPath);
     storage.copy(corporaService, preservationContainerPath,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_PRESERVATION_CONTAINER));
     AgentPreservationObject apo = model.getAgentPreservationObject(CorporaConstants.AGENT_RODA_8_PREMIS_XML);
@@ -669,29 +667,6 @@ public class ModelServiceTest {
     parameters.add(new LogEntryParameter("NAME2", "VALUE2"));
     entry.setParameters(parameters);
     model.addLogEntry(entry, logPath);
-  }
-
-  @Test
-  public void createSIPReport() throws RODAException {
-    SIPReport state = new SIPReport();
-    state.setComplete(true);
-    state.setCompletePercentage(99.9F);
-    state.setDatetime(new Date());
-    state.setFileID("fileID");
-    state.setId("ID");
-    state.setIngestedID("INGESTED");
-    state.setOriginalFilename("Filename");
-    state.setParentID("parentPID");
-    state.setProcessing(false);
-    state.setState("State");
-    SIPStateTransition[] stateTransitions = new SIPStateTransition[2];
-    SIPStateTransition st1 = new SIPStateTransition("SIP", "A", "B", new Date(), "TASK", true, "DESC 1");
-    SIPStateTransition st2 = new SIPStateTransition("SIP", "B", "C", new Date(), "TASK", false, "DESC 2");
-    stateTransitions[0] = st1;
-    stateTransitions[1] = st2;
-    state.setStateTransitions(stateTransitions);
-    state.setUsername("Username");
-    model.addSipReport(state);
   }
 
   private void createLogActionDirectory() {

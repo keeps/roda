@@ -10,12 +10,22 @@ package org.roda.core.data.common;
 public final class RodaConstants {
 
   /*
+   * RODA Core properties (provided via -D in the command-line)
+   */
+  public static final String CORE_NODE_TYPE = "roda.node.type";
+  public static final String CORE_CLUSTER_HOSTNAME = "roda.cluster.hostname";
+  public static final String CORE_CLUSTER_PORT = "roda.cluster.port";
+  public static final String CORE_NODE_HOSTNAME = "roda.node.hostname";
+  public static final String CORE_NODE_PORT = "roda.node.port";
+
+  /*
    * Misc
    */
   public static final String ISO8601 = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
   public static final String SOLRDATEFORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
   public static final String SHA1 = "SHA-1";
   public static final String MD5 = "MD5";
+  public static final String LOCALE = "locale";
 
   public enum DateGranularity {
     YEAR, MONTH, DAY, HOUR, MINUTE, SECOND, MILLISECOND
@@ -97,49 +107,43 @@ public final class RodaConstants {
   public static final String CORE_LDAP_DEFAULT_HOST = "localhost";
   public static final int CORE_LDAP_DEFAULT_PORT = 10389;
 
-  // RODA Core properties (provided with -D in the command-line)
-  public static final String CORE_NODE_TYPE = "roda.node.type";
-  public static final String CORE_CLUSTER_HOSTNAME = "roda.cluster.hostname";
-  public static final String CORE_CLUSTER_PORT = "roda.cluster.port";
-  public static final String CORE_NODE_HOSTNAME = "roda.node.hostname";
-  public static final String CORE_NODE_PORT = "roda.node.port";
-
   /*
    * INDEX NAMES
    */
   public static final String INDEX_AIP = "AIP";
   public static final String INDEX_SDO = "SDO";
-  // FIXME not in use. is this to remove?
-  public static final String INDEX_DESCRIPTIVE_METADATA = "DescriptiveMetadata";
   public static final String INDEX_PRESERVATION_EVENTS = "PreservationEvent";
   public static final String INDEX_PRESERVATION_OBJECTS = "PreservationObject";
-  public static final String INDEX_REPRESENTATIONS = "Representation";
-  public static final String INDEX_NOTIFICATIONS = "Notification";
+  public static final String INDEX_REPRESENTATION = "Representation";
   public static final String INDEX_PRESERVATION_AGENTS = "PreservationAgent";
-  public static final String INDEX_PRESERVATION_PLANS = "PreservationPlan";
-  public static final String INDEX_PRESERVATION_RISKS = "PreservationRisk";
-  public static final String INDEX_USER_LOG = "UserLog";
   public static final String INDEX_ACTION_LOG = "ActionLog";
   public static final String INDEX_OTHER_DESCRIPTIVE_DATA_PREFIX = "odd";
-  @Deprecated
-  public static final String INDEX_SIP_REPORT = "SIPReport";
-  public static final String INDEX_JOB_REPORT = "JobReport";
   public static final String INDEX_MEMBERS = "Members";
-  public static final String INDEX_CHARACTERIZATION = "Characterization";
-  public static final String INDEX_SIP = "SIP";
-  public static final String INDEX_JOB = "JOB";
+  public static final String INDEX_TRANSFERRED_RESOURCE = "TransferredResource";
+  public static final String INDEX_JOB = "Job";
+  public static final String INDEX_JOB_REPORT = "JobReport";
   public static final String INDEX_FILE = "File";
+  // FIXME not in use. are the following to remove?
+  // public static final String INDEX_DESCRIPTIVE_METADATA =
+  // "DescriptiveMetadata";
+  // public static final String INDEX_NOTIFICATIONS = "Notification";
+  // public static final String INDEX_PRESERVATION_PLANS = "PreservationPlan";
+  // public static final String INDEX_PRESERVATION_RISKS = "PreservationRisk";
+  // public static final String INDEX_USER_LOG = "UserLog";
+  // public static final String INDEX_CHARACTERIZATION = "Characterization";
 
   /*
    * STORAGE CONTAINERS
    */
   public static final String STORAGE_CONTAINER_SIP = "SIP";
   public static final String STORAGE_CONTAINER_AIP = "AIP";
-  public static final String STORAGE_CONTAINER_NOTIFICATIONS = "Notifications";
   public static final String STORAGE_CONTAINER_PRESERVATION = "Preservation";
-  public static final String STORAGE_CONTAINER_USERLOG = "User log";
   public static final String STORAGE_CONTAINER_ACTIONLOG = "Action log";
-  public static final String STORAGE_CONTAINER_SIP_REPORT = "SIP report";
+  public static final String STORAGE_CONTAINER_JOB_REPORT = "Job report";
+  // FIXME not in use. are the following to remove?
+  // public static final String STORAGE_CONTAINER_NOTIFICATIONS =
+  // "Notifications";
+  // public static final String STORAGE_CONTAINER_USERLOG = "User log";
 
   /*
    * STORAGE DIRECTORIES
@@ -147,10 +151,12 @@ public final class RodaConstants {
   public static final String STORAGE_DIRECTORY_METADATA = "metadata";
   public static final String STORAGE_DIRECTORY_DESCRIPTIVE = "descriptive";
   public static final String STORAGE_DIRECTORY_PRESERVATION = "preservation";
-  public static final String STORAGE_DIRECTORY_REPRESENTATION_PREFIX = "representation_";
   public static final String STORAGE_DIRECTORY_DATA = "data";
   public static final String STORAGE_DIRECTORY_AGENTS = "agents";
   public static final String STORAGE_DIRECTORY_OTHER = "other";
+  // FIXME not in use. are the following to remove?
+  // public static final String STORAGE_DIRECTORY_REPRESENTATION_PREFIX =
+  // "representation_";
 
   /*
    * STORAGE METADATA
@@ -333,45 +339,6 @@ public final class RodaConstants {
   public static final String LOG_PARAMETERS = "parameters";
   public static final String LOG_FILE_ID = "fileID";
 
-  @Deprecated
-  public static final String SIP_REPORT_ORIGINAL_FILENAME = "originalFilename";
-  @Deprecated
-  public static final String SIP_REPORT_ID = "id";
-  @Deprecated
-  public static final String SIP_REPORT_USERNAME = "username";
-  @Deprecated
-  public static final String SIP_REPORT_STATE = "state";
-  @Deprecated
-  public static final String SIP_REPORT_DATETIME = "datetime";
-  @Deprecated
-  public static final String SIP_REPORT_PROCESSING = "processing";
-  @Deprecated
-  public static final String SIP_REPORT_COMPLETE = "complete";
-  @Deprecated
-  public static final String SIP_REPORT_INGESTED_PID = "ingestedPID";
-  @Deprecated
-  public static final String SIP_REPORT_COMPLETE_PERCENTAGE = "completePercentage";
-  @Deprecated
-  public static final String SIP_REPORT_FILE_ID = "fileID";
-  @Deprecated
-  public static final String SIP_REPORT_PARENT_PID = "parentPID";
-  @Deprecated
-  public static final String SIP_REPORT_TRANSITION_DATETIME = "transition_datetime";
-  @Deprecated
-  public static final String SIP_REPORT_TRANSITION_DESCRIPTION = "transition_description";
-  @Deprecated
-  public static final String SIP_REPORT_TRANSITION_FROM = "transition_from";
-  @Deprecated
-  public static final String SIP_REPORT_TRANSITION_SIPID = "transition_sipID";
-  @Deprecated
-  public static final String SIP_REPORT_TRANSITION_TASKID = "transition_taskID";
-  @Deprecated
-  public static final String SIP_REPORT_TRANSITION_TO = "transition_to";
-  @Deprecated
-  public static final String SIP_REPORT_TRANSITION_SUCCESS = "transition_success";
-  @Deprecated
-  public static final String SIP_REPORT_TRANSITION_ID = "id";
-
   // MEMBER: USER or GROUP
   public static final String MEMBERS_ID = "id";
   public static final String MEMBERS_NAME = "name";
@@ -408,6 +375,17 @@ public final class RodaConstants {
 
   public static final String PLUGIN_PARAMS_JOB_ID = "job.id";
 
+  /* Job Report */
+  public static final String JOB_REPORT_ID = "id";
+  public static final String JOB_REPORT_AIP_ID = "aipId";
+  public static final String JOB_REPORT_OBJECT_ID = "objectId";
+  public static final String JOB_REPORT_JOB_ID = "jobId";
+  public static final String JOB_REPORT_REPORT = "report";
+  public static final String JOB_REPORT_DATE_CREATED = "dateCreated";
+  public static final String JOB_REPORT_DATE_UPDATE = "dateUpdated";
+  public static final String JOB_REPORT_LAST_PLUGIN_RAN = "lastPluginRan";
+  public static final String JOB_REPORT_LAST_PLUGIN_RAN_STATE = "lastPluginRanState";
+
   public static final String FILE_ID = "id";
   public static final String FILE_AIPID = "aipId";
   public static final String FILE_FORMAT_MIMETYPE = "formatMimetype";
@@ -428,22 +406,8 @@ public final class RodaConstants {
   public static final String REPORT_ATTR_OUTCOME_SUCCESS = "success";
   public static final String REPORT_ATTR_OUTCOME_FAILURE = "failure";
   public static final String REPORT_ATTR_OUTCOME_DETAILS = "outcomeDetails";
-
   public static final String REPORT_ATTR_REASON = "reason";
 
-  public static final String LOCALE = "locale";
-
-  /* Job Report */
-  public static final String JOB_REPORT_ID = "id";
-  public static final String JOB_REPORT_AIP_ID = "aipId";
-  public static final String JOB_REPORT_OBJECT_ID = "objectId";
-  public static final String JOB_REPORT_JOB_ID = "jobId";
-  public static final String JOB_REPORT_REPORT = "report";
-  public static final String JOB_REPORT_DATE_CREATED = "dateCreated";
-  public static final String JOB_REPORT_DATE_UPDATE = "dateUpdated";
-  public static final String JOB_REPORT_LAST_PLUGIN_RAN = "lastPluginRan";
-  public static final String JOB_REPORT_LAST_PLUGIN_RAN_STATE = "lastPluginRanState";
-  
   /* View representation */
   public static final String VIEW_REPRESENTATION_DESCRIPTION_LEVEL = "description-level-representation";
   public static final String VIEW_REPRESENTATION_REPRESENTATION = "representation";

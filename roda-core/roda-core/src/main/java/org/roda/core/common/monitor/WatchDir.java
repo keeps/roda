@@ -26,7 +26,7 @@ public class WatchDir implements Runnable {
   private static final Logger LOGGER = LoggerFactory.getLogger(WatchDir.class);
   private final boolean recursive;
   private final Path watched;
-  private ReindexSipRunnable reindexRunnable;
+  private ReindexTransferredResourcesRunnable reindexRunnable;
   private boolean watchInitialized;
   private Thread threadReindex;
   private ExecutorService executor;
@@ -47,11 +47,11 @@ public class WatchDir implements Runnable {
 
   }
 
-  public ReindexSipRunnable getReindexRunnable() {
+  public ReindexTransferredResourcesRunnable getReindexRunnable() {
     return reindexRunnable;
   }
 
-  public void setReindexRunnable(ReindexSipRunnable reindexRunnable) {
+  public void setReindexRunnable(ReindexTransferredResourcesRunnable reindexRunnable) {
     this.reindexRunnable = reindexRunnable;
   }
 
@@ -76,7 +76,7 @@ public class WatchDir implements Runnable {
 
     watchInitialized = true;
     if (index != null) {
-      reindexRunnable = new ReindexSipRunnable(watched, indexDate, index);
+      reindexRunnable = new ReindexTransferredResourcesRunnable(watched, indexDate, index);
       threadReindex = new Thread(reindexRunnable, "ReindexThread");
       threadReindex.start();
     }

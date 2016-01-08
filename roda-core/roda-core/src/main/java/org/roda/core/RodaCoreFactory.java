@@ -86,7 +86,6 @@ import org.roda.core.data.v2.Group;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.RODAMember;
 import org.roda.core.data.v2.RepresentationFilePreservationObject;
-import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.data.v2.User;
 import org.roda.core.index.IndexFolderObserver;
@@ -151,6 +150,8 @@ public class RodaCoreFactory {
   private static IndexService index;
   private static SolrClient solr;
   private static boolean FEATURE_OVERRIDE_INDEX_CONFIGS = true;
+  private static boolean TEST_DONT_DEPLOY_SOLR = false;
+  private static boolean TEST_DONT_DEPLOY_LDAP = false;
 
   // Orchestrator related objects
   private static PluginManager pluginManager;
@@ -165,8 +166,9 @@ public class RodaCoreFactory {
   private static Path rodaApacheDsConfigDirectory = null;
   private static Path rodaApacheDsDataDirectory = null;
 
-  private static FolderMonitorNIO sipFolderMonitor;
-  private static FolderObserver sipFolderObserver;
+  // TransferredResources related objects
+  private static FolderMonitorNIO transferredResourcesFolderMonitor;
+  private static FolderObserver transferredResourcesFolderObserver;
 
   // Configuration related objects
   private static CompositeConfiguration rodaConfiguration = null;
@@ -191,6 +193,12 @@ public class RodaCoreFactory {
 
   public static void instantiateWorker() {
     instantiate(NodeType.WORKER);
+  }
+
+  public static void instantiateTest(boolean dontInstantiateSolr, boolean dontInstantiateLdap) {
+    TEST_DONT_DEPLOY_SOLR = dontInstantiateSolr;
+    TEST_DONT_DEPLOY_LDAP = dontInstantiateLdap;
+    instantiate(NodeType.TEST);
   }
 
   public static void instantiateTest() {
@@ -235,6 +243,7 @@ public class RodaCoreFactory {
       } catch (URISyntaxException e) {
         LOGGER.error("Error instantiating solr/index model", e);
       } catch (GenericException e) {
+        // FIXME generic for detecting storage instantiate errors?
         LOGGER.error("Error instantiating storage model", e);
       }
 
@@ -242,10 +251,12 @@ public class RodaCoreFactory {
   }
 
   private static void instantiatePluginManager() {
-    try {
-      pluginManager = PluginManager.getDefaultPluginManager(getConfigPath(), getPluginsPath());
-    } catch (PluginManagerException e) {
-      LOGGER.error("Error instantiating PluginManager", e);
+    if (nodeType == NodeType.MASTER || nodeType == NodeType.WORKER) {
+      try {
+        pluginManager = PluginManager.getDefaultPluginManager(getConfigPath(), getPluginsPath());
+      } catch (PluginManagerException e) {
+        LOGGER.error("Error instantiating PluginManager", e);
+      }
     }
   }
 
@@ -268,11 +279,8 @@ public class RodaCoreFactory {
   }
 
   private static void instantiateStorageAndModel() throws GenericException {
-    if (nodeType != NodeType.TEST) {
-      // instantiate model related objects
-      storage = instantiateStorage();
-      model = new ModelService(storage);
-    }
+    storage = instantiateStorage();
+    model = new ModelService(storage);
   }
 
   private static StorageService instantiateStorage() throws GenericException {
@@ -303,25 +311,30 @@ public class RodaCoreFactory {
         copyIndexConfigsFromClasspathToRodaHome();
       }
 
-      System.setProperty("solr.data.dir", indexPath.toString());
-      System.setProperty("solr.data.dir.aip", indexPath.resolve("aip").toString());
-      System.setProperty("solr.data.dir.sdo", indexPath.resolve("sdo").toString());
-      System.setProperty("solr.data.dir.representations", indexPath.resolve("representation").toString());
-      System.setProperty("solr.data.dir.preservationevent", indexPath.resolve("preservationevent").toString());
-      System.setProperty("solr.data.dir.preservationobject", indexPath.resolve("preservationobject").toString());
-      System.setProperty("solr.data.dir.actionlog", indexPath.resolve("actionlog").toString());
-      System.setProperty("solr.data.dir.jobreport", indexPath.resolve("jobreport").toString());
-      System.setProperty("solr.data.dir.members", indexPath.resolve("members").toString());
-      System.setProperty("solr.data.dir.othermetadata", indexPath.resolve("othermetadata").toString());
-      System.setProperty("solr.data.dir.sip", indexPath.resolve("sip").toString());
-      System.setProperty("solr.data.dir.job", indexPath.resolve("job").toString());
-      System.setProperty("solr.data.dir.file", indexPath.resolve("file").toString());
-
       // instantiate solr
       solr = instantiateSolr(solrHome);
 
       // instantiate index related object
       index = new IndexService(solr, model);
+    } else if (nodeType == NodeType.TEST && !TEST_DONT_DEPLOY_SOLR) {
+      try {
+        URL solrConfigURL = RodaCoreFactory.class.getResource("/config/index/solr.xml");
+        Path solrConfigPath = Paths.get(solrConfigURL.toURI());
+        Files.copy(solrConfigPath, indexPath.resolve("solr.xml"));
+        Path aipSchema = indexPath.resolve("aip");
+        Files.createDirectories(aipSchema);
+        Files.createFile(aipSchema.resolve("core.properties"));
+
+        Path solrHome = Paths.get(RodaCoreFactory.class.getResource("/config/index/").toURI());
+
+        // instantiate solr
+        solr = instantiateSolr(solrHome);
+
+        // instantiate index related object
+        index = new IndexService(solr, model);
+      } catch (IOException e) {
+        LOGGER.error("Unable to instantiate Solr in TEST mode", e);
+      }
     }
   }
 
@@ -364,8 +377,24 @@ public class RodaCoreFactory {
       return new CloudSolrClient(solrCloudZooKeeperUrls);
     } else {
       // default to Embedded
+      setSolrSystemProperties();
       return new EmbeddedSolrServer(solrHome, "test");
     }
+  }
+
+  private static void setSolrSystemProperties() {
+    System.setProperty("solr.data.dir", indexPath.toString());
+    System.setProperty("solr.data.dir.aip", indexPath.resolve("aip").toString());
+    System.setProperty("solr.data.dir.sdo", indexPath.resolve("sdo").toString());
+    System.setProperty("solr.data.dir.representations", indexPath.resolve("representation").toString());
+    System.setProperty("solr.data.dir.file", indexPath.resolve("file").toString());
+    System.setProperty("solr.data.dir.preservationevent", indexPath.resolve("preservationevent").toString());
+    System.setProperty("solr.data.dir.preservationobject", indexPath.resolve("preservationobject").toString());
+    System.setProperty("solr.data.dir.actionlog", indexPath.resolve("actionlog").toString());
+    System.setProperty("solr.data.dir.members", indexPath.resolve("members").toString());
+    System.setProperty("solr.data.dir.transferredresource", indexPath.resolve("transferredresource").toString());
+    System.setProperty("solr.data.dir.job", indexPath.resolve("job").toString());
+    System.setProperty("solr.data.dir.jobreport", indexPath.resolve("jobreport").toString());
   }
 
   private static void instantiateNodeSpecificObjects(NodeType nodeType) {
@@ -383,9 +412,9 @@ public class RodaCoreFactory {
       startApacheDS();
 
       try {
-        startSIPFolderMonitor();
+        startTransferredResourcesFolderMonitor();
       } catch (Exception e) {
-        LOGGER.error("Error starting SIP Monitor: " + e.getMessage(), e);
+        LOGGER.error("Error starting Transferred Resources Monitor: " + e.getMessage(), e);
       }
 
     } else if (nodeType == NodeType.WORKER) {
@@ -395,10 +424,11 @@ public class RodaCoreFactory {
         getSystemProperty(RodaConstants.CORE_NODE_HOSTNAME, "localhost"),
         getSystemProperty(RodaConstants.CORE_NODE_PORT, "0"));
     } else if (nodeType == NodeType.TEST) {
-      // do nothing
+      if (!TEST_DONT_DEPLOY_LDAP) {
+        startApacheDS();
+      }
     } else {
       LOGGER.error("Unknown node type \"" + nodeType + "\"");
-      throw new RuntimeException("Unknown node type \"" + nodeType + "\"");
     }
   }
 
@@ -421,8 +451,7 @@ public class RodaCoreFactory {
       }
 
       // set roda.home in order to correctly configure logging even if no
-      // property
-      // has been defined
+      // property has been defined
       System.setProperty("roda.home", rodaHomePath.toString());
     }
 
@@ -482,6 +511,8 @@ public class RodaCoreFactory {
     essentialDirectories.add(configPath.resolve("schemas"));
     essentialDirectories.add(rodaHomePath.resolve("log"));
     essentialDirectories.add(dataPath);
+    // FIXME this folder creation shouldn't happen here
+    essentialDirectories.add(dataPath.resolve("transferredResources"));
     essentialDirectories.add(logPath);
     essentialDirectories.add(storagePath);
     essentialDirectories.add(indexPath);
@@ -501,12 +532,18 @@ public class RodaCoreFactory {
   public static void shutdown() throws IOException {
     if (instantiated) {
       solr.close();
-      pluginManager.shutdown();
-      pluginOrchestrator.shutdown();
-      sipFolderMonitor.stopWatch();
+
+      if (nodeType == NodeType.MASTER || nodeType == NodeType.TEST) {
+        stopApacheDS();
+      }
+
+      if (nodeType == NodeType.MASTER || nodeType == NodeType.WORKER) {
+        pluginManager.shutdown();
+      }
 
       if (nodeType == NodeType.MASTER) {
-        stopApacheDS();
+        pluginOrchestrator.shutdown();
+        transferredResourcesFolderMonitor.stopWatch();
       }
     }
   }
@@ -556,22 +593,23 @@ public class RodaCoreFactory {
 
   }
 
-  public static void startSIPFolderMonitor() throws Exception {
+  public static void startTransferredResourcesFolderMonitor() throws Exception {
 
     Configuration rodaConfig = RodaCoreFactory.getRodaConfiguration();
-    String SIPFolderPath = rodaConfig.getString("sip.folder");
-    Path sipFolderPath = dataPath.resolve(SIPFolderPath);
-    Date date = getFolderMonitorDate(sipFolderPath);
-    sipFolderObserver = new IndexFolderObserver(solr, sipFolderPath);
-    sipFolderMonitor = new FolderMonitorNIO(sipFolderPath, date, solr);
-    sipFolderMonitor.addFolderObserver(sipFolderObserver);
-    LOGGER.debug("Transfer folder monitor is fully initialized? " + getFolderMonitor().isFullyInitialized());
+    String transferredResourcesFolder = rodaConfig.getString("transferredResources.folder");
+    Path transferredResourcesFolderPath = dataPath.resolve(transferredResourcesFolder);
+    Date date = getFolderMonitorDate(transferredResourcesFolderPath);
+    transferredResourcesFolderObserver = new IndexFolderObserver(solr, transferredResourcesFolderPath);
+    transferredResourcesFolderMonitor = new FolderMonitorNIO(transferredResourcesFolderPath, date, solr);
+    transferredResourcesFolderMonitor.addFolderObserver(transferredResourcesFolderObserver);
+    LOGGER
+      .debug("Transferred resources folder monitor is fully initialized? " + getFolderMonitor().isFullyInitialized());
   }
 
-  public static Date getFolderMonitorDate(Path sipFolderPath) {
+  public static Date getFolderMonitorDate(Path folderPath) {
     Date folderMonitorDate = null;
     try {
-      Path dateFile = sipFolderPath.resolve(".date");
+      Path dateFile = folderPath.resolve(".date");
       if (Files.exists(dateFile)) {
         String dateFromFile = new String(Files.readAllBytes(dateFile));
         SimpleDateFormat df = new SimpleDateFormat(RodaConstants.SOLRDATEFORMAT);
@@ -583,9 +621,9 @@ public class RodaCoreFactory {
     return folderMonitorDate;
   }
 
-  public static void setFolderMonitorDate(Path sipFolderPath, Date d) {
+  public static void setFolderMonitorDate(Path folderPath, Date d) {
     try {
-      Path dateFile = sipFolderPath.resolve(".date");
+      Path dateFile = folderPath.resolve(".date");
       if (!Files.exists(dateFile)) {
         Files.createFile(dateFile);
       }
@@ -630,7 +668,7 @@ public class RodaCoreFactory {
   }
 
   public static FolderMonitorNIO getFolderMonitor() {
-    return sipFolderMonitor;
+    return transferredResourcesFolderMonitor;
   }
 
   public static NodeType getNodeType() {
@@ -685,7 +723,7 @@ public class RodaCoreFactory {
     propertiesConfiguration.setEncoding("UTF-8");
 
     if (Files.exists(config)) {
-      LOGGER.debug("Loading configuration from file " + config);
+      LOGGER.trace("Loading configuration from file " + config);
       propertiesConfiguration.load(config.toFile());
       RodaPropertiesReloadStrategy rodaPropertiesReloadStrategy = new RodaPropertiesReloadStrategy();
       rodaPropertiesReloadStrategy.setRefreshDelay(5000);
@@ -693,10 +731,10 @@ public class RodaCoreFactory {
     } else {
       InputStream inputStream = RodaCoreFactory.class.getResourceAsStream("/config/" + configurationFile);
       if (inputStream != null) {
-        LOGGER.debug("Loading configuration from classpath " + configurationFile);
+        LOGGER.trace("Loading configuration from classpath " + configurationFile);
         propertiesConfiguration.load(inputStream);
       } else {
-        LOGGER.error("Configuration " + configurationFile + " doesn't exist");
+        LOGGER.trace("Configuration " + configurationFile + " doesn't exist");
       }
     }
 
@@ -865,7 +903,7 @@ public class RodaCoreFactory {
       Filter filter = new Filter(new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID));
       RemoveOrphansPlugin removeOrphansPlugin = new RemoveOrphansPlugin();
       removeOrphansPlugin.setNewParent(model.retrieveAIP(parentId));
-      getPluginOrchestrator().runPluginFromIndex(SimpleDescriptionObject.class, filter, removeOrphansPlugin);
+      getPluginOrchestrator().runPluginFromIndex(IndexedAIP.class, filter, removeOrphansPlugin);
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error running remove orphans plugin", e);
     }

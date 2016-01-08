@@ -16,11 +16,9 @@ import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sort.SortParameter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
-import org.roda.core.data.v2.SIPReport;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.images.CommonImageBundle;
 import org.roda.wui.common.client.tools.Tools;
-import org.roda.wui.ingest.list.client.IngestListService;
 import org.roda.wui.management.statistics.client.StatisticsPanel.ValueDimension;
 
 import com.google.gwt.core.client.GWT;
@@ -138,42 +136,43 @@ public class IngestStatistics extends StatisticTab {
         public void onSuccess(StatisticData data) {
           if (data != null) {
             final String sipId = data.getValue();
-            IngestListService.Util.getInstance().retrieveSipReport(sipId, new AsyncCallback<SIPReport>() {
-
-              public void onFailure(Throwable caught) {
-                logger.error("Error creating sip duration report", caught);
-
-              }
-
-              public void onSuccess(final SIPReport result) {
-                report.addClickListener(new ClickListener() {
-
-                  public void onClick(Widget sender) {
-                    // FIXME
-                    // IngestReportWindow w = new
-                    // IngestReportWindow(result);
-                    // w.show();
-
-                  }
-
-                });
-                info.addClickListener(new ClickListener() {
-
-                  public void onClick(Widget sender) {
-                    String pid = result.getIngestedID();
-                    if (pid != null) {
-                      // ViewWindow viewWindow = new ViewWindow(pid);
-                      // viewWindow.show();
-                    } else {
-                      Window.alert(constants.viewImpossibleBcSipNotIngested());
-                    }
-                  }
-
-                });
-
-              }
-
-            });
+            // IngestListService.Util.getInstance().retrieveSipReport(sipId, new
+            // AsyncCallback<SIPReport>() {
+            //
+            // public void onFailure(Throwable caught) {
+            // logger.error("Error creating sip duration report", caught);
+            //
+            // }
+            //
+            // public void onSuccess(final SIPReport result) {
+            // report.addClickListener(new ClickListener() {
+            //
+            // public void onClick(Widget sender) {
+            // // FIXME
+            // // IngestReportWindow w = new
+            // // IngestReportWindow(result);
+            // // w.show();
+            //
+            // }
+            //
+            // });
+            // info.addClickListener(new ClickListener() {
+            //
+            // public void onClick(Widget sender) {
+            // String pid = result.getIngestedID();
+            // if (pid != null) {
+            // // ViewWindow viewWindow = new ViewWindow(pid);
+            // // viewWindow.show();
+            // } else {
+            // Window.alert(constants.viewImpossibleBcSipNotIngested());
+            // }
+            // }
+            //
+            // });
+            //
+            // }
+            //
+            // });
           } else {
             value.setText(constants.noDataAvailable());
           }

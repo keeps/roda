@@ -15,7 +15,6 @@ import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.JobReport;
 import org.roda.core.data.v2.LogEntry;
 import org.roda.core.data.v2.Representation;
-import org.roda.core.data.v2.SIPReport;
 import org.roda.core.data.v2.SimpleFile;
 import org.roda.core.data.v2.User;
 
@@ -110,12 +109,6 @@ public abstract class ModelObservable {
   protected void notifyLogEntryCreated(LogEntry entry) {
     for (ModelObserver observer : observers) {
       observer.logEntryCreated(entry);
-    }
-  }
-
-  protected void notifySipStateCreated(SIPReport state) {
-    for (ModelObserver observer : observers) {
-      observer.sipReportCreated(state);
     }
   }
 
