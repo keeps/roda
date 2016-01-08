@@ -340,7 +340,7 @@
 
 /* @group Breadcrumb */
 .main .wui-breadcrumbPanel {
-	
+	margin-top: 10px;
 }
 
 .main .wui-breadcrumbPanel .breadcrumb {
@@ -619,6 +619,11 @@
 	display: inline;
 	width: 50px;
 	vertical-align: middle;
+}
+
+.browseTitle-allCollections-wrapper .browseItemIcon,
+.browseTitle-allCollections-wrapper .browseItemPanelText {
+	display: inline-block;
 }
 
 .browseItemIcon-all {
@@ -1757,7 +1762,7 @@
 }
 
 .searchPanel {
-	margin-right: 55px;
+	margin-right: 40px;
 }
 
 .searchPanelLeft {
@@ -1771,30 +1776,42 @@
 	height: 4rem;
 	line-height: 4rem;
 	font-size: 2rem;
-	border: 3px solid #ccc;
+	border: none;
 	border-radius: 2px;
 	padding: 0 1rem;
+	background-color: #eee;
 }
 
-.searchButton {
+.search .searchButton {
 	cursor: pointer;
 	cursor: hand;
 	position: relative;
-	top: -6px;
 	float: right;
-	width: 55px;
-	margin-right: -55px;
+	margin-right: -40px;
+    height: 40px;
+    width: 40px;
+    background-color: #089de3;
 }
 
-.searchButton-html {
-	font-size: 20px;
+.search .searchButton:hover {
+	background-color: #3998d0;
 }
 
-.searchButton .fa-stack-2x {
+.search .searchBox::-webkit-input-placeholder,
+	.search .searchBox:placeholder-shown {
+	color: rgba(0,0,0, 0.5);
+}
+
+.search .searchButton-html {
+	font-size: 15px;
+}
+
+.search .searchButton .fa-stack-2x {
 	color: #089de3;
+	display: none;
 }
 
-.searchButton .fa-stack-1x {
+.search .searchButton .fa-stack-1x {
 	color: white;
 }
 
@@ -1803,12 +1820,12 @@
 	clear: both;
 }
 
-.search  .searchApplyFilters {
+.search .searchApplyFilters {
 	margin: 10px 0;
 	width: 100%;
 }
 
-.search  .searchAdvancedSearch {
+.search .searchAdvancedSearch {
 	margin: 10px 0;
 	width: 100%;
 }
@@ -1821,8 +1838,9 @@
 .searchAdvancedPanel {
 	padding: 20px !important;
 	min-height: auto;
-	background-color: #e6e7e8;
+	background-color: #eee;
 	margin-bottom: 20px;
+	border-top: 3px solid #089de3;
 }
 
 .search-field-label {
@@ -1974,11 +1992,11 @@
 	background-color: #eee;
 }
 
-.viewRepresentationFilePreviewPanel .filePreviewToolbar .viewRepresentationBreadcrumb
-	{
+.viewRepresentationFilePreviewPanel .filePreviewToolbar .viewRepresentationBreadcrumb {
 	padding-top: 5px;
 	margin-left: 40px;
 	float: left;
+	margin-top: 0px;
 }
 
 .viewRepresentationFilePreviewPanel .filePreviewToolbar .filePreviewToolbarIcons
@@ -2002,8 +2020,7 @@
 }
 
 .viewRepresentationFilePreviewPanel .filePreviewToolbar .filePreviewToolbarIcon:hover,
-	.viewRepresentationFilePreviewPanel .filePreviewToolbar .filePreviewToolbarIcon.active
-	{
+.viewRepresentationFilePreviewPanel .filePreviewToolbar .filePreviewToolbarIcon.active {
 	color: white;
 	background-color: #089de3;
 }
@@ -2107,6 +2124,7 @@
 	left: 2px;
 	float: left;
 	width: 40px;
+	margin-right: -55px;
 }
 
 .viewRepresentation .searchButton-html {
@@ -2190,14 +2208,14 @@
 /**********************************************
 				LOGIN
 ************************************************/
-.login {
+.loginPanel {
 	margin: 40px auto;
 	max-width: 400px;
 	background-color: #eee;
 	padding: 40px;
 }
 
-.login h1 {
+.loginPanel h1 {
 	margin-top: 0px;
 }
 

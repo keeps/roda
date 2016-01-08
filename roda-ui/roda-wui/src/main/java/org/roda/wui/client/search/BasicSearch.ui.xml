@@ -7,14 +7,14 @@
 	xmlns:d="urn:import:com.google.gwt.user.datepicker.client">
 
 	<ui:style>
-	.addbutton {
+		.addbutton {
 		margin-left: 10px;
-	}
-	
-	.searchbutton {
+		}
+
+		.searchbutton {
 		float: right;
 		margin-top: 5px;
-	}
+		}
 	</ui:style>
 
 	<ui:with field='messages' type='config.i18n.client.BrowseMessages' />
@@ -25,36 +25,33 @@
 				<g:HTML>
 					<h1>Search</h1>
 				</g:HTML>
+				<g:HTML addStyleNames="page-description" ui:field="searchDescription">
+					<p>
+						Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec
+						laoreet
+						at sapien vel efficitur. Mauris lacinia nisi a luctus
+						lacinia.
+						Donec est est, scelerisque pulvinar eros a, tempus rutrum
+						augue.
+						Integer scelerisque volutpat metus, a congue libero
+						ullamcorper
+						non. Integer gravida viverra mi, sit amet ultrices
+						lacus efficitur
+						sed. Maecenas vitae varius dolor. Curabitur ut
+						ultrices leo.
+						Vivamus sollicitudin orci ut pellentesque maximus.
+						Nam in enim
+						malesuada, vestibulum purus ac, porta risus. Lorem
+						ipsum dolor sit
+						amet, consectetur adipiscing elit.
+					</p>
+				</g:HTML>
 				<g:FlowPanel styleName="searchPanel">
 					<g:FlowPanel styleName="searchPanelLeft">
 						<g:TextBox ui:field="searchInputBox" addStyleNames="searchBox" />
 						<!-- <g:Hyperlink addStyleNames="searchInputAdvancedLink" -->
 						<!-- targetHistoryToken="dissemination.search.advanced">More search 
 							options</g:Hyperlink> -->
-						<g:DisclosurePanel addStyleNames="searchAdvancedDisclosure"
-							ui:field="searchAdvancedDisclosure">
-							<g:header>More search options</g:header>
-							<g:FlowPanel addStyleNames="searchAdvancedPanel">
-								<!-- <g:FlowPanel addStyleNames="searchAdvancedField"> <g:Label addStyleNames="form-label" 
-									ui:field="advancedSearchInputTitleLabel">Title</g:Label> <g:TextBox addStyleNames="form-textbox" 
-									ui:field="advancedSearchInputTitle" /> </g:FlowPanel> -->
-								<g:FlowPanel ui:field="searchAdvancedFieldsPanel"
-									styleName="searchAdvancedFieldsPanel empty" />
-								<g:FlowPanel styleName="searchAdvancedFieldAdd">
-									<g:ListBox styleName="form-listbox" ui:field="searchAdvancedFieldOptions">
-										<g:item>Scope and content</g:item>
-										<g:item>Producer</g:item>
-										<g:item>Author</g:item>
-										<g:item>Physical location</g:item>
-										<g:item>Arrangement</g:item>
-									</g:ListBox>
-									<g:Button styleName="btn btn-plus {style.addbutton}"
-										ui:field="searchAdvancedFieldOptionsAdd">Add search field</g:Button>
-									<g:Button styleName="btn btn-search {style.searchbutton}"
-										ui:field="searchAdvancedGo" enabled="false">Search</g:Button>
-								</g:FlowPanel>
-							</g:FlowPanel>
-						</g:DisclosurePanel>
 					</g:FlowPanel>
 					<wcag:AccessibleFocusPanel styleName="searchButton"
 						ui:field="searchInputButton">
@@ -66,13 +63,34 @@
 						</g:HTML>
 					</wcag:AccessibleFocusPanel>
 				</g:FlowPanel>
+				<g:DisclosurePanel addStyleNames="searchAdvancedDisclosure"
+					ui:field="searchAdvancedDisclosure">
+					<g:header>More search options</g:header>
+					<g:FlowPanel addStyleNames="searchAdvancedPanel">
+						<!-- <g:FlowPanel addStyleNames="searchAdvancedField"> <g:Label addStyleNames="form-label"
+							ui:field="advancedSearchInputTitleLabel">Title</g:Label> <g:TextBox addStyleNames="form-textbox"
+							ui:field="advancedSearchInputTitle" /> </g:FlowPanel> -->
+						<g:FlowPanel ui:field="searchAdvancedFieldsPanel"
+							styleName="searchAdvancedFieldsPanel empty" />
+						<g:FlowPanel styleName="searchAdvancedFieldAdd">
+							<g:ListBox styleName="form-listbox" ui:field="searchAdvancedFieldOptions">
+								<g:item>Scope and content</g:item>
+								<g:item>Producer</g:item>
+								<g:item>Author</g:item>
+								<g:item>Physical location</g:item>
+								<g:item>Arrangement</g:item>
+							</g:ListBox>
+							<g:Button styleName="btn btn-plus {style.addbutton}"
+								ui:field="searchAdvancedFieldOptionsAdd">Add search field</g:Button>
+							<g:Button styleName="btn btn-search {style.searchbutton}"
+								ui:field="searchAdvancedGo" enabled="false">Search</g:Button>
+						</g:FlowPanel>
+					</g:FlowPanel>
+				</g:DisclosurePanel>
 				<lists:AIPList addStyleNames="searchResults" ui:field="searchResultPanel" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel styleName="sidebar-group" ui:field="sidebarGroupDownloads">
-					<g:Label addStyleNames="h4">
-						<ui:text from='{messages.sidebarActionsTitle}' />
-					</g:Label>
 					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
 						<g:Label addStyleNames="h5 sidebar-facet-title">
 							Description levels

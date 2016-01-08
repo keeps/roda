@@ -353,15 +353,24 @@ pre>code {
 }
 
 .my-asyncdatagrid-pager-pagesize {
-	margin-right: 15px;
 	margin-left: auto;
 	margin-top: 5px;
 }
 
-.my-asyncdatagrid-pager-pagesize {
-	margin-right: 15px;
-	margin-left: auto;
-	margin-top: 5px;
+.my-asyncdatagrid-pager-pagesize a {
+	color: white;
+	background-color: #089de3;
+	padding: 4px 8px 4px 8px;
+	font-size: 11px;
+	margin-left: 5px;
+}
+
+.my-asyncdatagrid-pager-pagesize td:nth-child(2) {
+	display: none;
+}
+
+.my-asyncdatagrid-pager-pagesize a:hover {
+	background-color: #3998d0;
 }
 
 .my-asyncdatagrid-display {

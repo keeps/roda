@@ -280,7 +280,7 @@ public interface BrowseMessages extends Messages {
   String viewRepresentationNotSupportedPreview();
   
   @DefaultMessage("Search files...")
-  String viewRepresentationsSearchFiles();
+  String viewRepresentationsSearchPlaceHolder();
   
   /************* Ingest process new ****************/
   @DefaultMessage("Job {0,localdatetime,predef:DATE_TIME_SHORT}")
@@ -315,5 +315,7 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("Are you sure you want the selected items, including all their nested items?")
   String browseRemoveConfirmDialogMessage();
 
-
+  /************* Search ****************/
+  @DefaultMessage("Search records...")
+  String searchPlaceHolder();
 }

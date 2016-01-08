@@ -60,6 +60,8 @@ import com.google.gwt.user.datepicker.client.DateBox.DefaultFormat;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 
+import config.i18n.client.BrowseMessages;
+
 /**
  * @author Luis Faria
  * 
@@ -104,8 +106,7 @@ public class BasicSearch extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  // private SearchConstants constants = (SearchConstants)
-  // GWT.create(SearchConstants.class);
+  private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   @UiField
   TextBox searchInputBox;
@@ -172,6 +173,8 @@ public class BasicSearch extends Composite {
         }
       }
     });
+
+    searchInputBox.getElement().setPropertyString("placeholder", messages.searchPlaceHolder());
 
     this.searchInputBox.addValueChangeHandler(new ValueChangeHandler<String>() {
 

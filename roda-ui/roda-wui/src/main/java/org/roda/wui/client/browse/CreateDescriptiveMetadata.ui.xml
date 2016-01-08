@@ -16,7 +16,7 @@
 		addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
-				<g:Label styleName="h1">Create descriptive metadata</g:Label>
+				<g:Label styleName="h1">New descriptive metadata</g:Label>
 				<g:Label addStyleNames="form-label">
 					Type
 				</g:Label>

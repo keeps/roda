@@ -177,6 +177,12 @@ public class Browse extends Composite {
   FlowPanel preservationSidebar;
 
   @UiField
+  FlowPanel permissionsSidebar;
+
+  @UiField
+  FlowPanel actionsSidebar;
+
+  @UiField
   Button preservationEvents;
 
   @UiField
@@ -189,10 +195,10 @@ public class Browse extends Composite {
   Button moveItem;
 
   @UiField
-  Button editPermissions;
+  Button remove;
 
   @UiField
-  Button remove;
+  Button editPermissions;
 
   private boolean viewingTop;
 
@@ -328,6 +334,8 @@ public class Browse extends Composite {
     sidebarData.setVisible(false);
 
     preservationSidebar.setVisible(false);
+    actionsSidebar.setVisible(false);
+    permissionsSidebar.setVisible(false);
 
     // Set button visibility
     createItem.setVisible(false);
@@ -354,6 +362,7 @@ public class Browse extends Composite {
       itemIcon.setWidget(itemIconHtmlPanel);
       itemTitle.setText(sdo.getTitle() != null ? sdo.getTitle() : sdo.getId());
       itemTitle.removeStyleName("browseTitle-allCollections");
+      itemIcon.getParent().removeStyleName("browseTitle-allCollections-wrapper");
       itemDates.setText(getDatesText(sdo));
 
       itemMetadata.clear();
@@ -497,6 +506,9 @@ public class Browse extends Composite {
         preservationSidebar.setVisible(false);
       }
 
+      actionsSidebar.setVisible(true);
+      permissionsSidebar.setVisible(true);
+
       // Set button visibility
       createItem.setVisible(true);
       // createDescriptiveMetadata.setVisible(true);
@@ -525,6 +537,7 @@ public class Browse extends Composite {
     breadcrumb.setVisible(false);
     itemTitle.setText(messages.allCollectionsTitle());
     itemTitle.addStyleName("browseTitle-allCollections");
+    itemIcon.getParent().addStyleName("browseTitle-allCollections-wrapper");
     itemDates.setText("");
     itemMetadata.clear();
     itemMetadata.setVisible(false);
@@ -535,6 +548,8 @@ public class Browse extends Composite {
     downloadList.clear();
 
     preservationSidebar.setVisible(false);
+    actionsSidebar.setVisible(true);
+    permissionsSidebar.setVisible(false);
 
     // Set button visibility
     createItem.setVisible(true);

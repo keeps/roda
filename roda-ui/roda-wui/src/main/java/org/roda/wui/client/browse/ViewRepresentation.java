@@ -325,7 +325,7 @@ public class ViewRepresentation extends Composite {
     // nextFile.setText(messages.viewRepresentationNextFileButton());
     // previousFile.setText(messages.viewRepresentationPreviousFileButton());
 
-    searchInputBox.getElement().setPropertyString("placeholder", messages.viewRepresentationsSearchFiles());
+    searchInputBox.getElement().setPropertyString("placeholder", messages.viewRepresentationsSearchPlaceHolder());
 
     infoFile.setVisible(false);
     downloadFile.setVisible(false);

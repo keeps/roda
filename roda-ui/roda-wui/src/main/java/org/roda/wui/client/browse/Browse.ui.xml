@@ -33,7 +33,7 @@
 						amet, consectetur adipiscing elit.
 					</p>
 				</g:HTML>
-				<g:FlowPanel styleName="browseItemPanel">
+				<g:FlowPanel styleName="browseItemPanel browseTitle-allCollections-wrapper">
 					<g:SimplePanel styleName="browseItemIcon" ui:field="itemIcon" />
 					<g:FlowPanel styleName="browseItemPanelText">
 						<g:Label styleName="h1" addStyleNames="browseItemText"
@@ -65,12 +65,12 @@
 						<ui:msg>Events</ui:msg>
 					</g:Button>
 				</g:FlowPanel>
-				<g:FlowPanel>
+				<g:FlowPanel ui:field="actionsSidebar">
 					<g:Label addStyleNames="h4">
-						<ui:msg>Actions</ui:msg>
+						<ui:msg>Archival package</ui:msg>
 					</g:Label>
 					<g:Button addStyleNames="btn btn-plus" ui:field="createItem">
-						<ui:msg>New sublevel</ui:msg>
+						<ui:msg>New</ui:msg>
 					</g:Button>
 					<!-- <g:Button addStyleNames="btn btn-plus" ui:field="createDescriptiveMetadata"> -->
 					<!-- <ui:msg>New metadata</ui:msg> -->
@@ -82,7 +82,7 @@
 						<ui:msg>Remove</ui:msg>
 					</g:Button>
 				</g:FlowPanel>
-				<g:FlowPanel>
+				<g:FlowPanel ui:field="permissionsSidebar">
 					<g:Label addStyleNames="h4">
 						<ui:msg>Permissions</ui:msg>
 					</g:Label>

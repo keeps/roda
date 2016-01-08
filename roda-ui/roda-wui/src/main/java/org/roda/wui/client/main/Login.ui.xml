@@ -4,7 +4,7 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:i="urn:import:config.i18n.client">
 
-	<g:FlowPanel addStyleNames="login">
+	<g:FlowPanel addStyleNames="loginPanel">
 		<g:HTML>
 			<h1>Login</h1>
 		</g:HTML>

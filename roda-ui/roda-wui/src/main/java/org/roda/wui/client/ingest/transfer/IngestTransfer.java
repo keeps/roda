@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.facet.SimpleFacetParameter;
 import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
@@ -39,7 +40,6 @@ import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.Humanize;
-import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -111,7 +111,8 @@ public class IngestTransfer extends Composite {
     return instance;
   }
 
-  public static final String TOP_ICON = "<i class='fa fa-circle-o'></i>";
+  private static final String TOP_ICON = "<span class='roda-logo'></span>";
+
   public static final SafeHtml FOLDER_ICON = SafeHtmlUtils.fromSafeConstant("<i class='fa fa-folder-o'></i>");
   public static final SafeHtml FILE_ICON = SafeHtmlUtils.fromSafeConstant("<i class='fa fa-file-o'></i>");
 
