@@ -733,8 +733,8 @@ public class SolrUtils {
       ret = resultClass.cast(solrDocumentToLogEntry(doc));
     } else if (resultClass.equals(JobReport.class)) {
       ret = resultClass.cast(solrDocumentToJobReport(doc));
-    } else if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class)
-      || resultClass.equals(Group.class)) {
+    } else
+      if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class) || resultClass.equals(Group.class)) {
       ret = resultClass.cast(solrDocumentToRodaMember(doc));
     } else if (resultClass.equals(RepresentationFilePreservationObject.class)) {
       ret = resultClass.cast(solrDocumentToRepresentationFilePreservationObject(doc));
@@ -1410,6 +1410,10 @@ public class SolrUtils {
     doc.addField(RodaConstants.FILE_SIZE, file.getSize());
     doc.addField(RodaConstants.FILE_ISFILE, file.isFile());
 
+    doc.addField(RodaConstants.FILE_PRONOM,
+      file.getFileFormat().getPronom() != null ? file.getFileFormat().getPronom() : "");
+    doc.addField(RodaConstants.FILE_EXTENSION,
+      file.getFileFormat().getExtension() != null ? file.getFileFormat().getExtension() : "");
     // FIXME how to index format registries if any
     doc.addField(RodaConstants.FILE_FILEFORMAT, "");
     return doc;
@@ -1420,6 +1424,7 @@ public class SolrUtils {
     String fileId = objectToString(doc.get(RodaConstants.FILE_FILEID));
     boolean entryPoint = objectToBoolean(doc.get(RodaConstants.FILE_ISENTRYPOINT));
     String mimetype = objectToString(doc.get(RodaConstants.FILE_FORMAT_MIMETYPE));
+    String pronom = objectToString(doc.get(RodaConstants.FILE_PRONOM));
     LOGGER.error("solrDocumentToFile " + mimetype);
     String version = objectToString(doc.get(RodaConstants.FILE_FORMAT_VERSION));
     String representationId = objectToString(doc.get(RodaConstants.FILE_REPRESENTATIONID));
@@ -1428,7 +1433,7 @@ public class SolrUtils {
     boolean isFile = objectToBoolean(doc.get(RodaConstants.FILE_ISFILE));
     // FIXME how to restore format registries
     //
-    FileFormat fileFormat = new FileFormat(mimetype, version, new HashMap<String, String>());
+    FileFormat fileFormat = new FileFormat(mimetype, version, pronom, new HashMap<String, String>());
     SimpleFile file = new SimpleFile(fileId, aipId, representationId, entryPoint, fileFormat, originalName, size,
       isFile);
     return file;

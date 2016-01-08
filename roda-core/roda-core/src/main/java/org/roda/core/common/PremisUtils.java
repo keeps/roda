@@ -183,13 +183,6 @@ public class PremisUtils {
     }
   }
 
-  public static RepresentationFilePreservationObject updatePremisFile(RepresentationFilePreservationObject premisFile,
-    String toolName, Binary toolOutput) {
-    // TODO Update RepresentationFilePreservationObject with tool output
-
-    return premisFile;
-  }
-
   private static class RodaErrorHandler extends DefaultHandler {
     List<SAXParseException> errors;
 
@@ -217,5 +210,14 @@ public class PremisUtils {
       this.errors = errors;
     }
 
+  }
+
+  public static RepresentationFilePreservationObject updateFileFormat(RepresentationFilePreservationObject rfpo,
+    org.roda.core.data.v2.FileFormat fileFormat) {
+    System.out.println("Setting pronom: " + fileFormat.getPronom());
+    rfpo.setMimetype(fileFormat.getMimeType());
+    rfpo.setFormatRegistryKey(fileFormat.getPronom());
+    rfpo.setFormatRegistryName("http://www.nationalarchives.gov.uk/pronom");
+    return rfpo;
   }
 }

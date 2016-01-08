@@ -116,13 +116,12 @@ import org.roda.core.plugins.plugins.ingest.characterization.DroidPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.ExifToolPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.FFProbePlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.FITSPlugin;
-import org.roda.core.plugins.plugins.ingest.characterization.FastCharacterizationPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.JHOVEPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.JpylyzerPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.MediaInfoPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.PremisSkeletonPlugin;
+import org.roda.core.plugins.plugins.ingest.characterization.SiegfriedPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.TikaFullTextPlugin;
-import org.roda.core.plugins.plugins.ingest.characterization.ToolOutputProcessorPlugin;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fedora.FedoraStorageService;
 import org.roda.core.storage.fs.FileStorageService;
@@ -994,14 +993,9 @@ public class RodaCoreFactory {
     getPluginOrchestrator().runPluginOnAllAIPs(jpylyzerPlugin);
   }
 
-  private static void runPremisUpdatePlugin() {
-    Plugin<AIP> jpylyzerPlugin = new ToolOutputProcessorPlugin();
-    getPluginOrchestrator().runPluginOnAllAIPs(jpylyzerPlugin);
-  }
-
-  private static void runFastCharacterizationPlugin() {
-    Plugin<AIP> fastCharacterizationPlugin = new FastCharacterizationPlugin();
-    getPluginOrchestrator().runPluginOnAllAIPs(fastCharacterizationPlugin);
+  private static void runSiegfriedPlugin() {
+    Plugin<AIP> siegfriedPlugin = new SiegfriedPlugin();
+    getPluginOrchestrator().runPluginOnAllAIPs(siegfriedPlugin);
   }
 
   private static void runEARKPlugin() {
@@ -1093,6 +1087,7 @@ public class RodaCoreFactory {
     System.err.println("java -jar x.jar premisupdate");
     System.err.println("java -jar x.jar fastcharacterization");
     System.err.println("java -jar x.jar eark");
+    System.err.println("java -jar x.jar siegfried");
   }
 
   private static void printIndexMembers(List<String> args, Filter filter, Sorter sorter, Sublist sublist, Facets facets)
@@ -1198,14 +1193,12 @@ public class RodaCoreFactory {
       runFFProbePlugin();
     } else if ("jpylyzer".equals(args.get(0))) {
       runJpylyzerPlugin();
-    } else if ("premisupdate".equals(args.get(0))) {
-      runPremisUpdatePlugin();
-    } else if ("fastcharacterization".equals(args.get(0))) {
-      runFastCharacterizationPlugin();
     } else if ("eark".equals(args.get(0))) {
       runEARKPlugin();
     } else if ("transferredResource".equals(args.get(0))) {
       runTransferredResourceToAIPPlugin();
+    } else if ("siegfried".equals(args.get(0))) {
+      runSiegfriedPlugin();
     } else {
       printMainUsage();
     }

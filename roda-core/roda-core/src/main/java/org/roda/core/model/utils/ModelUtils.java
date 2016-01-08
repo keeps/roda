@@ -101,7 +101,7 @@ public final class ModelUtils {
     // FIXME how to load format registries if any
     Map<String, String> formatRegistries = new HashMap<String, String>();
 
-    return new FileFormat(mimetype, version, formatRegistries);
+    return new FileFormat(mimetype, version, "", formatRegistries);
   }
 
   /**

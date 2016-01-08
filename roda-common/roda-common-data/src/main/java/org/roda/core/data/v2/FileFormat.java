@@ -13,16 +13,35 @@ public class FileFormat extends RODAObject {
   private static final long serialVersionUID = -6855712550409310949L;
   private String mimeType;
   private String version;
+  private String pronom;
+  private String extension;
   private Map<String, String> formatRegistries;
 
-  public FileFormat(){
-    super(null,null);
+  public String getExtension() {
+    return extension;
   }
-  
-  public FileFormat(String mimeType, String version, Map<String, String> formatRegistries) {
+
+  public void setExtension(String extension) {
+    this.extension = extension;
+  }
+
+  public FileFormat() {
+    super(null, null);
+  }
+
+  public String getPronom() {
+    return pronom;
+  }
+
+  public void setPronom(String pronom) {
+    this.pronom = pronom;
+  }
+
+  public FileFormat(String mimeType, String version, String pronom, Map<String, String> formatRegistries) {
     super();
     this.mimeType = mimeType;
     this.version = version;
+    this.pronom = pronom;
     this.formatRegistries = formatRegistries;
   }
 
@@ -109,7 +128,5 @@ public class FileFormat extends RODAObject {
   public void setFormatRegistries(Map<String, String> formatRegistries) {
     this.formatRegistries = formatRegistries;
   }
-  
-  
 
 }

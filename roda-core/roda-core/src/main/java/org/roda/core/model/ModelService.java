@@ -22,6 +22,7 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.roda.core.common.LdapUtilityException;
+import org.roda.core.common.PremisUtils;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.common.UserUtility;
 import org.roda.core.common.ValidationUtils;
@@ -68,6 +69,7 @@ import org.roda.core.storage.Resource;
 import org.roda.core.storage.StoragePath;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSPathContentPayload;
+import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.util.DateParser;
@@ -77,6 +79,7 @@ import jersey.repackaged.com.google.common.collect.Sets;
 import lc.xmlns.premisV2.EventComplexType;
 import lc.xmlns.premisV2.EventOutcomeDetailComplexType;
 import lc.xmlns.premisV2.EventOutcomeInformationComplexType;
+import lc.xmlns.premisV2.ExtensionComplexType;
 import lc.xmlns.premisV2.LinkingObjectIdentifierComplexType;
 
 /**
@@ -1126,9 +1129,10 @@ public class ModelService extends ModelObservable {
         entryPoint = false;
       }
 
+      // TODO fetch applicationName, applicationVersion, ... from Premis?
       return new File(binaryPath.getName(), ModelUtils.getAIPidFromStoragePath(binaryPath),
         ModelUtils.getRepresentationIdFromStoragePath(binaryPath), entryPoint, fileFormat, binaryPath,
-        binaryPath.getName(), ((DefaultBinary) resource).getSizeInBytes(), true);
+        binaryPath.getName(), ((DefaultBinary) resource).getSizeInBytes(), true, null, null, null, null, null);
     } else {
       throw new GenericException(
         "Error while trying to convert something that it isn't a Binary into a representation file");
@@ -1356,7 +1360,16 @@ public class ModelService extends ModelObservable {
           epo.setOutcome(eoict.getEventOutcome());
           if (eoict.getEventOutcomeDetailList() != null && eoict.getEventOutcomeDetailList().size() > 0) {
             EventOutcomeDetailComplexType eodc = eoict.getEventOutcomeDetailList().get(0);
-            epo.setOutcomeDetailExtension(eodc.getEventOutcomeDetailExtension().toString());
+            List<ExtensionComplexType> ects = eodc.getEventOutcomeDetailExtensionList();
+            if (ects != null && ects.size() > 0) {
+              String outcomeDetailExtension = "";
+              for (ExtensionComplexType ect : ects) {
+                outcomeDetailExtension += ect.xmlText();
+              }
+              epo.setOutcomeDetailExtension(outcomeDetailExtension);
+
+            }
+
             epo.setOutcomeDetailNote(eodc.getEventOutcomeDetailNote());
           } else {
             epo.setOutcomeDetailExtension("");
@@ -1785,6 +1798,8 @@ public class ModelService extends ModelObservable {
   }
 
   public void updateFile(File file) {
+    // TODO
+
     notifyFileUpdated(file);
   }
 
@@ -1800,5 +1815,27 @@ public class ModelService extends ModelObservable {
     // update job report in storage
     // TODO
     notifyJobReportUpdated(jobReport);
+  }
+
+  public void updateFileFormats(List<File> updatedFiles) throws ModelServiceException {
+    for (File file : updatedFiles) {
+      try {
+        RepresentationFilePreservationObject rfpo = PremisUtils.getPremisFile(storage, file.getAipId(),
+          file.getRepresentationId(), file.getId() + ".premis.xml");
+        rfpo = PremisUtils.updateFileFormat(rfpo, file.getFileFormat());
+        Path premisFile = Files.createTempFile("file", ".premis.xml");
+        PremisFileObjectHelper helper = new PremisFileObjectHelper(rfpo);
+        helper.saveToFile(premisFile.toFile());
+        Binary b = (Binary) FSUtils.convertPathToResource(premisFile.getParent(), premisFile);
+        storage.updateBinaryContent(
+          ModelUtils.getPreservationFilePath(file.getAipId(), file.getRepresentationId(), file.getId() + ".premis.xml"),
+          b.getContent(), false, true);
+      } catch (IOException | PremisMetadataException | GenericException | RequestNotValidException | NotFoundException
+        | AuthorizationDeniedException e) {
+        e.printStackTrace();
+        LOGGER.warn("Error updating file format in storage for file " + file.getStoragePath().asString());
+      }
+    }
+    notifyUpdateFileFormats(updatedFiles);
   }
 }

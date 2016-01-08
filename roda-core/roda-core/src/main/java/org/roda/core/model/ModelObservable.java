@@ -226,4 +226,10 @@ public abstract class ModelObservable {
       observer.jobReportDeleted(jobReportId);
     }
   }
+
+  protected void notifyUpdateFileFormats(List<File> updatedFiles) {
+    for (ModelObserver observer : observers) {
+      observer.notifyUpdateFileFormats(updatedFiles);
+    }
+  }
 }

@@ -434,4 +434,11 @@ public class IndexModelObserver implements ModelObserver {
     deleteDocumentFromIndex(RodaConstants.INDEX_JOB_REPORT, jobReportId,
       "Error deleting Job Report(id=" + jobReportId + ")");
   }
+
+  @Override
+  public void notifyUpdateFileFormats(List<File> updatedFiles) {
+    for (File f : updatedFiles) {
+      fileUpdated(f);
+    }
+  }
 }

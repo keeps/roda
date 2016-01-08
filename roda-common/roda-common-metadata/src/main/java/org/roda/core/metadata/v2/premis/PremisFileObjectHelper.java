@@ -17,12 +17,12 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.roda.core.data.v2.Fixity;
 import org.roda.core.data.v2.RepresentationFilePreservationObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.util.DateParser;
 
 import lc.xmlns.premisV2.ContentLocationComplexType;
@@ -63,8 +63,8 @@ public class PremisFileObjectHelper extends PremisObjectHelper {
    * @throws PremisMetadataException
    *           if the PREMIS XML document is invalid.
    */
-  public static PremisFileObjectHelper newInstance(java.io.File premisFile) throws PremisMetadataException,
-    FileNotFoundException, IOException {
+  public static PremisFileObjectHelper newInstance(java.io.File premisFile)
+    throws PremisMetadataException, FileNotFoundException, IOException {
     FileInputStream premisInputStream = new FileInputStream(premisFile);
     PremisFileObjectHelper instance = newInstance(premisInputStream);
     premisInputStream.close();
@@ -86,8 +86,8 @@ public class PremisFileObjectHelper extends PremisObjectHelper {
    * @throws PremisMetadataException
    *           if the PREMIS XML document is invalid.
    */
-  public static PremisFileObjectHelper newInstance(InputStream premisInputStream) throws PremisMetadataException,
-    IOException {
+  public static PremisFileObjectHelper newInstance(InputStream premisInputStream)
+    throws PremisMetadataException, IOException {
 
     try {
 
@@ -266,8 +266,8 @@ public class PremisFileObjectHelper extends PremisObjectHelper {
       List<Fixity> fixities = new ArrayList<Fixity>();
 
       for (FixityComplexType fixity : characteristics.getFixityList()) {
-        fixities.add(new Fixity(fixity.getMessageDigestAlgorithm(), fixity.getMessageDigest(), fixity
-          .getMessageDigestOriginator()));
+        fixities.add(new Fixity(fixity.getMessageDigestAlgorithm(), fixity.getMessageDigest(),
+          fixity.getMessageDigestOriginator()));
       }
 
       pObject.setFixities(fixities.toArray(new Fixity[fixities.size()]));
@@ -277,27 +277,31 @@ public class PremisFileObjectHelper extends PremisObjectHelper {
     pObject.setSize(characteristics.getSize());
 
     // <format><formatDesignation>
-    if (characteristics.getFormat().getFormatDesignation() != null) {
 
-      FormatDesignationComplexType formatDesignation = characteristics.getFormat().getFormatDesignation();
+    if (characteristics.getFormatList() != null && characteristics.getFormatList().size() > 0) {
+      for (FormatComplexType fct : characteristics.getFormatList()) {
+        if (fct.getFormatDesignation() != null) {
+          FormatDesignationComplexType formatDesignation = fct.getFormatDesignation();
+          pObject.setFormatDesignationName(formatDesignation.getFormatName());
+          pObject.setFormatDesignationVersion(formatDesignation.getFormatVersion());
+          pObject.setMimetype(formatDesignation.getFormatName());
+          break;
+        }
+      }
+      for (FormatComplexType fct : characteristics.getFormatList()) {
+        if (fct.getFormatRegistry() != null) {
+          FormatRegistryComplexType formatRegistry = fct.getFormatRegistry();
+          pObject.setFormatRegistryName(formatRegistry.getFormatRegistryName());
+          pObject.setFormatRegistryKey(formatRegistry.getFormatRegistryKey());
+          pObject.setFormatRegistryRole(formatRegistry.getFormatRegistryRole());
+          break;
+        }
+      }
 
-      pObject.setFormatDesignationName(formatDesignation.getFormatName());
-      pObject.setFormatDesignationVersion(formatDesignation.getFormatVersion());
-      pObject.setMimetype(formatDesignation.getFormatName());
     }
-
-    // <format><formatRegistry>
-    if (characteristics.getFormat().getFormatRegistry() != null) {
-
-      FormatRegistryComplexType formatRegistry = characteristics.getFormat().getFormatRegistry();
-
-      pObject.setFormatRegistryName(formatRegistry.getFormatRegistryName());
-      pObject.setFormatRegistryKey(formatRegistry.getFormatRegistryKey());
-      pObject.setFormatRegistryRole(formatRegistry.getFormatRegistryRole());
-    }
-
     // <creatingApplication>
-    if (characteristics.getCreatingApplicationList() != null && characteristics.getCreatingApplicationList().size() > 0) {
+    if (characteristics.getCreatingApplicationList() != null
+      && characteristics.getCreatingApplicationList().size() > 0) {
 
       CreatingApplicationComplexType creatingApplication = characteristics.getCreatingApplicationArray(0);
 
@@ -311,10 +315,14 @@ public class PremisFileObjectHelper extends PremisObjectHelper {
     }
 
     // <objectCharacteristicsExtension>
-    if (characteristics.getObjectCharacteristicsExtension() != null) {
-      pObject.setObjectCharacteristicsExtension(characteristics.getObjectCharacteristicsExtension().xmlText());
+    if (characteristics.getObjectCharacteristicsExtensionList() != null
+      && characteristics.getObjectCharacteristicsExtensionList().size() > 0) {
+      String extension = "";
+      for (ExtensionComplexType ect : characteristics.getObjectCharacteristicsExtensionList()) {
+        extension += ect.xmlText();
+      }
+      pObject.setObjectCharacteristicsExtension(extension);
     }
-
   }
 
   private void writeObjectCharacteristics(RepresentationFilePreservationObject filePObject,

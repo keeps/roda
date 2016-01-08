@@ -394,6 +394,8 @@ public final class RodaConstants {
   public static final String FILE_ORIGINALNAME = "originalName";
   public static final String FILE_SIZE = "size";
   public static final String FILE_ISFILE = "isFile";
+  public static final String FILE_PRONOM = "formatPronom";
+  public static final String FILE_EXTENSION = "extension";
 
   public static final String REPORT_ATTR_AIP_ID = "aip.id";
   public static final String REPORT_ATTR_DATETIME = "datetime";

@@ -670,8 +670,8 @@
 				<version>1.0.0</version>
 			</dependency>
 			<dependency>
-				<groupId>pt.gov.dgarq.roda</groupId>
-				<artifactId>premis-v2.0</artifactId>
+				<groupId>org.roda-project</groupId>
+				<artifactId>premis-v2.2</artifactId>
 				<version>1.0.0</version>
 			</dependency>
 			<dependency>

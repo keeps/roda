@@ -17,13 +17,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.roda.core.data.v2.EventPreservationObject;
 import org.roda.core.metadata.MetadataException;
 import org.roda.core.util.XmlEncodeUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.util.DateParser;
 import org.w3c.util.InvalidDateException;
 
@@ -207,11 +207,19 @@ public class PremisEventHelper {
 
         pObject.setOutcomeDetailNote(eventOutcomeDetail.getEventOutcomeDetailNote());
 
-        XmlObject[] textList = eventOutcomeDetail.getEventOutcomeDetailExtension().selectPath("p/pre/text()"); //$NON-NLS-1$
-        if (textList != null && textList.length > 0) {
-          pObject.setOutcomeDetailExtension(textList[0].xmlText());
-        } else {
-          pObject.setOutcomeDetailExtension(eventOutcomeDetail.getEventOutcomeDetailExtension().xmlText());
+        List<ExtensionComplexType> ects = eventOutcomeDetail.getEventOutcomeDetailExtensionList();
+        if (ects != null && ects.size() > 0) {
+          String outcomeDetailExtension = "";
+          for (ExtensionComplexType ect : ects) {
+            XmlObject[] textList = ect.selectPath("p/pre/text()"); //$NON-NLS-1$
+            if (textList != null && textList.length > 0) {
+              outcomeDetailExtension += textList[0].xmlText();
+            } else {
+              outcomeDetailExtension += ect.xmlText();
+            }
+          }
+          pObject.setOutcomeDetailExtension(outcomeDetailExtension);
+
         }
 
       }
