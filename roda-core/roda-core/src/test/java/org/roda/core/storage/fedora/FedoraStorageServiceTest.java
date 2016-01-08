@@ -25,6 +25,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.AfterClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -157,6 +158,12 @@ public class FedoraStorageServiceTest extends AbstractStorageServiceTest<FedoraS
 
     // cleanup
     getStorage().deleteContainer(containerStoragePath);
+  }
+
+  @Ignore
+  @Test
+  public void testMoveBinaryToSameStorage() throws RODAException, IOException {
+    super.testMoveBinaryToSameStorage();
   }
 
 }
