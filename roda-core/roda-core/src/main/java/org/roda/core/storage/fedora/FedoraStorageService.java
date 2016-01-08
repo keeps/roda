@@ -257,7 +257,9 @@ public class FedoraStorageService implements StorageService {
     } catch (org.fcrepo.client.NotFoundException e) {
       throw new NotFoundException("Error getting directory " + storagePath, e);
     } catch (FedoraException e) {
-      throw new GenericException("Error getting directory " + storagePath, e);
+      // Unfortunately Fedora does not give a better error when requesting a
+      // file as a directory
+      throw new RequestNotValidException("Error getting directory " + storagePath, e);
     }
   }
 
@@ -485,7 +487,8 @@ public class FedoraStorageService implements StorageService {
 
   @Override
   public Map<String, Set<String>> updateMetadata(StoragePath storagePath, Map<String, Set<String>> metadata,
-    boolean replaceAll) throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
+    boolean replaceAll)
+      throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
 
     if (metadata != null) {
       String fedoraPath = FedoraUtils.createFedoraPath(storagePath);

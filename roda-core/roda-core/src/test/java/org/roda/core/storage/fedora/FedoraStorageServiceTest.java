@@ -27,6 +27,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.AfterClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -136,11 +137,11 @@ public class FedoraStorageServiceTest extends AbstractStorageServiceTest<FedoraS
     // the already exists exception will no be tested
     try {
       getStorage().createBinary(binaryStoragePath, binaryMetadata, payload, false);
-
-    } catch (RODAException e) {
-      e.printStackTrace();
-      fail(
-        "An exception should not have been thrown while creating a binary that already exists because fedora doesn't support it very well but it happened!");
+      // fail("An exception should have been thrown while creating a binary that
+      // already exists but it didn't happened!");
+    } catch (AlreadyExistsException e) {
+      // do nothing
+      fail("Fedora did not support this, change this test when it starts to support it");
     }
 
     // 4) delete binary
