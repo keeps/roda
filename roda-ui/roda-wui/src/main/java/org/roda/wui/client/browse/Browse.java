@@ -207,6 +207,7 @@ public class Browse extends Composite {
     fondsPanel = new AIPList();
     initWidget(uiBinder.createAndBindUi(this));
 
+    /* TODO set this pages enabled after developed */
     moveItem.setEnabled(false);
     editPermissions.setEnabled(false);
 
