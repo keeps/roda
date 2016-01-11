@@ -7,12 +7,14 @@
  */
 package org.roda.core.plugins.plugins.ingest.characterization;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,16 +28,23 @@ import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.AgentPreservationObject;
+import org.roda.core.data.v2.EventPreservationObject;
 import org.roda.core.data.v2.FileFormat;
+import org.roda.core.data.v2.JobReport.PluginState;
 import org.roda.core.data.v2.PluginType;
 import org.roda.core.index.IndexService;
+import org.roda.core.metadata.v2.premis.PremisAgentHelper;
+import org.roda.core.metadata.v2.premis.PremisMetadataException;
 import org.roda.core.model.AIP;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.ModelServiceException;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.plugins.PluginUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.StoragePath;
 import org.roda.core.storage.StorageService;
@@ -45,10 +54,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SiegfriedPlugin implements Plugin<AIP> {
+  private AgentPreservationObject agent;
   private static final Logger LOGGER = LoggerFactory.getLogger(SiegfriedPlugin.class);
 
   @Override
   public void init() throws PluginException {
+    agent = new AgentPreservationObject();
+    agent.setAgentName(getName() + "/" + getVersion()); //$NON-NLS-1$
+    agent.setAgentType(AgentPreservationObject.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN);
+    agent.setId("characterization-siegfried");
   }
 
   @Override
@@ -58,7 +72,7 @@ public class SiegfriedPlugin implements Plugin<AIP> {
 
   @Override
   public String getName() {
-    return "Sigefried characterization action";
+    return "Siegfried characterization action";
   }
 
   @Override
@@ -68,7 +82,7 @@ public class SiegfriedPlugin implements Plugin<AIP> {
 
   @Override
   public String getVersion() {
-    return "1.0";
+    return SiegfriedPluginUtils.getVersion();
   }
 
   @Override
@@ -89,6 +103,25 @@ public class SiegfriedPlugin implements Plugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
+    boolean created = false;
+    try {
+      AgentPreservationObject apo = model.getAgentPreservationObject(agent.getId());
+      created = true;
+    } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
+
+    }
+    if (!created) {
+      try {
+        byte[] serializedPremisAgent = new PremisAgentHelper(agent).saveToByteArray();
+        Path agentFile = Files.createTempFile("agent_preservation", ".xml");
+        Files.copy(new ByteArrayInputStream(serializedPremisAgent), agentFile, StandardCopyOption.REPLACE_EXISTING);
+        Binary agentResource = (Binary) FSUtils.convertPathToResource(agentFile.getParent(), agentFile);
+        model.createAgentMetadata(agent.getId(), agentResource);
+      } catch (RequestNotValidException | PremisMetadataException | IOException | NotFoundException | GenericException
+        | AlreadyExistsException | AuthorizationDeniedException e) {
+
+      }
+    }
 
     for (AIP aip : list) {
       LOGGER.debug("Processing AIP " + aip.getId());
@@ -142,7 +175,6 @@ public class SiegfriedPlugin implements Plugin<AIP> {
                     ff.setPronom(pronom);
                     ff.setMimeType(mime);
                     ff.setVersion(version);
-                    ff.setCreatedDate(new Date());
                     ff.setExtension(extension);
                     f.setFileFormat(ff);
                     f.setSize(fileSize);
@@ -155,6 +187,7 @@ public class SiegfriedPlugin implements Plugin<AIP> {
             }
           }
           model.updateFileFormats(updatedFiles);
+          createEvent(siegfriedOutput, PluginState.OK, aip, model);
           FSUtils.deletePath(data);
         } catch (PluginException | IOException | ModelServiceException | NotFoundException | GenericException
           | RequestNotValidException | AuthorizationDeniedException | AlreadyExistsException e) {
@@ -165,6 +198,24 @@ public class SiegfriedPlugin implements Plugin<AIP> {
 
     }
     return null;
+  }
+
+  private void createEvent(String outcomeDetail, PluginState state, AIP aip, ModelService model)
+    throws PluginException {
+
+    try {
+      boolean success = (state == PluginState.OK);
+
+      for (String representationID : aip.getRepresentationIds()) {
+        PluginUtils.createPluginEvent(aip.getId(), representationID, model,
+          EventPreservationObject.PRESERVATION_EVENT_TYPE_FORMAT_IDENTIFICATION,
+          "The files of the representation were successfully identified.",
+          EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_INGEST_TASK, agent.getId(),
+          Arrays.asList(representationID), success ? "success" : "error", success ? "" : "Error", outcomeDetail);
+      }
+    } catch (PremisMetadataException | IOException | RODAException e) {
+      throw new PluginException(e.getMessage(), e);
+    }
   }
 
   @Override

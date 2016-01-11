@@ -34,4 +34,20 @@ public class SiegfriedPluginUtils {
     }
   }
 
+  public static String getVersion() {
+    String version = null;
+    try {
+      List<String> command;
+      String siegfriedPath = RodaCoreFactory.getRodaConfigurationAsString("tools", "siegfried", "binary");
+      command = new ArrayList<String>(Arrays.asList(siegfriedPath.toString(), "--version"));
+      String siegfriedOutput = CommandUtility.execute(command);
+      if (siegfriedOutput.contains("\n")) {
+        return siegfriedOutput.split("\\n")[0].split(" ")[1];
+      }
+    } catch (CommandException ce) {
+      logger.error("Error getting siegfried version: " + ce.getMessage(), ce);
+    }
+    return version;
+  }
+
 }

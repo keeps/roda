@@ -214,7 +214,6 @@ public class PremisUtils {
 
   public static RepresentationFilePreservationObject updateFileFormat(RepresentationFilePreservationObject rfpo,
     org.roda.core.data.v2.FileFormat fileFormat) {
-    System.out.println("Setting pronom: " + fileFormat.getPronom());
     rfpo.setMimetype(fileFormat.getMimeType());
     rfpo.setFormatRegistryKey(fileFormat.getPronom());
     rfpo.setFormatRegistryName("http://www.nationalarchives.gov.uk/pronom");
