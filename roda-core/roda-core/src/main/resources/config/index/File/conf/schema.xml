@@ -120,7 +120,7 @@
    <field name="originalName" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="size" type="long" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="isFile" type="boolean" indexed="true" stored="true" required="false" multiValued="false" /> 
-   <field name="extension" type="boolean" indexed="true" stored="true" required="false" multiValued="false" /> 
+   <field name="extension" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
    
    <!-- Dynamic field definitions allow using convention over configuration
        for fields via the specification of patterns to match field names. 
