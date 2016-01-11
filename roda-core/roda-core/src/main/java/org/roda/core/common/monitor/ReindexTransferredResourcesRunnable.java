@@ -44,7 +44,7 @@ public class ReindexTransferredResourcesRunnable implements Runnable {
 
   public void run() {
     long start = System.currentTimeMillis();
-    LOGGER.info("Start indexing transferred resources: " + basePath.toString());
+    LOGGER.info("Start indexing transferred resources {}", basePath.toString());
     try {
       EnumSet<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
       Files.walkFileTree(basePath, opts, Integer.MAX_VALUE, new FileVisitor<Path>() {
@@ -71,11 +71,11 @@ public class ReindexTransferredResourcesRunnable implements Runnable {
         }
       });
       index.commit(RodaConstants.INDEX_TRANSFERRED_RESOURCE);
-      LOGGER.info("End indexing SIPs");
-      LOGGER.info("Time elapsed: " + ((System.currentTimeMillis() - start) / 1000) + " seconds");
+      LOGGER.info("End indexing Transferred Resources");
+      LOGGER.info("Time elapsed: {} seconds", ((System.currentTimeMillis() - start) / 1000));
       RodaCoreFactory.setFolderMonitorDate(basePath, new Date());
     } catch (IOException | SolrServerException e) {
-      LOGGER.error("Error reindexing SIPs", e);
+      LOGGER.error("Error reindexing Transferred Resources", e);
     }
   }
 
@@ -109,7 +109,8 @@ public class ReindexTransferredResourcesRunnable implements Runnable {
             LOGGER.debug("RELATIVE " + resourceAncestor.getRelativePath());
             LOGGER.debug("PARENT " + resourceAncestor.getParentPath());
             LOGGER.debug("------------------------------------------------");
-            index.add(RodaConstants.INDEX_TRANSFERRED_RESOURCE, SolrUtils.transferredResourceToSolrDocument(resourceAncestor));
+            index.add(RodaConstants.INDEX_TRANSFERRED_RESOURCE,
+              SolrUtils.transferredResourceToSolrDocument(resourceAncestor));
           } else {
             LOGGER.debug("---------------- NOT ADDED ----------------------");
             LOGGER.debug("FULLPATH " + resourceAncestor.getFullPath());
@@ -137,7 +138,7 @@ public class ReindexTransferredResourcesRunnable implements Runnable {
         index.commit(RodaConstants.INDEX_TRANSFERRED_RESOURCE);
       }
     } catch (IOException | SolrServerException e) {
-      LOGGER.error("Error adding path to SIPMonitorIndex", e);
+      LOGGER.error("Error adding path to Transferred Resources index", e);
     }
   }
 }

@@ -23,10 +23,10 @@ import org.roda.core.data.common.Pair;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.IndexResult;
+import org.roda.core.data.v2.IndexedAIP;
 import org.roda.core.data.v2.Representation;
 import org.roda.core.data.v2.RepresentationState;
 import org.roda.core.data.v2.RodaUser;
-import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AIPList;
@@ -216,17 +216,17 @@ public class Browse extends Composite {
 
       @Override
       public void onSelectionChange(SelectionChangeEvent event) {
-        SimpleDescriptionObject sdo = fondsPanel.getSelectionModel().getSelectedObject();
-        if (sdo != null) {
-          view(sdo.getId());
+        IndexedAIP aip = fondsPanel.getSelectionModel().getSelectedObject();
+        if (aip != null) {
+          view(aip.getId());
         }
       }
     });
 
-    fondsPanel.addValueChangeHandler(new ValueChangeHandler<IndexResult<SimpleDescriptionObject>>() {
+    fondsPanel.addValueChangeHandler(new ValueChangeHandler<IndexResult<IndexedAIP>>() {
 
       @Override
-      public void onValueChange(ValueChangeEvent<IndexResult<SimpleDescriptionObject>> event) {
+      public void onValueChange(ValueChangeEvent<IndexResult<IndexedAIP>> event) {
         fondsPanelTitle.setVisible(!viewingTop && event.getValue().getTotalCount() > 0);
         fondsPanel.setVisible(viewingTop || event.getValue().getTotalCount() > 0);
       }
@@ -352,20 +352,20 @@ public class Browse extends Composite {
       browseTitle.setVisible(false);
       browseDescription.setVisible(false);
 
-      SimpleDescriptionObject sdo = itemBundle.getSdo();
+      IndexedAIP aip = itemBundle.getAip();
       List<DescriptiveMetadataViewBundle> descMetadata = itemBundle.getDescriptiveMetadata();
       final PreservationMetadataBundle preservationMetadata = itemBundle.getPreservationMetadata();
       List<Representation> representations = itemBundle.getRepresentations();
 
-      breadcrumb.updatePath(getBreadcrumbsFromAncestors(itemBundle.getSdoAncestors(), sdo));
+      breadcrumb.updatePath(getBreadcrumbsFromAncestors(itemBundle.getAIPAncestors(), aip));
       breadcrumb.setVisible(true);
-      HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getElementLevelIconHTMLPanel(sdo.getLevel());
+      HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getElementLevelIconHTMLPanel(aip.getLevel());
       itemIconHtmlPanel.addStyleName("browseItemIcon-other");
       itemIcon.setWidget(itemIconHtmlPanel);
-      itemTitle.setText(sdo.getTitle() != null ? sdo.getTitle() : sdo.getId());
+      itemTitle.setText(aip.getTitle() != null ? aip.getTitle() : aip.getId());
       itemTitle.removeStyleName("browseTitle-allCollections");
       itemIcon.getParent().removeStyleName("browseTitle-allCollections-wrapper");
-      itemDates.setText(getDatesText(sdo));
+      itemDates.setText(getDatesText(aip));
 
       itemMetadata.clear();
       final List<Pair<String, HTML>> descriptiveMetadataContainers = new ArrayList<Pair<String, HTML>>();
@@ -492,7 +492,7 @@ public class Browse extends Composite {
 
       viewingTop = false;
       fondsPanelTitle.setVisible(true);
-      Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, sdo.getId()));
+      Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aip.getId()));
       fondsPanel.setFilter(filter);
 
       downloadList.clear();
@@ -561,12 +561,11 @@ public class Browse extends Composite {
     remove.setVisible(false);
   }
 
-  private List<BreadcrumbItem> getBreadcrumbsFromAncestors(List<SimpleDescriptionObject> sdoAncestors,
-    SimpleDescriptionObject sdo) {
+  private List<BreadcrumbItem> getBreadcrumbsFromAncestors(List<IndexedAIP> aipAncestors, IndexedAIP aip) {
     List<BreadcrumbItem> ret = new ArrayList<>();
     ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(TOP_ICON), RESOLVER.getHistoryPath()));
-    if (sdoAncestors != null) {
-      for (SimpleDescriptionObject ancestor : sdoAncestors) {
+    if (aipAncestors != null) {
+      for (IndexedAIP ancestor : aipAncestors) {
         SafeHtml breadcrumbLabel = getBreadcrumbLabel(ancestor);
         BreadcrumbItem ancestorBreadcrumb = new BreadcrumbItem(breadcrumbLabel,
           getViewItemHistoryToken(ancestor.getId()));
@@ -574,11 +573,11 @@ public class Browse extends Composite {
       }
     }
 
-    ret.add(new BreadcrumbItem(getBreadcrumbLabel(sdo), getViewItemHistoryToken(sdo.getId())));
+    ret.add(new BreadcrumbItem(getBreadcrumbLabel(aip), getViewItemHistoryToken(aip.getId())));
     return ret;
   }
 
-  private SafeHtml getBreadcrumbLabel(SimpleDescriptionObject ancestor) {
+  private SafeHtml getBreadcrumbLabel(IndexedAIP ancestor) {
     SafeHtml elementLevelIconSafeHtml = DescriptionLevelUtils.getElementLevelIconSafeHtml(ancestor.getLevel());
     SafeHtmlBuilder builder = new SafeHtmlBuilder();
     String label = ancestor.getTitle() != null ? ancestor.getTitle() : ancestor.getId();
@@ -788,11 +787,11 @@ public class Browse extends Composite {
   // }
   // }
 
-  private String getDatesText(SimpleDescriptionObject sdo) {
+  private String getDatesText(IndexedAIP aip) {
     String ret;
 
-    Date dateInitial = sdo.getDateInitial();
-    Date dateFinal = sdo.getDateFinal();
+    Date dateInitial = aip.getDateInitial();
+    Date dateFinal = aip.getDateFinal();
 
     if (dateInitial == null && dateFinal == null) {
       ret = messages.titleDatesEmpty();

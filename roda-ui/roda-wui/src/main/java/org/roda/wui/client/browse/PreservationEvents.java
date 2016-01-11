@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.roda.core.data.v2.SimpleDescriptionObject;
+import org.roda.core.data.v2.IndexedAIP;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
@@ -146,18 +146,18 @@ public class PreservationEvents extends Composite {
   }
 
   public void viewAction() {
-    SimpleDescriptionObject sdo = itemBundle.getSdo();
+    IndexedAIP aip = itemBundle.getAip();
     final PreservationMetadataBundle preservationMetadata = itemBundle.getPreservationMetadata();
 
-    breadcrumb.updatePath(getBreadcrumbsFromAncestors(itemBundle.getSdoAncestors(), sdo));
+    breadcrumb.updatePath(getBreadcrumbsFromAncestors(itemBundle.getAIPAncestors(), aip));
     breadcrumb.setVisible(true);
 
-    HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getElementLevelIconHTMLPanel(sdo.getLevel());
+    HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getElementLevelIconHTMLPanel(aip.getLevel());
     itemIconHtmlPanel.addStyleName("browseItemIcon-other");
     itemIcon.setWidget(itemIconHtmlPanel);
-    itemTitle.setText(sdo.getTitle() != null ? sdo.getTitle() : sdo.getId());
+    itemTitle.setText(aip.getTitle() != null ? aip.getTitle() : aip.getId());
     itemTitle.removeStyleName("browseTitle-allCollections");
-    itemDates.setText(getDatesText(sdo));
+    itemDates.setText(getDatesText(aip));
 
     if (!preservationMetadata.getRepresentationsMetadata().isEmpty()) {
       for (RepresentationPreservationMetadataBundle bundle : preservationMetadata.getRepresentationsMetadata()) {
@@ -185,22 +185,21 @@ public class PreservationEvents extends Composite {
     }
   }
 
-  private List<BreadcrumbItem> getBreadcrumbsFromAncestors(List<SimpleDescriptionObject> sdoAncestors,
-    SimpleDescriptionObject sdo) {
+  private List<BreadcrumbItem> getBreadcrumbsFromAncestors(List<IndexedAIP> aipAncestors, IndexedAIP aip) {
     List<BreadcrumbItem> ret = new ArrayList<>();
     ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(TOP_ICON), RESOLVER.getHistoryPath()));
-    for (SimpleDescriptionObject ancestor : sdoAncestors) {
+    for (IndexedAIP ancestor : aipAncestors) {
       SafeHtml breadcrumbLabel = getBreadcrumbLabel(ancestor);
       BreadcrumbItem ancestorBreadcrumb = new BreadcrumbItem(breadcrumbLabel,
         Tools.concat(Browse.RESOLVER.getHistoryPath(), ancestor.getId()));
       ret.add(1, ancestorBreadcrumb);
     }
 
-    ret.add(new BreadcrumbItem(getBreadcrumbLabel(sdo), Tools.concat(Browse.RESOLVER.getHistoryPath(), sdo.getId())));
+    ret.add(new BreadcrumbItem(getBreadcrumbLabel(aip), Tools.concat(Browse.RESOLVER.getHistoryPath(), aip.getId())));
     return ret;
   }
 
-  private SafeHtml getBreadcrumbLabel(SimpleDescriptionObject ancestor) {
+  private SafeHtml getBreadcrumbLabel(IndexedAIP ancestor) {
     SafeHtml elementLevelIconSafeHtml = DescriptionLevelUtils.getElementLevelIconSafeHtml(ancestor.getLevel());
     SafeHtmlBuilder builder = new SafeHtmlBuilder();
     String label = ancestor.getTitle() != null ? ancestor.getTitle() : ancestor.getId();
@@ -209,11 +208,11 @@ public class PreservationEvents extends Composite {
     return breadcrumbLabel;
   }
 
-  private String getDatesText(SimpleDescriptionObject sdo) {
+  private String getDatesText(IndexedAIP aip) {
     String ret;
 
-    Date dateInitial = sdo.getDateInitial();
-    Date dateFinal = sdo.getDateFinal();
+    Date dateInitial = aip.getDateInitial();
+    Date dateFinal = aip.getDateFinal();
 
     if (dateInitial == null && dateFinal == null) {
       ret = messages.titleDatesEmpty();

@@ -23,10 +23,10 @@ import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.IndexedAIP;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.Representation;
 import org.roda.core.data.v2.RepresentationState;
-import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.core.data.v2.SimpleFile;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.FileList;
@@ -427,14 +427,14 @@ public class ViewRepresentation extends Composite {
 
   private List<BreadcrumbItem> getBreadcrumbs(BrowseItemBundle itemBundle, SimpleFile simpleFile) {
     List<BreadcrumbItem> ret = new ArrayList<>();
-    SimpleDescriptionObject sdo = itemBundle.getSdo();
+    IndexedAIP aip = itemBundle.getAip();
     List<Representation> representations = itemBundle.getRepresentations();
     Representation rep = selectRepresentation(representations, representationId);
 
     ret
       .add(
         new BreadcrumbItem(
-          getBreadcrumbLabel((sdo.getTitle() != null) ? sdo.getTitle() : sdo.getId(),
+          getBreadcrumbLabel((aip.getTitle() != null) ? aip.getTitle() : aip.getId(),
             RodaConstants.VIEW_REPRESENTATION_DESCRIPTION_LEVEL),
           Tools.concat(Browse.RESOLVER.getHistoryPath(), aipId)));
     ret.add(

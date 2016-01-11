@@ -86,6 +86,7 @@ import org.roda.core.data.v2.FacetFieldResult;
 import org.roda.core.data.v2.FileFormat;
 import org.roda.core.data.v2.Group;
 import org.roda.core.data.v2.IndexResult;
+import org.roda.core.data.v2.IndexedAIP;
 import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.Job.JOB_STATE;
 import org.roda.core.data.v2.Job.ORCHESTRATOR_METHOD;
@@ -101,7 +102,6 @@ import org.roda.core.data.v2.RepresentationFilePreservationObject;
 import org.roda.core.data.v2.RepresentationState;
 import org.roda.core.data.v2.RodaGroup;
 import org.roda.core.data.v2.RodaUser;
-import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.core.data.v2.SimpleFile;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.data.v2.User;
@@ -253,27 +253,27 @@ public class SolrUtils {
 
   private static SolrInputDocument validateDescriptiveMetadataFields(SolrInputDocument doc) {
     SimpleDateFormat df = new SimpleDateFormat(RodaConstants.SOLRDATEFORMAT);
-    if (doc.get(RodaConstants.SDO_DATE_INITIAL) != null) {
-      Object value = doc.get(RodaConstants.SDO_DATE_INITIAL).getValue();
+    if (doc.get(RodaConstants.AIP_DATE_INITIAL) != null) {
+      Object value = doc.get(RodaConstants.AIP_DATE_INITIAL).getValue();
       if (value instanceof String) {
         try {
           Date d = df.parse((String) value);
-          doc.setField(RodaConstants.SDO_DATE_INITIAL, d);
+          doc.setField(RodaConstants.AIP_DATE_INITIAL, d);
         } catch (ParseException pe) {
-          doc.remove(RodaConstants.SDO_DATE_INITIAL);
-          doc.setField(RodaConstants.SDO_DATE_INITIAL + "_txt", value);
+          doc.remove(RodaConstants.AIP_DATE_INITIAL);
+          doc.setField(RodaConstants.AIP_DATE_INITIAL + "_txt", value);
         }
       }
     }
-    if (doc.get(RodaConstants.SDO_DATE_FINAL) != null) {
-      Object value = doc.get(RodaConstants.SDO_DATE_FINAL).getValue();
+    if (doc.get(RodaConstants.AIP_DATE_FINAL) != null) {
+      Object value = doc.get(RodaConstants.AIP_DATE_FINAL).getValue();
       if (value instanceof String) {
         try {
           Date d = df.parse((String) value);
-          doc.setField(RodaConstants.SDO_DATE_FINAL, d);
+          doc.setField(RodaConstants.AIP_DATE_FINAL, d);
         } catch (ParseException pe) {
-          doc.remove(RodaConstants.SDO_DATE_FINAL);
-          doc.setField(RodaConstants.SDO_DATE_FINAL + "_txt", value);
+          doc.remove(RodaConstants.AIP_DATE_FINAL);
+          doc.setField(RodaConstants.AIP_DATE_FINAL + "_txt", value);
         }
       }
     }
@@ -691,10 +691,8 @@ public class SolrUtils {
   // TODO: Handle SimpleRepresentationPreservationMetadata
   private static <T> String getIndexName(Class<T> resultClass) throws GenericException {
     String indexName;
-    if (resultClass.equals(AIP.class)) {
+    if (resultClass.equals(IndexedAIP.class)) {
       indexName = RodaConstants.INDEX_AIP;
-    } else if (resultClass.equals(SimpleDescriptionObject.class)) {
-      indexName = RodaConstants.INDEX_SDO;
     } else if (resultClass.equals(Representation.class)) {
       indexName = RodaConstants.INDEX_REPRESENTATION;
     } else if (resultClass.equals(RepresentationFilePreservationObject.class)) {
@@ -727,10 +725,8 @@ public class SolrUtils {
 
   private static <T> T solrDocumentTo(Class<T> resultClass, SolrDocument doc) throws GenericException {
     T ret;
-    if (resultClass.equals(AIP.class)) {
-      ret = resultClass.cast(solrDocumentToAIP(doc));
-    } else if (resultClass.equals(SimpleDescriptionObject.class)) {
-      ret = resultClass.cast(solrDocumentToSDO(doc));
+    if (resultClass.equals(IndexedAIP.class)) {
+      ret = resultClass.cast(solrDocumentToIndexAIP(doc));
     } else if (resultClass.equals(Representation.class)) {
       ret = resultClass.cast(solrDocumentToRepresentation(doc));
     } else if (resultClass.equals(LogEntry.class)) {
@@ -809,10 +805,13 @@ public class SolrUtils {
     return find(index, classToRetrieve, filter, null, new Sublist(0, 0)).getTotalCount();
   }
 
-  // FIXME see how to handle active
-  public static AIP solrDocumentToAIP(SolrDocument doc) {
+  // FIXME see how to handle active and all the other that are not being put in
+  // the indexedaip
+  public static IndexedAIP solrDocumentToIndexAIP(SolrDocument doc) {
     final String id = objectToString(doc.get(RodaConstants.AIP_ID));
+    final String label = id;
     final Boolean active = objectToBoolean(doc.get(RodaConstants.AIP_ACTIVE));
+    final String state = active ? RODAObject.STATE_ACTIVE : RODAObject.STATE_INACTIVE;
     final String parentId = objectToString(doc.get(RodaConstants.AIP_PARENT_ID));
     final Date dateCreated = objectToDate(doc.get(RodaConstants.AIP_DATE_CREATED));
     final Date dateModified = objectToDate(doc.get(RodaConstants.AIP_DATE_MODIFIED));
@@ -828,12 +827,25 @@ public class SolrUtils {
     final Map<String, List<String>> preservationEventsIds = new HashMap<String, List<String>>();
     final Map<String, List<String>> preservationFileObjectsIds = new HashMap<String, List<String>>();
 
-    return new AIP(id, parentId, active, dateCreated, dateModified, permissions, descriptiveMetadataFileIds,
-      representationIds, preservationRepresentationObjectsIds, preservationEventsIds, preservationFileObjectsIds);
+    final List<String> levels = objectToListString(doc.get(RodaConstants.AIP_LEVEL));
+    final List<String> titles = objectToListString(doc.get(RodaConstants.AIP_TITLE));
+    final List<String> descriptions = objectToListString(doc.get(RodaConstants.AIP_DESCRIPTION));
+    final Date dateInitial = objectToDate(doc.get(RodaConstants.AIP_DATE_INITIAL));
+    final Date dateFinal = objectToDate(doc.get(RodaConstants.AIP_DATE_FINAL));
+
+    final String level = levels.isEmpty() ? null : levels.get(0);
+    final String title = titles.isEmpty() ? null : titles.get(0);
+    final String description = descriptions.isEmpty() ? null : descriptions.get(0);
+    final int childrenCount = 0;
+
+    return new IndexedAIP(id, label, dateModified, dateCreated, state, level, title, dateInitial, dateFinal,
+      description, parentId, childrenCount, permissions);
   }
 
-  public static SolrInputDocument aipToSolrInputDocument(AIP aip) {
+  public static SolrInputDocument aipToSolrInputDocument(AIP aip, ModelService model, boolean safemode)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     SolrInputDocument ret = new SolrInputDocument();
+    final String aipId = aip.getId();
 
     ret.addField(RodaConstants.AIP_ID, aip.getId());
     ret.addField(RodaConstants.AIP_PARENT_ID, aip.getParentId());
@@ -844,52 +856,6 @@ public class SolrUtils {
     ret.addField(RodaConstants.AIP_REPRESENTATION_ID, aip.getRepresentationIds());
 
     setPermissions(aip, ret);
-
-    return ret;
-  }
-
-  public static SimpleDescriptionObject solrDocumentToSDO(SolrDocument doc) {
-    final String id = objectToString(doc.get(RodaConstants.AIP_ID));
-    final String label = id;
-    final Boolean active = objectToBoolean(doc.get(RodaConstants.AIP_ACTIVE));
-    final String state = active ? RODAObject.STATE_ACTIVE : RODAObject.STATE_INACTIVE;
-    final Date dateCreated = objectToDate(doc.get(RodaConstants.AIP_DATE_CREATED));
-    final Date dateModified = objectToDate(doc.get(RodaConstants.AIP_DATE_MODIFIED));
-    final String parentId = objectToString(doc.get(RodaConstants.AIP_PARENT_ID));
-
-    final List<String> levels = objectToListString(doc.get(RodaConstants.SDO_LEVEL));
-    final List<String> titles = objectToListString(doc.get(RodaConstants.SDO_TITLE));
-    final List<String> descriptions = objectToListString(doc.get(RodaConstants.SDO_DESCRIPTION));
-    final Date dateInitial = objectToDate(doc.get(RodaConstants.SDO_DATE_INITIAL));
-    final Date dateFinal = objectToDate(doc.get(RodaConstants.SDO_DATE_FINAL));
-
-    final String level = levels.isEmpty() ? null : levels.get(0);
-    final String title = titles.isEmpty() ? null : titles.get(0);
-    final String description = descriptions.isEmpty() ? null : descriptions.get(0);
-    final int childrenCount = 0;
-
-    RODAObjectPermissions permissions = getPermissions(doc);
-
-    return new SimpleDescriptionObject(id, label, dateModified, dateCreated, state, level, title, dateInitial,
-      dateFinal, description, parentId, childrenCount, permissions);
-
-  }
-
-  public static SolrInputDocument aipToSolrInputDocumentAsSDO(AIP aip, ModelService model, boolean safemode)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    final SolrInputDocument ret = new SolrInputDocument();
-    final String aipId = aip.getId();
-
-    ret.addField(RodaConstants.AIP_ID, aipId);
-    ret.addField(RodaConstants.AIP_PARENT_ID, aip.getParentId());
-    ret.addField(RodaConstants.AIP_ACTIVE, aip.isActive());
-    ret.addField(RodaConstants.AIP_DATE_CREATED, aip.getDateCreated());
-    ret.addField(RodaConstants.AIP_DATE_MODIFIED, aip.getDateModified());
-
-    // TODO see if this really should be indexed into SDO
-    ret.addField(RodaConstants.AIP_DESCRIPTIVE_METADATA_ID, aip.getDescriptiveMetadataIds());
-    ret.addField(RodaConstants.AIP_REPRESENTATION_ID, aip.getRepresentationIds());
-    ret.addField(RodaConstants.AIP_HAS_REPRESENTATIONS, !aip.getRepresentationIds().isEmpty());
 
     if (!safemode) {
 
@@ -911,14 +877,98 @@ public class SolrUtils {
       }
     }
 
-    // add permissions
-    setPermissions(aip, ret);
-
-    // TODO add information for SDO
-    // TODO add sub-documents with full descriptive metadata info
-
     return ret;
   }
+
+  // public static SimpleDescriptionObject solrDocumentToSDO(SolrDocument doc) {
+  // final String id = objectToString(doc.get(RodaConstants.AIP_ID));
+  // final String label = id;
+  // final Boolean active = objectToBoolean(doc.get(RodaConstants.AIP_ACTIVE));
+  // final String state = active ? RODAObject.STATE_ACTIVE :
+  // RODAObject.STATE_INACTIVE;
+  // final Date dateCreated =
+  // objectToDate(doc.get(RodaConstants.AIP_DATE_CREATED));
+  // final Date dateModified =
+  // objectToDate(doc.get(RodaConstants.AIP_DATE_MODIFIED));
+  // final String parentId =
+  // objectToString(doc.get(RodaConstants.AIP_PARENT_ID));
+  //
+  // final List<String> levels =
+  // objectToListString(doc.get(RodaConstants.SDO_LEVEL));
+  // final List<String> titles =
+  // objectToListString(doc.get(RodaConstants.SDO_TITLE));
+  // final List<String> descriptions =
+  // objectToListString(doc.get(RodaConstants.SDO_DESCRIPTION));
+  // final Date dateInitial =
+  // objectToDate(doc.get(RodaConstants.SDO_DATE_INITIAL));
+  // final Date dateFinal = objectToDate(doc.get(RodaConstants.SDO_DATE_FINAL));
+  //
+  // final String level = levels.isEmpty() ? null : levels.get(0);
+  // final String title = titles.isEmpty() ? null : titles.get(0);
+  // final String description = descriptions.isEmpty() ? null :
+  // descriptions.get(0);
+  // final int childrenCount = 0;
+  //
+  // RODAObjectPermissions permissions = getPermissions(doc);
+  //
+  // return new SimpleDescriptionObject(id, label, dateModified, dateCreated,
+  // state, level, title, dateInitial,
+  // dateFinal, description, parentId, childrenCount, permissions);
+  //
+  // }
+
+  // public static SolrInputDocument aipToSolrInputDocumentAsSDO(AIP aip,
+  // ModelService model, boolean safemode)
+  // throws ModelServiceException, StorageServiceException,
+  // IndexServiceException {
+  // final SolrInputDocument ret = new SolrInputDocument();
+  // final String aipId = aip.getId();
+  //
+  // ret.addField(RodaConstants.AIP_ID, aipId);
+  // ret.addField(RodaConstants.AIP_PARENT_ID, aip.getParentId());
+  // ret.addField(RodaConstants.AIP_ACTIVE, aip.isActive());
+  // ret.addField(RodaConstants.AIP_DATE_CREATED, aip.getDateCreated());
+  // ret.addField(RodaConstants.AIP_DATE_MODIFIED, aip.getDateModified());
+  //
+  // // TODO see if this really should be indexed into SDO
+  // ret.addField(RodaConstants.AIP_DESCRIPTIVE_METADATA_ID,
+  // aip.getDescriptiveMetadataIds());
+  // ret.addField(RodaConstants.AIP_REPRESENTATION_ID,
+  // aip.getRepresentationIds());
+  // ret.addField(RodaConstants.AIP_HAS_REPRESENTATIONS,
+  // !aip.getRepresentationIds().isEmpty());
+  //
+  // if (!safemode) {
+  //
+  // for (String descId : aip.getDescriptiveMetadataIds()) {
+  // DescriptiveMetadata metadata = model.retrieveDescriptiveMetadata(aipId,
+  // descId);
+  // StoragePath storagePath = metadata.getStoragePath();
+  // Binary binary = model.getStorage().getBinary(storagePath);
+  // try {
+  // SolrInputDocument fields = getDescriptiveMetataFields(binary);
+  // for (SolrInputField field : fields) {
+  // ret.addField(field.getName(), field.getValue(), field.getBoost());
+  // }
+  // } catch (IndexServiceException ise) {
+  // // TODO index the index errors for later processing
+  // LOGGER.warn("Error processing descriptive metadata " + descId + " from AIP
+  // " + aipId);
+  // } catch (Throwable e) {
+  // LOGGER.error("Error processing descriptive metadata " + descId + " from AIP
+  // " + aipId, e);
+  // }
+  // }
+  // }
+  //
+  // // add permissions
+  // setPermissions(aip, ret);
+  //
+  // // TODO add information for SDO
+  // // TODO add sub-documents with full descriptive metadata info
+  //
+  // return ret;
+  // }
 
   private static RODAObjectPermissions getPermissions(SolrDocument doc) {
     RODAObjectPermissions permissions = new RODAObjectPermissions();

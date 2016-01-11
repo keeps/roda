@@ -14,7 +14,7 @@ import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.SimpleDescriptionObject;
+import org.roda.core.data.v2.IndexedAIP;
 import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
 
@@ -28,11 +28,11 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.view.client.SelectionChangeEvent;
 
-public class SelectableAIPList extends FlowPanel implements HasValueChangeHandlers<SimpleDescriptionObject> {
+public class SelectableAIPList extends FlowPanel implements HasValueChangeHandlers<IndexedAIP> {
 
   private static final Filter ROOT_FILTER = new Filter(new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID));
 
-  private SimpleDescriptionObject selected;
+  private IndexedAIP selected;
 
   private Label selectedLabel;
 
@@ -57,21 +57,21 @@ public class SelectableAIPList extends FlowPanel implements HasValueChangeHandle
 
       @Override
       public void onSelectionChange(SelectionChangeEvent event) {
-        final SimpleDescriptionObject sdo = aipList.getSelectionModel().getSelectedObject();
-        if (sdo != null) {
+        final IndexedAIP aip = aipList.getSelectionModel().getSelectedObject();
+        if (aip != null) {
           final int index = breadcrumbs.size();
-          BreadcrumbItem breadcrumbItem = new BreadcrumbItem(sdo.getTitle(), new Command() {
+          BreadcrumbItem breadcrumbItem = new BreadcrumbItem(aip.getTitle(), new Command() {
 
             @Override
             public void execute() {
-              select(sdo);
+              select(aip);
               removeAfter(index);
             }
 
           });
           breadcrumbs.add(breadcrumbItem);
           breadcrumbPanel.updatePath(breadcrumbs);
-          select(sdo);
+          select(aip);
         }
       }
     });
@@ -113,12 +113,12 @@ public class SelectableAIPList extends FlowPanel implements HasValueChangeHandle
     breadcrumbPanel.updatePath(breadcrumbs);
   }
 
-  private void select(SimpleDescriptionObject sdo) {
-    if (sdo != null) {
-      selected = sdo;
-      Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, sdo.getId()));
+  private void select(IndexedAIP aip) {
+    if (aip != null) {
+      selected = aip;
+      Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aip.getId()));
       setInnerFilter(filter);
-      ValueChangeEvent.fire(this, sdo);
+      ValueChangeEvent.fire(this, aip);
       updateVisibles();
     }
   }
@@ -135,7 +135,7 @@ public class SelectableAIPList extends FlowPanel implements HasValueChangeHandle
     breadcrumbPanel.setVisible(selected != null);
   }
 
-  public SimpleDescriptionObject getSelected() {
+  public IndexedAIP getSelected() {
     return selected;
   }
 
@@ -166,7 +166,7 @@ public class SelectableAIPList extends FlowPanel implements HasValueChangeHandle
   }
 
   @Override
-  public HandlerRegistration addValueChangeHandler(ValueChangeHandler<SimpleDescriptionObject> handler) {
+  public HandlerRegistration addValueChangeHandler(ValueChangeHandler<IndexedAIP> handler) {
     return addHandler(handler, ValueChangeEvent.getType());
   }
 

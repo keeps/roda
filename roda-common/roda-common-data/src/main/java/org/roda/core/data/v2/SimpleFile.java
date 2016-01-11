@@ -10,6 +10,7 @@ package org.roda.core.data.v2;
 import java.util.Arrays;
 import java.util.List;
 
+// FIXME rename this to IndexedFile
 public class SimpleFile extends RODAObject {
 
   private static final long serialVersionUID = 3303019735787641534L;

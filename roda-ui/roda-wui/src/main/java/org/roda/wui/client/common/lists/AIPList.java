@@ -16,8 +16,8 @@ import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.IndexedAIP;
 import org.roda.core.data.v2.IndexResult;
-import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
@@ -38,17 +38,17 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.view.client.ProvidesKey;
 
-public class AIPList extends AsyncTableCell<SimpleDescriptionObject> {
+public class AIPList extends AsyncTableCell<IndexedAIP> {
 
   private static final int PAGE_SIZE = 20;
 
   private final ClientLogger logger = new ClientLogger(getClass().getName());
 
-  private Column<SimpleDescriptionObject, SafeHtml> levelColumn;
+  private Column<IndexedAIP, SafeHtml> levelColumn;
   // private TextColumn<SimpleDescriptionObject> idColumn;
-  private TextColumn<SimpleDescriptionObject> titleColumn;
-  private Column<SimpleDescriptionObject, Date> dateInitialColumn;
-  private Column<SimpleDescriptionObject, Date> dateFinalColumn;
+  private TextColumn<IndexedAIP> titleColumn;
+  private Column<IndexedAIP, Date> dateInitialColumn;
+  private Column<IndexedAIP, Date> dateFinalColumn;
 
   public AIPList() {
     this(null, null, null);
@@ -59,49 +59,48 @@ public class AIPList extends AsyncTableCell<SimpleDescriptionObject> {
   }
 
   @Override
-  protected void configureDisplay(CellTable<SimpleDescriptionObject> display) {
-    levelColumn = new Column<SimpleDescriptionObject, SafeHtml>(new SafeHtmlCell()) {
+  protected void configureDisplay(CellTable<IndexedAIP> display) {
+    levelColumn = new Column<IndexedAIP, SafeHtml>(new SafeHtmlCell()) {
       @Override
-      public SafeHtml getValue(SimpleDescriptionObject sdo) {
+      public SafeHtml getValue(IndexedAIP aip) {
         SafeHtml ret;
-        if (sdo == null) {
+        if (aip == null) {
           logger.error("Trying to display a NULL item");
           ret = null;
         } else {
-          ret = DescriptionLevelUtils.getElementLevelIconSafeHtml(sdo.getLevel());
+          ret = DescriptionLevelUtils.getElementLevelIconSafeHtml(aip.getLevel());
         }
         return ret;
       }
     };
 
-    // idColumn = new TextColumn<SimpleDescriptionObject>() {
+    // idColumn = new TextColumn<IndexAIP>() {
     //
     // @Override
-    // public String getValue(SimpleDescriptionObject sdo) {
-    // return sdo != null ? sdo.getId() : null;
+    // public String getValue(IndexAIP aip) {
+    // return aip != null ? aip.getId() : null;
     // }
     // };
 
-    titleColumn = new TextColumn<SimpleDescriptionObject>() {
+    titleColumn = new TextColumn<IndexedAIP>() {
 
       @Override
-      public String getValue(SimpleDescriptionObject sdo) {
-        return sdo != null ? sdo.getTitle() : null;
+      public String getValue(IndexedAIP aip) {
+        return aip != null ? aip.getTitle() : null;
       }
     };
 
-    dateInitialColumn = new Column<SimpleDescriptionObject, Date>(
-      new DateCell(DateTimeFormat.getFormat("yyyy-MM-dd"))) {
+    dateInitialColumn = new Column<IndexedAIP, Date>(new DateCell(DateTimeFormat.getFormat("yyyy-MM-dd"))) {
       @Override
-      public Date getValue(SimpleDescriptionObject sdo) {
-        return sdo != null ? sdo.getDateInitial() : null;
+      public Date getValue(IndexedAIP aip) {
+        return aip != null ? aip.getDateInitial() : null;
       }
     };
 
-    dateFinalColumn = new Column<SimpleDescriptionObject, Date>(new DateCell(DateTimeFormat.getFormat("yyyy-MM-dd"))) {
+    dateFinalColumn = new Column<IndexedAIP, Date>(new DateCell(DateTimeFormat.getFormat("yyyy-MM-dd"))) {
       @Override
-      public Date getValue(SimpleDescriptionObject sdo) {
-        return sdo != null ? sdo.getDateFinal() : null;
+      public Date getValue(IndexedAIP aip) {
+        return aip != null ? aip.getDateFinal() : null;
       }
     };
 
@@ -136,7 +135,7 @@ public class AIPList extends AsyncTableCell<SimpleDescriptionObject> {
 
   @Override
   protected void getData(Sublist sublist, ColumnSortList columnSortList,
-    AsyncCallback<IndexResult<SimpleDescriptionObject>> callback) {
+    AsyncCallback<IndexResult<IndexedAIP>> callback) {
 
     Filter filter = getFilter();
     if (filter == null) {
@@ -144,11 +143,11 @@ public class AIPList extends AsyncTableCell<SimpleDescriptionObject> {
       callback.onSuccess(null);
     } else {
 
-      Map<Column<SimpleDescriptionObject, ?>, String> columnSortingKeyMap = new HashMap<Column<SimpleDescriptionObject, ?>, String>();
-      columnSortingKeyMap.put(levelColumn, RodaConstants.SDO_LEVEL);
-      columnSortingKeyMap.put(titleColumn, RodaConstants.SDO_TITLE_SORT);
-      columnSortingKeyMap.put(dateInitialColumn, RodaConstants.SDO_DATE_INITIAL);
-      columnSortingKeyMap.put(dateFinalColumn, RodaConstants.SDO_DATE_FINAL);
+      Map<Column<IndexedAIP, ?>, String> columnSortingKeyMap = new HashMap<Column<IndexedAIP, ?>, String>();
+      columnSortingKeyMap.put(levelColumn, RodaConstants.AIP_LEVEL);
+      columnSortingKeyMap.put(titleColumn, RodaConstants.AIP_TITLE_SORT);
+      columnSortingKeyMap.put(dateInitialColumn, RodaConstants.AIP_DATE_INITIAL);
+      columnSortingKeyMap.put(dateFinalColumn, RodaConstants.AIP_DATE_FINAL);
 
       Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
@@ -159,11 +158,11 @@ public class AIPList extends AsyncTableCell<SimpleDescriptionObject> {
   }
 
   @Override
-  protected ProvidesKey<SimpleDescriptionObject> getKeyProvider() {
-    return new ProvidesKey<SimpleDescriptionObject>() {
+  protected ProvidesKey<IndexedAIP> getKeyProvider() {
+    return new ProvidesKey<IndexedAIP>() {
 
       @Override
-      public Object getKey(SimpleDescriptionObject item) {
+      public Object getKey(IndexedAIP item) {
         return item.getId();
       }
     };

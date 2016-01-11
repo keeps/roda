@@ -62,7 +62,7 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void aipCreated(final AIP aip) {
-    indexAIPandSDO(aip);
+    indexAIP(aip);
     indexRepresentations(aip);
     indexPreservationFileObjects(aip);
     indexPreservationsEvents(aip);
@@ -165,25 +165,21 @@ public class IndexModelObserver implements ModelObserver {
     }
   }
 
-  private void indexAIPandSDO(final AIP aip) {
-    indexAIPandSDO(aip, false);
+  private void indexAIP(final AIP aip) {
+    indexAIP(aip, false);
   }
 
-  private void indexAIPandSDO(final AIP aip, boolean safemode) {
+  private void indexAIP(final AIP aip, boolean safemode) {
     try {
-      SolrInputDocument aipDoc = SolrUtils.aipToSolrInputDocument(aip);
-      SolrInputDocument sdoDoc = SolrUtils.aipToSolrInputDocumentAsSDO(aip, model, safemode);
+      SolrInputDocument aipDoc = SolrUtils.aipToSolrInputDocument(aip, model, safemode);
       index.add(RodaConstants.INDEX_AIP, aipDoc);
       index.commit(RodaConstants.INDEX_AIP);
       LOGGER.debug("Adding AIP: " + aipDoc);
-      LOGGER.debug("Adding SDO: " + sdoDoc);
-      index.add(RodaConstants.INDEX_SDO, sdoDoc);
-      index.commit(RodaConstants.INDEX_SDO);
     } catch (SolrException | SolrServerException | IOException | RequestNotValidException | GenericException
       | NotFoundException | AuthorizationDeniedException e) {
       if (!safemode) {
         LOGGER.error("Error indexing AIP, trying safe mode", e);
-        indexAIPandSDO(aip, true);
+        indexAIP(aip, true);
       } else {
         LOGGER.error("Could not index created AIP", e);
       }
@@ -203,9 +199,6 @@ public class IndexModelObserver implements ModelObserver {
   public void aipDeleted(String aipId) {
     deleteDocumentFromIndex(RodaConstants.INDEX_AIP, aipId,
       "Error deleting AIP (from " + RodaConstants.INDEX_AIP + ")");
-
-    deleteDocumentFromIndex(RodaConstants.INDEX_SDO, aipId,
-      "Error deleting AIP (from " + RodaConstants.INDEX_SDO + ")");
 
     // TODO delete included representations, descriptive metadata and other
   }
@@ -239,6 +232,7 @@ public class IndexModelObserver implements ModelObserver {
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error when descriptive metadata created on retrieving the full AIP", e);
     }
+
   }
 
   @Override
@@ -320,7 +314,7 @@ public class IndexModelObserver implements ModelObserver {
   public void preservationMetadataCreated(PreservationMetadata preservationMetadata) {
     try {
       AIP aip = model.retrieveAIP(preservationMetadata.getAipId());
-      indexAIPandSDO(aip);
+      indexAIP(aip);
 
       Binary binary = model.getStorage().getBinary(preservationMetadata.getStoragePath());
       SolrInputDocument premisFileDocument = SolrUtils.premisToSolr(preservationMetadata.getAipId(),
@@ -340,6 +334,7 @@ public class IndexModelObserver implements ModelObserver {
       | AuthorizationDeniedException e) {
       LOGGER.error("Error when preservation metadata created on retrieving the full AIP", e);
     }
+
   }
 
   @Override

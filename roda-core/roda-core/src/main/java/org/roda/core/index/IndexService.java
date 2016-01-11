@@ -28,8 +28,8 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IndexResult;
+import org.roda.core.data.v2.IndexedAIP;
 import org.roda.core.data.v2.LogEntry;
-import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.AIP;
 import org.roda.core.model.ModelService;
@@ -58,14 +58,13 @@ public class IndexService {
     model.addModelObserver(observer);
   }
 
-  public SimpleDescriptionObject getParent(SimpleDescriptionObject sdo) throws NotFoundException, GenericException {
-    return SolrUtils.retrieve(index, SimpleDescriptionObject.class, sdo.getParentID());
+  public IndexedAIP getParent(IndexedAIP aip) throws NotFoundException, GenericException {
+    return SolrUtils.retrieve(index, IndexedAIP.class, aip.getParentID());
   }
 
-  public List<SimpleDescriptionObject> getAncestors(SimpleDescriptionObject sdo)
-    throws NotFoundException, GenericException {
-    List<SimpleDescriptionObject> ancestors = new ArrayList<SimpleDescriptionObject>();
-    SimpleDescriptionObject parent = null, actual = sdo;
+  public List<IndexedAIP> getAncestors(IndexedAIP aip) throws NotFoundException, GenericException {
+    List<IndexedAIP> ancestors = new ArrayList<IndexedAIP>();
+    IndexedAIP parent = null, actual = aip;
 
     while (actual != null && actual.getParentID() != null) {
       parent = getParent(actual);
@@ -131,7 +130,6 @@ public class IndexService {
   public void optimizeAIPs() throws GenericException {
     try {
       index.optimize(RodaConstants.INDEX_AIP);
-      index.optimize(RodaConstants.INDEX_SDO);
       index.optimize(RodaConstants.INDEX_FILE);
       index.optimize(RodaConstants.INDEX_REPRESENTATION);
       index.optimize(RodaConstants.INDEX_PRESERVATION_EVENTS);

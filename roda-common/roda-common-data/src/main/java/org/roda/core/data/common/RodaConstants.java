@@ -111,7 +111,6 @@ public final class RodaConstants {
    * INDEX NAMES
    */
   public static final String INDEX_AIP = "AIP";
-  public static final String INDEX_SDO = "SDO";
   public static final String INDEX_PRESERVATION_EVENTS = "PreservationEvent";
   public static final String INDEX_PRESERVATION_OBJECTS = "PreservationObject";
   public static final String INDEX_REPRESENTATION = "Representation";
@@ -224,20 +223,16 @@ public final class RodaConstants {
   public static final String AIP_PERMISSION_MODIFY_GROUPS = STORAGE_META_PERMISSION_MODIFY_GROUPS;
   public static final String AIP_PERMISSION_REMOVE_USERS = STORAGE_META_PERMISSION_REMOVE_USERS;
   public static final String AIP_PERMISSION_REMOVE_GROUPS = STORAGE_META_PERMISSION_REMOVE_GROUPS;
-
-  /*
-   * SDO FIELDS
-   */
-  public static final String SDO_LEVEL = "level";
-  public static final String SDO_TITLE = "title";
-  public static final String SDO_TITLE_SORT = "title_sort";
-  public static final String SDO_DATE_INITIAL = "dateInitial";
-  public static final String SDO_DATE_FINAL = "dateFinal";
-  public static final String SDO_CHILDREN_COUNT = "childrenCount";
-  public static final String SDO_DESCRIPTION = "description";
-  public static final String SDO_STATE = "state";
-  public static final String SDO_LABEL = "label";
-  public static final String SDO__ALL = "_all";
+  public static final String AIP_LEVEL = "level";
+  public static final String AIP_TITLE = "title";
+  public static final String AIP_TITLE_SORT = "title_sort";
+  public static final String AIP_DATE_INITIAL = "dateInitial";
+  public static final String AIP_DATE_FINAL = "dateFinal";
+  public static final String AIP_CHILDREN_COUNT = "childrenCount";
+  public static final String AIP_DESCRIPTION = "description";
+  public static final String AIP_STATE = "state";
+  public static final String AIP_LABEL = "label";
+  public static final String AIP__ALL = "_all";
 
   /**
    * Descriptive Metadata fields

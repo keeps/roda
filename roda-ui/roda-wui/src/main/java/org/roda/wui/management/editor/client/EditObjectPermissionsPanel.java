@@ -16,16 +16,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Vector;
 
 import org.roda.core.data.v2.Group;
+import org.roda.core.data.v2.IndexedAIP;
 import org.roda.core.data.v2.RODAMember;
-import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.core.data.v2.User;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.widgets.LoadingPopup;
 import org.roda.wui.common.client.widgets.WUIButton;
-
-import java.util.Vector;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -52,7 +51,7 @@ public class EditObjectPermissionsPanel extends Composite {
 
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
-  private final SimpleDescriptionObject sdo;
+  private final IndexedAIP aip;
   private Map<RODAMember, ObjectPermissions> permissions;
 
   private DockPanel layout;
@@ -73,10 +72,10 @@ public class EditObjectPermissionsPanel extends Composite {
   /**
    * Create a new edit producers panel
    * 
-   * @param sdo
+   * @param aip
    */
-  public EditObjectPermissionsPanel(SimpleDescriptionObject sdo) {
-    this.sdo = sdo;
+  public EditObjectPermissionsPanel(IndexedAIP aip) {
+    this.aip = aip;
     this.permissions = new HashMap<RODAMember, ObjectPermissions>();
     userMiniPermissionPanels = new Vector<UserMiniPermissionPanel>();
     groupMiniPermissionPanels = new Vector<GroupMiniPermissionPanel>();
@@ -231,7 +230,7 @@ public class EditObjectPermissionsPanel extends Composite {
 
   private void initializePermissionsList() {
     loading.show();
-    EditorService.Util.getInstance().getObjectPermissions(sdo.getId(),
+    EditorService.Util.getInstance().getObjectPermissions(aip.getId(),
       new AsyncCallback<Map<RODAMember, ObjectPermissions>>() {
 
         public void onFailure(Throwable caught) {
@@ -256,7 +255,7 @@ public class EditObjectPermissionsPanel extends Composite {
    */
   private void setMemberPermissions(RODAMember member, ObjectPermissions permission) {
     loading.show();
-    EditorService.Util.getInstance().setPermission(sdo.getId(), member, permission,
+    EditorService.Util.getInstance().setPermission(aip.getId(), member, permission,
       new AsyncCallback<Map<RODAMember, ObjectPermissions>>() {
 
         public void onFailure(Throwable caught) {
@@ -285,7 +284,7 @@ public class EditObjectPermissionsPanel extends Composite {
     for (GroupMiniPermissionPanel groupMiniPanel : groupMiniPermissionPanels) {
       permissions.put(groupMiniPanel.getGroup(), groupMiniPanel.getPermissions());
     }
-    EditorService.Util.getInstance().setObjectPermissions(sdo.getId(), permissions, recursivelly,
+    EditorService.Util.getInstance().setObjectPermissions(aip.getId(), permissions, recursivelly,
       new AsyncCallback<Map<RODAMember, ObjectPermissions>>() {
 
         public void onFailure(Throwable caught) {

@@ -35,10 +35,10 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.FileFormat;
+import org.roda.core.data.v2.IndexedAIP;
 import org.roda.core.data.v2.LogEntry;
 import org.roda.core.data.v2.LogEntryParameter;
 import org.roda.core.data.v2.RepresentationState;
-import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.core.metadata.v2.premis.PremisAgentHelper;
 import org.roda.core.metadata.v2.premis.PremisEventHelper;
 import org.roda.core.metadata.v2.premis.PremisFileObjectHelper;
@@ -655,33 +655,33 @@ public final class ModelUtils {
 
   }
 
-  public static ObjectNode sdoToJSON(SimpleDescriptionObject sdo)
+  public static ObjectNode aipToJSON(IndexedAIP indexedAIP)
     throws IOException, RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     JsonFactory factory = new JsonFactory();
     ObjectMapper mapper = new ObjectMapper(factory);
     ModelService model = RodaCoreFactory.getModelService();
 
     ObjectNode node = mapper.createObjectNode();
-    if (sdo.getTitle() != null) {
-      node = node.put("title", sdo.getTitle());
+    if (indexedAIP.getTitle() != null) {
+      node = node.put("title", indexedAIP.getTitle());
     }
-    if (sdo.getId() != null) {
-      node = node.put("id", sdo.getId());
+    if (indexedAIP.getId() != null) {
+      node = node.put("id", indexedAIP.getId());
     }
-    if (sdo.getParentID() != null) {
-      node = node.put("parentId", sdo.getParentID());
+    if (indexedAIP.getParentID() != null) {
+      node = node.put("parentId", indexedAIP.getParentID());
     }
-    if (sdo.getLevel() != null) {
-      node = node.put("descriptionlevel", sdo.getLevel());
+    if (indexedAIP.getLevel() != null) {
+      node = node.put("descriptionlevel", indexedAIP.getLevel());
     }
 
-    AIP aip = model.retrieveAIP(sdo.getId());
-    if (aip != null) {
-      List<String> descriptiveMetadaIds = aip.getDescriptiveMetadataIds();
+    AIP modelAIP = model.retrieveAIP(indexedAIP.getId());
+    if (modelAIP != null) {
+      List<String> descriptiveMetadaIds = modelAIP.getDescriptiveMetadataIds();
       if (descriptiveMetadaIds != null && descriptiveMetadaIds.size() > 0) {
         ArrayNode metadata = mapper.createArrayNode();
         for (String descriptiveMetadataID : descriptiveMetadaIds) {
-          DescriptiveMetadata dm = model.retrieveDescriptiveMetadata(aip.getId(), descriptiveMetadataID);
+          DescriptiveMetadata dm = model.retrieveDescriptiveMetadata(modelAIP.getId(), descriptiveMetadataID);
           ObjectNode dmNode = mapper.createObjectNode();
           if (dm.getId() != null) {
             dmNode = dmNode.put("id", dm.getId());
@@ -689,7 +689,7 @@ public final class ModelUtils {
           if (dm.getType() != null) {
             dmNode = dmNode.put("type", dm.getType());
           }
-          Binary b = model.retrieveDescriptiveMetadataBinary(aip.getId(), dm.getId());
+          Binary b = model.retrieveDescriptiveMetadataBinary(modelAIP.getId(), dm.getId());
           InputStream is = b.getContent().createInputStream();
           dmNode = dmNode.put("content", new String(Base64.encodeBase64(IOUtils.toByteArray(is))));
           dmNode = dmNode.put("contentEncoding", "Base64");

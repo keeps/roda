@@ -13,6 +13,7 @@ package org.roda.wui.client.browse;
 import java.util.List;
 import java.util.Map;
 
+import org.roda.core.data.v2.IndexedAIP;
 import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.HistoryResolver;
@@ -220,7 +221,7 @@ public class CreateDescriptiveMetadata extends Composite {
 
   private void cancel() {
     if (isNew) {
-      BrowserService.Util.getInstance().getSimpleDescriptionObject(aipId, new AsyncCallback<SimpleDescriptionObject>() {
+      BrowserService.Util.getInstance().getIndexedAIP(aipId, new AsyncCallback<IndexedAIP>() {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -228,8 +229,8 @@ public class CreateDescriptiveMetadata extends Composite {
         }
 
         @Override
-        public void onSuccess(SimpleDescriptionObject sdo) {
-          final String parentId = sdo.getParentID();
+        public void onSuccess(IndexedAIP aip) {
+          final String parentId = aip.getParentID();
           BrowserService.Util.getInstance().removeAIP(aipId, new AsyncCallback<Void>() {
 
             @Override

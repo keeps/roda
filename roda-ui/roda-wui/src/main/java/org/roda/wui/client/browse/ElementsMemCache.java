@@ -15,7 +15,7 @@ import java.util.Vector;
 
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
-import org.roda.core.data.v2.SimpleDescriptionObject;
+import org.roda.core.data.v2.IndexedAIP;
 import org.roda.wui.common.client.ClientLogger;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -44,7 +44,7 @@ public abstract class ElementsMemCache {
 
   private int count;
 
-  private SimpleDescriptionObject[] memCache;
+  private IndexedAIP[] memCache;
 
   private int elementsCachedNumber;
 
@@ -102,7 +102,7 @@ public abstract class ElementsMemCache {
         public void onSuccess(Integer count) {
           ElementsMemCache.this.count = count;
           if (memCache == null) {
-            memCache = new SimpleDescriptionObject[count];
+            memCache = new IndexedAIP[count];
           }
           loaded = true;
           loading = false;
@@ -157,7 +157,7 @@ public abstract class ElementsMemCache {
    *          the maximum number of item to fetch
    * @param callback
    */
-  protected abstract void getElements(int firstItemIndex, int count, AsyncCallback<SimpleDescriptionObject[]> callback);
+  protected abstract void getElements(int firstItemIndex, int count, AsyncCallback<IndexedAIP[]> callback);
 
   /**
    * Get an element from cache. If element is not yet in cache, it will be
@@ -167,7 +167,7 @@ public abstract class ElementsMemCache {
    *          the element index
    * @param callback
    */
-  public void getElement(final int index, final AsyncCallback<SimpleDescriptionObject> callback) {
+  public void getElement(final int index, final AsyncCallback<IndexedAIP> callback) {
     ensureLoaded(new AsyncCallback<Integer>() {
 
       public void onFailure(Throwable caught) {
@@ -185,7 +185,7 @@ public abstract class ElementsMemCache {
     });
   }
 
-  private void addCacheListener(final int index, final AsyncCallback<SimpleDescriptionObject> callback) {
+  private void addCacheListener(final int index, final AsyncCallback<IndexedAIP> callback) {
     cacheListeners.add(new CacheListener() {
 
       public void onIdle() {
@@ -210,7 +210,7 @@ public abstract class ElementsMemCache {
 
   }
 
-  private void cache(final int index, final AsyncCallback<SimpleDescriptionObject> callback) {
+  private void cache(final int index, final AsyncCallback<IndexedAIP> callback) {
     if (index < 0) {
       throw new IndexOutOfBoundsException(index + " < " + 0);
     } else if (index > count) {
@@ -231,17 +231,17 @@ public abstract class ElementsMemCache {
       final int blockstart = (index / LOAD_BLOCK_SIZE) * LOAD_BLOCK_SIZE;
       final int remainder = memCache.length - blockstart;
       final int blocksize = (remainder < LOAD_BLOCK_SIZE) ? remainder : LOAD_BLOCK_SIZE;
-      logger.debug("MemProxy cache fault, loading [" + blockstart + ", " + (blockstart + blocksize - 1) + "] for "
-        + index);
+      logger
+        .debug("MemProxy cache fault, loading [" + blockstart + ", " + (blockstart + blocksize - 1) + "] for " + index);
 
-      getElements(blockstart, blocksize, new AsyncCallback<SimpleDescriptionObject[]>() {
+      getElements(blockstart, blocksize, new AsyncCallback<IndexedAIP[]>() {
 
         public void onFailure(Throwable caught) {
           callback.onFailure(caught);
           work();
         }
 
-        public void onSuccess(final SimpleDescriptionObject[] block) {
+        public void onSuccess(final IndexedAIP[] block) {
           ensureLoaded(new AsyncCallback<Integer>() {
 
             public void onFailure(Throwable caught) {
@@ -265,7 +265,7 @@ public abstract class ElementsMemCache {
     }
   }
 
-  protected void updateBlock(int startIndex, SimpleDescriptionObject[] block) {
+  protected void updateBlock(int startIndex, IndexedAIP[] block) {
     for (int i = 0; i < block.length; i++) {
       memCache[i + startIndex] = block[i];
       elementsCachedNumber++;
@@ -295,8 +295,8 @@ public abstract class ElementsMemCache {
     int ret = -1;
     if (memCache != null) {
       for (int i = 0; i < memCache.length; i++) {
-        SimpleDescriptionObject sdo = memCache[i];
-        if (pid.equals(sdo.getId())) {
+        IndexedAIP aip = memCache[i];
+        if (pid.equals(aip.getId())) {
           ret = i;
         }
       }
@@ -304,7 +304,7 @@ public abstract class ElementsMemCache {
     return ret;
   }
 
-  public void clear(String pid, final AsyncCallback<SimpleDescriptionObject> item) {
+  public void clear(String pid, final AsyncCallback<IndexedAIP> item) {
     clear(getItemIndex(pid), item);
   }
 
@@ -316,7 +316,7 @@ public abstract class ElementsMemCache {
    * @param item
    *          the item re-cached
    */
-  public void clear(final int index, final AsyncCallback<SimpleDescriptionObject> item) {
+  public void clear(final int index, final AsyncCallback<IndexedAIP> item) {
     ensureLoaded(new AsyncCallback<Integer>() {
 
       public void onFailure(Throwable caught) {

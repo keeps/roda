@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.core.data.v2.User;
 
 /**

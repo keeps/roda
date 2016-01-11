@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.Vector;
 
 import org.roda.core.data.v2.Group;
+import org.roda.core.data.v2.IndexedAIP;
 import org.roda.core.data.v2.RODAMember;
-import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.core.data.v2.User;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.common.client.ClientLogger;
@@ -49,7 +49,7 @@ public class EditProducersPanel extends Composite {
 
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
-  private final SimpleDescriptionObject fondsSdo;
+  private final IndexedAIP fondsAip;
   private List<RODAMember> producers;
 
   private DockPanel layout;
@@ -72,10 +72,10 @@ public class EditProducersPanel extends Composite {
   /**
    * Create a new edit producers panel
    * 
-   * @param fondsSdo
+   * @param fondsAip
    */
-  public EditProducersPanel(SimpleDescriptionObject fondsSdo) {
-    this.fondsSdo = fondsSdo;
+  public EditProducersPanel(IndexedAIP fondsAip) {
+    this.fondsAip = fondsAip;
     this.producers = new Vector<RODAMember>();
     userMiniPanels = new Vector<UserMiniPanel>();
     groupMiniPanels = new Vector<GroupMiniPanel>();
@@ -258,7 +258,7 @@ public class EditProducersPanel extends Composite {
 
   private void initializeProducerList() {
     loading.show();
-    EditorService.Util.getInstance().getProducers(fondsSdo.getId(), new AsyncCallback<List<RODAMember>>() {
+    EditorService.Util.getInstance().getProducers(fondsAip.getId(), new AsyncCallback<List<RODAMember>>() {
 
       public void onFailure(Throwable caught) {
         loading.hide();
@@ -276,7 +276,7 @@ public class EditProducersPanel extends Composite {
 
   private void addProducer(RODAMember producer) {
     loading.show();
-    EditorService.Util.getInstance().addProducer(producer, fondsSdo.getId(), new AsyncCallback<List<RODAMember>>() {
+    EditorService.Util.getInstance().addProducer(producer, fondsAip.getId(), new AsyncCallback<List<RODAMember>>() {
 
       public void onFailure(Throwable caught) {
         loading.hide();
@@ -294,7 +294,7 @@ public class EditProducersPanel extends Composite {
 
   private void removeProducers(List<RODAMember> producers) {
     loading.show();
-    EditorService.Util.getInstance().removeProducers(producers, fondsSdo.getId(),
+    EditorService.Util.getInstance().removeProducers(producers, fondsAip.getId(),
       new AsyncCallback<List<RODAMember>>() {
 
         public void onFailure(Throwable caught) {

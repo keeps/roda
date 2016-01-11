@@ -13,9 +13,8 @@ package org.roda.wui.management.editor.client;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.roda.core.data.v2.SimpleDescriptionObject;
+import org.roda.core.data.v2.IndexedAIP;
 import org.roda.wui.common.client.ClientLogger;
-import org.roda.wui.common.client.widgets.LoadingPopup;
 import org.roda.wui.common.client.widgets.WUIButton;
 import org.roda.wui.common.client.widgets.WUIWindow;
 
@@ -38,7 +37,7 @@ public class MoveChooseDestinationPanel extends WUIWindow {
 
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
-  private final SimpleDescriptionObject source;
+  private final IndexedAIP source;
 
   // private final CollectionsTreeVerticalScrollPanel collectionsTree;
 
@@ -75,12 +74,12 @@ public class MoveChooseDestinationPanel extends WUIWindow {
   /**
    * Create a new panel to choose the destination where to move the object
    * 
-   * @param sdo
+   * @param aip
    *          the simple description object to move
    */
-  public MoveChooseDestinationPanel(SimpleDescriptionObject sdo) {
+  public MoveChooseDestinationPanel(IndexedAIP aip) {
     super(650, 550);
-    this.source = sdo;
+    this.source = aip;
     setTitle(constants.moveChooseDestinationTitle());
     // collectionsTree = new CollectionsTreeVerticalScrollPanel(false);
     // setWidget(collectionsTree);
@@ -89,7 +88,8 @@ public class MoveChooseDestinationPanel extends WUIWindow {
 
     listeners = new ArrayList<MoveListener>();
 
-    choose = new WUIButton(constants.moveChooseDestinationChoose(), WUIButton.Left.ROUND, WUIButton.Right.ARROW_FORWARD);
+    choose = new WUIButton(constants.moveChooseDestinationChoose(), WUIButton.Left.ROUND,
+      WUIButton.Right.ARROW_FORWARD);
 
     choose.setEnabled(false);
 
@@ -154,7 +154,7 @@ public class MoveChooseDestinationPanel extends WUIWindow {
 
   }
 
-  protected boolean isMoveValid(SimpleDescriptionObject source, SimpleDescriptionObject target) {
+  protected boolean isMoveValid(IndexedAIP source, IndexedAIP target) {
     // FIXME this is not valid anymore (see if "target" level can have a
     // child with the "source" level). At the very best, if the move is
     // illegal, roda-core will notice it as it validates the changes to the

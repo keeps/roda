@@ -23,6 +23,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IndexResult;
+import org.roda.core.data.v2.IndexedAIP;
 import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.JobReport;
 import org.roda.core.data.v2.PluginType;
@@ -91,8 +92,8 @@ public interface BrowserService extends RemoteService {
    * @throws AuthorizationDeniedException
    * @throws GenericException
    */
-  IndexResult<SimpleDescriptionObject> findDescriptiveMetadata(Filter filter, Sorter sorter, Sublist sublist,
-    Facets facets, String locale) throws GenericException, AuthorizationDeniedException, RequestNotValidException;
+  IndexResult<IndexedAIP> findDescriptiveMetadata(Filter filter, Sorter sorter, Sublist sublist, Facets facets,
+    String locale) throws GenericException, AuthorizationDeniedException, RequestNotValidException;
 
   BrowseItemBundle getItemBundle(String aipId, String localeString)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
@@ -110,8 +111,7 @@ public interface BrowserService extends RemoteService {
    * @throws GenericException
    * @throws AuthorizationDeniedException
    */
-  SimpleDescriptionObject getSimpleDescriptionObject(String pid)
-    throws AuthorizationDeniedException, GenericException, NotFoundException;
+  IndexedAIP getIndexedAIP(String pid) throws AuthorizationDeniedException, GenericException, NotFoundException;
 
   /**
    * Get description object
@@ -134,7 +134,7 @@ public interface BrowserService extends RemoteService {
    * @throws GenericException
    * @throws AuthorizationDeniedException
    */
-  List<SimpleDescriptionObject> getAncestors(SimpleDescriptionObject sdo)
+  List<IndexedAIP> getAncestors(IndexedAIP aip)
     throws AuthorizationDeniedException, GenericException, NotFoundException;
 
   public Long countDescriptiveMetadataBinaries(String aipId)
@@ -235,8 +235,8 @@ public interface BrowserService extends RemoteService {
   TimelineInfo getPreservationTimeline(List<String> repPIDs, List<String> icons, List<String> colors, String locale)
     throws RODAException;
 
-  SimpleDescriptionObject moveInHierarchy(String aipId, String parentId) throws AuthorizationDeniedException,
-    GenericException, NotFoundException, RequestNotValidException, AlreadyExistsException;
+  IndexedAIP moveInHierarchy(String aipId, String parentId) throws AuthorizationDeniedException, GenericException,
+    NotFoundException, RequestNotValidException, AlreadyExistsException;
 
   String createAIP(String parentId) throws AuthorizationDeniedException, GenericException, NotFoundException,
     RequestNotValidException, AlreadyExistsException;

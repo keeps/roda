@@ -13,7 +13,7 @@ package org.roda.wui.client.browse;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.roda.core.data.v2.SimpleDescriptionObject;
+import org.roda.core.data.v2.IndexedAIP;
 import org.roda.wui.client.browse.TimelineInfo.HotZone;
 import org.roda.wui.client.browse.TimelineInfo.Phase;
 import org.roda.wui.common.client.ClientLogger;
@@ -69,7 +69,7 @@ public class PreservationMetadataPanel extends Composite {
 
   private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
 
-  private final SimpleDescriptionObject sdo;
+  private final IndexedAIP aip;
 
   private final DockPanel layout;
   private HorizontalPanel header;
@@ -86,10 +86,10 @@ public class PreservationMetadataPanel extends Composite {
   /**
    * Create a new preservation metadata panel
    * 
-   * @param sdo
+   * @param aip
    */
-  public PreservationMetadataPanel(SimpleDescriptionObject sdo) {
-    this.sdo = sdo;
+  public PreservationMetadataPanel(IndexedAIP aip) {
+    this.aip = aip;
     layout = new DockPanel();
     initWidget(layout);
     timelineInfo = null;
@@ -132,7 +132,7 @@ public class PreservationMetadataPanel extends Composite {
 
       });
 
-      BrowserService.Util.getInstance().getPreservationsInfo(sdo.getId(), new AsyncCallback<List<PreservationInfo>>() {
+      BrowserService.Util.getInstance().getPreservationsInfo(aip.getId(), new AsyncCallback<List<PreservationInfo>>() {
 
         public void onFailure(Throwable caught) {
           logger.error("Error getting representations info", caught);

@@ -58,10 +58,10 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IndexResult;
+import org.roda.core.data.v2.IndexedAIP;
 import org.roda.core.data.v2.Representation;
 import org.roda.core.data.v2.RepresentationState;
 import org.roda.core.data.v2.RodaUser;
-import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.core.data.v2.SimpleFile;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.index.IndexService;
@@ -104,13 +104,13 @@ public class BrowserHelper {
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
     BrowseItemBundle itemBundle = new BrowseItemBundle();
 
-    // set sdo
-    SimpleDescriptionObject sdo = getSimpleDescriptionObject(aipId);
-    itemBundle.setSdo(sdo);
+    // set aip
+    IndexedAIP aip = getIndexedAIP(aipId);
+    itemBundle.setAIP(aip);
 
-    // set sdo ancestors
+    // set aip ancestors
     try {
-      itemBundle.setSdoAncestors(getAncestors(sdo));
+      itemBundle.setAIPAncestors(getAncestors(aip));
     } catch (NotFoundException e) {
       LOGGER.warn("Found an item with invalid ancestors: " + aipId, e);
     }
@@ -211,19 +211,19 @@ public class BrowserHelper {
     return ret;
   }
 
-  protected static List<SimpleDescriptionObject> getAncestors(SimpleDescriptionObject sdo)
-    throws GenericException, NotFoundException {
-    return RodaCoreFactory.getIndexService().getAncestors(sdo);
+  protected static List<IndexedAIP> getAncestors(IndexedAIP aip) throws GenericException, NotFoundException {
+
+    return RodaCoreFactory.getIndexService().getAncestors(aip);
 
   }
 
-  protected static IndexResult<SimpleDescriptionObject> findDescriptiveMetadata(Filter filter, Sorter sorter,
-    Sublist sublist, Facets facets) throws GenericException, RequestNotValidException {
-    IndexResult<SimpleDescriptionObject> sdos;
-    sdos = RodaCoreFactory.getIndexService().find(SimpleDescriptionObject.class, filter, sorter, sublist, facets);
-    LOGGER.debug(String.format("findDescriptiveMetadata(%1$s,%2$s,%3$s)=%4$s", filter, sorter, sublist, sdos));
+  protected static IndexResult<IndexedAIP> findDescriptiveMetadata(Filter filter, Sorter sorter, Sublist sublist,
+    Facets facets) throws GenericException, RequestNotValidException {
+    IndexResult<IndexedAIP> aips = RodaCoreFactory.getIndexService().find(IndexedAIP.class, filter, sorter, sublist,
+      facets);
+    LOGGER.debug(String.format("findDescriptiveMetadata(%1$s,%2$s,%3$s)=%4$s", filter, sorter, sublist, aips));
 
-    return sdos;
+    return aips;
   }
 
   public static Long countDescriptiveMetadataBinaries(String aipId)
@@ -251,7 +251,7 @@ public class BrowserHelper {
   }
 
   protected static Long countDescriptiveMetadata(Filter filter) throws GenericException, RequestNotValidException {
-    return RodaCoreFactory.getIndexService().count(SimpleDescriptionObject.class, filter);
+    return RodaCoreFactory.getIndexService().count(IndexedAIP.class, filter);
   }
 
   public static void validateGetAipRepresentationFileParams(String acceptFormat) throws RequestNotValidException {
@@ -261,9 +261,8 @@ public class BrowserHelper {
     }
   }
 
-  protected static SimpleDescriptionObject getSimpleDescriptionObject(String aipId)
-    throws GenericException, NotFoundException {
-    return RodaCoreFactory.getIndexService().retrieve(SimpleDescriptionObject.class, aipId);
+  protected static IndexedAIP getIndexedAIP(String aipId) throws GenericException, NotFoundException {
+    return RodaCoreFactory.getIndexService().retrieve(IndexedAIP.class, aipId);
   }
 
   protected static void validateGetAipRepresentationParams(String acceptFormat) throws RequestNotValidException {
@@ -383,6 +382,7 @@ public class BrowserHelper {
         String htmlDescriptive = HTMLUtils.descriptiveMetadataToHtml(descriptiveMetadataBinary,
           descriptiveMetadata.getType(), ServerTools.parseLocale(language));
         stream = new StreamingOutput() {
+
           @Override
           public void write(OutputStream os) throws IOException, WebApplicationException {
             PrintStream printStream = new PrintStream(os);
@@ -404,6 +404,7 @@ public class BrowserHelper {
     }
 
     return ret;
+
   }
 
   protected static void validateListAipPreservationMetadataParams(String acceptFormat) throws RequestNotValidException {
@@ -572,6 +573,7 @@ public class BrowserHelper {
         }
       };
       response = new StreamResponse(filename, MediaType.TEXT_HTML, stream);
+
     }
 
     return response;
@@ -595,7 +597,6 @@ public class BrowserHelper {
     };
 
     return new StreamResponse(filename, MediaType.APPLICATION_OCTET_STREAM, stream);
-
   }
 
   public static void createOrUpdateAipRepresentationPreservationMetadataFile(String aipId, String representationId,
@@ -630,8 +631,8 @@ public class BrowserHelper {
     RodaCoreFactory.getModelService().deletePreservationMetadata(aipId, representationId, fileId);
   }
 
-  public static SimpleDescriptionObject moveInHierarchy(String aipId, String parentId) throws GenericException,
-    NotFoundException, RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
+  public static IndexedAIP moveInHierarchy(String aipId, String parentId) throws GenericException, NotFoundException,
+    RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
     StorageService storage = RodaCoreFactory.getStorageService();
     ModelService model = RodaCoreFactory.getModelService();
     StoragePath aipPath = ModelUtils.getAIPpath(aipId);
@@ -648,13 +649,12 @@ public class BrowserHelper {
     storage.updateMetadata(aipPath, metadata, true);
     model.updateAIP(aipId, storage, aipPath);
 
-    return RodaCoreFactory.getIndexService().retrieve(SimpleDescriptionObject.class, aipId);
+    return RodaCoreFactory.getIndexService().retrieve(IndexedAIP.class, aipId);
 
   }
 
   public static AIP createAIP(String parentAipId) throws GenericException, AuthorizationDeniedException,
     RequestNotValidException, NotFoundException, AlreadyExistsException {
-
     ModelService model = RodaCoreFactory.getModelService();
     // IndexService index = RodaCoreFactory.getIndexService();
 
@@ -665,9 +665,6 @@ public class BrowserHelper {
 
     AIP aip = model.createAIP(metadata);
     return aip;
-    // return index.retrieve(SimpleDescriptionObject.class,
-    // aip.getId());
-
   }
 
   public static void removeAIP(String aipId)
@@ -699,6 +696,7 @@ public class BrowserHelper {
       // TODO check this exception, see if it should be a RODAException
       throw new ValidationException(e.getMessage());
     }
+
   }
 
   public static void removeDescriptiveMetadataFile(String aipId, String descriptiveMetadataId)
@@ -729,6 +727,7 @@ public class BrowserHelper {
         public void write(OutputStream os) throws IOException, WebApplicationException {
           ZipTools.zip(zipEntries, os);
         }
+
       };
       filename = zipName + ".zip";
     }
@@ -855,15 +854,15 @@ public class BrowserHelper {
       });
 
       Filter allButRepresentationsFilter = new Filter(
-        new OneOfManyFilterParameter(RodaConstants.SDO_LEVEL, descriptionsLevels));
+        new OneOfManyFilterParameter(RodaConstants.AIP_LEVEL, descriptionsLevels));
 
       IndexService index = RodaCoreFactory.getIndexService();
-      long collectionsCount = index.count(SimpleDescriptionObject.class, allButRepresentationsFilter);
+      long collectionsCount = index.count(IndexedAIP.class, allButRepresentationsFilter);
       for (int i = 0; i < collectionsCount; i += 100) {
-        IndexResult<SimpleDescriptionObject> collections = index.find(SimpleDescriptionObject.class,
-          allButRepresentationsFilter, null, new Sublist(i, 100));
-        for (SimpleDescriptionObject sdo : collections.getResults()) {
-          array.add(ModelUtils.sdoToJSON(sdo));
+        IndexResult<IndexedAIP> collections = index.find(IndexedAIP.class, allButRepresentationsFilter, null,
+          new Sublist(i, 100));
+        for (IndexedAIP aip : collections.getResults()) {
+          array.add(ModelUtils.aipToJSON(aip));
         }
       }
       root.set("dos", array);

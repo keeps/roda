@@ -13,7 +13,7 @@ package org.roda.wui.client.browse;
 import java.util.List;
 import java.util.Vector;
 
-import org.roda.core.data.v2.SimpleDescriptionObject;
+import org.roda.core.data.v2.IndexedAIP;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.StringUtility;
@@ -47,7 +47,7 @@ public class TreeItemPanel extends AccessibleFocusPanel implements SourcesSlider
 
   private final List<SliderEventListener> sliderListeners;
 
-  private SimpleDescriptionObject sdo;
+  private IndexedAIP aip;
 
   private final HorizontalPanel layout;
 
@@ -72,15 +72,15 @@ public class TreeItemPanel extends AccessibleFocusPanel implements SourcesSlider
   /**
    * Create a new tree item panel
    * 
-   * @param sdo
+   * @param aip
    *          the simple description object relative to this item
    * @param childrenCount
    *          the number of children this item has
    * @param showInfo
    *          whereas extended information should be presented
    */
-  public TreeItemPanel(SimpleDescriptionObject sdo, int childrenCount, boolean showInfo) {
-    this.sdo = sdo;
+  public TreeItemPanel(IndexedAIP aip, int childrenCount, boolean showInfo) {
+    this.aip = aip;
     this.showInfo = false;
     // this.childrenCount = childrenCount;
     this.sliderListeners = new Vector<SliderEventListener>();
@@ -94,12 +94,12 @@ public class TreeItemPanel extends AccessibleFocusPanel implements SourcesSlider
     waitImage.setVisible(false);
     waitImage.addStyleName("itemWaitingImage");
 
-    final String labeltext = sdo.getLabel();
+    final String labeltext = aip.getLabel();
 
     label = new Label(labeltext);
     label.setWordWrap(false);
 
-    image = DescriptionLevelUtils.getElementLevelIconImage(sdo.getLevel());
+    image = DescriptionLevelUtils.getElementLevelIconImage(aip.getLevel());
     if (image != null) {
       layout.add(image);
     }
@@ -136,10 +136,10 @@ public class TreeItemPanel extends AccessibleFocusPanel implements SourcesSlider
       this.showInfo = showInfo;
       if (showInfo) {
         title = new Label();
-        String normalizedTitle = StringUtility.normalizeSpaces(sdo.getTitle());
+        String normalizedTitle = StringUtility.normalizeSpaces(aip.getTitle());
         title.setText(normalizedTitle == null ? constants.noTitle() : normalizedTitle);
-        startDate = new Label(sdo.getDateInitial() == null ? constants.noDate() : sdo.getDateInitial().toString());
-        endDate = new Label(sdo.getDateFinal() == null ? constants.noDate() : sdo.getDateFinal().toString());
+        startDate = new Label(aip.getDateInitial() == null ? constants.noDate() : aip.getDateInitial().toString());
+        endDate = new Label(aip.getDateFinal() == null ? constants.noDate() : aip.getDateFinal().toString());
 
         title.addStyleName("treeitem-info-title");
         startDate.addStyleName("treeitem-info-data");
@@ -205,11 +205,11 @@ public class TreeItemPanel extends AccessibleFocusPanel implements SourcesSlider
       super(true, false);
       focus = new AccessibleFocusPanel();
       layout = new VerticalPanel();
-      header = new Label(sdo.getId());
+      header = new Label(aip.getId());
 
       scroll = new ScrollPanel();
-      description = new Label(sdo.getDescription() == null ? constants.noDescription()
-        : StringUtility.normalizeSpaces(sdo.getDescription()));
+      description = new Label(aip.getDescription() == null ? constants.noDescription()
+        : StringUtility.normalizeSpaces(aip.getDescription()));
 
       scroll.setWidget(description);
       layout.add(header);

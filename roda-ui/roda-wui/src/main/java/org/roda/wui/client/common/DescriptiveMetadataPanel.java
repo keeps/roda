@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Vector;
 
 import org.roda.core.data.DescriptionObject;
+import org.roda.core.data.v2.IndexedAIP;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
@@ -129,7 +130,9 @@ public class DescriptiveMetadataPanel extends Composite implements SourcesChange
 
   public DescriptiveMetadataPanel(DescriptionObject descObj, boolean valuesAsHtml) {
     super();
-    this.pid = descObj.getId();
+    // FIXME
+    // this.pid = descObj.getId();
+    this.pid = "";
     this.descObj = descObj;
     this.valuesAsHtml = valuesAsHtml;
     layout = new VerticalPanel();
@@ -167,7 +170,8 @@ public class DescriptiveMetadataPanel extends Composite implements SourcesChange
 
         public void onSuccess(DescriptionObject obj) {
           descObj = obj;
-          descObj.setLevel(DescriptionLevelUtils.REPRESENTATION_DESCRIPTION_LEVELS.get(0).getLevel());
+          // FIXME
+          //descObj.setLevel(DescriptionLevelUtils.REPRESENTATION_DESCRIPTION_LEVELS.get(0).getLevel());
           postInit();
           callback.onSuccess(descObj);
         }

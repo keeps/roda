@@ -84,6 +84,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.EventPreservationObject;
 import org.roda.core.data.v2.Group;
 import org.roda.core.data.v2.IndexResult;
+import org.roda.core.data.v2.IndexedAIP;
 import org.roda.core.data.v2.RODAMember;
 import org.roda.core.data.v2.RepresentationFilePreservationObject;
 import org.roda.core.data.v2.TransferredResource;
@@ -243,7 +244,6 @@ public class RodaCoreFactory {
       } catch (URISyntaxException e) {
         LOGGER.error("Error instantiating solr/index model", e);
       } catch (GenericException e) {
-        // FIXME generic for detecting storage instantiate errors?
         LOGGER.error("Error instantiating storage model", e);
       }
 
@@ -511,7 +511,6 @@ public class RodaCoreFactory {
     essentialDirectories.add(configPath.resolve("schemas"));
     essentialDirectories.add(rodaHomePath.resolve("log"));
     essentialDirectories.add(dataPath);
-    // FIXME this folder creation shouldn't happen here
     essentialDirectories.add(dataPath.resolve("transferredResources"));
     essentialDirectories.add(logPath);
     essentialDirectories.add(storagePath);

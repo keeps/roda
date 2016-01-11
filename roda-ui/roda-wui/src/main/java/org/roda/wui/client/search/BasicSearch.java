@@ -25,7 +25,7 @@ import org.roda.core.data.adapter.filter.DateIntervalFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.FilterParameter;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.SimpleDescriptionObject;
+import org.roda.core.data.v2.IndexedAIP;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
@@ -90,7 +90,7 @@ public class BasicSearch extends Composite {
       return "search";
     }
   };
-  private static final Filter DEFAULT_FILTER = new Filter(new BasicSearchFilterParameter(RodaConstants.SDO__ALL, "*"));
+  private static final Filter DEFAULT_FILTER = new Filter(new BasicSearchFilterParameter(RodaConstants.AIP__ALL, "*"));
 
   private static BasicSearch instance = null;
 
@@ -149,7 +149,7 @@ public class BasicSearch extends Composite {
 
   private BasicSearch() {
     Filter filter = DEFAULT_FILTER;
-    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.SDO_LEVEL),
+    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.AIP_LEVEL),
       new SimpleFacetParameter(RodaConstants.AIP_HAS_REPRESENTATIONS));
     // TODO externalise strings
     searchResultPanel = new AIPList(filter, facets, "Search results");
@@ -157,7 +157,7 @@ public class BasicSearch extends Composite {
     facetHasRepresentations = new FlowPanel();
 
     Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
-    facetPanels.put(RodaConstants.SDO_LEVEL, facetDescriptionLevels);
+    facetPanels.put(RodaConstants.AIP_LEVEL, facetDescriptionLevels);
     facetPanels.put(RodaConstants.AIP_HAS_REPRESENTATIONS, facetHasRepresentations);
     FacetUtils.bindFacets(searchResultPanel, facetPanels);
 
@@ -167,9 +167,9 @@ public class BasicSearch extends Composite {
 
       @Override
       public void onSelectionChange(SelectionChangeEvent event) {
-        SimpleDescriptionObject sdo = searchResultPanel.getSelectionModel().getSelectedObject();
-        if (sdo != null) {
-          view(sdo.getId());
+        IndexedAIP aip = searchResultPanel.getSelectionModel().getSelectedObject();
+        if (aip != null) {
+          view(aip.getId());
         }
       }
     });
@@ -240,8 +240,8 @@ public class BasicSearch extends Composite {
     Date dateInitial = inputDateInitial.getDatePicker().getValue();
     Date dateFinal = inputDateFinal.getDatePicker().getValue();
 
-    DateIntervalFilterParameter filterParameter = new DateIntervalFilterParameter(RodaConstants.SDO_DATE_INITIAL,
-      RodaConstants.SDO_DATE_FINAL, dateInitial, dateFinal);
+    DateIntervalFilterParameter filterParameter = new DateIntervalFilterParameter(RodaConstants.AIP_DATE_INITIAL,
+      RodaConstants.AIP_DATE_FINAL, dateInitial, dateFinal);
 
     searchResultPanel.setFilter(new Filter(filterParameter));
   }
@@ -256,7 +256,7 @@ public class BasicSearch extends Composite {
     // basic query
     String basicQuery = searchInputBox.getText();
     if (!"".equals(basicQuery)) {
-      parameters.add(new BasicSearchFilterParameter(RodaConstants.SDO__ALL, basicQuery));
+      parameters.add(new BasicSearchFilterParameter(RodaConstants.AIP__ALL, basicQuery));
     }
 
     for (Entry<String, TextBox> entry : searchFieldTextBoxes.entrySet()) {

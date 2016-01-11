@@ -98,7 +98,6 @@ public class ReindexPlugin implements Plugin<AIP> {
       LOGGER.debug("Clearing indexes");
       try {
         index.clearIndex(RodaConstants.INDEX_AIP);
-        index.clearIndex(RodaConstants.INDEX_SDO);
         index.clearIndex(RodaConstants.INDEX_REPRESENTATION);
         index.clearIndex(RodaConstants.INDEX_PRESERVATION_OBJECTS);
         index.clearIndex(RodaConstants.INDEX_PRESERVATION_EVENTS);
@@ -118,7 +117,6 @@ public class ReindexPlugin implements Plugin<AIP> {
     LOGGER.debug("Optimizing indexes");
     try {
       index.optimizeIndex(RodaConstants.INDEX_AIP);
-      index.optimizeIndex(RodaConstants.INDEX_SDO);
     } catch (GenericException e) {
       throw new PluginException("Error optimizing index", e);
     }

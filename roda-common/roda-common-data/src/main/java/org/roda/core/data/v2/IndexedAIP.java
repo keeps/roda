@@ -14,12 +14,11 @@ import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.eadc.DescriptionLevel;
 
 /**
- * This class contains the basic information about a Description Object.
+ * This class contains the indexed information about an AIP.
  * 
- * @author Rui Castro
+ * @author Hélder Silva <hsilva@keep.pt>
  */
-@Deprecated
-public class SimpleDescriptionObject extends RODAObject {
+public class IndexedAIP extends RODAObject {
   private static final long serialVersionUID = 38813680938917204L;
 
   // FIXME this should be defined from DescriptionLevelManager information
@@ -38,31 +37,29 @@ public class SimpleDescriptionObject extends RODAObject {
   private RODAObjectPermissions permissions = new RODAObjectPermissions();
 
   /**
-   * Constructs an empty (<strong>invalid</strong>)
-   * {@link SimpleDescriptionObject}.
+   * Constructs an empty (<strong>invalid</strong>) {@link IndexedAIP}.
    */
-  public SimpleDescriptionObject() {
+  public IndexedAIP() {
     super(null, null);
   }
 
   /**
-   * Constructs a new (<strong>invalid</strong>) {@link SimpleDescriptionObject}
-   * from a {@link RODAObject}.
+   * Constructs a new (<strong>invalid</strong>) {@link IndexedAIP} from a
+   * {@link RODAObject}.
    * 
    * @param rodaObject
    */
-  public SimpleDescriptionObject(RODAObject rodaObject) {
+  public IndexedAIP(RODAObject rodaObject) {
     super(rodaObject);
   }
 
   /**
-   * Constructs a new {@link SimpleDescriptionObject} cloning the one given by
-   * argument.
+   * Constructs a new {@link IndexedAIP} cloning the one given by argument.
    * 
    * @param other
-   *          the {@link SimpleDescriptionObject} to be cloned.
+   *          the {@link IndexedAIP} to be cloned.
    */
-  public SimpleDescriptionObject(SimpleDescriptionObject other) {
+  public IndexedAIP(IndexedAIP other) {
     this(other.getId(), other.getLabel(), other.getLastModifiedDate(), other.getCreatedDate(), other.getState(),
       other.getLevel(), other.getTitle(), other.getDateInitial(), other.getDateFinal(), other.getDescription(),
       other.getParentID(), other.getSubElementsCount(), other.getPermissions());
@@ -84,9 +81,9 @@ public class SimpleDescriptionObject extends RODAObject {
    * @param parentID
    * @param subElementsCount
    */
-  public SimpleDescriptionObject(String id, String label, Date lastModifiedDate, Date createdDate, String state,
-    String level, String title, Date dateInitial, Date dateFinal, String description, String parentID,
-    int subElementsCount, RODAObjectPermissions permissions) {
+  public IndexedAIP(String id, String label, Date lastModifiedDate, Date createdDate, String state, String level,
+    String title, Date dateInitial, Date dateFinal, String description, String parentID, int subElementsCount,
+    RODAObjectPermissions permissions) {
 
     super(id, label, lastModifiedDate, createdDate, state);
 

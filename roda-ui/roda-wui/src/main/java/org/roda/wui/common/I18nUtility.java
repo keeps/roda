@@ -11,16 +11,16 @@ import java.io.Serializable;
 import java.util.Locale;
 import java.util.MissingResourceException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.FacetFieldResult;
 import org.roda.core.data.v2.FacetValue;
+import org.roda.core.data.v2.IndexedAIP;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.RODAMember;
-import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.wui.common.server.ServerTools;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class I18nUtility {
   private static final Logger LOGGER = LoggerFactory.getLogger(I18nUtility.class);
@@ -68,7 +68,7 @@ public class I18nUtility {
 
   private static <T> String getPrefix(Class<T> resultClass) {
     String prefix;
-    if (resultClass.equals(SimpleDescriptionObject.class)) {
+    if (resultClass.equals(IndexedAIP.class)) {
       prefix = RodaConstants.I18N_UI_SEARCH_FACETS_PREFIX;
 
     } else if (resultClass.equals(RODAMember.class)) {

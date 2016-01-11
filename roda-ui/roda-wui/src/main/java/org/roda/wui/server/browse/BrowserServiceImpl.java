@@ -37,12 +37,12 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.EventPreservationObject;
 import org.roda.core.data.v2.IndexResult;
+import org.roda.core.data.v2.IndexedAIP;
 import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.JobReport;
 import org.roda.core.data.v2.PluginType;
 import org.roda.core.data.v2.RepresentationPreservationObject;
 import org.roda.core.data.v2.RodaUser;
-import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.core.data.v2.SimpleFile;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.model.ValidationException;
@@ -112,13 +112,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public IndexResult<SimpleDescriptionObject> findDescriptiveMetadata(Filter filter, Sorter sorter, Sublist sublist,
-    Facets facets, String localeString)
-      throws GenericException, AuthorizationDeniedException, RequestNotValidException {
+  public IndexResult<IndexedAIP> findDescriptiveMetadata(Filter filter, Sorter sorter, Sublist sublist, Facets facets,
+    String localeString) throws GenericException, AuthorizationDeniedException, RequestNotValidException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
-    IndexResult<SimpleDescriptionObject> result = Browser.findDescriptiveMetadata(user, filter, sorter, sublist,
-      facets);
-    return I18nUtility.translate(result, SimpleDescriptionObject.class, localeString);
+    IndexResult<IndexedAIP> result = Browser.findDescriptiveMetadata(user, filter, sorter, sublist, facets);
+    return I18nUtility.translate(result, IndexedAIP.class, localeString);
   }
 
   public IndexResult<SimpleFile> getRepresentationFiles(Filter filter, Sorter sorter, Sublist sublist, Facets facets,
@@ -133,16 +131,15 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     return Browser.countDescriptiveMetadata(user, filter);
   }
 
-  public SimpleDescriptionObject getSimpleDescriptionObject(String pid)
-    throws AuthorizationDeniedException, GenericException, NotFoundException {
+  public IndexedAIP getIndexedAIP(String pid) throws AuthorizationDeniedException, GenericException, NotFoundException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
-    return Browser.getSimpleDescriptionObject(user, pid);
+    return Browser.getIndexedAip(user, pid);
   }
 
-  public List<SimpleDescriptionObject> getAncestors(SimpleDescriptionObject sdo)
+  public List<IndexedAIP> getAncestors(IndexedAIP aip)
     throws AuthorizationDeniedException, GenericException, NotFoundException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
-    return Browser.getAncestors(user, sdo);
+    return Browser.getAncestors(user, aip);
   }
 
   public Long countDescriptiveMetadataBinaries(String aipId)
@@ -177,7 +174,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public SimpleDescriptionObject moveInHierarchy(String aipId, String parentId) throws AuthorizationDeniedException,
+  public IndexedAIP moveInHierarchy(String aipId, String parentId) throws AuthorizationDeniedException,
     GenericException, NotFoundException, RequestNotValidException, AlreadyExistsException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     return Browser.moveInHierarchy(user, aipId, parentId);

@@ -41,6 +41,7 @@ import org.roda.core.data.v2.SimpleDescriptionObject;
  * 
  * @author Rui Castro
  */
+@Deprecated
 public class DescriptionObject extends SimpleDescriptionObject {
   private static final long serialVersionUID = -2188159657722817564L;
 

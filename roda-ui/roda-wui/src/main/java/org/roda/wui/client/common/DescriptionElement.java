@@ -242,8 +242,8 @@ public class DescriptionElement implements SourcesChangeEvents {
       ret = new ChronListEditor();
     } else if (mode.equals(EditMode.ARRANGEMENT_TABLE)) {
       ret = new ArrangementTableEditor();
-    } else if (mode.equals(EditMode.LEVEL)) {
-      ret = new ElementLevelEditor(object.getId());
+      // } else if (mode.equals(EditMode.LEVEL)) {
+      // ret = new ElementLevelEditor(object.getId());
     } else if (mode.equals(EditMode.NOTES)) {
       ret = new NotesEditor();
     } else if (mode.equals(EditMode.PHYSDESC_GENREFORM)) {

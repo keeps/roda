@@ -13,11 +13,11 @@ package org.roda.wui.client.browse;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.SortParameter;
 import org.roda.core.data.adapter.sort.Sorter;
-import org.roda.core.data.v2.SimpleDescriptionObject;
+import org.roda.core.data.v2.IndexedAIP;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.widgets.LazyScroll;
-import org.roda.wui.common.client.widgets.ListHeaderPanel;
 import org.roda.wui.common.client.widgets.LazyScroll.Loader;
+import org.roda.wui.common.client.widgets.ListHeaderPanel;
 import org.roda.wui.common.client.widgets.ListHeaderPanel.ListHeaderListener;
 
 import com.google.gwt.core.client.GWT;
@@ -201,18 +201,18 @@ public abstract class ElementVerticalScrollPanel extends Composite implements Li
 
       for (int i = offset; i < last; i++) {
         final int index = i;
-        ElementVerticalScrollPanel.this.memProxy.getElement(i, new AsyncCallback<SimpleDescriptionObject>() {
+        ElementVerticalScrollPanel.this.memProxy.getElement(i, new AsyncCallback<IndexedAIP>() {
 
           public void onFailure(Throwable caught) {
             logger.error("Error loading ElementVerticalScroll", caught);
             callback.onFailure(caught);
           }
 
-          public void onSuccess(SimpleDescriptionObject sdo) {
-            if (sdo == null) {
+          public void onSuccess(IndexedAIP aip) {
+            if (aip == null) {
               logger.error("getElement(" + index + ") returned null");
             } else {
-              Widget widget = createWidget(sdo, index - windowOffset);
+              Widget widget = createWidget(aip, index - windowOffset);
               logger.debug("inserting widget before " + (index - windowOffset));
               elementLayout.insert(widget, index - windowOffset);
               if (--waitingToLoad == 0) {
@@ -233,7 +233,7 @@ public abstract class ElementVerticalScrollPanel extends Composite implements Li
     }
   }
 
-  protected abstract Widget createWidget(SimpleDescriptionObject sdo, int position);
+  protected abstract Widget createWidget(IndexedAIP aip, int position);
 
   protected abstract void removeWidget(Widget widget);
 

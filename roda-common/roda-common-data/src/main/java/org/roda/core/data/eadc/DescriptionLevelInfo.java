@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.roda.core.data.common.InvalidDescriptionLevel;
-import org.roda.core.data.v2.SimpleDescriptionObject;
 
 /**
  * This is information about the description level of a

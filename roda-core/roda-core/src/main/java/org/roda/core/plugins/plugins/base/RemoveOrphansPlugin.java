@@ -20,22 +20,20 @@ import org.roda.core.data.Report;
 import org.roda.core.data.common.InvalidParameterException;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.v2.IndexedAIP;
 import org.roda.core.data.v2.PluginType;
-import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.AIP;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.ModelServiceException;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.StoragePath;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.StorageServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class RemoveOrphansPlugin implements Plugin<SimpleDescriptionObject> {
+public class RemoveOrphansPlugin implements Plugin<IndexedAIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(RemoveOrphansPlugin.class);
   private AIP newParent;
 
@@ -88,17 +86,17 @@ public class RemoveOrphansPlugin implements Plugin<SimpleDescriptionObject> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage,
-    List<SimpleDescriptionObject> list) throws PluginException {
+  public Report execute(IndexService index, ModelService model, StorageService storage, List<IndexedAIP> list)
+    throws PluginException {
 
-    for (SimpleDescriptionObject sdo : list) {
+    for (IndexedAIP indexedAIP : list) {
       try {
-        LOGGER.debug("Processing AIP " + sdo.getId());
-        if (sdo.getLevel() == null || !sdo.getLevel().trim().equalsIgnoreCase("fonds")) {
-          AIP aip = model.retrieveAIP(sdo.getId());
+        LOGGER.debug("Processing AIP " + indexedAIP.getId());
+        if (indexedAIP.getLevel() == null || !indexedAIP.getLevel().trim().equalsIgnoreCase("fonds")) {
+          AIP aip = model.retrieveAIP(indexedAIP.getId());
           StoragePath aiPpath = ModelUtils.getAIPpath(aip.getId());
 
-          LOGGER.debug("  Moving orphan " + sdo.getId() + " to under " + newParent.getId());
+          LOGGER.debug("  Moving orphan " + indexedAIP.getId() + " to under " + newParent.getId());
           Map<String, Set<String>> simpleDescriptionObjectMetadata = storage.getMetadata(aiPpath);
           simpleDescriptionObjectMetadata.put(RodaConstants.STORAGE_META_PARENT_ID,
             new HashSet<String>(Arrays.asList(newParent.getId())));
@@ -106,10 +104,10 @@ public class RemoveOrphansPlugin implements Plugin<SimpleDescriptionObject> {
           aip.setParentId(newParent.getId());
           index.reindexAIP(aip);
         } else {
-          LOGGER.debug("  AIP doesn't need to be moved... Level: " + sdo.getLevel());
+          LOGGER.debug("  AIP doesn't need to be moved... Level: " + indexedAIP.getLevel());
         }
       } catch (RODAException e) {
-        LOGGER.error("Error processing SimpleDescriptionObject " + sdo.getId() + " (RemoveOrphansAction)");
+        LOGGER.error("Error processing AIP " + indexedAIP.getId() + " (RemoveOrphansAction)");
         LOGGER.error(e.getMessage(), e);
       }
     }
@@ -129,7 +127,7 @@ public class RemoveOrphansPlugin implements Plugin<SimpleDescriptionObject> {
   }
 
   @Override
-  public Plugin<SimpleDescriptionObject> cloneMe() {
+  public Plugin<IndexedAIP> cloneMe() {
     return new RemoveOrphansPlugin();
   }
 

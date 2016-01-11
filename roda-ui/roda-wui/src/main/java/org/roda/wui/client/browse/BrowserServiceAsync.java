@@ -21,6 +21,7 @@ import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RODAException;
 import org.roda.core.data.v2.IndexResult;
+import org.roda.core.data.v2.IndexedAIP;
 import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.JobReport;
 import org.roda.core.data.v2.PluginType;
@@ -43,7 +44,7 @@ public interface BrowserServiceAsync {
   void countDescriptiveMetadata(Filter filter, AsyncCallback<Long> callback);
 
   void findDescriptiveMetadata(Filter filter, Sorter sorter, Sublist sublist, Facets facets, String locale,
-    AsyncCallback<IndexResult<SimpleDescriptionObject>> callback);
+    AsyncCallback<IndexResult<IndexedAIP>> callback);
 
   void getItemBundle(String aipId, String localeString, AsyncCallback<BrowseItemBundle> callback);
 
@@ -58,7 +59,7 @@ public interface BrowserServiceAsync {
    * @return {@link SimpleDescriptionObject}
    * @throws RODAException
    */
-  public void getSimpleDescriptionObject(String pid, AsyncCallback<SimpleDescriptionObject> callback);
+  public void getIndexedAIP(String pid, AsyncCallback<IndexedAIP> callback);
 
   /**
    * Get description object
@@ -79,7 +80,7 @@ public interface BrowserServiceAsync {
    *         ends in the node itself
    * @throws RODAException
    */
-  public void getAncestors(SimpleDescriptionObject sdo, AsyncCallback<List<SimpleDescriptionObject>> callback);
+  public void getAncestors(IndexedAIP aip, AsyncCallback<List<IndexedAIP>> callback);
 
   void countDescriptiveMetadataBinaries(String aipId, AsyncCallback<Long> callback);
 
@@ -179,7 +180,7 @@ public interface BrowserServiceAsync {
   public void getPreservationTimeline(List<String> repPIDs, List<String> icons, List<String> colors, String locale,
     AsyncCallback<TimelineInfo> callback);
 
-  public void moveInHierarchy(String aipId, String parentId, AsyncCallback<SimpleDescriptionObject> callback);
+  public void moveInHierarchy(String aipId, String parentId, AsyncCallback<IndexedAIP> callback);
 
   void createAIP(String parentId, AsyncCallback<String> callback);
 

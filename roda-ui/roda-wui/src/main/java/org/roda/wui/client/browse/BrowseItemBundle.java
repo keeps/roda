@@ -10,15 +10,15 @@ package org.roda.wui.client.browse;
 import java.io.Serializable;
 import java.util.List;
 
+import org.roda.core.data.v2.IndexedAIP;
 import org.roda.core.data.v2.Representation;
-import org.roda.core.data.v2.SimpleDescriptionObject;
 
 public class BrowseItemBundle implements Serializable {
 
   private static final long serialVersionUID = 7901536603462531124L;
 
-  private SimpleDescriptionObject sdo;
-  private List<SimpleDescriptionObject> sdoAncestors;
+  private IndexedAIP aip;
+  private List<IndexedAIP> aipAncestors;
   private List<DescriptiveMetadataViewBundle> descriptiveMetadata;
   private PreservationMetadataBundle preservationMetadata;
   private List<Representation> representations;
@@ -28,23 +28,23 @@ public class BrowseItemBundle implements Serializable {
 
   }
 
-  public BrowseItemBundle(SimpleDescriptionObject sdo, List<SimpleDescriptionObject> sdoAncestors,
+  public BrowseItemBundle(IndexedAIP aip, List<IndexedAIP> aipAncestors,
     List<DescriptiveMetadataViewBundle> descriptiveMetadata, PreservationMetadataBundle preservationMetadata,
     List<Representation> representations) {
     super();
-    this.sdo = sdo;
-    this.setSdoAncestors(sdoAncestors);
+    this.aip = aip;
+    this.setAIPAncestors(aipAncestors);
     this.descriptiveMetadata = descriptiveMetadata;
     this.preservationMetadata = preservationMetadata;
     this.representations = representations;
   }
 
-  public SimpleDescriptionObject getSdo() {
-    return sdo;
+  public IndexedAIP getAip() {
+    return aip;
   }
 
-  public void setSdo(SimpleDescriptionObject sdo) {
-    this.sdo = sdo;
+  public void setAIP(IndexedAIP aip) {
+    this.aip = aip;
   }
 
   public List<DescriptiveMetadataViewBundle> getDescriptiveMetadata() {
@@ -71,12 +71,12 @@ public class BrowseItemBundle implements Serializable {
     this.representations = representations;
   }
 
-  public List<SimpleDescriptionObject> getSdoAncestors() {
-    return sdoAncestors;
+  public List<IndexedAIP> getAIPAncestors() {
+    return aipAncestors;
   }
 
-  public void setSdoAncestors(List<SimpleDescriptionObject> sdoAncestors) {
-    this.sdoAncestors = sdoAncestors;
+  public void setAIPAncestors(List<IndexedAIP> aipAncestors) {
+    this.aipAncestors = aipAncestors;
   }
 
 }

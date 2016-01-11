@@ -110,7 +110,8 @@
    <field name="dateCreated" type="tdate" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="dateModified" type="tdate" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="descriptiveMetadataId" type="string" indexed="true" stored="true" required="false" multiValued="true" /> 
-   <field name="representationId" type="string" indexed="true" stored="true" required="false" multiValued="true" /> 
+   <field name="representationId" type="string" indexed="true" stored="true" required="false" multiValued="true" />
+   <field name="hasRepresentations" type="boolean" default="false" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="permission.grant.users" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    <field name="permission.grant.groups" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    <field name="permission.read.users" type="string" indexed="true" stored="true" required="false" multiValued="true" />
@@ -121,6 +122,15 @@
    <field name="permission.modify.groups" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    <field name="permission.remove.users" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    <field name="permission.remove.groups" type="string" indexed="true" stored="true" required="false" multiValued="true" />
+   
+   <field name="level" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="title" type="text_general" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="title_sort" type="string" indexed="true" stored="false" required="false" multiValued="false" />
+   <field name="description" type="text_general" indexed="true" stored="true" required="false" multiValued="true" />
+   <field name="dateInitial" type="tdate" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="dateFinal" type="tdate" indexed="true" stored="true" required="false" multiValued="false" />
+
+   <field name="_all" type="text_general" indexed="true" stored="false" multiValued="true" />
 
    <!-- Dynamic field definitions allow using convention over configuration
        for fields via the specification of patterns to match field names. 
@@ -179,7 +189,8 @@
   <!-- copyField commands copy one field to another at the time a document
         is added to the index.  It's used either to index the same field differently,
         or to add multiple fields to the same field for easier/faster searching.  -->
-
+ <copyField source="title" dest="title_sort" />
+ <copyField source="*" dest="_all" />
     <!--
    <copyField source="title" dest="text"/>
    <copyField source="body" dest="text"/>
@@ -320,22 +331,28 @@
 	 removes stop words from case-insensitive "stopwords.txt"
 	 (empty by default), and down cases.  At query time only, it
 	 also applies synonyms. -->
-    <fieldType name="text_general" class="solr.TextField" positionIncrementGap="100">
-      <analyzer type="index">
-        <tokenizer class="solr.StandardTokenizerFactory"/>
-        <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt" />
-        <!-- in this example, we will only use synonyms at query time
-        <filter class="solr.SynonymFilterFactory" synonyms="index_synonyms.txt" ignoreCase="true" expand="false"/>
-        -->
-        <filter class="solr.LowerCaseFilterFactory"/>
-      </analyzer>
-      <analyzer type="query">
-        <tokenizer class="solr.StandardTokenizerFactory"/>
-        <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt" />
-        <filter class="solr.SynonymFilterFactory" synonyms="synonyms.txt" ignoreCase="true" expand="true"/>
-        <filter class="solr.LowerCaseFilterFactory"/>
-      </analyzer>
-    </fieldType>
+	<fieldType name="text_general" class="solr.TextField"
+		positionIncrementGap="100">
+		<analyzer type="index">
+			<tokenizer class="solr.StandardTokenizerFactory" />
+			<filter class="solr.ASCIIFoldingFilterFactory" />
+			<filter class="solr.StopFilterFactory" ignoreCase="true"
+				words="stopwords.txt" />
+			<!-- in this example, we will only use synonyms at query time <filter 
+				class="solr.SynonymFilterFactory" synonyms="index_synonyms.txt" ignoreCase="true" 
+				expand="false"/> -->
+			<filter class="solr.LowerCaseFilterFactory" />
+		</analyzer>
+		<analyzer type="query">
+			<tokenizer class="solr.StandardTokenizerFactory" />
+			<filter class="solr.ASCIIFoldingFilterFactory" />
+			<!-- <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt" 
+				/> -->
+			<!-- <filter class="solr.SynonymFilterFactory" synonyms="synonyms.txt" 
+				ignoreCase="true" expand="true"/> -->
+			<filter class="solr.LowerCaseFilterFactory" />
+		</analyzer>
+	</fieldType>
 
     <!-- A text field with defaults appropriate for English: it
          tokenizes with StandardTokenizer, removes English stop words

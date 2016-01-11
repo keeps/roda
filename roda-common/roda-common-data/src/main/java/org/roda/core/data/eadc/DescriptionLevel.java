@@ -10,7 +10,6 @@ package org.roda.core.data.eadc;
 import java.io.Serializable;
 
 import org.roda.core.data.common.InvalidDescriptionLevel;
-import org.roda.core.data.v2.SimpleDescriptionObject;
 
 /**
  * This is the description level of a {@link SimpleDescriptionObject}.
