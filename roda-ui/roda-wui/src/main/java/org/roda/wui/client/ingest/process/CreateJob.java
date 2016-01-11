@@ -235,6 +235,7 @@ public class CreateJob extends Composite {
 
   @UiHandler("buttonCreate")
   void buttonCreateHandler(ClickEvent e) {
+    buttonCreate.setEnabled(false);
     String jobName = this.name.getText();
     // TODO test if name is valid
     Job job = new Job();
@@ -259,6 +260,7 @@ public class CreateJob extends Composite {
         @Override
         public void onFailure(Throwable caught) {
           Toast.showError("Error", caught.getMessage());
+          buttonCreate.setEnabled(true);
         }
 
         @Override
@@ -281,11 +283,13 @@ public class CreateJob extends Composite {
           @Override
           public void onFailure(Throwable caught) {
             Toast.showError(caught.getMessage());
+            buttonCreate.setEnabled(true);
           }
 
           @Override
           public void onSuccess(Void result) {
             // do nothing
+            buttonCreate.setEnabled(true);
           }
         });
     }

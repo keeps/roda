@@ -439,7 +439,7 @@ public class ViewRepresentation extends Composite {
           Tools.concat(Browse.RESOLVER.getHistoryPath(), aipId)));
     ret.add(
       new BreadcrumbItem(getBreadcrumbLabel(representationType(rep), RodaConstants.VIEW_REPRESENTATION_REPRESENTATION),
-        Tools.concat(Browse.RESOLVER.getHistoryPath(), aipId, representationId)));
+        Tools.concat(ViewRepresentation.RESOLVER.getHistoryPath(), aipId, representationId)));
 
     if (simpleFile != null) {
       for (String folder : simpleFile.getPath()) {
