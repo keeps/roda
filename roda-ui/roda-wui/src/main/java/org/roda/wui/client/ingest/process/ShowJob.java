@@ -20,27 +20,23 @@ import org.roda.core.data.PluginParameter.PluginParameterType;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.Job.JOB_STATE;
-import org.roda.core.data.v2.JobReport;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.JobReportList;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.JavascriptUtils;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
@@ -57,6 +53,8 @@ import config.i18n.client.BrowseMessages;
  * 
  */
 public class ShowJob extends Composite {
+
+  private static final int PERIOD_MILLIS = 10000;
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
@@ -153,20 +151,9 @@ public class ShowJob extends Composite {
     creator.setText(job.getUsername());
     DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_FULL);
     dateStarted.setText(dateTimeFormat.format(job.getStartDate()));
-    JOB_STATE state = job.getState();
-    if (JOB_STATE.COMPLETED.equals(state) || JOB_STATE.FAILED_DURING_CREATION.equals(state)) {
-      // TODO different message for failure?
-      status.setText(messages.showJobStatusCompleted(job.getEndDate()));
-    } else if (JOB_STATE.CREATED.equals(state)) {
-      status.setText(messages.showJobStatusCreated());
-    } else if (JOB_STATE.STARTED.equals(state)) {
-      status.setText(messages.showJobStatusStarted(job.getCompletionPercentage()));
-    } else {
-      status.setText(state.toString());
-    }
+    updateStatus(job);
 
-    // TODO update this panel too
-    jobReports.autoUpdate(10000);
+    jobReports.autoUpdate(PERIOD_MILLIS);
 
     PluginInfo pluginInfo = pluginsInfo.get(job.getPlugin());
     plugin.setText(messages.pluginLabel(pluginInfo.getName(), pluginInfo.getVersion()));
@@ -185,6 +172,49 @@ public class ShowJob extends Composite {
       }
     }
 
+  }
+
+  private void updateStatus(final Job job) {
+    JOB_STATE state = job.getState();
+    if (JOB_STATE.COMPLETED.equals(state) || JOB_STATE.FAILED_DURING_CREATION.equals(state)) {
+      // TODO different message for failure?
+      status.setText(messages.showJobStatusCompleted(job.getEndDate()));
+    } else if (JOB_STATE.CREATED.equals(state)) {
+      status.setText(messages.showJobStatusCreated());
+    } else if (JOB_STATE.STARTED.equals(state)) {
+      status.setText(messages.showJobStatusStarted(job.getCompletionPercentage()));
+    } else {
+      status.setText(state.toString());
+    }
+
+    scheduleUpdateStatus(job);
+  }
+
+  private void scheduleUpdateStatus(final Job job) {
+    JOB_STATE state = job.getState();
+    if (!JOB_STATE.COMPLETED.equals(state) && !JOB_STATE.FAILED_DURING_CREATION.equals(state)) {
+      Timer scheduler = new Timer() {
+
+        @Override
+        public void run() {
+          BrowserService.Util.getInstance().retrieveJob(job.getId(), new AsyncCallback<Job>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+              Toast.showError(caught.getClass().getName(), caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(Job updatedJob) {
+              updateStatus(updatedJob);
+              scheduleUpdateStatus(updatedJob);
+            }
+          });
+        }
+
+      };
+      scheduler.schedule(PERIOD_MILLIS);
+    }
   }
 
   private void createBooleanLayout(PluginParameter parameter) {

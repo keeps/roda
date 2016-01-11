@@ -74,7 +74,7 @@ public final class HTMLUtils {
     throws ModelServiceException, TransformerException {
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
     return binaryToHtml(binary, descriptiveMetadataType, messages.getTranslations(
-      RodaConstants.I18N_CROSSWALKS_DISSEMINATION_HTML_PREFIX + binary.getStoragePath().getName(), Object.class, true));
+      RodaConstants.I18N_CROSSWALKS_DISSEMINATION_HTML_PREFIX + descriptiveMetadataType, Object.class, true));
   }
 
   public static String preservationObjectToHtml(Binary binary, final Locale locale)

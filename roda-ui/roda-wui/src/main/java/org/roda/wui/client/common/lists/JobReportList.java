@@ -91,7 +91,8 @@ public class JobReportList extends AsyncTableCell<JobReport> {
           if (objId != null) {
             // TODO externalise to messages
             b.append(SafeHtmlUtils.fromSafeConstant("<div class='job-report-object-input'>"));
-            b.append(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-sign-in'></i>"));
+            // b.append(SafeHtmlUtils.fromSafeConstant("<i class='fa
+            // fa-sign-in'></i>"));
             // TODO escape URI
             b.append(SafeHtmlUtils.fromSafeConstant("<a href='#ingest/transfer/" + objId + "'>"));
             b.append(SafeHtmlUtils.fromString(objId));
@@ -102,7 +103,9 @@ public class JobReportList extends AsyncTableCell<JobReport> {
           String aipId = jobReport.getAipId();
           if (aipId != null) {
             b.append(SafeHtmlUtils.fromSafeConstant("<div class='job-report-object-output'>"));
-            b.append(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-sign-out'></i>"));
+            // b.append(SafeHtmlUtils.fromSafeConstant("<i class='fa
+            // fa-sign-out'></i>"));
+            b.append(SafeHtmlUtils.fromSafeConstant("<span class='job-report-object-output-icon'>&#10551;</span>"));
             String aipBrowseLink = Tools.createHistoryHashLink(Browse.getViewItemHistoryToken(jobReport.getAipId()));
             b.append(SafeHtmlUtils.fromSafeConstant("<a href='" + aipBrowseLink + "'>"));
             b.append(SafeHtmlUtils.fromString(aipId));

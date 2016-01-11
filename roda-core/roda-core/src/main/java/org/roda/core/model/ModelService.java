@@ -134,7 +134,7 @@ public class ModelService extends ModelObservable {
     try {
       storage.createContainer(DefaultStoragePath.parse(containerName), new HashMap<String, Set<String>>());
     } catch (AlreadyExistsException e) {
-      LOGGER.error("Error initializing container: " + containerName, e);
+      // do nothing
     }
   }
 

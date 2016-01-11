@@ -2199,6 +2199,27 @@
 }
 
 /**********************************************
+				Show Job
+************************************************/
+.job-report-object-input a {
+	color: inherit;
+}
+
+.job-report-object-output {
+	margin-top: -5px;
+}
+
+.job-report-object-output .job-report-object-output-icon {
+	line-height: 1.1rem;
+}
+
+.job-report-object-output a {
+	font-size: 1.1rem;
+    line-height: 1.1rem;
+}
+
+
+/**********************************************
 				PRESERVATION EVENTS
 ************************************************/
 .preservationEvents .preservationMetadata .representation .header {
