@@ -117,9 +117,9 @@ public class BasicSearch extends Composite {
   @UiField(provided = true)
   AIPList searchResultPanel;
 
-  // ADVANCED SEARCH
-  @UiField
-  DisclosurePanel searchAdvancedDisclosure;
+//  // ADVANCED SEARCH
+//  @UiField
+//  DisclosurePanel searchAdvancedDisclosure;
 
   @UiField
   FlowPanel searchAdvancedFieldsPanel;
@@ -201,6 +201,9 @@ public class BasicSearch extends Composite {
       }
 
     };
+    
+    inputDateInitial.getElement().setPropertyString("placeholder", messages.sidebarFilterFromDate());
+    inputDateFinal.getElement().setPropertyString("placeholder", messages.sidebarFilterToDatePlaceHolder());
 
     inputDateInitial.setFormat(dateFormat);
     inputDateInitial.getDatePicker().setYearArrowsVisible(true);

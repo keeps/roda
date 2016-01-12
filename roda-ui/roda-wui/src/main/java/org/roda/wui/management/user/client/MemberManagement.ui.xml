@@ -20,9 +20,6 @@
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel>
-					<g:Label addStyleNames="h4">
-						<ui:msg>Filters</ui:msg>
-					</g:Label>
 					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
 						<g:Label addStyleNames="h5 sidebar-facet-title">
 							<ui:msg>Status</ui:msg>

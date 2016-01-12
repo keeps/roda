@@ -90,11 +90,29 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("Filters")
   String sidebarFiltersTitle();
   
+  @DefaultMessage("Dates")
+  String sidebarFilterDates();
+  
   @DefaultMessage("From date")
   String sidebarFilterFromDate();
   
   @DefaultMessage("To date")
   String sidebarFilterToDate();
+  
+  @DefaultMessage("From date")
+  String sidebarFilterFromDatePlaceHolder();
+  
+  @DefaultMessage("To date")
+  String sidebarFilterToDatePlaceHolder();
+  
+  @DefaultMessage("Folders and files")
+  String sidebarFoldersFilesTitle();
+  
+  @DefaultMessage("Process")
+  String sidebarProcessTitle();
+  
+  @DefaultMessage("Ingest")
+  String sidebarIngestTitle();
   
   @DefaultMessage("Actions")
   String sidebarActionsTitle();
@@ -142,13 +160,13 @@ public interface BrowseMessages extends Messages {
   @AlternateMessage({"one", "One file, {1}"})
   String downloadRepresentationInfo(@PluralCount int numberOfFiles, String readableFileSize);
 
-  @DefaultMessage("Original and normalized document")
+  @DefaultMessage("Original")
   SafeHtml downloadTitleOriginalAndNormalized();
 
-  @DefaultMessage("Original document")
+  @DefaultMessage("Original")
   SafeHtml downloadTitleOriginal();
 
-  @DefaultMessage("Normalized document")
+  @DefaultMessage("Normalized")
   SafeHtml downloadTitleNormalized();
 
   @DefaultMessage("Document")
@@ -195,22 +213,22 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("Successfully removed {0} items")
   String ingestTransferRemoveSuccessMessage(int size);
 
-  @DefaultMessage("Upload files")
+  @DefaultMessage("Upload")
   String ingestTransferButtonUploadFiles();
 
-  @DefaultMessage("Create sub-folder")
+  @DefaultMessage("New folder")
   String ingestTransferButtonCreateFolder();
 
-  @DefaultMessage("Remove folder")
+  @DefaultMessage("Remove")
   String ingestTransferButtonRemoveWholeFolder();
 
-  @DefaultMessage("Remove selected")
+  @DefaultMessage("Remove")
   String ingestTransferButtonRemoveSelectedItems();
 
-  @DefaultMessage("Ingest folder")
+  @DefaultMessage("Process")
   String ingestTransferButtonIngestWholeFolder();
 
-  @DefaultMessage("Ingest selected")
+  @DefaultMessage("Process")
   String ingestTransferButtonIngestSelectedItems();
 
   @DefaultMessage("Producers")
@@ -230,6 +248,26 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("Please select a name for your new folder")
   String ingestTransferCreateFolderMessage();
+
+  /***** CREATE PROCESS JOB *********/
+  
+  @DefaultMessage("New ingest process")
+  String createJobTitle();
+  
+  @DefaultMessage("Name")
+  String createJobName();
+  
+  @DefaultMessage("Selected submission information packages (SIP)")
+  String createJobSelectedSIP();
+  
+  @DefaultMessage("Ingest workflow")
+  String createJobIngestWorkflow();
+  
+  @DefaultMessage("Create")
+  String createJobCreateTitle();
+  
+  @DefaultMessage("Cancel")
+  String createJobCancelTitle();
   
   /****** INGEST TRANSFER UPLOAD *********/
   

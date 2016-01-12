@@ -281,6 +281,10 @@ pre>code {
 	content: "\f019";
 }
 
+.btn-view:after {
+	content: "\f01d";
+}
+
 .btn-clock:after {
 	content: "\f017";
 }
@@ -515,9 +519,9 @@ td.datePickerMonth, td.datePickerYear {
 
 /** Sidebar **/
 .sidebar-facet-title {
-	color: #666;
-	font-weight: 200;
+	color: inherit;
 	margin-bottom: 5px;
+	font-size: 1.8rem;
 }
 
 .sidebar-facet-label {
@@ -529,6 +533,17 @@ td.datePickerMonth, td.datePickerYear {
 
 .sidebar-facet-input {
 	padding: 2px;
+}
+
+.sidebar-facet-input-date {
+	width: 40%;
+}
+
+.sidebar-facet-date-separator {
+	display: inline-block;
+	margin-left: 2px;
+	margin-right: 2px;
+	color: #999;
 }
 
 .sidebar-facet-panel.facet-empty {

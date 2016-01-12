@@ -1763,6 +1763,7 @@
 
 .searchPanel {
 	margin-right: 40px;
+	height: 40px;
 }
 
 .searchPanelLeft {
@@ -1777,7 +1778,6 @@
 	line-height: 4rem;
 	font-size: 2rem;
 	border: none;
-	border-radius: 2px;
 	padding: 0 1rem;
 	background-color: #eee;
 }

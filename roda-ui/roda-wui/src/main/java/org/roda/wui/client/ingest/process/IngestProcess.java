@@ -48,6 +48,8 @@ import com.google.gwt.user.datepicker.client.DateBox.DefaultFormat;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 
+import config.i18n.client.BrowseMessages;
+
 /**
  * @author Luis Faria
  * 
@@ -95,6 +97,8 @@ public class IngestProcess extends Composite {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+  
+  private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   @UiField(provided = true)
   JobList jobList;
@@ -120,6 +124,7 @@ public class IngestProcess extends Composite {
 
     Filter filter = null;
 
+    @SuppressWarnings("deprecation")
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.SIP_REPORT_STATE),
       new SimpleFacetParameter(RodaConstants.SIP_REPORT_USERNAME));
 
@@ -143,6 +148,9 @@ public class IngestProcess extends Composite {
       }
 
     };
+    
+    inputDateInitial.getElement().setPropertyString("placeholder", messages.sidebarFilterFromDate());
+    inputDateFinal.getElement().setPropertyString("placeholder", messages.sidebarFilterToDatePlaceHolder());
 
     inputDateInitial.setFormat(dateFormat);
     inputDateInitial.getDatePicker().setYearArrowsVisible(true);

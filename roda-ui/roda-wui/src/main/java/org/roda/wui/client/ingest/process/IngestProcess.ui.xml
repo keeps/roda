@@ -48,10 +48,7 @@
 				<lists:JobList ui:field="jobList" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
-				<g:FlowPanel>
-					<g:Label addStyleNames="h4">
-						<ui:text from='{messages.sidebarFiltersTitle}' />
-					</g:Label>
+				<g:FlowPanel styleName="sidebar-group">
 					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
 						<g:Label addStyleNames="h5 sidebar-facet-title">
 							State
@@ -67,14 +64,12 @@
 					<!-- <g:Label addStyleNames="{style.other-producer-label}">Other producer:</g:Label> 
 						<g:TextBox addStyleNames="fieldTextBox {style.other-producer-input}" /> -->
 					<g:Label addStyleNames="h5 sidebar-facet-title">
-						<ui:text from='{messages.sidebarFilterFromDate}' />
+						<ui:text from='{messages.sidebarFilterDates}' />
 					</g:Label>
-					<d:DateBox addStyleNames="sidebar-facet-input fieldTextBox"
+					<d:DateBox addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date"
 						ui:field="inputDateInitial" />
-					<g:Label addStyleNames="h5 sidebar-facet-title">
-						<ui:text from='{messages.sidebarFilterToDate}' />
-					</g:Label>
-					<d:DateBox addStyleNames="sidebar-facet-input fieldTextBox"
+					<g:Label addStyleNames="sidebar-facet-date-separator">-</g:Label>
+					<d:DateBox addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date"
 						ui:field="inputDateFinal" />
 				</g:FlowPanel>
 				<g:FlowPanel>

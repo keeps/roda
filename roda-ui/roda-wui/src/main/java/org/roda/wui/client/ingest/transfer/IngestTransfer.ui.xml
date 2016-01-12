@@ -52,9 +52,6 @@
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel ui:field="filtersPanel">
-					<g:Label addStyleNames="h4">
-						<ui:text from='{messages.sidebarFiltersTitle}' />
-					</g:Label>
 					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
 						<g:Label addStyleNames="h5 sidebar-facet-title">
 							<ui:text from='{messages.ingestTransferFilterProducers}' />
@@ -64,7 +61,7 @@
 				</g:FlowPanel>
 				<g:FlowPanel>
 					<g:Label addStyleNames="h4">
-						<ui:text from='{messages.sidebarActionsTitle}' />
+						<ui:text from='{messages.sidebarFoldersFilesTitle}' />
 					</g:Label>
 					<g:Button addStyleNames="btn btn-upload" ui:field="uploadFiles">
 						<ui:text from='{messages.ingestTransferButtonUploadFiles}' />
@@ -75,6 +72,11 @@
 					<g:Button addStyleNames="btn btn-ban" ui:field="remove">
 						<ui:text from='{messages.ingestTransferButtonRemoveWholeFolder}' />
 					</g:Button>
+				</g:FlowPanel>
+				<g:FlowPanel>
+					<g:Label addStyleNames="h4">
+						<ui:text from='{messages.sidebarIngestTitle}' />
+					</g:Label>
 					<g:Button addStyleNames="btn btn-play" ui:field="startIngest">
 						<ui:text from='{messages.ingestTransferButtonIngestWholeFolder}' />
 					</g:Button>

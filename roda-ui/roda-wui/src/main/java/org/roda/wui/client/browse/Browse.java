@@ -44,6 +44,7 @@ import org.roda.wui.common.client.widgets.Toast;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -498,7 +499,7 @@ public class Browse extends Composite {
       sidebarData.setVisible(representations.size() > 0);
 
       for (Representation rep : representations) {
-        downloadList.add(createRepresentationDownloadPanel(rep));
+        downloadList.add(createRepresentationDownloadButton(rep));
       }
 
       if (!preservationMetadata.getRepresentationsMetadata().isEmpty()) {
@@ -586,6 +587,7 @@ public class Browse extends Composite {
     return breadcrumbLabel;
   }
 
+  @SuppressWarnings("unused")
   private Widget createRepresentationDownloadPanel(Representation rep) {
     FlowPanel downloadPanel = new FlowPanel();
     HTML icon = new HTML(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-download'></i>"));
@@ -622,6 +624,38 @@ public class Browse extends Composite {
     label.addStyleName("browseDownloadLabel");
     subLabel.addStyleName("browseDownloadSublabel");
     return downloadPanel;
+  }
+
+  private Widget createRepresentationDownloadButton(Representation rep) {
+    Button downloadButton = new Button();
+    final String aipId = rep.getAipId();
+    final String repId = rep.getId();
+
+    SafeHtml labelText;
+    Set<RepresentationState> statuses = rep.getStatuses();
+    if (statuses.containsAll(Arrays.asList(RepresentationState.ORIGINAL, RepresentationState.NORMALIZED))) {
+      labelText = messages.downloadTitleOriginalAndNormalized();
+    } else if (statuses.contains(RepresentationState.ORIGINAL)) {
+      labelText = messages.downloadTitleOriginal();
+    } else if (statuses.contains(RepresentationState.NORMALIZED)) {
+      labelText = messages.downloadTitleNormalized();
+    } else {
+      labelText = messages.downloadTitleDefault();
+    }
+
+    downloadButton.setText(labelText.asString());
+
+    downloadButton.addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        Tools.newHistory(Tools.concat(ViewRepresentation.RESOLVER.getHistoryPath(), aipId, repId));
+      }
+    });
+
+    downloadButton.addStyleName("btn btn-view");
+
+    return downloadButton;
   }
 
   private void getDescriptiveMetadataHTML(final String aipId, final String descId,
