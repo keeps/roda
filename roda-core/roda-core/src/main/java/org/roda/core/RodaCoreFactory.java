@@ -87,6 +87,7 @@ import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.IndexedAIP;
 import org.roda.core.data.v2.RODAMember;
 import org.roda.core.data.v2.RepresentationFilePreservationObject;
+import org.roda.core.data.v2.SimpleFile;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.data.v2.User;
 import org.roda.core.index.IndexFolderObserver;
@@ -1067,7 +1068,7 @@ public class RodaCoreFactory {
   private static void printMainUsage() {
     System.err.println("Syntax:");
     System.err.println("java -jar x.jar index reindex");
-    System.err.println("java -jar x.jar index list users|groups|sips");
+    System.err.println("java -jar x.jar index list users|groups|sips|file");
     System.err.println("java -jar x.jar orphans [newParentID]");
     System.err.println("java -jar x.jar fixity");
     System.err.println("java -jar x.jar antivirus");
@@ -1117,6 +1118,17 @@ public class RodaCoreFactory {
     System.out.println("Total number of SIPs: " + countSIP);
   }
 
+  private static void printFiles(Sorter sorter, Sublist sublist, Facets facets)
+    throws GenericException, RequestNotValidException {
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_SEARCH, "OLA-OLÁ-1234-XXXX_K"));
+    IndexResult<SimpleFile> res = index.find(SimpleFile.class, filter, sorter, sublist);
+
+    for (SimpleFile sf : res.getResults()) {
+      System.out.println(sf.toString());
+    }
+
+  }
+
   private static void printPreservationEvents(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
     throws GenericException, RequestNotValidException {
     index.find(EventPreservationObject.class, filter, sorter, sublist, facets);
@@ -1145,6 +1157,8 @@ public class RodaCoreFactory {
         printIndexMembers(args, filter, null, new Sublist(0, 10000), null);
       } else if ("list".equals(args.get(1)) && ("sips".equals(args.get(2)))) {
         printCountSips(null, new Sublist(0, 10000), null);
+      } else if ("list".equals(args.get(1)) && ("file".equals(args.get(2)))) {
+        printFiles(null, new Sublist(0, 10000), null);
       } else if ("reindex".equals(args.get(1)) && args.size() == 2) {
         runReindexAipsPlugin();
       } else if ("reindex".equals(args.get(1)) && args.size() >= 3) {

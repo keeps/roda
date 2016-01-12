@@ -396,6 +396,12 @@ public final class RodaConstants {
   public static final String FILE_ISFILE = "isFile";
   public static final String FILE_PRONOM = "formatPronom";
   public static final String FILE_EXTENSION = "extension";
+  public static final String FILE_CREATING_APPLICATION_NAME = "creatingApplicationName";
+  public static final String FILE_CREATING_APPLICATION_VERSION = "creatingApplicationVersion";
+  public static final String FILE_DATE_CREATED_BY_APPLICATION = "dateCreatedByApplication";
+  public static final String FILE_HASH = "hash";
+  public static final String FILE_FULLTEXT = "fulltext";
+  public static final String FILE_SEARCH = "search";
 
   public static final String REPORT_ATTR_AIP_ID = "aip.id";
   public static final String REPORT_ATTR_DATETIME = "datetime";
@@ -410,5 +416,4 @@ public final class RodaConstants {
   public static final String VIEW_REPRESENTATION_REPRESENTATION = "representation";
   public static final String VIEW_REPRESENTATION_FOLDER = "folder";
   public static final String VIEW_REPRESENTATION_FILE = "file";
-
 }

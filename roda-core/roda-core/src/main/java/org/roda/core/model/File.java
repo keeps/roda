@@ -8,6 +8,7 @@
 package org.roda.core.model;
 
 import java.io.Serializable;
+import java.util.List;
 
 import org.roda.core.data.v2.FileFormat;
 import org.roda.core.data.v2.SimpleFile;
@@ -19,8 +20,10 @@ public class File extends SimpleFile implements Serializable {
   private final StoragePath storagePath;
 
   public File(String id, String aipId, String representationId, boolean entryPoint, FileFormat fileFormat,
-    StoragePath storagePath, String originalName, long size, boolean isFile) {
-    super(id,aipId,representationId,entryPoint,fileFormat,originalName,size,isFile);
+    StoragePath storagePath, String originalName, long size, boolean isFile, String applicationName,
+    String applicationVersion, String dateCreatedByApplication, List<String> hash, String fulltext) {
+    super(id, aipId, representationId, entryPoint, fileFormat, originalName, size, isFile, applicationName,
+      applicationVersion, dateCreatedByApplication, hash, fulltext);
     this.storagePath = storagePath;
   }
 

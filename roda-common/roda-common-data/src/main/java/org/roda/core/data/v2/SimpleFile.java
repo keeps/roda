@@ -24,13 +24,19 @@ public class SimpleFile extends RODAObject {
   private String originalName = null;
   private long size = 0;
   private boolean isFile = false;
+  private String creatingApplicationName;
+  private String creatingApplicationVersion;
+  private String dateCreatedByApplication;
+  private List<String> hash;
+  private String fulltext;
 
   public SimpleFile() {
     super(null, null);
   }
 
   public SimpleFile(String id, String aipId, String representationId, boolean entryPoint, FileFormat fileFormat,
-    String originalName, long size, boolean isFile) {
+    String originalName, long size, boolean isFile, String creatingApplicationName, String creatingApplicationVersion,
+    String dateCreatedByApplication, List<String> hash, String fulltext) {
     super();
     this.id = id;
     this.aipId = aipId;
@@ -40,6 +46,51 @@ public class SimpleFile extends RODAObject {
     this.size = size;
     this.originalName = originalName;
     this.isFile = isFile;
+    this.creatingApplicationName = creatingApplicationName;
+    this.creatingApplicationVersion = creatingApplicationVersion;
+    this.dateCreatedByApplication = dateCreatedByApplication;
+    this.hash = hash;
+    this.fulltext = fulltext;
+  }
+
+  public String getFulltext() {
+    return fulltext;
+  }
+
+  public void setFulltext(String fulltext) {
+    this.fulltext = fulltext;
+  }
+
+  public String getCreatingApplicationName() {
+    return creatingApplicationName;
+  }
+
+  public void setCreatingApplicationName(String creatingApplicationName) {
+    this.creatingApplicationName = creatingApplicationName;
+  }
+
+  public String getCreatingApplicationVersion() {
+    return creatingApplicationVersion;
+  }
+
+  public void setCreatingApplicationVersion(String creatingApplicationVersion) {
+    this.creatingApplicationVersion = creatingApplicationVersion;
+  }
+
+  public String getDateCreatedByApplication() {
+    return dateCreatedByApplication;
+  }
+
+  public void setDateCreatedByApplication(String dateCreatedByApplication) {
+    this.dateCreatedByApplication = dateCreatedByApplication;
+  }
+
+  public List<String> getHash() {
+    return hash;
+  }
+
+  public void setHash(List<String> hash) {
+    this.hash = hash;
   }
 
   public boolean isFile() {
@@ -104,7 +155,7 @@ public class SimpleFile extends RODAObject {
   @Override
   public String toString() {
     return "File [id=" + id + ", aipId=" + aipId + ", representationId=" + representationId + ", entryPoint="
-      + entryPoint + ", fileFormat=" + fileFormat + "]";
+      + entryPoint + ", fileFormat=" + fileFormat + ",originalName=" + originalName + "]";
   }
 
   @Override

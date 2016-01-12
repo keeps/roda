@@ -166,9 +166,6 @@ public class SiegfriedPlugin implements Plugin<AIP> {
                   if (fileName.contains(".")) {
                     extension = fileName.substring(fileName.lastIndexOf('.'));
                   }
-
-                  System.out.println(fileName + " - " + pronom + " - " + mime);
-
                   try {
                     org.roda.core.model.File f = model.retrieveFile(aip.getId(), representationID, fileName);
                     FileFormat ff = new org.roda.core.data.v2.FileFormat();
@@ -178,6 +175,7 @@ public class SiegfriedPlugin implements Plugin<AIP> {
                     ff.setExtension(extension);
                     f.setFileFormat(ff);
                     f.setSize(fileSize);
+                    f.setOriginalName(fileName);
                     updatedFiles.add(f);
                   } catch (RequestNotValidException | AuthorizationDeniedException e) {
                     LOGGER.error("Error retrieving file: " + e.getMessage(), e);

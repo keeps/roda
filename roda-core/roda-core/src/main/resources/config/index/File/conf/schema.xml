@@ -117,10 +117,29 @@
    <!-- <field name="storagePath" type="string" indexed="true" stored="true" required="false" multiValued="false" /> -->
    <field name="isEntryPoint" type="boolean" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="fileFormat" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
-   <field name="originalName" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
+   <field name="originalName" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="size" type="long" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="isFile" type="boolean" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="extension" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
+   <field name="fulltext" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
+   <field name="creatingApplicationName" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
+   <field name="creatingApplicationVersion" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
+   <field name="dateCreatedByApplication" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
+   <field name="hash" type="string" indexed="true" stored="true" required="false" multiValued="true" /> 
+   <field name="search" type="search" indexed="true" stored="false" required="false" multiValued="true" />
+   
+   <defaultSearchField>search</defaultSearchField>
+   <copyField source="fulltext" dest="search"/>
+   <copyField source="formatMimetype" dest="search"/>
+   <copyField source="originalName" dest="search"/>
+   <copyField source="extension" dest="search"/>
+   <copyField source="formatPronom" dest="search"/>
+   <copyField source="fileFormat" dest="search"/>
+   <copyField source="creatingApplicationName" dest="search"/>
+   <copyField source="creatingApplicationVersion" dest="search"/>
+   <copyField source="dateCreatedByApplication" dest="search"/>
+   <copyField source="hash" dest="search"/>
+   
    
    <!-- Dynamic field definitions allow using convention over configuration
        for fields via the specification of patterns to match field names. 
@@ -542,4 +561,17 @@
    -->
     <fieldType name="currency" class="solr.CurrencyField" precisionStep="8" defaultCurrency="USD" currencyConfig="currency.xml" />
 
+   <fieldType name="search" class="solr.TextField" positionIncrementGap="100">
+      <analyzer type="index">
+         <tokenizer class="solr.PatternTokenizerFactory" pattern="[^\p{L}\p{N}]+"/>
+         <filter class="solr.LowerCaseFilterFactory"/>
+         <filter class="solr.ASCIIFoldingFilterFactory"/>
+      </analyzer>
+      <analyzer type="query">
+         <tokenizer class="solr.PatternTokenizerFactory" pattern="[^\p{L}\p{N}]+"/>
+         <filter class="solr.LowerCaseFilterFactory"/>
+         <filter class="solr.ASCIIFoldingFilterFactory"/>
+      </analyzer>
+   </fieldType>
+   
 </schema>

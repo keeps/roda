@@ -1416,26 +1416,37 @@ public class SolrUtils {
       file.getFileFormat().getExtension() != null ? file.getFileFormat().getExtension() : "");
     // FIXME how to index format registries if any
     doc.addField(RodaConstants.FILE_FILEFORMAT, "");
+    doc.addField(RodaConstants.FILE_FULLTEXT, file.getFulltext());
     return doc;
   }
 
   public static SimpleFile solrDocumentToFile(SolrDocument doc) {
-    String aipId = objectToString(doc.get(RodaConstants.FILE_AIPID));
-    String fileId = objectToString(doc.get(RodaConstants.FILE_FILEID));
-    boolean entryPoint = objectToBoolean(doc.get(RodaConstants.FILE_ISENTRYPOINT));
-    String mimetype = objectToString(doc.get(RodaConstants.FILE_FORMAT_MIMETYPE));
-    String pronom = objectToString(doc.get(RodaConstants.FILE_PRONOM));
-    LOGGER.error("solrDocumentToFile " + mimetype);
-    String version = objectToString(doc.get(RodaConstants.FILE_FORMAT_VERSION));
-    String representationId = objectToString(doc.get(RodaConstants.FILE_REPRESENTATIONID));
-    String originalName = objectToString(doc.get(RodaConstants.FILE_ORIGINALNAME));
-    long size = objectToLong(doc.get(RodaConstants.FILE_SIZE));
-    boolean isFile = objectToBoolean(doc.get(RodaConstants.FILE_ISFILE));
-    // FIXME how to restore format registries
-    //
-    FileFormat fileFormat = new FileFormat(mimetype, version, pronom, new HashMap<String, String>());
-    SimpleFile file = new SimpleFile(fileId, aipId, representationId, entryPoint, fileFormat, originalName, size,
-      isFile);
+    SimpleFile file = null;
+    try {
+      String aipId = objectToString(doc.get(RodaConstants.FILE_AIPID));
+      String fileId = objectToString(doc.get(RodaConstants.FILE_FILEID));
+      boolean entryPoint = objectToBoolean(doc.get(RodaConstants.FILE_ISENTRYPOINT));
+      String mimetype = objectToString(doc.get(RodaConstants.FILE_FORMAT_MIMETYPE));
+      String pronom = objectToString(doc.get(RodaConstants.FILE_PRONOM));
+      String version = objectToString(doc.get(RodaConstants.FILE_FORMAT_VERSION));
+      String representationId = objectToString(doc.get(RodaConstants.FILE_REPRESENTATIONID));
+      String originalName = objectToString(doc.get(RodaConstants.FILE_ORIGINALNAME));
+      String applicationName = objectToString(doc.get(RodaConstants.FILE_CREATING_APPLICATION_NAME));
+      String applicationVersion = objectToString(doc.get(RodaConstants.FILE_CREATING_APPLICATION_VERSION));
+      String dateCreatedByApplication = objectToString(doc.get(RodaConstants.FILE_DATE_CREATED_BY_APPLICATION));
+      List<String> hash = objectToListString(doc.get(RodaConstants.FILE_HASH));
+      String fullText = objectToString(doc.get(RodaConstants.FILE_FULLTEXT));
+
+      long size = objectToLong(doc.get(RodaConstants.FILE_SIZE));
+      boolean isFile = objectToBoolean(doc.get(RodaConstants.FILE_ISFILE));
+      // FIXME how to restore format registries
+      //
+      FileFormat fileFormat = new FileFormat(mimetype, version, pronom, new HashMap<String, String>());
+      file = new SimpleFile(fileId, aipId, representationId, entryPoint, fileFormat, originalName, size, isFile,
+        applicationName, applicationVersion, dateCreatedByApplication, hash, fullText);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
     return file;
   }
 
