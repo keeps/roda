@@ -692,7 +692,9 @@ public class SolrUtils {
   // TODO: Handle SimpleRepresentationPreservationMetadata
   private static <T> String getIndexName(Class<T> resultClass) throws GenericException {
     String indexName;
-    if (resultClass.equals(IndexedAIP.class)) {
+    if (resultClass.equals(AIP.class)) {
+      indexName = RodaConstants.INDEX_AIP;
+    } else if (resultClass.equals(IndexedAIP.class)) {
       indexName = RodaConstants.INDEX_AIP;
     } else if (resultClass.equals(Representation.class)) {
       indexName = RodaConstants.INDEX_REPRESENTATION;
@@ -726,7 +728,9 @@ public class SolrUtils {
 
   private static <T> T solrDocumentTo(Class<T> resultClass, SolrDocument doc) throws GenericException {
     T ret;
-    if (resultClass.equals(IndexedAIP.class)) {
+    if (resultClass.equals(AIP.class)) {
+      ret = resultClass.cast(solrDocumentToAIP(doc));
+    } else if (resultClass.equals(IndexedAIP.class)) {
       ret = resultClass.cast(solrDocumentToIndexAIP(doc));
     } else if (resultClass.equals(Representation.class)) {
       ret = resultClass.cast(solrDocumentToRepresentation(doc));
@@ -734,8 +738,8 @@ public class SolrUtils {
       ret = resultClass.cast(solrDocumentToLogEntry(doc));
     } else if (resultClass.equals(JobReport.class)) {
       ret = resultClass.cast(solrDocumentToJobReport(doc));
-    } else
-      if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class) || resultClass.equals(Group.class)) {
+    } else if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class)
+      || resultClass.equals(Group.class)) {
       ret = resultClass.cast(solrDocumentToRodaMember(doc));
     } else if (resultClass.equals(RepresentationFilePreservationObject.class)) {
       ret = resultClass.cast(solrDocumentToRepresentationFilePreservationObject(doc));
@@ -804,6 +808,28 @@ public class SolrUtils {
   public static <T extends Serializable> Long count(SolrClient index, Class<T> classToRetrieve, Filter filter)
     throws GenericException, RequestNotValidException {
     return find(index, classToRetrieve, filter, null, new Sublist(0, 0)).getTotalCount();
+  }
+
+  public static AIP solrDocumentToAIP(SolrDocument doc) {
+    final String id = objectToString(doc.get(RodaConstants.AIP_ID));
+    final Boolean active = objectToBoolean(doc.get(RodaConstants.AIP_ACTIVE));
+    final String parentId = objectToString(doc.get(RodaConstants.AIP_PARENT_ID));
+    final Date dateCreated = objectToDate(doc.get(RodaConstants.AIP_DATE_CREATED));
+    final Date dateModified = objectToDate(doc.get(RodaConstants.AIP_DATE_MODIFIED));
+    final List<String> descriptiveMetadataFileIds = objectToListString(
+      doc.get(RodaConstants.AIP_DESCRIPTIVE_METADATA_ID));
+    final List<String> representationIds = objectToListString(doc.get(RodaConstants.AIP_REPRESENTATION_ID));
+
+    RODAObjectPermissions permissions = getPermissions(doc);
+
+    // FIXME this information is not being recorded. passing by empty
+    // collections for easier processing
+    final Map<String, List<String>> preservationRepresentationObjectsIds = new HashMap<String, List<String>>();
+    final Map<String, List<String>> preservationEventsIds = new HashMap<String, List<String>>();
+    final Map<String, List<String>> preservationFileObjectsIds = new HashMap<String, List<String>>();
+
+    return new AIP(id, parentId, active, dateCreated, dateModified, permissions, descriptiveMetadataFileIds,
+      representationIds, preservationRepresentationObjectsIds, preservationEventsIds, preservationFileObjectsIds);
   }
 
   // FIXME see how to handle active and all the other that are not being put in
@@ -1368,7 +1394,8 @@ public class SolrUtils {
     doc.addField(RodaConstants.JOB_PLUGIN_PARAMETERS, ModelUtils.getJsonFromObject(job.getPluginParameters()));
     doc.addField(RodaConstants.JOB_ORCHESTRATOR_METHOD, job.getOrchestratorMethod());
     doc.addField(RodaConstants.JOB_OBJECT_IDS, job.getObjectIds());
-    doc.addField(RodaConstants.JOB_OBJECT_IDS_TO_AIP_IDS, ModelUtils.getJsonFromObject(job.getObjectIdsToAipIds()));
+    doc.addField(RodaConstants.JOB_OBJECT_IDS_TO_AIP_REPORT,
+      ModelUtils.getJsonFromObject(job.getObjectIdsToAipReport()));
 
     return doc;
   }
@@ -1389,8 +1416,8 @@ public class SolrUtils {
     job.setOrchestratorMethod(
       ORCHESTRATOR_METHOD.valueOf(objectToString(doc.get(RodaConstants.JOB_ORCHESTRATOR_METHOD))));
     job.setObjectIds(objectToListString(doc.get(RodaConstants.JOB_OBJECT_IDS)));
-    job.setObjectIdsToAipIds(
-      ModelUtils.getJobReportsFromJson(objectToString(doc.get(RodaConstants.JOB_OBJECT_IDS_TO_AIP_IDS))));
+    job.setObjectIdsToAipReport(
+      ModelUtils.getJobReportsFromJson(objectToString(doc.get(RodaConstants.JOB_OBJECT_IDS_TO_AIP_REPORT))));
 
     return job;
   }

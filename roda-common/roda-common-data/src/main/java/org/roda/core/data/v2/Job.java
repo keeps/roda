@@ -64,7 +64,7 @@ public class Job implements Serializable {
   private ORCHESTRATOR_METHOD orchestratorMethod = null;
   // list of object ids to act upon
   private List<String> objectIds = new ArrayList<String>();
-  // map between object ids and aip ids
+  // map between object ids and aip report
   private Map<String, Report> objectIdsToAipReport = new HashMap<String, Report>();
 
   // report id
@@ -90,7 +90,7 @@ public class Job implements Serializable {
     this.pluginParameters = new HashMap<String, String>(job.getPluginParameters());
     this.orchestratorMethod = job.getOrchestratorMethod();
     this.objectIds = new ArrayList<String>(job.getObjectIds());
-    this.objectIdsToAipReport = new HashMap<>(job.getObjectIdsToAipIds());
+    this.objectIdsToAipReport = new HashMap<>(job.getObjectIdsToAipReport());
   }
 
   public String getId() {
@@ -193,12 +193,12 @@ public class Job implements Serializable {
     return this;
   }
 
-  public Map<String, Report> getObjectIdsToAipIds() {
+  public Map<String, Report> getObjectIdsToAipReport() {
     return objectIdsToAipReport;
   }
 
-  public void setObjectIdsToAipIds(Map<String, Report> objectIdsToAipIds) {
-    this.objectIdsToAipReport = objectIdsToAipIds;
+  public void setObjectIdsToAipReport(Map<String, Report> objectIdsToAipReport) {
+    this.objectIdsToAipReport = objectIdsToAipReport;
   }
 
   public PluginType getPluginType() {
@@ -208,11 +208,6 @@ public class Job implements Serializable {
   public Job setPluginType(PluginType pluginType) {
     this.pluginType = pluginType;
     return this;
-  }
-
-  public void addObjectIdToAipIdMapping(String objectId, String aipId) {
-    // FIXME
-    // getObjectIdsToAipIds().put(objectId, aipId);
   }
 
   @Override
