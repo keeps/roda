@@ -63,7 +63,6 @@ public class ShowJob extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      GWT.log("Show job: " + historyTokens);
       if (historyTokens.size() == 1) {
         String jobId = historyTokens.get(0);
         BrowserService.Util.getInstance().retrieveJobBundle(jobId, new AsyncCallback<JobBundle>() {

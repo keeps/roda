@@ -674,59 +674,6 @@ public class Browse extends Composite {
     }
   }
 
-  // private void getPreservationMetadataHTML(final String aipId, final String
-  // repId,
-  // final AsyncCallback<SafeHtml> callback) {
-  // String uri = RestUtils.createPreservationMetadataHTMLUri(aipId, repId, 0,
-  // 10, 0, 10, 0, 10);
-  // RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET,
-  // uri);
-  // requestBuilder.setHeader("Authorization", "Custom");
-  // try {
-  // requestBuilder.sendRequest(null, new RequestCallback() {
-  //
-  // @Override
-  // public void onResponseReceived(Request request, Response response) {
-  // if (200 == response.getStatusCode()) {
-  // String html = response.getText();
-  // SafeHtml safeHtml = SafeHtmlUtils.fromTrustedString(html);
-  //
-  // callback.onSuccess(safeHtml);
-  // } else {
-  // String text = response.getText();
-  // String message;
-  // try {
-  // RestErrorOverlayType error = (RestErrorOverlayType)
-  // JsonUtils.safeEval(text);
-  // message = error.getMessage();
-  // } catch (IllegalArgumentException e) {
-  // message = text;
-  // }
-  //
-  // SafeHtmlBuilder b = new SafeHtmlBuilder();
-  //
-  // // error message
-  // b.append(SafeHtmlUtils.fromSafeConstant("<span class='error'>"));
-  // b.append(messages.preservationMetadataTranformToHTMLError());
-  // b.append(SafeHtmlUtils.fromSafeConstant("<pre><code>"));
-  // b.append(SafeHtmlUtils.fromString(message));
-  // b.append(SafeHtmlUtils.fromSafeConstant("</core></pre>"));
-  // b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
-  //
-  // callback.onSuccess(b.toSafeHtml());
-  // }
-  // }
-  //
-  // @Override
-  // public void onError(Request request, Throwable exception) {
-  // callback.onFailure(exception);
-  // }
-  // });
-  // } catch (RequestException e) {
-  // callback.onFailure(e);
-  // }
-  // }
-
   private String getDatesText(IndexedAIP aip) {
     String ret;
 

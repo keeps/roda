@@ -15,10 +15,12 @@ import java.util.List;
 import org.roda.core.data.Attribute;
 import org.roda.core.data.ReportItem;
 import org.roda.core.data.v2.JobReport;
+import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.client.ingest.transfer.IngestTransfer;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -28,6 +30,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -44,7 +47,6 @@ public class ShowJobReport extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      GWT.log("show job report: " + historyTokens);
       if (historyTokens.size() == 1) {
         String jobReportId = historyTokens.get(0);
         BrowserService.Util.getInstance().retrieveJobReport(jobReportId, new AsyncCallback<JobReport>() {
@@ -97,11 +99,11 @@ public class ShowJobReport extends Composite {
   @UiField
   Label id;
   @UiField
-  Label job;
+  Anchor job;
   @UiField
-  Label aip;
+  Anchor aip;
   @UiField
-  Label objectId;
+  Anchor objectId;
   @UiField
   Label dateCreated;
   @UiField
@@ -120,13 +122,15 @@ public class ShowJobReport extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
 
     id.setText(jobReport.getId());
-    // TODO make the Job id a link
     job.setText(jobReport.getJobId());
-    // TODO make the ObjectId a link
+    job.setHref(Tools.createHistoryHashLink(ShowJob.RESOLVER, jobReport.getJobId()));
     objectId.setText(jobReport.getObjectId());
+    // TODO fix link to transferred resource
+    objectId.setHref(Tools.createHistoryHashLink(IngestTransfer.RESOLVER, jobReport.getObjectId()));
+
     // TODO check if AIP exists
-    // TODO make the AIP id a link
     aip.setText(jobReport.getAipId());
+    aip.setHref(Tools.createHistoryHashLink(Browse.RESOLVER, jobReport.getAipId()));
     DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_FULL);
     dateCreated.setText(dateTimeFormat.format(jobReport.getDateCreated()));
     dateUpdated.setText(dateTimeFormat.format(jobReport.getDateUpdated()));
