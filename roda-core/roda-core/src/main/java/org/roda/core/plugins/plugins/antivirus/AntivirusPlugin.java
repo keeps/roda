@@ -22,8 +22,8 @@ import org.roda.core.data.Report;
 import org.roda.core.data.ReportItem;
 import org.roda.core.data.common.InvalidParameterException;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
@@ -123,8 +123,7 @@ public class AntivirusPlugin implements Plugin<AIP> {
     PluginState state;
 
     for (AIP aip : list) {
-      ReportItem reportItem = PluginUtils.createPluginReportItem(this, "Checking " + aip.getId() + " for virus",
-        aip.getId(), null);
+      ReportItem reportItem = PluginUtils.createPluginReportItem(this, "Check for virus", aip.getId(), null);
 
       VirusCheckResult virusCheckResult = null;
       Exception exception = null;

@@ -14,16 +14,18 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.tika.exception.TikaException;
+import org.roda.core.data.Attribute;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
+import org.roda.core.data.ReportItem;
 import org.roda.core.data.common.InvalidParameterException;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -55,8 +57,12 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 public class TikaFullTextPlugin implements Plugin<AIP> {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(TikaFullTextPlugin.class);
+
+  private Map<String, String> parameters;
+
   private AgentPreservationObject agent;
-  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Override
   public void init() throws PluginException {
@@ -93,26 +99,24 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
 
   @Override
   public Map<String, String> getParameterValues() {
-    return new HashMap<>();
+    return parameters;
   }
 
   @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
-    // no params
+    this.parameters = parameters;
   }
 
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
 
-    boolean created = false;
-    try {
-      AgentPreservationObject apo = model.getAgentPreservationObject(agent.getId());
-      created = true;
-    } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
+    Report report = PluginUtils.createPluginReport(this);
+    PluginState state;
 
-    }
-    if (!created) {
+    try {
+      model.getAgentPreservationObject(agent.getId());
+    } catch (NotFoundException e) {
       try {
         byte[] serializedPremisAgent = new PremisAgentHelper(agent).saveToByteArray();
         Path agentFile = Files.createTempFile("agent_preservation", ".xml");
@@ -120,19 +124,25 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
         Binary agentResource = (Binary) FSUtils.convertPathToResource(agentFile.getParent(), agentFile);
         model.createAgentMetadata(agent.getId(), agentResource);
       } catch (RequestNotValidException | PremisMetadataException | IOException | NotFoundException | GenericException
-        | AlreadyExistsException | AuthorizationDeniedException e) {
-
+        | AlreadyExistsException | AuthorizationDeniedException ee) {
+        LOGGER.error("Error creating PREMIS agent", e);
       }
+    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
+      LOGGER.error("Error getting PREMIS agent", e);
     }
+
     for (AIP aip : list) {
-      logger.debug("Processing AIP " + aip.getId());
+      ReportItem reportItem = PluginUtils.createPluginReportItem(this, "File metadata and full text extraction",
+        aip.getId(), null);
+
+      LOGGER.debug("Processing AIP " + aip.getId());
       try {
         for (String representationID : aip.getRepresentationIds()) {
-          logger.debug("Processing representation " + representationID + " of AIP " + aip.getId());
+          LOGGER.debug("Processing representation " + representationID + " of AIP " + aip.getId());
           Representation representation = model.retrieveRepresentation(aip.getId(), representationID);
           List<SimpleFile> updatedFiles = new ArrayList<SimpleFile>();
           for (String fileID : representation.getFileIds()) {
-            logger.debug(
+            LOGGER.debug(
               "Processing file " + fileID + " of representation " + representationID + " from AIP " + aip.getId());
             File file = model.retrieveFile(aip.getId(), representationID, fileID);
             Binary binary = storage.getBinary(file.getStoragePath());
@@ -145,7 +155,7 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
               resource);
             try {
               String fulltext = TikaFullTextPluginUtils.extractFullTextFromResult(tikaResult);
-              System.out.println("FULLTEXT: " + fulltext);
+              // System.out.println("FULLTEXT: " + fulltext);
               SimpleFile f = index.retrieve(SimpleFile.class, SolrUtils.getId(aip.getId(), representationID, fileID));
               f.setFulltext(fulltext);
               updatedFiles.add(f);
@@ -156,11 +166,31 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
           }
           model.updateFileFormats(updatedFiles);
         }
-      } catch (RODAException | SAXException | TikaException | ModelServiceException | IOException mse) {
-        logger.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage(), mse);
+
+        state = PluginState.OK;
+        reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
+
+      } catch (RODAException | SAXException | TikaException | ModelServiceException | IOException e) {
+        LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage(), e);
+
+        state = PluginState.ERROR;
+        reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()))
+          .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS,
+            "Error running SIEGFRIED " + aip.getId() + ": " + e.getMessage()));
       }
+
+      report.addItem(reportItem);
+
+      try {
+        PluginUtils.updateJobReport(model, index, this, reportItem, state, PluginUtils.getJobId(parameters),
+          aip.getId());
+      } catch (RODAException e) {
+        LOGGER.error("Error updating job report", e);
+      }
+
     }
-    return null;
+
+    return report;
   }
 
   private void createEvent(String outcomeDetail, PluginState state, AIP aip, ModelService model)
@@ -195,7 +225,13 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
 
   @Override
   public Plugin<AIP> cloneMe() {
-    return new TikaFullTextPlugin();
+    TikaFullTextPlugin tikaPlugin = new TikaFullTextPlugin();
+    try {
+      tikaPlugin.init();
+    } catch (PluginException e) {
+      LOGGER.error("Error doing " + TikaFullTextPlugin.class.getName() + "init", e);
+    }
+    return tikaPlugin;
   }
 
   @Override

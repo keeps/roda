@@ -31,14 +31,12 @@ import org.roda.core.index.IndexService;
 import org.roda.core.metadata.v2.premis.PremisMetadataException;
 import org.roda.core.model.AIP;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.ModelServiceException;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginUtils;
 import org.roda.core.storage.StoragePath;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.StorageServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,8 +92,7 @@ public class AutoAcceptSIPPlugin implements Plugin<AIP> {
     PluginState state;
 
     for (AIP aip : list) {
-      ReportItem reportItem = PluginUtils.createPluginReportItem(this, "Auto accept AIP " + aip.getId(), aip.getId(),
-        null);
+      ReportItem reportItem = PluginUtils.createPluginReportItem(this, "Auto accept SIP", aip.getId(), null);
       String outcomeDetail = "";
       try {
         LOGGER.debug("Auto accepting AIP " + aip.getId());

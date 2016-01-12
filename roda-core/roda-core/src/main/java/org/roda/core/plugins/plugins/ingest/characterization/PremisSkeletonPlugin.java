@@ -104,7 +104,7 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
       for (AIP aip : list) {
         LOGGER.debug("Processing AIP " + aip.getId());
         ReportItem reportItem = PluginUtils.createPluginReportItem(this,
-          "Creating base premis related directories/files for " + aip.getId(), aip.getId(), null);
+          "Creating base PREMIS", aip.getId(), null);
 
         try {
           for (String representationID : aip.getRepresentationIds()) {

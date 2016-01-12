@@ -42,6 +42,8 @@ import org.roda.core.plugins.plugins.PluginUtils;
 import org.roda.core.plugins.plugins.antivirus.AntivirusPlugin;
 import org.roda.core.plugins.plugins.base.AIPValidationPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.PremisSkeletonPlugin;
+import org.roda.core.plugins.plugins.ingest.characterization.SiegfriedPlugin;
+import org.roda.core.plugins.plugins.ingest.characterization.TikaFullTextPlugin;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,11 +66,17 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
     "parameter.do_producer_authorization_check", "Producer authorization check", PluginParameterType.BOOLEAN, "true",
     true, true,
     "Check SIP producer authorization. Verifies that the producer of the SIP has permissions to ingest to the specified Fonds.");
+  public static final PluginParameter PARAMETER_DO_FILE_FORMAT_IDENTIFICATION = new PluginParameter(
+    "parameter.do_file_format_identification", "File format identification", PluginParameterType.BOOLEAN, "true", true,
+    false, "Does file format identification.");
+  public static final PluginParameter PARAMETER_DO_METADATA_AND_FULL_TEXT_EXTRACTION = new PluginParameter(
+    "parameter.do_metadata_and_full_text_extraction", "File metadata and full text extraction",
+    PluginParameterType.BOOLEAN, "true", true, false, "Extracts file metadata and full text.");
   public static final PluginParameter PARAMETER_DO_AUTO_ACCEPT = new PluginParameter("parameter.do_auto_accept",
     "Auto accept SIP", PluginParameterType.BOOLEAN, "false", true, false, "Automatically accept SIPs.");
 
   private Map<String, String> parameters;
-  private int totalSteps = 6;
+  private int totalSteps = 8;
   private int currentCompletionPercentage = 0;
   private int completionPercentageStep = 100 / totalSteps;
   private Map<String, String> aipIdToObjectId;
@@ -106,6 +114,8 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
     pluginParameters.add(PARAMETER_CREATE_PREMIS_SKELETON);
     pluginParameters.add(PARAMETER_DO_SIP_SYNTAX_CHECK);
     pluginParameters.add(PARAMETER_DO_PRODUCER_AUTHORIZATION_CHECK);
+    pluginParameters.add(PARAMETER_DO_FILE_FORMAT_IDENTIFICATION);
+    pluginParameters.add(PARAMETER_DO_METADATA_AND_FULL_TEXT_EXTRACTION);
     pluginParameters.add(PARAMETER_DO_AUTO_ACCEPT);
     return pluginParameters;
   }
@@ -164,13 +174,17 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
     reports = mergeReports(reports, pluginReport);
     updateJobStatus(index, model);
 
-    // 6) do file format normalization
-    // pluginReport = doFileFormatNormalization(index, model, storage, aips);
-    // reports = mergeReports(reports, pluginReport);
+    // 6) do file format identification (sieg)
+    if (verifyIfStepShouldBePerformed(PARAMETER_DO_FILE_FORMAT_IDENTIFICATION)) {
+      pluginReport = doFileFormatIdentification(index, model, storage, aips);
+      reports = mergeReports(reports, pluginReport);
+    }
 
-    // 7) generate dissemination copy
-    // pluginReport = generateDisseminationCopy(index, model, storage, aips);
-    // reports = mergeReports(reports, pluginReport);
+    // 7) do metadata and full text extraction (tika)
+    if (verifyIfStepShouldBePerformed(PARAMETER_DO_METADATA_AND_FULL_TEXT_EXTRACTION)) {
+      pluginReport = doMetadataAndFullTextExtraction(index, model, storage, aips);
+      reports = mergeReports(reports, pluginReport);
+    }
 
     // 8) do auto accept
     if (verifyIfStepShouldBePerformed(PARAMETER_DO_AUTO_ACCEPT)) {
@@ -310,6 +324,16 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
   private Report verifyProducerAuthorization(IndexService index, ModelService model, StorageService storage,
     List<AIP> aips) {
     return executePlugin(index, model, storage, aips, VerifyProducerAuthorizationPlugin.class.getName());
+  }
+
+  private Report doFileFormatIdentification(IndexService index, ModelService model, StorageService storage,
+    List<AIP> aips) {
+    return executePlugin(index, model, storage, aips, SiegfriedPlugin.class.getName());
+  }
+
+  private Report doMetadataAndFullTextExtraction(IndexService index, ModelService model, StorageService storage,
+    List<AIP> aips) {
+    return executePlugin(index, model, storage, aips, TikaFullTextPlugin.class.getName());
   }
 
   private Report doFileFormatNormalization(IndexService index, ModelService model, StorageService storage,

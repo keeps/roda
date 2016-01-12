@@ -84,8 +84,8 @@ public class VerifyProducerAuthorizationPlugin implements Plugin<AIP> {
     PluginState state;
 
     for (AIP aip : list) {
-      ReportItem reportItem = PluginUtils.createPluginReportItem(this,
-        "Check producer authorization for AIP " + aip.getId(), aip.getId(), null);
+      ReportItem reportItem = PluginUtils.createPluginReportItem(this, "Check producer authorization", aip.getId(),
+        null);
 
       LOGGER.debug("Checking producer authorization for AIP " + aip.getId());
 

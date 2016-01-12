@@ -15,15 +15,17 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.roda.core.data.Attribute;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
+import org.roda.core.data.ReportItem;
 import org.roda.core.data.common.InvalidParameterException;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -56,13 +58,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SiegfriedPlugin implements Plugin<AIP> {
-  private AgentPreservationObject agent;
   private static final Logger LOGGER = LoggerFactory.getLogger(SiegfriedPlugin.class);
+
+  private Map<String, String> parameters;
+
+  private AgentPreservationObject agent;
 
   @Override
   public void init() throws PluginException {
     agent = new AgentPreservationObject();
-    agent.setAgentName(getName() + "/" + getVersion()); //$NON-NLS-1$
+    agent.setAgentName(getName() + "/" + getVersion());
     agent.setAgentType(AgentPreservationObject.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN);
     agent.setId("characterization-siegfried");
   }
@@ -94,25 +99,24 @@ public class SiegfriedPlugin implements Plugin<AIP> {
 
   @Override
   public Map<String, String> getParameterValues() {
-    return new HashMap<>();
+    return parameters;
   }
 
   @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
-    // no params
+    this.parameters = parameters;
   }
 
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
-    boolean created = false;
-    try {
-      AgentPreservationObject apo = model.getAgentPreservationObject(agent.getId());
-      created = true;
-    } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
 
-    }
-    if (!created) {
+    Report report = PluginUtils.createPluginReport(this);
+    PluginState state;
+
+    try {
+      model.getAgentPreservationObject(agent.getId());
+    } catch (NotFoundException e) {
       try {
         byte[] serializedPremisAgent = new PremisAgentHelper(agent).saveToByteArray();
         Path agentFile = Files.createTempFile("agent_preservation", ".xml");
@@ -120,16 +124,21 @@ public class SiegfriedPlugin implements Plugin<AIP> {
         Binary agentResource = (Binary) FSUtils.convertPathToResource(agentFile.getParent(), agentFile);
         model.createAgentMetadata(agent.getId(), agentResource);
       } catch (RequestNotValidException | PremisMetadataException | IOException | NotFoundException | GenericException
-        | AlreadyExistsException | AuthorizationDeniedException e) {
-
+        | AlreadyExistsException | AuthorizationDeniedException ee) {
+        LOGGER.error("Error creating PREMIS agent", e);
       }
+    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
+      LOGGER.error("Error getting PREMIS agent", e);
     }
 
     for (AIP aip : list) {
-      LOGGER.debug("Processing AIP " + aip.getId());
-      for (String representationID : aip.getRepresentationIds()) {
-        LOGGER.debug("Processing representation " + representationID + " of AIP " + aip.getId());
-        try {
+      ReportItem reportItem = PluginUtils.createPluginReportItem(this, "File format identification", aip.getId(), null);
+
+      LOGGER.debug("Processing AIP {}", aip.getId());
+      try {
+        for (String representationID : aip.getRepresentationIds()) {
+          LOGGER.debug("Processing representation {} of AIP {}", representationID, aip.getId());
+
           Path data = Files.createTempDirectory("data");
           StorageService tempStorage = new FileStorageService(data);
           StoragePath representationPath = ModelUtils.getRepresentationPath(aip.getId(), representationID);
@@ -188,15 +197,33 @@ public class SiegfriedPlugin implements Plugin<AIP> {
           model.updateFileFormats(updatedFiles);
           createEvent(siegfriedOutput, PluginState.OK, aip, model);
           FSUtils.deletePath(data);
-        } catch (PluginException | IOException | ModelServiceException | NotFoundException | GenericException
-          | RequestNotValidException | AuthorizationDeniedException | AlreadyExistsException e) {
-          e.printStackTrace();
-          LOGGER.error("Error running SIEGFRIED " + aip.getId() + ": " + e.getMessage());
+
         }
+
+        state = PluginState.OK;
+        reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
+
+      } catch (PluginException | IOException | ModelServiceException | NotFoundException | GenericException
+        | RequestNotValidException | AuthorizationDeniedException | AlreadyExistsException e) {
+        LOGGER.error("Error running SIEGFRIED " + aip.getId() + ": " + e.getMessage(), e);
+
+        state = PluginState.ERROR;
+        reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()))
+          .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS,
+            "Error running SIEGFRIED " + aip.getId() + ": " + e.getMessage()));
+      }
+
+      report.addItem(reportItem);
+
+      try {
+        PluginUtils.updateJobReport(model, index, this, reportItem, state, PluginUtils.getJobId(parameters),
+          aip.getId());
+      } catch (RODAException e) {
+        LOGGER.error("Error updating job report", e);
       }
 
     }
-    return null;
+    return report;
   }
 
   private void createEvent(String outcomeDetail, PluginState state, AIP aip, ModelService model)
@@ -231,7 +258,13 @@ public class SiegfriedPlugin implements Plugin<AIP> {
 
   @Override
   public Plugin<AIP> cloneMe() {
-    return new DroidPlugin();
+    SiegfriedPlugin siegfriedPlugin = new SiegfriedPlugin();
+    try {
+      siegfriedPlugin.init();
+    } catch (PluginException e) {
+      LOGGER.error("Error doing " + SiegfriedPlugin.class.getName() + "init", e);
+    }
+    return siegfriedPlugin;
   }
 
   @Override

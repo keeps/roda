@@ -62,8 +62,7 @@ public final class PluginUtils {
   }
 
   public static ReportItem createPluginReportItem(TransferredResource transferredResource, Plugin<?> plugin) {
-    return createPluginReportItem(plugin, "SIP to AIP from " + transferredResource.getId(), null,
-      transferredResource.getId());
+    return createPluginReportItem(plugin, "Extract SIP", null, transferredResource.getId());
   }
 
   public static ReportItem createPluginReportItem(Plugin<?> plugin, String title, String itemId, String otherId) {
