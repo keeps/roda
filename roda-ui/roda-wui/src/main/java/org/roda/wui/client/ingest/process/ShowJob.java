@@ -22,6 +22,7 @@ import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.Job.JOB_STATE;
+import org.roda.core.data.v2.JobReport;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.JobReportList;
@@ -45,6 +46,8 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.SelectionChangeEvent;
+import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 
 import config.i18n.client.BrowseMessages;
 
@@ -60,6 +63,7 @@ public class ShowJob extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
+      GWT.log("Show job: " + historyTokens);
       if (historyTokens.size() == 1) {
         String jobId = historyTokens.get(0);
         BrowserService.Util.getInstance().retrieveJobBundle(jobId, new AsyncCallback<JobBundle>() {
@@ -80,6 +84,8 @@ public class ShowJob extends Composite {
             callback.onSuccess(showJob);
           }
         });
+      } else if (historyTokens.size() > 1 && historyTokens.get(0).equals(ShowJobReport.RESOLVER.getHistoryToken())) {
+        ShowJobReport.RESOLVER.resolve(Tools.tail(historyTokens), callback);
       } else {
         Tools.newHistory(IngestProcess.RESOLVER);
         callback.onSuccess(null);
@@ -154,6 +160,16 @@ public class ShowJob extends Composite {
     updateStatus(job);
 
     jobReports.autoUpdate(PERIOD_MILLIS);
+
+    jobReports.getSelectionModel().addSelectionChangeHandler(new Handler() {
+
+      @Override
+      public void onSelectionChange(SelectionChangeEvent event) {
+        JobReport jobReport = jobReports.getSelectionModel().getSelectedObject();
+        GWT.log("new history: " + ShowJobReport.RESOLVER.getHistoryPath() + "/" + jobReport.getId());
+        Tools.newHistory(ShowJobReport.RESOLVER, jobReport.getId());
+      }
+    });
 
     PluginInfo pluginInfo = pluginsInfo.get(job.getPlugin());
     plugin.setText(messages.pluginLabel(pluginInfo.getName(), pluginInfo.getVersion()));

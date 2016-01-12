@@ -108,4 +108,8 @@ public class JobsHelper {
     return RodaCoreFactory.getIndexService().find(JobReport.class, filter, sorter, sublist, facets);
   }
 
+  public static JobReport retrieveJobReport(String jobReportId) throws NotFoundException, GenericException {
+    return RodaCoreFactory.getIndexService().retrieve(JobReport.class, jobReportId);
+  }
+
 }

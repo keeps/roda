@@ -405,66 +405,6 @@ public class Browse extends Composite {
 
       });
 
-      // if (!preservationMetadata.getRepresentationsMetadata().isEmpty()) {
-      // final FlowPanel premisContainer = new FlowPanel();
-      // final int premisTabIndex = itemMetadata.getWidgetCount();
-      // FlowPanel premisTab = new FlowPanel();
-      // premisTab.add(new HTML(SafeHtmlUtils.fromSafeConstant("<i class=\"fa
-      // fa-cog\"></i>")));
-      // premisTab.add(new Label(messages.premisTitle()));
-      //
-      // itemMetadata.add(premisContainer, premisTab);
-      //
-      // // Download link
-      // SafeUri downloadUri =
-      // RestUtils.createPreservationMetadataDownloadUri(aipId);
-      // SafeHtmlBuilder b = new SafeHtmlBuilder();
-      // b.append(SafeHtmlUtils.fromSafeConstant("<a href='"))
-      // .append(SafeHtmlUtils.fromTrustedString(downloadUri.asString()))
-      // .append(SafeHtmlUtils.fromSafeConstant("'
-      // class='descriptiveMetadataLink'>"));
-      // b.append(messages.download());
-      // b.append(SafeHtmlUtils.fromSafeConstant("</a>"));
-      // HTML downloadLinkWidget = new HTML(b.toSafeHtml());
-      // premisContainer.add(downloadLinkWidget);
-      //
-      // itemMetadata.addSelectionHandler(new SelectionHandler<Integer>() {
-      //
-      // @Override
-      // public void onSelection(SelectionEvent<Integer> event) {
-      // if (event.getSelectedItem() == premisTabIndex &&
-      // premisContainer.getWidgetCount() <= 1) {
-      // for (RepresentationPreservationMetadataBundle bundle :
-      // preservationMetadata
-      // .getRepresentationsMetadata()) {
-      // String repId = bundle.getRepresentationID();
-      // getPreservationMetadataHTML(aipId, repId, new AsyncCallback<SafeHtml>()
-      // {
-      //
-      // @Override
-      // public void onFailure(Throwable caught) {
-      // Toast.showError(messages.errorLoadingPreservationMetadata(caught.getMessage()));
-      // }
-      //
-      // @Override
-      // public void onSuccess(SafeHtml result) {
-      // HTML html = new HTML(result);
-      // premisContainer.add(html);
-      // JavascriptUtils.runHighlighter(html.getElement());
-      // JavascriptUtils.slideToggle(html.getElement(), ".toggle-next");
-      // JavascriptUtils.smoothScroll(html.getElement());
-      // }
-      // });
-      // }
-      // }
-      // }
-      // });
-      //
-      // premisTab.addStyleName("premisTab");
-      // premisContainer.addStyleName("preservationMetadata");
-      // premisContainer.addStyleName("metadataContent");
-      // }
-
       // Tab to add new metadata
       final int addTabIndex = itemMetadata.getWidgetCount();
       FlowPanel addTab = new FlowPanel();
@@ -848,14 +788,6 @@ public class Browse extends Composite {
       }
     });
   }
-
-  // @UiHandler("createDescriptiveMetadata")
-  // void buttonCreateDescriptiveMetadataHandler(ClickEvent e) {
-  // if (aipId != null) {
-  // Tools.newHistory(RESOLVER,
-  // CreateDescriptiveMetadata.RESOLVER.getHistoryToken(), aipId);
-  // }
-  // }
 
   @UiHandler("remove")
   void buttonRemoveHandler(ClickEvent e) {

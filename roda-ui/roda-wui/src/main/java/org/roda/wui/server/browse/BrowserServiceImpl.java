@@ -678,6 +678,12 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     return Jobs.findJobReports(user, filter, sorter, sublist, facets);
   }
 
+  @Override
+  public JobReport retrieveJobReport(String jobReportId) throws NotFoundException, GenericException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    return Jobs.retrieveJobReport(user, jobReportId);
+  }
+
   public List<Viewer> getViewersProperties() {
     List<Viewer> viewers = new ArrayList<Viewer>();
     String viewersString = RodaCoreFactory.getRodaConfigurationAsString("ui", "viewers");

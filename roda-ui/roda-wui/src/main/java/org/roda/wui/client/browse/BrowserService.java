@@ -292,4 +292,6 @@ public interface BrowserService extends RemoteService {
 
   Map<String, String> getSupportedMetadata(String locale) throws AuthorizationDeniedException, GenericException;
 
+  JobReport retrieveJobReport(String jobReportId) throws NotFoundException, GenericException;
+
 }

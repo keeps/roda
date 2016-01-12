@@ -103,20 +103,18 @@ public class BagitToAIPPlugin implements Plugin<TransferredResource> {
         String parent = bagInfoTxt.get("parent");
 
         AIP aipCreated = BagitToAIPPluginUtils.bagitToAip(bag, bagitPath, model, "metadata.xml");
-        
+
         state = PluginState.OK;
         reportItem.setItemId(aipCreated.getId());
         reportItem = reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
-        
-        
+
         if (parent != null) {
           if (aipCreated.getParentId() == null) {
             LOGGER.error("PARENT NOT FOUND!");
-            reportItem = reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, "Parent not found"));
+            reportItem = reportItem
+              .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, "Parent not found: " + parent));
           }
         }
-
-        
 
         LOGGER.debug("Done with converting " + bagitPath + " to AIP " + aipCreated.getId());
       } catch (Throwable e) {

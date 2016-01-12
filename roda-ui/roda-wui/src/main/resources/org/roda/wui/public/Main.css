@@ -2205,6 +2205,10 @@
 	color: inherit;
 }
 
+.job-report-object-input a:hover {
+	text-decoration: underline;
+}
+
 .job-report-object-output {
 	margin-top: -5px;
 }
@@ -2217,7 +2221,37 @@
 	font-size: 1.1rem;
     line-height: 1.1rem;
 }
+.job-report-object-output a:hover {
+	text-decoration: underline;
+}
 
+/**********************************************
+				Show Job Report
+************************************************/
+
+.report-item-title {
+	background-color: #089de3;
+	padding: 5px 10px;
+	color: white;
+	counter-increment: report-item-counter;
+	border-top-right-radius: 2px;
+	border-top-left-radius: 2px;
+}
+
+.report-item-title:before {
+	content: counter(report-item-counter) ".";
+	margin-right: 10px;
+	font-weight: 600;
+}
+
+.report-item-attributes {
+	border: 1px solid #089de3;
+	border-top: none;
+	border-bottom-right-radius: 2px;
+	border-bottom-left-radius: 2px;
+	padding: 20px;
+	margin-bottom: 20px;
+}
 
 /**********************************************
 				PRESERVATION EVENTS

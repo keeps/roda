@@ -74,7 +74,7 @@ public class Jobs extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, JOBS_COMPONENT, "getJob", null, duration, "job_id", job.getId());
+    registerAction(user, JOBS_COMPONENT, "getJob", null, duration, RodaConstants.JOB_ID, job.getId());
 
     return job;
   }
@@ -113,6 +113,23 @@ public class Jobs extends RodaCoreService {
       filter, RodaConstants.CONTROLLER_SORTER_PARAM, sorter, RodaConstants.CONTROLLER_SUBLIST_PARAM, sublist);
 
     return findJobReports;
+  }
+
+  public static JobReport retrieveJobReport(RodaUser user, String jobReportId)
+    throws NotFoundException, GenericException {
+    Date startDate = new Date();
+
+    // check user permissions
+    // TODO ???
+
+    // delegate
+    JobReport jobReport = JobsHelper.retrieveJobReport(jobReportId);
+
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, JOBS_COMPONENT, "retrieveJobReport", null, duration, RodaConstants.JOB_REPORT_ID, jobReportId);
+
+    return jobReport;
   }
 
   /*

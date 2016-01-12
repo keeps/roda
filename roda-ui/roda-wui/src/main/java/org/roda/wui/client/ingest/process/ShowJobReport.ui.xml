@@ -16,34 +16,38 @@
 	<g:FlowPanel styleName="wui-ingest-new" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
-				<g:Label styleName="h1">Ingest process</g:Label>
+				<g:Label styleName="h1">Information package processing report</g:Label>
 				<g:Label addStyleNames="label">
-					Name
+					id
 				</g:Label>
-				<g:Label ui:field="name" />
+				<g:Label ui:field="id" />
 				<g:Label addStyleNames="label">
-					Creator
+					Job
 				</g:Label>
-				<g:Label ui:field="creator" />
+				<g:Label ui:field="job" />
 				<g:Label addStyleNames="label">
-					Start date
+					Submission Information Package
 				</g:Label>
-				<g:Label ui:field="dateStarted" />
+				<g:Label ui:field="objectId" />
 				<g:Label addStyleNames="label">
-					Status
+					Archival Information Package
 				</g:Label>
-				<g:Label ui:field="status" />
-				<g:Label addStyleNames="label">
-					Plugin
-				</g:Label>
-				<g:Label ui:field="plugin" />
-				<g:FlowPanel addStyleNames="wui-plugin-options"
-					ui:field="pluginOptions" />
+				<g:Label ui:field="aip" />
 
-				<g:Label addStyleNames="h3 {style.reportTitle}">
-					Processed
+				<g:Label addStyleNames="label">
+					Date created
 				</g:Label>
-				<lists:JobReportList ui:field="jobReports" />
+				<g:Label ui:field="dateCreated" />
+				<g:Label addStyleNames="label">
+					Date updated
+				</g:Label>
+				<g:Label ui:field="dateUpdated" />
+				<g:Label addStyleNames="h4">
+					<ui:msg>Run tasks</ui:msg>
+				</g:Label>
+				<g:FlowPanel ui:field="reportAttributes" />
+				<g:FlowPanel ui:field="reportItems" />
+
 			</g:FlowPanel>
 
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
@@ -51,10 +55,6 @@
 					<g:Label addStyleNames="h4">
 						<ui:msg>Actions</ui:msg>
 					</g:Label>
-					<g:Button addStyleNames="btn btn-ban" ui:field="buttonStop">
-						Stop
-						process
-					</g:Button>
 					<g:Button addStyleNames="btn btn-times-circle" ui:field="buttonBack">
 						Back
 					</g:Button>

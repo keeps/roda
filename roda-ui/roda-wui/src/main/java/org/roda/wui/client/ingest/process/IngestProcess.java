@@ -202,7 +202,7 @@ public class IngestProcess extends Composite {
       callback.onSuccess(this);
     } else if (historyTokens.size() == 1 && historyTokens.get(0).equals(CreateJob.RESOLVER.getHistoryToken())) {
       CreateJob.RESOLVER.resolve(Tools.tail(historyTokens), callback);
-    } else if (historyTokens.size() == 2 && historyTokens.get(0).equals(ShowJob.RESOLVER.getHistoryToken())) {
+    } else if (historyTokens.size() > 1 && historyTokens.get(0).equals(ShowJob.RESOLVER.getHistoryToken())) {
       ShowJob.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else {
       Tools.newHistory(RESOLVER);
