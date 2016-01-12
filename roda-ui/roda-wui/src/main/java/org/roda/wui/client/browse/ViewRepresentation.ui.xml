@@ -106,28 +106,6 @@
 					</g:FlowPanel>
 				</g:FlowPanel>
 			</g:HorizontalPanel>
-
-			<!--<g:FlowPanel addStyleNames="col_10 content"> <g:Label styleName="h1" 
-				addStyleNames="viewRepresentationTitle"> <ui:msg description="View representation 
-				title">View representation</ui:msg> </g:Label> <m:BreadcrumbPanel ui:field="breadcrumb" 
-				addStyleNames="browseBreadcrumb" /> <g:HorizontalPanel ui:field="previewPanel"> 
-				<g:FlowPanel ui:field="filesPanel"> <g:FlowPanel styleName="searchPanel"> 
-				<g:FlowPanel styleName="searchPanelLeft"> <g:TextBox ui:field="searchInputBox" 
-				addStyleNames="searchBox" /> </g:FlowPanel> <wcag:AccessibleFocusPanel styleName="searchButton" 
-				ui:field="searchInputButton"> <g:HTML addStyleNames="searchButton-html"> 
-				<span class="fa-stack fa-lg"> <i class="fa fa-circle fa-stack-2x"></i> <i 
-				class="fa fa-search fa-stack-1x"></i> </span> </g:HTML> </wcag:AccessibleFocusPanel> 
-				</g:FlowPanel> <lists:FileList ui:field="filesList" /> </g:FlowPanel> <g:FlowPanel 
-				ui:field="filePreview"> </g:FlowPanel> </g:HorizontalPanel> </g:FlowPanel> -->
-			<!--<g:FlowPanel addStyleNames="col_2 last sidebar"> <g:FlowPanel> <g:Label 
-				addStyleNames="h4"> <ui:text from='{messages.sidebarActionsTitle}' /> </g:Label> 
-				<g:Button addStyleNames="btn btn-back" ui:field="back"> <ui:msg>Back</ui:msg> 
-				</g:Button> <g:Button addStyleNames="btn btn-previous-file" ui:field="previousFile"> 
-				<ui:msg>Previous file</ui:msg> </g:Button> <g:Button addStyleNames="btn btn-next-file" 
-				ui:field="nextFile"> <ui:msg>Next file</ui:msg> </g:Button> <g:Button addStyleNames="btn 
-				btn-download" ui:field="downloadFile"> <ui:msg>Download file</ui:msg> </g:Button> 
-				</g:FlowPanel> </g:FlowPanel> -->
-
 		</g:FlowPanel>
 	</g:FlowPanel>
 </ui:UiBinder>

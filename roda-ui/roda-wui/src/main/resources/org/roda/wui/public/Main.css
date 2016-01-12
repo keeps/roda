@@ -341,6 +341,7 @@
 /* @group Breadcrumb */
 .main .wui-breadcrumbPanel {
 	margin-top: 10px;
+	margin-bottom: 20px;
 }
 
 .main .wui-breadcrumbPanel .breadcrumb {
@@ -600,8 +601,6 @@
 }
 
 .browseBreadcrumb {
-	margin-top: 10px;
-	margin-bottom: 20px;
 }
 
 .browseItemPanel {
@@ -1645,7 +1644,6 @@
 /************************************************/
 .wui-ingest-transfer .wui-breadcrumbPanel {
 	position: relative;
-	top: -20px;
 }
 
 /*----------------------------
@@ -1762,13 +1760,19 @@
 }
 
 .searchPanel {
-	margin-right: 40px;
+	margin-right: 80px;
 	height: 40px;
 }
 
 .searchPanelLeft {
 	float: left;
 	width: 100%;
+}
+
+.searchPanelRight {
+	float: right;
+	width: 80px;
+	margin-right: -80px;
 }
 
 .search .searchBox {
@@ -1782,28 +1786,46 @@
 	background-color: #eee;
 }
 
-.search .searchButton {
+.search .searchBox::-webkit-input-placeholder,
+	.search .searchBox:placeholder-shown {
+	color: rgba(0,0,0, 0.5);
+}
+
+.search .searchButton,
+.search .searchAdvancedDisclosureButton {
 	cursor: pointer;
 	cursor: hand;
 	position: relative;
-	float: right;
-	margin-right: -40px;
+	float: left;
+	/* 	margin-right: -40px; */
     height: 40px;
     width: 40px;
     background-color: #089de3;
+}
+
+.search .searchAdvancedDisclosureButton {
+	background-color: #eee;
+	color: rgba(0,0,0, 0.5);
 }
 
 .search .searchButton:hover {
 	background-color: #3998d0;
 }
 
-.search .searchBox::-webkit-input-placeholder,
-	.search .searchBox:placeholder-shown {
-	color: rgba(0,0,0, 0.5);
-}
-
 .search .searchButton-html {
 	font-size: 15px;
+}
+
+.search .searchAdvancedDisclosureButton .fa-angle-up {
+	display: none;
+}
+
+.search .searchAdvancedDisclosureButton.open .fa-angle-up {
+	display: block;
+}
+
+.search .searchAdvancedDisclosureButton.open .fa-angle-down {
+	display: none;
 }
 
 .search .searchButton .fa-stack-2x {

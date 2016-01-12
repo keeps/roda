@@ -244,15 +244,6 @@ public class ViewRepresentation extends Composite {
   @UiField
   FlowPanel filePreview;
 
-  // @UiField
-  // Button back;
-  //
-  // @UiField
-  // Button nextFile;
-  //
-  // @UiField
-  // Button previousFile;
-
   @UiField
   FocusPanel downloadFile;
 
@@ -320,10 +311,6 @@ public class ViewRepresentation extends Composite {
 
     breadcrumb.updatePath(getBreadcrumbs(itemBundle, file));
     breadcrumb.setVisible(true);
-
-    // back.setText(messages.backButton());
-    // nextFile.setText(messages.viewRepresentationNextFileButton());
-    // previousFile.setText(messages.viewRepresentationPreviousFileButton());
 
     searchInputBox.getElement().setPropertyString("placeholder", messages.viewRepresentationsSearchPlaceHolder());
 
@@ -506,32 +493,6 @@ public class ViewRepresentation extends Composite {
     return icon;
   }
 
-  // @UiHandler("back")
-  // void buttonBackHandler(ClickEvent e) {
-  // Tools.newHistory(Tools.concat(ViewRepresentation.RESOLVER.getHistoryPath(),
-  // aipId, representationId));
-  // }
-  //
-  // @UiHandler("nextFile")
-  // void buttonNextFileHandler(ClickEvent e) {
-  // if (filesList.nextPageOnNextFile()) {
-  // filesList.nextPage();
-  // showNextFile = true;
-  // } else {
-  // filesList.nextItemSelection();
-  // }
-  // }
-  //
-  // @UiHandler("previousFile")
-  // void buttonPreviousFileHandler(ClickEvent e) {
-  // if (filesList.previousPageOnPreviousFile()) {
-  // filesList.prevousPage();
-  // showPreviousFile = true;
-  // } else {
-  // filesList.previousItemSelection();
-  // }
-  // }
-
   @UiHandler("downloadFile")
   void buttonDownloadFileHandler(ClickEvent e) {
     SafeUri downloadUri = null;
@@ -588,16 +549,12 @@ public class ViewRepresentation extends Composite {
     filesPanel.removeStyleName("fullWidth");
     previewPanel.setCellWidth(filePreviewPanel, "100%");
     filePreviewPanel.setVisible(true);
-    // nextFile.setVisible(true);
-    // previousFile.setVisible(true);
   }
 
   private void hideFilePreview() {
     filesPanel.addStyleName("fullWidth");
     previewPanel.setCellWidth(filePreviewPanel, "0px");
     filePreviewPanel.setVisible(false);
-    // nextFile.setVisible(false);
-    // previousFile.setVisible(false);
   }
 
   @SuppressWarnings("unused")
@@ -771,7 +728,7 @@ public class ViewRepresentation extends Composite {
 
     String basicQuery = searchInputBox.getText();
     if (!"".equals(basicQuery)) {
-      parameters.add(new BasicSearchFilterParameter(RodaConstants.SRO_FILE_IDS, basicQuery));
+      parameters.add(new BasicSearchFilterParameter(RodaConstants.FILE_SEARCH, basicQuery));
     }
 
     Filter filter = new Filter(defaultFilter);

@@ -129,6 +129,12 @@ public class IngestTransfer extends Composite {
   private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
 
   private TransferredResource resource;
+  
+  @UiField
+  Label ingestTransferTitle;
+
+  @UiField
+  HTML ingestTransferDescription;
 
   @UiField
   BreadcrumbPanel breadcrumb;
@@ -221,6 +227,9 @@ public class IngestTransfer extends Composite {
 
   protected void view(TransferredResource r) {
     resource = r;
+    
+    ingestTransferTitle.setVisible(false);
+    ingestTransferDescription.setVisible(false);
 
     HTML itemIconHtmlPanel = new HTML(r.isFile() ? FILE_ICON : FOLDER_ICON);
     itemIconHtmlPanel.addStyleName("browseItemIcon-other");
@@ -243,6 +252,9 @@ public class IngestTransfer extends Composite {
 
   protected void view() {
     resource = null;
+    
+    ingestTransferTitle.setVisible(true);
+    ingestTransferDescription.setVisible(true);
 
     HTML itemIconHtmlPanel = new HTML(TOP_ICON);
     itemIconHtmlPanel.addStyleName("browseItemIcon-all");

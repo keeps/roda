@@ -30,6 +30,7 @@ import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AIPList;
+import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.Tools;
@@ -49,7 +50,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
@@ -108,18 +108,23 @@ public class BasicSearch extends Composite {
 
   private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
+  @SuppressWarnings("unused")
+  private ClientLogger logger = new ClientLogger(getClass().getName());
+
   @UiField
   TextBox searchInputBox;
 
   @UiField
   AccessibleFocusPanel searchInputButton;
 
+  @UiField
+  AccessibleFocusPanel searchAdvancedDisclosureButton;
+
   @UiField(provided = true)
   AIPList searchResultPanel;
 
-//  // ADVANCED SEARCH
-//  @UiField
-//  DisclosurePanel searchAdvancedDisclosure;
+  @UiField
+  FlowPanel searchAdvancedPanel;
 
   @UiField
   FlowPanel searchAdvancedFieldsPanel;
@@ -175,6 +180,7 @@ public class BasicSearch extends Composite {
     });
 
     searchInputBox.getElement().setPropertyString("placeholder", messages.searchPlaceHolder());
+    searchAdvancedPanel.setVisible(false);
 
     this.searchInputBox.addValueChangeHandler(new ValueChangeHandler<String>() {
 
@@ -192,6 +198,15 @@ public class BasicSearch extends Composite {
       }
     });
 
+    this.searchAdvancedDisclosureButton.addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        showSearchAdvancedPanel();
+      }
+
+    });
+
     DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
     ValueChangeHandler<Date> valueChangeHandler = new ValueChangeHandler<Date>() {
 
@@ -201,7 +216,7 @@ public class BasicSearch extends Composite {
       }
 
     };
-    
+
     inputDateInitial.getElement().setPropertyString("placeholder", messages.sidebarFilterFromDate());
     inputDateFinal.getElement().setPropertyString("placeholder", messages.sidebarFilterToDatePlaceHolder());
 
@@ -231,9 +246,16 @@ public class BasicSearch extends Composite {
             BasicSearch.this.searchFields.put(searchField.getField(), searchField);
           }
         }
-
       });
+  }
 
+  private void showSearchAdvancedPanel() {
+    searchAdvancedPanel.setVisible(!searchAdvancedPanel.isVisible());
+    if (searchAdvancedPanel.isVisible()) {
+      searchAdvancedDisclosureButton.addStyleName("open");
+    } else {
+      searchAdvancedDisclosureButton.removeStyleName("open");
+    }
   }
 
   private void updateDateFilter() {

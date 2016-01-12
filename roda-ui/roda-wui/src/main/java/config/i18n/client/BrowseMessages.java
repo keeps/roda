@@ -290,6 +290,14 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("OK")
   String dialogOk();
+  
+  /*** Preservation events ***/
+  
+  @DefaultMessage("Download")
+  String preservationEventsDownloadButton();
+  
+  @DefaultMessage("Back")
+  String preservationEventsBackButton();
 
   /*** View representation ***/
   

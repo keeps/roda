@@ -330,7 +330,7 @@ pre>code {
 }
 
 .btn-back:after {
-	content: "\f060";
+	content: "\f0a8";
 }
 
 .btn-next-file:after {
@@ -547,7 +547,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .sidebar-facet-input-date {
-	width: 40%;
+	width: 45%;
 }
 
 .sidebar-facet-date-separator {

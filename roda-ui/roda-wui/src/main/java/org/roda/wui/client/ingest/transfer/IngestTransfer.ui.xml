@@ -14,10 +14,10 @@
 	<g:FlowPanel styleName="wui-ingest-transfer" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
-				<g:Label styleName="h1">
+				<g:Label styleName="h1" ui:field="ingestTransferTitle">
 					<ui:text from='{messages.ingestTransferTitle}' />
 				</g:Label>
-				<g:HTML addStyleNames="page-description" ui:field="searchDescription">
+				<g:HTML addStyleNames="page-description" ui:field="ingestTransferDescription">
 					<p>
 						Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec
 						laoreet
@@ -38,15 +38,16 @@
 						amet, consectetur adipiscing elit.
 					</p>
 				</g:HTML>
-				<m:BreadcrumbPanel ui:field="breadcrumb" />
 				<g:FlowPanel styleName="browseItemPanel browseTitle-allCollections-wrapper ">
 					<g:SimplePanel styleName="browseItemIcon" ui:field="itemIcon" />
 					<g:FlowPanel styleName="browseItemPanelText">
-						<g:Label styleName="h4" addStyleNames="browseItemText"
+						<g:Label styleName="h1" addStyleNames="browseItemText"
 							ui:field="itemTitle" />
-						<g:Label addStyleNames="browseItemDates" ui:field="itemDates" />
 					</g:FlowPanel>
+					<g:Label addStyleNames="browseItemDates" ui:field="itemDates" />
 				</g:FlowPanel>
+				<m:BreadcrumbPanel ui:field="breadcrumb"
+					addStyleNames="browseBreadcrumb" />
 				<lists:TransferredResourceList
 					addStyleNames="transferredResourceList" ui:field="transferredResourceList" />
 			</g:FlowPanel>
