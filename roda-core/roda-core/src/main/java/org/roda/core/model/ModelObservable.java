@@ -88,13 +88,13 @@ public abstract class ModelObservable {
     }
   }
 
-  protected void notifyFileCreated(SimpleFile file) {
+  protected void notifyFileCreated(File file) {
     for (ModelObserver observer : observers) {
       observer.fileCreated(file);
     }
   }
 
-  protected void notifyFileUpdated(SimpleFile file) {
+  protected void notifyFileUpdated(File file) {
     for (ModelObserver observer : observers) {
       observer.fileUpdated(file);
     }
@@ -227,7 +227,7 @@ public abstract class ModelObservable {
     }
   }
 
-  protected void notifyUpdateFileFormats(List<File> updatedFiles) {
+  protected void notifyUpdateFileFormats(List<SimpleFile> updatedFiles) {
     for (ModelObserver observer : observers) {
       observer.notifyUpdateFileFormats(updatedFiles);
     }

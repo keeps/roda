@@ -40,7 +40,6 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.AgentPreservationObject;
 import org.roda.core.data.v2.EventPreservationObject;
-import org.roda.core.data.v2.FileFormat;
 import org.roda.core.data.v2.Group;
 import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.JobReport;
@@ -668,7 +667,7 @@ public class ModelService extends ModelObservable {
           boolean notify = false;
           File fileUpdated = updateFile(aipId, representationId, file.getStoragePath().getName(), (Binary) file,
             createIfNotExists, notify);
-          notifyFileUpdated((SimpleFile) fileUpdated);
+          notifyFileUpdated(fileUpdated);
           fileIDsToUpdate.add(fileUpdated.getStoragePath().getName());
         } else {
           // FIXME log error and continue???
@@ -1121,17 +1120,14 @@ public class ModelService extends ModelObservable {
 
       // retrieve needed information to instantiate File
       Boolean entryPoint = ModelUtils.getBoolean(metadata, RodaConstants.STORAGE_META_ENTRYPOINT);
-      FileFormat fileFormat = ModelUtils.getFileFormat(metadata);
 
       if (entryPoint == null) {
-        // if entry point not defined, considering false
         entryPoint = false;
       }
 
-      // TODO fetch applicationName, applicationVersion, ... from Premis?
       return new File(binaryPath.getName(), ModelUtils.getAIPidFromStoragePath(binaryPath),
-        ModelUtils.getRepresentationIdFromStoragePath(binaryPath), entryPoint, fileFormat, binaryPath,
-        binaryPath.getName(), ((DefaultBinary) resource).getSizeInBytes(), true, null, null, null, null, null);
+        ModelUtils.getRepresentationIdFromStoragePath(binaryPath), entryPoint, binaryPath, binaryPath.getName(),
+        ((DefaultBinary) resource).getSizeInBytes(), true);
     } else {
       throw new GenericException(
         "Error while trying to convert something that it isn't a Binary into a representation file");
@@ -1816,8 +1812,8 @@ public class ModelService extends ModelObservable {
     notifyJobReportUpdated(jobReport);
   }
 
-  public void updateFileFormats(List<File> updatedFiles) throws ModelServiceException {
-    for (File file : updatedFiles) {
+  public void updateFileFormats(List<SimpleFile> updatedFiles) throws ModelServiceException {
+    for (SimpleFile file : updatedFiles) {
       try {
         RepresentationFilePreservationObject rfpo = PremisUtils.getPremisFile(storage, file.getAipId(),
           file.getRepresentationId(), file.getId() + ".premis.xml");
@@ -1832,7 +1828,8 @@ public class ModelService extends ModelObservable {
       } catch (IOException | PremisMetadataException | GenericException | RequestNotValidException | NotFoundException
         | AuthorizationDeniedException e) {
         e.printStackTrace();
-        LOGGER.warn("Error updating file format in storage for file " + file.getStoragePath().asString());
+        LOGGER.warn("Error updating file format in storage for file {}/{}/{} ", file.getAipId(),
+          file.getRepresentationId(), file.getId());
       }
     }
     notifyUpdateFileFormats(updatedFiles);

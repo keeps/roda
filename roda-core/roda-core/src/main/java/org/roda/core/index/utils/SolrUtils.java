@@ -107,6 +107,7 @@ import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.data.v2.User;
 import org.roda.core.model.AIP;
 import org.roda.core.model.DescriptiveMetadata;
+import org.roda.core.model.File;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
@@ -1394,7 +1395,7 @@ public class SolrUtils {
     return job;
   }
 
-  public static SolrInputDocument fileToSolrDocument(SimpleFile file) {
+  public static SolrInputDocument fileToSolrDocument(File file) {
     SolrInputDocument doc = new SolrInputDocument();
     doc.addField(RodaConstants.FILE_UUID, getId(file.getAipId(), file.getRepresentationId(), file.getId()));
     doc.addField(RodaConstants.FILE_ID, getId(file.getAipId(), file.getRepresentationId(), file.getId()));
@@ -1402,31 +1403,49 @@ public class SolrUtils {
     doc.addField(RodaConstants.FILE_FILEID, file.getId());
     doc.addField(RodaConstants.FILE_REPRESENTATIONID, file.getRepresentationId());
     doc.addField(RodaConstants.FILE_ISENTRYPOINT, file.isEntryPoint());
-    if(file.getFileFormat()!=null){
-      if(file.getFileFormat().getMimeType() != null){
-        doc.addField(RodaConstants.FILE_FORMAT_MIMETYPE,file.getFileFormat().getMimeType());
-      }
-      if(file.getFileFormat().getVersion() != null){
-        doc.addField(RodaConstants.FILE_FORMAT_VERSION,file.getFileFormat().getVersion());
-      }
-      if(file.getFileFormat().getPronom() != null){
-        doc.addField(RodaConstants.FILE_PRONOM,file.getFileFormat().getPronom());
-      }
-      if(file.getFileFormat().getExtension() != null){
-        doc.addField(RodaConstants.FILE_EXTENSION,file.getFileFormat().getExtension());
-      }
-      if(file.getFileFormat().getFormat() != null){
-        doc.addField(RodaConstants.FILE_FILEFORMAT,file.getFileFormat().getFormat());
-      }
-    }
-    if(file.getOriginalName()!=null){
+    if (file.getOriginalName() != null) {
       doc.addField(RodaConstants.FILE_ORIGINALNAME, file.getOriginalName());
     }
-    if(file.getSize()!=0){
+    if (file.getSize() != 0) {
       doc.addField(RodaConstants.FILE_SIZE, file.getSize());
     }
     doc.addField(RodaConstants.FILE_ISFILE, file.isFile());
-    if(file.getFulltext()!=null){
+    return doc;
+  }
+
+  public static SolrInputDocument simpleFileToSolrDocument(SimpleFile file) {
+    SolrInputDocument doc = new SolrInputDocument();
+    doc.addField(RodaConstants.FILE_UUID, getId(file.getAipId(), file.getRepresentationId(), file.getId()));
+    doc.addField(RodaConstants.FILE_ID, getId(file.getAipId(), file.getRepresentationId(), file.getId()));
+    doc.addField(RodaConstants.FILE_AIPID, file.getAipId());
+    doc.addField(RodaConstants.FILE_FILEID, file.getId());
+    doc.addField(RodaConstants.FILE_REPRESENTATIONID, file.getRepresentationId());
+    doc.addField(RodaConstants.FILE_ISENTRYPOINT, file.isEntryPoint());
+    if (file.getFileFormat() != null) {
+      if (file.getFileFormat().getMimeType() != null) {
+        doc.addField(RodaConstants.FILE_FORMAT_MIMETYPE, file.getFileFormat().getMimeType());
+      }
+      if (file.getFileFormat().getVersion() != null) {
+        doc.addField(RodaConstants.FILE_FORMAT_VERSION, file.getFileFormat().getVersion());
+      }
+      if (file.getFileFormat().getPronom() != null) {
+        doc.addField(RodaConstants.FILE_PRONOM, file.getFileFormat().getPronom());
+      }
+      if (file.getFileFormat().getExtension() != null) {
+        doc.addField(RodaConstants.FILE_EXTENSION, file.getFileFormat().getExtension());
+      }
+      if (file.getFileFormat().getFormat() != null) {
+        doc.addField(RodaConstants.FILE_FILEFORMAT, file.getFileFormat().getFormat());
+      }
+    }
+    if (file.getOriginalName() != null) {
+      doc.addField(RodaConstants.FILE_ORIGINALNAME, file.getOriginalName());
+    }
+    if (file.getSize() != 0) {
+      doc.addField(RodaConstants.FILE_SIZE, file.getSize());
+    }
+    doc.addField(RodaConstants.FILE_ISFILE, file.isFile());
+    if (file.getFulltext() != null) {
       doc.addField(RodaConstants.FILE_FULLTEXT, file.getFulltext());
     }
     return doc;

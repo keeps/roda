@@ -37,9 +37,9 @@ public interface ModelObserver {
 
   public void representationDeleted(String aipId, String representationId);
 
-  public void fileCreated(SimpleFile file);
+  public void fileCreated(File file);
 
-  public void fileUpdated(SimpleFile file);
+  public void fileUpdated(File file);
 
   public void fileDeleted(String aipId, String representationId, String fileId);
 
@@ -83,6 +83,6 @@ public interface ModelObserver {
 
   public void jobReportDeleted(String jobReportId);
 
-  public void notifyUpdateFileFormats(List<File> updatedFiles);
+  public void notifyUpdateFileFormats(List<SimpleFile> updatedFiles);
 
 }

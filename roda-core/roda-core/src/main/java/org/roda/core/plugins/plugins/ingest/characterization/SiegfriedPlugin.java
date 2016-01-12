@@ -35,7 +35,9 @@ import org.roda.core.data.v2.EventPreservationObject;
 import org.roda.core.data.v2.FileFormat;
 import org.roda.core.data.v2.JobReport.PluginState;
 import org.roda.core.data.v2.PluginType;
+import org.roda.core.data.v2.SimpleFile;
 import org.roda.core.index.IndexService;
+import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.metadata.v2.premis.PremisAgentHelper;
 import org.roda.core.metadata.v2.premis.PremisMetadataException;
 import org.roda.core.model.AIP;
@@ -136,7 +138,7 @@ public class SiegfriedPlugin implements Plugin<AIP> {
 
           final JSONObject obj = new JSONObject(siegfriedOutput);
           JSONArray files = (JSONArray) obj.get("files");
-          List<org.roda.core.model.File> updatedFiles = new ArrayList<org.roda.core.model.File>();
+          List<SimpleFile> updatedFiles = new ArrayList<SimpleFile>();
           for (int i = 0; i < files.length(); i++) {
             JSONObject fileObject = files.getJSONObject(i);
 
@@ -166,20 +168,17 @@ public class SiegfriedPlugin implements Plugin<AIP> {
                   if (fileName.contains(".")) {
                     extension = fileName.substring(fileName.lastIndexOf('.'));
                   }
-                  try {
-                    org.roda.core.model.File f = model.retrieveFile(aip.getId(), representationID, fileName);
-                    FileFormat ff = new org.roda.core.data.v2.FileFormat();
-                    ff.setPronom(pronom);
-                    ff.setMimeType(mime);
-                    ff.setVersion(version);
-                    ff.setExtension(extension);
-                    f.setFileFormat(ff);
-                    f.setSize(fileSize);
-                    f.setOriginalName(fileName);
-                    updatedFiles.add(f);
-                  } catch (RequestNotValidException | AuthorizationDeniedException e) {
-                    LOGGER.error("Error updating file: " + e.getMessage(), e);
-                  }
+                  SimpleFile f = index.retrieve(SimpleFile.class,
+                    SolrUtils.getId(aip.getId(), representationID, fileName));
+                  FileFormat ff = new org.roda.core.data.v2.FileFormat();
+                  ff.setPronom(pronom);
+                  ff.setMimeType(mime);
+                  ff.setVersion(version);
+                  ff.setExtension(extension);
+                  f.setFileFormat(ff);
+                  f.setSize(fileSize);
+                  f.setOriginalName(fileName);
+                  updatedFiles.add(f);
                 }
               }
             }

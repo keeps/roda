@@ -32,11 +32,12 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.AgentPreservationObject;
 import org.roda.core.data.v2.EventPreservationObject;
-import org.roda.core.data.v2.FileFormat;
+import org.roda.core.data.v2.JobReport.PluginState;
 import org.roda.core.data.v2.PluginType;
 import org.roda.core.data.v2.Representation;
-import org.roda.core.data.v2.JobReport.PluginState;
+import org.roda.core.data.v2.SimpleFile;
 import org.roda.core.index.IndexService;
+import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.metadata.v2.premis.PremisAgentHelper;
 import org.roda.core.metadata.v2.premis.PremisMetadataException;
 import org.roda.core.model.AIP;
@@ -103,7 +104,7 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
-    
+
     boolean created = false;
     try {
       AgentPreservationObject apo = model.getAgentPreservationObject(agent.getId());
@@ -129,7 +130,7 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
         for (String representationID : aip.getRepresentationIds()) {
           logger.debug("Processing representation " + representationID + " of AIP " + aip.getId());
           Representation representation = model.retrieveRepresentation(aip.getId(), representationID);
-          List<org.roda.core.model.File> updatedFiles = new ArrayList<org.roda.core.model.File>();
+          List<SimpleFile> updatedFiles = new ArrayList<SimpleFile>();
           for (String fileID : representation.getFileIds()) {
             logger.debug(
               "Processing file " + fileID + " of representation " + representationID + " from AIP " + aip.getId());
@@ -142,20 +143,18 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
             Binary resource = (Binary) FSUtils.convertPathToResource(tikaResult.getParent(), tikaResult);
             model.createOtherMetadata(aip.getId(), representationID, file.getStoragePath().getName() + ".xml", "tika",
               resource);
-
             try {
               String fulltext = TikaFullTextPluginUtils.extractFullTextFromResult(tikaResult);
-              System.out.println("FULLTEXT: "+fulltext);
-              org.roda.core.model.File f = model.retrieveFile(aip.getId(), representationID, fileID);
+              System.out.println("FULLTEXT: " + fulltext);
+              SimpleFile f = index.retrieve(SimpleFile.class, SolrUtils.getId(aip.getId(), representationID, fileID));
               f.setFulltext(fulltext);
               updatedFiles.add(f);
-            } catch (RequestNotValidException | AuthorizationDeniedException | ParserConfigurationException | IOException e) {
-              logger.error("Error updating file: " + e.getMessage(), e);
+            } catch (ParserConfigurationException pce) {
+
             }
-            model.updateFileFormats(updatedFiles);
-            createEvent("", PluginState.OK, aip, model);
-            
+
           }
+          model.updateFileFormats(updatedFiles);
         }
       } catch (RODAException | SAXException | TikaException | ModelServiceException | IOException mse) {
         logger.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage(), mse);
@@ -181,7 +180,7 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
       throw new PluginException(e.getMessage(), e);
     }
   }
-  
+
   @Override
   public Report beforeExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
 

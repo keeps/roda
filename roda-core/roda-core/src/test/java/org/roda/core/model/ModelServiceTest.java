@@ -173,8 +173,7 @@ public class ModelServiceTest {
     assertEquals(CorporaConstants.REPRESENTATION_1_ID, file_1_1.getRepresentationId());
     assertEquals(CorporaConstants.REPRESENTATION_1_FILE_1_ID, file_1_1.getId());
     assertTrue(file_1_1.isEntryPoint());
-    assertEquals(CorporaConstants.REPRESENTATION_1_FILE_1_FORMAT_MIMETYPE, file_1_1.getFileFormat().getMimeType());
-    assertEquals(CorporaConstants.REPRESENTATION_1_FILE_1_FORMAT_VERSION, file_1_1.getFileFormat().getVersion());
+    
     // TODO test format registries
 
     final Binary binary_1_1 = storage.getBinary(file_1_1.getStoragePath());
@@ -188,8 +187,6 @@ public class ModelServiceTest {
     assertEquals(CorporaConstants.REPRESENTATION_1_ID, file_1_2.getRepresentationId());
     assertEquals(CorporaConstants.REPRESENTATION_1_FILE_2_ID, file_1_2.getId());
     assertFalse(file_1_2.isEntryPoint());
-    assertEquals(CorporaConstants.REPRESENTATION_1_FILE_2_FORMAT_MIMETYPE, file_1_2.getFileFormat().getMimeType());
-    assertEquals(CorporaConstants.REPRESENTATION_1_FILE_2_FORMAT_VERSION, file_1_2.getFileFormat().getVersion());
     // TODO test format registries
 
     final Binary binary_1_2 = storage.getBinary(file_1_2.getStoragePath());
@@ -203,8 +200,6 @@ public class ModelServiceTest {
     assertEquals(CorporaConstants.REPRESENTATION_2_ID, file_2_1.getRepresentationId());
     assertEquals(CorporaConstants.REPRESENTATION_2_FILE_1_ID, file_2_1.getId());
     assertFalse(file_2_1.isEntryPoint());
-    assertEquals(CorporaConstants.REPRESENTATION_2_FILE_1_FORMAT_MIMETYPE, file_2_1.getFileFormat().getMimeType());
-    assertEquals(CorporaConstants.REPRESENTATION_2_FILE_1_FORMAT_VERSION, file_2_1.getFileFormat().getVersion());
     // TODO test format registries
 
     final Binary binary_2_1 = storage.getBinary(file_2_1.getStoragePath());
@@ -218,8 +213,6 @@ public class ModelServiceTest {
     assertEquals(CorporaConstants.REPRESENTATION_2_ID, file_2_2.getRepresentationId());
     assertEquals(CorporaConstants.REPRESENTATION_2_FILE_2_ID, file_2_2.getId());
     assertTrue(file_2_2.isEntryPoint());
-    assertEquals(CorporaConstants.REPRESENTATION_2_FILE_2_FORMAT_MIMETYPE, file_2_2.getFileFormat().getMimeType());
-    assertEquals(CorporaConstants.REPRESENTATION_2_FILE_2_FORMAT_VERSION, file_2_2.getFileFormat().getVersion());
     // TODO test format registries
 
     final Binary binary_2_2 = storage.getBinary(file_2_2.getStoragePath());

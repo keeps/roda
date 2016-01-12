@@ -133,16 +133,6 @@ public class IndexModelObserver implements ModelObserver {
         if (representation.getFileIds() != null && !representation.getFileIds().isEmpty()) {
           for (String fileId : representation.getFileIds()) {
             File file = model.retrieveFile(aip.getId(), representationId, fileId);
-            if (file.getFileFormat() == null) {
-              LOGGER.trace("FILE FORMAT NULL");
-            } else {
-              if (file.getFileFormat().getMimeType() == null) {
-                LOGGER.trace("MIME TYPE NULL");
-              } else {
-                LOGGER.trace("MIMETYPE: " + file.getFileFormat().getMimeType());
-              }
-            }
-
             SolrInputDocument fileDocument = SolrUtils.fileToSolrDocument(file);
             index.add(RodaConstants.INDEX_FILE, fileDocument);
           }
@@ -254,12 +244,12 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   @Override
-  public void fileCreated(SimpleFile file) {
+  public void fileCreated(File file) {
     addDocumentToIndex(RodaConstants.INDEX_FILE, SolrUtils.fileToSolrDocument(file), "Error creating File");
   }
 
   @Override
-  public void fileUpdated(SimpleFile file) {
+  public void fileUpdated(File file) {
     fileDeleted(file.getAipId(), file.getRepresentationId(), file.getId());
     fileCreated(file);
 
@@ -436,9 +426,9 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   @Override
-  public void notifyUpdateFileFormats(List<File> updatedFiles) {
-    for (File f : updatedFiles) {
-      fileUpdated(f);
+  public void notifyUpdateFileFormats(List<SimpleFile> updatedFiles) {
+    for (SimpleFile f : updatedFiles) {
+      addDocumentToIndex(RodaConstants.INDEX_FILE, SolrUtils.simpleFileToSolrDocument(f), "Error creating File");
     }
   }
 }
