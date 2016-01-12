@@ -73,8 +73,10 @@ public final class HTMLUtils {
   public static String descriptiveMetadataToHtml(Binary binary, String descriptiveMetadataType, final Locale locale)
     throws ModelServiceException, TransformerException {
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
-    return binaryToHtml(binary, descriptiveMetadataType, messages.getTranslations(
-      RodaConstants.I18N_CROSSWALKS_DISSEMINATION_HTML_PREFIX + descriptiveMetadataType, Object.class, true));
+
+    String lowerCaseDescriptiveMetadataType = descriptiveMetadataType.toLowerCase();
+    return binaryToHtml(binary, lowerCaseDescriptiveMetadataType, messages.getTranslations(
+      RodaConstants.I18N_CROSSWALKS_DISSEMINATION_HTML_PREFIX + lowerCaseDescriptiveMetadataType, Object.class, true));
   }
 
   public static String preservationObjectToHtml(Binary binary, final Locale locale)

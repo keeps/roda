@@ -188,8 +188,9 @@ public class ValidationUtils {
     throws ValidationException {
     try {
       InputStream inputStream = binary.getContent().createInputStream();
+      String lowerCaseDescriptiveMetadataType = descriptiveMetadataType.toLowerCase();
       InputStream schemaStream = RodaCoreFactory
-        .getConfigurationFileAsStream("schemas/" + descriptiveMetadataType + ".xsd");
+        .getConfigurationFileAsStream("schemas/" + lowerCaseDescriptiveMetadataType + ".xsd");
       if (schemaStream != null) {
         // FIXME is inputstream closed???
         Source xmlFile = new StreamSource(inputStream);

@@ -150,7 +150,7 @@ public class EditDescriptiveMetadata extends Composite {
           int index = 0;
           for (Map.Entry<String, String> entry : metadataTypes.entrySet()) {
             type.addItem(entry.getValue(), entry.getKey());
-            if (entry.getKey().equals(bundle.getType())) {
+            if (entry.getKey().equals(bundle.getType().toLowerCase())) {
               selected = index;
             }
 

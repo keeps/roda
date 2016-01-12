@@ -159,8 +159,8 @@ public class BrowserHelper {
         DescriptiveMetadataViewBundle bundle = new DescriptiveMetadataViewBundle();
         bundle.setId(descriptiveMetadata.getId());
         try {
-          bundle.setLabel(messages.getTranslation(
-            RodaConstants.I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX + descriptiveMetadata.getType()));
+          bundle.setLabel(messages.getTranslation(RodaConstants.I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX
+            + descriptiveMetadata.getType().toLowerCase()));
         } catch (MissingResourceException e) {
           bundle.setLabel(descriptiveMetadata.getId());
         }
