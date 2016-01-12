@@ -278,6 +278,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   // return Browser.retrieveMetadataFile(user, itemId, descriptiveMetadataId);
   // }
 
+  @Deprecated
   public DescriptionObject getDescriptionObject(String pid) throws RODAException {
     // DescriptionObject ret;
     // try {
@@ -293,6 +294,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     return null;
   }
 
+  @Deprecated
   public List<RepresentationInfo> getRepresentationsInfo(String doPID) throws RODAException {
     // List<RepresentationInfo> ret = new Vector<RepresentationInfo>();
     // try {
@@ -344,6 +346,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   // return ret;
   // }
 
+  @Deprecated
   protected List<DisseminationInfo> getDisseminations(RepresentationObject rep) {
     // List<DisseminationInfo> ret;
     // if (rep != null) {
@@ -399,6 +402,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   // return size;
   // }
 
+  @Deprecated
   public List<RepresentationPreservationObject> getDOPreservationObjects(String doPID) throws RODAException {
     // List<RepresentationPreservationObject> ret;
     // try {
@@ -420,6 +424,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   }
 
+  @Deprecated
   public List<PreservationInfo> getPreservationsInfo(String doPID) throws RODAException {
     // List<PreservationInfo> ret = new ArrayList<PreservationInfo>();
     // Browser browserService =
@@ -462,6 +467,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     return null;
   }
 
+  @Deprecated
   public TimelineInfo getPreservationTimeline(List<String> rpoPIDs, List<String> icons, List<String> colors,
     String localeString) throws RODAException {
     // final Locale locale = ServerTools.parseLocale(localeString);
@@ -510,6 +516,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   }
 
+  @Deprecated
   protected String createTimelineXML(EventPreservationObject[] pEvents, String icon, String color, Locale locale) {
 
     BrowserServiceMessages browserServiceMessages = new BrowserServiceMessages(locale);
@@ -600,10 +607,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public IndexResult<Job> findJobs(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
+  public IndexResult<Job> findJobs(Filter filter, Sorter sorter, Sublist sublist, Facets facets, String localeString)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
-    return Jobs.findJobs(user, filter, sorter, sublist, facets);
+    IndexResult<Job> result = Jobs.findJobs(user, filter, sorter, sublist, facets);
+    return I18nUtility.translate(result, Job.class, localeString);
   }
 
   @Override

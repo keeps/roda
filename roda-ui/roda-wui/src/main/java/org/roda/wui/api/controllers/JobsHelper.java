@@ -90,7 +90,7 @@ public class JobsHelper {
 
   public static IndexResult<Job> findJobs(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
     throws GenericException, RequestNotValidException {
-    return RodaCoreFactory.getIndexService().find(Job.class, filter, sorter, sublist);
+    return RodaCoreFactory.getIndexService().find(Job.class, filter, sorter, sublist, facets);
   }
 
   public static org.roda.core.data.v2.Jobs getJobsFromIndexResult(IndexResult<Job> jobsFromIndexResult) {
@@ -105,7 +105,7 @@ public class JobsHelper {
 
   public static IndexResult<JobReport> findJobReports(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
     throws GenericException, RequestNotValidException {
-    return RodaCoreFactory.getIndexService().find(JobReport.class, filter, sorter, sublist);
+    return RodaCoreFactory.getIndexService().find(JobReport.class, filter, sorter, sublist, facets);
   }
 
 }

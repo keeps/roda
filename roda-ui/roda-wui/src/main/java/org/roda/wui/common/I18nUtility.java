@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.util.Locale;
 import java.util.MissingResourceException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.FacetFieldResult;
@@ -54,30 +55,18 @@ public class I18nUtility {
 
   private static <T extends Serializable> String getFacetTranslation(String facetField, String facetValue,
     Locale locale, Class<T> resultClass) {
-    String bundleKey = getPrefix(resultClass) + facetField + "." + facetValue;
+    String bundleKey = RodaConstants.I18N_UI_FACETS_PREFIX + resultClass.getSimpleName() + "." + facetField
+      + (facetValue != null && facetValue.trim().length() == 0 ? "" : "." + facetValue.trim());
     String ret;
 
     try {
       ret = RodaCoreFactory.getI18NMessages(locale).getTranslation(bundleKey);
     } catch (MissingResourceException e) {
       ret = facetValue;
+      LOGGER.debug("Translation not found: " + bundleKey + " locale: " + locale);
     }
 
     return ret;
-  }
-
-  private static <T> String getPrefix(Class<T> resultClass) {
-    String prefix;
-    if (resultClass.equals(IndexedAIP.class)) {
-      prefix = RodaConstants.I18N_UI_SEARCH_FACETS_PREFIX;
-
-    } else if (resultClass.equals(RODAMember.class)) {
-      prefix = RodaConstants.I18N_UI_USER_ADMINISTRATION_FACETS_PREFIX;
-    } else {
-      prefix = "";
-      LOGGER.error("Error while trying to get i18n prefix for " + resultClass);
-    }
-    return prefix;
   }
 
 }

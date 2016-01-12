@@ -211,7 +211,8 @@ public interface BrowserServiceAsync {
   void getRepresentationFiles(Filter filter, Sorter sorter, Sublist sublist, Facets facets, String localeString,
     AsyncCallback<IndexResult<SimpleFile>> callback);
 
-  void findJobs(Filter filter, Sorter sorter, Sublist sublist, Facets facets, AsyncCallback<IndexResult<Job>> callback);
+  void findJobs(Filter filter, Sorter sorter, Sublist sublist, Facets facets, String localeString,
+    AsyncCallback<IndexResult<Job>> callback);
 
   void retrieveJob(String jobId, AsyncCallback<Job> callback);
 

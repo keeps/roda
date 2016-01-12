@@ -272,7 +272,7 @@ public interface BrowserService extends RemoteService {
   IndexResult<SimpleFile> getRepresentationFiles(Filter filter, Sorter sorter, Sublist sublist, Facets facets,
     String localeString) throws AuthorizationDeniedException, GenericException, RequestNotValidException;
 
-  IndexResult<Job> findJobs(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
+  IndexResult<Job> findJobs(Filter filter, Sorter sorter, Sublist sublist, Facets facets, String localeString)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException;
 
   Job retrieveJob(String jobId) throws AuthorizationDeniedException, GenericException, NotFoundException;
@@ -291,4 +291,5 @@ public interface BrowserService extends RemoteService {
   List<Viewer> getViewersProperties() throws GenericException;
 
   Map<String, String> getSupportedMetadata(String locale) throws AuthorizationDeniedException, GenericException;
+
 }
