@@ -152,7 +152,7 @@ public class SiegfriedPlugin implements Plugin<AIP> {
             LOGGER.debug("Creating other metadata (AIP: " + aip.getId() + ", REPRESENTATION: " + representationID
               + ", FILE: " + fileName + ")");
 
-            model.createOtherMetadata(aip.getId(), representationID, fileName + ".xml", "Siegfried", resource);
+            model.createOtherMetadata(aip.getId(), representationID, fileName + ".json", "Siegfried", resource);
 
             p.toFile().delete();
 
@@ -161,6 +161,7 @@ public class SiegfriedPlugin implements Plugin<AIP> {
               for (int j = 0; j < matches.length(); j++) {
                 JSONObject match = (JSONObject) matches.get(j);
                 if (match.getString("id").equalsIgnoreCase("pronom")) {
+                  String format = match.getString("format");
                   String pronom = match.getString("puid");
                   String mime = match.getString("mime");
                   String version = match.getString("version");
@@ -171,6 +172,7 @@ public class SiegfriedPlugin implements Plugin<AIP> {
                   SimpleFile f = index.retrieve(SimpleFile.class,
                     SolrUtils.getId(aip.getId(), representationID, fileName));
                   FileFormat ff = new org.roda.core.data.v2.FileFormat();
+                  ff.setFormat(format);
                   ff.setPronom(pronom);
                   ff.setMimeType(mime);
                   ff.setVersion(version);

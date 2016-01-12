@@ -53,7 +53,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
-
 public class PremisUtils {
   private final static Logger LOGGER = LoggerFactory.getLogger(PremisUtils.class);
   private static final String W3C_XML_SCHEMA_NS_URI = "http://www.w3.org/2001/XMLSchema";
@@ -217,10 +216,16 @@ public class PremisUtils {
 
   public static RepresentationFilePreservationObject updateFileFormat(RepresentationFilePreservationObject rfpo,
     org.roda.core.data.v2.FileFormat fileFormat) {
-    if(!StringUtils.isBlank(fileFormat.getMimeType())){
+    if (!StringUtils.isBlank(fileFormat.getFormat())) {
+      rfpo.setFormatDesignationName(fileFormat.getFormat());
+    }
+    if (!StringUtils.isBlank(fileFormat.getVersion())) {
+      rfpo.setFormatDesignationVersion(fileFormat.getVersion());
+    }
+    if (!StringUtils.isBlank(fileFormat.getMimeType())) {
       rfpo.setMimetype(fileFormat.getMimeType());
     }
-    if(!StringUtils.isBlank(fileFormat.getPronom())){
+    if (!StringUtils.isBlank(fileFormat.getPronom())) {
       rfpo.setFormatRegistryKey(fileFormat.getPronom());
       rfpo.setFormatRegistryName("http://www.nationalarchives.gov.uk/pronom");
     }

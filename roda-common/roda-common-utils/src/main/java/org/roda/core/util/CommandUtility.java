@@ -37,6 +37,20 @@ public class CommandUtility {
    * @throws CommandException
    */
   public static String execute(String... args) throws CommandException {
+    return execute(true, args);
+  }
+
+  /**
+   * Execute the given command line.
+   * 
+   * @param args
+   *          the command line as a list of arguments.
+   * 
+   * @return a {@link String} with the output of the command.
+   * 
+   * @throws CommandException
+   */
+  public static String execute(boolean withErrorStream, String... args) throws CommandException {
 
     int exitValue = 0;
     String output;
@@ -51,7 +65,7 @@ public class CommandUtility {
 
       // create and execute process
       ProcessBuilder processBuilder = new ProcessBuilder(args);
-      processBuilder.redirectErrorStream(true);
+      processBuilder.redirectErrorStream(withErrorStream);
       Process process = processBuilder.start();
 
       // Get process output
@@ -115,7 +129,11 @@ public class CommandUtility {
    * @throws CommandException
    */
   public static String execute(List<String> args) throws CommandException {
-    return execute(args.toArray(new String[args.size()]));
+    return execute(args, true);
+  }
+
+  public static String execute(List<String> args, boolean withErrorStream) throws CommandException {
+    return execute(withErrorStream, args.toArray(new String[args.size()]));
   }
 
 }

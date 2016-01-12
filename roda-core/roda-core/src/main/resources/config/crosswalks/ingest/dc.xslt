@@ -10,91 +10,95 @@
 			<xsl:apply-templates />
 		</doc>
 	</xsl:template>
-	<xsl:template match="metadata">
-		<xsl:if test="dc:title/text()">
+	<xsl:template match="simpledc">
+		<xsl:if test="title/text()">
 			<field name="title">
-				<xsl:value-of select="dc:title/text()" />
+				<xsl:value-of select="title/text()" />
 			</field>
 		</xsl:if>
-		<xsl:if test="dc:description/text()">
+		<xsl:if test="description/text()">
 			<field name="description">
-				<xsl:value-of select="dc:description/text()" />
+				<xsl:value-of select="description/text()" />
 			</field>
 		</xsl:if>
-		<xsl:if test="dc:contributor/text()">
+		<xsl:if test="contributor/text()">
 			<field name="dc.contributor_txt">
-				<xsl:value-of select="dc:contributor/text()" />
+				<xsl:value-of select="contributor/text()" />
 			</field>
 		</xsl:if>
-		<xsl:if test="dc:coverage/text()">
+		<xsl:if test="coverage/text()">
 			<field name="dc.coverage_txt">
-				<xsl:value-of select="dc:coverage/text()" />
+				<xsl:value-of select="coverage/text()" />
 			</field>
 		</xsl:if>
-		<xsl:if test="dc:creator/text()">
+		<xsl:if test="creator/text()">
 			<field name="dc.creator_txt">
-				<xsl:value-of select="dc:creator/text()" />
+				<xsl:value-of select="creator/text()" />
 			</field>
 		</xsl:if>
-		<xsl:if test="dc:date/text()">
+		<xsl:if test="date/text()">
 			<xsl:analyze-string regex="^\d{{4}}-\d{{2}}-\d{{2}}$"
-				select="dc:date/text()">
+				select="date/text()">
 				<xsl:matching-substring>
 					<xsl:variable name="date">
 						<xsl:value-of select="regex-group(0)" />
 					</xsl:variable>
 					<xsl:if test="not(normalize-space($date)='')">
 						<field name="dateInitial">
-							<xsl:value-of select="$date" />T00:00:00Z</field>
+							<xsl:value-of select="$date" />
+							T00:00:00Z
+						</field>
 						<field name="dateFinal">
-							<xsl:value-of select="$date" />T00:00:00Z</field>
+							<xsl:value-of select="$date" />
+							T00:00:00Z
+						</field>
 					</xsl:if>
 				</xsl:matching-substring>
 			</xsl:analyze-string>
 		</xsl:if>
-		<xsl:if test="dc:format/text()">
+		<xsl:if test="format/text()">
 			<field name="dc.format_txt">
-				<xsl:value-of select="dc:format/text()" />
+				<xsl:value-of select="format/text()" />
 			</field>
 		</xsl:if>
-		<xsl:if test="dc:identifier/text()">
+		<xsl:if test="identifier/text()">
 			<field name="dc.identifier_txt">
-				<xsl:value-of select="dc:identifier/text()" />
+				<xsl:value-of select="identifier/text()" />
 			</field>
 		</xsl:if>
-		<xsl:if test="dc:language/text()">
+		<xsl:if test="language/text()">
 			<field name="dc.language_txt">
-				<xsl:value-of select="dc:language/text()" />
+				<xsl:value-of select="language/text()" />
 			</field>
 		</xsl:if>
-		<xsl:if test="dc:publisher/text()">
+		<xsl:if test="publisher/text()">
 			<field name="dc.publisher_txt">
-				<xsl:value-of select="dc:publisher/text()" />
+				<xsl:value-of select="publisher/text()" />
 			</field>
 		</xsl:if>
-		<xsl:if test="dc:relation/text()">
+		<xsl:if test="relation/text()">
 			<field name="dc.relation_txt">
-				<xsl:value-of select="dc:relation/text()" />
+				<xsl:value-of select="relation/text()" />
 			</field>
 		</xsl:if>
-		<xsl:if test="dc:rights/text()">
+		<xsl:if test="rights/text()">
 			<field name="dc.rights_txt">
-				<xsl:value-of select="dc:rights/text()" />
+				<xsl:value-of select="rights/text()" />
 			</field>
 		</xsl:if>
-		<xsl:if test="dc:source/text()">
+		<xsl:if test="source/text()">
 			<field name="dc.source_txt">
-				<xsl:value-of select="dc:source/text()" />
+				<xsl:value-of select="source/text()" />
 			</field>
 		</xsl:if>
-		<xsl:if test="dc:subject/text()">
+		<xsl:if test="subject/text()">
 			<field name="dc.subject_txt">
-				<xsl:value-of select="dc:subject/text()" />
+				<xsl:value-of select="subject/text()" />
 			</field>
 		</xsl:if>
-		<xsl:if test="dc:type/text()">
+		<xsl:if test="type/text()">
 			<field name="dc.type_txt">
-				<xsl:value-of select="dc:type/text()" />
+				<xsl:value-of select="type/text()" />
 			</field>
 		</xsl:if>
 		<field name="level">item</field>

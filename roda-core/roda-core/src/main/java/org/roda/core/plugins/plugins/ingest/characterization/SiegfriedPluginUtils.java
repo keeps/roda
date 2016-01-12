@@ -34,7 +34,7 @@ public class SiegfriedPluginUtils {
   public static String runSiegfriedOnPath(Path sourceDirectory) throws PluginException {
     try {
       List<String> command = getBatchCommand(sourceDirectory);
-      String siegfriedOutput = CommandUtility.execute(command);
+      String siegfriedOutput = CommandUtility.execute(command, false);
       return siegfriedOutput;
     } catch (CommandException e) {
       throw new PluginException("Error while executing Siegfried command");
