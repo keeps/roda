@@ -12,17 +12,25 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.Parser;
 import org.apache.tika.sax.ToXMLContentHandler;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.ContentHandler;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 public class TikaFullTextPluginUtils {
-  public static Path extractMetadata(InputStream is) throws IOException, SAXException, TikaException{
+  public static Path extractMetadata(InputStream is) throws IOException, SAXException, TikaException {
     Parser parser = new AutoDetectParser();
     Metadata metadata = new Metadata();
     ContentHandler handler = new ToXMLContentHandler();
@@ -32,5 +40,21 @@ public class TikaFullTextPluginUtils {
     Path p = Files.createTempFile("tika", ".xml");
     Files.write(p, content.getBytes());
     return p;
+  }
+
+  public static String extractFullTextFromResult(Path tikaResult)
+    throws ParserConfigurationException, IOException, SAXException {
+    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+    DocumentBuilder db = dbf.newDocumentBuilder();
+    InputSource source = new InputSource(Files.newInputStream(tikaResult));
+
+    Document doc = db.parse(source);
+    NodeList nodes = doc.getElementsByTagName("body");
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < nodes.getLength(); i++) {
+      Node node = nodes.item(i);
+      sb.append(node.getTextContent());
+    }
+    return sb.toString();
   }
 }

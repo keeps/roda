@@ -769,14 +769,14 @@ public class RodaCoreFactory {
     try {
       if (Files.exists(config)) {
         inputStream = Files.newInputStream(config);
-        LOGGER.debug("Loading configuration from file " + config);
+        LOGGER.trace("Loading configuration from file " + config);
       }
     } catch (IOException e) {
       // do nothing
     }
     if (inputStream == null) {
       inputStream = RodaUtils.class.getResourceAsStream("/config/" + configurationFile);
-      LOGGER.debug("Loading configuration from classpath " + configurationFile);
+      LOGGER.trace("Loading configuration from classpath " + configurationFile);
     }
     return inputStream;
   }

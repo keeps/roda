@@ -178,7 +178,7 @@ public class SiegfriedPlugin implements Plugin<AIP> {
                     f.setOriginalName(fileName);
                     updatedFiles.add(f);
                   } catch (RequestNotValidException | AuthorizationDeniedException e) {
-                    LOGGER.error("Error retrieving file: " + e.getMessage(), e);
+                    LOGGER.error("Error updating file: " + e.getMessage(), e);
                   }
                 }
               }

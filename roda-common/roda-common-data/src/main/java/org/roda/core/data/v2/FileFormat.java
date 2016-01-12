@@ -16,6 +16,17 @@ public class FileFormat extends RODAObject {
   private String pronom;
   private String extension;
   private Map<String, String> formatRegistries;
+  private String format;
+  
+  
+
+  public String getFormat() {
+    return format;
+  }
+
+  public void setFormat(String format) {
+    this.format = format;
+  }
 
   public String getExtension() {
     return extension;

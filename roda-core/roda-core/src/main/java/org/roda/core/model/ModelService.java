@@ -155,7 +155,7 @@ public class ModelService extends ModelObservable {
     try {
       storage.createDirectory(directoryPath, new HashMap<String, Set<String>>());
     } catch (AlreadyExistsException e) {
-      LOGGER.error("Error initializing directory: " + directoryPath.asString(), e);
+      // do nothing
     }
 
   }
@@ -744,7 +744,6 @@ public class ModelService extends ModelObservable {
   public File retrieveFile(String aipId, String representationId, String fileId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     File file;
-
     StoragePath filePath = ModelUtils.getRepresentationFilePath(aipId, representationId, fileId);
     Binary binary = storage.getBinary(filePath);
     file = convertResourceToRepresentationFile(binary);

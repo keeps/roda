@@ -154,8 +154,20 @@ public class SimpleFile extends RODAObject {
 
   @Override
   public String toString() {
-    return "File [id=" + id + ", aipId=" + aipId + ", representationId=" + representationId + ", entryPoint="
-      + entryPoint + ", fileFormat=" + fileFormat + ",originalName=" + originalName + "]";
+    return "File[\n"+
+      "id:"+id+"\n"+
+      "aipId:"+aipId+"\n"+
+      "representationId:"+representationId+"\n"+
+      "entryPoint:"+entryPoint+"\n"+
+      "fileFormat:"+fileFormat+"\n"+
+      "size:"+size+"\n"+
+      "entryPoint:"+entryPoint+"\n"+
+      "originalName:"+originalName+"\n"+
+      "isFile:"+isFile+"\n"+
+      "creatingApplicationName:"+creatingApplicationName+"\n"+
+      "creatingApplicationVersion:"+creatingApplicationVersion+"\n"+
+      "dateCreatedByApplication:"+dateCreatedByApplication+"\n"+
+      "fulltext:"+fulltext+"\n]";
   }
 
   @Override

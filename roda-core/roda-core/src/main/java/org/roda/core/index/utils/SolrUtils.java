@@ -1399,24 +1399,36 @@ public class SolrUtils {
     doc.addField(RodaConstants.FILE_UUID, getId(file.getAipId(), file.getRepresentationId(), file.getId()));
     doc.addField(RodaConstants.FILE_ID, getId(file.getAipId(), file.getRepresentationId(), file.getId()));
     doc.addField(RodaConstants.FILE_AIPID, file.getAipId());
-    doc.addField(RodaConstants.FILE_FORMAT_MIMETYPE,
-      file.getFileFormat().getMimeType() != null ? file.getFileFormat().getMimeType() : "");
-    doc.addField(RodaConstants.FILE_FORMAT_VERSION,
-      file.getFileFormat().getVersion() != null ? file.getFileFormat().getVersion() : "");
     doc.addField(RodaConstants.FILE_FILEID, file.getId());
     doc.addField(RodaConstants.FILE_REPRESENTATIONID, file.getRepresentationId());
     doc.addField(RodaConstants.FILE_ISENTRYPOINT, file.isEntryPoint());
-    doc.addField(RodaConstants.FILE_ORIGINALNAME, file.getOriginalName());
-    doc.addField(RodaConstants.FILE_SIZE, file.getSize());
+    if(file.getFileFormat()!=null){
+      if(file.getFileFormat().getMimeType() != null){
+        doc.addField(RodaConstants.FILE_FORMAT_MIMETYPE,file.getFileFormat().getMimeType());
+      }
+      if(file.getFileFormat().getVersion() != null){
+        doc.addField(RodaConstants.FILE_FORMAT_VERSION,file.getFileFormat().getVersion());
+      }
+      if(file.getFileFormat().getPronom() != null){
+        doc.addField(RodaConstants.FILE_PRONOM,file.getFileFormat().getPronom());
+      }
+      if(file.getFileFormat().getExtension() != null){
+        doc.addField(RodaConstants.FILE_EXTENSION,file.getFileFormat().getExtension());
+      }
+      if(file.getFileFormat().getFormat() != null){
+        doc.addField(RodaConstants.FILE_FILEFORMAT,file.getFileFormat().getFormat());
+      }
+    }
+    if(file.getOriginalName()!=null){
+      doc.addField(RodaConstants.FILE_ORIGINALNAME, file.getOriginalName());
+    }
+    if(file.getSize()!=0){
+      doc.addField(RodaConstants.FILE_SIZE, file.getSize());
+    }
     doc.addField(RodaConstants.FILE_ISFILE, file.isFile());
-
-    doc.addField(RodaConstants.FILE_PRONOM,
-      file.getFileFormat().getPronom() != null ? file.getFileFormat().getPronom() : "");
-    doc.addField(RodaConstants.FILE_EXTENSION,
-      file.getFileFormat().getExtension() != null ? file.getFileFormat().getExtension() : "");
-    // FIXME how to index format registries if any
-    doc.addField(RodaConstants.FILE_FILEFORMAT, "");
-    doc.addField(RodaConstants.FILE_FULLTEXT, file.getFulltext());
+    if(file.getFulltext()!=null){
+      doc.addField(RodaConstants.FILE_FULLTEXT, file.getFulltext());
+    }
     return doc;
   }
 

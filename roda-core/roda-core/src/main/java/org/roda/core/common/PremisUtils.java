@@ -29,6 +29,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.FileFormat;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -45,11 +46,13 @@ import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.FileUtility;
+import org.roda.core.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
+
 
 public class PremisUtils {
   private final static Logger LOGGER = LoggerFactory.getLogger(PremisUtils.class);
@@ -214,9 +217,13 @@ public class PremisUtils {
 
   public static RepresentationFilePreservationObject updateFileFormat(RepresentationFilePreservationObject rfpo,
     org.roda.core.data.v2.FileFormat fileFormat) {
-    rfpo.setMimetype(fileFormat.getMimeType());
-    rfpo.setFormatRegistryKey(fileFormat.getPronom());
-    rfpo.setFormatRegistryName("http://www.nationalarchives.gov.uk/pronom");
+    if(!StringUtils.isBlank(fileFormat.getMimeType())){
+      rfpo.setMimetype(fileFormat.getMimeType());
+    }
+    if(!StringUtils.isBlank(fileFormat.getPronom())){
+      rfpo.setFormatRegistryKey(fileFormat.getPronom());
+      rfpo.setFormatRegistryName("http://www.nationalarchives.gov.uk/pronom");
+    }
     return rfpo;
   }
 }
