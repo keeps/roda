@@ -28,6 +28,7 @@ import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -37,9 +38,13 @@ import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -112,7 +117,11 @@ public class PreservationEvents extends Composite {
   @UiField
   FlowPanel premisContainer;
 
-  // private ClientLogger logger = new ClientLogger(getClass().getName());
+  @UiField
+  Button downloadButton;
+
+  @UiField
+  Button backButton;
 
   private String aipId;
 
@@ -128,6 +137,8 @@ public class PreservationEvents extends Composite {
     this.aipId = aipId;
 
     initWidget(uiBinder.createAndBindUi(this));
+
+    downloadButton.setEnabled(false);
 
     BrowserService.Util.getInstance().getItemBundle(aipId, LocaleInfo.getCurrentLocale().getLocaleName(),
       new AsyncCallback<BrowseItemBundle>() {
@@ -160,6 +171,8 @@ public class PreservationEvents extends Composite {
     itemDates.setText(getDatesText(aip));
 
     if (!preservationMetadata.getRepresentationsMetadata().isEmpty()) {
+      downloadButton.setEnabled(true);
+      
       for (RepresentationPreservationMetadataBundle bundle : preservationMetadata.getRepresentationsMetadata()) {
         String repId = bundle.getRepresentationID();
         getPreservationMetadataHTML(aipId, repId, new AsyncCallback<SafeHtml>() {
@@ -254,7 +267,6 @@ public class PreservationEvents extends Composite {
 
             SafeHtmlBuilder b = new SafeHtmlBuilder();
 
-            // error message
             b.append(SafeHtmlUtils.fromSafeConstant("<span class='error'>"));
             b.append(messages.preservationMetadataTranformToHTMLError());
             b.append(SafeHtmlUtils.fromSafeConstant("<pre><code>"));
@@ -274,5 +286,18 @@ public class PreservationEvents extends Composite {
     } catch (RequestException e) {
       callback.onFailure(e);
     }
+  }
+
+  @UiHandler("downloadButton")
+  void buttonDownloadHandler(ClickEvent e) {
+    SafeUri downloadUri = RestUtils.createPreservationMetadataDownloadUri(aipId);
+    if (downloadUri != null) {
+      Window.Location.assign(downloadUri.asString());
+    }
+  }
+
+  @UiHandler("backButton")
+  void buttonBackHandler(ClickEvent e) {
+    Tools.newHistory(Tools.concat(Browse.RESOLVER.getHistoryPath(), aipId));
   }
 }

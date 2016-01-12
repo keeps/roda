@@ -5,12 +5,11 @@
 	xmlns:i="urn:import:config.i18n.client" xmlns:m="urn:import:org.roda.wui.client.main"
 	xmlns:lists="urn:import:org.roda.wui.client.common.lists">
 
-	<ui:with field='constants' type='config.i18n.client.UserManagementConstants' />
-	<ui:with field='messages' type='config.i18n.client.UserManagementMessages' />
-
 	<ui:style>
 
 	</ui:style>
+
+	<ui:with field='messages' type='config.i18n.client.BrowseMessages' />
 
 	<g:FlowPanel styleName="preservationEvents" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
@@ -29,12 +28,17 @@
 					addStyleNames="preservationMetadata metadataContent">
 				</g:FlowPanel>
 			</g:FlowPanel>
-
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel>
 					<g:Label addStyleNames="h4">
-						<ui:msg>Actions</ui:msg>
+						<ui:text from='{messages.sidebarActionsTitle}' />
 					</g:Label>
+					<g:Button addStyleNames="btn btn-download" ui:field="downloadButton">
+						<ui:text from='{messages.preservationEventsDownloadButton}' />
+					</g:Button>
+					<g:Button addStyleNames="btn btn-back" ui:field="backButton">
+						<ui:text from='{messages.preservationEventsBackButton}' />
+					</g:Button>
 				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>
