@@ -766,8 +766,8 @@ public class ViewRepresentation extends Composite {
           values.put("Mimetype", fileFormat.getMimeType());
         }
 
-        if (fileFormat.getFormat() != null) {
-          values.put("Format", fileFormat.getFormat());
+        if (fileFormat.getFormatDesignationName() != null) {
+          values.put("Format", fileFormat.getFormatDesignationName());
         }
 
         if (fileFormat.getPronom() != null) {

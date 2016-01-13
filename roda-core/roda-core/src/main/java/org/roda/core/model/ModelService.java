@@ -1831,7 +1831,8 @@ public class ModelService extends ModelObservable {
         LOGGER.warn("Error updating file format in storage for file {}/{}/{} ", file.getAipId(),
           file.getRepresentationId(), file.getId());
       }
+      // notifyFileUpdated(file);
     }
-    notifyUpdateFileFormats(updatedFiles);
+    // TODO is any notify needed?
   }
 }

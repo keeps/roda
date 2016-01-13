@@ -15,7 +15,6 @@ import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.JobReport;
 import org.roda.core.data.v2.LogEntry;
 import org.roda.core.data.v2.Representation;
-import org.roda.core.data.v2.SimpleFile;
 import org.roda.core.data.v2.User;
 
 public abstract class ModelObservable {
@@ -224,12 +223,6 @@ public abstract class ModelObservable {
   protected void notifyJobReportDeleted(String jobReportId) {
     for (ModelObserver observer : observers) {
       observer.jobReportDeleted(jobReportId);
-    }
-  }
-
-  protected void notifyUpdateFileFormats(List<SimpleFile> updatedFiles) {
-    for (ModelObserver observer : observers) {
-      observer.notifyUpdateFileFormats(updatedFiles);
     }
   }
 }

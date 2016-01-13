@@ -7,14 +7,11 @@
  */
 package org.roda.core.model;
 
-import java.util.List;
-
 import org.roda.core.data.v2.Group;
 import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.JobReport;
 import org.roda.core.data.v2.LogEntry;
 import org.roda.core.data.v2.Representation;
-import org.roda.core.data.v2.SimpleFile;
 import org.roda.core.data.v2.User;
 
 public interface ModelObserver {
@@ -82,7 +79,5 @@ public interface ModelObserver {
   public void jobReportUpdated(JobReport jobReport);
 
   public void jobReportDeleted(String jobReportId);
-
-  public void notifyUpdateFileFormats(List<SimpleFile> updatedFiles);
 
 }

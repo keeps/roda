@@ -84,6 +84,7 @@ import org.roda.core.data.v2.AgentPreservationObject;
 import org.roda.core.data.v2.EventPreservationObject;
 import org.roda.core.data.v2.FacetFieldResult;
 import org.roda.core.data.v2.FileFormat;
+import org.roda.core.data.v2.Fixity;
 import org.roda.core.data.v2.Group;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.IndexedAIP;
@@ -754,7 +755,7 @@ public class SolrUtils {
     } else if (resultClass.equals(Job.class)) {
       ret = resultClass.cast(solrDocumentToJob(doc));
     } else if (resultClass.equals(SimpleFile.class)) {
-      ret = resultClass.cast(solrDocumentToFile(doc));
+      ret = resultClass.cast(solrDocumentToSimpleFile(doc));
     } else {
       throw new GenericException("Cannot find class index name: " + resultClass.getName());
     }
@@ -1424,7 +1425,7 @@ public class SolrUtils {
     return job;
   }
 
-  public static SolrInputDocument fileToSolrDocument(File file) {
+  public static SolrInputDocument fileToSolrDocument(File file, RepresentationFilePreservationObject premisFile) {
     SolrInputDocument doc = new SolrInputDocument();
     doc.addField(RodaConstants.FILE_UUID, getId(file.getAipId(), file.getRepresentationId(), file.getId()));
     doc.addField(RodaConstants.FILE_ID, getId(file.getAipId(), file.getRepresentationId(), file.getId()));
@@ -1439,69 +1440,135 @@ public class SolrUtils {
       doc.addField(RodaConstants.FILE_SIZE, file.getSize());
     }
     doc.addField(RodaConstants.FILE_ISFILE, file.isFile());
-    return doc;
-  }
 
-  public static SolrInputDocument simpleFileToSolrDocument(SimpleFile file) {
-    SolrInputDocument doc = new SolrInputDocument();
-    doc.addField(RodaConstants.FILE_UUID, getId(file.getAipId(), file.getRepresentationId(), file.getId()));
-    doc.addField(RodaConstants.FILE_ID, getId(file.getAipId(), file.getRepresentationId(), file.getId()));
-    doc.addField(RodaConstants.FILE_AIPID, file.getAipId());
-    doc.addField(RodaConstants.FILE_REPRESENTATIONID, file.getRepresentationId());
-    doc.addField(RodaConstants.FILE_FILEID, file.getId());
-    doc.addField(RodaConstants.FILE_ISENTRYPOINT, file.isEntryPoint());
+    if (premisFile != null) {
+      // Add information from PREMIS
+      if (premisFile.getFixities() != null && premisFile.getFixities().length > 0) {
+        List<String> hashes = new ArrayList<>();
+        for (Fixity fixity : premisFile.getFixities()) {
+          StringBuilder fixityPrint = new StringBuilder();
+          fixityPrint.append(fixity.getMessageDigest());
+          fixityPrint.append(" (");
+          fixityPrint.append(fixity.getMessageDigestAlgorithm());
+          // if (StringUtils.isNotBlank(fixity.getMessageDigestOriginator())) {
+          // fixityPrint.append(", ");
+          // fixityPrint.append(fixity.getMessageDigestOriginator());
+          // }
+          fixityPrint.append(")");
 
-    if (file.getOriginalName() != null) {
-      doc.addField(RodaConstants.FILE_ORIGINALNAME, file.getOriginalName());
-    }
-    if (file.getHash() != null && file.getHash().size() > 0) {
-      doc.addField(RodaConstants.FILE_HASH, file.getHash());
-    }
-    if (file.getSize() != 0) {
-      doc.addField(RodaConstants.FILE_SIZE, file.getSize());
-    }
-    doc.addField(RodaConstants.FILE_ISFILE, file.isFile());
+          hashes.add(fixity.getMessageDigest());
+        }
 
-    // format
-    if (file.getFileFormat() != null) {
-      FileFormat format = file.getFileFormat();
-      if (format.getFormatDesignationName() != null) {
-        doc.addField(RodaConstants.FILE_FILEFORMAT, format.getFormatDesignationName());
-      }
-      if (format.getFormatDesignationVersion() != null) {
-        doc.addField(RodaConstants.FILE_FORMAT_VERSION, format.getFormatDesignationVersion());
+        doc.addField(RodaConstants.FILE_HASH, hashes);
       }
 
-      if (format.getMimeType() != null) {
-        doc.addField(RodaConstants.FILE_FORMAT_MIMETYPE, format.getMimeType());
+      if (premisFile.getFormatDesignationName() != null) {
+        doc.addField(RodaConstants.FILE_FILEFORMAT, premisFile.getFormatDesignationName());
+      }
+      if (premisFile.getFormatDesignationVersion() != null) {
+        doc.addField(RodaConstants.FILE_FORMAT_VERSION, premisFile.getFormatDesignationVersion());
       }
 
-      if (format.getPronom() != null) {
-        doc.addField(RodaConstants.FILE_PRONOM, format.getPronom());
+      if (premisFile.getMimetype() != null) {
+        doc.addField(RodaConstants.FILE_FORMAT_MIMETYPE, premisFile.getMimetype());
       }
-      if (format.getExtension() != null) {
-        doc.addField(RodaConstants.FILE_EXTENSION, format.getExtension());
+
+      if ("http://www.nationalarchives.gov.uk/pronom".equals(premisFile.getFormatRegistryName())
+        && StringUtils.isNotBlank(premisFile.getFormatRegistryKey())) {
+        doc.addField(RodaConstants.FILE_PRONOM, premisFile.getFormatRegistryKey());
       }
+      // TODO remove file extension
+      // if (format.getExtension() != null) {
+      // doc.addField(RodaConstants.FILE_EXTENSION, format.getExtension());
+      // }
       // TODO add format registry
-    }
 
-    // technical features
-    if (file.getCreatingApplicationName() != null) {
-      doc.addField(RodaConstants.FILE_CREATING_APPLICATION_NAME, file.getCreatingApplicationName());
+      if (premisFile.getCreatingApplicationName() != null) {
+        doc.addField(RodaConstants.FILE_CREATING_APPLICATION_NAME, premisFile.getCreatingApplicationName());
+      }
+      if (premisFile.getCreatingApplicationVersion() != null) {
+        doc.addField(RodaConstants.FILE_CREATING_APPLICATION_VERSION, premisFile.getCreatingApplicationName());
+      }
+      if (premisFile.getDateCreatedByApplication() != null) {
+        doc.addField(RodaConstants.FILE_DATE_CREATED_BY_APPLICATION, premisFile.getDateCreatedByApplication());
+      }
     }
-    if (file.getCreatingApplicationVersion() != null) {
-      doc.addField(RodaConstants.FILE_CREATING_APPLICATION_VERSION, file.getCreatingApplicationVersion());
-    }
-    if (file.getDateCreatedByApplication() != null) {
-      doc.addField(RodaConstants.FILE_DATE_CREATED_BY_APPLICATION, file.getDateCreatedByApplication());
-    }
-    if (file.getFulltext() != null) {
-      doc.addField(RodaConstants.FILE_FULLTEXT, file.getFulltext());
-    }
+    // TODO add fulltext
+    // if (file.getFulltext() != null) {
+    // doc.addField(RodaConstants.FILE_FULLTEXT, file.getFulltext());
+    // }
+
     return doc;
   }
 
-  public static SimpleFile solrDocumentToFile(SolrDocument doc) {
+  // public static SolrInputDocument simpleFileToSolrDocument(SimpleFile file) {
+  // SolrInputDocument doc = new SolrInputDocument();
+  // doc.addField(RodaConstants.FILE_UUID, getId(file.getAipId(),
+  // file.getRepresentationId(), file.getId()));
+  // doc.addField(RodaConstants.FILE_ID, getId(file.getAipId(),
+  // file.getRepresentationId(), file.getId()));
+  // doc.addField(RodaConstants.FILE_AIPID, file.getAipId());
+  // doc.addField(RodaConstants.FILE_REPRESENTATIONID,
+  // file.getRepresentationId());
+  // doc.addField(RodaConstants.FILE_FILEID, file.getId());
+  // doc.addField(RodaConstants.FILE_ISENTRYPOINT, file.isEntryPoint());
+  //
+  // if (file.getOriginalName() != null) {
+  // doc.addField(RodaConstants.FILE_ORIGINALNAME, file.getOriginalName());
+  // }
+  // if (file.getHash() != null && file.getHash().size() > 0) {
+  // doc.addField(RodaConstants.FILE_HASH, file.getHash());
+  // }
+  // if (file.getSize() != 0) {
+  // doc.addField(RodaConstants.FILE_SIZE, file.getSize());
+  // }
+  // doc.addField(RodaConstants.FILE_ISFILE, file.isFile());
+  //
+  // // format
+  // if (file.getFileFormat() != null) {
+  // FileFormat format = file.getFileFormat();
+  // if (format.getFormatDesignationName() != null) {
+  // doc.addField(RodaConstants.FILE_FILEFORMAT,
+  // format.getFormatDesignationName());
+  // }
+  // if (format.getFormatDesignationVersion() != null) {
+  // doc.addField(RodaConstants.FILE_FORMAT_VERSION,
+  // format.getFormatDesignationVersion());
+  // }
+  //
+  // if (format.getMimeType() != null) {
+  // doc.addField(RodaConstants.FILE_FORMAT_MIMETYPE, format.getMimeType());
+  // }
+  //
+  // if (format.getPronom() != null) {
+  // doc.addField(RodaConstants.FILE_PRONOM, format.getPronom());
+  // }
+  // if (format.getExtension() != null) {
+  // doc.addField(RodaConstants.FILE_EXTENSION, format.getExtension());
+  // }
+  // // TODO add format registry
+  // }
+  //
+  // // technical features
+  // if (file.getCreatingApplicationName() != null) {
+  // doc.addField(RodaConstants.FILE_CREATING_APPLICATION_NAME,
+  // file.getCreatingApplicationName());
+  // }
+  // if (file.getCreatingApplicationVersion() != null) {
+  // doc.addField(RodaConstants.FILE_CREATING_APPLICATION_VERSION,
+  // file.getCreatingApplicationVersion());
+  // }
+  // if (file.getDateCreatedByApplication() != null) {
+  // doc.addField(RodaConstants.FILE_DATE_CREATED_BY_APPLICATION,
+  // file.getDateCreatedByApplication());
+  // }
+  // if (file.getFulltext() != null) {
+  // doc.addField(RodaConstants.FILE_FULLTEXT, file.getFulltext());
+  // }
+  // return doc;
+  // }
+
+  public static SimpleFile solrDocumentToSimpleFile(SolrDocument doc) {
     SimpleFile file = null;
     String aipId = objectToString(doc.get(RodaConstants.FILE_AIPID));
     String representationId = objectToString(doc.get(RodaConstants.FILE_REPRESENTATIONID));

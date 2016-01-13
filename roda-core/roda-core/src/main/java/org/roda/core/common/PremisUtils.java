@@ -104,13 +104,13 @@ public class PremisUtils {
     return pObjectFile;
   }
 
+
   public static RepresentationFilePreservationObject getPremisFile(StorageService storage, String aipID,
     String representationID, String fileID) throws IOException, PremisMetadataException, GenericException,
       RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    // TODO make this method add "premis.xml" to the file id!
     Binary binary = storage.getBinary(ModelUtils.getPreservationFilePath(aipID, representationID, fileID));
-    Path p = Files.createTempFile("temp", ".premis.xml");
-    Files.copy(binary.getContent().createInputStream(), p, StandardCopyOption.REPLACE_EXISTING);
-    return PremisFileObjectHelper.newInstance(Files.newInputStream(p)).getRepresentationFilePreservationObject();
+    return PremisFileObjectHelper.newInstance(binary.getContent().createInputStream()).getRepresentationFilePreservationObject();
   }
 
   public static boolean isPremisV2(Binary binary, Path configBasePath) throws IOException, SAXException {
