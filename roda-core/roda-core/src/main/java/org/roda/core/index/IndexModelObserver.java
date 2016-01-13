@@ -176,7 +176,7 @@ public class IndexModelObserver implements ModelObserver {
     try {
       index.add(RodaConstants.INDEX_FILE, fileDocument);
       if (commit) {
-        index.commit();
+        index.commit(RodaConstants.INDEX_FILE);
       }
     } catch (SolrServerException | IOException e) {
       LOGGER.error("Could not index file: " + file, e);
