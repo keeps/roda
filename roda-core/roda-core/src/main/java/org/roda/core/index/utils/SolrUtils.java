@@ -192,9 +192,11 @@ public class SolrUtils {
         if (binary.getMetadata().get(RodaConstants.STORAGE_META_TYPE) != null
           && binary.getMetadata().get(RodaConstants.STORAGE_META_TYPE).size() > 0) {
           String metadataType = binary.getMetadata().get(RodaConstants.STORAGE_META_TYPE).iterator().next();
-          String lowerCaseMetadataType = metadataType.toLowerCase();
-          transformerStream = RodaCoreFactory
-            .getConfigurationFileAsStream("crosswalks/ingest/" + lowerCaseMetadataType + ".xslt");
+          if (metadataType != null) {
+            String lowerCaseMetadataType = metadataType.toLowerCase();
+            transformerStream = RodaCoreFactory
+              .getConfigurationFileAsStream("crosswalks/ingest/" + lowerCaseMetadataType + ".xslt");
+          }
         }
       }
       // get xslt from filename
