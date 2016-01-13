@@ -780,6 +780,32 @@ public class ViewRepresentation extends Composite {
           values.put(messages.viewRepresentationInfoCreatedDate(), fileFormat.getCreatedDate().toString());
         }
       }
+
+      if (file.getCreatingApplicationName() != null) {
+        values.put(messages.viewRepresentationInfoCreatingApplicationName(), file.getCreatingApplicationName());
+      }
+
+      if (file.getCreatingApplicationVersion() != null) {
+        values.put(messages.viewRepresentationInfoCreatingApplicationVersion(), file.getCreatingApplicationVersion());
+      }
+
+      if (file.getDateCreatedByApplication() != null) {
+        values.put(messages.viewRepresentationInfoDateCreatedByApplication(), file.getDateCreatedByApplication());
+      }
+
+      if (file.getHash() != null && file.getHash().size() > 0) {
+        StringBuilder b = new StringBuilder();
+        boolean first = true;
+        for (String hash : file.getHash()) {
+          if (first) {
+            first = false;
+          } else {
+            b.append("\n");
+          }
+          b.append(hash);
+        }
+        values.put(messages.viewRepresentationInfoHash(), b.toString());
+      }
     }
 
     for (String key : values.keySet()) {

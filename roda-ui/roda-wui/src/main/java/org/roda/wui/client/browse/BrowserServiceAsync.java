@@ -184,7 +184,7 @@ public interface BrowserServiceAsync {
 
   void createAIP(String parentId, AsyncCallback<String> callback);
 
-  void removeAIP(String aipId, AsyncCallback<Void> callback);
+  void removeAIP(String aipId, AsyncCallback<String> callback);
 
   void updateDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle bundle, AsyncCallback<Void> callback);
 

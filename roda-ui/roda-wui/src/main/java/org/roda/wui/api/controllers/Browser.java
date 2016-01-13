@@ -463,7 +463,7 @@ public class Browser extends RodaCoreService {
     return aip;
   }
 
-  public static void removeAIP(RodaUser user, String aipId)
+  public static String removeAIP(RodaUser user, String aipId)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     Date start = new Date();
 
@@ -473,11 +473,12 @@ public class Browser extends RodaCoreService {
     UserUtility.checkObjectModifyPermissions(user, aip);
 
     // delegate
-    BrowserHelper.removeAIP(aipId);
+    String parentId = BrowserHelper.removeAIP(aipId);
 
     // register action
     long duration = new Date().getTime() - start.getTime();
     registerAction(user, BROWSER_COMPONENT, "removeAIP", aipId, duration);
+    return parentId;
   }
 
   public static DescriptiveMetadata createDescriptiveMetadataFile(RodaUser user, String aipId, String metadataId,

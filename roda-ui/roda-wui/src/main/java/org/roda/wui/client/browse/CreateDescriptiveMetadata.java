@@ -13,8 +13,6 @@ package org.roda.wui.client.browse;
 import java.util.List;
 import java.util.Map;
 
-import org.roda.core.data.v2.IndexedAIP;
-import org.roda.core.data.v2.SimpleDescriptionObject;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
@@ -221,7 +219,8 @@ public class CreateDescriptiveMetadata extends Composite {
 
   private void cancel() {
     if (isNew) {
-      BrowserService.Util.getInstance().getIndexedAIP(aipId, new AsyncCallback<IndexedAIP>() {
+
+      BrowserService.Util.getInstance().removeAIP(aipId, new AsyncCallback<String>() {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -229,27 +228,15 @@ public class CreateDescriptiveMetadata extends Composite {
         }
 
         @Override
-        public void onSuccess(IndexedAIP aip) {
-          final String parentId = aip.getParentID();
-          BrowserService.Util.getInstance().removeAIP(aipId, new AsyncCallback<Void>() {
-
-            @Override
-            public void onFailure(Throwable caught) {
-              Toast.showError(caught.getClass().getName(), caught.getMessage());
-            }
-
-            @Override
-            public void onSuccess(Void result) {
-              if (parentId != null) {
-                Tools.newHistory(Browse.RESOLVER, parentId);
-              } else {
-                Tools.newHistory(Browse.RESOLVER);
-              }
-            }
-          });
-
+        public void onSuccess(String parentId) {
+          if (parentId != null) {
+            Tools.newHistory(Browse.RESOLVER, parentId);
+          } else {
+            Tools.newHistory(Browse.RESOLVER);
+          }
         }
       });
+
     } else {
       Tools.newHistory(Browse.RESOLVER, aipId);
     }

@@ -8,6 +8,7 @@
 package org.roda.core.data.v2;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 import org.roda.core.data.RepresentationFile;
 
@@ -72,78 +73,6 @@ public class RepresentationFilePreservationObject extends PreservationObject imp
   }
 
   /**
-   * Constructs a new {@link RepresentationFilePreservationObject} cloning an
-   * existing {@link RepresentationFilePreservationObject}.
-   * 
-   * @param filePO
-   */
-  public RepresentationFilePreservationObject(RepresentationFilePreservationObject filePO) {
-    this(filePO.getId(), filePO.getPreservationLevel(), filePO.getCompositionLevel(), filePO.getFixities(),
-      filePO.getSize(), filePO.getFormatDesignationName(), filePO.getFormatDesignationVersion(),
-      filePO.getFormatRegistryName(), filePO.getFormatRegistryKey(), filePO.getFormatRegistryRole(),
-      filePO.getCreatingApplicationName(), filePO.getCreatingApplicationVersion(), filePO.getDateCreatedByApplication(),
-      filePO.getOriginalName(), filePO.getObjectCharacteristicsExtension(), filePO.getContentLocationType(),
-      filePO.getContentLocationValue());
-  }
-
-  /**
-   * Constructs a new {@link RepresentationFilePreservationObject} with the
-   * given parameters. private String fileId; private String
-   * representationObjectId; private String pronomId; private String mimetype;
-   * private long size; private String hash;
-   * 
-   * @param id
-   *          the identifier of the preservation object
-   * @param preservationLevel
-   * @param compositionLevel
-   * @param fixities
-   * @param size
-   * @param formatDesignationName
-   * @param formatDesignationVersion
-   * @param formatRegistryName
-   * @param formatRegistryKey
-   * @param formatRegistryRole
-   * @param creatingApplicationName
-   * @param creatingApplicationVersion
-   * @param dateCreatedByApplication
-   * @param originalName
-   * @param objectCharacteristicsExtension
-   * @param contentLocationType
-   * @param contentLocationValue
-   */
-  public RepresentationFilePreservationObject(String id, String preservationLevel, int compositionLevel,
-    Fixity[] fixities, long size, String formatDesignationName, String formatDesignationVersion,
-    String formatRegistryName, String formatRegistryKey, String formatRegistryRole, String creatingApplicationName,
-    String creatingApplicationVersion, String dateCreatedByApplication, String originalName,
-    String objectCharacteristicsExtension, String contentLocationType, String contentLocationValue) {
-
-    setId(id);
-    setPreservationLevel(preservationLevel);
-
-    setCompositionLevel(compositionLevel);
-    setFixities(fixities);
-    setSize(size);
-
-    setFormatDesignationName(formatDesignationName);
-    setFormatDesignationVersion(formatDesignationVersion);
-
-    setFormatRegistryName(formatRegistryName);
-    setFormatRegistryKey(formatRegistryKey);
-    setFormatRegistryRole(formatRegistryRole);
-
-    setCreatingApplicationName(creatingApplicationName);
-    setCreatingApplicationVersion(creatingApplicationVersion);
-    setDateCreatedByApplication(dateCreatedByApplication);
-
-    setOriginalName(originalName);
-
-    setObjectCharacteristicsExtension(objectCharacteristicsExtension);
-
-    setContentLocationType(contentLocationType);
-    setContentLocationValue(contentLocationValue);
-  }
-
-  /**
    * @param obj
    * 
    * @return <code>true</code> if the objects are equal and <code>false</code>
@@ -161,17 +90,20 @@ public class RepresentationFilePreservationObject extends PreservationObject imp
     }
   }
 
-  /**
-   * @return a {@link String} with this object's info.
-   * @see PreservationObject#toString()
-   */
+ 
+
   @Override
   public String toString() {
-    return "RepresentationFilePreservationObject(Model=" + getModel() + ", Id=" + getId() + ", size=" + getSize()
-      + ", formatDesignationName=" + getFormatDesignationName() + ", formatDesignationVersion="
-      + getFormatDesignationVersion() + ", formatRegistryName=" + getFormatRegistryName() + ", formatRegistryKey="
-      + getFormatRegistryKey() + ", formatRegistryRole=" + getFormatRegistryRole() + ", originalName="
-      + getOriginalName() + ")";
+    return "RepresentationFilePreservationObject [preservationLevel=" + preservationLevel + ", compositionLevel="
+      + compositionLevel + ", fixities=" + Arrays.toString(fixities) + ", formatDesignationName="
+      + formatDesignationName + ", formatDesignationVersion=" + formatDesignationVersion + ", formatRegistryName="
+      + formatRegistryName + ", formatRegistryKey=" + formatRegistryKey + ", formatRegistryRole=" + formatRegistryRole
+      + ", creatingApplicationName=" + creatingApplicationName + ", creatingApplicationVersion="
+      + creatingApplicationVersion + ", dateCreatedByApplication=" + dateCreatedByApplication + ", originalName="
+      + originalName + ", objectCharacteristicsExtension=" + objectCharacteristicsExtension + ", contentLocationType="
+      + contentLocationType + ", contentLocationValue=" + contentLocationValue + ", pronomId=" + pronomId
+      + ", mimetype=" + mimetype + ", size=" + size + ", hash=" + hash + ", representationObjectId="
+      + representationObjectId + "]";
   }
 
   /**

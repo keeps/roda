@@ -31,11 +31,11 @@ import javax.xml.validation.Validator;
 
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.data.FileFormat;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.FileFormat;
 import org.roda.core.data.v2.Fixity;
 import org.roda.core.data.v2.RepresentationFilePreservationObject;
 import org.roda.core.metadata.v2.premis.PremisFileObjectHelper;
@@ -46,7 +46,6 @@ import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.FileUtility;
-import org.roda.core.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -98,19 +97,18 @@ public class PremisUtils {
 
   public static RepresentationFilePreservationObject addFormatToPremis(RepresentationFilePreservationObject pObjectFile,
     FileFormat format) throws IOException, PremisMetadataException {
-    pObjectFile.setFormatDesignationName(format.getMimetype());
-    pObjectFile.setFormatRegistryName("pronom");
-    pObjectFile.setFormatRegistryKey(format.getPuid());
+    pObjectFile.setMimetype(format.getMimeType());
+    pObjectFile.setPronomId(format.getPronom());
     return pObjectFile;
   }
-
 
   public static RepresentationFilePreservationObject getPremisFile(StorageService storage, String aipID,
     String representationID, String fileID) throws IOException, PremisMetadataException, GenericException,
       RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     // TODO make this method add "premis.xml" to the file id!
     Binary binary = storage.getBinary(ModelUtils.getPreservationFilePath(aipID, representationID, fileID));
-    return PremisFileObjectHelper.newInstance(binary.getContent().createInputStream()).getRepresentationFilePreservationObject();
+    return PremisFileObjectHelper.newInstance(binary.getContent().createInputStream())
+      .getRepresentationFilePreservationObject();
   }
 
   public static boolean isPremisV2(Binary binary, Path configBasePath) throws IOException, SAXException {
@@ -215,7 +213,7 @@ public class PremisUtils {
   }
 
   public static RepresentationFilePreservationObject updateFileFormat(RepresentationFilePreservationObject rfpo,
-    org.roda.core.data.v2.FileFormat fileFormat) {
+    FileFormat fileFormat) {
     if (!StringUtils.isBlank(fileFormat.getFormatDesignationName())) {
       rfpo.setFormatDesignationName(fileFormat.getFormatDesignationName());
     }
@@ -226,9 +224,9 @@ public class PremisUtils {
       rfpo.setMimetype(fileFormat.getMimeType());
     }
     if (!StringUtils.isBlank(fileFormat.getPronom())) {
-      rfpo.setFormatRegistryKey(fileFormat.getPronom());
-      rfpo.setFormatRegistryName("http://www.nationalarchives.gov.uk/pronom");
+      rfpo.setPronomId(fileFormat.getPronom());
     }
+
     return rfpo;
   }
 }

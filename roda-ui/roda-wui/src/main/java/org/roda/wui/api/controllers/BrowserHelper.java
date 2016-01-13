@@ -671,9 +671,11 @@ public class BrowserHelper {
     return aip;
   }
 
-  public static void removeAIP(String aipId)
+  public static String removeAIP(String aipId)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    String parentId = RodaCoreFactory.getModelService().retrieveAIP(aipId).getParentId();
     RodaCoreFactory.getModelService().deleteAIP(aipId);
+    return parentId;
   }
 
   public static DescriptiveMetadata createDescriptiveMetadataFile(String aipId, String descriptiveMetadataId,

@@ -49,6 +49,7 @@ import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -418,7 +419,7 @@ public class Browse extends Composite {
       addTab.addStyleName("addTab");
       addTab.getParent().addStyleName("addTabWrapper");
 
-      if (!descMetadata.isEmpty() || !preservationMetadata.getRepresentationsMetadata().isEmpty()) {
+      if (!descMetadata.isEmpty()) {
         itemMetadata.setVisible(true);
         itemMetadata.selectTab(0);
       } else {
@@ -740,7 +741,7 @@ public class Browse extends Composite {
           @Override
           public void onSuccess(Boolean confirmed) {
             if (confirmed) {
-              BrowserService.Util.getInstance().removeAIP(aipId, new AsyncCallback<Void>() {
+              BrowserService.Util.getInstance().removeAIP(aipId, new AsyncCallback<String>() {
 
                 @Override
                 public void onFailure(Throwable caught) {
@@ -748,8 +749,12 @@ public class Browse extends Composite {
                 }
 
                 @Override
-                public void onSuccess(Void result) {
-                  Tools.newHistory(RESOLVER);
+                public void onSuccess(String parentId) {
+                  if (parentId != null) {
+                    Tools.newHistory(Browse.RESOLVER, parentId);
+                  } else {
+                    Tools.newHistory(Browse.RESOLVER);
+                  }
                 }
               });
             }

@@ -189,10 +189,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public void removeAIP(String aipId)
+  public String removeAIP(String aipId)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
-    Browser.removeAIP(user, aipId);
+    return Browser.removeAIP(user, aipId);
   }
 
   @Override

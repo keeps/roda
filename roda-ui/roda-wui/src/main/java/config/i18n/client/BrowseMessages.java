@@ -349,6 +349,19 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("Created date")
   String viewRepresentationInfoCreatedDate();
   
+  @DefaultMessage("Creating application name")
+  String viewRepresentationInfoCreatingApplicationName();
+  
+  @DefaultMessage("Creating application version")
+  String viewRepresentationInfoCreatingApplicationVersion();
+  
+  @DefaultMessage("Date created by application")
+  String viewRepresentationInfoDateCreatedByApplication();
+
+  @DefaultMessage("Fixity")
+  String viewRepresentationInfoHash();
+
+  
   /************* Ingest process new ****************/
   @DefaultMessage("Job {0,localdatetime,predef:DATE_TIME_SHORT}")
   String ingestProcessNewDefaultName(Date date);
@@ -385,4 +398,5 @@ public interface BrowseMessages extends Messages {
   /************* Search ****************/
   @DefaultMessage("Search records...")
   String searchPlaceHolder();
+
 }

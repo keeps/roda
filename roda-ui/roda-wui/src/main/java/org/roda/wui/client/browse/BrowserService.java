@@ -241,7 +241,7 @@ public interface BrowserService extends RemoteService {
   String createAIP(String parentId) throws AuthorizationDeniedException, GenericException, NotFoundException,
     RequestNotValidException, AlreadyExistsException;
 
-  void removeAIP(String aipId)
+  String removeAIP(String aipId)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
   void removeDescriptiveMetadataFile(String itemId, String descriptiveMetadataId)

@@ -42,9 +42,12 @@ import lc.xmlns.premisV2.StorageComplexType;
 
 /**
  * @author Rui Castro
+ * @author Luis Faria <lfaria@keep.pt>
  */
 public class PremisFileObjectHelper extends PremisObjectHelper {
 
+  public static final String FORMAT_REGISTRY_PRONOM_NAME = "http://www.nationalarchives.gov.uk/pronom";
+  public static final String FORMAT_REGISTRY_MIME_NAME = "http://www.iana.org/assignments/media-types/";
   private static final Logger logger = LoggerFactory.getLogger(PremisFileObjectHelper.class);
 
   /**
@@ -284,17 +287,22 @@ public class PremisFileObjectHelper extends PremisObjectHelper {
           FormatDesignationComplexType formatDesignation = fct.getFormatDesignation();
           pObject.setFormatDesignationName(formatDesignation.getFormatName());
           pObject.setFormatDesignationVersion(formatDesignation.getFormatVersion());
-          pObject.setMimetype(formatDesignation.getFormatName());
           break;
         }
       }
       for (FormatComplexType fct : characteristics.getFormatList()) {
         if (fct.getFormatRegistry() != null) {
           FormatRegistryComplexType formatRegistry = fct.getFormatRegistry();
-          pObject.setFormatRegistryName(formatRegistry.getFormatRegistryName());
-          pObject.setFormatRegistryKey(formatRegistry.getFormatRegistryKey());
-          pObject.setFormatRegistryRole(formatRegistry.getFormatRegistryRole());
-          break;
+
+          if (FORMAT_REGISTRY_PRONOM_NAME.equals(formatRegistry.getFormatRegistryName())) {
+            pObject.setPronomId(formatRegistry.getFormatRegistryKey());
+          } else if (FORMAT_REGISTRY_MIME_NAME.equals(formatRegistry.getFormatRegistryName())) {
+            pObject.setMimetype(formatRegistry.getFormatRegistryKey());
+          } else {
+            pObject.setFormatRegistryName(formatRegistry.getFormatRegistryName());
+            pObject.setFormatRegistryKey(formatRegistry.getFormatRegistryKey());
+            pObject.setFormatRegistryRole(formatRegistry.getFormatRegistryRole());
+          }
         }
       }
 
@@ -361,10 +369,35 @@ public class PremisFileObjectHelper extends PremisObjectHelper {
       formatDesignation.setFormatVersion(filePObject.getFormatDesignationVersion());
     }
 
+    boolean usedFormatRegistry = false;
+    // <format><formatRegistry>
+    if (!StringUtils.isBlank(filePObject.getPronomId())) {
+      FormatRegistryComplexType formatRegistry = format.addNewFormatRegistry();
+      formatRegistry.setFormatRegistryName(FORMAT_REGISTRY_PRONOM_NAME);
+      formatRegistry.setFormatRegistryKey(filePObject.getPronomId());
+      usedFormatRegistry = true;
+    }
+
+    // <format><formatRegistry>
+    if (!StringUtils.isBlank(filePObject.getMimetype())) {
+      FormatComplexType iFormat = format;
+      if (usedFormatRegistry) {
+        iFormat = objectCharacteristics.addNewFormat();
+      }
+      FormatRegistryComplexType formatRegistry = iFormat.addNewFormatRegistry();
+      formatRegistry.setFormatRegistryName(FORMAT_REGISTRY_MIME_NAME);
+      formatRegistry.setFormatRegistryKey(filePObject.getMimetype());
+      usedFormatRegistry = true;
+    }
+
     // <format><formatRegistry>
     if (!StringUtils.isBlank(filePObject.getFormatRegistryName())) {
+      FormatComplexType iFormat = format;
+      if (usedFormatRegistry) {
+        iFormat = objectCharacteristics.addNewFormat();
+      }
 
-      FormatRegistryComplexType formatRegistry = format.addNewFormatRegistry();
+      FormatRegistryComplexType formatRegistry = iFormat.addNewFormatRegistry();
 
       formatRegistry.setFormatRegistryName(filePObject.getFormatRegistryName());
 
@@ -375,6 +408,7 @@ public class PremisFileObjectHelper extends PremisObjectHelper {
       if (!StringUtils.isBlank(filePObject.getFormatRegistryRole())) {
         formatRegistry.setFormatRegistryRole(filePObject.getFormatRegistryRole());
       }
+      usedFormatRegistry = true;
     }
 
     // <creatingApplication>

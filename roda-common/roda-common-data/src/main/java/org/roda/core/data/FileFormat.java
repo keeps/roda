@@ -12,7 +12,9 @@ import java.io.Serializable;
 /**
  * @author Luis Faria
  * @author Vladislav Korecký <vladislav_korecky@gordic.cz>
+ * @deprecated use org.roda.core.data.v2.FileFormat instead
  */
+@Deprecated
 public class FileFormat implements Serializable {
 
   private static final long serialVersionUID = -1542372451417885666L;

@@ -1457,7 +1457,7 @@ public class SolrUtils {
           // }
           fixityPrint.append(")");
 
-          hashes.add(fixity.getMessageDigest());
+          hashes.add(fixityPrint.toString());
         }
 
         doc.addField(RodaConstants.FILE_HASH, hashes);
@@ -1474,9 +1474,8 @@ public class SolrUtils {
         doc.addField(RodaConstants.FILE_FORMAT_MIMETYPE, premisFile.getMimetype());
       }
 
-      if ("http://www.nationalarchives.gov.uk/pronom".equals(premisFile.getFormatRegistryName())
-        && StringUtils.isNotBlank(premisFile.getFormatRegistryKey())) {
-        doc.addField(RodaConstants.FILE_PRONOM, premisFile.getFormatRegistryKey());
+      if (StringUtils.isNotBlank(premisFile.getPronomId())) {
+        doc.addField(RodaConstants.FILE_PRONOM, premisFile.getPronomId());
       }
       // TODO remove file extension
       // if (format.getExtension() != null) {
