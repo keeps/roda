@@ -181,10 +181,10 @@ public class SiegfriedPlugin implements Plugin<AIP> {
                   SimpleFile f = index.retrieve(SimpleFile.class,
                     SolrUtils.getId(aip.getId(), representationID, fileName));
                   FileFormat ff = new org.roda.core.data.v2.FileFormat();
-                  ff.setFormat(format);
+                  ff.setFormatDesignationName(format);
+                  ff.setFormatDesignationVersion(version);
                   ff.setPronom(pronom);
                   ff.setMimeType(mime);
-                  ff.setVersion(version);
                   ff.setExtension(extension);
                   f.setFileFormat(ff);
                   f.setSize(fileSize);

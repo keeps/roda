@@ -99,9 +99,14 @@ public final class ModelUtils {
     String mimetype = getString(metadata, RodaConstants.STORAGE_META_FORMAT_MIME);
     String version = getString(metadata, RodaConstants.STORAGE_META_FORMAT_VERSION);
     // FIXME how to load format registries if any
-    Map<String, String> formatRegistries = new HashMap<String, String>();
+    // Map<String, String> formatRegistries = new HashMap<String, String>();
 
-    return new FileFormat(mimetype, version, "", formatRegistries);
+    FileFormat format = new FileFormat();
+    format.setMimeType(mimetype);
+    format.setMimeType(version);
+
+    // TODO check if this is needed or add all other metadata
+    return format;
   }
 
   /**

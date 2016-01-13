@@ -1447,33 +1447,54 @@ public class SolrUtils {
     doc.addField(RodaConstants.FILE_UUID, getId(file.getAipId(), file.getRepresentationId(), file.getId()));
     doc.addField(RodaConstants.FILE_ID, getId(file.getAipId(), file.getRepresentationId(), file.getId()));
     doc.addField(RodaConstants.FILE_AIPID, file.getAipId());
-    doc.addField(RodaConstants.FILE_FILEID, file.getId());
     doc.addField(RodaConstants.FILE_REPRESENTATIONID, file.getRepresentationId());
+    doc.addField(RodaConstants.FILE_FILEID, file.getId());
     doc.addField(RodaConstants.FILE_ISENTRYPOINT, file.isEntryPoint());
-    if (file.getFileFormat() != null) {
-      if (file.getFileFormat().getMimeType() != null) {
-        doc.addField(RodaConstants.FILE_FORMAT_MIMETYPE, file.getFileFormat().getMimeType());
-      }
-      if (file.getFileFormat().getVersion() != null) {
-        doc.addField(RodaConstants.FILE_FORMAT_VERSION, file.getFileFormat().getVersion());
-      }
-      if (file.getFileFormat().getPronom() != null) {
-        doc.addField(RodaConstants.FILE_PRONOM, file.getFileFormat().getPronom());
-      }
-      if (file.getFileFormat().getExtension() != null) {
-        doc.addField(RodaConstants.FILE_EXTENSION, file.getFileFormat().getExtension());
-      }
-      if (file.getFileFormat().getFormat() != null) {
-        doc.addField(RodaConstants.FILE_FILEFORMAT, file.getFileFormat().getFormat());
-      }
-    }
+
     if (file.getOriginalName() != null) {
       doc.addField(RodaConstants.FILE_ORIGINALNAME, file.getOriginalName());
+    }
+    if (file.getHash() != null && file.getHash().size() > 0) {
+      doc.addField(RodaConstants.FILE_HASH, file.getHash());
     }
     if (file.getSize() != 0) {
       doc.addField(RodaConstants.FILE_SIZE, file.getSize());
     }
     doc.addField(RodaConstants.FILE_ISFILE, file.isFile());
+
+    // format
+    if (file.getFileFormat() != null) {
+      FileFormat format = file.getFileFormat();
+      if (format.getFormatDesignationName() != null) {
+        doc.addField(RodaConstants.FILE_FILEFORMAT, format.getFormatDesignationName());
+      }
+      if (format.getFormatDesignationVersion() != null) {
+        doc.addField(RodaConstants.FILE_FORMAT_VERSION, format.getFormatDesignationVersion());
+      }
+
+      if (format.getMimeType() != null) {
+        doc.addField(RodaConstants.FILE_FORMAT_MIMETYPE, format.getMimeType());
+      }
+
+      if (format.getPronom() != null) {
+        doc.addField(RodaConstants.FILE_PRONOM, format.getPronom());
+      }
+      if (format.getExtension() != null) {
+        doc.addField(RodaConstants.FILE_EXTENSION, format.getExtension());
+      }
+      // TODO add format registry
+    }
+
+    // technical features
+    if (file.getCreatingApplicationName() != null) {
+      doc.addField(RodaConstants.FILE_CREATING_APPLICATION_NAME, file.getCreatingApplicationName());
+    }
+    if (file.getCreatingApplicationVersion() != null) {
+      doc.addField(RodaConstants.FILE_CREATING_APPLICATION_VERSION, file.getCreatingApplicationVersion());
+    }
+    if (file.getDateCreatedByApplication() != null) {
+      doc.addField(RodaConstants.FILE_DATE_CREATED_BY_APPLICATION, file.getDateCreatedByApplication());
+    }
     if (file.getFulltext() != null) {
       doc.addField(RodaConstants.FILE_FULLTEXT, file.getFulltext());
     }
@@ -1482,31 +1503,35 @@ public class SolrUtils {
 
   public static SimpleFile solrDocumentToFile(SolrDocument doc) {
     SimpleFile file = null;
-    try {
-      String aipId = objectToString(doc.get(RodaConstants.FILE_AIPID));
-      String fileId = objectToString(doc.get(RodaConstants.FILE_FILEID));
-      boolean entryPoint = objectToBoolean(doc.get(RodaConstants.FILE_ISENTRYPOINT));
-      String mimetype = objectToString(doc.get(RodaConstants.FILE_FORMAT_MIMETYPE));
-      String pronom = objectToString(doc.get(RodaConstants.FILE_PRONOM));
-      String version = objectToString(doc.get(RodaConstants.FILE_FORMAT_VERSION));
-      String representationId = objectToString(doc.get(RodaConstants.FILE_REPRESENTATIONID));
-      String originalName = objectToString(doc.get(RodaConstants.FILE_ORIGINALNAME));
-      String applicationName = objectToString(doc.get(RodaConstants.FILE_CREATING_APPLICATION_NAME));
-      String applicationVersion = objectToString(doc.get(RodaConstants.FILE_CREATING_APPLICATION_VERSION));
-      String dateCreatedByApplication = objectToString(doc.get(RodaConstants.FILE_DATE_CREATED_BY_APPLICATION));
-      List<String> hash = objectToListString(doc.get(RodaConstants.FILE_HASH));
-      String fullText = objectToString(doc.get(RodaConstants.FILE_FULLTEXT));
+    String aipId = objectToString(doc.get(RodaConstants.FILE_AIPID));
+    String representationId = objectToString(doc.get(RodaConstants.FILE_REPRESENTATIONID));
+    String fileId = objectToString(doc.get(RodaConstants.FILE_FILEID));
+    boolean entryPoint = objectToBoolean(doc.get(RodaConstants.FILE_ISENTRYPOINT));
 
-      long size = objectToLong(doc.get(RodaConstants.FILE_SIZE));
-      boolean isFile = objectToBoolean(doc.get(RodaConstants.FILE_ISFILE));
-      // FIXME how to restore format registries
-      //
-      FileFormat fileFormat = new FileFormat(mimetype, version, pronom, new HashMap<String, String>());
-      file = new SimpleFile(fileId, aipId, representationId, entryPoint, fileFormat, originalName, size, isFile,
-        applicationName, applicationVersion, dateCreatedByApplication, hash, fullText);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+    String originalName = objectToString(doc.get(RodaConstants.FILE_ORIGINALNAME));
+    List<String> hash = objectToListString(doc.get(RodaConstants.FILE_HASH));
+    long size = objectToLong(doc.get(RodaConstants.FILE_SIZE));
+    boolean isFile = objectToBoolean(doc.get(RodaConstants.FILE_ISFILE));
+
+    // format
+    String formatDesignationName = objectToString(doc.get(RodaConstants.FILE_FILEFORMAT));
+    String formatDesignationVersion = objectToString(doc.get(RodaConstants.FILE_FORMAT_VERSION));
+    String mimetype = objectToString(doc.get(RodaConstants.FILE_FORMAT_MIMETYPE));
+    String pronom = objectToString(doc.get(RodaConstants.FILE_PRONOM));
+    String extension = objectToString(doc.get(RodaConstants.FILE_EXTENSION));
+    // FIXME how to restore format registries
+    Map<String, String> formatRegistries = new HashMap<>();
+
+    // technical features
+    String creatingApplicationName = objectToString(doc.get(RodaConstants.FILE_CREATING_APPLICATION_NAME));
+    String creatingApplicationVersion = objectToString(doc.get(RodaConstants.FILE_CREATING_APPLICATION_VERSION));
+    String dateCreatedByApplication = objectToString(doc.get(RodaConstants.FILE_DATE_CREATED_BY_APPLICATION));
+    String fullText = objectToString(doc.get(RodaConstants.FILE_FULLTEXT));
+
+    FileFormat fileFormat = new FileFormat(formatDesignationName, formatDesignationVersion, mimetype, pronom, extension,
+      formatRegistries);
+    file = new SimpleFile(fileId, aipId, representationId, entryPoint, fileFormat, originalName, size, isFile,
+      creatingApplicationName, creatingApplicationVersion, dateCreatedByApplication, hash, fullText);
     return file;
   }
 

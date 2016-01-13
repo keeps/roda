@@ -216,11 +216,11 @@ public class PremisUtils {
 
   public static RepresentationFilePreservationObject updateFileFormat(RepresentationFilePreservationObject rfpo,
     org.roda.core.data.v2.FileFormat fileFormat) {
-    if (!StringUtils.isBlank(fileFormat.getFormat())) {
-      rfpo.setFormatDesignationName(fileFormat.getFormat());
+    if (!StringUtils.isBlank(fileFormat.getFormatDesignationName())) {
+      rfpo.setFormatDesignationName(fileFormat.getFormatDesignationName());
     }
-    if (!StringUtils.isBlank(fileFormat.getVersion())) {
-      rfpo.setFormatDesignationVersion(fileFormat.getVersion());
+    if (!StringUtils.isBlank(fileFormat.getFormatDesignationVersion())) {
+      rfpo.setFormatDesignationVersion(fileFormat.getFormatDesignationVersion());
     }
     if (!StringUtils.isBlank(fileFormat.getMimeType())) {
       rfpo.setMimetype(fileFormat.getMimeType());

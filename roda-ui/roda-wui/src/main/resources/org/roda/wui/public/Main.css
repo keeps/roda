@@ -2243,28 +2243,19 @@
 /**********************************************
 				Show Job
 ************************************************/
-.job-report-object-input a {
-	color: inherit;
-}
-
-.job-report-object-input a:hover {
-	text-decoration: underline;
-}
-
 .job-report-object-output {
-	margin-top: -5px;
+	
 }
 
 .job-report-object-output .job-report-object-output-icon {
 	line-height: 1.1rem;
+	color: #222;
 }
 
-.job-report-object-output a {
+.job-report-object-output {
 	font-size: 1.1rem;
     line-height: 1.1rem;
-}
-.job-report-object-output a:hover {
-	text-decoration: underline;
+    color: #089de3;
 }
 
 /**********************************************

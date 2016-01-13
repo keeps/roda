@@ -53,7 +53,7 @@ import config.i18n.client.BrowseMessages;
  */
 public class JobReportList extends AsyncTableCell<JobReport> {
 
-  private static final String STATUS_ERROR = "<i class='fa fa-exclamation-triangle'></i>";
+  private static final String STATUS_ERROR = "<i class='fa fa-exclamation-triangle error'></i>";
 
   private static final String STATUS_OK = "<i class='fa fa-check-circle'></i>";
 
@@ -89,27 +89,16 @@ public class JobReportList extends AsyncTableCell<JobReport> {
           SafeHtmlBuilder b = new SafeHtmlBuilder();
           String objId = jobReport.getObjectId();
           if (objId != null) {
-            // TODO externalise to messages
             b.append(SafeHtmlUtils.fromSafeConstant("<div class='job-report-object-input'>"));
-            // b.append(SafeHtmlUtils.fromSafeConstant("<i class='fa
-            // fa-sign-in'></i>"));
-            // TODO escape URI
-            b.append(SafeHtmlUtils.fromSafeConstant("<a href='#ingest/transfer/" + objId + "'>"));
             b.append(SafeHtmlUtils.fromString(objId));
-            b.append(SafeHtmlUtils.fromSafeConstant("</a>"));
             b.append(SafeHtmlUtils.fromSafeConstant("</div>"));
           }
 
           String aipId = jobReport.getAipId();
           if (aipId != null) {
             b.append(SafeHtmlUtils.fromSafeConstant("<div class='job-report-object-output'>"));
-            // b.append(SafeHtmlUtils.fromSafeConstant("<i class='fa
-            // fa-sign-out'></i>"));
             b.append(SafeHtmlUtils.fromSafeConstant("<span class='job-report-object-output-icon'>&#10551;</span>"));
-            String aipBrowseLink = Tools.createHistoryHashLink(Browse.getViewItemHistoryToken(jobReport.getAipId()));
-            b.append(SafeHtmlUtils.fromSafeConstant("<a href='" + aipBrowseLink + "'>"));
             b.append(SafeHtmlUtils.fromString(aipId));
-            b.append(SafeHtmlUtils.fromSafeConstant("</a>"));
             b.append(SafeHtmlUtils.fromSafeConstant("</div>"));
           }
           ret = b.toSafeHtml();
@@ -189,23 +178,6 @@ public class JobReportList extends AsyncTableCell<JobReport> {
     updatedDateColumn.setCellStyleNames("nowrap");
     lastPluginRunColumn.setCellStyleNames("nowrap");
 
-    display.setRowStyles(new RowStyles<JobReport>() {
-      @Override
-      public String getStyleNames(JobReport jobReport, int rowIndex) {
-        String ret;
-        switch (jobReport.getLastPluginRanState()) {
-          case OK:
-            ret = "row_ok";
-            break;
-          case ERROR:
-          default:
-            ret = "row_error";
-            break;
-        }
-        return ret;
-      }
-    });
-
   }
 
   @Override
@@ -239,11 +211,6 @@ public class JobReportList extends AsyncTableCell<JobReport> {
   @Override
   protected int getInitialPageSize() {
     return PAGE_SIZE;
-  }
-
-  @Override
-  protected CellPreviewEvent.Handler<JobReport> getSelectionEventManager() {
-    return DefaultSelectionEventManager.<JobReport> createBlacklistManager(0);
   }
 
 }

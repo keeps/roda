@@ -11,31 +11,52 @@ import java.util.Map;
 
 public class FileFormat extends RODAObject {
   private static final long serialVersionUID = -6855712550409310949L;
+
+  private String formatDesignationName;
+  private String formatDesignationVersion;
+
   private String mimeType;
-  private String version;
   private String pronom;
   private String extension;
   private Map<String, String> formatRegistries;
-  private String format;
-
-  public String getFormat() {
-    return format;
-  }
-
-  public void setFormat(String format) {
-    this.format = format;
-  }
-
-  public String getExtension() {
-    return extension;
-  }
-
-  public void setExtension(String extension) {
-    this.extension = extension;
-  }
-
+  
   public FileFormat() {
     super(null, null);
+  }
+
+  public FileFormat(String formatDesignationName, String formatDesignationVersion, String mimeType, String pronom,
+    String extension, Map<String, String> formatRegistries) {
+    super();
+    this.formatDesignationName = formatDesignationName;
+    this.formatDesignationVersion = formatDesignationVersion;
+    this.mimeType = mimeType;
+    this.pronom = pronom;
+    this.extension = extension;
+    this.formatRegistries = formatRegistries;
+  }
+
+  public String getFormatDesignationName() {
+    return formatDesignationName;
+  }
+
+  public void setFormatDesignationName(String formatDesignationName) {
+    this.formatDesignationName = formatDesignationName;
+  }
+
+  public String getFormatDesignationVersion() {
+    return formatDesignationVersion;
+  }
+
+  public void setFormatDesignationVersion(String formatDesignationVersion) {
+    this.formatDesignationVersion = formatDesignationVersion;
+  }
+
+  public String getMimeType() {
+    return mimeType;
+  }
+
+  public void setMimeType(String mimeType) {
+    this.mimeType = mimeType;
   }
 
   public String getPronom() {
@@ -46,96 +67,82 @@ public class FileFormat extends RODAObject {
     this.pronom = pronom;
   }
 
-  public FileFormat(String mimeType, String version, String pronom, Map<String, String> formatRegistries) {
-    super();
-    this.mimeType = mimeType;
-    this.version = version;
-    this.pronom = pronom;
-    this.formatRegistries = formatRegistries;
+  public String getExtension() {
+    return extension;
   }
 
-  /**
-   * @return the mimeType
-   */
-  public String getMimeType() {
-    return mimeType;
+  public void setExtension(String extension) {
+    this.extension = extension;
   }
 
-  /**
-   * @return the version
-   */
-  public String getVersion() {
-    return version;
-  }
-
-  /**
-   * @return the formatRegistries
-   */
   public Map<String, String> getFormatRegistries() {
     return formatRegistries;
   }
 
-  @Override
-  public String toString() {
-    return "FileFormat [mimeType=" + mimeType + ", version=" + version + ", formatRegistries=" + formatRegistries + "]";
+  public void setFormatRegistries(Map<String, String> formatRegistries) {
+    this.formatRegistries = formatRegistries;
   }
 
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
+    result = prime * result + ((extension == null) ? 0 : extension.hashCode());
+    result = prime * result + ((formatDesignationName == null) ? 0 : formatDesignationName.hashCode());
+    result = prime * result + ((formatDesignationVersion == null) ? 0 : formatDesignationVersion.hashCode());
     result = prime * result + ((formatRegistries == null) ? 0 : formatRegistries.hashCode());
     result = prime * result + ((mimeType == null) ? 0 : mimeType.hashCode());
-    result = prime * result + ((version == null) ? 0 : version.hashCode());
+    result = prime * result + ((pronom == null) ? 0 : pronom.hashCode());
     return result;
   }
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) {
+    if (this == obj)
       return true;
-    }
-    if (obj == null) {
+    if (!super.equals(obj))
       return false;
-    }
-    if (getClass() != obj.getClass()) {
+    if (getClass() != obj.getClass())
       return false;
-    }
     FileFormat other = (FileFormat) obj;
+    if (extension == null) {
+      if (other.extension != null)
+        return false;
+    } else if (!extension.equals(other.extension))
+      return false;
+    if (formatDesignationName == null) {
+      if (other.formatDesignationName != null)
+        return false;
+    } else if (!formatDesignationName.equals(other.formatDesignationName))
+      return false;
+    if (formatDesignationVersion == null) {
+      if (other.formatDesignationVersion != null)
+        return false;
+    } else if (!formatDesignationVersion.equals(other.formatDesignationVersion))
+      return false;
     if (formatRegistries == null) {
-      if (other.formatRegistries != null) {
+      if (other.formatRegistries != null)
         return false;
-      }
-    } else if (!formatRegistries.equals(other.formatRegistries)) {
+    } else if (!formatRegistries.equals(other.formatRegistries))
       return false;
-    }
     if (mimeType == null) {
-      if (other.mimeType != null) {
+      if (other.mimeType != null)
         return false;
-      }
-    } else if (!mimeType.equals(other.mimeType)) {
+    } else if (!mimeType.equals(other.mimeType))
       return false;
-    }
-    if (version == null) {
-      if (other.version != null) {
+    if (pronom == null) {
+      if (other.pronom != null)
         return false;
-      }
-    } else if (!version.equals(other.version)) {
+    } else if (!pronom.equals(other.pronom))
       return false;
-    }
     return true;
   }
 
-  public void setMimeType(String mimeType) {
-    this.mimeType = mimeType;
-  }
-
-  public void setVersion(String version) {
-    this.version = version;
-  }
-
-  public void setFormatRegistries(Map<String, String> formatRegistries) {
-    this.formatRegistries = formatRegistries;
+  @Override
+  public String toString() {
+    return "FileFormat [formatDesignationName=" + formatDesignationName + ", formatDesignationVersion="
+      + formatDesignationVersion + ", mimeType=" + mimeType + ", pronom=" + pronom + ", extension=" + extension
+      + ", formatRegistries=" + formatRegistries + "]";
   }
 
 }
