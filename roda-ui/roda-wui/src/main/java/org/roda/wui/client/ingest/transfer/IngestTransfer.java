@@ -238,6 +238,8 @@ public class IngestTransfer extends Composite {
     itemTitle.setText(r.getName());
     itemDates.setText(
       messages.ingestTransferItemInfo(r.getCreationDate(), Humanize.readableFileSize(r.getSize()), r.getOwner()));
+    itemTitle.removeStyleName("browseTitle-allCollections");
+    itemIcon.getParent().removeStyleName("browseTitle-allCollections-wrapper");
 
     Filter filter = new Filter(
       new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID, r.getRelativePath()),
@@ -262,6 +264,8 @@ public class IngestTransfer extends Composite {
     itemIcon.setWidget(itemIconHtmlPanel);
     itemTitle.setText("All transferred packages");
     itemDates.setText("");
+    itemTitle.addStyleName("browseTitle-allCollections");
+    itemIcon.getParent().addStyleName("browseTitle-allCollections-wrapper");
 
     transferredResourceList.setFilter(DEFAULT_FILTER);
     breadcrumb.setVisible(false);

@@ -12,6 +12,7 @@ package org.roda.wui.client.browse;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -23,8 +24,9 @@ import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.IndexedAIP;
+import org.roda.core.data.v2.FileFormat;
 import org.roda.core.data.v2.IndexResult;
+import org.roda.core.data.v2.IndexedAIP;
 import org.roda.core.data.v2.Representation;
 import org.roda.core.data.v2.RepresentationState;
 import org.roda.core.data.v2.SimpleFile;
@@ -34,6 +36,7 @@ import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.JavascriptUtils;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.Tools;
@@ -70,6 +73,7 @@ import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.SelectionChangeEvent;
@@ -215,6 +219,7 @@ public class ViewRepresentation extends Composite {
   private Filter defaultFilter;
 
   private boolean singleFileMode = false;
+  private boolean firstLoad = true;
   private boolean showNextFile = false;
   private boolean showPreviousFile = false;
 
@@ -245,10 +250,13 @@ public class ViewRepresentation extends Composite {
   FlowPanel filePreview;
 
   @UiField
-  FocusPanel downloadFile;
+  FocusPanel downloadFileButton;
 
   @UiField
-  FocusPanel infoFile;
+  FocusPanel infoFileButton;
+
+  @UiField
+  FlowPanel infoFilePanel;
 
   /**
    * Create a new panel to view a representation
@@ -314,11 +322,11 @@ public class ViewRepresentation extends Composite {
 
     searchInputBox.getElement().setPropertyString("placeholder", messages.viewRepresentationsSearchPlaceHolder());
 
-    infoFile.setVisible(false);
-    downloadFile.setVisible(false);
+    infoFileButton.setVisible(false);
+    downloadFileButton.setVisible(false);
 
-    infoFile.setTitle(messages.viewRepresentationInfoFileButton());
-    downloadFile.setTitle(messages.viewRepresentationDownloadFileButton());
+    infoFileButton.setTitle(messages.viewRepresentationInfoFileButton());
+    downloadFileButton.setTitle(messages.viewRepresentationDownloadFileButton());
 
     filesList.getSelectionModel().addSelectionChangeHandler(new Handler() {
 
@@ -331,9 +339,10 @@ public class ViewRepresentation extends Composite {
         // filePreview();
         // panelsControl();
         // }
-        changeURL();
+        changeInfoFile();
         filePreview();
         panelsControl();
+        changeURL();
       }
     });
 
@@ -347,7 +356,7 @@ public class ViewRepresentation extends Composite {
         } else if (showPreviousFile) {
           filesList.previousItemSelection();
           showPreviousFile = false;
-        } else {
+        } else if (firstLoad) {
           List<SimpleFile> results = event.getValue().getResults();
 
           if (results.size() == 1 && results.get(0).isFile()
@@ -360,6 +369,8 @@ public class ViewRepresentation extends Composite {
             && Window.getClientWidth() > WINDOW_WIDTH) {
             filesList.nextItemSelection();
           }
+
+          firstLoad = false;
         }
       }
 
@@ -404,10 +415,9 @@ public class ViewRepresentation extends Composite {
     String url = Window.Location.createUrlBuilder().buildString();
     String viewUrl = url.substring(url.indexOf("view/"));
     if (viewUrl.split("/").length == 3) {
-      url = url.replace(viewUrl, viewUrl + "/" + filesList.getSelectionModel().getSelectedObject().getId());
+      url = url.replace(viewUrl, viewUrl + "/" + file.getId());
     } else {
-      url = url.replace(viewUrl, viewUrl.substring(0, viewUrl.lastIndexOf("/")) + "/"
-        + filesList.getSelectionModel().getSelectedObject().getId());
+      url = url.replace(viewUrl, viewUrl.substring(0, viewUrl.lastIndexOf("/")) + "/" + file.getId());
     }
     JavascriptUtils.updateURLWithoutReloading(url);
   }
@@ -493,8 +503,8 @@ public class ViewRepresentation extends Composite {
     return icon;
   }
 
-  @UiHandler("downloadFile")
-  void buttonDownloadFileHandler(ClickEvent e) {
+  @UiHandler("downloadFileButton")
+  void buttonDownloadFileButtonHandler(ClickEvent e) {
     SafeUri downloadUri = null;
     if (file != null) {
       downloadUri = RestUtils.createRepresentationFileDownloadUri(aipId, representationId, file.getId());
@@ -507,11 +517,12 @@ public class ViewRepresentation extends Composite {
     }
   }
 
-  @UiHandler("infoFile")
-  void buttonInfoFileHandler(ClickEvent e) {
-    infoFile.setStyleName(infoFile.getStyleName().contains(" active") ? infoFile.getStyleName().replace(" active", "")
-      : infoFile.getStyleName().concat(" active"));
+  @UiHandler("infoFileButton")
+  void buttonInfoFileButtonHandler(ClickEvent e) {
+    infoFileButton.setStyleName(infoFileButton.getStyleName().contains(" active")
+      ? infoFileButton.getStyleName().replace(" active", "") : infoFileButton.getStyleName().concat(" active"));
 
+    changeInfoFile();
     JavascriptUtils.showRightHiddenPanel(".infoFilePanel");
   }
 
@@ -571,8 +582,8 @@ public class ViewRepresentation extends Composite {
 
     if (file != null && file.getOriginalName() != null) {
       breadcrumb.updatePath(getBreadcrumbs(itemBundle, file));
-      downloadFile.setVisible(true);
-      infoFile.setVisible(true);
+      downloadFileButton.setVisible(true);
+      infoFileButton.setVisible(true);
 
       /* TODO mimetypes */
       if (file.getOriginalName().toLowerCase().contains(".png")
@@ -738,8 +749,51 @@ public class ViewRepresentation extends Composite {
   }
 
   public void changeInfoFile() {
-    if (file != null) {
+    HashMap<String, String> values = new HashMap<String, String>();
+    infoFilePanel.clear();
 
+    if (file != null) {
+      if (file.getOriginalName() != null) {
+        values.put("Filename", file.getOriginalName());
+      }
+
+      values.put("Size", Humanize.readableFileSize(file.getSize()));
+
+      if (file.getFileFormat() != null) {
+        FileFormat fileFormat = file.getFileFormat();
+
+        if (fileFormat.getMimeType() != null) {
+          values.put("Mimetype", fileFormat.getMimeType());
+        }
+
+        if (fileFormat.getFormat() != null) {
+          values.put("Format", fileFormat.getFormat());
+        }
+
+        if (fileFormat.getPronom() != null) {
+          values.put("PRONOM", fileFormat.getPronom());
+        }
+
+        if (fileFormat.getCreatedDate() != null) {
+          values.put("Date created", fileFormat.getCreatedDate().toString());
+        }
+      }
+    }
+
+    for (String key : values.keySet()) {
+      FlowPanel entry = new FlowPanel();
+
+      Label keyLabel = new Label(key);
+      Label valueLabel = new Label(values.get(key));
+
+      entry.add(keyLabel);
+      entry.add(valueLabel);
+
+      infoFilePanel.add(entry);
+
+      keyLabel.addStyleName("infoFileEntryKey");
+      valueLabel.addStyleName("infoFileEntryValue");
+      entry.addStyleName("infoFileEntry");
     }
   }
 }

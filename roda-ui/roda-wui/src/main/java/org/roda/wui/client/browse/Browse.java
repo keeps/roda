@@ -189,9 +189,6 @@ public class Browse extends Composite {
   @UiField
   Button createItem;
 
-  // @UiField
-  // Button createDescriptiveMetadata;
-
   @UiField
   Button moveItem;
 
@@ -341,7 +338,6 @@ public class Browse extends Composite {
 
     // Set button visibility
     createItem.setVisible(false);
-    // createDescriptiveMetadata.setVisible(false);
     moveItem.setVisible(false);
     editPermissions.setVisible(false);
     remove.setVisible(false);
@@ -405,7 +401,6 @@ public class Browse extends Composite {
 
       });
 
-      // Tab to add new metadata
       final int addTabIndex = itemMetadata.getWidgetCount();
       FlowPanel addTab = new FlowPanel();
       addTab.add(new HTML(SafeHtmlUtils.fromSafeConstant("<i class=\"fa fa-plus-circle\"></i>")));
@@ -453,11 +448,9 @@ public class Browse extends Composite {
 
       // Set button visibility
       createItem.setVisible(true);
-      // createDescriptiveMetadata.setVisible(true);
       moveItem.setVisible(true);
       editPermissions.setVisible(true);
       remove.setVisible(true);
-
     } else {
       viewAction();
     }
@@ -495,7 +488,6 @@ public class Browse extends Composite {
 
     // Set button visibility
     createItem.setVisible(true);
-    // createDescriptiveMetadata.setVisible(false);
     moveItem.setVisible(false);
     editPermissions.setVisible(false);
     remove.setVisible(false);
@@ -545,8 +537,6 @@ public class Browse extends Composite {
 
     FlowPanel labelsPanel = new FlowPanel();
 
-    // Anchor label = new Anchor(labelText,
-    // RestUtils.createRepresentationDownloadUri(rep.getAipId(), rep.getId()));
     Anchor label = new Anchor(labelText,
       Tools.createHistoryHashLink(ViewRepresentation.RESOLVER, rep.getAipId(), rep.getId()));
     Label subLabel = new Label(

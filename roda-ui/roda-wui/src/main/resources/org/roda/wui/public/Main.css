@@ -702,8 +702,7 @@
 	color: #3998d0;
 }
 
-.browseItemMetadata .gwt-TabBarItem .premisTab, .browseItemMetadata .gwt-TabBarItem .addTab
-	{
+.browseItemMetadata .gwt-TabBarItem .premisTab, .browseItemMetadata .gwt-TabBarItem .addTab {
 	font-weight: normal;
 	font-size: 1.3rem;
 	white-space: nowrap;
@@ -1045,8 +1044,7 @@
 	display: none;
 }
 
-.event .linkingAgent .value:before, .event .linkingObject .value:before
-	{
+.event .linkingAgent .value:before, .event .linkingObject .value:before {
 	content: '(';
 }
 
@@ -1634,8 +1632,7 @@
 	font-size: 11px;
 }
 
-.wui-metadata-preservation .wui-metadata-preservation-timeline .timeline-copyright
-	{
+.wui-metadata-preservation .wui-metadata-preservation-timeline .timeline-copyright {
 	display: none;
 }
 
@@ -1787,7 +1784,7 @@
 }
 
 .search .searchBox::-webkit-input-placeholder,
-	.search .searchBox:placeholder-shown {
+.search .searchBox:placeholder-shown {
 	color: rgba(0,0,0, 0.5);
 }
 
@@ -1981,29 +1978,26 @@
 	display: none;
 }
 
-.viewRepresentation .my-files-table .org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableCell
-	{
+.viewRepresentation .my-files-table .org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableCell {
 	padding-right: 2px;
+	line-height: 1em;
+	margin-bottom: 2px;
 }
 
-.viewRepresentation .my-files-table .org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableOddRow
-	{
+.viewRepresentation .my-files-table .org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableOddRow {
 	background: white;
 	border: none;
 }
 
-.viewRepresentation .my-files-table .org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableOddRowCell
-	{
+.viewRepresentation .my-files-table .org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableOddRowCell {
 	border: 2px solid white;
 }
 
-.viewRepresentation .my-files-table .org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableHoveredRow
-	{
+.viewRepresentation .my-files-table .org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableHoveredRow {
 	background: #eee;
 }
 
-.viewRepresentation .my-files-table .org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableHoveredRow .org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableOddRowCell
-	{
+.viewRepresentation .my-files-table .org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableHoveredRow .org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableOddRowCell {
 	border: 2px solid #eee;
 }
 
@@ -2025,14 +2019,12 @@
 	margin-top: 0px;
 }
 
-.viewRepresentationFilePreviewPanel .filePreviewToolbar .filePreviewToolbarIcons
-	{
+.viewRepresentationFilePreviewPanel .filePreviewToolbar .filePreviewToolbarIcons {
 	float: right;
 	margin-right: 0px;
 }
 
-.viewRepresentationFilePreviewPanel .filePreviewToolbar .filePreviewToolbarIcon
-	{
+.viewRepresentationFilePreviewPanel .filePreviewToolbar .filePreviewToolbarIcon {
 	float: right;
 	font-size: 20px;
 	line-height: 35px;
@@ -2091,8 +2083,8 @@
 }
 
 .viewRepresentationEmptyPreview, .viewRepresentationErrorPreview,
-	.viewRepresentationNotSupportedPreview,
-	.viewRepresentationAudioFilePreviewHTML {
+.viewRepresentationNotSupportedPreview,
+.viewRepresentationAudioFilePreviewHTML {
 	margin-top: 120px;
 	color: #999;
 }
@@ -2133,7 +2125,7 @@
 }
 
 .viewRepresentation .searchBox::-webkit-input-placeholder,
-	.viewRepresentation .searchBox:placeholder-shown {
+.viewRepresentation .searchBox:placeholder-shown {
 	color: #ddd;
 }
 
@@ -2166,13 +2158,41 @@
 }
 
 .viewRepresentation .infoFilePanel {
-	height: 670px;
+	height: 630px;
 	width: 300px;
 	background: #089de3;
 	display: none;
 	color: white;
 	position: absolute;
 	right: 0;
+	padding: 20px;
+}
+
+.viewRepresentation .infoFileTitle {
+	font-size: 3rem;
+	margin-top: 1.2rem;
+	margin-bottom: 2.5rem;
+}
+
+.viewRepresentation .infoFileEntry {
+	margin-bottom: 0.3rem;
+}
+
+.viewRepresentation .infoFileEntryKey {
+	font-size: 1.3rem;
+	display: inline-block;
+	width: 100px;
+	vertical-align: top;
+	line-height: 1.1em;
+	color: rgba(255, 255, 255, 0.8);
+}
+
+.viewRepresentation .infoFileEntryValue {
+	font-size: 1.3rem;
+	display: inline-block;
+	word-break: break-all;
+	width: 200px;
+	line-height: 1.1em;
 }
 
 /**********************************************

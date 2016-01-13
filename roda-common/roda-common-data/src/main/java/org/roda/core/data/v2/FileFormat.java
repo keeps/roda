@@ -17,8 +17,6 @@ public class FileFormat extends RODAObject {
   private String extension;
   private Map<String, String> formatRegistries;
   private String format;
-  
-  
 
   public String getFormat() {
     return format;

@@ -72,9 +72,6 @@
 					<g:Button addStyleNames="btn btn-plus" ui:field="createItem">
 						<ui:msg>New</ui:msg>
 					</g:Button>
-					<!-- <g:Button addStyleNames="btn btn-plus" ui:field="createDescriptiveMetadata"> -->
-					<!-- <ui:msg>New metadata</ui:msg> -->
-					<!-- </g:Button> -->
 					<g:Button addStyleNames="btn btn-edit" ui:field="moveItem">
 						<ui:msg>Move</ui:msg>
 					</g:Button>
