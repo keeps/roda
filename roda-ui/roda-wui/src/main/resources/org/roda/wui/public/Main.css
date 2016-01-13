@@ -2003,8 +2003,7 @@
 
 .viewRepresentationFilePreviewPanel {
 	width: 100%;
-	padding-bottom: 20px;
-	height: 650px;
+	height: 705px;
 }
 
 .viewRepresentationFilePreviewPanel .filePreviewToolbar {
@@ -2017,6 +2016,7 @@
 	margin-left: 40px;
 	float: left;
 	margin-top: 0px;
+	margin-bottom: 0px;
 }
 
 .viewRepresentationFilePreviewPanel .filePreviewToolbar .filePreviewToolbarIcons {
@@ -2044,6 +2044,7 @@
 }
 
 .viewRepresentationFilePreview {
+	height: 650px;
 	display: inline-block;
 	vertical-align: top;
 	width: 100%;
@@ -2175,19 +2176,21 @@
 }
 
 .viewRepresentation .infoFileEntry {
-	margin-bottom: 0.3rem;
+	margin-bottom: 0.5em;
+	display: inline-flex;
 }
 
 .viewRepresentation .infoFileEntryKey {
+	vertical-align: top;
 	font-size: 1.3rem;
 	display: inline-block;
 	width: 100px;
-	vertical-align: top;
 	line-height: 1.1em;
 	color: rgba(255, 255, 255, 0.8);
 }
 
 .viewRepresentation .infoFileEntryValue {
+	vertical-align: top;
 	font-size: 1.3rem;
 	display: inline-block;
 	word-break: break-all;

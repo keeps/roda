@@ -326,7 +326,25 @@ public interface BrowseMessages extends Messages {
   String viewRepresentationNotSupportedPreview();
   
   @DefaultMessage("Search files...")
-  String viewRepresentationsSearchPlaceHolder();
+  String viewRepresentationSearchPlaceHolder();
+  
+  @DefaultMessage("Filename")
+  String viewRepresentationInfoFilename();
+  
+  @DefaultMessage("Size")
+  String viewRepresentationInfoSize();
+  
+  @DefaultMessage("Mimetype")
+  String viewRepresentationInfoMimetype();
+  
+  @DefaultMessage("Format")
+  String viewRepresentationInfoFormat();
+  
+  @DefaultMessage("PRONOM")
+  String viewRepresentationInfoPronom();
+  
+  @DefaultMessage("Created date")
+  String viewRepresentationInfoCreatedDate();
   
   /************* Ingest process new ****************/
   @DefaultMessage("Job {0,localdatetime,predef:DATE_TIME_SHORT}")

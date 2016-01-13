@@ -16,7 +16,6 @@
 
 	<g:FlowPanel styleName="viewRepresentation" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
-
 			<g:HorizontalPanel ui:field="previewPanel">
 				<!-- LEFT PANEL -->
 				<g:FlowPanel ui:field="filesPanel">
@@ -38,7 +37,6 @@
 						<lists:FileList ui:field="filesList" />
 					</g:FlowPanel>
 				</g:FlowPanel>
-
 				<!-- RIGHT PANEL -->
 				<g:FlowPanel ui:field="filePreviewPanel">
 					<g:FlowPanel addStyleNames="filePreviewToolbar">
@@ -61,7 +59,6 @@
 					</g:FlowPanel>
 					<g:FlowPanel addStyleNames="col_10 content" ui:field="filePreview">
 					</g:FlowPanel>
-
 					<!-- INFO PANEL -->
 					<g:FlowPanel addStyleNames="infoFilePanel">
 						<g:Label styleName="h1" addStyleNames="infoFileTitle">

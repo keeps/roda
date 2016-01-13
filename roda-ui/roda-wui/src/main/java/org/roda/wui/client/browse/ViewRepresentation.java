@@ -320,7 +320,7 @@ public class ViewRepresentation extends Composite {
     breadcrumb.updatePath(getBreadcrumbs(itemBundle, file));
     breadcrumb.setVisible(true);
 
-    searchInputBox.getElement().setPropertyString("placeholder", messages.viewRepresentationsSearchPlaceHolder());
+    searchInputBox.getElement().setPropertyString("placeholder", messages.viewRepresentationSearchPlaceHolder());
 
     infoFileButton.setVisible(false);
     downloadFileButton.setVisible(false);
@@ -339,9 +339,9 @@ public class ViewRepresentation extends Composite {
         // filePreview();
         // panelsControl();
         // }
-        changeInfoFile();
         filePreview();
         panelsControl();
+        changeInfoFile();
         changeURL();
       }
     });
@@ -754,28 +754,28 @@ public class ViewRepresentation extends Composite {
 
     if (file != null) {
       if (file.getOriginalName() != null) {
-        values.put("Filename", file.getOriginalName());
+        values.put(messages.viewRepresentationInfoFilename(), file.getOriginalName());
       }
 
-      values.put("Size", Humanize.readableFileSize(file.getSize()));
+      values.put(messages.viewRepresentationInfoSize(), Humanize.readableFileSize(file.getSize()));
 
       if (file.getFileFormat() != null) {
         FileFormat fileFormat = file.getFileFormat();
 
         if (fileFormat.getMimeType() != null) {
-          values.put("Mimetype", fileFormat.getMimeType());
+          values.put(messages.viewRepresentationInfoMimetype(), fileFormat.getMimeType());
         }
 
         if (fileFormat.getFormatDesignationName() != null) {
-          values.put("Format", fileFormat.getFormatDesignationName());
+          values.put(messages.viewRepresentationInfoFormat(), fileFormat.getFormatDesignationName());
         }
 
         if (fileFormat.getPronom() != null) {
-          values.put("PRONOM", fileFormat.getPronom());
+          values.put(messages.viewRepresentationInfoPronom(), fileFormat.getPronom());
         }
 
         if (fileFormat.getCreatedDate() != null) {
-          values.put("Date created", fileFormat.getCreatedDate().toString());
+          values.put(messages.viewRepresentationInfoCreatedDate(), fileFormat.getCreatedDate().toString());
         }
       }
     }
