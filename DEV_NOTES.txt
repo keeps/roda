@@ -8,7 +8,7 @@ Misc
 	1) java -Droda.node.type=worker -jar roda-core/roda-core/target/roda-core-2.0.0-SNAPSHOT-jar-with-dependencies.jar 
 	2) java -cp roda-core/roda-core/target/roda-core-2.0.0-SNAPSHOT-jar-with-dependencies.jar -Droda.node.type=worker org.roda.core.RodaCoreFactory
 
-* Solr HTTP (create cores from RODA install dir in /home/hsilva/.roda/)
+* Solr HTTP (create cores from RODA install dir in ~/.roda/)
 	$> cd SOLR_INSTALL_DIR
 	$> bin/solr start
-	$> for i in $(ls /home/hsilva/.roda/config/index/);do if [ -d /home/hsilva/.roda/config/index/$i ]; then bin/solr create -c $i -d /home/hsilva/.roda/config/index/$i/conf/ ; fi; done
+	$> for i in $(ls ~/.roda/config/index/);do if [ -d ~/.roda/config/index/$i ]; then bin/solr create -c $i -d ~/.roda/config/index/$i/conf/ ; fi; done

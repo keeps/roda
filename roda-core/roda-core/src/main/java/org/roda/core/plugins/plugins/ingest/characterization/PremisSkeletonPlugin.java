@@ -42,7 +42,7 @@ import org.roda.core.model.File;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.plugins.PluginUtils;
+import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
@@ -96,15 +96,14 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
-    Report report = PluginUtils.createPluginReport(this);
+    Report report = PluginHelper.createPluginReport(this);
     PluginState state;
 
     try {
       Path temp = Files.createTempDirectory("temp");
       for (AIP aip : list) {
         LOGGER.debug("Processing AIP " + aip.getId());
-        ReportItem reportItem = PluginUtils.createPluginReportItem(this,
-          "Creating base PREMIS", aip.getId(), null);
+        ReportItem reportItem = PluginHelper.createPluginReportItem(this, "Creating base PREMIS", aip.getId(), null);
 
         try {
           for (String representationID : aip.getRepresentationIds()) {
@@ -112,23 +111,22 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
           }
 
           state = PluginState.OK;
-          reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
+          reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(),
+            new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
+
         } catch (RODAException | PremisMetadataException e) {
           LOGGER.error("Error processing AIP " + aip.getId(), e);
 
           state = PluginState.ERROR;
-          reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()))
-            .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS,
-              "Error processing AIP " + aip.getId() + ": " + e.getMessage()));
+          reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(),
+            new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()),
+            new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
         }
 
         report.addItem(reportItem);
-        try {
-          PluginUtils.updateJobReport(model, index, this, reportItem, state, PluginUtils.getJobId(parameters),
-            aip.getId());
-        } catch (RODAException e) {
-          LOGGER.error("Error updating job report", e);
-        }
+
+        PluginHelper.updateJobReport(model, index, this, reportItem, state, PluginHelper.getJobId(parameters),
+          aip.getId());
       }
     } catch (IOException ioe) {
       LOGGER.error("Error executing FastCharacterizationAction: " + ioe.getMessage(), ioe);
@@ -172,8 +170,9 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
 
   private List<RepresentationFilePreservationObject> createPremisForRepresentationFile(ModelService model,
     StorageService storage, Path temp, AIP aip, String representationID, RepresentationPreservationObject pObject,
-    List<RepresentationFilePreservationObject> pObjectPartFiles, String fileID) throws IOException,
-      PremisMetadataException, RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    List<RepresentationFilePreservationObject> pObjectPartFiles, String fileID)
+      throws IOException, PremisMetadataException, RequestNotValidException, GenericException, NotFoundException,
+      AuthorizationDeniedException {
     LOGGER.debug("Processing file " + fileID + " from " + representationID + " of AIP " + aip.getId());
 
     File file = model.retrieveFile(aip.getId(), representationID, fileID);

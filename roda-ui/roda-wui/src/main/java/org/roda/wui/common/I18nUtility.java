@@ -11,14 +11,11 @@ import java.io.Serializable;
 import java.util.Locale;
 import java.util.MissingResourceException;
 
-import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.FacetFieldResult;
 import org.roda.core.data.v2.FacetValue;
-import org.roda.core.data.v2.IndexedAIP;
 import org.roda.core.data.v2.IndexResult;
-import org.roda.core.data.v2.RODAMember;
 import org.roda.wui.common.server.ServerTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,7 +60,7 @@ public class I18nUtility {
       ret = RodaCoreFactory.getI18NMessages(locale).getTranslation(bundleKey);
     } catch (MissingResourceException e) {
       ret = facetValue;
-      LOGGER.debug("Translation not found: " + bundleKey + " locale: " + locale);
+      LOGGER.trace("Translation not found: " + bundleKey + " locale: " + locale);
     }
 
     return ret;

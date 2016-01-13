@@ -7,13 +7,9 @@
  */
 package org.roda.core.plugins.plugins.ingest.characterization;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -26,29 +22,21 @@ import org.roda.core.data.Report;
 import org.roda.core.data.ReportItem;
 import org.roda.core.data.common.InvalidParameterException;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AlreadyExistsException;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.AgentPreservationObject;
-import org.roda.core.data.v2.EventPreservationObject;
 import org.roda.core.data.v2.JobReport.PluginState;
 import org.roda.core.data.v2.PluginType;
 import org.roda.core.data.v2.Representation;
 import org.roda.core.data.v2.SimpleFile;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.SolrUtils;
-import org.roda.core.metadata.v2.premis.PremisAgentHelper;
-import org.roda.core.metadata.v2.premis.PremisMetadataException;
 import org.roda.core.model.AIP;
 import org.roda.core.model.File;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.ModelServiceException;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.plugins.PluginUtils;
+import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
@@ -71,7 +59,7 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
   @Override
   public void init() throws PluginException {
     agent = new AgentPreservationObject();
-    agent.setAgentName(getName() + "/" + getVersion()); //$NON-NLS-1$
+    agent.setAgentName(getName() + "/" + getVersion());
     agent.setAgentType(AgentPreservationObject.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN);
     agent.setId("characterization-tika");
   }
@@ -115,28 +103,13 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
 
-    Report report = PluginUtils.createPluginReport(this);
+    Report report = PluginHelper.createPluginReport(this);
     PluginState state;
 
-    try {
-      model.getAgentPreservationObject(agent.getId());
-    } catch (NotFoundException e) {
-      try {
-        byte[] serializedPremisAgent = new PremisAgentHelper(agent).saveToByteArray();
-        Path agentFile = Files.createTempFile("agent_preservation", ".xml");
-        Files.copy(new ByteArrayInputStream(serializedPremisAgent), agentFile, StandardCopyOption.REPLACE_EXISTING);
-        Binary agentResource = (Binary) FSUtils.convertPathToResource(agentFile.getParent(), agentFile);
-        model.createAgentMetadata(agent.getId(), agentResource);
-      } catch (RequestNotValidException | PremisMetadataException | IOException | NotFoundException | GenericException
-        | AlreadyExistsException | AuthorizationDeniedException ee) {
-        LOGGER.error("Error creating PREMIS agent", e);
-      }
-    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
-      LOGGER.error("Error getting PREMIS agent", e);
-    }
+    PluginHelper.createPremisAgentIfInexistent(model, agent);
 
     for (AIP aip : list) {
-      ReportItem reportItem = PluginUtils.createPluginReportItem(this, "File metadata and full text extraction",
+      ReportItem reportItem = PluginHelper.createPluginReportItem(this, "File metadata and full-text extraction",
         aip.getId(), null);
 
       LOGGER.debug("Processing AIP " + aip.getId());
@@ -159,7 +132,6 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
               APP_NAME, resource);
             try {
               String fulltext = TikaFullTextPluginUtils.extractFullTextFromResult(tikaResult);
-              // System.out.println("FULLTEXT: " + fulltext);
               SimpleFile f = index.retrieve(SimpleFile.class, SolrUtils.getId(aip.getId(), representationID, fileID));
               f.setFulltext(fulltext);
               updatedFiles.add(f);
@@ -185,34 +157,11 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
 
       report.addItem(reportItem);
 
-      try {
-        PluginUtils.updateJobReport(model, index, this, reportItem, state, PluginUtils.getJobId(parameters),
-          aip.getId());
-      } catch (RODAException e) {
-        LOGGER.error("Error updating job report", e);
-      }
-
+      PluginHelper.updateJobReport(model, index, this, reportItem, state, PluginHelper.getJobId(parameters),
+        aip.getId());
     }
 
     return report;
-  }
-
-  private void createEvent(String outcomeDetail, PluginState state, AIP aip, ModelService model)
-    throws PluginException {
-
-    try {
-      boolean success = (state == PluginState.OK);
-
-      for (String representationID : aip.getRepresentationIds()) {
-        PluginUtils.createPluginEvent(aip.getId(), representationID, model,
-          EventPreservationObject.PRESERVATION_EVENT_TYPE_FORMAT_IDENTIFICATION,
-          "The files of the representation were successfully identified.",
-          EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_INGEST_TASK, agent.getId(),
-          Arrays.asList(representationID), success ? "success" : "error", success ? "" : "Error", outcomeDetail);
-      }
-    } catch (PremisMetadataException | IOException | RODAException e) {
-      throw new PluginException(e.getMessage(), e);
-    }
   }
 
   @Override

@@ -8,7 +8,6 @@
 package org.roda.core.plugins.plugins.ingest;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,11 +25,8 @@ import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.InvalidParameterException;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IndexResult;
-import org.roda.core.data.v2.Job;
-import org.roda.core.data.v2.Job.JOB_STATE;
 import org.roda.core.data.v2.PluginType;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.core.index.IndexService;
@@ -38,7 +34,7 @@ import org.roda.core.model.AIP;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.plugins.PluginUtils;
+import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.plugins.plugins.antivirus.AntivirusPlugin;
 import org.roda.core.plugins.plugins.base.AIPValidationPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.PremisSkeletonPlugin;
@@ -55,7 +51,7 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
     "SIP format", PluginParameterType.PLUGIN_SIP_TO_AIP, "", true, false,
     "Known format of SIP to be ingest into the repository.");
   public static final PluginParameter PARAMETER_DO_VIRUS_CHECK = new PluginParameter("parameter.do_virus_check",
-    "Virus check", PluginParameterType.BOOLEAN, "false", true, false, "Verifies if an SIP is free of virus.");
+    "Virus check", PluginParameterType.BOOLEAN, "true", true, false, "Verifies if an SIP is free of virus.");
   public static final PluginParameter PARAMETER_CREATE_PREMIS_SKELETON = new PluginParameter(
     "parameter.create.premis.skeleton", "Create basic PREMIS information", PluginParameterType.BOOLEAN, "true", true,
     true, "Create basic PREMIS information (e.g. PREMIS object for each representation file, etc.).");
@@ -73,7 +69,7 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
     "parameter.do_metadata_and_full_text_extraction", "File metadata and full text extraction",
     PluginParameterType.BOOLEAN, "true", true, false, "Extracts file metadata and full text.");
   public static final PluginParameter PARAMETER_DO_AUTO_ACCEPT = new PluginParameter("parameter.do_auto_accept",
-    "Auto accept SIP", PluginParameterType.BOOLEAN, "false", true, false, "Automatically accept SIPs.");
+    "Auto accept SIP", PluginParameterType.BOOLEAN, "true", true, false, "Automatically accept SIPs.");
 
   private Map<String, String> parameters;
   private int totalSteps = 8;
@@ -134,14 +130,14 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<TransferredResource> resources) throws PluginException {
-    Report report = PluginUtils.createPluginReport(this);
+    Report report = PluginHelper.createPluginReport(this);
     Report pluginReport;
 
     // FIXME
     Map<String, Report> reports = new HashMap<>();
     aipIdToObjectId = new HashMap<>();
 
-    updateJobStatus(index, model, 0);
+    PluginHelper.updateJobStatus(index, model, 0, parameters);
 
     // 1) transform TransferredResource into an AIP
     // 1.1) obtain list of AIPs that were successfully transformed from
@@ -149,50 +145,59 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
     pluginReport = transformTransferredResourceIntoAnAIP(index, model, storage, resources);
     reports = mergeReports(reports, pluginReport);
     List<AIP> aips = getAIPsFromReports(index, reports);
-    updateJobStatus(index, model);
+    currentCompletionPercentage = PluginHelper.updateJobStatus(index, model, currentCompletionPercentage,
+      completionPercentageStep, parameters);
 
     // 2) do virus check
-    if (verifyIfStepShouldBePerformed(PARAMETER_DO_VIRUS_CHECK)) {
+    if (PluginHelper.verifyIfStepShouldBePerformed(parameters, PARAMETER_DO_VIRUS_CHECK)) {
       pluginReport = doVirusCheck(index, model, storage, aips);
       reports = mergeReports(reports, pluginReport);
-      updateJobStatus(index, model);
+      currentCompletionPercentage = PluginHelper.updateJobStatus(index, model, currentCompletionPercentage,
+        completionPercentageStep, parameters);
     }
 
     // 3) create premis skeleton
     pluginReport = createPremisSkeleton(index, model, storage, aips);
     reports = mergeReports(reports, pluginReport);
-    updateJobStatus(index, model);
+    currentCompletionPercentage = PluginHelper.updateJobStatus(index, model, currentCompletionPercentage,
+      completionPercentageStep, parameters);
 
     // 4) verify if AIP is well formed
     pluginReport = verifyIfAipIsWellFormed(index, model, storage, aips);
     reports = mergeReports(reports, pluginReport);
-    updateJobStatus(index, model);
+    currentCompletionPercentage = PluginHelper.updateJobStatus(index, model, currentCompletionPercentage,
+      completionPercentageStep, parameters);
 
     // 5) verify if the user has permissions to ingest SIPS into the specified
     // fonds
     pluginReport = verifyProducerAuthorization(index, model, storage, aips);
     reports = mergeReports(reports, pluginReport);
-    updateJobStatus(index, model);
+    currentCompletionPercentage = PluginHelper.updateJobStatus(index, model, currentCompletionPercentage,
+      completionPercentageStep, parameters);
 
     // 6) do file format identification (sieg)
-    if (verifyIfStepShouldBePerformed(PARAMETER_DO_FILE_FORMAT_IDENTIFICATION)) {
+    if (PluginHelper.verifyIfStepShouldBePerformed(parameters, PARAMETER_DO_FILE_FORMAT_IDENTIFICATION)) {
       pluginReport = doFileFormatIdentification(index, model, storage, aips);
       reports = mergeReports(reports, pluginReport);
+      currentCompletionPercentage = PluginHelper.updateJobStatus(index, model, currentCompletionPercentage,
+        completionPercentageStep, parameters);
     }
 
     // 7) do metadata and full text extraction (tika)
-    if (verifyIfStepShouldBePerformed(PARAMETER_DO_METADATA_AND_FULL_TEXT_EXTRACTION)) {
+    if (PluginHelper.verifyIfStepShouldBePerformed(parameters, PARAMETER_DO_METADATA_AND_FULL_TEXT_EXTRACTION)) {
       pluginReport = doMetadataAndFullTextExtraction(index, model, storage, aips);
       reports = mergeReports(reports, pluginReport);
+      currentCompletionPercentage = PluginHelper.updateJobStatus(index, model, currentCompletionPercentage,
+        completionPercentageStep, parameters);
     }
 
     // 8) do auto accept
-    if (verifyIfStepShouldBePerformed(PARAMETER_DO_AUTO_ACCEPT)) {
+    if (PluginHelper.verifyIfStepShouldBePerformed(parameters, PARAMETER_DO_AUTO_ACCEPT)) {
       pluginReport = doAutoAccept(index, model, storage, aips);
       reports = mergeReports(reports, pluginReport);
     }
 
-    updateJobStatus(index, model, 100);
+    PluginHelper.updateJobStatus(index, model, 100, parameters);
 
     return report;
   }
@@ -200,35 +205,12 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
   private int calculateCompletionPercentageStep() {
     int effectiveTotalSteps = totalSteps;
     for (PluginParameter pluginParameter : getParameters()) {
-      if (pluginParameter.getType() == PluginParameterType.BOOLEAN && !verifyIfStepShouldBePerformed(pluginParameter)) {
+      if (pluginParameter.getType() == PluginParameterType.BOOLEAN
+        && !PluginHelper.verifyIfStepShouldBePerformed(parameters, pluginParameter)) {
         effectiveTotalSteps--;
       }
     }
     return 100 / effectiveTotalSteps;
-  }
-
-  private void updateJobStatus(IndexService index, ModelService model) {
-    currentCompletionPercentage = currentCompletionPercentage + completionPercentageStep;
-    updateJobStatus(index, model, currentCompletionPercentage);
-  }
-
-  private void updateJobStatus(IndexService index, ModelService model, int newCompletionPercentage) {
-    try {
-      LOGGER.debug("New job completionPercentage: " + newCompletionPercentage);
-      Job job = PluginUtils.getJobFromIndex(index, parameters);
-      job.setCompletionPercentage(newCompletionPercentage);
-
-      if (newCompletionPercentage == 0) {
-        job.setState(JOB_STATE.STARTED);
-      } else if (newCompletionPercentage == 100) {
-        job.setState(JOB_STATE.COMPLETED);
-        job.setEndDate(new Date());
-      }
-
-      model.updateJob(job);
-    } catch (NotFoundException | GenericException e) {
-      LOGGER.error("Unable to get Job from index", e);
-    }
   }
 
   private List<AIP> getAIPsFromReports(IndexService index, Map<String, Report> reports) {
@@ -262,11 +244,6 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
     }
 
     return aipIds;
-  }
-
-  private boolean verifyIfStepShouldBePerformed(PluginParameter pluginParameter) {
-    String paramValue = parameters.getOrDefault(pluginParameter.getId(), pluginParameter.getDefaultValue());
-    return Boolean.parseBoolean(paramValue);
   }
 
   private Map<String, Report> mergeReports(Map<String, Report> reports, Report plugin) {
@@ -334,16 +311,6 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
   private Report doMetadataAndFullTextExtraction(IndexService index, ModelService model, StorageService storage,
     List<AIP> aips) {
     return executePlugin(index, model, storage, aips, TikaFullTextPlugin.class.getName());
-  }
-
-  private Report doFileFormatNormalization(IndexService index, ModelService model, StorageService storage,
-    List<AIP> aips) {
-    return null;
-  }
-
-  private Report generateDisseminationCopy(IndexService index, ModelService model, StorageService storage,
-    List<AIP> aips) {
-    return null;
   }
 
   private Report doAutoAccept(IndexService index, ModelService model, StorageService storage, List<AIP> aips) {

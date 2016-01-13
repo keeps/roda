@@ -1845,7 +1845,6 @@ public class ModelService extends ModelObservable {
           b.getContent(), false, true);
       } catch (IOException | PremisMetadataException | GenericException | RequestNotValidException | NotFoundException
         | AuthorizationDeniedException e) {
-        e.printStackTrace();
         LOGGER.warn("Error updating file format in storage for file {}/{}/{} ", file.getAipId(),
           file.getRepresentationId(), file.getId());
       }

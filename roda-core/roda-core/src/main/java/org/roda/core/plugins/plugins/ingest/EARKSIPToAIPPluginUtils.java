@@ -16,14 +16,15 @@ import java.util.Map;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.model.AIP;
 import org.roda.core.model.ModelService;
+import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
@@ -54,7 +55,7 @@ public class EARKSIPToAIPPluginUtils {
 
     if (sip.getRepresentations() != null && sip.getRepresentations().size() > 0) {
       for (SIPRepresentation sr : sip.getRepresentations()) {
-        IngestUtils.createDirectories(model, aip.getId(), sr.getObjectID());
+        PluginHelper.createDirectories(model, aip.getId(), sr.getObjectID());
         if (sr.getData() != null && sr.getData().size() > 0) {
           for (Path p : sr.getData()) {
             Binary fileBinary = (Binary) FSUtils.convertPathToResource(p.getParent(), p);

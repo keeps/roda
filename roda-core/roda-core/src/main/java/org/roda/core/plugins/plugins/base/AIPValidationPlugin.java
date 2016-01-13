@@ -14,11 +14,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.common.ValidationUtils;
+import org.roda.core.data.Attribute;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
+import org.roda.core.data.ReportItem;
 import org.roda.core.data.common.InvalidParameterException;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.EventPreservationObject;
+import org.roda.core.data.v2.JobReport.PluginState;
 import org.roda.core.data.v2.PluginType;
 import org.roda.core.index.IndexService;
 import org.roda.core.metadata.v2.premis.PremisMetadataException;
@@ -26,11 +30,12 @@ import org.roda.core.model.AIP;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.plugins.PluginUtils;
+import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+// FIXME rename this to SIPValidationPlugin
 public class AIPValidationPlugin implements Plugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(AIPValidationPlugin.class);
 
@@ -48,12 +53,12 @@ public class AIPValidationPlugin implements Plugin<AIP> {
 
   @Override
   public String getName() {
-    return "AIP Validation action";
+    return "SIP syntax check";
   }
 
   @Override
   public String getDescription() {
-    return "Validates the XML files in the AIP";
+    return "Check SIP coherence. Verifies the validity and completeness of a SIP.";
   }
 
   @Override
@@ -81,24 +86,47 @@ public class AIPValidationPlugin implements Plugin<AIP> {
     throws PluginException {
     List<String> validAIP = new ArrayList<String>();
     List<String> invalidAIP = new ArrayList<String>();
+
+    Report report = PluginHelper.createPluginReport(this);
+    PluginState state;
+
     for (AIP aip : list) {
+      ReportItem reportItem = PluginHelper.createPluginReportItem(this, "SIP syntax check", aip.getId(), null);
+
       try {
-        LOGGER.debug("Validating AIP " + aip.getId());
+        LOGGER.debug("Validating AIP {}", aip.getId());
         boolean descriptiveValid = ValidationUtils.isAIPDescriptiveMetadataValid(model, aip.getId(), true);
         boolean preservationValid = ValidationUtils.isAIPPreservationMetadataValid(model, aip.getId(), true);
         if (descriptiveValid && preservationValid) {
           validAIP.add(aip.getId());
-          LOGGER.debug("Done with validating AIP " + aip.getId() + ": valid!");
+          LOGGER.debug("Done with validating AIP {}: valid!", aip.getId());
+
+          state = PluginState.OK;
+          reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
         } else {
           invalidAIP.add(aip.getId());
-          LOGGER.debug("Done with validating AIP " + aip.getId() + ": invalid!");
+          LOGGER.debug("Done with validating AIP {}: invalid!", aip.getId());
+
+          state = PluginState.ERROR;
+          reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
         }
+
         createEvent(aip, model, descriptiveValid, preservationValid);
-      } catch (RODAException mse) {
-        LOGGER.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage(), mse);
+
+      } catch (RODAException e) {
+        LOGGER.error("Error processing AIP " + aip.getId(), e);
+        state = PluginState.ERROR;
+        reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(),
+          new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()),
+          new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
       }
+
+      report.addItem(reportItem);
+
+      PluginHelper.updateJobReport(model, index, this, reportItem, state, PluginHelper.getJobId(parameters),
+        aip.getId());
     }
-    return null;
+    return report;
   }
 
   // TODO EVENT MUST BE "AIP EVENT" INSTEAD OF "REPRESENTATION EVENT"
@@ -109,7 +137,7 @@ public class AIPValidationPlugin implements Plugin<AIP> {
       boolean success = descriptiveValid && preservationValid;
 
       for (String representationID : aip.getRepresentationIds()) {
-        PluginUtils.createPluginEvent(aip.getId(), representationID, model,
+        PluginHelper.createPluginEvent(aip.getId(), representationID, model,
           EventPreservationObject.PRESERVATION_EVENT_TYPE_FORMAT_VALIDATION, "The AIP format was validated.",
           EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_INGEST_TASK, "AGENT ID",
           Arrays.asList(representationID), success ? "success" : "error", "Report", "");

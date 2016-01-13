@@ -20,10 +20,7 @@ import org.roda.core.data.Report;
 import org.roda.core.data.ReportItem;
 import org.roda.core.data.common.InvalidParameterException;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.EventPreservationObject;
 import org.roda.core.data.v2.JobReport.PluginState;
 import org.roda.core.data.v2.PluginType;
@@ -34,7 +31,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.plugins.PluginUtils;
+import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StoragePath;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
@@ -88,11 +85,11 @@ public class AutoAcceptSIPPlugin implements Plugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
-    Report report = PluginUtils.createPluginReport(this);
+    Report report = PluginHelper.createPluginReport(this);
     PluginState state;
 
     for (AIP aip : list) {
-      ReportItem reportItem = PluginUtils.createPluginReportItem(this, "Auto accept SIP", aip.getId(), null);
+      ReportItem reportItem = PluginHelper.createPluginReportItem(this, "Auto accept SIP", aip.getId(), null);
       String outcomeDetail = "";
       try {
         LOGGER.debug("Auto accepting AIP " + aip.getId());
@@ -115,12 +112,9 @@ public class AutoAcceptSIPPlugin implements Plugin<AIP> {
 
       createEvent(outcomeDetail, state, aip, model);
       report.addItem(reportItem);
-      try {
-        PluginUtils.updateJobReport(model, index, this, reportItem, state, PluginUtils.getJobId(parameters),
-          aip.getId());
-      } catch (NotFoundException | GenericException | RequestNotValidException e) {
-        LOGGER.error("Error updating job report", e);
-      }
+
+      PluginHelper.updateJobReport(model, index, this, reportItem, state, PluginHelper.getJobId(parameters),
+        aip.getId());
     }
 
     return report;
@@ -133,7 +127,7 @@ public class AutoAcceptSIPPlugin implements Plugin<AIP> {
       boolean success = (state == PluginState.OK);
 
       for (String representationID : aip.getRepresentationIds()) {
-        PluginUtils.createPluginEvent(aip.getId(), representationID, model,
+        PluginHelper.createPluginEvent(aip.getId(), representationID, model,
           EventPreservationObject.PRESERVATION_EVENT_TYPE_INGESTION, "The SIP was successfully accepted.",
           EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_INGEST_TASK, "AGENT ID",
           Arrays.asList(representationID), success ? "success" : "error", success ? "" : "Error", outcomeDetail);

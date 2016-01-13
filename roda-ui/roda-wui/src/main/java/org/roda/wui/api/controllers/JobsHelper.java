@@ -78,7 +78,7 @@ public class JobsHelper {
     RodaCoreFactory.getModelService().createJob(updatedJob, null);
 
     // FIXME should we verify if the job was created with success???
-
+    // FIXME correctly handle future returned by Patterns.ask
     Patterns.ask(RodaCoreFactory.getPluginOrchestrator().getCoordinator(), updatedJob, 5);
 
     return updatedJob;

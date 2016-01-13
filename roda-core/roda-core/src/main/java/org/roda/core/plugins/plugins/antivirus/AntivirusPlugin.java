@@ -37,7 +37,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.plugins.PluginUtils;
+import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StoragePath;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
@@ -118,12 +118,12 @@ public class AntivirusPlugin implements Plugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
-    Report report = PluginUtils.createPluginReport(this);
+    Report report = PluginHelper.createPluginReport(this);
     Path tempDirectory = null;
     PluginState state;
 
     for (AIP aip : list) {
-      ReportItem reportItem = PluginUtils.createPluginReportItem(this, "Check for virus", aip.getId(), null);
+      ReportItem reportItem = PluginHelper.createPluginReportItem(this, "Check for virus", aip.getId(), null);
 
       VirusCheckResult virusCheckResult = null;
       Exception exception = null;
@@ -135,16 +135,20 @@ public class AntivirusPlugin implements Plugin<AIP> {
         tempStorage.copy(storage, aipPath, aipPath);
 
         virusCheckResult = getAntiVirus().checkForVirus(tempDirectory);
+
         state = virusCheckResult.isClean() ? PluginState.OK : PluginState.ERROR;
-        reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()))
-          .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, virusCheckResult.getReport()));
+        reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(),
+          new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()),
+          new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, virusCheckResult.getReport()));
+
         LOGGER.debug("Done with checking if AIP " + aip.getId() + " has virus. Is clean of virus: "
           + virusCheckResult.isClean() + ". Virus check report: " + virusCheckResult.getReport());
       } catch (RuntimeException | IOException | RequestNotValidException | AlreadyExistsException | GenericException
         | NotFoundException | AuthorizationDeniedException e) {
         state = PluginState.ERROR;
-        reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()))
-          .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
+        reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(),
+          new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()),
+          new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
 
         exception = e;
         LOGGER.error("Error processing AIP " + aip.getId(), e);
@@ -161,12 +165,8 @@ public class AntivirusPlugin implements Plugin<AIP> {
       createEvent(virusCheckResult, exception, state, aip, model);
       report.addItem(reportItem);
 
-      try {
-        PluginUtils.updateJobReport(model, index, this, reportItem, state, PluginUtils.getJobId(parameters),
-          aip.getId());
-      } catch (NotFoundException | GenericException | RequestNotValidException e) {
-        LOGGER.error("Error updating job report", e);
-      }
+      PluginHelper.updateJobReport(model, index, this, reportItem, state, PluginHelper.getJobId(parameters),
+        aip.getId());
     }
 
     return report;
@@ -179,7 +179,7 @@ public class AntivirusPlugin implements Plugin<AIP> {
       boolean success = (virusCheckResult != null) && virusCheckResult.isClean();
 
       for (String representationID : aip.getRepresentationIds()) {
-        PluginUtils.createPluginEvent(aip.getId(), representationID, model,
+        PluginHelper.createPluginEvent(aip.getId(), representationID, model,
           EventPreservationObject.PRESERVATION_EVENT_TYPE_ANTIVIRUS_CHECK,
           "All the files from the SIP were verified against an antivirus.",
           EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_INGEST_TASK, "AGENT ID",

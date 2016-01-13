@@ -21,14 +21,15 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.model.AIP;
 import org.roda.core.model.ModelService;
+import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.fs.FSUtils;
@@ -53,11 +54,11 @@ public class BagitToAIPPluginUtils {
     Resource descriptiveMetadataResource = FSUtils.convertPathToResource(metadataFile.getParent(), metadataFile);
 
     Map<String, Set<String>> metadata = new HashMap<String, Set<String>>();
-    if (bag.getBagInfoTxt().get("parent") != null) {
+    String parentFromBagit = bagInfoTxt.get("parent");
+    if (parentFromBagit != null) {
       try {
-        model.retrieveAIP(bag.getBagInfoTxt().get("parent"));
-        metadata.put(RodaConstants.STORAGE_META_PARENT_ID,
-          new HashSet<String>(Arrays.asList(bag.getBagInfoTxt().get("parent"))));
+        model.retrieveAIP(parentFromBagit);
+        metadata.put(RodaConstants.STORAGE_META_PARENT_ID, new HashSet<String>(Arrays.asList(parentFromBagit)));
       } catch (RODAException mse) {
         LOGGER.error("Error retrieving AIP", mse);
       }
@@ -66,7 +67,7 @@ public class BagitToAIPPluginUtils {
     aip = model.createAIP(metadata, false, true);
 
     String representationID = "representation";
-    IngestUtils.createDirectories(model, aip.getId(), representationID);
+    PluginHelper.createDirectories(model, aip.getId(), representationID);
 
     model.createDescriptiveMetadata(aip.getId(), metadataFilename, (Binary) descriptiveMetadataResource, "metadata");
 

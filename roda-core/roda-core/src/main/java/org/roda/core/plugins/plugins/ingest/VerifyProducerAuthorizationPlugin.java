@@ -17,9 +17,6 @@ import org.roda.core.data.Report;
 import org.roda.core.data.ReportItem;
 import org.roda.core.data.common.InvalidParameterException;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.JobReport.PluginState;
 import org.roda.core.data.v2.PluginType;
 import org.roda.core.index.IndexService;
@@ -27,7 +24,7 @@ import org.roda.core.model.AIP;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.plugins.PluginUtils;
+import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,11 +77,11 @@ public class VerifyProducerAuthorizationPlugin implements Plugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
-    Report report = PluginUtils.createPluginReport(this);
+    Report report = PluginHelper.createPluginReport(this);
     PluginState state;
 
     for (AIP aip : list) {
-      ReportItem reportItem = PluginUtils.createPluginReportItem(this, "Check producer authorization", aip.getId(),
+      ReportItem reportItem = PluginHelper.createPluginReportItem(this, "Check producer authorization", aip.getId(),
         null);
 
       LOGGER.debug("Checking producer authorization for AIP " + aip.getId());
@@ -97,12 +94,9 @@ public class VerifyProducerAuthorizationPlugin implements Plugin<AIP> {
       LOGGER.debug("Done with checking producer authorization for AIP " + aip.getId());
 
       report.addItem(reportItem);
-      try {
-        PluginUtils.updateJobReport(model, index, this, reportItem, state, PluginUtils.getJobId(parameters),
-          aip.getId());
-      } catch (NotFoundException | GenericException | RequestNotValidException e) {
-        LOGGER.error("Error updating job report", e);
-      }
+
+      PluginHelper.updateJobReport(model, index, this, reportItem, state, PluginHelper.getJobId(parameters),
+        aip.getId());
     }
 
     return report;
